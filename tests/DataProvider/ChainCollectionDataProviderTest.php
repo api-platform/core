@@ -27,7 +27,7 @@ use PHPUnit\Framework\TestCase;
  */
 class ChainCollectionDataProviderTest extends TestCase
 {
-    public function testGetCollection()
+    public function testGetCollection(): void
     {
         $dummy = new Dummy();
         $dummy->setName('Rosa');
@@ -61,7 +61,7 @@ class ChainCollectionDataProviderTest extends TestCase
         );
     }
 
-    public function testGetCollectionNotSupported()
+    public function testGetCollectionNotSupported(): void
     {
         $firstDataProvider = $this->prophesize(CollectionDataProviderInterface::class);
         $firstDataProvider->willImplement(RestrictedDataProviderInterface::class);
@@ -77,7 +77,7 @@ class ChainCollectionDataProviderTest extends TestCase
      * @group legacy
      * @expectedDeprecation Throwing a "ApiPlatform\Core\Exception\ResourceClassNotSupportedException" in a data provider is deprecated in favor of implementing "ApiPlatform\Core\DataProvider\RestrictedDataProviderInterface"
      */
-    public function testLegacyGetCollection()
+    public function testLegacyGetCollection(): void
     {
         $dummy = new Dummy();
         $dummy->setName('Rosa');
@@ -102,7 +102,7 @@ class ChainCollectionDataProviderTest extends TestCase
      * @group legacy
      * @expectedDeprecation Throwing a "ApiPlatform\Core\Exception\ResourceClassNotSupportedException" in a data provider is deprecated in favor of implementing "ApiPlatform\Core\DataProvider\RestrictedDataProviderInterface"
      */
-    public function testLegacyGetCollectionExceptions()
+    public function testLegacyGetCollectionExceptions(): void
     {
         $firstDataProvider = $this->prophesize(CollectionDataProviderInterface::class);
         $firstDataProvider->getCollection('notfound', 'op', [])->willThrow(ResourceClassNotSupportedException::class);
@@ -113,7 +113,7 @@ class ChainCollectionDataProviderTest extends TestCase
         $this->assertEmpty($collection);
     }
 
-    public function testGetCollectionWithEmptyDataProviders()
+    public function testGetCollectionWithEmptyDataProviders(): void
     {
         $collection = (new ChainCollectionDataProvider([]))->getCollection(Dummy::class);
 

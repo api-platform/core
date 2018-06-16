@@ -21,7 +21,7 @@ use PHPUnit\Framework\TestCase;
  */
 class XmlExtractorTest extends TestCase
 {
-    public function testEmptyOperation()
+    public function testEmptyOperation(): void
     {
         $resources = (new XmlExtractor([__DIR__.'/../../Fixtures/FileConfigurations/empty-operation.xml']))->getResources();
 

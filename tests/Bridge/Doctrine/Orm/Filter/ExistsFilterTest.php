@@ -24,7 +24,7 @@ class ExistsFilterTest extends DoctrineOrmFilterTestCase
 {
     protected $filterClass = ExistsFilter::class;
 
-    public function testGetDescription()
+    public function testGetDescription(): void
     {
         $filter = new ExistsFilter($this->managerRegistry, null, null, ['name' => null, 'description' => null]);
 
@@ -37,7 +37,7 @@ class ExistsFilterTest extends DoctrineOrmFilterTestCase
         ], $filter->getDescription($this->resourceClass));
     }
 
-    public function testGetDescriptionDefaultFields()
+    public function testGetDescriptionDefaultFields(): void
     {
         $filter = new ExistsFilter($this->managerRegistry);
 

@@ -155,7 +155,7 @@ final class ApiLoader extends Loader
      *
      * @param RouteCollection $routeCollection
      */
-    private function loadExternalFiles(RouteCollection $routeCollection)
+    private function loadExternalFiles(RouteCollection $routeCollection): void
     {
         if ($this->entrypointEnabled) {
             $routeCollection->addCollection($this->fileLoader->load('api.xml'));
@@ -181,7 +181,7 @@ final class ApiLoader extends Loader
      *
      * @throws RuntimeException
      */
-    private function addRoute(RouteCollection $routeCollection, string $resourceClass, string $operationName, array $operation, ResourceMetadata $resourceMetadata, string $operationType)
+    private function addRoute(RouteCollection $routeCollection, string $resourceClass, string $operationName, array $operation, ResourceMetadata $resourceMetadata, string $operationType): void
     {
         $resourceShortName = $resourceMetadata->getShortName();
 

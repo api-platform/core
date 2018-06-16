@@ -90,7 +90,7 @@ final class FeatureContext implements Context, SnippetAcceptingContext
      *
      * @AfterStep
      */
-    public function removeAcceptHeaderAfterRequest(AfterStepScope $event)
+    public function removeAcceptHeaderAfterRequest(AfterStepScope $event): void
     {
         if (preg_match('/^I send a "[A-Z]+" request to ".+"/', $event->getStep()->getText())) {
             $this->request->setHttpHeader('Accept', null);
@@ -102,7 +102,7 @@ final class FeatureContext implements Context, SnippetAcceptingContext
      *
      * @BeforeScenario
      */
-    public function removeAcceptHeaderBeforeScenario()
+    public function removeAcceptHeaderBeforeScenario(): void
     {
         $this->request->setHttpHeader('Accept', null);
     }
@@ -110,7 +110,7 @@ final class FeatureContext implements Context, SnippetAcceptingContext
     /**
      * @BeforeScenario @createSchema
      */
-    public function createDatabase()
+    public function createDatabase(): void
     {
         $this->schemaTool->dropSchema($this->classes);
         $this->doctrine->getManager()->clear();
@@ -120,7 +120,7 @@ final class FeatureContext implements Context, SnippetAcceptingContext
     /**
      * @Given there are :nb dummy objects
      */
-    public function thereAreDummyObjects(int $nb)
+    public function thereAreDummyObjects(int $nb): void
     {
         $descriptions = ['Smart dummy.', 'Not so smart dummy.'];
 
@@ -140,7 +140,7 @@ final class FeatureContext implements Context, SnippetAcceptingContext
     /**
      * @Given there are :nb foo objects with fake names
      */
-    public function thereAreFooObjectsWithFakeNames(int $nb)
+    public function thereAreFooObjectsWithFakeNames(int $nb): void
     {
         $names = ['Hawsepipe', 'Sthenelus', 'Ephesian', 'Separativeness', 'Balbo'];
         $bars = ['Lorem', 'Ipsum', 'Dolor', 'Sit', 'Amet'];
@@ -159,7 +159,7 @@ final class FeatureContext implements Context, SnippetAcceptingContext
     /**
      * @Given there are :nb fooDummy objects with fake names
      */
-    public function thereAreFooDummyObjectsWithFakeNames($nb)
+    public function thereAreFooDummyObjectsWithFakeNames($nb): void
     {
         $names = ['Hawsepipe', 'Ephesian', 'Sthenelus', 'Separativeness', 'Balbo'];
         $dummies = ['Lorem', 'Ipsum', 'Dolor', 'Sit', 'Amet'];
@@ -181,7 +181,7 @@ final class FeatureContext implements Context, SnippetAcceptingContext
     /**
      * @Given there are :nb dummy group objects
      */
-    public function thereAreDummyGroupObjects(int $nb)
+    public function thereAreDummyGroupObjects(int $nb): void
     {
         for ($i = 1; $i <= $nb; ++$i) {
             $dummyGroup = new DummyGroup();
@@ -199,7 +199,7 @@ final class FeatureContext implements Context, SnippetAcceptingContext
     /**
      * @Given there are :nb dummy property objects
      */
-    public function thereAreDummyPropertyObjects(int $nb)
+    public function thereAreDummyPropertyObjects(int $nb): void
     {
         for ($i = 1; $i <= $nb; ++$i) {
             $dummyProperty = new DummyProperty();
@@ -221,7 +221,7 @@ final class FeatureContext implements Context, SnippetAcceptingContext
     /**
      * @Given there are :nb dummy property objects with :nb2 groups
      */
-    public function thereAreDummyPropertyObjectsWithGroups(int $nb, int $nb2)
+    public function thereAreDummyPropertyObjectsWithGroups(int $nb, int $nb2): void
     {
         for ($i = 1; $i <= $nb; ++$i) {
             $dummyProperty = new DummyProperty();
@@ -254,7 +254,7 @@ final class FeatureContext implements Context, SnippetAcceptingContext
     /**
      * @Given there are :nb embedded dummy objects
      */
-    public function thereAreEmbeddedDummyObjects(int $nb)
+    public function thereAreEmbeddedDummyObjects(int $nb): void
     {
         for ($i = 1; $i <= $nb; ++$i) {
             $dummy = new EmbeddedDummy();
@@ -273,7 +273,7 @@ final class FeatureContext implements Context, SnippetAcceptingContext
     /**
      * @Given there are :nb dummy objects with relatedDummy
      */
-    public function thereAreDummyObjectsWithRelatedDummy(int $nb)
+    public function thereAreDummyObjectsWithRelatedDummy(int $nb): void
     {
         for ($i = 1; $i <= $nb; ++$i) {
             $relatedDummy = new RelatedDummy();
@@ -294,7 +294,7 @@ final class FeatureContext implements Context, SnippetAcceptingContext
     /**
      * @Given there are :nb dummy objects with JSON and array data
      */
-    public function thereAreDummyObjectsWithJsonData(int $nb)
+    public function thereAreDummyObjectsWithJsonData(int $nb): void
     {
         for ($i = 1; $i <= $nb; ++$i) {
             $dummy = new Dummy();
@@ -313,7 +313,7 @@ final class FeatureContext implements Context, SnippetAcceptingContext
      * @Given there are :nb dummy objects with relatedDummy and its thirdLevel
      * @Given there is :nb dummy object with relatedDummy and its thirdLevel
      */
-    public function thereAreDummyObjectsWithRelatedDummyAndItsThirdLevel(int $nb)
+    public function thereAreDummyObjectsWithRelatedDummyAndItsThirdLevel(int $nb): void
     {
         for ($i = 1; $i <= $nb; ++$i) {
             $thirdLevel = new ThirdLevel();
@@ -338,7 +338,7 @@ final class FeatureContext implements Context, SnippetAcceptingContext
     /**
      * @Given there are :nb dummy objects with embeddedDummy
      */
-    public function thereAreDummyObjectsWithEmbeddedDummy(int $nb)
+    public function thereAreDummyObjectsWithEmbeddedDummy(int $nb): void
     {
         for ($i = 1; $i <= $nb; ++$i) {
             $embeddableDummy = new EmbeddableDummy();
@@ -357,7 +357,7 @@ final class FeatureContext implements Context, SnippetAcceptingContext
     /**
      * @Given there are :nb dummy objects having each :nbrelated relatedDummies
      */
-    public function thereAreDummyObjectsWithRelatedDummies(int $nb, int $nbrelated)
+    public function thereAreDummyObjectsWithRelatedDummies(int $nb, int $nbrelated): void
     {
         for ($i = 1; $i <= $nb; ++$i) {
             $dummy = new Dummy();
@@ -383,7 +383,7 @@ final class FeatureContext implements Context, SnippetAcceptingContext
      * @Given there are :nb dummy objects with dummyDate
      * @Given there is :nb dummy object with dummyDate
      */
-    public function thereAreDummyObjectsWithDummyDate(int $nb)
+    public function thereAreDummyObjectsWithDummyDate(int $nb): void
     {
         $descriptions = ['Smart dummy.', 'Not so smart dummy.'];
 
@@ -409,7 +409,7 @@ final class FeatureContext implements Context, SnippetAcceptingContext
     /**
      * @Given there are :nb dummy objects with dummyDate and dummyBoolean :bool
      */
-    public function thereAreDummyObjectsWithDummyDateAndDummyBoolean(int $nb, string $bool)
+    public function thereAreDummyObjectsWithDummyDateAndDummyBoolean(int $nb, string $bool): void
     {
         $descriptions = ['Smart dummy.', 'Not so smart dummy.'];
 
@@ -445,7 +445,7 @@ final class FeatureContext implements Context, SnippetAcceptingContext
     /**
      * @Given there are :nb dummy objects with dummyDate and relatedDummy
      */
-    public function thereAreDummyObjectsWithDummyDateAndRelatedDummy(int $nb)
+    public function thereAreDummyObjectsWithDummyDateAndRelatedDummy(int $nb): void
     {
         for ($i = 1; $i <= $nb; ++$i) {
             $date = new \DateTime(sprintf('2015-04-%d', $i), new \DateTimeZone('UTC'));
@@ -473,7 +473,7 @@ final class FeatureContext implements Context, SnippetAcceptingContext
     /**
      * @Given there are :nb embedded dummy objects with dummyDate and embeddedDummy
      */
-    public function thereAreDummyObjectsWithDummyDateAndEmbeddedDummy(int $nb)
+    public function thereAreDummyObjectsWithDummyDateAndEmbeddedDummy(int $nb): void
     {
         for ($i = 1; $i <= $nb; ++$i) {
             $date = new \DateTime(sprintf('2015-04-%d', $i), new \DateTimeZone('UTC'));
@@ -499,7 +499,7 @@ final class FeatureContext implements Context, SnippetAcceptingContext
     /**
      * @Given there are :nb dummy objects with dummyPrice
      */
-    public function thereAreDummyObjectsWithDummyPrice(int $nb)
+    public function thereAreDummyObjectsWithDummyPrice(int $nb): void
     {
         $descriptions = ['Smart dummy.', 'Not so smart dummy.'];
         $prices = ['9.99', '12.99', '15.99', '19.99'];
@@ -521,7 +521,7 @@ final class FeatureContext implements Context, SnippetAcceptingContext
      * @Given there are :nb dummy objects with dummyBoolean :bool
      * @Given there is :nb dummy object with dummyBoolean :bool
      */
-    public function thereAreDummyObjectsWithDummyBoolean(int $nb, string $bool)
+    public function thereAreDummyObjectsWithDummyBoolean(int $nb, string $bool): void
     {
         if (\in_array($bool, ['true', '1', 1], true)) {
             $bool = true;
@@ -549,7 +549,7 @@ final class FeatureContext implements Context, SnippetAcceptingContext
     /**
      * @Given there are :nb embedded dummy objects with embeddedDummy.dummyBoolean :bool
      */
-    public function thereAreDummyObjectsWithEmbeddedDummyBoolean(int $nb, string $bool)
+    public function thereAreDummyObjectsWithEmbeddedDummyBoolean(int $nb, string $bool): void
     {
         if (\in_array($bool, ['true', '1', 1], true)) {
             $bool = true;
@@ -576,7 +576,7 @@ final class FeatureContext implements Context, SnippetAcceptingContext
     /**
      * @Given there are :nb embedded dummy objects with relatedDummy.embeddedDummy.dummyBoolean :bool
      */
-    public function thereAreDummyObjectsWithRelationEmbeddedDummyBoolean(int $nb, string $bool)
+    public function thereAreDummyObjectsWithRelationEmbeddedDummyBoolean(int $nb, string $bool): void
     {
         if (\in_array($bool, ['true', '1', 1], true)) {
             $bool = true;
@@ -609,7 +609,7 @@ final class FeatureContext implements Context, SnippetAcceptingContext
     /**
      * @Given there are :nb SecuredDummy objects
      */
-    public function thereAreSecuredDummyObjects(int $nb)
+    public function thereAreSecuredDummyObjects(int $nb): void
     {
         for ($i = 1; $i <= $nb; ++$i) {
             $securedDummy = new SecuredDummy();
@@ -626,7 +626,7 @@ final class FeatureContext implements Context, SnippetAcceptingContext
     /**
      * @Given there is a RelationEmbedder object
      */
-    public function thereIsARelationEmbedderObject()
+    public function thereIsARelationEmbedderObject(): void
     {
         $relationEmbedder = new RelationEmbedder();
 
@@ -637,7 +637,7 @@ final class FeatureContext implements Context, SnippetAcceptingContext
     /**
      * @Given there is a Dummy Object mapped by UUID
      */
-    public function thereIsADummyObjectMappedByUUID()
+    public function thereIsADummyObjectMappedByUUID(): void
     {
         $dummy = new UuidIdentifierDummy();
         $dummy->setName('My Dummy');
@@ -650,7 +650,7 @@ final class FeatureContext implements Context, SnippetAcceptingContext
     /**
      * @Given there are Composite identifier objects
      */
-    public function thereIsACompositeIdentifierObject()
+    public function thereIsACompositeIdentifierObject(): void
     {
         $item = new CompositeItem();
         $item->setField1('foobar');
@@ -679,7 +679,7 @@ final class FeatureContext implements Context, SnippetAcceptingContext
     /**
      * @Given there are composite primitive identifiers objects
      */
-    public function thereAreCompositePrimitiveIdentifiersObjects()
+    public function thereAreCompositePrimitiveIdentifiersObjects(): void
     {
         $foo = new CompositePrimitiveItem('Foo', 2016);
         $foo->setDescription('This is foo.');
@@ -696,7 +696,7 @@ final class FeatureContext implements Context, SnippetAcceptingContext
     /**
      * @Given there is a FileConfigDummy object
      */
-    public function thereIsAFileConfigDummyObject()
+    public function thereIsAFileConfigDummyObject(): void
     {
         $fileConfigDummy = new FileConfigDummy();
         $fileConfigDummy->setName('ConfigDummy');
@@ -709,7 +709,7 @@ final class FeatureContext implements Context, SnippetAcceptingContext
     /**
      * @Given there is a DummyCar entity with related colors
      */
-    public function thereIsAFooEntityWithRelatedBars()
+    public function thereIsAFooEntityWithRelatedBars(): void
     {
         $foo = new DummyCar();
         $foo->setName('mustli');
@@ -736,7 +736,7 @@ final class FeatureContext implements Context, SnippetAcceptingContext
     /**
      * @Given there is a RelatedDummy with :nb friends
      */
-    public function thereIsARelatedDummyWithFriends(int $nb)
+    public function thereIsARelatedDummyWithFriends(int $nb): void
     {
         $relatedDummy = new RelatedDummy();
         $relatedDummy->setName('RelatedDummy with friends');
@@ -772,7 +772,7 @@ final class FeatureContext implements Context, SnippetAcceptingContext
     /**
      * @Given there is an answer :answer to the question :question
      */
-    public function thereIsAnAnswerToTheQuestion(string $a, string $q)
+    public function thereIsAnAnswerToTheQuestion(string $a, string $q): void
     {
         $answer = new Answer();
         $answer->setContent($a);
@@ -791,7 +791,7 @@ final class FeatureContext implements Context, SnippetAcceptingContext
     /**
      * @Given there are :nb nodes in a container :uuid
      */
-    public function thereAreNodesInAContainer(int $nb, string $uuid)
+    public function thereAreNodesInAContainer(int $nb, string $uuid): void
     {
         $container = new Container();
         $container->setId($uuid);
@@ -810,7 +810,7 @@ final class FeatureContext implements Context, SnippetAcceptingContext
     /**
      * @Then the password :password for user :user should be hashed
      */
-    public function thePasswordForUserShouldBeHashed(string $password, string $user)
+    public function thePasswordForUserShouldBeHashed(string $password, string $user): void
     {
         $user = $this->doctrine->getRepository(User::class)->find($user);
 
@@ -822,7 +822,7 @@ final class FeatureContext implements Context, SnippetAcceptingContext
     /**
      * @Given I have a product with offers
      */
-    public function createProductWithOffers()
+    public function createProductWithOffers(): void
     {
         $offer = new DummyOffer();
         $offer->setValue(2);
@@ -848,7 +848,7 @@ final class FeatureContext implements Context, SnippetAcceptingContext
     /**
      * @Given there are people having pets
      */
-    public function createPeopleWithPets()
+    public function createPeopleWithPets(): void
     {
         $personToPet = new PersonToPet();
 
@@ -877,7 +877,7 @@ final class FeatureContext implements Context, SnippetAcceptingContext
      * @Given there are :nb dummydate objects with dummyDate
      * @Given there is :nb dummydate object with dummyDate
      */
-    public function thereAreDummyDateObjectsWithDummyDate(int $nb)
+    public function thereAreDummyDateObjectsWithDummyDate(int $nb): void
     {
         for ($i = 1; $i <= $nb; ++$i) {
             $date = new \DateTime(sprintf('2015-04-%d', $i), new \DateTimeZone('UTC'));
@@ -894,7 +894,7 @@ final class FeatureContext implements Context, SnippetAcceptingContext
     /**
      * @Given there are :nb dummyimmutabledate objects with dummyDate
      */
-    public function thereAreDummyImmutableDateObjectsWithDummyDate(int $nb)
+    public function thereAreDummyImmutableDateObjectsWithDummyDate(int $nb): void
     {
         for ($i = 1; $i <= $nb; ++$i) {
             $date = new \DateTimeImmutable(sprintf('2015-04-%d', $i), new \DateTimeZone('UTC'));
@@ -910,7 +910,7 @@ final class FeatureContext implements Context, SnippetAcceptingContext
     /**
      * @Given there is a ramsey identified resource with uuid :uuid
      */
-    public function thereIsARamseyIdentifiedResource(string $uuid)
+    public function thereIsARamseyIdentifiedResource(string $uuid): void
     {
         $dummy = new RamseyUuidDummy();
         $dummy->setId($uuid);
@@ -922,7 +922,7 @@ final class FeatureContext implements Context, SnippetAcceptingContext
     /**
      * @Given there is a dummy object with a fourth level relation
      */
-    public function thereIsADummyObjectWithAFourthLevelRelation()
+    public function thereIsADummyObjectWithAFourthLevelRelation(): void
     {
         $fourthLevel = new FourthLevel();
         $fourthLevel->setLevel(4);

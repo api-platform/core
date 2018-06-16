@@ -27,7 +27,7 @@ use Psr\Cache\CacheItemPoolInterface;
  */
 class CachedResourceMetadataFactoryTest extends TestCase
 {
-    public function testCreateWithItemHit()
+    public function testCreateWithItemHit(): void
     {
         $cacheItem = $this->prophesize(CacheItemInterface::class);
         $cacheItem->isHit()->willReturn(true)->shouldBeCalled();
@@ -45,7 +45,7 @@ class CachedResourceMetadataFactoryTest extends TestCase
         $this->assertEquals(new ResourceMetadata(null, 'Dummy.'), $resultedResourceMetadata);
     }
 
-    public function testCreateWithItemNotHit()
+    public function testCreateWithItemNotHit(): void
     {
         $propertyMetadata = new ResourceMetadata(null, 'Dummy.');
 
@@ -70,7 +70,7 @@ class CachedResourceMetadataFactoryTest extends TestCase
         $this->assertEquals($expectedResult, $cachedResourceMetadataFactory->create(Dummy::class), 'Trigger the local cache');
     }
 
-    public function testCreateWithGetCacheItemThrowsCacheException()
+    public function testCreateWithGetCacheItemThrowsCacheException(): void
     {
         $decoratedResourceMetadataFactory = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $decoratedResourceMetadataFactory->create(Dummy::class)->willReturn(new ResourceMetadata(null, 'Dummy.'))->shouldBeCalled();

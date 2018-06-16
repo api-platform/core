@@ -56,7 +56,7 @@ class JsonldContextDummy
         return $this->id;
     }
 
-    public function setPerson($person)
+    public function setPerson($person): void
     {
         $this->person = $person;
     }

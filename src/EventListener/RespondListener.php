@@ -33,7 +33,7 @@ final class RespondListener
      *
      * @param GetResponseForControllerResultEvent $event
      */
-    public function onKernelView(GetResponseForControllerResultEvent $event)
+    public function onKernelView(GetResponseForControllerResultEvent $event): void
     {
         $controllerResult = $event->getControllerResult();
         $request = $event->getRequest();

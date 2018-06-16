@@ -28,7 +28,7 @@ use PHPUnit\Framework\TestCase;
  */
 class DoctrineOrmPropertyMetadataFactoryTest extends TestCase
 {
-    public function testCreateNoManager()
+    public function testCreateNoManager(): void
     {
         $propertyMetadata = new PropertyMetadata();
         $propertyMetadataFactory = $this->prophesize(PropertyMetadataFactoryInterface::class);
@@ -42,7 +42,7 @@ class DoctrineOrmPropertyMetadataFactoryTest extends TestCase
         $this->assertEquals($doctrineOrmPropertyMetadataFactory->create(Dummy::class, 'id', []), $propertyMetadata);
     }
 
-    public function testCreateNoClassMetadata()
+    public function testCreateNoClassMetadata(): void
     {
         $propertyMetadata = new PropertyMetadata();
         $propertyMetadataFactory = $this->prophesize(PropertyMetadataFactoryInterface::class);
@@ -59,7 +59,7 @@ class DoctrineOrmPropertyMetadataFactoryTest extends TestCase
         $this->assertEquals($doctrineOrmPropertyMetadataFactory->create(Dummy::class, 'id', []), $propertyMetadata);
     }
 
-    public function testCreateIsIdentifier()
+    public function testCreateIsIdentifier(): void
     {
         $propertyMetadata = new PropertyMetadata();
         $propertyMetadata = $propertyMetadata->withIdentifier(true);
@@ -80,7 +80,7 @@ class DoctrineOrmPropertyMetadataFactoryTest extends TestCase
         $this->assertEquals($doctrineOrmPropertyMetadataFactory->create(Dummy::class, 'id', []), $propertyMetadata);
     }
 
-    public function testCreateIsWritable()
+    public function testCreateIsWritable(): void
     {
         $propertyMetadata = new PropertyMetadata();
         $propertyMetadata = $propertyMetadata->withWritable(false);
@@ -105,7 +105,7 @@ class DoctrineOrmPropertyMetadataFactoryTest extends TestCase
         $this->assertEquals($doctrinePropertyMetadata->isWritable(), false);
     }
 
-    public function testCreateClassMetadataInfo()
+    public function testCreateClassMetadataInfo(): void
     {
         $propertyMetadata = new PropertyMetadata();
 
@@ -130,7 +130,7 @@ class DoctrineOrmPropertyMetadataFactoryTest extends TestCase
         $this->assertEquals($doctrinePropertyMetadata->isWritable(), true);
     }
 
-    public function testCreateClassMetadata()
+    public function testCreateClassMetadata(): void
     {
         $propertyMetadata = new PropertyMetadata();
 

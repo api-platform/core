@@ -54,7 +54,7 @@ final class ReadListener
      *
      * @throws NotFoundHttpException
      */
-    public function onKernelRequest(GetResponseEvent $event)
+    public function onKernelRequest(GetResponseEvent $event): void
     {
         $request = $event->getRequest();
         if (

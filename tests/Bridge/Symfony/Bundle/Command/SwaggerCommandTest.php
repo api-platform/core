@@ -29,7 +29,7 @@ class SwaggerCommandTest extends KernelTestCase
      */
     private $tester;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         self::bootKernel();
 
@@ -40,14 +40,14 @@ class SwaggerCommandTest extends KernelTestCase
         $this->tester = new ApplicationTester($application);
     }
 
-    public function testExecute()
+    public function testExecute(): void
     {
         $this->tester->run(['command' => 'api:swagger:export']);
 
         $this->assertJson($this->tester->getDisplay());
     }
 
-    public function testExecuteWithYaml()
+    public function testExecuteWithYaml(): void
     {
         $this->tester->run(['command' => 'api:swagger:export', '--yaml' => true]);
 
@@ -57,7 +57,7 @@ class SwaggerCommandTest extends KernelTestCase
     /**
      * @param string $data
      */
-    private function assertYaml($data)
+    private function assertYaml($data): void
     {
         try {
             Yaml::parse($data);

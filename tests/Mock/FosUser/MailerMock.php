@@ -26,7 +26,7 @@ class MailerMock implements MailerInterface
      *
      * @param UserInterface $user
      */
-    public function sendConfirmationEmailMessage(UserInterface $user)
+    public function sendConfirmationEmailMessage(UserInterface $user): void
     {
     }
 
@@ -35,7 +35,7 @@ class MailerMock implements MailerInterface
      *
      * @param UserInterface $user
      */
-    public function sendResettingEmailMessage(UserInterface $user)
+    public function sendResettingEmailMessage(UserInterface $user): void
     {
     }
 }

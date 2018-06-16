@@ -111,7 +111,7 @@ final class PartialCollectionViewNormalizer implements NormalizerInterface, Norm
     /**
      * {@inheritdoc}
      */
-    public function setNormalizer(NormalizerInterface $normalizer)
+    public function setNormalizer(NormalizerInterface $normalizer): void
     {
         if ($this->collectionNormalizer instanceof NormalizerAwareInterface) {
             $this->collectionNormalizer->setNormalizer($normalizer);

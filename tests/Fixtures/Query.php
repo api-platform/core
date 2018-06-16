@@ -20,9 +20,11 @@ class Query
 {
     public function getFirstResult()
     {
+        return null;
     }
 
     public function getMaxResults()
     {
+        return null;
     }
 }

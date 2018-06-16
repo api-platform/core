@@ -32,7 +32,7 @@ class AnnotationResourceMetadataFactoryTest extends TestCase
     /**
      * @dataProvider getCreateDependencies
      */
-    public function testCreate(ProphecyInterface $reader, ProphecyInterface $decorated = null, string $expectedShortName, string $expectedDescription)
+    public function testCreate(ProphecyInterface $reader, ProphecyInterface $decorated = null, string $expectedShortName, string $expectedDescription): void
     {
         $factory = new AnnotationResourceMetadataFactory($reader->reveal(), $decorated ? $decorated->reveal() : null);
         $metadata = $factory->create(Dummy::class);

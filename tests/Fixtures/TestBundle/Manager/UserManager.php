@@ -24,7 +24,7 @@ class UserManager extends BaseUserManager
     /**
      * {@inheritdoc}
      */
-    public function updateUser(UserInterface $user, $andFlush = true)
+    public function updateUser(UserInterface $user, $andFlush = true): void
     {
         // Extract email part before the `@` character to use it as username is username not set
         if (null === $user->getUsername()) {

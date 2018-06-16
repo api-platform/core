@@ -72,7 +72,7 @@ class CustomNormalizedDummy
     /**
      * @param string $name
      */
-    public function setName($name)
+    public function setName($name): void
     {
         $this->name = $name;
     }
@@ -96,7 +96,7 @@ class CustomNormalizedDummy
     /**
      * @param string $alias
      */
-    public function setAlias($alias)
+    public function setAlias($alias): void
     {
         $this->alias = $alias;
     }
@@ -112,7 +112,7 @@ class CustomNormalizedDummy
     /**
      * @param string $value
      */
-    public function setPersonalizedAlias($value)
+    public function setPersonalizedAlias($value): void
     {
         $this->alias = $value;
     }

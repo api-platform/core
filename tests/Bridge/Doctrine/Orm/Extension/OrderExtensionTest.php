@@ -29,7 +29,7 @@ use PHPUnit\Framework\TestCase;
  */
 class OrderExtensionTest extends TestCase
 {
-    public function testApplyToCollectionWithValidOrder()
+    public function testApplyToCollectionWithValidOrder(): void
     {
         $queryBuilderProphecy = $this->prophesize(QueryBuilder::class);
 
@@ -49,7 +49,7 @@ class OrderExtensionTest extends TestCase
         $orderExtensionTest->applyToCollection($queryBuilder, new QueryNameGenerator(), Dummy::class);
     }
 
-    public function testApplyToCollectionWithWrongOrder()
+    public function testApplyToCollectionWithWrongOrder(): void
     {
         $queryBuilderProphecy = $this->prophesize(QueryBuilder::class);
 
@@ -69,7 +69,7 @@ class OrderExtensionTest extends TestCase
         $orderExtensionTest->applyToCollection($queryBuilder, new QueryNameGenerator(), Dummy::class);
     }
 
-    public function testApplyToCollectionWithOrderOverridden()
+    public function testApplyToCollectionWithOrderOverridden(): void
     {
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $queryBuilderProphecy = $this->prophesize(QueryBuilder::class);
@@ -92,7 +92,7 @@ class OrderExtensionTest extends TestCase
         $orderExtensionTest->applyToCollection($queryBuilder, new QueryNameGenerator(), Dummy::class);
     }
 
-    public function testApplyToCollectionWithOrderOverriddenWithNoDirection()
+    public function testApplyToCollectionWithOrderOverriddenWithNoDirection(): void
     {
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $queryBuilderProphecy = $this->prophesize(QueryBuilder::class);
@@ -116,7 +116,7 @@ class OrderExtensionTest extends TestCase
         $orderExtensionTest->applyToCollection($queryBuilder, new QueryNameGenerator(), Dummy::class);
     }
 
-    public function testApplyToCollectionWithOrderOverriddenWithAssociation()
+    public function testApplyToCollectionWithOrderOverriddenWithAssociation(): void
     {
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $queryBuilderProphecy = $this->prophesize(QueryBuilder::class);
@@ -141,7 +141,7 @@ class OrderExtensionTest extends TestCase
         $orderExtensionTest->applyToCollection($queryBuilder, new QueryNameGenerator(), Dummy::class);
     }
 
-    public function testApplyToCollectionWithOrderOverriddenWithEmbeddedAssociation()
+    public function testApplyToCollectionWithOrderOverriddenWithEmbeddedAssociation(): void
     {
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $queryBuilderProphecy = $this->prophesize(QueryBuilder::class);

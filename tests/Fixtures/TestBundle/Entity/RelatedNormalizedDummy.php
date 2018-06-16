@@ -74,7 +74,7 @@ class RelatedNormalizedDummy
     /**
      * @param string $name
      */
-    public function setName($name)
+    public function setName($name): void
     {
         $this->name = $name;
     }
@@ -95,7 +95,7 @@ class RelatedNormalizedDummy
     /**
      * @param ArrayCollection $customNormalizedDummy
      */
-    public function setCustomNormalizedDummy($customNormalizedDummy)
+    public function setCustomNormalizedDummy($customNormalizedDummy): void
     {
         $this->customNormalizedDummy = $customNormalizedDummy;
     }

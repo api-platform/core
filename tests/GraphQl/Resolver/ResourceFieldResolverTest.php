@@ -22,7 +22,7 @@ use PHPUnit\Framework\TestCase;
 
 class ResourceFieldResolverTest extends TestCase
 {
-    public function testId()
+    public function testId(): void
     {
         $dummy = new Dummy();
 
@@ -37,7 +37,7 @@ class ResourceFieldResolverTest extends TestCase
         $this->assertEquals('/dummies/1', $resolver([ItemNormalizer::ITEM_KEY => serialize($dummy)], [], [], $resolveInfo));
     }
 
-    public function testOriginalId()
+    public function testOriginalId(): void
     {
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
 
@@ -49,7 +49,7 @@ class ResourceFieldResolverTest extends TestCase
         $this->assertEquals(1, $resolver(['id' => 1], [], [], $resolveInfo));
     }
 
-    public function testDirectAccess()
+    public function testDirectAccess(): void
     {
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
 

@@ -55,7 +55,7 @@ class SearchFilterTest extends DoctrineOrmFilterTestCase
         return new SearchFilter($managerRegistry, $requestStack, $iriConverter, $propertyAccessor, null, $properties);
     }
 
-    public function testGetDescription()
+    public function testGetDescription(): void
     {
         $filter = $this->filterFactory($this->managerRegistry, null);
 
@@ -344,7 +344,7 @@ class SearchFilterTest extends DoctrineOrmFilterTestCase
         ], $filter->getDescription($this->resourceClass));
     }
 
-    public function testDoubleJoin()
+    public function testDoubleJoin(): void
     {
         $this->doTestDoubleJoin(false);
     }
@@ -352,12 +352,12 @@ class SearchFilterTest extends DoctrineOrmFilterTestCase
     /**
      * @group legacy
      */
-    public function testRequestDoubleJoin()
+    public function testRequestDoubleJoin(): void
     {
         $this->doTestDoubleJoin(true);
     }
 
-    private function doTestDoubleJoin(bool $request)
+    private function doTestDoubleJoin(bool $request): void
     {
         $filters = ['relatedDummy.symfony' => 'foo'];
 
@@ -378,7 +378,7 @@ class SearchFilterTest extends DoctrineOrmFilterTestCase
         $this->assertEquals($actual, $expected);
     }
 
-    public function testTripleJoin()
+    public function testTripleJoin(): void
     {
         $this->doTestTripleJoin(false);
     }
@@ -386,12 +386,12 @@ class SearchFilterTest extends DoctrineOrmFilterTestCase
     /**
      * @group legacy
      */
-    public function testRequestTripleJoin()
+    public function testRequestTripleJoin(): void
     {
         $this->doTestTripleJoin(true);
     }
 
-    private function doTestTripleJoin(bool $request)
+    private function doTestTripleJoin(bool $request): void
     {
         $filters = ['relatedDummy.symfony' => 'foo', 'relatedDummy.thirdLevel.level' => '2'];
 
@@ -413,7 +413,7 @@ class SearchFilterTest extends DoctrineOrmFilterTestCase
         $this->assertEquals($actual, $expected);
     }
 
-    public function testJoinLeft()
+    public function testJoinLeft(): void
     {
         $this->doTestJoinLeft(false);
     }
@@ -421,12 +421,12 @@ class SearchFilterTest extends DoctrineOrmFilterTestCase
     /**
      * @group legacy
      */
-    public function testRequestJoinLeft()
+    public function testRequestJoinLeft(): void
     {
         $this->doTestJoinLeft(true);
     }
 
-    private function doTestJoinLeft(bool $request)
+    private function doTestJoinLeft(bool $request): void
     {
         $filters = ['relatedDummy.symfony' => 'foo', 'relatedDummy.thirdLevel.level' => '3'];
 
@@ -447,7 +447,7 @@ class SearchFilterTest extends DoctrineOrmFilterTestCase
         $this->assertEquals($actual, $expected);
     }
 
-    public function testApplyWithAnotherAlias()
+    public function testApplyWithAnotherAlias(): void
     {
         $this->doTestApplyWithAnotherAlias(false);
     }
@@ -455,12 +455,12 @@ class SearchFilterTest extends DoctrineOrmFilterTestCase
     /**
      * @group legacy
      */
-    public function testRequestApplyWithAnotherAlias()
+    public function testRequestApplyWithAnotherAlias(): void
     {
         $this->doTestApplyWithAnotherAlias(true);
     }
 
-    private function doTestApplyWithAnotherAlias(bool $request)
+    private function doTestApplyWithAnotherAlias(bool $request): void
     {
         $filters = ['name' => 'exact'];
 

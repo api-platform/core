@@ -61,7 +61,7 @@ final class AddFormatListener
      * @throws NotFoundHttpException
      * @throws NotAcceptableHttpException
      */
-    public function onKernelRequest(GetResponseEvent $event)
+    public function onKernelRequest(GetResponseEvent $event): void
     {
         $request = $event->getRequest();
         if (!$request->attributes->has('_api_resource_class') && !$request->attributes->has('_api_respond') && !$request->attributes->has('_graphql')) {
@@ -122,7 +122,7 @@ final class AddFormatListener
      * @param Request $request
      * @param array   $formats
      */
-    private function addRequestFormats(Request $request, array $formats)
+    private function addRequestFormats(Request $request, array $formats): void
     {
         foreach ($formats as $format => $mimeTypes) {
             $request->setFormat($format, $mimeTypes);
@@ -132,7 +132,7 @@ final class AddFormatListener
     /**
      * Populates the $mimeTypes property.
      */
-    private function populateMimeTypes()
+    private function populateMimeTypes(): void
     {
         if (null !== $this->mimeTypes) {
             return;

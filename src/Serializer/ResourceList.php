@@ -18,7 +18,7 @@ namespace ApiPlatform\Core\Serializer;
  */
 class ResourceList extends \ArrayObject
 {
-    public function serialize()
+    public function serialize(): void
     {
     }
 }

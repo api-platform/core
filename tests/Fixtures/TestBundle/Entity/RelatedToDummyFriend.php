@@ -62,7 +62,7 @@ class RelatedToDummyFriend
      */
     private $relatedDummy;
 
-    public function setName($name)
+    public function setName($name): void
     {
         $this->name = $name;
     }
@@ -83,7 +83,7 @@ class RelatedToDummyFriend
     /**
      * @param null|string $description
      */
-    public function setDescription($description)
+    public function setDescription($description): void
     {
         $this->description = $description;
     }
@@ -103,7 +103,7 @@ class RelatedToDummyFriend
      *
      * @param DummyFriend $dummyFriend the value to set
      */
-    public function setDummyFriend(DummyFriend $dummyFriend)
+    public function setDummyFriend(DummyFriend $dummyFriend): void
     {
         $this->dummyFriend = $dummyFriend;
     }
@@ -123,7 +123,7 @@ class RelatedToDummyFriend
      *
      * @param RelatedDummy $relatedDummy the value to set
      */
-    public function setRelatedDummy(RelatedDummy $relatedDummy)
+    public function setRelatedDummy(RelatedDummy $relatedDummy): void
     {
         $this->relatedDummy = $relatedDummy;
     }

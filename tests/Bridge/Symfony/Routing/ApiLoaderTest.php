@@ -43,7 +43,7 @@ use Symfony\Component\Routing\Route;
  */
 class ApiLoaderTest extends TestCase
 {
-    public function testApiLoader()
+    public function testApiLoader(): void
     {
         $resourceMetadata = new ResourceMetadata();
         $resourceMetadata = $resourceMetadata->withShortName('dummy');
@@ -98,7 +98,7 @@ class ApiLoaderTest extends TestCase
         );
     }
 
-    public function testApiLoaderWithPrefix()
+    public function testApiLoaderWithPrefix(): void
     {
         $resourceMetadata = new ResourceMetadata();
         $resourceMetadata = $resourceMetadata->withShortName('dummy');
@@ -127,7 +127,7 @@ class ApiLoaderTest extends TestCase
         );
     }
 
-    public function testNoMethodApiLoader()
+    public function testNoMethodApiLoader(): void
     {
         $this->expectException(\RuntimeException::class);
 
@@ -145,7 +145,7 @@ class ApiLoaderTest extends TestCase
         $this->getApiLoaderWithResourceMetadata($resourceMetadata)->load(null);
     }
 
-    public function testWrongMethodApiLoader()
+    public function testWrongMethodApiLoader(): void
     {
         $this->expectException(\RuntimeException::class);
 
@@ -163,14 +163,14 @@ class ApiLoaderTest extends TestCase
         $this->getApiLoaderWithResourceMetadata($resourceMetadata)->load(null);
     }
 
-    public function testNoShortNameApiLoader()
+    public function testNoShortNameApiLoader(): void
     {
         $this->expectException(InvalidResourceException::class);
 
         $this->getApiLoaderWithResourceMetadata(new ResourceMetadata())->load(null);
     }
 
-    public function testRecursiveSubresource()
+    public function testRecursiveSubresource(): void
     {
         $resourceMetadata = new ResourceMetadata();
         $resourceMetadata = $resourceMetadata->withShortName('dummy');

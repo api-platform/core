@@ -59,7 +59,7 @@ final class ChainDataPersister implements DataPersisterInterface
     /**
      * {@inheritdoc}
      */
-    public function remove($data)
+    public function remove($data): void
     {
         foreach ($this->persisters as $persister) {
             if ($persister->supports($data)) {

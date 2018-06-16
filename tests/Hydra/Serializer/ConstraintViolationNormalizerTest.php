@@ -27,7 +27,7 @@ use Symfony\Component\Validator\ConstraintViolationList;
  */
 class ConstraintViolationNormalizerTest extends TestCase
 {
-    public function testSupportNormalization()
+    public function testSupportNormalization(): void
     {
         $urlGeneratorProphecy = $this->prophesize(UrlGeneratorInterface::class);
         $nameConverterProphecy = $this->prophesize(NameConverterInterface::class);
@@ -40,7 +40,7 @@ class ConstraintViolationNormalizerTest extends TestCase
         $this->assertTrue($normalizer->hasCacheableSupportsMethod());
     }
 
-    public function testNormalize()
+    public function testNormalize(): void
     {
         $urlGeneratorProphecy = $this->prophesize(UrlGeneratorInterface::class);
         $nameConverterProphecy = $this->prophesize(NameConverterInterface::class);

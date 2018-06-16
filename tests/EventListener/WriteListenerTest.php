@@ -26,7 +26,7 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
  */
 class WriteListenerTest extends TestCase
 {
-    public function testOnKernelViewWithControllerResultAndPersist()
+    public function testOnKernelViewWithControllerResultAndPersist(): void
     {
         $dummy = new Dummy();
         $dummy->setName('Dummyrino');
@@ -57,7 +57,7 @@ class WriteListenerTest extends TestCase
      * @group legacy
      * @expectedDeprecation Returning void from ApiPlatform\Core\DataPersister\DataPersisterInterface::persist() is deprecated since API Platform 2.3 and will not be supported in API Platform 3, an object should always be returned.
      */
-    public function testOnKernelViewWithControllerResultAndPersistReturningVoid()
+    public function testOnKernelViewWithControllerResultAndPersistReturningVoid(): void
     {
         $dummy = new Dummy();
         $dummy->setName('Dummyrino');
@@ -87,7 +87,7 @@ class WriteListenerTest extends TestCase
     /**
      * @see https://github.com/api-platform/core/issues/1799
      */
-    public function testOnKernelViewWithControllerResultAndPersistWithImmutableResource()
+    public function testOnKernelViewWithControllerResultAndPersistWithImmutableResource(): void
     {
         $dummy = new Dummy();
         $dummy->setName('Dummyrino');
@@ -123,7 +123,7 @@ class WriteListenerTest extends TestCase
         }
     }
 
-    public function testOnKernelViewWithControllerResultAndRemove()
+    public function testOnKernelViewWithControllerResultAndRemove(): void
     {
         $dummy = new Dummy();
         $dummy->setName('Dummyrino');
@@ -146,7 +146,7 @@ class WriteListenerTest extends TestCase
         (new WriteListener($dataPersisterProphecy->reveal()))->onKernelView($event);
     }
 
-    public function testOnKernelViewWithSafeMethod()
+    public function testOnKernelViewWithSafeMethod(): void
     {
         $dummy = new Dummy();
         $dummy->setName('Dummyrino');
@@ -170,7 +170,7 @@ class WriteListenerTest extends TestCase
         (new WriteListener($dataPersisterProphecy->reveal()))->onKernelView($event);
     }
 
-    public function testOnKernelViewWithNoResourceClass()
+    public function testOnKernelViewWithNoResourceClass(): void
     {
         $dummy = new Dummy();
         $dummy->setName('Dummyrino');
@@ -193,7 +193,7 @@ class WriteListenerTest extends TestCase
         (new WriteListener($dataPersisterProphecy->reveal()))->onKernelView($event);
     }
 
-    public function testOnKernelViewWithNoDataPersisterSupport()
+    public function testOnKernelViewWithNoDataPersisterSupport(): void
     {
         $dummy = new Dummy();
         $dummy->setName('Dummyrino');

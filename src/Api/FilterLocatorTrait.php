@@ -33,7 +33,7 @@ trait FilterLocatorTrait
      * @param ContainerInterface|FilterCollection|null $filterLocator
      * @param bool                                     $allowNull
      */
-    private function setFilterLocator($filterLocator = null, bool $allowNull = false)
+    private function setFilterLocator($filterLocator = null, bool $allowNull = false): void
     {
         if ($filterLocator instanceof ContainerInterface || $filterLocator instanceof FilterCollection || (null === $filterLocator && $allowNull)) {
             if ($filterLocator instanceof FilterCollection) {

@@ -42,7 +42,7 @@ final class AddTagsListener
      *
      * @param FilterResponseEvent $event
      */
-    public function onKernelResponse(FilterResponseEvent $event)
+    public function onKernelResponse(FilterResponseEvent $event): void
     {
         $request = $event->getRequest();
         $response = $event->getResponse();

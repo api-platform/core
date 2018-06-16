@@ -40,7 +40,7 @@ final class AddHeadersListener
         $this->public = $public;
     }
 
-    public function onKernelResponse(FilterResponseEvent $event)
+    public function onKernelResponse(FilterResponseEvent $event): void
     {
         $request = $event->getRequest();
         if (!$request->isMethodCacheable() || !RequestAttributesExtractor::extractAttributes($request)) {

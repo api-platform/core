@@ -77,7 +77,7 @@ class RelationEmbedder
         return $this->related;
     }
 
-    public function setRelated(RelatedDummy $relatedDummy)
+    public function setRelated(RelatedDummy $relatedDummy): void
     {
         $this->related = $relatedDummy;
     }

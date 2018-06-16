@@ -105,7 +105,7 @@ class DummyEntityWithConstructor
     /**
      * @param string $baz
      */
-    public function setBaz(string $baz)
+    public function setBaz(string $baz): void
     {
         $this->baz = $baz;
     }

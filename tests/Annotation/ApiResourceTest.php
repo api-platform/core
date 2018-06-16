@@ -24,7 +24,7 @@ use PHPUnit\Framework\TestCase;
  */
 class ApiResourceTest extends TestCase
 {
-    public function testConstruct()
+    public function testConstruct(): void
     {
         $resource = new ApiResource([
             'accessControl' => 'has_role("ROLE_FOO")',
@@ -87,7 +87,7 @@ class ApiResourceTest extends TestCase
         ], $resource->attributes);
     }
 
-    public function testApiResourceAnnotation()
+    public function testApiResourceAnnotation(): void
     {
         $reader = new AnnotationReader();
         $resource = $reader->getClassAnnotation(new \ReflectionClass(AnnotatedClass::class), ApiResource::class);
@@ -105,7 +105,7 @@ class ApiResourceTest extends TestCase
         ], $resource->attributes);
     }
 
-    public function testConstructWithInvalidAttribute()
+    public function testConstructWithInvalidAttribute(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Unknown property "invalidAttribute" on annotation "ApiPlatform\\Core\\Annotation\\ApiResource".');

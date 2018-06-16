@@ -26,7 +26,7 @@ use Symfony\Component\Validator\ConstraintViolationList;
  */
 class ConstraintViolationNormalizerTest extends TestCase
 {
-    public function testSupportNormalization()
+    public function testSupportNormalization(): void
     {
         $nameConverterProphecy = $this->prophesize(NameConverterInterface::class);
         $normalizer = new ConstraintViolationListNormalizer([], $nameConverterProphecy->reveal());
@@ -37,7 +37,7 @@ class ConstraintViolationNormalizerTest extends TestCase
         $this->assertTrue($normalizer->hasCacheableSupportsMethod());
     }
 
-    public function testNormalize()
+    public function testNormalize(): void
     {
         $nameConverterProphecy = $this->prophesize(NameConverterInterface::class);
         $normalizer = new ConstraintViolationListNormalizer(['severity', 'anotherField1'], $nameConverterProphecy->reveal());

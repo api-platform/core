@@ -27,7 +27,7 @@ use Psr\Cache\CacheItemPoolInterface;
  */
 class CachedResourceNameCollectionFactoryTest extends TestCase
 {
-    public function testCreateWithItemHit()
+    public function testCreateWithItemHit(): void
     {
         $cacheItem = $this->prophesize(CacheItemInterface::class);
         $cacheItem->isHit()->willReturn(true)->shouldBeCalled();
@@ -48,7 +48,7 @@ class CachedResourceNameCollectionFactoryTest extends TestCase
         $this->assertEquals($expectedResult, $cachedResourceNameCollectionFactory->create(), 'Trigger the local cache');
     }
 
-    public function testCreateWithItemNotHit()
+    public function testCreateWithItemNotHit(): void
     {
         $resourceNameCollection = new ResourceNameCollection([Dummy::class]);
 
@@ -73,7 +73,7 @@ class CachedResourceNameCollectionFactoryTest extends TestCase
         $this->assertEquals($expectedResult, $cachedResourceNameCollectionFactory->create(), 'Trigger the local cache');
     }
 
-    public function testCreateWithGetCacheItemThrowsCacheException()
+    public function testCreateWithGetCacheItemThrowsCacheException(): void
     {
         $decoratedResourceNameCollectionFactory = $this->prophesize(ResourceNameCollectionFactoryInterface::class);
         $decoratedResourceNameCollectionFactory->create()->willReturn(new ResourceNameCollection([Dummy::class]))->shouldBeCalled();

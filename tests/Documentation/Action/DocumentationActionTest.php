@@ -29,7 +29,7 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class DocumentationActionTest extends TestCase
 {
-    public function testDocumentationAction()
+    public function testDocumentationAction(): void
     {
         $requestProphecy = $this->prophesize(Request::class);
         $attributesProphecy = $this->prophesize(ParameterBagInterface::class);
@@ -54,14 +54,14 @@ class DocumentationActionTest extends TestCase
      * @group legacy
      * @expectedDeprecation Using an array as formats provider is deprecated since API Platform 2.3 and will not be possible anymore in API Platform 3
      */
-    public function testDocumentationActionFormatDeprecation()
+    public function testDocumentationActionFormatDeprecation(): void
     {
         $resourceNameCollectionFactoryProphecy = $this->prophesize(ResourceNameCollectionFactoryInterface::class);
         $resourceNameCollectionFactoryProphecy->create()->willReturn(new ResourceNameCollection(['dummies']));
         new DocumentationAction($resourceNameCollectionFactoryProphecy->reveal(), '', '', '', ['formats' => ['jsonld' => 'application/ld+json']]);
     }
 
-    public function testDocumentationActionThrowsOnBadFormatArgument()
+    public function testDocumentationActionThrowsOnBadFormatArgument(): void
     {
         $this->expectException(\ApiPlatform\Core\Exception\InvalidArgumentException::class);
         $this->expectExceptionMessage('The "$formatsProvider" argument is expected to be an implementation of the "ApiPlatform\\Core\\Api\\FormatsProviderInterface" interface.');

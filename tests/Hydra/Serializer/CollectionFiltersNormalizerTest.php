@@ -31,7 +31,7 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
  */
 class CollectionFiltersNormalizerTest extends TestCase
 {
-    public function testSupportsNormalization()
+    public function testSupportsNormalization(): void
     {
         $decoratedProphecy = $this->prophesize(NormalizerInterface::class);
         $decoratedProphecy->willImplement(CacheableSupportsMethodInterface::class);
@@ -49,7 +49,7 @@ class CollectionFiltersNormalizerTest extends TestCase
         $this->assertTrue($normalizer->hasCacheableSupportsMethod());
     }
 
-    public function testDoNothingIfSubLevel()
+    public function testDoNothingIfSubLevel(): void
     {
         $dummy = new Dummy();
 
@@ -69,7 +69,7 @@ class CollectionFiltersNormalizerTest extends TestCase
         $this->assertEquals(['name' => 'foo'], $normalizer->normalize($dummy, null, ['api_sub_level' => true]));
     }
 
-    public function testDoNothingIfNoFilter()
+    public function testDoNothingIfNoFilter(): void
     {
         $dummy = new Dummy();
 
@@ -92,7 +92,7 @@ class CollectionFiltersNormalizerTest extends TestCase
         $this->assertEquals(['name' => 'foo'], $normalizer->normalize($dummy, null, ['collection_operation_name' => 'get']));
     }
 
-    public function testDoNothingIfNoRequestUri()
+    public function testDoNothingIfNoRequestUri(): void
     {
         $dummy = new Dummy();
 
@@ -115,7 +115,7 @@ class CollectionFiltersNormalizerTest extends TestCase
         $this->assertEquals(['name' => 'foo'], $normalizer->normalize($dummy, null, []));
     }
 
-    public function testNormalize()
+    public function testNormalize(): void
     {
         $filterProphecy = $this->prophesize(FilterInterface::class);
         $filterProphecy->getDescription(Dummy::class)->willReturn(['a' => ['property' => 'name', 'required' => true]])->shouldBeCalled();
@@ -131,7 +131,7 @@ class CollectionFiltersNormalizerTest extends TestCase
      * @group legacy
      * @expectedDeprecation The ApiPlatform\Core\Api\FilterCollection class is deprecated since version 2.1 and will be removed in 3.0. Provide an implementation of Psr\Container\ContainerInterface instead.
      */
-    public function testNormalizeWithDeprecatedFilterCollection()
+    public function testNormalizeWithDeprecatedFilterCollection(): void
     {
         $filterProphecy = $this->prophesize(FilterInterface::class);
         $filterProphecy->getDescription(Dummy::class)->willReturn(['a' => ['property' => 'name', 'required' => true]])->shouldBeCalled();
@@ -142,7 +142,7 @@ class CollectionFiltersNormalizerTest extends TestCase
     /**
      * @group legacy
      */
-    public function testConstructWithInvalidFilterLocator()
+    public function testConstructWithInvalidFilterLocator(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('The "$filterLocator" argument is expected to be an implementation of the "Psr\\Container\\ContainerInterface" interface.');
@@ -155,7 +155,7 @@ class CollectionFiltersNormalizerTest extends TestCase
         );
     }
 
-    private function normalize($filterLocator)
+    private function normalize($filterLocator): void
     {
         $dummy = new Dummy();
 

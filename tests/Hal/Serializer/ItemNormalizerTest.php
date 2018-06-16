@@ -41,7 +41,7 @@ use Symfony\Component\Serializer\SerializerInterface;
  */
 class ItemNormalizerTest extends TestCase
 {
-    public function testDoesNotSupportDenormalization()
+    public function testDoesNotSupportDenormalization(): void
     {
         $this->expectException(RuntimeException::class);
 
@@ -64,7 +64,7 @@ class ItemNormalizerTest extends TestCase
         $normalizer->denormalize(['foo'], 'Foo');
     }
 
-    public function testSupportsNormalization()
+    public function testSupportsNormalization(): void
     {
         $std = new \stdClass();
         $dummy = new Dummy();
@@ -95,7 +95,7 @@ class ItemNormalizerTest extends TestCase
         $this->assertTrue($normalizer->hasCacheableSupportsMethod());
     }
 
-    public function testNormalize()
+    public function testNormalize(): void
     {
         $relatedDummy = new RelatedDummy();
         $dummy = new Dummy();
@@ -155,7 +155,7 @@ class ItemNormalizerTest extends TestCase
         $this->assertEquals($expected, $normalizer->normalize($dummy));
     }
 
-    public function testNormalizeWithoutCache()
+    public function testNormalizeWithoutCache(): void
     {
         $relatedDummy = new RelatedDummy();
         $dummy = new Dummy();
@@ -212,12 +212,12 @@ class ItemNormalizerTest extends TestCase
             ],
             'name' => 'hello',
         ];
-        $this->assertEquals($expected, $normalizer->normalize($dummy, null, ['not_serializable' => function () {}]));
+        $this->assertEquals($expected, $normalizer->normalize($dummy, null, ['not_serializable' => function (): void {}]));
     }
 
-    public function testMaxDepth()
+    public function testMaxDepth(): void
     {
-        $setId = function (MaxDepthDummy $dummy, int $id) {
+        $setId = function (MaxDepthDummy $dummy, int $id): void {
             $prop = new \ReflectionProperty($dummy, 'id');
             $prop->setAccessible(true);
             $prop->setValue($dummy, $id);

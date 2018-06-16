@@ -23,7 +23,7 @@ use PHPUnit\Framework\TestCase;
  */
 class VarnishPurgerTest extends TestCase
 {
-    public function testPurge()
+    public function testPurge(): void
     {
         $clientProphecy1 = $this->prophesize(ClientInterface::class);
         $clientProphecy1->request('BAN', '', ['headers' => ['ApiPlatform-Ban-Regex' => '(^|\,)/foo($|\,)']])->willReturn(new Response())->shouldBeCalled();
@@ -38,7 +38,7 @@ class VarnishPurgerTest extends TestCase
         $purger->purge(['/foo' => '/foo', '/bar' => '/bar']);
     }
 
-    public function testEmptyTags()
+    public function testEmptyTags(): void
     {
         $clientProphecy1 = $this->prophesize(ClientInterface::class);
         $clientProphecy1->request()->shouldNotBeCalled();

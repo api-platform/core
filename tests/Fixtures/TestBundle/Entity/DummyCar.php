@@ -125,7 +125,7 @@ class DummyCar
      *
      * @param string name the value to set
      */
-    public function setName(string $name)
+    public function setName(string $name): void
     {
         $this->name = $name;
     }
@@ -145,7 +145,7 @@ class DummyCar
      *
      * @param bool canSell the value to set
      */
-    public function setCanSell(bool $canSell)
+    public function setCanSell(bool $canSell): void
     {
         $this->canSell = $canSell;
     }
@@ -165,7 +165,7 @@ class DummyCar
      *
      * @param \DateTime availableAt the value to set
      */
-    public function setAvailableAt(\DateTime $availableAt)
+    public function setAvailableAt(\DateTime $availableAt): void
     {
         $this->availableAt = $availableAt;
     }

@@ -30,7 +30,7 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class SerializerFilterContextBuilderTest extends TestCase
 {
-    public function testCreateFromRequestWithCollectionOperation()
+    public function testCreateFromRequestWithCollectionOperation(): void
     {
         $request = new Request();
 
@@ -71,7 +71,7 @@ class SerializerFilterContextBuilderTest extends TestCase
         $this->assertInternalType('array', $context);
     }
 
-    public function testCreateFromRequestWithItemOperation()
+    public function testCreateFromRequestWithItemOperation(): void
     {
         $request = new Request();
 
@@ -112,7 +112,7 @@ class SerializerFilterContextBuilderTest extends TestCase
         $this->assertInternalType('array', $context);
     }
 
-    public function testCreateFromRequestWithoutFilters()
+    public function testCreateFromRequestWithoutFilters(): void
     {
         $request = new Request();
 
@@ -143,7 +143,7 @@ class SerializerFilterContextBuilderTest extends TestCase
         $this->assertInternalType('array', $context);
     }
 
-    public function testCreateFromRequestWithoutAttributes()
+    public function testCreateFromRequestWithoutAttributes(): void
     {
         $request = new Request([], [], [
             '_api_resource_class' => DummyGroup::class,
@@ -188,7 +188,7 @@ class SerializerFilterContextBuilderTest extends TestCase
         $this->assertInternalType('array', $context);
     }
 
-    public function testCreateFromRequestThrowsExceptionWithoutAttributesAndRequestAttributes()
+    public function testCreateFromRequestThrowsExceptionWithoutAttributesAndRequestAttributes(): void
     {
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Request attributes are not valid.');

@@ -29,7 +29,7 @@ use Symfony\Component\Serializer\SerializerInterface;
  */
 class SerializeListenerTest extends TestCase
 {
-    public function testDoNotSerializeResponse()
+    public function testDoNotSerializeResponse(): void
     {
         $serializerProphecy = $this->prophesize(SerializerInterface::class);
         $serializerProphecy->serialize()->shouldNotBeCalled();
@@ -48,7 +48,7 @@ class SerializeListenerTest extends TestCase
         $listener->onKernelView($eventProphecy->reveal());
     }
 
-    public function testDoNotSerializeWhenFormatNotSet()
+    public function testDoNotSerializeWhenFormatNotSet(): void
     {
         $serializerProphecy = $this->prophesize(SerializerInterface::class);
         $serializerProphecy->serialize()->shouldNotBeCalled();
@@ -64,7 +64,7 @@ class SerializeListenerTest extends TestCase
         $listener->onKernelView($eventProphecy->reveal());
     }
 
-    public function testDoNotSerializeWhenResourceClassNotSet()
+    public function testDoNotSerializeWhenResourceClassNotSet(): void
     {
         $serializerProphecy = $this->prophesize(SerializerInterface::class);
         $serializerProphecy->serialize()->shouldNotBeCalled();
@@ -83,7 +83,7 @@ class SerializeListenerTest extends TestCase
         $listener->onKernelView($eventProphecy->reveal());
     }
 
-    public function testDoNotSerializeWhenOperationNotSet()
+    public function testDoNotSerializeWhenOperationNotSet(): void
     {
         $serializerProphecy = $this->prophesize(SerializerInterface::class);
         $serializerProphecy->serialize()->shouldNotBeCalled();
@@ -102,7 +102,7 @@ class SerializeListenerTest extends TestCase
         $listener->onKernelView($eventProphecy->reveal());
     }
 
-    public function testSerializeCollectionOperation()
+    public function testSerializeCollectionOperation(): void
     {
         $expectedContext = ['request_uri' => '', 'resource_class' => 'Foo', 'collection_operation_name' => 'get'];
         $serializerProphecy = $this->prophesize(SerializerInterface::class);
@@ -138,7 +138,7 @@ class SerializeListenerTest extends TestCase
         $listener->onKernelView($eventProphecy->reveal());
     }
 
-    public function testSerializeItemOperation()
+    public function testSerializeItemOperation(): void
     {
         $expectedContext = ['request_uri' => '', 'resource_class' => 'Foo', 'item_operation_name' => 'get'];
         $serializerProphecy = $this->prophesize(SerializerInterface::class);
@@ -173,7 +173,7 @@ class SerializeListenerTest extends TestCase
         $listener->onKernelView($eventProphecy->reveal());
     }
 
-    public function testEncode()
+    public function testEncode(): void
     {
         $serializerProphecy = $this->prophesize(SerializerInterface::class);
         $serializerProphecy->willImplement(EncoderInterface::class);

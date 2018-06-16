@@ -27,7 +27,7 @@ class OperationResourceMetadataFactoryTest extends TestCase
     /**
      * @dataProvider getMetadata
      */
-    public function testCreateOperation(ResourceMetadata $before, ResourceMetadata $after, array $formats = [])
+    public function testCreateOperation(ResourceMetadata $before, ResourceMetadata $after, array $formats = []): void
     {
         $decoratedProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $decoratedProphecy->create(Dummy::class)->shouldBeCalled()->willReturn($before);

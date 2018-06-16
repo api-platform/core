@@ -25,7 +25,7 @@ use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
  */
 class AddHeadersListenerTest extends TestCase
 {
-    public function testDoNotSetHeaderWhenMethodNotCacheable()
+    public function testDoNotSetHeaderWhenMethodNotCacheable(): void
     {
         $request = new Request([], [], ['_api_resource_class' => Dummy::class, '_api_item_operation_name' => 'get']);
         $request->setMethod('PUT');
@@ -42,7 +42,7 @@ class AddHeadersListenerTest extends TestCase
         $this->assertNull($response->getEtag());
     }
 
-    public function testDoNotSetHeaderWhenNotAnApiOperation()
+    public function testDoNotSetHeaderWhenNotAnApiOperation(): void
     {
         $request = new Request();
         $response = new Response();
@@ -57,7 +57,7 @@ class AddHeadersListenerTest extends TestCase
         $this->assertNull($response->getEtag());
     }
 
-    public function testDoNotSetHeaderWhenNoContent()
+    public function testDoNotSetHeaderWhenNoContent(): void
     {
         $request = new Request([], [], ['_api_resource_class' => Dummy::class, '_api_item_operation_name' => 'get']);
         $response = new Response();
@@ -72,7 +72,7 @@ class AddHeadersListenerTest extends TestCase
         $this->assertNull($response->getEtag());
     }
 
-    public function testAddHeaders()
+    public function testAddHeaders(): void
     {
         $request = new Request([], [], ['_api_resource_class' => Dummy::class, '_api_item_operation_name' => 'get']);
         $response = new Response('some content', 200, ['Vary' => ['Accept', 'Cookie']]);

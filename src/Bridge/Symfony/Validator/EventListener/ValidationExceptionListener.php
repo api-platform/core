@@ -40,7 +40,7 @@ final class ValidationExceptionListener
      *
      * @param GetResponseForExceptionEvent $event
      */
-    public function onKernelException(GetResponseForExceptionEvent $event)
+    public function onKernelException(GetResponseForExceptionEvent $event): void
     {
         $exception = $event->getException();
         if (!$exception instanceof ValidationException) {

@@ -56,7 +56,7 @@ class Foo
         return $this->id;
     }
 
-    public function setName($name)
+    public function setName($name): void
     {
         $this->name = $name;
     }
@@ -71,7 +71,7 @@ class Foo
         return $this->bar;
     }
 
-    public function setBar($bar)
+    public function setBar($bar): void
     {
         $this->bar = $bar;
     }

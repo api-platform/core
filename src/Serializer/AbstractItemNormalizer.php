@@ -165,7 +165,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
     /**
      * {@inheritdoc}
      */
-    protected function setAttributeValue($object, $attribute, $value, $format = null, array $context = [])
+    protected function setAttributeValue($object, $attribute, $value, $format = null, array $context = []): void
     {
         if (!\is_string($attribute)) {
             throw new InvalidValueException('Invalid value provided (invalid IRI?).');
@@ -225,7 +225,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
      *
      * @throws InvalidArgumentException
      */
-    protected function validateType(string $attribute, Type $type, $value, string $format = null)
+    protected function validateType(string $attribute, Type $type, $value, string $format = null): void
     {
         $builtinType = $type->getBuiltinType();
         if (Type::BUILTIN_TYPE_FLOAT === $builtinType && null !== $format && false !== strpos($format, 'json')) {
@@ -351,7 +351,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
      * @param string $attributeName
      * @param mixed  $value
      */
-    private function setValue($object, string $attributeName, $value)
+    private function setValue($object, string $attributeName, $value): void
     {
         try {
             $this->propertyAccessor->setValue($object, $attributeName, $value);

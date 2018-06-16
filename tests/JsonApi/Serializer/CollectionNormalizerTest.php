@@ -26,7 +26,7 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
  */
 class CollectionNormalizerTest extends TestCase
 {
-    public function testSupportsNormalize()
+    public function testSupportsNormalize(): void
     {
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
 
@@ -39,7 +39,7 @@ class CollectionNormalizerTest extends TestCase
         $this->assertTrue($normalizer->hasCacheableSupportsMethod());
     }
 
-    public function testNormalizePaginator()
+    public function testNormalizePaginator(): void
     {
         $paginatorProphecy = $this->prophesize(PaginatorInterface::class);
         $paginatorProphecy->getCurrentPage()->willReturn(3.)->shouldBeCalled();
@@ -109,7 +109,7 @@ class CollectionNormalizerTest extends TestCase
         $this->assertEquals($expected, $normalizer->normalize($paginator, CollectionNormalizer::FORMAT, ['request_uri' => '/foos?page=3']));
     }
 
-    public function testNormalizePartialPaginator()
+    public function testNormalizePartialPaginator(): void
     {
         $paginatorProphecy = $this->prophesize(PartialPaginatorInterface::class);
         $paginatorProphecy->getCurrentPage()->willReturn(3.)->shouldBeCalled();
@@ -175,7 +175,7 @@ class CollectionNormalizerTest extends TestCase
         $this->assertEquals($expected, $normalizer->normalize($paginator, CollectionNormalizer::FORMAT, ['request_uri' => '/foos?page=3']));
     }
 
-    public function testNormalizeArray()
+    public function testNormalizeArray(): void
     {
         $data = ['foo'];
 
@@ -225,7 +225,7 @@ class CollectionNormalizerTest extends TestCase
         $this->assertEquals($expected, $normalizer->normalize($data, CollectionNormalizer::FORMAT, ['request_uri' => '/foos']));
     }
 
-    public function testNormalizeIncludedData()
+    public function testNormalizeIncludedData(): void
     {
         $data = ['foo'];
 
@@ -295,7 +295,7 @@ class CollectionNormalizerTest extends TestCase
         $this->assertEquals($expected, $normalizer->normalize($data, CollectionNormalizer::FORMAT, ['request_uri' => '/foos']));
     }
 
-    public function testNormalizeWithoutDataKey()
+    public function testNormalizeWithoutDataKey(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('The JSON API document must contain a "data" key.');

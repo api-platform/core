@@ -52,7 +52,7 @@ final class JsonApiContext implements Context
      *
      * @BeforeScenario
      */
-    public function gatherContexts(BeforeScenarioScope $scope)
+    public function gatherContexts(BeforeScenarioScope $scope): void
     {
         /** @var InitializedContextEnvironment $environment */
         $environment = $scope->getEnvironment();
@@ -62,7 +62,7 @@ final class JsonApiContext implements Context
     /**
      * @Then the JSON should be valid according to the JSON API schema
      */
-    public function theJsonShouldBeValidAccordingToTheJsonApiSchema()
+    public function theJsonShouldBeValidAccordingToTheJsonApiSchema(): void
     {
         $json = $this->getJson()->getContent();
         $this->validator->validate($json, (object) ['$ref' => 'file://'.__DIR__.'/../../'.$this->jsonApiSchemaFile]);
@@ -75,7 +75,7 @@ final class JsonApiContext implements Context
     /**
      * @Then the JSON node :node should be an empty array
      */
-    public function theJsonNodeShouldBeAnEmptyArray($node)
+    public function theJsonNodeShouldBeAnEmptyArray($node): void
     {
         $actual = $this->getValueOfNode($node);
         if (null !== $actual && [] !== $actual) {
@@ -86,7 +86,7 @@ final class JsonApiContext implements Context
     /**
      * @Then the JSON node :node should be a number
      */
-    public function theJsonNodeShouldBeANumber($node)
+    public function theJsonNodeShouldBeANumber($node): void
     {
         if (!is_numeric($actual = $this->getValueOfNode($node))) {
             throw new ExpectationFailedException(sprintf('The node value is `%s`', json_encode($actual)));
@@ -96,7 +96,7 @@ final class JsonApiContext implements Context
     /**
      * @Then the JSON node :node should not be an empty string
      */
-    public function theJsonNodeShouldNotBeAnEmptyString($node)
+    public function theJsonNodeShouldNotBeAnEmptyString($node): void
     {
         if ('' === $actual = $this->getValueOfNode($node)) {
             throw new ExpectationFailedException(sprintf('The node value is `%s`', json_encode($actual)));
@@ -106,7 +106,7 @@ final class JsonApiContext implements Context
     /**
      * @Given there is a RelatedDummy
      */
-    public function thereIsARelatedDummy()
+    public function thereIsARelatedDummy(): void
     {
         $relatedDummy = new RelatedDummy();
         $relatedDummy->setName('RelatedDummy with no friends');
@@ -118,7 +118,7 @@ final class JsonApiContext implements Context
     /**
      * @Given there is a DummyFriend
      */
-    public function thereIsADummyFriend()
+    public function thereIsADummyFriend(): void
     {
         $friend = new DummyFriend();
         $friend->setName('DummyFriend');
@@ -130,7 +130,7 @@ final class JsonApiContext implements Context
     /**
      * @Given there is a CircularReference
      */
-    public function thereIsACircularReference()
+    public function thereIsACircularReference(): void
     {
         $circularReference = new CircularReference();
         $circularReference->parent = $circularReference;

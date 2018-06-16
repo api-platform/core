@@ -41,13 +41,13 @@ class ConfigurationTest extends TestCase
      */
     private $processor;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->configuration = new Configuration();
         $this->processor = new Processor();
     }
 
-    public function testDefaultConfig()
+    public function testDefaultConfig(): void
     {
         $treeBuilder = $this->configuration->getConfigTreeBuilder();
         $config = $this->processor->processConfiguration($this->configuration, ['api_platform' => ['title' => 'title', 'description' => 'description', 'version' => '1.0.0']]);
@@ -151,7 +151,7 @@ class ConfigurationTest extends TestCase
      * @group legacy
      * @expectedDeprecation Using a string "HTTP_INTERNAL_SERVER_ERROR" as a constant of the "Symfony\Component\HttpFoundation\Response" class is deprecated since API Platform 2.1 and will not be possible anymore in API Platform 3. Use the Symfony's custom YAML extension for PHP constants instead (i.e. "!php/const:Symfony\Component\HttpFoundation\Response::HTTP_INTERNAL_SERVER_ERROR").
      */
-    public function testLegacyExceptionToStatusConfig()
+    public function testLegacyExceptionToStatusConfig(): void
     {
         $config = $this->processor->processConfiguration($this->configuration, [
             'api_platform' => [
@@ -173,7 +173,7 @@ class ConfigurationTest extends TestCase
      * @group legacy
      * @expectedDeprecation The use of the `default_operation_path_resolver` has been deprecated in 2.1 and will be removed in 3.0. Use `path_segment_name_generator` instead.
      */
-    public function testLegacyDefaultOperationPathResolver()
+    public function testLegacyDefaultOperationPathResolver(): void
     {
         $config = $this->processor->processConfiguration($this->configuration, [
             'api_platform' => [
@@ -197,7 +197,7 @@ class ConfigurationTest extends TestCase
     /**
      * @dataProvider invalidHttpStatusCodeProvider
      */
-    public function testExceptionToStatusConfigWithInvalidHttpStatusCode($invalidHttpStatusCode)
+    public function testExceptionToStatusConfigWithInvalidHttpStatusCode($invalidHttpStatusCode): void
     {
         $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessageRegExp('/The HTTP status code ".+" is not valid\\./');
@@ -226,7 +226,7 @@ class ConfigurationTest extends TestCase
     /**
      * @dataProvider invalidHttpStatusCodeValueProvider
      */
-    public function testExceptionToStatusConfigWithInvalidHttpStatusCodeValue($invalidHttpStatusCodeValue)
+    public function testExceptionToStatusConfigWithInvalidHttpStatusCodeValue($invalidHttpStatusCodeValue): void
     {
         $this->expectException(InvalidTypeException::class);
         $this->expectExceptionMessageRegExp('/Invalid type for path "api_platform\\.exception_to_status\\.Exception". Expected int, but got .+\\./');
@@ -243,7 +243,7 @@ class ConfigurationTest extends TestCase
     /**
      * Test config for api keys.
      */
-    public function testApiKeysConfig()
+    public function testApiKeysConfig(): void
     {
         $exampleConfig = [
                 'name' => 'Authorization',
@@ -265,7 +265,7 @@ class ConfigurationTest extends TestCase
     /**
      * Test config for empty title and description.
      */
-    public function testEmptyTitleDescriptionConfig()
+    public function testEmptyTitleDescriptionConfig(): void
     {
         $config = $this->processor->processConfiguration($this->configuration, [
             'api_platform' => [],

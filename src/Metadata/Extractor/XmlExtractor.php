@@ -30,7 +30,7 @@ final class XmlExtractor extends AbstractExtractor
     /**
      * {@inheritdoc}
      */
-    protected function extractPath(string $path)
+    protected function extractPath(string $path): void
     {
         try {
             $xml = simplexml_import_dom(XmlUtils::loadFile($path, self::RESOURCE_SCHEMA));

@@ -32,7 +32,7 @@ use Prophecy\Argument;
  */
 class PurgeHttpCacheListenerTest extends TestCase
 {
-    public function testOnFlush()
+    public function testOnFlush(): void
     {
         $toInsert1 = new Dummy();
         $toInsert2 = new Dummy();
@@ -75,7 +75,7 @@ class PurgeHttpCacheListenerTest extends TestCase
         $listener->postFlush();
     }
 
-    public function testPreUpdate()
+    public function testPreUpdate(): void
     {
         $oldRelatedDummy = new RelatedDummy();
         $oldRelatedDummy->setId(1);

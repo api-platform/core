@@ -29,7 +29,7 @@ final class YamlExtractor extends AbstractExtractor
     /**
      * {@inheritdoc}
      */
-    protected function extractPath(string $path)
+    protected function extractPath(string $path): void
     {
         try {
             $resourcesYaml = Yaml::parse(file_get_contents($path), Yaml::PARSE_CONSTANT);
@@ -50,7 +50,7 @@ final class YamlExtractor extends AbstractExtractor
         $this->extractResources($resourcesYaml, $path);
     }
 
-    private function extractResources(array $resourcesYaml, string $path)
+    private function extractResources(array $resourcesYaml, string $path): void
     {
         foreach ($resourcesYaml as $resourceName => $resourceYaml) {
             if (null === $resourceYaml) {
@@ -86,7 +86,7 @@ final class YamlExtractor extends AbstractExtractor
         }
     }
 
-    private function extractProperties(array $resourceYaml, string $resourceName, string $path)
+    private function extractProperties(array $resourceYaml, string $resourceName, string $path): void
     {
         foreach ($resourceYaml['properties'] as $propertyName => $propertyValues) {
             if (null === $propertyValues) {

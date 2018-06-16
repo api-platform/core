@@ -56,7 +56,7 @@ final class DenyAccessListener
      *
      * @throws AccessDeniedException
      */
-    public function onKernelRequest(GetResponseEvent $event)
+    public function onKernelRequest(GetResponseEvent $event): void
     {
         $request = $event->getRequest();
         if (!$attributes = RequestAttributesExtractor::extractAttributes($request)) {

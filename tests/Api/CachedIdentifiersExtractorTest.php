@@ -43,7 +43,7 @@ class CachedIdentifiersExtractorTest extends TestCase
     /**
      * @dataProvider itemProvider
      */
-    public function testFirstPass($item, $expected)
+    public function testFirstPass($item, $expected): void
     {
         $key = 'iri_identifiers'.md5(Dummy::class);
 
@@ -73,7 +73,7 @@ class CachedIdentifiersExtractorTest extends TestCase
     /**
      * @dataProvider itemProvider
      */
-    public function testSecondPass($item, $expected)
+    public function testSecondPass($item, $expected): void
     {
         $key = 'iri_identifiers'.md5(Dummy::class);
 
@@ -126,7 +126,7 @@ class CachedIdentifiersExtractorTest extends TestCase
     /**
      * @dataProvider identifiersRelatedProvider
      */
-    public function testFirstPassWithRelated($item, $expected)
+    public function testFirstPassWithRelated($item, $expected): void
     {
         $key = 'iri_identifiers'.md5(Dummy::class);
         $keyRelated = 'iri_identifiers'.md5(RelatedDummy::class);
@@ -154,7 +154,7 @@ class CachedIdentifiersExtractorTest extends TestCase
     /**
      * @dataProvider identifiersRelatedProvider
      */
-    public function testSecondPassWithRelated($item, $expected)
+    public function testSecondPassWithRelated($item, $expected): void
     {
         $key = 'iri_identifiers'.md5(Dummy::class);
         $keyRelated = 'iri_identifiers'.md5(RelatedDummy::class);
@@ -184,7 +184,7 @@ class CachedIdentifiersExtractorTest extends TestCase
      * @group legacy
      * @expectedDeprecation Not injecting ApiPlatform\Core\Api\ResourceClassResolverInterface in the CachedIdentifiersExtractor might introduce cache issues with object identifiers.
      */
-    public function testDeprecationResourceClassResolver()
+    public function testDeprecationResourceClassResolver(): void
     {
         $cacheItemPool = $this->prophesize(CacheItemPoolInterface::class);
         $decoration = $this->prophesize(IdentifiersExtractorInterface::class);

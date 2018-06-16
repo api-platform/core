@@ -28,7 +28,7 @@ class QueryJoinParserTest extends TestCase
 {
     use PHPMock;
 
-    public function testGetClassMetadataFromJoinAlias()
+    public function testGetClassMetadataFromJoinAlias(): void
     {
         $queryBuilder = $this->prophesize(QueryBuilder::class);
         $queryBuilder->getRootEntities()->willReturn(['Dummy']);
@@ -43,19 +43,19 @@ class QueryJoinParserTest extends TestCase
         $this->assertEquals($metadata, $classMetadata->reveal());
     }
 
-    public function testGetJoinRelationshipWithJoin()
+    public function testGetJoinRelationshipWithJoin(): void
     {
         $join = new Join('INNER_JOIN', 'a_1.relatedDummy', 'a_1', null, 'a_1.name = r.name');
         $this->assertEquals('a_1.relatedDummy', QueryJoinParser::getJoinRelationship($join));
     }
 
-    public function testGetJoinRelationshipWithClassJoin()
+    public function testGetJoinRelationshipWithClassJoin(): void
     {
         $join = new Join('INNER_JOIN', RelatedDummy::class, 'a_1', null, 'a_1.name = r.name');
         $this->assertEquals(RelatedDummy::class, QueryJoinParser::getJoinRelationship($join));
     }
 
-    public function testGetJoinRelationshipWithReflection()
+    public function testGetJoinRelationshipWithReflection(): void
     {
         $methodExist = $this->getFunctionMock('ApiPlatform\Core\Bridge\Doctrine\Orm\Util', 'method_exists');
         $methodExist->expects($this->any())->with(Join::class, 'getJoin')->willReturn('false');
@@ -63,19 +63,19 @@ class QueryJoinParserTest extends TestCase
         $this->assertEquals('a_1.relatedDummy', QueryJoinParser::getJoinRelationship($join));
     }
 
-    public function testGetJoinAliasWithJoin()
+    public function testGetJoinAliasWithJoin(): void
     {
         $join = new Join('INNER_JOIN', 'relatedDummy', 'a_1', null, 'a_1.name = r.name');
         $this->assertEquals('a_1', QueryJoinParser::getJoinAlias($join));
     }
 
-    public function testGetJoinAliasWithClassJoin()
+    public function testGetJoinAliasWithClassJoin(): void
     {
         $join = new Join('LEFT_JOIN', RelatedDummy::class, 'a_1', null, 'a_1.name = r.name');
         $this->assertEquals('a_1', QueryJoinParser::getJoinAlias($join));
     }
 
-    public function testGetJoinAliasWithReflection()
+    public function testGetJoinAliasWithReflection(): void
     {
         $methodExist = $this->getFunctionMock('ApiPlatform\Core\Bridge\Doctrine\Orm\Util', 'method_exists');
         $methodExist->expects($this->any())->with(Join::class, 'getAlias')->willReturn('false');
@@ -83,13 +83,13 @@ class QueryJoinParserTest extends TestCase
         $this->assertEquals('a_1', QueryJoinParser::getJoinAlias($join));
     }
 
-    public function testGetOrderByPartsWithOrderBy()
+    public function testGetOrderByPartsWithOrderBy(): void
     {
         $orderBy = new OrderBy('name', 'asc');
         $this->assertEquals(['name asc'], QueryJoinParser::getOrderByParts($orderBy));
     }
 
-    public function testGetOrderByPartsWithReflection()
+    public function testGetOrderByPartsWithReflection(): void
     {
         $methodExist = $this->getFunctionMock('ApiPlatform\Core\Bridge\Doctrine\Orm\Util', 'method_exists');
         $methodExist->expects($this->any())->with(OrderBy::class, 'getParts')->willReturn('false');

@@ -36,7 +36,7 @@ use Symfony\Component\PropertyInfo\Type;
  */
 class SchemaBuilderTest extends TestCase
 {
-    public function testGetSchemaAllFields()
+    public function testGetSchemaAllFields(): void
     {
         $propertyMetadataMockBuilder = function ($builtinType, $resourceClassName) {
             return new PropertyMetadata(
@@ -67,7 +67,7 @@ class SchemaBuilderTest extends TestCase
         ], array_keys($mockedSchemaBuilder->getSchema()->getConfig()->getQuery()->getFields()));
     }
 
-    public function testGetSchemaResourceClassNotFound()
+    public function testGetSchemaResourceClassNotFound(): void
     {
         $propertyMetadataMockBuilder = function ($builtinType, $resourceClassName) {
             return new PropertyMetadata(
@@ -98,7 +98,7 @@ class SchemaBuilderTest extends TestCase
     /**
      * @dataProvider paginationProvider
      */
-    public function testGetSchema(bool $paginationEnabled)
+    public function testGetSchema(bool $paginationEnabled): void
     {
         $propertyMetadataMockBuilder = function ($builtinType, $resourceClassName) {
             return new PropertyMetadata(
@@ -230,8 +230,8 @@ class SchemaBuilderTest extends TestCase
         $resourceNameCollection = new ResourceNameCollection($resourceClassNames);
         $resourceNameCollectionFactoryProphecy->create()->willReturn($resourceNameCollection);
 
-        $collectionResolverFactoryProphecy->__invoke(Argument::cetera())->willReturn(function () {});
-        $itemMutationResolverFactoryProphecy->__invoke(Argument::cetera())->willReturn(function () {});
+        $collectionResolverFactoryProphecy->__invoke(Argument::cetera())->willReturn(function (): void {});
+        $itemMutationResolverFactoryProphecy->__invoke(Argument::cetera())->willReturn(function (): void {});
 
         return new SchemaBuilder(
             $propertyNameCollectionFactoryProphecy->reveal(),
@@ -240,8 +240,8 @@ class SchemaBuilderTest extends TestCase
             $resourceMetadataFactoryProphecy->reveal(),
             $collectionResolverFactoryProphecy->reveal(),
             $itemMutationResolverFactoryProphecy->reveal(),
-            function () {},
-            function () {},
+            function (): void {},
+            function (): void {},
             null,
             $paginationEnabled
         );

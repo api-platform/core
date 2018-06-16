@@ -33,7 +33,7 @@ use Symfony\Component\Validator\ConstraintViolationList;
  */
 class ValidationExceptionTest extends TestCase
 {
-    public function testToString()
+    public function testToString(): void
     {
         $e = new ValidationException(new ConstraintViolationList([
             new ConstraintViolation('message 1', '', [], '', '', 'invalid'),

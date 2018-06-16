@@ -23,7 +23,7 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class PropertyFilterTest extends TestCase
 {
-    public function testApply()
+    public function testApply(): void
     {
         $request = new Request(['properties' => ['foo', 'bar', 'baz']]);
         $context = ['attributes' => ['foo', 'qux']];
@@ -34,7 +34,7 @@ class PropertyFilterTest extends TestCase
         $this->assertEquals(['attributes' => ['foo', 'qux', 'foo', 'bar', 'baz']], $context);
     }
 
-    public function testApplyWithOverriding()
+    public function testApplyWithOverriding(): void
     {
         $request = new Request(['custom_properties' => ['foo', 'bar', 'baz']]);
         $context = ['attributes' => ['foo', 'qux']];
@@ -45,7 +45,7 @@ class PropertyFilterTest extends TestCase
         $this->assertEquals(['attributes' => ['foo', 'bar', 'baz']], $context);
     }
 
-    public function testApplyWithoutPropertiesInRequest()
+    public function testApplyWithoutPropertiesInRequest(): void
     {
         $context = ['attributes' => ['foo', 'bar']];
 
@@ -55,7 +55,7 @@ class PropertyFilterTest extends TestCase
         $this->assertEquals(['attributes' => ['foo', 'bar']], $context);
     }
 
-    public function testApplyWithPropertiesWhitelist()
+    public function testApplyWithPropertiesWhitelist(): void
     {
         $request = new Request(['properties' => ['foo', 'bar', 'baz']]);
         $context = ['attributes' => ['qux']];
@@ -66,7 +66,7 @@ class PropertyFilterTest extends TestCase
         $this->assertEquals(['attributes' => ['qux', 'foo', 'bar']], $context);
     }
 
-    public function testApplyWithPropertiesWhitelistWithNestedProperty()
+    public function testApplyWithPropertiesWhitelistWithNestedProperty(): void
     {
         $request = new Request(['properties' => ['foo', 'bar', 'group' => ['baz' => ['baz', 'qux'], 'qux']]]);
         $context = ['attributes' => ['qux']];
@@ -77,7 +77,7 @@ class PropertyFilterTest extends TestCase
         $this->assertEquals(['attributes' => ['qux', 'foo', 'group' => ['baz' => ['qux']]]], $context);
     }
 
-    public function testApplyWithPropertiesWhitelistNotMatchingAnyProperty()
+    public function testApplyWithPropertiesWhitelistNotMatchingAnyProperty(): void
     {
         $request = new Request(['properties' => ['foo', 'bar', 'group' => ['baz' => ['baz', 'qux'], 'qux']]]);
         $context = ['attributes' => ['qux']];
@@ -88,7 +88,7 @@ class PropertyFilterTest extends TestCase
         $this->assertEquals(['attributes' => ['qux']], $context);
     }
 
-    public function testApplyWithoutPropertiesWhitelistWithOverriding()
+    public function testApplyWithoutPropertiesWhitelistWithOverriding(): void
     {
         $request = new Request(['properties' => ['foo', 'bar', 'baz']]);
         $context = ['attributes' => ['qux']];
@@ -99,7 +99,7 @@ class PropertyFilterTest extends TestCase
         $this->assertEquals(['attributes' => ['foo', 'baz']], $context);
     }
 
-    public function testApplyWithPropertiesInPropertyFilterAttribute()
+    public function testApplyWithPropertiesInPropertyFilterAttribute(): void
     {
         $request = new Request(['properties' => ['foo', 'bar', 'baz']], [], ['_api_filters' => ['properties' => ['fooz']]]);
         $context = ['attributes' => ['foo', 'qux']];
@@ -110,7 +110,7 @@ class PropertyFilterTest extends TestCase
         $this->assertEquals(['attributes' => ['foo', 'qux', 'fooz']], $context);
     }
 
-    public function testApplyWithInvalidPropertiesInRequest()
+    public function testApplyWithInvalidPropertiesInRequest(): void
     {
         $request = new Request(['properties' => 'foo,bar,baz']);
         $context = ['attributes' => ['foo', 'bar']];
@@ -121,7 +121,7 @@ class PropertyFilterTest extends TestCase
         $this->assertEquals(['attributes' => ['foo', 'bar']], $context);
     }
 
-    public function testGetDescription()
+    public function testGetDescription(): void
     {
         $propertyFilter = new PropertyFilter('custom_properties');
         $expectedDescription = [

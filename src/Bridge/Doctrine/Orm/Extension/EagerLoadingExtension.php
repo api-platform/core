@@ -75,7 +75,7 @@ final class EagerLoadingExtension implements ContextAwareQueryCollectionExtensio
     /**
      * {@inheritdoc}
      */
-    public function applyToCollection(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass = null, string $operationName = null, array $context = [])
+    public function applyToCollection(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass = null, string $operationName = null, array $context = []): void
     {
         $this->apply(true, $queryBuilder, $queryNameGenerator, $resourceClass, $operationName, $context);
     }
@@ -83,12 +83,12 @@ final class EagerLoadingExtension implements ContextAwareQueryCollectionExtensio
     /**
      * The context may contain serialization groups which helps defining joined entities that are readable.
      */
-    public function applyToItem(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, array $identifiers, string $operationName = null, array $context = [])
+    public function applyToItem(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, array $identifiers, string $operationName = null, array $context = []): void
     {
         $this->apply(false, $queryBuilder, $queryNameGenerator, $resourceClass, $operationName, $context);
     }
 
-    private function apply(bool $collection, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass = null, string $operationName = null, array $context)
+    private function apply(bool $collection, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass = null, string $operationName = null, array $context): void
     {
         if (null === $resourceClass) {
             throw new InvalidArgumentException('The "$resourceClass" parameter must not be null');
@@ -123,7 +123,7 @@ final class EagerLoadingExtension implements ContextAwareQueryCollectionExtensio
      *
      * @throws RuntimeException when the max number of joins has been reached
      */
-    private function joinRelations(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, bool $forceEager, bool $fetchPartial, string $parentAlias, array $options = [], array $normalizationContext = [], bool $wasLeftJoin = false, int &$joinCount = 0, int $currentDepth = null)
+    private function joinRelations(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, bool $forceEager, bool $fetchPartial, string $parentAlias, array $options = [], array $normalizationContext = [], bool $wasLeftJoin = false, int &$joinCount = 0, int $currentDepth = null): void
     {
         if ($joinCount > $this->maxJoins) {
             throw new RuntimeException('The total number of joined relations has exceeded the specified maximum. Raise the limit if necessary, or use the "max_depth" option of the Symfony serializer.');
@@ -234,7 +234,7 @@ final class EagerLoadingExtension implements ContextAwareQueryCollectionExtensio
         }
     }
 
-    private function addSelect(QueryBuilder $queryBuilder, string $entity, string $associationAlias, array $propertyMetadataOptions)
+    private function addSelect(QueryBuilder $queryBuilder, string $entity, string $associationAlias, array $propertyMetadataOptions): void
     {
         $select = [];
         $entityManager = $queryBuilder->getEntityManager();

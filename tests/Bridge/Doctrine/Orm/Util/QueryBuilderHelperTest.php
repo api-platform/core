@@ -26,7 +26,7 @@ class QueryBuilderHelperTest extends TestCase
      *
      * @param string|null $originAlias
      */
-    public function testAddJoinOnce(string $originAliasForJoinOnce = null, string $expectedAlias)
+    public function testAddJoinOnce(string $originAliasForJoinOnce = null, string $expectedAlias): void
     {
         $queryBuilder = new QueryBuilder($this->prophesize(EntityManagerInterface::class)->reveal());
         $queryBuilder->from('foo', 'f');

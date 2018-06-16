@@ -60,7 +60,7 @@ class DummyOffer
         return $this->value;
     }
 
-    public function setValue(int $value)
+    public function setValue(int $value): void
     {
         $this->value = $value;
     }
@@ -70,7 +70,7 @@ class DummyOffer
         return $this->aggregate;
     }
 
-    public function setAggregate(DummyAggregateOffer $aggregate)
+    public function setAggregate(DummyAggregateOffer $aggregate): void
     {
         $this->aggregate = $aggregate;
     }

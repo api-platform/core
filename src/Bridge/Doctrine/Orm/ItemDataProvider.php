@@ -110,7 +110,7 @@ class ItemDataProvider implements DenormalizedIdentifiersAwareItemDataProviderIn
      * @param QueryBuilder  $queryBuilder
      * @param ClassMetadata $classMetadata
      */
-    private function addWhereForIdentifiers(array $identifiers, QueryBuilder $queryBuilder, ClassMetadata $classMetadata)
+    private function addWhereForIdentifiers(array $identifiers, QueryBuilder $queryBuilder, ClassMetadata $classMetadata): void
     {
         $alias = $queryBuilder->getRootAliases()[0];
         foreach ($identifiers as $identifier => $value) {

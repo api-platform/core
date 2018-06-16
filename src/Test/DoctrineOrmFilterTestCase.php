@@ -53,7 +53,7 @@ abstract class DoctrineOrmFilterTestCase extends KernelTestCase
      */
     protected $filterClass;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         self::bootKernel();
 
@@ -65,7 +65,7 @@ abstract class DoctrineOrmFilterTestCase extends KernelTestCase
     /**
      * @dataProvider provideApplyTestData
      */
-    public function testApply(array $properties = null, array $filterParameters, string $expectedDql, array $expectedParameters = null, callable $factory = null)
+    public function testApply(array $properties = null, array $filterParameters, string $expectedDql, array $expectedParameters = null, callable $factory = null): void
     {
         $this->doTestApply(false, $properties, $filterParameters, $expectedDql, $expectedParameters, $factory);
     }
@@ -74,12 +74,12 @@ abstract class DoctrineOrmFilterTestCase extends KernelTestCase
      * @group legacy
      * @dataProvider provideApplyTestData
      */
-    public function testApplyRequest(array $properties = null, array $filterParameters, string $expectedDql, array $expectedParameters = null, callable $factory = null)
+    public function testApplyRequest(array $properties = null, array $filterParameters, string $expectedDql, array $expectedParameters = null, callable $factory = null): void
     {
         $this->doTestApply(true, $properties, $filterParameters, $expectedDql, $expectedParameters, $factory);
     }
 
-    protected function doTestApply(bool $request, array $properties = null, array $filterParameters, string $expectedDql, array $expectedParameters = null, callable $filterFactory = null)
+    protected function doTestApply(bool $request, array $properties = null, array $filterParameters, string $expectedDql, array $expectedParameters = null, callable $filterFactory = null): void
     {
         if (null === $filterFactory) {
             $filterFactory = function (ManagerRegistry $managerRegistry, RequestStack $requestStack = null, array $properties = null): FilterInterface {

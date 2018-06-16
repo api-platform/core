@@ -29,7 +29,7 @@ use PHPUnit\Framework\TestCase;
  */
 class ResourceClassResolverTest extends TestCase
 {
-    public function testGetResourceClassWithIntendedClassName()
+    public function testGetResourceClassWithIntendedClassName(): void
     {
         $dummy = new Dummy();
         $dummy->setName('Smail');
@@ -41,7 +41,7 @@ class ResourceClassResolverTest extends TestCase
         $this->assertEquals($resourceClass, Dummy::class);
     }
 
-    public function testGetResourceClassWithOtherClassName()
+    public function testGetResourceClassWithOtherClassName(): void
     {
         $dummy = new Dummy();
         $dummy->setName('Smail');
@@ -53,7 +53,7 @@ class ResourceClassResolverTest extends TestCase
         $this->assertEquals($resourceClass, Dummy::class);
     }
 
-    public function testGetResourceClassWithNoClassName()
+    public function testGetResourceClassWithNoClassName(): void
     {
         $dummy = new Dummy();
         $dummy->setName('Smail');
@@ -65,7 +65,7 @@ class ResourceClassResolverTest extends TestCase
         $this->assertEquals($resourceClass, Dummy::class);
     }
 
-    public function testGetResourceClassWithTraversableAsValue()
+    public function testGetResourceClassWithTraversableAsValue(): void
     {
         $dummy = new Dummy();
         $dummy->setName('JLM');
@@ -81,7 +81,7 @@ class ResourceClassResolverTest extends TestCase
         $this->assertEquals($resourceClass, Dummy::class);
     }
 
-    public function testGetResourceClassWithPaginatorInterfaceAsValue()
+    public function testGetResourceClassWithPaginatorInterfaceAsValue(): void
     {
         $paginatorProphecy = $this->prophesize(PaginatorInterface::class);
 
@@ -94,7 +94,7 @@ class ResourceClassResolverTest extends TestCase
         $this->assertEquals($resourceClass, Dummy::class);
     }
 
-    public function testGetResourceClassWithWrongClassName()
+    public function testGetResourceClassWithWrongClassName(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('No resource class found for object of type "stdClass".');
@@ -106,7 +106,7 @@ class ResourceClassResolverTest extends TestCase
         $resourceClassResolver->getResourceClass(new \stdClass(), null);
     }
 
-    public function testGetResourceClassWithNoResourceClassName()
+    public function testGetResourceClassWithNoResourceClassName(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('No resource class found.');
@@ -117,7 +117,7 @@ class ResourceClassResolverTest extends TestCase
         $resourceClassResolver->getResourceClass(new \ArrayIterator([]), null);
     }
 
-    public function testIsResourceClassWithIntendedClassName()
+    public function testIsResourceClassWithIntendedClassName(): void
     {
         $dummy = new Dummy();
         $dummy->setName('Smail');
@@ -129,7 +129,7 @@ class ResourceClassResolverTest extends TestCase
         $this->assertTrue($resourceClass);
     }
 
-    public function testIsResourceClassWithWrongClassName()
+    public function testIsResourceClassWithWrongClassName(): void
     {
         $resourceNameCollectionFactoryProphecy = $this->prophesize(ResourceNameCollectionFactoryInterface::class);
         $resourceNameCollectionFactoryProphecy->create()->willReturn(new ResourceNameCollection([\ArrayIterator::class]))->shouldBeCalled();
@@ -139,7 +139,7 @@ class ResourceClassResolverTest extends TestCase
         $this->assertFalse($resourceClass);
     }
 
-    public function testGetResourceClassWithNoResourceClassNameAndNoObject()
+    public function testGetResourceClassWithNoResourceClassNameAndNoObject(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('No resource class found.');
@@ -150,7 +150,7 @@ class ResourceClassResolverTest extends TestCase
         $resourceClassResolver->getResourceClass(false, null);
     }
 
-    public function testGetResourceClassWithResourceClassNameAndNoObject()
+    public function testGetResourceClassWithResourceClassNameAndNoObject(): void
     {
         $resourceNameCollectionFactoryProphecy = $this->prophesize(ResourceNameCollectionFactoryInterface::class);
         $resourceNameCollectionFactoryProphecy->create()->willReturn(new ResourceNameCollection([Dummy::class]))->shouldBeCalled();
@@ -159,7 +159,7 @@ class ResourceClassResolverTest extends TestCase
         $this->assertEquals($resourceClassResolver->getResourceClass(false, Dummy::class), Dummy::class);
     }
 
-    public function testGetResourceClassWithChildResource()
+    public function testGetResourceClassWithChildResource(): void
     {
         $resourceNameCollectionFactoryProphecy = $this->prophesize(ResourceNameCollectionFactoryInterface::class);
         $resourceNameCollectionFactoryProphecy->create()->willReturn(new ResourceNameCollection([DummyTableInheritance::class]))->shouldBeCalled();

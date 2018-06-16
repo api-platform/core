@@ -32,7 +32,7 @@ class QueryParameterValidateListenerTest extends TestCase
     /**
      * unsafe method should not use filter validations.
      */
-    public function testOnKernelRequestWithUnsafeMethod()
+    public function testOnKernelRequestWithUnsafeMethod(): void
     {
         $this->setUpWithFilters();
 
@@ -50,7 +50,7 @@ class QueryParameterValidateListenerTest extends TestCase
     /**
      * If the tested filter is non-existant, then nothing should append.
      */
-    public function testOnKernelRequestWithWrongFilter()
+    public function testOnKernelRequestWithWrongFilter(): void
     {
         $this->setUpWithFilters(['some_inexistent_filter']);
 
@@ -71,7 +71,7 @@ class QueryParameterValidateListenerTest extends TestCase
     /**
      * if the required parameter is not set, throw an FilterValidationException.
      */
-    public function testOnKernelRequestWithRequiredFilterNotSet()
+    public function testOnKernelRequestWithRequiredFilterNotSet(): void
     {
         $this->setUpWithFilters(['some_filter']);
 
@@ -110,7 +110,7 @@ class QueryParameterValidateListenerTest extends TestCase
     /**
      * if the required parameter is set, no exception should be throwned.
      */
-    public function testOnKernelRequestWithRequiredFilter()
+    public function testOnKernelRequestWithRequiredFilter(): void
     {
         $this->setUpWithFilters(['some_filter']);
 
@@ -150,7 +150,7 @@ class QueryParameterValidateListenerTest extends TestCase
         );
     }
 
-    private function setUpWithFilters(array $filters = [])
+    private function setUpWithFilters(array $filters = []): void
     {
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataFactoryProphecy

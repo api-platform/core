@@ -37,7 +37,7 @@ class RamseyUuidDummy
         return $this->id;
     }
 
-    public function setId(string $uuid)
+    public function setId(string $uuid): void
     {
         $this->id = Uuid::fromString($uuid);
     }

@@ -36,7 +36,7 @@ final class AnnotationFilterPass implements CompilerPassInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
         $resourceClassDirectories = $container->getParameter('api_platform.resource_class_directories');
         $reader = $container->get('annotation_reader');
@@ -46,7 +46,7 @@ final class AnnotationFilterPass implements CompilerPassInterface
         }
     }
 
-    private function createFilterDefinitions(\ReflectionClass $reflectionClass, Reader $reader, ContainerBuilder $container)
+    private function createFilterDefinitions(\ReflectionClass $reflectionClass, Reader $reader, ContainerBuilder $container): void
     {
         foreach ($this->readFilterAnnotations($reflectionClass, $reader) as $id => list($arguments, $filterClass)) {
             if ($container->hasDefinition($id)) {

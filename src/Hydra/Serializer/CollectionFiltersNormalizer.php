@@ -110,7 +110,7 @@ final class CollectionFiltersNormalizer implements NormalizerInterface, Normaliz
     /**
      * {@inheritdoc}
      */
-    public function setNormalizer(NormalizerInterface $normalizer)
+    public function setNormalizer(NormalizerInterface $normalizer): void
     {
         if ($this->collectionNormalizer instanceof NormalizerAwareInterface) {
             $this->collectionNormalizer->setNormalizer($normalizer);

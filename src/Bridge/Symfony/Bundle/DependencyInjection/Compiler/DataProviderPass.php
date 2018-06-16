@@ -32,14 +32,14 @@ final class DataProviderPass implements CompilerPassInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
         foreach (OperationType::TYPES as $type) {
             $this->addSerializerLocator($container, $type);
         }
     }
 
-    private function addSerializerLocator(ContainerBuilder $container, string $type)
+    private function addSerializerLocator(ContainerBuilder $container, string $type): void
     {
         $services = $container->findTaggedServiceIds("api_platform.{$type}_data_provider", true);
 

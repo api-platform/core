@@ -42,7 +42,7 @@ use Symfony\Component\Serializer\SerializerInterface;
  */
 class AbstractItemNormalizerTest extends TestCase
 {
-    public function testSupportNormalizationAndSupportDenormalization()
+    public function testSupportNormalizationAndSupportDenormalization(): void
     {
         $std = new \stdClass();
         $dummy = new Dummy();
@@ -71,7 +71,7 @@ class AbstractItemNormalizerTest extends TestCase
         $this->assertTrue($normalizer->hasCacheableSupportsMethod());
     }
 
-    public function testNormalize()
+    public function testNormalize(): void
     {
         $relatedDummy = new RelatedDummy();
 
@@ -149,7 +149,7 @@ class AbstractItemNormalizerTest extends TestCase
         ], $normalizer->normalize($dummy, null, ['resources' => []]));
     }
 
-    public function testNormalizeReadableLinks()
+    public function testNormalizeReadableLinks(): void
     {
         $relatedDummy = new RelatedDummy();
 
@@ -215,7 +215,7 @@ class AbstractItemNormalizerTest extends TestCase
         ], $normalizer->normalize($dummy, null, ['resources' => []]));
     }
 
-    public function testDenormalize()
+    public function testDenormalize(): void
     {
         $relatedDummy1 = new RelatedDummy();
         $relatedDummy2 = new RelatedDummy();
@@ -286,7 +286,7 @@ class AbstractItemNormalizerTest extends TestCase
         ], Dummy::class);
     }
 
-    public function testDenormalizeWritableLinks()
+    public function testDenormalizeWritableLinks(): void
     {
         $relatedDummy1 = new RelatedDummy();
         $relatedDummy2 = new RelatedDummy();
@@ -358,7 +358,7 @@ class AbstractItemNormalizerTest extends TestCase
         ], Dummy::class);
     }
 
-    public function testBadRelationType()
+    public function testBadRelationType(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Expected IRI or nested document for attribute "relatedDummy", "integer" given.');
@@ -401,7 +401,7 @@ class AbstractItemNormalizerTest extends TestCase
         $normalizer->denormalize(['relatedDummy' => 22], Dummy::class);
     }
 
-    public function testInnerDocumentNotAllowed()
+    public function testInnerDocumentNotAllowed(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Nested documents for attribute "relatedDummy" are not allowed. Use IRIs instead.');
@@ -444,7 +444,7 @@ class AbstractItemNormalizerTest extends TestCase
         $normalizer->denormalize(['relatedDummy' => ['foo' => 'bar']], Dummy::class);
     }
 
-    public function testBadType()
+    public function testBadType(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('The type of the "foo" attribute must be "float", "integer" given.');
@@ -478,7 +478,7 @@ class AbstractItemNormalizerTest extends TestCase
         $normalizer->denormalize(['foo' => 42], Dummy::class);
     }
 
-    public function testJsonAllowIntAsFloat()
+    public function testJsonAllowIntAsFloat(): void
     {
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyNameCollectionFactoryProphecy->create(Dummy::class, [])->willReturn(
@@ -510,7 +510,7 @@ class AbstractItemNormalizerTest extends TestCase
         $normalizer->denormalize(['foo' => 42], Dummy::class, 'jsonfoo');
     }
 
-    public function testDenormalizeBadKeyType()
+    public function testDenormalizeBadKeyType(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('The type of the key "a" must be "int", "string" given.');
@@ -563,7 +563,7 @@ class AbstractItemNormalizerTest extends TestCase
         ], Dummy::class);
     }
 
-    public function testNullable()
+    public function testNullable(): void
     {
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyNameCollectionFactoryProphecy->create(Dummy::class, [])->willReturn(
@@ -594,7 +594,7 @@ class AbstractItemNormalizerTest extends TestCase
         $normalizer->denormalize(['name' => null], Dummy::class);
     }
 
-    public function testChildInheritedProperty()
+    public function testChildInheritedProperty(): void
     {
         $dummy = new DummyTableInheritance();
         $dummy->setName('foo');
@@ -642,7 +642,7 @@ class AbstractItemNormalizerTest extends TestCase
         ], $normalizer->normalize($dummy, null, ['resource_class' => DummyTableInheritance::class, 'resources' => []]));
     }
 
-    public function testDenormalizeRelationWithPlainId()
+    public function testDenormalizeRelationWithPlainId(): void
     {
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyNameCollectionFactoryProphecy->create(Dummy::class, [])->willReturn(
@@ -689,7 +689,7 @@ class AbstractItemNormalizerTest extends TestCase
         $normalizer->denormalize(['relatedDummy' => 1], Dummy::class, 'jsonld');
     }
 
-    public function testDoNotDenormalizeRelationWithPlainIdWhenPlainIdentifiersAreNotAllowed()
+    public function testDoNotDenormalizeRelationWithPlainIdWhenPlainIdentifiersAreNotAllowed(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Expected IRI or nested document for attribute "relatedDummy", "integer" given.');

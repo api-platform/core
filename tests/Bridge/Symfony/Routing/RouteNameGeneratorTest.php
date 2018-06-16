@@ -23,7 +23,7 @@ use PHPUnit\Framework\TestCase;
  */
 class RouteNameGeneratorTest extends TestCase
 {
-    public function testGenerate()
+    public function testGenerate(): void
     {
         $this->assertEquals('api_foos_get_collection', RouteNameGenerator::generate('get', 'Foo', OperationType::COLLECTION));
         $this->assertEquals('api_bars_custom_operation_item', RouteNameGenerator::generate('custom_operation', 'Bar', OperationType::ITEM));
@@ -33,12 +33,12 @@ class RouteNameGeneratorTest extends TestCase
      * @group legacy
      * @expectedDeprecation Using a boolean for the Operation Type is deprecated since API Platform 2.1 and will not be possible anymore in API Platform 3
      */
-    public function testLegacyGenerate()
+    public function testLegacyGenerate(): void
     {
         $this->assertEquals('api_foos_get_collection', RouteNameGenerator::generate('get', 'Foo', true));
     }
 
-    public function testGenerateWithSubresource()
+    public function testGenerateWithSubresource(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Subresource operations are not supported by the RouteNameGenerator.');

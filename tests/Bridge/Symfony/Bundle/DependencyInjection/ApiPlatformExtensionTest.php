@@ -96,17 +96,17 @@ class ApiPlatformExtensionTest extends TestCase
 
     private $extension;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->extension = new ApiPlatformExtension();
     }
 
-    public function tearDown()
+    public function tearDown(): void
     {
         unset($this->extension);
     }
 
-    public function testConstruct()
+    public function testConstruct(): void
     {
         $this->extension = new ApiPlatformExtension();
 
@@ -115,7 +115,7 @@ class ApiPlatformExtensionTest extends TestCase
         $this->assertInstanceOf(ConfigurationExtensionInterface::class, $this->extension);
     }
 
-    public function testNotPrependWhenNull()
+    public function testNotPrependWhenNull(): void
     {
         $containerBuilderProphecy = $this->prophesize(ContainerBuilder::class);
         $containerBuilderProphecy->getExtensionConfig('framework')->willReturn(null)->shouldBeCalled();
@@ -126,7 +126,7 @@ class ApiPlatformExtensionTest extends TestCase
         $this->extension->prepend($containerBuilder);
     }
 
-    public function testNotPrependSerializerWhenConfigExist()
+    public function testNotPrependSerializerWhenConfigExist(): void
     {
         $containerBuilderProphecy = $this->prophesize(ContainerBuilder::class);
         $containerBuilderProphecy->getExtensionConfig('framework')->willReturn([0 => ['serializer' => ['enabled' => false]]])->shouldBeCalled();
@@ -139,7 +139,7 @@ class ApiPlatformExtensionTest extends TestCase
         $this->extension->prepend($containerBuilder);
     }
 
-    public function testNotPrependPropertyInfoWhenConfigExist()
+    public function testNotPrependPropertyInfoWhenConfigExist(): void
     {
         $containerBuilderProphecy = $this->prophesize(ContainerBuilder::class);
         $containerBuilderProphecy->getExtensionConfig('framework')->willReturn([0 => ['property_info' => ['enabled' => false]]])->shouldBeCalled();
@@ -152,7 +152,7 @@ class ApiPlatformExtensionTest extends TestCase
         $this->extension->prepend($containerBuilder);
     }
 
-    public function testPrependWhenNotConfigured()
+    public function testPrependWhenNotConfigured(): void
     {
         $containerBuilderProphecy = $this->prophesize(ContainerBuilder::class);
         $containerBuilderProphecy->getExtensionConfig('framework')->willReturn([])->shouldBeCalled();
@@ -162,7 +162,7 @@ class ApiPlatformExtensionTest extends TestCase
         $this->extension->prepend($containerBuilder);
     }
 
-    public function testPrependWhenNotEnabled()
+    public function testPrependWhenNotEnabled(): void
     {
         $containerBuilderProphecy = $this->prophesize(ContainerBuilder::class);
         $containerBuilderProphecy->getExtensionConfig('framework')->willReturn([0 => ['serializer' => []]])->shouldBeCalled();
@@ -172,7 +172,7 @@ class ApiPlatformExtensionTest extends TestCase
         $this->extension->prepend($containerBuilder);
     }
 
-    public function testPrependWhenNameConverterIsConfigured()
+    public function testPrependWhenNameConverterIsConfigured(): void
     {
         $containerBuilderProphecy = $this->prophesize(ContainerBuilder::class);
         $containerBuilderProphecy->getExtensionConfig('framework')->willReturn([0 => ['serializer' => ['enabled' => true, 'name_converter' => 'foo'], 'property_info' => ['enabled' => false]]]);
@@ -181,7 +181,7 @@ class ApiPlatformExtensionTest extends TestCase
         $this->extension->prepend($containerBuilderProphecy->reveal());
     }
 
-    public function testNotPrependWhenNameConverterIsNotConfigured()
+    public function testNotPrependWhenNameConverterIsNotConfigured(): void
     {
         $containerBuilderProphecy = $this->prophesize(ContainerBuilder::class);
         $containerBuilderProphecy->getExtensionConfig('framework')->willReturn([0 => ['serializer' => ['enabled' => true], 'property_info' => ['enabled' => false]]])->shouldBeCalled();
@@ -190,7 +190,7 @@ class ApiPlatformExtensionTest extends TestCase
         $this->extension->prepend($containerBuilderProphecy->reveal());
     }
 
-    public function testLoadDefaultConfig()
+    public function testLoadDefaultConfig(): void
     {
         $containerBuilderProphecy = $this->getBaseContainerBuilderProphecy();
         $containerBuilder = $containerBuilderProphecy->reveal();
@@ -198,7 +198,7 @@ class ApiPlatformExtensionTest extends TestCase
         $this->extension->load(self::DEFAULT_CONFIG, $containerBuilder);
     }
 
-    public function testSetNameConverter()
+    public function testSetNameConverter(): void
     {
         $nameConverterId = 'test.name_converter';
 
@@ -209,7 +209,7 @@ class ApiPlatformExtensionTest extends TestCase
         $this->extension->load(array_merge_recursive(self::DEFAULT_CONFIG, ['api_platform' => ['name_converter' => $nameConverterId]]), $containerBuilder);
     }
 
-    public function testEnableFosUser()
+    public function testEnableFosUser(): void
     {
         $containerBuilderProphecy = $this->getBaseContainerBuilderProphecy();
         $containerBuilderProphecy->getParameter('kernel.bundles')->willReturn([
@@ -222,7 +222,7 @@ class ApiPlatformExtensionTest extends TestCase
         $this->extension->load(array_merge_recursive(self::DEFAULT_CONFIG, ['api_platform' => ['enable_fos_user' => true]]), $containerBuilder);
     }
 
-    public function testFosUserPriority()
+    public function testFosUserPriority(): void
     {
         $builder = new ContainerBuilder();
 
@@ -245,7 +245,7 @@ class ApiPlatformExtensionTest extends TestCase
      * @group legacy
      * @expectedDeprecation Enabling the NelmioApiDocBundle integration has been deprecated in 2.2 and will be removed in 3.0. NelmioApiDocBundle 3 has native support for API Platform.
      */
-    public function testEnableNelmioApiDoc()
+    public function testEnableNelmioApiDoc(): void
     {
         $containerBuilderProphecy = $this->getBaseContainerBuilderProphecy();
         $containerBuilderProphecy->getParameter('kernel.bundles')->willReturn([
@@ -259,7 +259,7 @@ class ApiPlatformExtensionTest extends TestCase
         $this->extension->load(array_merge_recursive(self::DEFAULT_CONFIG, ['api_platform' => ['enable_nelmio_api_doc' => true]]), $containerBuilder);
     }
 
-    public function testDisableGraphql()
+    public function testDisableGraphql(): void
     {
         $containerBuilderProphecy = $this->getBaseContainerBuilderProphecy();
         $containerBuilderProphecy->setDefinition('api_platform.action.graphql_entrypoint')->shouldNotBeCalled();
@@ -277,7 +277,7 @@ class ApiPlatformExtensionTest extends TestCase
         $this->extension->load(array_merge_recursive(self::DEFAULT_CONFIG, ['api_platform' => ['graphql' => ['enabled' => false]]]), $containerBuilder);
     }
 
-    public function testEnableSecurity()
+    public function testEnableSecurity(): void
     {
         $containerBuilderProphecy = $this->getBaseContainerBuilderProphecy();
         $containerBuilderProphecy->getParameter('kernel.bundles')->willReturn([
@@ -293,7 +293,7 @@ class ApiPlatformExtensionTest extends TestCase
         $this->extension->load(self::DEFAULT_CONFIG, $containerBuilder);
     }
 
-    public function testAddResourceClassDirectories()
+    public function testAddResourceClassDirectories(): void
     {
         $containerBuilderProphecy = $this->getBaseContainerBuilderProphecy();
         $containerBuilderProphecy->getParameter('api_platform.resource_class_directories')->shouldBeCalled()->willReturn([]);
@@ -315,7 +315,7 @@ class ApiPlatformExtensionTest extends TestCase
         $this->extension->load(array_merge_recursive(self::DEFAULT_CONFIG, ['api_platform' => ['resource_class_directories' => ['foobar']]]), $containerBuilder);
     }
 
-    public function testResourcesToWatchWithUnsupportedMappingType()
+    public function testResourcesToWatchWithUnsupportedMappingType(): void
     {
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessageRegExp('/Unsupported mapping type in ".+", supported types are XML & Yaml\\./');
@@ -326,7 +326,7 @@ class ApiPlatformExtensionTest extends TestCase
         );
     }
 
-    public function testResourcesToWatchWithNonExistentFile()
+    public function testResourcesToWatchWithNonExistentFile(): void
     {
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Could not open file or directory "fake_file.xml".');
@@ -337,7 +337,7 @@ class ApiPlatformExtensionTest extends TestCase
         );
     }
 
-    public function testDisableEagerLoadingExtension()
+    public function testDisableEagerLoadingExtension(): void
     {
         $containerBuilderProphecy = $this->getBaseContainerBuilderProphecy();
         $containerBuilderProphecy->setParameter('api_platform.eager_loading.enabled', false)->shouldBeCalled();
@@ -349,7 +349,7 @@ class ApiPlatformExtensionTest extends TestCase
         $this->extension->load(array_merge_recursive(self::DEFAULT_CONFIG, ['api_platform' => ['eager_loading' => ['enabled' => false]]]), $containerBuilder);
     }
 
-    public function testNotRegisterHttpCacheWhenEnabledWithNoVarnishServer()
+    public function testNotRegisterHttpCacheWhenEnabledWithNoVarnishServer(): void
     {
         $containerBuilderProphecy = $this->getBaseContainerBuilderProphecy();
         $containerBuilder = $containerBuilderProphecy->reveal();
@@ -360,7 +360,7 @@ class ApiPlatformExtensionTest extends TestCase
         $this->extension->load($config, $containerBuilder);
     }
 
-    public function testRegisterHttpCacheWhenEnabledWithNoRequestOption()
+    public function testRegisterHttpCacheWhenEnabledWithNoRequestOption(): void
     {
         $containerBuilderProphecy = $this->getBaseContainerBuilderProphecy();
         $containerBuilder = $containerBuilderProphecy->reveal();
@@ -371,7 +371,7 @@ class ApiPlatformExtensionTest extends TestCase
         $this->extension->load($config, $containerBuilder);
     }
 
-    public function testDisabledDocsRemovesAddLinkHeaderService()
+    public function testDisabledDocsRemovesAddLinkHeaderService(): void
     {
         $containerBuilderProphecy = $this->getBaseContainerBuilderProphecy();
         $containerBuilderProphecy->removeDefinition('api_platform.hydra.listener.response.add_link_header')->shouldBeCalled();

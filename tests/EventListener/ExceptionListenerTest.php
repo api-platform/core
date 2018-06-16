@@ -29,7 +29,7 @@ class ExceptionListenerTest extends TestCase
     /**
      * @dataProvider getRequest
      */
-    public function testOnKernelException(Request $request)
+    public function testOnKernelException(Request $request): void
     {
         $kernel = $this->prophesize(HttpKernelInterface::class);
         $kernel->handle(Argument::type(Request::class), HttpKernelInterface::SUB_REQUEST, false)->willReturn(new Response())->shouldBeCalled();
@@ -52,7 +52,7 @@ class ExceptionListenerTest extends TestCase
         ];
     }
 
-    public function testDoNothingWhenNotAnApiCall()
+    public function testDoNothingWhenNotAnApiCall(): void
     {
         $eventProphecy = $this->prophesize(GetResponseForExceptionEvent::class);
         $eventProphecy->getRequest()->willReturn(new Request())->shouldBeCalled();
@@ -61,7 +61,7 @@ class ExceptionListenerTest extends TestCase
         $listener->onKernelException($eventProphecy->reveal());
     }
 
-    public function testDoNothingWhenHtmlRequested()
+    public function testDoNothingWhenHtmlRequested(): void
     {
         $request = new Request([], [], ['_api_respond' => true]);
         $request->setRequestFormat('html');

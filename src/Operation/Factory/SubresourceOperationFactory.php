@@ -63,7 +63,7 @@ final class SubresourceOperationFactory implements SubresourceOperationFactoryIn
      * @param int    $depth             the number of visited
      * @param int    $maxDepth
      */
-    private function computeSubresourceOperations(string $resourceClass, array &$tree, string $rootResourceClass = null, array $parentOperation = null, array $visited = [], int $depth = 0, int $maxDepth = null)
+    private function computeSubresourceOperations(string $resourceClass, array &$tree, string $rootResourceClass = null, array $parentOperation = null, array $visited = [], int $depth = 0, int $maxDepth = null): void
     {
         if (null === $rootResourceClass) {
             $rootResourceClass = $resourceClass;

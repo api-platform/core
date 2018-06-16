@@ -21,12 +21,12 @@ use PHPUnit\Framework\TestCase;
  */
 class IntegerDenormalizerTest extends TestCase
 {
-    public function testDenormalize()
+    public function testDenormalize(): void
     {
         $this->assertSame(2, (new IntegerDenormalizer())->denormalize('2', 'int'));
     }
 
-    public function testSupportsDenormalization()
+    public function testSupportsDenormalization(): void
     {
         $normalizer = new IntegerDenormalizer();
         $this->assertTrue($normalizer->supportsDenormalization('1', 'int'));

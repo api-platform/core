@@ -32,7 +32,7 @@ class AnnotationPropertyMetadataFactoryTest extends TestCase
     /**
      * @dataProvider getDependencies
      */
-    public function testCreateProperty(ProphecyInterface $reader, ProphecyInterface $decorated = null, string $description)
+    public function testCreateProperty(ProphecyInterface $reader, ProphecyInterface $decorated = null, string $description): void
     {
         $factory = new AnnotationPropertyMetadataFactory($reader->reveal(), $decorated ? $decorated->reveal() : null);
         $metadata = $factory->create(Dummy::class, 'name');
@@ -87,7 +87,7 @@ class AnnotationPropertyMetadataFactoryTest extends TestCase
         ];
     }
 
-    public function testClassNotFound()
+    public function testClassNotFound(): void
     {
         $this->expectException(PropertyNotFoundException::class);
         $this->expectExceptionMessage('Property "foo" of class "\\DoNotExist" not found.');
@@ -96,7 +96,7 @@ class AnnotationPropertyMetadataFactoryTest extends TestCase
         $factory->create('\DoNotExist', 'foo');
     }
 
-    public function testClassNotFoundButParentFound()
+    public function testClassNotFoundButParentFound(): void
     {
         $propertyMetadata = new PropertyMetadata();
 

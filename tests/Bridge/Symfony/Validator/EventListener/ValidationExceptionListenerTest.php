@@ -27,7 +27,7 @@ use Symfony\Component\Validator\ConstraintViolationList;
  */
 class ValidationExceptionListenerTest extends TestCase
 {
-    public function testNotValidationException()
+    public function testNotValidationException(): void
     {
         $eventProphecy = $this->prophesize(GetResponseForExceptionEvent::class);
         $eventProphecy->getException()->willReturn(new \Exception())->shouldBeCalled();
@@ -39,7 +39,7 @@ class ValidationExceptionListenerTest extends TestCase
         $listener->onKernelException($eventProphecy->reveal());
     }
 
-    public function testValidationException()
+    public function testValidationException(): void
     {
         $list = new ConstraintViolationList([]);
 

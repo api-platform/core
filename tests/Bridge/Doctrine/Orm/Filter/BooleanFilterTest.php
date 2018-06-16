@@ -24,7 +24,7 @@ class BooleanFilterTest extends DoctrineOrmFilterTestCase
 {
     protected $filterClass = BooleanFilter::class;
 
-    public function testGetDescription()
+    public function testGetDescription(): void
     {
         $filter = new BooleanFilter($this->managerRegistry, null, null, [
             'id' => null,
@@ -42,7 +42,7 @@ class BooleanFilterTest extends DoctrineOrmFilterTestCase
         ], $filter->getDescription($this->resourceClass));
     }
 
-    public function testGetDescriptionDefaultFields()
+    public function testGetDescriptionDefaultFields(): void
     {
         $filter = new BooleanFilter($this->managerRegistry);
 

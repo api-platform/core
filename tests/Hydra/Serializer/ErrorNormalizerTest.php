@@ -24,7 +24,7 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class ErrorNormalizerTest extends TestCase
 {
-    public function testSupportsNormalization()
+    public function testSupportsNormalization(): void
     {
         $urlGeneratorProphecy = $this->prophesize(UrlGeneratorInterface::class);
 
@@ -47,7 +47,7 @@ class ErrorNormalizerTest extends TestCase
      * @param string $originalMessage original message of the Exception
      * @param bool   $debug           simulates kernel debug variable
      */
-    public function testErrorServerNormalize(int $status, string $originalMessage, bool $debug)
+    public function testErrorServerNormalize(int $status, string $originalMessage, bool $debug): void
     {
         $urlGeneratorProphecy = $this->prophesize(UrlGeneratorInterface::class);
         $urlGeneratorProphecy->generate('api_jsonld_context', ['shortName' => 'Error'])->willReturn('/context/foo')->shouldBeCalled();
@@ -81,7 +81,7 @@ class ErrorNormalizerTest extends TestCase
         ];
     }
 
-    public function testNormalize()
+    public function testNormalize(): void
     {
         $urlGeneratorProphecy = $this->prophesize(UrlGeneratorInterface::class);
         $urlGeneratorProphecy->generate('api_jsonld_context', ['shortName' => 'Error'])->willReturn('/context/foo')->shouldBeCalled();

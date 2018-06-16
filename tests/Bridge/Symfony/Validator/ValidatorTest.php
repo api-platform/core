@@ -26,7 +26,7 @@ use Symfony\Component\Validator\Validator\ValidatorInterface as SymfonyValidator
  */
 class ValidatorTest extends TestCase
 {
-    public function testValid()
+    public function testValid(): void
     {
         $data = new DummyEntity();
 
@@ -39,7 +39,7 @@ class ValidatorTest extends TestCase
         $validator->validate(new DummyEntity());
     }
 
-    public function testInvalid()
+    public function testInvalid(): void
     {
         $this->expectException(ValidationException::class);
 
@@ -58,7 +58,7 @@ class ValidatorTest extends TestCase
         $validator->validate(new DummyEntity());
     }
 
-    public function testGetGroupsFromCallable()
+    public function testGetGroupsFromCallable(): void
     {
         $data = new DummyEntity();
         $expectedValidationGroups = ['a', 'b', 'c'];
@@ -74,7 +74,7 @@ class ValidatorTest extends TestCase
         }]);
     }
 
-    public function testGetGroupsFromService()
+    public function testGetGroupsFromService(): void
     {
         $data = new DummyEntity();
 
@@ -97,7 +97,7 @@ class ValidatorTest extends TestCase
         $validator->validate(new DummyEntity(), ['groups' => 'groups_builder']);
     }
 
-    public function testValidatorWithScalarGroup()
+    public function testValidatorWithScalarGroup(): void
     {
         $data = new DummyEntity();
         $expectedValidationGroups = ['foo'];

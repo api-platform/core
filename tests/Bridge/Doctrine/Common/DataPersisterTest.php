@@ -25,12 +25,12 @@ use PHPUnit\Framework\TestCase;
  */
 class DataPersisterTest extends TestCase
 {
-    public function testConstruct()
+    public function testConstruct(): void
     {
         $this->assertInstanceOf(DataPersisterInterface::class, new DataPersister($this->prophesize(ManagerRegistry::class)->reveal()));
     }
 
-    public function testSupports()
+    public function testSupports(): void
     {
         $managerRegistryProphecy = $this->prophesize(ManagerRegistry::class);
         $managerRegistryProphecy->getManagerForClass(Dummy::class)->willReturn($this->prophesize(ObjectManager::class)->reveal())->shouldBeCalled();
@@ -38,12 +38,12 @@ class DataPersisterTest extends TestCase
         $this->assertTrue((new DataPersister($managerRegistryProphecy->reveal()))->supports(new Dummy()));
     }
 
-    public function testDoesNotSupport()
+    public function testDoesNotSupport(): void
     {
         $this->assertFalse((new DataPersister($this->prophesize(ManagerRegistry::class)->reveal()))->supports('dummy'));
     }
 
-    public function testPersist()
+    public function testPersist(): void
     {
         $dummy = new Dummy();
 
@@ -60,7 +60,7 @@ class DataPersisterTest extends TestCase
         $this->assertSame($dummy, $result);
     }
 
-    public function testPersistIfEntityAlreadyManaged()
+    public function testPersistIfEntityAlreadyManaged(): void
     {
         $dummy = new Dummy();
 
@@ -77,7 +77,7 @@ class DataPersisterTest extends TestCase
         $this->assertSame($dummy, $result);
     }
 
-    public function testPersistWithNullManager()
+    public function testPersistWithNullManager(): void
     {
         $dummy = new Dummy();
 
@@ -88,7 +88,7 @@ class DataPersisterTest extends TestCase
         $this->assertSame($dummy, $result);
     }
 
-    public function testRemove()
+    public function testRemove(): void
     {
         $dummy = new Dummy();
 
@@ -102,7 +102,7 @@ class DataPersisterTest extends TestCase
         (new DataPersister($managerRegistryProphecy->reveal()))->remove($dummy);
     }
 
-    public function testRemoveWithNullManager()
+    public function testRemoveWithNullManager(): void
     {
         $managerRegistryProphecy = $this->prophesize(ManagerRegistry::class);
         $managerRegistryProphecy->getManagerForClass(Dummy::class)->willReturn(null)->shouldBeCalled();

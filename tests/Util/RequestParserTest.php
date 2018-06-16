@@ -22,7 +22,7 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class RequestParserTest extends TestCase
 {
-    public function testParseAndDupplicateRequest()
+    public function testParseAndDupplicateRequest(): void
     {
         $request = new Request(['toto=tata'], [], [], [], [], [], '{"gerard":"toto"}');
         $value = RequestParser::parseAndDuplicateRequest($request);
@@ -32,7 +32,7 @@ class RequestParserTest extends TestCase
     /**
      * @dataProvider parseRequestParamsProvider
      */
-    public function testParseRequestParams($source, $expected)
+    public function testParseRequestParams($source, $expected): void
     {
         $actual = RequestParser::parseRequestParams($source);
         $this->assertEquals($expected, $actual);

@@ -79,7 +79,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
      *
      * @throws RuntimeException
      */
-    public function denormalize($data, $class, $format = null, array $context = [])
+    public function denormalize($data, $class, $format = null, array $context = []): void
     {
         throw new RuntimeException(sprintf('%s is a read-only format.', self::FORMAT));
     }

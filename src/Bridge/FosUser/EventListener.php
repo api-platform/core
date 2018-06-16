@@ -38,7 +38,7 @@ final class EventListener
      *
      * @param GetResponseForControllerResultEvent $event
      */
-    public function onKernelView(GetResponseForControllerResultEvent $event)
+    public function onKernelView(GetResponseForControllerResultEvent $event): void
     {
         $request = $event->getRequest();
         if (!RequestAttributesExtractor::extractAttributes($request)) {

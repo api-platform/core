@@ -23,7 +23,7 @@ use PHPUnit\Framework\TestCase;
  */
 class FormatsProviderTest extends TestCase
 {
-    public function testNoResourceClass()
+    public function testNoResourceClass(): void
     {
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create()->shouldNotBeCalled();
@@ -33,7 +33,7 @@ class FormatsProviderTest extends TestCase
         $this->assertSame(['jsonld' => 'application/ld+json'], $formatProvider->getFormatsFromAttributes([]));
     }
 
-    public function testResourceClassWithoutFormatsAttributes()
+    public function testResourceClassWithoutFormatsAttributes(): void
     {
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadata())->shouldBeCalled();
@@ -43,7 +43,7 @@ class FormatsProviderTest extends TestCase
         $this->assertSame(['jsonld' => ['application/ld+json']], $formatProvider->getFormatsFromAttributes(['resource_class' => 'Foo', 'collection_operation_name' => 'get']));
     }
 
-    public function testResourceClassWithFormatsAttributes()
+    public function testResourceClassWithFormatsAttributes(): void
     {
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadata = new ResourceMetadata(null, null, null, null, null, ['formats' => ['jsonld']]);
@@ -54,7 +54,7 @@ class FormatsProviderTest extends TestCase
         $this->assertSame(['jsonld' => ['application/ld+json']], $formatProvider->getFormatsFromAttributes(['resource_class' => 'Foo', 'collection_operation_name' => 'get']));
     }
 
-    public function testResourceClassWithFormatsAttributesOverRiddingMimeTypes()
+    public function testResourceClassWithFormatsAttributesOverRiddingMimeTypes(): void
     {
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadata = new ResourceMetadata(null, null, null, null, null, ['formats' => ['jsonld' => ['application/foo'], 'bar' => ['application/bar', 'application/baz'], 'buz' => 'application/fuz']]);
@@ -65,7 +65,7 @@ class FormatsProviderTest extends TestCase
         $this->assertSame(['jsonld' => ['application/foo'], 'bar' => ['application/bar', 'application/baz'], 'buz' => ['application/fuz']], $formatProvider->getFormatsFromAttributes(['resource_class' => 'Foo', 'collection_operation_name' => 'get']));
     }
 
-    public function testBadFormatsShortDeclaration()
+    public function testBadFormatsShortDeclaration(): void
     {
         $this->expectException(\ApiPlatform\Core\Exception\InvalidArgumentException::class);
         $this->expectExceptionMessage('You either need to add the format \'foo\' to your project configuration or declare a mime type for it in your annotation.');
@@ -79,7 +79,7 @@ class FormatsProviderTest extends TestCase
         $formatProvider->getFormatsFromAttributes(['resource_class' => 'Foo', 'collection_operation_name' => 'get']);
     }
 
-    public function testInvalidFormatsShortDeclaration()
+    public function testInvalidFormatsShortDeclaration(): void
     {
         $this->expectException(\ApiPlatform\Core\Exception\InvalidArgumentException::class);
         $this->expectExceptionMessage('The \'formats\' attributes value must be a string when trying to include an already configured format, array given.');
@@ -93,7 +93,7 @@ class FormatsProviderTest extends TestCase
         $this->assertSame(['jsonld' => ['application/ld+json']], $formatProvider->getFormatsFromAttributes(['resource_class' => 'Foo', 'collection_operation_name' => 'get']));
     }
 
-    public function testInvalidFormatsDeclaration()
+    public function testInvalidFormatsDeclaration(): void
     {
         $this->expectException(\ApiPlatform\Core\Exception\InvalidArgumentException::class);
         $this->expectExceptionMessage('The \'formats\' attributes must be an array, string given for resource class \'Foo\'.');

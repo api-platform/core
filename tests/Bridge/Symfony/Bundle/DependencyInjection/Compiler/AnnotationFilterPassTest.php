@@ -35,7 +35,7 @@ use Symfony\Component\DependencyInjection\Definition;
  */
 class AnnotationFilterPassTest extends TestCase
 {
-    public function testProcess()
+    public function testProcess(): void
     {
         $annotationFilterPass = new AnnotationFilterPass();
 
@@ -98,7 +98,7 @@ class AnnotationFilterPassTest extends TestCase
         $annotationFilterPass->process($containerBuilderProphecy->reveal());
     }
 
-    public function testProcessWrongFilter()
+    public function testProcessWrongFilter(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('The filter class "ApiPlatform\\Core\\Tests\\Fixtures\\TestBundle\\Doctrine\\Orm\\Filter\\AnotherDummyFilter" does not implement "ApiPlatform\\Core\\Api\\FilterInterface".');
@@ -132,7 +132,7 @@ class AnnotationFilterPassTest extends TestCase
         $annotationFilterPass->process($containerBuilderProphecy->reveal());
     }
 
-    public function testProcessExistingFilter()
+    public function testProcessExistingFilter(): void
     {
         $annotationFilterPass = new AnnotationFilterPass();
 

@@ -22,7 +22,7 @@ use PHPUnit\Framework\TestCase;
  */
 class YamlExtractorTest extends TestCase
 {
-    public function testInvalidProperty()
+    public function testInvalidProperty(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('The property "shortName" must be a "string", "integer" given.');
@@ -30,7 +30,7 @@ class YamlExtractorTest extends TestCase
         (new YamlExtractor([__DIR__.'/../../Fixtures/FileConfigurations/badpropertytype.yml']))->getResources();
     }
 
-    public function testParseException()
+    public function testParseException(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessageRegExp('/Unable to parse in ".+\\/\\.\\.\\/\\.\\.\\/Fixtures\\/FileConfigurations\\/parse_exception.yml"/');
@@ -38,7 +38,7 @@ class YamlExtractorTest extends TestCase
         (new YamlExtractor([__DIR__.'/../../Fixtures/FileConfigurations/parse_exception.yml']))->getResources();
     }
 
-    public function testEmptyResources()
+    public function testEmptyResources(): void
     {
         $resources = (new YamlExtractor([__DIR__.'/../../Fixtures/FileConfigurations/resources_empty.yml']))->getResources();
 

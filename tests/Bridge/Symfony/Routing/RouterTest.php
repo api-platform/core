@@ -25,7 +25,7 @@ use Symfony\Component\Routing\RouterInterface;
  */
 class RouterTest extends TestCase
 {
-    public function testContextAccessor()
+    public function testContextAccessor(): void
     {
         $context = new RequestContext();
 
@@ -38,7 +38,7 @@ class RouterTest extends TestCase
         $this->assertSame($context, $router->getContext());
     }
 
-    public function testGetRouteCollection()
+    public function testGetRouteCollection(): void
     {
         $routeCollection = new RouteCollection();
 
@@ -49,7 +49,7 @@ class RouterTest extends TestCase
         $this->assertSame($routeCollection, $router->getRouteCollection());
     }
 
-    public function testGenerate()
+    public function testGenerate(): void
     {
         $mockedRouter = $this->prophesize('Symfony\Component\Routing\RouterInterface');
         $mockedRouter->generate('foo', [], RouterInterface::ABSOLUTE_PATH)->willReturn('/bar')->shouldBeCalled();
@@ -58,7 +58,7 @@ class RouterTest extends TestCase
         $this->assertSame('/bar', $router->generate('foo'));
     }
 
-    public function testMatch()
+    public function testMatch(): void
     {
         $context = new RequestContext('/app_dev.php', 'GET', 'localhost', 'https');
 

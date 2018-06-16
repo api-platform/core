@@ -24,7 +24,7 @@ class NumericFilterTest extends DoctrineOrmFilterTestCase
 {
     protected $filterClass = NumericFilter::class;
 
-    public function testGetDescription()
+    public function testGetDescription(): void
     {
         $filter = new NumericFilter($this->managerRegistry, null, null, [
             'id' => null,
@@ -42,7 +42,7 @@ class NumericFilterTest extends DoctrineOrmFilterTestCase
         ], $filter->getDescription($this->resourceClass));
     }
 
-    public function testGetDescriptionDefaultFields()
+    public function testGetDescriptionDefaultFields(): void
     {
         $filter = new NumericFilter($this->managerRegistry);
 

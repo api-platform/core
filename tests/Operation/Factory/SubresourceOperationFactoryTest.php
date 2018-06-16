@@ -31,7 +31,7 @@ use PHPUnit\Framework\TestCase;
  */
 class SubresourceOperationFactoryTest extends TestCase
 {
-    public function testCreate()
+    public function testCreate(): void
     {
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create(RelatedDummyEntity::class)->shouldBeCalled()->willReturn(new ResourceMetadata('relatedDummyEntity'));
@@ -142,7 +142,7 @@ class SubresourceOperationFactoryTest extends TestCase
         ], $subresourceOperationFactory->create(DummyEntity::class));
     }
 
-    public function testCreateByOverriding()
+    public function testCreateByOverriding(): void
     {
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create(RelatedDummyEntity::class)->shouldBeCalled()->willReturn(new ResourceMetadata('relatedDummyEntity'));
@@ -260,7 +260,7 @@ class SubresourceOperationFactoryTest extends TestCase
         ], $subresourceOperationFactory->create(DummyEntity::class));
     }
 
-    public function testCreateWithMaxDepth()
+    public function testCreateWithMaxDepth(): void
     {
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create(RelatedDummyEntity::class)->shouldBeCalled()->willReturn(new ResourceMetadata('relatedDummyEntity'));
@@ -305,7 +305,7 @@ class SubresourceOperationFactoryTest extends TestCase
         ], $subresourceOperationFactory->create(DummyEntity::class));
     }
 
-    public function testCreateWithEnd()
+    public function testCreateWithEnd(): void
     {
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create(RelatedDummyEntity::class)->shouldBeCalled()->willReturn(new ResourceMetadata('relatedDummyEntity'));
@@ -363,7 +363,7 @@ class SubresourceOperationFactoryTest extends TestCase
         ], $result);
     }
 
-    public function testCreateWithEndButNoCollection()
+    public function testCreateWithEndButNoCollection(): void
     {
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create(RelatedDummyEntity::class)->shouldBeCalled()->willReturn(new ResourceMetadata('relatedDummyEntity'));

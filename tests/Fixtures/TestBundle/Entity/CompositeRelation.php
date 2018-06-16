@@ -62,7 +62,7 @@ class CompositeRelation
      *
      * @param string|null $value the value to set
      */
-    public function setValue($value = null)
+    public function setValue($value = null): void
     {
         $this->value = $value;
     }
@@ -82,7 +82,7 @@ class CompositeRelation
      *
      * @param CompositeItem $compositeItem the value to set
      */
-    public function setCompositeItem(CompositeItem $compositeItem)
+    public function setCompositeItem(CompositeItem $compositeItem): void
     {
         $this->compositeItem = $compositeItem;
     }
@@ -102,7 +102,7 @@ class CompositeRelation
      *
      * @param CompositeLabel $compositeLabel the value to set
      */
-    public function setCompositeLabel(CompositeLabel $compositeLabel)
+    public function setCompositeLabel(CompositeLabel $compositeLabel): void
     {
         $this->compositeLabel = $compositeLabel;
     }

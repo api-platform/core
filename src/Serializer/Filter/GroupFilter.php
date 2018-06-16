@@ -37,7 +37,7 @@ final class GroupFilter implements FilterInterface
     /**
      * {@inheritdoc}
      */
-    public function apply(Request $request, bool $normalization, array $attributes, array &$context)
+    public function apply(Request $request, bool $normalization, array $attributes, array &$context): void
     {
         if (array_key_exists($this->parameterName, $commonAttribute = $request->attributes->get('_api_filters', []))) {
             $groups = $commonAttribute[$this->parameterName];

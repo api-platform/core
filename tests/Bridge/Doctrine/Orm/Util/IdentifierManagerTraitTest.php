@@ -48,7 +48,7 @@ class IdentifierManagerTraitTest extends TestCase
     /**
      * @group legacy
      */
-    public function testSingleIdentifier()
+    public function testSingleIdentifier(): void
     {
         list($propertyNameCollectionFactory, $propertyMetadataFactory) = $this->getMetadataFactories(Dummy::class, [
             'id',
@@ -67,7 +67,7 @@ class IdentifierManagerTraitTest extends TestCase
     /**
      * @group legacy
      */
-    public function testCompositeIdentifier()
+    public function testCompositeIdentifier(): void
     {
         list($propertyNameCollectionFactory, $propertyMetadataFactory) = $this->getMetadataFactories(Dummy::class, [
             'ida',
@@ -90,7 +90,7 @@ class IdentifierManagerTraitTest extends TestCase
     /**
      * @group legacy
      */
-    public function testInvalidIdentifier()
+    public function testInvalidIdentifier(): void
     {
         $this->expectException(PropertyNotFoundException::class);
         $this->expectExceptionMessage('Invalid identifier "idbad=1;idb=2", "ida" was not found.');

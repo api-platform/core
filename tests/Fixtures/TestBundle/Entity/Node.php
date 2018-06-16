@@ -40,7 +40,7 @@ class Node
      */
     private $container;
 
-    public function setContainer(Container $container)
+    public function setContainer(Container $container): void
     {
         $this->container = $container;
     }
@@ -50,7 +50,7 @@ class Node
         return $this->container;
     }
 
-    public function setSerial(int $serial)
+    public function setSerial(int $serial): void
     {
         $this->serial = $serial;
     }

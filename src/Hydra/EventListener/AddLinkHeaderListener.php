@@ -36,7 +36,7 @@ final class AddLinkHeaderListener
      *
      * @param FilterResponseEvent $event
      */
-    public function onKernelResponse(FilterResponseEvent $event)
+    public function onKernelResponse(FilterResponseEvent $event): void
     {
         $event->getResponse()->headers->set('Link', sprintf(
             '<%s>; rel="%sapiDocumentation"',

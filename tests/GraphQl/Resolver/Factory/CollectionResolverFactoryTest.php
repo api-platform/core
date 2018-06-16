@@ -39,7 +39,7 @@ class CollectionResolverFactoryTest extends TestCase
     /**
      * @dataProvider paginationProvider
      */
-    public function testCreateCollectionResolverNoCollection(bool $paginationEnabled, array $expected)
+    public function testCreateCollectionResolverNoCollection(bool $paginationEnabled, array $expected): void
     {
         $factory = $this->createCollectionResolverFactory([], [], ['id' => 1], $paginationEnabled);
         $resolver = $factory(RelatedDummy::class, Dummy::class, 'operationName');
@@ -59,7 +59,7 @@ class CollectionResolverFactoryTest extends TestCase
         ];
     }
 
-    public function testCreateCollectionResolverNoPagination()
+    public function testCreateCollectionResolverNoPagination(): void
     {
         $factory = $this->createCollectionResolverFactory([
             'Object1',
@@ -78,7 +78,7 @@ class CollectionResolverFactoryTest extends TestCase
     /**
      * @dataProvider subresourceProvider
      */
-    public function testCreateSubresourceCollectionResolverNoPagination(array $subcollection, array $expected)
+    public function testCreateSubresourceCollectionResolverNoPagination(array $subcollection, array $expected): void
     {
         $factory = $this->createCollectionResolverFactory([
             'Object1',
@@ -113,7 +113,7 @@ class CollectionResolverFactoryTest extends TestCase
     /**
      * @dataProvider cursorProvider
      */
-    public function testCreateCollectionResolver(string $cursor, array $expectedCursors)
+    public function testCreateCollectionResolver(string $cursor, array $expectedCursors): void
     {
         $factory = $this->createCollectionResolverFactory([
             'Object1',
@@ -148,7 +148,7 @@ class CollectionResolverFactoryTest extends TestCase
         ];
     }
 
-    public function testCreatePaginatorCollectionResolver()
+    public function testCreatePaginatorCollectionResolver(): void
     {
         $collectionPaginatorProphecy = $this->prophesize(PaginatorInterface::class);
         $collectionPaginatorProphecy->rewind()->shouldBeCalled();

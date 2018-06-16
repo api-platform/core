@@ -31,7 +31,7 @@ use Psr\Container\ContainerInterface;
  */
 class FilterExtensionTest extends TestCase
 {
-    public function testApplyToCollectionWithValidFilters()
+    public function testApplyToCollectionWithValidFilters(): void
     {
         $queryBuilderProphecy = $this->prophesize(QueryBuilder::class);
 
@@ -60,7 +60,7 @@ class FilterExtensionTest extends TestCase
      * @group legacy
      * @expectedDeprecation The ApiPlatform\Core\Api\FilterCollection class is deprecated since version 2.1 and will be removed in 3.0. Provide an implementation of Psr\Container\ContainerInterface instead.
      */
-    public function testApplyToCollectionWithValidFiltersAndDeprecatedFilterCollection()
+    public function testApplyToCollectionWithValidFiltersAndDeprecatedFilterCollection(): void
     {
         $queryBuilderProphecy = $this->prophesize(QueryBuilder::class);
 
@@ -80,7 +80,7 @@ class FilterExtensionTest extends TestCase
     /**
      * @group legacy
      */
-    public function testConstructWithInvalidFilterLocator()
+    public function testConstructWithInvalidFilterLocator(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('The "$filterLocator" argument is expected to be an implementation of the "Psr\\Container\\ContainerInterface" interface.');
@@ -88,7 +88,7 @@ class FilterExtensionTest extends TestCase
         new FilterExtension($this->prophesize(ResourceMetadataFactoryInterface::class)->reveal(), new \ArrayObject());
     }
 
-    public function testApplyToCollectionWithoutFilters()
+    public function testApplyToCollectionWithoutFilters(): void
     {
         $dummyMetadata = new ResourceMetadata('dummy', 'dummy', '#dummy', ['get' => ['method' => 'GET'], 'put' => ['method' => 'PUT']], ['get' => ['method' => 'GET'], 'post' => ['method' => 'POST'], 'custom' => ['method' => 'GET', 'path' => '/foo'], 'custom2' => ['method' => 'POST', 'path' => '/foo']]);
 

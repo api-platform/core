@@ -43,7 +43,7 @@ final class JsonHalContext implements Context
      *
      * @BeforeScenario
      */
-    public function gatherContexts(BeforeScenarioScope $scope)
+    public function gatherContexts(BeforeScenarioScope $scope): void
     {
         /** @var InitializedContextEnvironment $environment */
         $environment = $scope->getEnvironment();
@@ -53,7 +53,7 @@ final class JsonHalContext implements Context
     /**
      * @Then the JSON should be valid according to the JSON HAL schema
      */
-    public function theJsonShouldBeValidAccordingToTheJsonHALSchema()
+    public function theJsonShouldBeValidAccordingToTheJsonHALSchema(): void
     {
         $json = $this->getJson()->getContent();
         $this->validator->validate($json, (object) ['$ref' => 'file://'.__DIR__.'/../../'.$this->schemaFile]);

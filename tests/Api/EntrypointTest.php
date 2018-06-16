@@ -23,7 +23,7 @@ use PHPUnit\Framework\TestCase;
  */
 class EntrypointTest extends TestCase
 {
-    public function testGetResourceNameCollection()
+    public function testGetResourceNameCollection(): void
     {
         $resourceNameCollection = new ResourceNameCollection([Dummy::class]);
         $entrypoint = new Entrypoint($resourceNameCollection);

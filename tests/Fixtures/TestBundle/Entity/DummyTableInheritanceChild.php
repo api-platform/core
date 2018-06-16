@@ -37,7 +37,7 @@ class DummyTableInheritanceChild extends DummyTableInheritance
         return $this->nickname;
     }
 
-    public function setNickname($nickname)
+    public function setNickname($nickname): void
     {
         $this->nickname = $nickname;
     }

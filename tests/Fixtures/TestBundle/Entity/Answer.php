@@ -129,7 +129,7 @@ class Answer
         return $this->relatedQuestions;
     }
 
-    public function addRelatedQuestion(Question $question)
+    public function addRelatedQuestion(Question $question): void
     {
         $this->relatedQuestions->add($question);
     }

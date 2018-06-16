@@ -25,35 +25,35 @@ use PHPUnit\Framework\TestCase;
 
 class QueryCheckerTest extends TestCase
 {
-    public function testHasHavingClauseWithHavingClause()
+    public function testHasHavingClauseWithHavingClause(): void
     {
         $queryBuilder = $this->prophesize(QueryBuilder::class);
         $queryBuilder->getDQLPart('having')->willReturn(['having' => 'toto']);
         $this->assertTrue(QueryChecker::hasHavingClause($queryBuilder->reveal()));
     }
 
-    public function testHasHavingClauseWithEmptyHavingClause()
+    public function testHasHavingClauseWithEmptyHavingClause(): void
     {
         $queryBuilder = $this->prophesize(QueryBuilder::class);
         $queryBuilder->getDQLPart('having')->willReturn([]);
         $this->assertFalse(QueryChecker::hasHavingClause($queryBuilder->reveal()));
     }
 
-    public function testHasMaxResult()
+    public function testHasMaxResult(): void
     {
         $queryBuilder = $this->prophesize(QueryBuilder::class);
         $queryBuilder->getMaxResults()->willReturn(10);
         $this->assertTrue(QueryChecker::hasMaxResults($queryBuilder->reveal()));
     }
 
-    public function testHasMaxResultWithNoMaxResult()
+    public function testHasMaxResultWithNoMaxResult(): void
     {
         $queryBuilder = $this->prophesize(QueryBuilder::class);
         $queryBuilder->getMaxResults()->willReturn(null);
         $this->assertFalse(QueryChecker::hasMaxResults($queryBuilder->reveal()));
     }
 
-    public function testHasRootEntityWithCompositeIdentifier()
+    public function testHasRootEntityWithCompositeIdentifier(): void
     {
         $queryBuilder = $this->prophesize(QueryBuilder::class);
         $queryBuilder->getRootEntities()->willReturn(['Dummy']);
@@ -67,7 +67,7 @@ class QueryCheckerTest extends TestCase
         $this->assertTrue(QueryChecker::hasRootEntityWithCompositeIdentifier($queryBuilder->reveal(), $managerRegistry->reveal()));
     }
 
-    public function testHasRootEntityWithNoCompositeIdentifier()
+    public function testHasRootEntityWithNoCompositeIdentifier(): void
     {
         $queryBuilder = $this->prophesize(QueryBuilder::class);
         $queryBuilder->getRootEntities()->willReturn(['Dummy']);
@@ -81,7 +81,7 @@ class QueryCheckerTest extends TestCase
         $this->assertFalse(QueryChecker::hasRootEntityWithCompositeIdentifier($queryBuilder->reveal(), $managerRegistry->reveal()));
     }
 
-    public function testHasRootEntityWithForeignKeyIdentifier()
+    public function testHasRootEntityWithForeignKeyIdentifier(): void
     {
         $queryBuilder = $this->prophesize(QueryBuilder::class);
         $queryBuilder->getRootEntities()->willReturn(['Dummy']);
@@ -95,7 +95,7 @@ class QueryCheckerTest extends TestCase
         $this->assertTrue(QueryChecker::hasRootEntityWithForeignKeyIdentifier($queryBuilder->reveal(), $managerRegistry->reveal()));
     }
 
-    public function testHasRootEntityWithNoForeignKeyIdentifier()
+    public function testHasRootEntityWithNoForeignKeyIdentifier(): void
     {
         $queryBuilder = $this->prophesize(QueryBuilder::class);
         $queryBuilder->getRootEntities()->willReturn(['Dummy']);
@@ -108,7 +108,7 @@ class QueryCheckerTest extends TestCase
         $this->assertFalse(QueryChecker::hasRootEntityWithForeignKeyIdentifier($queryBuilder->reveal(), $managerRegistry->reveal()));
     }
 
-    public function testHasOrderByOnToManyJoinWithoutJoin()
+    public function testHasOrderByOnToManyJoinWithoutJoin(): void
     {
         $queryBuilder = $this->prophesize(QueryBuilder::class);
         $queryBuilder->getRootEntities()->willReturn(['Dummy']);
@@ -124,7 +124,7 @@ class QueryCheckerTest extends TestCase
         $this->assertFalse(QueryChecker::hasOrderByOnToManyJoin($queryBuilder->reveal(), $managerRegistry->reveal()));
     }
 
-    public function testHasOrderByOnToManyJoinWithoutOrderBy()
+    public function testHasOrderByOnToManyJoinWithoutOrderBy(): void
     {
         $queryBuilder = $this->prophesize(QueryBuilder::class);
         $queryBuilder->getRootEntities()->willReturn(['Dummy']);
@@ -140,7 +140,7 @@ class QueryCheckerTest extends TestCase
         $this->assertFalse(QueryChecker::hasOrderByOnToManyJoin($queryBuilder->reveal(), $managerRegistry->reveal()));
     }
 
-    public function testHasOrderByOnToManyJoinWithoutJoinAndWithoutOrderBy()
+    public function testHasOrderByOnToManyJoinWithoutJoinAndWithoutOrderBy(): void
     {
         $queryBuilder = $this->prophesize(QueryBuilder::class);
         $queryBuilder->getRootEntities()->willReturn(['Dummy']);
@@ -156,7 +156,7 @@ class QueryCheckerTest extends TestCase
         $this->assertFalse(QueryChecker::hasOrderByOnToManyJoin($queryBuilder->reveal(), $managerRegistry->reveal()));
     }
 
-    public function testHasOrderByOnToManyJoinWithClassLeftJoin()
+    public function testHasOrderByOnToManyJoinWithClassLeftJoin(): void
     {
         $queryBuilder = $this->prophesize(QueryBuilder::class);
         $queryBuilder->getRootEntities()->willReturn(['Dummy']);
@@ -180,7 +180,7 @@ class QueryCheckerTest extends TestCase
     /**
      * Adds a test on the fix referenced in https://github.com/api-platform/core/pull/1449.
      */
-    public function testOrderByOnToManyWithRelationAsBasis()
+    public function testOrderByOnToManyWithRelationAsBasis(): void
     {
         $queryBuilder = $this->prophesize(QueryBuilder::class);
         $queryBuilder->getRootEntities()->willReturn(['Dummy']);

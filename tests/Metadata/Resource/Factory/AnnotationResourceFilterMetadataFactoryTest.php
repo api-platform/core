@@ -28,7 +28,7 @@ use Prophecy\Argument;
  */
 class AnnotationResourceFilterMetadataFactoryTest extends TestCase
 {
-    public function testCreate()
+    public function testCreate(): void
     {
         $decorated = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $decorated->create(Dummy::class)->willReturn(new ResourceMetadata('hello', 'blabla'))->shouldBeCalled();

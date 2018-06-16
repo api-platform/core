@@ -44,7 +44,7 @@ final class SerializeListener
      *
      * @param GetResponseForControllerResultEvent $event
      */
-    public function onKernelView(GetResponseForControllerResultEvent $event)
+    public function onKernelView(GetResponseForControllerResultEvent $event): void
     {
         $controllerResult = $event->getControllerResult();
         $request = $event->getRequest();
@@ -82,7 +82,7 @@ final class SerializeListener
      *
      * @throws RuntimeException
      */
-    private function serializeRawData(GetResponseForControllerResultEvent $event, Request $request, $controllerResult)
+    private function serializeRawData(GetResponseForControllerResultEvent $event, Request $request, $controllerResult): void
     {
         if (!$request->attributes->get('_api_respond')) {
             return;

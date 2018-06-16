@@ -27,7 +27,7 @@ class OrderFilterTest extends DoctrineOrmFilterTestCase
 {
     protected $filterClass = OrderFilter::class;
 
-    public function testGetDescription()
+    public function testGetDescription(): void
     {
         $filter = new OrderFilter($this->managerRegistry, null, 'order', null, ['id' => null, 'name' => null, 'foo' => null]);
         $this->assertEquals([
@@ -44,7 +44,7 @@ class OrderFilterTest extends DoctrineOrmFilterTestCase
         ], $filter->getDescription($this->resourceClass));
     }
 
-    public function testGetDescriptionDefaultFields()
+    public function testGetDescriptionDefaultFields(): void
     {
         $filter = new OrderFilter($this->managerRegistry);
 

@@ -34,7 +34,7 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
  */
 class ItemMutationResolverFactoryTest extends TestCase
 {
-    public function testCreateItemMutationResolverNoItem()
+    public function testCreateItemMutationResolverNoItem(): void
     {
         $this->expectException(Error::class);
 
@@ -50,7 +50,7 @@ class ItemMutationResolverFactoryTest extends TestCase
         $resolver(null, ['input' => ['id' => '/dummies/3', 'clientMutationId' => '1936']], null, $resolveInfo);
     }
 
-    public function testCreateItemDeleteMutationResolver()
+    public function testCreateItemDeleteMutationResolver(): void
     {
         $dummy = new Dummy();
 

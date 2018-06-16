@@ -31,7 +31,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  */
 class ReadListenerTest extends TestCase
 {
-    public function testNotAnApiPlatformRequest()
+    public function testNotAnApiPlatformRequest(): void
     {
         $identifierDenormalizer = $this->prophesize(ChainIdentifierDenormalizer::class);
 
@@ -54,7 +54,7 @@ class ReadListenerTest extends TestCase
     /**
      * @group legacy
      */
-    public function testLegacyConstructor()
+    public function testLegacyConstructor(): void
     {
         $collectionDataProvider = $this->prophesize(CollectionDataProviderInterface::class);
         $collectionDataProvider->getCollection()->shouldNotBeCalled();
@@ -72,7 +72,7 @@ class ReadListenerTest extends TestCase
         $listener->onKernelRequest($event->reveal());
     }
 
-    public function testDoNotCallWhenReceiveFlagIsFalse()
+    public function testDoNotCallWhenReceiveFlagIsFalse(): void
     {
         $identifierDenormalizer = $this->prophesize(ChainIdentifierDenormalizer::class);
 
@@ -95,7 +95,7 @@ class ReadListenerTest extends TestCase
         $listener->onKernelRequest($event->reveal());
     }
 
-    public function testRetrieveCollectionPost()
+    public function testRetrieveCollectionPost(): void
     {
         $identifierDenormalizer = $this->prophesize(ChainIdentifierDenormalizer::class);
 
@@ -121,7 +121,7 @@ class ReadListenerTest extends TestCase
         $this->assertNull($request->attributes->get('data'));
     }
 
-    public function testRetrieveCollectionGet()
+    public function testRetrieveCollectionGet(): void
     {
         $identifierDenormalizer = $this->prophesize(ChainIdentifierDenormalizer::class);
 
@@ -146,7 +146,7 @@ class ReadListenerTest extends TestCase
         $this->assertSame([], $request->attributes->get('data'));
     }
 
-    public function testRetrieveItem()
+    public function testRetrieveItem(): void
     {
         $identifierDenormalizer = $this->prophesize(ChainIdentifierDenormalizer::class);
         $identifierDenormalizer->denormalize('1', 'Foo')->shouldBeCalled()->willReturn(['id' => '1']);
@@ -173,7 +173,7 @@ class ReadListenerTest extends TestCase
         $this->assertSame($data, $request->attributes->get('data'));
     }
 
-    public function testRetrieveItemNoIdentifier()
+    public function testRetrieveItemNoIdentifier(): void
     {
         $this->expectException(NotFoundHttpException::class);
 
@@ -198,7 +198,7 @@ class ReadListenerTest extends TestCase
         $request->attributes->get('data');
     }
 
-    public function testRetrieveSubresource()
+    public function testRetrieveSubresource(): void
     {
         $identifierDenormalizer = $this->prophesize(ChainIdentifierDenormalizer::class);
         $identifierDenormalizer->denormalize('1', 'Bar')->shouldBeCalled()->willReturn(['id' => '1']);
@@ -225,7 +225,7 @@ class ReadListenerTest extends TestCase
         $this->assertSame($data, $request->attributes->get('data'));
     }
 
-    public function testRetrieveSubresourceNoDataProvider()
+    public function testRetrieveSubresourceNoDataProvider(): void
     {
         $this->expectException(RuntimeException::class);
 
@@ -247,7 +247,7 @@ class ReadListenerTest extends TestCase
         $request->attributes->get('data');
     }
 
-    public function testRetrieveSubresourceNotFound()
+    public function testRetrieveSubresourceNotFound(): void
     {
         $identifierDenormalizer = $this->prophesize(ChainIdentifierDenormalizer::class);
         $identifierDenormalizer->denormalize('1', 'Bar')->willThrow(new InvalidIdentifierException())->shouldBeCalled();
@@ -269,7 +269,7 @@ class ReadListenerTest extends TestCase
         $listener->onKernelRequest($event->reveal());
     }
 
-    public function testRetrieveItemNotFound()
+    public function testRetrieveItemNotFound(): void
     {
         $identifierDenormalizer = $this->prophesize(ChainIdentifierDenormalizer::class);
         $identifierDenormalizer->denormalize('22', 'Foo')->shouldBeCalled()->willReturn(['id' => 22]);
@@ -292,7 +292,7 @@ class ReadListenerTest extends TestCase
         $listener->onKernelRequest($event->reveal());
     }
 
-    public function testRetrieveBadItemNormalizedIdentifiers()
+    public function testRetrieveBadItemNormalizedIdentifiers(): void
     {
         $this->expectException(NotFoundHttpException::class);
 
@@ -313,7 +313,7 @@ class ReadListenerTest extends TestCase
         $listener->onKernelRequest($event->reveal());
     }
 
-    public function testRetrieveBadSubresourceNormalizedIdentifiers()
+    public function testRetrieveBadSubresourceNormalizedIdentifiers(): void
     {
         $this->expectException(NotFoundHttpException::class);
 

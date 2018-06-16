@@ -38,7 +38,7 @@ class ContextBuilderTest extends TestCase
     private $propertyMetadataFactoryProphecy;
     private $urlGeneratorProphecy;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->entityClass = '\Dummy\DummyEntity';
         $this->resourceNameCollectionFactoryProphecy = $this->prophesize(ResourceNameCollectionFactoryInterface::class);
@@ -48,7 +48,7 @@ class ContextBuilderTest extends TestCase
         $this->urlGeneratorProphecy = $this->prophesize(UrlGeneratorInterface::class);
     }
 
-    public function testResourceContext()
+    public function testResourceContext(): void
     {
         $this->resourceMetadataFactoryProphecy->create($this->entityClass)->willReturn(new ResourceMetadata('DummyEntity'));
         $this->propertyNameCollectionFactoryProphecy->create($this->entityClass)->willReturn(new PropertyNameCollection(['dummyPropertyA']));
@@ -65,7 +65,7 @@ class ContextBuilderTest extends TestCase
         $this->assertEquals($expected, $contextBuilder->getResourceContext($this->entityClass));
     }
 
-    public function testResourceContextWithJsonldContext()
+    public function testResourceContextWithJsonldContext(): void
     {
         $this->resourceMetadataFactoryProphecy->create($this->entityClass)->willReturn(new ResourceMetadata('DummyEntity'));
         $this->propertyNameCollectionFactoryProphecy->create($this->entityClass)->willReturn(new PropertyNameCollection(['dummyPropertyA']));
@@ -86,7 +86,7 @@ class ContextBuilderTest extends TestCase
         $this->assertEquals($expected, $contextBuilder->getResourceContext($this->entityClass));
     }
 
-    public function testGetEntryPointContext()
+    public function testGetEntryPointContext(): void
     {
         $this->resourceMetadataFactoryProphecy->create('dummyPropertyA')->willReturn(new ResourceMetadata('DummyEntity'));
         $this->propertyNameCollectionFactoryProphecy->create($this->entityClass)->willReturn(new PropertyNameCollection(['dummyPropertyA']));
@@ -107,7 +107,7 @@ class ContextBuilderTest extends TestCase
         $this->assertEquals($expected, $contextBuilder->getEntrypointContext());
     }
 
-    public function testResourceContextWithReverse()
+    public function testResourceContextWithReverse(): void
     {
         $this->resourceMetadataFactoryProphecy->create($this->entityClass)->willReturn(new ResourceMetadata('DummyEntity'));
         $this->propertyNameCollectionFactoryProphecy->create($this->entityClass)->willReturn(new PropertyNameCollection(['dummyPropertyA']));
