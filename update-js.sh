@@ -11,27 +11,13 @@ cp node_modules/swagger-ui-dist/swagger-ui-bundle.js $dest
 cp node_modules/swagger-ui-dist/swagger-ui-standalone-preset.js $dest
 cp node_modules/swagger-ui-dist/swagger-ui.css $dest
 
-dest=src/Bridge/Symfony/Bundle/Resources/public/es6-promise/
-if [ -d $dest ]; then
-  rm -Rf $dest
-fi
-mkdir -p $dest
-cp node_modules/es6-promise/dist/es6-promise.auto.min.js $dest
-
-dest=src/Bridge/Symfony/Bundle/Resources/public/fetch/
-if [ -d $dest ]; then
-  rm -Rf $dest
-fi
-mkdir -p $dest
-cp node_modules/fetch/lib/fetch.js $dest
-
 dest=src/Bridge/Symfony/Bundle/Resources/public/react/
 if [ -d $dest ]; then
   rm -Rf $dest
 fi
 mkdir -p $dest
-cp node_modules/react/cjs/react.production.min.js $dest
-cp node_modules/react-dom/cjs/react-dom.production.min.js $dest
+cp node_modules/react/umd/react.production.min.js $dest
+cp node_modules/react-dom/umd/react-dom.production.min.js $dest
 
 dest=src/Bridge/Symfony/Bundle/Resources/public/graphiql/
 if [ -d $dest ]; then
