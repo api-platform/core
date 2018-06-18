@@ -56,7 +56,8 @@ final class SwaggerCommand extends Command
         $this
             ->setName('api:swagger:export')
             ->setDescription('Dump the Swagger 2.0 (OpenAPI) documentation')
-            ->addOption('yaml', 'y', InputOption::VALUE_NONE, 'Dump the documentation in YAML');
+            ->addOption('yaml', 'y', InputOption::VALUE_NONE, 'Dump the documentation in YAML')
+            ->addOption('output', 'o', InputOption::VALUE_OPTIONAL, 'Write output to file');
     }
 
     /**
@@ -67,6 +68,14 @@ final class SwaggerCommand extends Command
         $documentation = new Documentation($this->resourceNameCollectionFactory->create(), $this->apiTitle, $this->apiDescription, $this->apiVersion, $this->apiFormats);
         $data = $this->documentationNormalizer->normalize($documentation);
         $content = $input->getOption('yaml') ? Yaml::dump($data) : json_encode($data, JSON_PRETTY_PRINT);
-        $output->writeln($content);
+
+        if (!empty($input->getOption('output'))) {
+            file_put_contents($input->getOption('output'), $content);
+            $output->writeln(
+                sprintf('Data written to %s', $input->getOption('output'))
+            );
+        } else {
+            $output->writeln($content);
+        }
     }
 }
