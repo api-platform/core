@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\Metadata\Property\Factory;
 
 use ApiPlatform\Core\Annotation\ApiSubresource;
+use ApiPlatform\Core\Exception\InvalidResourceException;
 use ApiPlatform\Core\Metadata\Property\Factory\AnnotationSubresourceMetadataFactory;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
@@ -58,12 +59,11 @@ class AnnotationSubresourceMetadataFactoryTest extends TestCase
         ];
     }
 
-    /**
-     * @expectedException \ApiPlatform\Core\Exception\InvalidResourceException
-     * @expectedExceptionMessage Property "relatedDummies" on resource "ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy" is declared as a subresource, but its type could not be determined.
-     */
     public function testCreatePropertyUnknownType()
     {
+        $this->expectException(InvalidResourceException::class);
+        $this->expectExceptionMessage('Property "relatedDummies" on resource "ApiPlatform\\Core\\Tests\\Fixtures\\TestBundle\\Entity\\Dummy" is declared as a subresource, but its type could not be determined.');
+
         $annotation = new ApiSubresource();
 
         $propertyReaderProphecy = $this->prophesize(Reader::class);
@@ -73,6 +73,6 @@ class AnnotationSubresourceMetadataFactoryTest extends TestCase
         $decoratedReturnProphecy->create(Dummy::class, 'relatedDummies', [])->willReturn(new PropertyMetadata(null, 'Several dummies'))->shouldBeCalled();
 
         $factory = new AnnotationSubresourceMetadataFactory($propertyReaderProphecy->reveal(), $decoratedReturnProphecy->reveal());
-        $metadata = $factory->create(Dummy::class, 'relatedDummies');
+        $factory->create(Dummy::class, 'relatedDummies');
     }
 }
