@@ -29,7 +29,7 @@ class IriHelperTest extends TestCase
                 'path' => '/hello.json',
                 'query' => 'foo=bar&page=2&bar=3',
             ],
-           'parameters' => [
+            'parameters' => [
                 'foo' => 'bar',
                 'bar' => '3',
             ],

@@ -238,3 +238,7 @@ services:
     test.annotation_reader:
         alias: annotation_reader
         public: true
+
+    app.dummy_validation.group_generator:
+        class: ApiPlatform\Core\Tests\Fixtures\TestBundle\Validator\DummyValidationGroupsGenerator
+        public: true

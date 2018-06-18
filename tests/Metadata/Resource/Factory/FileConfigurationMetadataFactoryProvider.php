@@ -101,8 +101,8 @@ abstract class FileConfigurationMetadataFactoryProvider extends TestCase
     {
         $resourceMetadata = new ResourceMetadata();
         $resourceMetadata = $resourceMetadata->withItemOperations([
-          'my_op_name' => ['method' => 'POST'],
-          'my_other_op_name' => ['method' => 'GET'],
+            'my_op_name' => ['method' => 'POST'],
+            'my_other_op_name' => ['method' => 'GET'],
         ]);
         $resourceMetadata = $resourceMetadata->withCollectionOperations([
             'my_op_name' => ['method' => 'POST'],

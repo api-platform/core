@@ -16,6 +16,7 @@ namespace ApiPlatform\Core\Bridge\Symfony\Validator;
 use ApiPlatform\Core\Bridge\Symfony\Validator\Exception\ValidationException;
 use ApiPlatform\Core\Validator\ValidatorInterface;
 use Psr\Container\ContainerInterface;
+use Symfony\Component\Validator\Constraints\GroupSequence;
 use Symfony\Component\Validator\Validator\ValidatorInterface as SymfonyValidatorInterface;
 
 /**
@@ -52,7 +53,9 @@ class Validator implements ValidatorInterface
                 $validationGroups = $validationGroups($data);
             }
 
-            $validationGroups = (array) $validationGroups;
+            if (!$validationGroups instanceof GroupSequence) {
+                $validationGroups = (array) $validationGroups;
+            }
         }
 
         $violations = $this->validator->validate($data, null, $validationGroups);

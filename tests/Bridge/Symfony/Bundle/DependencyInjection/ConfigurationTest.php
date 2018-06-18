@@ -246,15 +246,15 @@ class ConfigurationTest extends TestCase
     public function testApiKeysConfig()
     {
         $exampleConfig = [
-                'name' => 'Authorization',
-                'type' => 'query',
+            'name' => 'Authorization',
+            'type' => 'query',
         ];
 
         $config = $this->processor->processConfiguration($this->configuration, [
             'api_platform' => [
                 'swagger' => [
                     'api_keys' => [$exampleConfig],
-               ],
+                ],
             ],
         ]);
 

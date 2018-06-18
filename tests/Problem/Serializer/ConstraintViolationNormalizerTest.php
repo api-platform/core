@@ -60,18 +60,18 @@ class ConstraintViolationNormalizerTest extends TestCase
             'detail' => '_d: a
 _4: 1',
             'violations' => [
-                    [
-                        'propertyPath' => '_d',
-                        'message' => 'a',
-                        'payload' => [
-                            'severity' => 'warning',
-                        ],
-                    ],
-                    [
-                        'propertyPath' => '_4',
-                        'message' => '1',
+                [
+                    'propertyPath' => '_d',
+                    'message' => 'a',
+                    'payload' => [
+                        'severity' => 'warning',
                     ],
                 ],
+                [
+                    'propertyPath' => '_4',
+                    'message' => '1',
+                ],
+            ],
         ];
         $this->assertEquals($expected, $normalizer->normalize($list));
     }
