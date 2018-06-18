@@ -1,5 +1,13 @@
 # Changelog
 
+## 2.2.8
+
+* Fix support for max depth when using subresources
+* Fix a fatal error when a subresource type is not defined
+* Add support for group sequences in the validator configuration
+* Add a local class metadata cache in the HAL normalizer
+* `FilterEagerLoadingExtension` now accepts joins with class name as join value
+
 ## 2.2.7
 
 * Compatibility with Symfony 4.1
