@@ -1,5 +1,5 @@
 # Contributing to API Platform
-
+ test 
 First of all, thank you for contributing, you're awesome!
 
 To have your code integrated in the API Platform project, there is some rules to follow, but don't panic, it's easy!

@@ -7,15 +7,16 @@
 * Make resource class's constructor parameters writables
 * Add a shortcut syntax to define attributes at the root of `@ApiResource` and `@ApiProperty` annotations
 * Throw an exception if a required filter isn't set
-* Allow to specify the message when the access is denied using the `access_control_message` attribute
+* Allow to specify the message when access is denied using the `access_control_message` attribute
 * Add a new option to include null results when using the date filter
 * Allow data persisters to return a new instance instead of mutating the existing one
-* Add a new attribute to configure specific for formats per resources or operations
+* Add a new attribute to configure specific formats per resources or operations
 * Add an `--output` option to the `api:swagger:export` command
 * Implement the `CacheableSupportsMethodInterface` introduced in Symfony 4.1 in all (de)normalizers (improves the performance dramatically)
 * Drop support for PHP 7.0
+* Upgrade Swagger UI and GraphiQL
 * GraphQL: Add a `totalCount` field in GraphQL paginated collections
-* JSONAPI: Allow to include related resources
+* JSONAPI: Allow inclusion of related resources
 
 ## 2.2.8
 
