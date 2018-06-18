@@ -43,6 +43,7 @@
   -webkit-box-flex: 1;
       -ms-flex: 1;
           flex: 1;
+  overflow-x: hidden;
 }
 
 .graphiql-container .title {
@@ -83,6 +84,7 @@
       -ms-flex: 1;
           flex: 1;
   height: 34px;
+  overflow-y: visible;
   padding: 7px 14px 6px;
   -webkit-user-select: none;
      -moz-user-select: none;
@@ -101,6 +103,7 @@
 .graphiql-container .historyShow {
   background: -webkit-gradient(linear, left top, left bottom, from(#f7f7f7), to(#e2e2e2));
   background: linear-gradient(#f7f7f7, #e2e2e2);
+  border-radius: 0;
   border-bottom: 1px solid #d0d0d0;
   border-right: none;
   border-top: none;
@@ -1230,7 +1233,6 @@ span.CodeMirror-selectedtext { background: none; }
   margin-left: 5px;
   overflow: hidden;
   text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
 .graphiql-container .enum-value {
@@ -1258,7 +1260,7 @@ span.CodeMirror-selectedtext { background: none; }
 }
 
 .graphiql-container .arg-default-value {
-  color: #0B7FC7;
+  color: #43A047;
 }
 
 .graphiql-container .doc-deprecation {
