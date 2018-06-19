@@ -85,7 +85,7 @@ class ItemNormalizerTest extends TestCase
 
         $serializerProphecy = $this->prophesize(SerializerInterface::class);
         $serializerProphecy->willImplement(NormalizerInterface::class);
-        $serializerProphecy->normalize('hello', null, Argument::type('array'))->willReturn('hello')->shouldBeCalled();
+        $serializerProphecy->normalize('hello', null, Argument::type('array'))->shouldNotBeCalled();
 
         $normalizer = new ItemNormalizer(
             $propertyNameCollectionFactoryProphecy->reveal(),

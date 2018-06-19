@@ -106,7 +106,7 @@ class ItemNormalizerTest extends TestCase
 
         $serializerProphecy = $this->prophesize(SerializerInterface::class);
         $serializerProphecy->willImplement(NormalizerInterface::class);
-        $serializerProphecy->normalize('hello', null, Argument::type('array'))->willReturn('hello')->shouldBeCalled();
+        $serializerProphecy->normalize('hello', null, Argument::type('array'))->shouldNotBeCalled();
         $contextBuilderProphecy = $this->prophesize(ContextBuilderInterface::class);
         $contextBuilderProphecy->getResourceContextUri(Dummy::class)->willReturn('/contexts/Dummy');
 

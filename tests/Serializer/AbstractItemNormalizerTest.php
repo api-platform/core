@@ -129,7 +129,6 @@ class AbstractItemNormalizerTest extends TestCase
 
         $serializerProphecy = $this->prophesize(SerializerInterface::class);
         $serializerProphecy->willImplement(NormalizerInterface::class);
-        $serializerProphecy->normalize('foo', null, Argument::type('array'))->willReturn('foo')->shouldBeCalled();
         $serializerProphecy->normalize(['/dummies/2'], null, Argument::type('array'))->willReturn(['/dummies/2'])->shouldBeCalled();
 
         $normalizer = $this->getMockForAbstractClass(AbstractItemNormalizer::class, [
@@ -594,7 +593,7 @@ class AbstractItemNormalizerTest extends TestCase
         $normalizer->denormalize(['name' => null], Dummy::class);
     }
 
-    public function testChildInheritedProperty()
+    public function testChildInheritedScalarProperty()
     {
         $dummy = new DummyTableInheritance();
         $dummy->setName('foo');
@@ -624,7 +623,7 @@ class AbstractItemNormalizerTest extends TestCase
 
         $serializerProphecy = $this->prophesize(SerializerInterface::class);
         $serializerProphecy->willImplement(NormalizerInterface::class);
-        $serializerProphecy->normalize('foo', null, Argument::type('array'))->willReturn('foo')->shouldBeCalled();
+        $serializerProphecy->normalize('foo', null, Argument::type('array'))->shouldNotBeCalled();
         $serializerProphecy->normalize(null, null, Argument::type('array'))->willReturn(null)->shouldBeCalled();
 
         $normalizer = $this->getMockForAbstractClass(AbstractItemNormalizer::class, [
@@ -638,6 +637,54 @@ class AbstractItemNormalizerTest extends TestCase
 
         $this->assertEquals([
             'name' => 'foo',
+            'nickname' => null,
+        ], $normalizer->normalize($dummy, null, ['resource_class' => DummyTableInheritance::class, 'resources' => []]));
+    }
+
+    public function testChildInheritedNotScalarProperty()
+    {
+        $dummy = new DummyTableInheritance();
+        $dummy->setName(['foo']);
+
+        $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
+        $propertyNameCollectionFactoryProphecy->create(DummyTableInheritance::class, [])->willReturn(
+            new PropertyNameCollection(['name', 'nickname'])
+        )->shouldBeCalled();
+
+        $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
+        $propertyMetadataFactoryProphecy->create(DummyTableInheritance::class, 'name', [])->willReturn(
+            new PropertyMetadata(new Type(Type::BUILTIN_TYPE_STRING), '', true)
+        )->shouldBeCalled();
+        $propertyMetadataFactoryProphecy->create(DummyTableInheritance::class, 'nickname', [])->willReturn(
+            new PropertyMetadata(new Type(Type::BUILTIN_TYPE_STRING, true), '', true, true, false, false, false, false, null, DummyTableInheritanceChild::class)
+        )->shouldBeCalled();
+
+        $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
+        $iriConverterProphecy->getIriFromItem($dummy)->willReturn('/dummies/1')->shouldBeCalled();
+
+        $propertyAccessorProphecy = $this->prophesize(PropertyAccessorInterface::class);
+        $propertyAccessorProphecy->getValue($dummy, 'name')->willReturn(['foo'])->shouldBeCalled();
+        $propertyAccessorProphecy->getValue($dummy, 'nickname')->willThrow(new NoSuchPropertyException())->shouldBeCalled();
+
+        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
+        $resourceClassResolverProphecy->getResourceClass($dummy, DummyTableInheritance::class, true)->willReturn(DummyTableInheritance::class)->shouldBeCalled();
+
+        $serializerProphecy = $this->prophesize(SerializerInterface::class);
+        $serializerProphecy->willImplement(NormalizerInterface::class);
+        $serializerProphecy->normalize(['foo'], null, Argument::type('array'))->willReturn(['foo'])->shouldBeCalled();
+        $serializerProphecy->normalize(null, null, Argument::type('array'))->willReturn(null)->shouldBeCalled();
+
+        $normalizer = $this->getMockForAbstractClass(AbstractItemNormalizer::class, [
+            $propertyNameCollectionFactoryProphecy->reveal(),
+            $propertyMetadataFactoryProphecy->reveal(),
+            $iriConverterProphecy->reveal(),
+            $resourceClassResolverProphecy->reveal(),
+            $propertyAccessorProphecy->reveal(),
+        ]);
+        $normalizer->setSerializer($serializerProphecy->reveal());
+
+        $this->assertEquals([
+            'name' => ['foo'],
             'nickname' => null,
         ], $normalizer->normalize($dummy, null, ['resource_class' => DummyTableInheritance::class, 'resources' => []]));
     }

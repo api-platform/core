@@ -114,8 +114,8 @@ class ItemNormalizerTest extends TestCase
 
         $serializerProphecy = $this->prophesize(SerializerInterface::class);
         $serializerProphecy->willImplement(NormalizerInterface::class);
-        $serializerProphecy->normalize('hello', null, Argument::type('array'))->willReturn('hello')->shouldBeCalled();
-        $serializerProphecy->normalize(10, null, Argument::type('array'))->willReturn(10)->shouldBeCalled();
+        $serializerProphecy->normalize('hello', null, Argument::type('array'))->shouldNotBeCalled();
+        $serializerProphecy->normalize(10, null, Argument::type('array'))->shouldNotBeCalled();
         $serializerProphecy->normalize(null, null, Argument::type('array'))->willReturn(null)->shouldBeCalled();
 
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
