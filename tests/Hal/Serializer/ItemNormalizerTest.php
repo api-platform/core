@@ -125,7 +125,7 @@ class ItemNormalizerTest extends TestCase
 
         $serializerProphecy = $this->prophesize(SerializerInterface::class);
         $serializerProphecy->willImplement(NormalizerInterface::class);
-        $serializerProphecy->normalize('hello', null, Argument::type('array'))->willReturn('hello')->shouldBeCalled();
+        $serializerProphecy->normalize('hello', null, Argument::type('array'))->shouldNotBeCalled();
 
         $nameConverter = $this->prophesize(NameConverterInterface::class);
         $nameConverter->normalize('name')->shouldBeCalled()->willReturn('name');
@@ -185,7 +185,7 @@ class ItemNormalizerTest extends TestCase
 
         $serializerProphecy = $this->prophesize(SerializerInterface::class);
         $serializerProphecy->willImplement(NormalizerInterface::class);
-        $serializerProphecy->normalize('hello', null, Argument::type('array'))->willReturn('hello')->shouldBeCalled();
+        $serializerProphecy->normalize('hello', null, Argument::type('array'))->shouldNotBeCalled();
 
         $nameConverter = $this->prophesize(NameConverterInterface::class);
         $nameConverter->normalize('name')->shouldBeCalled()->willReturn('name');
