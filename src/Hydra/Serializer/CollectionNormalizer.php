@@ -67,7 +67,11 @@ final class CollectionNormalizer implements NormalizerInterface, NormalizerAware
         if (isset($context['api_sub_level'])) {
             $data = [];
             foreach ($object as $index => $obj) {
-                $data[$index] = $this->normalizer->normalize($obj, $format, $context);
+                if (is_scalar($obj)) {
+                    $data[$index] = $obj;
+                } else {
+                    $data[$index] = $this->normalizer->normalize($obj, $format, $context);
+                }
             }
 
             return $data;

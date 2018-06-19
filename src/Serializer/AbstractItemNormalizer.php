@@ -447,6 +447,10 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
 
         unset($context['resource_class']);
 
+        if (is_scalar($attributeValue)) {
+            return $attributeValue;
+        }
+
         return $this->serializer->normalize($attributeValue, $format, $context);
     }
 
