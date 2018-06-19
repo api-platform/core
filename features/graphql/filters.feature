@@ -154,3 +154,21 @@ Feature: Collections filtering
     And the header "Content-Type" should be equal to "application/json"
     And the JSON node "data.dummies.edges[0].node.name" should be equal to "Dummy #2"
     And the JSON node "data.dummies.edges[1].node.name" should be equal to "Dummy #1"
+
+  @createSchema
+  Scenario: Retrieve a collection filtered using the related search filter with two values
+    Given there are 10 dummy objects
+    When  I send the following GraphQL request:
+    """
+    {
+      dummies(name: ["#2", "#3"]) {
+        edges {
+          node {
+            id
+            name
+          }
+        }
+      }
+    }
+    """
+    Then the JSON node "data.dummies.edges" should have 2 element
