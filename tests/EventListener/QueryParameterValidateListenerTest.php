@@ -13,21 +13,20 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Tests\Filter;
 
-use ApiPlatform\Core\Api\FilterInterface;
 use ApiPlatform\Core\EventListener\QueryParameterValidateListener;
 use ApiPlatform\Core\Exception\FilterValidationException;
+use ApiPlatform\Core\Filter\QueryParameterValidator;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use PHPUnit\Framework\TestCase;
-use Psr\Container\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 
 class QueryParameterValidateListenerTest extends TestCase
 {
     private $testedInstance;
-    private $filterLocatorProphecy;
+    private $queryParameterValidor;
 
     /**
      * unsafe method should not use filter validations.
@@ -60,8 +59,7 @@ class QueryParameterValidateListenerTest extends TestCase
         $eventProphecy = $this->prophesize(RequestEvent::class);
         $eventProphecy->getRequest()->willReturn($request)->shouldBeCalled();
 
-        $this->filterLocatorProphecy->has('some_inexistent_filter')->shouldBeCalled();
-        $this->filterLocatorProphecy->get('some_inexistent_filter')->shouldNotBeCalled();
+        $this->queryParameterValidor->validateFilters(Dummy::class, ['some_inexistent_filter'], $request)->shouldBeCalled();
 
         $this->assertNull(
             $this->testedInstance->onKernelRequest($eventProphecy->reveal())
@@ -81,24 +79,10 @@ class QueryParameterValidateListenerTest extends TestCase
         $eventProphecy = $this->prophesize(RequestEvent::class);
         $eventProphecy->getRequest()->willReturn($request)->shouldBeCalled();
 
-        $this->filterLocatorProphecy
-            ->has('some_filter')
+        $this->queryParameterValidor
+            ->validateFilters(Dummy::class, ['some_filter'], $request)
             ->shouldBeCalled()
-            ->willReturn(true);
-        $filterProphecy = $this->prophesize(FilterInterface::class);
-        $filterProphecy
-            ->getDescription(Dummy::class)
-            ->shouldBeCalled()
-            ->willReturn([
-                'required' => [
-                    'required' => true,
-                ],
-            ]);
-        $this->filterLocatorProphecy
-            ->get('some_filter')
-            ->shouldBeCalled()
-            ->willReturn($filterProphecy->reveal());
-
+            ->willThrow(new FilterValidationException(['Query parameter "required" is required']));
         $this->expectException(FilterValidationException::class);
         $this->expectExceptionMessage('Query parameter "required" is required');
         $this->testedInstance->onKernelRequest($eventProphecy->reveal());
@@ -121,23 +105,9 @@ class QueryParameterValidateListenerTest extends TestCase
         $eventProphecy = $this->prophesize(RequestEvent::class);
         $eventProphecy->getRequest()->willReturn($request)->shouldBeCalled();
 
-        $this->filterLocatorProphecy
-            ->has('some_filter')
-            ->shouldBeCalled()
-            ->willReturn(true);
-        $filterProphecy = $this->prophesize(FilterInterface::class);
-        $filterProphecy
-            ->getDescription(Dummy::class)
-            ->shouldBeCalled()
-            ->willReturn([
-                'required' => [
-                    'required' => true,
-                ],
-            ]);
-        $this->filterLocatorProphecy
-            ->get('some_filter')
-            ->shouldBeCalled()
-            ->willReturn($filterProphecy->reveal());
+        $this->queryParameterValidor
+            ->validateFilters(Dummy::class, ['some_filter'], $request)
+            ->shouldBeCalled();
 
         $this->assertNull(
             $this->testedInstance->onKernelRequest($eventProphecy->reveal())
@@ -156,11 +126,11 @@ class QueryParameterValidateListenerTest extends TestCase
                 ])
             );
 
-        $this->filterLocatorProphecy = $this->prophesize(ContainerInterface::class);
+        $this->queryParameterValidor = $this->prophesize(QueryParameterValidator::class);
 
         $this->testedInstance = new QueryParameterValidateListener(
             $resourceMetadataFactoryProphecy->reveal(),
-            $this->filterLocatorProphecy->reveal()
+            $this->queryParameterValidor->reveal()
         );
     }
 }
