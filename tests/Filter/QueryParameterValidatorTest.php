@@ -11,11 +11,12 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Test\Filter;
+namespace ApiPlatform\Core\Tests\Filter;
 
 use ApiPlatform\Core\Api\FilterInterface;
 use ApiPlatform\Core\Exception\FilterValidationException;
 use ApiPlatform\Core\Filter\QueryParameterValidator;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;

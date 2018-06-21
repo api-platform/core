@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Filter;
+namespace ApiPlatform\Core\Tests\EventListener;
 
 use ApiPlatform\Core\EventListener\QueryParameterValidateListener;
 use ApiPlatform\Core\Exception\FilterValidationException;

@@ -76,7 +76,7 @@ class ArrayItems implements ValidatorInterface
             case 'pipes':
                 return '|';
             default:
-                throw new \InvalidArgumentException(sprintf('Unkwown collection format %s', $collectionFormat));
+                throw new \InvalidArgumentException(sprintf('Unknown collection format %s', $collectionFormat));
         }
     }
 }
