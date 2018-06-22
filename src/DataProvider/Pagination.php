@@ -85,24 +85,31 @@ final class Pagination
         $clientLimit = $this->options['client_items_per_page'];
         $request = $this->requestStack->getCurrentRequest();
 
-        if (null !== $resourceClass && $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass)) {
+        if (null !== $resourceClass) {
+            $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
             $limit = $resourceMetadata->getCollectionOperationAttribute($operationName, 'pagination_items_per_page', $limit, true);
 
             if ($request) {
                 $clientLimit = $resourceMetadata->getCollectionOperationAttribute($operationName, 'pagination_client_items_per_page', $clientLimit, true);
-            }
-        }
 
-        if (null !== $resourceClass && $request && $request->attributes->get('_graphql')) {
-            $collectionArgs = $request->attributes->get('_graphql_collections_args', []);
-            $limit = $collectionArgs[$resourceClass]['first'] ?? $limit;
+                if ($request->attributes->get('_graphql')) {
+                    $collectionArgs = $request->attributes->get('_graphql_collections_args', []);
+                    $limit = $collectionArgs[$resourceClass]['first'] ?? $limit;
+                }
+            }
         }
 
         if ($clientLimit && $request) {
             $limit = (int) $this->getParameterFromRequest($request, $this->options['items_per_page_parameter_name'], $limit);
+            $maxItemsPerPage = $this->options['maximum_items_per_page'];
 
-            if (null !== $this->options['maximum_items_per_page'] && $limit > $this->options['maximum_items_per_page']) {
-                $limit = $this->options['maximum_items_per_page'];
+            if (null !== $resourceClass) {
+                $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
+                $maxItemsPerPage = $resourceMetadata->getCollectionOperationAttribute($operationName, 'maximum_items_per_page', $maxItemsPerPage, true);
+            }
+
+            if (null !== $maxItemsPerPage && $limit > $maxItemsPerPage) {
+                $limit = $maxItemsPerPage;
             }
         }
 
@@ -134,15 +141,18 @@ final class Pagination
         $clientEnabled = $this->options[$partial ? 'client_partial' : 'client_enabled'];
         $request = $this->requestStack->getCurrentRequest();
 
-        if (null !== $resourceClass && $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass)) {
-            $enabled = $resourceMetadata->getCollectionOperationAttribute($operationName, $partial ? 'pagination_partial' : 'pagination_enabled', $enabled, true);
-
-            if ($request) {
-                $clientEnabled = $resourceMetadata->getCollectionOperationAttribute($operationName, $partial ? 'pagination_client_partial' : 'pagination_client_enabled', $clientEnabled, true);
-            }
+        if (null === $request) {
+            return false;
         }
 
-        if ($clientEnabled && $request) {
+        if (null !== $resourceClass) {
+            $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
+            $enabled = $resourceMetadata->getCollectionOperationAttribute($operationName, $partial ? 'pagination_partial' : 'pagination_enabled', $enabled, true);
+
+            $clientEnabled = $resourceMetadata->getCollectionOperationAttribute($operationName, $partial ? 'pagination_client_partial' : 'pagination_client_enabled', $clientEnabled, true);
+        }
+
+        if ($clientEnabled) {
             return filter_var($this->getParameterFromRequest($request, $this->options[$partial ? 'partial_parameter_name' : 'enabled_parameter_name'], $enabled), FILTER_VALIDATE_BOOLEAN);
         }
 

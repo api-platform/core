@@ -458,14 +458,6 @@ class ApiPlatformExtensionTest extends TestCase
             ->willReturn($childDefinitionProphecy)->shouldBeCalledTimes(1);
         $childDefinitionProphecy->addTag('api_platform.subresource_data_provider')->shouldBeCalledTimes(1);
 
-        $containerBuilderProphecy->registerForAutoconfiguration(QueryItemExtensionInterface::class)
-            ->willReturn($childDefinitionProphecy)->shouldBeCalledTimes(1);
-        $childDefinitionProphecy->addTag('api_platform.doctrine.orm.query_extension.item')->shouldBeCalledTimes(1);
-
-        $containerBuilderProphecy->registerForAutoconfiguration(QueryCollectionExtensionInterface::class)
-            ->willReturn($childDefinitionProphecy)->shouldBeCalledTimes(1);
-        $childDefinitionProphecy->addTag('api_platform.doctrine.orm.query_extension.collection')->shouldBeCalledTimes(1);
-
         $containerBuilderProphecy->registerForAutoconfiguration(FilterInterface::class)
             ->willReturn($childDefinitionProphecy)->shouldBeCalledTimes(1);
         $childDefinitionProphecy->addTag('api_platform.filter')->shouldBeCalledTimes(1);
@@ -489,17 +481,6 @@ class ApiPlatformExtensionTest extends TestCase
         $parameters = [
             'api_platform.collection.order' => 'ASC',
             'api_platform.collection.order_parameter_name' => 'order',
-            'api_platform.collection.pagination.client_enabled' => false,
-            'api_platform.collection.pagination.client_items_per_page' => false,
-            'api_platform.collection.pagination.enabled' => true,
-            'api_platform.collection.pagination.enabled_parameter_name' => 'pagination',
-            'api_platform.collection.pagination.items_per_page' => 30,
-            'api_platform.collection.pagination.items_per_page_parameter_name' => 'itemsPerPage',
-            'api_platform.collection.pagination.maximum_items_per_page' => null,
-            'api_platform.collection.pagination.page_parameter_name' => 'page',
-            'api_platform.collection.pagination.partial' => false,
-            'api_platform.collection.pagination.client_partial' => false,
-            'api_platform.collection.pagination.partial_parameter_name' => 'partial',
             'api_platform.description' => 'description',
             'api_platform.error_formats' => ['jsonproblem' => ['application/problem+json'], 'jsonld' => ['application/ld+json']],
             'api_platform.formats' => ['jsonld' => ['application/ld+json'], 'jsonhal' => ['application/hal+json']],
@@ -525,6 +506,24 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.enable_entrypoint' => true,
             'api_platform.enable_docs' => true,
         ];
+
+        $pagination = [
+            'client_enabled' => false,
+            'client_items_per_page' => false,
+            'enabled' => true,
+            'enabled_parameter_name' => 'pagination',
+            'items_per_page' => 30,
+            'items_per_page_parameter_name' => 'itemsPerPage',
+            'maximum_items_per_page' => null,
+            'page_parameter_name' => 'page',
+            'partial' => false,
+            'client_partial' => false,
+            'partial_parameter_name' => 'partial',
+        ];
+        foreach ($pagination as $key => $value) {
+            $parameters["api_platform.collection.pagination.{$key}"] = $value;
+        }
+        $parameters['api_platform.collection.pagination'] = $pagination;
 
         foreach ($parameters as $key => $value) {
             $containerBuilderProphecy->setParameter($key, $value)->shouldBeCalled();
@@ -601,6 +600,7 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.operation_path_resolver.router',
             'api_platform.operation_path_resolver.generator',
             'api_platform.operation_path_resolver.underscore',
+            'api_platform.pagination',
             'api_platform.path_segment_name_generator.underscore',
             'api_platform.path_segment_name_generator.dash',
             'api_platform.resource_class_resolver',
@@ -671,6 +671,15 @@ class ApiPlatformExtensionTest extends TestCase
     private function getBaseContainerBuilderProphecy()
     {
         $containerBuilderProphecy = $this->getPartialContainerBuilderProphecy();
+        $childDefinitionProphecy = $this->prophesize(ChildDefinition::class);
+
+        $containerBuilderProphecy->registerForAutoconfiguration(QueryItemExtensionInterface::class)
+            ->willReturn($childDefinitionProphecy)->shouldBeCalledTimes(1);
+        $childDefinitionProphecy->addTag('api_platform.doctrine.orm.query_extension.item')->shouldBeCalledTimes(1);
+
+        $containerBuilderProphecy->registerForAutoconfiguration(QueryCollectionExtensionInterface::class)
+            ->willReturn($childDefinitionProphecy)->shouldBeCalledTimes(1);
+        $childDefinitionProphecy->addTag('api_platform.doctrine.orm.query_extension.collection')->shouldBeCalledTimes(1);
 
         $containerBuilderProphecy->addResource(Argument::type(DirectoryResource::class))->shouldBeCalled();
 

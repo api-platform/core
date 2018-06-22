@@ -21,11 +21,9 @@ use ApiPlatform\Core\DataProvider\Pagination;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use Doctrine\Common\Persistence\ManagerRegistry;
-use Doctrine\Common\Util\Inflector;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Tools\Pagination\Paginator as DoctrineOrmPaginator;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\Validator\Mapping\Factory\MetadataFactoryInterface;
 
 /**
  * Applies pagination on the Doctrine query for resource collection when enabled.
@@ -52,41 +50,44 @@ final class PaginationExtension implements ContextAwareQueryResultCollectionExte
             $requestStack = $resourceMetadataFactory;
             $resourceMetadataFactory = $pagination;
 
-            if (3 < \count($args = func_get_args())) {
-                @trigger_error(sprintf('Passing "$enabled", "$clientEnabled", "$clientItemsPerPage", "$itemsPerPage", "$pageParameterName", "$enabledParameterName", "$itemsPerPageParameterName", "$maximumItemPerPage", "$partial", "$clientPartial" and "$partialParameterName" arguments is deprecated since API Platform 2.3 and will not be possible anymore in API Platform 3. Pass an instance of "%s" as third argument instead.', Paginator::class), E_USER_DEPRECATED);
-            }
-
-            $options = [];
-            $legacyArgs = [
-                ['name' => 'enabled', 'type' => 'bool', 'default' => true],
-                ['name' => 'client_enabled', 'type' => 'bool', 'default' => false],
-                ['name' => 'client_items_per_page', 'type' => 'bool', 'default' => false],
-                ['name' => 'items_per_page', 'type' => 'bool', 'default' => false],
-                ['name' => 'page_parameter_name', 'type' => 'string', 'default' => 'page'],
-                ['name' => 'enabled_parameter_name', 'type' => 'string', 'default' => 'pagination'],
-                ['name' => 'items_per_page_parameter_name', 'type' => 'string', 'default' => 'itemsPerPage'],
-                ['name' => 'maximum_items_per_page', 'type' => 'int', 'default' => null],
-                ['name' => 'partial', 'type' => 'bool', 'default' => false],
-                ['name' => 'client_partial', 'type' => 'bool', 'default' => false],
-                ['name' => 'partial_parameter_name', 'type' => 'string', 'default' => 'partial'],
+            $legacyPaginationArgs = [
+                3 => ['arg_name' => 'enabled', 'option_name' => 'enabled', 'type' => 'bool', 'default' => true],
+                4 => ['arg_name' => 'clientEnabled', 'option_name' => 'client_enabled', 'type' => 'bool', 'default' => false],
+                5 => ['arg_name' => 'clientItemsPerPage', 'option_name' => 'client_items_per_page', 'type' => 'bool', 'default' => false],
+                6 => ['arg_name' => 'itemsPerPage', 'option_name' => 'items_per_page', 'type' => 'int', 'default' => 30],
+                7 => ['arg_name' => 'pageParameterName', 'option_name' => 'page_parameter_name', 'type' => 'string', 'default' => 'page'],
+                8 => ['arg_name' => 'enabledParameterName', 'option_name' => 'enabled_parameter_name', 'type' => 'string', 'default' => 'pagination'],
+                9 => ['arg_name' => 'itemsPerPageParameterName', 'option_name' => 'items_per_page_parameter_name', 'type' => 'string', 'default' => 'itemsPerPage'],
+                10 => ['arg_name' => 'maximumItemPerPage', 'option_name' => 'maximum_items_per_page', 'type' => 'int', 'default' => null],
+                11 => ['arg_name' => 'partial', 'option_name' => 'partial', 'type' => 'bool', 'default' => false],
+                12 => ['arg_name' => 'clientPartial', 'option_name' => 'client_partial', 'type' => 'bool', 'default' => false],
+                13 => ['arg_name' => 'partialParameterName', 'option_name' => 'partial_parameter_name', 'type' => 'string', 'default' => 'partial'],
             ];
 
-            foreach ($legacyArgs as $i => $arg) {
-                $option = null;
-                if (array_key_exists($i + 3, $args)) {
-                    if (!\call_user_func('is_'.$arg['type'], $args[$i + 3]) && !(null === $arg['default'] && null === $args[$i + 3])) {
-                        throw new InvalidArgumentException(sprintf('The "$%s" argument is expected to be a %s%s.', Inflector::camelize($arg['name']), $arg['type'], null === $arg['default'] ? ' or null' : ''));
+            $paginationOptions = array_column($legacyPaginationArgs, 'default', 'option_name');
+
+            if (0 < \count($legacyArgs = \array_slice(\func_get_args(), 3, null, true))) {
+                @trigger_error(sprintf('Passing "$%s" arguments is deprecated since API Platform 2.3 and will not be possible anymore in API Platform 3. Pass an instance of "%s" as third argument instead.', implode('", "$', array_column($legacyPaginationArgs, 'arg_name')), Paginator::class), E_USER_DEPRECATED);
+
+                foreach ($legacyArgs as $pos => $arg) {
+                    [
+                        'arg_name' => $argName,
+                        'option_name' => $optionName,
+                        'type' => $type,
+                        'default' => $default,
+                    ] = $legacyPaginationArgs[$pos];
+
+                    if (!(\call_user_func("is_{$type}", $arg) || null === $default && null === $arg)) {
+                        throw new InvalidArgumentException(sprintf('The "$%s" argument is expected to be a %s%s.', $argName, $type, null === $default ? ' or null' : ''));
                     }
 
-                    $option = $args[$i + 3];
+                    $paginationOptions[$optionName] = $arg;
                 }
-
-                $options[$arg['name']] = $option ?? $arg['default'];
             }
 
-            $pagination = new Pagination($requestStack, $resourceMetadataFactory, $options);
+            $pagination = new Pagination($requestStack, $resourceMetadataFactory, $paginationOptions);
         } elseif (!$resourceMetadataFactory instanceof ResourceMetadataFactoryInterface) {
-            throw new InvalidArgumentException(sprintf('The "$resourceMetadataFactory" argument is expected to be an implementation of the "%s" interface.', MetadataFactoryInterface::class));
+            throw new InvalidArgumentException(sprintf('The "$resourceMetadataFactory" argument is expected to be an implementation of the "%s" interface.', ResourceMetadataFactoryInterface::class));
         } elseif (!$pagination instanceof Pagination) {
             throw new InvalidArgumentException(sprintf('The "$pagination" argument is expected to be an instance of the "%s" class.', Pagination::class));
         }
@@ -167,7 +168,7 @@ final class PaginationExtension implements ContextAwareQueryResultCollectionExte
 
         $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
 
-        return  $resourceMetadata->getCollectionOperationAttribute($operationName, 'pagination_fetch_join_collection', true, true);
+        return $resourceMetadata->getCollectionOperationAttribute($operationName, 'pagination_fetch_join_collection', true, true);
     }
 
     /**
