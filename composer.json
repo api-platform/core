@@ -84,6 +84,7 @@
         "symfony/security": "To use authorization features.",
         "symfony/twig-bundle": "To use the Swagger UI integration.",
         "symfony/web-profiler-bundle": "To use the data collector.",
+        "symfony/workflow": "To use workflows.",
         "webonyx/graphql-php": "To support GraphQL."
     },
     "autoload": {

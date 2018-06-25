@@ -38,6 +38,7 @@ use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Component\Workflow\WorkflowInterface;
 use Symfony\Component\Yaml\Yaml;
 
 /**
@@ -144,6 +145,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $this->registerHttpCache($container, $config, $loader, $useDoctrine);
         $this->registerValidatorConfiguration($container, $config, $loader);
         $this->registerDataCollector($container, $config, $loader);
+        $this->registerWorkflowConfiguration($container, $config, $loader);
     }
 
     /**
@@ -575,5 +577,14 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         }
 
         $loader->load('data_collector.xml');
+    }
+
+    private function registerWorkflowConfiguration(ContainerBuilder $container, array $config, XmlFileLoader $loader)
+    {
+        if (!$config['enable_workflow'] || !interface_exists(WorkflowInterface::class)) {
+            return;
+        }
+
+        $loader->load('workflow.xml');
     }
 }

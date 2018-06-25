@@ -11,6 +11,33 @@ framework:
     templating:
         engines:                       ['twig'] # For Swagger UI
 
+    workflows:
+      ordering:
+        type: 'workflow'
+        marking_store:
+          type: 'single_state'
+          arguments:
+            - 'status'
+        supports:
+          - ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\WorkflowOffer
+        places:
+          - create
+          - valid
+          - cancel
+        transitions:
+          validate:
+            from: create
+            to: valid
+          unvalidate:
+            from: valid
+            to: create
+          canceled:
+            from: [create, valid]
+            to: cancel
+          recover:
+            from: cancel
+            to: create
+
 doctrine:
     dbal:
         driver:                       'pdo_sqlite'

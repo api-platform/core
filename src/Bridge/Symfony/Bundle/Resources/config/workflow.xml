@@ -1,0 +1,31 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+  <services>
+
+    <service id="ApiPlatform\Core\Bridge\Symfony\Workflow\Metadata\Resource\Factory\WorkflowOperationResourceMetadataFactory" decorates="api_platform.metadata.resource.metadata_factory">
+      <argument type="collection"/>
+      <argument type="service" id="ApiPlatform\Core\Bridge\Symfony\Workflow\Metadata\Resource\Factory\WorkflowOperationResourceMetadataFactory.inner"/>
+    </service>
+
+    <service id="ApiPlatform\Core\Bridge\Symfony\Workflow\PathResolver\WorkflowOperationPathResolver" decorates="api_platform.operation_path_resolver.generator">
+      <argument type="service" id="ApiPlatform\Core\Bridge\Symfony\Workflow\PathResolver\WorkflowOperationPathResolver.inner"/>
+    </service>
+
+    <service id="ApiPlatform\Core\Bridge\Symfony\Workflow\EventListener\WorkflowStateListener">
+      <argument type="service" id="serializer"/>
+      <argument type="service" id="workflow.registry"/>
+      <tag name="kernel.event_listener" event="kernel.request" priority="1"/>
+    </service>
+
+    <service id="ApiPlatform\Core\Bridge\Symfony\Workflow\EventListener\WorkflowEnabledTransitionsListener">
+      <argument type="service" id="serializer"/>
+      <argument type="service" id="workflow.registry"/>
+      <tag name="kernel.event_listener" event="kernel.view" priority="21"/>
+    </service>
+  </services>
+
+</container>

@@ -93,6 +93,7 @@ final class Configuration implements ConfigurationInterface
                 ->booleanNode('enable_entrypoint')->defaultTrue()->info('Enable the entrypoint')->end()
                 ->booleanNode('enable_docs')->defaultTrue()->info('Enable the docs')->end()
                 ->booleanNode('enable_profiler')->defaultTrue()->info('Enable the data collector and the WebProfilerBundle integration.')->end()
+                ->booleanNode('enable_workflow')->defaultTrue()->info('Enable the Workflow integration.')->end()
 
                 ->arrayNode('oauth')
                     ->canBeEnabled()

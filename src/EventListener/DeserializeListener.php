@@ -82,6 +82,7 @@ final class DeserializeListener
         }
 
         $format = $this->getFormat($request);
+        $request->attributes->set('_format', $format);
         $context = $this->serializerContextBuilder->createFromRequest($request, false, $attributes);
 
         $data = $request->attributes->get('data');

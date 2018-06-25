@@ -85,6 +85,7 @@ class ConfigurationTest extends TestCase
             'enable_entrypoint' => true,
             'enable_docs' => true,
             'enable_profiler' => true,
+            'enable_workflow' => true,
             'graphql' => [
                 'enabled' => true,
                 'graphiql' => [
