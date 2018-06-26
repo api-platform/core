@@ -74,6 +74,9 @@ final class AddHeadersListener
             $this->public ? $response->setPublic() : $response->setPrivate();
         }
 
-        $response->headers->set(SessionListener::NO_AUTO_CACHE_CONTROL_HEADER, '');
+        if(\defined(SessionListener::class.'::NO_AUTO_CACHE_CONTROL_HEADER')){
+            $response->headers->set(SessionListener::NO_AUTO_CACHE_CONTROL_HEADER, '');
+        }
+
     }
 }
