@@ -15,6 +15,7 @@ namespace ApiPlatform\Core\HttpCache\EventListener;
 
 use ApiPlatform\Core\Util\RequestAttributesExtractor;
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
+use Symfony\Component\HttpKernel\EventListener\SessionListener;
 
 /**
  * Configures cache HTTP headers for the current response.
@@ -72,5 +73,10 @@ final class AddHeadersListener
         if (null !== $this->public) {
             $this->public ? $response->setPublic() : $response->setPrivate();
         }
+
+        if(\defined(SessionListener::class.'::NO_AUTO_CACHE_CONTROL_HEADER')){
+            $response->headers->set(SessionListener::NO_AUTO_CACHE_CONTROL_HEADER, '');
+        }
+
     }
 }

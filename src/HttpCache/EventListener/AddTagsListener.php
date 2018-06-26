@@ -16,6 +16,7 @@ namespace ApiPlatform\Core\HttpCache\EventListener;
 use ApiPlatform\Core\Api\IriConverterInterface;
 use ApiPlatform\Core\Util\RequestAttributesExtractor;
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
+use Symfony\Component\HttpKernel\EventListener\SessionListener;
 
 /**
  * Sets the list of resources' IRIs included in this response in the "Cache-Tags" HTTP header.
@@ -67,5 +68,8 @@ final class AddTagsListener
         }
 
         $event->getResponse()->headers->set('Cache-Tags', implode(',', $resources));
+        if(\defined(SessionListener::class.'::NO_AUTO_CACHE_CONTROL_HEADER')){
+            $response->headers->set(SessionListener::NO_AUTO_CACHE_CONTROL_HEADER, '');
+        }
     }
 }
