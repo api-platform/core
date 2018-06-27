@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\EventListener;
 
+use ApiPlatform\Core\Api\IriConverterInterface;
 use ApiPlatform\Core\DataPersister\DataPersisterInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
 
@@ -25,10 +26,12 @@ use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
 final class WriteListener
 {
     private $dataPersister;
+    private $iriConverter;
 
-    public function __construct(DataPersisterInterface $dataPersister)
+    public function __construct(DataPersisterInterface $dataPersister, IriConverterInterface $iriConverter = null)
     {
         $this->dataPersister = $dataPersister;
+        $this->iriConverter = $iriConverter;
     }
 
     /**
@@ -57,6 +60,10 @@ final class WriteListener
                 }
 
                 $event->setControllerResult($persistResult ?? $controllerResult);
+
+                if (null !== $this->iriConverter) {
+                    $request->attributes->set('_api_write_item_iri', $this->iriConverter->getIriFromItem($controllerResult));
+                }
                 break;
             case 'DELETE':
                 $this->dataPersister->remove($controllerResult);

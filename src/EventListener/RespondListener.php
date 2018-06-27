@@ -40,15 +40,25 @@ final class RespondListener
             return;
         }
 
+        $headers = [
+            'Content-Type' => sprintf('%s; charset=utf-8', $request->getMimeType($request->getRequestFormat())),
+            'Vary' => 'Accept',
+            'X-Content-Type-Options' => 'nosniff',
+            'X-Frame-Options' => 'deny',
+        ];
+
+        if ($request->attributes->has('_api_write_item_iri')) {
+            $headers['Content-Location'] = $request->attributes->get('_api_write_item_iri');
+
+            if ($request->isMethod('POST')) {
+                $headers['Location'] = $request->attributes->get('_api_write_item_iri');
+            }
+        }
+
         $event->setResponse(new Response(
             $controllerResult,
             self::METHOD_TO_CODE[$request->getMethod()] ?? Response::HTTP_OK,
-            [
-                'Content-Type' => sprintf('%s; charset=utf-8', $request->getMimeType($request->getRequestFormat())),
-                'Vary' => 'Accept',
-                'X-Content-Type-Options' => 'nosniff',
-                'X-Frame-Options' => 'deny',
-            ]
+            $headers
         ));
     }
 }
