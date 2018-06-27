@@ -22,7 +22,7 @@ use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
  * @author Kévin Dunglas <dunglas@gmail.com>
  * @author Baptiste Meyer <baptiste.meyer@gmail.com>
  */
-class WriteListener
+final class WriteListener
 {
     private $dataPersister;
 

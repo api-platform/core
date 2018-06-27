@@ -66,6 +66,6 @@ final class AddTagsListener
             return;
         }
 
-        $event->getResponse()->headers->set('Cache-Tags', implode(',', $resources));
+        $response->headers->set('Cache-Tags', implode(',', $resources));
     }
 }
