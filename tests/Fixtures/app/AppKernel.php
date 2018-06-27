@@ -110,12 +110,9 @@ class AppKernel extends Kernel
                 'default' => [
                     'provider' => 'chain_provider',
                     'http_basic' => null,
-                    'anonymous' => null,
+                    'anonymous' => true
                 ],
-            ],
-            'access_control' => [
-                ['path' => '^/', 'role' => 'IS_AUTHENTICATED_ANONYMOUSLY'],
-            ],
+            ]
         ];
 
         $c->loadFromExtension('security', $securityConfig);
