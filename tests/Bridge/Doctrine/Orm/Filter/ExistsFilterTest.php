@@ -265,6 +265,54 @@ class ExistsFilterTest extends DoctrineOrmFilterTestCase
                 ],
                 sprintf('SELECT o FROM %s o WHERE o.description IS NOT NULL AND o.relatedDummy IS NULL', Dummy::class),
             ],
+
+            'related owned association does not exist' => [
+                [
+                    'relatedOwnedDummy' => null,
+                ],
+                [
+                    'relatedOwnedDummy' => [
+                        'exists' => '0',
+                    ],
+                ],
+                sprintf('SELECT o FROM %s o LEFT JOIN o.relatedOwnedDummy relatedOwnedDummy_a1 WHERE relatedOwnedDummy_a1 IS NULL', Dummy::class),
+            ],
+
+            'related owned association exists' => [
+                [
+                    'relatedOwnedDummy' => null,
+                ],
+                [
+                    'relatedOwnedDummy' => [
+                        'exists' => '1',
+                    ],
+                ],
+                sprintf('SELECT o FROM %s o LEFT JOIN o.relatedOwnedDummy relatedOwnedDummy_a1 WHERE relatedOwnedDummy_a1 IS NOT NULL', Dummy::class),
+            ],
+
+            'related owning association does not exist' => [
+                [
+                    'relatedOwningDummy' => null,
+                ],
+                [
+                    'relatedOwningDummy' => [
+                        'exists' => '0',
+                    ],
+                ],
+                sprintf('SELECT o FROM %s o WHERE o.relatedOwningDummy IS NULL', Dummy::class),
+            ],
+
+            'related owning association exists' => [
+                [
+                    'relatedOwningDummy' => null,
+                ],
+                [
+                    'relatedOwningDummy' => [
+                        'exists' => '1',
+                    ],
+                ],
+                sprintf('SELECT o FROM %s o WHERE o.relatedOwningDummy IS NOT NULL', Dummy::class),
+            ],
         ];
     }
 }
