@@ -20,9 +20,9 @@ final class EqCondition implements ConditionInterface
 {
     public const TYPE = 'eq';
 
-    protected $key;
+    private $key;
 
-    protected $values;
+    private $values;
 
     public function __construct(string $key, array $values)
     {
