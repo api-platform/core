@@ -22,12 +22,7 @@ final class Where
     /**
      * @var ConditionInterface[]
      */
-    protected $conditions;
-
-    public function __construct(?ConditionInterface ...$conditions)
-    {
-        $this->conditions = $conditions ?? [];
-    }
+    private $conditions = [];
 
     /**
      * @return ConditionInterface[]
@@ -42,7 +37,7 @@ final class Where
         if (isset($this->conditions[$condition->getType()])) {
             $currentCondition = $this->conditions[$condition->getType()];
             unset($this->conditions[$condition->getType()]);
-            $condition = new AndCondition($currentCondition, $condition);
+            $condition = new AndCondition([$currentCondition, $condition]);
         }
 
         $this->conditions[$condition->getType()] = $condition;
@@ -51,8 +46,7 @@ final class Where
     public function apply(QueryBuilder $queryBuilder)
     {
         foreach ($this->conditions as $condition) {
-            $expr = $queryBuilder->expr();
-            $queryBuilder->andWhere($condition->apply($expr));
+            $queryBuilder->andWhere($condition->apply($queryBuilder));
         }
     }
 }

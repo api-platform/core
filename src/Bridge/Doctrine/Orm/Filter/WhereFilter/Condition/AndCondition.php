@@ -23,11 +23,11 @@ final class AndCondition implements ConditionInterface
     /**
      * @var ConditionInterface[]
      */
-    protected $conditions;
+    private $conditions;
 
-    public function __construct(ConditionInterface ...$conditions)
+    public function __construct(array $conditions)
     {
-        $this->conditions = $conditions ?? [];
+        $this->conditions = $conditions;
     }
 
     public function getType(): string

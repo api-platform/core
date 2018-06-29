@@ -57,11 +57,11 @@ final class WhereFilter implements ContextAwareFilterInterface
             switch ($type) {
                 case AndCondition::TYPE:
                     $conditions = $this->buildWhereFromArray($alias, $conditionArray)->getConditions();
-                    $where->addCondition(new AndCondition(...$conditions));
+                    $where->addCondition(new AndCondition($conditions));
                     break;
                 case OrCondition::TYPE:
                     $conditions = $this->buildWhereFromArray($alias, $conditionArray)->getConditions();
-                    $where->addCondition(new OrCondition(...$conditions));
+                    $where->addCondition(new OrCondition($conditions));
                     break;
                 case EqCondition::TYPE:
                     $where->addCondition(new EqCondition($alias.'.'.$conditionType, (array) $conditionArray[$type]));
