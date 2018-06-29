@@ -271,6 +271,21 @@ class IriConverterTest extends TestCase
         $this->assertEquals($converter->getItemFromIri('/users/3', ['fetch_data' => true]), $item);
     }
 
+    public function testNoIdentifiersException()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('No identifiers defined for resource of type "\App\Entity\Sample"');
+
+        $routeNameResolverProphecy = $this->prophesize(RouteNameResolverInterface::class);
+        $routerProphecy = $this->prophesize(RouterInterface::class);
+
+        $converter = $this->getIriConverter($routerProphecy, $routeNameResolverProphecy, null);
+
+        $method = new \ReflectionMethod(IriConverter::class, 'generateIdentifiersUrl');
+        $method->setAccessible(true);
+        $method->invoke($converter, [], '\App\Entity\Sample');
+    }
+
     /**
      * @group legacy
      * @expectedDeprecation Not injecting "ApiPlatform\Core\Api\IdentifiersExtractorInterface" is deprecated since API Platform 2.1 and will not be possible anymore in API Platform 3
