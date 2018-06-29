@@ -152,6 +152,20 @@ class Dummy
      */
     public $nameConverted;
 
+    /**
+     * @var RelatedOwnedDummy
+     *
+     * @ORM\OneToOne(targetEntity="RelatedOwnedDummy", cascade={"persist"}, mappedBy="owningDummy")
+     */
+    public $relatedOwnedDummy;
+
+    /**
+     * @var RelatedOwningDummy
+     *
+     * @ORM\OneToOne(targetEntity="RelatedOwningDummy", cascade={"persist"}, inversedBy="ownedDummy")
+     */
+    public $relatedOwningDummy;
+
     public static function staticMethod()
     {
     }
@@ -272,6 +286,30 @@ class Dummy
     public function addRelatedDummy(RelatedDummy $relatedDummy)
     {
         $this->relatedDummies->add($relatedDummy);
+    }
+
+    public function getRelatedOwnedDummy()
+    {
+        return $this->relatedOwnedDummy;
+    }
+
+    public function setRelatedOwnedDummy(RelatedOwnedDummy $relatedOwnedDummy)
+    {
+        $this->relatedOwnedDummy = $relatedOwnedDummy;
+
+        if ($this !== $this->relatedOwnedDummy->getOwningDummy()) {
+            $this->relatedOwnedDummy->setOwningDummy($this);
+        }
+    }
+
+    public function getRelatedOwningDummy()
+    {
+        return $this->relatedOwningDummy;
+    }
+
+    public function setRelatedOwningDummy(RelatedOwningDummy $relatedOwningDummy)
+    {
+        $this->relatedOwningDummy = $relatedOwningDummy;
     }
 
     /**

@@ -13,9 +13,11 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Bridge\Doctrine\Orm\Filter;
 
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryBuilderHelper;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
+use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
 
 /**
@@ -106,6 +108,15 @@ class ExistsFilter extends AbstractContextAwareFilter
             if ($metadata->isCollectionValuedAssociation($field)) {
                 $queryBuilder
                     ->andWhere(sprintf('%s.%s %s EMPTY', $alias, $field, $value ? 'IS NOT' : 'IS'));
+
+                return;
+            }
+
+            if ($metadata->isAssociationInverseSide($field)) {
+                $alias = QueryBuilderHelper::addJoinOnce($queryBuilder, $queryNameGenerator, $alias, $field, Join::LEFT_JOIN);
+
+                $queryBuilder
+                    ->andWhere(sprintf('%s %s NULL', $alias, $value ? 'IS NOT' : 'IS'));
 
                 return;
             }
