@@ -107,7 +107,7 @@ final class CollectionResolverFactory implements ResolverFactoryInterface
                 $offset = 1 + (int) $after;
             }
 
-            $data = ['edges' => [], 'pageInfo' => ['endCursor' => null, 'hasNextPage' => false]];
+            $data = ['totalCount' => 0.0, 'edges' => [], 'pageInfo' => ['endCursor' => null, 'hasNextPage' => false]];
             if ($collection instanceof PaginatorInterface && ($totalItems = $collection->getTotalItems()) > 0) {
                 $data['pageInfo']['endCursor'] = base64_encode((string) ($totalItems - 1));
                 $data['pageInfo']['hasNextPage'] = $collection->getCurrentPage() !== $collection->getLastPage() && (float) $collection->count() === $collection->getItemsPerPage();
