@@ -65,6 +65,8 @@ api_platform:
         shared_max_age: 3600
         vary:           ['Accept', 'Cookie']
         public:         true
+    mapping:
+        paths: ['%kernel.project_dir%/config/api_platform']
 
 fos_user:
     db_driver:        'orm'
@@ -94,6 +96,13 @@ services:
         public: false
         tags:
             -  { name: 'api_platform.item_data_provider' }
+
+    resource_interface.data_provider:
+        class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\DataProvider\ResourceInterfaceImplementationDataProvider'
+        public: false
+        tags:
+            -  { name: 'api_platform.item_data_provider' }
+            -  { name: 'api_platform.collection_data_provider' }
 
     app.serializer.denormalizer.serializable_resource:
         class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\Serializer\Denormalizer\SerializableResourceDenormalizer'

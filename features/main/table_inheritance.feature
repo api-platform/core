@@ -291,3 +291,35 @@ Feature: Table inheritance
       "required": ["hydra:member"]
     }
     """
+
+  Scenario: Get the parent interface collection
+    When I send a "GET" request to "/resource_interfaces"
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+    And the JSON should be valid according to this schema:
+    """
+    {
+      "type": "object",
+      "properties": {
+        "hydra:member": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "@type": {
+                "type": "string",
+                "pattern": "^ResourceInterface$"
+              },
+              "foo": {
+                "type": "string",
+                "required": "true"
+              }
+            }
+          },
+          "minItems": 1
+        }
+      },
+      "required": ["hydra:member"]
+    }
+    """
