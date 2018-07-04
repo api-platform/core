@@ -59,7 +59,7 @@
             <argument type="service" id="api_platform.property_accessor" />
             <argument type="service" id="api_platform.identifiers_extractor.cached" />
             <argument type="service" id="api_platform.subresource_data_provider" on-invalid="ignore" />
-            <argument type="service" id="api_platform.identifier.denormalizer" on-invalid="ignore" />
+            <argument type="service" id="api_platform.identifier.converter" on-invalid="ignore" />
         </service>
         <service id="ApiPlatform\Core\Api\IriConverterInterface" alias="api_platform.iri_converter" />
 
@@ -145,7 +145,7 @@
             <argument type="service" id="api_platform.item_data_provider" />
             <argument type="service" id="api_platform.subresource_data_provider" />
             <argument type="service" id="api_platform.serializer.context_builder" />
-            <argument type="service" id="api_platform.identifier.denormalizer" />
+            <argument type="service" id="api_platform.identifier.converter" />
 
             <tag name="kernel.event_listener" event="kernel.request" method="onKernelRequest" priority="4" />
         </service>
@@ -235,7 +235,7 @@
             <argument type="service" id="api_platform.resource_class_resolver" />
         </service>
 
-        <service id="api_platform.identifier.denormalizer" class="ApiPlatform\Core\Identifier\Normalizer\ChainIdentifierDenormalizer" public="false">
+        <service id="api_platform.identifier.converter" class="ApiPlatform\Core\Identifier\IdentifierConverter" public="false">
             <argument type="service" id="api_platform.identifiers_extractor.cached" />
             <argument type="service" id="api_platform.metadata.property.metadata_factory" />
             <argument type="tagged" tag="api_platform.identifier.denormalizer" />

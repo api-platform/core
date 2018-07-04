@@ -19,7 +19,7 @@ use ApiPlatform\Core\DataProvider\OperationDataProviderTrait;
 use ApiPlatform\Core\DataProvider\SubresourceDataProviderInterface;
 use ApiPlatform\Core\Exception\InvalidIdentifierException;
 use ApiPlatform\Core\Exception\RuntimeException;
-use ApiPlatform\Core\Identifier\Normalizer\ChainIdentifierDenormalizer;
+use ApiPlatform\Core\Identifier\IdentifierConverterInterface;
 use ApiPlatform\Core\Serializer\SerializerContextBuilderInterface;
 use ApiPlatform\Core\Util\RequestAttributesExtractor;
 use ApiPlatform\Core\Util\RequestParser;
@@ -38,13 +38,13 @@ final class ReadListener
 
     private $serializerContextBuilder;
 
-    public function __construct(CollectionDataProviderInterface $collectionDataProvider, ItemDataProviderInterface $itemDataProvider, SubresourceDataProviderInterface $subresourceDataProvider = null, SerializerContextBuilderInterface $serializerContextBuilder = null, ChainIdentifierDenormalizer $identifierDenormalizer = null)
+    public function __construct(CollectionDataProviderInterface $collectionDataProvider, ItemDataProviderInterface $itemDataProvider, SubresourceDataProviderInterface $subresourceDataProvider = null, SerializerContextBuilderInterface $serializerContextBuilder = null, IdentifierConverterInterface $identifierConverter = null)
     {
         $this->collectionDataProvider = $collectionDataProvider;
         $this->itemDataProvider = $itemDataProvider;
         $this->subresourceDataProvider = $subresourceDataProvider;
         $this->serializerContextBuilder = $serializerContextBuilder;
-        $this->identifierDenormalizer = $identifierDenormalizer;
+        $this->identifierConverter = $identifierConverter;
     }
 
     /**
@@ -84,8 +84,8 @@ final class ReadListener
 
         $data = [];
 
-        if ($this->identifierDenormalizer) {
-            $context[ChainIdentifierDenormalizer::HAS_IDENTIFIER_DENORMALIZER] = true;
+        if ($this->identifierConverter) {
+            $context[IdentifierConverterInterface::HAS_IDENTIFIER_CONVERTER] = true;
         }
 
         try {

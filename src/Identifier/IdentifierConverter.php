@@ -11,23 +11,20 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Identifier\Normalizer;
+namespace ApiPlatform\Core\Identifier;
 
 use ApiPlatform\Core\Api\IdentifiersExtractorInterface;
 use ApiPlatform\Core\Exception\InvalidIdentifierException;
-use ApiPlatform\Core\Identifier\CompositeIdentifierParser;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use Symfony\Component\PropertyInfo\Type;
 
 /**
- * Identifier normalizer.
+ * Identifier converter that chains identifier denormalizers.
  *
  * @author Antoine Bluchet <soyuka@gmail.com>
  */
-class ChainIdentifierDenormalizer
+final class IdentifierConverter implements IdentifierConverterInterface
 {
-    const HAS_IDENTIFIER_DENORMALIZER = 'has_identifier_denormalizer';
-
     private $propertyMetadataFactory;
     private $identifiersExtractor;
     private $identifierDenormalizers;
@@ -40,18 +37,16 @@ class ChainIdentifierDenormalizer
     }
 
     /**
-     * @throws InvalidIdentifierException
+     * {@inheritdoc}
      */
-    public function denormalize($data, $class, $format = null, array $context = [])
+    public function convert(string $data, string $class): array
     {
         $keys = $this->identifiersExtractor->getIdentifiersFromResourceClass($class);
 
-        if (!$keys) {
-            throw new InvalidIdentifierException(sprintf('Resource "%s" has no identifiers.', $class));
-        }
-
-        if (\count($keys) > 1) {
+        if (($numIdentifiers = \count($keys)) > 1) {
             $identifiers = CompositeIdentifierParser::parse($data);
+        } elseif (0 === $numIdentifiers) {
+            throw new InvalidIdentifierException(sprintf('Resource "%s" has no identifiers.', $class));
         } else {
             $identifiers = [$keys[0] => $data];
         }
