@@ -18,6 +18,7 @@ use ApiPlatform\Core\Exception\FilterValidationException;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Util\RequestAttributesExtractor;
 use Psr\Container\ContainerInterface;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 
 /**
@@ -77,7 +78,7 @@ final class QueryParameterValidateListener
     /**
      * Test if required filter is valid. It validates array notation too like "required[bar]".
      */
-    private function isRequiredFilterValid($name, $request): bool
+    private function isRequiredFilterValid(string $name, Request $request): bool
     {
         $matches = [];
         parse_str($name, $matches);
