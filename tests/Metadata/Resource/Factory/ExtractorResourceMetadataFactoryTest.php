@@ -22,6 +22,7 @@ use ApiPlatform\Core\Metadata\Resource\Factory\ExtractorResourceNameCollectionFa
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ShortNameResourceMetadataFactory;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
+use ApiPlatform\Core\Tests\Fixtures\DummyResourceInterface;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\FileConfigDummy;
 
 /**
@@ -286,5 +287,17 @@ class ExtractorResourceMetadataFactoryTest extends FileConfigurationMetadataFact
         $resourceMetadata = $shortNameResourceMetadataFactory->create(\DateTime::class);
         $this->assertInstanceOf(ResourceMetadata::class, $resourceMetadata);
         $this->assertSame(\DateTime::class, $resourceMetadata->getShortName());
+    }
+
+    public function testItSupportsInterfaceAsAResource()
+    {
+        $configPath = __DIR__.'/../../../Fixtures/FileConfigurations/interface_resource.yml';
+
+        $resourceMetadataFactory = new ExtractorResourceMetadataFactory(new YamlExtractor([$configPath]));
+        $shortNameResourceMetadataFactory = new ShortNameResourceMetadataFactory($resourceMetadataFactory);
+
+        $resourceMetadata = $shortNameResourceMetadataFactory->create(DummyResourceInterface::class);
+        $this->assertInstanceOf(ResourceMetadata::class, $resourceMetadata);
+        $this->assertSame('DummyResourceInterface', $resourceMetadata->getShortName());
     }
 }

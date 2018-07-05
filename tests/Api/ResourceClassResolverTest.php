@@ -18,6 +18,8 @@ use ApiPlatform\Core\DataProvider\PaginatorInterface;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceNameCollection;
+use ApiPlatform\Core\Tests\Fixtures\DummyResourceImplementation;
+use ApiPlatform\Core\Tests\Fixtures\DummyResourceInterface;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyCar;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyTableInheritance;
@@ -168,6 +170,17 @@ class ResourceClassResolverTest extends TestCase
 
         $resourceClassResolver = new ResourceClassResolver($resourceNameCollectionFactoryProphecy->reveal());
 
-        $this->assertEquals($resourceClassResolver->getResourceClass($t, DummyTableInheritance::class), DummyTableInheritanceChild::class);
+        $this->assertEquals(DummyTableInheritanceChild::class, $resourceClassResolver->getResourceClass($t, DummyTableInheritance::class));
+    }
+
+    public function testGetResourceClassWithInterfaceResource()
+    {
+        $dummy = new DummyResourceImplementation();
+        $resourceNameCollectionFactoryProphecy = $this->prophesize(ResourceNameCollectionFactoryInterface::class);
+        $resourceNameCollectionFactoryProphecy->create()->willReturn(new ResourceNameCollection([DummyResourceInterface::class]))->shouldBeCalled();
+
+        $resourceClassResolver = new ResourceClassResolver($resourceNameCollectionFactoryProphecy->reveal());
+        $resourceClass = $resourceClassResolver->getResourceClass($dummy, DummyResourceInterface::class, true);
+        $this->assertEquals(DummyResourceImplementation::class, $resourceClass);
     }
 }
