@@ -154,6 +154,7 @@ class SerializerFilterContextBuilderTest extends TestCase
             'resource_class' => DummyGroup::class,
             'collection_operation_name' => 'get',
             'receive' => true,
+            'persist' => true,
         ];
 
         $resourceMetadata = new ResourceMetadata(
