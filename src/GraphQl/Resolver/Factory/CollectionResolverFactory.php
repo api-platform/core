@@ -164,11 +164,14 @@ final class CollectionResolverFactory implements ResolverFactoryInterface
         $filters = $args;
         foreach ($filters as $name => $value) {
             if (\is_array($value)) {
+                if (0 === strpos($name, 'array')) {
+                    unset($filters[$name]);
+                    $name = substr($name, \strlen('array'));
+                }
                 $filters[$name] = $this->getNormalizedFilters($value);
-                continue;
             }
 
-            if (strpos($name, '_')) {
+            if (\is_string($name) && strpos($name, '_')) {
                 // Gives a chance to relations/nested fields.
                 $filters[str_replace('_', '.', $name)] = $value;
             }

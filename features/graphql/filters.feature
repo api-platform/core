@@ -156,19 +156,26 @@ Feature: Collections filtering
     And the JSON node "data.dummies.edges[1].node.name" should be equal to "Dummy #1"
 
   @createSchema
-  Scenario: Retrieve a collection filtered using the related search filter with two values
-    Given there are 10 dummy objects
+  Scenario: Retrieve a collection filtered using the related search filter with two values and exact strategy
+    Given there are 3 dummy objects with relatedDummy
     When  I send the following GraphQL request:
     """
     {
-      dummies(name: ["#2", "#3"]) {
+      dummies(arrayrelatedDummy_name: ["RelatedDummy #1", "RelatedDummy #2"]) {
         edges {
           node {
             id
             name
+            relatedDummy {
+              name
+            }
           }
         }
       }
     }
     """
-    Then the JSON node "data.dummies.edges" should have 2 element
+    Then the response status code should be 200
+    And the header "Content-Type" should be equal to "application/json"
+    And the JSON node "data.dummies.edges" should have 2 element
+    And the JSON node "data.dummies.edges[0].node.relatedDummy.name" should be equal to "RelatedDummy #1"
+    And the JSON node "data.dummies.edges[1].node.relatedDummy.name" should be equal to "RelatedDummy #2"
