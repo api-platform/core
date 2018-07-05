@@ -14,10 +14,8 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\DataProvider;
 
 use ApiPlatform\Core\Exception\InvalidArgumentException;
-use ApiPlatform\Core\Exception\InvalidIdentifierException;
 use ApiPlatform\Core\Exception\PropertyNotFoundException;
 use ApiPlatform\Core\Exception\RuntimeException;
-use ApiPlatform\Core\Identifier\Normalizer\ChainIdentifierDenormalizer;
 
 /**
  * @internal
@@ -35,14 +33,9 @@ trait OperationDataProviderTrait
     private $itemDataProvider;
 
     /**
-     * @var SubresourceDataProviderInterface
+     * @var SubresourceDataProviderInterface|null
      */
     private $subresourceDataProvider;
-
-    /**
-     * @var ChainIdentifierDenormalizer
-     */
-    private $identifierDenormalizer;
 
     /**
      * Retrieves data for a collection operation.
@@ -57,7 +50,7 @@ trait OperationDataProviderTrait
     /**
      * Gets data for an item operation.
      *
-     * @throws NotFoundHttpException
+     * @throws PropertyNotFoundException
      *
      * @return object|null
      */
@@ -73,14 +66,13 @@ trait OperationDataProviderTrait
     /**
      * Gets data for a nested operation.
      *
-     * @throws NotFoundHttpException
      * @throws RuntimeException
      *
      * @return object|null
      */
     private function getSubresourceData($identifiers, array $attributes, array $context)
     {
-        if (!$this->subresourceDataProvider) {
+        if (null === $this->subresourceDataProvider) {
             throw new RuntimeException('Subresources not supported');
         }
 
@@ -89,8 +81,6 @@ trait OperationDataProviderTrait
 
     /**
      * @param array $parameters - usually comes from $request->attributes->all()
-     *
-     * @throws InvalidIdentifierException
      */
     private function extractIdentifiers(array $parameters, array $attributes)
     {
@@ -104,12 +94,10 @@ trait OperationDataProviderTrait
 
         $identifiers = [];
 
-        foreach ($attributes['subresource_context']['identifiers'] as $key => list($id, $resourceClass, $hasIdentifier)) {
-            if (false === $hasIdentifier) {
-                continue;
+        foreach ($attributes['subresource_context']['identifiers'] as $key => list($id, , $hasIdentifier)) {
+            if (false !== $hasIdentifier) {
+                $identifiers[$id] = $parameters[$id];
             }
-
-            $identifiers[$id] = $parameters[$id];
         }
 
         return $identifiers;

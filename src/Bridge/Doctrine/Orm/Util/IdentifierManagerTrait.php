@@ -49,7 +49,7 @@ trait IdentifierManagerTrait
             $identifiersMap = [];
 
             // first transform identifiers to a proper key/value array
-            foreach (explode(';', $id) as $identifier) {
+            foreach (explode(';', (string) $id) as $identifier) {
                 if (!$identifier) {
                     continue;
                 }

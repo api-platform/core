@@ -31,7 +31,7 @@ trait AnnotationFilterExtractorTrait
      *
      * @param array $miscAnnotations class or property annotations
      *
-     * @return array only ApiFilter annotations
+     * @return \Iterator only ApiFilter annotations
      */
     private function getFilterAnnotations(array $miscAnnotations): \Iterator
     {

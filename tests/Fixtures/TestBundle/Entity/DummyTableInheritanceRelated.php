@@ -67,11 +67,6 @@ class DummyTableInheritanceRelated
         return $this->children;
     }
 
-    /**
-     * @param $children
-     *
-     * @return $this
-     */
     public function setChildren($children)
     {
         $this->children = $children;
@@ -79,11 +74,6 @@ class DummyTableInheritanceRelated
         return $this;
     }
 
-    /**
-     * @param $child
-     *
-     * @return $this
-     */
     public function addChild($child)
     {
         $this->children->add($child);
@@ -92,11 +82,6 @@ class DummyTableInheritanceRelated
         return $this;
     }
 
-    /**
-     * @param $child
-     *
-     * @return $this
-     */
     public function removeChild($child)
     {
         $this->children->remove($child);

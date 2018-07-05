@@ -83,7 +83,7 @@ class IriConverterTest extends TestCase
 
     public function testGetItemFromIri()
     {
-        $item = new \StdClass();
+        $item = new \stdClass();
         $itemDataProviderProphecy = $this->prophesize(ItemDataProviderInterface::class);
         $itemDataProviderProphecy->getItem(Dummy::class, 3, 'get', ['fetch_data' => true])->shouldBeCalled()->willReturn($item);
 
@@ -216,7 +216,7 @@ class IriConverterTest extends TestCase
 
     public function testGetItemFromIriWithSubresourceDataProvider()
     {
-        $item = new \StdClass();
+        $item = new \stdClass();
         $subresourceContext = ['identifiers' => [['id', Dummy::class, true]]];
         $itemDataProviderProphecy = $this->prophesize(ItemDataProviderInterface::class);
         $routeNameResolverProphecy = $this->prophesize(RouteNameResolverInterface::class);
@@ -259,8 +259,7 @@ class IriConverterTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Item not found for "/users/3".');
 
-        $item = new \StdClass();
-        $itemDataProviderProphecy = $this->prophesize(ItemDataProviderInterface::class);
+        $item = new \stdClass();
         $routeNameResolverProphecy = $this->prophesize(RouteNameResolverInterface::class);
         $routerProphecy = $this->prophesize(RouterInterface::class);
         $routerProphecy->match('/users/3')->willReturn([

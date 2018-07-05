@@ -133,7 +133,7 @@ final class XmlExtractor extends AbstractExtractor
     /**
      * Transforms an XML attribute's value in a PHP value.
      *
-     * @return bool|string|null
+     * @return string|int|bool|null
      */
     private function phpize(\SimpleXMLElement $array, string $key, string $type)
     {
