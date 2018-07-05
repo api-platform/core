@@ -161,7 +161,7 @@ Feature: Collections filtering
     When  I send the following GraphQL request:
     """
     {
-      dummies(arrayrelatedDummy_name: ["RelatedDummy #1", "RelatedDummy #2"]) {
+      dummies(relatedDummy_name_list: ["RelatedDummy #1", "RelatedDummy #2"]) {
         edges {
           node {
             id

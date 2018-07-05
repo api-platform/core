@@ -162,11 +162,11 @@ final class CollectionResolverFactory implements ResolverFactoryInterface
     private function getNormalizedFilters(array $args): array
     {
         $filters = $args;
+
         foreach ($filters as $name => $value) {
             if (\is_array($value)) {
-                if (0 === strpos($name, 'array')) {
-                    unset($filters[$name]);
-                    $name = substr($name, \strlen('array'));
+                if (strpos($name, '_list')) {
+                    $name = substr($name, 0, \strlen($name) - \strlen('_list'));
                 }
                 $filters[$name] = $this->getNormalizedFilters($value);
             }

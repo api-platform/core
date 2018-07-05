@@ -233,7 +233,7 @@ final class SchemaBuilder implements SchemaBuilderInterface
 
                         if ('[]' === substr($key, -2)) {
                             $graphqlFilterType = GraphQLType::listOf($graphqlFilterType);
-                            $key = 'array'.substr($key, 0, -2);
+                            $key = substr($key, 0, -2).'_list';
                         }
 
                         parse_str($key, $parsed);
