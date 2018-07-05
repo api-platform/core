@@ -61,13 +61,11 @@ final class FilterExtension implements ContextAwareQueryCollectionExtensionInter
         }
 
         foreach ($resourceFilters as $filterId) {
-            if (!($filter = $this->getFilter($filterId)) instanceof FilterInterface) {
-                continue;
+            $filter = $this->getFilter($filterId);
+            if ($filter instanceof FilterInterface) {
+                $context['filters'] = $context['filters'] ?? [];
+                $filter->apply($queryBuilder, $queryNameGenerator, $resourceClass, $operationName, $context);
             }
-
-            $context['filters'] = $context['filters'] ?? [];
-
-            $filter->apply($queryBuilder, $queryNameGenerator, $resourceClass, $operationName, $context);
         }
     }
 }

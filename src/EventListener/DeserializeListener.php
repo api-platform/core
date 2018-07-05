@@ -84,6 +84,9 @@ final class DeserializeListener
      */
     private function getFormat(Request $request): string
     {
+        /**
+         * @var string|null
+         */
         $contentType = $request->headers->get('CONTENT_TYPE');
         if (null === $contentType) {
             throw new NotAcceptableHttpException('The "Content-Type" header must exist.');

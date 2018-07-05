@@ -44,11 +44,7 @@ final class ContextAction
     /**
      * Generates a context according to the type requested.
      *
-     * @param $shortName string
-     *
      * @throws NotFoundHttpException
-     *
-     * @return array
      */
     public function __invoke(string $shortName): array
     {

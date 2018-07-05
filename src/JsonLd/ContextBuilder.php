@@ -36,7 +36,7 @@ final class ContextBuilder implements ContextBuilderInterface
     private $urlGenerator;
 
     /**
-     * @var NameConverterInterface
+     * @var NameConverterInterface|null
      */
     private $nameConverter;
 

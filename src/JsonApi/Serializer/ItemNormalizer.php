@@ -25,6 +25,8 @@ use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Serializer\AbstractItemNormalizer;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
+use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
+use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 /**
  * Converts between objects and array.
@@ -161,7 +163,10 @@ final class ItemNormalizer extends AbstractItemNormalizer
         if (!$this->resourceClassResolver->isResourceClass($className)) {
             $context['resource_class'] = $className;
 
-            return $this->serializer->denormalize($value, $className, $format, $context);
+            if ($this->serializer instanceof DenormalizerInterface) {
+                return $this->serializer->denormalize($value, $className, $format, $context);
+            }
+            throw new InvalidArgumentException(sprintf('The injected serializer must be an instance of "%s".', DenormalizerInterface::class));
         }
 
         if (!\is_array($value) || !isset($value['id'], $value['type'])) {
@@ -188,7 +193,10 @@ final class ItemNormalizer extends AbstractItemNormalizer
             } else {
                 unset($context['resource_class']);
 
-                return $this->serializer->normalize($relatedObject, $format, $context);
+                if ($this->serializer instanceof NormalizerInterface) {
+                    return $this->serializer->normalize($relatedObject, $format, $context);
+                }
+                throw new InvalidArgumentException(sprintf('The injected serializer must be an instance of "%s".', NormalizerInterface::class));
             }
         } else {
             $iri = $this->iriConverter->getIriFromItem($relatedObject);

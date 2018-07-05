@@ -26,10 +26,6 @@ class DummyValidationController
      *     defaults={"_api_resource_class"=DummyValidation::class, "_api_collection_operation_name"="post_validation_groups"}
      * )
      * @Method("POST")
-     *
-     * @param $data
-     *
-     * @return mixed
      */
     public function postValidationGroups($data)
     {
@@ -43,10 +39,6 @@ class DummyValidationController
      *     defaults={"_api_resource_class"=DummyValidation::class, "_api_collection_operation_name"="post_validation_sequence"}
      * )
      * @Method("POST")
-     *
-     * @param $data
-     *
-     * @return mixed
      */
     public function postValidationSequence($data)
     {

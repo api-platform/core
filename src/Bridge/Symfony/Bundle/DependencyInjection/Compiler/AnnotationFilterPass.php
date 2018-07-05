@@ -39,6 +39,9 @@ final class AnnotationFilterPass implements CompilerPassInterface
     public function process(ContainerBuilder $container)
     {
         $resourceClassDirectories = $container->getParameter('api_platform.resource_class_directories');
+        /**
+         * @var Reader
+         */
         $reader = $container->get('annotation_reader');
 
         foreach (ReflectionClassRecursiveIterator::getReflectionClassesFromDirectories($resourceClassDirectories) as $className => $reflectionClass) {

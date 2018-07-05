@@ -44,6 +44,9 @@ class ApiResourceTest extends TestCase
     public function testApiResourceAnnotation()
     {
         $reader = new AnnotationReader();
+        /**
+         * @var ApiResource
+         */
         $resource = $reader->getClassAnnotation(new \ReflectionClass(AnnotatedClass::class), ApiResource::class);
 
         $this->assertSame('shortName', $resource->shortName);

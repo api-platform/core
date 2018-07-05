@@ -23,8 +23,6 @@ class QueryBuilderHelperTest extends TestCase
 {
     /**
      * @dataProvider provideAddJoinOnce
-     *
-     * @param string|null $originAlias
      */
     public function testAddJoinOnce(string $originAliasForJoinOnce = null, string $expectedAlias)
     {
