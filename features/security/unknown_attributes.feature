@@ -33,6 +33,8 @@ Feature: Ignore unknown attributes
       "jsonData": [],
       "arrayData": [],
       "name_converted": null,
+      "relatedOwnedDummy": null,
+      "relatedOwningDummy": null,
       "id": 1,
       "name": "Not existing",
       "alias": null,

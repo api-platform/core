@@ -5,15 +5,13 @@ clone_folder: c:\projects\api-platform\core
 cache:
   - '%LOCALAPPDATA%\Composer\files'
 
-init:
-  - SET PATH=c:\tools\php72;%PATH%
-
 environment:
     APP_ENV: 'test'
 
 install:
   - ps: Set-Service wuauserv -StartupType Manual
-  - cinst -y php
+  - cinst -y php composer
+  - refreshenv
   - cd c:\tools\php72
   - copy php.ini-production php.ini /Y
   - echo date.timezone="UTC" >> php.ini
@@ -24,8 +22,7 @@ install:
   - echo extension=php_pdo_sqlite.dll >> php.ini
   - echo memory_limit=3G >> php.ini
   - cd %APPVEYOR_BUILD_FOLDER%
-  - php -r "readfile('http://getcomposer.org/installer');" | php
-  - php composer.phar install --no-interaction --no-progress
+  - composer install --no-interaction --no-progress
 
 test_script:
   - cd %APPVEYOR_BUILD_FOLDER%

@@ -769,11 +769,6 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
     }
 
     /**
-     * @param string           $operationType
-     * @param bool             $denormalization
-     * @param ResourceMetadata $resourceMetadata
-     * @param string           $operationType
-     *
      * @return array|null
      */
     private function getSerializerContext(string $operationType, bool $denormalization, ResourceMetadata $resourceMetadata, string $operationName)

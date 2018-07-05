@@ -33,7 +33,7 @@ trait OperationDataProviderTrait
     private $itemDataProvider;
 
     /**
-     * @var SubresourceDataProviderInterface
+     * @var SubresourceDataProviderInterface|null
      */
     private $subresourceDataProvider;
 
@@ -55,8 +55,6 @@ trait OperationDataProviderTrait
     /**
      * Gets data for an item operation.
      *
-     * @throws NotFoundHttpException
-     *
      * @return object|null
      */
     private function getItemData($identifiers, array $attributes, array $context)
@@ -67,14 +65,13 @@ trait OperationDataProviderTrait
     /**
      * Gets data for a nested operation.
      *
-     * @throws NotFoundHttpException
      * @throws RuntimeException
      *
      * @return object|null
      */
     private function getSubresourceData($identifiers, array $attributes, array $context)
     {
-        if (!$this->subresourceDataProvider) {
+        if (null === $this->subresourceDataProvider) {
             throw new RuntimeException('Subresources not supported');
         }
 

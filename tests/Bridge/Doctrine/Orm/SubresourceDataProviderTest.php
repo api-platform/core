@@ -233,7 +233,7 @@ class SubresourceDataProviderTest extends TestCase
 
         $managerRegistryProphecy->getManagerForClass(RelatedDummy::class)->shouldBeCalled()->willReturn($rDummyManagerProphecy->reveal());
 
-        $result = new \StdClass();
+        $result = new \stdClass();
         // Origin manager (ThirdLevel)
         $queryProphecy = $this->prophesize(AbstractQuery::class);
         $queryProphecy->getOneOrNullResult()->shouldBeCalled()->willReturn($result);
@@ -517,7 +517,7 @@ class SubresourceDataProviderTest extends TestCase
 
         $managerRegistryProphecy->getManagerForClass(RelatedDummy::class)->shouldBeCalled()->willReturn($rDummyManagerProphecy->reveal());
 
-        $result = new \StdClass();
+        $result = new \stdClass();
         $queryProphecy = $this->prophesize(AbstractQuery::class);
         $queryProphecy->getOneOrNullResult()->shouldBeCalled()->willReturn($result);
 

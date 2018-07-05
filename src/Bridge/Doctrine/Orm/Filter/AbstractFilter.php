@@ -164,7 +164,8 @@ abstract class AbstractFilter implements FilterInterface
             $resourceClass = null;
         }
 
-        if (false === $pos = strpos($property, '.')) {
+        $pos = strpos($property, '.');
+        if (false === $pos) {
             return false;
         }
 

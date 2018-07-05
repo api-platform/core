@@ -60,8 +60,8 @@ final class OrderExtension implements ContextAwareQueryCollectionExtensionInterf
                         $order = 'ASC';
                     }
 
-                    if (false === ($pos = \strpos($field, '.'))
-                        || isset($classMetaData->embeddedClasses[\substr($field, 0, $pos)])) {
+                    $pos = strpos($field, '.');
+                    if (false === $pos || isset($classMetaData->embeddedClasses[\substr($field, 0, $pos)])) {
                         // Configure default filter with property
                         $field = "{$rootAlias}.{$field}";
                     } else {

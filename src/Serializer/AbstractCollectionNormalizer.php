@@ -100,8 +100,10 @@ abstract class AbstractCollectionNormalizer implements NormalizerInterface, Norm
     protected function getPaginationConfig($object, array $context = []): array
     {
         $currentPage = $lastPage = $itemsPerPage = $pageTotalItems = $totalItems = null;
+        $paginated = $paginator = false;
 
-        if ($paginated = $paginator = $object instanceof PartialPaginatorInterface) {
+        if ($object instanceof PartialPaginatorInterface) {
+            $paginated = $paginator = true;
             if ($object instanceof PaginatorInterface) {
                 $paginated = 1. !== $lastPage = $object->getLastPage();
                 $totalItems = $object->getTotalItems();

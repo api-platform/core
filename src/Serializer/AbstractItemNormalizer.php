@@ -31,6 +31,8 @@ use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
+use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
+use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 /**
  * Base item normalizer.
@@ -316,7 +318,10 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             $context['api_allow_update'] = true;
 
             try {
-                return $this->serializer->denormalize($value, $className, $format, $context);
+                if ($this->serializer instanceof DenormalizerInterface) {
+                    return $this->serializer->denormalize($value, $className, $format, $context);
+                }
+                throw new InvalidArgumentException(sprintf('The injected serializer must be an instance of "%s".', DenormalizerInterface::class));
             } catch (InvalidValueException $e) {
                 if (!$this->allowPlainIdentifiers || null === $this->itemDataProvider) {
                     throw $e;
@@ -447,7 +452,10 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
 
         unset($context['resource_class']);
 
-        return $this->serializer->normalize($attributeValue, $format, $context);
+        if ($this->serializer instanceof NormalizerInterface) {
+            return $this->serializer->normalize($attributeValue, $format, $context);
+        }
+        throw new InvalidArgumentException(sprintf('The injected serializer must be an instance of "%s".', NormalizerInterface::class));
     }
 
     /**
@@ -488,7 +496,10 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
                 $context['resource_class'] = $resourceClass;
             }
 
-            return $this->serializer->normalize($relatedObject, $format, $context);
+            if ($this->serializer instanceof NormalizerInterface) {
+                return $this->serializer->normalize($relatedObject, $format, $context);
+            }
+            throw new InvalidArgumentException(sprintf('The injected serializer must be an instance of "%s".', NormalizerInterface::class));
         }
 
         $iri = $this->iriConverter->getIriFromItem($relatedObject);

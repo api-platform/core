@@ -127,10 +127,9 @@ final class QueryChecker
             $parts = QueryJoinParser::getOrderByParts($orderBy);
 
             foreach ($parts as $part) {
-                if (false !== ($pos = strpos($part, '.'))) {
-                    $alias = substr($part, 0, $pos);
-
-                    $orderByAliases[$alias] = true;
+                $pos = strpos($part, '.');
+                if (false !== $pos) {
+                    $orderByAliases[substr($part, 0, $pos)] = true;
                 }
             }
         }
