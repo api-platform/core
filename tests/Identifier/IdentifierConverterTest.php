@@ -11,10 +11,10 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Identifier\Normalizer;
+namespace ApiPlatform\Core\Tests\Identifier;
 
 use ApiPlatform\Core\Api\IdentifiersExtractorInterface;
-use ApiPlatform\Core\Identifier\Normalizer\ChainIdentifierDenormalizer;
+use ApiPlatform\Core\Identifier\IdentifierConverter;
 use ApiPlatform\Core\Identifier\Normalizer\DateTimeIdentifierDenormalizer;
 use ApiPlatform\Core\Identifier\Normalizer\IntegerDenormalizer;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
@@ -25,7 +25,7 @@ use Symfony\Component\PropertyInfo\Type;
 /**
  * @author Antoine Bluchet <soyuka@gmail.com>
  */
-class ChainIdentifierDenormalizerTest extends TestCase
+class IdentifierConverterTest extends TestCase
 {
     public function testCompositeIdentifier()
     {
@@ -46,9 +46,9 @@ class ChainIdentifierDenormalizerTest extends TestCase
 
         $identifierDenormalizers = [new IntegerDenormalizer(), new DateTimeIdentifierDenormalizer()];
 
-        $identifierDenormalizer = new ChainIdentifierDenormalizer($identifiersExtractor->reveal(), $propertyMetadataFactory->reveal(), $identifierDenormalizers);
+        $identifierDenormalizer = new IdentifierConverter($identifiersExtractor->reveal(), $propertyMetadataFactory->reveal(), $identifierDenormalizers);
 
-        $result = $identifierDenormalizer->denormalize($identifier, $class);
+        $result = $identifierDenormalizer->convert($identifier, $class);
         $this->assertEquals(['a' => 1, 'c' => '2', 'd' => new \DateTime('2015-04-05')], $result);
         $this->assertSame(1, $result['a']);
     }
@@ -67,9 +67,9 @@ class ChainIdentifierDenormalizerTest extends TestCase
         $identifiersExtractor->getIdentifiersFromResourceClass($class)->willReturn(['funkyid']);
 
         $identifierDenormalizers = [new DateTimeIdentifierDenormalizer()];
-        $identifierDenormalizer = new ChainIdentifierDenormalizer($identifiersExtractor->reveal(), $propertyMetadataFactory->reveal(), $identifierDenormalizers);
+        $identifierDenormalizer = new IdentifierConverter($identifiersExtractor->reveal(), $propertyMetadataFactory->reveal(), $identifierDenormalizers);
 
-        $this->assertEquals($identifierDenormalizer->denormalize($identifier, $class), ['funkyid' => new \DateTime('2015-04-05')]);
+        $this->assertEquals($identifierDenormalizer->convert($identifier, $class), ['funkyid' => new \DateTime('2015-04-05')]);
     }
 
     public function testIntegerIdentifier()
@@ -86,8 +86,8 @@ class ChainIdentifierDenormalizerTest extends TestCase
         $identifiersExtractor->getIdentifiersFromResourceClass($class)->willReturn(['id']);
 
         $identifierDenormalizers = [new IntegerDenormalizer()];
-        $identifierDenormalizer = new ChainIdentifierDenormalizer($identifiersExtractor->reveal(), $propertyMetadataFactory->reveal(), $identifierDenormalizers);
+        $identifierDenormalizer = new IdentifierConverter($identifiersExtractor->reveal(), $propertyMetadataFactory->reveal(), $identifierDenormalizers);
 
-        $this->assertSame(['id' => 42], $identifierDenormalizer->denormalize($identifier, $class));
+        $this->assertSame(['id' => 42], $identifierDenormalizer->convert($identifier, $class));
     }
 }

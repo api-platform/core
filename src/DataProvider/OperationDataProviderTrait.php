@@ -15,7 +15,7 @@ namespace ApiPlatform\Core\DataProvider;
 
 use ApiPlatform\Core\Exception\InvalidIdentifierException;
 use ApiPlatform\Core\Exception\RuntimeException;
-use ApiPlatform\Core\Identifier\Normalizer\ChainIdentifierDenormalizer;
+use ApiPlatform\Core\Identifier\IdentifierConverterInterface;
 
 /**
  * @internal
@@ -38,9 +38,9 @@ trait OperationDataProviderTrait
     private $subresourceDataProvider;
 
     /**
-     * @var ChainIdentifierDenormalizer
+     * @var IdentifierConverterInterface
      */
-    private $identifierDenormalizer;
+    private $identifierConverter;
 
     /**
      * Retrieves data for a collection operation.
@@ -95,8 +95,8 @@ trait OperationDataProviderTrait
 
             $id = $parameters['id'];
 
-            if ($this->identifierDenormalizer) {
-                return $this->identifierDenormalizer->denormalize((string) $id, $attributes['resource_class']);
+            if ($this->identifierConverter) {
+                return $this->identifierConverter->convert((string) $id, $attributes['resource_class']);
             }
 
             return $id;
@@ -111,8 +111,8 @@ trait OperationDataProviderTrait
 
             $identifiers[$id] = $parameters[$id];
 
-            if ($this->identifierDenormalizer) {
-                $identifiers[$id] = $this->identifierDenormalizer->denormalize((string) $identifiers[$id], $resourceClass);
+            if ($this->identifierConverter) {
+                $identifiers[$id] = $this->identifierConverter->convert((string) $identifiers[$id], $resourceClass);
             }
         }
 

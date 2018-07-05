@@ -19,7 +19,7 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\ItemDataProvider;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Core\Exception\PropertyNotFoundException;
 use ApiPlatform\Core\Exception\RuntimeException;
-use ApiPlatform\Core\Identifier\Normalizer\ChainIdentifierDenormalizer;
+use ApiPlatform\Core\Identifier\IdentifierConverterInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
@@ -47,7 +47,7 @@ class ItemDataProviderTest extends TestCase
 {
     public function testGetItemSingleIdentifier()
     {
-        $context = ['foo' => 'bar', 'fetch_data' => true, ChainIdentifierDenormalizer::HAS_IDENTIFIER_DENORMALIZER => true];
+        $context = ['foo' => 'bar', 'fetch_data' => true, IdentifierConverterInterface::HAS_IDENTIFIER_CONVERTER => true];
         $queryProphecy = $this->prophesize(AbstractQuery::class);
         $queryProphecy->getOneOrNullResult()->willReturn([])->shouldBeCalled();
 
@@ -119,7 +119,7 @@ class ItemDataProviderTest extends TestCase
             ],
         ], $queryBuilder);
 
-        $context = [ChainIdentifierDenormalizer::HAS_IDENTIFIER_DENORMALIZER => true];
+        $context = [IdentifierConverterInterface::HAS_IDENTIFIER_CONVERTER => true];
         $extensionProphecy = $this->prophesize(QueryItemExtensionInterface::class);
         $extensionProphecy->applyToItem($queryBuilder, Argument::type(QueryNameGeneratorInterface::class), Dummy::class, ['ida' => 1, 'idb' => 2], 'foo', $context)->shouldBeCalled();
 
@@ -177,7 +177,7 @@ class ItemDataProviderTest extends TestCase
             ],
         ], $queryBuilder);
 
-        $context = [ChainIdentifierDenormalizer::HAS_IDENTIFIER_DENORMALIZER => true];
+        $context = [IdentifierConverterInterface::HAS_IDENTIFIER_CONVERTER => true];
         $extensionProphecy = $this->prophesize(QueryResultItemExtensionInterface::class);
         $extensionProphecy->applyToItem($queryBuilder, Argument::type(QueryNameGeneratorInterface::class), Dummy::class, ['id' => 1], 'foo', $context)->shouldBeCalled();
         $extensionProphecy->supportsResult(Dummy::class, 'foo', $context)->willReturn(true)->shouldBeCalled();
@@ -234,7 +234,7 @@ class ItemDataProviderTest extends TestCase
             'id',
         ]);
 
-        (new ItemDataProvider($managerRegistryProphecy->reveal(), $propertyNameCollectionFactory, $propertyMetadataFactory, [$extensionProphecy->reveal()]))->getItem(Dummy::class, 'foo', null, [ChainIdentifierDenormalizer::HAS_IDENTIFIER_DENORMALIZER => true]);
+        (new ItemDataProvider($managerRegistryProphecy->reveal(), $propertyNameCollectionFactory, $propertyMetadataFactory, [$extensionProphecy->reveal()]))->getItem(Dummy::class, 'foo', null, [IdentifierConverterInterface::HAS_IDENTIFIER_CONVERTER => true]);
     }
 
     /**
