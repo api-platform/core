@@ -115,7 +115,7 @@ final class IriConverter implements IriConverterInterface
         $routeName = $this->routeNameResolver->getRouteName($resourceClass, OperationType::ITEM);
 
         try {
-            $identifiers = $this->generateIdentifiersUrl($this->identifiersExtractor->getIdentifiersFromItem($item));
+            $identifiers = $this->generateIdentifiersUrl($this->identifiersExtractor->getIdentifiersFromItem($item), $resourceClass);
 
             return $this->router->generate($routeName, ['id' => implode(';', $identifiers)], $referenceType);
         } catch (RuntimeException $e) {
@@ -170,12 +170,22 @@ final class IriConverter implements IriConverterInterface
     /**
      * Generate the identifier url.
      *
-     * @param array $identifiers
+     * @param array  $identifiers
+     * @param string $resourceClass
+     *
+     * @throws InvalidArgumentException
      *
      * @return string[]
      */
-    private function generateIdentifiersUrl(array $identifiers): array
+    private function generateIdentifiersUrl(array $identifiers, string $resourceClass): array
     {
+        if (0 === \count($identifiers)) {
+            throw new InvalidArgumentException(sprintf(
+                'No identifiers defined for resource of type "%s"',
+                $resourceClass
+            ));
+        }
+
         if (1 === \count($identifiers)) {
             return [rawurlencode((string) array_values($identifiers)[0])];
         }
