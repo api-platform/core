@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.2.9
+
+* Fix `ExistsFilter` for inverse side of OneToOne association
+* Fix to not populate subresource inverse side
+* Improve the overall code quality (PHPStan analysis)
+
 ## 2.2.8
 
 * Fix support for max depth when using subresources
