@@ -316,6 +316,32 @@ Feature: Subresource support
     }
     """
 
+  Scenario: The recipient of the person's greetings should be empty
+    Given there is a person named "Alice" greeting with a "hello" message
+    When I send a "GET" request to "/people/1/sent_greetings"
+    And the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+    And the JSON should be equal to:
+    """
+    {
+      "@context": "/contexts/Greeting",
+      "@id": "/people/1/sent_greetings",
+      "@type": "hydra:Collection",
+      "hydra:member": [
+        {
+          "@id": "/greetings/1",
+          "@type": "Greeting",
+          "message": "hello",
+          "sender": "/people/1",
+          "recipient": null,
+          "id": 1
+        }
+      ],
+      "hydra:totalItems": 1
+    }
+    """
+
   @dropSchema
   Scenario: Recursive resource
     When I send a "GET" request to "/dummy_products/2"
