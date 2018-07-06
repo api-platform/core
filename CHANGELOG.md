@@ -5,6 +5,7 @@
 * Add support for deprecating resources, operations and fields in GraphQL, Hydra and Swagger
 * Add API Platform panels in the Symfony profiler and in the web debug toolbar
 * Make resource class's constructor parameters writables
+* Add support for interface as a resource
 * Add a shortcut syntax to define attributes at the root of `@ApiResource` and `@ApiProperty` annotations
 * Throw an exception if a required filter isn't set
 * Allow to specify the message when access is denied using the `access_control_message` attribute
