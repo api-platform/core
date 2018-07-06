@@ -231,12 +231,15 @@ final class SchemaBuilder implements SchemaBuilderInterface
                         $filterType = \in_array($value['type'], Type::$builtinTypes, true) ? new Type($value['type'], $nullable) : new Type('object', $nullable, $value['type']);
                         $graphqlFilterType = $this->convertType($filterType, false, null, $depth);
 
-                        if ('[]' === $newKey = substr($key, -2)) {
-                            $key = $newKey;
+                        if ('[]' === substr($key, -2)) {
                             $graphqlFilterType = GraphQLType::listOf($graphqlFilterType);
+                            $key = substr($key, 0, -2).'_list';
                         }
 
                         parse_str($key, $parsed);
+                        if (array_key_exists($key, $parsed) && \is_array($parsed[$key])) {
+                            $parsed = [$key => ''];
+                        }
                         array_walk_recursive($parsed, function (&$value) use ($graphqlFilterType) {
                             $value = $graphqlFilterType;
                         });
