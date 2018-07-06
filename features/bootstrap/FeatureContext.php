@@ -34,6 +34,7 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\FileConfigDummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Foo;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\FooDummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\FourthLevel;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Greeting;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Node;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Person;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\PersonToPet;
@@ -786,6 +787,7 @@ final class FeatureContext implements Context, SnippetAcceptingContext
         $this->manager->persist($question);
 
         $this->manager->flush();
+        $this->manager->clear();
     }
 
     /**
@@ -951,5 +953,24 @@ final class FeatureContext implements Context, SnippetAcceptingContext
         $this->manager->persist($dummy);
 
         $this->manager->flush();
+    }
+
+    /**
+     * @Given there is a person named :name greeting with a :message message
+     */
+    public function thereIsAPersonWithAGreeting(string $name, string $message)
+    {
+        $person = new Person();
+        $person->name = $name;
+
+        $greeting = new Greeting();
+        $greeting->message = $message;
+        $greeting->sender = $person;
+
+        $this->manager->persist($person);
+        $this->manager->persist($greeting);
+
+        $this->manager->flush();
+        $this->manager->clear();
     }
 }

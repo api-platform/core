@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Serializer;
 
 use ApiPlatform\Core\Api\IriConverterInterface;
-use ApiPlatform\Core\Api\OperationType;
 use ApiPlatform\Core\Api\ResourceClassResolverInterface;
 use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
@@ -483,12 +482,6 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
      */
     protected function normalizeRelation(PropertyMetadata $propertyMetadata, $relatedObject, string $resourceClass, string $format = null, array $context)
     {
-        // On a subresource, we know the value of the identifiers.
-        // If attributeValue is null, meaning that it hasn't been returned by the DataProvider, get the item Iri
-        if (null === $relatedObject && isset($context['operation_type'], $context['subresource_resources'][$resourceClass]) && OperationType::SUBRESOURCE === $context['operation_type']) {
-            return $this->iriConverter->getItemIriFromResourceClass($resourceClass, $context['subresource_resources'][$resourceClass]);
-        }
-
         if (null === $relatedObject || $propertyMetadata->isReadableLink() || !empty($context['attributes'])) {
             if (null === $relatedObject) {
                 unset($context['resource_class']);
