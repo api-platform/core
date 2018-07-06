@@ -207,7 +207,7 @@ class IriConverterTest extends TestCase
 
     public function testGetItemFromIriWithIdentifierConverter()
     {
-        $item = new \StdClass();
+        $item = new \stdClass();
         $itemDataProviderProphecy = $this->prophesize(ItemDataProviderInterface::class);
         $itemDataProviderProphecy->getItem(Dummy::class, ['id' => 3], 'get', ['fetch_data' => true, IdentifierConverterInterface::HAS_IDENTIFIER_CONVERTER => true])->shouldBeCalled()->willReturn($item);
         $identifierConverterProphecy = $this->prophesize(IdentifierConverterInterface::class);

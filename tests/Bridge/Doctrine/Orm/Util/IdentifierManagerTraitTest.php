@@ -146,11 +146,6 @@ class IdentifierManagerTraitTest extends TestCase
 
     /**
      * Gets a mocked object manager.
-     *
-     * @param string $resourceClass
-     * @param array  $identifierFields
-     *
-     * @return ObjectManager
      */
     private function getObjectManager(string $resourceClass, array $identifierFields): ObjectManager
     {
