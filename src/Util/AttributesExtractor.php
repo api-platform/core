@@ -58,11 +58,10 @@ final class AttributesExtractor
             return [];
         }
 
-        if (null === $apiRequest = $attributes['_api_receive'] ?? null) {
-            $result['receive'] = true;
-        } else {
-            $result['receive'] = (bool) $apiRequest;
-        }
+        $result += [
+            'receive' => (bool) ($attributes['_api_receive'] ?? true),
+            'persist' => (bool) ($attributes['_api_persist'] ?? true),
+        ];
 
         return $result;
     }

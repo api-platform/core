@@ -107,7 +107,7 @@ class RequestDataCollectorTest extends TestCase
             $this->response
         );
 
-        $this->assertSame(['resource_class' => DummyEntity::class,  'item_operation_name' => 'get', 'receive' => true], $dataCollector->getRequestAttributes());
+        $this->assertSame(['resource_class' => DummyEntity::class,  'item_operation_name' => 'get', 'receive' => true, 'persist' => true], $dataCollector->getRequestAttributes());
         $this->assertSame(['foo', 'bar'], $dataCollector->getAcceptableContentTypes());
         $this->assertSame(DummyEntity::class, $dataCollector->getResourceClass());
         $this->assertSame(['foo' => null, 'a_filter' => \stdClass::class], $dataCollector->getFilters());
