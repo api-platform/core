@@ -16,7 +16,7 @@ parameters:
         - '#Call to an undefined method PHPUnit\\Framework\\MockObject\\MockObject::[a-zA-Z0-9_]+\(\)#'
         - '#Call to an undefined method Prophecy\\Prophecy\\ObjectProphecy::[a-zA-Z0-9_]+\(\)#'
         - '#Method ApiPlatform\\Core\\Tests\\Bridge\\Doctrine\\Orm\\ItemDataProviderTest::getManagerRegistry\(\) should return Doctrine\\Common\\Persistence\\ManagerRegistry but returns object\.#'
-        - '#Method ApiPlatform\\Core\\Tests\\Bridge\\Doctrine\\Util\\IdentifierManagerTraitTest::getObjectManager\(\) should return Doctrine\\Common\\Persistence\\ObjectManager but returns object\.#'
+        - '#Method ApiPlatform\\Core\\Tests\\Bridge\\Doctrine\\Orm\\Util\\IdentifierManagerTraitTest::getObjectManager\(\) should return Doctrine\\Common\\Persistence\\ObjectManager but returns object\.#'
         # Temporary fix while the PHPStan extension for Prophecy isn't compatible with 0.10
         - '#Parameter .* expects .*, .*object.* given\.#'
         - '#Parameter \#[0-9] \$filterLocator of class ApiPlatform\\Core\\Bridge\\Doctrine\\Orm\\Extension\\FilterExtension constructor expects ApiPlatform\\Core\\Api\\FilterCollection|Psr\\Container\\ContainerInterface(\|null)?, ArrayObject given\.#'

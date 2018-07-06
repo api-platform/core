@@ -214,6 +214,10 @@ final class ItemNormalizer extends AbstractItemNormalizer
             }
             if (isset($context['api_included'])) {
                 $context['api_sub_level'] = true;
+
+                if (!$this->serializer instanceof NormalizerInterface) {
+                    throw new InvalidArgumentException(sprintf('The injected serializer must be an instance of "%s".', NormalizerInterface::class));
+                }
                 $data = $this->serializer->normalize($relatedObject, $format, $context);
                 unset($context['api_sub_level']);
 

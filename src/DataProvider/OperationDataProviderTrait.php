@@ -38,7 +38,7 @@ trait OperationDataProviderTrait
     private $subresourceDataProvider;
 
     /**
-     * @var IdentifierConverterInterface
+     * @var IdentifierConverterInterface|null
      */
     private $identifierConverter;
 
@@ -92,7 +92,7 @@ trait OperationDataProviderTrait
 
             $id = $parameters['id'];
 
-            if ($this->identifierConverter) {
+            if (null !== $this->identifierConverter) {
                 return $this->identifierConverter->convert((string) $id, $attributes['resource_class']);
             }
 
@@ -108,7 +108,7 @@ trait OperationDataProviderTrait
 
             $identifiers[$id] = $parameters[$id];
 
-            if ($this->identifierConverter) {
+            if (null !== $this->identifierConverter) {
                 $identifiers[$id] = $this->identifierConverter->convert((string) $identifiers[$id], $resourceClass);
             }
         }
