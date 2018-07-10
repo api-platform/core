@@ -90,7 +90,7 @@ final class CollectionNormalizer extends AbstractCollectionNormalizer
             $data['data'][] = $item['data'];
 
             if (isset($item['included'])) {
-                $data['included'] = array_merge($data['included'] ?? [], $item['included']);
+                $data['included'] = array_unique(array_merge($data['included'] ?? [], $item['included']), SORT_REGULAR);
             }
         }
 
