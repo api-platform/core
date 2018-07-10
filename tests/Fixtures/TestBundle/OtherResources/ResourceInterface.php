@@ -16,4 +16,6 @@ namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\OtherResources;
 interface ResourceInterface
 {
     public function getFoo(): string;
+
+    public function getFooz(): string;
 }
