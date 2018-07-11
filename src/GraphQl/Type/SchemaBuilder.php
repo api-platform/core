@@ -300,6 +300,7 @@ final class SchemaBuilder implements SchemaBuilderInterface
             if (strpos($key, '.')) {
                 // Declare relations/nested fields in a GraphQL compatible syntax.
                 $args[str_replace('.', '_', $key)] = $value;
+                unset($args[$key]);
             }
         }
 
