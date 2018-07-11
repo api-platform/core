@@ -170,6 +170,31 @@ class WriteListenerTest extends TestCase
         (new WriteListener($dataPersisterProphecy->reveal()))->onKernelView($event);
     }
 
+    public function testOnKernelViewWithPersistFlagOff()
+    {
+        $dummy = new Dummy();
+        $dummy->setName('Dummyrino');
+
+        $dataPersisterProphecy = $this->prophesize(DataPersisterInterface::class);
+        $dataPersisterProphecy->supports($dummy)->shouldNotBeCalled();
+        $dataPersisterProphecy->persist($dummy)->shouldNotBeCalled();
+        $dataPersisterProphecy->remove($dummy)->shouldNotBeCalled();
+
+        $request = new Request();
+        $request->setMethod('HEAD');
+        $request->attributes->set('_api_resource_class', Dummy::class);
+        $request->attributes->set('_api_persist', false);
+
+        $event = new GetResponseForControllerResultEvent(
+            $this->prophesize(HttpKernelInterface::class)->reveal(),
+            $request,
+            HttpKernelInterface::MASTER_REQUEST,
+            $dummy
+        );
+
+        (new WriteListener($dataPersisterProphecy->reveal()))->onKernelView($event);
+    }
+
     public function testOnKernelViewWithNoResourceClass()
     {
         $dummy = new Dummy();
