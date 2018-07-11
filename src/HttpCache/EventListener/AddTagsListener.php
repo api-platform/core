@@ -56,7 +56,7 @@ final class AddTagsListener
         }
 
         $resources = $request->attributes->get('_resources');
-        if (isset($attributes['collection_operation_name'])) {
+        if (isset($attributes['collection_operation_name']) || ($attributes['subresource_context']['collection'] ?? false)) {
             // Allows to purge collections
             $iri = $this->iriConverter->getIriFromResourceClass($attributes['resource_class']);
             $resources[$iri] = $iri;
