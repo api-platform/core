@@ -166,4 +166,25 @@ class AddTagsListenerTest extends TestCase
 
         $this->assertSame('/dummies', $response->headers->get('Cache-Tags'));
     }
+
+    public function testAddSubResourceCollectionIri()
+    {
+        $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
+        $iriConverterProphecy->getIriFromResourceClass(Dummy::class)->willReturn('/dummies')->shouldBeCalled();
+
+        $request = new Request([], [], ['_resources' => ['/foo', '/bar'], '_api_resource_class' => Dummy::class, '_api_subresource_operation_name' => 'api_dummies_relatedDummies_get_subresource', '_api_subresource_context' => ['collection' => true]]);
+
+        $response = new Response();
+        $response->setPublic();
+        $response->setEtag('foo');
+
+        $event = $this->prophesize(FilterResponseEvent::class);
+        $event->getRequest()->willReturn($request)->shouldBeCalled();
+        $event->getResponse()->willReturn($response)->shouldBeCalled();
+
+        $listener = new AddTagsListener($iriConverterProphecy->reveal());
+        $listener->onKernelResponse($event->reveal());
+
+        $this->assertSame('/foo,/bar,/dummies', $response->headers->get('Cache-Tags'));
+    }
 }
