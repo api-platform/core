@@ -496,3 +496,91 @@ Feature: JSON API Inclusion of Related Resources
     }
   """
 
+  @createSchema
+  Scenario: Request inclusion of a related resources on collection should not duplicated included object
+    Given there are 3 dummy property objects with a shared group
+    When I send a "GET" request to "/dummy_properties?include=group"
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the JSON should be valid according to the JSON API schema
+    And the JSON should be deep equal to:
+    """
+    {
+        "links": {
+            "self": "\/dummy_properties?include=group"
+        },
+        "meta": {
+            "totalItems": 3,
+            "itemsPerPage": 3,
+            "currentPage": 1
+        },
+        "data": [
+            {
+                "id": "/dummy_properties/1",
+                "type": "DummyProperty",
+                "attributes": {
+                    "_id": 1,
+                    "foo": "Foo #1",
+                    "bar": "Bar #1",
+                    "baz": "Baz #1"
+                },
+                "relationships": {
+                    "group": {
+                        "data": {
+                            "type": "DummyGroup",
+                            "id": "/dummy_groups/1"
+                        }
+                    }
+                }
+            },
+            {
+                "id": "/dummy_properties/2",
+                "type": "DummyProperty",
+                "attributes": {
+                    "_id": 2,
+                    "foo": "Foo #2",
+                    "bar": "Bar #2",
+                    "baz": "Baz #2"
+                },
+                "relationships": {
+                    "group": {
+                        "data": {
+                            "type": "DummyGroup",
+                            "id": "/dummy_groups/1"
+                        }
+                    }
+                }
+            },
+            {
+                "id": "/dummy_properties/3",
+                "type": "DummyProperty",
+                "attributes": {
+                    "_id": 3,
+                    "foo": "Foo #3",
+                    "bar": "Bar #3",
+                    "baz": "Baz #3"
+                },
+                "relationships": {
+                    "group": {
+                        "data": {
+                            "type": "DummyGroup",
+                            "id": "/dummy_groups/1"
+                        }
+                    }
+                }
+            }
+        ],
+        "included": [
+            {
+                "id": "\/dummy_groups\/1",
+                "type": "DummyGroup",
+                "attributes": {
+                    "_id": 1,
+                    "foo": "Foo #shared",
+                    "bar": "Bar #shared",
+                    "baz": "Baz #shared"
+                }
+            }
+        ]
+    }
+  """

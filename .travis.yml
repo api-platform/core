@@ -11,7 +11,7 @@ env:
     - SYMFONY_DEPRECATIONS_HELPER=weak_vendors
     - APP_ENV=test
 
-matrix:
+jobs:
   include:
     - php: '7.1'
     - php: '7.2'
@@ -32,7 +32,8 @@ matrix:
         - mysql -e 'CREATE DATABASE api_platform_test;'
       env: APP_ENV=mysql
   allow_failures:
-      env: SYMFONY_DEPRECATIONS_HELPER=0
+    - env: SYMFONY_DEPRECATIONS_HELPER=0
+  fast_finish: true
 
 before_install:
   - phpenv config-rm xdebug.ini || echo "xdebug not available"

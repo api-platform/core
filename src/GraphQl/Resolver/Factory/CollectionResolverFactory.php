@@ -162,13 +162,16 @@ final class CollectionResolverFactory implements ResolverFactoryInterface
     private function getNormalizedFilters(array $args): array
     {
         $filters = $args;
+
         foreach ($filters as $name => $value) {
             if (\is_array($value)) {
+                if (strpos($name, '_list')) {
+                    $name = substr($name, 0, \strlen($name) - \strlen('_list'));
+                }
                 $filters[$name] = $this->getNormalizedFilters($value);
-                continue;
             }
 
-            if (strpos($name, '_')) {
+            if (\is_string($name) && strpos($name, '_')) {
                 // Gives a chance to relations/nested fields.
                 $filters[str_replace('_', '.', $name)] = $value;
             }
