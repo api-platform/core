@@ -95,6 +95,32 @@ class SchemaBuilderTest extends TestCase
         $this->assertArrayNotHasKey('objectProperty', $type->getFields());
     }
 
+    public function testConvertFilterArgsToTypes()
+    {
+        $propertyMetadataMockBuilder = function ($builtinType, $resourceClassName) {
+            return new PropertyMetadata();
+        };
+        $mockedSchemaBuilder = $this->createSchemaBuilder($propertyMetadataMockBuilder, false);
+
+        $reflectionClass = new \ReflectionClass(SchemaBuilder::class);
+        $method = $reflectionClass->getMethod('convertFilterArgsToTypes');
+        $method->setAccessible(true);
+        $filterArgs = [
+            'aField' => 'string',
+            'GraphqlRelatedResource.nestedFieldA' => 'string',
+            'GraphqlRelatedResource.nestedFieldB' => 'string',
+        ];
+
+        $this->assertSame(
+            [
+                'aField' => 'string',
+                'GraphqlRelatedResource_nestedFieldA' => 'string',
+                'GraphqlRelatedResource_nestedFieldB' => 'string',
+            ],
+            $method->invoke($mockedSchemaBuilder, $filterArgs)
+        );
+    }
+
     /**
      * @dataProvider paginationProvider
      */
@@ -230,8 +256,10 @@ class SchemaBuilderTest extends TestCase
         $resourceNameCollection = new ResourceNameCollection($resourceClassNames);
         $resourceNameCollectionFactoryProphecy->create()->willReturn($resourceNameCollection);
 
-        $collectionResolverFactoryProphecy->__invoke(Argument::cetera())->willReturn(function () {});
-        $itemMutationResolverFactoryProphecy->__invoke(Argument::cetera())->willReturn(function () {});
+        $collectionResolverFactoryProphecy->__invoke(Argument::cetera())->willReturn(function () {
+        });
+        $itemMutationResolverFactoryProphecy->__invoke(Argument::cetera())->willReturn(function () {
+        });
 
         return new SchemaBuilder(
             $propertyNameCollectionFactoryProphecy->reveal(),
@@ -240,8 +268,10 @@ class SchemaBuilderTest extends TestCase
             $resourceMetadataFactoryProphecy->reveal(),
             $collectionResolverFactoryProphecy->reveal(),
             $itemMutationResolverFactoryProphecy->reveal(),
-            function () {},
-            function () {},
+            function () {
+            },
+            function () {
+            },
             null,
             $paginationEnabled
         );

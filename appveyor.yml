@@ -6,7 +6,8 @@ cache:
   - '%LOCALAPPDATA%\Composer\files'
 
 environment:
-    APP_ENV: 'test'
+  SYMFONY_DEPRECATIONS_HELPER: weak_vendors
+  APP_ENV: test
 
 install:
   - ps: Set-Service wuauserv -StartupType Manual

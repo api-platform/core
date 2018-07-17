@@ -220,6 +220,31 @@ final class FeatureContext implements Context, SnippetAcceptingContext
     }
 
     /**
+     * @Given there are :nb dummy property objects with a shared group
+     */
+    public function thereAreDummyPropertyObjectsWithASharedGroup(int $nb)
+    {
+        $dummyGroup = new DummyGroup();
+        foreach (['foo', 'bar', 'baz'] as $property) {
+            $dummyGroup->$property = ucfirst($property).' #shared';
+        }
+        $this->manager->persist($dummyGroup);
+
+        for ($i = 1; $i <= $nb; ++$i) {
+            $dummyProperty = new DummyProperty();
+
+            foreach (['foo', 'bar', 'baz'] as $property) {
+                $dummyProperty->$property = ucfirst($property).' #'.$i;
+            }
+
+            $dummyProperty->group = $dummyGroup;
+            $this->manager->persist($dummyProperty);
+        }
+
+        $this->manager->flush();
+    }
+
+    /**
      * @Given there are :nb dummy property objects with :nb2 groups
      */
     public function thereAreDummyPropertyObjectsWithGroups(int $nb, int $nb2)
