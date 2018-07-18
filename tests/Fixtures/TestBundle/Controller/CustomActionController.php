@@ -25,7 +25,7 @@ class CustomActionController extends Controller
 {
     /**
      * @Route(
-     *     methods="GET",
+     *     methods={"GET"},
      *     name="custom_normalization",
      *     path="/custom/{id}/normalization",
      *     defaults={"_api_resource_class"=CustomActionDummy::class, "_api_item_operation_name"="custom_normalization"}
@@ -40,7 +40,7 @@ class CustomActionController extends Controller
 
     /**
      * @Route(
-     *     methods="POST",
+     *     methods={"POST"},
      *     name="custom_denormalization",
      *     path="/custom/denormalization",
      *     defaults={
@@ -64,7 +64,7 @@ class CustomActionController extends Controller
 
     /**
      * @Route(
-     *     methods="GET",
+     *     methods={"GET"},
      *     name="short_custom_normalization",
      *     path="/short_custom/{id}/normalization",
      *     defaults={"_api_resource_class"=CustomActionDummy::class, "_api_item_operation_name"="custom_normalization"}
@@ -79,7 +79,7 @@ class CustomActionController extends Controller
 
     /**
      * @Route(
-     *     methods="POST",
+     *     methods={"POST"},
      *     name="short_custom_denormalization",
      *     path="/short_custom/denormalization",
      *     defaults={
