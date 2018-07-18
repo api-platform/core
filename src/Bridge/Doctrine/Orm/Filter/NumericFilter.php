@@ -73,8 +73,6 @@ class NumericFilter extends AbstractContextAwareFilter
 
     /**
      * Gets the PHP type corresponding to this Doctrine type.
-     *
-     * @param string $doctrineType
      */
     private function getType(string $doctrineType = null): string
     {
