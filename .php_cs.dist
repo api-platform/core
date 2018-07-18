@@ -63,9 +63,9 @@ return PhpCsFixer\Config::create()
                 'use',
             ],
         ],
+        'no_superfluous_phpdoc_tags' => true,
         'no_useless_else' => true,
         'no_useless_return' => true,
-        'no_superfluous_phpdoc_tags' => true,
         'ordered_imports' => [
             'importsOrder' => [
                 'class',
