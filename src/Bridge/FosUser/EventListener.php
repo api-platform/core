@@ -35,8 +35,6 @@ final class EventListener
 
     /**
      * Persists, updates or delete data return by the controller if applicable.
-     *
-     * @param GetResponseForControllerResultEvent $event
      */
     public function onKernelView(GetResponseForControllerResultEvent $event)
     {

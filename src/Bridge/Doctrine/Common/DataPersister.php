@@ -77,7 +77,6 @@ final class DataPersister implements DataPersisterInterface
     /**
      * Gets the Doctrine object manager associated with given data.
      *
-     * @param mixed $data
      *
      * @return DoctrineObjectManager|null
      */

@@ -39,8 +39,6 @@ final class AddTagsListener
 
     /**
      * Adds the "Cache-Tags" header.
-     *
-     * @param FilterResponseEvent $event
      */
     public function onKernelResponse(FilterResponseEvent $event)
     {

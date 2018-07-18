@@ -36,8 +36,6 @@ final class WriteListener
 
     /**
      * Persists, updates or delete data return by the controller if applicable.
-     *
-     * @param GetResponseForControllerResultEvent $event
      */
     public function onKernelView(GetResponseForControllerResultEvent $event)
     {
@@ -72,8 +70,6 @@ final class WriteListener
     /**
      * Gets the manager if applicable.
      *
-     * @param string $resourceClass
-     * @param mixed  $data
      *
      * @return ObjectManager|null
      */

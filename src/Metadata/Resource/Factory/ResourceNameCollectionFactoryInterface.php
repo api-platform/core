@@ -24,8 +24,6 @@ interface ResourceNameCollectionFactoryInterface
 {
     /**
      * Creates the resource name collection.
-     *
-     * @return ResourceNameCollection
      */
     public function create(): ResourceNameCollection;
 }

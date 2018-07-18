@@ -58,12 +58,8 @@ final class ExtractorResourceMetadataFactory implements ResourceMetadataFactoryI
     /**
      * Returns the metadata from the decorated factory if available or throws an exception.
      *
-     * @param ResourceMetadata|null $parentPropertyMetadata
-     * @param string                $resourceClass
      *
      * @throws ResourceClassNotFoundException
-     *
-     * @return ResourceMetadata
      */
     private function handleNotFound(ResourceMetadata $parentPropertyMetadata = null, string $resourceClass): ResourceMetadata
     {
@@ -76,11 +72,6 @@ final class ExtractorResourceMetadataFactory implements ResourceMetadataFactoryI
 
     /**
      * Creates a new instance of metadata if the property is not already set.
-     *
-     * @param ResourceMetadata $resourceMetadata
-     * @param array            $metadata
-     *
-     * @return ResourceMetadata
      */
     private function update(ResourceMetadata $resourceMetadata, array $metadata): ResourceMetadata
     {

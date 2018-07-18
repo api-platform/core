@@ -57,8 +57,6 @@ final class DeserializeListener
 
     /**
      * Deserializes the data sent in the requested format.
-     *
-     * @param GetResponseEvent $event
      */
     public function onKernelRequest(GetResponseEvent $event)
     {
@@ -100,11 +98,8 @@ final class DeserializeListener
     /**
      * Extracts the format from the Content-Type header and check that it is supported.
      *
-     * @param Request $request
      *
      * @throws NotAcceptableHttpException
-     *
-     * @return string
      */
     private function getFormat(Request $request): string
     {

@@ -171,10 +171,6 @@ final class ResourceMetadata
 
     /**
      * Gets a collection operation attribute, optionally fallback to a resource attribute.
-     *
-     * @param mixed $defaultValue
-     *
-     * @return mixed
      */
     public function getCollectionOperationAttribute(string $operationName = null, string $key, $defaultValue = null, bool $resourceFallback = false)
     {
@@ -183,10 +179,6 @@ final class ResourceMetadata
 
     /**
      * Gets an item operation attribute, optionally fallback to a resource attribute.
-     *
-     * @param mixed $defaultValue
-     *
-     * @return mixed
      */
     public function getItemOperationAttribute(string $operationName = null, string $key, $defaultValue = null, bool $resourceFallback = false)
     {
@@ -195,10 +187,6 @@ final class ResourceMetadata
 
     /**
      * Gets a subresource operation attribute, optionally fallback to a resource attribute.
-     *
-     * @param mixed $defaultValue
-     *
-     * @return mixed
      */
     public function getSubresourceOperationAttribute(string $operationName = null, string $key, $defaultValue = null, bool $resourceFallback = false)
     {
@@ -207,10 +195,6 @@ final class ResourceMetadata
 
     /**
      * Gets an operation attribute, optionally fallback to a resource attribute.
-     *
-     * @param mixed $defaultValue
-     *
-     * @return mixed
      */
     private function findOperationAttribute(array $operations = null, string $operationName = null, string $key, $defaultValue = null, bool $resourceFallback = false)
     {
@@ -225,9 +209,6 @@ final class ResourceMetadata
         return $defaultValue;
     }
 
-    /**
-     * @return mixed
-     */
     public function getGraphqlAttribute(string $operationName, string $key, $defaultValue = null, bool $resourceFallback = false)
     {
         if (isset($this->graphql[$operationName][$key])) {
@@ -243,10 +224,6 @@ final class ResourceMetadata
 
     /**
      * Gets the first available operation attribute according to the following order: collection, item, subresource, optionally fallback to a default value.
-     *
-     * @param mixed $defaultValue
-     *
-     * @return mixed
      */
     public function getOperationAttribute(array $attributes, string $key, $defaultValue = null, bool $resourceFallback = false)
     {
@@ -271,10 +248,6 @@ final class ResourceMetadata
 
     /**
      * Gets an attribute for a given operation type and operation name.
-     *
-     * @param mixed $defaultValue
-     *
-     * @return mixed
      */
     public function getTypedOperationAttribute(string $operationType, string $operationName, string $key, $defaultValue = null, bool $resourceFallback = false)
     {
@@ -300,10 +273,6 @@ final class ResourceMetadata
 
     /**
      * Gets an attribute.
-     *
-     * @param mixed $defaultValue
-     *
-     * @return mixed
      */
     public function getAttribute(string $key, $defaultValue = null)
     {

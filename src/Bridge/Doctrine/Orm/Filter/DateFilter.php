@@ -156,14 +156,7 @@ class DateFilter extends AbstractContextAwareFilter
     /**
      * Adds the where clause according to the chosen null management.
      *
-     * @param QueryBuilder                $queryBuilder
-     * @param QueryNameGeneratorInterface $queryNameGenerator
-     * @param string                      $alias
-     * @param string                      $field
-     * @param string                      $operator
-     * @param string                      $value
-     * @param string|null                 $nullManagement
-     * @param string|Type                 $type
+     * @param string|Type $type
      */
     protected function addWhere(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $alias, string $field, string $operator, string $value, string $nullManagement = null, $type = null)
     {
@@ -210,11 +203,6 @@ class DateFilter extends AbstractContextAwareFilter
 
     /**
      * Determines whether the given property refers to a date field.
-     *
-     * @param string $property
-     * @param string $resourceClass
-     *
-     * @return bool
      */
     protected function isDateField(string $property, string $resourceClass): bool
     {
@@ -223,11 +211,6 @@ class DateFilter extends AbstractContextAwareFilter
 
     /**
      * Gets filter description.
-     *
-     * @param string $property
-     * @param string $period
-     *
-     * @return array
      */
     protected function getFilterDescription(string $property, string $period): array
     {

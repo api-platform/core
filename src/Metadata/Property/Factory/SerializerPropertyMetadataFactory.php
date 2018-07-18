@@ -64,13 +64,8 @@ final class SerializerPropertyMetadataFactory implements PropertyMetadataFactory
      * A false value is never reset as it could be unreadable/unwritable for other reasons.
      * If normalization/denormalization groups are not specified, the property is implicitly readable/writable.
      *
-     * @param PropertyMetadata $propertyMetadata
-     * @param string           $resourceClass
-     * @param string           $propertyName
-     * @param string[]|null    $normalizationGroups
-     * @param string[]|null    $denormalizationGroups
-     *
-     * @return PropertyMetadata
+     * @param string[]|null $normalizationGroups
+     * @param string[]|null $denormalizationGroups
      */
     private function transformReadWrite(PropertyMetadata $propertyMetadata, string $resourceClass, string $propertyName, array $normalizationGroups = null, array $denormalizationGroups = null): PropertyMetadata
     {
@@ -93,11 +88,8 @@ final class SerializerPropertyMetadataFactory implements PropertyMetadataFactory
      * If normalization/denormalization groups are not specified,
      * set link status to false since embedding of resource must be explicitly enabled
      *
-     * @param PropertyMetadata $propertyMetadata
-     * @param string[]|null    $normalizationGroups
-     * @param string[]|null    $denormalizationGroups
-     *
-     * @return PropertyMetadata
+     * @param string[]|null $normalizationGroups
+     * @param string[]|null $denormalizationGroups
      */
     private function transformLinkStatus(PropertyMetadata $propertyMetadata, array $normalizationGroups = null, array $denormalizationGroups = null): PropertyMetadata
     {
@@ -144,8 +136,6 @@ final class SerializerPropertyMetadataFactory implements PropertyMetadataFactory
      * - From metadata of the given operation ("collection_operation_name" and "item_operation_name" keys).
      * - From metadata of the current resource.
      *
-     * @param array  $options
-     * @param string $resourceClass
      *
      * @return (string[]|null)[]
      */
@@ -176,8 +166,6 @@ final class SerializerPropertyMetadataFactory implements PropertyMetadataFactory
     /**
      * Gets the serializer groups defined on a property.
      *
-     * @param string $resourceClass
-     * @param string $property
      *
      * @return string[]
      */
@@ -197,7 +185,6 @@ final class SerializerPropertyMetadataFactory implements PropertyMetadataFactory
     /**
      * Gets the serializer groups defined in a resource.
      *
-     * @param string $resourceClass
      *
      * @return string[]
      */

@@ -55,11 +55,8 @@ final class SubresourceOperationFactory implements SubresourceOperationFactoryIn
     /**
      * Handles subresource operations recursively and declare their corresponding routes.
      *
-     * @param string $resourceClass
-     * @param array  $tree
      * @param string $rootResourceClass null on the first iteration, it then keeps track of the origin resource class
      * @param array  $parentOperation   the previous call operation
-     * @param array  $visited
      * @param int    $depth             the number of visited
      * @param int    $maxDepth
      */

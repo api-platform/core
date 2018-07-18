@@ -30,9 +30,7 @@ final class AnnotationResourceNameCollectionFactory implements ResourceNameColle
     private $decorated;
 
     /**
-     * @param Reader                                      $reader
-     * @param string[]                                    $paths
-     * @param ResourceNameCollectionFactoryInterface|null $decorated
+     * @param string[] $paths
      */
     public function __construct(Reader $reader, array $paths, ResourceNameCollectionFactoryInterface $decorated = null)
     {

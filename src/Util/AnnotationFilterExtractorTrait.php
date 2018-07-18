@@ -132,8 +132,6 @@ trait AnnotationFilterExtractorTrait
      * @param \ReflectionClass $reflectionClass the reflection class of a Resource
      * @param string           $filterClass     the filter class
      * @param string           $filterId        the filter id
-     *
-     * @return string
      */
     private function generateFilterId(\ReflectionClass $reflectionClass, string $filterClass, string $filterId = null): string
     {

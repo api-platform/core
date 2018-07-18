@@ -56,7 +56,6 @@ final class AddFormatListener
     /**
      * Sets the applicable format to the HttpFoundation Request.
      *
-     * @param GetResponseEvent $event
      *
      * @throws NotFoundHttpException
      * @throws NotAcceptableHttpException
@@ -118,9 +117,6 @@ final class AddFormatListener
 
     /**
      * Adds API formats to the HttpFoundation Request.
-     *
-     * @param Request $request
-     * @param array   $formats
      */
     private function addRequestFormats(Request $request, array $formats)
     {
@@ -149,10 +145,7 @@ final class AddFormatListener
     /**
      * Retrieves an instance of NotAcceptableHttpException.
      *
-     * @param string        $accept
      * @param string[]|null $mimeTypes
-     *
-     * @return NotAcceptableHttpException
      */
     private function getNotAcceptableHttpException(string $accept, array $mimeTypes = null): NotAcceptableHttpException
     {

@@ -66,8 +66,6 @@ class DummyCarColor
     }
 
     /**
-     * @param DummyCar $car
-     *
      * @return static
      */
     public function setCar(DummyCar $car)

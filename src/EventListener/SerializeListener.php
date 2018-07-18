@@ -41,8 +41,6 @@ final class SerializeListener
 
     /**
      * Serializes the data to the requested format.
-     *
-     * @param GetResponseForControllerResultEvent $event
      */
     public function onKernelView(GetResponseForControllerResultEvent $event)
     {
@@ -76,9 +74,7 @@ final class SerializeListener
     /**
      * Tries to serialize data that are not API resources (e.g. the entrypoint or data returned by a custom controller).
      *
-     * @param GetResponseForControllerResultEvent $event
-     * @param Request                             $request
-     * @param object                              $controllerResult
+     * @param object $controllerResult
      *
      * @throws RuntimeException
      */

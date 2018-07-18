@@ -74,9 +74,6 @@ class SecuredDummy
      */
     private $owner;
 
-    /**
-     * @return int
-     */
     public function getId(): int
     {
         return $this->id;

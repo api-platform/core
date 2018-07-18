@@ -26,8 +26,6 @@ interface ExtractorInterface
      * Parses all metadata files and convert them in an array.
      *
      * @throws InvalidArgumentException
-     *
-     * @return array
      */
     public function getResources(): array;
 }

@@ -36,10 +36,6 @@ class FilterCollectionFactory
 
     /**
      * Creates a filter collection from a filter locator.
-     *
-     * @param ContainerInterface $filterLocator
-     *
-     * @return FilterCollection
      */
     public function createFilterCollectionFromLocator(ContainerInterface $filterLocator): FilterCollection
     {
