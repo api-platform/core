@@ -78,8 +78,6 @@ class DummyTableInheritance
     }
 
     /**
-     * @param DummyTableInheritanceRelated $parent
-     *
      * @return $this
      */
     public function setParent(DummyTableInheritanceRelated $parent)

@@ -29,13 +29,9 @@ trait IdentifierManagerTrait
     /**
      * Transform and check the identifier, composite or not.
      *
-     * @param int|string    $id
-     * @param ObjectManager $manager
-     * @param string        $resourceClass
+     * @param int|string $id
      *
      * @throws PropertyNotFoundException
-     *
-     * @return array
      */
     private function normalizeIdentifiers($id, ObjectManager $manager, string $resourceClass): array
     {

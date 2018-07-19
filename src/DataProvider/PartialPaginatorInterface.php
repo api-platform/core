@@ -22,15 +22,11 @@ interface PartialPaginatorInterface extends \Traversable, \Countable
 {
     /**
      * Gets the current page number.
-     *
-     * @return float
      */
     public function getCurrentPage(): float;
 
     /**
      * Gets the number of items by page.
-     *
-     * @return float
      */
     public function getItemsPerPage(): float;
 }

@@ -79,10 +79,6 @@ abstract class AbstractFilter implements FilterInterface
 
     /**
      * Gets class metadata for the given resource.
-     *
-     * @param string $resourceClass
-     *
-     * @return ClassMetadata
      */
     protected function getClassMetadata(string $resourceClass): ClassMetadata
     {
@@ -94,10 +90,6 @@ abstract class AbstractFilter implements FilterInterface
 
     /**
      * Determines whether the given property is enabled.
-     *
-     * @param string $property
-     *
-     * @return bool
      */
     protected function isPropertyEnabled(string $property/*, string $resourceClass*/): bool
     {
@@ -123,12 +115,6 @@ abstract class AbstractFilter implements FilterInterface
 
     /**
      * Determines whether the given property is mapped.
-     *
-     * @param string $property
-     * @param string $resourceClass
-     * @param bool   $allowAssociation
-     *
-     * @return bool
      */
     protected function isPropertyMapped(string $property, string $resourceClass, bool $allowAssociation = false): bool
     {
@@ -145,10 +131,6 @@ abstract class AbstractFilter implements FilterInterface
 
     /**
      * Determines whether the given property is nested.
-     *
-     * @param string $property
-     *
-     * @return bool
      */
     protected function isPropertyNested(string $property/*, string $resourceClass*/): bool
     {
@@ -174,11 +156,6 @@ abstract class AbstractFilter implements FilterInterface
 
     /**
      * Determines whether the given property is embedded.
-     *
-     * @param string $property
-     * @param string $resourceClass
-     *
-     * @return bool
      */
     protected function isPropertyEmbedded(string $property, string $resourceClass): bool
     {
@@ -188,10 +165,7 @@ abstract class AbstractFilter implements FilterInterface
     /**
      * Gets nested class metadata for the given resource.
      *
-     * @param string   $resourceClass
      * @param string[] $associations
-     *
-     * @return ClassMetadata
      */
     protected function getNestedMetadata(string $resourceClass, array $associations): ClassMetadata
     {
@@ -217,10 +191,6 @@ abstract class AbstractFilter implements FilterInterface
      * Returns an array with the following keys:
      *   - associations: array of associations according to nesting order
      *   - field: string holding the actual field (leaf node)
-     *
-     * @param string $property
-     *
-     * @return array
      */
     protected function splitPropertyParts(string $property/*, string $resourceClass*/): array
     {
@@ -292,10 +262,6 @@ abstract class AbstractFilter implements FilterInterface
     /**
      * Adds the necessary joins for a nested property.
      *
-     * @param string                      $property
-     * @param string                      $rootAlias
-     * @param QueryBuilder                $queryBuilder
-     * @param QueryNameGeneratorInterface $queryNameGenerator
      *
      * @throws InvalidArgumentException If property is not nested
      *

@@ -93,9 +93,6 @@ abstract class AbstractCollectionNormalizer implements NormalizerInterface, Norm
      * Gets the pagination configuration.
      *
      * @param iterable $object
-     * @param array    $context
-     *
-     * @return array
      */
     protected function getPaginationConfig($object, array $context = []): array
     {
@@ -124,20 +121,13 @@ abstract class AbstractCollectionNormalizer implements NormalizerInterface, Norm
      * Gets the pagination data.
      *
      * @param iterable $object
-     * @param array    $context
-     *
-     * @return array
      */
     abstract protected function getPaginationData($object, array $context = []): array;
 
     /**
      * Gets items data.
      *
-     * @param iterable    $object
-     * @param string|null $format
-     * @param array       $context
-     *
-     * @return array
+     * @param iterable $object
      */
     abstract protected function getItemsData($object, string $format = null, array $context = []): array;
 }

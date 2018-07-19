@@ -105,11 +105,6 @@ class BooleanFilter extends AbstractContextAwareFilter
 
     /**
      * Determines whether the given property refers to a boolean field.
-     *
-     * @param string $property
-     * @param string $resourceClass
-     *
-     * @return bool
      */
     protected function isBooleanField(string $property, string $resourceClass): bool
     {

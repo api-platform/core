@@ -26,13 +26,6 @@ trait JsonLdContextTrait
 {
     /**
      * Updates the given JSON-LD document to add its @context key.
-     *
-     * @param ContextBuilderInterface $contextBuilder
-     * @param string                  $resourceClass
-     * @param array                   $context
-     * @param array                   $data
-     *
-     * @return array
      */
     private function addJsonLdContext(ContextBuilderInterface $contextBuilder, string $resourceClass, array &$context, array $data = []): array
     {

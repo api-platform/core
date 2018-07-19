@@ -215,10 +215,6 @@ final class PaginationExtension implements ContextAwareQueryResultCollectionExte
 
     /**
      * Determines whether output walkers should be used.
-     *
-     * @param QueryBuilder $queryBuilder
-     *
-     * @return bool
      */
     private function useOutputWalkers(QueryBuilder $queryBuilder): bool
     {

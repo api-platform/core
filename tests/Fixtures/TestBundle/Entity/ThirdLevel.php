@@ -107,9 +107,6 @@ class ThirdLevel
         return $this->fourthLevel;
     }
 
-    /**
-     * @param FourthLevel|null $fourthLevel
-     */
     public function setFourthLevel(FourthLevel $fourthLevel = null)
     {
         $this->fourthLevel = $fourthLevel;

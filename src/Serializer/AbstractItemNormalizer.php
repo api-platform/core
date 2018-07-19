@@ -219,10 +219,6 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
     /**
      * Validates the type of the value. Allows using integers as floats for JSON formats.
      *
-     * @param string      $attribute
-     * @param Type        $type
-     * @param mixed       $value
-     * @param string|null $format
      *
      * @throws InvalidArgumentException
      */
@@ -245,17 +241,8 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
     /**
      * Denormalizes a collection of objects.
      *
-     * @param string           $attribute
-     * @param PropertyMetadata $propertyMetadata
-     * @param Type             $type
-     * @param string           $className
-     * @param mixed            $value
-     * @param string|null      $format
-     * @param array            $context
      *
      * @throws InvalidArgumentException
-     *
-     * @return array
      */
     protected function denormalizeCollection(string $attribute, PropertyMetadata $propertyMetadata, Type $type, string $className, $value, string $format = null, array $context): array
     {
@@ -286,12 +273,6 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
     /**
      * Denormalizes a relation.
      *
-     * @param string           $attributeName
-     * @param PropertyMetadata $propertyMetadata
-     * @param string           $className
-     * @param mixed            $value
-     * @param string|null      $format
-     * @param array            $context
      *
      * @throws InvalidArgumentException
      *
@@ -352,8 +333,6 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
      * Sets a value of the object using the PropertyAccess component.
      *
      * @param object $object
-     * @param string $attributeName
-     * @param mixed  $value
      */
     private function setValue($object, string $attributeName, $value)
     {
@@ -368,10 +347,6 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
      * Gets a valid context for property metadata factories.
      *
      * @see https://github.com/symfony/symfony/blob/master/src/Symfony/Component/PropertyInfo/Extractor/SerializerExtractor.php
-     *
-     * @param array $context
-     *
-     * @return array
      */
     protected function getFactoryOptions(array $context): array
     {
@@ -395,10 +370,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
     /**
      * Creates the context to use when serializing a relation.
      *
-     * @param string $resourceClass
-     * @param array  $context
      *
-     * @return array
      *
      * @deprecated since version 2.1, to be removed in 3.0.
      */
@@ -475,8 +447,6 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
     /**
      * Normalizes a relation as an object if is a Link or as an URI.
      *
-     * @param mixed       $relatedObject
-     * @param string|null $format
      *
      * @return string|array
      */

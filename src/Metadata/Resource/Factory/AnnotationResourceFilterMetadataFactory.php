@@ -85,12 +85,8 @@ final class AnnotationResourceFilterMetadataFactory implements ResourceMetadataF
     /**
      * Returns the metadata from the decorated factory if available or throws an exception.
      *
-     * @param ResourceMetadata|null $parentPropertyMetadata
-     * @param string                $resourceClass
      *
      * @throws ResourceClassNotFoundException
-     *
-     * @return ResourceMetadata
      */
     private function handleNotFound(ResourceMetadata $parentPropertyMetadata = null, string $resourceClass): ResourceMetadata
     {

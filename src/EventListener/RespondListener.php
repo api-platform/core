@@ -30,8 +30,6 @@ final class RespondListener
 
     /**
      * Creates a Response to send to the client according to the requested format.
-     *
-     * @param GetResponseForControllerResultEvent $event
      */
     public function onKernelView(GetResponseForControllerResultEvent $event)
     {

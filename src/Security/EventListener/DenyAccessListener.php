@@ -52,7 +52,6 @@ final class DenyAccessListener
     /**
      * Sets the applicable format to the HttpFoundation Request.
      *
-     * @param GetResponseEvent $event
      *
      * @throws AccessDeniedException
      */

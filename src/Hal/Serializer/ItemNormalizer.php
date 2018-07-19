@@ -96,9 +96,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
     /**
      * Gets HAL components of the resource: states, links and embedded.
      *
-     * @param object      $object
-     * @param string|null $format
-     * @param array       $context
+     * @param object $object
      *
      * @return array
      */
@@ -158,14 +156,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
     /**
      * Populates _links and _embedded keys.
      *
-     * @param array       $data
-     * @param object      $object
-     * @param string|null $format
-     * @param array       $context
-     * @param array       $components
-     * @param string      $type
-     *
-     * @return array
+     * @param object $object
      */
     private function populateRelation(array $data, $object, string $format = null, array $context, array $components, string $type): array
     {
@@ -219,8 +210,6 @@ final class ItemNormalizer extends AbstractItemNormalizer
      * Gets the IRI of the given relation.
      *
      * @param array|string $rel
-     *
-     * @return string
      */
     private function getRelationIri($rel): string
     {
@@ -230,8 +219,6 @@ final class ItemNormalizer extends AbstractItemNormalizer
     /**
      * Gets the cache key to use.
      *
-     * @param string|null $format
-     * @param array       $context
      *
      * @return bool|string
      */

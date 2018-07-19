@@ -92,12 +92,10 @@ class RangeFilter extends AbstractContextAwareFilter
     /**
      * Adds the where clause according to the operator.
      *
-     * @param QueryBuilder                $queryBuilder
-     * @param QueryNameGeneratorInterface $queryNameGenerator
-     * @param string                      $alias
-     * @param string                      $field
-     * @param string                      $operator
-     * @param string                      $value
+     * @param string $alias
+     * @param string $field
+     * @param string $operator
+     * @param string $value
      */
     protected function addWhere(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, $alias, $field, $operator, $value)
     {
@@ -190,11 +188,6 @@ class RangeFilter extends AbstractContextAwareFilter
 
     /**
      * Gets filter description.
-     *
-     * @param string $fieldName
-     * @param string $operator
-     *
-     * @return array
      */
     protected function getFilterDescription(string $fieldName, string $operator): array
     {

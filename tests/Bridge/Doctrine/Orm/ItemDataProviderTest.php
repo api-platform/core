@@ -239,11 +239,6 @@ class ItemDataProviderTest extends TestCase
 
     /**
      * Gets mocked metadata factories.
-     *
-     * @param string $resourceClass
-     * @param array  $identifiers
-     *
-     * @return array
      */
     private function getMetadataFactories(string $resourceClass, array $identifiers): array
     {
@@ -270,12 +265,6 @@ class ItemDataProviderTest extends TestCase
 
     /**
      * Gets a mocked manager registry.
-     *
-     * @param string       $resourceClass
-     * @param array        $identifierFields
-     * @param QueryBuilder $queryBuilder
-     *
-     * @return ManagerRegistry
      */
     private function getManagerRegistry(string $resourceClass, array $identifierFields, QueryBuilder $queryBuilder): ManagerRegistry
     {

@@ -103,10 +103,6 @@ final class SwaggerUiAction
 
     /**
      * Gets the base Twig context.
-     *
-     * @param Request $request
-     *
-     * @return array
      */
     private function getContext(Request $request, Documentation $documentation): array
     {

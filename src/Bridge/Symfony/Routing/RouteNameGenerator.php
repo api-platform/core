@@ -36,13 +36,9 @@ final class RouteNameGenerator
     /**
      * Generates a Symfony route name.
      *
-     * @param string      $operationName
-     * @param string      $resourceShortName
      * @param string|bool $operationType
      *
      * @throws InvalidArgumentException
-     *
-     * @return string
      */
     public static function generate(string $operationName, string $resourceShortName, $operationType): string
     {

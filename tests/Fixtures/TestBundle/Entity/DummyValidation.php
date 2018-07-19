@@ -70,8 +70,6 @@ class DummyValidation
     }
 
     /**
-     * @param int $id
-     *
      * @return DummyValidation
      */
     public function setId(int $id)

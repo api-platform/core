@@ -85,33 +85,21 @@ class EmbeddedDummy
         return $this->id;
     }
 
-    /**
-     * @return string
-     */
     public function getName(): string
     {
         return $this->name;
     }
 
-    /**
-     * @param string $name
-     */
     public function setName(string $name)
     {
         $this->name = $name;
     }
 
-    /**
-     * @return EmbeddableDummy
-     */
     public function getEmbeddedDummy(): EmbeddableDummy
     {
         return $this->embeddedDummy;
     }
 
-    /**
-     * @param EmbeddableDummy $embeddedDummy
-     */
     public function setEmbeddedDummy(EmbeddableDummy $embeddedDummy)
     {
         $this->embeddedDummy = $embeddedDummy;
@@ -125,9 +113,6 @@ class EmbeddedDummy
         return $this->dummyDate;
     }
 
-    /**
-     * @param \DateTime $dummyDate
-     */
     public function setDummyDate(\DateTime $dummyDate)
     {
         $this->dummyDate = $dummyDate;
@@ -141,9 +126,6 @@ class EmbeddedDummy
         return $this->relatedDummy;
     }
 
-    /**
-     * @param RelatedDummy $relatedDummy
-     */
     public function setRelatedDummy(RelatedDummy $relatedDummy)
     {
         $this->relatedDummy = $relatedDummy;

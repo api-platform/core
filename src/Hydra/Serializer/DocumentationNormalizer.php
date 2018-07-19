@@ -84,12 +84,6 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
 
     /**
      * Populates entrypoint properties.
-     *
-     * @param string           $resourceClass
-     * @param ResourceMetadata $resourceMetadata
-     * @param string           $shortName
-     * @param string           $prefixedShortName
-     * @param array            $entrypointProperties
      */
     private function populateEntrypointProperties(string $resourceClass, ResourceMetadata $resourceMetadata, string $shortName, string $prefixedShortName, array &$entrypointProperties)
     {
@@ -130,13 +124,6 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
 
     /**
      * Gets a Hydra class.
-     *
-     * @param string           $resourceClass
-     * @param ResourceMetadata $resourceMetadata
-     * @param string           $shortName
-     * @param string           $prefixedShortName
-     *
-     * @return array
      */
     private function getClass(string $resourceClass, ResourceMetadata $resourceMetadata, string $shortName, string $prefixedShortName): array
     {
@@ -162,10 +149,6 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
 
     /**
      * Gets the context for the property name factory.
-     *
-     * @param ResourceMetadata $resourceMetadata
-     *
-     * @return array
      */
     private function getPropertyNameCollectionFactoryContext(ResourceMetadata $resourceMetadata): array
     {
@@ -191,13 +174,6 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
 
     /**
      * Gets Hydra properties.
-     *
-     * @param string           $resourceClass
-     * @param ResourceMetadata $resourceMetadata
-     * @param string           $shortName
-     * @param string           $prefixedShortName
-     *
-     * @return array
      */
     private function getHydraProperties(string $resourceClass, ResourceMetadata $resourceMetadata, string $shortName, string $prefixedShortName): array
     {
@@ -220,13 +196,6 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
 
     /**
      * Gets Hydra operations.
-     *
-     * @param string           $resourceClass
-     * @param ResourceMetadata $resourceMetadata
-     * @param string           $prefixedShortName
-     * @param bool             $collection
-     *
-     * @return array
      */
     private function getHydraOperations(string $resourceClass, ResourceMetadata $resourceMetadata, string $prefixedShortName, bool $collection): array
     {
@@ -253,15 +222,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
     /**
      * Gets and populates if applicable a Hydra operation.
      *
-     * @param string              $resourceClass
-     * @param ResourceMetadata    $resourceMetadata
-     * @param string              $operationName
-     * @param array               $operation
-     * @param string              $prefixedShortName
-     * @param string              $operationType
      * @param SubresourceMetadata $subresourceMetadata
-     *
-     * @return array
      */
     private function getHydraOperation(string $resourceClass, ResourceMetadata $resourceMetadata, string $operationName, array $operation, string $prefixedShortName, string $operationType, SubresourceMetadata $subresourceMetadata = null): array
     {
@@ -341,7 +302,6 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
     /**
      * Gets the range of the property.
      *
-     * @param PropertyMetadata $propertyMetadata
      *
      * @return string|null
      */
@@ -392,11 +352,6 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
 
     /**
      * Builds the classes array.
-     *
-     * @param array $entrypointProperties
-     * @param array $classes
-     *
-     * @return array
      */
     private function getClasses(array $entrypointProperties, array $classes): array
     {
@@ -479,13 +434,6 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
 
     /**
      * Gets a property definition.
-     *
-     * @param PropertyMetadata $propertyMetadata
-     * @param string           $propertyName
-     * @param string           $prefixedShortName
-     * @param string           $shortName
-     *
-     * @return array
      */
     private function getProperty(PropertyMetadata $propertyMetadata, string $propertyName, string $prefixedShortName, string $shortName): array
     {
@@ -528,11 +476,6 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
 
     /**
      * Computes the documentation.
-     *
-     * @param Documentation $object
-     * @param array         $classes
-     *
-     * @return array
      */
     private function computeDoc(Documentation $object, array $classes): array
     {
@@ -554,8 +497,6 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
 
     /**
      * Builds the JSON-LD context for the API documentation.
-     *
-     * @return array
      */
     private function getContext(): array
     {
