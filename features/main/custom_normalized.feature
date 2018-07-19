@@ -16,6 +16,8 @@ Feature: Using custom normalized entity
     Then the response status code should be 201
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+    And the header "Content-Location" should be equal to "/custom_normalized_dummies/1"
+    And the header "Location" should be equal to "/custom_normalized_dummies/1"
     And the JSON should be equal to:
     """
     {
@@ -40,6 +42,8 @@ Feature: Using custom normalized entity
     Then the response status code should be 201
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/json; charset=utf-8"
+    And the header "Content-Location" should be equal to "/related_normalized_dummies/1"
+    And the header "Location" should be equal to "/related_normalized_dummies/1"
     And the JSON should be equal to:
     """
     {
@@ -68,6 +72,7 @@ Feature: Using custom normalized entity
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/json; charset=utf-8"
+    And the header "Content-Location" should be equal to "/related_normalized_dummies/1"
     And the JSON should be equal to:
     """
     {
@@ -134,6 +139,7 @@ Feature: Using custom normalized entity
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+    And the header "Content-Location" should be equal to "/custom_normalized_dummies/1"
     And the JSON should be equal to:
     """
     {

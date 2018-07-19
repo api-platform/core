@@ -67,7 +67,7 @@ class RespondListenerTest extends TestCase
     {
         $kernelProphecy = $this->prophesize(HttpKernelInterface::class);
 
-        $request = new Request([], [], ['_api_respond' => true]);
+        $request = new Request([], [], ['_api_respond' => true, '_api_write_item_iri' => '/dummy_entities/1']);
         $request->setMethod('POST');
         $request->setRequestFormat('xml');
 
@@ -88,6 +88,8 @@ class RespondListenerTest extends TestCase
         $this->assertEquals('Accept', $response->headers->get('Vary'));
         $this->assertEquals('nosniff', $response->headers->get('X-Content-Type-Options'));
         $this->assertEquals('deny', $response->headers->get('X-Frame-Options'));
+        $this->assertEquals('/dummy_entities/1', $response->headers->get('Location'));
+        $this->assertEquals('/dummy_entities/1', $response->headers->get('Content-Location'));
     }
 
     public function testCreate204Response()
