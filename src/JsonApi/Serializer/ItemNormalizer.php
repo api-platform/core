@@ -242,9 +242,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
     /**
      * Gets JSON API components of the resource: attributes, relationships, meta and links.
      *
-     * @param object      $object
-     * @param string|null $format
-     * @param array       $context
+     * @param object $object
      *
      * @return array
      */
@@ -308,14 +306,9 @@ final class ItemNormalizer extends AbstractItemNormalizer
     /**
      * Populates relationships keys.
      *
-     * @param object      $object
-     * @param string|null $format
-     * @param array       $context
-     * @param array       $relationships
+     * @param object $object
      *
      * @throws InvalidArgumentException
-     *
-     * @return array
      */
     private function getPopulatedRelations($object, string $format = null, array $context, array $relationships): array
     {
@@ -407,8 +400,6 @@ final class ItemNormalizer extends AbstractItemNormalizer
     /**
      * Gets the cache key to use.
      *
-     * @param string|null $format
-     * @param array       $context
      *
      * @return bool|string
      */

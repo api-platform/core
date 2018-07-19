@@ -170,7 +170,6 @@ final class IriConverter implements IriConverterInterface
     /**
      * Generate the identifier url.
      *
-     * @param array $identifiers
      *
      * @return string[]
      */

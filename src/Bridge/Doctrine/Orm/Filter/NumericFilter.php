@@ -73,10 +73,6 @@ class NumericFilter extends AbstractContextAwareFilter
 
     /**
      * Gets the PHP type corresponding to this Doctrine type.
-     *
-     * @param string $doctrineType
-     *
-     * @return string
      */
     private function getType(string $doctrineType = null): string
     {
@@ -135,11 +131,6 @@ class NumericFilter extends AbstractContextAwareFilter
 
     /**
      * Determines whether the given property refers to a numeric field.
-     *
-     * @param string $property
-     * @param string $resourceClass
-     *
-     * @return bool
      */
     protected function isNumericField(string $property, string $resourceClass): bool
     {

@@ -81,8 +81,6 @@ final class IterableType extends ScalarType
 
     /**
      * @param StringValueNode|BooleanValueNode|IntValueNode|FloatValueNode|ObjectValueNode|ListValueNode $valueNode
-     *
-     * @return mixed
      */
     private function parseIterableLiteral($valueNode)
     {

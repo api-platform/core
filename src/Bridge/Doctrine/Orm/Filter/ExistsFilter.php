@@ -135,11 +135,6 @@ class ExistsFilter extends AbstractContextAwareFilter
 
     /**
      * Determines whether the given property refers to a nullable field.
-     *
-     * @param string $property
-     * @param string $resourceClass
-     *
-     * @return bool
      */
     protected function isNullableField(string $property, string $resourceClass): bool
     {
@@ -172,9 +167,7 @@ class ExistsFilter extends AbstractContextAwareFilter
     /**
      * Determines whether an association is nullable.
      *
-     * @param array $associationMapping
      *
-     * @return bool
      *
      * @see https://github.com/doctrine/doctrine2/blob/v2.5.4/lib/Doctrine/ORM/Tools/EntityGenerator.php#L1221-L1246
      */

@@ -55,9 +55,6 @@ class Node
         $this->serial = $serial;
     }
 
-    /**
-     * @return int
-     */
     public function getSerial(): int
     {
         return $this->serial;

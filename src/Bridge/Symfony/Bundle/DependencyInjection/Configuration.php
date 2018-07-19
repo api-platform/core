@@ -237,7 +237,6 @@ final class Configuration implements ConfigurationInterface
     /**
      * Adds an exception to status section.
      *
-     * @param ArrayNodeDefinition $rootNode
      *
      * @throws InvalidConfigurationException
      */
@@ -291,10 +290,6 @@ final class Configuration implements ConfigurationInterface
 
     /**
      * Adds a format section.
-     *
-     * @param ArrayNodeDefinition $rootNode
-     * @param string              $key
-     * @param array               $defaultValue
      */
     private function addFormatSection(ArrayNodeDefinition $rootNode, string $key, array $defaultValue)
     {

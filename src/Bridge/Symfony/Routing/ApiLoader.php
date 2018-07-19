@@ -152,8 +152,6 @@ final class ApiLoader extends Loader
 
     /**
      * Load external files.
-     *
-     * @param RouteCollection $routeCollection
      */
     private function loadExternalFiles(RouteCollection $routeCollection)
     {

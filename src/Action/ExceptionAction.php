@@ -46,9 +46,8 @@ final class ExceptionAction
     private $exceptionToStatus;
 
     /**
-     * @param SerializerInterface $serializer
-     * @param array               $errorFormats      A list of enabled formats, the first one will be the default
-     * @param array               $exceptionToStatus A list of exceptions mapped to their HTTP status code
+     * @param array $errorFormats      A list of enabled formats, the first one will be the default
+     * @param array $exceptionToStatus A list of exceptions mapped to their HTTP status code
      */
     public function __construct(SerializerInterface $serializer, array $errorFormats, array $exceptionToStatus = [])
     {
@@ -59,11 +58,6 @@ final class ExceptionAction
 
     /**
      * Converts a an exception to a JSON response.
-     *
-     * @param FlattenException $exception
-     * @param Request          $request
-     *
-     * @return Response
      */
     public function __invoke(FlattenException $exception, Request $request): Response
     {

@@ -115,11 +115,6 @@ class IdentifierManagerTraitTest extends TestCase
 
     /**
      * Gets mocked metadata factories.
-     *
-     * @param string $resourceClass
-     * @param array  $identifiers
-     *
-     * @return array
      */
     private function getMetadataFactories(string $resourceClass, array $identifiers): array
     {

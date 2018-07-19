@@ -43,10 +43,7 @@ class ItemDataProvider implements DenormalizedIdentifiersAwareItemDataProviderIn
     private $itemExtensions;
 
     /**
-     * @param ManagerRegistry                        $managerRegistry
-     * @param PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory
-     * @param PropertyMetadataFactoryInterface       $propertyMetadataFactory
-     * @param QueryItemExtensionInterface[]          $itemExtensions
+     * @param QueryItemExtensionInterface[] $itemExtensions
      */
     public function __construct(ManagerRegistry $managerRegistry, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, /* iterable */ $itemExtensions = [])
     {
@@ -105,10 +102,6 @@ class ItemDataProvider implements DenormalizedIdentifiersAwareItemDataProviderIn
 
     /**
      * Add WHERE conditions to the query for one or more identifiers (simple or composite).
-     *
-     * @param array         $identifiers
-     * @param QueryBuilder  $queryBuilder
-     * @param ClassMetadata $classMetadata
      */
     private function addWhereForIdentifiers(array $identifiers, QueryBuilder $queryBuilder, ClassMetadata $classMetadata)
     {

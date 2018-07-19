@@ -86,13 +86,8 @@ final class AnnotationPropertyMetadataFactory implements PropertyMetadataFactory
     /**
      * Returns the metadata from the decorated factory if available or throws an exception.
      *
-     * @param PropertyMetadata|null $parentPropertyMetadata
-     * @param string                $resourceClass
-     * @param string                $property
      *
      * @throws PropertyNotFoundException
-     *
-     * @return PropertyMetadata
      */
     private function handleNotFound(PropertyMetadata $parentPropertyMetadata = null, string $resourceClass, string $property): PropertyMetadata
     {

@@ -37,8 +37,6 @@ use GraphQL\Type\Definition\ResolveInfo;
 trait ResourceAccessCheckerTrait
 {
     /**
-     * @param mixed $object
-     *
      * @throws Error
      */
     public function canAccess(ResourceAccessCheckerInterface $resourceAccessChecker = null, ResourceMetadata $resourceMetadata, string $resourceClass, ResolveInfo $info, $object = null, string $operationName = null)

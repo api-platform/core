@@ -23,15 +23,11 @@ interface PaginatorInterface extends PartialPaginatorInterface
 {
     /**
      * Gets last page.
-     *
-     * @return float
      */
     public function getLastPage(): float;
 
     /**
      * Gets the number of items in the whole collection.
-     *
-     * @return float
      */
     public function getTotalItems(): float;
 }

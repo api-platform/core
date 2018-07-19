@@ -70,25 +70,16 @@ class DummyEntityWithConstructor
         $this->bar = $bar;
     }
 
-    /**
-     * @return int
-     */
     public function getId(): int
     {
         return $this->id;
     }
 
-    /**
-     * @return string
-     */
     public function getFoo(): string
     {
         return $this->foo;
     }
 
-    /**
-     * @return string
-     */
     public function getBar(): string
     {
         return $this->bar;
@@ -102,9 +93,6 @@ class DummyEntityWithConstructor
         return $this->baz;
     }
 
-    /**
-     * @param string $baz
-     */
     public function setBaz(string $baz)
     {
         $this->baz = $baz;

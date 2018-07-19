@@ -102,15 +102,6 @@ final class ApiPlatformProvider implements AnnotationsProviderInterface
 
     /**
      * Builds ApiDoc annotation from ApiPlatform data.
-     *
-     * @param bool             $collection
-     * @param string           $resourceClass
-     * @param ResourceMetadata $resourceMetadata
-     * @param string           $operationName
-     * @param array            $resourceHydraDoc
-     * @param array            $entrypointHydraDoc
-     *
-     * @return ApiDoc
      */
     private function getApiDoc(bool $collection, string $resourceClass, ResourceMetadata $resourceMetadata, string $operationName, array $resourceHydraDoc, array $entrypointHydraDoc = []): ApiDoc
     {
@@ -161,8 +152,6 @@ final class ApiPlatformProvider implements AnnotationsProviderInterface
     /**
      * Gets Hydra documentation for the given resource.
      *
-     * @param array  $hydraApiDoc
-     * @param string $prefixedShortName
      *
      * @return array|null
      */
@@ -183,11 +172,6 @@ final class ApiPlatformProvider implements AnnotationsProviderInterface
 
     /**
      * Gets the Hydra documentation of a given operation.
-     *
-     * @param string $method
-     * @param array  $hydraDoc
-     *
-     * @return array
      */
     private function getOperationHydraDoc(string $method, array $hydraDoc): array
     {
@@ -206,12 +190,6 @@ final class ApiPlatformProvider implements AnnotationsProviderInterface
 
     /**
      * Gets the Hydra documentation for the collection operation.
-     *
-     * @param string $shortName
-     * @param string $method
-     * @param array  $hydraEntrypointDoc
-     *
-     * @return array
      */
     private function getCollectionOperationHydraDoc(string $shortName, string $method, array $hydraEntrypointDoc): array
     {

@@ -120,11 +120,7 @@ final class CollectionFiltersNormalizer implements NormalizerInterface, Normaliz
     /**
      * Returns the content of the Hydra search property.
      *
-     * @param string            $resourceClass
-     * @param array             $parts
      * @param FilterInterface[] $filters
-     *
-     * @return array
      */
     private function getSearch(string $resourceClass, array $parts, array $filters): array
     {

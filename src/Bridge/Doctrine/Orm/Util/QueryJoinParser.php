@@ -33,12 +33,6 @@ final class QueryJoinParser
 
     /**
      * Gets the class metadata from a given join alias.
-     *
-     * @param string          $alias
-     * @param QueryBuilder    $queryBuilder
-     * @param ManagerRegistry $managerRegistry
-     *
-     * @return ClassMetadata
      */
     public static function getClassMetadataFromJoinAlias(string $alias, QueryBuilder $queryBuilder, ManagerRegistry $managerRegistry): ClassMetadata
     {
@@ -103,10 +97,6 @@ final class QueryJoinParser
 
     /**
      * Gets the relationship from a Join expression.
-     *
-     * @param Join $join
-     *
-     * @return string
      */
     public static function getJoinRelationship(Join $join): string
     {
@@ -125,10 +115,6 @@ final class QueryJoinParser
 
     /**
      * Gets the alias from a Join expression.
-     *
-     * @param Join $join
-     *
-     * @return string
      */
     public static function getJoinAlias(Join $join): string
     {
@@ -148,7 +134,6 @@ final class QueryJoinParser
     /**
      * Gets the parts from an OrderBy expression.
      *
-     * @param OrderBy $orderBy
      *
      * @return string[]
      */

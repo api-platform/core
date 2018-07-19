@@ -28,11 +28,6 @@ final class ErrorFormatGuesser
 
     /**
      * Get the error format and its associated MIME type.
-     *
-     * @param Request $request
-     * @param array   $errorFormats
-     *
-     * @return array
      */
     public static function guessErrorFormat(Request $request, array $errorFormats): array
     {

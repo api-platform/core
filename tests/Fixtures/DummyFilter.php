@@ -36,10 +36,6 @@ class DummyFilter implements FilterInterface
      *   - required: if this filter is required
      *   - strategy: the used strategy
      * The description can contain additional data specific to a filter.
-     *
-     * @param string $resourceClass
-     *
-     * @return array
      */
     public function getDescription(string $resourceClass): array
     {

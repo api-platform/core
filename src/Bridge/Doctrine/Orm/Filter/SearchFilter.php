@@ -136,10 +136,6 @@ class SearchFilter extends AbstractContextAwareFilter
 
     /**
      * Converts a Doctrine type in PHP type.
-     *
-     * @param string $doctrineType
-     *
-     * @return string
      */
     private function getType(string $doctrineType): string
     {
@@ -292,13 +288,6 @@ class SearchFilter extends AbstractContextAwareFilter
     /**
      * Adds where clause according to the strategy.
      *
-     * @param string                      $strategy
-     * @param QueryBuilder                $queryBuilder
-     * @param QueryNameGeneratorInterface $queryNameGenerator
-     * @param string                      $alias
-     * @param string                      $field
-     * @param mixed                       $value
-     * @param bool                        $caseSensitive
      *
      * @throws InvalidArgumentException If strategy does not exist
      */
@@ -345,10 +334,6 @@ class SearchFilter extends AbstractContextAwareFilter
      *
      * For example, "o.name" will get wrapped into "LOWER(o.name)" when $caseSensitive
      * is false.
-     *
-     * @param bool $caseSensitive
-     *
-     * @return \Closure
      */
     protected function createWrapCase(bool $caseSensitive): \Closure
     {
@@ -363,10 +348,6 @@ class SearchFilter extends AbstractContextAwareFilter
 
     /**
      * Gets the ID from an IRI or a raw ID.
-     *
-     * @param string $value
-     *
-     * @return mixed
      */
     protected function getIdFromValue(string $value)
     {
@@ -383,10 +364,6 @@ class SearchFilter extends AbstractContextAwareFilter
 
     /**
      * Normalize the values array.
-     *
-     * @param array $values
-     *
-     * @return array
      */
     protected function normalizeValues(array $values): array
     {

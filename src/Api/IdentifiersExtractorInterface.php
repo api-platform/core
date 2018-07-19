@@ -33,8 +33,6 @@ interface IdentifiersExtractorInterface
      * @param object $item
      *
      * @throws RuntimeException
-     *
-     * @return array
      */
     public function getIdentifiersFromItem($item): array;
 }
