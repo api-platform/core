@@ -15,6 +15,7 @@ namespace ApiPlatform\Core\Tests\GraphQl\Type;
 
 use ApiPlatform\Core\Exception\ResourceClassNotFoundException;
 use ApiPlatform\Core\GraphQl\Resolver\Factory\ResolverFactoryInterface;
+use ApiPlatform\Core\GraphQl\Type\Definition\IterableType;
 use ApiPlatform\Core\GraphQl\Type\SchemaBuilder;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
@@ -24,8 +25,12 @@ use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Metadata\Resource\ResourceNameCollection;
+use GraphQL\Type\Definition\BooleanType;
+use GraphQL\Type\Definition\FloatType;
 use GraphQL\Type\Definition\ListOfType;
+use GraphQL\Type\Definition\NonNull;
 use GraphQL\Type\Definition\ObjectType;
+use GraphQL\Type\Definition\StringType;
 use GraphQL\Type\Definition\Type as GraphQLType;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
@@ -55,7 +60,7 @@ class SchemaBuilderTest extends TestCase
             );
         };
 
-        $mockedSchemaBuilder = $this->createSchemaBuilder($propertyMetadataMockBuilder, false);
+        $mockedSchemaBuilder = $this->createSchemaBuilder($propertyMetadataMockBuilder, false, 3);
         $this->assertEquals([
             'node',
             'shortName1',
@@ -85,7 +90,7 @@ class SchemaBuilderTest extends TestCase
                 Type::BUILTIN_TYPE_INT === $builtinType
             );
         };
-        $mockedSchemaBuilder = $this->createSchemaBuilder($propertyMetadataMockBuilder, false);
+        $mockedSchemaBuilder = $this->createSchemaBuilder($propertyMetadataMockBuilder, false, 3);
         $schema = $mockedSchemaBuilder->getSchema();
         $queryFields = $schema->getConfig()->getQuery()->getFields();
 
@@ -100,7 +105,7 @@ class SchemaBuilderTest extends TestCase
         $propertyMetadataMockBuilder = function ($builtinType, $resourceClassName) {
             return new PropertyMetadata();
         };
-        $mockedSchemaBuilder = $this->createSchemaBuilder($propertyMetadataMockBuilder, false);
+        $mockedSchemaBuilder = $this->createSchemaBuilder($propertyMetadataMockBuilder, false, 1);
 
         $reflectionClass = new \ReflectionClass(SchemaBuilder::class);
         $method = $reflectionClass->getMethod('convertFilterArgsToTypes');
@@ -119,6 +124,64 @@ class SchemaBuilderTest extends TestCase
             ],
             $method->invoke($mockedSchemaBuilder, $filterArgs)
         );
+    }
+
+    public function testGetSchemaResourceWithArrayOfScalar()
+    {
+        $propertyMetadataMockBuilder = function ($builtinType, $resourceClassName) {
+            $isAScalarType = \in_array(
+                $builtinType,
+                [Type::BUILTIN_TYPE_INT, Type::BUILTIN_TYPE_FLOAT, Type::BUILTIN_TYPE_STRING, Type::BUILTIN_TYPE_BOOL],
+                true
+            );
+
+            return new PropertyMetadata(
+                new Type(
+                    $isAScalarType ? Type::BUILTIN_TYPE_ARRAY : $builtinType,
+                    false,
+                    $resourceClassName,
+                    $isAScalarType || Type::BUILTIN_TYPE_ARRAY === $builtinType || Type::BUILTIN_TYPE_ITERABLE === $builtinType ? true : false,
+                    null,
+                    $isAScalarType ? new Type($builtinType) : null
+                ),
+                "{$builtinType}Description",
+                true,
+                true,
+                null,
+                null,
+                null
+            );
+        };
+        $mockedSchemaBuilder = $this->createSchemaBuilder($propertyMetadataMockBuilder, false, 1);
+        $schema = $mockedSchemaBuilder->getSchema();
+        $queryFields = $schema->getConfig()->getQuery()->getFields();
+
+        /** @var ObjectType $type */
+        $type = $queryFields['shortName1']->getType();
+
+        /** @var ListOfType $stringPropertyFieldType */
+        $stringPropertyFieldType = $type->getFields()['stringProperty']->getType();
+        $this->assertInstanceOf(ListOfType::class, $stringPropertyFieldType);
+        $this->assertInstanceOf(NonNull::class, $stringPropertyFieldType->getWrappedType(false));
+        $this->assertInstanceOf(StringType::class, $stringPropertyFieldType->getWrappedType(true));
+
+        /** @var ListOfType $floatPropertyFieldType */
+        $floatPropertyFieldType = $type->getFields()['floatProperty']->getType();
+        $this->assertInstanceOf(ListOfType::class, $floatPropertyFieldType);
+        $this->assertInstanceOf(NonNull::class, $floatPropertyFieldType->getWrappedType(false));
+        $this->assertInstanceOf(FloatType::class, $floatPropertyFieldType->getWrappedType(true));
+
+        /** @var ListOfType $boolPropertyFieldType */
+        $boolPropertyFieldType = $type->getFields()['boolProperty']->getType();
+        $this->assertInstanceOf(ListOfType::class, $boolPropertyFieldType);
+        $this->assertInstanceOf(NonNull::class, $boolPropertyFieldType->getWrappedType(false));
+        $this->assertInstanceOf(BooleanType::class, $boolPropertyFieldType->getWrappedType(true));
+
+        /** @var ListOfType $arrayPropertyFieldType */
+        $arrayPropertyFieldType = $type->getFields()['arrayProperty']->getType();
+        $this->assertInstanceOf(NonNull::class, $arrayPropertyFieldType);
+        $this->assertInstanceOf(IterableType::class, $arrayPropertyFieldType->getWrappedType(false));
+        $this->assertInstanceOf(IterableType::class, $arrayPropertyFieldType->getWrappedType(true));
     }
 
     /**
@@ -144,7 +207,7 @@ class SchemaBuilderTest extends TestCase
                 null
             );
         };
-        $mockedSchemaBuilder = $this->createSchemaBuilder($propertyMetadataMockBuilder, $paginationEnabled);
+        $mockedSchemaBuilder = $this->createSchemaBuilder($propertyMetadataMockBuilder, $paginationEnabled, 3);
         $schema = $mockedSchemaBuilder->getSchema();
         $queryFields = $schema->getConfig()->getQuery()->getFields();
         $mutationFields = $schema->getConfig()->getMutation()->getFields();
@@ -249,7 +312,7 @@ class SchemaBuilderTest extends TestCase
         ];
     }
 
-    private function createSchemaBuilder($propertyMetadataMockBuilder, bool $paginationEnabled): SchemaBuilder
+    private function createSchemaBuilder($propertyMetadataMockBuilder, bool $paginationEnabled, int $maxResource): SchemaBuilder
     {
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
@@ -259,7 +322,7 @@ class SchemaBuilderTest extends TestCase
         $itemMutationResolverFactoryProphecy = $this->prophesize(ResolverFactoryInterface::class);
 
         $resourceClassNames = [];
-        for ($i = 1; $i <= 3; ++$i) {
+        for ($i = 1; $i <= $maxResource; ++$i) {
             $resourceClassName = "GraphqlResource$i";
             $resourceClassNames[] = $resourceClassName;
             $resourceMetadata = new ResourceMetadata(
@@ -282,6 +345,7 @@ class SchemaBuilderTest extends TestCase
                 $propertyMetadataFactoryProphecy->create($resourceClassName, $propertyName, ['graphql_operation_name' => 'query'])->willReturn($propertyMetadataMockBuilder($builtinType, $resourceClassName));
                 $propertyMetadataFactoryProphecy->create($resourceClassName, $propertyName, ['graphql_operation_name' => 'create'])->willReturn($propertyMetadataMockBuilder($builtinType, $resourceClassName));
             }
+
             $propertyNameCollection = new PropertyNameCollection($propertyNames);
             $propertyNameCollectionFactoryProphecy->create($resourceClassName)->willReturn($propertyNameCollection);
         }
