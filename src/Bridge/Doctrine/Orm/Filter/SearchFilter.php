@@ -112,6 +112,7 @@ class SearchFilter extends AbstractContextAwareFilter
                         'type' => $typeOfField,
                         'required' => false,
                         'strategy' => $strategy,
+                        'is_collection' => '[]' === substr($filterParameterName, -2),
                     ];
                 }
             } elseif ($metadata->hasAssociation($field)) {
@@ -126,6 +127,7 @@ class SearchFilter extends AbstractContextAwareFilter
                         'type' => 'string',
                         'required' => false,
                         'strategy' => self::STRATEGY_EXACT,
+                        'is_collection' => '[]' === substr($filterParameterName, -2),
                     ];
                 }
             }
