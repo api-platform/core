@@ -16,6 +16,8 @@ namespace ApiPlatform\Core\Tests\Bridge\Doctrine\Orm\Filter;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\DateFilter;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGenerator;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyDate;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyImmutableDate;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityRepository;
 use Symfony\Bridge\Doctrine\Test\DoctrineTestHelper;
@@ -81,6 +83,54 @@ class DateFilterTest extends KernelTestCase
         $this->assertEquals($expected, $actual);
     }
 
+    public function testApplyDate()
+    {
+        $request = Request::create('/api/dummies', 'GET', [
+            'dummyDate' => [
+                'after' => '2015-04-05',
+            ],
+        ]);
+        $requestStack = new RequestStack();
+        $requestStack->push($request);
+
+        $queryBuilder = $this->repository->createQueryBuilder('o');
+
+        $filter = new DateFilter(
+            $this->managerRegistry,
+            $requestStack,
+            null,
+            ['dummyDate' => null]
+        );
+
+        $filter->apply($queryBuilder, new QueryNameGenerator(), DummyDate::class);
+        $this->assertEquals(new \DateTime('2015-04-05'), $queryBuilder->getParameters()[0]->getValue());
+        $this->assertInstanceOf(\DateTime::class, $queryBuilder->getParameters()[0]->getValue());
+    }
+
+    public function testApplyDateImmutable()
+    {
+        $request = Request::create('/api/dummy_immutable_dates', 'GET', [
+            'dummyDate' => [
+                'after' => '2015-04-05',
+            ],
+        ]);
+        $requestStack = new RequestStack();
+        $requestStack->push($request);
+
+        $queryBuilder = $this->repository->createQueryBuilder('o');
+
+        $filter = new DateFilter(
+            $this->managerRegistry,
+            $requestStack,
+            null,
+            ['dummyDate' => null]
+        );
+
+        $filter->apply($queryBuilder, new QueryNameGenerator(), DummyImmutableDate::class);
+        $this->assertEquals(new \DateTimeImmutable('2015-04-05'), $queryBuilder->getParameters()[0]->getValue());
+        $this->assertInstanceOf(\DateTimeImmutable::class, $queryBuilder->getParameters()[0]->getValue());
+    }
+
     public function testGetDescription()
     {
         $filter = new DateFilter(
@@ -94,7 +144,17 @@ class DateFilterTest extends KernelTestCase
                 'type' => 'DateTimeInterface',
                 'required' => false,
             ],
+            'dummyDate[strictly_before]' => [
+                'property' => 'dummyDate',
+                'type' => 'DateTimeInterface',
+                'required' => false,
+            ],
             'dummyDate[after]' => [
+                'property' => 'dummyDate',
+                'type' => 'DateTimeInterface',
+                'required' => false,
+            ],
+            'dummyDate[strictly_after]' => [
                 'property' => 'dummyDate',
                 'type' => 'DateTimeInterface',
                 'required' => false,
@@ -124,6 +184,15 @@ class DateFilterTest extends KernelTestCase
                 ],
                 sprintf('SELECT o FROM %s o WHERE o.dummyDate >= :dummyDate_p1', Dummy::class),
             ],
+            'after but not equals (all properties enabled)' => [
+                null,
+                [
+                    'dummyDate' => [
+                        'strictly_after' => '2015-04-05',
+                    ],
+                ],
+                sprintf('SELECT o FROM %s o WHERE o.dummyDate > :dummyDate_p1', Dummy::class),
+            ],
             'after' => [
                 [
                     'dummyDate' => null,
@@ -135,6 +204,17 @@ class DateFilterTest extends KernelTestCase
                 ],
                 sprintf('SELECT o FROM %s o WHERE o.dummyDate >= :dummyDate_p1', Dummy::class),
             ],
+            'after but not equals' => [
+                [
+                    'dummyDate' => null,
+                ],
+                [
+                    'dummyDate' => [
+                        'strictly_after' => '2015-04-05',
+                    ],
+                ],
+                sprintf('SELECT o FROM %s o WHERE o.dummyDate > :dummyDate_p1', Dummy::class),
+            ],
             'before (all properties enabled)' => [
                 null,
                 [
@@ -143,6 +223,15 @@ class DateFilterTest extends KernelTestCase
                     ],
                 ],
                 sprintf('SELECT o FROM %s o WHERE o.dummyDate <= :dummyDate_p1', Dummy::class),
+            ],
+            'before but not equals (all properties enabled)' => [
+                null,
+                [
+                    'dummyDate' => [
+                        'strictly_before' => '2015-04-05',
+                    ],
+                ],
+                sprintf('SELECT o FROM %s o WHERE o.dummyDate < :dummyDate_p1', Dummy::class),
             ],
             'before' => [
                 [
@@ -155,6 +244,17 @@ class DateFilterTest extends KernelTestCase
                 ],
                 sprintf('SELECT o FROM %s o WHERE o.dummyDate <= :dummyDate_p1', Dummy::class),
             ],
+            'before but not equals' => [
+                [
+                    'dummyDate' => null,
+                ],
+                [
+                    'dummyDate' => [
+                        'strictly_before' => '2015-04-05',
+                    ],
+                ],
+                sprintf('SELECT o FROM %s o WHERE o.dummyDate < :dummyDate_p1', Dummy::class),
+            ],
             'before + after (all properties enabled)' => [
                 null,
                 [
@@ -164,6 +264,16 @@ class DateFilterTest extends KernelTestCase
                     ],
                 ],
                 sprintf('SELECT o FROM %s o WHERE o.dummyDate <= :dummyDate_p1 AND o.dummyDate >= :dummyDate_p2', Dummy::class),
+            ],
+            'before but not equals + after but not equals (all properties enabled)' => [
+                null,
+                [
+                    'dummyDate' => [
+                        'strictly_after' => '2015-04-05',
+                        'strictly_before' => '2015-04-05',
+                    ],
+                ],
+                sprintf('SELECT o FROM %s o WHERE o.dummyDate < :dummyDate_p1 AND o.dummyDate > :dummyDate_p2', Dummy::class),
             ],
             'before + after' => [
                 [
@@ -176,6 +286,18 @@ class DateFilterTest extends KernelTestCase
                     ],
                 ],
                 sprintf('SELECT o FROM %s o WHERE o.dummyDate <= :dummyDate_p1 AND o.dummyDate >= :dummyDate_p2', Dummy::class),
+            ],
+            'before but not equals + after but not equals' => [
+                [
+                    'dummyDate' => null,
+                ],
+                [
+                    'dummyDate' => [
+                        'strictly_after' => '2015-04-05',
+                        'strictly_before' => '2015-04-05',
+                    ],
+                ],
+                sprintf('SELECT o FROM %s o WHERE o.dummyDate < :dummyDate_p1 AND o.dummyDate > :dummyDate_p2', Dummy::class),
             ],
             'property not enabled' => [
                 [
@@ -221,6 +343,17 @@ class DateFilterTest extends KernelTestCase
                     ],
                 ],
                 sprintf('SELECT o FROM %s o WHERE o.dummyDate >= :dummyDate_p1 OR o.dummyDate IS NULL', Dummy::class),
+            ],
+            'bad date format' => [
+                [
+                    'dummyDate' => null,
+                ],
+                [
+                    'dummyDate' => [
+                        'after' => '1932iur123ufqe',
+                    ],
+                ],
+                sprintf('SELECT o FROM %s o', Dummy::class),
             ],
         ];
     }

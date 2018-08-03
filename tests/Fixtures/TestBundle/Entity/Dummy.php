@@ -15,6 +15,7 @@ namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity;
 
 use ApiPlatform\Core\Annotation\ApiProperty;
 use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Core\Annotation\ApiSubresource;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -24,7 +25,17 @@ use Symfony\Component\Validator\Constraints as Assert;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  *
- * @ApiResource(attributes={"filters"={"my_dummy.search", "my_dummy.order", "my_dummy.date", "my_dummy.range", "my_dummy.boolean", "my_dummy.numeric"}})
+ * @ApiResource(attributes={
+ *     "filters"={
+ *         "my_dummy.boolean",
+ *         "my_dummy.date",
+ *         "my_dummy.exists",
+ *         "my_dummy.numeric",
+ *         "my_dummy.order",
+ *         "my_dummy.range",
+ *         "my_dummy.search",
+ *     }
+ * })
  * @ORM\Entity
  */
 class Dummy
@@ -115,6 +126,7 @@ class Dummy
      * @var ArrayCollection Several dummies
      *
      * @ORM\ManyToMany(targetEntity="RelatedDummy")
+     * @ApiSubresource
      */
     public $relatedDummies;
 
@@ -145,6 +157,11 @@ class Dummy
     public function getId()
     {
         return $this->id;
+    }
+
+    public function setId($id)
+    {
+        $this->id = $id;
     }
 
     public function setName($name)

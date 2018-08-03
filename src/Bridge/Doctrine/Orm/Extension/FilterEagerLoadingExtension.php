@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Bridge\Doctrine\Orm\Extension;
 
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\EagerLoadingTrait;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryBuilderHelper;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use Doctrine\ORM\Query\Expr\Join;
@@ -61,20 +62,31 @@ final class FilterEagerLoadingExtension implements QueryCollectionExtensionInter
 
         $queryBuilderClone = clone $queryBuilder;
         $queryBuilderClone->resetDQLPart('where');
+        $changedWhereClause = false;
 
         if (!$classMetadata->isIdentifierComposite) {
             $replacementAlias = $queryNameGenerator->generateJoinAlias($originAlias);
             $in = $this->getQueryBuilderWithNewAliases($queryBuilder, $queryNameGenerator, $originAlias, $replacementAlias);
             $in->select($replacementAlias);
             $queryBuilderClone->andWhere($queryBuilderClone->expr()->in($originAlias, $in->getDQL()));
+            $changedWhereClause = true;
         } else {
             // Because Doctrine doesn't support WHERE ( foo, bar ) IN () (https://github.com/doctrine/doctrine2/issues/5238), we are building as many subqueries as they are identifiers
-            foreach ($classMetadata->identifier as $identifier) {
+            foreach ($classMetadata->getIdentifier() as $identifier) {
+                if (!$classMetadata->hasAssociation($identifier)) {
+                    continue;
+                }
+
                 $replacementAlias = $queryNameGenerator->generateJoinAlias($originAlias);
                 $in = $this->getQueryBuilderWithNewAliases($queryBuilder, $queryNameGenerator, $originAlias, $replacementAlias);
                 $in->select("IDENTITY($replacementAlias.$identifier)");
                 $queryBuilderClone->andWhere($queryBuilderClone->expr()->in("$originAlias.$identifier", $in->getDQL()));
+                $changedWhereClause = true;
             }
+        }
+
+        if (false === $changedWhereClause) {
+            return;
         }
 
         $queryBuilder->resetDQLPart('where');
@@ -115,12 +127,15 @@ final class FilterEagerLoadingExtension implements QueryCollectionExtensionInter
 
         //Change join aliases
         foreach ($joinParts[$originAlias] as $joinPart) {
+            /** @var Join $joinPart */
+            $joinString = str_replace($aliases, $replacements, $joinPart->getJoin());
+            $pos = strpos($joinString, '.');
+            $alias = substr($joinString, 0, $pos);
+            $association = substr($joinString, $pos + 1);
+            $condition = str_replace($aliases, $replacements, $joinPart->getCondition());
+            $newAlias = QueryBuilderHelper::addJoinOnce($queryBuilderClone, $queryNameGenerator, $alias, $association, $joinPart->getJoinType(), $joinPart->getConditionType(), $condition);
             $aliases[] = "{$joinPart->getAlias()}.";
-            $alias = $queryNameGenerator->generateJoinAlias($joinPart->getAlias());
-            $replacements[] = "$alias.";
-            $join = new Join($joinPart->getJoinType(), str_replace($aliases, $replacements, $joinPart->getJoin()), $alias, $joinPart->getConditionType(), str_replace($aliases, $replacements, $joinPart->getCondition()), $joinPart->getIndexBy());
-
-            $queryBuilderClone->add('join', [$join], true);
+            $replacements[] = "$newAlias.";
         }
 
         $queryBuilderClone->add('where', str_replace($aliases, $replacements, (string) $wherePart));

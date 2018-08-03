@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Bridge\Doctrine\Orm\Filter;
 
 use ApiPlatform\Core\Api\IriConverterInterface;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryBuilderHelper;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
 use Doctrine\Common\Persistence\ManagerRegistry;
@@ -84,8 +85,8 @@ class SearchFilter extends AbstractFilter
                 continue;
             }
 
-            if ($this->isPropertyNested($property)) {
-                $propertyParts = $this->splitPropertyParts($property);
+            if ($this->isPropertyNested($property, $resourceClass)) {
+                $propertyParts = $this->splitPropertyParts($property, $resourceClass);
                 $field = $propertyParts['field'];
                 $metadata = $this->getNestedMetadata($resourceClass, $propertyParts['associations']);
             } else {
@@ -157,6 +158,16 @@ class SearchFilter extends AbstractFilter
                 return 'float';
         }
 
+        if (\defined(Type::class.'::DATE_IMMUTABLE')) {
+            switch ($doctrineType) {
+                case Type::DATE_IMMUTABLE:
+                case Type::TIME_IMMUTABLE:
+                case Type::DATETIME_IMMUTABLE:
+                case Type::DATETIMETZ_IMMUTABLE:
+                    return \DateTimeInterface::class;
+            }
+        }
+
         return 'string';
     }
 
@@ -167,7 +178,7 @@ class SearchFilter extends AbstractFilter
     {
         if (
             null === $value ||
-            !$this->isPropertyEnabled($property) ||
+            !$this->isPropertyEnabled($property, $resourceClass) ||
             !$this->isPropertyMapped($property, $resourceClass, true)
         ) {
             return;
@@ -176,8 +187,8 @@ class SearchFilter extends AbstractFilter
         $alias = 'o';
         $field = $property;
 
-        if ($this->isPropertyNested($property)) {
-            list($alias, $field, $associations) = $this->addJoinsForNestedProperty($property, $alias, $queryBuilder, $queryNameGenerator);
+        if ($this->isPropertyNested($property, $resourceClass)) {
+            list($alias, $field, $associations) = $this->addJoinsForNestedProperty($property, $alias, $queryBuilder, $queryNameGenerator, $resourceClass);
             $metadata = $this->getNestedMetadata($resourceClass, $associations);
         } else {
             $metadata = $this->getClassMetadata($resourceClass);
@@ -200,6 +211,14 @@ class SearchFilter extends AbstractFilter
                 $values = array_map([$this, 'getIdFromValue'], $values);
             }
 
+            if (!$this->hasValidValues($values, $this->getDoctrineFieldType($property, $resourceClass))) {
+                $this->logger->notice('Invalid filter ignored', [
+                     'exception' => new InvalidArgumentException(sprintf('Values for field "%s" are not valid according to the doctrine type.', $field)),
+                ]);
+
+                return;
+            }
+
             $strategy = $this->properties[$property] ?? self::STRATEGY_EXACT;
 
             // prefixing the strategy with i makes it case insensitive
@@ -208,7 +227,7 @@ class SearchFilter extends AbstractFilter
                 $caseSensitive = false;
             }
 
-            if (1 === count($values)) {
+            if (1 === \count($values)) {
                 $this->addWhereByStrategy($strategy, $queryBuilder, $queryNameGenerator, $alias, $field, $values[0], $caseSensitive);
 
                 return;
@@ -237,18 +256,32 @@ class SearchFilter extends AbstractFilter
 
         $values = array_map([$this, 'getIdFromValue'], $values);
 
+        if (!$this->hasValidValues($values, $this->getDoctrineFieldType($property, $resourceClass))) {
+            $this->logger->notice('Invalid filter ignored', [
+                    'exception' => new InvalidArgumentException(sprintf('Values for field "%s" are not valid according to the doctrine type.', $field)),
+            ]);
+
+            return;
+        }
+
         $association = $field;
         $valueParameter = $queryNameGenerator->generateParameterName($association);
 
-        $associationAlias = $this->addJoinOnce($queryBuilder, $queryNameGenerator, $alias, $association);
+        if ($metadata->isCollectionValuedAssociation($association)) {
+            $associationAlias = QueryBuilderHelper::addJoinOnce($queryBuilder, $queryNameGenerator, $alias, $association);
+            $associationField = 'id';
+        } else {
+            $associationAlias = $alias;
+            $associationField = $field;
+        }
 
-        if (1 === count($values)) {
+        if (1 === \count($values)) {
             $queryBuilder
-                ->andWhere(sprintf('%s.id = :%s', $associationAlias, $valueParameter))
+                ->andWhere(sprintf('%s.%s = :%s', $associationAlias, $associationField, $valueParameter))
                 ->setParameter($valueParameter, $values[0]);
         } else {
             $queryBuilder
-                ->andWhere(sprintf('%s.id IN (:%s)', $associationAlias, $valueParameter))
+                ->andWhere(sprintf('%s.%s IN (:%s)', $associationAlias, $associationField, $valueParameter))
                 ->setParameter($valueParameter, $values);
         }
     }
@@ -355,11 +388,27 @@ class SearchFilter extends AbstractFilter
     protected function normalizeValues(array $values): array
     {
         foreach ($values as $key => $value) {
-            if (!is_int($key) || !is_string($value)) {
+            if (!\is_int($key) || !\is_string($value)) {
                 unset($values[$key]);
             }
         }
 
         return array_values($values);
+    }
+
+    /**
+     * When the field should be an integer, check that the given value is a valid one.
+     *
+     * @param Type|string $type
+     */
+    protected function hasValidValues(array $values, $type = null): bool
+    {
+        foreach ($values as $key => $value) {
+            if (Type::INTEGER === $type && null !== $value && false === filter_var($value, FILTER_VALIDATE_INT)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }

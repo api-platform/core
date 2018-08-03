@@ -55,7 +55,8 @@ Feature: Documentation support
     And the value of the node "hydra:title" of the Hydra class "Dummy" is "Dummy"
     And the value of the node "hydra:description" of the Hydra class "Dummy" is "Dummy."
     # Properties
-    And "id" property doesn't exist for the Hydra class "Dummy"
+    And "id" property is readable for Hydra class "Dummy"
+    And "id" property is writable for Hydra class "Dummy"
     And "name" property is readable for Hydra class "Dummy"
     And "name" property is writable for Hydra class "Dummy"
     And "name" property is required for Hydra class "Dummy"
@@ -73,7 +74,8 @@ Feature: Documentation support
     And the value of the node "hydra:title" of the property "name" of the Hydra class "Dummy" is "name"
     And the value of the node "hydra:description" of the property "name" of the Hydra class "Dummy" is "The dummy name"
     # Operations
-    And the value of the node "@type" of the operation "GET" of the Hydra class "Dummy" is "hydra:Operation"
+    And the value of the node "@type" of the operation "GET" of the Hydra class "Dummy" contains "hydra:Operation"
+    And the value of the node "@type" of the operation "GET" of the Hydra class "Dummy" contains "schema:FindAction"
     And the value of the node "hydra:method" of the operation "GET" of the Hydra class "Dummy" is "GET"
     And the value of the node "hydra:title" of the operation "GET" of the Hydra class "Dummy" is "Retrieves Dummy resource."
     And the value of the node "rdfs:label" of the operation "GET" of the Hydra class "Dummy" is "Retrieves Dummy resource."

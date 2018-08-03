@@ -40,11 +40,32 @@ final class Configuration implements ConfigurationInterface
 
         $rootNode
             ->children()
-                ->scalarNode('title')->defaultValue('')->info('The title of the API.')->end()
-                ->scalarNode('description')->defaultValue('')->info('The description of the API.')->end()
-                ->scalarNode('version')->defaultValue('0.0.0')->info('The version of the API.')->end()
-                ->scalarNode('default_operation_path_resolver')->defaultValue('api_platform.operation_path_resolver.underscore')->info('Specify the default operation path resolver to use for generating resources operations path.')->end()
+                ->scalarNode('title')
+                    ->info('The title of the API.')
+                    ->cannotBeEmpty()
+                    ->defaultValue('')
+                ->end()
+                ->scalarNode('description')
+                    ->info('The description of the API.')
+                    ->cannotBeEmpty()
+                    ->defaultValue('')
+                ->end()
+                ->scalarNode('version')
+                    ->info('The version of the API.')
+                    ->cannotBeEmpty()
+                    ->defaultValue('0.0.0')
+                ->end()
+                ->scalarNode('default_operation_path_resolver')
+                    ->beforeNormalization()->always(function ($v) {
+                        @trigger_error('The use of the `default_operation_path_resolver` has been deprecated in 2.1 and will be removed in 3.0. Use `path_segment_name_generator` instead.', E_USER_DEPRECATED);
+
+                        return $v;
+                    })->end()
+                    ->defaultValue('api_platform.operation_path_resolver.underscore')
+                    ->info('[Deprecated] Specify the default operation path resolver to use for generating resources operations path.')
+                ->end()
                 ->scalarNode('name_converter')->defaultNull()->info('Specify a name converter to use.')->end()
+                ->scalarNode('path_segment_name_generator')->defaultValue('api_platform.path_segment_name_generator.underscore')->info('Specify a path name generator to use.')->end()
                 ->arrayNode('eager_loading')
                     ->canBeDisabled()
                     ->addDefaultsIfNotSet()
@@ -60,10 +81,46 @@ final class Configuration implements ConfigurationInterface
                 ->booleanNode('enable_swagger')->defaultValue(true)->info('Enable the Swagger documentation and export.')->end()
                 ->booleanNode('enable_swagger_ui')->defaultValue(class_exists(TwigBundle::class))->info('Enable Swagger ui.')->end()
 
+                ->arrayNode('oauth')
+                    ->canBeEnabled()
+                    ->addDefaultsIfNotSet()
+                    ->children()
+                        ->booleanNode('enabled')->defaultFalse()->info('To enable or disable oauth')->end()
+                        ->scalarNode('clientId')->defaultValue('')->info('The oauth client id.')->end()
+                        ->scalarNode('clientSecret')->defaultValue('')->info('The oauth client secret.')->end()
+                        ->scalarNode('type')->defaultValue('oauth2')->info('The oauth client secret.')->end()
+                        ->scalarNode('flow')->defaultValue('application')->info('The oauth flow grant type.')->end()
+                        ->scalarNode('tokenUrl')->defaultValue('/oauth/v2/token')->info('The oauth token url.')->end()
+                        ->scalarNode('authorizationUrl')->defaultValue('/oauth/v2/auth')->info('The oauth authentication url.')->end()
+                        ->arrayNode('scopes')
+                            ->prototype('scalar')->end()
+                        ->end()
+                    ->end()
+                ->end()
+
+                ->arrayNode('swagger')
+                    ->addDefaultsIfNotSet()
+                    ->children()
+                             ->arrayNode('api_keys')
+                                 ->prototype('array')
+                                    ->children()
+                                    ->scalarNode('name')
+                                        ->info('The name of the header or query parameter containing the api key.')
+                                    ->end()
+                                    ->enumNode('type')
+                                        ->info('Whether the api key should be a query parameter or a header.')
+                                        ->values(['query', 'header'])
+                                    ->end()
+                                ->end()
+                             ->end()
+                        ->end()
+                    ->end()
+                ->end()
+
                 ->arrayNode('collection')
                     ->addDefaultsIfNotSet()
                     ->children()
-                        ->scalarNode('order')->defaultNull()->info('The default order of results.')->end()
+                        ->scalarNode('order')->defaultValue('ASC')->info('The default order of results.')->end() // Default ORDER is required for postgresql and mysql >= 5.7 when using LIMIT/OFFSET request
                         ->scalarNode('order_parameter_name')->defaultValue('order')->cannotBeEmpty()->info('The name of the query parameter to order results.')->end()
                         ->arrayNode('pagination')
                             ->canBeDisabled()
@@ -81,6 +138,46 @@ final class Configuration implements ConfigurationInterface
                         ->end()
                     ->end()
                 ->end()
+
+                ->arrayNode('mapping')
+                    ->addDefaultsIfNotSet()
+                    ->children()
+                        ->arrayNode('paths')
+                            ->prototype('scalar')->end()
+                        ->end()
+                    ->end()
+                ->end()
+
+                ->arrayNode('resource_class_directories')
+                    ->prototype('scalar')->end()
+                ->end()
+
+                ->arrayNode('http_cache')
+                    ->addDefaultsIfNotSet()
+                    ->children()
+                        ->booleanNode('etag')->defaultTrue()->info('Automatically generate etags for API responses.')->end()
+                        ->integerNode('max_age')->defaultNull()->info('Default value for the response max age.')->end()
+                        ->integerNode('shared_max_age')->defaultNull()->info('Default value for the response shared (proxy) max age.')->end()
+                        ->arrayNode('vary')
+                            ->defaultValue(['Accept'])
+                            ->prototype('scalar')->end()
+                            ->info('Default values of the "Vary" HTTP header.')
+                        ->end()
+                        ->booleanNode('public')->defaultNull()->info('To make all responses public by default.')->end()
+                        ->arrayNode('invalidation')
+                            ->info('Enable the tags-based cache invalidation system.')
+                            ->canBeEnabled()
+                            ->children()
+                                ->arrayNode('varnish_urls')
+                                    ->defaultValue([])
+                                    ->prototype('scalar')->end()
+                                    ->info('URLs of the Varnish servers to purge using cache tags when a resource is updated.')
+                                ->end()
+                            ->end()
+                        ->end()
+                    ->end()
+                ->end()
+
             ->end();
 
         $this->addExceptionToStatusSection($rootNode);
@@ -121,12 +218,14 @@ final class Configuration implements ConfigurationInterface
                         ->ifArray()
                         ->then(function (array $exceptionToStatus) {
                             foreach ($exceptionToStatus as &$httpStatusCode) {
-                                if (is_int($httpStatusCode)) {
+                                if (\is_int($httpStatusCode)) {
                                     continue;
                                 }
 
-                                if (defined($httpStatusCodeConstant = sprintf('%s::%s', Response::class, $httpStatusCode))) {
-                                    $httpStatusCode = constant($httpStatusCodeConstant);
+                                if (\defined($httpStatusCodeConstant = sprintf('%s::%s', Response::class, $httpStatusCode))) {
+                                    @trigger_error(sprintf('Using a string "%s" as a constant of the "%s" class is deprecated since API Platform 2.1 and will not be possible anymore in API Platform 3. Use the Symfony\'s custom YAML extension for PHP constants instead (i.e. "!php/const:%s").', $httpStatusCode, Response::class, $httpStatusCodeConstant), E_USER_DEPRECATED);
+
+                                    $httpStatusCode = \constant($httpStatusCodeConstant);
                                 }
                             }
 

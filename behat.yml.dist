@@ -3,17 +3,20 @@ default:
     default:
       contexts:
         - 'FeatureContext': { doctrine: '@doctrine' }
+        - 'JsonContext'
         - 'HydraContext'
         - 'SwaggerContext'
+        - 'HttpCacheContext'
         - 'Behat\MinkExtension\Context\MinkContext'
         - 'Behatch\Context\RestContext'
-        - 'Behatch\Context\JsonContext'
+      filters:
+        tags: ~@postgres
   extensions:
     'Behat\Symfony2Extension':
       kernel:
-        env:       'test'
-        debug:     'true'
-        path:      'tests/Fixtures/app/AppKernel.php'
+        env: '%env(APP_ENV)%'
+        debug: 'true'
+        path: 'tests/Fixtures/app/AppKernel.php'
         bootstrap: 'tests/Fixtures/app/bootstrap.php'
     'Behat\MinkExtension':
       base_url: "http://example.com/"
@@ -26,11 +29,11 @@ coverage:
   suites:
     default:
       contexts:
-      contexts:
         - 'FeatureContext': { doctrine: '@doctrine' }
+        - 'JsonContext'
         - 'HydraContext'
         - 'SwaggerContext'
+        - 'HttpCacheContext'
         - 'CoverageContext'
         - 'Behat\MinkExtension\Context\MinkContext'
         - 'Behatch\Context\RestContext'
-        - 'Behatch\Context\JsonContext'

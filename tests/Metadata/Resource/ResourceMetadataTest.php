@@ -23,7 +23,7 @@ class ResourceMetadataTest extends TestCase
 {
     public function testValueObject()
     {
-        $metadata = new ResourceMetadata('shortName', 'desc', 'http://example.com/foo', ['iop1' => ['foo' => 'a'], 'iop2' => ['bar' => 'b']], ['cop1' => ['foo' => 'c'], 'cop2' => ['bar' => 'd']], ['baz' => 'bar']);
+        $metadata = new ResourceMetadata('shortName', 'desc', 'http://example.com/foo', ['iop1' => ['foo' => 'a'], 'iop2' => ['bar' => 'b']], ['cop1' => ['foo' => 'c'], 'cop2' => ['bar' => 'd']], ['baz' => 'bar'], ['sop1' => ['sub' => 'bus']]);
         $this->assertEquals('shortName', $metadata->getShortName());
         $this->assertEquals('desc', $metadata->getDescription());
         $this->assertEquals('http://example.com/foo', $metadata->getIri());
@@ -42,6 +42,10 @@ class ResourceMetadataTest extends TestCase
         $this->assertEquals(['baz' => 'bar'], $metadata->getAttributes());
         $this->assertEquals('bar', $metadata->getAttribute('baz'));
         $this->assertEquals('z', $metadata->getAttribute('notExist', 'z'));
+        $this->assertEquals(['sop1' => ['sub' => 'bus']], $metadata->getSubresourceOperations());
+        $this->assertEquals('bus', $metadata->getSubresourceOperationAttribute('sop1', 'sub'));
+        $this->assertEquals('sub', $metadata->getSubresourceOperationAttribute('sop1', 'bus', 'sub', false));
+        $this->assertEquals('bar', $metadata->getSubresourceOperationAttribute('sop1', 'baz', 'sub', true));
 
         $newMetadata = $metadata->withShortName('name');
         $this->assertNotSame($metadata, $newMetadata);

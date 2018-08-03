@@ -105,7 +105,11 @@ class SerializeListenerTest extends TestCase
     {
         $expectedContext = ['request_uri' => '', 'resource_class' => 'Foo', 'collection_operation_name' => 'get'];
         $serializerProphecy = $this->prophesize(SerializerInterface::class);
-        $serializerProphecy->serialize(Argument::any(), 'xml', $expectedContext)->willReturn('bar')->shouldBeCalled();
+        $serializerProphecy->serialize(Argument::any(), 'xml', Argument::that(function ($context) use ($expectedContext) {
+            unset($context['resources']);
+
+            return $context === $expectedContext;
+        }))->willReturn('bar')->shouldBeCalled();
 
         $request = new Request([], [], ['_api_resource_class' => 'Foo', '_api_collection_operation_name' => 'get']);
         $request->setRequestFormat('xml');
@@ -126,7 +130,11 @@ class SerializeListenerTest extends TestCase
     {
         $expectedContext = ['request_uri' => '', 'resource_class' => 'Foo', 'item_operation_name' => 'get'];
         $serializerProphecy = $this->prophesize(SerializerInterface::class);
-        $serializerProphecy->serialize(Argument::any(), 'xml', $expectedContext)->willReturn('bar')->shouldBeCalled();
+        $serializerProphecy->serialize(Argument::any(), 'xml', Argument::that(function ($context) use ($expectedContext) {
+            unset($context['resources']);
+
+            return $context === $expectedContext;
+        }))->willReturn('bar')->shouldBeCalled();
 
         $request = new Request([], [], ['_api_resource_class' => 'Foo', '_api_item_operation_name' => 'get']);
         $request->setRequestFormat('xml');

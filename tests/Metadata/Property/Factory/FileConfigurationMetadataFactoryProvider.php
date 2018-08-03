@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\Metadata\Property\Factory;
 
 use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
+use ApiPlatform\Core\Metadata\Property\SubresourceMetadata;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -37,6 +38,7 @@ abstract class FileConfigurationMetadataFactoryProvider extends TestCase
                 'bar' => [['Bar'], 'baz' => 'Baz'],
                 'baz' => 'Baz',
             ],
+            'subresource' => new SubresourceMetadata('Foo', true),
         ];
 
         return [[$this->getPropertyMetadata($metadata)]];
@@ -53,6 +55,7 @@ abstract class FileConfigurationMetadataFactoryProvider extends TestCase
             'required' => true,
             'identifier' => false,
             'attributes' => ['Foo'],
+            'subresource' => new SubresourceMetadata('Foo', true),
         ];
 
         return [[$this->getPropertyMetadata($metadata)]];

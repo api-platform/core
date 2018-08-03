@@ -84,7 +84,7 @@ class SearchFilterTest extends KernelTestCase
 
         $this->iriConverter = $iriConverterProphecy->reveal();
 
-        $this->propertyAccessor = self::$kernel->getContainer()->get('property_accessor');
+        $this->propertyAccessor = self::$kernel->getContainer()->get('test.property_accessor');
         $this->repository = $manager->getRepository(Dummy::class);
         $this->resourceClass = Dummy::class;
     }
@@ -523,7 +523,7 @@ class SearchFilterTest extends KernelTestCase
                     'relatedDummies' => [['foo']],
                 ],
                 [
-                    'dql' => sprintf('SELECT o FROM %s o INNER JOIN o.relatedDummy relatedDummy_a1 WHERE o.name = :name_p1 AND relatedDummy_a1.id = :relatedDummy_p2', Dummy::class),
+                    'dql' => sprintf('SELECT o FROM %s o WHERE o.name = :name_p1 AND o.relatedDummy = :relatedDummy_p2', Dummy::class),
                     'parameters' => [
                         'relatedDummy_p2' => 'foo',
                     ],
@@ -659,7 +659,7 @@ class SearchFilterTest extends KernelTestCase
                     'relatedDummy' => 'exact',
                 ],
                 [
-                    'dql' => sprintf('SELECT o FROM %s o INNER JOIN o.relatedDummy relatedDummy_a1 WHERE relatedDummy_a1.id = :relatedDummy_p1', Dummy::class),
+                    'dql' => sprintf('SELECT o FROM %s o WHERE o.relatedDummy = :relatedDummy_p1', Dummy::class),
                     'parameters' => [
                         'relatedDummy_p1' => 'exact',
                     ],
@@ -693,7 +693,7 @@ class SearchFilterTest extends KernelTestCase
                     'relatedDummies' => '1',
                 ],
                 [
-                    'dql' => sprintf('SELECT o FROM %s o INNER JOIN o.relatedDummy relatedDummy_a1 INNER JOIN o.relatedDummies relatedDummies_a2 WHERE relatedDummy_a1.id IN (:relatedDummy_p1) AND relatedDummies_a2.id = :relatedDummies_p2', Dummy::class),
+                    'dql' => sprintf('SELECT o FROM %s o INNER JOIN o.relatedDummies relatedDummies_a1 WHERE o.relatedDummy IN (:relatedDummy_p1) AND relatedDummies_a1.id = :relatedDummies_p2', Dummy::class),
                     'parameters' => [
                         'relatedDummy_p1' => [1, 2],
                         'relatedDummies_p2' => 1,
@@ -746,7 +746,7 @@ class SearchFilterTest extends KernelTestCase
 
     public function testTripleJoin()
     {
-        $request = Request::create('/api/dummies', 'GET', ['relatedDummy.symfony' => 'foo', 'relatedDummy.thirdLevel.level' => 'bar']);
+        $request = Request::create('/api/dummies', 'GET', ['relatedDummy.symfony' => 'foo', 'relatedDummy.thirdLevel.level' => '2']);
         $requestStack = new RequestStack();
         $requestStack->push($request);
         $queryBuilder = $this->repository->createQueryBuilder('o');
@@ -770,7 +770,7 @@ class SearchFilterTest extends KernelTestCase
 
     public function testJoinLeft()
     {
-        $request = Request::create('/api/dummies', 'GET', ['relatedDummy.symfony' => 'foo', 'relatedDummy.thirdLevel.level' => 'bar']);
+        $request = Request::create('/api/dummies', 'GET', ['relatedDummy.symfony' => 'foo', 'relatedDummy.thirdLevel.level' => '3']);
         $requestStack = new RequestStack();
         $requestStack->push($request);
         $queryBuilder = $this->repository->createQueryBuilder('o');

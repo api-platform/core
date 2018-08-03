@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Tests\Bridge\Symfony\Routing;
 
+use ApiPlatform\Core\Api\OperationType;
 use ApiPlatform\Core\Bridge\Symfony\Routing\CachedRouteNameResolver;
 use ApiPlatform\Core\Bridge\Symfony\Routing\RouteNameResolverInterface;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
@@ -51,12 +52,12 @@ class CachedRouteNameResolverTest extends TestCase
         $cacheItemPoolProphecy->save($cacheItemProphecy)->shouldNotBeCalled();
 
         $decoratedProphecy = $this->prophesize(RouteNameResolverInterface::class);
-        $decoratedProphecy->getRouteName('AppBundle\Entity\User', false)
+        $decoratedProphecy->getRouteName('AppBundle\Entity\User', OperationType::ITEM, [])
             ->willThrow(new InvalidArgumentException('No item route associated with the type "AppBundle\Entity\User".'))
             ->shouldBeCalled();
 
         $cachedRouteNameResolver = new CachedRouteNameResolver($cacheItemPoolProphecy->reveal(), $decoratedProphecy->reveal());
-        $cachedRouteNameResolver->getRouteName('AppBundle\Entity\User', false);
+        $cachedRouteNameResolver->getRouteName('AppBundle\Entity\User', OperationType::ITEM);
     }
 
     public function testGetRouteNameForItemRouteOnCacheMiss()
@@ -70,7 +71,7 @@ class CachedRouteNameResolverTest extends TestCase
         $cacheItemPoolProphecy->save($cacheItemProphecy)->willReturn(true)->shouldBeCalled();
 
         $decoratedProphecy = $this->prophesize(RouteNameResolverInterface::class);
-        $decoratedProphecy->getRouteName('AppBundle\Entity\User', false)->willReturn('some_item_route')->shouldBeCalled();
+        $decoratedProphecy->getRouteName('AppBundle\Entity\User', false, [])->willReturn('some_item_route')->shouldBeCalled();
 
         $cachedRouteNameResolver = new CachedRouteNameResolver($cacheItemPoolProphecy->reveal(), $decoratedProphecy->reveal());
         $actual = $cachedRouteNameResolver->getRouteName('AppBundle\Entity\User', false);
@@ -92,7 +93,7 @@ class CachedRouteNameResolverTest extends TestCase
         $decoratedProphecy->getRouteName(Argument::cetera())->shouldNotBeCalled();
 
         $cachedRouteNameResolver = new CachedRouteNameResolver($cacheItemPoolProphecy->reveal(), $decoratedProphecy->reveal());
-        $actual = $cachedRouteNameResolver->getRouteName('AppBundle\Entity\User', false);
+        $actual = $cachedRouteNameResolver->getRouteName('AppBundle\Entity\User', OperationType::ITEM);
 
         $this->assertSame('some_item_route', $actual);
     }
@@ -111,12 +112,12 @@ class CachedRouteNameResolverTest extends TestCase
         $cacheItemPoolProphecy->save($cacheItemProphecy)->shouldNotBeCalled();
 
         $decoratedProphecy = $this->prophesize(RouteNameResolverInterface::class);
-        $decoratedProphecy->getRouteName('AppBundle\Entity\User', true)
+        $decoratedProphecy->getRouteName('AppBundle\Entity\User', OperationType::COLLECTION, [])
             ->willThrow(new InvalidArgumentException('No collection route associated with the type "AppBundle\Entity\User".'))
             ->shouldBeCalled();
 
         $cachedRouteNameResolver = new CachedRouteNameResolver($cacheItemPoolProphecy->reveal(), $decoratedProphecy->reveal());
-        $cachedRouteNameResolver->getRouteName('AppBundle\Entity\User', true);
+        $cachedRouteNameResolver->getRouteName('AppBundle\Entity\User', OperationType::COLLECTION);
     }
 
     public function testGetRouteNameForCollectionRouteOnCacheMiss()
@@ -130,7 +131,7 @@ class CachedRouteNameResolverTest extends TestCase
         $cacheItemPoolProphecy->save($cacheItemProphecy)->willReturn(true)->shouldBeCalled();
 
         $decoratedProphecy = $this->prophesize(RouteNameResolverInterface::class);
-        $decoratedProphecy->getRouteName('AppBundle\Entity\User', true)->willReturn('some_collection_route')->shouldBeCalled();
+        $decoratedProphecy->getRouteName('AppBundle\Entity\User', true, [])->willReturn('some_collection_route')->shouldBeCalled();
 
         $cachedRouteNameResolver = new CachedRouteNameResolver($cacheItemPoolProphecy->reveal(), $decoratedProphecy->reveal());
         $actual = $cachedRouteNameResolver->getRouteName('AppBundle\Entity\User', true);
@@ -152,7 +153,7 @@ class CachedRouteNameResolverTest extends TestCase
         $decoratedProphecy->getRouteName(Argument::cetera())->shouldNotBeCalled();
 
         $cachedRouteNameResolver = new CachedRouteNameResolver($cacheItemPoolProphecy->reveal(), $decoratedProphecy->reveal());
-        $actual = $cachedRouteNameResolver->getRouteName('AppBundle\Entity\User', true);
+        $actual = $cachedRouteNameResolver->getRouteName('AppBundle\Entity\User', OperationType::COLLECTION);
 
         $this->assertSame('some_collection_route', $actual);
     }

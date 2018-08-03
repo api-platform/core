@@ -60,12 +60,10 @@ class NumericFilter extends AbstractFilter
             if (!$this->isPropertyMapped($property, $resourceClass) || !$this->isNumericField($property, $resourceClass)) {
                 continue;
             }
-            $propertyParts = $this->splitPropertyParts($property);
-            $metadata = $this->getNestedMetadata($resourceClass, $propertyParts['associations']);
 
             $description[$property] = [
                 'property' => $property,
-                'type' => $this->getType($metadata->getTypeOfField($propertyParts['field'])),
+                'type' => $this->getType($this->getDoctrineFieldType($property, $resourceClass)),
                 'required' => false,
             ];
         }
@@ -80,9 +78,9 @@ class NumericFilter extends AbstractFilter
      *
      * @return string
      */
-    private function getType(string $doctrineType): string
+    private function getType(string $doctrineType = null): string
     {
-        if (DBALType::DECIMAL === $doctrineType) {
+        if (null === $doctrineType || DBALType::DECIMAL === $doctrineType) {
             return 'string';
         }
 
@@ -99,16 +97,15 @@ class NumericFilter extends AbstractFilter
     protected function filterProperty(string $property, $value, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, string $operationName = null)
     {
         if (
-            !$this->isPropertyEnabled($property) ||
-            !$this->isPropertyMapped($property, $resourceClass) ||
-            !$this->isNumericField($property, $resourceClass)
+            !$this->isPropertyEnabled($property, $resourceClass) ||
+            !$this->isPropertyMapped($property, $resourceClass)
         ) {
             return;
         }
 
         if (!is_numeric($value)) {
             $this->logger->notice('Invalid filter ignored', [
-                'exception' => new InvalidArgumentException(sprintf('Invalid numeric value for "%s" property', $property)),
+                'exception' => new InvalidArgumentException(sprintf('Invalid numeric value for "%s::%s" property', $resourceClass, $property)),
             ]);
 
             return;
@@ -117,14 +114,23 @@ class NumericFilter extends AbstractFilter
         $alias = 'o';
         $field = $property;
 
-        if ($this->isPropertyNested($property)) {
-            list($alias, $field) = $this->addJoinsForNestedProperty($property, $alias, $queryBuilder, $queryNameGenerator);
+        if ($this->isPropertyNested($property, $resourceClass)) {
+            list($alias, $field) = $this->addJoinsForNestedProperty($property, $alias, $queryBuilder, $queryNameGenerator, $resourceClass);
         }
+
+        if (!isset(self::DOCTRINE_NUMERIC_TYPES[$this->getDoctrineFieldType($property, $resourceClass)])) {
+            $this->logger->notice('Invalid filter ignored', [
+                'exception' => new InvalidArgumentException(sprintf('The field "%s" of class "%s" is not a doctrine numeric type.', $field, $resourceClass)),
+            ]);
+
+            return;
+        }
+
         $valueParameter = $queryNameGenerator->generateParameterName($field);
 
         $queryBuilder
             ->andWhere(sprintf('%s.%s = :%s', $alias, $field, $valueParameter))
-            ->setParameter($valueParameter, $value);
+            ->setParameter($valueParameter, $value, $this->getDoctrineFieldType($property, $resourceClass));
     }
 
     /**
@@ -137,7 +143,7 @@ class NumericFilter extends AbstractFilter
      */
     protected function isNumericField(string $property, string $resourceClass): bool
     {
-        $propertyParts = $this->splitPropertyParts($property);
+        $propertyParts = $this->splitPropertyParts($property, $resourceClass);
         $metadata = $this->getNestedMetadata($resourceClass, $propertyParts['associations']);
 
         return isset(self::DOCTRINE_NUMERIC_TYPES[$metadata->getTypeOfField($propertyParts['field'])]);

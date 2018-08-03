@@ -21,6 +21,10 @@ use PHPUnit\Framework\TestCase;
  */
 class FilterCollectionTest extends TestCase
 {
+    /**
+     * @group legacy
+     * @expectedDeprecation The ApiPlatform\Core\Api\FilterCollection class is deprecated since version 2.1 and will be removed in 3.0. Provide an implementation of Psr\Container\ContainerInterface instead.
+     */
     public function testIsArrayObject()
     {
         $filterCollection = new FilterCollection();

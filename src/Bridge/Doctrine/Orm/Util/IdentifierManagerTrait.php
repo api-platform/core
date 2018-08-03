@@ -45,7 +45,7 @@ trait IdentifierManagerTrait
         $isOrm = interface_exists(EntityManagerInterface::class) && $manager instanceof EntityManagerInterface;
         $platform = $isOrm ? $manager->getConnection()->getDatabasePlatform() : null;
 
-        if (count($doctrineIdentifierFields) > 1) {
+        if (\count($doctrineIdentifierFields) > 1) {
             $identifiersMap = [];
 
             // first transform identifiers to a proper key/value array

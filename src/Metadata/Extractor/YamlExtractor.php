@@ -32,7 +32,7 @@ final class YamlExtractor extends AbstractExtractor
     protected function extractPath(string $path)
     {
         try {
-            $resourcesYaml = Yaml::parse(file_get_contents($path));
+            $resourcesYaml = Yaml::parse(file_get_contents($path), Yaml::PARSE_CONSTANT);
         } catch (ParseException $e) {
             $e->setParsedFile($path);
 
@@ -43,8 +43,8 @@ final class YamlExtractor extends AbstractExtractor
             return;
         }
 
-        if (!is_array($resourcesYaml)) {
-            throw new InvalidArgumentException(sprintf('"resources" setting is expected to be null or an array, %s given in "%s".', gettype($resourcesYaml), $path));
+        if (!\is_array($resourcesYaml)) {
+            throw new InvalidArgumentException(sprintf('"resources" setting is expected to be null or an array, %s given in "%s".', \gettype($resourcesYaml), $path));
         }
 
         $this->extractResources($resourcesYaml, $path);
@@ -57,8 +57,8 @@ final class YamlExtractor extends AbstractExtractor
                 $resourceYaml = [];
             }
 
-            if (!is_array($resourceYaml)) {
-                throw new InvalidArgumentException(sprintf('"%s" setting is expected to be null or an array, %s given in "%s".', $resourceName, gettype($resourceYaml), $path));
+            if (!\is_array($resourceYaml)) {
+                throw new InvalidArgumentException(sprintf('"%s" setting is expected to be null or an array, %s given in "%s".', $resourceName, \gettype($resourceYaml), $path));
             }
 
             $this->resources[$resourceName] = [
@@ -67,6 +67,7 @@ final class YamlExtractor extends AbstractExtractor
                 'iri' => $this->phpize($resourceYaml, 'iri', 'string'),
                 'itemOperations' => $resourceYaml['itemOperations'] ?? null,
                 'collectionOperations' => $resourceYaml['collectionOperations'] ?? null,
+                'subresourceOperations' => $resourceYaml['subresourceOperations'] ?? null,
                 'attributes' => $resourceYaml['attributes'] ?? null,
             ];
 
@@ -76,8 +77,8 @@ final class YamlExtractor extends AbstractExtractor
                 continue;
             }
 
-            if (!is_array($resourceYaml['properties'])) {
-                throw new InvalidArgumentException(sprintf('"properties" setting is expected to be null or an array, %s given in "%s".', gettype($resourceYaml['properties']), $path));
+            if (!\is_array($resourceYaml['properties'])) {
+                throw new InvalidArgumentException(sprintf('"properties" setting is expected to be null or an array, %s given in "%s".', \gettype($resourceYaml['properties']), $path));
             }
 
             $this->extractProperties($resourceYaml, $resourceName, $path);
@@ -93,8 +94,8 @@ final class YamlExtractor extends AbstractExtractor
                 continue;
             }
 
-            if (!is_array($propertyValues)) {
-                throw new InvalidArgumentException(sprintf('"%s" setting is expected to be null or an array, %s given in "%s".', $propertyName, gettype($propertyValues), $path));
+            if (!\is_array($propertyValues)) {
+                throw new InvalidArgumentException(sprintf('"%s" setting is expected to be null or an array, %s given in "%s".', $propertyName, \gettype($propertyValues), $path));
             }
 
             $this->resources[$resourceName]['properties'][$propertyName] = [
@@ -107,6 +108,7 @@ final class YamlExtractor extends AbstractExtractor
                 'identifier' => $this->phpize($propertyValues, 'identifier', 'bool'),
                 'iri' => $this->phpize($propertyValues, 'iri', 'string'),
                 'attributes' => $propertyValues['attributes'] ?? null,
+                'subresource' => $propertyValues['subresource'] ?? null,
             ];
         }
     }
@@ -130,17 +132,17 @@ final class YamlExtractor extends AbstractExtractor
 
         switch ($type) {
             case 'bool':
-                if (is_bool($array[$key])) {
+                if (\is_bool($array[$key])) {
                     return $array[$key];
                 }
                 break;
             case 'string':
-                if (is_string($array[$key])) {
+                if (\is_string($array[$key])) {
                     return $array[$key];
                 }
                 break;
         }
 
-        throw new InvalidArgumentException(sprintf('The property "%s" must be a "%s", "%s" given.', $key, $type, gettype($array[$key])));
+        throw new InvalidArgumentException(sprintf('The property "%s" must be a "%s", "%s" given.', $key, $type, \gettype($array[$key])));
     }
 }

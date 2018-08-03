@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<resources xmlns="https://api-platform.com/schema/metadata"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="https://api-platform.com/schema/metadata
+           https://api-platform.com/schema/metadata/metadata-2.0.xsd">
+        <resource class="ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\FileConfigDummy">
+            <itemOperation name="my_op_name">
+                <attribute name="method">POST</attribute>
+            </itemOperation>
+            <itemOperation name="my_other_op_name">
+                <attribute name="method">GET</attribute>
+            </itemOperation>
+            <collectionOperation name="my_op_name">
+                <attribute name="method">POST</attribute>
+            </collectionOperation>
+        </resource>
+</resources>

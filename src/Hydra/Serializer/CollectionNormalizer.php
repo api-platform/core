@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Hydra\Serializer;
 
 use ApiPlatform\Core\Api\IriConverterInterface;
+use ApiPlatform\Core\Api\OperationType;
 use ApiPlatform\Core\Api\ResourceClassResolverInterface;
 use ApiPlatform\Core\DataProvider\PaginatorInterface;
 use ApiPlatform\Core\JsonLd\ContextBuilderInterface;
@@ -53,7 +54,7 @@ final class CollectionNormalizer implements NormalizerInterface, NormalizerAware
      */
     public function supportsNormalization($data, $format = null)
     {
-        return self::FORMAT === $format && (is_array($data) || ($data instanceof \Traversable));
+        return self::FORMAT === $format && (\is_array($data) || ($data instanceof \Traversable));
     }
 
     /**
@@ -74,7 +75,12 @@ final class CollectionNormalizer implements NormalizerInterface, NormalizerAware
         $data = $this->addJsonLdContext($this->contextBuilder, $resourceClass, $context);
         $context = $this->initContext($resourceClass, $context);
 
-        $data['@id'] = $this->iriConverter->getIriFromResourceClass($resourceClass);
+        if (isset($context['operation_type']) && OperationType::SUBRESOURCE === $context['operation_type']) {
+            $data['@id'] = $this->iriConverter->getSubresourceIriFromResourceClass($resourceClass, $context);
+        } else {
+            $data['@id'] = $this->iriConverter->getIriFromResourceClass($resourceClass);
+        }
+
         $data['@type'] = 'hydra:Collection';
 
         $data['hydra:member'] = [];
@@ -82,8 +88,8 @@ final class CollectionNormalizer implements NormalizerInterface, NormalizerAware
             $data['hydra:member'][] = $this->normalizer->normalize($obj, $format, $context);
         }
 
-        if (is_array($object) || $object instanceof \Countable) {
-            $data['hydra:totalItems'] = $object instanceof PaginatorInterface ? $object->getTotalItems() : count($object);
+        if (\is_array($object) || $object instanceof \Countable) {
+            $data['hydra:totalItems'] = $object instanceof PaginatorInterface ? $object->getTotalItems() : \count($object);
         }
 
         return $data;

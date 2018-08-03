@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\Compiler;
 
+use ApiPlatform\Core\Api\OperationType;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
@@ -31,8 +32,9 @@ final class DataProviderPass implements CompilerPassInterface
      */
     public function process(ContainerBuilder $container)
     {
-        $this->registerDataProviders($container, 'collection');
-        $this->registerDataProviders($container, 'item');
+        foreach (OperationType::TYPES as $type) {
+            $this->registerDataProviders($container, $type);
+        }
     }
 
     /**
@@ -45,7 +47,7 @@ final class DataProviderPass implements CompilerPassInterface
      */
     private function registerDataProviders(ContainerBuilder $container, string $type)
     {
-        $services = $container->findTaggedServiceIds('api_platform.'.$type.'_data_provider');
+        $services = $container->findTaggedServiceIds("api_platform.{$type}_data_provider", true);
 
         $queue = new \SplPriorityQueue();
 
@@ -56,6 +58,6 @@ final class DataProviderPass implements CompilerPassInterface
             }
         }
 
-        $container->getDefinition('api_platform.'.$type.'_data_provider')->addArgument(iterator_to_array($queue, false));
+        $container->getDefinition("api_platform.{$type}_data_provider")->addArgument(iterator_to_array($queue, false));
     }
 }

@@ -123,9 +123,183 @@ Feature: Create-Retrieve-Update-Delete
       "hydra:totalItems": 1,
       "hydra:search": {
         "@type": "hydra:IriTemplate",
-        "hydra:template": "/dummies{?id,id[],name,alias,description,relatedDummy.name,relatedDummy.name[],relatedDummies,relatedDummies[],dummy,relatedDummies.name,order[id],order[name],order[relatedDummy.symfony],dummyDate[before],dummyDate[after],relatedDummy.dummyDate[before],relatedDummy.dummyDate[after],dummyFloat[between],dummyFloat[gt],dummyFloat[gte],dummyFloat[lt],dummyFloat[lte],dummyPrice[between],dummyPrice[gt],dummyPrice[gte],dummyPrice[lt],dummyPrice[lte],dummyBoolean,dummyFloat,dummyPrice}",
+        "hydra:template": "/dummies{?dummyBoolean,relatedDummy.embeddedDummy.dummyBoolean,dummyDate[before],dummyDate[strictly_before],dummyDate[after],dummyDate[strictly_after],relatedDummy.dummyDate[before],relatedDummy.dummyDate[strictly_before],relatedDummy.dummyDate[after],relatedDummy.dummyDate[strictly_after],description[exists],relatedDummy.name[exists],dummyBoolean[exists],dummyFloat,dummyPrice,order[id],order[name],order[relatedDummy.name],order[relatedDummy.symfony],dummyFloat[between],dummyFloat[gt],dummyFloat[gte],dummyFloat[lt],dummyFloat[lte],dummyPrice[between],dummyPrice[gt],dummyPrice[gte],dummyPrice[lt],dummyPrice[lte],id,id[],name,alias,description,relatedDummy.name,relatedDummy.name[],relatedDummies,relatedDummies[],dummy,relatedDummies.name}",
         "hydra:variableRepresentation": "BasicRepresentation",
         "hydra:mapping": [
+          {
+            "@type": "IriTemplateMapping",
+            "variable": "dummyBoolean",
+            "property": "dummyBoolean",
+            "required": false
+          },
+          {
+            "@type": "IriTemplateMapping",
+            "variable": "relatedDummy.embeddedDummy.dummyBoolean",
+            "property": "relatedDummy.embeddedDummy.dummyBoolean",
+            "required": false
+          },
+          {
+            "@type": "IriTemplateMapping",
+            "variable": "dummyDate[before]",
+            "property": "dummyDate",
+            "required": false
+          },
+          {
+            "@type": "IriTemplateMapping",
+            "variable": "dummyDate[strictly_before]",
+            "property": "dummyDate",
+            "required": false
+          },
+          {
+            "@type": "IriTemplateMapping",
+            "variable": "dummyDate[after]",
+            "property": "dummyDate",
+            "required": false
+          },
+          {
+            "@type": "IriTemplateMapping",
+            "variable": "dummyDate[strictly_after]",
+            "property": "dummyDate",
+            "required": false
+          },
+          {
+            "@type": "IriTemplateMapping",
+            "variable": "relatedDummy.dummyDate[before]",
+            "property": "relatedDummy.dummyDate",
+            "required": false
+          },
+          {
+            "@type": "IriTemplateMapping",
+            "variable": "relatedDummy.dummyDate[strictly_before]",
+            "property": "relatedDummy.dummyDate",
+            "required": false
+          },
+          {
+            "@type": "IriTemplateMapping",
+            "variable": "relatedDummy.dummyDate[after]",
+            "property": "relatedDummy.dummyDate",
+            "required": false
+          },
+          {
+            "@type": "IriTemplateMapping",
+            "variable": "relatedDummy.dummyDate[strictly_after]",
+            "property": "relatedDummy.dummyDate",
+            "required": false
+          },
+          {
+            "@type": "IriTemplateMapping",
+            "variable": "description[exists]",
+            "property": "description",
+            "required": false
+          },
+          {
+            "@type": "IriTemplateMapping",
+            "variable": "relatedDummy.name[exists]",
+            "property": "relatedDummy.name",
+            "required": false
+          },
+          {
+            "@type": "IriTemplateMapping",
+            "variable": "dummyBoolean[exists]",
+            "property": "dummyBoolean",
+            "required": false
+          },
+          {
+            "@type": "IriTemplateMapping",
+            "variable": "dummyFloat",
+            "property": "dummyFloat",
+            "required": false
+          },
+          {
+            "@type": "IriTemplateMapping",
+            "variable": "dummyPrice",
+            "property": "dummyPrice",
+            "required": false
+          },
+          {
+            "@type": "IriTemplateMapping",
+            "variable": "order[id]",
+            "property": "id",
+            "required": false
+          },
+          {
+            "@type": "IriTemplateMapping",
+            "variable": "order[name]",
+            "property": "name",
+            "required": false
+          },
+          {
+            "@type": "IriTemplateMapping",
+            "variable": "order[relatedDummy.name]",
+            "property": "relatedDummy.name",
+            "required": false
+          },
+          {
+            "@type": "IriTemplateMapping",
+            "variable": "order[relatedDummy.symfony]",
+            "property": "relatedDummy.symfony",
+            "required": false
+          },
+          {
+            "@type": "IriTemplateMapping",
+            "variable": "dummyFloat[between]",
+            "property": "dummyFloat",
+            "required": false
+          },
+          {
+            "@type": "IriTemplateMapping",
+            "variable": "dummyFloat[gt]",
+            "property": "dummyFloat",
+            "required": false
+          },
+          {
+            "@type": "IriTemplateMapping",
+            "variable": "dummyFloat[gte]",
+            "property": "dummyFloat",
+            "required": false
+          },
+          {
+            "@type": "IriTemplateMapping",
+            "variable": "dummyFloat[lt]",
+            "property": "dummyFloat",
+            "required": false
+          },
+          {
+            "@type": "IriTemplateMapping",
+            "variable": "dummyFloat[lte]",
+            "property": "dummyFloat",
+            "required": false
+          },
+          {
+            "@type": "IriTemplateMapping",
+            "variable": "dummyPrice[between]",
+            "property": "dummyPrice",
+            "required": false
+          },
+          {
+            "@type": "IriTemplateMapping",
+            "variable": "dummyPrice[gt]",
+            "property": "dummyPrice",
+            "required": false
+          },
+          {
+            "@type": "IriTemplateMapping",
+            "variable": "dummyPrice[gte]",
+            "property": "dummyPrice",
+            "required": false
+          },
+          {
+            "@type": "IriTemplateMapping",
+            "variable": "dummyPrice[lt]",
+            "property": "dummyPrice",
+            "required": false
+          },
+          {
+            "@type": "IriTemplateMapping",
+            "variable": "dummyPrice[lte]",
+            "property": "dummyPrice",
+            "required": false
+          },
           {
             "@type": "IriTemplateMapping",
             "variable": "id",
@@ -191,126 +365,6 @@ Feature: Create-Retrieve-Update-Delete
             "variable": "relatedDummies.name",
             "property": "relatedDummies.name",
             "required": false
-          },
-          {
-            "@type": "IriTemplateMapping",
-            "variable": "order[id]",
-            "property": "id",
-            "required": false
-          },
-          {
-            "@type": "IriTemplateMapping",
-            "variable": "order[name]",
-            "property": "name",
-            "required": false
-          },
-          {
-            "@type": "IriTemplateMapping",
-            "variable": "order[relatedDummy.symfony]",
-            "property": "relatedDummy.symfony",
-            "required": false
-          },
-          {
-            "@type": "IriTemplateMapping",
-            "variable": "dummyDate[before]",
-            "property": "dummyDate",
-            "required": false
-          },
-          {
-            "@type": "IriTemplateMapping",
-            "variable": "dummyDate[after]",
-            "property": "dummyDate",
-            "required": false
-          },
-          {
-            "@type": "IriTemplateMapping",
-            "variable": "relatedDummy.dummyDate[before]",
-            "property": "relatedDummy.dummyDate",
-            "required": false
-          },
-          {
-            "@type": "IriTemplateMapping",
-            "variable": "relatedDummy.dummyDate[after]",
-            "property": "relatedDummy.dummyDate",
-            "required": false
-          },
-          {
-            "@type": "IriTemplateMapping",
-            "variable": "dummyFloat[between]",
-            "property": "dummyFloat",
-            "required": false
-          },
-          {
-            "@type": "IriTemplateMapping",
-            "variable": "dummyFloat[gt]",
-            "property": "dummyFloat",
-            "required": false
-          },
-          {
-            "@type": "IriTemplateMapping",
-            "variable": "dummyFloat[gte]",
-            "property": "dummyFloat",
-            "required": false
-          },
-          {
-            "@type": "IriTemplateMapping",
-            "variable": "dummyFloat[lt]",
-            "property": "dummyFloat",
-            "required": false
-          },
-          {
-            "@type": "IriTemplateMapping",
-            "variable": "dummyFloat[lte]",
-            "property": "dummyFloat",
-            "required": false
-          },
-          {
-            "@type": "IriTemplateMapping",
-            "variable": "dummyPrice[between]",
-            "property": "dummyPrice",
-            "required": false
-          },
-          {
-            "@type": "IriTemplateMapping",
-            "variable": "dummyPrice[gt]",
-            "property": "dummyPrice",
-            "required": false
-          },
-          {
-            "@type": "IriTemplateMapping",
-            "variable": "dummyPrice[gte]",
-            "property": "dummyPrice",
-            "required": false
-          },
-          {
-            "@type": "IriTemplateMapping",
-            "variable": "dummyPrice[lt]",
-            "property": "dummyPrice",
-            "required": false
-          },
-          {
-            "@type": "IriTemplateMapping",
-            "variable": "dummyPrice[lte]",
-            "property": "dummyPrice",
-            "required": false
-          },
-          {
-            "@type": "IriTemplateMapping",
-            "variable": "dummyBoolean",
-            "property": "dummyBoolean",
-            "required": false
-          },
-          {
-            "@type": "IriTemplateMapping",
-            "variable": "dummyFloat",
-            "property": "dummyFloat",
-            "required": false
-          },
-          {
-            "@type": "IriTemplateMapping",
-            "variable": "dummyPrice",
-            "property": "dummyPrice",
-            "required": false
           }
         ]
       }
@@ -333,6 +387,41 @@ Feature: Create-Retrieve-Update-Delete
       ]
     }
     """
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+    And the JSON should be equal to:
+    """
+    {
+      "@context": "/contexts/Dummy",
+      "@id": "/dummies/1",
+      "@type": "Dummy",
+      "description": null,
+      "dummy": null,
+      "dummyBoolean": null,
+      "dummyDate": "2015-03-01T10:00:00+00:00",
+      "dummyFloat": null,
+      "dummyPrice": null,
+      "relatedDummy": null,
+      "relatedDummies": [],
+      "jsonData": [
+        {
+          "key": "value1"
+        },
+        {
+          "key": "value2"
+        }
+      ],
+      "name_converted": null,
+      "id": 1,
+      "name": "A nice dummy",
+      "alias": null
+    }
+    """
+
+  Scenario: Update a resource with empty body
+    When I add "Content-Type" header equal to "application/ld+json"
+    And I send a "PUT" request to "/dummies/1"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"

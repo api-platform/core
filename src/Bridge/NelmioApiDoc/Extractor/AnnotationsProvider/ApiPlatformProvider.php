@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Bridge\NelmioApiDoc\Extractor\AnnotationsProvider;
 
 use ApiPlatform\Core\Api\FilterCollection;
+use ApiPlatform\Core\Api\FilterLocatorTrait;
 use ApiPlatform\Core\Bridge\NelmioApiDoc\Parser\ApiPlatformParser;
 use ApiPlatform\Core\Bridge\Symfony\Routing\OperationMethodResolverInterface;
 use ApiPlatform\Core\Documentation\Documentation;
@@ -22,6 +23,7 @@ use ApiPlatform\Core\Metadata\Resource\Factory\ResourceNameCollectionFactoryInte
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Nelmio\ApiDocBundle\Extractor\AnnotationsProviderInterface;
+use Psr\Container\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
@@ -33,18 +35,23 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
  */
 final class ApiPlatformProvider implements AnnotationsProviderInterface
 {
+    use FilterLocatorTrait;
+
     private $resourceNameCollectionFactory;
     private $documentationNormalizer;
     private $resourceMetadataFactory;
-    private $filters;
     private $operationMethodResolver;
 
-    public function __construct(ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, NormalizerInterface $documentationNormalizer, ResourceMetadataFactoryInterface $resourceMetadataFactory, FilterCollection $filters, OperationMethodResolverInterface $operationMethodResolver)
+    /**
+     * @param ContainerInterface|FilterCollection $filterLocator The new filter locator or the deprecated filter collection
+     */
+    public function __construct(ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, NormalizerInterface $documentationNormalizer, ResourceMetadataFactoryInterface $resourceMetadataFactory, $filterLocator, OperationMethodResolverInterface $operationMethodResolver)
     {
+        $this->setFilterLocator($filterLocator);
+
         $this->resourceNameCollectionFactory = $resourceNameCollectionFactory;
         $this->documentationNormalizer = $documentationNormalizer;
         $this->resourceMetadataFactory = $resourceMetadataFactory;
-        $this->filters = $filters;
         $this->operationMethodResolver = $operationMethodResolver;
     }
 
@@ -133,8 +140,8 @@ final class ApiPlatformProvider implements AnnotationsProviderInterface
             $resourceFilters = $resourceMetadata->getCollectionOperationAttribute($operationName, 'filters', [], true);
 
             $data['filters'] = [];
-            foreach ($this->filters as $filterName => $filter) {
-                if (in_array($filterName, $resourceFilters, true)) {
+            foreach ($resourceFilters as $filterId) {
+                if ($filter = $this->getFilter($filterId)) {
                     foreach ($filter->getDescription($resourceClass) as $name => $definition) {
                         $data['filters'][] = ['name' => $name] + $definition;
                     }
@@ -158,7 +165,7 @@ final class ApiPlatformProvider implements AnnotationsProviderInterface
      */
     private function getResourceHydraDoc(array $hydraApiDoc, string $prefixedShortName)
     {
-        if (!isset($hydraApiDoc['hydra:supportedClass']) || !is_array($hydraApiDoc['hydra:supportedClass'])) {
+        if (!isset($hydraApiDoc['hydra:supportedClass']) || !\is_array($hydraApiDoc['hydra:supportedClass'])) {
             return null;
         }
 
@@ -181,7 +188,7 @@ final class ApiPlatformProvider implements AnnotationsProviderInterface
      */
     private function getOperationHydraDoc(string $method, array $hydraDoc): array
     {
-        if (!isset($hydraDoc['hydra:supportedOperation']) || !is_array($hydraDoc['hydra:supportedOperation'])) {
+        if (!isset($hydraDoc['hydra:supportedOperation']) || !\is_array($hydraDoc['hydra:supportedOperation'])) {
             return [];
         }
 
@@ -205,7 +212,7 @@ final class ApiPlatformProvider implements AnnotationsProviderInterface
      */
     private function getCollectionOperationHydraDoc(string $shortName, string $method, array $hydraEntrypointDoc): array
     {
-        if (!isset($hydraEntrypointDoc['hydra:supportedProperty']) || !is_array($hydraEntrypointDoc['hydra:supportedProperty'])) {
+        if (!isset($hydraEntrypointDoc['hydra:supportedProperty']) || !\is_array($hydraEntrypointDoc['hydra:supportedProperty'])) {
             return [];
         }
 

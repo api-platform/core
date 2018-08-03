@@ -1,6 +1,6 @@
 Feature: Configurable resource CRUD
   As a client software developer
-  I need to be able to configure api resources through Yaml
+  I need to be able to configure api resources through YAML
 
   @createSchema
   Scenario: Retrieve the ConfigDummy resource

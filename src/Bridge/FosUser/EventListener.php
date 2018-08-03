@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Bridge\FosUser;
 
-use ApiPlatform\Core\Exception\RuntimeException;
 use ApiPlatform\Core\Util\RequestAttributesExtractor;
 use FOS\UserBundle\Model\UserInterface;
 use FOS\UserBundle\Model\UserManagerInterface;
@@ -43,9 +42,7 @@ final class EventListener
     public function onKernelView(GetResponseForControllerResultEvent $event)
     {
         $request = $event->getRequest();
-        try {
-            RequestAttributesExtractor::extractAttributes($request);
-        } catch (RuntimeException $e) {
+        if (!RequestAttributesExtractor::extractAttributes($request)) {
             return;
         }
 

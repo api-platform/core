@@ -11,14 +11,32 @@
 
 declare(strict_types=1);
 
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Answer;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\CompositeItem;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\CompositeLabel;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\CompositeRelation;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Container;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyAggregateOffer;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyCar;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyCarColor;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyDate;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyFriend;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyGroup;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyImmutableDate;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyOffer;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyProduct;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyProperty;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\EmbeddableDummy;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\EmbeddedDummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\FileConfigDummy;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Foo;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\FooDummy;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Node;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Person;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\PersonToPet;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Pet;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Question;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RelatedDummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RelatedToDummyFriend;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RelationEmbedder;
@@ -122,6 +140,106 @@ final class FeatureContext implements Context, SnippetAcceptingContext
     }
 
     /**
+     * @Given there are :nb foo objects with fake names
+     */
+    public function thereAreFooObjectsWithFakeNames(int $nb)
+    {
+        $names = ['Hawsepipe', 'Sthenelus', 'Ephesian', 'Separativeness', 'Balbo'];
+        $bars = ['Lorem', 'Dolor', 'Dolor', 'Sit', 'Amet'];
+
+        for ($i = 0; $i < $nb; ++$i) {
+            $foo = new Foo();
+            $foo->setName($names[$i]);
+            $foo->setBar($bars[$i]);
+
+            $this->manager->persist($foo);
+        }
+
+        $this->manager->flush();
+    }
+
+    /**
+     * @Given there are :nb fooDummy objects with fake names
+     */
+    public function thereAreFooDummyObjectsWithFakeNames($nb)
+    {
+        $names = ['Hawsepipe', 'Ephesian', 'Sthenelus', 'Separativeness', 'Balbo'];
+        $dummies = ['Lorem', 'Dolor', 'Dolor', 'Sit', 'Amet'];
+
+        for ($i = 0; $i < $nb; ++$i) {
+            $dummy = new Dummy();
+            $dummy->setName($dummies[$i]);
+
+            $foo = new FooDummy();
+            $foo->setName($names[$i]);
+            $foo->setDummy($dummy);
+
+            $this->manager->persist($foo);
+        }
+
+        $this->manager->flush();
+    }
+
+    /**
+     * @Given there are :nb dummy group objects
+     */
+    public function thereIsDummyGroupObjects(int $nb)
+    {
+        for ($i = 1; $i <= $nb; ++$i) {
+            $dummyGroup = new DummyGroup();
+
+            foreach (['foo', 'bar', 'baz', 'qux'] as $property) {
+                $dummyGroup->$property = ucfirst($property).' #'.$i;
+            }
+
+            $this->manager->persist($dummyGroup);
+        }
+
+        $this->manager->flush();
+    }
+
+    /**
+     * @Given there are :nb dummy property objects
+     */
+    public function thereIsDummyPropertyObjects(int $nb)
+    {
+        for ($i = 1; $i <= $nb; ++$i) {
+            $dummyProperty = new DummyProperty();
+            $dummyGroup = new DummyGroup();
+
+            foreach (['foo', 'bar', 'baz'] as $property) {
+                $dummyProperty->$property = $dummyGroup->$property = ucfirst($property).' #'.$i;
+            }
+
+            $dummyProperty->group = $dummyGroup;
+
+            $this->manager->persist($dummyGroup);
+            $this->manager->persist($dummyProperty);
+        }
+
+        $this->manager->flush();
+    }
+
+    /**
+     * @Given there are :nb embedded dummy objects
+     */
+    public function thereIsEmbeddedDummyObjects(int $nb)
+    {
+        for ($i = 1; $i <= $nb; ++$i) {
+            $dummy = new EmbeddedDummy();
+            $dummy->setName('Dummy #'.$i);
+
+            $embeddableDummy = new EmbeddableDummy();
+            $embeddableDummy->setDummyName('Dummy #'.$i);
+            $dummy->setEmbeddedDummy($embeddableDummy);
+
+            $this->manager->persist($dummy);
+        }
+
+        $this->manager->flush();
+    }
+
+    /**
      * @Given there are :nb dummy objects with relatedDummy
      */
     public function thereIsDummyObjectsWithRelatedDummy(int $nb)
@@ -136,6 +254,25 @@ final class FeatureContext implements Context, SnippetAcceptingContext
             $dummy->setRelatedDummy($relatedDummy);
 
             $this->manager->persist($relatedDummy);
+            $this->manager->persist($dummy);
+        }
+
+        $this->manager->flush();
+    }
+
+    /**
+     * @Given there are :nb dummy objects with embeddedDummy
+     */
+    public function thereIsDummyObjectsWithEmbeddedDummy(int $nb)
+    {
+        for ($i = 1; $i <= $nb; ++$i) {
+            $embeddableDummy = new EmbeddableDummy();
+            $embeddableDummy->setDummyName('EmbeddedDummy #'.$i);
+
+            $dummy = new EmbeddedDummy();
+            $dummy->setName('Dummy #'.$i);
+            $dummy->setEmbeddedDummy($embeddableDummy);
+
             $this->manager->persist($dummy);
         }
 
@@ -258,6 +395,32 @@ final class FeatureContext implements Context, SnippetAcceptingContext
     }
 
     /**
+     * @Given there are :nb embedded dummy objects with dummyDate and embeddedDummy
+     */
+    public function thereIsDummyObjectsWithDummyDateAndEmbeddedDummy($nb)
+    {
+        for ($i = 1; $i <= $nb; ++$i) {
+            $date = new \DateTime(sprintf('2015-04-%d', $i), new \DateTimeZone('UTC'));
+
+            $embeddableDummy = new EmbeddableDummy();
+            $embeddableDummy->setDummyName('Embeddable #'.$i);
+            $embeddableDummy->setDummyDate($date);
+
+            $dummy = new EmbeddedDummy();
+            $dummy->setName('Dummy #'.$i);
+            $dummy->setEmbeddedDummy($embeddableDummy);
+            // Last Dummy has a null date
+            if ($nb !== $i) {
+                $dummy->setDummyDate($date);
+            }
+
+            $this->manager->persist($dummy);
+        }
+
+        $this->manager->flush();
+    }
+
+    /**
      * @Given there are :nb dummy objects with dummyPrice
      */
     public function thereIsDummyObjectsWithDummyPrice(int $nb)
@@ -300,6 +463,66 @@ final class FeatureContext implements Context, SnippetAcceptingContext
             $dummy->setDescription($descriptions[($i - 1) % 2]);
             $dummy->setDummyBoolean($bool);
 
+            $this->manager->persist($dummy);
+        }
+
+        $this->manager->flush();
+    }
+
+    /**
+     * @Given there are :nb embedded dummy objects with embeddedDummy.dummyBoolean :bool
+     */
+    public function thereIsDummyObjectsWithEmbeddedDummyBoolean(int $nb, string $bool)
+    {
+        if (in_array($bool, ['true', '1', 1], true)) {
+            $bool = true;
+        } elseif (in_array($bool, ['false', '0', 0], true)) {
+            $bool = false;
+        } else {
+            $expected = ['true', 'false', '1', '0'];
+            throw new InvalidArgumentException(sprintf('Invalid boolean value for "%s" property, expected one of ( "%s" )', $bool, implode('" | "', $expected)));
+        }
+
+        for ($i = 1; $i <= $nb; ++$i) {
+            $dummy = new EmbeddedDummy();
+            $dummy->setName('Embedded Dummy #'.$i);
+            $embeddableDummy = new EmbeddableDummy();
+            $embeddableDummy->setDummyName('Embedded Dummy #'.$i);
+            $embeddableDummy->setDummyBoolean($bool);
+            $dummy->setEmbeddedDummy($embeddableDummy);
+            $this->manager->persist($dummy);
+        }
+
+        $this->manager->flush();
+    }
+
+    /**
+     * @Given there are :nb embedded dummy objects with relatedDummy.embeddedDummy.dummyBoolean :bool
+     */
+    public function thereIsDummyObjectsWithRelationEmbeddedDummyBoolean(int $nb, string $bool)
+    {
+        if (in_array($bool, ['true', '1', 1], true)) {
+            $bool = true;
+        } elseif (in_array($bool, ['false', '0', 0], true)) {
+            $bool = false;
+        } else {
+            $expected = ['true', 'false', '1', '0'];
+            throw new InvalidArgumentException(sprintf('Invalid boolean value for "%s" property, expected one of ( "%s" )', $bool, implode('" | "', $expected)));
+        }
+
+        for ($i = 1; $i <= $nb; ++$i) {
+            $dummy = new EmbeddedDummy();
+            $dummy->setName('Embedded Dummy #'.$i);
+            $embeddableDummy = new EmbeddableDummy();
+            $embeddableDummy->setDummyName('Embedded Dummy #'.$i);
+            $embeddableDummy->setDummyBoolean($bool);
+
+            $relationDummy = new RelatedDummy();
+            $relationDummy->setEmbeddedDummy($embeddableDummy);
+
+            $dummy->setRelatedDummy($relationDummy);
+
+            $this->manager->persist($relationDummy);
             $this->manager->persist($dummy);
         }
 
@@ -428,6 +651,43 @@ final class FeatureContext implements Context, SnippetAcceptingContext
         $relatedDummy2 = new RelatedDummy();
         $relatedDummy2->setName('RelatedDummy without friends');
         $this->manager->persist($relatedDummy2);
+        $this->manager->flush();
+    }
+
+    /**
+     * @Given there is an answer :answer to the question :question
+     */
+    public function thereIsAnAnswerToTheQuestion(string $a, string $q)
+    {
+        $answer = new Answer();
+        $answer->setContent($a);
+
+        $question = new Question();
+        $question->setContent($q);
+        $question->setAnswer($answer);
+        $answer->addRelatedQuestion($question);
+
+        $this->manager->persist($answer);
+        $this->manager->persist($question);
+
+        $this->manager->flush();
+    }
+
+    /**
+     * @Given there are :nb nodes in a container :uuid
+     */
+    public function thereAreNodesInAContainer(int $nb, string $uuid)
+    {
+        $container = new Container();
+        $container->setId($uuid);
+        $this->manager->persist($container);
+
+        for ($i = 0; $i < $nb; ++$i) {
+            $node = new Node();
+            $node->setContainer($container);
+            $node->setSerial($i);
+            $this->manager->persist($node);
+        }
 
         $this->manager->flush();
     }
@@ -442,5 +702,92 @@ final class FeatureContext implements Context, SnippetAcceptingContext
         if (!password_verify($password, $user->getPassword())) {
             throw new \Exception('User password mismatch');
         }
+    }
+
+    /**
+     * @Given I have a product with offers
+     */
+    public function createProductWithOffers()
+    {
+        $offer = new DummyOffer();
+        $offer->setValue(2);
+        $aggregate = new DummyAggregateOffer();
+        $aggregate->setValue(1);
+        $aggregate->addOffer($offer);
+
+        $product = new DummyProduct();
+        $product->setName('Dummy product');
+        $product->addOffer($aggregate);
+
+        $relatedProduct = new DummyProduct();
+        $relatedProduct->setName('Dummy related product');
+        $relatedProduct->setParent($product);
+
+        $product->addRelatedProduct($relatedProduct);
+
+        $this->manager->persist($relatedProduct);
+        $this->manager->persist($product);
+        $this->manager->flush();
+    }
+
+    /**
+     * @Given there are people having pets
+     */
+    public function createPeopleWithPets()
+    {
+        $personToPet = new PersonToPet();
+
+        $person = new Person();
+        $person->name = 'foo';
+
+        $pet = new Pet();
+        $pet->name = 'bar';
+
+        $personToPet->person = $person;
+        $personToPet->pet = $pet;
+
+        $this->manager->persist($person);
+        $this->manager->persist($pet);
+        // since doctrine 2.6 we need existing identifiers on relations
+        $this->manager->flush();
+        $this->manager->persist($personToPet);
+
+        $person->pets->add($personToPet);
+        $this->manager->persist($person);
+
+        $this->manager->flush();
+    }
+
+    /**
+     * @Given there are :nb dummydate objects with dummyDate
+     */
+    public function thereIsDummyDateObjectsWithDummyDate(int $nb)
+    {
+        for ($i = 1; $i <= $nb; ++$i) {
+            $date = new \DateTime(sprintf('2015-04-%d', $i), new \DateTimeZone('UTC'));
+
+            $dummy = new DummyDate();
+            $dummy->dummyDate = $date;
+
+            $this->manager->persist($dummy);
+        }
+
+        $this->manager->flush();
+    }
+
+    /**
+     * @Given there are :nb dummyimmutabledate objects with dummyDate
+     */
+    public function thereIsDummyImmutableDateObjectsWithDummyDate(int $nb)
+    {
+        for ($i = 1; $i <= $nb; ++$i) {
+            $date = new \DateTimeImmutable(sprintf('2015-04-%d', $i), new \DateTimeZone('UTC'));
+            $dummy = new DummyImmutableDate();
+            $dummy->dummyDate = $date;
+
+            $this->manager->persist($dummy);
+        }
+
+        $this->manager->flush();
     }
 }

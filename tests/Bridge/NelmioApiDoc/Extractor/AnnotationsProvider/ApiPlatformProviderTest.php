@@ -28,6 +28,7 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RelatedDummy;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Nelmio\ApiDocBundle\Extractor\AnnotationsProviderInterface;
 use PHPUnit\Framework\TestCase;
+use Psr\Container\ContainerInterface;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
@@ -42,7 +43,7 @@ class ApiPlatformProviderTest extends TestCase
             $this->prophesize(ResourceNameCollectionFactoryInterface::class)->reveal(),
             $this->prophesize(NormalizerInterface::class)->reveal(),
             $this->prophesize(ResourceMetadataFactoryInterface::class)->reveal(),
-            new FilterCollection(),
+            $this->prophesize(ContainerInterface::class)->reveal(),
             $this->prophesize(OperationMethodResolverInterface::class)->reveal()
         );
 
@@ -50,6 +51,60 @@ class ApiPlatformProviderTest extends TestCase
     }
 
     public function testGetAnnotations()
+    {
+        $dummySearchFilterProphecy = $this->prophesize(FilterInterface::class);
+        $dummySearchFilterProphecy->getDescription(Dummy::class)->willReturn([
+            'name' => [
+                'property' => 'name',
+                'type' => 'string',
+                'required' => 'false',
+                'strategy' => 'partial',
+            ],
+        ])->shouldBeCalled();
+
+        $filterLocatorProphecy = $this->prophesize(ContainerInterface::class);
+        $filterLocatorProphecy->has('my_dummy.search')->willReturn(true)->shouldBeCalled();
+        $filterLocatorProphecy->get('my_dummy.search')->willReturn($dummySearchFilterProphecy->reveal())->shouldBeCalled();
+
+        $this->extractAnnotations($filterLocatorProphecy->reveal());
+    }
+
+    /**
+     * @group legacy
+     * @expectedDeprecation The ApiPlatform\Core\Api\FilterCollection class is deprecated since version 2.1 and will be removed in 3.0. Provide an implementation of Psr\Container\ContainerInterface instead.
+     */
+    public function testGetAnnotationsWithDeprecatedFilterCollection()
+    {
+        $dummySearchFilterProphecy = $this->prophesize(FilterInterface::class);
+        $dummySearchFilterProphecy->getDescription(Dummy::class)->willReturn([
+            'name' => [
+                'property' => 'name',
+                'type' => 'string',
+                'required' => 'false',
+                'strategy' => 'partial',
+            ],
+        ])->shouldBeCalled();
+
+        $this->extractAnnotations(new FilterCollection(['my_dummy.search' => $dummySearchFilterProphecy->reveal()]));
+    }
+
+    /**
+     * @group legacy
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage The "$filterLocator" argument is expected to be an implementation of the "Psr\Container\ContainerInterface" interface.
+     */
+    public function testConstructWithInvalidFilterLocator()
+    {
+        new ApiPlatformProvider(
+            $this->prophesize(ResourceNameCollectionFactoryInterface::class)->reveal(),
+            $this->prophesize(NormalizerInterface::class)->reveal(),
+            $this->prophesize(ResourceMetadataFactoryInterface::class)->reveal(),
+            new \ArrayObject(),
+            $this->prophesize(OperationMethodResolverInterface::class)->reveal()
+        );
+    }
+
+    private function extractAnnotations($filterLocator)
     {
         $resourceNameCollection = new ResourceNameCollection([Dummy::class, RelatedDummy::class]);
 
@@ -91,20 +146,6 @@ class ApiPlatformProviderTest extends TestCase
         $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn($dummyResourceMetadata)->shouldBeCalled();
         $resourceMetadataFactoryProphecy->create(RelatedDummy::class)->willReturn($relatedDummyResourceMetadata)->shouldBeCalled();
 
-        $dummySearchFilterProphecy = $this->prophesize(FilterInterface::class);
-        $dummySearchFilterProphecy->getDescription(Dummy::class)->willReturn([
-            'name' => [
-                'property' => 'name',
-                'type' => 'string',
-                'required' => 'false',
-                'strategy' => 'partial',
-            ],
-        ])->shouldBeCalled();
-
-        $filters = new FilterCollection([
-            'my_dummy.search' => $dummySearchFilterProphecy->reveal(),
-        ]);
-
         $operationMethodResolverProphecy = $this->prophesize(OperationMethodResolverInterface::class);
         $operationMethodResolverProphecy->getCollectionOperationMethod(Dummy::class, 'get')->willReturn('GET')->shouldBeCalled();
         $operationMethodResolverProphecy->getCollectionOperationMethod(Dummy::class, 'post')->willReturn('POST')->shouldBeCalled();
@@ -120,7 +161,8 @@ class ApiPlatformProviderTest extends TestCase
         $apiPlatformProvider = new ApiPlatformProvider(
             $resourceNameCollectionFactoryProphecy->reveal(),
             $apiDocumentationBuilderProphecy->reveal(),
-            $resourceMetadataFactoryProphecy->reveal(), $filters,
+            $resourceMetadataFactoryProphecy->reveal(),
+            $filterLocator,
             $operationMethodResolverProphecy->reveal()
         );
 
@@ -281,7 +323,7 @@ JSON;
             $resourceNameCollectionFactoryProphecy->reveal(),
             $documentationNormalizerProphecy->reveal(),
             $this->prophesize(ResourceMetadataFactoryInterface::class)->reveal(),
-            new FilterCollection(),
+            $this->prophesize(ContainerInterface::class)->reveal(),
             $this->prophesize(OperationMethodResolverInterface::class)->reveal()
         );
 
@@ -302,7 +344,7 @@ JSON;
             $resourceNameCollectionFactoryProphecy->reveal(),
             $documentationNormalizerProphecy->reveal(),
             $this->prophesize(ResourceMetadataFactoryInterface::class)->reveal(),
-            new FilterCollection(),
+            $this->prophesize(ContainerInterface::class)->reveal(),
             $this->prophesize(OperationMethodResolverInterface::class)->reveal()
         );
 
@@ -323,7 +365,7 @@ JSON;
             $resourceNameCollectionFactoryProphecy->reveal(),
             $documentationNormalizerProphecy->reveal(),
             $this->prophesize(ResourceMetadataFactoryInterface::class)->reveal(),
-            new FilterCollection(),
+            $this->prophesize(ContainerInterface::class)->reveal(),
             $this->prophesize(OperationMethodResolverInterface::class)->reveal()
         );
 
@@ -364,7 +406,7 @@ JSON;
             $resourceNameCollectionFactoryProphecy->reveal(),
             $documentationNormalizerProphecy->reveal(),
             $resourceMetadataFactoryProphecy->reveal(),
-            new FilterCollection(),
+            $this->prophesize(ContainerInterface::class)->reveal(),
             $operationMethodResolverProphecy->reveal()
         );
 
@@ -408,7 +450,7 @@ JSON;
             $resourceNameCollectionFactoryProphecy->reveal(),
             $documentationNormalizerProphecy->reveal(),
             $resourceMetadataFactoryProphecy->reveal(),
-            new FilterCollection(),
+            $this->prophesize(ContainerInterface::class)->reveal(),
             $operationMethodResolverProphecy->reveal()
         );
 
@@ -452,7 +494,7 @@ JSON;
             $resourceNameCollectionFactoryProphecy->reveal(),
             $documentationNormalizerProphecy->reveal(),
             $resourceMetadataFactoryProphecy->reveal(),
-            new FilterCollection(),
+            $this->prophesize(ContainerInterface::class)->reveal(),
             $operationMethodResolverProphecy->reveal()
         );
 
@@ -496,7 +538,7 @@ JSON;
             $resourceNameCollectionFactoryProphecy->reveal(),
             $documentationNormalizerProphecy->reveal(),
             $resourceMetadataFactoryProphecy->reveal(),
-            new FilterCollection(),
+            $this->prophesize(ContainerInterface::class)->reveal(),
             $operationMethodResolverProphecy->reveal()
         );
 
