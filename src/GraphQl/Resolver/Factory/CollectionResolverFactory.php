@@ -106,18 +106,32 @@ final class CollectionResolverFactory implements ResolverFactoryInterface
                 }
                 $offset = 1 + (int) $after;
             }
+            if (isset($args['before'])) {
+                $before = base64_decode($args['before'], true);
+                if (false === $before) {
+                    throw Error::createLocatedError(sprintf('Cursor %s is invalid', $args['before']), $info->fieldNodes, $info->path);
+                }
+                $offset = (int) $before - $collection->count();
+                $offset = 0 > $offset ? 0 : $offset;
+            }
+            if (isset($args['last']) && !isset($args['before'])) {
+                $offset = $collection->getTotalItems() - $args['last'];
+                $offset = 0 > $offset ? 0 : $offset;
+            }
 
-            $data = ['totalCount' => 0.0, 'edges' => [], 'pageInfo' => ['endCursor' => null, 'hasNextPage' => false]];
+            $data = ['totalCount' => 0.0, 'edges' => [], 'pageInfo' => ['startCursor' => null, 'endCursor' => null, 'hasNextPage' => false]];
+
             if ($collection instanceof PaginatorInterface && ($totalItems = $collection->getTotalItems()) > 0) {
-                $data['pageInfo']['endCursor'] = base64_encode((string) ($totalItems - 1));
-                $data['pageInfo']['hasNextPage'] = $collection->getCurrentPage() !== $collection->getLastPage() && (float) $collection->count() === $collection->getItemsPerPage();
                 $data['totalCount'] = $totalItems;
+                $data['pageInfo']['startCursor'] = \base64_encode((string) ($offset));
+                $data['pageInfo']['endCursor'] = \base64_encode((string) ($collection->count() - 1 + $offset));
+                $data['pageInfo']['hasNextPage'] = $collection->getCurrentPage() !== $collection->getLastPage() && (float) $collection->count() === $collection->getItemsPerPage();
             }
 
             foreach ($collection as $index => $object) {
                 $data['edges'][$index] = [
                     'node' => $this->normalizer->normalize($object, ItemNormalizer::FORMAT, $dataProviderContext),
-                    'cursor' => base64_encode((string) ($index + $offset)),
+                    'cursor' => \base64_encode((string) ($index + $offset)),
                 ];
             }
 

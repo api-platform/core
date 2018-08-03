@@ -44,6 +44,7 @@ Feature: GraphQL collection support
           }
         }
         pageInfo {
+          startCursor
           endCursor
           hasNextPage
         }
@@ -55,6 +56,7 @@ Feature: GraphQL collection support
     And the header "Content-Type" should be equal to "application/json"
     And the JSON node "data.dummies.edges" should have 0 element
     And the JSON node "data.dummies.pageInfo.endCursor" should be null
+    And the JSON node "data.dummies.pageInfo.startCursor" should be null
     And the JSON node "data.dummies.pageInfo.hasNextPage" should be false
 
   @createSchema
@@ -179,6 +181,7 @@ Feature: GraphQL collection support
               }
               totalCount
               pageInfo {
+                startCursor
                 endCursor
                 hasNextPage
               }
@@ -188,6 +191,7 @@ Feature: GraphQL collection support
         }
         totalCount
         pageInfo {
+          startCursor
           endCursor
           hasNextPage
         }
@@ -197,12 +201,14 @@ Feature: GraphQL collection support
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/json"
-    And the JSON node "data.dummies.pageInfo.endCursor" should be equal to "Mw=="
+    And the JSON node "data.dummies.pageInfo.startCursor" should be equal to "MA=="
+    And the JSON node "data.dummies.pageInfo.endCursor" should be equal to "MQ=="
     And the JSON node "data.dummies.pageInfo.hasNextPage" should be true
     And the JSON node "data.dummies.totalCount" should be equal to 4
     And the JSON node "data.dummies.edges[1].node.name" should be equal to "Dummy #2"
     And the JSON node "data.dummies.edges[1].cursor" should be equal to "MQ=="
-    And the JSON node "data.dummies.edges[1].node.relatedDummies.pageInfo.endCursor" should be equal to "Mw=="
+    And the JSON node "data.dummies.edges[1].node.relatedDummies.pageInfo.startCursor" should be equal to "MA=="
+    And the JSON node "data.dummies.edges[1].node.relatedDummies.pageInfo.endCursor" should be equal to "MQ=="
     And the JSON node "data.dummies.edges[1].node.relatedDummies.pageInfo.hasNextPage" should be true
     And the JSON node "data.dummies.edges[1].node.relatedDummies.totalCount" should be equal to 4
     And the JSON node "data.dummies.edges[1].node.relatedDummies.edges[0].node.name" should be equal to "RelatedDummy12"
@@ -222,6 +228,7 @@ Feature: GraphQL collection support
                 cursor
               }
               pageInfo {
+                startCursor
                 endCursor
                 hasNextPage
               }
@@ -230,6 +237,7 @@ Feature: GraphQL collection support
           cursor
         }
         pageInfo {
+          startCursor
           endCursor
           hasNextPage
         }
@@ -258,6 +266,7 @@ Feature: GraphQL collection support
                 cursor
               }
               pageInfo {
+                startCursor
                 endCursor
                 hasNextPage
               }
@@ -266,6 +275,7 @@ Feature: GraphQL collection support
           cursor
         }
         pageInfo {
+          startCursor
           endCursor
           hasNextPage
         }
@@ -277,9 +287,13 @@ Feature: GraphQL collection support
     And the header "Content-Type" should be equal to "application/json"
     And the JSON node "data.dummies.edges" should have 1 element
     And the JSON node "data.dummies.pageInfo.hasNextPage" should be false
+    And the JSON node "data.dummies.pageInfo.startCursor" should be equal to "Mw=="
+    And the JSON node "data.dummies.pageInfo.endCursor" should be equal to "Mw=="
     And the JSON node "data.dummies.edges[0].node.name" should be equal to "Dummy #4"
     And the JSON node "data.dummies.edges[0].cursor" should be equal to "Mw=="
     And the JSON node "data.dummies.edges[0].node.relatedDummies.pageInfo.hasNextPage" should be false
+    And the JSON node "data.dummies.edges[0].node.relatedDummies.pageInfo.startCursor" should be equal to "Mg=="
+    And the JSON node "data.dummies.edges[0].node.relatedDummies.pageInfo.endCursor" should be equal to "Mw=="
     And the JSON node "data.dummies.edges[0].node.relatedDummies.edges" should have 2 elements
     And the JSON node "data.dummies.edges[0].node.relatedDummies.edges[1].node.name" should be equal to "RelatedDummy44"
     And the JSON node "data.dummies.edges[0].node.relatedDummies.edges[1].cursor" should be equal to "Mw=="
@@ -298,6 +312,7 @@ Feature: GraphQL collection support
                 cursor
               }
               pageInfo {
+                startCursor
                 endCursor
                 hasNextPage
               }
@@ -306,6 +321,177 @@ Feature: GraphQL collection support
           cursor
         }
         pageInfo {
+          startCursor
+          endCursor
+          hasNextPage
+        }
+      }
+    }
+    """
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/json"
+    And the JSON node "data.dummies.edges" should have 0 element
+
+  @createSchema
+  Scenario: Paginate backwards through collections through a GraphQL query
+    Given there are 4 dummy objects having each 4 relatedDummies
+    When I send the following GraphQL request:
+    """
+    {
+      dummies(last: 2) {
+        edges {
+          node {
+            name
+            relatedDummies(last: 2) {
+              edges {
+                node {
+                  name
+                }
+                cursor
+              }
+              totalCount
+              pageInfo {
+                startCursor
+                endCursor
+                hasNextPage
+              }
+            }
+          }
+          cursor
+        }
+        totalCount
+        pageInfo {
+          startCursor
+          endCursor
+          hasNextPage
+        }
+      }
+    }
+    """
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/json"
+    And the JSON node "data.dummies.pageInfo.startCursor" should be equal to "Mg=="
+    And the JSON node "data.dummies.pageInfo.endCursor" should be equal to "Mw=="
+    And the JSON node "data.dummies.pageInfo.hasNextPage" should be false
+    And the JSON node "data.dummies.totalCount" should be equal to 4
+    And the JSON node "data.dummies.edges[1].node.name" should be equal to "Dummy #4"
+    And the JSON node "data.dummies.edges[1].cursor" should be equal to "Mw=="
+    And the JSON node "data.dummies.edges[1].node.relatedDummies.pageInfo.startCursor" should be equal to "Mg=="
+    And the JSON node "data.dummies.edges[1].node.relatedDummies.pageInfo.hasNextPage" should be false
+    And the JSON node "data.dummies.edges[1].node.relatedDummies.totalCount" should be equal to 4
+    And the JSON node "data.dummies.edges[1].node.relatedDummies.edges[0].node.name" should be equal to "RelatedDummy34"
+    And the JSON node "data.dummies.edges[1].node.relatedDummies.edges[0].cursor" should be equal to "Mg=="
+    When I send the following GraphQL request:
+    """
+    {
+      dummies(last: 2, before: "Mw==") {
+        edges {
+          node {
+            name
+            relatedDummies(last: 2, before: "Mg==") {
+              edges {
+                node {
+                  name
+                }
+                cursor
+              }
+              pageInfo {
+                startCursor
+                endCursor
+                hasNextPage
+              }
+            }
+          }
+          cursor
+        }
+        pageInfo {
+          startCursor
+          endCursor
+          hasNextPage
+        }
+      }
+    }
+    """
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/json"
+    And the JSON node "data.dummies.edges[0].node.name" should be equal to "Dummy #2"
+    And the JSON node "data.dummies.edges[0].cursor" should be equal to "MQ=="
+    And the JSON node "data.dummies.edges[1].node.relatedDummies.edges[0].node.name" should be equal to "RelatedDummy13"
+    And the JSON node "data.dummies.edges[1].node.relatedDummies.edges[0].cursor" should be equal to "MA=="
+    When I send the following GraphQL request:
+    """
+    {
+      dummies(last: 2, before: "MQ==") {
+        edges {
+          node {
+            name
+            relatedDummies(last: 3, before: "Mg==") {
+              edges {
+                node {
+                  name
+                }
+                cursor
+              }
+              pageInfo {
+                startCursor
+                endCursor
+                hasNextPage
+              }
+            }
+          }
+          cursor
+        }
+        pageInfo {
+          startCursor
+          endCursor
+          hasNextPage
+        }
+      }
+    }
+    """
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/json"
+    And the JSON node "data.dummies.edges" should have 1 element
+    And the JSON node "data.dummies.pageInfo.hasNextPage" should be true
+    And the JSON node "data.dummies.pageInfo.startCursor" should be equal to "MA=="
+    And the JSON node "data.dummies.pageInfo.endCursor" should be equal to "MA=="
+    And the JSON node "data.dummies.edges[0].node.name" should be equal to "Dummy #1"
+    And the JSON node "data.dummies.edges[0].cursor" should be equal to "MA=="
+    And the JSON node "data.dummies.edges[0].node.relatedDummies.pageInfo.hasNextPage" should be true
+    And the JSON node "data.dummies.edges[0].node.relatedDummies.pageInfo.startCursor" should be equal to "MA=="
+    And the JSON node "data.dummies.edges[0].node.relatedDummies.pageInfo.endCursor" should be equal to "MQ=="
+    And the JSON node "data.dummies.edges[0].node.relatedDummies.edges" should have 2 elements
+    And the JSON node "data.dummies.edges[0].node.relatedDummies.edges[1].node.name" should be equal to "RelatedDummy21"
+    And the JSON node "data.dummies.edges[0].node.relatedDummies.edges[1].cursor" should be equal to "MQ=="
+    When I send the following GraphQL request:
+    """
+    {
+      dummies(last: 2, before: "MA==") {
+        edges {
+          node {
+            name
+            relatedDummies(last: 1, before: "MQ==") {
+              edges {
+                node {
+                  name
+                }
+                cursor
+              }
+              pageInfo {
+                startCursor
+                endCursor
+                hasNextPage
+              }
+            }
+          }
+          cursor
+        }
+        pageInfo {
+          startCursor
           endCursor
           hasNextPage
         }

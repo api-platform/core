@@ -214,6 +214,14 @@ final class SchemaBuilder implements SchemaBuilderInterface
                             'type' => GraphQLType::int(),
                             'description' => 'Returns the first n elements from the list.',
                         ],
+                        'last' => [
+                            'type' => GraphQLType::int(),
+                            'description' => 'Returns the last n elements from the list.',
+                        ],
+                        'before' => [
+                            'type' => GraphQLType::string(),
+                            'description' => 'Returns the elements in the list that come before the specified cursor.',
+                        ],
                         'after' => [
                             'type' => GraphQLType::string(),
                             'description' => 'Returns the elements in the list that come after the specified cursor.',
@@ -489,6 +497,7 @@ final class SchemaBuilder implements SchemaBuilderInterface
             'description' => 'Information about the current page.',
             'fields' => [
                 'endCursor' => GraphQLType::string(),
+                'startCursor' => GraphQLType::string(),
                 'hasNextPage' => GraphQLType::nonNull(GraphQLType::boolean()),
             ],
         ];

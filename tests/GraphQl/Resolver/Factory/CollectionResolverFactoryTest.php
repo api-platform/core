@@ -54,7 +54,7 @@ class CollectionResolverFactoryTest extends TestCase
     public function paginationProvider(): array
     {
         return [
-            [true, ['totalCount' => 0.0, 'edges' => [], 'pageInfo' => ['endCursor' => null, 'hasNextPage' => false]]],
+            [true, ['totalCount' => 0.0, 'edges' => [], 'pageInfo' => ['startCursor' => null, 'endCursor' => null, 'hasNextPage' => false]]],
             [false, []],
         ];
     }
@@ -135,7 +135,7 @@ class CollectionResolverFactoryTest extends TestCase
             [
                 'totalCount' => 0.0,
                 'edges' => [['node' => 'normalizedObject1', 'cursor' => $expectedCursors[0]], ['node' => 'normalizedObject2', 'cursor' => $expectedCursors[1]]],
-                'pageInfo' => ['endCursor' => null, 'hasNextPage' => false],
+                'pageInfo' => ['startCursor' => null, 'endCursor' => null, 'hasNextPage' => false],
             ],
             $resolver(null, ['after' => $cursor], null, $resolveInfo)
         );
@@ -172,7 +172,7 @@ class CollectionResolverFactoryTest extends TestCase
         $resolveInfo->fieldNodes = [];
 
         $this->assertEquals(
-            ['edges' => [['node' => 'normalizedObject1', 'cursor' => 'Mg==']], 'pageInfo' => ['endCursor' => 'MTY=', 'hasNextPage' => true], 'totalCount' => 17],
+            ['edges' => [['node' => 'normalizedObject1', 'cursor' => 'Mg==']], 'pageInfo' => ['startCursor' => 'Mg==', 'endCursor' => 'OQ==', 'hasNextPage' => true], 'totalCount' => 17],
             $resolver(null, ['after' => $cursor], null, $resolveInfo)
         );
     }
