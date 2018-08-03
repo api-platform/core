@@ -84,7 +84,7 @@ final class QueryChecker
                 ->getManagerForClass($rootEntity)
                 ->getClassMetadata($rootEntity);
 
-            if ($rootMetadata instanceof ClassMetadata && ($isForeign ? $rootMetadata->isIdentifierComposite : $rootMetadata->containsForeignIdentifier)) {
+            if ($rootMetadata instanceof ClassMetadata && ($isForeign ? $rootMetadata->containsForeignIdentifier: $rootMetadata->isIdentifierComposite)) {
                 return true;
             }
         }
