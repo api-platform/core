@@ -59,7 +59,8 @@ class QueryCheckerTest extends TestCase
         $queryBuilder->getRootEntities()->willReturn(['Dummy']);
         $queryBuilder->getRootAliases()->willReturn(['d']);
         $classMetadata = new ClassMetadata('Dummy');
-        $classMetadata->containsForeignIdentifier = true;
+        $classMetadata->containsForeignIdentifier = false;
+        $classMetadata->isIdentifierComposite = true;
         $objectManager = $this->prophesize(ObjectManager::class);
         $objectManager->getClassMetadata('Dummy')->willReturn($classMetadata);
         $managerRegistry = $this->prophesize(ManagerRegistry::class);
@@ -73,7 +74,8 @@ class QueryCheckerTest extends TestCase
         $queryBuilder->getRootEntities()->willReturn(['Dummy']);
         $queryBuilder->getRootAliases()->willReturn(['d']);
         $classMetadata = new ClassMetadata('Dummy');
-        $classMetadata->containsForeignIdentifier = false;
+        $classMetadata->containsForeignIdentifier = true;
+        $classMetadata->isIdentifierComposite = false;
         $objectManager = $this->prophesize(ObjectManager::class);
         $objectManager->getClassMetadata('Dummy')->willReturn($classMetadata);
         $managerRegistry = $this->prophesize(ManagerRegistry::class);
@@ -88,6 +90,8 @@ class QueryCheckerTest extends TestCase
         $queryBuilder->getRootAliases()->willReturn(['d']);
         $classMetadata = new ClassMetadata('Dummy');
         $classMetadata->setIdentifier(['id', 'name']);
+        $classMetadata->containsForeignIdentifier = true;
+        $classMetadata->isIdentifierComposite = false;
         $objectManager = $this->prophesize(ObjectManager::class);
         $objectManager->getClassMetadata('Dummy')->willReturn($classMetadata);
         $managerRegistry = $this->prophesize(ManagerRegistry::class);
@@ -101,6 +105,8 @@ class QueryCheckerTest extends TestCase
         $queryBuilder->getRootEntities()->willReturn(['Dummy']);
         $queryBuilder->getRootAliases()->willReturn(['d']);
         $classMetadata = new ClassMetadata('Dummy');
+        $classMetadata->containsForeignIdentifier = false;
+        $classMetadata->isIdentifierComposite = true;
         $objectManager = $this->prophesize(ObjectManager::class);
         $objectManager->getClassMetadata('Dummy')->willReturn($classMetadata);
         $managerRegistry = $this->prophesize(ManagerRegistry::class);
