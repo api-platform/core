@@ -24,7 +24,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-final class AddFormatListener
+final class AddFormatListener implements AddFormatListenerInterface
 {
     private $negotiator;
     private $formats;

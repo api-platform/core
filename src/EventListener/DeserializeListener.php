@@ -26,7 +26,7 @@ use Symfony\Component\Serializer\SerializerInterface;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-final class DeserializeListener
+final class DeserializeListener implements DeserializeListenerInterface
 {
     private $serializer;
     private $serializerContextBuilder;
