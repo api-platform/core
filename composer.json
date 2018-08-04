@@ -37,10 +37,9 @@
         "behatch/contexts": "^3.1",
         "doctrine/annotations": "^1.2",
         "doctrine/doctrine-bundle": "^1.8",
-        "doctrine/mongodb-odm": "^1.1",
-        "doctrine/mongodb-odm-bundle": "^3.3",
+        "doctrine/mongodb-odm": "^1.2",
+        "doctrine/mongodb-odm-bundle": "^3.4",
         "doctrine/orm": "^2.5.2",
-        "ext-mongodb": "*",
         "friendsofsymfony/user-bundle": "^2.1",
         "guzzlehttp/guzzle": "^6.0",
         "justinrainbow/json-schema": "^5.0",
@@ -78,9 +77,6 @@
     "conflict": {
         "symfony/dependency-injection": "<3.4"
     },
-    "provide": {
-        "ext-mongo": "^1.6.14"
-    },
     "suggest": {
         "friendsofsymfony/user-bundle": "To use the FOSUserBundle bridge.",
         "guzzlehttp/guzzle": "To use the HTTP cache invalidation system.",
@@ -107,6 +103,9 @@
         }
     },
     "config": {
-        "sort-packages": true
+        "sort-packages": true,
+        "platform": {
+            "ext-mongo": "1.6.16"
+        }
     }
 }

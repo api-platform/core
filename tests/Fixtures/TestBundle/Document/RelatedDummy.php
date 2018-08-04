@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Document;
 
 use ApiPlatform\Core\Annotation\ApiResource;
-use ApiPlatform\Core\Annotation\ApiSubresource;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 use Symfony\Component\Serializer\Annotation\Groups;
@@ -25,7 +24,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  *
  * @author Alexandre Delplace <alexandre.delplacemille@gmail.com>
  *
- * @ApiResource(iri="https://schema.org/Product", attributes={"normalization_context"={"groups"={"friends"}}, "filters"={"related_dummy.friends"}})
+ * @ApiResource(iri="https://schema.org/Product", attributes={"normalization_context"={"groups"={"friends"}}})
  * @ODM\Document
  */
 class RelatedDummy extends ParentDummy
@@ -169,7 +168,7 @@ class RelatedDummy extends ParentDummy
 //    {
 //        $this->relatedToDummyFriend->add($relatedToDummyFriend);
 //    }
-//
+
     /**
      * @return EmbeddableDummy
      */
@@ -178,9 +177,6 @@ class RelatedDummy extends ParentDummy
         return $this->embeddedDummy;
     }
 
-    /**
-     * @param EmbeddableDummy $embeddedDummy
-     */
     public function setEmbeddedDummy(EmbeddableDummy $embeddedDummy)
     {
         $this->embeddedDummy = $embeddedDummy;

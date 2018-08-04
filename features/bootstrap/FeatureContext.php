@@ -53,6 +53,7 @@ use Behat\Behat\Context\SnippetAcceptingContext;
 use Behat\Behat\Hook\Scope\AfterStepScope;
 use Behatch\HttpCall\Request;
 use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\ODM\MongoDB\DocumentManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Tools\SchemaTool;
 
@@ -62,11 +63,12 @@ use Doctrine\ORM\Tools\SchemaTool;
 final class FeatureContext implements Context, SnippetAcceptingContext
 {
     /**
-     * @var EntityManagerInterface
+     * @var EntityManagerInterface|DocumentManager
      */
     private $manager;
     private $doctrine;
     private $schemaTool;
+    private $schemaManager;
     private $classes;
     private $request;
 
@@ -81,7 +83,8 @@ final class FeatureContext implements Context, SnippetAcceptingContext
     {
         $this->doctrine = $doctrine;
         $this->manager = $doctrine->getManager();
-        $this->schemaTool = new SchemaTool($this->manager);
+        $this->schemaTool = $this->manager instanceof EntityManagerInterface ? new SchemaTool($this->manager) : null;
+        $this->schemaManager = $this->manager instanceof DocumentManager ? $this->manager->getSchemaManager() : null;
         $this->classes = $this->manager->getMetadataFactory()->getAllMetadata();
         $this->request = $request;
     }
@@ -113,9 +116,10 @@ final class FeatureContext implements Context, SnippetAcceptingContext
      */
     public function createDatabase()
     {
-        $this->schemaTool->dropSchema($this->classes);
+        $this->schemaTool && $this->schemaTool->dropSchema($this->classes);
+        $this->schemaManager && $this->schemaManager->dropDatabases();
         $this->doctrine->getManager()->clear();
-        $this->schemaTool->createSchema($this->classes);
+        $this->schemaTool && $this->schemaTool->createSchema($this->classes);
     }
 
     /**

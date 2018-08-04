@@ -13,12 +13,12 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Document;
 
-use ApiPlatform\Core\Annotation\ApiResource;
 use ApiPlatform\Core\Annotation\ApiProperty;
+use ApiPlatform\Core\Annotation\ApiResource;
 use ApiPlatform\Core\Annotation\ApiSubresource;
 use Doctrine\Common\Collections\ArrayCollection;
-use Symfony\Component\Validator\Constraints as Assert;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * Dummy.
@@ -31,7 +31,7 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 class Dummy
 {
     /**
-     * @var string
+     * @var int The id
      *
      * @ODM\Id(strategy="INCREMENT", type="integer")
      */
@@ -111,8 +111,6 @@ class Dummy
     public $relatedDummy;
 
     /**
-     * @var ArrayCollection Several dummies
-     *
      * @ODM\ReferenceMany(targetDocument="RelatedDummy")
      * @ApiSubresource
      */
@@ -126,11 +124,32 @@ class Dummy
     public $jsonData;
 
     /**
+     * @var array
+     *
+     * @ODM\Field(type="raw")
+     */
+    public $arrayData;
+
+    /**
      * @var string
      *
      * @ODM\Field(type="string")
      */
     public $nameConverted;
+
+    /**
+     * @var RelatedOwnedDummy
+     *
+     * @ODM\ReferenceOne(targetDocument="RelatedOwnedDummy", cascade={"persist"}, mappedBy="owningDummy")
+     */
+    public $relatedOwnedDummy;
+
+    /**
+     * @var RelatedOwningDummy
+     *
+     * @ODM\ReferenceOne(targetDocument="RelatedOwningDummy", cascade={"persist"}, inversedBy="ownedDummy")
+     */
+    public $relatedOwningDummy;
 
     public static function staticMethod()
     {
@@ -140,6 +159,7 @@ class Dummy
     {
         $this->relatedDummies = new ArrayCollection();
         $this->jsonData = [];
+        $this->arrayData = [];
     }
 
     public function getId()
@@ -186,8 +206,14 @@ class Dummy
     {
     }
 
+    public function getFoo()
+    {
+        return $this->foo;
+    }
+
     public function setFoo(array $foo = null)
     {
+        $this->foo = $foo;
     }
 
     public function setDummyDate(\DateTime $dummyDate = null)
@@ -222,6 +248,16 @@ class Dummy
         return $this->jsonData;
     }
 
+    public function setArrayData($arrayData)
+    {
+        $this->arrayData = $arrayData;
+    }
+
+    public function getArrayData()
+    {
+        return $this->arrayData;
+    }
+
     public function getRelatedDummy()
     {
         return $this->relatedDummy;
@@ -235,6 +271,30 @@ class Dummy
     public function addRelatedDummy(RelatedDummy $relatedDummy)
     {
         $this->relatedDummies->add($relatedDummy);
+    }
+
+    public function getRelatedOwnedDummy()
+    {
+        return $this->relatedOwnedDummy;
+    }
+
+    public function setRelatedOwnedDummy(RelatedOwnedDummy $relatedOwnedDummy)
+    {
+        $this->relatedOwnedDummy = $relatedOwnedDummy;
+
+        if ($this !== $this->relatedOwnedDummy->getOwningDummy()) {
+            $this->relatedOwnedDummy->setOwningDummy($this);
+        }
+    }
+
+    public function getRelatedOwningDummy()
+    {
+        return $this->relatedOwningDummy;
+    }
+
+    public function setRelatedOwningDummy(RelatedOwningDummy $relatedOwningDummy)
+    {
+        $this->relatedOwningDummy = $relatedOwningDummy;
     }
 
     /**

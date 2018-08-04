@@ -31,11 +31,5 @@ use Doctrine\ODM\MongoDB\Query\Builder;
  */
 interface QueryItemExtensionInterface
 {
-    /**
-     * @param Builder     $queryBuilder
-     * @param string      $resourceClass
-     * @param array       $identifiers
-     * @param string|null $operationName
-     */
     public function applyToItem(Builder $queryBuilder, string $resourceClass, array $identifiers, string $operationName = null);
 }

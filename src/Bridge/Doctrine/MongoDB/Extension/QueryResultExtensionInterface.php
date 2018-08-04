@@ -32,18 +32,7 @@ use Doctrine\ODM\MongoDB\Query\Builder;
  */
 interface QueryResultExtensionInterface extends QueryCollectionExtensionInterface
 {
-    /**
-     * @param string      $resourceClass
-     * @param string|null $operationName
-     *
-     * @return bool
-     */
     public function supportsResult(string $resourceClass, string $operationName = null): bool;
 
-    /**
-     * @param Builder $queryBuilder
-     *
-     * @return mixed
-     */
     public function getResult(Builder $queryBuilder);
 }

@@ -13,10 +13,12 @@ install:
   - ps: Set-Service wuauserv -StartupType Manual
   - cinst -y php composer
   - refreshenv
-  - cd c:\tools\php72
-  - cd ext
-  - appveyor DownloadFile http://windows.php.net/downloads/pecl/releases/mongodb/1.1.8/php_mongodb-1.1.8-7.0-nts-vc14-x64.zip
-  - 7z x php_mongodb-1.1.8-7.0-nts-vc14-x64.zip -y >nul
+  - cd C:\Tools\php72\ext
+  - ps: |
+      $web = New-Object Net.WebClient
+      $web.Headers.Add('user-agent', 'AppVeyor')
+      $web.DownloadFile('https://windows.php.net/downloads/pecl/releases/mongodb/1.5.2/php_mongodb-1.5.2-7.2-nts-vc15-x64.zip', 'C:\Tools\php72\ext\php_mongodb.zip')
+  - 7z x php_mongodb.zip -y >nul
   - cd ..
   - copy php.ini-production php.ini /Y
   - echo date.timezone="UTC" >> php.ini

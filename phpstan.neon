@@ -3,7 +3,6 @@ parameters:
         - tests/Fixtures/app/AppKernel.php
     excludes_analyse:
         - tests/Fixtures/app/cache
-        - tests/Fixtures/appMongo/cache
         # The Symfony Configuration API isn't good enough to be analysed
         - src/Bridge/Symfony/Bundle/DependencyInjection/Configuration.php
     ignoreErrors:

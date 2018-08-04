@@ -33,10 +33,6 @@ interface FilterInterface extends BaseFilterInterface
 {
     /**
      * Applies the filter.
-     *
-     * @param Builder     $queryBuilder
-     * @param string      $resourceClass
-     * @param string|null $operationName
      */
     public function apply(Builder $queryBuilder, string $resourceClass, string $operationName = null);
 }

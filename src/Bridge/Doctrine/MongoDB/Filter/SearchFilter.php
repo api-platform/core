@@ -15,15 +15,12 @@ namespace ApiPlatform\Core\Bridge\Doctrine\MongoDB\Filter;
 
 use ApiPlatform\Core\Api\IriConverterInterface;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
-use Doctrine\Bundle\MongoDBBundle\Logger\LoggerInterface;
-use Doctrine\MongoDB\Query\Builder;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 class SearchFilter extends AbstractFilter
 {
-
     protected $iriConverter;
     protected $propertyAccessor;
     protected $requestStack;
@@ -36,10 +33,6 @@ class SearchFilter extends AbstractFilter
 
     /**
      * Gets the ID from an IRI or a raw ID.
-     *
-     * @param string $value
-     *
-     * @return mixed
      */
     protected function getIdFromValue(string $value)
     {
@@ -56,20 +49,15 @@ class SearchFilter extends AbstractFilter
 
     /**
      * Normalize the values array.
-     *
-     * @param array $values
-     *
-     * @return array
      */
     protected function normalizeValues(array $values): array
     {
         foreach ($values as $key => $value) {
-            if (!is_int($key) || !is_string($value)) {
+            if (!\is_int($key) || !\is_string($value)) {
                 unset($values[$key]);
             }
         }
 
         return array_values($values);
     }
-
 }

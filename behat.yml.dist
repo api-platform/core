@@ -28,6 +28,20 @@ default:
         - 'Behatch\Context\RestContext'
       filters:
         tags: ~@sqlite
+    mongodb:
+      contexts:
+        - 'FeatureContext': { doctrine: '@doctrine_mongodb' }
+        - 'GraphqlContext'
+        - 'JsonContext'
+        - 'HydraContext'
+        - 'SwaggerContext'
+        - 'HttpCacheContext'
+        - 'JsonApiContext': { doctrine: '@doctrine', jsonApiSchemaFile: 'tests/Fixtures/JsonSchema/jsonapi.json' }
+        - 'JsonHalContext': { schemaFile: 'tests/Fixtures/JsonHal/jsonhal.json' }
+        - 'Behat\MinkExtension\Context\MinkContext'
+        - 'Behatch\Context\RestContext'
+      filters:
+        tags: '@mongodb'
   extensions:
     'Behat\Symfony2Extension':
       kernel:

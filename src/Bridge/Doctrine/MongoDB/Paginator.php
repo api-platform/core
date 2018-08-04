@@ -104,6 +104,6 @@ final class Paginator implements \IteratorAggregate, PaginatorInterface
      */
     public function count()
     {
-        return count($this->getIterator());
+        return \count($this->getIterator());
     }
 }

@@ -23,6 +23,7 @@ namespace ApiPlatform\Core\Bridge\Doctrine\MongoDB;
 
 use ApiPlatform\Core\Bridge\Doctrine\MongoDB\Extension\QueryCollectionExtensionInterface;
 use ApiPlatform\Core\Bridge\Doctrine\MongoDB\Extension\QueryResultExtensionInterface;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\ContextAwareQueryCollectionExtensionInterface;
 use ApiPlatform\Core\DataProvider\CollectionDataProviderInterface;
 use ApiPlatform\Core\Exception\ResourceClassNotSupportedException;
 use Doctrine\Common\Persistence\ManagerRegistry;
@@ -38,11 +39,9 @@ class CollectionDataProvider implements CollectionDataProviderInterface
     private $decorated;
 
     /**
-     * @param ManagerRegistry                      $managerRegistry
-     * @param QueryCollectionExtensionInterface[]  $collectionExtensions
-     * @param CollectionDataProviderInterface|null $decorated
+     * @param QueryCollectionExtensionInterface[]|ContextAwareQueryCollectionExtensionInterface[] $collectionExtensions
      */
-    public function __construct(ManagerRegistry $managerRegistry, array $collectionExtensions = [], CollectionDataProviderInterface $decorated = null)
+    public function __construct(ManagerRegistry $managerRegistry, /* iterable */ $collectionExtensions = [], CollectionDataProviderInterface $decorated = null)
     {
         $this->managerRegistry = $managerRegistry;
         $this->collectionExtensions = $collectionExtensions;

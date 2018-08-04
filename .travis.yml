@@ -31,12 +31,13 @@ jobs:
       before_script:
         - mysql -e 'CREATE DATABASE api_platform_test;'
       env: APP_ENV=mysql
+    - php: '7.2'
+      services:
+        - mongodb
+      env: APP_ENV=mongodb
   allow_failures:
     - env: SYMFONY_DEPRECATIONS_HELPER=0
   fast_finish: true
-
-service:
-  - mongodb
 
 before_install:
   - phpenv config-rm xdebug.ini || echo "xdebug not available"
@@ -54,13 +55,16 @@ install:
 script:
   - tests/Fixtures/app/console cache:clear
   - vendor/bin/phpunit
+  - if [[ $APP_ENV = 'mongodb' ]]; then
+      vendor/bin/phpunit -c phpunit.mongo.xml;
+    fi
   - tests/Fixtures/app/console cache:clear
   - if [[ $APP_ENV = 'postgres' ]]; then
       vendor/bin/behat --suite=postgres --format=progress;
+    elif [[ $APP_ENV = 'mongodb' ]]; then
+      vendor/bin/behat --suite=mongodb --tags '~@filter&&~@orm-only' --format=progress;
     else
       vendor/bin/behat --suite=default --format=progress;
     fi
-  - vendor/bin/behat -c behat.mongo.yml --tags '~@filter&&~@orm-only'
-  - vendor/bin/phpunit -c phpunit.mongo.xml
   - tests/Fixtures/app/console api:swagger:export > swagger.json && npx swagger-cli validate swagger.json && rm swagger.json
   - tests/Fixtures/app/console api:swagger:export --yaml > swagger.yaml && npx swagger-cli validate --no-schema swagger.yaml && rm swagger.yaml

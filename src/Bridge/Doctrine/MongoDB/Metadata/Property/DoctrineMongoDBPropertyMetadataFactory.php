@@ -45,37 +45,41 @@ final class DoctrineMongoDBPropertyMetadataFactory implements PropertyMetadataFa
      */
     public function create(string $resourceClass, string $property, array $options = []): PropertyMetadata
     {
-        $itemMetadata = $this->decorated->create($resourceClass, $property, $options);
+        $propertyMetadata = $this->decorated->create($resourceClass, $property, $options);
 
-        if (null !== $itemMetadata->isIdentifier()) {
-            return $itemMetadata;
+        if (null !== $propertyMetadata->isIdentifier()) {
+            return $propertyMetadata;
         }
 
         $manager = $this->managerRegistry->getManagerForClass($resourceClass);
         if (!$manager) {
-            return $itemMetadata;
+            return $propertyMetadata;
         }
         /** @var ClassMetadata $doctrineClassMetadata */
         $doctrineClassMetadata = $manager->getClassMetadata($resourceClass);
         if (!$doctrineClassMetadata) {
-            return $itemMetadata;
+            return $propertyMetadata;
         }
 
         $identifiers = $doctrineClassMetadata->getIdentifier();
         foreach ($identifiers as $identifier) {
             if ($identifier === $property) {
-                $itemMetadata = $itemMetadata->withIdentifier(true);
-                $itemMetadata = $itemMetadata->withReadable(false);
-                $itemMetadata = $itemMetadata->withWritable($doctrineClassMetadata->isIdGeneratorNone());
+                $propertyMetadata = $propertyMetadata->withIdentifier(true);
+
+                if (null !== $propertyMetadata->isWritable()) {
+                    break;
+                }
+
+                $propertyMetadata = $propertyMetadata->withWritable(false);
 
                 break;
             }
         }
 
-        if (null === $itemMetadata->isIdentifier()) {
-            $itemMetadata = $itemMetadata->withIdentifier(false);
+        if (null === $propertyMetadata->isIdentifier()) {
+            $propertyMetadata = $propertyMetadata->withIdentifier(false);
         }
 
-        return $itemMetadata;
+        return $propertyMetadata;
     }
 }

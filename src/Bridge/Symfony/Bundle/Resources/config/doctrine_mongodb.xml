@@ -10,6 +10,12 @@
             <factory service="doctrine_mongodb.odm.default_document_manager" method="getMetadataFactory"/>
         </service>
 
+        <service id="api_platform.doctrine.mongodb.data_persister" class="ApiPlatform\Core\Bridge\Doctrine\Common\DataPersister" public="false">
+            <argument type="service" id="doctrine_mongodb" />
+
+            <tag name="api_platform.data_persister" />
+        </service>
+
         <service id="api_platform.doctrine.mongodb.collection_data_provider" public="false" abstract="true">
             <argument type="service" id="doctrine_mongodb"/>
             <argument type="tagged" tag="api_platform.doctrine.mongodb.query_extension.collection" />
@@ -61,11 +67,11 @@
 
         <!-- Metadata loader -->
 
-        <service id="api_platform.doctrine.mongodb.metadata.property.factory.item"
+        <service id="api_platform.doctrine.mongodb.metadata.property.metadata_factory"
                  class="ApiPlatform\Core\Bridge\Doctrine\MongoDB\Metadata\Property\DoctrineMongoDBPropertyMetadataFactory"
-                 decorates="api_platform.metadata.property.metadata_factory" public="false">
+                 decorates="api_platform.metadata.property.metadata_factory" decoration-priority="40" public="false">
             <argument type="service" id="doctrine_mongodb"/>
-            <argument type="service" id="api_platform.doctrine.mongodb.metadata.property.factory.item.inner"/>
+            <argument type="service" id="api_platform.doctrine.mongodb.metadata.property.metadata_factory.inner"/>
         </service>
 
         <!-- Event listener -->

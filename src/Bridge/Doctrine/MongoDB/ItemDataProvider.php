@@ -43,13 +43,9 @@ class ItemDataProvider implements ItemDataProviderInterface
     private $decorated;
 
     /**
-     * @param ManagerRegistry                        $managerRegistry
-     * @param PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory
-     * @param PropertyMetadataFactoryInterface       $propertyMetadataFactory
-     * @param QueryItemExtensionInterface[]          $itemExtensions
-     * @param ItemDataProviderInterface|null         $decorated
+     * @param QueryItemExtensionInterface[] $itemExtensions
      */
-    public function __construct(ManagerRegistry $managerRegistry, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, array $itemExtensions = [], ItemDataProviderInterface $decorated = null)
+    public function __construct(ManagerRegistry $managerRegistry, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, /* iterable */ $itemExtensions = [], ItemDataProviderInterface $decorated = null)
     {
         $this->managerRegistry = $managerRegistry;
         $this->propertyNameCollectionFactory = $propertyNameCollectionFactory;
@@ -76,7 +72,7 @@ class ItemDataProvider implements ItemDataProviderInterface
             throw new ResourceClassNotSupportedException();
         }
 
-        $identifierValues = explode('-', $id);
+        $identifierValues = explode('-', (string) $id);
         $identifiers = [];
         $i = 0;
 
@@ -97,7 +93,7 @@ class ItemDataProvider implements ItemDataProviderInterface
         }
 
         $fetchData = $context['fetch_data'] ?? true;
-        if (!$fetchData || $manager instanceof DocumentManager) {
+        if (!$fetchData && $manager instanceof DocumentManager) {
             return $manager->getReference($resourceClass, reset($identifiers));
         }
 

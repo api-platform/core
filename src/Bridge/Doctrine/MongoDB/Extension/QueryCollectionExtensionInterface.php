@@ -31,10 +31,5 @@ use Doctrine\ODM\MongoDB\Query\Builder;
  */
 interface QueryCollectionExtensionInterface
 {
-    /**
-     * @param Builder $queryBuilder
-     * @param string  $resourceClass
-     * @param string  $operationName
-     */
     public function applyToCollection(Builder $queryBuilder, string $resourceClass, string $operationName = null);
 }

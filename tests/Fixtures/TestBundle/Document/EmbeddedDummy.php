@@ -14,17 +14,15 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Document;
 
 use ApiPlatform\Core\Annotation\ApiResource;
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\RelatedDummy;
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\EmbeddableDummy;
-use Symfony\Component\Validator\Constraints as Assert;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * Embedded Dummy.
  *
  * @author Alexandre Delplace <alexandre.delplacemille@gmail.com>
  *
- * @ApiResource(attributes={"filters"={"my_dummy.search", "my_dummy.order", "my_dummy.date", "my_dummy.range", "my_dummy.boolean", "my_dummy.numeric"}})
+ * @ApiResource
  * @ODM\Document
  */
 class EmbeddedDummy
@@ -79,33 +77,21 @@ class EmbeddedDummy
         return $this->id;
     }
 
-    /**
-     * @return string
-     */
     public function getName(): string
     {
         return $this->name;
     }
 
-    /**
-     * @param string $name
-     */
     public function setName(string $name)
     {
         $this->name = $name;
     }
 
-    /**
-     * @return EmbeddableDummy
-     */
     public function getEmbeddedDummy(): EmbeddableDummy
     {
         return $this->embeddedDummy;
     }
 
-    /**
-     * @param EmbeddableDummy $embeddedDummy
-     */
     public function setEmbeddedDummy(EmbeddableDummy $embeddedDummy)
     {
         $this->embeddedDummy = $embeddedDummy;
@@ -119,9 +105,6 @@ class EmbeddedDummy
         return $this->dummyDate;
     }
 
-    /**
-     * @param \DateTime $dummyDate
-     */
     public function setDummyDate(\DateTime $dummyDate)
     {
         $this->dummyDate = $dummyDate;
@@ -135,9 +118,6 @@ class EmbeddedDummy
         return $this->relatedDummy;
     }
 
-    /**
-     * @param RelatedDummy $relatedDummy
-     */
     public function setRelatedDummy(RelatedDummy $relatedDummy)
     {
         $this->relatedDummy = $relatedDummy;
