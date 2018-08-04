@@ -13,8 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Problem\Serializer;
 
-use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
-use Symfony\Component\Validator\ConstraintViolationListInterface;
+use ApiPlatform\Core\Serializer\AbstractConstraintViolationListNormalizer;
 
 /**
  * Converts {@see \Symfony\Component\Validator\ConstraintViolationListInterface} the API Problem spec (RFC 7807).
@@ -23,7 +22,7 @@ use Symfony\Component\Validator\ConstraintViolationListInterface;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-final class ConstraintViolationListNormalizer implements NormalizerInterface
+final class ConstraintViolationListNormalizer extends AbstractConstraintViolationListNormalizer
 {
     const FORMAT = 'jsonproblem';
 
@@ -32,20 +31,7 @@ final class ConstraintViolationListNormalizer implements NormalizerInterface
      */
     public function normalize($object, $format = null, array $context = [])
     {
-        $violations = [];
-        $messages = [];
-
-        foreach ($object as $violation) {
-            $violations[] = [
-                'propertyPath' => $violation->getPropertyPath(),
-                'message' => $violation->getMessage(),
-            ];
-
-            $propertyPath = $violation->getPropertyPath();
-            $prefix = $propertyPath ? sprintf('%s: ', $propertyPath) : '';
-
-            $messages[] = $prefix.$violation->getMessage();
-        }
+        list($messages, $violations) = $this->getMessagesAndViolations($object);
 
         return [
             'type' => $context['type'] ?? 'https://tools.ietf.org/html/rfc2616#section-10',
@@ -53,13 +39,5 @@ final class ConstraintViolationListNormalizer implements NormalizerInterface
             'detail' => $messages ? implode("\n", $messages) : (string) $object,
             'violations' => $violations,
         ];
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function supportsNormalization($data, $format = null)
-    {
-        return self::FORMAT === $format && $data instanceof ConstraintViolationListInterface;
     }
 }

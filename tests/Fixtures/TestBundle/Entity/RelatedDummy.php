@@ -31,6 +31,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 class RelatedDummy extends ParentDummy
 {
     /**
+     * @ApiSubresource
      * @ORM\Column(type="integer")
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
@@ -153,9 +154,22 @@ class RelatedDummy extends ParentDummy
     }
 
     /**
+     * @return ThirdLevel|null
+     */
+    public function getThirdLevel()
+    {
+        return $this->thirdLevel;
+    }
+
+    public function setThirdLevel(ThirdLevel $thirdLevel = null)
+    {
+        $this->thirdLevel = $thirdLevel;
+    }
+
+    /**
      * Get relatedToDummyFriend.
      *
-     * @return RelatedToDummyFriend
+     * @return RelatedToDummyFriend[]
      */
     public function getRelatedToDummyFriend()
     {
@@ -165,7 +179,7 @@ class RelatedDummy extends ParentDummy
     /**
      * Set relatedToDummyFriend.
      *
-     * @param RelatedToDummyFriend the value to set
+     * @param RelatedToDummyFriend $relatedToDummyFriend the value to set
      */
     public function addRelatedToDummyFriend(RelatedToDummyFriend $relatedToDummyFriend)
     {
@@ -180,9 +194,6 @@ class RelatedDummy extends ParentDummy
         return $this->embeddedDummy;
     }
 
-    /**
-     * @param EmbeddableDummy $embeddedDummy
-     */
     public function setEmbeddedDummy(EmbeddableDummy $embeddedDummy)
     {
         $this->embeddedDummy = $embeddedDummy;

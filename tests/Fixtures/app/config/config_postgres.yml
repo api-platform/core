@@ -1,0 +1,13 @@
+imports:
+    - { resource: parameters_postgres.yml }
+    - { resource: config_test.yml }
+
+doctrine:
+    dbal:
+        driver:   'pdo_pgsql'
+        dbname:   '%dbname%'
+        user:     '%user%'
+        password: '%password%'
+        host:     '%host%'
+        types:
+            uuid:  Ramsey\Uuid\Doctrine\UuidType

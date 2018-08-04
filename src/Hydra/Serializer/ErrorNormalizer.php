@@ -16,6 +16,7 @@ namespace ApiPlatform\Core\Hydra\Serializer;
 use ApiPlatform\Core\Api\UrlGeneratorInterface;
 use ApiPlatform\Core\Problem\Serializer\ErrorNormalizerTrait;
 use Symfony\Component\Debug\Exception\FlattenException;
+use Symfony\Component\Serializer\Normalizer\CacheableSupportsMethodInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 /**
@@ -24,7 +25,7 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
  * @author Kévin Dunglas <dunglas@gmail.com>
  * @author Samuel ROZE <samuel.roze@gmail.com>
  */
-final class ErrorNormalizer implements NormalizerInterface
+final class ErrorNormalizer implements NormalizerInterface, CacheableSupportsMethodInterface
 {
     const FORMAT = 'jsonld';
 
@@ -44,10 +45,6 @@ final class ErrorNormalizer implements NormalizerInterface
      */
     public function normalize($object, $format = null, array $context = [])
     {
-        if ($this->debug) {
-            $trace = $object->getTrace();
-        }
-
         $data = [
             '@context' => $this->urlGenerator->generate('api_jsonld_context', ['shortName' => 'Error']),
             '@type' => 'hydra:Error',
@@ -55,7 +52,7 @@ final class ErrorNormalizer implements NormalizerInterface
             'hydra:description' => $this->getErrorMessage($object, $context, $this->debug),
         ];
 
-        if (isset($trace)) {
+        if ($this->debug && null !== $trace = $object->getTrace()) {
             $data['trace'] = $trace;
         }
 
@@ -68,5 +65,13 @@ final class ErrorNormalizer implements NormalizerInterface
     public function supportsNormalization($data, $format = null)
     {
         return self::FORMAT === $format && ($data instanceof \Exception || $data instanceof FlattenException);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function hasCacheableSupportsMethod(): bool
+    {
+        return true;
     }
 }

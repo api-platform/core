@@ -14,9 +14,11 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\Bridge\Symfony\Validator\EventListener;
 
 use ApiPlatform\Core\Bridge\Symfony\Validator\EventListener\ValidateListener;
+use ApiPlatform\Core\Bridge\Symfony\Validator\Exception\ValidationException;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Tests\Fixtures\DummyEntity;
+use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -27,8 +29,10 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
  * @author Samuel ROZE <samuel.roze@gmail.com>
+ *
+ * @group legacy
  */
-class ValidateListenerTest extends \PHPUnit_Framework_TestCase
+class ValidateListenerTest extends TestCase
 {
     public function testNotAnApiPlatformRequest()
     {
@@ -56,7 +60,8 @@ class ValidateListenerTest extends \PHPUnit_Framework_TestCase
         $expectedValidationGroups = ['a', 'b', 'c'];
 
         $validatorProphecy = $this->prophesize(ValidatorInterface::class);
-        $validatorProphecy->validate($data, null, $expectedValidationGroups)->shouldBeCalled();
+        $constraintViolationList = $this->prophesize(ConstraintViolationListInterface::class);
+        $validatorProphecy->validate($data, null, $expectedValidationGroups)->willReturn($constraintViolationList)->shouldBeCalled();
         $validator = $validatorProphecy->reveal();
 
         $containerProphecy = $this->prophesize(ContainerInterface::class);
@@ -74,7 +79,8 @@ class ValidateListenerTest extends \PHPUnit_Framework_TestCase
         $expectedValidationGroups = ['a', 'b', 'c'];
 
         $validatorProphecy = $this->prophesize(ValidatorInterface::class);
-        $validatorProphecy->validate($data, null, $expectedValidationGroups)->shouldBeCalled();
+        $constraintViolationList = $this->prophesize(ConstraintViolationListInterface::class);
+        $validatorProphecy->validate($data, null, $expectedValidationGroups)->willReturn($constraintViolationList)->shouldBeCalled();
         $validator = $validatorProphecy->reveal();
 
         $closure = function ($data) use ($expectedValidationGroups): array {
@@ -92,7 +98,8 @@ class ValidateListenerTest extends \PHPUnit_Framework_TestCase
         $data = new DummyEntity();
 
         $validatorProphecy = $this->prophesize(ValidatorInterface::class);
-        $validatorProphecy->validate($data, null, ['a', 'b', 'c'])->shouldBeCalled();
+        $constraintViolationList = $this->prophesize(ConstraintViolationListInterface::class);
+        $validatorProphecy->validate($data, null, ['a', 'b', 'c'])->willReturn($constraintViolationList)->shouldBeCalled();
         $validator = $validatorProphecy->reveal();
 
         list($resourceMetadataFactory, $event) = $this->createEventObject('groups_builder', $data);
@@ -117,7 +124,8 @@ class ValidateListenerTest extends \PHPUnit_Framework_TestCase
         $expectedValidationGroups = ['foo'];
 
         $validatorProphecy = $this->prophesize(ValidatorInterface::class);
-        $validatorProphecy->validate($data, null, $expectedValidationGroups)->shouldBeCalled();
+        $constraintViolationList = $this->prophesize(ConstraintViolationListInterface::class);
+        $validatorProphecy->validate($data, null, $expectedValidationGroups)->willreturn($constraintViolationList)->shouldBeCalled();
 
         $containerProphecy = $this->prophesize(ContainerInterface::class);
         $containerProphecy->has('foo')->willReturn(false)->shouldBeCalled();
@@ -143,15 +151,16 @@ class ValidateListenerTest extends \PHPUnit_Framework_TestCase
         $validationViewListener->onKernelView($event);
     }
 
-    /**
-     * @expectedException \ApiPlatform\Core\Bridge\Symfony\Validator\Exception\ValidationException
-     */
     public function testThrowsValidationExceptionWithViolationsFound()
     {
+        $this->expectException(ValidationException::class);
+
         $data = new DummyEntity();
         $expectedValidationGroups = ['a', 'b', 'c'];
 
         $violationsProphecy = $this->prophesize(ConstraintViolationListInterface::class);
+        $violationsProphecy->rewind()->shouldBeCalled();
+        $violationsProphecy->valid()->shouldBeCalled();
         $violationsProphecy->count()->willReturn(1)->shouldBeCalled();
         $violations = $violationsProphecy->reveal();
 
@@ -186,7 +195,7 @@ class ValidateListenerTest extends \PHPUnit_Framework_TestCase
             '_api_receive' => $receive,
         ]);
 
-        $request->setMethod(Request::METHOD_POST);
+        $request->setMethod('POST');
         $event = new GetResponseForControllerResultEvent($kernel, $request, HttpKernelInterface::MASTER_REQUEST, $data);
 
         return [$resourceMetadataFactory, $event];

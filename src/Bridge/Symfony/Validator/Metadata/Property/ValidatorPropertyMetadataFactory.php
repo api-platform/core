@@ -72,16 +72,11 @@ final class ValidatorPropertyMetadataFactory implements PropertyMetadataFactoryI
 
     /**
      * Tests if the property is required because of its validation groups.
-     *
-     * @param ValidatorPropertyMetadataInterface $validatorPropertyMetadata
-     * @param array                              $options
-     *
-     * @return bool
      */
     private function isRequiredByGroups(ValidatorPropertyMetadataInterface $validatorPropertyMetadata, array $options): bool
     {
         foreach ($options['validation_groups'] as $validationGroup) {
-            if (!is_string($validationGroup)) {
+            if (!\is_string($validationGroup)) {
                 continue;
             }
 
@@ -97,10 +92,6 @@ final class ValidatorPropertyMetadataFactory implements PropertyMetadataFactoryI
 
     /**
      * Is this constraint making the related property required?
-     *
-     * @param Constraint $constraint
-     *
-     * @return bool
      */
     private function isRequired(Constraint $constraint): bool
     {

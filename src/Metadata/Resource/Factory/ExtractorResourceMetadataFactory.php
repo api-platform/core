@@ -48,7 +48,7 @@ final class ExtractorResourceMetadataFactory implements ResourceMetadataFactoryI
             }
         }
 
-        if (!class_exists($resourceClass) || !$resource = $this->extractor->getResources()[$resourceClass] ?? false) {
+        if (!(class_exists($resourceClass) || interface_exists($resourceClass)) || !$resource = $this->extractor->getResources()[$resourceClass] ?? false) {
             return $this->handleNotFound($parentResourceMetadata, $resourceClass);
         }
 
@@ -58,12 +58,8 @@ final class ExtractorResourceMetadataFactory implements ResourceMetadataFactoryI
     /**
      * Returns the metadata from the decorated factory if available or throws an exception.
      *
-     * @param ResourceMetadata|null $parentPropertyMetadata
-     * @param string                $resourceClass
      *
      * @throws ResourceClassNotFoundException
-     *
-     * @return ResourceMetadata
      */
     private function handleNotFound(ResourceMetadata $parentPropertyMetadata = null, string $resourceClass): ResourceMetadata
     {
@@ -76,15 +72,10 @@ final class ExtractorResourceMetadataFactory implements ResourceMetadataFactoryI
 
     /**
      * Creates a new instance of metadata if the property is not already set.
-     *
-     * @param ResourceMetadata $resourceMetadata
-     * @param array            $metadata
-     *
-     * @return ResourceMetadata
      */
     private function update(ResourceMetadata $resourceMetadata, array $metadata): ResourceMetadata
     {
-        foreach (['shortName', 'description', 'iri', 'itemOperations', 'collectionOperations', 'attributes'] as $property) {
+        foreach (['shortName', 'description', 'iri', 'itemOperations', 'collectionOperations', 'subresourceOperations', 'graphql', 'attributes'] as $property) {
             if (null === $metadata[$property] || null !== $resourceMetadata->{'get'.ucfirst($property)}()) {
                 continue;
             }

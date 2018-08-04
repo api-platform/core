@@ -13,9 +13,11 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Bridge\Doctrine\Orm\Filter;
 
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryBuilderHelper;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
+use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
 
 /**
@@ -30,7 +32,7 @@ use Doctrine\ORM\QueryBuilder;
  *
  * @author Teoh Han Hui <teohhanhui@gmail.com>
  */
-class ExistsFilter extends AbstractFilter
+class ExistsFilter extends AbstractContextAwareFilter
 {
     const QUERY_PARAMETER_KEY = 'exists';
 
@@ -75,9 +77,9 @@ class ExistsFilter extends AbstractFilter
             return;
         }
 
-        if (in_array($value[self::QUERY_PARAMETER_KEY], ['true', '1', '', null], true)) {
+        if (\in_array($value[self::QUERY_PARAMETER_KEY], [true, 'true', '1', '', null], true)) {
             $value = true;
-        } elseif (in_array($value[self::QUERY_PARAMETER_KEY], ['false', '0'], true)) {
+        } elseif (\in_array($value[self::QUERY_PARAMETER_KEY], [false, 'false', '0'], true)) {
             $value = false;
         } else {
             $this->logger->notice('Invalid filter ignored', [
@@ -92,7 +94,7 @@ class ExistsFilter extends AbstractFilter
             return;
         }
 
-        $alias = 'o';
+        $alias = $queryBuilder->getRootAliases()[0];
         $field = $property;
 
         if ($this->isPropertyNested($property, $resourceClass)) {
@@ -106,6 +108,15 @@ class ExistsFilter extends AbstractFilter
             if ($metadata->isCollectionValuedAssociation($field)) {
                 $queryBuilder
                     ->andWhere(sprintf('%s.%s %s EMPTY', $alias, $field, $value ? 'IS NOT' : 'IS'));
+
+                return;
+            }
+
+            if ($metadata->isAssociationInverseSide($field)) {
+                $alias = QueryBuilderHelper::addJoinOnce($queryBuilder, $queryNameGenerator, $alias, $field, Join::LEFT_JOIN);
+
+                $queryBuilder
+                    ->andWhere(sprintf('%s %s NULL', $alias, $value ? 'IS NOT' : 'IS'));
 
                 return;
             }
@@ -124,11 +135,6 @@ class ExistsFilter extends AbstractFilter
 
     /**
      * Determines whether the given property refers to a nullable field.
-     *
-     * @param string $property
-     * @param string $resourceClass
-     *
-     * @return bool
      */
     protected function isNullableField(string $property, string $resourceClass): bool
     {
@@ -161,15 +167,13 @@ class ExistsFilter extends AbstractFilter
     /**
      * Determines whether an association is nullable.
      *
-     * @param array $associationMapping
      *
-     * @return bool
      *
      * @see https://github.com/doctrine/doctrine2/blob/v2.5.4/lib/Doctrine/ORM/Tools/EntityGenerator.php#L1221-L1246
      */
     private function isAssociationNullable(array $associationMapping): bool
     {
-        if (isset($associationMapping['id']) && $associationMapping['id']) {
+        if (!empty($associationMapping['id'])) {
             return false;
         }
 

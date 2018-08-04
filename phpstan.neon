@@ -4,14 +4,34 @@ parameters:
     excludes_analyse:
         - tests/Fixtures/app/cache
         - tests/Fixtures/appMongo/cache
+        # The Symfony Configuration API isn't good enough to be analysed
+        - src/Bridge/Symfony/Bundle/DependencyInjection/Configuration.php
     ignoreErrors:
-        - '#Call to an undefined method Symfony\\Component\\Routing\\Exception\\ExceptionInterface::getCode\(\)#'
-        - '#Call to an undefined method Prophecy\\Prophecy\\ObjectProphecy::[a-zA-Z0-9_]+\(\)#'
-        - '#Access to an undefined property Prophecy\\Prophecy\\ObjectProphecy::\$[a-zA-Z0-9_]+#'
-        - '#Call to an undefined method PHPUnit_Framework_MockObject_MockObject::[a-zA-Z0-9_]+\(\)#'
-        - '#Call to an undefined method Doctrine\\Common\\Persistence\\Mapping\\ClassMetadata::getAssociationMappings\(\)#'
+        # Real problems, hard to fix
+        - '#Parameter \#2 \$dqlPart of method Doctrine\\ORM\\QueryBuilder::add\(\) expects array\|object, string given\.#'
 
         # False positives
-        - '#Parameter \#2 \$dqlPart of method Doctrine\\ORM\\QueryBuilder::add\(\) expects Doctrine\\ORM\\Query\\Expr\\Base, Doctrine\\ORM\\Query\\Expr\\Join\[\] given#' # Fixed in Doctrine's master
+        - '#Access to an undefined property Prophecy\\Prophecy\\ObjectProphecy::\$[a-zA-Z0-9_]+#'
+        - '#Access to an undefined property object::\$isIdentifierComposite.#'
         - '#Call to an undefined method Doctrine\\Common\\Persistence\\ObjectManager::getConnection\(\)#'
-        - '#Parameter \#1 \$callable of static method Doctrine\\Common\\Annotations\\AnnotationRegistry::registerLoader\(\) expects callable, mixed\[\] given#'
+        - '#Call to an undefined method PHPUnit\\Framework\\MockObject\\MockObject::[a-zA-Z0-9_]+\(\)#'
+        - '#Call to an undefined method Prophecy\\Prophecy\\ObjectProphecy::[a-zA-Z0-9_]+\(\)#'
+        - '#Method ApiPlatform\\Core\\Tests\\Bridge\\Doctrine\\Orm\\ItemDataProviderTest::getManagerRegistry\(\) should return Doctrine\\Common\\Persistence\\ManagerRegistry but returns object\.#'
+        - '#Method ApiPlatform\\Core\\Tests\\Bridge\\Doctrine\\Orm\\Util\\IdentifierManagerTraitTest::getObjectManager\(\) should return Doctrine\\Common\\Persistence\\ObjectManager but returns object\.#'
+        # Temporary fix while the PHPStan extension for Prophecy isn't compatible with 0.10
+        - '#Parameter .* expects .*, .*object.* given\.#'
+        - '#Parameter \#[0-9] \$filterLocator of class ApiPlatform\\Core\\Bridge\\Doctrine\\Orm\\Extension\\FilterExtension constructor expects ApiPlatform\\Core\\Api\\FilterCollection|Psr\\Container\\ContainerInterface(\|null)?, ArrayObject given\.#'
+        - '#Property ApiPlatform\\Core\\Test\\DoctrineOrmFilterTestCase::\$managerRegistry \(Doctrine\\Common\\Persistence\\ManagerRegistry\) does not accept object\.#'
+        - '#Property ApiPlatform\\Core\\Test\\DoctrineOrmFilterTestCase::\$repository \(Doctrine\\ORM\\EntityRepository\) does not accept Doctrine\\Common\\Persistence\\ObjectRepository\.#'
+        # https://github.com/doctrine/doctrine2/pull/7298/files
+        - '#Strict comparison using === between null and int will always evaluate to false\.#'
+        - '#Strict comparison using !== between null and null will always evaluate to false\.#'
+
+        # Expected, due to deprecations
+        - '#Method ApiPlatform\\Core\\Bridge\\Doctrine\\Orm\\Extension\\QueryResult(Item|Collection)ExtensionInterface::getResult\(\) invoked with 4 parameters, 1 required\.#'
+        - '#Method ApiPlatform\\Core\\Bridge\\Doctrine\\Orm\\Extension\\QueryResult(Item|Collection)ExtensionInterface::supportsResult\(\) invoked with 3 parameters, 1-2 required\.#'
+        - '#Method ApiPlatform\\Core\\Bridge\\Doctrine\\Orm\\Filter\\AbstractFilter::apply\(\) invoked with 5 parameters, 3-4 required\.#'
+        - '#Method ApiPlatform\\Core\\Bridge\\Doctrine\\Orm\\Filter\\AbstractFilter::filterProperty\(\) invoked with 7 parameters, 5-6 required\.#'
+        - '#Method ApiPlatform\\Core\\Bridge\\Doctrine\\Orm\\Filter\\FilterInterface::apply\(\) invoked with 5 parameters, 3-4 required\.#'
+        - '#Method ApiPlatform\\Core\\Bridge\\Doctrine\\Orm\\Filter\\OrderFilter::filterProperty\(\) invoked with 7 parameters, 5-6 required\.#'
+        - '#Method ApiPlatform\\Core\\DataProvider\\CollectionDataProviderInterface::getCollection\(\) invoked with 3 parameters, 1-2 required.#'

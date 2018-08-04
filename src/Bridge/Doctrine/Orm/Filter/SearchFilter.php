@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Bridge\Doctrine\Orm\Filter;
 
 use ApiPlatform\Core\Api\IriConverterInterface;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryBuilderHelper;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
 use Doctrine\Common\Persistence\ManagerRegistry;
@@ -29,7 +30,7 @@ use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class SearchFilter extends AbstractFilter
+class SearchFilter extends AbstractContextAwareFilter
 {
     /**
      * @var string Exact matching
@@ -59,7 +60,10 @@ class SearchFilter extends AbstractFilter
     protected $iriConverter;
     protected $propertyAccessor;
 
-    public function __construct(ManagerRegistry $managerRegistry, RequestStack $requestStack, IriConverterInterface $iriConverter, PropertyAccessorInterface $propertyAccessor = null, LoggerInterface $logger = null, array $properties = null)
+    /**
+     * @param RequestStack|null $requestStack No prefix to prevent autowiring of this deprecated property
+     */
+    public function __construct(ManagerRegistry $managerRegistry, $requestStack = null, IriConverterInterface $iriConverter, PropertyAccessorInterface $propertyAccessor = null, LoggerInterface $logger = null, array $properties = null)
     {
         parent::__construct($managerRegistry, $requestStack, $logger, $properties);
 
@@ -132,10 +136,6 @@ class SearchFilter extends AbstractFilter
 
     /**
      * Converts a Doctrine type in PHP type.
-     *
-     * @param string $doctrineType
-     *
-     * @return string
      */
     private function getType(string $doctrineType): string
     {
@@ -157,6 +157,16 @@ class SearchFilter extends AbstractFilter
                 return 'float';
         }
 
+        if (\defined(Type::class.'::DATE_IMMUTABLE')) {
+            switch ($doctrineType) {
+                case Type::DATE_IMMUTABLE:
+                case Type::TIME_IMMUTABLE:
+                case Type::DATETIME_IMMUTABLE:
+                case Type::DATETIMETZ_IMMUTABLE:
+                    return \DateTimeInterface::class;
+            }
+        }
+
         return 'string';
     }
 
@@ -173,7 +183,7 @@ class SearchFilter extends AbstractFilter
             return;
         }
 
-        $alias = 'o';
+        $alias = $queryBuilder->getRootAliases()[0];
         $field = $property;
 
         if ($this->isPropertyNested($property, $resourceClass)) {
@@ -200,15 +210,23 @@ class SearchFilter extends AbstractFilter
                 $values = array_map([$this, 'getIdFromValue'], $values);
             }
 
+            if (!$this->hasValidValues($values, $this->getDoctrineFieldType($property, $resourceClass))) {
+                $this->logger->notice('Invalid filter ignored', [
+                    'exception' => new InvalidArgumentException(sprintf('Values for field "%s" are not valid according to the doctrine type.', $field)),
+                ]);
+
+                return;
+            }
+
             $strategy = $this->properties[$property] ?? self::STRATEGY_EXACT;
 
             // prefixing the strategy with i makes it case insensitive
-            if (strpos($strategy, 'i') === 0) {
+            if (0 === strpos($strategy, 'i')) {
                 $strategy = substr($strategy, 1);
                 $caseSensitive = false;
             }
 
-            if (1 === count($values)) {
+            if (1 === \count($values)) {
                 $this->addWhereByStrategy($strategy, $queryBuilder, $queryNameGenerator, $alias, $field, $values[0], $caseSensitive);
 
                 return;
@@ -237,18 +255,26 @@ class SearchFilter extends AbstractFilter
 
         $values = array_map([$this, 'getIdFromValue'], $values);
 
+        if (!$this->hasValidValues($values, $this->getDoctrineFieldType($property, $resourceClass))) {
+            $this->logger->notice('Invalid filter ignored', [
+                'exception' => new InvalidArgumentException(sprintf('Values for field "%s" are not valid according to the doctrine type.', $field)),
+            ]);
+
+            return;
+        }
+
         $association = $field;
         $valueParameter = $queryNameGenerator->generateParameterName($association);
 
         if ($metadata->isCollectionValuedAssociation($association)) {
-            $associationAlias = $this->addJoinOnce($queryBuilder, $queryNameGenerator, $alias, $association);
+            $associationAlias = QueryBuilderHelper::addJoinOnce($queryBuilder, $queryNameGenerator, $alias, $association);
             $associationField = 'id';
         } else {
             $associationAlias = $alias;
             $associationField = $field;
         }
 
-        if (1 === count($values)) {
+        if (1 === \count($values)) {
             $queryBuilder
                 ->andWhere(sprintf('%s.%s = :%s', $associationAlias, $associationField, $valueParameter))
                 ->setParameter($valueParameter, $values[0]);
@@ -262,13 +288,6 @@ class SearchFilter extends AbstractFilter
     /**
      * Adds where clause according to the strategy.
      *
-     * @param string                      $strategy
-     * @param QueryBuilder                $queryBuilder
-     * @param QueryNameGeneratorInterface $queryNameGenerator
-     * @param string                      $alias
-     * @param string                      $field
-     * @param mixed                       $value
-     * @param bool                        $caseSensitive
      *
      * @throws InvalidArgumentException If strategy does not exist
      */
@@ -315,10 +334,6 @@ class SearchFilter extends AbstractFilter
      *
      * For example, "o.name" will get wrapped into "LOWER(o.name)" when $caseSensitive
      * is false.
-     *
-     * @param bool $caseSensitive
-     *
-     * @return \Closure
      */
     protected function createWrapCase(bool $caseSensitive): \Closure
     {
@@ -333,10 +348,6 @@ class SearchFilter extends AbstractFilter
 
     /**
      * Gets the ID from an IRI or a raw ID.
-     *
-     * @param string $value
-     *
-     * @return mixed
      */
     protected function getIdFromValue(string $value)
     {
@@ -353,19 +364,31 @@ class SearchFilter extends AbstractFilter
 
     /**
      * Normalize the values array.
-     *
-     * @param array $values
-     *
-     * @return array
      */
     protected function normalizeValues(array $values): array
     {
         foreach ($values as $key => $value) {
-            if (!is_int($key) || !is_string($value)) {
+            if (!\is_int($key) || !\is_string($value)) {
                 unset($values[$key]);
             }
         }
 
         return array_values($values);
+    }
+
+    /**
+     * When the field should be an integer, check that the given value is a valid one.
+     *
+     * @param Type|string $type
+     */
+    protected function hasValidValues(array $values, $type = null): bool
+    {
+        foreach ($values as $key => $value) {
+            if (Type::INTEGER === $type && null !== $value && false === filter_var($value, FILTER_VALIDATE_INT)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }

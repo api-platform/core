@@ -22,11 +22,30 @@ use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
  */
 final class OperationResourceMetadataFactory implements ResourceMetadataFactoryInterface
 {
-    private $decorated;
+    /**
+     * @internal
+     */
+    const SUPPORTED_COLLECTION_OPERATION_METHODS = [
+        'GET' => true,
+        'POST' => true,
+    ];
 
-    public function __construct(ResourceMetadataFactoryInterface $decorated)
+    /**
+     * @internal
+     */
+    const SUPPORTED_ITEM_OPERATION_METHODS = [
+        'GET' => true,
+        'PUT' => true,
+        'DELETE' => true,
+    ];
+
+    private $decorated;
+    private $formats;
+
+    public function __construct(ResourceMetadataFactoryInterface $decorated, array $formats = [])
     {
         $this->decorated = $decorated;
+        $this->formats = $formats;
     }
 
     /**
@@ -35,19 +54,39 @@ final class OperationResourceMetadataFactory implements ResourceMetadataFactoryI
     public function create(string $resourceClass): ResourceMetadata
     {
         $resourceMetadata = $this->decorated->create($resourceClass);
-        $reflectionClass = new \ReflectionClass($resourceClass);
-        $isAbstract = $reflectionClass->isAbstract();
+        $isAbstract = (new \ReflectionClass($resourceClass))->isAbstract();
 
-        if (null === $resourceMetadata->getCollectionOperations()) {
+        $collectionOperations = $resourceMetadata->getCollectionOperations();
+        if (null === $collectionOperations) {
             $resourceMetadata = $resourceMetadata->withCollectionOperations($this->createOperations(
                 $isAbstract ? ['GET'] : ['GET', 'POST']
             ));
+        } else {
+            $resourceMetadata = $this->normalize(true, $resourceMetadata, $collectionOperations);
         }
 
-        if (null === $resourceMetadata->getItemOperations()) {
-            $resourceMetadata = $resourceMetadata->withItemOperations($this->createOperations(
-                $isAbstract ? ['GET', 'DELETE'] : ['GET', 'PUT', 'DELETE']
-            ));
+        $itemOperations = $resourceMetadata->getItemOperations();
+        if (null === $itemOperations) {
+            $methods = ['GET', 'DELETE'];
+
+            if (!$isAbstract) {
+                $methods[] = 'PUT';
+
+                if (isset($this->formats['jsonapi'])) {
+                    $methods[] = 'PATCH';
+                }
+            }
+
+            $resourceMetadata = $resourceMetadata->withItemOperations($this->createOperations($methods));
+        } else {
+            $resourceMetadata = $this->normalize(false, $resourceMetadata, $itemOperations);
+        }
+
+        $graphql = $resourceMetadata->getGraphql();
+        if (null === $graphql) {
+            $resourceMetadata = $resourceMetadata->withGraphql(['query' => [], 'delete' => [], 'update' => [], 'create' => []]);
+        } else {
+            $resourceMetadata = $this->normalizeGraphQl($resourceMetadata, $graphql);
         }
 
         return $resourceMetadata;
@@ -61,5 +100,44 @@ final class OperationResourceMetadataFactory implements ResourceMetadataFactoryI
         }
 
         return $operations;
+    }
+
+    private function normalize(bool $collection, ResourceMetadata $resourceMetadata, array $operations): ResourceMetadata
+    {
+        $newOperations = [];
+        foreach ($operations as $operationName => $operation) {
+            // e.g.: @ApiResource(itemOperations={"get"})
+            if (\is_int($operationName) && \is_string($operation)) {
+                $operationName = $operation;
+                $operation = [];
+            }
+
+            $upperOperationName = strtoupper($operationName);
+            if ($collection) {
+                $supported = isset(self::SUPPORTED_COLLECTION_OPERATION_METHODS[$upperOperationName]);
+            } else {
+                $supported = isset(self::SUPPORTED_ITEM_OPERATION_METHODS[$upperOperationName]) || (isset($this->formats['jsonapi']) && 'PATCH' === $upperOperationName);
+            }
+
+            if (!isset($operation['method']) && !isset($operation['route_name'])) {
+                $supported ? $operation['method'] = $upperOperationName : $operation['route_name'] = $operationName;
+            }
+
+            $newOperations[$operationName] = $operation;
+        }
+
+        return $collection ? $resourceMetadata->withCollectionOperations($newOperations) : $resourceMetadata->withItemOperations($newOperations);
+    }
+
+    private function normalizeGraphQl(ResourceMetadata $resourceMetadata, array $operations)
+    {
+        foreach ($operations as $operationName => $operation) {
+            if (\is_int($operationName) && \is_string($operation)) {
+                unset($operations[$operationName]);
+                $operations[$operation] = [];
+            }
+        }
+
+        return $resourceMetadata->withGraphql($operations);
     }
 }

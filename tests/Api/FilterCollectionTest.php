@@ -14,11 +14,12 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\Api;
 
 use ApiPlatform\Core\Api\FilterCollection;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class FilterCollectionTest extends \PHPUnit_Framework_TestCase
+class FilterCollectionTest extends TestCase
 {
     /**
      * @group legacy

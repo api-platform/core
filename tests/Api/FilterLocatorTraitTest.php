@@ -16,12 +16,13 @@ namespace ApiPlatform\Core\Tests\Api;
 use ApiPlatform\Core\Api\FilterCollection;
 use ApiPlatform\Core\Api\FilterInterface;
 use ApiPlatform\Core\Api\FilterLocatorTrait;
+use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 
 /**
  * @author Baptiste Meyer <baptiste.meyer@gmail.com>
  */
-class FilterLocatorTraitTest extends \PHPUnit_Framework_TestCase
+class FilterLocatorTraitTest extends TestCase
 {
     public function testSetFilterLocator()
     {
@@ -52,27 +53,29 @@ class FilterLocatorTraitTest extends \PHPUnit_Framework_TestCase
         $filterLocatorTraitImpl = $this->getFilterLocatorTraitImpl();
         $filterLocatorTraitImpl->setFilterLocator(null, true);
 
-        $this->assertEquals(null, $filterLocatorTraitImpl->getFilterLocator());
+        $this->assertNull($filterLocatorTraitImpl->getFilterLocator());
     }
 
     /**
      * @group legacy
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage The "$filterLocator" argument is expected to be an implementation of the "Psr\Container\ContainerInterface" interface.
      */
     public function testSetFilterLocatorWithNullAndNullNotAllowed()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The "$filterLocator" argument is expected to be an implementation of the "Psr\\Container\\ContainerInterface" interface.');
+
         $filterLocatorTraitImpl = $this->getFilterLocatorTraitImpl();
         $filterLocatorTraitImpl->setFilterLocator(null);
     }
 
     /**
      * @group legacy
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage The "$filterLocator" argument is expected to be an implementation of the "Psr\Container\ContainerInterface" interface or null.
      */
     public function testSetFilterLocatorWithInvalidFilterLocator()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The "$filterLocator" argument is expected to be an implementation of the "Psr\\Container\\ContainerInterface" interface or null.');
+
         $filterLocatorTraitImpl = $this->getFilterLocatorTraitImpl();
         $filterLocatorTraitImpl->setFilterLocator(new \ArrayObject(), true);
     }

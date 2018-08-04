@@ -25,22 +25,13 @@ interface ResourceClassResolverInterface
     /**
      * Guesses the associated resource.
      *
-     * @param mixed       $value
-     * @param string|null $resourceClass
-     * @param bool        $strict
      *
      * @throws InvalidArgumentException
-     *
-     * @return string
      */
     public function getResourceClass($value, string $resourceClass = null, bool $strict = false): string;
 
     /**
      * Is the given class a resource class?
-     *
-     * @param string $type
-     *
-     * @return bool
      */
     public function isResourceClass(string $type): bool;
 }

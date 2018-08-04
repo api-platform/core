@@ -6,7 +6,7 @@ Feature: Order filter on collections
 
   @createSchema
   Scenario: Get collection ordered in ascending order on an integer property and on which order filter has been enabled in whitelist mode
-    Given there is "30" dummy objects
+    Given there are 30 dummy objects
     When I send a "GET" request to "/dummies?order[id]=asc"
     Then the response status code should be 200
     And the response should be in JSON
@@ -301,8 +301,68 @@ Feature: Order filter on collections
     }
     """
 
+  Scenario: Get collection ordered collection on several property keep the order
+    # Adding 30 more data with the same name
+    Given there are 30 dummy objects
+    When I send a "GET" request to "/dummies?order[name]=desc&order[id]=desc"
+    Then the response status code should be 200
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+    And the JSON should be valid according to this schema:
+    """
+    {
+      "type": "object",
+      "properties": {
+        "@context": {"pattern": "^/contexts/Dummy$"},
+        "@id": {"pattern": "^/dummies$"},
+        "@type": {"pattern": "^hydra:Collection$"},
+        "hydra:member": {
+          "type": "array",
+          "items": [
+            {
+              "type": "object",
+              "properties": {
+                "@id": {
+                  "type": "string",
+                  "pattern": "^/dummies/39$"
+                }
+              }
+            },
+            {
+              "type": "object",
+              "properties": {
+                "@id": {
+                  "type": "string",
+                  "pattern": "^/dummies/9$"
+                }
+              }
+            },
+            {
+              "type": "object",
+              "properties": {
+                "@id": {
+                  "type": "string",
+                  "pattern": "^/dummies/38$"
+                }
+              }
+            }
+          ],
+          "additionalItems": false,
+          "maxItems": 3,
+          "minItems": 3
+        },
+        "hydra:view": {
+          "type": "object",
+          "properties": {
+            "@id": {"pattern": "^/dummies\\?order%5Bname%5D=desc"},
+            "@type": {"pattern": "^hydra:PartialCollectionView$"}
+          }
+        }
+      }
+    }
+    """
+
   Scenario: Get collection ordered in ascending order on an association and on which order filter has been enabled in whitelist mode
-    Given there is "30" dummy objects with relatedDummy
+    Given there are 30 dummy objects with relatedDummy
     When I send a "GET" request to "/dummies?order[relatedDummy]=asc"
     Then the response status code should be 200
     And the response should be in JSON
@@ -362,7 +422,7 @@ Feature: Order filter on collections
     """
 
   Scenario: Get collection ordered in ascending order on an embedded and on which order filter has been enabled in whitelist mode
-    Given there is "30" dummy objects with embeddedDummy
+    Given there are 30 dummy objects with embeddedDummy
     When I send a "GET" request to "/embedded_dummies?order[embeddedDummy]=asc"
     Then the response status code should be 200
     And the response should be in JSON
@@ -539,7 +599,6 @@ Feature: Order filter on collections
     }
     """
 
-  @dropSchema
   Scenario: Get collection ordered by a non valid properties and on which order filter has been enabled in whitelist mode
     When I send a "GET" request to "/dummies?order[alias]=asc"
     Then the response status code should be 200
@@ -766,6 +825,58 @@ Feature: Order filter on collections
           "type": "object",
           "properties": {
             "@id": {"pattern": "^/dummies\\?order%5Bunknown%5D=desc"},
+            "@type": {"pattern": "^hydra:PartialCollectionView$"}
+          }
+        }
+      }
+    }
+    """
+
+  @createSchema
+  Scenario: Get collection ordered in descending order on a related property
+    Given there are 2 dummy objects with relatedDummy
+    When I send a "GET" request to "/dummies?order[relatedDummy.name]=desc"
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+    And the JSON should be valid according to this schema:
+    """
+    {
+      "type": "object",
+      "properties": {
+        "@context": {"pattern": "^/contexts/Dummy$"},
+        "@id": {"pattern": "^/dummies$"},
+        "@type": {"pattern": "^hydra:Collection$"},
+        "hydra:member": {
+          "type": "array",
+          "items": [
+            {
+              "type": "object",
+              "properties": {
+                "@id": {
+                  "type": "string",
+                  "pattern": "^/dummies/2$"
+                }
+              }
+            },
+            {
+              "type": "object",
+              "properties": {
+                "@id": {
+                  "type": "string",
+                  "pattern": "^/dummies/1$"
+                }
+              }
+            }
+          ],
+          "additionalItems": false,
+          "maxItems": 2,
+          "minItems": 2
+        },
+        "hydra:view": {
+          "type": "object",
+          "properties": {
+            "@id": {"pattern": "^/dummies\\?order%5BrelatedDummy.name%5D=desc"},
             "@type": {"pattern": "^hydra:PartialCollectionView$"}
           }
         }

@@ -14,83 +14,19 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\Bridge\Doctrine\Orm\Filter;
 
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\ExistsFilter;
-use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGenerator;
+use ApiPlatform\Core\Test\DoctrineOrmFilterTestCase;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
-use Doctrine\Common\Persistence\ManagerRegistry;
-use Doctrine\ORM\EntityRepository;
-use Symfony\Bridge\Doctrine\Test\DoctrineTestHelper;
-use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * @author Antoine Bluchet <soyuka@gmail.com>
  */
-class ExistsFilterTest extends KernelTestCase
+class ExistsFilterTest extends DoctrineOrmFilterTestCase
 {
-    /**
-     * @var ManagerRegistry
-     */
-    private $managerRegistry;
-
-    /**
-     * @var EntityRepository
-     */
-    private $repository;
-
-    /**
-     * @var string
-     */
-    protected $resourceClass;
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function setUp()
-    {
-        self::bootKernel();
-        $manager = DoctrineTestHelper::createTestEntityManager();
-        $this->managerRegistry = self::$kernel->getContainer()->get('doctrine');
-        $this->repository = $manager->getRepository(Dummy::class);
-        $this->resourceClass = Dummy::class;
-    }
-
-    /**
-     * @dataProvider provideApplyTestData
-     */
-    public function testApply($properties, array $filterParameters, string $expected)
-    {
-        $request = Request::create('/api/dummies', 'GET', $filterParameters);
-
-        $requestStack = new RequestStack();
-        $requestStack->push($request);
-
-        $queryBuilder = $this->repository->createQueryBuilder('o');
-
-        $filter = new ExistsFilter(
-            $this->managerRegistry,
-            $requestStack,
-            null,
-            $properties
-        );
-
-        $filter->apply($queryBuilder, new QueryNameGenerator(), $this->resourceClass);
-        $actual = $queryBuilder->getQuery()->getDQL();
-
-        $this->assertEquals($expected, $actual);
-    }
+    protected $filterClass = ExistsFilter::class;
 
     public function testGetDescription()
     {
-        $filter = new ExistsFilter(
-            $this->managerRegistry,
-            new RequestStack(),
-            null,
-            [
-                'name' => null,
-                'description' => null,
-            ]
-        );
+        $filter = new ExistsFilter($this->managerRegistry, null, null, ['name' => null, 'description' => null]);
 
         $this->assertEquals([
             'description[exists]' => [
@@ -103,10 +39,7 @@ class ExistsFilterTest extends KernelTestCase
 
     public function testGetDescriptionDefaultFields()
     {
-        $filter = new ExistsFilter(
-            $this->managerRegistry,
-            new RequestStack()
-        );
+        $filter = new ExistsFilter($this->managerRegistry);
 
         $this->assertEquals([
             'alias[exists]' => [
@@ -144,6 +77,11 @@ class ExistsFilterTest extends KernelTestCase
                 'type' => 'bool',
                 'required' => false,
             ],
+            'arrayData[exists]' => [
+                'property' => 'arrayData',
+                'type' => 'bool',
+                'required' => false,
+            ],
             'nameConverted[exists]' => [
                 'property' => 'nameConverted',
                 'type' => 'bool',
@@ -157,16 +95,6 @@ class ExistsFilterTest extends KernelTestCase
         ], $filter->getDescription($this->resourceClass));
     }
 
-    /**
-     * Provides test data.
-     *
-     * Provides 3 parameters:
-     *  - configuration of filterable properties
-     *  - filter parameters
-     *  - expected DQL query
-     *
-     * @return array
-     */
     public function provideApplyTestData(): array
     {
         return [
@@ -336,6 +264,54 @@ class ExistsFilterTest extends KernelTestCase
                     ],
                 ],
                 sprintf('SELECT o FROM %s o WHERE o.description IS NOT NULL AND o.relatedDummy IS NULL', Dummy::class),
+            ],
+
+            'related owned association does not exist' => [
+                [
+                    'relatedOwnedDummy' => null,
+                ],
+                [
+                    'relatedOwnedDummy' => [
+                        'exists' => '0',
+                    ],
+                ],
+                sprintf('SELECT o FROM %s o LEFT JOIN o.relatedOwnedDummy relatedOwnedDummy_a1 WHERE relatedOwnedDummy_a1 IS NULL', Dummy::class),
+            ],
+
+            'related owned association exists' => [
+                [
+                    'relatedOwnedDummy' => null,
+                ],
+                [
+                    'relatedOwnedDummy' => [
+                        'exists' => '1',
+                    ],
+                ],
+                sprintf('SELECT o FROM %s o LEFT JOIN o.relatedOwnedDummy relatedOwnedDummy_a1 WHERE relatedOwnedDummy_a1 IS NOT NULL', Dummy::class),
+            ],
+
+            'related owning association does not exist' => [
+                [
+                    'relatedOwningDummy' => null,
+                ],
+                [
+                    'relatedOwningDummy' => [
+                        'exists' => '0',
+                    ],
+                ],
+                sprintf('SELECT o FROM %s o WHERE o.relatedOwningDummy IS NULL', Dummy::class),
+            ],
+
+            'related owning association exists' => [
+                [
+                    'relatedOwningDummy' => null,
+                ],
+                [
+                    'relatedOwningDummy' => [
+                        'exists' => '1',
+                    ],
+                ],
+                sprintf('SELECT o FROM %s o WHERE o.relatedOwningDummy IS NOT NULL', Dummy::class),
             ],
         ];
     }

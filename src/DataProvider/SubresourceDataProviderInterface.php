@@ -27,12 +27,12 @@ interface SubresourceDataProviderInterface
      *
      * @param string $resourceClass The root resource class
      * @param array  $identifiers   Identifiers and their values
-     * @param array  $context       The context indicate the conjuction between collection properties (identifiers) and their class
+     * @param array  $context       The context indicates the conjunction between collection properties (identifiers) and their class
      * @param string $operationName
      *
      * @throws ResourceClassNotSupportedException
      *
      * @return object|null
      */
-    public function getSubresource(string $resourceClass, array $identifiers, array $context, string $operationName);
+    public function getSubresource(string $resourceClass, array $identifiers, array $context, string $operationName = null);
 }

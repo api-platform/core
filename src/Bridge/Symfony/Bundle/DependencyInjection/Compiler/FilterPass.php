@@ -35,7 +35,7 @@ final class FilterPass implements CompilerPassInterface
     public function process(ContainerBuilder $container)
     {
         $filters = [];
-        foreach ($container->findTaggedServiceIds('api_platform.filter') as $serviceId => $tags) {
+        foreach ($container->findTaggedServiceIds('api_platform.filter', true) as $serviceId => $tags) {
             foreach ($tags as $tag) {
                 if (!isset($tag['id'])) {
                     $tag['id'] = $serviceId;

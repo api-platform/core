@@ -23,12 +23,15 @@ use Nelmio\ApiDocBundle\DataTypes;
 use Nelmio\ApiDocBundle\Parser\ParserInterface;
 use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
+use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 
 /**
  * Extract input and output information for the NelmioApiDocBundle.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  * @author Teoh Han Hui <teohhanhui@gmail.com>
+ *
+ * @deprecated since version 2.2, to be removed in 3.0. NelmioApiDocBundle 3 has native support for API Platform.
  */
 final class ApiPlatformParser implements ParserInterface
 {
@@ -49,6 +52,8 @@ final class ApiPlatformParser implements ParserInterface
 
     public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, NameConverterInterface $nameConverter = null)
     {
+        @trigger_error('The '.__CLASS__.' class is deprecated since version 2.2 and will be removed in 3.0. NelmioApiDocBundle 3 has native support for API Platform.', E_USER_DEPRECATED);
+
         $this->resourceMetadataFactory = $resourceMetadataFactory;
         $this->propertyNameCollectionFactory = $propertyNameCollectionFactory;
         $this->propertyMetadataFactory = $propertyMetadataFactory;
@@ -61,7 +66,7 @@ final class ApiPlatformParser implements ParserInterface
     public function supports(array $item)
     {
         $data = explode(':', $item['class'], 3);
-        if (!in_array($data[0], [self::IN_PREFIX, self::OUT_PREFIX], true)) {
+        if (!\in_array($data[0], [self::IN_PREFIX, self::OUT_PREFIX], true)) {
             return false;
         }
         if (!isset($data[1])) {
@@ -99,12 +104,7 @@ final class ApiPlatformParser implements ParserInterface
     /**
      * Parses a class.
      *
-     * @param ResourceMetadata $resourceMetadata
-     * @param string           $resourceClass
-     * @param string           $io
-     * @param string[]         $visited
-     *
-     * @return array
+     * @param string[] $visited
      */
     private function parseResource(ResourceMetadata $resourceMetadata, string $resourceClass, string $io, array $visited = []): array
     {
@@ -113,15 +113,15 @@ final class ApiPlatformParser implements ParserInterface
         $options = [];
         $attributes = $resourceMetadata->getAttributes();
 
-        if (isset($attributes['normalization_context']['groups'])) {
-            $options['serializer_groups'] = $attributes['normalization_context']['groups'];
+        if (isset($attributes['normalization_context'][AbstractNormalizer::GROUPS])) {
+            $options['serializer_groups'] = $attributes['normalization_context'][AbstractNormalizer::GROUPS];
         }
 
-        if (isset($attributes['denormalization_context']['groups'])) {
+        if (isset($attributes['denormalization_context'][AbstractNormalizer::GROUPS])) {
             if (isset($options['serializer_groups'])) {
-                $options['serializer_groups'] += $attributes['denormalization_context']['groups'];
+                $options['serializer_groups'] += $attributes['denormalization_context'][AbstractNormalizer::GROUPS];
             } else {
-                $options['serializer_groups'] = $attributes['denormalization_context']['groups'];
+                $options['serializer_groups'] = $attributes['denormalization_context'][AbstractNormalizer::GROUPS];
             }
         }
 
@@ -131,24 +131,18 @@ final class ApiPlatformParser implements ParserInterface
     private function getGroupsContext(ResourceMetadata $resourceMetadata, string $operationName, bool $isNormalization)
     {
         $groupsContext = $isNormalization ? 'normalization_context' : 'denormalization_context';
-        $itemOperationAttribute = $resourceMetadata->getItemOperationAttribute($operationName, $groupsContext, ['groups' => []], true)['groups'];
-        $collectionOperationAttribute = $resourceMetadata->getCollectionOperationAttribute($operationName, $groupsContext, ['groups' => []], true)['groups'];
+        $itemOperationAttribute = $resourceMetadata->getItemOperationAttribute($operationName, $groupsContext, [AbstractNormalizer::GROUPS => []], true)[AbstractNormalizer::GROUPS];
+        $collectionOperationAttribute = $resourceMetadata->getCollectionOperationAttribute($operationName, $groupsContext, [AbstractNormalizer::GROUPS => []], true)[AbstractNormalizer::GROUPS];
 
         return [
             $groupsContext => [
-                'groups' => array_merge($itemOperationAttribute ?? [], $collectionOperationAttribute ?? []),
+                AbstractNormalizer::GROUPS => array_merge($itemOperationAttribute ?? [], $collectionOperationAttribute ?? []),
             ],
         ];
     }
 
     /**
      * Returns groups of item & collection.
-     *
-     * @param ResourceMetadata $resourceMetadata
-     * @param string           $operationName
-     * @param string           $io
-     *
-     * @return array
      */
     private function getGroupsForItemAndCollectionOperation(ResourceMetadata $resourceMetadata, string $operationName, string $io): array
     {
@@ -157,13 +151,13 @@ final class ApiPlatformParser implements ParserInterface
 
         if (self::OUT_PREFIX === $io) {
             return [
-                'serializer_groups' => !empty($operation['normalization_context']) ? $operation['normalization_context']['groups'] : [],
+                'serializer_groups' => !empty($operation['normalization_context']) ? $operation['normalization_context'][AbstractNormalizer::GROUPS] : [],
             ];
         }
 
         if (self::IN_PREFIX === $io) {
             return [
-                'serializer_groups' => !empty($operation['denormalization_context']) ? $operation['denormalization_context']['groups'] : [],
+                'serializer_groups' => !empty($operation['denormalization_context']) ? $operation['denormalization_context'][AbstractNormalizer::GROUPS] : [],
             ];
         }
 
@@ -173,13 +167,8 @@ final class ApiPlatformParser implements ParserInterface
     /**
      * Returns a property metadata.
      *
-     * @param ResourceMetadata $resourceMetadata
-     * @param string           $resourceClass
-     * @param string           $io
-     * @param string[]         $visited
-     * @param string[]         $options
-     *
-     * @return array
+     * @param string[] $visited
+     * @param string[] $options
      */
     private function getPropertyMetadata(ResourceMetadata $resourceMetadata, string $resourceClass, string $io, array $visited, array $options): array
     {
@@ -202,11 +191,8 @@ final class ApiPlatformParser implements ParserInterface
     /**
      * Parses a property.
      *
-     * @param ResourceMetadata $resourceMetadata
-     * @param PropertyMetadata $propertyMetadata
-     * @param string           $io
-     * @param Type|null        $type
-     * @param string[]         $visited
+     * @param string   $io
+     * @param string[] $visited
      *
      * @return array
      */
@@ -279,7 +265,7 @@ final class ApiPlatformParser implements ParserInterface
 
             $data['actualType'] = DataTypes::MODEL;
             $data['subType'] = $className;
-            $data['children'] = in_array($className, $visited, true) ? [] : $this->parseResource($resourceMetadata, $className, $io, $visited);
+            $data['children'] = \in_array($className, $visited, true) ? [] : $this->parseResource($resourceMetadata, $className, $io, $visited);
 
             return $data;
         }

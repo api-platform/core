@@ -4,14 +4,13 @@ Feature: Retrieve data with Composite identifiers
   I need to retrieve all collections
 
   @createSchema
-  @dropSchema
   Scenario: Get a collection with composite identifiers
     Given there are Composite identifier objects
     When I send a "GET" request to "/composite_items"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
-    And the JSON should be equal to:
+    And the JSON should be deep equal to:
     """
     {
       "@context": "/contexts/CompositeItem",
@@ -36,7 +35,6 @@ Feature: Retrieve data with Composite identifiers
     """
 
   @createSchema
-  @dropSchema
   Scenario: Get collection with composite identifiers
     Given there are Composite identifier objects
     When I send a "GET" request to "/composite_relations"
@@ -125,7 +123,6 @@ Feature: Retrieve data with Composite identifiers
     When I send a "GET" request to "/composite_relations/compositeLabel=1;"
     Then the response status code should be 404
 
-  @dropSchema
   Scenario: Get first composite item
     Given there are Composite identifier objects
     When I send a "GET" request to "/composite_items/1"

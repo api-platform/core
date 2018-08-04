@@ -29,11 +29,6 @@ trait EagerLoadingTrait
 
     /**
      * Checks if an operation has a `force_eager` attribute.
-     *
-     * @param string $resourceClass
-     * @param array  $options
-     *
-     * @return bool
      */
     private function shouldOperationForceEager(string $resourceClass, array $options): bool
     {
@@ -42,11 +37,6 @@ trait EagerLoadingTrait
 
     /**
      * Checks if an operation has a `fetch_partial` attribute.
-     *
-     * @param string $resourceClass
-     * @param array  $options
-     *
-     * @return bool
      */
     private function shouldOperationFetchPartial(string $resourceClass, array $options): bool
     {
@@ -55,13 +45,6 @@ trait EagerLoadingTrait
 
     /**
      * Get the boolean attribute of an operation or the resource metadata.
-     *
-     * @param string $resourceClass
-     * @param array  $options
-     * @param string $attributeName
-     * @param bool   $default
-     *
-     * @return bool
      */
     private function getBooleanOperationAttribute(string $resourceClass, array $options, string $attributeName, bool $default): bool
     {
@@ -75,30 +58,26 @@ trait EagerLoadingTrait
             $attribute = $resourceMetadata->getAttribute($attributeName);
         }
 
-        return is_bool($attribute) ? $attribute : $default;
+        return \is_bool($attribute) ? $attribute : $default;
     }
 
     /**
      * Checkes if the class has an associationMapping with FETCH=EAGER.
      *
-     * @param EntityManager     $em
-     * @param ClassMetadataInfo $classMetadata
-     * @param array             $checked       array cache of tested metadata classes
-     *
-     * @return bool
+     * @param array $checked array cache of tested metadata classes
      */
     private function hasFetchEagerAssociation(EntityManager $em, ClassMetadataInfo $classMetadata, array &$checked = []): bool
     {
         $checked[] = $classMetadata->name;
 
-        foreach ($classMetadata->associationMappings as $mapping) {
+        foreach ($classMetadata->getAssociationMappings() as $mapping) {
             if (ClassMetadataInfo::FETCH_EAGER === $mapping['fetch']) {
                 return true;
             }
 
             $related = $em->getClassMetadata($mapping['targetEntity']);
 
-            if (in_array($related->name, $checked, true)) {
+            if (\in_array($related->name, $checked, true)) {
                 continue;
             }
 

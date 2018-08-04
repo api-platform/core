@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\EventListener;
 
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
 
@@ -25,14 +24,12 @@ use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
 final class RespondListener
 {
     const METHOD_TO_CODE = [
-        Request::METHOD_POST => Response::HTTP_CREATED,
-        Request::METHOD_DELETE => Response::HTTP_NO_CONTENT,
+        'POST' => Response::HTTP_CREATED,
+        'DELETE' => Response::HTTP_NO_CONTENT,
     ];
 
     /**
      * Creates a Response to send to the client according to the requested format.
-     *
-     * @param GetResponseForControllerResultEvent $event
      */
     public function onKernelView(GetResponseForControllerResultEvent $event)
     {
@@ -43,15 +40,25 @@ final class RespondListener
             return;
         }
 
+        $headers = [
+            'Content-Type' => sprintf('%s; charset=utf-8', $request->getMimeType($request->getRequestFormat())),
+            'Vary' => 'Accept',
+            'X-Content-Type-Options' => 'nosniff',
+            'X-Frame-Options' => 'deny',
+        ];
+
+        if ($request->attributes->has('_api_write_item_iri')) {
+            $headers['Content-Location'] = $request->attributes->get('_api_write_item_iri');
+
+            if ($request->isMethod('POST')) {
+                $headers['Location'] = $request->attributes->get('_api_write_item_iri');
+            }
+        }
+
         $event->setResponse(new Response(
             $controllerResult,
             self::METHOD_TO_CODE[$request->getMethod()] ?? Response::HTTP_OK,
-            [
-                'Content-Type' => sprintf('%s; charset=utf-8', $request->getMimeType($request->getRequestFormat())),
-                'Vary' => 'Accept',
-                'X-Content-Type-Options' => 'nosniff',
-                'X-Frame-Options' => 'deny',
-            ]
+            $headers
         ));
     }
 }

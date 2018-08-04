@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Bridge\Symfony\Routing;
 
-use Psr\Cache\CacheException;
+use ApiPlatform\Core\Cache\CachedTrait;
 use Psr\Cache\CacheItemPoolInterface;
 
 /**
@@ -23,9 +23,10 @@ use Psr\Cache\CacheItemPoolInterface;
  */
 final class CachedRouteNameResolver implements RouteNameResolverInterface
 {
+    use CachedTrait;
+
     const CACHE_KEY_PREFIX = 'route_name_';
 
-    private $cacheItemPool;
     private $decorated;
 
     public function __construct(CacheItemPoolInterface $cacheItemPool, RouteNameResolverInterface $decorated)
@@ -39,37 +40,11 @@ final class CachedRouteNameResolver implements RouteNameResolverInterface
      */
     public function getRouteName(string $resourceClass, $operationType /**, array $context = []**/): string
     {
-        $cacheKey = self::CACHE_KEY_PREFIX.md5(serialize([$resourceClass, $operationType]));
+        $context = \func_num_args() > 2 ? func_get_arg(2) : [];
+        $cacheKey = self::CACHE_KEY_PREFIX.md5(serialize([$resourceClass, $operationType, $context['subresource_resources'] ?? null]));
 
-        try {
-            $cacheItem = $this->cacheItemPool->getItem($cacheKey);
-
-            if ($cacheItem->isHit()) {
-                return $cacheItem->get();
-            }
-        } catch (CacheException $e) {
-            // do nothing
-        }
-
-        if (func_num_args() > 2) {
-            $context = func_get_arg(2);
-        } else {
-            $context = [];
-        }
-
-        $routeName = $this->decorated->getRouteName($resourceClass, $operationType, $context);
-
-        if (!isset($cacheItem)) {
-            return $routeName;
-        }
-
-        try {
-            $cacheItem->set($routeName);
-            $this->cacheItemPool->save($cacheItem);
-        } catch (CacheException $e) {
-            // do nothing
-        }
-
-        return $routeName;
+        return $this->getCached($cacheKey, function () use ($resourceClass, $operationType, $context) {
+            return $this->decorated->getRouteName($resourceClass, $operationType, $context);
+        });
     }
 }

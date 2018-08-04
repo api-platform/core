@@ -14,25 +14,24 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Hydra\Serializer;
 
 use ApiPlatform\Core\Api\UrlGeneratorInterface;
-use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
-use Symfony\Component\Validator\ConstraintViolationListInterface;
+use ApiPlatform\Core\Serializer\AbstractConstraintViolationListNormalizer;
+use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 
 /**
  * Converts {@see \Symfony\Component\Validator\ConstraintViolationListInterface} to a Hydra error representation.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-final class ConstraintViolationListNormalizer implements NormalizerInterface
+final class ConstraintViolationListNormalizer extends AbstractConstraintViolationListNormalizer
 {
     const FORMAT = 'jsonld';
 
-    /**
-     * @var UrlGeneratorInterface
-     */
     private $urlGenerator;
 
-    public function __construct(UrlGeneratorInterface $urlGenerator)
+    public function __construct(UrlGeneratorInterface $urlGenerator, array $serializePayloadFields = null, NameConverterInterface $nameConverter = null)
     {
+        parent::__construct($serializePayloadFields, $nameConverter);
+
         $this->urlGenerator = $urlGenerator;
     }
 
@@ -41,20 +40,7 @@ final class ConstraintViolationListNormalizer implements NormalizerInterface
      */
     public function normalize($object, $format = null, array $context = [])
     {
-        $violations = [];
-        $messages = [];
-
-        foreach ($object as $violation) {
-            $violations[] = [
-                'propertyPath' => $violation->getPropertyPath(),
-                'message' => $violation->getMessage(),
-            ];
-
-            $propertyPath = $violation->getPropertyPath();
-            $prefix = $propertyPath ? sprintf('%s: ', $propertyPath) : '';
-
-            $messages[] = $prefix.$violation->getMessage();
-        }
+        list($messages, $violations) = $this->getMessagesAndViolations($object);
 
         return [
             '@context' => $this->urlGenerator->generate('api_jsonld_context', ['shortName' => 'ConstraintViolationList']),
@@ -63,13 +49,5 @@ final class ConstraintViolationListNormalizer implements NormalizerInterface
             'hydra:description' => $messages ? implode("\n", $messages) : (string) $object,
             'violations' => $violations,
         ];
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function supportsNormalization($data, $format = null)
-    {
-        return self::FORMAT === $format && $data instanceof ConstraintViolationListInterface;
     }
 }

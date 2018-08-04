@@ -12,12 +12,13 @@
 declare(strict_types=1);
 
 use Behat\Symfony2Extension\Context\KernelAwareContext;
+use PHPUnit\Framework\ExpectationFailedException;
 use Symfony\Component\HttpKernel\KernelInterface;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class HttpCacheContext implements KernelAwareContext
+final class HttpCacheContext implements KernelAwareContext
 {
     /**
      * @var KernelInterface
@@ -30,19 +31,17 @@ class HttpCacheContext implements KernelAwareContext
     }
 
     /**
-     * @Then ":iris" IRIs should be purged
+     * @Then :iris IRIs should be purged
      */
     public function irisShouldBePurged(string $iris)
     {
-        $purger = $this->kernel->getContainer()->get('api_platform.http_cache.purger');
+        $purger = $this->kernel->getContainer()->get('test.api_platform.http_cache.purger');
 
         $purgedIris = implode(',', $purger->getIris());
         $purger->clear();
 
         if ($iris !== $purgedIris) {
-            throw new \PHPUnit_Framework_ExpectationFailedException(
-                sprintf('IRIs "%s" does not match expected "%s".', $purgedIris, $iris)
-            );
+            throw new ExpectationFailedException(sprintf('IRIs "%s" does not match expected "%s".', $purgedIris, $iris));
         }
     }
 }

@@ -12,6 +12,8 @@
             <argument type="service" id="api_platform.resource_class_resolver" />
             <argument type="service" id="api_platform.operation_method_resolver" />
             <argument type="service" id="api_platform.router" />
+            <argument type="service" id="api_platform.subresource_operation_factory" />
+            <argument type="service" id="api_platform.name_converter" on-invalid="ignore" />
 
             <tag name="serializer.normalizer" priority="32" />
         </service>
@@ -29,6 +31,8 @@
 
         <service id="api_platform.hydra.normalizer.constraint_violation_list" class="ApiPlatform\Core\Hydra\Serializer\ConstraintViolationListNormalizer" public="false">
             <argument type="service" id="api_platform.router" />
+            <argument>%api_platform.validator.serialize_payload_fields%</argument>
+            <argument type="service" id="api_platform.name_converter" on-invalid="ignore" />
 
             <tag name="serializer.normalizer" priority="64" />
         </service>

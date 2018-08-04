@@ -1,0 +1,9 @@
+ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\FlexConfig: ~
+ApiPlatform\Core\Tests\Fixtures\TestBundle\OtherResources\ResourceInterface:
+    itemOperations:
+        get:
+            method: 'GET'
+
+    collectionOperations:
+        get:
+            method: 'GET'

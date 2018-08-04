@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Metadata\Property\Factory;
 
 use ApiPlatform\Core\Annotation\ApiSubresource;
+use ApiPlatform\Core\Exception\InvalidResourceException;
 use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 use ApiPlatform\Core\Metadata\Property\SubresourceMetadata;
 use ApiPlatform\Core\Util\Reflection;
@@ -52,7 +53,7 @@ final class AnnotationSubresourceMetadataFactory implements PropertyMetadataFact
             $annotation = $this->reader->getPropertyAnnotation($reflectionClass->getProperty($property), ApiSubresource::class);
 
             if (null !== $annotation) {
-                return $this->updateMetadata($annotation, $propertyMetadata);
+                return $this->updateMetadata($annotation, $propertyMetadata, $resourceClass, $property);
             }
         }
 
@@ -70,19 +71,28 @@ final class AnnotationSubresourceMetadataFactory implements PropertyMetadataFact
             $annotation = $this->reader->getMethodAnnotation($reflectionMethod, ApiSubresource::class);
 
             if (null !== $annotation) {
-                return $this->updateMetadata($annotation, $propertyMetadata);
+                return $this->updateMetadata($annotation, $propertyMetadata, $resourceClass, $property);
             }
         }
 
         return $propertyMetadata;
     }
 
-    private function updateMetadata(ApiSubresource $annotation, PropertyMetadata $propertyMetadata): PropertyMetadata
+    private function updateMetadata(ApiSubresource $annotation, PropertyMetadata $propertyMetadata, string $originResourceClass, string $propertyName): PropertyMetadata
     {
         $type = $propertyMetadata->getType();
+        if (null === $type) {
+            throw new InvalidResourceException(sprintf('Property "%s" on resource "%s" is declared as a subresource, but its type could not be determined.', $propertyName, $originResourceClass));
+        }
         $isCollection = $type->isCollection();
         $resourceClass = $isCollection ? $type->getCollectionValueType()->getClassName() : $type->getClassName();
+        $maxDepth = $annotation->maxDepth;
+        // @ApiSubresource is on the class identifier (/collection/{id}/subcollection/{subcollectionId})
+        if (null === $resourceClass) {
+            $resourceClass = $originResourceClass;
+            $isCollection = false;
+        }
 
-        return $propertyMetadata->withSubresource(new SubresourceMetadata($resourceClass, $isCollection));
+        return $propertyMetadata->withSubresource(new SubresourceMetadata($resourceClass, $isCollection, $maxDepth));
     }
 }

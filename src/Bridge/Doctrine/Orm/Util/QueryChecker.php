@@ -32,10 +32,6 @@ final class QueryChecker
 
     /**
      * Determines whether the query builder uses a HAVING clause.
-     *
-     * @param QueryBuilder $queryBuilder
-     *
-     * @return bool
      */
     public static function hasHavingClause(QueryBuilder $queryBuilder): bool
     {
@@ -44,11 +40,6 @@ final class QueryChecker
 
     /**
      * Determines whether the query builder has any root entity with foreign key identifier.
-     *
-     * @param QueryBuilder    $queryBuilder
-     * @param ManagerRegistry $managerRegistry
-     *
-     * @return bool
      */
     public static function hasRootEntityWithForeignKeyIdentifier(QueryBuilder $queryBuilder, ManagerRegistry $managerRegistry): bool
     {
@@ -57,11 +48,6 @@ final class QueryChecker
 
     /**
      * Determines whether the query builder has any composite identifier.
-     *
-     * @param QueryBuilder    $queryBuilder
-     * @param ManagerRegistry $managerRegistry
-     *
-     * @return bool
      */
     public static function hasRootEntityWithCompositeIdentifier(QueryBuilder $queryBuilder, ManagerRegistry $managerRegistry): bool
     {
@@ -70,12 +56,6 @@ final class QueryChecker
 
     /**
      * Detects if the root entity has the given identifier.
-     *
-     * @param QueryBuilder    $queryBuilder
-     * @param ManagerRegistry $managerRegistry
-     * @param bool            $isForeign
-     *
-     * @return bool
      */
     private static function hasRootEntityWithIdentifier(QueryBuilder $queryBuilder, ManagerRegistry $managerRegistry, bool $isForeign): bool
     {
@@ -94,10 +74,6 @@ final class QueryChecker
 
     /**
      * Determines whether the query builder has the maximum number of results specified.
-     *
-     * @param QueryBuilder $queryBuilder
-     *
-     * @return bool
      */
     public static function hasMaxResults(QueryBuilder $queryBuilder): bool
     {
@@ -107,11 +83,6 @@ final class QueryChecker
     /**
      * Determines whether the query builder has ORDER BY on entity joined through
      * to-many association.
-     *
-     * @param QueryBuilder    $queryBuilder
-     * @param ManagerRegistry $managerRegistry
-     *
-     * @return bool
      */
     public static function hasOrderByOnToManyJoin(QueryBuilder $queryBuilder, ManagerRegistry $managerRegistry): bool
     {
@@ -127,27 +98,52 @@ final class QueryChecker
             $parts = QueryJoinParser::getOrderByParts($orderBy);
 
             foreach ($parts as $part) {
-                if (false !== ($pos = strpos($part, '.'))) {
-                    $alias = substr($part, 0, $pos);
-
-                    $orderByAliases[$alias] = true;
+                $pos = strpos($part, '.');
+                if (false !== $pos) {
+                    $orderByAliases[substr($part, 0, $pos)] = true;
                 }
             }
         }
 
-        if (!empty($orderByAliases)) {
-            foreach ($joinParts as $joins) {
-                foreach ($joins as $join) {
-                    $alias = QueryJoinParser::getJoinAlias($join);
+        if (!$orderByAliases) {
+            return false;
+        }
 
-                    if (isset($orderByAliases[$alias])) {
-                        $relationship = QueryJoinParser::getJoinRelationship($join);
-                        list($parentAlias, $association) = explode('.', $relationship);
+        foreach ($joinParts as $joins) {
+            foreach ($joins as $join) {
+                $alias = QueryJoinParser::getJoinAlias($join);
 
-                        $parentMetadata = QueryJoinParser::getClassMetadataFromJoinAlias($parentAlias, $queryBuilder, $managerRegistry);
+                if (!isset($orderByAliases[$alias])) {
+                    continue;
+                }
+                $relationship = QueryJoinParser::getJoinRelationship($join);
 
-                        if ($parentMetadata->isCollectionValuedAssociation($association)) {
-                            return true;
+                if (false !== strpos($relationship, '.')) {
+                    /*
+                     * We select the parent alias because it may differ from the origin alias given above
+                     * @see https://github.com/api-platform/core/issues/1313
+                     */
+                    list($relationAlias, $association) = explode('.', $relationship);
+                    $metadata = QueryJoinParser::getClassMetadataFromJoinAlias($relationAlias, $queryBuilder, $managerRegistry);
+                    if ($metadata->isCollectionValuedAssociation($association)) {
+                        return true;
+                    }
+                } else {
+                    $parentMetadata = $managerRegistry->getManagerForClass($relationship)->getClassMetadata($relationship);
+
+                    foreach ($queryBuilder->getRootEntities() as $rootEntity) {
+                        $rootMetadata = $managerRegistry
+                            ->getManagerForClass($rootEntity)
+                            ->getClassMetadata($rootEntity);
+
+                        if (!$rootMetadata instanceof ClassMetadata) {
+                            continue;
+                        }
+
+                        foreach ($rootMetadata->getAssociationsByTargetClass($relationship) as $association => $mapping) {
+                            if ($parentMetadata->isCollectionValuedAssociation($association)) {
+                                return true;
+                            }
                         }
                     }
                 }
@@ -159,10 +155,6 @@ final class QueryChecker
 
     /**
      * Determines whether the query builder already has a left join.
-     *
-     * @param QueryBuilder $queryBuilder
-     *
-     * @return bool
      */
     public static function hasLeftJoin(QueryBuilder $queryBuilder): bool
     {

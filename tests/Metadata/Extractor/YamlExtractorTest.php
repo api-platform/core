@@ -13,28 +13,28 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Tests\Metadata\Extractor;
 
+use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\Metadata\Extractor\YamlExtractor;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class YamlExtractorTest extends \PHPUnit_Framework_TestCase
+class YamlExtractorTest extends TestCase
 {
-    /**
-     * @expectedException \ApiPlatform\Core\Exception\InvalidArgumentException
-     * @expectedExceptionMessage The property "shortName" must be a "string", "integer" given.
-     */
     public function testInvalidProperty()
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('The property "shortName" must be a "string", "integer" given.');
+
         (new YamlExtractor([__DIR__.'/../../Fixtures/FileConfigurations/badpropertytype.yml']))->getResources();
     }
 
-    /**
-     * @expectedException \ApiPlatform\Core\Exception\InvalidArgumentException
-     * @expectedExceptionMessageRegExp /Unable to parse in ".+\/\.\.\/\.\.\/Fixtures\/FileConfigurations\/parse_exception.yml"/
-     */
     public function testParseException()
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessageRegExp('/Unable to parse in ".+\\/\\.\\.\\/\\.\\.\\/Fixtures\\/FileConfigurations\\/parse_exception.yml"/');
+
         (new YamlExtractor([__DIR__.'/../../Fixtures/FileConfigurations/parse_exception.yml']))->getResources();
     }
 

@@ -14,9 +14,13 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\Bridge\Symfony\Bundle\DependencyInjection;
 
 use ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\Configuration;
+use ApiPlatform\Core\Exception\FilterValidationException;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
+use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
+use Symfony\Component\Config\Definition\Exception\InvalidTypeException;
 use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Serializer\Exception\ExceptionInterface;
@@ -25,7 +29,7 @@ use Symfony\Component\Serializer\Exception\ExceptionInterface;
  * @author Kévin Dunglas <dunglas@gmail.com>
  * @author Baptiste Meyer <baptiste.meyer@gmail.com>
  */
-class ConfigurationTest extends \PHPUnit_Framework_TestCase
+class ConfigurationTest extends TestCase
 {
     /**
      * @var Configuration
@@ -66,14 +70,27 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
             'exception_to_status' => [
                 ExceptionInterface::class => Response::HTTP_BAD_REQUEST,
                 InvalidArgumentException::class => Response::HTTP_BAD_REQUEST,
+                FilterValidationException::class => Response::HTTP_BAD_REQUEST,
             ],
             'default_operation_path_resolver' => 'api_platform.operation_path_resolver.underscore',
             'path_segment_name_generator' => 'api_platform.path_segment_name_generator.underscore',
+            'validator' => [
+                'serialize_payload_fields' => [],
+            ],
             'name_converter' => null,
-            'enable_fos_user' => false,
+            'enable_fos_user' => true,
             'enable_nelmio_api_doc' => false,
             'enable_swagger' => true,
             'enable_swagger_ui' => true,
+            'enable_entrypoint' => true,
+            'enable_docs' => true,
+            'enable_profiler' => true,
+            'graphql' => [
+                'enabled' => true,
+                'graphiql' => [
+                    'enabled' => true,
+                ],
+            ],
             'oauth' => [
                 'enabled' => false,
                 'clientId' => '',
@@ -83,6 +100,9 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
                 'tokenUrl' => '/oauth/v2/token',
                 'authorizationUrl' => '/oauth/v2/auth',
                 'scopes' => [],
+            ],
+            'swagger' => [
+                'api_keys' => [],
             ],
             'eager_loading' => [
                 'enabled' => true,
@@ -95,12 +115,15 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
                 'order_parameter_name' => 'order',
                 'pagination' => [
                     'enabled' => true,
+                    'partial' => false,
                     'client_enabled' => false,
                     'client_items_per_page' => false,
+                    'client_partial' => false,
                     'items_per_page' => 30,
                     'page_parameter_name' => 'page',
                     'enabled_parameter_name' => 'pagination',
                     'items_per_page_parameter_name' => 'itemsPerPage',
+                    'partial_parameter_name' => 'partial',
                     'maximum_items_per_page' => null,
                 ],
             ],
@@ -108,7 +131,11 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
                 'paths' => [],
             ],
             'http_cache' => [
-                'invalidation' => ['enabled' => false, 'varnish_urls' => []],
+                'invalidation' => [
+                    'enabled' => false,
+                    'varnish_urls' => [],
+                    'request_options' => [],
+                ],
                 'etag' => true,
                 'max_age' => null,
                 'shared_max_age' => null,
@@ -119,12 +146,14 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
                 'enable_mongodb_odm' => false,
                 'enable_orm' => true,
             ],
+            'allow_plain_identifiers' => false,
+            'resource_class_directories' => [],
         ], $config);
     }
 
     /**
      * @group legacy
-     * @expectedDeprecation Using a string "HTTP_INTERNAL_SERVER_ERROR" as a constant of the "Symfony\Component\HttpFoundation\Response" class is deprecated since API Platform 2.1 and will not be possible anymore in API Platform 3. Use the Symfony's custom YAML extension for PHP constants instead (i.e. "!php/const:Symfony\Component\HttpFoundation\Response::HTTP_BAD_REQUEST").
+     * @expectedDeprecation Using a string "HTTP_INTERNAL_SERVER_ERROR" as a constant of the "Symfony\Component\HttpFoundation\Response" class is deprecated since API Platform 2.1 and will not be possible anymore in API Platform 3. Use the Symfony's custom YAML extension for PHP constants instead (i.e. "!php/const:Symfony\Component\HttpFoundation\Response::HTTP_INTERNAL_SERVER_ERROR").
      */
     public function testLegacyExceptionToStatusConfig()
     {
@@ -171,11 +200,12 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @dataProvider invalidHttpStatusCodeProvider
-     * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
-     * @expectedExceptionMessageRegExp /The HTTP status code ".+" is not valid\./
      */
     public function testExceptionToStatusConfigWithInvalidHttpStatusCode($invalidHttpStatusCode)
     {
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessageRegExp('/The HTTP status code ".+" is not valid\\./');
+
         $this->processor->processConfiguration($this->configuration, [
             'api_platform' => [
                 'exception_to_status' => [
@@ -199,11 +229,12 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @dataProvider invalidHttpStatusCodeValueProvider
-     * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidTypeException
-     * @expectedExceptionMessageRegExp /Invalid type for path "api_platform\.exception_to_status\.Exception". Expected int, but got .+\./
      */
     public function testExceptionToStatusConfigWithInvalidHttpStatusCodeValue($invalidHttpStatusCodeValue)
     {
+        $this->expectException(InvalidTypeException::class);
+        $this->expectExceptionMessageRegExp('/Invalid type for path "api_platform\\.exception_to_status\\.Exception". Expected int, but got .+\\./');
+
         $this->processor->processConfiguration($this->configuration, [
             'api_platform' => [
                 'exception_to_status' => [
@@ -211,5 +242,40 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
                 ],
             ],
         ]);
+    }
+
+    /**
+     * Test config for api keys.
+     */
+    public function testApiKeysConfig()
+    {
+        $exampleConfig = [
+            'name' => 'Authorization',
+            'type' => 'query',
+        ];
+
+        $config = $this->processor->processConfiguration($this->configuration, [
+            'api_platform' => [
+                'swagger' => [
+                    'api_keys' => [$exampleConfig],
+                ],
+            ],
+        ]);
+
+        $this->assertTrue(isset($config['swagger']['api_keys']));
+        $this->assertSame($exampleConfig, $config['swagger']['api_keys'][0]);
+    }
+
+    /**
+     * Test config for empty title and description.
+     */
+    public function testEmptyTitleDescriptionConfig()
+    {
+        $config = $this->processor->processConfiguration($this->configuration, [
+            'api_platform' => [],
+        ]);
+
+        $this->assertSame($config['title'], '');
+        $this->assertSame($config['description'], '');
     }
 }

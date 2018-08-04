@@ -33,7 +33,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
  * @author Kévin Dunglas <dunglas@gmail.com>
  * @author Théo FIDRY <theo.fidry@gmail.com>
  */
-class OrderFilter extends AbstractFilter
+class OrderFilter extends AbstractContextAwareFilter
 {
     const NULLS_SMALLEST = 'nulls_smallest';
     const NULLS_LARGEST = 'nulls_largest';
@@ -53,12 +53,15 @@ class OrderFilter extends AbstractFilter
      */
     protected $orderParameterName;
 
-    public function __construct(ManagerRegistry $managerRegistry, RequestStack $requestStack, string $orderParameterName, LoggerInterface $logger = null, array $properties = null)
+    /**
+     * @param RequestStack|null $requestStack No prefix to prevent autowiring of this deprecated property
+     */
+    public function __construct(ManagerRegistry $managerRegistry, $requestStack = null, string $orderParameterName = 'order', LoggerInterface $logger = null, array $properties = null)
     {
         if (null !== $properties) {
             $properties = array_map(function ($propertyOptions) {
                 // shorthand for default direction
-                if (is_string($propertyOptions)) {
+                if (\is_string($propertyOptions)) {
                     $propertyOptions = [
                         'default_direction' => $propertyOptions,
                     ];
@@ -71,6 +74,26 @@ class OrderFilter extends AbstractFilter
         parent::__construct($managerRegistry, $requestStack, $logger, $properties);
 
         $this->orderParameterName = $orderParameterName;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function apply(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, string $operationName = null, array $context = [])
+    {
+        if (isset($context['filters']) && !isset($context['filters'][$this->orderParameterName])) {
+            return;
+        }
+
+        if (!isset($context['filters'][$this->orderParameterName]) || !\is_array($context['filters'][$this->orderParameterName])) {
+            parent::apply($queryBuilder, $queryNameGenerator, $resourceClass, $operationName, $context);
+
+            return;
+        }
+
+        foreach ($context['filters'][$this->orderParameterName] as $property => $value) {
+            $this->filterProperty($property, $value, $queryBuilder, $queryNameGenerator, $resourceClass, $operationName, $context);
+        }
     }
 
     /**
@@ -115,11 +138,11 @@ class OrderFilter extends AbstractFilter
         }
 
         $direction = strtoupper($direction);
-        if (!in_array($direction, ['ASC', 'DESC'], true)) {
+        if (!\in_array($direction, ['ASC', 'DESC'], true)) {
             return;
         }
 
-        $alias = 'o';
+        $alias = $queryBuilder->getRootAliases()[0];
         $field = $property;
 
         if ($this->isPropertyNested($property, $resourceClass)) {
@@ -143,11 +166,9 @@ class OrderFilter extends AbstractFilter
      */
     protected function extractProperties(Request $request/*, string $resourceClass*/): array
     {
-        $properties = $request->query->get($this->orderParameterName, []);
-        if (!is_array($properties)) {
-            return [];
-        }
+        @trigger_error(sprintf('The use of "%s::extractProperties()" is deprecated since 2.2. Use the "filters" key of the context instead.', __CLASS__), E_USER_DEPRECATED);
+        $properties = $request->query->get($this->orderParameterName);
 
-        return $properties;
+        return \is_array($properties) ? $properties : [];
     }
 }

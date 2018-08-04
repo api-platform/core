@@ -14,12 +14,13 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\Metadata\Property;
 
 use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\PropertyInfo\Type;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class PropertyMetadataTest extends \PHPUnit_Framework_TestCase
+class PropertyMetadataTest extends TestCase
 {
     public function testValueObject()
     {
@@ -77,6 +78,10 @@ class PropertyMetadataTest extends \PHPUnit_Framework_TestCase
         $this->assertNotSame($metadata, $newMetadata);
         $this->assertEquals(['a' => 'b'], $newMetadata->getAttributes());
         $this->assertEquals('b', $newMetadata->getAttribute('a'));
+
+        $newMetadata = $metadata->withInitializable(true);
+        $this->assertNotSame($metadata, $newMetadata);
+        $this->assertTrue($newMetadata->isInitializable());
     }
 
     public function testShouldReturnRequiredFalseWhenRequiredTrueIsSetButMaskedByWritableFalse()

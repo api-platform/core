@@ -21,7 +21,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
  * @ORM\Entity
  * @ORM\InheritanceType("JOINED")
  * @ORM\DiscriminatorColumn(name="discr", type="string")
- * @ORM\DiscriminatorMap({"dummyTableInheritance" = "DummyTableInheritance", "dummyTableInheritanceChild" = "DummyTableInheritanceChild", "dummyTableInheritanceDifferentChild" = "DummyTableInheritanceDifferentChild"})
+ * @ORM\DiscriminatorMap({"dummyTableInheritance"="DummyTableInheritance", "dummyTableInheritanceChild"="DummyTableInheritanceChild", "dummyTableInheritanceDifferentChild"="DummyTableInheritanceDifferentChild"})
  * @ApiResource
  */
 class DummyTableInheritance
@@ -78,8 +78,6 @@ class DummyTableInheritance
     }
 
     /**
-     * @param DummyTableInheritanceRelated $parent
-     *
      * @return $this
      */
     public function setParent(DummyTableInheritanceRelated $parent)

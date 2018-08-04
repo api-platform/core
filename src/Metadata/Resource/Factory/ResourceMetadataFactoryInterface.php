@@ -26,11 +26,8 @@ interface ResourceMetadataFactoryInterface
     /**
      * Creates a resource metadata.
      *
-     * @param string $resourceClass
      *
      * @throws ResourceClassNotFoundException
-     *
-     * @return ResourceMetadata
      */
     public function create(string $resourceClass): ResourceMetadata;
 }

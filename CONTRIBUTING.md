@@ -4,7 +4,7 @@ First of all, thank you for contributing, you're awesome!
 
 To have your code integrated in the API Platform project, there is some rules to follow, but don't panic, it's easy!
 
-## Reporting bugs
+## Reporting Bugs
 
 If you happen to find a bug, we kindly request you to report it. However, before submitting it, please:
 
@@ -27,11 +27,10 @@ publicly**. We will disclose details of the issue and credit you after having re
 
 ### Writing a Pull Request
 
-First of all, you must decide on what branch your changes will be based. If the changes your are going to make are
-fully backward-compatible, you should base your changes on the latest stable branch (`2.0` at the moment).
-Otherwise, you should base your changes on the `master` branch.
+First of all, you must decide on what branch your changes will be based depending of the nature of the change.
+See [the dedicated documentation entry](https://api-platform.com/docs/extra/releases/).
 
-### Matching coding standards
+### Matching Coding Standards
 
 The API Platform project follows [Symfony coding standards](https://symfony.com/doc/current/contributing/code/standards.html).
 But don't worry, you can fix CS issues automatically using the [PHP CS Fixer](http://cs.sensiolabs.org/) tool
@@ -52,7 +51,7 @@ When you send a PR, just make sure that:
 * You make a PR on the related documentation in the [api-platform/docs](https://github.com/api-platform/docs) repository.
 * You make the PR on the same branch you based your changes on. If you see commits
 that you did not make in your PR, you're doing it wrong.
-* Also don't forget to add a comment when you update a PR with a ping to the maintainer (`@dunglas`, `@sroze` or `@theofidry`), so he/she will get a notification.
+* Also don't forget to add a comment when you update a PR with a ping to [the maintainers](https://github.com/orgs/api-platform/people), so he/she will get a notification.
 * Squash your commits into one commit. (see the next chapter)
 
 All Pull Requests must include [this header](.github/PULL_REQUEST_TEMPLATE.md).
@@ -63,7 +62,7 @@ On `api-platform/core` there are two kinds of tests: unit (`phpunit`) and integr
 
 Both `phpunit` and `behat` are development dependencies and should be available in the `vendor` directory.
 
-#### Phpunit and coverage generation
+#### Phpunit and Coverage Generation
 
 To launch unit tests:
 
@@ -90,16 +89,10 @@ Coverage will be available in `coverage/index.html`.
 The command to launch Behat tests is:
 
 ```
-./vendor/bin/behat --stop-on-failure -vvv
+./vendor/bin/behat --suite=default --stop-on-failure -vvv
 ```
 
-You may need to clear the cache manually before running behat tests because of the temporary sql database. To do so, just remove the `test` cache directory:
-
-```
-rm -r tests/Fixtures/app/cache/test
-```
-
-## Squash your commits
+## Squash your Commits
 
 If you have 3 commits. So start with:
 
@@ -127,7 +120,7 @@ Now force push to update your PR:
 git push --force
 ```
 
-# License and copyright attribution
+# License and Copyright Attribution
 
 When you open a Pull Request to the API Platform project, you agree to license your code under the [MIT license](LICENSE)
 and to transfer the copyright on the submitted code to Kévin Dunglas.

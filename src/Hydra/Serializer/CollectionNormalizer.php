@@ -17,9 +17,11 @@ use ApiPlatform\Core\Api\IriConverterInterface;
 use ApiPlatform\Core\Api\OperationType;
 use ApiPlatform\Core\Api\ResourceClassResolverInterface;
 use ApiPlatform\Core\DataProvider\PaginatorInterface;
+use ApiPlatform\Core\DataProvider\PartialPaginatorInterface;
 use ApiPlatform\Core\JsonLd\ContextBuilderInterface;
 use ApiPlatform\Core\JsonLd\Serializer\JsonLdContextTrait;
 use ApiPlatform\Core\Serializer\ContextTrait;
+use Symfony\Component\Serializer\Normalizer\CacheableSupportsMethodInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerAwareInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerAwareTrait;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
@@ -30,7 +32,7 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
  * @author Kevin Dunglas <dunglas@gmail.com>
  * @author Samuel ROZE <samuel.roze@gmail.com>
  */
-final class CollectionNormalizer implements NormalizerInterface, NormalizerAwareInterface
+final class CollectionNormalizer implements NormalizerInterface, NormalizerAwareInterface, CacheableSupportsMethodInterface
 {
     use ContextTrait;
     use JsonLdContextTrait;
@@ -54,7 +56,7 @@ final class CollectionNormalizer implements NormalizerInterface, NormalizerAware
      */
     public function supportsNormalization($data, $format = null)
     {
-        return self::FORMAT === $format && (is_array($data) || ($data instanceof \Traversable));
+        return self::FORMAT === $format && (\is_array($data) || ($data instanceof \Traversable));
     }
 
     /**
@@ -75,7 +77,7 @@ final class CollectionNormalizer implements NormalizerInterface, NormalizerAware
         $data = $this->addJsonLdContext($this->contextBuilder, $resourceClass, $context);
         $context = $this->initContext($resourceClass, $context);
 
-        if (isset($context['operation_type']) && $context['operation_type'] === OperationType::SUBRESOURCE) {
+        if (isset($context['operation_type']) && OperationType::SUBRESOURCE === $context['operation_type']) {
             $data['@id'] = $this->iriConverter->getSubresourceIriFromResourceClass($resourceClass, $context);
         } else {
             $data['@id'] = $this->iriConverter->getIriFromResourceClass($resourceClass);
@@ -88,10 +90,23 @@ final class CollectionNormalizer implements NormalizerInterface, NormalizerAware
             $data['hydra:member'][] = $this->normalizer->normalize($obj, $format, $context);
         }
 
-        if (is_array($object) || $object instanceof \Countable) {
-            $data['hydra:totalItems'] = $object instanceof PaginatorInterface ? $object->getTotalItems() : count($object);
+        $paginated = null;
+        if (
+            \is_array($object) ||
+            ($paginated = $object instanceof PaginatorInterface) ||
+            $object instanceof \Countable && !$object instanceof PartialPaginatorInterface
+        ) {
+            $data['hydra:totalItems'] = $paginated ? $object->getTotalItems() : \count($object);
         }
 
         return $data;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function hasCacheableSupportsMethod(): bool
+    {
+        return true;
     }
 }

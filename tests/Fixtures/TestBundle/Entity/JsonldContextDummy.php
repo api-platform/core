@@ -41,7 +41,7 @@ class JsonldContextDummy
      *
      * @ApiProperty(
      *     attributes={
-     *         "jsonld_context"= {
+     *         "jsonld_context"={
      *             "@id"="http://example.com/id",
      *             "@type"="@id",
      *             "foo"="bar"

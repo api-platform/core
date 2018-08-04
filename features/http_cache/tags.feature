@@ -1,3 +1,4 @@
+@sqlite
 Feature: Cache invalidation through HTTP Cache tags
   In order to have a fast API
   As an API software developer
@@ -69,6 +70,7 @@ Feature: Cache invalidation through HTTP Cache tags
     {
     }
     """
+    When I add "Content-Type" header equal to "application/ld+json"
     And I send a "POST" request to "/relation2s" with body:
     """
     {
@@ -91,7 +93,6 @@ Feature: Cache invalidation through HTTP Cache tags
     Then the response status code should be 201
     And "/relation1s,/relation2s/1" IRIs should be purged
 
-  @dropSchema
   Scenario: Update a Relation1
     When I add "Content-Type" header equal to "application/ld+json"
     And I send a "PUT" request to "/relation1s/1" with body:

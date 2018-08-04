@@ -23,6 +23,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
  * A User.
  *
  * @ORM\Entity
+ * @ORM\Table(name="user_test")
  * @ApiResource(attributes={
  *     "normalization_context"={"groups"={"user", "user-read"}},
  *     "denormalization_context"={"groups"={"user", "user-write"}}

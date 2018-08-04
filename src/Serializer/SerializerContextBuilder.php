@@ -16,6 +16,7 @@ namespace ApiPlatform\Core\Serializer;
 use ApiPlatform\Core\Api\OperationType;
 use ApiPlatform\Core\Exception\RuntimeException;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
+use ApiPlatform\Core\Swagger\Serializer\DocumentationNormalizer;
 use ApiPlatform\Core\Util\RequestAttributesExtractor;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -65,14 +66,15 @@ final class SerializerContextBuilder implements SerializerContextBuilderInterfac
             $context['item_operation_name'] = $attributes['item_operation_name'];
         }
 
-        $context['operation_type'] = $operationType ? $operationType : OperationType::ITEM;
+        $context['operation_type'] = $operationType ?: OperationType::ITEM;
 
         if (!$normalization && !isset($context['api_allow_update'])) {
-            $context['api_allow_update'] = Request::METHOD_PUT === $request->getMethod();
+            $context['api_allow_update'] = \in_array($request->getMethod(), ['PUT', 'PATCH'], true);
         }
 
         $context['resource_class'] = $attributes['resource_class'];
         $context['request_uri'] = $request->getRequestUri();
+        $context['uri'] = $request->getUri();
 
         if (isset($attributes['subresource_context'])) {
             $context['subresource_identifiers'] = [];
@@ -90,6 +92,8 @@ final class SerializerContextBuilder implements SerializerContextBuilderInterfac
             $context['subresource_property'] = $attributes['subresource_property'];
             $context['subresource_resource_class'] = $attributes['subresource_resource_class'] ?? null;
         }
+
+        unset($context[DocumentationNormalizer::SWAGGER_DEFINITION_NAME]);
 
         return $context;
     }

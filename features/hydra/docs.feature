@@ -35,19 +35,19 @@ Feature: Documentation support
     And the JSON node "hydra:description" should be equal to "This is a test API."
     And the JSON node "hydra:entrypoint" should be equal to "/"
     # Supported classes
-    And the Hydra class "The API entrypoint" exist
-    And the Hydra class "A constraint violation" exist
-    And the Hydra class "A constraint violation list" exist
-    And the Hydra class "CircularReference" exist
-    And the Hydra class "CustomIdentifierDummy" exist
-    And the Hydra class "CustomNormalizedDummy" exist
-    And the Hydra class "CustomWritableIdentifierDummy" exist
-    And the Hydra class "Dummy" exist
-    And the Hydra class "RelatedDummy" exist
-    And the Hydra class "RelationEmbedder" exist
-    And the Hydra class "ThirdLevel" exist
-    And the Hydra class "ParentDummy" not exist
-    And the Hydra class "UnknownDummy" not exist
+    And the Hydra class "The API entrypoint" exists
+    And the Hydra class "A constraint violation" exists
+    And the Hydra class "A constraint violation list" exists
+    And the Hydra class "CircularReference" exists
+    And the Hydra class "CustomIdentifierDummy" exists
+    And the Hydra class "CustomNormalizedDummy" exists
+    And the Hydra class "CustomWritableIdentifierDummy" exists
+    And the Hydra class "Dummy" exists
+    And the Hydra class "RelatedDummy" exists
+    And the Hydra class "RelationEmbedder" exists
+    And the Hydra class "ThirdLevel" exists
+    And the Hydra class "ParentDummy" doesn't exist
+    And the Hydra class "UnknownDummy" doesn't exist
     # Doc
     And the value of the node "@id" of the Hydra class "Dummy" is "#Dummy"
     And the value of the node "@type" of the Hydra class "Dummy" is "hydra:Class"
@@ -55,10 +55,14 @@ Feature: Documentation support
     And the value of the node "hydra:title" of the Hydra class "Dummy" is "Dummy"
     And the value of the node "hydra:description" of the Hydra class "Dummy" is "Dummy."
     # Properties
-    And "id" property doesn't exist for the Hydra class "Dummy"
+    And "id" property is readable for Hydra class "Dummy"
+    And "id" property is writable for Hydra class "Dummy"
     And "name" property is readable for Hydra class "Dummy"
     And "name" property is writable for Hydra class "Dummy"
     And "name" property is required for Hydra class "Dummy"
+    And "plainPassword" property is not readable for Hydra class "User"
+    And "plainPassword" property is writable for Hydra class "User"
+    And "plainPassword" property is not required for Hydra class "User"
     And the value of the node "@type" of the property "name" of the Hydra class "Dummy" is "hydra:SupportedProperty"
     And the value of the node "hydra:property.@id" of the property "name" of the Hydra class "Dummy" is "http://schema.org/name"
     And the value of the node "hydra:property.@type" of the property "name" of the Hydra class "Dummy" is "rdf:Property"
@@ -79,3 +83,8 @@ Feature: Documentation support
     And the value of the node "hydra:title" of the operation "PUT" of the Hydra class "Dummy" is "Replaces the Dummy resource."
     And the value of the node "hydra:title" of the operation "DELETE" of the Hydra class "Dummy" is "Deletes the Dummy resource."
     And the value of the node "returns" of the operation "DELETE" of the Hydra class "Dummy" is "owl:Nothing"
+    # Deprecations
+    And the boolean value of the node "owl:deprecated" of the Hydra class "DeprecatedResource" is true
+    And the boolean value of the node "owl:deprecated" of the property "deprecatedField" of the Hydra class "DeprecatedResource" is true
+    And the boolean value of the node "owl:deprecated" of the property "The collection of DeprecatedResource resources" of the Hydra class "The API entrypoint" is true
+    And the boolean value of the node "owl:deprecated" of the operation "GET" of the Hydra class "DeprecatedResource" is true

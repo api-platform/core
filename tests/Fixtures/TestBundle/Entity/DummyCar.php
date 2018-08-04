@@ -13,7 +13,13 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity;
 
+use ApiPlatform\Core\Annotation\ApiFilter;
 use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\BooleanFilter;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\DateFilter;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
+use ApiPlatform\Core\Serializer\Filter\GroupFilter;
+use ApiPlatform\Core\Serializer\Filter\PropertyFilter;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation as Serializer;
@@ -21,11 +27,15 @@ use Symfony\Component\Serializer\Annotation as Serializer;
 /**
  * @ApiResource(
  *     attributes={
- *          "normalization_context"={"groups"={"colors"}},
- *          "filters"={"dummy_car_colors.search_filter"}
+ *         "normalization_context"={"groups"={"colors"}}
  *     }
  * )
  * @ORM\Entity
+ * @ApiFilter(DateFilter::class, strategy=DateFilter::EXCLUDE_NULL)
+ * @ApiFilter(BooleanFilter::class)
+ * @ApiFilter(PropertyFilter::class, arguments={"parameterName"="foobar"})
+ * @ApiFilter(GroupFilter::class, arguments={"parameterName"="foobargroups"})
+ * @ApiFilter(GroupFilter::class, arguments={"parameterName"="foobargroups_override"}, id="override")
  */
 class DummyCar
 {
@@ -44,8 +54,31 @@ class DummyCar
      * @ORM\OneToMany(targetEntity="DummyCarColor", mappedBy="car")
      *
      * @Serializer\Groups({"colors"})
+     * @ApiFilter(SearchFilter::class, properties={"colors.prop"="ipartial"})
      */
     private $colors;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(type="string")
+     * @ApiFilter(SearchFilter::class, strategy="partial")
+     */
+    private $name;
+
+    /**
+     * @var bool
+     *
+     * @ORM\Column(type="boolean")
+     */
+    private $canSell;
+
+    /**
+     * @var \DateTime
+     *
+     * @ORM\Column(type="datetime")
+     */
+    private $availableAt;
 
     public function __construct()
     {
@@ -57,23 +90,45 @@ class DummyCar
         return $this->id;
     }
 
-    /**
-     * @return mixed
-     */
     public function getColors()
     {
         return $this->colors;
     }
 
-    /**
-     * @param mixed $colors
-     *
-     * @return static
-     */
-    public function setColors($colors)
+    public function setColors($colors): self
     {
         $this->colors = $colors;
 
         return $this;
+    }
+
+    public function getName(): string
+    {
+        return $this->name;
+    }
+
+    public function setName(string $name)
+    {
+        $this->name = $name;
+    }
+
+    public function getCanSell(): bool
+    {
+        return $this->canSell;
+    }
+
+    public function setCanSell(bool $canSell)
+    {
+        $this->canSell = $canSell;
+    }
+
+    public function getAvailableAt(): \DateTime
+    {
+        return $this->availableAt;
+    }
+
+    public function setAvailableAt(\DateTime $availableAt)
+    {
+        $this->availableAt = $availableAt;
     }
 }

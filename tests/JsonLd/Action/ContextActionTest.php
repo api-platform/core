@@ -19,11 +19,13 @@ use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Metadata\Resource\ResourceNameCollection;
+use PHPUnit\Framework\TestCase;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
  * @author Amrouche Hamza <hamza.simperfit@gmail.com>
  */
-class ContextActionTest extends \PHPUnit_Framework_TestCase
+class ContextActionTest extends TestCase
 {
     public function testContextActionWithEntrypoint()
     {
@@ -62,11 +64,10 @@ class ContextActionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(['@context' => ['/dummies']], $contextAction('dummy'));
     }
 
-    /**
-     * @expectedException \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
-     */
     public function testContextActionWithThrown()
     {
+        $this->expectException(NotFoundHttpException::class);
+
         $contextBuilderProphecy = $this->prophesize(ContextBuilderInterface::class);
         $resourceNameCollectionFactoryProphecy = $this->prophesize(ResourceNameCollectionFactoryInterface::class);
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);

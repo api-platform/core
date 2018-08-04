@@ -29,7 +29,7 @@ Feature: Collections support
     """
 
   Scenario: Retrieve the first page of a collection
-    Given there is "30" dummy objects
+    Given there are 30 dummy objects
     And I send a "GET" request to "/dummies"
     Then the response status code should be 200
     And the response should be in JSON
@@ -161,6 +161,50 @@ Feature: Collections support
         "hydra:search": {}
       },
       "additionalProperties": false
+    }
+    """
+
+  Scenario: Enable the partial pagination client side
+    When I send a "GET" request to "/dummies?page=7&partial=1"
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+    And the JSON should be valid according to this schema:
+    """
+    {
+      "type": "object",
+      "properties": {
+        "@context": {"pattern": "^/contexts/Dummy$"},
+        "@id": {"pattern": "^/dummies$"},
+        "@type": {"pattern": "^hydra:Collection$"},
+        "hydra:totalItems": {"type":"number", "maximum": 30},
+        "hydra:member": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "@id": {
+                "oneOf": [
+                  {"pattern": "^/dummies/19$"},
+                  {"pattern": "^/dummies/20$"},
+                  {"pattern": "^/dummies/21$"}
+                ]
+              }
+            }
+          },
+          "maxItems": 3
+        },
+        "hydra:view": {
+          "type": "object",
+          "properties": {
+            "@id": {"pattern": "^/dummies\\?partial=1&page=7$"},
+            "@type": {"pattern": "^hydra:PartialCollectionView$"},
+            "hydra:next": {"pattern": "^/dummies\\?partial=1&page=8$"},
+            "hydra:previous": {"pattern": "^/dummies\\?partial=1&page=6$"}
+          },
+          "additionalProperties": false
+        }
+      }
     }
     """
 
@@ -314,7 +358,6 @@ Feature: Collections support
     }
     """
 
-  @dropSchema
   Scenario: Filter with non-exact match
     When I send a "GET" request to "/dummies?name=Dummy%20%238"
     Then the response status code should be 200
@@ -351,3 +394,44 @@ Feature: Collections support
       "additionalProperties": false
     }
     """
+
+  @createSchema
+  Scenario: Allow passing 0 to `itemsPerPage`
+    When I send a "GET" request to "/dummies?itemsPerPage=0"
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+    And the JSON should be valid according to this schema:
+    """
+    {
+      "type": "object",
+      "properties": {
+        "@context": {"pattern": "^/contexts/Dummy$"},
+        "@id": {"pattern": "^/dummies$"},
+        "@type": {"pattern": "^hydra:Collection$"},
+        "hydra:totalItems": {"type":"number", "maximum": 30},
+        "hydra:member": {
+          "type": "array",
+          "minItems": 0,
+          "maxItems": 0
+        },
+        "hydra:view": {
+          "type": "object",
+          "properties": {
+            "@id": {"pattern": "^/dummies\\?itemsPerPage=0$"},
+            "@type": {"pattern": "^hydra:PartialCollectionView$"},
+            "hydra:first": {"pattern": "^/dummies\\?itemsPerPage=0&page=1$"},
+            "hydra:last": {"pattern": "^/dummies\\?itemsPerPage=0&page=1$"},
+            "hydra:previous": {"pattern": "^/dummies\\?itemsPerPage=0&page=1$"},
+            "hydra:next": {"pattern": "^/dummies\\?itemsPerPage=0&page=1$"}
+          }
+        },
+        "hydra:search": {}
+      },
+      "additionalProperties": false
+    }
+    """
+
+    When I send a "GET" request to "/dummies?itemsPerPage=0&page=2"
+    Then the response status code should be 400
+    And the JSON node "hydra:description" should be equal to "Page should not be greater than 1 if itemsPerPage is equal to 0"

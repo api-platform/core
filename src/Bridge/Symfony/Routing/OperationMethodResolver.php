@@ -70,52 +70,34 @@ final class OperationMethodResolver implements OperationMethodResolverInterface
     }
 
     /**
-     * @param string $resourceClass
-     * @param string $operationName
-     * @param string $operationType
-     *
      * @throws RuntimeException
-     *
-     * @return string
      */
     private function getOperationMethod(string $resourceClass, string $operationName, string $operationType): string
     {
         $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
 
-        if ($operationType === OperationType::ITEM) {
+        if (OperationType::ITEM === $operationType) {
             $method = $resourceMetadata->getItemOperationAttribute($operationName, 'method');
         } else {
             $method = $resourceMetadata->getCollectionOperationAttribute($operationName, 'method');
         }
 
         if (null !== $method) {
-            return $method;
+            return strtoupper($method);
         }
 
         if (null === $routeName = $this->getRouteName($resourceMetadata, $operationName, $operationType)) {
             throw new RuntimeException(sprintf('Either a "route_name" or a "method" operation attribute must exist for the operation "%s" of the resource "%s".', $operationName, $resourceClass));
         }
 
-        $route = $this->getRoute($routeName);
-        $methods = $route->getMethods();
-
-        if (empty($methods)) {
-            return 'GET';
-        }
-
-        return $methods[0];
+        return $this->getRoute($routeName)->getMethods()[0] ?? 'GET';
     }
 
     /**
      * Gets the route related to the given operation.
      *
-     * @param string $resourceClass
-     * @param string $operationName
-     * @param string $operationType
      *
      * @throws RuntimeException
-     *
-     * @return Route
      */
     private function getOperationRoute(string $resourceClass, string $operationName, string $operationType): Route
     {
@@ -141,15 +123,12 @@ final class OperationMethodResolver implements OperationMethodResolverInterface
     /**
      * Gets the route name or null if not defined.
      *
-     * @param ResourceMetadata $resourceMetadata
-     * @param string           $operationName
-     * @param string           $operationType
      *
      * @return string|null
      */
     private function getRouteName(ResourceMetadata $resourceMetadata, string $operationName, string $operationType)
     {
-        if ($operationType === OperationType::ITEM) {
+        if (OperationType::ITEM === $operationType) {
             return $resourceMetadata->getItemOperationAttribute($operationName, 'route_name');
         }
 
@@ -159,11 +138,8 @@ final class OperationMethodResolver implements OperationMethodResolverInterface
     /**
      * Gets the route with the given name.
      *
-     * @param string $routeName
      *
      * @throws RuntimeException
-     *
-     * @return Route
      */
     private function getRoute(string $routeName): Route
     {

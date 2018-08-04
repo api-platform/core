@@ -26,6 +26,7 @@ final class SubresourceOperationFactory implements SubresourceOperationFactoryIn
 {
     const SUBRESOURCE_SUFFIX = '_subresource';
     const FORMAT_SUFFIX = '.{_format}';
+    const ROUTE_OPTIONS = ['defaults' => [], 'requirements' => [], 'options' => [], 'host' => '', 'schemes' => [], 'condition' => '', 'controller' => null];
 
     private $resourceMetadataFactory;
     private $propertyNameCollectionFactory;
@@ -54,13 +55,12 @@ final class SubresourceOperationFactory implements SubresourceOperationFactoryIn
     /**
      * Handles subresource operations recursively and declare their corresponding routes.
      *
-     * @param string $resourceClass
-     * @param array  $tree
      * @param string $rootResourceClass null on the first iteration, it then keeps track of the origin resource class
      * @param array  $parentOperation   the previous call operation
-     * @param array  $visited
+     * @param int    $depth             the number of visited
+     * @param int    $maxDepth
      */
-    private function computeSubresourceOperations(string $resourceClass, array &$tree, string $rootResourceClass = null, array $parentOperation = null, array $visited = [])
+    private function computeSubresourceOperations(string $resourceClass, array &$tree, string $rootResourceClass = null, array $parentOperation = null, array $visited = [], int $depth = 0, int $maxDepth = null)
     {
         if (null === $rootResourceClass) {
             $rootResourceClass = $resourceClass;
@@ -76,12 +76,33 @@ final class SubresourceOperationFactory implements SubresourceOperationFactoryIn
             $subresource = $propertyMetadata->getSubresource();
             $subresourceClass = $subresource->getResourceClass();
             $subresourceMetadata = $this->resourceMetadataFactory->create($subresourceClass);
+            $isLastItem = $resourceClass === $parentOperation['resource_class'] && $propertyMetadata->isIdentifier();
+
+            // A subresource that is also an identifier can't be a start point
+            if ($isLastItem && (null === $parentOperation || false === $parentOperation['collection'])) {
+                continue;
+            }
 
             $visiting = "$resourceClass $property $subresourceClass";
+
+            // Handle maxDepth
+            if ($rootResourceClass === $resourceClass) {
+                $maxDepth = $subresource->getMaxDepth();
+            }
+
+            if (null !== $maxDepth && $depth >= $maxDepth) {
+                break;
+            }
             if (isset($visited[$visiting])) {
                 continue;
             }
 
+            if ($rootResourceClass === $resourceClass) {
+                // reset depth when we return to rootResourceClass
+                $depth = 0;
+            }
+
+            $rootResourceMetadata = $this->resourceMetadataFactory->create($rootResourceClass);
             $operationName = 'get';
             $operation = [
                 'property' => $property,
@@ -91,49 +112,76 @@ final class SubresourceOperationFactory implements SubresourceOperationFactoryIn
             ];
 
             if (null === $parentOperation) {
-                $rootResourceMetadata = $this->resourceMetadataFactory->create($rootResourceClass);
                 $rootShortname = $rootResourceMetadata->getShortName();
                 $operation['identifiers'] = [['id', $rootResourceClass, true]];
-                $operation['route_name'] = sprintf(
-                    '%s%s_%s_%s%s',
-                    RouteNameGenerator::ROUTE_NAME_PREFIX,
-                    RouteNameGenerator::inflector($rootShortname),
+                $operation['operation_name'] = sprintf(
+                    '%s_%s%s',
                     RouteNameGenerator::inflector($operation['property'], $operation['collection'] ?? false),
                     $operationName,
                     self::SUBRESOURCE_SUFFIX
                 );
 
-                $operation['path'] = sprintf(
+                $subresourceOperation = $rootResourceMetadata->getSubresourceOperations()[$operation['operation_name']] ?? [];
+
+                $operation['route_name'] = sprintf(
+                    '%s%s_%s',
+                    RouteNameGenerator::ROUTE_NAME_PREFIX,
+                    RouteNameGenerator::inflector($rootShortname),
+                    $operation['operation_name']
+                );
+
+                $operation['path'] = $subresourceOperation['path'] ?? sprintf(
                     '/%s/{id}/%s%s',
                     $this->pathSegmentNameGenerator->getSegmentName($rootShortname, true),
                     $this->pathSegmentNameGenerator->getSegmentName($operation['property'], $operation['collection']),
                     self::FORMAT_SUFFIX
                 );
 
-                if (!in_array($rootShortname, $operation['shortNames'], true)) {
+                if (!\in_array($rootShortname, $operation['shortNames'], true)) {
                     $operation['shortNames'][] = $rootShortname;
                 }
             } else {
                 $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
                 $operation['identifiers'] = $parentOperation['identifiers'];
-                $operation['identifiers'][] = [$parentOperation['property'], $resourceClass, $parentOperation['collection']];
-                $operation['route_name'] = str_replace('get'.self::SUBRESOURCE_SUFFIX, RouteNameGenerator::inflector($property, $operation['collection']).'_get'.self::SUBRESOURCE_SUFFIX, $parentOperation['route_name']);
+                $operation['identifiers'][] = [$parentOperation['property'], $resourceClass, $isLastItem ? true : $parentOperation['collection']];
+                $operation['operation_name'] = str_replace(
+                    'get'.self::SUBRESOURCE_SUFFIX,
+                    RouteNameGenerator::inflector($isLastItem ? 'item' : $property, $operation['collection']).'_get'.self::SUBRESOURCE_SUFFIX,
+                    $parentOperation['operation_name']
+                );
+                $operation['route_name'] = str_replace($parentOperation['operation_name'], $operation['operation_name'], $parentOperation['route_name']);
 
-                if (!in_array($resourceMetadata->getShortName(), $operation['shortNames'], true)) {
+                if (!\in_array($resourceMetadata->getShortName(), $operation['shortNames'], true)) {
                     $operation['shortNames'][] = $resourceMetadata->getShortName();
                 }
 
-                $operation['path'] = str_replace(self::FORMAT_SUFFIX, '', $parentOperation['path']);
-                if ($parentOperation['collection']) {
-                    list($key) = end($operation['identifiers']);
-                    $operation['path'] .= sprintf('/{%s}', $key);
+                $subresourceOperation = $rootResourceMetadata->getSubresourceOperations()[$operation['operation_name']] ?? [];
+
+                if (isset($subresourceOperation['path'])) {
+                    $operation['path'] = $subresourceOperation['path'];
+                } else {
+                    $operation['path'] = str_replace(self::FORMAT_SUFFIX, '', $parentOperation['path']);
+
+                    if ($parentOperation['collection']) {
+                        list($key) = end($operation['identifiers']);
+                        $operation['path'] .= sprintf('/{%s}', $key);
+                    }
+
+                    if ($isLastItem) {
+                        $operation['path'] .= self::FORMAT_SUFFIX;
+                    } else {
+                        $operation['path'] .= sprintf('/%s%s', $this->pathSegmentNameGenerator->getSegmentName($property, $operation['collection']), self::FORMAT_SUFFIX);
+                    }
                 }
-                $operation['path'] .= sprintf('/%s%s', $this->pathSegmentNameGenerator->getSegmentName($property, $operation['collection']), self::FORMAT_SUFFIX);
+            }
+
+            foreach (self::ROUTE_OPTIONS as $routeOption => $defaultValue) {
+                $operation[$routeOption] = $subresourceOperation[$routeOption] ?? $defaultValue;
             }
 
             $tree[$operation['route_name']] = $operation;
 
-            $this->computeSubresourceOperations($subresourceClass, $tree, $rootResourceClass, $operation, $visited + [$visiting => true]);
+            $this->computeSubresourceOperations($subresourceClass, $tree, $rootResourceClass, $operation, $visited + [$visiting => true], ++$depth, $maxDepth);
         }
     }
 }

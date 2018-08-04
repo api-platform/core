@@ -22,11 +22,13 @@ final class SubresourceMetadata
 {
     private $resourceClass;
     private $collection;
+    private $maxDepth;
 
-    public function __construct(string $resourceClass, bool $collection = false)
+    public function __construct(string $resourceClass, bool $collection = false, int $maxDepth = null)
     {
         $this->resourceClass = $resourceClass;
         $this->collection = $collection;
+        $this->maxDepth = $maxDepth;
     }
 
     public function getResourceClass(): string
@@ -53,5 +55,13 @@ final class SubresourceMetadata
         $metadata->collection = $collection;
 
         return $metadata;
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getMaxDepth()
+    {
+        return $this->maxDepth;
     }
 }

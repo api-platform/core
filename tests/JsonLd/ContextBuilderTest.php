@@ -23,12 +23,13 @@ use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Metadata\Resource\ResourceNameCollection;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\PropertyInfo\Type;
 
 /**
  * @author Markus Mächler <markus.maechler@bithost.ch>
  */
-class ContextBuilderTest extends \PHPUnit_Framework_TestCase
+class ContextBuilderTest extends TestCase
 {
     private $entityClass;
     private $resourceNameCollectionFactoryProphecy;
@@ -58,7 +59,7 @@ class ContextBuilderTest extends \PHPUnit_Framework_TestCase
         $expected = [
             '@vocab' => '#',
             'hydra' => 'http://www.w3.org/ns/hydra/core#',
-            'dummyPropertyA' => '#DummyEntity/dummyPropertyA',
+            'dummyPropertyA' => 'DummyEntity/dummyPropertyA',
         ];
 
         $this->assertEquals($expected, $contextBuilder->getResourceContext($this->entityClass));
@@ -118,7 +119,7 @@ class ContextBuilderTest extends \PHPUnit_Framework_TestCase
             '@vocab' => '#',
             'hydra' => 'http://www.w3.org/ns/hydra/core#',
             'dummyPropertyA' => [
-                '@id' => '#DummyEntity/dummyPropertyA',
+                '@id' => 'DummyEntity/dummyPropertyA',
                 '@reverse' => 'parent',
             ],
         ];

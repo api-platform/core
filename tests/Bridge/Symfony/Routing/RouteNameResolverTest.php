@@ -16,6 +16,7 @@ namespace ApiPlatform\Core\Tests\Bridge\Symfony\Routing;
 use ApiPlatform\Core\Api\OperationType;
 use ApiPlatform\Core\Bridge\Symfony\Routing\RouteNameResolver;
 use ApiPlatform\Core\Bridge\Symfony\Routing\RouteNameResolverInterface;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\RouterInterface;
@@ -23,7 +24,7 @@ use Symfony\Component\Routing\RouterInterface;
 /**
  * @author Teoh Han Hui <teohhanhui@gmail.com>
  */
-class RouteNameResolverTest extends \PHPUnit_Framework_TestCase
+class RouteNameResolverTest extends TestCase
 {
     public function testConstruct()
     {
@@ -34,12 +35,11 @@ class RouteNameResolverTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf(RouteNameResolverInterface::class, $routeNameResolver);
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage No item route associated with the type "AppBundle\Entity\User".
-     */
     public function testGetRouteNameForItemRouteWithNoMatchingRoute()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('No item route associated with the type "AppBundle\\Entity\\User".');
+
         $routeCollection = new RouteCollection();
         $routeCollection->add('some_collection_route', new Route('/some/collection/path', [
             '_api_resource_class' => 'AppBundle\Entity\User',
@@ -55,7 +55,7 @@ class RouteNameResolverTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @group legacy
-     * @expectedDeprecation Using a boolean for the Operation Type is deprecrated since API Platform 2.1 and will not be possible anymore in API Platform 3
+     * @expectedDeprecation Using a boolean for the Operation Type is deprecated since API Platform 2.1 and will not be possible anymore in API Platform 3
      */
     public function testGetRouteNameForItemRouteLegacy()
     {
@@ -99,12 +99,11 @@ class RouteNameResolverTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('some_item_route', $actual);
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage No collection route associated with the type "AppBundle\Entity\User".
-     */
     public function testGetRouteNameForCollectionRouteWithNoMatchingRoute()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('No collection route associated with the type "AppBundle\\Entity\\User".');
+
         $routeCollection = new RouteCollection();
         $routeCollection->add('some_item_route', new Route('/some/item/path/{id}', [
             '_api_resource_class' => 'AppBundle\Entity\User',
@@ -120,7 +119,7 @@ class RouteNameResolverTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @group legacy
-     * @expectedDeprecation Using a boolean for the Operation Type is deprecrated since API Platform 2.1 and will not be possible anymore in API Platform 3
+     * @expectedDeprecation Using a boolean for the Operation Type is deprecated since API Platform 2.1 and will not be possible anymore in API Platform 3
      */
     public function testGetRouteNameForCollectionRouteLegacy()
     {

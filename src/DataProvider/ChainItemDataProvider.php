@@ -27,7 +27,7 @@ final class ChainItemDataProvider implements ItemDataProviderInterface
     /**
      * @param ItemDataProviderInterface[] $dataProviders
      */
-    public function __construct(array $dataProviders)
+    public function __construct(/* iterable */ $dataProviders)
     {
         $this->dataProviders = $dataProviders;
     }
@@ -37,12 +37,30 @@ final class ChainItemDataProvider implements ItemDataProviderInterface
      */
     public function getItem(string $resourceClass, $id, string $operationName = null, array $context = [])
     {
-        foreach ($this->dataProviders as $dataProviders) {
+        foreach ($this->dataProviders as $dataProvider) {
             try {
-                return $dataProviders->getItem($resourceClass, $id, $operationName, $context);
+                if ($dataProvider instanceof RestrictedDataProviderInterface
+                    && !$dataProvider->supports($resourceClass, $operationName, $context)) {
+                    continue;
+                }
+
+                $identifier = $id;
+                if (!$dataProvider instanceof DenormalizedIdentifiersAwareItemDataProviderInterface && $identifier && \is_array($identifier)) {
+                    if (\count($identifier) > 1) {
+                        @trigger_error(sprintf('Receiving "$id" as non-array in an item data provider is deprecated in 2.3 in favor of implementing "%s".', DenormalizedIdentifiersAwareItemDataProviderInterface::class), E_USER_DEPRECATED);
+                        $identifier = http_build_query($identifier, '', ';');
+                    } else {
+                        $identifier = current($identifier);
+                    }
+                }
+
+                return $dataProvider->getItem($resourceClass, $identifier, $operationName, $context);
             } catch (ResourceClassNotSupportedException $e) {
+                @trigger_error(sprintf('Throwing a "%s" is deprecated in favor of implementing "%s"', \get_class($e), RestrictedDataProviderInterface::class), E_USER_DEPRECATED);
                 continue;
             }
         }
+
+        return null;
     }
 }

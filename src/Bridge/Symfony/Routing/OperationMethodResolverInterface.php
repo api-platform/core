@@ -25,22 +25,12 @@ use Symfony\Component\Routing\Route;
 interface OperationMethodResolverInterface extends BaseOperationMethodResolverInterface
 {
     /**
-     * @param string $resourceClass
-     * @param string $operationName
-     *
      * @throws RuntimeException
-     *
-     * @return Route
      */
     public function getCollectionOperationRoute(string $resourceClass, string $operationName): Route;
 
     /**
-     * @param string $resourceClass
-     * @param string $operationName
-     *
      * @throws RuntimeException
-     *
-     * @return Route
      */
     public function getItemOperationRoute(string $resourceClass, string $operationName): Route;
 }

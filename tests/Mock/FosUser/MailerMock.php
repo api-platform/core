@@ -23,8 +23,6 @@ class MailerMock implements MailerInterface
 {
     /**
      * Sends an email to a user to confirm the account creation.
-     *
-     * @param UserInterface $user
      */
     public function sendConfirmationEmailMessage(UserInterface $user)
     {
@@ -32,8 +30,6 @@ class MailerMock implements MailerInterface
 
     /**
      * Sends an email to a user to confirm the password reset.
-     *
-     * @param UserInterface $user
      */
     public function sendResettingEmailMessage(UserInterface $user)
     {

@@ -22,7 +22,7 @@ use Doctrine\ORM\QueryBuilder;
  *
  * @author Lee Siong Chan <ahlee2326@me.com>
  */
-class RangeFilter extends AbstractFilter
+class RangeFilter extends AbstractContextAwareFilter
 {
     const PARAMETER_BETWEEN = 'between';
     const PARAMETER_GREATER_THAN = 'gt';
@@ -63,14 +63,14 @@ class RangeFilter extends AbstractFilter
     protected function filterProperty(string $property, $values, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, string $operationName = null)
     {
         if (
-            !is_array($values) ||
+            !\is_array($values) ||
             !$this->isPropertyEnabled($property, $resourceClass) ||
             !$this->isPropertyMapped($property, $resourceClass)
         ) {
             return;
         }
 
-        $alias = 'o';
+        $alias = $queryBuilder->getRootAliases()[0];
         $field = $property;
 
         if ($this->isPropertyNested($property, $resourceClass)) {
@@ -92,12 +92,10 @@ class RangeFilter extends AbstractFilter
     /**
      * Adds the where clause according to the operator.
      *
-     * @param QueryBuilder                $queryBuilder
-     * @param QueryNameGeneratorInterface $queryNameGenerator
-     * @param string                      $alias
-     * @param string                      $field
-     * @param string                      $operator
-     * @param string                      $value
+     * @param string $alias
+     * @param string $field
+     * @param string $operator
+     * @param string $value
      */
     protected function addWhere(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, $alias, $field, $operator, $value)
     {
@@ -107,7 +105,7 @@ class RangeFilter extends AbstractFilter
             case self::PARAMETER_BETWEEN:
                 $rangeValue = explode('..', $value);
 
-                if (2 !== count($rangeValue)) {
+                if (2 !== \count($rangeValue)) {
                     $this->logger->notice('Invalid filter ignored', [
                         'exception' => new InvalidArgumentException(sprintf('Invalid format for "[%s]", expected "<min>..<max>"', $operator)),
                     ]);
@@ -190,11 +188,6 @@ class RangeFilter extends AbstractFilter
 
     /**
      * Gets filter description.
-     *
-     * @param string $fieldName
-     * @param string $operator
-     *
-     * @return array
      */
     protected function getFilterDescription(string $fieldName, string $operator): array
     {

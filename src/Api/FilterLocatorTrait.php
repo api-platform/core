@@ -31,11 +31,10 @@ trait FilterLocatorTrait
      * Sets a filter locator with a backward compatibility.
      *
      * @param ContainerInterface|FilterCollection|null $filterLocator
-     * @param bool                                     $allowNull
      */
     private function setFilterLocator($filterLocator = null, bool $allowNull = false)
     {
-        if ($filterLocator instanceof ContainerInterface || $filterLocator instanceof FilterCollection || null === $filterLocator && $allowNull) {
+        if ($filterLocator instanceof ContainerInterface || $filterLocator instanceof FilterCollection || (null === $filterLocator && $allowNull)) {
             if ($filterLocator instanceof FilterCollection) {
                 @trigger_error(sprintf('The %s class is deprecated since version 2.1 and will be removed in 3.0. Provide an implementation of %s instead.', FilterCollection::class, ContainerInterface::class), E_USER_DEPRECATED);
             }
@@ -49,7 +48,6 @@ trait FilterLocatorTrait
     /**
      * Gets a filter with a backward compatibility.
      *
-     * @param string $filterId
      *
      * @return FilterInterface|null
      */
@@ -62,5 +60,7 @@ trait FilterLocatorTrait
         if ($this->filterLocator instanceof FilterCollection && $this->filterLocator->offsetExists($filterId)) {
             return $this->filterLocator->offsetGet($filterId);
         }
+
+        return null;
     }
 }

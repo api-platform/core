@@ -22,6 +22,8 @@ Feature: Create-Retrieve-Update-Delete
     Then the response status code should be 201
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+    And the header "Content-Location" should be equal to "/dummies/1"
+    And the header "Location" should be equal to "/dummies/1"
     And the JSON should be equal to:
     """
     {
@@ -42,10 +44,14 @@ Feature: Create-Retrieve-Update-Delete
           "value2"
         ]
       },
+      "arrayData": [],
       "name_converted": null,
+      "relatedOwnedDummy": null,
+      "relatedOwningDummy": null,
       "id": 1,
       "name": "My Dummy",
-      "alias": null
+      "alias": null,
+      "foo": null
     }
     """
 
@@ -74,10 +80,14 @@ Feature: Create-Retrieve-Update-Delete
           "value2"
         ]
       },
+      "arrayData": [],
       "name_converted": null,
+      "relatedOwnedDummy": null,
+      "relatedOwningDummy": null,
       "id": 1,
       "name": "My Dummy",
-      "alias": null
+      "alias": null,
+      "foo": null
     }
     """
 
@@ -114,16 +124,20 @@ Feature: Create-Retrieve-Update-Delete
               "value2"
             ]
           },
+          "arrayData": [],
           "name_converted": null,
+          "relatedOwnedDummy": null,
+          "relatedOwningDummy": null,
           "id": 1,
           "name": "My Dummy",
-          "alias": null
+          "alias": null,
+          "foo": null
         }
       ],
       "hydra:totalItems": 1,
       "hydra:search": {
         "@type": "hydra:IriTemplate",
-        "hydra:template": "/dummies{?dummyBoolean,relatedDummy.embeddedDummy.dummyBoolean,dummyDate[before],dummyDate[after],relatedDummy.dummyDate[before],relatedDummy.dummyDate[after],description[exists],relatedDummy.name[exists],dummyBoolean[exists],dummyFloat,dummyPrice,order[id],order[name],order[relatedDummy.name],order[relatedDummy.symfony],dummyFloat[between],dummyFloat[gt],dummyFloat[gte],dummyFloat[lt],dummyFloat[lte],dummyPrice[between],dummyPrice[gt],dummyPrice[gte],dummyPrice[lt],dummyPrice[lte],id,id[],name,alias,description,relatedDummy.name,relatedDummy.name[],relatedDummies,relatedDummies[],dummy,relatedDummies.name}",
+        "hydra:template": "/dummies{?dummyBoolean,relatedDummy.embeddedDummy.dummyBoolean,dummyDate[before],dummyDate[strictly_before],dummyDate[after],dummyDate[strictly_after],relatedDummy.dummyDate[before],relatedDummy.dummyDate[strictly_before],relatedDummy.dummyDate[after],relatedDummy.dummyDate[strictly_after],description[exists],relatedDummy.name[exists],dummyBoolean[exists],relatedDummy[exists],dummyFloat,dummyPrice,order[id],order[name],order[description],order[relatedDummy.name],order[relatedDummy.symfony],order[dummyDate],dummyFloat[between],dummyFloat[gt],dummyFloat[gte],dummyFloat[lt],dummyFloat[lte],dummyPrice[between],dummyPrice[gt],dummyPrice[gte],dummyPrice[lt],dummyPrice[lte],id,id[],name,alias,description,relatedDummy.name,relatedDummy.name[],relatedDummies,relatedDummies[],dummy,relatedDummies.name,properties[]}",
         "hydra:variableRepresentation": "BasicRepresentation",
         "hydra:mapping": [
           {
@@ -146,7 +160,19 @@ Feature: Create-Retrieve-Update-Delete
           },
           {
             "@type": "IriTemplateMapping",
+            "variable": "dummyDate[strictly_before]",
+            "property": "dummyDate",
+            "required": false
+          },
+          {
+            "@type": "IriTemplateMapping",
             "variable": "dummyDate[after]",
+            "property": "dummyDate",
+            "required": false
+          },
+          {
+            "@type": "IriTemplateMapping",
+            "variable": "dummyDate[strictly_after]",
             "property": "dummyDate",
             "required": false
           },
@@ -158,7 +184,19 @@ Feature: Create-Retrieve-Update-Delete
           },
           {
             "@type": "IriTemplateMapping",
+            "variable": "relatedDummy.dummyDate[strictly_before]",
+            "property": "relatedDummy.dummyDate",
+            "required": false
+          },
+          {
+            "@type": "IriTemplateMapping",
             "variable": "relatedDummy.dummyDate[after]",
+            "property": "relatedDummy.dummyDate",
+            "required": false
+          },
+          {
+            "@type": "IriTemplateMapping",
+            "variable": "relatedDummy.dummyDate[strictly_after]",
             "property": "relatedDummy.dummyDate",
             "required": false
           },
@@ -178,6 +216,12 @@ Feature: Create-Retrieve-Update-Delete
             "@type": "IriTemplateMapping",
             "variable": "dummyBoolean[exists]",
             "property": "dummyBoolean",
+            "required": false
+          },
+          {
+            "@type": "IriTemplateMapping",
+            "variable": "relatedDummy[exists]",
+            "property": "relatedDummy",
             "required": false
           },
           {
@@ -206,6 +250,12 @@ Feature: Create-Retrieve-Update-Delete
           },
           {
             "@type": "IriTemplateMapping",
+            "variable": "order[description]",
+            "property": "description",
+            "required": false
+          },
+          {
+            "@type": "IriTemplateMapping",
             "variable": "order[relatedDummy.name]",
             "property": "relatedDummy.name",
             "required": false
@@ -214,6 +264,12 @@ Feature: Create-Retrieve-Update-Delete
             "@type": "IriTemplateMapping",
             "variable": "order[relatedDummy.symfony]",
             "property": "relatedDummy.symfony",
+            "required": false
+          },
+          {
+            "@type": "IriTemplateMapping",
+            "variable": "order[dummyDate]",
+            "property": "dummyDate",
             "required": false
           },
           {
@@ -341,6 +397,12 @@ Feature: Create-Retrieve-Update-Delete
             "variable": "relatedDummies.name",
             "property": "relatedDummies.name",
             "required": false
+          },
+          {
+              "@type": "IriTemplateMapping",
+              "variable": "properties[]",
+              "property": null,
+              "required": false
           }
         ]
       }
@@ -366,6 +428,7 @@ Feature: Create-Retrieve-Update-Delete
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+    And the header "Content-Location" should be equal to "/dummies/1"
     And the JSON should be equal to:
     """
     {
@@ -388,10 +451,14 @@ Feature: Create-Retrieve-Update-Delete
           "key": "value2"
         }
       ],
+      "arrayData": [],
       "name_converted": null,
+      "relatedOwnedDummy": null,
+      "relatedOwningDummy": null,
       "id": 1,
       "name": "A nice dummy",
-      "alias": null
+      "alias": null,
+      "foo": null
     }
     """
 
@@ -401,6 +468,7 @@ Feature: Create-Retrieve-Update-Delete
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+    And the header "Content-Location" should be equal to "/dummies/1"
     And the JSON should be equal to:
     """
     {
@@ -423,14 +491,17 @@ Feature: Create-Retrieve-Update-Delete
           "key": "value2"
         }
       ],
+      "arrayData": [],
       "name_converted": null,
+      "relatedOwnedDummy": null,
+      "relatedOwningDummy": null,
       "id": 1,
       "name": "A nice dummy",
-      "alias": null
+      "alias": null,
+      "foo": null
     }
     """
 
-  @dropSchema
   Scenario: Delete a resource
     When I send a "DELETE" request to "/dummies/1"
     Then the response status code should be 204

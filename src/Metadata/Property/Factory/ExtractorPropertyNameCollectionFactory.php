@@ -43,19 +43,22 @@ final class ExtractorPropertyNameCollectionFactory implements PropertyNameCollec
     public function create(string $resourceClass, array $options = []): PropertyNameCollection
     {
         $propertyNames = [];
+        $propertyNameCollection = null;
 
         if ($this->decorated) {
             try {
-                foreach ($propertyNameCollection = $this->decorated->create($resourceClass, $options) as $propertyName) {
-                    $propertyNames[$propertyName] = $propertyName;
-                }
+                $propertyNameCollection = $this->decorated->create($resourceClass, $options);
             } catch (ResourceClassNotFoundException $resourceClassNotFoundException) {
                 // Ignore not found exceptions from parent
+            }
+
+            foreach ($propertyNameCollection as $propertyName) {
+                $propertyNames[$propertyName] = $propertyName;
             }
         }
 
         if (!class_exists($resourceClass)) {
-            if (isset($propertyNameCollection)) {
+            if (null !== $propertyNameCollection) {
                 return $propertyNameCollection;
             }
 

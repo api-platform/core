@@ -28,7 +28,9 @@ use Symfony\Component\Serializer\Annotation\Groups;
  *     "normalization_context"={"groups"={"dummy_read"}},
  *     "denormalization_context"={"groups"={"dummy_write"}},
  *     "filters"={
- *         "dummy_property.property"
+ *         "dummy_property.property",
+ *         "dummy_property.whitelist_property",
+ *         "dummy_property.whitelisted_properties"
  *     }
  * })
  */
@@ -80,6 +82,14 @@ class DummyProperty
      * @Groups({"dummy_read", "dummy_write"})
      */
     public $group;
+
+    /**
+     * @var DummyGroup[]
+     *
+     * @ORM\ManyToMany(targetEntity=DummyGroup::class, cascade={"persist"})
+     * @Groups({"dummy_read", "dummy_write"})
+     */
+    public $groups;
 
     /**
      * @return int

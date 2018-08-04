@@ -33,8 +33,6 @@ final class AddLinkHeaderListener
 
     /**
      * Sends the Hydra header on each response.
-     *
-     * @param FilterResponseEvent $event
      */
     public function onKernelResponse(FilterResponseEvent $event)
     {

@@ -13,6 +13,9 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\EventListener;
 
+use ApiPlatform\Core\Api\FormatsProviderInterface;
+use ApiPlatform\Core\Exception\InvalidArgumentException;
+use ApiPlatform\Core\Util\RequestAttributesExtractor;
 use Negotiation\Negotiator;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
@@ -27,19 +30,32 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 final class AddFormatListener
 {
     private $negotiator;
-    private $formats;
+    private $formats = [];
     private $mimeTypes;
+    private $formatsProvider;
 
-    public function __construct(Negotiator $negotiator, array $formats)
+    /**
+     * @throws InvalidArgumentException
+     */
+    public function __construct(Negotiator $negotiator, /* FormatsProviderInterface */ $formatsProvider)
     {
         $this->negotiator = $negotiator;
-        $this->formats = $formats;
+        if (\is_array($formatsProvider)) {
+            @trigger_error('Using an array as formats provider is deprecated since API Platform 2.3 and will not be possible anymore in API Platform 3', E_USER_DEPRECATED);
+            $this->formats = $formatsProvider;
+
+            return;
+        }
+        if (!$formatsProvider instanceof FormatsProviderInterface) {
+            throw new InvalidArgumentException(sprintf('The "$formatsProvider" argument is expected to be an implementation of the "%s" interface.', FormatsProviderInterface::class));
+        }
+
+        $this->formatsProvider = $formatsProvider;
     }
 
     /**
      * Sets the applicable format to the HttpFoundation Request.
      *
-     * @param GetResponseEvent $event
      *
      * @throws NotFoundHttpException
      * @throws NotAcceptableHttpException
@@ -47,8 +63,12 @@ final class AddFormatListener
     public function onKernelRequest(GetResponseEvent $event)
     {
         $request = $event->getRequest();
-        if (!$request->attributes->has('_api_resource_class') && !$request->attributes->has('_api_respond')) {
+        if (!$request->attributes->has('_api_resource_class') && !$request->attributes->has('_api_respond') && !$request->attributes->has('_graphql')) {
             return;
+        }
+        // BC check to be removed in 3.0
+        if (null !== $this->formatsProvider) {
+            $this->formats = $this->formatsProvider->getFormatsFromAttributes(RequestAttributesExtractor::extractAttributes($request));
         }
 
         $this->populateMimeTypes();
@@ -58,7 +78,7 @@ final class AddFormatListener
         if (null === $routeFormat = $request->attributes->get('_format') ?: null) {
             $mimeTypes = array_keys($this->mimeTypes);
         } elseif (!isset($this->formats[$routeFormat])) {
-            throw new NotFoundHttpException('Not Found');
+            throw new NotFoundHttpException(sprintf('Format "%s" is not supported', $routeFormat));
         } else {
             $mimeTypes = Request::getMimeTypes($routeFormat);
         }
@@ -97,9 +117,6 @@ final class AddFormatListener
 
     /**
      * Adds API formats to the HttpFoundation Request.
-     *
-     * @param Request $request
-     * @param array   $formats
      */
     private function addRequestFormats(Request $request, array $formats)
     {
@@ -128,10 +145,7 @@ final class AddFormatListener
     /**
      * Retrieves an instance of NotAcceptableHttpException.
      *
-     * @param string        $accept
      * @param string[]|null $mimeTypes
-     *
-     * @return NotAcceptableHttpException
      */
     private function getNotAcceptableHttpException(string $accept, array $mimeTypes = null): NotAcceptableHttpException
     {

@@ -22,18 +22,9 @@ trait ContextTrait
 {
     /**
      * Initializes the context.
-     *
-     * @param string $resourceClass
-     * @param array  $context
-     *
-     * @return array
      */
     private function initContext(string $resourceClass, array $context): array
     {
-        if (isset($context['api_sub_level'])) {
-            return $context;
-        }
-
         return array_merge($context, [
             'api_sub_level' => true,
             'resource_class' => $resourceClass,

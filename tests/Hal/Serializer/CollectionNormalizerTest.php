@@ -15,13 +15,15 @@ namespace ApiPlatform\Core\Tests\Hal\Serializer;
 
 use ApiPlatform\Core\Api\ResourceClassResolverInterface;
 use ApiPlatform\Core\DataProvider\PaginatorInterface;
+use ApiPlatform\Core\DataProvider\PartialPaginatorInterface;
 use ApiPlatform\Core\Hal\Serializer\CollectionNormalizer;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class CollectionNormalizerTest extends \PHPUnit_Framework_TestCase
+class CollectionNormalizerTest extends TestCase
 {
     public function testSupportsNormalize()
     {
@@ -32,6 +34,7 @@ class CollectionNormalizerTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($normalizer->supportsNormalization(new \ArrayObject(), CollectionNormalizer::FORMAT));
         $this->assertFalse($normalizer->supportsNormalization([], 'xml'));
         $this->assertFalse($normalizer->supportsNormalization(new \ArrayObject(), 'xml'));
+        $this->assertTrue($normalizer->hasCacheableSupportsMethod());
     }
 
     public function testNormalizeApiSubLevel()
@@ -50,15 +53,80 @@ class CollectionNormalizerTest extends \PHPUnit_Framework_TestCase
 
     public function testNormalizePaginator()
     {
-        $paginatorProphecy = $this->prophesize(PaginatorInterface::class);
-        $paginatorProphecy->getCurrentPage()->willReturn(3);
-        $paginatorProphecy->getLastPage()->willReturn(7);
-        $paginatorProphecy->getItemsPerPage()->willReturn(12);
-        $paginatorProphecy->getTotalItems()->willReturn(1312);
+        $this->assertEquals(
+            [
+                '_links' => [
+                    'self' => ['href' => '/?page=3'],
+                    'first' => ['href' => '/?page=1'],
+                    'last' => ['href' => '/?page=7'],
+                    'prev' => ['href' => '/?page=2'],
+                    'next' => ['href' => '/?page=4'],
+                    'item' => [
+                        '/me',
+                    ],
+                ],
+                '_embedded' => [
+                    'item' => [
+                        [
+                            '_links' => [
+                                'self' => '/me',
+                            ],
+                            'name' => 'Kévin',
+                        ],
+                    ],
+                ],
+                'totalItems' => 1312,
+                'itemsPerPage' => 12,
+            ],
+            $this->normalizePaginator(false)
+        );
+    }
+
+    public function testNormalizePartialPaginator()
+    {
+        $this->assertEquals(
+            [
+                '_links' => [
+                    'self' => ['href' => '/?page=3'],
+                    'prev' => ['href' => '/?page=2'],
+                    'next' => ['href' => '/?page=4'],
+                    'item' => [
+                        '/me',
+                    ],
+                ],
+                '_embedded' => [
+                    'item' => [
+                        [
+                            '_links' => [
+                                'self' => '/me',
+                            ],
+                            'name' => 'Kévin',
+                        ],
+                    ],
+                ],
+                'itemsPerPage' => 12,
+            ],
+            $this->normalizePaginator(true)
+        );
+    }
+
+    private function normalizePaginator($partial = false)
+    {
+        $paginatorProphecy = $this->prophesize($partial ? PartialPaginatorInterface::class : PaginatorInterface::class);
+        $paginatorProphecy->getCurrentPage()->willReturn(3)->shouldBeCalled();
+        $paginatorProphecy->getItemsPerPage()->willReturn(12)->shouldBeCalled();
         $paginatorProphecy->rewind()->shouldBeCalled();
         $paginatorProphecy->valid()->willReturn(true, false)->shouldBeCalled();
         $paginatorProphecy->current()->willReturn('foo')->shouldBeCalled();
         $paginatorProphecy->next()->willReturn()->shouldBeCalled();
+
+        if (!$partial) {
+            $paginatorProphecy->getLastPage()->willReturn(7)->shouldBeCalled();
+            $paginatorProphecy->getTotalItems()->willReturn(1312)->shouldBeCalled();
+        } else {
+            $paginatorProphecy->count()->willReturn(12)->shouldBeCalled();
+        }
+
         $paginator = $paginatorProphecy->reveal();
 
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
@@ -70,30 +138,6 @@ class CollectionNormalizerTest extends \PHPUnit_Framework_TestCase
         $normalizer = new CollectionNormalizer($resourceClassResolverProphecy->reveal(), 'page');
         $normalizer->setNormalizer($itemNormalizer->reveal());
 
-        $expected = [
-            '_links' => [
-                'self' => '/?page=3',
-                'first' => '/?page=1',
-                'last' => '/?page=7',
-                'prev' => '/?page=2',
-                'next' => '/?page=4',
-                'item' => [
-                        '/me',
-                    ],
-            ],
-            '_embedded' => [
-                    'item' => [
-                        [
-                            '_links' => [
-                                    'self' => '/me',
-                                ],
-                            'name' => 'Kévin',
-                        ],
-                    ],
-            ],
-            'totalItems' => 1312,
-            'itemsPerPage' => 12,
-        ];
-        $this->assertEquals($expected, $normalizer->normalize($paginator));
+        return $normalizer->normalize($paginator);
     }
 }

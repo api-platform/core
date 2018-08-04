@@ -15,6 +15,7 @@ namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity;
 
 use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
@@ -22,7 +23,10 @@ use Symfony\Component\Validator\Constraints as Assert;
  *
  * @author Jordan Samouh <jordan.samouh@gmail.com>
  *
- * @ApiResource(attributes={"filters"={"my_dummy.search", "my_dummy.order", "my_dummy.date", "my_dummy.range", "my_dummy.boolean", "my_dummy.numeric"}})
+ * @ApiResource(
+ *     attributes={"filters"={"my_dummy.search", "my_dummy.order", "my_dummy.date", "my_dummy.range", "my_dummy.boolean", "my_dummy.numeric"}},
+ *     itemOperations={"get", "put", "delete", "groups"={"method"="GET", "path"="/embedded_dummies_groups/{id}", "normalization_context"={"groups"={"embed"}}}}
+ * )
  * @ORM\Entity
  */
 class EmbeddedDummy
@@ -40,6 +44,7 @@ class EmbeddedDummy
      * @var string The dummy name
      *
      * @ORM\Column(nullable=true)
+     * @Groups({"embed"})
      */
     private $name;
 
@@ -55,6 +60,7 @@ class EmbeddedDummy
      * @var EmbeddableDummy
      *
      * @ORM\Embedded(class="EmbeddableDummy")
+     * @Groups({"embed"})
      */
     public $embeddedDummy;
 
@@ -79,33 +85,21 @@ class EmbeddedDummy
         return $this->id;
     }
 
-    /**
-     * @return string
-     */
     public function getName(): string
     {
         return $this->name;
     }
 
-    /**
-     * @param string $name
-     */
     public function setName(string $name)
     {
         $this->name = $name;
     }
 
-    /**
-     * @return EmbeddableDummy
-     */
     public function getEmbeddedDummy(): EmbeddableDummy
     {
         return $this->embeddedDummy;
     }
 
-    /**
-     * @param EmbeddableDummy $embeddedDummy
-     */
     public function setEmbeddedDummy(EmbeddableDummy $embeddedDummy)
     {
         $this->embeddedDummy = $embeddedDummy;
@@ -119,9 +113,6 @@ class EmbeddedDummy
         return $this->dummyDate;
     }
 
-    /**
-     * @param \DateTime $dummyDate
-     */
     public function setDummyDate(\DateTime $dummyDate)
     {
         $this->dummyDate = $dummyDate;
@@ -135,9 +126,6 @@ class EmbeddedDummy
         return $this->relatedDummy;
     }
 
-    /**
-     * @param RelatedDummy $relatedDummy
-     */
     public function setRelatedDummy(RelatedDummy $relatedDummy)
     {
         $this->relatedDummy = $relatedDummy;

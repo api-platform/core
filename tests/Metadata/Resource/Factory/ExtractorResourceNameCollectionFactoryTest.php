@@ -13,19 +13,21 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Tests\Metadata\Resource\Factory;
 
+use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\Metadata\Extractor\XmlExtractor;
 use ApiPlatform\Core\Metadata\Extractor\YamlExtractor;
 use ApiPlatform\Core\Metadata\Resource\Factory\ExtractorResourceNameCollectionFactory;
 use ApiPlatform\Core\Metadata\Resource\ResourceNameCollection;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\FileConfigDummy;
+use PHPUnit\Framework\TestCase;
 
 /**
  * Tests extractor resource name collection factory.
  *
  * @author Antoine Bluchet <soyuka@gmail.com>
  */
-class ExtractorResourceNameCollectionFactoryTest extends \PHPUnit_Framework_TestCase
+class ExtractorResourceNameCollectionFactoryTest extends TestCase
 {
     public function testXmlResourceName()
     {
@@ -38,11 +40,10 @@ class ExtractorResourceNameCollectionFactoryTest extends \PHPUnit_Framework_Test
         ]));
     }
 
-    /**
-     * @expectedException \ApiPlatform\Core\Exception\InvalidArgumentException
-     */
     public function testInvalidExtractorResourceNameCollectionFactory()
     {
+        $this->expectException(InvalidArgumentException::class);
+
         $configPath = __DIR__.'/../../../Fixtures/FileConfigurations/resourcesinvalid.xml';
         $factory = new ExtractorResourceNameCollectionFactory(new XmlExtractor([$configPath]));
         $factory->create();
@@ -67,11 +68,10 @@ class ExtractorResourceNameCollectionFactoryTest extends \PHPUnit_Framework_Test
         $this->assertEquals($factory->create(), new ResourceNameCollection([FileConfigDummy::class]));
     }
 
-    /**
-     * @expectedException \ApiPlatform\Core\Exception\InvalidArgumentException
-     */
     public function testCreateWithMalformedYaml()
     {
+        $this->expectException(InvalidArgumentException::class);
+
         $configPath = __DIR__.'/../../../Fixtures/FileConfigurations/parse_exception.yml';
 
         (new ExtractorResourceNameCollectionFactory(new YamlExtractor([$configPath])))->create();

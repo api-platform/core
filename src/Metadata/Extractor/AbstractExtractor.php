@@ -50,8 +50,6 @@ abstract class AbstractExtractor implements ExtractorInterface
 
     /**
      * Extracts metadata from a given path.
-     *
-     * @param string $path
      */
     abstract protected function extractPath(string $path);
 }

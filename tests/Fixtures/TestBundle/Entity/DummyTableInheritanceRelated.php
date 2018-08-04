@@ -22,8 +22,8 @@ use Symfony\Component\Serializer\Annotation\Groups;
  * @ORM\Entity
  * @ApiResource(
  *     attributes={
- *          "normalization_context"={"groups"={"default"}},
- *          "denormalization_context"={"groups"={"default"}}
+ *         "normalization_context"={"groups"={"default"}},
+ *         "denormalization_context"={"groups"={"default"}}
  *     }
  * )
  */
@@ -67,14 +67,24 @@ class DummyTableInheritanceRelated
         return $this->children;
     }
 
-    /**
-     * @param $children
-     *
-     * @return $this
-     */
     public function setChildren($children)
     {
         $this->children = $children;
+
+        return $this;
+    }
+
+    public function addChild($child)
+    {
+        $this->children->add($child);
+        $child->setParent($this);
+
+        return $this;
+    }
+
+    public function removeChild($child)
+    {
+        $this->children->remove($child);
 
         return $this;
     }

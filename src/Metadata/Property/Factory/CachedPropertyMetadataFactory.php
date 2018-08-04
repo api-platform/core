@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Metadata\Property\Factory;
 
+use ApiPlatform\Core\Cache\CachedTrait;
 use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
-use Psr\Cache\CacheException;
 use Psr\Cache\CacheItemPoolInterface;
 
 /**
@@ -24,11 +24,11 @@ use Psr\Cache\CacheItemPoolInterface;
  */
 final class CachedPropertyMetadataFactory implements PropertyMetadataFactoryInterface
 {
+    use CachedTrait;
+
     const CACHE_KEY_PREFIX = 'property_metadata_';
 
-    private $cacheItemPool;
     private $decorated;
-    private $localCache = [];
 
     public function __construct(CacheItemPoolInterface $cacheItemPool, PropertyMetadataFactoryInterface $decorated)
     {
@@ -41,32 +41,10 @@ final class CachedPropertyMetadataFactory implements PropertyMetadataFactoryInte
      */
     public function create(string $resourceClass, string $property, array $options = []): PropertyMetadata
     {
-        $localCacheKey = serialize([$resourceClass, $property, $options]);
-        if (isset($this->localCache[$localCacheKey])) {
-            return $this->localCache[$localCacheKey];
-        }
+        $cacheKey = self::CACHE_KEY_PREFIX.md5(serialize([$resourceClass, $property, $options]));
 
-        $cacheKey = self::CACHE_KEY_PREFIX.md5($localCacheKey);
-
-        try {
-            $cacheItem = $this->cacheItemPool->getItem($cacheKey);
-
-            if ($cacheItem->isHit()) {
-                return $this->localCache[$localCacheKey] = $cacheItem->get();
-            }
-        } catch (CacheException $e) {
-            // do nothing
-        }
-
-        $propertyMetadata = $this->decorated->create($resourceClass, $property, $options);
-
-        if (!isset($cacheItem)) {
-            return $this->localCache[$localCacheKey] = $propertyMetadata;
-        }
-
-        $cacheItem->set($propertyMetadata);
-        $this->cacheItemPool->save($cacheItem);
-
-        return $this->localCache[$localCacheKey] = $propertyMetadata;
+        return $this->getCached($cacheKey, function () use ($resourceClass, $property, $options) {
+            return $this->decorated->create($resourceClass, $property, $options);
+        });
     }
 }

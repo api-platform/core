@@ -18,9 +18,11 @@ use ApiPlatform\Core\Exception\InvalidArgumentException;
 /**
  * Generic item normalizer.
  *
+ * @final
+ *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-final class ItemNormalizer extends AbstractItemNormalizer
+class ItemNormalizer extends AbstractItemNormalizer
 {
     /**
      * {@inheritdoc}
@@ -30,7 +32,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
     public function denormalize($data, $class, $format = null, array $context = [])
     {
         // Avoid issues with proxies if we populated the object
-        if (isset($data['id']) && !isset($context['object_to_populate'])) {
+        if (isset($data['id']) && !isset($context[self::OBJECT_TO_POPULATE])) {
             if (isset($context['api_allow_update']) && true !== $context['api_allow_update']) {
                 throw new InvalidArgumentException('Update is not allowed for this operation.');
             }
@@ -44,7 +46,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
     private function updateObjectToPopulate(array $data, array &$context)
     {
         try {
-            $context['object_to_populate'] = $this->iriConverter->getItemFromIri((string) $data['id'], $context + ['fetch_data' => false]);
+            $context[self::OBJECT_TO_POPULATE] = $this->iriConverter->getItemFromIri((string) $data['id'], $context + ['fetch_data' => true]);
         } catch (InvalidArgumentException $e) {
             $identifier = null;
             foreach ($this->propertyNameCollectionFactory->create($context['resource_class'], $context) as $propertyName) {
@@ -58,7 +60,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
                 throw $e;
             }
 
-            $context['object_to_populate'] = $this->iriConverter->getItemFromIri(sprintf('%s/%s', $this->iriConverter->getIriFromResourceClass($context['resource_class']), $data[$identifier]), $context + ['fetch_data' => false]);
+            $context[self::OBJECT_TO_POPULATE] = $this->iriConverter->getItemFromIri(sprintf('%s/%s', $this->iriConverter->getIriFromResourceClass($context['resource_class']), $data[$identifier]), $context + ['fetch_data' => true]);
         }
     }
 }

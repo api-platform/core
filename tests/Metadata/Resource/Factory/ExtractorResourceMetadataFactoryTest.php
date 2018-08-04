@@ -13,12 +13,16 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Tests\Metadata\Resource\Factory;
 
+use ApiPlatform\Core\Exception\InvalidArgumentException;
+use ApiPlatform\Core\Exception\ResourceClassNotFoundException;
 use ApiPlatform\Core\Metadata\Extractor\XmlExtractor;
 use ApiPlatform\Core\Metadata\Extractor\YamlExtractor;
 use ApiPlatform\Core\Metadata\Resource\Factory\ExtractorResourceMetadataFactory;
 use ApiPlatform\Core\Metadata\Resource\Factory\ExtractorResourceNameCollectionFactory;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
+use ApiPlatform\Core\Metadata\Resource\Factory\ShortNameResourceMetadataFactory;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
+use ApiPlatform\Core\Tests\Fixtures\DummyResourceInterface;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\FileConfigDummy;
 
 /**
@@ -42,12 +46,11 @@ class ExtractorResourceMetadataFactoryTest extends FileConfigurationMetadataFact
         $this->assertEquals($expectedResourceMetadata, $resourceMetadata);
     }
 
-    /**
-     * @expectedException \ApiPlatform\Core\Exception\ResourceClassNotFoundException
-     * @expectedExceptionMessage Resource "ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\ThisDoesNotExist" not found.
-     */
     public function testXmlDoesNotExistMetadataFactory()
     {
+        $this->expectException(ResourceClassNotFoundException::class);
+        $this->expectExceptionMessage('Resource "ApiPlatform\\Core\\Tests\\Fixtures\\TestBundle\\Entity\\ThisDoesNotExist" not found.');
+
         $configPath = __DIR__.'/../../../Fixtures/FileConfigurations/resourcenotfound.xml';
         $factory = new ExtractorResourceNameCollectionFactory(new XmlExtractor([$configPath]));
         $resourceMetadataFactory = new ExtractorResourceMetadataFactory(new XmlExtractor([$configPath]));
@@ -73,7 +76,7 @@ class ExtractorResourceMetadataFactoryTest extends FileConfigurationMetadataFact
     }
 
     /**
-     * @expectedDeprecation Configuring "%s" tags without using a parent "%ss" tag is deprecrated since API Platform 2.1 and will not be possible anymore in API Platform 3
+     * @expectedDeprecation Configuring "%s" tags without using a parent "%ss" tag is deprecated since API Platform 2.1 and will not be possible anymore in API Platform 3
      * @group legacy
      * @dataProvider legacyOperationsResourceMetadataProvider
      */
@@ -119,11 +122,10 @@ class ExtractorResourceMetadataFactoryTest extends FileConfigurationMetadataFact
         $this->assertEquals($expectedResourceMetadata, $resourceMetadata);
     }
 
-    /**
-     * @expectedException \ApiPlatform\Core\Exception\InvalidArgumentException
-     */
     public function testInvalidXmlResourceMetadataFactory()
     {
+        $this->expectException(InvalidArgumentException::class);
+
         $configPath = __DIR__.'/../../../Fixtures/FileConfigurations/resourcesinvalid.xml';
         $resourceMetadataFactory = new ExtractorResourceMetadataFactory(new XmlExtractor([$configPath]));
 
@@ -179,12 +181,11 @@ class ExtractorResourceMetadataFactoryTest extends FileConfigurationMetadataFact
         $this->assertEquals($expectedResourceMetadata, $resourceMetadata);
     }
 
-    /**
-     * @expectedException \ApiPlatform\Core\Exception\ResourceClassNotFoundException
-     * @expectedExceptionMessage Resource "ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\ThisDoesNotExist" not found.
-     */
     public function testYamlDoesNotExistMetadataFactory()
     {
+        $this->expectException(ResourceClassNotFoundException::class);
+        $this->expectExceptionMessage('Resource "ApiPlatform\\Core\\Tests\\Fixtures\\TestBundle\\Entity\\ThisDoesNotExist" not found.');
+
         $configPath = __DIR__.'/../../../Fixtures/FileConfigurations/resourcenotfound.yml';
         $factory = new ExtractorResourceNameCollectionFactory(new YamlExtractor([$configPath]));
         $resourceMetadataFactory = new ExtractorResourceMetadataFactory(new YamlExtractor([$configPath]));
@@ -257,24 +258,46 @@ class ExtractorResourceMetadataFactoryTest extends FileConfigurationMetadataFact
         $this->assertEquals($expectedResourceMetadata, $resourceMetadata);
     }
 
-    /**
-     * @expectedException \ApiPlatform\Core\Exception\InvalidArgumentException
-     */
     public function testCreateWithMalformedYaml()
     {
+        $this->expectException(InvalidArgumentException::class);
+
         $configPath = __DIR__.'/../../../Fixtures/FileConfigurations/parse_exception.yml';
 
         (new ExtractorResourceMetadataFactory(new YamlExtractor([$configPath])))->create(FileConfigDummy::class);
     }
 
-    /**
-     * @expectedException \ApiPlatform\Core\Exception\InvalidArgumentException
-     * @expectedExceptionMessageRegExp /"ApiPlatform\\Core\\Tests\\Fixtures\\TestBundle\\Entity\\Dummy" setting is expected to be null or an array, string given in ".+\/Fixtures\/FileConfigurations\/bad_declaration\.yml"\./
-     */
     public function testCreateWithBadDeclaration()
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessageRegExp('/"ApiPlatform\\\\Core\\\\Tests\\\\Fixtures\\\\TestBundle\\\\Entity\\\\Dummy" setting is expected to be null or an array, string given in ".+\\/Fixtures\\/FileConfigurations\\/bad_declaration\\.yml"\\./');
+
         $configPath = __DIR__.'/../../../Fixtures/FileConfigurations/bad_declaration.yml';
 
         (new ExtractorResourceMetadataFactory(new YamlExtractor([$configPath])))->create(FileConfigDummy::class);
+    }
+
+    public function testCreateShortNameResourceMetadataForClassWithoutNamespace()
+    {
+        $configPath = __DIR__.'/../../../Fixtures/FileConfigurations/resourceswithoutnamespace.yml';
+
+        $resourceMetadataFactory = new ExtractorResourceMetadataFactory(new YamlExtractor([$configPath]));
+        $shortNameResourceMetadataFactory = new ShortNameResourceMetadataFactory($resourceMetadataFactory);
+
+        $resourceMetadata = $shortNameResourceMetadataFactory->create(\DateTime::class);
+        $this->assertInstanceOf(ResourceMetadata::class, $resourceMetadata);
+        $this->assertSame(\DateTime::class, $resourceMetadata->getShortName());
+    }
+
+    public function testItSupportsInterfaceAsAResource()
+    {
+        $configPath = __DIR__.'/../../../Fixtures/FileConfigurations/interface_resource.yml';
+
+        $resourceMetadataFactory = new ExtractorResourceMetadataFactory(new YamlExtractor([$configPath]));
+        $shortNameResourceMetadataFactory = new ShortNameResourceMetadataFactory($resourceMetadataFactory);
+
+        $resourceMetadata = $shortNameResourceMetadataFactory->create(DummyResourceInterface::class);
+        $this->assertInstanceOf(ResourceMetadata::class, $resourceMetadata);
+        $this->assertSame('DummyResourceInterface', $resourceMetadata->getShortName());
     }
 }

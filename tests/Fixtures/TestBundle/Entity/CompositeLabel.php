@@ -51,7 +51,7 @@ class CompositeLabel
     /**
      * Gets value.
      *
-     * @return string
+     * @return string|null
      */
     public function getValue()
     {
@@ -61,9 +61,9 @@ class CompositeLabel
     /**
      * Sets value.
      *
-     * @param string the value to set
+     * @param string|null $value the value to set
      */
-    public function setValue($value)
+    public function setValue($value = null)
     {
         $this->value = $value;
     }

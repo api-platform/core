@@ -29,17 +29,11 @@ class NotAResource
         $this->bar = $bar;
     }
 
-    /**
-     * @return mixed
-     */
     public function getFoo()
     {
         return $this->foo;
     }
 
-    /**
-     * @return mixed
-     */
     public function getBar()
     {
         return $this->bar;

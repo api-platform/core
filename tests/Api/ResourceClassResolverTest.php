@@ -15,16 +15,21 @@ namespace ApiPlatform\Core\Tests\Api;
 
 use ApiPlatform\Core\Api\ResourceClassResolver;
 use ApiPlatform\Core\DataProvider\PaginatorInterface;
+use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceNameCollection;
+use ApiPlatform\Core\Tests\Fixtures\DummyResourceImplementation;
+use ApiPlatform\Core\Tests\Fixtures\DummyResourceInterface;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyCar;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyTableInheritance;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyTableInheritanceChild;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @author Amrouche Hamza <hamza.simperfit@gmail.com>
  */
-class ResourceClassResolverTest extends \PHPUnit_Framework_TestCase
+class ResourceClassResolverTest extends TestCase
 {
     public function testGetResourceClassWithIntendedClassName()
     {
@@ -35,6 +40,18 @@ class ResourceClassResolverTest extends \PHPUnit_Framework_TestCase
 
         $resourceClassResolver = new ResourceClassResolver($resourceNameCollectionFactoryProphecy->reveal());
         $resourceClass = $resourceClassResolver->getResourceClass($dummy, Dummy::class);
+        $this->assertEquals($resourceClass, Dummy::class);
+    }
+
+    public function testGetResourceClassWithOtherClassName()
+    {
+        $dummy = new Dummy();
+        $dummy->setName('Smail');
+        $resourceNameCollectionFactoryProphecy = $this->prophesize(ResourceNameCollectionFactoryInterface::class);
+        $resourceNameCollectionFactoryProphecy->create()->willReturn(new ResourceNameCollection([Dummy::class]))->shouldBeCalled();
+
+        $resourceClassResolver = new ResourceClassResolver($resourceNameCollectionFactoryProphecy->reveal());
+        $resourceClass = $resourceClassResolver->getResourceClass($dummy, DummyCar::class, true);
         $this->assertEquals($resourceClass, Dummy::class);
     }
 
@@ -79,12 +96,11 @@ class ResourceClassResolverTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($resourceClass, Dummy::class);
     }
 
-    /**
-     * @expectedException \ApiPlatform\Core\Exception\InvalidArgumentException
-     * @expectedExceptionMessage No resource class found for object of type "stdClass".
-     */
     public function testGetResourceClassWithWrongClassName()
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('No resource class found for object of type "stdClass".');
+
         $resourceNameCollectionFactoryProphecy = $this->prophesize(ResourceNameCollectionFactoryInterface::class);
         $resourceNameCollectionFactoryProphecy->create()->willReturn(new ResourceNameCollection([Dummy::class]))->shouldBeCalled();
 
@@ -92,12 +108,11 @@ class ResourceClassResolverTest extends \PHPUnit_Framework_TestCase
         $resourceClassResolver->getResourceClass(new \stdClass(), null);
     }
 
-    /**
-     * @expectedException \ApiPlatform\Core\Exception\InvalidArgumentException
-     * @expectedExceptionMessage No resource class found.
-     */
     public function testGetResourceClassWithNoResourceClassName()
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('No resource class found.');
+
         $resourceNameCollectionFactoryProphecy = $this->prophesize(ResourceNameCollectionFactoryInterface::class);
 
         $resourceClassResolver = new ResourceClassResolver($resourceNameCollectionFactoryProphecy->reveal());
@@ -126,12 +141,11 @@ class ResourceClassResolverTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($resourceClass);
     }
 
-    /**
-     * @expectedException \ApiPlatform\Core\Exception\InvalidArgumentException
-     * @expectedExceptionMessage No resource class found.
-     */
     public function testGetResourceClassWithNoResourceClassNameAndNoObject()
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('No resource class found.');
+
         $resourceNameCollectionFactoryProphecy = $this->prophesize(ResourceNameCollectionFactoryInterface::class);
 
         $resourceClassResolver = new ResourceClassResolver($resourceNameCollectionFactoryProphecy->reveal());
@@ -156,6 +170,17 @@ class ResourceClassResolverTest extends \PHPUnit_Framework_TestCase
 
         $resourceClassResolver = new ResourceClassResolver($resourceNameCollectionFactoryProphecy->reveal());
 
-        $this->assertEquals($resourceClassResolver->getResourceClass($t, DummyTableInheritance::class), DummyTableInheritanceChild::class);
+        $this->assertEquals(DummyTableInheritanceChild::class, $resourceClassResolver->getResourceClass($t, DummyTableInheritance::class));
+    }
+
+    public function testGetResourceClassWithInterfaceResource()
+    {
+        $dummy = new DummyResourceImplementation();
+        $resourceNameCollectionFactoryProphecy = $this->prophesize(ResourceNameCollectionFactoryInterface::class);
+        $resourceNameCollectionFactoryProphecy->create()->willReturn(new ResourceNameCollection([DummyResourceInterface::class]))->shouldBeCalled();
+
+        $resourceClassResolver = new ResourceClassResolver($resourceNameCollectionFactoryProphecy->reveal());
+        $resourceClass = $resourceClassResolver->getResourceClass($dummy, DummyResourceInterface::class, true);
+        $this->assertEquals(DummyResourceImplementation::class, $resourceClass);
     }
 }

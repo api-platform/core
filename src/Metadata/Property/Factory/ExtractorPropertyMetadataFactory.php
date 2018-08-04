@@ -77,13 +77,8 @@ final class ExtractorPropertyMetadataFactory implements PropertyMetadataFactoryI
     /**
      * Returns the metadata from the decorated factory if available or throws an exception.
      *
-     * @param PropertyMetadata|null $parentPropertyMetadata
-     * @param string                $resourceClass
-     * @param string                $property
      *
      * @throws PropertyNotFoundException
-     *
-     * @return PropertyMetadata
      */
     private function handleNotFound(PropertyMetadata $parentPropertyMetadata = null, string $resourceClass, string $property): PropertyMetadata
     {
@@ -96,11 +91,6 @@ final class ExtractorPropertyMetadataFactory implements PropertyMetadataFactoryI
 
     /**
      * Creates a new instance of metadata if the property is not already set.
-     *
-     * @param PropertyMetadata $propertyMetadata
-     * @param array            $metadata
-     *
-     * @return PropertyMetadata
      */
     private function update(PropertyMetadata $propertyMetadata, array $metadata): PropertyMetadata
     {
@@ -142,6 +132,7 @@ final class ExtractorPropertyMetadataFactory implements PropertyMetadataFactoryI
         }
 
         $type = $propertyMetadata->getType();
+        $maxDepth = $subresource['maxDepth'] ?? null;
 
         if (null !== $type) {
             $isCollection = $type->isCollection();
@@ -153,6 +144,6 @@ final class ExtractorPropertyMetadataFactory implements PropertyMetadataFactoryI
             return null;
         }
 
-        return new SubresourceMetadata($resourceClass, $isCollection);
+        return new SubresourceMetadata($resourceClass, $isCollection, $maxDepth);
     }
 }

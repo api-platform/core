@@ -18,32 +18,33 @@ Feature: JSON-LD contexts generation
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
-    And the JSON should be equal to:
+    And the JSON should be a superset of:
     """
     {
         "@context": {
             "@vocab": "http://example.com/docs.jsonld#",
             "hydra": "http://www.w3.org/ns/hydra/core#",
             "description": "https://schema.org/description",
-            "dummy": "#Dummy/dummy",
-            "dummyBoolean": "#Dummy/dummyBoolean",
-            "dummyDate": "#Dummy/dummyDate",
-            "dummyFloat": "#Dummy/dummyFloat",
-            "dummyPrice": "#Dummy/dummyPrice",
+            "dummy": "Dummy/dummy",
+            "dummyBoolean": "Dummy/dummyBoolean",
+            "dummyDate": "Dummy/dummyDate",
+            "dummyFloat": "Dummy/dummyFloat",
+            "dummyPrice": "Dummy/dummyPrice",
             "relatedDummy": {
-                "@id": "#Dummy/relatedDummy",
+                "@id": "Dummy/relatedDummy",
                 "@type": "@id"
             },
             "relatedDummies": {
-                "@id": "#Dummy/relatedDummies",
+                "@id": "Dummy/relatedDummies",
                 "@type": "@id"
             },
-            "jsonData": "#Dummy/jsonData",
-            "nameConverted": "#Dummy/nameConverted",
-						"id": "#Dummy/id",
+            "jsonData": "Dummy/jsonData",
+            "arrayData": "Dummy/arrayData",
+            "nameConverted": "Dummy/nameConverted",
+            "id": "Dummy/id",
             "name": "http://schema.org/name",
             "alias": "https://schema.org/alternateName",
-            "foo": "#Dummy/foo"
+            "foo": "Dummy/foo"
         }
     }
     """
@@ -59,10 +60,10 @@ Feature: JSON-LD contexts generation
           "@context": {
               "@vocab": "http://example.com/docs.jsonld#",
               "hydra": "http://www.w3.org/ns/hydra/core#",
-              "paris": "#RelationEmbedder/paris",
-              "krondstadt": "#RelationEmbedder/krondstadt",
-              "anotherRelated": "#RelationEmbedder/anotherRelated",
-              "related": "#RelationEmbedder/related"
+              "paris": "RelationEmbedder/paris",
+              "krondstadt": "RelationEmbedder/krondstadt",
+              "anotherRelated": "RelationEmbedder/anotherRelated",
+              "related": "RelationEmbedder/related"
           }
       }
       """

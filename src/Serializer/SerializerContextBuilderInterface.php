@@ -26,13 +26,8 @@ interface SerializerContextBuilderInterface
     /**
      * Creates a serialization context from a Request.
      *
-     * @param Request    $request
-     * @param bool       $normalization
-     * @param array|null $extractedAttributes
      *
      * @throws RuntimeException
-     *
-     * @return array
      */
     public function createFromRequest(Request $request, bool $normalization, array $extractedAttributes = null): array;
 }

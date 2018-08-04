@@ -34,7 +34,8 @@ use Symfony\Component\Validator\Constraints as Assert;
  *         "my_dummy.order",
  *         "my_dummy.range",
  *         "my_dummy.search",
- *     },
+ *         "my_dummy.property"
+ *     }
  * })
  * @ORM\Entity
  */
@@ -138,11 +139,32 @@ class Dummy
     public $jsonData;
 
     /**
+     * @var array
+     *
+     * @ORM\Column(type="simple_array", nullable=true)
+     */
+    public $arrayData;
+
+    /**
      * @var string
      *
      * @ORM\Column(nullable=true)
      */
     public $nameConverted;
+
+    /**
+     * @var RelatedOwnedDummy
+     *
+     * @ORM\OneToOne(targetEntity="RelatedOwnedDummy", cascade={"persist"}, mappedBy="owningDummy")
+     */
+    public $relatedOwnedDummy;
+
+    /**
+     * @var RelatedOwningDummy
+     *
+     * @ORM\OneToOne(targetEntity="RelatedOwningDummy", cascade={"persist"}, inversedBy="ownedDummy")
+     */
+    public $relatedOwningDummy;
 
     public static function staticMethod()
     {
@@ -152,6 +174,7 @@ class Dummy
     {
         $this->relatedDummies = new ArrayCollection();
         $this->jsonData = [];
+        $this->arrayData = [];
     }
 
     public function getId()
@@ -198,8 +221,14 @@ class Dummy
     {
     }
 
+    public function getFoo()
+    {
+        return $this->foo;
+    }
+
     public function setFoo(array $foo = null)
     {
+        $this->foo = $foo;
     }
 
     public function setDummyDate(\DateTime $dummyDate = null)
@@ -234,6 +263,16 @@ class Dummy
         return $this->jsonData;
     }
 
+    public function setArrayData($arrayData)
+    {
+        $this->arrayData = $arrayData;
+    }
+
+    public function getArrayData()
+    {
+        return $this->arrayData;
+    }
+
     public function getRelatedDummy()
     {
         return $this->relatedDummy;
@@ -247,6 +286,30 @@ class Dummy
     public function addRelatedDummy(RelatedDummy $relatedDummy)
     {
         $this->relatedDummies->add($relatedDummy);
+    }
+
+    public function getRelatedOwnedDummy()
+    {
+        return $this->relatedOwnedDummy;
+    }
+
+    public function setRelatedOwnedDummy(RelatedOwnedDummy $relatedOwnedDummy)
+    {
+        $this->relatedOwnedDummy = $relatedOwnedDummy;
+
+        if ($this !== $this->relatedOwnedDummy->getOwningDummy()) {
+            $this->relatedOwnedDummy->setOwningDummy($this);
+        }
+    }
+
+    public function getRelatedOwningDummy()
+    {
+        return $this->relatedOwningDummy;
+    }
+
+    public function setRelatedOwningDummy(RelatedOwningDummy $relatedOwningDummy)
+    {
+        $this->relatedOwningDummy = $relatedOwningDummy;
     }
 
     /**
@@ -273,5 +336,10 @@ class Dummy
     public function getDummy()
     {
         return $this->dummy;
+    }
+
+    public function getRelatedDummies()
+    {
+        return $this->relatedDummies;
     }
 }

@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\EventListener;
 
 use ApiPlatform\Core\Exception\RuntimeException;
+use ApiPlatform\Core\Serializer\ResourceList;
 use ApiPlatform\Core\Serializer\SerializerContextBuilderInterface;
 use ApiPlatform\Core\Util\RequestAttributesExtractor;
 use Symfony\Component\HttpFoundation\Request;
@@ -40,8 +41,6 @@ final class SerializeListener
 
     /**
      * Serializes the data to the requested format.
-     *
-     * @param GetResponseForControllerResultEvent $event
      */
     public function onKernelView(GetResponseForControllerResultEvent $event)
     {
@@ -59,21 +58,23 @@ final class SerializeListener
         }
 
         $context = $this->serializerContextBuilder->createFromRequest($request, true, $attributes);
-        $resources = [];
+        if ($included = $request->attributes->get('_api_included')) {
+            $context['api_included'] = $included;
+        }
+        $resources = new ResourceList();
         $context['resources'] = &$resources;
+        $request->attributes->set('_api_normalization_context', $context);
 
         $event->setControllerResult($this->serializer->serialize($controllerResult, $request->getRequestFormat(), $context));
 
         $request->attributes->set('_api_respond', true);
-        $request->attributes->set('_resources', $request->attributes->get('_resources', []) + $resources);
+        $request->attributes->set('_resources', $request->attributes->get('_resources', []) + (array) $resources);
     }
 
     /**
      * Tries to serialize data that are not API resources (e.g. the entrypoint or data returned by a custom controller).
      *
-     * @param GetResponseForControllerResultEvent $event
-     * @param Request                             $request
-     * @param object                              $controllerResult
+     * @param object $controllerResult
      *
      * @throws RuntimeException
      */
@@ -83,8 +84,8 @@ final class SerializeListener
             return;
         }
 
-        if (is_object($controllerResult)) {
-            $event->setControllerResult($this->serializer->serialize($controllerResult, $request->getRequestFormat()));
+        if (\is_object($controllerResult)) {
+            $event->setControllerResult($this->serializer->serialize($controllerResult, $request->getRequestFormat(), $request->attributes->get('_api_normalization_context', [])));
 
             return;
         }

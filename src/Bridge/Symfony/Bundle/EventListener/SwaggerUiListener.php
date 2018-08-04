@@ -19,8 +19,6 @@ final class SwaggerUiListener
 {
     /**
      * Sets SwaggerUiAction as controller if the requested format is HTML.
-     *
-     * @param $event GetResponseEvent
      */
     public function onKernelRequest(GetResponseEvent $event)
     {

@@ -21,13 +21,14 @@ use ApiPlatform\Core\Metadata\Property\PropertyNameCollection;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\UpperCaseIdentifierDummy;
 use Doctrine\Common\Annotations\Reader;
+use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class AnnotationPropertyNameCollectionFactoryTest extends \PHPUnit_Framework_TestCase
+class AnnotationPropertyNameCollectionFactoryTest extends TestCase
 {
     /**
      * @dataProvider getDependencies
@@ -93,12 +94,11 @@ class AnnotationPropertyNameCollectionFactoryTest extends \PHPUnit_Framework_Tes
         ];
     }
 
-    /**
-     * @expectedException \ApiPlatform\Core\Exception\ResourceClassNotFoundException
-     * @expectedExceptionMessage The resource class "\DoNotExist" does not exist.
-     */
     public function testClassDoesNotExist()
     {
+        $this->expectException(ResourceClassNotFoundException::class);
+        $this->expectExceptionMessage('The resource class "\\DoNotExist" does not exist.');
+
         $reader = $this->prophesize(Reader::class);
 
         $factory = new AnnotationPropertyNameCollectionFactory($reader->reveal());
