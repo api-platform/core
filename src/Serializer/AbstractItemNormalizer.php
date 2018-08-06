@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Serializer;
 
+use ApiPlatform\Core\Api\IdentifiersExtractorInterface;
 use ApiPlatform\Core\Api\IriConverterInterface;
 use ApiPlatform\Core\Api\ResourceClassResolverInterface;
 use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
@@ -51,8 +52,9 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
     protected $localCache = [];
     protected $itemDataProvider;
     protected $allowPlainIdentifiers;
+    protected $identifiersExtractor;
 
-    public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, IriConverterInterface $iriConverter, ResourceClassResolverInterface $resourceClassResolver, PropertyAccessorInterface $propertyAccessor = null, NameConverterInterface $nameConverter = null, ClassMetadataFactoryInterface $classMetadataFactory = null, ItemDataProviderInterface $itemDataProvider = null, bool $allowPlainIdentifiers = false)
+    public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, IriConverterInterface $iriConverter, ResourceClassResolverInterface $resourceClassResolver, PropertyAccessorInterface $propertyAccessor = null, NameConverterInterface $nameConverter = null, ClassMetadataFactoryInterface $classMetadataFactory = null, ItemDataProviderInterface $itemDataProvider = null, bool $allowPlainIdentifiers = false, IdentifiersExtractorInterface $identifiersExtractor = null)
     {
         parent::__construct($classMetadataFactory, $nameConverter);
 
@@ -67,6 +69,12 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
         $this->setCircularReferenceHandler(function ($object) {
             return $this->iriConverter->getIriFromItem($object);
         });
+
+        if (null === $identifiersExtractor) {
+            @trigger_error(sprintf('Not passing an instance of IdentifiersExtractorInterface in "%s" is deprecated and will be mandatory in version 3.0. Not passing it is deprecated since 2.2.', __METHOD__), E_USER_DEPRECATED);
+        }
+
+        $this->identifiersExtractor = $identifiersExtractor;
     }
 
     /**
@@ -115,6 +123,8 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
         if (!isset($context['resource_class'])) {
             $context['resource_class'] = $class;
         }
+
+        $this->setObjectToPopulate($data, $class, $context);
 
         return parent::denormalize($data, $class, $format, $context);
     }
@@ -491,5 +501,52 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
         }
 
         return $iri;
+    }
+
+    /**
+     * Sets the object to populate if allowed to and not set already. If you pass identifiers, it will search for them,
+     * otherwise it falls back to the provided IdentifiersExtractor.
+     *
+     * @param mixed  $data
+     * @param string $class
+     * @param array  $context
+     */
+    protected function setObjectToPopulate($data, string $class, array &$context)
+    {
+        if (isset($context[self::OBJECT_TO_POPULATE]) || !\is_array($data)) {
+            return;
+        }
+
+        $updateAllowed = $context['api_allow_update'] ?? false;
+        $identifiers = $this->getIdentifiersForDenormalization($class);
+        $identifiersData = \array_intersect_key($data, array_flip($identifiers));
+
+        if (0 === \count($identifiersData)) {
+            return;
+        }
+
+        if (!$updateAllowed) {
+            throw new InvalidArgumentException('Update is not allowed for this operation.');
+        }
+
+        // TODO: use $this->iriConverter->getIriFromPlainIdentifier() once https://github.com/api-platform/core/pull/1837 is merged.
+        $iri = implode(';', $identifiersData);
+
+        $context[self::OBJECT_TO_POPULATE] = $this->iriConverter->getItemFromIri($iri, $context + ['fetch_data' => true]);
+    }
+
+    /**
+     * Returns the identifiers used when denormalizing an object.
+     * Usually this is just what the IdentifiersExtractor provides but you might want to override this method in your
+     * normalizer depending on the format used. Note: They also have to be writeable to serve as proper identifier.
+     */
+    protected function getIdentifiersForDenormalization(string $class): array
+    {
+        // Backwards compatibility
+        if (null === $this->identifiersExtractor) {
+            return ['id'];
+        }
+
+        return $this->identifiersExtractor->getIdentifiersFromResourceClass($class);
     }
 }

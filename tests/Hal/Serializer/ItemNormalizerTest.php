@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Tests\Hal\Serializer;
 
+use ApiPlatform\Core\Api\IdentifiersExtractorInterface;
 use ApiPlatform\Core\Api\IriConverterInterface;
 use ApiPlatform\Core\Api\ResourceClassResolverInterface;
 use ApiPlatform\Core\Exception\RuntimeException;
@@ -50,6 +51,7 @@ class ItemNormalizerTest extends TestCase
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
         $nameConverter = $this->prophesize(NameConverterInterface::class);
+        $identifiersExtractor = $this->prophesize(IdentifiersExtractorInterface::class);
 
         $normalizer = new ItemNormalizer(
             $propertyNameCollectionFactoryProphecy->reveal(),
@@ -57,7 +59,11 @@ class ItemNormalizerTest extends TestCase
             $iriConverterProphecy->reveal(),
             $resourceClassResolverProphecy->reveal(),
             null,
-            $nameConverter->reveal()
+            $nameConverter->reveal(),
+            null,
+            null,
+            false,
+            $identifiersExtractor->reveal()
         );
 
         $this->assertFalse($normalizer->supportsDenormalization('foo', ItemNormalizer::FORMAT));
@@ -80,13 +86,19 @@ class ItemNormalizerTest extends TestCase
 
         $nameConverter = $this->prophesize(NameConverterInterface::class);
 
+        $identifiersExtractor = $this->prophesize(IdentifiersExtractorInterface::class);
+
         $normalizer = new ItemNormalizer(
             $propertyNameCollectionFactoryProphecy->reveal(),
             $propertyMetadataFactoryProphecy->reveal(),
             $iriConverterProphecy->reveal(),
             $resourceClassResolverProphecy->reveal(),
             null,
-            $nameConverter->reveal()
+            $nameConverter->reveal(),
+            null,
+            null,
+            false,
+            $identifiersExtractor->reveal()
         );
 
         $this->assertTrue($normalizer->supportsNormalization($dummy, 'jsonhal'));
@@ -130,13 +142,19 @@ class ItemNormalizerTest extends TestCase
         $nameConverter->normalize('name')->shouldBeCalled()->willReturn('name');
         $nameConverter->normalize('relatedDummy')->shouldBeCalled()->willReturn('related_dummy');
 
+        $identifiersExtractor = $this->prophesize(IdentifiersExtractorInterface::class);
+
         $normalizer = new ItemNormalizer(
             $propertyNameCollectionFactoryProphecy->reveal(),
             $propertyMetadataFactoryProphecy->reveal(),
             $iriConverterProphecy->reveal(),
             $resourceClassResolverProphecy->reveal(),
             null,
-            $nameConverter->reveal()
+            $nameConverter->reveal(),
+            null,
+            null,
+            false,
+            $identifiersExtractor->reveal()
         );
         $normalizer->setSerializer($serializerProphecy->reveal());
 
@@ -190,13 +208,19 @@ class ItemNormalizerTest extends TestCase
         $nameConverter->normalize('name')->shouldBeCalled()->willReturn('name');
         $nameConverter->normalize('relatedDummy')->shouldBeCalled()->willReturn('related_dummy');
 
+        $identifiersExtractor = $this->prophesize(IdentifiersExtractorInterface::class);
+
         $normalizer = new ItemNormalizer(
             $propertyNameCollectionFactoryProphecy->reveal(),
             $propertyMetadataFactoryProphecy->reveal(),
             $iriConverterProphecy->reveal(),
             $resourceClassResolverProphecy->reveal(),
             null,
-            $nameConverter->reveal()
+            $nameConverter->reveal(),
+            null,
+            null,
+            false,
+            $identifiersExtractor->reveal()
         );
         $normalizer->setSerializer($serializerProphecy->reveal());
 
@@ -270,7 +294,10 @@ class ItemNormalizerTest extends TestCase
             $resourceClassResolverProphecy->reveal(),
             null,
             null,
-            $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()))
+            $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader())),
+            null,
+            false,
+            $this->prophesize(IdentifiersExtractorInterface::class)->reveal()
         );
         $serializer = new Serializer([$normalizer]);
         $normalizer->setSerializer($serializer);

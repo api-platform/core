@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\JsonLd\Serializer;
 
+use ApiPlatform\Core\Api\IdentifiersExtractorInterface;
 use ApiPlatform\Core\Api\IriConverterInterface;
 use ApiPlatform\Core\Api\ResourceClassResolverInterface;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
@@ -41,9 +42,9 @@ final class ItemNormalizer extends AbstractItemNormalizer
     private $resourceMetadataFactory;
     private $contextBuilder;
 
-    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, IriConverterInterface $iriConverter, ResourceClassResolverInterface $resourceClassResolver, ContextBuilderInterface $contextBuilder, PropertyAccessorInterface $propertyAccessor = null, NameConverterInterface $nameConverter = null, ClassMetadataFactoryInterface $classMetadataFactory = null)
+    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, IriConverterInterface $iriConverter, ResourceClassResolverInterface $resourceClassResolver, ContextBuilderInterface $contextBuilder, PropertyAccessorInterface $propertyAccessor = null, NameConverterInterface $nameConverter = null, ClassMetadataFactoryInterface $classMetadataFactory = null, IdentifiersExtractorInterface $identifiersExtractor = null)
     {
-        parent::__construct($propertyNameCollectionFactory, $propertyMetadataFactory, $iriConverter, $resourceClassResolver, $propertyAccessor, $nameConverter, $classMetadataFactory);
+        parent::__construct($propertyNameCollectionFactory, $propertyMetadataFactory, $iriConverter, $resourceClassResolver, $propertyAccessor, $nameConverter, $classMetadataFactory, null, false, $identifiersExtractor);
 
         $this->resourceMetadataFactory = $resourceMetadataFactory;
         $this->contextBuilder = $contextBuilder;
@@ -91,20 +92,36 @@ final class ItemNormalizer extends AbstractItemNormalizer
 
     /**
      * {@inheritdoc}
-     *
-     * @throws InvalidArgumentException
      */
-    public function denormalize($data, $class, $format = null, array $context = [])
+    protected function setObjectToPopulate($data, string $class, array &$context)
     {
-        // Avoid issues with proxies if we populated the object
-        if (isset($data['@id']) && !isset($context[self::OBJECT_TO_POPULATE])) {
-            if (isset($context['api_allow_update']) && true !== $context['api_allow_update']) {
-                throw new InvalidArgumentException('Update is not allowed for this operation.');
-            }
+        try {
+            parent::setObjectToPopulate($data, $class, $context);
 
-            $context[self::OBJECT_TO_POPULATE] = $this->iriConverter->getItemFromIri($data['@id'], $context + ['fetch_data' => true]);
+            return;
+        } catch (InvalidArgumentException $e) {
         }
 
-        return parent::denormalize($data, $class, $format, $context);
+        // https://github.com/api-platform/core/issues/857
+        $identifiers = $this->identifiersExtractor->getIdentifiersFromResourceClass($class);
+        $identifiersData = \array_intersect_key($data, array_flip($identifiers));
+        if (0 === \count($identifiersData)) {
+            throw $e;
+        }
+
+        // TODO: use $this->iriConverter->getIriFromPlainIdentifier() once https://github.com/api-platform/core/pull/1837 is merged.
+        $context[self::OBJECT_TO_POPULATE] = $this->iriConverter->getItemFromIri(
+            sprintf(
+                '%s/%s',
+                $this->iriConverter->getIriFromResourceClass($context['resource_class']),
+                implode(';', $identifiersData)
+            ),
+            $context + ['fetch_data' => true]
+        );
+    }
+
+    protected function getIdentifiersForDenormalization(string $class): array
+    {
+        return ['@id'];
     }
 }
