@@ -249,11 +249,11 @@ final class SchemaBuilder implements SchemaBuilderInterface
                 $args = $this->convertFilterArgsToTypes($args);
             }
 
-            if ($isInternalGraphqlType || $input || null !== $mutationName) {
+            if ($isInternalGraphqlType || $input) {
                 $resolve = null;
             } elseif ($this->isCollection($type)) {
                 $resolverFactory = $this->collectionResolverFactory;
-                $resolve = $resolverFactory($className, $rootResource);
+                $resolve = $resolverFactory($className, $rootResource, $mutationName);
             } else {
                 $resolve = $this->itemResolver;
             }
