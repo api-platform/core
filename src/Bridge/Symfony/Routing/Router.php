@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Bridge\Symfony\Routing;
 
 use ApiPlatform\Core\Api\UrlGeneratorInterface;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\RouterInterface;
 
@@ -71,16 +70,13 @@ final class Router implements RouterInterface, UrlGeneratorInterface
         $baseContext = $this->router->getContext();
         $pathInfo = str_replace($baseContext->getBaseUrl(), '', $pathInfo);
 
-        $request = Request::create($pathInfo);
-        $context = (new RequestContext())->fromRequest($request);
+        $context = clone $baseContext;
+        $context->setMethod('GET');
         $context->setPathInfo($pathInfo);
-        $context->setScheme($baseContext->getScheme());
-        $context->setHost($baseContext->getHost());
 
+        $this->router->setContext($context);
         try {
-            $this->router->setContext($context);
-
-            return $this->router->match($request->getPathInfo());
+            return $this->router->match($pathInfo);
         } finally {
             $this->router->setContext($baseContext);
         }
