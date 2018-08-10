@@ -255,7 +255,7 @@ class OrderFilterTest extends DoctrineOrmFilterTestCase
                         'relatedDummy.symfony' => 'desc',
                     ],
                 ],
-                sprintf('SELECT o FROM %s o INNER JOIN o.relatedDummy relatedDummy_a1 ORDER BY o.id ASC, o.name DESC, relatedDummy_a1.symfony DESC', Dummy::class),
+                sprintf('SELECT o FROM %s o LEFT JOIN o.relatedDummy relatedDummy_a1 ORDER BY o.id ASC, o.name DESC, relatedDummy_a1.symfony DESC', Dummy::class),
                 null,
                 $orderFilterFactory,
             ],
@@ -351,6 +351,17 @@ class OrderFilterTest extends DoctrineOrmFilterTestCase
                     'name' => 'q',
                 ],
                 sprintf('SELECT o FROM %s o', Dummy::class),
+                null,
+                $orderFilterFactory,
+            ],
+            'not nullable relation will be a LEFT JOIN' => [
+                [
+                    'relatedDummy.name' => 'ASC',
+                ],
+                [
+                    'order' => ['relatedDummy.name' => 'ASC'],
+                ],
+                sprintf('SELECT o FROM %s o LEFT JOIN o.relatedDummy relatedDummy_a1 ORDER BY relatedDummy_a1.name ASC', Dummy::class),
                 null,
                 $orderFilterFactory,
             ],

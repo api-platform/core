@@ -269,7 +269,7 @@ abstract class AbstractFilter implements FilterInterface
      *               the second element is the $field name
      *               the third element is the $associations array
      */
-    protected function addJoinsForNestedProperty(string $property, string $rootAlias, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator/*, string $resourceClass*/): array
+    protected function addJoinsForNestedProperty(string $property, string $rootAlias, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator/*, string $resourceClass, string $joinType*/): array
     {
         if (\func_num_args() > 4) {
             $resourceClass = func_get_arg(4);
@@ -283,12 +283,18 @@ abstract class AbstractFilter implements FilterInterface
             $resourceClass = null;
         }
 
+        if (\func_num_args() > 5) {
+            $joinType = func_get_arg(5);
+        } else {
+            $joinType = null;
+        }
+
         $propertyParts = $this->splitPropertyParts($property, $resourceClass);
         $parentAlias = $rootAlias;
         $alias = null;
 
         foreach ($propertyParts['associations'] as $association) {
-            $alias = QueryBuilderHelper::addJoinOnce($queryBuilder, $queryNameGenerator, $parentAlias, $association);
+            $alias = QueryBuilderHelper::addJoinOnce($queryBuilder, $queryNameGenerator, $parentAlias, $association, $joinType);
             $parentAlias = $alias;
         }
 
