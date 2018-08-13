@@ -31,6 +31,11 @@ class ItemNormalizer extends AbstractItemNormalizer
      */
     public function denormalize($data, $class, $format = null, array $context = [])
     {
+        $context['api_denormalize'] = true;
+        if (!isset($context['resource_class'])) {
+            $context['resource_class'] = $class;
+        }
+
         // Avoid issues with proxies if we populated the object
         if (isset($data['id']) && !isset($context[self::OBJECT_TO_POPULATE])) {
             if (isset($context['api_allow_update']) && true !== $context['api_allow_update']) {
