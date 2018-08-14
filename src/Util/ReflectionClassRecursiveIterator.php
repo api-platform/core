@@ -52,6 +52,7 @@ final class ReflectionClassRecursiveIterator
         }
 
         $declared = get_declared_classes();
+        sort($declared);
         foreach ($declared as $className) {
             $reflectionClass = new \ReflectionClass($className);
             $sourceFile = $reflectionClass->getFileName();
