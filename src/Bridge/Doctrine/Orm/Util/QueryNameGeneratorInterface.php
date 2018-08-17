@@ -13,10 +13,12 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Bridge\Doctrine\Orm\Util;
 
+use ApiPlatform\Core\Bridge\Doctrine\Common\Util\QueryNameGeneratorInterface as CommonQueryNameGeneratorInterface;
+
 /**
  * @author Amrouche Hamza <hamza.simperfit@gmail.com>
  */
-interface QueryNameGeneratorInterface
+interface QueryNameGeneratorInterface extends CommonQueryNameGeneratorInterface
 {
     /**
      * Generates a cacheable alias for DQL join.

@@ -13,9 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Doctrine\Orm\Filter;
 
-use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\AbstractFilter;
-use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGeneratorInterface;
-use Doctrine\ORM\QueryBuilder;
+use ApiPlatform\Core\Bridge\Doctrine\Common\Filter\AbstractFilter;
+use ApiPlatform\Core\Bridge\Doctrine\Common\Util\QueryNameGeneratorInterface;
 
 class DummyFilter extends AbstractFilter
 {
@@ -24,7 +23,7 @@ class DummyFilter extends AbstractFilter
         return $this->splitPropertyParts($property);
     }
 
-    protected function filterProperty(string $property, $values, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, string $operationName = null)
+    protected function filterProperty(string $property, $values, $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, string $operationName = null)
     {
     }
 

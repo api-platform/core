@@ -11,13 +11,13 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Bridge\Doctrine\Orm\Filter;
+namespace ApiPlatform\Core\Bridge\Doctrine\MongoDB\Filter;
 
 use ApiPlatform\Core\Bridge\Doctrine\Common\Filter\AbstractBooleanFilter;
 use ApiPlatform\Core\Bridge\Doctrine\Common\Util\QueryNameGeneratorInterface as CommonQueryNameGeneratorInterface;
-use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGeneratorInterface;
+use ApiPlatform\Core\Bridge\Doctrine\Common\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
-use Doctrine\ORM\QueryBuilder;
+use Doctrine\ODM\MongoDB\Aggregation\Builder;
 
 /**
  * Filters the collection by boolean values.
@@ -38,10 +38,10 @@ class BooleanFilter extends AbstractBooleanFilter
     /**
      * {@inheritdoc}
      *
-     * @param QueryBuilder                $queryBuilder
+     * @param Builder                     $aggregationBuilder
      * @param QueryNameGeneratorInterface $queryNameGenerator
      */
-    protected function filterProperty(string $property, $value, $queryBuilder, CommonQueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, string $operationName = null)
+    protected function filterProperty(string $property, $value, $aggregationBuilder, CommonQueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, string $operationName = null)
     {
         if (
             !$this->isPropertyEnabled($property, $resourceClass) ||
@@ -56,17 +56,10 @@ class BooleanFilter extends AbstractBooleanFilter
             return;
         }
 
-        $alias = $queryBuilder->getRootAliases()[0];
-        $field = $property;
-
         if ($this->isPropertyNested($property, $resourceClass)) {
-            list($alias, $field) = $this->addJoinsForNestedProperty($property, $alias, $queryBuilder, $queryNameGenerator, $resourceClass);
+            $this->addLookupsForNestedProperty($property, $aggregationBuilder, $resourceClass);
         }
 
-        $valueParameter = $queryNameGenerator->generateParameterName($field);
-
-        $queryBuilder
-            ->andWhere(sprintf('%s.%s = :%s', $alias, $field, $valueParameter))
-            ->setParameter($valueParameter, $value);
+        $aggregationBuilder->match()->field($property)->equals($value);
     }
 }

@@ -21,11 +21,12 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Bridge\Doctrine\MongoDB\Extension;
 
+use ApiPlatform\Core\Bridge\Doctrine\Common\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Core\Bridge\Doctrine\MongoDB\Paginator;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use Doctrine\Common\Persistence\ManagerRegistry;
-use Doctrine\ODM\MongoDB\Query\Builder;
+use Doctrine\ODM\MongoDB\Aggregation\Builder;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
@@ -65,7 +66,7 @@ class PaginationExtension implements QueryResultExtensionInterface
     /**
      * {@inheritdoc}
      */
-    public function applyToCollection(Builder $queryBuilder, string $resourceClass, string $operationName = null)
+    public function applyToCollection(Builder $aggregationBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, string $operationName = null)
     {
         $request = $this->requestStack->getCurrentRequest();
         if (null === $request) {
@@ -82,9 +83,18 @@ class PaginationExtension implements QueryResultExtensionInterface
             $itemsPerPage = (int) $request->query->get($this->itemsPerPageParameterName, $itemsPerPage);
         }
 
-        $queryBuilder
-            ->skip(($request->query->get($this->pageParameterName, 1) - 1) * $itemsPerPage)
-            ->limit($itemsPerPage);
+        $repository = $this->managerRegistry->getManagerForClass($resourceClass)->getRepository($resourceClass);
+        $aggregationBuilder
+            ->facet()
+            ->field('results')->pipeline(
+                $repository->createAggregationBuilder()
+                    ->skip(($request->query->get($this->pageParameterName, 1) - 1) * $itemsPerPage)
+                    ->limit($itemsPerPage)
+            )
+            ->field('count')->pipeline(
+                $repository->createAggregationBuilder()
+                    ->count('count')
+            );
     }
 
     /**
@@ -105,9 +115,9 @@ class PaginationExtension implements QueryResultExtensionInterface
     /**
      * {@inheritdoc}
      */
-    public function getResult(Builder $queryBuilder)
+    public function getResult(Builder $aggregationBuilder, string $resourceClass)
     {
-        return new Paginator($queryBuilder->getQuery()->execute());
+        return new Paginator($aggregationBuilder->execute(), $this->managerRegistry->getManagerForClass($resourceClass)->getUnitOfWork(), $resourceClass);
     }
 
     private function isPaginationEnabled(Request $request, ResourceMetadata $resourceMetadata, string $operationName = null): bool

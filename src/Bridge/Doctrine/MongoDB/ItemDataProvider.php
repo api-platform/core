@@ -10,37 +10,30 @@
  */
 
 declare(strict_types=1);
-/*
- * This file is part of the API Platform project.
- *
- * (c) Kévin Dunglas <dunglas@gmail.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
 
 namespace ApiPlatform\Core\Bridge\Doctrine\MongoDB;
 
 use ApiPlatform\Core\Bridge\Doctrine\MongoDB\Extension\QueryItemExtensionInterface;
+use ApiPlatform\Core\Bridge\Doctrine\MongoDB\Util\QueryNameGenerator;
 use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
+use ApiPlatform\Core\DataProvider\RestrictedDataProviderInterface;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
-use ApiPlatform\Core\Exception\ResourceClassNotSupportedException;
+use ApiPlatform\Core\Exception\RuntimeException;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\ODM\MongoDB\Aggregation\Builder;
 use Doctrine\ODM\MongoDB\DocumentManager;
-use Doctrine\ODM\MongoDB\DocumentRepository;
 
 /**
  * Item data provider for the Doctrine MongoDB ODM.
  */
-class ItemDataProvider implements ItemDataProviderInterface
+class ItemDataProvider implements ItemDataProviderInterface, RestrictedDataProviderInterface
 {
     private $managerRegistry;
     private $propertyNameCollectionFactory;
     private $propertyMetadataFactory;
     private $itemExtensions;
-    private $decorated;
 
     /**
      * @param QueryItemExtensionInterface[] $itemExtensions
@@ -51,26 +44,21 @@ class ItemDataProvider implements ItemDataProviderInterface
         $this->propertyNameCollectionFactory = $propertyNameCollectionFactory;
         $this->propertyMetadataFactory = $propertyMetadataFactory;
         $this->itemExtensions = $itemExtensions;
-        $this->decorated = $decorated;
+    }
+
+    public function supports(string $resourceClass, string $operationName = null, array $context = []): bool
+    {
+        return null !== $this->managerRegistry->getManagerForClass($resourceClass);
     }
 
     /**
      * {@inheritdoc}
+     *
+     * @throws RuntimeException
      */
     public function getItem(string $resourceClass, $id, string $operationName = null, array $context = [])
     {
-        if ($this->decorated) {
-            try {
-                return $this->decorated->getItem($resourceClass, $id, $operationName, $context);
-            } catch (ResourceClassNotSupportedException $resourceClassNotSupportedException) {
-                // Ignore it
-            }
-        }
-
         $manager = $this->managerRegistry->getManagerForClass($resourceClass);
-        if (null === $manager) {
-            throw new ResourceClassNotSupportedException();
-        }
 
         $identifierValues = explode('-', (string) $id);
         $identifiers = [];
@@ -97,19 +85,22 @@ class ItemDataProvider implements ItemDataProviderInterface
             return $manager->getReference($resourceClass, reset($identifiers));
         }
 
-        /** @var DocumentRepository $repository */
         $repository = $manager->getRepository($resourceClass);
-        $queryBuilder = $repository->createQueryBuilder();
+        if (!method_exists($repository, 'createAggregationBuilder')) {
+            throw new RuntimeException('The repository class must have a "createAggregationBuilder" method.');
+        }
+        /** @var Builder $aggregationBuilder */
+        $aggregationBuilder = $repository->createAggregationBuilder();
+        $queryNameGenerator = new QueryNameGenerator();
 
         foreach ($identifiers as $propertyName => $value) {
-            $queryBuilder
-                ->field($propertyName)->equals($value);
+            $aggregationBuilder->match()->field($propertyName)->equals($value);
         }
 
         foreach ($this->itemExtensions as $extension) {
-            $extension->applyToItem($queryBuilder, $resourceClass, $identifiers, $operationName);
+            $extension->applyToItem($aggregationBuilder, $queryNameGenerator, $resourceClass, $identifiers, $operationName);
         }
 
-        return $queryBuilder->getQuery()->getSingleResult();
+        return $aggregationBuilder->hydrate($resourceClass)->execute()->getSingleResult();
     }
 }

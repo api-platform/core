@@ -10,18 +10,10 @@
  */
 
 declare(strict_types=1);
-/*
- * This file is part of the API Platform project.
- *
- * (c) Kévin Dunglas <dunglas@gmail.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
 
 namespace ApiPlatform\Core\Bridge\Doctrine\MongoDB\Extension;
 
-use Doctrine\ODM\MongoDB\Query\Builder;
+use Doctrine\ODM\MongoDB\Aggregation\Builder;
 
 /**
  * Interface of Doctrine ORM query extensions that supports result production
@@ -34,5 +26,5 @@ interface QueryResultExtensionInterface extends QueryCollectionExtensionInterfac
 {
     public function supportsResult(string $resourceClass, string $operationName = null): bool;
 
-    public function getResult(Builder $queryBuilder);
+    public function getResult(Builder $aggregationBuilder, string $resourceClass);
 }

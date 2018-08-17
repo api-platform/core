@@ -11,16 +11,13 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Bridge\Doctrine\Orm\Filter;
+namespace ApiPlatform\Core\Bridge\Doctrine\Common\Filter;
 
-use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryBuilderHelper;
-use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGeneratorInterface;
-use ApiPlatform\Core\Exception\InvalidArgumentException;
+use ApiPlatform\Core\Bridge\Doctrine\Common\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Core\Util\RequestParser;
 use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Common\Persistence\Mapping\ClassMetadata;
 use Doctrine\DBAL\Types\Type;
-use Doctrine\ORM\Mapping\ClassMetadata;
-use Doctrine\ORM\QueryBuilder;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use Symfony\Component\HttpFoundation\Request;
@@ -59,7 +56,7 @@ abstract class AbstractFilter implements FilterInterface
     /**
      * {@inheritdoc}
      */
-    public function apply(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, string $operationName = null/*, array $context = []*/)
+    public function apply($builder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, string $operationName = null/*, array $context = []*/)
     {
         @trigger_error(sprintf('Using "%s::apply()" is deprecated since 2.2. Use "%s::apply()" with the "filters" context key instead.', __CLASS__, AbstractContextAwareFilter::class), E_USER_DEPRECATED);
 
@@ -68,14 +65,14 @@ abstract class AbstractFilter implements FilterInterface
         }
 
         foreach ($this->extractProperties($request, $resourceClass) as $property => $value) {
-            $this->filterProperty($property, $value, $queryBuilder, $queryNameGenerator, $resourceClass, $operationName);
+            $this->filterProperty($property, $value, $builder, $queryNameGenerator, $resourceClass, $operationName);
         }
     }
 
     /**
      * Passes a property through the filter.
      */
-    abstract protected function filterProperty(string $property, $value, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, string $operationName = null/*, array $context = []*/);
+    abstract protected function filterProperty(string $property, $value, $builder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, string $operationName = null/*, array $context = []*/);
 
     /**
      * Gets class metadata for the given resource.
@@ -175,10 +172,7 @@ abstract class AbstractFilter implements FilterInterface
             if ($metadata->hasAssociation($association)) {
                 $associationClass = $metadata->getAssociationTargetClass($association);
 
-                $metadata = $this
-                    ->managerRegistry
-                    ->getManagerForClass($associationClass)
-                    ->getClassMetadata($associationClass);
+                $metadata = $this->getClassMetadata($associationClass);
             }
         }
 
@@ -225,7 +219,7 @@ abstract class AbstractFilter implements FilterInterface
             }
         }
 
-        if ($slice === \count($parts)) {
+        if (\count($parts) === $slice) {
             --$slice;
         }
 
@@ -257,46 +251,6 @@ abstract class AbstractFilter implements FilterInterface
         }
 
         return $request->query->all();
-    }
-
-    /**
-     * Adds the necessary joins for a nested property.
-     *
-     *
-     * @throws InvalidArgumentException If property is not nested
-     *
-     * @return array An array where the first element is the join $alias of the leaf entity,
-     *               the second element is the $field name
-     *               the third element is the $associations array
-     */
-    protected function addJoinsForNestedProperty(string $property, string $rootAlias, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator/*, string $resourceClass*/): array
-    {
-        if (\func_num_args() > 4) {
-            $resourceClass = func_get_arg(4);
-        } else {
-            if (__CLASS__ !== \get_class($this)) {
-                $r = new \ReflectionMethod($this, __FUNCTION__);
-                if (__CLASS__ !== $r->getDeclaringClass()->getName()) {
-                    @trigger_error(sprintf('Method %s() will have a fifth `$resourceClass` argument in version API Platform 3.0. Not defining it is deprecated since API Platform 2.1.', __FUNCTION__), E_USER_DEPRECATED);
-                }
-            }
-            $resourceClass = null;
-        }
-
-        $propertyParts = $this->splitPropertyParts($property, $resourceClass);
-        $parentAlias = $rootAlias;
-        $alias = null;
-
-        foreach ($propertyParts['associations'] as $association) {
-            $alias = QueryBuilderHelper::addJoinOnce($queryBuilder, $queryNameGenerator, $parentAlias, $association);
-            $parentAlias = $alias;
-        }
-
-        if (null === $alias) {
-            throw new InvalidArgumentException(sprintf('Cannot add joins for property "%s" - property is not nested.', $property));
-        }
-
-        return [$alias, $propertyParts['field'], $propertyParts['associations']];
     }
 
     /**

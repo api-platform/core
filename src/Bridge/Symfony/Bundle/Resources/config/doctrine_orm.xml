@@ -119,13 +119,13 @@
         </service>
         <service id="ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\EagerLoadingExtension" alias="api_platform.doctrine.orm.query_extension.eager_loading" />
 
-        <service id="api_platform.doctrine.orm.query_extension.filter" class="ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\FilterExtension" public="false">
+        <service id="api_platform.doctrine.orm.query_extension.filter" class="ApiPlatform\Core\Bridge\Doctrine\Common\Extension\FilterExtension" public="false">
             <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
             <argument type="service" id="api_platform.filter_locator" />
 
             <tag name="api_platform.doctrine.orm.query_extension.collection" priority="32" />
         </service>
-        <service id="ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\FilterExtension" alias="api_platform.doctrine.orm.query_extension.filter" />
+        <service id="ApiPlatform\Core\Bridge\Doctrine\Common\Extension\FilterExtension" alias="api_platform.doctrine.orm.query_extension.filter" />
 
         <!-- This needs to be executed right after the filter extension -->
 

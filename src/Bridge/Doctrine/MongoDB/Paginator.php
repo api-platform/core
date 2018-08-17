@@ -10,31 +10,32 @@
  */
 
 declare(strict_types=1);
-/*
- * This file is part of the API Platform project.
- *
- * (c) Kévin Dunglas <dunglas@gmail.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
 
 namespace ApiPlatform\Core\Bridge\Doctrine\MongoDB;
 
 use ApiPlatform\Core\DataProvider\PaginatorInterface;
-use Doctrine\ODM\MongoDB\Cursor;
+use Doctrine\ODM\MongoDB\CommandCursor;
+use Doctrine\ODM\MongoDB\UnitOfWork;
 
 /**
- * Decorates the Doctrine ORM paginator.
+ * Decorates the Doctrine ODM paginator.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
 final class Paginator implements \IteratorAggregate, PaginatorInterface
 {
     /**
-     * @var Cursor
+     * @var CommandCursor
      */
     private $cursor;
+    /**
+     * @var UnitOfWork
+     */
+    private $unitOfWork;
+    /**
+     * @var string
+     */
+    private $resourceClass;
     /**
      * @var int
      */
@@ -48,15 +49,20 @@ final class Paginator implements \IteratorAggregate, PaginatorInterface
      */
     private $totalItems;
 
-    public function __construct(Cursor $cursor)
+    public function __construct(CommandCursor $cursor, UnitOfWork $unitOfWork, string $resourceClass)
     {
         $this->cursor = $cursor;
+        $this->unitOfWork = $unitOfWork;
+        $this->resourceClass = $resourceClass;
 
-        $info = $cursor->info();
+        $resultsFacetInfo = $this->getResultsFacetInfo();
 
-        $this->firstResult = $info['skip'];
-        $this->maxResults = $info['limit'];
-        $this->totalItems = $cursor->count();
+        // See https://github.com/alcaeus/mongo-php-adapter#mongocommandcursor
+        // Since the method getCursorInfo in CommandCursor always returns 0 for 'skip' and 'limit',
+        // the values set in the facet stage are used instead.
+        $this->firstResult = $resultsFacetInfo[0]['$skip'];
+        $this->maxResults = $resultsFacetInfo[1]['$limit'];
+        $this->totalItems = $cursor->toArray()[0]['count'][0]['count'];
     }
 
     /**
@@ -96,7 +102,9 @@ final class Paginator implements \IteratorAggregate, PaginatorInterface
      */
     public function getIterator()
     {
-        return new \ArrayIterator($this->cursor->toArray());
+        return new \ArrayIterator(array_map(function ($result) {
+            return $this->unitOfWork->getOrCreateDocument($this->resourceClass, $result);
+        }, $this->cursor->toArray()[0]['results']));
     }
 
     /**
@@ -105,5 +113,18 @@ final class Paginator implements \IteratorAggregate, PaginatorInterface
     public function count()
     {
         return \count($this->getIterator());
+    }
+
+    private function getResultsFacetInfo(): array
+    {
+        $infoPipeline = $this->cursor->info()['query']['pipeline'];
+        $indexFacetStage = 0;
+        foreach ($infoPipeline as $indexStage => $infoStage) {
+            if (array_key_exists('$facet', $infoStage)) {
+                $indexFacetStage = $indexStage;
+            }
+        }
+
+        return $infoPipeline[$indexFacetStage]['$facet']['results'];
     }
 }

@@ -22,7 +22,10 @@ use Symfony\Component\Validator\Constraints as Assert;
  *
  * @author Alexandre Delplace <alexandre.delplacemille@gmail.com>
  *
- * @ApiResource
+ * @ApiResource(
+ *     attributes={"filters"={"my_dummy.mongodb.boolean"}},
+ *     itemOperations={"get", "put", "delete", "groups"={"method"="GET", "path"="/embedded_dummies_groups/{id}", "normalization_context"={"groups"={"embed"}}}}
+ * )
  * @ODM\Document
  */
 class EmbeddedDummy
@@ -59,7 +62,7 @@ class EmbeddedDummy
     /**
      * @var RelatedDummy A related dummy
      *
-     * @ODM\ReferenceOne(targetDocument="RelatedDummy")
+     * @ODM\ReferenceOne(targetDocument="RelatedDummy", storeAs="id")
      */
     public $relatedDummy;
 

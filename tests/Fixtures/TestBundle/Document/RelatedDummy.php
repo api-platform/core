@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Document;
 
 use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Core\Annotation\ApiSubresource;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 use Symfony\Component\Serializer\Annotation\Groups;
@@ -65,12 +66,12 @@ class RelatedDummy extends ParentDummy
 //     */
 //    public $thirdLevel;
 
-//    /**
-//     * @ApiSubresource
-//     * @ORM\OneToMany(targetEntity="RelatedToDummyFriend", cascade={"persist"}, mappedBy="relatedDummy")
-//     * @Groups({"fakemanytomany", "friends"})
-//     */
-//    public $relatedToDummyFriend;
+    /**
+     * @ApiSubresource
+     * @ODM\ReferenceMany(targetDocument="RelatedToDummyFriend", cascade={"persist"}, mappedBy="relatedDummy")
+     * @Groups({"fakemanytomany", "friends"})
+     */
+    public $relatedToDummyFriend;
 
     public function __construct()
     {
@@ -149,25 +150,25 @@ class RelatedDummy extends ParentDummy
         $this->dummyBoolean = $dummyBoolean;
     }
 
-//    /**
-//     * Get relatedToDummyFriend.
-//     *
-//     * @return RelatedToDummyFriend
-//     */
-//    public function getRelatedToDummyFriend()
-//    {
-//        return $this->relatedToDummyFriend;
-//    }
-//
-//    /**
-//     * Set relatedToDummyFriend.
-//     *
-//     * @param RelatedToDummyFriend the value to set
-//     */
-//    public function addRelatedToDummyFriend(RelatedToDummyFriend $relatedToDummyFriend)
-//    {
-//        $this->relatedToDummyFriend->add($relatedToDummyFriend);
-//    }
+    /**
+     * Get relatedToDummyFriend.
+     *
+     * @return RelatedToDummyFriend
+     */
+    public function getRelatedToDummyFriend()
+    {
+        return $this->relatedToDummyFriend;
+    }
+
+    /**
+     * Set relatedToDummyFriend.
+     *
+     * @param RelatedToDummyFriend the value to set
+     */
+    public function addRelatedToDummyFriend(RelatedToDummyFriend $relatedToDummyFriend)
+    {
+        $this->relatedToDummyFriend->add($relatedToDummyFriend);
+    }
 
     /**
      * @return EmbeddableDummy

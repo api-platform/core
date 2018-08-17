@@ -25,7 +25,11 @@ use Symfony\Component\Validator\Constraints as Assert;
  *
  * @author Alexandre Delplace <alexandre.delplacemille@gmail.com>
  *
- * @ApiResource
+ * @ApiResource(attributes={
+ *     "filters"={
+ *         "my_dummy.mongodb.boolean"
+ *     }
+ * })
  * @ODM\Document
  */
 class Dummy

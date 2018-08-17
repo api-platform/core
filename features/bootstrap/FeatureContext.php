@@ -48,6 +48,12 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\SecuredDummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\ThirdLevel;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\User;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\UuidIdentifierDummy;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\Dummy as DummyDocument;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\DummyFriend as DummyFriendDocument;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\EmbeddableDummy as EmbeddableDummyDocument;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\EmbeddedDummy as EmbeddedDummyDocument;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\RelatedDummy as RelatedDummyDocument;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\RelatedToDummyFriend as RelatedToDummyFriendDocument;
 use Behat\Behat\Context\Context;
 use Behat\Behat\Context\SnippetAcceptingContext;
 use Behat\Behat\Hook\Scope\AfterStepScope;
@@ -116,10 +122,10 @@ final class FeatureContext implements Context, SnippetAcceptingContext
      */
     public function createDatabase()
     {
-        $this->schemaTool && $this->schemaTool->dropSchema($this->classes);
-        $this->schemaManager && $this->schemaManager->dropDatabases();
+        $this->isOrm() && $this->schemaTool->dropSchema($this->classes);
+        $this->isOdm() && $this->schemaManager->dropDatabases();
         $this->doctrine->getManager()->clear();
-        $this->schemaTool && $this->schemaTool->createSchema($this->classes);
+        $this->isOrm() && $this->schemaTool->createSchema($this->classes);
     }
 
     /**
@@ -130,7 +136,7 @@ final class FeatureContext implements Context, SnippetAcceptingContext
         $descriptions = ['Smart dummy.', 'Not so smart dummy.'];
 
         for ($i = 1; $i <= $nb; ++$i) {
-            $dummy = new Dummy();
+            $dummy = $this->buildDummy();
             $dummy->setName('Dummy #'.$i);
             $dummy->setAlias('Alias #'.($nb - $i));
             $dummy->setDummy('SomeDummyTest'.$i);
@@ -170,7 +176,7 @@ final class FeatureContext implements Context, SnippetAcceptingContext
         $dummies = ['Lorem', 'Ipsum', 'Dolor', 'Sit', 'Amet'];
 
         for ($i = 0; $i < $nb; ++$i) {
-            $dummy = new Dummy();
+            $dummy = $this->buildDummy();
             $dummy->setName($dummies[$i]);
 
             $foo = new FooDummy();
@@ -287,10 +293,10 @@ final class FeatureContext implements Context, SnippetAcceptingContext
     public function thereAreEmbeddedDummyObjects(int $nb)
     {
         for ($i = 1; $i <= $nb; ++$i) {
-            $dummy = new EmbeddedDummy();
+            $dummy = $this->buildEmbeddedDummy();
             $dummy->setName('Dummy #'.$i);
 
-            $embeddableDummy = new EmbeddableDummy();
+            $embeddableDummy = $this->buildEmbeddableDummy();
             $embeddableDummy->setDummyName('Dummy #'.$i);
             $dummy->setEmbeddedDummy($embeddableDummy);
 
@@ -306,10 +312,10 @@ final class FeatureContext implements Context, SnippetAcceptingContext
     public function thereAreDummyObjectsWithRelatedDummy(int $nb)
     {
         for ($i = 1; $i <= $nb; ++$i) {
-            $relatedDummy = new RelatedDummy();
+            $relatedDummy = $this->buildRelatedDummy();
             $relatedDummy->setName('RelatedDummy #'.$i);
 
-            $dummy = new Dummy();
+            $dummy = $this->buildDummy();
             $dummy->setName('Dummy #'.$i);
             $dummy->setAlias('Alias #'.($nb - $i));
             $dummy->setRelatedDummy($relatedDummy);
@@ -327,7 +333,7 @@ final class FeatureContext implements Context, SnippetAcceptingContext
     public function thereAreDummyObjectsWithJsonData(int $nb)
     {
         for ($i = 1; $i <= $nb; ++$i) {
-            $dummy = new Dummy();
+            $dummy = $this->buildDummy();
             $dummy->setName('Dummy #'.$i);
             $dummy->setAlias('Alias #'.($nb - $i));
             $dummy->setJsonData(['foo' => ['bar', 'baz'], 'bar' => 5]);
@@ -348,11 +354,11 @@ final class FeatureContext implements Context, SnippetAcceptingContext
         for ($i = 1; $i <= $nb; ++$i) {
             $thirdLevel = new ThirdLevel();
 
-            $relatedDummy = new RelatedDummy();
+            $relatedDummy = $this->buildRelatedDummy();
             $relatedDummy->setName('RelatedDummy #'.$i);
             $relatedDummy->setThirdLevel($thirdLevel);
 
-            $dummy = new Dummy();
+            $dummy = $this->buildDummy();
             $dummy->setName('Dummy #'.$i);
             $dummy->setAlias('Alias #'.($nb - $i));
             $dummy->setRelatedDummy($relatedDummy);
@@ -371,10 +377,10 @@ final class FeatureContext implements Context, SnippetAcceptingContext
     public function thereAreDummyObjectsWithEmbeddedDummy(int $nb)
     {
         for ($i = 1; $i <= $nb; ++$i) {
-            $embeddableDummy = new EmbeddableDummy();
+            $embeddableDummy = $this->buildEmbeddableDummy();
             $embeddableDummy->setDummyName('EmbeddedDummy #'.$i);
 
-            $dummy = new EmbeddedDummy();
+            $dummy = $this->buildEmbeddedDummy();
             $dummy->setName('Dummy #'.$i);
             $dummy->setEmbeddedDummy($embeddableDummy);
 
@@ -390,12 +396,12 @@ final class FeatureContext implements Context, SnippetAcceptingContext
     public function thereAreDummyObjectsWithRelatedDummies(int $nb, int $nbrelated)
     {
         for ($i = 1; $i <= $nb; ++$i) {
-            $dummy = new Dummy();
+            $dummy = $this->buildDummy();
             $dummy->setName('Dummy #'.$i);
             $dummy->setAlias('Alias #'.($nb - $i));
 
             for ($j = 1; $j <= $nbrelated; ++$j) {
-                $relatedDummy = new RelatedDummy();
+                $relatedDummy = $this->buildRelatedDummy();
                 $relatedDummy->setName('RelatedDummy'.$j.$i);
 
                 $this->manager->persist($relatedDummy);
@@ -420,7 +426,7 @@ final class FeatureContext implements Context, SnippetAcceptingContext
         for ($i = 1; $i <= $nb; ++$i) {
             $date = new \DateTime(sprintf('2015-04-%d', $i), new \DateTimeZone('UTC'));
 
-            $dummy = new Dummy();
+            $dummy = $this->buildDummy();
             $dummy->setName('Dummy #'.$i);
             $dummy->setAlias('Alias #'.($nb - $i));
             $dummy->setDescription($descriptions[($i - 1) % 2]);
@@ -455,7 +461,7 @@ final class FeatureContext implements Context, SnippetAcceptingContext
         for ($i = 1; $i <= $nb; ++$i) {
             $date = new \DateTime(sprintf('2015-04-%d', $i), new \DateTimeZone('UTC'));
 
-            $dummy = new Dummy();
+            $dummy = $this->buildDummy();
             $dummy->setName('Dummy #'.$i);
             $dummy->setAlias('Alias #'.($nb - $i));
             $dummy->setDescription($descriptions[($i - 1) % 2]);
@@ -480,11 +486,11 @@ final class FeatureContext implements Context, SnippetAcceptingContext
         for ($i = 1; $i <= $nb; ++$i) {
             $date = new \DateTime(sprintf('2015-04-%d', $i), new \DateTimeZone('UTC'));
 
-            $relatedDummy = new RelatedDummy();
+            $relatedDummy = $this->buildRelatedDummy();
             $relatedDummy->setName('RelatedDummy #'.$i);
             $relatedDummy->setDummyDate($date);
 
-            $dummy = new Dummy();
+            $dummy = $this->buildDummy();
             $dummy->setName('Dummy #'.$i);
             $dummy->setAlias('Alias #'.($nb - $i));
             $dummy->setRelatedDummy($relatedDummy);
@@ -508,11 +514,11 @@ final class FeatureContext implements Context, SnippetAcceptingContext
         for ($i = 1; $i <= $nb; ++$i) {
             $date = new \DateTime(sprintf('2015-04-%d', $i), new \DateTimeZone('UTC'));
 
-            $embeddableDummy = new EmbeddableDummy();
+            $embeddableDummy = $this->buildEmbeddableDummy();
             $embeddableDummy->setDummyName('Embeddable #'.$i);
             $embeddableDummy->setDummyDate($date);
 
-            $dummy = new EmbeddedDummy();
+            $dummy = $this->buildEmbeddedDummy();
             $dummy->setName('Dummy #'.$i);
             $dummy->setEmbeddedDummy($embeddableDummy);
             // Last Dummy has a null date
@@ -535,7 +541,7 @@ final class FeatureContext implements Context, SnippetAcceptingContext
         $prices = ['9.99', '12.99', '15.99', '19.99'];
 
         for ($i = 1; $i <= $nb; ++$i) {
-            $dummy = new Dummy();
+            $dummy = $this->buildDummy();
             $dummy->setName('Dummy #'.$i);
             $dummy->setAlias('Alias #'.($nb - $i));
             $dummy->setDescription($descriptions[($i - 1) % 2]);
@@ -564,7 +570,7 @@ final class FeatureContext implements Context, SnippetAcceptingContext
         $descriptions = ['Smart dummy.', 'Not so smart dummy.'];
 
         for ($i = 1; $i <= $nb; ++$i) {
-            $dummy = new Dummy();
+            $dummy = $this->buildDummy();
             $dummy->setName('Dummy #'.$i);
             $dummy->setAlias('Alias #'.($nb - $i));
             $dummy->setDescription($descriptions[($i - 1) % 2]);
@@ -591,9 +597,9 @@ final class FeatureContext implements Context, SnippetAcceptingContext
         }
 
         for ($i = 1; $i <= $nb; ++$i) {
-            $dummy = new EmbeddedDummy();
+            $dummy = $this->buildEmbeddedDummy();
             $dummy->setName('Embedded Dummy #'.$i);
-            $embeddableDummy = new EmbeddableDummy();
+            $embeddableDummy = $this->buildEmbeddableDummy();
             $embeddableDummy->setDummyName('Embedded Dummy #'.$i);
             $embeddableDummy->setDummyBoolean($bool);
             $dummy->setEmbeddedDummy($embeddableDummy);
@@ -618,13 +624,13 @@ final class FeatureContext implements Context, SnippetAcceptingContext
         }
 
         for ($i = 1; $i <= $nb; ++$i) {
-            $dummy = new EmbeddedDummy();
+            $dummy = $this->buildEmbeddedDummy();
             $dummy->setName('Embedded Dummy #'.$i);
-            $embeddableDummy = new EmbeddableDummy();
+            $embeddableDummy = $this->buildEmbeddableDummy();
             $embeddableDummy->setDummyName('Embedded Dummy #'.$i);
             $embeddableDummy->setDummyBoolean($bool);
 
-            $relationDummy = new RelatedDummy();
+            $relationDummy = $this->buildRelatedDummy();
             $relationDummy->setEmbeddedDummy($embeddableDummy);
 
             $dummy->setRelatedDummy($relationDummy);
@@ -768,13 +774,13 @@ final class FeatureContext implements Context, SnippetAcceptingContext
      */
     public function thereIsARelatedDummyWithFriends(int $nb)
     {
-        $relatedDummy = new RelatedDummy();
+        $relatedDummy = $this->buildRelatedDummy();
         $relatedDummy->setName('RelatedDummy with friends');
         $this->manager->persist($relatedDummy);
         $this->manager->flush();
 
         for ($i = 1; $i <= $nb; ++$i) {
-            $friend = new DummyFriend();
+            $friend = $this->buildDummyFriend();
             $friend->setName('Friend-'.$i);
 
             $this->manager->persist($friend);
@@ -782,7 +788,7 @@ final class FeatureContext implements Context, SnippetAcceptingContext
             // See https://github.com/doctrine/doctrine2/pull/6701
             $this->manager->flush();
 
-            $relation = new RelatedToDummyFriend();
+            $relation = $this->buildRelatedToDummyFriend();
             $relation->setName('Relation-'.$i);
             $relation->setDummyFriend($friend);
             $relation->setRelatedDummy($relatedDummy);
@@ -792,7 +798,7 @@ final class FeatureContext implements Context, SnippetAcceptingContext
             $this->manager->persist($relation);
         }
 
-        $relatedDummy2 = new RelatedDummy();
+        $relatedDummy2 = $this->buildRelatedDummy();
         $relatedDummy2->setName('RelatedDummy without friends');
         $this->manager->persist($relatedDummy2);
         $this->manager->flush();
@@ -964,17 +970,16 @@ final class FeatureContext implements Context, SnippetAcceptingContext
         $thirdLevel->setFourthLevel($fourthLevel);
         $this->manager->persist($thirdLevel);
 
-        $namedRelatedDummy = new RelatedDummy();
+        $namedRelatedDummy = $this->buildRelatedDummy();
         $namedRelatedDummy->setName('Hello');
         $namedRelatedDummy->setThirdLevel($thirdLevel);
         $this->manager->persist($namedRelatedDummy);
 
-        $relatedDummy = new RelatedDummy();
-        $relatedDummy = new RelatedDummy();
+        $relatedDummy = $this->buildRelatedDummy();
         $relatedDummy->setThirdLevel($thirdLevel);
         $this->manager->persist($relatedDummy);
 
-        $dummy = new Dummy();
+        $dummy = $this->buildDummy();
         $dummy->setName('Dummy with relations');
         $dummy->setRelatedDummy($namedRelatedDummy);
         $dummy->addRelatedDummy($namedRelatedDummy);
@@ -1001,5 +1006,63 @@ final class FeatureContext implements Context, SnippetAcceptingContext
 
         $this->manager->flush();
         $this->manager->clear();
+    }
+
+    private function isOrm(): bool
+    {
+        return null !== $this->schemaTool;
+    }
+
+    private function isOdm(): bool
+    {
+        return null !== $this->schemaManager;
+    }
+
+    /**
+     * @return Dummy|DummyDocument
+     */
+    private function buildDummy()
+    {
+        return $this->isOrm() ? new Dummy() : new DummyDocument();
+    }
+
+    /**
+     * @return DummyFriend|DummyFriendDocument
+     */
+    private function buildDummyFriend()
+    {
+        return $this->isOrm() ? new DummyFriend() : new DummyFriendDocument();
+    }
+
+    /**
+     * @return EmbeddableDummy|EmbeddableDummyDocument
+     */
+    private function buildEmbeddableDummy()
+    {
+        return $this->isOrm() ? new EmbeddableDummy() : new EmbeddableDummyDocument();
+    }
+
+    /**
+     * @return EmbeddedDummy|EmbeddedDummyDocument
+     */
+    private function buildEmbeddedDummy()
+    {
+        return $this->isOrm() ? new EmbeddedDummy() : new EmbeddedDummyDocument();
+    }
+
+    /**
+     * @return RelatedDummy|RelatedDummyDocument
+     */
+    private function buildRelatedDummy()
+    {
+        return $this->isOrm() ? new RelatedDummy() : new RelatedDummyDocument();
+    }
+
+    /**
+     * @return RelatedToDummyFriend|RelatedToDummyFriendDocument
+     */
+    private function buildRelatedToDummyFriend()
+    {
+        return $this->isOrm() ? new RelatedToDummyFriend() : new RelatedToDummyFriendDocument();
     }
 }

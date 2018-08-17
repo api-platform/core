@@ -10,17 +10,10 @@
  */
 
 declare(strict_types=1);
-/*
- * This file is part of the API Platform project.
- *
- * (c) Kévin Dunglas <dunglas@gmail.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
 
 namespace ApiPlatform\Core\Bridge\Doctrine\MongoDB\Extension;
 
+use ApiPlatform\Core\Bridge\Doctrine\Common\Util\QueryNameGeneratorInterface;
 use Doctrine\ODM\MongoDB\Query\Builder;
 
 /**
@@ -31,5 +24,5 @@ use Doctrine\ODM\MongoDB\Query\Builder;
  */
 interface QueryItemExtensionInterface
 {
-    public function applyToItem(Builder $queryBuilder, string $resourceClass, array $identifiers, string $operationName = null);
+    public function applyToItem(Builder $aggregationBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, array $identifiers, string $operationName = null);
 }
