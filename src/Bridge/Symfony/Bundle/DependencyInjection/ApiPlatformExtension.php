@@ -16,6 +16,8 @@ namespace ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection;
 use ApiPlatform\Core\Api\FilterInterface;
 use ApiPlatform\Core\Bridge\Doctrine\MongoDB\Extension\QueryCollectionExtensionInterface as MongoDbQueryCollectionExtensionInterface;
 use ApiPlatform\Core\Bridge\Doctrine\MongoDB\Extension\QueryItemExtensionInterface as MongoDbQueryItemExtensionInterface;
+use ApiPlatform\Core\Bridge\Doctrine\PHPCR\Extension\QueryCollectionExtensionInterface as PHPCRDbQueryCollectionExtensionInterface;
+use ApiPlatform\Core\Bridge\Doctrine\PHPCR\Extension\QueryItemExtensionInterface as PHPCRQueryItemExtensionIterface;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\EagerLoadingExtension;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\FilterEagerLoadingExtension;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\QueryCollectionExtensionInterface;
@@ -114,6 +116,10 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             ->addTag('api_platform.doctrine.mongodb.query_extension.item');
         $container->registerForAutoconfiguration(MongoDbQueryCollectionExtensionInterface::class)
             ->addTag('api_platform.doctrine.mongodb.query_extension.collection');
+        $container->registerForAutoconfiguration(PHPCRQueryItemExtensionIterface::class)
+            ->addTag('api_platform.doctrine.phpcr.query_extension.item');
+        $container->registerForAutoconfiguration(PHPCRDbQueryCollectionExtensionInterface::class)
+            ->addTag('api_platform.doctrine.phpcr.query_extension.collection');
         $container->registerForAutoconfiguration(FilterInterface::class)
             ->addTag('api_platform.filter');
 
@@ -243,7 +249,10 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
                 $paths[] = "$dirname/Entity";
             }
             if ($config['doctrine']['enable_mongodb_odm']) {
-                $paths[] = "$dirname/Document";
+                $paths[] = "$dirname/Document/MongoDB";
+            }
+            if ($config['doctrine']['enable_phpcr_odm']) {
+                $paths[] = "$dirname/Document/PHPCR";
             }
 
             foreach ($paths as $path) {
@@ -427,6 +436,11 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         //  Doctrine MongoDB ODM support
         if ($config['doctrine']['enable_mongodb_odm']) {
             $loader->load('doctrine_mongodb.xml');
+        }
+
+        // Doctrine PHPCR ODM support
+        if ($config['doctrine']['enable_phpcr_odm']) {
+            $loader->load('doctrine_phpcr.xml');
         }
 
         // FOSUser support

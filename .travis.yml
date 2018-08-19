@@ -31,10 +31,6 @@ jobs:
       before_script:
         - mysql -e 'CREATE DATABASE api_platform_test;'
       env: APP_ENV=mysql
-    - php: '7.2'
-      services:
-        - mongodb
-      env: APP_ENV=mongodb
   allow_failures:
     - env: SYMFONY_DEPRECATIONS_HELPER=0
   fast_finish: true
@@ -59,10 +55,15 @@ script:
       vendor/bin/phpunit -c phpunit.mongo.xml;
     fi
   - tests/Fixtures/app/console cache:clear
+  - if [[ $APP_ENV = 'phpcr' ]]; then
+      vendor/bin/phpunit -c phpunit.phpcr.xml
+    fi
   - if [[ $APP_ENV = 'postgres' ]]; then
       vendor/bin/behat --suite=postgres --format=progress;
     elif [[ $APP_ENV = 'mongodb' ]]; then
       vendor/bin/behat --suite=mongodb --tags '~@filter&&~@orm-only' --format=progress;
+    elif [[ $APP_ENV = 'phpcr' ]]; then
+       vendor/bin/behat --suite=phpcr --tags '~@filter&&~@orm-only' --format=progress;
     else
       vendor/bin/behat --suite=default --format=progress;
     fi

@@ -1,0 +1,40 @@
+imports:
+    - { resource: config_test.yml }
+    - { resource: parameters_phpcr.yml }
+
+api_platform:
+    doctrine:
+        enable_phpcr_odm: true
+        enable_orm: false
+
+doctrine_phpcr:
+    # configure the PHPCR session
+    session:
+        backend:   '%phpcr_backend%'
+        workspace: '%phpcr_workspace%'
+        username:  '%phpcr_user%'
+        password:  '%phpcr_pass%'
+    # enable the ODM layer
+    odm:
+        auto_mapping: true
+        auto_generate_proxy_classes: '%kernel.debug%'
+        locales:
+            en: ['de', 'fr']
+            de: ['en', 'fr']
+            fr: ['en', 'de']
+
+services:
+    app.my_dummy_resource.phpcr.boolean_filter:
+        parent:    'api_platform.doctrine.phpcr.boolean_filter'
+        arguments: [ { 'dummyBoolean': ~, 'embeddedDummy.dummyBoolean': ~, 'relatedDummy.embeddedDummy.dummyBoolean': ~ } ]
+        tags:      [ { name: 'api_platform.filter', id: 'my_dummy.phpcr.boolean' } ]
+
+    app.related_dummy_resource.search_filter:
+        parent:    'api_platform.doctrine.phpcr.search_filter'
+        arguments: [ { 'relatedToDummyFriend.dummyFriend': 'exact', 'name': 'partial' } ]
+        tags:      [ { name: 'api_platform.filter', id: 'related_dummy.phpcr.friends' } ]
+
+    app.related_dummy_to_friend_resource.search_filter:
+        parent:    'api_platform.doctrine.phpcr.search_filter'
+        arguments: [ { 'name': 'ipartial', 'description': 'ipartial' } ]
+        tags:      [ { name: 'api_platform.filter', id: 'related_to_dummy_friend.phpcr.name' } ]

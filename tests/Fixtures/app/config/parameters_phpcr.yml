@@ -1,0 +1,22 @@
+parameters:
+    server:
+    dbname: 'api_platform_test'
+    driver: pdo_sqlite
+    path: '%kernel.project_dir%/var/app.sqlite'
+    database_password: ''
+    phpcr_backend:
+        logging: true
+        profiling: true
+        type: doctrinedbal
+        connection: default
+        parameters:
+            jackalope.check_login_on_server: false
+    phpcr_workspace: default
+    phpcr_user: admin
+    phpcr_pass: admin
+
+    locale: en
+    locales:
+        - en
+        - fr
+        - de

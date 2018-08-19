@@ -11,14 +11,18 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Document;
+namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\MongoDB;
 
 use ApiPlatform\Core\Annotation\ApiResource;
 use ApiPlatform\Core\Annotation\ApiSubresource;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\MongoDB\EmbeddableDummy;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\MongoDB\ParentDummy;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\MongoDB\RelatedToDummyFriend;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
+use Doctrine\ODM\PHPCR\Mapping\Annotations as PHPCRODM;
 
 /**
  * Related Dummy.

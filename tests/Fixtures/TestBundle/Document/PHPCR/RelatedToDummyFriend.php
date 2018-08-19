@@ -11,31 +11,41 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Document;
+namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\PHPCR;
 
 use ApiPlatform\Core\Annotation\ApiProperty;
 use ApiPlatform\Core\Annotation\ApiResource;
-use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
+use Doctrine\ODM\PHPCR\Mapping\Annotations as PHPCRODM;
 
 /**
  * Related To Dummy Friend represent an association table for a manytomany relation.
  *
- * @ApiResource(attributes={"normalization_context"={"groups"={"fakemanytomany"}}, "filters"={"related_to_dummy_friend.name"}})
- * @ODM\Document
+ * @ApiResource(attributes={"normalization_context"={"groups"={"fakemanytomany"}}, "filters"={"related_to_dummy_friend.phpcr.name"}})
+ * @PHPCRODM\Document(referenceable=true)
  */
 class RelatedToDummyFriend
 {
     /**
-     * @ODM\Id(strategy="INCREMENT", type="integer")
+     * @PHPCRODM\Id
      */
     private $id;
 
     /**
+     * @PHPCRODM\Node
+     */
+    public $node;
+
+    /**
+     * @PHPCRODM\ParentDocument()
+     */
+    public $parentDocument;
+
+    /**
      * @var string The dummy name
      *
-     * @ODM\Field(type="string")
+     * @PHPCRODM\Field(type="string")
      * @Assert\NotBlank
      * @ApiProperty(iri="http://schema.org/name")
      * @Groups({"fakemanytomany", "friends"})
@@ -45,22 +55,20 @@ class RelatedToDummyFriend
     /**
      * @var string|null The dummy description
      *
-     * @ODM\Field(type="string")
+     * @PHPCRODM\Field(type="string")
      * @Groups({"fakemanytomany", "friends"})
      */
     private $description;
 
     /**
-     * @ODM\Id
-     * @ODM\ReferenceOne(targetDocument="DummyFriend")
+     * @PHPCRODM\ReferenceOne(targetDocument="DummyFriend")
      * @Groups({"fakemanytomany", "friends"})
      * @Assert\NotNull
      */
     private $dummyFriend;
 
     /**
-     * @ODM\Id
-     * @ODM\ReferenceOne(targetDocument="RelatedDummy", inversedBy="relatedToDummyFriend")
+     * @PHPCRODM\ReferenceOne(targetDocument="RelatedDummy")
      * @Assert\NotNull
      */
     private $relatedDummy;

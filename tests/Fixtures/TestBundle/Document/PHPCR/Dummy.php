@@ -11,14 +11,13 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Document;
+namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\PHPCR;
 
 use ApiPlatform\Core\Annotation\ApiProperty;
 use ApiPlatform\Core\Annotation\ApiResource;
 use ApiPlatform\Core\Annotation\ApiSubresource;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 use Symfony\Component\Validator\Constraints as Assert;
+use Doctrine\ODM\PHPCR\Mapping\Annotations as PHPCRODM;
 
 /**
  * Dummy.
@@ -27,34 +26,44 @@ use Symfony\Component\Validator\Constraints as Assert;
  *
  * @ApiResource(attributes={
  *     "filters"={
- *         "my_dummy.mongodb.boolean"
+ *         "my_dummy.phpcr.boolean"
  *     }
  * })
- * @ODM\Document
+ * @PHPCRODM\Document(referenceable=true)
  */
 class Dummy
 {
     /**
      * @var int The id
      *
-     * @ODM\Id(strategy="INCREMENT", type="integer")
+     * @PHPCRODM\Id
      */
     private $id;
 
     /**
+     * @PHPCRODM\Node
+     */
+    public $node;
+
+    /**
+     * @PHPCRODM\ParentDocument()
+     */
+    public $parentDocument;
+
+    /**
      * @var string The dummy name
      *
-     * @ODM\Field(type="string")
      * @Assert\NotBlank
      * @ApiProperty(iri="http://schema.org/name")
+     * @PHPCRODM\Field()
      */
     private $name;
 
     /**
      * @var string The dummy name alias
      *
-     * @ODM\Field(type="string")
      * @ApiProperty(iri="https://schema.org/alternateName")
+     * @PHPCRODM\Field()
      */
     private $alias;
 
@@ -66,56 +75,56 @@ class Dummy
     /**
      * @var string A short description of the item
      *
-     * @ODM\Field(type="string")
      * @ApiProperty(iri="https://schema.org/description")
+     * @PHPCRODM\Field()
      */
     public $description;
 
     /**
      * @var string A dummy
      *
-     * @ODM\Field(type="string")
+     * @PHPCRODM\Field()
      */
     public $dummy;
 
     /**
      * @var bool A dummy boolean
      *
-     * @ODM\Field(type="boolean")
+     * @PHPCRODM\Field(type="boolean")
      */
     public $dummyBoolean;
 
     /**
      * @var \DateTime A dummy date
      *
-     * @ODM\Field(type="date")
      * @Assert\DateTime
+     * @PHPCRODM\Field(type="date")
      */
     public $dummyDate;
 
     /**
      * @var string A dummy float
      *
-     * @ODM\Field(type="float")
+     * @PHPCRODM\Field(type="float")
      */
     public $dummyFloat;
 
     /**
      * @var string A dummy price
      *
-     * @ODM\Field(type="int")
+     * @PHPCRODM\Field(type="int")
      */
     public $dummyPrice;
 
     /**
      * @var RelatedDummy A related dummy
      *
-     * @ODM\ReferenceOne(targetDocument="RelatedDummy")
+     * @PHPCRODM\ReferenceOne(targetDocument="RelatedDummy")
      */
     public $relatedDummy;
 
     /**
-     * @ODM\ReferenceMany(targetDocument="RelatedDummy")
+     * @PHPCRODM\ReferenceMany(targetDocument="RelatedDummy")
      * @ApiSubresource
      */
     public $relatedDummies;
@@ -123,35 +132,35 @@ class Dummy
     /**
      * @var array serialize data
      *
-     * @ODM\Field(type="raw")
+     * @PHPCRODM\Field(type="text")
      */
     public $jsonData;
 
     /**
      * @var array
      *
-     * @ODM\Field(type="raw")
+     * @PHPCRODM\Field(type="raw")
      */
     public $arrayData;
 
     /**
      * @var string
      *
-     * @ODM\Field(type="string")
+     * @PHPCRODM\Field(type="string")
      */
     public $nameConverted;
 
     /**
      * @var RelatedOwnedDummy
      *
-     * @ODM\ReferenceOne(targetDocument="RelatedOwnedDummy", cascade={"persist"}, mappedBy="owningDummy")
+     * @PHPCRODM\ReferenceOne(targetDocument="RelatedOwnedDummy", cascade={"persist"})
      */
     public $relatedOwnedDummy;
 
     /**
      * @var RelatedOwningDummy
      *
-     * @ODM\ReferenceOne(targetDocument="RelatedOwningDummy", cascade={"persist"}, inversedBy="ownedDummy")
+     * @PHPCRODM\ReferenceOne(targetDocument="RelatedOwningDummy", cascade={"persist"})
      */
     public $relatedOwningDummy;
 

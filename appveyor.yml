@@ -35,6 +35,9 @@ install:
 services:
   - mongodb
 
+services:
+  - phpcr
+
 test_script:
   - cd %APPVEYOR_BUILD_FOLDER%
   - php vendor\behat\behat\bin\behat --format=progress --suite=default

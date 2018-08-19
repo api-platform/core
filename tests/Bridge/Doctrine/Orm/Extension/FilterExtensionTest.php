@@ -15,8 +15,8 @@ namespace ApiPlatform\Core\Tests\Bridge\Doctrine\Orm\Extension;
 
 use ApiPlatform\Core\Api\FilterCollection;
 use ApiPlatform\Core\Api\FilterInterface as ApiFilterInterface;
-use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\FilterExtension;
-use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\FilterInterface;
+use ApiPlatform\Core\Bridge\Doctrine\Common\Extension\FilterExtension;
+use ApiPlatform\Core\Bridge\Doctrine\Common\Filter\FilterInterface;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGenerator;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;

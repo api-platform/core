@@ -16,6 +16,7 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\User;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\TestBundle;
 use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
 use Doctrine\Bundle\MongoDBBundle\DoctrineMongoDBBundle;
+use Doctrine\Bundle\PHPCRBundle\DoctrinePHPCRBundle;
 use FOS\UserBundle\FOSUserBundle;
 use Nelmio\ApiDocBundle\NelmioApiDocBundle;
 use Sensio\Bundle\FrameworkExtraBundle\SensioFrameworkExtraBundle;
@@ -58,6 +59,7 @@ class AppKernel extends Kernel
             new FOSUserBundle(),
             new TestBundle(),
             new DoctrineMongoDBBundle(),
+            new DoctrinePHPCRBundle(),
         ];
 
         if ($_SERVER['LEGACY'] ?? true) {

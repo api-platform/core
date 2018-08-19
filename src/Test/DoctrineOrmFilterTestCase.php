@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Test;
 
-use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\FilterInterface;
+use ApiPlatform\Core\Bridge\Doctrine\Common\Filter\FilterInterface;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGenerator;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use Doctrine\Common\Persistence\ManagerRegistry;
@@ -79,8 +79,14 @@ abstract class DoctrineOrmFilterTestCase extends KernelTestCase
         $this->doTestApply(true, $properties, $filterParameters, $expectedDql, $expectedParameters, $factory);
     }
 
-    protected function doTestApply(bool $request, array $properties = null, array $filterParameters, string $expectedDql, array $expectedParameters = null, callable $filterFactory = null)
-    {
+    protected function doTestApply(
+        bool $request,
+        array $properties = null,
+        array $filterParameters,
+        string $expectedDql,
+        array $expectedParameters = null,
+        callable $filterFactory = null
+    ) {
         if (null === $filterFactory) {
             $filterFactory = function (ManagerRegistry $managerRegistry, RequestStack $requestStack = null, array $properties = null): FilterInterface {
                 $filterClass = $this->filterClass;

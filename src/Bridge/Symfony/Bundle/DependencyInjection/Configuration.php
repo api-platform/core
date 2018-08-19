@@ -86,6 +86,7 @@ final class Configuration implements ConfigurationInterface
                     ->addDefaultsIfNotSet()
                     ->children()
                         ->booleanNode('enable_mongodb_odm')->defaultValue(false)->info('Enable Doctrine MongoDB ODM integration.')->end()
+                        ->booleanNode('enable_phpcr_odm')->defaultValue(false)->info('Enable Doctrine PHPCR ODM integration.')->end()
                         ->booleanNode('enable_orm')->defaultValue(true)->info('Enable Doctrine ORM integration.')->end()
                     ->end()
                 ->end()

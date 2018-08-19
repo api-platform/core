@@ -42,6 +42,20 @@ default:
         - 'Behatch\Context\RestContext'
       filters:
         tags: '@mongodb'
+    phpcr:
+      contexts:
+        - 'FeatureContext': { doctrine: '@doctrine_phpcr' }
+        - 'GraphqlContext'
+        - 'JsonContext'
+        - 'HydraContext'
+        - 'SwaggerContext'
+        - 'HttpCacheContext'
+        - 'JsonApiContext': { doctrine_phpcr: '@doctrine', jsonApiSchemaFile: 'tests/Fixtures/JsonSchema/jsonapi.json' }
+        - 'JsonHalContext': { schemaFile: 'tests/Fixtures/JsonHal/jsonhal.json' }
+        - 'Behat\MinkExtension\Context\MinkContext'
+        - 'Behatch\Context\RestContext'
+      filters:
+        tags: ~@phpcr
   extensions:
     'Behat\Symfony2Extension':
       kernel:

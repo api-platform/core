@@ -11,11 +11,11 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Document;
+namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\PHPCR;
 
 use ApiPlatform\Core\Annotation\ApiProperty;
 use ApiPlatform\Core\Annotation\ApiResource;
-use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
+use Doctrine\ODM\PHPCR\Mapping\Annotations as PHPCRODM;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -25,21 +25,31 @@ use Symfony\Component\Validator\Constraints as Assert;
  * @author Alan Poulain <contact@alanpoulain.eu>
  *
  * @ApiResource
- * @ODM\Document
+ * @PHPCRODM\Document(referenceable=true)
  */
 class DummyFriend
 {
     /**
      * @var int The id
      *
-     * @ODM\Id(strategy="INCREMENT", type="integer")
+     * @PHPCRODM\Id
      */
     private $id;
 
     /**
+     * @PHPCRODM\Node
+     */
+    public $node;
+
+    /**
+     * @PHPCRODM\ParentDocument()
+     */
+    public $parentDocument;
+
+    /**
      * @var string The dummy name
      *
-     * @ODM\Field(type="string")
+     * @PHPCRODM\Field(type="string")
      * @Assert\NotBlank
      * @ApiProperty(iri="http://schema.org/name")
      * @Groups({"fakemanytomany", "friends"})

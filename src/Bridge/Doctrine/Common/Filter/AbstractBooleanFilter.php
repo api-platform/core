@@ -79,7 +79,7 @@ abstract class AbstractBooleanFilter extends AbstractContextAwareFilter
             $value = false;
         } else {
             $this->logger->notice('Invalid filter ignored', [
-                'exception' => new InvalidArgumentException(sprintf('Invalid boolean value for "%s" property, expected one of ( "%s" )', $property, implode('" | "', [
+                'exception' => new InvalidArgumentException(sprintf('Invalid boolean value for "%s" property, expected one of ( "%s" )', $value, implode('" | "', [
                     'true',
                     'false',
                     '1',

@@ -11,39 +11,61 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Document;
+namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\PHPCR;
 
-use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
+use Doctrine\ODM\PHPCR\Mapping\Annotations as PHPCRODM;
 
 /**
  * Embeddable Dummy.
  *
  * @author Alexandre Delplace <alexandre.delplacemille@gmail.com>
  *
- * @ODM\EmbeddedDocument
+ * @PHPCRODM\Document(referenceable=true)
  */
 class EmbeddableDummy
 {
     /**
+     * @var int The id
+     *
+     * @PHPCRODM\Id
+     */
+    private $id;
+
+    /**
+     * @PHPCRODM\Uuid
+     **/
+    private $uuid;
+
+    /**
+     * @PHPCRODM\Node
+     */
+    public $node;
+
+    /**
+     * @PHPCRODM\ParentDocument()
+     */
+    public $parentDocument;
+
+    /**
      * @var string The dummy name
      *
-     * @ODM\Field(type="string")
+     * @PHPCRODM\Field(type="string")
      */
     private $dummyName;
 
     /**
      * @var bool A dummy boolean
      *
-     * @ODM\Field(type="boolean")
+     * @PHPCRODM\Field(type="boolean")
      */
     public $dummyBoolean;
 
     /**
      * @var \DateTime A dummy date
      *
-     * @ODM\Field(type="date")
+     * @PHPCRODM\Field(type="date")
      * @Assert\DateTime
      */
     public $dummyDate;
@@ -51,19 +73,19 @@ class EmbeddableDummy
     /**
      * @var string A dummy float
      *
-     * @ODM\Field(type="float")
+     * @PHPCRODM\Field(type="float")
      */
     public $dummyFloat;
 
     /**
      * @var string A dummy price
      *
-     * @ODM\Field(type="float")
+     * @PHPCRODM\Field(type="float")
      */
     public $dummyPrice;
 
     /**
-     * @ODM\Field(type="string")
+     * @PHPCRODM\Field(type="string")
      * @Groups({"barcelona", "chicago"})
      */
     protected $symfony;

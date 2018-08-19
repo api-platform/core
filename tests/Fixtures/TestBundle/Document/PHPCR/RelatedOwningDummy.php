@@ -11,39 +11,49 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Document;
+namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\PHPCR;
 
 use ApiPlatform\Core\Annotation\ApiResource;
-use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
+use Doctrine\ODM\PHPCR\Mapping\Annotations as PHPCRODM;
 
 /**
- * Related Owned Dummy.
+ * Related Owning Dummy.
  *
  * @author Alan Poulain <contact@alanpoulain.eu>
  *
  * @ApiResource(iri="https://schema.org/Product")
- * @ODM\Document
+ * @PHPCRODM\Document(referenceable=true)
  */
-class RelatedOwnedDummy
+class RelatedOwningDummy
 {
     /**
-     * @ODM\Id(strategy="INCREMENT", type="integer")
+     * @PHPCRODM\Id
      */
     private $id;
 
     /**
+     * @PHPCRODM\Node
+     */
+    public $node;
+
+    /**
+     * @PHPCRODM\ParentDocument()
+     */
+    public $parentDocument;
+
+    /**
      * @var string A name
      *
-     * @ODM\Field(type="string")
+     * @PHPCRODM\Field(type="string")
      */
     public $name;
 
     /**
      * @var Dummy
      *
-     * @ODM\ReferenceOne(targetDocument="Dummy", cascade={"persist"}, inversedBy="relatedOwnedDummy")
+     * @PHPCRODM\ReferenceOne(targetDocument="Dummy", cascade={"persist"})
      */
-    public $owningDummy;
+    public $ownedDummy;
 
     public function getId()
     {
@@ -66,22 +76,26 @@ class RelatedOwnedDummy
     }
 
     /**
-     * Get owning dummy.
+     * Get owned dummy.
      *
      * @return Dummy
      */
-    public function getOwningDummy()
+    public function getOwnedDummy()
     {
-        return $this->owningDummy;
+        return $this->ownedDummy;
     }
 
     /**
-     * Set owning dummy.
+     * Set owned dummy.
      *
-     * @param Dummy $owningDummy the value to set
+     * @param Dummy $ownedDummy the value to set
      */
-    public function setOwningDummy(Dummy $owningDummy)
+    public function setOwnedDummy(Dummy $ownedDummy)
     {
-        $this->owningDummy = $owningDummy;
+        $this->ownedDummy = $ownedDummy;
+
+        if ($this !== $this->ownedDummy->getRelatedOwningDummy()) {
+            $this->ownedDummy->setRelatedOwningDummy($this);
+        }
     }
 }
