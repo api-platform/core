@@ -13,60 +13,18 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Bridge\Doctrine\Common\Filter;
 
-use ApiPlatform\Core\Api\IriConverterInterface;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\DBAL\Types\Type;
-use Psr\Log\LoggerInterface;
-use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\PropertyAccess\PropertyAccess;
-use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 /**
- * Abstract class for filtering the collection by given properties.
+ * Trait for filtering the collection by given properties.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-abstract class AbstractSearchFilter extends AbstractContextAwareFilter
+trait SearchFilterTrait
 {
-    /**
-     * @var string Exact matching
-     */
-    const STRATEGY_EXACT = 'exact';
-
-    /**
-     * @var string The value must be contained in the field
-     */
-    const STRATEGY_PARTIAL = 'partial';
-
-    /**
-     * @var string Finds fields that are starting with the value
-     */
-    const STRATEGY_START = 'start';
-
-    /**
-     * @var string Finds fields that are ending with the value
-     */
-    const STRATEGY_END = 'end';
-
-    /**
-     * @var string Finds fields that are starting with the word
-     */
-    const STRATEGY_WORD_START = 'word_start';
-
     protected $iriConverter;
     protected $propertyAccessor;
-
-    /**
-     * @param RequestStack|null $requestStack No prefix to prevent autowiring of this deprecated property
-     */
-    public function __construct(ManagerRegistry $managerRegistry, $requestStack = null, IriConverterInterface $iriConverter, PropertyAccessorInterface $propertyAccessor = null, LoggerInterface $logger = null, array $properties = null)
-    {
-        parent::__construct($managerRegistry, $requestStack, $logger, $properties);
-
-        $this->iriConverter = $iriConverter;
-        $this->propertyAccessor = $propertyAccessor ?: PropertyAccess::createPropertyAccessor();
-    }
 
     /**
      * {@inheritdoc}
@@ -77,21 +35,21 @@ abstract class AbstractSearchFilter extends AbstractContextAwareFilter
 
         $properties = $this->properties;
         if (null === $properties) {
-            $properties = array_fill_keys($this->getClassMetadata($resourceClass)->getFieldNames(), null);
+            $properties = array_fill_keys($this->propertyHelper->getClassMetadata($resourceClass)->getFieldNames(), null);
         }
 
         foreach ($properties as $property => $strategy) {
-            if (!$this->isPropertyMapped($property, $resourceClass, true)) {
+            if (!$this->propertyHelper->isPropertyMapped($property, $resourceClass, true)) {
                 continue;
             }
 
-            if ($this->isPropertyNested($property, $resourceClass)) {
-                $propertyParts = $this->splitPropertyParts($property, $resourceClass);
+            if ($this->propertyHelper->isPropertyNested($property, $resourceClass)) {
+                $propertyParts = $this->propertyHelper->splitPropertyParts($property, $resourceClass);
                 $field = $propertyParts['field'];
-                $metadata = $this->getNestedMetadata($resourceClass, $propertyParts['associations']);
+                $metadata = $this->propertyHelper->getNestedMetadata($resourceClass, $propertyParts['associations']);
             } else {
                 $field = $property;
-                $metadata = $this->getClassMetadata($resourceClass);
+                $metadata = $this->propertyHelper->getClassMetadata($resourceClass);
             }
 
             if ($metadata->hasField($field)) {
@@ -165,24 +123,6 @@ abstract class AbstractSearchFilter extends AbstractContextAwareFilter
         }
 
         return 'string';
-    }
-
-    /**
-     * Creates a function that will wrap a Doctrine expression according to the
-     * specified case sensitivity.
-     *
-     * For example, "o.name" will get wrapped into "LOWER(o.name)" when $caseSensitive
-     * is false.
-     */
-    protected function createWrapCase(bool $caseSensitive): \Closure
-    {
-        return function (string $expr) use ($caseSensitive): string {
-            if ($caseSensitive) {
-                return $expr;
-            }
-
-            return sprintf('LOWER(%s)', $expr);
-        };
     }
 
     /**

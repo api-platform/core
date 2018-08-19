@@ -13,12 +13,18 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Filter;
 
-use ApiPlatform\Core\Bridge\Doctrine\Common\Filter\AbstractFilter;
-use ApiPlatform\Core\Bridge\Doctrine\Common\Util\QueryNameGeneratorInterface;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\AbstractFilter;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGeneratorInterface;
+use Doctrine\ORM\QueryBuilder;
 
 final class RequiredFilter extends AbstractFilter
 {
-    protected function filterProperty(string $property, $value, $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, string $operationName = null)
+    public static function getPropertyHelperServiceName(): string
+    {
+        return '';
+    }
+
+    protected function filterProperty(string $property, $value, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, string $operationName = null)
     {
     }
 

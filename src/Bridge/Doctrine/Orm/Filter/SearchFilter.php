@@ -13,34 +13,50 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Bridge\Doctrine\Orm\Filter;
 
-use ApiPlatform\Core\Bridge\Doctrine\Common\Filter\AbstractSearchFilter;
-use ApiPlatform\Core\Bridge\Doctrine\Common\Util\QueryNameGeneratorInterface as CommonQueryNameGeneratorInterface;
+use ApiPlatform\Core\Api\IriConverterInterface;
+use ApiPlatform\Core\Bridge\Doctrine\ClassMetadata\PropertyHelper;
+use ApiPlatform\Core\Bridge\Doctrine\Common\Filter\SearchFilterInterface;
+use ApiPlatform\Core\Bridge\Doctrine\Common\Filter\SearchFilterTrait;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryBuilderHelper;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
+use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\QueryBuilder;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\PropertyAccess\PropertyAccess;
+use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 /**
  * Filter the collection by given properties.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class SearchFilter extends AbstractSearchFilter
+class SearchFilter extends AbstractContextAwareFilter implements SearchFilterInterface
 {
-    use FilterTrait;
+    use SearchFilterTrait;
+
+    /**
+     * @param ManagerRegistry|null $managerRegistry No prefix to prevent autowiring of this deprecated property
+     * @param RequestStack|null $requestStack No prefix to prevent autowiring of this deprecated property
+     */
+    public function __construct($managerRegistry = null, $requestStack = null, IriConverterInterface $iriConverter, PropertyAccessorInterface $propertyAccessor = null, LoggerInterface $logger = null, PropertyHelper $propertyHelper = null, array $properties = null)
+    {
+        parent::__construct($managerRegistry, $requestStack, $logger, $propertyHelper, $properties);
+
+        $this->iriConverter = $iriConverter;
+        $this->propertyAccessor = $propertyAccessor ?: PropertyAccess::createPropertyAccessor();
+    }
 
     /**
      * {@inheritdoc}
-     *
-     * @param QueryBuilder                $queryBuilder
-     * @param QueryNameGeneratorInterface $queryNameGenerator
      */
-    protected function filterProperty(string $property, $value, $queryBuilder, CommonQueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, string $operationName = null)
+    protected function filterProperty(string $property, $value, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, string $operationName = null)
     {
         if (
             null === $value ||
             !$this->isPropertyEnabled($property, $resourceClass) ||
-            !$this->isPropertyMapped($property, $resourceClass, true)
+            !$this->propertyHelper->isPropertyMapped($property, $resourceClass, true)
         ) {
             return;
         }
@@ -48,11 +64,11 @@ class SearchFilter extends AbstractSearchFilter
         $alias = $queryBuilder->getRootAliases()[0];
         $field = $property;
 
-        if ($this->isPropertyNested($property, $resourceClass)) {
+        if ($this->propertyHelper->isPropertyNested($property, $resourceClass)) {
             list($alias, $field, $associations) = $this->addJoinsForNestedProperty($property, $alias, $queryBuilder, $queryNameGenerator, $resourceClass);
-            $metadata = $this->getNestedMetadata($resourceClass, $associations);
+            $metadata = $this->propertyHelper->getNestedMetadata($resourceClass, $associations);
         } else {
-            $metadata = $this->getClassMetadata($resourceClass);
+            $metadata = $this->propertyHelper->getClassMetadata($resourceClass);
         }
 
         $values = $this->normalizeValues((array) $value);
@@ -72,7 +88,7 @@ class SearchFilter extends AbstractSearchFilter
                 $values = array_map([$this, 'getIdFromValue'], $values);
             }
 
-            if (!$this->hasValidValues($values, $this->getDoctrineFieldType($property, $resourceClass))) {
+            if (!$this->hasValidValues($values, $this->propertyHelper->getDoctrineFieldType($property, $resourceClass))) {
                 $this->logger->notice('Invalid filter ignored', [
                     'exception' => new InvalidArgumentException(sprintf('Values for field "%s" are not valid according to the doctrine type.', $field)),
                 ]);
@@ -117,7 +133,7 @@ class SearchFilter extends AbstractSearchFilter
 
         $values = array_map([$this, 'getIdFromValue'], $values);
 
-        if (!$this->hasValidValues($values, $this->getDoctrineFieldType($property, $resourceClass))) {
+        if (!$this->hasValidValues($values, $this->propertyHelper->getDoctrineFieldType($property, $resourceClass))) {
             $this->logger->notice('Invalid filter ignored', [
                 'exception' => new InvalidArgumentException(sprintf('Values for field "%s" are not valid according to the doctrine type.', $field)),
             ]);
@@ -187,5 +203,23 @@ class SearchFilter extends AbstractSearchFilter
             default:
                 throw new InvalidArgumentException(sprintf('strategy %s does not exist.', $strategy));
         }
+    }
+
+    /**
+     * Creates a function that will wrap a Doctrine expression according to the
+     * specified case sensitivity.
+     *
+     * For example, "o.name" will get wrapped into "LOWER(o.name)" when $caseSensitive
+     * is false.
+     */
+    protected function createWrapCase(bool $caseSensitive): \Closure
+    {
+        return function (string $expr) use ($caseSensitive): string {
+            if ($caseSensitive) {
+                return $expr;
+            }
+
+            return sprintf('LOWER(%s)', $expr);
+        };
     }
 }

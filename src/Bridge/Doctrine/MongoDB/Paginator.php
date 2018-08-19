@@ -21,6 +21,7 @@ use Doctrine\ODM\MongoDB\UnitOfWork;
  * Decorates the Doctrine ODM paginator.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
+ * @author Alan Poulain <contact@alanpoulain.eu>
  */
 final class Paginator implements \IteratorAggregate, PaginatorInterface
 {

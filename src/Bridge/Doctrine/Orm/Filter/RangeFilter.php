@@ -13,8 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Bridge\Doctrine\Orm\Filter;
 
-use ApiPlatform\Core\Bridge\Doctrine\Common\Filter\AbstractContextAwareFilter;
-use ApiPlatform\Core\Bridge\Doctrine\Common\Util\QueryNameGeneratorInterface as CommonQueryNameGeneratorInterface;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
 use Doctrine\ORM\QueryBuilder;
@@ -26,8 +24,6 @@ use Doctrine\ORM\QueryBuilder;
  */
 class RangeFilter extends AbstractContextAwareFilter
 {
-    use FilterTrait;
-
     const PARAMETER_BETWEEN = 'between';
     const PARAMETER_GREATER_THAN = 'gt';
     const PARAMETER_GREATER_THAN_OR_EQUAL = 'gte';
@@ -43,11 +39,11 @@ class RangeFilter extends AbstractContextAwareFilter
 
         $properties = $this->properties;
         if (null === $properties) {
-            $properties = array_fill_keys($this->getClassMetadata($resourceClass)->getFieldNames(), null);
+            $properties = array_fill_keys($this->propertyHelper->getClassMetadata($resourceClass)->getFieldNames(), null);
         }
 
         foreach ($properties as $property => $unused) {
-            if (!$this->isPropertyMapped($property, $resourceClass)) {
+            if (!$this->propertyHelper->isPropertyMapped($property, $resourceClass)) {
                 continue;
             }
 
@@ -63,16 +59,13 @@ class RangeFilter extends AbstractContextAwareFilter
 
     /**
      * {@inheritdoc}
-     *
-     * @param QueryBuilder                $queryBuilder
-     * @param QueryNameGeneratorInterface $queryNameGenerator
      */
-    protected function filterProperty(string $property, $values, $queryBuilder, CommonQueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, string $operationName = null)
+    protected function filterProperty(string $property, $values, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, string $operationName = null)
     {
         if (
             !\is_array($values) ||
             !$this->isPropertyEnabled($property, $resourceClass) ||
-            !$this->isPropertyMapped($property, $resourceClass)
+            !$this->propertyHelper->isPropertyMapped($property, $resourceClass)
         ) {
             return;
         }
@@ -80,7 +73,7 @@ class RangeFilter extends AbstractContextAwareFilter
         $alias = $queryBuilder->getRootAliases()[0];
         $field = $property;
 
-        if ($this->isPropertyNested($property, $resourceClass)) {
+        if ($this->propertyHelper->isPropertyNested($property, $resourceClass)) {
             list($alias, $field) = $this->addJoinsForNestedProperty($property, $alias, $queryBuilder, $queryNameGenerator, $resourceClass);
         }
 

@@ -11,14 +11,16 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Bridge\Doctrine\Common\Extension;
+namespace ApiPlatform\Core\Bridge\Doctrine\Orm\Extension;
 
 use ApiPlatform\Core\Api\FilterCollection;
 use ApiPlatform\Core\Api\FilterLocatorTrait;
-use ApiPlatform\Core\Bridge\Doctrine\Common\Filter\FilterInterface;
-use ApiPlatform\Core\Bridge\Doctrine\Common\Util\QueryNameGeneratorInterface;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\FilterInterface;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\OrderFilter;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
+use Doctrine\ORM\QueryBuilder;
 use Psr\Container\ContainerInterface;
 
 /**
@@ -46,7 +48,7 @@ final class FilterExtension implements ContextAwareQueryCollectionExtensionInter
     /**
      * {@inheritdoc}
      */
-    public function applyToCollection($builder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass = null, string $operationName = null, array $context = [])
+    public function applyToCollection(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass = null, string $operationName = null, array $context = [])
     {
         if (null === $resourceClass) {
             throw new InvalidArgumentException('The "$resourceClass" parameter must not be null');
@@ -59,12 +61,25 @@ final class FilterExtension implements ContextAwareQueryCollectionExtensionInter
             return;
         }
 
+        $orderFilter = null;
+
         foreach ($resourceFilters as $filterId) {
             $filter = $this->getFilter($filterId);
             if ($filter instanceof FilterInterface) {
+                // Apply the OrderFilter after every other filter to avoid an edge case where OrderFilter would do a LEFT JOIN instead of an INNER JOIN
+                if ($filter instanceof OrderFilter) {
+                    $orderFilter = $filter;
+                    continue;
+                }
+
                 $context['filters'] = $context['filters'] ?? [];
-                $filter->apply($builder, $queryNameGenerator, $resourceClass, $operationName, $context);
+                $filter->apply($queryBuilder, $queryNameGenerator, $resourceClass, $operationName, $context);
             }
+        }
+
+        if (null !== $orderFilter) {
+            $context['filters'] = $context['filters'] ?? [];
+            $orderFilter->apply($queryBuilder, $queryNameGenerator, $resourceClass, $operationName, $context);
         }
     }
 }

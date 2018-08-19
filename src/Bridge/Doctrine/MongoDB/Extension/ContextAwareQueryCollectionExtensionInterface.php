@@ -11,16 +11,17 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Bridge\Doctrine\Common\Extension;
+namespace ApiPlatform\Core\Bridge\Doctrine\MongoDB\Extension;
 
-use ApiPlatform\Core\Bridge\Doctrine\Common\Util\QueryNameGeneratorInterface;
+use Doctrine\ODM\MongoDB\Aggregation\Builder;
 
 /**
  * Context aware extension.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
+ * @author Alan Poulain <contact@alanpoulain.eu>
  */
 interface ContextAwareQueryCollectionExtensionInterface extends QueryCollectionExtensionInterface
 {
-    public function applyToCollection($builder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, string $operationName = null, array $context = []);
+    public function applyToCollection(Builder $aggregationBuilder, string $resourceClass, string $operationName = null, array $context = []);
 }

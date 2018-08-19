@@ -49,6 +49,8 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\ThirdLevel;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\User;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\UuidIdentifierDummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\Dummy as DummyDocument;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\DummyCar as DummyCarDocument;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\DummyCarColor as DummyCarColorDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\DummyFriend as DummyFriendDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\EmbeddableDummy as EmbeddableDummyDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\EmbeddedDummy as EmbeddedDummyDocument;
@@ -747,18 +749,18 @@ final class FeatureContext implements Context, SnippetAcceptingContext
      */
     public function thereIsAFooEntityWithRelatedBars()
     {
-        $foo = new DummyCar();
+        $foo = $this->buildDummyCar();
         $foo->setName('mustli');
         $foo->setCanSell(true);
         $foo->setAvailableAt(new \DateTime());
         $this->manager->persist($foo);
 
-        $bar1 = new DummyCarColor();
+        $bar1 = $this->buildDummyCarColor();
         $bar1->setProp('red');
         $bar1->setCar($foo);
         $this->manager->persist($bar1);
 
-        $bar2 = new DummyCarColor();
+        $bar2 = $this->buildDummyCarColor();
         $bar2->setProp('blue');
         $bar2->setCar($foo);
         $this->manager->persist($bar2);
@@ -1024,6 +1026,22 @@ final class FeatureContext implements Context, SnippetAcceptingContext
     private function buildDummy()
     {
         return $this->isOrm() ? new Dummy() : new DummyDocument();
+    }
+
+    /**
+     * @return DummyCar|DummyCarDocument
+     */
+    private function buildDummyCar()
+    {
+        return $this->isOrm() ? new DummyCar() : new DummyCarDocument();
+    }
+
+    /**
+     * @return DummyCarColor|DummyCarColorDocument
+     */
+    private function buildDummyCarColor()
+    {
+        return $this->isOrm() ? new DummyCarColor() : new DummyCarColorDocument();
     }
 
     /**

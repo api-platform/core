@@ -13,10 +13,9 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Bridge\Doctrine\MongoDB;
 
+use ApiPlatform\Core\Bridge\Doctrine\MongoDB\Extension\ContextAwareQueryCollectionExtensionInterface;
 use ApiPlatform\Core\Bridge\Doctrine\MongoDB\Extension\QueryCollectionExtensionInterface;
 use ApiPlatform\Core\Bridge\Doctrine\MongoDB\Extension\QueryResultExtensionInterface;
-use ApiPlatform\Core\Bridge\Doctrine\MongoDB\Util\QueryNameGenerator;
-use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\ContextAwareQueryCollectionExtensionInterface;
 use ApiPlatform\Core\DataProvider\CollectionDataProviderInterface;
 use ApiPlatform\Core\DataProvider\RestrictedDataProviderInterface;
 use ApiPlatform\Core\Exception\RuntimeException;
@@ -26,7 +25,7 @@ use Doctrine\ODM\MongoDB\Aggregation\Builder;
 /**
  * Collection data provider for the Doctrine MongoDB ODM.
  */
-class CollectionDataProvider implements CollectionDataProviderInterface, RestrictedDataProviderInterface
+final class CollectionDataProvider implements CollectionDataProviderInterface, RestrictedDataProviderInterface
 {
     private $managerRegistry;
     private $collectionExtensions;
@@ -34,7 +33,7 @@ class CollectionDataProvider implements CollectionDataProviderInterface, Restric
     /**
      * @param QueryCollectionExtensionInterface[]|ContextAwareQueryCollectionExtensionInterface[] $collectionExtensions
      */
-    public function __construct(ManagerRegistry $managerRegistry, /* iterable */ $collectionExtensions = [])
+    public function __construct(ManagerRegistry $managerRegistry, iterable $collectionExtensions = [])
     {
         $this->managerRegistry = $managerRegistry;
         $this->collectionExtensions = $collectionExtensions;
@@ -61,9 +60,8 @@ class CollectionDataProvider implements CollectionDataProviderInterface, Restric
 
         /** @var Builder $aggregationBuilder */
         $aggregationBuilder = $repository->createAggregationBuilder();
-        $queryNameGenerator = new QueryNameGenerator();
         foreach ($this->collectionExtensions as $extension) {
-            $extension->applyToCollection($aggregationBuilder, $queryNameGenerator, $resourceClass, $operationName, $context);
+            $extension->applyToCollection($aggregationBuilder, $resourceClass, $operationName, $context);
 
             if ($extension instanceof QueryResultExtensionInterface && $extension->supportsResult($resourceClass, $operationName, $context)) {
                 return $extension->getResult($aggregationBuilder, $resourceClass, $operationName, $context);

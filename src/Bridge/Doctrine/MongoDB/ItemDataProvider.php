@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Bridge\Doctrine\MongoDB;
 
 use ApiPlatform\Core\Bridge\Doctrine\MongoDB\Extension\QueryItemExtensionInterface;
-use ApiPlatform\Core\Bridge\Doctrine\MongoDB\Util\QueryNameGenerator;
 use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
 use ApiPlatform\Core\DataProvider\RestrictedDataProviderInterface;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
@@ -28,7 +27,7 @@ use Doctrine\ODM\MongoDB\DocumentManager;
 /**
  * Item data provider for the Doctrine MongoDB ODM.
  */
-class ItemDataProvider implements ItemDataProviderInterface, RestrictedDataProviderInterface
+final class ItemDataProvider implements ItemDataProviderInterface, RestrictedDataProviderInterface
 {
     private $managerRegistry;
     private $propertyNameCollectionFactory;
@@ -38,7 +37,7 @@ class ItemDataProvider implements ItemDataProviderInterface, RestrictedDataProvi
     /**
      * @param QueryItemExtensionInterface[] $itemExtensions
      */
-    public function __construct(ManagerRegistry $managerRegistry, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, /* iterable */ $itemExtensions = [], ItemDataProviderInterface $decorated = null)
+    public function __construct(ManagerRegistry $managerRegistry, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, iterable $itemExtensions = [])
     {
         $this->managerRegistry = $managerRegistry;
         $this->propertyNameCollectionFactory = $propertyNameCollectionFactory;
@@ -91,14 +90,13 @@ class ItemDataProvider implements ItemDataProviderInterface, RestrictedDataProvi
         }
         /** @var Builder $aggregationBuilder */
         $aggregationBuilder = $repository->createAggregationBuilder();
-        $queryNameGenerator = new QueryNameGenerator();
 
         foreach ($identifiers as $propertyName => $value) {
             $aggregationBuilder->match()->field($propertyName)->equals($value);
         }
 
         foreach ($this->itemExtensions as $extension) {
-            $extension->applyToItem($aggregationBuilder, $queryNameGenerator, $resourceClass, $identifiers, $operationName);
+            $extension->applyToItem($aggregationBuilder, $resourceClass, $identifiers, $operationName);
         }
 
         return $aggregationBuilder->hydrate($resourceClass)->execute()->getSingleResult();

@@ -13,46 +13,54 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Bridge\Doctrine\MongoDB\Filter;
 
-use ApiPlatform\Core\Bridge\Doctrine\Common\Filter\AbstractSearchFilter;
-use ApiPlatform\Core\Bridge\Doctrine\Common\Util\QueryNameGeneratorInterface as CommonQueryNameGeneratorInterface;
-use ApiPlatform\Core\Bridge\Doctrine\Common\Util\QueryNameGeneratorInterface;
-use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryBuilderHelper;
+use ApiPlatform\Core\Api\IriConverterInterface;
+use ApiPlatform\Core\Bridge\Doctrine\ClassMetadata\PropertyHelper;
+use ApiPlatform\Core\Bridge\Doctrine\Common\Filter\SearchFilterInterface;
+use ApiPlatform\Core\Bridge\Doctrine\Common\Filter\SearchFilterTrait;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
-use Doctrine\ODM\MongoDB\Query\Builder;
+use Doctrine\ODM\MongoDB\Aggregation\Builder;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\PropertyAccess\PropertyAccess;
+use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 /**
  * Filter the collection by given properties.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
+ * @author Alan Poulain <contact@alanpoulain.eu>
  */
-class SearchFilter extends AbstractSearchFilter
+class SearchFilter extends AbstractContextAwareFilter implements SearchFilterInterface
 {
+    use SearchFilterTrait;
+
+    public function __construct(IriConverterInterface $iriConverter, PropertyAccessorInterface $propertyAccessor = null, LoggerInterface $logger = null, PropertyHelper $propertyHelper = null, array $properties = null)
+    {
+        parent::__construct($logger, $propertyHelper, $properties);
+
+        $this->iriConverter = $iriConverter;
+        $this->propertyAccessor = $propertyAccessor ?: PropertyAccess::createPropertyAccessor();
+    }
+
     /**
      * {@inheritdoc}
-     *
-     * @param Builder                     $queryBuilder
-     * @param QueryNameGeneratorInterface $queryNameGenerator
      */
-    protected function filterProperty(string $property, $value, $queryBuilder, CommonQueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, string $operationName = null)
+    protected function filterProperty(string $property, $value, Builder $aggregationBuilder, string $resourceClass, string $operationName = null, array $context = [])
     {
         if (
             null === $value ||
             !$this->isPropertyEnabled($property, $resourceClass) ||
-            !$this->isPropertyMapped($property, $resourceClass, true)
+            !$this->propertyHelper->isPropertyMapped($property, $resourceClass, true)
         ) {
             return;
         }
 
-        return;
-
-        $alias = $queryBuilder->getRootAliases()[0];
         $field = $property;
 
-        if ($this->isPropertyNested($property, $resourceClass)) {
-            list($alias, $field, $associations) = $this->addJoinsForNestedProperty($property, $alias, $queryBuilder, $queryNameGenerator, $resourceClass);
-            $metadata = $this->getNestedMetadata($resourceClass, $associations);
+        if ($this->propertyHelper->isPropertyNested($property, $resourceClass)) {
+            list($field, $associations) = $this->addLookupsForNestedProperty($property, $aggregationBuilder, $resourceClass);
+            $metadata = $this->propertyHelper->getNestedMetadata($resourceClass, $associations);
         } else {
-            $metadata = $this->getClassMetadata($resourceClass);
+            $metadata = $this->propertyHelper->getClassMetadata($resourceClass);
         }
 
         $values = $this->normalizeValues((array) $value);
@@ -67,12 +75,12 @@ class SearchFilter extends AbstractSearchFilter
 
         $caseSensitive = true;
 
-        if ($metadata->hasField($field)) {
+        if ($metadata->hasField($field) && !$metadata->hasAssociation($field)) {
             if ('id' === $field) {
                 $values = array_map([$this, 'getIdFromValue'], $values);
             }
 
-            if (!$this->hasValidValues($values, $this->getDoctrineFieldType($property, $resourceClass))) {
+            if (!$this->hasValidValues($values, $this->propertyHelper->getDoctrineFieldType($property, $resourceClass))) {
                 $this->logger->notice('Invalid filter ignored', [
                     'exception' => new InvalidArgumentException(sprintf('Values for field "%s" are not valid according to the doctrine type.', $field)),
                 ]);
@@ -89,25 +97,22 @@ class SearchFilter extends AbstractSearchFilter
             }
 
             if (1 === \count($values)) {
-                $this->addWhereByStrategy($strategy, $queryBuilder, $queryNameGenerator, $alias, $field, $values[0], $caseSensitive);
+                $aggregationBuilder
+                    ->match()
+                    ->field($property)
+                    ->equals($this->addEqualityMatchStrategy($strategy, $values[0], $caseSensitive));
 
                 return;
             }
 
-            if (self::STRATEGY_EXACT !== $strategy) {
-                $this->logger->notice('Invalid filter ignored', [
-                    'exception' => new InvalidArgumentException(sprintf('"%s" strategy selected for "%s" property, but only "%s" strategy supports multiple values', $strategy, $property, self::STRATEGY_EXACT)),
-                ]);
-
-                return;
+            $inValues = [];
+            foreach ($values as $inValue) {
+                $inValues[] = $this->addEqualityMatchStrategy($strategy, $inValue, $caseSensitive);
             }
-
-            $wrapCase = $this->createWrapCase($caseSensitive);
-            $valueParameter = $queryNameGenerator->generateParameterName($field);
-
-            $queryBuilder
-                ->andWhere(sprintf($wrapCase('%s.%s').' IN (:%s)', $alias, $field, $valueParameter))
-                ->setParameter($valueParameter, $caseSensitive ? $values : array_map('strtolower', $values));
+            $aggregationBuilder
+                ->match()
+                ->field($property)
+                ->in($inValues);
         }
 
         // metadata doesn't have the field, nor an association on the field
@@ -117,75 +122,70 @@ class SearchFilter extends AbstractSearchFilter
 
         $values = array_map([$this, 'getIdFromValue'], $values);
 
-        if (!$this->hasValidValues($values, $this->getDoctrineFieldType($property, $resourceClass))) {
+        if (!$this->hasValidValues($values, $this->propertyHelper->getDoctrineFieldType($property, $resourceClass))) {
             $this->logger->notice('Invalid filter ignored', [
-                'exception' => new InvalidArgumentException(sprintf('Values for field "%s" are not valid according to the doctrine type.', $field)),
+                'exception' => new InvalidArgumentException(sprintf('Values for field "%s" are not valid according to the doctrine type.', $property)),
             ]);
 
             return;
         }
 
-        $association = $field;
-        $valueParameter = $queryNameGenerator->generateParameterName($association);
-
-        if ($metadata->isCollectionValuedAssociation($association)) {
-            $associationAlias = QueryBuilderHelper::addJoinOnce($queryBuilder, $queryNameGenerator, $alias, $association);
-            $associationField = 'id';
-        } else {
-            $associationAlias = $alias;
-            $associationField = $field;
-        }
-
         if (1 === \count($values)) {
-            $queryBuilder
-                ->andWhere(sprintf('%s.%s = :%s', $associationAlias, $associationField, $valueParameter))
-                ->setParameter($valueParameter, $values[0]);
+            $aggregationBuilder
+                ->match()
+                ->field("$property.id")
+                ->equals($values[0]);
         } else {
-            $queryBuilder
-                ->andWhere(sprintf('%s.%s IN (:%s)', $associationAlias, $associationField, $valueParameter))
-                ->setParameter($valueParameter, $values);
+            $aggregationBuilder
+                ->match()
+                ->field("$property.id")
+                ->in($values);
         }
     }
 
     /**
-     * Adds where clause according to the strategy.
+     * Add equality match stage according to the strategy.
+     *
+     * @return \MongoRegex|string
      *
      * @throws InvalidArgumentException If strategy does not exist
      */
-    protected function addWhereByStrategy(string $strategy, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $alias, string $field, $value, bool $caseSensitive)
+    protected function addEqualityMatchStrategy(string $strategy, $value, bool $caseSensitive)
     {
-        $wrapCase = $this->createWrapCase($caseSensitive);
-        $valueParameter = $queryNameGenerator->generateParameterName($field);
+        $addCaseFlag = $this->addCaseFlag($caseSensitive);
 
         switch ($strategy) {
             case null:
             case self::STRATEGY_EXACT:
-                $queryBuilder
-                    ->andWhere(sprintf($wrapCase('%s.%s').' = '.$wrapCase(':%s'), $alias, $field, $valueParameter))
-                    ->setParameter($valueParameter, $value);
-                break;
+                return $caseSensitive ? $value : new \MongoRegex($addCaseFlag("/^$value$/"));
             case self::STRATEGY_PARTIAL:
-                $queryBuilder
-                    ->andWhere(sprintf($wrapCase('%s.%s').' LIKE '.$wrapCase('CONCAT(\'%%\', :%s, \'%%\')'), $alias, $field, $valueParameter))
-                    ->setParameter($valueParameter, $value);
-                break;
+                return new \MongoRegex($addCaseFlag("/$value/"));
             case self::STRATEGY_START:
-                $queryBuilder
-                    ->andWhere(sprintf($wrapCase('%s.%s').' LIKE '.$wrapCase('CONCAT(:%s, \'%%\')'), $alias, $field, $valueParameter))
-                    ->setParameter($valueParameter, $value);
-                break;
+                return new \MongoRegex($addCaseFlag("/^$value/"));
             case self::STRATEGY_END:
-                $queryBuilder
-                    ->andWhere(sprintf($wrapCase('%s.%s').' LIKE '.$wrapCase('CONCAT(\'%%\', :%s)'), $alias, $field, $valueParameter))
-                    ->setParameter($valueParameter, $value);
-                break;
+                return new \MongoRegex($addCaseFlag("/$value$/"));
             case self::STRATEGY_WORD_START:
-                $queryBuilder
-                    ->andWhere(sprintf($wrapCase('%1$s.%2$s').' LIKE '.$wrapCase('CONCAT(:%3$s, \'%%\')').' OR '.$wrapCase('%1$s.%2$s').' LIKE '.$wrapCase('CONCAT(\'%% \', :%3$s, \'%%\')'), $alias, $field, $valueParameter))
-                    ->setParameter($valueParameter, $value);
-                break;
+                return new \MongoRegex($addCaseFlag("/(^$value.*|.*\s$value.*)/"));
             default:
                 throw new InvalidArgumentException(sprintf('strategy %s does not exist.', $strategy));
         }
+    }
+
+    /**
+     * Create a function that will add a flag to a Mongo regular expression according
+     * to the specified case sensitivity.
+     *
+     * For example, "/value/" will be returned as "/value/i" when $caseSensitive
+     * is false.
+     */
+    protected function addCaseFlag(bool $caseSensitive): \Closure
+    {
+        return function (string $expr) use ($caseSensitive): string {
+            if ($caseSensitive) {
+                return $expr;
+            }
+
+            return "{$expr}i";
+        };
     }
 }

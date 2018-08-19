@@ -13,10 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Bridge\Doctrine\MongoDB\Filter;
 
-use ApiPlatform\Core\Bridge\Doctrine\Common\Filter\AbstractBooleanFilter;
-use ApiPlatform\Core\Bridge\Doctrine\Common\Util\QueryNameGeneratorInterface as CommonQueryNameGeneratorInterface;
-use ApiPlatform\Core\Bridge\Doctrine\Common\Util\QueryNameGeneratorInterface;
-use ApiPlatform\Core\Exception\InvalidArgumentException;
+use ApiPlatform\Core\Bridge\Doctrine\Common\Filter\BooleanFilterTrait;
 use Doctrine\ODM\MongoDB\Aggregation\Builder;
 
 /**
@@ -30,33 +27,31 @@ use Doctrine\ODM\MongoDB\Aggregation\Builder;
  *
  * @author Amrouche Hamza <hamza.simperfit@gmail.com>
  * @author Teoh Han Hui <teohhanhui@gmail.com>
+ * @author Alan Poulain <contact@alanpoulain.eu>
  */
-class BooleanFilter extends AbstractBooleanFilter
+class BooleanFilter extends AbstractContextAwareFilter
 {
-    use FilterTrait;
+    use BooleanFilterTrait;
 
     /**
      * {@inheritdoc}
-     *
-     * @param Builder                     $aggregationBuilder
-     * @param QueryNameGeneratorInterface $queryNameGenerator
      */
-    protected function filterProperty(string $property, $value, $aggregationBuilder, CommonQueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, string $operationName = null)
+    protected function filterProperty(string $property, $value, Builder $aggregationBuilder, string $resourceClass, string $operationName = null, array $context = [])
     {
         if (
             !$this->isPropertyEnabled($property, $resourceClass) ||
-            !$this->isPropertyMapped($property, $resourceClass) ||
+            !$this->propertyHelper->isPropertyMapped($property, $resourceClass) ||
             !$this->isBooleanField($property, $resourceClass)
         ) {
             return;
         }
 
-        $value = $this->normalizeValue($value);
+        $value = $this->normalizeValue($value, $property);
         if (null === $value) {
             return;
         }
 
-        if ($this->isPropertyNested($property, $resourceClass)) {
+        if ($this->propertyHelper->isPropertyNested($property, $resourceClass)) {
             $this->addLookupsForNestedProperty($property, $aggregationBuilder, $resourceClass);
         }
 

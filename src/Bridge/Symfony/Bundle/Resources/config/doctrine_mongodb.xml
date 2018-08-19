@@ -5,6 +5,10 @@
            xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <services>
+        <service id="api_platform.doctrine.mongodb.property_helper" class="ApiPlatform\Core\Bridge\Doctrine\ClassMetadata\PropertyHelper" public="false">
+            <argument type="service" id="doctrine_mongodb"/>
+        </service>
+
         <service id="api_platform.doctrine.metadata_factory" class="Doctrine\Common\Persistence\Mapping\ClassMetadataFactory" public="false">
             <factory service="doctrine_mongodb.odm.default_document_manager" method="getMetadataFactory"/>
         </service>
@@ -42,17 +46,15 @@
         <!-- Filter -->
 
         <service id="api_platform.doctrine.mongodb.search_filter" class="ApiPlatform\Core\Bridge\Doctrine\MongoDB\Filter\SearchFilter" public="false" abstract="true">
-            <argument type="service" id="doctrine_mongodb" />
-            <argument>null</argument>
             <argument type="service" id="api_platform.iri_converter" />
             <argument type="service" id="api_platform.property_accessor" />
             <argument type="service" id="logger" on-invalid="ignore" />
+            <argument type="service" id="api_platform.doctrine.mongodb.property_helper" />
         </service>
 
         <service id="api_platform.doctrine.mongodb.boolean_filter" class="ApiPlatform\Core\Bridge\Doctrine\MongoDB\Filter\BooleanFilter" public="false" abstract="true">
-            <argument type="service" id="doctrine_mongodb" />
-            <argument>null</argument>
             <argument type="service" id="logger" on-invalid="ignore" />
+            <argument type="service" id="api_platform.doctrine.mongodb.property_helper" />
         </service>
 
         <!-- Metadata loader -->
@@ -79,13 +81,13 @@
         <!--<tag name="api_platform.doctrine.orm.query_extension.collection" />-->
         <!--</service>-->
 
-        <service id="api_platform.doctrine.mongodb.query_extension.filter" class="ApiPlatform\Core\Bridge\Doctrine\Common\Extension\FilterExtension" public="false">
+        <service id="api_platform.doctrine.mongodb.query_extension.filter" class="ApiPlatform\Core\Bridge\Doctrine\MongoDB\Extension\FilterExtension" public="false">
             <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
             <argument type="service" id="api_platform.filter_locator" />
 
             <tag name="api_platform.doctrine.mongodb.query_extension.collection" priority="32" />
         </service>
-        <service id="ApiPlatform\Core\Bridge\Doctrine\Common\Extension\FilterExtension" alias="api_platform.doctrine.mongodb.query_extension.filter" />
+        <service id="ApiPlatform\Core\Bridge\Doctrine\MongoDB\Extension\FilterExtension" alias="api_platform.doctrine.mongodb.query_extension.filter" />
 
         <service id="api_platform.doctrine.mongodb.query_extension.pagination"
                  class="ApiPlatform\Core\Bridge\Doctrine\MongoDB\Extension\PaginationExtension" public="false">

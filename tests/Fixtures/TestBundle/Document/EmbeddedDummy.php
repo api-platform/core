@@ -23,7 +23,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  * @author Alexandre Delplace <alexandre.delplacemille@gmail.com>
  *
  * @ApiResource(
- *     attributes={"filters"={"my_dummy.mongodb.boolean"}},
+ *     attributes={"filters"={"my_dummy.mongodb.search", "my_dummy.mongodb.boolean"}},
  *     itemOperations={"get", "put", "delete", "groups"={"method"="GET", "path"="/embedded_dummies_groups/{id}", "normalization_context"={"groups"={"embed"}}}}
  * )
  * @ODM\Document

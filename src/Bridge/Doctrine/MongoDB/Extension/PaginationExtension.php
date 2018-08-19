@@ -21,7 +21,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Bridge\Doctrine\MongoDB\Extension;
 
-use ApiPlatform\Core\Bridge\Doctrine\Common\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Core\Bridge\Doctrine\MongoDB\Paginator;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
@@ -35,8 +34,9 @@ use Symfony\Component\HttpFoundation\RequestStack;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  * @author Samuel ROZE <samuel.roze@gmail.com>
+ * @author Alan Poulain <contact@alanpoulain.eu>
  */
-class PaginationExtension implements QueryResultExtensionInterface
+final class PaginationExtension implements QueryResultExtensionInterface
 {
     private $managerRegistry;
     private $requestStack;
@@ -66,7 +66,7 @@ class PaginationExtension implements QueryResultExtensionInterface
     /**
      * {@inheritdoc}
      */
-    public function applyToCollection(Builder $aggregationBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, string $operationName = null)
+    public function applyToCollection(Builder $aggregationBuilder, string $resourceClass, string $operationName = null)
     {
         $request = $this->requestStack->getCurrentRequest();
         if (null === $request) {

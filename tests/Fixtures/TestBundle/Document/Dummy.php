@@ -27,7 +27,8 @@ use Symfony\Component\Validator\Constraints as Assert;
  *
  * @ApiResource(attributes={
  *     "filters"={
- *         "my_dummy.mongodb.boolean"
+ *         "my_dummy.mongodb.boolean",
+ *         "my_dummy.mongodb.search"
  *     }
  * })
  * @ODM\Document
@@ -115,7 +116,7 @@ class Dummy
     public $relatedDummy;
 
     /**
-     * @ODM\ReferenceMany(targetDocument="RelatedDummy")
+     * @ODM\ReferenceMany(targetDocument="RelatedDummy", storeAs="id")
      * @ApiSubresource
      */
     public $relatedDummies;

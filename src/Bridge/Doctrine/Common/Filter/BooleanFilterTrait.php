@@ -17,7 +17,7 @@ use ApiPlatform\Core\Exception\InvalidArgumentException;
 use Doctrine\DBAL\Types\Type as DBALType;
 
 /**
- * Abstract class for filtering the collection by boolean values.
+ * Trait for filtering the collection by boolean values.
  *
  * Filters collection on equality of boolean properties. The value is specified
  * as one of ( "true" | "false" | "1" | "0" ) in the query.
@@ -28,7 +28,7 @@ use Doctrine\DBAL\Types\Type as DBALType;
  * @author Amrouche Hamza <hamza.simperfit@gmail.com>
  * @author Teoh Han Hui <teohhanhui@gmail.com>
  */
-abstract class AbstractBooleanFilter extends AbstractContextAwareFilter
+trait BooleanFilterTrait
 {
     /**
      * {@inheritdoc}
@@ -39,11 +39,11 @@ abstract class AbstractBooleanFilter extends AbstractContextAwareFilter
 
         $properties = $this->properties;
         if (null === $properties) {
-            $properties = array_fill_keys($this->getClassMetadata($resourceClass)->getFieldNames(), null);
+            $properties = array_fill_keys($this->propertyHelper->getClassMetadata($resourceClass)->getFieldNames(), null);
         }
 
         foreach ($properties as $property => $unused) {
-            if (!$this->isPropertyMapped($property, $resourceClass) || !$this->isBooleanField($property, $resourceClass)) {
+            if (!$this->propertyHelper->isPropertyMapped($property, $resourceClass) || !$this->isBooleanField($property, $resourceClass)) {
                 continue;
             }
 
@@ -62,8 +62,8 @@ abstract class AbstractBooleanFilter extends AbstractContextAwareFilter
      */
     protected function isBooleanField(string $property, string $resourceClass): bool
     {
-        $propertyParts = $this->splitPropertyParts($property, $resourceClass);
-        $metadata = $this->getNestedMetadata($resourceClass, $propertyParts['associations']);
+        $propertyParts = $this->propertyHelper->splitPropertyParts($property, $resourceClass);
+        $metadata = $this->propertyHelper->getNestedMetadata($resourceClass, $propertyParts['associations']);
 
         return DBALType::BOOLEAN === $metadata->getTypeOfField($propertyParts['field']);
     }
@@ -71,7 +71,7 @@ abstract class AbstractBooleanFilter extends AbstractContextAwareFilter
     /**
      * @return bool|null
      */
-    protected function normalizeValue($value)
+    protected function normalizeValue($value, string $property)
     {
         if (\in_array($value, [true, 'true', '1'], true)) {
             $value = true;

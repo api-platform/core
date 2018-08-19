@@ -11,19 +11,20 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Bridge\Doctrine\Common\Filter;
+namespace ApiPlatform\Core\Bridge\Doctrine\MongoDB\Filter;
 
-use ApiPlatform\Core\Api\FilterInterface as BaseFilterInterface;
+use ApiPlatform\Core\Bridge\Doctrine\Common\Filter\FilterInterface as BaseFilterInterface;
+use Doctrine\ODM\MongoDB\Aggregation\Builder;
 
 /**
- * Doctrine filter interface.
+ * Doctrine ODM filter interface.
  *
  * @author Alan Poulain <contact@alanpoulain.eu>
  */
 interface FilterInterface extends BaseFilterInterface
 {
     /**
-     * For autowiring the property helper in annotation filters.
+     * Applies the filter.
      */
-    public static function getPropertyHelperServiceName(): string;
+    public function apply(Builder $aggregationBuilder, string $resourceClass, string $operationName = null);
 }

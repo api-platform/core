@@ -13,8 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Bridge\Doctrine\Orm\Filter;
 
-use ApiPlatform\Core\Bridge\Doctrine\Common\Filter\AbstractContextAwareFilter;
-use ApiPlatform\Core\Bridge\Doctrine\Common\Util\QueryNameGeneratorInterface as CommonQueryNameGeneratorInterface;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
 use Doctrine\DBAL\Types\Type;
@@ -28,8 +26,6 @@ use Doctrine\ORM\QueryBuilder;
  */
 class DateFilter extends AbstractContextAwareFilter
 {
-    use FilterTrait;
-
     const PARAMETER_BEFORE = 'before';
     const PARAMETER_STRICTLY_BEFORE = 'strictly_before';
     const PARAMETER_AFTER = 'after';
@@ -58,11 +54,11 @@ class DateFilter extends AbstractContextAwareFilter
 
         $properties = $this->properties;
         if (null === $properties) {
-            $properties = array_fill_keys($this->getClassMetadata($resourceClass)->getFieldNames(), null);
+            $properties = array_fill_keys($this->propertyHelper->getClassMetadata($resourceClass)->getFieldNames(), null);
         }
 
         foreach ($properties as $property => $nullManagement) {
-            if (!$this->isPropertyMapped($property, $resourceClass) || !$this->isDateField($property, $resourceClass)) {
+            if (!$this->propertyHelper->isPropertyMapped($property, $resourceClass) || !$this->isDateField($property, $resourceClass)) {
                 continue;
             }
 
@@ -77,17 +73,14 @@ class DateFilter extends AbstractContextAwareFilter
 
     /**
      * {@inheritdoc}
-     *
-     * @param QueryBuilder                $queryBuilder
-     * @param QueryNameGeneratorInterface $queryNameGenerator
      */
-    protected function filterProperty(string $property, $values, $queryBuilder, CommonQueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, string $operationName = null)
+    protected function filterProperty(string $property, $values, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, string $operationName = null)
     {
         // Expect $values to be an array having the period as keys and the date value as values
         if (
             !\is_array($values) ||
             !$this->isPropertyEnabled($property, $resourceClass) ||
-            !$this->isPropertyMapped($property, $resourceClass) ||
+            !$this->propertyHelper->isPropertyMapped($property, $resourceClass) ||
             !$this->isDateField($property, $resourceClass)
         ) {
             return;
@@ -96,12 +89,12 @@ class DateFilter extends AbstractContextAwareFilter
         $alias = $queryBuilder->getRootAliases()[0];
         $field = $property;
 
-        if ($this->isPropertyNested($property, $resourceClass)) {
+        if ($this->propertyHelper->isPropertyNested($property, $resourceClass)) {
             list($alias, $field) = $this->addJoinsForNestedProperty($property, $alias, $queryBuilder, $queryNameGenerator, $resourceClass);
         }
 
         $nullManagement = $this->properties[$property] ?? null;
-        $type = $this->getDoctrineFieldType($property, $resourceClass);
+        $type = $this->propertyHelper->getDoctrineFieldType($property, $resourceClass);
 
         if (self::EXCLUDE_NULL === $nullManagement) {
             $queryBuilder->andWhere($queryBuilder->expr()->isNotNull(sprintf('%s.%s', $alias, $field)));
@@ -213,7 +206,7 @@ class DateFilter extends AbstractContextAwareFilter
      */
     protected function isDateField(string $property, string $resourceClass): bool
     {
-        return isset(self::DOCTRINE_DATE_TYPES[$this->getDoctrineFieldType($property, $resourceClass)]);
+        return isset(self::DOCTRINE_DATE_TYPES[$this->propertyHelper->getDoctrineFieldType($property, $resourceClass)]);
     }
 
     /**

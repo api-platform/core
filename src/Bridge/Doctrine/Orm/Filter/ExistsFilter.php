@@ -13,8 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Bridge\Doctrine\Orm\Filter;
 
-use ApiPlatform\Core\Bridge\Doctrine\Common\Filter\AbstractContextAwareFilter;
-use ApiPlatform\Core\Bridge\Doctrine\Common\Util\QueryNameGeneratorInterface as CommonQueryNameGeneratorInterface;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryBuilderHelper;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
@@ -36,8 +34,6 @@ use Doctrine\ORM\QueryBuilder;
  */
 class ExistsFilter extends AbstractContextAwareFilter
 {
-    use FilterTrait;
-
     const QUERY_PARAMETER_KEY = 'exists';
 
     /**
@@ -49,11 +45,11 @@ class ExistsFilter extends AbstractContextAwareFilter
 
         $properties = $this->properties;
         if (null === $properties) {
-            $properties = array_fill_keys($this->getClassMetadata($resourceClass)->getFieldNames(), null);
+            $properties = array_fill_keys($this->propertyHelper->getClassMetadata($resourceClass)->getFieldNames(), null);
         }
 
         foreach ($properties as $property => $unused) {
-            if (!$this->isPropertyMapped($property, $resourceClass, true) || !$this->isNullableField($property, $resourceClass)) {
+            if (!$this->propertyHelper->isPropertyMapped($property, $resourceClass, true) || !$this->isNullableField($property, $resourceClass)) {
                 continue;
             }
 
@@ -69,16 +65,13 @@ class ExistsFilter extends AbstractContextAwareFilter
 
     /**
      * {@inheritdoc}
-     *
-     * @param QueryBuilder                $queryBuilder
-     * @param QueryNameGeneratorInterface $queryNameGenerator
      */
-    protected function filterProperty(string $property, $value, $queryBuilder, CommonQueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, string $operationName = null)
+    protected function filterProperty(string $property, $value, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, string $operationName = null)
     {
         if (
             !isset($value[self::QUERY_PARAMETER_KEY]) ||
             !$this->isPropertyEnabled($property, $resourceClass) ||
-            !$this->isPropertyMapped($property, $resourceClass, true) ||
+            !$this->propertyHelper->isPropertyMapped($property, $resourceClass, true) ||
             !$this->isNullableField($property, $resourceClass)
         ) {
             return;
@@ -104,12 +97,12 @@ class ExistsFilter extends AbstractContextAwareFilter
         $alias = $queryBuilder->getRootAliases()[0];
         $field = $property;
 
-        if ($this->isPropertyNested($property, $resourceClass)) {
+        if ($this->propertyHelper->isPropertyNested($property, $resourceClass)) {
             list($alias, $field) = $this->addJoinsForNestedProperty($property, $alias, $queryBuilder, $queryNameGenerator, $resourceClass);
         }
 
-        $propertyParts = $this->splitPropertyParts($property, $resourceClass);
-        $metadata = $this->getNestedMetadata($resourceClass, $propertyParts['associations']);
+        $propertyParts = $this->propertyHelper->splitPropertyParts($property, $resourceClass);
+        $metadata = $this->propertyHelper->getNestedMetadata($resourceClass, $propertyParts['associations']);
 
         if ($metadata->hasAssociation($field)) {
             if ($metadata->isCollectionValuedAssociation($field)) {
@@ -145,8 +138,8 @@ class ExistsFilter extends AbstractContextAwareFilter
      */
     protected function isNullableField(string $property, string $resourceClass): bool
     {
-        $propertyParts = $this->splitPropertyParts($property, $resourceClass);
-        $metadata = $this->getNestedMetadata($resourceClass, $propertyParts['associations']);
+        $propertyParts = $this->propertyHelper->splitPropertyParts($property, $resourceClass);
+        $metadata = $this->propertyHelper->getNestedMetadata($resourceClass, $propertyParts['associations']);
 
         $field = $propertyParts['field'];
 

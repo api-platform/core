@@ -19,6 +19,7 @@ use Doctrine\Common\Annotations\Reader;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Reference;
 
 /**
  * Injects filters.
@@ -60,6 +61,9 @@ final class AnnotationFilterPass implements CompilerPassInterface
             $definition->setClass($filterClass);
             $definition->addTag(self::TAG_FILTER_NAME);
             $definition->setAutowired(true);
+            if ((new \ReflectionClass($filterClass))->hasMethod('getPropertyHelperServiceName')) {
+                $definition->setArgument('$propertyHelper', new Reference($filterClass::getPropertyHelperServiceName()));
+            }
 
             foreach ($arguments as $key => $value) {
                 $definition->setArgument("$$key", $value);

@@ -25,7 +25,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  *
  * @author Alexandre Delplace <alexandre.delplacemille@gmail.com>
  *
- * @ApiResource(iri="https://schema.org/Product", attributes={"normalization_context"={"groups"={"friends"}}})
+ * @ApiResource(iri="https://schema.org/Product", attributes={"normalization_context"={"groups"={"friends"}}, "filters"={"related_dummy.mongodb.friends"}})
  * @ODM\Document
  */
 class RelatedDummy extends ParentDummy
@@ -68,7 +68,7 @@ class RelatedDummy extends ParentDummy
 
     /**
      * @ApiSubresource
-     * @ODM\ReferenceMany(targetDocument="RelatedToDummyFriend", cascade={"persist"}, mappedBy="relatedDummy")
+     * @ODM\ReferenceMany(targetDocument="RelatedToDummyFriend", cascade={"persist"}, mappedBy="relatedDummy", storeAs="id")
      * @Groups({"fakemanytomany", "friends"})
      */
     public $relatedToDummyFriend;

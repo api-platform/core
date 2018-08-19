@@ -14,3 +14,11 @@ services:
         parent:    'api_platform.doctrine.mongodb.boolean_filter'
         arguments: [ { 'dummyBoolean': ~, 'embeddedDummy.dummyBoolean': ~, 'relatedDummy.embeddedDummy.dummyBoolean': ~ } ]
         tags:      [ { name: 'api_platform.filter', id: 'my_dummy.mongodb.boolean' } ]
+    app.my_dummy_resource.mongodb.search_filter:
+        parent:    'api_platform.doctrine.mongodb.search_filter'
+        arguments: [ { 'id': 'exact', 'name': 'partial', 'alias': 'start', 'description': 'word_start', 'relatedDummy.name': 'exact', 'relatedDummies': 'exact', 'dummy': 'ipartial', 'relatedDummies.name': 'start', 'embeddedDummy.dummyName': 'partial' } ]
+        tags:      [ { name: 'api_platform.filter', id: 'my_dummy.mongodb.search' } ]
+    app.related_dummy_resource.mongodb.search_filter:
+        parent:    'api_platform.doctrine.mongodb.search_filter'
+        arguments: [ { 'relatedToDummyFriend.dummyFriend': 'exact', 'name': 'partial' } ]
+        tags:      [ { name: 'api_platform.filter', id: 'related_dummy.mongodb.friends' } ]

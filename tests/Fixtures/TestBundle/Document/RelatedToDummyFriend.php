@@ -60,7 +60,7 @@ class RelatedToDummyFriend
 
     /**
      * @ODM\Id
-     * @ODM\ReferenceOne(targetDocument="RelatedDummy", inversedBy="relatedToDummyFriend")
+     * @ODM\ReferenceOne(targetDocument="RelatedDummy", inversedBy="relatedToDummyFriend", storeAs="id")
      * @Assert\NotNull
      */
     private $relatedDummy;

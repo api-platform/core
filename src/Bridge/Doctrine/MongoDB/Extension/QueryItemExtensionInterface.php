@@ -13,16 +13,16 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Bridge\Doctrine\MongoDB\Extension;
 
-use ApiPlatform\Core\Bridge\Doctrine\Common\Util\QueryNameGeneratorInterface;
-use Doctrine\ODM\MongoDB\Query\Builder;
+use Doctrine\ODM\MongoDB\Aggregation\Builder;
 
 /**
- * Interface of Doctrine ODM query extensions for item queries.
+ * Interface of Doctrine MongoDB ODM query extensions for item queries.
  *
  * @author Maxime STEINHAUSSER <maxime.steinhausser@gmail.com>
  * @author Kévin Dunglas <dunglas@gmail.com>
+ * @author Alan Poulain <contact@alanpoulain.eu>
  */
 interface QueryItemExtensionInterface
 {
-    public function applyToItem(Builder $aggregationBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, array $identifiers, string $operationName = null);
+    public function applyToItem(Builder $aggregationBuilder, string $resourceClass, array $identifiers, string $operationName = null);
 }

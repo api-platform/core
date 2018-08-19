@@ -13,8 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Bridge\Doctrine\Orm\Filter;
 
-use ApiPlatform\Core\Bridge\Doctrine\Common\Filter\AbstractContextAwareFilter;
-use ApiPlatform\Core\Bridge\Doctrine\Common\Util\QueryNameGeneratorInterface as CommonQueryNameGeneratorInterface;
+use ApiPlatform\Core\Bridge\Doctrine\ClassMetadata\PropertyHelper;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\QueryBuilder;
@@ -37,8 +36,6 @@ use Symfony\Component\HttpFoundation\RequestStack;
  */
 class OrderFilter extends AbstractContextAwareFilter
 {
-    use FilterTrait;
-
     const NULLS_SMALLEST = 'nulls_smallest';
     const NULLS_LARGEST = 'nulls_largest';
     const NULLS_DIRECTION_MAP = [
@@ -58,9 +55,10 @@ class OrderFilter extends AbstractContextAwareFilter
     protected $orderParameterName;
 
     /**
+     * @param ManagerRegistry|null $managerRegistry No prefix to prevent autowiring of this deprecated property
      * @param RequestStack|null $requestStack No prefix to prevent autowiring of this deprecated property
      */
-    public function __construct(ManagerRegistry $managerRegistry, $requestStack = null, string $orderParameterName = 'order', LoggerInterface $logger = null, array $properties = null)
+    public function __construct($managerRegistry = null, $requestStack = null, string $orderParameterName = 'order', LoggerInterface $logger = null, PropertyHelper $propertyHelper = null, array $properties = null)
     {
         if (null !== $properties) {
             $properties = array_map(function ($propertyOptions) {
@@ -75,7 +73,7 @@ class OrderFilter extends AbstractContextAwareFilter
             }, $properties);
         }
 
-        parent::__construct($managerRegistry, $requestStack, $logger, $properties);
+        parent::__construct($managerRegistry, $requestStack, $logger, $propertyHelper, $properties);
 
         $this->orderParameterName = $orderParameterName;
     }
@@ -83,7 +81,7 @@ class OrderFilter extends AbstractContextAwareFilter
     /**
      * {@inheritdoc}
      */
-    public function apply($queryBuilder, CommonQueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, string $operationName = null, array $context = [])
+    public function apply(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, string $operationName = null, array $context = [])
     {
         if (isset($context['filters']) && !isset($context['filters'][$this->orderParameterName])) {
             return;
@@ -109,11 +107,11 @@ class OrderFilter extends AbstractContextAwareFilter
 
         $properties = $this->properties;
         if (null === $properties) {
-            $properties = array_fill_keys($this->getClassMetadata($resourceClass)->getFieldNames(), null);
+            $properties = array_fill_keys($this->propertyHelper->getClassMetadata($resourceClass)->getFieldNames(), null);
         }
 
         foreach ($properties as $property => $propertyOptions) {
-            if (!$this->isPropertyMapped($property, $resourceClass)) {
+            if (!$this->propertyHelper->isPropertyMapped($property, $resourceClass)) {
                 continue;
             }
 
@@ -129,13 +127,10 @@ class OrderFilter extends AbstractContextAwareFilter
 
     /**
      * {@inheritdoc}
-     *
-     * @param QueryBuilder                $queryBuilder
-     * @param QueryNameGeneratorInterface $queryNameGenerator
      */
-    protected function filterProperty(string $property, $direction, $queryBuilder, CommonQueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, string $operationName = null)
+    protected function filterProperty(string $property, $direction, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, string $operationName = null)
     {
-        if (!$this->isPropertyEnabled($property, $resourceClass) || !$this->isPropertyMapped($property, $resourceClass)) {
+        if (!$this->isPropertyEnabled($property, $resourceClass) || !$this->propertyHelper->isPropertyMapped($property, $resourceClass)) {
             return;
         }
 
@@ -152,7 +147,7 @@ class OrderFilter extends AbstractContextAwareFilter
         $alias = $queryBuilder->getRootAliases()[0];
         $field = $property;
 
-        if ($this->isPropertyNested($property, $resourceClass)) {
+        if ($this->propertyHelper->isPropertyNested($property, $resourceClass)) {
             list($alias, $field) = $this->addJoinsForNestedProperty($property, $alias, $queryBuilder, $queryNameGenerator, $resourceClass);
         }
 

@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Bridge\Doctrine\MongoDB\Extension;
 
-use ApiPlatform\Core\Bridge\Doctrine\Common\Util\QueryNameGeneratorInterface;
 use Doctrine\ODM\MongoDB\Aggregation\Builder;
 
 /**
@@ -21,8 +20,9 @@ use Doctrine\ODM\MongoDB\Aggregation\Builder;
  *
  * @author Samuel ROZE <samuel.roze@gmail.com>
  * @author Kévin Dunglas <dunglas@gmail.com>
+ * @author Alan Poulain <contact@alanpoulain.eu>
  */
 interface QueryCollectionExtensionInterface
 {
-    public function applyToCollection(Builder $aggregationBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, string $operationName = null);
+    public function applyToCollection(Builder $aggregationBuilder, string $resourceClass, string $operationName = null);
 }
