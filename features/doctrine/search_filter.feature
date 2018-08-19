@@ -1,3 +1,4 @@
+@filter
 Feature: Search filter on collections
   In order to get specific result from a large collections of resources
   As a client software developer

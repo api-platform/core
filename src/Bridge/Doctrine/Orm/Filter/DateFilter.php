@@ -13,6 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Bridge\Doctrine\Orm\Filter;
 
+use ApiPlatform\Core\Bridge\Doctrine\Common\Filter\AbstractContextAwareFilter;
+use ApiPlatform\Core\Bridge\Doctrine\Common\Util\QueryNameGeneratorInterface as CommonQueryNameGeneratorInterface;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
 use Doctrine\DBAL\Types\Type;
@@ -26,6 +28,8 @@ use Doctrine\ORM\QueryBuilder;
  */
 class DateFilter extends AbstractContextAwareFilter
 {
+    use FilterTrait;
+
     const PARAMETER_BEFORE = 'before';
     const PARAMETER_STRICTLY_BEFORE = 'strictly_before';
     const PARAMETER_AFTER = 'after';
@@ -73,8 +77,11 @@ class DateFilter extends AbstractContextAwareFilter
 
     /**
      * {@inheritdoc}
+     *
+     * @param QueryBuilder                $queryBuilder
+     * @param QueryNameGeneratorInterface $queryNameGenerator
      */
-    protected function filterProperty(string $property, $values, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, string $operationName = null)
+    protected function filterProperty(string $property, $values, $queryBuilder, CommonQueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, string $operationName = null)
     {
         // Expect $values to be an array having the period as keys and the date value as values
         if (

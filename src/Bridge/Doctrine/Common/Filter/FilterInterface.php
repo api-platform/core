@@ -11,14 +11,13 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Bridge\Doctrine\Orm\Filter;
+namespace ApiPlatform\Core\Bridge\Doctrine\Common\Filter;
 
 use ApiPlatform\Core\Api\FilterInterface as BaseFilterInterface;
-use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGeneratorInterface;
-use Doctrine\ORM\QueryBuilder;
+use ApiPlatform\Core\Bridge\Doctrine\Common\Util\QueryNameGeneratorInterface;
 
 /**
- * Doctrine ORM filter interface.
+ * Doctrine filter interface.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
@@ -27,5 +26,5 @@ interface FilterInterface extends BaseFilterInterface
     /**
      * Applies the filter.
      */
-    public function apply(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, string $operationName = null);
+    public function apply($builder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, string $operationName = null);
 }

@@ -4,6 +4,8 @@ Feature: Create-Retrieve-Update-Delete
   I need to be able to retrieve, create, update and delete JSON-LD encoded resources.
 
   @createSchema
+  @mongodb
+  @phpcr
   Scenario: Create a resource
     When I add "Content-Type" header equal to "application/ld+json"
     And I send a "POST" request to "/dummies" with body:
@@ -55,6 +57,7 @@ Feature: Create-Retrieve-Update-Delete
     }
     """
 
+  @mongodb
   Scenario: Get a resource
     When I send a "GET" request to "/dummies/1"
     Then the response status code should be 200
@@ -91,6 +94,8 @@ Feature: Create-Retrieve-Update-Delete
     }
     """
 
+  @mongodb
+  @phpcr
   Scenario: Get a not found exception
     When I send a "GET" request to "/dummies/42"
     Then the response status code should be 404
@@ -409,6 +414,8 @@ Feature: Create-Retrieve-Update-Delete
     }
     """
 
+  @mongodb
+  @phpcr
   Scenario: Update a resource
     When I add "Content-Type" header equal to "application/ld+json"
     And I send a "PUT" request to "/dummies/1" with body:
@@ -462,6 +469,8 @@ Feature: Create-Retrieve-Update-Delete
     }
     """
 
+  @mongodb
+  @phpcr
   Scenario: Update a resource with empty body
     When I add "Content-Type" header equal to "application/ld+json"
     And I send a "PUT" request to "/dummies/1"
@@ -502,6 +511,8 @@ Feature: Create-Retrieve-Update-Delete
     }
     """
 
+  @mongodb
+  @phpcr
   Scenario: Delete a resource
     When I send a "DELETE" request to "/dummies/1"
     Then the response status code should be 204

@@ -1,3 +1,4 @@
+@filter
 Feature: Date filter on collections
   In order to retrieve large collections of resources filtered by date
   As a client software developer

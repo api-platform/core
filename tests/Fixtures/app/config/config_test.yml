@@ -23,6 +23,13 @@ doctrine:
         auto_generate_proxy_classes:   '%kernel.debug%'
         auto_mapping:                  true
 
+doctrine_mongodb:
+    connections:
+        default:                       ~
+    document_managers:
+        default:
+            auto_mapping:              true
+
 twig:
     strict_variables: '%kernel.debug%'
 

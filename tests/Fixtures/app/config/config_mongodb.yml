@@ -1,0 +1,16 @@
+imports:
+    - { resource: parameters_mongodb.yml }
+    - { resource: config_test_mongodb.yml }
+
+doctrine_mongodb:
+    connections:
+        default:
+            server: '%server%'
+            options: {}
+    default_database: '%dbname%'
+
+services:
+    app.my_dummy_resource.mongodb.boolean_filter:
+        parent:    'api_platform.doctrine.mongodb.boolean_filter'
+        arguments: [ { 'dummyBoolean': ~, 'embeddedDummy.dummyBoolean': ~, 'relatedDummy.embeddedDummy.dummyBoolean': ~ } ]
+        tags:      [ { name: 'api_platform.filter', id: 'my_dummy.mongodb.boolean' } ]

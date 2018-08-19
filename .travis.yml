@@ -38,6 +38,7 @@ jobs:
 before_install:
   - phpenv config-rm xdebug.ini || echo "xdebug not available"
   - echo "memory_limit=-1" >> ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/travis.ini
+  - echo "extension=mongodb.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
   - export PATH="$PATH:$HOME/.composer/vendor/bin"
 
 install:
@@ -50,9 +51,19 @@ install:
 script:
   - tests/Fixtures/app/console cache:clear
   - vendor/bin/phpunit
+  - if [[ $APP_ENV = 'mongodb' ]]; then
+      vendor/bin/phpunit -c phpunit.mongo.xml;
+    fi
   - tests/Fixtures/app/console cache:clear
+  - if [[ $APP_ENV = 'phpcr' ]]; then
+      vendor/bin/phpunit -c phpunit.phpcr.xml
+    fi
   - if [[ $APP_ENV = 'postgres' ]]; then
       vendor/bin/behat --suite=postgres --format=progress;
+    elif [[ $APP_ENV = 'mongodb' ]]; then
+      vendor/bin/behat --suite=mongodb --tags '~@filter&&~@orm-only' --format=progress;
+    elif [[ $APP_ENV = 'phpcr' ]]; then
+       vendor/bin/behat --suite=phpcr --tags '~@filter&&~@orm-only' --format=progress;
     else
       vendor/bin/behat --suite=default --format=progress;
     fi

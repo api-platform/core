@@ -142,6 +142,11 @@ class ConfigurationTest extends TestCase
                 'vary' => ['Accept'],
                 'public' => null,
             ],
+            'doctrine' => [
+                'enable_mongodb_odm' => false,
+                'enable_phpcr_odm' => false,
+                'enable_orm' => true,
+            ],
             'allow_plain_identifiers' => false,
             'resource_class_directories' => [],
         ], $config);

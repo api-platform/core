@@ -14,6 +14,10 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection;
 
 use ApiPlatform\Core\Api\FilterInterface;
+use ApiPlatform\Core\Bridge\Doctrine\MongoDB\Extension\QueryCollectionExtensionInterface as MongoDbQueryCollectionExtensionInterface;
+use ApiPlatform\Core\Bridge\Doctrine\MongoDB\Extension\QueryItemExtensionInterface as MongoDbQueryItemExtensionInterface;
+use ApiPlatform\Core\Bridge\Doctrine\PHPCR\Extension\QueryCollectionExtensionInterface as PHPCRDbQueryCollectionExtensionInterface;
+use ApiPlatform\Core\Bridge\Doctrine\PHPCR\Extension\QueryItemExtensionInterface as PHPCRQueryItemExtensionIterface;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\EagerLoadingExtension;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\FilterEagerLoadingExtension;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\QueryCollectionExtensionInterface;
@@ -108,6 +112,14 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             ->addTag('api_platform.doctrine.orm.query_extension.item');
         $container->registerForAutoconfiguration(QueryCollectionExtensionInterface::class)
             ->addTag('api_platform.doctrine.orm.query_extension.collection');
+        $container->registerForAutoconfiguration(MongoDbQueryItemExtensionInterface::class)
+            ->addTag('api_platform.doctrine.mongodb.query_extension.item');
+        $container->registerForAutoconfiguration(MongoDbQueryCollectionExtensionInterface::class)
+            ->addTag('api_platform.doctrine.mongodb.query_extension.collection');
+        $container->registerForAutoconfiguration(PHPCRQueryItemExtensionIterface::class)
+            ->addTag('api_platform.doctrine.phpcr.query_extension.item');
+        $container->registerForAutoconfiguration(PHPCRDbQueryCollectionExtensionInterface::class)
+            ->addTag('api_platform.doctrine.phpcr.query_extension.collection');
         $container->registerForAutoconfiguration(FilterInterface::class)
             ->addTag('api_platform.filter');
 
@@ -199,7 +211,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $loader->load('metadata/metadata.xml');
         $loader->load('metadata/xml.xml');
 
-        list($xmlResources, $yamlResources) = $this->getResourcesToWatch($container, $config['mapping']['paths']);
+        list($xmlResources, $yamlResources) = $this->getResourcesToWatch($container, $config);
 
         if (!empty($config['resource_class_directories'])) {
             $container->setParameter('api_platform.resource_class_directories', array_merge(
@@ -223,7 +235,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         }
     }
 
-    private function getBundlesResourcesPaths(ContainerBuilder $container): array
+    private function getBundlesResourcesPaths(ContainerBuilder $container, array $config): array
     {
         $bundlesResourcesPaths = [];
 
@@ -233,7 +245,15 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             foreach (['.yaml', '.yml', '.xml', ''] as $extension) {
                 $paths[] = "$dirname/Resources/config/api_resources$extension";
             }
-            $paths[] = "$dirname/Entity";
+            if ($config['doctrine']['enable_orm']) {
+                $paths[] = "$dirname/Entity";
+            }
+            if ($config['doctrine']['enable_mongodb_odm']) {
+                $paths[] = "$dirname/Document/MongoDB";
+            }
+            if ($config['doctrine']['enable_phpcr_odm']) {
+                $paths[] = "$dirname/Document/PHPCR";
+            }
 
             foreach ($paths as $path) {
                 if ($container->fileExists($path, false)) {
@@ -245,9 +265,9 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         return $bundlesResourcesPaths;
     }
 
-    private function getResourcesToWatch(ContainerBuilder $container, array $resourcesPaths): array
+    private function getResourcesToWatch(ContainerBuilder $container, array $config): array
     {
-        $paths = array_unique(array_merge($resourcesPaths, $this->getBundlesResourcesPaths($container)));
+        $paths = array_unique(array_merge($config['mapping']['paths'], $this->getBundlesResourcesPaths($container, $config)));
 
         // Flex structure (only if nothing specified)
         $projectDir = $container->getParameter('kernel.project_dir');
@@ -411,6 +431,16 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         // Doctrine ORM support
         if ($useDoctrine) {
             $loader->load('doctrine_orm.xml');
+        }
+
+        //  Doctrine MongoDB ODM support
+        if ($config['doctrine']['enable_mongodb_odm']) {
+            $loader->load('doctrine_mongodb.xml');
+        }
+
+        // Doctrine PHPCR ODM support
+        if ($config['doctrine']['enable_phpcr_odm']) {
+            $loader->load('doctrine_phpcr.xml');
         }
 
         // FOSUser support

@@ -1,3 +1,4 @@
+@orm-only
 Feature: FOSUser integration
   In order to use FOSUserBundle
   As an API software developer

@@ -13,6 +13,12 @@ reusable-steps:
     run:
       name: Disable Xdebug PHP extension
       command: sudo rm /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
+  - &install-php-extensions
+    run:
+      name: Install PHP extensions
+      command: |
+        sudo pecl install mongodb
+        echo 'extension=mongodb.so' | sudo tee /usr/local/etc/php/conf.d/mongodb.ini
   - &restore-composer-cache
     restore_cache:
       keys:
@@ -106,6 +112,7 @@ jobs:
       - *restore-composer-cache
       - *disable-xdebug-php-extension
       - *disable-php-memory-limit
+      - *install-php-extensions
       - *update-composer
       - *update-project-dependencies
       - run:
@@ -133,6 +140,7 @@ jobs:
       - *restore-npm-cache
       - *disable-xdebug-php-extension
       - *disable-php-memory-limit
+      - *install-php-extensions
       - *update-composer
       - *update-project-dependencies
       - *save-composer-cache-by-revision
@@ -176,6 +184,7 @@ jobs:
       - *restore-npm-cache
       - *disable-xdebug-php-extension
       - *disable-php-memory-limit
+      - *install-php-extensions
       - *update-composer
       - *update-project-dependencies
       - *save-composer-cache-by-revision

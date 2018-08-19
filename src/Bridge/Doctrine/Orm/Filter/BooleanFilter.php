@@ -13,9 +13,10 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Bridge\Doctrine\Orm\Filter;
 
+use ApiPlatform\Core\Bridge\Doctrine\Common\Filter\AbstractBooleanFilter;
+use ApiPlatform\Core\Bridge\Doctrine\Common\Util\QueryNameGeneratorInterface as CommonQueryNameGeneratorInterface;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
-use Doctrine\DBAL\Types\Type as DBALType;
 use Doctrine\ORM\QueryBuilder;
 
 /**
@@ -30,39 +31,17 @@ use Doctrine\ORM\QueryBuilder;
  * @author Amrouche Hamza <hamza.simperfit@gmail.com>
  * @author Teoh Han Hui <teohhanhui@gmail.com>
  */
-class BooleanFilter extends AbstractContextAwareFilter
+class BooleanFilter extends AbstractBooleanFilter
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function getDescription(string $resourceClass): array
-    {
-        $description = [];
-
-        $properties = $this->properties;
-        if (null === $properties) {
-            $properties = array_fill_keys($this->getClassMetadata($resourceClass)->getFieldNames(), null);
-        }
-
-        foreach ($properties as $property => $unused) {
-            if (!$this->isPropertyMapped($property, $resourceClass) || !$this->isBooleanField($property, $resourceClass)) {
-                continue;
-            }
-
-            $description[$property] = [
-                'property' => $property,
-                'type' => 'bool',
-                'required' => false,
-            ];
-        }
-
-        return $description;
-    }
+    use FilterTrait;
 
     /**
      * {@inheritdoc}
+     *
+     * @param QueryBuilder                $queryBuilder
+     * @param QueryNameGeneratorInterface $queryNameGenerator
      */
-    protected function filterProperty(string $property, $value, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, string $operationName = null)
+    protected function filterProperty(string $property, $value, $queryBuilder, CommonQueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, string $operationName = null)
     {
         if (
             !$this->isPropertyEnabled($property, $resourceClass) ||
@@ -72,20 +51,8 @@ class BooleanFilter extends AbstractContextAwareFilter
             return;
         }
 
-        if (\in_array($value, [true, 'true', '1'], true)) {
-            $value = true;
-        } elseif (\in_array($value, [false, 'false', '0'], true)) {
-            $value = false;
-        } else {
-            $this->logger->notice('Invalid filter ignored', [
-                'exception' => new InvalidArgumentException(sprintf('Invalid boolean value for "%s" property, expected one of ( "%s" )', $property, implode('" | "', [
-                    'true',
-                    'false',
-                    '1',
-                    '0',
-                ]))),
-            ]);
-
+        $value = $this->normalizeValue($value);
+        if (null === $value) {
             return;
         }
 
@@ -101,16 +68,5 @@ class BooleanFilter extends AbstractContextAwareFilter
         $queryBuilder
             ->andWhere(sprintf('%s.%s = :%s', $alias, $field, $valueParameter))
             ->setParameter($valueParameter, $value);
-    }
-
-    /**
-     * Determines whether the given property refers to a boolean field.
-     */
-    protected function isBooleanField(string $property, string $resourceClass): bool
-    {
-        $propertyParts = $this->splitPropertyParts($property, $resourceClass);
-        $metadata = $this->getNestedMetadata($resourceClass, $propertyParts['associations']);
-
-        return DBALType::BOOLEAN === $metadata->getTypeOfField($propertyParts['field']);
     }
 }
