@@ -88,6 +88,8 @@ final class SubresourceOperationFactory implements SubresourceOperationFactoryIn
             // Handle maxDepth
             if ($rootResourceClass === $resourceClass) {
                 $maxDepth = $subresource->getMaxDepth();
+                // reset depth when we return to rootResourceClass
+                $depth = 0;
             }
 
             if (null !== $maxDepth && $depth >= $maxDepth) {
@@ -95,11 +97,6 @@ final class SubresourceOperationFactory implements SubresourceOperationFactoryIn
             }
             if (isset($visited[$visiting])) {
                 continue;
-            }
-
-            if ($rootResourceClass === $resourceClass) {
-                // reset depth when we return to rootResourceClass
-                $depth = 0;
             }
 
             $rootResourceMetadata = $this->resourceMetadataFactory->create($rootResourceClass);
