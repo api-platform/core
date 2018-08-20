@@ -462,6 +462,49 @@ class SubresourceOperationFactoryTest extends TestCase
         ], $subresourceOperationFactory->create(DummyEntity::class));
     }
 
+    public function testCreateWithMaxDepthSelfReferencingSubresources()
+    {
+        /**
+         * DummyEntity -subresource-> DummyEntity -subresource-> DummyEntity ...
+         */
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
+        $resourceMetadataFactoryProphecy->create(DummyEntity::class)->shouldBeCalled()->willReturn(new ResourceMetadata('dummyEntity'));
+
+        $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
+        $propertyNameCollectionFactoryProphecy->create(DummyEntity::class)->shouldBeCalled()->willReturn(new PropertyNameCollection(['subresource']));
+
+        $subresource = (new PropertyMetadata())->withSubresource(new SubresourceMetadata(DummyEntity::class, false));
+
+        $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
+        $propertyMetadataFactoryProphecy->create(DummyEntity::class, 'subresource')->shouldBeCalled()->willReturn($subresource);
+
+        $pathSegmentNameGeneratorProphecy = $this->prophesize(PathSegmentNameGeneratorInterface::class);
+        $pathSegmentNameGeneratorProphecy->getSegmentName('dummyEntity', true)->shouldBeCalled()->willReturn('dummy_entities');
+        $pathSegmentNameGeneratorProphecy->getSegmentName('subresource', false)->shouldBeCalled()->willReturn('subresources');
+
+        $subresourceOperationFactory = new SubresourceOperationFactory(
+            $resourceMetadataFactoryProphecy->reveal(),
+            $propertyNameCollectionFactoryProphecy->reveal(),
+            $propertyMetadataFactoryProphecy->reveal(),
+            $pathSegmentNameGeneratorProphecy->reveal()
+        );
+
+        $this->assertEquals([
+            'api_dummy_entities_subresource_get_subresource' => [
+                'property' => 'subresource',
+                'collection' => false,
+                'resource_class' => DummyEntity::class,
+                'shortNames' => ['dummyEntity'],
+                'identifiers' => [
+                    ['id', DummyEntity::class, true],
+                ],
+                'route_name' => 'api_dummy_entities_subresource_get_subresource',
+                'path' => '/dummy_entities/{id}/subresources.{_format}',
+                'operation_name' => 'subresource_get_subresource',
+            ] + SubresourceOperationFactory::ROUTE_OPTIONS,
+        ], $subresourceOperationFactory->create(DummyEntity::class));
+    }
+
     public function testCreateWithEnd()
     {
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
