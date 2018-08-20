@@ -462,7 +462,7 @@ class SubresourceOperationFactoryTest extends TestCase
         ], $subresourceOperationFactory->create(DummyEntity::class));
     }
 
-    public function testCreateWithMaxDepthSelfReferencingSubresources()
+    public function testCreateSelfReferencingSubresources()
     {
         /**
          * DummyEntity -subresource-> DummyEntity -subresource-> DummyEntity ...
