@@ -60,15 +60,7 @@ class ChainDataPersisterTest extends TestCase
         $barPersisterProphecy->supports($dummy)->willReturn(true)->shouldBeCalled();
         $barPersisterProphecy->persist($dummy)->shouldBeCalled();
 
-        $bazPersisterProphecy = $this->prophesize(DataPersisterInterface::class);
-        $bazPersisterProphecy->supports($dummy)->willReturn(true)->shouldBeCalled();
-        $bazPersisterProphecy->persist($dummy)->shouldBeCalled();
-
-        (new ChainDataPersister([
-            $fooPersisterProphecy->reveal(),
-            $barPersisterProphecy->reveal(),
-            $bazPersisterProphecy->reveal(),
-        ]))->persist($dummy);
+        (new ChainDataPersister([$fooPersisterProphecy->reveal(), $barPersisterProphecy->reveal()]))->persist($dummy);
     }
 
     public function testRemove()
