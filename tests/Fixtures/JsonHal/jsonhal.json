@@ -38,26 +38,26 @@
       "type": "object",
       "properties": {
         "name": {
-          "$ref": "http://hyperschema.org/core/base#/definitions/name"
+          "$ref": "base.json#/definitions/name"
         },
         "href": {
           "anyOf": [
             {
-              "$ref": "http://hyperschema.org/core/link#/definitions/href"
+              "$ref": "link.json#/definitions/href"
             },
             {
-              "$ref": "http://hyperschema.org/core/link#/definitions/hrefTemplated"
+              "$ref": "link.json#/definitions/hrefTemplated"
             }
           ]
         },
         "templated": {
-          "$ref": "http://hyperschema.org/core/link#/definitions/isTemplated"
+          "$ref": "link.json#/definitions/isTemplated"
         },
         "type": {
-          "$ref": "http://hyperschema.org/core/base#/definitions/mediaType"
+          "$ref": "base.json#/definitions/mediaType"
         },
         "deprecation": {
-          "$ref": "http://hyperschema.org/core/link#/definitions/isDeprecated"
+          "$ref": "link.json#/definitions/isDeprecated"
         }
       },
       "required": [
