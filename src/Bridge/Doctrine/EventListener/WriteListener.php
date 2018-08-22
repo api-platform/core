@@ -21,6 +21,7 @@ use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
 /**
  * Bridges Doctrine and the API system.
  *
+ * @deprecated
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
 final class WriteListener
