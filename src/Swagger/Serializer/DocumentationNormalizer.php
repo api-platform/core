@@ -203,9 +203,6 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
         return $pathOperation;
     }
 
-    /**
-     * @return \ArrayObject
-     */
     private function updateGetOperation(\ArrayObject $pathOperation, array $mimeTypes, string $operationType, ResourceMetadata $resourceMetadata, string $resourceClass, string $resourceShortName, string $operationName, \ArrayObject $definitions): \ArrayObject
     {
         $serializerContext = $this->getSerializerContext($operationType, false, $resourceMetadata, $operationName);
