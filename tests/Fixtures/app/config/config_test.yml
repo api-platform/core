@@ -13,13 +13,18 @@ framework:
 
 doctrine:
     dbal:
-        driver:   'pdo_sqlite'
-        path:     '%kernel.cache_dir%/db.sqlite'
-        charset:  'UTF8'
+        driver:                       'pdo_sqlite'
+        path:                         '%kernel.cache_dir%/db.sqlite'
+        charset:                      'UTF8'
+        types:
+            uuid:  Ramsey\Uuid\Doctrine\UuidType
 
     orm:
         auto_generate_proxy_classes:   '%kernel.debug%'
         auto_mapping:                  true
+
+twig:
+    strict_variables: '%kernel.debug%'
 
 api_platform:
     title:                             'My Dummy API'
@@ -50,6 +55,7 @@ api_platform:
     exception_to_status:
         Symfony\Component\Serializer\Exception\ExceptionInterface: 400
         ApiPlatform\Core\Exception\InvalidArgumentException: 400
+        ApiPlatform\Core\Exception\FilterValidationException: 400
         # Use this syntax with Symfony YAML 3.4+:
         #ApiPlatform\Core\Exception\InvalidArgumentException: !php/const Symfony\Component\HttpFoundation\Response::HTTP_BAD_REQUEST
     http_cache:
@@ -59,12 +65,12 @@ api_platform:
         shared_max_age: 3600
         vary:           ['Accept', 'Cookie']
         public:         true
+    mapping:
+        paths: ['%kernel.project_dir%/config/api_platform']
 
 fos_user:
     db_driver:        'orm'
     firewall_name:    'api'
-    service:
-        user_manager: 'app.user_manager'
     user_class:       'ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\User'
     from_email:
         address:      'no-reply@les-tilleuls.coop'
@@ -89,19 +95,18 @@ services:
         tags:
             -  { name: 'api_platform.item_data_provider' }
 
+    resource_interface.data_provider:
+        class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\DataProvider\ResourceInterfaceImplementationDataProvider'
+        public: false
+        tags:
+            -  { name: 'api_platform.item_data_provider' }
+            -  { name: 'api_platform.collection_data_provider' }
+
     app.serializer.denormalizer.serializable_resource:
         class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\Serializer\Denormalizer\SerializableResourceDenormalizer'
         public: false
         tags:
             -  { name: 'serializer.normalizer' }
-
-    app.user_manager:
-        class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\Manager\UserManager'
-        arguments:
-            -  '@fos_user.util.password_updater'
-            -  '@fos_user.util.canonical_fields_updater'
-            -  '@fos_user.object_manager'
-            -  '%fos_user.model.user.class%'
 
     fos_user.mailer.default:
         class: 'ApiPlatform\Core\Tests\Mock\FosUser\MailerMock'
@@ -159,6 +164,14 @@ services:
         parent:    'api_platform.serializer.property_filter'
         tags:      [ { name: 'api_platform.filter', id: 'my_dummy.property' } ]
 
+    ApiPlatform\Core\Tests\Fixtures\TestBundle\Filter\RequiredFilter:
+        arguments: ['@doctrine']
+        tags: ['api_platform.filter']
+
+    ApiPlatform\Core\Tests\Fixtures\TestBundle\Filter\ArrayRequiredFilter:
+        arguments: ['@doctrine']
+        tags: ['api_platform.filter']
+
     app.config_dummy_resource.action:
         class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\Action\ConfigCustom'
         arguments: ['@api_platform.item_data_provider']
@@ -204,7 +217,7 @@ services:
 
     app.related_dummy_to_friend_resource.search_filter:
         parent:    'api_platform.doctrine.orm.search_filter'
-        arguments: [ { 'name': 'ipartial' } ]
+        arguments: [ { 'name': 'ipartial', 'description': 'ipartial' } ]
         tags:      [ { name: 'api_platform.filter', id: 'related_to_dummy_friend.name' } ]
 
     logger:
@@ -223,4 +236,8 @@ services:
 
     test.annotation_reader:
         alias: annotation_reader
+        public: true
+
+    app.dummy_validation.group_generator:
+        class: ApiPlatform\Core\Tests\Fixtures\TestBundle\Validator\DummyValidationGroupsGenerator
         public: true

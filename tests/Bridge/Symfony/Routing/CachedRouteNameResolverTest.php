@@ -39,12 +39,11 @@ class CachedRouteNameResolverTest extends TestCase
         $this->assertInstanceOf(RouteNameResolverInterface::class, $cachedRouteNameResolver);
     }
 
-    /**
-     * @expectedException \ApiPlatform\Core\Exception\InvalidArgumentException
-     * @expectedExceptionMessage No item route associated with the type "AppBundle\Entity\User".
-     */
     public function testGetRouteNameForItemRouteWithNoMatchingRoute()
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('No item route associated with the type "AppBundle\\Entity\\User".');
+
         $cacheItemProphecy = $this->prophesize(CacheItemInterface::class);
         $cacheItemProphecy->isHit()->willReturn(false)->shouldBeCalled();
 
@@ -99,12 +98,11 @@ class CachedRouteNameResolverTest extends TestCase
         $this->assertSame('some_item_route', $cachedRouteNameResolver->getRouteName('AppBundle\Entity\User', OperationType::ITEM), 'Trigger the local cache');
     }
 
-    /**
-     * @expectedException \ApiPlatform\Core\Exception\InvalidArgumentException
-     * @expectedExceptionMessage No collection route associated with the type "AppBundle\Entity\User".
-     */
     public function testGetRouteNameForCollectionRouteWithNoMatchingRoute()
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('No collection route associated with the type "AppBundle\\Entity\\User".');
+
         $cacheItemProphecy = $this->prophesize(CacheItemInterface::class);
         $cacheItemProphecy->isHit()->willReturn(false)->shouldBeCalled();
 

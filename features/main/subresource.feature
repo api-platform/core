@@ -221,17 +221,17 @@ Feature: Subresource support
     """
 
   Scenario: Create a dummy with a relation that is a subresource
-       When I add "Content-Type" header equal to "application/ld+json"
-       And I send a "POST" request to "/dummies" with body:
-       """
-       {
-         "name": "Dummy with relations",
-         "relatedDummy": "/dummies/1/related_dummies/2"
-       }
-       """
-       Then the response status code should be 201
-       And the response should be in JSON
-       And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+    When I add "Content-Type" header equal to "application/ld+json"
+    And I send a "POST" request to "/dummies" with body:
+    """
+    {
+      "name": "Dummy with relations",
+      "relatedDummy": "/dummies/1/related_dummies/2"
+    }
+    """
+    Then the response status code should be 201
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
 
   Scenario: Get the embedded relation subresource item at the third level
     When I send a "GET" request to "/dummies/1/related_dummies/1/third_level"
@@ -310,6 +310,32 @@ Feature: Subresource support
           "id": 1,
           "value": 2,
           "aggregate": "/dummy_aggregate_offers/1"
+        }
+      ],
+      "hydra:totalItems": 1
+    }
+    """
+
+  Scenario: The recipient of the person's greetings should be empty
+    Given there is a person named "Alice" greeting with a "hello" message
+    When I send a "GET" request to "/people/1/sent_greetings"
+    And the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+    And the JSON should be equal to:
+    """
+    {
+      "@context": "/contexts/Greeting",
+      "@id": "/people/1/sent_greetings",
+      "@type": "hydra:Collection",
+      "hydra:member": [
+        {
+          "@id": "/greetings/1",
+          "@type": "Greeting",
+          "message": "hello",
+          "sender": "/people/1",
+          "recipient": null,
+          "id": 1
         }
       ],
       "hydra:totalItems": 1

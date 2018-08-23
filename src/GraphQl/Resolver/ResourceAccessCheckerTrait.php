@@ -37,8 +37,6 @@ use GraphQL\Type\Definition\ResolveInfo;
 trait ResourceAccessCheckerTrait
 {
     /**
-     * @param object $object
-     *
      * @throws Error
      */
     public function canAccess(ResourceAccessCheckerInterface $resourceAccessChecker = null, ResourceMetadata $resourceMetadata, string $resourceClass, ResolveInfo $info, $object = null, string $operationName = null)
@@ -47,11 +45,11 @@ trait ResourceAccessCheckerTrait
             return;
         }
 
-        $isGranted = $resourceMetadata->getGraphqlAttribute($operationName, 'access_control', null, true);
+        $isGranted = $resourceMetadata->getGraphqlAttribute($operationName ?? '', 'access_control', null, true);
         if (null === $isGranted || $resourceAccessChecker->isGranted($resourceClass, $isGranted, ['object' => $object])) {
             return;
         }
 
-        throw Error::createLocatedError('Access Denied.', $info->fieldNodes, $info->path);
+        throw Error::createLocatedError($resourceMetadata->getGraphqlAttribute($operationName ?? '', 'access_control_message', 'Access Denied.'), $info->fieldNodes, $info->path);
     }
 }

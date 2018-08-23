@@ -14,10 +14,13 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\Bridge\Symfony\Bundle\DependencyInjection;
 
 use ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\Configuration;
+use ApiPlatform\Core\Exception\FilterValidationException;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
+use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
+use Symfony\Component\Config\Definition\Exception\InvalidTypeException;
 use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Serializer\Exception\ExceptionInterface;
@@ -67,6 +70,7 @@ class ConfigurationTest extends TestCase
             'exception_to_status' => [
                 ExceptionInterface::class => Response::HTTP_BAD_REQUEST,
                 InvalidArgumentException::class => Response::HTTP_BAD_REQUEST,
+                FilterValidationException::class => Response::HTTP_BAD_REQUEST,
             ],
             'default_operation_path_resolver' => 'api_platform.operation_path_resolver.underscore',
             'path_segment_name_generator' => 'api_platform.path_segment_name_generator.underscore',
@@ -80,6 +84,7 @@ class ConfigurationTest extends TestCase
             'enable_swagger_ui' => true,
             'enable_entrypoint' => true,
             'enable_docs' => true,
+            'enable_profiler' => true,
             'graphql' => [
                 'enabled' => true,
                 'graphiql' => [
@@ -126,7 +131,11 @@ class ConfigurationTest extends TestCase
                 'paths' => [],
             ],
             'http_cache' => [
-                'invalidation' => ['enabled' => false, 'varnish_urls' => []],
+                'invalidation' => [
+                    'enabled' => false,
+                    'varnish_urls' => [],
+                    'request_options' => [],
+                ],
                 'etag' => true,
                 'max_age' => null,
                 'shared_max_age' => null,
@@ -187,11 +196,12 @@ class ConfigurationTest extends TestCase
 
     /**
      * @dataProvider invalidHttpStatusCodeProvider
-     * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
-     * @expectedExceptionMessageRegExp /The HTTP status code ".+" is not valid\./
      */
     public function testExceptionToStatusConfigWithInvalidHttpStatusCode($invalidHttpStatusCode)
     {
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessageRegExp('/The HTTP status code ".+" is not valid\\./');
+
         $this->processor->processConfiguration($this->configuration, [
             'api_platform' => [
                 'exception_to_status' => [
@@ -215,11 +225,12 @@ class ConfigurationTest extends TestCase
 
     /**
      * @dataProvider invalidHttpStatusCodeValueProvider
-     * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidTypeException
-     * @expectedExceptionMessageRegExp /Invalid type for path "api_platform\.exception_to_status\.Exception". Expected int, but got .+\./
      */
     public function testExceptionToStatusConfigWithInvalidHttpStatusCodeValue($invalidHttpStatusCodeValue)
     {
+        $this->expectException(InvalidTypeException::class);
+        $this->expectExceptionMessageRegExp('/Invalid type for path "api_platform\\.exception_to_status\\.Exception". Expected int, but got .+\\./');
+
         $this->processor->processConfiguration($this->configuration, [
             'api_platform' => [
                 'exception_to_status' => [
@@ -235,15 +246,15 @@ class ConfigurationTest extends TestCase
     public function testApiKeysConfig()
     {
         $exampleConfig = [
-                'name' => 'Authorization',
-                'type' => 'query',
+            'name' => 'Authorization',
+            'type' => 'query',
         ];
 
         $config = $this->processor->processConfiguration($this->configuration, [
             'api_platform' => [
                 'swagger' => [
                     'api_keys' => [$exampleConfig],
-               ],
+                ],
             ],
         ]);
 

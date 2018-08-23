@@ -30,6 +30,8 @@ final class EventPriorities
     const POST_VALIDATE = 63;
     const PRE_WRITE = 33;
     const POST_WRITE = 31;
+    const PRE_SERIALIZE = 17;
+    const POST_SERIALIZE = 15;
     const PRE_RESPOND = 9;
     // kernel.response
     const POST_RESPOND = 0;

@@ -84,6 +84,14 @@ class DummyProperty
     public $group;
 
     /**
+     * @var DummyGroup[]
+     *
+     * @ORM\ManyToMany(targetEntity=DummyGroup::class, cascade={"persist"})
+     * @Groups({"dummy_read", "dummy_write"})
+     */
+    public $groups;
+
+    /**
      * @return int
      */
     public function getId()

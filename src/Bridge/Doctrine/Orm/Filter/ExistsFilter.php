@@ -13,9 +13,11 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Bridge\Doctrine\Orm\Filter;
 
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryBuilderHelper;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
+use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
 
 /**
@@ -110,6 +112,15 @@ class ExistsFilter extends AbstractContextAwareFilter
                 return;
             }
 
+            if ($metadata->isAssociationInverseSide($field)) {
+                $alias = QueryBuilderHelper::addJoinOnce($queryBuilder, $queryNameGenerator, $alias, $field, Join::LEFT_JOIN);
+
+                $queryBuilder
+                    ->andWhere(sprintf('%s %s NULL', $alias, $value ? 'IS NOT' : 'IS'));
+
+                return;
+            }
+
             $queryBuilder
                 ->andWhere(sprintf('%s.%s %s NULL', $alias, $field, $value ? 'IS NOT' : 'IS'));
 
@@ -124,11 +135,6 @@ class ExistsFilter extends AbstractContextAwareFilter
 
     /**
      * Determines whether the given property refers to a nullable field.
-     *
-     * @param string $property
-     * @param string $resourceClass
-     *
-     * @return bool
      */
     protected function isNullableField(string $property, string $resourceClass): bool
     {
@@ -161,15 +167,13 @@ class ExistsFilter extends AbstractContextAwareFilter
     /**
      * Determines whether an association is nullable.
      *
-     * @param array $associationMapping
      *
-     * @return bool
      *
      * @see https://github.com/doctrine/doctrine2/blob/v2.5.4/lib/Doctrine/ORM/Tools/EntityGenerator.php#L1221-L1246
      */
     private function isAssociationNullable(array $associationMapping): bool
     {
-        if (isset($associationMapping['id']) && $associationMapping['id']) {
+        if (!empty($associationMapping['id'])) {
             return false;
         }
 

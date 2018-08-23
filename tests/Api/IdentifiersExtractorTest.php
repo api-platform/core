@@ -15,6 +15,7 @@ namespace ApiPlatform\Core\Tests\Api;
 
 use ApiPlatform\Core\Api\IdentifiersExtractor;
 use ApiPlatform\Core\Api\ResourceClassResolverInterface;
+use ApiPlatform\Core\Exception\RuntimeException;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
@@ -152,12 +153,11 @@ class IdentifiersExtractorTest extends TestCase
         $this->assertSame($expected, $identifiersExtractor->getIdentifiersFromItem($item));
     }
 
-    /**
-     * @expectedException \ApiPlatform\Core\Exception\RuntimeException
-     * @expectedMessage No identifier found in "ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RelatedDummy" through relation "relatedDummy" of "ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy" used as identifier
-     */
     public function testThrowNoIdentifierFromItem()
     {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('No identifier found in "ApiPlatform\\Core\\Tests\\Fixtures\\TestBundle\\Entity\\RelatedDummy" through relation "relatedDummy" of "ApiPlatform\\Core\\Tests\\Fixtures\\TestBundle\\Entity\\Dummy" used as identifier');
+
         $prophecies = $this->getMetadataFactoryProphecies(Dummy::class, ['id', 'relatedDummy']);
         list($propertyNameCollectionFactoryProphecy, $propertyMetadataFactoryProphecy) = $this->getMetadataFactoryProphecies(RelatedDummy::class, [], $prophecies);
 

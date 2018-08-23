@@ -25,6 +25,12 @@ reusable-steps:
         - npm-cache-{{ .Revision }}
         - npm-cache-{{ .Branch }}
         - npm-cache
+  - &restore-php-cs-fixer-cache
+    restore_cache:
+      keys:
+        - php-cs-fixer-cache-{{ .Revision }}
+        - php-cs-fixer-cache-{{ .Branch }}
+        - php-cs-fixer-cache
   - &save-composer-cache-by-branch
     save_cache:
       paths:
@@ -45,6 +51,16 @@ reusable-steps:
       paths:
         - ~/.npm
       key: npm-cache-{{ .Revision }}-{{ .BuildNum }}
+  - &save-php-cs-fixer-cache-by-branch
+    save_cache:
+      paths:
+        - .php_cs.cache
+      key: php-cs-fixer-cache-{{ .Branch }}-{{ .BuildNum }}
+  - &save-php-cs-fixer-cache-by-revision
+    save_cache:
+      paths:
+        - .php_cs.cache
+      key: php-cs-fixer-cache-{{ .Revision }}-{{ .BuildNum }}
   - &update-composer
     run:
       name: Update Composer
@@ -55,7 +71,55 @@ reusable-steps:
       command: composer update --prefer-dist --no-progress --no-suggest --ansi
 
 jobs:
-  phpunit-php-7.2-coverage:
+  php-cs-fixer:
+    docker:
+      - image: circleci/php:7.2-node-browsers
+    environment:
+      PHP_CS_FIXER_FUTURE_MODE: 1
+    working_directory: ~/api-platform/core
+    steps:
+      - checkout
+      - *restore-composer-cache
+      - *restore-php-cs-fixer-cache
+      - *disable-xdebug-php-extension
+      - *disable-php-memory-limit
+      - *update-composer
+      - run:
+          name: Install PHP-CS-Fixer
+          command: composer global require friendsofphp/php-cs-fixer:^2.12
+      - *save-composer-cache-by-revision
+      - *save-composer-cache-by-branch
+      - run:
+          name: Run PHP-CS-Fixer
+          command: |-
+            export PATH="$PATH:$HOME/.composer/vendor/bin"
+            php-cs-fixer fix --dry-run --diff --ansi
+      - *save-php-cs-fixer-cache-by-revision
+      - *save-php-cs-fixer-cache-by-branch
+
+  phpstan:
+    docker:
+      - image: circleci/php:7.2-node-browsers
+    working_directory: ~/api-platform/core
+    steps:
+      - checkout
+      - *restore-composer-cache
+      - *disable-xdebug-php-extension
+      - *disable-php-memory-limit
+      - *update-composer
+      - *update-project-dependencies
+      - run:
+          name: Install PHPStan
+          command: composer global require phpstan/phpstan:0.10.1
+      - *save-composer-cache-by-revision
+      - *save-composer-cache-by-branch
+      - run:
+          name: Run PHPStan
+          command: |-
+            export PATH="$PATH:$HOME/.composer/vendor/bin"
+            phpstan analyse -c phpstan.neon -l5 --ansi src tests
+
+  phpunit-coverage:
     docker:
       - image: circleci/php:7.2-node-browsers
     environment:
@@ -78,7 +142,7 @@ jobs:
           name: Run PHPUnit tests
           command: |-
             mkdir -p build/logs/tmp build/cov
-            find tests -name '*Test.php' | circleci tests split --split-by=timings | parallel -j10% --rpl '{_} s/\//_/g;' \
+            circleci tests glob "tests/**/*Test.php" | circleci tests split --split-by=timings | parallel -j10% --rpl '{_} s/\//_/g;' \
               phpdbg -qrr vendor/bin/phpunit --coverage-php build/cov/coverage-{_}.cov --log-junit build/logs/tmp/{_}.xml --colors=always {}
       - run:
           name: Merge PHPUnit test reports
@@ -98,7 +162,7 @@ jobs:
       - *save-npm-cache-by-revision
       - *save-npm-cache-by-branch
 
-  behat-php-7.2-coverage:
+  behat-coverage:
     docker:
       - image: circleci/php:7.2-node-browsers
     environment:
@@ -181,11 +245,15 @@ jobs:
 
 workflows:
   version: 2
+  lint:
+    jobs:
+      - php-cs-fixer
+      - phpstan
   test-with-coverage:
     jobs:
-      - phpunit-php-7.2-coverage
-      - behat-php-7.2-coverage
+      - phpunit-coverage
+      - behat-coverage
       - merge-and-upload-coverage:
           requires:
-            - phpunit-php-7.2-coverage
-            - behat-php-7.2-coverage
+            - phpunit-coverage
+            - behat-coverage

@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\GraphQl\Type\Definition;
 
 use GraphQL\Error\Error;
-use GraphQL\Error\InvariantViolation;
 use GraphQL\Language\AST\BooleanValueNode;
 use GraphQL\Language\AST\FloatValueNode;
 use GraphQL\Language\AST\IntValueNode;
@@ -33,9 +32,13 @@ use GraphQL\Utils\Utils;
  */
 final class IterableType extends ScalarType
 {
-    public $name = 'Iterable';
+    public function __construct()
+    {
+        $this->name = 'Iterable';
+        $this->description = 'The `Iterable` scalar type represents an array or a Traversable with any kind of data.';
 
-    public $description = 'The `Iterable` scalar type represents an array or a Traversable with any kind of data.';
+        parent::__construct();
+    }
 
     /**
      * {@inheritdoc}
@@ -44,7 +47,7 @@ final class IterableType extends ScalarType
     {
         // is_iterable
         if (!(\is_array($value) || $value instanceof \Traversable)) {
-            throw new InvariantViolation(sprintf('Iterable cannot represent non iterable value: %s', Utils::printSafe($value)));
+            throw new Error(sprintf('Iterable cannot represent non iterable value: %s', Utils::printSafe($value)));
         }
 
         return $value;
@@ -66,13 +69,14 @@ final class IterableType extends ScalarType
     /**
      * {@inheritdoc}
      */
-    public function parseLiteral($valueNode)
+    public function parseLiteral($valueNode, array $variables = null)
     {
         if ($valueNode instanceof ObjectValueNode || $valueNode instanceof ListValueNode) {
             return $this->parseIterableLiteral($valueNode);
         }
 
-        return null;
+        // Intentionally without message, as all information already in wrapped Exception
+        throw new \Exception();
     }
 
     /**

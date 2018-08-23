@@ -48,7 +48,7 @@ final class DataPersister implements DataPersisterInterface
     public function persist($data)
     {
         if (!$manager = $this->getManager($data)) {
-            return;
+            return $data;
         }
 
         if (!$manager->contains($data)) {
@@ -57,6 +57,8 @@ final class DataPersister implements DataPersisterInterface
 
         $manager->flush();
         $manager->refresh($data);
+
+        return $data;
     }
 
     /**
@@ -75,12 +77,11 @@ final class DataPersister implements DataPersisterInterface
     /**
      * Gets the Doctrine object manager associated with given data.
      *
-     * @param mixed $data
      *
      * @return DoctrineObjectManager|null
      */
     private function getManager($data)
     {
-        return is_object($data) ? $this->managerRegistry->getManagerForClass($this->getObjectClass($data)) : null;
+        return \is_object($data) ? $this->managerRegistry->getManagerForClass($this->getObjectClass($data)) : null;
     }
 }

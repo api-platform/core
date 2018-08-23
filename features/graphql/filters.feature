@@ -4,7 +4,6 @@ Feature: Collections filtering
   I need to be able to set filters
 
   @createSchema
-  @dropSchema
   Scenario: Retrieve a collection filtered using the boolean filter
     Given there is 1 dummy object with dummyBoolean true
     And there is 1 dummy object with dummyBoolean false
@@ -25,7 +24,6 @@ Feature: Collections filtering
     And the JSON node "data.dummies.edges[0].node.dummyBoolean" should be false
 
   @createSchema
-  @dropSchema
   Scenario: Retrieve a collection filtered using the exists filter
     Given there are 3 dummy objects
     And there are 2 dummy objects with relatedDummy
@@ -49,7 +47,6 @@ Feature: Collections filtering
     And the JSON node "data.dummies.edges[0].node.relatedDummy" should have 1 element
 
   @createSchema
-  @dropSchema
   Scenario: Retrieve a collection filtered using the date filter
     Given there are 3 dummy objects with dummyDate
     When I send the following GraphQL request:
@@ -69,7 +66,6 @@ Feature: Collections filtering
     And the JSON node "data.dummies.edges[0].node.dummyDate" should be equal to "2015-04-02T00:00:00+00:00"
 
   @createSchema
-  @dropSchema
   Scenario: Retrieve a collection filtered using the search filter
     Given there are 10 dummy objects
     When I send the following GraphQL request:
@@ -89,7 +85,6 @@ Feature: Collections filtering
     And the JSON node "data.dummies.edges[0].node.id" should be equal to "/dummies/2"
 
   @createSchema
-  @dropSchema
   Scenario: Retrieve a collection filtered using the search filter
     Given there are 3 dummy objects having each 3 relatedDummies
     When I send the following GraphQL request:
@@ -118,7 +113,6 @@ Feature: Collections filtering
     And the JSON node "data.dummies.edges[2].node.relatedDummies.edges[0].node.name" should be equal to "RelatedDummy13"
 
   @createSchema
-  @dropSchema
   Scenario: Retrieve a collection filtered using the related search filter
     Given there are 1 dummy objects having each 2 relatedDummies
     And there are 1 dummy objects having each 3 relatedDummies
@@ -138,7 +132,6 @@ Feature: Collections filtering
     And the JSON node "data.dummies.edges" should have 1 element
 
   @createSchema
-  @dropSchema
   Scenario: Retrieve a collection ordered using nested properties
     Given there are 2 dummy objects with relatedDummy
     When I send the following GraphQL request:
@@ -161,3 +154,28 @@ Feature: Collections filtering
     And the header "Content-Type" should be equal to "application/json"
     And the JSON node "data.dummies.edges[0].node.name" should be equal to "Dummy #2"
     And the JSON node "data.dummies.edges[1].node.name" should be equal to "Dummy #1"
+
+  @createSchema
+  Scenario: Retrieve a collection filtered using the related search filter with two values and exact strategy
+    Given there are 3 dummy objects with relatedDummy
+    When  I send the following GraphQL request:
+    """
+    {
+      dummies(relatedDummy_name_list: ["RelatedDummy #1", "RelatedDummy #2"]) {
+        edges {
+          node {
+            id
+            name
+            relatedDummy {
+              name
+            }
+          }
+        }
+      }
+    }
+    """
+    Then the response status code should be 200
+    And the header "Content-Type" should be equal to "application/json"
+    And the JSON node "data.dummies.edges" should have 2 element
+    And the JSON node "data.dummies.edges[0].node.relatedDummy.name" should be equal to "RelatedDummy #1"
+    And the JSON node "data.dummies.edges[1].node.relatedDummy.name" should be equal to "RelatedDummy #2"

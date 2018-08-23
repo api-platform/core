@@ -22,11 +22,6 @@ trait ContextTrait
 {
     /**
      * Initializes the context.
-     *
-     * @param string $resourceClass
-     * @param array  $context
-     *
-     * @return array
      */
     private function initContext(string $resourceClass, array $context): array
     {

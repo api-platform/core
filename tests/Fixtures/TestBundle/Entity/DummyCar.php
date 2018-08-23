@@ -90,81 +90,43 @@ class DummyCar
         return $this->id;
     }
 
-    /**
-     * @return mixed
-     */
     public function getColors()
     {
         return $this->colors;
     }
 
-    /**
-     * @param mixed $colors
-     *
-     * @return static
-     */
-    public function setColors($colors)
+    public function setColors($colors): self
     {
         $this->colors = $colors;
 
         return $this;
     }
 
-    /**
-     * Get name.
-     *
-     * @return string
-     */
     public function getName(): string
     {
         return $this->name;
     }
 
-    /**
-     * Set name.
-     *
-     * @param string name the value to set
-     */
     public function setName(string $name)
     {
         $this->name = $name;
     }
 
-    /**
-     * Get canSell.
-     *
-     * @return bool canSell
-     */
     public function getCanSell(): bool
     {
         return $this->canSell;
     }
 
-    /**
-     * Set canSell.
-     *
-     * @param bool canSell the value to set
-     */
     public function setCanSell(bool $canSell)
     {
         $this->canSell = $canSell;
     }
 
-    /**
-     * Get availableAt.
-     *
-     * @return \DateTime availableAt
-     */
     public function getAvailableAt(): \DateTime
     {
         return $this->availableAt;
     }
 
-    /**
-     * Set availableAt.
-     *
-     * @param \DateTime availableAt the value to set
-     */
     public function setAvailableAt(\DateTime $availableAt)
     {
         $this->availableAt = $availableAt;

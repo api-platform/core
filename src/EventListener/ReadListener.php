@@ -17,8 +17,9 @@ use ApiPlatform\Core\DataProvider\CollectionDataProviderInterface;
 use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
 use ApiPlatform\Core\DataProvider\OperationDataProviderTrait;
 use ApiPlatform\Core\DataProvider\SubresourceDataProviderInterface;
-use ApiPlatform\Core\Exception\InvalidArgumentException;
+use ApiPlatform\Core\Exception\InvalidIdentifierException;
 use ApiPlatform\Core\Exception\RuntimeException;
+use ApiPlatform\Core\Identifier\IdentifierConverterInterface;
 use ApiPlatform\Core\Serializer\SerializerContextBuilderInterface;
 use ApiPlatform\Core\Util\RequestAttributesExtractor;
 use ApiPlatform\Core\Util\RequestParser;
@@ -37,18 +38,18 @@ final class ReadListener
 
     private $serializerContextBuilder;
 
-    public function __construct(CollectionDataProviderInterface $collectionDataProvider, ItemDataProviderInterface $itemDataProvider, SubresourceDataProviderInterface $subresourceDataProvider = null, SerializerContextBuilderInterface $serializerContextBuilder = null)
+    public function __construct(CollectionDataProviderInterface $collectionDataProvider, ItemDataProviderInterface $itemDataProvider, SubresourceDataProviderInterface $subresourceDataProvider = null, SerializerContextBuilderInterface $serializerContextBuilder = null, IdentifierConverterInterface $identifierConverter = null)
     {
         $this->collectionDataProvider = $collectionDataProvider;
         $this->itemDataProvider = $itemDataProvider;
         $this->subresourceDataProvider = $subresourceDataProvider;
         $this->serializerContextBuilder = $serializerContextBuilder;
+        $this->identifierConverter = $identifierConverter;
     }
 
     /**
      * Calls the data provider and sets the data attribute.
      *
-     * @param GetResponseEvent $event
      *
      * @throws NotFoundHttpException
      */
@@ -82,6 +83,10 @@ final class ReadListener
 
         $data = [];
 
+        if ($this->identifierConverter) {
+            $context[IdentifierConverterInterface::HAS_IDENTIFIER_CONVERTER] = true;
+        }
+
         try {
             $identifiers = $this->extractIdentifiers($request->attributes->all(), $attributes);
 
@@ -95,7 +100,7 @@ final class ReadListener
 
                 $data = $this->getSubresourceData($identifiers, $attributes, $context);
             }
-        } catch (InvalidArgumentException $e) {
+        } catch (InvalidIdentifierException $e) {
             $data = null;
         }
 

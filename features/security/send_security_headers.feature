@@ -21,7 +21,6 @@ Feature: Send security header
     And the header "X-Content-Type-Options" should be equal to "nosniff"
     And the header "X-Frame-Options" should be equal to "deny"
 
-  @dropSchema
   Scenario: Error validation responses must always contain security headers
     When I add "Content-Type" header equal to "application/ld+json"
     And I send a "POST" request to "/dummies" with body:

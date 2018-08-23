@@ -30,6 +30,7 @@ class EmbeddableDummy
      * @var string The dummy name
      *
      * @ORM\Column(nullable=true)
+     * @Groups({"embed"})
      */
     private $dummyName;
 
@@ -84,9 +85,6 @@ class EmbeddableDummy
         return $this->dummyName;
     }
 
-    /**
-     * @param string $dummyName
-     */
     public function setDummyName(string $dummyName)
     {
         $this->dummyName = $dummyName;
@@ -100,9 +98,6 @@ class EmbeddableDummy
         return $this->dummyBoolean;
     }
 
-    /**
-     * @param bool $dummyBoolean
-     */
     public function setDummyBoolean(bool $dummyBoolean)
     {
         $this->dummyBoolean = $dummyBoolean;
@@ -116,9 +111,6 @@ class EmbeddableDummy
         return $this->dummyDate;
     }
 
-    /**
-     * @param \DateTime $dummyDate
-     */
     public function setDummyDate(\DateTime $dummyDate)
     {
         $this->dummyDate = $dummyDate;
@@ -132,9 +124,6 @@ class EmbeddableDummy
         return $this->dummyFloat;
     }
 
-    /**
-     * @param string $dummyFloat
-     */
     public function setDummyFloat(string $dummyFloat)
     {
         $this->dummyFloat = $dummyFloat;
@@ -148,25 +137,16 @@ class EmbeddableDummy
         return $this->dummyPrice;
     }
 
-    /**
-     * @param string $dummyPrice
-     */
     public function setDummyPrice(string $dummyPrice)
     {
         $this->dummyPrice = $dummyPrice;
     }
 
-    /**
-     * @return mixed
-     */
     public function getSymfony()
     {
         return $this->symfony;
     }
 
-    /**
-     * @param mixed $symfony
-     */
     public function setSymfony($symfony)
     {
         $this->symfony = $symfony;

@@ -34,11 +34,13 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\FileConfigDummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Foo;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\FooDummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\FourthLevel;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Greeting;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Node;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Person;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\PersonToPet;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Pet;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Question;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RamseyUuidDummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RelatedDummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RelatedToDummyFriend;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RelationEmbedder;
@@ -111,16 +113,9 @@ final class FeatureContext implements Context, SnippetAcceptingContext
      */
     public function createDatabase()
     {
-        $this->schemaTool->createSchema($this->classes);
-    }
-
-    /**
-     * @AfterScenario @dropSchema
-     */
-    public function dropDatabase()
-    {
         $this->schemaTool->dropSchema($this->classes);
         $this->doctrine->getManager()->clear();
+        $this->schemaTool->createSchema($this->classes);
     }
 
     /**
@@ -218,6 +213,90 @@ final class FeatureContext implements Context, SnippetAcceptingContext
             $dummyProperty->group = $dummyGroup;
 
             $this->manager->persist($dummyGroup);
+            $this->manager->persist($dummyProperty);
+        }
+
+        $this->manager->flush();
+    }
+
+    /**
+     * @Given there are :nb dummy property objects with a shared group
+     */
+    public function thereAreDummyPropertyObjectsWithASharedGroup(int $nb)
+    {
+        $dummyGroup = new DummyGroup();
+        foreach (['foo', 'bar', 'baz'] as $property) {
+            $dummyGroup->$property = ucfirst($property).' #shared';
+        }
+        $this->manager->persist($dummyGroup);
+
+        for ($i = 1; $i <= $nb; ++$i) {
+            $dummyProperty = new DummyProperty();
+
+            foreach (['foo', 'bar', 'baz'] as $property) {
+                $dummyProperty->$property = ucfirst($property).' #'.$i;
+            }
+
+            $dummyProperty->group = $dummyGroup;
+            $this->manager->persist($dummyProperty);
+        }
+
+        $this->manager->flush();
+    }
+
+    /**
+     * @Given there are :nb dummy property objects with different number of related groups
+     */
+    public function thereAreDummyPropertyObjectsWithADifferentNumberRelatedGroups(int $nb)
+    {
+        for ($i = 1; $i <= $nb; ++$i) {
+            $dummyGroup = new DummyGroup();
+            $dummyProperty = new DummyProperty();
+
+            foreach (['foo', 'bar', 'baz'] as $property) {
+                $dummyProperty->$property = $dummyGroup->$property = ucfirst($property).' #'.$i;
+            }
+
+            $this->manager->persist($dummyGroup);
+            $dummyGroups[$i] = $dummyGroup;
+
+            for ($j = 1; $j <= $i; ++$j) {
+                $dummyProperty->groups[] = $dummyGroups[$j];
+            }
+
+            $this->manager->persist($dummyProperty);
+        }
+
+        $this->manager->flush();
+    }
+
+    /**
+     * @Given there are :nb dummy property objects with :nb2 groups
+     */
+    public function thereAreDummyPropertyObjectsWithGroups(int $nb, int $nb2)
+    {
+        for ($i = 1; $i <= $nb; ++$i) {
+            $dummyProperty = new DummyProperty();
+            $dummyGroup = new DummyGroup();
+
+            foreach (['foo', 'bar', 'baz'] as $property) {
+                $dummyProperty->$property = $dummyGroup->$property = ucfirst($property).' #'.$i;
+            }
+
+            $dummyProperty->group = $dummyGroup;
+
+            $this->manager->persist($dummyGroup);
+            for ($j = 1; $j <= $nb2; ++$j) {
+                $dummyGroup = new DummyGroup();
+
+                foreach (['foo', 'bar', 'baz'] as $property) {
+                    $dummyGroup->$property = ucfirst($property).' #'.$i.$j;
+                }
+
+                $dummyProperty->groups[] = $dummyGroup;
+                $this->manager->persist($dummyGroup);
+            }
+
             $this->manager->persist($dummyProperty);
         }
 
@@ -386,9 +465,9 @@ final class FeatureContext implements Context, SnippetAcceptingContext
     {
         $descriptions = ['Smart dummy.', 'Not so smart dummy.'];
 
-        if (in_array($bool, ['true', '1', 1], true)) {
+        if (\in_array($bool, ['true', '1', 1], true)) {
             $bool = true;
-        } elseif (in_array($bool, ['false', '0', 0], true)) {
+        } elseif (\in_array($bool, ['false', '0', 0], true)) {
             $bool = false;
         } else {
             $expected = ['true', 'false', '1', '0'];
@@ -496,9 +575,9 @@ final class FeatureContext implements Context, SnippetAcceptingContext
      */
     public function thereAreDummyObjectsWithDummyBoolean(int $nb, string $bool)
     {
-        if (in_array($bool, ['true', '1', 1], true)) {
+        if (\in_array($bool, ['true', '1', 1], true)) {
             $bool = true;
-        } elseif (in_array($bool, ['false', '0', 0], true)) {
+        } elseif (\in_array($bool, ['false', '0', 0], true)) {
             $bool = false;
         } else {
             $expected = ['true', 'false', '1', '0'];
@@ -524,9 +603,9 @@ final class FeatureContext implements Context, SnippetAcceptingContext
      */
     public function thereAreDummyObjectsWithEmbeddedDummyBoolean(int $nb, string $bool)
     {
-        if (in_array($bool, ['true', '1', 1], true)) {
+        if (\in_array($bool, ['true', '1', 1], true)) {
             $bool = true;
-        } elseif (in_array($bool, ['false', '0', 0], true)) {
+        } elseif (\in_array($bool, ['false', '0', 0], true)) {
             $bool = false;
         } else {
             $expected = ['true', 'false', '1', '0'];
@@ -551,9 +630,9 @@ final class FeatureContext implements Context, SnippetAcceptingContext
      */
     public function thereAreDummyObjectsWithRelationEmbeddedDummyBoolean(int $nb, string $bool)
     {
-        if (in_array($bool, ['true', '1', 1], true)) {
+        if (\in_array($bool, ['true', '1', 1], true)) {
             $bool = true;
-        } elseif (in_array($bool, ['false', '0', 0], true)) {
+        } elseif (\in_array($bool, ['false', '0', 0], true)) {
             $bool = false;
         } else {
             $expected = ['true', 'false', '1', '0'];
@@ -739,6 +818,7 @@ final class FeatureContext implements Context, SnippetAcceptingContext
         $relatedDummy2->setName('RelatedDummy without friends');
         $this->manager->persist($relatedDummy2);
         $this->manager->flush();
+        $this->manager->clear();
     }
 
     /**
@@ -758,6 +838,7 @@ final class FeatureContext implements Context, SnippetAcceptingContext
         $this->manager->persist($question);
 
         $this->manager->flush();
+        $this->manager->clear();
     }
 
     /**
@@ -880,6 +961,18 @@ final class FeatureContext implements Context, SnippetAcceptingContext
     }
 
     /**
+     * @Given there is a ramsey identified resource with uuid :uuid
+     */
+    public function thereIsARamseyIdentifiedResource(string $uuid)
+    {
+        $dummy = new RamseyUuidDummy();
+        $dummy->setId($uuid);
+
+        $this->manager->persist($dummy);
+        $this->manager->flush();
+    }
+
+    /**
      * @Given there is a dummy object with a fourth level relation
      */
     public function thereIsADummyObjectWithAFourthLevelRelation()
@@ -911,5 +1004,24 @@ final class FeatureContext implements Context, SnippetAcceptingContext
         $this->manager->persist($dummy);
 
         $this->manager->flush();
+    }
+
+    /**
+     * @Given there is a person named :name greeting with a :message message
+     */
+    public function thereIsAPersonWithAGreeting(string $name, string $message)
+    {
+        $person = new Person();
+        $person->name = $name;
+
+        $greeting = new Greeting();
+        $greeting->message = $message;
+        $greeting->sender = $person;
+
+        $this->manager->persist($person);
+        $this->manager->persist($greeting);
+
+        $this->manager->flush();
+        $this->manager->clear();
     }
 }

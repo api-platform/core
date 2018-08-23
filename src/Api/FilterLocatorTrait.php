@@ -31,7 +31,6 @@ trait FilterLocatorTrait
      * Sets a filter locator with a backward compatibility.
      *
      * @param ContainerInterface|FilterCollection|null $filterLocator
-     * @param bool                                     $allowNull
      */
     private function setFilterLocator($filterLocator = null, bool $allowNull = false)
     {
@@ -49,7 +48,6 @@ trait FilterLocatorTrait
     /**
      * Gets a filter with a backward compatibility.
      *
-     * @param string $filterId
      *
      * @return FilterInterface|null
      */
@@ -62,5 +60,7 @@ trait FilterLocatorTrait
         if ($this->filterLocator instanceof FilterCollection && $this->filterLocator->offsetExists($filterId)) {
             return $this->filterLocator->offsetGet($filterId);
         }
+
+        return null;
     }
 }

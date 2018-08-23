@@ -101,10 +101,8 @@ final class FilterEagerLoadingExtension implements ContextAwareQueryCollectionEx
     /**
      * Returns a clone of the given query builder where everything gets re-aliased.
      *
-     * @param QueryBuilder                $queryBuilder
-     * @param QueryNameGeneratorInterface $queryNameGenerator
-     * @param string                      $originAlias        the base alias
-     * @param string                      $replacement        the replacement for the base alias, will change the from alias
+     * @param string $originAlias the base alias
+     * @param string $replacement the replacement for the base alias, will change the from alias
      *
      * @return QueryBuilder
      */
@@ -135,6 +133,9 @@ final class FilterEagerLoadingExtension implements ContextAwareQueryCollectionEx
             /** @var Join $joinPart */
             $joinString = str_replace($aliases, $replacements, $joinPart->getJoin());
             $pos = strpos($joinString, '.');
+            if (false === $pos) {
+                continue;
+            }
             $alias = substr($joinString, 0, $pos);
             $association = substr($joinString, $pos + 1);
             $condition = str_replace($aliases, $replacements, $joinPart->getCondition());

@@ -35,23 +35,43 @@ final class TransformFieldsetsParametersListener
     {
         $request = $event->getRequest();
 
+        $includeParameter = $request->query->get('include');
         if (
             'jsonapi' !== $request->getRequestFormat() ||
             !($resourceClass = $request->attributes->get('_api_resource_class')) ||
-            !($fieldsParameter = $request->query->get('fields')) ||
-            !\is_array($fieldsParameter)
+            (!($fieldsParameter = $request->query->get('fields')) && !$includeParameter)
         ) {
             return;
         }
 
-        $resourceShortName = $this->resourceMetadataFactory->create($resourceClass)->getShortName();
+        if (
+            ($fieldsParameter && !\is_array($fieldsParameter)) ||
+            ($includeParameter && !\is_string($includeParameter))
+        ) {
+            return;
+        }
+
         $properties = [];
+
+        $includeParameter = explode(',', $includeParameter ?? '');
+
+        if (!$fieldsParameter) {
+            $request->attributes->set('_api_included', $includeParameter);
+
+            return;
+        }
+
+        $resourceShortName = $this->resourceMetadataFactory->create($resourceClass)->getShortName();
 
         foreach ($fieldsParameter as $resourceType => $fields) {
             $fields = explode(',', $fields);
 
             if ($resourceShortName === $resourceType) {
                 $properties = array_merge($properties, $fields);
+            } elseif (\in_array($resourceType, $includeParameter, true)) {
+                $properties[$resourceType] = $fields;
+
+                $request->attributes->set('_api_included', array_merge($request->attributes->get('_api_included', []), [$resourceType]));
             } else {
                 $properties[$resourceType] = $fields;
             }

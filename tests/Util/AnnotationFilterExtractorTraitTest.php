@@ -42,30 +42,30 @@ class AnnotationFilterExtractorTraitTest extends KernelTestCase
         $services = [];
 
         $this->assertEquals($this->extractor->getFilters($reflectionClass), [
-          'annotated_api_platform_core_tests_fixtures_test_bundle_entity_dummy_car_api_platform_core_bridge_doctrine_orm_filter_date_filter' => [
-            ['properties' => ['id' => 'exclude_null', 'colors' => 'exclude_null', 'name' => 'exclude_null', 'canSell' => 'exclude_null', 'availableAt' => 'exclude_null']],
-            DateFilter::class,
-          ],
-          'annotated_api_platform_core_tests_fixtures_test_bundle_entity_dummy_car_api_platform_core_bridge_doctrine_orm_filter_boolean_filter' => [
-            [],
-            BooleanFilter::class,
-          ],
-          'annotated_api_platform_core_tests_fixtures_test_bundle_entity_dummy_car_api_platform_core_bridge_doctrine_orm_filter_search_filter' => [
-            ['properties' => ['name' => 'partial', 'colors.prop' => 'ipartial']],
-            SearchFilter::class,
-          ],
-          'annotated_api_platform_core_tests_fixtures_test_bundle_entity_dummy_car_api_platform_core_serializer_filter_property_filter' => [
-            ['parameterName' => 'foobar'],
-            PropertyFilter::class,
-          ],
-          'annotated_api_platform_core_tests_fixtures_test_bundle_entity_dummy_car_api_platform_core_serializer_filter_group_filter' => [
-            ['parameterName' => 'foobargroups'],
-            GroupFilter::class,
-          ],
-          'annotated_api_platform_core_tests_fixtures_test_bundle_entity_dummy_car_api_platform_core_serializer_filter_group_filter_override' => [
-            ['parameterName' => 'foobargroups_override'],
-            GroupFilter::class,
-          ],
+            'annotated_api_platform_core_tests_fixtures_test_bundle_entity_dummy_car_api_platform_core_bridge_doctrine_orm_filter_date_filter' => [
+                ['properties' => ['id' => 'exclude_null', 'colors' => 'exclude_null', 'name' => 'exclude_null', 'canSell' => 'exclude_null', 'availableAt' => 'exclude_null']],
+                DateFilter::class,
+            ],
+            'annotated_api_platform_core_tests_fixtures_test_bundle_entity_dummy_car_api_platform_core_bridge_doctrine_orm_filter_boolean_filter' => [
+                [],
+                BooleanFilter::class,
+            ],
+            'annotated_api_platform_core_tests_fixtures_test_bundle_entity_dummy_car_api_platform_core_bridge_doctrine_orm_filter_search_filter' => [
+                ['properties' => ['name' => 'partial', 'colors.prop' => 'ipartial']],
+                SearchFilter::class,
+            ],
+            'annotated_api_platform_core_tests_fixtures_test_bundle_entity_dummy_car_api_platform_core_serializer_filter_property_filter' => [
+                ['parameterName' => 'foobar'],
+                PropertyFilter::class,
+            ],
+            'annotated_api_platform_core_tests_fixtures_test_bundle_entity_dummy_car_api_platform_core_serializer_filter_group_filter' => [
+                ['parameterName' => 'foobargroups'],
+                GroupFilter::class,
+            ],
+            'annotated_api_platform_core_tests_fixtures_test_bundle_entity_dummy_car_api_platform_core_serializer_filter_group_filter_override' => [
+                ['parameterName' => 'foobargroups_override'],
+                GroupFilter::class,
+            ],
         ]);
     }
 

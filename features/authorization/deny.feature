@@ -65,7 +65,6 @@ Feature: Authorization checking
     Then the response status code should be 403
     And the response should be in JSON
 
-  @dropSchema
   Scenario: An user can retrieve an item he owns
     When I add "Accept" header equal to "application/ld+json"
     And I add "Authorization" header equal to "Basic ZHVuZ2xhczprZXZpbg=="

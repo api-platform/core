@@ -78,9 +78,22 @@ Feature: Documentation support
     And the JSON node "paths./related_dummies/{id}/related_to_dummy_friends.get.parameters[3].required" should be false
     And the JSON node "paths./related_dummies/{id}/related_to_dummy_friends.get.parameters[3].type" should be equal to "integer"
     And the JSON node "paths./related_dummies/{id}/related_to_dummy_friends.get.parameters" should have 4 element
+    #And the JSON node "paths./related_dummies/{id}/related_to_dummy_friends.get.parameters[2].name" should be equal to "description"
+    #And the JSON node "paths./related_dummies/{id}/related_to_dummy_friends.get.parameters[2].in" should be equal to "query"
+    #And the JSON node "paths./related_dummies/{id}/related_to_dummy_friends.get.parameters[2].required" should be false
+    #And the JSON node "paths./related_dummies/{id}/related_to_dummy_friends.get.parameters[2].type" should be equal to "string"
 
     # Subcollection - check schema
     And the JSON node "paths./related_dummies/{id}/related_to_dummy_friends.get.responses.200.schema.items.$ref" should be equal to "#/definitions/RelatedToDummyFriend-fakemanytomany"
+
+    # Deprecations
+    And the JSON node "paths./dummies.get.deprecated" should not exist
+    And the JSON node "paths./deprecated_resources.get.deprecated" should be true
+    And the JSON node "paths./deprecated_resources.post.deprecated" should be true
+    And the JSON node "paths./deprecated_resources/{id}.get.deprecated" should be true
+    And the JSON node "paths./deprecated_resources/{id}.delete.deprecated" should be true
+    And the JSON node "paths./deprecated_resources/{id}.put.deprecated" should be true
+    And the JSON node "paths./deprecated_resources/{id}.patch.deprecated" should be true
 
   Scenario: Swagger UI is enabled for docs endpoint
     Given I add "Accept" header equal to "text/html"
@@ -88,7 +101,6 @@ Feature: Documentation support
     Then the response status code should be 200
     And I should see text matching "My Dummy API"
 
-  @dropSchema
   Scenario: Swagger UI is enabled for an arbitrary endpoint
     Given I add "Accept" header equal to "text/html"
     And I send a "GET" request to "/dummies"

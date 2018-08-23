@@ -35,8 +35,6 @@ final class EventListener
 
     /**
      * Persists, updates or delete data return by the controller if applicable.
-     *
-     * @param GetResponseForControllerResultEvent $event
      */
     public function onKernelView(GetResponseForControllerResultEvent $event)
     {
@@ -50,14 +48,11 @@ final class EventListener
             return;
         }
 
-        switch ($request->getMethod()) {
-            case 'DELETE':
-                $this->userManager->deleteUser($user);
-                $event->setControllerResult(null);
-                break;
-            default:
-                $this->userManager->updateUser($user);
-                break;
+        if ('DELETE' === $request->getMethod()) {
+            $this->userManager->deleteUser($user);
+            $event->setControllerResult(null);
+        } else {
+            $this->userManager->updateUser($user);
         }
     }
 }

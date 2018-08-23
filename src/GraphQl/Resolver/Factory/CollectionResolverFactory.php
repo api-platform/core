@@ -28,7 +28,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 /**
- * Creates a function retrieving a collection to resolve a GraphQL query.
+ * Creates a function retrieving a collection to resolve a GraphQL query or a field returned by a mutation.
  *
  * @experimental
  *
@@ -62,7 +62,11 @@ final class CollectionResolverFactory implements ResolverFactoryInterface
 
     public function __invoke(string $resourceClass = null, string $rootClass = null, string $operationName = null): callable
     {
-        return function ($source, $args, $context, ResolveInfo $info) use ($resourceClass, $rootClass) {
+        return function ($source, $args, $context, ResolveInfo $info) use ($resourceClass, $rootClass, $operationName) {
+            if (null === $resourceClass) {
+                return null;
+            }
+
             if ($this->requestStack && null !== $request = $this->requestStack->getCurrentRequest()) {
                 $request->attributes->set(
                     '_graphql_collections_args',
@@ -71,11 +75,11 @@ final class CollectionResolverFactory implements ResolverFactoryInterface
             }
 
             $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
-            $dataProviderContext = $resourceMetadata->getGraphqlAttribute('query', 'normalization_context', [], true);
+            $dataProviderContext = $resourceMetadata->getGraphqlAttribute($operationName ?? 'query', 'normalization_context', [], true);
             $dataProviderContext['attributes'] = $this->fieldsToAttributes($info);
             $dataProviderContext['filters'] = $this->getNormalizedFilters($args);
 
-            if (isset($source[$rootProperty = $info->fieldName], $source[ItemNormalizer::ITEM_KEY])) {
+            if (isset($rootClass, $source[$rootProperty = $info->fieldName], $source[ItemNormalizer::ITEM_KEY])) {
                 $rootResolvedFields = $this->identifiersExtractor->getIdentifiersFromItem(unserialize($source[ItemNormalizer::ITEM_KEY]));
                 $subresource = $this->getSubresource($rootClass, $rootResolvedFields, array_keys($rootResolvedFields), $rootProperty, $resourceClass, true, $dataProviderContext);
                 $collection = $subresource ?? [];
@@ -83,7 +87,7 @@ final class CollectionResolverFactory implements ResolverFactoryInterface
                 $collection = $this->collectionDataProvider->getCollection($resourceClass, null, $dataProviderContext);
             }
 
-            $this->canAccess($this->resourceAccessChecker, $resourceMetadata, $resourceClass, $info, $collection, 'query');
+            $this->canAccess($this->resourceAccessChecker, $resourceMetadata, $resourceClass, $info, $collection, $operationName ?? 'query');
 
             if (!$this->paginationEnabled) {
                 $data = [];
@@ -103,10 +107,11 @@ final class CollectionResolverFactory implements ResolverFactoryInterface
                 $offset = 1 + (int) $after;
             }
 
-            $data = ['edges' => [], 'pageInfo' => ['endCursor' => null, 'hasNextPage' => false]];
+            $data = ['totalCount' => 0.0, 'edges' => [], 'pageInfo' => ['endCursor' => null, 'hasNextPage' => false]];
             if ($collection instanceof PaginatorInterface && ($totalItems = $collection->getTotalItems()) > 0) {
                 $data['pageInfo']['endCursor'] = base64_encode((string) ($totalItems - 1));
                 $data['pageInfo']['hasNextPage'] = $collection->getCurrentPage() !== $collection->getLastPage() && (float) $collection->count() === $collection->getItemsPerPage();
+                $data['totalCount'] = $totalItems;
             }
 
             foreach ($collection as $index => $object) {
@@ -157,13 +162,16 @@ final class CollectionResolverFactory implements ResolverFactoryInterface
     private function getNormalizedFilters(array $args): array
     {
         $filters = $args;
+
         foreach ($filters as $name => $value) {
             if (\is_array($value)) {
+                if (strpos($name, '_list')) {
+                    $name = substr($name, 0, \strlen($name) - \strlen('_list'));
+                }
                 $filters[$name] = $this->getNormalizedFilters($value);
-                continue;
             }
 
-            if (strpos($name, '_')) {
+            if (\is_string($name) && strpos($name, '_')) {
                 // Gives a chance to relations/nested fields.
                 $filters[str_replace('_', '.', $name)] = $value;
             }

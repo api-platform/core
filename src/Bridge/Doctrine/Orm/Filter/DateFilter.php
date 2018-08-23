@@ -33,6 +33,7 @@ class DateFilter extends AbstractContextAwareFilter
     const EXCLUDE_NULL = 'exclude_null';
     const INCLUDE_NULL_BEFORE = 'include_null_before';
     const INCLUDE_NULL_AFTER = 'include_null_after';
+    const INCLUDE_NULL_BEFORE_AND_AFTER = 'include_null_before_and_after';
     const DOCTRINE_DATE_TYPES = [
         'date' => true,
         'datetime' => true,
@@ -155,14 +156,7 @@ class DateFilter extends AbstractContextAwareFilter
     /**
      * Adds the where clause according to the chosen null management.
      *
-     * @param QueryBuilder                $queryBuilder
-     * @param QueryNameGeneratorInterface $queryNameGenerator
-     * @param string                      $alias
-     * @param string                      $field
-     * @param string                      $operator
-     * @param string                      $value
-     * @param string|null                 $nullManagement
-     * @param string|Type                 $type
+     * @param string|Type $type
      */
     protected function addWhere(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $alias, string $field, string $operator, string $value, string $nullManagement = null, $type = null)
     {
@@ -171,8 +165,8 @@ class DateFilter extends AbstractContextAwareFilter
         } catch (\Exception $e) {
             // Silently ignore this filter if it can not be transformed to a \DateTime
             $this->logger->notice('Invalid filter ignored', [
-              'exception' => new InvalidArgumentException(sprintf('The field "%s" has a wrong date format. Use one accepted by the \DateTime constructor', $field)),
-          ]);
+                'exception' => new InvalidArgumentException(sprintf('The field "%s" has a wrong date format. Use one accepted by the \DateTime constructor', $field)),
+            ]);
 
             return;
         }
@@ -189,8 +183,9 @@ class DateFilter extends AbstractContextAwareFilter
         if (null === $nullManagement || self::EXCLUDE_NULL === $nullManagement) {
             $queryBuilder->andWhere($baseWhere);
         } elseif (
-            (\in_array($operator, [self::PARAMETER_BEFORE, self::PARAMETER_STRICTLY_BEFORE], true) && self::INCLUDE_NULL_BEFORE === $nullManagement) ||
-            (\in_array($operator, [self::PARAMETER_AFTER, self::PARAMETER_STRICTLY_AFTER], true) && self::INCLUDE_NULL_AFTER === $nullManagement)
+            (self::INCLUDE_NULL_BEFORE === $nullManagement && \in_array($operator, [self::PARAMETER_BEFORE, self::PARAMETER_STRICTLY_BEFORE], true)) ||
+            (self::INCLUDE_NULL_AFTER === $nullManagement && \in_array($operator, [self::PARAMETER_AFTER, self::PARAMETER_STRICTLY_AFTER], true)) ||
+            (self::INCLUDE_NULL_BEFORE_AND_AFTER === $nullManagement && \in_array($operator, [self::PARAMETER_AFTER, self::PARAMETER_STRICTLY_AFTER, self::PARAMETER_BEFORE, self::PARAMETER_STRICTLY_BEFORE], true))
         ) {
             $queryBuilder->andWhere($queryBuilder->expr()->orX(
                 $baseWhere,
@@ -208,11 +203,6 @@ class DateFilter extends AbstractContextAwareFilter
 
     /**
      * Determines whether the given property refers to a date field.
-     *
-     * @param string $property
-     * @param string $resourceClass
-     *
-     * @return bool
      */
     protected function isDateField(string $property, string $resourceClass): bool
     {
@@ -221,11 +211,6 @@ class DateFilter extends AbstractContextAwareFilter
 
     /**
      * Gets filter description.
-     *
-     * @param string $property
-     * @param string $period
-     *
-     * @return array
      */
     protected function getFilterDescription(string $property, string $period): array
     {

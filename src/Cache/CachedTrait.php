@@ -33,26 +33,18 @@ trait CachedTrait
 
         try {
             $cacheItem = $this->cacheItemPool->getItem($cacheKey);
-
-            if ($cacheItem->isHit()) {
-                return $this->localCache[$cacheKey] = $cacheItem->get();
-            }
         } catch (CacheException $e) {
-            //do nothing
+            return $this->localCache[$cacheKey] = $getValue();
+        }
+
+        if ($cacheItem->isHit()) {
+            return $this->localCache[$cacheKey] = $cacheItem->get();
         }
 
         $value = $getValue();
 
-        if (!isset($cacheItem)) {
-            return $this->localCache[$cacheKey] = $value;
-        }
-
-        try {
-            $cacheItem->set($value);
-            $this->cacheItemPool->save($cacheItem);
-        } catch (CacheException $e) {
-            // do nothing
-        }
+        $cacheItem->set($value);
+        $this->cacheItemPool->save($cacheItem);
 
         return $this->localCache[$cacheKey] = $value;
     }

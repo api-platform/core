@@ -13,7 +13,7 @@
         }
     ],
     "require": {
-        "php": ">=7.0",
+        "php": ">=7.1",
 
         "doctrine/inflector": "^1.0",
         "psr/cache": "^1.0",
@@ -22,20 +22,22 @@
         "symfony/http-kernel": "^2.7 || ^3.0 || ^4.0",
         "symfony/property-access": "^2.7 || ^3.0 || ^4.0",
         "symfony/property-info": "^3.3.11 || ^4.0",
-        "symfony/serializer": "^3.1 || ^4.0",
+        "symfony/serializer": "^4.1",
         "willdurand/negotiation": "^2.0.3"
     },
     "require-dev": {
+        "symfony/http-foundation": "^3.1@dev || ^4.0@dev",
+
         "behat/behat": "^3.1",
         "behat/mink": "^1.7",
         "behat/mink-browserkit-driver": "^1.3.1",
         "behat/mink-extension": "^2.2",
         "behat/symfony2-extension": "^2.1.1",
-        "behatch/contexts": "^3.1",
+        "behatch/contexts": "3.1.0",
         "doctrine/annotations": "^1.2",
-        "doctrine/doctrine-bundle": "^1.6.3",
+        "doctrine/doctrine-bundle": "^1.8",
         "doctrine/orm": "^2.5.2",
-        "friendsofsymfony/user-bundle": "^2.0",
+        "friendsofsymfony/user-bundle": "^2.1",
         "guzzlehttp/guzzle": "^6.0",
         "justinrainbow/json-schema": "^5.0",
         "nelmio/api-doc-bundle": "^2.13.3",
@@ -44,15 +46,16 @@
         "phpdocumentor/type-resolver": "^0.2.1 || ^0.3 || 0.4",
         "phpunit/phpunit": "^6.1",
         "psr/log": "^1.0",
-        "sensio/framework-extra-bundle": "^3.0.11 || ^4.0",
+        "ramsey/uuid": "^3.7",
+        "ramsey/uuid-doctrine": "^1.4",
         "symfony/asset": "^3.3 || ^4.0",
         "symfony/cache": "^3.3 || ^4.0",
-        "symfony/config": "^3.3 || ^4.0",
-        "symfony/console": "^3.3 || ^4.0",
+        "symfony/config": "^3.4 || ^4.0",
+        "symfony/console": "^3.4 || ^4.0",
         "symfony/debug": "^2.8 || ^3.0 || ^4.0",
-        "symfony/dependency-injection": "^3.3 || ^4.0",
+        "symfony/dependency-injection": "^3.4 || ^4.0",
         "symfony/doctrine-bridge": "^2.8.12 || ^3.0 || ^4.0",
-        "symfony/event-dispatcher": "^3.3 || ^4.0",
+        "symfony/event-dispatcher": "^3.4 || ^4.0",
         "symfony/expression-language": "^2.8 || ^3.0 || ^4.0",
         "symfony/finder": "^3.3 || ^4.0",
         "symfony/form": "^3.3 || ^4.0",
@@ -60,25 +63,28 @@
         "symfony/phpunit-bridge": "^3.3 || ^4.0",
         "symfony/routing": "^3.3 || ^4.0",
         "symfony/security": "^3.0 || ^4.0",
-        "symfony/security-bundle": "^3.0 || ^4.0",
-        "symfony/twig-bundle": "^3.1 || ^4.0",
+        "symfony/security-bundle": "^3.4 || ^4.0",
+        "symfony/twig-bundle": "^3.4 || ^4.0",
         "symfony/validator": "^3.3 || ^4.0",
+        "symfony/web-profiler-bundle": "^3.3 || ^4.0",
         "symfony/yaml": "^3.3 || ^4.0",
-        "webonyx/graphql-php": "^0.11.5"
+        "webonyx/graphql-php": ">=0.12 <1.0"
     },
     "conflict": {
-        "symfony/dependency-injection": "<3.3"
+        "symfony/dependency-injection": "<3.4"
     },
     "suggest": {
         "friendsofsymfony/user-bundle": "To use the FOSUserBundle bridge.",
         "guzzlehttp/guzzle": "To use the HTTP cache invalidation system.",
         "phpdocumentor/reflection-docblock": "To support extracting metadata from PHPDoc.",
         "psr/cache-implementation": "To use metadata caching.",
+        "ramsey/uuid": "To support Ramsey's UUID identifiers.",
         "symfony/cache": "To have metadata caching when using Symfony integration.",
         "symfony/config": "To load XML configuration files.",
         "symfony/expression-language": "To use authorization features.",
         "symfony/security": "To use authorization features.",
         "symfony/twig-bundle": "To use the Swagger UI integration.",
+        "symfony/web-profiler-bundle": "To use the data collector.",
         "webonyx/graphql-php": "To support GraphQL."
     },
     "autoload": {
@@ -89,7 +95,7 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "2.2.x-dev"
+            "dev-master": "2.3.x-dev"
         }
     },
     "config": {

@@ -56,7 +56,8 @@ class DataPersisterTest extends TestCase
         $managerRegistryProphecy = $this->prophesize(ManagerRegistry::class);
         $managerRegistryProphecy->getManagerForClass(Dummy::class)->willReturn($objectManagerProphecy->reveal())->shouldBeCalled();
 
-        (new DataPersister($managerRegistryProphecy->reveal()))->persist($dummy);
+        $result = (new DataPersister($managerRegistryProphecy->reveal()))->persist($dummy);
+        $this->assertSame($dummy, $result);
     }
 
     public function testPersistIfEntityAlreadyManaged()
@@ -72,15 +73,19 @@ class DataPersisterTest extends TestCase
         $managerRegistryProphecy = $this->prophesize(ManagerRegistry::class);
         $managerRegistryProphecy->getManagerForClass(Dummy::class)->willReturn($objectManagerProphecy->reveal())->shouldBeCalled();
 
-        (new DataPersister($managerRegistryProphecy->reveal()))->persist($dummy);
+        $result = (new DataPersister($managerRegistryProphecy->reveal()))->persist($dummy);
+        $this->assertSame($dummy, $result);
     }
 
     public function testPersistWithNullManager()
     {
+        $dummy = new Dummy();
+
         $managerRegistryProphecy = $this->prophesize(ManagerRegistry::class);
         $managerRegistryProphecy->getManagerForClass(Dummy::class)->willReturn(null)->shouldBeCalled();
 
-        (new DataPersister($managerRegistryProphecy->reveal()))->persist(new Dummy());
+        $result = (new DataPersister($managerRegistryProphecy->reveal()))->persist($dummy);
+        $this->assertSame($dummy, $result);
     }
 
     public function testRemove()

@@ -302,6 +302,7 @@ SQL;
     {
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create(CompositeRelation::class)->willReturn(new ResourceMetadata(CompositeRelation::class));
+        $resourceMetadataFactoryProphecy->create(DummyCar::class)->willReturn(new ResourceMetadata(DummyCar::class));
 
         $classMetadata = new ClassMetadataInfo(CompositeRelation::class);
         $classMetadata->isIdentifierComposite = true;
@@ -322,6 +323,7 @@ SQL;
             ->innerJoin('o.compositeItem', 'item')
             ->innerJoin('o.compositeLabel', 'label')
             ->leftJoin('o.foo', 'foo', 'WITH', 'o.bar = item.foo')
+            ->leftJoin(DummyCar::class, 'car', 'WITH', 'car.id = o.car')
             ->where('item.field1 = :foo')
             ->setParameter('foo', 1);
 
@@ -331,16 +333,18 @@ SQL;
         $queryNameGenerator->generateJoinAlias('o')->shouldBeCalled()->willReturn('o_2');
 
         $queryNameGenerator->generateJoinAlias('foo')->shouldBeCalled()->willReturn('foo_2');
+        $queryNameGenerator->generateJoinAlias(DummyCar::class)->shouldNotBeCalled();
 
         $filterEagerLoadingExtension = new FilterEagerLoadingExtension($resourceMetadataFactoryProphecy->reveal(), false);
         $filterEagerLoadingExtension->applyToCollection($qb, $queryNameGenerator->reveal(), CompositeRelation::class, 'get');
 
-        $expected = <<<SQL
+        $expected = <<<DQL
 SELECT o
 FROM ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\CompositeRelation o
 INNER JOIN o.compositeItem item
 INNER JOIN o.compositeLabel label
 LEFT JOIN o.foo foo WITH o.bar = item.foo
+LEFT JOIN ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyCar car WITH car.id = o.car
 WHERE o.item IN(
     SELECT IDENTITY(o_2.item) FROM ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\CompositeRelation o_2
     INNER JOIN o_2.compositeItem item_2
@@ -354,7 +358,7 @@ WHERE o.item IN(
     LEFT JOIN o_2.foo foo_2 WITH o_2.bar = item_2.foo
     WHERE item_2.field1 = :foo
 )
-SQL;
+DQL;
 
         $this->assertEquals($this->toDQLString($expected), $qb->getDQL());
     }

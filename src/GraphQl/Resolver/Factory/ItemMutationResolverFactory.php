@@ -64,11 +64,15 @@ final class ItemMutationResolverFactory implements ResolverFactoryInterface
     public function __invoke(string $resourceClass = null, string $rootClass = null, string $operationName = null): callable
     {
         return function ($root, $args, $context, ResolveInfo $info) use ($resourceClass, $operationName) {
+            if (null === $resourceClass) {
+                return null;
+            }
+
             $data = ['clientMutationId' => $args['input']['clientMutationId'] ?? null];
             $item = null;
 
             $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
-            $normalizationContext = $resourceMetadata->getGraphqlAttribute($operationName, 'normalization_context', [], true);
+            $normalizationContext = $resourceMetadata->getGraphqlAttribute($operationName ?? '', 'normalization_context', [], true);
             $normalizationContext['attributes'] = $info->getFieldSelection(PHP_INT_MAX);
 
             if (isset($args['input']['id'])) {
@@ -86,11 +90,16 @@ final class ItemMutationResolverFactory implements ResolverFactoryInterface
                 case 'create':
                 case 'update':
                     $context = null === $item ? ['resource_class' => $resourceClass] : ['resource_class' => $resourceClass, 'object_to_populate' => $item];
+                    $context += $resourceMetadata->getGraphqlAttribute($operationName, 'denormalization_context', [], true);
                     $item = $this->normalizer->denormalize($args['input'], $resourceClass, ItemNormalizer::FORMAT, $context);
                     $this->validate($item, $info, $resourceMetadata, $operationName);
-                    $this->dataPersister->persist($item);
+                    $persistResult = $this->dataPersister->persist($item);
 
-                    return $this->normalizer->normalize($item, ItemNormalizer::FORMAT, $normalizationContext) + $data;
+                    if (null === $persistResult) {
+                        @trigger_error(sprintf('Returning void from %s::persist() is deprecated since API Platform 2.3 and will not be supported in API Platform 3, an object should always be returned.', DataPersisterInterface::class), E_USER_DEPRECATED);
+                    }
+
+                    return $this->normalizer->normalize($persistResult ?? $item, ItemNormalizer::FORMAT, $normalizationContext) + $data;
                 case 'delete':
                     if ($item) {
                         $this->dataPersister->remove($item);

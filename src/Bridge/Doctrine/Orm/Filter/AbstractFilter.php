@@ -79,10 +79,6 @@ abstract class AbstractFilter implements FilterInterface
 
     /**
      * Gets class metadata for the given resource.
-     *
-     * @param string $resourceClass
-     *
-     * @return ClassMetadata
      */
     protected function getClassMetadata(string $resourceClass): ClassMetadata
     {
@@ -94,10 +90,6 @@ abstract class AbstractFilter implements FilterInterface
 
     /**
      * Determines whether the given property is enabled.
-     *
-     * @param string $property
-     *
-     * @return bool
      */
     protected function isPropertyEnabled(string $property/*, string $resourceClass*/): bool
     {
@@ -123,12 +115,6 @@ abstract class AbstractFilter implements FilterInterface
 
     /**
      * Determines whether the given property is mapped.
-     *
-     * @param string $property
-     * @param string $resourceClass
-     * @param bool   $allowAssociation
-     *
-     * @return bool
      */
     protected function isPropertyMapped(string $property, string $resourceClass, bool $allowAssociation = false): bool
     {
@@ -145,10 +131,6 @@ abstract class AbstractFilter implements FilterInterface
 
     /**
      * Determines whether the given property is nested.
-     *
-     * @param string $property
-     *
-     * @return bool
      */
     protected function isPropertyNested(string $property/*, string $resourceClass*/): bool
     {
@@ -164,7 +146,8 @@ abstract class AbstractFilter implements FilterInterface
             $resourceClass = null;
         }
 
-        if (false === $pos = strpos($property, '.')) {
+        $pos = strpos($property, '.');
+        if (false === $pos) {
             return false;
         }
 
@@ -173,11 +156,6 @@ abstract class AbstractFilter implements FilterInterface
 
     /**
      * Determines whether the given property is embedded.
-     *
-     * @param string $property
-     * @param string $resourceClass
-     *
-     * @return bool
      */
     protected function isPropertyEmbedded(string $property, string $resourceClass): bool
     {
@@ -187,10 +165,7 @@ abstract class AbstractFilter implements FilterInterface
     /**
      * Gets nested class metadata for the given resource.
      *
-     * @param string   $resourceClass
      * @param string[] $associations
-     *
-     * @return ClassMetadata
      */
     protected function getNestedMetadata(string $resourceClass, array $associations): ClassMetadata
     {
@@ -216,13 +191,10 @@ abstract class AbstractFilter implements FilterInterface
      * Returns an array with the following keys:
      *   - associations: array of associations according to nesting order
      *   - field: string holding the actual field (leaf node)
-     *
-     * @param string $property
-     *
-     * @return array
      */
     protected function splitPropertyParts(string $property/*, string $resourceClass*/): array
     {
+        $resourceClass = null;
         $parts = explode('.', $property);
 
         if (\func_num_args() > 1) {
@@ -236,7 +208,7 @@ abstract class AbstractFilter implements FilterInterface
             }
         }
 
-        if (!isset($resourceClass)) {
+        if (null === $resourceClass) {
             return [
                 'associations' => \array_slice($parts, 0, -1),
                 'field' => end($parts),
@@ -290,10 +262,6 @@ abstract class AbstractFilter implements FilterInterface
     /**
      * Adds the necessary joins for a nested property.
      *
-     * @param string                      $property
-     * @param string                      $rootAlias
-     * @param QueryBuilder                $queryBuilder
-     * @param QueryNameGeneratorInterface $queryNameGenerator
      *
      * @throws InvalidArgumentException If property is not nested
      *
@@ -301,7 +269,7 @@ abstract class AbstractFilter implements FilterInterface
      *               the second element is the $field name
      *               the third element is the $associations array
      */
-    protected function addJoinsForNestedProperty(string $property, string $rootAlias, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator/*, string $resourceClass*/): array
+    protected function addJoinsForNestedProperty(string $property, string $rootAlias, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator/*, string $resourceClass, string $joinType*/): array
     {
         if (\func_num_args() > 4) {
             $resourceClass = func_get_arg(4);
@@ -315,15 +283,22 @@ abstract class AbstractFilter implements FilterInterface
             $resourceClass = null;
         }
 
+        if (\func_num_args() > 5) {
+            $joinType = func_get_arg(5);
+        } else {
+            $joinType = null;
+        }
+
         $propertyParts = $this->splitPropertyParts($property, $resourceClass);
         $parentAlias = $rootAlias;
+        $alias = null;
 
         foreach ($propertyParts['associations'] as $association) {
-            $alias = QueryBuilderHelper::addJoinOnce($queryBuilder, $queryNameGenerator, $parentAlias, $association);
+            $alias = QueryBuilderHelper::addJoinOnce($queryBuilder, $queryNameGenerator, $parentAlias, $association, $joinType);
             $parentAlias = $alias;
         }
 
-        if (!isset($alias)) {
+        if (null === $alias) {
             throw new InvalidArgumentException(sprintf('Cannot add joins for property "%s" - property is not nested.', $property));
         }
 

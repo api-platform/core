@@ -25,6 +25,8 @@ use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Serializer\AbstractItemNormalizer;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
+use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
+use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 /**
  * Converts between objects and array.
@@ -67,7 +69,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
         // Get and populate attributes data
         $objectAttributesData = parent::normalize($object, $format, $context);
 
-        if (!is_array($objectAttributesData)) {
+        if (!\is_array($objectAttributesData)) {
             return $objectAttributesData;
         }
 
@@ -77,7 +79,9 @@ final class ItemNormalizer extends AbstractItemNormalizer
 
         // Get and populate relations
         $components = $this->getComponents($object, $format, $context);
-        $objectRelationshipsData = $this->getPopulatedRelations($object, $format, $context, $components['relationships']);
+        $populatedRelationContext = $context;
+        $objectRelationshipsData = $this->getPopulatedRelations($object, $format, $populatedRelationContext, $components['relationships']);
+        $objectRelatedResources = $this->getRelatedResources($object, $format, $context, $components['relationships']);
 
         $item = [
             'id' => $this->iriConverter->getIriFromItem($object),
@@ -92,7 +96,13 @@ final class ItemNormalizer extends AbstractItemNormalizer
             $item['relationships'] = $objectRelationshipsData;
         }
 
-        return ['data' => $item];
+        $data = ['data' => $item];
+
+        if ($objectRelatedResources) {
+            $data['included'] = $objectRelatedResources;
+        }
+
+        return $data;
     }
 
     /**
@@ -109,7 +119,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
     public function denormalize($data, $class, $format = null, array $context = [])
     {
         // Avoid issues with proxies if we populated the object
-        if (isset($data['data']['id']) && !isset($context[self::OBJECT_TO_POPULATE])) {
+        if (!isset($context[self::OBJECT_TO_POPULATE]) && isset($data['data']['id'])) {
             if (isset($context['api_allow_update']) && true !== $context['api_allow_update']) {
                 throw new InvalidArgumentException('Update is not allowed for this operation.');
             }
@@ -147,7 +157,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
      */
     protected function setAttributeValue($object, $attribute, $value, $format = null, array $context = [])
     {
-        parent::setAttributeValue($object, $attribute, is_array($value) && array_key_exists('data', $value) ? $value['data'] : $value, $format, $context);
+        parent::setAttributeValue($object, $attribute, \is_array($value) && array_key_exists('data', $value) ? $value['data'] : $value, $format, $context);
     }
 
     /**
@@ -161,10 +171,13 @@ final class ItemNormalizer extends AbstractItemNormalizer
         if (!$this->resourceClassResolver->isResourceClass($className)) {
             $context['resource_class'] = $className;
 
-            return $this->serializer->denormalize($value, $className, $format, $context);
+            if ($this->serializer instanceof DenormalizerInterface) {
+                return $this->serializer->denormalize($value, $className, $format, $context);
+            }
+            throw new InvalidArgumentException(sprintf('The injected serializer must be an instance of "%s".', DenormalizerInterface::class));
         }
 
-        if (!is_array($value) || !isset($value['id'], $value['type'])) {
+        if (!\is_array($value) || !isset($value['id'], $value['type'])) {
             throw new InvalidArgumentException('Only resource linkage supported currently, see: http://jsonapi.org/format/#document-resource-object-linkage.');
         }
 
@@ -183,18 +196,32 @@ final class ItemNormalizer extends AbstractItemNormalizer
     protected function normalizeRelation(PropertyMetadata $propertyMetadata, $relatedObject, string $resourceClass, string $format = null, array $context)
     {
         if (null === $relatedObject) {
-            if (isset($context['operation_type']) && OperationType::SUBRESOURCE === $context['operation_type'] && isset($context['subresource_resources'][$resourceClass])) {
+            if (isset($context['operation_type'], $context['subresource_resources'][$resourceClass]) && OperationType::SUBRESOURCE === $context['operation_type']) {
                 $iri = $this->iriConverter->getItemIriFromResourceClass($resourceClass, $context['subresource_resources'][$resourceClass]);
             } else {
                 unset($context['resource_class']);
 
-                return $this->serializer->normalize($relatedObject, $format, $context);
+                if ($this->serializer instanceof NormalizerInterface) {
+                    return $this->serializer->normalize($relatedObject, $format, $context);
+                }
+                throw new InvalidArgumentException(sprintf('The injected serializer must be an instance of "%s".', NormalizerInterface::class));
             }
         } else {
             $iri = $this->iriConverter->getIriFromItem($relatedObject);
 
             if (isset($context['resources'])) {
                 $context['resources'][$iri] = $iri;
+            }
+            if (isset($context['api_included'])) {
+                $context['api_sub_level'] = true;
+
+                if (!$this->serializer instanceof NormalizerInterface) {
+                    throw new InvalidArgumentException(sprintf('The injected serializer must be an instance of "%s".', NormalizerInterface::class));
+                }
+                $data = $this->serializer->normalize($relatedObject, $format, $context);
+                unset($context['api_sub_level']);
+
+                return $data;
             }
         }
 
@@ -215,9 +242,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
     /**
      * Gets JSON API components of the resource: attributes, relationships, meta and links.
      *
-     * @param object      $object
-     * @param string|null $format
-     * @param array       $context
+     * @param object $object
      *
      * @return array
      */
@@ -281,19 +306,19 @@ final class ItemNormalizer extends AbstractItemNormalizer
     /**
      * Populates relationships keys.
      *
-     * @param object      $object
-     * @param string|null $format
-     * @param array       $context
-     * @param array       $relationships
+     * @param object $object
      *
      * @throws InvalidArgumentException
-     *
-     * @return array
      */
     private function getPopulatedRelations($object, string $format = null, array $context, array $relationships): array
     {
         $data = [];
 
+        if (!isset($context['resource_class'])) {
+            return $data;
+        }
+
+        unset($context['api_included']);
         foreach ($relationships as $relationshipDataArray) {
             $relationshipName = $relationshipDataArray['name'];
 
@@ -313,6 +338,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
 
             // Many to one relationship
             if ('one' === $relationshipDataArray['cardinality']) {
+                unset($attributeValue['data']['attributes']);
                 $data[$relationshipName] = $attributeValue;
 
                 continue;
@@ -323,7 +349,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
                 if (!isset($attributeValueElement['data'])) {
                     throw new InvalidArgumentException(sprintf('The JSON API attribute \'%s\' must contain a "data" key.', $relationshipName));
                 }
-
+                unset($attributeValueElement['data']['attributes']);
                 $data[$relationshipName]['data'][] = $attributeValueElement['data'];
             }
         }
@@ -332,10 +358,48 @@ final class ItemNormalizer extends AbstractItemNormalizer
     }
 
     /**
+     * Populates included keys.
+     */
+    private function getRelatedResources($object, string $format = null, array $context, array $relationships): array
+    {
+        if (!isset($context['api_included'])) {
+            return [];
+        }
+
+        $included = [];
+        foreach ($relationships as $relationshipDataArray) {
+            if (!\in_array($relationshipDataArray['name'], $context['api_included'], true)) {
+                continue;
+            }
+
+            $relationshipName = $relationshipDataArray['name'];
+            $relationContext = $context;
+            $attributeValue = $this->getAttributeValue($object, $relationshipName, $format, $relationContext);
+
+            if (!$attributeValue) {
+                continue;
+            }
+
+            // Many to one relationship
+            if ('one' === $relationshipDataArray['cardinality']) {
+                $included[] = $attributeValue['data'];
+
+                continue;
+            }
+            // Many to many relationship
+            foreach ($attributeValue as $attributeValueElement) {
+                if (isset($attributeValueElement['data'])) {
+                    $included[] = $attributeValueElement['data'];
+                }
+            }
+        }
+
+        return $included;
+    }
+
+    /**
      * Gets the cache key to use.
      *
-     * @param string|null $format
-     * @param array       $context
      *
      * @return bool|string
      */

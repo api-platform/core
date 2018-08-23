@@ -16,6 +16,7 @@ namespace ApiPlatform\Core\Serializer;
 use ApiPlatform\Core\Api\ResourceClassResolverInterface;
 use ApiPlatform\Core\DataProvider\PaginatorInterface;
 use ApiPlatform\Core\DataProvider\PartialPaginatorInterface;
+use Symfony\Component\Serializer\Normalizer\CacheableSupportsMethodInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerAwareInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerAwareTrait;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
@@ -25,7 +26,7 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
  *
  * @author Baptiste Meyer <baptiste.meyer@gmail.com>
  */
-abstract class AbstractCollectionNormalizer implements NormalizerInterface, NormalizerAwareInterface
+abstract class AbstractCollectionNormalizer implements NormalizerInterface, NormalizerAwareInterface, CacheableSupportsMethodInterface
 {
     use ContextTrait { initContext as protected; }
     use NormalizerAwareTrait;
@@ -49,7 +50,15 @@ abstract class AbstractCollectionNormalizer implements NormalizerInterface, Norm
      */
     public function supportsNormalization($data, $format = null)
     {
-        return static::FORMAT === $format && (is_array($data) || $data instanceof \Traversable);
+        return static::FORMAT === $format && (\is_array($data) || $data instanceof \Traversable);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function hasCacheableSupportsMethod(): bool
+    {
+        return true;
     }
 
     /**
@@ -84,26 +93,25 @@ abstract class AbstractCollectionNormalizer implements NormalizerInterface, Norm
      * Gets the pagination configuration.
      *
      * @param iterable $object
-     * @param array    $context
-     *
-     * @return array
      */
     protected function getPaginationConfig($object, array $context = []): array
     {
         $currentPage = $lastPage = $itemsPerPage = $pageTotalItems = $totalItems = null;
+        $paginated = $paginator = false;
 
-        if ($paginated = $paginator = $object instanceof PartialPaginatorInterface) {
+        if ($object instanceof PartialPaginatorInterface) {
+            $paginated = $paginator = true;
             if ($object instanceof PaginatorInterface) {
                 $paginated = 1. !== $lastPage = $object->getLastPage();
                 $totalItems = $object->getTotalItems();
             } else {
-                $pageTotalItems = (float) count($object);
+                $pageTotalItems = (float) \count($object);
             }
 
             $currentPage = $object->getCurrentPage();
             $itemsPerPage = $object->getItemsPerPage();
-        } elseif (is_array($object) || $object instanceof \Countable) {
-            $totalItems = count($object);
+        } elseif (\is_array($object) || $object instanceof \Countable) {
+            $totalItems = \count($object);
         }
 
         return [$paginator, $paginated, $currentPage, $itemsPerPage, $lastPage, $pageTotalItems, $totalItems];
@@ -113,20 +121,13 @@ abstract class AbstractCollectionNormalizer implements NormalizerInterface, Norm
      * Gets the pagination data.
      *
      * @param iterable $object
-     * @param array    $context
-     *
-     * @return array
      */
     abstract protected function getPaginationData($object, array $context = []): array;
 
     /**
      * Gets items data.
      *
-     * @param iterable    $object
-     * @param string|null $format
-     * @param array       $context
-     *
-     * @return array
+     * @param iterable $object
      */
     abstract protected function getItemsData($object, string $format = null, array $context = []): array;
 }

@@ -15,7 +15,6 @@ namespace ApiPlatform\Core\Tests\GraphQl\Type\Definition;
 
 use ApiPlatform\Core\GraphQl\Type\Definition\IterableType;
 use GraphQL\Error\Error;
-use GraphQL\Error\InvariantViolation;
 use GraphQL\Language\AST\BooleanValueNode;
 use GraphQL\Language\AST\FloatValueNode;
 use GraphQL\Language\AST\IntValueNode;
@@ -36,8 +35,8 @@ class IterableTypeTest extends TestCase
     {
         $iterableType = new IterableType();
 
-        $this->expectException(InvariantViolation::class);
-        $this->expectExceptionMessage('Iterable cannot represent non iterable value: "foo"');
+        $this->expectException(Error::class);
+        $this->expectExceptionMessageRegExp('/Iterable cannot represent non iterable value: .+/');
 
         $iterableType->serialize('foo');
 
@@ -49,7 +48,7 @@ class IterableTypeTest extends TestCase
         $iterableType = new IterableType();
 
         $this->expectException(Error::class);
-        $this->expectExceptionMessage('Iterable cannot represent non iterable value: "foo"');
+        $this->expectExceptionMessageRegExp('/Iterable cannot represent non iterable value: .+/');
 
         $iterableType->parseValue('foo');
 
@@ -60,7 +59,8 @@ class IterableTypeTest extends TestCase
     {
         $iterableType = new IterableType();
 
-        $this->assertNull($iterableType->parseLiteral(new IntValueNode(['value' => 1])));
+        $this->expectException(\Exception::class);
+        $iterableType->parseLiteral(new IntValueNode(['value' => 1]));
 
         $listValueNode = new ListValueNode(['values' => []]);
         $this->assertEquals([], $iterableType->parseLiteral($listValueNode));

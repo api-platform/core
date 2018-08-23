@@ -122,6 +122,7 @@ final class XmlExtractor extends AbstractExtractor
                 'subresource' => $property->subresource ? [
                     'collection' => $this->phpize($property->subresource, 'collection', 'bool'),
                     'resourceClass' => $this->phpize($property->subresource, 'resourceClass', 'string'),
+                    'maxDepth' => $this->phpize($property->subresource, 'maxDepth', 'integer'),
                 ] : null,
             ];
         }
@@ -132,7 +133,7 @@ final class XmlExtractor extends AbstractExtractor
     /**
      * Transforms an XML attribute's value in a PHP value.
      *
-     * @return bool|string|null
+     * @return string|int|bool|null
      */
     private function phpize(\SimpleXMLElement $array, string $key, string $type)
     {
@@ -143,6 +144,8 @@ final class XmlExtractor extends AbstractExtractor
         switch ($type) {
             case 'string':
                 return (string) $array[$key];
+            case 'integer':
+                return (int) $array[$key];
             case 'bool':
                 return (bool) XmlUtils::phpize($array[$key]);
         }

@@ -18,6 +18,7 @@ use ApiPlatform\Core\DataProvider\PartialPaginatorInterface;
 use ApiPlatform\Core\Hydra\Serializer\PartialCollectionViewNormalizer;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
+use Symfony\Component\Serializer\Normalizer\CacheableSupportsMethodInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerAwareInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
@@ -105,10 +106,13 @@ class PartialCollectionViewNormalizerTest extends TestCase
     public function testSupportsNormalization()
     {
         $decoratedNormalizerProphecy = $this->prophesize(NormalizerInterface::class);
+        $decoratedNormalizerProphecy->willImplement(CacheableSupportsMethodInterface::class);
         $decoratedNormalizerProphecy->supportsNormalization(Argument::any(), null)->willReturn(true)->shouldBeCalled();
+        $decoratedNormalizerProphecy->hasCacheableSupportsMethod()->willReturn(true)->shouldBeCalled();
 
         $normalizer = new PartialCollectionViewNormalizer($decoratedNormalizerProphecy->reveal());
         $this->assertTrue($normalizer->supportsNormalization(new \stdClass()));
+        $this->assertTrue($normalizer->hasCacheableSupportsMethod());
     }
 
     public function testSetNormalizer()

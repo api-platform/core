@@ -107,6 +107,10 @@ final class EagerLoadingExtension implements ContextAwareQueryCollectionExtensio
             $context += $this->getNormalizationContext($context['resource_class'] ?? $resourceClass, $contextType, $options);
         }
 
+        if (empty($context[AbstractNormalizer::GROUPS]) && !isset($context[AbstractNormalizer::ATTRIBUTES])) {
+            return;
+        }
+
         $this->joinRelations($queryBuilder, $queryNameGenerator, $resourceClass, $forceEager, $fetchPartial, $queryBuilder->getRootAliases()[0], $options, $context);
     }
 
@@ -136,7 +140,7 @@ final class EagerLoadingExtension implements ContextAwareQueryCollectionExtensio
 
         foreach ($classMetadata->associationMappings as $association => $mapping) {
             //Don't join if max depth is enabled and the current depth limit is reached
-            if (0 === $currentDepth && isset($normalizationContext[AbstractObjectNormalizer::ENABLE_MAX_DEPTH])) {
+            if (0 === $currentDepth && ($normalizationContext[AbstractObjectNormalizer::ENABLE_MAX_DEPTH] ?? false)) {
                 continue;
             }
 
@@ -170,7 +174,14 @@ final class EagerLoadingExtension implements ContextAwareQueryCollectionExtensio
                 $inAttributes = null;
             }
 
-            if (false === $fetchEager = $propertyMetadata->getAttribute('fetchEager')) {
+            if (
+                (null === $fetchEager = $propertyMetadata->getAttribute('fetch_eager')) &&
+                (null !== $fetchEager = $propertyMetadata->getAttribute('fetchEager'))
+            ) {
+                @trigger_error('The "fetchEager" attribute is deprecated since 2.3. Please use "fetch_eager" instead.', E_USER_DEPRECATED);
+            }
+
+            if (false === $fetchEager) {
                 continue;
             }
 
@@ -200,9 +211,13 @@ final class EagerLoadingExtension implements ContextAwareQueryCollectionExtensio
                 $queryBuilder->addSelect($associationAlias);
             }
 
-            // Avoid recursion
+            // Avoid recursive joins
             if ($mapping['targetEntity'] === $resourceClass) {
-                $queryBuilder->addSelect($associationAlias);
+                // Avoid joining the same association twice (see #1959)
+                if (!\in_array($associationAlias, $queryBuilder->getAllAliases(), true)) {
+                    $queryBuilder->addSelect($associationAlias);
+                }
+
                 continue;
             }
 
@@ -224,46 +239,51 @@ final class EagerLoadingExtension implements ContextAwareQueryCollectionExtensio
         $select = [];
         $entityManager = $queryBuilder->getEntityManager();
         $targetClassMetadata = $entityManager->getClassMetadata($entity);
-        if ($targetClassMetadata->subClasses) {
+        if (!empty($targetClassMetadata->subClasses)) {
             $queryBuilder->addSelect($associationAlias);
-        } else {
-            foreach ($this->propertyNameCollectionFactory->create($entity) as $property) {
-                $propertyMetadata = $this->propertyMetadataFactory->create($entity, $property, $propertyMetadataOptions);
 
-                if (true === $propertyMetadata->isIdentifier()) {
-                    $select[] = $property;
-                    continue;
-                }
+            return;
+        }
 
+        foreach ($this->propertyNameCollectionFactory->create($entity) as $property) {
+            $propertyMetadata = $this->propertyMetadataFactory->create($entity, $property, $propertyMetadataOptions);
+
+            if (true === $propertyMetadata->isIdentifier()) {
+                $select[] = $property;
+                continue;
+            }
+
+            // If it's an embedded property see below
+            if (!array_key_exists($property, $targetClassMetadata->embeddedClasses)) {
                 //the field test allows to add methods to a Resource which do not reflect real database fields
                 if ($targetClassMetadata->hasField($property) && (true === $propertyMetadata->getAttribute('fetchable') || $propertyMetadata->isReadable())) {
                     $select[] = $property;
                 }
 
-                if (array_key_exists($property, $targetClassMetadata->embeddedClasses)) {
-                    foreach ($this->propertyNameCollectionFactory->create($targetClassMetadata->embeddedClasses[$property]['class']) as $embeddedProperty) {
-                        $propertyMetadata = $this->propertyMetadataFactory->create($entity, $property, $propertyMetadataOptions);
-                        $propertyName = "$property.$embeddedProperty";
-                        if ($targetClassMetadata->hasField($propertyName) && (true === $propertyMetadata->getAttribute('fetchable') || $propertyMetadata->isReadable())) {
-                            $select[] = $propertyName;
-                        }
-                    }
-                }
+                continue;
             }
 
-            $queryBuilder->addSelect(sprintf('partial %s.{%s}', $associationAlias, implode(',', $select)));
+            // It's an embedded property, select relevent subfields
+            foreach ($this->propertyNameCollectionFactory->create($targetClassMetadata->embeddedClasses[$property]['class']) as $embeddedProperty) {
+                $propertyMetadata = $this->propertyMetadataFactory->create($entity, $property, $propertyMetadataOptions);
+                $propertyName = "$property.$embeddedProperty";
+                if ($targetClassMetadata->hasField($propertyName) && (true === $propertyMetadata->getAttribute('fetchable') || $propertyMetadata->isReadable())) {
+                    $select[] = $propertyName;
+                }
+            }
         }
+
+        $queryBuilder->addSelect(sprintf('partial %s.{%s}', $associationAlias, implode(',', $select)));
     }
 
     /**
-     * Gets serializer context.
+     * Gets the serializer context.
      *
      * @param string $contextType normalization_context or denormalization_context
      * @param array  $options     represents the operation name so that groups are the one of the specific operation
      */
     private function getNormalizationContext(string $resourceClass, string $contextType, array $options): array
     {
-        $request = null;
         if (null !== $this->requestStack && null !== $this->serializerContextBuilder && null !== $request = $this->requestStack->getCurrentRequest()) {
             return $this->serializerContextBuilder->createFromRequest($request, 'normalization_context' === $contextType);
         }

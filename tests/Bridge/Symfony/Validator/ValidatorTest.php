@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Tests\Bridge\Symfony\Validator;
 
+use ApiPlatform\Core\Bridge\Symfony\Validator\Exception\ValidationException;
 use ApiPlatform\Core\Bridge\Symfony\Validator\Validator;
 use ApiPlatform\Core\Tests\Fixtures\DummyEntity;
 use PHPUnit\Framework\TestCase;
@@ -38,11 +39,10 @@ class ValidatorTest extends TestCase
         $validator->validate(new DummyEntity());
     }
 
-    /**
-     * @expectedException \ApiPlatform\Core\Bridge\Symfony\Validator\Exception\ValidationException
-     */
     public function testInvalid()
     {
+        $this->expectException(ValidationException::class);
+
         $data = new DummyEntity();
 
         $constraintViolationListProphecy = $this->prophesize(ConstraintViolationListInterface::class);

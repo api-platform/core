@@ -23,8 +23,7 @@ interface PathSegmentNameGeneratorInterface
     /**
      * Transforms a given string to a valid path name which can be pluralized (eg. for collections).
      *
-     * @param string $name       usually a ResourceMetadata shortname
-     * @param bool   $collection
+     * @param string $name usually a ResourceMetadata shortname
      *
      * @return string A string that is a part of the route name
      */

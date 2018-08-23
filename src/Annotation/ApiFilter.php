@@ -53,11 +53,11 @@ final class ApiFilter
 
     public function __construct($options = [])
     {
-        if (!isset($options['value'])) {
+        if (!\is_string($options['value'] ?? null)) {
             throw new InvalidArgumentException('This annotation needs a value representing the filter class.');
         }
 
-        if (!is_subclass_of($options['value'], FilterInterface::class)) {
+        if (!is_a($options['value'], FilterInterface::class, true)) {
             throw new InvalidArgumentException(sprintf('The filter class "%s" does not implement "%s".', $options['value'], FilterInterface::class));
         }
 

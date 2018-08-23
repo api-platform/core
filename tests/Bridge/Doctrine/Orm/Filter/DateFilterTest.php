@@ -33,6 +33,10 @@ class DateFilterTest extends DoctrineOrmFilterTestCase
     public function testApplyDate()
     {
         $this->doTestApplyDate(false);
+    }
+
+    public function testApplyDateImmutable()
+    {
         $this->doTestApplyDateImmutable(false);
     }
 
@@ -42,6 +46,13 @@ class DateFilterTest extends DoctrineOrmFilterTestCase
     public function testRequestApplyDate()
     {
         $this->doTestApplyDate(true);
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testRequestApplyDateImmutable()
+    {
         $this->doTestApplyDateImmutable(true);
     }
 
@@ -71,7 +82,7 @@ class DateFilterTest extends DoctrineOrmFilterTestCase
         $requestStack = null;
         if ($request) {
             $requestStack = new RequestStack();
-            $requestStack->push(Request::create('/api/dummy_immutable_date', 'GET', $filters));
+            $requestStack->push(Request::create('/api/dummy_immutable_dates', 'GET', $filters));
         }
 
         $queryBuilder = $this->repository->createQueryBuilder('o');
@@ -275,6 +286,17 @@ class DateFilterTest extends DoctrineOrmFilterTestCase
             'after (include_null_after)' => [
                 [
                     'dummyDate' => 'include_null_after',
+                ],
+                [
+                    'dummyDate' => [
+                        'after' => '2015-04-05',
+                    ],
+                ],
+                sprintf('SELECT o FROM %s o WHERE o.dummyDate >= :dummyDate_p1 OR o.dummyDate IS NULL', Dummy::class),
+            ],
+            'include null before and after (include_null_before_and_after)' => [
+                [
+                    'dummyDate' => 'include_null_before_and_after',
                 ],
                 [
                     'dummyDate' => [

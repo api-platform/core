@@ -28,7 +28,9 @@ use ApiPlatform\Core\DataPersister\DataPersisterInterface;
 use ApiPlatform\Core\DataProvider\CollectionDataProviderInterface;
 use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
 use ApiPlatform\Core\DataProvider\SubresourceDataProviderInterface;
+use ApiPlatform\Core\Exception\FilterValidationException;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
+use ApiPlatform\Core\Exception\RuntimeException;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
@@ -73,6 +75,22 @@ class ApiPlatformExtensionTest extends TestCase
         'http_cache' => ['invalidation' => [
             'enabled' => true,
             'varnish_urls' => ['test'],
+            'request_options' => [
+                'allow_redirects' => [
+                    'max' => 5,
+                    'protocols' => ['http', 'https'],
+                    'stric' => false,
+                    'referer' => false,
+                    'track_redirects' => false,
+                ],
+                'http_errors' => true,
+                'decode_content' => false,
+                'verify' => false,
+                'cookies' => true,
+                'headers' => [
+                    'User-Agent' => 'none',
+                ],
+            ],
         ]],
     ]];
 
@@ -286,7 +304,7 @@ class ApiPlatformExtensionTest extends TestCase
                 return $arg;
             }
 
-            if (!in_array('foobar', $arg, true)) {
+            if (!\in_array('foobar', $arg, true)) {
                 throw new \Exception('"foobar" should be in "resource_class_directories"');
             }
 
@@ -297,24 +315,22 @@ class ApiPlatformExtensionTest extends TestCase
         $this->extension->load(array_merge_recursive(self::DEFAULT_CONFIG, ['api_platform' => ['resource_class_directories' => ['foobar']]]), $containerBuilder);
     }
 
-    /**
-     * @expectedException \ApiPlatform\Core\Exception\RuntimeException
-     * @expectedExceptionMessageRegExp /Unsupported mapping type in ".+", supported types are XML & Yaml\./
-     */
     public function testResourcesToWatchWithUnsupportedMappingType()
     {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessageRegExp('/Unsupported mapping type in ".+", supported types are XML & Yaml\\./');
+
         $this->extension->load(
             array_merge_recursive(self::DEFAULT_CONFIG, ['api_platform' => ['mapping' => ['paths' => [__FILE__]]]]),
             $this->getPartialContainerBuilderProphecy(false)->reveal()
         );
     }
 
-    /**
-     * @expectedException \ApiPlatform\Core\Exception\RuntimeException
-     * @expectedExceptionMessage Could not open file or directory "fake_file.xml".
-     */
     public function testResourcesToWatchWithNonExistentFile()
     {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Could not open file or directory "fake_file.xml".');
+
         $this->extension->load(
             array_merge_recursive(self::DEFAULT_CONFIG, ['api_platform' => ['mapping' => ['paths' => ['fake_file.xml']]]]),
             $this->getPartialContainerBuilderProphecy()->reveal()
@@ -340,6 +356,17 @@ class ApiPlatformExtensionTest extends TestCase
 
         $config = self::DEFAULT_CONFIG;
         $config['api_platform']['http_cache']['invalidation']['varnish_urls'] = [];
+
+        $this->extension->load($config, $containerBuilder);
+    }
+
+    public function testRegisterHttpCacheWhenEnabledWithNoRequestOption()
+    {
+        $containerBuilderProphecy = $this->getBaseContainerBuilderProphecy();
+        $containerBuilder = $containerBuilderProphecy->reveal();
+
+        $config = self::DEFAULT_CONFIG;
+        unset($config['api_platform']['http_cache']['invalidation']['request_options']);
 
         $this->extension->load($config, $containerBuilder);
     }
@@ -424,7 +451,11 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.description' => 'description',
             'api_platform.error_formats' => ['jsonproblem' => ['application/problem+json'], 'jsonld' => ['application/ld+json']],
             'api_platform.formats' => ['jsonld' => ['application/ld+json'], 'jsonhal' => ['application/hal+json']],
-            'api_platform.exception_to_status' => [ExceptionInterface::class => Response::HTTP_BAD_REQUEST, InvalidArgumentException::class => Response::HTTP_BAD_REQUEST],
+            'api_platform.exception_to_status' => [
+                ExceptionInterface::class => Response::HTTP_BAD_REQUEST,
+                InvalidArgumentException::class => Response::HTTP_BAD_REQUEST,
+                FilterValidationException::class => Response::HTTP_BAD_REQUEST,
+            ],
             'api_platform.title' => 'title',
             'api_platform.version' => 'version',
             'api_platform.allow_plain_identifiers' => false,
@@ -468,12 +499,19 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.cache.route_name_resolver',
             'api_platform.cache.subresource_operation_factory',
             'api_platform.collection_data_provider',
+            'api_platform.formats_provider',
             'api_platform.filter_locator',
             'api_platform.filter_collection_factory',
             'api_platform.filters',
             'api_platform.identifiers_extractor',
             'api_platform.identifiers_extractor.cached',
             'api_platform.iri_converter',
+            'api_platform.identifier.converter',
+            'api_platform.identifier.integer',
+            'api_platform.identifier.date_normalizer',
+            'api_platform.identifier.uuid_normalizer',
+            'api_platform.identifiers_extractor',
+            'api_platform.identifiers_extractor.cached',
             'api_platform.item_data_provider',
             'api_platform.listener.exception',
             'api_platform.listener.exception.validation',
@@ -483,6 +521,7 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.listener.view.respond',
             'api_platform.listener.view.serialize',
             'api_platform.listener.view.validate',
+            'api_platform.listener.view.validate_query_parameters',
             'api_platform.listener.view.write',
             'api_platform.metadata.extractor.xml',
             'api_platform.metadata.property.metadata_factory.cached',
@@ -610,6 +649,7 @@ class ApiPlatformExtensionTest extends TestCase
         }
 
         $definitions = [
+            'api_platform.data_collector.request',
             'api_platform.doctrine.listener.http_cache.purge',
             'api_platform.doctrine.metadata_factory',
             'api_platform.doctrine.orm.boolean_filter',

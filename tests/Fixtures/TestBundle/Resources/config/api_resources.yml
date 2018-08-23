@@ -3,7 +3,7 @@ resources:
         shortName: 'fileconfigdummy'
         description: 'Dummy resource'
         itemOperations:
-            custom_operation:  
+            custom_operation:
                 method: 'GET'
                 controller: 'app.config_dummy_resource.action'
         properties:

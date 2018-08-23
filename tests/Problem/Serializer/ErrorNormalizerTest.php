@@ -34,6 +34,7 @@ class ErrorNormalizerTest extends TestCase
         $this->assertTrue($normalizer->supportsNormalization(new FlattenException(), ErrorNormalizer::FORMAT));
         $this->assertFalse($normalizer->supportsNormalization(new FlattenException(), 'xml'));
         $this->assertFalse($normalizer->supportsNormalization(new \stdClass(), ErrorNormalizer::FORMAT));
+        $this->assertTrue($normalizer->hasCacheableSupportsMethod());
     }
 
     public function testNormalize()
@@ -42,9 +43,9 @@ class ErrorNormalizerTest extends TestCase
 
         $this->assertEquals(
             [
-            'type' => 'https://tools.ietf.org/html/rfc2616#section-10',
-            'title' => 'An error occurred',
-            'detail' => 'Hello',
+                'type' => 'https://tools.ietf.org/html/rfc2616#section-10',
+                'title' => 'An error occurred',
+                'detail' => 'Hello',
             ],
             $normalizer->normalize(new \Exception('Hello'))
         );

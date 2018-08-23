@@ -46,7 +46,6 @@ final class ValidateListener
     /**
      * Validates data returned by the controller if applicable.
      *
-     * @param GetResponseForControllerResultEvent $event
      *
      * @throws ValidationException
      */

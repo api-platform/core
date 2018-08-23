@@ -344,7 +344,6 @@ Feature: Range filter on collections
     }
     """
 
-  @dropSchema
   Scenario: Filter for entities within an impossible range
     When I send a "GET" request to "/dummies?dummyPrice[gt]=19.99"
     Then the response status code should be 200

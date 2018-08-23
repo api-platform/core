@@ -16,9 +16,9 @@ namespace ApiPlatform\Core\Tests\JsonApi\Serializer;
 use ApiPlatform\Core\Api\ResourceClassResolverInterface;
 use ApiPlatform\Core\DataProvider\PaginatorInterface;
 use ApiPlatform\Core\DataProvider\PartialPaginatorInterface;
+use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\JsonApi\Serializer\CollectionNormalizer;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 /**
@@ -36,6 +36,7 @@ class CollectionNormalizerTest extends TestCase
         $this->assertTrue($normalizer->supportsNormalization(new \ArrayObject(), CollectionNormalizer::FORMAT));
         $this->assertFalse($normalizer->supportsNormalization([], 'xml'));
         $this->assertFalse($normalizer->supportsNormalization(new \ArrayObject(), 'xml'));
+        $this->assertTrue($normalizer->hasCacheableSupportsMethod());
     }
 
     public function testNormalizePaginator()
@@ -224,12 +225,81 @@ class CollectionNormalizerTest extends TestCase
         $this->assertEquals($expected, $normalizer->normalize($data, CollectionNormalizer::FORMAT, ['request_uri' => '/foos']));
     }
 
-    /**
-     * @expectedException \ApiPlatform\Core\Exception\InvalidArgumentException
-     * @expectedExceptionMessage The JSON API document must contain a "data" key.
-     */
+    public function testNormalizeIncludedData()
+    {
+        $data = ['foo'];
+
+        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
+        $resourceClassResolverProphecy->getResourceClass($data, null, true)->willReturn('Foo')->shouldBeCalled();
+
+        $itemNormalizer = $this->prophesize(NormalizerInterface::class);
+        $itemNormalizer
+            ->normalize(
+                'foo',
+                CollectionNormalizer::FORMAT,
+                [
+                    'request_uri' => '/foos',
+                    'api_sub_level' => true,
+                    'resource_class' => 'Foo',
+                ]
+            )
+            ->willReturn([
+                'data' => [
+                    'type' => 'Foo',
+                    'id' => 1,
+                    'attributes' => [
+                        'id' => 1,
+                        'name' => 'Baptiste',
+                    ],
+                ],
+                'included' => [
+                    [
+                        'type' => 'Bar',
+                        'id' => 1,
+                        'attributes' => [
+                            'id' => 1,
+                            'name' => 'Anto',
+                        ],
+                    ],
+                ],
+            ]);
+
+        $normalizer = new CollectionNormalizer($resourceClassResolverProphecy->reveal(), 'page');
+        $normalizer->setNormalizer($itemNormalizer->reveal());
+
+        $expected = [
+            'links' => ['self' => '/foos'],
+            'data' => [
+                [
+                    'type' => 'Foo',
+                    'id' => 1,
+                    'attributes' => [
+                        'id' => 1,
+                        'name' => 'Baptiste',
+                    ],
+                ],
+            ],
+            'meta' => ['totalItems' => 1],
+            'included' => [
+                [
+                    'type' => 'Bar',
+                    'id' => 1,
+                    'attributes' => [
+                        'id' => 1,
+                        'name' => 'Anto',
+                    ],
+                ],
+            ],
+        ];
+
+        $this->assertEquals($expected, $normalizer->normalize($data, CollectionNormalizer::FORMAT, ['request_uri' => '/foos']));
+    }
+
     public function testNormalizeWithoutDataKey()
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('The JSON API document must contain a "data" key.');
+
         $data = ['foo'];
 
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);

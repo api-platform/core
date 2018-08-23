@@ -58,7 +58,7 @@
             <argument>%api_platform.title%</argument>
             <argument>%api_platform.description%</argument>
             <argument>%api_platform.version%</argument>
-            <argument>%api_platform.formats%</argument>
+            <argument type="service" id="api_platform.formats_provider" />
             <argument>%api_platform.oauth.enabled%</argument>
             <argument>%api_platform.oauth.clientId%</argument>
             <argument>%api_platform.oauth.clientSecret%</argument>

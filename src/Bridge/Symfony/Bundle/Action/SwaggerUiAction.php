@@ -13,10 +13,13 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Bridge\Symfony\Bundle\Action;
 
+use ApiPlatform\Core\Api\FormatsProviderInterface;
 use ApiPlatform\Core\Documentation\Documentation;
+use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\Exception\RuntimeException;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
+use ApiPlatform\Core\Util\RequestAttributesExtractor;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -37,7 +40,7 @@ final class SwaggerUiAction
     private $title;
     private $description;
     private $version;
-    private $formats;
+    private $formats = [];
     private $oauthEnabled;
     private $oauthClientId;
     private $oauthClientSecret;
@@ -46,8 +49,12 @@ final class SwaggerUiAction
     private $oauthTokenUrl;
     private $oauthAuthorizationUrl;
     private $oauthScopes;
+    private $formatsProvider;
 
-    public function __construct(ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, ResourceMetadataFactoryInterface $resourceMetadataFactory, NormalizerInterface $normalizer, \Twig_Environment $twig, UrlGeneratorInterface $urlGenerator, string $title = '', string $description = '', string $version = '', array $formats = [], $oauthEnabled = false, $oauthClientId = '', $oauthClientSecret = '', $oauthType = '', $oauthFlow = '', $oauthTokenUrl = '', $oauthAuthorizationUrl = '', $oauthScopes = [])
+    /**
+     * @throws InvalidArgumentException
+     */
+    public function __construct(ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, ResourceMetadataFactoryInterface $resourceMetadataFactory, NormalizerInterface $normalizer, \Twig_Environment $twig, UrlGeneratorInterface $urlGenerator, string $title = '', string $description = '', string $version = '', /* FormatsProviderInterface */ $formatsProvider = [], $oauthEnabled = false, $oauthClientId = '', $oauthClientSecret = '', $oauthType = '', $oauthFlow = '', $oauthTokenUrl = '', $oauthAuthorizationUrl = '', $oauthScopes = [])
     {
         $this->resourceNameCollectionFactory = $resourceNameCollectionFactory;
         $this->resourceMetadataFactory = $resourceMetadataFactory;
@@ -57,7 +64,6 @@ final class SwaggerUiAction
         $this->title = $title;
         $this->description = $description;
         $this->version = $version;
-        $this->formats = $formats;
         $this->oauthEnabled = $oauthEnabled;
         $this->oauthClientId = $oauthClientId;
         $this->oauthClientSecret = $oauthClientSecret;
@@ -66,10 +72,30 @@ final class SwaggerUiAction
         $this->oauthTokenUrl = $oauthTokenUrl;
         $this->oauthAuthorizationUrl = $oauthAuthorizationUrl;
         $this->oauthScopes = $oauthScopes;
+
+        if (\is_array($formatsProvider)) {
+            if ($formatsProvider) {
+                // Only trigger notification for non-default argument
+                @trigger_error('Using an array as formats provider is deprecated since API Platform 2.3 and will not be possible anymore in API Platform 3', E_USER_DEPRECATED);
+            }
+            $this->formats = $formatsProvider;
+
+            return;
+        }
+        if (!$formatsProvider instanceof FormatsProviderInterface) {
+            throw new InvalidArgumentException(sprintf('The "$formatsProvider" argument is expected to be an implementation of the "%s" interface.', FormatsProviderInterface::class));
+        }
+
+        $this->formatsProvider = $formatsProvider;
     }
 
     public function __invoke(Request $request)
     {
+        // BC check to be removed in 3.0
+        if (null !== $this->formatsProvider) {
+            $this->formats = $this->formatsProvider->getFormatsFromAttributes(RequestAttributesExtractor::extractAttributes($request));
+        }
+
         $documentation = new Documentation($this->resourceNameCollectionFactory->create(), $this->title, $this->description, $this->version, $this->formats);
 
         return new Response($this->twig->render('@ApiPlatform/SwaggerUi/index.html.twig', $this->getContext($request, $documentation)));
@@ -77,10 +103,6 @@ final class SwaggerUiAction
 
     /**
      * Gets the base Twig context.
-     *
-     * @param Request $request
-     *
-     * @return array
      */
     private function getContext(Request $request, Documentation $documentation): array
     {

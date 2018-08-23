@@ -13,11 +13,9 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\DataProvider;
 
-use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\Exception\InvalidIdentifierException;
-use ApiPlatform\Core\Exception\PropertyNotFoundException;
 use ApiPlatform\Core\Exception\RuntimeException;
-use ApiPlatform\Core\Identifier\Normalizer\ChainIdentifierDenormalizer;
+use ApiPlatform\Core\Identifier\IdentifierConverterInterface;
 
 /**
  * @internal
@@ -35,14 +33,14 @@ trait OperationDataProviderTrait
     private $itemDataProvider;
 
     /**
-     * @var SubresourceDataProviderInterface
+     * @var SubresourceDataProviderInterface|null
      */
     private $subresourceDataProvider;
 
     /**
-     * @var ChainIdentifierDenormalizer
+     * @var IdentifierConverterInterface|null
      */
-    private $identifierDenormalizer;
+    private $identifierConverter;
 
     /**
      * Retrieves data for a collection operation.
@@ -57,30 +55,23 @@ trait OperationDataProviderTrait
     /**
      * Gets data for an item operation.
      *
-     * @throws NotFoundHttpException
-     *
      * @return object|null
      */
     private function getItemData($identifiers, array $attributes, array $context)
     {
-        try {
-            return $this->itemDataProvider->getItem($attributes['resource_class'], $identifiers, $attributes['item_operation_name'], $context);
-        } catch (PropertyNotFoundException $e) {
-            return null;
-        }
+        return $this->itemDataProvider->getItem($attributes['resource_class'], $identifiers, $attributes['item_operation_name'], $context);
     }
 
     /**
      * Gets data for a nested operation.
      *
-     * @throws NotFoundHttpException
      * @throws RuntimeException
      *
      * @return object|null
      */
     private function getSubresourceData($identifiers, array $attributes, array $context)
     {
-        if (!$this->subresourceDataProvider) {
+        if (null === $this->subresourceDataProvider) {
             throw new RuntimeException('Subresources not supported');
         }
 
@@ -96,10 +87,20 @@ trait OperationDataProviderTrait
     {
         if (isset($attributes['item_operation_name'])) {
             if (!isset($parameters['id'])) {
-                throw new InvalidArgumentException('Parameter "id" not found');
+                throw new InvalidIdentifierException('Parameter "id" not found');
             }
 
-            return $parameters['id'];
+            $id = $parameters['id'];
+
+            if (null !== $this->identifierConverter) {
+                return $this->identifierConverter->convert((string) $id, $attributes['resource_class']);
+            }
+
+            return $id;
+        }
+
+        if (!isset($attributes['subresource_context'])) {
+            throw new RuntimeException('Either "item_operation_name" or "collection_operation_name" must be defined, unless the "_api_receive" request attribute is set to false.');
         }
 
         $identifiers = [];
@@ -110,6 +111,10 @@ trait OperationDataProviderTrait
             }
 
             $identifiers[$id] = $parameters[$id];
+
+            if (null !== $this->identifierConverter) {
+                $identifiers[$id] = $this->identifierConverter->convert((string) $identifiers[$id], $resourceClass);
+            }
         }
 
         return $identifiers;

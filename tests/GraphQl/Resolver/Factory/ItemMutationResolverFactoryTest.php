@@ -21,6 +21,7 @@ use ApiPlatform\Core\GraphQl\Resolver\Factory\ResolverFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
+use GraphQL\Error\Error;
 use GraphQL\Type\Definition\ResolveInfo;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
@@ -33,11 +34,10 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
  */
 class ItemMutationResolverFactoryTest extends TestCase
 {
-    /**
-     * @expectedException \GraphQL\Error\Error
-     */
     public function testCreateItemMutationResolverNoItem()
     {
+        $this->expectException(Error::class);
+
         $dataPersisterProphecy = $this->prophesize(DataPersisterInterface::class);
         $dataPersisterProphecy->remove(Argument::any())->shouldNotBeCalled();
 

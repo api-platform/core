@@ -35,7 +35,6 @@ Feature: JSON API error handling
     }
     """
 
-  @dropSchema
   Scenario: Get a validation error on an relationship
     Given there is a RelatedDummy
     And there is a DummyFriend

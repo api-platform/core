@@ -26,6 +26,7 @@ use ApiPlatform\Core\Exception\RuntimeException;
 use Doctrine\Common\Annotations\Annotation;
 use Doctrine\ORM\Version;
 use phpDocumentor\Reflection\DocBlockFactoryInterface;
+use Ramsey\Uuid\Uuid;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Resource\DirectoryResource;
@@ -122,6 +123,10 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             $loader->load('security.xml');
         }
 
+        if (class_exists(Uuid::class)) {
+            $loader->load('ramsey_uuid.xml');
+        }
+
         $useDoctrine = isset($bundles['DoctrineBundle']) && class_exists(Version::class);
 
         $this->registerMetadataConfiguration($container, $config, $loader);
@@ -138,15 +143,11 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $this->registerDoctrineExtensionConfiguration($container, $config, $useDoctrine);
         $this->registerHttpCache($container, $config, $loader, $useDoctrine);
         $this->registerValidatorConfiguration($container, $config, $loader);
+        $this->registerDataCollector($container, $config, $loader);
     }
 
     /**
      * Handles configuration.
-     *
-     * @param ContainerBuilder $container
-     * @param array            $config
-     * @param array            $formats
-     * @param array            $errorFormats
      */
     private function handleConfig(ContainerBuilder $container, array $config, array $formats, array $errorFormats)
     {
@@ -192,10 +193,6 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
 
     /**
      * Registers metadata configuration.
-     *
-     * @param ContainerBuilder $container
-     * @param array            $config
-     * @param XmlFileLoader    $loader
      */
     private function registerMetadataConfiguration(ContainerBuilder $container, array $config, XmlFileLoader $loader)
     {
@@ -204,7 +201,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
 
         list($xmlResources, $yamlResources) = $this->getResourcesToWatch($container, $config['mapping']['paths']);
 
-        if (isset($config['resource_class_directories']) && $config['resource_class_directories']) {
+        if (!empty($config['resource_class_directories'])) {
             $container->setParameter('api_platform.resource_class_directories', array_merge(
                 $config['resource_class_directories'], $container->getParameter('api_platform.resource_class_directories')
             ));
@@ -292,10 +289,6 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
 
     /**
      * Registers the OAuth configuration.
-     *
-     * @param ContainerBuilder $container
-     * @param array            $config
-     * @param XmlFileLoader    $loader
      */
     private function registerOAuthConfiguration(ContainerBuilder $container, array $config, XmlFileLoader $loader)
     {
@@ -315,10 +308,6 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
 
     /**
      * Registers the api keys configuration.
-     *
-     * @param ContainerBuilder $container
-     * @param array            $config
-     * @param XmlFileLoader    $loader
      */
     private function registerApiKeysConfiguration(ContainerBuilder $container, array $config, XmlFileLoader $loader)
     {
@@ -327,10 +316,6 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
 
     /**
      * Registers the Swagger and Swagger UI configuration.
-     *
-     * @param ContainerBuilder $container
-     * @param array            $config
-     * @param XmlFileLoader    $loader
      */
     private function registerSwaggerConfiguration(ContainerBuilder $container, array $config, XmlFileLoader $loader)
     {
@@ -350,9 +335,6 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
 
     /**
      * Registers the JsonApi configuration.
-     *
-     * @param array         $formats
-     * @param XmlFileLoader $loader
      */
     private function registerJsonApiConfiguration(array $formats, XmlFileLoader $loader)
     {
@@ -365,11 +347,6 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
 
     /**
      * Registers the JSON-LD and Hydra configuration.
-     *
-     * @param ContainerBuilder $container
-     * @param array            $formats
-     * @param XmlFileLoader    $loader
-     * @param bool             $docEnabled
      */
     private function registerJsonLdConfiguration(ContainerBuilder $container, array $formats, XmlFileLoader $loader, bool $docEnabled)
     {
@@ -387,9 +364,6 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
 
     /**
      * Registers the HAL configuration.
-     *
-     * @param array         $formats
-     * @param XmlFileLoader $loader
      */
     private function registerJsonHalConfiguration(array $formats, XmlFileLoader $loader)
     {
@@ -402,9 +376,6 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
 
     /**
      * Registers the JSON Problem configuration.
-     *
-     * @param array         $errorFormats
-     * @param XmlFileLoader $loader
      */
     private function registerJsonProblemConfiguration(array $errorFormats, XmlFileLoader $loader)
     {
@@ -417,10 +388,6 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
 
     /**
      * Registers the GraphQL configuration.
-     *
-     * @param ContainerBuilder $container
-     * @param array            $config
-     * @param XmlFileLoader    $loader
      */
     private function registerGraphqlConfiguration(ContainerBuilder $container, array $config, XmlFileLoader $loader)
     {
@@ -437,10 +404,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
     /**
      * Registers configuration for integration with third-party bundles.
      *
-     * @param string[]      $bundles
-     * @param array         $config
-     * @param XmlFileLoader $loader
-     * @param bool          $useDoctrine
+     * @param string[] $bundles
      */
     private function registerBundlesConfiguration(array $bundles, array $config, XmlFileLoader $loader, bool $useDoctrine)
     {
@@ -462,8 +426,6 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
 
     /**
      * Registers the cache configuration.
-     *
-     * @param ContainerBuilder $container
      */
     private function registerCacheConfiguration(ContainerBuilder $container)
     {
@@ -481,10 +443,6 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
 
     /**
      * Manipulate doctrine extension services according to the configuration.
-     *
-     * @param ContainerBuilder $container
-     * @param array            $config
-     * @param bool             $useDoctrine
      */
     private function registerDoctrineExtensionConfiguration(ContainerBuilder $container, array $config, bool $useDoctrine)
     {
@@ -515,7 +473,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $definitions = [];
         foreach ($config['http_cache']['invalidation']['varnish_urls'] as $key => $url) {
             $definition = new ChildDefinition('api_platform.http_cache.purger.varnish_client');
-            $definition->addArgument(['base_uri' => $url]);
+            $definition->addArgument(['base_uri' => $url] + $config['http_cache']['invalidation']['request_options']);
 
             $definitions[] = $definition;
         }
@@ -526,10 +484,6 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
 
     /**
      * Normalizes the format from config to the one accepted by Symfony HttpFoundation.
-     *
-     * @param array $configFormats
-     *
-     * @return array
      */
     private function getFormats(array $configFormats): array
     {
@@ -545,10 +499,6 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
 
     /**
      * Registers the Validator configuration.
-     *
-     * @param ContainerBuilder $container
-     * @param array            $config
-     * @param XmlFileLoader    $loader
      */
     private function registerValidatorConfiguration(ContainerBuilder $container, array $config, XmlFileLoader $loader)
     {
@@ -557,5 +507,17 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         }
 
         $container->setParameter('api_platform.validator.serialize_payload_fields', $config['validator']['serialize_payload_fields']);
+    }
+
+    /**
+     * Registers the DataCollector configuration.
+     */
+    private function registerDataCollector(ContainerBuilder $container, array $config, XmlFileLoader $loader)
+    {
+        if (!$config['enable_profiler']) {
+            return;
+        }
+
+        $loader->load('data_collector.xml');
     }
 }

@@ -22,6 +22,7 @@ use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * @author Alan Poulain <contact@alanpoulain.eu>
@@ -31,7 +32,7 @@ class EntrypointActionTest extends TestCase
     /**
      * Hack to avoid transient failing test because of Date header.
      */
-    private function assertEqualsWithoutDateHeader(JsonResponse $expected, JsonResponse $actual)
+    private function assertEqualsWithoutDateHeader(JsonResponse $expected, Response $actual)
     {
         $expected->headers->remove('Date');
         $actual->headers->remove('Date');
@@ -42,7 +43,7 @@ class EntrypointActionTest extends TestCase
     {
         $request = new Request(['query' => 'graphqlQuery', 'variables' => '["graphqlVariable"]', 'operation' => 'graphqlOperationName']);
         $request->setRequestFormat('json');
-        $mockedEntrypoint = $this->getEntrypointAction($request);
+        $mockedEntrypoint = $this->getEntrypointAction();
 
         $this->assertEqualsWithoutDateHeader(new JsonResponse(['GraphQL']), $mockedEntrypoint($request));
     }
@@ -52,7 +53,7 @@ class EntrypointActionTest extends TestCase
         $request = new Request(['variables' => '["graphqlVariable"]', 'operation' => 'graphqlOperationName'], [], [], [], [], [], 'graphqlQuery');
         $request->setMethod('POST');
         $request->headers->set('Content-Type', 'application/graphql');
-        $mockedEntrypoint = $this->getEntrypointAction($request);
+        $mockedEntrypoint = $this->getEntrypointAction();
 
         $this->assertEqualsWithoutDateHeader(new JsonResponse(['GraphQL']), $mockedEntrypoint($request));
     }
@@ -62,7 +63,7 @@ class EntrypointActionTest extends TestCase
         $request = new Request([], [], [], [], [], [], '{"query": "graphqlQuery", "variables": "[\"graphqlVariable\"]", "operation": "graphqlOperationName"}');
         $request->setMethod('POST');
         $request->headers->set('Content-Type', 'application/json');
-        $mockedEntrypoint = $this->getEntrypointAction($request);
+        $mockedEntrypoint = $this->getEntrypointAction();
 
         $this->assertEqualsWithoutDateHeader(new JsonResponse(['GraphQL']), $mockedEntrypoint($request));
     }
@@ -72,7 +73,7 @@ class EntrypointActionTest extends TestCase
         $request = new Request();
         $request->setMethod('POST');
         $request->headers->set('Content-Type', 'application/xml');
-        $mockedEntrypoint = $this->getEntrypointAction($request);
+        $mockedEntrypoint = $this->getEntrypointAction();
 
         $this->assertEquals(400, $mockedEntrypoint($request)->getStatusCode());
         $this->assertEquals('{"errors":[{"message":"GraphQL query is not valid","category":"graphql"}]}', $mockedEntrypoint($request)->getContent());
@@ -82,7 +83,7 @@ class EntrypointActionTest extends TestCase
     {
         $request = new Request();
         $request->setMethod('PUT');
-        $mockedEntrypoint = $this->getEntrypointAction($request);
+        $mockedEntrypoint = $this->getEntrypointAction();
 
         $this->assertEquals(400, $mockedEntrypoint($request)->getStatusCode());
         $this->assertEquals('{"errors":[{"message":"GraphQL query is not valid","category":"graphql"}]}', $mockedEntrypoint($request)->getContent());
@@ -92,13 +93,13 @@ class EntrypointActionTest extends TestCase
     {
         $request = new Request(['query' => 'graphqlQuery', 'variables' => 'graphqlVariable', 'operation' => 'graphqlOperationName']);
         $request->setRequestFormat('json');
-        $mockedEntrypoint = $this->getEntrypointAction($request);
+        $mockedEntrypoint = $this->getEntrypointAction();
 
         $this->assertEquals(400, $mockedEntrypoint($request)->getStatusCode());
         $this->assertEquals('{"errors":[{"message":"GraphQL variables are not valid JSON","category":"graphql"}]}', $mockedEntrypoint($request)->getContent());
     }
 
-    private function getEntrypointAction(Request $request): EntrypointAction
+    private function getEntrypointAction(): EntrypointAction
     {
         $schema = $this->prophesize(Schema::class);
         $schemaBuilderProphecy = $this->prophesize(SchemaBuilderInterface::class);

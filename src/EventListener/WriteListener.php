@@ -22,7 +22,7 @@ use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
  * @author Kévin Dunglas <dunglas@gmail.com>
  * @author Baptiste Meyer <baptiste.meyer@gmail.com>
  */
-class WriteListener
+final class WriteListener
 {
     private $dataPersister;
 
@@ -50,7 +50,13 @@ class WriteListener
             case 'PUT':
             case 'PATCH':
             case 'POST':
-                $this->dataPersister->persist($controllerResult);
+                $persistResult = $this->dataPersister->persist($controllerResult);
+
+                if (null === $persistResult) {
+                    @trigger_error(sprintf('Returning void from %s::persist() is deprecated since API Platform 2.3 and will not be supported in API Platform 3, an object should always be returned.', DataPersisterInterface::class), E_USER_DEPRECATED);
+                }
+
+                $event->setControllerResult($persistResult ?? $controllerResult);
                 break;
             case 'DELETE':
                 $this->dataPersister->remove($controllerResult);

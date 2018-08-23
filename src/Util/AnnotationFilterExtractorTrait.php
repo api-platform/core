@@ -31,12 +31,12 @@ trait AnnotationFilterExtractorTrait
      *
      * @param array $miscAnnotations class or property annotations
      *
-     * @return array only ApiFilter annotations
+     * @return \Iterator only ApiFilter annotations
      */
     private function getFilterAnnotations(array $miscAnnotations): \Iterator
     {
         foreach ($miscAnnotations as $miscAnnotation) {
-            if (ApiFilter::class === get_class($miscAnnotation)) {
+            if (ApiFilter::class === \get_class($miscAnnotation)) {
                 yield $miscAnnotation;
             }
         }
@@ -51,7 +51,7 @@ trait AnnotationFilterExtractorTrait
 
         if ($filterAnnotation->properties) {
             foreach ($filterAnnotation->properties as $property => $strategy) {
-                if (is_int($property)) {
+                if (\is_int($property)) {
                     $properties[$strategy] = null;
                 } else {
                     $properties[$property] = $strategy;
@@ -132,8 +132,6 @@ trait AnnotationFilterExtractorTrait
      * @param \ReflectionClass $reflectionClass the reflection class of a Resource
      * @param string           $filterClass     the filter class
      * @param string           $filterId        the filter id
-     *
-     * @return string
      */
     private function generateFilterId(\ReflectionClass $reflectionClass, string $filterClass, string $filterId = null): string
     {

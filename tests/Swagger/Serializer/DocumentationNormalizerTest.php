@@ -19,6 +19,7 @@ use ApiPlatform\Core\Api\ResourceClassResolverInterface;
 use ApiPlatform\Core\Api\UrlGeneratorInterface;
 use ApiPlatform\Core\Bridge\Symfony\Routing\RouterOperationPathResolver;
 use ApiPlatform\Core\Documentation\Documentation;
+use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
@@ -1263,12 +1264,11 @@ class DocumentationNormalizerTest extends TestCase
         ]));
     }
 
-    /**
-     * @expectedException \ApiPlatform\Core\Exception\InvalidArgumentException
-     * @expectedExceptionMessage The "$filterLocator" argument is expected to be an implementation of the "Psr\Container\ContainerInterface" interface or null.
-     */
     public function testConstructWithInvalidFilterLocator()
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('The "$filterLocator" argument is expected to be an implementation of the "Psr\\Container\\ContainerInterface" interface or null.');
+
         new DocumentationNormalizer(
             $this->prophesize(ResourceMetadataFactoryInterface::class)->reveal(),
             $this->prophesize(PropertyNameCollectionFactoryInterface::class)->reveal(),
@@ -1304,6 +1304,7 @@ class DocumentationNormalizerTest extends TestCase
         $this->assertTrue($normalizer->supportsNormalization($documentation, 'json'));
         $this->assertFalse($normalizer->supportsNormalization($documentation));
         $this->assertFalse($normalizer->supportsNormalization(new Dummy(), 'json'));
+        $this->assertTrue($normalizer->hasCacheableSupportsMethod());
     }
 
     public function testNoOperations()

@@ -44,6 +44,8 @@ Feature: Create-Retrieve-Update-Delete
       },
       "arrayData": [],
       "name_converted": null,
+      "relatedOwnedDummy": null,
+      "relatedOwningDummy": null,
       "id": 1,
       "name": "My Dummy",
       "alias": null,
@@ -78,6 +80,8 @@ Feature: Create-Retrieve-Update-Delete
       },
       "arrayData": [],
       "name_converted": null,
+      "relatedOwnedDummy": null,
+      "relatedOwningDummy": null,
       "id": 1,
       "name": "My Dummy",
       "alias": null,
@@ -120,6 +124,8 @@ Feature: Create-Retrieve-Update-Delete
           },
           "arrayData": [],
           "name_converted": null,
+          "relatedOwnedDummy": null,
+          "relatedOwningDummy": null,
           "id": 1,
           "name": "My Dummy",
           "alias": null,
@@ -444,6 +450,8 @@ Feature: Create-Retrieve-Update-Delete
       ],
       "arrayData": [],
       "name_converted": null,
+      "relatedOwnedDummy": null,
+      "relatedOwningDummy": null,
       "id": 1,
       "name": "A nice dummy",
       "alias": null,
@@ -481,6 +489,8 @@ Feature: Create-Retrieve-Update-Delete
       ],
       "arrayData": [],
       "name_converted": null,
+      "relatedOwnedDummy": null,
+      "relatedOwningDummy": null,
       "id": 1,
       "name": "A nice dummy",
       "alias": null,
@@ -488,7 +498,6 @@ Feature: Create-Retrieve-Update-Delete
     }
     """
 
-  @dropSchema
   Scenario: Delete a resource
     When I send a "DELETE" request to "/dummies/1"
     Then the response status code should be 204

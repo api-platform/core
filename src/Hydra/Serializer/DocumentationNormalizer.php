@@ -29,6 +29,7 @@ use ApiPlatform\Core\Operation\Factory\SubresourceOperationFactoryInterface;
 use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
+use Symfony\Component\Serializer\Normalizer\CacheableSupportsMethodInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 /**
@@ -36,7 +37,7 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-final class DocumentationNormalizer implements NormalizerInterface
+final class DocumentationNormalizer implements NormalizerInterface, CacheableSupportsMethodInterface
 {
     const FORMAT = 'jsonld';
 
@@ -83,12 +84,6 @@ final class DocumentationNormalizer implements NormalizerInterface
 
     /**
      * Populates entrypoint properties.
-     *
-     * @param string           $resourceClass
-     * @param ResourceMetadata $resourceMetadata
-     * @param string           $shortName
-     * @param string           $prefixedShortName
-     * @param array            $entrypointProperties
      */
     private function populateEntrypointProperties(string $resourceClass, ResourceMetadata $resourceMetadata, string $shortName, string $prefixedShortName, array &$entrypointProperties)
     {
@@ -97,7 +92,7 @@ final class DocumentationNormalizer implements NormalizerInterface
             return;
         }
 
-        $entrypointProperties[] = [
+        $entrypointProperty = [
             '@type' => 'hydra:SupportedProperty',
             'hydra:property' => [
                 '@id' => sprintf('#Entrypoint/%s', lcfirst($shortName)),
@@ -119,17 +114,16 @@ final class DocumentationNormalizer implements NormalizerInterface
             'hydra:readable' => true,
             'hydra:writable' => false,
         ];
+
+        if ($resourceMetadata->getCollectionOperationAttribute('GET', 'deprecation_reason', null, true)) {
+            $entrypointProperty['owl:deprecated'] = true;
+        }
+
+        $entrypointProperties[] = $entrypointProperty;
     }
 
     /**
      * Gets a Hydra class.
-     *
-     * @param string           $resourceClass
-     * @param ResourceMetadata $resourceMetadata
-     * @param string           $shortName
-     * @param string           $prefixedShortName
-     *
-     * @return array
      */
     private function getClass(string $resourceClass, ResourceMetadata $resourceMetadata, string $shortName, string $prefixedShortName): array
     {
@@ -146,15 +140,15 @@ final class DocumentationNormalizer implements NormalizerInterface
             $class['hydra:description'] = $description;
         }
 
+        if ($resourceMetadata->getAttribute('deprecation_reason')) {
+            $class['owl:deprecated'] = true;
+        }
+
         return $class;
     }
 
     /**
      * Gets the context for the property name factory.
-     *
-     * @param ResourceMetadata $resourceMetadata
-     *
-     * @return array
      */
     private function getPropertyNameCollectionFactoryContext(ResourceMetadata $resourceMetadata): array
     {
@@ -180,13 +174,6 @@ final class DocumentationNormalizer implements NormalizerInterface
 
     /**
      * Gets Hydra properties.
-     *
-     * @param string           $resourceClass
-     * @param ResourceMetadata $resourceMetadata
-     * @param string           $shortName
-     * @param string           $prefixedShortName
-     *
-     * @return array
      */
     private function getHydraProperties(string $resourceClass, ResourceMetadata $resourceMetadata, string $shortName, string $prefixedShortName): array
     {
@@ -209,13 +196,6 @@ final class DocumentationNormalizer implements NormalizerInterface
 
     /**
      * Gets Hydra operations.
-     *
-     * @param string           $resourceClass
-     * @param ResourceMetadata $resourceMetadata
-     * @param string           $prefixedShortName
-     * @param bool             $collection
-     *
-     * @return array
      */
     private function getHydraOperations(string $resourceClass, ResourceMetadata $resourceMetadata, string $prefixedShortName, bool $collection): array
     {
@@ -242,15 +222,7 @@ final class DocumentationNormalizer implements NormalizerInterface
     /**
      * Gets and populates if applicable a Hydra operation.
      *
-     * @param string              $resourceClass
-     * @param ResourceMetadata    $resourceMetadata
-     * @param string              $operationName
-     * @param array               $operation
-     * @param string              $prefixedShortName
-     * @param string              $operationType
      * @param SubresourceMetadata $subresourceMetadata
-     *
-     * @return array
      */
     private function getHydraOperation(string $resourceClass, ResourceMetadata $resourceMetadata, string $operationName, array $operation, string $prefixedShortName, string $operationType, SubresourceMetadata $subresourceMetadata = null): array
     {
@@ -263,6 +235,10 @@ final class DocumentationNormalizer implements NormalizerInterface
         }
 
         $hydraOperation = $operation['hydra_context'] ?? [];
+        if ($resourceMetadata->getTypedOperationAttribute($operationType, $operationName, 'deprecation_reason', null, true)) {
+            $hydraOperation['owl:deprecated'] = true;
+        }
+
         $shortName = $resourceMetadata->getShortName();
 
         if ('GET' === $method && OperationType::COLLECTION === $operationType) {
@@ -326,7 +302,6 @@ final class DocumentationNormalizer implements NormalizerInterface
     /**
      * Gets the range of the property.
      *
-     * @param PropertyMetadata $propertyMetadata
      *
      * @return string|null
      */
@@ -377,11 +352,6 @@ final class DocumentationNormalizer implements NormalizerInterface
 
     /**
      * Builds the classes array.
-     *
-     * @param array $entrypointProperties
-     * @param array $classes
-     *
-     * @return array
      */
     private function getClasses(array $entrypointProperties, array $classes): array
     {
@@ -464,13 +434,6 @@ final class DocumentationNormalizer implements NormalizerInterface
 
     /**
      * Gets a property definition.
-     *
-     * @param PropertyMetadata $propertyMetadata
-     * @param string           $propertyName
-     * @param string           $prefixedShortName
-     * @param string           $shortName
-     *
-     * @return array
      */
     private function getProperty(PropertyMetadata $propertyMetadata, string $propertyName, string $prefixedShortName, string $shortName): array
     {
@@ -493,7 +456,7 @@ final class DocumentationNormalizer implements NormalizerInterface
             'hydra:title' => $propertyName,
             'hydra:required' => $propertyMetadata->isRequired(),
             'hydra:readable' => $propertyMetadata->isReadable(),
-            'hydra:writable' => $propertyMetadata->isWritable(),
+            'hydra:writable' => $propertyMetadata->isWritable() || $propertyMetadata->isInitializable(),
         ];
 
         if (null !== $range = $this->getRange($propertyMetadata)) {
@@ -504,16 +467,15 @@ final class DocumentationNormalizer implements NormalizerInterface
             $property['hydra:description'] = $description;
         }
 
+        if ($propertyMetadata->getAttribute('deprecation_reason')) {
+            $property['owl:deprecated'] = true;
+        }
+
         return $property;
     }
 
     /**
      * Computes the documentation.
-     *
-     * @param Documentation $object
-     * @param array         $classes
-     *
-     * @return array
      */
     private function computeDoc(Documentation $object, array $classes): array
     {
@@ -535,8 +497,6 @@ final class DocumentationNormalizer implements NormalizerInterface
 
     /**
      * Builds the JSON-LD context for the API documentation.
-     *
-     * @return array
      */
     private function getContext(): array
     {
@@ -562,5 +522,13 @@ final class DocumentationNormalizer implements NormalizerInterface
     public function supportsNormalization($data, $format = null, array $context = [])
     {
         return self::FORMAT === $format && $data instanceof Documentation;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function hasCacheableSupportsMethod(): bool
+    {
+        return true;
     }
 }

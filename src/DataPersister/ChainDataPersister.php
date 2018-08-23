@@ -25,7 +25,7 @@ final class ChainDataPersister implements DataPersisterInterface
     /**
      * @param DataPersisterInterface[] $persisters
      */
-    public function __construct(array $persisters)
+    public function __construct(/* iterable */ $persisters)
     {
         $this->persisters = $persisters;
     }
@@ -51,7 +51,7 @@ final class ChainDataPersister implements DataPersisterInterface
     {
         foreach ($this->persisters as $persister) {
             if ($persister->supports($data)) {
-                $persister->persist($data);
+                return $persister->persist($data) ?? $data;
             }
         }
     }

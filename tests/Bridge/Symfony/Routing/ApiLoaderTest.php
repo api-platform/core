@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\Bridge\Symfony\Routing;
 
 use ApiPlatform\Core\Bridge\Symfony\Routing\ApiLoader;
+use ApiPlatform\Core\Exception\InvalidResourceException;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
@@ -97,11 +98,39 @@ class ApiLoaderTest extends TestCase
         );
     }
 
-    /**
-     * @expectedException \RuntimeException
-     */
+    public function testApiLoaderWithPrefix()
+    {
+        $resourceMetadata = new ResourceMetadata();
+        $resourceMetadata = $resourceMetadata->withShortName('dummy');
+        $resourceMetadata = $resourceMetadata->withItemOperations([
+            'get' => ['method' => 'GET', 'requirements' => ['id' => '\d+'], 'defaults' => ['my_default' => 'default_value', '_controller' => 'should_not_be_overriden']],
+            'put' => ['method' => 'PUT'],
+            'delete' => ['method' => 'DELETE'],
+        ]);
+        $resourceMetadata = $resourceMetadata->withAttributes(['route_prefix' => '/foobar-prefix']);
+
+        $routeCollection = $this->getApiLoaderWithResourceMetadata($resourceMetadata)->load(null);
+
+        $this->assertEquals(
+            $this->getRoute('/foobar-prefix/dummies/{id}.{_format}', 'api_platform.action.get_item', DummyEntity::class, 'get', ['GET'], false, ['id' => '\d+'], ['my_default' => 'default_value']),
+            $routeCollection->get('api_dummies_get_item')
+        );
+
+        $this->assertEquals(
+            $this->getRoute('/foobar-prefix/dummies/{id}.{_format}', 'api_platform.action.delete_item', DummyEntity::class, 'delete', ['DELETE']),
+            $routeCollection->get('api_dummies_delete_item')
+        );
+
+        $this->assertEquals(
+            $this->getRoute('/foobar-prefix/dummies/{id}.{_format}', 'api_platform.action.put_item', DummyEntity::class, 'put', ['PUT']),
+            $routeCollection->get('api_dummies_put_item')
+        );
+    }
+
     public function testNoMethodApiLoader()
     {
+        $this->expectException(\RuntimeException::class);
+
         $resourceMetadata = new ResourceMetadata();
         $resourceMetadata = $resourceMetadata->withShortName('dummy');
 
@@ -116,11 +145,10 @@ class ApiLoaderTest extends TestCase
         $this->getApiLoaderWithResourceMetadata($resourceMetadata)->load(null);
     }
 
-    /**
-     * @expectedException \RuntimeException
-     */
     public function testWrongMethodApiLoader()
     {
+        $this->expectException(\RuntimeException::class);
+
         $resourceMetadata = new ResourceMetadata();
         $resourceMetadata = $resourceMetadata->withShortName('dummy');
 
@@ -135,11 +163,10 @@ class ApiLoaderTest extends TestCase
         $this->getApiLoaderWithResourceMetadata($resourceMetadata)->load(null);
     }
 
-    /**
-     * @expectedException \ApiPlatform\Core\Exception\InvalidResourceException
-     */
     public function testNoShortNameApiLoader()
     {
+        $this->expectException(InvalidResourceException::class);
+
         $this->getApiLoaderWithResourceMetadata(new ResourceMetadata())->load(null);
     }
 

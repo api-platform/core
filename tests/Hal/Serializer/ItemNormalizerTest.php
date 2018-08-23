@@ -15,18 +15,25 @@ namespace ApiPlatform\Core\Tests\Hal\Serializer;
 
 use ApiPlatform\Core\Api\IriConverterInterface;
 use ApiPlatform\Core\Api\ResourceClassResolverInterface;
+use ApiPlatform\Core\Exception\RuntimeException;
 use ApiPlatform\Core\Hal\Serializer\ItemNormalizer;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 use ApiPlatform\Core\Metadata\Property\PropertyNameCollection;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\MaxDepthDummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RelatedDummy;
+use Doctrine\Common\Annotations\AnnotationReader;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Symfony\Component\PropertyInfo\Type;
+use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
+use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
+use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
+use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Serializer\SerializerInterface;
 
 /**
@@ -34,11 +41,10 @@ use Symfony\Component\Serializer\SerializerInterface;
  */
 class ItemNormalizerTest extends TestCase
 {
-    /**
-     * @expectedException \ApiPlatform\Core\Exception\RuntimeException
-     */
     public function testDoesNotSupportDenormalization()
     {
+        $this->expectException(RuntimeException::class);
+
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
@@ -86,6 +92,7 @@ class ItemNormalizerTest extends TestCase
         $this->assertTrue($normalizer->supportsNormalization($dummy, 'jsonhal'));
         $this->assertFalse($normalizer->supportsNormalization($dummy, 'xml'));
         $this->assertFalse($normalizer->supportsNormalization($std, 'jsonhal'));
+        $this->assertTrue($normalizer->hasCacheableSupportsMethod());
     }
 
     public function testNormalize()
@@ -206,5 +213,134 @@ class ItemNormalizerTest extends TestCase
             'name' => 'hello',
         ];
         $this->assertEquals($expected, $normalizer->normalize($dummy, null, ['not_serializable' => function () {}]));
+    }
+
+    public function testMaxDepth()
+    {
+        $setId = function (MaxDepthDummy $dummy, int $id) {
+            $prop = new \ReflectionProperty($dummy, 'id');
+            $prop->setAccessible(true);
+            $prop->setValue($dummy, $id);
+        };
+
+        $level1 = new MaxDepthDummy();
+        $setId($level1, 1);
+        $level1->name = 'level 1';
+
+        $level2 = new MaxDepthDummy();
+        $setId($level2, 2);
+        $level2->name = 'level 2';
+        $level1->child = $level2;
+
+        $level3 = new MaxDepthDummy();
+        $setId($level3, 3);
+        $level3->name = 'level 3';
+        $level2->child = $level3;
+
+        $propertyNameCollection = new PropertyNameCollection(['id', 'name', 'child']);
+        $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
+        $propertyNameCollectionFactoryProphecy->create(MaxDepthDummy::class, [])->willReturn($propertyNameCollection)->shouldBeCalled();
+
+        $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
+        $propertyMetadataFactoryProphecy->create(MaxDepthDummy::class, 'id', [])->willReturn(
+            new PropertyMetadata(new Type(Type::BUILTIN_TYPE_INT), '', true)
+        )->shouldBeCalled();
+        $propertyMetadataFactoryProphecy->create(MaxDepthDummy::class, 'name', [])->willReturn(
+            new PropertyMetadata(new Type(Type::BUILTIN_TYPE_STRING), '', true)
+        )->shouldBeCalled();
+        $propertyMetadataFactoryProphecy->create(MaxDepthDummy::class, 'child', [])->willReturn(
+            new PropertyMetadata(new Type(Type::BUILTIN_TYPE_OBJECT, false, MaxDepthDummy::class), '', true, false, true)
+        )->shouldBeCalled();
+
+        $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
+        $iriConverterProphecy->getIriFromItem($level1)->willReturn('/max_depth_dummies/1')->shouldBeCalled();
+        $iriConverterProphecy->getIriFromItem($level2)->willReturn('/max_depth_dummies/2')->shouldBeCalled();
+        $iriConverterProphecy->getIriFromItem($level3)->willReturn('/max_depth_dummies/3')->shouldBeCalled();
+
+        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
+        $resourceClassResolverProphecy->getResourceClass($level1, null, true)->willReturn(MaxDepthDummy::class)->shouldBeCalled();
+        $resourceClassResolverProphecy->getResourceClass($level1, MaxDepthDummy::class, true)->willReturn(MaxDepthDummy::class)->shouldBeCalled();
+        $resourceClassResolverProphecy->getResourceClass($level2, MaxDepthDummy::class, true)->willReturn(MaxDepthDummy::class)->shouldBeCalled();
+        $resourceClassResolverProphecy->getResourceClass($level3, MaxDepthDummy::class, true)->willReturn(MaxDepthDummy::class)->shouldBeCalled();
+        $resourceClassResolverProphecy->isResourceClass(MaxDepthDummy::class)->willReturn(true)->shouldBeCalled();
+
+        $normalizer = new ItemNormalizer(
+            $propertyNameCollectionFactoryProphecy->reveal(),
+            $propertyMetadataFactoryProphecy->reveal(),
+            $iriConverterProphecy->reveal(),
+            $resourceClassResolverProphecy->reveal(),
+            null,
+            null,
+            $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()))
+        );
+        $serializer = new Serializer([$normalizer]);
+        $normalizer->setSerializer($serializer);
+
+        $expected = [
+            '_links' => [
+                'self' => [
+                    'href' => '/max_depth_dummies/1',
+                ],
+                'child' => [
+                    'href' => '/max_depth_dummies/2',
+                ],
+            ],
+            '_embedded' => [
+                'child' => [
+                    '_links' => [
+                        'self' => [
+                            'href' => '/max_depth_dummies/2',
+                        ],
+                        'child' => [
+                            'href' => '/max_depth_dummies/3',
+                        ],
+                    ],
+                    '_embedded' => [
+                        'child' => [
+                            '_links' => [
+                                'self' => [
+                                    'href' => '/max_depth_dummies/3',
+                                ],
+                            ],
+                            'id' => 3,
+                            'name' => 'level 3',
+                        ],
+                    ],
+                    'id' => 2,
+                    'name' => 'level 2',
+                ],
+            ],
+            'id' => 1,
+            'name' => 'level 1',
+        ];
+
+        $this->assertEquals($expected, $normalizer->normalize($level1, ItemNormalizer::FORMAT));
+        $this->assertEquals($expected, $normalizer->normalize($level1, ItemNormalizer::FORMAT, [ObjectNormalizer::ENABLE_MAX_DEPTH => false]));
+
+        $expected = [
+            '_links' => [
+                'self' => [
+                    'href' => '/max_depth_dummies/1',
+                ],
+                'child' => [
+                    'href' => '/max_depth_dummies/2',
+                ],
+            ],
+            '_embedded' => [
+                'child' => [
+                    '_links' => [
+                        'self' => [
+                            'href' => '/max_depth_dummies/2',
+                        ],
+                    ],
+                    'id' => 2,
+                    'name' => 'level 2',
+                ],
+            ],
+            'id' => 1,
+            'name' => 'level 1',
+        ];
+
+        $this->assertEquals($expected, $normalizer->normalize($level1, ItemNormalizer::FORMAT, [ObjectNormalizer::ENABLE_MAX_DEPTH => true]));
     }
 }

@@ -54,22 +54,20 @@ class ResourceAccessCheckerTest extends TestCase
         return [[true], [false]];
     }
 
-    /**
-     * @expectedException \LogicException
-     * @expectedExceptionMessage The "symfony/security" library must be installed to use the "access_control" attribute.
-     */
     public function testSecurityComponentNotAvailable()
     {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('The "symfony/security" library must be installed to use the "access_control" attribute.');
+
         $checker = new ResourceAccessChecker($this->prophesize(ExpressionLanguage::class)->reveal());
         $checker->isGranted(Dummy::class, 'has_role("ROLE_ADMIN")');
     }
 
-    /**
-     * @expectedException \LogicException
-     * @expectedExceptionMessage The "symfony/expression-language" library must be installed to use the "access_control".
-     */
     public function testExpressionLanguageNotInstalled()
     {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('The "symfony/expression-language" library must be installed to use the "access_control".');
+
         $authenticationTrustResolverProphecy = $this->prophesize(AuthenticationTrustResolverInterface::class);
         $tokenStorageProphecy = $this->prophesize(TokenStorageInterface::class);
         $tokenStorageProphecy->getToken()->willReturn($this->prophesize(TokenInterface::class)->reveal());
@@ -78,12 +76,11 @@ class ResourceAccessCheckerTest extends TestCase
         $checker->isGranted(Dummy::class, 'has_role("ROLE_ADMIN")');
     }
 
-    /**
-     * @expectedException \LogicException
-     * @expectedExceptionMessage The current token must be set to use the "access_control" attribute (is the URL behind a firewall?).
-     */
     public function testNotBehindAFirewall()
     {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('The current token must be set to use the "access_control" attribute (is the URL behind a firewall?).');
+
         $authenticationTrustResolverProphecy = $this->prophesize(AuthenticationTrustResolverInterface::class);
         $tokenStorageProphecy = $this->prophesize(TokenStorageInterface::class);
 

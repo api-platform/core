@@ -33,6 +33,10 @@ class ContainNonResourceItemDataProvider implements ItemDataProviderInterface, R
      */
     public function getItem(string $resourceClass, $id, string $operationName = null, array $context = [])
     {
+        if (!is_scalar($id)) {
+            throw new \InvalidArgumentException('The id must be a scalar.');
+        }
+
         // Retrieve the blog post item from somewhere
         $cnr = new ContainNonResource();
         $cnr->id = $id;

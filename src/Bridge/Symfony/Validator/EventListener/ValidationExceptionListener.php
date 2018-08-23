@@ -37,8 +37,6 @@ final class ValidationExceptionListener
 
     /**
      * Returns a list of violations normalized in the Hydra format.
-     *
-     * @param GetResponseForExceptionEvent $event
      */
     public function onKernelException(GetResponseForExceptionEvent $event)
     {

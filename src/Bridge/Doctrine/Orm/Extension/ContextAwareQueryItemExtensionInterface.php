@@ -24,8 +24,5 @@ interface ContextAwareQueryItemExtensionInterface extends QueryItemExtensionInte
 {
     public function supportsResult(string $resourceClass, string $operationName = null, array $context = []): bool;
 
-    /**
-     * @return mixed
-     */
     public function getResult(QueryBuilder $queryBuilder, string $resourceClass = null, string $operationName = null, array $context = []);
 }

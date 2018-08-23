@@ -34,6 +34,7 @@ class CollectionNormalizerTest extends TestCase
         $this->assertTrue($normalizer->supportsNormalization(new \ArrayObject(), CollectionNormalizer::FORMAT));
         $this->assertFalse($normalizer->supportsNormalization([], 'xml'));
         $this->assertFalse($normalizer->supportsNormalization(new \ArrayObject(), 'xml'));
+        $this->assertTrue($normalizer->hasCacheableSupportsMethod());
     }
 
     public function testNormalizeApiSubLevel()
@@ -61,18 +62,18 @@ class CollectionNormalizerTest extends TestCase
                     'prev' => ['href' => '/?page=2'],
                     'next' => ['href' => '/?page=4'],
                     'item' => [
-                            '/me',
-                        ],
+                        '/me',
+                    ],
                 ],
                 '_embedded' => [
-                        'item' => [
-                            [
-                                '_links' => [
-                                        'self' => '/me',
-                                    ],
-                                'name' => 'Kévin',
+                    'item' => [
+                        [
+                            '_links' => [
+                                'self' => '/me',
                             ],
+                            'name' => 'Kévin',
                         ],
+                    ],
                 ],
                 'totalItems' => 1312,
                 'itemsPerPage' => 12,

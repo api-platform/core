@@ -16,12 +16,14 @@ namespace ApiPlatform\Core\Tests\Hydra\Serializer;
 use ApiPlatform\Core\Api\FilterCollection;
 use ApiPlatform\Core\Api\ResourceClassResolverInterface;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\FilterInterface;
+use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\Hydra\Serializer\CollectionFiltersNormalizer;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
+use Symfony\Component\Serializer\Normalizer\CacheableSupportsMethodInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 /**
@@ -32,7 +34,9 @@ class CollectionFiltersNormalizerTest extends TestCase
     public function testSupportsNormalization()
     {
         $decoratedProphecy = $this->prophesize(NormalizerInterface::class);
+        $decoratedProphecy->willImplement(CacheableSupportsMethodInterface::class);
         $decoratedProphecy->supportsNormalization('foo', 'abc')->willReturn(true)->shouldBeCalled();
+        $decoratedProphecy->hasCacheableSupportsMethod()->willReturn(true)->shouldBeCalled();
 
         $normalizer = new CollectionFiltersNormalizer(
             $decoratedProphecy->reveal(),
@@ -42,6 +46,7 @@ class CollectionFiltersNormalizerTest extends TestCase
         );
 
         $this->assertTrue($normalizer->supportsNormalization('foo', 'abc'));
+        $this->assertTrue($normalizer->hasCacheableSupportsMethod());
     }
 
     public function testDoNothingIfSubLevel()
@@ -136,11 +141,12 @@ class CollectionFiltersNormalizerTest extends TestCase
 
     /**
      * @group legacy
-     * @expectedException \ApiPlatform\Core\Exception\InvalidArgumentException
-     * @expectedExceptionMessage The "$filterLocator" argument is expected to be an implementation of the "Psr\Container\ContainerInterface" interface.
      */
     public function testConstructWithInvalidFilterLocator()
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('The "$filterLocator" argument is expected to be an implementation of the "Psr\\Container\\ContainerInterface" interface.');
+
         new CollectionFiltersNormalizer(
             $this->prophesize(NormalizerInterface::class)->reveal(),
             $this->prophesize(ResourceMetadataFactoryInterface::class)->reveal(),
