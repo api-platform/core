@@ -29,7 +29,7 @@
         </service>
         -->
 
-        <service id="api_platform.metadata.property.metadata_factory.annotation" decorates="api_platform.metadata.property.metadata_factory" decoration-priority="40" class="ApiPlatform\Core\Metadata\Property\Factory\AnnotationPropertyMetadataFactory" public="false">
+        <service id="api_platform.metadata.property.metadata_factory.annotation" decorates="api_platform.metadata.property.metadata_factory" decoration-priority="20" class="ApiPlatform\Core\Metadata\Property\Factory\AnnotationPropertyMetadataFactory" public="false">
             <argument type="service" id="annotation_reader" />
             <argument type="service" id="api_platform.metadata.property.metadata_factory.annotation.inner" />
         </service>

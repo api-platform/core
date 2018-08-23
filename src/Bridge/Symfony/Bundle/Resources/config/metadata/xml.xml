@@ -23,7 +23,7 @@
         </service>
 
         <service id="api_platform.metadata.property.metadata_factory" alias="api_platform.metadata.property.metadata_factory.xml" />
-        <service id="api_platform.metadata.property.metadata_factory.xml" class="ApiPlatform\Core\Metadata\Property\Factory\ExtractorPropertyMetadataFactory" public="false">
+        <service id="api_platform.metadata.property.metadata_factory.xml" class="ApiPlatform\Core\Metadata\Property\Factory\ExtractorPropertyMetadataFactory" decoration-priority="20" public="false">
             <argument type="service" id="api_platform.metadata.extractor.xml" />
         </service>
     </services>
