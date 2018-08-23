@@ -448,9 +448,15 @@ final class SchemaBuilder implements SchemaBuilderInterface
                 continue;
             }
 
-            if ($fieldConfiguration = $this->getResourceFieldConfiguration($resourceClass, $resourceMetadata, $propertyMetadata->getDescription(), $propertyMetadata->getAttribute('deprecation_reason', ''), $propertyType, $resourceClass, $input, $mutationName, ++$depth)) {
+            $rootResource = $resourceClass;
+            if (null !== $propertyMetadata->getSubresource()) {
+                $resourceClass = $propertyMetadata->getSubresource()->getResourceClass();
+                $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
+            }
+            if ($fieldConfiguration = $this->getResourceFieldConfiguration($resourceClass, $resourceMetadata, $propertyMetadata->getDescription(), $propertyMetadata->getAttribute('deprecation_reason', ''), $propertyType, $rootResource, $input, $mutationName, ++$depth)) {
                 $fields['id' === $property ? '_id' : $property] = $fieldConfiguration;
             }
+            $resourceClass = $rootResource;
         }
 
         if (null !== $mutationName) {
