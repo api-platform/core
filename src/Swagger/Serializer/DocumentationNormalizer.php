@@ -643,7 +643,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
         $pathOperation['parameters'][] = $this->getPaginationParameters();
 
         if ($resourceMetadata->getCollectionOperationAttribute($operationName, 'pagination_client_items_per_page', $this->clientItemsPerPage, true)) {
-            $pathOperation['parameters'][] = $this->getItemsParPageParameters();
+            $pathOperation['parameters'][] = $this->getItemsPerPageParameters();
         }
     }
 
