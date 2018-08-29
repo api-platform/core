@@ -134,6 +134,8 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
      * Remove it after symfony/serializer version update @link https://github.com/symfony/symfony/pull/28263.
      *
      * {@inheritdoc}
+     *
+     * @internal
      */
     protected function instantiateObject(array &$data, $class, array &$context, \ReflectionClass $reflectionClass, $allowedAttributes, string $format = null)
     {
