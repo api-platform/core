@@ -184,7 +184,7 @@ final class SchemaBuilder implements SchemaBuilderInterface
         if ($fieldConfiguration = $this->getResourceFieldConfiguration($resourceClass, $resourceMetadata, ucfirst("{$mutationName}s a $shortName."), $deprecationReason, $resourceType, $resourceClass, false, $mutationName)) {
             $fieldConfiguration['args'] += ['input' => $this->getResourceFieldConfiguration($resourceClass, $resourceMetadata, null, $deprecationReason, $resourceType, $resourceClass, true, $mutationName)];
 
-            if (!$this->isCollectionOfObject($resourceType)) {
+            if (!$this->isCollectionOfObjects($resourceType)) {
                 $itemMutationResolverFactory = $this->itemMutationResolverFactory;
                 $fieldConfiguration['resolve'] = $itemMutationResolverFactory($resourceClass, null, $mutationName);
             }
@@ -212,13 +212,13 @@ final class SchemaBuilder implements SchemaBuilderInterface
             if ($isInternalGraphqlType) {
                 $className = '';
             } else {
-                $className = $this->isCollectionOfObject($type)
+                $className = $this->isCollectionOfObjects($type)
                     ? $type->getCollectionValueType()->getClassName()
                     : $type->getClassName();
             }
 
             $args = [];
-            if (!$input && null === $mutationName && !$isInternalGraphqlType && $this->isCollectionOfObject($type)) {
+            if (!$input && null === $mutationName && !$isInternalGraphqlType && $this->isCollectionOfObjects($type)) {
                 if ($this->paginationEnabled) {
                     $args = [
                         'first' => [
@@ -262,7 +262,7 @@ final class SchemaBuilder implements SchemaBuilderInterface
 
             if ($isInternalGraphqlType || $input) {
                 $resolve = null;
-            } elseif ($this->isCollectionOfObject($type)) {
+            } elseif ($this->isCollectionOfObjects($type)) {
                 $resolverFactory = $this->collectionResolverFactory;
                 $resolve = $resolverFactory($className, $rootResource, $mutationName);
             } else {
@@ -359,14 +359,14 @@ final class SchemaBuilder implements SchemaBuilderInterface
                 $graphqlType = GraphQLType::string();
                 break;
             case Type::BUILTIN_TYPE_ARRAY:
-                if ($this->isCollectionOfScalar($type)) {
+                if ($this->isCollectionOfScalars($type)) {
                     $graphqlType = $this->convertType($type->getCollectionValueType());
                     break;
                 }
-                $graphqlType = $this->convertToIterableType();
+                $graphqlType = $this->getIterableType();
                 break;
             case Type::BUILTIN_TYPE_ITERABLE:
-                $graphqlType = $this->convertToIterableType();
+                $graphqlType = $this->getIterableType();
                 break;
             case Type::BUILTIN_TYPE_OBJECT:
                 if (($input && $depth > 0) || is_a($type->getClassName(), \DateTimeInterface::class, true)) {
@@ -374,7 +374,7 @@ final class SchemaBuilder implements SchemaBuilderInterface
                     break;
                 }
 
-                $resourceClass = $this->isCollectionOfObject($type)
+                $resourceClass = $this->isCollectionOfObjects($type)
                     ? $type->getCollectionValueType()->getClassName()
                     : $type->getClassName();
                 if (null === $resourceClass) {
@@ -397,13 +397,13 @@ final class SchemaBuilder implements SchemaBuilderInterface
                 throw new InvalidTypeException(sprintf('The type "%s" is not supported.', $builtinType));
         }
 
-        if ($this->isCollectionOfObject($type)) {
+        if ($this->isCollectionOfObjects($type)) {
             return $this->paginationEnabled && !$input
                 ? $this->getResourcePaginatedCollectionType($resourceClass, $graphqlType)
                 : GraphQLType::listOf($graphqlType);
         }
 
-        if ($this->isCollectionOfScalar($type)) {
+        if ($this->isCollectionOfScalars($type)) {
             return GraphQLType::listOf($graphqlType);
         }
 
@@ -546,17 +546,16 @@ final class SchemaBuilder implements SchemaBuilderInterface
         return $this->graphqlTypes["{$shortName}Connection"] = new ObjectType($configuration);
     }
 
-    private function isCollectionOfObject(Type $type): bool
+    private function isCollectionOfObjects(Type $type): bool
     {
         return $type->isCollection()
             && Type::BUILTIN_TYPE_OBJECT === $type->getBuiltinType();
     }
 
-    private function isCollectionOfScalar(Type $type): bool
+    private function isCollectionOfScalars(Type $type): bool
     {
         return $type->isCollection()
             && null !== $type->getCollectionValueType()
-            && null === $type->getCollectionValueType()->getClassName()
             && \in_array(
                 $type->getCollectionValueType()->getBuiltinType(),
                 [Type::BUILTIN_TYPE_INT, Type::BUILTIN_TYPE_FLOAT, Type::BUILTIN_TYPE_STRING, Type::BUILTIN_TYPE_BOOL],
@@ -564,7 +563,7 @@ final class SchemaBuilder implements SchemaBuilderInterface
             );
     }
 
-    private function convertToIterableType()
+    private function getIterableType()
     {
         return $this->graphqlTypes['Iterable'];
     }
