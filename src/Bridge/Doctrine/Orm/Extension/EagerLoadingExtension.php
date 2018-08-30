@@ -232,6 +232,8 @@ final class EagerLoadingExtension implements ContextAwareQueryCollectionExtensio
 
             $this->joinRelations($queryBuilder, $queryNameGenerator, $mapping['targetEntity'], $forceEager, $fetchPartial, $associationAlias, $options, $normalizationContext, 'leftJoin' === $method, $joinCount, $currentDepth);
         }
+
+        $queryBuilder->getQuery()->getResult();
     }
 
     private function addSelect(QueryBuilder $queryBuilder, string $entity, string $associationAlias, array $propertyMetadataOptions)
