@@ -25,6 +25,8 @@ use Symfony\Component\Serializer\SerializerInterface;
 /**
  * @author Amrouche Hamza <hamza.simperfit@gmail.com>
  * @author Baptiste Meyer <baptiste.meyer@gmail.com>
+ *
+ * @group time-sensitive
  */
 class ExceptionActionTest extends TestCase
 {
