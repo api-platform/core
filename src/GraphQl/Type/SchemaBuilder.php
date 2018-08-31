@@ -556,11 +556,7 @@ final class SchemaBuilder implements SchemaBuilderInterface
     {
         return $type->isCollection()
             && null !== $type->getCollectionValueType()
-            && \in_array(
-                $type->getCollectionValueType()->getBuiltinType(),
-                [Type::BUILTIN_TYPE_INT, Type::BUILTIN_TYPE_FLOAT, Type::BUILTIN_TYPE_STRING, Type::BUILTIN_TYPE_BOOL],
-                true
-            );
+            && null === $type->getCollectionValueType()->getClassName();
     }
 
     private function getIterableType()
