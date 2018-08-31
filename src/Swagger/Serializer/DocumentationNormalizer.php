@@ -445,7 +445,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
     {
         $propertySchema = new \ArrayObject($propertyMetadata->getAttributes()['swagger_context'] ?? []);
 
-        if (false === $propertyMetadata->isWritable()) {
+        if (false === $propertyMetadata->isWritable() && !$propertyMetadata->isInitializable()) {
             $propertySchema['readOnly'] = true;
         }
 
