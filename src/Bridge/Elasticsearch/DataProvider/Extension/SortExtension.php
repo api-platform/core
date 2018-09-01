@@ -53,7 +53,7 @@ final class SortExtension implements FullBodySearchCollectionExtensionInterface
     {
         $orders = [];
 
-        if (null !== ($defaultOrder = $this->resourceMetadataFactory->create($resourceClass)->getAttribute('order')) && is_array($defaultOrder)) {
+        if (null !== ($defaultOrder = $this->resourceMetadataFactory->create($resourceClass)->getAttribute('order')) && \is_array($defaultOrder)) {
             foreach ($defaultOrder as $property => $direction) {
                 if (\is_int($property)) {
                     $property = $direction;

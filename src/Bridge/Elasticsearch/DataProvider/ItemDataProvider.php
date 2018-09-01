@@ -63,7 +63,7 @@ final class ItemDataProvider implements ItemDataProviderInterface, RestrictedDat
      */
     public function getItem(string $resourceClass, $id, string $operationName = null, array $context = [])
     {
-        if (is_array($id)) {
+        if (\is_array($id)) {
             if (1 !== \count($id)) {
                 throw new InvalidArgumentException('Composite identifiers not supported.');
             }

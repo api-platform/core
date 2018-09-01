@@ -161,8 +161,6 @@ final class Pagination
 
     /**
      * Gets the given pagination parameter name from the given request.
-     *
-     * @return mixed
      */
     private function getParameterFromRequest(Request $request, string $parameterName, $default = null)
     {

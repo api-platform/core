@@ -16,7 +16,6 @@ namespace ApiPlatform\Core\Bridge\Elasticsearch\DataProvider\Filter;
 use ApiPlatform\Core\Api\ResourceClassResolverInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
-use Symfony\Component\PropertyInfo\Type;
 
 /**
  * Order the collection by given properties.

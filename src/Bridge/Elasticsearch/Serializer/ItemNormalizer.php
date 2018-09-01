@@ -55,7 +55,7 @@ final class ItemNormalizer extends ObjectNormalizer
      */
     public function denormalize($data, $class, $format = null, array $context = [])
     {
-        if (isset($data['_id']) && is_string($data['_id']) && isset($data['_source']) && is_array($data['_source'])) {
+        if (isset($data['_id']) && \is_string($data['_id']) && isset($data['_source']) && \is_array($data['_source'])) {
             $data = $this->populateIdentifier($data, $class)['_source'];
         }
 

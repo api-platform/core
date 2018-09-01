@@ -154,8 +154,6 @@ final class TermFilter extends AbstractFilter implements ConstantScoreFilterInte
 
     /**
      * Gets the ID from an IRI or a raw ID.
-     *
-     * @return mixed
      */
     private function getIdentifierValue(string $iri, string $property)
     {
