@@ -99,6 +99,10 @@ trait OperationDataProviderTrait
             return $id;
         }
 
+        if (!isset($attributes['subresource_context'])) {
+            throw new RuntimeException('Either "item_operation_name" or "collection_operation_name" must be defined, unless the "_api_receive" request attribute is set to false.');
+        }
+
         $identifiers = [];
 
         foreach ($attributes['subresource_context']['identifiers'] as $key => list($id, $resourceClass, $hasIdentifier)) {

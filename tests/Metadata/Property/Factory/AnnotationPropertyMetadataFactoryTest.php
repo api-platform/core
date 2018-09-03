@@ -83,7 +83,7 @@ class AnnotationPropertyMetadataFactoryTest extends TestCase
             [$propertyReaderProphecy, null, 'description'],
             [$getterReaderProphecy, $decoratedThrowNotFoundProphecy, 'description'],
             [$setterReaderProphecy, $decoratedThrowNotFoundProphecy, 'description'],
-            [$setterReaderProphecy, $decoratedReturnProphecy, 'Hi'],
+            [$setterReaderProphecy, $decoratedReturnProphecy, 'description'],
         ];
     }
 

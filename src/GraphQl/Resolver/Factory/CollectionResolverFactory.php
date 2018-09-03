@@ -28,7 +28,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 /**
- * Creates a function retrieving a collection to resolve a GraphQL query.
+ * Creates a function retrieving a collection to resolve a GraphQL query or a field returned by a mutation.
  *
  * @experimental
  *
@@ -62,7 +62,7 @@ final class CollectionResolverFactory implements ResolverFactoryInterface
 
     public function __invoke(string $resourceClass = null, string $rootClass = null, string $operationName = null): callable
     {
-        return function ($source, $args, $context, ResolveInfo $info) use ($resourceClass, $rootClass) {
+        return function ($source, $args, $context, ResolveInfo $info) use ($resourceClass, $rootClass, $operationName) {
             if (null === $resourceClass) {
                 return null;
             }
@@ -75,7 +75,7 @@ final class CollectionResolverFactory implements ResolverFactoryInterface
             }
 
             $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
-            $dataProviderContext = $resourceMetadata->getGraphqlAttribute('query', 'normalization_context', [], true);
+            $dataProviderContext = $resourceMetadata->getGraphqlAttribute($operationName ?? 'query', 'normalization_context', [], true);
             $dataProviderContext['attributes'] = $this->fieldsToAttributes($info);
             $dataProviderContext['filters'] = $this->getNormalizedFilters($args);
 
@@ -87,7 +87,7 @@ final class CollectionResolverFactory implements ResolverFactoryInterface
                 $collection = $this->collectionDataProvider->getCollection($resourceClass, null, $dataProviderContext);
             }
 
-            $this->canAccess($this->resourceAccessChecker, $resourceMetadata, $resourceClass, $info, $collection, 'query');
+            $this->canAccess($this->resourceAccessChecker, $resourceMetadata, $resourceClass, $info, $collection, $operationName ?? 'query');
 
             if (!$this->paginationEnabled) {
                 $data = [];

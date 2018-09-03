@@ -50,12 +50,16 @@ abstract class FileConfigurationMetadataFactoryProvider extends TestCase
             'description' => 'The dummy foo',
             'readable' => true,
             'writable' => true,
-            'readableLink' => true,
+            'readableLink' => false,
             'writableLink' => false,
             'required' => true,
             'identifier' => false,
-            'attributes' => ['Foo'],
-            'subresource' => new SubresourceMetadata('Foo', true, 1),
+            'attributes' => [
+                'foo' => ['Foo'],
+                'bar' => [['Bar'], 'baz' => 'Baz'],
+                'baz' => 'Baz',
+            ],
+            'subresource' => new SubresourceMetadata('Foo', false, null),
         ];
 
         return [[$this->getPropertyMetadata($metadata)]];

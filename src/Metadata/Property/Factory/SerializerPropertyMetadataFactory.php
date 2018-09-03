@@ -93,9 +93,6 @@ final class SerializerPropertyMetadataFactory implements PropertyMetadataFactory
      */
     private function transformLinkStatus(PropertyMetadata $propertyMetadata, array $normalizationGroups = null, array $denormalizationGroups = null): PropertyMetadata
     {
-        $propertyMetadata = $propertyMetadata->withReadableLink(true);
-        $propertyMetadata = $propertyMetadata->withWritableLink(true);
-
         // No need to check link status if property is not readable and not writable
         if (false === $propertyMetadata->isReadable() && false === $propertyMetadata->isWritable()) {
             return $propertyMetadata;
@@ -109,7 +106,7 @@ final class SerializerPropertyMetadataFactory implements PropertyMetadataFactory
         $relatedClass = $type->isCollection() && ($collectionValueType = $type->getCollectionValueType()) ? $collectionValueType->getClassName() : $type->getClassName();
 
         if (null === $relatedClass) {
-            return $propertyMetadata;
+            return $propertyMetadata->withReadableLink(true)->withWritableLink(true);
         }
 
         // No need to check link status if related class is not a resource
@@ -121,8 +118,13 @@ final class SerializerPropertyMetadataFactory implements PropertyMetadataFactory
 
         $relatedGroups = $this->getResourceSerializerGroups($relatedClass);
 
-        $propertyMetadata = $propertyMetadata->withReadableLink(null !== $normalizationGroups && !empty(array_intersect($normalizationGroups, $relatedGroups)));
-        $propertyMetadata = $propertyMetadata->withWritableLink(null !== $denormalizationGroups && !empty(array_intersect($denormalizationGroups, $relatedGroups)));
+        if (null === $propertyMetadata->isReadableLink()) {
+            $propertyMetadata = $propertyMetadata->withReadableLink(null !== $normalizationGroups && !empty(array_intersect($normalizationGroups, $relatedGroups)));
+        }
+
+        if (null === $propertyMetadata->isWritableLink()) {
+            $propertyMetadata = $propertyMetadata->withWritableLink(null !== $denormalizationGroups && !empty(array_intersect($denormalizationGroups, $relatedGroups)));
+        }
 
         return $propertyMetadata;
     }

@@ -33,10 +33,6 @@ doctrine_mongodb:
 twig:
     strict_variables: '%kernel.debug%'
 
-sensio_framework_extra:
-    router:
-        annotations: false
-
 api_platform:
     title:                             'My Dummy API'
     description:                       'This is a test API.'

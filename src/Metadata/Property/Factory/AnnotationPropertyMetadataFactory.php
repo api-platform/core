@@ -128,11 +128,6 @@ final class AnnotationPropertyMetadataFactory implements PropertyMetadataFactory
 
     private function createWith(PropertyMetadata $propertyMetadata, array $property, $value): PropertyMetadata
     {
-        $getter = $property[0].ucfirst($property[1]);
-        if (null !== $propertyMetadata->$getter()) {
-            return $propertyMetadata;
-        }
-
         $wither = 'with'.ucfirst($property[1]);
 
         return $propertyMetadata->$wither($value);

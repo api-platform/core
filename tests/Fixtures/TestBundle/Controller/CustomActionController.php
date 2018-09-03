@@ -31,11 +31,11 @@ class CustomActionController extends Controller
      *     defaults={"_api_resource_class"=CustomActionDummy::class, "_api_item_operation_name"="custom_normalization"}
      * )
      */
-    public function customNormalizationAction(CustomActionDummy $_data)
+    public function customNormalizationAction(CustomActionDummy $data)
     {
-        $_data->setFoo('foo');
+        $data->setFoo('foo');
 
-        return $this->json($_data);
+        return $this->json($data);
     }
 
     /**

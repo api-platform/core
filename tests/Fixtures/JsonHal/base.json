@@ -1,0 +1,51 @@
+{
+  "definitions": {
+    "id": {
+      "title": "ID",
+      "description": "Unique ID",
+      "type": "string"
+    },
+    "name": {
+      "title": "Name",
+      "description": "Name of a resource, link, action, etc.",
+      "type": "string"
+    },
+    "class": {
+      "title": "Class Name",
+      "description": "Class name of of a resource, link, action, etc.",
+      "type": "string"
+    },
+    "classes": {
+      "title": "Class Array",
+      "description": "An array of classes",
+      "type": "array",
+      "items": { "$ref": "#/definitions/class" }
+    },
+    "mediaType": {
+      "title": "Media Type",
+      "description": "A media type",
+      "type": "string"
+    },
+    "mediaTypes": {
+      "title": "Media Types",
+      "description": "A list of media types",
+      "type": "array",
+      "items": { "$ref": "#/definitions/mediaType" }
+    },
+    "title": {
+      "title": "Title",
+      "description": "A title for a resource, link, action, etc.",
+      "type": "string"
+    },
+    "description": {
+      "title": "Description",
+      "description": "A description for a resource, link, action, etc.",
+      "type": "string"
+    },
+    "prefix": {
+      "title": "Prefix",
+      "description": "Prefix used for curies",
+      "type": "string"
+    }
+  }
+}
