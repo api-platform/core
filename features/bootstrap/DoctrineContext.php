@@ -11,11 +11,13 @@
 
 declare(strict_types=1);
 
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\Address as AddressDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\Answer as AnswerDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\CompositeItem as CompositeItemDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\CompositeLabel as CompositeLabelDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\CompositePrimitiveItem as CompositePrimitiveItemDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\CompositeRelation as CompositeRelationDocument;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\Customer as CustomerDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\Dummy as DummyDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\DummyAggregateOffer as DummyAggregateOfferDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\DummyCar as DummyCarDocument;
@@ -37,6 +39,7 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\FooDummy as FooDummyDocu
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\FourthLevel as FourthLevelDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\Greeting as GreetingDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\MaxDepthDummy as MaxDepthDummyDocument;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\Order as OrderDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\Person as PersonDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\PersonToPet as PersonToPetDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\Pet as PetDocument;
@@ -49,12 +52,14 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\RelationEmbedder as Rela
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\SecuredDummy as SecuredDummyDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\ThirdLevel as ThirdLevelDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\User as UserDocument;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Address;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Answer;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\CompositeItem;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\CompositeLabel;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\CompositePrimitiveItem;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\CompositeRelation;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Container;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Customer;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyAggregateOffer;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyCar;
@@ -78,6 +83,7 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\FourthLevel;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Greeting;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\MaxDepthDummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Node;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Order;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Person;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\PersonToPet;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Pet;
@@ -1504,5 +1510,34 @@ final class DoctrineContext implements Context
     private function buildThirdLevel()
     {
         return $this->isOrm() ? new ThirdLevel() : new ThirdLevelDocument();
+    }
+
+    /**
+     * @Given there is a order with same customer and receiver
+     */
+    public function testEagerLoadingNotDuplicateRelation()
+    {
+        $customer = $this->isOrm() ? new Customer() : new CustomerDocument();
+        $customer->name = 'customer_name';
+
+        $address1 = $this->isOrm() ? new Address() : new AddressDocument();
+        $address1->name = 'foo';
+        $address2 = $this->isOrm() ? new Address() : new AddressDocument();
+        $address2->name = 'bar';
+
+        $order = $this->isOrm() ? new Order() : new OrderDocument();
+        $order->recipient = $customer;
+        $order->customer = $customer;
+
+        $customer->addresses->add($address1);
+        $customer->addresses->add($address2);
+
+        $this->manager->persist($address1);
+        $this->manager->persist($address2);
+        $this->manager->persist($customer);
+        $this->manager->persist($order);
+
+        $this->manager->flush();
+        $this->manager->clear();
     }
 }
