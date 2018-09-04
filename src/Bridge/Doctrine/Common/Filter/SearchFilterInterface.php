@@ -18,7 +18,7 @@ namespace ApiPlatform\Core\Bridge\Doctrine\Common\Filter;
  *
  * @author Alan Poulain <contact@alanpoulain.eu>
  */
-interface SearchFilterInterface extends FilterInterface
+interface SearchFilterInterface
 {
     /**
      * @var string Exact matching

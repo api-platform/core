@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Bridge\Doctrine\Orm\Filter;
 
-use ApiPlatform\Core\Bridge\Doctrine\ClassMetadata\PropertyHelper;
+use ApiPlatform\Core\Bridge\Doctrine\Common\PropertyHelper;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryBuilderHelper;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
@@ -81,14 +81,6 @@ abstract class AbstractFilter implements FilterInterface
         foreach ($this->extractProperties($request, $resourceClass) as $property => $value) {
             $this->filterProperty($property, $value, $queryBuilder, $queryNameGenerator, $resourceClass, $operationName);
         }
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public static function getPropertyHelperServiceName(): string
-    {
-        return 'api_platform.doctrine.orm.property_helper';
     }
 
     /**

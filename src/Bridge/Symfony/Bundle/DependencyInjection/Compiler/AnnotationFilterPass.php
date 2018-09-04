@@ -13,6 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\Compiler;
 
+use ApiPlatform\Core\Bridge\Doctrine\MongoDB\Filter\FilterInterface as MongoDbOdmFilterInterface;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\FilterInterface;
 use ApiPlatform\Core\Util\AnnotationFilterExtractorTrait;
 use ApiPlatform\Core\Util\ReflectionClassRecursiveIterator;
 use Doctrine\Common\Annotations\Reader;
@@ -61,8 +63,13 @@ final class AnnotationFilterPass implements CompilerPassInterface
             $definition->setClass($filterClass);
             $definition->addTag(self::TAG_FILTER_NAME);
             $definition->setAutowired(true);
-            if ((new \ReflectionClass($filterClass))->hasMethod('getPropertyHelperServiceName')) {
-                $definition->setArgument('$propertyHelper', new Reference($filterClass::getPropertyHelperServiceName()));
+            if (is_a($filterClass, FilterInterface::class, true) || is_a($filterClass, MongoDbOdmFilterInterface::class, true)) {
+                $definition->setArgument(
+                    '$propertyHelper',
+                    is_a($filterClass, MongoDbOdmFilterInterface::class, true)
+                    ? new Reference('api_platform.doctrine.mongodb.property_helper')
+                    : new Reference('api_platform.doctrine.orm.property_helper')
+                );
             }
 
             foreach ($arguments as $key => $value) {

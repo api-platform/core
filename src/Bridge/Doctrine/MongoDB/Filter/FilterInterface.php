@@ -13,11 +13,11 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Bridge\Doctrine\MongoDB\Filter;
 
-use ApiPlatform\Core\Bridge\Doctrine\Common\Filter\FilterInterface as BaseFilterInterface;
+use ApiPlatform\Core\Api\FilterInterface as BaseFilterInterface;
 use Doctrine\ODM\MongoDB\Aggregation\Builder;
 
 /**
- * Doctrine ODM filter interface.
+ * Doctrine MongoDB ODM filter interface.
  *
  * @author Alan Poulain <contact@alanpoulain.eu>
  */

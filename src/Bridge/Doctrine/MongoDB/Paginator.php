@@ -18,7 +18,7 @@ use Doctrine\ODM\MongoDB\CommandCursor;
 use Doctrine\ODM\MongoDB\UnitOfWork;
 
 /**
- * Decorates the Doctrine ODM paginator.
+ * Decorates the Doctrine MongoDB ODM paginator.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  * @author Alan Poulain <contact@alanpoulain.eu>

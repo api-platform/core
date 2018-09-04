@@ -11,20 +11,19 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Bridge\Doctrine\ClassMetadata;
+namespace ApiPlatform\Core\Bridge\Doctrine\Common;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Persistence\Mapping\ClassMetadata;
-use Doctrine\DBAL\Types\Type;
 
 /**
- * Helper for getting information regarding a property using the resource metadata.
+ * {@inheritdoc}
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  * @author Théo FIDRY <theo.fidry@gmail.com>
  * @author Alan Poulain <contact@alanpoulain.eu>
  */
-final class PropertyHelper
+final class PropertyHelper implements PropertyHelperInterface
 {
     private $managerRegistry;
 
@@ -34,7 +33,7 @@ final class PropertyHelper
     }
 
     /**
-     * Determines whether the given property is mapped.
+     * {@inheritdoc}
      */
     public function isPropertyMapped(string $property, string $resourceClass, bool $allowAssociation = false): bool
     {
@@ -50,7 +49,7 @@ final class PropertyHelper
     }
 
     /**
-     * Determines whether the given property is nested.
+     * {@inheritdoc}
      */
     public function isPropertyNested(string $property, ?string $resourceClass): bool
     {
@@ -63,7 +62,7 @@ final class PropertyHelper
     }
 
     /**
-     * Determines whether the given property is embedded.
+     * {@inheritdoc}
      */
     public function isPropertyEmbedded(string $property, string $resourceClass): bool
     {
@@ -71,11 +70,7 @@ final class PropertyHelper
     }
 
     /**
-     * Splits the given property into parts.
-     *
-     * Returns an array with the following keys:
-     *   - associations: array of associations according to nesting order
-     *   - field: string holding the actual field (leaf node)
+     * {@inheritdoc}
      */
     public function splitPropertyParts(string $property, ?string $resourceClass): array
     {
@@ -109,9 +104,7 @@ final class PropertyHelper
     }
 
     /**
-     * Gets the Doctrine Type of a given property/resourceClass.
-     *
-     * @return Type|string|null
+     * {@inheritdoc}
      */
     public function getDoctrineFieldType(string $property, string $resourceClass)
     {
@@ -122,9 +115,7 @@ final class PropertyHelper
     }
 
     /**
-     * Gets nested class metadata for the given resource.
-     *
-     * @param string[] $associations
+     * {@inheritdoc}
      */
     public function getNestedMetadata(string $resourceClass, array $associations): ClassMetadata
     {
@@ -142,7 +133,7 @@ final class PropertyHelper
     }
 
     /**
-     * Gets class metadata for the given resource.
+     * {@inheritdoc}
      */
     public function getClassMetadata(string $resourceClass): ClassMetadata
     {

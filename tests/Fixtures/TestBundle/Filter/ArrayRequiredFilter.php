@@ -19,11 +19,6 @@ use Doctrine\ORM\QueryBuilder;
 
 final class ArrayRequiredFilter extends AbstractFilter
 {
-    public static function getPropertyHelperServiceName(): string
-    {
-        return '';
-    }
-
     protected function filterProperty(string $property, $value, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, string $operationName = null)
     {
     }

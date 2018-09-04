@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Bridge\Doctrine\MongoDB\Filter;
 
-use ApiPlatform\Core\Bridge\Doctrine\ClassMetadata\PropertyHelper;
+use ApiPlatform\Core\Bridge\Doctrine\Common\PropertyHelper;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
 use Doctrine\ODM\MongoDB\Aggregation\Builder;
 use Psr\Log\LoggerInterface;
@@ -40,14 +40,6 @@ abstract class AbstractContextAwareFilter implements ContextAwareFilterInterface
         foreach ($context['filters'] as $property => $value) {
             $this->filterProperty($property, $value, $aggregationBuilder, $resourceClass, $operationName, $context);
         }
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public static function getPropertyHelperServiceName(): string
-    {
-        return 'api_platform.doctrine.mongodb.property_helper';
     }
 
     /**
