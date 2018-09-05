@@ -60,7 +60,7 @@ trait BooleanFilterTrait
     /**
      * Determines whether the given property refers to a boolean field.
      */
-    protected function isBooleanField(string $property, string $resourceClass): bool
+    private function isBooleanField(string $property, string $resourceClass): bool
     {
         $propertyParts = $this->propertyHelper->splitPropertyParts($property, $resourceClass);
         $metadata = $this->propertyHelper->getNestedMetadata($resourceClass, $propertyParts['associations']);
@@ -71,7 +71,7 @@ trait BooleanFilterTrait
     /**
      * @return bool|null
      */
-    protected function normalizeValue($value, string $property)
+    private function normalizeValue($value, string $property)
     {
         if (\in_array($value, [true, 'true', '1'], true)) {
             $value = true;

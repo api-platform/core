@@ -128,7 +128,7 @@ trait SearchFilterTrait
     /**
      * Gets the ID from an IRI or a raw ID.
      */
-    protected function getIdFromValue(string $value)
+    private function getIdFromValue(string $value)
     {
         try {
             if ($item = $this->iriConverter->getItemFromIri($value, ['fetch_data' => false])) {
@@ -144,7 +144,7 @@ trait SearchFilterTrait
     /**
      * Normalize the values array.
      */
-    protected function normalizeValues(array $values): array
+    private function normalizeValues(array $values): array
     {
         foreach ($values as $key => $value) {
             if (!\is_int($key) || !\is_string($value)) {
@@ -160,7 +160,7 @@ trait SearchFilterTrait
      *
      * @param Type|string $type
      */
-    protected function hasValidValues(array $values, $type = null): bool
+    private function hasValidValues(array $values, $type = null): bool
     {
         foreach ($values as $key => $value) {
             if (Type::INTEGER === $type && null !== $value && false === filter_var($value, FILTER_VALIDATE_INT)) {

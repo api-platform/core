@@ -29,7 +29,7 @@ use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
  * @author Kévin Dunglas <dunglas@gmail.com>
  * @author Alan Poulain <contact@alanpoulain.eu>
  */
-class SearchFilter extends AbstractContextAwareFilter implements SearchFilterInterface
+final class SearchFilter extends AbstractContextAwareFilter implements SearchFilterInterface
 {
     use SearchFilterTrait;
 
@@ -150,7 +150,7 @@ class SearchFilter extends AbstractContextAwareFilter implements SearchFilterInt
      *
      * @throws InvalidArgumentException If strategy does not exist
      */
-    protected function addEqualityMatchStrategy(string $strategy, $value, bool $caseSensitive)
+    private function addEqualityMatchStrategy(string $strategy, $value, bool $caseSensitive)
     {
         $addCaseFlag = $this->addCaseFlag($caseSensitive);
 
@@ -178,7 +178,7 @@ class SearchFilter extends AbstractContextAwareFilter implements SearchFilterInt
      * For example, "/value/" will be returned as "/value/i" when $caseSensitive
      * is false.
      */
-    protected function addCaseFlag(bool $caseSensitive): \Closure
+    private function addCaseFlag(bool $caseSensitive): \Closure
     {
         return function (string $expr) use ($caseSensitive): string {
             if ($caseSensitive) {

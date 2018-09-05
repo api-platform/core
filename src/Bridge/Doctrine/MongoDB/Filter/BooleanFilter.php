@@ -29,7 +29,7 @@ use Doctrine\ODM\MongoDB\Aggregation\Builder;
  * @author Teoh Han Hui <teohhanhui@gmail.com>
  * @author Alan Poulain <contact@alanpoulain.eu>
  */
-class BooleanFilter extends AbstractContextAwareFilter
+final class BooleanFilter extends AbstractContextAwareFilter
 {
     use BooleanFilterTrait;
 
