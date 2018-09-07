@@ -20,6 +20,7 @@ use Doctrine\DBAL\Types\Type;
  * Trait for filtering the collection by given properties.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
+ * @author Alan Poulain <contact@alanpoulain.eu>
  */
 trait SearchFilterTrait
 {

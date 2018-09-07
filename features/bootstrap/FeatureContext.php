@@ -51,6 +51,7 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\UuidIdentifierDummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\Dummy as DummyDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\DummyCar as DummyCarDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\DummyCarColor as DummyCarColorDocument;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\DummyDate as DummyDateDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\DummyFriend as DummyFriendDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\EmbeddableDummy as EmbeddableDummyDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\EmbeddedDummy as EmbeddedDummyDocument;
@@ -947,7 +948,7 @@ final class FeatureContext implements Context, SnippetAcceptingContext
         for ($i = 1; $i <= $nb; ++$i) {
             $date = new \DateTime(sprintf('2015-04-%d', $i), new \DateTimeZone('UTC'));
 
-            $dummy = new DummyDate();
+            $dummy = $this->buildDummyDate();
             $dummy->dummyDate = $date;
 
             $this->manager->persist($dummy);
@@ -1068,6 +1069,14 @@ final class FeatureContext implements Context, SnippetAcceptingContext
     private function buildDummyCarColor()
     {
         return $this->isOrm() ? new DummyCarColor() : new DummyCarColorDocument();
+    }
+
+    /**
+     * @return DummyDate|DummyDateDocument
+     */
+    private function buildDummyDate()
+    {
+        return $this->isOrm() ? new DummyDate() : new DummyDateDocument();
     }
 
     /**

@@ -4,6 +4,7 @@ Feature: Date filter on collections
   As a client software developer
   I need to retrieve collections filtered by date
 
+  @mongodb
   @createSchema
   Scenario: Get collection filtered by date
     Given there are 30 dummy objects with dummyDate
@@ -161,6 +162,7 @@ Feature: Date filter on collections
     }
     """
 
+  @mongodb
   Scenario: Search for entities within a range
     # The order should not influence the search
     When I send a "GET" request to "/dummies?dummyDate[before]=2015-04-05&dummyDate[after]=2015-04-05"
@@ -237,6 +239,7 @@ Feature: Date filter on collections
     }
     """
 
+  @mongodb
   Scenario: Search for entities within an impossible range
     When I send a "GET" request to "/dummies?dummyDate[after]=2015-04-06&dummyDate[before]=2015-04-04"
     Then the response status code should be 200
@@ -265,6 +268,7 @@ Feature: Date filter on collections
     }
     """
 
+  @mongodb
   Scenario: Get collection filtered by association date
     Given there are 30 dummy objects with dummyDate and relatedDummy
     When I send a "GET" request to "/dummies?relatedDummy.dummyDate[after]=2015-04-28"
@@ -384,6 +388,7 @@ Feature: Date filter on collections
     }
     """
 
+  @mongodb
   @createSchema
   Scenario: Get collection filtered by association date
     Given there are 2 dummy objects with dummyDate and relatedDummy
@@ -677,6 +682,7 @@ Feature: Date filter on collections
     }
     """
 
+  @mongodb
   @createSchema
   Scenario: Get collection filtered by date that is not a datetime
     Given there are 30 dummydate objects with dummyDate
@@ -693,6 +699,7 @@ Feature: Date filter on collections
     And the JSON node "hydra:totalItems" should be equal to 3
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
 
+  @mongodb
   @createSchema
   Scenario: Get collection filtered by embedded date
     Given there are 2 embedded dummy objects with dummyDate and embeddedDummy

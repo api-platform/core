@@ -28,6 +28,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  * @ApiResource(attributes={
  *     "filters"={
  *         "my_dummy.mongodb.boolean",
+ *         "my_dummy.mongodb.date",
  *         "my_dummy.mongodb.search"
  *     }
  * })
@@ -111,7 +112,7 @@ class Dummy
     /**
      * @var RelatedDummy A related dummy
      *
-     * @ODM\ReferenceOne(targetDocument="RelatedDummy")
+     * @ODM\ReferenceOne(targetDocument="RelatedDummy", storeAs="id")
      */
     public $relatedDummy;
 

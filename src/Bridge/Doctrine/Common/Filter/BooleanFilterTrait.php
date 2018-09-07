@@ -27,6 +27,7 @@ use Doctrine\DBAL\Types\Type as DBALType;
  *
  * @author Amrouche Hamza <hamza.simperfit@gmail.com>
  * @author Teoh Han Hui <teohhanhui@gmail.com>
+ * @author Alan Poulain <contact@alanpoulain.eu>
  */
 trait BooleanFilterTrait
 {

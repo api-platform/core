@@ -11,20 +11,20 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Bridge\Doctrine\Orm\Filter;
+namespace ApiPlatform\Core\Bridge\Doctrine\MongoDB\Filter;
 
 use ApiPlatform\Core\Bridge\Doctrine\Common\Filter\DateFilterInterface;
 use ApiPlatform\Core\Bridge\Doctrine\Common\Filter\DateFilterTrait;
-use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
 use Doctrine\DBAL\Types\Type;
-use Doctrine\ORM\QueryBuilder;
+use Doctrine\ODM\MongoDB\Aggregation\Builder;
 
 /**
  * Filters the collection by date intervals.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  * @author Théo FIDRY <theo.fidry@gmail.com>
+ * @author Alan Poulain <contact@alanpoulain.eu>
  */
 class DateFilter extends AbstractContextAwareFilter implements DateFilterInterface
 {
@@ -33,7 +33,7 @@ class DateFilter extends AbstractContextAwareFilter implements DateFilterInterfa
     /**
      * {@inheritdoc}
      */
-    protected function filterProperty(string $property, $values, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, string $operationName = null)
+    protected function filterProperty(string $property, $values, Builder $aggregationBuilder, string $resourceClass, string $operationName = null, array $context = [])
     {
         // Expect $values to be an array having the period as keys and the date value as values
         if (
@@ -45,25 +45,22 @@ class DateFilter extends AbstractContextAwareFilter implements DateFilterInterfa
             return;
         }
 
-        $alias = $queryBuilder->getRootAliases()[0];
         $field = $property;
 
         if ($this->isPropertyNested($property, $resourceClass)) {
-            list($alias, $field) = $this->addJoinsForNestedProperty($property, $alias, $queryBuilder, $queryNameGenerator, $resourceClass);
+            $this->addLookupsForNestedProperty($property, $aggregationBuilder, $resourceClass);
         }
 
         $nullManagement = $this->properties[$property] ?? null;
         $type = $this->getDoctrineFieldType($property, $resourceClass);
 
         if (self::EXCLUDE_NULL === $nullManagement) {
-            $queryBuilder->andWhere($queryBuilder->expr()->isNotNull(sprintf('%s.%s', $alias, $field)));
+            $aggregationBuilder->match()->field($field)->notEqual(null);
         }
 
         if (isset($values[self::PARAMETER_BEFORE])) {
-            $this->addWhere(
-                $queryBuilder,
-                $queryNameGenerator,
-                $alias,
+            $this->addMatch(
+                $aggregationBuilder,
                 $field,
                 self::PARAMETER_BEFORE,
                 $values[self::PARAMETER_BEFORE],
@@ -73,10 +70,8 @@ class DateFilter extends AbstractContextAwareFilter implements DateFilterInterfa
         }
 
         if (isset($values[self::PARAMETER_STRICTLY_BEFORE])) {
-            $this->addWhere(
-                $queryBuilder,
-                $queryNameGenerator,
-                $alias,
+            $this->addMatch(
+                $aggregationBuilder,
                 $field,
                 self::PARAMETER_STRICTLY_BEFORE,
                 $values[self::PARAMETER_STRICTLY_BEFORE],
@@ -86,10 +81,8 @@ class DateFilter extends AbstractContextAwareFilter implements DateFilterInterfa
         }
 
         if (isset($values[self::PARAMETER_AFTER])) {
-            $this->addWhere(
-                $queryBuilder,
-                $queryNameGenerator,
-                $alias,
+            $this->addMatch(
+                $aggregationBuilder,
                 $field,
                 self::PARAMETER_AFTER,
                 $values[self::PARAMETER_AFTER],
@@ -99,10 +92,8 @@ class DateFilter extends AbstractContextAwareFilter implements DateFilterInterfa
         }
 
         if (isset($values[self::PARAMETER_STRICTLY_AFTER])) {
-            $this->addWhere(
-                $queryBuilder,
-                $queryNameGenerator,
-                $alias,
+            $this->addMatch(
+                $aggregationBuilder,
                 $field,
                 self::PARAMETER_STRICTLY_AFTER,
                 $values[self::PARAMETER_STRICTLY_AFTER],
@@ -113,11 +104,11 @@ class DateFilter extends AbstractContextAwareFilter implements DateFilterInterfa
     }
 
     /**
-     * Adds the where clause according to the chosen null management.
+     * Adds the match stage according to the chosen null management.
      *
      * @param string|Type $type
      */
-    protected function addWhere(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $alias, string $field, string $operator, string $value, string $nullManagement = null, $type = null)
+    private function addMatch(Builder $aggregationBuilder, string $field, string $operator, string $value, string $nullManagement = null, $type = null)
     {
         try {
             $value = false === strpos($type, '_immutable') ? new \DateTime($value) : new \DateTimeImmutable($value);
@@ -130,33 +121,29 @@ class DateFilter extends AbstractContextAwareFilter implements DateFilterInterfa
             return;
         }
 
-        $valueParameter = $queryNameGenerator->generateParameterName($field);
         $operatorValue = [
-            self::PARAMETER_BEFORE => '<=',
-            self::PARAMETER_STRICTLY_BEFORE => '<',
-            self::PARAMETER_AFTER => '>=',
-            self::PARAMETER_STRICTLY_AFTER => '>',
+            self::PARAMETER_BEFORE => '$lte',
+            self::PARAMETER_STRICTLY_BEFORE => '$lt',
+            self::PARAMETER_AFTER => '$gte',
+            self::PARAMETER_STRICTLY_AFTER => '$gt',
         ];
-        $baseWhere = sprintf('%s.%s %s :%s', $alias, $field, $operatorValue[$operator], $valueParameter);
 
         if (null === $nullManagement || self::EXCLUDE_NULL === $nullManagement) {
-            $queryBuilder->andWhere($baseWhere);
+            $aggregationBuilder->match()->addAnd($aggregationBuilder->matchExpr()->field($field)->operator($operatorValue[$operator], $value));
         } elseif (
             (self::INCLUDE_NULL_BEFORE === $nullManagement && \in_array($operator, [self::PARAMETER_BEFORE, self::PARAMETER_STRICTLY_BEFORE], true)) ||
             (self::INCLUDE_NULL_AFTER === $nullManagement && \in_array($operator, [self::PARAMETER_AFTER, self::PARAMETER_STRICTLY_AFTER], true)) ||
             (self::INCLUDE_NULL_BEFORE_AND_AFTER === $nullManagement && \in_array($operator, [self::PARAMETER_AFTER, self::PARAMETER_STRICTLY_AFTER, self::PARAMETER_BEFORE, self::PARAMETER_STRICTLY_BEFORE], true))
         ) {
-            $queryBuilder->andWhere($queryBuilder->expr()->orX(
-                $baseWhere,
-                $queryBuilder->expr()->isNull(sprintf('%s.%s', $alias, $field))
-            ));
+            $aggregationBuilder->match()->addOr(
+                $aggregationBuilder->matchExpr()->field($field)->operator($operatorValue[$operator], $value),
+                $aggregationBuilder->matchExpr()->field($field)->equals(null)
+            );
         } else {
-            $queryBuilder->andWhere($queryBuilder->expr()->andX(
-                $baseWhere,
-                $queryBuilder->expr()->isNotNull(sprintf('%s.%s', $alias, $field))
-            ));
+            $aggregationBuilder->match()->addAnd(
+                $aggregationBuilder->matchExpr()->field($field)->operator($operatorValue[$operator], $value),
+                $aggregationBuilder->matchExpr()->field($field)->notEqual(null)
+            );
         }
-
-        $queryBuilder->setParameter($valueParameter, $value, $type);
     }
 }
