@@ -459,8 +459,8 @@ final class SchemaBuilder implements SchemaBuilderInterface
                 $propertyMetadata = $this->propertyMetadataFactory->create($resourceClass, $property, ['graphql_operation_name' => $mutationName ?? 'query']);
                 if (
                     null === ($propertyType = $propertyMetadata->getType())
-                    || (!$input && null === $mutationName && false === $propertyMetadata->isReadable())
-                    || (null !== $mutationName && false === $propertyMetadata->isWritable())
+                    || (!$input && false === $propertyMetadata->isReadable())
+                    || ($input && null !== $mutationName && false === $propertyMetadata->isWritable())
                 ) {
                     continue;
                 }
