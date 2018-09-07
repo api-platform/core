@@ -16,8 +16,8 @@ namespace ApiPlatform\Core\Bridge\Doctrine\MongoDB\Filter;
 use ApiPlatform\Core\Api\IriConverterInterface;
 use ApiPlatform\Core\Bridge\Doctrine\Common\Filter\SearchFilterInterface;
 use ApiPlatform\Core\Bridge\Doctrine\Common\Filter\SearchFilterTrait;
-use ApiPlatform\Core\Bridge\Doctrine\Common\PropertyHelper;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
+use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ODM\MongoDB\Aggregation\Builder;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\PropertyAccess\PropertyAccess;
@@ -33,9 +33,9 @@ final class SearchFilter extends AbstractContextAwareFilter implements SearchFil
 {
     use SearchFilterTrait;
 
-    public function __construct(IriConverterInterface $iriConverter, PropertyAccessorInterface $propertyAccessor = null, LoggerInterface $logger = null, PropertyHelper $propertyHelper = null, array $properties = null)
+    public function __construct(ManagerRegistry $managerRegistry, IriConverterInterface $iriConverter, PropertyAccessorInterface $propertyAccessor = null, LoggerInterface $logger = null, array $properties = null)
     {
-        parent::__construct($logger, $propertyHelper, $properties);
+        parent::__construct($managerRegistry, $logger, $properties);
 
         $this->iriConverter = $iriConverter;
         $this->propertyAccessor = $propertyAccessor ?: PropertyAccess::createPropertyAccessor();
@@ -49,18 +49,18 @@ final class SearchFilter extends AbstractContextAwareFilter implements SearchFil
         if (
             null === $value ||
             !$this->isPropertyEnabled($property, $resourceClass) ||
-            !$this->propertyHelper->isPropertyMapped($property, $resourceClass, true)
+            !$this->isPropertyMapped($property, $resourceClass, true)
         ) {
             return;
         }
 
         $field = $property;
 
-        if ($this->propertyHelper->isPropertyNested($property, $resourceClass)) {
+        if ($this->isPropertyNested($property, $resourceClass)) {
             list($field, $associations) = $this->addLookupsForNestedProperty($property, $aggregationBuilder, $resourceClass);
-            $metadata = $this->propertyHelper->getNestedMetadata($resourceClass, $associations);
+            $metadata = $this->getNestedMetadata($resourceClass, $associations);
         } else {
-            $metadata = $this->propertyHelper->getClassMetadata($resourceClass);
+            $metadata = $this->getClassMetadata($resourceClass);
         }
 
         $values = $this->normalizeValues((array) $value);
@@ -80,7 +80,7 @@ final class SearchFilter extends AbstractContextAwareFilter implements SearchFil
                 $values = array_map([$this, 'getIdFromValue'], $values);
             }
 
-            if (!$this->hasValidValues($values, $this->propertyHelper->getDoctrineFieldType($property, $resourceClass))) {
+            if (!$this->hasValidValues($values, $this->getDoctrineFieldType($property, $resourceClass))) {
                 $this->logger->notice('Invalid filter ignored', [
                     'exception' => new InvalidArgumentException(sprintf('Values for field "%s" are not valid according to the doctrine type.', $field)),
                 ]);
@@ -122,7 +122,7 @@ final class SearchFilter extends AbstractContextAwareFilter implements SearchFil
 
         $values = array_map([$this, 'getIdFromValue'], $values);
 
-        if (!$this->hasValidValues($values, $this->propertyHelper->getDoctrineFieldType($property, $resourceClass))) {
+        if (!$this->hasValidValues($values, $this->getDoctrineFieldType($property, $resourceClass))) {
             $this->logger->notice('Invalid filter ignored', [
                 'exception' => new InvalidArgumentException(sprintf('Values for field "%s" are not valid according to the doctrine type.', $property)),
             ]);

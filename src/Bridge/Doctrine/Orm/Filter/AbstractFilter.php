@@ -13,14 +13,12 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Bridge\Doctrine\Orm\Filter;
 
-use ApiPlatform\Core\Bridge\Doctrine\Common\PropertyHelper;
+use ApiPlatform\Core\Bridge\Doctrine\Common\PropertyHelperTrait;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryBuilderHelper;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\Util\RequestParser;
 use Doctrine\Common\Persistence\ManagerRegistry;
-use Doctrine\DBAL\Types\Type;
-use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\QueryBuilder;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
@@ -37,33 +35,24 @@ use Symfony\Component\HttpFoundation\RequestStack;
  */
 abstract class AbstractFilter implements FilterInterface
 {
-    protected $managerRegistry;
+    use PropertyHelperTrait;
+
     protected $requestStack;
     protected $logger;
-    protected $propertyHelper;
     protected $properties;
 
     /**
-     * @param ManagerRegistry|null $managerRegistry No prefix to prevent autowiring of this deprecated property
-     * @param RequestStack|null    $requestStack    No prefix to prevent autowiring of this deprecated property
+     * @param RequestStack|null $requestStack No prefix to prevent autowiring of this deprecated property
      */
-    public function __construct($managerRegistry = null, $requestStack = null, LoggerInterface $logger = null, PropertyHelper $propertyHelper = null, array $properties = null)
+    public function __construct(ManagerRegistry $managerRegistry, $requestStack = null, LoggerInterface $logger = null, array $properties = null)
     {
-        if (null !== $managerRegistry) {
-            @trigger_error(sprintf('Passing an instance of "%s" is deprecated since 2.4.', ManagerRegistry::class), E_USER_DEPRECATED);
-        }
         if (null !== $requestStack) {
             @trigger_error(sprintf('Passing an instance of "%s" is deprecated since 2.2. Use "filters" context key instead.', RequestStack::class), E_USER_DEPRECATED);
-        }
-        if (null === $propertyHelper) {
-            @trigger_error(sprintf('Not injecting "%s" is deprecated since API Platform 2.4 and will not be possible anymore in API Platform 3', PropertyHelper::class), E_USER_DEPRECATED);
-            $propertyHelper = new PropertyHelper($managerRegistry);
         }
 
         $this->managerRegistry = $managerRegistry;
         $this->requestStack = $requestStack;
         $this->logger = $logger ?? new NullLogger();
-        $this->propertyHelper = $propertyHelper;
         $this->properties = $properties;
     }
 
@@ -107,7 +96,7 @@ abstract class AbstractFilter implements FilterInterface
 
         if (null === $this->properties) {
             // to ensure sanity, nested properties must still be explicitly enabled
-            return !$this->propertyHelper->isPropertyNested($property, $resourceClass);
+            return !$this->isPropertyNested($property, $resourceClass);
         }
 
         return array_key_exists($property, $this->properties);
@@ -124,7 +113,7 @@ abstract class AbstractFilter implements FilterInterface
         $needsFixing = false;
         if (null !== $this->properties) {
             foreach ($this->properties as $property => $value) {
-                if (($this->propertyHelper->isPropertyNested($property, $resourceClass) || $this->propertyHelper->isPropertyEmbedded($property, $resourceClass)) && $request->query->has(str_replace('.', '_', $property))) {
+                if (($this->isPropertyNested($property, $resourceClass) || $this->isPropertyEmbedded($property, $resourceClass)) && $request->query->has(str_replace('.', '_', $property))) {
                     $needsFixing = true;
                 }
             }
@@ -167,7 +156,7 @@ abstract class AbstractFilter implements FilterInterface
             $joinType = null;
         }
 
-        $propertyParts = $this->propertyHelper->splitPropertyParts($property, $resourceClass);
+        $propertyParts = $this->splitPropertyParts($property, $resourceClass);
         $parentAlias = $rootAlias;
         $alias = null;
 
@@ -181,108 +170,5 @@ abstract class AbstractFilter implements FilterInterface
         }
 
         return [$alias, $propertyParts['field'], $propertyParts['associations']];
-    }
-
-    /**
-     * Gets class metadata for the given resource.
-     */
-    protected function getClassMetadata(string $resourceClass): ClassMetadata
-    {
-        @trigger_error(sprintf('Using "%s::getClassMetadata()" is deprecated since 2.4. Use "%s::getClassMetadata()" instead.', __CLASS__, PropertyHelper::class), E_USER_DEPRECATED);
-
-        return $this->propertyHelper->getClassMetadata($resourceClass);
-    }
-
-    /**
-     * Determines whether the given property is mapped.
-     */
-    protected function isPropertyMapped(string $property, string $resourceClass, bool $allowAssociation = false): bool
-    {
-        @trigger_error(sprintf('Using "%s::isPropertyMapped()" is deprecated since 2.4. Use "%s::isPropertyMapped()" instead.', __CLASS__, PropertyHelper::class), E_USER_DEPRECATED);
-
-        return $this->propertyHelper->isPropertyMapped($property, $resourceClass, $allowAssociation);
-    }
-
-    /**
-     * Determines whether the given property is nested.
-     */
-    protected function isPropertyNested(string $property/*, string $resourceClass*/): bool
-    {
-        if (\func_num_args() > 1) {
-            $resourceClass = (string) func_get_arg(1);
-        } else {
-            if (__CLASS__ !== \get_class($this)) {
-                $r = new \ReflectionMethod($this, __FUNCTION__);
-                if (__CLASS__ !== $r->getDeclaringClass()->getName()) {
-                    @trigger_error(sprintf('Method %s() will have a second `$resourceClass` argument in version API Platform 3.0. Not defining it is deprecated since API Platform 2.1.', __FUNCTION__), E_USER_DEPRECATED);
-                }
-            }
-            $resourceClass = null;
-        }
-
-        @trigger_error(sprintf('Using "%s::isPropertyNested()" is deprecated since 2.4. Use "%s::isPropertyNested()" instead.', __CLASS__, PropertyHelper::class), E_USER_DEPRECATED);
-
-        return $this->propertyHelper->isPropertyNested($property, $resourceClass);
-    }
-
-    /**
-     * Determines whether the given property is embedded.
-     */
-    protected function isPropertyEmbedded(string $property, string $resourceClass): bool
-    {
-        @trigger_error(sprintf('Using "%s::isPropertyEmbedded()" is deprecated since 2.4. Use "%s::isPropertyEmbedded()" instead.', __CLASS__, PropertyHelper::class), E_USER_DEPRECATED);
-
-        return $this->propertyHelper->isPropertyEmbedded($property, $resourceClass);
-    }
-
-    /**
-     * Gets nested class metadata for the given resource.
-     *
-     * @param string[] $associations
-     */
-    protected function getNestedMetadata(string $resourceClass, array $associations): ClassMetadata
-    {
-        @trigger_error(sprintf('Using "%s::getNestedMetadata()" is deprecated since 2.4. Use "%s::getNestedMetadata()" instead.', __CLASS__, PropertyHelper::class), E_USER_DEPRECATED);
-
-        return $this->propertyHelper->getNestedMetadata($resourceClass, $associations);
-    }
-
-    /**
-     * Splits the given property into parts.
-     *
-     * Returns an array with the following keys:
-     *   - associations: array of associations according to nesting order
-     *   - field: string holding the actual field (leaf node)
-     */
-    protected function splitPropertyParts(string $property/*, string $resourceClass*/): array
-    {
-        $resourceClass = null;
-
-        if (\func_num_args() > 1) {
-            $resourceClass = func_get_arg(1);
-        } else {
-            if (__CLASS__ !== \get_class($this)) {
-                $r = new \ReflectionMethod($this, __FUNCTION__);
-                if (__CLASS__ !== $r->getDeclaringClass()->getName()) {
-                    @trigger_error(sprintf('Method %s() will have a second `$resourceClass` argument in version API Platform 3.0. Not defining it is deprecated since API Platform 2.1.', __FUNCTION__), E_USER_DEPRECATED);
-                }
-            }
-        }
-
-        @trigger_error(sprintf('Using "%s::splitPropertyParts()" is deprecated since 2.4. Use "%s::splitPropertyParts()" instead.', __CLASS__, PropertyHelper::class), E_USER_DEPRECATED);
-
-        return $this->propertyHelper->splitPropertyParts($property, $resourceClass);
-    }
-
-    /**
-     * Gets the Doctrine Type of a given property/resourceClass.
-     *
-     * @return Type|string|null
-     */
-    protected function getDoctrineFieldType(string $property, string $resourceClass)
-    {
-        @trigger_error(sprintf('Using "%s::getDoctrineFieldType()" is deprecated since 2.4. Use "%s::getDoctrineFieldType()" instead.', __CLASS__, PropertyHelper::class), E_USER_DEPRECATED);
-
-        return $this->propertyHelper->getDoctrineFieldType($property, $resourceClass);
     }
 }

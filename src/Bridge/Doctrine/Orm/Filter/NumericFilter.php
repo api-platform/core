@@ -53,17 +53,17 @@ class NumericFilter extends AbstractContextAwareFilter
 
         $properties = $this->properties;
         if (null === $properties) {
-            $properties = array_fill_keys($this->propertyHelper->getClassMetadata($resourceClass)->getFieldNames(), null);
+            $properties = array_fill_keys($this->getClassMetadata($resourceClass)->getFieldNames(), null);
         }
 
         foreach ($properties as $property => $unused) {
-            if (!$this->propertyHelper->isPropertyMapped($property, $resourceClass) || !$this->isNumericField($property, $resourceClass)) {
+            if (!$this->isPropertyMapped($property, $resourceClass) || !$this->isNumericField($property, $resourceClass)) {
                 continue;
             }
 
             $description[$property] = [
                 'property' => $property,
-                'type' => $this->getType($this->propertyHelper->getDoctrineFieldType($property, $resourceClass)),
+                'type' => $this->getType($this->getDoctrineFieldType($property, $resourceClass)),
                 'required' => false,
             ];
         }
@@ -94,7 +94,7 @@ class NumericFilter extends AbstractContextAwareFilter
     {
         if (
             !$this->isPropertyEnabled($property, $resourceClass) ||
-            !$this->propertyHelper->isPropertyMapped($property, $resourceClass)
+            !$this->isPropertyMapped($property, $resourceClass)
         ) {
             return;
         }
@@ -110,11 +110,11 @@ class NumericFilter extends AbstractContextAwareFilter
         $alias = $queryBuilder->getRootAliases()[0];
         $field = $property;
 
-        if ($this->propertyHelper->isPropertyNested($property, $resourceClass)) {
+        if ($this->isPropertyNested($property, $resourceClass)) {
             list($alias, $field) = $this->addJoinsForNestedProperty($property, $alias, $queryBuilder, $queryNameGenerator, $resourceClass);
         }
 
-        if (!isset(self::DOCTRINE_NUMERIC_TYPES[$this->propertyHelper->getDoctrineFieldType($property, $resourceClass)])) {
+        if (!isset(self::DOCTRINE_NUMERIC_TYPES[$this->getDoctrineFieldType($property, $resourceClass)])) {
             $this->logger->notice('Invalid filter ignored', [
                 'exception' => new InvalidArgumentException(sprintf('The field "%s" of class "%s" is not a doctrine numeric type.', $field, $resourceClass)),
             ]);
@@ -126,7 +126,7 @@ class NumericFilter extends AbstractContextAwareFilter
 
         $queryBuilder
             ->andWhere(sprintf('%s.%s = :%s', $alias, $field, $valueParameter))
-            ->setParameter($valueParameter, $value, $this->propertyHelper->getDoctrineFieldType($property, $resourceClass));
+            ->setParameter($valueParameter, $value, $this->getDoctrineFieldType($property, $resourceClass));
     }
 
     /**
@@ -134,8 +134,8 @@ class NumericFilter extends AbstractContextAwareFilter
      */
     protected function isNumericField(string $property, string $resourceClass): bool
     {
-        $propertyParts = $this->propertyHelper->splitPropertyParts($property, $resourceClass);
-        $metadata = $this->propertyHelper->getNestedMetadata($resourceClass, $propertyParts['associations']);
+        $propertyParts = $this->splitPropertyParts($property, $resourceClass);
+        $metadata = $this->getNestedMetadata($resourceClass, $propertyParts['associations']);
 
         return isset(self::DOCTRINE_NUMERIC_TYPES[$metadata->getTypeOfField($propertyParts['field'])]);
     }

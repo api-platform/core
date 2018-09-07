@@ -13,22 +13,24 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Bridge\Doctrine\MongoDB\Filter;
 
-use ApiPlatform\Core\Bridge\Doctrine\Common\PropertyHelper;
+use ApiPlatform\Core\Bridge\Doctrine\Common\PropertyHelperTrait;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
+use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ODM\MongoDB\Aggregation\Builder;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 
 abstract class AbstractContextAwareFilter implements ContextAwareFilterInterface
 {
+    use PropertyHelperTrait;
+
     protected $logger;
-    protected $propertyHelper;
     protected $properties;
 
-    public function __construct(LoggerInterface $logger = null, PropertyHelper $propertyHelper = null, array $properties = null)
+    public function __construct(ManagerRegistry $managerRegistry, LoggerInterface $logger = null, array $properties = null)
     {
+        $this->managerRegistry = $managerRegistry;
         $this->logger = $logger ?? new NullLogger();
-        $this->propertyHelper = $propertyHelper;
         $this->properties = $properties;
     }
 
@@ -54,7 +56,7 @@ abstract class AbstractContextAwareFilter implements ContextAwareFilterInterface
     {
         if (null === $this->properties) {
             // to ensure sanity, nested properties must still be explicitly enabled
-            return !$this->propertyHelper->isPropertyNested($property, $resourceClass);
+            return !$this->isPropertyNested($property, $resourceClass);
         }
 
         return array_key_exists($property, $this->properties);
@@ -70,14 +72,14 @@ abstract class AbstractContextAwareFilter implements ContextAwareFilterInterface
      */
     protected function addLookupsForNestedProperty(string $property, Builder $aggregationBuilder, string $resourceClass): array
     {
-        $propertyParts = $this->propertyHelper->splitPropertyParts($property, $resourceClass);
+        $propertyParts = $this->splitPropertyParts($property, $resourceClass);
         $association = $propertyParts['associations'][0] ?? null;
 
         if (null === $association) {
             throw new InvalidArgumentException(sprintf('Cannot add lookups for property "%s" - property is not nested.', $property));
         }
 
-        if ($this->propertyHelper->getClassMetadata($resourceClass)->hasReference($association)) {
+        if ($this->getClassMetadata($resourceClass)->hasReference($association)) {
             $aggregationBuilder->lookup($association)->alias($association);
         }
 

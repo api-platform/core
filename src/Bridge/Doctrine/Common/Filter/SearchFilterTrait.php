@@ -35,21 +35,21 @@ trait SearchFilterTrait
 
         $properties = $this->properties;
         if (null === $properties) {
-            $properties = array_fill_keys($this->propertyHelper->getClassMetadata($resourceClass)->getFieldNames(), null);
+            $properties = array_fill_keys($this->getClassMetadata($resourceClass)->getFieldNames(), null);
         }
 
         foreach ($properties as $property => $strategy) {
-            if (!$this->propertyHelper->isPropertyMapped($property, $resourceClass, true)) {
+            if (!$this->isPropertyMapped($property, $resourceClass, true)) {
                 continue;
             }
 
-            if ($this->propertyHelper->isPropertyNested($property, $resourceClass)) {
-                $propertyParts = $this->propertyHelper->splitPropertyParts($property, $resourceClass);
+            if ($this->isPropertyNested($property, $resourceClass)) {
+                $propertyParts = $this->splitPropertyParts($property, $resourceClass);
                 $field = $propertyParts['field'];
-                $metadata = $this->propertyHelper->getNestedMetadata($resourceClass, $propertyParts['associations']);
+                $metadata = $this->getNestedMetadata($resourceClass, $propertyParts['associations']);
             } else {
                 $field = $property;
-                $metadata = $this->propertyHelper->getClassMetadata($resourceClass);
+                $metadata = $this->getClassMetadata($resourceClass);
             }
 
             if ($metadata->hasField($field)) {

@@ -39,11 +39,11 @@ trait BooleanFilterTrait
 
         $properties = $this->properties;
         if (null === $properties) {
-            $properties = array_fill_keys($this->propertyHelper->getClassMetadata($resourceClass)->getFieldNames(), null);
+            $properties = array_fill_keys($this->getClassMetadata($resourceClass)->getFieldNames(), null);
         }
 
         foreach ($properties as $property => $unused) {
-            if (!$this->propertyHelper->isPropertyMapped($property, $resourceClass) || !$this->isBooleanField($property, $resourceClass)) {
+            if (!$this->isPropertyMapped($property, $resourceClass) || !$this->isBooleanField($property, $resourceClass)) {
                 continue;
             }
 
@@ -62,8 +62,8 @@ trait BooleanFilterTrait
      */
     private function isBooleanField(string $property, string $resourceClass): bool
     {
-        $propertyParts = $this->propertyHelper->splitPropertyParts($property, $resourceClass);
-        $metadata = $this->propertyHelper->getNestedMetadata($resourceClass, $propertyParts['associations']);
+        $propertyParts = $this->splitPropertyParts($property, $resourceClass);
+        $metadata = $this->getNestedMetadata($resourceClass, $propertyParts['associations']);
 
         return DBALType::BOOLEAN === $metadata->getTypeOfField($propertyParts['field']);
     }

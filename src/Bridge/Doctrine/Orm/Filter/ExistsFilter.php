@@ -45,11 +45,11 @@ class ExistsFilter extends AbstractContextAwareFilter
 
         $properties = $this->properties;
         if (null === $properties) {
-            $properties = array_fill_keys($this->propertyHelper->getClassMetadata($resourceClass)->getFieldNames(), null);
+            $properties = array_fill_keys($this->getClassMetadata($resourceClass)->getFieldNames(), null);
         }
 
         foreach ($properties as $property => $unused) {
-            if (!$this->propertyHelper->isPropertyMapped($property, $resourceClass, true) || !$this->isNullableField($property, $resourceClass)) {
+            if (!$this->isPropertyMapped($property, $resourceClass, true) || !$this->isNullableField($property, $resourceClass)) {
                 continue;
             }
 
@@ -71,7 +71,7 @@ class ExistsFilter extends AbstractContextAwareFilter
         if (
             !isset($value[self::QUERY_PARAMETER_KEY]) ||
             !$this->isPropertyEnabled($property, $resourceClass) ||
-            !$this->propertyHelper->isPropertyMapped($property, $resourceClass, true) ||
+            !$this->isPropertyMapped($property, $resourceClass, true) ||
             !$this->isNullableField($property, $resourceClass)
         ) {
             return;
@@ -97,12 +97,12 @@ class ExistsFilter extends AbstractContextAwareFilter
         $alias = $queryBuilder->getRootAliases()[0];
         $field = $property;
 
-        if ($this->propertyHelper->isPropertyNested($property, $resourceClass)) {
+        if ($this->isPropertyNested($property, $resourceClass)) {
             list($alias, $field) = $this->addJoinsForNestedProperty($property, $alias, $queryBuilder, $queryNameGenerator, $resourceClass);
         }
 
-        $propertyParts = $this->propertyHelper->splitPropertyParts($property, $resourceClass);
-        $metadata = $this->propertyHelper->getNestedMetadata($resourceClass, $propertyParts['associations']);
+        $propertyParts = $this->splitPropertyParts($property, $resourceClass);
+        $metadata = $this->getNestedMetadata($resourceClass, $propertyParts['associations']);
 
         if ($metadata->hasAssociation($field)) {
             if ($metadata->isCollectionValuedAssociation($field)) {
@@ -138,8 +138,8 @@ class ExistsFilter extends AbstractContextAwareFilter
      */
     protected function isNullableField(string $property, string $resourceClass): bool
     {
-        $propertyParts = $this->propertyHelper->splitPropertyParts($property, $resourceClass);
-        $metadata = $this->propertyHelper->getNestedMetadata($resourceClass, $propertyParts['associations']);
+        $propertyParts = $this->splitPropertyParts($property, $resourceClass);
+        $metadata = $this->getNestedMetadata($resourceClass, $propertyParts['associations']);
 
         $field = $propertyParts['field'];
 

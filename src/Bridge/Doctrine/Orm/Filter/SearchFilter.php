@@ -16,7 +16,6 @@ namespace ApiPlatform\Core\Bridge\Doctrine\Orm\Filter;
 use ApiPlatform\Core\Api\IriConverterInterface;
 use ApiPlatform\Core\Bridge\Doctrine\Common\Filter\SearchFilterInterface;
 use ApiPlatform\Core\Bridge\Doctrine\Common\Filter\SearchFilterTrait;
-use ApiPlatform\Core\Bridge\Doctrine\Common\PropertyHelper;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryBuilderHelper;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
@@ -37,12 +36,11 @@ class SearchFilter extends AbstractContextAwareFilter implements SearchFilterInt
     use SearchFilterTrait;
 
     /**
-     * @param ManagerRegistry|null $managerRegistry No prefix to prevent autowiring of this deprecated property
      * @param RequestStack|null $requestStack No prefix to prevent autowiring of this deprecated property
      */
-    public function __construct($managerRegistry = null, $requestStack = null, IriConverterInterface $iriConverter, PropertyAccessorInterface $propertyAccessor = null, LoggerInterface $logger = null, PropertyHelper $propertyHelper = null, array $properties = null)
+    public function __construct(ManagerRegistry $managerRegistry, $requestStack = null, IriConverterInterface $iriConverter, PropertyAccessorInterface $propertyAccessor = null, LoggerInterface $logger = null, array $properties = null)
     {
-        parent::__construct($managerRegistry, $requestStack, $logger, $propertyHelper, $properties);
+        parent::__construct($managerRegistry, $requestStack, $logger, $properties);
 
         $this->iriConverter = $iriConverter;
         $this->propertyAccessor = $propertyAccessor ?: PropertyAccess::createPropertyAccessor();
@@ -56,7 +54,7 @@ class SearchFilter extends AbstractContextAwareFilter implements SearchFilterInt
         if (
             null === $value ||
             !$this->isPropertyEnabled($property, $resourceClass) ||
-            !$this->propertyHelper->isPropertyMapped($property, $resourceClass, true)
+            !$this->isPropertyMapped($property, $resourceClass, true)
         ) {
             return;
         }
@@ -64,11 +62,11 @@ class SearchFilter extends AbstractContextAwareFilter implements SearchFilterInt
         $alias = $queryBuilder->getRootAliases()[0];
         $field = $property;
 
-        if ($this->propertyHelper->isPropertyNested($property, $resourceClass)) {
+        if ($this->isPropertyNested($property, $resourceClass)) {
             list($alias, $field, $associations) = $this->addJoinsForNestedProperty($property, $alias, $queryBuilder, $queryNameGenerator, $resourceClass);
-            $metadata = $this->propertyHelper->getNestedMetadata($resourceClass, $associations);
+            $metadata = $this->getNestedMetadata($resourceClass, $associations);
         } else {
-            $metadata = $this->propertyHelper->getClassMetadata($resourceClass);
+            $metadata = $this->getClassMetadata($resourceClass);
         }
 
         $values = $this->normalizeValues((array) $value);
@@ -88,7 +86,7 @@ class SearchFilter extends AbstractContextAwareFilter implements SearchFilterInt
                 $values = array_map([$this, 'getIdFromValue'], $values);
             }
 
-            if (!$this->hasValidValues($values, $this->propertyHelper->getDoctrineFieldType($property, $resourceClass))) {
+            if (!$this->hasValidValues($values, $this->getDoctrineFieldType($property, $resourceClass))) {
                 $this->logger->notice('Invalid filter ignored', [
                     'exception' => new InvalidArgumentException(sprintf('Values for field "%s" are not valid according to the doctrine type.', $field)),
                 ]);
@@ -133,7 +131,7 @@ class SearchFilter extends AbstractContextAwareFilter implements SearchFilterInt
 
         $values = array_map([$this, 'getIdFromValue'], $values);
 
-        if (!$this->hasValidValues($values, $this->propertyHelper->getDoctrineFieldType($property, $resourceClass))) {
+        if (!$this->hasValidValues($values, $this->getDoctrineFieldType($property, $resourceClass))) {
             $this->logger->notice('Invalid filter ignored', [
                 'exception' => new InvalidArgumentException(sprintf('Values for field "%s" are not valid according to the doctrine type.', $field)),
             ]);

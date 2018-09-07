@@ -21,7 +21,7 @@ class DummyFilter extends AbstractFilter
 {
     public function doSplitPropertiesWithoutResourceClass($property)
     {
-        return $this->propertyHelper->splitPropertyParts($property, null);
+        return $this->splitPropertyParts($property, null);
     }
 
     protected function filterProperty(string $property, $values, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, string $operationName = null)

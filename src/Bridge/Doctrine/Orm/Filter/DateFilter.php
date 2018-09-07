@@ -54,11 +54,11 @@ class DateFilter extends AbstractContextAwareFilter
 
         $properties = $this->properties;
         if (null === $properties) {
-            $properties = array_fill_keys($this->propertyHelper->getClassMetadata($resourceClass)->getFieldNames(), null);
+            $properties = array_fill_keys($this->getClassMetadata($resourceClass)->getFieldNames(), null);
         }
 
         foreach ($properties as $property => $nullManagement) {
-            if (!$this->propertyHelper->isPropertyMapped($property, $resourceClass) || !$this->isDateField($property, $resourceClass)) {
+            if (!$this->isPropertyMapped($property, $resourceClass) || !$this->isDateField($property, $resourceClass)) {
                 continue;
             }
 
@@ -80,7 +80,7 @@ class DateFilter extends AbstractContextAwareFilter
         if (
             !\is_array($values) ||
             !$this->isPropertyEnabled($property, $resourceClass) ||
-            !$this->propertyHelper->isPropertyMapped($property, $resourceClass) ||
+            !$this->isPropertyMapped($property, $resourceClass) ||
             !$this->isDateField($property, $resourceClass)
         ) {
             return;
@@ -89,12 +89,12 @@ class DateFilter extends AbstractContextAwareFilter
         $alias = $queryBuilder->getRootAliases()[0];
         $field = $property;
 
-        if ($this->propertyHelper->isPropertyNested($property, $resourceClass)) {
+        if ($this->isPropertyNested($property, $resourceClass)) {
             list($alias, $field) = $this->addJoinsForNestedProperty($property, $alias, $queryBuilder, $queryNameGenerator, $resourceClass);
         }
 
         $nullManagement = $this->properties[$property] ?? null;
-        $type = $this->propertyHelper->getDoctrineFieldType($property, $resourceClass);
+        $type = $this->getDoctrineFieldType($property, $resourceClass);
 
         if (self::EXCLUDE_NULL === $nullManagement) {
             $queryBuilder->andWhere($queryBuilder->expr()->isNotNull(sprintf('%s.%s', $alias, $field)));
@@ -206,7 +206,7 @@ class DateFilter extends AbstractContextAwareFilter
      */
     protected function isDateField(string $property, string $resourceClass): bool
     {
-        return isset(self::DOCTRINE_DATE_TYPES[$this->propertyHelper->getDoctrineFieldType($property, $resourceClass)]);
+        return isset(self::DOCTRINE_DATE_TYPES[$this->getDoctrineFieldType($property, $resourceClass)]);
     }
 
     /**

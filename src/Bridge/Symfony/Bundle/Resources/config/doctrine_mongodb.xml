@@ -5,10 +5,6 @@
            xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <services>
-        <service id="api_platform.doctrine.mongodb.property_helper" class="ApiPlatform\Core\Bridge\Doctrine\Common\PropertyHelper" public="false">
-            <argument type="service" id="doctrine_mongodb"/>
-        </service>
-
         <service id="api_platform.doctrine.metadata_factory" class="Doctrine\Common\Persistence\Mapping\ClassMetadataFactory" public="false">
             <factory service="doctrine_mongodb.odm.default_document_manager" method="getMetadataFactory"/>
         </service>
@@ -46,15 +42,15 @@
         <!-- Filter -->
 
         <service id="api_platform.doctrine.mongodb.search_filter" class="ApiPlatform\Core\Bridge\Doctrine\MongoDB\Filter\SearchFilter" public="false" abstract="true">
+            <argument type="service" id="doctrine_mongodb" />
             <argument type="service" id="api_platform.iri_converter" />
             <argument type="service" id="api_platform.property_accessor" />
             <argument type="service" id="logger" on-invalid="ignore" />
-            <argument type="service" id="api_platform.doctrine.mongodb.property_helper" />
         </service>
 
         <service id="api_platform.doctrine.mongodb.boolean_filter" class="ApiPlatform\Core\Bridge\Doctrine\MongoDB\Filter\BooleanFilter" public="false" abstract="true">
+            <argument type="service" id="doctrine_mongodb" />
             <argument type="service" id="logger" on-invalid="ignore" />
-            <argument type="service" id="api_platform.doctrine.mongodb.property_helper" />
         </service>
 
         <!-- Metadata loader -->

@@ -13,29 +13,24 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Bridge\Doctrine\Common;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Persistence\Mapping\ClassMetadata;
+use Doctrine\DBAL\Types\Type;
 
 /**
- * {@inheritdoc}
+ * Helper trait for getting information regarding a property using the resource metadata.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  * @author Théo FIDRY <theo.fidry@gmail.com>
  * @author Alan Poulain <contact@alanpoulain.eu>
  */
-final class PropertyHelper implements PropertyHelperInterface
+trait PropertyHelperTrait
 {
-    private $managerRegistry;
-
-    public function __construct(ManagerRegistry $managerRegistry)
-    {
-        $this->managerRegistry = $managerRegistry;
-    }
+    protected $managerRegistry;
 
     /**
-     * {@inheritdoc}
+     * Determines whether the given property is mapped.
      */
-    public function isPropertyMapped(string $property, string $resourceClass, bool $allowAssociation = false): bool
+    protected function isPropertyMapped(string $property, string $resourceClass, bool $allowAssociation = false): bool
     {
         if ($this->isPropertyNested($property, $resourceClass)) {
             $propertyParts = $this->splitPropertyParts($property, $resourceClass);
@@ -49,10 +44,22 @@ final class PropertyHelper implements PropertyHelperInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Determines whether the given property is nested.
      */
-    public function isPropertyNested(string $property, ?string $resourceClass): bool
+    protected function isPropertyNested(string $property/*, string $resourceClass*/): bool
     {
+        if (\func_num_args() > 1) {
+            $resourceClass = (string) func_get_arg(1);
+        } else {
+            if (__CLASS__ !== \get_class($this)) {
+                $r = new \ReflectionMethod($this, __FUNCTION__);
+                if (__CLASS__ !== $r->getDeclaringClass()->getName()) {
+                    @trigger_error(sprintf('Method %s() will have a second `$resourceClass` argument in version API Platform 3.0. Not defining it is deprecated since API Platform 2.1.', __FUNCTION__), E_USER_DEPRECATED);
+                }
+            }
+            $resourceClass = null;
+        }
+
         $pos = strpos($property, '.');
         if (false === $pos) {
             return false;
@@ -62,19 +69,35 @@ final class PropertyHelper implements PropertyHelperInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Determines whether the given property is embedded.
      */
-    public function isPropertyEmbedded(string $property, string $resourceClass): bool
+    protected function isPropertyEmbedded(string $property, string $resourceClass): bool
     {
         return false !== strpos($property, '.') && $this->getClassMetadata($resourceClass)->hasField($property);
     }
 
     /**
-     * {@inheritdoc}
+     * Splits the given property into parts.
+     *
+     * Returns an array with the following keys:
+     *   - associations: array of associations according to nesting order
+     *   - field: string holding the actual field (leaf node)
      */
-    public function splitPropertyParts(string $property, ?string $resourceClass): array
+    protected function splitPropertyParts(string $property/*, string $resourceClass*/): array
     {
+        $resourceClass = null;
         $parts = explode('.', $property);
+
+        if (\func_num_args() > 1) {
+            $resourceClass = func_get_arg(1);
+        } else {
+            if (__CLASS__ !== \get_class($this)) {
+                $r = new \ReflectionMethod($this, __FUNCTION__);
+                if (__CLASS__ !== $r->getDeclaringClass()->getName()) {
+                    @trigger_error(sprintf('Method %s() will have a second `$resourceClass` argument in version API Platform 3.0. Not defining it is deprecated since API Platform 2.1.', __FUNCTION__), E_USER_DEPRECATED);
+                }
+            }
+        }
 
         if (null === $resourceClass) {
             return [
@@ -104,9 +127,11 @@ final class PropertyHelper implements PropertyHelperInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Gets the Doctrine Type of a given property/resourceClass.
+     *
+     * @return Type|string|null
      */
-    public function getDoctrineFieldType(string $property, string $resourceClass)
+    protected function getDoctrineFieldType(string $property, string $resourceClass)
     {
         $propertyParts = $this->splitPropertyParts($property, $resourceClass);
         $metadata = $this->getNestedMetadata($resourceClass, $propertyParts['associations']);
@@ -115,9 +140,11 @@ final class PropertyHelper implements PropertyHelperInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Gets nested class metadata for the given resource.
+     *
+     * @param string[] $associations
      */
-    public function getNestedMetadata(string $resourceClass, array $associations): ClassMetadata
+    protected function getNestedMetadata(string $resourceClass, array $associations): ClassMetadata
     {
         $metadata = $this->getClassMetadata($resourceClass);
 
@@ -133,9 +160,9 @@ final class PropertyHelper implements PropertyHelperInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Gets class metadata for the given resource.
      */
-    public function getClassMetadata(string $resourceClass): ClassMetadata
+    protected function getClassMetadata(string $resourceClass): ClassMetadata
     {
         return $this
             ->managerRegistry

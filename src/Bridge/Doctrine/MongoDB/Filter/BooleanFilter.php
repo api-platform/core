@@ -40,7 +40,7 @@ final class BooleanFilter extends AbstractContextAwareFilter
     {
         if (
             !$this->isPropertyEnabled($property, $resourceClass) ||
-            !$this->propertyHelper->isPropertyMapped($property, $resourceClass) ||
+            !$this->isPropertyMapped($property, $resourceClass) ||
             !$this->isBooleanField($property, $resourceClass)
         ) {
             return;
@@ -51,7 +51,7 @@ final class BooleanFilter extends AbstractContextAwareFilter
             return;
         }
 
-        if ($this->propertyHelper->isPropertyNested($property, $resourceClass)) {
+        if ($this->isPropertyNested($property, $resourceClass)) {
             $this->addLookupsForNestedProperty($property, $aggregationBuilder, $resourceClass);
         }
 
