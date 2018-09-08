@@ -47,40 +47,52 @@ header #logo img {
 /** spider and web **/
 
 .web, .spider {
-  pointer-events: none;
-  right:0;
-  z-index:101;
-  position:fixed;
+  right: 0;
+  z-index: 101;
+  position: fixed;
 }
 
 .web {
-  top:0;
+  top: 0;
 }
 
 .web:after {
   content: "";
-  opacity:0;
+  opacity: 0;
   width: 2px;
   height: 70px;
   position: fixed;
   right: 35px;
   background-color: black;
-  animation-name: webAnim;
-  animation-duration: 2s;
-  animation-delay: 2s;
-  animation-fill-mode: forwards;
-  animation-timing-function: ease-in-out;
+}
+
+.web.calm:after {
+  opacity: 0.2;
+  height: calc(100% - 120px);
+  transition: height 2s ease-in-out 2s, opacity 0s linear 2s;
+}
+
+.web.frighten:after {
+  opacity: 0.2;
+  transition: height 1s ease-in-out;
 }
 
 .spider {
-  opacity:0;
-  top:170px;
-  animation-name: spiderAnim;
-  animation-duration: 2s;
-  animation-delay: 2s;
-  transform:translateY(-100%);
-  animation-fill-mode: forwards;
-  animation-timing-function: ease-in-out;
+  opacity: 0;
+  top: 170px;
+  transform: translateY(-100%);
+}
+
+.spider.calm {
+  opacity: 1;
+  top: calc(100% - 30px);
+  transition: top 2s ease-in-out 2s, opacity 0s linear 2s;
+}
+
+.spider.frighten {
+  opacity: 1;
+  transition: top 1s ease-in-out;
+  animation: shake 0.5s ease-in-out;
 }
 
 
@@ -330,11 +342,17 @@ text-align:center;
   font-family: Open Sans,sans-serif!important;
 }
 
-@keyframes spiderAnim {
-    from {opacity:1; top:170px}
-    to {opacity:1; top:calc(100% - 30px)}
-}
-@keyframes webAnim {
-    from {opacity:0.2; height:70px}
-    to {opacity:0.2; height:calc(100% - 120px)}
+@keyframes shake {
+  10%, 90% {
+    transform: translate(-1px, -100%);
+  }
+  20%, 80% {
+    transform: translate(2px, -100%);
+  }
+  30%, 50%, 70% {
+    transform: translate(-4px, -100%);
+  }
+  40%, 60% {
+    transform: translate(4px, -100%);
+  }
 }

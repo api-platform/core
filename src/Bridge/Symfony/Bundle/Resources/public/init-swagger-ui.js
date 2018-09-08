@@ -1,6 +1,21 @@
 'use strict';
 
 window.onload = () => {
+    const webby = document.getElementsByClassName('spider')[0];
+    const web = document.getElementsByClassName('web')[0];
+    webby.className += ' calm';
+    web.className += ' calm';
+    webby.addEventListener('click', () => {
+        if (-1 === webby.className.indexOf('frighten')) {
+            webby.className = webby.className.replace('calm', 'frighten');
+            web.className = web.className.replace('calm', 'frighten');
+            setTimeout(() => {
+                webby.className = webby.className.replace('frighten', 'calm');
+                web.className = web.className.replace('frighten', 'calm');
+            }, 10000);
+        }
+    });
+
     const data = JSON.parse(document.getElementById('swagger-data').innerText);
     const ui = SwaggerUIBundle({
         spec: data.spec,
