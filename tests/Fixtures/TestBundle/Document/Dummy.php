@@ -29,6 +29,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  *     "filters"={
  *         "my_dummy.mongodb.boolean",
  *         "my_dummy.mongodb.date",
+ *         "my_dummy.mongodb.exists",
  *         "my_dummy.mongodb.search"
  *     }
  * })
@@ -83,7 +84,7 @@ class Dummy
     /**
      * @var bool A dummy boolean
      *
-     * @ODM\Field(type="boolean")
+     * @ODM\Field(type="boolean", nullable=true)
      */
     public $dummyBoolean;
 

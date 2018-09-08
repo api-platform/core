@@ -18,6 +18,10 @@ services:
         parent:    'api_platform.doctrine.mongodb.date_filter'
         arguments: [ { 'dummyDate': ~, 'relatedDummy.dummyDate': ~, 'embeddedDummy.dummyDate': ~ } ]
         tags:      [ { name: 'api_platform.filter', id: 'my_dummy.mongodb.date' } ]
+    app.my_dummy_resource.mongodb.exists_filter:
+        parent:    'api_platform.doctrine.mongodb.exists_filter'
+        arguments: [ { 'description': ~, 'relatedDummy.name': ~, 'dummyBoolean': ~, 'relatedDummy': ~ } ]
+        tags:      [ { name: 'api_platform.filter', id: 'my_dummy.mongodb.exists' } ]
     app.my_dummy_resource.mongodb.search_filter:
         parent:    'api_platform.doctrine.mongodb.search_filter'
         arguments: [ { 'id': 'exact', 'name': 'partial', 'alias': 'start', 'description': 'word_start', 'relatedDummy.name': 'exact', 'relatedDummies': 'exact', 'dummy': 'ipartial', 'relatedDummies.name': 'start', 'embeddedDummy.dummyName': 'partial' } ]
