@@ -1,7 +1,7 @@
 'use strict';
 
 window.onload = () => {
-    const webby = document.getElementsByClassName('spider')[0];
+    const webby = document.getElementsByClassName('webby')[0];
     const web = document.getElementsByClassName('web')[0];
     webby.className += ' calm';
     web.className += ' calm';
