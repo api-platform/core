@@ -33,6 +33,7 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 final class ItemResolver
 {
     use ClassInfoTrait;
+    use FieldsToAttributesTrait;
     use ResourceAccessCheckerTrait;
 
     private $iriConverter;
@@ -59,7 +60,7 @@ final class ItemResolver
             return null;
         }
 
-        $baseNormalizationContext = ['attributes' => $this->replaceIdKey($info->getFieldSelection(PHP_INT_MAX))];
+        $baseNormalizationContext = ['attributes' => $this->fieldsToAttributes($info)];
         try {
             $item = $this->iriConverter->getItemFromIri($args['id'], $baseNormalizationContext);
         } catch (ItemNotFoundException $e) {
@@ -73,26 +74,5 @@ final class ItemResolver
         $normalizationContext = $resourceMetadata->getGraphqlAttribute('query', 'normalization_context', [], true);
 
         return $this->normalizer->normalize($item, ItemNormalizer::FORMAT, $normalizationContext + $baseNormalizationContext);
-    }
-
-    /**
-     * Recursively replaces the key "_id" (the raw id i GraphQL) by "id" (the name of the property expected by the Serializer).
-     */
-    private function replaceIdKey(array $array): array
-    {
-        foreach ($array as $key => $value) {
-            if ('_id' === $key) {
-                $array['id'] = true;
-                unset($array['key']);
-
-                continue;
-            }
-
-            if (\is_array($array[$key])) {
-                $array[$key] = $this->replaceIdKey($array[$key]);
-            }
-        }
-
-        return $array;
     }
 }
