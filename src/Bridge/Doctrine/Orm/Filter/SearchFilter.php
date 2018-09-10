@@ -62,20 +62,14 @@ class SearchFilter extends AbstractContextAwareFilter implements SearchFilterInt
         $alias = $queryBuilder->getRootAliases()[0];
         $field = $property;
 
+        $associations = [];
         if ($this->isPropertyNested($property, $resourceClass)) {
             list($alias, $field, $associations) = $this->addJoinsForNestedProperty($property, $alias, $queryBuilder, $queryNameGenerator, $resourceClass);
-            $metadata = $this->getNestedMetadata($resourceClass, $associations);
-        } else {
-            $metadata = $this->getClassMetadata($resourceClass);
         }
+        $metadata = $this->getNestedMetadata($resourceClass, $associations);
 
-        $values = $this->normalizeValues((array) $value);
-
-        if (empty($values)) {
-            $this->logger->notice('Invalid filter ignored', [
-                'exception' => new InvalidArgumentException(sprintf('At least one value is required, multiple values should be in "%1$s[]=firstvalue&%1$s[]=secondvalue" format', $property)),
-            ]);
-
+        $values = $this->normalizeValues((array) $value, $property);
+        if (null === $values) {
             return;
         }
 

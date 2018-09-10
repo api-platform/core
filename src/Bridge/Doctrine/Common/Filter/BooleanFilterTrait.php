@@ -69,10 +69,7 @@ trait BooleanFilterTrait
         return DBALType::BOOLEAN === $metadata->getTypeOfField($propertyParts['field']);
     }
 
-    /**
-     * @return bool|null
-     */
-    private function normalizeValue($value, string $property)
+    private function normalizeValue($value, string $property): ?bool
     {
         if (\in_array($value, [true, 'true', '1'], true)) {
             $value = true;

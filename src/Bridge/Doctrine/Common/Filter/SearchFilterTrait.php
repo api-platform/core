@@ -145,12 +145,20 @@ trait SearchFilterTrait
     /**
      * Normalize the values array.
      */
-    private function normalizeValues(array $values): array
+    private function normalizeValues(array $values, string $property): ?array
     {
         foreach ($values as $key => $value) {
             if (!\is_int($key) || !\is_string($value)) {
                 unset($values[$key]);
             }
+        }
+
+        if (empty($values)) {
+            $this->logger->notice('Invalid filter ignored', [
+                'exception' => new InvalidArgumentException(sprintf('At least one value is required, multiple values should be in "%1$s[]=firstvalue&%1$s[]=secondvalue" format', $property)),
+            ]);
+
+            return null;
         }
 
         return array_values($values);
