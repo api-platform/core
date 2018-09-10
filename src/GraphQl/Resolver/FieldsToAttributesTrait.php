@@ -23,7 +23,7 @@ use GraphQL\Type\Definition\ResolveInfo;
 trait FieldsToAttributesTrait
 {
     /**
-     * Recursively replaces the key "_id" (the raw id in GraphQL) by "id" (the name of the property expected by the Serializer) and flatten edge and node structures (pagination).
+     * Retrieve fields, recursively replaces the "_id" key (the raw id) by "id" (the name of the property expected by the Serializer) and flattens edge and node structures (pagination).
      */
     private function fieldsToAttributes(ResolveInfo $info): array
     {
