@@ -18,6 +18,7 @@ use ApiPlatform\Core\DataProvider\CollectionDataProviderInterface;
 use ApiPlatform\Core\DataProvider\PaginatorInterface;
 use ApiPlatform\Core\DataProvider\SubresourceDataProviderInterface;
 use ApiPlatform\Core\Exception\ResourceClassNotSupportedException;
+use ApiPlatform\Core\GraphQl\Resolver\FieldsToAttributesTrait;
 use ApiPlatform\Core\GraphQl\Resolver\ResourceAccessCheckerTrait;
 use ApiPlatform\Core\GraphQl\Serializer\ItemNormalizer;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
@@ -37,6 +38,7 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
  */
 final class CollectionResolverFactory implements ResolverFactoryInterface
 {
+    use FieldsToAttributesTrait;
     use ResourceAccessCheckerTrait;
 
     private $collectionDataProvider;
@@ -123,16 +125,6 @@ final class CollectionResolverFactory implements ResolverFactoryInterface
 
             return $data;
         };
-    }
-
-    private function fieldsToAttributes(ResolveInfo $info): array
-    {
-        $fields = $info->getFieldSelection(PHP_INT_MAX);
-        if (isset($fields['edges']['node'])) {
-            $fields = $fields['edges']['node'];
-        }
-
-        return $fields;
     }
 
     /**

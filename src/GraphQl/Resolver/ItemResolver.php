@@ -33,6 +33,7 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 final class ItemResolver
 {
     use ClassInfoTrait;
+    use FieldsToAttributesTrait;
     use ResourceAccessCheckerTrait;
 
     private $iriConverter;
@@ -59,7 +60,7 @@ final class ItemResolver
             return null;
         }
 
-        $baseNormalizationContext = ['attributes' => $info->getFieldSelection(PHP_INT_MAX)];
+        $baseNormalizationContext = ['attributes' => $this->fieldsToAttributes($info)];
         try {
             $item = $this->iriConverter->getItemFromIri($args['id'], $baseNormalizationContext);
         } catch (ItemNotFoundException $e) {
