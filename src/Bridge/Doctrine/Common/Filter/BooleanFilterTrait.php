@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Bridge\Doctrine\Common\Filter;
 
 use ApiPlatform\Core\Exception\InvalidArgumentException;
-use Doctrine\DBAL\Types\Type as DBALType;
 
 /**
  * Trait for filtering the collection by boolean values.
@@ -63,10 +62,7 @@ trait BooleanFilterTrait
      */
     private function isBooleanField(string $property, string $resourceClass): bool
     {
-        $propertyParts = $this->splitPropertyParts($property, $resourceClass);
-        $metadata = $this->getNestedMetadata($resourceClass, $propertyParts['associations']);
-
-        return DBALType::BOOLEAN === $metadata->getTypeOfField($propertyParts['field']);
+        return isset(self::DOCTRINE_BOOLEAN_TYPES[$this->getDoctrineFieldType($property, $resourceClass)]);
     }
 
     private function normalizeValue($value, string $property): ?bool

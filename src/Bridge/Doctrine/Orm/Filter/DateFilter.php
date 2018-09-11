@@ -17,7 +17,7 @@ use ApiPlatform\Core\Bridge\Doctrine\Common\Filter\DateFilterInterface;
 use ApiPlatform\Core\Bridge\Doctrine\Common\Filter\DateFilterTrait;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Type as DBALType;
 use Doctrine\ORM\QueryBuilder;
 
 /**
@@ -29,6 +29,17 @@ use Doctrine\ORM\QueryBuilder;
 class DateFilter extends AbstractContextAwareFilter implements DateFilterInterface
 {
     use DateFilterTrait;
+
+    const DOCTRINE_DATE_TYPES = [
+        DBALType::DATE => true,
+        DBALType::DATETIME => true,
+        DBALType::DATETIMETZ => true,
+        DBALType::TIME => true,
+        DBALType::DATE_IMMUTABLE => true,
+        DBALType::DATETIME_IMMUTABLE => true,
+        DBALType::DATETIMETZ_IMMUTABLE => true,
+        DBALType::TIME_IMMUTABLE => true,
+    ];
 
     /**
      * {@inheritdoc}
@@ -115,7 +126,7 @@ class DateFilter extends AbstractContextAwareFilter implements DateFilterInterfa
     /**
      * Adds the where clause according to the chosen null management.
      *
-     * @param string|Type $type
+     * @param string|DBALType $type
      */
     protected function addWhere(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $alias, string $field, string $operator, string $value, string $nullManagement = null, $type = null)
     {

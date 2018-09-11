@@ -20,6 +20,7 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryBuilderHelper;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
 use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\DBAL\Types\Type as DBALType;
 use Doctrine\ORM\QueryBuilder;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -34,6 +35,8 @@ use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 class SearchFilter extends AbstractContextAwareFilter implements SearchFilterInterface
 {
     use SearchFilterTrait;
+
+    const DOCTRINE_INTEGER_TYPE = DBALType::INTEGER;
 
     /**
      * @param RequestStack|null $requestStack No prefix to prevent autowiring of this deprecated property
@@ -213,5 +216,41 @@ class SearchFilter extends AbstractContextAwareFilter implements SearchFilterInt
 
             return sprintf('LOWER(%s)', $expr);
         };
+    }
+
+    /**
+     * Converts a Doctrine type in PHP type.
+     */
+    private function getType(string $doctrineType): string
+    {
+        switch ($doctrineType) {
+            case DBALType::TARRAY:
+                return 'array';
+            case DBALType::BIGINT:
+            case DBALType::INTEGER:
+            case DBALType::SMALLINT:
+                return 'int';
+            case DBALType::BOOLEAN:
+                return 'bool';
+            case DBALType::DATE:
+            case DBALType::TIME:
+            case DBALType::DATETIME:
+            case DBALType::DATETIMETZ:
+                return \DateTimeInterface::class;
+            case DBALType::FLOAT:
+                return 'float';
+        }
+
+        if (\defined(DBALType::class.'::DATE_IMMUTABLE')) {
+            switch ($doctrineType) {
+                case DBALType::DATE_IMMUTABLE:
+                case DBALType::TIME_IMMUTABLE:
+                case DBALType::DATETIME_IMMUTABLE:
+                case DBALType::DATETIMETZ_IMMUTABLE:
+                    return \DateTimeInterface::class;
+            }
+        }
+
+        return 'string';
     }
 }

@@ -15,6 +15,7 @@ namespace ApiPlatform\Core\Bridge\Doctrine\MongoDB\Filter;
 
 use ApiPlatform\Core\Bridge\Doctrine\Common\Filter\BooleanFilterTrait;
 use Doctrine\ODM\MongoDB\Aggregation\Builder;
+use Doctrine\ODM\MongoDB\Types\Type as MongoDbType;
 
 /**
  * Filters the collection by boolean values.
@@ -32,6 +33,11 @@ use Doctrine\ODM\MongoDB\Aggregation\Builder;
 final class BooleanFilter extends AbstractContextAwareFilter
 {
     use BooleanFilterTrait;
+
+    const DOCTRINE_BOOLEAN_TYPES = [
+        MongoDbType::BOOL => true,
+        MongoDbType::BOOLEAN => true,
+    ];
 
     /**
      * {@inheritdoc}

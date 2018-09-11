@@ -63,6 +63,11 @@
             <argument type="service" id="logger" on-invalid="ignore" />
         </service>
 
+        <service id="api_platform.doctrine.mongodb.numeric_filter" class="ApiPlatform\Core\Bridge\Doctrine\MongoDB\Filter\NumericFilter" public="false" abstract="true">
+            <argument type="service" id="doctrine_mongodb" />
+            <argument type="service" id="logger" on-invalid="ignore" />
+        </service>
+
         <!-- Metadata loader -->
 
         <service id="api_platform.doctrine.mongodb.metadata.property.metadata_factory"

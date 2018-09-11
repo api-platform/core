@@ -11,12 +11,11 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Bridge\Doctrine\Orm\Filter;
+namespace ApiPlatform\Core\Bridge\Doctrine\MongoDB\Filter;
 
 use ApiPlatform\Core\Bridge\Doctrine\Common\Filter\NumericFilterTrait;
-use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGeneratorInterface;
-use Doctrine\DBAL\Types\Type as DBALType;
-use Doctrine\ORM\QueryBuilder;
+use Doctrine\ODM\MongoDB\Aggregation\Builder;
+use Doctrine\ODM\MongoDB\Types\Type as MongoDbType;
 
 /**
  * Filters the collection by numeric values.
@@ -28,28 +27,25 @@ use Doctrine\ORM\QueryBuilder;
  *
  * @author Amrouche Hamza <hamza.simperfit@gmail.com>
  * @author Teoh Han Hui <teohhanhui@gmail.com>
+ * @author Alan Poulain <contact@alanpoulain.eu>
  */
-class NumericFilter extends AbstractContextAwareFilter
+final class NumericFilter extends AbstractContextAwareFilter
 {
     use NumericFilterTrait;
 
     /**
      * Type of numeric in Doctrine.
-     *
-     * @see http://doctrine-orm.readthedocs.org/projects/doctrine-dbal/en/latest/reference/types.html
      */
     const DOCTRINE_NUMERIC_TYPES = [
-        DBALType::BIGINT => true,
-        DBALType::DECIMAL => true,
-        DBALType::FLOAT => true,
-        DBALType::INTEGER => true,
-        DBALType::SMALLINT => true,
+        MongoDbType::INT => true,
+        MongoDbType::INTEGER => true,
+        MongoDbType::FLOAT => true,
     ];
 
     /**
      * {@inheritdoc}
      */
-    protected function filterProperty(string $property, $value, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, string $operationName = null)
+    protected function filterProperty(string $property, $value, Builder $aggregationBuilder, string $resourceClass, string $operationName = null, array $context = [])
     {
         if (
             !$this->isPropertyEnabled($property, $resourceClass) ||
@@ -64,18 +60,11 @@ class NumericFilter extends AbstractContextAwareFilter
             return;
         }
 
-        $alias = $queryBuilder->getRootAliases()[0];
-        $field = $property;
-
         if ($this->isPropertyNested($property, $resourceClass)) {
-            list($alias, $field) = $this->addJoinsForNestedProperty($property, $alias, $queryBuilder, $queryNameGenerator, $resourceClass);
+            $this->addLookupsForNestedProperty($property, $aggregationBuilder, $resourceClass);
         }
 
-        $valueParameter = $queryNameGenerator->generateParameterName($field);
-
-        $queryBuilder
-            ->andWhere(sprintf('%s.%s = :%s', $alias, $field, $valueParameter))
-            ->setParameter($valueParameter, $value, $this->getDoctrineFieldType($property, $resourceClass));
+        $aggregationBuilder->match()->field($property)->equals($value)->type($this->getDoctrineFieldType($property, $resourceClass));
     }
 
     /**
@@ -83,11 +72,11 @@ class NumericFilter extends AbstractContextAwareFilter
      */
     private function getType(string $doctrineType = null): string
     {
-        if (null === $doctrineType || DBALType::DECIMAL === $doctrineType) {
+        if (null === $doctrineType) {
             return 'string';
         }
 
-        if (DBALType::FLOAT === $doctrineType) {
+        if (MongoDbType::FLOAT === $doctrineType) {
             return 'float';
         }
 

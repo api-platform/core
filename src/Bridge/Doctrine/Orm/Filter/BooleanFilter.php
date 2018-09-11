@@ -15,6 +15,7 @@ namespace ApiPlatform\Core\Bridge\Doctrine\Orm\Filter;
 
 use ApiPlatform\Core\Bridge\Doctrine\Common\Filter\BooleanFilterTrait;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGeneratorInterface;
+use Doctrine\DBAL\Types\Type as DBALType;
 use Doctrine\ORM\QueryBuilder;
 
 /**
@@ -32,6 +33,10 @@ use Doctrine\ORM\QueryBuilder;
 class BooleanFilter extends AbstractContextAwareFilter
 {
     use BooleanFilterTrait;
+
+    const DOCTRINE_BOOLEAN_TYPES = [
+        DBALType::BOOLEAN => true,
+    ];
 
     /**
      * {@inheritdoc}

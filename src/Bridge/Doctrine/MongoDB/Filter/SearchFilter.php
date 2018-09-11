@@ -19,6 +19,7 @@ use ApiPlatform\Core\Bridge\Doctrine\Common\Filter\SearchFilterTrait;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ODM\MongoDB\Aggregation\Builder;
+use Doctrine\ODM\MongoDB\Types\Type as MongoDbType;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
@@ -32,6 +33,8 @@ use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 final class SearchFilter extends AbstractContextAwareFilter implements SearchFilterInterface
 {
     use SearchFilterTrait;
+
+    const DOCTRINE_INTEGER_TYPE = MongoDbType::INTEGER;
 
     public function __construct(ManagerRegistry $managerRegistry, IriConverterInterface $iriConverter, PropertyAccessorInterface $propertyAccessor = null, LoggerInterface $logger = null, array $properties = null)
     {
@@ -181,5 +184,26 @@ final class SearchFilter extends AbstractContextAwareFilter implements SearchFil
 
             return "{$expr}i";
         };
+    }
+
+    /**
+     * Converts a Doctrine type in PHP type.
+     */
+    private function getType(string $doctrineType): string
+    {
+        switch ($doctrineType) {
+            case MongoDbType::INT:
+            case MongoDbType::INTEGER:
+                return 'int';
+            case MongoDbType::BOOL:
+            case MongoDbType::BOOLEAN:
+                return 'bool';
+            case MongoDbType::DATE:
+                return \DateTimeInterface::class;
+            case MongoDbType::FLOAT:
+                return 'float';
+        }
+
+        return 'string';
     }
 }

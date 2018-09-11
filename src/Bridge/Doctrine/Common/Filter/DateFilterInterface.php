@@ -30,14 +30,4 @@ interface DateFilterInterface
     const INCLUDE_NULL_BEFORE = 'include_null_before';
     const INCLUDE_NULL_AFTER = 'include_null_after';
     const INCLUDE_NULL_BEFORE_AND_AFTER = 'include_null_before_and_after';
-    const DOCTRINE_DATE_TYPES = [
-        'date' => true,
-        'datetime' => true,
-        'datetimetz' => true,
-        'time' => true,
-        'date_immutable' => true,
-        'datetime_immutable' => true,
-        'datetimetz_immutable' => true,
-        'time_immutable' => true,
-    ];
 }

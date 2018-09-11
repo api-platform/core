@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Bridge\Doctrine\Common\Filter;
 
 use ApiPlatform\Core\Exception\InvalidArgumentException;
-use Doctrine\DBAL\Types\Type;
 
 /**
  * Trait for filtering the collection by given properties.
@@ -91,42 +90,6 @@ trait SearchFilterTrait
     }
 
     /**
-     * Converts a Doctrine type in PHP type.
-     */
-    private function getType(string $doctrineType): string
-    {
-        switch ($doctrineType) {
-            case Type::TARRAY:
-                return 'array';
-            case Type::BIGINT:
-            case Type::INTEGER:
-            case Type::SMALLINT:
-                return 'int';
-            case Type::BOOLEAN:
-                return 'bool';
-            case Type::DATE:
-            case Type::TIME:
-            case Type::DATETIME:
-            case Type::DATETIMETZ:
-                return \DateTimeInterface::class;
-            case Type::FLOAT:
-                return 'float';
-        }
-
-        if (\defined(Type::class.'::DATE_IMMUTABLE')) {
-            switch ($doctrineType) {
-                case Type::DATE_IMMUTABLE:
-                case Type::TIME_IMMUTABLE:
-                case Type::DATETIME_IMMUTABLE:
-                case Type::DATETIMETZ_IMMUTABLE:
-                    return \DateTimeInterface::class;
-            }
-        }
-
-        return 'string';
-    }
-
-    /**
      * Gets the ID from an IRI or a raw ID.
      */
     private function getIdFromValue(string $value)
@@ -166,13 +129,11 @@ trait SearchFilterTrait
 
     /**
      * When the field should be an integer, check that the given value is a valid one.
-     *
-     * @param Type|string $type
      */
     private function hasValidValues(array $values, $type = null): bool
     {
         foreach ($values as $key => $value) {
-            if (Type::INTEGER === $type && null !== $value && false === filter_var($value, FILTER_VALIDATE_INT)) {
+            if (self::DOCTRINE_INTEGER_TYPE === $type && null !== $value && false === filter_var($value, FILTER_VALIDATE_INT)) {
                 return false;
             }
         }

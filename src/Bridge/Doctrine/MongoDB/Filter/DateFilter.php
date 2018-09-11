@@ -16,8 +16,8 @@ namespace ApiPlatform\Core\Bridge\Doctrine\MongoDB\Filter;
 use ApiPlatform\Core\Bridge\Doctrine\Common\Filter\DateFilterInterface;
 use ApiPlatform\Core\Bridge\Doctrine\Common\Filter\DateFilterTrait;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
-use Doctrine\DBAL\Types\Type;
 use Doctrine\ODM\MongoDB\Aggregation\Builder;
+use Doctrine\ODM\MongoDB\Types\Type as MongoDbType;
 
 /**
  * Filters the collection by date intervals.
@@ -29,6 +29,10 @@ use Doctrine\ODM\MongoDB\Aggregation\Builder;
 class DateFilter extends AbstractContextAwareFilter implements DateFilterInterface
 {
     use DateFilterTrait;
+
+    const DOCTRINE_DATE_TYPES = [
+        MongoDbType::DATE => true,
+    ];
 
     /**
      * {@inheritdoc}
@@ -106,12 +110,12 @@ class DateFilter extends AbstractContextAwareFilter implements DateFilterInterfa
     /**
      * Adds the match stage according to the chosen null management.
      *
-     * @param string|Type $type
+     * @param string|MongoDbType $type
      */
     private function addMatch(Builder $aggregationBuilder, string $field, string $operator, string $value, string $nullManagement = null, $type = null)
     {
         try {
-            $value = false === strpos($type, '_immutable') ? new \DateTime($value) : new \DateTimeImmutable($value);
+            $value = new \DateTime($value);
         } catch (\Exception $e) {
             // Silently ignore this filter if it can not be transformed to a \DateTime
             $this->logger->notice('Invalid filter ignored', [
