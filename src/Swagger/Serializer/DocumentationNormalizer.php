@@ -608,7 +608,11 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
                     'in' => 'query',
                     'required' => $data['required'],
                 ];
-                $parameter += $this->getType($data['type'], false, null, null, $definitions, $serializerContext);
+                $parameter += $this->getType($data['type'], $data['is_collection'] ?? false, null, null, $definitions, $serializerContext);
+
+                if ('array' === $parameter['type']) {
+                    $parameter['collectionFormat'] = \in_array($data['type'], [Type::BUILTIN_TYPE_ARRAY, Type::BUILTIN_TYPE_OBJECT], true) ? 'csv' : 'multi';
+                }
 
                 if (isset($data['swagger'])) {
                     $parameter = $data['swagger'] + $parameter;
