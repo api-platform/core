@@ -92,16 +92,21 @@ final class SchemaBuilder implements SchemaBuilderInterface
             }
         }
 
-        return new Schema([
+        $schema = [
             'query' => new ObjectType([
                 'name' => 'Query',
                 'fields' => $queryFields,
             ]),
-            'mutation' => new ObjectType([
+        ];
+
+        if ($mutationFields) {
+            $schema['mutation'] = new ObjectType([
                 'name' => 'Mutation',
                 'fields' => $mutationFields,
-            ]),
-        ]);
+            ]);
+        }
+
+        return new Schema($schema);
     }
 
     private function getNodeInterface(): InterfaceType
