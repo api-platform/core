@@ -1,5 +1,15 @@
 # Changelog
 
+## 2.3.2
+
+* Open API/Swagger: detect correctly collection parameters
+* Open API/Swagger: fix serialization of nested objects when exporting as YAML
+* GraphQL: fix support of properties also mapped as subresources
+* GraphQL: fix retrieving the internal `_id` when `id` is not part of the requested fields
+* GraphQL: only exposes the mutations if any
+* Doctrine: prevent data duplication in Eager loaded relations
+* Preserve the host in the internal router
+
 ## 2.3.1
 
 * Data persisters: call only the 1st matching data persister, this fix may break existing code, see https://github.com/api-platform/docs/issues/540#issuecomment-405945358
