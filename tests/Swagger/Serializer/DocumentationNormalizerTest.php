@@ -2037,7 +2037,7 @@ class DocumentationNormalizerTest extends TestCase
                                 'required' => false,
                                 'type' => 'boolean',
                                 'description' => 'Enable or disable pagination',
-                            ]
+                            ],
                         ],
                         'responses' => [
                             200 => [

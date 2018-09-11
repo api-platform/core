@@ -643,7 +643,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
     }
 
     /**
-     * Returns enable pagination parameter for the "get" collection operation
+     * Returns enable pagination parameter for the "get" collection operation.
      */
     private function getPaginationClientEnabledParameters(): array
     {
