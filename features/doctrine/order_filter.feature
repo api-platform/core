@@ -1,4 +1,5 @@
 @filter
+@mongodb
 Feature: Order filter on collections
   In order to retrieve ordered large collections of resources
   As a client software developer

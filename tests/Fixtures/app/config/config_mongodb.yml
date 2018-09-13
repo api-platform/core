@@ -26,6 +26,10 @@ services:
         parent:    'api_platform.doctrine.mongodb.numeric_filter'
         arguments: [ { 'dummyFloat': ~, 'dummyPrice': ~ } ]
         tags:      [ { name: 'api_platform.filter', id: 'my_dummy.mongodb.numeric' } ]
+    app.my_dummy_resource.mongodb.order_filter:
+        parent:    'api_platform.doctrine.mongodb.order_filter'
+        arguments: [ { 'id': ~, 'name': 'desc', 'description': ~, 'relatedDummy.name': ~, 'embeddedDummy.dummyName': 'desc', 'relatedDummy.symfony': ~, 'dummyDate': ~ } ]
+        tags:      [ { name: 'api_platform.filter', id: 'my_dummy.mongodb.order' } ]
     app.my_dummy_resource.mongodb.search_filter:
         parent:    'api_platform.doctrine.mongodb.search_filter'
         arguments: [ { 'id': 'exact', 'name': 'partial', 'alias': 'start', 'description': 'word_start', 'relatedDummy.name': 'exact', 'relatedDummies': 'exact', 'dummy': 'ipartial', 'relatedDummies.name': 'start', 'embeddedDummy.dummyName': 'partial' } ]

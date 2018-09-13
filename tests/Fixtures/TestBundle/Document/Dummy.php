@@ -31,6 +31,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  *         "my_dummy.mongodb.date",
  *         "my_dummy.mongodb.exists",
  *         "my_dummy.mongodb.numeric",
+ *         "my_dummy.mongodb.order",
  *         "my_dummy.mongodb.search"
  *     }
  * })
