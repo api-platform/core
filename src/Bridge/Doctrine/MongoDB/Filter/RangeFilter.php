@@ -11,26 +11,26 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Bridge\Doctrine\Orm\Filter;
+namespace ApiPlatform\Core\Bridge\Doctrine\MongoDB\Filter;
 
 use ApiPlatform\Core\Bridge\Doctrine\Common\Filter\RangeFilterInterface;
 use ApiPlatform\Core\Bridge\Doctrine\Common\Filter\RangeFilterTrait;
-use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGeneratorInterface;
-use Doctrine\ORM\QueryBuilder;
+use Doctrine\ODM\MongoDB\Aggregation\Builder;
 
 /**
  * Filters the collection by range.
  *
  * @author Lee Siong Chan <ahlee2326@me.com>
+ * @author Alan Poulain <contact@alanpoulain.eu>
  */
-class RangeFilter extends AbstractContextAwareFilter implements RangeFilterInterface
+final class RangeFilter extends AbstractContextAwareFilter implements RangeFilterInterface
 {
     use RangeFilterTrait;
 
     /**
      * {@inheritdoc}
      */
-    protected function filterProperty(string $property, $values, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, string $operationName = null)
+    protected function filterProperty(string $property, $values, Builder $aggregationBuilder, string $resourceClass, string $operationName = null, array $context = [])
     {
         if (
             !\is_array($values) ||
@@ -40,18 +40,15 @@ class RangeFilter extends AbstractContextAwareFilter implements RangeFilterInter
             return;
         }
 
-        $alias = $queryBuilder->getRootAliases()[0];
         $field = $property;
 
         if ($this->isPropertyNested($property, $resourceClass)) {
-            list($alias, $field) = $this->addJoinsForNestedProperty($property, $alias, $queryBuilder, $queryNameGenerator, $resourceClass);
+            $this->addLookupsForNestedProperty($property, $aggregationBuilder, $resourceClass);
         }
 
         foreach ($values as $operator => $value) {
-            $this->addWhere(
-                $queryBuilder,
-                $queryNameGenerator,
-                $alias,
+            $this->addMatch(
+                $aggregationBuilder,
                 $field,
                 $operator,
                 $value
@@ -60,17 +57,10 @@ class RangeFilter extends AbstractContextAwareFilter implements RangeFilterInter
     }
 
     /**
-     * Adds the where clause according to the operator.
-     *
-     * @param string $alias
-     * @param string $field
-     * @param string $operator
-     * @param string $value
+     * Adds the match stage according to the operator.
      */
-    protected function addWhere(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, $alias, $field, $operator, $value)
+    protected function addMatch(Builder $aggregationBuilder, string $field, string $operator, string $value)
     {
-        $valueParameter = $queryNameGenerator->generateParameterName($field);
-
         switch ($operator) {
             case self::PARAMETER_BETWEEN:
                 $rangeValue = explode('..', $value);
@@ -80,10 +70,7 @@ class RangeFilter extends AbstractContextAwareFilter implements RangeFilterInter
                     return;
                 }
 
-                $queryBuilder
-                    ->andWhere(sprintf('%1$s.%2$s BETWEEN :%3$s_1 AND :%3$s_2', $alias, $field, $valueParameter))
-                    ->setParameter(sprintf('%s_1', $valueParameter), $rangeValue[0])
-                    ->setParameter(sprintf('%s_2', $valueParameter), $rangeValue[1]);
+                $aggregationBuilder->match()->field($field)->lte($rangeValue[0])->gte($rangeValue[1]);
 
                 break;
             case self::PARAMETER_GREATER_THAN:
@@ -92,9 +79,7 @@ class RangeFilter extends AbstractContextAwareFilter implements RangeFilterInter
                     return;
                 }
 
-                $queryBuilder
-                    ->andWhere(sprintf('%s.%s > :%s', $alias, $field, $valueParameter))
-                    ->setParameter($valueParameter, $value);
+                $aggregationBuilder->match()->field($field)->gt($value);
 
                 break;
             case self::PARAMETER_GREATER_THAN_OR_EQUAL:
@@ -103,9 +88,7 @@ class RangeFilter extends AbstractContextAwareFilter implements RangeFilterInter
                     return;
                 }
 
-                $queryBuilder
-                    ->andWhere(sprintf('%s.%s >= :%s', $alias, $field, $valueParameter))
-                    ->setParameter($valueParameter, $value);
+                $aggregationBuilder->match()->field($field)->gte($value);
 
                 break;
             case self::PARAMETER_LESS_THAN:
@@ -114,9 +97,7 @@ class RangeFilter extends AbstractContextAwareFilter implements RangeFilterInter
                     return;
                 }
 
-                $queryBuilder
-                    ->andWhere(sprintf('%s.%s < :%s', $alias, $field, $valueParameter))
-                    ->setParameter($valueParameter, $value);
+                $aggregationBuilder->match()->field($field)->lt($value);
 
                 break;
             case self::PARAMETER_LESS_THAN_OR_EQUAL:
@@ -125,9 +106,7 @@ class RangeFilter extends AbstractContextAwareFilter implements RangeFilterInter
                     return;
                 }
 
-                $queryBuilder
-                    ->andWhere(sprintf('%s.%s <= :%s', $alias, $field, $valueParameter))
-                    ->setParameter($valueParameter, $value);
+                $aggregationBuilder->match()->field($field)->lte($value);
 
                 break;
         }

@@ -53,22 +53,22 @@ trait ExistsFilterTrait
     private function normalizeValue($value, string $property): ?bool
     {
         if (\in_array($value[self::QUERY_PARAMETER_KEY], [true, 'true', '1', '', null], true)) {
-            $value = true;
-        } elseif (\in_array($value[self::QUERY_PARAMETER_KEY], [false, 'false', '0'], true)) {
-            $value = false;
-        } else {
-            $this->logger->notice('Invalid filter ignored', [
-                'exception' => new InvalidArgumentException(sprintf('Invalid value for "%s[%s]", expected one of ( "%s" )', $property, self::QUERY_PARAMETER_KEY, implode('" | "', [
-                    'true',
-                    'false',
-                    '1',
-                    '0',
-                ]))),
-            ]);
-
-            $value = null;
+            return true;
         }
 
-        return $value;
+        if (\in_array($value[self::QUERY_PARAMETER_KEY], [false, 'false', '0'], true)) {
+            return false;
+        }
+
+        $this->logger->notice('Invalid filter ignored', [
+            'exception' => new InvalidArgumentException(sprintf('Invalid value for "%s[%s]", expected one of ( "%s" )', $property, self::QUERY_PARAMETER_KEY, implode('" | "', [
+                'true',
+                'false',
+                '1',
+                '0',
+            ]))),
+        ]);
+
+        return null;
     }
 }

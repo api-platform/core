@@ -32,7 +32,9 @@ use Symfony\Component\Validator\Constraints as Assert;
  *         "my_dummy.mongodb.exists",
  *         "my_dummy.mongodb.numeric",
  *         "my_dummy.mongodb.order",
- *         "my_dummy.mongodb.search"
+ *         "my_dummy.mongodb.range",
+ *         "my_dummy.mongodb.search",
+ *         "my_dummy.property"
  *     }
  * })
  * @ODM\Document
@@ -71,7 +73,7 @@ class Dummy
     /**
      * @var string A short description of the item
      *
-     * @ODM\Field(type="string")
+     * @ODM\Field(type="string", nullable=true)
      * @ApiProperty(iri="https://schema.org/description")
      */
     public $description;
@@ -115,7 +117,7 @@ class Dummy
     /**
      * @var RelatedDummy A related dummy
      *
-     * @ODM\ReferenceOne(targetDocument="RelatedDummy", storeAs="id")
+     * @ODM\ReferenceOne(targetDocument="RelatedDummy", storeAs="id", nullable=true)
      */
     public $relatedDummy;
 

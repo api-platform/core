@@ -68,22 +68,22 @@ trait BooleanFilterTrait
     private function normalizeValue($value, string $property): ?bool
     {
         if (\in_array($value, [true, 'true', '1'], true)) {
-            $value = true;
-        } elseif (\in_array($value, [false, 'false', '0'], true)) {
-            $value = false;
-        } else {
-            $this->logger->notice('Invalid filter ignored', [
-                'exception' => new InvalidArgumentException(sprintf('Invalid boolean value for "%s" property, expected one of ( "%s" )', $property, implode('" | "', [
-                    'true',
-                    'false',
-                    '1',
-                    '0',
-                ]))),
-            ]);
-
-            $value = null;
+            return true;
         }
 
-        return $value;
+        if (\in_array($value, [false, 'false', '0'], true)) {
+            return false;
+        }
+
+        $this->logger->notice('Invalid filter ignored', [
+            'exception' => new InvalidArgumentException(sprintf('Invalid boolean value for "%s" property, expected one of ( "%s" )', $property, implode('" | "', [
+                'true',
+                'false',
+                '1',
+                '0',
+            ]))),
+        ]);
+
+        return null;
     }
 }

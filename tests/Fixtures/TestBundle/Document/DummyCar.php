@@ -15,6 +15,8 @@ namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Document;
 
 use ApiPlatform\Core\Annotation\ApiFilter;
 use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Core\Bridge\Doctrine\MongoDB\Filter\BooleanFilter;
+use ApiPlatform\Core\Bridge\Doctrine\MongoDB\Filter\DateFilter;
 use ApiPlatform\Core\Bridge\Doctrine\MongoDB\Filter\SearchFilter;
 use ApiPlatform\Core\Serializer\Filter\GroupFilter;
 use ApiPlatform\Core\Serializer\Filter\PropertyFilter;
@@ -29,6 +31,8 @@ use Symfony\Component\Serializer\Annotation as Serializer;
  *     }
  * )
  * @ODM\Document
+ * @ApiFilter(DateFilter::class, strategy=DateFilter::EXCLUDE_NULL)
+ * @ApiFilter(BooleanFilter::class)
  * @ApiFilter(PropertyFilter::class, arguments={"parameterName"="foobar"})
  * @ApiFilter(GroupFilter::class, arguments={"parameterName"="foobargroups"})
  * @ApiFilter(GroupFilter::class, arguments={"parameterName"="foobargroups_override"}, id="override")

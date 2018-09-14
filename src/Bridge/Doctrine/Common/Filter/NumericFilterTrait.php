@@ -66,7 +66,7 @@ trait NumericFilterTrait
                 'exception' => new InvalidArgumentException(sprintf('Invalid numeric value for "%s" property', $property)),
             ]);
 
-            $value = null;
+            return null;
         }
 
         return $value;

@@ -39,7 +39,7 @@ class RelatedDummy extends ParentDummy
     /**
      * @var string A name
      *
-     * @ODM\Field(type="string")
+     * @ODM\Field(type="string", nullable=true)
      * @Groups({"friends"})
      */
     public $name;

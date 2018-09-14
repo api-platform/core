@@ -63,7 +63,7 @@ trait OrderFilterTrait
 
         $value = strtoupper($value);
         if (!\in_array($value, [self::DIRECTION_ASC, self::DIRECTION_DESC], true)) {
-            $value = null;
+            return null;
         }
 
         return $value;
