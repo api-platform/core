@@ -150,8 +150,7 @@ jobs:
           name: Run PHPUnit tests
           command: |-
             mkdir -p build/logs/tmp build/cov
-            circleci tests glob "tests/**/*Test.php" | circleci tests split --split-by=timings | parallel -j10% --rpl '{_} s/\//_/g;' \
-              phpdbg -qrr vendor/bin/phpunit --coverage-php build/cov/coverage-{_}.cov --log-junit build/logs/tmp/{_}.xml --colors=always {}
+            phpdbg -qrr vendor/bin/phpunit --coverage-php build/cov/coverage.cov --log-junit build/logs/tmp/coverage.xml --colors=always
       - run:
           name: Merge PHPUnit test reports
           command: |-

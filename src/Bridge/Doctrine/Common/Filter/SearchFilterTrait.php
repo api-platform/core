@@ -67,6 +67,7 @@ trait SearchFilterTrait
                         'type' => $typeOfField,
                         'required' => false,
                         'strategy' => $strategy,
+                        'is_collection' => '[]' === substr($filterParameterName, -2),
                     ];
                 }
             } elseif ($metadata->hasAssociation($field)) {
@@ -81,6 +82,7 @@ trait SearchFilterTrait
                         'type' => 'string',
                         'required' => false,
                         'strategy' => self::STRATEGY_EXACT,
+                        'is_collection' => '[]' === substr($filterParameterName, -2),
                     ];
                 }
             }

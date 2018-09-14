@@ -17,6 +17,7 @@ use ApiPlatform\Core\Api\IriConverterInterface;
 use ApiPlatform\Core\DataPersister\DataPersisterInterface;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\Exception\ItemNotFoundException;
+use ApiPlatform\Core\GraphQl\Resolver\FieldsToAttributesTrait;
 use ApiPlatform\Core\GraphQl\Resolver\ResourceAccessCheckerTrait;
 use ApiPlatform\Core\GraphQl\Serializer\ItemNormalizer;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
@@ -38,6 +39,7 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
  */
 final class ItemMutationResolverFactory implements ResolverFactoryInterface
 {
+    use FieldsToAttributesTrait;
     use ResourceAccessCheckerTrait;
 
     private $iriConverter;
@@ -73,7 +75,7 @@ final class ItemMutationResolverFactory implements ResolverFactoryInterface
 
             $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
             $normalizationContext = $resourceMetadata->getGraphqlAttribute($operationName ?? '', 'normalization_context', [], true);
-            $normalizationContext['attributes'] = $info->getFieldSelection(PHP_INT_MAX);
+            $normalizationContext['attributes'] = $this->fieldsToAttributes($info);
 
             if (isset($args['input']['id'])) {
                 try {

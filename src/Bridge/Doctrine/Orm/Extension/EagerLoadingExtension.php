@@ -232,6 +232,9 @@ final class EagerLoadingExtension implements ContextAwareQueryCollectionExtensio
 
             $this->joinRelations($queryBuilder, $queryNameGenerator, $mapping['targetEntity'], $forceEager, $fetchPartial, $associationAlias, $options, $normalizationContext, 'leftJoin' === $method, $joinCount, $currentDepth);
         }
+
+        // result is discarded (this is just re-hydrating the collections) see http://ocramius.github.io/blog/doctrine-orm-optimization-hydration/
+        $queryBuilder->getQuery()->getResult();
     }
 
     private function addSelect(QueryBuilder $queryBuilder, string $entity, string $associationAlias, array $propertyMetadataOptions)
