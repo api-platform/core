@@ -19,6 +19,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
 /**
  * Parent Dummy.
  *
+ * @author Kévin Dunglas <dunglas@gmail.com>
  * @author Alexandre Delplace <alexandre.delplacemille@gmail.com>
  *
  * @ODM\MappedSuperclass

@@ -1,5 +1,4 @@
 @filter
-@mongodb
 Feature: Numeric filter on collections
   In order to retrieve ordered large collections of resources
   As a client software developer

@@ -4,7 +4,6 @@ Feature: Search filter on collections
   As a client software developer
   I need to search for collections properties
 
-  @mongodb
   @createSchema
   Scenario: Test ManyToMany with filter on join table
     Given there is a RelatedDummy with 4 friends
@@ -16,7 +15,6 @@ Feature: Search filter on collections
     And the JSON node "_embedded.item[0]._links.relatedToDummyFriend" should have 4 elements
     And the JSON node "_embedded.item[0]._embedded.relatedToDummyFriend" should have 4 elements
 
-  @mongodb
   @createSchema
   Scenario: Test #944
     Given there is a DummyCar entity with related colors
@@ -121,7 +119,6 @@ Feature: Search filter on collections
     }
     """
 
-  @mongodb
   Scenario: Search collection by name (partial)
     Given there are 30 dummy objects
     When I send a "GET" request to "/dummies?name=my"
@@ -162,7 +159,6 @@ Feature: Search filter on collections
     }
     """
 
-  @mongodb
   Scenario: Search collection by name (partial)
     Given there are 30 embedded dummy objects
     When I send a "GET" request to "/embedded_dummies?embeddedDummy.dummyName=my"
@@ -203,7 +199,6 @@ Feature: Search filter on collections
     }
     """
 
-  @mongodb
   Scenario: Search collection by name (partial case insensitive)
     When I send a "GET" request to "/dummies?dummy=somedummytest1"
     Then the response status code should be 200
@@ -232,7 +227,6 @@ Feature: Search filter on collections
     }
     """
 
-  @mongodb
   Scenario: Search collection by alias (start)
     When I send a "GET" request to "/dummies?alias=Ali"
     Then the response status code should be 200
@@ -312,7 +306,6 @@ Feature: Search filter on collections
     }
     """
 
-  @mongodb
   # note on Postgres compared to sqlite the LIKE clause is case sensitive
   @postgres
   Scenario: Search collection by description (word_start)
@@ -354,7 +347,6 @@ Feature: Search filter on collections
     }
     """
 
-  @mongodb
   Scenario: Search for entities within an impossible range
     When I send a "GET" request to "/dummies?name=MuYm"
     Then the response status code should be 200
@@ -383,7 +375,6 @@ Feature: Search filter on collections
     }
     """
 
-  @mongodb
   @createSchema
   Scenario: Search related collection by name
     Given there are 3 dummy objects having each 3 relatedDummies
@@ -396,7 +387,6 @@ Feature: Search filter on collections
     And the JSON node "_embedded.item[1]._links.relatedDummies" should have 3 elements
     And the JSON node "_embedded.item[2]._links.relatedDummies" should have 3 elements
 
-  @mongodb
   @createSchema
   Scenario: Get collection by id equals 9.99 which is not possible
     Given there are 30 dummy objects
@@ -438,7 +428,6 @@ Feature: Search filter on collections
     }
     """
 
-  @mongodb
   Scenario: Get collection by id 10
     When I send a "GET" request to "/dummies?id=10"
     Then the response status code should be 200
@@ -477,7 +466,6 @@ Feature: Search filter on collections
     """
 
 
-  @mongodb
   Scenario: Get collection ordered by a non valid properties
     When I send a "GET" request to "/dummies?unknown=0"
     Then the response status code should be 200

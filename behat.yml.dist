@@ -41,7 +41,7 @@ default:
         - 'Behat\MinkExtension\Context\MinkContext'
         - 'Behatch\Context\RestContext'
       filters:
-        tags: '@mongodb'
+        tags: '~@sqlite&&~@!mongodb'
   extensions:
     'Behat\Symfony2Extension':
       kernel:

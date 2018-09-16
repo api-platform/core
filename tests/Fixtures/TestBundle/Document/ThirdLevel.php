@@ -20,6 +20,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
 /**
  * Third Level.
  *
+ * @author Kévin Dunglas <dunglas@gmail.com>
  * @author Alexandre Delplace <alexandre.delplacemille@gmail.com>
  *
  * @ApiResource

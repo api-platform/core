@@ -23,6 +23,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 /**
  * Related Dummy.
  *
+ * @author Kévin Dunglas <dunglas@gmail.com>
  * @author Alexandre Delplace <alexandre.delplacemille@gmail.com>
  *
  * @ApiResource(iri="https://schema.org/Product", attributes={"normalization_context"={"groups"={"friends"}}, "filters"={"related_dummy.mongodb.friends"}})
@@ -59,12 +60,12 @@ class RelatedDummy extends ParentDummy
      */
     public $dummyDate;
 
-//    /**
-//     * @ApiSubresource
-//     * @ORM\ManyToOne(targetEntity="ThirdLevel", cascade={"persist"})
-//     * @Groups({"barcelona", "chicago", "friends"})
-//     */
-//    public $thirdLevel;
+    /**
+     * @ApiSubresource
+     * @ODM\ReferenceOne(targetDocument="ThirdLevel", cascade={"persist"})
+     * @Groups({"barcelona", "chicago", "friends"})
+     */
+    public $thirdLevel;
 
     /**
      * @ApiSubresource
@@ -148,6 +149,19 @@ class RelatedDummy extends ParentDummy
     public function setDummyBoolean($dummyBoolean)
     {
         $this->dummyBoolean = $dummyBoolean;
+    }
+
+    /**
+     * @return ThirdLevel|null
+     */
+    public function getThirdLevel()
+    {
+        return $this->thirdLevel;
+    }
+
+    public function setThirdLevel(ThirdLevel $thirdLevel = null)
+    {
+        $this->thirdLevel = $thirdLevel;
     }
 
     /**

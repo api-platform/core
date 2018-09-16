@@ -20,6 +20,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 /**
  * Embeddable Dummy.
  *
+ * @author Jordan Samouh <jordan.samouh@gmail.com>
  * @author Alexandre Delplace <alexandre.delplacemille@gmail.com>
  *
  * @ODM\EmbeddedDocument

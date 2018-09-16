@@ -20,7 +20,7 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
  * Dummy Date.
  *
  * @author Antoine Bluchet <soyuka@gmail.com>
- *
+ * @author Alan Poulain <contact@alanpoulain.eu>
  *
  * @ApiResource(attributes={
  *     "filters"={"my_dummy_date.mongodb.date"}

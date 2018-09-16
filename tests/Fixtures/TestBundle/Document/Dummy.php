@@ -23,6 +23,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 /**
  * Dummy.
  *
+ * @author Kévin Dunglas <dunglas@gmail.com>
  * @author Alexandre Delplace <alexandre.delplacemille@gmail.com>
  *
  * @ApiResource(attributes={
@@ -122,6 +123,8 @@ class Dummy
     public $relatedDummy;
 
     /**
+     * @var ArrayCollection Several dummies
+     *
      * @ODM\ReferenceMany(targetDocument="RelatedDummy", storeAs="id")
      * @ApiSubresource
      */

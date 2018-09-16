@@ -19,6 +19,7 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 /**
  * Related Owning Dummy.
  *
+ * @author Sergey V. Ryabov <sryabov@mhds.ru>
  * @author Alan Poulain <contact@alanpoulain.eu>
  *
  * @ApiResource(iri="https://schema.org/Product")

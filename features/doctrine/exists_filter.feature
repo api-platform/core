@@ -1,5 +1,4 @@
 @filter
-@mongodb
 Feature: Exists filter on collections
   In order to retrieve large collections of resources
   As a client software developer

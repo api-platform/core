@@ -5,6 +5,13 @@
            xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <services>
+        <!-- Should be done by DoctrineMongoDBExtension. -->
+        <service id="api_platform.doctrine.mongodb_odm.default_entity_manager.property_info_extractor" class="Symfony\Bridge\Doctrine\PropertyInfo\DoctrineExtractor">
+            <argument type="service" id="api_platform.doctrine.metadata_factory" />
+            <tag name="property_info.list_extractor" priority="-1001" />
+            <tag name="property_info.type_extractor" priority="-999" />
+        </service>
+
         <service id="api_platform.doctrine.metadata_factory" class="Doctrine\Common\Persistence\Mapping\ClassMetadataFactory" public="false">
             <factory service="doctrine_mongodb.odm.default_document_manager" method="getMetadataFactory"/>
         </service>
@@ -98,11 +105,6 @@
 
         <!-- Doctrine Query extensions -->
 
-        <!--<service id="api_platform.doctrine.orm.query_extension.eager_loading" class="ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\EagerLoadingExtension" public="false">-->
-        <!--<tag name="api_platform.doctrine.orm.query_extension.item" />-->
-        <!--<tag name="api_platform.doctrine.orm.query_extension.collection" />-->
-        <!--</service>-->
-
         <service id="api_platform.doctrine.mongodb.query_extension.filter" class="ApiPlatform\Core\Bridge\Doctrine\MongoDB\Extension\FilterExtension" public="false">
             <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
             <argument type="service" id="api_platform.filter_locator" />
@@ -126,12 +128,6 @@
 
             <tag name="api_platform.doctrine.mongodb.query_extension.collection"/>
         </service>
-
-        <!--<service id="api_platform.doctrine.orm.query_extension.order" class="ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\OrderExtension" public="false">-->
-        <!--<argument>%api_platform.collection.order%</argument>-->
-
-        <!--<tag name="api_platform.doctrine.orm.query_extension.collection" />-->
-        <!--</service>-->
     </services>
 
 </container>

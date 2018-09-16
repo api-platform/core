@@ -53,10 +53,13 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\DummyCar as DummyCarDocu
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\DummyCarColor as DummyCarColorDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\DummyDate as DummyDateDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\DummyFriend as DummyFriendDocument;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\DummyGroup as DummyGroupDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\EmbeddableDummy as EmbeddableDummyDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\EmbeddedDummy as EmbeddedDummyDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\RelatedDummy as RelatedDummyDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\RelatedToDummyFriend as RelatedToDummyFriendDocument;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\SecuredDummy as SecuredDummyDocument;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\ThirdLevel as ThirdLevelDocument;
 use Behat\Behat\Context\Context;
 use Behat\Behat\Context\SnippetAcceptingContext;
 use Behat\Behat\Hook\Scope\AfterStepScope;
@@ -198,7 +201,7 @@ final class FeatureContext implements Context, SnippetAcceptingContext
     public function thereAreDummyGroupObjects(int $nb)
     {
         for ($i = 1; $i <= $nb; ++$i) {
-            $dummyGroup = new DummyGroup();
+            $dummyGroup = $this->buildDummyGroup();
 
             foreach (['foo', 'bar', 'baz', 'qux'] as $property) {
                 $dummyGroup->$property = ucfirst($property).' #'.$i;
@@ -217,7 +220,7 @@ final class FeatureContext implements Context, SnippetAcceptingContext
     {
         for ($i = 1; $i <= $nb; ++$i) {
             $dummyProperty = new DummyProperty();
-            $dummyGroup = new DummyGroup();
+            $dummyGroup = $this->buildDummyGroup();
 
             foreach (['foo', 'bar', 'baz'] as $property) {
                 $dummyProperty->$property = $dummyGroup->$property = ucfirst($property).' #'.$i;
@@ -237,7 +240,7 @@ final class FeatureContext implements Context, SnippetAcceptingContext
      */
     public function thereAreDummyPropertyObjectsWithASharedGroup(int $nb)
     {
-        $dummyGroup = new DummyGroup();
+        $dummyGroup = $this->buildDummyGroup();
         foreach (['foo', 'bar', 'baz'] as $property) {
             $dummyGroup->$property = ucfirst($property).' #shared';
         }
@@ -263,7 +266,7 @@ final class FeatureContext implements Context, SnippetAcceptingContext
     public function thereAreDummyPropertyObjectsWithADifferentNumberRelatedGroups(int $nb)
     {
         for ($i = 1; $i <= $nb; ++$i) {
-            $dummyGroup = new DummyGroup();
+            $dummyGroup = $this->buildDummyGroup();
             $dummyProperty = new DummyProperty();
 
             foreach (['foo', 'bar', 'baz'] as $property) {
@@ -290,7 +293,7 @@ final class FeatureContext implements Context, SnippetAcceptingContext
     {
         for ($i = 1; $i <= $nb; ++$i) {
             $dummyProperty = new DummyProperty();
-            $dummyGroup = new DummyGroup();
+            $dummyGroup = $this->buildDummyGroup();
 
             foreach (['foo', 'bar', 'baz'] as $property) {
                 $dummyProperty->$property = $dummyGroup->$property = ucfirst($property).' #'.$i;
@@ -300,7 +303,7 @@ final class FeatureContext implements Context, SnippetAcceptingContext
 
             $this->manager->persist($dummyGroup);
             for ($j = 1; $j <= $nb2; ++$j) {
-                $dummyGroup = new DummyGroup();
+                $dummyGroup = $this->buildDummyGroup();
 
                 foreach (['foo', 'bar', 'baz'] as $property) {
                     $dummyGroup->$property = ucfirst($property).' #'.$i.$j;
@@ -381,7 +384,7 @@ final class FeatureContext implements Context, SnippetAcceptingContext
     public function thereAreDummyObjectsWithRelatedDummyAndItsThirdLevel(int $nb)
     {
         for ($i = 1; $i <= $nb; ++$i) {
-            $thirdLevel = new ThirdLevel();
+            $thirdLevel = $this->buildThirdLevel();
 
             $relatedDummy = $this->buildRelatedDummy();
             $relatedDummy->setName('RelatedDummy #'.$i);
@@ -677,7 +680,7 @@ final class FeatureContext implements Context, SnippetAcceptingContext
     public function thereAreSecuredDummyObjects(int $nb)
     {
         for ($i = 1; $i <= $nb; ++$i) {
-            $securedDummy = new SecuredDummy();
+            $securedDummy = $this->buildSecuredDummy();
             $securedDummy->setTitle("#$i");
             $securedDummy->setDescription("Hello #$i");
             $securedDummy->setOwner('notexist');
@@ -994,7 +997,7 @@ final class FeatureContext implements Context, SnippetAcceptingContext
         $fourthLevel->setLevel(4);
         $this->manager->persist($fourthLevel);
 
-        $thirdLevel = new ThirdLevel();
+        $thirdLevel = $this->buildThirdLevel();
         $thirdLevel->setLevel(3);
         $thirdLevel->setFourthLevel($fourthLevel);
         $this->manager->persist($thirdLevel);
@@ -1088,6 +1091,14 @@ final class FeatureContext implements Context, SnippetAcceptingContext
     }
 
     /**
+     * @return DummyGroup|DummyGroupDocument
+     */
+    private function buildDummyGroup()
+    {
+        return $this->isOrm() ? new DummyGroup() : new DummyGroupDocument();
+    }
+
+    /**
      * @return EmbeddableDummy|EmbeddableDummyDocument
      */
     private function buildEmbeddableDummy()
@@ -1117,5 +1128,21 @@ final class FeatureContext implements Context, SnippetAcceptingContext
     private function buildRelatedToDummyFriend()
     {
         return $this->isOrm() ? new RelatedToDummyFriend() : new RelatedToDummyFriendDocument();
+    }
+
+    /**
+     * @return SecuredDummy|SecuredDummyDocument
+     */
+    private function buildSecuredDummy()
+    {
+        return $this->isOrm() ? new SecuredDummy() : new SecuredDummyDocument();
+    }
+
+    /**
+     * @return ThirdLevel|ThirdLevelDocument
+     */
+    private function buildThirdLevel()
+    {
+        return $this->isOrm() ? new ThirdLevel() : new ThirdLevelDocument();
     }
 }
