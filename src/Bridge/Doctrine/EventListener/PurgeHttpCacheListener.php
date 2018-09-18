@@ -111,12 +111,11 @@ final class PurgeHttpCacheListener
             return;
         }
 
-        $iri = $this->iriConverter->getIriFromResourceClass($resourceClass);
+        $iri = $purgeItem
+	        ? $this->iriConverter->getIriFromItem($entity)
+	        : $this->iriConverter->getIriFromResourceClass($resourceClass);
+
         $this->tags[$iri] = $iri;
-        if ($purgeItem) {
-            $iri = $this->iriConverter->getIriFromItem($entity);
-            $this->tags[$iri] = $iri;
-        }
     }
 
     private function gatherRelationTags(EntityManagerInterface $em, $entity)
