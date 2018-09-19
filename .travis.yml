@@ -6,11 +6,6 @@ cache:
     - $HOME/.composer/cache
     - $HOME/.npm
 
-env:
-  global:
-    - SYMFONY_DEPRECATIONS_HELPER=weak_vendors
-    - APP_ENV=test
-
 jobs:
   include:
     - php: '7.1'
