@@ -164,9 +164,6 @@ jobs:
   behat-coverage:
     docker:
       - image: circleci/php:7.2-node-browsers
-    environment:
-      SYMFONY_DEPRECATIONS_HELPER: weak_vendors
-      APP_ENV: test
     parallelism: 2
     working_directory: ~/api-platform/core
     steps:

@@ -14,6 +14,7 @@
         <server name="KERNEL_CLASS" value="AppKernel" />
         <server name="APP_ENV" value="test" />
         <server name="LEGACY" value="0" />
+        <server name="SYMFONY_DEPRECATIONS_HELPER" value="weak_vendors" />
     </php>
 
     <testsuites>
