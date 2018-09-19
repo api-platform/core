@@ -14,20 +14,18 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Document;
 
 use ApiPlatform\Core\Annotation\ApiResource;
-use ApiPlatform\Core\Annotation\ApiSubresource;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
- * Third Level.
+ * Fourth Level.
  *
- * @author Kévin Dunglas <dunglas@gmail.com>
- * @author Alexandre Delplace <alexandre.delplacemille@gmail.com>
+ * @author Alan Poulain <contact@alanpoulain.eu>
  *
  * @ApiResource
  * @ODM\Document
  */
-class ThirdLevel
+class FourthLevel
 {
     /**
      * @var int The id
@@ -42,21 +40,7 @@ class ThirdLevel
      * @ODM\Field(type="integer")
      * @Groups({"barcelona", "chicago"})
      */
-    private $level = 3;
-
-    /**
-     * @var bool
-     *
-     * @ODM\Field(type="boolean")
-     */
-    private $test = true;
-
-    /**
-     * @ApiSubresource
-     * @ODM\ReferenceOne(targetDocument="FourthLevel", cascade={"persist"}, storeAs="id")
-     * @Groups({"barcelona", "chicago", "friends"})
-     */
-    public $fourthLevel;
+    private $level = 4;
 
     /**
      * @return int
@@ -80,34 +64,5 @@ class ThirdLevel
     public function setLevel($level)
     {
         $this->level = $level;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isTest()
-    {
-        return $this->test;
-    }
-
-    /**
-     * @param bool $test
-     */
-    public function setTest($test)
-    {
-        $this->test = $test;
-    }
-
-    /**
-     * @return FourthLevel|null
-     */
-    public function getFourthLevel()
-    {
-        return $this->fourthLevel;
-    }
-
-    public function setFourthLevel(FourthLevel $fourthLevel = null)
-    {
-        $this->fourthLevel = $fourthLevel;
     }
 }

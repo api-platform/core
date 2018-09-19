@@ -13,9 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Bridge\Doctrine\MongoDB;
 
-use ApiPlatform\Core\Bridge\Doctrine\MongoDB\Extension\ContextAwareQueryCollectionExtensionInterface;
-use ApiPlatform\Core\Bridge\Doctrine\MongoDB\Extension\QueryCollectionExtensionInterface;
-use ApiPlatform\Core\Bridge\Doctrine\MongoDB\Extension\QueryResultExtensionInterface;
+use ApiPlatform\Core\Bridge\Doctrine\MongoDB\Extension\AggregationCollectionExtensionInterface;
+use ApiPlatform\Core\Bridge\Doctrine\MongoDB\Extension\AggregationResultCollectionExtensionInterface;
 use ApiPlatform\Core\DataProvider\CollectionDataProviderInterface;
 use ApiPlatform\Core\DataProvider\RestrictedDataProviderInterface;
 use ApiPlatform\Core\Exception\RuntimeException;
@@ -31,7 +30,7 @@ final class CollectionDataProvider implements CollectionDataProviderInterface, R
     private $collectionExtensions;
 
     /**
-     * @param QueryCollectionExtensionInterface[]|ContextAwareQueryCollectionExtensionInterface[] $collectionExtensions
+     * @param AggregationCollectionExtensionInterface[] $collectionExtensions
      */
     public function __construct(ManagerRegistry $managerRegistry, iterable $collectionExtensions = [])
     {
@@ -63,7 +62,7 @@ final class CollectionDataProvider implements CollectionDataProviderInterface, R
         foreach ($this->collectionExtensions as $extension) {
             $extension->applyToCollection($aggregationBuilder, $resourceClass, $operationName, $context);
 
-            if ($extension instanceof QueryResultExtensionInterface && $extension->supportsResult($resourceClass, $operationName, $context)) {
+            if ($extension instanceof AggregationResultCollectionExtensionInterface && $extension->supportsResult($resourceClass, $operationName, $context)) {
                 return $extension->getResult($aggregationBuilder, $resourceClass, $operationName, $context);
             }
         }

@@ -16,16 +16,14 @@ namespace ApiPlatform\Core\Bridge\Doctrine\MongoDB\Extension;
 use Doctrine\ODM\MongoDB\Aggregation\Builder;
 
 /**
- * Interface of Doctrine MongoDB ODM query extensions that supports result production
+ * Interface of Doctrine MongoDB ODM aggregation extensions that supports result production
  * for specific cases such as pagination.
  *
- * @author Samuel ROZE <samuel.roze@gmail.com>
- * @author Kévin Dunglas <dunglas@gmail.com>
  * @author Alan Poulain <contact@alanpoulain.eu>
  */
-interface QueryResultExtensionInterface extends QueryCollectionExtensionInterface
+interface AggregationResultCollectionExtensionInterface extends AggregationCollectionExtensionInterface
 {
-    public function supportsResult(string $resourceClass, string $operationName = null): bool;
+    public function supportsResult(string $resourceClass, string $operationName = null, array $context = []): bool;
 
-    public function getResult(Builder $aggregationBuilder, string $resourceClass);
+    public function getResult(Builder $aggregationBuilder, string $resourceClass, string $operationName = null, array $context = []);
 }

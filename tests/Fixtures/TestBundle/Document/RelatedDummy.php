@@ -32,6 +32,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 class RelatedDummy extends ParentDummy
 {
     /**
+     * @ApiSubresource
      * @ODM\Id(strategy="INCREMENT", type="integer")
      * @Groups({"friends"})
      */
@@ -62,7 +63,7 @@ class RelatedDummy extends ParentDummy
 
     /**
      * @ApiSubresource
-     * @ODM\ReferenceOne(targetDocument="ThirdLevel", cascade={"persist"})
+     * @ODM\ReferenceOne(targetDocument="ThirdLevel", cascade={"persist"}, storeAs="id")
      * @Groups({"barcelona", "chicago", "friends"})
      */
     public $thirdLevel;
@@ -77,6 +78,7 @@ class RelatedDummy extends ParentDummy
     public function __construct()
     {
         $this->relatedToDummyFriend = new ArrayCollection();
+        $this->embeddedDummy = new EmbeddableDummy();
     }
 
     /**

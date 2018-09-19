@@ -22,12 +22,12 @@ use Doctrine\ODM\MongoDB\Aggregation\Builder;
 use Psr\Container\ContainerInterface;
 
 /**
- * Applies filters on a resource query.
+ * Applies filters on a resource aggregation.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  * @author Samuel ROZE <samuel.roze@gmail.com>
  */
-final class FilterExtension implements ContextAwareQueryCollectionExtensionInterface
+final class FilterExtension implements AggregationCollectionExtensionInterface
 {
     use FilterLocatorTrait;
 

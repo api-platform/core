@@ -48,14 +48,24 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\SecuredDummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\ThirdLevel;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\User;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\UuidIdentifierDummy;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\Answer as AnswerDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\Dummy as DummyDocument;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\DummyAggregateOffer as DummyAggregateOfferDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\DummyCar as DummyCarDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\DummyCarColor as DummyCarColorDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\DummyDate as DummyDateDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\DummyFriend as DummyFriendDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\DummyGroup as DummyGroupDocument;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\DummyOffer as DummyOfferDocument;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\DummyProduct as DummyProductDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\EmbeddableDummy as EmbeddableDummyDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\EmbeddedDummy as EmbeddedDummyDocument;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\FourthLevel as FourthLevelDocument;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\Greeting as GreetingDocument;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\Person as PersonDocument;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\PersonToPet as PersonToPetDocument;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\Pet as PetDocument;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\Question as QuestionDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\RelatedDummy as RelatedDummyDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\RelatedToDummyFriend as RelatedToDummyFriendDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\SecuredDummy as SecuredDummyDocument;
@@ -842,10 +852,10 @@ final class FeatureContext implements Context, SnippetAcceptingContext
      */
     public function thereIsAnAnswerToTheQuestion(string $a, string $q)
     {
-        $answer = new Answer();
+        $answer = $this->buildAnswer();
         $answer->setContent($a);
 
-        $question = new Question();
+        $question = $this->buildQuestion();
         $question->setContent($q);
         $question->setAnswer($answer);
         $answer->addRelatedQuestion($question);
@@ -893,17 +903,17 @@ final class FeatureContext implements Context, SnippetAcceptingContext
      */
     public function createProductWithOffers()
     {
-        $offer = new DummyOffer();
+        $offer = $this->buildDummyOffer();
         $offer->setValue(2);
-        $aggregate = new DummyAggregateOffer();
+        $aggregate = $this->buildDummyAggregateOffer();
         $aggregate->setValue(1);
         $aggregate->addOffer($offer);
 
-        $product = new DummyProduct();
+        $product = $this->buildDummyProduct();
         $product->setName('Dummy product');
         $product->addOffer($aggregate);
 
-        $relatedProduct = new DummyProduct();
+        $relatedProduct = $this->buildDummyProduct();
         $relatedProduct->setName('Dummy related product');
         $relatedProduct->setParent($product);
 
@@ -919,12 +929,12 @@ final class FeatureContext implements Context, SnippetAcceptingContext
      */
     public function createPeopleWithPets()
     {
-        $personToPet = new PersonToPet();
+        $personToPet = $this->buildPersonToPet();
 
-        $person = new Person();
+        $person = $this->buildPerson();
         $person->name = 'foo';
 
-        $pet = new Pet();
+        $pet = $this->buildPet();
         $pet->name = 'bar';
 
         $personToPet->person = $person;
@@ -993,7 +1003,7 @@ final class FeatureContext implements Context, SnippetAcceptingContext
      */
     public function thereIsADummyObjectWithAFourthLevelRelation()
     {
-        $fourthLevel = new FourthLevel();
+        $fourthLevel = $this->buildFourthLevel();
         $fourthLevel->setLevel(4);
         $this->manager->persist($fourthLevel);
 
@@ -1026,10 +1036,10 @@ final class FeatureContext implements Context, SnippetAcceptingContext
      */
     public function thereIsAPersonWithAGreeting(string $name, string $message)
     {
-        $person = new Person();
+        $person = $this->buildPerson();
         $person->name = $name;
 
-        $greeting = new Greeting();
+        $greeting = $this->buildGreeting();
         $greeting->message = $message;
         $greeting->sender = $person;
 
@@ -1051,11 +1061,27 @@ final class FeatureContext implements Context, SnippetAcceptingContext
     }
 
     /**
+     * @return Answer|AnswerDocument
+     */
+    private function buildAnswer()
+    {
+        return $this->isOrm() ? new Answer() : new AnswerDocument();
+    }
+
+    /**
      * @return Dummy|DummyDocument
      */
     private function buildDummy()
     {
         return $this->isOrm() ? new Dummy() : new DummyDocument();
+    }
+
+    /**
+     * @return DummyAggregateOffer|DummyAggregateOfferDocument
+     */
+    private function buildDummyAggregateOffer()
+    {
+        return $this->isOrm() ? new DummyAggregateOffer() : new DummyAggregateOfferDocument();
     }
 
     /**
@@ -1099,6 +1125,22 @@ final class FeatureContext implements Context, SnippetAcceptingContext
     }
 
     /**
+     * @return DummyOffer|DummyOfferDocument
+     */
+    private function buildDummyOffer()
+    {
+        return $this->isOrm() ? new DummyOffer() : new DummyOfferDocument();
+    }
+
+    /**
+     * @return DummyProduct|DummyProductDocument
+     */
+    private function buildDummyProduct()
+    {
+        return $this->isOrm() ? new DummyProduct() : new DummyProductDocument();
+    }
+
+    /**
      * @return EmbeddableDummy|EmbeddableDummyDocument
      */
     private function buildEmbeddableDummy()
@@ -1112,6 +1154,54 @@ final class FeatureContext implements Context, SnippetAcceptingContext
     private function buildEmbeddedDummy()
     {
         return $this->isOrm() ? new EmbeddedDummy() : new EmbeddedDummyDocument();
+    }
+
+    /**
+     * @return FourthLevel|FourthLevelDocument
+     */
+    private function buildFourthLevel()
+    {
+        return $this->isOrm() ? new FourthLevel() : new FourthLevelDocument();
+    }
+
+    /**
+     * @return Greeting|GreetingDocument
+     */
+    private function buildGreeting()
+    {
+        return $this->isOrm() ? new Greeting() : new GreetingDocument();
+    }
+
+    /**
+     * @return Person|PersonDocument
+     */
+    private function buildPerson()
+    {
+        return $this->isOrm() ? new Person() : new PersonDocument();
+    }
+
+    /**
+     * @return PersonToPet|PersonToPetDocument
+     */
+    private function buildPersonToPet()
+    {
+        return $this->isOrm() ? new PersonToPet() : new PersonToPetDocument();
+    }
+
+    /**
+     * @return Pet|PetDocument
+     */
+    private function buildPet()
+    {
+        return $this->isOrm() ? new Pet() : new PetDocument();
+    }
+
+    /**
+     * @return Question|QuestionDocument
+     */
+    private function buildQuestion()
+    {
+        return $this->isOrm() ? new Question() : new QuestionDocument();
     }
 
     /**

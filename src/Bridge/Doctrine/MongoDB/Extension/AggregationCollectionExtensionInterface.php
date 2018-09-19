@@ -16,13 +16,11 @@ namespace ApiPlatform\Core\Bridge\Doctrine\MongoDB\Extension;
 use Doctrine\ODM\MongoDB\Aggregation\Builder;
 
 /**
- * Interface of Doctrine MongoDB ODM query extensions for collection queries.
+ * Interface of Doctrine MongoDB ODM aggregation extensions for collection aggregations.
  *
- * @author Samuel ROZE <samuel.roze@gmail.com>
- * @author Kévin Dunglas <dunglas@gmail.com>
  * @author Alan Poulain <contact@alanpoulain.eu>
  */
-interface QueryCollectionExtensionInterface
+interface AggregationCollectionExtensionInterface
 {
-    public function applyToCollection(Builder $aggregationBuilder, string $resourceClass, string $operationName = null);
+    public function applyToCollection(Builder $aggregationBuilder, string $resourceClass, string $operationName = null, array $context = []);
 }

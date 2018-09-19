@@ -24,14 +24,22 @@
 
         <service id="api_platform.doctrine.mongodb.collection_data_provider" public="false" abstract="true">
             <argument type="service" id="doctrine_mongodb"/>
-            <argument type="tagged" tag="api_platform.doctrine.mongodb.query_extension.collection" />
+            <argument type="tagged" tag="api_platform.doctrine.mongodb.aggregation_extension.collection" />
         </service>
 
         <service id="api_platform.doctrine.mongodb.item_data_provider" public="false" abstract="true">
             <argument type="service" id="doctrine_mongodb"/>
             <argument type="service" id="api_platform.metadata.property.name_collection_factory"/>
             <argument type="service" id="api_platform.metadata.property.metadata_factory"/>
-            <argument type="tagged" tag="api_platform.doctrine.mongodb.query_extension.item" />
+            <argument type="tagged" tag="api_platform.doctrine.mongodb.aggregation_extension.item" />
+        </service>
+
+        <service id="api_platform.doctrine.mongodb.subresource_data_provider" public="false" abstract="true">
+            <argument type="service" id="doctrine_mongodb" />
+            <argument type="service" id="api_platform.metadata.property.name_collection_factory" />
+            <argument type="service" id="api_platform.metadata.property.metadata_factory" />
+            <argument type="tagged" tag="api_platform.doctrine.mongodb.aggregation_extension.collection" />
+            <argument type="tagged" tag="api_platform.doctrine.mongodb.aggregation_extension.item" />
         </service>
 
         <service id="api_platform.doctrine.mongodb.default.collection_data_provider"
@@ -44,6 +52,11 @@
                  parent="api_platform.doctrine.mongodb.item_data_provider"
                  class="ApiPlatform\Core\Bridge\Doctrine\MongoDB\ItemDataProvider">
             <tag name="api_platform.item_data_provider"/>
+        </service>
+        <service id="api_platform.doctrine.mongodb.default.subresource_data_provider"
+                 parent="api_platform.doctrine.mongodb.subresource_data_provider"
+                 class="ApiPlatform\Core\Bridge\Doctrine\MongoDB\SubresourceDataProvider">
+            <tag name="api_platform.subresource_data_provider" />
         </service>
 
         <!-- Filter -->
@@ -109,7 +122,7 @@
             <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
             <argument type="service" id="api_platform.filter_locator" />
 
-            <tag name="api_platform.doctrine.mongodb.query_extension.collection" priority="32" />
+            <tag name="api_platform.doctrine.mongodb.aggregation_extension.collection" priority="32" />
         </service>
         <service id="ApiPlatform\Core\Bridge\Doctrine\MongoDB\Extension\FilterExtension" alias="api_platform.doctrine.mongodb.query_extension.filter" />
 
@@ -126,7 +139,7 @@
             <argument>%api_platform.collection.pagination.enabled_parameter_name%</argument>
             <argument>%api_platform.collection.pagination.items_per_page_parameter_name%</argument>
 
-            <tag name="api_platform.doctrine.mongodb.query_extension.collection"/>
+            <tag name="api_platform.doctrine.mongodb.aggregation_extension.collection"/>
         </service>
     </services>
 

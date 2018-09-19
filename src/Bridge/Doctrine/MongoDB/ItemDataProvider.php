@@ -13,7 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Bridge\Doctrine\MongoDB;
 
-use ApiPlatform\Core\Bridge\Doctrine\MongoDB\Extension\QueryItemExtensionInterface;
+use ApiPlatform\Core\Bridge\Doctrine\MongoDB\Extension\AggregationItemExtensionInterface;
+use ApiPlatform\Core\Bridge\Doctrine\MongoDB\Extension\AggregationResultItemExtensionInterface;
 use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
 use ApiPlatform\Core\DataProvider\RestrictedDataProviderInterface;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
@@ -35,7 +36,7 @@ final class ItemDataProvider implements ItemDataProviderInterface, RestrictedDat
     private $itemExtensions;
 
     /**
-     * @param QueryItemExtensionInterface[] $itemExtensions
+     * @param AggregationItemExtensionInterface[] $itemExtensions
      */
     public function __construct(ManagerRegistry $managerRegistry, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, iterable $itemExtensions = [])
     {
@@ -97,6 +98,10 @@ final class ItemDataProvider implements ItemDataProviderInterface, RestrictedDat
 
         foreach ($this->itemExtensions as $extension) {
             $extension->applyToItem($aggregationBuilder, $resourceClass, $identifiers, $operationName);
+
+            if ($extension instanceof AggregationResultItemExtensionInterface && $extension->supportsResult($resourceClass, $operationName, $context)) {
+                return $extension->getResult($aggregationBuilder, $resourceClass, $operationName, $context);
+            }
         }
 
         return $aggregationBuilder->hydrate($resourceClass)->execute()->getSingleResult();

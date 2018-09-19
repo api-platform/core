@@ -30,13 +30,13 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
- * Applies pagination on the Doctrine query for resource collection when enabled.
+ * Applies pagination on the Doctrine aggregation for resource collection when enabled.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  * @author Samuel ROZE <samuel.roze@gmail.com>
  * @author Alan Poulain <contact@alanpoulain.eu>
  */
-final class PaginationExtension implements QueryResultExtensionInterface
+final class PaginationExtension implements AggregationResultCollectionExtensionInterface
 {
     private $managerRegistry;
     private $requestStack;
@@ -66,7 +66,7 @@ final class PaginationExtension implements QueryResultExtensionInterface
     /**
      * {@inheritdoc}
      */
-    public function applyToCollection(Builder $aggregationBuilder, string $resourceClass, string $operationName = null)
+    public function applyToCollection(Builder $aggregationBuilder, string $resourceClass, string $operationName = null, array $context = [])
     {
         $request = $this->requestStack->getCurrentRequest();
         if (null === $request) {
@@ -100,7 +100,7 @@ final class PaginationExtension implements QueryResultExtensionInterface
     /**
      * {@inheritdoc}
      */
-    public function supportsResult(string $resourceClass, string $operationName = null): bool
+    public function supportsResult(string $resourceClass, string $operationName = null, array $context = []): bool
     {
         $request = $this->requestStack->getCurrentRequest();
         if (null === $request) {
@@ -115,7 +115,7 @@ final class PaginationExtension implements QueryResultExtensionInterface
     /**
      * {@inheritdoc}
      */
-    public function getResult(Builder $aggregationBuilder, string $resourceClass)
+    public function getResult(Builder $aggregationBuilder, string $resourceClass, string $operationName = null, array $context = [])
     {
         return new Paginator($aggregationBuilder->execute(), $this->managerRegistry->getManagerForClass($resourceClass)->getUnitOfWork(), $resourceClass);
     }
