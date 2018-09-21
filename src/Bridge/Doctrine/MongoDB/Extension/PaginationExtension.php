@@ -22,6 +22,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Bridge\Doctrine\MongoDB\Extension;
 
 use ApiPlatform\Core\Bridge\Doctrine\MongoDB\Paginator;
+use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use Doctrine\Common\Persistence\ManagerRegistry;
@@ -48,8 +49,9 @@ final class PaginationExtension implements AggregationResultCollectionExtensionI
     private $pageParameterName;
     private $enabledParameterName;
     private $itemsPerPageParameterName;
+    private $maximumItemPerPage;
 
-    public function __construct(ManagerRegistry $managerRegistry, RequestStack $requestStack, ResourceMetadataFactoryInterface $resourceMetadataFactory, bool $enabled = true, bool $clientEnabled = false, bool $clientItemsPerPage = false, int $itemsPerPage = 30, string $pageParameterName = 'page', string $enabledParameterName = 'pagination', string $itemsPerPageParameterName = 'itemsPerPage')
+    public function __construct(ManagerRegistry $managerRegistry, RequestStack $requestStack, ResourceMetadataFactoryInterface $resourceMetadataFactory, bool $enabled = true, bool $clientEnabled = false, bool $clientItemsPerPage = false, int $itemsPerPage = 30, string $pageParameterName = 'page', string $enabledParameterName = 'pagination', string $itemsPerPageParameterName = 'itemsPerPage', int $maximumItemPerPage = null)
     {
         $this->managerRegistry = $managerRegistry;
         $this->requestStack = $requestStack;
@@ -61,6 +63,7 @@ final class PaginationExtension implements AggregationResultCollectionExtensionI
         $this->pageParameterName = $pageParameterName;
         $this->enabledParameterName = $enabledParameterName;
         $this->itemsPerPageParameterName = $itemsPerPageParameterName;
+        $this->maximumItemPerPage = $maximumItemPerPage;
     }
 
     /**
@@ -79,8 +82,40 @@ final class PaginationExtension implements AggregationResultCollectionExtensionI
         }
 
         $itemsPerPage = $resourceMetadata->getCollectionOperationAttribute($operationName, 'pagination_items_per_page', $this->itemsPerPage, true);
+        if ($request->attributes->get('_graphql')) {
+            $collectionArgs = $request->attributes->get('_graphql_collections_args', []);
+            $itemsPerPage = $collectionArgs[$resourceClass]['first'] ?? $itemsPerPage;
+        }
+
         if ($resourceMetadata->getCollectionOperationAttribute($operationName, 'pagination_client_items_per_page', $this->clientItemsPerPage, true)) {
-            $itemsPerPage = (int) $request->query->get($this->itemsPerPageParameterName, $itemsPerPage);
+            $maxItemsPerPage = $resourceMetadata->getCollectionOperationAttribute($operationName, 'maximum_items_per_page', $this->maximumItemPerPage, true);
+
+            $itemsPerPage = (int) $this->getPaginationParameter($request, $this->itemsPerPageParameterName, $itemsPerPage);
+            $itemsPerPage = (null !== $maxItemsPerPage && $itemsPerPage >= $maxItemsPerPage ? $maxItemsPerPage : $itemsPerPage);
+        }
+
+        if (0 > $itemsPerPage) {
+            throw new InvalidArgumentException('Item per page parameter should not be less than 0');
+        }
+
+        $page = (int) $this->getPaginationParameter($request, $this->pageParameterName, 1);
+
+        if (1 > $page) {
+            throw new InvalidArgumentException('Page should not be less than 1');
+        }
+
+        if (0 === $itemsPerPage && 1 < $page) {
+            throw new InvalidArgumentException('Page should not be greater than 1 if itemsPerPage is equal to 0');
+        }
+
+        $firstResult = ($page - 1) * $itemsPerPage;
+        if ($request->attributes->get('_graphql')) {
+            $collectionArgs = $request->attributes->get('_graphql_collections_args', []);
+            if (isset($collectionArgs[$resourceClass]['after'])) {
+                $after = \base64_decode($collectionArgs[$resourceClass]['after'], true);
+                $firstResult = (int) $after;
+                $firstResult = false === $after ? $firstResult : ++$firstResult;
+            }
         }
 
         $repository = $this->managerRegistry->getManagerForClass($resourceClass)->getRepository($resourceClass);
@@ -88,7 +123,7 @@ final class PaginationExtension implements AggregationResultCollectionExtensionI
             ->facet()
             ->field('results')->pipeline(
                 $repository->createAggregationBuilder()
-                    ->skip(($request->query->get($this->pageParameterName, 1) - 1) * $itemsPerPage)
+                    ->skip($firstResult)
                     ->limit($itemsPerPage)
             )
             ->field('count')->pipeline(
@@ -130,5 +165,14 @@ final class PaginationExtension implements AggregationResultCollectionExtensionI
         }
 
         return $enabled;
+    }
+
+    private function getPaginationParameter(Request $request, string $parameterName, $default = null)
+    {
+        if (null !== $paginationAttribute = $request->attributes->get('_api_pagination')) {
+            return array_key_exists($parameterName, $paginationAttribute) ? $paginationAttribute[$parameterName] : $default;
+        }
+
+        return $request->query->get($parameterName, $default);
     }
 }

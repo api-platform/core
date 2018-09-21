@@ -57,11 +57,11 @@ final class SearchFilter extends AbstractContextAwareFilter implements SearchFil
             return;
         }
 
-        $field = $property;
+        $matchField = $field = $property;
 
         $associations = [];
         if ($this->isPropertyNested($property, $resourceClass)) {
-            list($field, $associations) = $this->addLookupsForNestedProperty($property, $aggregationBuilder, $resourceClass);
+            [$matchField, $field, $associations] = $this->addLookupsForNestedProperty($property, $aggregationBuilder, $resourceClass);
         }
         $metadata = $this->getNestedMetadata($resourceClass, $associations);
 
@@ -96,7 +96,7 @@ final class SearchFilter extends AbstractContextAwareFilter implements SearchFil
             if (1 === \count($values)) {
                 $aggregationBuilder
                     ->match()
-                    ->field($property)
+                    ->field($matchField)
                     ->equals($this->addEqualityMatchStrategy($strategy, $values[0], $caseSensitive));
 
                 return;
@@ -108,7 +108,7 @@ final class SearchFilter extends AbstractContextAwareFilter implements SearchFil
             }
             $aggregationBuilder
                 ->match()
-                ->field($property)
+                ->field($matchField)
                 ->in($inValues);
         }
 
@@ -130,12 +130,12 @@ final class SearchFilter extends AbstractContextAwareFilter implements SearchFil
         if (1 === \count($values)) {
             $aggregationBuilder
                 ->match()
-                ->field("$property.id")
+                ->field("$matchField.\$id")
                 ->equals($values[0]);
         } else {
             $aggregationBuilder
                 ->match()
-                ->field("$property.id")
+                ->field("$matchField.\$id")
                 ->in($values);
         }
     }

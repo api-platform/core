@@ -60,11 +60,13 @@ final class NumericFilter extends AbstractContextAwareFilter
             return;
         }
 
+        $matchField = $field = $property;
+
         if ($this->isPropertyNested($property, $resourceClass)) {
-            $this->addLookupsForNestedProperty($property, $aggregationBuilder, $resourceClass);
+            [$matchField] = $this->addLookupsForNestedProperty($property, $aggregationBuilder, $resourceClass);
         }
 
-        $aggregationBuilder->match()->field($property)->equals($value)->type($this->getDoctrineFieldType($property, $resourceClass));
+        $aggregationBuilder->match()->field($matchField)->equals($value)->type($this->getDoctrineFieldType($field, $resourceClass));
     }
 
     /**

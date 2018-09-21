@@ -133,14 +133,14 @@ class Dummy
     /**
      * @var array serialize data
      *
-     * @ODM\Field(type="raw")
+     * @ODM\Field(type="hash", nullable=true)
      */
     public $jsonData;
 
     /**
      * @var array
      *
-     * @ODM\Field(type="raw")
+     * @ODM\Field(type="collection", nullable=true)
      */
     public $arrayData;
 

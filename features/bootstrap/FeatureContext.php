@@ -49,6 +49,10 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\ThirdLevel;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\User;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\UuidIdentifierDummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\Answer as AnswerDocument;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\CompositeItem as CompositeItemDocument;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\CompositeLabel as CompositeLabelDocument;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\CompositePrimitiveItem as CompositePrimitiveItemDocument;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\CompositeRelation as CompositeRelationDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\Dummy as DummyDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\DummyAggregateOffer as DummyAggregateOfferDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\DummyCar as DummyCarDocument;
@@ -730,16 +734,16 @@ final class FeatureContext implements Context, SnippetAcceptingContext
      */
     public function thereIsACompositeIdentifierObject()
     {
-        $item = new CompositeItem();
+        $item = $this->buildCompositeItem();
         $item->setField1('foobar');
         $this->manager->persist($item);
         $this->manager->flush();
 
         for ($i = 0; $i < 4; ++$i) {
-            $label = new CompositeLabel();
+            $label = $this->buildCompositeLabel();
             $label->setValue('foo-'.$i);
 
-            $rel = new CompositeRelation();
+            $rel = $this->buildCompositeRelation();
             $rel->setCompositeLabel($label);
             $rel->setCompositeItem($item);
             $rel->setValue('somefoobardummy');
@@ -759,11 +763,11 @@ final class FeatureContext implements Context, SnippetAcceptingContext
      */
     public function thereAreCompositePrimitiveIdentifiersObjects()
     {
-        $foo = new CompositePrimitiveItem('Foo', 2016);
+        $foo = $this->buildCompositePrimitiveItem('Foo', 2016);
         $foo->setDescription('This is foo.');
         $this->manager->persist($foo);
 
-        $bar = new CompositePrimitiveItem('Bar', 2017);
+        $bar = $this->buildCompositePrimitiveItem('Bar', 2017);
         $bar->setDescription('This is bar.');
         $this->manager->persist($bar);
 
@@ -1066,6 +1070,38 @@ final class FeatureContext implements Context, SnippetAcceptingContext
     private function buildAnswer()
     {
         return $this->isOrm() ? new Answer() : new AnswerDocument();
+    }
+
+    /**
+     * @return CompositeItem|CompositeItemDocument
+     */
+    private function buildCompositeItem()
+    {
+        return $this->isOrm() ? new CompositeItem() : new CompositeItemDocument();
+    }
+
+    /**
+     * @return CompositeLabel|CompositeLabelDocument
+     */
+    private function buildCompositeLabel()
+    {
+        return $this->isOrm() ? new CompositeLabel() : new CompositeLabelDocument();
+    }
+
+    /**
+     * @return CompositePrimitiveItem|CompositePrimitiveItemDocument
+     */
+    private function buildCompositePrimitiveItem(string $name, int $year)
+    {
+        return $this->isOrm() ? new CompositePrimitiveItem($name, $year) : new CompositePrimitiveItemDocument($name, $year);
+    }
+
+    /**
+     * @return CompositeRelation|CompositeRelationDocument
+     */
+    private function buildCompositeRelation()
+    {
+        return $this->isOrm() ? new CompositeRelation() : new CompositeRelationDocument();
     }
 
     /**

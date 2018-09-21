@@ -93,13 +93,13 @@ final class OrderFilter extends AbstractContextAwareFilter implements OrderFilte
             return;
         }
 
-        $field = $property;
+        $matchField = $property;
 
         if ($this->isPropertyNested($property, $resourceClass)) {
-            $this->addLookupsForNestedProperty($property, $aggregationBuilder, $resourceClass);
+            [$matchField] = $this->addLookupsForNestedProperty($property, $aggregationBuilder, $resourceClass);
         }
 
-        $this->fieldDirections[$field] = $direction;
+        $this->fieldDirections[$matchField] = $direction;
         $aggregationBuilder->sort($this->fieldDirections, $direction);
     }
 }

@@ -67,8 +67,9 @@ abstract class AbstractContextAwareFilter implements ContextAwareFilterInterface
      *
      * @throws InvalidArgumentException If property is not nested
      *
-     * @return array An array where the first element is the $field name
-     *               the second element is the $associations array
+     * @return array An array where the first element is the $alias of the lookup,
+     *               the second element is the $field name
+     *               the third element is the $associations array
      */
     protected function addLookupsForNestedProperty(string $property, Builder $aggregationBuilder, string $resourceClass): array
     {
@@ -79,10 +80,13 @@ abstract class AbstractContextAwareFilter implements ContextAwareFilterInterface
             throw new InvalidArgumentException(sprintf('Cannot add lookups for property "%s" - property is not nested.', $property));
         }
 
+        $alias = $association;
         if ($this->getClassMetadata($resourceClass)->hasReference($association)) {
-            $aggregationBuilder->lookup($association)->alias($association);
+            $alias = "${association}_lkup";
+            $aggregationBuilder->lookup($association)->alias($alias);
         }
 
-        return [$propertyParts['field'], $propertyParts['associations']];
+        // assocation.property => association_lkup.property
+        return [str_replace($association, $alias, $property), $propertyParts['field'], $propertyParts['associations']];
     }
 }

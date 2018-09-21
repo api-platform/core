@@ -40,16 +40,17 @@ final class RangeFilter extends AbstractContextAwareFilter implements RangeFilte
             return;
         }
 
-        $field = $property;
+        $matchField = $field = $property;
 
         if ($this->isPropertyNested($property, $resourceClass)) {
-            $this->addLookupsForNestedProperty($property, $aggregationBuilder, $resourceClass);
+            [$matchField] = $this->addLookupsForNestedProperty($property, $aggregationBuilder, $resourceClass);
         }
 
         foreach ($values as $operator => $value) {
             $this->addMatch(
                 $aggregationBuilder,
                 $field,
+                $matchField,
                 $operator,
                 $value
             );
@@ -59,7 +60,7 @@ final class RangeFilter extends AbstractContextAwareFilter implements RangeFilte
     /**
      * Adds the match stage according to the operator.
      */
-    protected function addMatch(Builder $aggregationBuilder, string $field, string $operator, string $value)
+    protected function addMatch(Builder $aggregationBuilder, string $field, string $matchField, string $operator, string $value)
     {
         switch ($operator) {
             case self::PARAMETER_BETWEEN:
@@ -70,7 +71,7 @@ final class RangeFilter extends AbstractContextAwareFilter implements RangeFilte
                     return;
                 }
 
-                $aggregationBuilder->match()->field($field)->lte($rangeValue[0])->gte($rangeValue[1]);
+                $aggregationBuilder->match()->field($matchField)->lte($rangeValue[0])->gte($rangeValue[1]);
 
                 break;
             case self::PARAMETER_GREATER_THAN:
@@ -79,7 +80,7 @@ final class RangeFilter extends AbstractContextAwareFilter implements RangeFilte
                     return;
                 }
 
-                $aggregationBuilder->match()->field($field)->gt($value);
+                $aggregationBuilder->match()->field($matchField)->gt($value);
 
                 break;
             case self::PARAMETER_GREATER_THAN_OR_EQUAL:
@@ -88,7 +89,7 @@ final class RangeFilter extends AbstractContextAwareFilter implements RangeFilte
                     return;
                 }
 
-                $aggregationBuilder->match()->field($field)->gte($value);
+                $aggregationBuilder->match()->field($matchField)->gte($value);
 
                 break;
             case self::PARAMETER_LESS_THAN:
@@ -97,7 +98,7 @@ final class RangeFilter extends AbstractContextAwareFilter implements RangeFilte
                     return;
                 }
 
-                $aggregationBuilder->match()->field($field)->lt($value);
+                $aggregationBuilder->match()->field($matchField)->lt($value);
 
                 break;
             case self::PARAMETER_LESS_THAN_OR_EQUAL:
@@ -106,7 +107,7 @@ final class RangeFilter extends AbstractContextAwareFilter implements RangeFilte
                     return;
                 }
 
-                $aggregationBuilder->match()->field($field)->lte($value);
+                $aggregationBuilder->match()->field($matchField)->lte($value);
 
                 break;
         }

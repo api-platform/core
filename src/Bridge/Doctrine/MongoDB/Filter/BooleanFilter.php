@@ -57,10 +57,12 @@ final class BooleanFilter extends AbstractContextAwareFilter
             return;
         }
 
+        $matchField = $property;
+
         if ($this->isPropertyNested($property, $resourceClass)) {
-            $this->addLookupsForNestedProperty($property, $aggregationBuilder, $resourceClass);
+            [$matchField] = $this->addLookupsForNestedProperty($property, $aggregationBuilder, $resourceClass);
         }
 
-        $aggregationBuilder->match()->field($property)->equals($value);
+        $aggregationBuilder->match()->field($matchField)->equals($value);
     }
 }

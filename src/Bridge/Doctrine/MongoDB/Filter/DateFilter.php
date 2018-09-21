@@ -49,23 +49,23 @@ class DateFilter extends AbstractContextAwareFilter implements DateFilterInterfa
             return;
         }
 
-        $field = $property;
+        $matchField = $field = $property;
 
         if ($this->isPropertyNested($property, $resourceClass)) {
-            $this->addLookupsForNestedProperty($property, $aggregationBuilder, $resourceClass);
+            [$matchField] = $this->addLookupsForNestedProperty($property, $aggregationBuilder, $resourceClass);
         }
 
         $nullManagement = $this->properties[$property] ?? null;
-        $type = $this->getDoctrineFieldType($property, $resourceClass);
+        $type = $this->getDoctrineFieldType($field, $resourceClass);
 
         if (self::EXCLUDE_NULL === $nullManagement) {
-            $aggregationBuilder->match()->field($field)->notEqual(null);
+            $aggregationBuilder->match()->field($matchField)->notEqual(null);
         }
 
         if (isset($values[self::PARAMETER_BEFORE])) {
             $this->addMatch(
                 $aggregationBuilder,
-                $field,
+                $matchField,
                 self::PARAMETER_BEFORE,
                 $values[self::PARAMETER_BEFORE],
                 $nullManagement,
@@ -76,7 +76,7 @@ class DateFilter extends AbstractContextAwareFilter implements DateFilterInterfa
         if (isset($values[self::PARAMETER_STRICTLY_BEFORE])) {
             $this->addMatch(
                 $aggregationBuilder,
-                $field,
+                $matchField,
                 self::PARAMETER_STRICTLY_BEFORE,
                 $values[self::PARAMETER_STRICTLY_BEFORE],
                 $nullManagement,
@@ -87,7 +87,7 @@ class DateFilter extends AbstractContextAwareFilter implements DateFilterInterfa
         if (isset($values[self::PARAMETER_AFTER])) {
             $this->addMatch(
                 $aggregationBuilder,
-                $field,
+                $matchField,
                 self::PARAMETER_AFTER,
                 $values[self::PARAMETER_AFTER],
                 $nullManagement,
@@ -98,7 +98,7 @@ class DateFilter extends AbstractContextAwareFilter implements DateFilterInterfa
         if (isset($values[self::PARAMETER_STRICTLY_AFTER])) {
             $this->addMatch(
                 $aggregationBuilder,
-                $field,
+                $matchField,
                 self::PARAMETER_STRICTLY_AFTER,
                 $values[self::PARAMETER_STRICTLY_AFTER],
                 $nullManagement,

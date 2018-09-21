@@ -54,13 +54,13 @@ final class ExistsFilter extends AbstractContextAwareFilter implements ExistsFil
             return;
         }
 
-        $field = $property;
+        $matchField = $property;
 
         if ($this->isPropertyNested($property, $resourceClass)) {
-            $this->addLookupsForNestedProperty($property, $aggregationBuilder, $resourceClass);
+            [$matchField] = $this->addLookupsForNestedProperty($property, $aggregationBuilder, $resourceClass);
         }
 
-        $aggregationBuilder->match()->field($field)->{$value ? 'notEqual' : 'equals'}(null);
+        $aggregationBuilder->match()->field($matchField)->{$value ? 'notEqual' : 'equals'}(null);
     }
 
     /**
