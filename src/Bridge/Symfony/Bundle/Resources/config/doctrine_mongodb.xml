@@ -6,7 +6,7 @@
 
     <services>
         <!-- Should be done by DoctrineMongoDBExtension. -->
-        <service id="api_platform.doctrine.mongodb_odm.default_entity_manager.property_info_extractor" class="Symfony\Bridge\Doctrine\PropertyInfo\DoctrineExtractor">
+        <service id="api_platform.doctrine.mongodb_odm.default_entity_manager.property_info_extractor" class="ApiPlatform\Core\Bridge\Doctrine\MongoDB\PropertyInfo\DoctrineExtractor">
             <argument type="service" id="api_platform.doctrine.metadata_factory" />
             <tag name="property_info.list_extractor" priority="-1001" />
             <tag name="property_info.type_extractor" priority="-999" />

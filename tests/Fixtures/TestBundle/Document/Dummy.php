@@ -61,7 +61,7 @@ class Dummy
     /**
      * @var string The dummy name alias
      *
-     * @ODM\Field(type="string")
+     * @ODM\Field(nullable=true)
      * @ApiProperty(iri="https://schema.org/alternateName")
      */
     private $alias;
@@ -82,7 +82,7 @@ class Dummy
     /**
      * @var string A dummy
      *
-     * @ODM\Field(type="string")
+     * @ODM\Field(nullable=true)
      */
     public $dummy;
 
@@ -96,7 +96,7 @@ class Dummy
     /**
      * @var \DateTime A dummy date
      *
-     * @ODM\Field(type="date")
+     * @ODM\Field(type="date", nullable=true)
      * @Assert\DateTime
      */
     public $dummyDate;
@@ -104,14 +104,14 @@ class Dummy
     /**
      * @var string A dummy float
      *
-     * @ODM\Field(type="float")
+     * @ODM\Field(type="float", nullable=true)
      */
     public $dummyFloat;
 
     /**
      * @var string A dummy price
      *
-     * @ODM\Field(type="int")
+     * @ODM\Field(type="int", nullable=true)
      */
     public $dummyPrice;
 
@@ -147,21 +147,21 @@ class Dummy
     /**
      * @var string
      *
-     * @ODM\Field(type="string")
+     * @ODM\Field(nullable=true)
      */
     public $nameConverted;
 
     /**
      * @var RelatedOwnedDummy
      *
-     * @ODM\ReferenceOne(targetDocument="RelatedOwnedDummy", cascade={"persist"}, mappedBy="owningDummy")
+     * @ODM\ReferenceOne(targetDocument="RelatedOwnedDummy", cascade={"persist"}, mappedBy="owningDummy", nullable=true)
      */
     public $relatedOwnedDummy;
 
     /**
      * @var RelatedOwningDummy
      *
-     * @ODM\ReferenceOne(targetDocument="RelatedOwningDummy", cascade={"persist"}, inversedBy="ownedDummy")
+     * @ODM\ReferenceOne(targetDocument="RelatedOwningDummy", cascade={"persist"}, inversedBy="ownedDummy", nullable=true)
      */
     public $relatedOwningDummy;
 

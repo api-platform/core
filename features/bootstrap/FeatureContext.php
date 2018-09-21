@@ -64,6 +64,7 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\DummyOffer as DummyOffer
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\DummyProduct as DummyProductDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\EmbeddableDummy as EmbeddableDummyDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\EmbeddedDummy as EmbeddedDummyDocument;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\Foo as FooDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\FourthLevel as FourthLevelDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\Greeting as GreetingDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\Person as PersonDocument;
@@ -177,7 +178,7 @@ final class FeatureContext implements Context, SnippetAcceptingContext
         $bars = ['Lorem', 'Ipsum', 'Dolor', 'Sit', 'Amet'];
 
         for ($i = 0; $i < $nb; ++$i) {
-            $foo = new Foo();
+            $foo = $this->buildFoo();
             $foo->setName($names[$i]);
             $foo->setBar($bars[$i]);
 
@@ -1190,6 +1191,14 @@ final class FeatureContext implements Context, SnippetAcceptingContext
     private function buildEmbeddedDummy()
     {
         return $this->isOrm() ? new EmbeddedDummy() : new EmbeddedDummyDocument();
+    }
+
+    /**
+     * @return Foo|FooDocument
+     */
+    private function buildFoo()
+    {
+        return $this->isOrm() ? new Foo() : new FooDocument();
     }
 
     /**
