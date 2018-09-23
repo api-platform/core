@@ -45,7 +45,7 @@ class Dummy
     /**
      * @var int The id
      *
-     * @ODM\Id(strategy="INCREMENT", type="integer")
+     * @ODM\Id(strategy="INCREMENT", type="integer", nullable=true)
      */
     private $id;
 

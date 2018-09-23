@@ -15,10 +15,11 @@ namespace ApiPlatform\Core\Bridge\Doctrine\MongoDB;
 
 use ApiPlatform\Core\Bridge\Doctrine\MongoDB\Extension\AggregationItemExtensionInterface;
 use ApiPlatform\Core\Bridge\Doctrine\MongoDB\Extension\AggregationResultItemExtensionInterface;
-use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\IdentifierManagerTrait;
+use ApiPlatform\Core\DataProvider\DenormalizedIdentifiersAwareItemDataProviderInterface;
 use ApiPlatform\Core\DataProvider\RestrictedDataProviderInterface;
-use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\Exception\RuntimeException;
+use ApiPlatform\Core\Identifier\IdentifierConverterInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use Doctrine\Common\Persistence\ManagerRegistry;
@@ -28,11 +29,11 @@ use Doctrine\ODM\MongoDB\DocumentManager;
 /**
  * Item data provider for the Doctrine MongoDB ODM.
  */
-final class ItemDataProvider implements ItemDataProviderInterface, RestrictedDataProviderInterface
+final class ItemDataProvider implements DenormalizedIdentifiersAwareItemDataProviderInterface, RestrictedDataProviderInterface
 {
+    use IdentifierManagerTrait;
+
     private $managerRegistry;
-    private $propertyNameCollectionFactory;
-    private $propertyMetadataFactory;
     private $itemExtensions;
 
     /**
@@ -60,29 +61,13 @@ final class ItemDataProvider implements ItemDataProviderInterface, RestrictedDat
     {
         $manager = $this->managerRegistry->getManagerForClass($resourceClass);
 
-        $identifierValues = explode('-', (string) $id);
-        $identifiers = [];
-        $i = 0;
-
-        foreach ($this->propertyNameCollectionFactory->create($resourceClass) as $propertyName) {
-            $itemMetadata = $this->propertyMetadataFactory->create($resourceClass, $propertyName);
-
-            $identifier = $itemMetadata->isIdentifier();
-            if (null === $identifier || false === $identifier) {
-                continue;
-            }
-
-            if (!isset($identifierValues[$i])) {
-                throw new InvalidArgumentException(sprintf('Invalid identifier "%s".', $id));
-            }
-
-            $identifiers[$propertyName] = $identifierValues[$i];
-            ++$i;
+        if (!($context[IdentifierConverterInterface::HAS_IDENTIFIER_CONVERTER] ?? false)) {
+            $id = $this->normalizeIdentifiers($id, $manager, $resourceClass);
         }
 
         $fetchData = $context['fetch_data'] ?? true;
         if (!$fetchData && $manager instanceof DocumentManager) {
-            return $manager->getReference($resourceClass, reset($identifiers));
+            return $manager->getReference($resourceClass, $id);
         }
 
         $repository = $manager->getRepository($resourceClass);
@@ -92,12 +77,12 @@ final class ItemDataProvider implements ItemDataProviderInterface, RestrictedDat
         /** @var Builder $aggregationBuilder */
         $aggregationBuilder = $repository->createAggregationBuilder();
 
-        foreach ($identifiers as $propertyName => $value) {
+        foreach ($id as $propertyName => $value) {
             $aggregationBuilder->match()->field($propertyName)->equals($value);
         }
 
         foreach ($this->itemExtensions as $extension) {
-            $extension->applyToItem($aggregationBuilder, $resourceClass, $identifiers, $operationName);
+            $extension->applyToItem($aggregationBuilder, $resourceClass, $id, $operationName);
 
             if ($extension instanceof AggregationResultItemExtensionInterface && $extension->supportsResult($resourceClass, $operationName, $context)) {
                 return $extension->getResult($aggregationBuilder, $resourceClass, $operationName, $context);

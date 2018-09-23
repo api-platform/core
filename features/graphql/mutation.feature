@@ -59,7 +59,7 @@ Feature: GraphQL mutation support
     When I send the following GraphQL request:
     """
     mutation {
-      createDummy(input: {_id: 1, name: "A dummy", foo: [], relatedDummy: "/related_dummies/1", clientMutationId: "myId"}) {
+      createDummy(input: {name: "A dummy", foo: [], relatedDummy: "/related_dummies/1", clientMutationId: "myId"}) {
         id
         name
         foo
@@ -83,7 +83,7 @@ Feature: GraphQL mutation support
     When I send the following GraphQL request:
     """
     mutation {
-      createDummy(input: {_id: 2, name: "A dummy", foo: [], jsonData: {bar:{baz:3,qux:[7.6,false,null]}}, arrayData: ["bar", "baz"], clientMutationId: "myId"}) {
+      createDummy(input: {name: "A dummy", foo: [], jsonData: {bar:{baz:3,qux:[7.6,false,null]}}, arrayData: ["bar", "baz"], clientMutationId: "myId"}) {
         id
         name
         foo
@@ -122,6 +122,7 @@ Feature: GraphQL mutation support
     And the JSON node "data.deleteFoo.id" should be equal to "/foos/1"
     And the JSON node "data.deleteFoo.clientMutationId" should be equal to "anotherId"
 
+  @!mongodb
   @dropSchema
   Scenario: Delete an item with composite identifiers through a mutation
     Given there are Composite identifier objects
@@ -172,6 +173,7 @@ Feature: GraphQL mutation support
     And the JSON node "data.updateDummy.relatedDummies.edges[0].node.name" should be equal to "RelatedDummy11"
     And the JSON node "data.updateDummy.clientMutationId" should be equal to "myId"
 
+  @!mongodb
   Scenario: Modify an item with composite identifiers through a mutation
     Given there are Composite identifier objects
     When I send the following GraphQL request:
@@ -210,6 +212,7 @@ Feature: GraphQL mutation support
     And the JSON node "data.createWritableId.name" should be equal to "Foo"
     And the JSON node "data.createWritableId.clientMutationId" should be equal to "m"
 
+  @!mongodb
   Scenario: Update an item with a custom UUID
     When I send the following GraphQL request:
     """

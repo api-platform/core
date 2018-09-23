@@ -294,6 +294,7 @@ Feature: HAL Collections support
     }
     """
 
+  @!mongodb
   Scenario: Enable the partial pagination client side
     When I add "Accept" header equal to "application/hal+json"
     And I send a "GET" request to "/dummies?page=2&partial=1"
