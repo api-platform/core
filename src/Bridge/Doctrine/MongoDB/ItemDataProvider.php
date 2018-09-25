@@ -67,7 +67,7 @@ final class ItemDataProvider implements DenormalizedIdentifiersAwareItemDataProv
 
         $fetchData = $context['fetch_data'] ?? true;
         if (!$fetchData && $manager instanceof DocumentManager) {
-            return $manager->getReference($resourceClass, $id);
+            return $manager->getReference($resourceClass, reset($id));
         }
 
         $repository = $manager->getRepository($resourceClass);

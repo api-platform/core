@@ -94,18 +94,14 @@ final class PaginationExtension implements AggregationResultCollectionExtensionI
             $itemsPerPage = (null !== $maxItemsPerPage && $itemsPerPage >= $maxItemsPerPage ? $maxItemsPerPage : $itemsPerPage);
         }
 
-        if (0 > $itemsPerPage) {
-            throw new InvalidArgumentException('Item per page parameter should not be less than 0');
+        if (0 >= $itemsPerPage) {
+            throw new InvalidArgumentException('Item per page parameter should not be less than 1');
         }
 
         $page = (int) $this->getPaginationParameter($request, $this->pageParameterName, 1);
 
         if (1 > $page) {
             throw new InvalidArgumentException('Page should not be less than 1');
-        }
-
-        if (0 === $itemsPerPage && 1 < $page) {
-            throw new InvalidArgumentException('Page should not be greater than 1 if itemsPerPage is equal to 0');
         }
 
         $firstResult = ($page - 1) * $itemsPerPage;

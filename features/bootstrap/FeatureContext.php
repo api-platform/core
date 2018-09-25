@@ -73,8 +73,10 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\Pet as PetDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\Question as QuestionDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\RelatedDummy as RelatedDummyDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\RelatedToDummyFriend as RelatedToDummyFriendDocument;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\RelationEmbedder as RelationEmbedderDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\SecuredDummy as SecuredDummyDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\ThirdLevel as ThirdLevelDocument;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\User as UserDocument;
 use Behat\Behat\Context\Context;
 use Behat\Behat\Context\SnippetAcceptingContext;
 use Behat\Behat\Hook\Scope\AfterStepScope;
@@ -711,7 +713,7 @@ final class FeatureContext implements Context, SnippetAcceptingContext
      */
     public function thereIsARelationEmbedderObject()
     {
-        $relationEmbedder = new RelationEmbedder();
+        $relationEmbedder = $this->buildRelationEmbedder();
 
         $this->manager->persist($relationEmbedder);
         $this->manager->flush();
@@ -896,7 +898,7 @@ final class FeatureContext implements Context, SnippetAcceptingContext
      */
     public function thePasswordForUserShouldBeHashed(string $password, string $user)
     {
-        $user = $this->doctrine->getRepository(User::class)->find($user);
+        $user = $this->doctrine->getRepository($this->isOrm() ? User::class : UserDocument::class)->find($user);
 
         if (!password_verify($password, $user->getPassword())) {
             throw new \Exception('User password mismatch');
@@ -1263,6 +1265,14 @@ final class FeatureContext implements Context, SnippetAcceptingContext
     private function buildRelatedToDummyFriend()
     {
         return $this->isOrm() ? new RelatedToDummyFriend() : new RelatedToDummyFriendDocument();
+    }
+
+    /**
+     * @return RelationEmbedder|RelationEmbedderDocument
+     */
+    private function buildRelationEmbedder()
+    {
+        return $this->isOrm() ? new RelationEmbedder() : new RelationEmbedderDocument();
     }
 
     /**

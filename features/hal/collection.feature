@@ -809,6 +809,7 @@ Feature: HAL Collections support
     }
     """
 
+  @!mongodb
   @dropSchema
   Scenario: Allow passing 0 to `itemsPerPage`
     When I add "Accept" header equal to "application/hal+json"

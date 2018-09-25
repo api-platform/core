@@ -46,6 +46,7 @@ Feature: Max depth handling
     }
     """
 
+  @!mongodb
   @dropSchema
   Scenario: Add a 2nd level of descendants
     When I add "Accept" header equal to "application/hal+json"

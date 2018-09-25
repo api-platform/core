@@ -1,7 +1,15 @@
 imports:
-    - { resource: config_test.yml }
+    - { resource: config_common.yml }
 
 api_platform:
     doctrine:
         enable_mongodb_odm: true
         enable_orm: false
+
+fos_user:
+    db_driver:       'mongodb'
+    firewall_name:   'api'
+    user_class:      'ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\User'
+    from_email:
+        address:     'no-reply@les-tilleuls.coop'
+        sender_name: 'Kévin Dunglas'
