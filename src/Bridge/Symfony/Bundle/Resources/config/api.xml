@@ -50,6 +50,15 @@
             <argument type="service" id="router" />
         </service>
 
+        <service id="api_platform.expression.evaluator" class="ApiPlatform\Core\Bridge\Symfony\Routing\ExpressionEvaluator">
+            <argument type="service" id="api_platform.security.expression_language" />
+            <argument type="collection"/>
+            <call method="setContextVariable">
+                <argument>container</argument>
+                <argument type="service" id="service_container"/>
+            </call>
+        </service>
+
         <service id="api_platform.iri_converter" class="ApiPlatform\Core\Bridge\Symfony\Routing\IriConverter" public="false">
             <argument type="service" id="api_platform.metadata.property.name_collection_factory" />
             <argument type="service" id="api_platform.metadata.property.metadata_factory" />
@@ -60,6 +69,9 @@
             <argument type="service" id="api_platform.identifiers_extractor.cached" />
             <argument type="service" id="api_platform.subresource_data_provider" on-invalid="ignore" />
             <argument type="service" id="api_platform.identifier.converter" on-invalid="ignore" />
+            <call method="setExpressionEvaluator">
+                <argument type="service" id="api_platform.expression.evaluator" />
+            </call>
         </service>
         <service id="ApiPlatform\Core\Api\IriConverterInterface" alias="api_platform.iri_converter" />
 

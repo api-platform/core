@@ -17,6 +17,7 @@ use ApiPlatform\Core\Exception\RuntimeException;
 use ApiPlatform\Core\Serializer\AbstractItemNormalizer;
 use ApiPlatform\Core\Serializer\ContextTrait;
 use Symfony\Component\Serializer\Mapping\AttributeMetadataInterface;
+use ApiPlatform\Core\Api\UrlGeneratorInterface;
 
 /**
  * Converts between objects and array including HAL metadata.
@@ -51,7 +52,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
 
         $resourceClass = $this->resourceClassResolver->getResourceClass($object, $context['resource_class'] ?? null, true);
         $context = $this->initContext($resourceClass, $context);
-        $context['iri'] = $this->iriConverter->getIriFromItem($object);
+        $context['iri'] = $this->iriConverter->getIriFromItem($object, UrlGeneratorInterface::ABS_PATH, $context);
         $context['api_normalize'] = true;
 
         $rawData = parent::normalize($object, $format, $context);

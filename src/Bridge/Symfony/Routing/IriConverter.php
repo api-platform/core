@@ -34,6 +34,8 @@ use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\Routing\Exception\ExceptionInterface as RoutingExceptionInterface;
 use Symfony\Component\Routing\RouterInterface;
+use Hateoas\Expression\ExpressionEvaluator;
+use Symfony\Component\PropertyAccess\PropertyAccessor;
 
 /**
  * {@inheritdoc}
@@ -48,6 +50,8 @@ final class IriConverter implements IriConverterInterface
     private $routeNameResolver;
     private $router;
     private $identifiersExtractor;
+    private $propertyAccessor;
+    private $expressionEvaluator;
 
     public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, ItemDataProviderInterface $itemDataProvider, RouteNameResolverInterface $routeNameResolver, RouterInterface $router, PropertyAccessorInterface $propertyAccessor = null, IdentifiersExtractorInterface $identifiersExtractor = null, SubresourceDataProviderInterface $subresourceDataProvider = null, IdentifierConverterInterface $identifierConverter = null)
     {
@@ -57,10 +61,11 @@ final class IriConverter implements IriConverterInterface
         $this->identifiersExtractor = $identifiersExtractor;
         $this->subresourceDataProvider = $subresourceDataProvider;
         $this->identifierConverter = $identifierConverter;
+        $this->propertyAccessor =  $propertyAccessor ?? PropertyAccess::createPropertyAccessor();
 
         if (null === $identifiersExtractor) {
             @trigger_error(sprintf('Not injecting "%s" is deprecated since API Platform 2.1 and will not be possible anymore in API Platform 3', IdentifiersExtractorInterface::class), E_USER_DEPRECATED);
-            $this->identifiersExtractor = new IdentifiersExtractor($propertyNameCollectionFactory, $propertyMetadataFactory, $propertyAccessor ?? PropertyAccess::createPropertyAccessor());
+            $this->identifiersExtractor = new IdentifiersExtractor($propertyNameCollectionFactory, $propertyMetadataFactory, $this->propertyAccessor);
         }
     }
 
@@ -106,11 +111,26 @@ final class IriConverter implements IriConverterInterface
         throw new ItemNotFoundException(sprintf('Item not found for "%s".', $iri));
     }
 
+    public function setExpressionEvaluator($expressionEvaluator)
+    {
+        $this->expressionEvaluator = $expressionEvaluator;
+    }
+
     /**
      * {@inheritdoc}
      */
-    public function getIriFromItem($item, int $referenceType = UrlGeneratorInterface::ABS_PATH): string
+    public function getIriFromItem($item, int $referenceType = UrlGeneratorInterface::ABS_PATH, $context = []): string
     {
+        if ($routeName =  $this->propertyAccessor->getValue($context, '[iri][route]')) {
+            $parameters = $this->propertyAccessor->getValue($context, '[iri][parameters]');
+
+            return $this->router->generate(
+                $routeName,
+                !empty($parameters)? $this->expressionEvaluator->evaluateArray($parameters, $item): [],
+                $referenceType
+            );
+        }
+
         $resourceClass = $this->getObjectClass($item);
         $routeName = $this->routeNameResolver->getRouteName($resourceClass, OperationType::ITEM);
 

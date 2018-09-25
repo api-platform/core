@@ -43,7 +43,7 @@ interface IriConverterInterface
      * @throws InvalidArgumentException
      * @throws RuntimeException
      */
-    public function getIriFromItem($item, int $referenceType = UrlGeneratorInterface::ABS_PATH): string;
+    public function getIriFromItem($item, int $referenceType = UrlGeneratorInterface::ABS_PATH, $context = []): string;
 
     /**
      * Gets the IRI associated with the given resource collection.
