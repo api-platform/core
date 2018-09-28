@@ -227,8 +227,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
         foreach ($propertyNames as $propertyName) {
             $propertyMetadata = $this->propertyMetadataFactory->create($context['resource_class'], $propertyName, $options);
 
-            if (
-                $this->isAllowedAttribute($classOrObject, $propertyName, null, $context) &&
+            if ($this->isAllowedAttribute($classOrObject, $propertyName, null, $context) &&
                 (
                     isset($context['api_normalize']) && $propertyMetadata->isReadable() ||
                     isset($context['api_denormalize']) && ($propertyMetadata->isWritable() || !\is_object($classOrObject) && $propertyMetadata->isInitializable())
@@ -267,8 +266,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             return $value;
         }
 
-        if (
-            $type->isCollection() &&
+        if ($type->isCollection() &&
             null !== ($collectionValueType = $type->getCollectionValueType()) &&
             null !== $className = $collectionValueType->getClassName()
         ) {
@@ -520,24 +518,16 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
      */
     protected function normalizeRelation(PropertyMetadata $propertyMetadata, $relatedObject, string $resourceClass, string $format = null, array $context)
     {
-        if (null === $relatedObject || $propertyMetadata->isReadableLink() || !empty($context['attributes'])) {
-            if (null === $relatedObject) {
-                unset($context['resource_class']);
-            } else {
-                $context['resource_class'] = $resourceClass;
-            }
-
-            if ($this->serializer instanceof NormalizerInterface) {
-                return $this->serializer->normalize($relatedObject, $format, $context);
-            }
-            throw new InvalidArgumentException(sprintf('The injected serializer must be an instance of "%s".', NormalizerInterface::class));
+        if (null === $relatedObject) {
+            unset($context['resource_class']);
+        } else {
+            $context['resource_class'] = $resourceClass;
         }
 
-        $iri = $this->iriConverter->getIriFromItem($relatedObject);
-        if (isset($context['resources'])) {
-            $context['resources'][$iri] = $iri;
+        if ($this->serializer instanceof NormalizerInterface) {
+            return $this->serializer->normalize($relatedObject, $format, $context);
         }
 
-        return $iri;
+        throw new InvalidArgumentException(sprintf('The injected serializer must be an instance of "%s".', NormalizerInterface::class));
     }
 }
