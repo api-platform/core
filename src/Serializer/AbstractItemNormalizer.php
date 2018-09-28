@@ -47,28 +47,22 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
 
     protected $propertyNameCollectionFactory;
     protected $propertyMetadataFactory;
-    protected $iriConverter;
     protected $resourceClassResolver;
     protected $propertyAccessor;
     protected $localCache = [];
     protected $itemDataProvider;
     protected $allowPlainIdentifiers;
 
-    public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, IriConverterInterface $iriConverter, ResourceClassResolverInterface $resourceClassResolver, PropertyAccessorInterface $propertyAccessor = null, NameConverterInterface $nameConverter = null, ClassMetadataFactoryInterface $classMetadataFactory = null, ItemDataProviderInterface $itemDataProvider = null, bool $allowPlainIdentifiers = false)
+    public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, ResourceClassResolverInterface $resourceClassResolver, PropertyAccessorInterface $propertyAccessor = null, NameConverterInterface $nameConverter = null, ClassMetadataFactoryInterface $classMetadataFactory = null, ItemDataProviderInterface $itemDataProvider = null, bool $allowPlainIdentifiers = false)
     {
         parent::__construct($classMetadataFactory, $nameConverter);
 
         $this->propertyNameCollectionFactory = $propertyNameCollectionFactory;
         $this->propertyMetadataFactory = $propertyMetadataFactory;
-        $this->iriConverter = $iriConverter;
         $this->resourceClassResolver = $resourceClassResolver;
         $this->propertyAccessor = $propertyAccessor ?: PropertyAccess::createPropertyAccessor();
         $this->itemDataProvider = $itemDataProvider;
         $this->allowPlainIdentifiers = $allowPlainIdentifiers;
-
-        $this->setCircularReferenceHandler(function ($object) {
-            return $this->iriConverter->getIriFromItem($object);
-        });
     }
 
     /**
@@ -99,11 +93,6 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
         $resourceClass = $this->resourceClassResolver->getResourceClass($object, $context['resource_class'] ?? null, true);
         $context = $this->initContext($resourceClass, $context);
         $context['api_normalize'] = true;
-
-        if (isset($context['resources'])) {
-            $resource = $context['iri'] ?? $this->iriConverter->getIriFromItem($object);
-            $context['resources'][$resource] = $resource;
-        }
 
         return parent::normalize($object, $format, $context);
     }
