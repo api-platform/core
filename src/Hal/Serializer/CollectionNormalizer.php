@@ -15,6 +15,7 @@ namespace ApiPlatform\Core\Hal\Serializer;
 
 use ApiPlatform\Core\Serializer\AbstractCollectionNormalizer;
 use ApiPlatform\Core\Util\IriHelper;
+use Hateoas\Factory\LinksFactory;
 
 /**
  * Normalizes collections in the HAL format.
@@ -25,6 +26,8 @@ use ApiPlatform\Core\Util\IriHelper;
 final class CollectionNormalizer extends AbstractCollectionNormalizer
 {
     const FORMAT = 'jsonhal';
+
+    private $linkFactory;
 
     /**
      * {@inheritdoc}
@@ -63,7 +66,14 @@ final class CollectionNormalizer extends AbstractCollectionNormalizer
             $data['itemsPerPage'] = (int) $itemsPerPage;
         }
 
-        return $data;
+        $links = ItemNormalizer::serializeLinks($this->linksFactory->create($object, $context));
+
+        return empty($links)? $data:  array_merge_recursive($data, ['_links' => $links]);
+    }
+
+    public function setLinksFactory(LinksFactory $linkFactory)
+    {
+        $this->linksFactory = $linkFactory;
     }
 
     /**
@@ -77,7 +87,6 @@ final class CollectionNormalizer extends AbstractCollectionNormalizer
             $item = $this->normalizer->normalize($obj, $format, $context);
 
             $data['_embedded']['item'][] = $item;
-            $data['_links']['item'][] = $item['_links']['self'];
         }
 
         return $data;

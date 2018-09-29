@@ -47,28 +47,22 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
 
     protected $propertyNameCollectionFactory;
     protected $propertyMetadataFactory;
-    protected $iriConverter;
     protected $resourceClassResolver;
     protected $propertyAccessor;
     protected $localCache = [];
     protected $itemDataProvider;
     protected $allowPlainIdentifiers;
 
-    public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, IriConverterInterface $iriConverter, ResourceClassResolverInterface $resourceClassResolver, PropertyAccessorInterface $propertyAccessor = null, NameConverterInterface $nameConverter = null, ClassMetadataFactoryInterface $classMetadataFactory = null, ItemDataProviderInterface $itemDataProvider = null, bool $allowPlainIdentifiers = false)
+    public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, ResourceClassResolverInterface $resourceClassResolver, PropertyAccessorInterface $propertyAccessor = null, NameConverterInterface $nameConverter = null, ClassMetadataFactoryInterface $classMetadataFactory = null, ItemDataProviderInterface $itemDataProvider = null, bool $allowPlainIdentifiers = false)
     {
         parent::__construct($classMetadataFactory, $nameConverter);
 
         $this->propertyNameCollectionFactory = $propertyNameCollectionFactory;
         $this->propertyMetadataFactory = $propertyMetadataFactory;
-        $this->iriConverter = $iriConverter;
         $this->resourceClassResolver = $resourceClassResolver;
         $this->propertyAccessor = $propertyAccessor ?: PropertyAccess::createPropertyAccessor();
         $this->itemDataProvider = $itemDataProvider;
         $this->allowPlainIdentifiers = $allowPlainIdentifiers;
-
-        $this->setCircularReferenceHandler(function ($object) {
-            return $this->iriConverter->getIriFromItem($object);
-        });
     }
 
     /**
@@ -99,11 +93,6 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
         $resourceClass = $this->resourceClassResolver->getResourceClass($object, $context['resource_class'] ?? null, true);
         $context = $this->initContext($resourceClass, $context);
         $context['api_normalize'] = true;
-
-        if (isset($context['resources'])) {
-            $resource = $context['iri'] ?? $this->iriConverter->getIriFromItem($object);
-            $context['resources'][$resource] = $resource;
-        }
 
         return parent::normalize($object, $format, $context);
     }
@@ -238,8 +227,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
         foreach ($propertyNames as $propertyName) {
             $propertyMetadata = $this->propertyMetadataFactory->create($context['resource_class'], $propertyName, $options);
 
-            if (
-                $this->isAllowedAttribute($classOrObject, $propertyName, null, $context) &&
+            if ($this->isAllowedAttribute($classOrObject, $propertyName, null, $context) &&
                 (
                     isset($context['api_normalize']) && $propertyMetadata->isReadable() ||
                     isset($context['api_denormalize']) && ($propertyMetadata->isWritable() || !\is_object($classOrObject) && $propertyMetadata->isInitializable())
@@ -278,8 +266,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             return $value;
         }
 
-        if (
-            $type->isCollection() &&
+        if ($type->isCollection() &&
             null !== ($collectionValueType = $type->getCollectionValueType()) &&
             null !== $className = $collectionValueType->getClassName()
         ) {
@@ -359,16 +346,6 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
      */
     protected function denormalizeRelation(string $attributeName, PropertyMetadata $propertyMetadata, string $className, $value, string $format = null, array $context)
     {
-        if (\is_string($value)) {
-            try {
-                return $this->iriConverter->getItemFromIri($value, $context + ['fetch_data' => true]);
-            } catch (ItemNotFoundException $e) {
-                throw new InvalidArgumentException($e->getMessage(), $e->getCode(), $e);
-            } catch (InvalidArgumentException $e) {
-                // Give a chance to other normalizers (e.g.: DateTimeNormalizer)
-            }
-        }
-
         if (
             !$this->resourceClassResolver->isResourceClass($className) ||
             $propertyMetadata->isWritableLink()
@@ -401,11 +378,11 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             }
 
             throw new InvalidArgumentException(sprintf(
-                'Expected IRI or nested document for attribute "%s", "%s" given.', $attributeName, \gettype($value)
+                'Expected nested document for attribute "%s", "%s" given.', $attributeName, \gettype($value)
             ));
         }
 
-        throw new InvalidArgumentException(sprintf('Nested documents for attribute "%s" are not allowed. Use IRIs instead.', $attributeName));
+        throw new InvalidArgumentException(sprintf('Nested documents for attribute "%s" are not allowed.', $attributeName));
     }
 
     /**
@@ -531,24 +508,16 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
      */
     protected function normalizeRelation(PropertyMetadata $propertyMetadata, $relatedObject, string $resourceClass, string $format = null, array $context)
     {
-        if (null === $relatedObject || $propertyMetadata->isReadableLink() || !empty($context['attributes'])) {
-            if (null === $relatedObject) {
-                unset($context['resource_class']);
-            } else {
-                $context['resource_class'] = $resourceClass;
-            }
-
-            if ($this->serializer instanceof NormalizerInterface) {
-                return $this->serializer->normalize($relatedObject, $format, $context);
-            }
-            throw new InvalidArgumentException(sprintf('The injected serializer must be an instance of "%s".', NormalizerInterface::class));
+        if (null === $relatedObject) {
+            unset($context['resource_class']);
+        } else {
+            $context['resource_class'] = $resourceClass;
         }
 
-        $iri = $this->iriConverter->getIriFromItem($relatedObject);
-        if (isset($context['resources'])) {
-            $context['resources'][$iri] = $iri;
+        if ($this->serializer instanceof NormalizerInterface) {
+            return $this->serializer->normalize($relatedObject, $format, $context);
         }
 
-        return $iri;
+        throw new InvalidArgumentException(sprintf('The injected serializer must be an instance of "%s".', NormalizerInterface::class));
     }
 }

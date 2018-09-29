@@ -26,12 +26,10 @@ use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
 final class WriteListener
 {
     private $dataPersister;
-    private $iriConverter;
 
-    public function __construct(DataPersisterInterface $dataPersister, IriConverterInterface $iriConverter = null)
+    public function __construct(DataPersisterInterface $dataPersister)
     {
         $this->dataPersister = $dataPersister;
-        $this->iriConverter = $iriConverter;
     }
 
     /**
@@ -61,9 +59,6 @@ final class WriteListener
 
                 $event->setControllerResult($persistResult ?? $controllerResult);
 
-                if (null !== $this->iriConverter) {
-                    $request->attributes->set('_api_write_item_iri', $this->iriConverter->getIriFromItem($controllerResult));
-                }
                 break;
             case 'DELETE':
                 $this->dataPersister->remove($controllerResult);

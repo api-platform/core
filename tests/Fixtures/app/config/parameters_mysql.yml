@@ -1,5 +1,0 @@
-parameters:
-    dbname:   'api_platform_test'
-    user:     'travis'
-    password: ''
-    host:     'localhost'

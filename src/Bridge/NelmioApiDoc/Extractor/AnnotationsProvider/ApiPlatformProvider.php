@@ -16,7 +16,7 @@ namespace ApiPlatform\Core\Bridge\NelmioApiDoc\Extractor\AnnotationsProvider;
 use ApiPlatform\Core\Api\FilterCollection;
 use ApiPlatform\Core\Api\FilterLocatorTrait;
 use ApiPlatform\Core\Bridge\NelmioApiDoc\Parser\ApiPlatformParser;
-use ApiPlatform\Core\Bridge\Symfony\Routing\OperationMethodResolverInterface;
+use Videni\Bundle\RestBundle\Routing\OperationMethodResolverInterface;
 use ApiPlatform\Core\Documentation\Documentation;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;

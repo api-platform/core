@@ -1,3 +1,0 @@
-resources:
-    'ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\FileConfigDummy':
-        shortName: 1

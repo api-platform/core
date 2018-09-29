@@ -60,6 +60,7 @@ final class SerializerContextBuilder implements SerializerContextBuilderInterfac
         if (null !== $operationKey) {
             $attribute = $attributes[$operationKey];
             $context = $resourceMetadata->getCollectionOperationAttribute($attribute, $key, [], true);
+
             $context[$operationKey] = $attribute;
         } else {
             $context = $resourceMetadata->getItemOperationAttribute($attributes['item_operation_name'], $key, [], true);

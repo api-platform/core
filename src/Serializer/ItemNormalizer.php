@@ -24,6 +24,7 @@ use ApiPlatform\Core\Exception\InvalidArgumentException;
  */
 class ItemNormalizer extends AbstractItemNormalizer
 {
+
     /**
      * {@inheritdoc}
      *
@@ -46,7 +47,12 @@ class ItemNormalizer extends AbstractItemNormalizer
     private function updateObjectToPopulate(array $data, array &$context)
     {
         try {
-            $context[self::OBJECT_TO_POPULATE] = $this->iriConverter->getItemFromIri((string) $data['id'], $context + ['fetch_data' => true]);
+            $context[self::OBJECT_TO_POPULATE] = $this->itemDataProvider->getItem(
+                $context['resource_class'],
+                (string)$data['id'],
+                $context['collection_operation_name'],
+                $context + ['fetch_data' => true]
+            );
         } catch (InvalidArgumentException $e) {
             $identifier = null;
             foreach ($this->propertyNameCollectionFactory->create($context['resource_class'], $context) as $propertyName) {
@@ -60,7 +66,8 @@ class ItemNormalizer extends AbstractItemNormalizer
                 throw $e;
             }
 
-            $context[self::OBJECT_TO_POPULATE] = $this->iriConverter->getItemFromIri(sprintf('%s/%s', $this->iriConverter->getIriFromResourceClass($context['resource_class']), $data[$identifier]), $context + ['fetch_data' => true]);
+            $context[self::OBJECT_TO_POPULATE] = $this->itemDataProvider->getItem($context['resource_class'], $data[$identifier], $context['collection_operation_name'], $context + ['fetch_data' => true]);
         }
     }
 }
+
