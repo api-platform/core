@@ -68,7 +68,7 @@ final class CollectionNormalizer extends AbstractCollectionNormalizer
 
         $links = ItemNormalizer::serializeLinks($this->linksFactory->create($object, $context));
 
-        return empty($links)? $data:  array_merge($data, ['_links' => $links]);
+        return empty($links)? $data:  array_merge_recursive($data, ['_links' => $links]);
     }
 
     public function setLinksFactory(LinksFactory $linkFactory)
