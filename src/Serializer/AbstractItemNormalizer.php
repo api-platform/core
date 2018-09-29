@@ -346,16 +346,6 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
      */
     protected function denormalizeRelation(string $attributeName, PropertyMetadata $propertyMetadata, string $className, $value, string $format = null, array $context)
     {
-        if (\is_string($value)) {
-            try {
-                return $this->iriConverter->getItemFromIri($value, $context + ['fetch_data' => true]);
-            } catch (ItemNotFoundException $e) {
-                throw new InvalidArgumentException($e->getMessage(), $e->getCode(), $e);
-            } catch (InvalidArgumentException $e) {
-                // Give a chance to other normalizers (e.g.: DateTimeNormalizer)
-            }
-        }
-
         if (
             !$this->resourceClassResolver->isResourceClass($className) ||
             $propertyMetadata->isWritableLink()
@@ -388,11 +378,11 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             }
 
             throw new InvalidArgumentException(sprintf(
-                'Expected IRI or nested document for attribute "%s", "%s" given.', $attributeName, \gettype($value)
+                'Expected nested document for attribute "%s", "%s" given.', $attributeName, \gettype($value)
             ));
         }
 
-        throw new InvalidArgumentException(sprintf('Nested documents for attribute "%s" are not allowed. Use IRIs instead.', $attributeName));
+        throw new InvalidArgumentException(sprintf('Nested documents for attribute "%s" are not allowed.', $attributeName));
     }
 
     /**
