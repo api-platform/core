@@ -31,7 +31,7 @@ final class QueryBuilderHelper
     /**
      * Adds a join to the QueryBuilder if none exists.
      */
-    public static function addJoinOnce(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $alias, string $association, string $joinType = null, string $conditionType = null, string $condition = null, string $originAlias = null): string
+    public static function addJoinOnce(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $alias, string $association, string $joinType = null, string $conditionType = null, string $condition = null, string $originAlias = null, string $newAlias = null): string
     {
         $join = self::getExistingJoin($queryBuilder, $alias, $association, $originAlias);
 
@@ -39,7 +39,7 @@ final class QueryBuilderHelper
             return $join->getAlias();
         }
 
-        $associationAlias = $queryNameGenerator->generateJoinAlias($association);
+        $associationAlias = $newAlias ?: $queryNameGenerator->generateJoinAlias($association);
         $query = "$alias.$association";
 
         if (Join::LEFT_JOIN === $joinType || QueryChecker::hasLeftJoin($queryBuilder)) {
