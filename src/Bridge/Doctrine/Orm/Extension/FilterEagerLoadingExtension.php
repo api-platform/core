@@ -138,10 +138,11 @@ final class FilterEagerLoadingExtension implements ContextAwareQueryCollectionEx
             }
             $alias = substr($joinString, 0, $pos);
             $association = substr($joinString, $pos + 1);
-            $condition = str_replace($aliases, $replacements, $joinPart->getCondition());
-            $newAlias = QueryBuilderHelper::addJoinOnce($queryBuilderClone, $queryNameGenerator, $alias, $association, $joinPart->getJoinType(), $joinPart->getConditionType(), $condition, $originAlias);
+            $newAlias = $queryNameGenerator->generateJoinAlias($association);
             $aliases[] = "{$joinPart->getAlias()}.";
             $replacements[] = "$newAlias.";
+            $condition = str_replace($aliases, $replacements, $joinPart->getCondition());
+            QueryBuilderHelper::addJoinOnce($queryBuilderClone, $queryNameGenerator, $alias, $association, $joinPart->getJoinType(), $joinPart->getConditionType(), $condition, $originAlias, $newAlias);
         }
 
         $queryBuilderClone->add('where', str_replace($aliases, $replacements, (string) $wherePart));
