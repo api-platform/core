@@ -6,7 +6,7 @@ Feature: Max depth handling
   @createSchema
   Scenario: Create a resource with 1 level of descendants
     When I add "Content-Type" header equal to "application/ld+json"
-    And I send a "POST" request to "/max_depth_dummies" with body:
+    And I send a "POST" request to "/max_depth_eager_dummies" with body:
     """
     {
       "name": "level 1",
@@ -21,14 +21,14 @@ Feature: Max depth handling
     And the JSON should be equal to:
     """
     {
-      "@context": "/contexts/MaxDepthDummy",
-      "@id": "/max_depth_dummies/1",
-      "@type": "MaxDepthDummy",
+      "@context": "/contexts/MaxDepthEagerDummy",
+      "@id": "/max_depth_eager_dummies/1",
+      "@type": "MaxDepthEagerDummy",
       "id": 1,
       "name": "level 1",
       "child": {
-        "@id": "/max_depth_dummies/2",
-        "@type": "MaxDepthDummy",
+        "@id": "/max_depth_eager_dummies/2",
+        "@type": "MaxDepthEagerDummy",
         "id": 2,
         "name": "level 2"
       }
@@ -38,12 +38,12 @@ Feature: Max depth handling
   @dropSchema
   Scenario: Add a 2nd level of descendants
     When I add "Content-Type" header equal to "application/ld+json"
-    And I send a "PUT" request to "max_depth_dummies/1" with body:
+    And I send a "PUT" request to "max_depth_eager_dummies/1" with body:
     """
     {
-      "@id": "/max_depth_dummies/1",
+      "@id": "/max_depth_eager_dummies/1",
       "child": {
-        "@id": "/max_depth_dummies/2",
+        "@id": "/max_depth_eager_dummies/2",
         "child": {
           "name": "level 3"
         }
@@ -56,14 +56,14 @@ Feature: Max depth handling
     And the JSON should be equal to:
     """
     {
-      "@context": "/contexts/MaxDepthDummy",
-      "@id": "/max_depth_dummies/1",
-      "@type": "MaxDepthDummy",
+      "@context": "/contexts/MaxDepthEagerDummy",
+      "@id": "/max_depth_eager_dummies/1",
+      "@type": "MaxDepthEagerDummy",
       "id": 1,
       "name": "level 1",
       "child": {
-        "@id": "/max_depth_dummies/2",
-        "@type": "MaxDepthDummy",
+        "@id": "/max_depth_eager_dummies/2",
+        "@type": "MaxDepthEagerDummy",
         "id": 2,
         "name": "level 2"
       }
