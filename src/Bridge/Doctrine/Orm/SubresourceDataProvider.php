@@ -28,6 +28,7 @@ use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInte
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
+use Doctrine\ORM\Mapping\MappingException;
 use Doctrine\ORM\QueryBuilder;
 
 /**
@@ -175,6 +176,17 @@ final class SubresourceDataProvider implements SubresourceDataProviderInterface
                     $qb->select($alias)
                         ->from($identifierResourceClass, $alias);
                     break;
+                // ONE_TO_ONE relation can be Unidirectional or Bidirectional. For Bidirectional mappedBy attribute is used.
+                case ClassMetadataInfo::ONE_TO_ONE:
+                    try {
+                        $mappedBy = $classMetadata->getAssociationMapping($previousAssociationProperty)['mappedBy'];
+                        $previousAlias = "$previousAlias.$mappedBy";
+
+                        $qb->select($alias)
+                            ->from($identifierResourceClass, $alias);
+                        break;
+                    } catch (MappingException $e) {
+                    }
                 default:
                     $qb->select("IDENTITY($alias.$previousAssociationProperty)")
                         ->from($identifierResourceClass, $alias);
