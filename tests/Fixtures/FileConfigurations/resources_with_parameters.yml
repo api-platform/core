@@ -1,0 +1,50 @@
+resources:
+    '%dummy_class%': ~
+    '%dummy_class%Bis': ~
+    '%file_config_dummy_class%':
+        shortName: 'thedummyshortname'
+        description: 'Dummy resource'
+        itemOperations:
+            my_op_name:
+                method: 'GET'
+            my_other_op_name:
+                method: 'POST'
+        collectionOperations:
+            my_collection_op:
+                method: 'POST'
+                path: 'the/collection/path'
+        subresourceOperations:
+            my_collection_subresource:
+                path: 'the/subresource/path'
+        graphql:
+            query:
+                normalization_context:
+                    groups: ['graphql']
+        attributes:
+            normalization_context:
+                groups: ['default']
+            denormalization_context:
+                groups: ['default']
+            hydra_context:
+                '@type': 'hydra:Operation'
+                '@hydra:title': 'File config Dummy'
+                # Use this syntax with Symfony YAML 3.4+:
+                #'@hydra:title': !php/const ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\FileConfigDummy::HYDRA_TITLE
+        iri: 'someirischema'
+        properties:
+            'foo':
+                subresource: {collection: true, resourceClass: 'Foo', maxDepth: 1}
+                description: 'The dummy foo'
+                readable: true
+                writable: true
+                readableLink: false
+                writableLink: false
+                required: true
+                attributes:
+                    'foo': ['Foo']
+                    'bar':
+                        '0': ['Bar']
+                        'baz': 'Baz'
+                    'baz': 'Baz'
+            'name':
+                description: 'The dummy name'
