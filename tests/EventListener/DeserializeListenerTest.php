@@ -172,7 +172,7 @@ class DeserializeListenerTest extends TestCase
         $serializerContextBuilderProphecy->createFromRequest(Argument::type(Request::class), false, Argument::type('array'))->willReturn([])->shouldBeCalled();
 
         $formatsProviderProphecy = $this->prophesize(FormatsProviderInterface::class);
-        $formatsProviderProphecy->getFormatsFromAttributes(['resource_class' => 'Foo', 'collection_operation_name' => 'post', 'receive' => true, 'persist' => true])->willReturn(self::FORMATS)->shouldBeCalled();
+        $formatsProviderProphecy->getFormatsFromAttributes(['resource_class' => 'Foo', 'input_class' => 'Foo', 'output_class' => 'Foo', 'collection_operation_name' => 'post', 'receive' => true, 'persist' => true])->willReturn(self::FORMATS)->shouldBeCalled();
 
         $listener = new DeserializeListener($serializerProphecy->reveal(), $serializerContextBuilderProphecy->reveal(), $formatsProviderProphecy->reveal());
 

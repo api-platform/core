@@ -66,6 +66,8 @@ class SubresourceOperationFactoryTest extends TestCase
                 'property' => 'subresource',
                 'collection' => false,
                 'resource_class' => RelatedDummyEntity::class,
+                'input_class' => RelatedDummyEntity::class,
+                'output_class' => RelatedDummyEntity::class,
                 'shortNames' => ['relatedDummyEntity', 'dummyEntity'],
                 'identifiers' => [
                     ['id', DummyEntity::class, true],
@@ -78,6 +80,8 @@ class SubresourceOperationFactoryTest extends TestCase
                 'property' => 'anotherSubresource',
                 'collection' => false,
                 'resource_class' => DummyEntity::class,
+                'input_class' => DummyEntity::class,
+                'output_class' => DummyEntity::class,
                 'shortNames' => ['dummyEntity', 'relatedDummyEntity'],
                 'identifiers' => [
                     ['id', DummyEntity::class, true],
@@ -91,6 +95,8 @@ class SubresourceOperationFactoryTest extends TestCase
                 'property' => 'subcollection',
                 'collection' => true,
                 'resource_class' => RelatedDummyEntity::class,
+                'input_class' => RelatedDummyEntity::class,
+                'output_class' => RelatedDummyEntity::class,
                 'shortNames' => ['relatedDummyEntity', 'dummyEntity'],
                 'identifiers' => [
                     ['id', DummyEntity::class, true],
@@ -105,6 +111,8 @@ class SubresourceOperationFactoryTest extends TestCase
                 'property' => 'subcollection',
                 'collection' => true,
                 'resource_class' => RelatedDummyEntity::class,
+                'input_class' => RelatedDummyEntity::class,
+                'output_class' => RelatedDummyEntity::class,
                 'shortNames' => ['relatedDummyEntity', 'dummyEntity'],
                 'identifiers' => [
                     ['id', DummyEntity::class, true],
@@ -117,6 +125,8 @@ class SubresourceOperationFactoryTest extends TestCase
                 'property' => 'anotherSubresource',
                 'collection' => false,
                 'resource_class' => DummyEntity::class,
+                'input_class' => DummyEntity::class,
+                'output_class' => DummyEntity::class,
                 'shortNames' => ['dummyEntity', 'relatedDummyEntity'],
                 'identifiers' => [
                     ['id', DummyEntity::class, true],
@@ -130,6 +140,8 @@ class SubresourceOperationFactoryTest extends TestCase
                 'property' => 'subresource',
                 'collection' => false,
                 'resource_class' => RelatedDummyEntity::class,
+                'input_class' => RelatedDummyEntity::class,
+                'output_class' => RelatedDummyEntity::class,
                 'shortNames' => ['relatedDummyEntity', 'dummyEntity'],
                 'identifiers' => [
                     ['id', DummyEntity::class, true],
@@ -184,6 +196,8 @@ class SubresourceOperationFactoryTest extends TestCase
                 'property' => 'subresource',
                 'collection' => false,
                 'resource_class' => RelatedDummyEntity::class,
+                'input_class' => RelatedDummyEntity::class,
+                'output_class' => RelatedDummyEntity::class,
                 'shortNames' => ['relatedDummyEntity', 'dummyEntity'],
                 'identifiers' => [
                     ['id', DummyEntity::class, true],
@@ -196,6 +210,8 @@ class SubresourceOperationFactoryTest extends TestCase
                 'property' => 'anotherSubresource',
                 'collection' => false,
                 'resource_class' => DummyEntity::class,
+                'input_class' => DummyEntity::class,
+                'output_class' => DummyEntity::class,
                 'shortNames' => ['dummyEntity', 'relatedDummyEntity'],
                 'identifiers' => [
                     ['id', DummyEntity::class, true],
@@ -209,6 +225,8 @@ class SubresourceOperationFactoryTest extends TestCase
                 'property' => 'subcollection',
                 'collection' => true,
                 'resource_class' => RelatedDummyEntity::class,
+                'input_class' => RelatedDummyEntity::class,
+                'output_class' => RelatedDummyEntity::class,
                 'shortNames' => ['relatedDummyEntity', 'dummyEntity'],
                 'identifiers' => [
                     ['id', DummyEntity::class, true],
@@ -223,6 +241,8 @@ class SubresourceOperationFactoryTest extends TestCase
                 'property' => 'subcollection',
                 'collection' => true,
                 'resource_class' => RelatedDummyEntity::class,
+                'input_class' => RelatedDummyEntity::class,
+                'output_class' => RelatedDummyEntity::class,
                 'shortNames' => ['relatedDummyEntity', 'dummyEntity'],
                 'identifiers' => [
                     ['id', DummyEntity::class, true],
@@ -235,6 +255,8 @@ class SubresourceOperationFactoryTest extends TestCase
                 'property' => 'anotherSubresource',
                 'collection' => false,
                 'resource_class' => DummyEntity::class,
+                'input_class' => DummyEntity::class,
+                'output_class' => DummyEntity::class,
                 'shortNames' => ['dummyEntity', 'relatedDummyEntity'],
                 'identifiers' => [
                     ['id', DummyEntity::class, true],
@@ -248,6 +270,8 @@ class SubresourceOperationFactoryTest extends TestCase
                 'property' => 'subresource',
                 'collection' => false,
                 'resource_class' => RelatedDummyEntity::class,
+                'input_class' => RelatedDummyEntity::class,
+                'output_class' => RelatedDummyEntity::class,
                 'shortNames' => ['relatedDummyEntity', 'dummyEntity'],
                 'identifiers' => [
                     ['id', DummyEntity::class, true],
@@ -295,6 +319,8 @@ class SubresourceOperationFactoryTest extends TestCase
                 'property' => 'subresource',
                 'collection' => false,
                 'resource_class' => RelatedDummyEntity::class,
+                'input_class' => RelatedDummyEntity::class,
+                'output_class' => RelatedDummyEntity::class,
                 'shortNames' => ['relatedDummyEntity', 'dummyEntity'],
                 'identifiers' => [
                     ['id', DummyEntity::class, true],
@@ -355,6 +381,8 @@ class SubresourceOperationFactoryTest extends TestCase
                 'property' => 'subresource',
                 'collection' => false,
                 'resource_class' => RelatedDummyEntity::class,
+                'input_class' => RelatedDummyEntity::class,
+                'output_class' => RelatedDummyEntity::class,
                 'shortNames' => ['relatedDummyEntity', 'dummyEntity'],
                 'identifiers' => [
                     ['id', DummyEntity::class, true],
@@ -367,6 +395,8 @@ class SubresourceOperationFactoryTest extends TestCase
                 'property' => 'secondSubresource',
                 'collection' => false,
                 'resource_class' => DummyValidatedEntity::class,
+                'input_class' => DummyValidatedEntity::class,
+                'output_class' => DummyValidatedEntity::class,
                 'shortNames' => ['dummyValidatedEntity', 'dummyEntity'],
                 'identifiers' => [
                     ['id', DummyEntity::class, true],
@@ -379,6 +409,8 @@ class SubresourceOperationFactoryTest extends TestCase
                 'property' => 'moreSubresource',
                 'collection' => false,
                 'resource_class' => RelatedDummyEntity::class,
+                'input_class' => RelatedDummyEntity::class,
+                'output_class' => RelatedDummyEntity::class,
                 'shortNames' => ['relatedDummyEntity', 'dummyValidatedEntity'],
                 'identifiers' => [
                     ['id', DummyEntity::class, true],
@@ -439,6 +471,8 @@ class SubresourceOperationFactoryTest extends TestCase
                 'property' => 'subresource',
                 'collection' => false,
                 'resource_class' => RelatedDummyEntity::class,
+                'input_class' => RelatedDummyEntity::class,
+                'output_class' => RelatedDummyEntity::class,
                 'shortNames' => ['relatedDummyEntity', 'dummyEntity'],
                 'identifiers' => [
                     ['id', DummyEntity::class, true],
@@ -451,6 +485,8 @@ class SubresourceOperationFactoryTest extends TestCase
                 'property' => 'secondSubresource',
                 'collection' => false,
                 'resource_class' => DummyValidatedEntity::class,
+                'input_class' => DummyValidatedEntity::class,
+                'output_class' => DummyValidatedEntity::class,
                 'shortNames' => ['dummyValidatedEntity', 'dummyEntity'],
                 'identifiers' => [
                     ['id', DummyEntity::class, true],
@@ -494,6 +530,8 @@ class SubresourceOperationFactoryTest extends TestCase
                 'property' => 'subresource',
                 'collection' => false,
                 'resource_class' => DummyEntity::class,
+                'input_class' => DummyEntity::class,
+                'output_class' => DummyEntity::class,
                 'shortNames' => ['dummyEntity'],
                 'identifiers' => [
                     ['id', DummyEntity::class, true],
@@ -539,6 +577,8 @@ class SubresourceOperationFactoryTest extends TestCase
                 'property' => 'subresource',
                 'collection' => true,
                 'resource_class' => RelatedDummyEntity::class,
+                'input_class' => RelatedDummyEntity::class,
+                'output_class' => RelatedDummyEntity::class,
                 'shortNames' => ['relatedDummyEntity', 'dummyEntity'],
                 'identifiers' => [
                     ['id', DummyEntity::class, true],
@@ -551,6 +591,8 @@ class SubresourceOperationFactoryTest extends TestCase
                 'property' => 'id',
                 'collection' => false,
                 'resource_class' => DummyEntity::class,
+                'input_class' => DummyEntity::class,
+                'output_class' => DummyEntity::class,
                 'shortNames' => ['dummyEntity', 'relatedDummyEntity'],
                 'identifiers' => [
                     ['id', DummyEntity::class, true],
@@ -597,6 +639,8 @@ class SubresourceOperationFactoryTest extends TestCase
                 'property' => 'subresource',
                 'collection' => false,
                 'resource_class' => RelatedDummyEntity::class,
+                'input_class' => RelatedDummyEntity::class,
+                'output_class' => RelatedDummyEntity::class,
                 'shortNames' => ['relatedDummyEntity', 'dummyEntity'],
                 'identifiers' => [
                     ['id', DummyEntity::class, true],
@@ -646,6 +690,8 @@ class SubresourceOperationFactoryTest extends TestCase
                 'identifiers' => [
                     ['id', DummyEntity::class, true],
                 ],
+                'input_class' => RelatedDummyEntity::class,
+                'output_class' => RelatedDummyEntity::class,
                 'route_name' => 'api_dummy_entities_subresource_get_subresource',
                 'path' => '/root_resource_prefix/dummy_entities/{id}/subresource.{_format}',
                 'operation_name' => 'subresource_get_subresource',
