@@ -23,9 +23,9 @@ use Symfony\Component\DependencyInjection\ContainerInterface as SymfonyContainer
  */
 abstract class AbstractExtractor implements ExtractorInterface
 {
-    private $container;
     protected $paths;
     protected $resources;
+    private $container;
 
     /**
      * @param string[] $paths
@@ -61,16 +61,17 @@ abstract class AbstractExtractor implements ExtractorInterface
     /**
      * Recursively replaces placeholders with the service container parameters.
      *
-     * @see https://github.com/symfony/symfony/blob/master/src/Symfony/Component/Routing/Router.php
+     * @see https://github.com/symfony/symfony/blob/6fec32c/src/Symfony/Bundle/FrameworkBundle/Routing/Router.php
+     *
      * @copyright (c) Fabien Potencier <fabien@symfony.com>
      *
      * @param mixed $value The source which might contain "%placeholders%"
      *
-     * @return mixed The source with the placeholders replaced by the container
-     *               parameters. Arrays are resolved recursively.
-     *
      * @throws ParameterNotFoundException When a placeholder does not exist as a container parameter
      * @throws RuntimeException           When a container value is not a string or a numeric value
+     *
+     * @return mixed The source with the placeholders replaced by the container
+     *               parameters. Arrays are resolved recursively.
      */
     protected function resolve($value)
     {
