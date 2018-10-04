@@ -207,7 +207,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             ));
         }
 
-        $container->getDefinition('api_platform.metadata.extractor.xml')->addArgument($xmlResources);
+        $container->getDefinition('api_platform.metadata.extractor.xml')->replaceArgument(0, $xmlResources);
 
         if (class_exists(Annotation::class)) {
             $loader->load('metadata/annotation.xml');
@@ -215,7 +215,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
 
         if (class_exists(Yaml::class)) {
             $loader->load('metadata/yaml.xml');
-            $container->getDefinition('api_platform.metadata.extractor.yaml')->addArgument($yamlResources);
+            $container->getDefinition('api_platform.metadata.extractor.yaml')->replaceArgument(0, $yamlResources);
         }
 
         if (interface_exists(DocBlockFactoryInterface::class)) {

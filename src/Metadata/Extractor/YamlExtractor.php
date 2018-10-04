@@ -53,6 +53,7 @@ final class YamlExtractor extends AbstractExtractor
     private function extractResources(array $resourcesYaml, string $path)
     {
         foreach ($resourcesYaml as $resourceName => $resourceYaml) {
+            $this->resolve($resourceName);
             if (null === $resourceYaml) {
                 $resourceYaml = [];
             }
