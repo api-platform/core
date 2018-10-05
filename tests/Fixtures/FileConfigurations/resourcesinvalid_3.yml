@@ -1,0 +1,3 @@
+resources:
+    'Foo':
+        properties: 'invalid'

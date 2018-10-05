@@ -39,7 +39,7 @@ final class XmlExtractor extends AbstractExtractor
         }
 
         foreach ($xml->resource as $resource) {
-            $resourceClass = (string) $resource['class'];
+            $resourceClass = $this->resolve((string) $resource['class']);
 
             $this->resources[$resourceClass] = [
                 'shortName' => $this->phpize($resource, 'shortName', 'string'),
