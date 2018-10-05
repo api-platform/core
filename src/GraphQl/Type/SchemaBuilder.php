@@ -71,11 +71,11 @@ final class SchemaBuilder implements SchemaBuilderInterface
         $this->defaultFieldResolver = $defaultFieldResolver;
         $this->filterLocator = $filterLocator;
         $this->paginationEnabled = $paginationEnabled;
-        $this->graphqlTypes['Iterable'] = new IterableType();
     }
 
     public function getSchema(): Schema
     {
+        $this->graphqlTypes['Iterable'] = new IterableType();
         $queryFields = ['node' => $this->getNodeQueryField()];
         $mutationFields = [];
 
