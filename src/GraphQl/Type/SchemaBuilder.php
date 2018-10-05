@@ -366,6 +366,10 @@ final class SchemaBuilder implements SchemaBuilderInterface
                 }
 
                 $resourceClass = $this->isCollection($type) ? $type->getCollectionValueType()->getClassName() : $type->getClassName();
+                if (null === $resourceClass) {
+                    return null;
+                }
+
                 try {
                     $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
                     if ([] === $resourceMetadata->getGraphql() ?? []) {

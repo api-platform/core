@@ -209,6 +209,37 @@ class SchemaBuilderTest extends TestCase
         );
     }
 
+    /**
+     * Tests that the GraphQL SchemaBuilder supports an edge case where a property is typed as an Type::BUILTIN_TYPE_OBJECT but has no class related.
+     */
+    public function testObjectTypeWithoutClass()
+    {
+        $propertyMetadataMockBuilder = function ($builtinType, $resourceClassName) {
+            return new PropertyMetadata(
+                new Type(
+                    $builtinType
+                ),
+                "{$builtinType}Description",
+                true,
+                true,
+                null,
+                null,
+                null
+            );
+        };
+
+        $mockedSchemaBuilder = $this->createSchemaBuilder($propertyMetadataMockBuilder, false);
+        $this->assertEquals([
+            'node',
+            'shortName1',
+            'shortName1s',
+            'shortName2',
+            'shortName2s',
+            'shortName3',
+            'shortName3s',
+        ], array_keys($mockedSchemaBuilder->getSchema()->getConfig()->getQuery()->getFields()));
+    }
+
     public function paginationProvider(): array
     {
         return [
