@@ -5,10 +5,6 @@ clone_folder: c:\projects\api-platform\core
 cache:
   - '%LOCALAPPDATA%\Composer\files'
 
-environment:
-  SYMFONY_DEPRECATIONS_HELPER: weak_vendors
-  APP_ENV: test
-
 install:
   - ps: Set-Service wuauserv -StartupType Manual
   - cinst -y php composer

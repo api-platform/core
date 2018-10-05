@@ -18,7 +18,10 @@ use ApiPlatform\Core\DataPersister\DataPersisterInterface;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use PHPUnit\Framework\TestCase;
+use Prophecy\Prediction\CallPrediction;
+use Prophecy\Prediction\NoCallsPrediction;
 
 /**
  * @author Baptiste Meyer <baptiste.meyer@gmail.com>
@@ -69,6 +72,7 @@ class DataPersisterTest extends TestCase
         $objectManagerProphecy->persist($dummy)->shouldNotBeCalled();
         $objectManagerProphecy->flush()->shouldBeCalled();
         $objectManagerProphecy->refresh($dummy)->shouldBeCalled();
+        $objectManagerProphecy->getClassMetadata(Dummy::class)->willReturn(null)->shouldBeCalled();
 
         $managerRegistryProphecy = $this->prophesize(ManagerRegistry::class);
         $managerRegistryProphecy->getManagerForClass(Dummy::class)->willReturn($objectManagerProphecy->reveal())->shouldBeCalled();
@@ -108,5 +112,37 @@ class DataPersisterTest extends TestCase
         $managerRegistryProphecy->getManagerForClass(Dummy::class)->willReturn(null)->shouldBeCalled();
 
         (new DataPersister($managerRegistryProphecy->reveal()))->remove(new Dummy());
+    }
+
+    public function getTrackingPolicyParameters()
+    {
+        return [
+            'deferred explicit' => [true, true],
+            'deferred implicit' => [false, false],
+        ];
+    }
+
+    /**
+     * @dataProvider getTrackingPolicyParameters
+     */
+    public function testTrackingPolicy($deferredExplicit, $persisted)
+    {
+        $dummy = new Dummy();
+
+        $classMetadataInfo = $this->prophesize(ClassMetadataInfo::class);
+        $classMetadataInfo->isChangeTrackingDeferredExplicit()->willReturn($deferredExplicit)->shouldBeCalled();
+
+        $objectManagerProphecy = $this->prophesize(ObjectManager::class);
+        $objectManagerProphecy->getClassMetadata(Dummy::class)->willReturn($classMetadataInfo)->shouldBeCalled();
+        $objectManagerProphecy->contains($dummy)->willReturn(true);
+        $objectManagerProphecy->persist($dummy)->should($persisted ? new CallPrediction() : new NoCallsPrediction());
+        $objectManagerProphecy->flush()->shouldBeCalled();
+        $objectManagerProphecy->refresh($dummy)->shouldBeCalled();
+
+        $managerRegistryProphecy = $this->prophesize(ManagerRegistry::class);
+        $managerRegistryProphecy->getManagerForClass(Dummy::class)->willReturn($objectManagerProphecy)->shouldBeCalled();
+
+        $result = (new DataPersister($managerRegistryProphecy->reveal()))->persist($dummy);
+        $this->assertSame($dummy, $result);
     }
 }

@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity;
 
-use ApiPlatform\Core\Annotation\ApiProperty;
 use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
@@ -28,7 +27,7 @@ use Symfony\Component\Serializer\Annotation\MaxDepth;
  *
  * @author Brian Fox <brian@brianfox.fr>
  */
-class MaxDepthDummy
+class MaxDepthEagerDummy
 {
     /**
      * @ORM\Column(type="integer")
@@ -45,8 +44,7 @@ class MaxDepthDummy
     public $name;
 
     /**
-     * @ORM\ManyToOne(targetEntity="MaxDepthDummy", cascade={"persist"})
-     * @ApiProperty(attributes={"fetch_eager"=false})
+     * @ORM\ManyToOne(targetEntity="MaxDepthEagerDummy", cascade={"persist"})
      * @Groups({"default"})
      * @MaxDepth(1)
      */
