@@ -15,7 +15,6 @@ namespace ApiPlatform\Core\Metadata\Extractor;
 
 use Psr\Container\ContainerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface as SymfonyContainerInterface;
-use function array_key_exists;
 
 /**
  * Base file extractor.
