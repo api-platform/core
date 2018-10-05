@@ -62,6 +62,21 @@ class IriConverterTest extends TestCase
         $converter->getItemFromIri('/users/3');
     }
 
+    public function testGetItemFromIriCollectionRouteException()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('The iri "/users" references a collection not an item.');
+
+        $routerProphecy = $this->prophesize(RouterInterface::class);
+        $routerProphecy->match('/users')->willReturn([
+            '_api_resource_class' => Dummy::class,
+            '_api_collection_operation_name' => 'get',
+        ])->shouldBeCalledTimes(1);
+
+        $converter = $this->getIriConverter($routerProphecy);
+        $converter->getItemFromIri('/users');
+    }
+
     public function testGetItemFromIriItemNotFoundException()
     {
         $this->expectException(ItemNotFoundException::class);
