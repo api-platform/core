@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.3.3
+
+* Doctrine: revert "prevent data duplication in Eager loaded relations"
+
 ## 2.3.2
 
 * Open API/Swagger: detect correctly collection parameters

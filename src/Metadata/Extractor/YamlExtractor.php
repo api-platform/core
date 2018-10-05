@@ -53,6 +53,8 @@ final class YamlExtractor extends AbstractExtractor
     private function extractResources(array $resourcesYaml, string $path)
     {
         foreach ($resourcesYaml as $resourceName => $resourceYaml) {
+            $resourceName = $this->resolve($resourceName);
+
             if (null === $resourceYaml) {
                 $resourceYaml = [];
             }
@@ -108,7 +110,7 @@ final class YamlExtractor extends AbstractExtractor
                 'required' => $this->phpize($propertyValues, 'required', 'bool'),
                 'identifier' => $this->phpize($propertyValues, 'identifier', 'bool'),
                 'iri' => $this->phpize($propertyValues, 'iri', 'string'),
-                'attributes' => $propertyValues['attributes'] ?? null,
+                'attributes' => $propertyValues['attributes'] ?? [],
                 'subresource' => $propertyValues['subresource'] ?? null,
             ];
         }

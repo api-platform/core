@@ -64,7 +64,7 @@ final class EntrypointAction
         try {
             $executionResult = $this->executor->executeQuery($this->schemaBuilder->getSchema(), $query, null, null, $variables, $operation);
         } catch (\Exception $e) {
-            $executionResult = new ExecutionResult(null, [$e]);
+            $executionResult = new ExecutionResult(null, [$e] + ($this->debug ? ['trace' => $e->getTraceAsString()] : []));
         }
 
         return new JsonResponse($executionResult->toArray($this->debug));

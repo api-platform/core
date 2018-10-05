@@ -651,7 +651,7 @@ class ApiPlatformExtensionTest extends TestCase
 
         foreach (['yaml', 'xml'] as $format) {
             $definitionProphecy = $this->prophesize(Definition::class);
-            $definitionProphecy->addArgument(Argument::type('array'))->shouldBeCalled();
+            $definitionProphecy->replaceArgument(0, Argument::type('array'))->shouldBeCalled();
             $containerBuilderProphecy->getDefinition('api_platform.metadata.extractor.'.$format)->willReturn($definitionProphecy->reveal())->shouldBeCalled();
         }
 

@@ -1,0 +1,4 @@
+resources:
+    'Foo':
+        properties:
+            myprop: 'invalid'

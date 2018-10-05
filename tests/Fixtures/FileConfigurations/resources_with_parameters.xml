@@ -1,0 +1,82 @@
+<?xml version="1.0" ?>
+
+<resources xmlns="https://api-platform.com/schema/metadata"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="https://api-platform.com/schema/metadata
+           https://api-platform.com/schema/metadata/metadata-2.0.xsd">
+    <resource class="%dummy_class%"/>
+    <resource class="%dummy_class%Bis"/>
+    <resource
+            class="%file_config_dummy_class%"
+            shortName="thedummyshortname"
+            description="Dummy resource"
+            iri="someirischema"
+    >
+        <itemOperations>
+            <itemOperation name="my_op_name">
+                <attribute name="method">GET</attribute>
+            </itemOperation>
+            <itemOperation name="my_other_op_name">
+                <attribute name="method">POST</attribute>
+            </itemOperation>
+        </itemOperations>
+        <collectionOperations>
+            <collectionOperation name="my_collection_op">
+                <attribute name="method">POST</attribute>
+                <attribute name="path">the/collection/path</attribute>
+            </collectionOperation>
+        </collectionOperations>
+        <subresourceOperations>
+            <subresourceOperation name="my_collection_subresource">
+                <attribute name="path">the/subresource/path</attribute>
+            </subresourceOperation>
+        </subresourceOperations>
+        <graphql>
+            <operation name="query">
+                <attribute name="normalization_context">
+                    <attribute name="groups">
+                        <attribute>graphql</attribute>
+                    </attribute>
+                </attribute>
+            </operation>
+        </graphql>
+        <attribute name="normalization_context">
+            <attribute name="groups">
+                <attribute>default</attribute>
+            </attribute>
+        </attribute>
+        <attribute name="denormalization_context">
+            <attribute name="groups">
+                <attribute>default</attribute>
+            </attribute>
+        </attribute>
+        <attribute name="hydra_context">
+            <attribute name="@type">hydra:Operation</attribute>
+            <attribute name="@hydra:title">File config Dummy</attribute>
+        </attribute>
+
+        <property
+                name="foo"
+                description="The dummy foo"
+                readable="true"
+                writable="true"
+                readableLink="false"
+                writableLink="false"
+                required="true"
+        >
+            <subresource collection="true" resourceClass="Foo" maxDepth="1" />
+            <attribute name="foo">
+                <attribute>Foo</attribute>
+            </attribute>
+            <attribute name="bar">
+                <attribute>
+                    <attribute>Bar</attribute>
+                </attribute>
+                <attribute name="baz">Baz</attribute>
+            </attribute>
+            <attribute name="baz">Baz</attribute>
+        </property>
+
+        <property name="name" description="The dummy name"/>
+    </resource>
+</resources>
