@@ -11,6 +11,37 @@
 
 declare(strict_types=1);
 
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\Answer as AnswerDocument;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\CompositeItem as CompositeItemDocument;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\CompositeLabel as CompositeLabelDocument;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\CompositePrimitiveItem as CompositePrimitiveItemDocument;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\CompositeRelation as CompositeRelationDocument;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\Dummy as DummyDocument;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\DummyAggregateOffer as DummyAggregateOfferDocument;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\DummyCar as DummyCarDocument;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\DummyCarColor as DummyCarColorDocument;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\DummyDate as DummyDateDocument;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\DummyFriend as DummyFriendDocument;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\DummyGroup as DummyGroupDocument;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\DummyOffer as DummyOfferDocument;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\DummyProduct as DummyProductDocument;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\DummyProperty as DummyPropertyDocument;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\EmbeddableDummy as EmbeddableDummyDocument;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\EmbeddedDummy as EmbeddedDummyDocument;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\Foo as FooDocument;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\FourthLevel as FourthLevelDocument;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\Greeting as GreetingDocument;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\MaxDepthDummy as MaxDepthDummyDocument;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\Person as PersonDocument;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\PersonToPet as PersonToPetDocument;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\Pet as PetDocument;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\Question as QuestionDocument;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\RelatedDummy as RelatedDummyDocument;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\RelatedToDummyFriend as RelatedToDummyFriendDocument;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\RelationEmbedder as RelationEmbedderDocument;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\SecuredDummy as SecuredDummyDocument;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\ThirdLevel as ThirdLevelDocument;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\User as UserDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Answer;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\CompositeItem;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\CompositeLabel;
@@ -49,35 +80,6 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\SecuredDummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\ThirdLevel;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\User;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\UuidIdentifierDummy;
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\Answer as AnswerDocument;
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\CompositeItem as CompositeItemDocument;
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\CompositeLabel as CompositeLabelDocument;
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\CompositePrimitiveItem as CompositePrimitiveItemDocument;
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\CompositeRelation as CompositeRelationDocument;
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\Dummy as DummyDocument;
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\DummyAggregateOffer as DummyAggregateOfferDocument;
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\DummyCar as DummyCarDocument;
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\DummyCarColor as DummyCarColorDocument;
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\DummyDate as DummyDateDocument;
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\DummyFriend as DummyFriendDocument;
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\DummyGroup as DummyGroupDocument;
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\DummyOffer as DummyOfferDocument;
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\DummyProduct as DummyProductDocument;
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\EmbeddableDummy as EmbeddableDummyDocument;
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\EmbeddedDummy as EmbeddedDummyDocument;
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\Foo as FooDocument;
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\FourthLevel as FourthLevelDocument;
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\Greeting as GreetingDocument;
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\Person as PersonDocument;
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\PersonToPet as PersonToPetDocument;
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\Pet as PetDocument;
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\Question as QuestionDocument;
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\RelatedDummy as RelatedDummyDocument;
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\RelatedToDummyFriend as RelatedToDummyFriendDocument;
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\RelationEmbedder as RelationEmbedderDocument;
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\SecuredDummy as SecuredDummyDocument;
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\ThirdLevel as ThirdLevelDocument;
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\User as UserDocument;
 use Behat\Behat\Context\Context;
 use Behat\Behat\Context\SnippetAcceptingContext;
 use Behat\Behat\Hook\Scope\AfterStepScope;
@@ -237,7 +239,7 @@ final class FeatureContext implements Context, SnippetAcceptingContext
     public function thereAreDummyPropertyObjects(int $nb)
     {
         for ($i = 1; $i <= $nb; ++$i) {
-            $dummyProperty = new DummyProperty();
+            $dummyProperty = $this->buildDummyProperty();
             $dummyGroup = $this->buildDummyGroup();
 
             foreach (['foo', 'bar', 'baz'] as $property) {
@@ -265,7 +267,7 @@ final class FeatureContext implements Context, SnippetAcceptingContext
         $this->manager->persist($dummyGroup);
 
         for ($i = 1; $i <= $nb; ++$i) {
-            $dummyProperty = new DummyProperty();
+            $dummyProperty = $this->buildDummyProperty();
 
             foreach (['foo', 'bar', 'baz'] as $property) {
                 $dummyProperty->$property = ucfirst($property).' #'.$i;
@@ -285,7 +287,7 @@ final class FeatureContext implements Context, SnippetAcceptingContext
     {
         for ($i = 1; $i <= $nb; ++$i) {
             $dummyGroup = $this->buildDummyGroup();
-            $dummyProperty = new DummyProperty();
+            $dummyProperty = $this->buildDummyProperty();
 
             foreach (['foo', 'bar', 'baz'] as $property) {
                 $dummyProperty->$property = $dummyGroup->$property = ucfirst($property).' #'.$i;
@@ -310,7 +312,7 @@ final class FeatureContext implements Context, SnippetAcceptingContext
     public function thereAreDummyPropertyObjectsWithGroups(int $nb, int $nb2)
     {
         for ($i = 1; $i <= $nb; ++$i) {
-            $dummyProperty = new DummyProperty();
+            $dummyProperty = $this->buildDummyProperty();
             $dummyGroup = $this->buildDummyGroup();
 
             foreach (['foo', 'bar', 'baz'] as $property) {
@@ -1063,12 +1065,12 @@ final class FeatureContext implements Context, SnippetAcceptingContext
      */
     public function thereIsAMaxDepthDummyWithLevelOfDescendants(int $level)
     {
-        $maxDepthDummy = new MaxDepthDummy();
+        $maxDepthDummy = $this->buildMaxDepthDummy();
         $maxDepthDummy->name = "level $level";
         $this->manager->persist($maxDepthDummy);
 
         for ($i = 1; $i <= $level; ++$i) {
-            $maxDepthDummy = $maxDepthDummy->child = new MaxDepthDummy();
+            $maxDepthDummy = $maxDepthDummy->child = $this->buildMaxDepthDummy();
             $maxDepthDummy->name = 'level '.($i + 1);
             $this->manager->persist($maxDepthDummy);
         }
@@ -1199,6 +1201,14 @@ final class FeatureContext implements Context, SnippetAcceptingContext
     }
 
     /**
+     * @return DummyProperty|DummyPropertyDocument
+     */
+    private function buildDummyProperty()
+    {
+        return $this->isOrm() ? new DummyProperty() : new DummyPropertyDocument();
+    }
+
+    /**
      * @return EmbeddableDummy|EmbeddableDummyDocument
      */
     private function buildEmbeddableDummy()
@@ -1236,6 +1246,14 @@ final class FeatureContext implements Context, SnippetAcceptingContext
     private function buildGreeting()
     {
         return $this->isOrm() ? new Greeting() : new GreetingDocument();
+    }
+
+    /**
+     * @return MaxDepthDummy|MaxDepthDummyDocument
+     */
+    private function buildMaxDepthDummy()
+    {
+        return $this->isOrm() ? new MaxDepthDummy() : new MaxDepthDummyDocument();
     }
 
     /**

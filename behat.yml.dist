@@ -36,7 +36,7 @@ default:
         - 'HydraContext'
         - 'SwaggerContext'
         - 'HttpCacheContext'
-        - 'JsonApiContext': { doctrine: '@doctrine', jsonApiSchemaFile: 'tests/Fixtures/JsonSchema/jsonapi.json' }
+        - 'JsonApiContext': { doctrine: '@doctrine_mongodb', jsonApiSchemaFile: 'tests/Fixtures/JsonSchema/jsonapi.json' }
         - 'JsonHalContext': { schemaFile: 'tests/Fixtures/JsonHal/jsonhal.json' }
         - 'Behat\MinkExtension\Context\MinkContext'
         - 'Behatch\Context\RestContext'
