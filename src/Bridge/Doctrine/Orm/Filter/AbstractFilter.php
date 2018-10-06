@@ -286,6 +286,12 @@ abstract class AbstractFilter implements FilterInterface
         if (\func_num_args() > 5) {
             $joinType = func_get_arg(5);
         } else {
+            if (__CLASS__ !== \get_class($this)) {
+                $r = new \ReflectionMethod($this, __FUNCTION__);
+                if (__CLASS__ !== $r->getDeclaringClass()->getName()) {
+                    @trigger_error(sprintf('Method %s() will have a sixth `$joinType` argument in version API Platform 3.0. Not defining it is deprecated since API Platform 2.3.', __FUNCTION__), E_USER_DEPRECATED);
+                }
+            }
             $joinType = null;
         }
 
