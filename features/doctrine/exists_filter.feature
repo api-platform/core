@@ -6,7 +6,7 @@ Feature: Exists filter on collections
   @createSchema
   Scenario: Get collection where exists does not exist
     Given there are 15 dummy objects with dummyBoolean true
-    When I send a "GET" request to "/dummies?dummyBoolean[exists]=0"
+    When I send a "GET" request to "/dummies?exists[dummyBoolean]=0"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
@@ -26,7 +26,7 @@ Feature: Exists filter on collections
         "hydra:view": {
           "type": "object",
           "properties": {
-            "@id": {"pattern": "^/dummies\\?dummyBoolean%5Bexists%5D=0$"},
+            "@id": {"pattern": "^/dummies\\?exists%5BdummyBoolean%5D=0$"},
             "@type": {"pattern": "^hydra:PartialCollectionView$"}
           }
         }
@@ -35,7 +35,7 @@ Feature: Exists filter on collections
     """
 
   Scenario: Get collection where exists does exist
-    When I send a "GET" request to "/dummies?dummyBoolean[exists]=1"
+    When I send a "GET" request to "/dummies?exists[dummyBoolean]=1"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
@@ -55,7 +55,7 @@ Feature: Exists filter on collections
         "hydra:view": {
           "type": "object",
           "properties": {
-            "@id": {"pattern": "^/dummies\\?dummyBoolean%5Bexists%5D=1&page=1$"},
+            "@id": {"pattern": "^/dummies\\?exists%5BdummyBoolean%5D=1&page=1$"},
             "@type": {"pattern": "^hydra:PartialCollectionView$"}
           }
         }

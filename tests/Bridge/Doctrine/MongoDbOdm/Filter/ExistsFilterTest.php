@@ -16,6 +16,7 @@ namespace ApiPlatform\Core\Tests\Bridge\Doctrine\MongoDbOdm\Filter;
 use ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Filter\ExistsFilter;
 use ApiPlatform\Core\Test\DoctrineMongoDbOdmFilterTestCase;
 use ApiPlatform\Core\Tests\Bridge\Doctrine\Common\Filter\ExistsFilterTestTrait;
+use Doctrine\Common\Persistence\ManagerRegistry;
 
 /**
  * @author Alan Poulain <contact@alanpoulain.eu>
@@ -31,77 +32,77 @@ class ExistsFilterTest extends DoctrineMongoDbOdmFilterTestCase
         $filter = $this->buildFilter();
 
         $this->assertEquals([
-            'id[exists]' => [
+            'exists[id]' => [
                 'property' => 'id',
                 'type' => 'bool',
                 'required' => false,
             ],
-            'alias[exists]' => [
+            'exists[alias]' => [
                 'property' => 'alias',
                 'type' => 'bool',
                 'required' => false,
             ],
-            'description[exists]' => [
+            'exists[description]' => [
                 'property' => 'description',
                 'type' => 'bool',
                 'required' => false,
             ],
-            'dummy[exists]' => [
+            'exists[dummy]' => [
                 'property' => 'dummy',
                 'type' => 'bool',
                 'required' => false,
             ],
-            'dummyDate[exists]' => [
+            'exists[dummyDate]' => [
                 'property' => 'dummyDate',
                 'type' => 'bool',
                 'required' => false,
             ],
-            'dummyFloat[exists]' => [
+            'exists[dummyFloat]' => [
                 'property' => 'dummyFloat',
                 'type' => 'bool',
                 'required' => false,
             ],
-            'dummyPrice[exists]' => [
+            'exists[dummyPrice]' => [
                 'property' => 'dummyPrice',
                 'type' => 'bool',
                 'required' => false,
             ],
-            'jsonData[exists]' => [
+            'exists[jsonData]' => [
                 'property' => 'jsonData',
                 'type' => 'bool',
                 'required' => false,
             ],
-            'arrayData[exists]' => [
+            'exists[arrayData]' => [
                 'property' => 'arrayData',
                 'type' => 'bool',
                 'required' => false,
             ],
-            'nameConverted[exists]' => [
+            'exists[nameConverted]' => [
                 'property' => 'nameConverted',
                 'type' => 'bool',
                 'required' => false,
             ],
-            'dummyBoolean[exists]' => [
+            'exists[dummyBoolean]' => [
                 'property' => 'dummyBoolean',
                 'type' => 'bool',
                 'required' => false,
             ],
-            'relatedDummy[exists]' => [
+            'exists[relatedDummy]' => [
                 'property' => 'relatedDummy',
                 'type' => 'bool',
                 'required' => false,
             ],
-            'relatedDummies[exists]' => [
+            'exists[relatedDummies]' => [
                 'property' => 'relatedDummies',
                 'type' => 'bool',
                 'required' => false,
             ],
-            'relatedOwnedDummy[exists]' => [
+            'exists[relatedOwnedDummy]' => [
                 'property' => 'relatedOwnedDummy',
                 'type' => 'bool',
                 'required' => false,
             ],
-            'relatedOwningDummy[exists]' => [
+            'exists[relatedOwningDummy]' => [
                 'property' => 'relatedOwningDummy',
                 'type' => 'bool',
                 'required' => false,
@@ -111,6 +112,13 @@ class ExistsFilterTest extends DoctrineMongoDbOdmFilterTestCase
 
     public function provideApplyTestData(): array
     {
+        $existsFilterFactory = function (ManagerRegistry $managerRegistry, array $properties = null): ExistsFilter {
+            return new ExistsFilter($managerRegistry, null, 'exists', $properties);
+        };
+        $customExistsFilterFactory = function (ManagerRegistry $managerRegistry, array $properties = null): ExistsFilter {
+            return new ExistsFilter($managerRegistry, null, 'customExists', $properties);
+        };
+
         return array_merge_recursive(
             $this->provideApplyTestArguments(),
             [
@@ -124,6 +132,7 @@ class ExistsFilterTest extends DoctrineMongoDbOdmFilterTestCase
                             ],
                         ],
                     ],
+                    $existsFilterFactory,
                 ],
 
                 'valid values (empty for true)' => [
@@ -136,6 +145,7 @@ class ExistsFilterTest extends DoctrineMongoDbOdmFilterTestCase
                             ],
                         ],
                     ],
+                    $existsFilterFactory,
                 ],
 
                 'valid values (1 for true)' => [
@@ -148,10 +158,12 @@ class ExistsFilterTest extends DoctrineMongoDbOdmFilterTestCase
                             ],
                         ],
                     ],
+                    $existsFilterFactory,
                 ],
 
                 'invalid values' => [
                     [],
+                    $existsFilterFactory,
                 ],
 
                 'negative values' => [
@@ -162,6 +174,7 @@ class ExistsFilterTest extends DoctrineMongoDbOdmFilterTestCase
                             ],
                         ],
                     ],
+                    $existsFilterFactory,
                 ],
 
                 'negative values (0)' => [
@@ -172,6 +185,74 @@ class ExistsFilterTest extends DoctrineMongoDbOdmFilterTestCase
                             ],
                         ],
                     ],
+                    $existsFilterFactory,
+                ],
+
+                'multiple values (true and true)' => [
+                    [
+                        [
+                            '$match' => [
+                                'alias' => [
+                                    '$ne' => null,
+                                ],
+                            ],
+                        ],
+                        [
+                            '$match' => [
+                                'description' => [
+                                    '$ne' => null,
+                                ],
+                            ],
+                        ],
+                    ],
+                    $existsFilterFactory,
+                ],
+
+                'multiple values (1 and 0)' => [
+                    [
+                        [
+                            '$match' => [
+                                'alias' => [
+                                    '$ne' => null,
+                                ],
+                            ],
+                        ],
+                        [
+                            '$match' => [
+                                'description' => null,
+                            ],
+                        ],
+                    ],
+                    $existsFilterFactory,
+                ],
+
+                'multiple values (false and 0)' => [
+                    [
+                        [
+                            '$match' => [
+                                'alias' => null,
+                            ],
+                        ],
+                        [
+                            '$match' => [
+                                'description' => null,
+                            ],
+                        ],
+                    ],
+                    $existsFilterFactory,
+                ],
+
+                'custom exists parameter name' => [
+                    [
+                        [
+                            '$match' => [
+                                'description' => [
+                                    '$ne' => null,
+                                ],
+                            ],
+                        ],
+                    ],
+                    $customExistsFilterFactory,
                 ],
 
                 'related values' => [
@@ -202,6 +283,7 @@ class ExistsFilterTest extends DoctrineMongoDbOdmFilterTestCase
                             ],
                         ],
                     ],
+                    $existsFilterFactory,
                 ],
 
                 'not nullable values' => [
@@ -214,6 +296,7 @@ class ExistsFilterTest extends DoctrineMongoDbOdmFilterTestCase
                             ],
                         ],
                     ],
+                    $existsFilterFactory,
                 ],
 
                 'related collection not empty' => [
@@ -233,6 +316,7 @@ class ExistsFilterTest extends DoctrineMongoDbOdmFilterTestCase
                             ],
                         ],
                     ],
+                    $existsFilterFactory,
                 ],
 
                 'related collection empty' => [
@@ -250,6 +334,7 @@ class ExistsFilterTest extends DoctrineMongoDbOdmFilterTestCase
                             ],
                         ],
                     ],
+                    $existsFilterFactory,
                 ],
 
                 'related association exists' => [
@@ -269,6 +354,7 @@ class ExistsFilterTest extends DoctrineMongoDbOdmFilterTestCase
                             ],
                         ],
                     ],
+                    $existsFilterFactory,
                 ],
 
                 'related association does not exist' => [
@@ -286,6 +372,7 @@ class ExistsFilterTest extends DoctrineMongoDbOdmFilterTestCase
                             ],
                         ],
                     ],
+                    $existsFilterFactory,
                 ],
 
                 'related owned association does not exist' => [
@@ -296,6 +383,7 @@ class ExistsFilterTest extends DoctrineMongoDbOdmFilterTestCase
                             ],
                         ],
                     ],
+                    $existsFilterFactory,
                 ],
 
                 'related owned association exists' => [
@@ -308,6 +396,7 @@ class ExistsFilterTest extends DoctrineMongoDbOdmFilterTestCase
                             ],
                         ],
                     ],
+                    $existsFilterFactory,
                 ],
 
                 'related owning association does not exist' => [
@@ -318,6 +407,7 @@ class ExistsFilterTest extends DoctrineMongoDbOdmFilterTestCase
                             ],
                         ],
                     ],
+                    $existsFilterFactory,
                 ],
 
                 'related owning association exists' => [
@@ -330,8 +420,46 @@ class ExistsFilterTest extends DoctrineMongoDbOdmFilterTestCase
                             ],
                         ],
                     ],
+                    $existsFilterFactory,
                 ],
             ]
         );
+    }
+
+    /**
+     * @group legacy
+     * @expectedDeprecation The ExistsFilter syntax "description[exists]=true/false" is deprecated since 2.5. Use the syntax "exists[description]=true/false" instead.
+     */
+    public function testLegacyExistsAfterSyntax()
+    {
+        $args = [
+            [
+                'description' => null,
+            ],
+            [
+                'description' => [
+                    'exists' => 'true',
+                ],
+            ],
+            [
+                [
+                    '$match' => [
+                        'description' => [
+                            '$ne' => null,
+                        ],
+                    ],
+                ],
+            ],
+            function (ManagerRegistry $managerRegistry, array $properties = null): ExistsFilter {
+                return new ExistsFilter($managerRegistry, null, 'exists', $properties);
+            },
+        ];
+
+        $this->testApply(...$args);
+    }
+
+    protected function buildFilter(?array $properties = null)
+    {
+        return new $this->filterClass($this->managerRegistry, null, 'exists', $properties);
     }
 }

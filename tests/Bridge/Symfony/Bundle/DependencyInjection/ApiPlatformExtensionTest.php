@@ -653,6 +653,7 @@ class ApiPlatformExtensionTest extends TestCase
         })->shouldBeCalled();
 
         $parameters = [
+            'api_platform.collection.exists_parameter_name' => 'exists',
             'api_platform.collection.order' => 'ASC',
             'api_platform.collection.order_parameter_name' => 'order',
             'api_platform.description' => 'description',
