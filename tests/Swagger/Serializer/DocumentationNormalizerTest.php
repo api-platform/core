@@ -1229,6 +1229,13 @@ class DocumentationNormalizerTest extends TestCase
                 'required' => false,
                 'strategy' => 'partial',
             ]]),
+            'f3' => new DummyFilter(['toto' => [
+                'property' => 'name',
+                'type' => 'array',
+                'is_collection' => true,
+                'required' => true,
+                'strategy' => 'exact',
+            ]]),
         ];
 
         foreach ($filters as $filterId => $filter) {
@@ -1236,7 +1243,7 @@ class DocumentationNormalizerTest extends TestCase
             $filterLocatorProphecy->get($filterId)->willReturn($filter)->shouldBeCalled();
         }
 
-        $filterLocatorProphecy->has('f3')->willReturn(false)->shouldBeCalled();
+        $filterLocatorProphecy->has('f4')->willReturn(false)->shouldBeCalled();
 
         $this->normalizeWithFilters($filterLocatorProphecy->reveal());
     }
@@ -1260,6 +1267,13 @@ class DocumentationNormalizerTest extends TestCase
                 'type' => 'int',
                 'required' => false,
                 'strategy' => 'partial',
+            ]]),
+            'f3' => new DummyFilter(['toto' => [
+                'property' => 'name',
+                'type' => 'array',
+                'is_collection' => true,
+                'required' => true,
+                'strategy' => 'exact',
             ]]),
         ]));
     }
@@ -1651,7 +1665,7 @@ class DocumentationNormalizerTest extends TestCase
             'This is a dummy.',
             null,
             [],
-            ['get' => ['method' => 'GET', 'filters' => ['f1', 'f2', 'f3']]],
+            ['get' => ['method' => 'GET', 'filters' => ['f1', 'f2', 'f3', 'f4']]],
             []
         );
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
@@ -1715,6 +1729,16 @@ class DocumentationNormalizerTest extends TestCase
                                 'in' => 'query',
                                 'required' => false,
                                 'type' => 'integer',
+                            ],
+                            [
+                                'name' => 'toto',
+                                'in' => 'query',
+                                'required' => true,
+                                'type' => 'array',
+                                'items' => [
+                                    'type' => 'string',
+                                ],
+                                'collectionFormat' => 'csv',
                             ],
                             [
                                 'name' => 'page',
