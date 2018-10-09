@@ -40,6 +40,7 @@ final class SwaggerUiAction
     private $title;
     private $description;
     private $version;
+    private $showWebby;
     private $formats = [];
     private $oauthEnabled;
     private $oauthClientId;
@@ -54,7 +55,7 @@ final class SwaggerUiAction
     /**
      * @throws InvalidArgumentException
      */
-    public function __construct(ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, ResourceMetadataFactoryInterface $resourceMetadataFactory, NormalizerInterface $normalizer, \Twig_Environment $twig, UrlGeneratorInterface $urlGenerator, string $title = '', string $description = '', string $version = '', /* FormatsProviderInterface */ $formatsProvider = [], $oauthEnabled = false, $oauthClientId = '', $oauthClientSecret = '', $oauthType = '', $oauthFlow = '', $oauthTokenUrl = '', $oauthAuthorizationUrl = '', $oauthScopes = [])
+    public function __construct(ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, ResourceMetadataFactoryInterface $resourceMetadataFactory, NormalizerInterface $normalizer, \Twig_Environment $twig, UrlGeneratorInterface $urlGenerator, string $title = '', string $description = '', string $version = '', bool $showWebby = true, /* FormatsProviderInterface */ $formatsProvider = [], $oauthEnabled = false, $oauthClientId = '', $oauthClientSecret = '', $oauthType = '', $oauthFlow = '', $oauthTokenUrl = '', $oauthAuthorizationUrl = '', $oauthScopes = [])
     {
         $this->resourceNameCollectionFactory = $resourceNameCollectionFactory;
         $this->resourceMetadataFactory = $resourceMetadataFactory;
@@ -62,6 +63,7 @@ final class SwaggerUiAction
         $this->twig = $twig;
         $this->urlGenerator = $urlGenerator;
         $this->title = $title;
+        $this->showWebby = $showWebby;
         $this->description = $description;
         $this->version = $version;
         $this->oauthEnabled = $oauthEnabled;
@@ -110,6 +112,7 @@ final class SwaggerUiAction
             'title' => $this->title,
             'description' => $this->description,
             'formats' => $this->formats,
+            'showWebby' => $this->showWebby,
         ];
 
         $swaggerData = [
