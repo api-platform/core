@@ -29,7 +29,7 @@ class ParentDummy
     /**
      * @var int The age
      *
-     * @ODM\Field(type="integer")
+     * @ODM\Field(type="integer", nullable=true)
      * @Groups({"friends"})
      */
     private $age;
@@ -37,5 +37,10 @@ class ParentDummy
     public function getAge()
     {
         return $this->age;
+    }
+
+    public function setAge($age)
+    {
+        return $this->age = $age;
     }
 }

@@ -1,11 +1,9 @@
 resources:
-    'ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\FileConfigDummy':
-        shortName: 'fileconfigdummy'
-        description: 'Dummy resource'
+    ApiPlatform\Core\Tests\Fixtures\TestBundle\OtherResources\ResourceInterface:
         itemOperations:
-            custom_operation:
+            get:
                 method: 'GET'
-                controller: 'app.config_dummy_resource.action'
-        properties:
-            foo:
-                description: 'The dummy foo'
+
+        collectionOperations:
+            get:
+                method: 'GET'

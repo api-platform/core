@@ -72,8 +72,6 @@ api_platform:
         shared_max_age: 3600
         vary:           ['Accept', 'Cookie']
         public:         true
-    mapping:
-        paths: ['%kernel.project_dir%/config/api_platform']
 
 parameters:
     container.autowiring.strict_mode: true

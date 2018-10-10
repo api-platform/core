@@ -1,6 +1,10 @@
 imports:
     - { resource: config_common.yml }
 
+api_platform:
+    mapping:
+        paths: ['%kernel.project_dir%/config/api_platform_orm']
+
 fos_user:
     db_driver:        'orm'
     firewall_name:    'api'

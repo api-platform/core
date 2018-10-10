@@ -63,7 +63,7 @@ class RelatedDummy extends ParentDummy
 
     /**
      * @ApiSubresource
-     * @ODM\ReferenceOne(targetDocument="ThirdLevel", cascade={"persist"}, storeAs="id")
+     * @ODM\ReferenceOne(targetDocument="ThirdLevel", cascade={"persist"}, nullable=true, storeAs="id")
      * @Groups({"barcelona", "chicago", "friends"})
      */
     public $thirdLevel;

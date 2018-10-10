@@ -28,6 +28,7 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\DummyProduct as DummyPro
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\DummyProperty as DummyPropertyDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\EmbeddableDummy as EmbeddableDummyDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\EmbeddedDummy as EmbeddedDummyDocument;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\FileConfigDummy as FileConfigDummyDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\Foo as FooDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\FourthLevel as FourthLevelDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\Greeting as GreetingDocument;
@@ -786,7 +787,7 @@ final class FeatureContext implements Context, SnippetAcceptingContext
      */
     public function thereIsAFileConfigDummyObject()
     {
-        $fileConfigDummy = new FileConfigDummy();
+        $fileConfigDummy = $this->buildFileConfigDummy();
         $fileConfigDummy->setName('ConfigDummy');
         $fileConfigDummy->setFoo('Foo');
 
@@ -1222,6 +1223,14 @@ final class FeatureContext implements Context, SnippetAcceptingContext
     private function buildEmbeddedDummy()
     {
         return $this->isOrm() ? new EmbeddedDummy() : new EmbeddedDummyDocument();
+    }
+
+    /**
+     * @return FileConfigDummy|FileConfigDummyDocument
+     */
+    private function buildFileConfigDummy()
+    {
+        return $this->isOrm() ? new FileConfigDummy() : new FileConfigDummyDocument();
     }
 
     /**

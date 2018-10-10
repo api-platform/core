@@ -5,6 +5,8 @@ api_platform:
     doctrine:
         enable_mongodb_odm: true
         enable_orm: false
+    mapping:
+        paths: ['%kernel.project_dir%/config/api_platform_mongodb_odm']
 
 fos_user:
     db_driver:       'mongodb'
