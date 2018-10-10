@@ -55,6 +55,11 @@ final class RespondListener
             }
         }
 
+        if ($request->attributes->has('sunset')) {
+            $headers['Sunset'] = (new \DateTimeImmutable($request->attributes->get('sunset')))
+                ->format(\DateTime::RFC1123);
+        }
+
         $event->setResponse(new Response(
             $controllerResult,
             self::METHOD_TO_CODE[$request->getMethod()] ?? Response::HTTP_OK,
