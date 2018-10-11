@@ -371,7 +371,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
 
         if (
             !$this->resourceClassResolver->isResourceClass($className) ||
-            $propertyMetadata->isWritableLink()
+            ($propertyMetadata->isWritableLink() && is_array($value))
         ) {
             $context['resource_class'] = $className;
             $context['api_allow_update'] = true;
