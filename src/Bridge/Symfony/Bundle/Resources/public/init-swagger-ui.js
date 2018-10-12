@@ -134,7 +134,7 @@ window.onload = () => {
 
 function manageWebbyDisplay() {
     const webby = document.getElementsByClassName('webby')[0];
-    if(!webby) return;
+    if (!webby) return;
 
     const web = document.getElementsByClassName('web')[0];
     webby.classList.add('calm');
