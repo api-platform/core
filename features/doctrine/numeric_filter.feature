@@ -47,6 +47,51 @@ Feature: Numeric filter on collections
     }
     """
 
+  @createSchema
+  Scenario: Get collection by multiple dummyPrice
+    Given there are 10 dummy objects with dummyPrice
+    When I send a "GET" request to "/dummies?dummyPrice[]=9.99&dummyPrice[]=12.99"
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+    And print last JSON response
+    And the JSON should be valid according to this schema:
+    """
+    {
+      "type": "object",
+      "properties": {
+        "@context": {"pattern": "^/contexts/Dummy$"},
+        "@id": {"pattern": "^/dummies$"},
+        "@type": {"pattern": "^hydra:Collection$"},
+        "hydra:member": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "@id": {
+                "oneOf": [
+                  {"pattern": "^/dummies/1$"},
+                  {"pattern": "^/dummies/2$"},
+                  {"pattern": "^/dummies/5$"}
+                ]
+              }
+            }
+          },
+          "maxItems": 3,
+          "uniqueItems": true
+        },
+        "hydra:totalItems": {"pattern": "^6$"},
+        "hydra:view": {
+          "type": "object",
+          "properties": {
+            "@id": {"pattern": "^/dummies\\?dummyPrice%5B%5D=9.99&dummyPrice%5B%5D=12.99"},
+            "@type": {"pattern": "^hydra:PartialCollectionView$"}
+          }
+        }
+      }
+    }
+    """
+
   Scenario: Get collection by non-numeric dummyPrice=marty
     Given there are 10 dummy objects with dummyPrice
     When I send a "GET" request to "/dummies?dummyPrice=marty"
