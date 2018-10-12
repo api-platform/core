@@ -380,7 +380,7 @@ final class SchemaBuilder implements SchemaBuilderInterface
                 if (null === $resourceClass) {
                     return null;
                 }
-                
+
                 try {
                     $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
                     if ([] === $resourceMetadata->getGraphql() ?? []) {
