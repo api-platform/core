@@ -30,6 +30,7 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\EmbeddableDummy as Embed
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\EmbeddedDummy as EmbeddedDummyDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\FileConfigDummy as FileConfigDummyDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\Foo as FooDocument;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\FooDummy as FooDummyDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\FourthLevel as FourthLevelDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\Greeting as GreetingDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\MaxDepthDummy as MaxDepthDummyDocument;
@@ -206,7 +207,7 @@ final class FeatureContext implements Context, SnippetAcceptingContext
             $dummy = $this->buildDummy();
             $dummy->setName($dummies[$i]);
 
-            $foo = new FooDummy();
+            $foo = $this->buildFooDummy();
             $foo->setName($names[$i]);
             $foo->setDummy($dummy);
 
@@ -1239,6 +1240,14 @@ final class FeatureContext implements Context, SnippetAcceptingContext
     private function buildFoo()
     {
         return $this->isOrm() ? new Foo() : new FooDocument();
+    }
+
+    /**
+     * @return FooDummy|FooDummyDocument
+     */
+    private function buildFooDummy()
+    {
+        return $this->isOrm() ? new FooDummy() : new FooDummyDocument();
     }
 
     /**

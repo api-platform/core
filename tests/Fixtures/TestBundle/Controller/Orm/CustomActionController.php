@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Controller;
+namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Controller\Orm;
 
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\CustomActionDummy;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;

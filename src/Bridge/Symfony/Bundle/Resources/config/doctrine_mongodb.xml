@@ -116,17 +116,17 @@
             <tag name="kernel.event_listener" event="kernel.view" method="onKernelView" priority="32" />
         </service>
 
-        <!-- Doctrine Query extensions -->
+        <!-- Doctrine Aggregation extensions -->
 
-        <service id="api_platform.doctrine.mongodb.query_extension.filter" class="ApiPlatform\Core\Bridge\Doctrine\MongoDB\Extension\FilterExtension" public="false">
+        <service id="api_platform.doctrine.mongodb.aggregation_extension.filter" class="ApiPlatform\Core\Bridge\Doctrine\MongoDB\Extension\FilterExtension" public="false">
             <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
             <argument type="service" id="api_platform.filter_locator" />
 
             <tag name="api_platform.doctrine.mongodb.aggregation_extension.collection" priority="32" />
         </service>
-        <service id="ApiPlatform\Core\Bridge\Doctrine\MongoDB\Extension\FilterExtension" alias="api_platform.doctrine.mongodb.query_extension.filter" />
+        <service id="ApiPlatform\Core\Bridge\Doctrine\MongoDB\Extension\FilterExtension" alias="api_platform.doctrine.mongodb.aggregation_extension.filter" />
 
-        <service id="api_platform.doctrine.mongodb.query_extension.pagination"
+        <service id="api_platform.doctrine.mongodb.aggregation_extension.pagination"
                  class="ApiPlatform\Core\Bridge\Doctrine\MongoDB\Extension\PaginationExtension" public="false">
             <argument type="service" id="doctrine_mongodb"/>
             <argument type="service" id="request_stack"/>
@@ -142,6 +142,16 @@
 
             <tag name="api_platform.doctrine.mongodb.aggregation_extension.collection"/>
         </service>
+        <service id="ApiPlatform\Core\Bridge\Doctrine\MongoDB\Extension\PaginationExtension" alias="api_platform.doctrine.mongodb.aggregation_extension.pagination" />
+
+        <service id="api_platform.doctrine.mongodb.aggregation_extension.order" class="ApiPlatform\Core\Bridge\Doctrine\MongoDB\Extension\OrderExtension" public="false">
+            <argument>%api_platform.collection.order%</argument>
+            <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
+            <argument type="service" id="doctrine_mongodb" />
+
+            <tag name="api_platform.doctrine.mongodb.aggregation_extension.collection" priority="16" />
+        </service>
+        <service id="ApiPlatform\Core\Bridge\Doctrine\MongoDB\Extension\OrderExtension" alias="api_platform.doctrine.mongodb.aggregation_extension.order" />
     </services>
 
 </container>

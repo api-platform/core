@@ -9,5 +9,5 @@ relation_embedded.custom_get:
         _controller: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\Controller\CustomController::customAction'
 
 controller:
-    resource: '@TestBundle/Controller'
+    resource: '@TestBundle/Controller/Orm'
     type: annotation

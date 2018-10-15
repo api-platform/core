@@ -68,7 +68,7 @@ class AppKernel extends Kernel
 
     protected function configureRoutes(RouteCollectionBuilder $routes)
     {
-        $routes->import('config/routing.yml');
+        $routes->import("config/routing_{$this->getRoutingEnvironment()}.yml");
 
         if ($_SERVER['LEGACY'] ?? true) {
             $routes->import('@NelmioApiDocBundle/Resources/config/routing.yml', '/nelmioapidoc');
@@ -137,5 +137,14 @@ class AppKernel extends Kernel
             ]);
             $c->loadFromExtension('api_platform', ['enable_nelmio_api_doc' => true]);
         }
+    }
+
+    private function getRoutingEnvironment(): string
+    {
+        if ('mongodb' === $environment = $this->getEnvironment()) {
+            return $environment;
+        }
+
+        return 'common';
     }
 }
