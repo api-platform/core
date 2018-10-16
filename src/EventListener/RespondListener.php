@@ -13,6 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\EventListener;
 
+use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
+use ApiPlatform\Core\Util\RequestAttributesExtractor;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
 
@@ -27,6 +29,13 @@ final class RespondListener
         'POST' => Response::HTTP_CREATED,
         'DELETE' => Response::HTTP_NO_CONTENT,
     ];
+
+    private $resourceMetadataFactory;
+
+    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory = null)
+    {
+        $this->resourceMetadataFactory = $resourceMetadataFactory;
+    }
 
     /**
      * Creates a Response to send to the client according to the requested format.
@@ -55,9 +64,11 @@ final class RespondListener
             }
         }
 
-        if ($request->attributes->has('sunset')) {
-            $headers['Sunset'] = (new \DateTimeImmutable($request->attributes->get('sunset')))
-                ->format(\DateTime::RFC1123);
+        if ($this->resourceMetadataFactory && $attributes = RequestAttributesExtractor::extractAttributes($request)) {
+            $resourceMetadata = $this->resourceMetadataFactory->create($attributes['resource_class']);
+            if ($sunset = $resourceMetadata->getOperationAttribute($attributes, 'sunset', null, true)) {
+                $headers['Sunset'] = (new \DateTimeImmutable($sunset))->format(\DateTime::RFC1123);
+            }
         }
 
         $event->setResponse(new Response(
