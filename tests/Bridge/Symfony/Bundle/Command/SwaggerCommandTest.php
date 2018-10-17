@@ -52,6 +52,7 @@ class SwaggerCommandTest extends KernelTestCase
         $this->tester->run(['command' => 'api:swagger:export', '--yaml' => true]);
 
         $this->assertYaml($this->tester->getDisplay());
+        $this->assertContains('    /dummy_cars: {', $this->tester->getDisplay());
     }
 
     public function testWriteToFile()
