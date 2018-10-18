@@ -77,6 +77,7 @@ Feature: Relations support
     }
     """
 
+  @!mongodb
   Scenario: Create a friend relationship
     When I add "Content-Type" header equal to "application/ld+json"
     And I send a "POST" request to "/related_to_dummy_friends" with body:
@@ -106,6 +107,7 @@ Feature: Relations support
     }
     """
 
+  @!mongodb
   Scenario: Get the relationship
     When I send a "GET" request to "/related_to_dummy_friends/dummyFriend=1;relatedDummy=1"
     And the response status code should be 200

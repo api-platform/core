@@ -17,6 +17,7 @@ use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
 use ApiPlatform\Core\DataProvider\SerializerAwareDataProviderInterface;
 use ApiPlatform\Core\DataProvider\SerializerAwareDataProviderTrait;
 use ApiPlatform\Core\Exception\ResourceClassNotSupportedException;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\SerializableResource as SerializableResourceDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\SerializableResource;
 
 /**
@@ -31,7 +32,7 @@ class SerializableItemDataProvider implements ItemDataProviderInterface, Seriali
      */
     public function getItem(string $resourceClass, $id, string $operationName = null, array $context = [])
     {
-        if (SerializableResource::class !== $resourceClass) {
+        if (!\in_array($resourceClass, [SerializableResource::class, SerializableResourceDocument::class], true)) {
             throw new ResourceClassNotSupportedException();
         }
 

@@ -15,6 +15,7 @@ namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Document;
 
 use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
+use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
@@ -42,6 +43,7 @@ class EmbeddedDummy
      * @var string The dummy name
      *
      * @ODM\Field(type="string")
+     * @Groups({"embed"})
      */
     private $name;
 
@@ -57,6 +59,7 @@ class EmbeddedDummy
      * @var EmbeddableDummy
      *
      * @ODM\EmbedOne(targetDocument="EmbeddableDummy")
+     * @Groups({"embed"})
      */
     public $embeddedDummy;
 

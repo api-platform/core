@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Bridge\Doctrine\MongoDB;
 
 use ApiPlatform\Core\DataProvider\PaginatorInterface;
+use ApiPlatform\Core\Exception\RuntimeException;
 use Doctrine\ODM\MongoDB\CommandCursor;
 use Doctrine\ODM\MongoDB\UnitOfWork;
 
@@ -61,8 +62,8 @@ final class Paginator implements \IteratorAggregate, PaginatorInterface
         // See https://github.com/alcaeus/mongo-php-adapter#mongocommandcursor
         // Since the method getCursorInfo in CommandCursor always returns 0 for 'skip' and 'limit',
         // the values set in the facet stage are used instead.
-        $this->firstResult = $resultsFacetInfo[0]['$skip'];
-        $this->maxResults = $resultsFacetInfo[1]['$limit'];
+        $this->firstResult = $this->getStageInfo($resultsFacetInfo, '$skip');
+        $this->maxResults = $this->getStageInfo($resultsFacetInfo, '$limit');
         $this->totalItems = $cursor->toArray()[0]['count'][0]['count'];
     }
 
@@ -127,5 +128,19 @@ final class Paginator implements \IteratorAggregate, PaginatorInterface
         }
 
         return $infoPipeline[$indexFacetStage]['$facet']['results'];
+    }
+
+    /**
+     * @throws RuntimeException
+     */
+    private function getStageInfo(array $resultsFacetInfo, string $stage): int
+    {
+        foreach ($resultsFacetInfo as $resultFacetInfo) {
+            if (isset($resultFacetInfo[$stage])) {
+                return $resultFacetInfo[$stage];
+            }
+        }
+
+        throw new RuntimeException("$stage stage was not found in the facet stage of the aggregation pipeline");
     }
 }

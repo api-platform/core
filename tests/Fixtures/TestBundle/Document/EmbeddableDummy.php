@@ -31,6 +31,7 @@ class EmbeddableDummy
      * @var string The dummy name
      *
      * @ODM\Field(type="string")
+     * @Groups({"embed"})
      */
     private $dummyName;
 
