@@ -19,8 +19,6 @@ use Symfony\Component\HttpFoundation\Request;
  * Extracts data used by the library form a Request instance.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
- *
- * @internal
  */
 final class RequestAttributesExtractor
 {
