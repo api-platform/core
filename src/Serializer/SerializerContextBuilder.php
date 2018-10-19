@@ -16,9 +16,11 @@ namespace ApiPlatform\Core\Serializer;
 use ApiPlatform\Core\Api\OperationType;
 use ApiPlatform\Core\Exception\RuntimeException;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
+use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Swagger\Serializer\DocumentationNormalizer;
 use ApiPlatform\Core\Util\RequestAttributesExtractor;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 
 /**
  * {@inheritdoc}
@@ -96,6 +98,58 @@ final class SerializerContextBuilder implements SerializerContextBuilderInterfac
         }
 
         unset($context[DocumentationNormalizer::SWAGGER_DEFINITION_NAME]);
+
+        return $context;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function createFromResourceClass(array $options, string $resourceClass): array
+    {
+        if (isset($options['serializer_groups'])) {
+            return [$options['serializer_groups'], $options['serializer_groups']];
+        }
+
+        $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
+        if (isset($options['collection_operation_name'])) {
+            $normalizationContext = $resourceMetadata->getCollectionOperationAttribute($options['collection_operation_name'], 'normalization_context', null, true);
+            $denormalizationContext = $resourceMetadata->getCollectionOperationAttribute($options['collection_operation_name'], 'denormalization_context', null, true);
+        } elseif (isset($options['item_operation_name'])) {
+            $normalizationContext = $resourceMetadata->getItemOperationAttribute($options['item_operation_name'], 'normalization_context', null, true);
+            $denormalizationContext = $resourceMetadata->getItemOperationAttribute($options['item_operation_name'], 'denormalization_context', null, true);
+        } elseif (isset($options['graphql_operation_name'])) {
+            $normalizationContext = $resourceMetadata->getGraphqlAttribute($options['graphql_operation_name'], 'normalization_context', null, true);
+            $denormalizationContext = $resourceMetadata->getGraphqlAttribute($options['graphql_operation_name'], 'denormalization_context', null, true);
+        } else {
+            $normalizationContext = $resourceMetadata->getAttribute('normalization_context');
+            $denormalizationContext = $resourceMetadata->getAttribute('denormalization_context');
+        }
+
+        return [$normalizationContext['groups'] ?? null, $denormalizationContext['groups'] ?? null];
+    }
+
+    /**
+     * Gets the context for the property name factory.
+     */
+    public function getPropertyNameCollectionFactoryContext(ResourceMetadata $resourceMetadata): array
+    {
+        $attributes = $resourceMetadata->getAttributes();
+        $context = [];
+
+        if (isset($attributes['normalization_context'][AbstractNormalizer::GROUPS])) {
+            $context['serializer_groups'] = $attributes['normalization_context'][AbstractNormalizer::GROUPS];
+        }
+
+        if (isset($attributes['denormalization_context'][AbstractNormalizer::GROUPS])) {
+            if (isset($context['serializer_groups'])) {
+                foreach ($attributes['denormalization_context'][AbstractNormalizer::GROUPS] as $groupName) {
+                    $context['serializer_groups'][] = $groupName;
+                }
+            } else {
+                $context['serializer_groups'] = $attributes['denormalization_context'][AbstractNormalizer::GROUPS];
+            }
+        }
 
         return $context;
     }

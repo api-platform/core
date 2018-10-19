@@ -16,6 +16,7 @@ namespace ApiPlatform\Core\Metadata\Property\Factory;
 use ApiPlatform\Core\Exception\ResourceClassNotFoundException;
 use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
+use ApiPlatform\Core\Serializer\SerializerContextBuilderInterface;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface as SerializerClassMetadataFactoryInterface;
 
 /**
@@ -29,12 +30,14 @@ final class SerializerPropertyMetadataFactory implements PropertyMetadataFactory
     private $resourceMetadataFactory;
     private $serializerClassMetadataFactory;
     private $decorated;
+    private $contextBuilder;
 
-    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, SerializerClassMetadataFactoryInterface $serializerClassMetadataFactory, PropertyMetadataFactoryInterface $decorated)
+    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, SerializerClassMetadataFactoryInterface $serializerClassMetadataFactory, PropertyMetadataFactoryInterface $decorated, SerializerContextBuilderInterface $contextBuilder)
     {
         $this->resourceMetadataFactory = $resourceMetadataFactory;
         $this->serializerClassMetadataFactory = $serializerClassMetadataFactory;
         $this->decorated = $decorated;
+        $this->contextBuilder = $contextBuilder;
     }
 
     /**
@@ -50,7 +53,7 @@ final class SerializerPropertyMetadataFactory implements PropertyMetadataFactory
             $resourceClass = $childResourceClass;
         }
 
-        list($normalizationGroups, $denormalizationGroups) = $this->getEffectiveSerializerGroups($options, $resourceClass);
+        list($normalizationGroups, $denormalizationGroups) = $this->contextBuilder->createFromResourceClass($options, $resourceClass);
 
         $propertyMetadata = $this->transformReadWrite($propertyMetadata, $resourceClass, $property, $normalizationGroups, $denormalizationGroups);
         $propertyMetadata = $this->transformLinkStatus($propertyMetadata, $normalizationGroups, $denormalizationGroups);
@@ -127,42 +130,6 @@ final class SerializerPropertyMetadataFactory implements PropertyMetadataFactory
         }
 
         return $propertyMetadata;
-    }
-
-    /**
-     * Gets the effective serializer groups used in normalization/denormalization.
-     *
-     * Groups are extracted in the following order:
-     *
-     * - From the "serializer_groups" key of the $options array.
-     * - From metadata of the given operation ("collection_operation_name" and "item_operation_name" keys).
-     * - From metadata of the current resource.
-     *
-     *
-     * @return (string[]|null)[]
-     */
-    private function getEffectiveSerializerGroups(array $options, string $resourceClass): array
-    {
-        if (isset($options['serializer_groups'])) {
-            return [$options['serializer_groups'], $options['serializer_groups']];
-        }
-
-        $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
-        if (isset($options['collection_operation_name'])) {
-            $normalizationContext = $resourceMetadata->getCollectionOperationAttribute($options['collection_operation_name'], 'normalization_context', null, true);
-            $denormalizationContext = $resourceMetadata->getCollectionOperationAttribute($options['collection_operation_name'], 'denormalization_context', null, true);
-        } elseif (isset($options['item_operation_name'])) {
-            $normalizationContext = $resourceMetadata->getItemOperationAttribute($options['item_operation_name'], 'normalization_context', null, true);
-            $denormalizationContext = $resourceMetadata->getItemOperationAttribute($options['item_operation_name'], 'denormalization_context', null, true);
-        } elseif (isset($options['graphql_operation_name'])) {
-            $normalizationContext = $resourceMetadata->getGraphqlAttribute($options['graphql_operation_name'], 'normalization_context', null, true);
-            $denormalizationContext = $resourceMetadata->getGraphqlAttribute($options['graphql_operation_name'], 'denormalization_context', null, true);
-        } else {
-            $normalizationContext = $resourceMetadata->getAttribute('normalization_context');
-            $denormalizationContext = $resourceMetadata->getAttribute('denormalization_context');
-        }
-
-        return [$normalizationContext['groups'] ?? null, $denormalizationContext['groups'] ?? null];
     }
 
     /**

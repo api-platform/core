@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Serializer;
 
 use ApiPlatform\Core\Exception\RuntimeException;
+use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -30,4 +31,23 @@ interface SerializerContextBuilderInterface
      * @throws RuntimeException
      */
     public function createFromRequest(Request $request, bool $normalization, array $extractedAttributes = null): array;
+
+    /**
+     * Gets the effective serializer groups used in normalization/denormalization.
+     *
+     * Groups are extracted in the following order:
+     *
+     * - From the "serializer_groups" key of the $options array.
+     * - From metadata of the given operation ("collection_operation_name" and "item_operation_name" keys).
+     * - From metadata of the current resource.
+     *
+     *
+     * @return (string[]|null)[]
+     */
+    public function createFromResourceClass(array $options, string $resourceClass): array;
+
+    /**
+     * Gets the context for the property name factory.
+     */
+    public function getPropertyNameCollectionFactoryContext(ResourceMetadata $resourceMetadata): array;
 }

@@ -15,6 +15,7 @@ namespace ApiPlatform\Core\Serializer;
 
 use ApiPlatform\Core\Exception\RuntimeException;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
+use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Serializer\Filter\FilterInterface;
 use ApiPlatform\Core\Util\RequestAttributesExtractor;
 use Psr\Container\ContainerInterface;
@@ -63,5 +64,21 @@ final class SerializerFilterContextBuilder implements SerializerContextBuilderIn
         }
 
         return $context;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function createFromResourceClass(array $options, string $resourceClass): array
+    {
+        return $this->decorated->createFromResourceClass($options, $resourceClass);
+    }
+
+    /**
+     * Gets the context for the property name factory.
+     */
+    public function getPropertyNameCollectionFactoryContext(ResourceMetadata $resourceMetadata): array
+    {
+        return $this->decorated->getPropertyNameCollectionFactoryContext($resourceMetadata);
     }
 }

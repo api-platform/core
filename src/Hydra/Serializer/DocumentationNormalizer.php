@@ -26,6 +26,7 @@ use ApiPlatform\Core\Metadata\Property\SubresourceMetadata;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Operation\Factory\SubresourceOperationFactoryInterface;
+use ApiPlatform\Core\Serializer\SerializerContextBuilderInterface;
 use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
@@ -49,8 +50,9 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
     private $urlGenerator;
     private $subresourceOperationFactory;
     private $nameConverter;
+    private $contextBuilder;
 
-    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, ResourceClassResolverInterface $resourceClassResolver, OperationMethodResolverInterface $operationMethodResolver, UrlGeneratorInterface $urlGenerator, SubresourceOperationFactoryInterface $subresourceOperationFactory = null, NameConverterInterface $nameConverter = null)
+    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, ResourceClassResolverInterface $resourceClassResolver, OperationMethodResolverInterface $operationMethodResolver, UrlGeneratorInterface $urlGenerator, SerializerContextBuilderInterface $contextBuilder, SubresourceOperationFactoryInterface $subresourceOperationFactory = null, NameConverterInterface $nameConverter = null)
     {
         $this->resourceMetadataFactory = $resourceMetadataFactory;
         $this->propertyNameCollectionFactory = $propertyNameCollectionFactory;
@@ -58,6 +60,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
         $this->resourceClassResolver = $resourceClassResolver;
         $this->operationMethodResolver = $operationMethodResolver;
         $this->urlGenerator = $urlGenerator;
+        $this->contextBuilder = $contextBuilder;
         $this->subresourceOperationFactory = $subresourceOperationFactory;
         $this->nameConverter = $nameConverter;
     }
@@ -148,37 +151,12 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
     }
 
     /**
-     * Gets the context for the property name factory.
-     */
-    private function getPropertyNameCollectionFactoryContext(ResourceMetadata $resourceMetadata): array
-    {
-        $attributes = $resourceMetadata->getAttributes();
-        $context = [];
-
-        if (isset($attributes['normalization_context'][AbstractNormalizer::GROUPS])) {
-            $context['serializer_groups'] = $attributes['normalization_context'][AbstractNormalizer::GROUPS];
-        }
-
-        if (isset($attributes['denormalization_context'][AbstractNormalizer::GROUPS])) {
-            if (isset($context['serializer_groups'])) {
-                foreach ($attributes['denormalization_context'][AbstractNormalizer::GROUPS] as $groupName) {
-                    $context['serializer_groups'][] = $groupName;
-                }
-            } else {
-                $context['serializer_groups'] = $attributes['denormalization_context'][AbstractNormalizer::GROUPS];
-            }
-        }
-
-        return $context;
-    }
-
-    /**
      * Gets Hydra properties.
      */
     private function getHydraProperties(string $resourceClass, ResourceMetadata $resourceMetadata, string $shortName, string $prefixedShortName): array
     {
         $properties = [];
-        foreach ($this->propertyNameCollectionFactory->create($resourceClass, $this->getPropertyNameCollectionFactoryContext($resourceMetadata)) as $propertyName) {
+        foreach ($this->propertyNameCollectionFactory->create($resourceClass, $this->contextBuilder->getPropertyNameCollectionFactoryContext($resourceMetadata)) as $propertyName) {
             $propertyMetadata = $this->propertyMetadataFactory->create($resourceClass, $propertyName);
             if (true === $propertyMetadata->isIdentifier() && false === $propertyMetadata->isWritable()) {
                 continue;
