@@ -520,5 +520,10 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         }
 
         $loader->load('data_collector.xml');
+
+        if ($container->hasParameter('kernel.debug') && $container->getParameter('kernel.debug')) {
+            $loader->load('data_provider_debug.xml');
+            $loader->load('data_persister_debug.xml');
+        }
     }
 }

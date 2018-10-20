@@ -193,6 +193,8 @@ class ApiPlatformExtensionTest extends TestCase
     public function testLoadDefaultConfig()
     {
         $containerBuilderProphecy = $this->getBaseContainerBuilderProphecy();
+        $containerBuilderProphecy->hasParameter('kernel.debug')->willReturn(true);
+        $containerBuilderProphecy->getParameter('kernel.debug')->willReturn(false);
         $containerBuilder = $containerBuilderProphecy->reveal();
 
         $this->extension->load(self::DEFAULT_CONFIG, $containerBuilder);
@@ -203,6 +205,8 @@ class ApiPlatformExtensionTest extends TestCase
         $nameConverterId = 'test.name_converter';
 
         $containerBuilderProphecy = $this->getBaseContainerBuilderProphecy();
+        $containerBuilderProphecy->hasParameter('kernel.debug')->willReturn(true);
+        $containerBuilderProphecy->getParameter('kernel.debug')->willReturn(false);
         $containerBuilderProphecy->setAlias('api_platform.name_converter', $nameConverterId)->shouldBeCalled();
         $containerBuilder = $containerBuilderProphecy->reveal();
 
@@ -212,6 +216,8 @@ class ApiPlatformExtensionTest extends TestCase
     public function testEnableFosUser()
     {
         $containerBuilderProphecy = $this->getBaseContainerBuilderProphecy();
+        $containerBuilderProphecy->hasParameter('kernel.debug')->willReturn(true);
+        $containerBuilderProphecy->getParameter('kernel.debug')->willReturn(false);
         $containerBuilderProphecy->getParameter('kernel.bundles')->willReturn([
             'DoctrineBundle' => DoctrineBundle::class,
             'FOSUserBundle' => FOSUserBundle::class,
@@ -389,6 +395,9 @@ class ApiPlatformExtensionTest extends TestCase
     {
         $containerBuilderProphecy = $this->prophesize(ContainerBuilder::class);
         $childDefinitionProphecy = $this->prophesize(ChildDefinition::class);
+
+        $containerBuilderProphecy->hasParameter('kernel.debug')->willReturn(true);
+        $containerBuilderProphecy->getParameter('kernel.debug')->willReturn(false);
 
         $containerBuilderProphecy->registerForAutoconfiguration(DataPersisterInterface::class)
             ->willReturn($childDefinitionProphecy)->shouldBeCalledTimes(1);
