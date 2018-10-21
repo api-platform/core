@@ -1,21 +1,7 @@
 'use strict';
 
 window.onload = () => {
-    const webby = document.getElementsByClassName('webby')[0];
-    const web = document.getElementsByClassName('web')[0];
-    webby.classList.add('calm');
-    web.classList.add('calm');
-    webby.addEventListener('click', () => {
-        if (webby.classList.contains('frighten')) {
-            return;
-        }
-        webby.classList.replace('calm', 'frighten');
-        web.classList.replace('calm', 'frighten');
-        setTimeout(() => {
-            webby.classList.replace('frighten', 'calm');
-            web.classList.replace('frighten', 'calm');
-        }, 10000);
-    });
+    manageWebbyDisplay();
 
     const data = JSON.parse(document.getElementById('swagger-data').innerText);
     const ui = SwaggerUIBundle({
@@ -145,3 +131,23 @@ window.onload = () => {
         }
     }
 };
+
+function manageWebbyDisplay() {
+    const webby = document.getElementsByClassName('webby')[0];
+    if (!webby) return;
+
+    const web = document.getElementsByClassName('web')[0];
+    webby.classList.add('calm');
+    web.classList.add('calm');
+    webby.addEventListener('click', () => {
+        if (webby.classList.contains('frighten')) {
+            return;
+        }
+        webby.classList.replace('calm', 'frighten');
+        web.classList.replace('calm', 'frighten');
+        setTimeout(() => {
+            webby.classList.replace('frighten', 'calm');
+            web.classList.replace('frighten', 'calm');
+        }, 10000);
+    });
+}

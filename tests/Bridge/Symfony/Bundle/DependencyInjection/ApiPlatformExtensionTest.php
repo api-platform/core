@@ -458,6 +458,7 @@ class ApiPlatformExtensionTest extends TestCase
             ],
             'api_platform.title' => 'title',
             'api_platform.version' => 'version',
+            'api_platform.show_webby' => true,
             'api_platform.allow_plain_identifiers' => false,
             'api_platform.eager_loading.enabled' => Argument::type('bool'),
             'api_platform.eager_loading.max_joins' => 30,
