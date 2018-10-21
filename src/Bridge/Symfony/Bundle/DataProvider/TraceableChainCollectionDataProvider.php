@@ -31,9 +31,7 @@ final class TraceableChainCollectionDataProvider implements ContextAwareCollecti
     public function __construct(CollectionDataProviderInterface $collectionDataProvider)
     {
         if ($collectionDataProvider instanceof ChainCollectionDataProvider) {
-            $reflection = new \ReflectionProperty(ChainCollectionDataProvider::class, 'dataProviders');
-            $reflection->setAccessible(true);
-            $this->dataProviders = $reflection->getValue($collectionDataProvider);
+            $this->dataProviders = $collectionDataProvider->dataProviders;
         }
     }
 

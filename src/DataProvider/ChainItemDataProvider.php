@@ -22,7 +22,8 @@ use ApiPlatform\Core\Exception\ResourceClassNotSupportedException;
  */
 final class ChainItemDataProvider implements ItemDataProviderInterface
 {
-    private $dataProviders;
+    /** @internal */
+    public $dataProviders;
 
     /**
      * @param ItemDataProviderInterface[] $dataProviders

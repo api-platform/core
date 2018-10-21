@@ -31,9 +31,7 @@ final class TraceableChainItemDataProvider implements ItemDataProviderInterface
     public function __construct(ItemDataProviderInterface $itemDataProvider)
     {
         if ($itemDataProvider instanceof ChainItemDataProvider) {
-            $reflection = new \ReflectionProperty(ChainItemDataProvider::class, 'dataProviders');
-            $reflection->setAccessible(true);
-            $this->dataProviders = $reflection->getValue($itemDataProvider);
+            $this->dataProviders = $itemDataProvider->dataProviders;
         }
     }
 

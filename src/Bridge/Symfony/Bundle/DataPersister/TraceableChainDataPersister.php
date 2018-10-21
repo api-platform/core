@@ -29,9 +29,7 @@ final class TraceableChainDataPersister implements DataPersisterInterface
     {
         if ($dataPersister instanceof ChainDataPersister) {
             $this->decorated = $dataPersister;
-            $reflection = new \ReflectionProperty(ChainDataPersister::class, 'persisters');
-            $reflection->setAccessible(true);
-            $this->persisters = $reflection->getValue($dataPersister);
+            $this->persisters = $dataPersister->persisters;
         }
     }
 

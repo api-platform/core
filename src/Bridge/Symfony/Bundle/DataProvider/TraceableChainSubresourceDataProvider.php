@@ -30,9 +30,7 @@ final class TraceableChainSubresourceDataProvider implements SubresourceDataProv
     public function __construct(SubresourceDataProviderInterface $subresourceDataProvider)
     {
         if ($subresourceDataProvider instanceof ChainSubresourceDataProvider) {
-            $reflection = new \ReflectionProperty(ChainSubresourceDataProvider::class, 'dataProviders');
-            $reflection->setAccessible(true);
-            $this->dataProviders = $reflection->getValue($subresourceDataProvider);
+            $this->dataProviders = $subresourceDataProvider->dataProviders;
         }
     }
 
