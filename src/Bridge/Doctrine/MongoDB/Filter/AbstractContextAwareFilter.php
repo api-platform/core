@@ -20,7 +20,7 @@ use Doctrine\ODM\MongoDB\Aggregation\Builder;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 
-abstract class AbstractContextAwareFilter implements ContextAwareFilterInterface
+abstract class AbstractContextAwareFilter implements FilterInterface
 {
     use PropertyHelperTrait;
     use MongoDbPropertyHelperTrait;
@@ -38,7 +38,7 @@ abstract class AbstractContextAwareFilter implements ContextAwareFilterInterface
     /**
      * {@inheritdoc}
      */
-    public function apply(Builder $aggregationBuilder, string $resourceClass, string $operationName = null, array $context = [])
+    public function apply(Builder $aggregationBuilder, string $resourceClass, string $operationName = null, array &$context = [])
     {
         foreach ($context['filters'] as $property => $value) {
             $this->filterProperty($property, $value, $aggregationBuilder, $resourceClass, $operationName, $context);
@@ -48,7 +48,7 @@ abstract class AbstractContextAwareFilter implements ContextAwareFilterInterface
     /**
      * Passes a property through the filter.
      */
-    abstract protected function filterProperty(string $property, $value, Builder $aggregationBuilder, string $resourceClass, string $operationName = null, array $context = []);
+    abstract protected function filterProperty(string $property, $value, Builder $aggregationBuilder, string $resourceClass, string $operationName = null, array &$context = []);
 
     /**
      * Determines whether the given property is enabled.

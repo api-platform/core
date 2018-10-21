@@ -35,7 +35,6 @@ final class OrderExtension implements AggregationCollectionExtensionInterface
 
     private $order;
     private $resourceMetadataFactory;
-    private $fieldOrders;
 
     public function __construct(string $order = null, ResourceMetadataFactoryInterface $resourceMetadataFactory = null, ManagerRegistry $managerRegistry = null)
     {
@@ -47,7 +46,7 @@ final class OrderExtension implements AggregationCollectionExtensionInterface
     /**
      * {@inheritdoc}
      */
-    public function applyToCollection(Builder $aggregationBuilder, string $resourceClass = null, string $operationName = null, array $context = [])
+    public function applyToCollection(Builder $aggregationBuilder, string $resourceClass = null, string $operationName = null, array &$context = [])
     {
         if (null === $resourceClass) {
             throw new InvalidArgumentException('The "$resourceClass" parameter must not be null');
@@ -68,8 +67,9 @@ final class OrderExtension implements AggregationCollectionExtensionInterface
                     if ($this->isPropertyNested($field, $resourceClass)) {
                         [$field] = $this->addLookupsForNestedProperty($field, $aggregationBuilder, $resourceClass);
                     }
-                    $this->fieldOrders[$field] = $order;
-                    $aggregationBuilder->sort($this->fieldOrders, $order);
+                    $aggregationBuilder->sort(
+                        $context['mongodb_odm_sort_fields'] = ($context['mongodb_odm_sort_fields'] ?? []) + [$field => $order]
+                    );
                 }
 
                 return;
@@ -78,8 +78,9 @@ final class OrderExtension implements AggregationCollectionExtensionInterface
 
         if (null !== $this->order) {
             foreach ($identifiers as $identifier) {
-                $this->fieldOrders[$identifier] = $this->order;
-                $aggregationBuilder->sort($this->fieldOrders, $this->order);
+                $aggregationBuilder->sort(
+                    $context['mongodb_odm_sort_fields'] = ($context['mongodb_odm_sort_fields'] ?? []) + [$identifier => $this->order]
+                );
             }
         }
     }

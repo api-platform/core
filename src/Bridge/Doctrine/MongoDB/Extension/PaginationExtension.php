@@ -69,7 +69,7 @@ final class PaginationExtension implements AggregationResultCollectionExtensionI
     /**
      * {@inheritdoc}
      */
-    public function applyToCollection(Builder $aggregationBuilder, string $resourceClass, string $operationName = null, array $context = [])
+    public function applyToCollection(Builder $aggregationBuilder, string $resourceClass, string $operationName = null, array &$context = [])
     {
         $request = $this->requestStack->getCurrentRequest();
         if (null === $request) {

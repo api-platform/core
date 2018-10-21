@@ -37,7 +37,7 @@ class DateFilter extends AbstractContextAwareFilter implements DateFilterInterfa
     /**
      * {@inheritdoc}
      */
-    protected function filterProperty(string $property, $values, Builder $aggregationBuilder, string $resourceClass, string $operationName = null, array $context = [])
+    protected function filterProperty(string $property, $values, Builder $aggregationBuilder, string $resourceClass, string $operationName = null, array &$context = [])
     {
         // Expect $values to be an array having the period as keys and the date value as values
         if (
@@ -49,14 +49,13 @@ class DateFilter extends AbstractContextAwareFilter implements DateFilterInterfa
             return;
         }
 
-        $matchField = $field = $property;
+        $matchField = $property;
 
         if ($this->isPropertyNested($property, $resourceClass)) {
             [$matchField] = $this->addLookupsForNestedProperty($property, $aggregationBuilder, $resourceClass);
         }
 
         $nullManagement = $this->properties[$property] ?? null;
-        $type = $this->getDoctrineFieldType($field, $resourceClass);
 
         if (self::EXCLUDE_NULL === $nullManagement) {
             $aggregationBuilder->match()->field($matchField)->notEqual(null);
@@ -68,8 +67,7 @@ class DateFilter extends AbstractContextAwareFilter implements DateFilterInterfa
                 $matchField,
                 self::PARAMETER_BEFORE,
                 $values[self::PARAMETER_BEFORE],
-                $nullManagement,
-                $type
+                $nullManagement
             );
         }
 
@@ -79,8 +77,7 @@ class DateFilter extends AbstractContextAwareFilter implements DateFilterInterfa
                 $matchField,
                 self::PARAMETER_STRICTLY_BEFORE,
                 $values[self::PARAMETER_STRICTLY_BEFORE],
-                $nullManagement,
-                $type
+                $nullManagement
             );
         }
 
@@ -90,8 +87,7 @@ class DateFilter extends AbstractContextAwareFilter implements DateFilterInterfa
                 $matchField,
                 self::PARAMETER_AFTER,
                 $values[self::PARAMETER_AFTER],
-                $nullManagement,
-                $type
+                $nullManagement
             );
         }
 
@@ -101,18 +97,15 @@ class DateFilter extends AbstractContextAwareFilter implements DateFilterInterfa
                 $matchField,
                 self::PARAMETER_STRICTLY_AFTER,
                 $values[self::PARAMETER_STRICTLY_AFTER],
-                $nullManagement,
-                $type
+                $nullManagement
             );
         }
     }
 
     /**
      * Adds the match stage according to the chosen null management.
-     *
-     * @param string|MongoDbType $type
      */
-    private function addMatch(Builder $aggregationBuilder, string $field, string $operator, string $value, string $nullManagement = null, $type = null)
+    private function addMatch(Builder $aggregationBuilder, string $field, string $operator, string $value, string $nullManagement = null)
     {
         try {
             $value = new \DateTime($value);

@@ -38,7 +38,7 @@ final class ExistsFilter extends AbstractContextAwareFilter implements ExistsFil
     /**
      * {@inheritdoc}
      */
-    protected function filterProperty(string $property, $value, Builder $aggregationBuilder, string $resourceClass, string $operationName = null, array $context = [])
+    protected function filterProperty(string $property, $value, Builder $aggregationBuilder, string $resourceClass, string $operationName = null, array &$context = [])
     {
         if (
             !isset($value[self::QUERY_PARAMETER_KEY]) ||

@@ -37,8 +37,6 @@ final class OrderFilter extends AbstractContextAwareFilter implements OrderFilte
 {
     use OrderFilterTrait;
 
-    private $fieldDirections;
-
     public function __construct(ManagerRegistry $managerRegistry, string $orderParameterName = 'order', LoggerInterface $logger = null, array $properties = null)
     {
         if (null !== $properties) {
@@ -62,7 +60,7 @@ final class OrderFilter extends AbstractContextAwareFilter implements OrderFilte
     /**
      * {@inheritdoc}
      */
-    public function apply(Builder $aggregationBuilder, string $resourceClass, string $operationName = null, array $context = [])
+    public function apply(Builder $aggregationBuilder, string $resourceClass, string $operationName = null, array &$context = [])
     {
         if (isset($context['filters']) && !isset($context['filters'][$this->orderParameterName])) {
             return;
@@ -82,7 +80,7 @@ final class OrderFilter extends AbstractContextAwareFilter implements OrderFilte
     /**
      * {@inheritdoc}
      */
-    protected function filterProperty(string $property, $direction, Builder $aggregationBuilder, string $resourceClass, string $operationName = null, array $context = [])
+    protected function filterProperty(string $property, $direction, Builder $aggregationBuilder, string $resourceClass, string $operationName = null, array &$context = [])
     {
         if (!$this->isPropertyEnabled($property, $resourceClass) || !$this->isPropertyMapped($property, $resourceClass)) {
             return;
@@ -99,7 +97,8 @@ final class OrderFilter extends AbstractContextAwareFilter implements OrderFilte
             [$matchField] = $this->addLookupsForNestedProperty($property, $aggregationBuilder, $resourceClass);
         }
 
-        $this->fieldDirections[$matchField] = $direction;
-        $aggregationBuilder->sort($this->fieldDirections, $direction);
+        $aggregationBuilder->sort(
+            $context['mongodb_odm_sort_fields'] = ($context['mongodb_odm_sort_fields'] ?? []) + [$matchField => $direction]
+        );
     }
 }

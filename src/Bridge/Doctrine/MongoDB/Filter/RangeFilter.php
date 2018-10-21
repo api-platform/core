@@ -30,7 +30,7 @@ final class RangeFilter extends AbstractContextAwareFilter implements RangeFilte
     /**
      * {@inheritdoc}
      */
-    protected function filterProperty(string $property, $values, Builder $aggregationBuilder, string $resourceClass, string $operationName = null, array $context = [])
+    protected function filterProperty(string $property, $values, Builder $aggregationBuilder, string $resourceClass, string $operationName = null, array &$context = [])
     {
         if (
             !\is_array($values) ||

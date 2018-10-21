@@ -46,7 +46,7 @@ final class FilterExtension implements AggregationCollectionExtensionInterface
     /**
      * {@inheritdoc}
      */
-    public function applyToCollection(Builder $aggregationBuilder, string $resourceClass = null, string $operationName = null, array $context = [])
+    public function applyToCollection(Builder $aggregationBuilder, string $resourceClass = null, string $operationName = null, array &$context = [])
     {
         if (null === $resourceClass) {
             throw new InvalidArgumentException('The "$resourceClass" parameter must not be null');
