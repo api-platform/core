@@ -12,7 +12,8 @@
 {% block toolbar %}
     {% set icon %}
         {% set status_color = collector.counters.ignored_filters|default(false) ? 'yellow' : 'default' %}
-        {{ include('@ApiPlatform/DataCollector/api-platform.svg') }}
+        {{ include('@ApiPlatform/DataCollector/api-platform-icon.svg') }}
+        <span class="sf-toolbar-value"></span>
     {% endset %}
 
     {% set text %}
