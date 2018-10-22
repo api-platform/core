@@ -47,24 +47,29 @@ final class TraceableChainSubresourceDataProvider implements SubresourceDataProv
     public function getSubresource(string $resourceClass, array $identifiers, array $context, string $operationName = null)
     {
         $this->context = $context;
-        foreach ($this->dataProviders as $dataProvider) {
-            $this->providersResponse[\get_class($dataProvider)] = null;
-        }
+        $match = false;
+        $result = null;
 
         foreach ($this->dataProviders as $dataProvider) {
-            try {
-                if ($dataProvider instanceof RestrictedDataProviderInterface && !$dataProvider->supports($resourceClass, $operationName, $context)) {
-                    $this->providersResponse[\get_class($dataProvider)] = false;
-                    continue;
-                }
-                $this->providersResponse[\get_class($dataProvider)] = true;
-
-                return $dataProvider->getSubresource($resourceClass, $identifiers, $context, $operationName);
-            } catch (ResourceClassNotSupportedException $e) {
-                @trigger_error(sprintf('Throwing a "%s" in a data provider is deprecated in favor of implementing "%s"', ResourceClassNotSupportedException::class, RestrictedDataProviderInterface::class), E_USER_DEPRECATED);
-                $this->providersResponse[\get_class($dataProvider)] = false;
+            $this->providersResponse[\get_class($dataProvider)] = $match ? null : false;
+            if ($match) {
                 continue;
             }
+            try {
+                if ($dataProvider instanceof RestrictedDataProviderInterface && !$dataProvider->supports($resourceClass, $operationName, $context)) {
+                    continue;
+                }
+
+                $result = $dataProvider->getSubresource($resourceClass, $identifiers, $context, $operationName);
+                $this->providersResponse[\get_class($dataProvider)] = $match = true;
+            } catch (ResourceClassNotSupportedException $e) {
+                @trigger_error(sprintf('Throwing a "%s" in a data provider is deprecated in favor of implementing "%s"', ResourceClassNotSupportedException::class, RestrictedDataProviderInterface::class), E_USER_DEPRECATED);
+                continue;
+            }
+        }
+
+        if ($match) {
+            return $result;
         }
 
         return ($context['collection'] ?? false) ? [] : null;

@@ -78,14 +78,18 @@ class TraceableChainSubresourceDataCollectorTest extends TestCase
 
         yield 'ChainSubresourceDataProvider' => [
             new ChainSubresourceDataProvider([
-                new class() implements RestrictedDataProviderInterface {
+                new class() implements SubresourceDataProviderInterface, RestrictedDataProviderInterface {
+                    public function getSubresource(string $resourceClass, array $identifiers, array $context, string $operationName = null)
+                    {
+                    }
+
                     public function supports(string $resourceClass, string $operationName = null, array $context = []): bool
                     {
                         return false;
                     }
                 },
-                new class() implements RestrictedDataProviderInterface {
-                    public function getSubresource()
+                new class() implements SubresourceDataProviderInterface, RestrictedDataProviderInterface {
+                    public function getSubresource(string $resourceClass, array $identifiers, array $context, string $operationName = null)
                     {
                     }
 
@@ -94,8 +98,8 @@ class TraceableChainSubresourceDataCollectorTest extends TestCase
                         return true;
                     }
                 },
-                new class() {
-                    public function getSubresource()
+                new class() implements SubresourceDataProviderInterface {
+                    public function getSubresource(string $resourceClass, array $identifiers, array $context, string $operationName = null)
                     {
                     }
                 },
@@ -109,14 +113,14 @@ class TraceableChainSubresourceDataCollectorTest extends TestCase
     {
         yield 'deprecated ChainSubresourceDataProvider - ResourceClassNotSupportedException' => [
             new ChainSubresourceDataProvider([
-                new class() {
-                    public function getSubresource()
+                new class() implements SubresourceDataProviderInterface {
+                    public function getSubresource(string $resourceClass, array $identifiers, array $context, string $operationName = null)
                     {
                         throw new ResourceClassNotSupportedException('nope');
                     }
                 },
-                new class() {
-                    public function getSubresource()
+                new class() implements SubresourceDataProviderInterface {
+                    public function getSubresource(string $resourceClass, array $identifiers, array $context, string $operationName = null)
                     {
                     }
                 },

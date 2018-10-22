@@ -78,9 +78,10 @@ class TraceableChainCollectionDataCollectorTest extends TestCase
 
         yield 'ChainCollectionDataProvider' => [
             new ChainCollectionDataProvider([
-                new class() implements RestrictedDataProviderInterface {
-                    public function getCollection()
+                new class() implements CollectionDataProviderInterface, RestrictedDataProviderInterface {
+                    public function getCollection(string $resourceClass, string $operationName = null)
                     {
+                        return [];
                     }
 
                     public function supports(string $resourceClass, string $operationName = null, array $context = []): bool
@@ -88,9 +89,10 @@ class TraceableChainCollectionDataCollectorTest extends TestCase
                         return false;
                     }
                 },
-                new class() implements RestrictedDataProviderInterface {
-                    public function getCollection()
+                new class() implements CollectionDataProviderInterface, RestrictedDataProviderInterface {
+                    public function getCollection(string $resourceClass, string $operationName = null)
                     {
+                        return [];
                     }
 
                     public function supports(string $resourceClass, string $operationName = null, array $context = []): bool
@@ -98,9 +100,10 @@ class TraceableChainCollectionDataCollectorTest extends TestCase
                         return true;
                     }
                 },
-                new class() {
-                    public function getCollection()
+                new class() implements CollectionDataProviderInterface {
+                    public function getCollection(string $resourceClass, string $operationName = null)
                     {
+                        return [];
                     }
                 },
             ]),
@@ -113,14 +116,14 @@ class TraceableChainCollectionDataCollectorTest extends TestCase
     {
         yield 'ChainCollectionDataProvider' => [
             new ChainCollectionDataProvider([
-                new class() {
-                    public function getCollection()
+                new class() implements CollectionDataProviderInterface {
+                    public function getCollection(string $resourceClass, string $operationName = null)
                     {
                         throw new ResourceClassNotSupportedException('nope');
                     }
                 },
-                new class() {
-                    public function getCollection()
+                new class() implements CollectionDataProviderInterface {
+                    public function getCollection(string $resourceClass, string $operationName = null)
                     {
                     }
                 },

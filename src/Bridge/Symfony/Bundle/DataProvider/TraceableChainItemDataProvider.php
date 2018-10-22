@@ -48,15 +48,17 @@ final class TraceableChainItemDataProvider implements ItemDataProviderInterface
     public function getItem(string $resourceClass, $id, string $operationName = null, array $context = [])
     {
         $this->context = $context;
-        foreach ($this->dataProviders as $dataProvider) {
-            $this->providersResponse[\get_class($dataProvider)] = null;
-        }
+        $match = false;
+        $result = null;
 
         foreach ($this->dataProviders as $dataProvider) {
+            $this->providersResponse[\get_class($dataProvider)] = $match ? null : false;
+            if ($match) {
+                continue;
+            }
             try {
                 if ($dataProvider instanceof RestrictedDataProviderInterface
                     && !$dataProvider->supports($resourceClass, $operationName, $context)) {
-                    $this->providersResponse[\get_class($dataProvider)] = false;
                     continue;
                 }
 
@@ -69,16 +71,15 @@ final class TraceableChainItemDataProvider implements ItemDataProviderInterface
                         $identifier = current($identifier);
                     }
                 }
-                $this->providersResponse[\get_class($dataProvider)] = true;
 
-                return $dataProvider->getItem($resourceClass, $identifier, $operationName, $context);
+                $result = $dataProvider->getItem($resourceClass, $identifier, $operationName, $context);
+                $this->providersResponse[\get_class($dataProvider)] = $match = true;
             } catch (ResourceClassNotSupportedException $e) {
                 @trigger_error(sprintf('Throwing a "%s" is deprecated in favor of implementing "%s"', \get_class($e), RestrictedDataProviderInterface::class), E_USER_DEPRECATED);
-                $this->providersResponse[\get_class($dataProvider)] = false;
                 continue;
             }
         }
 
-        return null;
+        return $result;
     }
 }

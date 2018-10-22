@@ -51,17 +51,17 @@ final class TraceableChainDataPersister implements DataPersisterInterface
      */
     public function persist($data)
     {
+        $match = null;
         foreach ($this->persisters as $persister) {
-            $this->persistersResponse[\get_class($persister)] = null;
-        }
-        foreach ($this->persisters as $persister) {
-            if ($persister->supports($data)) {
+            $this->persistersResponse[\get_class($persister)] = $match ? null : false;
+            if (!$match && $persister->supports($data)) {
+                $match = $persister;
                 $this->persistersResponse[\get_class($persister)] = true;
-
-                return $persister->persist($data) ?? $data;
             }
+        }
 
-            $this->persistersResponse[\get_class($persister)] = false;
+        if ($match) {
+            return $match->persist($data) ?? $data;
         }
     }
 
@@ -70,18 +70,17 @@ final class TraceableChainDataPersister implements DataPersisterInterface
      */
     public function remove($data)
     {
+        $match = null;
         foreach ($this->persisters as $persister) {
-            $this->persistersResponse[\get_class($persister)] = null;
+            $this->persistersResponse[\get_class($persister)] = $match ? null : false;
+            if (!$match && $persister->supports($data)) {
+                $match = $persister;
+                $this->persistersResponse[\get_class($persister)] = true;
+            }
         }
 
-        foreach ($this->persisters as $persister) {
-            if ($persister->supports($data)) {
-                $this->persistersResponse[\get_class($persister)] = true;
-
-                return $persister->remove($data);
-            }
-
-            $this->persistersResponse[\get_class($persister)] = false;
+        if ($match) {
+            return $match->remove($data);
         }
     }
 }

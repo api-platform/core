@@ -48,27 +48,28 @@ final class TraceableChainCollectionDataProvider implements ContextAwareCollecti
     public function getCollection(string $resourceClass, string $operationName = null, array $context = [])
     {
         $this->context = $context;
-        foreach ($this->dataProviders as $dataProvider) {
-            $this->providersResponse[\get_class($dataProvider)] = null;
-        }
+        $results = null;
+        $match = false;
 
         foreach ($this->dataProviders as $dataProvider) {
+            $this->providersResponse[\get_class($dataProvider)] = $match ? null : false;
+            if ($match) {
+                continue;
+            }
             try {
                 if ($dataProvider instanceof RestrictedDataProviderInterface
                     && !$dataProvider->supports($resourceClass, $operationName, $context)) {
-                    $this->providersResponse[\get_class($dataProvider)] = false;
                     continue;
                 }
-                $this->providersResponse[\get_class($dataProvider)] = true;
 
-                return $dataProvider->getCollection($resourceClass, $operationName, $context);
+                $results = $dataProvider->getCollection($resourceClass, $operationName, $context);
+                $this->providersResponse[\get_class($dataProvider)] = $match = true;
             } catch (ResourceClassNotSupportedException $e) {
                 @trigger_error(sprintf('Throwing a "%s" in a data provider is deprecated in favor of implementing "%s"', ResourceClassNotSupportedException::class, RestrictedDataProviderInterface::class), E_USER_DEPRECATED);
-                $this->providersResponse[\get_class($dataProvider)] = false;
                 continue;
             }
         }
 
-        return [];
+        return $results ?? [];
     }
 }
