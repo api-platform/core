@@ -143,9 +143,9 @@ final class SearchFilter extends AbstractContextAwareFilter implements SearchFil
     /**
      * Add equality match stage according to the strategy.
      *
-     * @return \MongoRegex|string
-     *
      * @throws InvalidArgumentException If strategy does not exist
+     *
+     * @return \MongoRegex|string
      */
     private function addEqualityMatchStrategy(string $strategy, $value, bool $caseSensitive)
     {

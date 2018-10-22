@@ -12,8 +12,8 @@
 declare(strict_types=1);
 
 use ApiPlatform\Core\Bridge\Symfony\Bundle\ApiPlatformBundle;
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\User;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\User as UserDocument;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\User;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\TestBundle;
 use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
 use Doctrine\Bundle\MongoDBBundle\DoctrineMongoDBBundle;

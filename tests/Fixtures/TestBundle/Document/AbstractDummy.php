@@ -27,7 +27,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  * @ODM\Document
  * @ODM\InheritanceType("SINGLE_COLLECTION")
  * @ODM\DiscriminatorField(value="discr")
- * @ODM\DiscriminatorMap({"concrete" = "ConcreteDummy"})
+ * @ODM\DiscriminatorMap({"concrete"="ConcreteDummy"})
  */
 abstract class AbstractDummy
 {
