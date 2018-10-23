@@ -8,6 +8,7 @@ parameters:
     ignoreErrors:
         # Real problems, hard to fix
         - '#Parameter \#2 \$dqlPart of method Doctrine\\ORM\\QueryBuilder::add\(\) expects array\|object, string given\.#'
+        - '#Call to function method_exists\(\) with .Doctrine.+ and .get(Join|Alias|Parts). will always evaluate to false\.#'
 
         # False positives
         - '#Access to an undefined property Prophecy\\Prophecy\\ObjectProphecy::\$[a-zA-Z0-9_]+#'

@@ -34,7 +34,7 @@ class InheritedPropertyNameCollectionFactoryTest extends TestCase
 
         $propertyNameCollectionFactory = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyNameCollectionFactory->create(DummyTableInheritance::class, [])->willReturn(new PropertyNameCollection(['name']))->shouldBeCalled();
-        $propertyNameCollectionFactory->create(DummyTableInheritanceChild::class, [])->willReturn(new PropertyNameCollection(['nickname', 169]))->shouldBeCalled();
+        $propertyNameCollectionFactory->create(DummyTableInheritanceChild::class, [])->willReturn(new PropertyNameCollection(['nickname', '169']))->shouldBeCalled();
 
         $factory = new InheritedPropertyNameCollectionFactory($resourceNameCollectionFactory->reveal(), $propertyNameCollectionFactory->reveal());
         $metadata = $factory->create(DummyTableInheritance::class);
