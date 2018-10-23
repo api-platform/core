@@ -1010,15 +1010,31 @@ final class FeatureContext implements Context, SnippetAcceptingContext
     }
 
     /**
-     * @Given there is a RelatedOwnedDummy and a RelatedOwningDummy object with OneToOne bidirectional relation
+     * @Given there is a RelatedOwnedDummy object with OneToOne relation
      */
-    public function thereIsARelatedOwnedDummyAndARelatedOwningDummy()
+    public function thereIsARelatedOwnedDummy()
     {
         $relatedOwnedDummy = new RelatedOwnedDummy();
         $this->manager->persist($relatedOwnedDummy);
 
+        $dummy = new Dummy();
+        $dummy->setOwnedDummy($relatedOwnedDummy);
+        $this->manager->persist($dummy);
+
+        $this->manager->flush();
+    }
+
+    /**
+     * @Given there is a RelatedOwningDummy object with OneToOne relation
+     */
+    public function thereIsARelatedOwningDummy()
+    {
+
+        $dummy = new Dummy();
+        $this->manager->persist($dummy);
+
         $relatedOwningDummy = new RelatedOwningDummy();
-        $relatedOwningDummy->setOwnedDummy($relatedOwnedDummy);
+        $relatedOwningDummy->setOwnedDummy($dummy);
         $this->manager->persist($relatedOwningDummy);
 
         $this->manager->flush();

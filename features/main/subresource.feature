@@ -368,34 +368,34 @@ Feature: Subresource support
 
   @dropSchema
   Scenario: The OneToOne subresource should be accessible from owned side
-    Given there is a RelatedOwnedDummy and a RelatedOwningDummy object with OneToOne bidirectional relation
-    When I send a "GET" request to "/related_owned_dummies/1/related_owning_dummy"
+    @Given there is a RelatedOwnedDummy object with OneToOne relation
+    When I send a "GET" request to "/related_owned_dummies/1/owning_dummy"
     And the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
     And the JSON should be equal to:
     """
     {
-      "@context": "/contexts/RelatedOwningDummy",
-      "@id": "/related_owning_dummies/1",
-      "@type": "RelatedOwningDummy",
+      "@context": "/contexts/Dummy",
+      "@id": "/dummies/1",
+      "@type": "Dummy",
       "id": 1
     }
     """
 
   @dropSchema
   Scenario: The OneToOne subresource should be accessible from owning side
-    Given there is a RelatedOwnedDummy and a RelatedOwningDummy object with OneToOne bidirectional relation
-    When I send a "GET" request to "/related_owning_dummies/1/related_owned_dummy"
+    Given there is a RelatedOwningDummy object with OneToOne relation
+    When I send a "GET" request to "/related_owning_dummies/1/owned_dummy"
     And the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
     And the JSON should be equal to:
     """
     {
-      "@context": "/contexts/RelatedOwnedDummy",
-      "@id": "/related_owned_dummies/1",
-      "@type": "RelatedOwnedDummy",
+      "@context": "/contexts/Dummy",
+      "@id": "/dummies/1",
+      "@type": "Dummy",
       "id": 1
     }
     """
