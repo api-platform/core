@@ -326,8 +326,6 @@ class SubresourceDataProviderTest extends TestCase
 
         $context = ['property' => 'ownedDummy', 'identifiers' => [['id', RelatedOwningDummy::class], ['ownedDummy', RelatedOwnedDummy::class]], 'collection' => false, IdentifierConverterInterface::HAS_IDENTIFIER_CONVERTER => true];
 
-
-
         $this->assertEquals($result, $dataProvider->getSubresource(RelatedOwnedDummy::class, ['id' => ['id' => 1], 'ownedDummy' => ['id' => 1]], $context));
     }
 
