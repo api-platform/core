@@ -250,6 +250,8 @@ final class ApiResource
     private $validationGroups;
 
     /**
+     * @see https://github.com/Haehnchen/idea-php-annotation-plugin/issues/112
+     *
      * @var string
      */
     private $sunset;
