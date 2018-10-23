@@ -1029,7 +1029,6 @@ final class FeatureContext implements Context, SnippetAcceptingContext
      */
     public function thereIsARelatedOwningDummy()
     {
-
         $dummy = new Dummy();
         $this->manager->persist($dummy);
 
