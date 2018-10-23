@@ -19,7 +19,7 @@ install:
   - echo extension=php_pdo_sqlite.dll >> php.ini
   - echo memory_limit=3G >> php.ini
   - cd %APPVEYOR_BUILD_FOLDER%
-  - composer install --no-interaction --no-progress
+  - composer install --no-interaction --no-progress --no-suggest
 
 test_script:
   - cd %APPVEYOR_BUILD_FOLDER%

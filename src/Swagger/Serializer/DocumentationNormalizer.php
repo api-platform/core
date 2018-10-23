@@ -267,10 +267,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
                     ],
                 ],
             ];
-
-            if (!isset($pathOperation['parameters']) && $parameters = $this->getFiltersParameters($resourceClass, $operationName, $resourceMetadata, $definitions, $serializerContext)) {
-                $pathOperation['parameters'] = $parameters;
-            }
+            $pathOperation['parameters'] ?? $pathOperation['parameters'] = $this->getFiltersParameters($resourceClass, $operationName, $resourceMetadata, $definitions, $serializerContext);
 
             if ($this->paginationEnabled && $resourceMetadata->getCollectionOperationAttribute($operationName, 'pagination_enabled', true, true)) {
                 $pathOperation['parameters'][] = $this->getPaginationParameters();

@@ -55,14 +55,6 @@ class QueryJoinParserTest extends TestCase
         $this->assertEquals(RelatedDummy::class, QueryJoinParser::getJoinRelationship($join));
     }
 
-    public function testGetJoinRelationshipWithReflection()
-    {
-        $methodExist = $this->getFunctionMock('ApiPlatform\Core\Bridge\Doctrine\Orm\Util', 'method_exists');
-        $methodExist->expects($this->any())->with(Join::class, 'getJoin')->willReturn('false');
-        $join = new Join('INNER_JOIN', 'a_1.relatedDummy', 'a_1', null, 'a_1.name = r.name');
-        $this->assertEquals('a_1.relatedDummy', QueryJoinParser::getJoinRelationship($join));
-    }
-
     public function testGetJoinAliasWithJoin()
     {
         $join = new Join('INNER_JOIN', 'relatedDummy', 'a_1', null, 'a_1.name = r.name');
@@ -75,25 +67,9 @@ class QueryJoinParserTest extends TestCase
         $this->assertEquals('a_1', QueryJoinParser::getJoinAlias($join));
     }
 
-    public function testGetJoinAliasWithReflection()
-    {
-        $methodExist = $this->getFunctionMock('ApiPlatform\Core\Bridge\Doctrine\Orm\Util', 'method_exists');
-        $methodExist->expects($this->any())->with(Join::class, 'getAlias')->willReturn('false');
-        $join = new Join('INNER_JOIN', 'relatedDummy', 'a_1', null, 'a_1.name = r.name');
-        $this->assertEquals('a_1', QueryJoinParser::getJoinAlias($join));
-    }
-
     public function testGetOrderByPartsWithOrderBy()
     {
         $orderBy = new OrderBy('name', 'asc');
         $this->assertEquals(['name asc'], QueryJoinParser::getOrderByParts($orderBy));
-    }
-
-    public function testGetOrderByPartsWithReflection()
-    {
-        $methodExist = $this->getFunctionMock('ApiPlatform\Core\Bridge\Doctrine\Orm\Util', 'method_exists');
-        $methodExist->expects($this->any())->with(OrderBy::class, 'getParts')->willReturn('false');
-        $orderBy = new OrderBy('name', 'desc');
-        $this->assertEquals(['name desc'], QueryJoinParser::getOrderByParts($orderBy));
     }
 }
