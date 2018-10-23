@@ -130,8 +130,8 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $useDoctrine = isset($bundles['DoctrineBundle']) && class_exists(Version::class);
 
         $this->registerMetadataConfiguration($container, $config, $loader);
-        $this->registerOAuthConfiguration($container, $config, $loader);
-        $this->registerApiKeysConfiguration($container, $config, $loader);
+        $this->registerOAuthConfiguration($container, $config);
+        $this->registerApiKeysConfiguration($container, $config);
         $this->registerSwaggerConfiguration($container, $config, $loader);
         $this->registerJsonApiConfiguration($formats, $loader);
         $this->registerJsonLdConfiguration($container, $formats, $loader, $config['enable_docs']);
@@ -141,9 +141,9 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $this->registerBundlesConfiguration($bundles, $config, $loader, $useDoctrine);
         $this->registerCacheConfiguration($container);
         $this->registerDoctrineExtensionConfiguration($container, $config, $useDoctrine);
-        $this->registerHttpCache($container, $config, $loader, $useDoctrine);
-        $this->registerValidatorConfiguration($container, $config, $loader);
-        $this->registerDataCollector($container, $config, $loader);
+        $this->registerHttpCacheConfiguration($container, $config, $loader, $useDoctrine);
+        $this->registerValidatorConfiguration($container, $config);
+        $this->registerDataCollectorConfiguration($config, $loader);
     }
 
     /**
@@ -290,7 +290,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
     /**
      * Registers the OAuth configuration.
      */
-    private function registerOAuthConfiguration(ContainerBuilder $container, array $config, XmlFileLoader $loader)
+    private function registerOAuthConfiguration(ContainerBuilder $container, array $config)
     {
         if (!$config['oauth']) {
             return;
@@ -309,7 +309,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
     /**
      * Registers the api keys configuration.
      */
-    private function registerApiKeysConfiguration(ContainerBuilder $container, array $config, XmlFileLoader $loader)
+    private function registerApiKeysConfiguration(ContainerBuilder $container, array $config)
     {
         $container->setParameter('api_platform.swagger.api_keys', $config['swagger']['api_keys']);
     }
@@ -456,7 +456,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $container->removeDefinition('api_platform.doctrine.orm.query_extension.filter_eager_loading');
     }
 
-    private function registerHttpCache(ContainerBuilder $container, array $config, XmlFileLoader $loader, bool $useDoctrine)
+    private function registerHttpCacheConfiguration(ContainerBuilder $container, array $config, XmlFileLoader $loader, bool $useDoctrine)
     {
         $loader->load('http_cache.xml');
 
@@ -500,7 +500,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
     /**
      * Registers the Validator configuration.
      */
-    private function registerValidatorConfiguration(ContainerBuilder $container, array $config, XmlFileLoader $loader)
+    private function registerValidatorConfiguration(ContainerBuilder $container, array $config)
     {
         if (!$config['validator']) {
             return;
@@ -512,7 +512,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
     /**
      * Registers the DataCollector configuration.
      */
-    private function registerDataCollector(ContainerBuilder $container, array $config, XmlFileLoader $loader)
+    private function registerDataCollectorConfiguration(array $config, XmlFileLoader $loader)
     {
         if (!$config['enable_profiler']) {
             return;
