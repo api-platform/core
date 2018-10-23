@@ -14,6 +14,9 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\EventListener;
 
 use ApiPlatform\Core\EventListener\RespondListener;
+use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
+use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -117,5 +120,27 @@ class RespondListenerTest extends TestCase
         $this->assertEquals('Accept', $response->headers->get('Vary'));
         $this->assertEquals('nosniff', $response->headers->get('X-Content-Type-Options'));
         $this->assertEquals('deny', $response->headers->get('X-Frame-Options'));
+    }
+
+    public function testSetSunsetHeader()
+    {
+        $kernelProphecy = $this->prophesize(HttpKernelInterface::class);
+
+        $request = new Request([], [], ['_api_resource_class' => Dummy::class, '_api_item_operation_name' => 'get', '_api_respond' => true]);
+
+        $event = new GetResponseForControllerResultEvent(
+            $kernelProphecy->reveal(),
+            $request,
+            HttpKernelInterface::MASTER_REQUEST,
+            'bar'
+        );
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
+        $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadata(null, null, null, ['get' => ['sunset' => 'tomorrow']]));
+
+        $listener = new RespondListener($resourceMetadataFactoryProphecy->reveal());
+        $listener->onKernelView($event);
+
+        $response = $event->getResponse();
+        $this->assertEquals(new \DateTimeImmutable('tomorrow'), \DateTime::createFromFormat(DATE_RFC1123, $response->headers->get('Sunset')));
     }
 }

@@ -54,6 +54,7 @@ class ApiResourceTest extends TestCase
             'shortName' => 'shortName',
             'subresourceOperations' => [],
             'validationGroups' => ['foo', 'bar'],
+            'sunset' => 'Thu, 11 Oct 2018 00:00:00 +0200',
         ]);
 
         $this->assertSame('shortName', $resource->shortName);
@@ -84,6 +85,7 @@ class ApiResourceTest extends TestCase
             'pagination_partial' => true,
             'route_prefix' => '/foo',
             'validation_groups' => ['baz', 'qux'],
+            'sunset' => 'Thu, 11 Oct 2018 00:00:00 +0200',
         ], $resource->attributes);
     }
 

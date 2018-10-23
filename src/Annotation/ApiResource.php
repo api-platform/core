@@ -51,6 +51,7 @@ use ApiPlatform\Core\Exception\InvalidArgumentException;
  *     @Attribute("routePrefix", type="string"),
  *     @Attribute("shortName", type="string"),
  *     @Attribute("subresourceOperations", type="array"),
+ *     @Attribute("sunset", type="string"),
  *     @Attribute("swaggerContext", type="array"),
  *     @Attribute("validationGroups", type="mixed")
  * )
@@ -247,6 +248,11 @@ final class ApiResource
      * @var mixed
      */
     private $validationGroups;
+
+    /**
+     * @var string
+     */
+    private $sunset;
 
     /**
      * @throws InvalidArgumentException
