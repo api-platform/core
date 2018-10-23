@@ -763,6 +763,8 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.http_cache.purger.varnish_client',
             'api_platform.http_cache.listener.response.add_tags',
             'api_platform.validator',
+            'api_platform.mercure.listener.response.add_link_header',
+            'api_platform.doctrine.listener.mercure.publish',
         ];
 
         foreach ($definitions as $definition) {
@@ -785,6 +787,7 @@ class ApiPlatformExtensionTest extends TestCase
 
         $containerBuilderProphecy->hasParameter('api_platform.metadata_cache')->willReturn(true)->shouldBeCalled();
         $containerBuilderProphecy->getParameter('api_platform.metadata_cache')->willReturn(true)->shouldBeCalled();
+        $containerBuilderProphecy->hasParameter('mercure.default_hub')->willReturn(true)->shouldBeCalled();
 
         return $containerBuilderProphecy;
     }

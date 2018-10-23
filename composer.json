@@ -1,4 +1,17 @@
 {
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/symfony/mercure"
+        },
+        {
+            "type": "vcs",
+            "url": "https://github.com/symfony/mercure-bundle"
+        }
+    ],
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+
     "name": "api-platform/core",
     "type": "library",
     "description": "The ultimate solution to create web APIs.",
@@ -14,7 +27,6 @@
     ],
     "require": {
         "php": ">=7.1",
-
         "doctrine/inflector": "^1.0",
         "psr/cache": "^1.0",
         "psr/container": "^1.0",
@@ -23,6 +35,7 @@
         "symfony/property-access": "^2.7 || ^3.0 || ^4.0",
         "symfony/property-info": "^3.3.11 || ^4.0",
         "symfony/serializer": "^4.1",
+        "symfony/web-link": "^4.1",
         "willdurand/negotiation": "^2.0.3"
     },
     "require-dev": {
@@ -58,6 +71,9 @@
         "symfony/finder": "^3.3 || ^4.0",
         "symfony/form": "^3.3 || ^4.0",
         "symfony/framework-bundle": "^3.3 || ^4.0",
+        "symfony/mercure": "*",
+        "symfony/mercure-bundle": "*",
+        "symfony/messenger": "^4.1",
         "symfony/phpunit-bridge": "^3.3 || ^4.0",
         "symfony/routing": "^3.3 || ^4.0",
         "symfony/security": "^3.0 || ^4.0",

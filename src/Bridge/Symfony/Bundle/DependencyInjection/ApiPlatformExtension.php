@@ -144,6 +144,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $this->registerHttpCacheConfiguration($container, $config, $loader, $useDoctrine);
         $this->registerValidatorConfiguration($container, $config);
         $this->registerDataCollectorConfiguration($container, $config, $loader);
+        $this->registerMercureConfiguration($container, $loader, $useDoctrine);
     }
 
     /**
@@ -523,6 +524,18 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
 
         if ($container->hasParameter('kernel.debug') && $container->getParameter('kernel.debug')) {
             $loader->load('debug.xml');
+        }
+    }
+
+    private function registerMercureConfiguration(ContainerBuilder $container, XmlFileLoader $loader, bool $useDoctrine)
+    {
+        if (!$container->hasParameter('mercure.default_hub')) {
+            return;
+        }
+
+        $loader->load('mercure.xml');
+        if ($useDoctrine) {
+            $loader->load('doctrine_orm_mercure_publisher.xml');
         }
     }
 }
