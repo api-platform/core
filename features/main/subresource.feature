@@ -352,8 +352,8 @@ Feature: Subresource support
     And the JSON should be equal to:
     """
     {
-      "@context": "\/contexts\/Dummy",
-      "@id": "\/dummies\/3",
+      "@context": "/contexts/Dummy",
+      "@id": "/dummies/3",
       "@type": "Dummy",
       "description": null,
       "dummy": null,
@@ -366,7 +366,7 @@ Feature: Subresource support
       "jsonData": [],
       "arrayData": [],
       "name_converted": null,
-      "relatedOwnedDummy": "\/related_owned_dummies\/1",
+      "relatedOwnedDummy": "/related_owned_dummies/1",
       "relatedOwningDummy": null,
       "id": 3,
       "name": "plop",
@@ -385,8 +385,8 @@ Feature: Subresource support
     And the JSON should be equal to:
     """
     {
-      "@context": "\/contexts\/Dummy",
-      "@id": "\/dummies\/4",
+      "@context": "/contexts/Dummy",
+      "@id": "/dummies/4",
       "@type": "Dummy",
       "description": null,
       "dummy": null,
@@ -400,7 +400,7 @@ Feature: Subresource support
       "arrayData": [],
       "name_converted": null,
       "relatedOwnedDummy": null,
-      "relatedOwningDummy": "\/related_owning_dummies\/1",
+      "relatedOwningDummy": "/related_owning_dummies/1",
       "id": 4,
       "name": "plop",
       "alias": null,
@@ -431,4 +431,3 @@ Feature: Subresource support
       "parent": null
     }
     """
-

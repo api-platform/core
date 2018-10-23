@@ -281,9 +281,7 @@ class SubresourceDataProviderTest extends TestCase
         $queryBuilder->setParameter('id_p1', 1, DBALType::INTEGER)->shouldBeCalled()->willReturn($queryBuilder);
         $funcProphecy = $this->prophesize(Func::class);
         $func = $funcProphecy->reveal();
-
         $queryBuilder->andWhere($func)->shouldBeCalled()->willReturn($queryBuilder);
-
         $queryBuilder->getQuery()->shouldBeCalled()->willReturn($queryProphecy->reveal());
 
         $repositoryProphecy = $this->prophesize(EntityRepository::class);
