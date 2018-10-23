@@ -95,7 +95,7 @@ final class QueryChecker
 
         $orderByAliases = [];
         foreach ($orderByParts as $orderBy) {
-            $parts = QueryJoinParser::getOrderByParts($orderBy);
+            $parts = $orderBy->getParts();
 
             foreach ($parts as $part) {
                 $pos = strpos($part, '.');
@@ -111,12 +111,12 @@ final class QueryChecker
 
         foreach ($joinParts as $joins) {
             foreach ($joins as $join) {
-                $alias = QueryJoinParser::getJoinAlias($join);
+                $alias = $join->getAlias();
 
                 if (!isset($orderByAliases[$alias])) {
                     continue;
                 }
-                $relationship = QueryJoinParser::getJoinRelationship($join);
+                $relationship = $join->getJoin();
 
                 if (false !== strpos($relationship, '.')) {
                     /*
