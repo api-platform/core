@@ -1018,6 +1018,7 @@ final class FeatureContext implements Context, SnippetAcceptingContext
         $this->manager->persist($relatedOwnedDummy);
 
         $dummy = new Dummy();
+        $dummy->setName('plop');
         $dummy->setRelatedOwnedDummy($relatedOwnedDummy);
         $this->manager->persist($dummy);
 
@@ -1030,6 +1031,7 @@ final class FeatureContext implements Context, SnippetAcceptingContext
     public function thereIsARelatedOwningDummy()
     {
         $dummy = new Dummy();
+        $dummy->setName('plop');
         $this->manager->persist($dummy);
 
         $relatedOwningDummy = new RelatedOwningDummy();

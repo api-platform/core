@@ -355,7 +355,8 @@ Feature: Subresource support
       "@context": "/contexts/Dummy",
       "@id": "/dummies/1",
       "@type": "Dummy",
-      "id": 1
+      "id": 1,
+      "name": "plop"
     }
     """
 
@@ -372,7 +373,8 @@ Feature: Subresource support
       "@context": "/contexts/Dummy",
       "@id": "/dummies/1",
       "@type": "Dummy",
-      "id": 1
+      "id": 1,
+      "name": "plop"
     }
     """
 
