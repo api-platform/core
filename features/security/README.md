@@ -60,7 +60,7 @@ one of the most popular framework validation in the world.
 
 The sending of security headers is ensured by [our "send security headers" functional test suite](send_security_headers.feature)
 and the unit tests of the [`RespondListener`](../../tests/EventListener/RespondListenerTest.php), [`ExceptionAction`](../../tests/Action/ExceptionActionTest.php)
-and [`ValidationExceptionListener`](../../tests/Bridge/Symfony/Validation/EventListener/ValidationExceptionListenerTest.php).
+and [`ValidationExceptionListener`](../../tests/Bridge/Symfony/Validator/EventListener/ValidationExceptionListenerTest.php).
 
 ### JSON encoding
 

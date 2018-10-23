@@ -110,7 +110,7 @@ jobs:
       - *update-project-dependencies
       - run:
           name: Install PHPStan
-          command: composer global require phpstan/phpstan:0.10.1
+          command: composer global require phpstan/phpstan:0.10.5
       - *save-composer-cache-by-revision
       - *save-composer-cache-by-branch
       - run:
