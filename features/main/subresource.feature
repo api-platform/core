@@ -352,11 +352,26 @@ Feature: Subresource support
     And the JSON should be equal to:
     """
     {
-      "@context": "/contexts/Dummy",
-      "@id": "/dummies/1",
+      "@context": "\/contexts\/Dummy",
+      "@id": "\/dummies\/3",
       "@type": "Dummy",
-      "id": 1,
-      "name": "plop"
+      "description": null,
+      "dummy": null,
+      "dummyBoolean": null,
+      "dummyDate": null,
+      "dummyFloat": null,
+      "dummyPrice": null,
+      "relatedDummy": null,
+      "relatedDummies": [],
+      "jsonData": [],
+      "arrayData": [],
+      "name_converted": null,
+      "relatedOwnedDummy": "\/related_owned_dummies\/1",
+      "relatedOwningDummy": null,
+      "id": 3,
+      "name": "plop",
+      "alias": null,
+      "foo": null
     }
     """
 
@@ -370,11 +385,26 @@ Feature: Subresource support
     And the JSON should be equal to:
     """
     {
-      "@context": "/contexts/Dummy",
-      "@id": "/dummies/1",
+      "@context": "\/contexts\/Dummy",
+      "@id": "\/dummies\/4",
       "@type": "Dummy",
-      "id": 1,
-      "name": "plop"
+      "description": null,
+      "dummy": null,
+      "dummyBoolean": null,
+      "dummyDate": null,
+      "dummyFloat": null,
+      "dummyPrice": null,
+      "relatedDummy": null,
+      "relatedDummies": [],
+      "jsonData": [],
+      "arrayData": [],
+      "name_converted": null,
+      "relatedOwnedDummy": null,
+      "relatedOwningDummy": "\/related_owning_dummies\/1",
+      "id": 4,
+      "name": "plop",
+      "alias": null,
+      "foo": null
     }
     """
 
