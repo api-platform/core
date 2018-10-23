@@ -75,6 +75,7 @@ final class SchemaBuilder implements SchemaBuilderInterface
 
     public function getSchema(): Schema
     {
+        $this->graphqlTypes['Iterable'] = new IterableType();
         $queryFields = ['node' => $this->getNodeQueryField()];
         $mutationFields = [];
 
@@ -97,6 +98,9 @@ final class SchemaBuilder implements SchemaBuilderInterface
                 'name' => 'Query',
                 'fields' => $queryFields,
             ]),
+            'typeLoader' => function ($name) {
+                return $this->graphqlTypes[$name];
+            },
         ];
 
         if ($mutationFields) {
@@ -111,11 +115,11 @@ final class SchemaBuilder implements SchemaBuilderInterface
 
     private function getNodeInterface(): InterfaceType
     {
-        if (isset($this->graphqlTypes['#node'])) {
-            return $this->graphqlTypes['#node'];
+        if (isset($this->graphqlTypes['Node'])) {
+            return $this->graphqlTypes['Node'];
         }
 
-        return $this->graphqlTypes['#node'] = new InterfaceType([
+        return $this->graphqlTypes['Node'] = new InterfaceType([
             'name' => 'Node',
             'description' => 'A node, according to the Relay specification.',
             'fields' => [
@@ -129,9 +133,9 @@ final class SchemaBuilder implements SchemaBuilderInterface
                     return null;
                 }
 
-                $resourceClass = $this->getObjectClass(unserialize($value[ItemNormalizer::ITEM_KEY]));
+                $shortName = (new \ReflectionObject(unserialize($value[ItemNormalizer::ITEM_KEY])))->getShortName();
 
-                return $this->graphqlTypes[$resourceClass][null][false] ?? null;
+                return $this->graphqlTypes[$shortName] ?? null;
             },
         ]);
     }
@@ -354,10 +358,7 @@ final class SchemaBuilder implements SchemaBuilderInterface
                 break;
             case Type::BUILTIN_TYPE_ARRAY:
             case Type::BUILTIN_TYPE_ITERABLE:
-                if (!isset($this->graphqlTypes['#iterable'])) {
-                    $this->graphqlTypes['#iterable'] = new IterableType();
-                }
-                $graphqlType = $this->graphqlTypes['#iterable'];
+                $graphqlType = $this->graphqlTypes['Iterable'];
                 break;
             case Type::BUILTIN_TYPE_OBJECT:
                 if (($input && $depth > 0) || is_a($type->getClassName(), \DateTimeInterface::class, true)) {
@@ -400,10 +401,6 @@ final class SchemaBuilder implements SchemaBuilderInterface
      */
     private function getResourceObjectType(string $resourceClass, ResourceMetadata $resourceMetadata, bool $input = false, string $mutationName = null, int $depth = 0): GraphQLType
     {
-        if (isset($this->graphqlTypes[$resourceClass][$mutationName][$input])) {
-            return $this->graphqlTypes[$resourceClass][$mutationName][$input];
-        }
-
         $shortName = $resourceMetadata->getShortName();
         if (null !== $mutationName) {
             $shortName = $mutationName.ucfirst($shortName);
@@ -412,6 +409,10 @@ final class SchemaBuilder implements SchemaBuilderInterface
             $shortName .= 'Input';
         } elseif (null !== $mutationName) {
             $shortName .= 'Payload';
+        }
+
+        if (isset($this->graphqlTypes[$shortName])) {
+            return $this->graphqlTypes[$shortName];
         }
 
         $configuration = [
@@ -424,7 +425,7 @@ final class SchemaBuilder implements SchemaBuilderInterface
             'interfaces' => [$this->getNodeInterface()],
         ];
 
-        return $this->graphqlTypes[$resourceClass][$mutationName][$input] = $input ? new InputObjectType($configuration) : new ObjectType($configuration);
+        return $this->graphqlTypes[$shortName] = $input ? new InputObjectType($configuration) : new ObjectType($configuration);
     }
 
     /**
@@ -486,8 +487,8 @@ final class SchemaBuilder implements SchemaBuilderInterface
     {
         $shortName = $resourceType->name;
 
-        if (isset($this->graphqlTypes[$resourceClass]['connection'])) {
-            return $this->graphqlTypes[$resourceClass]['connection'];
+        if (isset($this->graphqlTypes["{$shortName}Connection"])) {
+            return $this->graphqlTypes["{$shortName}Connection"];
         }
 
         $edgeObjectTypeConfiguration = [
@@ -499,6 +500,8 @@ final class SchemaBuilder implements SchemaBuilderInterface
             ],
         ];
         $edgeObjectType = new ObjectType($edgeObjectTypeConfiguration);
+        $this->graphqlTypes["{$shortName}Edge"] = $edgeObjectType;
+
         $pageInfoObjectTypeConfiguration = [
             'name' => "{$shortName}PageInfo",
             'description' => 'Information about the current page.',
@@ -508,6 +511,7 @@ final class SchemaBuilder implements SchemaBuilderInterface
             ],
         ];
         $pageInfoObjectType = new ObjectType($pageInfoObjectTypeConfiguration);
+        $this->graphqlTypes["{$shortName}PageInfo"] = $pageInfoObjectType;
 
         $configuration = [
             'name' => "{$shortName}Connection",
@@ -519,7 +523,7 @@ final class SchemaBuilder implements SchemaBuilderInterface
             ],
         ];
 
-        return $this->graphqlTypes[$resourceClass]['connection'] = new ObjectType($configuration);
+        return $this->graphqlTypes["{$shortName}Connection"] = new ObjectType($configuration);
     }
 
     private function isCollection(Type $type): bool
