@@ -51,16 +51,7 @@ final class TraceableChainDataPersister implements DataPersisterInterface
      */
     public function persist($data)
     {
-        $match = null;
-        foreach ($this->persisters as $persister) {
-            $this->persistersResponse[\get_class($persister)] = $match ? null : false;
-            if (!$match && $persister->supports($data)) {
-                $match = $persister;
-                $this->persistersResponse[\get_class($persister)] = true;
-            }
-        }
-
-        if ($match) {
+        if ($match = $this->tracePersisters($data)) {
             return $match->persist($data) ?? $data;
         }
     }
@@ -69,6 +60,13 @@ final class TraceableChainDataPersister implements DataPersisterInterface
      * {@inheritdoc}
      */
     public function remove($data)
+    {
+        if ($match = $this->tracePersisters($data)) {
+            return $match->remove($data);
+        }
+    }
+
+    private function tracePersisters($data)
     {
         $match = null;
         foreach ($this->persisters as $persister) {
@@ -79,8 +77,6 @@ final class TraceableChainDataPersister implements DataPersisterInterface
             }
         }
 
-        if ($match) {
-            return $match->remove($data);
-        }
+        return $match;
     }
 }
