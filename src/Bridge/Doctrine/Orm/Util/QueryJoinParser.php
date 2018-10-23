@@ -100,17 +100,7 @@ final class QueryJoinParser
      */
     public static function getJoinRelationship(Join $join): string
     {
-        static $relationshipProperty = null;
-        static $initialized = false;
-
-        if (!$initialized && !method_exists(Join::class, 'getJoin')) {
-            $relationshipProperty = new \ReflectionProperty(Join::class, '_join');
-            $relationshipProperty->setAccessible(true);
-
-            $initialized = true;
-        }
-
-        return (null === $relationshipProperty) ? $join->getJoin() : $relationshipProperty->getValue($join);
+        return $join->getJoin();
     }
 
     /**
@@ -118,17 +108,7 @@ final class QueryJoinParser
      */
     public static function getJoinAlias(Join $join): string
     {
-        static $aliasProperty = null;
-        static $initialized = false;
-
-        if (!$initialized && !method_exists(Join::class, 'getAlias')) {
-            $aliasProperty = new \ReflectionProperty(Join::class, '_alias');
-            $aliasProperty->setAccessible(true);
-
-            $initialized = true;
-        }
-
-        return (null === $aliasProperty) ? $join->getAlias() : $aliasProperty->getValue($join);
+        return $join->getAlias();
     }
 
     /**
@@ -139,16 +119,6 @@ final class QueryJoinParser
      */
     public static function getOrderByParts(OrderBy $orderBy): array
     {
-        static $partsProperty = null;
-        static $initialized = false;
-
-        if (!$initialized && !method_exists(OrderBy::class, 'getParts')) {
-            $partsProperty = new \ReflectionProperty(OrderBy::class, '_parts');
-            $partsProperty->setAccessible(true);
-
-            $initialized = true;
-        }
-
-        return (null === $partsProperty) ? $orderBy->getParts() : $partsProperty->getValue($orderBy);
+        return $orderBy->getParts();
     }
 }
