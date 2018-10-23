@@ -416,7 +416,7 @@ Feature: Subresource support
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
     And the JSON should be equal to:
     """
-    {+
+    {
       "@context": "/contexts/DummyProduct",
       "@id": "/dummy_products/2",
       "@type": "DummyProduct",
