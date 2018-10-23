@@ -1018,7 +1018,7 @@ final class FeatureContext implements Context, SnippetAcceptingContext
         $this->manager->persist($relatedOwnedDummy);
 
         $dummy = new Dummy();
-        $dummy->setOwnedDummy($relatedOwnedDummy);
+        $dummy->setRelatedOwnedDummy($relatedOwnedDummy);
         $this->manager->persist($dummy);
 
         $this->manager->flush();
