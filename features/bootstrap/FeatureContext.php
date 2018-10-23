@@ -43,6 +43,8 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Pet;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Question;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RamseyUuidDummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RelatedDummy;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RelatedOwnedDummy;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RelatedOwningDummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RelatedToDummyFriend;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RelationEmbedder;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\SecuredDummy;
@@ -1003,6 +1005,21 @@ final class FeatureContext implements Context, SnippetAcceptingContext
         $dummy->addRelatedDummy($namedRelatedDummy);
         $dummy->addRelatedDummy($relatedDummy);
         $this->manager->persist($dummy);
+
+        $this->manager->flush();
+    }
+
+    /**
+     * @Given there is a RelatedOwnedDummy and a RelatedOwningDummy object with OneToOne bidirectional relation
+     */
+    public function thereIsARelatedOwnedDummyAndARelatedOwningDummy()
+    {
+        $relatedOwnedDummy = new RelatedOwnedDummy();
+        $this->manager->persist($relatedOwnedDummy);
+
+        $relatedOwningDummy = new RelatedOwningDummy();
+        $relatedOwningDummy->setOwnedDummy($relatedOwnedDummy);
+        $this->manager->persist($relatedOwningDummy);
 
         $this->manager->flush();
     }
