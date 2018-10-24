@@ -96,7 +96,7 @@ final class IriConverter implements IriConverterInterface
         }
 
         if (isset($attributes['subresource_operation_name'])) {
-            if ($item = $this->getSubresourceData($identifiers, $attributes, $context)) {
+            if (($item = $this->getSubresourceData($identifiers, $attributes, $context)) && !\is_array($item)) {
                 return $item;
             }
 
