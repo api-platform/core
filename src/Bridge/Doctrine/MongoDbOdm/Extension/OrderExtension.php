@@ -11,10 +11,10 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Bridge\Doctrine\MongoDB\Extension;
+namespace ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Extension;
 
 use ApiPlatform\Core\Bridge\Doctrine\Common\PropertyHelperTrait;
-use ApiPlatform\Core\Bridge\Doctrine\MongoDB\PropertyHelperTrait as MongoDbPropertyHelperTrait;
+use ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\PropertyHelperTrait as MongoDbOdmPropertyHelperTrait;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use Doctrine\Common\Persistence\ManagerRegistry;
@@ -31,7 +31,7 @@ use Doctrine\ODM\MongoDB\Aggregation\Builder;
 final class OrderExtension implements AggregationCollectionExtensionInterface
 {
     use PropertyHelperTrait;
-    use MongoDbPropertyHelperTrait;
+    use MongoDbOdmPropertyHelperTrait;
 
     private $order;
     private $resourceMetadataFactory;

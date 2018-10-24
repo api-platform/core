@@ -11,11 +11,11 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Bridge\Doctrine\MongoDB\Extension;
+namespace ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Extension;
 
 use ApiPlatform\Core\Api\FilterCollection;
 use ApiPlatform\Core\Api\FilterLocatorTrait;
-use ApiPlatform\Core\Bridge\Doctrine\MongoDB\Filter\FilterInterface;
+use ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Filter\FilterInterface;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use Doctrine\ODM\MongoDB\Aggregation\Builder;

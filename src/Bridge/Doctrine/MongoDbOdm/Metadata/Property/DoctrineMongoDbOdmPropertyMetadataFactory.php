@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Bridge\Doctrine\MongoDB\Metadata\Property;
+namespace ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Metadata\Property;
 
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
@@ -23,7 +23,7 @@ use Doctrine\ODM\MongoDB\Mapping\ClassMetadata;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-final class DoctrineMongoDBPropertyMetadataFactory implements PropertyMetadataFactoryInterface
+final class DoctrineMongoDbOdmPropertyMetadataFactory implements PropertyMetadataFactoryInterface
 {
     private $decorated;
     private $managerRegistry;

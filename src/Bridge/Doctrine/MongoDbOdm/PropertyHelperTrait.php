@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Bridge\Doctrine\MongoDB;
+namespace ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm;
 
 use ApiPlatform\Core\Exception\InvalidArgumentException;
 use Doctrine\ODM\MongoDB\Aggregation\Builder;

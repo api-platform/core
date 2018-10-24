@@ -15,9 +15,9 @@ namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Document;
 
 use ApiPlatform\Core\Annotation\ApiFilter;
 use ApiPlatform\Core\Annotation\ApiResource;
-use ApiPlatform\Core\Bridge\Doctrine\MongoDB\Filter\BooleanFilter;
-use ApiPlatform\Core\Bridge\Doctrine\MongoDB\Filter\DateFilter;
-use ApiPlatform\Core\Bridge\Doctrine\MongoDB\Filter\SearchFilter;
+use ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Filter\BooleanFilter;
+use ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Filter\DateFilter;
+use ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Filter\SearchFilter;
 use ApiPlatform\Core\Serializer\Filter\GroupFilter;
 use ApiPlatform\Core\Serializer\Filter\PropertyFilter;
 use Doctrine\Common\Collections\ArrayCollection;

@@ -19,9 +19,9 @@ declare(strict_types=1);
  * file that was distributed with this source code.
  */
 
-namespace ApiPlatform\Core\Bridge\Doctrine\MongoDB\Extension;
+namespace ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Extension;
 
-use ApiPlatform\Core\Bridge\Doctrine\MongoDB\Paginator;
+use ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Paginator;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;

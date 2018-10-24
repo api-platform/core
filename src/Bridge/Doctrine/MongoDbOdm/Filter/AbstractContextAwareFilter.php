@@ -11,10 +11,10 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Bridge\Doctrine\MongoDB\Filter;
+namespace ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Filter;
 
 use ApiPlatform\Core\Bridge\Doctrine\Common\PropertyHelperTrait;
-use ApiPlatform\Core\Bridge\Doctrine\MongoDB\PropertyHelperTrait as MongoDbPropertyHelperTrait;
+use ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\PropertyHelperTrait as MongoDbOdmPropertyHelperTrait;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ODM\MongoDB\Aggregation\Builder;
 use Psr\Log\LoggerInterface;
@@ -23,7 +23,7 @@ use Psr\Log\NullLogger;
 abstract class AbstractContextAwareFilter implements FilterInterface
 {
     use PropertyHelperTrait;
-    use MongoDbPropertyHelperTrait;
+    use MongoDbOdmPropertyHelperTrait;
 
     protected $logger;
     protected $properties;

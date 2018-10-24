@@ -11,17 +11,17 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Bridge\Doctrine\MongoDB\Extension;
+namespace ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Extension;
 
 use Doctrine\ODM\MongoDB\Aggregation\Builder;
 
 /**
  * Interface of Doctrine MongoDB ODM aggregation extensions that supports result production
- * for specific cases such as Aggregation alteration.
+ * for specific cases such as pagination.
  *
  * @author Alan Poulain <contact@alanpoulain.eu>
  */
-interface AggregationResultItemExtensionInterface extends AggregationItemExtensionInterface
+interface AggregationResultCollectionExtensionInterface extends AggregationCollectionExtensionInterface
 {
     public function supportsResult(string $resourceClass, string $operationName = null, array $context = []): bool;
 

@@ -6,7 +6,7 @@
 
     <services>
         <!-- Should be done by DoctrineMongoDBExtension. -->
-        <service id="api_platform.doctrine.mongodb_odm.default_entity_manager.property_info_extractor" class="ApiPlatform\Core\Bridge\Doctrine\MongoDB\PropertyInfo\DoctrineExtractor">
+        <service id="api_platform.doctrine.mongodb_odm.default_entity_manager.property_info_extractor" class="ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\PropertyInfo\DoctrineExtractor">
             <argument type="service" id="api_platform.doctrine.metadata_factory" />
             <tag name="property_info.list_extractor" priority="-1001" />
             <tag name="property_info.type_extractor" priority="-999" />
@@ -44,57 +44,57 @@
 
         <service id="api_platform.doctrine.mongodb.default.collection_data_provider"
                  parent="api_platform.doctrine.mongodb.collection_data_provider"
-                 class="ApiPlatform\Core\Bridge\Doctrine\MongoDB\CollectionDataProvider">
+                 class="ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\CollectionDataProvider">
             <tag name="api_platform.collection_data_provider"/>
 
         </service>
         <service id="api_platform.doctrine.mongodb.default.item_data_provider"
                  parent="api_platform.doctrine.mongodb.item_data_provider"
-                 class="ApiPlatform\Core\Bridge\Doctrine\MongoDB\ItemDataProvider">
+                 class="ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\ItemDataProvider">
             <tag name="api_platform.item_data_provider"/>
         </service>
         <service id="api_platform.doctrine.mongodb.default.subresource_data_provider"
                  parent="api_platform.doctrine.mongodb.subresource_data_provider"
-                 class="ApiPlatform\Core\Bridge\Doctrine\MongoDB\SubresourceDataProvider">
+                 class="ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\SubresourceDataProvider">
             <tag name="api_platform.subresource_data_provider" />
         </service>
 
         <!-- Filter -->
 
-        <service id="api_platform.doctrine.mongodb.search_filter" class="ApiPlatform\Core\Bridge\Doctrine\MongoDB\Filter\SearchFilter" public="false" abstract="true">
+        <service id="api_platform.doctrine.mongodb.search_filter" class="ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Filter\SearchFilter" public="false" abstract="true">
             <argument type="service" id="doctrine_mongodb" />
             <argument type="service" id="api_platform.iri_converter" />
             <argument type="service" id="api_platform.property_accessor" />
             <argument type="service" id="logger" on-invalid="ignore" />
         </service>
 
-        <service id="api_platform.doctrine.mongodb.boolean_filter" class="ApiPlatform\Core\Bridge\Doctrine\MongoDB\Filter\BooleanFilter" public="false" abstract="true">
+        <service id="api_platform.doctrine.mongodb.boolean_filter" class="ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Filter\BooleanFilter" public="false" abstract="true">
             <argument type="service" id="doctrine_mongodb" />
             <argument type="service" id="logger" on-invalid="ignore" />
         </service>
 
-        <service id="api_platform.doctrine.mongodb.date_filter" class="ApiPlatform\Core\Bridge\Doctrine\MongoDB\Filter\DateFilter" public="false" abstract="true">
+        <service id="api_platform.doctrine.mongodb.date_filter" class="ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Filter\DateFilter" public="false" abstract="true">
             <argument type="service" id="doctrine_mongodb" />
             <argument type="service" id="logger" on-invalid="ignore" />
         </service>
 
-        <service id="api_platform.doctrine.mongodb.exists_filter" class="ApiPlatform\Core\Bridge\Doctrine\MongoDB\Filter\ExistsFilter" public="false" abstract="true">
+        <service id="api_platform.doctrine.mongodb.exists_filter" class="ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Filter\ExistsFilter" public="false" abstract="true">
             <argument type="service" id="doctrine_mongodb" />
             <argument type="service" id="logger" on-invalid="ignore" />
         </service>
 
-        <service id="api_platform.doctrine.mongodb.numeric_filter" class="ApiPlatform\Core\Bridge\Doctrine\MongoDB\Filter\NumericFilter" public="false" abstract="true">
+        <service id="api_platform.doctrine.mongodb.numeric_filter" class="ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Filter\NumericFilter" public="false" abstract="true">
             <argument type="service" id="doctrine_mongodb" />
             <argument type="service" id="logger" on-invalid="ignore" />
         </service>
 
-        <service id="api_platform.doctrine.mongodb.order_filter" class="ApiPlatform\Core\Bridge\Doctrine\MongoDB\Filter\OrderFilter" public="false" abstract="true">
+        <service id="api_platform.doctrine.mongodb.order_filter" class="ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Filter\OrderFilter" public="false" abstract="true">
             <argument type="service" id="doctrine_mongodb" />
             <argument>%api_platform.collection.order_parameter_name%</argument>
             <argument type="service" id="logger" on-invalid="ignore" />
         </service>
 
-        <service id="api_platform.doctrine.mongodb.range_filter" class="ApiPlatform\Core\Bridge\Doctrine\MongoDB\Filter\RangeFilter" public="false" abstract="true">
+        <service id="api_platform.doctrine.mongodb.range_filter" class="ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Filter\RangeFilter" public="false" abstract="true">
             <argument type="service" id="doctrine_mongodb" />
             <argument type="service" id="logger" on-invalid="ignore" />
         </service>
@@ -102,7 +102,7 @@
         <!-- Metadata loader -->
 
         <service id="api_platform.doctrine.mongodb.metadata.property.metadata_factory"
-                 class="ApiPlatform\Core\Bridge\Doctrine\MongoDB\Metadata\Property\DoctrineMongoDBPropertyMetadataFactory"
+                 class="ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Metadata\Property\DoctrineMongoDbOdmPropertyMetadataFactory"
                  decorates="api_platform.metadata.property.metadata_factory" decoration-priority="40" public="false">
             <argument type="service" id="doctrine_mongodb"/>
             <argument type="service" id="api_platform.doctrine.mongodb.metadata.property.metadata_factory.inner"/>
@@ -118,16 +118,16 @@
 
         <!-- Doctrine Aggregation extensions -->
 
-        <service id="api_platform.doctrine.mongodb.aggregation_extension.filter" class="ApiPlatform\Core\Bridge\Doctrine\MongoDB\Extension\FilterExtension" public="false">
+        <service id="api_platform.doctrine.mongodb.aggregation_extension.filter" class="ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Extension\FilterExtension" public="false">
             <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
             <argument type="service" id="api_platform.filter_locator" />
 
             <tag name="api_platform.doctrine.mongodb.aggregation_extension.collection" priority="32" />
         </service>
-        <service id="ApiPlatform\Core\Bridge\Doctrine\MongoDB\Extension\FilterExtension" alias="api_platform.doctrine.mongodb.aggregation_extension.filter" />
+        <service id="ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Extension\FilterExtension" alias="api_platform.doctrine.mongodb.aggregation_extension.filter" />
 
         <service id="api_platform.doctrine.mongodb.aggregation_extension.pagination"
-                 class="ApiPlatform\Core\Bridge\Doctrine\MongoDB\Extension\PaginationExtension" public="false">
+                 class="ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Extension\PaginationExtension" public="false">
             <argument type="service" id="doctrine_mongodb"/>
             <argument type="service" id="request_stack"/>
             <argument type="service" id="api_platform.metadata.resource.metadata_factory"/>
@@ -142,16 +142,16 @@
 
             <tag name="api_platform.doctrine.mongodb.aggregation_extension.collection"/>
         </service>
-        <service id="ApiPlatform\Core\Bridge\Doctrine\MongoDB\Extension\PaginationExtension" alias="api_platform.doctrine.mongodb.aggregation_extension.pagination" />
+        <service id="ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Extension\PaginationExtension" alias="api_platform.doctrine.mongodb.aggregation_extension.pagination" />
 
-        <service id="api_platform.doctrine.mongodb.aggregation_extension.order" class="ApiPlatform\Core\Bridge\Doctrine\MongoDB\Extension\OrderExtension" public="false">
+        <service id="api_platform.doctrine.mongodb.aggregation_extension.order" class="ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Extension\OrderExtension" public="false">
             <argument>%api_platform.collection.order%</argument>
             <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
             <argument type="service" id="doctrine_mongodb" />
 
             <tag name="api_platform.doctrine.mongodb.aggregation_extension.collection" priority="16" />
         </service>
-        <service id="ApiPlatform\Core\Bridge\Doctrine\MongoDB\Extension\OrderExtension" alias="api_platform.doctrine.mongodb.aggregation_extension.order" />
+        <service id="ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Extension\OrderExtension" alias="api_platform.doctrine.mongodb.aggregation_extension.order" />
     </services>
 
 </container>

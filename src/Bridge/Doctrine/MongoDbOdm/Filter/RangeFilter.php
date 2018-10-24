@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Bridge\Doctrine\MongoDB\Filter;
+namespace ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Filter;
 
 use ApiPlatform\Core\Bridge\Doctrine\Common\Filter\RangeFilterInterface;
 use ApiPlatform\Core\Bridge\Doctrine\Common\Filter\RangeFilterTrait;

@@ -14,8 +14,8 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection;
 
 use ApiPlatform\Core\Api\FilterInterface;
-use ApiPlatform\Core\Bridge\Doctrine\MongoDB\Extension\AggregationCollectionExtensionInterface as MongoDbAggregationCollectionExtensionInterface;
-use ApiPlatform\Core\Bridge\Doctrine\MongoDB\Extension\AggregationItemExtensionInterface as MongoDbAggregationItemExtensionInterface;
+use ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Extension\AggregationCollectionExtensionInterface as MongoDbAggregationCollectionExtensionInterface;
+use ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Extension\AggregationItemExtensionInterface as MongoDbAggregationItemExtensionInterface;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\EagerLoadingExtension;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\FilterEagerLoadingExtension;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\QueryCollectionExtensionInterface;
@@ -426,7 +426,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
 
         //  Doctrine MongoDB ODM support
         if ($config['doctrine']['enable_mongodb_odm']) {
-            $loader->load('doctrine_mongodb.xml');
+            $loader->load('doctrine_mongodb_odm.xml');
         }
 
         // FOSUser support

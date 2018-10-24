@@ -11,32 +11,35 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Bridge\Doctrine\MongoDB\Filter;
+namespace ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Filter;
 
-use ApiPlatform\Core\Bridge\Doctrine\Common\Filter\BooleanFilterTrait;
+use ApiPlatform\Core\Bridge\Doctrine\Common\Filter\NumericFilterTrait;
 use Doctrine\ODM\MongoDB\Aggregation\Builder;
 use Doctrine\ODM\MongoDB\Types\Type as MongoDbType;
 
 /**
- * Filters the collection by boolean values.
+ * Filters the collection by numeric values.
  *
- * Filters collection on equality of boolean properties. The value is specified
- * as one of ( "true" | "false" | "1" | "0" ) in the query.
+ * Filters collection by equality of numeric properties.
  *
  * For each property passed, if the resource does not have such property or if
- * the value is not one of ( "true" | "false" | "1" | "0" ) the property is ignored.
+ * the value is not numeric, the property is ignored.
  *
  * @author Amrouche Hamza <hamza.simperfit@gmail.com>
  * @author Teoh Han Hui <teohhanhui@gmail.com>
  * @author Alan Poulain <contact@alanpoulain.eu>
  */
-final class BooleanFilter extends AbstractContextAwareFilter
+final class NumericFilter extends AbstractContextAwareFilter
 {
-    use BooleanFilterTrait;
+    use NumericFilterTrait;
 
-    const DOCTRINE_BOOLEAN_TYPES = [
-        MongoDbType::BOOL => true,
-        MongoDbType::BOOLEAN => true,
+    /**
+     * Type of numeric in Doctrine.
+     */
+    const DOCTRINE_NUMERIC_TYPES = [
+        MongoDbType::INT => true,
+        MongoDbType::INTEGER => true,
+        MongoDbType::FLOAT => true,
     ];
 
     /**
@@ -47,7 +50,7 @@ final class BooleanFilter extends AbstractContextAwareFilter
         if (
             !$this->isPropertyEnabled($property, $resourceClass) ||
             !$this->isPropertyMapped($property, $resourceClass) ||
-            !$this->isBooleanField($property, $resourceClass)
+            !$this->isNumericField($property, $resourceClass)
         ) {
             return;
         }
@@ -57,12 +60,28 @@ final class BooleanFilter extends AbstractContextAwareFilter
             return;
         }
 
-        $matchField = $property;
+        $matchField = $field = $property;
 
         if ($this->isPropertyNested($property, $resourceClass)) {
             [$matchField] = $this->addLookupsForNestedProperty($property, $aggregationBuilder, $resourceClass);
         }
 
-        $aggregationBuilder->match()->field($matchField)->equals($value);
+        $aggregationBuilder->match()->field($matchField)->equals($value)->type($this->getDoctrineFieldType($field, $resourceClass));
+    }
+
+    /**
+     * Gets the PHP type corresponding to this Doctrine type.
+     */
+    private function getType(string $doctrineType = null): string
+    {
+        if (null === $doctrineType) {
+            return 'string';
+        }
+
+        if (MongoDbType::FLOAT === $doctrineType) {
+            return 'float';
+        }
+
+        return 'int';
     }
 }

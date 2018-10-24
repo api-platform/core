@@ -11,10 +11,10 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Bridge\Doctrine\MongoDB;
+namespace ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm;
 
-use ApiPlatform\Core\Bridge\Doctrine\MongoDB\Extension\AggregationCollectionExtensionInterface;
-use ApiPlatform\Core\Bridge\Doctrine\MongoDB\Extension\AggregationResultCollectionExtensionInterface;
+use ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Extension\AggregationCollectionExtensionInterface;
+use ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Extension\AggregationResultCollectionExtensionInterface;
 use ApiPlatform\Core\DataProvider\CollectionDataProviderInterface;
 use ApiPlatform\Core\DataProvider\RestrictedDataProviderInterface;
 use ApiPlatform\Core\Exception\RuntimeException;

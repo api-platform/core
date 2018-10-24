@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\Compiler;
 
-use ApiPlatform\Core\Bridge\Doctrine\MongoDB\Filter\FilterInterface as MongoDbOdmFilterInterface;
+use ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Filter\FilterInterface as MongoDbOdmFilterInterface;
 use ApiPlatform\Core\Util\AnnotationFilterExtractorTrait;
 use ApiPlatform\Core\Util\ReflectionClassRecursiveIterator;
 use Doctrine\Common\Annotations\Reader;

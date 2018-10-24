@@ -10,7 +10,7 @@
  */
 
 //namespace Symfony\Bridge\Doctrine\PropertyInfo;
-namespace ApiPlatform\Core\Bridge\Doctrine\MongoDB\PropertyInfo;
+namespace ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\PropertyInfo;
 
 use Doctrine\Common\Persistence\Mapping\ClassMetadataFactory;
 use Doctrine\Common\Persistence\Mapping\MappingException;
