@@ -141,6 +141,8 @@ class RespondListenerTest extends TestCase
         $listener->onKernelView($event);
 
         $response = $event->getResponse();
-        $this->assertEquals(new \DateTimeImmutable('tomorrow'), \DateTime::createFromFormat(DATE_RFC1123, $response->headers->get('Sunset')));
+        /** @var string $value */
+        $value = $response->headers->get('Sunset');
+        $this->assertEquals(new \DateTimeImmutable('tomorrow'), \DateTime::createFromFormat(DATE_RFC1123, $value));
     }
 }
