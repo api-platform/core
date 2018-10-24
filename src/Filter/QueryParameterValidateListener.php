@@ -94,11 +94,11 @@ final class QueryParameterValidateListener
         if (\is_array($matches[$rootName])) {
             $keyName = array_keys($matches[$rootName])[0];
 
-            $queryParameter = $request->query->get($rootName);
+            $queryParameter = $request->query->get((string) $rootName);
 
             return \is_array($queryParameter) && isset($queryParameter[$keyName]);
         }
 
-        return null !== $request->query->get($rootName);
+        return null !== $request->query->get((string) $rootName);
     }
 }

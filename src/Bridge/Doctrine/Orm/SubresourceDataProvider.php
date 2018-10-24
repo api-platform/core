@@ -191,7 +191,7 @@ final class SubresourceDataProvider implements SubresourceDataProviderInterface
         foreach ($normalizedIdentifiers as $key => $value) {
             $placeholder = $queryNameGenerator->generateParameterName($key);
             $qb->andWhere("$alias.$key = :$placeholder");
-            $topQueryBuilder->setParameter($placeholder, $value, $classMetadata->getTypeOfField($key));
+            $topQueryBuilder->setParameter($placeholder, $value, (string) $classMetadata->getTypeOfField($key));
         }
 
         // Recurse queries

@@ -69,7 +69,7 @@ class ItemDataProvider implements DenormalizedIdentifiersAwareItemDataProviderIn
     {
         $manager = $this->managerRegistry->getManagerForClass($resourceClass);
 
-        if (!($context[IdentifierConverterInterface::HAS_IDENTIFIER_CONVERTER] ?? false)) {
+        if (!\is_array($id) && !($context[IdentifierConverterInterface::HAS_IDENTIFIER_CONVERTER] ?? false)) {
             $id = $this->normalizeIdentifiers($id, $manager, $resourceClass);
         }
 
@@ -87,7 +87,7 @@ class ItemDataProvider implements DenormalizedIdentifiersAwareItemDataProviderIn
         $queryNameGenerator = new QueryNameGenerator();
         $doctrineClassMetadata = $manager->getClassMetadata($resourceClass);
 
-        $this->addWhereForIdentifiers($id, $queryBuilder, $doctrineClassMetadata);
+        $this->addWhereForIdentifiers((array) $id, $queryBuilder, $doctrineClassMetadata);
 
         foreach ($this->itemExtensions as $extension) {
             $extension->applyToItem($queryBuilder, $queryNameGenerator, $resourceClass, $id, $operationName, $context);

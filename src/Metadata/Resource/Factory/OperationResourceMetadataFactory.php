@@ -112,7 +112,7 @@ final class OperationResourceMetadataFactory implements ResourceMetadataFactoryI
                 $operation = [];
             }
 
-            $upperOperationName = strtoupper($operationName);
+            $upperOperationName = strtoupper((string) $operationName);
             if ($collection) {
                 $supported = isset(self::SUPPORTED_COLLECTION_OPERATION_METHODS[$upperOperationName]);
             } else {

@@ -157,10 +157,10 @@ final class SubresourceOperationFactory implements SubresourceOperationFactoryIn
                 if (isset($subresourceOperation['path'])) {
                     $operation['path'] = $subresourceOperation['path'];
                 } else {
-                    $operation['path'] = str_replace(self::FORMAT_SUFFIX, '', $parentOperation['path']);
+                    $operation['path'] = str_replace(self::FORMAT_SUFFIX, '', (string) $parentOperation['path']);
 
                     if ($parentOperation['collection']) {
-                        list($key) = end($operation['identifiers']);
+                        [$key] = end($operation['identifiers']);
                         $operation['path'] .= sprintf('/{%s}', $key);
                     }
 
