@@ -15,6 +15,7 @@ namespace ApiPlatform\Core\Tests\Bridge\Doctrine\Orm\Filter;
 
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\ExistsFilter;
 use ApiPlatform\Core\Test\DoctrineOrmFilterTestCase;
+use ApiPlatform\Core\Tests\Bridge\Doctrine\Common\Filter\ExistsFilterTestTrait;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 
 /**
@@ -22,78 +23,9 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
  */
 class ExistsFilterTest extends DoctrineOrmFilterTestCase
 {
+    use ExistsFilterTestTrait;
+
     protected $filterClass = ExistsFilter::class;
-
-    public function testGetDescription()
-    {
-        $filter = new ExistsFilter($this->managerRegistry, null, null, ['name' => null, 'description' => null]);
-
-        $this->assertEquals([
-            'description[exists]' => [
-                'property' => 'description',
-                'type' => 'bool',
-                'required' => false,
-            ],
-        ], $filter->getDescription($this->resourceClass));
-    }
-
-    public function testGetDescriptionDefaultFields()
-    {
-        $filter = new ExistsFilter($this->managerRegistry);
-
-        $this->assertEquals([
-            'alias[exists]' => [
-                'property' => 'alias',
-                'type' => 'bool',
-                'required' => false,
-            ],
-            'description[exists]' => [
-                'property' => 'description',
-                'type' => 'bool',
-                'required' => false,
-            ],
-            'dummy[exists]' => [
-                'property' => 'dummy',
-                'type' => 'bool',
-                'required' => false,
-            ],
-            'dummyDate[exists]' => [
-                'property' => 'dummyDate',
-                'type' => 'bool',
-                'required' => false,
-            ],
-            'dummyFloat[exists]' => [
-                'property' => 'dummyFloat',
-                'type' => 'bool',
-                'required' => false,
-            ],
-            'dummyPrice[exists]' => [
-                'property' => 'dummyPrice',
-                'type' => 'bool',
-                'required' => false,
-            ],
-            'jsonData[exists]' => [
-                'property' => 'jsonData',
-                'type' => 'bool',
-                'required' => false,
-            ],
-            'arrayData[exists]' => [
-                'property' => 'arrayData',
-                'type' => 'bool',
-                'required' => false,
-            ],
-            'nameConverted[exists]' => [
-                'property' => 'nameConverted',
-                'type' => 'bool',
-                'required' => false,
-            ],
-            'dummyBoolean[exists]' => [
-                'property' => 'dummyBoolean',
-                'type' => 'bool',
-                'required' => false,
-            ],
-        ], $filter->getDescription($this->resourceClass));
-    }
 
     public function provideApplyTestData(): array
     {
