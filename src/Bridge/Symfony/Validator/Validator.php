@@ -77,7 +77,12 @@ class Validator implements ValidatorInterface
             $requestStack = $this->container->get('request_stack');
             $request = $requestStack->getCurrentRequest();
 
-            if ($request && ('' !== $requestContent = $request->getContent()) && !$request->attributes->get('_graphql') && 'POST' !== $request->getMethod()) {
+            if (
+                $request &&
+                ('' !== $requestContent = $request->getContent()) &&
+                !$request->attributes->get('_graphql') &&
+                'POST' !== $request->getMethod()
+            ) {
                 $ctx = $this->validator->startContext();
                 $decoded = $this->decoder->decode($requestContent, $request->getRequestFormat());
 
