@@ -18,7 +18,11 @@ use ApiPlatform\Core\Bridge\Symfony\Validator\Validator;
 use ApiPlatform\Core\Tests\Fixtures\DummyEntity;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\Serializer\Encoder\DecoderInterface;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
+use Symfony\Component\Validator\Validator\ContextualValidatorInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface as SymfonyValidatorInterface;
 
 /**
@@ -112,5 +116,38 @@ class ValidatorTest extends TestCase
 
         $validator = new Validator($symfonyValidator, $containerProphecy->reveal());
         $validator->validate(new DummyEntity(), ['groups' => 'foo']);
+    }
+
+    public function testOnlyValidatesSubmittedPropertiesWithIncompletePutRequest()
+    {
+        $data = new DummyEntity();
+        $expectedValidationGroups = ['foo'];
+
+        $constraintViolationListProphecy = $this->prophesize(ConstraintViolationListInterface::class);
+
+        $contextualValidatorProphecy = $this->prophesize(ContextualValidatorInterface::class);
+        $contextualValidatorProphecy->getViolations()->willReturn($constraintViolationListProphecy->reveal())->shouldBeCalled();
+        $contextualValidatorProphecy->validateProperty($data, 'propertyName', $expectedValidationGroups)->willReturn($constraintViolationListProphecy->reveal())->shouldBeCalled();
+
+        $symfonyValidatorProphecy = $this->prophesize(SymfonyValidatorInterface::class);
+        $symfonyValidatorProphecy->startContext()->willReturn($contextualValidatorProphecy->reveal())->shouldBeCalled();
+        $symfonyValidator = $symfonyValidatorProphecy->reveal();
+
+        $requestProphecy = $this->prophesize(Request::class);
+        $requestProphecy->getMethod()->willReturn('put')->shouldBeCalled();
+        $requestProphecy->getContent()->willReturn('{}')->shouldBeCalled();
+        $requestProphecy->getRequestFormat()->willReturn('json')->shouldBeCalled();
+
+        $requestStackProphecy = $this->prophesize(RequestStack::class);
+        $requestStackProphecy->getCurrentRequest()->willReturn($requestProphecy->reveal())->shouldBeCalled();
+
+        $containerProphecy = $this->prophesize(ContainerInterface::class);
+        $containerProphecy->get('request_stack')->willReturn($requestStackProphecy->reveal())->shouldBeCalled();
+
+        $decoderProphecy = $this->prophesize(DecoderInterface::class);
+        $decoderProphecy->decode('{}', 'json')->willReturn(['propertyName' => 'propertyValue'])->shouldBeCalled();
+
+        $validator = new Validator($symfonyValidator, $containerProphecy->reveal(), $decoderProphecy->reveal());
+        $validator->validate(new DummyEntity(), ['groups' => $expectedValidationGroups]);
     }
 }

@@ -16,7 +16,10 @@ namespace ApiPlatform\Core\Bridge\Symfony\Validator;
 use ApiPlatform\Core\Bridge\Symfony\Validator\Exception\ValidationException;
 use ApiPlatform\Core\Validator\ValidatorInterface;
 use Psr\Container\ContainerInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\Serializer\Encoder\DecoderInterface;
 use Symfony\Component\Validator\Constraints\GroupSequence;
+use Symfony\Component\Validator\ConstraintViolationListInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface as SymfonyValidatorInterface;
 
 /**
@@ -28,11 +31,13 @@ class Validator implements ValidatorInterface
 {
     private $validator;
     private $container;
+    private $decoder;
 
-    public function __construct(SymfonyValidatorInterface $validator, ContainerInterface $container = null)
+    public function __construct(SymfonyValidatorInterface $validator, ContainerInterface $container = null, DecoderInterface $decoder = null)
     {
         $this->validator = $validator;
         $this->container = $container;
+        $this->decoder = $decoder;
     }
 
     /**
@@ -58,9 +63,32 @@ class Validator implements ValidatorInterface
             }
         }
 
-        $violations = $this->validator->validate($data, null, $validationGroups);
+        $violations = $this->getViolations($data, $validationGroups);
+
         if (0 !== \count($violations)) {
             throw new ValidationException($violations);
         }
+    }
+
+    private function getViolations($data, $validationGroups): ConstraintViolationListInterface
+    {
+        if ($this->container && $this->decoder) {
+            /** @var RequestStack $requestStack */
+            $requestStack = $this->container->get('request_stack');
+            $request = $requestStack->getCurrentRequest();
+
+            if ($request && strtolower($request->getMethod()) !== 'post') {
+                $ctx = $this->validator->startContext();
+                $decoded = $this->decoder->decode($request->getContent(), $request->getRequestFormat());
+
+                foreach ($decoded as $postKey=>$postValue) {
+                    $ctx->validateProperty($data, $postKey, $validationGroups);
+                }
+
+                return $ctx->getViolations();
+            }
+        }
+
+        return $this->validator->validate($data, null, $validationGroups);
     }
 }
