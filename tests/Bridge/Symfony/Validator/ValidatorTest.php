@@ -138,11 +138,10 @@ class ValidatorTest extends TestCase
         $requestProphecy->getMethod()->willReturn('put')->shouldBeCalled();
         $requestProphecy->getContent()->willReturn('{}')->shouldBeCalled();
         $requestProphecy->getRequestFormat()->willReturn('json')->shouldBeCalled();
-        $request = $requestProphecy->reveal();
-        $request->attributes = new ParameterBag(['_graphql' => false]);
+        $requestProphecy->attributes = new ParameterBag(['_graphql' => false]);
 
         $requestStackProphecy = $this->prophesize(RequestStack::class);
-        $requestStackProphecy->getCurrentRequest()->willReturn($request)->shouldBeCalled();
+        $requestStackProphecy->getCurrentRequest()->willReturn($requestProphecy->reveal())->shouldBeCalled();
 
         $containerProphecy = $this->prophesize(ContainerInterface::class);
         $containerProphecy->get('request_stack')->willReturn($requestStackProphecy->reveal())->shouldBeCalled();
