@@ -16,6 +16,8 @@ namespace ApiPlatform\Core\Tests\Bridge\Symfony\Bundle\DependencyInjection;
 use ApiPlatform\Core\Api\FilterInterface;
 use ApiPlatform\Core\Api\IriConverterInterface;
 use ApiPlatform\Core\Api\UrlGeneratorInterface;
+use ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Extension\AggregationCollectionExtensionInterface;
+use ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Extension\AggregationItemExtensionInterface;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\EagerLoadingExtension;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\FilterEagerLoadingExtension;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\FilterExtension;
@@ -420,6 +422,14 @@ class ApiPlatformExtensionTest extends TestCase
         $containerBuilderProphecy->registerForAutoconfiguration(QueryCollectionExtensionInterface::class)
             ->willReturn($childDefinitionProphecy)->shouldBeCalledTimes(1);
         $childDefinitionProphecy->addTag('api_platform.doctrine.orm.query_extension.collection')->shouldBeCalledTimes(1);
+
+        $containerBuilderProphecy->registerForAutoconfiguration(AggregationItemExtensionInterface::class)
+            ->willReturn($childDefinitionProphecy)->shouldBeCalledTimes(1);
+        $childDefinitionProphecy->addTag('api_platform.doctrine.mongodb.aggregation_extension.item')->shouldBeCalledTimes(1);
+
+        $containerBuilderProphecy->registerForAutoconfiguration(AggregationCollectionExtensionInterface::class)
+            ->willReturn($childDefinitionProphecy)->shouldBeCalledTimes(1);
+        $childDefinitionProphecy->addTag('api_platform.doctrine.mongodb.aggregation_extension.collection')->shouldBeCalledTimes(1);
 
         $containerBuilderProphecy->registerForAutoconfiguration(FilterInterface::class)
             ->willReturn($childDefinitionProphecy)->shouldBeCalledTimes(1);

@@ -14,8 +14,8 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection;
 
 use ApiPlatform\Core\Api\FilterInterface;
-use ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Extension\AggregationCollectionExtensionInterface as MongoDbAggregationCollectionExtensionInterface;
-use ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Extension\AggregationItemExtensionInterface as MongoDbAggregationItemExtensionInterface;
+use ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Extension\AggregationCollectionExtensionInterface;
+use ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Extension\AggregationItemExtensionInterface;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\EagerLoadingExtension;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\FilterEagerLoadingExtension;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\QueryCollectionExtensionInterface;
@@ -110,9 +110,9 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             ->addTag('api_platform.doctrine.orm.query_extension.item');
         $container->registerForAutoconfiguration(QueryCollectionExtensionInterface::class)
             ->addTag('api_platform.doctrine.orm.query_extension.collection');
-        $container->registerForAutoconfiguration(MongoDbAggregationItemExtensionInterface::class)
+        $container->registerForAutoconfiguration(AggregationItemExtensionInterface::class)
             ->addTag('api_platform.doctrine.mongodb.aggregation_extension.item');
-        $container->registerForAutoconfiguration(MongoDbAggregationCollectionExtensionInterface::class)
+        $container->registerForAutoconfiguration(AggregationCollectionExtensionInterface::class)
             ->addTag('api_platform.doctrine.mongodb.aggregation_extension.collection');
         $container->registerForAutoconfiguration(FilterInterface::class)
             ->addTag('api_platform.filter');
