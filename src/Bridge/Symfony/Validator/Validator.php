@@ -77,11 +77,11 @@ class Validator implements ValidatorInterface
             $requestStack = $this->container->get('request_stack');
             $request = $requestStack->getCurrentRequest();
 
-            if ($request && strtolower($request->getMethod()) !== 'post') {
+            if ($request && 'post' !== strtolower($request->getMethod())) {
                 $ctx = $this->validator->startContext();
                 $decoded = $this->decoder->decode($request->getContent(), $request->getRequestFormat());
 
-                foreach ($decoded as $postKey=>$postValue) {
+                foreach ($decoded as $postKey => $postValue) {
                     $ctx->validateProperty($data, $postKey, $validationGroups);
                 }
 
