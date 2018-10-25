@@ -8,7 +8,7 @@
         <service id="api_platform.validator" class="ApiPlatform\Core\Bridge\Symfony\Validator\Validator">
             <argument type="service" id="validator" />
             <argument type="service" id="service_container" />
-            <argument type="service" id="serializer" />
+            <argument type="service" id="Symfony\Component\Serializer\Normalizer\DenormalizerInterface" />
         </service>
         <service id="ApiPlatform\Core\Validator\ValidatorInterface" alias="api_platform.validator" />
 

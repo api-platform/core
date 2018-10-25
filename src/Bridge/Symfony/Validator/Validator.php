@@ -77,9 +77,9 @@ class Validator implements ValidatorInterface
             $requestStack = $this->container->get('request_stack');
             $request = $requestStack->getCurrentRequest();
 
-            if ($request && !$request->attributes->get('_graphql') && 'post' !== strtolower($request->getMethod())) {
+            if ($request && ('' !== $requestContent = $request->getContent()) && !$request->attributes->get('_graphql') && 'post' !== strtolower($request->getMethod())) {
                 $ctx = $this->validator->startContext();
-                $decoded = $this->decoder->decode($request->getContent(), $request->getRequestFormat());
+                $decoded = $this->decoder->decode($requestContent, $request->getRequestFormat());
 
                 foreach ($decoded as $postKey => $postValue) {
                     $ctx->validateProperty($data, $postKey, $validationGroups);

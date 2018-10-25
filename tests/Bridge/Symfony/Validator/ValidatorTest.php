@@ -18,6 +18,7 @@ use ApiPlatform\Core\Bridge\Symfony\Validator\Validator;
 use ApiPlatform\Core\Tests\Fixtures\DummyEntity;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
+use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Serializer\Encoder\DecoderInterface;
@@ -137,9 +138,11 @@ class ValidatorTest extends TestCase
         $requestProphecy->getMethod()->willReturn('put')->shouldBeCalled();
         $requestProphecy->getContent()->willReturn('{}')->shouldBeCalled();
         $requestProphecy->getRequestFormat()->willReturn('json')->shouldBeCalled();
+        $request = $requestProphecy->reveal();
+        $request->attributes = new ParameterBag(['_graphql' => false]);
 
         $requestStackProphecy = $this->prophesize(RequestStack::class);
-        $requestStackProphecy->getCurrentRequest()->willReturn($requestProphecy->reveal())->shouldBeCalled();
+        $requestStackProphecy->getCurrentRequest()->willReturn($request)->shouldBeCalled();
 
         $containerProphecy = $this->prophesize(ContainerInterface::class);
         $containerProphecy->get('request_stack')->willReturn($requestStackProphecy->reveal())->shouldBeCalled();
