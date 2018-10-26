@@ -156,7 +156,7 @@ final class PublishMercureUpdatesListener
     /**
      * @param object|string $entity
      */
-    private function publishUpdate($entity, array $targets, bool $deleted = false): void
+    private function publishUpdate($entity, array $targets): void
     {
         if (\is_string($entity)) {
             // By convention, if the entity has been deleted, we send only its IRI
