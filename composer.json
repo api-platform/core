@@ -1,17 +1,4 @@
 {
-    "repositories": [
-        {
-            "type": "vcs",
-            "url": "https://github.com/symfony/mercure"
-        },
-        {
-            "type": "vcs",
-            "url": "https://github.com/symfony/mercure-bundle"
-        }
-    ],
-    "minimum-stability": "dev",
-    "prefer-stable": true,
-
     "name": "api-platform/core",
     "type": "library",
     "description": "The ultimate solution to create web APIs.",
