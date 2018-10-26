@@ -115,8 +115,6 @@ final class PublishMercureUpdatesListener
 
     /**
      * @param object $entity
-     *
-     * @return bool|string[]
      */
     private function storeEntityToPublish($entity, string $property): void
     {

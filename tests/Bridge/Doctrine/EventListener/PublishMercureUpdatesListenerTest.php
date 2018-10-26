@@ -49,7 +49,7 @@ class PublishMercureUpdatesListenerTest extends TestCase
         $toDelete = new Dummy();
         $toDelete->setId(3);
         $toDeleteExpressionLanguage = new DummyFriend();
-        $toDeleteExpressionLanguage->setId('4');
+        $toDeleteExpressionLanguage->setId(4);
 
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
         $resourceClassResolverProphecy->isResourceClass(Dummy::class)->willReturn(true);
