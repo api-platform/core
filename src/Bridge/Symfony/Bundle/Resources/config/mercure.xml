@@ -9,7 +9,6 @@
 
         <service id="api_platform.mercure.listener.response.add_link_header" class="ApiPlatform\Core\Mercure\EventListener\AddLinkHeaderListener">
             <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
-            <argument>%mercure.default_hub%</argument>
 
             <tag name="kernel.event_listener" event="kernel.response" method="onKernelResponse" />
         </service>

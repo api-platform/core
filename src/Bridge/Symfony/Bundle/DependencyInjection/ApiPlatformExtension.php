@@ -144,7 +144,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $this->registerHttpCacheConfiguration($container, $config, $loader, $useDoctrine);
         $this->registerValidatorConfiguration($container, $config);
         $this->registerDataCollectorConfiguration($container, $config, $loader);
-        $this->registerMercureConfiguration($container, $loader, $useDoctrine);
+        $this->registerMercureConfiguration($container, $config, $loader, $useDoctrine);
     }
 
     /**
@@ -527,13 +527,15 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         }
     }
 
-    private function registerMercureConfiguration(ContainerBuilder $container, XmlFileLoader $loader, bool $useDoctrine)
+    private function registerMercureConfiguration(ContainerBuilder $container, array $config, XmlFileLoader $loader, bool $useDoctrine)
     {
-        if (!$container->hasParameter('mercure.default_hub')) {
+        if (!$config['mercure']['enabled'] || !$container->hasParameter('mercure.default_hub')) {
             return;
         }
 
         $loader->load('mercure.xml');
+        $container->getDefinition('api_platform.mercure.listener.response.add_link_header')->addArgument($config['mercure']['hub_url'] ?? '%mercure.default_hub%');
+
         if ($useDoctrine) {
             $loader->load('doctrine_orm_mercure_publisher.xml');
         }

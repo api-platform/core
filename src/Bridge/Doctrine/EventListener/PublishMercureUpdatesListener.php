@@ -15,6 +15,7 @@ namespace ApiPlatform\Core\Bridge\Doctrine\EventListener;
 
 use ApiPlatform\Core\Api\IriConverterInterface;
 use ApiPlatform\Core\Api\ResourceClassResolverInterface;
+use ApiPlatform\Core\Api\UrlGeneratorInterface;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\Exception\RuntimeException;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
@@ -146,7 +147,7 @@ final class PublishMercureUpdatesListener
         }
 
         if ('deletedEntities' === $property) {
-            $this->deletedEntities[$this->iriConverter->getIriFromItem($entity)] = $value;
+            $this->deletedEntities[$this->iriConverter->getIriFromItem($entity, UrlGeneratorInterface::ABS_URL)] = $value;
 
             return;
         }
@@ -166,7 +167,7 @@ final class PublishMercureUpdatesListener
             $iri = $entity;
             $data = json_encode(['@id' => $iri]);
         } else {
-            $iri = $this->iriConverter->getIriFromItem($entity);
+            $iri = $this->iriConverter->getIriFromItem($entity, UrlGeneratorInterface::ABS_URL);
             $data = $this->serializer->serialize($entity, 'jsonld');
         }
 
