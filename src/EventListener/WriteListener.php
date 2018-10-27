@@ -59,7 +59,8 @@ final class WriteListener
                     @trigger_error(sprintf('Returning void from %s::persist() is deprecated since API Platform 2.3 and will not be supported in API Platform 3, an object should always be returned.', DataPersisterInterface::class), E_USER_DEPRECATED);
                 }
 
-                $event->setControllerResult($persistResult ?? $controllerResult);
+                $controllerResult = $persistResult ?? $controllerResult;
+                $event->setControllerResult($controllerResult);
 
                 if (null !== $this->iriConverter) {
                     $request->attributes->set('_api_write_item_iri', $this->iriConverter->getIriFromItem($controllerResult));
