@@ -88,4 +88,25 @@ class AddHeadersListenerTest extends TestCase
         $this->assertSame('max-age=100, public, s-maxage=200', $response->headers->get('Cache-Control'));
         $this->assertSame(['Accept', 'Cookie', 'Accept-Encoding'], $response->getVary());
     }
+
+    public function testDoNotSetHeaderWhenAlreadySet()
+    {
+        $request = new Request([], [], ['_api_resource_class' => Dummy::class, '_api_item_operation_name' => 'get']);
+        $response = new Response();
+        $response->setEtag('etag');
+        $response->setMaxAge(0);
+        // This also calls setPublic
+        $response->setSharedMaxAge(0);
+
+        $event = $this->prophesize(FilterResponseEvent::class);
+        $event->getRequest()->willReturn($request)->shouldBeCalled();
+        $event->getResponse()->willReturn($response)->shouldBeCalled();
+
+        $listener = new AddHeadersListener(true, 100, 200, ['Accept', 'Accept-Encoding'], true);
+        $listener->onKernelResponse($event->reveal());
+
+        $this->assertSame('"etag"', $response->getEtag());
+        $this->assertSame('max-age=0, public, s-maxage=0', $response->headers->get('Cache-Control'));
+        $this->assertSame([], $response->getVary());
+    }
 }

@@ -53,11 +53,11 @@ final class AddHeadersListener
             return;
         }
 
-        if ($this->etag) {
+        if (!$response->getEtag() && $this->etag) {
             $response->setEtag(md5($response->getContent()));
         }
 
-        if (null !== $this->maxAge) {
+        if (!$response->getMaxAge() && null !== $this->maxAge) {
             $response->setMaxAge($this->maxAge);
         }
 
@@ -65,11 +65,11 @@ final class AddHeadersListener
             $response->setVary(array_diff($this->vary, $response->getVary()), false);
         }
 
-        if (null !== $this->sharedMaxAge) {
+        if (!$response->headers->hasCacheControlDirective('s-maxage') && null !== $this->sharedMaxAge) {
             $response->setSharedMaxAge($this->sharedMaxAge);
         }
 
-        if (null !== $this->public) {
+        if (!$response->headers->hasCacheControlDirective('public') && !$response->headers->hasCacheControlDirective('private') && null !== $this->public) {
             $this->public ? $response->setPublic() : $response->setPrivate();
         }
     }
