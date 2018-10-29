@@ -108,7 +108,7 @@ class ApiResourceTest extends TestCase
             'route_prefix' => '/whatever',
             'access_control' => "has_role('ROLE_FOO')",
             'access_control_message' => 'You are not foo.',
-            'cache_headers' => ['max_age' => 0, 'shared_max_age' => 0]
+            'cache_headers' => ['max_age' => 0, 'shared_max_age' => 0],
         ], $resource->attributes);
     }
 
