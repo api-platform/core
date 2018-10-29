@@ -11,17 +11,16 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Bridge\Doctrine\Orm\Filter;
+namespace ApiPlatform\Core\Tests\Bridge\Doctrine\MongoDbOdm\Filter;
 
-use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\BooleanFilter;
-use ApiPlatform\Core\Test\DoctrineOrmFilterTestCase;
+use ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Filter\BooleanFilter;
+use ApiPlatform\Core\Test\DoctrineMongoDbOdmFilterTestCase;
 use ApiPlatform\Core\Tests\Bridge\Doctrine\Common\Filter\BooleanFilterTestTrait;
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 
 /**
- * @author Amrouche Hamza <hamza.simperfit@gmail.com>
+ * @author Alan Poulain <contact@alanpoulain.eu>
  */
-class BooleanFilterTest extends DoctrineOrmFilterTestCase
+class BooleanFilterTest extends DoctrineMongoDbOdmFilterTestCase
 {
     use BooleanFilterTestTrait;
 
@@ -39,7 +38,11 @@ class BooleanFilterTest extends DoctrineOrmFilterTestCase
                 [
                     'dummyBoolean' => 'true',
                 ],
-                sprintf('SELECT o FROM %s o WHERE o.dummyBoolean = :dummyBoolean_p1', Dummy::class),
+                [
+                    [
+                        '$match' => ['dummyBoolean' => true],
+                    ],
+                ],
             ],
             'string ("false")' => [
                 [
@@ -50,7 +53,11 @@ class BooleanFilterTest extends DoctrineOrmFilterTestCase
                 [
                     'dummyBoolean' => 'false',
                 ],
-                sprintf('SELECT o FROM %s o WHERE o.dummyBoolean = :dummyBoolean_p1', Dummy::class),
+                [
+                    [
+                        '$match' => ['dummyBoolean' => false],
+                    ],
+                ],
             ],
             'non-boolean' => [
                 [
@@ -61,7 +68,7 @@ class BooleanFilterTest extends DoctrineOrmFilterTestCase
                 [
                     'dummyBoolean' => 'toto',
                 ],
-                sprintf('SELECT o FROM %s o', Dummy::class),
+                [],
             ],
             'numeric string ("0")' => [
                 [
@@ -72,7 +79,11 @@ class BooleanFilterTest extends DoctrineOrmFilterTestCase
                 [
                     'dummyBoolean' => '0',
                 ],
-                sprintf('SELECT o FROM %s o WHERE o.dummyBoolean = :dummyBoolean_p1', Dummy::class),
+                [
+                    [
+                        '$match' => ['dummyBoolean' => false],
+                    ],
+                ],
             ],
             'numeric string ("1")' => [
                 [
@@ -83,7 +94,11 @@ class BooleanFilterTest extends DoctrineOrmFilterTestCase
                 [
                     'dummyBoolean' => '1',
                 ],
-                sprintf('SELECT o FROM %s o WHERE o.dummyBoolean = :dummyBoolean_p1', Dummy::class),
+                [
+                    [
+                        '$match' => ['dummyBoolean' => true],
+                    ],
+                ],
             ],
             'nested properties' => [
                 [
@@ -94,7 +109,19 @@ class BooleanFilterTest extends DoctrineOrmFilterTestCase
                 [
                     'relatedDummy.dummyBoolean' => '1',
                 ],
-                sprintf('SELECT o FROM %s o INNER JOIN o.relatedDummy relatedDummy_a1 WHERE relatedDummy_a1.dummyBoolean = :dummyBoolean_p1', Dummy::class),
+                [
+                    [
+                        '$lookup' => [
+                            'from' => 'RelatedDummy',
+                            'localField' => 'relatedDummy',
+                            'foreignField' => '_id',
+                            'as' => 'relatedDummy_lkup',
+                        ],
+                    ],
+                    [
+                        '$match' => ['relatedDummy_lkup.dummyBoolean' => true],
+                    ],
+                ],
             ],
             'numeric string ("1") on non-boolean property' => [
                 [
@@ -105,7 +132,7 @@ class BooleanFilterTest extends DoctrineOrmFilterTestCase
                 [
                     'name' => '1',
                 ],
-                sprintf('SELECT o FROM %s o', Dummy::class),
+                [],
             ],
             'numeric string ("0") on non-boolean property' => [
                 [
@@ -116,7 +143,7 @@ class BooleanFilterTest extends DoctrineOrmFilterTestCase
                 [
                     'name' => '0',
                 ],
-                sprintf('SELECT o FROM %s o', Dummy::class),
+                [],
             ],
             'string ("true") on non-boolean property' => [
                 [
@@ -127,7 +154,7 @@ class BooleanFilterTest extends DoctrineOrmFilterTestCase
                 [
                     'name' => 'true',
                 ],
-                sprintf('SELECT o FROM %s o', Dummy::class),
+                [],
             ],
             'string ("false") on non-boolean property' => [
                 [
@@ -138,7 +165,7 @@ class BooleanFilterTest extends DoctrineOrmFilterTestCase
                 [
                     'name' => 'false',
                 ],
-                sprintf('SELECT o FROM %s o', Dummy::class),
+                [],
             ],
             'mixed boolean, non-boolean and invalid property' => [
                 [
@@ -152,7 +179,11 @@ class BooleanFilterTest extends DoctrineOrmFilterTestCase
                     'name' => 'true',
                     'id' => '0',
                 ],
-                sprintf('SELECT o FROM %s o WHERE o.dummyBoolean = :dummyBoolean_p1', Dummy::class),
+                [
+                    [
+                        '$match' => ['dummyBoolean' => false],
+                    ],
+                ],
             ],
         ];
     }
