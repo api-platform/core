@@ -44,7 +44,6 @@ final class AddHeadersListener
     }
 
     /**
-     * @param FilterResponseEvent $event
      * @throws \ApiPlatform\Core\Exception\ResourceClassNotFoundException
      */
     public function onKernelResponse(FilterResponseEvent $event)
