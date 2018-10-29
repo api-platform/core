@@ -6,6 +6,7 @@
 
     <services>
         <service id="api_platform.http_cache.listener.response.configure" class="ApiPlatform\Core\HttpCache\EventListener\AddHeadersListener">
+            <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
             <argument>%api_platform.http_cache.etag%</argument>
             <argument>%api_platform.http_cache.max_age%</argument>
             <argument>%api_platform.http_cache.shared_max_age%</argument>

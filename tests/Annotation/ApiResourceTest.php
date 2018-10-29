@@ -29,7 +29,7 @@ class ApiResourceTest extends TestCase
         $resource = new ApiResource([
             'accessControl' => 'has_role("ROLE_FOO")',
             'accessControlMessage' => 'You are not foo.',
-            'attributes' => ['foo' => 'bar', 'validation_groups' => ['baz', 'qux']],
+            'attributes' => ['foo' => 'bar', 'validation_groups' => ['baz', 'qux'], 'cache_headers' => ['max_age' => 0, 'shared_max_age' => 0]],
             'collectionOperations' => ['bar' => ['foo']],
             'denormalizationContext' => ['groups' => ['foo']],
             'description' => 'description',
@@ -85,6 +85,7 @@ class ApiResourceTest extends TestCase
             'pagination_partial' => true,
             'route_prefix' => '/foo',
             'validation_groups' => ['baz', 'qux'],
+            'cache_headers' => ['max_age' => 0, 'shared_max_age' => 0],
             'sunset' => 'Thu, 11 Oct 2018 00:00:00 +0200',
         ], $resource->attributes);
     }
@@ -107,6 +108,7 @@ class ApiResourceTest extends TestCase
             'route_prefix' => '/whatever',
             'access_control' => "has_role('ROLE_FOO')",
             'access_control_message' => 'You are not foo.',
+            'cache_headers' => ['max_age' => 0, 'shared_max_age' => 0]
         ], $resource->attributes);
     }
 

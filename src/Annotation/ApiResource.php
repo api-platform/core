@@ -252,6 +252,13 @@ final class ApiResource
     /**
      * @see https://github.com/Haehnchen/idea-php-annotation-plugin/issues/112
      *
+     * @var array
+     */
+    private $responseCacheHeaders;
+
+    /**
+     * @see https://github.com/Haehnchen/idea-php-annotation-plugin/issues/112
+     *
      * @var string
      */
     private $sunset;
