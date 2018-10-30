@@ -93,8 +93,8 @@ final class ApiGatewayNormalizer implements NormalizerInterface, CacheableSuppor
 
         // $data['definitions'] is an instance of \ArrayObject
         foreach (array_keys($data['definitions']->getArrayCopy()) as $definition) {
-            if (!preg_match('/^[A-z]+$/', $definition)) {
-                $data['definitions'][str_replace(['-', '_'], '', $definition)] = $data['definitions'][$definition];
+            if (!preg_match('/^[A-z]+$/', (string) $definition)) {
+                $data['definitions'][str_replace(['-', '_'], '', (string) $definition)] = $data['definitions'][$definition];
                 unset($data['definitions'][$definition]);
             }
         }

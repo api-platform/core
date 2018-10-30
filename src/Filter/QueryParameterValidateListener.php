@@ -86,7 +86,7 @@ final class QueryParameterValidateListener
             return false;
         }
 
-        $rootName = array_keys($matches)[0] ?? '';
+        $rootName = (string) (array_keys($matches)[0] ?? null);
         if (!$rootName) {
             return false;
         }

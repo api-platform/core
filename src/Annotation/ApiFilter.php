@@ -37,7 +37,7 @@ final class ApiFilter
     public $strategy;
 
     /**
-     * @var string
+     * @var string|FilterInterface
      */
     public $filterClass;
 
