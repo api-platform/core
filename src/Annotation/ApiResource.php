@@ -53,7 +53,8 @@ use ApiPlatform\Core\Exception\InvalidArgumentException;
  *     @Attribute("subresourceOperations", type="array"),
  *     @Attribute("sunset", type="string"),
  *     @Attribute("swaggerContext", type="array"),
- *     @Attribute("validationGroups", type="mixed")
+ *     @Attribute("validationGroups", type="mixed"),
+ *     @Attribute("cacheHeaders", type="array")
  * )
  */
 final class ApiResource
