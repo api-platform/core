@@ -33,19 +33,16 @@ final class AddHeadersListener
     private $public;
     private $resourceMetadataFactory;
 
-    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, bool $etag = false, int $maxAge = null, int $sharedMaxAge = null, array $vary = null, bool $public = null)
+    public function __construct(bool $etag = false, int $maxAge = null, int $sharedMaxAge = null, array $vary = null, bool $public = null, ResourceMetadataFactoryInterface $resourceMetadataFactory = null)
     {
-        $this->resourceMetadataFactory = $resourceMetadataFactory;
         $this->etag = $etag;
         $this->maxAge = $maxAge;
         $this->sharedMaxAge = $sharedMaxAge;
         $this->vary = $vary;
         $this->public = $public;
+        $this->resourceMetadataFactory = $resourceMetadataFactory;
     }
 
-    /**
-     * @throws \ApiPlatform\Core\Exception\ResourceClassNotFoundException
-     */
     public function onKernelResponse(FilterResponseEvent $event)
     {
         $request = $event->getRequest();
@@ -62,26 +59,26 @@ final class AddHeadersListener
         $resourceCacheHeaders = [];
         if ($this->resourceMetadataFactory && $attributes = RequestAttributesExtractor::extractAttributes($request)) {
             $resourceMetadata = $this->resourceMetadataFactory->create($attributes['resource_class']);
-            $resourceCacheHeaders = $resourceMetadata->getAttribute('cache_headers');
+            $resourceCacheHeaders = $resourceMetadata->getOperationAttribute($attributes, 'cache_headers', [], true);
         }
 
-        if (!$response->getEtag() && $this->etag) {
+        if ($this->etag && !$response->getEtag()) {
             $response->setEtag(md5($response->getContent()));
         }
 
-        if (!$response->headers->hasCacheControlDirective('max-age') && (($useMeta = isset($resourceCacheHeaders['max_age'])) || null !== $this->maxAge)) {
-            $response->setMaxAge($useMeta ? $resourceCacheHeaders['max_age'] : $this->maxAge);
+        if (null !== ($maxAge = $resourceCacheHeaders['max_age'] ?? $this->maxAge) && !$response->headers->hasCacheControlDirective('max-age')) {
+            $response->setMaxAge($maxAge);
         }
 
         if (null !== $this->vary) {
             $response->setVary(array_diff($this->vary, $response->getVary()), false);
         }
 
-        if (!$response->headers->hasCacheControlDirective('s-maxage') && (($useMeta = isset($resourceCacheHeaders['shared_max_age'])) || null !== $this->sharedMaxAge)) {
-            $response->setSharedMaxAge($useMeta ? $resourceCacheHeaders['shared_max_age'] : $this->sharedMaxAge);
+        if (null !== ($sharedMaxAge = $resourceCacheHeaders['shared_max_age'] ?? $this->sharedMaxAge) && !$response->headers->hasCacheControlDirective('s-maxage')) {
+            $response->setSharedMaxAge($sharedMaxAge);
         }
 
-        if (!$response->headers->hasCacheControlDirective('public') && !$response->headers->hasCacheControlDirective('private') && null !== $this->public) {
+        if (null !== $this->public && !$response->headers->hasCacheControlDirective('public')) {
             $this->public ? $response->setPublic() : $response->setPrivate();
         }
     }

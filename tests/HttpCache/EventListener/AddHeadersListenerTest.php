@@ -38,10 +38,7 @@ class AddHeadersListenerTest extends TestCase
         $event->getRequest()->willReturn($request)->shouldBeCalled();
         $event->getResponse()->willReturn($response)->shouldNotBeCalled();
 
-        $factory = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $factory->create(Dummy::class)->willReturn(new ResourceMetadata())->shouldNotBeCalled();
-
-        $listener = new AddHeadersListener($factory->reveal(), true);
+        $listener = new AddHeadersListener(true);
         $listener->onKernelResponse($event->reveal());
 
         $this->assertNull($response->getEtag());
@@ -56,10 +53,7 @@ class AddHeadersListenerTest extends TestCase
         $event->getRequest()->willReturn($request)->shouldBeCalled();
         $event->getResponse()->willReturn($response)->shouldNotBeCalled();
 
-        $factory = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $factory->create(Dummy::class)->willReturn(new ResourceMetadata())->shouldNotBeCalled();
-
-        $listener = new AddHeadersListener($factory->reveal(), true);
+        $listener = new AddHeadersListener(true);
         $listener->onKernelResponse($event->reveal());
 
         $this->assertNull($response->getEtag());
@@ -74,10 +68,7 @@ class AddHeadersListenerTest extends TestCase
         $event->getRequest()->willReturn($request)->shouldBeCalled();
         $event->getResponse()->willReturn($response)->shouldBeCalled();
 
-        $factory = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $factory->create(Dummy::class)->willReturn(new ResourceMetadata())->shouldNotBeCalled();
-
-        $listener = new AddHeadersListener($factory->reveal(), true);
+        $listener = new AddHeadersListener(true);
         $listener->onKernelResponse($event->reveal());
 
         $this->assertNull($response->getEtag());
@@ -95,7 +86,7 @@ class AddHeadersListenerTest extends TestCase
         $factory = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $factory->create(Dummy::class)->willReturn(new ResourceMetadata())->shouldBeCalled();
 
-        $listener = new AddHeadersListener($factory->reveal(), true, 100, 200, ['Accept', 'Accept-Encoding'], true);
+        $listener = new AddHeadersListener(true, 100, 200, ['Accept', 'Accept-Encoding'], true, $factory->reveal());
         $listener->onKernelResponse($event->reveal());
 
         $this->assertSame('"9893532233caff98cd083a116b013c0b"', $response->getEtag());
@@ -119,7 +110,7 @@ class AddHeadersListenerTest extends TestCase
         $factory = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $factory->create(Dummy::class)->willReturn(new ResourceMetadata())->shouldBeCalled();
 
-        $listener = new AddHeadersListener($factory->reveal(), true, 100, 200, [], true);
+        $listener = new AddHeadersListener(true, 100, 200, [], true, $factory->reveal());
         $listener->onKernelResponse($event->reveal());
 
         $this->assertSame('"etag"', $response->getEtag());
@@ -139,7 +130,7 @@ class AddHeadersListenerTest extends TestCase
         $factory = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $factory->create(Dummy::class)->willReturn($metadata)->shouldBeCalled();
 
-        $listener = new AddHeadersListener($factory->reveal(), true, 100, 200, ['Accept', 'Accept-Encoding'], true);
+        $listener = new AddHeadersListener(true, 100, 200, ['Accept', 'Accept-Encoding'], true, $factory->reveal());
         $listener->onKernelResponse($event->reveal());
 
         $this->assertSame('max-age=123, public, s-maxage=456', $response->headers->get('Cache-Control'));

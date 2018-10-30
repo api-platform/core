@@ -257,6 +257,13 @@ final class ApiResource
     private $sunset;
 
     /**
+     * @see https://github.com/Haehnchen/idea-php-annotation-plugin/issues/112
+     *
+     * @var array
+     */
+    private $cacheHeaders;
+
+    /**
      * @throws InvalidArgumentException
      */
     public function __construct(array $values = [])
