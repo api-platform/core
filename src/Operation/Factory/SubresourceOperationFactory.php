@@ -127,8 +127,14 @@ final class SubresourceOperationFactory implements SubresourceOperationFactoryIn
                     $operation['operation_name']
                 );
 
+                $prefix = trim(trim($rootResourceMetadata->getAttribute('route_prefix', '')), '/');
+                if ('' !== $prefix) {
+                    $prefix .= '/';
+                }
+
                 $operation['path'] = $subresourceOperation['path'] ?? sprintf(
-                    '/%s/{id}/%s%s',
+                    '/%s%s/{id}/%s%s',
+                    $prefix,
                     $this->pathSegmentNameGenerator->getSegmentName($rootShortname, true),
                     $this->pathSegmentNameGenerator->getSegmentName($operation['property'], $operation['collection']),
                     self::FORMAT_SUFFIX
