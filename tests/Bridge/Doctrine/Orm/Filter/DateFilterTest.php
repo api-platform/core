@@ -16,6 +16,7 @@ namespace ApiPlatform\Core\Tests\Bridge\Doctrine\Orm\Filter;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\DateFilter;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGenerator;
 use ApiPlatform\Core\Test\DoctrineOrmFilterTestCase;
+use ApiPlatform\Core\Tests\Bridge\Doctrine\Common\Filter\DateFilterTestTrait;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyDate;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyImmutableDate;
@@ -28,6 +29,8 @@ use Symfony\Component\HttpFoundation\RequestStack;
  */
 class DateFilterTest extends DoctrineOrmFilterTestCase
 {
+    use DateFilterTestTrait;
+
     protected $filterClass = DateFilter::class;
 
     public function testApplyDate()
@@ -92,34 +95,6 @@ class DateFilterTest extends DoctrineOrmFilterTestCase
 
         $this->assertEquals(new \DateTimeImmutable('2015-04-05'), $queryBuilder->getParameters()[0]->getValue());
         $this->assertInstanceOf(\DateTimeImmutable::class, $queryBuilder->getParameters()[0]->getValue());
-    }
-
-    public function testGetDescription()
-    {
-        $filter = new DateFilter($this->managerRegistry);
-
-        $this->assertEquals([
-            'dummyDate[before]' => [
-                'property' => 'dummyDate',
-                'type' => 'DateTimeInterface',
-                'required' => false,
-            ],
-            'dummyDate[strictly_before]' => [
-                'property' => 'dummyDate',
-                'type' => 'DateTimeInterface',
-                'required' => false,
-            ],
-            'dummyDate[after]' => [
-                'property' => 'dummyDate',
-                'type' => 'DateTimeInterface',
-                'required' => false,
-            ],
-            'dummyDate[strictly_after]' => [
-                'property' => 'dummyDate',
-                'type' => 'DateTimeInterface',
-                'required' => false,
-            ],
-        ], $filter->getDescription($this->resourceClass));
     }
 
     public function provideApplyTestData(): array

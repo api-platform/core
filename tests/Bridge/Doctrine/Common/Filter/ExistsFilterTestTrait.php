@@ -15,7 +15,6 @@ namespace ApiPlatform\Core\Tests\Bridge\Doctrine\Common\Filter;
 
 /**
  * @author Antoine Bluchet <soyuka@gmail.com>
- * @author Alan Poulain <contact@alanpoulain.eu>
  */
 trait ExistsFilterTestTrait
 {
