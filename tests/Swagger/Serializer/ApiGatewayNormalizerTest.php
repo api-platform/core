@@ -30,7 +30,7 @@ final class ApiGatewayNormalizerTest extends TestCase
     private $documentationNormalizerMock;
 
     /**
-     * @var ObjectProphecy|\stdClass
+     * @var ObjectProphecy
      */
     private $objectMock;
 

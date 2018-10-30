@@ -98,7 +98,7 @@ class SearchFilter extends AbstractContextAwareFilter
             }
 
             if ($metadata->hasField($field)) {
-                $typeOfField = $this->getType($metadata->getTypeOfField($field));
+                $typeOfField = $this->getType((string) $metadata->getTypeOfField($field));
                 $strategy = $this->properties[$property] ?? self::STRATEGY_EXACT;
                 $filterParameterNames = [$property];
 

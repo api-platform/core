@@ -67,7 +67,7 @@ trait OperationDataProviderTrait
      *
      * @throws RuntimeException
      *
-     * @return object|null
+     * @return array|object|null
      */
     private function getSubresourceData($identifiers, array $attributes, array $context)
     {
