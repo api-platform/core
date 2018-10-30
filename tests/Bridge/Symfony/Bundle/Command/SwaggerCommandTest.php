@@ -62,7 +62,16 @@ class SwaggerCommandTest extends KernelTestCase
             operationId: getDummyCarCollection
 YAML;
 
-        $this->assertContains($expected, $result);
+        $this->assertContains($expected, $result, 'nested object should be present.');
+
+        $expected = <<<YAML
+    '/dummy_cars/{id}':
+        get:
+            tags: []
+            operationId: getDummyCarItem
+YAML;
+
+        $this->assertContains($expected, $result, 'arrays should be correctly formatted.');
     }
 
     public function testWriteToFile()
