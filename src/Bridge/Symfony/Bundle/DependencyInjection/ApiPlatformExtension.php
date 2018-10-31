@@ -579,7 +579,21 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
 
         $container->setParameter('api_platform.rate_limit.priority', $rateLimitConfig['priority']);
         $container->setParameter('api_platform.rate_limit.storage_method', $rateLimitConfig['storage_method']);
-        $container->setParameter('api_platform.rate_limit.limits', $rateLimitConfig['limits']);
+        $container->setParameter(
+            'api_platform.rate_limit.limits',
+            array_map(
+                function (array $limitConfig) {
+                    return [
+                        'time_frame' => [
+                            'window' => (int)$limitConfig['time_frame'],
+                            'scale'  => preg_replace('/[0-9]+/', '', $limitConfig['time_frame']),
+                        ],
+                        'capacity' => $limitConfig['capacity'],
+                    ];
+                },
+                $rateLimitConfig['limits']
+            )
+        );
 
         $loader->load('rate_limits.xml');
     }
