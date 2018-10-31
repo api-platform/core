@@ -18,6 +18,7 @@ use ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\Compiler\DataPers
 use ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\Compiler\DataProviderPass;
 use ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\Compiler\DoctrineQueryExtensionPass;
 use ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\Compiler\FilterPass;
+use ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\Compiler\RateLimitPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
@@ -40,5 +41,6 @@ final class ApiPlatformBundle extends Bundle
         $container->addCompilerPass(new AnnotationFilterPass());
         $container->addCompilerPass(new FilterPass());
         $container->addCompilerPass(new DoctrineQueryExtensionPass());
+        $container->addCompilerPass(new RateLimitPass());
     }
 }

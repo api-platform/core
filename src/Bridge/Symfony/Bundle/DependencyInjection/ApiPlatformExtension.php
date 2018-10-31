@@ -141,6 +141,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $this->registerDoctrineExtensionConfiguration($container, $config, $useDoctrine);
         $this->registerHttpCache($container, $config, $loader, $useDoctrine);
         $this->registerValidatorConfiguration($container, $config, $loader);
+        $this->registerRateLimits($container, $config, $loader);
     }
 
     /**
@@ -560,5 +561,26 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         }
 
         $container->setParameter('api_platform.validator.serialize_payload_fields', $config['validator']['serialize_payload_fields']);
+    }
+
+
+    /**
+     * Registers the rate limiting listener, and configures the rate limiter services
+     */
+    private function registerRateLimits(ContainerBuilder $container, array $config, XmlFileLoader $loader)
+    {
+        $rateLimitConfig = $config['rate_limits'];
+
+        $container->setParameter('api_platform.rate_limit.enabled', $rateLimitConfig['enabled']);
+
+        if (!$rateLimitConfig['enabled']) {
+            return;
+        }
+
+        $container->setParameter('api_platform.rate_limit.priority', $rateLimitConfig['priority']);
+        $container->setParameter('api_platform.rate_limit.storage_method', $rateLimitConfig['storage_method']);
+        $container->setParameter('api_platform.rate_limit.limits', $rateLimitConfig['limits']);
+
+        $loader->load('rate_limits.xml');
     }
 }
