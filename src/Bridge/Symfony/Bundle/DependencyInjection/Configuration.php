@@ -342,7 +342,7 @@ final class Configuration implements ConfigurationInterface
      */
     private function addRateLimitSection(ArrayNodeDefinition $rootNode)
     {
-        $timeFrameTypes = "'M' (months), 'W' (weeks), 'D' (days), 'h' (hours), 'm' (minutes) or 's' (seconds)";
+        $timeFrameTypes = "'Y' (years), 'M' (months), 'W' (weeks), 'D' (days), 'h' (hours), 'm' (minutes) or 's' (seconds)";
 
         $rootNode
             ->children()
