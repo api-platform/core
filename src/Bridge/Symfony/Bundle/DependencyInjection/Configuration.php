@@ -16,7 +16,9 @@ namespace ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\Exception\RateLimitExceededException;
 use FOS\UserBundle\FOSUserBundle;
+use function func_get_args;
 use GraphQL\GraphQL;
+use function preg_match;
 use Symfony\Bundle\TwigBundle\TwigBundle;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
@@ -340,6 +342,8 @@ final class Configuration implements ConfigurationInterface
      */
     private function addRateLimitSection(ArrayNodeDefinition $rootNode)
     {
+        $timeFrameTypes = "'M' (months), 'W' (weeks), 'D' (days), 'h' (hours), 'm' (minutes) or 's' (seconds)";
+
         $rootNode
             ->children()
                 ->arrayNode('rate_limits')
@@ -353,8 +357,24 @@ final class Configuration implements ConfigurationInterface
                             ->info('Limits for different limiters.')
                             ->arrayPrototype()
                                 ->children()
-                                    ->scalarNode('id')->end()
-                                    ->scalarNode('time_frame')->defaultValue('1m')->info('The time frame to use when checking against capacity.')->end()
+                                    ->scalarNode('id')->info('The key to match the limiter service configKey.')->end()
+                                    ->scalarNode('time_frame')
+                                        ->info(
+                                            'The time frame to use when checking against capacity.  Should be an ' .
+                                            'integer immediately followed by one of ' . $timeFrameTypes)
+                                        ->defaultValue('1m')
+                                        ->validate()->always(function($value){
+                                            return (string) $value;
+                                        })->end()
+                                        ->validate()
+                                            ->ifTrue(function($value){
+                                                return !preg_match('/\d+[MWDhms]/', $value);
+                                            })
+                                            ->thenInvalid(
+                                                'Value should be a number followed by one of ' . $timeFrameTypes
+                                            )
+                                        ->end()
+                                    ->end()
                                     ->scalarNode('capacity')->info('The number of requests allowed within the given time_frame.')->end()
                                 ->end()
                             ->end()
