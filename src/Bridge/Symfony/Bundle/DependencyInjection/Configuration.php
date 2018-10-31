@@ -231,6 +231,8 @@ final class Configuration implements ConfigurationInterface
             'jsonld' => ['mime_types' => ['application/ld+json']],
         ]);
 
+        $this->addRateLimitSection($rootNode);
+
         return $treeBuilder;
     }
 
@@ -321,6 +323,38 @@ final class Configuration implements ConfigurationInterface
                     ->prototype('array')
                         ->children()
                             ->arrayNode('mime_types')->prototype('scalar')->end()->end()
+                        ->end()
+                    ->end()
+                ->end()
+            ->end();
+    }
+
+    /**
+     * Adds an rate_limit section.
+     *
+     * @param ArrayNodeDefinition $rootNode
+     *
+     * @throws InvalidConfigurationException
+     */
+    private function addRateLimitSection(ArrayNodeDefinition $rootNode)
+    {
+        $rootNode
+            ->children()
+                ->arrayNode('rate_limits')
+                    ->info('Configure the rate limits.')
+                    ->addDefaultsIfNotSet()
+                    ->children()
+                        ->booleanNode('enabled')->defaultFalse()->info('Whether to use rate limiting.')->end()
+                        ->scalarNode('storage_method')->defaultValue('apcu')->info('The storage mechanism to use when tracking usage.')->end()
+                        ->arrayNode('limits')
+                            ->info('Limits for different limiters.')
+                            ->arrayPrototype()
+                                ->children()
+                                    ->scalarNode('id')->end()
+                                    ->scalarNode('time_frame')->defaultValue('1m')->info('The time frame to use when checking against capacity.')->end()
+                                    ->scalarNode('capacity')->info('The number of requests allowed within the given time_frame.')->end()
+                                ->end()
+                            ->end()
                         ->end()
                     ->end()
                 ->end()
