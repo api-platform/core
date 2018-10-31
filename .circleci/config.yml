@@ -117,14 +117,14 @@ jobs:
       - *update-project-dependencies
       - run:
           name: Install PHPStan
-          command: composer global require phpstan/phpstan:0.10.1
+          command: composer global require phpstan/phpstan:0.10.5
       - *save-composer-cache-by-revision
       - *save-composer-cache-by-branch
       - run:
           name: Run PHPStan
           command: |-
             export PATH="$PATH:$HOME/.composer/vendor/bin"
-            phpstan analyse -c phpstan.neon -l5 --ansi src tests
+            phpstan analyse -c phpstan.neon -l6 --ansi src tests
 
   phpunit-coverage:
     docker:

@@ -53,7 +53,7 @@ trait DateFilterTrait
      */
     private function isDateField(string $property, string $resourceClass): bool
     {
-        return isset(self::DOCTRINE_DATE_TYPES[$this->getDoctrineFieldType($property, $resourceClass)]);
+        return isset(self::DOCTRINE_DATE_TYPES[(string) $this->getDoctrineFieldType($property, $resourceClass)]);
     }
 
     /**

@@ -43,7 +43,7 @@ trait NumericFilterTrait
 
             $description[$property] = [
                 'property' => $property,
-                'type' => $this->getType($this->getDoctrineFieldType($property, $resourceClass)),
+                'type' => $this->getType((string) $this->getDoctrineFieldType($property, $resourceClass)),
                 'required' => false,
             ];
         }
@@ -56,7 +56,7 @@ trait NumericFilterTrait
      */
     private function isNumericField(string $property, string $resourceClass): bool
     {
-        return isset(self::DOCTRINE_NUMERIC_TYPES[$this->getDoctrineFieldType($property, $resourceClass)]);
+        return isset(self::DOCTRINE_NUMERIC_TYPES[(string) $this->getDoctrineFieldType($property, $resourceClass)]);
     }
 
     private function normalizeValue($value, string $property)

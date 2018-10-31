@@ -26,7 +26,7 @@ install:
   - echo extension=php_mongodb.dll >> php.ini
   - echo memory_limit=3G >> php.ini
   - cd %APPVEYOR_BUILD_FOLDER%
-  - composer install --no-interaction --no-progress --ignore-platform-reqs
+  - composer install --no-interaction --no-progress --no-suggest --ignore-platform-reqs
 
 services:
   - mongodb

@@ -175,7 +175,7 @@ abstract class ExtractorTestCase extends TestCase
                 'attributes' => null,
                 'properties' => null,
             ],
-            \ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyBis::class => [
+            '\ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyBis' => [
                 'shortName' => null,
                 'description' => null,
                 'iri' => null,
@@ -301,7 +301,7 @@ abstract class ExtractorTestCase extends TestCase
                 'attributes' => null,
                 'properties' => null,
             ],
-            \ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyBis::class => [
+            '\ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyBis' => [
                 'shortName' => null,
                 'description' => null,
                 'iri' => null,

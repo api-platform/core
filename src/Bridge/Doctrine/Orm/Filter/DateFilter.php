@@ -64,7 +64,7 @@ class DateFilter extends AbstractContextAwareFilter implements DateFilterInterfa
         }
 
         $nullManagement = $this->properties[$property] ?? null;
-        $type = $this->getDoctrineFieldType($property, $resourceClass);
+        $type = (string) $this->getDoctrineFieldType($property, $resourceClass);
 
         if (self::EXCLUDE_NULL === $nullManagement) {
             $queryBuilder->andWhere($queryBuilder->expr()->isNotNull(sprintf('%s.%s', $alias, $field)));
@@ -130,6 +130,7 @@ class DateFilter extends AbstractContextAwareFilter implements DateFilterInterfa
      */
     protected function addWhere(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $alias, string $field, string $operator, string $value, string $nullManagement = null, $type = null)
     {
+        $type = (string) $type;
         try {
             $value = false === strpos($type, '_immutable') ? new \DateTime($value) : new \DateTimeImmutable($value);
         } catch (\Exception $e) {

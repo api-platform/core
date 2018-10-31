@@ -58,6 +58,7 @@ final class Configuration implements ConfigurationInterface
                     ->cannotBeEmpty()
                     ->defaultValue('0.0.0')
                 ->end()
+                ->booleanNode('show_webby')->defaultTrue()->info('If true, show Webby on the documentation page')->end()
                 ->scalarNode('default_operation_path_resolver')
                     ->defaultValue('api_platform.operation_path_resolver.underscore')
                     ->setDeprecated('The use of the `default_operation_path_resolver` has been deprecated in 2.1 and will be removed in 3.0. Use `path_segment_name_generator` instead.')

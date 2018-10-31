@@ -83,7 +83,7 @@ final class EntrypointAction
         }
 
         if ('json' === $request->getContentType()) {
-            $input = \json_decode($request->getContent(), true);
+            $input = \json_decode((string) $request->getContent(), true);
 
             if (isset($input['query'])) {
                 $query = $input['query'];

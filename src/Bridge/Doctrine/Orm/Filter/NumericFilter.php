@@ -75,7 +75,7 @@ class NumericFilter extends AbstractContextAwareFilter
 
         $queryBuilder
             ->andWhere(sprintf('%s.%s = :%s', $alias, $field, $valueParameter))
-            ->setParameter($valueParameter, $value, $this->getDoctrineFieldType($property, $resourceClass));
+            ->setParameter($valueParameter, $value, (string) $this->getDoctrineFieldType($property, $resourceClass));
     }
 
     /**
