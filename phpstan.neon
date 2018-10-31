@@ -14,9 +14,12 @@ parameters:
         - '#Access to an undefined property object::\$isIdentifierComposite.#'
         - '#Call to an undefined method Doctrine\\Common\\Persistence\\ObjectManager::getConnection\(\)#'
         - '#Call to an undefined method PHPUnit\\Framework\\MockObject\\MockObject::[a-zA-Z0-9_]+\(\)#'
-        - '#Call to an undefined method Prophecy\\Prophecy\\ObjectProphecy::[a-zA-Z0-9_]+\(\)#'
+        - '#Call to an undefined method Prophecy\\Prophecy\\ObjectProphecy(|.*)?::[a-zA-Z0-9_]+\(\)#'
         - '#Method ApiPlatform\\Core\\Tests\\Bridge\\Doctrine\\Orm\\ItemDataProviderTest::getManagerRegistry\(\) should return Doctrine\\Common\\Persistence\\ManagerRegistry but returns object\.#'
         - '#Method ApiPlatform\\Core\\Tests\\Bridge\\Doctrine\\Orm\\Util\\IdentifierManagerTraitTest::getObjectManager\(\) should return Doctrine\\Common\\Persistence\\ObjectManager but returns object\.#'
+        - '#Parameter \#1 \$function of function call_user_func expects callable, .+ given\.#'
+        - '#Parameter \#1 \$classes of class ApiPlatform\\Core\\Metadata\\Resource\\ResourceNameCollection constructor expects array<string>, array<int, int\|string> given\.#'
+        - '#Method ApiPlatform\\Core\\Util\\RequestParser::parseRequestParams\(\) should return array but returns array\|false\.#'
         # Temporary fix while the PHPStan extension for Prophecy isn't compatible with 0.10
         - '#Parameter .* expects .*, .*object.* given\.#'
         - '#Parameter \#[0-9] \$filterLocator of class ApiPlatform\\Core\\Bridge\\Doctrine\\Orm\\Extension\\FilterExtension constructor expects ApiPlatform\\Core\\Api\\FilterCollection|Psr\\Container\\ContainerInterface(\|null)?, ArrayObject given\.#'
@@ -25,7 +28,7 @@ parameters:
         # https://github.com/doctrine/doctrine2/pull/7298/files
         - '#Strict comparison using === between null and int will always evaluate to false\.#'
         - '#Strict comparison using !== between null and null will always evaluate to false\.#'
-        - '#Class ApiPlatform\\Core\\Tests\\Fixtures\\TestBundle\\Entity\\DummyBis not found.#'
+        - '#Method ApiPlatform\\Core\\(Serializer\\Abstract|JsonApi\\Serializer\\)ItemNormalizer::normalizeRelation\(\) should return array\|string but returns array\|bool\|float\|int\|string\.#'
 
         # Expected, due to deprecations
         - '#Method ApiPlatform\\Core\\Bridge\\Doctrine\\Orm\\Extension\\QueryResult(Item|Collection)ExtensionInterface::getResult\(\) invoked with 4 parameters, 1 required\.#'

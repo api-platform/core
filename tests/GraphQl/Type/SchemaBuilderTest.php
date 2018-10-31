@@ -183,6 +183,7 @@ class SchemaBuilderTest extends TestCase
             $this->assertEquals(GraphQLType::nonNull(GraphQLType::int()), $objectPropertyFieldType->getField('totalCount')->getType());
             /** @var ListOfType $edgesType */
             $edgesType = $objectPropertyFieldType->getFields()['edges']->getType();
+            /** @var ObjectType $edgeType */
             $edgeType = $edgesType->getWrappedType();
             $this->assertSame('ShortName1Edge', $edgeType->name);
             $this->assertEquals(GraphQLType::nonNull(GraphQLType::string()), $edgeType->getField('cursor')->getType());

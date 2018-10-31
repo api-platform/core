@@ -103,3 +103,40 @@ Feature: Cache invalidation through HTTP Cache tags
     """
     Then the response status code should be 200
     And "/relation1s,/relation1s/1,/relation2s/2,/relation2s/1" IRIs should be purged
+
+  Scenario: Create a Relation3 with many to many
+    When I add "Content-Type" header equal to "application/ld+json"
+    And I send a "POST" request to "/relation3s" with body:
+    """
+    {
+      "relation2s": ["/relation2s/1", "/relation2s/2"]
+    }
+    """
+    Then the response status code should be 201
+    And "/relation3s,/relation2s/1,/relation2s/2" IRIs should be purged
+
+  Scenario: Get a Relation3
+    When I add "Content-Type" header equal to "application/ld+json"
+    And I send a "GET" request to "/relation3s"
+    Then the response status code should be 200
+    And the header "Cache-Tags" should be equal to "/relation3s/1,/relation2s/1,/relation2s/2,/relation3s"
+
+  Scenario: Update a collection member only
+    When I add "Content-Type" header equal to "application/ld+json"
+    And I send a "PUT" request to "/relation3s/1" with body:
+    """
+    {
+      "relation2s": ["/relation2s/2"]
+    }
+    """
+    Then the response status code should be 200
+    And the header "Cache-Tags" should not exist
+    And "/relation3s,/relation3s/1,/relation2s/2,/relation2s,/relation2s/1" IRIs should be purged
+
+  Scenario: Delete the collection owner
+    When I add "Content-Type" header equal to "application/ld+json"
+    And I send a "DELETE" request to "/relation3s/1"
+    Then the response status code should be 204
+    And the header "Cache-Tags" should not exist
+    And "/relation3s,/relation3s/1,/relation2s/2" IRIs should be purged
+
