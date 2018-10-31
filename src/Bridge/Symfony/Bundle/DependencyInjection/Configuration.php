@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection;
 
 use ApiPlatform\Core\Exception\InvalidArgumentException;
+use ApiPlatform\Core\Exception\RateLimitExceededException;
 use FOS\UserBundle\FOSUserBundle;
 use GraphQL\GraphQL;
 use Symfony\Bundle\TwigBundle\TwigBundle;
@@ -251,6 +252,7 @@ final class Configuration implements ConfigurationInterface
                     ->defaultValue([
                         ExceptionInterface::class => Response::HTTP_BAD_REQUEST,
                         InvalidArgumentException::class => Response::HTTP_BAD_REQUEST,
+                        RateLimitExceededException::class => Response::HTTP_TOO_MANY_REQUESTS,
                     ])
                     ->info('The list of exceptions mapped to their HTTP status code.')
                     ->normalizeKeys(false)
