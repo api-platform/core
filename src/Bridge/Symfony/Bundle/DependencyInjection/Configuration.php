@@ -345,6 +345,7 @@ final class Configuration implements ConfigurationInterface
                     ->addDefaultsIfNotSet()
                     ->children()
                         ->booleanNode('enabled')->defaultFalse()->info('Whether to use rate limiting.')->end()
+                        ->booleanNode('priority')->defaultValue(28)->info('The priority to use for the rate limit listener.')->end()
                         ->scalarNode('storage_method')->defaultValue('apcu')->info('The storage mechanism to use when tracking usage.')->end()
                         ->arrayNode('limits')
                             ->info('Limits for different limiters.')
