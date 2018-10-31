@@ -143,7 +143,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $this->registerDoctrineExtensionConfiguration($container, $config, $useDoctrine);
         $this->registerHttpCacheConfiguration($container, $config, $loader, $useDoctrine);
         $this->registerValidatorConfiguration($container, $config);
-        $this->registerDataCollectorConfiguration($config, $loader);
+        $this->registerDataCollectorConfiguration($container, $config, $loader);
     }
 
     /**
@@ -513,7 +513,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
     /**
      * Registers the DataCollector configuration.
      */
-    private function registerDataCollectorConfiguration(array $config, XmlFileLoader $loader)
+    private function registerDataCollectorConfiguration(ContainerBuilder $container, array $config, XmlFileLoader $loader)
     {
         if (!$config['enable_profiler']) {
             return;
