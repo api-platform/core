@@ -28,7 +28,6 @@ parameters:
         # https://github.com/doctrine/doctrine2/pull/7298/files
         - '#Strict comparison using === between null and int will always evaluate to false\.#'
         - '#Strict comparison using !== between null and null will always evaluate to false\.#'
-        - '#Class ApiPlatform\\Core\\Tests\\Fixtures\\TestBundle\\Entity\\DummyBis not found.#'
         - '#Method ApiPlatform\\Core\\(Serializer\\Abstract|JsonApi\\Serializer\\)ItemNormalizer::normalizeRelation\(\) should return array\|string but returns array\|bool\|float\|int\|string\.#'
 
         # Expected, due to deprecations

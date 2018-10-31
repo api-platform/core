@@ -168,7 +168,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
                 $paramName = $constructorParameter->name;
                 $key = $this->nameConverter ? $this->nameConverter->normalize($paramName) : $paramName;
 
-                $allowed = false === $allowedAttributes || \in_array($paramName, $allowedAttributes, true);
+                $allowed = false === $allowedAttributes || (\is_array($allowedAttributes) && \in_array($paramName, $allowedAttributes, true));
                 $ignored = !$this->isAllowedAttribute($class, $paramName, $format, $context);
                 if ($constructorParameter->isVariadic()) {
                     if ($allowed && !$ignored && (isset($data[$key]) || array_key_exists($key, $data))) {
