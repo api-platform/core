@@ -11,6 +11,7 @@
             <argument>%api_platform.http_cache.shared_max_age%</argument>
             <argument>%api_platform.http_cache.vary%</argument>
             <argument>%api_platform.http_cache.public%</argument>
+            <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
 
             <tag name="kernel.event_listener" event="kernel.response" method="onKernelResponse" priority="-1" />
         </service>
