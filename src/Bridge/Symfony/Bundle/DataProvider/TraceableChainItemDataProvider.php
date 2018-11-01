@@ -11,34 +11,51 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\DataProvider;
+namespace ApiPlatform\Core\Bridge\Symfony\Bundle\DataProvider;
 
+use ApiPlatform\Core\DataProvider\ChainItemDataProvider;
+use ApiPlatform\Core\DataProvider\DenormalizedIdentifiersAwareItemDataProviderInterface;
+use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
+use ApiPlatform\Core\DataProvider\RestrictedDataProviderInterface;
 use ApiPlatform\Core\Exception\ResourceClassNotSupportedException;
 
 /**
- * Tries each configured data provider and returns the result of the first able to handle the resource class.
- *
- * @author Kévin Dunglas <dunglas@gmail.com>
+ * @author Anthony GRASSIOT <antograssiot@free.fr>
  */
-final class ChainItemDataProvider implements ItemDataProviderInterface
+final class TraceableChainItemDataProvider implements ItemDataProviderInterface
 {
-    /** @internal */
-    public $dataProviders;
+    private $dataProviders = [];
+    private $context = [];
+    private $providersResponse = [];
 
-    /**
-     * @param ItemDataProviderInterface[] $dataProviders
-     */
-    public function __construct(/* iterable */ $dataProviders)
+    public function __construct(ItemDataProviderInterface $itemDataProvider)
     {
-        $this->dataProviders = $dataProviders;
+        if ($itemDataProvider instanceof ChainItemDataProvider) {
+            $this->dataProviders = $itemDataProvider->dataProviders;
+        }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    public function getProvidersResponse(): array
+    {
+        return $this->providersResponse;
+    }
+
+    public function getContext(): array
+    {
+        return $this->context;
+    }
+
     public function getItem(string $resourceClass, $id, string $operationName = null, array $context = [])
     {
+        $this->context = $context;
+        $match = false;
+        $result = null;
+
         foreach ($this->dataProviders as $dataProvider) {
+            $this->providersResponse[\get_class($dataProvider)] = $match ? null : false;
+            if ($match) {
+                continue;
+            }
             try {
                 if ($dataProvider instanceof RestrictedDataProviderInterface
                     && !$dataProvider->supports($resourceClass, $operationName, $context)) {
@@ -55,13 +72,14 @@ final class ChainItemDataProvider implements ItemDataProviderInterface
                     }
                 }
 
-                return $dataProvider->getItem($resourceClass, $identifier, $operationName, $context);
+                $result = $dataProvider->getItem($resourceClass, $identifier, $operationName, $context);
+                $this->providersResponse[\get_class($dataProvider)] = $match = true;
             } catch (ResourceClassNotSupportedException $e) {
                 @trigger_error(sprintf('Throwing a "%s" is deprecated in favor of implementing "%s"', \get_class($e), RestrictedDataProviderInterface::class), E_USER_DEPRECATED);
                 continue;
             }
         }
 
-        return null;
+        return $result;
     }
 }

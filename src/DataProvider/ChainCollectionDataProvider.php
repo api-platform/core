@@ -22,7 +22,8 @@ use ApiPlatform\Core\Exception\ResourceClassNotSupportedException;
  */
 final class ChainCollectionDataProvider implements ContextAwareCollectionDataProviderInterface
 {
-    private $dataProviders;
+    /** @internal */
+    public $dataProviders;
 
     /**
      * @param ContextAwareCollectionDataProviderInterface[]|CollectionDataProviderInterface[] $dataProviders
