@@ -181,7 +181,9 @@ final class SubresourceDataProvider implements SubresourceDataProviderInterface
                 case ClassMetadataInfo::ONE_TO_ONE:
                     $association = $classMetadata->getAssociationMapping($previousAssociationProperty);
                     if (!isset($association['mappedBy'])) {
-                        goto def;
+                        $qb->select("IDENTITY($alias.$previousAssociationProperty)")
+                            ->from($identifierResourceClass, $alias);
+                        break;
                     }
                     $mappedBy = $association['mappedBy'];
                     $previousAlias = "$previousAlias.$mappedBy";
@@ -190,7 +192,6 @@ final class SubresourceDataProvider implements SubresourceDataProviderInterface
                         ->from($identifierResourceClass, $alias);
                     break;
                 default:
-                    def:
                     $qb->select("IDENTITY($alias.$previousAssociationProperty)")
                         ->from($identifierResourceClass, $alias);
             }
