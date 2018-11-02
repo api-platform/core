@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Swagger\Serializer;
+namespace ApiPlatform\Core\OpenAPI\Serializer;
 
 use ApiPlatform\Core\Api\FilterCollection;
 use ApiPlatform\Core\Api\FilterLocatorTrait;
@@ -19,43 +19,39 @@ use ApiPlatform\Core\Api\OperationAwareFormatsProviderInterface;
 use ApiPlatform\Core\Api\OperationMethodResolverInterface;
 use ApiPlatform\Core\Api\OperationType;
 use ApiPlatform\Core\Api\ResourceClassResolverInterface;
-use ApiPlatform\Core\Api\UrlGeneratorInterface;
 use ApiPlatform\Core\Documentation\Documentation;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
-use ApiPlatform\Core\OpenAPI\Serializer\AbstractDocumentationNormalizer;
 use ApiPlatform\Core\Operation\Factory\SubresourceOperationFactoryInterface;
 use ApiPlatform\Core\PathResolver\OperationPathResolverInterface;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
+use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 /**
- * Creates a machine readable Swagger API documentation.
+ * Creates a machine readable OpenAPI 3.0 documentation.
  *
- * @author Amrouche Hamza <hamza.simperfit@gmail.com>
- * @author Teoh Han Hui <teohhanhui@gmail.com>
- * @author Kévin Dunglas <dunglas@gmail.com>
+ * @experimental
+ *
+ * @author Anthony GRASSIOT <antograssiot@free.fr>
  */
 final class DocumentationNormalizer extends AbstractDocumentationNormalizer
 {
     use FilterLocatorTrait;
 
-    const SWAGGER_VERSION = '2.0';
+    const OPENAPI_VERSION = '3.0.2';
     const SWAGGER_DEFINITION_NAME = 'swagger_definition_name';
-    const ATTRIBUTE_NAME = 'swagger_context';
+
+    private $legacyNormalizer;
 
     /**
      * @param ContainerInterface|FilterCollection|null $filterLocator The new filter locator or the deprecated filter collection
      */
-    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, ResourceClassResolverInterface $resourceClassResolver, OperationMethodResolverInterface $operationMethodResolver, OperationPathResolverInterface $operationPathResolver, UrlGeneratorInterface $urlGenerator = null, $filterLocator = null, NameConverterInterface $nameConverter = null, bool $oauthEnabled = false, string $oauthType = '', string $oauthFlow = '', string $oauthTokenUrl = '', string $oauthAuthorizationUrl = '', array $oauthScopes = [], array $apiKeys = [], SubresourceOperationFactoryInterface $subresourceOperationFactory = null, bool $paginationEnabled = true, string $paginationPageParameterName = 'page', bool $clientItemsPerPage = false, string $itemsPerPageParameterName = 'itemsPerPage', OperationAwareFormatsProviderInterface $formatsProvider = null, bool $paginationClientEnabled = false, string $paginationClientEnabledParameterName = 'pagination', array $defaultContext = [])
+    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, ResourceClassResolverInterface $resourceClassResolver, OperationMethodResolverInterface $operationMethodResolver, OperationPathResolverInterface $operationPathResolver, $filterLocator = null, NameConverterInterface $nameConverter = null, bool $oauthEnabled = false, string $oauthType = '', string $oauthFlow = '', string $oauthTokenUrl = '', string $oauthAuthorizationUrl = '', array $oauthScopes = [], array $apiKeys = [], SubresourceOperationFactoryInterface $subresourceOperationFactory = null, bool $paginationEnabled = true, string $paginationPageParameterName = 'page', bool $clientItemsPerPage = false, string $itemsPerPageParameterName = 'itemsPerPage', OperationAwareFormatsProviderInterface $formatsProvider = null, bool $paginationClientEnabled = false, string $paginationClientEnabledParameterName = 'pagination', NormalizerInterface $legacyNormalizer = null, array $defaultContext = [])
     {
-        if ($urlGenerator) {
-            @trigger_error(sprintf('Passing an instance of %s to %s() is deprecated since version 2.1 and will be removed in 3.0.', UrlGeneratorInterface::class, __METHOD__), E_USER_DEPRECATED);
-        }
-
         $this->setFilterLocator($filterLocator, true);
 
         $this->resourceMetadataFactory = $resourceMetadataFactory;
@@ -64,6 +60,8 @@ final class DocumentationNormalizer extends AbstractDocumentationNormalizer
         $this->resourceClassResolver = $resourceClassResolver;
         $this->operationMethodResolver = $operationMethodResolver;
         $this->operationPathResolver = $operationPathResolver;
+        $this->subresourceOperationFactory = $subresourceOperationFactory;
+        $this->legacyNormalizer = $legacyNormalizer;
         $this->nameConverter = $nameConverter;
         $this->oauthEnabled = $oauthEnabled;
         $this->oauthType = $oauthType;
@@ -71,7 +69,6 @@ final class DocumentationNormalizer extends AbstractDocumentationNormalizer
         $this->oauthTokenUrl = $oauthTokenUrl;
         $this->oauthAuthorizationUrl = $oauthAuthorizationUrl;
         $this->oauthScopes = $oauthScopes;
-        $this->subresourceOperationFactory = $subresourceOperationFactory;
         $this->paginationEnabled = $paginationEnabled;
         $this->paginationPageParameterName = $paginationPageParameterName;
         $this->apiKeys = $apiKeys;
@@ -90,6 +87,10 @@ final class DocumentationNormalizer extends AbstractDocumentationNormalizer
      */
     public function normalize($object, $format = null, array $context = [])
     {
+        if (2 === ($context['spec-version'] ?? 3) || ($context['api_gateway'] ?? false)) {
+            return $this->legacyNormalizer->normalize($object, $format, $context);
+        }
+
         $mimeTypes = $object->getMimeTypes();
         $definitions = new \ArrayObject();
         $paths = new \ArrayObject();
@@ -118,15 +119,14 @@ final class DocumentationNormalizer extends AbstractDocumentationNormalizer
                     $responseFormats = $this->formatsProvider->getFormatsFromOperation($subresourceOperation['resource_class'], $operationName, OperationType::SUBRESOURCE);
                     $responseMimeTypes = $this->extractMimeTypes($responseFormats);
                 }
-                $pathOperation['produces'] = $responseMimeTypes ?? $mimeTypes;
                 $pathOperation['summary'] = sprintf('Retrieves %s%s resource%s.', $subresourceOperation['collection'] ? 'the collection of ' : 'a ', $subresourceOperation['shortNames'][0], $subresourceOperation['collection'] ? 's' : '');
                 $pathOperation['responses'] = [
                     '200' => $subresourceOperation['collection'] ? [
                         'description' => sprintf('%s collection response', $subresourceOperation['shortNames'][0]),
-                        'schema' => ['type' => 'array', 'items' => ['$ref' => sprintf('#/definitions/%s', $responseDefinitionKey)]],
+                        'content' => array_fill_keys($responseMimeTypes ?? $mimeTypes, ['schema' => ['type' => 'array', 'items' => ['$ref' => sprintf('#/components/schemas/%s', $responseDefinitionKey)]]]),
                     ] : [
                         'description' => sprintf('%s resource response', $subresourceOperation['shortNames'][0]),
-                        'schema' => ['$ref' => sprintf('#/definitions/%s', $responseDefinitionKey)],
+                        'content' => array_fill_keys($responseMimeTypes ?? $mimeTypes, ['schema' => ['$ref' => sprintf('#/components/schemas/%s', $responseDefinitionKey)]]),
                     ],
                     '404' => ['description' => 'Resource not found'],
                 ];
@@ -137,7 +137,7 @@ final class DocumentationNormalizer extends AbstractDocumentationNormalizer
 
                 foreach ($subresourceOperation['identifiers'] as list($identifier, , $hasIdentifier)) {
                     if (true === $hasIdentifier) {
-                        $pathOperation['parameters'][] = ['name' => $identifier, 'in' => 'path', 'required' => true, 'type' => 'string'];
+                        $pathOperation['parameters'][] = ['name' => $identifier, 'in' => 'path', 'required' => true, 'schema' => ['type' => 'string']];
                         $parametersMemory[] = $identifier;
                     }
                 }
@@ -168,19 +168,21 @@ final class DocumentationNormalizer extends AbstractDocumentationNormalizer
         $serializerContext = $this->getSerializerContext($operationType, false, $resourceMetadata, $operationName);
         $responseDefinitionKey = $this->getDefinition($definitions, $resourceMetadata, $resourceClass, $serializerContext);
 
-        $pathOperation['produces'] ?? $pathOperation['produces'] = $mimeTypes;
-
         if (OperationType::COLLECTION === $operationType) {
             $pathOperation['summary'] ?? $pathOperation['summary'] = sprintf('Retrieves the collection of %s resources.', $resourceShortName);
+
             $pathOperation['responses'] ?? $pathOperation['responses'] = [
                 '200' => [
                     'description' => sprintf('%s collection response', $resourceShortName),
-                    'schema' => [
-                        'type' => 'array',
-                        'items' => ['$ref' => sprintf('#/definitions/%s', $responseDefinitionKey)],
-                    ],
+                    'content' => array_fill_keys($mimeTypes, [
+                        'schema' => [
+                            'type' => 'array',
+                            'items' => ['$ref' => sprintf('#/components/schemas/%s', $responseDefinitionKey)],
+                        ],
+                    ]),
                 ],
             ];
+
             $pathOperation['parameters'] ?? $pathOperation['parameters'] = $this->getFiltersParameters($resourceClass, $operationName, $resourceMetadata, $definitions, $serializerContext);
 
             if ($this->paginationEnabled && $resourceMetadata->getCollectionOperationAttribute($operationName, 'pagination_enabled', true, true)) {
@@ -202,12 +204,17 @@ final class DocumentationNormalizer extends AbstractDocumentationNormalizer
             'name' => 'id',
             'in' => 'path',
             'required' => true,
-            'type' => 'string',
+            'schema' => [
+                'type' => 'string',
+            ],
         ]];
+
         $pathOperation['responses'] ?? $pathOperation['responses'] = [
             '200' => [
                 'description' => sprintf('%s resource response', $resourceShortName),
-                'schema' => ['$ref' => sprintf('#/definitions/%s', $responseDefinitionKey)],
+                'content' => array_fill_keys($mimeTypes, [
+                    'schema' => ['$ref' => sprintf('#/components/schemas/%s', $responseDefinitionKey)],
+                ]),
             ],
             '404' => ['description' => 'Resource not found'],
         ];
@@ -220,26 +227,27 @@ final class DocumentationNormalizer extends AbstractDocumentationNormalizer
      */
     protected function updatePostOperation(\ArrayObject $pathOperation, array $mimeTypes, string $operationType, ResourceMetadata $resourceMetadata, string $resourceClass, string $resourceShortName, string $operationName, \ArrayObject $definitions)
     {
-        $pathOperation['consumes'] ?? $pathOperation['consumes'] = $mimeTypes;
-        $pathOperation['produces'] ?? $pathOperation['produces'] = $mimeTypes;
         $pathOperation['summary'] ?? $pathOperation['summary'] = sprintf('Creates a %s resource.', $resourceShortName);
-        $pathOperation['parameters'] ?? $pathOperation['parameters'] = [[
-            'name' => lcfirst($resourceShortName),
-            'in' => 'body',
-            'description' => sprintf('The new %s resource', $resourceShortName),
-            'schema' => ['$ref' => sprintf('#/definitions/%s', $this->getDefinition($definitions, $resourceMetadata, $resourceClass,
-                $this->getSerializerContext($operationType, true, $resourceMetadata, $operationName)
-            ))],
-        ]];
         $pathOperation['responses'] ?? $pathOperation['responses'] = [
             '201' => [
                 'description' => sprintf('%s resource created', $resourceShortName),
-                'schema' => ['$ref' => sprintf('#/definitions/%s', $this->getDefinition($definitions, $resourceMetadata, $resourceClass,
-                    $this->getSerializerContext($operationType, false, $resourceMetadata, $operationName)
-                ))],
+                'content' => array_fill_keys($mimeTypes, [
+                    'schema' => ['$ref' => sprintf('#/components/schemas/%s', $this->getDefinition($definitions, $resourceMetadata, $resourceClass,
+                        $this->getSerializerContext($operationType, false, $resourceMetadata, $operationName))),
+                    ],
+                ]),
             ],
             '400' => ['description' => 'Invalid input'],
             '404' => ['description' => 'Resource not found'],
+        ];
+
+        $pathOperation['requestBody'] ?? $pathOperation['requestBody'] = [
+            'content' => array_fill_keys($mimeTypes, [
+                'schema' => ['$ref' => sprintf('#/components/schemas/%s', $this->getDefinition($definitions, $resourceMetadata, $resourceClass,
+                    $this->getSerializerContext($operationType, true, $resourceMetadata, $operationName))),
+                ],
+            ]),
+            'description' => sprintf('The new %s resource', $resourceShortName),
         ];
 
         return $pathOperation;
@@ -250,34 +258,38 @@ final class DocumentationNormalizer extends AbstractDocumentationNormalizer
      */
     protected function updatePutOperation(\ArrayObject $pathOperation, array $mimeTypes, string $operationType, ResourceMetadata $resourceMetadata, string $resourceClass, string $resourceShortName, string $operationName, \ArrayObject $definitions)
     {
-        $pathOperation['consumes'] ?? $pathOperation['consumes'] = $mimeTypes;
-        $pathOperation['produces'] ?? $pathOperation['produces'] = $mimeTypes;
         $pathOperation['summary'] ?? $pathOperation['summary'] = sprintf('Replaces the %s resource.', $resourceShortName);
         $pathOperation['parameters'] ?? $pathOperation['parameters'] = [
             [
                 'name' => 'id',
                 'in' => 'path',
-                'type' => 'string',
                 'required' => true,
-            ],
-            [
-                'name' => lcfirst($resourceShortName),
-                'in' => 'body',
-                'description' => sprintf('The updated %s resource', $resourceShortName),
-                'schema' => ['$ref' => sprintf('#/definitions/%s', $this->getDefinition($definitions, $resourceMetadata, $resourceClass,
-                    $this->getSerializerContext($operationType, true, $resourceMetadata, $operationName)
-                ))],
+                'schema' => [
+                    'type' => 'string',
+                ],
             ],
         ];
+
         $pathOperation['responses'] ?? $pathOperation['responses'] = [
             '200' => [
                 'description' => sprintf('%s resource updated', $resourceShortName),
-                'schema' => ['$ref' => sprintf('#/definitions/%s', $this->getDefinition($definitions, $resourceMetadata, $resourceClass,
-                    $this->getSerializerContext($operationType, false, $resourceMetadata, $operationName)
-                ))],
+                'content' => array_fill_keys($mimeTypes, [
+                    'schema' => ['$ref' => sprintf('#/components/schemas/%s', $this->getDefinition($definitions, $resourceMetadata, $resourceClass,
+                        $this->getSerializerContext($operationType, false, $resourceMetadata, $operationName))),
+                    ],
+                ]),
             ],
             '400' => ['description' => 'Invalid input'],
             '404' => ['description' => 'Resource not found'],
+        ];
+
+        $pathOperation['requestBody'] ?? $pathOperation['requestBody'] = [
+            'content' => array_fill_keys($mimeTypes, [
+                'schema' => ['$ref' => sprintf('#/components/schemas/%s', $this->getDefinition($definitions, $resourceMetadata, $resourceClass,
+                    $this->getSerializerContext($operationType, true, $resourceMetadata, $operationName))),
+                ],
+            ]),
+            'description' => sprintf('The updated %s resource', $resourceShortName),
         ];
 
         return $pathOperation;
@@ -294,27 +306,35 @@ final class DocumentationNormalizer extends AbstractDocumentationNormalizer
         $pathOperation['parameters'] ?? $pathOperation['parameters'] = [[
             'name' => 'id',
             'in' => 'path',
-            'type' => 'string',
             'required' => true,
+            'schema' => [
+                'type' => 'string',
+            ],
         ]];
 
         return $pathOperation;
     }
 
     /**
-     * Computes the Swagger documentation.
+     * Computes the OpenAPI documentation.
      */
-    protected function computeDoc(Documentation $documentation, \ArrayObject $definitions, \ArrayObject $paths, array $context): array
+    private function computeDoc(Documentation $documentation, \ArrayObject $definitions, \ArrayObject $paths, array $context): array
     {
         $doc = [
-            'swagger' => self::SWAGGER_VERSION,
-            'basePath' => $context[self::BASE_URL] ?? $this->defaultContext[self::BASE_URL],
+            'openapi' => self::OPENAPI_VERSION,
             'info' => [
                 'title' => $documentation->getTitle(),
                 'version' => $documentation->getVersion(),
             ],
             'paths' => $paths,
+            'servers' => [
+                ['url' => $context['base_url'] ?? '/'],
+            ],
         ];
+
+        if ('' !== $description = $documentation->getDescription()) {
+            $doc['info']['description'] = $description;
+        }
 
         $securityDefinitions = [];
         $security = [];
@@ -332,40 +352,36 @@ final class DocumentationNormalizer extends AbstractDocumentationNormalizer
             $security[] = ['oauth' => []];
         }
 
-        if ($this->apiKeys) {
-            foreach ($this->apiKeys as $key => $apiKey) {
-                $name = $apiKey['name'];
-                $type = $apiKey['type'];
+        foreach ($this->apiKeys as $key => $apiKey) {
+            $name = $apiKey['name'];
+            $type = $apiKey['type'];
 
-                $securityDefinitions[$key] = [
-                    'type' => 'apiKey',
-                    'in' => $type,
-                    'description' => sprintf('Value for the %s %s', $name, 'query' === $type ? sprintf('%s parameter', $type) : $type),
-                    'name' => $name,
-                ];
+            $securityDefinitions[$key] = [
+                'type' => 'apiKey',
+                'in' => $type,
+                'description' => sprintf('Value for the %s %s', $name, 'query' === $type ? sprintf('%s parameter', $type) : $type),
+                'name' => $name,
+            ];
 
-                $security[] = [$key => []];
-            }
+            $security[] = [$key => []];
         }
 
         if ($securityDefinitions && $security) {
-            $doc['securityDefinitions'] = $securityDefinitions;
             $doc['security'] = $security;
         }
 
-        if ('' !== $description = $documentation->getDescription()) {
-            $doc['info']['description'] = $description;
-        }
-
-        if (\count($definitions) > 0) {
-            $doc['definitions'] = $definitions;
+        if (\count($definitions) + \count($securityDefinitions)) {
+            $doc['components'] = [];
+            $doc['components']['schemas'] = \count($definitions) ? $definitions : null;
+            $doc['components']['securitySchemes'] = \count($securityDefinitions) ? $securityDefinitions : null;
+            $doc['components'] = array_filter($doc['components']);
         }
 
         return $doc;
     }
 
     /**
-     * Gets Swagger parameters corresponding to enabled filters.
+     * Gets OpenAPI parameters corresponding to enabled filters.
      */
     private function getFiltersParameters(string $resourceClass, string $operationName, ResourceMetadata $resourceMetadata, \ArrayObject $definitions, array $serializerContext = null): array
     {
@@ -385,11 +401,12 @@ final class DocumentationNormalizer extends AbstractDocumentationNormalizer
                     'name' => $name,
                     'in' => 'query',
                     'required' => $data['required'],
+                    'schema' => $this->getType($data['type'], $data['is_collection'] ?? false, null, null, $definitions, $serializerContext),
                 ];
-                $parameter += $this->getType($data['type'], $data['is_collection'] ?? false, null, null, $definitions, $serializerContext);
 
-                if ('array' === $parameter['type']) {
-                    $parameter['collectionFormat'] = \in_array($data['type'], [Type::BUILTIN_TYPE_ARRAY, Type::BUILTIN_TYPE_OBJECT], true) ? 'csv' : 'multi';
+                if ('array' === $parameter['schema']['type'] ?? '') {
+                    $parameter['style'] = \in_array($data['type'], [Type::BUILTIN_TYPE_ARRAY, Type::BUILTIN_TYPE_OBJECT], true) ? 'deepObject' : 'form';
+                    $parameter['explode'] = true;
                 }
 
                 if (isset($data['swagger'])) {
@@ -401,5 +418,52 @@ final class DocumentationNormalizer extends AbstractDocumentationNormalizer
         }
 
         return $parameters;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getPaginationParameters(): array
+    {
+        $parameters = array_merge(parent::getPaginationParameters(), ['schema' => ['type' => 'integer']]);
+        unset($parameters['type']);
+
+        return $parameters;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getPaginationClientEnabledParameters(): array
+    {
+        $parameters = array_merge(parent::getPaginationClientEnabledParameters(), ['schema' => ['type' => 'boolean']]);
+        unset($parameters['type']);
+
+        return $parameters;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getItemsPerPageParameters(): array
+    {
+        $parameters = array_merge(parent::getItemsPerPageParameters(), ['schema' => ['type' => 'integer']]);
+        unset($parameters['type']);
+
+        return $parameters;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getType(string $type, bool $isCollection, string $className = null, bool $readableLink = null, \ArrayObject $definitions, array $serializerContext = null): array
+    {
+        $type = parent::getType($type, $isCollection, $className, $readableLink, $definitions, $serializerContext);
+
+        if ($type['$ref'] ?? false) {
+            $type['$ref'] = str_replace('#/definitions/', '#/components/schemas/', $type['$ref']);
+        }
+
+        return $type;
     }
 }
