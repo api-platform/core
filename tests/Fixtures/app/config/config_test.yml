@@ -241,3 +241,9 @@ services:
     app.dummy_validation.group_generator:
         class: ApiPlatform\Core\Tests\Fixtures\TestBundle\Validator\DummyValidationGroupsGenerator
         public: true
+
+    app.dummy_input_data_persister:
+        class: ApiPlatform\Core\Tests\Fixtures\TestBundle\DataPersister\DummyInputDataPersister
+        public: false
+        tags:
+            -  { name: 'api_platform.data_persister' }
