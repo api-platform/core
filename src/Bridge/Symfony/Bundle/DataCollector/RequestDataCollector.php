@@ -84,21 +84,21 @@ final class RequestDataCollector extends DataCollector
 
         if ($this->collectionDataProvider instanceof TraceableChainCollectionDataProvider) {
             $this->data['dataProviders']['collection'] = [
-                'context' => $this->collectionDataProvider->getContext(),
+                'context' => $this->cloneVar($this->collectionDataProvider->getContext()),
                 'responses' => $this->collectionDataProvider->getProvidersResponse(),
             ];
         }
 
         if ($this->itemDataProvider instanceof TraceableChainItemDataProvider) {
             $this->data['dataProviders']['item'] = [
-                'context' => $this->itemDataProvider->getContext(),
+                'context' => $this->cloneVar($this->itemDataProvider->getContext()),
                 'responses' => $this->itemDataProvider->getProvidersResponse(),
             ];
         }
 
         if ($this->subresourceDataProvider instanceof TraceableChainSubresourceDataProvider) {
             $this->data['dataProviders']['subresource'] = [
-                'context' => $this->subresourceDataProvider->getContext(),
+                'context' => $this->cloneVar($this->subresourceDataProvider->getContext()),
                 'responses' => $this->subresourceDataProvider->getProvidersResponse(),
             ];
         }

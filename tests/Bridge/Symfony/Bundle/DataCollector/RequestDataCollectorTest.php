@@ -174,21 +174,27 @@ class RequestDataCollectorTest extends TestCase
             $this->assertStringStartsWith('class@anonymous', $class);
             $this->assertTrue($response);
         }
-        $this->assertSame(['collection_context'], $dataProvider['context']);
+        $context = $dataProvider['context'];
+        $this->assertInstanceOf(Data::class, $context);
+        $this->assertSame(['collection_context'], $context->getValue(true));
 
         $dataProvider = $dataCollector->getItemDataProviders();
         foreach ($dataProvider['responses'] as $class => $response) {
             $this->assertStringStartsWith('class@anonymous', $class);
             $this->assertTrue($response);
         }
-        $this->assertSame(['item_context'], $dataProvider['context']);
+        $context = $dataProvider['context'];
+        $this->assertInstanceOf(Data::class, $context);
+        $this->assertSame(['item_context'], $context->getValue(true));
 
         $dataProvider = $dataCollector->getSubresourceDataProviders();
         foreach ($dataProvider['responses'] as $class => $response) {
             $this->assertStringStartsWith('class@anonymous', $class);
             $this->assertTrue($response);
         }
-        $this->assertSame(['subresource_context'], $dataProvider['context']);
+        $context = $dataProvider['context'];
+        $this->assertInstanceOf(Data::class, $context);
+        $this->assertSame(['subresource_context'], $context->getValue(true));
 
         $dataPersister = $dataCollector->getDataPersisters();
         foreach ($dataPersister['responses'] as $class => $response) {
