@@ -17,7 +17,7 @@
             <argument type="service" id="mercure.hub.default.publisher" />
 
             <tag name="doctrine.event_listener" event="onFlush" />
-            <tag name="doctrine.event_listener" event="postFlush" />
+            <tag name="kernel.event_listener" event="kernel.terminate" method="postFlush" />
         </service>
 
     </services>

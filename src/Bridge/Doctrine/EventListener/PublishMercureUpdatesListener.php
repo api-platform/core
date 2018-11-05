@@ -27,7 +27,7 @@ use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 
 /**
- * Publish resources updates to the Mercure hub.
+ * Publishes resources updates to the Mercure hub.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  *
@@ -85,7 +85,7 @@ final class PublishMercureUpdatesListener
     }
 
     /**
-     * Purges tags collected during this request, and clears the tag list.
+     * Publishes updates for changes collected on flush, and resets the store.
      */
     public function postFlush()
     {
