@@ -15,7 +15,7 @@
 
             <tag name="doctrine.event_listener" event="preUpdate" />
             <tag name="doctrine.event_listener" event="onFlush" />
-            <tag name="kernel.event_listener" event="kernel.terminate" method="postFlush" />
+            <tag name="doctrine.event_listener" event="postFlush" />
         </service>
 
     </services>
