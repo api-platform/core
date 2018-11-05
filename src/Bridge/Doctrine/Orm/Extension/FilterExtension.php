@@ -61,14 +61,14 @@ final class FilterExtension implements ContextAwareQueryCollectionExtensionInter
             return;
         }
 
-        $orderFilter = null;
+        $orderFilters = [];
 
         foreach ($resourceFilters as $filterId) {
             $filter = $this->getFilter($filterId);
             if ($filter instanceof FilterInterface) {
                 // Apply the OrderFilter after every other filter to avoid an edge case where OrderFilter would do a LEFT JOIN instead of an INNER JOIN
                 if ($filter instanceof OrderFilter) {
-                    $orderFilter = $filter;
+                    $orderFilters[] = $filter;
                     continue;
                 }
 
@@ -77,7 +77,7 @@ final class FilterExtension implements ContextAwareQueryCollectionExtensionInter
             }
         }
 
-        if (null !== $orderFilter) {
+        foreach ($orderFilters as $orderFilter) {
             $context['filters'] = $context['filters'] ?? [];
             $orderFilter->apply($queryBuilder, $queryNameGenerator, $resourceClass, $operationName, $context);
         }

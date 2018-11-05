@@ -43,6 +43,8 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Pet;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Question;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RamseyUuidDummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RelatedDummy;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RelatedOwnedDummy;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RelatedOwningDummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RelatedToDummyFriend;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RelationEmbedder;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\SecuredDummy;
@@ -1003,6 +1005,38 @@ final class FeatureContext implements Context, SnippetAcceptingContext
         $dummy->addRelatedDummy($namedRelatedDummy);
         $dummy->addRelatedDummy($relatedDummy);
         $this->manager->persist($dummy);
+
+        $this->manager->flush();
+    }
+
+    /**
+     * @Given there is a RelatedOwnedDummy object with OneToOne relation
+     */
+    public function thereIsARelatedOwnedDummy()
+    {
+        $relatedOwnedDummy = new RelatedOwnedDummy();
+        $this->manager->persist($relatedOwnedDummy);
+
+        $dummy = new Dummy();
+        $dummy->setName('plop');
+        $dummy->setRelatedOwnedDummy($relatedOwnedDummy);
+        $this->manager->persist($dummy);
+
+        $this->manager->flush();
+    }
+
+    /**
+     * @Given there is a RelatedOwningDummy object with OneToOne relation
+     */
+    public function thereIsARelatedOwningDummy()
+    {
+        $dummy = new Dummy();
+        $dummy->setName('plop');
+        $this->manager->persist($dummy);
+
+        $relatedOwningDummy = new RelatedOwningDummy();
+        $relatedOwningDummy->setOwnedDummy($dummy);
+        $this->manager->persist($relatedOwningDummy);
 
         $this->manager->flush();
     }
