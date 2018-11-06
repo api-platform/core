@@ -21,7 +21,7 @@ use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
  *
  * @author Anthony GRASSIOT <antograssiot@free.fr>
  */
-final class FormatsProvider implements FormatsProviderInterface
+final class FormatsProvider implements FormatsProviderInterface, ExtendedFormatsProviderInterface
 {
     private $configuredFormats;
     private $resourceMetadataFactory;
@@ -51,6 +51,26 @@ final class FormatsProvider implements FormatsProviderInterface
 
         if (!\is_array($formats)) {
             throw new InvalidArgumentException(sprintf("The 'formats' attributes must be an array, %s given for resource class '%s'.", \gettype($formats), $attributes['resource_class']));
+        }
+
+        return $this->getOperationFormats($formats);
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @throws InvalidArgumentException
+     */
+    public function getFormatsFromOperation(string $resourceClass, string $operationName, string $operationType): array
+    {
+        $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
+
+        if (!$formats = $resourceMetadata->getTypedOperationAttribute($operationType, $operationName, 'formats', [], true)) {
+            return $this->configuredFormats;
+        }
+
+        if (!\is_array($formats)) {
+            throw new InvalidArgumentException(sprintf("The 'formats' attributes must be an array, %s given for resource class '%s'.", \gettype($formats), $resourceClass));
         }
 
         return $this->getOperationFormats($formats);
