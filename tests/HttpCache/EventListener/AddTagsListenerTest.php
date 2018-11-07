@@ -119,7 +119,8 @@ class AddTagsListenerTest extends TestCase
                     '/resource/2',
                     '/resource/3',
                     '/resource/4',
-                    '/resource/5']
+                    '/resource/5',
+                ]
             ),
             $response->headers->get('Cache-Tags')
         );
