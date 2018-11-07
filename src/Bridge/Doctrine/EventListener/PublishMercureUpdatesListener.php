@@ -98,8 +98,8 @@ final class PublishMercureUpdatesListener
                 $this->publishUpdate($entity, $this->updatedEntities[$entity]);
             }
 
-            foreach ($this->deletedEntities as $iri => $targets) {
-                $this->publishUpdate($iri, $targets);
+            foreach ($this->deletedEntities as $entity) {
+                $this->publishUpdate($entity, $this->deletedEntities[$entity]);
             }
         } finally {
             $this->reset();
@@ -110,7 +110,7 @@ final class PublishMercureUpdatesListener
     {
         $this->createdEntities = new \SplObjectStorage();
         $this->updatedEntities = new \SplObjectStorage();
-        $this->deletedEntities = [];
+        $this->deletedEntities = new \SplObjectStorage();
     }
 
     /**
@@ -145,7 +145,10 @@ final class PublishMercureUpdatesListener
         }
 
         if ('deletedEntities' === $property) {
-            $this->deletedEntities[$this->iriConverter->getIriFromItem($entity, UrlGeneratorInterface::ABS_URL)] = $value;
+            $this->deletedEntities[(object) [
+                'id' => $this->iriConverter->getIriFromItem($entity),
+                'iri' => $this->iriConverter->getIriFromItem($entity, UrlGeneratorInterface::ABS_URL),
+            ]] = $value;
 
             return;
         }
@@ -158,12 +161,12 @@ final class PublishMercureUpdatesListener
      */
     private function publishUpdate($entity, array $targets): void
     {
-        if (\is_string($entity)) {
+        if ($entity instanceof \stdClass) {
             // By convention, if the entity has been deleted, we send only its IRI
             // This may change in the feature, because it's not JSON Merge Patch compliant,
             // and I'm not a fond of this approach
-            $iri = $entity;
-            $data = json_encode(['@id' => $iri]);
+            $iri = $entity->iri;
+            $data = json_encode(['@id' => $entity->id]);
         } else {
             $iri = $this->iriConverter->getIriFromItem($entity, UrlGeneratorInterface::ABS_URL);
             $data = $this->serializer->serialize($entity, 'jsonld');
