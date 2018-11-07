@@ -31,10 +31,15 @@ use Symfony\Component\HttpKernel\Event\ResponseEvent;
 final class AddTagsListener
 {
     private $iriConverter;
+    /**
+     * @var array
+     */
+    private $cacheResources;
 
-    public function __construct(IriConverterInterface $iriConverter)
+    public function __construct(IriConverterInterface $iriConverter, array $cacheResources)
     {
         $this->iriConverter = $iriConverter;
+        $this->cacheResources = $cacheResources;
     }
 
     /**
@@ -54,6 +59,13 @@ final class AddTagsListener
         }
 
         $resources = $request->attributes->get('_resources');
+        if(!empty($this->cacheResources)) {
+            $cacheResourcesFlipped = array_flip($this->cacheResources);
+            $resources = array_filter($resources, function($key) use ($cacheResourcesFlipped) {
+                $resourceParts = explode('/', trim($key, '/'));
+                return array_key_exists(array_shift($resourceParts), $cacheResourcesFlipped);
+            }, ARRAY_FILTER_USE_KEY);
+        }
         if (isset($attributes['collection_operation_name']) || ($attributes['subresource_context']['collection'] ?? false)) {
             // Allows to purge collections
             $iri = $this->iriConverter->getIriFromResourceClass($attributes['resource_class']);
