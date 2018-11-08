@@ -55,8 +55,8 @@ final class NumericFilter extends AbstractContextAwareFilter
             return;
         }
 
-        $value = $this->normalizeValue($value, $property);
-        if (null === $value) {
+        $values = $this->normalizeValues($value, $property);
+        if (null === $values) {
             return;
         }
 
@@ -66,7 +66,11 @@ final class NumericFilter extends AbstractContextAwareFilter
             [$matchField] = $this->addLookupsForNestedProperty($property, $aggregationBuilder, $resourceClass);
         }
 
-        $aggregationBuilder->match()->field($matchField)->equals($value)->type($this->getDoctrineFieldType($field, $resourceClass));
+        if (1 === \count($values)) {
+            $aggregationBuilder->match()->field($matchField)->equals($values[0])->type((string) $this->getDoctrineFieldType($field, $resourceClass));
+        } else {
+            $aggregationBuilder->match()->field($matchField)->in($values);
+        }
     }
 
     /**

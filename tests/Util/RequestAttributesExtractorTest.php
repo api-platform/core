@@ -27,7 +27,14 @@ class RequestAttributesExtractorTest extends TestCase
         $request = new Request([], [], ['_api_resource_class' => 'Foo', '_api_collection_operation_name' => 'post']);
 
         $this->assertEquals(
-            ['resource_class' => 'Foo', 'collection_operation_name' => 'post', 'receive' => true, 'persist' => true],
+            [
+                'resource_class' => 'Foo',
+                'collection_operation_name' => 'post',
+                'input_class' => 'Foo',
+                'output_class' => 'Foo',
+                'receive' => true,
+                'persist' => true,
+            ],
             RequestAttributesExtractor::extractAttributes($request)
         );
     }
@@ -37,7 +44,14 @@ class RequestAttributesExtractorTest extends TestCase
         $request = new Request([], [], ['_api_resource_class' => 'Foo', '_api_item_operation_name' => 'get']);
 
         $this->assertEquals(
-            ['resource_class' => 'Foo', 'item_operation_name' => 'get', 'receive' => true, 'persist' => true],
+            [
+                'resource_class' => 'Foo',
+                'item_operation_name' => 'get',
+                'input_class' => 'Foo',
+                'output_class' => 'Foo',
+                'receive' => true,
+                'persist' => true,
+            ],
             RequestAttributesExtractor::extractAttributes($request)
         );
     }
@@ -47,21 +61,42 @@ class RequestAttributesExtractorTest extends TestCase
         $request = new Request([], [], ['_api_resource_class' => 'Foo', '_api_item_operation_name' => 'get', '_api_receive' => '0']);
 
         $this->assertEquals(
-            ['resource_class' => 'Foo', 'item_operation_name' => 'get', 'receive' => false, 'persist' => true],
+            [
+                'resource_class' => 'Foo',
+                'item_operation_name' => 'get',
+                'input_class' => 'Foo',
+                'output_class' => 'Foo',
+                'receive' => false,
+                'persist' => true,
+            ],
             RequestAttributesExtractor::extractAttributes($request)
         );
 
         $request = new Request([], [], ['_api_resource_class' => 'Foo', '_api_item_operation_name' => 'get', '_api_receive' => '1']);
 
         $this->assertEquals(
-            ['resource_class' => 'Foo', 'item_operation_name' => 'get', 'receive' => true, 'persist' => true],
+            [
+                'resource_class' => 'Foo',
+                'item_operation_name' => 'get',
+                'input_class' => 'Foo',
+                'output_class' => 'Foo',
+                'receive' => true,
+                'persist' => true,
+            ],
             RequestAttributesExtractor::extractAttributes($request)
         );
 
         $request = new Request([], [], ['_api_resource_class' => 'Foo', '_api_item_operation_name' => 'get']);
 
         $this->assertEquals(
-            ['resource_class' => 'Foo', 'item_operation_name' => 'get', 'receive' => true, 'persist' => true],
+            [
+                'resource_class' => 'Foo',
+                'input_class' => 'Foo',
+                'output_class' => 'Foo',
+                'item_operation_name' => 'get',
+                'receive' => true,
+                'persist' => true,
+            ],
             RequestAttributesExtractor::extractAttributes($request)
         );
     }
@@ -71,21 +106,92 @@ class RequestAttributesExtractorTest extends TestCase
         $request = new Request([], [], ['_api_resource_class' => 'Foo', '_api_item_operation_name' => 'get', '_api_persist' => '0']);
 
         $this->assertEquals(
-            ['resource_class' => 'Foo', 'item_operation_name' => 'get', 'receive' => true, 'persist' => false],
+            [
+                'resource_class' => 'Foo',
+                'input_class' => 'Foo',
+                'output_class' => 'Foo',
+                'item_operation_name' => 'get',
+                'receive' => true,
+                'persist' => false,
+            ],
             RequestAttributesExtractor::extractAttributes($request)
         );
 
         $request = new Request([], [], ['_api_resource_class' => 'Foo', '_api_item_operation_name' => 'get', '_api_persist' => '1']);
 
         $this->assertEquals(
-            ['resource_class' => 'Foo', 'item_operation_name' => 'get', 'receive' => true, 'persist' => true],
+            [
+                'resource_class' => 'Foo',
+                'input_class' => 'Foo',
+                'output_class' => 'Foo',
+                'item_operation_name' => 'get',
+                'receive' => true,
+                'persist' => true,
+            ],
             RequestAttributesExtractor::extractAttributes($request)
         );
 
         $request = new Request([], [], ['_api_resource_class' => 'Foo', '_api_item_operation_name' => 'get']);
 
         $this->assertEquals(
-            ['resource_class' => 'Foo', 'item_operation_name' => 'get', 'receive' => true, 'persist' => true],
+            [
+                'resource_class' => 'Foo',
+                'input_class' => 'Foo',
+                'output_class' => 'Foo',
+                'item_operation_name' => 'get',
+                'receive' => true,
+                'persist' => true,
+            ],
+            RequestAttributesExtractor::extractAttributes($request)
+        );
+    }
+
+    public function testExtractInputOutputResourceClass()
+    {
+        $request = new Request([], [], ['_api_resource_class' => 'Foo', '_api_item_operation_name' => 'get', '_api_input_class' => 'Bar']);
+
+        $this->assertEquals(
+            [
+                'resource_class' => 'Foo',
+                'item_operation_name' => 'get',
+                'input_class' => 'Bar',
+                'output_class' => 'Foo',
+                'receive' => true,
+                'persist' => true,
+            ],
+            RequestAttributesExtractor::extractAttributes($request)
+        );
+
+        $request = new Request([], [], ['_api_resource_class' => 'Foo', '_api_item_operation_name' => 'get', '_api_output_class' => 'Bar']);
+
+        $this->assertEquals(
+            [
+                'resource_class' => 'Foo',
+                'item_operation_name' => 'get',
+                'input_class' => 'Foo',
+                'output_class' => 'Bar',
+                'receive' => true,
+                'persist' => true,
+            ],
+            RequestAttributesExtractor::extractAttributes($request)
+        );
+
+        $request = new Request([], [], [
+            '_api_resource_class' => 'Foo',
+            '_api_item_operation_name' => 'get',
+            '_api_input_class' => 'FooBar',
+            '_api_output_class' => 'Bar',
+        ]);
+
+        $this->assertEquals(
+            [
+                'resource_class' => 'Foo',
+                'item_operation_name' => 'get',
+                'input_class' => 'FooBar',
+                'output_class' => 'Bar',
+                'receive' => true,
+                'persist' => true,
+            ],
             RequestAttributesExtractor::extractAttributes($request)
         );
     }

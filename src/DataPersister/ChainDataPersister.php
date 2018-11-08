@@ -20,7 +20,8 @@ namespace ApiPlatform\Core\DataPersister;
  */
 final class ChainDataPersister implements DataPersisterInterface
 {
-    private $persisters;
+    /** @internal */
+    public $persisters;
 
     /**
      * @param DataPersisterInterface[] $persisters

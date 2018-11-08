@@ -40,6 +40,11 @@ final class RangeFilter extends AbstractContextAwareFilter implements RangeFilte
             return;
         }
 
+        $values = $this->normalizeValues($values, $property);
+        if (null === $values) {
+            return;
+        }
+
         $matchField = $field = $property;
 
         if ($this->isPropertyNested($property, $resourceClass)) {

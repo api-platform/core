@@ -27,7 +27,8 @@ use Symfony\Component\Serializer\Annotation as Serializer;
 /**
  * @ApiResource(
  *     attributes={
- *         "normalization_context"={"groups"={"colors"}}
+ *         "normalization_context"={"groups"={"colors"}},
+ *         "sunset"="2050-01-01"
  *     }
  * )
  * @ODM\Document

@@ -38,6 +38,13 @@ class NumericFilterTest extends DoctrineOrmFilterTestCase
                 'property' => 'id',
                 'type' => 'int',
                 'required' => false,
+                'is_collection' => false,
+            ],
+            'id[]' => [
+                'property' => 'id',
+                'type' => 'int',
+                'required' => false,
+                'is_collection' => true,
             ],
         ], $filter->getDescription($this->resourceClass));
     }
@@ -51,16 +58,37 @@ class NumericFilterTest extends DoctrineOrmFilterTestCase
                 'property' => 'id',
                 'type' => 'int',
                 'required' => false,
+                'is_collection' => false,
+            ],
+            'id[]' => [
+                'property' => 'id',
+                'type' => 'int',
+                'required' => false,
+                'is_collection' => true,
             ],
             'dummyFloat' => [
                 'property' => 'dummyFloat',
                 'type' => 'float',
                 'required' => false,
+                'is_collection' => false,
+            ],
+            'dummyFloat[]' => [
+                'property' => 'dummyFloat',
+                'type' => 'float',
+                'required' => false,
+                'is_collection' => true,
             ],
             'dummyPrice' => [
                 'property' => 'dummyPrice',
                 'type' => 'string',
                 'required' => false,
+                'is_collection' => false,
+            ],
+            'dummyPrice[]' => [
+                'property' => 'dummyPrice',
+                'type' => 'string',
+                'required' => false,
+                'is_collection' => true,
             ],
         ], $filter->getDescription($this->resourceClass));
     }
@@ -78,6 +106,50 @@ class NumericFilterTest extends DoctrineOrmFilterTestCase
                     'dummyPrice' => '21',
                 ],
                 sprintf('SELECT o FROM %s o WHERE o.dummyPrice = :dummyPrice_p1', Dummy::class),
+            ],
+            'multiple numeric string (positive integer)' => [
+                [
+                    'id' => null,
+                    'name' => null,
+                    'dummyPrice' => null,
+                ],
+                [
+                    'dummyPrice' => ['21', '22'],
+                ],
+                sprintf('SELECT o FROM %s o WHERE o.dummyPrice IN (:dummyPrice_p1)', Dummy::class),
+            ],
+            'multiple numeric string with one invalid property key' => [
+                [
+                    'id' => null,
+                    'name' => null,
+                    'dummyPrice' => null,
+                ],
+                [
+                    'dummyPrice' => ['invalid' => '21', '22'],
+                ],
+                sprintf('SELECT o FROM %s o WHERE o.dummyPrice = :dummyPrice_p1', Dummy::class),
+            ],
+            'multiple numeric string with invalid value keys' => [
+                [
+                    'id' => null,
+                    'name' => null,
+                    'dummyPrice' => null,
+                ],
+                [
+                    'dummyPrice' => ['invalid' => '21', 'invalid2' => '22'],
+                ],
+                sprintf('SELECT o FROM %s o', Dummy::class),
+            ],
+            'multiple non-numeric' => [
+                [
+                    'id' => null,
+                    'name' => null,
+                    'dummyPrice' => null,
+                ],
+                [
+                    'dummyPrice' => ['test', 'invalid'],
+                ],
+                sprintf('SELECT o FROM %s o', Dummy::class),
             ],
             'numeric string (negative integer)' => [
                 [

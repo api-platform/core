@@ -41,11 +41,16 @@ trait NumericFilterTrait
                 continue;
             }
 
-            $description[$property] = [
-                'property' => $property,
-                'type' => $this->getType((string) $this->getDoctrineFieldType($property, $resourceClass)),
-                'required' => false,
-            ];
+            $filterParameterNames = [$property, $property.'[]'];
+
+            foreach ($filterParameterNames as $filterParameterName) {
+                $description[$filterParameterName] = [
+                    'property' => $property,
+                    'type' => $this->getType((string) $this->getDoctrineFieldType($property, $resourceClass)),
+                    'required' => false,
+                    'is_collection' => '[]' === substr($filterParameterName, -2),
+                ];
+            }
         }
 
         return $description;
@@ -59,9 +64,9 @@ trait NumericFilterTrait
         return isset(self::DOCTRINE_NUMERIC_TYPES[(string) $this->getDoctrineFieldType($property, $resourceClass)]);
     }
 
-    private function normalizeValue($value, string $property)
+    private function normalizeValues($value, string $property): ?array
     {
-        if (!is_numeric($value)) {
+        if (!is_numeric($value) && (!\is_array($value) || !$this->isNumericArray($value))) {
             $this->logger->notice('Invalid filter ignored', [
                 'exception' => new InvalidArgumentException(sprintf('Invalid numeric value for "%s" property', $property)),
             ]);
@@ -69,6 +74,33 @@ trait NumericFilterTrait
             return null;
         }
 
-        return $value;
+        $values = (array) $value;
+
+        foreach ($values as $key => $val) {
+            if (!\is_int($key)) {
+                unset($values[$key]);
+            }
+        }
+
+        if (empty($values)) {
+            $this->logger->notice('Invalid filter ignored', [
+                'exception' => new InvalidArgumentException(sprintf('At least one value is required, multiple values should be in "%1$s[]=firstvalue&%1$s[]=secondvalue" format', $property)),
+            ]);
+
+            return null;
+        }
+
+        return array_values($values);
+    }
+
+    private function isNumericArray(array $values): bool
+    {
+        foreach ($values as $value) {
+            if (!is_numeric($value)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }

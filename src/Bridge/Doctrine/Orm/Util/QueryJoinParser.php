@@ -48,8 +48,8 @@ final class QueryJoinParser
             $aliasMap[$rootAlias] = 'root';
 
             foreach ($joins as $join) {
-                $alias = self::getJoinAlias($join);
-                $relationship = self::getJoinRelationship($join);
+                $alias = $join->getAlias();
+                $relationship = $join->getJoin();
 
                 $pos = strpos($relationship, '.');
 
@@ -100,6 +100,8 @@ final class QueryJoinParser
      */
     public static function getJoinRelationship(Join $join): string
     {
+        @trigger_error(sprintf('The use of "%s::getJoinRelationship()" is deprecated since 2.3 and will be removed in 3.0. Use "%s::getJoin()" directly instead.', __CLASS__, Join::class), E_USER_DEPRECATED);
+
         return $join->getJoin();
     }
 
@@ -108,17 +110,20 @@ final class QueryJoinParser
      */
     public static function getJoinAlias(Join $join): string
     {
+        @trigger_error(sprintf('The use of "%s::getJoinAlias()" is deprecated since 2.3 and will be removed in 3.0. Use "%s::getAlias()" directly instead.', __CLASS__, Join::class), E_USER_DEPRECATED);
+
         return $join->getAlias();
     }
 
     /**
      * Gets the parts from an OrderBy expression.
      *
-     *
      * @return string[]
      */
     public static function getOrderByParts(OrderBy $orderBy): array
     {
+        @trigger_error(sprintf('The use of "%s::getOrderByParts()" is deprecated since 2.3 and will be removed in 3.0. Use "%s::getParts()" directly instead.', __CLASS__, OrderBy::class), E_USER_DEPRECATED);
+
         return $orderBy->getParts();
     }
 }

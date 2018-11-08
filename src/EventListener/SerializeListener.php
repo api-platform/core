@@ -63,6 +63,10 @@ final class SerializeListener
         }
         $resources = new ResourceList();
         $context['resources'] = &$resources;
+        if (isset($context['output_class'])) {
+            $context['resource_class'] = $context['output_class'];
+        }
+
         $request->attributes->set('_api_normalization_context', $context);
 
         $event->setControllerResult($this->serializer->serialize($controllerResult, $request->getRequestFormat(), $context));

@@ -40,6 +40,11 @@ class RangeFilter extends AbstractContextAwareFilter implements RangeFilterInter
             return;
         }
 
+        $values = $this->normalizeValues($values, $property);
+        if (null === $values) {
+            return;
+        }
+
         $alias = $queryBuilder->getRootAliases()[0];
         $field = $property;
 

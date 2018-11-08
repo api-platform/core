@@ -7,6 +7,49 @@
     </tr>
 {% endmacro %}
 
+{% macro providerTable(object, name) %}
+    {% if object.responses is empty %}
+        <div class="empty">
+            <p>No calls to {{ name }} have been recorded.</p>
+        </div>
+    {% else %}
+        <table>
+            <thead>
+            <tr>
+                <th>#</th>
+                <th>Answer</th>
+                <th>{{ name|capitalize }}</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for class, answer in object.responses %}
+                <tr>
+                    <td class="font-normal text-small text-muted nowrap">{{ loop.index }}</td>
+                    <td class="font-normal">
+                        {% if answer is same as(true) %}
+                            <span class="label status-success same-width">TRUE</span>
+                        {% elseif answer is same as(false) %}
+                            <span class="label status-error same-width">FALSE</span>
+                        {% else %}
+                            <span class="label status-info same-width">NOT USED</span>
+                        {% endif %}
+                    </td>
+                    <td class="font-normal">{{ class }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+            {% if object.context is defined %}
+                <tfoot>
+                    <tr>
+                        <td class="font-normal" colspan="2"></td>
+                        <td class="font-normal">Context{{ profiler_dump(object.context, 2) }}</td>
+                    </tr>
+                </tfoot>
+            {% endif %}
+        </table>
+    {% endif %}
+{% endmacro %}
+
 {% import _self as apiPlatform %}
 
 {% block toolbar %}
@@ -51,121 +94,125 @@
     </div>
 
     {% if collector.resourceMetadata %}
-        <h2>Metadata</h2>
-        <h3>Short name: "{{ collector.resourceMetadata.shortName }}"</h3>
-        <table>
-            <thead>
-                <tr>
-                    <th scope="col" class="key">
-                        Item operations
-                    </th>
-                    <th scope="col">
-                        Attributes
-                    </th>
-                </tr>
-            </thead>
+        <div class="sf-tabs">
+            <div class="tab">
+                <h3 class="tab-title">Resource Metadata</h3>
+                <div class="tab-content">
+                    <h3>Short name: "{{ collector.resourceMetadata.shortName }}"</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th scope="col" class="key">
+                                    Item operations
+                                </th>
+                                <th scope="col">
+                                    Attributes
+                                </th>
+                            </tr>
+                        </thead>
 
-            <tbody>
-                {% for key, itemOperation in collector.resourceMetadata.itemOperations %}
-                    {{ apiPlatform.operationLine(key, itemOperation, collector.requestAttributes.item_operation_name|default('')) }}
-                {% endfor %}
-            </tbody>
-        </table>
+                        <tbody>
+                            {% for key, itemOperation in collector.resourceMetadata.itemOperations %}
+                                {{ apiPlatform.operationLine(key, itemOperation, collector.requestAttributes.item_operation_name|default('')) }}
+                            {% endfor %}
+                        </tbody>
+                    </table>
 
-        <table>
-            <thead>
-                <tr>
-                    <th scope="col" class="key">
-                        Collection operations
-                    </th>
-                    <th scope="col">
-                        Attributes
-                    </th>
-                </tr>
-            </thead>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th scope="col" class="key">
+                                    Collection operations
+                                </th>
+                                <th scope="col">
+                                    Attributes
+                                </th>
+                            </tr>
+                        </thead>
 
-            <tbody>
-                {% for key, collectionOperation in collector.resourceMetadata.collectionOperations %}
-                    {{ apiPlatform.operationLine(key, collectionOperation, collector.requestAttributes.collection_operation_name|default('')) }}
-                {% else %}
-                    <tr>
-                        <td colspan="2" class="text-muted">
-                            No available collection operation for this resource.
-                        </td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-
-        <table>
-            <thead>
-                <tr>
-                    <th scope="col">
-                        Filters
-                    </th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for id, filter in collector.filters %}
-                    {% set ignored_filter = filter is same as(null) %}
-                    <tr{% if ignored_filter %} class="status-warning"{% endif %}>
-                        <td>
-                            {{ id }}
-                            {% if ignored_filter %}
-                                <span class="newline text-muted">ignored filter</span>
+                        <tbody>
+                            {% for key, collectionOperation in collector.resourceMetadata.collectionOperations %}
+                                {{ apiPlatform.operationLine(key, collectionOperation, collector.requestAttributes.collection_operation_name|default('')) }}
                             {% else %}
-                                {{ dump(filter) }}
-                            {% endif %}
-                        </td>
-                    </tr>
-                {% else %}
-                    <tr>
-                        <td class="text-muted">
-                            No available filter declared for this resource.
-                        </td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+                                <tr>
+                                    <td colspan="2" class="text-muted">
+                                        No available collection operation for this resource.
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
 
-        <table>
-            <thead>
-                <tr>
-                    <th scope="col" class="key">
-                        Attributes
-                    </th>
-                    <th scope="col"></th>
-                </tr>
-            </thead>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th scope="col">
+                                    Filters
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for id, filter in collector.filters %}
+                                {% set ignored_filter = filter is same as(null) %}
+                                <tr{% if ignored_filter %} class="status-warning"{% endif %}>
+                                    <td>
+                                        {{ id }}
+                                        {% if ignored_filter %}
+                                            <span class="newline text-muted">ignored filter</span>
+                                        {% else %}
+                                            {{ dump(filter) }}
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% else %}
+                                <tr>
+                                    <td class="text-muted">
+                                        No available filter declared for this resource.
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
 
-            <tbody>
-                {% for key, value in collector.resourceMetadata.attributes if key != 'filters' %}
-                    <tr>
-                        <th scope="row">
-                            {{ key }}
-                        </th>
-                        <td>
-                            {{- profiler_dump(value, 2) -}}
-                        </td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-        <h2>Acceptable Content Types</h2>
-        <table>
-            <thead>
-            <tr>
-                <th>Content Type</th>
-            </tr>
-            </thead>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th scope="col" class="key">
+                                    Attributes
+                                </th>
+                                <th scope="col"></th>
+                            </tr>
+                        </thead>
 
-            <tbody>
-                {% for type in collector.acceptableContentTypes %}
-                    <tr>
-                        <td>{{ type }}</td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+                        <tbody>
+                            {% for key, value in collector.resourceMetadata.attributes if key != 'filters' %}
+                                <tr>
+                                    <th scope="row">
+                                        {{ key }}
+                                    </th>
+                                    <td>
+                                        {{- profiler_dump(value, 2) -}}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="tab">
+                <h3 class="tab-title">Data Providers</h3>
+                <div class="tab-content">
+                    {{ apiPlatform.providerTable(collector.collectionDataProviders, 'collection data provider') }}
+                    {{ apiPlatform.providerTable(collector.itemDataProviders, 'item data provider') }}
+                    {{ apiPlatform.providerTable(collector.subresourceDataProviders, 'subresource data provider') }}
+                </div>
+            </div>
+            <div class="tab">
+                <h3 class="tab-title">Data Persisters</h3>
+                <div class="tab-content">
+                    {{ apiPlatform.providerTable(collector.dataPersisters, 'data persister') }}
+                </div>
+            </div>
+        </div>
     {% endif %}
 {% endblock %}

@@ -26,6 +26,7 @@ use ApiPlatform\Core\Exception\InvalidArgumentException;
  *     @Attribute("accessControl", type="string"),
  *     @Attribute("accessControlMessage", type="string"),
  *     @Attribute("attributes", type="array"),
+ *     @Attribute("cacheHeaders", type="array"),
  *     @Attribute("collectionOperations", type="array"),
  *     @Attribute("denormalizationContext", type="array"),
  *     @Attribute("deprecationReason", type="string"),
@@ -36,11 +37,13 @@ use ApiPlatform\Core\Exception\InvalidArgumentException;
  *     @Attribute("filters", type="string[]"),
  *     @Attribute("graphql", type="array"),
  *     @Attribute("hydraContext", type="array"),
+ *     @Attribute("inputClass", type="string"),
  *     @Attribute("iri", type="string"),
  *     @Attribute("itemOperations", type="array"),
  *     @Attribute("maximumItemsPerPage", type="int"),
  *     @Attribute("normalizationContext", type="array"),
  *     @Attribute("order", type="array"),
+ *     @Attribute("outputClass", type="string"),
  *     @Attribute("paginationClientEnabled", type="bool"),
  *     @Attribute("paginationClientItemsPerPage", type="bool"),
  *     @Attribute("paginationClientPartial", type="bool"),
@@ -108,6 +111,13 @@ final class ApiResource
      * @var string
      */
     private $accessControlMessage;
+
+    /**
+     * @see https://github.com/Haehnchen/idea-php-annotation-plugin/issues/112
+     *
+     * @var array
+     */
+    private $cacheHeaders;
 
     /**
      * @see https://github.com/Haehnchen/idea-php-annotation-plugin/issues/112
@@ -255,6 +265,20 @@ final class ApiResource
      * @var string
      */
     private $sunset;
+
+    /**
+     * @see https://github.com/Haehnchen/idea-php-annotation-plugin/issues/112
+     *
+     * @var string
+     */
+    private $inputClass;
+
+    /**
+     * @see https://github.com/Haehnchen/idea-php-annotation-plugin/issues/112
+     *
+     * @var string
+     */
+    private $outputClass;
 
     /**
      * @throws InvalidArgumentException

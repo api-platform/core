@@ -59,8 +59,8 @@ class NumericFilter extends AbstractContextAwareFilter
             return;
         }
 
-        $value = $this->normalizeValue($value, $property);
-        if (null === $value) {
+        $values = $this->normalizeValues($value, $property);
+        if (null === $values) {
             return;
         }
 
@@ -73,9 +73,15 @@ class NumericFilter extends AbstractContextAwareFilter
 
         $valueParameter = $queryNameGenerator->generateParameterName($field);
 
-        $queryBuilder
-            ->andWhere(sprintf('%s.%s = :%s', $alias, $field, $valueParameter))
-            ->setParameter($valueParameter, $value, (string) $this->getDoctrineFieldType($property, $resourceClass));
+        if (1 === \count($values)) {
+            $queryBuilder
+                ->andWhere(sprintf('%s.%s = :%s', $alias, $field, $valueParameter))
+                ->setParameter($valueParameter, $values[0], (string) $this->getDoctrineFieldType($property, $resourceClass));
+        } else {
+            $queryBuilder
+                ->andWhere(sprintf('%s.%s IN (:%s)', $alias, $field, $valueParameter))
+                ->setParameter($valueParameter, $values);
+        }
     }
 
     /**

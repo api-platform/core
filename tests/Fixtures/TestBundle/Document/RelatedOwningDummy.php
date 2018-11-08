@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Document;
 
 use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Core\Annotation\ApiSubresource;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 
 /**
@@ -43,6 +44,7 @@ class RelatedOwningDummy
      * @var Dummy
      *
      * @ODM\ReferenceOne(targetDocument="Dummy", cascade={"persist"}, mappedBy="relatedOwningDummy")
+     * @ApiSubresource
      */
     public $ownedDummy;
 

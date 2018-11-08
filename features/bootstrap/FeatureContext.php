@@ -39,6 +39,8 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\PersonToPet as PersonToP
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\Pet as PetDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\Question as QuestionDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\RelatedDummy as RelatedDummyDocument;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\RelatedOwnedDummy as RelatedOwnedDummyDocument;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\RelatedOwningDummy as RelatedOwningDummyDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\RelatedToDummyFriend as RelatedToDummyFriendDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\RelationEmbedder as RelationEmbedderDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\SecuredDummy as SecuredDummyDocument;
@@ -76,6 +78,8 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Pet;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Question;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RamseyUuidDummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RelatedDummy;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RelatedOwnedDummy;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RelatedOwningDummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RelatedToDummyFriend;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RelationEmbedder;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\SecuredDummy;
@@ -1044,6 +1048,38 @@ final class FeatureContext implements Context, SnippetAcceptingContext
     }
 
     /**
+     * @Given there is a RelatedOwnedDummy object with OneToOne relation
+     */
+    public function thereIsARelatedOwnedDummy()
+    {
+        $relatedOwnedDummy = $this->buildRelatedOwnedDummy();
+        $this->manager->persist($relatedOwnedDummy);
+
+        $dummy = $this->buildDummy();
+        $dummy->setName('plop');
+        $dummy->setRelatedOwnedDummy($relatedOwnedDummy);
+        $this->manager->persist($dummy);
+
+        $this->manager->flush();
+    }
+
+    /**
+     * @Given there is a RelatedOwningDummy object with OneToOne relation
+     */
+    public function thereIsARelatedOwningDummy()
+    {
+        $dummy = $this->buildDummy();
+        $dummy->setName('plop');
+        $this->manager->persist($dummy);
+
+        $relatedOwningDummy = $this->buildRelatedOwningDummy();
+        $relatedOwningDummy->setOwnedDummy($dummy);
+        $this->manager->persist($relatedOwningDummy);
+
+        $this->manager->flush();
+    }
+
+    /**
      * @Given there is a person named :name greeting with a :message message
      */
     public function thereIsAPersonWithAGreeting(string $name, string $message)
@@ -1312,6 +1348,22 @@ final class FeatureContext implements Context, SnippetAcceptingContext
     private function buildRelatedDummy()
     {
         return $this->isOrm() ? new RelatedDummy() : new RelatedDummyDocument();
+    }
+
+    /**
+     * @return RelatedOwnedDummy|RelatedOwnedDummyDocument
+     */
+    private function buildRelatedOwnedDummy()
+    {
+        return $this->isOrm() ? new RelatedOwnedDummy() : new RelatedOwnedDummyDocument();
+    }
+
+    /**
+     * @return RelatedOwningDummy|RelatedOwningDummyDocument
+     */
+    private function buildRelatedOwningDummy()
+    {
+        return $this->isOrm() ? new RelatedOwningDummy() : new RelatedOwningDummyDocument();
     }
 
     /**

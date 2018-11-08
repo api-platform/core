@@ -161,7 +161,7 @@ class Dummy
     /**
      * @var RelatedOwningDummy
      *
-     * @ODM\ReferenceOne(targetDocument="RelatedOwningDummy", cascade={"persist"}, inversedBy="ownedDummy", nullable=true)
+     * @ODM\ReferenceOne(targetDocument="RelatedOwningDummy", cascade={"persist"}, inversedBy="ownedDummy", nullable=true, storeAs="id")
      */
     public $relatedOwningDummy;
 

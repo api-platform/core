@@ -81,6 +81,9 @@ final class DeserializeListener
 
         $format = $this->getFormat($request);
         $context = $this->serializerContextBuilder->createFromRequest($request, false, $attributes);
+        if (isset($context['input_class'])) {
+            $context['resource_class'] = $context['input_class'];
+        }
 
         $data = $request->attributes->get('data');
         if (null !== $data) {
@@ -90,7 +93,7 @@ final class DeserializeListener
         $request->attributes->set(
             'data',
             $this->serializer->deserialize(
-                $requestContent, $attributes['resource_class'], $format, $context
+                $requestContent, $attributes['input_class'], $format, $context
             )
         );
     }

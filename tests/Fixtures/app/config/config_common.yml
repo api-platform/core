@@ -84,26 +84,26 @@ services:
         class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\DataProvider\ContainNonResourceItemDataProvider'
         public: false
         tags:
-        -  { name: 'api_platform.item_data_provider' }
+            -  { name: 'api_platform.item_data_provider' }
 
     serializable.item_data_provider:
         class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\DataProvider\SerializableItemDataProvider'
         public: false
         tags:
-        -  { name: 'api_platform.item_data_provider' }
+            -  { name: 'api_platform.item_data_provider' }
 
     resource_interface.data_provider:
         class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\DataProvider\ResourceInterfaceImplementationDataProvider'
         public: false
         tags:
-        -  { name: 'api_platform.item_data_provider' }
-        -  { name: 'api_platform.collection_data_provider' }
+            -  { name: 'api_platform.item_data_provider' }
+            -  { name: 'api_platform.collection_data_provider' }
 
     app.serializer.denormalizer.serializable_resource:
         class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\Serializer\Denormalizer\SerializableResourceDenormalizer'
         public: false
         tags:
-        -  { name: 'serializer.normalizer' }
+            -  { name: 'serializer.normalizer' }
 
     fos_user.mailer.default:
         class: 'ApiPlatform\Core\Tests\Mock\FosUser\MailerMock'
@@ -238,3 +238,9 @@ services:
     app.dummy_validation.group_generator:
         class: ApiPlatform\Core\Tests\Fixtures\TestBundle\Validator\DummyValidationGroupsGenerator
         public: true
+
+    app.dummy_input_data_persister:
+        class: ApiPlatform\Core\Tests\Fixtures\TestBundle\DataPersister\DummyInputDataPersister
+        public: false
+        tags:
+            -  { name: 'api_platform.data_persister' }

@@ -192,7 +192,7 @@ jobs:
             mkdir -p build/logs/tmp build/cov
             for f in $(find features -name '*.feature' -not -path 'features/main/exposed_state.feature' | circleci tests split --split-by=timings); do
               _f=${f//\//_}
-              FEATURE="${_f}" phpdbg -qrr vendor/bin/behat --profile=coverage --suite=default --tags=~@postgres --format=progress --out=std --format=junit --out=build/logs/tmp/"${_f}" "$f"
+              FEATURE="${_f}" phpdbg -qrr vendor/bin/behat --profile=coverage --suite=default --format=progress --out=std --format=junit --out=build/logs/tmp/"${_f}" "$f"
             done
       - run:
           name: Merge Behat test reports
