@@ -125,7 +125,7 @@ class Dummy
     /**
      * @var ArrayCollection Several dummies
      *
-     * @ODM\ReferenceMany(targetDocument="RelatedDummy", storeAs="id")
+     * @ODM\ReferenceMany(targetDocument="RelatedDummy", storeAs="id", nullable=true)
      * @ApiSubresource
      */
     public $relatedDummies;

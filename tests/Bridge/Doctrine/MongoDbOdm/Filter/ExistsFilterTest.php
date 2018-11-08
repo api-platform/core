@@ -11,17 +11,17 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Bridge\Doctrine\Orm\Filter;
+namespace ApiPlatform\Core\Tests\Bridge\Doctrine\MongoDbOdm\Filter;
 
-use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\ExistsFilter;
-use ApiPlatform\Core\Test\DoctrineOrmFilterTestCase;
+use ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Filter\ExistsFilter;
+use ApiPlatform\Core\Test\DoctrineMongoDbOdmFilterTestCase;
 use ApiPlatform\Core\Tests\Bridge\Doctrine\Common\Filter\ExistsFilterTestTrait;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 
 /**
- * @author Antoine Bluchet <soyuka@gmail.com>
+ * @author Alan Poulain <contact@alanpoulain.eu>
  */
-class ExistsFilterTest extends DoctrineOrmFilterTestCase
+class ExistsFilterTest extends DoctrineMongoDbOdmFilterTestCase
 {
     use ExistsFilterTestTrait;
 
@@ -87,6 +87,26 @@ class ExistsFilterTest extends DoctrineOrmFilterTestCase
                 'type' => 'bool',
                 'required' => false,
             ],
+            'relatedDummy[exists]' => [
+                'property' => 'relatedDummy',
+                'type' => 'bool',
+                'required' => false,
+            ],
+            'relatedDummies[exists]' => [
+                'property' => 'relatedDummies',
+                'type' => 'bool',
+                'required' => false,
+            ],
+            'relatedOwnedDummy[exists]' => [
+                'property' => 'relatedOwnedDummy',
+                'type' => 'bool',
+                'required' => false,
+            ],
+            'relatedOwningDummy[exists]' => [
+                'property' => 'relatedOwningDummy',
+                'type' => 'bool',
+                'required' => false,
+            ],
         ], $filter->getDescription($this->resourceClass));
     }
 
@@ -102,7 +122,15 @@ class ExistsFilterTest extends DoctrineOrmFilterTestCase
                         'exists' => 'true',
                     ],
                 ],
-                sprintf('SELECT o FROM %s o WHERE o.description IS NOT NULL', Dummy::class),
+                [
+                    [
+                        '$match' => [
+                            'description' => [
+                                '$ne' => null,
+                            ],
+                        ],
+                    ],
+                ],
             ],
 
             'valid values (empty for true)' => [
@@ -114,7 +142,15 @@ class ExistsFilterTest extends DoctrineOrmFilterTestCase
                         'exists' => '',
                     ],
                 ],
-                sprintf('SELECT o FROM %s o WHERE o.description IS NOT NULL', Dummy::class),
+                [
+                    [
+                        '$match' => [
+                            'description' => [
+                                '$ne' => null,
+                            ],
+                        ],
+                    ],
+                ],
             ],
 
             'valid values (1 for true)' => [
@@ -126,7 +162,15 @@ class ExistsFilterTest extends DoctrineOrmFilterTestCase
                         'exists' => '1',
                     ],
                 ],
-                sprintf('SELECT o FROM %s o WHERE o.description IS NOT NULL', Dummy::class),
+                [
+                    [
+                        '$match' => [
+                            'description' => [
+                                '$ne' => null,
+                            ],
+                        ],
+                    ],
+                ],
             ],
 
             'invalid values' => [
@@ -138,7 +182,7 @@ class ExistsFilterTest extends DoctrineOrmFilterTestCase
                         'exists' => 'invalid',
                     ],
                 ],
-                sprintf('SELECT o FROM %s o', Dummy::class),
+                [],
             ],
 
             'negative values' => [
@@ -150,7 +194,13 @@ class ExistsFilterTest extends DoctrineOrmFilterTestCase
                         'exists' => 'false',
                     ],
                 ],
-                sprintf('SELECT o FROM %s o WHERE o.description IS NULL', Dummy::class),
+                [
+                    [
+                        '$match' => [
+                            'description' => null,
+                        ],
+                    ],
+                ],
             ],
 
             'negative values (0)' => [
@@ -162,7 +212,13 @@ class ExistsFilterTest extends DoctrineOrmFilterTestCase
                         'exists' => '0',
                     ],
                 ],
-                sprintf('SELECT o FROM %s o WHERE o.description IS NULL', Dummy::class),
+                [
+                    [
+                        '$match' => [
+                            'description' => null,
+                        ],
+                    ],
+                ],
             ],
 
             'related values' => [
@@ -178,7 +234,30 @@ class ExistsFilterTest extends DoctrineOrmFilterTestCase
                         'exists' => '1',
                     ],
                 ],
-                sprintf('SELECT o FROM %s o INNER JOIN o.relatedDummy relatedDummy_a1 WHERE o.description IS NOT NULL AND relatedDummy_a1.name IS NOT NULL', Dummy::class),
+                [
+                    [
+                        '$match' => [
+                            'description' => [
+                                '$ne' => null,
+                            ],
+                        ],
+                    ],
+                    [
+                        '$lookup' => [
+                            'from' => 'RelatedDummy',
+                            'localField' => 'relatedDummy',
+                            'foreignField' => '_id',
+                            'as' => 'relatedDummy_lkup',
+                        ],
+                    ],
+                    [
+                        '$match' => [
+                            'relatedDummy_lkup.name' => [
+                                '$ne' => null,
+                            ],
+                        ],
+                    ],
+                ],
             ],
 
             'not nullable values' => [
@@ -194,7 +273,15 @@ class ExistsFilterTest extends DoctrineOrmFilterTestCase
                         'exists' => '0',
                     ],
                 ],
-                sprintf('SELECT o FROM %s o WHERE o.description IS NOT NULL', Dummy::class),
+                [
+                    [
+                        '$match' => [
+                            'description' => [
+                                '$ne' => null,
+                            ],
+                        ],
+                    ],
+                ],
             ],
 
             'related collection not empty' => [
@@ -210,7 +297,22 @@ class ExistsFilterTest extends DoctrineOrmFilterTestCase
                         'exists' => '1',
                     ],
                 ],
-                sprintf('SELECT o FROM %s o WHERE o.description IS NOT NULL AND o.relatedDummies IS NOT EMPTY', Dummy::class),
+                [
+                    [
+                        '$match' => [
+                            'description' => [
+                                '$ne' => null,
+                            ],
+                        ],
+                    ],
+                    [
+                        '$match' => [
+                            'relatedDummies' => [
+                                '$ne' => null,
+                            ],
+                        ],
+                    ],
+                ],
             ],
 
             'related collection empty' => [
@@ -226,7 +328,20 @@ class ExistsFilterTest extends DoctrineOrmFilterTestCase
                         'exists' => '0',
                     ],
                 ],
-                sprintf('SELECT o FROM %s o WHERE o.description IS NOT NULL AND o.relatedDummies IS EMPTY', Dummy::class),
+                [
+                    [
+                        '$match' => [
+                            'description' => [
+                                '$ne' => null,
+                            ],
+                        ],
+                    ],
+                    [
+                        '$match' => [
+                            'relatedDummies' => null,
+                        ],
+                    ],
+                ],
             ],
 
             'related association exists' => [
@@ -242,7 +357,22 @@ class ExistsFilterTest extends DoctrineOrmFilterTestCase
                         'exists' => '1',
                     ],
                 ],
-                sprintf('SELECT o FROM %s o WHERE o.description IS NOT NULL AND o.relatedDummy IS NOT NULL', Dummy::class),
+                [
+                    [
+                        '$match' => [
+                            'description' => [
+                                '$ne' => null,
+                            ],
+                        ],
+                    ],
+                    [
+                        '$match' => [
+                            'relatedDummy' => [
+                                '$ne' => null,
+                            ],
+                        ],
+                    ],
+                ],
             ],
 
             'related association does not exist' => [
@@ -258,7 +388,20 @@ class ExistsFilterTest extends DoctrineOrmFilterTestCase
                         'exists' => '0',
                     ],
                 ],
-                sprintf('SELECT o FROM %s o WHERE o.description IS NOT NULL AND o.relatedDummy IS NULL', Dummy::class),
+                [
+                    [
+                        '$match' => [
+                            'description' => [
+                                '$ne' => null,
+                            ],
+                        ],
+                    ],
+                    [
+                        '$match' => [
+                            'relatedDummy' => null,
+                        ],
+                    ],
+                ],
             ],
 
             'related owned association does not exist' => [
@@ -270,7 +413,13 @@ class ExistsFilterTest extends DoctrineOrmFilterTestCase
                         'exists' => '0',
                     ],
                 ],
-                sprintf('SELECT o FROM %s o LEFT JOIN o.relatedOwnedDummy relatedOwnedDummy_a1 WHERE relatedOwnedDummy_a1 IS NULL', Dummy::class),
+                [
+                    [
+                        '$match' => [
+                            'relatedOwnedDummy' => null,
+                        ],
+                    ],
+                ],
             ],
 
             'related owned association exists' => [
@@ -282,7 +431,15 @@ class ExistsFilterTest extends DoctrineOrmFilterTestCase
                         'exists' => '1',
                     ],
                 ],
-                sprintf('SELECT o FROM %s o LEFT JOIN o.relatedOwnedDummy relatedOwnedDummy_a1 WHERE relatedOwnedDummy_a1 IS NOT NULL', Dummy::class),
+                [
+                    [
+                        '$match' => [
+                            'relatedOwnedDummy' => [
+                                '$ne' => null,
+                            ],
+                        ],
+                    ],
+                ],
             ],
 
             'related owning association does not exist' => [
@@ -294,7 +451,13 @@ class ExistsFilterTest extends DoctrineOrmFilterTestCase
                         'exists' => '0',
                     ],
                 ],
-                sprintf('SELECT o FROM %s o WHERE o.relatedOwningDummy IS NULL', Dummy::class),
+                [
+                    [
+                        '$match' => [
+                            'relatedOwningDummy' => null,
+                        ],
+                    ],
+                ],
             ],
 
             'related owning association exists' => [
@@ -306,7 +469,15 @@ class ExistsFilterTest extends DoctrineOrmFilterTestCase
                         'exists' => '1',
                     ],
                 ],
-                sprintf('SELECT o FROM %s o WHERE o.relatedOwningDummy IS NOT NULL', Dummy::class),
+                [
+                    [
+                        '$match' => [
+                            'relatedOwningDummy' => [
+                                '$ne' => null,
+                            ],
+                        ],
+                    ],
+                ],
             ],
         ];
     }

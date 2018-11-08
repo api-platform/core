@@ -113,5 +113,10 @@ abstract class DoctrineOrmFilterTestCase extends KernelTestCase
         }
     }
 
+    protected function buildFilter(?array $properties = null)
+    {
+        return new $this->filterClass($this->managerRegistry, null, null, $properties);
+    }
+
     abstract public function provideApplyTestData(): array;
 }

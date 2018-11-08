@@ -20,7 +20,7 @@ trait BooleanFilterTestTrait
 {
     public function testGetDescription()
     {
-        $filter = new $this->filterClass($this->managerRegistry, null, null, [
+        $filter = $this->buildFilter([
             'id' => null,
             'name' => null,
             'foo' => null,
@@ -38,7 +38,7 @@ trait BooleanFilterTestTrait
 
     public function testGetDescriptionDefaultFields()
     {
-        $filter = new $this->filterClass($this->managerRegistry);
+        $filter = $this->buildFilter();
 
         $this->assertEquals([
             'dummyBoolean' => [

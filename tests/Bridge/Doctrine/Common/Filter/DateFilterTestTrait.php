@@ -21,7 +21,7 @@ trait DateFilterTestTrait
 {
     public function testGetDescription()
     {
-        $filter = new $this->filterClass($this->managerRegistry);
+        $filter = $this->buildFilter();
 
         $this->assertEquals([
             'dummyDate[before]' => [
