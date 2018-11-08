@@ -143,6 +143,10 @@ class ConfigurationTest extends TestCase
                 'vary' => ['Accept'],
                 'public' => null,
             ],
+            'mercure' => [
+                'enabled' => true,
+                'hub_url' => null,
+            ],
             'allow_plain_identifiers' => false,
             'resource_class_directories' => [],
         ], $config);
