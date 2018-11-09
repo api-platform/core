@@ -16,6 +16,7 @@ namespace ApiPlatform\Core\Hal\Serializer;
 use ApiPlatform\Core\Exception\RuntimeException;
 use ApiPlatform\Core\Serializer\AbstractItemNormalizer;
 use ApiPlatform\Core\Serializer\ContextTrait;
+use ApiPlatform\Core\Util\ClassInfoTrait;
 use Symfony\Component\Serializer\Mapping\AttributeMetadataInterface;
 
 /**
@@ -26,6 +27,7 @@ use Symfony\Component\Serializer\Mapping\AttributeMetadataInterface;
 final class ItemNormalizer extends AbstractItemNormalizer
 {
     use ContextTrait;
+    use ClassInfoTrait;
 
     const FORMAT = 'jsonhal';
 
@@ -102,7 +104,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
      */
     private function getComponents($object, string $format = null, array $context)
     {
-        $cacheKey = \get_class($object).'-'.$context['cache_key'];
+        $cacheKey = $this->getObjectClass($object).'-'.$context['cache_key'];
 
         if (isset($this->componentsCache[$cacheKey])) {
             return $this->componentsCache[$cacheKey];
@@ -160,7 +162,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
      */
     private function populateRelation(array $data, $object, string $format = null, array $context, array $components, string $type): array
     {
-        $class = \get_class($object);
+        $class = $this->getObjectClass($object);
 
         $attributesMetadata = \array_key_exists($class, $this->attributesMetadataCache) ?
             $this->attributesMetadataCache[$class] :

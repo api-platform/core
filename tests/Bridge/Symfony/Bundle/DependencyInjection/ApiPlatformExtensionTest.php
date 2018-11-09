@@ -193,6 +193,8 @@ class ApiPlatformExtensionTest extends TestCase
     public function testLoadDefaultConfig()
     {
         $containerBuilderProphecy = $this->getBaseContainerBuilderProphecy();
+        $containerBuilderProphecy->hasParameter('kernel.debug')->willReturn(true);
+        $containerBuilderProphecy->getParameter('kernel.debug')->willReturn(false);
         $containerBuilder = $containerBuilderProphecy->reveal();
 
         $this->extension->load(self::DEFAULT_CONFIG, $containerBuilder);
@@ -203,6 +205,8 @@ class ApiPlatformExtensionTest extends TestCase
         $nameConverterId = 'test.name_converter';
 
         $containerBuilderProphecy = $this->getBaseContainerBuilderProphecy();
+        $containerBuilderProphecy->hasParameter('kernel.debug')->willReturn(true);
+        $containerBuilderProphecy->getParameter('kernel.debug')->willReturn(false);
         $containerBuilderProphecy->setAlias('api_platform.name_converter', $nameConverterId)->shouldBeCalled();
         $containerBuilder = $containerBuilderProphecy->reveal();
 
@@ -212,6 +216,8 @@ class ApiPlatformExtensionTest extends TestCase
     public function testEnableFosUser()
     {
         $containerBuilderProphecy = $this->getBaseContainerBuilderProphecy();
+        $containerBuilderProphecy->hasParameter('kernel.debug')->willReturn(true);
+        $containerBuilderProphecy->getParameter('kernel.debug')->willReturn(false);
         $containerBuilderProphecy->getParameter('kernel.bundles')->willReturn([
             'DoctrineBundle' => DoctrineBundle::class,
             'FOSUserBundle' => FOSUserBundle::class,
@@ -220,6 +226,29 @@ class ApiPlatformExtensionTest extends TestCase
         $containerBuilder = $containerBuilderProphecy->reveal();
 
         $this->extension->load(array_merge_recursive(self::DEFAULT_CONFIG, ['api_platform' => ['enable_fos_user' => true]]), $containerBuilder);
+    }
+
+    public function testDisableProfiler()
+    {
+        $containerBuilderProphecy = $this->getBaseContainerBuilderProphecy();
+        $containerBuilder = $containerBuilderProphecy->reveal();
+        $containerBuilderProphecy->setDefinition('api_platform.data_collector.request', Argument::type(Definition::class))->shouldNotBeCalled();
+
+        $this->extension->load(array_merge_recursive(self::DEFAULT_CONFIG, ['api_platform' => ['enable_profiler' => false]]), $containerBuilder);
+    }
+
+    public function testEnableProfilerWithDebug()
+    {
+        $containerBuilderProphecy = $this->getBaseContainerBuilderProphecy();
+        $containerBuilderProphecy->hasParameter('kernel.debug')->willReturn(true);
+        $containerBuilderProphecy->getParameter('kernel.debug')->willReturn(true);
+        $containerBuilderProphecy->setDefinition('debug.api_platform.collection_data_provider', Argument::type(Definition::class))->shouldBeCalled();
+        $containerBuilderProphecy->setDefinition('debug.api_platform.item_data_provider', Argument::type(Definition::class))->shouldBeCalled();
+        $containerBuilderProphecy->setDefinition('debug.api_platform.subresource_data_provider', Argument::type(Definition::class))->shouldBeCalled();
+        $containerBuilderProphecy->setDefinition('debug.api_platform.data_persister', Argument::type(Definition::class))->shouldBeCalled();
+        $containerBuilder = $containerBuilderProphecy->reveal();
+
+        $this->extension->load(array_merge_recursive(self::DEFAULT_CONFIG, ['api_platform' => ['enable_profiler' => true]]), $containerBuilder);
     }
 
     public function testFosUserPriority()
@@ -390,6 +419,9 @@ class ApiPlatformExtensionTest extends TestCase
         $containerBuilderProphecy = $this->prophesize(ContainerBuilder::class);
         $childDefinitionProphecy = $this->prophesize(ChildDefinition::class);
 
+        $containerBuilderProphecy->hasParameter('kernel.debug')->willReturn(true);
+        $containerBuilderProphecy->getParameter('kernel.debug')->willReturn(false);
+
         $containerBuilderProphecy->registerForAutoconfiguration(DataPersisterInterface::class)
             ->willReturn($childDefinitionProphecy)->shouldBeCalledTimes(1);
         $childDefinitionProphecy->addTag('api_platform.data_persister')->shouldBeCalledTimes(1);
@@ -458,6 +490,7 @@ class ApiPlatformExtensionTest extends TestCase
             ],
             'api_platform.title' => 'title',
             'api_platform.version' => 'version',
+            'api_platform.show_webby' => true,
             'api_platform.allow_plain_identifiers' => false,
             'api_platform.eager_loading.enabled' => Argument::type('bool'),
             'api_platform.eager_loading.max_joins' => 30,
@@ -644,7 +677,7 @@ class ApiPlatformExtensionTest extends TestCase
 
         foreach (['yaml', 'xml'] as $format) {
             $definitionProphecy = $this->prophesize(Definition::class);
-            $definitionProphecy->addArgument(Argument::type('array'))->shouldBeCalled();
+            $definitionProphecy->replaceArgument(0, Argument::type('array'))->shouldBeCalled();
             $containerBuilderProphecy->getDefinition('api_platform.metadata.extractor.'.$format)->willReturn($definitionProphecy->reveal())->shouldBeCalled();
         }
 
@@ -730,6 +763,8 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.http_cache.purger.varnish_client',
             'api_platform.http_cache.listener.response.add_tags',
             'api_platform.validator',
+            'api_platform.mercure.listener.response.add_link_header',
+            'api_platform.doctrine.listener.mercure.publish',
         ];
 
         foreach ($definitions as $definition) {
@@ -752,6 +787,9 @@ class ApiPlatformExtensionTest extends TestCase
 
         $containerBuilderProphecy->hasParameter('api_platform.metadata_cache')->willReturn(true)->shouldBeCalled();
         $containerBuilderProphecy->getParameter('api_platform.metadata_cache')->willReturn(true)->shouldBeCalled();
+        $containerBuilderProphecy->hasParameter('mercure.default_hub')->willReturn(true)->shouldBeCalled();
+
+        $containerBuilderProphecy->getDefinition('api_platform.mercure.listener.response.add_link_header')->willReturn(new Definition());
 
         return $containerBuilderProphecy;
     }

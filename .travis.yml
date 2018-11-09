@@ -6,11 +6,6 @@ cache:
     - $HOME/.composer/cache
     - $HOME/.npm
 
-env:
-  global:
-    - SYMFONY_DEPRECATIONS_HELPER=weak_vendors
-    - APP_ENV=test
-
 jobs:
   include:
     - php: '7.1'
@@ -57,4 +52,4 @@ script:
       vendor/bin/behat --suite=default --format=progress;
     fi
   - tests/Fixtures/app/console api:swagger:export > swagger.json && npx swagger-cli validate swagger.json && rm swagger.json
-  - tests/Fixtures/app/console api:swagger:export --yaml > swagger.yaml && npx swagger-cli validate --no-schema swagger.yaml && rm swagger.yaml
+  - tests/Fixtures/app/console api:swagger:export --yaml > swagger.yaml && npx swagger-cli validate swagger.yaml && rm swagger.yaml

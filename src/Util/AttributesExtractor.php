@@ -35,6 +35,8 @@ final class AttributesExtractor
     public static function extractAttributes(array $attributes): array
     {
         $result = ['resource_class' => $attributes['_api_resource_class'] ?? null];
+        $result['input_class'] = $attributes['_api_input_class'] ?? $result['resource_class'];
+        $result['output_class'] = $attributes['_api_output_class'] ?? $result['resource_class'];
 
         if ($subresourceContext = $attributes['_api_subresource_context'] ?? null) {
             $result['subresource_context'] = $subresourceContext;

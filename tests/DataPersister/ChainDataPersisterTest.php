@@ -60,15 +60,11 @@ class ChainDataPersisterTest extends TestCase
         $barPersisterProphecy->supports($dummy)->willReturn(true)->shouldBeCalled();
         $barPersisterProphecy->persist($dummy)->shouldBeCalled();
 
-        $bazPersisterProphecy = $this->prophesize(DataPersisterInterface::class);
-        $bazPersisterProphecy->supports($dummy)->willReturn(true)->shouldBeCalled();
-        $bazPersisterProphecy->persist($dummy)->shouldBeCalled();
+        $foobarPersisterProphecy = $this->prophesize(DataPersisterInterface::class);
+        $foobarPersisterProphecy->supports($dummy)->shouldNotBeCalled();
+        $foobarPersisterProphecy->persist($dummy)->shouldNotBeCalled();
 
-        (new ChainDataPersister([
-            $fooPersisterProphecy->reveal(),
-            $barPersisterProphecy->reveal(),
-            $bazPersisterProphecy->reveal(),
-        ]))->persist($dummy);
+        (new ChainDataPersister([$fooPersisterProphecy->reveal(), $barPersisterProphecy->reveal(), $foobarPersisterProphecy->reveal()]))->persist($dummy);
     }
 
     public function testRemove()
@@ -83,6 +79,10 @@ class ChainDataPersisterTest extends TestCase
         $barPersisterProphecy->supports($dummy)->willReturn(true)->shouldBeCalled();
         $barPersisterProphecy->remove($dummy)->shouldBeCalled();
 
-        (new ChainDataPersister([$fooPersisterProphecy->reveal(), $barPersisterProphecy->reveal()]))->remove($dummy);
+        $foobarPersisterProphecy = $this->prophesize(DataPersisterInterface::class);
+        $foobarPersisterProphecy->supports($dummy)->shouldNotBeCalled();
+        $foobarPersisterProphecy->remove($dummy)->shouldNotBeCalled();
+
+        (new ChainDataPersister([$fooPersisterProphecy->reveal(), $barPersisterProphecy->reveal(), $foobarPersisterProphecy->reveal()]))->remove($dummy);
     }
 }

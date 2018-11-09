@@ -48,8 +48,8 @@ final class QueryJoinParser
             $aliasMap[$rootAlias] = 'root';
 
             foreach ($joins as $join) {
-                $alias = self::getJoinAlias($join);
-                $relationship = self::getJoinRelationship($join);
+                $alias = $join->getAlias();
+                $relationship = $join->getJoin();
 
                 $pos = strpos($relationship, '.');
 
@@ -100,17 +100,9 @@ final class QueryJoinParser
      */
     public static function getJoinRelationship(Join $join): string
     {
-        static $relationshipProperty = null;
-        static $initialized = false;
+        @trigger_error(sprintf('The use of "%s::getJoinRelationship()" is deprecated since 2.3 and will be removed in 3.0. Use "%s::getJoin()" directly instead.', __CLASS__, Join::class), E_USER_DEPRECATED);
 
-        if (!$initialized && !method_exists(Join::class, 'getJoin')) {
-            $relationshipProperty = new \ReflectionProperty(Join::class, '_join');
-            $relationshipProperty->setAccessible(true);
-
-            $initialized = true;
-        }
-
-        return (null === $relationshipProperty) ? $join->getJoin() : $relationshipProperty->getValue($join);
+        return $join->getJoin();
     }
 
     /**
@@ -118,37 +110,20 @@ final class QueryJoinParser
      */
     public static function getJoinAlias(Join $join): string
     {
-        static $aliasProperty = null;
-        static $initialized = false;
+        @trigger_error(sprintf('The use of "%s::getJoinAlias()" is deprecated since 2.3 and will be removed in 3.0. Use "%s::getAlias()" directly instead.', __CLASS__, Join::class), E_USER_DEPRECATED);
 
-        if (!$initialized && !method_exists(Join::class, 'getAlias')) {
-            $aliasProperty = new \ReflectionProperty(Join::class, '_alias');
-            $aliasProperty->setAccessible(true);
-
-            $initialized = true;
-        }
-
-        return (null === $aliasProperty) ? $join->getAlias() : $aliasProperty->getValue($join);
+        return $join->getAlias();
     }
 
     /**
      * Gets the parts from an OrderBy expression.
      *
-     *
      * @return string[]
      */
     public static function getOrderByParts(OrderBy $orderBy): array
     {
-        static $partsProperty = null;
-        static $initialized = false;
+        @trigger_error(sprintf('The use of "%s::getOrderByParts()" is deprecated since 2.3 and will be removed in 3.0. Use "%s::getParts()" directly instead.', __CLASS__, OrderBy::class), E_USER_DEPRECATED);
 
-        if (!$initialized && !method_exists(OrderBy::class, 'getParts')) {
-            $partsProperty = new \ReflectionProperty(OrderBy::class, '_parts');
-            $partsProperty->setAccessible(true);
-
-            $initialized = true;
-        }
-
-        return (null === $partsProperty) ? $orderBy->getParts() : $partsProperty->getValue($orderBy);
+        return $orderBy->getParts();
     }
 }

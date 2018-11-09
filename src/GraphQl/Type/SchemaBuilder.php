@@ -75,6 +75,7 @@ final class SchemaBuilder implements SchemaBuilderInterface
 
     public function getSchema(): Schema
     {
+        $this->graphqlTypes['Iterable'] = new IterableType();
         $queryFields = ['node' => $this->getNodeQueryField()];
         $mutationFields = [];
 
@@ -92,25 +93,33 @@ final class SchemaBuilder implements SchemaBuilderInterface
             }
         }
 
-        return new Schema([
+        $schema = [
             'query' => new ObjectType([
                 'name' => 'Query',
                 'fields' => $queryFields,
             ]),
-            'mutation' => new ObjectType([
+            'typeLoader' => function ($name) {
+                return $this->graphqlTypes[$name];
+            },
+        ];
+
+        if ($mutationFields) {
+            $schema['mutation'] = new ObjectType([
                 'name' => 'Mutation',
                 'fields' => $mutationFields,
-            ]),
-        ]);
+            ]);
+        }
+
+        return new Schema($schema);
     }
 
     private function getNodeInterface(): InterfaceType
     {
-        if (isset($this->graphqlTypes['#node'])) {
-            return $this->graphqlTypes['#node'];
+        if (isset($this->graphqlTypes['Node'])) {
+            return $this->graphqlTypes['Node'];
         }
 
-        return $this->graphqlTypes['#node'] = new InterfaceType([
+        return $this->graphqlTypes['Node'] = new InterfaceType([
             'name' => 'Node',
             'description' => 'A node, according to the Relay specification.',
             'fields' => [
@@ -124,9 +133,9 @@ final class SchemaBuilder implements SchemaBuilderInterface
                     return null;
                 }
 
-                $resourceClass = $this->getObjectClass(unserialize($value[ItemNormalizer::ITEM_KEY]));
+                $shortName = (new \ReflectionObject(unserialize($value[ItemNormalizer::ITEM_KEY])))->getShortName();
 
-                return $this->graphqlTypes[$resourceClass][null][false] ?? null;
+                return $this->graphqlTypes[$shortName] ?? null;
             },
         ]);
     }
@@ -291,7 +300,7 @@ final class SchemaBuilder implements SchemaBuilderInterface
             if (\is_array($value)) {
                 $value = $this->mergeFilterArgs($args[$key] ?? [], $value);
                 if (!isset($value['#name'])) {
-                    $name = (false === $pos = strrpos($original, '[')) ? $original : substr($original, 0, $pos);
+                    $name = (false === $pos = strrpos($original, '[')) ? $original : substr($original, 0, (int) $pos);
                     $value['#name'] = ($resourceMetadata ? $resourceMetadata->getShortName() : '').'Filter_'.strtr($name, ['[' => '_', ']' => '', '.' => '__']);
                 }
             }
@@ -357,10 +366,7 @@ final class SchemaBuilder implements SchemaBuilderInterface
                 break;
             case Type::BUILTIN_TYPE_ARRAY:
             case Type::BUILTIN_TYPE_ITERABLE:
-                if (!isset($this->graphqlTypes['#iterable'])) {
-                    $this->graphqlTypes['#iterable'] = new IterableType();
-                }
-                $graphqlType = $this->graphqlTypes['#iterable'];
+                $graphqlType = $this->graphqlTypes['Iterable'];
                 break;
             case Type::BUILTIN_TYPE_OBJECT:
                 if (($input && $depth > 0) || is_a($type->getClassName(), \DateTimeInterface::class, true)) {
@@ -369,6 +375,10 @@ final class SchemaBuilder implements SchemaBuilderInterface
                 }
 
                 $resourceClass = $this->isCollection($type) ? $type->getCollectionValueType()->getClassName() : $type->getClassName();
+                if (null === $resourceClass) {
+                    return null;
+                }
+
                 try {
                     $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
                     if ([] === $resourceMetadata->getGraphql() ?? []) {
@@ -399,10 +409,6 @@ final class SchemaBuilder implements SchemaBuilderInterface
      */
     private function getResourceObjectType(string $resourceClass, ResourceMetadata $resourceMetadata, bool $input = false, string $mutationName = null, int $depth = 0): GraphQLType
     {
-        if (isset($this->graphqlTypes[$resourceClass][$mutationName][$input])) {
-            return $this->graphqlTypes[$resourceClass][$mutationName][$input];
-        }
-
         $shortName = $resourceMetadata->getShortName();
         if (null !== $mutationName) {
             $shortName = $mutationName.ucfirst($shortName);
@@ -411,6 +417,10 @@ final class SchemaBuilder implements SchemaBuilderInterface
             $shortName .= 'Input';
         } elseif (null !== $mutationName) {
             $shortName .= 'Payload';
+        }
+
+        if (isset($this->graphqlTypes[$shortName])) {
+            return $this->graphqlTypes[$shortName];
         }
 
         $configuration = [
@@ -423,7 +433,7 @@ final class SchemaBuilder implements SchemaBuilderInterface
             'interfaces' => [$this->getNodeInterface()],
         ];
 
-        return $this->graphqlTypes[$resourceClass][$mutationName][$input] = $input ? new InputObjectType($configuration) : new ObjectType($configuration);
+        return $this->graphqlTypes[$shortName] = $input ? new InputObjectType($configuration) : new ObjectType($configuration);
     }
 
     /**
@@ -456,9 +466,15 @@ final class SchemaBuilder implements SchemaBuilderInterface
                 continue;
             }
 
-            if ($fieldConfiguration = $this->getResourceFieldConfiguration($resourceClass, $resourceMetadata, $propertyMetadata->getDescription(), $propertyMetadata->getAttribute('deprecation_reason', ''), $propertyType, $resourceClass, $input, $mutationName, ++$depth)) {
+            $rootResource = $resourceClass;
+            if (null !== $propertyMetadata->getSubresource()) {
+                $resourceClass = $propertyMetadata->getSubresource()->getResourceClass();
+                $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
+            }
+            if ($fieldConfiguration = $this->getResourceFieldConfiguration($resourceClass, $resourceMetadata, $propertyMetadata->getDescription(), $propertyMetadata->getAttribute('deprecation_reason', ''), $propertyType, $rootResource, $input, $mutationName, ++$depth)) {
                 $fields['id' === $property ? '_id' : $property] = $fieldConfiguration;
             }
+            $resourceClass = $rootResource;
         }
 
         if (null !== $mutationName) {
@@ -479,8 +495,8 @@ final class SchemaBuilder implements SchemaBuilderInterface
     {
         $shortName = $resourceType->name;
 
-        if (isset($this->graphqlTypes[$resourceClass]['connection'])) {
-            return $this->graphqlTypes[$resourceClass]['connection'];
+        if (isset($this->graphqlTypes["{$shortName}Connection"])) {
+            return $this->graphqlTypes["{$shortName}Connection"];
         }
 
         $edgeObjectTypeConfiguration = [
@@ -492,6 +508,8 @@ final class SchemaBuilder implements SchemaBuilderInterface
             ],
         ];
         $edgeObjectType = new ObjectType($edgeObjectTypeConfiguration);
+        $this->graphqlTypes["{$shortName}Edge"] = $edgeObjectType;
+
         $pageInfoObjectTypeConfiguration = [
             'name' => "{$shortName}PageInfo",
             'description' => 'Information about the current page.',
@@ -502,6 +520,7 @@ final class SchemaBuilder implements SchemaBuilderInterface
             ],
         ];
         $pageInfoObjectType = new ObjectType($pageInfoObjectTypeConfiguration);
+        $this->graphqlTypes["{$shortName}PageInfo"] = $pageInfoObjectType;
 
         $configuration = [
             'name' => "{$shortName}Connection",
@@ -513,7 +532,7 @@ final class SchemaBuilder implements SchemaBuilderInterface
             ],
         ];
 
-        return $this->graphqlTypes[$resourceClass]['connection'] = new ObjectType($configuration);
+        return $this->graphqlTypes["{$shortName}Connection"] = new ObjectType($configuration);
     }
 
     private function isCollection(Type $type): bool

@@ -20,7 +20,8 @@ namespace ApiPlatform\Core\DataPersister;
  */
 final class ChainDataPersister implements DataPersisterInterface
 {
-    private $persisters;
+    /** @internal */
+    public $persisters;
 
     /**
      * @param DataPersisterInterface[] $persisters
@@ -51,11 +52,9 @@ final class ChainDataPersister implements DataPersisterInterface
     {
         foreach ($this->persisters as $persister) {
             if ($persister->supports($data)) {
-                $data = $persister->persist($data) ?? $data;
+                return $persister->persist($data) ?? $data;
             }
         }
-
-        return $data;
     }
 
     /**
@@ -65,7 +64,7 @@ final class ChainDataPersister implements DataPersisterInterface
     {
         foreach ($this->persisters as $persister) {
             if ($persister->supports($data)) {
-                $persister->remove($data);
+                return $persister->remove($data);
             }
         }
     }

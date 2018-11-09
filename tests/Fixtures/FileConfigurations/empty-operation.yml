@@ -1,0 +1,10 @@
+resources:
+    'App\Entity\Greeting':
+        collectionOperations:
+            get:
+                filters:
+                    - 'greeting.search_filter'
+            post: ~
+        itemOperations:
+            get: ~
+            put: ~

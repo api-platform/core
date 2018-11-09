@@ -22,7 +22,8 @@ use ApiPlatform\Core\Exception\ResourceClassNotSupportedException;
  */
 final class ChainSubresourceDataProvider implements SubresourceDataProviderInterface
 {
-    private $dataProviders;
+    /** @internal */
+    public $dataProviders;
 
     /**
      * @param SubresourceDataProviderInterface[] $dataProviders

@@ -79,6 +79,10 @@ final class IriConverter implements IriConverterInterface
             throw new InvalidArgumentException(sprintf('No resource associated to "%s".', $iri));
         }
 
+        if (isset($parameters['_api_collection_operation_name'])) {
+            throw new InvalidArgumentException(sprintf('The iri "%s" references a collection not an item.', $iri));
+        }
+
         $attributes = AttributesExtractor::extractAttributes($parameters);
 
         try {
@@ -92,7 +96,7 @@ final class IriConverter implements IriConverterInterface
         }
 
         if (isset($attributes['subresource_operation_name'])) {
-            if ($item = $this->getSubresourceData($identifiers, $attributes, $context)) {
+            if (($item = $this->getSubresourceData($identifiers, $attributes, $context)) && !\is_array($item)) {
                 return $item;
             }
 

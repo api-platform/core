@@ -110,14 +110,14 @@ jobs:
       - *update-project-dependencies
       - run:
           name: Install PHPStan
-          command: composer global require phpstan/phpstan:0.10.1
+          command: composer global require phpstan/phpstan:0.10.5
       - *save-composer-cache-by-revision
       - *save-composer-cache-by-branch
       - run:
           name: Run PHPStan
           command: |-
             export PATH="$PATH:$HOME/.composer/vendor/bin"
-            phpstan analyse -c phpstan.neon -l5 --ansi src tests
+            phpstan analyse -c phpstan.neon -l6 --ansi src tests
 
   phpunit-coverage:
     docker:
@@ -142,8 +142,7 @@ jobs:
           name: Run PHPUnit tests
           command: |-
             mkdir -p build/logs/tmp build/cov
-            find tests -name '*Test.php' | circleci tests split --split-by=timings | parallel -j10% --rpl '{_} s/\//_/g;' \
-              phpdbg -qrr vendor/bin/phpunit --coverage-php build/cov/coverage-{_}.cov --log-junit build/logs/tmp/{_}.xml --colors=always {}
+            phpdbg -qrr vendor/bin/phpunit --coverage-php build/cov/coverage.cov --log-junit build/logs/tmp/coverage.xml --colors=always
       - run:
           name: Merge PHPUnit test reports
           command: |-
@@ -165,9 +164,6 @@ jobs:
   behat-coverage:
     docker:
       - image: circleci/php:7.2-node-browsers
-    environment:
-      SYMFONY_DEPRECATIONS_HELPER: weak_vendors
-      APP_ENV: test
     parallelism: 2
     working_directory: ~/api-platform/core
     steps:
@@ -187,7 +183,7 @@ jobs:
             mkdir -p build/logs/tmp build/cov
             for f in $(find features -name '*.feature' -not -path 'features/main/exposed_state.feature' | circleci tests split --split-by=timings); do
               _f=${f//\//_}
-              FEATURE="${_f}" phpdbg -qrr vendor/bin/behat --profile=coverage --suite=default --tags=~@postgres --format=progress --out=std --format=junit --out=build/logs/tmp/"${_f}" "$f"
+              FEATURE="${_f}" phpdbg -qrr vendor/bin/behat --profile=coverage --suite=default --format=progress --out=std --format=junit --out=build/logs/tmp/"${_f}" "$f"
             done
       - run:
           name: Merge Behat test reports

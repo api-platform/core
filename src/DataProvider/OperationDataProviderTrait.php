@@ -49,7 +49,7 @@ trait OperationDataProviderTrait
      */
     private function getCollectionData(array $attributes, array $context)
     {
-        return $this->collectionDataProvider->getCollection($attributes['resource_class'], $attributes['collection_operation_name'], $context);
+        return $this->collectionDataProvider->getCollection($attributes['output_class'], $attributes['collection_operation_name'], $context);
     }
 
     /**
@@ -59,7 +59,7 @@ trait OperationDataProviderTrait
      */
     private function getItemData($identifiers, array $attributes, array $context)
     {
-        return $this->itemDataProvider->getItem($attributes['resource_class'], $identifiers, $attributes['item_operation_name'], $context);
+        return $this->itemDataProvider->getItem($attributes['output_class'], $identifiers, $attributes['item_operation_name'], $context);
     }
 
     /**
@@ -67,7 +67,7 @@ trait OperationDataProviderTrait
      *
      * @throws RuntimeException
      *
-     * @return object|null
+     * @return array|object|null
      */
     private function getSubresourceData($identifiers, array $attributes, array $context)
     {
@@ -75,7 +75,7 @@ trait OperationDataProviderTrait
             throw new RuntimeException('Subresources not supported');
         }
 
-        return $this->subresourceDataProvider->getSubresource($attributes['resource_class'], $identifiers, $attributes['subresource_context'] + $context, $attributes['subresource_operation_name']);
+        return $this->subresourceDataProvider->getSubresource($attributes['output_class'], $identifiers, $attributes['subresource_context'] + $context, $attributes['subresource_operation_name']);
     }
 
     /**
@@ -93,7 +93,7 @@ trait OperationDataProviderTrait
             $id = $parameters['id'];
 
             if (null !== $this->identifierConverter) {
-                return $this->identifierConverter->convert((string) $id, $attributes['resource_class']);
+                return $this->identifierConverter->convert((string) $id, $attributes['output_class']);
             }
 
             return $id;

@@ -57,7 +57,9 @@ final class ApiLoader extends Loader
 
     public function __construct(KernelInterface $kernel, ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, ResourceMetadataFactoryInterface $resourceMetadataFactory, OperationPathResolverInterface $operationPathResolver, ContainerInterface $container, array $formats, array $resourceClassDirectories = [], SubresourceOperationFactoryInterface $subresourceOperationFactory = null, bool $graphqlEnabled = false, bool $entrypointEnabled = true, bool $docsEnabled = true)
     {
-        $this->fileLoader = new XmlFileLoader(new FileLocator($kernel->locateResource('@ApiPlatformBundle/Resources/config/routing')));
+        /** @var string[]|string $paths */
+        $paths = $kernel->locateResource('@ApiPlatformBundle/Resources/config/routing');
+        $this->fileLoader = new XmlFileLoader(new FileLocator($paths));
         $this->resourceNameCollectionFactory = $resourceNameCollectionFactory;
         $this->resourceMetadataFactory = $resourceMetadataFactory;
         $this->operationPathResolver = $operationPathResolver;
@@ -121,6 +123,8 @@ final class ApiLoader extends Loader
                         '_controller' => $controller,
                         '_format' => null,
                         '_api_resource_class' => $operation['resource_class'],
+                        '_api_input_class' => $operation['input_class'],
+                        '_api_output_class' => $operation['output_class'],
                         '_api_subresource_operation_name' => $operation['route_name'],
                         '_api_subresource_context' => [
                             'property' => $operation['property'],
@@ -208,6 +212,8 @@ final class ApiLoader extends Loader
                 '_controller' => $controller,
                 '_format' => null,
                 '_api_resource_class' => $resourceClass,
+                '_api_input_class' => $resourceMetadata->getAttribute('input_class', $resourceClass),
+                '_api_output_class' => $resourceMetadata->getAttribute('output_class', $resourceClass),
                 sprintf('_api_%s_operation_name', $operationType) => $operationName,
             ] + ($operation['defaults'] ?? []),
             $operation['requirements'] ?? [],

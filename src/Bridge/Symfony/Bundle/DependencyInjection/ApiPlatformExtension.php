@@ -130,8 +130,8 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $useDoctrine = isset($bundles['DoctrineBundle']) && class_exists(Version::class);
 
         $this->registerMetadataConfiguration($container, $config, $loader);
-        $this->registerOAuthConfiguration($container, $config, $loader);
-        $this->registerApiKeysConfiguration($container, $config, $loader);
+        $this->registerOAuthConfiguration($container, $config);
+        $this->registerApiKeysConfiguration($container, $config);
         $this->registerSwaggerConfiguration($container, $config, $loader);
         $this->registerJsonApiConfiguration($formats, $loader);
         $this->registerJsonLdConfiguration($container, $formats, $loader, $config['enable_docs']);
@@ -141,9 +141,10 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $this->registerBundlesConfiguration($bundles, $config, $loader, $useDoctrine);
         $this->registerCacheConfiguration($container);
         $this->registerDoctrineExtensionConfiguration($container, $config, $useDoctrine);
-        $this->registerHttpCache($container, $config, $loader, $useDoctrine);
-        $this->registerValidatorConfiguration($container, $config, $loader);
-        $this->registerDataCollector($container, $config, $loader);
+        $this->registerHttpCacheConfiguration($container, $config, $loader, $useDoctrine);
+        $this->registerValidatorConfiguration($container, $config);
+        $this->registerDataCollectorConfiguration($container, $config, $loader);
+        $this->registerMercureConfiguration($container, $config, $loader, $useDoctrine);
     }
 
     /**
@@ -156,6 +157,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $container->setParameter('api_platform.title', $config['title']);
         $container->setParameter('api_platform.description', $config['description']);
         $container->setParameter('api_platform.version', $config['version']);
+        $container->setParameter('api_platform.show_webby', $config['show_webby']);
         $container->setParameter('api_platform.exception_to_status', $config['exception_to_status']);
         $container->setParameter('api_platform.formats', $formats);
         $container->setParameter('api_platform.error_formats', $errorFormats);
@@ -207,7 +209,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             ));
         }
 
-        $container->getDefinition('api_platform.metadata.extractor.xml')->addArgument($xmlResources);
+        $container->getDefinition('api_platform.metadata.extractor.xml')->replaceArgument(0, $xmlResources);
 
         if (class_exists(Annotation::class)) {
             $loader->load('metadata/annotation.xml');
@@ -215,7 +217,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
 
         if (class_exists(Yaml::class)) {
             $loader->load('metadata/yaml.xml');
-            $container->getDefinition('api_platform.metadata.extractor.yaml')->addArgument($yamlResources);
+            $container->getDefinition('api_platform.metadata.extractor.yaml')->replaceArgument(0, $yamlResources);
         }
 
         if (interface_exists(DocBlockFactoryInterface::class)) {
@@ -290,7 +292,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
     /**
      * Registers the OAuth configuration.
      */
-    private function registerOAuthConfiguration(ContainerBuilder $container, array $config, XmlFileLoader $loader)
+    private function registerOAuthConfiguration(ContainerBuilder $container, array $config)
     {
         if (!$config['oauth']) {
             return;
@@ -309,7 +311,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
     /**
      * Registers the api keys configuration.
      */
-    private function registerApiKeysConfiguration(ContainerBuilder $container, array $config, XmlFileLoader $loader)
+    private function registerApiKeysConfiguration(ContainerBuilder $container, array $config)
     {
         $container->setParameter('api_platform.swagger.api_keys', $config['swagger']['api_keys']);
     }
@@ -456,7 +458,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $container->removeDefinition('api_platform.doctrine.orm.query_extension.filter_eager_loading');
     }
 
-    private function registerHttpCache(ContainerBuilder $container, array $config, XmlFileLoader $loader, bool $useDoctrine)
+    private function registerHttpCacheConfiguration(ContainerBuilder $container, array $config, XmlFileLoader $loader, bool $useDoctrine)
     {
         $loader->load('http_cache.xml');
 
@@ -500,7 +502,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
     /**
      * Registers the Validator configuration.
      */
-    private function registerValidatorConfiguration(ContainerBuilder $container, array $config, XmlFileLoader $loader)
+    private function registerValidatorConfiguration(ContainerBuilder $container, array $config)
     {
         if (!$config['validator']) {
             return;
@@ -512,12 +514,30 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
     /**
      * Registers the DataCollector configuration.
      */
-    private function registerDataCollector(ContainerBuilder $container, array $config, XmlFileLoader $loader)
+    private function registerDataCollectorConfiguration(ContainerBuilder $container, array $config, XmlFileLoader $loader)
     {
         if (!$config['enable_profiler']) {
             return;
         }
 
         $loader->load('data_collector.xml');
+
+        if ($container->hasParameter('kernel.debug') && $container->getParameter('kernel.debug')) {
+            $loader->load('debug.xml');
+        }
+    }
+
+    private function registerMercureConfiguration(ContainerBuilder $container, array $config, XmlFileLoader $loader, bool $useDoctrine)
+    {
+        if (!$config['mercure']['enabled'] || !$container->hasParameter('mercure.default_hub')) {
+            return;
+        }
+
+        $loader->load('mercure.xml');
+        $container->getDefinition('api_platform.mercure.listener.response.add_link_header')->addArgument($config['mercure']['hub_url'] ?? '%mercure.default_hub%');
+
+        if ($useDoctrine) {
+            $loader->load('doctrine_orm_mercure_publisher.xml');
+        }
     }
 }

@@ -374,6 +374,35 @@ Feature: Search filter on collections
     }
     """
 
+  @sqlite
+  Scenario: Search for entities with an existing collection route name
+    When I send a "GET" request to "/dummies?relatedDummies=dummy_cars"
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+    And the JSON should be valid according to this schema:
+    """
+    {
+      "type": "object",
+      "properties": {
+        "@context": {"pattern": "^/contexts/Dummy$"},
+        "@id": {"pattern": "^/dummies$"},
+        "@type": {"pattern": "^hydra:Collection$"},
+        "hydra:member": {
+          "type": "array",
+          "maxItems": 0
+        },
+        "hydra:view": {
+          "type": "object",
+          "properties": {
+            "@id": {"pattern": "^/dummies\\?relatedDummies=dummy_cars"},
+            "@type": {"pattern": "^hydra:PartialCollectionView$"}
+          }
+        }
+      }
+    }
+    """
+
   @createSchema
   Scenario: Search related collection by name
     Given there are 3 dummy objects having each 3 relatedDummies

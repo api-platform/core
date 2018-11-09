@@ -67,12 +67,11 @@ final class SwaggerCommand extends Command
     {
         $documentation = new Documentation($this->resourceNameCollectionFactory->create(), $this->apiTitle, $this->apiDescription, $this->apiVersion, $this->apiFormats);
         $data = $this->documentationNormalizer->normalize($documentation);
-        $content = $input->getOption('yaml') ? Yaml::dump($data) : json_encode($data, JSON_PRETTY_PRINT);
-
-        if (!empty($input->getOption('output'))) {
-            file_put_contents($input->getOption('output'), $content);
+        $content = $input->getOption('yaml') ? Yaml::dump($data, 6, 4, Yaml::DUMP_OBJECT_AS_MAP | Yaml::DUMP_EMPTY_ARRAY_AS_SEQUENCE) : (json_encode($data, JSON_PRETTY_PRINT) ?: '');
+        if (!empty($filename = $input->getOption('output')) && \is_string($filename)) {
+            file_put_contents($filename, $content);
             $output->writeln(
-                sprintf('Data written to %s', $input->getOption('output'))
+                sprintf('Data written to %s', $filename)
             );
         } else {
             $output->writeln($content);

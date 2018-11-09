@@ -79,7 +79,7 @@ final class ItemNormalizer extends BaseItemNormalizer
 
         if (($context['api_denormalize'] ?? false) && false !== ($indexId = array_search('id', $allowedAttributes, true))) {
             $allowedAttributes[] = '_id';
-            array_splice($allowedAttributes, $indexId, 1);
+            array_splice($allowedAttributes, (int) $indexId, 1);
         }
 
         return $allowedAttributes;

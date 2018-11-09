@@ -33,13 +33,14 @@ final class XmlExtractor extends AbstractExtractor
     protected function extractPath(string $path)
     {
         try {
+            /** @var \SimpleXMLElement $xml */
             $xml = simplexml_import_dom(XmlUtils::loadFile($path, self::RESOURCE_SCHEMA));
         } catch (\InvalidArgumentException $e) {
             throw new InvalidArgumentException($e->getMessage(), $e->getCode(), $e);
         }
 
         foreach ($xml->resource as $resource) {
-            $resourceClass = (string) $resource['class'];
+            $resourceClass = $this->resolve((string) $resource['class']);
 
             $this->resources[$resourceClass] = [
                 'shortName' => $this->phpize($resource, 'shortName', 'string'),

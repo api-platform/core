@@ -43,57 +43,53 @@ class QueryJoinParserTest extends TestCase
         $this->assertEquals($metadata, $classMetadata->reveal());
     }
 
+    /**
+     * @group legacy
+     * @expectedDeprecation The use of "ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryJoinParser::getJoinRelationship()" is deprecated since 2.3 and will be removed in 3.0. Use "Doctrine\ORM\Query\Expr\Join::getJoin()" directly instead.
+     */
     public function testGetJoinRelationshipWithJoin()
     {
         $join = new Join('INNER_JOIN', 'a_1.relatedDummy', 'a_1', null, 'a_1.name = r.name');
         $this->assertEquals('a_1.relatedDummy', QueryJoinParser::getJoinRelationship($join));
     }
 
+    /**
+     * @group legacy
+     * @expectedDeprecation The use of "ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryJoinParser::getJoinRelationship()" is deprecated since 2.3 and will be removed in 3.0. Use "Doctrine\ORM\Query\Expr\Join::getJoin()" directly instead.
+     */
     public function testGetJoinRelationshipWithClassJoin()
     {
         $join = new Join('INNER_JOIN', RelatedDummy::class, 'a_1', null, 'a_1.name = r.name');
         $this->assertEquals(RelatedDummy::class, QueryJoinParser::getJoinRelationship($join));
     }
 
-    public function testGetJoinRelationshipWithReflection()
-    {
-        $methodExist = $this->getFunctionMock('ApiPlatform\Core\Bridge\Doctrine\Orm\Util', 'method_exists');
-        $methodExist->expects($this->any())->with(Join::class, 'getJoin')->willReturn('false');
-        $join = new Join('INNER_JOIN', 'a_1.relatedDummy', 'a_1', null, 'a_1.name = r.name');
-        $this->assertEquals('a_1.relatedDummy', QueryJoinParser::getJoinRelationship($join));
-    }
-
+    /**
+     * @group legacy
+     * @expectedDeprecation The use of "ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryJoinParser::getJoinAlias()" is deprecated since 2.3 and will be removed in 3.0. Use "Doctrine\ORM\Query\Expr\Join::getAlias()" directly instead.
+     */
     public function testGetJoinAliasWithJoin()
     {
         $join = new Join('INNER_JOIN', 'relatedDummy', 'a_1', null, 'a_1.name = r.name');
         $this->assertEquals('a_1', QueryJoinParser::getJoinAlias($join));
     }
 
+    /**
+     * @group legacy
+     * @expectedDeprecation The use of "ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryJoinParser::getJoinAlias()" is deprecated since 2.3 and will be removed in 3.0. Use "Doctrine\ORM\Query\Expr\Join::getAlias()" directly instead.
+     */
     public function testGetJoinAliasWithClassJoin()
     {
         $join = new Join('LEFT_JOIN', RelatedDummy::class, 'a_1', null, 'a_1.name = r.name');
         $this->assertEquals('a_1', QueryJoinParser::getJoinAlias($join));
     }
 
-    public function testGetJoinAliasWithReflection()
-    {
-        $methodExist = $this->getFunctionMock('ApiPlatform\Core\Bridge\Doctrine\Orm\Util', 'method_exists');
-        $methodExist->expects($this->any())->with(Join::class, 'getAlias')->willReturn('false');
-        $join = new Join('INNER_JOIN', 'relatedDummy', 'a_1', null, 'a_1.name = r.name');
-        $this->assertEquals('a_1', QueryJoinParser::getJoinAlias($join));
-    }
-
+    /**
+     * @group legacy
+     * @expectedDeprecation The use of "ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryJoinParser::getOrderByParts()" is deprecated since 2.3 and will be removed in 3.0. Use "Doctrine\ORM\Query\Expr\OrderBy::getParts()" directly instead.
+     */
     public function testGetOrderByPartsWithOrderBy()
     {
         $orderBy = new OrderBy('name', 'asc');
         $this->assertEquals(['name asc'], QueryJoinParser::getOrderByParts($orderBy));
-    }
-
-    public function testGetOrderByPartsWithReflection()
-    {
-        $methodExist = $this->getFunctionMock('ApiPlatform\Core\Bridge\Doctrine\Orm\Util', 'method_exists');
-        $methodExist->expects($this->any())->with(OrderBy::class, 'getParts')->willReturn('false');
-        $orderBy = new OrderBy('name', 'desc');
-        $this->assertEquals(['name desc'], QueryJoinParser::getOrderByParts($orderBy));
     }
 }

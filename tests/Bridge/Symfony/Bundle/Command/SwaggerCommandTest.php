@@ -51,16 +51,37 @@ class SwaggerCommandTest extends KernelTestCase
     {
         $this->tester->run(['command' => 'api:swagger:export', '--yaml' => true]);
 
-        $this->assertYaml($this->tester->getDisplay());
+        $result = $this->tester->getDisplay();
+        $this->assertYaml($result);
+
+        $expected = <<<YAML
+    /dummy_cars:
+        get:
+            tags:
+                - DummyCar
+            operationId: getDummyCarCollection
+YAML;
+
+        $this->assertContains($expected, $result, 'nested object should be present.');
+
+        $expected = <<<YAML
+    '/dummy_cars/{id}':
+        get:
+            tags: []
+            operationId: getDummyCarItem
+YAML;
+
+        $this->assertContains($expected, $result, 'arrays should be correctly formatted.');
     }
 
     public function testWriteToFile()
     {
+        /** @var string $tmpFile */
         $tmpFile = tempnam(sys_get_temp_dir(), 'test_write_to_file');
 
         $this->tester->run(['command' => 'api:swagger:export', '--output' => $tmpFile]);
 
-        $this->assertJson(file_get_contents($tmpFile));
+        $this->assertJson((string) @file_get_contents($tmpFile));
         @unlink($tmpFile);
     }
 

@@ -75,6 +75,7 @@ class SwaggerUiActionTest extends TestCase
             'title' => '',
             'description' => '',
             'formats' => [],
+            'showWebby' => true,
             'swagger_data' => [
                 'url' => '/url',
                 'spec' => self::SPEC,
@@ -102,6 +103,7 @@ class SwaggerUiActionTest extends TestCase
             'title' => '',
             'description' => '',
             'formats' => [],
+            'showWebby' => true,
             'swagger_data' => [
                 'url' => '/url',
                 'spec' => self::SPEC,
@@ -148,6 +150,7 @@ class SwaggerUiActionTest extends TestCase
             'title' => '',
             'description' => '',
             'formats' => [],
+            'showWebby' => true,
             'swagger_data' => [
                 'url' => '/url',
                 'spec' => self::SPEC,

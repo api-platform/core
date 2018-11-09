@@ -183,6 +183,7 @@ class SchemaBuilderTest extends TestCase
             $this->assertEquals(GraphQLType::nonNull(GraphQLType::int()), $objectPropertyFieldType->getField('totalCount')->getType());
             /** @var ListOfType $edgesType */
             $edgesType = $objectPropertyFieldType->getFields()['edges']->getType();
+            /** @var ObjectType $edgeType */
             $edgeType = $edgesType->getWrappedType();
             $this->assertSame('ShortName1Edge', $edgeType->name);
             $this->assertEquals(GraphQLType::nonNull(GraphQLType::string()), $edgeType->getField('cursor')->getType());
@@ -207,6 +208,37 @@ class SchemaBuilderTest extends TestCase
             ['id', '_id', 'floatProperty', 'stringProperty', 'boolProperty', 'objectProperty', 'arrayProperty', 'iterableProperty', 'clientMutationId'],
             array_keys($resourceTypeFields)
         );
+    }
+
+    /**
+     * Tests that the GraphQL SchemaBuilder supports an edge case where a property is typed as an Type::BUILTIN_TYPE_OBJECT but has no class related.
+     */
+    public function testObjectTypeWithoutClass()
+    {
+        $propertyMetadataMockBuilder = function ($builtinType, $resourceClassName) {
+            return new PropertyMetadata(
+                new Type(
+                    $builtinType
+                ),
+                "{$builtinType}Description",
+                true,
+                true,
+                null,
+                null,
+                null
+            );
+        };
+
+        $mockedSchemaBuilder = $this->createSchemaBuilder($propertyMetadataMockBuilder, false);
+        $this->assertEquals([
+            'node',
+            'shortName1',
+            'shortName1s',
+            'shortName2',
+            'shortName2s',
+            'shortName3',
+            'shortName3s',
+        ], array_keys($mockedSchemaBuilder->getSchema()->getConfig()->getQuery()->getFields()));
     }
 
     public function paginationProvider(): array

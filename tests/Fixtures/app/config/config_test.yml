@@ -26,6 +26,12 @@ doctrine:
 twig:
     strict_variables: '%kernel.debug%'
 
+mercure:
+    hubs:
+        default:
+            url: https://demo.mercure.rocks/hub
+            jwt: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJtZXJjdXJlIjp7InN1YnNjcmliZSI6WyJmb28iLCJiYXIiXSwicHVibGlzaCI6WyJmb28iXX19.LRLvirgONK13JgacQ_VbcjySbVhkSmHy3IznH3tA9PM
+
 api_platform:
     title:                             'My Dummy API'
     description:                       'This is a test API.'
@@ -241,3 +247,12 @@ services:
     app.dummy_validation.group_generator:
         class: ApiPlatform\Core\Tests\Fixtures\TestBundle\Validator\DummyValidationGroupsGenerator
         public: true
+
+    app.dummy_input_data_persister:
+        class: ApiPlatform\Core\Tests\Fixtures\TestBundle\DataPersister\DummyInputDataPersister
+        public: false
+        tags:
+            -  { name: 'api_platform.data_persister' }
+
+    mercure.hub.default.publisher:
+        class: ApiPlatform\Core\Tests\Fixtures\DummyMercurePublisher

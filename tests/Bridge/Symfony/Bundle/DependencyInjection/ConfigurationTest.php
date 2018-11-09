@@ -58,6 +58,7 @@ class ConfigurationTest extends TestCase
             'title' => 'title',
             'description' => 'description',
             'version' => '1.0.0',
+            'show_webby' => true,
             'formats' => [
                 'jsonld' => ['mime_types' => ['application/ld+json']],
                 'json' => ['mime_types' => ['application/json']],
@@ -141,6 +142,10 @@ class ConfigurationTest extends TestCase
                 'shared_max_age' => null,
                 'vary' => ['Accept'],
                 'public' => null,
+            ],
+            'mercure' => [
+                'enabled' => true,
+                'hub_url' => null,
             ],
             'allow_plain_identifiers' => false,
             'resource_class_directories' => [],

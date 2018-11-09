@@ -3,6 +3,30 @@ Feature: Operation support
   As an API developer
   I need to be able to add custom operations and remove built-in ones
 
+  @createSchema
+  @dropSchema
+  Scenario: Can not write readonly property
+    When I add "Content-Type" header equal to "application/ld+json"
+    And I send a "POST" request to "/readable_only_properties" with body:
+    """
+    {
+      "name": "My Dummy"
+    }
+    """
+    Then the response status code should be 201
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+    And the JSON should be equal to:
+    """
+    {
+      "@context": "/contexts/ReadableOnlyProperty",
+      "@id": "/readable_only_properties/1",
+      "@type": "ReadableOnlyProperty",
+      "id": 1,
+      "name": "Read only"
+    }
+    """
+
   Scenario: Access custom operations
     When I send a "GET" request to "/relation_embedders/42/custom"
     Then the response status code should be 200

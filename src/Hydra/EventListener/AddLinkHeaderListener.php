@@ -15,6 +15,8 @@ namespace ApiPlatform\Core\Hydra\EventListener;
 
 use ApiPlatform\Core\Api\UrlGeneratorInterface;
 use ApiPlatform\Core\JsonLd\ContextBuilder;
+use Fig\Link\GenericLinkProvider;
+use Fig\Link\Link;
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
 
 /**
@@ -36,9 +38,15 @@ final class AddLinkHeaderListener
      */
     public function onKernelResponse(FilterResponseEvent $event)
     {
-        $event->getResponse()->headers->set('Link', sprintf(
-            '<%s>; rel="%sapiDocumentation"',
-            $this->urlGenerator->generate('api_doc', ['_format' => 'jsonld'], UrlGeneratorInterface::ABS_URL), ContextBuilder::HYDRA_NS)
-        );
+        $apiDocUrl = $this->urlGenerator->generate('api_doc', ['_format' => 'jsonld'], UrlGeneratorInterface::ABS_URL);
+        $link = new Link(ContextBuilder::HYDRA_NS.'apiDocumentation', $apiDocUrl);
+
+        $attributes = $event->getRequest()->attributes;
+        if (null === $linkProvider = $attributes->get('_links')) {
+            $attributes->set('_links', new GenericLinkProvider([$link]));
+
+            return;
+        }
+        $attributes->set('_links', $linkProvider->withLink($link));
     }
 }

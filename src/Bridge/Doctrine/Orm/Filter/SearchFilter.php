@@ -98,7 +98,7 @@ class SearchFilter extends AbstractContextAwareFilter
             }
 
             if ($metadata->hasField($field)) {
-                $typeOfField = $this->getType($metadata->getTypeOfField($field));
+                $typeOfField = $this->getType((string) $metadata->getTypeOfField($field));
                 $strategy = $this->properties[$property] ?? self::STRATEGY_EXACT;
                 $filterParameterNames = [$property];
 
@@ -112,6 +112,7 @@ class SearchFilter extends AbstractContextAwareFilter
                         'type' => $typeOfField,
                         'required' => false,
                         'strategy' => $strategy,
+                        'is_collection' => '[]' === substr($filterParameterName, -2),
                     ];
                 }
             } elseif ($metadata->hasAssociation($field)) {
@@ -126,6 +127,7 @@ class SearchFilter extends AbstractContextAwareFilter
                         'type' => 'string',
                         'required' => false,
                         'strategy' => self::STRATEGY_EXACT,
+                        'is_collection' => '[]' === substr($filterParameterName, -2),
                     ];
                 }
             }

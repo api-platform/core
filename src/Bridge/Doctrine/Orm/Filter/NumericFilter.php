@@ -61,11 +61,16 @@ class NumericFilter extends AbstractContextAwareFilter
                 continue;
             }
 
-            $description[$property] = [
-                'property' => $property,
-                'type' => $this->getType($this->getDoctrineFieldType($property, $resourceClass)),
-                'required' => false,
-            ];
+            $filterParameterNames = [$property, $property.'[]'];
+
+            foreach ($filterParameterNames as $filterParameterName) {
+                $description[$filterParameterName] = [
+                    'property' => $property,
+                    'type' => $this->getType((string) $this->getDoctrineFieldType($property, $resourceClass)),
+                    'required' => false,
+                    'is_collection' => '[]' === substr($filterParameterName, -2),
+                ];
+            }
         }
 
         return $description;
@@ -99,9 +104,19 @@ class NumericFilter extends AbstractContextAwareFilter
             return;
         }
 
-        if (!is_numeric($value)) {
+        if (!is_numeric($value) && (!\is_array($value) || !$this->isNumericArray($value))) {
             $this->logger->notice('Invalid filter ignored', [
                 'exception' => new InvalidArgumentException(sprintf('Invalid numeric value for "%s::%s" property', $resourceClass, $property)),
+            ]);
+
+            return;
+        }
+
+        $values = $this->normalizeValues((array) $value);
+
+        if (empty($values)) {
+            $this->logger->notice('Invalid filter ignored', [
+                'exception' => new InvalidArgumentException(sprintf('At least one value is required, multiple values should be in "%1$s[]=firstvalue&%1$s[]=secondvalue" format', $property)),
             ]);
 
             return;
@@ -114,7 +129,7 @@ class NumericFilter extends AbstractContextAwareFilter
             list($alias, $field) = $this->addJoinsForNestedProperty($property, $alias, $queryBuilder, $queryNameGenerator, $resourceClass);
         }
 
-        if (!isset(self::DOCTRINE_NUMERIC_TYPES[$this->getDoctrineFieldType($property, $resourceClass)])) {
+        if (!isset(self::DOCTRINE_NUMERIC_TYPES[(string) $this->getDoctrineFieldType($property, $resourceClass)])) {
             $this->logger->notice('Invalid filter ignored', [
                 'exception' => new InvalidArgumentException(sprintf('The field "%s" of class "%s" is not a doctrine numeric type.', $field, $resourceClass)),
             ]);
@@ -124,9 +139,15 @@ class NumericFilter extends AbstractContextAwareFilter
 
         $valueParameter = $queryNameGenerator->generateParameterName($field);
 
-        $queryBuilder
-            ->andWhere(sprintf('%s.%s = :%s', $alias, $field, $valueParameter))
-            ->setParameter($valueParameter, $value, $this->getDoctrineFieldType($property, $resourceClass));
+        if (1 === \count($values)) {
+            $queryBuilder
+                ->andWhere(sprintf('%s.%s = :%s', $alias, $field, $valueParameter))
+                ->setParameter($valueParameter, $values[0], (string) $this->getDoctrineFieldType($property, $resourceClass));
+        } else {
+            $queryBuilder
+                ->andWhere(sprintf('%s.%s IN (:%s)', $alias, $field, $valueParameter))
+                ->setParameter($valueParameter, $values);
+        }
     }
 
     /**
@@ -137,6 +158,28 @@ class NumericFilter extends AbstractContextAwareFilter
         $propertyParts = $this->splitPropertyParts($property, $resourceClass);
         $metadata = $this->getNestedMetadata($resourceClass, $propertyParts['associations']);
 
-        return isset(self::DOCTRINE_NUMERIC_TYPES[$metadata->getTypeOfField($propertyParts['field'])]);
+        return isset(self::DOCTRINE_NUMERIC_TYPES[(string) $metadata->getTypeOfField($propertyParts['field'])]);
+    }
+
+    protected function isNumericArray(array $values): bool
+    {
+        foreach ($values as $value) {
+            if (!is_numeric($value)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    protected function normalizeValues(array $values): array
+    {
+        foreach ($values as $key => $value) {
+            if (!\is_int($key)) {
+                unset($values[$key]);
+            }
+        }
+
+        return array_values($values);
     }
 }

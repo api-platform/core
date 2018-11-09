@@ -106,6 +106,8 @@ final class SubresourceOperationFactory implements SubresourceOperationFactoryIn
                 'collection' => $subresource->isCollection(),
                 'resource_class' => $subresourceClass,
                 'shortNames' => [$subresourceMetadata->getShortName()],
+                'input_class' => $subresourceMetadata->getAttribute('input_class', $subresourceClass),
+                'output_class' => $subresourceMetadata->getAttribute('output_class', $subresourceClass),
             ];
 
             if (null === $parentOperation) {
@@ -127,8 +129,14 @@ final class SubresourceOperationFactory implements SubresourceOperationFactoryIn
                     $operation['operation_name']
                 );
 
+                $prefix = trim(trim($rootResourceMetadata->getAttribute('route_prefix', '')), '/');
+                if ('' !== $prefix) {
+                    $prefix .= '/';
+                }
+
                 $operation['path'] = $subresourceOperation['path'] ?? sprintf(
-                    '/%s/{id}/%s%s',
+                    '/%s%s/{id}/%s%s',
+                    $prefix,
                     $this->pathSegmentNameGenerator->getSegmentName($rootShortname, true),
                     $this->pathSegmentNameGenerator->getSegmentName($operation['property'], $operation['collection']),
                     self::FORMAT_SUFFIX
@@ -157,10 +165,10 @@ final class SubresourceOperationFactory implements SubresourceOperationFactoryIn
                 if (isset($subresourceOperation['path'])) {
                     $operation['path'] = $subresourceOperation['path'];
                 } else {
-                    $operation['path'] = str_replace(self::FORMAT_SUFFIX, '', $parentOperation['path']);
+                    $operation['path'] = str_replace(self::FORMAT_SUFFIX, '', (string) $parentOperation['path']);
 
                     if ($parentOperation['collection']) {
-                        list($key) = end($operation['identifiers']);
+                        [$key] = end($operation['identifiers']);
                         $operation['path'] .= sprintf('/{%s}', $key);
                     }
 

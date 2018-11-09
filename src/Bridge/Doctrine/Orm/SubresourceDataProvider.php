@@ -178,6 +178,19 @@ final class SubresourceDataProvider implements SubresourceDataProviderInterface
                     $qb->select($alias)
                         ->from($identifierResourceClass, $alias);
                     break;
+                case ClassMetadataInfo::ONE_TO_ONE:
+                    $association = $classMetadata->getAssociationMapping($previousAssociationProperty);
+                    if (!isset($association['mappedBy'])) {
+                        $qb->select("IDENTITY($alias.$previousAssociationProperty)")
+                            ->from($identifierResourceClass, $alias);
+                        break;
+                    }
+                    $mappedBy = $association['mappedBy'];
+                    $previousAlias = "$previousAlias.$mappedBy";
+
+                    $qb->select($alias)
+                        ->from($identifierResourceClass, $alias);
+                    break;
                 default:
                     $qb->select("IDENTITY($alias.$previousAssociationProperty)")
                         ->from($identifierResourceClass, $alias);
@@ -191,7 +204,7 @@ final class SubresourceDataProvider implements SubresourceDataProviderInterface
         foreach ($normalizedIdentifiers as $key => $value) {
             $placeholder = $queryNameGenerator->generateParameterName($key);
             $qb->andWhere("$alias.$key = :$placeholder");
-            $topQueryBuilder->setParameter($placeholder, $value, $classMetadata->getTypeOfField($key));
+            $topQueryBuilder->setParameter($placeholder, $value, (string) $classMetadata->getTypeOfField($key));
         }
 
         // Recurse queries

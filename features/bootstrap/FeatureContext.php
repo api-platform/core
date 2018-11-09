@@ -35,6 +35,7 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Foo;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\FooDummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\FourthLevel;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Greeting;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\MaxDepthDummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Node;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Person;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\PersonToPet;
@@ -42,6 +43,8 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Pet;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Question;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RamseyUuidDummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RelatedDummy;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RelatedOwnedDummy;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RelatedOwningDummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RelatedToDummyFriend;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RelationEmbedder;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\SecuredDummy;
@@ -1007,6 +1010,38 @@ final class FeatureContext implements Context, SnippetAcceptingContext
     }
 
     /**
+     * @Given there is a RelatedOwnedDummy object with OneToOne relation
+     */
+    public function thereIsARelatedOwnedDummy()
+    {
+        $relatedOwnedDummy = new RelatedOwnedDummy();
+        $this->manager->persist($relatedOwnedDummy);
+
+        $dummy = new Dummy();
+        $dummy->setName('plop');
+        $dummy->setRelatedOwnedDummy($relatedOwnedDummy);
+        $this->manager->persist($dummy);
+
+        $this->manager->flush();
+    }
+
+    /**
+     * @Given there is a RelatedOwningDummy object with OneToOne relation
+     */
+    public function thereIsARelatedOwningDummy()
+    {
+        $dummy = new Dummy();
+        $dummy->setName('plop');
+        $this->manager->persist($dummy);
+
+        $relatedOwningDummy = new RelatedOwningDummy();
+        $relatedOwningDummy->setOwnedDummy($dummy);
+        $this->manager->persist($relatedOwningDummy);
+
+        $this->manager->flush();
+    }
+
+    /**
      * @Given there is a person named :name greeting with a :message message
      */
     public function thereIsAPersonWithAGreeting(string $name, string $message)
@@ -1023,5 +1058,23 @@ final class FeatureContext implements Context, SnippetAcceptingContext
 
         $this->manager->flush();
         $this->manager->clear();
+    }
+
+    /**
+     * @Given there is a max depth dummy with :level level of descendants
+     */
+    public function thereIsAMaxDepthDummyWithLevelOfDescendants(int $level)
+    {
+        $maxDepthDummy = new MaxDepthDummy();
+        $maxDepthDummy->name = "level $level";
+        $this->manager->persist($maxDepthDummy);
+
+        for ($i = 1; $i <= $level; ++$i) {
+            $maxDepthDummy = $maxDepthDummy->child = new MaxDepthDummy();
+            $maxDepthDummy->name = 'level '.($i + 1);
+            $this->manager->persist($maxDepthDummy);
+        }
+
+        $this->manager->flush();
     }
 }

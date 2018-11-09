@@ -14,6 +14,18 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\Bridge\Symfony\Bundle\DataCollector;
 
 use ApiPlatform\Core\Bridge\Symfony\Bundle\DataCollector\RequestDataCollector;
+use ApiPlatform\Core\Bridge\Symfony\Bundle\DataPersister\TraceableChainDataPersister;
+use ApiPlatform\Core\Bridge\Symfony\Bundle\DataProvider\TraceableChainCollectionDataProvider;
+use ApiPlatform\Core\Bridge\Symfony\Bundle\DataProvider\TraceableChainItemDataProvider;
+use ApiPlatform\Core\Bridge\Symfony\Bundle\DataProvider\TraceableChainSubresourceDataProvider;
+use ApiPlatform\Core\DataPersister\ChainDataPersister;
+use ApiPlatform\Core\DataPersister\DataPersisterInterface;
+use ApiPlatform\Core\DataProvider\ChainCollectionDataProvider;
+use ApiPlatform\Core\DataProvider\ChainItemDataProvider;
+use ApiPlatform\Core\DataProvider\ChainSubresourceDataProvider;
+use ApiPlatform\Core\DataProvider\CollectionDataProviderInterface;
+use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
+use ApiPlatform\Core\DataProvider\SubresourceDataProviderInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Tests\Fixtures\DummyEntity;
@@ -69,6 +81,12 @@ class RequestDataCollectorTest extends TestCase
         $this->assertSame(['foo', 'bar'], $dataCollector->getAcceptableContentTypes());
         $this->assertNull($dataCollector->getResourceClass());
         $this->assertNull($dataCollector->getResourceMetadata());
+
+        $expected = ['context' => [], 'responses' => []];
+        $this->assertSame($expected, $dataCollector->getCollectionDataProviders());
+        $this->assertSame($expected, $dataCollector->getItemDataProviders());
+        $this->assertSame($expected, $dataCollector->getSubresourceDataProviders());
+        $this->assertSame(['responses' => []], $dataCollector->getDataPersisters());
     }
 
     public function testNotCallingCollect()
@@ -87,6 +105,12 @@ class RequestDataCollectorTest extends TestCase
         $this->assertSame([], $dataCollector->getCounters());
         $this->assertNull($dataCollector->getResourceClass());
         $this->assertNull($dataCollector->getResourceMetadata());
+
+        $expected = ['context' => [], 'responses' => []];
+        $this->assertSame($expected, $dataCollector->getCollectionDataProviders());
+        $this->assertSame($expected, $dataCollector->getItemDataProviders());
+        $this->assertSame($expected, $dataCollector->getSubresourceDataProviders());
+        $this->assertSame(['responses' => []], $dataCollector->getDataPersisters());
     }
 
     public function testWithResource()
@@ -97,9 +121,14 @@ class RequestDataCollectorTest extends TestCase
         $this->filterLocator->has('foo')->willReturn(false)->shouldBeCalled();
         $this->filterLocator->has('a_filter')->willReturn(true)->shouldBeCalled();
         $this->filterLocator->get('a_filter')->willReturn(new \stdClass())->shouldBeCalled();
+
         $dataCollector = new RequestDataCollector(
             $this->metadataFactory->reveal(),
-            $this->filterLocator->reveal()
+            $this->filterLocator->reveal(),
+            new ChainCollectionDataProvider([]),
+            new ChainItemDataProvider([]),
+            new ChainSubresourceDataProvider([]),
+            new ChainDataPersister([])
         );
 
         $dataCollector->collect(
@@ -107,13 +136,71 @@ class RequestDataCollectorTest extends TestCase
             $this->response
         );
 
-        $this->assertSame(['resource_class' => DummyEntity::class,  'item_operation_name' => 'get', 'receive' => true, 'persist' => true], $dataCollector->getRequestAttributes());
+        $this->assertSame(['resource_class' => DummyEntity::class, 'input_class' => DummyEntity::class, 'output_class' => DummyEntity::class, 'item_operation_name' => 'get', 'receive' => true, 'persist' => true], $dataCollector->getRequestAttributes());
         $this->assertSame(['foo', 'bar'], $dataCollector->getAcceptableContentTypes());
         $this->assertSame(DummyEntity::class, $dataCollector->getResourceClass());
         $this->assertSame(['foo' => null, 'a_filter' => \stdClass::class], $dataCollector->getFilters());
         $this->assertSame(['ignored_filters' => 1], $dataCollector->getCounters());
         $this->assertInstanceOf(Data::class, $dataCollector->getResourceMetadata());
         $this->assertSame(ResourceMetadata::class, $dataCollector->getResourceMetadata()->getType());
+
+        $expected = ['context' => [], 'responses' => []];
+        $this->assertSame($expected, $dataCollector->getCollectionDataProviders());
+        $this->assertSame($expected, $dataCollector->getItemDataProviders());
+        $this->assertSame($expected, $dataCollector->getSubresourceDataProviders());
+        $this->assertSame(['responses' => []], $dataCollector->getDataPersisters());
+    }
+
+    public function testWithResourceWithTraceables()
+    {
+        $this->apiResourceClassWillReturn(DummyEntity::class);
+
+        $dataCollector = new RequestDataCollector(
+            $this->metadataFactory->reveal(),
+            $this->filterLocator->reveal(),
+            $this->getUsedCollectionDataProvider(),
+            $this->getUsedItemDataProvider(),
+            $this->getUsedSubresourceDataProvider(),
+            $this->getUsedPersister()
+        );
+
+        $dataCollector->collect(
+            $this->request->reveal(),
+            $this->response
+        );
+
+        $dataProvider = $dataCollector->getCollectionDataProviders();
+        foreach ($dataProvider['responses'] as $class => $response) {
+            $this->assertStringStartsWith('class@anonymous', $class);
+            $this->assertTrue($response);
+        }
+        $context = $dataProvider['context'];
+        $this->assertInstanceOf(Data::class, $context);
+        $this->assertSame(['collection_context'], $context->getValue(true));
+
+        $dataProvider = $dataCollector->getItemDataProviders();
+        foreach ($dataProvider['responses'] as $class => $response) {
+            $this->assertStringStartsWith('class@anonymous', $class);
+            $this->assertTrue($response);
+        }
+        $context = $dataProvider['context'];
+        $this->assertInstanceOf(Data::class, $context);
+        $this->assertSame(['item_context'], $context->getValue(true));
+
+        $dataProvider = $dataCollector->getSubresourceDataProviders();
+        foreach ($dataProvider['responses'] as $class => $response) {
+            $this->assertStringStartsWith('class@anonymous', $class);
+            $this->assertTrue($response);
+        }
+        $context = $dataProvider['context'];
+        $this->assertInstanceOf(Data::class, $context);
+        $this->assertSame(['subresource_context'], $context->getValue(true));
+
+        $dataPersister = $dataCollector->getDataPersisters();
+        foreach ($dataPersister['responses'] as $class => $response) {
+            $this->assertStringStartsWith('class@anonymous', $class);
+            $this->assertTrue($response);
+        }
     }
 
     private function apiResourceClassWillReturn($data, $context = [])
@@ -136,5 +223,70 @@ class RequestDataCollectorTest extends TestCase
                     new ResourceMetadata(null, null, null, [], [], ['filters' => ['foo', 'a_filter']])
                 );
         }
+    }
+
+    private function getUsedCollectionDataProvider(): TraceableChainCollectionDataProvider
+    {
+        $collectionDataProvider = new TraceableChainCollectionDataProvider(new ChainCollectionDataProvider([
+            new class() implements CollectionDataProviderInterface {
+                public function getCollection(string $resourceClass, string $operationName = null)
+                {
+                }
+            },
+        ]));
+        $collectionDataProvider->getCollection('', '', ['collection_context']);
+
+        return $collectionDataProvider;
+    }
+
+    private function getUsedItemDataProvider(): TraceableChainItemDataProvider
+    {
+        $itemDataProvider = new TraceableChainItemDataProvider(new ChainItemDataProvider([
+            new class() implements ItemDataProviderInterface {
+                public function getItem(string $resourceClass, $id, string $operationName = null, array $context = [])
+                {
+                }
+            },
+        ]));
+        $itemDataProvider->getItem('', '', null, ['item_context']);
+
+        return $itemDataProvider;
+    }
+
+    private function getUsedSubresourceDataProvider(): TraceableChainSubresourceDataProvider
+    {
+        $subresourceDataProvider = new TraceableChainSubresourceDataProvider(new ChainSubresourceDataProvider([
+            new class() implements SubresourceDataProviderInterface {
+                public function getSubresource(string $resourceClass, array $identifiers, array $context, string $operationName = null)
+                {
+                }
+            },
+        ]));
+        $subresourceDataProvider->getSubresource('', [], ['subresource_context']);
+
+        return $subresourceDataProvider;
+    }
+
+    private function getUsedPersister(): TraceableChainDataPersister
+    {
+        $dataPersister = new TraceableChainDataPersister(new ChainDataPersister([
+            new class() implements DataPersisterInterface {
+                public function supports($data): bool
+                {
+                    return true;
+                }
+
+                public function persist($data)
+                {
+                }
+
+                public function remove($data)
+                {
+                }
+            },
+        ]));
+        $dataPersister->persist('');
+
+        return $dataPersister;
     }
 }

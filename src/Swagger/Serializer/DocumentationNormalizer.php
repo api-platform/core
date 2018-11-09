@@ -68,11 +68,13 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
     private $paginationPageParameterName;
     private $clientItemsPerPage;
     private $itemsPerPageParameterName;
+    private $paginationClientEnabled;
+    private $paginationClientEnabledParameterName;
 
     /**
      * @param ContainerInterface|FilterCollection|null $filterLocator The new filter locator or the deprecated filter collection
      */
-    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, ResourceClassResolverInterface $resourceClassResolver, OperationMethodResolverInterface $operationMethodResolver, OperationPathResolverInterface $operationPathResolver, UrlGeneratorInterface $urlGenerator = null, $filterLocator = null, NameConverterInterface $nameConverter = null, $oauthEnabled = false, $oauthType = '', $oauthFlow = '', $oauthTokenUrl = '', $oauthAuthorizationUrl = '', array $oauthScopes = [], array $apiKeys = [], SubresourceOperationFactoryInterface $subresourceOperationFactory = null, $paginationEnabled = true, $paginationPageParameterName = 'page', $clientItemsPerPage = false, $itemsPerPageParameterName = 'itemsPerPage')
+    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, ResourceClassResolverInterface $resourceClassResolver, OperationMethodResolverInterface $operationMethodResolver, OperationPathResolverInterface $operationPathResolver, UrlGeneratorInterface $urlGenerator = null, $filterLocator = null, NameConverterInterface $nameConverter = null, $oauthEnabled = false, $oauthType = '', $oauthFlow = '', $oauthTokenUrl = '', $oauthAuthorizationUrl = '', array $oauthScopes = [], array $apiKeys = [], SubresourceOperationFactoryInterface $subresourceOperationFactory = null, $paginationEnabled = true, $paginationPageParameterName = 'page', $clientItemsPerPage = false, $itemsPerPageParameterName = 'itemsPerPage', $paginationClientEnabled = false, $paginationClientEnabledParameterName = 'pagination')
     {
         if ($urlGenerator) {
             @trigger_error(sprintf('Passing an instance of %s to %s() is deprecated since version 2.1 and will be removed in 3.0.', UrlGeneratorInterface::class, __METHOD__), E_USER_DEPRECATED);
@@ -100,6 +102,8 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
         $this->subresourceOperationFactory = $subresourceOperationFactory;
         $this->clientItemsPerPage = $clientItemsPerPage;
         $this->itemsPerPageParameterName = $itemsPerPageParameterName;
+        $this->paginationClientEnabled = $paginationClientEnabled;
+        $this->paginationClientEnabledParameterName = $paginationClientEnabledParameterName;
     }
 
     /**
@@ -263,10 +267,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
                     ],
                 ],
             ];
-
-            if (!isset($pathOperation['parameters']) && $parameters = $this->getFiltersParameters($resourceClass, $operationName, $resourceMetadata, $definitions, $serializerContext)) {
-                $pathOperation['parameters'] = $parameters;
-            }
+            $pathOperation['parameters'] ?? $pathOperation['parameters'] = $this->getFiltersParameters($resourceClass, $operationName, $resourceMetadata, $definitions, $serializerContext);
 
             if ($this->paginationEnabled && $resourceMetadata->getCollectionOperationAttribute($operationName, 'pagination_enabled', true, true)) {
                 $pathOperation['parameters'][] = $this->getPaginationParameters();
@@ -274,6 +275,9 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
                 if ($resourceMetadata->getCollectionOperationAttribute($operationName, 'pagination_client_items_per_page', $this->clientItemsPerPage, true)) {
                     $pathOperation['parameters'][] = $this->getItemsPerPageParameters();
                 }
+            }
+            if ($this->paginationEnabled && $resourceMetadata->getCollectionOperationAttribute($operationName, 'pagination_client_enabled', $this->paginationClientEnabled, true)) {
+                $pathOperation['parameters'][] = $this->getPaginationClientEnabledParameters();
             }
 
             return $pathOperation;
@@ -445,7 +449,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
     {
         $propertySchema = new \ArrayObject($propertyMetadata->getAttributes()['swagger_context'] ?? []);
 
-        if (false === $propertyMetadata->isWritable()) {
+        if (false === $propertyMetadata->isWritable() && !$propertyMetadata->isInitializable()) {
             $propertySchema['readOnly'] = true;
         }
 
@@ -608,7 +612,11 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
                     'in' => 'query',
                     'required' => $data['required'],
                 ];
-                $parameter += $this->getType($data['type'], false, null, null, $definitions, $serializerContext);
+                $parameter += $this->getType($data['type'], $data['is_collection'] ?? false, null, null, $definitions, $serializerContext);
+
+                if ('array' === $parameter['type']) {
+                    $parameter['collectionFormat'] = \in_array($data['type'], [Type::BUILTIN_TYPE_ARRAY, Type::BUILTIN_TYPE_OBJECT], true) ? 'csv' : 'multi';
+                }
 
                 if (isset($data['swagger'])) {
                     $parameter = $data['swagger'] + $parameter;
@@ -632,6 +640,20 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
             'required' => false,
             'type' => 'integer',
             'description' => 'The collection page number',
+        ];
+    }
+
+    /**
+     * Returns enable pagination parameter for the "get" collection operation.
+     */
+    private function getPaginationClientEnabledParameters(): array
+    {
+        return [
+            'name' => $this->paginationClientEnabledParameterName,
+            'in' => 'query',
+            'required' => false,
+            'type' => 'boolean',
+            'description' => 'Enable or disable pagination',
         ];
     }
 

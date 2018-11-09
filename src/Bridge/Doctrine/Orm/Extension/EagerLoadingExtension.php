@@ -167,8 +167,6 @@ final class EagerLoadingExtension implements ContextAwareQueryCollectionExtensio
                 if ($inAttributes = isset($normalizationContext[AbstractNormalizer::ATTRIBUTES][$association])) {
                     // prepare the child context
                     $normalizationContext[AbstractNormalizer::ATTRIBUTES] = $normalizationContext[AbstractNormalizer::ATTRIBUTES][$association];
-                } else {
-                    unset($normalizationContext[AbstractNormalizer::ATTRIBUTES]);
                 }
             } else {
                 $inAttributes = null;

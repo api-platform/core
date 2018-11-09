@@ -1,5 +1,36 @@
 # Changelog
 
+## 2.3.3
+
+* Doctrine: revert "prevent data duplication in Eager loaded relations"
+
+## 2.3.2
+
+* Open API/Swagger: detect correctly collection parameters
+* Open API/Swagger: fix serialization of nested objects when exporting as YAML
+* GraphQL: fix support of properties also mapped as subresources
+* GraphQL: fix retrieving the internal `_id` when `id` is not part of the requested fields
+* GraphQL: only exposes the mutations if any
+* Doctrine: prevent data duplication in Eager loaded relations
+* Preserve the host in the internal router
+
+## 2.3.1
+
+* Data persisters: call only the 1st matching data persister, this fix may break existing code, see https://github.com/api-platform/docs/issues/540#issuecomment-405945358
+* Subresources: fix inverse side population
+* Subresources: add subresources collections to cache tags
+* Subresources: fix Doctrine identifier parameter type detection
+* Subresources: fix max depth handling
+* GraphQL: send a 200 HTTP status code when a GraphQL response contain some errors
+* GraphQL: fix filters to allow dealing with multiple values
+* GraphQL: remove invalid and useless parameters from the GraphQL schema
+* GraphQL: use the collection resolver in mutations
+* JSON API: remove duplicate data from includes
+* Filters: fix composite keys support
+* Filters: fix the `OrderFilter` when applied on nested entities
+* List Doctrine Inflector as a hard dependency
+* Various quality and usability improvements
+
 ## 2.3.0
 
 * Add support for deprecating resources, operations and fields in GraphQL, Hydra and Swagger
