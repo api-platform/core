@@ -16,7 +16,6 @@ namespace ApiPlatform\Core\Tests\Bridge\Doctrine\MongoDbOdm\Filter;
 use ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Filter\ExistsFilter;
 use ApiPlatform\Core\Test\DoctrineMongoDbOdmFilterTestCase;
 use ApiPlatform\Core\Tests\Bridge\Doctrine\Common\Filter\ExistsFilterTestTrait;
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 
 /**
  * @author Alan Poulain <contact@alanpoulain.eu>
@@ -112,373 +111,224 @@ class ExistsFilterTest extends DoctrineMongoDbOdmFilterTestCase
 
     public function provideApplyTestData(): array
     {
-        return [
-            'valid values' => [
-                [
-                    'description' => null,
-                ],
-                [
-                    'description' => [
-                        'exists' => 'true',
-                    ],
-                ],
-                [
+        return array_merge_recursive(
+            $this->provideApplyTestArguments(),
+            [
+                'valid values' => [
                     [
-                        '$match' => [
-                            'description' => [
-                                '$ne' => null,
+                        [
+                            '$match' => [
+                                'description' => [
+                                    '$ne' => null,
+                                ],
                             ],
                         ],
                     ],
                 ],
-            ],
 
-            'valid values (empty for true)' => [
-                [
-                    'description' => null,
-                ],
-                [
-                    'description' => [
-                        'exists' => '',
-                    ],
-                ],
-                [
+                'valid values (empty for true)' => [
                     [
-                        '$match' => [
-                            'description' => [
-                                '$ne' => null,
+                        [
+                            '$match' => [
+                                'description' => [
+                                    '$ne' => null,
+                                ],
                             ],
                         ],
                     ],
                 ],
-            ],
 
-            'valid values (1 for true)' => [
-                [
-                    'description' => null,
-                ],
-                [
-                    'description' => [
-                        'exists' => '1',
-                    ],
-                ],
-                [
+                'valid values (1 for true)' => [
                     [
-                        '$match' => [
-                            'description' => [
-                                '$ne' => null,
+                        [
+                            '$match' => [
+                                'description' => [
+                                    '$ne' => null,
+                                ],
                             ],
                         ],
                     ],
                 ],
-            ],
 
-            'invalid values' => [
-                [
-                    'description' => null,
+                'invalid values' => [
+                    [],
                 ],
-                [
-                    'description' => [
-                        'exists' => 'invalid',
-                    ],
-                ],
-                [],
-            ],
 
-            'negative values' => [
-                [
-                    'description' => null,
-                ],
-                [
-                    'description' => [
-                        'exists' => 'false',
-                    ],
-                ],
-                [
+                'negative values' => [
                     [
-                        '$match' => [
-                            'description' => null,
-                        ],
-                    ],
-                ],
-            ],
-
-            'negative values (0)' => [
-                [
-                    'description' => null,
-                ],
-                [
-                    'description' => [
-                        'exists' => '0',
-                    ],
-                ],
-                [
-                    [
-                        '$match' => [
-                            'description' => null,
-                        ],
-                    ],
-                ],
-            ],
-
-            'related values' => [
-                [
-                    'description' => null,
-                    'relatedDummy.name' => null,
-                ],
-                [
-                    'description' => [
-                        'exists' => '1',
-                    ],
-                    'relatedDummy.name' => [
-                        'exists' => '1',
-                    ],
-                ],
-                [
-                    [
-                        '$match' => [
-                            'description' => [
-                                '$ne' => null,
-                            ],
-                        ],
-                    ],
-                    [
-                        '$lookup' => [
-                            'from' => 'RelatedDummy',
-                            'localField' => 'relatedDummy',
-                            'foreignField' => '_id',
-                            'as' => 'relatedDummy_lkup',
-                        ],
-                    ],
-                    [
-                        '$match' => [
-                            'relatedDummy_lkup.name' => [
-                                '$ne' => null,
+                        [
+                            '$match' => [
+                                'description' => null,
                             ],
                         ],
                     ],
                 ],
-            ],
 
-            'not nullable values' => [
-                [
-                    'description' => null,
-                    'name' => null,
-                ],
-                [
-                    'description' => [
-                        'exists' => '1',
-                    ],
-                    'name' => [
-                        'exists' => '0',
-                    ],
-                ],
-                [
+                'negative values (0)' => [
                     [
-                        '$match' => [
-                            'description' => [
-                                '$ne' => null,
+                        [
+                            '$match' => [
+                                'description' => null,
                             ],
                         ],
                     ],
                 ],
-            ],
 
-            'related collection not empty' => [
-                [
-                    'description' => null,
-                    'relatedDummies' => null,
-                ],
-                [
-                    'description' => [
-                        'exists' => '1',
-                    ],
-                    'relatedDummies' => [
-                        'exists' => '1',
-                    ],
-                ],
-                [
+                'related values' => [
                     [
-                        '$match' => [
-                            'description' => [
-                                '$ne' => null,
+                        [
+                            '$match' => [
+                                'description' => [
+                                    '$ne' => null,
+                                ],
                             ],
                         ],
-                    ],
-                    [
-                        '$match' => [
-                            'relatedDummies' => [
-                                '$ne' => null,
+                        [
+                            '$lookup' => [
+                                'from' => 'RelatedDummy',
+                                'localField' => 'relatedDummy',
+                                'foreignField' => '_id',
+                                'as' => 'relatedDummy_lkup',
+                            ],
+                        ],
+                        [
+                            '$match' => [
+                                'relatedDummy_lkup.name' => [
+                                    '$ne' => null,
+                                ],
                             ],
                         ],
                     ],
                 ],
-            ],
 
-            'related collection empty' => [
-                [
-                    'description' => null,
-                    'relatedDummies' => null,
-                ],
-                [
-                    'description' => [
-                        'exists' => '1',
-                    ],
-                    'relatedDummies' => [
-                        'exists' => '0',
-                    ],
-                ],
-                [
+                'not nullable values' => [
                     [
-                        '$match' => [
-                            'description' => [
-                                '$ne' => null,
-                            ],
-                        ],
-                    ],
-                    [
-                        '$match' => [
-                            'relatedDummies' => null,
-                        ],
-                    ],
-                ],
-            ],
-
-            'related association exists' => [
-                [
-                    'description' => null,
-                    'relatedDummy' => null,
-                ],
-                [
-                    'description' => [
-                        'exists' => '1',
-                    ],
-                    'relatedDummy' => [
-                        'exists' => '1',
-                    ],
-                ],
-                [
-                    [
-                        '$match' => [
-                            'description' => [
-                                '$ne' => null,
-                            ],
-                        ],
-                    ],
-                    [
-                        '$match' => [
-                            'relatedDummy' => [
-                                '$ne' => null,
+                        [
+                            '$match' => [
+                                'description' => [
+                                    '$ne' => null,
+                                ],
                             ],
                         ],
                     ],
                 ],
-            ],
 
-            'related association does not exist' => [
-                [
-                    'description' => null,
-                    'relatedDummy' => null,
-                ],
-                [
-                    'description' => [
-                        'exists' => '1',
-                    ],
-                    'relatedDummy' => [
-                        'exists' => '0',
-                    ],
-                ],
-                [
+                'related collection not empty' => [
                     [
-                        '$match' => [
-                            'description' => [
-                                '$ne' => null,
+                        [
+                            '$match' => [
+                                'description' => [
+                                    '$ne' => null,
+                                ],
                             ],
                         ],
-                    ],
-                    [
-                        '$match' => [
-                            'relatedDummy' => null,
-                        ],
-                    ],
-                ],
-            ],
-
-            'related owned association does not exist' => [
-                [
-                    'relatedOwnedDummy' => null,
-                ],
-                [
-                    'relatedOwnedDummy' => [
-                        'exists' => '0',
-                    ],
-                ],
-                [
-                    [
-                        '$match' => [
-                            'relatedOwnedDummy' => null,
-                        ],
-                    ],
-                ],
-            ],
-
-            'related owned association exists' => [
-                [
-                    'relatedOwnedDummy' => null,
-                ],
-                [
-                    'relatedOwnedDummy' => [
-                        'exists' => '1',
-                    ],
-                ],
-                [
-                    [
-                        '$match' => [
-                            'relatedOwnedDummy' => [
-                                '$ne' => null,
+                        [
+                            '$match' => [
+                                'relatedDummies' => [
+                                    '$ne' => null,
+                                ],
                             ],
                         ],
                     ],
                 ],
-            ],
 
-            'related owning association does not exist' => [
-                [
-                    'relatedOwningDummy' => null,
-                ],
-                [
-                    'relatedOwningDummy' => [
-                        'exists' => '0',
-                    ],
-                ],
-                [
+                'related collection empty' => [
                     [
-                        '$match' => [
-                            'relatedOwningDummy' => null,
+                        [
+                            '$match' => [
+                                'description' => [
+                                    '$ne' => null,
+                                ],
+                            ],
                         ],
-                    ],
-                ],
-            ],
-
-            'related owning association exists' => [
-                [
-                    'relatedOwningDummy' => null,
-                ],
-                [
-                    'relatedOwningDummy' => [
-                        'exists' => '1',
-                    ],
-                ],
-                [
-                    [
-                        '$match' => [
-                            'relatedOwningDummy' => [
-                                '$ne' => null,
+                        [
+                            '$match' => [
+                                'relatedDummies' => null,
                             ],
                         ],
                     ],
                 ],
-            ],
-        ];
+
+                'related association exists' => [
+                    [
+                        [
+                            '$match' => [
+                                'description' => [
+                                    '$ne' => null,
+                                ],
+                            ],
+                        ],
+                        [
+                            '$match' => [
+                                'relatedDummy' => [
+                                    '$ne' => null,
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+
+                'related association does not exist' => [
+                    [
+                        [
+                            '$match' => [
+                                'description' => [
+                                    '$ne' => null,
+                                ],
+                            ],
+                        ],
+                        [
+                            '$match' => [
+                                'relatedDummy' => null,
+                            ],
+                        ],
+                    ],
+                ],
+
+                'related owned association does not exist' => [
+                    [
+                        [
+                            '$match' => [
+                                'relatedOwnedDummy' => null,
+                            ],
+                        ],
+                    ],
+                ],
+
+                'related owned association exists' => [
+                    [
+                        [
+                            '$match' => [
+                                'relatedOwnedDummy' => [
+                                    '$ne' => null,
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+
+                'related owning association does not exist' => [
+                    [
+                        [
+                            '$match' => [
+                                'relatedOwningDummy' => null,
+                            ],
+                        ],
+                    ],
+                ],
+
+                'related owning association exists' => [
+                    [
+                        [
+                            '$match' => [
+                                'relatedOwningDummy' => [
+                                    '$ne' => null,
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ]
+        );
     }
 }

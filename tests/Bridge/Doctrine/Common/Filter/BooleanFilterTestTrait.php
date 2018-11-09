@@ -48,4 +48,123 @@ trait BooleanFilterTestTrait
             ],
         ], $filter->getDescription($this->resourceClass));
     }
+
+    private function provideApplyTestArguments(): array
+    {
+        return [
+            'string ("true")' => [
+                [
+                    'id' => null,
+                    'name' => null,
+                    'dummyBoolean' => null,
+                ],
+                [
+                    'dummyBoolean' => 'true',
+                ],
+            ],
+            'string ("false")' => [
+                [
+                    'id' => null,
+                    'name' => null,
+                    'dummyBoolean' => null,
+                ],
+                [
+                    'dummyBoolean' => 'false',
+                ],
+            ],
+            'non-boolean' => [
+                [
+                    'id' => null,
+                    'name' => null,
+                    'dummyBoolean' => null,
+                ],
+                [
+                    'dummyBoolean' => 'toto',
+                ],
+            ],
+            'numeric string ("0")' => [
+                [
+                    'id' => null,
+                    'name' => null,
+                    'dummyBoolean' => null,
+                ],
+                [
+                    'dummyBoolean' => '0',
+                ],
+            ],
+            'numeric string ("1")' => [
+                [
+                    'id' => null,
+                    'name' => null,
+                    'dummyBoolean' => null,
+                ],
+                [
+                    'dummyBoolean' => '1',
+                ],
+            ],
+            'nested properties' => [
+                [
+                    'id' => null,
+                    'name' => null,
+                    'relatedDummy.dummyBoolean' => null,
+                ],
+                [
+                    'relatedDummy.dummyBoolean' => '1',
+                ],
+            ],
+            'numeric string ("1") on non-boolean property' => [
+                [
+                    'id' => null,
+                    'name' => null,
+                    'dummyBoolean' => null,
+                ],
+                [
+                    'name' => '1',
+                ],
+            ],
+            'numeric string ("0") on non-boolean property' => [
+                [
+                    'id' => null,
+                    'name' => null,
+                    'dummyBoolean' => null,
+                ],
+                [
+                    'name' => '0',
+                ],
+            ],
+            'string ("true") on non-boolean property' => [
+                [
+                    'id' => null,
+                    'name' => null,
+                    'dummyBoolean' => null,
+                ],
+                [
+                    'name' => 'true',
+                ],
+            ],
+            'string ("false") on non-boolean property' => [
+                [
+                    'id' => null,
+                    'name' => null,
+                    'dummyBoolean' => null,
+                ],
+                [
+                    'name' => 'false',
+                ],
+            ],
+            'mixed boolean, non-boolean and invalid property' => [
+                [
+                    'id' => null,
+                    'name' => null,
+                    'dummyBoolean' => null,
+                ],
+                [
+                    'dummyBoolean' => 'false',
+                    'toto' => 'toto',
+                    'name' => 'true',
+                    'id' => '0',
+                ],
+            ],
+        ];
+    }
 }

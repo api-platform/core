@@ -15,6 +15,7 @@ namespace ApiPlatform\Core\Tests\Bridge\Doctrine\Orm\Filter;
 
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\NumericFilter;
 use ApiPlatform\Core\Test\DoctrineOrmFilterTestCase;
+use ApiPlatform\Core\Tests\Bridge\Doctrine\Common\Filter\NumericFilterTestTrait;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 
 /**
@@ -22,36 +23,13 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
  */
 class NumericFilterTest extends DoctrineOrmFilterTestCase
 {
+    use NumericFilterTestTrait;
+
     protected $filterClass = NumericFilter::class;
-
-    public function testGetDescription()
-    {
-        $filter = new NumericFilter($this->managerRegistry, null, null, [
-            'id' => null,
-            'name' => null,
-            'foo' => null,
-            'dummyBoolean' => null,
-        ]);
-
-        $this->assertEquals([
-            'id' => [
-                'property' => 'id',
-                'type' => 'int',
-                'required' => false,
-                'is_collection' => false,
-            ],
-            'id[]' => [
-                'property' => 'id',
-                'type' => 'int',
-                'required' => false,
-                'is_collection' => true,
-            ],
-        ], $filter->getDescription($this->resourceClass));
-    }
 
     public function testGetDescriptionDefaultFields()
     {
-        $filter = new NumericFilter($this->managerRegistry);
+        $filter = $this->buildFilter();
 
         $this->assertEquals([
             'id' => [
@@ -95,129 +73,43 @@ class NumericFilterTest extends DoctrineOrmFilterTestCase
 
     public function provideApplyTestData(): array
     {
-        return [
-            'numeric string (positive integer)' => [
-                [
-                    'id' => null,
-                    'name' => null,
-                    'dummyPrice' => null,
+        return array_merge_recursive(
+            $this->provideApplyTestArguments(),
+            [
+                'numeric string (positive integer)' => [
+                    sprintf('SELECT o FROM %s o WHERE o.dummyPrice = :dummyPrice_p1', Dummy::class),
                 ],
-                [
-                    'dummyPrice' => '21',
+                'multiple numeric string (positive integer)' => [
+                    sprintf('SELECT o FROM %s o WHERE o.dummyPrice IN (:dummyPrice_p1)', Dummy::class),
                 ],
-                sprintf('SELECT o FROM %s o WHERE o.dummyPrice = :dummyPrice_p1', Dummy::class),
-            ],
-            'multiple numeric string (positive integer)' => [
-                [
-                    'id' => null,
-                    'name' => null,
-                    'dummyPrice' => null,
+                'multiple numeric string with one invalid property key' => [
+                    sprintf('SELECT o FROM %s o WHERE o.dummyPrice = :dummyPrice_p1', Dummy::class),
                 ],
-                [
-                    'dummyPrice' => ['21', '22'],
+                'multiple numeric string with invalid value keys' => [
+                    sprintf('SELECT o FROM %s o', Dummy::class),
                 ],
-                sprintf('SELECT o FROM %s o WHERE o.dummyPrice IN (:dummyPrice_p1)', Dummy::class),
-            ],
-            'multiple numeric string with one invalid property key' => [
-                [
-                    'id' => null,
-                    'name' => null,
-                    'dummyPrice' => null,
+                'multiple non-numeric' => [
+                    sprintf('SELECT o FROM %s o', Dummy::class),
                 ],
-                [
-                    'dummyPrice' => ['invalid' => '21', '22'],
+                'numeric string (negative integer)' => [
+                    sprintf('SELECT o FROM %s o WHERE o.dummyPrice = :dummyPrice_p1', Dummy::class),
                 ],
-                sprintf('SELECT o FROM %s o WHERE o.dummyPrice = :dummyPrice_p1', Dummy::class),
-            ],
-            'multiple numeric string with invalid value keys' => [
-                [
-                    'id' => null,
-                    'name' => null,
-                    'dummyPrice' => null,
+                'non-numeric' => [
+                    sprintf('SELECT o FROM %s o', Dummy::class),
                 ],
-                [
-                    'dummyPrice' => ['invalid' => '21', 'invalid2' => '22'],
+                'numeric string ("0")' => [
+                    sprintf('SELECT o FROM %s o WHERE o.dummyPrice = :dummyPrice_p1', Dummy::class),
                 ],
-                sprintf('SELECT o FROM %s o', Dummy::class),
-            ],
-            'multiple non-numeric' => [
-                [
-                    'id' => null,
-                    'name' => null,
-                    'dummyPrice' => null,
+                'nested property' => [
+                    sprintf('SELECT o FROM %s o INNER JOIN o.relatedDummy relatedDummy_a1 WHERE relatedDummy_a1.id = :id_p1', Dummy::class),
                 ],
-                [
-                    'dummyPrice' => ['test', 'invalid'],
+                'mixed numeric and non-numeric' => [
+                    sprintf('SELECT o FROM %s o WHERE o.dummyPrice = :dummyPrice_p1', Dummy::class),
                 ],
-                sprintf('SELECT o FROM %s o', Dummy::class),
-            ],
-            'numeric string (negative integer)' => [
-                [
-                    'id' => null,
-                    'name' => null,
-                    'dummyPrice' => null,
+                'mixed numeric, non-numeric and invalid property' => [
+                    sprintf('SELECT o FROM %s o WHERE o.dummyPrice = :dummyPrice_p1', Dummy::class),
                 ],
-                [
-                    'dummyPrice' => '-21',
-                ],
-                sprintf('SELECT o FROM %s o WHERE o.dummyPrice = :dummyPrice_p1', Dummy::class),
-            ],
-            'non-numeric' => [
-                [
-                    'id' => null,
-                ],
-                [
-                    'id' => 'toto',
-                ],
-                sprintf('SELECT o FROM %s o', Dummy::class),
-            ],
-            'numeric string ("0")' => [
-                [
-                    'id' => null,
-                    'name' => null,
-                    'dummyPrice' => null,
-                ],
-                [
-                    'dummyPrice' => 0,
-                ],
-                sprintf('SELECT o FROM %s o WHERE o.dummyPrice = :dummyPrice_p1', Dummy::class),
-            ],
-            'nested property' => [
-                [
-                    'id' => null,
-                    'name' => null,
-                    'relatedDummy.id' => null,
-                ],
-                [
-                    'relatedDummy.id' => 0,
-                ],
-                sprintf('SELECT o FROM %s o INNER JOIN o.relatedDummy relatedDummy_a1 WHERE relatedDummy_a1.id = :id_p1', Dummy::class),
-            ],
-            'mixed numeric and non-numeric' => [
-                [
-                    'id' => null,
-                    'name' => null,
-                    'dummyPrice' => null,
-                ],
-                [
-                    'dummyPrice' => 10,
-                    'name' => '15toto',
-                ],
-                sprintf('SELECT o FROM %s o WHERE o.dummyPrice = :dummyPrice_p1', Dummy::class),
-            ],
-            'mixed numeric, non-numeric and invalid property' => [
-                [
-                    'id' => null,
-                    'name' => null,
-                    'dummyPrice' => null,
-                ],
-                [
-                    'toto' => 'toto',
-                    'name' => 'gerard',
-                    'dummyPrice' => '0',
-                ],
-                sprintf('SELECT o FROM %s o WHERE o.dummyPrice = :dummyPrice_p1', Dummy::class),
-            ],
-        ];
+            ]
+        );
     }
 }
