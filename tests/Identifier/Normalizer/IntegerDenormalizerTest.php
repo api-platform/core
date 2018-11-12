@@ -31,6 +31,8 @@ class IntegerDenormalizerTest extends TestCase
         $normalizer = new IntegerDenormalizer();
         $this->assertTrue($normalizer->supportsDenormalization('1', 'int'));
         $this->assertFalse($normalizer->supportsDenormalization([], 'int'));
+        $this->assertFalse($normalizer->supportsDenormalization('kdunglas', 'int'));
+        $this->assertFalse($normalizer->supportsDenormalization('7.2', 'int'));
         $this->assertFalse($normalizer->supportsDenormalization('1', 'foo'));
         $this->assertTrue($normalizer->hasCacheableSupportsMethod());
     }

@@ -29,7 +29,7 @@ final class IntegerDenormalizer implements DenormalizerInterface, CacheableSuppo
      */
     public function supportsDenormalization($data, $type, $format = null): bool
     {
-        return Type::BUILTIN_TYPE_INT === $type && \is_string($data);
+        return Type::BUILTIN_TYPE_INT === $type && \ctype_digit($data);
     }
 
     /**
