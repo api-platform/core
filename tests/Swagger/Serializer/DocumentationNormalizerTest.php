@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Tests\Swagger\Serializer;
 
-use ApiPlatform\Core\Api\ExtendedFormatsProviderInterface;
 use ApiPlatform\Core\Api\FilterCollection;
+use ApiPlatform\Core\Api\OperationAwareFormatsProviderInterface;
 use ApiPlatform\Core\Api\OperationMethodResolverInterface;
 use ApiPlatform\Core\Api\OperationType;
 use ApiPlatform\Core\Api\ResourceClassResolverInterface;
@@ -1809,7 +1809,7 @@ class DocumentationNormalizerTest extends TestCase
         $propertyNameCollectionFactory = $propertyNameCollectionFactoryProphecy->reveal();
         $propertyMetadataFactory = $propertyMetadataFactoryProphecy->reveal();
 
-        $formatProviderProphecy = $this->prophesize(ExtendedFormatsProviderInterface::class);
+        $formatProviderProphecy = $this->prophesize(OperationAwareFormatsProviderInterface::class);
         $formatProviderProphecy->getFormatsFromOperation(Question::class, 'get', OperationType::ITEM)->willReturn(['json' => ['application/json'], 'csv' => ['text/csv']]);
         $formatProviderProphecy->getFormatsFromOperation(Answer::class, 'get', OperationType::SUBRESOURCE)->willReturn(['xml' => ['text/xml']]);
 
@@ -2029,7 +2029,7 @@ class DocumentationNormalizerTest extends TestCase
 
         $operationPathResolver = new OperationPathResolver(new UnderscorePathSegmentNameGenerator());
 
-        $formatProviderProphecy = $this->prophesize(ExtendedFormatsProviderInterface::class);
+        $formatProviderProphecy = $this->prophesize(OperationAwareFormatsProviderInterface::class);
         $formatProviderProphecy->getFormatsFromOperation(Dummy::class, 'get', OperationType::COLLECTION)->willReturn(['xml' => ['application/xml', 'text/xml']]);
         $formatProviderProphecy->getFormatsFromOperation(Dummy::class, 'post', OperationType::COLLECTION)->willReturn(['xml' => ['text/xml'], 'csv' => ['text/csv']]);
         $formatProviderProphecy->getFormatsFromOperation(Dummy::class, 'get', OperationType::ITEM)->willReturn(['jsonapi' => ['application/vnd.api+json']]);

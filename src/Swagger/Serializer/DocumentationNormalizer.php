@@ -13,9 +13,9 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Swagger\Serializer;
 
-use ApiPlatform\Core\Api\ExtendedFormatsProviderInterface;
 use ApiPlatform\Core\Api\FilterCollection;
 use ApiPlatform\Core\Api\FilterLocatorTrait;
+use ApiPlatform\Core\Api\OperationAwareFormatsProviderInterface;
 use ApiPlatform\Core\Api\OperationMethodResolverInterface;
 use ApiPlatform\Core\Api\OperationType;
 use ApiPlatform\Core\Api\ResourceClassResolverInterface;
@@ -74,7 +74,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
     /**
      * @param ContainerInterface|FilterCollection|null $filterLocator The new filter locator or the deprecated filter collection
      */
-    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, ResourceClassResolverInterface $resourceClassResolver, OperationMethodResolverInterface $operationMethodResolver, OperationPathResolverInterface $operationPathResolver, UrlGeneratorInterface $urlGenerator = null, $filterLocator = null, NameConverterInterface $nameConverter = null, $oauthEnabled = false, $oauthType = '', $oauthFlow = '', $oauthTokenUrl = '', $oauthAuthorizationUrl = '', array $oauthScopes = [], array $apiKeys = [], SubresourceOperationFactoryInterface $subresourceOperationFactory = null, $paginationEnabled = true, $paginationPageParameterName = 'page', $clientItemsPerPage = false, $itemsPerPageParameterName = 'itemsPerPage', ExtendedFormatsProviderInterface $formatsProvider = null)
+    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, ResourceClassResolverInterface $resourceClassResolver, OperationMethodResolverInterface $operationMethodResolver, OperationPathResolverInterface $operationPathResolver, UrlGeneratorInterface $urlGenerator = null, $filterLocator = null, NameConverterInterface $nameConverter = null, $oauthEnabled = false, $oauthType = '', $oauthFlow = '', $oauthTokenUrl = '', $oauthAuthorizationUrl = '', array $oauthScopes = [], array $apiKeys = [], SubresourceOperationFactoryInterface $subresourceOperationFactory = null, $paginationEnabled = true, $paginationPageParameterName = 'page', $clientItemsPerPage = false, $itemsPerPageParameterName = 'itemsPerPage', OperationAwareFormatsProviderInterface $formatsProvider = null)
     {
         if ($urlGenerator) {
             @trigger_error(sprintf('Passing an instance of %s to %s() is deprecated since version 2.1 and will be removed in 3.0.', UrlGeneratorInterface::class, __METHOD__), E_USER_DEPRECATED);

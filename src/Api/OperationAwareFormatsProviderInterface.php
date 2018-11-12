@@ -18,7 +18,7 @@ namespace ApiPlatform\Core\Api;
  *
  * @author Anthony GRASSIOT <antograssiot@free.fr>
  */
-interface ExtendedFormatsProviderInterface
+interface OperationAwareFormatsProviderInterface extends FormatsProviderInterface
 {
     /**
      * Finds formats for an operation.

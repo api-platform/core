@@ -21,7 +21,7 @@ use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
  *
  * @author Anthony GRASSIOT <antograssiot@free.fr>
  */
-final class FormatsProvider implements FormatsProviderInterface, ExtendedFormatsProviderInterface
+final class FormatsProvider implements FormatsProviderInterface, OperationAwareFormatsProviderInterface
 {
     private $configuredFormats;
     private $resourceMetadataFactory;
