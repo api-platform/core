@@ -147,6 +147,10 @@ class ConfigurationTest extends TestCase
                 'enable_mongodb_odm' => false,
                 'enable_orm' => true,
             ],
+            'mercure' => [
+                'enabled' => true,
+                'hub_url' => null,
+            ],
             'allow_plain_identifiers' => false,
             'resource_class_directories' => [],
         ], $config);

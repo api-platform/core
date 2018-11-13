@@ -23,6 +23,7 @@ use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Mercure\Update;
 use Symfony\Component\Serializer\Exception\ExceptionInterface;
 
 /**
@@ -222,6 +223,13 @@ final class Configuration implements ConfigurationInterface
                                 ->end()
                             ->end()
                         ->end()
+                    ->end()
+                ->end()
+
+                ->arrayNode('mercure')
+                    ->{class_exists(Update::class) ? 'canBeDisabled' : 'canBeEnabled'}()
+                    ->children()
+                        ->scalarNode('hub_url')->defaultNull()->info('The URL send in the Link HTTP header. If not set, will default to the URL for the Symfony\'s bundle default hub.')
                     ->end()
                 ->end()
 

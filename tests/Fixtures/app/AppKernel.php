@@ -21,6 +21,7 @@ use FOS\UserBundle\FOSUserBundle;
 use Nelmio\ApiDocBundle\NelmioApiDocBundle;
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
 use Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait;
+use Symfony\Bundle\MercureBundle\MercureBundle;
 use Symfony\Bundle\SecurityBundle\SecurityBundle;
 use Symfony\Bundle\TwigBundle\TwigBundle;
 use Symfony\Component\Config\Loader\LoaderInterface;
@@ -52,6 +53,7 @@ class AppKernel extends Kernel
             new FrameworkBundle(),
             new TwigBundle(),
             new DoctrineBundle(),
+            new MercureBundle(),
             new ApiPlatformBundle(),
             new SecurityBundle(),
             new FOSUserBundle(),
