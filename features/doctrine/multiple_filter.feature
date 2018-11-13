@@ -1,4 +1,3 @@
-@filter
 Feature: Multiple filters on collections
   In order to retrieve large collections of filtered resources
   As a client software developer

@@ -1,4 +1,3 @@
-@filter
 Feature: Range filter on collections
   In order to filter results from large collections of resources
   As a client software developer

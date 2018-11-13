@@ -57,7 +57,7 @@ script:
   - if [[ $APP_ENV = 'postgres' ]]; then
       vendor/bin/behat --suite=postgres --format=progress;
     elif [[ $APP_ENV = 'mongodb' ]]; then
-      vendor/bin/behat --suite=mongodb --tags '~@filter&&~@orm-only' --format=progress;
+      vendor/bin/behat --suite=mongodb --format=progress;
     else
       vendor/bin/behat --suite=default --format=progress;
     fi
