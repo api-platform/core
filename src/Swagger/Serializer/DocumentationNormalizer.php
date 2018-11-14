@@ -97,7 +97,6 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
         $this->paginationEnabled = $paginationEnabled;
         $this->paginationPageParameterName = $paginationPageParameterName;
         $this->apiKeys = $apiKeys;
-        $this->subresourceOperationFactory = $subresourceOperationFactory;
         $this->clientItemsPerPage = $clientItemsPerPage;
         $this->itemsPerPageParameterName = $itemsPerPageParameterName;
     }
