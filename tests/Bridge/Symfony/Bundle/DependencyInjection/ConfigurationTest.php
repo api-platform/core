@@ -180,7 +180,6 @@ class ConfigurationTest extends TestCase
             'http_cache' => [
                 'invalidation' => [
                     'enabled' => false,
-                    'resources' => [],
                     'varnish_urls' => [],
                     'request_options' => [],
                 ],
