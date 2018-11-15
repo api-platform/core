@@ -15,6 +15,9 @@ final class ApiPlatformEvents
     const PRE_SERIALIZE = 'api_platform.pre_serialize';
     const POST_SERIALIZE = 'api_platform.post_serialize';
 
+    const PRE_DESERIALIZE = 'api_platform.pre_deserialize';
+    const POST_DESERIALIZE = 'api_platform.post_deserialize';
+
     const PRE_RESPOND = 'api_platform.pre_respond';
     const POST_RESPOND = 'api_platform.post_respond';
 

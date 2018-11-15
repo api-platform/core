@@ -13,11 +13,13 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\EventListener;
 
-use ApiPlatform\Core\Api\FormatMatcher;
 use ApiPlatform\Core\Api\FormatsProviderInterface;
+use ApiPlatform\Core\Event\PostDeserializeEvent;
+use ApiPlatform\Core\Event\PreDeserializeEvent;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\Serializer\SerializerContextBuilderInterface;
 use ApiPlatform\Core\Util\RequestAttributesExtractor;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\Exception\NotAcceptableHttpException;
@@ -35,25 +37,27 @@ final class DeserializeListener
     private $serializerContextBuilder;
     private $formats = [];
     private $formatsProvider;
-    private $formatMatcher;
+    private $dispatcher;
 
     /**
      * @throws InvalidArgumentException
      */
-    public function __construct(SerializerInterface $serializer, SerializerContextBuilderInterface $serializerContextBuilder, /* FormatsProviderInterface */ $formatsProvider)
+    public function __construct(SerializerInterface $serializer, SerializerContextBuilderInterface $serializerContextBuilder, /* FormatsProviderInterface */ $formatsProvider, EventDispatcherInterface $dispatcher)
     {
         $this->serializer = $serializer;
         $this->serializerContextBuilder = $serializerContextBuilder;
         if (\is_array($formatsProvider)) {
             @trigger_error('Using an array as formats provider is deprecated since API Platform 2.3 and will not be possible anymore in API Platform 3', E_USER_DEPRECATED);
             $this->formats = $formatsProvider;
-        } else {
-            if (!$formatsProvider instanceof FormatsProviderInterface) {
-                throw new InvalidArgumentException(sprintf('The "$formatsProvider" argument is expected to be an implementation of the "%s" interface.', FormatsProviderInterface::class));
-            }
 
-            $this->formatsProvider = $formatsProvider;
+            return;
         }
+        if (!$formatsProvider instanceof FormatsProviderInterface) {
+            throw new InvalidArgumentException(sprintf('The "$formatsProvider" argument is expected to be an implementation of the "%s" interface.', FormatsProviderInterface::class));
+        }
+
+        $this->formatsProvider = $formatsProvider;
+        $this->dispatcher = $dispatcher;
     }
 
     /**
@@ -64,10 +68,9 @@ final class DeserializeListener
         $request = $event->getRequest();
         $method = $request->getMethod();
         if (
-            'DELETE' === $method
-            || $request->isMethodSafe(false)
+            $request->isMethodSafe(false)
+            || 'DELETE' === $method
             || !($attributes = RequestAttributesExtractor::extractAttributes($request))
-            || false === ($attributes['input_class'] ?? null)
             || !$attributes['receive']
             || (
                     '' === ($requestContent = $request->getContent())
@@ -80,7 +83,6 @@ final class DeserializeListener
         if (null !== $this->formatsProvider) {
             $this->formats = $this->formatsProvider->getFormatsFromAttributes($attributes);
         }
-        $this->formatMatcher = new FormatMatcher($this->formats);
 
         $format = $this->getFormat($request);
         $context = $this->serializerContextBuilder->createFromRequest($request, false, $attributes);
@@ -93,16 +95,19 @@ final class DeserializeListener
             $context[AbstractNormalizer::OBJECT_TO_POPULATE] = $data;
         }
 
+        $this->dispatcher->dispatch(PreDeserializeEvent::NAME, new PreDeserializeEvent($requestContent));
         $request->attributes->set(
             'data',
             $this->serializer->deserialize(
                 $requestContent, $attributes['input_class'], $format, $context
             )
         );
+        $this->dispatcher->dispatch(PostDeserializeEvent::NAME, new PostDeserializeEvent($requestContent));
     }
 
     /**
      * Extracts the format from the Content-Type header and check that it is supported.
+     *
      *
      * @throws NotAcceptableHttpException
      */
@@ -116,7 +121,7 @@ final class DeserializeListener
             throw new NotAcceptableHttpException('The "Content-Type" header must exist.');
         }
 
-        $format = $this->formatMatcher->getFormat($contentType);
+        $format = $request->getFormat($contentType);
         if (null === $format || !isset($this->formats[$format])) {
             $supportedMimeTypes = [];
             foreach ($this->formats as $mimeTypes) {
