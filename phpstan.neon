@@ -37,4 +37,10 @@ parameters:
         - '#Method ApiPlatform\\Core\\Bridge\\Doctrine\\Orm\\Filter\\AbstractFilter::filterProperty\(\) invoked with 7 parameters, 5-6 required\.#'
         - '#Method ApiPlatform\\Core\\Bridge\\Doctrine\\Orm\\Filter\\FilterInterface::apply\(\) invoked with 5 parameters, 3-4 required\.#'
         - '#Method ApiPlatform\\Core\\Bridge\\Doctrine\\Orm\\Filter\\OrderFilter::filterProperty\(\) invoked with 7 parameters, 5-6 required\.#'
-        - '#Method ApiPlatform\\Core\\DataProvider\\CollectionDataProviderInterface::getCollection\(\) invoked with 3 parameters, 1-2 required.#'
+        - '#Method ApiPlatform\\Core\\DataProvider\\CollectionDataProviderInterface::getCollection\(\) invoked with 3 parameters, 1-2 required\.#'
+
+        # Expected, due to feature detection, to adapt when Symfony 4.2 will be released
+        - '#Class Symfony\\Component\\Serializer\\NameConverter\\AdvancedNameConverterInterface not found\.#'
+        - '#Method Symfony\\Component\\Serializer\\Normalizer\\AbstractObjectNormalizer::__construct\(\) invoked with 6 parameters, 0-4 required\.#'
+        - '#Parameter \#1 \$bitmask of class Symfony\\Component\\Serializer\\Encoder\\JsonEncode constructor expects int, array<string, int> given\.#'
+        - '#Parameter \#1 \$associative of class Symfony\\Component\\Serializer\\Encoder\\JsonDecode constructor expects bool, array<string, true> given\.#'
