@@ -27,14 +27,21 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 final class ErrorNormalizer implements NormalizerInterface, CacheableSupportsMethodInterface
 {
     const FORMAT = 'jsonproblem';
+    const TYPE = 'type';
+    const TITLE = 'title';
 
     use ErrorNormalizerTrait;
 
     private $debug;
+    private $defaultContext = [
+        self::TYPE => 'https://tools.ietf.org/html/rfc2616#section-10',
+        self::TITLE => 'An error occurred',
+    ];
 
-    public function __construct(bool $debug = false)
+    public function __construct(bool $debug = false, array $defaultContext = [])
     {
         $this->debug = $debug;
+        $this->defaultContext = array_merge($this->defaultContext, $defaultContext);
     }
 
     /**
@@ -43,8 +50,8 @@ final class ErrorNormalizer implements NormalizerInterface, CacheableSupportsMet
     public function normalize($object, $format = null, array $context = [])
     {
         $data = [
-            'type' => $context['type'] ?? 'https://tools.ietf.org/html/rfc2616#section-10',
-            'title' => $context['title'] ?? 'An error occurred',
+            'type' => $context[self::TYPE] ?? $this->defaultContext[self::TYPE],
+            'title' => $context[self::TITLE] ?? $this->defaultContext[self::TITLE],
             'detail' => $this->getErrorMessage($object, $context, $this->debug),
         ];
 

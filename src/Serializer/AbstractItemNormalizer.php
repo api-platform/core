@@ -55,12 +55,13 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
     protected $itemDataProvider;
     protected $allowPlainIdentifiers;
 
-    public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, IriConverterInterface $iriConverter, ResourceClassResolverInterface $resourceClassResolver, PropertyAccessorInterface $propertyAccessor = null, NameConverterInterface $nameConverter = null, ClassMetadataFactoryInterface $classMetadataFactory = null, ItemDataProviderInterface $itemDataProvider = null, bool $allowPlainIdentifiers = false)
+    public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, IriConverterInterface $iriConverter, ResourceClassResolverInterface $resourceClassResolver, PropertyAccessorInterface $propertyAccessor = null, NameConverterInterface $nameConverter = null, ClassMetadataFactoryInterface $classMetadataFactory = null, ItemDataProviderInterface $itemDataProvider = null, bool $allowPlainIdentifiers = false, array $defaultContext = [])
     {
-        $defaultContext = ['circular_reference_handler' => function ($object) {
-            return $this->iriConverter->getIriFromItem($object);
-        }];
-
+        if (!isset($defaultContext[self::CIRCULAR_REFERENCE_HANDLER])) {
+            $defaultContext['circular_reference_handler'] = function ($object) {
+                return $this->iriConverter->getIriFromItem($object);
+            };
+        }
         if (!interface_exists(AdvancedNameConverterInterface::class)) {
             $this->setCircularReferenceHandler($defaultContext['circular_reference_handler']);
         }
