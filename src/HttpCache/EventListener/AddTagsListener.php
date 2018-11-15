@@ -89,11 +89,13 @@ final class AddTagsListener
             }
         }
         $filteredResources = $resources;
+        $results = [];
         foreach($resourceCacheHeadersPerResourceClass as $resourceClass => $attributes) {
             if(array_key_exists('cache_tags', $attributes) && $attributes['cache_tags'] === false) {
                 $iri = $this->iriConverter->getIriFromResourceClass($resourceClass);
-                $matches = preg_grep('/^\\'. $iri . '\/.*/', $filteredResources);
-                $filteredResources = array_diff_key($filteredResources, $matches);
+                $matches = preg_grep('/^\\'. $iri . '\/{0,1}.*/', $filteredResources);
+                $filteredResources = array_diff($filteredResources, $matches);
+                $results[] = $filteredResources;
             }
         }
 

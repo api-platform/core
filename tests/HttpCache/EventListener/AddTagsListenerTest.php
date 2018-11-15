@@ -93,56 +93,6 @@ class AddTagsListenerTest extends TestCase
         $this->assertFalse($response->headers->has('Cache-Tags'));
     }
 
-    public function testFilterTagsByConfig()
-    {
-        $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
-        $request = new Request([], [], ['_resources' => [
-            '/resource/1' => '/resource/1',
-            '/resource/2' => '/resource/2',
-            '/resource/3' => '/resource/3',
-            '/resource/4' => '/resource/4',
-            '/resource/5' => '/resource/5',
-            '/subresource/1' => '/subresource/1',
-            '/subresource/2' => '/subresource/2',
-            '/subresource/3' => '/subresource/3',
-            '/subresource/4' => '/subresource/4',
-            '/subresource/5' => '/subresource/5',
-        ], '_api_resource_class' => Dummy::class, '_api_item_operation_name' => 'get']);
-
-        $response = new Response();
-        $response->setPublic();
-        $response->setEtag('foo');
-
-        $event = $this->prophesize(FilterResponseEvent::class);
-        $event->getRequest()->willReturn($request)->shouldBeCalled();
-        $event->getResponse()->willReturn($response)->shouldBeCalled();
-
-        $factory = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $factory->create(Dummy::class)->willReturn(new ResourceMetadata(
-            null,
-            null,
-            null,
-            null,
-            null,
-            ['cache_headers' => ['cache_tags' => false]]))->shouldBeCalled();
-
-        $listener = new AddTagsListener($iriConverterProphecy->reveal(), $factory->reveal());
-        $listener->onKernelResponse($event->reveal());
-
-        $this->assertSame(
-            implode(',',
-                [
-                    '/resource/1',
-                    '/resource/2',
-                    '/resource/3',
-                    '/resource/4',
-                    '/resource/5',
-                ]
-            ),
-            $response->headers->get('Cache-Tags')
-        );
-    }
-
     public function testDoNotSetHeaderWhenEmptyTagList()
     {
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
@@ -153,12 +103,11 @@ class AddTagsListenerTest extends TestCase
         $response->setPublic();
         $response->setEtag('foo');
 
-        $event = $this->prophesize(ResponseEvent::class);
+        $event = $this->prophesize(FilterResponseEvent::class);
         $event->getRequest()->willReturn($request)->shouldBeCalled();
         $event->getResponse()->willReturn($response)->shouldBeCalled();
 
         $factory = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $factory->create(Dummy::class)->willReturn(new ResourceMetadata())->shouldBeCalled();
 
         $listener = new AddTagsListener($iriConverterProphecy->reveal(), $factory->reveal());
         $listener->onKernelResponse($event->reveal());
@@ -181,7 +130,6 @@ class AddTagsListenerTest extends TestCase
         $event->getResponse()->willReturn($response)->shouldBeCalled();
 
         $factory = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $factory->create(Dummy::class)->willReturn(new ResourceMetadata())->shouldBeCalled();
 
         $listener = new AddTagsListener($iriConverterProphecy->reveal(), $factory->reveal());
         $listener->onKernelResponse($event->reveal());
@@ -205,7 +153,6 @@ class AddTagsListenerTest extends TestCase
         $event->getResponse()->willReturn($response)->shouldBeCalled();
 
         $factory = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $factory->create(Dummy::class)->willReturn(new ResourceMetadata())->shouldBeCalled();
 
         $listener = new AddTagsListener($iriConverterProphecy->reveal(), $factory->reveal());
         $listener->onKernelResponse($event->reveal());
@@ -229,7 +176,6 @@ class AddTagsListenerTest extends TestCase
         $event->getResponse()->willReturn($response)->shouldBeCalled();
 
         $factory = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $factory->create(Dummy::class)->willReturn(new ResourceMetadata())->shouldBeCalled();
 
         $listener = new AddTagsListener($iriConverterProphecy->reveal(), $factory->reveal());
         $listener->onKernelResponse($event->reveal());
@@ -253,11 +199,44 @@ class AddTagsListenerTest extends TestCase
         $event->getResponse()->willReturn($response)->shouldBeCalled();
 
         $factory = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $factory->create(Dummy::class)->willReturn(new ResourceMetadata())->shouldBeCalled();
 
         $listener = new AddTagsListener($iriConverterProphecy->reveal(), $factory->reveal());
         $listener->onKernelResponse($event->reveal());
 
         $this->assertSame('/foo,/bar,/dummies', $response->headers->get('Cache-Tags'));
+    }
+
+    public function testRemoveCacheTagByAnnotation()
+    {
+        $fooObj = new class(){};
+        $barObj = new class(){};
+        $fooObjClass = get_class($fooObj);
+        $barObjClass = get_class($barObj);
+
+        $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
+        $iriConverterProphecy->getIriFromResourceClass(Dummy::class)->willReturn('/dummies')->shouldBeCalled();
+        $iriConverterProphecy->getItemFromIri('/dummies/1')->willReturn(new Dummy())->shouldBeCalled();
+        $iriConverterProphecy->getItemFromIri('/foo/1')->willReturn($fooObj)->shouldBeCalled();
+        $iriConverterProphecy->getItemFromIri('/bar/1')->willReturn($barObj)->shouldBeCalled();
+
+        $request = new Request([], [], ['_resources' => ['/foo/1' => '/foo/1', '/bar/1' => '/bar/1', '/dummies/1' => '/dummies/1'], '_api_resource_class' => Dummy::class, '_api_subresource_operation_name' => 'api_dummies_relatedDummies_get_subresource', '_api_subresource_context' => ['collection' => true]]);
+
+        $response = new Response();
+        $response->setPublic();
+        $response->setEtag('foo');
+
+        $event = $this->prophesize(ResponseEvent::class);
+        $event->getRequest()->willReturn($request)->shouldBeCalled();
+        $event->getResponse()->willReturn($response)->shouldBeCalled();
+
+        $factory = $this->prophesize(ResourceMetadataFactoryInterface::class);
+        $factory->create($fooObjClass)->willReturn(new ResourceMetadata(null, null, null, null, null, ['cache_header' => ['cache_tags' => true]]));
+        $factory->create($barObjClass)->willReturn(new ResourceMetadata(null, null, null, null, null, ['cache_header' => ['cache_tags' => true]]));
+        $factory->create(Dummy::class)->willReturn(new ResourceMetadata(null, null, null, null, null, ['cache_header' => ['cache_tags' => false]]));
+
+        $listener = new AddTagsListener($iriConverterProphecy->reveal(), $factory->reveal());
+        $listener->onKernelResponse($event->reveal());
+
+        $this->assertSame('/foo/1,/bar/1', $response->headers->get('Cache-Tags'));
     }
 }
