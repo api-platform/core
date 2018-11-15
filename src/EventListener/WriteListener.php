@@ -16,7 +16,6 @@ namespace ApiPlatform\Core\EventListener;
 use ApiPlatform\Core\Api\IriConverterInterface;
 use ApiPlatform\Core\DataPersister\DataPersisterInterface;
 use ApiPlatform\Core\Event\PostWriteEvent;
-use ApiPlatform\Core\Event\PreRespondEvent;
 use ApiPlatform\Core\Event\PreWriteEvent;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;

@@ -84,7 +84,6 @@ final class SerializeListener
 
         $request->attributes->set('_api_respond', true);
         $request->attributes->set('_resources', $request->attributes->get('_resources', []) + (array) $resources);
-
     }
 
     /**
