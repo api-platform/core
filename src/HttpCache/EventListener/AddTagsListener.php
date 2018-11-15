@@ -70,30 +70,33 @@ final class AddTagsListener
             return;
         }
 
-        $resources = $this->filterDisabledResources($resources, $attributes);
+        $resources = $this->removeDisabledResourcesFromCacheTags($resources);
 
         $response->headers->set('Cache-Tags', implode(',', $resources));
     }
 
-    private function filterDisabledResources($resources, $attributes)
+    private function removeDisabledResourcesFromCacheTags($resources)
     {
-        $resourceCacheHeaders = [];
+        $resourceCacheHeadersPerResourceClass = [];
         if ($this->resourceMetadataFactory) {
-            $resourceMetadata     = $this->resourceMetadataFactory->create($attributes['resource_class']);
-            $resourceCacheHeaders = $resourceMetadata->getOperationAttribute($attributes, 'cache_headers', [], true);
+            foreach($resources as $resource) {
+                if (count(explode('/', $resource)) !== 3) { // simple check if it's an item or collection resource
+                    continue;
+                }
+                $resourceClass  = get_class($this->iriConverter->getItemFromIri($resource));
+                $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
+                $resourceCacheHeadersPerResourceClass[$resourceClass] = $resourceMetadata->getAttribute('cache_header', ['cache_tags' => true]);
+            }
+        }
+        $filteredResources = $resources;
+        foreach($resourceCacheHeadersPerResourceClass as $resourceClass => $attributes) {
+            if(array_key_exists('cache_tags', $attributes) && $attributes['cache_tags'] === false) {
+                $iri = $this->iriConverter->getIriFromResourceClass($resourceClass);
+                $matches = preg_grep('/^\\'. $iri . '\/.*/', $filteredResources);
+                $filteredResources = array_diff_key($filteredResources, $matches);
+            }
         }
 
-        if (!empty($resourceCacheHeaders)
-            && array_key_exists('cache_tags', $resourceCacheHeaders)
-            && !$resourceCacheHeaders['cache_tags']
-        ) {
-            $iri = $this->iriConverter->getIriFromResourceClass($attributes['resource_class']);
-            $matches = preg_grep('/^'. $iri . '\/.*/', $resources);
-            $filteredResources = array_diff_key($resources, $matches);
-
-            return $filteredResources;
-        }
-
-        return $resources;
+        return $filteredResources;
     }
 }
