@@ -17,4 +17,7 @@ final class ApiPlatformEvents
 
     const PRE_RESPOND = 'api_platform.pre_respond';
     const POST_RESPOND = 'api_platform.post_respond';
+
+    const PRE_ADD_FORMAT = 'api_platform.pre_add_format';
+    const POST_ADD_FORMAT = 'api_platform.post_add_format';
 }
