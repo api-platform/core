@@ -208,12 +208,12 @@ class AddTagsListenerTest extends TestCase
 
     public function testRemoveCacheTagByAnnotation()
     {
-        $fooObj = new class(){
+        $fooObj = new class() {
         };
-        $barObj = new class(){
+        $barObj = new class() {
         };
-        $fooObjClass = get_class($fooObj);
-        $barObjClass = get_class($barObj);
+        $fooObjClass = \get_class($fooObj);
+        $barObjClass = \get_class($barObj);
 
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
         $iriConverterProphecy->getIriFromResourceClass(Dummy::class)->willReturn('/dummies')->shouldBeCalled();

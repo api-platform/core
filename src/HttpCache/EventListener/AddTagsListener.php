@@ -79,19 +79,19 @@ final class AddTagsListener
     {
         $resourceCacheHeadersPerResourceClass = [];
         foreach ($resources as $resource) {
-            if (3 !== count(explode('/', $resource))) { // simple check if it's an item or collection resource
+            if (3 !== \count(explode('/', $resource))) { // simple check if it's an item or collection resource
                 continue;
             }
-            $resourceClass = get_class($this->iriConverter->getItemFromIri($resource));
+            $resourceClass = \get_class($this->iriConverter->getItemFromIri($resource));
             $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
             $resourceCacheHeadersPerResourceClass[$resourceClass] = $resourceMetadata->getAttribute('cache_header', ['cache_tags' => true]);
         }
         $filteredResources = $resources;
         $results           = [];
         foreach ($resourceCacheHeadersPerResourceClass as $resourceClass => $attributes) {
-            if (array_key_exists('cache_tags', $attributes) && $attributes['cache_tags'] === false) {
+            if (array_key_exists('cache_tags', $attributes) && false === $attributes['cache_tags']) {
                 $iri = $this->iriConverter->getIriFromResourceClass($resourceClass);
-                $matches = preg_grep('/^\\' . $iri . '\/{0,1}.*/', $filteredResources);
+                $matches = preg_grep('/^\\'.$iri.'\/{0,1}.*/', $filteredResources);
                 $filteredResources = array_diff($filteredResources, $matches);
                 $results[] = $filteredResources;
             }
