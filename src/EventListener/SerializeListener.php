@@ -13,12 +13,14 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\EventListener;
 
+use ApiPlatform\Core\Event\PostSerializeEvent;
+use ApiPlatform\Core\Event\PreSerializeEvent;
 use ApiPlatform\Core\Exception\RuntimeException;
 use ApiPlatform\Core\Serializer\ResourceList;
 use ApiPlatform\Core\Serializer\SerializerContextBuilderInterface;
 use ApiPlatform\Core\Util\RequestAttributesExtractor;
-use Fig\Link\GenericLinkProvider;
-use Fig\Link\Link;
+use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
@@ -35,10 +37,14 @@ final class SerializeListener
     private $serializer;
     private $serializerContextBuilder;
 
-    public function __construct(SerializerInterface $serializer, SerializerContextBuilderInterface $serializerContextBuilder)
+    /** @var EventDispatcherInterface */
+    private $dispatcher;
+
+    public function __construct(SerializerInterface $serializer, SerializerContextBuilderInterface $serializerContextBuilder, EventDispatcherInterface $dispatcher)
     {
         $this->serializer = $serializer;
         $this->serializerContextBuilder = $serializerContextBuilder;
+        $this->dispatcher = $dispatcher;
     }
 
     /**
@@ -49,7 +55,7 @@ final class SerializeListener
         $controllerResult = $event->getControllerResult();
         $request = $event->getRequest();
 
-        if ($controllerResult instanceof Response || !$request->attributes->getBoolean('_api_respond', true)) {
+        if ($controllerResult instanceof Response) {
             return;
         }
 
@@ -59,43 +65,27 @@ final class SerializeListener
             return;
         }
 
-        $request->attributes->set('_api_respond', true);
         $context = $this->serializerContextBuilder->createFromRequest($request, true, $attributes);
-
-        if (isset($context['output_class'])) {
-            if (false === $context['output_class']) {
-                // If the output class is explicitly set to false, the response must be empty
-                $event->setControllerResult('');
-
-                return;
-            }
-
-            $context['resource_class'] = $context['output_class'];
-        }
-
         if ($included = $request->attributes->get('_api_included')) {
             $context['api_included'] = $included;
         }
         $resources = new ResourceList();
         $context['resources'] = &$resources;
-
-        $resourcesToPush = new ResourceList();
-        $context['resources_to_push'] = &$resourcesToPush;
+        if (isset($context['output_class'])) {
+            $context['resource_class'] = $context['output_class'];
+        }
 
         $request->attributes->set('_api_normalization_context', $context);
 
+        $this->dispatcher->dispatch(PreSerializeEvent::NAME, new PreSerializeEvent($this->serializer, $this->serializerContextBuilder));
+
         $event->setControllerResult($this->serializer->serialize($controllerResult, $request->getRequestFormat(), $context));
 
-        $request->attributes->set('_resources', $request->attributes->get('_resources', []) + (array) $resources);
-        if (!\count($resourcesToPush)) {
-            return;
-        }
+        $this->dispatcher->dispatch(PostSerializeEvent::NAME, new PostSerializeEvent($this->serializer, $this->serializerContextBuilder));
 
-        $linkProvider = $request->attributes->get('_links', new GenericLinkProvider());
-        foreach ($resourcesToPush as $resourceToPush) {
-            $linkProvider = $linkProvider->withLink(new Link('preload', $resourceToPush));
-        }
-        $request->attributes->set('_links', $linkProvider);
+        $request->attributes->set('_api_respond', true);
+        $request->attributes->set('_resources', $request->attributes->get('_resources', []) + (array) $resources);
+
     }
 
     /**
@@ -107,6 +97,10 @@ final class SerializeListener
      */
     private function serializeRawData(GetResponseForControllerResultEvent $event, Request $request, $controllerResult)
     {
+        if (!$request->attributes->get('_api_respond')) {
+            return;
+        }
+
         if (\is_object($controllerResult)) {
             $event->setControllerResult($this->serializer->serialize($controllerResult, $request->getRequestFormat(), $request->attributes->get('_api_normalization_context', [])));
 

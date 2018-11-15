@@ -13,8 +13,11 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\EventListener;
 
+use ApiPlatform\Core\Event\PostRespondEvent;
+use ApiPlatform\Core\Event\PreRespondEvent;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Util\RequestAttributesExtractor;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
 
@@ -31,10 +34,13 @@ final class RespondListener
     ];
 
     private $resourceMetadataFactory;
+    /** @var EventDispatcherInterface */
+    private $dispatcher;
 
-    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory = null)
+    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory = null, EventDispatcherInterface $dispatcher = null)
     {
         $this->resourceMetadataFactory = $resourceMetadataFactory;
+        $this->dispatcher = $dispatcher;
     }
 
     /**
@@ -75,10 +81,14 @@ final class RespondListener
             $status = $resourceMetadata->getOperationAttribute($attributes, 'status');
         }
 
+        $this->dispatcher->dispatch(PreRespondEvent::NAME, new PreRespondEvent($this->resourceMetadataFactory));
+
         $event->setResponse(new Response(
             $controllerResult,
             $status ?? self::METHOD_TO_CODE[$request->getMethod()] ?? Response::HTTP_OK,
             $headers
         ));
+
+        $this->dispatcher->dispatch(PostRespondEvent::NAME, new PostRespondEvent($this->resourceMetadataFactory));
     }
 }

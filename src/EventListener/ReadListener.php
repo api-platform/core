@@ -17,12 +17,15 @@ use ApiPlatform\Core\DataProvider\CollectionDataProviderInterface;
 use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
 use ApiPlatform\Core\DataProvider\OperationDataProviderTrait;
 use ApiPlatform\Core\DataProvider\SubresourceDataProviderInterface;
+use ApiPlatform\Core\Event\PostReadEvent;
+use ApiPlatform\Core\Event\PreReadEvent;
 use ApiPlatform\Core\Exception\InvalidIdentifierException;
 use ApiPlatform\Core\Exception\RuntimeException;
 use ApiPlatform\Core\Identifier\IdentifierConverterInterface;
 use ApiPlatform\Core\Serializer\SerializerContextBuilderInterface;
 use ApiPlatform\Core\Util\RequestAttributesExtractor;
 use ApiPlatform\Core\Util\RequestParser;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -37,14 +40,17 @@ final class ReadListener
     use OperationDataProviderTrait;
 
     private $serializerContextBuilder;
+    /** @var EventDispatcherInterface */
+    private $dispatcher;
 
-    public function __construct(CollectionDataProviderInterface $collectionDataProvider, ItemDataProviderInterface $itemDataProvider, SubresourceDataProviderInterface $subresourceDataProvider = null, SerializerContextBuilderInterface $serializerContextBuilder = null, IdentifierConverterInterface $identifierConverter = null)
+    public function __construct(CollectionDataProviderInterface $collectionDataProvider, ItemDataProviderInterface $itemDataProvider, SubresourceDataProviderInterface $subresourceDataProvider = null, SerializerContextBuilderInterface $serializerContextBuilder = null, IdentifierConverterInterface $identifierConverter = null, EventDispatcherInterface $dispatcher = null)
     {
         $this->collectionDataProvider = $collectionDataProvider;
         $this->itemDataProvider = $itemDataProvider;
         $this->subresourceDataProvider = $subresourceDataProvider;
         $this->serializerContextBuilder = $serializerContextBuilder;
         $this->identifierConverter = $identifierConverter;
+        $this->dispatcher = $dispatcher;
     }
 
     /**
@@ -89,6 +95,8 @@ final class ReadListener
         try {
             $identifiers = $this->extractIdentifiers($request->attributes->all(), $attributes);
 
+            $this->dispatcher->dispatch(PreReadEvent::NAME, new PreReadEvent($this->collectionDataProvider, $this->itemDataProvider, $this->subresourceDataProvider, $this->serializerContextBuilder, $this->identifierConverter));
+
             if (isset($attributes['item_operation_name'])) {
                 $data = $this->getItemData($identifiers, $attributes, $context);
             } elseif (isset($attributes['subresource_operation_name'])) {
@@ -99,6 +107,9 @@ final class ReadListener
 
                 $data = $this->getSubresourceData($identifiers, $attributes, $context);
             }
+
+            $this->dispatcher->dispatch(PostReadEvent::NAME, new PostReadEvent($this->collectionDataProvider, $this->itemDataProvider, $this->subresourceDataProvider, $this->serializerContextBuilder, $this->identifierConverter));
+
         } catch (InvalidIdentifierException $e) {
             throw new NotFoundHttpException('Not found, because of an invalid identifier configuration', $e);
         }
