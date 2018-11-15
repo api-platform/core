@@ -87,7 +87,7 @@ final class AddTagsListener
             $resourceCacheHeadersPerResourceClass[$resourceClass] = $resourceMetadata->getAttribute('cache_header', ['cache_tags' => true]);
         }
         $filteredResources = $resources;
-        $results           = [];
+        $results = [];
         foreach ($resourceCacheHeadersPerResourceClass as $resourceClass => $attributes) {
             if (array_key_exists('cache_tags', $attributes) && false === $attributes['cache_tags']) {
                 $iri = $this->iriConverter->getIriFromResourceClass($resourceClass);
