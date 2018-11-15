@@ -123,7 +123,6 @@ class ApiPlatformExtensionTest extends TestCase
         ],
         'http_cache' => ['invalidation' => [
             'enabled' => true,
-            'resources' => [],
             'varnish_urls' => ['test'],
             'request_options' => [
                 'allow_redirects' => [
@@ -844,7 +843,6 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.http_cache.etag' => true,
             'api_platform.http_cache.max_age' => null,
             'api_platform.http_cache.shared_max_age' => null,
-            'api_platform.http_cache.resources' => [],
             'api_platform.http_cache.vary' => ['Accept'],
             'api_platform.http_cache.public' => null,
             'api_platform.defaults' => ['attributes' => []],
