@@ -103,7 +103,7 @@ class ApiResourceTest extends TestCase
             'route_prefix' => '/foo',
             'swagger_context' => ['description' => 'bar'],
             'validation_groups' => ['baz', 'qux'],
-            'cache_headers' => ['max_age' => 0, 'shared_max_age' => 0, 'vary' => ['Custom-Vary-1', 'Custom-Vary-2']],
+            'cache_headers' => ['max_age' => 0, 'shared_max_age' => 0, 'cache_tags' => true, 'vary' => ['Custom-Vary-1', 'Custom-Vary-2']],
             'sunset' => 'Thu, 11 Oct 2018 00:00:00 +0200',
         ], $resource->attributes);
     }
@@ -128,7 +128,7 @@ class ApiResourceTest extends TestCase
             'security_message' => 'You are not foo.',
             'security_post_denormalize' => "is_granted('ROLE_BAR')",
             'security_post_denormalize_message' => 'You are not bar.',
-            'cache_headers' => ['max_age' => 0, 'shared_max_age' => 0, 'vary' => ['Custom-Vary-1', 'Custom-Vary-2']],
+            'cache_headers' => ['max_age' => 0, 'shared_max_age' => 0, 'cache_tags' => true, 'vary' => ['Custom-Vary-1', 'Custom-Vary-2']],
         ], $resource->attributes);
     }
 

@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\HttpCache\EventListener;
 
 use ApiPlatform\Core\Api\IriConverterInterface;
+use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Util\RequestAttributesExtractor;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 
@@ -32,14 +33,14 @@ final class AddTagsListener
 {
     private $iriConverter;
     /**
-     * @var array
+     * @var ResourceMetadataFactoryInterface
      */
-    private $cacheResources;
+    private $resourceMetadataFactory;
 
-    public function __construct(IriConverterInterface $iriConverter, array $cacheResources)
+    public function __construct(IriConverterInterface $iriConverter, ResourceMetadataFactoryInterface $resourceMetadataFactory = null)
     {
-        $this->iriConverter = $iriConverter;
-        $this->cacheResources = $cacheResources;
+        $this->iriConverter            = $iriConverter;
+        $this->resourceMetadataFactory = $resourceMetadataFactory;
     }
 
     /**
@@ -47,7 +48,7 @@ final class AddTagsListener
      */
     public function onKernelResponse(ResponseEvent $event): void
     {
-        $request = $event->getRequest();
+        $request  = $event->getRequest();
         $response = $event->getResponse();
 
         if (
@@ -58,18 +59,10 @@ final class AddTagsListener
             return;
         }
 
-        $resources = $request->attributes->get('_resources');
-        if (!empty($this->cacheResources)) {
-            $cacheResourcesFlipped = array_flip($this->cacheResources);
-            $resources = array_filter($resources, function ($key) use ($cacheResourcesFlipped) {
-                $resourceParts = explode('/', trim($key, '/'));
-
-                return array_key_exists(array_shift($resourceParts), $cacheResourcesFlipped);
-            }, ARRAY_FILTER_USE_KEY);
-        }
+        $resources            = $request->attributes->get('_resources');
         if (isset($attributes['collection_operation_name']) || ($attributes['subresource_context']['collection'] ?? false)) {
             // Allows to purge collections
-            $iri = $this->iriConverter->getIriFromResourceClass($attributes['resource_class']);
+            $iri             = $this->iriConverter->getIriFromResourceClass($attributes['resource_class']);
             $resources[$iri] = $iri;
         }
 
@@ -77,6 +70,30 @@ final class AddTagsListener
             return;
         }
 
+        $resources = $this->filterDisabledResources($resources, $attributes);
+
         $response->headers->set('Cache-Tags', implode(',', $resources));
+    }
+
+    private function filterDisabledResources($resources, $attributes)
+    {
+        $resourceCacheHeaders = [];
+        if ($this->resourceMetadataFactory) {
+            $resourceMetadata     = $this->resourceMetadataFactory->create($attributes['resource_class']);
+            $resourceCacheHeaders = $resourceMetadata->getOperationAttribute($attributes, 'cache_headers', [], true);
+        }
+
+        if (!empty($resourceCacheHeaders)
+            && array_key_exists('cache_tags', $resourceCacheHeaders)
+            && !$resourceCacheHeaders['cache_tags']
+        ) {
+            $iri = $this->iriConverter->getIriFromResourceClass($attributes['resource_class']);
+            $matches = preg_grep('/^'. $iri . '\/.*/', $resources);
+            $filteredResources = array_diff_key($resources, $matches);
+
+            return $filteredResources;
+        }
+
+        return $resources;
     }
 }

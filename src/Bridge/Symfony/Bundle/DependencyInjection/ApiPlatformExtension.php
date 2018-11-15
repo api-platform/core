@@ -182,7 +182,6 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $container->setParameter('api_platform.http_cache.etag', $config['http_cache']['etag']);
         $container->setParameter('api_platform.http_cache.max_age', $config['http_cache']['max_age']);
         $container->setParameter('api_platform.http_cache.shared_max_age', $config['http_cache']['shared_max_age']);
-        $container->setParameter('api_platform.http_cache.resources', $config['http_cache']['invalidation']['resources']);
         $container->setParameter('api_platform.http_cache.vary', $config['http_cache']['vary']);
         $container->setParameter('api_platform.http_cache.public', $config['http_cache']['public']);
 
