@@ -208,8 +208,10 @@ class AddTagsListenerTest extends TestCase
 
     public function testRemoveCacheTagByAnnotation()
     {
-        $fooObj = new class(){};
-        $barObj = new class(){};
+        $fooObj = new class(){
+        };
+        $barObj = new class(){
+        };
         $fooObjClass = get_class($fooObj);
         $barObjClass = get_class($barObj);
 
