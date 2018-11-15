@@ -2,59 +2,26 @@
 
 namespace ApiPlatform\Core\Event;
 
-use ApiPlatform\Core\DataProvider\CollectionDataProviderInterface;
-use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
-use ApiPlatform\Core\DataProvider\SubresourceDataProviderInterface;
-use ApiPlatform\Core\Identifier\IdentifierConverterInterface;
-use ApiPlatform\Core\Serializer\SerializerContextBuilderInterface;
 use Symfony\Component\EventDispatcher\Event;
 
-class PostReadEvent extends Event
+final class PostReadEvent extends Event
 {
-    const NAME = 'api_platform.post_read';
+    const NAME = ApiPlatformEvents::POST_READ;
 
-    /** @var CollectionDataProviderInterface */
-    protected $collectionDataProvider;
-    /** @var ItemDataProviderInterface */
-    protected $itemDataProvider;
-    /** @var SubresourceDataProviderInterface */
-    protected $subresourceDataProvider;
-    /** @var SerializerContextBuilderInterface */
-    protected $serializerContextBuilder;
-    /** @var IdentifierConverterInterface */
-    protected $identifierConverter;
+    private $data;
 
-    public function __construct(CollectionDataProviderInterface $collectionDataProvider, ItemDataProviderInterface $itemDataProvider, SubresourceDataProviderInterface $subresourceDataProvider = null, SerializerContextBuilderInterface $serializerContextBuilder = null, IdentifierConverterInterface $identifierConverter = null)
+    public function __construct($data)
     {
-        $this->collectionDataProvider = $collectionDataProvider;
-        $this->itemDataProvider = $itemDataProvider;
-        $this->subresourceDataProvider = $subresourceDataProvider;
-        $this->serializerContextBuilder = $serializerContextBuilder;
-        $this->identifierConverter = $identifierConverter;
+        $this->data = $data;
     }
 
-    public function getSerializerContextBuilder(): SerializerContextBuilderInterface
+    public function getData()
     {
-        return $this->serializerContextBuilder;
+        return $this->data;
     }
 
-    public function getCollectionDataProvider(): CollectionDataProviderInterface
+    public function setData($data): void
     {
-        return $this->collectionDataProvider;
-    }
-
-    public function getIdentifierConverter(): IdentifierConverterInterface
-    {
-        return $this->identifierConverter;
-    }
-
-    public function getItemDataProvider(): ItemDataProviderInterface
-    {
-        return $this->itemDataProvider;
-    }
-
-    public function getSubresourceDataProvider(): SubresourceDataProviderInterface
-    {
-        return $this->subresourceDataProvider;
+        $this->data = $data;
     }
 }

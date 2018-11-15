@@ -19,7 +19,6 @@ use ApiPlatform\Core\Exception\RuntimeException;
 use ApiPlatform\Core\Serializer\ResourceList;
 use ApiPlatform\Core\Serializer\SerializerContextBuilderInterface;
 use ApiPlatform\Core\Util\RequestAttributesExtractor;
-use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -77,11 +76,11 @@ final class SerializeListener
 
         $request->attributes->set('_api_normalization_context', $context);
 
-        $this->dispatcher->dispatch(PreSerializeEvent::NAME, new PreSerializeEvent($this->serializer, $this->serializerContextBuilder));
+        $this->dispatcher->dispatch(PreSerializeEvent::NAME, new PreSerializeEvent($controllerResult));
 
         $event->setControllerResult($this->serializer->serialize($controllerResult, $request->getRequestFormat(), $context));
 
-        $this->dispatcher->dispatch(PostSerializeEvent::NAME, new PostSerializeEvent($this->serializer, $this->serializerContextBuilder));
+        $this->dispatcher->dispatch(PostSerializeEvent::NAME, new PostSerializeEvent($controllerResult));
 
         $request->attributes->set('_api_respond', true);
         $request->attributes->set('_resources', $request->attributes->get('_resources', []) + (array) $resources);

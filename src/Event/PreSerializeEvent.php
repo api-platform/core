@@ -4,32 +4,25 @@
 namespace ApiPlatform\Core\Event;
 
 
-use ApiPlatform\Core\Serializer\SerializerContextBuilderInterface;
 use Symfony\Component\EventDispatcher\Event;
-use Symfony\Component\Serializer\SerializerInterface;
 
-class PreSerializeEvent extends Event
+final class PreSerializeEvent extends Event
 {
-    const NAME = 'api_platform.pre_serialize';
+    const NAME = ApiPlatformEvents::PRE_SERIALIZE;
+    private $controllerResult;
 
-    /** @var SerializerInterface */
-    protected $serializer;
-    /** @var SerializerContextBuilderInterface */
-    protected $serializerContextBuilder;
-
-    public function __construct(SerializerInterface $serializer, SerializerContextBuilderInterface $serializerContextBuilder)
+    public function __construct($controllerResult)
     {
-        $this->serializer = $serializer;
-        $this->serializerContextBuilder = $serializerContextBuilder;
+        $this->controllerResult = $controllerResult;
     }
 
-    public function getSerializer(): SerializerInterface
+    public function getControllerResult()
     {
-        return $this->serializer;
+        return $this->controllerResult;
     }
 
-    public function getSerializerContextBuilder(): SerializerContextBuilderInterface
+    public function setControllerResult($controllerResult): void
     {
-        return $this->serializerContextBuilder;
+        $this->controllerResult = $controllerResult;
     }
 }

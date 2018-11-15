@@ -4,22 +4,27 @@
 namespace ApiPlatform\Core\Event;
 
 
-use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use Symfony\Component\EventDispatcher\Event;
+use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
 
-class PostRespondEvent extends Event
+final class PostRespondEvent extends Event
 {
-    const NAME = 'api_platform.post_respond';
+    const NAME = ApiPlatformEvents::POST_RESPOND;
 
-    protected $resourceMetadataFactory;
+    private $event;
 
-    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory = null)
+    public function __construct(GetResponseForControllerResultEvent $event)
     {
-        $this->resourceMetadataFactory = $resourceMetadataFactory;
+        $this->event = $event;
     }
 
-    public function getResourceMetadataFactory(): ResourceMetadataFactoryInterface
+    public function getEvent(): GetResponseForControllerResultEvent
     {
-        return $this->resourceMetadataFactory;
+        return $this->event;
+    }
+
+    public function setEvent(GetResponseForControllerResultEvent $event): void
+    {
+        $this->event = $event;
     }
 }
