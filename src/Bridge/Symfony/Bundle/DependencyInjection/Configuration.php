@@ -38,8 +38,8 @@ final class Configuration implements ConfigurationInterface
      */
     public function getConfigTreeBuilder()
     {
-        $treeBuilder = new TreeBuilder();
-        $rootNode = $treeBuilder->root('api_platform');
+        $treeBuilder = new TreeBuilder('api_platform');
+        $rootNode = $rootNode = $treeBuilder->getRootNode();
 
         $rootNode
             ->children()
