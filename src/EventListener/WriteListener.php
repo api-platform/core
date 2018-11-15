@@ -54,14 +54,19 @@ final class WriteListener
             return;
         }
 
-        $this->dispatcher->dispatch(PreWriteEvent::NAME, new PreWriteEvent($request->getMethod(), $controllerResult));
+        if (null !== $this->dispatcher) {
+            $this->dispatcher->dispatch(PreWriteEvent::NAME, new PreWriteEvent($request->getMethod(), $controllerResult));
+        }
 
         switch ($request->getMethod()) {
             case 'PUT':
             case 'PATCH':
             case 'POST':
                 $persistResult = $this->dataPersister->persist($controllerResult);
-                $this->dispatcher->dispatch(PostWriteEvent::NAME, new PostWriteEvent($request->getMethod(), $controllerResult));
+
+                if (null !== $this->dispatcher) {
+                    $this->dispatcher->dispatch(PostWriteEvent::NAME, new PostWriteEvent($request->getMethod(), $controllerResult));
+                }
 
                 if (null === $persistResult) {
                     @trigger_error(sprintf('Returning void from %s::persist() is deprecated since API Platform 2.3 and will not be supported in API Platform 3, an object should always be returned.', DataPersisterInterface::class), E_USER_DEPRECATED);
@@ -78,7 +83,11 @@ final class WriteListener
                 break;
             case 'DELETE':
                 $this->dataPersister->remove($controllerResult);
-                $this->dispatcher->dispatch(PostWriteEvent::NAME, new PostWriteEvent($request->getMethod(), $controllerResult));
+
+                if (null !== $this->dispatcher) {
+                    $this->dispatcher->dispatch(PostWriteEvent::NAME, new PostWriteEvent($request->getMethod(), $controllerResult));
+                }
+
                 $event->setControllerResult(null);
                 break;
         }

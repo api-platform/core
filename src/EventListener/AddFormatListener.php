@@ -41,7 +41,7 @@ final class AddFormatListener
     /**
      * @throws InvalidArgumentException
      */
-    public function __construct(Negotiator $negotiator, /* FormatsProviderInterface */ $formatsProvider, EventDispatcherInterface $dispatcher)
+    public function __construct(Negotiator $negotiator, /* FormatsProviderInterface */ $formatsProvider, EventDispatcherInterface $dispatcher = null)
     {
         $this->negotiator = $negotiator;
         if (\is_array($formatsProvider)) {
@@ -77,9 +77,16 @@ final class AddFormatListener
         }
 
         $this->populateMimeTypes();
-        $this->dispatcher->dispatch(PreAddFormatEvent::NAME, new PreAddFormatEvent($this->formats));
+
+        if (null !== $this->dispatcher) {
+            $this->dispatcher->dispatch(PreAddFormatEvent::NAME, new PreAddFormatEvent($this->formats));
+        }
+
         $this->addRequestFormats($request, $this->formats);
-        $this->dispatcher->dispatch(PostAddFormatEvent::NAME, new PostAddFormatEvent($this->formats));
+
+        if (null !== $this->dispatcher) {
+            $this->dispatcher->dispatch(PostAddFormatEvent::NAME, new PostAddFormatEvent($this->formats));
+        }
 
         // Empty strings must be converted to null because the Symfony router doesn't support parameter typing before 3.2 (_format)
         if (null === $routeFormat = $request->attributes->get('_format') ?: null) {

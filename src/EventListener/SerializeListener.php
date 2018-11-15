@@ -39,7 +39,7 @@ final class SerializeListener
     /** @var EventDispatcherInterface */
     private $dispatcher;
 
-    public function __construct(SerializerInterface $serializer, SerializerContextBuilderInterface $serializerContextBuilder, EventDispatcherInterface $dispatcher)
+    public function __construct(SerializerInterface $serializer, SerializerContextBuilderInterface $serializerContextBuilder, EventDispatcherInterface $dispatcher = null)
     {
         $this->serializer = $serializer;
         $this->serializerContextBuilder = $serializerContextBuilder;
@@ -76,11 +76,15 @@ final class SerializeListener
 
         $request->attributes->set('_api_normalization_context', $context);
 
-        $this->dispatcher->dispatch(PreSerializeEvent::NAME, new PreSerializeEvent($controllerResult));
+        if (null !== $this->dispatcher) {
+            $this->dispatcher->dispatch(PreSerializeEvent::NAME, new PreSerializeEvent($controllerResult));
+        }
 
         $event->setControllerResult($this->serializer->serialize($controllerResult, $request->getRequestFormat(), $context));
 
-        $this->dispatcher->dispatch(PostSerializeEvent::NAME, new PostSerializeEvent($controllerResult));
+        if (null !== $this->dispatcher) {
+            $this->dispatcher->dispatch(PostSerializeEvent::NAME, new PostSerializeEvent($controllerResult));
+        }
 
         $request->attributes->set('_api_respond', true);
         $request->attributes->set('_resources', $request->attributes->get('_resources', []) + (array) $resources);

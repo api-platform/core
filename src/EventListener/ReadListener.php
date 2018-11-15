@@ -94,7 +94,9 @@ final class ReadListener
         try {
             $identifiers = $this->extractIdentifiers($request->attributes->all(), $attributes);
 
-            $this->dispatcher->dispatch(PreReadEvent::NAME, new PreReadEvent($data));
+            if (null !== $this->dispatcher) {
+                $this->dispatcher->dispatch(PreReadEvent::NAME, new PreReadEvent($data));
+            }
 
             if (isset($attributes['item_operation_name'])) {
                 $data = $this->getItemData($identifiers, $attributes, $context);
@@ -110,7 +112,9 @@ final class ReadListener
             throw new NotFoundHttpException('Not found, because of an invalid identifier configuration', $e);
         }
 
-        $this->dispatcher->dispatch(PostReadEvent::NAME, new PostReadEvent($data));
+        if (null !== $this->dispatcher) {
+            $this->dispatcher->dispatch(PostReadEvent::NAME, new PostReadEvent($data));
+        }
 
         if (null === $data) {
             throw new NotFoundHttpException('Not Found');

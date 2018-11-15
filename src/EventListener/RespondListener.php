@@ -81,7 +81,9 @@ final class RespondListener
             $status = $resourceMetadata->getOperationAttribute($attributes, 'status');
         }
 
-        $this->dispatcher->dispatch(PreRespondEvent::NAME, new PreRespondEvent($event));
+        if (null !== $this->dispatcher) {
+            $this->dispatcher->dispatch(PreRespondEvent::NAME, new PreRespondEvent($event));
+        }
 
         $event->setResponse(new Response(
             $controllerResult,
@@ -89,6 +91,8 @@ final class RespondListener
             $headers
         ));
 
-        $this->dispatcher->dispatch(PostRespondEvent::NAME, new PostRespondEvent($event));
+        if (null !== $this->dispatcher) {
+            $this->dispatcher->dispatch(PostRespondEvent::NAME, new PostRespondEvent($event));
+        }
     }
 }

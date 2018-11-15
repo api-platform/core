@@ -42,7 +42,7 @@ final class DeserializeListener
     /**
      * @throws InvalidArgumentException
      */
-    public function __construct(SerializerInterface $serializer, SerializerContextBuilderInterface $serializerContextBuilder, /* FormatsProviderInterface */ $formatsProvider, EventDispatcherInterface $dispatcher)
+    public function __construct(SerializerInterface $serializer, SerializerContextBuilderInterface $serializerContextBuilder, /* FormatsProviderInterface */ $formatsProvider, EventDispatcherInterface $dispatcher = null)
     {
         $this->serializer = $serializer;
         $this->serializerContextBuilder = $serializerContextBuilder;
@@ -95,14 +95,20 @@ final class DeserializeListener
             $context[AbstractNormalizer::OBJECT_TO_POPULATE] = $data;
         }
 
-        $this->dispatcher->dispatch(PreDeserializeEvent::NAME, new PreDeserializeEvent($requestContent));
+        if (null !== $this->dispatcher) {
+            $this->dispatcher->dispatch(PreDeserializeEvent::NAME, new PreDeserializeEvent($requestContent));
+        }
+
         $request->attributes->set(
             'data',
             $this->serializer->deserialize(
                 $requestContent, $attributes['input_class'], $format, $context
             )
         );
-        $this->dispatcher->dispatch(PostDeserializeEvent::NAME, new PostDeserializeEvent($requestContent));
+
+        if (null !== $this->dispatcher) {
+            $this->dispatcher->dispatch(PostDeserializeEvent::NAME, new PostDeserializeEvent($requestContent));
+        }
     }
 
     /**
