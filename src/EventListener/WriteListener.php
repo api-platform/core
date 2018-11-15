@@ -15,11 +15,14 @@ namespace ApiPlatform\Core\EventListener;
 
 use ApiPlatform\Core\Api\IriConverterInterface;
 use ApiPlatform\Core\DataPersister\DataPersisterInterface;
-use ApiPlatform\Core\Util\RequestAttributesExtractor;
+use ApiPlatform\Core\Event\PostWriteEvent;
+use ApiPlatform\Core\Event\PreRespondEvent;
+use ApiPlatform\Core\Event\PreWriteEvent;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
 
 /**
- * Bridges persistence and the API system.
+ * Bridges persistense and the API system.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  * @author Baptiste Meyer <baptiste.meyer@gmail.com>
@@ -28,11 +31,13 @@ final class WriteListener
 {
     private $dataPersister;
     private $iriConverter;
+    private $dispatcher;
 
-    public function __construct(DataPersisterInterface $dataPersister, IriConverterInterface $iriConverter = null)
+    public function __construct(DataPersisterInterface $dataPersister, IriConverterInterface $iriConverter = null, EventDispatcherInterface $dispatcher = null)
     {
         $this->dataPersister = $dataPersister;
         $this->iriConverter = $iriConverter;
+        $this->dispatcher = $dispatcher;
     }
 
     /**
@@ -41,7 +46,7 @@ final class WriteListener
     public function onKernelView(GetResponseForControllerResultEvent $event)
     {
         $request = $event->getRequest();
-        if ($request->isMethodSafe(false) || !$request->attributes->getBoolean('_api_persist', true) || !$attributes = RequestAttributesExtractor::extractAttributes($request)) {
+        if ($request->isMethodSafe(false) || !$request->attributes->has('_api_resource_class') || !$request->attributes->getBoolean('_api_persist', true)) {
             return;
         }
 
@@ -50,11 +55,14 @@ final class WriteListener
             return;
         }
 
+        $this->dispatcher->dispatch(PreWriteEvent::NAME, new PreWriteEvent($request->getMethod(), $controllerResult));
+
         switch ($request->getMethod()) {
             case 'PUT':
             case 'PATCH':
             case 'POST':
                 $persistResult = $this->dataPersister->persist($controllerResult);
+                $this->dispatcher->dispatch(PostWriteEvent::NAME, new PostWriteEvent($request->getMethod(), $controllerResult));
 
                 if (null === $persistResult) {
                     @trigger_error(sprintf('Returning void from %s::persist() is deprecated since API Platform 2.3 and will not be supported in API Platform 3, an object should always be returned.', DataPersisterInterface::class), E_USER_DEPRECATED);
@@ -65,12 +73,13 @@ final class WriteListener
                 // Controller result must be immutable for _api_write_item_iri
                 // if it's class changed compared to the base class let's avoid calling the IriConverter
                 // especially that the Output class could be a DTO that's not referencing any route
-                if (null !== $this->iriConverter && (false !== $attributes['output_class'] ?? null) && $attributes['resource_class'] === ($class = \get_class($controllerResult)) && $class === \get_class($event->getControllerResult())) {
+                if (null !== $this->iriConverter && \get_class($controllerResult) === \get_class($event->getControllerResult())) {
                     $request->attributes->set('_api_write_item_iri', $this->iriConverter->getIriFromItem($controllerResult));
                 }
                 break;
             case 'DELETE':
                 $this->dataPersister->remove($controllerResult);
+                $this->dispatcher->dispatch(PostWriteEvent::NAME, new PostWriteEvent($request->getMethod(), $controllerResult));
                 $event->setControllerResult(null);
                 break;
         }
