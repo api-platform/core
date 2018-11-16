@@ -117,6 +117,13 @@ class AddTagsListenerTest extends TestCase
 
     public function testAddTags()
     {
+        $fooObj = new class() {
+        };
+        $barObj = new class() {
+        };
+        $fooObjClass = \get_class($fooObj);
+        $barObjClass = \get_class($barObj);
+
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
 
         $request = new Request([], [], ['_resources' => ['/foo', '/bar'], '_api_resource_class' => Dummy::class, '_api_item_operation_name' => 'get']);
@@ -130,6 +137,10 @@ class AddTagsListenerTest extends TestCase
         $event->getResponse()->willReturn($response)->shouldBeCalled();
 
         $factory = $this->prophesize(ResourceMetadataFactoryInterface::class);
+        $factory->create($fooObjClass)->willReturn(new ResourceMetadata(null, null, null, null, null, []));
+        $factory->create($barObjClass)->willReturn(new ResourceMetadata(null, null, null, null, null, []));
+        $iriConverterProphecy->getItemFromIri('/foo')->willReturn($fooObj)->shouldBeCalled();
+        $iriConverterProphecy->getItemFromIri('/bar')->willReturn($barObj)->shouldBeCalled();
 
         $listener = new AddTagsListener($iriConverterProphecy->reveal(), $factory->reveal());
         $listener->onKernelResponse($event->reveal());
@@ -139,6 +150,13 @@ class AddTagsListenerTest extends TestCase
 
     public function testAddCollectionIri()
     {
+        $fooObj = new class() {
+        };
+        $barObj = new class() {
+        };
+        $fooObjClass = \get_class($fooObj);
+        $barObjClass = \get_class($barObj);
+
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
         $iriConverterProphecy->getIriFromResourceClass(Dummy::class)->willReturn('/dummies')->shouldBeCalled();
 
@@ -153,6 +171,10 @@ class AddTagsListenerTest extends TestCase
         $event->getResponse()->willReturn($response)->shouldBeCalled();
 
         $factory = $this->prophesize(ResourceMetadataFactoryInterface::class);
+        $factory->create($fooObjClass)->willReturn(new ResourceMetadata(null, null, null, null, null, []));
+        $factory->create($barObjClass)->willReturn(new ResourceMetadata(null, null, null, null, null, []));
+        $iriConverterProphecy->getItemFromIri('/foo')->willReturn($fooObj)->shouldBeCalled();
+        $iriConverterProphecy->getItemFromIri('/bar')->willReturn($barObj)->shouldBeCalled();
 
         $listener = new AddTagsListener($iriConverterProphecy->reveal(), $factory->reveal());
         $listener->onKernelResponse($event->reveal());
@@ -185,6 +207,13 @@ class AddTagsListenerTest extends TestCase
 
     public function testAddSubResourceCollectionIri()
     {
+        $fooObj = new class() {
+        };
+        $barObj = new class() {
+        };
+        $fooObjClass = \get_class($fooObj);
+        $barObjClass = \get_class($barObj);
+
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
         $iriConverterProphecy->getIriFromResourceClass(Dummy::class)->willReturn('/dummies')->shouldBeCalled();
 
@@ -199,6 +228,10 @@ class AddTagsListenerTest extends TestCase
         $event->getResponse()->willReturn($response)->shouldBeCalled();
 
         $factory = $this->prophesize(ResourceMetadataFactoryInterface::class);
+        $factory->create($fooObjClass)->willReturn(new ResourceMetadata(null, null, null, null, null, []));
+        $factory->create($barObjClass)->willReturn(new ResourceMetadata(null, null, null, null, null, []));
+        $iriConverterProphecy->getItemFromIri('/foo')->willReturn($fooObj)->shouldBeCalled();
+        $iriConverterProphecy->getItemFromIri('/bar')->willReturn($barObj)->shouldBeCalled();
 
         $listener = new AddTagsListener($iriConverterProphecy->reveal(), $factory->reveal());
         $listener->onKernelResponse($event->reveal());

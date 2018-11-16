@@ -83,7 +83,7 @@ final class AddTagsListener
         $resourceCacheHeadersPerResourceClass = [];
         foreach ($resourceClasses as $resourceClass) {
             $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
-            $resourceCacheHeadersPerResourceClass[$resourceClass] = $resourceMetadata->getAttribute('cache_headers', []);
+            $resourceCacheHeadersPerResourceClass[$resourceClass] = $resourceMetadata->getAttribute('cache_headers', ['tags' => true]);
         }
 
         $filteredResources = $resources;
