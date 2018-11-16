@@ -15,6 +15,7 @@ namespace ApiPlatform\Core\Swagger\Serializer;
 
 use ApiPlatform\Core\Api\FilterCollection;
 use ApiPlatform\Core\Api\FilterLocatorTrait;
+use ApiPlatform\Core\Api\OperationAwareFormatsProviderInterface;
 use ApiPlatform\Core\Api\OperationMethodResolverInterface;
 use ApiPlatform\Core\Api\OperationType;
 use ApiPlatform\Core\Api\ResourceClassResolverInterface;
@@ -68,11 +69,12 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
     private $paginationPageParameterName;
     private $clientItemsPerPage;
     private $itemsPerPageParameterName;
+    private $formatsProvider;
 
     /**
      * @param ContainerInterface|FilterCollection|null $filterLocator The new filter locator or the deprecated filter collection
      */
-    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, ResourceClassResolverInterface $resourceClassResolver, OperationMethodResolverInterface $operationMethodResolver, OperationPathResolverInterface $operationPathResolver, UrlGeneratorInterface $urlGenerator = null, $filterLocator = null, NameConverterInterface $nameConverter = null, $oauthEnabled = false, $oauthType = '', $oauthFlow = '', $oauthTokenUrl = '', $oauthAuthorizationUrl = '', array $oauthScopes = [], array $apiKeys = [], SubresourceOperationFactoryInterface $subresourceOperationFactory = null, $paginationEnabled = true, $paginationPageParameterName = 'page', $clientItemsPerPage = false, $itemsPerPageParameterName = 'itemsPerPage')
+    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, ResourceClassResolverInterface $resourceClassResolver, OperationMethodResolverInterface $operationMethodResolver, OperationPathResolverInterface $operationPathResolver, UrlGeneratorInterface $urlGenerator = null, $filterLocator = null, NameConverterInterface $nameConverter = null, $oauthEnabled = false, $oauthType = '', $oauthFlow = '', $oauthTokenUrl = '', $oauthAuthorizationUrl = '', array $oauthScopes = [], array $apiKeys = [], SubresourceOperationFactoryInterface $subresourceOperationFactory = null, $paginationEnabled = true, $paginationPageParameterName = 'page', $clientItemsPerPage = false, $itemsPerPageParameterName = 'itemsPerPage', OperationAwareFormatsProviderInterface $formatsProvider = null)
     {
         if ($urlGenerator) {
             @trigger_error(sprintf('Passing an instance of %s to %s() is deprecated since version 2.1 and will be removed in 3.0.', UrlGeneratorInterface::class, __METHOD__), E_USER_DEPRECATED);
@@ -99,6 +101,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
         $this->apiKeys = $apiKeys;
         $this->clientItemsPerPage = $clientItemsPerPage;
         $this->itemsPerPageParameterName = $itemsPerPageParameterName;
+        $this->formatsProvider = $formatsProvider;
     }
 
     /**
@@ -130,7 +133,11 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
                 $pathOperation = new \ArrayObject([]);
                 $pathOperation['tags'] = $subresourceOperation['shortNames'];
                 $pathOperation['operationId'] = $operationId;
-                $pathOperation['produces'] = $mimeTypes;
+                if (null !== $this->formatsProvider) {
+                    $responseFormats = $this->formatsProvider->getFormatsFromOperation($subresourceOperation['resource_class'], $operationName, OperationType::SUBRESOURCE);
+                    $responseMimeTypes = $this->extractMimeTypes($responseFormats);
+                }
+                $pathOperation['produces'] = $responseMimeTypes ?? $mimeTypes;
                 $pathOperation['summary'] = sprintf('Retrieves %s%s resource%s.', $subresourceOperation['collection'] ? 'the collection of ' : 'a ', $subresourceOperation['shortNames'][0], $subresourceOperation['collection'] ? 's' : '');
                 $pathOperation['responses'] = [
                     '200' => $subresourceOperation['collection'] ? [
@@ -223,17 +230,20 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
         if ($resourceMetadata->getTypedOperationAttribute($operationType, $operationName, 'deprecation_reason', null, true)) {
             $pathOperation['deprecated'] = true;
         }
-
+        if (null !== $this->formatsProvider) {
+            $responseFormats = $this->formatsProvider->getFormatsFromOperation($resourceClass, $operationName, $operationType);
+            $responseMimeTypes = $this->extractMimeTypes($responseFormats);
+        }
         switch ($method) {
             case 'GET':
-                return $this->updateGetOperation($pathOperation, $mimeTypes, $operationType, $resourceMetadata, $resourceClass, $resourceShortName, $operationName, $definitions);
+                return $this->updateGetOperation($pathOperation, $responseMimeTypes ?? $mimeTypes, $operationType, $resourceMetadata, $resourceClass, $resourceShortName, $operationName, $definitions);
             case 'POST':
-                return $this->updatePostOperation($pathOperation, $mimeTypes, $operationType, $resourceMetadata, $resourceClass, $resourceShortName, $operationName, $definitions);
+                return $this->updatePostOperation($pathOperation, $responseMimeTypes ?? $mimeTypes, $operationType, $resourceMetadata, $resourceClass, $resourceShortName, $operationName, $definitions);
             case 'PATCH':
                 $pathOperation['summary'] ?? $pathOperation['summary'] = sprintf('Updates the %s resource.', $resourceShortName);
                 // no break
             case 'PUT':
-                return $this->updatePutOperation($pathOperation, $mimeTypes, $operationType, $resourceMetadata, $resourceClass, $resourceShortName, $operationName, $definitions);
+                return $this->updatePutOperation($pathOperation, $responseMimeTypes ?? $mimeTypes, $operationType, $resourceMetadata, $resourceClass, $resourceShortName, $operationName, $definitions);
             case 'DELETE':
                 return $this->updateDeleteOperation($pathOperation, $resourceShortName);
         }
@@ -677,5 +687,17 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
         }
 
         return $resourceMetadata->getItemOperationAttribute($operationName, $contextKey, null, true);
+    }
+
+    private function extractMimeTypes(array $responseFormats): array
+    {
+        $responseMimeTypes = [];
+        foreach ($responseFormats as $mimeTypes) {
+            foreach ($mimeTypes as $mimeType) {
+                $responseMimeTypes[] = $mimeType;
+            }
+        }
+
+        return $responseMimeTypes;
     }
 }
