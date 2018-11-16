@@ -53,9 +53,6 @@ final class ItemMutationResolverFactory implements ResolverFactoryInterface
     private $resourceMetadataFactory;
     private $resourceAccessChecker;
     private $validator;
-    /**
-     * @var EventDispatcherInterface
-     */
     private $dispatcher;
 
     public function __construct(IriConverterInterface $iriConverter, DataPersisterInterface $dataPersister, NormalizerInterface $normalizer, ResourceMetadataFactoryInterface $resourceMetadataFactory, ResourceAccessCheckerInterface $resourceAccessChecker = null, ValidatorInterface $validator = null, EventDispatcherInterface $dispatcher = null)
