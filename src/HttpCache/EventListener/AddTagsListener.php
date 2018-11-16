@@ -98,8 +98,12 @@ final class AddTagsListener
         return $filteredResources;
     }
 
-    private function getAvailableResourceClasses(array $resources)
+    private function getAvailableResourceClasses(?array $resources)
     {
+        if(!$resources) {
+
+            return [];
+        }
         $resourceClasses = [];
         foreach ($resources as $resource) {
             $resourceClasses[] = $this->getObjectClass($this->iriConverter->getItemFromIri($resource));
