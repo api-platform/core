@@ -14,14 +14,14 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Controller;
 
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\CustomActionDummy;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class CustomActionController extends Controller
+class CustomActionController extends AbstractController
 {
     /**
      * @Route(
