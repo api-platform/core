@@ -18,20 +18,20 @@ use Symfony\Component\EventDispatcher\Event;
 final class PostSerializeEvent extends Event
 {
     const NAME = ApiPlatformEvents::POST_SERIALIZE;
-    private $controllerResult;
+    private $object;
 
-    public function __construct($controllerResult)
+    public function __construct($object)
     {
-        $this->controllerResult = $controllerResult;
+        $this->object = $object;
     }
 
-    public function getControllerResult()
+    public function getObject()
     {
-        return $this->controllerResult;
+        return $this->object;
     }
 
-    public function setControllerResult($controllerResult): void
+    public function setObject($object): void
     {
-        $this->controllerResult = $controllerResult;
+        $this->object = $object;
     }
 }

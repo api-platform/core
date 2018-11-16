@@ -88,13 +88,13 @@ final class ItemResolver
 
         $normalizationContext = $resourceMetadata->getGraphqlAttribute('query', 'normalization_context', [], true);
 
-        if($this->dispatcher !== null) {
+        if (null !== $this->dispatcher) {
             $this->dispatcher->dispatch(PreSerializeEvent::NAME, new PreSerializeEvent($item));
         }
 
         $normalizedObject = $this->normalizer->normalize($item, ItemNormalizer::FORMAT, $normalizationContext + $baseNormalizationContext);
 
-        if($this->dispatcher !== null) {
+        if (null !== $this->dispatcher) {
             $this->dispatcher->dispatch(PostSerializeEvent::NAME, new PostSerializeEvent($item));
         }
 
