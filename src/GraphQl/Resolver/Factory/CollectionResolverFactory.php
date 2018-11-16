@@ -17,6 +17,10 @@ use ApiPlatform\Core\Api\IdentifiersExtractorInterface;
 use ApiPlatform\Core\DataProvider\CollectionDataProviderInterface;
 use ApiPlatform\Core\DataProvider\PaginatorInterface;
 use ApiPlatform\Core\DataProvider\SubresourceDataProviderInterface;
+use ApiPlatform\Core\Event\PostReadEvent;
+use ApiPlatform\Core\Event\PostSerializeEvent;
+use ApiPlatform\Core\Event\PreReadEvent;
+use ApiPlatform\Core\Event\PreSerializeEvent;
 use ApiPlatform\Core\Exception\ResourceClassNotSupportedException;
 use ApiPlatform\Core\GraphQl\Resolver\FieldsToAttributesTrait;
 use ApiPlatform\Core\GraphQl\Resolver\ResourceAccessCheckerTrait;
@@ -25,6 +29,7 @@ use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Security\ResourceAccessCheckerInterface;
 use GraphQL\Error\Error;
 use GraphQL\Type\Definition\ResolveInfo;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
@@ -49,8 +54,12 @@ final class CollectionResolverFactory implements ResolverFactoryInterface
     private $requestStack;
     private $paginationEnabled;
     private $resourceMetadataFactory;
+    /**
+     * @var EventDispatcherInterface
+     */
+    private $dispatcher;
 
-    public function __construct(CollectionDataProviderInterface $collectionDataProvider, SubresourceDataProviderInterface $subresourceDataProvider, NormalizerInterface $normalizer, IdentifiersExtractorInterface $identifiersExtractor, ResourceMetadataFactoryInterface $resourceMetadataFactory, ResourceAccessCheckerInterface $resourceAccessChecker = null, RequestStack $requestStack = null, bool $paginationEnabled = false)
+    public function __construct(CollectionDataProviderInterface $collectionDataProvider, SubresourceDataProviderInterface $subresourceDataProvider, NormalizerInterface $normalizer, IdentifiersExtractorInterface $identifiersExtractor, ResourceMetadataFactoryInterface $resourceMetadataFactory, ResourceAccessCheckerInterface $resourceAccessChecker = null, RequestStack $requestStack = null, bool $paginationEnabled = false, EventDispatcherInterface $dispatcher = null)
     {
         $this->subresourceDataProvider = $subresourceDataProvider;
         $this->collectionDataProvider = $collectionDataProvider;
@@ -60,6 +69,7 @@ final class CollectionResolverFactory implements ResolverFactoryInterface
         $this->requestStack = $requestStack;
         $this->paginationEnabled = $paginationEnabled;
         $this->resourceMetadataFactory = $resourceMetadataFactory;
+        $this->dispatcher = $dispatcher;
     }
 
     public function __invoke(string $resourceClass = null, string $rootClass = null, string $operationName = null): callable
@@ -85,9 +95,22 @@ final class CollectionResolverFactory implements ResolverFactoryInterface
             if (isset($rootClass, $source[$rootProperty = $info->fieldName], $source[ItemNormalizer::ITEM_KEY])) {
                 $rootResolvedFields = $this->identifiersExtractor->getIdentifiersFromItem(unserialize($source[ItemNormalizer::ITEM_KEY]));
                 $subresource = $this->getSubresource($rootClass, $rootResolvedFields, array_keys($rootResolvedFields), $rootProperty, $resourceClass, true, $dataProviderContext);
+
+                if (null !== $this->dispatcher) {
+                    $this->dispatcher->dispatch(PreReadEvent::NAME, new PreReadEvent($subresource));
+                }
+
                 $collection = $subresource ?? [];
             } else {
+                if (null !== $this->dispatcher) {
+                    $this->dispatcher->dispatch(PreReadEvent::NAME, new PreReadEvent([]));
+                }
+
                 $collection = $this->collectionDataProvider->getCollection($resourceClass, null, $dataProviderContext);
+            }
+
+            if (null !== $this->dispatcher) {
+                $this->dispatcher->dispatch(PostReadEvent::NAME, new PostReadEvent($collection));
             }
 
             $this->canAccess($this->resourceAccessChecker, $resourceMetadata, $resourceClass, $info, $collection, $operationName ?? 'query');
@@ -95,7 +118,15 @@ final class CollectionResolverFactory implements ResolverFactoryInterface
             if (!$this->paginationEnabled) {
                 $data = [];
                 foreach ($collection as $index => $object) {
+                    if (null !== $this->dispatcher) {
+                        $this->dispatcher->dispatch(PreSerializeEvent::NAME, new PreSerializeEvent($collection));
+                    }
+
                     $data[$index] = $this->normalizer->normalize($object, ItemNormalizer::FORMAT, $dataProviderContext);
+
+                    if (null !== $this->dispatcher) {
+                        $this->dispatcher->dispatch(PostSerializeEvent::NAME, new PostSerializeEvent($collection));
+                    }
                 }
 
                 return $data;
@@ -118,10 +149,18 @@ final class CollectionResolverFactory implements ResolverFactoryInterface
             }
 
             foreach ($collection as $index => $object) {
+                if (null !== $this->dispatcher) {
+                    $this->dispatcher->dispatch(PreSerializeEvent::NAME, new PreSerializeEvent($collection));
+                }
+
                 $data['edges'][$index] = [
                     'node' => $this->normalizer->normalize($object, ItemNormalizer::FORMAT, $dataProviderContext),
                     'cursor' => base64_encode((string) ($index + $offset)),
                 ];
+
+                if (null !== $this->dispatcher) {
+                    $this->dispatcher->dispatch(PostSerializeEvent::NAME, new PostSerializeEvent($collection));
+                }
             }
 
             return $data;

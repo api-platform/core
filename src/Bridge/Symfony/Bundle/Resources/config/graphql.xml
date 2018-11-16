@@ -18,6 +18,7 @@
             <argument type="service" id="api_platform.security.resource_access_checker" on-invalid="null" />
             <argument type="service" id="request_stack" />
             <argument>%api_platform.collection.pagination.enabled%</argument>
+            <argument type="service" id="event_dispatcher" />
         </service>
 
         <service id="api_platform.graphql.resolver.factory.item_mutation" class="ApiPlatform\Core\GraphQl\Resolver\Factory\ItemMutationResolverFactory" public="false">
