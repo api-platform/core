@@ -101,7 +101,6 @@ final class AddTagsListener
     private function getAvailableResourceClasses(?array $resources)
     {
         if(!$resources) {
-
             return [];
         }
         $resourceClasses = [];
