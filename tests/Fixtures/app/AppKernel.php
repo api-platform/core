@@ -63,6 +63,11 @@ class AppKernel extends Kernel
         return $bundles;
     }
 
+    public function getProjectDir()
+    {
+        return __DIR__;
+    }
+
     protected function configureRoutes(RouteCollectionBuilder $routes)
     {
         $routes->import('config/routing.yml');
@@ -76,7 +81,7 @@ class AppKernel extends Kernel
     {
         $c->setParameter('kernel.project_dir', __DIR__);
 
-        $loader->load("{$this->getRootDir()}/config/config_{$this->getEnvironment()}.yml");
+        $loader->load(__DIR__."/config/config_{$this->getEnvironment()}.yml");
 
         $securityConfig = [
             'encoders' => [
