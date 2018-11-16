@@ -89,7 +89,7 @@ final class AddTagsListener
         $filteredResources = $resources;
         $results = [];
         foreach ($resourceCacheHeadersPerResourceClass as $resourceClass => $attributes) {
-            if (array_key_exists('cache_tags', $attributes) && false === $attributes['cache_tags']) {
+            if (false === $attributes['tags'] ?? true) {
                 $iri = $this->iriConverter->getIriFromResourceClass($resourceClass);
                 $matches = preg_grep('/^\\'.$iri.'\/{0,1}.*/', $filteredResources);
                 $filteredResources = array_diff($filteredResources, $matches);
