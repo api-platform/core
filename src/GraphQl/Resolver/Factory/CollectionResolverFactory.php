@@ -54,9 +54,6 @@ final class CollectionResolverFactory implements ResolverFactoryInterface
     private $requestStack;
     private $paginationEnabled;
     private $resourceMetadataFactory;
-    /**
-     * @var EventDispatcherInterface
-     */
     private $dispatcher;
 
     public function __construct(CollectionDataProviderInterface $collectionDataProvider, SubresourceDataProviderInterface $subresourceDataProvider, NormalizerInterface $normalizer, IdentifiersExtractorInterface $identifiersExtractor, ResourceMetadataFactoryInterface $resourceMetadataFactory, ResourceAccessCheckerInterface $resourceAccessChecker = null, RequestStack $requestStack = null, bool $paginationEnabled = false, EventDispatcherInterface $dispatcher = null)
