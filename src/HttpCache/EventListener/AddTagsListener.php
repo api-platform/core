@@ -15,6 +15,7 @@ namespace ApiPlatform\Core\HttpCache\EventListener;
 
 use ApiPlatform\Core\Api\IriConverterInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
+use ApiPlatform\Core\Util\ClassInfoTrait;
 use ApiPlatform\Core\Util\RequestAttributesExtractor;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 
@@ -31,6 +32,7 @@ use Symfony\Component\HttpKernel\Event\ResponseEvent;
  */
 final class AddTagsListener
 {
+    use ClassInfoTrait;
     private $iriConverter;
     /**
      * @var ResourceMetadataFactoryInterface
@@ -60,6 +62,7 @@ final class AddTagsListener
         }
 
         $resources = $request->attributes->get('_resources');
+        $resourceClasses = $this->getAvailableResourceClasses($resources);
         if (isset($attributes['collection_operation_name']) || ($attributes['subresource_context']['collection'] ?? false)) {
             // Allows to purge collections
             $iri = $this->iriConverter->getIriFromResourceClass($attributes['resource_class']);
@@ -70,33 +73,38 @@ final class AddTagsListener
             return;
         }
 
-        $resources = null !== $this->resourceMetadataFactory ? $this->removeDisabledResourcesFromCacheTags($resources) : $resources;
+        $resources = $this->removeDisabledResourcesFromCacheTags($resources, $resourceClasses);
 
         $response->headers->set('Cache-Tags', implode(',', $resources));
     }
 
-    private function removeDisabledResourcesFromCacheTags($resources)
+    private function removeDisabledResourcesFromCacheTags($resources, $resourceClasses)
     {
         $resourceCacheHeadersPerResourceClass = [];
-        foreach ($resources as $resource) {
-            if (3 !== \count(explode('/', $resource))) { // simple check if it's an item or collection resource
-                continue;
-            }
-            $resourceClass =  $this->getObjectClass($this->iriConverter->getItemFromIri($resource));
+        foreach ($resourceClasses as $resourceClass) {
             $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
-            $resourceCacheHeadersPerResourceClass[$resourceClass] = $resourceMetadata->getAttribute('cache_header', ['cache_tags' => true]);
+            $resourceCacheHeadersPerResourceClass[$resourceClass] = $resourceMetadata->getAttribute('cache_headers', []);
         }
+
         $filteredResources = $resources;
-        $results = [];
         foreach ($resourceCacheHeadersPerResourceClass as $resourceClass => $attributes) {
             if (false === $attributes['tags'] ?? true) {
                 $iri = $this->iriConverter->getIriFromResourceClass($resourceClass);
                 $matches = preg_grep('/^\\'.$iri.'\/{0,1}.*/', $filteredResources);
                 $filteredResources = array_diff($filteredResources, $matches);
-                $results[] = $filteredResources;
             }
         }
 
         return $filteredResources;
+    }
+
+    private function getAvailableResourceClasses(array $resources)
+    {
+        $resourceClasses = [];
+        foreach ($resources as $resource) {
+            $resourceClasses[] = $this->getObjectClass($this->iriConverter->getItemFromIri($resource));
+        }
+
+        return array_unique($resourceClasses);
     }
 }

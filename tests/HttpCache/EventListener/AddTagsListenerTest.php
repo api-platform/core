@@ -232,9 +232,9 @@ class AddTagsListenerTest extends TestCase
         $event->getResponse()->willReturn($response)->shouldBeCalled();
 
         $factory = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $factory->create($fooObjClass)->willReturn(new ResourceMetadata(null, null, null, null, null, ['cache_header' => ['cache_tags' => true]]));
-        $factory->create($barObjClass)->willReturn(new ResourceMetadata(null, null, null, null, null, ['cache_header' => ['cache_tags' => true]]));
-        $factory->create(Dummy::class)->willReturn(new ResourceMetadata(null, null, null, null, null, ['cache_header' => ['cache_tags' => false]]));
+        $factory->create($fooObjClass)->willReturn(new ResourceMetadata(null, null, null, null, null, ['cache_headers' => ['tags' => true]]));
+        $factory->create($barObjClass)->willReturn(new ResourceMetadata(null, null, null, null, null, ['cache_headers' => ['tags' => true]]));
+        $factory->create(Dummy::class)->willReturn(new ResourceMetadata(null, null, null, null, null, ['cache_headers' => ['tags' => false]]));
 
         $listener = new AddTagsListener($iriConverterProphecy->reveal(), $factory->reveal());
         $listener->onKernelResponse($event->reveal());
