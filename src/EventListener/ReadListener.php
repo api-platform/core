@@ -101,7 +101,7 @@ final class ReadListener
                 $data = $this->getSubresourceData($identifiers, $attributes, $context);
             }
         } catch (InvalidIdentifierException $e) {
-            $data = null;
+            throw new NotFoundHttpException('Not found, because of an invalid identifier configuration', $e);
         }
 
         if (null === $data) {
