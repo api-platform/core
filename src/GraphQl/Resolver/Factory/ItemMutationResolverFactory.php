@@ -15,6 +15,8 @@ namespace ApiPlatform\Core\GraphQl\Resolver\Factory;
 
 use ApiPlatform\Core\Api\IriConverterInterface;
 use ApiPlatform\Core\DataPersister\DataPersisterInterface;
+use ApiPlatform\Core\Event\PostWriteEvent;
+use ApiPlatform\Core\Event\PreWriteEvent;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\Exception\ItemNotFoundException;
 use ApiPlatform\Core\GraphQl\Resolver\FieldsToAttributesTrait;
@@ -28,6 +30,7 @@ use ApiPlatform\Core\Validator\Exception\ValidationException;
 use ApiPlatform\Core\Validator\ValidatorInterface;
 use GraphQL\Error\Error;
 use GraphQL\Type\Definition\ResolveInfo;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
@@ -50,8 +53,12 @@ final class ItemMutationResolverFactory implements ResolverFactoryInterface
     private $resourceMetadataFactory;
     private $resourceAccessChecker;
     private $validator;
+    /**
+     * @var EventDispatcherInterface
+     */
+    private $dispatcher;
 
-    public function __construct(IriConverterInterface $iriConverter, DataPersisterInterface $dataPersister, NormalizerInterface $normalizer, ResourceMetadataFactoryInterface $resourceMetadataFactory, ResourceAccessCheckerInterface $resourceAccessChecker = null, ValidatorInterface $validator = null)
+    public function __construct(IriConverterInterface $iriConverter, DataPersisterInterface $dataPersister, NormalizerInterface $normalizer, ResourceMetadataFactoryInterface $resourceMetadataFactory, ResourceAccessCheckerInterface $resourceAccessChecker = null, ValidatorInterface $validator = null, EventDispatcherInterface $dispatcher = null)
     {
         if (!$normalizer instanceof DenormalizerInterface) {
             throw new InvalidArgumentException(sprintf('The normalizer must implements the "%s" interface', DenormalizerInterface::class));
@@ -63,6 +70,7 @@ final class ItemMutationResolverFactory implements ResolverFactoryInterface
         $this->resourceMetadataFactory = $resourceMetadataFactory;
         $this->resourceAccessChecker = $resourceAccessChecker;
         $this->validator = $validator;
+        $this->dispatcher = $dispatcher;
     }
 
     public function __invoke(string $resourceClass = null, string $rootClass = null, string $operationName = null): callable
@@ -104,7 +112,16 @@ final class ItemMutationResolverFactory implements ResolverFactoryInterface
                     $context += $resourceMetadata->getGraphqlAttribute($operationName, 'denormalization_context', [], true);
                     $item = $this->normalizer->denormalize($args['input'], $resourceClass, ItemNormalizer::FORMAT, $context);
                     $this->validate($item, $info, $resourceMetadata, $operationName);
+
+                    if (null !== $this->dispatcher) {
+                        $this->dispatcher->dispatch(PreWriteEvent::NAME, new PreWriteEvent($operationName, $item));
+                    }
+
                     $persistResult = $this->dataPersister->persist($item);
+
+                    if (null !== $this->dispatcher) {
+                        $this->dispatcher->dispatch(PostWriteEvent::NAME, new PostWriteEvent($operationName, $item));
+                    }
 
                     if (null === $persistResult) {
                         @trigger_error(sprintf('Returning void from %s::persist() is deprecated since API Platform 2.3 and will not be supported in API Platform 3, an object should always be returned.', DataPersisterInterface::class), E_USER_DEPRECATED);
@@ -112,11 +129,19 @@ final class ItemMutationResolverFactory implements ResolverFactoryInterface
 
                     return $this->normalizer->normalize($persistResult ?? $item, ItemNormalizer::FORMAT, $normalizationContext) + $data;
                 case 'delete':
+                    if (null !== $this->dispatcher) {
+                        $this->dispatcher->dispatch(PreWriteEvent::NAME, new PreWriteEvent($operationName, $item));
+                    }
+
                     if ($item) {
                         $this->dataPersister->remove($item);
                         $data['id'] = $args['input']['id'];
                     } else {
                         $data['id'] = null;
+                    }
+
+                    if (null !== $this->dispatcher) {
+                        $this->dispatcher->dispatch(PostWriteEvent::NAME, new PostWriteEvent($operationName, $item));
                     }
             }
 
