@@ -14,12 +14,15 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\GraphQl\Resolver;
 
 use ApiPlatform\Core\Api\IriConverterInterface;
+use ApiPlatform\Core\Event\PostReadEvent;
+use ApiPlatform\Core\Event\PreReadEvent;
 use ApiPlatform\Core\Exception\ItemNotFoundException;
 use ApiPlatform\Core\GraphQl\Serializer\ItemNormalizer;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Security\ResourceAccessCheckerInterface;
 use ApiPlatform\Core\Util\ClassInfoTrait;
 use GraphQL\Type\Definition\ResolveInfo;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 /**
@@ -40,13 +43,15 @@ final class ItemResolver
     private $resourceAccessChecker;
     private $normalizer;
     private $resourceMetadataFactory;
+    private $dispatcher;
 
-    public function __construct(IriConverterInterface $iriConverter, NormalizerInterface $normalizer, ResourceMetadataFactoryInterface $resourceMetadataFactory, ResourceAccessCheckerInterface $resourceAccessChecker = null)
+    public function __construct(IriConverterInterface $iriConverter, NormalizerInterface $normalizer, ResourceMetadataFactoryInterface $resourceMetadataFactory, ResourceAccessCheckerInterface $resourceAccessChecker = null, EventDispatcherInterface $dispatcher = null)
     {
         $this->iriConverter = $iriConverter;
         $this->normalizer = $normalizer;
         $this->resourceMetadataFactory = $resourceMetadataFactory;
         $this->resourceAccessChecker = $resourceAccessChecker;
+        $this->dispatcher = $dispatcher;
     }
 
     public function __invoke($source, $args, $context, ResolveInfo $info)
@@ -62,7 +67,15 @@ final class ItemResolver
 
         $baseNormalizationContext = ['attributes' => $this->fieldsToAttributes($info)];
         try {
+            if (null !== $this->dispatcher) {
+                $this->dispatcher->dispatch(PreReadEvent::NAME, new PreReadEvent(null));
+            }
+
             $item = $this->iriConverter->getItemFromIri($args['id'], $baseNormalizationContext);
+
+            if (null !== $this->dispatcher) {
+                $this->dispatcher->dispatch(PostReadEvent::NAME, new PostReadEvent($item));
+            }
         } catch (ItemNotFoundException $e) {
             return null;
         }

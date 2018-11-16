@@ -35,6 +35,7 @@
             <argument type="service" id="serializer" />
             <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
             <argument type="service" id="api_platform.security.resource_access_checker" on-invalid="ignore" />
+            <argument type="service" id="event_dispatcher" />
         </service>
 
         <service id="api_platform.graphql.resolver.resource_field" class="ApiPlatform\Core\GraphQl\Resolver\ResourceFieldResolver" public="false">
