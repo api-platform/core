@@ -15,7 +15,9 @@ namespace ApiPlatform\Core\GraphQl\Resolver;
 
 use ApiPlatform\Core\Api\IriConverterInterface;
 use ApiPlatform\Core\Event\PostReadEvent;
+use ApiPlatform\Core\Event\PostSerializeEvent;
 use ApiPlatform\Core\Event\PreReadEvent;
+use ApiPlatform\Core\Event\PreSerializeEvent;
 use ApiPlatform\Core\Exception\ItemNotFoundException;
 use ApiPlatform\Core\GraphQl\Serializer\ItemNormalizer;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
@@ -86,6 +88,16 @@ final class ItemResolver
 
         $normalizationContext = $resourceMetadata->getGraphqlAttribute('query', 'normalization_context', [], true);
 
-        return $this->normalizer->normalize($item, ItemNormalizer::FORMAT, $normalizationContext + $baseNormalizationContext);
+        if($this->dispatcher !== null) {
+            $this->dispatcher->dispatch(PreSerializeEvent::NAME, new PreSerializeEvent($item));
+        }
+
+        $normalizedObject = $this->normalizer->normalize($item, ItemNormalizer::FORMAT, $normalizationContext + $baseNormalizationContext);
+
+        if($this->dispatcher !== null) {
+            $this->dispatcher->dispatch(PostSerializeEvent::NAME, new PostSerializeEvent($item));
+        }
+
+        return $normalizedObject;
     }
 }
