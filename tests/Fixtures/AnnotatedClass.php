@@ -23,7 +23,7 @@ use ApiPlatform\Core\Annotation\ApiResource;
  *     itemOperations={"foo"={"bar"}},
  *     collectionOperations={"bar"={"foo"}},
  *     graphql={"query"={"normalization_context"={"groups"={"foo", "bar"}}}},
- *     attributes={"foo"="bar", "route_prefix"="/whatever", "cache_headers"={"max_age"=0, "shared_max_age"=0, "cache_tags"=true, "vary"={"Custom-Vary-1", "Custom-Vary-2"}}},
+ *     attributes={"foo"="bar", "route_prefix"="/whatever", "cache_headers"={"max_age"=0, "shared_max_age"=0, "tags"=true, "vary"={"Custom-Vary-1", "Custom-Vary-2"}}},
  *     routePrefix="/foo",
  *     security="is_granted('ROLE_FOO')",
  *     securityMessage="You are not foo.",
