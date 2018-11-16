@@ -82,7 +82,7 @@ final class AddTagsListener
             if (3 !== \count(explode('/', $resource))) { // simple check if it's an item or collection resource
                 continue;
             }
-            $resourceClass = \get_class($this->iriConverter->getItemFromIri($resource));
+            $resourceClass =  $this->getObjectClass($this->iriConverter->getItemFromIri($resource));
             $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
             $resourceCacheHeadersPerResourceClass[$resourceClass] = $resourceMetadata->getAttribute('cache_header', ['cache_tags' => true]);
         }
