@@ -66,7 +66,6 @@
         "symfony/routing": "^3.3 || ^4.0",
         "symfony/security": "^3.0 || ^4.0",
         "symfony/security-bundle": "^3.4 || ^4.0",
-        "symfony/serializer": "^4.2@beta",
         "symfony/twig-bundle": "^3.4 || ^4.0",
         "symfony/validator": "^3.3 || ^4.0",
         "symfony/web-profiler-bundle": "^3.3 || ^4.0",

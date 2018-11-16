@@ -57,7 +57,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
 
     public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, IriConverterInterface $iriConverter, ResourceClassResolverInterface $resourceClassResolver, PropertyAccessorInterface $propertyAccessor = null, NameConverterInterface $nameConverter = null, ClassMetadataFactoryInterface $classMetadataFactory = null, ItemDataProviderInterface $itemDataProvider = null, bool $allowPlainIdentifiers = false, array $defaultContext = [])
     {
-        if (!isset($defaultContext[self::CIRCULAR_REFERENCE_HANDLER])) {
+        if (!isset($defaultContext['circular_reference_handler'])) {
             $defaultContext['circular_reference_handler'] = function ($object) {
                 return $this->iriConverter->getIriFromItem($object);
             };
