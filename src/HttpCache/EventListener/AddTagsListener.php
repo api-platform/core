@@ -70,7 +70,7 @@ final class AddTagsListener
             return;
         }
 
-        $resources = $this->removeDisabledResourcesFromCacheTags($resources);
+        $resources = null !== $this->resourceMetadataFactory ? $this->removeDisabledResourcesFromCacheTags($resources) : $resources;
 
         $response->headers->set('Cache-Tags', implode(',', $resources));
     }
