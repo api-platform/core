@@ -69,11 +69,11 @@ final class AddTagsListener
             $resources[$iri] = $iri;
         }
 
+        $resources = $this->removeDisabledResourcesFromCacheTags($resources, $resourceClasses);
+
         if (!$resources) {
             return;
         }
-
-        $resources = $this->removeDisabledResourcesFromCacheTags($resources, $resourceClasses);
 
         $response->headers->set('Cache-Tags', implode(',', $resources));
     }
