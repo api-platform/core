@@ -1,5 +1,22 @@
 # Changelog
 
+## 2.3.4
+
+* Open API/Swagger: fix YAML export
+* Open API/Swagger: Correctly expose overridden formats
+* GraphQL: display the stack trace when in debug mode
+* GraphQL: prevent a crash when the class name isn't provided
+* Fix handling of one-to-one relations in subresources
+* Fix max depth handling when eager fetching is disabled
+* Compatibility with Symfony 4.2
+* Prevent calling the remove method from all data persisters
+* Persist Doctrine entities with the `DEFERRED_EXPLICIT` change tracking policy
+* Throw an `InvalidArgumentException` when trying to get an item from a collection route
+* Improve the debug bar panel visibility
+* Take into account the `route_prefix` attribute in subresources
+* Allow to use multiple values with `NumericFilter`
+* Improve exception handling in `ReadListener` by adding the previous exception
+
 ## 2.3.3
 
 * Doctrine: revert "prevent data duplication in Eager loaded relations"
