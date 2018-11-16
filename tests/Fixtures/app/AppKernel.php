@@ -63,6 +63,11 @@ class AppKernel extends Kernel
         return $bundles;
     }
 
+    public function getProjectDir()
+    {
+        return __DIR__;
+    }
+
     protected function configureRoutes(RouteCollectionBuilder $routes)
     {
         $routes->import('config/routing.yml');
