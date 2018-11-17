@@ -32,6 +32,7 @@ use Prophecy\Argument;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\PropertyInfo\Type;
+use Symfony\Component\Serializer\NameConverter\AdvancedNameConverterInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\SerializerInterface;
@@ -140,13 +141,16 @@ class AbstractItemNormalizerTest extends TestCase
             $propertyAccessorProphecy->reveal(),
         ]);
         $normalizer->setSerializer($serializerProphecy->reveal());
-        $normalizer->setIgnoredAttributes(['alias']);
+
+        if (!interface_exists(AdvancedNameConverterInterface::class)) {
+            $normalizer->setIgnoredAttributes(['alias']);
+        }
 
         $this->assertEquals([
             'name' => 'foo',
             'relatedDummy' => '/dummies/2',
             'relatedDummies' => ['/dummies/2'],
-        ], $normalizer->normalize($dummy, null, ['resources' => []]));
+        ], $normalizer->normalize($dummy, null, ['resources' => [], 'ignored_attributes' => ['alias']]));
     }
 
     public function testNormalizeReadableLinks()
