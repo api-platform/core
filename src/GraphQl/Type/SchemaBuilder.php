@@ -363,10 +363,10 @@ final class SchemaBuilder implements SchemaBuilderInterface
                     $graphqlType = $this->convertType($type->getCollectionValueType());
                     break;
                 }
-                $graphqlType = $this->getIterableType();
+                $graphqlType = $this->graphqlTypes['Iterable'];
                 break;
             case Type::BUILTIN_TYPE_ITERABLE:
-                $graphqlType = $this->getIterableType();
+                $graphqlType = $this->graphqlTypes['Iterable'];
                 break;
             case Type::BUILTIN_TYPE_OBJECT:
                 if (($input && $depth > 0) || is_a($type->getClassName(), \DateTimeInterface::class, true)) {
@@ -557,10 +557,5 @@ final class SchemaBuilder implements SchemaBuilderInterface
         return $type->isCollection()
             && null !== $type->getCollectionValueType()
             && null === $type->getCollectionValueType()->getClassName();
-    }
-
-    private function getIterableType()
-    {
-        return $this->graphqlTypes['Iterable'];
     }
 }
