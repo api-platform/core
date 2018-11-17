@@ -18,6 +18,7 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGenerator;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\Test\DoctrineOrmFilterTestCase;
+use ApiPlatform\Core\Tests\Bridge\Doctrine\Common\Filter\SearchFilterTestTrait;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RelatedDummy;
 use Doctrine\Common\Persistence\ManagerRegistry;
@@ -31,33 +32,14 @@ use Symfony\Component\HttpFoundation\RequestStack;
  */
 class SearchFilterTest extends DoctrineOrmFilterTestCase
 {
+    use SearchFilterTestTrait;
+
     protected $alias = 'oo';
     protected $filterClass = SearchFilter::class;
 
-    protected function filterFactory(ManagerRegistry $managerRegistry, RequestStack $requestStack = null, array $properties = null)
+    public function testGetDescriptionDefaultFields()
     {
-        $relatedDummyProphecy = $this->prophesize(RelatedDummy::class);
-        $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
-
-        $iriConverterProphecy->getItemFromIri(Argument::type('string'), ['fetch_data' => false])->will(function ($args) use ($relatedDummyProphecy) {
-            if (false !== strpos($args[0], '/related_dummies')) {
-                $relatedDummyProphecy->getId()->shouldBeCalled()->willReturn(1);
-
-                return $relatedDummyProphecy->reveal();
-            }
-
-            throw new InvalidArgumentException();
-        });
-
-        $iriConverter = $iriConverterProphecy->reveal();
-        $propertyAccessor = self::$kernel->getContainer()->get('test.property_accessor');
-
-        return new SearchFilter($managerRegistry, $requestStack, $iriConverter, $propertyAccessor, null, $properties);
-    }
-
-    public function testGetDescription()
-    {
-        $filter = $this->filterFactory($this->managerRegistry, null);
+        $filter = $this->buildSearchFilter($this->managerRegistry);
 
         $this->assertEquals([
             'id' => [
@@ -229,163 +211,6 @@ class SearchFilterTest extends DoctrineOrmFilterTestCase
                 'is_collection' => true,
             ],
         ], $filter->getDescription($this->resourceClass));
-
-        $filter = $this->filterFactory($this->managerRegistry, null, [
-            'id' => null,
-            'name' => null,
-            'alias' => null,
-            'dummy' => null,
-            'dummyDate' => null,
-            'jsonData' => null,
-            'arrayData' => null,
-            'nameConverted' => null,
-            'foo' => null,
-            'relatedDummies.dummyDate' => null,
-            'relatedDummy' => null,
-        ]);
-
-        $this->assertEquals([
-            'id' => [
-                'property' => 'id',
-                'type' => 'int',
-                'required' => false,
-                'strategy' => 'exact',
-                'is_collection' => false,
-            ],
-            'id[]' => [
-                'property' => 'id',
-                'type' => 'int',
-                'required' => false,
-                'strategy' => 'exact',
-                'is_collection' => true,
-            ],
-            'name' => [
-                'property' => 'name',
-                'type' => 'string',
-                'required' => false,
-                'strategy' => 'exact',
-                'is_collection' => false,
-            ],
-            'name[]' => [
-                'property' => 'name',
-                'type' => 'string',
-                'required' => false,
-                'strategy' => 'exact',
-                'is_collection' => true,
-            ],
-            'alias' => [
-                'property' => 'alias',
-                'type' => 'string',
-                'required' => false,
-                'strategy' => 'exact',
-                'is_collection' => false,
-            ],
-            'alias[]' => [
-                'property' => 'alias',
-                'type' => 'string',
-                'required' => false,
-                'strategy' => 'exact',
-                'is_collection' => true,
-            ],
-            'dummy' => [
-                'property' => 'dummy',
-                'type' => 'string',
-                'required' => false,
-                'strategy' => 'exact',
-                'is_collection' => false,
-            ],
-            'dummy[]' => [
-                'property' => 'dummy',
-                'type' => 'string',
-                'required' => false,
-                'strategy' => 'exact',
-                'is_collection' => true,
-            ],
-            'dummyDate' => [
-                'property' => 'dummyDate',
-                'type' => 'DateTimeInterface',
-                'required' => false,
-                'strategy' => 'exact',
-                'is_collection' => false,
-            ],
-            'dummyDate[]' => [
-                'property' => 'dummyDate',
-                'type' => 'DateTimeInterface',
-                'required' => false,
-                'strategy' => 'exact',
-                'is_collection' => true,
-            ],
-            'jsonData' => [
-                'property' => 'jsonData',
-                'type' => 'string',
-                'required' => false,
-                'strategy' => 'exact',
-                'is_collection' => false,
-            ],
-            'jsonData[]' => [
-                'property' => 'jsonData',
-                'type' => 'string',
-                'required' => false,
-                'strategy' => 'exact',
-                'is_collection' => true,
-            ],
-            'arrayData' => [
-                'property' => 'arrayData',
-                'type' => 'string',
-                'required' => false,
-                'strategy' => 'exact',
-                'is_collection' => false,
-            ],
-            'arrayData[]' => [
-                'property' => 'arrayData',
-                'type' => 'string',
-                'required' => false,
-                'strategy' => 'exact',
-                'is_collection' => true,
-            ],
-            'nameConverted' => [
-                'property' => 'nameConverted',
-                'type' => 'string',
-                'required' => false,
-                'strategy' => 'exact',
-                'is_collection' => false,
-            ],
-            'nameConverted[]' => [
-                'property' => 'nameConverted',
-                'type' => 'string',
-                'required' => false,
-                'strategy' => 'exact',
-                'is_collection' => true,
-            ],
-            'relatedDummies.dummyDate' => [
-                'property' => 'relatedDummies.dummyDate',
-                'type' => 'DateTimeInterface',
-                'required' => false,
-                'strategy' => 'exact',
-                'is_collection' => false,
-            ],
-            'relatedDummies.dummyDate[]' => [
-                'property' => 'relatedDummies.dummyDate',
-                'type' => 'DateTimeInterface',
-                'required' => false,
-                'strategy' => 'exact',
-                'is_collection' => true,
-            ],
-            'relatedDummy' => [
-                'property' => 'relatedDummy',
-                'type' => 'string',
-                'required' => false,
-                'strategy' => 'exact',
-                'is_collection' => false,
-            ],
-            'relatedDummy[]' => [
-                'property' => 'relatedDummy',
-                'type' => 'string',
-                'required' => false,
-                'strategy' => 'exact',
-                'is_collection' => true,
-            ],
-        ], $filter->getDescription($this->resourceClass));
     }
 
     public function testDoubleJoin()
@@ -412,7 +237,7 @@ class SearchFilterTest extends DoctrineOrmFilterTestCase
         }
 
         $queryBuilder = $this->repository->createQueryBuilder($this->alias);
-        $filter = $this->filterFactory($this->managerRegistry, $requestStack, ['relatedDummy.symfony' => null]);
+        $filter = $this->buildSearchFilter($this->managerRegistry, ['relatedDummy.symfony' => null], $requestStack);
 
         $queryBuilder->innerJoin(sprintf('%s.relatedDummy', $this->alias), 'relateddummy_a1');
         $filter->apply($queryBuilder, new QueryNameGenerator(), $this->resourceClass, 'op', $request ? [] : ['filters' => $filters]);
@@ -446,7 +271,7 @@ class SearchFilterTest extends DoctrineOrmFilterTestCase
         }
 
         $queryBuilder = $this->repository->createQueryBuilder($this->alias);
-        $filter = $this->filterFactory($this->managerRegistry, $requestStack, ['relatedDummy.symfony' => null, 'relatedDummy.thirdLevel.level' => null]);
+        $filter = $this->buildSearchFilter($this->managerRegistry, ['relatedDummy.symfony' => null, 'relatedDummy.thirdLevel.level' => null], $requestStack);
 
         $queryBuilder->innerJoin(sprintf('%s.relatedDummy', $this->alias), 'relateddummy_a1');
         $queryBuilder->innerJoin('relateddummy_a1.thirdLevel', 'thirdLevel_a1');
@@ -483,7 +308,7 @@ class SearchFilterTest extends DoctrineOrmFilterTestCase
         $queryBuilder = $this->repository->createQueryBuilder($this->alias);
         $queryBuilder->leftJoin(sprintf('%s.relatedDummy', $this->alias), 'relateddummy_a1');
 
-        $filter = $this->filterFactory($this->managerRegistry, $requestStack, ['relatedDummy.symfony' => null, 'relatedDummy.thirdLevel.level' => null]);
+        $filter = $this->buildSearchFilter($this->managerRegistry, ['relatedDummy.symfony' => null, 'relatedDummy.thirdLevel.level' => null], $requestStack);
         $filter->apply($queryBuilder, new QueryNameGenerator(), $this->resourceClass, 'op', $request ? [] : ['filters' => $filters]);
 
         $actual = strtolower($queryBuilder->getQuery()->getDQL());
@@ -516,7 +341,7 @@ class SearchFilterTest extends DoctrineOrmFilterTestCase
 
         $queryBuilder = $this->repository->createQueryBuilder('somealias');
 
-        $filter = $this->filterFactory($this->managerRegistry, $requestStack, ['id' => null, 'name' => null]);
+        $filter = $this->buildSearchFilter($this->managerRegistry, ['id' => null, 'name' => null], $requestStack);
         $filter->apply($queryBuilder, new QueryNameGenerator(), $this->resourceClass, 'op', $request ? [] : ['filters' => $filters]);
 
         $expectedDql = sprintf('SELECT %s FROM %s %1$s WHERE %1$s.name = :name_p1', 'somealias', Dummy::class);
@@ -525,258 +350,139 @@ class SearchFilterTest extends DoctrineOrmFilterTestCase
 
     public function provideApplyTestData(): array
     {
-        $filterFactory = [$this, 'filterFactory'];
+        $filterFactory = [$this, 'buildSearchFilter'];
 
-        return [
-            'exact' => [
-                [
-                    'id' => null,
-                    'name' => null,
+        return array_merge_recursive(
+            $this->provideApplyTestArguments(),
+            [
+                'exact' => [
+                    sprintf('SELECT %s FROM %s %1$s WHERE %1$s.name = :name_p1', $this->alias, Dummy::class),
+                    ['name_p1' => 'exact'],
+                    $filterFactory,
                 ],
-                [
-                    'name' => 'exact',
+                'exact (case insensitive)' => [
+                    sprintf('SELECT %s FROM %s %1$s WHERE LOWER(%1$s.name) = LOWER(:name_p1)', $this->alias, Dummy::class),
+                    ['name_p1' => 'exact'],
+                    $filterFactory,
                 ],
-                sprintf('SELECT %s FROM %s %1$s WHERE %1$s.name = :name_p1', $this->alias, Dummy::class),
-                ['name_p1' => 'exact'],
-                $filterFactory,
-            ],
-            'exact (case insensitive)' => [
-                [
-                    'id' => null,
-                    'name' => 'iexact',
-                ],
-                [
-                    'name' => 'exact',
-                ],
-                sprintf('SELECT %s FROM %s %1$s WHERE LOWER(%1$s.name) = LOWER(:name_p1)', $this->alias, Dummy::class),
-                ['name_p1' => 'exact'],
-                $filterFactory,
-            ],
-            'exact (multiple values)' => [
-                [
-                    'id' => null,
-                    'name' => 'exact',
-                ],
-                [
-                    'name' => [
-                        'CaSE',
-                        'SENSitive',
+                'exact (multiple values)' => [
+                    sprintf('SELECT %s FROM %s %1$s WHERE %1$s.name IN (:name_p1)', $this->alias, Dummy::class),
+                    [
+                        'name_p1' => [
+                            'CaSE',
+                            'SENSitive',
+                        ],
                     ],
+                    $filterFactory,
                 ],
-                sprintf('SELECT %s FROM %s %1$s WHERE %1$s.name IN (:name_p1)', $this->alias, Dummy::class),
-                [
-                    'name_p1' => [
-                        'CaSE',
-                        'SENSitive',
+                'exact (multiple values; case insensitive)' => [
+                    sprintf('SELECT %s FROM %s %1$s WHERE LOWER(%1$s.name) IN (:name_p1)', $this->alias, Dummy::class),
+                    [
+                        'name_p1' => [
+                            'case',
+                            'insensitive',
+                        ],
                     ],
+                    $filterFactory,
                 ],
-                $filterFactory,
-            ],
-            'exact (multiple values; case insensitive)' => [
-                [
-                    'id' => null,
-                    'name' => 'iexact',
+                'invalid property' => [
+                    sprintf('SELECT %s FROM %s %1$s', $this->alias, Dummy::class),
+                    [],
+                    $filterFactory,
                 ],
-                [
-                    'name' => [
-                        'CaSE',
-                        'inSENSitive',
+                'invalid values for relations' => [
+                    sprintf('SELECT %s FROM %s %1$s WHERE %1$s.name = :name_p1 AND %1$s.relatedDummy = :relatedDummy_p2', $this->alias, Dummy::class),
+                    ['relatedDummy_p2' => 'foo'],
+                    $filterFactory,
+                ],
+                'partial' => [
+                    sprintf('SELECT %s FROM %s %1$s WHERE %1$s.name LIKE CONCAT(\'%%\', :name_p1, \'%%\')', $this->alias, Dummy::class),
+                    ['name_p1' => 'partial'],
+                    $filterFactory,
+                ],
+                'partial (case insensitive)' => [
+                    sprintf('SELECT %s FROM %s %1$s WHERE LOWER(%1$s.name) LIKE LOWER(CONCAT(\'%%\', :name_p1, \'%%\'))', $this->alias, Dummy::class),
+                    ['name_p1' => 'partial'],
+                    $filterFactory,
+                ],
+                'start' => [
+                    sprintf('SELECT %s FROM %s %1$s WHERE %1$s.name LIKE CONCAT(:name_p1, \'%%\')', $this->alias, Dummy::class),
+                    ['name_p1' => 'partial'],
+                    $filterFactory,
+                ],
+                'start (case insensitive)' => [
+                    sprintf('SELECT %s FROM %s %1$s WHERE LOWER(%1$s.name) LIKE LOWER(CONCAT(:name_p1, \'%%\'))', $this->alias, Dummy::class),
+                    ['name_p1' => 'partial'],
+                    $filterFactory,
+                ],
+                'end' => [
+                    sprintf('SELECT %s FROM %s %1$s WHERE %1$s.name LIKE CONCAT(\'%%\', :name_p1)', $this->alias, Dummy::class),
+                    ['name_p1' => 'partial'],
+                    $filterFactory,
+                ],
+                'end (case insensitive)' => [
+                    sprintf('SELECT %s FROM %s %1$s WHERE LOWER(%1$s.name) LIKE LOWER(CONCAT(\'%%\', :name_p1))', $this->alias, Dummy::class),
+                    ['name_p1' => 'partial'],
+                    $filterFactory,
+                ],
+                'word_start' => [
+                    sprintf('SELECT %s FROM %s %1$s WHERE %1$s.name LIKE CONCAT(:name_p1, \'%%\') OR %1$s.name LIKE CONCAT(\'%% \', :name_p1, \'%%\')', $this->alias, Dummy::class),
+                    ['name_p1' => 'partial'],
+                    $filterFactory,
+                ],
+                'word_start (case insensitive)' => [
+                    sprintf('SELECT %s FROM %s %1$s WHERE LOWER(%1$s.name) LIKE LOWER(CONCAT(:name_p1, \'%%\')) OR LOWER(%1$s.name) LIKE LOWER(CONCAT(\'%% \', :name_p1, \'%%\'))', $this->alias, Dummy::class),
+                    ['name_p1' => 'partial'],
+                    $filterFactory,
+                ],
+                'invalid value for relation' => [
+                    sprintf('SELECT %s FROM %s %1$s WHERE %1$s.relatedDummy = :relatedDummy_p1', $this->alias, Dummy::class),
+                    ['relatedDummy_p1' => 'exact'],
+                    $filterFactory,
+                ],
+                'IRI value for relation' => [
+                    sprintf('SELECT %s FROM %s %1$s INNER JOIN %1$s.relatedDummy relatedDummy_a1 WHERE relatedDummy_a1.id = :id_p1', $this->alias, Dummy::class),
+                    ['id_p1' => 1],
+                    $filterFactory,
+                ],
+                'mixed IRI and entity ID values for relations' => [
+                    sprintf('SELECT %s FROM %s %1$s INNER JOIN %1$s.relatedDummies relatedDummies_a1 WHERE %1$s.relatedDummy IN (:relatedDummy_p1) AND relatedDummies_a1.id = :relatedDummies_p2', $this->alias, Dummy::class),
+                    [
+                        'relatedDummy_p1' => [1, 2],
+                        'relatedDummies_p2' => 1,
                     ],
+                    $filterFactory,
                 ],
-                sprintf('SELECT %s FROM %s %1$s WHERE LOWER(%1$s.name) IN (:name_p1)', $this->alias, Dummy::class),
-                [
-                    'name_p1' => [
-                        'case',
-                        'insensitive',
+                'nested property' => [
+                    sprintf('SELECT %s FROM %s %1$s INNER JOIN %1$s.relatedDummy relatedDummy_a1 WHERE %1$s.name = :name_p1 AND relatedDummy_a1.symfony = :symfony_p2', $this->alias, Dummy::class),
+                    [
+                        'name_p1' => 'exact',
+                        'symfony_p2' => 'exact',
                     ],
+                    $filterFactory,
                 ],
-                $filterFactory,
-            ],
-            'invalid property' => [
-                [
-                    'id' => null,
-                    'name' => null,
-                ],
-                [
-                    'foo' => 'exact',
-                ],
-                sprintf('SELECT %s FROM %s %1$s', $this->alias, Dummy::class),
-                [],
-                $filterFactory,
-            ],
-            'invalid values for relations' => [
-                [
-                    'id' => null,
-                    'name' => null,
-                    'relatedDummy' => null,
-                    'relatedDummies' => null,
-                ],
-                [
-                    'name' => ['foo'],
-                    'relatedDummy' => ['foo'],
-                    'relatedDummies' => [['foo']],
-                ],
-                sprintf('SELECT %s FROM %s %1$s WHERE %1$s.name = :name_p1 AND %1$s.relatedDummy = :relatedDummy_p2', $this->alias, Dummy::class),
-                ['relatedDummy_p2' => 'foo'],
-                $filterFactory,
-            ],
-            'partial' => [
-                [
-                    'id' => null,
-                    'name' => 'partial',
-                ],
-                [
-                    'name' => 'partial',
-                ],
-                sprintf('SELECT %s FROM %s %1$s WHERE %1$s.name LIKE CONCAT(\'%%\', :name_p1, \'%%\')', $this->alias, Dummy::class),
-                ['name_p1' => 'partial'],
-                $filterFactory,
-            ],
-            'partial (case insensitive)' => [
-                [
-                    'id' => null,
-                    'name' => 'ipartial',
-                ],
-                [
-                    'name' => 'partial',
-                ],
-                sprintf('SELECT %s FROM %s %1$s WHERE LOWER(%1$s.name) LIKE LOWER(CONCAT(\'%%\', :name_p1, \'%%\'))', $this->alias, Dummy::class),
-                ['name_p1' => 'partial'],
-                $filterFactory,
-            ],
-            'start' => [
-                [
-                    'id' => null,
-                    'name' => 'start',
-                ],
-                [
-                    'name' => 'partial',
-                ],
-                sprintf('SELECT %s FROM %s %1$s WHERE %1$s.name LIKE CONCAT(:name_p1, \'%%\')', $this->alias, Dummy::class),
-                ['name_p1' => 'partial'],
-                $filterFactory,
-            ],
-            'start (case insensitive)' => [
-                [
-                    'id' => null,
-                    'name' => 'istart',
-                ],
-                [
-                    'name' => 'partial',
-                ],
-                sprintf('SELECT %s FROM %s %1$s WHERE LOWER(%1$s.name) LIKE LOWER(CONCAT(:name_p1, \'%%\'))', $this->alias, Dummy::class),
-                ['name_p1' => 'partial'],
-                $filterFactory,
-            ],
-            'end' => [
-                [
-                    'id' => null,
-                    'name' => 'end',
-                ],
-                [
-                    'name' => 'partial',
-                ],
-                sprintf('SELECT %s FROM %s %1$s WHERE %1$s.name LIKE CONCAT(\'%%\', :name_p1)', $this->alias, Dummy::class),
-                ['name_p1' => 'partial'],
-                $filterFactory,
-            ],
-            'end (case insensitive)' => [
-                [
-                    'id' => null,
-                    'name' => 'iend',
-                ],
-                [
-                    'name' => 'partial',
-                ],
-                sprintf('SELECT %s FROM %s %1$s WHERE LOWER(%1$s.name) LIKE LOWER(CONCAT(\'%%\', :name_p1))', $this->alias, Dummy::class),
-                ['name_p1' => 'partial'],
-                $filterFactory,
-            ],
-            'word_start' => [
-                [
-                    'id' => null,
-                    'name' => 'word_start',
-                ],
-                [
-                    'name' => 'partial',
-                ],
-                sprintf('SELECT %s FROM %s %1$s WHERE %1$s.name LIKE CONCAT(:name_p1, \'%%\') OR %1$s.name LIKE CONCAT(\'%% \', :name_p1, \'%%\')', $this->alias, Dummy::class),
-                ['name_p1' => 'partial'],
-                $filterFactory,
-            ],
-            'word_start (case insensitive)' => [
-                [
-                    'id' => null,
-                    'name' => 'iword_start',
-                ],
-                [
-                    'name' => 'partial',
-                ],
-                sprintf('SELECT %s FROM %s %1$s WHERE LOWER(%1$s.name) LIKE LOWER(CONCAT(:name_p1, \'%%\')) OR LOWER(%1$s.name) LIKE LOWER(CONCAT(\'%% \', :name_p1, \'%%\'))', $this->alias, Dummy::class),
-                ['name_p1' => 'partial'],
-                $filterFactory,
-            ],
-            'invalid value for relation' => [
-                [
-                    'id' => null,
-                    'name' => null,
-                    'relatedDummy' => null,
-                ],
-                [
-                    'relatedDummy' => 'exact',
-                ],
-                sprintf('SELECT %s FROM %s %1$s WHERE %1$s.relatedDummy = :relatedDummy_p1', $this->alias, Dummy::class),
-                ['relatedDummy_p1' => 'exact'],
-                $filterFactory,
-            ],
-            'IRI value for relation' => [
-                [
-                    'id' => null,
-                    'name' => null,
-                    'relatedDummy.id' => null,
-                ],
-                [
-                    'relatedDummy.id' => '/related_dummies/1',
-                ],
-                sprintf('SELECT %s FROM %s %1$s INNER JOIN %1$s.relatedDummy relatedDummy_a1 WHERE relatedDummy_a1.id = :id_p1', $this->alias, Dummy::class),
-                ['id_p1' => 1],
-                $filterFactory,
-            ],
-            'mixed IRI and entity ID values for relations' => [
-                [
-                    'id' => null,
-                    'name' => null,
-                    'relatedDummy' => null,
-                    'relatedDummies' => null,
-                ],
-                [
-                    'relatedDummy' => ['/related_dummies/1', '2'],
-                    'relatedDummies' => '1',
-                ],
-                sprintf('SELECT %s FROM %s %1$s INNER JOIN %1$s.relatedDummies relatedDummies_a1 WHERE %1$s.relatedDummy IN (:relatedDummy_p1) AND relatedDummies_a1.id = :relatedDummies_p2', $this->alias, Dummy::class),
-                [
-                    'relatedDummy_p1' => [1, 2],
-                    'relatedDummies_p2' => 1,
-                ],
-                $filterFactory,
-            ],
-            'nested property' => [
-                [
-                    'id' => null,
-                    'name' => null,
-                    'relatedDummy.symfony' => null,
-                ],
-                [
-                    'name' => 'exact',
-                    'relatedDummy.symfony' => 'exact',
-                ],
-                sprintf('SELECT %s FROM %s %1$s INNER JOIN %1$s.relatedDummy relatedDummy_a1 WHERE %1$s.name = :name_p1 AND relatedDummy_a1.symfony = :symfony_p2', $this->alias, Dummy::class),
-                [
-                    'name_p1' => 'exact',
-                    'symfony_p2' => 'exact',
-                ],
-                $filterFactory,
-            ],
-        ];
+            ]
+        );
+    }
+
+    protected function buildSearchFilter(ManagerRegistry $managerRegistry, ?array $properties = null, RequestStack $requestStack = null)
+    {
+        $relatedDummyProphecy = $this->prophesize(RelatedDummy::class);
+        $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
+
+        $iriConverterProphecy->getItemFromIri(Argument::type('string'), ['fetch_data' => false])->will(function ($args) use ($relatedDummyProphecy) {
+            if (false !== strpos($args[0], '/related_dummies')) {
+                $relatedDummyProphecy->getId()->shouldBeCalled()->willReturn(1);
+
+                return $relatedDummyProphecy->reveal();
+            }
+
+            throw new InvalidArgumentException();
+        });
+
+        $iriConverter = $iriConverterProphecy->reveal();
+        $propertyAccessor = self::$kernel->getContainer()->get('test.property_accessor');
+
+        return new SearchFilter($managerRegistry, $requestStack, $iriConverter, $propertyAccessor, null, $properties);
     }
 }

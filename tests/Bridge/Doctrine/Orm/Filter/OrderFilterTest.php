@@ -100,10 +100,10 @@ class OrderFilterTest extends DoctrineOrmFilterTestCase
 
     public function provideApplyTestData(): array
     {
-        $orderFilterFactory = function (ManagerRegistry $managerRegistry, RequestStack $requestStack = null, array $properties = null): OrderFilter {
+        $orderFilterFactory = function (ManagerRegistry $managerRegistry, array $properties = null, RequestStack $requestStack = null): OrderFilter {
             return new OrderFilter($managerRegistry, $requestStack, 'order', null, $properties);
         };
-        $customOrderFilterFactory = function (ManagerRegistry $managerRegistry, RequestStack $requestStack = null, array $properties = null): OrderFilter {
+        $customOrderFilterFactory = function (ManagerRegistry $managerRegistry, array $properties = null, RequestStack $requestStack = null): OrderFilter {
             return new OrderFilter($managerRegistry, $requestStack, 'customOrder', null, $properties);
         };
 

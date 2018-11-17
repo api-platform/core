@@ -82,7 +82,7 @@ abstract class DoctrineOrmFilterTestCase extends KernelTestCase
     protected function doTestApply(bool $request, array $properties = null, array $filterParameters, string $expectedDql, array $expectedParameters = null, callable $filterFactory = null)
     {
         if (null === $filterFactory) {
-            $filterFactory = function (ManagerRegistry $managerRegistry, RequestStack $requestStack = null, array $properties = null): FilterInterface {
+            $filterFactory = function (ManagerRegistry $managerRegistry, array $properties = null, RequestStack $requestStack = null): FilterInterface {
                 $filterClass = $this->filterClass;
 
                 return new $filterClass($managerRegistry, $requestStack, null, $properties);
@@ -96,7 +96,7 @@ abstract class DoctrineOrmFilterTestCase extends KernelTestCase
         }
 
         $queryBuilder = $this->repository->createQueryBuilder($this->alias);
-        $filterCallable = $filterFactory($this->managerRegistry, $requestStack, $properties);
+        $filterCallable = $filterFactory($this->managerRegistry, $properties, $requestStack);
         $filterCallable->apply($queryBuilder, new QueryNameGenerator(), $this->resourceClass, null, $request ? [] : ['filters' => $filterParameters]);
 
         $this->assertEquals($expectedDql, $queryBuilder->getQuery()->getDQL());

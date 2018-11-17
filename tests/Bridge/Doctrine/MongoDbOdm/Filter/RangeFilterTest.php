@@ -11,17 +11,16 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Bridge\Doctrine\Orm\Filter;
+namespace ApiPlatform\Core\Tests\Bridge\Doctrine\MongoDbOdm\Filter;
 
-use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\RangeFilter;
-use ApiPlatform\Core\Test\DoctrineOrmFilterTestCase;
+use ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Filter\RangeFilter;
+use ApiPlatform\Core\Test\DoctrineMongoDbOdmFilterTestCase;
 use ApiPlatform\Core\Tests\Bridge\Doctrine\Common\Filter\RangeFilterTestTrait;
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 
 /**
- * @author Lee Siong Chan <ahlee2326@me.com>
+ * @author Alan Poulain <contact@alanpoulain.eu>
  */
-class RangeFilterTest extends DoctrineOrmFilterTestCase
+class RangeFilterTest extends DoctrineMongoDbOdmFilterTestCase
 {
     use RangeFilterTestTrait;
 
@@ -332,6 +331,106 @@ class RangeFilterTest extends DoctrineOrmFilterTestCase
                 'type' => 'string',
                 'required' => false,
             ],
+            'relatedDummy[between]' => [
+                'property' => 'relatedDummy',
+                'type' => 'string',
+                'required' => false,
+            ],
+            'relatedDummy[gt]' => [
+                'property' => 'relatedDummy',
+                'type' => 'string',
+                'required' => false,
+            ],
+            'relatedDummy[gte]' => [
+                'property' => 'relatedDummy',
+                'type' => 'string',
+                'required' => false,
+            ],
+            'relatedDummy[lt]' => [
+                'property' => 'relatedDummy',
+                'type' => 'string',
+                'required' => false,
+            ],
+            'relatedDummy[lte]' => [
+                'property' => 'relatedDummy',
+                'type' => 'string',
+                'required' => false,
+            ],
+            'relatedDummies[between]' => [
+                'property' => 'relatedDummies',
+                'type' => 'string',
+                'required' => false,
+            ],
+            'relatedDummies[gt]' => [
+                'property' => 'relatedDummies',
+                'type' => 'string',
+                'required' => false,
+            ],
+            'relatedDummies[gte]' => [
+                'property' => 'relatedDummies',
+                'type' => 'string',
+                'required' => false,
+            ],
+            'relatedDummies[lt]' => [
+                'property' => 'relatedDummies',
+                'type' => 'string',
+                'required' => false,
+            ],
+            'relatedDummies[lte]' => [
+                'property' => 'relatedDummies',
+                'type' => 'string',
+                'required' => false,
+            ],
+            'relatedOwnedDummy[between]' => [
+                'property' => 'relatedOwnedDummy',
+                'type' => 'string',
+                'required' => false,
+            ],
+            'relatedOwnedDummy[gt]' => [
+                'property' => 'relatedOwnedDummy',
+                'type' => 'string',
+                'required' => false,
+            ],
+            'relatedOwnedDummy[gte]' => [
+                'property' => 'relatedOwnedDummy',
+                'type' => 'string',
+                'required' => false,
+            ],
+            'relatedOwnedDummy[lt]' => [
+                'property' => 'relatedOwnedDummy',
+                'type' => 'string',
+                'required' => false,
+            ],
+            'relatedOwnedDummy[lte]' => [
+                'property' => 'relatedOwnedDummy',
+                'type' => 'string',
+                'required' => false,
+            ],
+            'relatedOwningDummy[between]' => [
+                'property' => 'relatedOwningDummy',
+                'type' => 'string',
+                'required' => false,
+            ],
+            'relatedOwningDummy[gt]' => [
+                'property' => 'relatedOwningDummy',
+                'type' => 'string',
+                'required' => false,
+            ],
+            'relatedOwningDummy[gte]' => [
+                'property' => 'relatedOwningDummy',
+                'type' => 'string',
+                'required' => false,
+            ],
+            'relatedOwningDummy[lt]' => [
+                'property' => 'relatedOwningDummy',
+                'type' => 'string',
+                'required' => false,
+            ],
+            'relatedOwningDummy[lte]' => [
+                'property' => 'relatedOwningDummy',
+                'type' => 'string',
+                'required' => false,
+            ],
         ], $filter->getDescription($this->resourceClass));
     }
 
@@ -341,43 +440,99 @@ class RangeFilterTest extends DoctrineOrmFilterTestCase
             $this->provideApplyTestArguments(),
             [
                 'between' => [
-                    sprintf('SELECT o FROM %s o WHERE o.dummyPrice BETWEEN :dummyPrice_p1_1 AND :dummyPrice_p1_2', Dummy::class),
+                    [
+                        [
+                            '$match' => [
+                                'dummyPrice' => [
+                                    '$lte' => '9.99',
+                                    '$gte' => '15.99',
+                                ],
+                            ],
+                        ],
+                    ],
                 ],
                 'between (too many operands)' => [
-                    sprintf('SELECT o FROM %s o', Dummy::class),
+                    [],
                 ],
                 'between (too few operands)' => [
-                    sprintf('SELECT o FROM %s o', Dummy::class),
+                    [],
                 ],
                 'between (non-numeric operands)' => [
-                    sprintf('SELECT o FROM %s o', Dummy::class),
+                    [],
                 ],
                 'lt' => [
-                    sprintf('SELECT o FROM %s o WHERE o.dummyPrice < :dummyPrice_p1', Dummy::class),
+                    [
+                        [
+                            '$match' => [
+                                'dummyPrice' => [
+                                    '$lt' => '9.99',
+                                ],
+                            ],
+                        ],
+                    ],
                 ],
                 'lt (non-numeric)' => [
-                    sprintf('SELECT o FROM %s o', Dummy::class),
+                    [],
                 ],
                 'lte' => [
-                    sprintf('SELECT o FROM %s o WHERE o.dummyPrice <= :dummyPrice_p1', Dummy::class),
+                    [
+                        [
+                            '$match' => [
+                                'dummyPrice' => [
+                                    '$lte' => '9.99',
+                                ],
+                            ],
+                        ],
+                    ],
                 ],
                 'lte (non-numeric)' => [
-                    sprintf('SELECT o FROM %s o', Dummy::class),
+                    [],
                 ],
                 'gt' => [
-                    sprintf('SELECT o FROM %s o WHERE o.dummyPrice > :dummyPrice_p1', Dummy::class),
+                    [
+                        [
+                            '$match' => [
+                                'dummyPrice' => [
+                                    '$gt' => '9.99',
+                                ],
+                            ],
+                        ],
+                    ],
                 ],
                 'gt (non-numeric)' => [
-                    sprintf('SELECT o FROM %s o', Dummy::class),
+                    [],
                 ],
                 'gte' => [
-                    sprintf('SELECT o FROM %s o WHERE o.dummyPrice >= :dummyPrice_p1', Dummy::class),
+                    [
+                        [
+                            '$match' => [
+                                'dummyPrice' => [
+                                    '$gte' => '9.99',
+                                ],
+                            ],
+                        ],
+                    ],
                 ],
                 'gte (non-numeric)' => [
-                    sprintf('SELECT o FROM %s o', Dummy::class),
+                    [],
                 ],
                 'lte + gte' => [
-                    sprintf('SELECT o FROM %s o WHERE o.dummyPrice >= :dummyPrice_p1 AND o.dummyPrice <= :dummyPrice_p2', Dummy::class),
+                    [
+                        [
+                            '$match' => [
+                                'dummyPrice' => [
+                                    '$gte' => '9.99',
+                                ],
+                            ],
+                        ],
+                        [
+                            '$match' => [
+                                'dummyPrice' => [
+                                    '$lte' => '19.99',
+                                ],
+                            ],
+                        ],
+                    ],
                 ],
             ]
         );
