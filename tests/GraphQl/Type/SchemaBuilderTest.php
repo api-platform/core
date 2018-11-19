@@ -140,7 +140,7 @@ class SchemaBuilderTest extends TestCase
                     $isAScalarType ? Type::BUILTIN_TYPE_ARRAY : $builtinType,
                     false,
                     $resourceClassName,
-                    $isAScalarType || Type::BUILTIN_TYPE_ARRAY === $builtinType || Type::BUILTIN_TYPE_ITERABLE === $builtinType ? true : false,
+                    $isAScalarType || Type::BUILTIN_TYPE_ARRAY === $builtinType || Type::BUILTIN_TYPE_ITERABLE === $builtinType,
                     null,
                     $isAScalarType ? new Type($builtinType) : null
                 ),
@@ -292,7 +292,7 @@ class SchemaBuilderTest extends TestCase
             );
         };
 
-        $mockedSchemaBuilder = $this->createSchemaBuilder($propertyMetadataMockBuilder, false);
+        $mockedSchemaBuilder = $this->createSchemaBuilder($propertyMetadataMockBuilder, false, 3);
         $this->assertEquals([
             'node',
             'shortName1',
