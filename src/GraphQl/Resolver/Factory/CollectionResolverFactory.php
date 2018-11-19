@@ -122,7 +122,7 @@ final class CollectionResolverFactory implements ResolverFactoryInterface
                     $data[$index] = $this->normalizer->normalize($object, ItemNormalizer::FORMAT, $dataProviderContext);
 
                     if (null !== $this->dispatcher) {
-                        $this->dispatcher->dispatch(PostSerializeEvent::NAME, new PostSerializeEvent($collection));
+                        $this->dispatcher->dispatch(PostSerializeEvent::NAME, new PostSerializeEvent($data[$index]));
                     }
                 }
 
@@ -156,7 +156,7 @@ final class CollectionResolverFactory implements ResolverFactoryInterface
                 ];
 
                 if (null !== $this->dispatcher) {
-                    $this->dispatcher->dispatch(PostSerializeEvent::NAME, new PostSerializeEvent($collection));
+                    $this->dispatcher->dispatch(PostSerializeEvent::NAME, new PostSerializeEvent($data['edges'][$index]));
                 }
             }
 

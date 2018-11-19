@@ -95,7 +95,7 @@ final class ItemResolver
         $normalizedObject = $this->normalizer->normalize($item, ItemNormalizer::FORMAT, $normalizationContext + $baseNormalizationContext);
 
         if (null !== $this->dispatcher) {
-            $this->dispatcher->dispatch(PostSerializeEvent::NAME, new PostSerializeEvent($item));
+            $this->dispatcher->dispatch(PostSerializeEvent::NAME, new PostSerializeEvent($normalizedObject));
         }
 
         return $normalizedObject;

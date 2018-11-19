@@ -80,11 +80,13 @@ final class SerializeListener
             $this->dispatcher->dispatch(PreSerializeEvent::NAME, new PreSerializeEvent($controllerResult));
         }
 
-        $event->setControllerResult($this->serializer->serialize($controllerResult, $request->getRequestFormat(), $context));
+        $serializedResult = $this->serializer->serialize($controllerResult, $request->getRequestFormat(), $context);
 
         if (null !== $this->dispatcher) {
-            $this->dispatcher->dispatch(PostSerializeEvent::NAME, new PostSerializeEvent($controllerResult));
+            $this->dispatcher->dispatch(PostSerializeEvent::NAME, new PostSerializeEvent($serializedResult));
         }
+
+        $event->setControllerResult($serializedResult);
 
         $request->attributes->set('_api_respond', true);
         $request->attributes->set('_resources', $request->attributes->get('_resources', []) + (array) $resources);
