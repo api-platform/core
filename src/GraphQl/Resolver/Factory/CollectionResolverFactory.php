@@ -114,16 +114,17 @@ final class CollectionResolverFactory implements ResolverFactoryInterface
 
             if (!$this->paginationEnabled) {
                 $data = [];
+
+                if (null !== $this->dispatcher) {
+                    $this->dispatcher->dispatch(PreSerializeEvent::NAME, new PreSerializeEvent($collection));
+                }
+
                 foreach ($collection as $index => $object) {
-                    if (null !== $this->dispatcher) {
-                        $this->dispatcher->dispatch(PreSerializeEvent::NAME, new PreSerializeEvent($collection));
-                    }
-
                     $data[$index] = $this->normalizer->normalize($object, ItemNormalizer::FORMAT, $dataProviderContext);
+                }
 
-                    if (null !== $this->dispatcher) {
-                        $this->dispatcher->dispatch(PostSerializeEvent::NAME, new PostSerializeEvent($data[$index]));
-                    }
+                if (null !== $this->dispatcher) {
+                    $this->dispatcher->dispatch(PostSerializeEvent::NAME, new PostSerializeEvent($data));
                 }
 
                 return $data;
@@ -145,19 +146,19 @@ final class CollectionResolverFactory implements ResolverFactoryInterface
                 $data['totalCount'] = $totalItems;
             }
 
-            foreach ($collection as $index => $object) {
-                if (null !== $this->dispatcher) {
-                    $this->dispatcher->dispatch(PreSerializeEvent::NAME, new PreSerializeEvent($collection));
-                }
+            if (null !== $this->dispatcher) {
+                $this->dispatcher->dispatch(PreSerializeEvent::NAME, new PreSerializeEvent($collection));
+            }
 
+            foreach ($collection as $index => $object) {
                 $data['edges'][$index] = [
                     'node' => $this->normalizer->normalize($object, ItemNormalizer::FORMAT, $dataProviderContext),
                     'cursor' => base64_encode((string) ($index + $offset)),
                 ];
+            }
 
-                if (null !== $this->dispatcher) {
-                    $this->dispatcher->dispatch(PostSerializeEvent::NAME, new PostSerializeEvent($data['edges'][$index]));
-                }
+            if (null !== $this->dispatcher) {
+                $this->dispatcher->dispatch(PostSerializeEvent::NAME, new PostSerializeEvent($data['edges']));
             }
 
             return $data;
