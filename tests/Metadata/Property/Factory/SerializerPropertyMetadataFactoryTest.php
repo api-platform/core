@@ -50,16 +50,19 @@ class SerializerPropertyMetadataFactoryTest extends TestCase
         $this->assertInstanceOf(PropertyMetadataFactoryInterface::class, $serializerPropertyMetadataFactory);
     }
 
-    public function testCreate()
+    /**
+     * @dataProvider groupsProvider
+     */
+    public function testCreate($readGroups, $writeGroups)
     {
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $dummyResourceMetadata = (new ResourceMetadata())
             ->withAttributes([
                 'normalization_context' => [
-                    AbstractNormalizer::GROUPS => ['dummy_read'],
+                    AbstractNormalizer::GROUPS => $readGroups,
                 ],
                 'denormalization_context' => [
-                    AbstractNormalizer::GROUPS => ['dummy_write'],
+                    AbstractNormalizer::GROUPS => $writeGroups,
                 ],
             ]);
         $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn($dummyResourceMetadata)->shouldBeCalled();
@@ -123,6 +126,14 @@ class SerializerPropertyMetadataFactoryTest extends TestCase
         $this->assertInstanceOf(PropertyMetadata::class, $actual[2]);
         $this->assertFalse($actual[2]->isReadable());
         $this->assertFalse($actual[2]->isWritable());
+    }
+
+    public function groupsProvider(): array
+    {
+        return [
+            [['dummy_read'], ['dummy_write']],
+            ['dummy_read', 'dummy_write'],
+        ];
     }
 
     public function testCreateInherited()
