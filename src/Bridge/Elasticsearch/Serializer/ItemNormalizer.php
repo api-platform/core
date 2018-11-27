@@ -31,11 +31,11 @@ use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
  */
 final class ItemNormalizer extends ObjectNormalizer
 {
-    const FORMAT = 'elasticsearch';
+    public const FORMAT = 'elasticsearch';
 
     private $identifiersExtractor;
 
-    public function __construct(ClassMetadataFactoryInterface $classMetadataFactory = null, NameConverterInterface $nameConverter = null, PropertyAccessorInterface $propertyAccessor = null, PropertyTypeExtractorInterface $propertyTypeExtractor = null, IdentifiersExtractorInterface $identifiersExtractor)
+    public function __construct(IdentifiersExtractorInterface $identifiersExtractor, ?ClassMetadataFactoryInterface $classMetadataFactory = null, ?NameConverterInterface $nameConverter = null, ?PropertyAccessorInterface $propertyAccessor = null, ?PropertyTypeExtractorInterface $propertyTypeExtractor = null)
     {
         parent::__construct($classMetadataFactory, $nameConverter, $propertyAccessor, $propertyTypeExtractor);
 
@@ -45,7 +45,7 @@ final class ItemNormalizer extends ObjectNormalizer
     /**
      * {@inheritdoc}
      */
-    public function supportsDenormalization($data, $type, $format = null)
+    public function supportsDenormalization($data, $type, $format = null): bool
     {
         return self::FORMAT === $format && parent::supportsDenormalization($data, $type, $format);
     }
@@ -55,7 +55,7 @@ final class ItemNormalizer extends ObjectNormalizer
      */
     public function denormalize($data, $class, $format = null, array $context = [])
     {
-        if (isset($data['_id']) && \is_string($data['_id']) && isset($data['_source']) && \is_array($data['_source'])) {
+        if (\is_string($data['_id'] ?? null) && \is_array($data['_source'] ?? null)) {
             $data = $this->populateIdentifier($data, $class)['_source'];
         }
 
@@ -65,7 +65,7 @@ final class ItemNormalizer extends ObjectNormalizer
     /**
      * {@inheritdoc}
      */
-    public function supportsNormalization($data, $format = null)
+    public function supportsNormalization($data, $format = null): bool
     {
         return false;
     }

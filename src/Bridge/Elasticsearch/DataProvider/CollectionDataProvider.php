@@ -52,7 +52,7 @@ final class CollectionDataProvider implements ContextAwareCollectionDataProvider
     /**
      * {@inheritdoc}
      */
-    public function supports(string $resourceClass, string $operationName = null, array $context = []): bool
+    public function supports(string $resourceClass, ?string $operationName = null, array $context = []): bool
     {
         try {
             $this->indexMetadataFactory->create($resourceClass);
@@ -66,13 +66,13 @@ final class CollectionDataProvider implements ContextAwareCollectionDataProvider
     /**
      * {@inheritdoc}
      */
-    public function getCollection(string $resourceClass, string $operationName = null, array $context = [])
+    public function getCollection(string $resourceClass, ?string $operationName = null, array $context = [])
     {
         $indexMetadata = $this->indexMetadataFactory->create($resourceClass);
         $body = [];
 
         foreach ($this->collectionExtensions as $collectionExtension) {
-            $collectionExtension->applyToCollection($body, $resourceClass, $operationName, $context);
+            $body = $collectionExtension->applyToCollection($body, $resourceClass, $operationName, $context);
         }
 
         if (!isset($body['query']) && !isset($body['aggs'])) {

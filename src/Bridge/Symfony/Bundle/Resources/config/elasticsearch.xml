@@ -43,11 +43,11 @@
         </service>
 
         <service id="api_platform.elasticsearch.normalizer.item" class="ApiPlatform\Core\Bridge\Elasticsearch\Serializer\ItemNormalizer">
+            <argument type="service" id="api_platform.identifiers_extractor.cached" />
             <argument type="service" id="serializer.mapping.class_metadata_factory" />
             <argument>null</argument>
             <argument type="service" id="serializer.property_accessor" />
             <argument type="service" id="property_info" on-invalid="ignore" />
-            <argument type="service" id="api_platform.identifiers_extractor.cached" />
 
             <tag name="serializer.normalizer" priority="8" />
         </service>
@@ -87,7 +87,6 @@
             <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
             <argument type="service" id="api_platform.identifiers_extractor.cached" />
             <argument type="service" id="api_platform.metadata.property.metadata_factory" />
-            <argument type="service" id="api_platform.resource_class_resolver" />
             <argument>%api_platform.collection.order%</argument>
 
             <tag name="api_platform.elasticsearch.query_extension.collection" priority="10" />

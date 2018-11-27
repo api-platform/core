@@ -47,7 +47,7 @@ final class ItemDataProvider implements ItemDataProviderInterface, RestrictedDat
     /**
      * {@inheritdoc}
      */
-    public function supports(string $resourceClass, string $operationName = null, array $context = []): bool
+    public function supports(string $resourceClass, ?string $operationName = null, array $context = []): bool
     {
         try {
             $this->indexMetadataFactory->create($resourceClass);
@@ -61,7 +61,7 @@ final class ItemDataProvider implements ItemDataProviderInterface, RestrictedDat
     /**
      * {@inheritdoc}
      */
-    public function getItem(string $resourceClass, $id, string $operationName = null, array $context = [])
+    public function getItem(string $resourceClass, $id, ?string $operationName = null, array $context = [])
     {
         if (\is_array($id)) {
             if (1 !== \count($id)) {

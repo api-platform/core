@@ -35,7 +35,7 @@ abstract class AbstractFilter implements FilterInterface
     protected $properties;
     protected $propertyNameCollectionFactory;
 
-    public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, ResourceClassResolverInterface $resourceClassResolver, array $properties = null)
+    public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, ResourceClassResolverInterface $resourceClassResolver, ?array $properties = null)
     {
         $this->propertyNameCollectionFactory = $propertyNameCollectionFactory;
         $this->propertyMetadataFactory = $propertyMetadataFactory;
@@ -48,15 +48,14 @@ abstract class AbstractFilter implements FilterInterface
      */
     protected function getProperties(string $resourceClass): \Traversable
     {
-        if (null === $properties = $this->properties) {
-            try {
-                $properties = iterator_to_array($this->propertyNameCollectionFactory->create($resourceClass));
-            } catch (ResourceClassNotFoundException $e) {
-                $properties = [];
-            }
+        if (null !== $this->properties) {
+            yield from $this->properties;
         }
 
-        yield from $properties;
+        try {
+            yield from $this->propertyNameCollectionFactory->create($resourceClass);
+        } catch (ResourceClassNotFoundException $e) {
+        }
     }
 
     /**
@@ -78,24 +77,28 @@ abstract class AbstractFilter implements FilterInterface
      */
     protected function getMetadata(string $resourceClass, string $property): array
     {
+        $noop = [null, null, null, null];
+
         if (!$this->hasProperty($resourceClass, $property)) {
-            return array_fill(0, 4, null);
+            return $noop;
         }
 
         $properties = explode('.', $property);
         $totalProperties = \count($properties);
         $currentResourceClass = $resourceClass;
         $hasAssociation = false;
+        $currentProperty = null;
+        $type = null;
 
         foreach ($properties as $index => $currentProperty) {
             try {
                 $propertyMetadata = $this->propertyMetadataFactory->create($currentResourceClass, $currentProperty);
             } catch (PropertyNotFoundException $e) {
-                return array_fill(0, 4, null);
+                return $noop;
             }
 
             if (null === $type = $propertyMetadata->getType()) {
-                return array_fill(0, 4, null);
+                return $noop;
             }
 
             ++$index;
@@ -106,11 +109,11 @@ abstract class AbstractFilter implements FilterInterface
                     break;
                 }
 
-                return array_fill(0, 4, null);
+                return $noop;
             }
 
             if ($type->isCollection() && null === $type = $type->getCollectionValueType()) {
-                return array_fill(0, 4, null);
+                return $noop;
             }
 
             if (Type::BUILTIN_TYPE_ARRAY === $builtinType && Type::BUILTIN_TYPE_OBJECT !== $type->getBuiltinType()) {
@@ -118,13 +121,13 @@ abstract class AbstractFilter implements FilterInterface
                     break;
                 }
 
-                return array_fill(0, 4, null);
+                return $noop;
             }
 
             $currentResourceClass = $type->getClassName();
 
             if (null === $currentResourceClass || !$this->resourceClassResolver->isResourceClass($currentResourceClass)) {
-                return array_fill(0, 4, null);
+                return $noop;
             }
 
             $hasAssociation = $totalProperties === $index;

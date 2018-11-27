@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Bridge\Elasticsearch\DataProvider\Extension;
 
 use ApiPlatform\Core\Api\IdentifiersExtractorInterface;
-use ApiPlatform\Core\Api\ResourceClassResolverInterface;
 use ApiPlatform\Core\Bridge\Elasticsearch\Util\FieldDatatypeTrait;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
@@ -37,7 +36,7 @@ final class SortExtension implements FullBodySearchCollectionExtensionInterface
     private $identifiersExtractor;
     private $resourceMetadataFactory;
 
-    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, IdentifiersExtractorInterface $identifiersExtractor, PropertyMetadataFactoryInterface $propertyMetadataFactory, ResourceClassResolverInterface $resourceClassResolver, string $defaultDirection = null)
+    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, IdentifiersExtractorInterface $identifiersExtractor, PropertyMetadataFactoryInterface $propertyMetadataFactory, ?string $defaultDirection = null)
     {
         $this->resourceMetadataFactory = $resourceMetadataFactory;
         $this->identifiersExtractor = $identifiersExtractor;
@@ -49,7 +48,7 @@ final class SortExtension implements FullBodySearchCollectionExtensionInterface
     /**
      * {@inheritdoc}
      */
-    public function applyToCollection(array &$requestBody, string $resourceClass, string $operationName = null, array $context): void
+    public function applyToCollection(array $requestBody, string $resourceClass, ?string $operationName = null, array $context = []): array
     {
         $orders = [];
 
@@ -69,10 +68,12 @@ final class SortExtension implements FullBodySearchCollectionExtensionInterface
         }
 
         if (!$orders) {
-            return;
+            return $requestBody;
         }
 
         $requestBody['sort'] = array_merge_recursive($requestBody['sort'] ?? [], $orders);
+
+        return $requestBody;
     }
 
     private function getOrder(string $resourceClass, string $property, string $direction): array

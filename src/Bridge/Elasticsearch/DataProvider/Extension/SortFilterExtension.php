@@ -38,8 +38,10 @@ final class SortFilterExtension extends AbstractFilterExtension
     /**
      * {@inheritdoc}
      */
-    protected function alterRequestBody(array &$requestBody, array $clauseBody): void
+    protected function alterRequestBody(array $requestBody, array $clauseBody): array
     {
         $requestBody['sort'] = array_merge_recursive($requestBody['sort'] ?? [], $clauseBody);
+
+        return $requestBody;
     }
 }

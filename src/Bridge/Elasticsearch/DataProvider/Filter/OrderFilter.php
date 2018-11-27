@@ -31,7 +31,7 @@ final class OrderFilter extends AbstractFilter implements SortFilterInterface
 {
     private $orderParameterName;
 
-    public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, ResourceClassResolverInterface $resourceClassResolver, string $orderParameterName = 'order', array $properties = null)
+    public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, ResourceClassResolverInterface $resourceClassResolver, string $orderParameterName = 'order', ?array $properties = null)
     {
         parent::__construct($propertyNameCollectionFactory, $propertyMetadataFactory, $resourceClassResolver, $properties);
 
@@ -41,16 +41,16 @@ final class OrderFilter extends AbstractFilter implements SortFilterInterface
     /**
      * {@inheritdoc}
      */
-    public function apply(array &$clauseBody, string $resourceClass, string $operationName = null, array $context): void
+    public function apply(array $clauseBody, string $resourceClass, ?string $operationName = null, array $context = []): array
     {
         if (!\is_array($properties = $context['filters'][$this->orderParameterName] ?? [])) {
-            return;
+            return $clauseBody;
         }
 
         $orders = [];
 
         foreach ($properties as $property => $direction) {
-            list($type) = $this->getMetadata($resourceClass, $property);
+            [$type] = $this->getMetadata($resourceClass, $property);
 
             if (!$type) {
                 continue;
@@ -74,10 +74,10 @@ final class OrderFilter extends AbstractFilter implements SortFilterInterface
         }
 
         if (!$orders) {
-            return;
+            return $clauseBody;
         }
 
-        $clauseBody = array_merge_recursive($clauseBody, $orders);
+        return array_merge_recursive($clauseBody, $orders);
     }
 
     /**
@@ -88,7 +88,7 @@ final class OrderFilter extends AbstractFilter implements SortFilterInterface
         $description = [];
 
         foreach ($this->getProperties($resourceClass) as $property) {
-            list($type) = $this->getMetadata($resourceClass, $property);
+            [$type] = $this->getMetadata($resourceClass, $property);
 
             if (!$type) {
                 continue;

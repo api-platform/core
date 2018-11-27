@@ -16,7 +16,7 @@ namespace ApiPlatform\Core\Bridge\Elasticsearch\Metadata\Factory;
 use ApiPlatform\Core\Bridge\Elasticsearch\Exception\IndexNotFoundException;
 use ApiPlatform\Core\Bridge\Elasticsearch\Metadata\DocumentMetadata;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
-use Doctrine\Common\Util\Inflector;
+use Doctrine\Common\Inflector\Inflector;
 use Elasticsearch\Client;
 use Elasticsearch\Common\Exceptions\Missing404Exception;
 
@@ -35,7 +35,7 @@ final class CatDocumentMetadataFactory implements DocumentMetadataFactoryInterfa
     private $resourceMetadataFactory;
     private $decorated;
 
-    public function __construct(Client $client, ResourceMetadataFactoryInterface $resourceMetadataFactory, DocumentMetadataFactoryInterface $decorated = null)
+    public function __construct(Client $client, ResourceMetadataFactoryInterface $resourceMetadataFactory, ?DocumentMetadataFactoryInterface $decorated = null)
     {
         $this->client = $client;
         $this->resourceMetadataFactory = $resourceMetadataFactory;

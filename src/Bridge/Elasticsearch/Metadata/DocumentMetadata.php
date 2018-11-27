@@ -24,12 +24,12 @@ namespace ApiPlatform\Core\Bridge\Elasticsearch\Metadata;
  */
 final class DocumentMetadata
 {
-    const DEFAULT_TYPE = '_doc';
+    public const DEFAULT_TYPE = '_doc';
 
     private $index;
     private $type;
 
-    public function __construct(string $index = null, string $type = self::DEFAULT_TYPE)
+    public function __construct(?string $index = null, string $type = self::DEFAULT_TYPE)
     {
         $this->index = $index;
         $this->type = $type;
@@ -49,7 +49,7 @@ final class DocumentMetadata
     /**
      * Gets the document index.
      */
-    public function getIndex()
+    public function getIndex(): ?string
     {
         return $this->index;
     }

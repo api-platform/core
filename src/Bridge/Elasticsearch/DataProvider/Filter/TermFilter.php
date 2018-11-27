@@ -37,7 +37,7 @@ final class TermFilter extends AbstractFilter implements ConstantScoreFilterInte
     private $iriConverter;
     private $propertyAccessor;
 
-    public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, ResourceClassResolverInterface $resourceClassResolver, IdentifiersExtractorInterface $identifiersExtractor, IriConverterInterface $iriConverter, PropertyAccessorInterface $propertyAccessor, array $properties = null)
+    public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, ResourceClassResolverInterface $resourceClassResolver, IdentifiersExtractorInterface $identifiersExtractor, IriConverterInterface $iriConverter, PropertyAccessorInterface $propertyAccessor, ?array $properties = null)
     {
         parent::__construct($propertyNameCollectionFactory, $propertyMetadataFactory, $resourceClassResolver, $properties);
 
@@ -49,12 +49,12 @@ final class TermFilter extends AbstractFilter implements ConstantScoreFilterInte
     /**
      * {@inheritdoc}
      */
-    public function apply(array &$clauseBody, string $resourceClass, string $operationName = null, array $context): void
+    public function apply(array $clauseBody, string $resourceClass, ?string $operationName = null, array $context = null): array
     {
         $terms = [];
 
         foreach ($context['filters'] ?? [] as $property => $values) {
-            list($type, $hasAssociation, $nestedResourceClass, $nestedProperty) = $this->getMetadata($resourceClass, $property);
+            [$type, $hasAssociation, $nestedResourceClass, $nestedProperty] = $this->getMetadata($resourceClass, $property);
 
             if (!$type || !$values = (array) $values) {
                 continue;
@@ -82,10 +82,10 @@ final class TermFilter extends AbstractFilter implements ConstantScoreFilterInte
         }
 
         if (!$terms) {
-            return;
+            return $clauseBody;
         }
 
-        $clauseBody = array_merge_recursive($clauseBody, [
+        return array_merge_recursive($clauseBody, [
             'bool' => [
                 'must' => $terms,
             ],
@@ -100,7 +100,7 @@ final class TermFilter extends AbstractFilter implements ConstantScoreFilterInte
         $description = [];
 
         foreach ($this->getProperties($resourceClass) as $property) {
-            list($type, $hasAssociation) = $this->getMetadata($resourceClass, $property);
+            [$type, $hasAssociation] = $this->getMetadata($resourceClass, $property);
 
             if (!$type) {
                 continue;
@@ -123,11 +123,7 @@ final class TermFilter extends AbstractFilter implements ConstantScoreFilterInte
      */
     private function getPHPType(Type $type): string
     {
-        if (null === $builtinType = $type->getBuiltinType()) {
-            return 'string';
-        }
-
-        switch ($builtinType) {
+        switch ($builtinType = $type->getBuiltinType()) {
             case Type::BUILTIN_TYPE_ARRAY:
             case Type::BUILTIN_TYPE_INT:
             case Type::BUILTIN_TYPE_FLOAT:
@@ -138,6 +134,7 @@ final class TermFilter extends AbstractFilter implements ConstantScoreFilterInte
                 if (null !== ($className = $type->getClassName()) && is_a($className, \DateTimeInterface::class, true)) {
                     return \DateTimeInterface::class;
                 }
+
                 // no break
             default:
                 return 'string';
@@ -174,8 +171,8 @@ final class TermFilter extends AbstractFilter implements ConstantScoreFilterInte
     {
         foreach ($values as $value) {
             if (
-                Type::BUILTIN_TYPE_INT === $type->getBuiltinType()
-                && null !== $value
+                null !== $value
+                && Type::BUILTIN_TYPE_INT === $type->getBuiltinType()
                 && false === filter_var($value, FILTER_VALIDATE_INT)
             ) {
                 return false;

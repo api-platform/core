@@ -46,7 +46,7 @@ final class Paginator implements \IteratorAggregate, PaginatorInterface
     /**
      * {@inheritdoc}
      */
-    public function count()
+    public function count(): int
     {
         return isset($this->documents['hits']['hits']) ? \count($this->documents['hits']['hits']) : 0;
     }

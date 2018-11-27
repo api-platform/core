@@ -37,7 +37,7 @@ final class ConstantScoreFilterExtension extends AbstractFilterExtension
     /**
      * {@inheritdoc}
      */
-    protected function alterRequestBody(array &$requestBody, array $clauseBody): void
+    protected function alterRequestBody(array $requestBody, array $clauseBody): array
     {
         $requestBody['query'] = $requestBody['query'] ?? [];
         $requestBody['query'] += [
@@ -45,5 +45,7 @@ final class ConstantScoreFilterExtension extends AbstractFilterExtension
                 'filter' => $clauseBody,
             ],
         ];
+
+        return $requestBody;
     }
 }

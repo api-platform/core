@@ -25,5 +25,5 @@ namespace ApiPlatform\Core\Bridge\Elasticsearch\DataProvider\Extension;
  */
 interface FullBodySearchCollectionExtensionInterface
 {
-    public function applyToCollection(array &$requestBody, string $resourceClass, string $operationName = null, array $context): void;
+    public function applyToCollection(array $requestBody, string $resourceClass, ?string $operationName = null, array $context = []): array;
 }

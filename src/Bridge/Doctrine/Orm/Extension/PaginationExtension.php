@@ -38,8 +38,8 @@ final class PaginationExtension implements ContextAwareQueryResultCollectionExte
     private $pagination;
 
     /**
-     * @param ResourceMetadataFactoryInterface $resourceMetadataFactory
-     * @param Pagination                       $pagination
+     * @param ResourceMetadataFactoryInterface|RequestStack $resourceMetadataFactory
+     * @param Pagination|ResourceMetadataFactoryInterface   $pagination
      */
     public function __construct(ManagerRegistry $managerRegistry, /* ResourceMetadataFactoryInterface */ $resourceMetadataFactory, /* Pagination */ $pagination)
     {

@@ -37,13 +37,13 @@ abstract class AbstractFilterExtension implements FullBodySearchCollectionExtens
     /**
      * {@inheritdoc}
      */
-    public function applyToCollection(array &$requestBody, string $resourceClass, string $operationName = null, array $context): void
+    public function applyToCollection(array $requestBody, string $resourceClass, ?string $operationName = null, array $context = []): array
     {
         $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
         $resourceFilters = $resourceMetadata->getCollectionOperationAttribute($operationName, 'filters', [], true);
 
         if (!$resourceFilters) {
-            return;
+            return $requestBody;
         }
 
         $context['filters'] = $context['filters'] ?? [];
@@ -51,15 +51,15 @@ abstract class AbstractFilterExtension implements FullBodySearchCollectionExtens
 
         foreach ($resourceFilters as $filterId) {
             if ($this->filterLocator->has($filterId) && is_a($filter = $this->filterLocator->get($filterId), $this->getFilterInterface(), true)) {
-                $filter->apply($clauseBody, $resourceClass, $operationName, $context);
+                $clauseBody = $filter->apply($clauseBody, $resourceClass, $operationName, $context);
             }
         }
 
         if (!$clauseBody) {
-            return;
+            return $requestBody;
         }
 
-        $this->alterRequestBody($requestBody, $clauseBody);
+        return $this->alterRequestBody($requestBody, $clauseBody);
     }
 
     /**
@@ -70,5 +70,5 @@ abstract class AbstractFilterExtension implements FullBodySearchCollectionExtens
     /**
      * Alters the request body.
      */
-    abstract protected function alterRequestBody(array &$requestBody, array $clauseBody): void;
+    abstract protected function alterRequestBody(array $requestBody, array $clauseBody): array;
 }

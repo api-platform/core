@@ -29,7 +29,7 @@ final class AttributeDocumentMetadataFactory implements DocumentMetadataFactoryI
     private $resourceMetadataFactory;
     private $decorated;
 
-    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, DocumentMetadataFactoryInterface $decorated = null)
+    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, ?DocumentMetadataFactoryInterface $decorated = null)
     {
         $this->resourceMetadataFactory = $resourceMetadataFactory;
         $this->decorated = $decorated;

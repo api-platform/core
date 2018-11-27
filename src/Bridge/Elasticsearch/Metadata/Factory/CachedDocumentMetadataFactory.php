@@ -27,7 +27,7 @@ use Psr\Cache\CacheItemPoolInterface;
  */
 final class CachedDocumentMetadataFactory implements DocumentMetadataFactoryInterface
 {
-    const CACHE_KEY_PREFIX = 'index_metadata';
+    private const CACHE_KEY_PREFIX = 'index_metadata';
 
     private $cacheItemPool;
     private $decorated;
