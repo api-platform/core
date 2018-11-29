@@ -82,7 +82,7 @@ class DoctrineMongoDbOdmSetup
         return $config;
     }
 
-    private static function createCacheConfiguration(bool $isDevMode, string $proxyDir, string $hydratorDir, ?Cache $cache) :  Cache
+    private static function createCacheConfiguration(bool $isDevMode, string $proxyDir, string $hydratorDir, ?Cache $cache): Cache
     {
         $cache = self::createCacheInstance($isDevMode, $cache);
 
@@ -101,7 +101,7 @@ class DoctrineMongoDbOdmSetup
         return $cache;
     }
 
-    private static function createCacheInstance(bool $isDevMode, ?Cache $cache) : Cache
+    private static function createCacheInstance(bool $isDevMode, ?Cache $cache): Cache
     {
         if (null !== $cache) {
             return $cache;

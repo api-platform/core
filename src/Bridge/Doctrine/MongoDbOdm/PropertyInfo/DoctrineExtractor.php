@@ -102,17 +102,14 @@ final class DoctrineExtractor implements PropertyListExtractorInterface, Propert
             switch ($typeOfField) {
                 case MongoDbType::DATE:
                     return [new Type(Type::BUILTIN_TYPE_OBJECT, $nullable, 'DateTime')];
-
                 case MongoDbType::HASH:
                     return [new Type(Type::BUILTIN_TYPE_ARRAY, $nullable, null, true)];
-
                 case MongoDbType::COLLECTION:
                     return [new Type(Type::BUILTIN_TYPE_ARRAY, $nullable, null, true, new Type(Type::BUILTIN_TYPE_INT))];
-
                 default:
                     $builtinType = $this->getPhpType($typeOfField);
 
-                    return $builtinType ? array(new Type($builtinType, $nullable)) : null;
+                    return $builtinType ? [new Type($builtinType, $nullable)] : null;
             }
         }
     }
@@ -153,10 +150,8 @@ final class DoctrineExtractor implements PropertyListExtractorInterface, Propert
             case MongoDbType::INTID:
             case MongoDbType::KEY:
                 return Type::BUILTIN_TYPE_INT;
-
             case MongoDbType::FLOAT:
                 return Type::BUILTIN_TYPE_FLOAT;
-
             case MongoDbType::STRING:
             case MongoDbType::ID:
             case MongoDbType::OBJECTID:
@@ -169,7 +164,6 @@ final class DoctrineExtractor implements PropertyListExtractorInterface, Propert
             case MongoDbType::BINDATAUUID:
             case MongoDbType::BINDATAUUIDRFC4122:
                 return Type::BUILTIN_TYPE_STRING;
-
             case MongoDbType::BOOLEAN:
             case MongoDbType::BOOL:
                 return Type::BUILTIN_TYPE_BOOL;
