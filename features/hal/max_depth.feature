@@ -91,7 +91,6 @@ Feature: Max depth handling
     }
     """
 
-  @dropSchema
   Scenario: Add a 2nd level of descendants when eager fetching is disabled
     Given there is a max depth dummy with 1 level of descendants
     When I add "Accept" header equal to "application/hal+json"

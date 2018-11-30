@@ -138,7 +138,6 @@ Feature: GraphQL query support
     And the header "Content-Type" should be equal to "application/json"
     And the JSON node "data.dummy._id" should be equal to "1"
 
-  @dropSchema
   Scenario: Retrieve an nonexistent item through a GraphQL query
     When I send the following GraphQL request:
     """
