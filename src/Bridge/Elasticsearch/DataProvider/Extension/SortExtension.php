@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Bridge\Elasticsearch\DataProvider\Extension;
 
-use ApiPlatform\Core\Api\IdentifiersExtractorInterface;
+use ApiPlatform\Core\Bridge\Elasticsearch\Api\IdentifierExtractorInterface;
 use ApiPlatform\Core\Bridge\Elasticsearch\Util\FieldDatatypeTrait;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
@@ -33,15 +33,14 @@ final class SortExtension implements FullBodySearchCollectionExtensionInterface
     use FieldDatatypeTrait;
 
     private $defaultDirection;
-    private $identifiersExtractor;
+    private $identifierExtractor;
     private $resourceMetadataFactory;
 
-    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, IdentifiersExtractorInterface $identifiersExtractor, PropertyMetadataFactoryInterface $propertyMetadataFactory, ?string $defaultDirection = null)
+    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, IdentifierExtractorInterface $identifierExtractor, PropertyMetadataFactoryInterface $propertyMetadataFactory, ?string $defaultDirection = null)
     {
         $this->resourceMetadataFactory = $resourceMetadataFactory;
-        $this->identifiersExtractor = $identifiersExtractor;
+        $this->identifierExtractor = $identifierExtractor;
         $this->propertyMetadataFactory = $propertyMetadataFactory;
-        $this->identifiersExtractor = $identifiersExtractor;
         $this->defaultDirection = $defaultDirection;
     }
 
@@ -52,7 +51,10 @@ final class SortExtension implements FullBodySearchCollectionExtensionInterface
     {
         $orders = [];
 
-        if (null !== ($defaultOrder = $this->resourceMetadataFactory->create($resourceClass)->getAttribute('order')) && \is_array($defaultOrder)) {
+        if (
+            null !== ($defaultOrder = $this->resourceMetadataFactory->create($resourceClass)->getAttribute('order'))
+            && \is_array($defaultOrder)
+        ) {
             foreach ($defaultOrder as $property => $direction) {
                 if (\is_int($property)) {
                     $property = $direction;
@@ -62,9 +64,11 @@ final class SortExtension implements FullBodySearchCollectionExtensionInterface
                 $orders[] = $this->getOrder($resourceClass, $property, $direction);
             }
         } elseif (null !== $this->defaultDirection) {
-            foreach ($this->identifiersExtractor->getIdentifiersFromResourceClass($resourceClass) as $identifier) {
-                $orders[] = $this->getOrder($resourceClass, $identifier, $this->defaultDirection);
-            }
+            $orders[] = $this->getOrder(
+                $resourceClass,
+                $this->identifierExtractor->getIdentifierFromResourceClass($resourceClass),
+                $this->defaultDirection
+            );
         }
 
         if (!$orders) {
@@ -80,8 +84,8 @@ final class SortExtension implements FullBodySearchCollectionExtensionInterface
     {
         $order = ['order' => strtolower($direction)];
 
-        if ($this->isNestedField($resourceClass, $nestedPath = explode('.', $property)[0])) {
-            $order['nested_path'] = $nestedPath;
+        if (null !== $nestedPath = $this->getNestedFieldPath($resourceClass, $property)) {
+            $order['nested'] = ['path' => $nestedPath];
         }
 
         return [$property => $order];

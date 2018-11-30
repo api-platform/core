@@ -30,7 +30,7 @@ use Symfony\Component\PropertyInfo\Type;
  */
 abstract class AbstractFilter implements FilterInterface
 {
-    use FieldDatatypeTrait { isNestedField as protected; }
+    use FieldDatatypeTrait { getNestedFieldPath as protected; }
 
     protected $properties;
     protected $propertyNameCollectionFactory;
@@ -49,7 +49,7 @@ abstract class AbstractFilter implements FilterInterface
     protected function getProperties(string $resourceClass): \Traversable
     {
         if (null !== $this->properties) {
-            yield from $this->properties;
+            return yield from $this->properties;
         }
 
         try {

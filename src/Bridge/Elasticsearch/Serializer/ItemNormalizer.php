@@ -13,8 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Bridge\Elasticsearch\Serializer;
 
-use ApiPlatform\Core\Api\IdentifiersExtractorInterface;
-use ApiPlatform\Core\Exception\InvalidArgumentException;
+use ApiPlatform\Core\Bridge\Elasticsearch\Api\IdentifierExtractorInterface;
 use ApiPlatform\Core\Exception\RuntimeException;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\PropertyInfo\PropertyTypeExtractorInterface;
@@ -33,13 +32,13 @@ final class ItemNormalizer extends ObjectNormalizer
 {
     public const FORMAT = 'elasticsearch';
 
-    private $identifiersExtractor;
+    private $identifierExtractor;
 
-    public function __construct(IdentifiersExtractorInterface $identifiersExtractor, ?ClassMetadataFactoryInterface $classMetadataFactory = null, ?NameConverterInterface $nameConverter = null, ?PropertyAccessorInterface $propertyAccessor = null, ?PropertyTypeExtractorInterface $propertyTypeExtractor = null)
+    public function __construct(IdentifierExtractorInterface $identifierExtractor, ?ClassMetadataFactoryInterface $classMetadataFactory = null, ?NameConverterInterface $nameConverter = null, ?PropertyAccessorInterface $propertyAccessor = null, ?PropertyTypeExtractorInterface $propertyTypeExtractor = null)
     {
         parent::__construct($classMetadataFactory, $nameConverter, $propertyAccessor, $propertyTypeExtractor);
 
-        $this->identifiersExtractor = $identifiersExtractor;
+        $this->identifierExtractor = $identifierExtractor;
     }
 
     /**
@@ -83,14 +82,10 @@ final class ItemNormalizer extends ObjectNormalizer
      */
     private function populateIdentifier(array $data, string $class): array
     {
-        $identifiers = $this->identifiersExtractor->getIdentifiersFromResourceClass($class);
+        $identifier = $this->identifierExtractor->getIdentifierFromResourceClass($class);
 
-        if (1 !== \count($identifiers)) {
-            throw new InvalidArgumentException('Composite identifiers not supported.');
-        }
-
-        if (!isset($data['_source'][$identifiers[0]])) {
-            $data['_source'][$identifiers[0]] = $data['_id'];
+        if (!isset($data['_source'][$identifier])) {
+            $data['_source'][$identifier] = $data['_id'];
         }
 
         return $data;

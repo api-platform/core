@@ -13,9 +13,9 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Bridge\Elasticsearch\DataProvider\Filter;
 
-use ApiPlatform\Core\Api\IdentifiersExtractorInterface;
 use ApiPlatform\Core\Api\IriConverterInterface;
 use ApiPlatform\Core\Api\ResourceClassResolverInterface;
+use ApiPlatform\Core\Bridge\Elasticsearch\Api\IdentifierExtractorInterface;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
@@ -33,15 +33,15 @@ use Symfony\Component\PropertyInfo\Type;
  */
 final class TermFilter extends AbstractFilter implements ConstantScoreFilterInterface
 {
-    private $identifiersExtractor;
+    private $identifierExtractor;
     private $iriConverter;
     private $propertyAccessor;
 
-    public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, ResourceClassResolverInterface $resourceClassResolver, IdentifiersExtractorInterface $identifiersExtractor, IriConverterInterface $iriConverter, PropertyAccessorInterface $propertyAccessor, ?array $properties = null)
+    public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, ResourceClassResolverInterface $resourceClassResolver, IdentifierExtractorInterface $identifierExtractor, IriConverterInterface $iriConverter, PropertyAccessorInterface $propertyAccessor, ?array $properties = null)
     {
         parent::__construct($propertyNameCollectionFactory, $propertyMetadataFactory, $resourceClassResolver, $properties);
 
-        $this->identifiersExtractor = $identifiersExtractor;
+        $this->identifierExtractor = $identifierExtractor;
         $this->iriConverter = $iriConverter;
         $this->propertyAccessor = $propertyAccessor;
     }
@@ -74,7 +74,7 @@ final class TermFilter extends AbstractFilter implements ConstantScoreFilterInte
                 $term = ['terms' => [$property => $values]];
             }
 
-            if ($this->isNestedField($resourceClass, $nestedPath = explode('.', $property)[0])) {
+            if (null !== $nestedPath = $this->getNestedFieldPath($resourceClass, $property)) {
                 $term = ['nested' => ['path' => $nestedPath, 'query' => $term]];
             }
 
@@ -146,7 +146,7 @@ final class TermFilter extends AbstractFilter implements ConstantScoreFilterInte
      */
     private function isIdentifier(string $resourceClass, string $property): bool
     {
-        return \in_array($property, $this->identifiersExtractor->getIdentifiersFromResourceClass($resourceClass), true);
+        return $property === $this->identifierExtractor->getIdentifierFromResourceClass($resourceClass);
     }
 
     /**

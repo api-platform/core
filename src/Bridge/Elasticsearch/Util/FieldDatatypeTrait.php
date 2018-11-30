@@ -40,30 +40,54 @@ trait FieldDatatypeTrait
     private $resourceClassResolver;
 
     /**
-     * Is the given property of the given resource class potentially mapped as a nested field in Elasticsearch?
+     * Is the decomposed given property of the given resource class potentially mapped as a nested field in Elasticsearch?
      */
     private function isNestedField(string $resourceClass, string $property): bool
     {
+        return null !== $this->getNestedFieldPath($resourceClass, $property);
+    }
+
+    /**
+     * Get the nested path to the decomposed given property (e.g.: foo.bar.baz => foo.bar).
+     */
+    private function getNestedFieldPath(string $resourceClass, string $property): ?string
+    {
+        $properties = explode('.', $property);
+        $currentProperty = array_shift($properties);
+
         try {
-            $propertyMetadata = $this->propertyMetadataFactory->create($resourceClass, $property);
+            $propertyMetadata = $this->propertyMetadataFactory->create($resourceClass, $currentProperty);
         } catch (PropertyNotFoundException $e) {
-            return false;
+            return null;
         }
 
         if (null === $type = $propertyMetadata->getType()) {
-            return false;
+            return null;
         }
 
-        if (!$type->isCollection()) {
-            return false;
+        if (!$properties) {
+            return null;
         }
 
-        if (null === $type = $type->getCollectionValueType()) {
-            return false;
+        if (
+            Type::BUILTIN_TYPE_OBJECT === $type->getBuiltinType()
+            && null !== ($nextResourceClass = $type->getClassName())
+            && $this->resourceClassResolver->isResourceClass($nextResourceClass)
+        ) {
+            $nestedPath = $this->getNestedFieldPath($nextResourceClass, implode('.', $properties));
+
+            return null === $nestedPath ? $nestedPath : "$currentProperty.$nestedPath";
         }
 
-        return Type::BUILTIN_TYPE_OBJECT === $type->getBuiltinType()
+        if (
+            null !== ($type = $type->getCollectionValueType())
+            && Type::BUILTIN_TYPE_OBJECT === $type->getBuiltinType()
             && null !== ($className = $type->getClassName())
-            && $this->resourceClassResolver->isResourceClass($className);
+            && $this->resourceClassResolver->isResourceClass($className)
+        ) {
+            return $currentProperty;
+        }
+
+        return null;
     }
 }
