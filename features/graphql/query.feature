@@ -152,3 +152,63 @@ Feature: GraphQL query support
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/json"
     And the JSON node "data.dummy" should be null
+
+  Scenario: Retrieve an nonexistent IRI through a GraphQL query
+    When I send the following GraphQL request:
+    """
+    {
+      foo(id: "/foo/1") {
+        name
+      }
+    }
+    """
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/json"
+    And the JSON node "errors[0].debugMessage" should be equal to 'No route matches "/foo/1".'
+    And the JSON should be valid according to this schema:
+    """
+    {
+      "type": "object",
+      "properties": {
+        "errors": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "debugMessage": {"type": "string"},
+              "message": {"type": "string"},
+              "extensions": {"type": "object"},
+              "locations": {"type": "array"},
+              "path": {"type": "array"},
+              "trace": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "file": {"type": "string"},
+                    "line": {"type": "integer"},
+                    "call": {"type": ["string", "null"]},
+                    "function": {"type": ["string", "null"]}
+                  },
+                  "additionalProperties": false
+                },
+                "minItems": 1
+              }
+            },
+            "required": [
+              "debugMessage",
+              "message",
+              "extensions",
+              "locations",
+              "path",
+              "trace"
+            ],
+            "additionalProperties": false
+          },
+          "minItems": 1,
+          "maxItems": 1
+        }
+      }
+    }
+    """

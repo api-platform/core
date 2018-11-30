@@ -20,6 +20,8 @@ parameters:
         - '#Parameter \#1 \$function of function call_user_func expects callable, .+ given\.#'
         - '#Parameter \#1 \$classes of class ApiPlatform\\Core\\Metadata\\Resource\\ResourceNameCollection constructor expects array<string>, array<int, int\|string> given\.#'
         - '#Method ApiPlatform\\Core\\Util\\RequestParser::parseRequestParams\(\) should return array but returns array\|false\.#'
+        - '#Parameter \#1 \$vars of class GraphQL\\Language\\AST\\(IntValue|ObjectField|ObjectValue|BooleanValue|ListValue|StringValue)Node constructor expects array<GraphQL\\Language\\AST\\Location\|GraphQL\\Language\\AST\\NameNode\|GraphQL\\Language\\AST\\NodeList\|GraphQL\\Language\\AST\\SelectionSetNode\|string\|null>, array<string, .+> given\.#'
+        - '#Parameter \#1 \$defaultContext of class Symfony\\Component\\Serializer\\Encoder\\Json(De|En)code constructor expects array, (int|true) given\.#'
         # Temporary fix while the PHPStan extension for Prophecy isn't compatible with 0.10
         - '#Parameter .* expects .*, .*object.* given\.#'
         - '#Parameter \#[0-9] \$filterLocator of class ApiPlatform\\Core\\Bridge\\Doctrine\\Orm\\Extension\\FilterExtension constructor expects ApiPlatform\\Core\\Api\\FilterCollection|Psr\\Container\\ContainerInterface(\|null)?, ArrayObject given\.#'
@@ -38,9 +40,3 @@ parameters:
         - '#Method ApiPlatform\\Core\\Bridge\\Doctrine\\Orm\\Filter\\FilterInterface::apply\(\) invoked with 5 parameters, 3-4 required\.#'
         - '#Method ApiPlatform\\Core\\Bridge\\Doctrine\\Orm\\Filter\\OrderFilter::filterProperty\(\) invoked with 7 parameters, 5-6 required\.#'
         - '#Method ApiPlatform\\Core\\DataProvider\\CollectionDataProviderInterface::getCollection\(\) invoked with 3 parameters, 1-2 required\.#'
-
-        # Expected, due to feature detection, to adapt when Symfony 4.2 will be released
-        - '#Class Symfony\\Component\\Serializer\\NameConverter\\AdvancedNameConverterInterface not found\.#'
-        - '#Method Symfony\\Component\\Serializer\\Normalizer\\AbstractObjectNormalizer::__construct\(\) invoked with 6 parameters, 0-4 required\.#'
-        - '#Parameter \#1 \$bitmask of class Symfony\\Component\\Serializer\\Encoder\\JsonEncode constructor expects int, array<string, int> given\.#'
-        - '#Parameter \#1 \$associative of class Symfony\\Component\\Serializer\\Encoder\\JsonDecode constructor expects bool, array<string, true> given\.#'
