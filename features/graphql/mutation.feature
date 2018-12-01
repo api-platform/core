@@ -122,7 +122,6 @@ Feature: GraphQL mutation support
     And the JSON node "data.deleteFoo.id" should be equal to "/foos/1"
     And the JSON node "data.deleteFoo.clientMutationId" should be equal to "anotherId"
 
-  @dropSchema
   Scenario: Delete an item with composite identifiers through a mutation
     Given there are Composite identifier objects
     When I send the following GraphQL request:
@@ -250,7 +249,6 @@ Feature: GraphQL mutation support
     And the JSON node "data.createDummyGroup.baz" should be null
     And the JSON node "data.createDummyGroup.clientMutationId" should be equal to "myId"
 
-  @dropSchema
   Scenario: Trigger a validation error
     When I send the following GraphQL request:
     """
