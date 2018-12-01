@@ -40,7 +40,7 @@ final class ItemNormalizer extends BaseItemNormalizer
     public function normalize($object, $format = null, array $context = [])
     {
         $data = parent::normalize($object, $format, $context);
-        $data[self::ITEM_KEY] = serialize($object); // calling serialize prevent weird normalization process done by Webonyx's GraphQL PHP
+        $data[self::ITEM_KEY] = serialize($this->cloneToEmptyObject($object)); // calling serialize prevent weird normalization process done by Webonyx's GraphQL PHP
 
         return $data;
     }
@@ -88,4 +88,30 @@ final class ItemNormalizer extends BaseItemNormalizer
 
         parent::setAttributeValue($object, $attribute, $value, $format, $context);
     }
+
+	/**
+	 * Return object of passed type with all empty fields except id.
+	 * Necessary to speed up serialization/deserialization on Webonyx side.
+	 *
+	 * @param $originalObject
+	 *
+	 * @return object
+	 */
+	private function cloneToEmptyObject($originalObject)
+	{
+		$class = get_class($originalObject);
+		$emptyObject = new $class;
+
+		try {
+			$reflectionClass = new \ReflectionClass($class);
+			$property = $reflectionClass->getProperty('id');
+		} catch (\ReflectionException $e) {
+			return $originalObject;
+		}
+
+		$property->setAccessible(true);
+		$property->setValue($emptyObject, $property->getValue($originalObject));
+
+		return $emptyObject;
+	}
 }
