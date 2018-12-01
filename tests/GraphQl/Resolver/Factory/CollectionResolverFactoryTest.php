@@ -23,7 +23,10 @@ use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RelatedDummy;
+use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\ResolveInfo;
+use GraphQL\Type\Definition\Type;
+use GraphQL\Type\Schema;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Symfony\Component\HttpFoundation\Request;
@@ -44,9 +47,7 @@ class CollectionResolverFactoryTest extends TestCase
         $factory = $this->createCollectionResolverFactory([], [], ['id' => 1], $paginationEnabled);
         $resolver = $factory(RelatedDummy::class, Dummy::class, 'operationName');
 
-        $resolveInfo = new ResolveInfo([]);
-        $resolveInfo->fieldName = 'relatedDummies';
-        $resolveInfo->fieldNodes = [];
+        $resolveInfo = new ResolveInfo('relatedDummies', [], null, new ObjectType(['name' => '']), '', new Schema([]), null, null, null, null);
 
         $this->assertEquals($expected, $resolver(null, [], null, $resolveInfo));
     }
@@ -68,9 +69,7 @@ class CollectionResolverFactoryTest extends TestCase
 
         $resolver = $factory(RelatedDummy::class, Dummy::class, 'operationName');
 
-        $resolveInfo = new ResolveInfo([]);
-        $resolveInfo->fieldName = 'rootProperty';
-        $resolveInfo->fieldNodes = [];
+        $resolveInfo = new ResolveInfo('rootProperty', [], null, new ObjectType(['name' => '']), '', new Schema([]), null, null, null, null);
 
         $this->assertEquals(['normalizedObject1', 'normalizedObject2'], $resolver(null, [], null, $resolveInfo));
     }
@@ -87,9 +86,7 @@ class CollectionResolverFactoryTest extends TestCase
 
         $resolver = $factory(RelatedDummy::class, Dummy::class, 'operationName');
 
-        $resolveInfo = new ResolveInfo([]);
-        $resolveInfo->fieldName = 'relatedDummies';
-        $resolveInfo->fieldNodes = [];
+        $resolveInfo = new ResolveInfo('relatedDummies', [], null, new ObjectType(['name' => '']), '', new Schema([]), null, null, null, null);
 
         $dummy = new Dummy();
         $dummy->setId(1);
@@ -122,9 +119,7 @@ class CollectionResolverFactoryTest extends TestCase
 
         $resolver = $factory(RelatedDummy::class, Dummy::class, 'operationName');
 
-        $resolveInfo = new ResolveInfo([]);
-        $resolveInfo->fieldName = 'relatedDummies';
-        $resolveInfo->fieldNodes = [];
+        $resolveInfo = new ResolveInfo('relatedDummies', [], null, new ObjectType(['name' => '']), '', new Schema([]), null, null, null, null);
 
         if ('$bad$' === $cursor) {
             $this->expectException(\Exception::class);
@@ -167,9 +162,7 @@ class CollectionResolverFactoryTest extends TestCase
         $resolverFactory = $this->createCollectionResolverFactory($collectionPaginatorProphecy->reveal(), [], [], true, $cursor);
         $resolver = $resolverFactory(RelatedDummy::class, Dummy::class, 'operationName');
 
-        $resolveInfo = new ResolveInfo([]);
-        $resolveInfo->fieldName = 'relatedDummies';
-        $resolveInfo->fieldNodes = [];
+        $resolveInfo = new ResolveInfo('relatedDummies', [], null, new ObjectType(['name' => '']), '', new Schema([]), null, null, null, null);
 
         $this->assertEquals(
             ['edges' => [['node' => 'normalizedObject1', 'cursor' => 'Mg==']], 'pageInfo' => ['endCursor' => 'MTY=', 'hasNextPage' => true], 'totalCount' => 17],
