@@ -14,7 +14,6 @@
     ],
     "require": {
         "php": ">=7.1",
-
         "doctrine/inflector": "^1.0",
         "psr/cache": "^1.0",
         "psr/container": "^1.0",
@@ -66,7 +65,7 @@
         "symfony/validator": "^3.3 || ^4.0",
         "symfony/web-profiler-bundle": "^3.3 || ^4.0",
         "symfony/yaml": "^3.3 || ^4.0",
-        "webonyx/graphql-php": ">=0.12 <1.0"
+        "webonyx/graphql-php": ">=0.13 <1.0"
     },
     "conflict": {
         "symfony/dependency-injection": "<3.4"

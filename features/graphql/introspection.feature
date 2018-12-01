@@ -310,7 +310,6 @@ Feature: GraphQL introspection support
     And the JSON node "data.typeCreatePayload.fields[2].name" should be equal to "baz"
     And the JSON node "data.typeCreatePayload.fields[3].name" should be equal to "clientMutationId"
 
-  @dropSchema
   Scenario: Retrieve an item through a GraphQL query
     Given there are 4 dummy objects with relatedDummy
     When I send the following GraphQL request:

@@ -14,7 +14,6 @@ Feature: Operation support
     """
 
   @createSchema
-  @dropSchema
   Scenario: Select a resource and it's embedded data
     Given there are 1 embedded dummy objects
     When I send a "GET" request to "/embedded_dummies_groups/1"
