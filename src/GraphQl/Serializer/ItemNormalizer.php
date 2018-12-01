@@ -93,7 +93,7 @@ final class ItemNormalizer extends BaseItemNormalizer
 	 * Return object of passed type with all empty fields except id.
 	 * Necessary to speed up serialization/deserialization on Webonyx side.
 	 *
-	 * @param $originalObject
+	 * @param object $originalObject
 	 *
 	 * @return object
 	 */
