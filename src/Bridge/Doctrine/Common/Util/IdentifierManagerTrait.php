@@ -11,11 +11,13 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Bridge\Doctrine\Orm\Util;
+namespace ApiPlatform\Core\Bridge\Doctrine\Common\Util;
 
 use ApiPlatform\Core\Exception\PropertyNotFoundException;
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\DBAL\Types\Type as DBALType;
+use Doctrine\ODM\MongoDB\DocumentManager;
+use Doctrine\ODM\MongoDB\Types\Type as MongoDbType;
 use Doctrine\ORM\EntityManagerInterface;
 
 /**
@@ -39,6 +41,7 @@ trait IdentifierManagerTrait
         $doctrineClassMetadata = $manager->getClassMetadata($resourceClass);
         $doctrineIdentifierFields = $doctrineClassMetadata->getIdentifier();
         $isOrm = interface_exists(EntityManagerInterface::class) && $manager instanceof EntityManagerInterface;
+        $isOdm = class_exists(DocumentManager::class) && $manager instanceof DocumentManager;
         $platform = $isOrm ? $manager->getConnection()->getDatabasePlatform() : null;
         $identifiersMap = null;
 
@@ -75,6 +78,9 @@ trait IdentifierManagerTrait
 
             if ($isOrm && null !== $doctrineTypeName && DBALType::hasType($doctrineTypeName)) {
                 $identifier = DBALType::getType($doctrineTypeName)->convertToPHPValue($identifier, $platform);
+            }
+            if ($isOdm && null !== $doctrineTypeName && MongoDbType::hasType($doctrineTypeName)) {
+                $identifier = MongoDbType::getType($doctrineTypeName)->convertToPHPValue($identifier);
             }
 
             $identifiers[$propertyName] = $identifier;

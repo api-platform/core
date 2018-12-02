@@ -11,20 +11,23 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Bridge\Doctrine\Orm\Util;
+namespace ApiPlatform\Core\Tests\Bridge\Doctrine\Common\Util;
 
-use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\IdentifierManagerTrait;
+use ApiPlatform\Core\Bridge\Doctrine\Common\Util\IdentifierManagerTrait;
 use ApiPlatform\Core\Exception\PropertyNotFoundException;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 use ApiPlatform\Core\Metadata\Property\PropertyNameCollection;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\Dummy as DummyDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use Doctrine\Common\Persistence\Mapping\ClassMetadata;
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Types\Type as DBALType;
+use Doctrine\ODM\MongoDB\DocumentManager;
+use Doctrine\ODM\MongoDB\Types\Type as MongoDbType;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\TestCase;
 
@@ -53,7 +56,7 @@ class IdentifierManagerTraitTest extends TestCase
         list($propertyNameCollectionFactory, $propertyMetadataFactory) = $this->getMetadataFactories(Dummy::class, [
             'id',
         ]);
-        $objectManager = $this->getObjectManager(Dummy::class, [
+        $objectManager = $this->getEntityManager(Dummy::class, [
             'id' => [
                 'type' => DBALType::INTEGER,
             ],
@@ -67,13 +70,32 @@ class IdentifierManagerTraitTest extends TestCase
     /**
      * @group legacy
      */
+    public function testSingleDocumentIdentifier()
+    {
+        [$propertyNameCollectionFactory, $propertyMetadataFactory] = $this->getMetadataFactories(DummyDocument::class, [
+            'id',
+        ]);
+        $objectManager = $this->getDocumentManager(DummyDocument::class, [
+            'id' => [
+                'type' => MongoDbType::INTEGER,
+            ],
+        ]);
+
+        $identifierManager = $this->getIdentifierManagerTraitImpl($propertyNameCollectionFactory, $propertyMetadataFactory);
+
+        $this->assertEquals($identifierManager->normalizeIdentifiers(1, $objectManager, DummyDocument::class), ['id' => 1]);
+    }
+
+    /**
+     * @group legacy
+     */
     public function testCompositeIdentifier()
     {
         list($propertyNameCollectionFactory, $propertyMetadataFactory) = $this->getMetadataFactories(Dummy::class, [
             'ida',
             'idb',
         ]);
-        $objectManager = $this->getObjectManager(Dummy::class, [
+        $objectManager = $this->getEntityManager(Dummy::class, [
             'ida' => [
                 'type' => DBALType::INTEGER,
             ],
@@ -99,7 +121,7 @@ class IdentifierManagerTraitTest extends TestCase
             'ida',
             'idb',
         ]);
-        $objectManager = $this->getObjectManager(Dummy::class, [
+        $objectManager = $this->getEntityManager(Dummy::class, [
             'ida' => [
                 'type' => DBALType::INTEGER,
             ],
@@ -140,9 +162,9 @@ class IdentifierManagerTraitTest extends TestCase
     }
 
     /**
-     * Gets a mocked object manager.
+     * Gets a mocked entity manager.
      */
-    private function getObjectManager(string $resourceClass, array $identifierFields): ObjectManager
+    private function getEntityManager(string $resourceClass, array $identifierFields): ObjectManager
     {
         $classMetadataProphecy = $this->prophesize(ClassMetadata::class);
         $classMetadataProphecy->getIdentifier()->willReturn(array_keys($identifierFields));
@@ -159,6 +181,24 @@ class IdentifierManagerTraitTest extends TestCase
         $managerProphecy = $this->prophesize(EntityManagerInterface::class);
         $managerProphecy->getClassMetadata($resourceClass)->willReturn($classMetadataProphecy->reveal());
         $managerProphecy->getConnection()->willReturn($connectionProphecy);
+
+        return $managerProphecy->reveal();
+    }
+
+    /**
+     * Gets a mocked document manager.
+     */
+    private function getDocumentManager(string $resourceClass, array $identifierFields): ObjectManager
+    {
+        $classMetadataProphecy = $this->prophesize(ClassMetadata::class);
+        $classMetadataProphecy->getIdentifier()->willReturn(array_keys($identifierFields));
+
+        foreach ($identifierFields as $name => $field) {
+            $classMetadataProphecy->getTypeOfField($name)->willReturn($field['type']);
+        }
+
+        $managerProphecy = $this->prophesize(DocumentManager::class);
+        $managerProphecy->getClassMetadata($resourceClass)->willReturn($classMetadataProphecy->reveal());
 
         return $managerProphecy->reveal();
     }

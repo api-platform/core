@@ -16,7 +16,7 @@ parameters:
         - '#Call to an undefined method PHPUnit\\Framework\\MockObject\\MockObject::[a-zA-Z0-9_]+\(\)#'
         - '#Call to an undefined method Prophecy\\Prophecy\\ObjectProphecy(|.*)?::[a-zA-Z0-9_]+\(\)#'
         - '#Method ApiPlatform\\Core\\Tests\\Bridge\\Doctrine\\Orm\\ItemDataProviderTest::getManagerRegistry\(\) should return Doctrine\\Common\\Persistence\\ManagerRegistry but returns object\.#'
-        - '#Method ApiPlatform\\Core\\Tests\\Bridge\\Doctrine\\Orm\\Util\\IdentifierManagerTraitTest::getObjectManager\(\) should return Doctrine\\Common\\Persistence\\ObjectManager but returns object\.#'
+        - '#Method ApiPlatform\\Core\\Tests\\Bridge\\Doctrine\\Common\\Util\\IdentifierManagerTraitTest::getObjectManager\(\) should return Doctrine\\Common\\Persistence\\ObjectManager but returns object\.#'
         - '#Parameter \#1 \$function of function call_user_func expects callable, .+ given\.#'
         - '#Parameter \#1 \$classes of class ApiPlatform\\Core\\Metadata\\Resource\\ResourceNameCollection constructor expects array<string>, array<int, int\|string> given\.#'
         - '#Method ApiPlatform\\Core\\Util\\RequestParser::parseRequestParams\(\) should return array but returns array\|false\.#'

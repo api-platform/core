@@ -115,7 +115,6 @@ class DoctrineMongoDbOdmSetup
             return new \Doctrine\Common\Cache\ApcuCache();
         }
 
-
         if (\extension_loaded('memcached')) {
             $memcached = new \Memcached();
             $memcached->addServer('127.0.0.1', 11211);
