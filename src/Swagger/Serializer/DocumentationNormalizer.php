@@ -49,6 +49,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
     const SWAGGER_VERSION = '2.0';
     const FORMAT = 'json';
     const SWAGGER_DEFINITION_NAME = 'swagger_definition_name';
+    const BASE_URL = 'base_url';
 
     private $resourceMetadataFactory;
     private $propertyNameCollectionFactory;
@@ -72,11 +73,12 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
     private $paginationClientEnabled;
     private $paginationClientEnabledParameterName;
     private $formatsProvider;
+    private $defaultContext = [self::BASE_URL => '/'];
 
     /**
      * @param ContainerInterface|FilterCollection|null $filterLocator The new filter locator or the deprecated filter collection
      */
-    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, ResourceClassResolverInterface $resourceClassResolver, OperationMethodResolverInterface $operationMethodResolver, OperationPathResolverInterface $operationPathResolver, UrlGeneratorInterface $urlGenerator = null, $filterLocator = null, NameConverterInterface $nameConverter = null, $oauthEnabled = false, $oauthType = '', $oauthFlow = '', $oauthTokenUrl = '', $oauthAuthorizationUrl = '', array $oauthScopes = [], array $apiKeys = [], SubresourceOperationFactoryInterface $subresourceOperationFactory = null, $paginationEnabled = true, $paginationPageParameterName = 'page', $clientItemsPerPage = false, $itemsPerPageParameterName = 'itemsPerPage', OperationAwareFormatsProviderInterface $formatsProvider = null, $paginationClientEnabled = false, $paginationClientEnabledParameterName = 'pagination')
+    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, ResourceClassResolverInterface $resourceClassResolver, OperationMethodResolverInterface $operationMethodResolver, OperationPathResolverInterface $operationPathResolver, UrlGeneratorInterface $urlGenerator = null, $filterLocator = null, NameConverterInterface $nameConverter = null, $oauthEnabled = false, $oauthType = '', $oauthFlow = '', $oauthTokenUrl = '', $oauthAuthorizationUrl = '', array $oauthScopes = [], array $apiKeys = [], SubresourceOperationFactoryInterface $subresourceOperationFactory = null, $paginationEnabled = true, $paginationPageParameterName = 'page', $clientItemsPerPage = false, $itemsPerPageParameterName = 'itemsPerPage', OperationAwareFormatsProviderInterface $formatsProvider = null, $paginationClientEnabled = false, $paginationClientEnabledParameterName = 'pagination', array $defaultContext = [])
     {
         if ($urlGenerator) {
             @trigger_error(sprintf('Passing an instance of %s to %s() is deprecated since version 2.1 and will be removed in 3.0.', UrlGeneratorInterface::class, __METHOD__), E_USER_DEPRECATED);
@@ -106,6 +108,8 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
         $this->formatsProvider = $formatsProvider;
         $this->paginationClientEnabled = $paginationClientEnabled;
         $this->paginationClientEnabledParameterName = $paginationClientEnabledParameterName;
+
+        $this->defaultContext = array_merge($this->defaultContext, $defaultContext);
     }
 
     /**
@@ -543,7 +547,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
     {
         $doc = [
             'swagger' => self::SWAGGER_VERSION,
-            'basePath' => $context['base_url'] ?? '/',
+            'basePath' => $context[self::BASE_URL] ?? $this->defaultContext[self::BASE_URL],
             'info' => [
                 'title' => $documentation->getTitle(),
                 'version' => $documentation->getVersion(),

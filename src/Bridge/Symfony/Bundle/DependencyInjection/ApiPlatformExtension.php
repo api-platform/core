@@ -545,7 +545,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
 
     private function registerMercureConfiguration(ContainerBuilder $container, array $config, XmlFileLoader $loader, bool $useDoctrine)
     {
-        if (!$config['mercure']['enabled'] || !$container->hasParameter('mercure.default_hub')) {
+        if (!$config['mercure']['enabled']) {
             return;
         }
 

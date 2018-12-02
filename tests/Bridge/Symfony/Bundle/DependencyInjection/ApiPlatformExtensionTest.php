@@ -42,6 +42,7 @@ use ApiPlatform\Core\Serializer\SerializerContextBuilderInterface;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\TestBundle;
 use ApiPlatform\Core\Validator\ValidatorInterface;
 use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
+use Doctrine\ORM\OptimisticLockException;
 use FOS\UserBundle\FOSUserBundle;
 use Nelmio\ApiDocBundle\NelmioApiDocBundle;
 use PHPUnit\Framework\TestCase;
@@ -504,6 +505,7 @@ class ApiPlatformExtensionTest extends TestCase
                 ExceptionInterface::class => Response::HTTP_BAD_REQUEST,
                 InvalidArgumentException::class => Response::HTTP_BAD_REQUEST,
                 FilterValidationException::class => Response::HTTP_BAD_REQUEST,
+                OptimisticLockException::class => Response::HTTP_CONFLICT,
             ],
             'api_platform.title' => 'title',
             'api_platform.version' => 'version',
@@ -804,7 +806,6 @@ class ApiPlatformExtensionTest extends TestCase
 
         $containerBuilderProphecy->hasParameter('api_platform.metadata_cache')->willReturn(true)->shouldBeCalled();
         $containerBuilderProphecy->getParameter('api_platform.metadata_cache')->willReturn(true)->shouldBeCalled();
-        $containerBuilderProphecy->hasParameter('mercure.default_hub')->willReturn(true)->shouldBeCalled();
 
         $containerBuilderProphecy->getDefinition('api_platform.mercure.listener.response.add_link_header')->willReturn(new Definition());
 

@@ -66,11 +66,9 @@ api_platform:
             client_partial:            true
             items_per_page:            3
     exception_to_status:
-        Symfony\Component\Serializer\Exception\ExceptionInterface: 400
-        ApiPlatform\Core\Exception\InvalidArgumentException: 400
-        ApiPlatform\Core\Exception\FilterValidationException: 400
-        # Use this syntax with Symfony YAML 3.4+:
-        #ApiPlatform\Core\Exception\InvalidArgumentException: !php/const Symfony\Component\HttpFoundation\Response::HTTP_BAD_REQUEST
+        Symfony\Component\Serializer\Exception\ExceptionInterface: !php/const Symfony\Component\HttpFoundation\Response::HTTP_BAD_REQUEST
+        ApiPlatform\Core\Exception\InvalidArgumentException: !php/const Symfony\Component\HttpFoundation\Response::HTTP_BAD_REQUEST
+        ApiPlatform\Core\Exception\FilterValidationException: !php/const Symfony\Component\HttpFoundation\Response::HTTP_BAD_REQUEST
     http_cache:
         invalidation:
             enabled: true

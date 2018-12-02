@@ -27,7 +27,6 @@ Feature: Expose persisted object state
     """
 
   @!mongodb
-  @dropSchema
   Scenario: Update a resource with truncable value value should return the correct object state
     When I add "Content-Type" header equal to "application/ld+json"
     And I send a "PUT" request to "/truncated_dummies/1" with body:

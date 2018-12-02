@@ -407,7 +407,6 @@ Feature: Subresource support
     }
     """
 
-  @dropSchema
   Scenario: Recursive resource
     When I send a "GET" request to "/dummy_products/2"
     And the response status code should be 200
