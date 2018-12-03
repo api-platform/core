@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm;
 
 use ApiPlatform\Core\DataProvider\PaginatorInterface;
-use ApiPlatform\Core\Exception\RuntimeException;
+use ApiPlatform\Core\Exception\InvalidArgumentException;
 use Doctrine\ODM\MongoDB\CommandCursor;
 use Doctrine\ODM\MongoDB\UnitOfWork;
 
@@ -38,6 +38,10 @@ final class Paginator implements \IteratorAggregate, PaginatorInterface
      * @var string
      */
     private $resourceClass;
+
+    /** @var \ArrayIterator */
+    private $iterator;
+
     /**
      * @var int
      */
@@ -57,7 +61,8 @@ final class Paginator implements \IteratorAggregate, PaginatorInterface
         $this->unitOfWork = $unitOfWork;
         $this->resourceClass = $resourceClass;
 
-        $resultsFacetInfo = $this->getResultsFacetInfo();
+        $resultsFacetInfo = $this->getFacetInfo('results');
+        $this->getFacetInfo('count');
 
         // See https://github.com/alcaeus/mongo-php-adapter#mongocommandcursor
         // Since the method getCursorInfo in CommandCursor always returns 0 for 'skip' and 'limit',
@@ -102,9 +107,9 @@ final class Paginator implements \IteratorAggregate, PaginatorInterface
     /**
      * {@inheritdoc}
      */
-    public function getIterator()
+    public function getIterator(): \Traversable
     {
-        return new \ArrayIterator(array_map(function ($result) {
+        return $this->iterator ?? $this->iterator = new \ArrayIterator(array_map(function ($result) {
             return $this->unitOfWork->getOrCreateDocument($this->resourceClass, $result);
         }, $this->cursor->toArray()[0]['results']));
     }
@@ -112,26 +117,32 @@ final class Paginator implements \IteratorAggregate, PaginatorInterface
     /**
      * {@inheritdoc}
      */
-    public function count()
+    public function count(): int
     {
-        return \count($this->getIterator());
-    }
-
-    private function getResultsFacetInfo(): array
-    {
-        $infoPipeline = $this->cursor->info()['query']['pipeline'];
-        $indexFacetStage = 0;
-        foreach ($infoPipeline as $indexStage => $infoStage) {
-            if (array_key_exists('$facet', $infoStage)) {
-                $indexFacetStage = $indexStage;
-            }
-        }
-
-        return $infoPipeline[$indexFacetStage]['$facet']['results'];
+        return iterator_count($this->getIterator());
     }
 
     /**
-     * @throws RuntimeException
+     * @throws InvalidArgumentException
+     */
+    private function getFacetInfo(string $field): array
+    {
+        $infoPipeline = $this->cursor->info()['query']['pipeline'];
+        foreach ($infoPipeline as $indexStage => $infoStage) {
+            if (array_key_exists('$facet', $infoStage)) {
+                if (!isset($infoPipeline[$indexStage]['$facet'][$field])) {
+                    throw new InvalidArgumentException("\"$field\" facet was not applied to the aggregation pipeline.");
+                }
+
+                return $infoPipeline[$indexStage]['$facet'][$field];
+            }
+        }
+
+        throw new InvalidArgumentException('$facet stage was not applied to the aggregation pipeline.');
+    }
+
+    /**
+     * @throws InvalidArgumentException
      */
     private function getStageInfo(array $resultsFacetInfo, string $stage): int
     {
@@ -141,6 +152,6 @@ final class Paginator implements \IteratorAggregate, PaginatorInterface
             }
         }
 
-        throw new RuntimeException("$stage stage was not found in the facet stage of the aggregation pipeline");
+        throw new InvalidArgumentException("$stage stage was not applied to the facet stage of the aggregation pipeline.");
     }
 }
