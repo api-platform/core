@@ -15,7 +15,7 @@ namespace ApiPlatform\Core\Bridge\Elasticsearch\DataProvider;
 
 use ApiPlatform\Core\Bridge\Elasticsearch\DataProvider\Extension\FullBodySearchCollectionExtensionInterface;
 use ApiPlatform\Core\Bridge\Elasticsearch\Exception\IndexNotFoundException;
-use ApiPlatform\Core\Bridge\Elasticsearch\Metadata\Factory\DocumentMetadataFactoryInterface;
+use ApiPlatform\Core\Bridge\Elasticsearch\Metadata\Document\Factory\DocumentMetadataFactoryInterface;
 use ApiPlatform\Core\DataProvider\ContextAwareCollectionDataProviderInterface;
 use ApiPlatform\Core\DataProvider\Pagination;
 use ApiPlatform\Core\DataProvider\RestrictedDataProviderInterface;

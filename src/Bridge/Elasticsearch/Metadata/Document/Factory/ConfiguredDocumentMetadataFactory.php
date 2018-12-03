@@ -11,10 +11,10 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Bridge\Elasticsearch\Metadata\Factory;
+namespace ApiPlatform\Core\Bridge\Elasticsearch\Metadata\Document\Factory;
 
 use ApiPlatform\Core\Bridge\Elasticsearch\Exception\IndexNotFoundException;
-use ApiPlatform\Core\Bridge\Elasticsearch\Metadata\DocumentMetadata;
+use ApiPlatform\Core\Bridge\Elasticsearch\Metadata\Document\DocumentMetadata;
 
 /**
  * Creates document's metadata using the mapping configuration.

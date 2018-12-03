@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Bridge\Elasticsearch\DataProvider;
 
 use ApiPlatform\Core\Bridge\Elasticsearch\Exception\IndexNotFoundException;
-use ApiPlatform\Core\Bridge\Elasticsearch\Metadata\Factory\DocumentMetadataFactoryInterface;
+use ApiPlatform\Core\Bridge\Elasticsearch\Metadata\Document\Factory\DocumentMetadataFactoryInterface;
 use ApiPlatform\Core\Bridge\Elasticsearch\Serializer\ItemNormalizer;
 use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
 use ApiPlatform\Core\DataProvider\RestrictedDataProviderInterface;

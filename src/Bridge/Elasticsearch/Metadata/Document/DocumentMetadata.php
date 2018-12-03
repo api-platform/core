@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Bridge\Elasticsearch\Metadata;
+namespace ApiPlatform\Core\Bridge\Elasticsearch\Metadata\Document;
 
 /**
  * Document metadata.
