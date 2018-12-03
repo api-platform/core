@@ -64,7 +64,7 @@ reusable-steps:
   - &update-composer
     run:
       name: Update Composer
-      command: composer self-update
+      command: sudo composer self-update
   - &update-project-dependencies
     run:
       name: Update project dependencies
