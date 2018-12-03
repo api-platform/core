@@ -84,6 +84,10 @@ final class ItemNormalizer extends ObjectNormalizer
     {
         $identifier = $this->identifierExtractor->getIdentifierFromResourceClass($class);
 
+        if (null !== $this->nameConverter) {
+            $identifier = $this->nameConverter->normalize($identifier);
+        }
+
         if (!isset($data['_source'][$identifier])) {
             $data['_source'][$identifier] = $data['_id'];
         }
