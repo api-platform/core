@@ -48,7 +48,7 @@ final class JsonContext extends BaseJsonContext
     /**
      * @Then /^the JSON should be deep equal to:$/
      */
-    public function theJsonShouldBeDeepEqualTo(PyStringNode $content)
+    public function theJsonShouldBeDeepEqualTo(PyStringNode $content): void
     {
         $actual = $this->getJson();
         try {
@@ -70,7 +70,7 @@ final class JsonContext extends BaseJsonContext
     /**
      * @Then /^the JSON should be a superset of:$/
      */
-    public function theJsonIsASupersetOf(PyStringNode $content)
+    public function theJsonIsASupersetOf(PyStringNode $content): void
     {
         $actual = json_decode($this->httpCallResultPool->getResult()->getValue(), true);
         Assert::assertArraySubset(json_decode($content->getRaw(), true), $actual);

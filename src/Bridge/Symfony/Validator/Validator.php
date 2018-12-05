@@ -38,7 +38,7 @@ class Validator implements ValidatorInterface
     /**
      * {@inheritdoc}
      */
-    public function validate($data, array $context = [])
+    public function validate($data, array $context = []): void
     {
         if (null !== $validationGroups = $context['groups'] ?? null) {
             if (

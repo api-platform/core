@@ -34,7 +34,7 @@ final class CoverageContext implements Context
     /**
      * @BeforeSuite
      */
-    public static function setup()
+    public static function setup(): void
     {
         $filter = new Filter();
         $filter->addDirectoryToWhitelist(__DIR__.'/../../src');
@@ -44,7 +44,7 @@ final class CoverageContext implements Context
     /**
      * @AfterSuite
      */
-    public static function tearDown()
+    public static function tearDown(): void
     {
         $feature = getenv('FEATURE') ?: 'behat';
         (new PHP())->process(self::$coverage, __DIR__."/../../build/cov/coverage-$feature.cov");
@@ -53,7 +53,7 @@ final class CoverageContext implements Context
     /**
      * @BeforeScenario
      */
-    public function startCoverage(BeforeScenarioScope $scope)
+    public function startCoverage(BeforeScenarioScope $scope): void
     {
         self::$coverage->start("{$scope->getFeature()->getTitle()}::{$scope->getScenario()->getTitle()}");
     }
@@ -61,7 +61,7 @@ final class CoverageContext implements Context
     /**
      * @AfterScenario
      */
-    public function stopCoverage()
+    public function stopCoverage(): void
     {
         self::$coverage->stop();
     }

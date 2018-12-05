@@ -28,7 +28,7 @@ use Psr\Cache\CacheItemPoolInterface;
  */
 class CachedRouteNameResolverTest extends TestCase
 {
-    public function testConstruct()
+    public function testConstruct(): void
     {
         $cacheItemPoolProphecy = $this->prophesize(CacheItemPoolInterface::class);
 
@@ -39,7 +39,7 @@ class CachedRouteNameResolverTest extends TestCase
         $this->assertInstanceOf(RouteNameResolverInterface::class, $cachedRouteNameResolver);
     }
 
-    public function testGetRouteNameForItemRouteWithNoMatchingRoute()
+    public function testGetRouteNameForItemRouteWithNoMatchingRoute(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('No item route associated with the type "AppBundle\\Entity\\User".');
@@ -60,7 +60,7 @@ class CachedRouteNameResolverTest extends TestCase
         $cachedRouteNameResolver->getRouteName('AppBundle\Entity\User', OperationType::ITEM);
     }
 
-    public function testGetRouteNameForItemRouteOnCacheMiss()
+    public function testGetRouteNameForItemRouteOnCacheMiss(): void
     {
         $cacheItemProphecy = $this->prophesize(CacheItemInterface::class);
         $cacheItemProphecy->isHit()->willReturn(false)->shouldBeCalledTimes(1);
@@ -79,7 +79,7 @@ class CachedRouteNameResolverTest extends TestCase
         $this->assertSame('some_item_route', $cachedRouteNameResolver->getRouteName('AppBundle\Entity\User', false), 'Trigger the local cache');
     }
 
-    public function testGetRouteNameForItemRouteOnCacheHit()
+    public function testGetRouteNameForItemRouteOnCacheHit(): void
     {
         $cacheItemProphecy = $this->prophesize(CacheItemInterface::class);
         $cacheItemProphecy->isHit()->shouldBeCalledTimes(1)->willReturn(true);
@@ -98,7 +98,7 @@ class CachedRouteNameResolverTest extends TestCase
         $this->assertSame('some_item_route', $cachedRouteNameResolver->getRouteName('AppBundle\Entity\User', OperationType::ITEM), 'Trigger the local cache');
     }
 
-    public function testGetRouteNameForCollectionRouteWithNoMatchingRoute()
+    public function testGetRouteNameForCollectionRouteWithNoMatchingRoute(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('No collection route associated with the type "AppBundle\\Entity\\User".');
@@ -119,7 +119,7 @@ class CachedRouteNameResolverTest extends TestCase
         $cachedRouteNameResolver->getRouteName('AppBundle\Entity\User', OperationType::COLLECTION);
     }
 
-    public function testGetRouteNameForCollectionRouteOnCacheMiss()
+    public function testGetRouteNameForCollectionRouteOnCacheMiss(): void
     {
         $cacheItemProphecy = $this->prophesize(CacheItemInterface::class);
         $cacheItemProphecy->isHit()->shouldBeCalledTimes(1)->willReturn(false);
@@ -138,7 +138,7 @@ class CachedRouteNameResolverTest extends TestCase
         $this->assertSame('some_collection_route', $cachedRouteNameResolver->getRouteName('AppBundle\Entity\User', true), 'Trigger the local cache');
     }
 
-    public function testGetRouteNameForCollectionRouteOnCacheHit()
+    public function testGetRouteNameForCollectionRouteOnCacheHit(): void
     {
         $cacheItemProphecy = $this->prophesize(CacheItemInterface::class);
         $cacheItemProphecy->isHit()->willReturn(true)->shouldBeCalledTimes(1);
@@ -157,7 +157,7 @@ class CachedRouteNameResolverTest extends TestCase
         $this->assertSame('some_collection_route', $cachedRouteNameResolver->getRouteName('AppBundle\Entity\User', OperationType::COLLECTION), 'Trigger the local cache');
     }
 
-    public function testGetRouteNameWithCacheItemThrowsCacheException()
+    public function testGetRouteNameWithCacheItemThrowsCacheException(): void
     {
         $cacheException = $this->prophesize(CacheException::class);
         $cacheException->willExtend(\Exception::class);

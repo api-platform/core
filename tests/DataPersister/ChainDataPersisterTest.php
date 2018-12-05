@@ -23,12 +23,12 @@ use PHPUnit\Framework\TestCase;
  */
 class ChainDataPersisterTest extends TestCase
 {
-    public function testContruct()
+    public function testContruct(): void
     {
         $this->assertInstanceOf(DataPersisterInterface::class, new ChainDataPersister([$this->prophesize(DataPersisterInterface::class)->reveal()]));
     }
 
-    public function testSupports()
+    public function testSupports(): void
     {
         $dummy = new Dummy();
 
@@ -38,7 +38,7 @@ class ChainDataPersisterTest extends TestCase
         $this->assertTrue((new ChainDataPersister([$persisterProphecy->reveal()]))->supports($dummy));
     }
 
-    public function testDoesNotSupport()
+    public function testDoesNotSupport(): void
     {
         $dummy = new Dummy();
 
@@ -48,7 +48,7 @@ class ChainDataPersisterTest extends TestCase
         $this->assertFalse((new ChainDataPersister([$persisterProphecy->reveal()]))->supports($dummy));
     }
 
-    public function testPersist()
+    public function testPersist(): void
     {
         $dummy = new Dummy();
 
@@ -67,7 +67,7 @@ class ChainDataPersisterTest extends TestCase
         (new ChainDataPersister([$fooPersisterProphecy->reveal(), $barPersisterProphecy->reveal(), $foobarPersisterProphecy->reveal()]))->persist($dummy);
     }
 
-    public function testRemove()
+    public function testRemove(): void
     {
         $dummy = new Dummy();
 

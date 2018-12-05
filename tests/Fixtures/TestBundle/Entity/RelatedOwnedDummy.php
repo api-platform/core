@@ -55,12 +55,12 @@ class RelatedOwnedDummy
         return $this->id;
     }
 
-    public function setId($id)
+    public function setId($id): void
     {
         $this->id = $id;
     }
 
-    public function setName($name)
+    public function setName($name): void
     {
         $this->name = $name;
     }
@@ -85,7 +85,7 @@ class RelatedOwnedDummy
      *
      * @param Dummy $owningDummy the value to set
      */
-    public function setOwningDummy(Dummy $owningDummy)
+    public function setOwningDummy(Dummy $owningDummy): void
     {
         $this->owningDummy = $owningDummy;
     }

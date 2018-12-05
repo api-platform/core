@@ -33,7 +33,7 @@ use Symfony\Component\Serializer\SerializerInterface;
  */
 class ItemNormalizerTest extends TestCase
 {
-    public function testSupportNormalization()
+    public function testSupportNormalization(): void
     {
         $std = new \stdClass();
         $dummy = new Dummy();
@@ -64,7 +64,7 @@ class ItemNormalizerTest extends TestCase
         $this->assertTrue($normalizer->hasCacheableSupportsMethod());
     }
 
-    public function testNormalize()
+    public function testNormalize(): void
     {
         $dummy = new Dummy();
         $dummy->setName('hello');
@@ -98,7 +98,7 @@ class ItemNormalizerTest extends TestCase
         $this->assertEquals(['name' => 'hello'], $normalizer->normalize($dummy, null, ['resources' => []]));
     }
 
-    public function testDenormalize()
+    public function testDenormalize(): void
     {
         $context = ['resource_class' => Dummy::class, 'api_allow_update' => true];
 
@@ -128,7 +128,7 @@ class ItemNormalizerTest extends TestCase
         $this->assertInstanceOf(Dummy::class, $normalizer->denormalize(['name' => 'hello'], Dummy::class, null, $context));
     }
 
-    public function testDenormalizeWithIri()
+    public function testDenormalizeWithIri(): void
     {
         $context = ['resource_class' => Dummy::class, 'api_allow_update' => true];
 
@@ -159,7 +159,7 @@ class ItemNormalizerTest extends TestCase
         $this->assertInstanceOf(Dummy::class, $normalizer->denormalize(['id' => '/dummies/12', 'name' => 'hello'], Dummy::class, null, $context));
     }
 
-    public function testDenormalizeWithIdAndUpdateNotAllowed()
+    public function testDenormalizeWithIdAndUpdateNotAllowed(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Update is not allowed for this operation.');

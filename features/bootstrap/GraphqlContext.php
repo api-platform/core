@@ -54,7 +54,7 @@ final class GraphqlContext implements Context
      *
      * @BeforeScenario
      */
-    public function gatherContexts(BeforeScenarioScope $scope)
+    public function gatherContexts(BeforeScenarioScope $scope): void
     {
         /** @var InitializedContextEnvironment $environment */
         $environment = $scope->getEnvironment();
@@ -64,7 +64,7 @@ final class GraphqlContext implements Context
     /**
      * @When I have the following GraphQL request:
      */
-    public function IHaveTheFollowingGraphqlRequest(PyStringNode $request)
+    public function IHaveTheFollowingGraphqlRequest(PyStringNode $request): void
     {
         $this->graphqlRequest = ['query' => $request->getRaw()];
         $this->graphqlLine = $request->getLine();
@@ -73,7 +73,7 @@ final class GraphqlContext implements Context
     /**
      * @When I send the following GraphQL request:
      */
-    public function ISendTheFollowingGraphqlRequest(PyStringNode $request)
+    public function ISendTheFollowingGraphqlRequest(PyStringNode $request): void
     {
         $this->IHaveTheFollowingGraphqlRequest($request);
         $this->sendGraphqlRequest();
@@ -82,7 +82,7 @@ final class GraphqlContext implements Context
     /**
      * @When I send the GraphQL request with variables:
      */
-    public function ISendTheGraphqlRequestWithVariables(PyStringNode $variables)
+    public function ISendTheGraphqlRequestWithVariables(PyStringNode $variables): void
     {
         $this->graphqlRequest['variables'] = $variables->getRaw();
         $this->sendGraphqlRequest();
@@ -91,7 +91,7 @@ final class GraphqlContext implements Context
     /**
      * @When I send the GraphQL request with operation :operation
      */
-    public function ISendTheGraphqlRequestWithOperation(string $operation)
+    public function ISendTheGraphqlRequestWithOperation(string $operation): void
     {
         $this->graphqlRequest['operation'] = $operation;
         $this->sendGraphqlRequest();
@@ -100,7 +100,7 @@ final class GraphqlContext implements Context
     /**
      * @When I send the query to introspect the schema
      */
-    public function ISendTheQueryToIntrospectTheSchema()
+    public function ISendTheQueryToIntrospectTheSchema(): void
     {
         $this->graphqlRequest = ['query' => Introspection::getIntrospectionQuery()];
         $this->sendGraphqlRequest();
@@ -109,7 +109,7 @@ final class GraphqlContext implements Context
     /**
      * @Then the GraphQL field :fieldName is deprecated for the reason :reason
      */
-    public function theGraphQLFieldIsDeprecatedForTheReason(string $fieldName, string $reason)
+    public function theGraphQLFieldIsDeprecatedForTheReason(string $fieldName, string $reason): void
     {
         foreach (json_decode($this->request->getContent(), true)['data']['__type']['fields'] as $field) {
             if ($fieldName === $field['name'] && $field['isDeprecated'] && $reason === $field['deprecationReason']) {
@@ -120,7 +120,7 @@ final class GraphqlContext implements Context
         throw new ExpectationFailedException(sprintf('The field "%s" is not deprecated.', $fieldName));
     }
 
-    private function sendGraphqlRequest()
+    private function sendGraphqlRequest(): void
     {
         $this->request->setHttpHeader('Accept', null);
         $this->restContext->iSendARequestTo('GET', '/graphql?'.http_build_query($this->graphqlRequest));

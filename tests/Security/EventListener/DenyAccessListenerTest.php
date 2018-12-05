@@ -34,7 +34,7 @@ use Symfony\Component\Security\Core\Role\RoleHierarchyInterface;
  */
 class DenyAccessListenerTest extends TestCase
 {
-    public function testNoResourceClass()
+    public function testNoResourceClass(): void
     {
         $request = new Request();
 
@@ -50,7 +50,7 @@ class DenyAccessListenerTest extends TestCase
         $listener->onKernelRequest($event);
     }
 
-    public function testNoIsGrantedAttribute()
+    public function testNoIsGrantedAttribute(): void
     {
         $request = new Request([], [], ['_api_resource_class' => 'Foo', '_api_collection_operation_name' => 'get']);
 
@@ -67,7 +67,7 @@ class DenyAccessListenerTest extends TestCase
         $listener->onKernelRequest($event);
     }
 
-    public function testIsGranted()
+    public function testIsGranted(): void
     {
         $data = new \stdClass();
         $request = new Request([], [], ['_api_resource_class' => 'Foo', '_api_collection_operation_name' => 'get', 'data' => $data]);
@@ -88,7 +88,7 @@ class DenyAccessListenerTest extends TestCase
         $listener->onKernelRequest($event);
     }
 
-    public function testIsNotGranted()
+    public function testIsNotGranted(): void
     {
         $this->expectException(AccessDeniedException::class);
 
@@ -110,7 +110,7 @@ class DenyAccessListenerTest extends TestCase
         $listener->onKernelRequest($event);
     }
 
-    public function testAccessControlMessage()
+    public function testAccessControlMessage(): void
     {
         $this->expectException(AccessDeniedException::class);
         $this->expectExceptionMessage('You are not admin.');
@@ -136,7 +136,7 @@ class DenyAccessListenerTest extends TestCase
     /**
      * @group legacy
      */
-    public function testIsGrantedLegacy()
+    public function testIsGrantedLegacy(): void
     {
         $data = new \stdClass();
         $request = new Request([], [], ['_api_resource_class' => 'Foo', '_api_collection_operation_name' => 'get', 'data' => $data]);
@@ -160,7 +160,7 @@ class DenyAccessListenerTest extends TestCase
     /**
      * @group legacy
      */
-    public function testIsNotGrantedLegacy()
+    public function testIsNotGrantedLegacy(): void
     {
         $this->expectException(AccessDeniedException::class);
 
@@ -185,7 +185,7 @@ class DenyAccessListenerTest extends TestCase
     /**
      * @group legacy
      */
-    public function testSecurityComponentNotAvailable()
+    public function testSecurityComponentNotAvailable(): void
     {
         $this->expectException(\LogicException::class);
 
@@ -207,7 +207,7 @@ class DenyAccessListenerTest extends TestCase
     /**
      * @group legacy
      */
-    public function testExpressionLanguageNotInstalled()
+    public function testExpressionLanguageNotInstalled(): void
     {
         $this->expectException(\LogicException::class);
 
@@ -233,7 +233,7 @@ class DenyAccessListenerTest extends TestCase
     /**
      * @group legacy
      */
-    public function testNotBehindAFirewall()
+    public function testNotBehindAFirewall(): void
     {
         $this->expectException(\LogicException::class);
 

@@ -37,7 +37,7 @@ final class VarnishPurger implements PurgerInterface
     /**
      * {@inheritdoc}
      */
-    public function purge(array $iris)
+    public function purge(array $iris): void
     {
         if (!$iris) {
             return;

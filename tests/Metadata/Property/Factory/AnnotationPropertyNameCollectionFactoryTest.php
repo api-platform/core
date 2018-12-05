@@ -33,7 +33,7 @@ class AnnotationPropertyNameCollectionFactoryTest extends TestCase
     /**
      * @dataProvider getDependencies
      */
-    public function testCreate(PropertyNameCollectionFactoryInterface $decorated = null, array $results)
+    public function testCreate(PropertyNameCollectionFactoryInterface $decorated = null, array $results): void
     {
         $reader = $this->prophesize(Reader::class);
         $reader->getPropertyAnnotation(new \ReflectionProperty(Dummy::class, 'name'), ApiProperty::class)->willReturn(new ApiProperty())->shouldBeCalled();
@@ -67,7 +67,7 @@ class AnnotationPropertyNameCollectionFactoryTest extends TestCase
     /**
      * @dataProvider getUpperCaseDependencies
      */
-    public function testUpperCaseCreate(ObjectProphecy $decorated = null, array $results)
+    public function testUpperCaseCreate(ObjectProphecy $decorated = null, array $results): void
     {
         $reader = $this->prophesize(Reader::class);
         $reader->getPropertyAnnotation(new \ReflectionProperty(UpperCaseIdentifierDummy::class, 'name'), ApiProperty::class)->willReturn(new ApiProperty())->shouldBeCalled();
@@ -94,7 +94,7 @@ class AnnotationPropertyNameCollectionFactoryTest extends TestCase
         ];
     }
 
-    public function testClassDoesNotExist()
+    public function testClassDoesNotExist(): void
     {
         $this->expectException(ResourceClassNotFoundException::class);
         $this->expectExceptionMessage('The resource class "\\DoNotExist" does not exist.');

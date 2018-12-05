@@ -25,7 +25,7 @@ class TransformFieldsetsParametersListenerTest extends TestCase
 {
     private $listener;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadata('dummy'));
@@ -33,7 +33,7 @@ class TransformFieldsetsParametersListenerTest extends TestCase
         $this->listener = new TransformFieldsetsParametersListener($resourceMetadataFactoryProphecy->reveal());
     }
 
-    public function testOnKernelRequestWithInvalidFormat()
+    public function testOnKernelRequestWithInvalidFormat(): void
     {
         $expectedRequest = new Request();
         $expectedRequest->setRequestFormat('badformat');
@@ -48,7 +48,7 @@ class TransformFieldsetsParametersListenerTest extends TestCase
         $this->assertEquals($expectedRequest, $request);
     }
 
-    public function testOnKernelRequestWithInvalidFilter()
+    public function testOnKernelRequestWithInvalidFilter(): void
     {
         $eventProphecy = $this->prophesize(GetResponseEvent::class);
 
@@ -70,7 +70,7 @@ class TransformFieldsetsParametersListenerTest extends TestCase
         $this->assertEquals($expectedRequest, $request);
     }
 
-    public function testOnKernelRequest()
+    public function testOnKernelRequest(): void
     {
         $request = new Request(
             ['fields' => ['dummy' => 'id,name,dummyFloat', 'relatedDummy' => 'id,name'], 'include' => 'relatedDummy,foo'],
@@ -98,7 +98,7 @@ class TransformFieldsetsParametersListenerTest extends TestCase
         $this->assertEquals($expectedRequest, $request);
     }
 
-    public function testOnKernelRequestWithIncludeWithoutFields()
+    public function testOnKernelRequestWithIncludeWithoutFields(): void
     {
         $request = new Request(
             ['include' => 'relatedDummy,foo'],
@@ -125,7 +125,7 @@ class TransformFieldsetsParametersListenerTest extends TestCase
         $this->assertEquals($expectedRequest, $request);
     }
 
-    public function testOnKernelRequestWithWrongParametersTypesDoesnTAffectRequestAttributes()
+    public function testOnKernelRequestWithWrongParametersTypesDoesnTAffectRequestAttributes(): void
     {
         $request = new Request(
             ['fields' => 'foo', 'include' => ['relatedDummy,foo']],

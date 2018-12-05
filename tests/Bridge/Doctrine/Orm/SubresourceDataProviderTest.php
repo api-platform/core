@@ -48,7 +48,7 @@ use Prophecy\Argument;
  */
 class SubresourceDataProviderTest extends TestCase
 {
-    private function assertIdentifierManagerMethodCalls($managerProphecy)
+    private function assertIdentifierManagerMethodCalls($managerProphecy): void
     {
         $platformProphecy = $this->prophesize(AbstractPlatform::class);
 
@@ -101,7 +101,7 @@ class SubresourceDataProviderTest extends TestCase
         return $managerRegistryProphecy->reveal();
     }
 
-    public function testNotASubresource()
+    public function testNotASubresource(): void
     {
         $this->expectException(ResourceClassNotSupportedException::class);
         $this->expectExceptionMessage('The given resource class is not a subresource.');
@@ -116,7 +116,7 @@ class SubresourceDataProviderTest extends TestCase
         $dataProvider->getSubresource(Dummy::class, ['id' => 1], []);
     }
 
-    public function testGetSubresource()
+    public function testGetSubresource(): void
     {
         $dql = 'SELECT relatedDummies_a2 FROM ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy id_a1 INNER JOIN id_a1.relatedDummies relatedDummies_a2 WHERE id_a1.id = :id_p1';
 
@@ -174,7 +174,7 @@ class SubresourceDataProviderTest extends TestCase
         $this->assertEquals([], $dataProvider->getSubresource(RelatedDummy::class, ['id' => ['id' => 1]], $context));
     }
 
-    public function testGetSubSubresourceItem()
+    public function testGetSubSubresourceItem(): void
     {
         $managerRegistryProphecy = $this->prophesize(ManagerRegistry::class);
         $identifiers = ['id'];
@@ -268,7 +268,7 @@ class SubresourceDataProviderTest extends TestCase
         $this->assertEquals($result, $dataProvider->getSubresource(ThirdLevel::class, ['id' => ['id' => 1], 'relatedDummies' => ['id' => 1]], $context));
     }
 
-    public function testGetSubresourceOneToOneOwningRelation()
+    public function testGetSubresourceOneToOneOwningRelation(): void
     {
         // RelatedOwningDummy OneToOne Dummy
         $dql = 'SELECT ownedDummy_a2 FROM ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy id_a1 INNER JOIN id_a1.ownedDummy ownedDummy_a2 WHERE id_a1.id = :id_p1';
@@ -324,7 +324,7 @@ class SubresourceDataProviderTest extends TestCase
         $this->assertEquals([], $dataProvider->getSubresource(RelatedOwningDummy::class, ['id' => ['id' => 1]], $context));
     }
 
-    public function testQueryResultExtension()
+    public function testQueryResultExtension(): void
     {
         $dql = 'SELECT relatedDummies_a2 FROM ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy id_a1 INNER JOIN id_a1.relatedDummies relatedDummies_a2 WHERE id_a1.id = :id_p1';
 
@@ -384,7 +384,7 @@ class SubresourceDataProviderTest extends TestCase
         $this->assertEquals([], $dataProvider->getSubresource(RelatedDummy::class, ['id' => ['id' => 1]], $context));
     }
 
-    public function testCannotCreateQueryBuilder()
+    public function testCannotCreateQueryBuilder(): void
     {
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('The repository class must have a "createQueryBuilder" method.');
@@ -404,7 +404,7 @@ class SubresourceDataProviderTest extends TestCase
         $dataProvider->getSubresource(Dummy::class, ['id' => 1], []);
     }
 
-    public function testThrowResourceClassNotSupportedException()
+    public function testThrowResourceClassNotSupportedException(): void
     {
         $this->expectException(ResourceClassNotSupportedException::class);
 
@@ -421,7 +421,7 @@ class SubresourceDataProviderTest extends TestCase
     /**
      * @group legacy
      */
-    public function testGetSubSubresourceItemLegacy()
+    public function testGetSubSubresourceItemLegacy(): void
     {
         $managerRegistryProphecy = $this->prophesize(ManagerRegistry::class);
         $identifiers = ['id'];
@@ -517,7 +517,7 @@ class SubresourceDataProviderTest extends TestCase
         $this->assertEquals($result, $dataProvider->getSubresource(ThirdLevel::class, ['id' => 1, 'relatedDummies' => 1], $context));
     }
 
-    public function testGetSubresourceCollectionItem()
+    public function testGetSubresourceCollectionItem(): void
     {
         $managerRegistryProphecy = $this->prophesize(ManagerRegistry::class);
         $identifiers = ['id'];

@@ -31,7 +31,7 @@ use PHPUnit\Framework\TestCase;
  */
 class IterableTypeTest extends TestCase
 {
-    public function testSerialize()
+    public function testSerialize(): void
     {
         $iterableType = new IterableType();
 
@@ -43,7 +43,7 @@ class IterableTypeTest extends TestCase
         $this->assertEquals(['foo'], $iterableType->serialize(['foo']));
     }
 
-    public function testParseValue()
+    public function testParseValue(): void
     {
         $iterableType = new IterableType();
 
@@ -55,7 +55,7 @@ class IterableTypeTest extends TestCase
         $this->assertEquals(['foo'], $iterableType->parseValue(['foo']));
     }
 
-    public function testParseLiteral()
+    public function testParseLiteral(): void
     {
         $iterableType = new IterableType();
 

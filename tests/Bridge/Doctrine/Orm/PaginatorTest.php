@@ -24,7 +24,7 @@ class PaginatorTest extends TestCase
     /**
      * @dataProvider initializeProvider
      */
-    public function testInitialize($firstResult, $maxResults, $totalItems, $currentPage, $lastPage)
+    public function testInitialize($firstResult, $maxResults, $totalItems, $currentPage, $lastPage): void
     {
         $paginator = $this->getPaginator($firstResult, $maxResults, $totalItems);
 
@@ -33,7 +33,7 @@ class PaginatorTest extends TestCase
         $this->assertEquals($maxResults, $paginator->getItemsPerPage());
     }
 
-    public function testInitializeWithQueryFirstResultNotApplied()
+    public function testInitializeWithQueryFirstResultNotApplied(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('"Doctrine\\ORM\\Query::setFirstResult()" or/and "Doctrine\\ORM\\Query::setMaxResults()" was/were not applied to the query.');
@@ -41,7 +41,7 @@ class PaginatorTest extends TestCase
         $this->getPaginatorWithMalformedQuery(false);
     }
 
-    public function testInitializeWithQueryMaxResultsNotApplied()
+    public function testInitializeWithQueryMaxResultsNotApplied(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('"Doctrine\\ORM\\Query::setFirstResult()" or/and "Doctrine\\ORM\\Query::setMaxResults()" was/were not applied to the query.');
@@ -49,7 +49,7 @@ class PaginatorTest extends TestCase
         $this->getPaginatorWithMalformedQuery(true);
     }
 
-    public function testGetIterator()
+    public function testGetIterator(): void
     {
         $paginator = $this->getPaginator();
 
@@ -74,7 +74,7 @@ class PaginatorTest extends TestCase
         return new Paginator($doctrinePaginator->reveal());
     }
 
-    private function getPaginatorWithMalformedQuery($maxResults = false)
+    private function getPaginatorWithMalformedQuery($maxResults = false): void
     {
         $query = $this->prophesize(Query::class);
         $query->getFirstResult()->willReturn($maxResults ? 42 : null)->shouldBeCalled();

@@ -45,7 +45,7 @@ use Prophecy\Argument;
  */
 class ItemDataProviderTest extends TestCase
 {
-    public function testGetItemSingleIdentifier()
+    public function testGetItemSingleIdentifier(): void
     {
         $context = ['foo' => 'bar', 'fetch_data' => true, IdentifierConverterInterface::HAS_IDENTIFIER_CONVERTER => true];
         $queryProphecy = $this->prophesize(AbstractQuery::class);
@@ -83,7 +83,7 @@ class ItemDataProviderTest extends TestCase
         $this->assertEquals([], $dataProvider->getItem(Dummy::class, ['id' => 1], 'foo', $context));
     }
 
-    public function testGetItemDoubleIdentifier()
+    public function testGetItemDoubleIdentifier(): void
     {
         $queryProphecy = $this->prophesize(AbstractQuery::class);
         $queryProphecy->getOneOrNullResult()->willReturn([])->shouldBeCalled();
@@ -131,7 +131,7 @@ class ItemDataProviderTest extends TestCase
     /**
      * @group legacy
      */
-    public function testGetItemWrongCompositeIdentifier()
+    public function testGetItemWrongCompositeIdentifier(): void
     {
         $this->expectException(PropertyNotFoundException::class);
 
@@ -152,7 +152,7 @@ class ItemDataProviderTest extends TestCase
         $dataProvider->getItem(Dummy::class, 'ida=1;', 'foo');
     }
 
-    public function testQueryResultExtension()
+    public function testQueryResultExtension(): void
     {
         $comparisonProphecy = $this->prophesize(Comparison::class);
         $comparison = $comparisonProphecy->reveal();
@@ -188,7 +188,7 @@ class ItemDataProviderTest extends TestCase
         $this->assertEquals([], $dataProvider->getItem(Dummy::class, ['id' => 1], 'foo', $context));
     }
 
-    public function testUnsupportedClass()
+    public function testUnsupportedClass(): void
     {
         $managerRegistryProphecy = $this->prophesize(ManagerRegistry::class);
         $managerRegistryProphecy->getManagerForClass(Dummy::class)->willReturn(null)->shouldBeCalled();
@@ -203,7 +203,7 @@ class ItemDataProviderTest extends TestCase
         $this->assertFalse($dataProvider->supports(Dummy::class, 'foo'));
     }
 
-    public function testCannotCreateQueryBuilder()
+    public function testCannotCreateQueryBuilder(): void
     {
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('The repository class must have a "createQueryBuilder" method.');

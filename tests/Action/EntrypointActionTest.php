@@ -24,7 +24,7 @@ use PHPUnit\Framework\TestCase;
  */
 class EntrypointActionTest extends TestCase
 {
-    public function testGetEntrypoint()
+    public function testGetEntrypoint(): void
     {
         $resourceNameCollectionFactoryProphecy = $this->prophesize(ResourceNameCollectionFactoryInterface::class);
         $resourceNameCollectionFactoryProphecy->create()->willReturn(new ResourceNameCollection(['dummies']));

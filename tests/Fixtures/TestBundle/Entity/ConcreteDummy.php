@@ -35,7 +35,7 @@ class ConcreteDummy extends AbstractDummy
      */
     private $instance;
 
-    public function setInstance($instance)
+    public function setInstance($instance): void
     {
         $this->instance = $instance;
     }

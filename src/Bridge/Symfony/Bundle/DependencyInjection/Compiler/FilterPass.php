@@ -32,7 +32,7 @@ final class FilterPass implements CompilerPassInterface
      *
      * @throws RuntimeException
      */
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
         $filters = [];
         foreach ($container->findTaggedServiceIds('api_platform.filter', true) as $serviceId => $tags) {

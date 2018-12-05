@@ -27,7 +27,7 @@ use Symfony\Component\PropertyInfo\Type;
  */
 class IdentifierConverterTest extends TestCase
 {
-    public function testCompositeIdentifier()
+    public function testCompositeIdentifier(): void
     {
         $identifier = 'a=1;c=2;d=2015-04-05';
         $class = 'Dummy';
@@ -53,7 +53,7 @@ class IdentifierConverterTest extends TestCase
         $this->assertSame(1, $result['a']);
     }
 
-    public function testSingleDateIdentifier()
+    public function testSingleDateIdentifier(): void
     {
         $identifier = '2015-04-05';
         $class = 'Dummy';
@@ -72,7 +72,7 @@ class IdentifierConverterTest extends TestCase
         $this->assertEquals($identifierDenormalizer->convert($identifier, $class), ['funkyid' => new \DateTime('2015-04-05')]);
     }
 
-    public function testIntegerIdentifier()
+    public function testIntegerIdentifier(): void
     {
         $identifier = '42';
         $class = 'Dummy';

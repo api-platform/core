@@ -26,7 +26,7 @@ use Psr\Cache\CacheItemPoolInterface;
  */
 class CachedSubresourceOperationFactoryTest extends TestCase
 {
-    public function testCreateWithItemHit()
+    public function testCreateWithItemHit(): void
     {
         $cacheItem = $this->prophesize(CacheItemInterface::class);
         $cacheItem->isHit()->willReturn(true)->shouldBeCalledTimes(1);
@@ -45,7 +45,7 @@ class CachedSubresourceOperationFactoryTest extends TestCase
         $this->assertEquals($expectedResult, $cachedSubresourceOperationFactory->create(Dummy::class), 'Trigger the local cache');
     }
 
-    public function testCreateWithItemNotHit()
+    public function testCreateWithItemNotHit(): void
     {
         $cacheItem = $this->prophesize(CacheItemInterface::class);
         $cacheItem->isHit()->willReturn(false)->shouldBeCalledTimes(1);
@@ -65,7 +65,7 @@ class CachedSubresourceOperationFactoryTest extends TestCase
         $this->assertEquals($expectedResult, $cachedSubresourceOperationFactory->create(Dummy::class), 'Trigger the local cache');
     }
 
-    public function testCreateWithGetCacheItemThrowsCacheException()
+    public function testCreateWithGetCacheItemThrowsCacheException(): void
     {
         $cacheException = $this->prophesize(CacheException::class);
         $cacheException->willExtend(\Exception::class);

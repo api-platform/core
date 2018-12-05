@@ -24,7 +24,7 @@ use PHPUnit\Framework\TestCase;
  */
 class CommonFilterTest extends TestCase
 {
-    public function testSplitPropertiesWithoutResourceClass()
+    public function testSplitPropertiesWithoutResourceClass(): void
     {
         $managerRegistry = $this->prophesize(ManagerRegistry::class);
 

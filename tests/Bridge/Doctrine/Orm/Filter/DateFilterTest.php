@@ -30,12 +30,12 @@ class DateFilterTest extends DoctrineOrmFilterTestCase
 {
     protected $filterClass = DateFilter::class;
 
-    public function testApplyDate()
+    public function testApplyDate(): void
     {
         $this->doTestApplyDate(false);
     }
 
-    public function testApplyDateImmutable()
+    public function testApplyDateImmutable(): void
     {
         $this->doTestApplyDateImmutable(false);
     }
@@ -43,7 +43,7 @@ class DateFilterTest extends DoctrineOrmFilterTestCase
     /**
      * @group legacy
      */
-    public function testRequestApplyDate()
+    public function testRequestApplyDate(): void
     {
         $this->doTestApplyDate(true);
     }
@@ -51,12 +51,12 @@ class DateFilterTest extends DoctrineOrmFilterTestCase
     /**
      * @group legacy
      */
-    public function testRequestApplyDateImmutable()
+    public function testRequestApplyDateImmutable(): void
     {
         $this->doTestApplyDateImmutable(true);
     }
 
-    private function doTestApplyDate(bool $request)
+    private function doTestApplyDate(bool $request): void
     {
         $filters = ['dummyDate' => ['after' => '2015-04-05']];
 
@@ -75,7 +75,7 @@ class DateFilterTest extends DoctrineOrmFilterTestCase
         $this->assertInstanceOf(\DateTime::class, $queryBuilder->getParameters()[0]->getValue());
     }
 
-    private function doTestApplyDateImmutable(bool $request)
+    private function doTestApplyDateImmutable(bool $request): void
     {
         $filters = ['dummyDate' => ['after' => '2015-04-05']];
 
@@ -94,7 +94,7 @@ class DateFilterTest extends DoctrineOrmFilterTestCase
         $this->assertInstanceOf(\DateTimeImmutable::class, $queryBuilder->getParameters()[0]->getValue());
     }
 
-    public function testGetDescription()
+    public function testGetDescription(): void
     {
         $filter = new DateFilter($this->managerRegistry);
 

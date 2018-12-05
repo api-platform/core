@@ -30,13 +30,13 @@ class ValidatorPropertyMetadataFactoryTest extends TestCase
 {
     private $validatorClassMetadata;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->validatorClassMetadata = new ClassMetadata(DummyValidatedEntity::class);
         (new AnnotationLoader(new AnnotationReader()))->loadClassMetadata($this->validatorClassMetadata);
     }
 
-    public function testCreateWithPropertyWithRequiredConstraints()
+    public function testCreateWithPropertyWithRequiredConstraints(): void
     {
         $propertyMetadata = new PropertyMetadata(null, 'A dummy', true, true, null, null, null, false);
         $expectedPropertyMetadata = $propertyMetadata->withRequired(true);
@@ -54,7 +54,7 @@ class ValidatorPropertyMetadataFactoryTest extends TestCase
         $this->assertEquals($expectedPropertyMetadata, $resultedPropertyMetadata);
     }
 
-    public function testCreateWithPropertyWithNotRequiredConstraints()
+    public function testCreateWithPropertyWithNotRequiredConstraints(): void
     {
         $propertyMetadata = new PropertyMetadata(null, 'A dummy date', true, true, null, null, null, false);
         $expectedPropertyMetadata = $propertyMetadata->withRequired(false);
@@ -72,7 +72,7 @@ class ValidatorPropertyMetadataFactoryTest extends TestCase
         $this->assertEquals($expectedPropertyMetadata, $resultedPropertyMetadata);
     }
 
-    public function testCreateWithPropertyWithoutConstraints()
+    public function testCreateWithPropertyWithoutConstraints(): void
     {
         $propertyMetadata = new PropertyMetadata(null, 'A dummy id', true, true, null, null, null, true);
         $expectedPropertyMetadata = $propertyMetadata->withRequired(false);
@@ -90,7 +90,7 @@ class ValidatorPropertyMetadataFactoryTest extends TestCase
         $this->assertEquals($expectedPropertyMetadata, $resultedPropertyMetadata);
     }
 
-    public function testCreateWithPropertyWithRightValidationGroupsAndRequiredConstraints()
+    public function testCreateWithPropertyWithRightValidationGroupsAndRequiredConstraints(): void
     {
         $propertyMetadata = new PropertyMetadata(null, 'A dummy group', true, true, null, null, null, false);
         $expectedPropertyMetadata = $propertyMetadata->withRequired(true);
@@ -108,7 +108,7 @@ class ValidatorPropertyMetadataFactoryTest extends TestCase
         $this->assertEquals($expectedPropertyMetadata, $resultedPropertyMetadata);
     }
 
-    public function testCreateWithPropertyWithBadValidationGroupsAndRequiredConstraints()
+    public function testCreateWithPropertyWithBadValidationGroupsAndRequiredConstraints(): void
     {
         $propertyMetadata = new PropertyMetadata(null, 'A dummy group', true, true, null, null, null, false);
         $expectedPropertyMetadata = $propertyMetadata->withRequired(false);
@@ -126,7 +126,7 @@ class ValidatorPropertyMetadataFactoryTest extends TestCase
         $this->assertEquals($expectedPropertyMetadata, $resultedPropertyMetadata);
     }
 
-    public function testCreateWithPropertyWithNonStringValidationGroupsAndRequiredConstraints()
+    public function testCreateWithPropertyWithNonStringValidationGroupsAndRequiredConstraints(): void
     {
         $propertyMetadata = new PropertyMetadata(null, 'A dummy group', true, true, null, null, null, false);
         $expectedPropertyMetadata = $propertyMetadata->withRequired(false);
@@ -144,7 +144,7 @@ class ValidatorPropertyMetadataFactoryTest extends TestCase
         $this->assertEquals($expectedPropertyMetadata, $resultedPropertyMetadata);
     }
 
-    public function testCreateWithRequiredByDecorated()
+    public function testCreateWithRequiredByDecorated(): void
     {
         $propertyMetadata = new PropertyMetadata(null, 'A dummy date', true, true, null, null, true, false);
         $expectedPropertyMetadata = clone $propertyMetadata;

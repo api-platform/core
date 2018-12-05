@@ -33,7 +33,7 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
  */
 class ItemResolverTest extends TestCase
 {
-    public function testCreateItemResolverNoItem()
+    public function testCreateItemResolverNoItem(): void
     {
         $resolver = $this->createItemResolver(null);
 
@@ -42,7 +42,7 @@ class ItemResolverTest extends TestCase
         $this->assertNull($resolver(null, ['id' => '/related_dummies/3'], null, $resolveInfo));
     }
 
-    public function testCreateItemResolver()
+    public function testCreateItemResolver(): void
     {
         $resolver = $this->createItemResolver(new RelatedDummy());
 
@@ -54,7 +54,7 @@ class ItemResolverTest extends TestCase
     /**
      * @dataProvider subresourceProvider
      */
-    public function testCreateSubresourceItemResolver($normalizedSubresource)
+    public function testCreateSubresourceItemResolver($normalizedSubresource): void
     {
         $resolver = $this->createItemResolver(new Dummy());
 

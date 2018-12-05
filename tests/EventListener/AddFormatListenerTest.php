@@ -27,7 +27,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  */
 class AddFormatListenerTest extends TestCase
 {
-    public function testNoResourceClass()
+    public function testNoResourceClass(): void
     {
         $request = new Request();
 
@@ -44,7 +44,7 @@ class AddFormatListenerTest extends TestCase
         $this->assertNull($request->getFormat('application/vnd.notexist'));
     }
 
-    public function testSupportedRequestFormat()
+    public function testSupportedRequestFormat(): void
     {
         $request = new Request([], [], ['_api_resource_class' => 'Foo']);
         $request->setRequestFormat('xml');
@@ -63,7 +63,7 @@ class AddFormatListenerTest extends TestCase
         $this->assertSame('text/xml', $request->getMimeType($request->getRequestFormat()));
     }
 
-    public function testRespondFlag()
+    public function testRespondFlag(): void
     {
         $request = new Request([], [], ['_api_respond' => true]);
         $request->setRequestFormat('xml');
@@ -82,7 +82,7 @@ class AddFormatListenerTest extends TestCase
         $this->assertSame('text/xml', $request->getMimeType($request->getRequestFormat()));
     }
 
-    public function testUnsupportedRequestFormat()
+    public function testUnsupportedRequestFormat(): void
     {
         $this->expectException(NotAcceptableHttpException::class);
         $this->expectExceptionMessage('Requested format "text/xml" is not supported. Supported MIME types are "application/json".');
@@ -102,7 +102,7 @@ class AddFormatListenerTest extends TestCase
         $this->assertSame('json', $request->getRequestFormat());
     }
 
-    public function testSupportedAcceptHeader()
+    public function testSupportedAcceptHeader(): void
     {
         $request = new Request([], [], ['_api_resource_class' => 'Foo']);
         $request->headers->set('Accept', 'text/html, application/xhtml+xml, application/xml, application/json;q=0.9, */*;q=0.8');
@@ -120,7 +120,7 @@ class AddFormatListenerTest extends TestCase
         $this->assertSame('json', $request->getRequestFormat());
     }
 
-    public function testAcceptAllHeader()
+    public function testAcceptAllHeader(): void
     {
         $request = new Request([], [], ['_api_resource_class' => 'Foo']);
         $request->headers->set('Accept', 'text/html, application/xhtml+xml, application/xml;q=0.9, */*;q=0.8');
@@ -139,7 +139,7 @@ class AddFormatListenerTest extends TestCase
         $this->assertSame('application/octet-stream', $request->getMimeType($request->getRequestFormat()));
     }
 
-    public function testUnsupportedAcceptHeader()
+    public function testUnsupportedAcceptHeader(): void
     {
         $this->expectException(NotAcceptableHttpException::class);
         $this->expectExceptionMessage('Requested format "text/html, application/xhtml+xml, application/xml;q=0.9" is not supported. Supported MIME types are "application/octet-stream", "application/json".');
@@ -158,7 +158,7 @@ class AddFormatListenerTest extends TestCase
         $listener->onKernelRequest($event);
     }
 
-    public function testInvalidAcceptHeader()
+    public function testInvalidAcceptHeader(): void
     {
         $this->expectException(NotAcceptableHttpException::class);
         $this->expectExceptionMessage('Requested format "invalid" is not supported. Supported MIME types are "application/json".');
@@ -177,7 +177,7 @@ class AddFormatListenerTest extends TestCase
         $listener->onKernelRequest($event);
     }
 
-    public function testAcceptHeaderTakePrecedenceOverRequestFormat()
+    public function testAcceptHeaderTakePrecedenceOverRequestFormat(): void
     {
         $request = new Request([], [], ['_api_resource_class' => 'Foo']);
         $request->headers->set('Accept', 'application/json');
@@ -196,7 +196,7 @@ class AddFormatListenerTest extends TestCase
         $this->assertSame('json', $request->getRequestFormat());
     }
 
-    public function testInvalidRouteFormat()
+    public function testInvalidRouteFormat(): void
     {
         $this->expectException(NotFoundHttpException::class);
         $this->expectExceptionMessage('Format "invalid" is not supported');
@@ -214,7 +214,7 @@ class AddFormatListenerTest extends TestCase
         $listener->onKernelRequest($event);
     }
 
-    public function testResourceClassSupportedRequestFormat()
+    public function testResourceClassSupportedRequestFormat(): void
     {
         $request = new Request([], [], ['_api_resource_class' => 'Foo', '_api_collection_operation_name' => 'get']);
         $request->setRequestFormat('csv');
@@ -233,7 +233,7 @@ class AddFormatListenerTest extends TestCase
         $this->assertSame('text/csv', $request->getMimeType($request->getRequestFormat()));
     }
 
-    public function testBadFormatsProviderParameterThrowsException()
+    public function testBadFormatsProviderParameterThrowsException(): void
     {
         $this->expectException(\ApiPlatform\Core\Exception\InvalidArgumentException::class);
         $this->expectExceptionMessage('The "$formatsProvider" argument is expected to be an implementation of the "ApiPlatform\\Core\\Api\\FormatsProviderInterface" interface.');
@@ -245,7 +245,7 @@ class AddFormatListenerTest extends TestCase
      * @group legacy
      * @expectedDeprecation Using an array as formats provider is deprecated since API Platform 2.3 and will not be possible anymore in API Platform 3
      */
-    public function testLegacyFormatsParameter()
+    public function testLegacyFormatsParameter(): void
     {
         new AddFormatListener(new Negotiator(), ['xml' => ['text/xml']]);
     }

@@ -244,7 +244,7 @@ final class Configuration implements ConfigurationInterface
      *
      * @throws InvalidConfigurationException
      */
-    private function addExceptionToStatusSection(ArrayNodeDefinition $rootNode)
+    private function addExceptionToStatusSection(ArrayNodeDefinition $rootNode): void
     {
         $rootNode
             ->children()
@@ -295,7 +295,7 @@ final class Configuration implements ConfigurationInterface
     /**
      * Adds a format section.
      */
-    private function addFormatSection(ArrayNodeDefinition $rootNode, string $key, array $defaultValue)
+    private function addFormatSection(ArrayNodeDefinition $rootNode, string $key, array $defaultValue): void
     {
         $rootNode
             ->children()

@@ -26,7 +26,7 @@ use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
  */
 class AddTagsListenerTest extends TestCase
 {
-    public function testDoNotSetHeaderWhenMethodNotCacheable()
+    public function testDoNotSetHeaderWhenMethodNotCacheable(): void
     {
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
 
@@ -47,7 +47,7 @@ class AddTagsListenerTest extends TestCase
         $this->assertFalse($response->headers->has('Cache-Tags'));
     }
 
-    public function testDoNotSetHeaderWhenResponseNotCacheable()
+    public function testDoNotSetHeaderWhenResponseNotCacheable(): void
     {
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
 
@@ -65,7 +65,7 @@ class AddTagsListenerTest extends TestCase
         $this->assertFalse($response->headers->has('Cache-Tags'));
     }
 
-    public function testDoNotSetHeaderWhenNotAnApiOperation()
+    public function testDoNotSetHeaderWhenNotAnApiOperation(): void
     {
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
 
@@ -85,7 +85,7 @@ class AddTagsListenerTest extends TestCase
         $this->assertFalse($response->headers->has('Cache-Tags'));
     }
 
-    public function testDoNotSetHeaderWhenEmptyTagList()
+    public function testDoNotSetHeaderWhenEmptyTagList(): void
     {
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
 
@@ -105,7 +105,7 @@ class AddTagsListenerTest extends TestCase
         $this->assertFalse($response->headers->has('Cache-Tags'));
     }
 
-    public function testAddTags()
+    public function testAddTags(): void
     {
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
 
@@ -125,7 +125,7 @@ class AddTagsListenerTest extends TestCase
         $this->assertSame('/foo,/bar', $response->headers->get('Cache-Tags'));
     }
 
-    public function testAddCollectionIri()
+    public function testAddCollectionIri(): void
     {
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
         $iriConverterProphecy->getIriFromResourceClass(Dummy::class)->willReturn('/dummies')->shouldBeCalled();
@@ -146,7 +146,7 @@ class AddTagsListenerTest extends TestCase
         $this->assertSame('/foo,/bar,/dummies', $response->headers->get('Cache-Tags'));
     }
 
-    public function testAddCollectionIriWhenCollectionIsEmpty()
+    public function testAddCollectionIriWhenCollectionIsEmpty(): void
     {
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
         $iriConverterProphecy->getIriFromResourceClass(Dummy::class)->willReturn('/dummies')->shouldBeCalled();
@@ -167,7 +167,7 @@ class AddTagsListenerTest extends TestCase
         $this->assertSame('/dummies', $response->headers->get('Cache-Tags'));
     }
 
-    public function testAddSubResourceCollectionIri()
+    public function testAddSubResourceCollectionIri(): void
     {
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
         $iriConverterProphecy->getIriFromResourceClass(Dummy::class)->willReturn('/dummies')->shouldBeCalled();

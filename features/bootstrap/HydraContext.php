@@ -37,7 +37,7 @@ final class HydraContext implements Context
      *
      * @BeforeScenario
      */
-    public function gatherContexts(BeforeScenarioScope $scope)
+    public function gatherContexts(BeforeScenarioScope $scope): void
     {
         /** @var InitializedContextEnvironment $environment */
         $environment = $scope->getEnvironment();
@@ -47,7 +47,7 @@ final class HydraContext implements Context
     /**
      * @Then the Hydra class :class exists
      */
-    public function assertTheHydraClassExist(string $className)
+    public function assertTheHydraClassExist(string $className): void
     {
         try {
             $this->getClassInfo($className);
@@ -59,7 +59,7 @@ final class HydraContext implements Context
     /**
      * @Then the Hydra class :class doesn't exist
      */
-    public function assertTheHydraClassNotExist(string $className)
+    public function assertTheHydraClassNotExist(string $className): void
     {
         try {
             $this->getClassInfo($className);
@@ -73,7 +73,7 @@ final class HydraContext implements Context
     /**
      * @Then the boolean value of the node :node of the Hydra class :class is true
      */
-    public function assertBooleanNodeValueIs(string $nodeName, string $className)
+    public function assertBooleanNodeValueIs(string $nodeName, string $className): void
     {
         Assert::assertTrue($this->propertyAccessor->getValue($this->getClassInfo($className), $nodeName));
     }
@@ -81,7 +81,7 @@ final class HydraContext implements Context
     /**
      * @Then the value of the node :node of the Hydra class :class is :value
      */
-    public function assertNodeValueIs(string $nodeName, string $className, string $value)
+    public function assertNodeValueIs(string $nodeName, string $className, string $value): void
     {
         Assert::assertEquals(
             $this->propertyAccessor->getValue($this->getClassInfo($className), $nodeName),
@@ -92,7 +92,7 @@ final class HydraContext implements Context
     /**
      * @Then the boolean value of the node :node of the property :prop of the Hydra class :class is true
      */
-    public function assertPropertyNodeValueIsTrue(string $nodeName, string $propertyName, string $className)
+    public function assertPropertyNodeValueIsTrue(string $nodeName, string $propertyName, string $className): void
     {
         Assert::assertTrue($this->propertyAccessor->getValue($this->getPropertyInfo($propertyName, $className), $nodeName));
     }
@@ -100,7 +100,7 @@ final class HydraContext implements Context
     /**
      * @Then the value of the node :node of the property :prop of the Hydra class :class is :value
      */
-    public function assertPropertyNodeValueIs(string $nodeName, string $propertyName, string $className, string $value)
+    public function assertPropertyNodeValueIs(string $nodeName, string $propertyName, string $className, string $value): void
     {
         Assert::assertEquals(
             $this->propertyAccessor->getValue($this->getPropertyInfo($propertyName, $className), $nodeName),
@@ -111,7 +111,7 @@ final class HydraContext implements Context
     /**
      * @Then the boolean value of the node :node of the operation :operation of the Hydra class :class is true
      */
-    public function assertOperationNodeBooleanValueIs(string $nodeName, string $operationMethod, string $className)
+    public function assertOperationNodeBooleanValueIs(string $nodeName, string $operationMethod, string $className): void
     {
         Assert::assertTrue($this->propertyAccessor->getValue($this->getOperation($operationMethod, $className), $nodeName));
     }
@@ -119,7 +119,7 @@ final class HydraContext implements Context
     /**
      * @Then the value of the node :node of the operation :operation of the Hydra class :class is :value
      */
-    public function assertOperationNodeValueIs(string $nodeName, string $operationMethod, string $className, string $value)
+    public function assertOperationNodeValueIs(string $nodeName, string $operationMethod, string $className, string $value): void
     {
         Assert::assertEquals(
             $this->propertyAccessor->getValue($this->getOperation($operationMethod, $className), $nodeName),
@@ -130,7 +130,7 @@ final class HydraContext implements Context
     /**
      * @Then the value of the node :node of the operation :operation of the Hydra class :class contains :value
      */
-    public function assertOperationNodeValueContains(string $nodeName, string $operationMethod, string $className, string $value)
+    public function assertOperationNodeValueContains(string $nodeName, string $operationMethod, string $className, string $value): void
     {
         $property = $this->getOperation($operationMethod, $className);
 
@@ -140,7 +140,7 @@ final class HydraContext implements Context
     /**
      * @Then :nb operations are available for Hydra class :class
      */
-    public function assertNbOperationsExist(int $nb, string $className)
+    public function assertNbOperationsExist(int $nb, string $className): void
     {
         Assert::assertEquals($nb, \count($this->getOperations($className)));
     }
@@ -148,7 +148,7 @@ final class HydraContext implements Context
     /**
      * @Then :nb properties are available for Hydra class :class
      */
-    public function assertNbPropertiesExist(int $nb, string $className)
+    public function assertNbPropertiesExist(int $nb, string $className): void
     {
         Assert::assertEquals($nb, \count($this->getProperties($className)));
     }
@@ -156,7 +156,7 @@ final class HydraContext implements Context
     /**
      * @Then :prop property doesn't exist for the Hydra class :class
      */
-    public function assertPropertyNotExist(string $propertyName, string $className)
+    public function assertPropertyNotExist(string $propertyName, string $className): void
     {
         try {
             $this->getPropertyInfo($propertyName, $className);
@@ -170,7 +170,7 @@ final class HydraContext implements Context
     /**
      * @Then :prop property is readable for Hydra class :class
      */
-    public function assertPropertyIsReadable(string $propertyName, string $className)
+    public function assertPropertyIsReadable(string $propertyName, string $className): void
     {
         if (!$this->getPropertyInfo($propertyName, $className)->{'hydra:readable'}) {
             throw new ExpectationFailedException(sprintf('Property "%s" of class "%s" is not readable', $propertyName, $className));
@@ -180,7 +180,7 @@ final class HydraContext implements Context
     /**
      * @Then :prop property is not readable for Hydra class :class
      */
-    public function assertPropertyIsNotReadable(string $propertyName, string $className)
+    public function assertPropertyIsNotReadable(string $propertyName, string $className): void
     {
         if ($this->getPropertyInfo($propertyName, $className)->{'hydra:readable'}) {
             throw new ExpectationFailedException(sprintf('Property "%s" of class "%s" is readable', $propertyName, $className));
@@ -190,7 +190,7 @@ final class HydraContext implements Context
     /**
      * @Then :prop property is writable for Hydra class :class
      */
-    public function assertPropertyIsWritable(string $propertyName, string $className)
+    public function assertPropertyIsWritable(string $propertyName, string $className): void
     {
         if (!$this->getPropertyInfo($propertyName, $className)->{'hydra:writable'}) {
             throw new ExpectationFailedException(sprintf('Property "%s" of class "%s" is not writable', $propertyName, $className));
@@ -200,7 +200,7 @@ final class HydraContext implements Context
     /**
      * @Then :prop property is required for Hydra class :class
      */
-    public function assertPropertyIsRequired(string $propertyName, string $className)
+    public function assertPropertyIsRequired(string $propertyName, string $className): void
     {
         if (!$this->getPropertyInfo($propertyName, $className)->{'hydra:required'}) {
             throw new ExpectationFailedException(sprintf('Property "%s" of class "%s" is not required', $propertyName, $className));
@@ -210,7 +210,7 @@ final class HydraContext implements Context
     /**
      * @Then :prop property is not required for Hydra class :class
      */
-    public function assertPropertyIsNotRequired(string $propertyName, string $className)
+    public function assertPropertyIsNotRequired(string $propertyName, string $className): void
     {
         if ($this->getPropertyInfo($propertyName, $className)->{'hydra:required'}) {
             throw new ExpectationFailedException(sprintf('Property "%s" of class "%s" is required', $propertyName, $className));

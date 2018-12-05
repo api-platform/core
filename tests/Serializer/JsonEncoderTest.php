@@ -26,31 +26,31 @@ class JsonEncoderTest extends TestCase
      */
     private $encoder;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->encoder = new JsonEncoder('json');
     }
 
-    public function testSupportEncoding()
+    public function testSupportEncoding(): void
     {
         $this->assertTrue($this->encoder->supportsEncoding('json'));
         $this->assertFalse($this->encoder->supportsEncoding('csv'));
     }
 
-    public function testEncode()
+    public function testEncode(): void
     {
         $data = ['foo' => 'bar'];
 
         $this->assertEquals('{"foo":"bar"}', $this->encoder->encode($data, 'json'));
     }
 
-    public function testSupportDecoding()
+    public function testSupportDecoding(): void
     {
         $this->assertTrue($this->encoder->supportsDecoding('json'));
         $this->assertFalse($this->encoder->supportsDecoding('csv'));
     }
 
-    public function testDecode()
+    public function testDecode(): void
     {
         $this->assertEquals(['foo' => 'bar'], $this->encoder->decode('{"foo":"bar"}', 'json'));
     }

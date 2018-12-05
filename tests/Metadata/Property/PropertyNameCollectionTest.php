@@ -21,7 +21,7 @@ use PHPUnit\Framework\TestCase;
  */
 class PropertyNameCollectionTest extends TestCase
 {
-    public function testValueObject()
+    public function testValueObject(): void
     {
         $collection = new PropertyNameCollection(['foo', 'bar']);
         $this->assertInstanceOf(\Countable::class, $collection);

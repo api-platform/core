@@ -37,7 +37,7 @@ final class RequestDataCollector extends DataCollector
     /**
      * {@inheritdoc}
      */
-    public function collect(Request $request, Response $response, \Exception $exception = null)
+    public function collect(Request $request, Response $response, \Exception $exception = null): void
     {
         $counters = ['ignored_filters' => 0];
         $resourceClass = $request->attributes->get('_api_resource_class');
@@ -105,7 +105,7 @@ final class RequestDataCollector extends DataCollector
     /**
      * {@inheritdoc}
      */
-    public function reset()
+    public function reset(): void
     {
         $this->data = [];
     }

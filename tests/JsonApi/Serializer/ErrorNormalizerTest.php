@@ -23,7 +23,7 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class ErrorNormalizerTest extends TestCase
 {
-    public function testSupportsNormalization()
+    public function testSupportsNormalization(): void
     {
         $normalizer = new ErrorNormalizer();
 
@@ -44,7 +44,7 @@ class ErrorNormalizerTest extends TestCase
      * @param string $originalMessage original message of the Exception
      * @param bool   $debug           simulates kernel debug variable
      */
-    public function testNormalize($status, $originalMessage, $debug)
+    public function testNormalize($status, $originalMessage, $debug): void
     {
         $normalizer = new ErrorNormalizer($debug);
         $exception = FlattenException::create(new \Exception($originalMessage), $status);

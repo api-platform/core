@@ -21,7 +21,7 @@ use PHPUnit\Framework\TestCase;
  */
 class DateTimeIdentifierNormalizerTest extends TestCase
 {
-    public function testDenormalize()
+    public function testDenormalize(): void
     {
         $this->expectException(\ApiPlatform\Core\Exception\InvalidIdentifierException::class);
 
@@ -29,7 +29,7 @@ class DateTimeIdentifierNormalizerTest extends TestCase
         $normalizer->denormalize('not valid', \DateTimeImmutable::class);
     }
 
-    public function testHasCacheableSupportsMethod()
+    public function testHasCacheableSupportsMethod(): void
     {
         $this->assertTrue((new DateTimeIdentifierDenormalizer())->hasCacheableSupportsMethod());
     }

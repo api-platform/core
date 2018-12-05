@@ -38,7 +38,7 @@ final class QueryParameterValidateListener
         $this->setFilterLocator($filterLocator);
     }
 
-    public function onKernelRequest(GetResponseEvent $event)
+    public function onKernelRequest(GetResponseEvent $event): void
     {
         $request = $event->getRequest();
         if (

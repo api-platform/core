@@ -27,7 +27,7 @@ use PHPUnit\Framework\TestCase;
  */
 class InheritedPropertyNameCollectionFactoryTest extends TestCase
 {
-    public function testCreate()
+    public function testCreate(): void
     {
         $resourceNameCollectionFactory = $this->prophesize(ResourceNameCollectionFactoryInterface::class);
         $resourceNameCollectionFactory->create()->willReturn(new ResourceNameCollection([DummyTableInheritance::class, DummyTableInheritanceChild::class]))->shouldBeCalled();

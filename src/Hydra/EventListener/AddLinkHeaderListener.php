@@ -34,7 +34,7 @@ final class AddLinkHeaderListener
     /**
      * Sends the Hydra header on each response.
      */
-    public function onKernelResponse(FilterResponseEvent $event)
+    public function onKernelResponse(FilterResponseEvent $event): void
     {
         $event->getResponse()->headers->set('Link', sprintf(
             '<%s>; rel="%sapiDocumentation"',

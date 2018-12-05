@@ -85,7 +85,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
     /**
      * Populates entrypoint properties.
      */
-    private function populateEntrypointProperties(string $resourceClass, ResourceMetadata $resourceMetadata, string $shortName, string $prefixedShortName, array &$entrypointProperties)
+    private function populateEntrypointProperties(string $resourceClass, ResourceMetadata $resourceMetadata, string $shortName, string $prefixedShortName, array &$entrypointProperties): void
     {
         $hydraCollectionOperations = $this->getHydraOperations($resourceClass, $resourceMetadata, $prefixedShortName, true);
         if (empty($hydraCollectionOperations)) {

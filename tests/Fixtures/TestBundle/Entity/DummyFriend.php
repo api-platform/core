@@ -63,7 +63,7 @@ class DummyFriend
      *
      * @param int $id the value to set
      */
-    public function setId($id)
+    public function setId($id): void
     {
         $this->id = $id;
     }
@@ -83,7 +83,7 @@ class DummyFriend
      *
      * @param string $name the value to set
      */
-    public function setName($name)
+    public function setName($name): void
     {
         $this->name = $name;
     }

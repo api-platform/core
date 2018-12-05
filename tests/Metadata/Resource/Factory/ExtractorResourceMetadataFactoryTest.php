@@ -35,7 +35,7 @@ class ExtractorResourceMetadataFactoryTest extends FileConfigurationMetadataFact
     /**
      * @dataProvider resourceMetadataProvider
      */
-    public function testXmlCreateResourceMetadata($expectedResourceMetadata)
+    public function testXmlCreateResourceMetadata($expectedResourceMetadata): void
     {
         $configPath = __DIR__.'/../../../Fixtures/FileConfigurations/resources.xml';
 
@@ -46,7 +46,7 @@ class ExtractorResourceMetadataFactoryTest extends FileConfigurationMetadataFact
         $this->assertEquals($expectedResourceMetadata, $resourceMetadata);
     }
 
-    public function testXmlDoesNotExistMetadataFactory()
+    public function testXmlDoesNotExistMetadataFactory(): void
     {
         $this->expectException(ResourceClassNotFoundException::class);
         $this->expectExceptionMessage('Resource "ApiPlatform\\Core\\Tests\\Fixtures\\TestBundle\\Entity\\ThisDoesNotExist" not found.');
@@ -63,7 +63,7 @@ class ExtractorResourceMetadataFactoryTest extends FileConfigurationMetadataFact
     /**
      * @dataProvider optionalResourceMetadataProvider
      */
-    public function testXmlOptionalResourceMetadata($expectedResourceMetadata)
+    public function testXmlOptionalResourceMetadata($expectedResourceMetadata): void
     {
         $configPath = __DIR__.'/../../../Fixtures/FileConfigurations/resourcesoptional.xml';
 
@@ -80,7 +80,7 @@ class ExtractorResourceMetadataFactoryTest extends FileConfigurationMetadataFact
      * @group legacy
      * @dataProvider legacyOperationsResourceMetadataProvider
      */
-    public function testLegacyOperationsResourceMetadata($expectedResourceMetadata)
+    public function testLegacyOperationsResourceMetadata($expectedResourceMetadata): void
     {
         $configPath = __DIR__.'/../../../Fixtures/FileConfigurations/legacyoperations.xml';
 
@@ -95,7 +95,7 @@ class ExtractorResourceMetadataFactoryTest extends FileConfigurationMetadataFact
     /**
      * @dataProvider noCollectionOperationsResourceMetadataProvider
      */
-    public function testXmlNoCollectionOperationsResourceMetadata($expectedResourceMetadata)
+    public function testXmlNoCollectionOperationsResourceMetadata($expectedResourceMetadata): void
     {
         $configPath = __DIR__.'/../../../Fixtures/FileConfigurations/nocollectionoperations.xml';
 
@@ -110,7 +110,7 @@ class ExtractorResourceMetadataFactoryTest extends FileConfigurationMetadataFact
     /**
      * @dataProvider noItemOperationsResourceMetadataProvider
      */
-    public function testXmlNoItemOperationsResourceMetadata($expectedResourceMetadata)
+    public function testXmlNoItemOperationsResourceMetadata($expectedResourceMetadata): void
     {
         $configPath = __DIR__.'/../../../Fixtures/FileConfigurations/noitemoperations.xml';
 
@@ -122,7 +122,7 @@ class ExtractorResourceMetadataFactoryTest extends FileConfigurationMetadataFact
         $this->assertEquals($expectedResourceMetadata, $resourceMetadata);
     }
 
-    public function testInvalidXmlResourceMetadataFactory()
+    public function testInvalidXmlResourceMetadataFactory(): void
     {
         $this->expectException(InvalidArgumentException::class);
 
@@ -135,7 +135,7 @@ class ExtractorResourceMetadataFactoryTest extends FileConfigurationMetadataFact
     /**
      * @dataProvider optionalResourceMetadataProvider
      */
-    public function testXmlParentResourceMetadataFactory(ResourceMetadata $expectedResourceMetadata)
+    public function testXmlParentResourceMetadataFactory(ResourceMetadata $expectedResourceMetadata): void
     {
         $configPath = __DIR__.'/../../../Fixtures/FileConfigurations/resourcesoptional.xml';
 
@@ -153,7 +153,7 @@ class ExtractorResourceMetadataFactoryTest extends FileConfigurationMetadataFact
     /**
      * @dataProvider resourceMetadataProvider
      */
-    public function testXmlExistingParentResourceMetadataFactory(ResourceMetadata $expectedResourceMetadata)
+    public function testXmlExistingParentResourceMetadataFactory(ResourceMetadata $expectedResourceMetadata): void
     {
         $configPath = __DIR__.'/../../../Fixtures/FileConfigurations/resources.xml';
 
@@ -170,7 +170,7 @@ class ExtractorResourceMetadataFactoryTest extends FileConfigurationMetadataFact
     /**
      * @dataProvider resourceMetadataProvider
      */
-    public function testYamlCreateResourceMetadata(ResourceMetadata $expectedResourceMetadata)
+    public function testYamlCreateResourceMetadata(ResourceMetadata $expectedResourceMetadata): void
     {
         $configPath = __DIR__.'/../../../Fixtures/FileConfigurations/resources.yml';
 
@@ -181,7 +181,7 @@ class ExtractorResourceMetadataFactoryTest extends FileConfigurationMetadataFact
         $this->assertEquals($expectedResourceMetadata, $resourceMetadata);
     }
 
-    public function testYamlDoesNotExistMetadataFactory()
+    public function testYamlDoesNotExistMetadataFactory(): void
     {
         $this->expectException(ResourceClassNotFoundException::class);
         $this->expectExceptionMessage('Resource "ApiPlatform\\Core\\Tests\\Fixtures\\TestBundle\\Entity\\ThisDoesNotExist" not found.');
@@ -198,7 +198,7 @@ class ExtractorResourceMetadataFactoryTest extends FileConfigurationMetadataFact
     /**
      * @dataProvider optionalResourceMetadataProvider
      */
-    public function testYamlOptionalResourceMetadata($expectedResourceMetadata)
+    public function testYamlOptionalResourceMetadata($expectedResourceMetadata): void
     {
         $configPath = __DIR__.'/../../../Fixtures/FileConfigurations/resourcesoptional.yml';
 
@@ -212,7 +212,7 @@ class ExtractorResourceMetadataFactoryTest extends FileConfigurationMetadataFact
     /**
      * @dataProvider resourceMetadataProvider
      */
-    public function testYamlSingleResourceMetadata(ResourceMetadata $expectedResourceMetadata)
+    public function testYamlSingleResourceMetadata(ResourceMetadata $expectedResourceMetadata): void
     {
         $configPath = __DIR__.'/../../../Fixtures/FileConfigurations/single_resource.yml';
 
@@ -226,7 +226,7 @@ class ExtractorResourceMetadataFactoryTest extends FileConfigurationMetadataFact
     /**
      * @dataProvider optionalResourceMetadataProvider
      */
-    public function testYamlParentResourceMetadataFactory(ResourceMetadata $expectedResourceMetadata)
+    public function testYamlParentResourceMetadataFactory(ResourceMetadata $expectedResourceMetadata): void
     {
         $configPath = __DIR__.'/../../../Fixtures/FileConfigurations/resourcesoptional.yml';
 
@@ -244,7 +244,7 @@ class ExtractorResourceMetadataFactoryTest extends FileConfigurationMetadataFact
     /**
      * @dataProvider resourceMetadataProvider
      */
-    public function testYamlExistingParentResourceMetadataFactory(ResourceMetadata $expectedResourceMetadata)
+    public function testYamlExistingParentResourceMetadataFactory(ResourceMetadata $expectedResourceMetadata): void
     {
         $configPath = __DIR__.'/../../../Fixtures/FileConfigurations/resources.yml';
 
@@ -258,7 +258,7 @@ class ExtractorResourceMetadataFactoryTest extends FileConfigurationMetadataFact
         $this->assertEquals($expectedResourceMetadata, $resourceMetadata);
     }
 
-    public function testCreateWithMalformedYaml()
+    public function testCreateWithMalformedYaml(): void
     {
         $this->expectException(InvalidArgumentException::class);
 
@@ -267,7 +267,7 @@ class ExtractorResourceMetadataFactoryTest extends FileConfigurationMetadataFact
         (new ExtractorResourceMetadataFactory(new YamlExtractor([$configPath])))->create(FileConfigDummy::class);
     }
 
-    public function testCreateWithBadDeclaration()
+    public function testCreateWithBadDeclaration(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessageRegExp('/"ApiPlatform\\\\Core\\\\Tests\\\\Fixtures\\\\TestBundle\\\\Entity\\\\Dummy" setting is expected to be null or an array, string given in ".+\\/Fixtures\\/FileConfigurations\\/bad_declaration\\.yml"\\./');
@@ -277,7 +277,7 @@ class ExtractorResourceMetadataFactoryTest extends FileConfigurationMetadataFact
         (new ExtractorResourceMetadataFactory(new YamlExtractor([$configPath])))->create(FileConfigDummy::class);
     }
 
-    public function testCreateShortNameResourceMetadataForClassWithoutNamespace()
+    public function testCreateShortNameResourceMetadataForClassWithoutNamespace(): void
     {
         $configPath = __DIR__.'/../../../Fixtures/FileConfigurations/resourceswithoutnamespace.yml';
 
@@ -289,7 +289,7 @@ class ExtractorResourceMetadataFactoryTest extends FileConfigurationMetadataFact
         $this->assertSame(\DateTime::class, $resourceMetadata->getShortName());
     }
 
-    public function testItSupportsInterfaceAsAResource()
+    public function testItSupportsInterfaceAsAResource(): void
     {
         $configPath = __DIR__.'/../../../Fixtures/FileConfigurations/interface_resource.yml';
 

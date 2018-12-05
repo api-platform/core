@@ -10,14 +10,6 @@
  */
 
 declare(strict_types=1);
-/*
- * This file is part of the API Platform project.
- *
- * (c) Kévin Dunglas <dunglas@gmail.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
 
 namespace ApiPlatform\Core\Annotation;
 
@@ -42,7 +34,7 @@ trait AttributesHydratorTrait
     /**
      * @throws InvalidArgumentException
      */
-    private function hydrateAttributes(array $values)
+    private function hydrateAttributes(array $values): void
     {
         if (isset($values['attributes'])) {
             $this->attributes = $values['attributes'];

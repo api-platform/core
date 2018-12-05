@@ -30,7 +30,7 @@ use Symfony\Component\Serializer\SerializerInterface;
  */
 class ExceptionActionTest extends TestCase
 {
-    public function testActionWithCatchableException()
+    public function testActionWithCatchableException(): void
     {
         $serializerException = $this->prophesize(ExceptionInterface::class);
         if (!is_a(ExceptionInterface::class, \Throwable::class, true)) {
@@ -55,7 +55,7 @@ class ExceptionActionTest extends TestCase
         $this->assertEquals($expected, $exceptionAction($flattenException, $request));
     }
 
-    public function testActionWithUncatchableException()
+    public function testActionWithUncatchableException(): void
     {
         $serializerException = $this->prophesize(ExceptionInterface::class);
         if (!is_a(ExceptionInterface::class, \Throwable::class, true)) {

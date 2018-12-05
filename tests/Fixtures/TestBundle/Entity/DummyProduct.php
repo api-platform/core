@@ -78,12 +78,12 @@ class DummyProduct
         return $this->offers;
     }
 
-    public function setOffers($offers)
+    public function setOffers($offers): void
     {
         $this->offers = $offers;
     }
 
-    public function addOffer(DummyAggregateOffer $offer)
+    public function addOffer(DummyAggregateOffer $offer): void
     {
         $this->offers->add($offer);
         $offer->setProduct($this);
@@ -99,7 +99,7 @@ class DummyProduct
         return $this->name;
     }
 
-    public function setName($name)
+    public function setName($name): void
     {
         $this->name = $name;
     }
@@ -109,12 +109,12 @@ class DummyProduct
         return $this->relatedProducts;
     }
 
-    public function setRelatedProducts(Collection $relatedProducts)
+    public function setRelatedProducts(Collection $relatedProducts): void
     {
         $this->relatedProducts = $relatedProducts;
     }
 
-    public function addRelatedProduct(self $relatedProduct)
+    public function addRelatedProduct(self $relatedProduct): void
     {
         $this->relatedProducts->add($relatedProduct);
         $relatedProduct->setParent($this);
@@ -125,7 +125,7 @@ class DummyProduct
         return $this->parent;
     }
 
-    public function setParent(self $product)
+    public function setParent(self $product): void
     {
         $this->parent = $product;
     }

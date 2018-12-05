@@ -22,7 +22,7 @@ use PHPUnit\Framework\TestCase;
 
 class PhpDocResourceMetadataFactoryTest extends TestCase
 {
-    public function testExistingDescription()
+    public function testExistingDescription(): void
     {
         $resourceMetadata = new ResourceMetadata(null, 'My desc');
         $decoratedProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
@@ -33,7 +33,7 @@ class PhpDocResourceMetadataFactoryTest extends TestCase
         $this->assertSame($resourceMetadata, $factory->create('Foo'));
     }
 
-    public function testNoDocBlock()
+    public function testNoDocBlock(): void
     {
         $resourceMetadata = new ResourceMetadata();
         $decoratedProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
@@ -44,7 +44,7 @@ class PhpDocResourceMetadataFactoryTest extends TestCase
         $this->assertSame($resourceMetadata, $factory->create(ClassWithNoDocBlock::class));
     }
 
-    public function testExtractDescription()
+    public function testExtractDescription(): void
     {
         $decoratedProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $decoratedProphecy->create(DummyEntity::class)->willReturn(new ResourceMetadata())->shouldBeCalled();

@@ -155,7 +155,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
     /**
      * {@inheritdoc}
      */
-    protected function setAttributeValue($object, $attribute, $value, $format = null, array $context = [])
+    protected function setAttributeValue($object, $attribute, $value, $format = null, array $context = []): void
     {
         parent::setAttributeValue($object, $attribute, \is_array($value) && array_key_exists('data', $value) ? $value['data'] : $value, $format, $context);
     }

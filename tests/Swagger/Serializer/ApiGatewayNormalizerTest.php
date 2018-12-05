@@ -39,7 +39,7 @@ final class ApiGatewayNormalizerTest extends TestCase
      */
     private $normalizer;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->documentationNormalizerMock = $this->prophesize(NormalizerInterface::class);
         $this->documentationNormalizerMock->willImplement(CacheableSupportsMethodInterface::class);
@@ -48,14 +48,14 @@ final class ApiGatewayNormalizerTest extends TestCase
         $this->normalizer = new ApiGatewayNormalizer($this->documentationNormalizerMock->reveal());
     }
 
-    public function testSupportsNormalization()
+    public function testSupportsNormalization(): void
     {
         $this->documentationNormalizerMock->supportsNormalization('foo', 'bar')->willReturn(true)->shouldBeCalledTimes(1);
         $this->assertTrue($this->normalizer->supportsNormalization('foo', 'bar'));
         $this->assertTrue($this->normalizer->hasCacheableSupportsMethod());
     }
 
-    public function testNormalizeWithoutApiGateway()
+    public function testNormalizeWithoutApiGateway(): void
     {
         $this->documentationNormalizerMock->normalize($this->objectMock, 'jsonld', [])
             ->willReturn(['basePath' => ''])
@@ -63,7 +63,7 @@ final class ApiGatewayNormalizerTest extends TestCase
         $this->assertEquals(['basePath' => '/'], $this->normalizer->normalize($this->objectMock->reveal(), 'jsonld'));
     }
 
-    public function testNormalizeWithApiGateway()
+    public function testNormalizeWithApiGateway(): void
     {
         $this->documentationNormalizerMock->normalize($this->objectMock, 'jsonld', ['api_gateway' => true])
             ->willReturn([

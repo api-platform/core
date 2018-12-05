@@ -43,7 +43,7 @@ class ItemNormalizer extends AbstractItemNormalizer
         return parent::denormalize($data, $class, $format, $context);
     }
 
-    private function updateObjectToPopulate(array $data, array &$context)
+    private function updateObjectToPopulate(array $data, array &$context): void
     {
         try {
             $context[self::OBJECT_TO_POPULATE] = $this->iriConverter->getItemFromIri((string) $data['id'], $context + ['fetch_data' => true]);

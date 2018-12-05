@@ -33,7 +33,7 @@ use Prophecy\Argument;
  */
 class CollectionDataProviderTest extends TestCase
 {
-    public function testGetCollection()
+    public function testGetCollection(): void
     {
         $queryProphecy = $this->prophesize(AbstractQuery::class);
         $queryProphecy->getResult()->willReturn([])->shouldBeCalled();
@@ -58,7 +58,7 @@ class CollectionDataProviderTest extends TestCase
         $this->assertEquals([], $dataProvider->getCollection(Dummy::class, 'foo'));
     }
 
-    public function testQueryResultExtension()
+    public function testQueryResultExtension(): void
     {
         $queryBuilderProphecy = $this->prophesize(QueryBuilder::class);
         $queryBuilder = $queryBuilderProphecy->reveal();
@@ -81,7 +81,7 @@ class CollectionDataProviderTest extends TestCase
         $this->assertEquals([], $dataProvider->getCollection(Dummy::class, 'foo'));
     }
 
-    public function testCannotCreateQueryBuilder()
+    public function testCannotCreateQueryBuilder(): void
     {
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('The repository class must have a "createQueryBuilder" method.');
@@ -98,7 +98,7 @@ class CollectionDataProviderTest extends TestCase
         $this->assertEquals([], $dataProvider->getCollection(Dummy::class, 'foo'));
     }
 
-    public function testUnsupportedClass()
+    public function testUnsupportedClass(): void
     {
         $managerRegistryProphecy = $this->prophesize(ManagerRegistry::class);
         $managerRegistryProphecy->getManagerForClass(Dummy::class)->willReturn(null)->shouldBeCalled();

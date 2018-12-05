@@ -23,17 +23,17 @@ class ResourceListTest extends TestCase
      */
     private $resourceList;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->resourceList = new ResourceList();
     }
 
-    public function testImplementsArrayObject()
+    public function testImplementsArrayObject(): void
     {
         $this->assertInstanceOf(\ArrayObject::class, $this->resourceList);
     }
 
-    public function testSerialize()
+    public function testSerialize(): void
     {
         $this->resourceList['foo'] = 'bar';
 

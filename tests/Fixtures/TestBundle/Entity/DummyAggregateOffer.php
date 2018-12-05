@@ -70,12 +70,12 @@ class DummyAggregateOffer
         return $this->offers;
     }
 
-    public function setOffers($offers)
+    public function setOffers($offers): void
     {
         $this->offers = $offers;
     }
 
-    public function addOffer(DummyOffer $offer)
+    public function addOffer(DummyOffer $offer): void
     {
         $this->offers->add($offer);
         $offer->setAggregate($this);
@@ -91,7 +91,7 @@ class DummyAggregateOffer
         return $this->value;
     }
 
-    public function setValue($value)
+    public function setValue($value): void
     {
         $this->value = $value;
     }
@@ -101,7 +101,7 @@ class DummyAggregateOffer
         return $this->product;
     }
 
-    public function setProduct(DummyProduct $product)
+    public function setProduct(DummyProduct $product): void
     {
         $this->product = $product;
     }

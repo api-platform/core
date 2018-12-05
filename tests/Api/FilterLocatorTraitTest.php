@@ -24,7 +24,7 @@ use Psr\Container\ContainerInterface;
  */
 class FilterLocatorTraitTest extends TestCase
 {
-    public function testSetFilterLocator()
+    public function testSetFilterLocator(): void
     {
         $filterLocator = $this->prophesize(ContainerInterface::class)->reveal();
 
@@ -38,7 +38,7 @@ class FilterLocatorTraitTest extends TestCase
      * @group legacy
      * @expectedDeprecation The ApiPlatform\Core\Api\FilterCollection class is deprecated since version 2.1 and will be removed in 3.0. Provide an implementation of Psr\Container\ContainerInterface instead.
      */
-    public function testSetFilterLocatorWithDeprecatedFilterCollection()
+    public function testSetFilterLocatorWithDeprecatedFilterCollection(): void
     {
         $filterCollection = new FilterCollection();
 
@@ -48,7 +48,7 @@ class FilterLocatorTraitTest extends TestCase
         $this->assertEquals($filterCollection, $filterLocatorTraitImpl->getFilterLocator());
     }
 
-    public function testSetFilterLocatorWithNullAndNullAllowed()
+    public function testSetFilterLocatorWithNullAndNullAllowed(): void
     {
         $filterLocatorTraitImpl = $this->getFilterLocatorTraitImpl();
         $filterLocatorTraitImpl->setFilterLocator(null, true);
@@ -59,7 +59,7 @@ class FilterLocatorTraitTest extends TestCase
     /**
      * @group legacy
      */
-    public function testSetFilterLocatorWithNullAndNullNotAllowed()
+    public function testSetFilterLocatorWithNullAndNullNotAllowed(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('The "$filterLocator" argument is expected to be an implementation of the "Psr\\Container\\ContainerInterface" interface.');
@@ -71,7 +71,7 @@ class FilterLocatorTraitTest extends TestCase
     /**
      * @group legacy
      */
-    public function testSetFilterLocatorWithInvalidFilterLocator()
+    public function testSetFilterLocatorWithInvalidFilterLocator(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('The "$filterLocator" argument is expected to be an implementation of the "Psr\\Container\\ContainerInterface" interface or null.');
@@ -80,7 +80,7 @@ class FilterLocatorTraitTest extends TestCase
         $filterLocatorTraitImpl->setFilterLocator(new \ArrayObject(), true);
     }
 
-    public function testGetFilter()
+    public function testGetFilter(): void
     {
         $filter = $this->prophesize(FilterInterface::class)->reveal();
 
@@ -97,7 +97,7 @@ class FilterLocatorTraitTest extends TestCase
         $this->assertEquals($filter, $returnedFilter);
     }
 
-    public function testGetFilterWithNonexistentFilterId()
+    public function testGetFilterWithNonexistentFilterId(): void
     {
         $filterLocatorProphecy = $this->prophesize(ContainerInterface::class);
         $filterLocatorProphecy->has('foo')->willReturn(false)->shouldBeCalled();
@@ -114,7 +114,7 @@ class FilterLocatorTraitTest extends TestCase
      * @group legacy
      * @expectedDeprecation The ApiPlatform\Core\Api\FilterCollection class is deprecated since version 2.1 and will be removed in 3.0. Provide an implementation of Psr\Container\ContainerInterface instead.
      */
-    public function testGetFilterWithDeprecatedFilterCollection()
+    public function testGetFilterWithDeprecatedFilterCollection(): void
     {
         $filter = $this->prophesize(FilterInterface::class)->reveal();
 
@@ -131,7 +131,7 @@ class FilterLocatorTraitTest extends TestCase
      * @group legacy
      * @expectedDeprecation The ApiPlatform\Core\Api\FilterCollection class is deprecated since version 2.1 and will be removed in 3.0. Provide an implementation of Psr\Container\ContainerInterface instead.
      */
-    public function testGetFilterWithNonexistentFilterIdAndDeprecatedFilterCollection()
+    public function testGetFilterWithNonexistentFilterIdAndDeprecatedFilterCollection(): void
     {
         $filterLocatorTraitImpl = $this->getFilterLocatorTraitImpl();
         $filterLocatorTraitImpl->setFilterLocator(new FilterCollection());

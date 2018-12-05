@@ -39,7 +39,7 @@ use Symfony\Component\Routing\RouterInterface;
  */
 class IriConverterTest extends TestCase
 {
-    public function testGetItemFromIriNoRouteException()
+    public function testGetItemFromIriNoRouteException(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('No route matches "/users/3".');
@@ -50,7 +50,7 @@ class IriConverterTest extends TestCase
         $converter->getItemFromIri('/users/3');
     }
 
-    public function testGetItemFromIriNoResourceException()
+    public function testGetItemFromIriNoResourceException(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('No resource associated to "/users/3".');
@@ -62,7 +62,7 @@ class IriConverterTest extends TestCase
         $converter->getItemFromIri('/users/3');
     }
 
-    public function testGetItemFromIriCollectionRouteException()
+    public function testGetItemFromIriCollectionRouteException(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('The iri "/users" references a collection not an item.');
@@ -77,7 +77,7 @@ class IriConverterTest extends TestCase
         $converter->getItemFromIri('/users');
     }
 
-    public function testGetItemFromIriItemNotFoundException()
+    public function testGetItemFromIriItemNotFoundException(): void
     {
         $this->expectException(ItemNotFoundException::class);
         $this->expectExceptionMessage('Item not found for "/users/3".');
@@ -98,7 +98,7 @@ class IriConverterTest extends TestCase
         $converter->getItemFromIri('/users/3');
     }
 
-    public function testGetItemFromIri()
+    public function testGetItemFromIri(): void
     {
         $item = new \stdClass();
         $itemDataProviderProphecy = $this->prophesize(ItemDataProviderInterface::class);
@@ -115,7 +115,7 @@ class IriConverterTest extends TestCase
         $this->assertEquals($converter->getItemFromIri('/users/3', ['fetch_data' => true]), $item);
     }
 
-    public function testGetItemFromIriWithOperationName()
+    public function testGetItemFromIriWithOperationName(): void
     {
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
 
@@ -139,7 +139,7 @@ class IriConverterTest extends TestCase
         $this->assertEquals($converter->getItemFromIri('/users/3', ['fetch_data' => true]), 'foo');
     }
 
-    public function testGetIriFromResourceClass()
+    public function testGetIriFromResourceClass(): void
     {
         $routeNameResolverProphecy = $this->prophesize(RouteNameResolverInterface::class);
         $routeNameResolverProphecy->getRouteName(Dummy::class, OperationType::COLLECTION)->willReturn('dummies');
@@ -151,7 +151,7 @@ class IriConverterTest extends TestCase
         $this->assertEquals($converter->getIriFromResourceClass(Dummy::class), '/dummies');
     }
 
-    public function testNotAbleToGenerateGetIriFromResourceClass()
+    public function testNotAbleToGenerateGetIriFromResourceClass(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Unable to generate an IRI for "ApiPlatform\\Core\\Tests\\Fixtures\\TestBundle\\Entity\\Dummy"');
@@ -166,7 +166,7 @@ class IriConverterTest extends TestCase
         $converter->getIriFromResourceClass(Dummy::class);
     }
 
-    public function testGetSubresourceIriFromResourceClass()
+    public function testGetSubresourceIriFromResourceClass(): void
     {
         $routeNameResolverProphecy = $this->prophesize(RouteNameResolverInterface::class);
         $routeNameResolverProphecy->getRouteName(Dummy::class, OperationType::SUBRESOURCE, Argument::type('array'))->willReturn('api_dummies_related_dummies_get_subresource');
@@ -178,7 +178,7 @@ class IriConverterTest extends TestCase
         $this->assertEquals($converter->getSubresourceIriFromResourceClass(Dummy::class, ['subresource_identifiers' => ['id' => 1], 'subresource_resources' => [RelatedDummy::class => 1]]), '/dummies/1/related_dummies');
     }
 
-    public function testNotAbleToGenerateGetSubresourceIriFromResourceClass()
+    public function testNotAbleToGenerateGetSubresourceIriFromResourceClass(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Unable to generate an IRI for "ApiPlatform\\Core\\Tests\\Fixtures\\TestBundle\\Entity\\Dummy"');
@@ -193,7 +193,7 @@ class IriConverterTest extends TestCase
         $converter->getSubresourceIriFromResourceClass(Dummy::class, ['subresource_identifiers' => ['id' => 1], 'subresource_resources' => [RelatedDummy::class => 1]]);
     }
 
-    public function testGetItemIriFromResourceClass()
+    public function testGetItemIriFromResourceClass(): void
     {
         $routeNameResolverProphecy = $this->prophesize(RouteNameResolverInterface::class);
         $routeNameResolverProphecy->getRouteName(Dummy::class, OperationType::ITEM)->willReturn('api_dummies_get_item');
@@ -205,7 +205,7 @@ class IriConverterTest extends TestCase
         $this->assertEquals($converter->getItemIriFromResourceClass(Dummy::class, ['id' => 1]), '/dummies/1');
     }
 
-    public function testNotAbleToGenerateGetItemIriFromResourceClass()
+    public function testNotAbleToGenerateGetItemIriFromResourceClass(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Unable to generate an IRI for "ApiPlatform\\Core\\Tests\\Fixtures\\TestBundle\\Entity\\Dummy"');
@@ -220,7 +220,7 @@ class IriConverterTest extends TestCase
         $converter->getItemIriFromResourceClass(Dummy::class, ['id' => 1]);
     }
 
-    public function testGetItemFromIriWithIdentifierConverter()
+    public function testGetItemFromIriWithIdentifierConverter(): void
     {
         $item = new \stdClass();
         $itemDataProviderProphecy = $this->prophesize(ItemDataProviderInterface::class);
@@ -238,7 +238,7 @@ class IriConverterTest extends TestCase
         $this->assertEquals($converter->getItemFromIri('/users/3', ['fetch_data' => true]), $item);
     }
 
-    public function testGetItemFromIriWithSubresourceDataProvider()
+    public function testGetItemFromIriWithSubresourceDataProvider(): void
     {
         $item = new \stdClass();
         $subresourceContext = ['identifiers' => [['id', Dummy::class, true]]];
@@ -257,7 +257,7 @@ class IriConverterTest extends TestCase
         $this->assertEquals($converter->getItemFromIri('/users/3/adresses', ['fetch_data' => true]), $item);
     }
 
-    public function testGetItemFromIriWithSubresourceDataProviderNotFound()
+    public function testGetItemFromIriWithSubresourceDataProviderNotFound(): void
     {
         $this->expectException(ItemNotFoundException::class);
         $this->expectExceptionMessage('Item not found for "/users/3/adresses".');
@@ -280,7 +280,7 @@ class IriConverterTest extends TestCase
         $converter->getItemFromIri('/users/3/adresses', ['fetch_data' => true]);
     }
 
-    public function testGetItemFromIriBadIdentifierException()
+    public function testGetItemFromIriBadIdentifierException(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Item not found for "/users/3".');
@@ -304,7 +304,7 @@ class IriConverterTest extends TestCase
      * @expectedDeprecation Not injecting "ApiPlatform\Core\Api\IdentifiersExtractorInterface" is deprecated since API Platform 2.1 and will not be possible anymore in API Platform 3
      * @expectedDeprecation Not injecting ApiPlatform\Core\Api\ResourceClassResolverInterface in the CachedIdentifiersExtractor might introduce cache issues with object identifiers.
      */
-    public function testLegacyConstructor()
+    public function testLegacyConstructor(): void
     {
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);

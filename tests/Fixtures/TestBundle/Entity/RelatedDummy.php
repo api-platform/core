@@ -102,12 +102,12 @@ class RelatedDummy extends ParentDummy
         return $this->id;
     }
 
-    public function setId($id)
+    public function setId($id): void
     {
         $this->id = $id;
     }
 
-    public function setName($name)
+    public function setName($name): void
     {
         $this->name = $name;
     }
@@ -122,12 +122,12 @@ class RelatedDummy extends ParentDummy
         return $this->symfony;
     }
 
-    public function setSymfony($symfony)
+    public function setSymfony($symfony): void
     {
         $this->symfony = $symfony;
     }
 
-    public function setDummyDate(\DateTime $dummyDate)
+    public function setDummyDate(\DateTime $dummyDate): void
     {
         $this->dummyDate = $dummyDate;
     }
@@ -148,7 +148,7 @@ class RelatedDummy extends ParentDummy
     /**
      * @param bool $dummyBoolean
      */
-    public function setDummyBoolean($dummyBoolean)
+    public function setDummyBoolean($dummyBoolean): void
     {
         $this->dummyBoolean = $dummyBoolean;
     }
@@ -161,7 +161,7 @@ class RelatedDummy extends ParentDummy
         return $this->thirdLevel;
     }
 
-    public function setThirdLevel(ThirdLevel $thirdLevel = null)
+    public function setThirdLevel(ThirdLevel $thirdLevel = null): void
     {
         $this->thirdLevel = $thirdLevel;
     }
@@ -181,7 +181,7 @@ class RelatedDummy extends ParentDummy
      *
      * @param RelatedToDummyFriend $relatedToDummyFriend the value to set
      */
-    public function addRelatedToDummyFriend(RelatedToDummyFriend $relatedToDummyFriend)
+    public function addRelatedToDummyFriend(RelatedToDummyFriend $relatedToDummyFriend): void
     {
         $this->relatedToDummyFriend->add($relatedToDummyFriend);
     }
@@ -194,7 +194,7 @@ class RelatedDummy extends ParentDummy
         return $this->embeddedDummy;
     }
 
-    public function setEmbeddedDummy(EmbeddableDummy $embeddedDummy)
+    public function setEmbeddedDummy(EmbeddableDummy $embeddedDummy): void
     {
         $this->embeddedDummy = $embeddedDummy;
     }

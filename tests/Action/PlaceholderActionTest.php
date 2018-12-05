@@ -21,7 +21,7 @@ use PHPUnit\Framework\TestCase;
  */
 class PlaceholderActionTest extends TestCase
 {
-    public function testAction()
+    public function testAction(): void
     {
         $action = new PlaceholderAction();
 

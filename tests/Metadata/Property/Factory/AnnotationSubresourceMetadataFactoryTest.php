@@ -33,7 +33,7 @@ class AnnotationSubresourceMetadataFactoryTest extends TestCase
     /**
      * @dataProvider getDependencies
      */
-    public function testCreateProperty(ProphecyInterface $reader, ProphecyInterface $decorated = null)
+    public function testCreateProperty(ProphecyInterface $reader, ProphecyInterface $decorated = null): void
     {
         $factory = new AnnotationSubresourceMetadataFactory($reader->reveal(), $decorated->reveal());
         $metadata = $factory->create(Dummy::class, 'relatedDummies');
@@ -59,7 +59,7 @@ class AnnotationSubresourceMetadataFactoryTest extends TestCase
         ];
     }
 
-    public function testCreatePropertyUnknownType()
+    public function testCreatePropertyUnknownType(): void
     {
         $this->expectException(InvalidResourceException::class);
         $this->expectExceptionMessage('Property "relatedDummies" on resource "ApiPlatform\\Core\\Tests\\Fixtures\\TestBundle\\Entity\\Dummy" is declared as a subresource, but its type could not be determined.');

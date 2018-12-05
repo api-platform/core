@@ -69,7 +69,7 @@ class EmbeddableDummy
      */
     protected $symfony;
 
-    public static function staticMethod()
+    public static function staticMethod(): void
     {
     }
 
@@ -85,7 +85,7 @@ class EmbeddableDummy
         return $this->dummyName;
     }
 
-    public function setDummyName(string $dummyName)
+    public function setDummyName(string $dummyName): void
     {
         $this->dummyName = $dummyName;
     }
@@ -98,7 +98,7 @@ class EmbeddableDummy
         return $this->dummyBoolean;
     }
 
-    public function setDummyBoolean(bool $dummyBoolean)
+    public function setDummyBoolean(bool $dummyBoolean): void
     {
         $this->dummyBoolean = $dummyBoolean;
     }
@@ -111,7 +111,7 @@ class EmbeddableDummy
         return $this->dummyDate;
     }
 
-    public function setDummyDate(\DateTime $dummyDate)
+    public function setDummyDate(\DateTime $dummyDate): void
     {
         $this->dummyDate = $dummyDate;
     }
@@ -124,7 +124,7 @@ class EmbeddableDummy
         return $this->dummyFloat;
     }
 
-    public function setDummyFloat(string $dummyFloat)
+    public function setDummyFloat(string $dummyFloat): void
     {
         $this->dummyFloat = $dummyFloat;
     }
@@ -137,7 +137,7 @@ class EmbeddableDummy
         return $this->dummyPrice;
     }
 
-    public function setDummyPrice(string $dummyPrice)
+    public function setDummyPrice(string $dummyPrice): void
     {
         $this->dummyPrice = $dummyPrice;
     }
@@ -147,7 +147,7 @@ class EmbeddableDummy
         return $this->symfony;
     }
 
-    public function setSymfony($symfony)
+    public function setSymfony($symfony): void
     {
         $this->symfony = $symfony;
     }

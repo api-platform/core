@@ -50,7 +50,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
     /**
      * {@inheritdoc}
      */
-    public function prepend(ContainerBuilder $container)
+    public function prepend(ContainerBuilder $container): void
     {
         if (!$frameworkConfiguration = $container->getExtensionConfig('framework')) {
             return;
@@ -82,7 +82,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
     /**
      * {@inheritdoc}
      */
-    public function load(array $configs, ContainerBuilder $container)
+    public function load(array $configs, ContainerBuilder $container): void
     {
         $configuration = new Configuration();
         $config = $this->processConfiguration($configuration, $configs);
@@ -149,7 +149,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
     /**
      * Handles configuration.
      */
-    private function handleConfig(ContainerBuilder $container, array $config, array $formats, array $errorFormats)
+    private function handleConfig(ContainerBuilder $container, array $config, array $formats, array $errorFormats): void
     {
         $container->setParameter('api_platform.enable_entrypoint', $config['enable_entrypoint']);
         $container->setParameter('api_platform.enable_docs', $config['enable_docs']);
@@ -194,7 +194,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
     /**
      * Registers metadata configuration.
      */
-    private function registerMetadataConfiguration(ContainerBuilder $container, array $config, XmlFileLoader $loader)
+    private function registerMetadataConfiguration(ContainerBuilder $container, array $config, XmlFileLoader $loader): void
     {
         $loader->load('metadata/metadata.xml');
         $loader->load('metadata/xml.xml');
@@ -290,7 +290,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
     /**
      * Registers the OAuth configuration.
      */
-    private function registerOAuthConfiguration(ContainerBuilder $container, array $config)
+    private function registerOAuthConfiguration(ContainerBuilder $container, array $config): void
     {
         if (!$config['oauth']) {
             return;
@@ -309,7 +309,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
     /**
      * Registers the api keys configuration.
      */
-    private function registerApiKeysConfiguration(ContainerBuilder $container, array $config)
+    private function registerApiKeysConfiguration(ContainerBuilder $container, array $config): void
     {
         $container->setParameter('api_platform.swagger.api_keys', $config['swagger']['api_keys']);
     }
@@ -317,7 +317,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
     /**
      * Registers the Swagger and Swagger UI configuration.
      */
-    private function registerSwaggerConfiguration(ContainerBuilder $container, array $config, XmlFileLoader $loader)
+    private function registerSwaggerConfiguration(ContainerBuilder $container, array $config, XmlFileLoader $loader): void
     {
         if (!$config['enable_swagger']) {
             return;
@@ -336,7 +336,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
     /**
      * Registers the JsonApi configuration.
      */
-    private function registerJsonApiConfiguration(array $formats, XmlFileLoader $loader)
+    private function registerJsonApiConfiguration(array $formats, XmlFileLoader $loader): void
     {
         if (!isset($formats['jsonapi'])) {
             return;
@@ -348,7 +348,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
     /**
      * Registers the JSON-LD and Hydra configuration.
      */
-    private function registerJsonLdConfiguration(ContainerBuilder $container, array $formats, XmlFileLoader $loader, bool $docEnabled)
+    private function registerJsonLdConfiguration(ContainerBuilder $container, array $formats, XmlFileLoader $loader, bool $docEnabled): void
     {
         if (!isset($formats['jsonld'])) {
             return;
@@ -365,7 +365,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
     /**
      * Registers the HAL configuration.
      */
-    private function registerJsonHalConfiguration(array $formats, XmlFileLoader $loader)
+    private function registerJsonHalConfiguration(array $formats, XmlFileLoader $loader): void
     {
         if (!isset($formats['jsonhal'])) {
             return;
@@ -377,7 +377,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
     /**
      * Registers the JSON Problem configuration.
      */
-    private function registerJsonProblemConfiguration(array $errorFormats, XmlFileLoader $loader)
+    private function registerJsonProblemConfiguration(array $errorFormats, XmlFileLoader $loader): void
     {
         if (!isset($errorFormats['jsonproblem'])) {
             return;
@@ -389,7 +389,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
     /**
      * Registers the GraphQL configuration.
      */
-    private function registerGraphqlConfiguration(ContainerBuilder $container, array $config, XmlFileLoader $loader)
+    private function registerGraphqlConfiguration(ContainerBuilder $container, array $config, XmlFileLoader $loader): void
     {
         if (!$config['graphql']) {
             return;
@@ -406,7 +406,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
      *
      * @param string[] $bundles
      */
-    private function registerBundlesConfiguration(array $bundles, array $config, XmlFileLoader $loader, bool $useDoctrine)
+    private function registerBundlesConfiguration(array $bundles, array $config, XmlFileLoader $loader, bool $useDoctrine): void
     {
         // Doctrine ORM support
         if ($useDoctrine) {
@@ -427,7 +427,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
     /**
      * Registers the cache configuration.
      */
-    private function registerCacheConfiguration(ContainerBuilder $container)
+    private function registerCacheConfiguration(ContainerBuilder $container): void
     {
         // Don't use system cache pool in dev
         if ($container->hasParameter('api_platform.metadata_cache') ? $container->getParameter('api_platform.metadata_cache') : !$container->getParameter('kernel.debug')) {
@@ -444,7 +444,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
     /**
      * Manipulate doctrine extension services according to the configuration.
      */
-    private function registerDoctrineExtensionConfiguration(ContainerBuilder $container, array $config, bool $useDoctrine)
+    private function registerDoctrineExtensionConfiguration(ContainerBuilder $container, array $config, bool $useDoctrine): void
     {
         if (!$useDoctrine || $config['eager_loading']['enabled']) {
             return;
@@ -456,7 +456,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $container->removeDefinition('api_platform.doctrine.orm.query_extension.filter_eager_loading');
     }
 
-    private function registerHttpCacheConfiguration(ContainerBuilder $container, array $config, XmlFileLoader $loader, bool $useDoctrine)
+    private function registerHttpCacheConfiguration(ContainerBuilder $container, array $config, XmlFileLoader $loader, bool $useDoctrine): void
     {
         $loader->load('http_cache.xml');
 
@@ -500,7 +500,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
     /**
      * Registers the Validator configuration.
      */
-    private function registerValidatorConfiguration(ContainerBuilder $container, array $config)
+    private function registerValidatorConfiguration(ContainerBuilder $container, array $config): void
     {
         if (!$config['validator']) {
             return;
@@ -512,7 +512,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
     /**
      * Registers the DataCollector configuration.
      */
-    private function registerDataCollectorConfiguration(array $config, XmlFileLoader $loader)
+    private function registerDataCollectorConfiguration(array $config, XmlFileLoader $loader): void
     {
         if (!$config['enable_profiler']) {
             return;

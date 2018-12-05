@@ -42,7 +42,7 @@ use Symfony\Component\Serializer\SerializerInterface;
  */
 class ItemNormalizerTest extends TestCase
 {
-    public function testSupportDenormalization()
+    public function testSupportDenormalization(): void
     {
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
         $resourceClassResolverProphecy->isResourceClass(Dummy::class)->willReturn(true)->shouldBeCalled();
@@ -63,7 +63,7 @@ class ItemNormalizerTest extends TestCase
         $this->assertTrue($normalizer->hasCacheableSupportsMethod());
     }
 
-    public function testSupportNormalization()
+    public function testSupportNormalization(): void
     {
         $std = new \stdClass();
         $dummy = new Dummy();
@@ -87,7 +87,7 @@ class ItemNormalizerTest extends TestCase
         $this->assertFalse($normalizer->supportsNormalization($std, ItemNormalizer::FORMAT));
     }
 
-    public function testNormalize()
+    public function testNormalize(): void
     {
         $dummy = new Dummy();
         $dummy->setId(10);
@@ -150,7 +150,7 @@ class ItemNormalizerTest extends TestCase
         );
     }
 
-    public function testNormalizeIsNotAnArray()
+    public function testNormalizeIsNotAnArray(): void
     {
         $object = new \stdClass();
         $object->object = $object;
@@ -179,7 +179,7 @@ class ItemNormalizerTest extends TestCase
                 'circular_reference_limit' => $circularReferenceLimit,
                 'circular_reference_handler' => $circularReferenceHandler,
                 'circular_reference_limit_counters' => [spl_object_hash($object) => 2],
-                'cache_error' => function () {},
+                'cache_error' => function (): void {},
             ];
         } else {
             $normalizer->setCircularReferenceLimit($circularReferenceLimit);
@@ -187,14 +187,14 @@ class ItemNormalizerTest extends TestCase
 
             $context = [
                 'circular_reference_limit' => [spl_object_hash($object) => 2],
-                'cache_error' => function () {},
+                'cache_error' => function (): void {},
             ];
         }
 
         $this->assertEquals('object', $normalizer->normalize($object, ItemNormalizer::FORMAT, $context));
     }
 
-    public function testNormalizeThrowsNoSuchPropertyException()
+    public function testNormalizeThrowsNoSuchPropertyException(): void
     {
         $this->expectException(NoSuchPropertyException::class);
 
@@ -225,7 +225,7 @@ class ItemNormalizerTest extends TestCase
         $normalizer->normalize($foo, ItemNormalizer::FORMAT);
     }
 
-    public function testDenormalize()
+    public function testDenormalize(): void
     {
         $relatedDummy1 = new RelatedDummy();
         $relatedDummy1->setId(1);
@@ -336,7 +336,7 @@ class ItemNormalizerTest extends TestCase
         );
     }
 
-    public function testDenormalizeUpdateOperationNotAllowed()
+    public function testDenormalizeUpdateOperationNotAllowed(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Update is not allowed for this operation.');
@@ -366,7 +366,7 @@ class ItemNormalizerTest extends TestCase
         );
     }
 
-    public function testDenormalizeCollectionIsNotArray()
+    public function testDenormalizeCollectionIsNotArray(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('The type of the "relatedDummies" attribute must be "array", "string" given.');
@@ -418,7 +418,7 @@ class ItemNormalizerTest extends TestCase
         );
     }
 
-    public function testDenormalizeCollectionWithInvalidKey()
+    public function testDenormalizeCollectionWithInvalidKey(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('The type of the key "0" must be "string", "integer" given.');
@@ -475,7 +475,7 @@ class ItemNormalizerTest extends TestCase
         );
     }
 
-    public function testDenormalizeRelationIsNotResourceLinkage()
+    public function testDenormalizeRelationIsNotResourceLinkage(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Only resource linkage supported currently, see: http://jsonapi.org/format/#document-resource-object-linkage.');

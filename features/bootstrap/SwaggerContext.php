@@ -30,7 +30,7 @@ final class SwaggerContext implements Context
      *
      * @BeforeScenario
      */
-    public function gatherContexts(BeforeScenarioScope $scope)
+    public function gatherContexts(BeforeScenarioScope $scope): void
     {
         /** @var InitializedContextEnvironment $environment */
         $environment = $scope->getEnvironment();
@@ -40,7 +40,7 @@ final class SwaggerContext implements Context
     /**
      * @Then the Swagger class :class exists
      */
-    public function assertTheSwaggerClassExist(string $className)
+    public function assertTheSwaggerClassExist(string $className): void
     {
         try {
             $this->getClassInfo($className);
@@ -52,7 +52,7 @@ final class SwaggerContext implements Context
     /**
      * @Then the Swagger class :class doesn't exist
      */
-    public function assertTheSwaggerClassNotExist(string $className)
+    public function assertTheSwaggerClassNotExist(string $className): void
     {
         try {
             $this->getClassInfo($className);
@@ -66,7 +66,7 @@ final class SwaggerContext implements Context
     /**
      * @Then the Swagger path :arg1 exists
      */
-    public function assertThePathExist(string $path)
+    public function assertThePathExist(string $path): void
     {
         $json = $this->getLastJsonResponse();
 
@@ -76,7 +76,7 @@ final class SwaggerContext implements Context
     /**
      * @Then :prop property exists for the Swagger class :class
      */
-    public function assertPropertyExist(string $propertyName, string $className)
+    public function assertPropertyExist(string $propertyName, string $className): void
     {
         try {
             $this->getPropertyInfo($propertyName, $className);
@@ -88,7 +88,7 @@ final class SwaggerContext implements Context
     /**
      * @Then :prop property is required for Swagger class :class
      */
-    public function assertPropertyIsRequired(string $propertyName, string $className)
+    public function assertPropertyIsRequired(string $propertyName, string $className): void
     {
         if (!\in_array($propertyName, $this->getClassInfo($className)->required, true)) {
             throw new ExpectationFailedException(sprintf('Property "%s" of class "%s" should be required', $propertyName, $className));

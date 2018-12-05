@@ -56,7 +56,7 @@ class FooDummy
         return $this->id;
     }
 
-    public function setName($name)
+    public function setName($name): void
     {
         $this->name = $name;
     }
@@ -71,7 +71,7 @@ class FooDummy
         return $this->dummy;
     }
 
-    public function setDummy(Dummy $dummy)
+    public function setDummy(Dummy $dummy): void
     {
         $this->dummy = $dummy;
     }

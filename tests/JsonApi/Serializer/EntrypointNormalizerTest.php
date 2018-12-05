@@ -31,7 +31,7 @@ use PHPUnit\Framework\TestCase;
  */
 class EntrypointNormalizerTest extends TestCase
 {
-    public function testSupportNormalization()
+    public function testSupportNormalization(): void
     {
         $collection = new ResourceNameCollection();
         $entrypoint = new Entrypoint($collection);
@@ -48,7 +48,7 @@ class EntrypointNormalizerTest extends TestCase
         $this->assertTrue($normalizer->hasCacheableSupportsMethod());
     }
 
-    public function testNormalize()
+    public function testNormalize(): void
     {
         $collection = new ResourceNameCollection([Dummy::class, RelatedDummy::class, DummyCar::class]);
         $entrypoint = new Entrypoint($collection);

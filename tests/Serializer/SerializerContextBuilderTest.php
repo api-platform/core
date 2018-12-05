@@ -31,7 +31,7 @@ class SerializerContextBuilderTest extends TestCase
      */
     private $builder;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $resourceMetadata = new ResourceMetadata(
             null,
@@ -51,7 +51,7 @@ class SerializerContextBuilderTest extends TestCase
         $this->builder = new SerializerContextBuilder($resourceMetadataFactoryProphecy->reveal());
     }
 
-    public function testCreateFromRequest()
+    public function testCreateFromRequest(): void
     {
         $request = Request::create('/foos/1');
         $request->attributes->replace(['_api_resource_class' => 'Foo', '_api_item_operation_name' => 'get', '_api_format' => 'xml', '_api_mime_type' => 'text/xml']);
@@ -84,14 +84,14 @@ class SerializerContextBuilderTest extends TestCase
         $this->assertEquals($expected, $this->builder->createFromRequest($request, false));
     }
 
-    public function testThrowExceptionOnInvalidRequest()
+    public function testThrowExceptionOnInvalidRequest(): void
     {
         $this->expectException(RuntimeException::class);
 
         $this->builder->createFromRequest(new Request(), false);
     }
 
-    public function testReuseExistingAttributes()
+    public function testReuseExistingAttributes(): void
     {
         $expected = ['bar' => 'baz', 'item_operation_name' => 'get', 'resource_class' => 'Foo', 'request_uri' => '/foos/1', 'api_allow_update' => false, 'operation_type' => 'item', 'uri' => 'http://localhost/foos/1'];
         $this->assertEquals($expected, $this->builder->createFromRequest(Request::create('/foos/1'), false, ['resource_class' => 'Foo', 'item_operation_name' => 'get']));

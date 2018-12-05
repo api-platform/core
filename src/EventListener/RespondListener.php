@@ -31,7 +31,7 @@ final class RespondListener
     /**
      * Creates a Response to send to the client according to the requested format.
      */
-    public function onKernelView(GetResponseForControllerResultEvent $event)
+    public function onKernelView(GetResponseForControllerResultEvent $event): void
     {
         $controllerResult = $event->getControllerResult();
         $request = $event->getRequest();

@@ -63,7 +63,7 @@ class FourthLevel
     /**
      * @param int $level
      */
-    public function setLevel($level)
+    public function setLevel($level): void
     {
         $this->level = $level;
     }

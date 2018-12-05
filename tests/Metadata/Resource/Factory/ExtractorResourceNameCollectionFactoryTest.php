@@ -29,7 +29,7 @@ use PHPUnit\Framework\TestCase;
  */
 class ExtractorResourceNameCollectionFactoryTest extends TestCase
 {
-    public function testXmlResourceName()
+    public function testXmlResourceName(): void
     {
         $configPath = __DIR__.'/../../../Fixtures/FileConfigurations/resources.xml';
         $factory = new ExtractorResourceNameCollectionFactory(new XmlExtractor([$configPath]));
@@ -40,7 +40,7 @@ class ExtractorResourceNameCollectionFactoryTest extends TestCase
         ]));
     }
 
-    public function testInvalidExtractorResourceNameCollectionFactory()
+    public function testInvalidExtractorResourceNameCollectionFactory(): void
     {
         $this->expectException(InvalidArgumentException::class);
 
@@ -49,7 +49,7 @@ class ExtractorResourceNameCollectionFactoryTest extends TestCase
         $factory->create();
     }
 
-    public function testYamlResourceName()
+    public function testYamlResourceName(): void
     {
         $configPath = __DIR__.'/../../../Fixtures/FileConfigurations/resources.yml';
         $factory = new ExtractorResourceNameCollectionFactory(new YamlExtractor([$configPath]));
@@ -60,7 +60,7 @@ class ExtractorResourceNameCollectionFactoryTest extends TestCase
         ]));
     }
 
-    public function testYamlSingleResourceName()
+    public function testYamlSingleResourceName(): void
     {
         $configPath = __DIR__.'/../../../Fixtures/FileConfigurations/single_resource.yml';
         $factory = new ExtractorResourceNameCollectionFactory(new YamlExtractor([$configPath]));
@@ -68,7 +68,7 @@ class ExtractorResourceNameCollectionFactoryTest extends TestCase
         $this->assertEquals($factory->create(), new ResourceNameCollection([FileConfigDummy::class]));
     }
 
-    public function testCreateWithMalformedYaml()
+    public function testCreateWithMalformedYaml(): void
     {
         $this->expectException(InvalidArgumentException::class);
 

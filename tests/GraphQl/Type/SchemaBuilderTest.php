@@ -36,7 +36,7 @@ use Symfony\Component\PropertyInfo\Type;
  */
 class SchemaBuilderTest extends TestCase
 {
-    public function testGetSchemaAllFields()
+    public function testGetSchemaAllFields(): void
     {
         $propertyMetadataMockBuilder = function ($builtinType, $resourceClassName) {
             return new PropertyMetadata(
@@ -67,7 +67,7 @@ class SchemaBuilderTest extends TestCase
         ], array_keys($mockedSchemaBuilder->getSchema()->getConfig()->getQuery()->getFields()));
     }
 
-    public function testGetSchemaResourceClassNotFound()
+    public function testGetSchemaResourceClassNotFound(): void
     {
         $propertyMetadataMockBuilder = function ($builtinType, $resourceClassName) {
             return new PropertyMetadata(
@@ -95,7 +95,7 @@ class SchemaBuilderTest extends TestCase
         $this->assertArrayNotHasKey('objectProperty', $type->getFields());
     }
 
-    public function testConvertFilterArgsToTypes()
+    public function testConvertFilterArgsToTypes(): void
     {
         $propertyMetadataMockBuilder = function ($builtinType, $resourceClassName) {
             return new PropertyMetadata();
@@ -124,7 +124,7 @@ class SchemaBuilderTest extends TestCase
     /**
      * @dataProvider paginationProvider
      */
-    public function testGetSchema(bool $paginationEnabled)
+    public function testGetSchema(bool $paginationEnabled): void
     {
         $propertyMetadataMockBuilder = function ($builtinType, $resourceClassName) {
             return new PropertyMetadata(
@@ -213,7 +213,7 @@ class SchemaBuilderTest extends TestCase
     /**
      * Tests that the GraphQL SchemaBuilder supports an edge case where a property is typed as an Type::BUILTIN_TYPE_OBJECT but has no class related.
      */
-    public function testObjectTypeWithoutClass()
+    public function testObjectTypeWithoutClass(): void
     {
         $propertyMetadataMockBuilder = function ($builtinType, $resourceClassName) {
             return new PropertyMetadata(
@@ -288,9 +288,9 @@ class SchemaBuilderTest extends TestCase
         $resourceNameCollection = new ResourceNameCollection($resourceClassNames);
         $resourceNameCollectionFactoryProphecy->create()->willReturn($resourceNameCollection);
 
-        $collectionResolverFactoryProphecy->__invoke(Argument::cetera())->willReturn(function () {
+        $collectionResolverFactoryProphecy->__invoke(Argument::cetera())->willReturn(function (): void {
         });
-        $itemMutationResolverFactoryProphecy->__invoke(Argument::cetera())->willReturn(function () {
+        $itemMutationResolverFactoryProphecy->__invoke(Argument::cetera())->willReturn(function (): void {
         });
 
         return new SchemaBuilder(
@@ -300,9 +300,9 @@ class SchemaBuilderTest extends TestCase
             $resourceMetadataFactoryProphecy->reveal(),
             $collectionResolverFactoryProphecy->reveal(),
             $itemMutationResolverFactoryProphecy->reveal(),
-            function () {
+            function (): void {
             },
-            function () {
+            function (): void {
             },
             null,
             $paginationEnabled

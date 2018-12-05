@@ -54,7 +54,7 @@ abstract class AbstractDummy
         return $this->id;
     }
 
-    public function setName($name)
+    public function setName($name): void
     {
         $this->name = $name;
     }

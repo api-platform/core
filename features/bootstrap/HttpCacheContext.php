@@ -25,7 +25,7 @@ final class HttpCacheContext implements KernelAwareContext
      */
     private $kernel;
 
-    public function setKernel(KernelInterface $kernel)
+    public function setKernel(KernelInterface $kernel): void
     {
         $this->kernel = $kernel;
     }
@@ -33,7 +33,7 @@ final class HttpCacheContext implements KernelAwareContext
     /**
      * @Then :iris IRIs should be purged
      */
-    public function irisShouldBePurged(string $iris)
+    public function irisShouldBePurged(string $iris): void
     {
         $purger = $this->kernel->getContainer()->get('test.api_platform.http_cache.purger');
 

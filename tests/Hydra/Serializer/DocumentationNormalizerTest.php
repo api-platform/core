@@ -37,7 +37,7 @@ use Symfony\Component\PropertyInfo\Type;
  */
 class DocumentationNormalizerTest extends TestCase
 {
-    public function testNormalize()
+    public function testNormalize(): void
     {
         $title = 'Test Api';
         $desc = 'test ApiGerard';

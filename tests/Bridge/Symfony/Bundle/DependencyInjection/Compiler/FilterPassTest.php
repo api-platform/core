@@ -26,7 +26,7 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class FilterPassTest extends TestCase
 {
-    public function testProcess()
+    public function testProcess(): void
     {
         $filterPass = new FilterPass();
 
@@ -48,7 +48,7 @@ class FilterPassTest extends TestCase
         $filterPass->process($containerBuilderProphecy->reveal());
     }
 
-    public function testIdNotExist()
+    public function testIdNotExist(): void
     {
         $filterPass = new FilterPass();
 

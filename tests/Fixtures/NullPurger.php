@@ -22,7 +22,7 @@ final class NullPurger implements PurgerInterface
 {
     private $iris = [];
 
-    public function purge(array $iris)
+    public function purge(array $iris): void
     {
         $this->iris = $iris;
     }
@@ -32,7 +32,7 @@ final class NullPurger implements PurgerInterface
         return $this->iris;
     }
 
-    public function clear()
+    public function clear(): void
     {
         $this->iris = [];
     }

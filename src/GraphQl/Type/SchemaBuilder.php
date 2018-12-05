@@ -245,7 +245,7 @@ final class SchemaBuilder implements SchemaBuilderInterface
                         if (array_key_exists($key, $parsed) && \is_array($parsed[$key])) {
                             $parsed = [$key => ''];
                         }
-                        array_walk_recursive($parsed, function (&$value) use ($graphqlFilterType) {
+                        array_walk_recursive($parsed, function (&$value) use ($graphqlFilterType): void {
                             $value = $graphqlFilterType;
                         });
                         $args = $this->mergeFilterArgs($args, $parsed, $resourceMetadata, $key);

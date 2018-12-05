@@ -22,7 +22,7 @@ use PHPUnit\Framework\TestCase;
  */
 class IriHelperTest extends TestCase
 {
-    public function testHelpers()
+    public function testHelpers(): void
     {
         $parsed = [
             'parts' => [
@@ -39,7 +39,7 @@ class IriHelperTest extends TestCase
         $this->assertEquals('/hello.json?foo=bar&bar=3&page=2', IriHelper::createIri($parsed['parts'], $parsed['parameters'], 'page', 2.));
     }
 
-    public function testHelpersWithAbsoluteUrl()
+    public function testHelpersWithAbsoluteUrl(): void
     {
         $parsed = [
             'parts' => [
@@ -70,7 +70,7 @@ class IriHelperTest extends TestCase
         $this->assertEquals('https://foo:bar@localhost:443/hello.json?foo=bar&bar=3&page=2#foo', IriHelper::createIri($parsed['parts'], $parsed['parameters'], 'page', 2., true));
     }
 
-    public function testParseIriWithInvalidUrl()
+    public function testParseIriWithInvalidUrl(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('The request URI "http:///" is malformed.');

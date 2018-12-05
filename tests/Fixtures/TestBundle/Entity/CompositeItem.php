@@ -69,7 +69,7 @@ class CompositeItem
      *
      * @param string|null $field1 the value to set
      */
-    public function setField1($field1 = null)
+    public function setField1($field1 = null): void
     {
         $this->field1 = $field1;
     }

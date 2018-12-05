@@ -24,7 +24,7 @@ use PHPUnit\Framework\TestCase;
  */
 class AnnotationResourceNameCollectionFactoryTest extends TestCase
 {
-    public function testCreate()
+    public function testCreate(): void
     {
         $decorated = $this->prophesize(ResourceNameCollectionFactoryInterface::class);
         $decorated->create()->willReturn(new ResourceNameCollection(['foo', 'bar']))->shouldBeCalled();

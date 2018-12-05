@@ -32,14 +32,14 @@ class EntrypointActionTest extends TestCase
     /**
      * Hack to avoid transient failing test because of Date header.
      */
-    private function assertEqualsWithoutDateHeader(JsonResponse $expected, Response $actual)
+    private function assertEqualsWithoutDateHeader(JsonResponse $expected, Response $actual): void
     {
         $expected->headers->remove('Date');
         $actual->headers->remove('Date');
         $this->assertEquals($expected, $actual);
     }
 
-    public function testGetAction()
+    public function testGetAction(): void
     {
         $request = new Request(['query' => 'graphqlQuery', 'variables' => '["graphqlVariable"]', 'operation' => 'graphqlOperationName']);
         $request->setRequestFormat('json');
@@ -48,7 +48,7 @@ class EntrypointActionTest extends TestCase
         $this->assertEqualsWithoutDateHeader(new JsonResponse(['GraphQL']), $mockedEntrypoint($request));
     }
 
-    public function testPostRawAction()
+    public function testPostRawAction(): void
     {
         $request = new Request(['variables' => '["graphqlVariable"]', 'operation' => 'graphqlOperationName'], [], [], [], [], [], 'graphqlQuery');
         $request->setMethod('POST');
@@ -58,7 +58,7 @@ class EntrypointActionTest extends TestCase
         $this->assertEqualsWithoutDateHeader(new JsonResponse(['GraphQL']), $mockedEntrypoint($request));
     }
 
-    public function testPostJsonAction()
+    public function testPostJsonAction(): void
     {
         $request = new Request([], [], [], [], [], [], '{"query": "graphqlQuery", "variables": "[\"graphqlVariable\"]", "operation": "graphqlOperationName"}');
         $request->setMethod('POST');
@@ -68,7 +68,7 @@ class EntrypointActionTest extends TestCase
         $this->assertEqualsWithoutDateHeader(new JsonResponse(['GraphQL']), $mockedEntrypoint($request));
     }
 
-    public function testBadContentTypePostAction()
+    public function testBadContentTypePostAction(): void
     {
         $request = new Request();
         $request->setMethod('POST');
@@ -79,7 +79,7 @@ class EntrypointActionTest extends TestCase
         $this->assertEquals('{"errors":[{"message":"GraphQL query is not valid","extensions":{"category":"graphql"}}]}', $mockedEntrypoint($request)->getContent());
     }
 
-    public function testBadMethodAction()
+    public function testBadMethodAction(): void
     {
         $request = new Request();
         $request->setMethod('PUT');
@@ -89,7 +89,7 @@ class EntrypointActionTest extends TestCase
         $this->assertEquals('{"errors":[{"message":"GraphQL query is not valid","extensions":{"category":"graphql"}}]}', $mockedEntrypoint($request)->getContent());
     }
 
-    public function testBadVariablesAction()
+    public function testBadVariablesAction(): void
     {
         $request = new Request(['query' => 'graphqlQuery', 'variables' => 'graphqlVariable', 'operation' => 'graphqlOperationName']);
         $request->setRequestFormat('json');

@@ -32,7 +32,7 @@ class WriteListenerTest extends TestCase
     /**
      * @expectedDeprecation The ApiPlatform\Core\Bridge\Doctrine\EventListener\WriteListener class is deprecated since version 2.2 and will be removed in 3.0. Use the ApiPlatform\Core\EventListener\WriteListener class instead.
      */
-    public function testOnKernelViewWithControllerResultAndPostMethod()
+    public function testOnKernelViewWithControllerResultAndPostMethod(): void
     {
         $dummy = new Dummy();
         $dummy->setName('Dummyrino');
@@ -57,7 +57,7 @@ class WriteListenerTest extends TestCase
     /**
      * @expectedDeprecation The ApiPlatform\Core\Bridge\Doctrine\EventListener\WriteListener class is deprecated since version 2.2 and will be removed in 3.0. Use the ApiPlatform\Core\EventListener\WriteListener class instead.
      */
-    public function testOnKernelViewWithControllerResultAndDeleteMethod()
+    public function testOnKernelViewWithControllerResultAndDeleteMethod(): void
     {
         $dummy = new Dummy();
         $dummy->setName('Dummyrino');
@@ -83,7 +83,7 @@ class WriteListenerTest extends TestCase
     /**
      * @expectedDeprecation The ApiPlatform\Core\Bridge\Doctrine\EventListener\WriteListener class is deprecated since version 2.2 and will be removed in 3.0. Use the ApiPlatform\Core\EventListener\WriteListener class instead.
      */
-    public function testOnKernelViewWithSafeMethod()
+    public function testOnKernelViewWithSafeMethod(): void
     {
         $dummy = new Dummy();
         $dummy->setName('Dummyrino');
@@ -103,7 +103,7 @@ class WriteListenerTest extends TestCase
     /**
      * @expectedDeprecation The ApiPlatform\Core\Bridge\Doctrine\EventListener\WriteListener class is deprecated since version 2.2 and will be removed in 3.0. Use the ApiPlatform\Core\EventListener\WriteListener class instead.
      */
-    public function testOnKernelViewWithNoResourceClass()
+    public function testOnKernelViewWithNoResourceClass(): void
     {
         $dummy = new Dummy();
         $dummy->setName('Dummyrino');
@@ -123,7 +123,7 @@ class WriteListenerTest extends TestCase
     /**
      * @expectedDeprecation The ApiPlatform\Core\Bridge\Doctrine\EventListener\WriteListener class is deprecated since version 2.2 and will be removed in 3.0. Use the ApiPlatform\Core\EventListener\WriteListener class instead.
      */
-    public function testOnKernelViewWithNoManager()
+    public function testOnKernelViewWithNoManager(): void
     {
         $dummy = new Dummy();
         $dummy->setName('Dummyrino');

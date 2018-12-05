@@ -34,7 +34,7 @@ class ExtractorPropertyMetadataFactoryTest extends FileConfigurationMetadataFact
     /**
      * @dataProvider propertyMetadataProvider
      */
-    public function testCreateXml(PropertyMetadata $expectedPropertyMetadata)
+    public function testCreateXml(PropertyMetadata $expectedPropertyMetadata): void
     {
         $configPath = __DIR__.'/../../../Fixtures/FileConfigurations/resources.xml';
 
@@ -48,7 +48,7 @@ class ExtractorPropertyMetadataFactoryTest extends FileConfigurationMetadataFact
     /**
      * @dataProvider decoratedPropertyMetadataProvider
      */
-    public function testCreateWithParentPropertyMetadataFactoryXml(PropertyMetadata $expectedPropertyMetadata)
+    public function testCreateWithParentPropertyMetadataFactoryXml(PropertyMetadata $expectedPropertyMetadata): void
     {
         $configPath = __DIR__.'/../../../Fixtures/FileConfigurations/resources.xml';
 
@@ -65,7 +65,7 @@ class ExtractorPropertyMetadataFactoryTest extends FileConfigurationMetadataFact
         $this->assertEquals($expectedPropertyMetadata, $propertyMetadata);
     }
 
-    public function testCreateWithNonexistentResourceXml()
+    public function testCreateWithNonexistentResourceXml(): void
     {
         $this->expectException(PropertyNotFoundException::class);
         $this->expectExceptionMessage('Property "foo" of the resource class "ApiPlatform\\Core\\Tests\\Fixtures\\TestBundle\\Entity\\ThisDoesNotExist" not found.');
@@ -75,7 +75,7 @@ class ExtractorPropertyMetadataFactoryTest extends FileConfigurationMetadataFact
         (new ExtractorPropertyMetadataFactory(new XmlExtractor([$configPath])))->create('ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\ThisDoesNotExist', 'foo');
     }
 
-    public function testCreateWithNonexistentPropertyXml()
+    public function testCreateWithNonexistentPropertyXml(): void
     {
         $this->expectException(PropertyNotFoundException::class);
         $this->expectExceptionMessage('Property "bar" of the resource class "ApiPlatform\\Core\\Tests\\Fixtures\\TestBundle\\Entity\\FileConfigDummy" not found.');
@@ -85,7 +85,7 @@ class ExtractorPropertyMetadataFactoryTest extends FileConfigurationMetadataFact
         (new ExtractorPropertyMetadataFactory(new XmlExtractor([$configPath])))->create(FileConfigDummy::class, 'bar');
     }
 
-    public function testCreateWithInvalidXml()
+    public function testCreateWithInvalidXml(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessageRegExp('#.+Element \'\\{https://api-platform.com/schema/metadata\\}foo\': This element is not expected\\..+#');
@@ -98,7 +98,7 @@ class ExtractorPropertyMetadataFactoryTest extends FileConfigurationMetadataFact
     /**
      * @dataProvider propertyMetadataProvider
      */
-    public function testCreateYaml(PropertyMetadata $expectedPropertyMetadata)
+    public function testCreateYaml(PropertyMetadata $expectedPropertyMetadata): void
     {
         $configPath = __DIR__.'/../../../Fixtures/FileConfigurations/resources.yml';
 
@@ -112,7 +112,7 @@ class ExtractorPropertyMetadataFactoryTest extends FileConfigurationMetadataFact
     /**
      * @dataProvider decoratedPropertyMetadataProvider
      */
-    public function testCreateWithParentPropertyMetadataFactoryYaml(PropertyMetadata $expectedPropertyMetadata)
+    public function testCreateWithParentPropertyMetadataFactoryYaml(PropertyMetadata $expectedPropertyMetadata): void
     {
         $configPath = __DIR__.'/../../../Fixtures/FileConfigurations/resources.yml';
 
@@ -132,7 +132,7 @@ class ExtractorPropertyMetadataFactoryTest extends FileConfigurationMetadataFact
     /**
      * @dataProvider decoratedPropertyMetadataProvider
      */
-    public function testCreateWithCollectionTypedParentPropertyMetadataFactoryYaml(PropertyMetadata $expectedPropertyMetadata)
+    public function testCreateWithCollectionTypedParentPropertyMetadataFactoryYaml(PropertyMetadata $expectedPropertyMetadata): void
     {
         $configPath = __DIR__.'/../../../Fixtures/FileConfigurations/resources.yml';
 
@@ -163,7 +163,7 @@ class ExtractorPropertyMetadataFactoryTest extends FileConfigurationMetadataFact
     /**
      * @dataProvider decoratedPropertyMetadataProvider
      */
-    public function testCreateWithTypedParentPropertyMetadataFactoryYaml(PropertyMetadata $expectedPropertyMetadata)
+    public function testCreateWithTypedParentPropertyMetadataFactoryYaml(PropertyMetadata $expectedPropertyMetadata): void
     {
         $configPath = __DIR__.'/../../../Fixtures/FileConfigurations/resources.yml';
 
@@ -185,7 +185,7 @@ class ExtractorPropertyMetadataFactoryTest extends FileConfigurationMetadataFact
         $this->assertEquals($expectedPropertyMetadata, $propertyMetadata);
     }
 
-    public function testCreateWithNonexistentResourceYaml()
+    public function testCreateWithNonexistentResourceYaml(): void
     {
         $this->expectException(PropertyNotFoundException::class);
         $this->expectExceptionMessage('Property "foo" of the resource class "ApiPlatform\\Core\\Tests\\Fixtures\\TestBundle\\Entity\\ThisDoesNotExist" not found.');
@@ -195,7 +195,7 @@ class ExtractorPropertyMetadataFactoryTest extends FileConfigurationMetadataFact
         (new ExtractorPropertyMetadataFactory(new YamlExtractor([$configPath])))->create('ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\ThisDoesNotExist', 'foo');
     }
 
-    public function testCreateWithNonexistentPropertyYaml()
+    public function testCreateWithNonexistentPropertyYaml(): void
     {
         $this->expectException(PropertyNotFoundException::class);
         $this->expectExceptionMessage('Property "bar" of the resource class "ApiPlatform\\Core\\Tests\\Fixtures\\TestBundle\\Entity\\FileConfigDummy" not found.');
@@ -205,7 +205,7 @@ class ExtractorPropertyMetadataFactoryTest extends FileConfigurationMetadataFact
         (new ExtractorPropertyMetadataFactory(new YamlExtractor([$configPath])))->create(FileConfigDummy::class, 'bar');
     }
 
-    public function testCreateWithMalformedResourcesSettingYaml()
+    public function testCreateWithMalformedResourcesSettingYaml(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessageRegExp('/"resources" setting is expected to be null or an array, string given in ".+\\/\\.\\.\\/\\.\\.\\/\\.\\.\\/Fixtures\\/FileConfigurations\\/resourcesinvalid\\.yml"\\./');
@@ -215,7 +215,7 @@ class ExtractorPropertyMetadataFactoryTest extends FileConfigurationMetadataFact
         (new ExtractorPropertyMetadataFactory(new YamlExtractor([$configPath])))->create(FileConfigDummy::class, 'foo');
     }
 
-    public function testCreateWithMalformedPropertiesSettingYaml()
+    public function testCreateWithMalformedPropertiesSettingYaml(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessageRegExp('/"properties" setting is expected to be null or an array, string given in ".+\\/\\.\\.\\/\\.\\.\\/\\.\\.\\/Fixtures\\/FileConfigurations\\/propertiesinvalid\\.yml"\\./');
@@ -225,7 +225,7 @@ class ExtractorPropertyMetadataFactoryTest extends FileConfigurationMetadataFact
         (new ExtractorPropertyMetadataFactory(new YamlExtractor([$configPath])))->create(FileConfigDummy::class, 'foo');
     }
 
-    public function testCreateWithMalformedPropertySettingYaml()
+    public function testCreateWithMalformedPropertySettingYaml(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessageRegExp('/"foo" setting is expected to be null or an array, string given in ".+\\/\\.\\.\\/\\.\\.\\/\\.\\.\\/Fixtures\\/FileConfigurations\\/propertyinvalid\\.yml"\\./');
@@ -235,7 +235,7 @@ class ExtractorPropertyMetadataFactoryTest extends FileConfigurationMetadataFact
         (new ExtractorPropertyMetadataFactory(new YamlExtractor([$configPath])))->create(FileConfigDummy::class, 'foo');
     }
 
-    public function testCreateWithMalformedYaml()
+    public function testCreateWithMalformedYaml(): void
     {
         $this->expectException(InvalidArgumentException::class);
 

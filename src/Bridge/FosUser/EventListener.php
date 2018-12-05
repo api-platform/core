@@ -36,7 +36,7 @@ final class EventListener
     /**
      * Persists, updates or delete data return by the controller if applicable.
      */
-    public function onKernelView(GetResponseForControllerResultEvent $event)
+    public function onKernelView(GetResponseForControllerResultEvent $event): void
     {
         $request = $event->getRequest();
         if (!RequestAttributesExtractor::extractAttributes($request)) {

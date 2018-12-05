@@ -31,7 +31,7 @@ final class TransformSortingParametersListener
         $this->orderParameterName = $orderParameterName;
     }
 
-    public function onKernelRequest(GetResponseEvent $event)
+    public function onKernelRequest(GetResponseEvent $event): void
     {
         $request = $event->getRequest();
 

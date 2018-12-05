@@ -21,7 +21,7 @@ use PHPUnit\Framework\TestCase;
  */
 class ApiPropertyTest extends TestCase
 {
-    public function testAssignation()
+    public function testAssignation(): void
     {
         $property = new ApiProperty();
         $property->description = 'description';
@@ -45,7 +45,7 @@ class ApiPropertyTest extends TestCase
         $this->assertEquals(['foo' => 'bar'], $property->attributes);
     }
 
-    public function testConstruct()
+    public function testConstruct(): void
     {
         $property = new ApiProperty([
             'deprecationReason' => 'this field is deprecated',

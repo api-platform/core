@@ -65,7 +65,7 @@ final class DataPersister implements DataPersisterInterface
     /**
      * {@inheritdoc}
      */
-    public function remove($data)
+    public function remove($data): void
     {
         if (!$manager = $this->getManager($data)) {
             return;

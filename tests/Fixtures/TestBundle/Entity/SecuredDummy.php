@@ -84,7 +84,7 @@ class SecuredDummy
         return $this->title;
     }
 
-    public function setTitle(string $title)
+    public function setTitle(string $title): void
     {
         $this->title = $title;
     }
@@ -94,7 +94,7 @@ class SecuredDummy
         return $this->description;
     }
 
-    public function setDescription(string $description)
+    public function setDescription(string $description): void
     {
         $this->description = $description;
     }
@@ -104,7 +104,7 @@ class SecuredDummy
         return $this->owner;
     }
 
-    public function setOwner(string $owner)
+    public function setOwner(string $owner): void
     {
         $this->owner = $owner;
     }

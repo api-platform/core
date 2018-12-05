@@ -22,7 +22,7 @@ use Symfony\Component\PropertyInfo\Type;
  */
 class PropertyMetadataTest extends TestCase
 {
-    public function testValueObject()
+    public function testValueObject(): void
     {
         $type = new Type(Type::BUILTIN_TYPE_STRING);
         $metadata = new PropertyMetadata(new Type(Type::BUILTIN_TYPE_STRING), 'desc', true, true, false, false, true, false, 'http://example.com/foo', null, ['foo' => 'bar']);
@@ -84,7 +84,7 @@ class PropertyMetadataTest extends TestCase
         $this->assertTrue($newMetadata->isInitializable());
     }
 
-    public function testShouldReturnRequiredFalseWhenRequiredTrueIsSetButMaskedByWritableFalse()
+    public function testShouldReturnRequiredFalseWhenRequiredTrueIsSetButMaskedByWritableFalse(): void
     {
         $metadata = new PropertyMetadata();
 
@@ -94,7 +94,7 @@ class PropertyMetadataTest extends TestCase
         $this->assertFalse($metadata->isRequired());
     }
 
-    public function testShouldReturnPreviouslySetRequiredTrueWhenWritableFalseUnmasked()
+    public function testShouldReturnPreviouslySetRequiredTrueWhenWritableFalseUnmasked(): void
     {
         $metadata = new PropertyMetadata();
 

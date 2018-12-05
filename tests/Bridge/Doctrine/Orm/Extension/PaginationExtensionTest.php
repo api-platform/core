@@ -36,7 +36,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
  */
 class PaginationExtensionTest extends TestCase
 {
-    public function testApplyToCollection()
+    public function testApplyToCollection(): void
     {
         $requestStack = new RequestStack();
         $requestStack->push(new Request(['pagination' => true, 'itemsPerPage' => 20, '_page' => 2]));
@@ -68,7 +68,7 @@ class PaginationExtensionTest extends TestCase
         $extension->applyToCollection($queryBuilder, new QueryNameGenerator(), 'Foo', 'op');
     }
 
-    public function testApplyToCollectionWithItemPerPageZero()
+    public function testApplyToCollectionWithItemPerPageZero(): void
     {
         $requestStack = new RequestStack();
         $requestStack->push(new Request(['pagination' => true, 'itemsPerPage' => 0, '_page' => 1]));
@@ -100,7 +100,7 @@ class PaginationExtensionTest extends TestCase
         $extension->applyToCollection($queryBuilder, new QueryNameGenerator(), 'Foo', 'op');
     }
 
-    public function testApplyToCollectionWithItemPerPageZeroAndPage2()
+    public function testApplyToCollectionWithItemPerPageZeroAndPage2(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Page should not be greater than 1 if itemsPerPage is equal to 0');
@@ -135,7 +135,7 @@ class PaginationExtensionTest extends TestCase
         $extension->applyToCollection($queryBuilder, new QueryNameGenerator(), 'Foo', 'op');
     }
 
-    public function testApplyToCollectionWithItemPerPageLessThen0()
+    public function testApplyToCollectionWithItemPerPageLessThen0(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Item per page parameter should not be less than 0');
@@ -170,7 +170,7 @@ class PaginationExtensionTest extends TestCase
         $extension->applyToCollection($queryBuilder, new QueryNameGenerator(), 'Foo', 'op');
     }
 
-    public function testApplyToCollectionWithItemPerPageTooHigh()
+    public function testApplyToCollectionWithItemPerPageTooHigh(): void
     {
         $requestStack = new RequestStack();
         $requestStack->push(new Request(['pagination' => true, 'itemsPerPage' => 301, '_page' => 2]));
@@ -205,7 +205,7 @@ class PaginationExtensionTest extends TestCase
         $extension->applyToCollection($queryBuilder, new QueryNameGenerator(), 'Foo', 'op');
     }
 
-    public function testApplyToCollectionWithGraphql()
+    public function testApplyToCollectionWithGraphql(): void
     {
         $requestStack = new RequestStack();
         $requestStack->push(new Request(['pagination' => true], [], [
@@ -239,7 +239,7 @@ class PaginationExtensionTest extends TestCase
         $extension->applyToCollection($queryBuilder, new QueryNameGenerator(), 'Foo', 'op');
     }
 
-    public function testApplyToCollectionNoRequest()
+    public function testApplyToCollectionNoRequest(): void
     {
         $queryBuilderProphecy = $this->prophesize(QueryBuilder::class);
         $queryBuilderProphecy->setFirstResult(Argument::any())->shouldNotBeCalled();
@@ -254,7 +254,7 @@ class PaginationExtensionTest extends TestCase
         $extension->applyToCollection($queryBuilder, new QueryNameGenerator(), 'Foo', 'op');
     }
 
-    public function testApplyToCollectionEmptyRequest()
+    public function testApplyToCollectionEmptyRequest(): void
     {
         $requestStack = new RequestStack();
         $requestStack->push(new Request());
@@ -276,7 +276,7 @@ class PaginationExtensionTest extends TestCase
         $extension->applyToCollection($queryBuilder, new QueryNameGenerator(), 'Foo', 'op');
     }
 
-    public function testApplyToCollectionPaginationDisabled()
+    public function testApplyToCollectionPaginationDisabled(): void
     {
         $requestStack = new RequestStack();
         $requestStack->push(new Request());
@@ -299,7 +299,7 @@ class PaginationExtensionTest extends TestCase
         $extension->applyToCollection($queryBuilder, new QueryNameGenerator(), 'Foo', 'op');
     }
 
-    public function testApplyToCollectionWithMaximumItemsPerPage()
+    public function testApplyToCollectionWithMaximumItemsPerPage(): void
     {
         $requestStack = new RequestStack();
         $requestStack->push(new Request(['pagination' => true, 'itemsPerPage' => 80, 'page' => 1]));
@@ -334,7 +334,7 @@ class PaginationExtensionTest extends TestCase
         $extension->applyToCollection($queryBuilder, new QueryNameGenerator(), 'Foo', 'op');
     }
 
-    public function testSupportsResult()
+    public function testSupportsResult(): void
     {
         $requestStack = new RequestStack();
         $requestStack->push(new Request());
@@ -351,7 +351,7 @@ class PaginationExtensionTest extends TestCase
         $this->assertTrue($extension->supportsResult('Foo', 'op'));
     }
 
-    public function testSupportsResultNoRequest()
+    public function testSupportsResultNoRequest(): void
     {
         $extension = new PaginationExtension(
             $this->prophesize(ManagerRegistry::class)->reveal(),
@@ -361,7 +361,7 @@ class PaginationExtensionTest extends TestCase
         $this->assertFalse($extension->supportsResult('Foo', 'op'));
     }
 
-    public function testSupportsResultEmptyRequest()
+    public function testSupportsResultEmptyRequest(): void
     {
         $requestStack = new RequestStack();
         $requestStack->push(new Request());
@@ -378,7 +378,7 @@ class PaginationExtensionTest extends TestCase
         $this->assertTrue($extension->supportsResult('Foo', 'op'));
     }
 
-    public function testSupportsResultClientNotAllowedToPaginate()
+    public function testSupportsResultClientNotAllowedToPaginate(): void
     {
         $requestStack = new RequestStack();
         $requestStack->push(new Request(['pagination' => true]));
@@ -397,7 +397,7 @@ class PaginationExtensionTest extends TestCase
         $this->assertFalse($extension->supportsResult('Foo', 'op'));
     }
 
-    public function testSupportsResultPaginationDisabled()
+    public function testSupportsResultPaginationDisabled(): void
     {
         $requestStack = new RequestStack();
         $requestStack->push(new Request());
@@ -415,7 +415,7 @@ class PaginationExtensionTest extends TestCase
         $this->assertFalse($extension->supportsResult('Foo', 'op'));
     }
 
-    public function testGetResult()
+    public function testGetResult(): void
     {
         $result = $this->getPaginationExtensionResult(false);
 
@@ -423,7 +423,7 @@ class PaginationExtensionTest extends TestCase
         $this->assertInstanceOf(PaginatorInterface::class, $result);
     }
 
-    public function testGetResultWithoutFetchJoinCollection()
+    public function testGetResultWithoutFetchJoinCollection(): void
     {
         $result = $this->getPaginationExtensionResult(false, false, false);
 
@@ -431,7 +431,7 @@ class PaginationExtensionTest extends TestCase
         $this->assertInstanceOf(PaginatorInterface::class, $result);
     }
 
-    public function testGetResultWithPartial()
+    public function testGetResultWithPartial(): void
     {
         $result = $this->getPaginationExtensionResult(true);
 
@@ -439,7 +439,7 @@ class PaginationExtensionTest extends TestCase
         $this->assertNotInstanceOf(PaginatorInterface::class, $result);
     }
 
-    public function testSimpleGetResult()
+    public function testSimpleGetResult(): void
     {
         $result = $this->getPaginationExtensionResult(false, true);
 

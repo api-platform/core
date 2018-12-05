@@ -31,7 +31,7 @@ class DeserializeListenerTest extends TestCase
 {
     const FORMATS = ['json' => ['application/json']];
 
-    public function testDoNotCallWhenRequestMethodIsSafe()
+    public function testDoNotCallWhenRequestMethodIsSafe(): void
     {
         $eventProphecy = $this->prophesize(GetResponseEvent::class);
 
@@ -55,7 +55,7 @@ class DeserializeListenerTest extends TestCase
     /**
      * @dataProvider allowedEmptyRequestMethodsProvider
      */
-    public function testDoNotCallWhenSendingAndEmptyRequestContent($method)
+    public function testDoNotCallWhenSendingAndEmptyRequestContent($method): void
     {
         $eventProphecy = $this->prophesize(GetResponseEvent::class);
 
@@ -82,7 +82,7 @@ class DeserializeListenerTest extends TestCase
         return [['PUT'], ['POST']];
     }
 
-    public function testDoNotCallWhenRequestNotManaged()
+    public function testDoNotCallWhenRequestNotManaged(): void
     {
         $eventProphecy = $this->prophesize(GetResponseEvent::class);
 
@@ -103,7 +103,7 @@ class DeserializeListenerTest extends TestCase
         $listener->onKernelRequest($eventProphecy->reveal());
     }
 
-    public function testDoNotCallWhenReceiveFlagIsFalse()
+    public function testDoNotCallWhenReceiveFlagIsFalse(): void
     {
         $eventProphecy = $this->prophesize(GetResponseEvent::class);
 
@@ -127,7 +127,7 @@ class DeserializeListenerTest extends TestCase
     /**
      * @dataProvider methodProvider
      */
-    public function testDeserialize(string $method, bool $populateObject)
+    public function testDeserialize(string $method, bool $populateObject): void
     {
         $result = $populateObject ? new \stdClass() : null;
         $eventProphecy = $this->prophesize(GetResponseEvent::class);
@@ -154,7 +154,7 @@ class DeserializeListenerTest extends TestCase
     /**
      * @dataProvider methodProvider
      */
-    public function testDeserializeResourceClassSupportedFormat(string $method, bool $populateObject)
+    public function testDeserializeResourceClassSupportedFormat(string $method, bool $populateObject): void
     {
         $result = $populateObject ? new \stdClass() : null;
         $eventProphecy = $this->prophesize(GetResponseEvent::class);
@@ -184,7 +184,7 @@ class DeserializeListenerTest extends TestCase
         return [['POST', false], ['PUT', true]];
     }
 
-    public function testContentNegotiation()
+    public function testContentNegotiation(): void
     {
         $eventProphecy = $this->prophesize(GetResponseEvent::class);
 
@@ -211,7 +211,7 @@ class DeserializeListenerTest extends TestCase
         $listener->onKernelRequest($eventProphecy->reveal());
     }
 
-    public function testNotSupportedContentType()
+    public function testNotSupportedContentType(): void
     {
         $this->expectException(NotAcceptableHttpException::class);
         $this->expectExceptionMessage('The content-type "application/rdf+xml" is not supported. Supported MIME types are "application/ld+json", "text/xml".');
@@ -241,7 +241,7 @@ class DeserializeListenerTest extends TestCase
         $listener->onKernelRequest($eventProphecy->reveal());
     }
 
-    public function testNoContentType()
+    public function testNoContentType(): void
     {
         $this->expectException(NotAcceptableHttpException::class);
         $this->expectExceptionMessage('The "Content-Type" header must exist.');
@@ -270,7 +270,7 @@ class DeserializeListenerTest extends TestCase
         $listener->onKernelRequest($eventProphecy->reveal());
     }
 
-    public function testBadFormatsProviderParameterThrowsException()
+    public function testBadFormatsProviderParameterThrowsException(): void
     {
         $this->expectException(\ApiPlatform\Core\Exception\InvalidArgumentException::class);
         $this->expectExceptionMessage('The "$formatsProvider" argument is expected to be an implementation of the "ApiPlatform\\Core\\Api\\FormatsProviderInterface" interface.');
@@ -292,7 +292,7 @@ class DeserializeListenerTest extends TestCase
      * @group legacy
      * @expectedDeprecation Using an array as formats provider is deprecated since API Platform 2.3 and will not be possible anymore in API Platform 3
      */
-    public function testLegacyFormatsParameter()
+    public function testLegacyFormatsParameter(): void
     {
         $serializerProphecy = $this->prophesize(SerializerInterface::class);
         $serializerProphecy->deserialize()->shouldNotBeCalled();

@@ -35,7 +35,7 @@ class RequestDataCollectorTest extends TestCase
     private $metadataFactory;
     private $filterLocator;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->response = $this->createMock(Response::class);
         $this->attributes = $this->prophesize(ParameterBag::class);
@@ -49,7 +49,7 @@ class RequestDataCollectorTest extends TestCase
         $this->filterLocator = $this->prophesize(ContainerInterface::class);
     }
 
-    public function testNoResourceClass()
+    public function testNoResourceClass(): void
     {
         $this->apiResourceClassWillReturn(null);
 
@@ -71,7 +71,7 @@ class RequestDataCollectorTest extends TestCase
         $this->assertNull($dataCollector->getResourceMetadata());
     }
 
-    public function testNotCallingCollect()
+    public function testNotCallingCollect(): void
     {
         $this->request
             ->getAcceptableContentTypes()
@@ -89,7 +89,7 @@ class RequestDataCollectorTest extends TestCase
         $this->assertNull($dataCollector->getResourceMetadata());
     }
 
-    public function testWithResource()
+    public function testWithResource(): void
     {
         $this->apiResourceClassWillReturn(DummyEntity::class, ['_api_item_operation_name' => 'get', '_api_receive' => true]);
         $this->request->attributes = $this->attributes->reveal();
@@ -116,7 +116,7 @@ class RequestDataCollectorTest extends TestCase
         $this->assertSame(ResourceMetadata::class, $dataCollector->getResourceMetadata()->getType());
     }
 
-    private function apiResourceClassWillReturn($data, $context = [])
+    private function apiResourceClassWillReturn($data, $context = []): void
     {
         $this->attributes->get('_api_resource_class')->shouldBeCalled()->willReturn($data);
         $this->attributes->all()->shouldBeCalled()->willReturn([

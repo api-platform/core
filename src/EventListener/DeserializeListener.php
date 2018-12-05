@@ -58,7 +58,7 @@ final class DeserializeListener
     /**
      * Deserializes the data sent in the requested format.
      */
-    public function onKernelRequest(GetResponseEvent $event)
+    public function onKernelRequest(GetResponseEvent $event): void
     {
         $request = $event->getRequest();
         $method = $request->getMethod();

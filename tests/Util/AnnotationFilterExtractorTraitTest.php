@@ -29,13 +29,13 @@ class AnnotationFilterExtractorTraitTest extends KernelTestCase
 {
     private $extractor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         self::bootKernel();
         $this->extractor = new AnnotationFilterExtractor(self::$kernel->getContainer()->get('test.annotation_reader'));
     }
 
-    public function testReadAnnotations()
+    public function testReadAnnotations(): void
     {
         $reflectionClass = new \ReflectionClass(DummyCar::class);
         $readerProphecy = $this->prophesize(Reader::class);
@@ -69,7 +69,7 @@ class AnnotationFilterExtractorTraitTest extends KernelTestCase
         ]);
     }
 
-    public function testReadOrderAnnotations()
+    public function testReadOrderAnnotations(): void
     {
         $reflectionClass = new \ReflectionClass(DummyEntityFilterAnnotated::class);
         $readerProphecy = $this->prophesize(Reader::class);

@@ -29,7 +29,7 @@ use PHPUnit\Framework\TestCase;
  */
 class ChainItemDataProviderTest extends TestCase
 {
-    public function testGetItem()
+    public function testGetItem(): void
     {
         $dummy = new Dummy();
         $dummy->setName('Lucie');
@@ -57,7 +57,7 @@ class ChainItemDataProviderTest extends TestCase
         $this->assertEquals($dummy, $chainItemDataProvider->getItem(Dummy::class, ['id' => 1]));
     }
 
-    public function testGetItemWithoutDenormalizedIdentifiers()
+    public function testGetItemWithoutDenormalizedIdentifiers(): void
     {
         $dummy = new Dummy();
         $dummy->setName('Lucie');
@@ -85,7 +85,7 @@ class ChainItemDataProviderTest extends TestCase
         $this->assertEquals($dummy, $chainItemDataProvider->getItem(Dummy::class, ['id' => 1]));
     }
 
-    public function testGetItemExceptions()
+    public function testGetItemExceptions(): void
     {
         $firstDataProvider = $this->prophesize(ItemDataProviderInterface::class);
         $firstDataProvider->willImplement(RestrictedDataProviderInterface::class);
@@ -100,7 +100,7 @@ class ChainItemDataProviderTest extends TestCase
      * @group legacy
      * @expectedDeprecation Throwing a "ApiPlatform\Core\Exception\ResourceClassNotSupportedException" is deprecated in favor of implementing "ApiPlatform\Core\DataProvider\RestrictedDataProviderInterface"
      */
-    public function testLegacyGetItem()
+    public function testLegacyGetItem(): void
     {
         $dummy = new Dummy();
         $dummy->setName('Lucie');
@@ -123,7 +123,7 @@ class ChainItemDataProviderTest extends TestCase
      * @group legacy
      * @expectedDeprecation Receiving "$id" as non-array in an item data provider is deprecated in 2.3 in favor of implementing "ApiPlatform\Core\DataProvider\DenormalizedIdentifiersAwareItemDataProviderInterface".
      */
-    public function testLegacyGetItemWithoutDenormalizedIdentifiersAndCompositeIdentifier()
+    public function testLegacyGetItemWithoutDenormalizedIdentifiersAndCompositeIdentifier(): void
     {
         $dummy = new CompositePrimitiveItem('Lucie', 1984);
 
@@ -143,7 +143,7 @@ class ChainItemDataProviderTest extends TestCase
      * @group legacy
      * @expectedDeprecation Throwing a "ApiPlatform\Core\Exception\ResourceClassNotSupportedException" is deprecated in favor of implementing "ApiPlatform\Core\DataProvider\RestrictedDataProviderInterface"
      */
-    public function testLegacyGetItemExceptions()
+    public function testLegacyGetItemExceptions(): void
     {
         $firstDataProvider = $this->prophesize(ItemDataProviderInterface::class);
         $firstDataProvider->getItem('notfound', 1, null, [])->willThrow(ResourceClassNotSupportedException::class);

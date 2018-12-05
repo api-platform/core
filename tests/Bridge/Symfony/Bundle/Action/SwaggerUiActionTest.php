@@ -41,7 +41,7 @@ class SwaggerUiActionTest extends TestCase
     /**
      * @dataProvider getInvokeParameters
      */
-    public function testInvoke(Request $request, ProphecyInterface $twigProphecy)
+    public function testInvoke(Request $request, ProphecyInterface $twigProphecy): void
     {
         $resourceNameCollectionFactoryProphecy = $this->prophesize(ResourceNameCollectionFactoryInterface::class);
         $resourceNameCollectionFactoryProphecy->create()->willReturn(new ResourceNameCollection(['Foo', 'Bar']))->shouldBeCalled();
@@ -133,7 +133,7 @@ class SwaggerUiActionTest extends TestCase
     /**
      * @dataProvider getDoNotRunCurrentRequestParameters
      */
-    public function testDoNotRunCurrentRequest(Request $request)
+    public function testDoNotRunCurrentRequest(Request $request): void
     {
         $resourceNameCollectionFactoryProphecy = $this->prophesize(ResourceNameCollectionFactoryInterface::class);
         $resourceNameCollectionFactoryProphecy->create()->willReturn(new ResourceNameCollection(['Foo', 'Bar']))->shouldBeCalled();

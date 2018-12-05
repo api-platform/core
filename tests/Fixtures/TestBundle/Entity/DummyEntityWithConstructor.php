@@ -93,7 +93,7 @@ class DummyEntityWithConstructor
         return $this->baz;
     }
 
-    public function setBaz(string $baz)
+    public function setBaz(string $baz): void
     {
         $this->baz = $baz;
     }

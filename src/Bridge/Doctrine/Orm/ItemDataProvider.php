@@ -103,7 +103,7 @@ class ItemDataProvider implements DenormalizedIdentifiersAwareItemDataProviderIn
     /**
      * Add WHERE conditions to the query for one or more identifiers (simple or composite).
      */
-    private function addWhereForIdentifiers(array $identifiers, QueryBuilder $queryBuilder, ClassMetadata $classMetadata)
+    private function addWhereForIdentifiers(array $identifiers, QueryBuilder $queryBuilder, ClassMetadata $classMetadata): void
     {
         $alias = $queryBuilder->getRootAliases()[0];
         foreach ($identifiers as $identifier => $value) {

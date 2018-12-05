@@ -32,7 +32,7 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
  */
 class ValidateListenerTest extends TestCase
 {
-    public function testNotAnApiPlatformRequest()
+    public function testNotAnApiPlatformRequest(): void
     {
         $validatorProphecy = $this->prophesize(ValidatorInterface::class);
         $validatorProphecy->validate()->shouldNotBeCalled();
@@ -52,7 +52,7 @@ class ValidateListenerTest extends TestCase
         $listener->onKernelView($event->reveal());
     }
 
-    public function testValidatorIsCalled()
+    public function testValidatorIsCalled(): void
     {
         $data = new DummyEntity();
         $expectedValidationGroups = ['a', 'b', 'c'];
@@ -67,7 +67,7 @@ class ValidateListenerTest extends TestCase
         $validationViewListener->onKernelView($event);
     }
 
-    public function testDoNotCallWhenReceiveFlagIsFalse()
+    public function testDoNotCallWhenReceiveFlagIsFalse(): void
     {
         $data = new DummyEntity();
         $expectedValidationGroups = ['a', 'b', 'c'];
@@ -82,7 +82,7 @@ class ValidateListenerTest extends TestCase
         $validationViewListener->onKernelView($event);
     }
 
-    public function testThrowsValidationExceptionWithViolationsFound()
+    public function testThrowsValidationExceptionWithViolationsFound(): void
     {
         $this->expectException(ValidationException::class);
 

@@ -30,7 +30,7 @@ use Symfony\Component\Serializer\SerializerInterface;
  */
 class CollectionNormalizerTest extends TestCase
 {
-    public function testSupportsNormalize()
+    public function testSupportsNormalize(): void
     {
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
         $iriConvert = $this->prophesize(IriConverterInterface::class);
@@ -47,7 +47,7 @@ class CollectionNormalizerTest extends TestCase
         $this->assertTrue($normalizer->hasCacheableSupportsMethod());
     }
 
-    public function testNormalizeApiSubLevel()
+    public function testNormalizeApiSubLevel(): void
     {
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
         $resourceClassResolverProphecy->getResourceClass(['foo' => 'bar'], null, true)->willReturn('Foo')->shouldBeCalled();
@@ -65,7 +65,7 @@ class CollectionNormalizerTest extends TestCase
         $this->assertEquals(['@context' => '/contexts/Foo', '@id' => '/foo/1', '@type' => 'hydra:Collection', 'hydra:member' => [0 => '22'], 'hydra:totalItems' => 1], $normalizer->normalize(['foo' => 'bar'], null));
     }
 
-    public function testNormalizePaginator()
+    public function testNormalizePaginator(): void
     {
         $this->assertEquals(
             [
@@ -84,7 +84,7 @@ class CollectionNormalizerTest extends TestCase
         );
     }
 
-    public function testNormalizePartialPaginator()
+    public function testNormalizePartialPaginator(): void
     {
         $this->assertEquals(
             [

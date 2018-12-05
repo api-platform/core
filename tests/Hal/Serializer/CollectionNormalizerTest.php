@@ -25,7 +25,7 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
  */
 class CollectionNormalizerTest extends TestCase
 {
-    public function testSupportsNormalize()
+    public function testSupportsNormalize(): void
     {
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
         $normalizer = new CollectionNormalizer($resourceClassResolverProphecy->reveal(), 'page');
@@ -37,7 +37,7 @@ class CollectionNormalizerTest extends TestCase
         $this->assertTrue($normalizer->hasCacheableSupportsMethod());
     }
 
-    public function testNormalizeApiSubLevel()
+    public function testNormalizeApiSubLevel(): void
     {
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
         $resourceClassResolverProphecy->getResourceClass()->shouldNotBeCalled();
@@ -51,7 +51,7 @@ class CollectionNormalizerTest extends TestCase
         $this->assertEquals(['foo' => 22], $normalizer->normalize(['foo' => 'bar'], null, ['api_sub_level' => true]));
     }
 
-    public function testNormalizePaginator()
+    public function testNormalizePaginator(): void
     {
         $this->assertEquals(
             [
@@ -82,7 +82,7 @@ class CollectionNormalizerTest extends TestCase
         );
     }
 
-    public function testNormalizePartialPaginator()
+    public function testNormalizePartialPaginator(): void
     {
         $this->assertEquals(
             [

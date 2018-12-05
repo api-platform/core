@@ -71,7 +71,7 @@ class EmbeddedDummy
      */
     public $relatedDummy;
 
-    public static function staticMethod()
+    public static function staticMethod(): void
     {
     }
 
@@ -90,7 +90,7 @@ class EmbeddedDummy
         return $this->name;
     }
 
-    public function setName(string $name)
+    public function setName(string $name): void
     {
         $this->name = $name;
     }
@@ -100,7 +100,7 @@ class EmbeddedDummy
         return $this->embeddedDummy;
     }
 
-    public function setEmbeddedDummy(EmbeddableDummy $embeddedDummy)
+    public function setEmbeddedDummy(EmbeddableDummy $embeddedDummy): void
     {
         $this->embeddedDummy = $embeddedDummy;
     }
@@ -113,7 +113,7 @@ class EmbeddedDummy
         return $this->dummyDate;
     }
 
-    public function setDummyDate(\DateTime $dummyDate)
+    public function setDummyDate(\DateTime $dummyDate): void
     {
         $this->dummyDate = $dummyDate;
     }
@@ -126,7 +126,7 @@ class EmbeddedDummy
         return $this->relatedDummy;
     }
 
-    public function setRelatedDummy(RelatedDummy $relatedDummy)
+    public function setRelatedDummy(RelatedDummy $relatedDummy): void
     {
         $this->relatedDummy = $relatedDummy;
     }

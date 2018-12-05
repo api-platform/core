@@ -25,7 +25,7 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
  */
 class RespondListenerTest extends TestCase
 {
-    public function testDoNotHandleResponse()
+    public function testDoNotHandleResponse(): void
     {
         $request = new Request();
         $request->setRequestFormat('xml');
@@ -38,7 +38,7 @@ class RespondListenerTest extends TestCase
         $listener->onKernelView($eventProphecy->reveal());
     }
 
-    public function testCreate200Response()
+    public function testCreate200Response(): void
     {
         $request = new Request([], [], ['_api_respond' => true]);
         $request->setRequestFormat('xml');
@@ -63,7 +63,7 @@ class RespondListenerTest extends TestCase
         $this->assertEquals('deny', $response->headers->get('X-Frame-Options'));
     }
 
-    public function testCreate201Response()
+    public function testCreate201Response(): void
     {
         $kernelProphecy = $this->prophesize(HttpKernelInterface::class);
 
@@ -90,7 +90,7 @@ class RespondListenerTest extends TestCase
         $this->assertEquals('deny', $response->headers->get('X-Frame-Options'));
     }
 
-    public function testCreate204Response()
+    public function testCreate204Response(): void
     {
         $kernelProphecy = $this->prophesize(HttpKernelInterface::class);
 

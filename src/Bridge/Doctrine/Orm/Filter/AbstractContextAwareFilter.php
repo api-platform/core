@@ -21,7 +21,7 @@ abstract class AbstractContextAwareFilter extends AbstractFilter implements Cont
     /**
      * {@inheritdoc}
      */
-    public function apply(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, string $operationName = null, array $context = [])
+    public function apply(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, string $operationName = null, array $context = []): void
     {
         if (!isset($context['filters']) || !\is_array($context['filters'])) {
             parent::apply($queryBuilder, $queryNameGenerator, $resourceClass, $operationName, $context);

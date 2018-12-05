@@ -25,7 +25,7 @@ use PHPUnit\Framework\TestCase;
  */
 class ChainSubresourcedataProviderTest extends TestCase
 {
-    public function testGetSubresource()
+    public function testGetSubresource(): void
     {
         $dummy = new Dummy();
         $dummy->setName('Rosa');
@@ -53,7 +53,7 @@ class ChainSubresourcedataProviderTest extends TestCase
         $this->assertEquals([$dummy, $dummy2], $chainSubresourceDataProvider->getSubresource(Dummy::class, ['id' => 1], $context, 'get'));
     }
 
-    public function testGetSubresourceExceptionsItem()
+    public function testGetSubresourceExceptionsItem(): void
     {
         $context = ['collection' => false];
         $firstDataProvider = $this->prophesize(SubresourceDataProviderInterface::class);
@@ -65,7 +65,7 @@ class ChainSubresourcedataProviderTest extends TestCase
         $this->assertNull($chainSubresourceDataProvider->getSubresource(Dummy::class, ['id' => 1], $context, 'get'));
     }
 
-    public function testGetSubresourceExceptionsCollection()
+    public function testGetSubresourceExceptionsCollection(): void
     {
         $context = ['collection' => true];
         $firstDataProvider = $this->prophesize(SubresourceDataProviderInterface::class);
@@ -81,7 +81,7 @@ class ChainSubresourcedataProviderTest extends TestCase
      * @group legacy
      * @expectedDeprecation Throwing a "ApiPlatform\Core\Exception\ResourceClassNotSupportedException" in a data provider is deprecated in favor of implementing "ApiPlatform\Core\DataProvider\RestrictedDataProviderInterface"
      */
-    public function testLegacyGetSubresource()
+    public function testLegacyGetSubresource(): void
     {
         $dummy = new Dummy();
         $dummy->setName('Rosa');
@@ -107,7 +107,7 @@ class ChainSubresourcedataProviderTest extends TestCase
      * @group legacy
      * @expectedDeprecation Throwing a "ApiPlatform\Core\Exception\ResourceClassNotSupportedException" in a data provider is deprecated in favor of implementing "ApiPlatform\Core\DataProvider\RestrictedDataProviderInterface"
      */
-    public function testLegacyGetCollectionExeptions()
+    public function testLegacyGetCollectionExeptions(): void
     {
         $firstDataProvider = $this->prophesize(SubresourceDataProviderInterface::class);
         $firstDataProvider->getSubresource('notfound', ['id' => 1], [], 'get')->willThrow(ResourceClassNotSupportedException::class);

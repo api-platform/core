@@ -28,7 +28,7 @@ class FilterCollectionFactoryTest extends TestCase
      * @group legacy
      * @expectedDeprecation The ApiPlatform\Core\Api\FilterCollection class is deprecated since version 2.1 and will be removed in 3.0. Provide an implementation of Psr\Container\ContainerInterface instead.
      */
-    public function testCreateFilterCollectionFromLocator()
+    public function testCreateFilterCollectionFromLocator(): void
     {
         $filter = $this->prophesize(FilterInterface::class)->reveal();
 

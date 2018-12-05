@@ -19,7 +19,7 @@ use Ramsey\Uuid\Uuid;
 
 class UuidNormalizerTest extends TestCase
 {
-    public function testDenormalizeUuid()
+    public function testDenormalizeUuid(): void
     {
         $uuid = Uuid::uuid4();
         $normalizer = new UuidNormalizer();
@@ -27,14 +27,14 @@ class UuidNormalizerTest extends TestCase
         $this->assertEquals($uuid, $normalizer->denormalize($uuid->toString(), Uuid::class));
     }
 
-    public function testNoSupportDenormalizeUuid()
+    public function testNoSupportDenormalizeUuid(): void
     {
         $uuid = 'notanuuid';
         $normalizer = new UuidNormalizer();
         $this->assertFalse($normalizer->supportsDenormalization($uuid, ''));
     }
 
-    public function testFailDenormalizeUuid()
+    public function testFailDenormalizeUuid(): void
     {
         $this->expectException(\ApiPlatform\Core\Exception\InvalidIdentifierException::class);
 

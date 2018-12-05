@@ -22,7 +22,7 @@ use PHPUnit\Framework\TestCase;
  */
 class ResourceMetadataTest extends TestCase
 {
-    public function testValueObject()
+    public function testValueObject(): void
     {
         $metadata = new ResourceMetadata('shortName', 'desc', 'http://example.com/foo', ['iop1' => ['foo' => 'a'], 'iop2' => ['bar' => 'b']], ['cop1' => ['foo' => 'c'], 'cop2' => ['bar' => 'd']], ['baz' => 'bar'], ['sop1' => ['sub' => 'bus']], ['query' => ['foo' => 'graphql']]);
         $this->assertSame('shortName', $metadata->getShortName());
@@ -74,7 +74,7 @@ class ResourceMetadataTest extends TestCase
     /**
      * @dataProvider getWithMethods
      */
-    public function testWithMethods(string $name, $value)
+    public function testWithMethods(string $name, $value): void
     {
         $metadata = new ResourceMetadata();
         $newMetadata = \call_user_func([$metadata, "with$name"], $value);
@@ -82,13 +82,13 @@ class ResourceMetadataTest extends TestCase
         $this->assertSame($value, \call_user_func([$newMetadata, "get$name"]));
     }
 
-    public function testGetOperationAttributeFallback()
+    public function testGetOperationAttributeFallback(): void
     {
         $metadata = new ResourceMetadata();
         $this->assertSame('okay', $metadata->getOperationAttribute([], 'doh', 'okay'));
     }
 
-    public function testGetOperationAttributeFallbackToResourceAttribute()
+    public function testGetOperationAttributeFallbackToResourceAttribute(): void
     {
         $metadata = new ResourceMetadata(null, null, null, null, null, ['doh' => 'nuts']);
         $this->assertSame('nuts', $metadata->getOperationAttribute([], 'doh', 'okay', true));

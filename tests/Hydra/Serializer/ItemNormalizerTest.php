@@ -34,7 +34,7 @@ use Symfony\Component\Serializer\SerializerInterface;
  */
 class ItemNormalizerTest extends TestCase
 {
-    public function testDontSupportDenormalization()
+    public function testDontSupportDenormalization(): void
     {
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
@@ -51,7 +51,7 @@ class ItemNormalizerTest extends TestCase
         $this->assertTrue($normalizer->hasCacheableSupportsMethod());
     }
 
-    public function testSupportNormalization()
+    public function testSupportNormalization(): void
     {
         $std = new \stdClass();
         $dummy = new Dummy();
@@ -82,7 +82,7 @@ class ItemNormalizerTest extends TestCase
         $this->assertTrue($normalizer->hasCacheableSupportsMethod());
     }
 
-    public function testNormalize()
+    public function testNormalize(): void
     {
         $dummy = new Dummy();
         $dummy->setName('hello');

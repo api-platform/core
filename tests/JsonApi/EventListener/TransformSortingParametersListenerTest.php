@@ -25,12 +25,12 @@ class TransformSortingParametersListenerTest extends TestCase
 {
     private $listener;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->listener = new TransformSortingParametersListener();
     }
 
-    public function testOnKernelRequestWithInvalidFormat()
+    public function testOnKernelRequestWithInvalidFormat(): void
     {
         $expectedRequest = new Request();
         $expectedRequest->setRequestFormat('badformat');
@@ -45,7 +45,7 @@ class TransformSortingParametersListenerTest extends TestCase
         $this->assertEquals($expectedRequest, $request);
     }
 
-    public function testOnKernelRequestWithInvalidFilter()
+    public function testOnKernelRequestWithInvalidFilter(): void
     {
         $eventProphecy = $this->prophesize(GetResponseEvent::class);
 
@@ -67,7 +67,7 @@ class TransformSortingParametersListenerTest extends TestCase
         $this->assertEquals($expectedRequest, $request);
     }
 
-    public function testOnKernelRequest()
+    public function testOnKernelRequest(): void
     {
         $request = new Request(['sort' => 'foo,-bar,-baz,qux']);
         $request->setRequestFormat('jsonapi');

@@ -26,7 +26,7 @@ use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
  */
 class EventListenerTest extends TestCase
 {
-    public function testDelete()
+    public function testDelete(): void
     {
         $user = $this->prophesize(UserInterface::class);
 
@@ -45,7 +45,7 @@ class EventListenerTest extends TestCase
         $listener->onKernelView($event->reveal());
     }
 
-    public function testUpdate()
+    public function testUpdate(): void
     {
         $user = $this->prophesize(UserInterface::class);
 
@@ -64,7 +64,7 @@ class EventListenerTest extends TestCase
         $listener->onKernelView($event->reveal());
     }
 
-    public function testNotApiRequest()
+    public function testNotApiRequest(): void
     {
         $request = new Request();
 
@@ -79,7 +79,7 @@ class EventListenerTest extends TestCase
         $listener->onKernelView($event->reveal());
     }
 
-    public function testNotUser()
+    public function testNotUser(): void
     {
         $request = new Request([], [], ['_api_resource_class' => User::class, '_api_item_operation_name' => 'put']);
         $request->setMethod('PUT');
@@ -96,7 +96,7 @@ class EventListenerTest extends TestCase
         $listener->onKernelView($event->reveal());
     }
 
-    public function testSafeMethod()
+    public function testSafeMethod(): void
     {
         $request = new Request([], [], ['_api_resource_class' => User::class, '_api_item_operation_name' => 'put']);
 

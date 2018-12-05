@@ -42,7 +42,7 @@ class ApiPlatformProviderTest extends TestCase
     /**
      * @expectedDeprecation The ApiPlatform\Core\Bridge\NelmioApiDoc\Extractor\AnnotationsProvider\ApiPlatformProvider class is deprecated since version 2.2 and will be removed in 3.0. NelmioApiDocBundle 3 has native support for API Platform.
      */
-    public function testConstruct()
+    public function testConstruct(): void
     {
         $apiPlatformProvider = new ApiPlatformProvider(
             $this->prophesize(ResourceNameCollectionFactoryInterface::class)->reveal(),
@@ -58,7 +58,7 @@ class ApiPlatformProviderTest extends TestCase
     /**
      * @expectedDeprecation The ApiPlatform\Core\Bridge\NelmioApiDoc\Extractor\AnnotationsProvider\ApiPlatformProvider class is deprecated since version 2.2 and will be removed in 3.0. NelmioApiDocBundle 3 has native support for API Platform.
      */
-    public function testGetAnnotations()
+    public function testGetAnnotations(): void
     {
         $dummySearchFilterProphecy = $this->prophesize(FilterInterface::class);
         $dummySearchFilterProphecy->getDescription(Dummy::class)->willReturn([
@@ -81,7 +81,7 @@ class ApiPlatformProviderTest extends TestCase
      * @expectedDeprecation The ApiPlatform\Core\Bridge\NelmioApiDoc\Extractor\AnnotationsProvider\ApiPlatformProvider class is deprecated since version 2.2 and will be removed in 3.0. NelmioApiDocBundle 3 has native support for API Platform.
      * @expectedDeprecation The ApiPlatform\Core\Api\FilterCollection class is deprecated since version 2.1 and will be removed in 3.0. Provide an implementation of Psr\Container\ContainerInterface instead.
      */
-    public function testGetAnnotationsWithDeprecatedFilterCollection()
+    public function testGetAnnotationsWithDeprecatedFilterCollection(): void
     {
         $dummySearchFilterProphecy = $this->prophesize(FilterInterface::class);
         $dummySearchFilterProphecy->getDescription(Dummy::class)->willReturn([
@@ -99,7 +99,7 @@ class ApiPlatformProviderTest extends TestCase
     /**
      * @expectedDeprecation The ApiPlatform\Core\Bridge\NelmioApiDoc\Extractor\AnnotationsProvider\ApiPlatformProvider class is deprecated since version 2.2 and will be removed in 3.0. NelmioApiDocBundle 3 has native support for API Platform.
      */
-    public function testConstructWithInvalidFilterLocator()
+    public function testConstructWithInvalidFilterLocator(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('The "$filterLocator" argument is expected to be an implementation of the "Psr\\Container\\ContainerInterface" interface.');
@@ -113,7 +113,7 @@ class ApiPlatformProviderTest extends TestCase
         );
     }
 
-    private function extractAnnotations($filterLocator)
+    private function extractAnnotations($filterLocator): void
     {
         $resourceNameCollection = new ResourceNameCollection([Dummy::class, RelatedDummy::class]);
 
@@ -320,7 +320,7 @@ JSON;
         return json_decode($hydraDocJson, true);
     }
 
-    public function testGetAnnotationsWithEmptyHydraDoc()
+    public function testGetAnnotationsWithEmptyHydraDoc(): void
     {
         $documentationNormalizerProphecy = $this->prophesize(NormalizerInterface::class);
         $documentationNormalizerProphecy->normalize(new Documentation(new ResourceNameCollection([Dummy::class])))->willReturn([])->shouldBeCalled();
@@ -339,7 +339,7 @@ JSON;
         $this->assertEquals([], $apiPlatformProvider->getAnnotations());
     }
 
-    public function testGetAnnotationsWithInvalidHydraSupportedClass()
+    public function testGetAnnotationsWithInvalidHydraSupportedClass(): void
     {
         $hydraDoc = ['hydra:supportedClass' => 'not an array'];
 
@@ -360,7 +360,7 @@ JSON;
         $this->assertEquals([], $apiPlatformProvider->getAnnotations());
     }
 
-    public function testGetAnnotationsWithEmptyHydraSupportedClass()
+    public function testGetAnnotationsWithEmptyHydraSupportedClass(): void
     {
         $hydraDoc = ['hydra:supportedClass' => []];
 
@@ -381,7 +381,7 @@ JSON;
         $this->assertEquals([], $apiPlatformProvider->getAnnotations());
     }
 
-    public function testGetAnnotationsWithInvalidHydraSupportedOperation()
+    public function testGetAnnotationsWithInvalidHydraSupportedOperation(): void
     {
         $hydraDoc = ['hydra:supportedClass' => [
             ['@id' => '#Entrypoint'],
@@ -425,7 +425,7 @@ JSON;
         $this->assertEquals([$apiDoc], $apiPlatformProvider->getAnnotations());
     }
 
-    public function testGetAnnotationsWithEmptyHydraSupportedOperation()
+    public function testGetAnnotationsWithEmptyHydraSupportedOperation(): void
     {
         $hydraDoc = ['hydra:supportedClass' => [
             ['@id' => '#Entrypoint'],
@@ -469,7 +469,7 @@ JSON;
         $this->assertEquals([$apiDoc], $apiPlatformProvider->getAnnotations());
     }
 
-    public function testGetAnnotationsWithInvalidHydraSupportedProperty()
+    public function testGetAnnotationsWithInvalidHydraSupportedProperty(): void
     {
         $hydraDoc = ['hydra:supportedClass' => [
             ['@id' => '#Entrypoint', 'hydra:supportedProperty' => 'not an array'],
@@ -513,7 +513,7 @@ JSON;
         $this->assertEquals([$apiDoc], $apiPlatformProvider->getAnnotations());
     }
 
-    public function testGetAnnotationsWithEmptyHydraSupportedProperty()
+    public function testGetAnnotationsWithEmptyHydraSupportedProperty(): void
     {
         $hydraDoc = ['hydra:supportedClass' => [
             ['@id' => '#Entrypoint', 'hydra:supportedProperty' => []],

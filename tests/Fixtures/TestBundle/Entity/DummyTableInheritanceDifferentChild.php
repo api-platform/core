@@ -37,7 +37,7 @@ class DummyTableInheritanceDifferentChild extends DummyTableInheritance
         return $this->email;
     }
 
-    public function setEmail($email)
+    public function setEmail($email): void
     {
         $this->email = $email;
     }

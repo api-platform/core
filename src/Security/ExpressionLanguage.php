@@ -25,7 +25,7 @@ use Symfony\Component\Security\Core\Authorization\ExpressionLanguage as BaseExpr
  */
 class ExpressionLanguage extends BaseExpressionLanguage
 {
-    protected function registerFunctions()
+    protected function registerFunctions(): void
     {
         parent::registerFunctions();
 

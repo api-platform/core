@@ -108,7 +108,7 @@ class DummyCar
         return $this->name;
     }
 
-    public function setName(string $name)
+    public function setName(string $name): void
     {
         $this->name = $name;
     }
@@ -118,7 +118,7 @@ class DummyCar
         return $this->canSell;
     }
 
-    public function setCanSell(bool $canSell)
+    public function setCanSell(bool $canSell): void
     {
         $this->canSell = $canSell;
     }
@@ -128,7 +128,7 @@ class DummyCar
         return $this->availableAt;
     }
 
-    public function setAvailableAt(\DateTime $availableAt)
+    public function setAvailableAt(\DateTime $availableAt): void
     {
         $this->availableAt = $availableAt;
     }

@@ -30,7 +30,7 @@ class ResourceAccessCheckerTest extends TestCase
     /**
      * @dataProvider getGranted
      */
-    public function testIsGranted(bool $granted)
+    public function testIsGranted(bool $granted): void
     {
         $expressionLanguageProphecy = $this->prophesize(ExpressionLanguage::class);
         $expressionLanguageProphecy->evaluate('has_role("ROLE_ADMIN")', Argument::type('array'))->willReturn($granted)->shouldBeCalled();
@@ -54,7 +54,7 @@ class ResourceAccessCheckerTest extends TestCase
         return [[true], [false]];
     }
 
-    public function testSecurityComponentNotAvailable()
+    public function testSecurityComponentNotAvailable(): void
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('The "symfony/security" library must be installed to use the "access_control" attribute.');
@@ -63,7 +63,7 @@ class ResourceAccessCheckerTest extends TestCase
         $checker->isGranted(Dummy::class, 'has_role("ROLE_ADMIN")');
     }
 
-    public function testExpressionLanguageNotInstalled()
+    public function testExpressionLanguageNotInstalled(): void
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('The "symfony/expression-language" library must be installed to use the "access_control".');
@@ -76,7 +76,7 @@ class ResourceAccessCheckerTest extends TestCase
         $checker->isGranted(Dummy::class, 'has_role("ROLE_ADMIN")');
     }
 
-    public function testNotBehindAFirewall()
+    public function testNotBehindAFirewall(): void
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('The current token must be set to use the "access_control" attribute (is the URL behind a firewall?).');

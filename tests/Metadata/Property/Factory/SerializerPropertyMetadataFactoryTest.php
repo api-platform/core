@@ -34,7 +34,7 @@ use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
  */
 class SerializerPropertyMetadataFactoryTest extends TestCase
 {
-    public function testConstruct()
+    public function testConstruct(): void
     {
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataFactory = $resourceMetadataFactoryProphecy->reveal();
@@ -50,7 +50,7 @@ class SerializerPropertyMetadataFactoryTest extends TestCase
         $this->assertInstanceOf(PropertyMetadataFactoryInterface::class, $serializerPropertyMetadataFactory);
     }
 
-    public function testCreate()
+    public function testCreate(): void
     {
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $dummyResourceMetadata = (new ResourceMetadata())
@@ -125,7 +125,7 @@ class SerializerPropertyMetadataFactoryTest extends TestCase
         $this->assertFalse($actual[2]->isWritable());
     }
 
-    public function testCreateInherited()
+    public function testCreateInherited(): void
     {
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create(DummyTableInheritanceChild::class)->willReturn(new ResourceMetadata())->shouldBeCalled();

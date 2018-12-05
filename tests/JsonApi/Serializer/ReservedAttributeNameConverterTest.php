@@ -24,7 +24,7 @@ class ReservedAttributeNameConverterTest extends TestCase
 {
     private $reservedAttributeNameConverter;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->reservedAttributeNameConverter = new ReservedAttributeNameConverter(new CustomConverter());
     }
@@ -52,7 +52,7 @@ class ReservedAttributeNameConverterTest extends TestCase
      * @param string $propertyName
      * @param string $expectedPropertyName
      */
-    public function testNormalize($propertyName, $expectedPropertyName)
+    public function testNormalize($propertyName, $expectedPropertyName): void
     {
         $this->assertEquals($expectedPropertyName, $this->reservedAttributeNameConverter->normalize($propertyName));
     }
@@ -63,7 +63,7 @@ class ReservedAttributeNameConverterTest extends TestCase
      * @param string $expectedPropertyName
      * @param string $propertyName
      */
-    public function testDenormalize($expectedPropertyName, $propertyName)
+    public function testDenormalize($expectedPropertyName, $propertyName): void
     {
         $this->assertEquals($expectedPropertyName, $this->reservedAttributeNameConverter->denormalize($propertyName));
     }

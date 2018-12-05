@@ -32,7 +32,7 @@ use PHPUnit\Framework\TestCase;
  */
 class SubresourceOperationFactoryTest extends TestCase
 {
-    public function testCreate()
+    public function testCreate(): void
     {
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create(RelatedDummyEntity::class)->shouldBeCalled()->willReturn(new ResourceMetadata('relatedDummyEntity'));
@@ -143,7 +143,7 @@ class SubresourceOperationFactoryTest extends TestCase
         ], $subresourceOperationFactory->create(DummyEntity::class));
     }
 
-    public function testCreateByOverriding()
+    public function testCreateByOverriding(): void
     {
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create(RelatedDummyEntity::class)->shouldBeCalled()->willReturn(new ResourceMetadata('relatedDummyEntity'));
@@ -261,7 +261,7 @@ class SubresourceOperationFactoryTest extends TestCase
         ], $subresourceOperationFactory->create(DummyEntity::class));
     }
 
-    public function testCreateWithMaxDepth()
+    public function testCreateWithMaxDepth(): void
     {
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create(RelatedDummyEntity::class)->shouldBeCalled()->willReturn(new ResourceMetadata('relatedDummyEntity'));
@@ -309,7 +309,7 @@ class SubresourceOperationFactoryTest extends TestCase
     /**
      * Test for issue: https://github.com/api-platform/core/issues/1711.
      */
-    public function testCreateWithMaxDepthMultipleSubresources()
+    public function testCreateWithMaxDepthMultipleSubresources(): void
     {
         /**
          * DummyEntity -subresource-> RelatedDummyEntity -anotherSubresource-> DummyEntity
@@ -394,7 +394,7 @@ class SubresourceOperationFactoryTest extends TestCase
     /**
      * Test for issue: https://github.com/api-platform/core/issues/2103.
      */
-    public function testCreateWithMaxDepthMultipleSubresourcesSameMaxDepth()
+    public function testCreateWithMaxDepthMultipleSubresourcesSameMaxDepth(): void
     {
         /**
          * DummyEntity -subresource (maxDepth=1)-> RelatedDummyEntity -anotherSubresource-> DummyEntity
@@ -462,7 +462,7 @@ class SubresourceOperationFactoryTest extends TestCase
         ], $subresourceOperationFactory->create(DummyEntity::class));
     }
 
-    public function testCreateSelfReferencingSubresources()
+    public function testCreateSelfReferencingSubresources(): void
     {
         /**
          * DummyEntity -subresource-> DummyEntity -subresource-> DummyEntity ...
@@ -505,7 +505,7 @@ class SubresourceOperationFactoryTest extends TestCase
         ], $subresourceOperationFactory->create(DummyEntity::class));
     }
 
-    public function testCreateWithEnd()
+    public function testCreateWithEnd(): void
     {
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create(RelatedDummyEntity::class)->shouldBeCalled()->willReturn(new ResourceMetadata('relatedDummyEntity'));
@@ -563,7 +563,7 @@ class SubresourceOperationFactoryTest extends TestCase
         ], $result);
     }
 
-    public function testCreateWithEndButNoCollection()
+    public function testCreateWithEndButNoCollection(): void
     {
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create(RelatedDummyEntity::class)->shouldBeCalled()->willReturn(new ResourceMetadata('relatedDummyEntity'));
@@ -608,7 +608,7 @@ class SubresourceOperationFactoryTest extends TestCase
         ], $result);
     }
 
-    public function testCreateWithRootResourcePrefix()
+    public function testCreateWithRootResourcePrefix(): void
     {
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create(RelatedDummyEntity::class)->shouldBeCalled()->willReturn(new ResourceMetadata('relatedDummyEntity'));

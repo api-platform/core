@@ -26,7 +26,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  */
 class ApiPlatformBundleTest extends TestCase
 {
-    public function testBuild()
+    public function testBuild(): void
     {
         $containerProphecy = $this->prophesize(ContainerBuilder::class);
         $containerProphecy->addCompilerPass(Argument::type(DataProviderPass::class))->shouldBeCalled();

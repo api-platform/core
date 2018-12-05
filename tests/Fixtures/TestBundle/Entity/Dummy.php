@@ -166,7 +166,7 @@ class Dummy
      */
     public $relatedOwningDummy;
 
-    public static function staticMethod()
+    public static function staticMethod(): void
     {
     }
 
@@ -182,12 +182,12 @@ class Dummy
         return $this->id;
     }
 
-    public function setId($id)
+    public function setId($id): void
     {
         $this->id = $id;
     }
 
-    public function setName($name)
+    public function setName($name): void
     {
         $this->name = $name;
     }
@@ -197,7 +197,7 @@ class Dummy
         return $this->name;
     }
 
-    public function setAlias($alias)
+    public function setAlias($alias): void
     {
         $this->alias = $alias;
     }
@@ -207,7 +207,7 @@ class Dummy
         return $this->alias;
     }
 
-    public function setDescription($description)
+    public function setDescription($description): void
     {
         $this->description = $description;
     }
@@ -217,7 +217,7 @@ class Dummy
         return $this->description;
     }
 
-    public function hasRole($role)
+    public function hasRole($role): void
     {
     }
 
@@ -226,12 +226,12 @@ class Dummy
         return $this->foo;
     }
 
-    public function setFoo(array $foo = null)
+    public function setFoo(array $foo = null): void
     {
         $this->foo = $foo;
     }
 
-    public function setDummyDate(\DateTime $dummyDate = null)
+    public function setDummyDate(\DateTime $dummyDate = null): void
     {
         $this->dummyDate = $dummyDate;
     }
@@ -253,7 +253,7 @@ class Dummy
         return $this->dummyPrice;
     }
 
-    public function setJsonData($jsonData)
+    public function setJsonData($jsonData): void
     {
         $this->jsonData = $jsonData;
     }
@@ -263,7 +263,7 @@ class Dummy
         return $this->jsonData;
     }
 
-    public function setArrayData($arrayData)
+    public function setArrayData($arrayData): void
     {
         $this->arrayData = $arrayData;
     }
@@ -278,12 +278,12 @@ class Dummy
         return $this->relatedDummy;
     }
 
-    public function setRelatedDummy(RelatedDummy $relatedDummy)
+    public function setRelatedDummy(RelatedDummy $relatedDummy): void
     {
         $this->relatedDummy = $relatedDummy;
     }
 
-    public function addRelatedDummy(RelatedDummy $relatedDummy)
+    public function addRelatedDummy(RelatedDummy $relatedDummy): void
     {
         $this->relatedDummies->add($relatedDummy);
     }
@@ -293,7 +293,7 @@ class Dummy
         return $this->relatedOwnedDummy;
     }
 
-    public function setRelatedOwnedDummy(RelatedOwnedDummy $relatedOwnedDummy)
+    public function setRelatedOwnedDummy(RelatedOwnedDummy $relatedOwnedDummy): void
     {
         $this->relatedOwnedDummy = $relatedOwnedDummy;
 
@@ -307,7 +307,7 @@ class Dummy
         return $this->relatedOwningDummy;
     }
 
-    public function setRelatedOwningDummy(RelatedOwningDummy $relatedOwningDummy)
+    public function setRelatedOwningDummy(RelatedOwningDummy $relatedOwningDummy): void
     {
         $this->relatedOwningDummy = $relatedOwningDummy;
     }
@@ -323,12 +323,12 @@ class Dummy
     /**
      * @param bool $dummyBoolean
      */
-    public function setDummyBoolean($dummyBoolean)
+    public function setDummyBoolean($dummyBoolean): void
     {
         $this->dummyBoolean = $dummyBoolean;
     }
 
-    public function setDummy($dummy = null)
+    public function setDummy($dummy = null): void
     {
         $this->dummy = $dummy;
     }
