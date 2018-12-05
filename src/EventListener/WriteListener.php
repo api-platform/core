@@ -55,7 +55,7 @@ final class WriteListener
         }
 
         if (null !== $this->dispatcher) {
-            $this->dispatcher->dispatch(PreWriteEvent::NAME, new PreWriteEvent($request->getMethod(), $controllerResult));
+            $this->dispatcher->dispatch(PreWriteEvent::NAME, new PreWriteEvent($controllerResult));
         }
 
         switch ($request->getMethod()) {
@@ -65,7 +65,7 @@ final class WriteListener
                 $persistResult = $this->dataPersister->persist($controllerResult);
 
                 if (null !== $this->dispatcher) {
-                    $this->dispatcher->dispatch(PostWriteEvent::NAME, new PostWriteEvent($request->getMethod(), $controllerResult));
+                    $this->dispatcher->dispatch(PostWriteEvent::NAME, new PostWriteEvent($controllerResult));
                 }
 
                 if (null === $persistResult) {
@@ -85,7 +85,7 @@ final class WriteListener
                 $this->dataPersister->remove($controllerResult);
 
                 if (null !== $this->dispatcher) {
-                    $this->dispatcher->dispatch(PostWriteEvent::NAME, new PostWriteEvent($request->getMethod(), $controllerResult));
+                    $this->dispatcher->dispatch(PostWriteEvent::NAME, new PostWriteEvent($controllerResult));
                 }
 
                 $event->setControllerResult(null);

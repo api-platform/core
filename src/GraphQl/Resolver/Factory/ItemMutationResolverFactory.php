@@ -111,13 +111,13 @@ final class ItemMutationResolverFactory implements ResolverFactoryInterface
                     $this->validate($item, $info, $resourceMetadata, $operationName);
 
                     if (null !== $this->dispatcher) {
-                        $this->dispatcher->dispatch(PreWriteEvent::NAME, new PreWriteEvent($operationName, $item));
+                        $this->dispatcher->dispatch(PreWriteEvent::NAME, new PreWriteEvent($item));
                     }
 
                     $persistResult = $this->dataPersister->persist($item);
 
                     if (null !== $this->dispatcher) {
-                        $this->dispatcher->dispatch(PostWriteEvent::NAME, new PostWriteEvent($operationName, $item));
+                        $this->dispatcher->dispatch(PostWriteEvent::NAME, new PostWriteEvent($item));
                     }
 
                     if (null === $persistResult) {
@@ -127,7 +127,7 @@ final class ItemMutationResolverFactory implements ResolverFactoryInterface
                     return $this->normalizer->normalize($persistResult ?? $item, ItemNormalizer::FORMAT, $normalizationContext) + $data;
                 case 'delete':
                     if (null !== $this->dispatcher) {
-                        $this->dispatcher->dispatch(PreWriteEvent::NAME, new PreWriteEvent($operationName, $item));
+                        $this->dispatcher->dispatch(PreWriteEvent::NAME, new PreWriteEvent($item));
                     }
 
                     if ($item) {
@@ -138,7 +138,7 @@ final class ItemMutationResolverFactory implements ResolverFactoryInterface
                     }
 
                     if (null !== $this->dispatcher) {
-                        $this->dispatcher->dispatch(PostWriteEvent::NAME, new PostWriteEvent($operationName, $item));
+                        $this->dispatcher->dispatch(PostWriteEvent::NAME, new PostWriteEvent($item));
                     }
             }
 
