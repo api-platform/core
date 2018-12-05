@@ -52,7 +52,6 @@ final class DenyAccessListener
     /**
      * Sets the applicable format to the HttpFoundation Request.
      *
-     *
      * @throws AccessDeniedException
      */
     public function onKernelRequest(GetResponseEvent $event)

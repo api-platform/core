@@ -45,11 +45,6 @@ return PhpCsFixer\Config::create()
             'header' => $header,
             'location' => 'after_open',
         ],
-        'native_function_invocation' => [
-            'include' => [
-                '@compiler_optimized',
-            ],
-        ],
         'no_extra_blank_lines' => [
             'tokens' => [
                 'break',
@@ -74,8 +69,11 @@ return PhpCsFixer\Config::create()
             ],
             'sortAlgorithm' => 'alpha',
         ],
+        'php_unit_method_casing' => [
+            'case' => 'camel_case',
+        ],
         'phpdoc_order' => true,
-        // 'simplified_null_return' => true,
+        'phpdoc_trim_consecutive_blank_line_separation' => true,
         'strict_comparison' => true,
         'strict_param' => true,
         'ternary_to_null_coalescing' => true,

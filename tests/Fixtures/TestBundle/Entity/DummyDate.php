@@ -21,7 +21,6 @@ use Doctrine\ORM\Mapping as ORM;
  *
  * @author Antoine Bluchet <soyuka@gmail.com>
  *
- *
  * @ApiResource(attributes={
  *     "filters"={"my_dummy_date.date"}
  * })

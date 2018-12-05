@@ -302,7 +302,6 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
     /**
      * Gets the range of the property.
      *
-     *
      * @return string|null
      */
     private function getRange(PropertyMetadata $propertyMetadata)
