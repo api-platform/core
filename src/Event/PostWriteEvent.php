@@ -15,35 +15,23 @@ namespace ApiPlatform\Core\Event;
 
 use Symfony\Component\EventDispatcher\Event;
 
-class PostWriteEvent extends Event
+final class PostWriteEvent extends Event
 {
     const NAME = Events::POST_WRITE;
-    private $method;
-    private $controllerResult;
+    private $data;
 
-    public function __construct(string $method, $controllerResult)
+    public function __construct($controllerResult)
     {
-        $this->method = $method;
-        $this->controllerResult = $controllerResult;
+        $this->data = $controllerResult;
     }
 
-    public function getMethod(): string
+    public function getData()
     {
-        return $this->method;
+        return $this->data;
     }
 
-    public function setMethod(string $method): void
+    public function setData($data): void
     {
-        $this->method = $method;
-    }
-
-    public function getControllerResult()
-    {
-        return $this->controllerResult;
-    }
-
-    public function setControllerResult($controllerResult): void
-    {
-        $this->controllerResult = $controllerResult;
+        $this->data = $data;
     }
 }

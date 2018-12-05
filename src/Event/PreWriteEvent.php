@@ -15,7 +15,7 @@ namespace ApiPlatform\Core\Event;
 
 use Symfony\Component\EventDispatcher\Event;
 
-class PreWriteEvent extends Event
+final class PreWriteEvent extends Event
 {
     const NAME = Events::PRE_WRITE;
     private $method;

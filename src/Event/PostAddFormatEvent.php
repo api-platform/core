@@ -15,22 +15,22 @@ namespace ApiPlatform\Core\Event;
 
 use Symfony\Component\EventDispatcher\Event;
 
-class PostAddFormatEvent extends Event
+final class PostAddFormatEvent extends Event
 {
     const NAME = Events::POST_ADD_FORMAT;
     private $formats;
 
-    public function __construct($formats)
+    public function __construct(array $formats)
     {
         $this->formats = $formats;
     }
 
-    public function getFormats()
+    public function getFormats(): array
     {
         return $this->formats;
     }
 
-    public function setFormats($formats): void
+    public function setFormats(array $formats): void
     {
         $this->formats = $formats;
     }

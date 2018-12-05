@@ -18,20 +18,20 @@ use Symfony\Component\EventDispatcher\Event;
 final class PreSerializeEvent extends Event
 {
     const NAME = Events::PRE_SERIALIZE;
-    private $object;
+    private $data;
 
     public function __construct($object)
     {
-        $this->object = $object;
+        $this->data = $object;
     }
 
-    public function getObject()
+    public function getData()
     {
-        return $this->object;
+        return $this->data;
     }
 
-    public function setObject($object): void
+    public function setData($data): void
     {
-        $this->object = $object;
+        $this->data = $data;
     }
 }

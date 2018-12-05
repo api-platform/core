@@ -18,7 +18,6 @@ use Symfony\Component\EventDispatcher\Event;
 final class PreReadEvent extends Event
 {
     const NAME = Events::PRE_READ;
-
     private $data;
 
     public function __construct($data)

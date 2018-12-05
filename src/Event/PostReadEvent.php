@@ -18,7 +18,6 @@ use Symfony\Component\EventDispatcher\Event;
 final class PostReadEvent extends Event
 {
     const NAME = Events::POST_READ;
-
     private $data;
 
     public function __construct($data)
