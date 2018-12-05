@@ -18,32 +18,20 @@ use Symfony\Component\EventDispatcher\Event;
 final class PreWriteEvent extends Event
 {
     const NAME = Events::PRE_WRITE;
-    private $method;
-    private $controllerResult;
+    private $data;
 
-    public function __construct(string $method, $controllerResult)
+    public function __construct($data)
     {
-        $this->method = $method;
-        $this->controllerResult = $controllerResult;
+        $this->data = $data;
     }
 
-    public function getMethod(): string
+    public function getData()
     {
-        return $this->method;
+        return $this->data;
     }
 
-    public function setMethod(string $method): void
+    public function setData($data): void
     {
-        $this->method = $method;
-    }
-
-    public function getControllerResult()
-    {
-        return $this->controllerResult;
-    }
-
-    public function setControllerResult($controllerResult): void
-    {
-        $this->controllerResult = $controllerResult;
+        $this->data = $data;
     }
 }
