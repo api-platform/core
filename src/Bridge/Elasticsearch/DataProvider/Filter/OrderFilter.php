@@ -16,6 +16,7 @@ namespace ApiPlatform\Core\Bridge\Elasticsearch\DataProvider\Filter;
 use ApiPlatform\Core\Api\ResourceClassResolverInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
+use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 
 /**
  * Order the collection by given properties.
@@ -31,9 +32,9 @@ final class OrderFilter extends AbstractFilter implements SortFilterInterface
 {
     private $orderParameterName;
 
-    public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, ResourceClassResolverInterface $resourceClassResolver, string $orderParameterName = 'order', ?array $properties = null)
+    public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, ResourceClassResolverInterface $resourceClassResolver, ?NameConverterInterface $nameConverter = null, string $orderParameterName = 'order', ?array $properties = null)
     {
-        parent::__construct($propertyNameCollectionFactory, $propertyMetadataFactory, $resourceClassResolver, $properties);
+        parent::__construct($propertyNameCollectionFactory, $propertyMetadataFactory, $resourceClassResolver, $nameConverter, $properties);
 
         $this->orderParameterName = $orderParameterName;
     }
@@ -56,7 +57,7 @@ final class OrderFilter extends AbstractFilter implements SortFilterInterface
                 continue;
             }
 
-            if (empty($direction) && null !== $defaultDirection = $this->properties[$property]['default_direction'] ?? null) {
+            if (empty($direction) && null !== $defaultDirection = $this->properties[$property] ?? null) {
                 $direction = $defaultDirection;
             }
 
@@ -67,9 +68,11 @@ final class OrderFilter extends AbstractFilter implements SortFilterInterface
             $order = ['order' => $direction];
 
             if (null !== $nestedPath = $this->getNestedFieldPath($resourceClass, $property)) {
+                $nestedPath = null === $this->nameConverter ? $nestedPath : $this->nameConverter->normalize($nestedPath);
                 $order['nested'] = ['path' => $nestedPath];
             }
 
+            $property = null === $this->nameConverter ? $property : $this->nameConverter->normalize($property);
             $orders[] = [$property => $order];
         }
 

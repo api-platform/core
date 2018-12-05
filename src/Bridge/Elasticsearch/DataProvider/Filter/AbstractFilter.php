@@ -20,6 +20,7 @@ use ApiPlatform\Core\Exception\ResourceClassNotFoundException;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use Symfony\Component\PropertyInfo\Type;
+use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 
 /**
  * Abstract class with helpers for easing the implementation of a filter.
@@ -34,12 +35,14 @@ abstract class AbstractFilter implements FilterInterface
 
     protected $properties;
     protected $propertyNameCollectionFactory;
+    protected $nameConverter;
 
-    public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, ResourceClassResolverInterface $resourceClassResolver, ?array $properties = null)
+    public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, ResourceClassResolverInterface $resourceClassResolver, ?NameConverterInterface $nameConverter = null, ?array $properties = null)
     {
         $this->propertyNameCollectionFactory = $propertyNameCollectionFactory;
         $this->propertyMetadataFactory = $propertyMetadataFactory;
         $this->resourceClassResolver = $resourceClassResolver;
+        $this->nameConverter = $nameConverter;
         $this->properties = $properties;
     }
 
@@ -49,7 +52,7 @@ abstract class AbstractFilter implements FilterInterface
     protected function getProperties(string $resourceClass): \Traversable
     {
         if (null !== $this->properties) {
-            return yield from $this->properties;
+            return yield from array_keys($this->properties);
         }
 
         try {
@@ -126,11 +129,17 @@ abstract class AbstractFilter implements FilterInterface
 
             $currentResourceClass = $type->getClassName();
 
-            if (null === $currentResourceClass || !$this->resourceClassResolver->isResourceClass($currentResourceClass)) {
+            if (null === $currentResourceClass) {
                 return $noop;
             }
 
-            $hasAssociation = $totalProperties === $index;
+            $isResourceClass = $this->resourceClassResolver->isResourceClass($currentResourceClass);
+
+            if ($totalProperties !== $index && !$isResourceClass) {
+                return $noop;
+            }
+
+            $hasAssociation = $totalProperties === $index && $isResourceClass;
         }
 
         return [$type, $hasAssociation, $currentResourceClass, $currentProperty];

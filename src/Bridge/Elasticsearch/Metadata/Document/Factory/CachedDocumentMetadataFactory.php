@@ -58,23 +58,23 @@ final class CachedDocumentMetadataFactory implements DocumentMetadataFactoryInte
             return $this->handleNotFound($this->localCache[$resourceClass] = $cacheItem->get(), $resourceClass);
         }
 
-        $indexMetadata = $this->decorated->create($resourceClass);
+        $documentMetadata = $this->decorated->create($resourceClass);
 
-        $cacheItem->set($indexMetadata);
+        $cacheItem->set($documentMetadata);
         $this->cacheItemPool->save($cacheItem);
 
-        return $this->handleNotFound($this->localCache[$resourceClass] = $indexMetadata, $resourceClass);
+        return $this->handleNotFound($this->localCache[$resourceClass] = $documentMetadata, $resourceClass);
     }
 
     /**
      * @throws IndexNotFoundException
      */
-    private function handleNotFound(DocumentMetadata $indexMetadata, string $resourceClass): DocumentMetadata
+    private function handleNotFound(DocumentMetadata $documentMetadata, string $resourceClass): DocumentMetadata
     {
-        if (null === $indexMetadata->getIndex()) {
+        if (null === $documentMetadata->getIndex()) {
             throw new IndexNotFoundException(sprintf('No index associated with the "%s" resource class.', $resourceClass));
         }
 
-        return $indexMetadata;
+        return $documentMetadata;
     }
 }

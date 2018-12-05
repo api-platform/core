@@ -40,35 +40,35 @@ final class AttributeDocumentMetadataFactory implements DocumentMetadataFactoryI
      */
     public function create(string $resourceClass): DocumentMetadata
     {
-        $indexMetadata = null;
+        $documentMetadata = null;
 
         if ($this->decorated) {
             try {
-                $indexMetadata = $this->decorated->create($resourceClass);
+                $documentMetadata = $this->decorated->create($resourceClass);
             } catch (IndexNotFoundException $e) {
             }
         }
 
         $resourceMetadata = null;
 
-        if (!$indexMetadata || null === $indexMetadata->getIndex()) {
+        if (!$documentMetadata || null === $documentMetadata->getIndex()) {
             $resourceMetadata = $resourceMetadata ?? $this->resourceMetadataFactory->create($resourceClass);
 
             if (null !== $index = $resourceMetadata->getAttribute('elasticsearch_index')) {
-                $indexMetadata = $indexMetadata ? $indexMetadata->withIndex($index) : new DocumentMetadata($index);
+                $documentMetadata = $documentMetadata ? $documentMetadata->withIndex($index) : new DocumentMetadata($index);
             }
         }
 
-        if (!$indexMetadata || DocumentMetadata::DEFAULT_TYPE === $indexMetadata->getType()) {
+        if (!$documentMetadata || DocumentMetadata::DEFAULT_TYPE === $documentMetadata->getType()) {
             $resourceMetadata = $resourceMetadata ?? $this->resourceMetadataFactory->create($resourceClass);
 
             if (null !== $type = $resourceMetadata->getAttribute('elasticsearch_type')) {
-                $indexMetadata = $indexMetadata ? $indexMetadata->withType($type) : new DocumentMetadata(null, $type);
+                $documentMetadata = $documentMetadata ? $documentMetadata->withType($type) : new DocumentMetadata(null, $type);
             }
         }
 
-        if ($indexMetadata) {
-            return $indexMetadata;
+        if ($documentMetadata) {
+            return $documentMetadata;
         }
 
         throw new IndexNotFoundException(sprintf('No index associated with the "%s" resource class.', $resourceClass));

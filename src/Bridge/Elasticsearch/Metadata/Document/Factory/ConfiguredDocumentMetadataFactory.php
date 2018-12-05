@@ -39,33 +39,33 @@ final class ConfiguredDocumentMetadataFactory implements DocumentMetadataFactory
      */
     public function create(string $resourceClass): DocumentMetadata
     {
-        $indexMetadata = null;
+        $documentMetadata = null;
 
         if ($this->decorated) {
             try {
-                $indexMetadata = $this->decorated->create($resourceClass);
+                $documentMetadata = $this->decorated->create($resourceClass);
             } catch (IndexNotFoundException $e) {
             }
         }
 
         if (null === $index = $this->mapping[$resourceClass] ?? null) {
-            if ($indexMetadata) {
-                return $indexMetadata;
+            if ($documentMetadata) {
+                return $documentMetadata;
             }
 
             throw new IndexNotFoundException(sprintf('No index associated with the "%s" resource class.', $resourceClass));
         }
 
-        $indexMetadata = $indexMetadata ?? new DocumentMetadata();
+        $documentMetadata = $documentMetadata ?? new DocumentMetadata();
 
         if (isset($index['index'])) {
-            $indexMetadata = $indexMetadata->withIndex($index['index']);
+            $documentMetadata = $documentMetadata->withIndex($index['index']);
         }
 
         if (isset($index['type'])) {
-            $indexMetadata = $indexMetadata->withType($index['type']);
+            $documentMetadata = $documentMetadata->withType($index['type']);
         }
 
-        return $indexMetadata;
+        return $documentMetadata;
     }
 }

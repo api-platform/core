@@ -21,6 +21,7 @@ use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\PropertyInfo\Type;
+use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 
 /**
  * Filter the collection by given properties.
@@ -37,9 +38,9 @@ final class TermFilter extends AbstractFilter implements ConstantScoreFilterInte
     private $iriConverter;
     private $propertyAccessor;
 
-    public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, ResourceClassResolverInterface $resourceClassResolver, IdentifierExtractorInterface $identifierExtractor, IriConverterInterface $iriConverter, PropertyAccessorInterface $propertyAccessor, ?array $properties = null)
+    public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, ResourceClassResolverInterface $resourceClassResolver, IdentifierExtractorInterface $identifierExtractor, IriConverterInterface $iriConverter, PropertyAccessorInterface $propertyAccessor, ?NameConverterInterface $nameConverter = null, ?array $properties = null)
     {
-        parent::__construct($propertyNameCollectionFactory, $propertyMetadataFactory, $resourceClassResolver, $properties);
+        parent::__construct($propertyNameCollectionFactory, $propertyMetadataFactory, $resourceClassResolver, $nameConverter, $properties);
 
         $this->identifierExtractor = $identifierExtractor;
         $this->iriConverter = $iriConverter;
@@ -68,13 +69,16 @@ final class TermFilter extends AbstractFilter implements ConstantScoreFilterInte
                 continue;
             }
 
+            $convertedProperty = null === $this->nameConverter ? $property : $this->nameConverter->normalize($property);
+
             if (1 === \count($values)) {
-                $term = ['term' => [$property => $values[0]]];
+                $term = ['term' => [$convertedProperty => reset($values)]];
             } else {
-                $term = ['terms' => [$property => $values]];
+                $term = ['terms' => [$convertedProperty => $values]];
             }
 
             if (null !== $nestedPath = $this->getNestedFieldPath($resourceClass, $property)) {
+                $nestedPath = null === $this->nameConverter ? $nestedPath : $this->nameConverter->normalize($nestedPath);
                 $term = ['nested' => ['path' => $nestedPath, 'query' => $term]];
             }
 

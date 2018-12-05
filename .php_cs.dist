@@ -13,7 +13,6 @@ HEADER;
 
 $finder = PhpCsFixer\Finder::create()
     ->in(__DIR__)
-    ->exclude('tests/Fixtures/app/cache')
     ->exclude('tests/Fixtures/app/var')
 ;
 

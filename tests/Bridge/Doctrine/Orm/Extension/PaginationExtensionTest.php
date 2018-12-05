@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Tests\Bridge\Doctrine\Orm\Extension;
 
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\ContextAwareQueryResultCollectionExtensionInterface;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\PaginationExtension;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGenerator;
 use ApiPlatform\Core\DataProvider\Pagination;
@@ -37,6 +38,80 @@ use Symfony\Component\HttpFoundation\RequestStack;
  */
 class PaginationExtensionTest extends TestCase
 {
+    /**
+     * @group legacy
+     * @expectedDeprecation Passing an instance of "Symfony\Component\HttpFoundation\RequestStack" as second argument of "ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\PaginationExtension" is deprecated since API Platform 2.4 and will not be possible anymore in API Platform 3. Pass an instance of "ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface" instead.
+     * @expectedDeprecation Passing an instance of "ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface" as third argument of "ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\PaginationExtension" is deprecated since API Platform 2.4 and will not be possible anymore in API Platform 3. Pass an instance of "ApiPlatform\Core\DataProvider\Pagination" instead.
+     * @expectedDeprecation Passing "$enabled", "$clientEnabled", "$clientItemsPerPage", "$itemsPerPage", "$pageParameterName", "$enabledParameterName", "$itemsPerPageParameterName", "$maximumItemPerPage", "$partial", "$clientPartial", "$partialParameterName" arguments is deprecated since API Platform 2.4 and will not be possible anymore in API Platform 3. Pass an instance of "ApiPlatform\Core\Bridge\Doctrine\Orm\Paginator" as third argument instead.
+     */
+    public function testLegacyConstruct()
+    {
+        $paginationExtension = new PaginationExtension(
+            $this->prophesize(ManagerRegistry::class)->reveal(),
+            new RequestStack(),
+            $this->prophesize(ResourceMetadataFactoryInterface::class)->reveal(),
+            true,
+            true,
+            true
+        );
+
+        self::assertInstanceOf(ContextAwareQueryResultCollectionExtensionInterface::class, $paginationExtension);
+    }
+
+    /**
+     * @group legacy
+     * @expectedDeprecation Passing an instance of "Symfony\Component\HttpFoundation\RequestStack" as second argument of "ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\PaginationExtension" is deprecated since API Platform 2.4 and will not be possible anymore in API Platform 3. Pass an instance of "ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface" instead.
+     * @expectedDeprecation Passing an instance of "ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface" as third argument of "ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\PaginationExtension" is deprecated since API Platform 2.4 and will not be possible anymore in API Platform 3. Pass an instance of "ApiPlatform\Core\DataProvider\Pagination" instead.
+     * @expectedDeprecation Passing "$enabled", "$clientEnabled", "$clientItemsPerPage", "$itemsPerPage", "$pageParameterName", "$enabledParameterName", "$itemsPerPageParameterName", "$maximumItemPerPage", "$partial", "$clientPartial", "$partialParameterName" arguments is deprecated since API Platform 2.4 and will not be possible anymore in API Platform 3. Pass an instance of "ApiPlatform\Core\Bridge\Doctrine\Orm\Paginator" as third argument instead.
+     */
+    public function testLegacyConstructWithBadArgument()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('The "$enabled" argument is expected to be a bool.');
+
+        new PaginationExtension(
+            $this->prophesize(ManagerRegistry::class)->reveal(),
+            new RequestStack(),
+            $this->prophesize(ResourceMetadataFactoryInterface::class)->reveal(),
+            'bad argument'
+        );
+    }
+
+    public function testConstruct()
+    {
+        $paginationExtension = new PaginationExtension(
+            $this->prophesize(ManagerRegistry::class)->reveal(),
+            $this->prophesize(ResourceMetadataFactoryInterface::class)->reveal(),
+            new Pagination(new RequestStack(), $this->prophesize(ResourceMetadataFactoryInterface::class)->reveal())
+        );
+
+        self::assertInstanceOf(ContextAwareQueryResultCollectionExtensionInterface::class, $paginationExtension);
+    }
+
+    public function testConstructWithBadResourceMetadataFactory()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage(sprintf('The "$resourceMetadataFactory" argument is expected to be an implementation of the "%s" interface.', ResourceMetadataFactoryInterface::class));
+
+        new PaginationExtension(
+            $this->prophesize(ManagerRegistry::class)->reveal(),
+            new \stdClass(),
+            new Pagination(new RequestStack(), $this->prophesize(ResourceMetadataFactoryInterface::class)->reveal())
+        );
+    }
+
+    public function testConstructWithBadPagination()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage(sprintf('The "$pagination" argument is expected to be an instance of the "%s" class.', Pagination::class));
+
+        new PaginationExtension(
+            $this->prophesize(ManagerRegistry::class)->reveal(),
+            $this->prophesize(ResourceMetadataFactoryInterface::class)->reveal(),
+            new \stdClass()
+        );
+    }
+
     public function testApplyToCollection()
     {
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);

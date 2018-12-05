@@ -83,10 +83,7 @@ final class ItemNormalizer extends ObjectNormalizer
     private function populateIdentifier(array $data, string $class): array
     {
         $identifier = $this->identifierExtractor->getIdentifierFromResourceClass($class);
-
-        if (null !== $this->nameConverter) {
-            $identifier = $this->nameConverter->normalize($identifier);
-        }
+        $identifier = null === $this->nameConverter ? $identifier : $this->nameConverter->normalize($identifier);
 
         if (!isset($data['_source'][$identifier])) {
             $data['_source'][$identifier] = $data['_id'];

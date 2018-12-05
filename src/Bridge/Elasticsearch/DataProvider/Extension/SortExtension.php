@@ -13,10 +13,12 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Bridge\Elasticsearch\DataProvider\Extension;
 
+use ApiPlatform\Core\Api\ResourceClassResolverInterface;
 use ApiPlatform\Core\Bridge\Elasticsearch\Api\IdentifierExtractorInterface;
 use ApiPlatform\Core\Bridge\Elasticsearch\Util\FieldDatatypeTrait;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
+use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 
 /**
  * Applies selected sorting while querying resource collection.
@@ -35,12 +37,15 @@ final class SortExtension implements FullBodySearchCollectionExtensionInterface
     private $defaultDirection;
     private $identifierExtractor;
     private $resourceMetadataFactory;
+    private $nameConverter;
 
-    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, IdentifierExtractorInterface $identifierExtractor, PropertyMetadataFactoryInterface $propertyMetadataFactory, ?string $defaultDirection = null)
+    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, IdentifierExtractorInterface $identifierExtractor, PropertyMetadataFactoryInterface $propertyMetadataFactory, ResourceClassResolverInterface $resourceClassResolver, ?NameConverterInterface $nameConverter = null, ?string $defaultDirection = null)
     {
         $this->resourceMetadataFactory = $resourceMetadataFactory;
         $this->identifierExtractor = $identifierExtractor;
         $this->propertyMetadataFactory = $propertyMetadataFactory;
+        $this->resourceClassResolver = $resourceClassResolver;
+        $this->nameConverter = $nameConverter;
         $this->defaultDirection = $defaultDirection;
     }
 
@@ -85,8 +90,11 @@ final class SortExtension implements FullBodySearchCollectionExtensionInterface
         $order = ['order' => strtolower($direction)];
 
         if (null !== $nestedPath = $this->getNestedFieldPath($resourceClass, $property)) {
+            $nestedPath = null === $this->nameConverter ? $nestedPath : $this->nameConverter->normalize($nestedPath);
             $order['nested'] = ['path' => $nestedPath];
         }
+
+        $property = null === $this->nameConverter ? $property : $this->nameConverter->normalize($property);
 
         return [$property => $order];
     }

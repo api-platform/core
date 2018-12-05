@@ -47,35 +47,43 @@ final class CatDocumentMetadataFactory implements DocumentMetadataFactoryInterfa
      */
     public function create(string $resourceClass): DocumentMetadata
     {
-        $indexMetadata = null;
+        $documentMetadata = null;
 
         if ($this->decorated) {
             try {
-                $indexMetadata = $this->decorated->create($resourceClass);
+                $documentMetadata = $this->decorated->create($resourceClass);
             } catch (IndexNotFoundException $e) {
             }
         }
 
-        if ($indexMetadata && null !== $indexMetadata->getIndex()) {
-            return $indexMetadata;
+        if ($documentMetadata && null !== $documentMetadata->getIndex()) {
+            return $documentMetadata;
         }
 
-        $index = Inflector::tableize($this->resourceMetadataFactory->create($resourceClass)->getShortName());
+        if (null === $resourceShortName = $this->resourceMetadataFactory->create($resourceClass)->getShortName()) {
+            return $this->handleNotFound($documentMetadata, $resourceClass);
+        }
+
+        $index = Inflector::tableize($resourceShortName);
 
         try {
             $this->client->cat()->indices(['index' => $index]);
         } catch (Missing404Exception $e) {
-            if ($indexMetadata) {
-                return $indexMetadata;
-            }
-
-            throw new IndexNotFoundException(sprintf('No index associated with the "%s" resource class.', $resourceClass));
+            return $this->handleNotFound($documentMetadata, $resourceClass);
         }
 
-        if ($indexMetadata) {
-            return $indexMetadata->withIndex($index);
+        return ($documentMetadata ?? new DocumentMetadata())->withIndex($index);
+    }
+
+    /**
+     * @throws IndexNotFoundException
+     */
+    private function handleNotFound(?DocumentMetadata $documentMetadata, string $resourceClass): DocumentMetadata
+    {
+        if ($documentMetadata) {
+            return $documentMetadata;
         }
 
-        return new DocumentMetadata($index);
+        throw new IndexNotFoundException(sprintf('No index associated with the "%s" resource class.', $resourceClass));
     }
 }

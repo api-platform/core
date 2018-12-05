@@ -32,7 +32,7 @@ use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 final class CollectionDataProvider implements ContextAwareCollectionDataProviderInterface, RestrictedDataProviderInterface
 {
     private $client;
-    private $indexMetadataFactory;
+    private $documentMetadataFactory;
     private $denormalizer;
     private $pagination;
     private $collectionExtensions;
@@ -40,10 +40,10 @@ final class CollectionDataProvider implements ContextAwareCollectionDataProvider
     /**
      * @param FullBodySearchCollectionExtensionInterface[] $collectionExtensions
      */
-    public function __construct(Client $client, DocumentMetadataFactoryInterface $indexMetadataFactory, DenormalizerInterface $denormalizer, Pagination $pagination, iterable $collectionExtensions = [])
+    public function __construct(Client $client, DocumentMetadataFactoryInterface $documentMetadataFactory, DenormalizerInterface $denormalizer, Pagination $pagination, iterable $collectionExtensions = [])
     {
         $this->client = $client;
-        $this->indexMetadataFactory = $indexMetadataFactory;
+        $this->documentMetadataFactory = $documentMetadataFactory;
         $this->denormalizer = $denormalizer;
         $this->pagination = $pagination;
         $this->collectionExtensions = $collectionExtensions;
@@ -55,7 +55,7 @@ final class CollectionDataProvider implements ContextAwareCollectionDataProvider
     public function supports(string $resourceClass, ?string $operationName = null, array $context = []): bool
     {
         try {
-            $this->indexMetadataFactory->create($resourceClass);
+            $this->documentMetadataFactory->create($resourceClass);
         } catch (IndexNotFoundException $e) {
             return false;
         }
@@ -68,7 +68,7 @@ final class CollectionDataProvider implements ContextAwareCollectionDataProvider
      */
     public function getCollection(string $resourceClass, ?string $operationName = null, array $context = [])
     {
-        $indexMetadata = $this->indexMetadataFactory->create($resourceClass);
+        $documentMetadata = $this->documentMetadataFactory->create($resourceClass);
         $body = [];
 
         foreach ($this->collectionExtensions as $collectionExtension) {
@@ -95,8 +95,8 @@ final class CollectionDataProvider implements ContextAwareCollectionDataProvider
         }
 
         $documents = $this->client->search([
-            'index' => $indexMetadata->getIndex(),
-            'type' => $indexMetadata->getType(),
+            'index' => $documentMetadata->getIndex(),
+            'type' => $documentMetadata->getType(),
             'body' => $body,
         ]);
 

@@ -34,13 +34,13 @@ use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 final class ItemDataProvider implements ItemDataProviderInterface, RestrictedDataProviderInterface
 {
     private $client;
-    private $indexMetadataFactory;
+    private $documentMetadataFactory;
     private $denormalizer;
 
-    public function __construct(Client $client, DocumentMetadataFactoryInterface $indexMetadataFactory, DenormalizerInterface $denormalizer)
+    public function __construct(Client $client, DocumentMetadataFactoryInterface $documentMetadataFactory, DenormalizerInterface $denormalizer)
     {
         $this->client = $client;
-        $this->indexMetadataFactory = $indexMetadataFactory;
+        $this->documentMetadataFactory = $documentMetadataFactory;
         $this->denormalizer = $denormalizer;
     }
 
@@ -50,7 +50,7 @@ final class ItemDataProvider implements ItemDataProviderInterface, RestrictedDat
     public function supports(string $resourceClass, ?string $operationName = null, array $context = []): bool
     {
         try {
-            $this->indexMetadataFactory->create($resourceClass);
+            $this->documentMetadataFactory->create($resourceClass);
         } catch (IndexNotFoundException $e) {
             return false;
         }
@@ -68,15 +68,15 @@ final class ItemDataProvider implements ItemDataProviderInterface, RestrictedDat
                 throw new InvalidArgumentException('Composite identifiers not supported.');
             }
 
-            $id = array_values($id)[0];
+            $id = reset($id);
         }
 
-        $indexMetadata = $this->indexMetadataFactory->create($resourceClass);
+        $documentMetadata = $this->documentMetadataFactory->create($resourceClass);
 
         try {
             $document = $this->client->get([
-                'index' => $indexMetadata->getIndex(),
-                'type' => $indexMetadata->getType(),
+                'index' => $documentMetadata->getIndex(),
+                'type' => $documentMetadata->getType(),
                 'id' => (string) $id,
             ]);
         } catch (Missing404Exception $e) {

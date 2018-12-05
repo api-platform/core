@@ -230,7 +230,11 @@ final class Configuration implements ConfigurationInterface
                 ->arrayNode('mercure')
                     ->{class_exists(MercureBundle::class) ? 'canBeDisabled' : 'canBeEnabled'}()
                     ->children()
-                        ->scalarNode('hub_url')->defaultNull()->info('The URL send in the Link HTTP header. If not set, will default to the URL for the Symfony\'s bundle default hub.')
+                        ->scalarNode('hub_url')
+                            ->defaultNull()
+                            ->info('The URL send in the Link HTTP header. If not set, will default to the URL for the Symfony\'s bundle default hub.')
+                        ->end()
+                    ->end()
                 ->end()
 
                 ->arrayNode('elasticsearch')
