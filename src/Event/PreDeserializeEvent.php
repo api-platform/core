@@ -20,9 +20,9 @@ final class PreDeserializeEvent extends Event
     const NAME = Events::PRE_DESERIALIZE;
     private $data;
 
-    public function __construct($controllerResult)
+    public function __construct($data)
     {
-        $this->data = $controllerResult;
+        $this->data = $data;
     }
 
     public function getData()
