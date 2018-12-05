@@ -32,7 +32,6 @@ final class RequestAttributesExtractor
      * Extracts resource class, operation name and format request attributes. Returns an empty array if the request does
      * not contain required attributes.
      *
-     *
      * @return array
      */
     public static function extractAttributes(Request $request)

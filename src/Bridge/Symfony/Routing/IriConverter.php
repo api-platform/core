@@ -174,7 +174,6 @@ final class IriConverter implements IriConverterInterface
     /**
      * Generate the identifier url.
      *
-     *
      * @return string[]
      */
     private function generateIdentifiersUrl(array $identifiers): array

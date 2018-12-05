@@ -48,7 +48,6 @@ trait FilterLocatorTrait
     /**
      * Gets a filter with a backward compatibility.
      *
-     *
      * @return FilterInterface|null
      */
     private function getFilter(string $filterId)
