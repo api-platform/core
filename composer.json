@@ -17,7 +17,7 @@
         "doctrine/inflector": "^1.0",
         "psr/cache": "^1.0",
         "psr/container": "^1.0",
-        "symfony/event-dispatcher": "^4.1",
+        "symfony/event-dispatcher": "^3.4 || ^4.0",
         "symfony/http-foundation": "^3.1 || ^4.0",
         "symfony/http-kernel": "^2.7 || ^3.0 || ^4.0",
         "symfony/property-access": "^2.7 || ^3.0 || ^4.0",
