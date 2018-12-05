@@ -17,7 +17,7 @@ use Symfony\Component\EventDispatcher\Event;
 
 class PostWriteEvent extends Event
 {
-    const NAME = ApiPlatformEvents::POST_WRITE;
+    const NAME = Events::POST_WRITE;
     private $method;
     private $controllerResult;
 

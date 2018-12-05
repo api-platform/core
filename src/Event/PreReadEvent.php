@@ -17,7 +17,7 @@ use Symfony\Component\EventDispatcher\Event;
 
 final class PreReadEvent extends Event
 {
-    const NAME = ApiPlatformEvents::PRE_READ;
+    const NAME = Events::PRE_READ;
 
     private $data;
 

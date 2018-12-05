@@ -17,7 +17,7 @@ use Symfony\Component\EventDispatcher\Event;
 
 final class PreSerializeEvent extends Event
 {
-    const NAME = ApiPlatformEvents::PRE_SERIALIZE;
+    const NAME = Events::PRE_SERIALIZE;
     private $object;
 
     public function __construct($object)

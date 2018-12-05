@@ -18,7 +18,7 @@ use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
 
 final class PreRespondEvent extends Event
 {
-    const NAME = ApiPlatformEvents::PRE_RESPOND;
+    const NAME = Events::PRE_RESPOND;
 
     private $event;
 

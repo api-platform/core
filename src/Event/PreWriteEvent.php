@@ -17,7 +17,7 @@ use Symfony\Component\EventDispatcher\Event;
 
 class PreWriteEvent extends Event
 {
-    const NAME = ApiPlatformEvents::PRE_WRITE;
+    const NAME = Events::PRE_WRITE;
     private $method;
     private $controllerResult;
 

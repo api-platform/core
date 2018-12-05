@@ -17,7 +17,7 @@ use Symfony\Component\EventDispatcher\Event;
 
 class PostAddFormatEvent extends Event
 {
-    const NAME = ApiPlatformEvents::POST_ADD_FORMAT;
+    const NAME = Events::POST_ADD_FORMAT;
     private $formats;
 
     public function __construct($formats)

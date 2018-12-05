@@ -17,7 +17,7 @@ use Symfony\Component\EventDispatcher\Event;
 
 final class PostReadEvent extends Event
 {
-    const NAME = ApiPlatformEvents::POST_READ;
+    const NAME = Events::POST_READ;
 
     private $data;
 

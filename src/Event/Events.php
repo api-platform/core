@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Event;
 
-final class ApiPlatformEvents
+final class Events
 {
     const PRE_READ = 'api_platform.pre_read';
     const POST_READ = 'api_platform.post_read';
