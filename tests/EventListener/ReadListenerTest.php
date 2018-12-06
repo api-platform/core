@@ -16,12 +16,15 @@ namespace ApiPlatform\Core\Tests\EventListener;
 use ApiPlatform\Core\DataProvider\CollectionDataProviderInterface;
 use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
 use ApiPlatform\Core\DataProvider\SubresourceDataProviderInterface;
+use ApiPlatform\Core\Event\PostReadEvent;
+use ApiPlatform\Core\Event\PreReadEvent;
 use ApiPlatform\Core\EventListener\ReadListener;
 use ApiPlatform\Core\Exception\InvalidIdentifierException;
 use ApiPlatform\Core\Exception\RuntimeException;
 use ApiPlatform\Core\Identifier\IdentifierConverterInterface;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -167,7 +170,11 @@ class ReadListenerTest extends TestCase
         $event = $this->prophesize(GetResponseEvent::class);
         $event->getRequest()->willReturn($request)->shouldBeCalled();
 
-        $listener = new ReadListener($collectionDataProvider->reveal(), $itemDataProvider->reveal(), $subresourceDataProvider->reveal(), null, $identifierConverter->reveal());
+        $eventDispatcher = $this->prophesize(EventDispatcherInterface::class);
+        $eventDispatcher->dispatch(PreReadEvent::NAME, new PreReadEvent([]))->shouldBeCalled(self::once());
+        $eventDispatcher->dispatch(PostReadEvent::NAME, new PostReadEvent($data))->shouldBeCalled(self::once());
+
+        $listener = new ReadListener($collectionDataProvider->reveal(), $itemDataProvider->reveal(), $subresourceDataProvider->reveal(), null, $identifierConverter->reveal(), $eventDispatcher->reveal());
         $listener->onKernelRequest($event->reveal());
 
         $this->assertSame($data, $request->attributes->get('data'));

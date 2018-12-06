@@ -14,10 +14,13 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\EventListener;
 
 use ApiPlatform\Core\Api\FormatsProviderInterface;
+use ApiPlatform\Core\Event\PostDeserializeEvent;
+use ApiPlatform\Core\Event\PreDeserializeEvent;
 use ApiPlatform\Core\EventListener\DeserializeListener;
 use ApiPlatform\Core\Serializer\SerializerContextBuilderInterface;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\Exception\NotAcceptableHttpException;
@@ -168,7 +171,11 @@ class DeserializeListenerTest extends TestCase
         $serializerContextBuilderProphecy = $this->prophesize(SerializerContextBuilderInterface::class);
         $serializerContextBuilderProphecy->createFromRequest(Argument::type(Request::class), false, Argument::type('array'))->willReturn([])->shouldBeCalled();
 
-        $listener = new DeserializeListener($serializerProphecy->reveal(), $serializerContextBuilderProphecy->reveal(), $formatsProviderProphecy->reveal());
+        $eventDispatcher = $this->prophesize(EventDispatcherInterface::class);
+        $eventDispatcher->dispatch(PreDeserializeEvent::NAME, new PreDeserializeEvent($request->getContent()))->shouldBeCalled(self::once());
+        $eventDispatcher->dispatch(PostDeserializeEvent::NAME, new PostDeserializeEvent($request->getContent()))->shouldBeCalled(self::once());
+
+        $listener = new DeserializeListener($serializerProphecy->reveal(), $serializerContextBuilderProphecy->reveal(), $formatsProviderProphecy->reveal(), $eventDispatcher->reveal());
         $listener->onKernelRequest($eventProphecy->reveal());
     }
 
