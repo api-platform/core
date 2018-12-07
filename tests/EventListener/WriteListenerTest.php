@@ -15,11 +15,14 @@ namespace ApiPlatform\Core\Tests\EventListener;
 
 use ApiPlatform\Core\Api\IriConverterInterface;
 use ApiPlatform\Core\DataPersister\DataPersisterInterface;
+use ApiPlatform\Core\Event\PostWriteEvent;
+use ApiPlatform\Core\Event\PreWriteEvent;
 use ApiPlatform\Core\EventListener\WriteListener;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyTableInheritance;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyTableInheritanceChild;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
@@ -127,7 +130,11 @@ class WriteListenerTest extends TestCase
             $request->setMethod($httpMethod);
             $request->attributes->set(sprintf('_api_%s_operation_name', 'POST' === $httpMethod ? 'collection' : 'item'), strtolower($httpMethod));
 
-            (new WriteListener($dataPersisterProphecy->reveal(), $iriConverterProphecy->reveal()))->onKernelView($event);
+            $eventDispatcher = $this->prophesize(EventDispatcherInterface::class);
+            $eventDispatcher->dispatch(PreWriteEvent::NAME, new PreWriteEvent($event->getControllerResult()))->shouldBeCalled(self::once());
+            $eventDispatcher->dispatch(PostWriteEvent::NAME, new PostWriteEvent($event->getControllerResult()))->shouldBeCalled(self::once());
+
+            (new WriteListener($dataPersisterProphecy->reveal(), $iriConverterProphecy->reveal(), $eventDispatcher->reveal()))->onKernelView($event);
 
             $this->assertSame($dummy2, $event->getControllerResult());
             $this->assertEquals('/dummy/1', $request->attributes->get('_api_write_item_iri'));

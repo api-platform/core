@@ -13,11 +13,14 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Tests\EventListener;
 
+use ApiPlatform\Core\Event\PostSerializeEvent;
+use ApiPlatform\Core\Event\PreSerializeEvent;
 use ApiPlatform\Core\EventListener\SerializeListener;
 use ApiPlatform\Core\Serializer\ResourceList;
 use ApiPlatform\Core\Serializer\SerializerContextBuilderInterface;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
@@ -98,7 +101,11 @@ class SerializeListenerTest extends TestCase
         $serializerContextBuilderProphecy = $this->prophesize(SerializerContextBuilderInterface::class);
         $serializerContextBuilderProphecy->createFromRequest(Argument::type(Request::class), true, Argument::type('array'))->willReturn($expectedContext)->shouldBeCalled();
 
-        $listener = new SerializeListener($serializerProphecy->reveal(), $serializerContextBuilderProphecy->reveal());
+        $eventDispatcher = $this->prophesize(EventDispatcherInterface::class);
+        $eventDispatcher->dispatch(PreSerializeEvent::NAME, new PreSerializeEvent($eventProphecy->reveal()->getControllerResult()))->shouldBeCalled(self::once());
+        $eventDispatcher->dispatch(PostSerializeEvent::NAME, new PostSerializeEvent('bar'))->shouldBeCalled(self::once());
+
+        $listener = new SerializeListener($serializerProphecy->reveal(), $serializerContextBuilderProphecy->reveal(), $eventDispatcher->reveal());
         $listener->onKernelView($eventProphecy->reveal());
     }
 
