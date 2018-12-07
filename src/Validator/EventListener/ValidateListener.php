@@ -14,9 +14,12 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Validator\EventListener;
 
 use ApiPlatform\Core\Bridge\Symfony\Validator\Exception\ValidationException;
+use ApiPlatform\Core\Event\PostValidateEvent;
+use ApiPlatform\Core\Event\PreValidateEvent;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Util\RequestAttributesExtractor;
 use ApiPlatform\Core\Validator\ValidatorInterface;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
 
 /**
@@ -28,11 +31,16 @@ final class ValidateListener
 {
     private $validator;
     private $resourceMetadataFactory;
+    /**
+     * @var EventDispatcher
+     */
+    private $eventDispatcher;
 
-    public function __construct(ValidatorInterface $validator, ResourceMetadataFactoryInterface $resourceMetadataFactory)
+    public function __construct(ValidatorInterface $validator, ResourceMetadataFactoryInterface $resourceMetadataFactory, EventDispatcher $eventDispatcher = null)
     {
         $this->validator = $validator;
         $this->resourceMetadataFactory = $resourceMetadataFactory;
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     /**
@@ -56,6 +64,14 @@ final class ValidateListener
         $resourceMetadata = $this->resourceMetadataFactory->create($attributes['resource_class']);
         $validationGroups = $resourceMetadata->getOperationAttribute($attributes, 'validation_groups', null, true);
 
+        if (null !== $this->eventDispatcher) {
+            $this->eventDispatcher->dispatch(PreValidateEvent::NAME, new PreValidateEvent($data));
+        }
+
         $this->validator->validate($data, ['groups' => $validationGroups]);
+
+        if (null !== $this->eventDispatcher) {
+            $this->eventDispatcher->dispatch(PostValidateEvent::NAME, new PostValidateEvent($data));
+        }
     }
 }

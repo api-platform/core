@@ -32,4 +32,7 @@ final class Events
 
     const PRE_ADD_FORMAT = 'api_platform.pre_add_format';
     const POST_ADD_FORMAT = 'api_platform.post_add_format';
+
+    const PRE_VALIDATE = 'api_platform.pre_validate';
+    const POST_VALIDATE = 'api_platform.post_validate';
 }

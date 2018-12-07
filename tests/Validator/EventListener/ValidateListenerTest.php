@@ -13,6 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Tests\Validator\EventListener;
 
+use ApiPlatform\Core\Event\PostValidateEvent;
+use ApiPlatform\Core\Event\PreValidateEvent;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Tests\Fixtures\DummyEntity;
@@ -20,6 +22,7 @@ use ApiPlatform\Core\Validator\EventListener\ValidateListener;
 use ApiPlatform\Core\Validator\Exception\ValidationException;
 use ApiPlatform\Core\Validator\ValidatorInterface;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
@@ -63,7 +66,11 @@ class ValidateListenerTest extends TestCase
 
         list($resourceMetadataFactory, $event) = $this->createEventObject($expectedValidationGroups, $data);
 
-        $validationViewListener = new ValidateListener($validator, $resourceMetadataFactory);
+        $eventDispatcher = $this->prophesize(EventDispatcher::class);
+        $eventDispatcher->dispatch(PreValidateEvent::NAME, new PreValidateEvent($data))->shouldBeCalled(self::once());
+        $eventDispatcher->dispatch(PostValidateEvent::NAME, new PostValidateEvent($data))->shouldBeCalled(self::once());
+
+        $validationViewListener = new ValidateListener($validator, $resourceMetadataFactory, $eventDispatcher->reveal());
         $validationViewListener->onKernelView($event);
     }
 
