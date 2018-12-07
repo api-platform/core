@@ -19,7 +19,7 @@ use ApiPlatform\Core\Event\PreValidateEvent;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Util\RequestAttributesExtractor;
 use ApiPlatform\Core\Validator\ValidatorInterface;
-use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
 
 /**
@@ -31,12 +31,9 @@ final class ValidateListener
 {
     private $validator;
     private $resourceMetadataFactory;
-    /**
-     * @var EventDispatcher
-     */
     private $eventDispatcher;
 
-    public function __construct(ValidatorInterface $validator, ResourceMetadataFactoryInterface $resourceMetadataFactory, EventDispatcher $eventDispatcher = null)
+    public function __construct(ValidatorInterface $validator, ResourceMetadataFactoryInterface $resourceMetadataFactory, EventDispatcherInterface $eventDispatcher = null)
     {
         $this->validator = $validator;
         $this->resourceMetadataFactory = $resourceMetadataFactory;
