@@ -93,8 +93,10 @@ class SerializeListenerTest extends TestCase
         $request = new Request([], [], ['_api_resource_class' => 'Foo', '_api_collection_operation_name' => 'get']);
         $request->setRequestFormat('xml');
 
+        $data = new \stdClass();
+
         $eventProphecy = $this->prophesize(GetResponseForControllerResultEvent::class);
-        $eventProphecy->getControllerResult()->willReturn(new \stdClass())->shouldBeCalled();
+        $eventProphecy->getControllerResult()->willReturn($data)->shouldBeCalled();
         $eventProphecy->getRequest()->willReturn($request)->shouldBeCalled();
         $eventProphecy->setControllerResult('bar')->shouldBeCalled();
 
@@ -102,7 +104,7 @@ class SerializeListenerTest extends TestCase
         $serializerContextBuilderProphecy->createFromRequest(Argument::type(Request::class), true, Argument::type('array'))->willReturn($expectedContext)->shouldBeCalled();
 
         $eventDispatcher = $this->prophesize(EventDispatcherInterface::class);
-        $eventDispatcher->dispatch(PreSerializeEvent::NAME, new PreSerializeEvent($eventProphecy->reveal()->getControllerResult()))->shouldBeCalled(self::once());
+        $eventDispatcher->dispatch(PreSerializeEvent::NAME, new PreSerializeEvent($data))->shouldBeCalled(self::once());
         $eventDispatcher->dispatch(PostSerializeEvent::NAME, new PostSerializeEvent('bar'))->shouldBeCalled(self::once());
 
         $listener = new SerializeListener($serializerProphecy->reveal(), $serializerContextBuilderProphecy->reveal(), $eventDispatcher->reveal());
