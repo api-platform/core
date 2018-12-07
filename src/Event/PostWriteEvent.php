@@ -20,9 +20,9 @@ final class PostWriteEvent extends Event
     const NAME = Events::POST_WRITE;
     private $data;
 
-    public function __construct($controllerResult)
+    public function __construct($data)
     {
-        $this->data = $controllerResult;
+        $this->data = $data;
     }
 
     public function getData()
