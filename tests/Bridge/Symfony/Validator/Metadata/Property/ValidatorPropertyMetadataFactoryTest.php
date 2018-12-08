@@ -199,7 +199,5 @@ class ValidatorPropertyMetadataFactoryTest extends TestCase
             $resultedPropertyMetadata = $validatorPropertyMetadataFactory->create(DummyIriWithValidationEntity::class, $property);
             $this->assertSame($iri, $resultedPropertyMetadata->getIri());
         }
-
-        $this->assertInstanceOf(PropertyMetadata::class, $resultedPropertyMetadata);
     }
 }
