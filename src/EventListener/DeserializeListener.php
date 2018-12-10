@@ -98,7 +98,6 @@ final class DeserializeListener
     /**
      * Extracts the format from the Content-Type header and check that it is supported.
      *
-     *
      * @throws NotAcceptableHttpException
      */
     private function getFormat(Request $request): string

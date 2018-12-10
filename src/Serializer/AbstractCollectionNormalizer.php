@@ -50,7 +50,7 @@ abstract class AbstractCollectionNormalizer implements NormalizerInterface, Norm
      */
     public function supportsNormalization($data, $format = null)
     {
-        return static::FORMAT === $format && (\is_array($data) || $data instanceof \Traversable);
+        return static::FORMAT === $format && is_iterable($data);
     }
 
     /**

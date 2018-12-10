@@ -18,11 +18,13 @@ namespace ApiPlatform\Core\Tests\Fixtures;
  */
 class Query
 {
-    public function getFirstResult()
+    public function getFirstResult(): ?int
     {
+        return null;
     }
 
-    public function getMaxResults()
+    public function getMaxResults(): ?int
     {
+        return null;
     }
 }

@@ -290,7 +290,6 @@ class SearchFilter extends AbstractContextAwareFilter
     /**
      * Adds where clause according to the strategy.
      *
-     *
      * @throws InvalidArgumentException If strategy does not exist
      */
     protected function addWhereByStrategy(string $strategy, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $alias, string $field, $value, bool $caseSensitive)

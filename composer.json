@@ -68,6 +68,7 @@
         "webonyx/graphql-php": ">=0.13 <1.0"
     },
     "conflict": {
+        "doctrine/common": "<2.7",
         "symfony/dependency-injection": "<3.4"
     },
     "suggest": {
