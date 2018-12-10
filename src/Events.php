@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Event;
+namespace ApiPlatform\Core;
 
 final class Events
 {
