@@ -108,9 +108,7 @@ final class ValidatorPropertyMetadataFactory implements PropertyMetadataFactoryI
             }
         }
 
-        $propertyMetadata = $propertyMetadata->withIri($iri);
-
-        return $propertyMetadata->withRequired($required ?? false);
+        return $propertyMetadata->withIri($iri)->withRequired($required ?? false);
     }
 
     /**
