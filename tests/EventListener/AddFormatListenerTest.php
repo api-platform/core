@@ -230,11 +230,7 @@ class AddFormatListenerTest extends TestCase
         $formatsProviderProphecy = $this->prophesize(FormatsProviderInterface::class);
         $formatsProviderProphecy->getFormatsFromAttributes(['resource_class' => 'Foo', 'input_class' => 'Foo', 'output_class' => 'Foo', 'collection_operation_name' => 'get', 'receive' => true, 'persist' => true])->willReturn(['csv' => ['text/csv']])->shouldBeCalled();
 
-        $eventDispatcher = $this->prophesize(EventDispatcherInterface::class);
-        $eventDispatcher->dispatch(Events::PRE_ADD_FORMAT, new PreAddFormatEvent(['csv' => ['text/csv']]))->shouldBeCalled(self::once());
-        $eventDispatcher->dispatch(Events::POST_ADD_FORMAT, new PostAddFormatEvent(['csv' => ['text/csv']]))->shouldBeCalled(self::once());
-
-        $listener = new AddFormatListener(new Negotiator(), $formatsProviderProphecy->reveal(), $eventDispatcher->reveal());
+        $listener = new AddFormatListener(new Negotiator(), $formatsProviderProphecy->reveal());
         $listener->onKernelRequest($event);
 
         $this->assertSame('csv', $request->getRequestFormat());

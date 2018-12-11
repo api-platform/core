@@ -14,13 +14,9 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\EventListener;
 
 use ApiPlatform\Core\Api\FormatsProviderInterface;
-use ApiPlatform\Core\Event\PostAddFormatEvent;
-use ApiPlatform\Core\Event\PreAddFormatEvent;
-use ApiPlatform\Core\Events;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\Util\RequestAttributesExtractor;
 use Negotiation\Negotiator;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\Exception\NotAcceptableHttpException;
@@ -42,7 +38,7 @@ final class AddFormatListener
     /**
      * @throws InvalidArgumentException
      */
-    public function __construct(Negotiator $negotiator, /* FormatsProviderInterface */ $formatsProvider, EventDispatcherInterface $dispatcher = null)
+    public function __construct(Negotiator $negotiator, /* FormatsProviderInterface */ $formatsProvider)
     {
         $this->negotiator = $negotiator;
         if (\is_array($formatsProvider)) {
@@ -56,7 +52,6 @@ final class AddFormatListener
         }
 
         $this->formatsProvider = $formatsProvider;
-        $this->dispatcher = $dispatcher;
     }
 
     /**
@@ -79,15 +74,7 @@ final class AddFormatListener
 
         $this->populateMimeTypes();
 
-        if (null !== $this->dispatcher) {
-            $this->dispatcher->dispatch(Events::PRE_ADD_FORMAT, new PreAddFormatEvent($this->formats));
-        }
-
         $this->addRequestFormats($request, $this->formats);
-
-        if (null !== $this->dispatcher) {
-            $this->dispatcher->dispatch(Events::POST_ADD_FORMAT, new PostAddFormatEvent($this->formats));
-        }
 
         // Empty strings must be converted to null because the Symfony router doesn't support parameter typing before 3.2 (_format)
         if (null === $routeFormat = $request->attributes->get('_format') ?: null) {

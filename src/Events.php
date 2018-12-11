@@ -29,7 +29,4 @@ final class Events
 
     const PRE_SERIALIZE = 'api_platform.pre_serialize';
     const POST_SERIALIZE = 'api_platform.post_serialize';
-
-    const PRE_ADD_FORMAT = 'api_platform.pre_add_format';
-    const POST_ADD_FORMAT = 'api_platform.post_add_format';
 }
