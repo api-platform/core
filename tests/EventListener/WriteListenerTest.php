@@ -18,6 +18,7 @@ use ApiPlatform\Core\DataPersister\DataPersisterInterface;
 use ApiPlatform\Core\Event\PostWriteEvent;
 use ApiPlatform\Core\Event\PreWriteEvent;
 use ApiPlatform\Core\EventListener\WriteListener;
+use ApiPlatform\Core\Events;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyTableInheritance;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyTableInheritanceChild;
@@ -131,8 +132,8 @@ class WriteListenerTest extends TestCase
             $request->attributes->set(sprintf('_api_%s_operation_name', 'POST' === $httpMethod ? 'collection' : 'item'), strtolower($httpMethod));
 
             $eventDispatcher = $this->prophesize(EventDispatcherInterface::class);
-            $eventDispatcher->dispatch(PreWriteEvent::NAME, new PreWriteEvent($event->getControllerResult()))->shouldBeCalled(self::once());
-            $eventDispatcher->dispatch(PostWriteEvent::NAME, new PostWriteEvent($event->getControllerResult()))->shouldBeCalled(self::once());
+            $eventDispatcher->dispatch(Events::PRE_WRITE, new PreWriteEvent($event->getControllerResult()))->shouldBeCalled(self::once());
+            $eventDispatcher->dispatch(Events::POST_WRITE, new PostWriteEvent($event->getControllerResult()))->shouldBeCalled(self::once());
 
             (new WriteListener($dataPersisterProphecy->reveal(), $iriConverterProphecy->reveal(), $eventDispatcher->reveal()))->onKernelView($event);
 

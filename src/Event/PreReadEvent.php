@@ -13,12 +13,10 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Event;
 
-use ApiPlatform\Core\Events;
 use Symfony\Component\EventDispatcher\Event;
 
 final class PreReadEvent extends Event
 {
-    const NAME = Events::PRE_READ;
     private $data;
 
     public function __construct($data)

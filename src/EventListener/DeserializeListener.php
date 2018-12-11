@@ -16,6 +16,7 @@ namespace ApiPlatform\Core\EventListener;
 use ApiPlatform\Core\Api\FormatsProviderInterface;
 use ApiPlatform\Core\Event\PostDeserializeEvent;
 use ApiPlatform\Core\Event\PreDeserializeEvent;
+use ApiPlatform\Core\Events;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\Serializer\SerializerContextBuilderInterface;
 use ApiPlatform\Core\Util\RequestAttributesExtractor;
@@ -96,7 +97,7 @@ final class DeserializeListener
         }
 
         if (null !== $this->dispatcher) {
-            $this->dispatcher->dispatch(PreDeserializeEvent::NAME, new PreDeserializeEvent($requestContent));
+            $this->dispatcher->dispatch(Events::PRE_DESERIALIZE, new PreDeserializeEvent($requestContent));
         }
 
         $request->attributes->set(
@@ -107,7 +108,7 @@ final class DeserializeListener
         );
 
         if (null !== $this->dispatcher) {
-            $this->dispatcher->dispatch(PostDeserializeEvent::NAME, new PostDeserializeEvent($requestContent));
+            $this->dispatcher->dispatch(Events::POST_DESERIALIZE, new PostDeserializeEvent($requestContent));
         }
     }
 

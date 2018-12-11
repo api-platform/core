@@ -19,6 +19,7 @@ use ApiPlatform\Core\DataProvider\OperationDataProviderTrait;
 use ApiPlatform\Core\DataProvider\SubresourceDataProviderInterface;
 use ApiPlatform\Core\Event\PostReadEvent;
 use ApiPlatform\Core\Event\PreReadEvent;
+use ApiPlatform\Core\Events;
 use ApiPlatform\Core\Exception\InvalidIdentifierException;
 use ApiPlatform\Core\Exception\RuntimeException;
 use ApiPlatform\Core\Identifier\IdentifierConverterInterface;
@@ -95,7 +96,7 @@ final class ReadListener
             $identifiers = $this->extractIdentifiers($request->attributes->all(), $attributes);
 
             if (null !== $this->dispatcher) {
-                $this->dispatcher->dispatch(PreReadEvent::NAME, new PreReadEvent($data));
+                $this->dispatcher->dispatch(Events::PRE_READ, new PreReadEvent($data));
             }
 
             if (isset($attributes['item_operation_name'])) {
@@ -113,7 +114,7 @@ final class ReadListener
         }
 
         if (null !== $this->dispatcher) {
-            $this->dispatcher->dispatch(PostReadEvent::NAME, new PostReadEvent($data));
+            $this->dispatcher->dispatch(Events::POST_READ, new PostReadEvent($data));
         }
 
         if (null === $data) {

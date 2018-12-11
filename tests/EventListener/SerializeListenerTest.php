@@ -16,6 +16,7 @@ namespace ApiPlatform\Core\Tests\EventListener;
 use ApiPlatform\Core\Event\PostSerializeEvent;
 use ApiPlatform\Core\Event\PreSerializeEvent;
 use ApiPlatform\Core\EventListener\SerializeListener;
+use ApiPlatform\Core\Events;
 use ApiPlatform\Core\Serializer\ResourceList;
 use ApiPlatform\Core\Serializer\SerializerContextBuilderInterface;
 use PHPUnit\Framework\TestCase;
@@ -104,8 +105,8 @@ class SerializeListenerTest extends TestCase
         $serializerContextBuilderProphecy->createFromRequest(Argument::type(Request::class), true, Argument::type('array'))->willReturn($expectedContext)->shouldBeCalled();
 
         $eventDispatcher = $this->prophesize(EventDispatcherInterface::class);
-        $eventDispatcher->dispatch(PreSerializeEvent::NAME, new PreSerializeEvent($data))->shouldBeCalled(self::once());
-        $eventDispatcher->dispatch(PostSerializeEvent::NAME, new PostSerializeEvent('bar'))->shouldBeCalled(self::once());
+        $eventDispatcher->dispatch(Events::PRE_SERIALIZE, new PreSerializeEvent($data))->shouldBeCalled(self::once());
+        $eventDispatcher->dispatch(Events::POST_SERIALIZE, new PostSerializeEvent('bar'))->shouldBeCalled(self::once());
 
         $listener = new SerializeListener($serializerProphecy->reveal(), $serializerContextBuilderProphecy->reveal(), $eventDispatcher->reveal());
         $listener->onKernelView($eventProphecy->reveal());

@@ -17,6 +17,7 @@ use ApiPlatform\Core\Api\FormatsProviderInterface;
 use ApiPlatform\Core\Event\PostDeserializeEvent;
 use ApiPlatform\Core\Event\PreDeserializeEvent;
 use ApiPlatform\Core\EventListener\DeserializeListener;
+use ApiPlatform\Core\Events;
 use ApiPlatform\Core\Serializer\SerializerContextBuilderInterface;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
@@ -172,8 +173,8 @@ class DeserializeListenerTest extends TestCase
         $serializerContextBuilderProphecy->createFromRequest(Argument::type(Request::class), false, Argument::type('array'))->willReturn([])->shouldBeCalled();
 
         $eventDispatcher = $this->prophesize(EventDispatcherInterface::class);
-        $eventDispatcher->dispatch(PreDeserializeEvent::NAME, new PreDeserializeEvent($request->getContent()))->shouldBeCalled(self::once());
-        $eventDispatcher->dispatch(PostDeserializeEvent::NAME, new PostDeserializeEvent($request->getContent()))->shouldBeCalled(self::once());
+        $eventDispatcher->dispatch(Events::PRE_DESERIALIZE, new PreDeserializeEvent($request->getContent()))->shouldBeCalled(self::once());
+        $eventDispatcher->dispatch(Events::POST_DESERIALIZE, new PostDeserializeEvent($request->getContent()))->shouldBeCalled(self::once());
 
         $listener = new DeserializeListener($serializerProphecy->reveal(), $serializerContextBuilderProphecy->reveal(), $formatsProviderProphecy->reveal(), $eventDispatcher->reveal());
         $listener->onKernelRequest($eventProphecy->reveal());

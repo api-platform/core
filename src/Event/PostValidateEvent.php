@@ -13,12 +13,10 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Event;
 
-use ApiPlatform\Core\Events;
 use Symfony\Component\EventDispatcher\Event;
 
 class PostValidateEvent extends Event
 {
-    const NAME = Events::POST_VALIDATE;
     private $data;
 
     public function __construct($data)

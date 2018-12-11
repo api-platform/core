@@ -13,12 +13,10 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Event;
 
-use ApiPlatform\Core\Events;
 use Symfony\Component\EventDispatcher\Event;
 
 final class PostSerializeEvent extends Event
 {
-    const NAME = Events::POST_SERIALIZE;
     private $data;
 
     public function __construct($object)

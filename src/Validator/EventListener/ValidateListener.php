@@ -16,6 +16,7 @@ namespace ApiPlatform\Core\Validator\EventListener;
 use ApiPlatform\Core\Bridge\Symfony\Validator\Exception\ValidationException;
 use ApiPlatform\Core\Event\PostValidateEvent;
 use ApiPlatform\Core\Event\PreValidateEvent;
+use ApiPlatform\Core\Events;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Util\RequestAttributesExtractor;
 use ApiPlatform\Core\Validator\ValidatorInterface;
@@ -62,13 +63,13 @@ final class ValidateListener
         $validationGroups = $resourceMetadata->getOperationAttribute($attributes, 'validation_groups', null, true);
 
         if (null !== $this->eventDispatcher) {
-            $this->eventDispatcher->dispatch(PreValidateEvent::NAME, new PreValidateEvent($data));
+            $this->eventDispatcher->dispatch(Events::PRE_VALIDATE, new PreValidateEvent($data));
         }
 
         $this->validator->validate($data, ['groups' => $validationGroups]);
 
         if (null !== $this->eventDispatcher) {
-            $this->eventDispatcher->dispatch(PostValidateEvent::NAME, new PostValidateEvent($data));
+            $this->eventDispatcher->dispatch(Events::POST_VALIDATE, new PostValidateEvent($data));
         }
     }
 }

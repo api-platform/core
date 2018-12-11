@@ -15,6 +15,7 @@ namespace ApiPlatform\Core\Tests\Validator\EventListener;
 
 use ApiPlatform\Core\Event\PostValidateEvent;
 use ApiPlatform\Core\Event\PreValidateEvent;
+use ApiPlatform\Core\Events;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Tests\Fixtures\DummyEntity;
@@ -67,8 +68,8 @@ class ValidateListenerTest extends TestCase
         list($resourceMetadataFactory, $event) = $this->createEventObject($expectedValidationGroups, $data);
 
         $eventDispatcher = $this->prophesize(EventDispatcher::class);
-        $eventDispatcher->dispatch(PreValidateEvent::NAME, new PreValidateEvent($data))->shouldBeCalled(self::once());
-        $eventDispatcher->dispatch(PostValidateEvent::NAME, new PostValidateEvent($data))->shouldBeCalled(self::once());
+        $eventDispatcher->dispatch(Events::PRE_VALIDATE, new PreValidateEvent($data))->shouldBeCalled(self::once());
+        $eventDispatcher->dispatch(Events::POST_VALIDATE, new PostValidateEvent($data))->shouldBeCalled(self::once());
 
         $validationViewListener = new ValidateListener($validator, $resourceMetadataFactory, $eventDispatcher->reveal());
         $validationViewListener->onKernelView($event);

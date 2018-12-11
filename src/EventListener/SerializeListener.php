@@ -15,6 +15,7 @@ namespace ApiPlatform\Core\EventListener;
 
 use ApiPlatform\Core\Event\PostSerializeEvent;
 use ApiPlatform\Core\Event\PreSerializeEvent;
+use ApiPlatform\Core\Events;
 use ApiPlatform\Core\Exception\RuntimeException;
 use ApiPlatform\Core\Serializer\ResourceList;
 use ApiPlatform\Core\Serializer\SerializerContextBuilderInterface;
@@ -77,13 +78,13 @@ final class SerializeListener
         $request->attributes->set('_api_normalization_context', $context);
 
         if (null !== $this->dispatcher) {
-            $this->dispatcher->dispatch(PreSerializeEvent::NAME, new PreSerializeEvent($controllerResult));
+            $this->dispatcher->dispatch(Events::PRE_SERIALIZE, new PreSerializeEvent($controllerResult));
         }
 
         $serializedResult = $this->serializer->serialize($controllerResult, $request->getRequestFormat(), $context);
 
         if (null !== $this->dispatcher) {
-            $this->dispatcher->dispatch(PostSerializeEvent::NAME, new PostSerializeEvent($serializedResult));
+            $this->dispatcher->dispatch(Events::POST_SERIALIZE, new PostSerializeEvent($serializedResult));
         }
 
         $event->setControllerResult($serializedResult);

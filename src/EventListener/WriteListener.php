@@ -17,6 +17,7 @@ use ApiPlatform\Core\Api\IriConverterInterface;
 use ApiPlatform\Core\DataPersister\DataPersisterInterface;
 use ApiPlatform\Core\Event\PostWriteEvent;
 use ApiPlatform\Core\Event\PreWriteEvent;
+use ApiPlatform\Core\Events;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
 
@@ -55,7 +56,7 @@ final class WriteListener
         }
 
         if (null !== $this->dispatcher) {
-            $this->dispatcher->dispatch(PreWriteEvent::NAME, new PreWriteEvent($controllerResult));
+            $this->dispatcher->dispatch(Events::PRE_WRITE, new PreWriteEvent($controllerResult));
         }
 
         switch ($request->getMethod()) {
@@ -65,7 +66,7 @@ final class WriteListener
                 $persistResult = $this->dataPersister->persist($controllerResult);
 
                 if (null !== $this->dispatcher) {
-                    $this->dispatcher->dispatch(PostWriteEvent::NAME, new PostWriteEvent($controllerResult));
+                    $this->dispatcher->dispatch(Events::POST_WRITE, new PostWriteEvent($controllerResult));
                 }
 
                 if (null === $persistResult) {

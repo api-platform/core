@@ -13,12 +13,10 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Event;
 
-use ApiPlatform\Core\Events;
 use Symfony\Component\EventDispatcher\Event;
 
 final class PreWriteEvent extends Event
 {
-    const NAME = Events::PRE_WRITE;
     private $data;
 
     public function __construct($data)

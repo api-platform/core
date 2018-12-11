@@ -17,6 +17,7 @@ use ApiPlatform\Core\Api\FormatsProviderInterface;
 use ApiPlatform\Core\Event\PostAddFormatEvent;
 use ApiPlatform\Core\Event\PreAddFormatEvent;
 use ApiPlatform\Core\EventListener\AddFormatListener;
+use ApiPlatform\Core\Events;
 use Negotiation\Negotiator;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -230,8 +231,8 @@ class AddFormatListenerTest extends TestCase
         $formatsProviderProphecy->getFormatsFromAttributes(['resource_class' => 'Foo', 'input_class' => 'Foo', 'output_class' => 'Foo', 'collection_operation_name' => 'get', 'receive' => true, 'persist' => true])->willReturn(['csv' => ['text/csv']])->shouldBeCalled();
 
         $eventDispatcher = $this->prophesize(EventDispatcherInterface::class);
-        $eventDispatcher->dispatch(PreAddFormatEvent::NAME, new PreAddFormatEvent(['csv' => ['text/csv']]))->shouldBeCalled(self::once());
-        $eventDispatcher->dispatch(PostAddFormatEvent::NAME, new PostAddFormatEvent(['csv' => ['text/csv']]))->shouldBeCalled(self::once());
+        $eventDispatcher->dispatch(Events::PRE_ADD_FORMAT, new PreAddFormatEvent(['csv' => ['text/csv']]))->shouldBeCalled(self::once());
+        $eventDispatcher->dispatch(Events::POST_ADD_FORMAT, new PostAddFormatEvent(['csv' => ['text/csv']]))->shouldBeCalled(self::once());
 
         $listener = new AddFormatListener(new Negotiator(), $formatsProviderProphecy->reveal(), $eventDispatcher->reveal());
         $listener->onKernelRequest($event);

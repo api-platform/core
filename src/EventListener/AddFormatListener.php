@@ -16,6 +16,7 @@ namespace ApiPlatform\Core\EventListener;
 use ApiPlatform\Core\Api\FormatsProviderInterface;
 use ApiPlatform\Core\Event\PostAddFormatEvent;
 use ApiPlatform\Core\Event\PreAddFormatEvent;
+use ApiPlatform\Core\Events;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\Util\RequestAttributesExtractor;
 use Negotiation\Negotiator;
@@ -79,13 +80,13 @@ final class AddFormatListener
         $this->populateMimeTypes();
 
         if (null !== $this->dispatcher) {
-            $this->dispatcher->dispatch(PreAddFormatEvent::NAME, new PreAddFormatEvent($this->formats));
+            $this->dispatcher->dispatch(Events::PRE_ADD_FORMAT, new PreAddFormatEvent($this->formats));
         }
 
         $this->addRequestFormats($request, $this->formats);
 
         if (null !== $this->dispatcher) {
-            $this->dispatcher->dispatch(PostAddFormatEvent::NAME, new PostAddFormatEvent($this->formats));
+            $this->dispatcher->dispatch(Events::POST_ADD_FORMAT, new PostAddFormatEvent($this->formats));
         }
 
         // Empty strings must be converted to null because the Symfony router doesn't support parameter typing before 3.2 (_format)

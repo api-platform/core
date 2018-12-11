@@ -19,6 +19,7 @@ use ApiPlatform\Core\DataProvider\SubresourceDataProviderInterface;
 use ApiPlatform\Core\Event\PostReadEvent;
 use ApiPlatform\Core\Event\PreReadEvent;
 use ApiPlatform\Core\EventListener\ReadListener;
+use ApiPlatform\Core\Events;
 use ApiPlatform\Core\Exception\InvalidIdentifierException;
 use ApiPlatform\Core\Exception\RuntimeException;
 use ApiPlatform\Core\Identifier\IdentifierConverterInterface;
@@ -171,8 +172,8 @@ class ReadListenerTest extends TestCase
         $event->getRequest()->willReturn($request)->shouldBeCalled();
 
         $eventDispatcher = $this->prophesize(EventDispatcherInterface::class);
-        $eventDispatcher->dispatch(PreReadEvent::NAME, new PreReadEvent([]))->shouldBeCalled(self::once());
-        $eventDispatcher->dispatch(PostReadEvent::NAME, new PostReadEvent($data))->shouldBeCalled(self::once());
+        $eventDispatcher->dispatch(Events::PRE_READ, new PreReadEvent([]))->shouldBeCalled(self::once());
+        $eventDispatcher->dispatch(Events::POST_READ, new PostReadEvent($data))->shouldBeCalled(self::once());
 
         $listener = new ReadListener($collectionDataProvider->reveal(), $itemDataProvider->reveal(), $subresourceDataProvider->reveal(), null, $identifierConverter->reveal(), $eventDispatcher->reveal());
         $listener->onKernelRequest($event->reveal());

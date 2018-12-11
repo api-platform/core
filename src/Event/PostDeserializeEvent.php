@@ -13,12 +13,10 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Event;
 
-use ApiPlatform\Core\Events;
 use Symfony\Component\EventDispatcher\Event;
 
 final class PostDeserializeEvent extends Event
 {
-    const NAME = Events::POST_DESERIALIZE;
     private $data;
 
     public function __construct($controllerResult)
