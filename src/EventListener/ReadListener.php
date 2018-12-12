@@ -26,6 +26,7 @@ use ApiPlatform\Core\Util\RequestParser;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 
 /**
  * Retrieves data from the applicable data provider and sets it as a request parameter called data.
@@ -37,14 +38,16 @@ final class ReadListener
     use OperationDataProviderTrait;
 
     private $serializerContextBuilder;
+    private $nameConverter;
 
-    public function __construct(CollectionDataProviderInterface $collectionDataProvider, ItemDataProviderInterface $itemDataProvider, SubresourceDataProviderInterface $subresourceDataProvider = null, SerializerContextBuilderInterface $serializerContextBuilder = null, IdentifierConverterInterface $identifierConverter = null)
+    public function __construct(CollectionDataProviderInterface $collectionDataProvider, ItemDataProviderInterface $itemDataProvider, SubresourceDataProviderInterface $subresourceDataProvider = null, SerializerContextBuilderInterface $serializerContextBuilder = null, IdentifierConverterInterface $identifierConverter = null, ?NameConverterInterface $nameConverter = null)
     {
         $this->collectionDataProvider = $collectionDataProvider;
         $this->itemDataProvider = $itemDataProvider;
         $this->subresourceDataProvider = $subresourceDataProvider;
         $this->serializerContextBuilder = $serializerContextBuilder;
         $this->identifierConverter = $identifierConverter;
+        $this->nameConverter = $nameConverter;
     }
 
     /**
@@ -64,7 +67,12 @@ final class ReadListener
 
         if (null === $filters = $request->attributes->get('_api_filters')) {
             $queryString = RequestParser::getQueryString($request);
-            $filters = $queryString ? RequestParser::parseRequestParams($queryString) : null;
+            if ($queryString) {
+                foreach (RequestParser::parseRequestParams($queryString) as $name => $value) {
+                    $name = $this->nameConverter ? $this->nameConverter->denormalize($name) : $name;
+                    $filters[$name] = $value;
+                }
+            }
         }
 
         $context = null === $filters ? [] : ['filters' => $filters];

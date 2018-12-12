@@ -610,7 +610,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
 
             foreach ($filter->getDescription($resourceClass) as $name => $data) {
                 $parameter = [
-                    'name' => $name,
+                    'name' => $this->nameConverter ? $this->nameConverter->normalize($name) : $name,
                     'in' => 'query',
                     'required' => $data['required'],
                 ];
