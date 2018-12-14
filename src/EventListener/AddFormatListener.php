@@ -56,7 +56,6 @@ final class AddFormatListener
     /**
      * Sets the applicable format to the HttpFoundation Request.
      *
-     *
      * @throws NotFoundHttpException
      * @throws NotAcceptableHttpException
      */

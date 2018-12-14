@@ -252,7 +252,6 @@ final class Configuration implements ConfigurationInterface
     /**
      * Adds an exception to status section.
      *
-     *
      * @throws InvalidConfigurationException
      */
     private function addExceptionToStatusSection(ArrayNodeDefinition $rootNode)

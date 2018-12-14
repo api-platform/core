@@ -337,8 +337,8 @@ class DocumentationNormalizerTest extends TestCase
         $operationMethodResolverProphecy->getItemOperationMethod(Dummy::class, 'get')->shouldBeCalled()->willReturn('GET');
 
         $nameConverterProphecy = $this->prophesize(NameConverterInterface::class);
-        $nameConverterProphecy->normalize('name')->willReturn('name')->shouldBeCalled();
-        $nameConverterProphecy->normalize('nameConverted')->willReturn('name_converted')->shouldBeCalled();
+        $nameConverterProphecy->normalize('name', Dummy::class, DocumentationNormalizer::FORMAT, null)->willReturn('name')->shouldBeCalled();
+        $nameConverterProphecy->normalize('nameConverted', Dummy::class, DocumentationNormalizer::FORMAT, null)->willReturn('name_converted')->shouldBeCalled();
 
         $operationPathResolver = new CustomOperationPathResolver(new OperationPathResolver(new UnderscorePathSegmentNameGenerator()));
 

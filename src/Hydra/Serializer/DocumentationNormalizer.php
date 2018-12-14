@@ -76,7 +76,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
             $prefixedShortName = $resourceMetadata->getIri() ?? "#$shortName";
 
             $this->populateEntrypointProperties($resourceClass, $resourceMetadata, $shortName, $prefixedShortName, $entrypointProperties);
-            $classes[] = $this->getClass($resourceClass, $resourceMetadata, $shortName, $prefixedShortName);
+            $classes[] = $this->getClass($resourceClass, $resourceMetadata, $shortName, $prefixedShortName, $context);
         }
 
         return $this->computeDoc($object, $this->getClasses($entrypointProperties, $classes));
@@ -125,14 +125,14 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
     /**
      * Gets a Hydra class.
      */
-    private function getClass(string $resourceClass, ResourceMetadata $resourceMetadata, string $shortName, string $prefixedShortName): array
+    private function getClass(string $resourceClass, ResourceMetadata $resourceMetadata, string $shortName, string $prefixedShortName, array $context): array
     {
         $class = [
             '@id' => $prefixedShortName,
             '@type' => 'hydra:Class',
             'rdfs:label' => $shortName,
             'hydra:title' => $shortName,
-            'hydra:supportedProperty' => $this->getHydraProperties($resourceClass, $resourceMetadata, $shortName, $prefixedShortName),
+            'hydra:supportedProperty' => $this->getHydraProperties($resourceClass, $resourceMetadata, $shortName, $prefixedShortName, $context),
             'hydra:supportedOperation' => $this->getHydraOperations($resourceClass, $resourceMetadata, $prefixedShortName, false),
         ];
 
@@ -175,7 +175,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
     /**
      * Gets Hydra properties.
      */
-    private function getHydraProperties(string $resourceClass, ResourceMetadata $resourceMetadata, string $shortName, string $prefixedShortName): array
+    private function getHydraProperties(string $resourceClass, ResourceMetadata $resourceMetadata, string $shortName, string $prefixedShortName, array $context): array
     {
         $properties = [];
         foreach ($this->propertyNameCollectionFactory->create($resourceClass, $this->getPropertyNameCollectionFactoryContext($resourceMetadata)) as $propertyName) {
@@ -185,7 +185,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
             }
 
             if ($this->nameConverter) {
-                $propertyName = $this->nameConverter->normalize($propertyName);
+                $propertyName = $this->nameConverter->normalize($propertyName, $resourceClass, self::FORMAT, $context);
             }
 
             $properties[] = $this->getProperty($propertyMetadata, $propertyName, $prefixedShortName, $shortName);
@@ -301,7 +301,6 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
 
     /**
      * Gets the range of the property.
-     *
      *
      * @return string|null
      */

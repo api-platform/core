@@ -16,6 +16,7 @@ namespace ApiPlatform\Core\Tests\Bridge\Symfony\Validator\EventListener;
 use ApiPlatform\Core\Bridge\Symfony\Validator\EventListener\ValidationExceptionListener;
 use ApiPlatform\Core\Bridge\Symfony\Validator\Exception\ValidationException;
 use PHPUnit\Framework\TestCase;
+use Prophecy\Argument;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
@@ -41,19 +42,27 @@ class ValidationExceptionListenerTest extends TestCase
 
     public function testValidationException()
     {
+        $exceptionJson = '{"foo": "bar"}';
         $list = new ConstraintViolationList([]);
 
         $eventProphecy = $this->prophesize(GetResponseForExceptionEvent::class);
         $eventProphecy->getException()->willReturn(new ValidationException($list))->shouldBeCalled();
         $eventProphecy->getRequest()->willReturn(new Request())->shouldBeCalled();
-        $eventProphecy->setResponse(new Response('{"foo": "bar"}', Response::HTTP_BAD_REQUEST, [
-            'Content-Type' => 'application/ld+json; charset=utf-8',
-            'X-Content-Type-Options' => 'nosniff',
-            'X-Frame-Options' => 'deny',
-        ]))->shouldBeCalled();
+        $eventProphecy->setResponse(Argument::allOf(
+            Argument::type(Response::class),
+            Argument::which('getContent', $exceptionJson),
+            Argument::which('getStatusCode', Response::HTTP_BAD_REQUEST),
+            Argument::that(function (Response $response): bool {
+                return
+                    'application/ld+json; charset=utf-8' === $response->headers->get('Content-Type')
+                    && 'nosniff' === $response->headers->get('X-Content-Type-Options')
+                    && 'deny' === $response->headers->get('X-Frame-Options')
+                ;
+            })
+        ))->shouldBeCalled();
 
         $serializerProphecy = $this->prophesize(SerializerInterface::class);
-        $serializerProphecy->serialize($list, 'hydra')->willReturn('{"foo": "bar"}')->shouldBeCalled();
+        $serializerProphecy->serialize($list, 'hydra')->willReturn($exceptionJson)->shouldBeCalled();
 
         $listener = new ValidationExceptionListener($serializerProphecy->reveal(), ['hydra' => ['application/ld+json']]);
         $listener->onKernelException($eventProphecy->reveal());

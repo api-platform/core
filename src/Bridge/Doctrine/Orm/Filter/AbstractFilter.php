@@ -262,7 +262,6 @@ abstract class AbstractFilter implements FilterInterface
     /**
      * Adds the necessary joins for a nested property.
      *
-     *
      * @throws InvalidArgumentException If property is not nested
      *
      * @return array An array where the first element is the join $alias of the leaf entity,

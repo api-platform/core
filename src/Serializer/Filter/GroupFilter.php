@@ -69,6 +69,7 @@ final class GroupFilter implements FilterInterface
             "$this->parameterName[]" => [
                 'property' => null,
                 'type' => 'string',
+                'is_collection' => true,
                 'required' => false,
             ],
         ];
