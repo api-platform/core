@@ -430,7 +430,10 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
         $options = isset($serializerContext[AbstractNormalizer::GROUPS]) ? ['serializer_groups' => $serializerContext[AbstractNormalizer::GROUPS]] : [];
         foreach ($this->propertyNameCollectionFactory->create($resourceClass, $options) as $propertyName) {
             $propertyMetadata = $this->propertyMetadataFactory->create($resourceClass, $propertyName);
-            $normalizedPropertyName = $this->nameConverter ? $this->nameConverter->normalize($propertyName) : $propertyName;
+            $normalizedPropertyName = $this->nameConverter
+                ? $this->nameConverter->normalize($propertyName, $resourceClass, self::FORMAT, $serializerContext)
+                : $propertyName
+            ;
 
             if ($propertyMetadata->isRequired()) {
                 $definitionSchema['required'][] = $normalizedPropertyName;
