@@ -304,7 +304,6 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
     /**
      * Validates the type of the value. Allows using integers as floats for JSON formats.
      *
-     *
      * @throws InvalidArgumentException
      */
     protected function validateType(string $attribute, Type $type, $value, string $format = null)
@@ -325,7 +324,6 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
 
     /**
      * Denormalizes a collection of objects.
-     *
      *
      * @throws InvalidArgumentException
      */
@@ -357,7 +355,6 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
 
     /**
      * Denormalizes a relation.
-     *
      *
      * @throws InvalidArgumentException
      *
@@ -455,8 +452,6 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
     /**
      * Creates the context to use when serializing a relation.
      *
-     *
-     *
      * @deprecated since version 2.1, to be removed in 3.0.
      */
     protected function createRelationSerializationContext(string $resourceClass, array $context): array
@@ -488,7 +483,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
         $type = $propertyMetadata->getType();
 
         if (
-            (\is_array($attributeValue) || $attributeValue instanceof \Traversable) &&
+            is_iterable($attributeValue) &&
             $type &&
             $type->isCollection() &&
             ($collectionValueType = $type->getCollectionValueType()) &&
@@ -531,7 +526,6 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
 
     /**
      * Normalizes a relation as an object if is a Link or as an URI.
-     *
      *
      * @return string|array
      */

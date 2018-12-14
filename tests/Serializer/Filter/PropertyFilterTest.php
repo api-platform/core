@@ -128,6 +128,7 @@ class PropertyFilterTest extends TestCase
             'custom_properties[]' => [
                 'property' => null,
                 'type' => 'string',
+                'is_collection' => true,
                 'required' => false,
             ],
         ];

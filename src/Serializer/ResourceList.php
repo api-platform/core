@@ -18,7 +18,11 @@ namespace ApiPlatform\Core\Serializer;
  */
 class ResourceList extends \ArrayObject
 {
-    public function serialize()
+    /**
+     * {@inheritdoc}
+     */
+    public function serialize(): ?string
     {
+        return null;
     }
 }

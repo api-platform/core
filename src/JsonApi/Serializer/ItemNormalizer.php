@@ -400,7 +400,6 @@ final class ItemNormalizer extends AbstractItemNormalizer
     /**
      * Gets the cache key to use.
      *
-     *
      * @return bool|string
      */
     private function getJsonApiCacheKey(string $format = null, array $context)

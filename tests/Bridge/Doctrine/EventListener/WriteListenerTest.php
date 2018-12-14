@@ -23,8 +23,6 @@ use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 /**
- * @author Amrouche Hamza <hamza.simperfit@gmail.com>
- *
  * @group legacy
  */
 class WriteListenerTest extends TestCase
@@ -41,7 +39,7 @@ class WriteListenerTest extends TestCase
         $objectManagerProphecy->persist($dummy)->shouldBeCalled();
         $objectManagerProphecy->flush()->shouldBeCalled();
         $managerRegistryProphecy = $this->prophesize(ManagerRegistry::class);
-        $managerRegistryProphecy->getManagerForClass('Dummy')->willReturn($objectManagerProphecy->reveal());
+        $managerRegistryProphecy->getManagerForClass('Dummy')->willReturn($objectManagerProphecy);
 
         $writeListener = new WriteListener($managerRegistryProphecy->reveal());
         $httpKernelProphecy = $this->prophesize(HttpKernelInterface::class);
@@ -50,8 +48,7 @@ class WriteListenerTest extends TestCase
         $request->attributes->set('_api_resource_class', 'Dummy');
         $event = new GetResponseForControllerResultEvent($httpKernelProphecy->reveal(), $request, HttpKernelInterface::MASTER_REQUEST, $dummy);
 
-        $this->assertNull($writeListener->onKernelView($event));
-        $this->assertNotEquals($dummy, $writeListener->onKernelView($event));
+        $writeListener->onKernelView($event);
     }
 
     /**
@@ -66,18 +63,18 @@ class WriteListenerTest extends TestCase
         $objectManagerProphecy->remove($dummy)->shouldBeCalled();
         $objectManagerProphecy->flush()->shouldBeCalled();
         $managerRegistryProphecy = $this->prophesize(ManagerRegistry::class);
-        $managerRegistryProphecy->getManagerForClass('Dummy')->willReturn($objectManagerProphecy->reveal());
+        $managerRegistryProphecy->getManagerForClass('Dummy')->willReturn($objectManagerProphecy);
 
         $writeListener = new WriteListener($managerRegistryProphecy->reveal());
         $request = new Request();
         $request->setMethod('DELETE');
         $request->attributes->set('_api_resource_class', 'Dummy');
-        $event = $this->prophesize(GetResponseForControllerResultEvent::class);
-        $event->setControllerResult(null)->shouldBeCalled();
-        $event->getRequest()->willReturn($request);
-        $event->getControllerResult()->willReturn($dummy);
-        $this->assertNull($writeListener->onKernelView($event->reveal()));
-        $this->assertNotEquals($dummy, $writeListener->onKernelView($event->reveal()));
+        $eventProphecy = $this->prophesize(GetResponseForControllerResultEvent::class);
+        $eventProphecy->setControllerResult(null)->shouldBeCalled();
+        $eventProphecy->getRequest()->willReturn($request);
+        $eventProphecy->getControllerResult()->willReturn($dummy);
+
+        $writeListener->onKernelView($eventProphecy->reveal());
     }
 
     /**
@@ -88,16 +85,19 @@ class WriteListenerTest extends TestCase
         $dummy = new Dummy();
         $dummy->setName('Dummyrino');
 
+        $objectManagerProphecy = $this->prophesize(ObjectManager::class);
+        $objectManagerProphecy->flush()->shouldNotBeCalled();
         $managerRegistryProphecy = $this->prophesize(ManagerRegistry::class);
+        $managerRegistryProphecy->getManagerForClass('Dummy')->willReturn($objectManagerProphecy);
 
         $writeListener = new WriteListener($managerRegistryProphecy->reveal());
         $httpKernelProphecy = $this->prophesize(HttpKernelInterface::class);
         $request = new Request();
         $request->setMethod('HEAD');
+        $request->attributes->set('_api_resource_class', 'Dummy');
         $event = new GetResponseForControllerResultEvent($httpKernelProphecy->reveal(), $request, HttpKernelInterface::MASTER_REQUEST, $dummy);
 
-        $this->assertNull($writeListener->onKernelView($event));
-        $this->assertNotEquals($dummy, $writeListener->onKernelView($event));
+        $writeListener->onKernelView($event);
     }
 
     /**
@@ -108,7 +108,10 @@ class WriteListenerTest extends TestCase
         $dummy = new Dummy();
         $dummy->setName('Dummyrino');
 
+        $objectManagerProphecy = $this->prophesize(ObjectManager::class);
+        $objectManagerProphecy->flush()->shouldNotBeCalled();
         $managerRegistryProphecy = $this->prophesize(ManagerRegistry::class);
+        $managerRegistryProphecy->getManagerForClass('Dummy')->willReturn($objectManagerProphecy);
 
         $writeListener = new WriteListener($managerRegistryProphecy->reveal());
         $httpKernelProphecy = $this->prophesize(HttpKernelInterface::class);
@@ -116,12 +119,12 @@ class WriteListenerTest extends TestCase
         $request->setMethod('POST');
         $event = new GetResponseForControllerResultEvent($httpKernelProphecy->reveal(), $request, HttpKernelInterface::MASTER_REQUEST, $dummy);
 
-        $this->assertNull($writeListener->onKernelView($event));
-        $this->assertNotEquals($dummy, $writeListener->onKernelView($event));
+        $writeListener->onKernelView($event);
     }
 
     /**
      * @expectedDeprecation The ApiPlatform\Core\Bridge\Doctrine\EventListener\WriteListener class is deprecated since version 2.2 and will be removed in 3.0. Use the ApiPlatform\Core\EventListener\WriteListener class instead.
+     * @doesNotPerformAssertions
      */
     public function testOnKernelViewWithNoManager()
     {
@@ -138,7 +141,6 @@ class WriteListenerTest extends TestCase
         $request->attributes->set('_api_resource_class', 'Dummy');
         $event = new GetResponseForControllerResultEvent($httpKernelProphecy->reveal(), $request, HttpKernelInterface::MASTER_REQUEST, $dummy);
 
-        $this->assertNull($writeListener->onKernelView($event));
-        $this->assertNotEquals($dummy, $writeListener->onKernelView($event));
+        $writeListener->onKernelView($event);
     }
 }
