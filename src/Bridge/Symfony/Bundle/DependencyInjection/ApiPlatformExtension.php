@@ -322,7 +322,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
     }
 
     /**
-     * Registers the Swagger and Swagger UI configuration.
+     * Registers the Swagger, ReDoc and Swagger UI configuration.
      */
     private function registerSwaggerConfiguration(ContainerBuilder $container, array $config, XmlFileLoader $loader)
     {
@@ -332,9 +332,10 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
 
         $loader->load('swagger.xml');
 
-        if ($config['enable_swagger_ui']) {
+        if ($config['enable_swagger_ui'] || $config['enable_re_doc']) {
             $loader->load('swagger-ui.xml');
             $container->setParameter('api_platform.enable_swagger_ui', $config['enable_swagger_ui']);
+            $container->setParameter('api_platform.enable_re_doc', $config['enable_re_doc']);
         }
 
         $container->setParameter('api_platform.enable_swagger', $config['enable_swagger']);

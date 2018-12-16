@@ -86,6 +86,7 @@ class ConfigurationTest extends TestCase
             'enable_swagger' => true,
             'enable_swagger_ui' => true,
             'enable_entrypoint' => true,
+            'enable_re_doc' => true,
             'enable_docs' => true,
             'enable_profiler' => true,
             'graphql' => [

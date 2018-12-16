@@ -76,6 +76,9 @@ class SwaggerUiActionTest extends TestCase
             'description' => '',
             'formats' => [],
             'showWebby' => true,
+            "swaggerUiEnabled" => false,
+            "reDocEnabled" => false,
+            "graphqlEnabled" => false,
             'swagger_data' => [
                 'url' => '/url',
                 'spec' => self::SPEC,
@@ -103,7 +106,10 @@ class SwaggerUiActionTest extends TestCase
             'title' => '',
             'description' => '',
             'formats' => [],
+            "swaggerUiEnabled" => false,
             'showWebby' => true,
+            "reDocEnabled" => false,
+            "graphqlEnabled" => false,
             'swagger_data' => [
                 'url' => '/url',
                 'spec' => self::SPEC,
@@ -151,6 +157,9 @@ class SwaggerUiActionTest extends TestCase
             'description' => '',
             'formats' => [],
             'showWebby' => true,
+            "swaggerUiEnabled" => false,
+            "reDocEnabled" => false,
+            "graphqlEnabled" => false,
             'swagger_data' => [
                 'url' => '/url',
                 'spec' => self::SPEC,

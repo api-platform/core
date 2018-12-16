@@ -64,13 +64,24 @@
             {% for format in formats|keys %}
                 <a href="{{ path(app.request.attributes.get('_route'), app.request.attributes.get('_route_params')|merge({'_format': format})) }}">{{ format }}</a>
             {% endfor %}
+            <br>
+            Other API docs:
+            {% set active = app.request.get('ui', 'swagger_ui') %}
+            {% if swaggerUiEnabled and active != 'swagger_ui' %}<a href="{{ path('api_entrypoint') }}">Swagger UI</a>{% endif %}
+            {% if reDocEnabled and active != 're_doc' %}<a href="{{ path('api_entrypoint', {'ui': 're_doc'}) }}">ReDoc</a>{% endif %}
+            <a href="{% if graphqlEnabled %}{{ path('api_graphql_entrypoint') }}{% else %}javascript:alert('GraphQL support is not enabled, see https://api-platform.com/docs/core/graphql/'){% endif %}">GraphiQL</a>
         </div>
     </div>
 </div>
 
-<script src="{{ asset('bundles/apiplatform/swagger-ui/swagger-ui-bundle.js') }}"></script>
-<script src="{{ asset('bundles/apiplatform/swagger-ui/swagger-ui-standalone-preset.js') }}"></script>
-<script src="{{ asset('bundles/apiplatform/init-swagger-ui.js') }}"></script>
+{% if ((false == swaggerUiEnabled and reDocEnabled) or (reDocEnabled and app.request.get('ui') == 're_doc')) %}
+    <script src="{{ asset('bundles/apiplatform/redoc/redoc.standalone.js') }}"></script>
+    <script src="{{ asset('bundles/apiplatform/init-redoc-ui.js') }}"></script>
+{% elseif (swaggerUiEnabled) %}
+    <script src="{{ asset('bundles/apiplatform/swagger-ui/swagger-ui-bundle.js') }}"></script>
+    <script src="{{ asset('bundles/apiplatform/swagger-ui/swagger-ui-standalone-preset.js') }}"></script>
+    <script src="{{ asset('bundles/apiplatform/init-swagger-ui.js') }}"></script>
+{% endif %}
 
 </body>
 </html>

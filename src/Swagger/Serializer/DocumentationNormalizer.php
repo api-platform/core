@@ -676,6 +676,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
         $docs += [
             'info' => [
                 'title' => $documentation->getTitle(),
+                'description' => $documentation->getDescription(),
                 'version' => $documentation->getVersion(),
             ],
             'paths' => $paths,

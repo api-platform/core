@@ -26,7 +26,7 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 /**
- * Displays the documentation in Swagger UI.
+ * Displays the documentation.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
@@ -51,11 +51,14 @@ final class SwaggerUiAction
     private $oauthAuthorizationUrl;
     private $oauthScopes;
     private $formatsProvider;
+    private $swaggerUiEnabled;
+    private $reDocEnabled;
+    private $graphqlEnabled;
 
     /**
      * @throws InvalidArgumentException
      */
-    public function __construct(ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, ResourceMetadataFactoryInterface $resourceMetadataFactory, NormalizerInterface $normalizer, \Twig_Environment $twig, UrlGeneratorInterface $urlGenerator, string $title = '', string $description = '', string $version = '', /* FormatsProviderInterface */ $formatsProvider = [], $oauthEnabled = false, $oauthClientId = '', $oauthClientSecret = '', $oauthType = '', $oauthFlow = '', $oauthTokenUrl = '', $oauthAuthorizationUrl = '', $oauthScopes = [], bool $showWebby = true)
+    public function __construct(ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, ResourceMetadataFactoryInterface $resourceMetadataFactory, NormalizerInterface $normalizer, \Twig_Environment $twig, UrlGeneratorInterface $urlGenerator, string $title = '', string $description = '', string $version = '', /* FormatsProviderInterface */ $formatsProvider = [], $oauthEnabled = false, $oauthClientId = '', $oauthClientSecret = '', $oauthType = '', $oauthFlow = '', $oauthTokenUrl = '', $oauthAuthorizationUrl = '', $oauthScopes = [], bool $showWebby = true, bool $swaggerUiEnabled = false, bool $reDocEnabled = false, bool $graphqlEnabled = false)
     {
         $this->resourceNameCollectionFactory = $resourceNameCollectionFactory;
         $this->resourceMetadataFactory = $resourceMetadataFactory;
@@ -74,6 +77,9 @@ final class SwaggerUiAction
         $this->oauthTokenUrl = $oauthTokenUrl;
         $this->oauthAuthorizationUrl = $oauthAuthorizationUrl;
         $this->oauthScopes = $oauthScopes;
+        $this->swaggerUiEnabled = $swaggerUiEnabled;
+        $this->reDocEnabled = $reDocEnabled;
+        $this->graphqlEnabled = $graphqlEnabled;
 
         if (\is_array($formatsProvider)) {
             if ($formatsProvider) {
@@ -113,6 +119,9 @@ final class SwaggerUiAction
             'description' => $this->description,
             'formats' => $this->formats,
             'showWebby' => $this->showWebby,
+            'swaggerUiEnabled' => $this->swaggerUiEnabled,
+            'reDocEnabled' => $this->reDocEnabled,
+            'graphqlEnabled' => $this->graphqlEnabled,
         ];
 
         $swaggerData = [
