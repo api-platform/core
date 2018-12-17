@@ -15,6 +15,7 @@ namespace ApiPlatform\Core\Tests\EventListener;
 
 use ApiPlatform\Core\EventListener\RespondListener;
 use PHPUnit\Framework\TestCase;
+use Prophecy\Argument;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
@@ -28,11 +29,24 @@ class RespondListenerTest extends TestCase
     public function testDoNotHandleResponse()
     {
         $request = new Request();
-        $request->setRequestFormat('xml');
 
         $eventProphecy = $this->prophesize(GetResponseForControllerResultEvent::class);
-        $eventProphecy->getControllerResult()->willReturn(new Response())->shouldBeCalled();
-        $eventProphecy->getRequest()->willReturn($request)->shouldBeCalled();
+        $eventProphecy->getControllerResult()->willReturn(new Response());
+        $eventProphecy->getRequest()->willReturn($request);
+        $eventProphecy->setResponse(Argument::any())->shouldNotBeCalled();
+
+        $listener = new RespondListener();
+        $listener->onKernelView($eventProphecy->reveal());
+    }
+
+    public function testDoNotHandleWhenRespondFlagIsFalse()
+    {
+        $request = new Request([], [], ['_api_respond' => false]);
+
+        $eventProphecy = $this->prophesize(GetResponseForControllerResultEvent::class);
+        $eventProphecy->getControllerResult()->willReturn('foo');
+        $eventProphecy->getRequest()->willReturn($request);
+        $eventProphecy->setResponse(Argument::any())->shouldNotBeCalled();
 
         $listener = new RespondListener();
         $listener->onKernelView($eventProphecy->reveal());
