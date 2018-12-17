@@ -35,6 +35,7 @@ Feature: Ignore unknown attributes
       "name_converted": null,
       "relatedOwnedDummy": null,
       "relatedOwningDummy": null,
+      "relatedUuidDummies": [],
       "id": 1,
       "name": "Not existing",
       "alias": null,

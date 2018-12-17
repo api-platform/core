@@ -166,6 +166,42 @@ class Dummy
      */
     public $relatedOwningDummy;
 
+    /**
+     * @var ArrayCollection Several UuidIdentifierDummies
+     *
+     * @ORM\ManyToMany(targetEntity="UuidIdentifierDummy")
+     * @ORM\JoinTable(name="dummy_uuiddummy",
+     *     joinColumns={@ORM\JoinColumn(name="dummy_id", referencedColumnName="id")},
+     *     inverseJoinColumns={@ORM\JoinColumn(name="otherdummy_uuid", referencedColumnName="uuid")}
+     * )
+     */
+    public $relatedUuidDummies;
+
+    /**
+     * @var ArrayCollection Several MultipleIdentifierDummies
+     *
+     * @ORM\ManyToMany(targetEntity="MultipleIdentifiersDummy")
+     * @ORM\JoinTable(name="dummy_multipleiddummy",
+     *     joinColumns={@ORM\JoinColumn(name="dummy_id", referencedColumnName="id")},
+     *     inverseJoinColumns={
+     *         @ORM\JoinColumn(name="otherdummy_key1", referencedColumnName="firstKey"),
+     *         @ORM\JoinColumn(name="otherdummy_key2", referencedColumnName="secondKey")
+     *     }
+     * )
+     */
+    public $relatedMultipleIdentifiersDummies;
+
+    /**
+     * @var ArrayCollection Several DifferentIdentifierDummies
+     *
+     * @ORM\ManyToMany(targetEntity="DifferentIdentifierDummy")
+     * @ORM\JoinTable(name="dummy_differentiddummy",
+     *     joinColumns={@ORM\JoinColumn(name="dummy_id", referencedColumnName="id")},
+     *     inverseJoinColumns={@ORM\JoinColumn(name="otherdummy_id", referencedColumnName="id")}
+     * )
+     */
+    public $relatedDifferentIdentifierDummies;
+
     public static function staticMethod()
     {
     }
@@ -173,6 +209,7 @@ class Dummy
     public function __construct()
     {
         $this->relatedDummies = new ArrayCollection();
+        $this->relatedUuidDummies = new ArrayCollection();
         $this->jsonData = [];
         $this->arrayData = [];
     }

@@ -35,6 +35,7 @@ Feature: Handle properly invalid data submitted to the API
       "name_converted": null,
 	  "relatedOwnedDummy": null,
 	  "relatedOwningDummy": null,
+      "relatedUuidDummies": [],
       "id": 1,
       "name": "Not existing",
       "alias": null,

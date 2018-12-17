@@ -760,6 +760,52 @@ class SearchFilterTest extends DoctrineOrmFilterTestCase
                 ],
                 $filterFactory,
             ],
+            'property with custom identifier for relations' => [
+                [
+                    'id' => null,
+                    'name' => null,
+                    'relatedUuidDummies' => null,
+                ],
+                [
+                    'relatedUuidDummies' => '1',
+                ],
+                sprintf('SELECT %s FROM %s %1$s INNER JOIN %1$s.relatedUuidDummies relatedUuidDummies_a1 WHERE relatedUuidDummies_a1.uuid = :relatedUuidDummies_p1', $this->alias, Dummy::class),
+                [
+                    'relatedUuidDummies_p1' => 1,
+                ],
+                $filterFactory,
+            ],
+            'property with different primary key and identifier for relations' => [
+                [
+                    'id' => null,
+                    'name' => null,
+                    'relatedDifferentIdentifierDummies' => null,
+                ],
+                [
+                    'relatedDifferentIdentifierDummies' => '1',
+                ],
+                sprintf('SELECT %s FROM %s %1$s INNER JOIN %1$s.relatedDifferentIdentifierDummies relatedDifferentIdentifierDummies_a1 WHERE relatedDifferentIdentifierDummies_a1.key = :relatedDifferentIdentifierDummies_p1', $this->alias, Dummy::class),
+                [
+                    'relatedDifferentIdentifierDummies_p1' => '1',
+                ],
+                $filterFactory,
+            ],
+            'property with multiple identifiers for relations' => [
+                [
+                    'id' => null,
+                    'name' => null,
+                    'relatedMultipleIdentifiersDummies' => null,
+                ],
+                [
+                    'relatedMultipleIdentifiersDummies' => ['firstKey=1;secondKey=2'],
+                ],
+                sprintf('SELECT %s FROM %s %1$s INNER JOIN %1$s.relatedMultipleIdentifiersDummies relatedMultipleIdentifiersDummies_a1 WHERE relatedMultipleIdentifiersDummies_a1.firstKey = :relatedMultipleIdentifiersDummies_p1 AND relatedMultipleIdentifiersDummies_a1.secondKey = :relatedMultipleIdentifiersDummies_p2', $this->alias, Dummy::class),
+                [
+                    'relatedMultipleIdentifiersDummies_p1' => '1',
+                    'relatedMultipleIdentifiersDummies_p2' => '2',
+                ],
+                $filterFactory,
+            ],
             'nested property' => [
                 [
                     'id' => null,
