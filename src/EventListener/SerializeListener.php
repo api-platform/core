@@ -57,21 +57,30 @@ final class SerializeListener
             return;
         }
 
+        $request->attributes->set('_api_respond', true);
         $context = $this->serializerContextBuilder->createFromRequest($request, true, $attributes);
+
+        if (isset($context['output_class'])) {
+            if (false === $context['output_class']) {
+                // If the output class is explicitly set to false, the response must be empty
+                $event->setControllerResult('');
+
+                return;
+            }
+
+            $context['resource_class'] = $context['output_class'];
+        }
+
         if ($included = $request->attributes->get('_api_included')) {
             $context['api_included'] = $included;
         }
         $resources = new ResourceList();
         $context['resources'] = &$resources;
-        if (isset($context['output_class'])) {
-            $context['resource_class'] = $context['output_class'];
-        }
 
         $request->attributes->set('_api_normalization_context', $context);
 
         $event->setControllerResult($this->serializer->serialize($controllerResult, $request->getRequestFormat(), $context));
 
-        $request->attributes->set('_api_respond', true);
         $request->attributes->set('_resources', $request->attributes->get('_resources', []) + (array) $resources);
     }
 
