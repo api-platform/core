@@ -66,6 +66,7 @@ final class DeserializeListener
             $request->isMethodSafe(false)
             || 'DELETE' === $method
             || !($attributes = RequestAttributesExtractor::extractAttributes($request))
+            || false === ($attributes['input_class'] ?? null)
             || !$attributes['receive']
             || (
                     '' === ($requestContent = $request->getContent())
