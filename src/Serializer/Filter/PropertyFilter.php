@@ -67,12 +67,26 @@ final class PropertyFilter implements FilterInterface
      */
     public function getDescription(string $resourceClass): array
     {
+        $swaggerExample = sprintf('%s[]={propertyName}&%s[]={anotherPropertyName}&%s[{nestedPropertyParent}][]={nestedProperty}',
+            $this->parameterName,
+            $this->parameterName,
+            $this->parameterName
+        );
+
         return [
             "$this->parameterName[]" => [
                 'property' => null,
                 'type' => 'string',
                 'is_collection' => true,
                 'required' => false,
+                'swagger' => [
+                    'description' => 'Allows you to reduce the response to contain only the properties you need. If your desired property is nested, you can address it using nested arrays. Example: '.$swaggerExample,
+                    'name' => $this->parameterName,
+                    'type' => 'array',
+                    'items' => [
+                        'type' => 'string',
+                    ],
+                ],
             ],
         ];
     }
