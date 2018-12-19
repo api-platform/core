@@ -442,7 +442,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
         foreach ($this->propertyNameCollectionFactory->create($resourceClass, $options) as $propertyName) {
             $propertyMetadata = $this->propertyMetadataFactory->create($resourceClass, $propertyName);
             $normalizedPropertyName = $this->nameConverter
-                ? $this->nameConverter->normalize($propertyName, $resourceClass, self::FORMAT, $serializerContext)
+                ? $this->nameConverter->normalize($propertyName, $resourceClass, self::FORMAT, $serializerContext ?? [])
                 : $propertyName
             ;
 
