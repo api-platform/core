@@ -159,6 +159,63 @@ class ItemNormalizerTest extends TestCase
         $this->assertInstanceOf(Dummy::class, $normalizer->denormalize(['id' => '/dummies/12', 'name' => 'hello'], Dummy::class, null, $context));
     }
 
+    public function testDenormalizeWithIdWithoutResourceClass()
+    {
+        $context = [];
+
+        $propertyNameCollection = new PropertyNameCollection(['id']);
+        $propertyNameCollectionFactoryProphecy = $this
+            ->prophesize(PropertyNameCollectionFactoryInterface::class);
+        $propertyNameCollectionFactoryProphecy
+            ->create(Dummy::class, Argument::type('array'))
+            ->willReturn($propertyNameCollection)
+            ->shouldBeCalled();
+
+        $propertyMetadataFactory = new PropertyMetadata(null, null, true, true);
+        $propertyMetadataFactoryProphecy = $this
+            ->prophesize(PropertyMetadataFactoryInterface::class);
+
+        $propertyMetadataFactoryProphecy
+            ->create(Dummy::class, 'id', Argument::any())
+            ->willReturn($propertyMetadataFactory->withIdentifier(true));
+
+        $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
+
+        $iriConverterProphecy
+            ->getItemFromIri('12', Argument::type('array'))
+            ->willThrow(new InvalidArgumentException());
+        $iriConverterProphecy
+            ->getIriFromResourceClass(Dummy::class)
+            ->willReturn('/dummies');
+        $iriConverterProphecy
+            ->getItemFromIri('/dummies/12', Argument::type('array'))
+            ->willReturn(null);
+
+        $resourceClassResolverProphecy = $this
+            ->prophesize(ResourceClassResolverInterface::class);
+
+        $serializerProphecy = $this->prophesize(SerializerInterface::class);
+        $serializerProphecy->willImplement(DenormalizerInterface::class);
+
+        $normalizer = new ItemNormalizer(
+            $propertyNameCollectionFactoryProphecy->reveal(),
+            $propertyMetadataFactoryProphecy->reveal(),
+            $iriConverterProphecy->reveal(),
+            $resourceClassResolverProphecy->reveal()
+        );
+        $normalizer->setSerializer($serializerProphecy->reveal());
+
+        $this->assertInstanceOf(
+          Dummy::class,
+          $normalizer->denormalize(
+            ['id' => 12],
+            Dummy::class,
+            null,
+            $context
+          )
+        );
+    }
+
     public function testDenormalizeWithIdAndUpdateNotAllowed()
     {
         $this->expectException(InvalidArgumentException::class);
