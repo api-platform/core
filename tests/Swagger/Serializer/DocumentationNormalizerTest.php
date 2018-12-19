@@ -48,6 +48,7 @@ use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\RouterInterface;
+use Symfony\Component\Serializer\NameConverter\AdvancedNameConverterInterface;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 
@@ -331,9 +332,13 @@ class DocumentationNormalizerTest extends TestCase
         $operationMethodResolverProphecy = $this->prophesize(OperationMethodResolverInterface::class);
         $operationMethodResolverProphecy->getItemOperationMethod(Dummy::class, 'get')->shouldBeCalled()->willReturn('GET');
 
-        $nameConverterProphecy = $this->prophesize(NameConverterInterface::class);
-        $nameConverterProphecy->normalize('name', Dummy::class, DocumentationNormalizer::FORMAT, null)->willReturn('name')->shouldBeCalled();
-        $nameConverterProphecy->normalize('nameConverted', Dummy::class, DocumentationNormalizer::FORMAT, null)->willReturn('name_converted')->shouldBeCalled();
+        $nameConverterProphecy = $this->prophesize(
+            interface_exists(AdvancedNameConverterInterface::class)
+                ? AdvancedNameConverterInterface::class
+                : NameConverterInterface::class
+        );
+        $nameConverterProphecy->normalize('name', Dummy::class, DocumentationNormalizer::FORMAT, [])->willReturn('name')->shouldBeCalled();
+        $nameConverterProphecy->normalize('nameConverted', Dummy::class, DocumentationNormalizer::FORMAT, [])->willReturn('name_converted')->shouldBeCalled();
 
         $operationPathResolver = new CustomOperationPathResolver(new OperationPathResolver(new UnderscorePathSegmentNameGenerator()));
 
