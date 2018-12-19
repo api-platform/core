@@ -30,7 +30,7 @@ use Prophecy\Prophecy\ProphecyInterface;
 class AnnotationPropertyMetadataFactoryTest extends TestCase
 {
     /**
-     * @dataProvider getDependencies
+     * @dataProvider dependenciesProvider
      */
     public function testCreateProperty(ProphecyInterface $reader, ProphecyInterface $decorated = null, string $description)
     {
@@ -48,7 +48,7 @@ class AnnotationPropertyMetadataFactoryTest extends TestCase
         $this->assertEquals(['foo' => 'bar'], $metadata->getAttributes());
     }
 
-    public function getDependencies()
+    public function dependenciesProvider(): array
     {
         $annotation = new ApiProperty();
         $annotation->description = 'description';

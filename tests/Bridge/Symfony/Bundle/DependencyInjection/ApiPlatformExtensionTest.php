@@ -768,6 +768,7 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.validator',
             'api_platform.mercure.listener.response.add_link_header',
             'api_platform.doctrine.listener.mercure.publish',
+            'api_platform.messenger.data_persister',
         ];
 
         foreach ($definitions as $definition) {
@@ -776,6 +777,7 @@ class ApiPlatformExtensionTest extends TestCase
 
         $aliases = [
             'api_platform.http_cache.purger' => 'api_platform.http_cache.purger.varnish',
+            'api_platform.message_bus' => 'message_bus',
             EagerLoadingExtension::class => 'api_platform.doctrine.orm.query_extension.eager_loading',
             FilterExtension::class => 'api_platform.doctrine.orm.query_extension.filter',
             FilterEagerLoadingExtension::class => 'api_platform.doctrine.orm.query_extension.filter_eager_loading',
