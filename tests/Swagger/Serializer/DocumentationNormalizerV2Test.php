@@ -11,13 +11,14 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\OpenApi\Serializer;
+namespace ApiPlatform\Core\Tests\Swagger\Serializer;
 
 use ApiPlatform\Core\Api\FilterCollection;
 use ApiPlatform\Core\Api\OperationAwareFormatsProviderInterface;
 use ApiPlatform\Core\Api\OperationMethodResolverInterface;
 use ApiPlatform\Core\Api\OperationType;
 use ApiPlatform\Core\Api\ResourceClassResolverInterface;
+use ApiPlatform\Core\Api\UrlGeneratorInterface;
 use ApiPlatform\Core\Bridge\Symfony\Routing\RouterOperationPathResolver;
 use ApiPlatform\Core\Documentation\Documentation;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
@@ -29,12 +30,12 @@ use ApiPlatform\Core\Metadata\Property\SubresourceMetadata;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Metadata\Resource\ResourceNameCollection;
-use ApiPlatform\Core\OpenApi\Serializer\DocumentationNormalizer;
 use ApiPlatform\Core\Operation\Factory\SubresourceOperationFactory;
 use ApiPlatform\Core\Operation\UnderscorePathSegmentNameGenerator;
 use ApiPlatform\Core\PathResolver\CustomOperationPathResolver;
 use ApiPlatform\Core\PathResolver\OperationPathResolver;
 use ApiPlatform\Core\PathResolver\OperationPathResolverInterface;
+use ApiPlatform\Core\Swagger\Serializer\DocumentationNormalizer;
 use ApiPlatform\Core\Tests\Fixtures\DummyFilter;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Answer;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
@@ -47,17 +48,35 @@ use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\RouterInterface;
+use Symfony\Component\Serializer\NameConverter\AdvancedNameConverterInterface;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
-use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 /**
  * @author Amrouche Hamza <hamza.simperfit@gmail.com>
  * @author Kévin Dunglas <dunglas@gmail.com>
- * @author Anthony GRASSIOT <antograssiot@free.fr>
  */
-class DocumentationNormalizerTest extends TestCase
+class DocumentationNormalizerV2Test extends TestCase
 {
+    /**
+     * @group legacy
+     * @expectedDeprecation Passing an instance of ApiPlatform\Core\Api\UrlGeneratorInterface to ApiPlatform\Core\Swagger\Serializer\DocumentationNormalizer::__construct() is deprecated since version 2.1 and will be removed in 3.0.
+     */
+    public function testLegacyConstruct()
+    {
+        $normalizer = new DocumentationNormalizer(
+            $this->prophesize(ResourceMetadataFactoryInterface::class)->reveal(),
+            $this->prophesize(PropertyNameCollectionFactoryInterface::class)->reveal(),
+            $this->prophesize(PropertyMetadataFactoryInterface::class)->reveal(),
+            $this->prophesize(ResourceClassResolverInterface::class)->reveal(),
+            $this->prophesize(OperationMethodResolverInterface::class)->reveal(),
+            $this->prophesize(OperationPathResolverInterface::class)->reveal(),
+            $this->prophesize(UrlGeneratorInterface::class)->reveal()
+        );
+
+        $this->assertInstanceOf(DocumentationNormalizer::class, $normalizer);
+    }
+
     public function testNormalize()
     {
         $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), 'Test API', 'This is a test API.', '1.2.3', ['jsonld' => ['application/ld+json']]);
@@ -96,7 +115,8 @@ class DocumentationNormalizerTest extends TestCase
         );
 
         $expected = [
-            'openapi' => '3.0.2',
+            'swagger' => '2.0',
+            'basePath' => '/app_dev.php/',
             'info' => [
                 'title' => 'Test API',
                 'description' => 'This is a test API.',
@@ -107,37 +127,30 @@ class DocumentationNormalizerTest extends TestCase
                     'get' => new \ArrayObject([
                         'tags' => ['Dummy'],
                         'operationId' => 'getDummyCollection',
+                        'produces' => ['application/ld+json'],
                         'summary' => 'Retrieves the collection of Dummy resources.',
                         'parameters' => [
                             [
                                 'name' => 'page',
                                 'in' => 'query',
                                 'required' => false,
-                                'schema' => [
-                                    'type' => 'integer',
-                                ],
+                                'type' => 'integer',
                                 'description' => 'The collection page number',
                             ],
                             [
                                 'name' => 'itemsPerPage',
                                 'in' => 'query',
                                 'required' => false,
-                                'schema' => [
-                                    'type' => 'integer',
-                                ],
+                                'type' => 'integer',
                                 'description' => 'The number of items per page',
                             ],
                         ],
                         'responses' => [
-                            '200' => [
+                            200 => [
                                 'description' => 'Dummy collection response',
-                                'content' => [
-                                    'application/ld+json' => [
-                                        'schema' => [
-                                            'type' => 'array',
-                                            'items' => ['$ref' => '#/components/schemas/Dummy'],
-                                        ],
-                                    ],
+                                'schema' => [
+                                    'type' => 'array',
+                                    'items' => ['$ref' => '#/definitions/Dummy'],
                                 ],
                             ],
                         ],
@@ -145,26 +158,24 @@ class DocumentationNormalizerTest extends TestCase
                     'post' => new \ArrayObject([
                         'tags' => ['Dummy'],
                         'operationId' => 'postDummyCollection',
-                        'requestBody' => [
-                            'content' => [
-                                'application/ld+json' => [
-                                    'schema' => ['$ref' => '#/components/schemas/Dummy'],
-                                ],
-                            ],
-                            'description' => 'The new Dummy resource',
-                        ],
+                        'consumes' => ['application/ld+json'],
+                        'produces' => ['application/ld+json'],
                         'summary' => 'Creates a Dummy resource.',
-                        'responses' => [
-                            '201' => [
-                                'description' => 'Dummy resource created',
-                                'content' => [
-                                    'application/ld+json' => [
-                                        'schema' => ['$ref' => '#/components/schemas/Dummy'],
-                                    ],
-                                ],
+                        'parameters' => [
+                            [
+                                'name' => 'dummy',
+                                'in' => 'body',
+                                'description' => 'The new Dummy resource',
+                                'schema' => ['$ref' => '#/definitions/Dummy'],
                             ],
-                            '400' => ['description' => 'Invalid input'],
-                            '404' => ['description' => 'Resource not found'],
+                        ],
+                        'responses' => [
+                            201 => [
+                                'description' => 'Dummy resource created',
+                                'schema' => ['$ref' => '#/definitions/Dummy'],
+                            ],
+                            400 => ['description' => 'Invalid input'],
+                            404 => ['description' => 'Resource not found'],
                         ],
                     ]),
                 ],
@@ -172,58 +183,51 @@ class DocumentationNormalizerTest extends TestCase
                     'get' => new \ArrayObject([
                         'tags' => ['Dummy'],
                         'operationId' => 'getDummyItem',
+                        'produces' => ['application/ld+json'],
                         'summary' => 'Retrieves a Dummy resource.',
                         'parameters' => [
                             [
                                 'name' => 'id',
                                 'in' => 'path',
-                                'schema' => ['type' => 'string'],
+                                'type' => 'string',
                                 'required' => true,
                             ],
                         ],
                         'responses' => [
-                            '200' => [
+                            200 => [
                                 'description' => 'Dummy resource response',
-                                'content' => [
-                                    'application/ld+json' => [
-                                        'schema' => ['$ref' => '#/components/schemas/Dummy'],
-                                    ],
-                                ],
+                                'schema' => ['$ref' => '#/definitions/Dummy'],
                             ],
-                            '404' => ['description' => 'Resource not found'],
+                            404 => ['description' => 'Resource not found'],
                         ],
                     ]),
                     'put' => new \ArrayObject([
                         'tags' => ['Dummy'],
                         'operationId' => 'putDummyItem',
-                        'requestBody' => [
-                            'content' => [
-                                'application/ld+json' => [
-                                    'schema' => ['$ref' => '#/components/schemas/Dummy'],
-                                ],
-                            ],
-                            'description' => 'The updated Dummy resource',
-                        ],
+                        'consumes' => ['application/ld+json'],
+                        'produces' => ['application/ld+json'],
                         'summary' => 'Replaces the Dummy resource.',
                         'parameters' => [
                             [
                                 'name' => 'id',
                                 'in' => 'path',
-                                'schema' => ['type' => 'string'],
+                                'type' => 'string',
                                 'required' => true,
+                            ],
+                            [
+                                'name' => 'dummy',
+                                'in' => 'body',
+                                'description' => 'The updated Dummy resource',
+                                'schema' => ['$ref' => '#/definitions/Dummy'],
                             ],
                         ],
                         'responses' => [
-                            '200' => [
+                            200 => [
                                 'description' => 'Dummy resource updated',
-                                'content' => [
-                                    'application/ld+json' => [
-                                        'schema' => ['$ref' => '#/components/schemas/Dummy'],
-                                    ],
-                                ],
+                                'schema' => ['$ref' => '#/definitions/Dummy'],
                             ],
-                            '400' => ['description' => 'Invalid input'],
-                            '404' => ['description' => 'Resource not found'],
+                            400 => ['description' => 'Invalid input'],
+                            404 => ['description' => 'Resource not found'],
                         ],
                     ]),
                 ],
@@ -231,33 +235,30 @@ class DocumentationNormalizerTest extends TestCase
                     'get' => new \ArrayObject([
                         'tags' => ['Dummy'],
                         'operationId' => 'customDummyCollection',
+                        'produces' => ['application/ld+json'],
                         'summary' => 'Retrieves the collection of Dummy resources.',
                         'parameters' => [
                             [
                                 'name' => 'page',
                                 'in' => 'query',
                                 'required' => false,
-                                'schema' => ['type' => 'integer'],
+                                'type' => 'integer',
                                 'description' => 'The collection page number',
                             ],
                             [
                                 'name' => 'itemsPerPage',
                                 'in' => 'query',
                                 'required' => false,
-                                'schema' => ['type' => 'integer'],
+                                'type' => 'integer',
                                 'description' => 'The number of items per page',
                             ],
                         ],
                         'responses' => [
-                            '200' => [
+                            200 => [
                                 'description' => 'Dummy collection response',
-                                'content' => [
-                                    'application/ld+json' => [
-                                        'schema' => [
-                                            'type' => 'array',
-                                            'items' => ['$ref' => '#/components/schemas/Dummy'],
-                                        ],
-                                    ],
+                                'schema' => [
+                                    'type' => 'array',
+                                    'items' => ['$ref' => '#/definitions/Dummy'],
                                 ],
                             ],
                         ],
@@ -265,55 +266,50 @@ class DocumentationNormalizerTest extends TestCase
                     'post' => new \ArrayObject([
                         'tags' => ['Dummy'],
                         'operationId' => 'custom2DummyCollection',
+                        'produces' => ['application/ld+json'],
+                        'consumes' => ['application/ld+json'],
                         'summary' => 'Creates a Dummy resource.',
-                        'requestBody' => [
-                            'content' => [
-                                'application/ld+json' => [
-                                    'schema' => ['$ref' => '#/components/schemas/Dummy'],
-                                ],
+                        'parameters' => [
+                            [
+                                'name' => 'dummy',
+                                'in' => 'body',
+                                'description' => 'The new Dummy resource',
+                                'schema' => ['$ref' => '#/definitions/Dummy'],
                             ],
-                            'description' => 'The new Dummy resource',
                         ],
                         'responses' => [
-                            '201' => [
+                            201 => [
                                 'description' => 'Dummy resource created',
-                                'content' => [
-                                    'application/ld+json' => [
-                                        'schema' => ['$ref' => '#/components/schemas/Dummy'],
-                                    ],
-                                ],
+                                'schema' => ['$ref' => '#/definitions/Dummy'],
                             ],
-                            '400' => ['description' => 'Invalid input'],
-                            '404' => ['description' => 'Resource not found'],
+                            400 => ['description' => 'Invalid input'],
+                            404 => ['description' => 'Resource not found'],
                         ],
                     ]),
                 ],
             ]),
-            'components' => [
-                'schemas' => new \ArrayObject([
-                    'Dummy' => new \ArrayObject([
-                        'type' => 'object',
-                        'description' => 'This is a dummy.',
-                        'externalDocs' => ['url' => 'http://schema.example.com/Dummy'],
-                        'properties' => [
-                            'id' => new \ArrayObject([
-                                'type' => 'integer',
-                                'description' => 'This is an id.',
-                                'readOnly' => true,
-                            ]),
-                            'name' => new \ArrayObject([
-                                'type' => 'string',
-                                'description' => 'This is a name.',
-                            ]),
-                            'description' => new \ArrayObject([
-                                'type' => 'string',
-                                'description' => 'This is an initializable but not writable property.',
-                            ]),
-                        ],
-                    ]),
+            'definitions' => new \ArrayObject([
+                'Dummy' => new \ArrayObject([
+                    'type' => 'object',
+                    'description' => 'This is a dummy.',
+                    'externalDocs' => ['url' => 'http://schema.example.com/Dummy'],
+                    'properties' => [
+                        'id' => new \ArrayObject([
+                            'type' => 'integer',
+                            'description' => 'This is an id.',
+                            'readOnly' => true,
+                        ]),
+                        'name' => new \ArrayObject([
+                            'type' => 'string',
+                            'description' => 'This is a name.',
+                        ]),
+                        'description' => new \ArrayObject([
+                            'type' => 'string',
+                            'description' => 'This is an initializable but not writable property.',
+                        ]),
+                    ],
                 ]),
-            ],
-            'servers' => [['url' => '/app_dev.php/']],
+            ]),
         ];
 
         $this->assertEquals($expected, $normalizer->normalize($documentation, DocumentationNormalizer::FORMAT, ['base_url' => '/app_dev.php/']));
@@ -341,7 +337,11 @@ class DocumentationNormalizerTest extends TestCase
         $operationMethodResolverProphecy = $this->prophesize(OperationMethodResolverInterface::class);
         $operationMethodResolverProphecy->getItemOperationMethod(Dummy::class, 'get')->shouldBeCalled()->willReturn('GET');
 
-        $nameConverterProphecy = $this->prophesize(NameConverterInterface::class);
+        $nameConverterProphecy = $this->prophesize(
+            interface_exists(AdvancedNameConverterInterface::class)
+                ? AdvancedNameConverterInterface::class
+                : NameConverterInterface::class
+        );
         $nameConverterProphecy->normalize('name', Dummy::class, DocumentationNormalizer::FORMAT, [])->willReturn('name')->shouldBeCalled();
         $nameConverterProphecy->normalize('nameConverted', Dummy::class, DocumentationNormalizer::FORMAT, [])->willReturn('name_converted')->shouldBeCalled();
 
@@ -355,6 +355,7 @@ class DocumentationNormalizerTest extends TestCase
             $operationMethodResolverProphecy->reveal(),
             $operationPathResolver,
             null,
+            null,
             $nameConverterProphecy->reveal(),
             true,
             'oauth2',
@@ -365,7 +366,8 @@ class DocumentationNormalizerTest extends TestCase
         );
 
         $expected = [
-            'openapi' => '3.0.2',
+            'swagger' => '2.0',
+            'basePath' => '/',
             'info' => [
                 'title' => 'Dummy API',
                 'description' => 'This is a dummy API',
@@ -376,59 +378,53 @@ class DocumentationNormalizerTest extends TestCase
                     'get' => new \ArrayObject([
                         'tags' => ['Dummy'],
                         'operationId' => 'getDummyItem',
+                        'produces' => ['application/ld+json'],
                         'summary' => 'Retrieves a Dummy resource.',
                         'parameters' => [
                             [
                                 'name' => 'id',
                                 'in' => 'path',
-                                'schema' => ['type' => 'string'],
+                                'type' => 'string',
                                 'required' => true,
                             ],
                         ],
                         'responses' => [
-                            '200' => [
+                            200 => [
                                 'description' => 'Dummy resource response',
-                                'content' => [
-                                    'application/ld+json' => [
-                                        'schema' => ['$ref' => '#/components/schemas/Dummy'],
-                                    ],
-                                ],
+                                'schema' => ['$ref' => '#/definitions/Dummy'],
                             ],
-                            '404' => ['description' => 'Resource not found'],
+                            404 => ['description' => 'Resource not found'],
                         ],
                     ]),
                 ],
             ]),
-            'components' => [
-                'schemas' => new \ArrayObject([
-                    'Dummy' => new \ArrayObject([
-                        'type' => 'object',
-                        'description' => 'This is a dummy.',
-                        'properties' => [
-                            'name' => new \ArrayObject([
-                                'type' => 'string',
-                                'description' => 'This is a name.',
-                            ]),
-                            'name_converted' => new \ArrayObject([
-                                'type' => 'string',
-                                'description' => 'This is a converted name.',
-                            ]),
-                        ],
-                    ]),
-                ]),
-                'securitySchemes' => [
-                    'oauth' => [
-                        'type' => 'oauth2',
-                        'description' => 'OAuth client_credentials Grant',
-                        'flow' => 'application',
-                        'tokenUrl' => '/oauth/v2/token',
-                        'authorizationUrl' => '/oauth/v2/auth',
-                        'scopes' => ['scope param'],
+            'definitions' => new \ArrayObject([
+                'Dummy' => new \ArrayObject([
+                    'type' => 'object',
+                    'description' => 'This is a dummy.',
+                    'properties' => [
+                        'name' => new \ArrayObject([
+                            'type' => 'string',
+                            'description' => 'This is a name.',
+                        ]),
+                        'name_converted' => new \ArrayObject([
+                            'type' => 'string',
+                            'description' => 'This is a converted name.',
+                        ]),
                     ],
+                ]),
+            ]),
+            'securityDefinitions' => [
+                'oauth' => [
+                    'type' => 'oauth2',
+                    'description' => 'OAuth client_credentials Grant',
+                    'flow' => 'application',
+                    'tokenUrl' => '/oauth/v2/token',
+                    'authorizationUrl' => '/oauth/v2/auth',
+                    'scopes' => ['scope param'],
                 ],
             ],
             'security' => [['oauth' => []]],
-            'servers' => [['url' => '/']],
         ];
 
         $this->assertEquals($expected, $normalizer->normalize($documentation));
@@ -477,6 +473,7 @@ class DocumentationNormalizerTest extends TestCase
             $operationPathResolver,
             null,
             null,
+            null,
             false,
             '',
             '',
@@ -487,8 +484,8 @@ class DocumentationNormalizerTest extends TestCase
         );
 
         $expected = [
-            'openapi' => '3.0.2',
-            'servers' => [['url' => '/app_dev.php/']],
+            'swagger' => '2.0',
+            'basePath' => '/app_dev.php/',
             'info' => [
                 'title' => 'Test API',
                 'description' => 'This is a test API.',
@@ -499,55 +496,50 @@ class DocumentationNormalizerTest extends TestCase
                     'get' => new \ArrayObject([
                         'tags' => ['Dummy'],
                         'operationId' => 'getDummyItem',
+                        'produces' => ['application/ld+json'],
                         'summary' => 'Retrieves a Dummy resource.',
                         'parameters' => [
                             [
                                 'name' => 'id',
                                 'in' => 'path',
-                                'schema' => ['type' => 'string'],
+                                'type' => 'string',
                                 'required' => true,
                             ],
                         ],
                         'responses' => [
-                            '200' => [
+                            200 => [
                                 'description' => 'Dummy resource response',
-                                'content' => [
-                                    'application/ld+json' => [
-                                        'schema' => ['$ref' => '#/components/schemas/Dummy'],
-                                    ],
-                                ],
+                                'schema' => ['$ref' => '#/definitions/Dummy'],
                             ],
-                            '404' => ['description' => 'Resource not found'],
+                            404 => ['description' => 'Resource not found'],
                         ],
                     ]),
                 ],
             ]),
-            'components' => [
-                'schemas' => new \ArrayObject([
-                    'Dummy' => new \ArrayObject([
-                        'type' => 'object',
-                        'description' => 'This is a dummy.',
-                        'properties' => [
-                            'name' => new \ArrayObject([
-                                'type' => 'string',
-                                'description' => 'This is a name.',
-                            ]),
-                        ],
-                    ]),
+            'definitions' => new \ArrayObject([
+                'Dummy' => new \ArrayObject([
+                    'type' => 'object',
+                    'description' => 'This is a dummy.',
+                    'properties' => [
+                        'name' => new \ArrayObject([
+                            'type' => 'string',
+                            'description' => 'This is a name.',
+                        ]),
+                    ],
                 ]),
-                'securitySchemes' => [
-                    'header' => [
-                        'type' => 'apiKey',
-                        'in' => 'header',
-                        'description' => 'Value for the Authorization header',
-                        'name' => 'Authorization',
-                    ],
-                    'query' => [
-                        'type' => 'apiKey',
-                        'in' => 'query',
-                        'description' => 'Value for the key query parameter',
-                        'name' => 'key',
-                    ],
+            ]),
+            'securityDefinitions' => [
+                'header' => [
+                    'type' => 'apiKey',
+                    'in' => 'header',
+                    'description' => 'Value for the Authorization header',
+                    'name' => 'Authorization',
+                ],
+                'query' => [
+                    'type' => 'apiKey',
+                    'in' => 'query',
+                    'description' => 'Value for the key query parameter',
+                    'name' => 'key',
                 ],
             ],
             'security' => [
@@ -616,7 +608,8 @@ class DocumentationNormalizerTest extends TestCase
         );
 
         $expected = [
-            'openapi' => '3.0.2',
+            'swagger' => '2.0',
+            'basePath' => '/',
             'info' => [
                 'title' => 'Test API',
                 'description' => 'This is a test API.',
@@ -629,26 +622,23 @@ class DocumentationNormalizerTest extends TestCase
                             'Dummy',
                         ],
                         'operationId' => 'getDummyCollection',
+                        'produces' => ['application/ld+json'],
                         'summary' => 'Retrieves the collection of Dummy resources.',
                         'parameters' => [
                             [
                                 'name' => 'page',
                                 'in' => 'query',
                                 'required' => false,
-                                'schema' => ['type' => 'integer'],
+                                'type' => 'integer',
                                 'description' => 'The collection page number',
                             ],
                         ],
                         'responses' => [
-                            '200' => [
+                            200 => [
                                 'description' => 'Dummy collection response',
-                                'content' => [
-                                    'application/ld+json' => [
-                                        'schema' => [
-                                            'type' => 'array',
-                                            'items' => ['$ref' => '#/components/schemas/Dummy'],
-                                        ],
-                                    ],
+                                'schema' => [
+                                    'type' => 'array',
+                                    'items' => ['$ref' => '#/definitions/Dummy'],
                                 ],
                             ],
                         ],
@@ -656,26 +646,22 @@ class DocumentationNormalizerTest extends TestCase
                     'post' => new \ArrayObject([
                         'tags' => ['Dummy'],
                         'operationId' => 'postDummyCollection',
+                        'consumes' => ['application/ld+json'],
+                        'produces' => ['application/ld+json'],
                         'summary' => 'Creates a Dummy resource.',
-                        'requestBody' => [
-                            'content' => [
-                                'application/ld+json' => [
-                                    'schema' => ['$ref' => '#/components/schemas/Dummy'],
-                                ],
-                            ],
+                        'parameters' => [[
+                            'name' => 'dummy',
+                            'in' => 'body',
                             'description' => 'The new Dummy resource',
-                        ],
+                            'schema' => ['$ref' => '#/definitions/Dummy'],
+                        ]],
                         'responses' => [
-                            '201' => [
+                            201 => [
                                 'description' => 'Dummy resource created',
-                                'content' => [
-                                    'application/ld+json' => [
-                                        'schema' => ['$ref' => '#/components/schemas/Dummy'],
-                                    ],
-                                ],
+                                'schema' => ['$ref' => '#/definitions/Dummy'],
                             ],
-                            '400' => ['description' => 'Invalid input'],
-                            '404' => ['description' => 'Resource not found'],
+                            400 => ['description' => 'Invalid input'],
+                            404 => ['description' => 'Resource not found'],
                         ],
                     ]),
                 ],
@@ -683,95 +669,83 @@ class DocumentationNormalizerTest extends TestCase
                     'get' => new \ArrayObject([
                         'tags' => ['Dummy'],
                         'operationId' => 'getDummyItem',
+                        'produces' => ['application/ld+json'],
                         'summary' => 'Retrieves a Dummy resource.',
-                        'parameters' => [
-                            [
-                                'name' => 'id',
-                                'in' => 'path',
-                                'schema' => ['type' => 'string'],
-                                'required' => true,
-                            ],
-                        ],
+                        'parameters' => [[
+                            'name' => 'id',
+                            'in' => 'path',
+                            'type' => 'string',
+                            'required' => true,
+                        ]],
                         'responses' => [
-                            '200' => [
+                            200 => [
                                 'description' => 'Dummy resource response',
-                                'content' => [
-                                    'application/ld+json' => [
-                                        'schema' => ['$ref' => '#/components/schemas/Dummy'],
-                                    ],
-                                ],
+                                'schema' => ['$ref' => '#/definitions/Dummy'],
                             ],
-                            '404' => ['description' => 'Resource not found'],
+                            404 => ['description' => 'Resource not found'],
                         ],
                     ]),
                     'put' => new \ArrayObject([
                         'tags' => ['Dummy'],
                         'operationId' => 'putDummyItem',
-                        'requestBody' => [
-                            'content' => [
-                                'application/ld+json' => [
-                                    'schema' => ['$ref' => '#/components/schemas/Dummy'],
-                                ],
-                            ],
-                            'description' => 'The updated Dummy resource',
-                        ],
+                        'consumes' => ['application/ld+json'],
+                        'produces' => ['application/ld+json'],
                         'summary' => 'Replaces the Dummy resource.',
                         'parameters' => [
                             [
                                 'name' => 'id',
                                 'in' => 'path',
-                                'schema' => ['type' => 'string'],
+                                'type' => 'string',
                                 'required' => true,
+                            ],
+                            [
+                                'name' => 'dummy',
+                                'in' => 'body',
+                                'description' => 'The updated Dummy resource',
+                                'schema' => ['$ref' => '#/definitions/Dummy'],
                             ],
                         ],
                         'responses' => [
-                            '200' => [
+                            200 => [
                                 'description' => 'Dummy resource updated',
-                                'content' => [
-                                    'application/ld+json' => [
-                                        'schema' => ['$ref' => '#/components/schemas/'.$ref],
-                                    ],
-                                ],
+                                'schema' => ['$ref' => '#/definitions/'.$ref],
                             ],
-                            '400' => ['description' => 'Invalid input'],
-                            '404' => ['description' => 'Resource not found'],
+                            400 => ['description' => 'Invalid input'],
+                            404 => ['description' => 'Resource not found'],
                         ],
                     ]),
                 ],
             ]),
-            'components' => [
-                'schemas' => new \ArrayObject([
-                    'Dummy' => new \ArrayObject([
-                        'type' => 'object',
-                        'description' => 'This is a dummy.',
-                        'externalDocs' => ['url' => 'http://schema.example.com/Dummy'],
-                        'properties' => [
-                            'name' => new \ArrayObject([
-                                'type' => 'string',
-                                'description' => 'This is a name.',
-                            ]),
-                        ],
-                    ]),
-                    $ref => new \ArrayObject([
-                        'type' => 'object',
-                        'description' => 'This is a dummy.',
-                        'externalDocs' => ['url' => 'http://schema.example.com/Dummy'],
-                        'properties' => [
-                            'gerard' => new \ArrayObject([
-                                'type' => 'string',
-                                'description' => 'This is a gerard.',
-                            ]),
-                        ],
-                    ]),
+            'definitions' => new \ArrayObject([
+                'Dummy' => new \ArrayObject([
+                    'type' => 'object',
+                    'description' => 'This is a dummy.',
+                    'externalDocs' => ['url' => 'http://schema.example.com/Dummy'],
+                    'properties' => [
+                        'name' => new \ArrayObject([
+                            'type' => 'string',
+                            'description' => 'This is a name.',
+                        ]),
+                    ],
                 ]),
-            ],
-            'servers' => [['url' => '/']],
+                $ref => new \ArrayObject([
+                    'type' => 'object',
+                    'description' => 'This is a dummy.',
+                    'externalDocs' => ['url' => 'http://schema.example.com/Dummy'],
+                    'properties' => [
+                        'gerard' => new \ArrayObject([
+                            'type' => 'string',
+                            'description' => 'This is a gerard.',
+                        ]),
+                    ],
+                ]),
+            ]),
         ];
 
         $this->assertEquals($expected, $normalizer->normalize($documentation));
     }
 
-    public function testNormalizeWithOpenApiDefinitionName()
+    public function testNormalizeWithSwaggerDefinitionName()
     {
         $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), 'Test API', 'This is a test API.', '1.2.3', ['jsonld' => ['application/ld+json']]);
 
@@ -814,7 +788,8 @@ class DocumentationNormalizerTest extends TestCase
         );
 
         $expected = [
-            'openapi' => '3.0.2',
+            'swagger' => '2.0',
+            'basePath' => '/app_dev.php/',
             'info' => [
                 'title' => 'Test API',
                 'description' => 'This is a test API.',
@@ -825,46 +800,40 @@ class DocumentationNormalizerTest extends TestCase
                     'get' => new \ArrayObject([
                         'tags' => ['Dummy'],
                         'operationId' => 'getDummyItem',
+                        'produces' => ['application/ld+json'],
                         'summary' => 'Retrieves a Dummy resource.',
                         'parameters' => [
                             [
                                 'name' => 'id',
                                 'in' => 'path',
-                                'schema' => ['type' => 'string'],
+                                'type' => 'string',
                                 'required' => true,
                             ],
                         ],
                         'responses' => [
-                            '200' => [
+                            200 => [
                                 'description' => 'Dummy resource response',
-                                'content' => [
-                                    'application/ld+json' => [
-                                        'schema' => ['$ref' => '#/components/schemas/Dummy-Read'],
-                                    ],
-                                ],
+                                'schema' => ['$ref' => '#/definitions/Dummy-Read'],
                             ],
-                            '404' => ['description' => 'Resource not found'],
+                            404 => ['description' => 'Resource not found'],
                         ],
                     ]),
                 ],
             ]),
-            'components' => [
-                'schemas' => new \ArrayObject([
-                    'Dummy-Read' => new \ArrayObject([
-                        'type' => 'object',
-                        'description' => 'This is a dummy.',
-                        'externalDocs' => ['url' => 'http://schema.example.com/Dummy'],
-                        'properties' => [
-                            'id' => new \ArrayObject([
-                                'type' => 'integer',
-                                'description' => 'This is an id.',
-                                'readOnly' => true,
-                            ]),
-                        ],
-                    ]),
+            'definitions' => new \ArrayObject([
+                'Dummy-Read' => new \ArrayObject([
+                    'type' => 'object',
+                    'description' => 'This is a dummy.',
+                    'externalDocs' => ['url' => 'http://schema.example.com/Dummy'],
+                    'properties' => [
+                        'id' => new \ArrayObject([
+                            'type' => 'integer',
+                            'description' => 'This is an id.',
+                            'readOnly' => true,
+                        ]),
+                    ],
                 ]),
-            ],
-            'servers' => [['url' => '/app_dev.php/']],
+            ]),
         ];
 
         $this->assertEquals($expected, $normalizer->normalize($documentation, DocumentationNormalizer::FORMAT, ['base_url' => '/app_dev.php/']));
@@ -924,7 +893,8 @@ class DocumentationNormalizerTest extends TestCase
         );
 
         $expected = [
-            'openapi' => '3.0.2',
+            'swagger' => '2.0',
+            'basePath' => '/',
             'info' => [
                 'title' => 'Test API',
                 'description' => 'This is a test API.',
@@ -937,26 +907,23 @@ class DocumentationNormalizerTest extends TestCase
                             'Dummy',
                         ],
                         'operationId' => 'getDummyCollection',
+                        'produces' => ['application/ld+json'],
                         'summary' => 'Retrieves the collection of Dummy resources.',
                         'parameters' => [
                             [
                                 'name' => 'page',
                                 'in' => 'query',
                                 'required' => false,
-                                'schema' => ['type' => 'integer'],
+                                'type' => 'integer',
                                 'description' => 'The collection page number',
                             ],
                         ],
                         'responses' => [
-                            '200' => [
+                            200 => [
                                 'description' => 'Dummy collection response',
-                                'content' => [
-                                    'application/ld+json' => [
-                                        'schema' => [
-                                            'type' => 'array',
-                                            'items' => ['$ref' => '#/components/schemas/Dummy'],
-                                        ],
-                                    ],
+                                'schema' => [
+                                    'type' => 'array',
+                                    'items' => ['$ref' => '#/definitions/Dummy'],
                                 ],
                             ],
                         ],
@@ -964,26 +931,22 @@ class DocumentationNormalizerTest extends TestCase
                     'post' => new \ArrayObject([
                         'tags' => ['Dummy'],
                         'operationId' => 'postDummyCollection',
-                        'requestBody' => [
-                            'content' => [
-                                'application/ld+json' => [
-                                    'schema' => ['$ref' => '#/components/schemas/Dummy'],
-                                ],
-                            ],
-                            'description' => 'The new Dummy resource',
-                        ],
+                        'consumes' => ['application/ld+json'],
+                        'produces' => ['application/ld+json'],
                         'summary' => 'Creates a Dummy resource.',
+                        'parameters' => [[
+                            'name' => 'dummy',
+                            'in' => 'body',
+                            'description' => 'The new Dummy resource',
+                            'schema' => ['$ref' => '#/definitions/Dummy'],
+                        ]],
                         'responses' => [
-                            '201' => [
+                            201 => [
                                 'description' => 'Dummy resource created',
-                                'content' => [
-                                    'application/ld+json' => [
-                                        'schema' => ['$ref' => '#/components/schemas/Dummy'],
-                                    ],
-                                ],
+                                'schema' => ['$ref' => '#/definitions/Dummy'],
                             ],
-                            '400' => ['description' => 'Invalid input'],
-                            '404' => ['description' => 'Resource not found'],
+                            400 => ['description' => 'Invalid input'],
+                            404 => ['description' => 'Resource not found'],
                         ],
                     ]),
                 ],
@@ -991,87 +954,77 @@ class DocumentationNormalizerTest extends TestCase
                     'get' => new \ArrayObject([
                         'tags' => ['Dummy'],
                         'operationId' => 'getDummyItem',
+                        'produces' => ['application/ld+json'],
                         'summary' => 'Retrieves a Dummy resource.',
                         'parameters' => [[
                             'name' => 'id',
                             'in' => 'path',
-                            'schema' => ['type' => 'string'],
+                            'type' => 'string',
                             'required' => true,
                         ]],
                         'responses' => [
-                            '200' => [
+                            200 => [
                                 'description' => 'Dummy resource response',
-                                'content' => [
-                                    'application/ld+json' => [
-                                        'schema' => ['$ref' => '#/components/schemas/Dummy'],
-                                    ],
-                                ],
+                                'schema' => ['$ref' => '#/definitions/Dummy'],
                             ],
-                            '404' => ['description' => 'Resource not found'],
+                            404 => ['description' => 'Resource not found'],
                         ],
                     ]),
                     'put' => new \ArrayObject([
                         'tags' => ['Dummy'],
                         'operationId' => 'putDummyItem',
-                        'requestBody' => [
-                            'content' => [
-                                'application/ld+json' => [
-                                    'schema' => ['$ref' => '#/components/schemas/Dummy-dummy'],
-                                ],
-                            ],
-                            'description' => 'The updated Dummy resource',
-                        ],
+                        'consumes' => ['application/ld+json'],
+                        'produces' => ['application/ld+json'],
                         'summary' => 'Replaces the Dummy resource.',
                         'parameters' => [
                             [
                                 'name' => 'id',
                                 'in' => 'path',
-                                'schema' => ['type' => 'string'],
+                                'type' => 'string',
                                 'required' => true,
+                            ],
+                            [
+                                'name' => 'dummy',
+                                'in' => 'body',
+                                'description' => 'The updated Dummy resource',
+                                'schema' => ['$ref' => '#/definitions/Dummy-dummy'],
                             ],
                         ],
                         'responses' => [
-                            '200' => [
+                            200 => [
                                 'description' => 'Dummy resource updated',
-                                'content' => [
-                                    'application/ld+json' => [
-                                        'schema' => ['$ref' => '#/components/schemas/Dummy'],
-                                    ],
-                                ],
+                                'schema' => ['$ref' => '#/definitions/Dummy'],
                             ],
-                            '400' => ['description' => 'Invalid input'],
-                            '404' => ['description' => 'Resource not found'],
+                            400 => ['description' => 'Invalid input'],
+                            404 => ['description' => 'Resource not found'],
                         ],
                     ]),
                 ],
             ]),
-            'components' => [
-                'schemas' => new \ArrayObject([
-                    'Dummy' => new \ArrayObject([
-                        'type' => 'object',
-                        'description' => 'This is a dummy.',
-                        'externalDocs' => ['url' => 'http://schema.example.com/Dummy'],
-                        'properties' => [
-                            'name' => new \ArrayObject([
-                                'type' => 'string',
-                                'description' => 'This is a name.',
-                            ]),
-                        ],
-                    ]),
-                    'Dummy-dummy' => new \ArrayObject([
-                        'type' => 'object',
-                        'description' => 'This is a dummy.',
-                        'externalDocs' => ['url' => 'http://schema.example.com/Dummy'],
-                        'properties' => [
-                            'gerard' => new \ArrayObject([
-                                'type' => 'string',
-                                'description' => 'This is a gerard.',
-                            ]),
-                        ],
-                    ]),
+            'definitions' => new \ArrayObject([
+                'Dummy' => new \ArrayObject([
+                    'type' => 'object',
+                    'description' => 'This is a dummy.',
+                    'externalDocs' => ['url' => 'http://schema.example.com/Dummy'],
+                    'properties' => [
+                        'name' => new \ArrayObject([
+                            'type' => 'string',
+                            'description' => 'This is a name.',
+                        ]),
+                    ],
                 ]),
-            ],
-            'servers' => [['url' => '/']],
+                'Dummy-dummy' => new \ArrayObject([
+                    'type' => 'object',
+                    'description' => 'This is a dummy.',
+                    'externalDocs' => ['url' => 'http://schema.example.com/Dummy'],
+                    'properties' => [
+                        'gerard' => new \ArrayObject([
+                            'type' => 'string',
+                            'description' => 'This is a gerard.',
+                        ]),
+                    ],
+                ]),
+            ]),
         ];
 
         $this->assertEquals($expected, $normalizer->normalize($documentation));
@@ -1134,7 +1087,8 @@ class DocumentationNormalizerTest extends TestCase
         );
 
         $expected = [
-            'openapi' => '3.0.2',
+            'swagger' => '2.0',
+            'basePath' => '/',
             'info' => [
                 'title' => 'Test API',
                 'description' => 'This is a test API.',
@@ -1147,26 +1101,23 @@ class DocumentationNormalizerTest extends TestCase
                             'Dummy',
                         ],
                         'operationId' => 'getDummyCollection',
+                        'produces' => ['application/ld+json'],
                         'summary' => 'Retrieves the collection of Dummy resources.',
                         'parameters' => [
                             [
                                 'name' => 'page',
                                 'in' => 'query',
                                 'required' => false,
-                                'schema' => ['type' => 'integer'],
+                                'type' => 'integer',
                                 'description' => 'The collection page number',
                             ],
                         ],
                         'responses' => [
-                            '200' => [
+                            200 => [
                                 'description' => 'Dummy collection response',
-                                'content' => [
-                                    'application/ld+json' => [
-                                        'schema' => [
-                                            'type' => 'array',
-                                            'items' => ['$ref' => '#/components/schemas/Dummy'],
-                                        ],
-                                    ],
+                                'schema' => [
+                                    'type' => 'array',
+                                    'items' => ['$ref' => '#/definitions/Dummy'],
                                 ],
                             ],
                         ],
@@ -1174,26 +1125,22 @@ class DocumentationNormalizerTest extends TestCase
                     'post' => new \ArrayObject([
                         'tags' => ['Dummy'],
                         'operationId' => 'postDummyCollection',
-                        'requestBody' => [
-                            'content' => [
-                                'application/ld+json' => [
-                                    'schema' => ['$ref' => '#/components/schemas/Dummy'],
-                                ],
-                            ],
-                            'description' => 'The new Dummy resource',
-                        ],
+                        'consumes' => ['application/ld+json'],
+                        'produces' => ['application/ld+json'],
                         'summary' => 'Creates a Dummy resource.',
+                        'parameters' => [[
+                            'name' => 'dummy',
+                            'in' => 'body',
+                            'description' => 'The new Dummy resource',
+                            'schema' => ['$ref' => '#/definitions/Dummy'],
+                        ]],
                         'responses' => [
-                            '201' => [
+                            201 => [
                                 'description' => 'Dummy resource created',
-                                'content' => [
-                                    'application/ld+json' => [
-                                        'schema' => ['$ref' => '#/components/schemas/Dummy'],
-                                    ],
-                                ],
+                                'schema' => ['$ref' => '#/definitions/Dummy'],
                             ],
-                            '400' => ['description' => 'Invalid input'],
-                            '404' => ['description' => 'Resource not found'],
+                            400 => ['description' => 'Invalid input'],
+                            404 => ['description' => 'Resource not found'],
                         ],
                     ]),
                 ],
@@ -1201,87 +1148,77 @@ class DocumentationNormalizerTest extends TestCase
                     'get' => new \ArrayObject([
                         'tags' => ['Dummy'],
                         'operationId' => 'getDummyItem',
+                        'produces' => ['application/ld+json'],
                         'summary' => 'Retrieves a Dummy resource.',
                         'parameters' => [[
                             'name' => 'id',
                             'in' => 'path',
-                            'schema' => ['type' => 'string'],
+                            'type' => 'string',
                             'required' => true,
                         ]],
                         'responses' => [
-                            '200' => [
+                            200 => [
                                 'description' => 'Dummy resource response',
-                                'content' => [
-                                    'application/ld+json' => [
-                                        'schema' => ['$ref' => '#/components/schemas/Dummy'],
-                                    ],
-                                ],
+                                'schema' => ['$ref' => '#/definitions/Dummy'],
                             ],
-                            '404' => ['description' => 'Resource not found'],
+                            404 => ['description' => 'Resource not found'],
                         ],
                     ]),
                     'put' => new \ArrayObject([
                         'tags' => ['Dummy'],
                         'operationId' => 'putDummyItem',
-                        'requestBody' => [
-                            'content' => [
-                                'application/ld+json' => [
-                                    'schema' => ['$ref' => '#/components/schemas/Dummy-dummy'],
-                                ],
-                            ],
-                            'description' => 'The updated Dummy resource',
-                        ],
+                        'consumes' => ['application/ld+json'],
+                        'produces' => ['application/ld+json'],
                         'summary' => 'Replaces the Dummy resource.',
                         'parameters' => [
                             [
                                 'name' => 'id',
                                 'in' => 'path',
-                                'schema' => ['type' => 'string'],
+                                'type' => 'string',
                                 'required' => true,
+                            ],
+                            [
+                                'name' => 'dummy',
+                                'in' => 'body',
+                                'description' => 'The updated Dummy resource',
+                                'schema' => ['$ref' => '#/definitions/Dummy-dummy'],
                             ],
                         ],
                         'responses' => [
-                            '200' => [
+                            200 => [
                                 'description' => 'Dummy resource updated',
-                                'content' => [
-                                    'application/ld+json' => [
-                                        'schema' => ['$ref' => '#/components/schemas/Dummy-dummy'],
-                                    ],
-                                ],
+                                'schema' => ['$ref' => '#/definitions/Dummy-dummy'],
                             ],
-                            '400' => ['description' => 'Invalid input'],
-                            '404' => ['description' => 'Resource not found'],
+                            400 => ['description' => 'Invalid input'],
+                            404 => ['description' => 'Resource not found'],
                         ],
                     ]),
                 ],
             ]),
-            'components' => [
-                'schemas' => new \ArrayObject([
-                    'Dummy' => new \ArrayObject([
-                        'type' => 'object',
-                        'description' => 'This is a dummy.',
-                        'externalDocs' => ['url' => 'http://schema.example.com/Dummy'],
-                        'properties' => [
-                            'name' => new \ArrayObject([
-                                'type' => 'string',
-                                'description' => 'This is a name.',
-                            ]),
-                        ],
-                    ]),
-                    'Dummy-dummy' => new \ArrayObject([
-                        'type' => 'object',
-                        'description' => 'This is a dummy.',
-                        'externalDocs' => ['url' => 'http://schema.example.com/Dummy'],
-                        'properties' => [
-                            'gerard' => new \ArrayObject([
-                                'type' => 'string',
-                                'description' => 'This is a gerard.',
-                            ]),
-                        ],
-                    ]),
+            'definitions' => new \ArrayObject([
+                'Dummy' => new \ArrayObject([
+                    'type' => 'object',
+                    'description' => 'This is a dummy.',
+                    'externalDocs' => ['url' => 'http://schema.example.com/Dummy'],
+                    'properties' => [
+                        'name' => new \ArrayObject([
+                            'type' => 'string',
+                            'description' => 'This is a name.',
+                        ]),
+                    ],
                 ]),
-            ],
-            'servers' => [['url' => '/']],
+                'Dummy-dummy' => new \ArrayObject([
+                    'type' => 'object',
+                    'description' => 'This is a dummy.',
+                    'externalDocs' => ['url' => 'http://schema.example.com/Dummy'],
+                    'properties' => [
+                        'gerard' => new \ArrayObject([
+                            'type' => 'string',
+                            'description' => 'This is a gerard.',
+                        ]),
+                    ],
+                ]),
+            ]),
         ];
 
         $this->assertEquals($expected, $normalizer->normalize($documentation));
@@ -1296,7 +1233,7 @@ class DocumentationNormalizerTest extends TestCase
                 'type' => 'string',
                 'required' => true,
                 'strategy' => 'exact',
-                'openapi' => ['x-foo' => 'bar'],
+                'swagger' => ['x-foo' => 'bar'],
             ]]),
             'f2' => new DummyFilter(['ha' => [
                 'property' => 'foo',
@@ -1335,7 +1272,7 @@ class DocumentationNormalizerTest extends TestCase
                 'type' => 'string',
                 'required' => true,
                 'strategy' => 'exact',
-                'openapi' => ['x-foo' => 'bar'],
+                'swagger' => ['x-foo' => 'bar'],
             ]]),
             'f2' => new DummyFilter(['ha' => [
                 'property' => 'foo',
@@ -1365,6 +1302,7 @@ class DocumentationNormalizerTest extends TestCase
             $this->prophesize(ResourceClassResolverInterface::class)->reveal(),
             $this->prophesize(OperationMethodResolverInterface::class)->reveal(),
             $this->prophesize(OperationPathResolverInterface::class)->reveal(),
+            null,
             new \ArrayObject()
         );
     }
@@ -1434,13 +1372,13 @@ class DocumentationNormalizerTest extends TestCase
         );
 
         $expected = [
-            'openapi' => '3.0.2',
+            'swagger' => '2.0',
+            'basePath' => '/',
             'info' => [
                 'title' => '',
                 'version' => '0.0.0',
             ],
             'paths' => new \ArrayObject([]),
-            'servers' => [['url' => '/']],
         ];
 
         $this->assertEquals($expected, $normalizer->normalize($documentation));
@@ -1483,7 +1421,8 @@ class DocumentationNormalizerTest extends TestCase
         );
 
         $expected = [
-            'openapi' => '3.0.2',
+            'swagger' => '2.0',
+            'basePath' => '/',
             'info' => [
                 'title' => '',
                 'version' => '0.0.0',
@@ -1496,7 +1435,6 @@ class DocumentationNormalizerTest extends TestCase
                     ]),
                 ],
             ]),
-            'servers' => [['url' => '/']],
         ];
 
         $this->assertEquals($expected, $normalizer->normalize($documentation));
@@ -1575,7 +1513,8 @@ class DocumentationNormalizerTest extends TestCase
         );
 
         $expected = [
-            'openapi' => '3.0.2',
+            'swagger' => '2.0',
+            'basePath' => '/',
             'info' => [
                 'title' => 'Test API',
                 'description' => 'This is a test API.',
@@ -1588,26 +1527,23 @@ class DocumentationNormalizerTest extends TestCase
                             'Dummy',
                         ],
                         'operationId' => 'getDummyCollection',
+                        'produces' => ['application/ld+json'],
                         'summary' => 'Retrieves the collection of Dummy resources.',
                         'parameters' => [
                             [
                                 'name' => 'page',
                                 'in' => 'query',
                                 'required' => false,
-                                'schema' => ['type' => 'integer'],
+                                'type' => 'integer',
                                 'description' => 'The collection page number',
                             ],
                         ],
                         'responses' => [
-                            '200' => [
+                            200 => [
                                 'description' => 'Dummy collection response',
-                                'content' => [
-                                    'application/ld+json' => [
-                                        'schema' => [
-                                            'type' => 'array',
-                                            'items' => ['$ref' => '#/components/schemas/Dummy'],
-                                        ],
-                                    ],
+                                'schema' => [
+                                    'type' => 'array',
+                                    'items' => ['$ref' => '#/definitions/Dummy'],
                                 ],
                             ],
                         ],
@@ -1615,26 +1551,22 @@ class DocumentationNormalizerTest extends TestCase
                     'post' => new \ArrayObject([
                         'tags' => ['Dummy'],
                         'operationId' => 'postDummyCollection',
-                        'requestBody' => [
-                            'content' => [
-                                'application/ld+json' => [
-                                    'schema' => ['$ref' => '#/components/schemas/Dummy'],
-                                ],
-                            ],
-                            'description' => 'The new Dummy resource',
-                        ],
+                        'consumes' => ['application/ld+json'],
+                        'produces' => ['application/ld+json'],
                         'summary' => 'Creates a Dummy resource.',
+                        'parameters' => [[
+                            'name' => 'dummy',
+                            'in' => 'body',
+                            'description' => 'The new Dummy resource',
+                            'schema' => ['$ref' => '#/definitions/Dummy'],
+                        ]],
                         'responses' => [
-                            '201' => [
+                            201 => [
                                 'description' => 'Dummy resource created',
-                                'content' => [
-                                    'application/ld+json' => [
-                                        'schema' => ['$ref' => '#/components/schemas/Dummy'],
-                                    ],
-                                ],
+                                'schema' => ['$ref' => '#/definitions/Dummy'],
                             ],
-                            '400' => ['description' => 'Invalid input'],
-                            '404' => ['description' => 'Resource not found'],
+                            400 => ['description' => 'Invalid input'],
+                            404 => ['description' => 'Resource not found'],
                         ],
                     ]),
                 ],
@@ -1642,102 +1574,92 @@ class DocumentationNormalizerTest extends TestCase
                     'get' => new \ArrayObject([
                         'tags' => ['Dummy'],
                         'operationId' => 'getDummyItem',
+                        'produces' => ['application/ld+json'],
                         'summary' => 'Retrieves a Dummy resource.',
                         'parameters' => [[
                             'name' => 'id',
                             'in' => 'path',
-                            'schema' => ['type' => 'string'],
+                            'type' => 'string',
                             'required' => true,
                         ]],
                         'responses' => [
-                            '200' => [
+                            200 => [
                                 'description' => 'Dummy resource response',
-                                'content' => [
-                                    'application/ld+json' => [
-                                        'schema' => ['$ref' => '#/components/schemas/Dummy'],
-                                    ],
-                                ],
+                                'schema' => ['$ref' => '#/definitions/Dummy'],
                             ],
-                            '404' => ['description' => 'Resource not found'],
+                            404 => ['description' => 'Resource not found'],
                         ],
                     ]),
                     'put' => new \ArrayObject([
                         'tags' => ['Dummy'],
                         'operationId' => 'putDummyItem',
-                        'requestBody' => [
-                            'content' => [
-                                'application/ld+json' => [
-                                    'schema' => ['$ref' => '#/components/schemas/Dummy'],
-                                ],
-                            ],
-                            'description' => 'The updated Dummy resource',
-                        ],
+                        'consumes' => ['application/ld+json'],
+                        'produces' => ['application/ld+json'],
                         'summary' => 'Replaces the Dummy resource.',
                         'parameters' => [
                             [
                                 'name' => 'id',
                                 'in' => 'path',
-                                'schema' => ['type' => 'string'],
+                                'type' => 'string',
                                 'required' => true,
+                            ],
+                            [
+                                'name' => 'dummy',
+                                'in' => 'body',
+                                'description' => 'The updated Dummy resource',
+                                'schema' => ['$ref' => '#/definitions/Dummy'],
                             ],
                         ],
                         'responses' => [
-                            '200' => [
+                            200 => [
                                 'description' => 'Dummy resource updated',
-                                'content' => [
-                                    'application/ld+json' => [
-                                        'schema' => ['$ref' => '#/components/schemas/'.$ref],
-                                    ],
-                                ],
+                                'schema' => ['$ref' => '#/definitions/'.$ref],
                             ],
-                            '400' => ['description' => 'Invalid input'],
-                            '404' => ['description' => 'Resource not found'],
+                            400 => ['description' => 'Invalid input'],
+                            404 => ['description' => 'Resource not found'],
                         ],
                     ]),
                 ],
             ]),
-            'components' => [
-                'schemas' => new \ArrayObject([
-                    'Dummy' => new \ArrayObject([
-                        'type' => 'object',
-                        'description' => 'This is a dummy.',
-                        'externalDocs' => ['url' => 'http://schema.example.com/Dummy'],
-                        'properties' => [
-                            'name' => new \ArrayObject([
-                                'type' => 'string',
-                                'description' => 'This is a name.',
-                            ]),
-                        ],
-                    ]),
-                    $ref => new \ArrayObject([
-                        'type' => 'object',
-                        'description' => 'This is a dummy.',
-                        'externalDocs' => ['url' => 'http://schema.example.com/Dummy'],
-                        'properties' => [
-                            'name' => new \ArrayObject([
-                                'type' => 'string',
-                                'description' => 'This is a name.',
-                            ]),
-                            'relatedDummy' => new \ArrayObject([
-                                'description' => 'This is a related dummy \o/.',
-                                '$ref' => '#/components/schemas/'.$relatedDummyRef,
-                            ]),
-                        ],
-                    ]),
-                    $relatedDummyRef => new \ArrayObject([
-                        'type' => 'object',
-                        'description' => 'This is a related dummy.',
-                        'externalDocs' => ['url' => 'http://schema.example.com/RelatedDummy'],
-                        'properties' => [
-                            'name' => new \ArrayObject([
-                                'type' => 'string',
-                                'description' => 'This is a name.',
-                            ]),
-                        ],
-                    ]),
+            'definitions' => new \ArrayObject([
+                'Dummy' => new \ArrayObject([
+                    'type' => 'object',
+                    'description' => 'This is a dummy.',
+                    'externalDocs' => ['url' => 'http://schema.example.com/Dummy'],
+                    'properties' => [
+                        'name' => new \ArrayObject([
+                            'type' => 'string',
+                            'description' => 'This is a name.',
+                        ]),
+                    ],
                 ]),
-            ],
-            'servers' => [['url' => '/']],
+                $ref => new \ArrayObject([
+                    'type' => 'object',
+                    'description' => 'This is a dummy.',
+                    'externalDocs' => ['url' => 'http://schema.example.com/Dummy'],
+                    'properties' => [
+                        'name' => new \ArrayObject([
+                            'type' => 'string',
+                            'description' => 'This is a name.',
+                        ]),
+                        'relatedDummy' => new \ArrayObject([
+                            'description' => 'This is a related dummy \o/.',
+                            '$ref' => '#/definitions/'.$relatedDummyRef,
+                        ]),
+                    ],
+                ]),
+                $relatedDummyRef => new \ArrayObject([
+                    'type' => 'object',
+                    'description' => 'This is a related dummy.',
+                    'externalDocs' => ['url' => 'http://schema.example.com/RelatedDummy'],
+                    'properties' => [
+                        'name' => new \ArrayObject([
+                            'type' => 'string',
+                            'description' => 'This is a name.',
+                        ]),
+                    ],
+                ]),
+            ]),
         ];
 
         $this->assertEquals($expected, $normalizer->normalize($documentation));
@@ -1779,11 +1701,13 @@ class DocumentationNormalizerTest extends TestCase
             $resourceClassResolverProphecy->reveal(),
             $operationMethodResolverProphecy->reveal(),
             $operationPathResolver,
+            null,
             $filterLocator
         );
 
         $expected = [
-            'openapi' => '3.0.2',
+            'swagger' => '2.0',
+            'basePath' => '/',
             'info' => [
                 'title' => '',
                 'version' => '0.0.0',
@@ -1793,17 +1717,14 @@ class DocumentationNormalizerTest extends TestCase
                     'get' => new \ArrayObject([
                         'tags' => ['Dummy'],
                         'operationId' => 'getDummyCollection',
+                        'produces' => ['application/ld+json'],
                         'summary' => 'Retrieves the collection of Dummy resources.',
                         'responses' => [
-                            '200' => [
+                            200 => [
                                 'description' => 'Dummy collection response',
-                                'content' => [
-                                    'application/ld+json' => [
-                                        'schema' => [
-                                            'type' => 'array',
-                                            'items' => ['$ref' => '#/components/schemas/Dummy'],
-                                        ],
-                                    ],
+                                'schema' => [
+                                    'type' => 'array',
+                                    'items' => ['$ref' => '#/definitions/Dummy'],
                                 ],
                             ],
                         ],
@@ -1813,53 +1734,47 @@ class DocumentationNormalizerTest extends TestCase
                                 'name' => 'name',
                                 'in' => 'query',
                                 'required' => true,
-                                'schema' => ['type' => 'string'],
+                                'type' => 'string',
                             ],
                             [
                                 'name' => 'ha',
                                 'in' => 'query',
                                 'required' => false,
-                                'schema' => ['type' => 'integer'],
+                                'type' => 'integer',
                             ],
                             [
                                 'name' => 'toto',
                                 'in' => 'query',
                                 'required' => true,
-                                'schema' => [
-                                    'type' => 'array',
-                                    'items' => [
-                                        'type' => 'string',
-                                    ],
+                                'type' => 'array',
+                                'items' => [
+                                    'type' => 'string',
                                 ],
-                                'style' => 'deepObject',
-                                'explode' => true,
+                                'collectionFormat' => 'csv',
                             ],
                             [
                                 'name' => 'page',
                                 'in' => 'query',
                                 'required' => false,
-                                'schema' => ['type' => 'integer'],
+                                'type' => 'integer',
                                 'description' => 'The collection page number',
                             ],
                         ],
                     ]),
                 ],
             ]),
-            'components' => [
-                'schemas' => new \ArrayObject([
-                    'Dummy' => new \ArrayObject([
-                        'type' => 'object',
-                        'description' => 'This is a dummy.',
-                        'properties' => [
-                            'name' => new \ArrayObject([
-                                'description' => 'This is a name.',
-                                'type' => 'string',
-                            ]),
-                        ],
-                    ]),
+            'definitions' => new \ArrayObject([
+                'Dummy' => new \ArrayObject([
+                    'type' => 'object',
+                    'description' => 'This is a dummy.',
+                    'properties' => [
+                        'name' => new \ArrayObject([
+                            'description' => 'This is a name.',
+                            'type' => 'string',
+                        ]),
+                    ],
                 ]),
-            ],
-            'servers' => [['url' => '/']],
+            ]),
         ];
 
         $this->assertEquals($expected, $normalizer->normalize($documentation));
@@ -1904,11 +1819,11 @@ class DocumentationNormalizerTest extends TestCase
         $propertyNameCollectionFactory = $propertyNameCollectionFactoryProphecy->reveal();
         $propertyMetadataFactory = $propertyMetadataFactoryProphecy->reveal();
 
-        $subresourceOperationFactory = new SubresourceOperationFactory($resourceMetadataFactory, $propertyNameCollectionFactory, $propertyMetadataFactory, new UnderscorePathSegmentNameGenerator());
-
         $formatProviderProphecy = $this->prophesize(OperationAwareFormatsProviderInterface::class);
         $formatProviderProphecy->getFormatsFromOperation(Question::class, 'get', OperationType::ITEM)->willReturn(['json' => ['application/json'], 'csv' => ['text/csv']]);
         $formatProviderProphecy->getFormatsFromOperation(Answer::class, 'get', OperationType::SUBRESOURCE)->willReturn(['xml' => ['text/xml']]);
+
+        $subresourceOperationFactory = new SubresourceOperationFactory($resourceMetadataFactory, $propertyNameCollectionFactory, $propertyMetadataFactory, new UnderscorePathSegmentNameGenerator());
 
         $normalizer = new DocumentationNormalizer(
             $resourceMetadataFactory,
@@ -1917,14 +1832,27 @@ class DocumentationNormalizerTest extends TestCase
             $resourceClassResolverProphecy->reveal(),
             $operationMethodResolverProphecy->reveal(),
             $operationPathResolver,
-            null, null, false, '', '', '', '', [], [],
+            null,
+            null,
+            null,
+            false,
+            '',
+            '',
+            '',
+            '',
+            [],
+            [],
             $subresourceOperationFactory,
-            true, 'page', false, 'itemsPerPage',
+            true,
+            'page',
+            false,
+            'itemsPerPage',
             $formatProviderProphecy->reveal()
         );
 
         $expected = [
-            'openapi' => '3.0.2',
+            'swagger' => '2.0',
+            'basePath' => '/',
             'info' => [
                 'title' => 'Test API',
                 'description' => 'This is a test API.',
@@ -1935,28 +1863,22 @@ class DocumentationNormalizerTest extends TestCase
                     'get' => new \ArrayObject([
                         'tags' => ['Question'],
                         'operationId' => 'getQuestionItem',
+                        'produces' => ['application/json', 'text/csv'],
                         'summary' => 'Retrieves a Question resource.',
                         'parameters' => [
                             [
                                 'name' => 'id',
                                 'in' => 'path',
-                                'schema' => ['type' => 'string'],
+                                'type' => 'string',
                                 'required' => true,
                             ],
                         ],
                         'responses' => [
-                            '200' => [
+                            200 => [
                                 'description' => 'Question resource response',
-                                'content' => [
-                                    'application/json' => [
-                                        'schema' => ['$ref' => '#/components/schemas/Question'],
-                                    ],
-                                    'text/csv' => [
-                                        'schema' => ['$ref' => '#/components/schemas/Question'],
-                                    ],
-                                ],
+                                'schema' => ['$ref' => '#/definitions/Question'],
                             ],
-                            '404' => ['description' => 'Resource not found'],
+                            404 => ['description' => 'Resource not found'],
                         ],
                     ]),
                 ],
@@ -1964,64 +1886,58 @@ class DocumentationNormalizerTest extends TestCase
                     'get' => new \ArrayObject([
                         'tags' => ['Answer', 'Question'],
                         'operationId' => 'api_questions_answer_get_subresource',
+                        'produces' => ['text/xml'],
                         'summary' => 'Retrieves a Answer resource.',
                         'responses' => [
-                            '200' => [
+                            200 => [
                                 'description' => 'Answer resource response',
-                                'content' => [
-                                    'text/xml' => [
-                                        'schema' => ['$ref' => '#/components/schemas/Answer'],
-                                    ],
-                                ],
+                                'schema' => ['$ref' => '#/definitions/Answer'],
                             ],
-                            '404' => ['description' => 'Resource not found'],
+                            404 => ['description' => 'Resource not found'],
                         ],
                         'parameters' => [
                             [
                                 'name' => 'id',
                                 'in' => 'path',
-                                'schema' => ['type' => 'string'],
+                                'type' => 'string',
                                 'required' => true,
                             ],
                         ],
                     ]),
                 ]),
             ]),
-            'components' => [
-                'schemas' => new \ArrayObject([
-                    'Question' => new \ArrayObject([
-                        'type' => 'object',
-                        'description' => 'This is a question.',
-                        'externalDocs' => ['url' => 'http://schema.example.com/Question'],
-                        'properties' => [
-                            'answer' => new \ArrayObject([
-                                'type' => 'array',
-                                'description' => 'This is a name.',
-                                'items' => ['$ref' => '#/components/schemas/Answer'],
-                            ]),
-                        ],
-                    ]),
-                    'Answer' => new \ArrayObject([
-                        'type' => 'object',
-                        'description' => 'This is an answer.',
-                        'externalDocs' => ['url' => 'http://schema.example.com/Answer'],
-                        'properties' => [
-                            'content' => new \ArrayObject([
-                                'type' => 'array',
-                                'description' => 'This is a name.',
-                                'items' => ['$ref' => '#/components/schemas/Answer'],
-                            ]),
-                        ],
-                    ]),
+            'definitions' => new \ArrayObject([
+                'Question' => new \ArrayObject([
+                    'type' => 'object',
+                    'description' => 'This is a question.',
+                    'externalDocs' => ['url' => 'http://schema.example.com/Question'],
+                    'properties' => [
+                        'answer' => new \ArrayObject([
+                            'type' => 'array',
+                            'description' => 'This is a name.',
+                            'items' => ['$ref' => '#/definitions/Answer'],
+                        ]),
+                    ],
                 ]),
-            ],
-            'servers' => [['url' => '/']],
+                'Answer' => new \ArrayObject([
+                    'type' => 'object',
+                    'description' => 'This is an answer.',
+                    'externalDocs' => ['url' => 'http://schema.example.com/Answer'],
+                    'properties' => [
+                        'content' => new \ArrayObject([
+                            'type' => 'array',
+                            'description' => 'This is a name.',
+                            'items' => ['$ref' => '#/definitions/Answer'],
+                        ]),
+                    ],
+                ]),
+            ]),
         ];
 
         $this->assertEquals($expected, $normalizer->normalize($documentation));
     }
 
-    public function testNormalizeWithPropertyOpenApiContext()
+    public function testNormalizeWithPropertySwaggerContext()
     {
         $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), 'Test API', 'This is a test API.', '1.2.3', ['jsonld' => ['application/ld+json']]);
 
@@ -2034,7 +1950,7 @@ class DocumentationNormalizerTest extends TestCase
 
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
         $propertyMetadataFactoryProphecy->create(Dummy::class, 'id')->shouldBeCalled()->willReturn(new PropertyMetadata(new Type(Type::BUILTIN_TYPE_INT), 'This is an id.', true, false));
-        $propertyMetadataFactoryProphecy->create(Dummy::class, 'name')->shouldBeCalled()->willReturn(new PropertyMetadata(new Type(Type::BUILTIN_TYPE_STRING), 'This is a name.', true, true, true, true, false, false, null, null, ['openapi_context' => ['type' => 'string', 'enum' => ['one', 'two'], 'example' => 'one']]));
+        $propertyMetadataFactoryProphecy->create(Dummy::class, 'name')->shouldBeCalled()->willReturn(new PropertyMetadata(new Type(Type::BUILTIN_TYPE_STRING), 'This is a name.', true, true, true, true, false, false, null, null, ['swagger_context' => ['type' => 'string', 'enum' => ['one', 'two'], 'example' => 'one']]));
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
         $resourceClassResolverProphecy->isResourceClass(Dummy::class)->willReturn(true);
 
@@ -2053,8 +1969,8 @@ class DocumentationNormalizerTest extends TestCase
         );
 
         $expected = [
-            'openapi' => '3.0.2',
-            'servers' => [['url' => '/app_dev.php/']],
+            'swagger' => '2.0',
+            'basePath' => '/app_dev.php/',
             'info' => [
                 'title' => 'Test API',
                 'description' => 'This is a test API.',
@@ -2065,51 +1981,46 @@ class DocumentationNormalizerTest extends TestCase
                     'get' => new \ArrayObject([
                         'tags' => ['Dummy'],
                         'operationId' => 'getDummyItem',
+                        'produces' => ['application/ld+json'],
                         'summary' => 'Retrieves a Dummy resource.',
                         'parameters' => [
                             [
                                 'name' => 'id',
                                 'in' => 'path',
-                                'schema' => ['type' => 'string'],
+                                'type' => 'string',
                                 'required' => true,
                             ],
                         ],
                         'responses' => [
-                            '200' => [
+                            200 => [
                                 'description' => 'Dummy resource response',
-                                'content' => [
-                                    'application/ld+json' => [
-                                        'schema' => ['$ref' => '#/components/schemas/Dummy'],
-                                    ],
-                                ],
+                                'schema' => ['$ref' => '#/definitions/Dummy'],
                             ],
-                            '404' => ['description' => 'Resource not found'],
+                            404 => ['description' => 'Resource not found'],
                         ],
                     ]),
                 ],
             ]),
-            'components' => [
-                'schemas' => new \ArrayObject([
-                    'Dummy' => new \ArrayObject([
-                        'type' => 'object',
-                        'description' => 'This is a dummy.',
-                        'externalDocs' => ['url' => 'http://schema.example.com/Dummy'],
-                        'properties' => [
-                            'id' => new \ArrayObject([
-                                'type' => 'integer',
-                                'description' => 'This is an id.',
-                                'readOnly' => true,
-                            ]),
-                            'name' => new \ArrayObject([
-                                'type' => 'string',
-                                'description' => 'This is a name.',
-                                'enum' => ['one', 'two'],
-                                'example' => 'one',
-                            ]),
-                        ],
-                    ]),
+            'definitions' => new \ArrayObject([
+                'Dummy' => new \ArrayObject([
+                    'type' => 'object',
+                    'description' => 'This is a dummy.',
+                    'externalDocs' => ['url' => 'http://schema.example.com/Dummy'],
+                    'properties' => [
+                        'id' => new \ArrayObject([
+                            'type' => 'integer',
+                            'description' => 'This is an id.',
+                            'readOnly' => true,
+                        ]),
+                        'name' => new \ArrayObject([
+                            'type' => 'string',
+                            'description' => 'This is a name.',
+                            'enum' => ['one', 'two'],
+                            'example' => 'one',
+                        ]),
+                    ],
                 ]),
-            ],
+            ]),
         ];
 
         $this->assertEquals($expected, $normalizer->normalize($documentation, DocumentationNormalizer::FORMAT, ['base_url' => '/app_dev.php/']));
@@ -2128,7 +2039,7 @@ class DocumentationNormalizerTest extends TestCase
 
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
         $propertyMetadataFactoryProphecy->create(Dummy::class, 'id')->shouldBeCalled()->willReturn(new PropertyMetadata(new Type(Type::BUILTIN_TYPE_INT), 'This is an id.', true, false));
-        $propertyMetadataFactoryProphecy->create(Dummy::class, 'name')->shouldBeCalled()->willReturn(new PropertyMetadata(new Type(Type::BUILTIN_TYPE_STRING), 'This is a name.', true, true, true, true, false, false, null, null, ['openapi_context' => ['type' => 'string', 'enum' => ['one', 'two'], 'example' => 'one']]));
+        $propertyMetadataFactoryProphecy->create(Dummy::class, 'name')->shouldBeCalled()->willReturn(new PropertyMetadata(new Type(Type::BUILTIN_TYPE_STRING), 'This is a name.', true, true, true, true, false, false, null, null, ['swagger_context' => ['type' => 'string', 'enum' => ['one', 'two'], 'example' => 'one']]));
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
         $resourceClassResolverProphecy->isResourceClass(Dummy::class)->willReturn(true);
 
@@ -2147,8 +2058,8 @@ class DocumentationNormalizerTest extends TestCase
         );
 
         $expected = [
-            'openapi' => '3.0.2',
-            'servers' => [['url' => '/app_dev.php/']],
+            'swagger' => '2.0',
+            'basePath' => '/app_dev.php/',
             'info' => [
                 'title' => 'Test API',
                 'description' => 'This is a test API.',
@@ -2159,61 +2070,56 @@ class DocumentationNormalizerTest extends TestCase
                     'get' => new \ArrayObject([
                         'tags' => ['Dummy'],
                         'operationId' => 'getDummyCollection',
+                        'produces' => ['application/ld+json'],
                         'summary' => 'Retrieves the collection of Dummy resources.',
                         'parameters' => [
                             [
                                 'name' => 'page',
                                 'in' => 'query',
                                 'required' => false,
-                                'schema' => ['type' => 'integer'],
+                                'type' => 'integer',
                                 'description' => 'The collection page number',
                             ],
                             [
                                 'name' => 'pagination',
                                 'in' => 'query',
                                 'required' => false,
-                                'schema' => ['type' => 'boolean'],
+                                'type' => 'boolean',
                                 'description' => 'Enable or disable pagination',
                             ],
                         ],
                         'responses' => [
-                            '200' => [
+                            200 => [
                                 'description' => 'Dummy collection response',
-                                'content' => [
-                                    'application/ld+json' => [
-                                        'schema' => [
-                                            'type' => 'array',
-                                            'items' => ['$ref' => '#/components/schemas/Dummy'],
-                                        ],
-                                    ],
+                                'schema' => [
+                                    'type' => 'array',
+                                    'items' => ['$ref' => '#/definitions/Dummy'],
                                 ],
                             ],
                         ],
                     ]),
                 ],
             ]),
-            'components' => [
-                'schemas' => new \ArrayObject([
-                    'Dummy' => new \ArrayObject([
-                        'type' => 'object',
-                        'description' => 'This is a dummy.',
-                        'externalDocs' => ['url' => 'http://schema.example.com/Dummy'],
-                        'properties' => [
-                            'id' => new \ArrayObject([
-                                'type' => 'integer',
-                                'description' => 'This is an id.',
-                                'readOnly' => true,
-                            ]),
-                            'name' => new \ArrayObject([
-                                'type' => 'string',
-                                'description' => 'This is a name.',
-                                'enum' => ['one', 'two'],
-                                'example' => 'one',
-                            ]),
-                        ],
-                    ]),
+            'definitions' => new \ArrayObject([
+                'Dummy' => new \ArrayObject([
+                    'type' => 'object',
+                    'description' => 'This is a dummy.',
+                    'externalDocs' => ['url' => 'http://schema.example.com/Dummy'],
+                    'properties' => [
+                        'id' => new \ArrayObject([
+                            'type' => 'integer',
+                            'description' => 'This is an id.',
+                            'readOnly' => true,
+                        ]),
+                        'name' => new \ArrayObject([
+                            'type' => 'string',
+                            'description' => 'This is a name.',
+                            'enum' => ['one', 'two'],
+                            'example' => 'one',
+                        ]),
+                    ],
                 ]),
-            ],
+            ]),
         ];
 
         $this->assertEquals($expected, $normalizer->normalize($documentation, DocumentationNormalizer::FORMAT, ['base_url' => '/app_dev.php/']));
@@ -2257,15 +2163,27 @@ class DocumentationNormalizerTest extends TestCase
             $resourceClassResolverProphecy->reveal(),
             $operationMethodResolverProphecy->reveal(),
             $operationPathResolver,
-            null, null, false, '', '', '', '', [], [],
             null,
-            false, '', false, '',
+            null,
+            null, false,
+            '',
+            '',
+            '',
+            '',
+            [],
+            [],
+
+            null,
+            false,
+            'page',
+            false,
+            'itemsPerPage',
             $formatProviderProphecy->reveal()
         );
 
         $expected = [
-            'openapi' => '3.0.2',
-            'servers' => [['url' => '/']],
+            'swagger' => '2.0',
+            'basePath' => '/',
             'info' => [
                 'title' => 'Test API',
                 'description' => 'This is a test API.',
@@ -2276,24 +2194,15 @@ class DocumentationNormalizerTest extends TestCase
                     'get' => new \ArrayObject([
                         'tags' => ['Dummy'],
                         'operationId' => 'getDummyCollection',
+                        'produces' => ['application/xml', 'text/xml'],
                         'summary' => 'Retrieves the collection of Dummy resources.',
                         'parameters' => [],
                         'responses' => [
                             200 => [
                                 'description' => 'Dummy collection response',
-                                'content' => [
-                                    'application/xml' => [
-                                        'schema' => [
-                                            'type' => 'array',
-                                            'items' => ['$ref' => '#/components/schemas/Dummy'],
-                                        ],
-                                    ],
-                                    'text/xml' => [
-                                        'schema' => [
-                                            'type' => 'array',
-                                            'items' => ['$ref' => '#/components/schemas/Dummy'],
-                                        ],
-                                    ],
+                                'schema' => [
+                                    'type' => 'array',
+                                    'items' => ['$ref' => '#/definitions/Dummy'],
                                 ],
                             ],
                         ],
@@ -2301,29 +2210,21 @@ class DocumentationNormalizerTest extends TestCase
                     'post' => new \ArrayObject([
                         'tags' => ['Dummy'],
                         'operationId' => 'postDummyCollection',
+                        'consumes' => ['text/xml', 'text/csv'],
+                        'produces' => ['text/xml', 'text/csv'],
                         'summary' => 'Creates a Dummy resource.',
-                        'requestBody' => [
-                            'content' => [
-                                'text/xml' => [
-                                    'schema' => ['$ref' => '#/components/schemas/Dummy'],
-                                ],
-                                'text/csv' => [
-                                    'schema' => ['$ref' => '#/components/schemas/Dummy'],
-                                ],
+                        'parameters' => [
+                            [
+                                'name' => 'dummy',
+                                'in' => 'body',
+                                'description' => 'The new Dummy resource',
+                                'schema' => ['$ref' => '#/definitions/Dummy'],
                             ],
-                            'description' => 'The new Dummy resource',
                         ],
                         'responses' => [
                             201 => [
                                 'description' => 'Dummy resource created',
-                                'content' => [
-                                    'text/xml' => [
-                                        'schema' => ['$ref' => '#/components/schemas/Dummy'],
-                                    ],
-                                    'text/csv' => [
-                                        'schema' => ['$ref' => '#/components/schemas/Dummy'],
-                                    ],
-                                ],
+                                'schema' => ['$ref' => '#/definitions/Dummy'],
                             ],
                             400 => ['description' => 'Invalid input'],
                             404 => ['description' => 'Resource not found'],
@@ -2334,23 +2235,20 @@ class DocumentationNormalizerTest extends TestCase
                     'get' => new \ArrayObject([
                         'tags' => ['Dummy'],
                         'operationId' => 'getDummyItem',
+                        'produces' => ['application/vnd.api+json'],
                         'summary' => 'Retrieves a Dummy resource.',
                         'parameters' => [
                             [
                                 'name' => 'id',
                                 'in' => 'path',
-                                'schema' => ['type' => 'string'],
+                                'type' => 'string',
                                 'required' => true,
                             ],
                         ],
                         'responses' => [
                             200 => [
                                 'description' => 'Dummy resource response',
-                                'content' => [
-                                    'application/vnd.api+json' => [
-                                        'schema' => ['$ref' => '#/components/schemas/Dummy'],
-                                    ],
-                                ],
+                                'schema' => ['$ref' => '#/definitions/Dummy'],
                             ],
                             404 => ['description' => 'Resource not found'],
                         ],
@@ -2358,37 +2256,27 @@ class DocumentationNormalizerTest extends TestCase
                     'put' => new \ArrayObject([
                         'tags' => ['Dummy'],
                         'operationId' => 'putDummyItem',
+                        'consumes' => ['application/json', 'text/csv'],
+                        'produces' => ['application/json', 'text/csv'],
                         'summary' => 'Replaces the Dummy resource.',
                         'parameters' => [
                             [
                                 'name' => 'id',
                                 'in' => 'path',
-                                'schema' => ['type' => 'string'],
+                                'type' => 'string',
                                 'required' => true,
                             ],
-                        ],
-                        'requestBody' => [
-                            'content' => [
-                                'application/json' => [
-                                    'schema' => ['$ref' => '#/components/schemas/Dummy'],
-                                ],
-                                'text/csv' => [
-                                    'schema' => ['$ref' => '#/components/schemas/Dummy'],
-                                ],
+                            [
+                                'name' => 'dummy',
+                                'in' => 'body',
+                                'description' => 'The updated Dummy resource',
+                                'schema' => ['$ref' => '#/definitions/Dummy'],
                             ],
-                            'description' => 'The updated Dummy resource',
                         ],
                         'responses' => [
                             200 => [
                                 'description' => 'Dummy resource updated',
-                                'content' => [
-                                    'application/json' => [
-                                        'schema' => ['$ref' => '#/components/schemas/Dummy'],
-                                    ],
-                                    'text/csv' => [
-                                        'schema' => ['$ref' => '#/components/schemas/Dummy'],
-                                    ],
-                                ],
+                                'schema' => ['$ref' => '#/definitions/Dummy'],
                             ],
                             400 => ['description' => 'Invalid input'],
                             404 => ['description' => 'Resource not found'],
@@ -2396,65 +2284,26 @@ class DocumentationNormalizerTest extends TestCase
                     ]),
                 ],
             ]),
-            'components' => [
-                'schemas' => new \ArrayObject([
-                    'Dummy' => new \ArrayObject([
-                        'type' => 'object',
-                        'description' => 'This is a dummy.',
-                        'externalDocs' => ['url' => 'http://schema.example.com/Dummy'],
-                        'properties' => [
-                            'id' => new \ArrayObject([
-                                'type' => 'integer',
-                                'description' => 'This is an id.',
-                                'readOnly' => true,
-                            ]),
-                            'name' => new \ArrayObject([
-                                'type' => 'string',
-                                'description' => 'This is a name.',
-                            ]),
-                        ],
-                    ]),
+            'definitions' => new \ArrayObject([
+                'Dummy' => new \ArrayObject([
+                    'type' => 'object',
+                    'description' => 'This is a dummy.',
+                    'externalDocs' => ['url' => 'http://schema.example.com/Dummy'],
+                    'properties' => [
+                        'id' => new \ArrayObject([
+                            'type' => 'integer',
+                            'description' => 'This is an id.',
+                            'readOnly' => true,
+                        ]),
+                        'name' => new \ArrayObject([
+                            'type' => 'string',
+                            'description' => 'This is a name.',
+                        ]),
+                    ],
                 ]),
-            ],
+            ]),
         ];
 
         $this->assertEquals($expected, $normalizer->normalize($documentation, DocumentationNormalizer::FORMAT, ['base_url' => '/']));
-    }
-
-    /** @dataProvider legacyContextProvider */
-    public function testNormalizeWithLegacyNormalizer(array $context)
-    {
-        $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), 'Test API', 'This is a test API.', '1.2.3', ['jsonld' => ['application/ld+json']]);
-
-        $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
-        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
-        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
-        $operationMethodResolverProphecy = $this->prophesize(OperationMethodResolverInterface::class);
-        $operationPathResolver = new OperationPathResolver(new UnderscorePathSegmentNameGenerator());
-
-        $legacyNormalizerProphecy = $this->prophesize(NormalizerInterface::class);
-        $legacyNormalizerProphecy->normalize($documentation, DocumentationNormalizer::FORMAT, $context)->shouldBeCalled();
-
-        $normalizer = new DocumentationNormalizer(
-            $resourceMetadataFactoryProphecy->reveal(),
-            $propertyNameCollectionFactoryProphecy->reveal(),
-            $propertyMetadataFactoryProphecy->reveal(),
-            $resourceClassResolverProphecy->reveal(),
-            $operationMethodResolverProphecy->reveal(),
-            $operationPathResolver,
-            null, null, false, '', '', '', '', [], [],
-            null,
-            false, '', false, '', null, false, '',
-            $legacyNormalizerProphecy->reveal()
-        );
-
-        $normalizer->normalize($documentation, DocumentationNormalizer::FORMAT, $context);
-    }
-
-    public function legacyContextProvider()
-    {
-        yield 'swagger 2' => [['base_url' => '/', 'spec_version' => 2]];
-        yield 'Api Gateway' => [['base_url' => '/', 'api_gateway' => true]];
     }
 }
