@@ -87,7 +87,7 @@ final class DocumentationNormalizer extends AbstractDocumentationNormalizer
      */
     public function normalize($object, $format = null, array $context = [])
     {
-        if (2 === ($context['spec-version'] ?? 3) || ($context['api_gateway'] ?? false)) {
+        if (2 === ($context['spec_version'] ?? 3) || ($context['api_gateway'] ?? false)) {
             return $this->legacyNormalizer->normalize($object, $format, $context);
         }
 

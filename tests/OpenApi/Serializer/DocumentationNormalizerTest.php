@@ -2454,7 +2454,7 @@ class DocumentationNormalizerTest extends TestCase
 
     public function legacyContextProvider()
     {
-        yield 'swagger 2' => [['base_url' => '/', 'spec-version' => 2]];
+        yield 'swagger 2' => [['base_url' => '/', 'spec_version' => 2]];
         yield 'Api Gateway' => [['base_url' => '/', 'api_gateway' => true]];
     }
 }
