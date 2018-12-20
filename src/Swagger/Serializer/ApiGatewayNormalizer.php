@@ -44,12 +44,12 @@ final class ApiGatewayNormalizer implements NormalizerInterface, CacheableSuppor
     public function normalize($object, $format = null, array $context = [])
     {
         $data = $this->documentationNormalizer->normalize($object, $format, $context);
-        if (empty($data['basePath'])) {
-            $data['basePath'] = '/';
-        }
-
         if (!($context[self::API_GATEWAY] ?? $this->defaultContext[self::API_GATEWAY])) {
             return $data;
+        }
+
+        if (empty($data['basePath'])) {
+            $data['basePath'] = '/';
         }
 
         foreach ($data['paths'] as $path => $operations) {
