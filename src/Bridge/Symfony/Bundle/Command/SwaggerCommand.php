@@ -15,7 +15,7 @@ namespace ApiPlatform\Core\Bridge\Symfony\Bundle\Command;
 
 use ApiPlatform\Core\Documentation\Documentation;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
-use ApiPlatform\Core\OpenApi\Serializer\AbstractDocumentationNormalizer;
+use ApiPlatform\Core\Swagger\Serializer\DocumentationNormalizer;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Exception\InvalidOptionException;
 use Symfony\Component\Console\Input\InputInterface;
@@ -79,7 +79,7 @@ final class SwaggerCommand extends Command
         }
 
         $documentation = new Documentation($this->resourceNameCollectionFactory->create(), $this->apiTitle, $this->apiDescription, $this->apiVersion, $this->apiFormats);
-        $data = $this->normalizer->normalize($documentation, AbstractDocumentationNormalizer::FORMAT, ['spec_version' => (int) $version]);
+        $data = $this->normalizer->normalize($documentation, DocumentationNormalizer::FORMAT, ['spec_version' => (int) $version]);
         $content = $input->getOption('yaml') ? Yaml::dump($data, 10, 2, Yaml::DUMP_OBJECT_AS_MAP | Yaml::DUMP_EMPTY_ARRAY_AS_SEQUENCE) : (json_encode($data, JSON_PRETTY_PRINT) ?: '');
 
         if (!empty($filename = $input->getOption('output')) && \is_string($filename)) {
