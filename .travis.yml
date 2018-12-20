@@ -9,17 +9,18 @@ jobs:
   include:
     - php: '7.1'
     - php: '7.2'
-    - php: '7.2'
+    - php: '7.3'
+    - php: '7.3'
       env: deps=low
-    - php: '7.2'
+    - php: '7.3'
       env: SYMFONY_DEPRECATIONS_HELPER=0
-    - php: '7.2'
+    - php: '7.3'
       services:
         - postgresql
       before_script:
         - psql -c 'create database api_platform_test;' -U postgres
       env: APP_ENV=postgres
-    - php: '7.2'
+    - php: '7.3'
       services:
         - mysql
       before_script:
