@@ -27,36 +27,7 @@ class DefaultPropertyMetadataFactoryTest extends TestCase
         $factory = new DefaultPropertyMetadataFactory();
         $metadata = $factory->create(DummyPropertyWithDefaultValue::class, 'foo');
 
-        $shouldBe = [
-            'swagger_context' => [
-                'default' => 'foo',
-                'example' => 'foo',
-            ],
-        ];
-        $this->assertEquals($metadata->getAttributes(), $shouldBe);
-    }
-
-    public function testCreateShouldNotOverrideExampleIfAlreadyPresent()
-    {
-        $decoratedReturnProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
-        $decoratedReturnProphecy->create(DummyPropertyWithDefaultValue::class, 'foo', [])
-            ->willReturn(new PropertyMetadata(null, 'A dummy', true, true, null, null, false, false, null, null, [
-                'swagger_context' => [
-                    'example' => 'foo example',
-                ],
-            ]))
-            ->shouldBeCalled();
-
-        $factory = new DefaultPropertyMetadataFactory($decoratedReturnProphecy->reveal());
-        $metadata = $factory->create(DummyPropertyWithDefaultValue::class, 'foo');
-
-        $shouldBe = [
-            'swagger_context' => [
-                'default' => 'foo',
-                'example' => 'foo example',
-            ],
-        ];
-        $this->assertEquals($metadata->getAttributes(), $shouldBe);
+        $this->assertEquals($metadata->getDefault(), 'foo');
     }
 
     public function testClassDoesNotExist()

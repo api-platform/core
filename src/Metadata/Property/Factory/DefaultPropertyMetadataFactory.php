@@ -16,7 +16,10 @@ namespace ApiPlatform\Core\Metadata\Property\Factory;
 use ApiPlatform\Core\Exception\PropertyNotFoundException;
 use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 
-class DefaultPropertyMetadataFactory implements PropertyMetadataFactoryInterface
+/**
+ * Populates defaults values of the ressource properties using the default PHP values of properties.
+ */
+final class DefaultPropertyMetadataFactory implements PropertyMetadataFactoryInterface
 {
     private $decorated;
 
@@ -45,16 +48,10 @@ class DefaultPropertyMetadataFactory implements PropertyMetadataFactoryInterface
 
         $defaultProperties = $reflectionClass->getDefaultProperties();
 
-        if (array_key_exists($property, $defaultProperties) && null !== ($defaultProperty = $defaultProperties[$property])) {
-            $attributes = $propertyMetadata->getAttributes() ?? [];
-            $attributes['swagger_context']['default'] = $defaultProperty;
-            if (!isset($attributes['swagger_context']['example'])) {
-                $attributes['swagger_context']['example'] = $defaultProperty;
-            }
-
-            return $propertyMetadata->withAttributes($attributes);
+        if (!array_key_exists($property, $defaultProperties) || null === ($defaultProperty = $defaultProperties[$property])) {
+            return $propertyMetadata;
         }
 
-        return $propertyMetadata;
+        return $propertyMetadata->withDefault($defaultProperty);
     }
 }

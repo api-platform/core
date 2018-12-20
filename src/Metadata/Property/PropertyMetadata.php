@@ -38,8 +38,16 @@ final class PropertyMetadata
     private $attributes;
     private $subresource;
     private $initializable;
+    /**
+     * @var null
+     */
+    private $default;
+    /**
+     * @var null
+     */
+    private $example;
 
-    public function __construct(Type $type = null, string $description = null, bool $readable = null, bool $writable = null, bool $readableLink = null, bool $writableLink = null, bool $required = null, bool $identifier = null, string $iri = null, $childInherited = null, array $attributes = null, SubresourceMetadata $subresource = null, bool $initializable = null)
+    public function __construct(Type $type = null, string $description = null, bool $readable = null, bool $writable = null, bool $readableLink = null, bool $writableLink = null, bool $required = null, bool $identifier = null, string $iri = null, $childInherited = null, array $attributes = null, SubresourceMetadata $subresource = null, bool $initializable = null, $default = null, $example = null)
     {
         $this->type = $type;
         $this->description = $description;
@@ -57,6 +65,8 @@ final class PropertyMetadata
         $this->attributes = $attributes;
         $this->subresource = $subresource;
         $this->initializable = $initializable;
+        $this->default = $default;
+        $this->example = $example;
     }
 
     /**
@@ -346,6 +356,44 @@ final class PropertyMetadata
     {
         $metadata = clone $this;
         $metadata->initializable = $initializable;
+
+        return $metadata;
+    }
+
+    /**
+     * Returns the default value of the property or NULL if the property doesn't have a default value.
+     */
+    public function getDefault()
+    {
+        return $this->default;
+    }
+
+    /**
+     * Returns a new instance with the given default value for the property.
+     */
+    public function withDefault($default): self
+    {
+        $metadata = clone $this;
+        $metadata->default = $default;
+
+        return $metadata;
+    }
+
+    /**
+     * Returns an example of the value of the property.
+     */
+    public function getExample()
+    {
+        return $this->example;
+    }
+
+    /**
+     * Returns a new instance with the given example.
+     */
+    public function withExample($example): self
+    {
+        $metadata = clone $this;
+        $metadata->example = $example;
 
         return $metadata;
     }
