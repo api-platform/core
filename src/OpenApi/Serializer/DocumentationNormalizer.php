@@ -409,8 +409,8 @@ final class DocumentationNormalizer extends AbstractDocumentationNormalizer
                     $parameter['explode'] = true;
                 }
 
-                if (isset($data['swagger'])) {
-                    $parameter = $data['swagger'] + $parameter;
+                if (isset($data['openapi'])) {
+                    $parameter = $data['openapi'] + $parameter;
                 }
 
                 $parameters[] = $parameter;
