@@ -64,16 +64,20 @@ final class RespondListener
             }
         }
 
+        $status = null;
         if ($this->resourceMetadataFactory && $attributes = RequestAttributesExtractor::extractAttributes($request)) {
             $resourceMetadata = $this->resourceMetadataFactory->create($attributes['resource_class']);
+
             if ($sunset = $resourceMetadata->getOperationAttribute($attributes, 'sunset', null, true)) {
                 $headers['Sunset'] = (new \DateTimeImmutable($sunset))->format(\DateTime::RFC1123);
             }
+
+            $status = $resourceMetadata->getOperationAttribute($attributes, 'status');
         }
 
         $event->setResponse(new Response(
             $controllerResult,
-            self::METHOD_TO_CODE[$request->getMethod()] ?? Response::HTTP_OK,
+            $status ?? self::METHOD_TO_CODE[$request->getMethod()] ?? Response::HTTP_OK,
             $headers
         ));
     }
