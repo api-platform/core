@@ -33,7 +33,7 @@
         "behatch/contexts": "3.1.0",
         "doctrine/annotations": "^1.2",
         "doctrine/doctrine-bundle": "^1.8",
-        "doctrine/orm": "^2.5.2",
+        "doctrine/orm": "^2.6.3",
         "friendsofsymfony/user-bundle": "^2.1",
         "guzzlehttp/guzzle": "^6.0",
         "justinrainbow/json-schema": "^5.0",
