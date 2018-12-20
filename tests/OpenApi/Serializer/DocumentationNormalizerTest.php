@@ -1296,7 +1296,7 @@ class DocumentationNormalizerTest extends TestCase
                 'type' => 'string',
                 'required' => true,
                 'strategy' => 'exact',
-                'swagger' => ['x-foo' => 'bar'],
+                'openapi' => ['x-foo' => 'bar'],
             ]]),
             'f2' => new DummyFilter(['ha' => [
                 'property' => 'foo',
@@ -1335,7 +1335,7 @@ class DocumentationNormalizerTest extends TestCase
                 'type' => 'string',
                 'required' => true,
                 'strategy' => 'exact',
-                'swagger' => ['x-foo' => 'bar'],
+                'openapi' => ['x-foo' => 'bar'],
             ]]),
             'f2' => new DummyFilter(['ha' => [
                 'property' => 'foo',
