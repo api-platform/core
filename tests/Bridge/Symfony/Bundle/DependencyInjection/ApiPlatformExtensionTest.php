@@ -725,7 +725,6 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.swagger.command.swagger_command',
             'api_platform.swagger.action.ui',
             'api_platform.swagger.listener.ui',
-            'api_platform.openapi.normalizer.documentation',
             'api_platform.hal.encoder',
             'api_platform.hal.normalizer.collection',
             'api_platform.hal.normalizer.entrypoint',
