@@ -39,7 +39,7 @@
             <tag name="serializer.normalizer" priority="17" />
         </service>
 
-        <service id="api_platform.openapi.normalizer.documentation" class="ApiPlatform\Core\OpenAPI\Serializer\DocumentationNormalizer" public="false">
+        <service id="api_platform.openapi.normalizer.documentation" class="ApiPlatform\Core\OpenApi\Serializer\DocumentationNormalizer" public="false">
             <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
             <argument type="service" id="api_platform.metadata.property.name_collection_factory" />
             <argument type="service" id="api_platform.metadata.property.metadata_factory" />

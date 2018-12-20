@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\OpenAPI\Serializer;
+namespace ApiPlatform\Core\OpenApi\Serializer;
 
 use ApiPlatform\Core\Api\OperationType;
 use ApiPlatform\Core\Documentation\Documentation;

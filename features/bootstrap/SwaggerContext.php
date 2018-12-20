@@ -52,7 +52,7 @@ final class SwaggerContext implements Context
     /**
      * @Then the OpenAPI class :class exists
      */
-    public function assertTheOpenAPIClassExist(string $className)
+    public function assertTheOpenApiClassExist(string $className)
     {
         try {
             $this->getClassInfo($className, 3);
@@ -115,7 +115,7 @@ final class SwaggerContext implements Context
     /**
      * @Then :prop property exists for the OpenAPI class :class
      */
-    public function assertPropertyExistForTheOpenAPIClass(string $propertyName, string $className)
+    public function assertPropertyExistForTheOpenApiClass(string $propertyName, string $className)
     {
         try {
             $this->getPropertyInfo($propertyName, $className, 3);

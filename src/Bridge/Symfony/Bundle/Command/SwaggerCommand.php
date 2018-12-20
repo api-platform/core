@@ -15,7 +15,7 @@ namespace ApiPlatform\Core\Bridge\Symfony\Bundle\Command;
 
 use ApiPlatform\Core\Documentation\Documentation;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
-use ApiPlatform\Core\OpenAPI\Serializer\AbstractDocumentationNormalizer;
+use ApiPlatform\Core\OpenApi\Serializer\AbstractDocumentationNormalizer;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Exception\InvalidOptionException;
 use Symfony\Component\Console\Input\InputInterface;

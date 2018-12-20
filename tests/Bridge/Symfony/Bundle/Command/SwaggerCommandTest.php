@@ -48,7 +48,7 @@ class SwaggerCommandTest extends KernelTestCase
         $this->assertJson($this->tester->getDisplay());
     }
 
-    public function testExecuteOpenAPIVersion2()
+    public function testExecuteOpenApiVersion2()
     {
         $this->tester->run(['command' => 'api:openapi:export', '--spec-version' => '2']);
 
@@ -83,7 +83,7 @@ YAML;
         $this->assertContains('openapi: 3.0.2', $result);
     }
 
-    public function testExecuteOpenAPIVersion2WithYaml()
+    public function testExecuteOpenApiVersion2WithYaml()
     {
         $this->tester->run(['command' => 'api:openapi:export', '--spec-version' => '2', '--yaml' => true]);
 
