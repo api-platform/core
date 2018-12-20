@@ -60,8 +60,11 @@ window.onload = () => {
                 }
             }
 
-            op.querySelector('.execute').click();
-            op.scrollIntoView();
+            // Wait input values to be populated before executing the query
+            setTimeout(function(){
+                op.querySelector('.execute').click();
+                op.scrollIntoView();
+            }, 500);
         });
 
         tryOutObserver.observe(document, {childList: true, subtree: true});
