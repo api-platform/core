@@ -67,9 +67,6 @@ class SwaggerUiActionTest extends TestCase
 
     public function getInvokeParameters()
     {
-        $postRequest = new Request([], [], ['_api_resource_class' => 'Foo', '_api_item_operation_name' => 'post']);
-        $postRequest->setMethod('POST');
-
         $twigCollectionProphecy = $this->prophesize(\Twig_Environment::class);
         $twigCollectionProphecy->render('@ApiPlatform/SwaggerUi/index.html.twig', [
             'title' => '',
@@ -135,6 +132,7 @@ class SwaggerUiActionTest extends TestCase
         return [
             [new Request([], [], ['_api_resource_class' => 'Foo', '_api_collection_operation_name' => 'get']), $twigCollectionProphecy],
             [new Request([], [], ['_api_resource_class' => 'Foo', '_api_item_operation_name' => 'get']), $twigItemProphecy],
+            [new Request([], [], ['_api_resource_class' => 'Foo', '_api_item_operation_name' => 'get'], [], [], ['SCRIPT_FILENAME' => '/foo/bar', 'SCRIPT_NAME' => '/foo/bar']), $twigItemProphecy],
         ];
     }
 
