@@ -84,7 +84,7 @@ class DocumentationNormalizerV2Test extends TestCase
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyNameCollectionFactoryProphecy->create(Dummy::class, [])->shouldBeCalled()->willReturn(new PropertyNameCollection(['id', 'name', 'description']));
 
-        $dummyMetadata = new ResourceMetadata('Dummy', 'This is a dummy.', 'http://schema.example.com/Dummy', ['get' => ['method' => 'GET'], 'put' => ['method' => 'PUT']], ['get' => ['method' => 'GET'], 'post' => ['method' => 'POST'], 'custom' => ['method' => 'GET', 'path' => '/foo'], 'custom2' => ['method' => 'POST', 'path' => '/foo']], ['pagination_client_items_per_page' => true]);
+        $dummyMetadata = new ResourceMetadata('Dummy', 'This is a dummy.', 'http://schema.example.com/Dummy', ['get' => ['method' => 'GET', 'status' => '202'], 'put' => ['method' => 'PUT', 'status' => '202']], ['get' => ['method' => 'GET', 'status' => '202'], 'post' => ['method' => 'POST', 'status' => '202'], 'custom' => ['method' => 'GET', 'path' => '/foo', 'status' => '202'], 'custom2' => ['method' => 'POST', 'path' => '/foo']], ['pagination_client_items_per_page' => true]);
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create(Dummy::class)->shouldBeCalled()->willReturn($dummyMetadata);
 
@@ -146,7 +146,7 @@ class DocumentationNormalizerV2Test extends TestCase
                             ],
                         ],
                         'responses' => [
-                            200 => [
+                            202 => [
                                 'description' => 'Dummy collection response',
                                 'schema' => [
                                     'type' => 'array',
@@ -170,7 +170,7 @@ class DocumentationNormalizerV2Test extends TestCase
                             ],
                         ],
                         'responses' => [
-                            201 => [
+                            202 => [
                                 'description' => 'Dummy resource created',
                                 'schema' => ['$ref' => '#/definitions/Dummy'],
                             ],
@@ -194,7 +194,7 @@ class DocumentationNormalizerV2Test extends TestCase
                             ],
                         ],
                         'responses' => [
-                            200 => [
+                            202 => [
                                 'description' => 'Dummy resource response',
                                 'schema' => ['$ref' => '#/definitions/Dummy'],
                             ],
@@ -222,7 +222,7 @@ class DocumentationNormalizerV2Test extends TestCase
                             ],
                         ],
                         'responses' => [
-                            200 => [
+                            202 => [
                                 'description' => 'Dummy resource updated',
                                 'schema' => ['$ref' => '#/definitions/Dummy'],
                             ],
@@ -254,7 +254,7 @@ class DocumentationNormalizerV2Test extends TestCase
                             ],
                         ],
                         'responses' => [
-                            200 => [
+                            202 => [
                                 'description' => 'Dummy collection response',
                                 'schema' => [
                                     'type' => 'array',
