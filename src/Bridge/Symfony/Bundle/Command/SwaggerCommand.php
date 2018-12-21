@@ -61,7 +61,7 @@ final class SwaggerCommand extends Command
             ->setAliases(['api:swagger:export'])
             ->setDescription('Dump the OpenAPI documentation')
             ->addOption('yaml', 'y', InputOption::VALUE_NONE, 'Dump the documentation in YAML')
-            ->addOption('spec-version', null, InputOption::VALUE_OPTIONAL, 'OpenAPI version to use ("2" or "3")', '3')
+            ->addOption('spec-version', null, InputOption::VALUE_OPTIONAL, 'OpenAPI version to use ("2" or "3")', '2')
             ->addOption('output', 'o', InputOption::VALUE_OPTIONAL, 'Write output to file');
     }
 
