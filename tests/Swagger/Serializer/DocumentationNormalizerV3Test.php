@@ -457,7 +457,6 @@ class DocumentationNormalizerV3Test extends TestCase
                 ],
             ],
             'security' => [['oauth' => []]],
-            'servers' => [['url' => '/']],
         ];
 
         $this->assertEquals($expected, $normalizer->normalize($documentation));
@@ -823,7 +822,6 @@ class DocumentationNormalizerV3Test extends TestCase
                     ]),
                 ]),
             ],
-            'servers' => [['url' => '/']],
         ];
 
         $this->assertEquals($expected, $normalizer->normalize($documentation));
@@ -1167,7 +1165,6 @@ class DocumentationNormalizerV3Test extends TestCase
                     ]),
                 ]),
             ],
-            'servers' => [['url' => '/']],
         ];
 
         $this->assertEquals($expected, $normalizer->normalize($documentation));
@@ -1396,7 +1393,6 @@ class DocumentationNormalizerV3Test extends TestCase
                     ]),
                 ]),
             ],
-            'servers' => [['url' => '/']],
         ];
 
         $this->assertEquals($expected, $normalizer->normalize($documentation));
@@ -1611,7 +1607,6 @@ class DocumentationNormalizerV3Test extends TestCase
                 'version' => '0.0.0',
             ],
             'paths' => new \ArrayObject([]),
-            'servers' => [['url' => '/']],
         ];
 
         $this->assertEquals($expected, $normalizer->normalize($documentation));
@@ -1686,7 +1681,6 @@ class DocumentationNormalizerV3Test extends TestCase
                     ]),
                 ],
             ]),
-            'servers' => [['url' => '/']],
         ];
 
         $this->assertEquals($expected, $normalizer->normalize($documentation));
@@ -1946,7 +1940,6 @@ class DocumentationNormalizerV3Test extends TestCase
                     ]),
                 ]),
             ],
-            'servers' => [['url' => '/']],
         ];
 
         $this->assertEquals($expected, $normalizer->normalize($documentation));
@@ -2086,7 +2079,6 @@ class DocumentationNormalizerV3Test extends TestCase
                     ]),
                 ]),
             ],
-            'servers' => [['url' => '/']],
         ];
 
         $this->assertEquals($expected, $normalizer->normalize($documentation));
@@ -2257,7 +2249,6 @@ class DocumentationNormalizerV3Test extends TestCase
                     ]),
                 ]),
             ],
-            'servers' => [['url' => '/']],
         ];
 
         $this->assertEquals($expected, $normalizer->normalize($documentation));
@@ -2560,7 +2551,6 @@ class DocumentationNormalizerV3Test extends TestCase
 
         $expected = [
             'openapi' => '3.0.2',
-            'servers' => [['url' => '/']],
             'info' => [
                 'title' => 'Test API',
                 'description' => 'This is a test API.',
