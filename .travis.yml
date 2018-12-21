@@ -9,6 +9,10 @@ jobs:
   include:
     - php: '7.1'
     - php: '7.2'
+    - php: '7.2'
+      services:
+        - elasticsearch
+      env: APP_ENV=elasticsearch
     - php: '7.3'
     - php: '7.3'
       env: deps=low
@@ -31,6 +35,9 @@ jobs:
   fast_finish: true
 
 before_install:
+  - if [[ $APP_ENV = 'elasticsearch' ]]; then
+      curl -O https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-6.5.0.deb && sudo dpkg -i --force-confnew elasticsearch-6.5.0.deb && sudo service elasticsearch restart;
+    fi
   - phpenv config-rm xdebug.ini || echo "xdebug not available"
   - echo "memory_limit=-1" >> ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/travis.ini
   - export PATH="$PATH:$HOME/.composer/vendor/bin"
@@ -48,6 +55,8 @@ script:
   - tests/Fixtures/app/console cache:clear
   - if [[ $APP_ENV = 'postgres' ]]; then
       vendor/bin/behat --suite=postgres --format=progress;
+    elif [[ $APP_ENV = 'elasticsearch' ]]; then
+      vendor/bin/behat --suite=elasticsearch --format=progress;
     else
       vendor/bin/behat --suite=default --format=progress;
     fi

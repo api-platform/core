@@ -15,6 +15,13 @@ namespace ApiPlatform\Core\Bridge\Elasticsearch\Exception;
 
 use ApiPlatform\Core\Exception\ExceptionInterface;
 
+/**
+ * Non unique identifier exception.
+ *
+ * @experimental
+ *
+ * @author Baptiste Meyer <baptiste.meyer@gmail.com>
+ */
 final class NonUniqueIdentifierException extends \Exception implements ExceptionInterface
 {
 }

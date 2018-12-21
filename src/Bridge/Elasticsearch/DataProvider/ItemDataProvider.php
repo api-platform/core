@@ -13,12 +13,13 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Bridge\Elasticsearch\DataProvider;
 
+use ApiPlatform\Core\Bridge\Elasticsearch\Api\IdentifierExtractorInterface;
 use ApiPlatform\Core\Bridge\Elasticsearch\Exception\IndexNotFoundException;
+use ApiPlatform\Core\Bridge\Elasticsearch\Exception\NonUniqueIdentifierException;
 use ApiPlatform\Core\Bridge\Elasticsearch\Metadata\Document\Factory\DocumentMetadataFactoryInterface;
 use ApiPlatform\Core\Bridge\Elasticsearch\Serializer\ItemNormalizer;
 use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
 use ApiPlatform\Core\DataProvider\RestrictedDataProviderInterface;
-use ApiPlatform\Core\Exception\InvalidArgumentException;
 use Elasticsearch\Client;
 use Elasticsearch\Common\Exceptions\Missing404Exception;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
@@ -35,12 +36,14 @@ final class ItemDataProvider implements ItemDataProviderInterface, RestrictedDat
 {
     private $client;
     private $documentMetadataFactory;
+    private $identifierExtractor;
     private $denormalizer;
 
-    public function __construct(Client $client, DocumentMetadataFactoryInterface $documentMetadataFactory, DenormalizerInterface $denormalizer)
+    public function __construct(Client $client, DocumentMetadataFactoryInterface $documentMetadataFactory, IdentifierExtractorInterface $identifierExtractor, DenormalizerInterface $denormalizer)
     {
         $this->client = $client;
         $this->documentMetadataFactory = $documentMetadataFactory;
+        $this->identifierExtractor = $identifierExtractor;
         $this->denormalizer = $denormalizer;
     }
 
@@ -55,6 +58,12 @@ final class ItemDataProvider implements ItemDataProviderInterface, RestrictedDat
             return false;
         }
 
+        try {
+            $this->identifierExtractor->getIdentifierFromResourceClass($resourceClass);
+        } catch (NonUniqueIdentifierException $e) {
+            return false;
+        }
+
         return true;
     }
 
@@ -64,11 +73,7 @@ final class ItemDataProvider implements ItemDataProviderInterface, RestrictedDat
     public function getItem(string $resourceClass, $id, ?string $operationName = null, array $context = [])
     {
         if (\is_array($id)) {
-            if (1 !== \count($id)) {
-                throw new InvalidArgumentException('Composite identifiers not supported.');
-            }
-
-            $id = reset($id);
+            $id = $id[$this->identifierExtractor->getIdentifierFromResourceClass($resourceClass)];
         }
 
         $documentMetadata = $this->documentMetadataFactory->create($resourceClass);

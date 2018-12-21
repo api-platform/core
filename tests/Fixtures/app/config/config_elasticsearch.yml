@@ -1,0 +1,9 @@
+imports:
+    - { resource: parameters_elasticsearch.yml }
+    - { resource: config_test.yml }
+
+api_platform:
+    mapping:
+        paths: ['%kernel.project_dir%/../Elasticsearch/Model']
+    elasticsearch:
+        host: '%host%'

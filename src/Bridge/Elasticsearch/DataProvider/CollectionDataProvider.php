@@ -13,8 +13,10 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Bridge\Elasticsearch\DataProvider;
 
+use ApiPlatform\Core\Bridge\Elasticsearch\Api\IdentifierExtractorInterface;
 use ApiPlatform\Core\Bridge\Elasticsearch\DataProvider\Extension\FullBodySearchCollectionExtensionInterface;
 use ApiPlatform\Core\Bridge\Elasticsearch\Exception\IndexNotFoundException;
+use ApiPlatform\Core\Bridge\Elasticsearch\Exception\NonUniqueIdentifierException;
 use ApiPlatform\Core\Bridge\Elasticsearch\Metadata\Document\Factory\DocumentMetadataFactoryInterface;
 use ApiPlatform\Core\DataProvider\ContextAwareCollectionDataProviderInterface;
 use ApiPlatform\Core\DataProvider\Pagination;
@@ -33,6 +35,7 @@ final class CollectionDataProvider implements ContextAwareCollectionDataProvider
 {
     private $client;
     private $documentMetadataFactory;
+    private $identifierExtractor;
     private $denormalizer;
     private $pagination;
     private $collectionExtensions;
@@ -40,10 +43,11 @@ final class CollectionDataProvider implements ContextAwareCollectionDataProvider
     /**
      * @param FullBodySearchCollectionExtensionInterface[] $collectionExtensions
      */
-    public function __construct(Client $client, DocumentMetadataFactoryInterface $documentMetadataFactory, DenormalizerInterface $denormalizer, Pagination $pagination, iterable $collectionExtensions = [])
+    public function __construct(Client $client, DocumentMetadataFactoryInterface $documentMetadataFactory, IdentifierExtractorInterface $identifierExtractor, DenormalizerInterface $denormalizer, Pagination $pagination, iterable $collectionExtensions = [])
     {
         $this->client = $client;
         $this->documentMetadataFactory = $documentMetadataFactory;
+        $this->identifierExtractor = $identifierExtractor;
         $this->denormalizer = $denormalizer;
         $this->pagination = $pagination;
         $this->collectionExtensions = $collectionExtensions;
@@ -57,6 +61,12 @@ final class CollectionDataProvider implements ContextAwareCollectionDataProvider
         try {
             $this->documentMetadataFactory->create($resourceClass);
         } catch (IndexNotFoundException $e) {
+            return false;
+        }
+
+        try {
+            $this->identifierExtractor->getIdentifierFromResourceClass($resourceClass);
+        } catch (NonUniqueIdentifierException $e) {
             return false;
         }
 

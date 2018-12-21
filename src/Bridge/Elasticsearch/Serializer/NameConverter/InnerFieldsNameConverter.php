@@ -16,6 +16,13 @@ namespace ApiPlatform\Core\Bridge\Elasticsearch\Serializer\NameConverter;
 use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 
+/**
+ * Converts inner fields with a decorated name converter.
+ *
+ * @experimental
+ *
+ * @author Baptiste Meyer <baptiste.meyer@gmail.com>
+ */
 final class InnerFieldsNameConverter implements NameConverterInterface
 {
     private $decorated;
@@ -41,7 +48,7 @@ final class InnerFieldsNameConverter implements NameConverterInterface
         return $this->convertInnerFields($propertyName, false);
     }
 
-    private function convertInnerFields(string $propertyName, bool $normalization)
+    private function convertInnerFields(string $propertyName, bool $normalization): string
     {
         $convertedProperties = [];
 

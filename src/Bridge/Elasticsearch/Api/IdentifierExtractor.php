@@ -16,6 +16,13 @@ namespace ApiPlatform\Core\Bridge\Elasticsearch\Api;
 use ApiPlatform\Core\Api\IdentifiersExtractorInterface;
 use ApiPlatform\Core\Bridge\Elasticsearch\Exception\NonUniqueIdentifierException;
 
+/**
+ * {@inheritdoc}
+ *
+ * @experimental
+ *
+ * @author Baptiste Meyer <baptiste.meyer@gmail.com>
+ */
 final class IdentifierExtractor implements IdentifierExtractorInterface
 {
     private $identifiersExtractor;
@@ -25,6 +32,9 @@ final class IdentifierExtractor implements IdentifierExtractorInterface
         $this->identifiersExtractor = $identifiersExtractor;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getIdentifierFromResourceClass(string $resourceClass): string
     {
         $identifiers = $this->identifiersExtractor->getIdentifiersFromResourceClass($resourceClass);
@@ -34,7 +44,7 @@ final class IdentifierExtractor implements IdentifierExtractorInterface
         }
 
         if (1 < $totalIdentifiers) {
-            throw new NonUniqueIdentifierException(sprintf('Composite identifiers not supported.'));
+            throw new NonUniqueIdentifierException('Composite identifiers not supported.');
         }
 
         return reset($identifiers);

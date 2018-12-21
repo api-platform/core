@@ -15,6 +15,7 @@ namespace ApiPlatform\Core\Tests\Bridge\Symfony\Bundle\DependencyInjection;
 
 use ApiPlatform\Core\Api\FilterInterface;
 use ApiPlatform\Core\Api\IriConverterInterface;
+use ApiPlatform\Core\Api\ResourceClassResolverInterface;
 use ApiPlatform\Core\Api\UrlGeneratorInterface;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\EagerLoadingExtension;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\FilterEagerLoadingExtension;
@@ -23,6 +24,7 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\OrderExtension;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\PaginationExtension;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\QueryCollectionExtensionInterface;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\QueryItemExtensionInterface;
+use ApiPlatform\Core\Bridge\Elasticsearch\Api\IdentifierExtractorInterface;
 use ApiPlatform\Core\Bridge\Elasticsearch\DataProvider\Extension\FullBodySearchCollectionExtensionInterface;
 use ApiPlatform\Core\Bridge\Elasticsearch\Metadata\Document\Factory\DocumentMetadataFactoryInterface;
 use ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\ApiPlatformExtension;
@@ -468,6 +470,7 @@ class ApiPlatformExtensionTest extends TestCase
         $containerBuilderProphecy->setDefinition('api_platform.elasticsearch.order_filter', Argument::type(Definition::class))->shouldBeCalled();
         $containerBuilderProphecy->setAlias('api_platform.elasticsearch.metadata.document.metadata_factory', 'api_platform.elasticsearch.metadata.document.metadata_factory.configured')->shouldBeCalled();
         $containerBuilderProphecy->setAlias(DocumentMetadataFactoryInterface::class, 'api_platform.elasticsearch.metadata.document.metadata_factory')->shouldBeCalled();
+        $containerBuilderProphecy->setAlias(IdentifierExtractorInterface::class, 'api_platform.elasticsearch.identifier_extractor')->shouldBeCalled();
         $containerBuilderProphecy->hasAlias('api_platform.name_converter')->willReturn(true)->shouldBeCalled();
         $containerBuilderProphecy->getDefinition('api_platform.elasticsearch.name_converter.inner_fields')->willReturn($definitionProphecy)->shouldBeCalled();
         $containerBuilderProphecy->registerForAutoconfiguration(FullBodySearchCollectionExtensionInterface::class)->willReturn($childDefinitionProphecy)->shouldBeCalled();
@@ -704,6 +707,7 @@ class ApiPlatformExtensionTest extends TestCase
             PropertyNameCollectionFactoryInterface::class => 'api_platform.metadata.property.name_collection_factory',
             PropertyMetadataFactoryInterface::class => 'api_platform.metadata.property.metadata_factory',
             ValidatorInterface::class => 'api_platform.validator',
+            ResourceClassResolverInterface::class => 'api_platform.resource_class_resolver',
         ];
 
         foreach ($aliases as $alias => $service) {

@@ -32,6 +32,9 @@ final class OrderFilter extends AbstractFilter implements SortFilterInterface
 {
     private $orderParameterName;
 
+    /**
+     * {@inheritdoc}
+     */
     public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, ResourceClassResolverInterface $resourceClassResolver, ?NameConverterInterface $nameConverter = null, string $orderParameterName = 'order', ?array $properties = null)
     {
         parent::__construct($propertyNameCollectionFactory, $propertyMetadataFactory, $resourceClassResolver, $nameConverter, $properties);

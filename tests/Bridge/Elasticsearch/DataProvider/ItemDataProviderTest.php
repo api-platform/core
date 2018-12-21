@@ -13,13 +13,14 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Tests\Bridge\Elasticsearch\DataProvider;
 
+use ApiPlatform\Core\Bridge\Elasticsearch\Api\IdentifierExtractorInterface;
 use ApiPlatform\Core\Bridge\Elasticsearch\DataProvider\ItemDataProvider;
 use ApiPlatform\Core\Bridge\Elasticsearch\Exception\IndexNotFoundException;
+use ApiPlatform\Core\Bridge\Elasticsearch\Exception\NonUniqueIdentifierException;
 use ApiPlatform\Core\Bridge\Elasticsearch\Metadata\Document\DocumentMetadata;
 use ApiPlatform\Core\Bridge\Elasticsearch\Metadata\Document\Factory\DocumentMetadataFactoryInterface;
 use ApiPlatform\Core\Bridge\Elasticsearch\Serializer\ItemNormalizer;
 use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
-use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\CompositeRelation;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Foo;
@@ -38,6 +39,7 @@ class ItemDataProviderTest extends TestCase
             new ItemDataProvider(
                 $this->prophesize(Client::class)->reveal(),
                 $this->prophesize(DocumentMetadataFactoryInterface::class)->reveal(),
+                $this->prophesize(IdentifierExtractorInterface::class)->reveal(),
                 $this->prophesize(DenormalizerInterface::class)->reveal()
             )
         );
@@ -48,21 +50,31 @@ class ItemDataProviderTest extends TestCase
         $documentMetadataFactoryProphecy = $this->prophesize(DocumentMetadataFactoryInterface::class);
         $documentMetadataFactoryProphecy->create(Foo::class)->willReturn(new DocumentMetadata('foo'))->shouldBeCalled();
         $documentMetadataFactoryProphecy->create(Dummy::class)->willThrow(new IndexNotFoundException())->shouldBeCalled();
+        $documentMetadataFactoryProphecy->create(CompositeRelation::class)->willReturn(new DocumentMetadata('composite_relation'))->shouldBeCalled();
+
+        $identifierExtractorProphecy = $this->prophesize(IdentifierExtractorInterface::class);
+        $identifierExtractorProphecy->getIdentifierFromResourceClass(Foo::class)->willReturn('id')->shouldBeCalled();
+        $identifierExtractorProphecy->getIdentifierFromResourceClass(CompositeRelation::class)->willThrow(new NonUniqueIdentifierException())->shouldBeCalled();
 
         $itemDataProvider = new ItemDataProvider(
             $this->prophesize(Client::class)->reveal(),
             $documentMetadataFactoryProphecy->reveal(),
+            $identifierExtractorProphecy->reveal(),
             $this->prophesize(DenormalizerInterface::class)->reveal()
         );
 
         self::assertTrue($itemDataProvider->supports(Foo::class));
         self::assertFalse($itemDataProvider->supports(Dummy::class));
+        self::assertFalse($itemDataProvider->supports(CompositeRelation::class));
     }
 
     public function testGetItem()
     {
         $documentMetadataFactoryProphecy = $this->prophesize(DocumentMetadataFactoryInterface::class);
         $documentMetadataFactoryProphecy->create(Foo::class)->willReturn(new DocumentMetadata('foo'))->shouldBeCalled();
+
+        $identifierExtractorProphecy = $this->prophesize(IdentifierExtractorInterface::class);
+        $identifierExtractorProphecy->getIdentifierFromResourceClass(Foo::class)->willReturn('id')->shouldBeCalled();
 
         $document = [
             '_index' => 'foo',
@@ -87,7 +99,7 @@ class ItemDataProviderTest extends TestCase
         $denormalizerProphecy = $this->prophesize(DenormalizerInterface::class);
         $denormalizerProphecy->denormalize($document, Foo::class, ItemNormalizer::FORMAT, [AbstractNormalizer::ALLOW_EXTRA_ATTRIBUTES => true])->willReturn($foo)->shouldBeCalled();
 
-        $itemDataProvider = new ItemDataProvider($clientProphecy->reveal(), $documentMetadataFactoryProphecy->reveal(), $denormalizerProphecy->reveal());
+        $itemDataProvider = new ItemDataProvider($clientProphecy->reveal(), $documentMetadataFactoryProphecy->reveal(), $identifierExtractorProphecy->reveal(), $denormalizerProphecy->reveal());
 
         self::assertSame($foo, $itemDataProvider->getItem(Foo::class, ['id' => 1]));
     }
@@ -97,20 +109,14 @@ class ItemDataProviderTest extends TestCase
         $documentMetadataFactoryProphecy = $this->prophesize(DocumentMetadataFactoryInterface::class);
         $documentMetadataFactoryProphecy->create(Foo::class)->willReturn(new DocumentMetadata('foo'))->shouldBeCalled();
 
+        $identifierExtractorProphecy = $this->prophesize(IdentifierExtractorInterface::class);
+        $identifierExtractorProphecy->getIdentifierFromResourceClass(Foo::class)->willReturn('id')->shouldBeCalled();
+
         $clientProphecy = $this->prophesize(Client::class);
         $clientProphecy->get(['index' => 'foo', 'type' => DocumentMetadata::DEFAULT_TYPE, 'id' => '404'])->willThrow(new Missing404Exception())->shouldBeCalled();
 
-        $itemDataProvider = new ItemDataProvider($clientProphecy->reveal(), $documentMetadataFactoryProphecy->reveal(), $this->prophesize(DenormalizerInterface::class)->reveal());
+        $itemDataProvider = new ItemDataProvider($clientProphecy->reveal(), $documentMetadataFactoryProphecy->reveal(), $identifierExtractorProphecy->reveal(), $this->prophesize(DenormalizerInterface::class)->reveal());
 
         self::assertNull($itemDataProvider->getItem(Foo::class, ['id' => 404]));
-    }
-
-    public function testGetItemWithCompositeIdentifiers()
-    {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Composite identifiers not supported.');
-
-        $itemDataProvider = new ItemDataProvider($this->prophesize(Client::class)->reveal(), $this->prophesize(DocumentMetadataFactoryInterface::class)->reveal(), $this->prophesize(DenormalizerInterface::class)->reveal());
-        $itemDataProvider->getItem(CompositeRelation::class, ['compositeItem' => 1, 'compositeLabel' => 2]);
     }
 }

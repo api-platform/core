@@ -54,9 +54,6 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\ThirdLevel;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\User;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\UuidIdentifierDummy;
 use Behat\Behat\Context\Context;
-use Behat\Behat\Context\SnippetAcceptingContext;
-use Behat\Behat\Hook\Scope\AfterStepScope;
-use Behatch\HttpCall\Request;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Tools\SchemaTool;
@@ -64,7 +61,7 @@ use Doctrine\ORM\Tools\SchemaTool;
 /**
  * Defines application features from the specific context.
  */
-final class FeatureContext implements Context, SnippetAcceptingContext
+final class DoctrineContext implements Context
 {
     /**
      * @var EntityManagerInterface
@@ -73,7 +70,6 @@ final class FeatureContext implements Context, SnippetAcceptingContext
     private $doctrine;
     private $schemaTool;
     private $classes;
-    private $request;
 
     /**
      * Initializes context.
@@ -82,35 +78,12 @@ final class FeatureContext implements Context, SnippetAcceptingContext
      * You can also pass arbitrary arguments to the
      * context constructor through behat.yml.
      */
-    public function __construct(ManagerRegistry $doctrine, Request $request)
+    public function __construct(ManagerRegistry $doctrine)
     {
         $this->doctrine = $doctrine;
         $this->manager = $doctrine->getManager();
         $this->schemaTool = new SchemaTool($this->manager);
         $this->classes = $this->manager->getMetadataFactory()->getAllMetadata();
-        $this->request = $request;
-    }
-
-    /**
-     * Sets the default Accept HTTP header to null (workaround to artificially remove it).
-     *
-     * @AfterStep
-     */
-    public function removeAcceptHeaderAfterRequest(AfterStepScope $event)
-    {
-        if (preg_match('/^I send a "[A-Z]+" request to ".+"/', $event->getStep()->getText())) {
-            $this->request->setHttpHeader('Accept', null);
-        }
-    }
-
-    /**
-     * Sets the default Accept HTTP header to null (workaround to artificially remove it).
-     *
-     * @BeforeScenario
-     */
-    public function removeAcceptHeaderBeforeScenario()
-    {
-        $this->request->setHttpHeader('Accept', null);
     }
 
     /**

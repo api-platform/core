@@ -127,15 +127,13 @@ abstract class AbstractFilter implements FilterInterface
                 return $noop;
             }
 
-            $currentResourceClass = $type->getClassName();
-
-            if (null === $currentResourceClass) {
+            if (null === $className = $type->getClassName()) {
                 return $noop;
             }
 
-            $isResourceClass = $this->resourceClassResolver->isResourceClass($currentResourceClass);
-
-            if ($totalProperties !== $index && !$isResourceClass) {
+            if ($isResourceClass = $this->resourceClassResolver->isResourceClass($className)) {
+                $currentResourceClass = $className;
+            } elseif ($totalProperties !== $index) {
                 return $noop;
             }
 

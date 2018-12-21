@@ -18,6 +18,8 @@ use ApiPlatform\Core\Bridge\Elasticsearch\Exception\NonUniqueIdentifierException
 /**
  * Extracts identifier for a given resource.
  *
+ * @experimental
+ *
  * @author Baptiste Meyer <baptiste.meyer@gmail.com>
  */
 interface IdentifierExtractorInterface

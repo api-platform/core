@@ -55,8 +55,11 @@ class AppKernel extends Kernel
             new ApiPlatformBundle(),
             new SecurityBundle(),
             new FOSUserBundle(),
-            new TestBundle(),
         ];
+
+        if ('elasticsearch' !== $this->getEnvironment()) {
+            $bundles[] = new TestBundle();
+        }
 
         if ($_SERVER['LEGACY'] ?? true) {
             $bundles[] = new NelmioApiDocBundle();
@@ -72,7 +75,7 @@ class AppKernel extends Kernel
 
     protected function configureRoutes(RouteCollectionBuilder $routes)
     {
-        $routes->import('config/routing.yml');
+        $routes->import("config/routing_{$this->getEnvironment()}.yml");
 
         if ($_SERVER['LEGACY'] ?? true) {
             $routes->import('@NelmioApiDocBundle/Resources/config/routing.yml', '/nelmioapidoc');

@@ -13,6 +13,7 @@
         <service id="api_platform.resource_class_resolver" class="ApiPlatform\Core\Api\ResourceClassResolver" public="false">
             <argument type="service" id="api_platform.metadata.resource.name_collection_factory" />
         </service>
+        <service id="ApiPlatform\Core\Api\ResourceClassResolverInterface" alias="api_platform.resource_class_resolver" />
 
         <service id="api_platform.operation_method_resolver" class="ApiPlatform\Core\Bridge\Symfony\Routing\OperationMethodResolver" public="false">
             <argument type="service" id="api_platform.router" />

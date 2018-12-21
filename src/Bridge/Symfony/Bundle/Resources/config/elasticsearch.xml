@@ -49,6 +49,7 @@
         <service id="api_platform.elasticsearch.identifier_extractor" class="ApiPlatform\Core\Bridge\Elasticsearch\Api\IdentifierExtractor" public="false">
             <argument type="service" id="api_platform.identifiers_extractor" />
         </service>
+        <service id="ApiPlatform\Core\Bridge\Elasticsearch\Api\IdentifierExtractorInterface" alias="api_platform.elasticsearch.identifier_extractor" />
 
         <service id="api_platform.elasticsearch.name_converter.inner_fields" class="ApiPlatform\Core\Bridge\Elasticsearch\Serializer\NameConverter\InnerFieldsNameConverter" public="false" />
 
@@ -65,6 +66,7 @@
         <service id="api_platform.elasticsearch.item_data_provider" class="ApiPlatform\Core\Bridge\Elasticsearch\DataProvider\ItemDataProvider" public="false">
             <argument type="service" id="api_platform.elasticsearch.client" />
             <argument type="service" id="api_platform.elasticsearch.metadata.document.metadata_factory" />
+            <argument type="service" id="api_platform.elasticsearch.identifier_extractor" />
             <argument type="service" id="serializer" />
 
             <tag name="api_platform.item_data_provider" priority="5" />
@@ -73,6 +75,7 @@
         <service id="api_platform.elasticsearch.collection_data_provider" class="ApiPlatform\Core\Bridge\Elasticsearch\DataProvider\CollectionDataProvider" public="false">
             <argument type="service" id="api_platform.elasticsearch.client" />
             <argument type="service" id="api_platform.elasticsearch.metadata.document.metadata_factory" />
+            <argument type="service" id="api_platform.elasticsearch.identifier_extractor" />
             <argument type="service" id="serializer" />
             <argument type="service" id="api_platform.pagination" />
             <argument type="tagged" tag="api_platform.elasticsearch.query_extension.collection" />
@@ -97,6 +100,7 @@
             <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
             <argument type="service" id="api_platform.elasticsearch.identifier_extractor" />
             <argument type="service" id="api_platform.metadata.property.metadata_factory" />
+            <argument type="service" id="api_platform.resource_class_resolver" />
             <argument type="service" id="api_platform.elasticsearch.name_converter.inner_fields" />
             <argument>%api_platform.collection.order%</argument>
 

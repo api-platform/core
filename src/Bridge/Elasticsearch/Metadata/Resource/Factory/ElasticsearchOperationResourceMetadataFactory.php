@@ -16,6 +16,13 @@ namespace ApiPlatform\Core\Bridge\Elasticsearch\Metadata\Resource\Factory;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 
+/**
+ * Creates read-only operations for Elasticsearch.
+ *
+ * @experimental
+ *
+ * @author Baptiste Meyer <baptiste.meyer@gmail.com>
+ */
 final class ElasticsearchOperationResourceMetadataFactory implements ResourceMetadataFactoryInterface
 {
     private $decorated;

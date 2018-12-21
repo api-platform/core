@@ -13,16 +13,19 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Tests\Bridge\Elasticsearch\DataProvider;
 
+use ApiPlatform\Core\Bridge\Elasticsearch\Api\IdentifierExtractorInterface;
 use ApiPlatform\Core\Bridge\Elasticsearch\DataProvider\CollectionDataProvider;
 use ApiPlatform\Core\Bridge\Elasticsearch\DataProvider\Extension\FullBodySearchCollectionExtensionInterface;
 use ApiPlatform\Core\Bridge\Elasticsearch\DataProvider\Paginator;
 use ApiPlatform\Core\Bridge\Elasticsearch\Exception\IndexNotFoundException;
+use ApiPlatform\Core\Bridge\Elasticsearch\Exception\NonUniqueIdentifierException;
 use ApiPlatform\Core\Bridge\Elasticsearch\Metadata\Document\DocumentMetadata;
 use ApiPlatform\Core\Bridge\Elasticsearch\Metadata\Document\Factory\DocumentMetadataFactoryInterface;
 use ApiPlatform\Core\DataProvider\CollectionDataProviderInterface;
 use ApiPlatform\Core\DataProvider\Pagination;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\CompositeRelation;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Foo;
 use Elasticsearch\Client;
@@ -40,6 +43,7 @@ class CollectionDataProviderTest extends TestCase
             new CollectionDataProvider(
                 $this->prophesize(Client::class)->reveal(),
                 $this->prophesize(DocumentMetadataFactoryInterface::class)->reveal(),
+                $this->prophesize(IdentifierExtractorInterface::class)->reveal(),
                 $this->prophesize(DenormalizerInterface::class)->reveal(),
                 new Pagination(new RequestStack(), $this->prophesize(ResourceMetadataFactoryInterface::class)->reveal())
             )
@@ -51,16 +55,23 @@ class CollectionDataProviderTest extends TestCase
         $documentMetadataFactoryProphecy = $this->prophesize(DocumentMetadataFactoryInterface::class);
         $documentMetadataFactoryProphecy->create(Foo::class)->willReturn(new DocumentMetadata('foo'))->shouldBeCalled();
         $documentMetadataFactoryProphecy->create(Dummy::class)->willThrow(new IndexNotFoundException())->shouldBeCalled();
+        $documentMetadataFactoryProphecy->create(CompositeRelation::class)->willReturn(new DocumentMetadata('composite_relation'))->shouldBeCalled();
+
+        $identifierExtractorProphecy = $this->prophesize(IdentifierExtractorInterface::class);
+        $identifierExtractorProphecy->getIdentifierFromResourceClass(Foo::class)->willReturn('id')->shouldBeCalled();
+        $identifierExtractorProphecy->getIdentifierFromResourceClass(CompositeRelation::class)->willThrow(new NonUniqueIdentifierException())->shouldBeCalled();
 
         $collectionDataProvider = new CollectionDataProvider(
             $this->prophesize(Client::class)->reveal(),
             $documentMetadataFactoryProphecy->reveal(),
+            $identifierExtractorProphecy->reveal(),
             $this->prophesize(DenormalizerInterface::class)->reveal(),
             new Pagination(new RequestStack(), $this->prophesize(ResourceMetadataFactoryInterface::class)->reveal())
         );
 
         self::assertTrue($collectionDataProvider->supports(Foo::class));
         self::assertFalse($collectionDataProvider->supports(Dummy::class));
+        self::assertFalse($collectionDataProvider->supports(CompositeRelation::class));
     }
 
     public function testGetCollection()
@@ -137,6 +148,7 @@ class CollectionDataProviderTest extends TestCase
         $collectionDataProvider = new CollectionDataProvider(
             $clientProphecy->reveal(),
             $documentMetadataFactoryProphecy->reveal(),
+            $this->prophesize(IdentifierExtractorInterface::class)->reveal(),
             $denormalizer = $this->prophesize(DenormalizerInterface::class)->reveal(),
             new Pagination(new RequestStack(), $resourceMetadataFactoryProphecy->reveal(), ['items_per_page' => 2]),
             [$fullBodySearchCollectionExtensionProphecy->reveal()]
