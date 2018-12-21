@@ -35,6 +35,14 @@ interface FilterInterface
      *       'name' => 'My Name',
      *       'type' => 'integer',
      *     ]
+     *   - openapi (optional): additional parameters for the path operation in the version 3 spec,
+     *     e.g. 'openapi' => [
+     *       'description' => 'My Description',
+     *       'name' => 'My Name',
+     *       'schema' => [
+     *          'type' => 'integer',
+     *       ]
+     *     ]
      * The description can contain additional data specific to a filter.
      *
      * @see \ApiPlatform\Core\Swagger\Serializer\DocumentationNormalizer::getFiltersParameters
