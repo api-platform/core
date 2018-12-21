@@ -1376,7 +1376,6 @@ class DocumentationNormalizerV2Test extends TestCase
             'basePath' => '/',
             'info' => [
                 'title' => '',
-                'description' => '',
                 'version' => '0.0.0',
             ],
             'paths' => new \ArrayObject([]),
@@ -1426,7 +1425,6 @@ class DocumentationNormalizerV2Test extends TestCase
             'basePath' => '/',
             'info' => [
                 'title' => '',
-                'description' => '',
                 'version' => '0.0.0',
             ],
             'paths' => new \ArrayObject([
@@ -1712,7 +1710,6 @@ class DocumentationNormalizerV2Test extends TestCase
             'basePath' => '/',
             'info' => [
                 'title' => '',
-                'description' => '',
                 'version' => '0.0.0',
             ],
             'paths' => new \ArrayObject([

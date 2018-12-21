@@ -1609,7 +1609,6 @@ class DocumentationNormalizerV3Test extends TestCase
             'info' => [
                 'title' => '',
                 'version' => '0.0.0',
-                'description' => '',
             ],
             'paths' => new \ArrayObject([]),
             'servers' => [['url' => '/']],
@@ -1678,7 +1677,6 @@ class DocumentationNormalizerV3Test extends TestCase
             'info' => [
                 'title' => '',
                 'version' => '0.0.0',
-                'description' => '',
             ],
             'paths' => new \ArrayObject([
                 '/dummies' => [
@@ -2016,7 +2014,6 @@ class DocumentationNormalizerV3Test extends TestCase
             'info' => [
                 'title' => '',
                 'version' => '0.0.0',
-                'description' => '',
             ],
             'paths' => new \ArrayObject([
                 '/dummies' => [
