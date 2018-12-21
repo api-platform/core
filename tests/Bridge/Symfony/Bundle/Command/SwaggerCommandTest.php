@@ -41,23 +41,23 @@ class SwaggerCommandTest extends KernelTestCase
         $this->tester = new ApplicationTester($application);
     }
 
-    public function testExecuteWithAlias()
+    public function testExecuteWithAliasVersion3()
     {
-        $this->tester->run(['command' => 'api:swagger:export']);
+        $this->tester->run(['command' => 'api:swagger:export', '--spec-version' => '3']);
 
         $this->assertJson($this->tester->getDisplay());
     }
 
     public function testExecuteOpenApiVersion2()
     {
-        $this->tester->run(['command' => 'api:openapi:export', '--spec-version' => '2']);
+        $this->tester->run(['command' => 'api:openapi:export']);
 
         $this->assertJson($this->tester->getDisplay());
     }
 
-    public function testExecuteWithYaml()
+    public function testExecuteWithYamlVersion3()
     {
-        $this->tester->run(['command' => 'api:swagger:export', '--yaml' => true]);
+        $this->tester->run(['command' => 'api:swagger:export', '--yaml' => true, '--spec-version' => '3']);
 
         $result = $this->tester->getDisplay();
         $this->assertYaml($result);
@@ -85,7 +85,7 @@ YAML;
 
     public function testExecuteOpenApiVersion2WithYaml()
     {
-        $this->tester->run(['command' => 'api:openapi:export', '--spec-version' => '2', '--yaml' => true]);
+        $this->tester->run(['command' => 'api:openapi:export', '--yaml' => true]);
 
         $result = $this->tester->getDisplay();
         $this->assertYaml($result);

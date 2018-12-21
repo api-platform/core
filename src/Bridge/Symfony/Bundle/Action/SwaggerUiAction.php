@@ -124,7 +124,7 @@ final class SwaggerUiAction
             'graphqlEnabled' => $this->graphqlEnabled,
         ];
 
-        $swaggerContext = ['spec_version' => $request->query->getInt('spec_version', 3)];
+        $swaggerContext = ['spec_version' => $request->query->getInt('spec_version', 2)];
         if ('' !== $baseUrl = $request->getBaseUrl()) {
             $swaggerContext['base_url'] = $baseUrl;
         }
