@@ -18,6 +18,7 @@ use ApiPlatform\Core\DataPersister\DataPersisterInterface;
 use ApiPlatform\Core\Event\PostWriteEvent;
 use ApiPlatform\Core\Event\PreWriteEvent;
 use ApiPlatform\Core\Events;
+use ApiPlatform\Core\Util\RequestAttributesExtractor;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
 
@@ -46,7 +47,7 @@ final class WriteListener
     public function onKernelView(GetResponseForControllerResultEvent $event)
     {
         $request = $event->getRequest();
-        if ($request->isMethodSafe(false) || !$request->attributes->has('_api_resource_class') || !$request->attributes->getBoolean('_api_persist', true)) {
+        if ($request->isMethodSafe(false) || !$request->attributes->getBoolean('_api_persist', true) || !$attributes = RequestAttributesExtractor::extractAttributes($request)) {
             return;
         }
 
@@ -78,7 +79,7 @@ final class WriteListener
                 // Controller result must be immutable for _api_write_item_iri
                 // if it's class changed compared to the base class let's avoid calling the IriConverter
                 // especially that the Output class could be a DTO that's not referencing any route
-                if (null !== $this->iriConverter && \get_class($controllerResult) === \get_class($event->getControllerResult())) {
+                if (null !== $this->iriConverter && (false !== $attributes['output_class'] ?? null) && \get_class($controllerResult) === \get_class($event->getControllerResult())) {
                     $request->attributes->set('_api_write_item_iri', $this->iriConverter->getIriFromItem($controllerResult));
                 }
                 break;
