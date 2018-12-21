@@ -37,6 +37,7 @@ use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
+use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\Yaml\Yaml;
 
@@ -145,6 +146,10 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $this->registerValidatorConfiguration($container, $config);
         $this->registerDataCollectorConfiguration($container, $config, $loader);
         $this->registerMercureConfiguration($container, $config, $loader, $useDoctrine);
+
+        if (interface_exists(MessageBusInterface::class)) {
+            $loader->load('messenger.xml');
+        }
     }
 
     /**

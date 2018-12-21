@@ -42,6 +42,7 @@ use ApiPlatform\Core\Exception\InvalidArgumentException;
  *     @Attribute("itemOperations", type="array"),
  *     @Attribute("maximumItemsPerPage", type="int"),
  *     @Attribute("mercure", type="mixed"),
+ *     @Attribute("messenger", type="bool"),
  *     @Attribute("normalizationContext", type="array"),
  *     @Attribute("openapiContext", type="array"),
  *     @Attribute("order", type="array"),
@@ -183,6 +184,13 @@ final class ApiResource
      * @var mixed
      */
     private $mercure;
+
+    /**
+     * @see https://github.com/Haehnchen/idea-php-annotation-plugin/issues/112
+     *
+     * @var bool
+     */
+    private $messenger;
 
     /**
      * @see https://github.com/Haehnchen/idea-php-annotation-plugin/issues/112
