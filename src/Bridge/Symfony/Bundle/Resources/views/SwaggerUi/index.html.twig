@@ -74,7 +74,7 @@
     </div>
 </div>
 
-{% if ((false == swaggerUiEnabled and reDocEnabled) or (reDocEnabled and active_ui == 're_doc')) %}
+{% if (reDocEnabled and not swaggerUiEnabled) or (reDocEnabled and 're_doc' == active_ui) %}
     <script src="{{ asset('bundles/apiplatform/redoc/redoc.standalone.js') }}"></script>
     <script src="{{ asset('bundles/apiplatform/init-redoc-ui.js') }}"></script>
 {% elseif (swaggerUiEnabled) %}
