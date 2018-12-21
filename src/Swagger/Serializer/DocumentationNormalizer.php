@@ -185,7 +185,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
 
                 $pathOperation['summary'] = sprintf('Retrieves %s%s resource%s.', $subresourceOperation['collection'] ? 'the collection of ' : 'a ', $subresourceOperation['shortNames'][0], $subresourceOperation['collection'] ? 's' : '');
                 $pathOperation['responses'] = [
-                    '200' => $baseSuccessResponse,
+                    (string) $resourceMetadata->getSubresourceOperationAttribute($operationName, 'status', '200') => $baseSuccessResponse,
                     '404' => ['description' => 'Resource not found'],
                 ];
 
@@ -291,7 +291,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
             case 'PUT':
                 return $this->updatePutOperation($v3, $pathOperation, $responseMimeTypes ?? $mimeTypes, $operationType, $resourceMetadata, $resourceClass, $resourceShortName, $operationName, $definitions);
             case 'DELETE':
-                return $this->updateDeleteOperation($v3, $pathOperation, $resourceShortName);
+                return $this->updateDeleteOperation($v3, $pathOperation, $resourceShortName, $operationType, $operationName, $resourceMetadata);
         }
 
         return $pathOperation;
@@ -301,6 +301,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
     {
         $serializerContext = $this->getSerializerContext($operationType, false, $resourceMetadata, $operationName);
         $responseDefinitionKey = $this->getDefinition($v3, $definitions, $resourceMetadata, $resourceClass, $serializerContext);
+        $successStatus = (string) $resourceMetadata->getTypedOperationAttribute($operationType, $operationName, 'status', '200');
 
         if (!$v3) {
             $pathOperation['produces'] ?? $pathOperation['produces'] = $mimeTypes;
@@ -324,10 +325,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
                 ];
             }
 
-            $pathOperation['responses'] ?? $pathOperation['responses'] = [
-                '200' => $successResponse,
-            ];
-
+            $pathOperation['responses'] ?? $pathOperation['responses'] = [$successStatus => $successResponse];
             $pathOperation['parameters'] ?? $pathOperation['parameters'] = $this->getFiltersParameters($v3, $resourceClass, $operationName, $resourceMetadata, $definitions, $serializerContext);
 
             if ($this->paginationEnabled && $resourceMetadata->getCollectionOperationAttribute($operationName, 'pagination_enabled', true, true)) {
@@ -385,7 +383,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
         }
 
         $pathOperation['responses'] ?? $pathOperation['responses'] = [
-            '200' => $successResponse,
+            $successStatus => $successResponse,
             '404' => ['description' => 'Resource not found'],
         ];
 
@@ -416,7 +414,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
         }
 
         $pathOperation['responses'] ?? $pathOperation['responses'] = [
-            '201' => $successResponse,
+            (string) $resourceMetadata->getTypedOperationAttribute($operationType, $operationName, 'status', '201') => $successResponse,
             '400' => ['description' => 'Invalid input'],
             '404' => ['description' => 'Resource not found'],
         ];
@@ -473,7 +471,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
         }
 
         $pathOperation['responses'] ?? $pathOperation['responses'] = [
-            '200' => $successResponse,
+            (string) $resourceMetadata->getTypedOperationAttribute($operationType, $operationName, 'status', '200') => $successResponse,
             '400' => ['description' => 'Invalid input'],
             '404' => ['description' => 'Resource not found'],
         ];
@@ -501,11 +499,11 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
         return $pathOperation;
     }
 
-    private function updateDeleteOperation(bool $v3, \ArrayObject $pathOperation, string $resourceShortName): \ArrayObject
+    private function updateDeleteOperation(bool $v3, \ArrayObject $pathOperation, string $resourceShortName, string $operationType, string $operationName, ResourceMetadata $resourceMetadata): \ArrayObject
     {
         $pathOperation['summary'] ?? $pathOperation['summary'] = sprintf('Removes the %s resource.', $resourceShortName);
         $pathOperation['responses'] ?? $pathOperation['responses'] = [
-            '204' => ['description' => sprintf('%s resource deleted', $resourceShortName)],
+            (string) $resourceMetadata->getTypedOperationAttribute($operationType, $operationName, 'status', '204') => ['description' => sprintf('%s resource deleted', $resourceShortName)],
             '404' => ['description' => 'Resource not found'],
         ];
 
