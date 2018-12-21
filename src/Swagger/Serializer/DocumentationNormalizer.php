@@ -661,15 +661,17 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
 
     private function computeDoc(bool $v3, Documentation $documentation, \ArrayObject $definitions, \ArrayObject $paths, array $context): array
     {
+        $baseUrl = $context[self::BASE_URL] ?? $this->defaultContext[self::BASE_URL];
+
         if ($v3) {
-            $docs = [
-                'openapi' => self::OPENAPI_VERSION,
-                'servers' => [['url' => $context[self::BASE_URL] ?? $this->defaultContext[self::BASE_URL]]],
-            ];
+            $docs = ['openapi' => self::OPENAPI_VERSION];
+            if ('/' !== $baseUrl) {
+                $docs['servers'] = [['url' => $context[self::BASE_URL] ?? $this->defaultContext[self::BASE_URL]]];
+            }
         } else {
             $docs = [
                 'swagger' => self::SWAGGER_VERSION,
-                'basePath' => $context[self::BASE_URL] ?? $this->defaultContext[self::BASE_URL],
+                'basePath' => $baseUrl,
             ];
         }
 

@@ -124,9 +124,14 @@ final class SwaggerUiAction
             'graphqlEnabled' => $this->graphqlEnabled,
         ];
 
+        $swaggerContext = ['spec_version' => $request->query->getInt('spec_version', 3)];
+        if ('' !== $baseUrl = $request->getBaseUrl()) {
+            $swaggerContext['base_url'] = $baseUrl;
+        }
+
         $swaggerData = [
             'url' => $this->urlGenerator->generate('api_doc', ['format' => 'json']),
-            'spec' => $this->normalizer->normalize($documentation, 'json', ['base_url' => $request->getBaseUrl(), 'spec_version' => $request->query->getInt('spec_version', 3)]),
+            'spec' => $this->normalizer->normalize($documentation, 'json', $swaggerContext),
         ];
 
         $swaggerData['oauth'] = [
