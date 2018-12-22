@@ -135,13 +135,15 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
         $mimeTypes = $object->getMimeTypes();
         $definitions = new \ArrayObject();
         $paths = new \ArrayObject();
+        $links = new \ArrayObject();
 
         foreach ($object->getResourceNameCollection() as $resourceClass) {
             $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
             $resourceShortName = $resourceMetadata->getShortName();
 
-            $this->addPaths($v3, $paths, $definitions, $resourceClass, $resourceShortName, $resourceMetadata, $mimeTypes, OperationType::COLLECTION);
-            $this->addPaths($v3, $paths, $definitions, $resourceClass, $resourceShortName, $resourceMetadata, $mimeTypes, OperationType::ITEM);
+            // Items needs to be parsed first to be able to reference the lines from the collection operation
+            $this->addPaths($v3, $paths, $definitions, $resourceClass, $resourceShortName, $resourceMetadata, $mimeTypes, OperationType::ITEM, $links);
+            $this->addPaths($v3, $paths, $definitions, $resourceClass, $resourceShortName, $resourceMetadata, $mimeTypes, OperationType::COLLECTION, $links);
 
             if (null === $this->subresourceOperationFactory) {
                 continue;
@@ -236,7 +238,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
     /**
      * Updates the list of entries in the paths collection.
      */
-    private function addPaths(bool $v3, \ArrayObject $paths, \ArrayObject $definitions, string $resourceClass, string $resourceShortName, ResourceMetadata $resourceMetadata, array $mimeTypes, string $operationType)
+    private function addPaths(bool $v3, \ArrayObject $paths, \ArrayObject $definitions, string $resourceClass, string $resourceShortName, ResourceMetadata $resourceMetadata, array $mimeTypes, string $operationType, \ArrayObject $links)
     {
         if (null === $operations = OperationType::COLLECTION === $operationType ? $resourceMetadata->getCollectionOperations() : $resourceMetadata->getItemOperations()) {
             return;
@@ -246,7 +248,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
             $path = $this->getPath($resourceShortName, $operationName, $operation, $operationType);
             $method = OperationType::ITEM === $operationType ? $this->operationMethodResolver->getItemOperationMethod($resourceClass, $operationName) : $this->operationMethodResolver->getCollectionOperationMethod($resourceClass, $operationName);
 
-            $paths[$path][strtolower($method)] = $this->getPathOperation($v3, $operationName, $operation, $method, $operationType, $resourceClass, $resourceMetadata, $mimeTypes, $definitions);
+            $paths[$path][strtolower($method)] = $this->getPathOperation($v3, $operationName, $operation, $method, $operationType, $resourceClass, $resourceMetadata, $mimeTypes, $definitions, $links);
         }
     }
 
@@ -275,12 +277,15 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
      *
      * @param string[] $mimeTypes
      */
-    private function getPathOperation(bool $v3, string $operationName, array $operation, string $method, string $operationType, string $resourceClass, ResourceMetadata $resourceMetadata, array $mimeTypes, \ArrayObject $definitions): \ArrayObject
+    private function getPathOperation(bool $v3, string $operationName, array $operation, string $method, string $operationType, string $resourceClass, ResourceMetadata $resourceMetadata, array $mimeTypes, \ArrayObject $definitions, \ArrayObject $links): \ArrayObject
     {
         $pathOperation = new \ArrayObject($operation[$v3 ? 'openapi_context' : 'swagger_context'] ?? []);
         $resourceShortName = $resourceMetadata->getShortName();
         $pathOperation['tags'] ?? $pathOperation['tags'] = [$resourceShortName];
         $pathOperation['operationId'] ?? $pathOperation['operationId'] = lcfirst($operationName).ucfirst($resourceShortName).ucfirst($operationType);
+        if ($v3 && 'GET' === $method && OperationType::ITEM === $operationType && $link = $this->getLinkObject($resourceClass, $pathOperation['operationId'], $this->getPath($resourceShortName, $operationName, $operation, $operationType))) {
+            $links[$pathOperation['operationId']] = $link;
+        }
         if ($resourceMetadata->getTypedOperationAttribute($operationType, $operationName, 'deprecation_reason', null, true)) {
             $pathOperation['deprecated'] = true;
         }
@@ -292,7 +297,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
             case 'GET':
                 return $this->updateGetOperation($v3, $pathOperation, $responseMimeTypes ?? $mimeTypes, $operationType, $resourceMetadata, $resourceClass, $resourceShortName, $operationName, $definitions);
             case 'POST':
-                return $this->updatePostOperation($v3, $pathOperation, $responseMimeTypes ?? $mimeTypes, $operationType, $resourceMetadata, $resourceClass, $resourceShortName, $operationName, $definitions);
+                return $this->updatePostOperation($v3, $pathOperation, $responseMimeTypes ?? $mimeTypes, $operationType, $resourceMetadata, $resourceClass, $resourceShortName, $operationName, $definitions, $links);
             case 'PATCH':
                 $pathOperation['summary'] ?? $pathOperation['summary'] = sprintf('Updates the %s resource.', $resourceShortName);
             // no break
@@ -408,7 +413,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
         return $pathOperation;
     }
 
-    private function updatePostOperation(bool $v3, \ArrayObject $pathOperation, array $mimeTypes, string $operationType, ResourceMetadata $resourceMetadata, string $resourceClass, string $resourceShortName, string $operationName, \ArrayObject $definitions): \ArrayObject
+    private function updatePostOperation(bool $v3, \ArrayObject $pathOperation, array $mimeTypes, string $operationType, ResourceMetadata $resourceMetadata, string $resourceClass, string $resourceShortName, string $operationName, \ArrayObject $definitions, \ArrayObject $links): \ArrayObject
     {
         if (!$v3) {
             $pathOperation['consumes'] ?? $pathOperation['consumes'] = $mimeTypes;
@@ -426,6 +431,9 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
         if ($responseDefinitionKey) {
             if ($v3) {
                 $successResponse['content'] = array_fill_keys($mimeTypes, ['schema' => ['$ref' => sprintf('#/components/schemas/%s', $responseDefinitionKey)]]);
+                if ($links[$key = 'get'.ucfirst($resourceShortName).ucfirst(OperationType::ITEM)] ?? null) {
+                    $successResponse['links'] = [ucfirst($key) => $links[$key]];
+                }
             } else {
                 $successResponse['schema'] = ['$ref' => sprintf('#/definitions/%s', $responseDefinitionKey)];
             }
@@ -851,5 +859,30 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
         }
 
         return $responseMimeTypes;
+    }
+
+    /**
+     * https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.0.md#linkObject.
+     */
+    private function getLinkObject(string $resourceClass, string $operationId, string $path): array
+    {
+        $linkObject = $identifiers = [];
+        foreach ($this->propertyNameCollectionFactory->create($resourceClass, []) as $propertyName) {
+            $propertyMetadata = $this->propertyMetadataFactory->create($resourceClass, $propertyName);
+            if (!$propertyMetadata->isIdentifier()) {
+                continue;
+            }
+
+            $linkObject['parameters'][$propertyName] = sprintf('$response.body#/%s', $propertyName);
+            $identifiers[] = $propertyName;
+        }
+
+        if (!$linkObject) {
+            return [];
+        }
+        $linkObject['operationId'] = $operationId;
+        $linkObject['description'] = 1 === \count($identifiers) ? sprintf('The `%1$s` value returned in the response can be used as the `%1$s` parameter in `GET %2$s`.', $identifiers[0], $path) : sprintf('The values returned in the response can be used in `GET %s`.', $path);
+
+        return $linkObject;
     }
 }
