@@ -1,8 +1,8 @@
 {
     "name": "api-platform/core",
     "type": "library",
-    "description": "The ultimate solution to create web APIs.",
-    "keywords": ["REST", "API", "JSON", "JSON-LD", "Hydra", "Swagger", "HAL"],
+    "description": "Build a fully-featured hypermedia or GraphQL API in minutes",
+    "keywords": ["REST", "GraphQL", "API", "JSON-LD", "Hydra", "JSONAPI", "OpenAPI", "HAL", "Swagger"],
     "homepage": "https://api-platform.com",
     "license": "MIT",
     "authors": [
