@@ -2,7 +2,7 @@
     "name": "api-platform/core",
     "type": "library",
     "description": "Build a fully-featured hypermedia or GraphQL API in minutes",
-    "keywords": ["REST", "GraphQL", "API", "JSON-LD", "Hydra", "JSON:API", "OpenAPI", "HAL", "Swagger"],
+    "keywords": ["REST", "GraphQL", "API", "JSON-LD", "Hydra", "JSONAPI", "OpenAPI", "HAL", "Swagger"],
     "homepage": "https://api-platform.com",
     "license": "MIT",
     "authors": [
