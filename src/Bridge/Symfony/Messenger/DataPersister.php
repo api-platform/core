@@ -18,6 +18,7 @@ use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Util\ClassInfoTrait;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\MessageBusInterface;
+use Symfony\Component\Messenger\Stamp\HandledStamp;
 
 /**
  * Dispatches the given resource using the message bus of Symfony Messenger.
@@ -52,9 +53,12 @@ final class DataPersister implements DataPersisterInterface
      */
     public function persist($data)
     {
-        $this->messageBus->dispatch($data);
+        $envelope = $this->messageBus->dispatch($data);
+        if (null === $stamp = $envelope->last(HandledStamp::class)) {
+            return $data;
+        }
 
-        return $data;
+        return $stamp->getResult();
     }
 
     /**
