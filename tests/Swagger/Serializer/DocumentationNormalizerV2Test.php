@@ -39,6 +39,8 @@ use ApiPlatform\Core\Swagger\Serializer\DocumentationNormalizer;
 use ApiPlatform\Core\Tests\Fixtures\DummyFilter;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Answer;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\InputDto;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\OutputDto;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Question;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RelatedDummy;
 use PHPUnit\Framework\TestCase;
@@ -2305,5 +2307,225 @@ class DocumentationNormalizerV2Test extends TestCase
         ];
 
         $this->assertEquals($expected, $normalizer->normalize($documentation, DocumentationNormalizer::FORMAT, ['base_url' => '/']));
+    }
+
+    public function testNormalizeWithInputAndOutpusClass()
+    {
+        $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), 'Test API', 'This is a test API.', '1.2.3', ['jsonld' => ['application/ld+json']]);
+
+        $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
+        //$propertyNameCollectionFactoryProphecy->create(Dummy::class, [])->shouldBeCalled()->willReturn(new PropertyNameCollection(['id', 'name', 'description']));
+        $propertyNameCollectionFactoryProphecy->create(InputDto::class, [])->shouldBeCalled()->willReturn(new PropertyNameCollection(['foo', 'bar']));
+        $propertyNameCollectionFactoryProphecy->create(OutputDto::class, [])->shouldBeCalled()->willReturn(new PropertyNameCollection(['baz', 'bat']));
+
+        $dummyMetadata = new ResourceMetadata('Dummy', 'This is a dummy.', 'http://schema.example.com/Dummy', ['get' => [], 'put' => []], ['get' => [], 'post' => []], ['input_class' => InputDto::class, 'output_class' => OutputDto::class]);
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
+        $resourceMetadataFactoryProphecy->create(Dummy::class)->shouldBeCalled()->willReturn($dummyMetadata);
+
+        $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
+        //$propertyMetadataFactoryProphecy->create(Dummy::class, 'id')->shouldBeCalled()->willReturn(new PropertyMetadata(new Type(Type::BUILTIN_TYPE_INT), 'This is an id.', true, false));
+        //$propertyMetadataFactoryProphecy->create(Dummy::class, 'name')->shouldBeCalled()->willReturn(new PropertyMetadata(new Type(Type::BUILTIN_TYPE_STRING), 'This is a name.', true, true, true, true, false, false, null, null, []));
+        //$propertyMetadataFactoryProphecy->create(Dummy::class, 'description')->shouldBeCalled()->willReturn(new PropertyMetadata(new Type(Type::BUILTIN_TYPE_STRING), 'This is an initializable but not writable property.', true, false, true, true, false, false, null, null, [], null, true));
+        // InputDto
+        $propertyMetadataFactoryProphecy->create(InputDto::class, 'foo')->shouldBeCalled()->willReturn(new PropertyMetadata(new Type(Type::BUILTIN_TYPE_STRING), 'foo', true, false));
+        $propertyMetadataFactoryProphecy->create(InputDto::class, 'bar')->shouldBeCalled()->willReturn(new PropertyMetadata(new Type(Type::BUILTIN_TYPE_INT), 'bar', true, true, true, true, false, false, null, null, []));
+        // OutputDto
+        $propertyMetadataFactoryProphecy->create(OutputDto::class, 'baz')->shouldBeCalled()->willReturn(new PropertyMetadata(new Type(Type::BUILTIN_TYPE_STRING), 'baz', true, false));
+        $propertyMetadataFactoryProphecy->create(OutputDto::class, 'bat')->shouldBeCalled()->willReturn(new PropertyMetadata(new Type(Type::BUILTIN_TYPE_INT), 'bat', true, true, true, true, false, false, null, null, []));
+
+        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
+        $resourceClassResolverProphecy->isResourceClass(Dummy::class)->willReturn(true);
+
+        $operationMethodResolverProphecy = $this->prophesize(OperationMethodResolverInterface::class);
+        $operationMethodResolverProphecy->getItemOperationMethod(Dummy::class, 'get')->shouldBeCalled()->willReturn('GET');
+        $operationMethodResolverProphecy->getItemOperationMethod(Dummy::class, 'put')->shouldBeCalled()->willReturn('PUT');
+        $operationMethodResolverProphecy->getCollectionOperationMethod(Dummy::class, 'get')->shouldBeCalled()->willReturn('GET');
+        $operationMethodResolverProphecy->getCollectionOperationMethod(Dummy::class, 'post')->shouldBeCalled()->willReturn('POST');
+
+        $operationPathResolver = new CustomOperationPathResolver(new OperationPathResolver(new UnderscorePathSegmentNameGenerator()));
+
+        $normalizer = new DocumentationNormalizer(
+            $resourceMetadataFactoryProphecy->reveal(),
+            $propertyNameCollectionFactoryProphecy->reveal(),
+            $propertyMetadataFactoryProphecy->reveal(),
+            $resourceClassResolverProphecy->reveal(),
+            $operationMethodResolverProphecy->reveal(),
+            $operationPathResolver
+        );
+
+        $expected = [
+            'swagger' => '2.0',
+            'basePath' => '/app_dev.php/',
+            'info' => [
+                'title' => 'Test API',
+                'version' => '1.2.3',
+                'description' => 'This is a test API.',
+            ],
+            'paths' => new \ArrayObject([
+                '/dummies' => [
+                    'get' => new \ArrayObject([
+                        'tags' => ['Dummy'],
+                        'operationId' => 'getDummyCollection',
+                        'produces' => ['application/ld+json'],
+                        'summary' => 'Retrieves the collection of Dummy resources.',
+                        'responses' => [
+                            200 => [
+                                'description' => 'Dummy collection response',
+                                'schema' => [
+                                    'type' => 'array',
+                                    'items' => [
+                                        '$ref' => '#/definitions/Dummy:493a0d3a5177c370781f2ac2c84227fc',
+                                    ],
+                                ],
+                            ],
+                        ],
+                        'parameters' => [
+                            [
+                                'name' => 'page',
+                                'in' => 'query',
+                                'required' => false,
+                                'description' => 'The collection page number',
+                                'type' => 'integer',
+                            ],
+                        ],
+                    ]),
+                    'post' => new \ArrayObject([
+                        'tags' => ['Dummy'],
+                        'operationId' => 'postDummyCollection',
+                        'consumes' => ['application/ld+json'],
+                        'produces' => ['application/ld+json'],
+                        'summary' => 'Creates a Dummy resource.',
+                        'responses' => [
+                            201 => [
+                                'description' => 'Dummy resource created',
+                                'schema' => [
+                                    '$ref' => '#/definitions/Dummy:493a0d3a5177c370781f2ac2c84227fc',
+                                ],
+                            ],
+                            400 => [
+                                'description' => 'Invalid input',
+                            ],
+                            404 => [
+                                'description' => 'Resource not found',
+                            ],
+                        ],
+                        'parameters' => [
+                            [
+                                'name' => 'dummy',
+                                'in' => 'body',
+                                'description' => 'The new Dummy resource',
+                                'schema' => [
+                                    '$ref' => '#/definitions/Dummy:b8724508705e1cb0779d76040a5058e6',
+                                ],
+                            ],
+                        ],
+                    ]),
+                ],
+                '/dummies/{id}' => [
+                    'get' => new \ArrayObject([
+                        'tags' => ['Dummy'],
+                        'operationId' => 'getDummyItem',
+                        'produces' => ['application/ld+json'],
+                        'summary' => 'Retrieves a Dummy resource.',
+                        'parameters' => [
+                            [
+                                'name' => 'id',
+                                'in' => 'path',
+                                'required' => true,
+                                'type' => 'string',
+                            ],
+                        ],
+                        'responses' => [
+                            200 => [
+                                'description' => 'Dummy resource response',
+                                'schema' => [
+                                    '$ref' => '#/definitions/Dummy:493a0d3a5177c370781f2ac2c84227fc',
+                                ],
+                            ],
+                            404 => [
+                                'description' => 'Resource not found',
+                            ],
+                        ],
+                    ]),
+                    'put' => new \ArrayObject([
+                        'tags' => ['Dummy'],
+                        'operationId' => 'putDummyItem',
+                        'consumes' => ['application/ld+json'],
+                        'produces' => ['application/ld+json'],
+                        'summary' => 'Replaces the Dummy resource.',
+                        'parameters' => [
+                            [
+                                'name' => 'id',
+                                'in' => 'path',
+                                'required' => true,
+                                'type' => 'string',
+                            ],
+                            [
+                                'name' => 'dummy',
+                                'in' => 'body',
+                                'description' => 'The updated Dummy resource',
+                                'schema' => [
+                                    '$ref' => '#/definitions/Dummy:b8724508705e1cb0779d76040a5058e6',
+                                ],
+                            ],
+                        ],
+                        'responses' => [
+                            200 => [
+                                'description' => 'Dummy resource updated',
+                                'schema' => [
+                                    '$ref' => '#/definitions/Dummy:493a0d3a5177c370781f2ac2c84227fc',
+                                ],
+                            ],
+                            400 => [
+                                'description' => 'Invalid input',
+                            ],
+                            404 => [
+                                'description' => 'Resource not found',
+                            ],
+                        ],
+                    ]),
+                ],
+            ]),
+            'definitions' => new \ArrayObject([
+                'Dummy:493a0d3a5177c370781f2ac2c84227fc' => new \ArrayObject([
+                    'type' => 'object',
+                    'description' => 'This is a dummy.',
+                    'externalDocs' => [
+                        'url' => 'http://schema.example.com/Dummy',
+                    ],
+                    'properties' => [
+                        'baz' => new \ArrayObject([
+                            'readOnly' => true,
+                            'description' => 'baz',
+                            'type' => 'string',
+                        ]),
+                        'bat' => new \ArrayObject([
+                            'description' => 'bat',
+                            'type' => 'integer',
+                        ]),
+                    ],
+                ]),
+                'Dummy:b8724508705e1cb0779d76040a5058e6' => new \ArrayObject([
+                    'type' => 'object',
+                    'description' => 'This is a dummy.',
+                    'externalDocs' => [
+                        'url' => 'http://schema.example.com/Dummy',
+                    ],
+                    'properties' => [
+                        'foo' => new \ArrayObject([
+                            'readOnly' => true,
+                            'description' => 'foo',
+                            'type' => 'string',
+                        ]),
+                        'bar' => new \ArrayObject([
+                            'description' => 'bar',
+                            'type' => 'integer',
+                        ]),
+                    ],
+                ]),
+            ]),
+        ];
+
+        $this->assertEquals($expected, $normalizer->normalize($documentation, DocumentationNormalizer::FORMAT, ['base_url' => '/app_dev.php/']));
     }
 }
