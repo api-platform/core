@@ -51,7 +51,7 @@ script:
     else
       vendor/bin/behat --suite=default --format=progress;
     fi
-  - tests/Fixtures/app/console api:swagger:export --spec-version 2 > swagger.json && npx swagger-cli validate swagger.json && rm swagger.json
-  - tests/Fixtures/app/console api:swagger:export --spec-version 2 --yaml > swagger.yaml && npx swagger-cli validate swagger.yaml && rm swagger.yaml
-  - tests/Fixtures/app/console api:openapi:export > swagger.json && npx swagger-cli validate swagger.json && rm swagger.json
-  - tests/Fixtures/app/console api:openapi:export --yaml > swagger.yaml && npx swagger-cli validate swagger.yaml && rm swagger.yaml
+  - tests/Fixtures/app/console api:swagger:export > swagger.json && npx swagger-cli validate swagger.json && rm swagger.json
+  - tests/Fixtures/app/console api:swagger:export --yaml > swagger.yaml && npx swagger-cli validate swagger.yaml && rm swagger.yaml
+  - tests/Fixtures/app/console api:openapi:export --spec-version 3 > swagger.json && npx swagger-cli validate swagger.json && rm swagger.json
+  - tests/Fixtures/app/console api:openapi:export --spec-version 3 --yaml > swagger.yaml && npx swagger-cli validate swagger.yaml && rm swagger.yaml
