@@ -1,5 +1,17 @@
 # Changelog
 
+## 2.3.5
+
+* GraphQL: compatibility with `webonyx/graphql-php` 0.13
+* OpenAPI/Swagger: expose `properties[]` as a collection parameter
+* OpenAPI/Swagger: add a description for the `properties[]` filter
+* OpenAPI/Swagger: Leverage advanced name converters
+* JSON-LD: Prevent an error in `ItemNormalizer` when `$context['resource_class']` is not defined
+* Allow to pass a the serialization group to use a string instead of as an array of one element
+* Modernize the code base to use PHP 7.1 features when possible
+* Bump minimal dependencies of the used Symfony components
+* Improve the Packagist description
+
 ## 2.3.4
 
 * Open API/Swagger: fix YAML export
