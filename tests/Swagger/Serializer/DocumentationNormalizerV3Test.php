@@ -69,7 +69,7 @@ class DocumentationNormalizerV3Test extends TestCase
         $resourceMetadataFactoryProphecy->create(Dummy::class)->shouldBeCalled()->willReturn($dummyMetadata);
 
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
-        $propertyMetadataFactoryProphecy->create(Dummy::class, 'id')->shouldBeCalled()->willReturn(new PropertyMetadata(new Type(Type::BUILTIN_TYPE_INT), 'This is an id.', true, false));
+        $propertyMetadataFactoryProphecy->create(Dummy::class, 'id')->shouldBeCalled()->willReturn(new PropertyMetadata(new Type(Type::BUILTIN_TYPE_INT), 'This is an id.', true, false, null, null, null, true));
         $propertyMetadataFactoryProphecy->create(Dummy::class, 'name')->shouldBeCalled()->willReturn(new PropertyMetadata(new Type(Type::BUILTIN_TYPE_STRING), 'This is a name.', true, true, true, true, false, false, null, null, []));
         $propertyMetadataFactoryProphecy->create(Dummy::class, 'description')->shouldBeCalled()->willReturn(new PropertyMetadata(new Type(Type::BUILTIN_TYPE_STRING), 'This is an initializable but not writable property.', true, false, true, true, false, false, null, null, [], null, true));
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
@@ -178,6 +178,13 @@ class DocumentationNormalizerV3Test extends TestCase
                                 'content' => [
                                     'application/ld+json' => [
                                         'schema' => ['$ref' => '#/components/schemas/Dummy'],
+                                    ],
+                                ],
+                                'links' => [
+                                    'GetDummyItem' => [
+                                        'operationId' => 'getDummyItem',
+                                        'parameters' => ['id' => '$response.body#/id'],
+                                        'description' => 'The `id` value returned in the response can be used as the `id` parameter in `GET /dummies/{id}`.',
                                     ],
                                 ],
                             ],
@@ -298,6 +305,13 @@ class DocumentationNormalizerV3Test extends TestCase
                                 'content' => [
                                     'application/ld+json' => [
                                         'schema' => ['$ref' => '#/components/schemas/Dummy'],
+                                    ],
+                                ],
+                                'links' => [
+                                    'GetDummyItem' => [
+                                        'operationId' => 'getDummyItem',
+                                        'parameters' => ['id' => '$response.body#/id'],
+                                        'description' => 'The `id` value returned in the response can be used as the `id` parameter in `GET /dummies/{id}`.',
                                     ],
                                 ],
                             ],
@@ -2502,7 +2516,7 @@ class DocumentationNormalizerV3Test extends TestCase
         $resourceMetadataFactoryProphecy->create(Dummy::class)->shouldBeCalled()->willReturn($dummyMetadata);
 
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
-        $propertyMetadataFactoryProphecy->create(Dummy::class, 'id')->shouldBeCalled()->willReturn(new PropertyMetadata(new Type(Type::BUILTIN_TYPE_INT), 'This is an id.', true, false));
+        $propertyMetadataFactoryProphecy->create(Dummy::class, 'id')->shouldBeCalled()->willReturn(new PropertyMetadata(new Type(Type::BUILTIN_TYPE_INT), 'This is an id.', true, false, null, null, null, true));
         $propertyMetadataFactoryProphecy->create(Dummy::class, 'name')->shouldBeCalled()->willReturn(new PropertyMetadata(new Type(Type::BUILTIN_TYPE_STRING), 'This is a name.', true, true, true, true, false, false, null, null, []));
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
         $resourceClassResolverProphecy->isResourceClass(Dummy::class)->willReturn(true);
@@ -2607,6 +2621,13 @@ class DocumentationNormalizerV3Test extends TestCase
                                     ],
                                     'text/csv' => [
                                         'schema' => ['$ref' => '#/components/schemas/Dummy'],
+                                    ],
+                                ],
+                                'links' => [
+                                    'GetDummyItem' => [
+                                        'operationId' => 'getDummyItem',
+                                        'parameters' => ['id' => '$response.body#/id'],
+                                        'description' => 'The `id` value returned in the response can be used as the `id` parameter in `GET /dummies/{id}`.',
                                     ],
                                 ],
                             ],
