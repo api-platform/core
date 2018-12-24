@@ -141,7 +141,7 @@ final class SerializerPropertyMetadataFactory implements PropertyMetadataFactory
     private function getEffectiveSerializerGroups(array $options, string $resourceClass): array
     {
         if (isset($options['serializer_groups'])) {
-            return [$options['serializer_groups'], $options['serializer_groups']];
+            return [(array) $options['serializer_groups'], (array) $options['serializer_groups']];
         }
 
         $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
@@ -159,7 +159,10 @@ final class SerializerPropertyMetadataFactory implements PropertyMetadataFactory
             $denormalizationContext = $resourceMetadata->getAttribute('denormalization_context');
         }
 
-        return [$normalizationContext['groups'] ?? null, $denormalizationContext['groups'] ?? null];
+        return [
+            isset($normalizationContext['groups']) ? (array) $normalizationContext['groups'] : null,
+            isset($denormalizationContext['groups']) ? (array) $denormalizationContext['groups'] : null,
+        ];
     }
 
     /**
