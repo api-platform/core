@@ -28,8 +28,8 @@ use Symfony\Component\Serializer\Annotation as Serializer;
  * @ApiResource(
  *     itemOperations={"get"={"swagger_context"={"tags"={}}, "openapi_context"={"tags"={}}}, "put", "delete"},
  *     attributes={
- *         "normalization_context"={"groups"={"colors"}},
- *         "sunset"="2050-01-01"
+ *         "sunset"="2050-01-01",
+ *         "normalization_context"={"groups"="colors"}
  *     }
  * )
  * @ORM\Entity
