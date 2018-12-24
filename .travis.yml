@@ -11,7 +11,7 @@ jobs:
       env: NO_UNIT_TESTS=true
       before_install:
         - composer remove --dev ext-mongodb doctrine/mongodb-odm doctrine/mongodb-odm-bundle
-        - sed -i '26,32d' tests/Fixtures/app/config/config_common.yml
+        - sed -i '33,39d' tests/Fixtures/app/config/config_common.yml
     - php: '7.2'
     - php: '7.3'
     - php: '7.3'
