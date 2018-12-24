@@ -22,6 +22,7 @@ use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\MessageBusInterface;
+use Symfony\Component\Messenger\Stamp\HandledStamp;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
@@ -59,5 +60,16 @@ class DataPersisterTest extends TestCase
 
         $dataPersister = new DataPersister($this->prophesize(ResourceMetadataFactoryInterface::class)->reveal(), $messageBus->reveal());
         $dataPersister->remove($dummy);
+    }
+
+    public function testHandle()
+    {
+        $dummy = new Dummy();
+
+        $messageBus = $this->prophesize(MessageBusInterface::class);
+        $messageBus->dispatch($dummy)->willReturn(new Envelope(new \stdClass(), new HandledStamp('result', 'DummyHandler::__invoke')))->shouldBeCalled();
+
+        $dataPersister = new DataPersister($this->prophesize(ResourceMetadataFactoryInterface::class)->reveal(), $messageBus->reveal());
+        $this->assertSame('result', $dataPersister->persist($dummy));
     }
 }
