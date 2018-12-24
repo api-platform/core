@@ -156,18 +156,22 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
         $context = [];
 
         if (isset($attributes['normalization_context'][AbstractNormalizer::GROUPS])) {
-            $context['serializer_groups'] = $attributes['normalization_context'][AbstractNormalizer::GROUPS];
+            $context['serializer_groups'] = (array) $attributes['normalization_context'][AbstractNormalizer::GROUPS];
         }
 
-        if (isset($attributes['denormalization_context'][AbstractNormalizer::GROUPS])) {
-            if (isset($context['serializer_groups'])) {
-                foreach ($attributes['denormalization_context'][AbstractNormalizer::GROUPS] as $groupName) {
-                    $context['serializer_groups'][] = $groupName;
-                }
-            } else {
-                $context['serializer_groups'] = $attributes['denormalization_context'][AbstractNormalizer::GROUPS];
-            }
+        if (!isset($attributes['denormalization_context'][AbstractNormalizer::GROUPS])) {
+            return $context;
         }
+
+        if (isset($context['serializer_groups'])) {
+            foreach ((array) $attributes['denormalization_context'][AbstractNormalizer::GROUPS] as $groupName) {
+                $context['serializer_groups'][] = $groupName;
+            }
+
+            return $context;
+        }
+
+        $context['serializer_groups'] = (array) $attributes['denormalization_context'][AbstractNormalizer::GROUPS];
 
         return $context;
     }
