@@ -406,6 +406,9 @@ class PaginationExtensionTest extends TestCase
                                 ['$skip' => 3],
                                 ['$limit' => 6],
                             ],
+                            'count' => [
+                                ['$count' => 'count'],
+                            ],
                         ],
                     ],
                 ],

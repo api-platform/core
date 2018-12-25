@@ -111,7 +111,7 @@ final class SubresourceDataProvider implements SubresourceDataProviderInterface
 
         $topAggregationBuilder = $topAggregationBuilder ?? $previousAggregationBuilder;
 
-        list($identifier, $identifierResourceClass) = $context['identifiers'][$remainingIdentifiers - 1];
+        [$identifier, $identifierResourceClass] = $context['identifiers'][$remainingIdentifiers - 1];
         $previousAssociationProperty = $context['identifiers'][$remainingIdentifiers][0] ?? $context['property'];
 
         $manager = $this->managerRegistry->getManagerForClass($identifierResourceClass);
