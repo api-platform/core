@@ -60,12 +60,12 @@ class Required implements ValidatorInterface
         if (\is_array($matches[$rootName])) {
             $keyName = array_keys($matches[$rootName])[0];
 
-            $queryParameter = $request->query->get($rootName);
+            $queryParameter = $request->query->get((string) $rootName);
 
             return \is_array($queryParameter) && isset($queryParameter[$keyName]);
         }
 
-        return $request->query->has($rootName);
+        return $request->query->has((string) $rootName);
     }
 
     /**
@@ -87,7 +87,7 @@ class Required implements ValidatorInterface
         if (\is_array($matches[$rootName])) {
             $keyName = array_keys($matches[$rootName])[0];
 
-            $queryParameter = $request->query->get($rootName);
+            $queryParameter = $request->query->get((string) $rootName);
 
             if (\is_array($queryParameter) && isset($queryParameter[$keyName])) {
                 return $queryParameter[$keyName];
@@ -96,6 +96,6 @@ class Required implements ValidatorInterface
             return null;
         }
 
-        return $request->query->get($rootName);
+        return $request->query->get((string) $rootName);
     }
 }
