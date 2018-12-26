@@ -29,7 +29,7 @@ class BoundsFilter extends AbstractFilter
         return [
             'maximum' => [
                 'property' => 'maximum',
-                'type' => 'number',
+                'type' => 'float',
                 'required' => false,
                 'swagger' => [
                     'maximum' => 10,
@@ -37,7 +37,7 @@ class BoundsFilter extends AbstractFilter
             ],
             'exclusiveMaximum' => [
                 'property' => 'maximum',
-                'type' => 'number',
+                'type' => 'float',
                 'required' => false,
                 'swagger' => [
                     'maximum' => 10,
@@ -46,7 +46,7 @@ class BoundsFilter extends AbstractFilter
             ],
             'minimum' => [
                 'property' => 'minimum',
-                'type' => 'number',
+                'type' => 'float',
                 'required' => false,
                 'swagger' => [
                     'minimum' => 5,
@@ -54,7 +54,7 @@ class BoundsFilter extends AbstractFilter
             ],
             'exclusiveMinimum' => [
                 'property' => 'exclusiveMinimum',
-                'type' => 'number',
+                'type' => 'float',
                 'required' => false,
                 'swagger' => [
                     'minimum' => 5,
