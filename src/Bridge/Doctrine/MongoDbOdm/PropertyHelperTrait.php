@@ -48,6 +48,6 @@ trait PropertyHelperTrait
         }
 
         // assocation.property => association_lkup.property
-        return [str_replace($association, $alias, $property), $propertyParts['field'], $propertyParts['associations']];
+        return [substr_replace($property, $alias, 0, \strlen($association)), $propertyParts['field'], $propertyParts['associations']];
     }
 }
