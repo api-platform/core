@@ -355,7 +355,7 @@ final class FeatureContext implements Context, SnippetAcceptingContext
         for ($i = 1; $i <= $nb; ++$i) {
             $dummyDto = new DummyDto();
             $dummyDto->foo = 'DummyDto foo #'.$i;
-            $dummyDto->bar = $i/3;
+            $dummyDto->bar = $i / 3;
 
             $this->manager->persist($dummyDto);
         }
