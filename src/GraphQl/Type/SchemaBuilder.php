@@ -381,7 +381,11 @@ final class SchemaBuilder implements SchemaBuilderInterface
                     return null;
                 }
 
-                $graphqlType = $this->getResourceObjectType($resourceMetadata->getAttribute($input ? 'input_class' : 'output_class', $resourceClass), $resourceMetadata, $input, $mutationName, $depth);
+                $dtoClass = $resourceMetadata->getAttribute($input ? 'input_class' : 'output_class', $resourceClass);
+                if (!empty($dtoClass)) {
+                    $resourceClass = $dtoClass;
+                }
+                $graphqlType = $this->getResourceObjectType($resourceClass, $resourceMetadata, $input, $mutationName, $depth);
                 break;
             default:
                 throw new InvalidTypeException(sprintf('The type "%s" is not supported.', $builtinType));
