@@ -64,7 +64,9 @@ final class ChainDataPersister implements DataPersisterInterface
     {
         foreach ($this->persisters as $persister) {
             if ($persister->supports($data)) {
-                return $persister->remove($data);
+                $persister->remove($data);
+
+                return;
             }
         }
     }

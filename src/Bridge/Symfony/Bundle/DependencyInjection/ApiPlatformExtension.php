@@ -39,6 +39,7 @@ use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
+use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\Yaml\Yaml;
 
@@ -151,6 +152,10 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $this->registerValidatorConfiguration($container, $config);
         $this->registerDataCollectorConfiguration($container, $config, $loader);
         $this->registerMercureConfiguration($container, $config, $loader, $useDoctrine);
+
+        if (interface_exists(MessageBusInterface::class)) {
+            $loader->load('messenger.xml');
+        }
     }
 
     /**
@@ -328,7 +333,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
     }
 
     /**
-     * Registers the Swagger and Swagger UI configuration.
+     * Registers the Swagger, ReDoc and Swagger UI configuration.
      */
     private function registerSwaggerConfiguration(ContainerBuilder $container, array $config, XmlFileLoader $loader)
     {
@@ -338,9 +343,10 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
 
         $loader->load('swagger.xml');
 
-        if ($config['enable_swagger_ui']) {
+        if ($config['enable_swagger_ui'] || $config['enable_re_doc']) {
             $loader->load('swagger-ui.xml');
             $container->setParameter('api_platform.enable_swagger_ui', $config['enable_swagger_ui']);
+            $container->setParameter('api_platform.enable_re_doc', $config['enable_re_doc']);
         }
 
         $container->setParameter('api_platform.enable_swagger', $config['enable_swagger']);

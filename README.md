@@ -4,7 +4,7 @@ API Platform Core is an easy to use and powerful system to create [hypermedia-dr
 It is a component of the [API Platform framework](https://api-platform.com) and it can be integrated
 with [the Symfony framework](https://symfony.com) using the bundle distributed with the library.
 
-It natively supports popular open formats including [JSON for Linked Data (JSON-LD)](http://json-ld.org), [Hydra Core Vocabulary](http://www.hydra-cg.com), [Swagger (OpenAPI)](http://swagger.io), [HAL](http://stateless.co/hal_specification.html) and [HTTP Problem](https://tools.ietf.org/html/draft-ietf-appsawg-http-problem-03).
+It natively supports popular open formats including [JSON for Linked Data (JSON-LD)](http://json-ld.org), [Hydra Core Vocabulary](http://www.hydra-cg.com), [OpenAPI v2 (formerly Swagger) and v3](https://www.openapis.org), [HAL](http://stateless.co/hal_specification.html) and [HTTP Problem](https://tools.ietf.org/html/draft-ietf-appsawg-http-problem-03).
 
 Build a working and fully-featured CRUD API in minutes. Leverage the awesome features of the tool to develop complex and
 high performance API-first projects. Extend or override everything you want.

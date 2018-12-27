@@ -3,37 +3,7 @@
 window.onload = () => {
     manageWebbyDisplay();
 
-    const data = JSON.parse(document.getElementById('swagger-data').innerText);
-    const ui = SwaggerUIBundle({
-        spec: data.spec,
-        dom_id: '#swagger-ui',
-        validatorUrl: null,
-        presets: [
-            SwaggerUIBundle.presets.apis,
-            SwaggerUIStandalonePreset,
-        ],
-        plugins: [
-            SwaggerUIBundle.plugins.DownloadUrl,
-        ],
-        layout: 'StandaloneLayout',
-    });
-
-    if (data.oauth.enabled) {
-        ui.initOAuth({
-            clientId: data.oauth.clientId,
-            clientSecret: data.oauth.clientSecret,
-            realm: data.oauth.type,
-            appName: data.spec.info.title,
-            scopeSeparator: ' ',
-            additionalQueryStringParams: {}
-        });
-    }
-
-    window.ui = ui;
-
-    if (!data.operationId) return;
-
-    const opObserver = new MutationObserver(function (mutations, self) {
+    new MutationObserver(function (mutations, self) {
         const op = document.getElementById(`operations-${data.shortName}-${data.operationId}`);
         if (!op) return;
 
@@ -60,14 +30,41 @@ window.onload = () => {
                 }
             }
 
-            op.querySelector('.execute').click();
-            op.scrollIntoView();
+            // Wait input values to be populated before executing the query
+            setTimeout(function(){
+                op.querySelector('.execute').click();
+                op.scrollIntoView();
+            }, 500);
         });
 
         tryOutObserver.observe(document, {childList: true, subtree: true});
+    }).observe(document, {childList: true, subtree: true});
+
+    const data = JSON.parse(document.getElementById('swagger-data').innerText);
+    const ui = SwaggerUIBundle({
+        spec: data.spec,
+        dom_id: '#swagger-ui',
+        validatorUrl: null,
+        presets: [
+            SwaggerUIBundle.presets.apis,
+            SwaggerUIStandalonePreset,
+        ],
+        plugins: [
+            SwaggerUIBundle.plugins.DownloadUrl,
+        ],
+        layout: 'StandaloneLayout',
     });
 
-    opObserver.observe(document, {childList: true, subtree: true});
+    if (data.oauth.enabled) {
+        ui.initOAuth({
+            clientId: data.oauth.clientId,
+            clientSecret: data.oauth.clientSecret,
+            realm: data.oauth.type,
+            appName: data.spec.info.title,
+            scopeSeparator: ' ',
+            additionalQueryStringParams: {}
+        });
+    }
 
     // Workaround for https://github.com/swagger-api/swagger-ui/issues/3028
     // Adapted from https://github.com/vitalyq/react-trigger-change/blob/master/lib/change.js
@@ -130,24 +127,24 @@ window.onload = () => {
             Object.defineProperty(node, 'value', descriptor);
         }
     }
+
+    function manageWebbyDisplay() {
+        const webby = document.getElementsByClassName('webby')[0];
+        if (!webby) return;
+
+        const web = document.getElementsByClassName('web')[0];
+        webby.classList.add('calm');
+        web.classList.add('calm');
+        webby.addEventListener('click', () => {
+            if (webby.classList.contains('frighten')) {
+                return;
+            }
+            webby.classList.replace('calm', 'frighten');
+            web.classList.replace('calm', 'frighten');
+            setTimeout(() => {
+                webby.classList.replace('frighten', 'calm');
+                web.classList.replace('frighten', 'calm');
+            }, 10000);
+        });
+    }
 };
-
-function manageWebbyDisplay() {
-    const webby = document.getElementsByClassName('webby')[0];
-    if (!webby) return;
-
-    const web = document.getElementsByClassName('web')[0];
-    webby.classList.add('calm');
-    web.classList.add('calm');
-    webby.addEventListener('click', () => {
-        if (webby.classList.contains('frighten')) {
-            return;
-        }
-        webby.classList.replace('calm', 'frighten');
-        web.classList.replace('calm', 'frighten');
-        setTimeout(() => {
-            webby.classList.replace('frighten', 'calm');
-            web.classList.replace('frighten', 'calm');
-        }, 10000);
-    });
-}

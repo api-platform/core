@@ -46,7 +46,6 @@ final class ValidateListener
     /**
      * Validates data returned by the controller if applicable.
      *
-     *
      * @throws ValidationException
      */
     public function onKernelView(GetResponseForControllerResultEvent $event)

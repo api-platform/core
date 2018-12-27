@@ -46,8 +46,7 @@ final class IterableType extends ScalarType
      */
     public function serialize($value)
     {
-        // is_iterable
-        if (!(\is_array($value) || $value instanceof \Traversable)) {
+        if (!is_iterable($value)) {
             throw new Error(sprintf('Iterable cannot represent non iterable value: %s', Utils::printSafe($value)));
         }
 
@@ -59,8 +58,7 @@ final class IterableType extends ScalarType
      */
     public function parseValue($value)
     {
-        // is_iterable
-        if (!(\is_array($value) || $value instanceof \Traversable)) {
+        if (!is_iterable($value)) {
             throw new Error(sprintf('Iterable cannot represent non iterable value: %s', Utils::printSafeJson($value)));
         }
 

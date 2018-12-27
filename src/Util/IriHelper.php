@@ -31,7 +31,6 @@ final class IriHelper
     /**
      * Parses and standardizes the request IRI.
      *
-     *
      * @throws InvalidArgumentException
      */
     public static function parseIri(string $iri, string $pageParameterName): array

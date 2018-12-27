@@ -145,4 +145,25 @@ class RespondListenerTest extends TestCase
         $value = $response->headers->get('Sunset');
         $this->assertEquals(new \DateTimeImmutable('tomorrow'), \DateTime::createFromFormat(DATE_RFC1123, $value));
     }
+
+    public function testSetCustomStatus()
+    {
+        $kernelProphecy = $this->prophesize(HttpKernelInterface::class);
+
+        $request = new Request([], [], ['_api_resource_class' => Dummy::class, '_api_item_operation_name' => 'get', '_api_respond' => true]);
+
+        $event = new GetResponseForControllerResultEvent(
+            $kernelProphecy->reveal(),
+            $request,
+            HttpKernelInterface::MASTER_REQUEST,
+            'bar'
+        );
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
+        $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadata(null, null, null, ['get' => ['status' => Response::HTTP_ACCEPTED]]));
+
+        $listener = new RespondListener($resourceMetadataFactoryProphecy->reveal());
+        $listener->onKernelView($event);
+
+        $this->assertSame(Response::HTTP_ACCEPTED, $event->getResponse()->getStatusCode());
+    }
 }

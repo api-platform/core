@@ -221,7 +221,6 @@ final class ItemNormalizer extends AbstractItemNormalizer
     /**
      * Gets the cache key to use.
      *
-     *
      * @return bool|string
      */
     private function getHalCacheKey(string $format = null, array $context)

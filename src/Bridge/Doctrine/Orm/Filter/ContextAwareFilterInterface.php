@@ -24,7 +24,7 @@ use Doctrine\ORM\QueryBuilder;
 interface ContextAwareFilterInterface extends FilterInterface
 {
     /**
-     * Applies the filter.
+     * {@inheritdoc}
      */
     public function apply(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, string $operationName = null, array $context = []);
 }

@@ -14,12 +14,15 @@ HEADER;
 $finder = PhpCsFixer\Finder::create()
     ->in(__DIR__)
     ->exclude('tests/Fixtures/app/cache')
+    ->exclude('tests/Fixtures/app/var')
 ;
 
 return PhpCsFixer\Config::create()
     ->setRiskyAllowed(true)
     ->setRules([
         '@DoctrineAnnotation' => true,
+        '@PHP71Migration' => true,
+        '@PHP71Migration:risky' => true,
         '@PHPUnit60Migration:risky' => true,
         '@Symfony' => true,
         '@Symfony:risky' => true,
@@ -33,7 +36,7 @@ return PhpCsFixer\Config::create()
         'braces' => [
             'allow_single_line_closure' => true,
         ],
-        'declare_strict_types' => true,
+        'compact_nullable_typehint' => true,
         'doctrine_annotation_array_assignment' => [
             'operator' => '=',
         ],
@@ -44,11 +47,6 @@ return PhpCsFixer\Config::create()
         'header_comment' => [
             'header' => $header,
             'location' => 'after_open',
-        ],
-        'native_function_invocation' => [
-            'include' => [
-                '@compiler_optimized',
-            ],
         ],
         'no_extra_blank_lines' => [
             'tokens' => [
@@ -74,11 +72,14 @@ return PhpCsFixer\Config::create()
             ],
             'sortAlgorithm' => 'alpha',
         ],
+        'php_unit_method_casing' => [
+            'case' => 'camel_case',
+        ],
         'phpdoc_order' => true,
-        // 'simplified_null_return' => true,
+        'phpdoc_trim_consecutive_blank_line_separation' => true,
         'strict_comparison' => true,
         'strict_param' => true,
-        'ternary_to_null_coalescing' => true,
+        'void_return' => false, // BC breaks; to be done in API Platform 3.0
     ])
     ->setFinder($finder)
 ;

@@ -128,8 +128,6 @@ class ExistsFilter extends AbstractContextAwareFilter implements ExistsFilterInt
     /**
      * Determines whether an association is nullable.
      *
-     *
-     *
      * @see https://github.com/doctrine/doctrine2/blob/v2.5.4/lib/Doctrine/ORM/Tools/EntityGenerator.php#L1221-L1246
      */
     private function isAssociationNullable(array $associationMapping): bool

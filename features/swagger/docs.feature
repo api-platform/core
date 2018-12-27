@@ -92,9 +92,13 @@ Feature: Documentation support
     And I send a "GET" request to "/docs"
     Then the response status code should be 200
     And I should see text matching "My Dummy API"
+    And I should see text matching "swagger"
+    And I should see text matching "2.0"
 
   Scenario: Swagger UI is enabled for an arbitrary endpoint
     Given I add "Accept" header equal to "text/html"
     And I send a "GET" request to "/dummies"
     Then the response status code should be 200
     And I should see text matching "My Dummy API"
+    And I should see text matching "swagger"
+    And I should see text matching "2.0"

@@ -9,23 +9,24 @@ jobs:
   include:
     - php: '7.1'
     - php: '7.2'
-    - php: '7.2'
+    - php: '7.3'
+    - php: '7.3'
       env: deps=low
-    - php: '7.2'
+    - php: '7.3'
       env: SYMFONY_DEPRECATIONS_HELPER=0
-    - php: '7.2'
+    - php: '7.3'
       services:
         - postgresql
       before_script:
         - psql -c 'create database api_platform_test;' -U postgres
       env: APP_ENV=postgres
-    - php: '7.2'
+    - php: '7.3'
       services:
         - mysql
       before_script:
         - mysql -e 'CREATE DATABASE api_platform_test;'
       env: APP_ENV=mysql
-    - php: '7.2'
+    - php: '7.3'
       services:
         - mongodb
       env: APP_ENV=mongodb
@@ -62,3 +63,5 @@ script:
     fi
   - tests/Fixtures/app/console api:swagger:export > swagger.json && npx swagger-cli validate swagger.json && rm swagger.json
   - tests/Fixtures/app/console api:swagger:export --yaml > swagger.yaml && npx swagger-cli validate swagger.yaml && rm swagger.yaml
+  - tests/Fixtures/app/console api:openapi:export --spec-version 3 > swagger.json && npx swagger-cli validate swagger.json && rm swagger.json
+  - tests/Fixtures/app/console api:openapi:export --spec-version 3 --yaml > swagger.yaml && npx swagger-cli validate swagger.yaml && rm swagger.yaml

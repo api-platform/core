@@ -136,7 +136,7 @@ final class ApiPlatformParser implements ParserInterface
 
         return [
             $groupsContext => [
-                AbstractNormalizer::GROUPS => array_merge($itemOperationAttribute ?? [], $collectionOperationAttribute ?? []),
+                AbstractNormalizer::GROUPS => array_merge((array) ($itemOperationAttribute ?? []), (array) ($collectionOperationAttribute ?? [])),
             ],
         ];
     }
