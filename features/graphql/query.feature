@@ -211,3 +211,68 @@ Feature: GraphQL query support
       }
     }
     """
+
+  Scenario: Use outputClass instead of resource class through a GraphQL query
+    Given there are 2 dummyDto objects
+    When I send the following GraphQL request:
+    """
+    {
+      dummyDtos {
+        edges {
+          node {
+            baz
+            bat
+          }
+        }
+      }
+    }
+    """
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/json"
+    And print last JSON response
+    And the JSON should be valid according to this schema:
+    """
+    {
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "object",
+          "properties": {
+            "dummyDtos": {
+              "type": "object",
+              "properties": {
+                "edges": {
+                  "type": "array",
+                  "minItems": 2,
+                  "maxItems": 2,
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "node": {
+                        "type": "object",
+                        "properties": {
+                          "baz": {"type": "number"},
+                          "bat": {"type": "string"}
+                        },
+                        "required": ["baz", "bat"],
+                        "additionalProperties": false
+                      }
+                    },
+                    "required": ["node"],
+                    "additionalProperties": false
+                  }
+                }
+              },
+              "required": ["edges"],
+              "additionalProperties": false
+            }
+          },
+          "required": ["dummyDtos"],
+          "additionalProperties": false
+        }
+      },
+      "required": ["data"],
+      "additionalProperties": false
+    }
+    """

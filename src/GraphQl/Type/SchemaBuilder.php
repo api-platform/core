@@ -381,7 +381,7 @@ final class SchemaBuilder implements SchemaBuilderInterface
                     return null;
                 }
 
-                $dtoClass = $resourceMetadata->getAttribute($input ? 'input_class' : 'output_class', $resourceClass);
+                $dtoClass = $resourceMetadata->getAttribute($input ? 'input_class' : 'output_class');
                 if (!empty($dtoClass)) {
                     $resourceClass = $dtoClass;
                 }

@@ -93,6 +93,13 @@ services:
         tags:
             -  { name: 'api_platform.item_data_provider' }
 
+    dummy_dto.data_provider:
+        class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\DataProvider\DummyDtoCollectionDataProvider'
+        public: false
+        arguments: ['@doctrine']
+        tags:
+            -  { name: 'api_platform.collection_data_provider' }
+
     serializable.item_data_provider:
         class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\DataProvider\SerializableItemDataProvider'
         public: false

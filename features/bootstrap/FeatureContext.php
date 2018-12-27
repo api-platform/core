@@ -22,6 +22,7 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyAggregateOffer;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyCar;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyCarColor;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyDate;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyDto;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyFriend;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyGroup;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyImmutableDate;
@@ -341,6 +342,22 @@ final class FeatureContext implements Context, SnippetAcceptingContext
 
             $this->manager->persist($relatedDummy);
             $this->manager->persist($dummy);
+        }
+
+        $this->manager->flush();
+    }
+
+    /**
+     * @Given there are :nb dummyDto objects
+     */
+    public function thereAreDummyDtoObjects(int $nb)
+    {
+        for ($i = 1; $i <= $nb; ++$i) {
+            $dummyDto = new DummyDto();
+            $dummyDto->foo = 'DummyDto foo #'.$i;
+            $dummyDto->bar = $i/3;
+
+            $this->manager->persist($dummyDto);
         }
 
         $this->manager->flush();
