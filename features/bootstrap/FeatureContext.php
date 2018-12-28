@@ -22,7 +22,8 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyAggregateOffer;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyCar;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyCarColor;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyDate;
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyDto;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyDtoNoInput;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyDtoNoOutput;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyFriend;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyGroup;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyImmutableDate;
@@ -348,14 +349,30 @@ final class FeatureContext implements Context, SnippetAcceptingContext
     }
 
     /**
-     * @Given there are :nb dummyDto objects
+     * @Given there are :nb dummyDtoNoInput objects
      */
-    public function thereAreDummyDtoObjects(int $nb)
+    public function thereAreDummyDtoNoInputObjects(int $nb)
     {
         for ($i = 1; $i <= $nb; ++$i) {
-            $dummyDto = new DummyDto();
-            $dummyDto->foo = 'DummyDto foo #'.$i;
-            $dummyDto->bar = $i / 3;
+            $dummyDto = new DummyDtoNoInput();
+            $dummyDto->lorem = 'DummyDtoNoInput foo #'.$i;
+            $dummyDto->ipsum = round($i / 3, 2);
+
+            $this->manager->persist($dummyDto);
+        }
+
+        $this->manager->flush();
+    }
+
+    /**
+     * @Given there are :nb dummyDtoNoOutput objects
+     */
+    public function thereAreDummyDtoNoOutputObjects(int $nb)
+    {
+        for ($i = 1; $i <= $nb; ++$i) {
+            $dummyDto = new DummyDtoNoOutput();
+            $dummyDto->lorem = 'DummyDtoNoOutput foo #'.$i;
+            $dummyDto->ipsum = $i / 3;
 
             $this->manager->persist($dummyDto);
         }

@@ -25,12 +25,12 @@ use Doctrine\ORM\Mapping as ORM;
  *
  * @ApiResource(
  *     attributes={
- *         "input_class"=InputDto::class,
+ *         "input_class"=false,
  *         "output_class"=OutputDto::class
  *     }
  * )
  */
-class DummyDto
+class DummyDtoNoInput
 {
     /**
      * @var int The id
@@ -46,14 +46,14 @@ class DummyDto
      *
      * @ORM\Column
      */
-    public $foo;
+    public $lorem;
 
     /**
      * @var float
      *
      * @ORM\Column(type="float")
      */
-    public $bar;
+    public $ipsum;
 
     public function getId()
     {
