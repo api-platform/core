@@ -67,6 +67,16 @@ final class TraceableChainDataPersister implements ContextAwareDataPersisterInte
         }
     }
 
+    /**
+     * {@inheritdoc}
+     */
+    public function removeElementFromCollection($data, array $context = [])
+    {
+        if ($match = $this->tracePersisters($data, $context)) {
+            return $match->removeElementFromCollection($data, $context);
+        }
+    }
+
     private function tracePersisters($data, array $context = [])
     {
         $match = null;

@@ -97,6 +97,13 @@ final class ReadListener
                 }
 
                 $data = $this->getSubresourceData($identifiers, $attributes, $context);
+
+                \array_pop($identifiers);
+                $parentData = $this->itemDataProvider->getItem($attributes['subresource_context']['identifiers'][0][1], $identifiers, null, $context);
+                if (null === $parentData) {
+                    throw new NotFoundHttpException('Not Found');
+                }
+                $request->attributes->set('parentData', $parentData);
             }
         } catch (InvalidIdentifierException $e) {
             throw new NotFoundHttpException('Not found, because of an invalid identifier configuration', $e);

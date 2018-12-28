@@ -70,4 +70,18 @@ final class ChainDataPersister implements ContextAwareDataPersisterInterface
             }
         }
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function removeElementFromCollection($data, array $context = [])
+    {
+        foreach ($this->persisters as $persister) {
+            if ($persister->supports($data, $context)) {
+                $persister->removeElementFromCollection($data, $context);
+
+                return;
+            }
+        }
+    }
 }

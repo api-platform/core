@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Operation\Factory;
 
+use ApiPlatform\Core\Bridge\Symfony\Routing\ApiLoader;
 use ApiPlatform\Core\Bridge\Symfony\Routing\RouteNameGenerator;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
@@ -56,8 +57,8 @@ final class SubresourceOperationFactory implements SubresourceOperationFactoryIn
      * Handles subresource operations recursively and declare their corresponding routes.
      *
      * @param string $rootResourceClass null on the first iteration, it then keeps track of the origin resource class
-     * @param array  $parentOperation   the previous call operation
-     * @param int    $depth             the number of visited
+     * @param array  $parentOperation the previous call operation
+     * @param int    $depth the number of visited
      * @param int    $maxDepth
      */
     private function computeSubresourceOperations(string $resourceClass, array &$tree, string $rootResourceClass = null, array $parentOperation = null, array $visited = [], int $depth = 0, int $maxDepth = null): void
@@ -99,10 +100,10 @@ final class SubresourceOperationFactory implements SubresourceOperationFactoryIn
             }
 
             $rootResourceMetadata = $this->resourceMetadataFactory->create($rootResourceClass);
-            $operationName = 'get';
             $operation = [
                 'property' => $property,
                 'collection' => $subresource->isCollection(),
+                'method' => 'GET',
                 'resource_class' => $subresourceClass,
                 'shortNames' => [$subresourceMetadata->getShortName()],
             ];
@@ -113,7 +114,7 @@ final class SubresourceOperationFactory implements SubresourceOperationFactoryIn
                 $operation['operation_name'] = sprintf(
                     '%s_%s%s',
                     RouteNameGenerator::inflector($operation['property'], $operation['collection'] ?? false),
-                    $operationName,
+                    'get',
                     self::SUBRESOURCE_SUFFIX
                 );
 
@@ -162,7 +163,7 @@ final class SubresourceOperationFactory implements SubresourceOperationFactoryIn
                 if (isset($subresourceOperation['path'])) {
                     $operation['path'] = $subresourceOperation['path'];
                 } else {
-                    $operation['path'] = str_replace(self::FORMAT_SUFFIX, '', (string) $parentOperation['path']);
+                    $operation['path'] = str_replace(self::FORMAT_SUFFIX, '', (string)$parentOperation['path']);
 
                     if ($parentOperation['collection']) {
                         [$key] = end($operation['identifiers']);
@@ -182,6 +183,39 @@ final class SubresourceOperationFactory implements SubresourceOperationFactoryIn
             }
 
             $tree[$operation['route_name']] = $operation;
+
+            if (null === $parentOperation && $operation['collection']) {
+                foreach (['post', 'delete'] as $method) {
+                    if (!\call_user_func([$subresource, 'is'.ucfirst($method).'Enabled'])) {
+                        continue;
+                    }
+
+                    $operationName = sprintf(
+                        '%s_item_%s%s',
+                        RouteNameGenerator::inflector($operation['property'], $operation['collection'] ?? false),
+                        $method,
+                        self::SUBRESOURCE_SUFFIX
+                    );
+                    $routeName = sprintf(
+                        '%s%s_%s',
+                        RouteNameGenerator::ROUTE_NAME_PREFIX,
+                        RouteNameGenerator::inflector($rootResourceMetadata->getShortName()),
+                        $operationName
+                    );
+                    $tree[$routeName] = [
+                            'property' => $operation['identifiers'][0][0],
+                            'collection' => false,
+                            'operation_name' => $operationName,
+                            'route_name' => $routeName,
+                            'method' => strtoupper($method),
+                            'controller' => ApiLoader::DEFAULT_ACTION_PATTERN.$method.self::SUBRESOURCE_SUFFIX,
+                        ] + $operation;
+                    if ('delete' === $method) {
+                        $tree[$routeName]['path'] = \str_ireplace(self::FORMAT_SUFFIX, sprintf('/{%s}%s', $operation['property'], self::FORMAT_SUFFIX), $tree[$routeName]['path']);
+                        $tree[$routeName]['identifiers'][] = [$operation['property'], $subresource->getResourceClass(), true];
+                    }
+                }
+            }
 
             $this->computeSubresourceOperations($subresourceClass, $tree, $rootResourceClass, $operation, $visited + [$visiting => true], ++$depth, $maxDepth);
         }

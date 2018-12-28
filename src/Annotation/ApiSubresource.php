@@ -20,6 +20,11 @@ namespace ApiPlatform\Core\Annotation;
  *
  * @Annotation
  * @Target({"METHOD", "PROPERTY"})
+ * @Attributes(
+ *     @Attribute("maxDepth", type="int"),
+ *     @Attribute("postEnabled", type="bool"),
+ *     @Attribute("deleteEnabled", type="bool")
+ * )
  */
 final class ApiSubresource
 {
@@ -27,4 +32,14 @@ final class ApiSubresource
      * @var int
      */
     public $maxDepth;
+
+    /**
+     * @var bool
+     */
+    public $postEnabled = true;
+
+    /**
+     * @var bool
+     */
+    public $deleteEnabled = true;
 }

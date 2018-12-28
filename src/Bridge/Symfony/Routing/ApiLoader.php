@@ -135,7 +135,7 @@ final class ApiLoader extends Loader
                     $operation['options'] ?? [],
                     $operation['host'] ?? '',
                     $operation['schemes'] ?? [],
-                    ['GET'],
+                    [$operation['method'] ?? 'GET'],
                     $operation['condition'] ?? ''
                 ));
             }

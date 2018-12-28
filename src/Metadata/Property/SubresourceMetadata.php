@@ -23,12 +23,16 @@ final class SubresourceMetadata
     private $resourceClass;
     private $collection;
     private $maxDepth;
+    private $postEnabled;
+    private $deleteEnabled;
 
-    public function __construct(string $resourceClass, bool $collection = false, int $maxDepth = null)
+    public function __construct(string $resourceClass, bool $collection = false, int $maxDepth = null, bool $postEnabled = true, bool $deleteEnabled = true)
     {
         $this->resourceClass = $resourceClass;
         $this->collection = $collection;
         $this->maxDepth = $maxDepth;
+        $this->postEnabled = $postEnabled;
+        $this->deleteEnabled = $deleteEnabled;
     }
 
     public function getResourceClass(): string
@@ -60,5 +64,15 @@ final class SubresourceMetadata
     public function getMaxDepth(): ?int
     {
         return $this->maxDepth;
+    }
+
+    public function isPostEnabled(): bool
+    {
+        return $this->postEnabled;
+    }
+
+    public function isDeleteEnabled(): bool
+    {
+        return $this->deleteEnabled;
     }
 }

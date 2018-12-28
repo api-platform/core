@@ -236,6 +236,8 @@
         <service id="api_platform.action.put_item" alias="api_platform.action.placeholder" public="true" />
         <service id="api_platform.action.delete_item" alias="api_platform.action.placeholder" public="true" />
         <service id="api_platform.action.get_subresource" alias="api_platform.action.placeholder" public="true" />
+        <service id="api_platform.action.post_subresource" alias="api_platform.action.placeholder" public="true" />
+        <service id="api_platform.action.delete_subresource" alias="api_platform.action.placeholder" public="true" />
 
         <service id="api_platform.action.entrypoint" class="ApiPlatform\Core\Action\EntrypointAction" public="true">
             <argument type="service" id="api_platform.metadata.resource.name_collection_factory" />

@@ -86,13 +86,12 @@ final class AnnotationSubresourceMetadataFactory implements PropertyMetadataFact
         }
         $isCollection = $type->isCollection();
         $resourceClass = $isCollection && ($collectionValueType = $type->getCollectionValueType()) ? $collectionValueType->getClassName() : $type->getClassName();
-        $maxDepth = $annotation->maxDepth;
         // @ApiSubresource is on the class identifier (/collection/{id}/subcollection/{subcollectionId})
         if (null === $resourceClass) {
             $resourceClass = $originResourceClass;
             $isCollection = false;
         }
 
-        return $propertyMetadata->withSubresource(new SubresourceMetadata($resourceClass, $isCollection, $maxDepth));
+        return $propertyMetadata->withSubresource(new SubresourceMetadata($resourceClass, $isCollection, $annotation->maxDepth, $annotation->postEnabled, $annotation->deleteEnabled));
     }
 }

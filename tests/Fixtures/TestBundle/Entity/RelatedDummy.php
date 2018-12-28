@@ -43,7 +43,7 @@ class RelatedDummy extends ParentDummy
      * @var string A name
      *
      * @ORM\Column(nullable=true)
-     * @Groups({"friends"})
+     * @Groups({"barcelona", "chicago", "friends"})
      */
     public $name;
 

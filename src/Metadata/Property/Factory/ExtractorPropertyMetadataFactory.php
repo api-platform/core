@@ -133,7 +133,6 @@ final class ExtractorPropertyMetadataFactory implements PropertyMetadataFactoryI
         }
 
         $type = $propertyMetadata->getType();
-        $maxDepth = \is_array($subresource) ? $subresource['maxDepth'] ?? null : null;
 
         if (null !== $type) {
             $isCollection = $type->isCollection();
@@ -145,6 +144,12 @@ final class ExtractorPropertyMetadataFactory implements PropertyMetadataFactoryI
             return null;
         }
 
-        return new SubresourceMetadata($resourceClass, $isCollection, $maxDepth);
+        return new SubresourceMetadata(
+            $resourceClass,
+            $isCollection,
+            \is_array($subresource) ? $subresource['maxDepth'] ?? null : null,
+            \is_array($subresource) ? $subresource['postEnabled'] ?? true : true,
+            \is_array($subresource) ? $subresource['deleteEnabled'] ?? true : true
+        );
     }
 }

@@ -94,12 +94,14 @@ final class DeserializeListener
             $context[AbstractNormalizer::OBJECT_TO_POPULATE] = $data;
         }
 
+        $context['api_allow_update'] = \array_key_exists('subresource_context', $attributes);
         $request->attributes->set(
             'data',
             $this->serializer->deserialize(
                 $requestContent, $context['resource_class'], $format, $context
             )
         );
+        $a = 'b';
     }
 
     /**

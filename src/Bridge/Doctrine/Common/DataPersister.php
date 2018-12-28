@@ -18,6 +18,8 @@ use ApiPlatform\Core\Util\ClassInfoTrait;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Persistence\ObjectManager as DoctrineObjectManager;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
+use Symfony\Component\PropertyAccess\PropertyAccess;
+use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 /**
  * Data persister for Doctrine.
@@ -29,10 +31,12 @@ final class DataPersister implements ContextAwareDataPersisterInterface
     use ClassInfoTrait;
 
     private $managerRegistry;
+    private $propertyAccessor;
 
-    public function __construct(ManagerRegistry $managerRegistry)
+    public function __construct(ManagerRegistry $managerRegistry, PropertyAccessorInterface $propertyAccessor = null)
     {
         $this->managerRegistry = $managerRegistry;
+        $this->propertyAccessor = $propertyAccessor ?? PropertyAccess::createPropertyAccessor();
     }
 
     /**
@@ -73,6 +77,19 @@ final class DataPersister implements ContextAwareDataPersisterInterface
 
         $manager->remove($data);
         $manager->flush();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function removeElementFromCollection($data, array $context = [])
+    {
+        if (!$manager = $this->getManager($data)) {
+            return;
+        }
+
+        $context['parentData']->removeRelatedDummy($data);
+        $this->persist($context['parentData'], $context);
     }
 
     /**

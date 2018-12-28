@@ -34,4 +34,9 @@ interface ContextAwareDataPersisterInterface extends DataPersisterInterface
      * {@inheritdoc}
      */
     public function remove($data, array $context = []);
+
+    /**
+     * {@inheritdoc}
+     */
+    public function removeElementFromCollection($data, array $context = []);
 }

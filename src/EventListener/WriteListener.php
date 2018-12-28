@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\EventListener;
 
 use ApiPlatform\Core\Api\IriConverterInterface;
+use ApiPlatform\Core\DataPersister\ContextAwareDataPersisterInterface;
 use ApiPlatform\Core\DataPersister\DataPersisterInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Util\RequestAttributesExtractor;
@@ -31,7 +32,7 @@ final class WriteListener
     private $iriConverter;
     private $resourceMetadataFactory;
 
-    public function __construct(DataPersisterInterface $dataPersister, IriConverterInterface $iriConverter = null, ResourceMetadataFactoryInterface $resourceMetadataFactory = null)
+    public function __construct(ContextAwareDataPersisterInterface $dataPersister, IriConverterInterface $iriConverter = null, ResourceMetadataFactoryInterface $resourceMetadataFactory = null)
     {
         $this->dataPersister = $dataPersister;
         $this->iriConverter = $iriConverter;
@@ -79,9 +80,23 @@ final class WriteListener
                 if ($hasOutput) {
                     $request->attributes->set('_api_write_item_iri', $this->iriConverter->getIriFromItem($controllerResult));
                 }
-            break;
+
+                // In case of POST request on a subresource, add data to root object collection association
+                if ($request->attributes->has('parentData')) {
+                    $request->attributes->get('parentData')->addRelatedDummy($request->attributes->get('data'));
+                    $this->dataPersister->persist($request->attributes->get('parentData'));
+                }
+                break;
             case 'DELETE':
-                $this->dataPersister->remove($controllerResult);
+                // In case of POST request on a subresource, add data to root object collection association
+                if ($request->attributes->has('parentData')) {
+                    $this->dataPersister->removeElementFromCollection($controllerResult, [
+                        'parentData' => $request->attributes->get('parentData'),
+                        'collection' => $attributes,
+                    ]);
+                } else {
+                    $this->dataPersister->remove($controllerResult);
+                }
                 $event->setControllerResult(null);
                 break;
         }

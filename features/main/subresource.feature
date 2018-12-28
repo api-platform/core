@@ -269,6 +269,273 @@ Feature: Subresource support
     }
     """
 
+  @createSchema
+  Scenario: Create an entry on a subresource collection
+    Given there is a dummy object with a fourth level relation
+    When I add "Content-Type" header equal to "application/ld+json"
+    And I send a "POST" request to "/dummies/1/related_dummies" with body:
+    """
+    {
+      "name": "New related dummy"
+    }
+    """
+    Then the response status code should be 201
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+    Then I send a "GET" request to "/dummies/1/related_dummies"
+    And the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+    And the JSON should be equal to:
+    """
+    {
+      "@context": "/contexts/RelatedDummy",
+      "@id": "/dummies/1/related_dummies",
+      "@type": "hydra:Collection",
+      "hydra:member": [
+        {
+          "@id": "/related_dummies/1",
+          "@type": "https://schema.org/Product",
+          "id": 1,
+          "name": "Hello",
+          "symfony": "symfony",
+          "dummyDate": null,
+          "thirdLevel": {
+            "@id": "/third_levels/1",
+            "@type": "ThirdLevel",
+            "fourthLevel": "/fourth_levels/1"
+          },
+          "relatedToDummyFriend": [],
+          "dummyBoolean": null,
+          "embeddedDummy": [],
+          "age": null
+        },
+        {
+          "@id": "/related_dummies/2",
+          "@type": "https://schema.org/Product",
+          "id": 2,
+          "name": null,
+          "symfony": "symfony",
+          "dummyDate": null,
+          "thirdLevel": {
+            "@id": "/third_levels/1",
+            "@type": "ThirdLevel",
+            "fourthLevel": "/fourth_levels/1"
+          },
+          "relatedToDummyFriend": [],
+          "dummyBoolean": null,
+          "embeddedDummy": [],
+          "age": null
+        },
+        {
+          "@id": "/related_dummies/3",
+          "@type": "https://schema.org/Product",
+          "id": 3,
+          "name": "New related dummy",
+          "symfony": "symfony",
+          "dummyDate": null,
+          "thirdLevel": null,
+          "relatedToDummyFriend": [],
+          "dummyBoolean": null,
+          "embeddedDummy": [],
+          "age": null
+        }
+      ],
+      "hydra:totalItems": 3,
+      "hydra:search": {
+        "@type": "hydra:IriTemplate",
+        "hydra:template": "/dummies/1/related_dummies{?relatedToDummyFriend.dummyFriend,relatedToDummyFriend.dummyFriend[],name}",
+        "hydra:variableRepresentation": "BasicRepresentation",
+        "hydra:mapping": [
+          {
+            "@type": "IriTemplateMapping",
+            "variable": "relatedToDummyFriend.dummyFriend",
+            "property": "relatedToDummyFriend.dummyFriend",
+            "required": false
+          },
+          {
+            "@type": "IriTemplateMapping",
+            "variable": "relatedToDummyFriend.dummyFriend[]",
+            "property": "relatedToDummyFriend.dummyFriend",
+            "required": false
+          },
+          {
+            "@type": "IriTemplateMapping",
+            "variable": "name",
+            "property": "name",
+            "required": false
+          }
+        ]
+      }
+    }
+    """
+
+  @createSchema
+  Scenario: Add an existing entry on a subresource collection
+    Given there is a dummy object with a fourth level relation
+    And there is a RelatedDummy with 0 friends
+    When I add "Content-Type" header equal to "application/ld+json"
+    And I send a "POST" request to "/dummies/1/related_dummies" with body:
+    """
+    {
+      "@id": "/related_dummies/3"
+    }
+    """
+    Then the response status code should be 201
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+    Then I send a "GET" request to "/dummies/1/related_dummies"
+    And the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+    And the JSON should be equal to:
+    """
+    {
+      "@context": "/contexts/RelatedDummy",
+      "@id": "/dummies/1/related_dummies",
+      "@type": "hydra:Collection",
+      "hydra:member": [
+        {
+          "@id": "/related_dummies/1",
+          "@type": "https://schema.org/Product",
+          "id": 1,
+          "name": "Hello",
+          "symfony": "symfony",
+          "dummyDate": null,
+          "thirdLevel": {
+            "@id": "/third_levels/1",
+            "@type": "ThirdLevel",
+            "fourthLevel": "/fourth_levels/1"
+          },
+          "relatedToDummyFriend": [],
+          "dummyBoolean": null,
+          "embeddedDummy": [],
+          "age": null
+        },
+        {
+          "@id": "/related_dummies/2",
+          "@type": "https://schema.org/Product",
+          "id": 2,
+          "name": null,
+          "symfony": "symfony",
+          "dummyDate": null,
+          "thirdLevel": {
+            "@id": "/third_levels/1",
+            "@type": "ThirdLevel",
+            "fourthLevel": "/fourth_levels/1"
+          },
+          "relatedToDummyFriend": [],
+          "dummyBoolean": null,
+          "embeddedDummy": [],
+          "age": null
+        },
+        {
+          "@id": "/related_dummies/3",
+          "@type": "https://schema.org/Product",
+          "id": 3,
+          "name": "RelatedDummy with friends",
+          "symfony": "symfony",
+          "dummyDate": null,
+          "thirdLevel": null,
+          "relatedToDummyFriend": [],
+          "dummyBoolean": null,
+          "embeddedDummy": [],
+          "age": null
+        }
+      ],
+      "hydra:totalItems": 3,
+      "hydra:search": {
+        "@type": "hydra:IriTemplate",
+        "hydra:template": "/dummies/1/related_dummies{?relatedToDummyFriend.dummyFriend,relatedToDummyFriend.dummyFriend[],name}",
+        "hydra:variableRepresentation": "BasicRepresentation",
+        "hydra:mapping": [
+          {
+            "@type": "IriTemplateMapping",
+            "variable": "relatedToDummyFriend.dummyFriend",
+            "property": "relatedToDummyFriend.dummyFriend",
+            "required": false
+          },
+          {
+            "@type": "IriTemplateMapping",
+            "variable": "relatedToDummyFriend.dummyFriend[]",
+            "property": "relatedToDummyFriend.dummyFriend",
+            "required": false
+          },
+          {
+            "@type": "IriTemplateMapping",
+            "variable": "name",
+            "property": "name",
+            "required": false
+          }
+        ]
+      }
+    }
+    """
+
+  @createSchema
+  Scenario: Delete an entry on a subresource collection
+    Given there is a dummy object with a fourth level relation
+    When I send a "DELETE" request to "/dummies/1/related_dummies/2"
+    Then the response status code should be 204
+    And the response should be empty
+    And I send a "GET" request to "/dummies/1/related_dummies"
+    And the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+    And the JSON should be equal to:
+    """
+    {
+      "@context": "/contexts/RelatedDummy",
+      "@id": "/dummies/1/related_dummies",
+      "@type": "hydra:Collection",
+      "hydra:member": [
+        {
+          "@id": "/related_dummies/1",
+          "@type": "https://schema.org/Product",
+          "id": 1,
+          "name": "Hello",
+          "symfony": "symfony",
+          "dummyDate": null,
+          "thirdLevel": {
+            "@id": "/third_levels/1",
+            "@type": "ThirdLevel",
+            "fourthLevel": "/fourth_levels/1"
+          },
+          "relatedToDummyFriend": [],
+          "dummyBoolean": null,
+          "embeddedDummy": [],
+          "age": null
+        }
+      ],
+      "hydra:totalItems": 1,
+      "hydra:search": {
+        "@type": "hydra:IriTemplate",
+        "hydra:template": "/dummies/1/related_dummies{?relatedToDummyFriend.dummyFriend,relatedToDummyFriend.dummyFriend[],name}",
+        "hydra:variableRepresentation": "BasicRepresentation",
+        "hydra:mapping": [
+          {
+            "@type": "IriTemplateMapping",
+            "variable": "relatedToDummyFriend.dummyFriend",
+            "property": "relatedToDummyFriend.dummyFriend",
+            "required": false
+          },
+          {
+            "@type": "IriTemplateMapping",
+            "variable": "relatedToDummyFriend.dummyFriend[]",
+            "property": "relatedToDummyFriend.dummyFriend",
+            "required": false
+          },
+          {
+            "@type": "IriTemplateMapping",
+            "variable": "name",
+            "property": "name",
+            "required": false
+          }
+        ]
+      }
+    }
+    """
+
   Scenario: Get offers subresource from aggregate offers subresource
     Given I have a product with offers
     When I send a "GET" request to "/dummy_products/2/offers/1/offers"
