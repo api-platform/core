@@ -42,7 +42,7 @@ class MaxDepthDummy
     public $name;
 
     /**
-     * @ODM\ReferenceOne(targetDocument="MaxDepthDummy", cascade={"persist"})
+     * @ODM\ReferenceOne(targetDocument=MaxDepthDummy::class, cascade={"persist"})
      * @Groups({"default"})
      * @MaxDepth(1)
      */

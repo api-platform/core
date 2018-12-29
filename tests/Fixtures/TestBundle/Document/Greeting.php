@@ -33,12 +33,12 @@ class Greeting
     public $message = '';
 
     /**
-     * @ODM\ReferenceOne(targetDocument="Person", inversedBy="sentGreetings", storeAs="id")
+     * @ODM\ReferenceOne(targetDocument=Person::class, inversedBy="sentGreetings", storeAs="id")
      */
     public $sender;
 
     /**
-     * @ODM\ReferenceOne(targetDocument="Person")
+     * @ODM\ReferenceOne(targetDocument=Person::class)
      */
     public $recipient;
 

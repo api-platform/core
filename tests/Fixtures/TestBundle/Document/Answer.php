@@ -42,13 +42,13 @@ class Answer
     private $content;
 
     /**
-     * @ODM\ReferenceOne(targetDocument="Question", mappedBy="answer")
+     * @ODM\ReferenceOne(targetDocument=Question::class, mappedBy="answer")
      * @Serializer\Groups({"foobar"})
      */
     private $question;
 
     /**
-     * @ODM\ReferenceMany(targetDocument="Question", mappedBy="answer")
+     * @ODM\ReferenceMany(targetDocument=Question::class, mappedBy="answer")
      * @Serializer\Groups({"foobar"})
      * @ApiSubresource
      */

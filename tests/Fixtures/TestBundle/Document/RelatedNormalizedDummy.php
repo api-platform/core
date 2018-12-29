@@ -54,7 +54,7 @@ class RelatedNormalizedDummy
     /**
      * @var ArrayCollection Several Normalized dummies
      *
-     * @ODM\ReferenceMany(targetDocument="CustomNormalizedDummy")
+     * @ODM\ReferenceMany(targetDocument=CustomNormalizedDummy::class)
      * @Groups({"related_output", "related_input"})
      */
     public $customNormalizedDummy;

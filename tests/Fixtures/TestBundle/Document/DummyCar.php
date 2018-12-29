@@ -51,7 +51,7 @@ class DummyCar
     /**
      * @var mixed Something else
      *
-     * @ODM\ReferenceMany(targetDocument="DummyCarColor", mappedBy="car")
+     * @ODM\ReferenceMany(targetDocument=DummyCarColor::class, mappedBy="car")
      *
      * @Serializer\Groups({"colors"})
      * @ApiFilter(SearchFilter::class, properties={"colors.prop"="ipartial"})

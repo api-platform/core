@@ -53,7 +53,7 @@ class ThirdLevel
 
     /**
      * @ApiSubresource
-     * @ODM\ReferenceOne(targetDocument="FourthLevel", cascade={"persist"}, storeAs="id")
+     * @ODM\ReferenceOne(targetDocument=FourthLevel::class, cascade={"persist"}, storeAs="id")
      * @Groups({"barcelona", "chicago", "friends"})
      */
     public $fourthLevel;

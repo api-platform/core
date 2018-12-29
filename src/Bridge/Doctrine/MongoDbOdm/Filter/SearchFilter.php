@@ -20,6 +20,7 @@ use ApiPlatform\Core\Exception\InvalidArgumentException;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ODM\MongoDB\Aggregation\Builder;
 use Doctrine\ODM\MongoDB\Types\Type as MongoDbType;
+use MongoDB\BSON\Regex;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
@@ -145,45 +146,25 @@ final class SearchFilter extends AbstractContextAwareFilter implements SearchFil
      *
      * @throws InvalidArgumentException If strategy does not exist
      *
-     * @return \MongoRegex|string
+     * @return Regex|string
      */
     private function addEqualityMatchStrategy(string $strategy, $value, bool $caseSensitive)
     {
-        $addCaseFlag = $this->addCaseFlag($caseSensitive);
-
         switch ($strategy) {
             case null:
             case self::STRATEGY_EXACT:
-                return $caseSensitive ? $value : new \MongoRegex($addCaseFlag("/^$value$/"));
+                return $caseSensitive ? $value : new Regex("^$value$", $caseSensitive ? '' : 'i');
             case self::STRATEGY_PARTIAL:
-                return new \MongoRegex($addCaseFlag("/$value/"));
+                return new Regex($value, $caseSensitive ? '' : 'i');
             case self::STRATEGY_START:
-                return new \MongoRegex($addCaseFlag("/^$value/"));
+                return new Regex("^$value", $caseSensitive ? '' : 'i');
             case self::STRATEGY_END:
-                return new \MongoRegex($addCaseFlag("/$value$/"));
+                return new Regex("$value$", $caseSensitive ? '' : 'i');
             case self::STRATEGY_WORD_START:
-                return new \MongoRegex($addCaseFlag("/(^$value.*|.*\s$value.*)/"));
+                return new Regex("(^$value.*|.*\s$value.*)", $caseSensitive ? '' : 'i');
             default:
                 throw new InvalidArgumentException(sprintf('strategy %s does not exist.', $strategy));
         }
-    }
-
-    /**
-     * Create a function that will add a flag to a Mongo regular expression according
-     * to the specified case sensitivity.
-     *
-     * For example, "/value/" will be returned as "/value/i" when $caseSensitive
-     * is false.
-     */
-    private function addCaseFlag(bool $caseSensitive): \Closure
-    {
-        return function (string $expr) use ($caseSensitive): string {
-            if ($caseSensitive) {
-                return $expr;
-            }
-
-            return "{$expr}i";
-        };
     }
 
     /**

@@ -41,7 +41,7 @@ class Person
     public $name;
 
     /**
-     * @ODM\ReferenceMany(targetDocument="PersonToPet", mappedBy="person")
+     * @ODM\ReferenceMany(targetDocument=PersonToPet::class, mappedBy="person")
      * @Groups({"people.pets"})
      *
      * @var ArrayCollection
@@ -50,7 +50,7 @@ class Person
 
     /**
      * @ApiSubresource
-     * @ODM\ReferenceMany(targetDocument="Greeting", mappedBy="sender")
+     * @ODM\ReferenceMany(targetDocument=Greeting::class, mappedBy="sender")
      */
     public $sentGreetings;
 

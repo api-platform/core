@@ -36,7 +36,7 @@ abstract class VoDummyVehicle
     /**
      * @var VoDummyInsuranceCompany
      *
-     * @ODM\ReferenceOne(targetDocument="VoDummyInsuranceCompany", cascade={"persist"})
+     * @ODM\ReferenceOne(targetDocument=VoDummyInsuranceCompany::class, cascade={"persist"})
      * @Groups({"write"})
      */
     private $insuranceCompany;
@@ -44,7 +44,7 @@ abstract class VoDummyVehicle
     /**
      * @var VoDummyDriver[]|Collection
      *
-     * @ODM\ReferenceMany(targetDocument="VoDummyDriver", cascade={"persist"})
+     * @ODM\ReferenceMany(targetDocument=VoDummyDriver::class, cascade={"persist"})
      * @Groups({"write"})
      */
     private $drivers;

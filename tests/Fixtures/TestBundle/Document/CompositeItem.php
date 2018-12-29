@@ -37,7 +37,7 @@ class CompositeItem
     private $field1;
 
     /**
-     * @ODM\ReferenceMany(targetDocument="CompositeRelation", mappedBy="compositeItem")
+     * @ODM\ReferenceMany(targetDocument=CompositeRelation::class, mappedBy="compositeItem")
      * @Groups({"default"})
      */
     private $compositeValues;

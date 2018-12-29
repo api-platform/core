@@ -41,7 +41,7 @@ class DummyTableInheritanceRelated
     /**
      * @var ArrayCollection Related children
      *
-     * @ODM\ReferenceMany(targetDocument="DummyTableInheritance", mappedBy="parent")
+     * @ODM\ReferenceMany(targetDocument=DummyTableInheritance::class, mappedBy="parent")
      *
      * @Groups({"default"})
      */

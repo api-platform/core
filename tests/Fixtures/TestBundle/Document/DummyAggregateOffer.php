@@ -40,14 +40,14 @@ class DummyAggregateOffer
      * @var ArrayCollection
      *
      * @ApiSubresource
-     * @ODM\ReferenceMany(targetDocument="DummyOffer", mappedBy="aggregate", cascade={"persist"})
+     * @ODM\ReferenceMany(targetDocument=DummyOffer::class, mappedBy="aggregate", cascade={"persist"})
      */
     private $offers;
 
     /**
      * @var DummyProduct The dummy product
      *
-     * @ODM\ReferenceOne(targetDocument="DummyProduct", inversedBy="offers", storeAs="id")
+     * @ODM\ReferenceOne(targetDocument=DummyProduct::class, inversedBy="offers", storeAs="id")
      */
     private $product;
 

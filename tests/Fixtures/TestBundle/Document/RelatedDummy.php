@@ -63,14 +63,14 @@ class RelatedDummy extends ParentDummy
 
     /**
      * @ApiSubresource
-     * @ODM\ReferenceOne(targetDocument="ThirdLevel", cascade={"persist"}, nullable=true, storeAs="id")
+     * @ODM\ReferenceOne(targetDocument=ThirdLevel::class, cascade={"persist"}, nullable=true, storeAs="id")
      * @Groups({"barcelona", "chicago", "friends"})
      */
     public $thirdLevel;
 
     /**
      * @ApiSubresource
-     * @ODM\ReferenceMany(targetDocument="RelatedToDummyFriend", cascade={"persist"}, mappedBy="relatedDummy", storeAs="id")
+     * @ODM\ReferenceMany(targetDocument=RelatedToDummyFriend::class, cascade={"persist"}, mappedBy="relatedDummy", storeAs="id")
      * @Groups({"fakemanytomany", "friends"})
      */
     public $relatedToDummyFriend;
@@ -92,7 +92,7 @@ class RelatedDummy extends ParentDummy
     /**
      * @var EmbeddableDummy
      *
-     * @ODM\EmbedOne(targetDocument="EmbeddableDummy")
+     * @ODM\EmbedOne(targetDocument=EmbeddableDummy::class)
      * @Groups({"friends"})
      */
     public $embeddedDummy;

@@ -44,7 +44,7 @@ class DummyOffer
     /**
      * @var DummyAggregateOffer The dummy aggregate offer value
      *
-     * @ODM\ReferenceOne(targetDocument="DummyAggregateOffer", inversedBy="offers", storeAs="id")
+     * @ODM\ReferenceOne(targetDocument=DummyAggregateOffer::class, inversedBy="offers", storeAs="id")
      */
     private $aggregate;
 

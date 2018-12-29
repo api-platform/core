@@ -16,6 +16,7 @@ namespace ApiPlatform\Core\Tests\Bridge\Doctrine\MongoDbOdm\Filter;
 use ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Filter\DateFilter;
 use ApiPlatform\Core\Test\DoctrineMongoDbOdmFilterTestCase;
 use ApiPlatform\Core\Tests\Bridge\Doctrine\Common\Filter\DateFilterTestTrait;
+use MongoDB\BSON\UTCDateTime;
 
 /**
  * @author Alan Poulain <contact@alanpoulain.eu>
@@ -38,7 +39,7 @@ class DateFilterTest extends DoctrineMongoDbOdmFilterTestCase
                                 '$and' => [
                                     [
                                         'dummyDate' => [
-                                            '$gte' => new \MongoDate(1428192000, 0),
+                                            '$gte' => new UTCDateTime(1428192000000),
                                         ],
                                     ],
                                 ],
@@ -53,7 +54,7 @@ class DateFilterTest extends DoctrineMongoDbOdmFilterTestCase
                                 '$and' => [
                                     [
                                         'dummyDate' => [
-                                            '$gt' => new \MongoDate(1428192000, 0),
+                                            '$gt' => new UTCDateTime(1428192000000),
                                         ],
                                     ],
                                 ],
@@ -68,7 +69,7 @@ class DateFilterTest extends DoctrineMongoDbOdmFilterTestCase
                                 '$and' => [
                                     [
                                         'dummyDate' => [
-                                            '$gte' => new \MongoDate(1428192000, 0),
+                                            '$gte' => new UTCDateTime(1428192000000),
                                         ],
                                     ],
                                 ],
@@ -83,7 +84,7 @@ class DateFilterTest extends DoctrineMongoDbOdmFilterTestCase
                                 '$and' => [
                                     [
                                         'dummyDate' => [
-                                            '$gt' => new \MongoDate(1428192000, 0),
+                                            '$gt' => new UTCDateTime(1428192000000),
                                         ],
                                     ],
                                 ],
@@ -98,7 +99,7 @@ class DateFilterTest extends DoctrineMongoDbOdmFilterTestCase
                                 '$and' => [
                                     [
                                         'dummyDate' => [
-                                            '$lte' => new \MongoDate(1428192000, 0),
+                                            '$lte' => new UTCDateTime(1428192000000),
                                         ],
                                     ],
                                 ],
@@ -113,7 +114,7 @@ class DateFilterTest extends DoctrineMongoDbOdmFilterTestCase
                                 '$and' => [
                                     [
                                         'dummyDate' => [
-                                            '$lt' => new \MongoDate(1428192000, 0),
+                                            '$lt' => new UTCDateTime(1428192000000),
                                         ],
                                     ],
                                 ],
@@ -128,7 +129,7 @@ class DateFilterTest extends DoctrineMongoDbOdmFilterTestCase
                                 '$and' => [
                                     [
                                         'dummyDate' => [
-                                            '$lte' => new \MongoDate(1428192000, 0),
+                                            '$lte' => new UTCDateTime(1428192000000),
                                         ],
                                     ],
                                 ],
@@ -143,7 +144,7 @@ class DateFilterTest extends DoctrineMongoDbOdmFilterTestCase
                                 '$and' => [
                                     [
                                         'dummyDate' => [
-                                            '$lt' => new \MongoDate(1428192000, 0),
+                                            '$lt' => new UTCDateTime(1428192000000),
                                         ],
                                     ],
                                 ],
@@ -158,7 +159,7 @@ class DateFilterTest extends DoctrineMongoDbOdmFilterTestCase
                                 '$and' => [
                                     [
                                         'dummyDate' => [
-                                            '$lte' => new \MongoDate(1428192000, 0),
+                                            '$lte' => new UTCDateTime(1428192000000),
                                         ],
                                     ],
                                 ],
@@ -169,7 +170,7 @@ class DateFilterTest extends DoctrineMongoDbOdmFilterTestCase
                                 '$and' => [
                                     [
                                         'dummyDate' => [
-                                            '$gte' => new \MongoDate(1428192000, 0),
+                                            '$gte' => new UTCDateTime(1428192000000),
                                         ],
                                     ],
                                 ],
@@ -184,7 +185,7 @@ class DateFilterTest extends DoctrineMongoDbOdmFilterTestCase
                                 '$and' => [
                                     [
                                         'dummyDate' => [
-                                            '$lt' => new \MongoDate(1428192000, 0),
+                                            '$lt' => new UTCDateTime(1428192000000),
                                         ],
                                     ],
                                 ],
@@ -195,7 +196,7 @@ class DateFilterTest extends DoctrineMongoDbOdmFilterTestCase
                                 '$and' => [
                                     [
                                         'dummyDate' => [
-                                            '$gt' => new \MongoDate(1428192000, 0),
+                                            '$gt' => new UTCDateTime(1428192000000),
                                         ],
                                     ],
                                 ],
@@ -210,7 +211,7 @@ class DateFilterTest extends DoctrineMongoDbOdmFilterTestCase
                                 '$and' => [
                                     [
                                         'dummyDate' => [
-                                            '$lte' => new \MongoDate(1428192000, 0),
+                                            '$lte' => new UTCDateTime(1428192000000),
                                         ],
                                     ],
                                 ],
@@ -221,7 +222,7 @@ class DateFilterTest extends DoctrineMongoDbOdmFilterTestCase
                                 '$and' => [
                                     [
                                         'dummyDate' => [
-                                            '$gte' => new \MongoDate(1428192000, 0),
+                                            '$gte' => new UTCDateTime(1428192000000),
                                         ],
                                     ],
                                 ],
@@ -236,7 +237,7 @@ class DateFilterTest extends DoctrineMongoDbOdmFilterTestCase
                                 '$and' => [
                                     [
                                         'dummyDate' => [
-                                            '$lt' => new \MongoDate(1428192000, 0),
+                                            '$lt' => new UTCDateTime(1428192000000),
                                         ],
                                     ],
                                 ],
@@ -247,7 +248,7 @@ class DateFilterTest extends DoctrineMongoDbOdmFilterTestCase
                                 '$and' => [
                                     [
                                         'dummyDate' => [
-                                            '$gt' => new \MongoDate(1428192000, 0),
+                                            '$gt' => new UTCDateTime(1428192000000),
                                         ],
                                     ],
                                 ],
@@ -273,7 +274,7 @@ class DateFilterTest extends DoctrineMongoDbOdmFilterTestCase
                                 '$and' => [
                                     [
                                         'relatedDummy_lkup.dummyDate' => [
-                                            '$gte' => new \MongoDate(1428192000, 0),
+                                            '$gte' => new UTCDateTime(1428192000000),
                                         ],
                                     ],
                                 ],
@@ -293,7 +294,7 @@ class DateFilterTest extends DoctrineMongoDbOdmFilterTestCase
                                 '$and' => [
                                     [
                                         'dummyDate' => [
-                                            '$gte' => new \MongoDate(1428192000, 0),
+                                            '$gte' => new UTCDateTime(1428192000000),
                                         ],
                                     ],
                                 ],
@@ -308,7 +309,7 @@ class DateFilterTest extends DoctrineMongoDbOdmFilterTestCase
                                 '$or' => [
                                     [
                                         'dummyDate' => [
-                                            '$gte' => new \MongoDate(1428192000, 0),
+                                            '$gte' => new UTCDateTime(1428192000000),
                                         ],
                                     ],
                                     [
@@ -326,7 +327,7 @@ class DateFilterTest extends DoctrineMongoDbOdmFilterTestCase
                                 '$or' => [
                                     [
                                         'dummyDate' => [
-                                            '$gte' => new \MongoDate(1428192000, 0),
+                                            '$gte' => new UTCDateTime(1428192000000),
                                         ],
                                     ],
                                     [

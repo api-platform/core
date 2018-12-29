@@ -30,7 +30,7 @@ class PersonToPet
     private $id;
 
     /**
-     * @ODM\ReferenceOne(targetDocument="Pet")
+     * @ODM\ReferenceOne(targetDocument=Pet::class)
      * @Groups({"people.pets"})
      *
      * @var Pet
@@ -38,7 +38,7 @@ class PersonToPet
     public $pet;
 
     /**
-     * @ODM\ReferenceOne(targetDocument="Person")
+     * @ODM\ReferenceOne(targetDocument=Person::class)
      *
      * @var Person
      */

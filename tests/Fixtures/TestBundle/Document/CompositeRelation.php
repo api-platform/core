@@ -37,13 +37,13 @@ class CompositeRelation
     private $value;
 
     /**
-     * @ODM\ReferenceOne(targetDocument="CompositeItem", inversedBy="compositeValues")
+     * @ODM\ReferenceOne(targetDocument=CompositeItem::class, inversedBy="compositeValues")
      * @Groups({"default"})
      */
     private $compositeItem;
 
     /**
-     * @ODM\ReferenceOne(targetDocument="CompositeLabel")
+     * @ODM\ReferenceOne(targetDocument=CompositeLabel::class)
      * @Groups({"default"})
      */
     private $compositeLabel;

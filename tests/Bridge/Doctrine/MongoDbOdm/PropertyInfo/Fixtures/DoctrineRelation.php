@@ -30,7 +30,7 @@ class DoctrineRelation
     public $id;
 
     /**
-     * @ReferenceOne(targetDocument="DoctrineDummy", inversedBy="indexedFoo")
+     * @ReferenceOne(targetDocument=DoctrineDummy::class, inversedBy="indexedFoo")
      */
     protected $foo;
 }

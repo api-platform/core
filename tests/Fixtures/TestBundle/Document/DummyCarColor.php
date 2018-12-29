@@ -34,7 +34,7 @@ class DummyCarColor
     /**
      * @var DummyCar
      *
-     * @ODM\ReferenceOne(targetDocument="DummyCar", inversedBy="colors", storeAs="id")
+     * @ODM\ReferenceOne(targetDocument=DummyCar::class, inversedBy="colors", storeAs="id")
      * @Assert\NotBlank
      */
     private $car;

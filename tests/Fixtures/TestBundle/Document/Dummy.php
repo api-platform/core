@@ -118,14 +118,14 @@ class Dummy
     /**
      * @var RelatedDummy A related dummy
      *
-     * @ODM\ReferenceOne(targetDocument="RelatedDummy", storeAs="id", nullable=true)
+     * @ODM\ReferenceOne(targetDocument=RelatedDummy::class, storeAs="id", nullable=true)
      */
     public $relatedDummy;
 
     /**
      * @var ArrayCollection Several dummies
      *
-     * @ODM\ReferenceMany(targetDocument="RelatedDummy", storeAs="id", nullable=true)
+     * @ODM\ReferenceMany(targetDocument=RelatedDummy::class, storeAs="id", nullable=true)
      * @ApiSubresource
      */
     public $relatedDummies;
@@ -154,14 +154,14 @@ class Dummy
     /**
      * @var RelatedOwnedDummy
      *
-     * @ODM\ReferenceOne(targetDocument="RelatedOwnedDummy", cascade={"persist"}, mappedBy="owningDummy", nullable=true)
+     * @ODM\ReferenceOne(targetDocument=RelatedOwnedDummy::class, cascade={"persist"}, mappedBy="owningDummy", nullable=true)
      */
     public $relatedOwnedDummy;
 
     /**
      * @var RelatedOwningDummy
      *
-     * @ODM\ReferenceOne(targetDocument="RelatedOwningDummy", cascade={"persist"}, inversedBy="ownedDummy", nullable=true, storeAs="id")
+     * @ODM\ReferenceOne(targetDocument=RelatedOwningDummy::class, cascade={"persist"}, inversedBy="ownedDummy", nullable=true, storeAs="id")
      */
     public $relatedOwningDummy;
 

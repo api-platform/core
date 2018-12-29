@@ -22,8 +22,8 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\Common\Persistence\ObjectRepository;
 use Doctrine\ODM\MongoDB\Aggregation\Builder;
-use Doctrine\ODM\MongoDB\CommandCursor;
-use Doctrine\ODM\MongoDB\DocumentRepository;
+use Doctrine\ODM\MongoDB\Iterator\Iterator;
+use Doctrine\ODM\MongoDB\Repository\DocumentRepository;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -33,13 +33,12 @@ class CollectionDataProviderTest extends TestCase
 {
     public function testGetCollection()
     {
-        $commandCursor = $this->prophesize(CommandCursor::class);
-        $commandCursor->toArray()->willReturn([])->shouldBeCalled();
+        $iterator = $this->prophesize(Iterator::class)->reveal();
 
         $aggregationBuilderProphecy = $this->prophesize(Builder::class);
         $aggregationBuilderProphecy->match()->shouldBeCalled();
         $aggregationBuilderProphecy->hydrate(Dummy::class)->willReturn($aggregationBuilderProphecy)->shouldBeCalled();
-        $aggregationBuilderProphecy->execute()->willReturn($commandCursor->reveal())->shouldBeCalled();
+        $aggregationBuilderProphecy->execute()->willReturn($iterator)->shouldBeCalled();
         $aggregationBuilder = $aggregationBuilderProphecy->reveal();
 
         $repositoryProphecy = $this->prophesize(DocumentRepository::class);
@@ -55,7 +54,7 @@ class CollectionDataProviderTest extends TestCase
         $extensionProphecy->applyToCollection($aggregationBuilder, Dummy::class, 'foo', [])->shouldBeCalled();
 
         $dataProvider = new CollectionDataProvider($managerRegistryProphecy->reveal(), [$extensionProphecy->reveal()]);
-        $this->assertEquals([], $dataProvider->getCollection(Dummy::class, 'foo'));
+        $this->assertEquals($iterator, $dataProvider->getCollection(Dummy::class, 'foo'));
     }
 
     public function testAggregationResultExtension()

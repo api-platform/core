@@ -18,7 +18,6 @@ use Doctrine\Common\Cache\Cache;
 use Doctrine\Common\Cache\CacheProvider;
 use Doctrine\ODM\MongoDB\Configuration;
 use Doctrine\ODM\MongoDB\Mapping\Driver\XmlDriver;
-use Doctrine\ODM\MongoDB\Mapping\Driver\YamlDriver;
 
 /**
  * Convenience class for setting up Doctrine from different installations and configurations.
@@ -51,17 +50,6 @@ class DoctrineMongoDbOdmSetup
     }
 
     /**
-     * Creates a configuration with a yaml metadata driver.
-     */
-    public static function createYAMLMetadataConfiguration(array $paths, bool $isDevMode = false, string $proxyDir = null, string $hydratorDir = null, Cache $cache = null): Configuration
-    {
-        $config = self::createConfiguration($isDevMode, $proxyDir, $hydratorDir, $cache);
-        $config->setMetadataDriverImpl(new YamlDriver($paths));
-
-        return $config;
-    }
-
-    /**
      * Creates a configuration without a metadata driver.
      */
     public static function createConfiguration(bool $isDevMode = false, string $proxyDir = null, string $hydratorDir = null, Cache $cache = null): Configuration
@@ -77,7 +65,7 @@ class DoctrineMongoDbOdmSetup
         $config->setHydratorDir($hydratorDir);
         $config->setProxyNamespace('DoctrineProxies');
         $config->setHydratorNamespace('DoctrineHydrators');
-        $config->setAutoGenerateProxyClasses($isDevMode);
+        $config->setAutoGenerateProxyClasses($isDevMode ? Configuration::AUTOGENERATE_EVAL : Configuration::AUTOGENERATE_FILE_NOT_EXISTS);
 
         return $config;
     }

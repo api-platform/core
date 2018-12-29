@@ -58,7 +58,7 @@ class EmbeddedDummy
     /**
      * @var EmbeddableDummy
      *
-     * @ODM\EmbedOne(targetDocument="EmbeddableDummy")
+     * @ODM\EmbedOne(targetDocument=EmbeddableDummy::class)
      * @Groups({"embed"})
      */
     public $embeddedDummy;
@@ -66,7 +66,7 @@ class EmbeddedDummy
     /**
      * @var RelatedDummy A related dummy
      *
-     * @ODM\ReferenceOne(targetDocument="RelatedDummy", storeAs="id")
+     * @ODM\ReferenceOne(targetDocument=RelatedDummy::class, storeAs="id")
      */
     public $relatedDummy;
 

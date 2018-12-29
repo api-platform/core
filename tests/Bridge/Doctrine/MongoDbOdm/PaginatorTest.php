@@ -16,7 +16,7 @@ namespace ApiPlatform\Core\Tests\Bridge\Doctrine\MongoDbOdm;
 use ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Paginator;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\Dummy;
-use Doctrine\ODM\MongoDB\CommandCursor;
+use Doctrine\ODM\MongoDB\Iterator\Iterator;
 use Doctrine\ODM\MongoDB\UnitOfWork;
 use PHPUnit\Framework\TestCase;
 
@@ -83,25 +83,21 @@ class PaginatorTest extends TestCase
 
     private function getPaginator($firstResult = 1, $maxResults = 15, $totalItems = 42)
     {
-        $commandCursor = $this->prophesize(CommandCursor::class);
-        $commandCursor->info()->willReturn([
-            'query' => [
-                'pipeline' => [
-                    [
-                        '$facet' => [
-                            'results' => [
-                                ['$skip' => $firstResult],
-                                ['$limit' => $maxResults],
-                            ],
-                            'count' => [
-                                ['$count' => 'count'],
-                            ],
-                        ],
+        $iterator = $this->prophesize(Iterator::class);
+        $pipeline = [
+            [
+                '$facet' => [
+                    'results' => [
+                        ['$skip' => $firstResult],
+                        ['$limit' => $maxResults],
+                    ],
+                    'count' => [
+                        ['$count' => 'count'],
                     ],
                 ],
             ],
-        ]);
-        $commandCursor->toArray()->willReturn([
+        ];
+        $iterator->toArray()->willReturn([
             [
                 'count' => [
                     [
@@ -114,41 +110,35 @@ class PaginatorTest extends TestCase
 
         $unitOfWork = $this->prophesize(UnitOfWork::class);
 
-        return new Paginator($commandCursor->reveal(), $unitOfWork->reveal(), Dummy::class);
+        return new Paginator($iterator->reveal(), $unitOfWork->reveal(), Dummy::class, $pipeline);
     }
 
     private function getPaginatorWithMissingStage($facet = false, $results = false, $count = false, $maxResults = false)
     {
-        $cursorInfo = [
-            'query' => [
-                'pipeline' => [],
-            ],
-        ];
+        $pipeline = [];
 
         if ($facet) {
-            $cursorInfo['query']['pipeline'][] = [
+            $pipeline[] = [
                 '$facet' => [],
             ];
         }
 
         if ($results) {
-            $cursorInfo['query']['pipeline'][0]['$facet']['results'] = [];
+            $pipeline[0]['$facet']['results'] = [];
         }
 
         if ($count) {
-            $cursorInfo['query']['pipeline'][0]['$facet']['count'] = [];
+            $pipeline[0]['$facet']['count'] = [];
         }
 
         if ($maxResults) {
-            $cursorInfo['query']['pipeline'][0]['$facet']['results'][] = ['$skip' => 42];
+            $pipeline[0]['$facet']['results'][] = ['$skip' => 42];
         }
 
-        $commandCursor = $this->prophesize(CommandCursor::class);
-        $commandCursor->info()->willReturn($cursorInfo);
-
+        $iterator = $this->prophesize(Iterator::class);
         $unitOfWork = $this->prophesize(UnitOfWork::class);
 
-        return new Paginator($commandCursor->reveal(), $unitOfWork->reveal(), Dummy::class);
+        return new Paginator($iterator->reveal(), $unitOfWork->reveal(), Dummy::class, $pipeline);
     }
 
     public function initializeProvider()

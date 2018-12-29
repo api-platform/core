@@ -45,7 +45,7 @@ class FooDummy
     /**
      * @var Dummy The foo dummy
      *
-     * @ODM\ReferenceOne(targetDocument="Dummy", cascade={"persist"}, storeAs="id")
+     * @ODM\ReferenceOne(targetDocument=Dummy::class, cascade={"persist"}, storeAs="id")
      */
     private $dummy;
 

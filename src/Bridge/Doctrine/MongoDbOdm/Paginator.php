@@ -15,7 +15,7 @@ namespace ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm;
 
 use ApiPlatform\Core\DataProvider\PaginatorInterface;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
-use Doctrine\ODM\MongoDB\CommandCursor;
+use Doctrine\ODM\MongoDB\Iterator\Iterator;
 use Doctrine\ODM\MongoDB\UnitOfWork;
 
 /**
@@ -27,9 +27,13 @@ use Doctrine\ODM\MongoDB\UnitOfWork;
 final class Paginator implements \IteratorAggregate, PaginatorInterface
 {
     /**
-     * @var CommandCursor
+     * @var Iterator
      */
-    private $cursor;
+    private $mongoDbOdmIterator;
+    /**
+     * @var array
+     */
+    private $pipeline;
     /**
      * @var UnitOfWork
      */
@@ -55,11 +59,12 @@ final class Paginator implements \IteratorAggregate, PaginatorInterface
      */
     private $totalItems;
 
-    public function __construct(CommandCursor $cursor, UnitOfWork $unitOfWork, string $resourceClass)
+    public function __construct(Iterator $mongoDbOdmIterator, UnitOfWork $unitOfWork, string $resourceClass, array $pipeline)
     {
-        $this->cursor = $cursor;
+        $this->mongoDbOdmIterator = $mongoDbOdmIterator;
         $this->unitOfWork = $unitOfWork;
         $this->resourceClass = $resourceClass;
+        $this->pipeline = $pipeline;
 
         $resultsFacetInfo = $this->getFacetInfo('results');
         $this->getFacetInfo('count');
@@ -69,7 +74,7 @@ final class Paginator implements \IteratorAggregate, PaginatorInterface
         // the values set in the facet stage are used instead.
         $this->firstResult = $this->getStageInfo($resultsFacetInfo, '$skip');
         $this->maxResults = $this->getStageInfo($resultsFacetInfo, '$limit');
-        $this->totalItems = $cursor->toArray()[0]['count'][0]['count'];
+        $this->totalItems = $mongoDbOdmIterator->toArray()[0]['count'][0]['count'];
     }
 
     /**
@@ -111,7 +116,7 @@ final class Paginator implements \IteratorAggregate, PaginatorInterface
     {
         return $this->iterator ?? $this->iterator = new \ArrayIterator(array_map(function ($result) {
             return $this->unitOfWork->getOrCreateDocument($this->resourceClass, $result);
-        }, $this->cursor->toArray()[0]['results']));
+        }, $this->mongoDbOdmIterator->toArray()[0]['results']));
     }
 
     /**
@@ -127,14 +132,13 @@ final class Paginator implements \IteratorAggregate, PaginatorInterface
      */
     private function getFacetInfo(string $field): array
     {
-        $infoPipeline = $this->cursor->info()['query']['pipeline'];
-        foreach ($infoPipeline as $indexStage => $infoStage) {
+        foreach ($this->pipeline as $indexStage => $infoStage) {
             if (array_key_exists('$facet', $infoStage)) {
-                if (!isset($infoPipeline[$indexStage]['$facet'][$field])) {
+                if (!isset($this->pipeline[$indexStage]['$facet'][$field])) {
                     throw new InvalidArgumentException("\"$field\" facet was not applied to the aggregation pipeline.");
                 }
 
-                return $infoPipeline[$indexStage]['$facet'][$field];
+                return $this->pipeline[$indexStage]['$facet'][$field];
             }
         }
 

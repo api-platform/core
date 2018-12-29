@@ -148,7 +148,7 @@ final class PaginationExtension implements AggregationResultCollectionExtensionI
      */
     public function getResult(Builder $aggregationBuilder, string $resourceClass, string $operationName = null, array $context = [])
     {
-        return new Paginator($aggregationBuilder->execute(), $this->managerRegistry->getManagerForClass($resourceClass)->getUnitOfWork(), $resourceClass);
+        return new Paginator($aggregationBuilder->execute(), $this->managerRegistry->getManagerForClass($resourceClass)->getUnitOfWork(), $resourceClass, $aggregationBuilder->getPipeline());
     }
 
     private function isPaginationEnabled(Request $request, ResourceMetadata $resourceMetadata, string $operationName = null): bool

@@ -20,6 +20,7 @@ use ApiPlatform\Core\Test\DoctrineMongoDbOdmFilterTestCase;
 use ApiPlatform\Core\Tests\Bridge\Doctrine\Common\Filter\SearchFilterTestTrait;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\RelatedDummy;
 use Doctrine\Common\Persistence\ManagerRegistry;
+use MongoDB\BSON\Regex;
 use Prophecy\Argument;
 
 /**
@@ -284,7 +285,7 @@ class SearchFilterTest extends DoctrineMongoDbOdmFilterTestCase
                     [
                         [
                             '$match' => [
-                                'name' => new \MongoRegex('/^exact$/i'),
+                                'name' => new Regex('^exact$', 'i'),
                             ],
                         ],
                     ],
@@ -311,8 +312,8 @@ class SearchFilterTest extends DoctrineMongoDbOdmFilterTestCase
                             '$match' => [
                                 'name' => [
                                     '$in' => [
-                                        new \MongoRegex('/^CaSE$/i'),
-                                        new \MongoRegex('/^inSENSitive$/i'),
+                                        new Regex('^CaSE$', 'i'),
+                                        new Regex('^inSENSitive$', 'i'),
                                     ],
                                 ],
                             ],
@@ -343,7 +344,7 @@ class SearchFilterTest extends DoctrineMongoDbOdmFilterTestCase
                     [
                         [
                             '$match' => [
-                                'name' => new \MongoRegex('/partial/'),
+                                'name' => new Regex('partial'),
                             ],
                         ],
                     ],
@@ -353,7 +354,7 @@ class SearchFilterTest extends DoctrineMongoDbOdmFilterTestCase
                     [
                         [
                             '$match' => [
-                                'name' => new \MongoRegex('/partial/i'),
+                                'name' => new Regex('partial', 'i'),
                             ],
                         ],
                     ],
@@ -363,7 +364,7 @@ class SearchFilterTest extends DoctrineMongoDbOdmFilterTestCase
                     [
                         [
                             '$match' => [
-                                'name' => new \MongoRegex('/^partial/'),
+                                'name' => new Regex('^partial'),
                             ],
                         ],
                     ],
@@ -373,7 +374,7 @@ class SearchFilterTest extends DoctrineMongoDbOdmFilterTestCase
                     [
                         [
                             '$match' => [
-                                'name' => new \MongoRegex('/^partial/i'),
+                                'name' => new Regex('^partial', 'i'),
                             ],
                         ],
                     ],
@@ -383,7 +384,7 @@ class SearchFilterTest extends DoctrineMongoDbOdmFilterTestCase
                     [
                         [
                             '$match' => [
-                                'name' => new \MongoRegex('/partial$/'),
+                                'name' => new Regex('partial$'),
                             ],
                         ],
                     ],
@@ -393,7 +394,7 @@ class SearchFilterTest extends DoctrineMongoDbOdmFilterTestCase
                     [
                         [
                             '$match' => [
-                                'name' => new \MongoRegex('/partial$/i'),
+                                'name' => new Regex('partial$', 'i'),
                             ],
                         ],
                     ],
@@ -403,7 +404,7 @@ class SearchFilterTest extends DoctrineMongoDbOdmFilterTestCase
                     [
                         [
                             '$match' => [
-                                'name' => new \MongoRegex('/(^partial.*|.*\spartial.*)/'),
+                                'name' => new Regex('(^partial.*|.*\spartial.*)'),
                             ],
                         ],
                     ],
@@ -413,7 +414,7 @@ class SearchFilterTest extends DoctrineMongoDbOdmFilterTestCase
                     [
                         [
                             '$match' => [
-                                'name' => new \MongoRegex('/(^partial.*|.*\spartial.*)/i'),
+                                'name' => new Regex('(^partial.*|.*\spartial.*)', 'i'),
                             ],
                         ],
                     ],

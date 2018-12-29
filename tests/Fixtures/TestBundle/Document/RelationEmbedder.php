@@ -59,13 +59,13 @@ class RelationEmbedder
     public $krondstadt = 'Krondstadt';
 
     /**
-     * @ODM\ReferenceOne(targetDocument="RelatedDummy", cascade={"persist"})
+     * @ODM\ReferenceOne(targetDocument=RelatedDummy::class, cascade={"persist"})
      * @Groups({"chicago", "barcelona"})
      */
     public $anotherRelated;
 
     /**
-     * @ODM\ReferenceOne(targetDocument="RelatedDummy")
+     * @ODM\ReferenceOne(targetDocument=RelatedDummy::class)
      * @Groups({"barcelona", "chicago"})
      */
     protected $related;

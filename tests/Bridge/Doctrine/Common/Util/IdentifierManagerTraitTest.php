@@ -27,6 +27,7 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Types\Type as DBALType;
 use Doctrine\ODM\MongoDB\DocumentManager;
+use Doctrine\ODM\MongoDB\Mapping\ClassMetadata as MongoDbOdmClassMetadata;
 use Doctrine\ODM\MongoDB\Types\Type as MongoDbType;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\TestCase;
@@ -190,7 +191,7 @@ class IdentifierManagerTraitTest extends TestCase
      */
     private function getDocumentManager(string $resourceClass, array $identifierFields): ObjectManager
     {
-        $classMetadataProphecy = $this->prophesize(ClassMetadata::class);
+        $classMetadataProphecy = $this->prophesize(MongoDbOdmClassMetadata::class);
         $classMetadataProphecy->getIdentifier()->willReturn(array_keys($identifierFields));
 
         foreach ($identifierFields as $name => $field) {

@@ -17,7 +17,7 @@ use ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Filter\FilterInterface;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\Dummy;
 use Doctrine\Bundle\MongoDBBundle\Tests\TestCase;
 use Doctrine\Common\Persistence\ManagerRegistry;
-use Doctrine\ODM\MongoDB\DocumentRepository;
+use Doctrine\ODM\MongoDB\Repository\DocumentRepository;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
 /**

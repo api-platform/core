@@ -31,12 +31,12 @@ class DoctrineWithEmbedded
     public $id;
 
     /**
-     * @EmbedOne(targetDocument="DoctrineEmbeddable")
+     * @EmbedOne(targetDocument=DoctrineEmbeddable::class)
      */
     protected $embedOne;
 
     /**
-     * @EmbedMany(targetDocument="DoctrineEmbeddable")
+     * @EmbedMany(targetDocument=DoctrineEmbeddable::class)
      */
     protected $embedMany;
 }

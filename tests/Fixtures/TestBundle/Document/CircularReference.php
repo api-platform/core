@@ -34,14 +34,14 @@ class CircularReference
     public $id;
 
     /**
-     * @ODM\ReferenceOne(targetDocument="CircularReference", inversedBy="children")
+     * @ODM\ReferenceOne(targetDocument=CircularReference::class, inversedBy="children")
      *
      * @Groups({"circular"})
      */
     public $parent;
 
     /**
-     * @ODM\ReferenceMany(targetDocument="CircularReference", mappedBy="parent")
+     * @ODM\ReferenceMany(targetDocument=CircularReference::class, mappedBy="parent")
      *
      * @Groups({"circular"})
      */

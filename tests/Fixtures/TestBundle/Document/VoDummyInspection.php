@@ -37,7 +37,7 @@ class VoDummyInspection
     /**
      * @var VoDummyCar
      *
-     * @ODM\ReferenceOne(targetDocument="VoDummyCar", inversedBy="inspections")
+     * @ODM\ReferenceOne(targetDocument=VoDummyCar::class, inversedBy="inspections")
      * @Groups({"write"})
      */
     private $car;

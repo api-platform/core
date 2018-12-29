@@ -41,7 +41,7 @@ class DummyProduct
      * @var Collection
      *
      * @ApiSubresource
-     * @ODM\ReferenceMany(targetDocument="DummyAggregateOffer", mappedBy="product", cascade={"persist"})
+     * @ODM\ReferenceMany(targetDocument=DummyAggregateOffer::class, mappedBy="product", cascade={"persist"})
      */
     private $offers;
 
@@ -56,12 +56,12 @@ class DummyProduct
      * @var Collection
      *
      * @ApiSubresource
-     * @ODM\ReferenceMany(targetDocument="DummyProduct", mappedBy="parent")
+     * @ODM\ReferenceMany(targetDocument=DummyProduct::class, mappedBy="parent")
      */
     private $relatedProducts;
 
     /**
-     * @ODM\ReferenceOne(targetDocument="DummyProduct", inversedBy="relatedProducts")
+     * @ODM\ReferenceOne(targetDocument=DummyProduct::class, inversedBy="relatedProducts")
      */
     private $parent;
 

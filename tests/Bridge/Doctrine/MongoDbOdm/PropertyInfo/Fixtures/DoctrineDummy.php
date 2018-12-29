@@ -32,27 +32,17 @@ class DoctrineDummy
     public $id;
 
     /**
-     * @Id(strategy="INCREMENT")
-     */
-    public $intId;
-
-    /**
-     * @Id(strategy="NONE")
-     */
-    public $customId;
-
-    /**
-     * @ReferenceOne(targetDocument="DoctrineRelation")
+     * @ReferenceOne(targetDocument=DoctrineRelation::class)
      */
     public $foo;
 
     /**
-     * @ReferenceMany(targetDocument="DoctrineRelation")
+     * @ReferenceMany(targetDocument=DoctrineRelation::class)
      */
     public $bar;
 
     /**
-     * @ReferenceMany(targetDocument="DoctrineRelation", mappedBy="foo", storeAs="id")
+     * @ReferenceMany(targetDocument=DoctrineRelation::class, mappedBy="foo", storeAs="id")
      */
     protected $indexedFoo;
 

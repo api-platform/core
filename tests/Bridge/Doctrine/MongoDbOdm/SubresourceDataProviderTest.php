@@ -32,10 +32,10 @@ use Doctrine\Common\Persistence\ObjectRepository;
 use Doctrine\ODM\MongoDB\Aggregation\Builder;
 use Doctrine\ODM\MongoDB\Aggregation\Stage\Lookup;
 use Doctrine\ODM\MongoDB\Aggregation\Stage\Match;
-use Doctrine\ODM\MongoDB\CommandCursor;
 use Doctrine\ODM\MongoDB\DocumentManager;
-use Doctrine\ODM\MongoDB\DocumentRepository;
+use Doctrine\ODM\MongoDB\Iterator\Iterator;
 use Doctrine\ODM\MongoDB\Mapping\ClassMetadata;
+use Doctrine\ODM\MongoDB\Repository\DocumentRepository;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 
@@ -123,9 +123,9 @@ class SubresourceDataProviderTest extends TestCase
         $dummyMatch->field('id')->shouldBeCalled()->willReturn($dummyMatch);
         $dummyAggregationBuilder->match()->shouldBeCalled()->willReturn($dummyMatch->reveal());
 
-        $dummyCommandCursor = $this->prophesize(CommandCursor::class);
-        $dummyCommandCursor->toArray()->shouldBeCalled()->willReturn([['_id' => 1, 'relatedDummies' => [['_id' => 2]]]]);
-        $dummyAggregationBuilder->execute()->shouldBeCalled()->willReturn($dummyCommandCursor->reveal());
+        $dummyIterator = $this->prophesize(Iterator::class);
+        $dummyIterator->toArray()->shouldBeCalled()->willReturn([['_id' => 1, 'relatedDummies' => [['_id' => 2]]]]);
+        $dummyAggregationBuilder->execute()->shouldBeCalled()->willReturn($dummyIterator->reveal());
 
         $managerProphecy->createAggregationBuilder(Dummy::class)->shouldBeCalled()->willReturn($dummyAggregationBuilder->reveal());
 
@@ -134,9 +134,9 @@ class SubresourceDataProviderTest extends TestCase
         $match->field('_id')->shouldBeCalled()->willReturn($match);
         $aggregationBuilder->match()->shouldBeCalled()->willReturn($match);
 
-        $commandCursor = $this->prophesize(CommandCursor::class);
-        $commandCursor->toArray()->shouldBeCalled()->willReturn([]);
-        $aggregationBuilder->execute()->shouldBeCalled()->willReturn($commandCursor->reveal());
+        $iterator = $this->prophesize(Iterator::class);
+        $iterator->toArray()->shouldBeCalled()->willReturn([]);
+        $aggregationBuilder->execute()->shouldBeCalled()->willReturn($iterator->reveal());
         $aggregationBuilder->hydrate(RelatedDummy::class)->shouldBeCalled()->willReturn($aggregationBuilder);
 
         $managerRegistryProphecy = $this->prophesize(ManagerRegistry::class);
@@ -168,9 +168,9 @@ class SubresourceDataProviderTest extends TestCase
         $dummyMatch->field('id')->shouldBeCalled()->willReturn($dummyMatch);
         $dummyAggregationBuilder->match()->shouldBeCalled()->willReturn($dummyMatch->reveal());
 
-        $dummyCommandCursor = $this->prophesize(CommandCursor::class);
-        $dummyCommandCursor->toArray()->shouldBeCalled()->willReturn([['_id' => 1, 'relatedDummies' => [['_id' => 2]]]]);
-        $dummyAggregationBuilder->execute()->shouldBeCalled()->willReturn($dummyCommandCursor->reveal());
+        $dummyIterator = $this->prophesize(Iterator::class);
+        $dummyIterator->toArray()->shouldBeCalled()->willReturn([['_id' => 1, 'relatedDummies' => [['_id' => 2]]]]);
+        $dummyAggregationBuilder->execute()->shouldBeCalled()->willReturn($dummyIterator->reveal());
 
         $classMetadataProphecy = $this->prophesize(ClassMetadata::class);
         $classMetadataProphecy->hasAssociation('relatedDummies')->willReturn(true)->shouldBeCalled();
@@ -195,9 +195,9 @@ class SubresourceDataProviderTest extends TestCase
         $previousRMatch->field('_id')->shouldBeCalled()->willReturn($previousRMatch);
         $rAggregationBuilder->match()->shouldBeCalled()->willReturn($rMatch->reveal(), $previousRMatch->reveal());
 
-        $rCommandCursor = $this->prophesize(CommandCursor::class);
-        $rCommandCursor->toArray()->shouldBeCalled()->willReturn([['_id' => 1, 'thirdLevel' => [['_id' => 3]]]]);
-        $rAggregationBuilder->execute()->shouldBeCalled()->willReturn($rCommandCursor->reveal());
+        $rIterator = $this->prophesize(Iterator::class);
+        $rIterator->toArray()->shouldBeCalled()->willReturn([['_id' => 1, 'thirdLevel' => [['_id' => 3]]]]);
+        $rAggregationBuilder->execute()->shouldBeCalled()->willReturn($rIterator->reveal());
 
         $rClassMetadataProphecy = $this->prophesize(ClassMetadata::class);
         $rClassMetadataProphecy->hasAssociation('thirdLevel')->shouldBeCalled()->willReturn(true);
@@ -217,9 +217,9 @@ class SubresourceDataProviderTest extends TestCase
         $match->field('_id')->shouldBeCalled()->willReturn($match);
         $aggregationBuilder->match()->shouldBeCalled()->willReturn($match);
 
-        $commandCursor = $this->prophesize(CommandCursor::class);
-        $commandCursor->getSingleResult()->shouldBeCalled()->willReturn($result);
-        $aggregationBuilder->execute()->shouldBeCalled()->willReturn($commandCursor->reveal());
+        $iterator = $this->prophesize(Iterator::class);
+        $iterator->current()->shouldBeCalled()->willReturn($result);
+        $aggregationBuilder->execute()->shouldBeCalled()->willReturn($iterator->reveal());
         $aggregationBuilder->hydrate(ThirdLevel::class)->shouldBeCalled()->willReturn($aggregationBuilder);
 
         $repositoryProphecy = $this->prophesize(DocumentRepository::class);
@@ -269,10 +269,10 @@ class SubresourceDataProviderTest extends TestCase
         $previousMatch->field('_id')->shouldBeCalled()->willReturn($previousMatch);
         $aggregationBuilder->match()->shouldBeCalled()->willReturn($match->reveal(), $previousMatch->reveal());
 
-        $commandCursor = $this->prophesize(CommandCursor::class);
-        $commandCursor->toArray()->shouldBeCalled()->willReturn([['_id' => 1, 'ownedDummy' => [['_id' => 3]]]]);
-        $commandCursor->getSingleResult()->shouldBeCalled()->willReturn([]);
-        $aggregationBuilder->execute()->shouldBeCalled()->willReturn($commandCursor->reveal());
+        $iterator = $this->prophesize(Iterator::class);
+        $iterator->toArray()->shouldBeCalled()->willReturn([['_id' => 1, 'ownedDummy' => [['_id' => 3]]]]);
+        $iterator->current()->shouldBeCalled()->willReturn([]);
+        $aggregationBuilder->execute()->shouldBeCalled()->willReturn($iterator->reveal());
         $aggregationBuilder->hydrate(RelatedOwningDummy::class)->shouldBeCalled()->willReturn($aggregationBuilder);
 
         $managerRegistryProphecy = $this->prophesize(ManagerRegistry::class);
@@ -317,9 +317,9 @@ class SubresourceDataProviderTest extends TestCase
         $previousMatch->field('_id')->shouldBeCalled()->willReturn($previousMatch);
         $aggregationBuilder->match()->shouldBeCalled()->willReturn($match->reveal(), $previousMatch->reveal());
 
-        $commandCursor = $this->prophesize(CommandCursor::class);
-        $commandCursor->toArray()->shouldBeCalled()->willReturn([['_id' => 1, 'relatedDummies' => [['_id' => 3]]]]);
-        $aggregationBuilder->execute()->shouldBeCalled()->willReturn($commandCursor->reveal());
+        $iterator = $this->prophesize(Iterator::class);
+        $iterator->toArray()->shouldBeCalled()->willReturn([['_id' => 1, 'relatedDummies' => [['_id' => 3]]]]);
+        $aggregationBuilder->execute()->shouldBeCalled()->willReturn($iterator->reveal());
 
         $managerRegistryProphecy = $this->prophesize(ManagerRegistry::class);
         $managerRegistryProphecy->getManagerForClass(RelatedDummy::class)->shouldBeCalled()->willReturn($managerProphecy->reveal());
@@ -397,9 +397,9 @@ class SubresourceDataProviderTest extends TestCase
 
         $result = new \stdClass();
 
-        $rCommandCursor = $this->prophesize(CommandCursor::class);
-        $rCommandCursor->getSingleResult()->shouldBeCalled()->willReturn($result);
-        $rAggregationBuilder->execute()->shouldBeCalled()->willReturn($rCommandCursor->reveal());
+        $rIterator = $this->prophesize(Iterator::class);
+        $rIterator->current()->shouldBeCalled()->willReturn($result);
+        $rAggregationBuilder->execute()->shouldBeCalled()->willReturn($rIterator->reveal());
         $rAggregationBuilder->hydrate(RelatedDummy::class)->shouldBeCalled()->willReturn($rAggregationBuilder);
 
         $aggregationBuilder = $this->prophesize(Builder::class);

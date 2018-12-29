@@ -21,7 +21,6 @@ use ApiPlatform\Core\Tests\Bridge\Doctrine\MongoDbOdm\PropertyInfo\Fixtures\Doct
 use ApiPlatform\Core\Tests\Bridge\Doctrine\MongoDbOdm\PropertyInfo\Fixtures\DoctrineRelation;
 use ApiPlatform\Core\Tests\Bridge\Doctrine\MongoDbOdm\PropertyInfo\Fixtures\DoctrineWithEmbedded;
 use Doctrine\Common\Collections\Collection;
-use Doctrine\MongoDB\Connection;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Doctrine\ODM\MongoDB\Types\Type as MongoDbType;
 use PHPUnit\Framework\TestCase;
@@ -38,8 +37,6 @@ class DoctrineExtractorTest extends TestCase
         $this->assertEquals(
             [
                 'id',
-                'intId',
-                'customId',
                 'foo',
                 'bar',
                 'indexedFoo',
@@ -135,8 +132,6 @@ class DoctrineExtractorTest extends TestCase
     {
         return [
             ['id', [new Type(Type::BUILTIN_TYPE_STRING)]],
-            ['intId', [new Type(Type::BUILTIN_TYPE_INT)]],
-            ['customId', null],
             ['bin', [new Type(Type::BUILTIN_TYPE_STRING)]],
             ['binByteArray', [new Type(Type::BUILTIN_TYPE_STRING)]],
             ['binCustom', [new Type(Type::BUILTIN_TYPE_STRING)]],
@@ -201,7 +196,7 @@ class DoctrineExtractorTest extends TestCase
     private function createExtractor(): DoctrineExtractor
     {
         $config = DoctrineMongoDbOdmSetup::createAnnotationMetadataConfiguration([__DIR__.\DIRECTORY_SEPARATOR.'Fixtures'], true);
-        $documentManager = DocumentManager::create(new Connection(), $config);
+        $documentManager = DocumentManager::create(null, $config);
 
         if (!MongoDbType::hasType('foo')) {
             MongoDbType::addType('foo', DoctrineFooType::class);

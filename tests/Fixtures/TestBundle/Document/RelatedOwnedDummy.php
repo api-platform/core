@@ -43,7 +43,7 @@ class RelatedOwnedDummy
     /**
      * @var Dummy
      *
-     * @ODM\ReferenceOne(targetDocument="Dummy", cascade={"persist"}, inversedBy="relatedOwnedDummy", storeAs="id")
+     * @ODM\ReferenceOne(targetDocument=Dummy::class, cascade={"persist"}, inversedBy="relatedOwnedDummy", storeAs="id")
      * @ApiSubresource
      */
     public $owningDummy;

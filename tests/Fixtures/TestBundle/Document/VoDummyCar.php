@@ -47,7 +47,7 @@ class VoDummyCar extends VoDummyVehicle
     /**
      * @var VoDummyInspection[]|Collection
      *
-     * @ODM\ReferenceMany(targetDocument="VoDummyInspection", mappedBy="car", cascade={"persist"})
+     * @ODM\ReferenceMany(targetDocument=VoDummyInspection::class, mappedBy="car", cascade={"persist"})
      * @Groups({"write"})
      */
     private $inspections;

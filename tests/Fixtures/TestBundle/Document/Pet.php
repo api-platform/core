@@ -40,7 +40,7 @@ class Pet
     public $name;
 
     /**
-     * @ODM\ReferenceMany(targetDocument="PersonToPet", mappedBy="pet")
+     * @ODM\ReferenceMany(targetDocument=PersonToPet::class, mappedBy="pet")
      *
      * @var ArrayCollection
      */

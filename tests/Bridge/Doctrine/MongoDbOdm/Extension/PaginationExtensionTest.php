@@ -21,14 +21,14 @@ use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Persistence\ObjectManager;
-use Doctrine\MongoDB\Aggregation\Stage\Count;
-use Doctrine\MongoDB\Aggregation\Stage\Facet;
-use Doctrine\MongoDB\Aggregation\Stage\Limit;
-use Doctrine\MongoDB\Aggregation\Stage\Skip;
 use Doctrine\ODM\MongoDB\Aggregation\Builder;
-use Doctrine\ODM\MongoDB\CommandCursor;
+use Doctrine\ODM\MongoDB\Aggregation\Stage\Count;
+use Doctrine\ODM\MongoDB\Aggregation\Stage\Facet;
+use Doctrine\ODM\MongoDB\Aggregation\Stage\Limit;
+use Doctrine\ODM\MongoDB\Aggregation\Stage\Skip;
 use Doctrine\ODM\MongoDB\DocumentManager;
-use Doctrine\ODM\MongoDB\DocumentRepository;
+use Doctrine\ODM\MongoDB\Iterator\Iterator;
+use Doctrine\ODM\MongoDB\Repository\DocumentRepository;
 use Doctrine\ODM\MongoDB\UnitOfWork;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
@@ -396,25 +396,8 @@ class PaginationExtensionTest extends TestCase
 
         $this->managerRegistryProphecy->getManagerForClass('Foo')->shouldBeCalled()->willReturn($documentManagerProphecy->reveal());
 
-        $commandCursorProphecy = $this->prophesize(CommandCursor::class);
-        $commandCursorProphecy->info()->shouldBeCalled()->willReturn([
-            'query' => [
-                'pipeline' => [
-                    [
-                        '$facet' => [
-                            'results' => [
-                                ['$skip' => 3],
-                                ['$limit' => 6],
-                            ],
-                            'count' => [
-                                ['$count' => 'count'],
-                            ],
-                        ],
-                    ],
-                ],
-            ],
-        ]);
-        $commandCursorProphecy->toArray()->shouldBeCalled()->willReturn([
+        $iteratorProphecy = $this->prophesize(Iterator::class);
+        $iteratorProphecy->toArray()->shouldBeCalled()->willReturn([
             [
                 'count' => [
                     [
@@ -425,7 +408,20 @@ class PaginationExtensionTest extends TestCase
         ]);
 
         $aggregationBuilderProphecy = $this->prophesize(Builder::class);
-        $aggregationBuilderProphecy->execute()->shouldBeCalled()->willReturn($commandCursorProphecy->reveal());
+        $aggregationBuilderProphecy->execute()->shouldBeCalled()->willReturn($iteratorProphecy->reveal());
+        $aggregationBuilderProphecy->getPipeline()->shouldBeCalled()->willReturn([
+            [
+                '$facet' => [
+                    'results' => [
+                        ['$skip' => 3],
+                        ['$limit' => 6],
+                    ],
+                    'count' => [
+                        ['$count' => 'count'],
+                    ],
+                ],
+            ],
+        ]);
 
         $paginationExtension = new PaginationExtension(
             $this->managerRegistryProphecy->reveal(),

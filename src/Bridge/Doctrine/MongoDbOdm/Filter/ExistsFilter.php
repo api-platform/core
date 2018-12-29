@@ -16,7 +16,7 @@ namespace ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Filter;
 use ApiPlatform\Core\Bridge\Doctrine\Common\Filter\ExistsFilterInterface;
 use ApiPlatform\Core\Bridge\Doctrine\Common\Filter\ExistsFilterTrait;
 use Doctrine\ODM\MongoDB\Aggregation\Builder;
-use Doctrine\ODM\MongoDB\Mapping\ClassMetadataInfo;
+use Doctrine\ODM\MongoDB\Mapping\ClassMetadata;
 
 /**
  * Filters the collection by whether a property value exists or not.
@@ -73,7 +73,7 @@ final class ExistsFilter extends AbstractContextAwareFilter implements ExistsFil
 
         $field = $propertyParts['field'];
 
-        if ($metadata instanceof ClassMetadataInfo && $metadata->hasField($field)) {
+        if ($metadata instanceof ClassMetadata && $metadata->hasField($field)) {
             return $metadata->isNullable($field);
         }
 

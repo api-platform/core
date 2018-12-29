@@ -34,7 +34,7 @@ class Question
     private $content;
 
     /**
-     * @ODM\ReferenceOne(targetDocument="Answer", inversedBy="question", storeAs="id")
+     * @ODM\ReferenceOne(targetDocument=Answer::class, inversedBy="question", storeAs="id")
      * @ApiSubresource
      */
     private $answer;

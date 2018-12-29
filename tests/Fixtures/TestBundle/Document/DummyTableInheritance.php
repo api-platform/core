@@ -20,8 +20,8 @@ use Symfony\Component\Serializer\Annotation\Groups;
 /**
  * @ODM\Document
  * @ODM\InheritanceType("SINGLE_COLLECTION")
- * @ODM\DiscriminatorField(name="discr")
- * @ODM\DiscriminatorMap({"dummyTableInheritance"="DummyTableInheritance", "dummyTableInheritanceChild"="DummyTableInheritanceChild", "dummyTableInheritanceDifferentChild"="DummyTableInheritanceDifferentChild"})
+ * @ODM\DiscriminatorField(value="discr")
+ * @ODM\DiscriminatorMap({"dummyTableInheritance"=DummyTableInheritance::class, "dummyTableInheritanceChild"=DummyTableInheritanceChild::class, "dummyTableInheritanceDifferentChild"=DummyTableInheritanceDifferentChild::class})
  * @ApiResource
  */
 class DummyTableInheritance
@@ -47,7 +47,7 @@ class DummyTableInheritance
     /**
      * @var DummyTableInheritanceRelated
      *
-     * @ODM\ReferenceOne(targetDocument="DummyTableInheritanceRelated", inversedBy="children")
+     * @ODM\ReferenceOne(targetDocument=DummyTableInheritanceRelated::class, inversedBy="children")
      */
     private $parent;
 

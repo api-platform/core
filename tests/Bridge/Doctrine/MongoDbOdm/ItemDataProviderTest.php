@@ -29,9 +29,9 @@ use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\Common\Persistence\ObjectRepository;
 use Doctrine\ODM\MongoDB\Aggregation\Builder;
 use Doctrine\ODM\MongoDB\Aggregation\Stage\Match;
-use Doctrine\ODM\MongoDB\CommandCursor;
-use Doctrine\ODM\MongoDB\DocumentRepository;
+use Doctrine\ODM\MongoDB\Iterator\Iterator;
 use Doctrine\ODM\MongoDB\Mapping\ClassMetadata;
+use Doctrine\ODM\MongoDB\Repository\DocumentRepository;
 use Doctrine\ODM\MongoDB\Types\Type as MongoDbType;
 use PHPUnit\Framework\TestCase;
 
@@ -48,13 +48,13 @@ class ItemDataProviderTest extends TestCase
         $matchProphecy->field('id')->willReturn($matchProphecy)->shouldBeCalled();
         $matchProphecy->equals(1)->shouldBeCalled();
 
-        $commandCursor = $this->prophesize(CommandCursor::class);
-        $commandCursor->getSingleResult()->willReturn([])->shouldBeCalled();
+        $iterator = $this->prophesize(Iterator::class);
+        $iterator->current()->willReturn([])->shouldBeCalled();
 
         $aggregationBuilderProphecy = $this->prophesize(Builder::class);
         $aggregationBuilderProphecy->match()->willReturn($matchProphecy->reveal())->shouldBeCalled();
         $aggregationBuilderProphecy->hydrate(Dummy::class)->willReturn($aggregationBuilderProphecy)->shouldBeCalled();
-        $aggregationBuilderProphecy->execute()->willReturn($commandCursor->reveal())->shouldBeCalled();
+        $aggregationBuilderProphecy->execute()->willReturn($iterator->reveal())->shouldBeCalled();
         $aggregationBuilder = $aggregationBuilderProphecy->reveal();
 
         [$propertyNameCollectionFactory, $propertyMetadataFactory] = $this->getMetadataFactories(Dummy::class, [
@@ -78,13 +78,13 @@ class ItemDataProviderTest extends TestCase
         $matchProphecy->equals(1)->shouldBeCalled();
         $matchProphecy->equals(2)->shouldBeCalled();
 
-        $commandCursor = $this->prophesize(CommandCursor::class);
-        $commandCursor->getSingleResult()->willReturn([])->shouldBeCalled();
+        $iterator = $this->prophesize(Iterator::class);
+        $iterator->current()->willReturn([])->shouldBeCalled();
 
         $aggregationBuilderProphecy = $this->prophesize(Builder::class);
         $aggregationBuilderProphecy->match()->willReturn($matchProphecy->reveal())->shouldBeCalled();
         $aggregationBuilderProphecy->hydrate(Dummy::class)->willReturn($aggregationBuilderProphecy)->shouldBeCalled();
-        $aggregationBuilderProphecy->execute()->willReturn($commandCursor->reveal())->shouldBeCalled();
+        $aggregationBuilderProphecy->execute()->willReturn($iterator->reveal())->shouldBeCalled();
         $aggregationBuilder = $aggregationBuilderProphecy->reveal();
 
         [$propertyNameCollectionFactory, $propertyMetadataFactory] = $this->getMetadataFactories(Dummy::class, [

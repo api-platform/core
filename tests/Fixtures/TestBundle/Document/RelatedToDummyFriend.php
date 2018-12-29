@@ -51,14 +51,14 @@ class RelatedToDummyFriend
     private $description;
 
     /**
-     * @ODM\ReferenceOne(targetDocument="DummyFriend")
+     * @ODM\ReferenceOne(targetDocument=DummyFriend::class)
      * @Groups({"fakemanytomany", "friends"})
      * @Assert\NotNull
      */
     private $dummyFriend;
 
     /**
-     * @ODM\ReferenceOne(targetDocument="RelatedDummy", inversedBy="relatedToDummyFriend", storeAs="id")
+     * @ODM\ReferenceOne(targetDocument=RelatedDummy::class, inversedBy="relatedToDummyFriend", storeAs="id")
      * @Assert\NotNull
      */
     private $relatedDummy;
