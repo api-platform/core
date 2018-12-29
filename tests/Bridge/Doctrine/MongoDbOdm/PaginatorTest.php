@@ -74,6 +74,15 @@ class PaginatorTest extends TestCase
         $this->getPaginatorWithMissingStage(true, true, true, true);
     }
 
+    public function testInitializeWithNoCount()
+    {
+        $paginator = $this->getPaginatorWithNoCount();
+
+        $this->assertEquals(1, $paginator->getCurrentPage());
+        $this->assertEquals(1, $paginator->getLastPage());
+        $this->assertEquals(15, $paginator->getItemsPerPage());
+    }
+
     public function testGetIterator()
     {
         $paginator = $this->getPaginator();
@@ -136,6 +145,33 @@ class PaginatorTest extends TestCase
         }
 
         $iterator = $this->prophesize(Iterator::class);
+        $unitOfWork = $this->prophesize(UnitOfWork::class);
+
+        return new Paginator($iterator->reveal(), $unitOfWork->reveal(), Dummy::class, $pipeline);
+    }
+
+    private function getPaginatorWithNoCount($firstResult = 1, $maxResults = 15)
+    {
+        $iterator = $this->prophesize(Iterator::class);
+        $pipeline = [
+            [
+                '$facet' => [
+                    'results' => [
+                        ['$skip' => $firstResult],
+                        ['$limit' => $maxResults],
+                    ],
+                    'count' => [
+                        ['$count' => 'count'],
+                    ],
+                ],
+            ],
+        ];
+        $iterator->toArray()->willReturn([
+            [
+                'count' => [],
+                'results' => [],
+            ],
+        ]);
         $unitOfWork = $this->prophesize(UnitOfWork::class);
 
         return new Paginator($iterator->reveal(), $unitOfWork->reveal(), Dummy::class, $pipeline);

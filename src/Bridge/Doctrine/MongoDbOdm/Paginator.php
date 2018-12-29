@@ -74,7 +74,7 @@ final class Paginator implements \IteratorAggregate, PaginatorInterface
         // the values set in the facet stage are used instead.
         $this->firstResult = $this->getStageInfo($resultsFacetInfo, '$skip');
         $this->maxResults = $this->getStageInfo($resultsFacetInfo, '$limit');
-        $this->totalItems = $mongoDbOdmIterator->toArray()[0]['count'][0]['count'];
+        $this->totalItems = $mongoDbOdmIterator->toArray()[0]['count'][0]['count'] ?? 0;
     }
 
     /**
