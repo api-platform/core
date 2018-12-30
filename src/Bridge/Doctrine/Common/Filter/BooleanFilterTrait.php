@@ -62,7 +62,7 @@ trait BooleanFilterTrait
      */
     private function isBooleanField(string $property, string $resourceClass): bool
     {
-        return isset(self::DOCTRINE_BOOLEAN_TYPES[$this->getDoctrineFieldType($property, $resourceClass)]);
+        return isset(self::DOCTRINE_BOOLEAN_TYPES[(string) $this->getDoctrineFieldType($property, $resourceClass)]);
     }
 
     private function normalizeValue($value, string $property): ?bool

@@ -16,7 +16,6 @@ namespace ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Metadata\Property;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 use Doctrine\Common\Persistence\ManagerRegistry;
-use Doctrine\ODM\MongoDB\Mapping\ClassMetadata;
 
 /**
  * Use Doctrine metadata to populate the identifier property.
@@ -49,11 +48,7 @@ final class DoctrineMongoDbOdmPropertyMetadataFactory implements PropertyMetadat
         if (!$manager) {
             return $propertyMetadata;
         }
-        /** @var ClassMetadata $doctrineClassMetadata */
         $doctrineClassMetadata = $manager->getClassMetadata($resourceClass);
-        if (!$doctrineClassMetadata) {
-            return $propertyMetadata;
-        }
 
         $identifiers = $doctrineClassMetadata->getIdentifier();
         foreach ($identifiers as $identifier) {

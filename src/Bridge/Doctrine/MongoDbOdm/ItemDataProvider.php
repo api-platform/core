@@ -61,9 +61,10 @@ final class ItemDataProvider implements DenormalizedIdentifiersAwareItemDataProv
     {
         $manager = $this->managerRegistry->getManagerForClass($resourceClass);
 
-        if (!($context[IdentifierConverterInterface::HAS_IDENTIFIER_CONVERTER] ?? false)) {
+        if (!\is_array($id) && !($context[IdentifierConverterInterface::HAS_IDENTIFIER_CONVERTER] ?? false)) {
             $id = $this->normalizeIdentifiers($id, $manager, $resourceClass);
         }
+        $id = (array) $id;
 
         $fetchData = $context['fetch_data'] ?? true;
         if (!$fetchData && $manager instanceof DocumentManager) {

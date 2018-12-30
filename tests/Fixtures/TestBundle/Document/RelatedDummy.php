@@ -179,7 +179,7 @@ class RelatedDummy extends ParentDummy
     /**
      * Set relatedToDummyFriend.
      *
-     * @param RelatedToDummyFriend the value to set
+     * @param RelatedToDummyFriend $relatedToDummyFriend the value to set
      */
     public function addRelatedToDummyFriend(RelatedToDummyFriend $relatedToDummyFriend)
     {

@@ -45,9 +45,9 @@ final class DoctrineExtractor implements PropertyListExtractorInterface, Propert
         try {
             $metadata = $this->objectManager->getClassMetadata($class);
         } catch (MappingException $exception) {
-            return;
+            return null;
         } catch (MongoDbOdmMappingException $exception) {
-            return;
+            return null;
         }
 
         return $metadata->getFieldNames();
@@ -61,9 +61,9 @@ final class DoctrineExtractor implements PropertyListExtractorInterface, Propert
         try {
             $metadata = $this->objectManager->getClassMetadata($class);
         } catch (MappingException $exception) {
-            return;
+            return null;
         } catch (MongoDbOdmMappingException $exception) {
-            return;
+            return null;
         }
 
         $reflectionMetadata = new \ReflectionClass($metadata);

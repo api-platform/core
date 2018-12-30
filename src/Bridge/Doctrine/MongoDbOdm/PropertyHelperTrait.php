@@ -15,6 +15,7 @@ namespace ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm;
 
 use ApiPlatform\Core\Exception\InvalidArgumentException;
 use Doctrine\ODM\MongoDB\Aggregation\Builder;
+use Doctrine\ODM\MongoDB\Mapping\ClassMetadata;
 
 /**
  * Helper trait regarding a property in a MongoDB document using the resource metadata.
@@ -42,7 +43,8 @@ trait PropertyHelperTrait
         }
 
         $alias = $association;
-        if ($this->getClassMetadata($resourceClass)->hasReference($association)) {
+        $classMetadata = $this->getClassMetadata($resourceClass);
+        if ($classMetadata instanceof ClassMetadata && $classMetadata->hasReference($association)) {
             $alias = "${association}_lkup";
             $aggregationBuilder->lookup($association)->alias($alias);
         }
