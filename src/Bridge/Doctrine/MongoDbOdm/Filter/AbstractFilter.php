@@ -13,18 +13,26 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Filter;
 
-use ApiPlatform\Core\Bridge\Doctrine\Common\PropertyHelperTrait;
 use ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\PropertyHelperTrait as MongoDbOdmPropertyHelperTrait;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ODM\MongoDB\Aggregation\Builder;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 
-abstract class AbstractContextAwareFilter implements FilterInterface
+/**
+ * {@inheritdoc}
+ *
+ * Abstract class for easing the implementation of a filter.
+ *
+ * @experimental
+ *
+ * @author Alan Poulain <contact@alanpoulain.eu>
+ */
+abstract class AbstractFilter implements FilterInterface
 {
-    use PropertyHelperTrait;
     use MongoDbOdmPropertyHelperTrait;
 
+    protected $managerRegistry;
     protected $logger;
     protected $properties;
 
@@ -49,6 +57,26 @@ abstract class AbstractContextAwareFilter implements FilterInterface
      * Passes a property through the filter.
      */
     abstract protected function filterProperty(string $property, $value, Builder $aggregationBuilder, string $resourceClass, string $operationName = null, array &$context = []);
+
+    /**
+     * Determines whether the given property is nested.
+     */
+    abstract protected function isPropertyNested(string $property/*, string $resourceClass*/): bool;
+
+    protected function getManagerRegistry(): ManagerRegistry
+    {
+        return $this->managerRegistry;
+    }
+
+    protected function getProperties(): ?array
+    {
+        return $this->properties;
+    }
+
+    protected function getLogger(): LoggerInterface
+    {
+        return $this->logger;
+    }
 
     /**
      * Determines whether the given property is enabled.

@@ -13,7 +13,9 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Bridge\Doctrine\Common\Filter;
 
+use ApiPlatform\Core\Bridge\Doctrine\Common\PropertyHelperTrait;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
+use Psr\Log\LoggerInterface;
 
 /**
  * Trait for filtering the collection by range.
@@ -23,6 +25,8 @@ use ApiPlatform\Core\Exception\InvalidArgumentException;
  */
 trait RangeFilterTrait
 {
+    use PropertyHelperTrait;
+
     /**
      * {@inheritdoc}
      */
@@ -30,7 +34,7 @@ trait RangeFilterTrait
     {
         $description = [];
 
-        $properties = $this->properties;
+        $properties = $this->getProperties();
         if (null === $properties) {
             $properties = array_fill_keys($this->getClassMetadata($resourceClass)->getFieldNames(), null);
         }
@@ -50,10 +54,14 @@ trait RangeFilterTrait
         return $description;
     }
 
+    abstract protected function getProperties(): ?array;
+
+    abstract protected function getLogger(): LoggerInterface;
+
     /**
      * Gets filter description.
      */
-    private function getFilterDescription(string $fieldName, string $operator): array
+    protected function getFilterDescription(string $fieldName, string $operator): array
     {
         return [
             sprintf('%s[%s]', $fieldName, $operator) => [
@@ -75,7 +83,7 @@ trait RangeFilterTrait
         }
 
         if (empty($values)) {
-            $this->logger->notice('Invalid filter ignored', [
+            $this->getLogger()->notice('Invalid filter ignored', [
                 'exception' => new InvalidArgumentException(sprintf('At least one valid operator ("%s") is required for "%s" property', implode('", "', $operators), $property)),
             ]);
 
@@ -91,7 +99,7 @@ trait RangeFilterTrait
     private function normalizeBetweenValues(array $values, string $property): ?array
     {
         if (2 !== \count($values)) {
-            $this->logger->notice('Invalid filter ignored', [
+            $this->getLogger()->notice('Invalid filter ignored', [
                 'exception' => new InvalidArgumentException(sprintf('Invalid format for "[%s]", expected "<min>..<max>"', self::PARAMETER_BETWEEN)),
             ]);
 
@@ -99,7 +107,7 @@ trait RangeFilterTrait
         }
 
         if (!is_numeric($values[0]) || !is_numeric($values[1])) {
-            $this->logger->notice('Invalid filter ignored', [
+            $this->getLogger()->notice('Invalid filter ignored', [
                 'exception' => new InvalidArgumentException(sprintf('Invalid values for "[%s]" range, expected numbers', self::PARAMETER_BETWEEN)),
             ]);
 
@@ -115,7 +123,7 @@ trait RangeFilterTrait
     private function normalizeValue(string $value, string $property, string $operator): ?string
     {
         if (!is_numeric($value)) {
-            $this->logger->notice('Invalid filter ignored', [
+            $this->getLogger()->notice('Invalid filter ignored', [
                 'exception' => new InvalidArgumentException(sprintf('Invalid value for "[%s]", expected number', $operator)),
             ]);
 

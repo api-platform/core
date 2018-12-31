@@ -18,6 +18,8 @@ use Doctrine\ODM\MongoDB\Aggregation\Builder;
 /**
  * Interface of Doctrine MongoDB ODM aggregation extensions for collection aggregations.
  *
+ * @experimental
+ *
  * @author Alan Poulain <contact@alanpoulain.eu>
  */
 interface AggregationCollectionExtensionInterface

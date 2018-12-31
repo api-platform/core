@@ -25,11 +25,13 @@ use Doctrine\ODM\MongoDB\Types\Type as MongoDbType;
  * For each property passed, if the resource does not have such property or if
  * the value is not numeric, the property is ignored.
  *
+ * @experimental
+ *
  * @author Amrouche Hamza <hamza.simperfit@gmail.com>
  * @author Teoh Han Hui <teohhanhui@gmail.com>
  * @author Alan Poulain <contact@alanpoulain.eu>
  */
-final class NumericFilter extends AbstractContextAwareFilter
+final class NumericFilter extends AbstractFilter
 {
     use NumericFilterTrait;
 
@@ -74,9 +76,9 @@ final class NumericFilter extends AbstractContextAwareFilter
     }
 
     /**
-     * Gets the PHP type corresponding to this Doctrine type.
+     * {@inheritdoc}
      */
-    private function getType(string $doctrineType = null): string
+    protected function getType(string $doctrineType = null): string
     {
         if (null === $doctrineType) {
             return 'string';

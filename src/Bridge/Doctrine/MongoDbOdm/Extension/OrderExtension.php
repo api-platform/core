@@ -23,6 +23,8 @@ use Doctrine\ODM\MongoDB\Aggregation\Builder;
 /**
  * Applies selected ordering while querying resource collection.
  *
+ * @experimental
+ *
  * @author Kévin Dunglas <dunglas@gmail.com>
  * @author Samuel ROZE <samuel.roze@gmail.com>
  * @author Vincent Chalamon <vincentchalamon@gmail.com>
@@ -35,6 +37,7 @@ final class OrderExtension implements AggregationCollectionExtensionInterface
 
     private $order;
     private $resourceMetadataFactory;
+    private $managerRegistry;
 
     public function __construct(string $order = null, ResourceMetadataFactoryInterface $resourceMetadataFactory = null, ManagerRegistry $managerRegistry = null)
     {
@@ -83,5 +86,10 @@ final class OrderExtension implements AggregationCollectionExtensionInterface
                 );
             }
         }
+    }
+
+    protected function getManagerRegistry(): ManagerRegistry
+    {
+        return $this->managerRegistry;
     }
 }

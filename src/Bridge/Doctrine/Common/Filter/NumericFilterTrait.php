@@ -13,7 +13,9 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Bridge\Doctrine\Common\Filter;
 
+use ApiPlatform\Core\Bridge\Doctrine\Common\PropertyHelperTrait;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
+use Psr\Log\LoggerInterface;
 
 /**
  * Trait for filtering the collection by numeric values.
@@ -24,6 +26,8 @@ use ApiPlatform\Core\Exception\InvalidArgumentException;
  */
 trait NumericFilterTrait
 {
+    use PropertyHelperTrait;
+
     /**
      * {@inheritdoc}
      */
@@ -31,7 +35,7 @@ trait NumericFilterTrait
     {
         $description = [];
 
-        $properties = $this->properties;
+        $properties = $this->getProperties();
         if (null === $properties) {
             $properties = array_fill_keys($this->getClassMetadata($resourceClass)->getFieldNames(), null);
         }
@@ -48,7 +52,7 @@ trait NumericFilterTrait
                     'property' => $property,
                     'type' => $this->getType((string) $this->getDoctrineFieldType($property, $resourceClass)),
                     'required' => false,
-                    'is_collection' => '[]' === substr($filterParameterName, -2),
+                    'is_collection' => '[]' === substr((string) $filterParameterName, -2),
                 ];
             }
         }
@@ -57,17 +61,26 @@ trait NumericFilterTrait
     }
 
     /**
+     * Gets the PHP type corresponding to this Doctrine type.
+     */
+    abstract protected function getType(string $doctrineType = null): string;
+
+    abstract protected function getProperties(): ?array;
+
+    abstract protected function getLogger(): LoggerInterface;
+
+    /**
      * Determines whether the given property refers to a numeric field.
      */
-    private function isNumericField(string $property, string $resourceClass): bool
+    protected function isNumericField(string $property, string $resourceClass): bool
     {
         return isset(self::DOCTRINE_NUMERIC_TYPES[(string) $this->getDoctrineFieldType($property, $resourceClass)]);
     }
 
-    private function normalizeValues($value, string $property): ?array
+    protected function normalizeValues($value, string $property): ?array
     {
         if (!is_numeric($value) && (!\is_array($value) || !$this->isNumericArray($value))) {
-            $this->logger->notice('Invalid filter ignored', [
+            $this->getLogger()->notice('Invalid filter ignored', [
                 'exception' => new InvalidArgumentException(sprintf('Invalid numeric value for "%s" property', $property)),
             ]);
 
@@ -83,7 +96,7 @@ trait NumericFilterTrait
         }
 
         if (empty($values)) {
-            $this->logger->notice('Invalid filter ignored', [
+            $this->getLogger()->notice('Invalid filter ignored', [
                 'exception' => new InvalidArgumentException(sprintf('At least one value is required, multiple values should be in "%1$s[]=firstvalue&%1$s[]=secondvalue" format', $property)),
             ]);
 
@@ -93,7 +106,7 @@ trait NumericFilterTrait
         return array_values($values);
     }
 
-    private function isNumericArray(array $values): bool
+    protected function isNumericArray(array $values): bool
     {
         foreach ($values as $value) {
             if (!is_numeric($value)) {

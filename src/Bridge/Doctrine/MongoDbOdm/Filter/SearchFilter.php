@@ -28,10 +28,12 @@ use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 /**
  * Filter the collection by given properties.
  *
+ * @experimental
+ *
  * @author Kévin Dunglas <dunglas@gmail.com>
  * @author Alan Poulain <contact@alanpoulain.eu>
  */
-final class SearchFilter extends AbstractContextAwareFilter implements SearchFilterInterface
+final class SearchFilter extends AbstractFilter implements SearchFilterInterface
 {
     use SearchFilterTrait;
 
@@ -43,6 +45,16 @@ final class SearchFilter extends AbstractContextAwareFilter implements SearchFil
 
         $this->iriConverter = $iriConverter;
         $this->propertyAccessor = $propertyAccessor ?: PropertyAccess::createPropertyAccessor();
+    }
+
+    protected function getIriConverter(): IriConverterInterface
+    {
+        return $this->iriConverter;
+    }
+
+    protected function getPropertyAccessor(): PropertyAccessorInterface
+    {
+        return $this->propertyAccessor;
     }
 
     /**
@@ -168,9 +180,9 @@ final class SearchFilter extends AbstractContextAwareFilter implements SearchFil
     }
 
     /**
-     * Converts a Doctrine type in PHP type.
+     * {@inheritdoc}
      */
-    private function getType(string $doctrineType): string
+    protected function getType(string $doctrineType): string
     {
         switch ($doctrineType) {
             case MongoDbType::INT:

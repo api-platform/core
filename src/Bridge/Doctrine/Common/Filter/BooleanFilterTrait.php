@@ -13,7 +13,9 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Bridge\Doctrine\Common\Filter;
 
+use ApiPlatform\Core\Bridge\Doctrine\Common\PropertyHelperTrait;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
+use Psr\Log\LoggerInterface;
 
 /**
  * Trait for filtering the collection by boolean values.
@@ -30,6 +32,8 @@ use ApiPlatform\Core\Exception\InvalidArgumentException;
  */
 trait BooleanFilterTrait
 {
+    use PropertyHelperTrait;
+
     /**
      * {@inheritdoc}
      */
@@ -37,7 +41,7 @@ trait BooleanFilterTrait
     {
         $description = [];
 
-        $properties = $this->properties;
+        $properties = $this->getProperties();
         if (null === $properties) {
             $properties = array_fill_keys($this->getClassMetadata($resourceClass)->getFieldNames(), null);
         }
@@ -57,10 +61,14 @@ trait BooleanFilterTrait
         return $description;
     }
 
+    abstract protected function getProperties(): ?array;
+
+    abstract protected function getLogger(): LoggerInterface;
+
     /**
      * Determines whether the given property refers to a boolean field.
      */
-    private function isBooleanField(string $property, string $resourceClass): bool
+    protected function isBooleanField(string $property, string $resourceClass): bool
     {
         return isset(self::DOCTRINE_BOOLEAN_TYPES[(string) $this->getDoctrineFieldType($property, $resourceClass)]);
     }
@@ -75,7 +83,7 @@ trait BooleanFilterTrait
             return false;
         }
 
-        $this->logger->notice('Invalid filter ignored', [
+        $this->getLogger()->notice('Invalid filter ignored', [
             'exception' => new InvalidArgumentException(sprintf('Invalid boolean value for "%s" property, expected one of ( "%s" )', $property, implode('" | "', [
                 'true',
                 'false',

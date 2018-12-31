@@ -27,6 +27,11 @@ use Doctrine\ORM\QueryBuilder;
 trait PropertyHelperTrait
 {
     /**
+     * Splits the given property into parts.
+     */
+    abstract protected function splitPropertyParts(string $property/*, string $resourceClass*/): array;
+
+    /**
      * Adds the necessary joins for a nested property.
      *
      * @throws InvalidArgumentException If property is not nested

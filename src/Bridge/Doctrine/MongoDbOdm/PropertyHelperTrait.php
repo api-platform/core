@@ -14,16 +14,29 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm;
 
 use ApiPlatform\Core\Exception\InvalidArgumentException;
+use Doctrine\Common\Persistence\Mapping\ClassMetadata;
 use Doctrine\ODM\MongoDB\Aggregation\Builder;
-use Doctrine\ODM\MongoDB\Mapping\ClassMetadata;
+use Doctrine\ODM\MongoDB\Mapping\ClassMetadata as MongoDbOdmClassMetadata;
 
 /**
  * Helper trait regarding a property in a MongoDB document using the resource metadata.
+ *
+ * @experimental
  *
  * @author Alan Poulain <contact@alanpoulain.eu>
  */
 trait PropertyHelperTrait
 {
+    /**
+     * Splits the given property into parts.
+     */
+    abstract protected function splitPropertyParts(string $property/*, string $resourceClass*/): array;
+
+    /**
+     * Gets class metadata for the given resource.
+     */
+    abstract protected function getClassMetadata(string $resourceClass): ClassMetadata;
+
     /**
      * Adds the necessary lookups for a nested property.
      *
@@ -44,7 +57,7 @@ trait PropertyHelperTrait
 
         $alias = $association;
         $classMetadata = $this->getClassMetadata($resourceClass);
-        if ($classMetadata instanceof ClassMetadata && $classMetadata->hasReference($association)) {
+        if ($classMetadata instanceof MongoDbOdmClassMetadata && $classMetadata->hasReference($association)) {
             $alias = "${association}_lkup";
             $aggregationBuilder->lookup($association)->alias($alias);
         }

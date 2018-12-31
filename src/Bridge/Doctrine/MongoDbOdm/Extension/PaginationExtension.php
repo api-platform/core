@@ -33,6 +33,8 @@ use Symfony\Component\HttpFoundation\RequestStack;
 /**
  * Applies pagination on the Doctrine aggregation for resource collection when enabled.
  *
+ * @experimental
+ *
  * @author Kévin Dunglas <dunglas@gmail.com>
  * @author Samuel ROZE <samuel.roze@gmail.com>
  * @author Alan Poulain <contact@alanpoulain.eu>

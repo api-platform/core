@@ -85,9 +85,9 @@ class NumericFilter extends AbstractContextAwareFilter
     }
 
     /**
-     * Gets the PHP type corresponding to this Doctrine type.
+     * {@inheritdoc}
      */
-    private function getType(string $doctrineType = null): string
+    protected function getType(string $doctrineType = null): string
     {
         if (null === $doctrineType || DBALType::DECIMAL === $doctrineType) {
             return 'string';

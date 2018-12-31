@@ -28,6 +28,10 @@ use Doctrine\ODM\MongoDB\DocumentManager;
 
 /**
  * Item data provider for the Doctrine MongoDB ODM.
+ *
+ * @experimental
+ *
+ * @author Alan Poulain <contact@alanpoulain.eu>
  */
 final class ItemDataProvider implements DenormalizedIdentifiersAwareItemDataProviderInterface, RestrictedDataProviderInterface
 {

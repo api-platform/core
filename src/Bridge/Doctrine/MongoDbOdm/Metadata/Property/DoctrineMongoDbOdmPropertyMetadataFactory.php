@@ -20,7 +20,10 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 /**
  * Use Doctrine metadata to populate the identifier property.
  *
+ * @experimental
+ *
  * @author Kévin Dunglas <dunglas@gmail.com>
+ * @author Alan Poulain <contact@alanpoulain.eu>
  */
 final class DoctrineMongoDbOdmPropertyMetadataFactory implements PropertyMetadataFactoryInterface
 {

@@ -95,7 +95,7 @@ class ExistsFilter extends AbstractContextAwareFilter implements ExistsFilterInt
     }
 
     /**
-     * Determines whether the given property refers to a nullable field.
+     * {@inheritdoc}
      */
     protected function isNullableField(string $property, string $resourceClass): bool
     {

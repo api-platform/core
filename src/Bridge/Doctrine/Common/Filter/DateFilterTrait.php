@@ -13,6 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Bridge\Doctrine\Common\Filter;
 
+use ApiPlatform\Core\Bridge\Doctrine\Common\PropertyHelperTrait;
+
 /**
  * Trait for filtering the collection by date intervals.
  *
@@ -22,6 +24,8 @@ namespace ApiPlatform\Core\Bridge\Doctrine\Common\Filter;
  */
 trait DateFilterTrait
 {
+    use PropertyHelperTrait;
+
     /**
      * {@inheritdoc}
      */
@@ -29,7 +33,7 @@ trait DateFilterTrait
     {
         $description = [];
 
-        $properties = $this->properties;
+        $properties = $this->getProperties();
         if (null === $properties) {
             $properties = array_fill_keys($this->getClassMetadata($resourceClass)->getFieldNames(), null);
         }
@@ -48,10 +52,12 @@ trait DateFilterTrait
         return $description;
     }
 
+    abstract protected function getProperties(): ?array;
+
     /**
      * Determines whether the given property refers to a date field.
      */
-    private function isDateField(string $property, string $resourceClass): bool
+    protected function isDateField(string $property, string $resourceClass): bool
     {
         return isset(self::DOCTRINE_DATE_TYPES[(string) $this->getDoctrineFieldType($property, $resourceClass)]);
     }
@@ -59,7 +65,7 @@ trait DateFilterTrait
     /**
      * Gets filter description.
      */
-    private function getFilterDescription(string $property, string $period): array
+    protected function getFilterDescription(string $property, string $period): array
     {
         return [
             sprintf('%s[%s]', $property, $period) => [

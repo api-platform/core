@@ -28,10 +28,12 @@ use Doctrine\ODM\MongoDB\Mapping\ClassMetadata;
  * Request: GET /products?brand[exists]
  * Interpretation: filter products which have a brand
  *
+ * @experimental
+ *
  * @author Teoh Han Hui <teohhanhui@gmail.com>
  * @author Alan Poulain <contact@alanpoulain.eu>
  */
-final class ExistsFilter extends AbstractContextAwareFilter implements ExistsFilterInterface
+final class ExistsFilter extends AbstractFilter implements ExistsFilterInterface
 {
     use ExistsFilterTrait;
 
@@ -64,7 +66,7 @@ final class ExistsFilter extends AbstractContextAwareFilter implements ExistsFil
     }
 
     /**
-     * Determines whether the given property refers to a nullable field.
+     * {@inheritdoc}
      */
     protected function isNullableField(string $property, string $resourceClass): bool
     {

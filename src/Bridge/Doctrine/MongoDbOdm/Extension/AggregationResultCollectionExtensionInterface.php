@@ -19,6 +19,8 @@ use Doctrine\ODM\MongoDB\Aggregation\Builder;
  * Interface of Doctrine MongoDB ODM aggregation extensions that supports result production
  * for specific cases such as pagination.
  *
+ * @experimental
+ *
  * @author Alan Poulain <contact@alanpoulain.eu>
  */
 interface AggregationResultCollectionExtensionInterface extends AggregationCollectionExtensionInterface

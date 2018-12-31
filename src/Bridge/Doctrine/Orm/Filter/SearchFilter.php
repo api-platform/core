@@ -49,6 +49,16 @@ class SearchFilter extends AbstractContextAwareFilter implements SearchFilterInt
         $this->propertyAccessor = $propertyAccessor ?: PropertyAccess::createPropertyAccessor();
     }
 
+    protected function getIriConverter(): IriConverterInterface
+    {
+        return $this->iriConverter;
+    }
+
+    protected function getPropertyAccessor(): PropertyAccessorInterface
+    {
+        return $this->propertyAccessor;
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -219,9 +229,9 @@ class SearchFilter extends AbstractContextAwareFilter implements SearchFilterInt
     }
 
     /**
-     * Converts a Doctrine type in PHP type.
+     * {@inheritdoc}
      */
-    private function getType(string $doctrineType): string
+    protected function getType(string $doctrineType): string
     {
         switch ($doctrineType) {
             case DBALType::TARRAY:

@@ -43,4 +43,8 @@ parameters:
         - '#Method ApiPlatform\\Core\\Bridge\\Doctrine\\Orm\\Filter\\AbstractFilter::filterProperty\(\) invoked with 7 parameters, 5-6 required\.#'
         - '#Method ApiPlatform\\Core\\Bridge\\Doctrine\\Orm\\Filter\\FilterInterface::apply\(\) invoked with 5 parameters, 3-4 required\.#'
         - '#Method ApiPlatform\\Core\\Bridge\\Doctrine\\Orm\\Filter\\OrderFilter::filterProperty\(\) invoked with 7 parameters, 5-6 required\.#'
+        - '#Method ApiPlatform\\Core\\Bridge\\Doctrine\\Orm\\Filter\\(Abstract|Boolean|Date|Exists|Numeric|Order|Range|Search)Filter::isPropertyNested\(\) invoked with 2 parameters, 1 required\.#'
+        - '#Method ApiPlatform\\Core\\Bridge\\Doctrine\\Orm\\Filter\\(Abstract|Boolean|Date|Exists|Numeric|Order|Range|Search)Filter::splitPropertyParts\(\) invoked with 2 parameters, 1 required\.#'
+        - '#Method ApiPlatform\\Core\\Bridge\\Doctrine\\MongoDbOdm\\Filter\\(Abstract|Boolean|Date|Exists|Numeric|Order|Range|Search)Filter::isPropertyNested\(\) invoked with 2 parameters, 1 required\.#'
+        - '#Method ApiPlatform\\Core\\Bridge\\Doctrine\\MongoDbOdm\\Filter\\(Abstract|Boolean|Date|Exists|Numeric|Order|Range|Search)Filter::splitPropertyParts\(\) invoked with 2 parameters, 1 required\.#'
         - '#Method ApiPlatform\\Core\\DataProvider\\CollectionDataProviderInterface::getCollection\(\) invoked with 3 parameters, 1-2 required\.#'

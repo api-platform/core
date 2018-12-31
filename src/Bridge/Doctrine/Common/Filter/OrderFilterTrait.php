@@ -13,6 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Bridge\Doctrine\Common\Filter;
 
+use ApiPlatform\Core\Bridge\Doctrine\Common\PropertyHelperTrait;
+
 /**
  * Trait for ordering the collection by given properties.
  *
@@ -22,6 +24,8 @@ namespace ApiPlatform\Core\Bridge\Doctrine\Common\Filter;
  */
 trait OrderFilterTrait
 {
+    use PropertyHelperTrait;
+
     /**
      * @var string Keyword used to retrieve the value
      */
@@ -34,7 +38,7 @@ trait OrderFilterTrait
     {
         $description = [];
 
-        $properties = $this->properties;
+        $properties = $this->getProperties();
         if (null === $properties) {
             $properties = array_fill_keys($this->getClassMetadata($resourceClass)->getFieldNames(), null);
         }
@@ -54,9 +58,11 @@ trait OrderFilterTrait
         return $description;
     }
 
+    abstract protected function getProperties(): ?array;
+
     private function normalizeValue($value, string $property): ?string
     {
-        if (empty($value) && null !== $defaultDirection = $this->properties[$property]['default_direction'] ?? null) {
+        if (empty($value) && null !== $defaultDirection = $this->getProperties()[$property]['default_direction'] ?? null) {
             // fallback to default direction
             $value = $defaultDirection;
         }

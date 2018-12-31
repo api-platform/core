@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Bridge\Doctrine\Orm\Filter;
 
-use ApiPlatform\Core\Bridge\Doctrine\Common\PropertyHelperTrait;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\PropertyHelperTrait as OrmPropertyHelperTrait;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Core\Util\RequestParser;
@@ -34,9 +33,9 @@ use Symfony\Component\HttpFoundation\RequestStack;
  */
 abstract class AbstractFilter implements FilterInterface
 {
-    use PropertyHelperTrait;
     use OrmPropertyHelperTrait;
 
+    protected $managerRegistry;
     protected $requestStack;
     protected $logger;
     protected $properties;
@@ -76,6 +75,31 @@ abstract class AbstractFilter implements FilterInterface
      * Passes a property through the filter.
      */
     abstract protected function filterProperty(string $property, $value, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, string $operationName = null/*, array $context = []*/);
+
+    /**
+     * Determines whether the given property is nested.
+     */
+    abstract protected function isPropertyNested(string $property/*, string $resourceClass*/): bool;
+
+    /**
+     * Determines whether the given property is embedded.
+     */
+    abstract protected function isPropertyEmbedded(string $property, string $resourceClass): bool;
+
+    protected function getManagerRegistry(): ManagerRegistry
+    {
+        return $this->managerRegistry;
+    }
+
+    protected function getProperties(): ?array
+    {
+        return $this->properties;
+    }
+
+    protected function getLogger(): LoggerInterface
+    {
+        return $this->logger;
+    }
 
     /**
      * Determines whether the given property is enabled.

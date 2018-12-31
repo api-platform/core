@@ -21,6 +21,8 @@ use Doctrine\ODM\MongoDB\UnitOfWork;
 /**
  * Decorates the Doctrine MongoDB ODM paginator.
  *
+ * @experimental
+ *
  * @author Kévin Dunglas <dunglas@gmail.com>
  * @author Alan Poulain <contact@alanpoulain.eu>
  */

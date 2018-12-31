@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Bridge\Doctrine\Common;
 
+use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Persistence\Mapping\ClassMetadata;
 use Doctrine\DBAL\Types\Type;
 
@@ -25,7 +26,7 @@ use Doctrine\DBAL\Types\Type;
  */
 trait PropertyHelperTrait
 {
-    protected $managerRegistry;
+    abstract protected function getManagerRegistry(): ManagerRegistry;
 
     /**
      * Determines whether the given property is mapped.
@@ -165,7 +166,7 @@ trait PropertyHelperTrait
     protected function getClassMetadata(string $resourceClass): ClassMetadata
     {
         return $this
-            ->managerRegistry
+            ->getManagerRegistry()
             ->getManagerForClass($resourceClass)
             ->getClassMetadata($resourceClass);
     }

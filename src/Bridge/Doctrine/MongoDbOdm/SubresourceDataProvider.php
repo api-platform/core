@@ -32,6 +32,8 @@ use Doctrine\ODM\MongoDB\Mapping\ClassMetadata;
 /**
  * Subresource data provider for the Doctrine MongoDB ODM.
  *
+ * @experimental
+ *
  * @author Antoine Bluchet <soyuka@gmail.com>
  * @author Alan Poulain <contact@alanpoulain.eu>
  */

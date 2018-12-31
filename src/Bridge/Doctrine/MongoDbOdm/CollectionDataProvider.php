@@ -23,6 +23,10 @@ use Doctrine\ODM\MongoDB\Aggregation\Builder;
 
 /**
  * Collection data provider for the Doctrine MongoDB ODM.
+ *
+ * @experimental
+ *
+ * @author Alan Poulain <contact@alanpoulain.eu>
  */
 final class CollectionDataProvider implements CollectionDataProviderInterface, RestrictedDataProviderInterface
 {
