@@ -147,8 +147,10 @@ class ConfigurationTest extends TestCase
                 'public' => null,
             ],
             'doctrine' => [
-                'enable_mongodb_odm' => false,
-                'enable_orm' => true,
+                'enabled' => true,
+            ],
+            'doctrine_mongodb_odm' => [
+                'enabled' => true,
             ],
             'mercure' => [
                 'enabled' => true,

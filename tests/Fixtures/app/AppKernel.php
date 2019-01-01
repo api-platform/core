@@ -152,6 +152,6 @@ class AppKernel extends Kernel
             return $environment;
         }
 
-        return 'common';
+        return 'orm';
     }
 }

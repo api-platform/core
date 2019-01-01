@@ -2,9 +2,7 @@ imports:
     - { resource: config_common.yml }
 
 api_platform:
-    doctrine:
-        enable_mongodb_odm: true
-        enable_orm: false
+    doctrine: false
     mapping:
         paths: ['%kernel.project_dir%/config/api_platform_mongodb_odm']
 

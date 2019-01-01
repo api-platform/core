@@ -1,0 +1,6 @@
+routing_common:
+    resource: 'routing_common.yml'
+
+controller:
+    resource: '@TestBundle/Controller/Orm'
+    type: annotation

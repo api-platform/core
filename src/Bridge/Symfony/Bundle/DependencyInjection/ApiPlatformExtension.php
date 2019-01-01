@@ -107,14 +107,6 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             ->addTag('api_platform.collection_data_provider');
         $container->registerForAutoconfiguration(SubresourceDataProviderInterface::class)
             ->addTag('api_platform.subresource_data_provider');
-        $container->registerForAutoconfiguration(QueryItemExtensionInterface::class)
-            ->addTag('api_platform.doctrine.orm.query_extension.item');
-        $container->registerForAutoconfiguration(QueryCollectionExtensionInterface::class)
-            ->addTag('api_platform.doctrine.orm.query_extension.collection');
-        $container->registerForAutoconfiguration(AggregationItemExtensionInterface::class)
-            ->addTag('api_platform.doctrine.mongodb.aggregation_extension.item');
-        $container->registerForAutoconfiguration(AggregationCollectionExtensionInterface::class)
-            ->addTag('api_platform.doctrine.mongodb.aggregation_extension.collection');
         $container->registerForAutoconfiguration(FilterInterface::class)
             ->addTag('api_platform.filter');
 
@@ -134,7 +126,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             $loader->load('ramsey_uuid.xml');
         }
 
-        $useDoctrine = isset($bundles['DoctrineBundle']) && class_exists(Version::class);
+        $useDoctrine = $config['doctrine']['enabled'] && isset($bundles['DoctrineBundle']) && class_exists(Version::class);
 
         $this->registerMetadataConfiguration($container, $config, $loader);
         $this->registerOAuthConfiguration($container, $config);
@@ -145,9 +137,10 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $this->registerJsonHalConfiguration($formats, $loader);
         $this->registerJsonProblemConfiguration($errorFormats, $loader);
         $this->registerGraphqlConfiguration($container, $config, $loader);
-        $this->registerBundlesConfiguration($bundles, $config, $loader, $useDoctrine);
+        $this->registerBundlesConfiguration($bundles, $config, $loader);
         $this->registerCacheConfiguration($container);
-        $this->registerDoctrineExtensionConfiguration($container, $config, $useDoctrine);
+        $this->registerDoctrineConfiguration($container, $config, $loader, $useDoctrine);
+        $this->registerDoctrineMongoDbOdmConfiguration($container, $config, $loader);
         $this->registerHttpCacheConfiguration($container, $config, $loader, $useDoctrine);
         $this->registerValidatorConfiguration($container, $config);
         $this->registerDataCollectorConfiguration($container, $config, $loader);
@@ -246,10 +239,10 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             foreach (['.yaml', '.yml', '.xml', ''] as $extension) {
                 $paths[] = "$dirname/Resources/config/api_resources$extension";
             }
-            if ($config['doctrine']['enable_orm']) {
+            if ($config['doctrine']['enabled']) {
                 $paths[] = "$dirname/Entity";
             }
-            if ($config['doctrine']['enable_mongodb_odm']) {
+            if ($config['doctrine_mongodb_odm']['enabled']) {
                 $paths[] = "$dirname/Document";
             }
 
@@ -425,18 +418,8 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
      *
      * @param string[] $bundles
      */
-    private function registerBundlesConfiguration(array $bundles, array $config, XmlFileLoader $loader, bool $useDoctrine)
+    private function registerBundlesConfiguration(array $bundles, array $config, XmlFileLoader $loader)
     {
-        // Doctrine ORM support
-        if ($useDoctrine) {
-            $loader->load('doctrine_orm.xml');
-        }
-
-        //  Doctrine MongoDB ODM support
-        if ($config['doctrine']['enable_mongodb_odm']) {
-            $loader->load('doctrine_mongodb_odm.xml');
-        }
-
         // FOSUser support
         if (isset($bundles['FOSUserBundle']) && $config['enable_fos_user']) {
             $loader->load('fos_user.xml');
@@ -466,11 +449,22 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
     }
 
     /**
-     * Manipulate doctrine extension services according to the configuration.
+     * Manipulate doctrine services according to the configuration.
      */
-    private function registerDoctrineExtensionConfiguration(ContainerBuilder $container, array $config, bool $useDoctrine)
+    private function registerDoctrineConfiguration(ContainerBuilder $container, array $config, XmlFileLoader $loader, bool $useDoctrine)
     {
-        if (!$useDoctrine || $config['eager_loading']['enabled']) {
+        if (!$useDoctrine) {
+            return;
+        }
+
+        $container->registerForAutoconfiguration(QueryItemExtensionInterface::class)
+            ->addTag('api_platform.doctrine.orm.query_extension.item');
+        $container->registerForAutoconfiguration(QueryCollectionExtensionInterface::class)
+            ->addTag('api_platform.doctrine.orm.query_extension.collection');
+
+        $loader->load('doctrine_orm.xml');
+
+        if ($config['eager_loading']['enabled']) {
             return;
         }
 
@@ -478,6 +472,23 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $container->removeDefinition('api_platform.doctrine.orm.query_extension.eager_loading');
         $container->removeAlias(FilterEagerLoadingExtension::class);
         $container->removeDefinition('api_platform.doctrine.orm.query_extension.filter_eager_loading');
+    }
+
+    /**
+     * Register the Doctrine MongoDB ODM configuration.
+     */
+    private function registerDoctrineMongoDbOdmConfiguration(ContainerBuilder $container, array $config, XmlFileLoader $loader)
+    {
+        if (!$config['doctrine_mongodb_odm']['enabled']) {
+            return;
+        }
+
+        $container->registerForAutoconfiguration(AggregationItemExtensionInterface::class)
+            ->addTag('api_platform.doctrine.mongodb.aggregation_extension.item');
+        $container->registerForAutoconfiguration(AggregationCollectionExtensionInterface::class)
+            ->addTag('api_platform.doctrine.mongodb.aggregation_extension.collection');
+
+        $loader->load('doctrine_mongodb_odm.xml');
     }
 
     private function registerHttpCacheConfiguration(ContainerBuilder $container, array $config, XmlFileLoader $loader, bool $useDoctrine)

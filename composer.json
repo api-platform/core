@@ -79,6 +79,7 @@
         "doctrine/common": "<2.7"
     },
     "suggest": {
+        "doctrine/mongodb-odm-bundle": "To support MongoDB.",
         "friendsofsymfony/user-bundle": "To use the FOSUserBundle bridge.",
         "guzzlehttp/guzzle": "To use the HTTP cache invalidation system.",
         "phpdocumentor/reflection-docblock": "To support extracting metadata from PHPDoc.",

@@ -1,7 +1,8 @@
 imports:
-    - { resource: config_common.yml }
+    - { resource: config_orm.yml }
 
 api_platform:
+    doctrine_mongodb_odm: false
     mapping:
         paths: ['%kernel.project_dir%/config/api_platform_orm']
 

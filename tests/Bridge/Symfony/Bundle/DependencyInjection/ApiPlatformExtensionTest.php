@@ -18,6 +18,9 @@ use ApiPlatform\Core\Api\IriConverterInterface;
 use ApiPlatform\Core\Api\UrlGeneratorInterface;
 use ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Extension\AggregationCollectionExtensionInterface;
 use ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Extension\AggregationItemExtensionInterface;
+use ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Extension\FilterExtension as MongoDbOdmFilterExtension;
+use ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Extension\OrderExtension as MongoDbOdmOrderExtension;
+use ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Extension\PaginationExtension as MongoDbOdmPaginationExtension;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\EagerLoadingExtension;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\FilterEagerLoadingExtension;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\FilterExtension;
@@ -361,7 +364,7 @@ class ApiPlatformExtensionTest extends TestCase
 
         $this->extension->load(
             array_merge_recursive(self::DEFAULT_CONFIG, ['api_platform' => ['mapping' => ['paths' => [__FILE__]]]]),
-            $this->getPartialContainerBuilderProphecy(false)->reveal()
+            $this->getPartialContainerBuilderProphecy()->reveal()
         );
     }
 
@@ -443,7 +446,7 @@ class ApiPlatformExtensionTest extends TestCase
         $this->extension->load($config, $containerBuilder);
     }
 
-    private function getPartialContainerBuilderProphecy($test = false)
+    private function getPartialContainerBuilderProphecy()
     {
         $containerBuilderProphecy = $this->prophesize(ContainerBuilder::class);
         $childDefinitionProphecy = $this->prophesize(ChildDefinition::class);
@@ -466,22 +469,6 @@ class ApiPlatformExtensionTest extends TestCase
         $containerBuilderProphecy->registerForAutoconfiguration(SubresourceDataProviderInterface::class)
             ->willReturn($childDefinitionProphecy)->shouldBeCalledTimes(1);
         $childDefinitionProphecy->addTag('api_platform.subresource_data_provider')->shouldBeCalledTimes(1);
-
-        $containerBuilderProphecy->registerForAutoconfiguration(QueryItemExtensionInterface::class)
-            ->willReturn($childDefinitionProphecy)->shouldBeCalledTimes(1);
-        $childDefinitionProphecy->addTag('api_platform.doctrine.orm.query_extension.item')->shouldBeCalledTimes(1);
-
-        $containerBuilderProphecy->registerForAutoconfiguration(QueryCollectionExtensionInterface::class)
-            ->willReturn($childDefinitionProphecy)->shouldBeCalledTimes(1);
-        $childDefinitionProphecy->addTag('api_platform.doctrine.orm.query_extension.collection')->shouldBeCalledTimes(1);
-
-        $containerBuilderProphecy->registerForAutoconfiguration(AggregationItemExtensionInterface::class)
-            ->willReturn($childDefinitionProphecy)->shouldBeCalledTimes(1);
-        $childDefinitionProphecy->addTag('api_platform.doctrine.mongodb.aggregation_extension.item')->shouldBeCalledTimes(1);
-
-        $containerBuilderProphecy->registerForAutoconfiguration(AggregationCollectionExtensionInterface::class)
-            ->willReturn($childDefinitionProphecy)->shouldBeCalledTimes(1);
-        $childDefinitionProphecy->addTag('api_platform.doctrine.mongodb.aggregation_extension.collection')->shouldBeCalledTimes(1);
 
         $containerBuilderProphecy->registerForAutoconfiguration(FilterInterface::class)
             ->willReturn($childDefinitionProphecy)->shouldBeCalledTimes(1);
@@ -689,6 +676,24 @@ class ApiPlatformExtensionTest extends TestCase
     {
         $containerBuilderProphecy = $this->getPartialContainerBuilderProphecy();
 
+        $childDefinitionProphecy = $this->prophesize(ChildDefinition::class);
+
+        $containerBuilderProphecy->registerForAutoconfiguration(QueryItemExtensionInterface::class)
+            ->willReturn($childDefinitionProphecy)->shouldBeCalledTimes(1);
+        $childDefinitionProphecy->addTag('api_platform.doctrine.orm.query_extension.item')->shouldBeCalledTimes(1);
+
+        $containerBuilderProphecy->registerForAutoconfiguration(QueryCollectionExtensionInterface::class)
+            ->willReturn($childDefinitionProphecy)->shouldBeCalledTimes(1);
+        $childDefinitionProphecy->addTag('api_platform.doctrine.orm.query_extension.collection')->shouldBeCalledTimes(1);
+
+        $containerBuilderProphecy->registerForAutoconfiguration(AggregationItemExtensionInterface::class)
+            ->willReturn($childDefinitionProphecy)->shouldBeCalledTimes(1);
+        $childDefinitionProphecy->addTag('api_platform.doctrine.mongodb.aggregation_extension.item')->shouldBeCalledTimes(1);
+
+        $containerBuilderProphecy->registerForAutoconfiguration(AggregationCollectionExtensionInterface::class)
+            ->willReturn($childDefinitionProphecy)->shouldBeCalledTimes(1);
+        $childDefinitionProphecy->addTag('api_platform.doctrine.mongodb.aggregation_extension.collection')->shouldBeCalledTimes(1);
+
         $containerBuilderProphecy->addResource(Argument::type(DirectoryResource::class))->shouldBeCalled();
 
         $parameters = [
@@ -744,6 +749,25 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.doctrine.orm.range_filter',
             'api_platform.doctrine.orm.search_filter',
             'api_platform.doctrine.orm.subresource_data_provider',
+            'api_platform.doctrine_mongodb.odm.aggregation_extension.filter',
+            'api_platform.doctrine_mongodb.odm.aggregation_extension.order',
+            'api_platform.doctrine_mongodb.odm.aggregation_extension.pagination',
+            'api_platform.doctrine_mongodb.odm.boolean_filter',
+            'api_platform.doctrine_mongodb.odm.collection_data_provider',
+            'api_platform.doctrine_mongodb.odm.data_persister',
+            'api_platform.doctrine_mongodb.odm.date_filter',
+            'api_platform.doctrine_mongodb.odm.default.collection_data_provider',
+            'api_platform.doctrine_mongodb.odm.default.item_data_provider',
+            'api_platform.doctrine_mongodb.odm.default.subresource_data_provider',
+            'api_platform.doctrine_mongodb.odm.default_entity_manager.property_info_extractor',
+            'api_platform.doctrine_mongodb.odm.exists_filter',
+            'api_platform.doctrine_mongodb.odm.item_data_provider',
+            'api_platform.doctrine_mongodb.odm.metadata.property.metadata_factory',
+            'api_platform.doctrine_mongodb.odm.numeric_filter',
+            'api_platform.doctrine_mongodb.odm.order_filter',
+            'api_platform.doctrine_mongodb.odm.range_filter',
+            'api_platform.doctrine_mongodb.odm.search_filter',
+            'api_platform.doctrine_mongodb.odm.subresource_data_provider',
             'api_platform.graphql.action.entrypoint',
             'api_platform.graphql.executor',
             'api_platform.graphql.schema_builder',
@@ -816,6 +840,9 @@ class ApiPlatformExtensionTest extends TestCase
             EagerLoadingExtension::class => 'api_platform.doctrine.orm.query_extension.eager_loading',
             FilterExtension::class => 'api_platform.doctrine.orm.query_extension.filter',
             FilterEagerLoadingExtension::class => 'api_platform.doctrine.orm.query_extension.filter_eager_loading',
+            MongoDbOdmFilterExtension::class => 'api_platform.doctrine_mongodb.odm.aggregation_extension.filter',
+            MongoDbOdmOrderExtension::class => 'api_platform.doctrine_mongodb.odm.aggregation_extension.order',
+            MongoDbOdmPaginationExtension::class => 'api_platform.doctrine_mongodb.odm.aggregation_extension.pagination',
             PaginationExtension::class => 'api_platform.doctrine.orm.query_extension.pagination',
             OrderExtension::class => 'api_platform.doctrine.orm.query_extension.order',
             ValidatorInterface::class => 'api_platform.validator',

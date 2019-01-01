@@ -15,6 +15,8 @@ namespace ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection;
 
 use ApiPlatform\Core\Exception\FilterValidationException;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
+use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
+use Doctrine\Bundle\MongoDBBundle\DoctrineMongoDBBundle;
 use Doctrine\ORM\OptimisticLockException;
 use FOS\UserBundle\FOSUserBundle;
 use GraphQL\GraphQL;
@@ -91,11 +93,10 @@ final class Configuration implements ConfigurationInterface
                     ->end()
                 ->end()
                 ->arrayNode('doctrine')
-                    ->addDefaultsIfNotSet()
-                    ->children()
-                        ->booleanNode('enable_mongodb_odm')->defaultValue(false)->info('Enable Doctrine MongoDB ODM integration.')->end()
-                        ->booleanNode('enable_orm')->defaultValue(true)->info('Enable Doctrine ORM integration.')->end()
-                    ->end()
+                    ->{class_exists(DoctrineBundle::class) ? 'canBeDisabled' : 'canBeEnabled'}()
+                ->end()
+                ->arrayNode('doctrine_mongodb_odm')
+                    ->{class_exists(DoctrineMongoDBBundle::class) ? 'canBeDisabled' : 'canBeEnabled'}()
                 ->end()
                 ->booleanNode('enable_fos_user')->defaultValue(class_exists(FOSUserBundle::class))->info('Enable the FOSUserBundle integration.')->end()
                 ->booleanNode('enable_nelmio_api_doc')
