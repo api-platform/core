@@ -58,8 +58,11 @@ class AppKernel extends Kernel
             new SecurityBundle(),
             new FOSUserBundle(),
             new TestBundle(),
-            new DoctrineMongoDBBundle(),
         ];
+
+        if (class_exists(DoctrineMongoDBBundle::class)) {
+            $bundles[] = new DoctrineMongoDBBundle();
+        }
 
         if ($_SERVER['LEGACY'] ?? true) {
             $bundles[] = new NelmioApiDocBundle();

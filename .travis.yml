@@ -8,6 +8,10 @@ cache:
 jobs:
   include:
     - php: '7.1'
+      env: NO_UNIT_TESTS=true
+      before_install:
+        - composer remove --dev ext-mongodb doctrine/mongodb-odm doctrine/mongodb-odm-bundle
+        - sed -i '26,32d' tests/Fixtures/app/config/config_common.yml
     - php: '7.2'
     - php: '7.3'
     - php: '7.3'
@@ -49,7 +53,9 @@ install:
 
 script:
   - tests/Fixtures/app/console cache:clear
-  - vendor/bin/phpunit
+  - if [[ $NO_UNIT_TESTS != true ]]; then
+      vendor/bin/phpunit;
+    fi
   - if [[ $APP_ENV = 'mongodb' ]]; then
       vendor/bin/phpunit -c phpunit.mongo.xml;
     fi
