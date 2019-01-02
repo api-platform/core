@@ -17,7 +17,7 @@ use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * DummyDto.
+ * DummyDtoNoInput.
  *
  * @author Vincent Chalamon <vincentchalamon@gmail.com>
  *

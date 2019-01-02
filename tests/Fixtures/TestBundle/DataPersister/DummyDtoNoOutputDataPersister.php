@@ -37,8 +37,6 @@ class DummyDtoNoOutputDataPersister implements DataPersisterInterface
 
     /**
      * {@inheritdoc}
-     *
-     * @var InputDto
      */
     public function persist($data)
     {

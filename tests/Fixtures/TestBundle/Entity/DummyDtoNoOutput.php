@@ -27,7 +27,6 @@ use Doctrine\ORM\Mapping as ORM;
  *     attributes={
  *         "input_class"=InputDto::class,
  *         "output_class"=false
- *
  *     }
  * )
  */
