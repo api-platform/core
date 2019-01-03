@@ -33,7 +33,6 @@ final class AddFormatListener
     private $formats = [];
     private $mimeTypes;
     private $formatsProvider;
-    private $dispatcher;
 
     /**
      * @throws InvalidArgumentException
