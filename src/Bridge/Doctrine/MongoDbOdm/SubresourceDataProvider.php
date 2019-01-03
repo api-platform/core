@@ -99,7 +99,7 @@ final class SubresourceDataProvider implements SubresourceDataProviderInterface
 
         $iterator = $aggregationBuilder->hydrate($resourceClass)->execute();
 
-        return $context['collection'] ? $iterator->toArray() : $iterator->current();
+        return $context['collection'] ? $iterator->toArray() : ($iterator->current() ?: null);
     }
 
     /**

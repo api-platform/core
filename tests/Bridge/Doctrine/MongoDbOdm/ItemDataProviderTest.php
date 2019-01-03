@@ -49,7 +49,8 @@ class ItemDataProviderTest extends TestCase
         $matchProphecy->equals(1)->shouldBeCalled();
 
         $iterator = $this->prophesize(Iterator::class);
-        $iterator->current()->willReturn([])->shouldBeCalled();
+        $result = new \stdClass();
+        $iterator->current()->willReturn($result)->shouldBeCalled();
 
         $aggregationBuilderProphecy = $this->prophesize(Builder::class);
         $aggregationBuilderProphecy->match()->willReturn($matchProphecy->reveal())->shouldBeCalled();
@@ -67,7 +68,7 @@ class ItemDataProviderTest extends TestCase
 
         $dataProvider = new ItemDataProvider($managerRegistry, $propertyNameCollectionFactory, $propertyMetadataFactory, [$extensionProphecy->reveal()]);
 
-        $this->assertEquals([], $dataProvider->getItem(Dummy::class, ['id' => 1], 'foo', $context));
+        $this->assertEquals($result, $dataProvider->getItem(Dummy::class, ['id' => 1], 'foo', $context));
     }
 
     public function testGetItemDoubleIdentifier()
@@ -79,7 +80,8 @@ class ItemDataProviderTest extends TestCase
         $matchProphecy->equals(2)->shouldBeCalled();
 
         $iterator = $this->prophesize(Iterator::class);
-        $iterator->current()->willReturn([])->shouldBeCalled();
+        $result = new \stdClass();
+        $iterator->current()->willReturn($result)->shouldBeCalled();
 
         $aggregationBuilderProphecy = $this->prophesize(Builder::class);
         $aggregationBuilderProphecy->match()->willReturn($matchProphecy->reveal())->shouldBeCalled();
@@ -99,7 +101,7 @@ class ItemDataProviderTest extends TestCase
 
         $dataProvider = new ItemDataProvider($managerRegistry, $propertyNameCollectionFactory, $propertyMetadataFactory, [$extensionProphecy->reveal()]);
 
-        $this->assertEquals([], $dataProvider->getItem(Dummy::class, ['ida' => 1, 'idb' => 2], 'foo', $context));
+        $this->assertEquals($result, $dataProvider->getItem(Dummy::class, ['ida' => 1, 'idb' => 2], 'foo', $context));
     }
 
     /**

@@ -271,7 +271,8 @@ class SubresourceDataProviderTest extends TestCase
 
         $iterator = $this->prophesize(Iterator::class);
         $iterator->toArray()->shouldBeCalled()->willReturn([['_id' => 1, 'ownedDummy' => [['_id' => 3]]]]);
-        $iterator->current()->shouldBeCalled()->willReturn([]);
+        $result = new \stdClass();
+        $iterator->current()->shouldBeCalled()->willReturn($result);
         $aggregationBuilder->execute()->shouldBeCalled()->willReturn($iterator->reveal());
         $aggregationBuilder->hydrate(RelatedOwningDummy::class)->shouldBeCalled()->willReturn($aggregationBuilder);
 
@@ -285,7 +286,7 @@ class SubresourceDataProviderTest extends TestCase
 
         $context = ['property' => 'ownedDummy', 'identifiers' => [['id', Dummy::class]], 'collection' => false, IdentifierConverterInterface::HAS_IDENTIFIER_CONVERTER => true];
 
-        $this->assertEquals([], $dataProvider->getSubresource(RelatedOwningDummy::class, ['id' => ['id' => 1]], $context));
+        $this->assertEquals($result, $dataProvider->getSubresource(RelatedOwningDummy::class, ['id' => ['id' => 1]], $context));
     }
 
     public function testAggregationResultExtension()

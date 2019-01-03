@@ -94,6 +94,6 @@ final class ItemDataProvider implements DenormalizedIdentifiersAwareItemDataProv
             }
         }
 
-        return $aggregationBuilder->hydrate($resourceClass)->execute()->current();
+        return $aggregationBuilder->hydrate($resourceClass)->execute()->current() ?: null;
     }
 }
