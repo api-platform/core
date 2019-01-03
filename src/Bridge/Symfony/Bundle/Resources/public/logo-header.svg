@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Generator: Adobe Illustrator 20.1.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
-<svg version="1.1" id="Calque_1" xmlns="http://www.w3.org/2000/svg"  x="0px" y="0px"
+<svg version="1.1" id="Calque_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
 	 viewBox="0 0 1200 322.6" style="enable-background:new 0 0 1200 322.6;" xml:space="preserve">
 <style type="text/css">
 	.st0{fill:#85CCD3;}
@@ -93,7 +93,7 @@
 		<circle class="st5" cx="201.5" cy="121.5" r="2"/>
 		<ellipse class="st8" cx="170.5" cy="118.4" rx="21" ry="21.7"/>
 		<circle cx="172.2" cy="119.6" r="9.6"/>
-
+		
 			<ellipse transform="matrix(0.9984 -5.733701e-02 5.733701e-02 0.9984 -6.4604 10.3496)" class="st5" cx="177.1" cy="117.8" rx="2.5" ry="2.5"/>
 	</g>
 </g>
