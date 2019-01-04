@@ -44,8 +44,8 @@ final class PaginationExtension implements ContextAwareQueryResultCollectionExte
     public function __construct(ManagerRegistry $managerRegistry, /* ResourceMetadataFactoryInterface */ $resourceMetadataFactory, /* Pagination */ $pagination)
     {
         if ($resourceMetadataFactory instanceof RequestStack && $pagination instanceof ResourceMetadataFactoryInterface) {
-            @trigger_error(sprintf('Passing an instance of "%s" as second argument of "%s" is deprecated since API Platform 2.3 and will not be possible anymore in API Platform 3. Pass an instance of "%s" instead.', RequestStack::class, self::class, ResourceMetadataFactoryInterface::class), E_USER_DEPRECATED);
-            @trigger_error(sprintf('Passing an instance of "%s" as third argument of "%s" is deprecated since API Platform 2.3 and will not be possible anymore in API Platform 3. Pass an instance of "%s" instead.', ResourceMetadataFactoryInterface::class, self::class, Pagination::class), E_USER_DEPRECATED);
+            @trigger_error(sprintf('Passing an instance of "%s" as second argument of "%s" is deprecated since API Platform 2.4 and will not be possible anymore in API Platform 3. Pass an instance of "%s" instead.', RequestStack::class, self::class, ResourceMetadataFactoryInterface::class), E_USER_DEPRECATED);
+            @trigger_error(sprintf('Passing an instance of "%s" as third argument of "%s" is deprecated since API Platform 2.4 and will not be possible anymore in API Platform 3. Pass an instance of "%s" instead.', ResourceMetadataFactoryInterface::class, self::class, Pagination::class), E_USER_DEPRECATED);
 
             $requestStack = $resourceMetadataFactory;
             $resourceMetadataFactory = $pagination;
@@ -67,7 +67,7 @@ final class PaginationExtension implements ContextAwareQueryResultCollectionExte
             $paginationOptions = array_column($legacyPaginationArgs, 'default', 'option_name');
 
             if (0 < \count($legacyArgs = \array_slice(\func_get_args(), 3, null, true))) {
-                @trigger_error(sprintf('Passing "$%s" arguments is deprecated since API Platform 2.3 and will not be possible anymore in API Platform 3. Pass an instance of "%s" as third argument instead.', implode('", "$', array_column($legacyPaginationArgs, 'arg_name')), Paginator::class), E_USER_DEPRECATED);
+                @trigger_error(sprintf('Passing "$%s" arguments is deprecated since API Platform 2.4 and will not be possible anymore in API Platform 3. Pass an instance of "%s" as third argument instead.', implode('", "$', array_column($legacyPaginationArgs, 'arg_name')), Paginator::class), E_USER_DEPRECATED);
 
                 foreach ($legacyArgs as $pos => $arg) {
                     [
@@ -77,7 +77,7 @@ final class PaginationExtension implements ContextAwareQueryResultCollectionExte
                         'default' => $default,
                     ] = $legacyPaginationArgs[$pos];
 
-                    if (!(\call_user_func("is_{$type}", $arg) || null === $default && null === $arg)) {
+                    if (!((null === $default && null === $arg) || \call_user_func("is_{$type}", $arg))) {
                         throw new InvalidArgumentException(sprintf('The "$%s" argument is expected to be a %s%s.', $argName, $type, null === $default ? ' or null' : ''));
                     }
 
