@@ -229,6 +229,9 @@ class OrderFilterTest extends DoctrineMongoDbOdmFilterTestCase
                             ],
                         ],
                         [
+                            '$unwind' => '$relatedDummy_lkup',
+                        ],
+                        [
                             '$sort' => [
                                 '_id' => 1,
                                 'name' => -1,
@@ -331,6 +334,9 @@ class OrderFilterTest extends DoctrineMongoDbOdmFilterTestCase
                                 'foreignField' => '_id',
                                 'as' => 'relatedDummy_lkup',
                             ],
+                        ],
+                        [
+                            '$unwind' => '$relatedDummy_lkup',
                         ],
                         [
                             '$sort' => [

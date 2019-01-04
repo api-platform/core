@@ -192,6 +192,9 @@ class ExistsFilterTest extends DoctrineMongoDbOdmFilterTestCase
                             ],
                         ],
                         [
+                            '$unwind' => '$relatedDummy_lkup',
+                        ],
+                        [
                             '$match' => [
                                 'relatedDummy_lkup.name' => [
                                     '$ne' => null,

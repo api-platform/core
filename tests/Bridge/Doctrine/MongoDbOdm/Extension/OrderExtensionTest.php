@@ -122,8 +122,11 @@ class OrderExtensionTest extends TestCase
         $aggregationBuilderProphecy = $this->prophesize(Builder::class);
 
         $lookupProphecy = $this->prophesize(Lookup::class);
+        $lookupProphecy->localField('author')->shouldBeCalled()->willReturn($lookupProphecy);
+        $lookupProphecy->foreignField('_id')->shouldBeCalled()->willReturn($lookupProphecy);
         $lookupProphecy->alias('author_lkup')->shouldBeCalled();
-        $aggregationBuilderProphecy->lookup('author')->shouldBeCalled()->willReturn($lookupProphecy->reveal());
+        $aggregationBuilderProphecy->lookup(Dummy::class)->shouldBeCalled()->willReturn($lookupProphecy->reveal());
+        $aggregationBuilderProphecy->unwind('$author_lkup')->shouldBeCalled();
         $aggregationBuilderProphecy->sort(['author_lkup.name' => 'ASC'])->shouldBeCalled();
 
         $classMetadataProphecy = $this->prophesize(ClassMetadata::class);
@@ -132,6 +135,7 @@ class OrderExtensionTest extends TestCase
         $classMetadataProphecy->hasAssociation('name')->shouldBeCalled()->willReturn(false);
         $classMetadataProphecy->getAssociationTargetClass('author')->shouldBeCalled()->willReturn(Dummy::class);
         $classMetadataProphecy->hasReference('author')->shouldBeCalled()->willReturn(true);
+        $classMetadataProphecy->getFieldMapping('author')->shouldBeCalled()->willReturn(['isOwningSide' => true]);
 
         $resourceMetadataFactoryProphecy->create(Dummy::class)->shouldBeCalled()->willReturn(new ResourceMetadata(null, null, null, null, null, ['order' => ['author.name']]));
 

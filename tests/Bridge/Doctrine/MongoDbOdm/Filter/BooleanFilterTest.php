@@ -73,6 +73,9 @@ class BooleanFilterTest extends DoctrineMongoDbOdmFilterTestCase
                             ],
                         ],
                         [
+                            '$unwind' => '$relatedDummy_lkup',
+                        ],
+                        [
                             '$match' => ['relatedDummy_lkup.dummyBoolean' => true],
                         ],
                     ],

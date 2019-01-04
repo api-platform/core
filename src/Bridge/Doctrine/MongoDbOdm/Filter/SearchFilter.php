@@ -18,8 +18,10 @@ use ApiPlatform\Core\Bridge\Doctrine\Common\Filter\SearchFilterInterface;
 use ApiPlatform\Core\Bridge\Doctrine\Common\Filter\SearchFilterTrait;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
 use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Common\Persistence\Mapping\ClassMetadata;
 use Doctrine\ODM\MongoDB\Aggregation\Builder;
 use Doctrine\ODM\MongoDB\Types\Type as MongoDbType;
+use Doctrine\ODM\MongoDB\Types\Type;
 use MongoDB\BSON\Regex;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\PropertyAccess\PropertyAccess;
@@ -110,14 +112,14 @@ final class SearchFilter extends AbstractFilter implements SearchFilterInterface
                 $aggregationBuilder
                     ->match()
                     ->field($matchField)
-                    ->equals($this->addEqualityMatchStrategy($strategy, $values[0], $caseSensitive));
+                    ->equals($this->addEqualityMatchStrategy($strategy, $field, $values[0], $caseSensitive, $metadata));
 
                 return;
             }
 
             $inValues = [];
             foreach ($values as $inValue) {
-                $inValues[] = $this->addEqualityMatchStrategy($strategy, $inValue, $caseSensitive);
+                $inValues[] = $this->addEqualityMatchStrategy($strategy, $field, $inValue, $caseSensitive, $metadata);
             }
             $aggregationBuilder
                 ->match()
@@ -160,9 +162,13 @@ final class SearchFilter extends AbstractFilter implements SearchFilterInterface
      *
      * @return Regex|string
      */
-    private function addEqualityMatchStrategy(string $strategy, $value, bool $caseSensitive)
+    private function addEqualityMatchStrategy(string $strategy, string $field, $value, bool $caseSensitive, ClassMetadata $metadata)
     {
+        $type = $metadata->getTypeOfField($field);
+
         switch ($strategy) {
+            case Type::STRING !== $type:
+                return Type::getType($type)->convertToDatabaseValue($value);
             case null:
             case self::STRATEGY_EXACT:
                 return $caseSensitive ? $value : new Regex("^$value$", $caseSensitive ? '' : 'i');

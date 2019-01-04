@@ -441,6 +441,9 @@ class SearchFilterTest extends DoctrineMongoDbOdmFilterTestCase
                             ],
                         ],
                         [
+                            '$unwind' => '$relatedDummy_lkup',
+                        ],
+                        [
                             '$match' => [
                                 'relatedDummy_lkup.id' => 1,
                             ],
@@ -482,6 +485,9 @@ class SearchFilterTest extends DoctrineMongoDbOdmFilterTestCase
                                 'foreignField' => '_id',
                                 'as' => 'relatedDummy_lkup',
                             ],
+                        ],
+                        [
+                            '$unwind' => '$relatedDummy_lkup',
                         ],
                         [
                             '$match' => [

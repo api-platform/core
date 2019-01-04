@@ -270,6 +270,9 @@ class DateFilterTest extends DoctrineMongoDbOdmFilterTestCase
                             ],
                         ],
                         [
+                            '$unwind' => '$relatedDummy_lkup',
+                        ],
+                        [
                             '$match' => [
                                 '$and' => [
                                     [

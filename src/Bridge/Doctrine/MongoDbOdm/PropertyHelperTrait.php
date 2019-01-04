@@ -49,20 +49,43 @@ trait PropertyHelperTrait
     protected function addLookupsForNestedProperty(string $property, Builder $aggregationBuilder, string $resourceClass): array
     {
         $propertyParts = $this->splitPropertyParts($property, $resourceClass);
-        $association = $propertyParts['associations'][0] ?? null;
+        $alias = '';
 
-        if (null === $association) {
+        foreach ($propertyParts['associations'] as $association) {
+            $classMetadata = $this->getClassMetadata($resourceClass);
+
+            if (!$classMetadata instanceof MongoDbOdmClassMetadata) {
+                break;
+            }
+
+            if ($classMetadata->hasReference($association)) {
+                $propertyAlias = "${association}_lkup";
+                // previous_association_lkup.association
+                $localField = "$alias$association";
+                // previous_association_lkup.association_lkup
+                $alias .= $propertyAlias;
+                $referenceMapping = $classMetadata->getFieldMapping($association);
+
+                $aggregationBuilder->lookup($classMetadata->getAssociationTargetClass($association))
+                    ->localField($referenceMapping['isOwningSide'] ? $localField : '_id')
+                    ->foreignField($referenceMapping['isOwningSide'] ? '_id' : $referenceMapping['mappedBy'])
+                    ->alias($alias);
+                $aggregationBuilder->unwind("\$$alias");
+
+                // assocation.property => association_lkup.property
+                $property = substr_replace($property, $propertyAlias, strpos($property, $association), \strlen($association));
+                $resourceClass = $classMetadata->getAssociationTargetClass($association);
+                $alias .= '.';
+            } elseif ($classMetadata->hasEmbed($association)) {
+                $alias = "$association.";
+                $resourceClass = $classMetadata->getAssociationTargetClass($association);
+            }
+        }
+
+        if ('' === $alias) {
             throw new InvalidArgumentException(sprintf('Cannot add lookups for property "%s" - property is not nested.', $property));
         }
 
-        $alias = $association;
-        $classMetadata = $this->getClassMetadata($resourceClass);
-        if ($classMetadata instanceof MongoDbOdmClassMetadata && $classMetadata->hasReference($association)) {
-            $alias = "${association}_lkup";
-            $aggregationBuilder->lookup($association)->alias($alias);
-        }
-
-        // assocation.property => association_lkup.property
-        return [substr_replace($property, $alias, 0, \strlen($association)), $propertyParts['field'], $propertyParts['associations']];
+        return [$property, $propertyParts['field'], $propertyParts['associations']];
     }
 }

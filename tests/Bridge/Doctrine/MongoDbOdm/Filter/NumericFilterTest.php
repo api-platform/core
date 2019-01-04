@@ -154,6 +154,9 @@ class NumericFilterTest extends DoctrineMongoDbOdmFilterTestCase
                             ],
                         ],
                         [
+                            '$unwind' => '$relatedDummy_lkup',
+                        ],
+                        [
                             '$match' => [
                                 'relatedDummy_lkup.id' => [
                                     '$in' => [0],
