@@ -21,7 +21,6 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Persistence\Mapping\ClassMetadata;
 use Doctrine\ODM\MongoDB\Aggregation\Builder;
 use Doctrine\ODM\MongoDB\Types\Type as MongoDbType;
-use Doctrine\ODM\MongoDB\Types\Type;
 use MongoDB\BSON\Regex;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\PropertyAccess\PropertyAccess;
@@ -167,8 +166,8 @@ final class SearchFilter extends AbstractFilter implements SearchFilterInterface
         $type = $metadata->getTypeOfField($field);
 
         switch ($strategy) {
-            case Type::STRING !== $type:
-                return Type::getType($type)->convertToDatabaseValue($value);
+            case MongoDbType::STRING !== $type:
+                return MongoDbType::getType($type)->convertToDatabaseValue($value);
             case null:
             case self::STRATEGY_EXACT:
                 return $caseSensitive ? $value : new Regex("^$value$", $caseSensitive ? '' : 'i');
