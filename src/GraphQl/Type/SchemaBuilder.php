@@ -212,9 +212,7 @@ final class SchemaBuilder implements SchemaBuilderInterface
             if ($isStandardGraphqlType) {
                 $className = '';
             } else {
-                $className = $this->isCollectionOfObjects($type)
-                    ? $type->getCollectionValueType()->getClassName()
-                    : $type->getClassName();
+                $className = $this->isCollectionOfObjects($type) ? $type->getCollectionValueType()->getClassName() : $type->getClassName();
             }
 
             $args = [];
@@ -374,9 +372,7 @@ final class SchemaBuilder implements SchemaBuilderInterface
                     break;
                 }
 
-                $resourceClass = $this->isCollectionOfObjects($type)
-                    ? $type->getCollectionValueType()->getClassName()
-                    : $type->getClassName();
+                $resourceClass = $this->isCollectionOfObjects($type) ? $type->getCollectionValueType()->getClassName() : $type->getClassName();
                 if (null === $resourceClass) {
                     return null;
                 }
@@ -398,18 +394,14 @@ final class SchemaBuilder implements SchemaBuilderInterface
         }
 
         if ($this->isCollectionOfObjects($type)) {
-            return $this->paginationEnabled && !$input
-                ? $this->getResourcePaginatedCollectionType($resourceClass, $graphqlType)
-                : GraphQLType::listOf($graphqlType);
+            return $this->paginationEnabled && !$input ? $this->getResourcePaginatedCollectionType($resourceClass, $graphqlType) : GraphQLType::listOf($graphqlType);
         }
 
         if ($this->isCollectionOfScalars($type)) {
             return GraphQLType::listOf($graphqlType);
         }
 
-        return $type->isNullable() || (null !== $mutationName && 'update' === $mutationName)
-            ? $graphqlType
-            : GraphQLType::nonNull($graphqlType);
+        return $type->isNullable() || (null !== $mutationName && 'update' === $mutationName) ? $graphqlType : GraphQLType::nonNull($graphqlType);
     }
 
     /**
@@ -467,9 +459,7 @@ final class SchemaBuilder implements SchemaBuilderInterface
         }
 
         foreach ($this->propertyNameCollectionFactory->create($resourceClass) as $property) {
-            $propertyMetadata = $this->propertyMetadataFactory->create(
-                $resourceClass, $property, ['graphql_operation_name' => $mutationName ?? 'query']
-            );
+            $propertyMetadata = $this->propertyMetadataFactory->create($resourceClass, $property, ['graphql_operation_name' => $mutationName ?? 'query']);
             if (
                 null === ($propertyType = $propertyMetadata->getType())
                 || (!$input && null === $mutationName && false === $propertyMetadata->isReadable())

@@ -246,6 +246,32 @@ Feature: GraphQL introspection support
     And the JSON node "data.__type.fields[9].name" should be equal to "jsonData"
     And the JSON node "data.__type.fields[9].type.name" should be equal to "Iterable"
 
+  Scenario: Introspect a scalar array type field
+    When I send the following GraphQL request:
+    """
+    {
+      __type(name: "DummyIterable") {
+        description,
+        fields {
+          name
+          type {
+            name
+            kind
+            ofType {
+              name
+              kind
+              ofType {
+                name
+                kind
+              }
+            }
+          }
+        }
+      }
+    }
+    """
+    Then print last JSON response
+
   Scenario: Retrieve entity - using serialization groups - fields
     When I send the following GraphQL request:
     """
