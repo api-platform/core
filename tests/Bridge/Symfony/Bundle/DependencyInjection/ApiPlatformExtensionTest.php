@@ -40,6 +40,7 @@ use ApiPlatform\Core\Serializer\SerializerContextBuilderInterface;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\TestBundle;
 use ApiPlatform\Core\Validator\ValidatorInterface;
 use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
+use Doctrine\ORM\OptimisticLockException;
 use FOS\UserBundle\FOSUserBundle;
 use Nelmio\ApiDocBundle\NelmioApiDocBundle;
 use PHPUnit\Framework\TestCase;
@@ -414,6 +415,25 @@ class ApiPlatformExtensionTest extends TestCase
         $this->extension->load($config, $containerBuilder);
     }
 
+    public function testDisabledSwaggerUIAndRedoc()
+    {
+        $containerBuilderProphecy = $this->getBaseContainerBuilderProphecy();
+        $containerBuilderProphecy->setDefinition('api_platform.swagger.action.ui', Argument::type(Definition::class))->shouldNotBeCalled();
+        $containerBuilderProphecy->setDefinition('api_platform.swagger.listener.ui', Argument::type(Definition::class))->shouldNotBeCalled();
+        $containerBuilderProphecy->setParameter('api_platform.enable_swagger_ui', true)->shouldNotBeCalled();
+        $containerBuilderProphecy->setParameter('api_platform.enable_swagger_ui', true)->shouldNotBeCalled();
+        $containerBuilderProphecy->setParameter('api_platform.enable_swagger_ui', false)->shouldNotBeCalled();
+        $containerBuilderProphecy->setParameter('api_platform.enable_re_doc', true)->shouldNotBeCalled();
+        $containerBuilderProphecy->setParameter('api_platform.enable_re_doc', false)->shouldNotBeCalled();
+        $containerBuilder = $containerBuilderProphecy->reveal();
+
+        $config = self::DEFAULT_CONFIG;
+        $config['api_platform']['enable_swagger_ui'] = false;
+        $config['api_platform']['enable_re_doc'] = false;
+
+        $this->extension->load($config, $containerBuilder);
+    }
+
     private function getPartialContainerBuilderProphecy($test = false)
     {
         $containerBuilderProphecy = $this->prophesize(ContainerBuilder::class);
@@ -487,6 +507,7 @@ class ApiPlatformExtensionTest extends TestCase
                 ExceptionInterface::class => Response::HTTP_BAD_REQUEST,
                 InvalidArgumentException::class => Response::HTTP_BAD_REQUEST,
                 FilterValidationException::class => Response::HTTP_BAD_REQUEST,
+                OptimisticLockException::class => Response::HTTP_CONFLICT,
             ],
             'api_platform.title' => 'title',
             'api_platform.version' => 'version',
@@ -665,6 +686,7 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.swagger.api_keys' => [],
             'api_platform.enable_swagger' => true,
             'api_platform.enable_swagger_ui' => true,
+            'api_platform.enable_re_doc' => true,
             'api_platform.graphql.enabled' => true,
             'api_platform.graphql.graphiql.enabled' => true,
             'api_platform.resource_class_directories' => Argument::type('array'),
@@ -756,7 +778,6 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.problem.encoder',
             'api_platform.problem.normalizer.constraint_violation_list',
             'api_platform.problem.normalizer.error',
-            'api_platform.swagger.action.ui',
             'api_platform.swagger.command.swagger_command',
             'api_platform.http_cache.listener.response.configure',
             'api_platform.http_cache.purger.varnish',
@@ -765,6 +786,7 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.validator',
             'api_platform.mercure.listener.response.add_link_header',
             'api_platform.doctrine.listener.mercure.publish',
+            'api_platform.messenger.data_persister',
         ];
 
         foreach ($definitions as $definition) {
@@ -773,6 +795,7 @@ class ApiPlatformExtensionTest extends TestCase
 
         $aliases = [
             'api_platform.http_cache.purger' => 'api_platform.http_cache.purger.varnish',
+            'api_platform.message_bus' => 'message_bus',
             EagerLoadingExtension::class => 'api_platform.doctrine.orm.query_extension.eager_loading',
             FilterExtension::class => 'api_platform.doctrine.orm.query_extension.filter',
             FilterEagerLoadingExtension::class => 'api_platform.doctrine.orm.query_extension.filter_eager_loading',
@@ -787,7 +810,6 @@ class ApiPlatformExtensionTest extends TestCase
 
         $containerBuilderProphecy->hasParameter('api_platform.metadata_cache')->willReturn(true)->shouldBeCalled();
         $containerBuilderProphecy->getParameter('api_platform.metadata_cache')->willReturn(true)->shouldBeCalled();
-        $containerBuilderProphecy->hasParameter('mercure.default_hub')->willReturn(true)->shouldBeCalled();
 
         $containerBuilderProphecy->getDefinition('api_platform.mercure.listener.response.add_link_header')->willReturn(new Definition());
 

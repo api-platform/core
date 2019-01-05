@@ -67,11 +67,34 @@ final class PropertyFilter implements FilterInterface
      */
     public function getDescription(string $resourceClass): array
     {
+        $example = sprintf('%1$s[]={propertyName}&%1$s[]={anotherPropertyName}&%1$s[{nestedPropertyParent}][]={nestedProperty}',
+            $this->parameterName
+        );
+
         return [
             "$this->parameterName[]" => [
                 'property' => null,
                 'type' => 'string',
+                'is_collection' => true,
                 'required' => false,
+                'swagger' => [
+                    'description' => 'Allows you to reduce the response to contain only the properties you need. If your desired property is nested, you can address it using nested arrays. Example: '.$example,
+                    'name' => $this->parameterName,
+                    'type' => 'array',
+                    'items' => [
+                        'type' => 'string',
+                    ],
+                ],
+                'openapi' => [
+                    'description' => 'Allows you to reduce the response to contain only the properties you need. If your desired property is nested, you can address it using nested arrays. Example: '.$example,
+                    'name' => $this->parameterName,
+                    'schema' => [
+                        'type' => 'array',
+                        'items' => [
+                            'type' => 'string',
+                        ],
+                    ],
+                ],
             ],
         ];
     }

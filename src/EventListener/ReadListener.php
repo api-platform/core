@@ -50,7 +50,6 @@ final class ReadListener
     /**
      * Calls the data provider and sets the data attribute.
      *
-     *
      * @throws NotFoundHttpException
      */
     public function onKernelRequest(GetResponseEvent $event)

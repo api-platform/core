@@ -808,7 +808,6 @@ Feature: HAL Collections support
     }
     """
 
-  @dropSchema
   Scenario: Allow passing 0 to `itemsPerPage`
     When I add "Accept" header equal to "application/hal+json"
     And I send a "GET" request to "/dummies?itemsPerPage=0"

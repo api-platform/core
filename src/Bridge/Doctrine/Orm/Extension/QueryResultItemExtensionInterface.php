@@ -25,5 +25,8 @@ interface QueryResultItemExtensionInterface extends QueryItemExtensionInterface
 {
     public function supportsResult(string $resourceClass, string $operationName = null): bool;
 
+    /**
+     * @return object|null
+     */
     public function getResult(QueryBuilder $queryBuilder);
 }

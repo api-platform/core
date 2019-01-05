@@ -124,6 +124,27 @@ class DeserializeListenerTest extends TestCase
         $listener->onKernelRequest($eventProphecy->reveal());
     }
 
+    public function testDoNotCallWhenInputClassDisabled()
+    {
+        $eventProphecy = $this->prophesize(GetResponseEvent::class);
+
+        $request = new Request([], [], ['data' => new \stdClass(), '_api_resource_class' => 'Foo', '_api_collection_operation_name' => 'post', '_api_input_class' => false]);
+        $request->setMethod('POST');
+        $eventProphecy->getRequest()->willReturn($request)->shouldBeCalled();
+
+        $serializerProphecy = $this->prophesize(SerializerInterface::class);
+        $serializerProphecy->deserialize()->shouldNotBeCalled();
+
+        $serializerContextBuilderProphecy = $this->prophesize(SerializerContextBuilderInterface::class);
+        $serializerContextBuilderProphecy->createFromRequest(Argument::type(Request::class), false, Argument::type('array'))->shouldNotBeCalled();
+
+        $formatsProviderProphecy = $this->prophesize(FormatsProviderInterface::class);
+        $formatsProviderProphecy->getFormatsFromAttributes(Argument::type('array'))->shouldNotBeCalled();
+
+        $listener = new DeserializeListener($serializerProphecy->reveal(), $serializerContextBuilderProphecy->reveal(), $formatsProviderProphecy->reveal());
+        $listener->onKernelRequest($eventProphecy->reveal());
+    }
+
     /**
      * @dataProvider methodProvider
      */

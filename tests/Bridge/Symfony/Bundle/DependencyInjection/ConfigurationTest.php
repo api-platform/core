@@ -16,6 +16,7 @@ namespace ApiPlatform\Core\Tests\Bridge\Symfony\Bundle\DependencyInjection;
 use ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\Configuration;
 use ApiPlatform\Core\Exception\FilterValidationException;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
+use Doctrine\ORM\OptimisticLockException;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
@@ -72,6 +73,7 @@ class ConfigurationTest extends TestCase
                 ExceptionInterface::class => Response::HTTP_BAD_REQUEST,
                 InvalidArgumentException::class => Response::HTTP_BAD_REQUEST,
                 FilterValidationException::class => Response::HTTP_BAD_REQUEST,
+                OptimisticLockException::class => Response::HTTP_CONFLICT,
             ],
             'default_operation_path_resolver' => 'api_platform.operation_path_resolver.underscore',
             'path_segment_name_generator' => 'api_platform.path_segment_name_generator.underscore',
@@ -84,6 +86,7 @@ class ConfigurationTest extends TestCase
             'enable_swagger' => true,
             'enable_swagger_ui' => true,
             'enable_entrypoint' => true,
+            'enable_re_doc' => true,
             'enable_docs' => true,
             'enable_profiler' => true,
             'graphql' => [
@@ -154,7 +157,7 @@ class ConfigurationTest extends TestCase
 
     /**
      * @group legacy
-     * @expectedDeprecation Using a string "HTTP_INTERNAL_SERVER_ERROR" as a constant of the "Symfony\Component\HttpFoundation\Response" class is deprecated since API Platform 2.1 and will not be possible anymore in API Platform 3. Use the Symfony's custom YAML extension for PHP constants instead (i.e. "!php/const:Symfony\Component\HttpFoundation\Response::HTTP_INTERNAL_SERVER_ERROR").
+     * @expectedDeprecation Using a string "HTTP_INTERNAL_SERVER_ERROR" as a constant of the "Symfony\Component\HttpFoundation\Response" class is deprecated since API Platform 2.1 and will not be possible anymore in API Platform 3. Use the Symfony's custom YAML extension for PHP constants instead (i.e. "!php/const Symfony\Component\HttpFoundation\Response::HTTP_INTERNAL_SERVER_ERROR").
      */
     public function testLegacyExceptionToStatusConfig()
     {

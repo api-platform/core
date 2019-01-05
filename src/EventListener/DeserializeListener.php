@@ -66,6 +66,7 @@ final class DeserializeListener
             $request->isMethodSafe(false)
             || 'DELETE' === $method
             || !($attributes = RequestAttributesExtractor::extractAttributes($request))
+            || false === ($attributes['input_class'] ?? null)
             || !$attributes['receive']
             || (
                     '' === ($requestContent = $request->getContent())
@@ -100,7 +101,6 @@ final class DeserializeListener
 
     /**
      * Extracts the format from the Content-Type header and check that it is supported.
-     *
      *
      * @throws NotAcceptableHttpException
      */

@@ -64,7 +64,7 @@ reusable-steps:
   - &update-composer
     run:
       name: Update Composer
-      command: composer self-update
+      command: sudo composer self-update
   - &update-project-dependencies
     run:
       name: Update project dependencies
@@ -86,7 +86,7 @@ jobs:
       - *update-composer
       - run:
           name: Install PHP-CS-Fixer
-          command: composer global require friendsofphp/php-cs-fixer:^2.12
+          command: composer global require friendsofphp/php-cs-fixer:^2.13
       - *save-composer-cache-by-revision
       - *save-composer-cache-by-branch
       - run:
@@ -124,7 +124,6 @@ jobs:
       - image: circleci/php:7.2-node-browsers
     environment:
       SYMFONY_DEPRECATIONS_HELPER: weak_vendors
-      APP_ENV: test
     parallelism: 2
     working_directory: ~/api-platform/core
     steps:
@@ -141,8 +140,11 @@ jobs:
       - run:
           name: Run PHPUnit tests
           command: |-
-            mkdir -p build/logs/tmp build/cov
-            phpdbg -qrr vendor/bin/phpunit --coverage-php build/cov/coverage.cov --log-junit build/logs/tmp/coverage.xml --colors=always
+            mkdir -p build/logs/parallel build/logs/tmp build/cov
+            split_tests=$(find tests -name '*Test.php' -not -path 'tests/Bridge/Symfony/Bundle/DependencyInjection/ApiPlatformExtensionTest.php' | circleci tests split --split-by=timings)
+            export PARALLEL='-j10% --joblog build/logs/parallel/jobs.log --rpl {_}\ s/\\//_/g;'
+            phpunit_cmd='phpdbg -qrr vendor/bin/phpunit --coverage-php build/cov/coverage-{_}.cov --log-junit build/logs/tmp/{_}.xml --colors=always {}'
+            echo "$split_tests" | parallel "$phpunit_cmd" || echo "$split_tests" | parallel --retry-failed "$phpunit_cmd"
       - run:
           name: Merge PHPUnit test reports
           command: |-
@@ -154,6 +156,9 @@ jobs:
       - store_artifacts:
           path: build/logs/phpunit/junit.xml
           destination: build/logs/phpunit/junit.xml
+      - store_artifacts:
+          path: build/logs/parallel/jobs.log
+          destination: build/logs/parallel/jobs.log
       - persist_to_workspace:
           root: build
           paths:

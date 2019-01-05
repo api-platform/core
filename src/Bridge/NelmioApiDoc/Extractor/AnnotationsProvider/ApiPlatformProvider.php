@@ -152,7 +152,6 @@ final class ApiPlatformProvider implements AnnotationsProviderInterface
     /**
      * Gets Hydra documentation for the given resource.
      *
-     *
      * @return array|null
      */
     private function getResourceHydraDoc(array $hydraApiDoc, string $prefixedShortName)

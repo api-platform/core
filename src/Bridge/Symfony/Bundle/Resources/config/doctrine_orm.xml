@@ -12,7 +12,7 @@
         <service id="api_platform.doctrine.orm.data_persister" class="ApiPlatform\Core\Bridge\Doctrine\Common\DataPersister" public="false">
             <argument type="service" id="doctrine" />
 
-            <tag name="api_platform.data_persister" />
+            <tag name="api_platform.data_persister" priority="-1000" />
         </service>
 
         <service id="api_platform.doctrine.orm.collection_data_provider" public="false" abstract="true">

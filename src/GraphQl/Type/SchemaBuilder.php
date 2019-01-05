@@ -208,8 +208,8 @@ final class SchemaBuilder implements SchemaBuilderInterface
             }
 
             $graphqlWrappedType = $graphqlType instanceof WrappingType ? $graphqlType->getWrappedType() : $graphqlType;
-            $isInternalGraphqlType = \in_array($graphqlWrappedType, GraphQLType::getInternalTypes(), true);
-            if ($isInternalGraphqlType) {
+            $isStandardGraphqlType = \in_array($graphqlWrappedType, GraphQLType::getStandardTypes(), true);
+            if ($isStandardGraphqlType) {
                 $className = '';
             } else {
                 $className = $this->isCollectionOfObjects($type)
@@ -218,7 +218,7 @@ final class SchemaBuilder implements SchemaBuilderInterface
             }
 
             $args = [];
-            if (!$input && null === $mutationName && !$isInternalGraphqlType && $this->isCollectionOfObjects($type)) {
+            if (!$input && null === $mutationName && !$isStandardGraphqlType && $this->isCollectionOfObjects($type)) {
                 if ($this->paginationEnabled) {
                     $args = [
                         'first' => [
@@ -260,7 +260,7 @@ final class SchemaBuilder implements SchemaBuilderInterface
                 $args = $this->convertFilterArgsToTypes($args);
             }
 
-            if ($isInternalGraphqlType || $input) {
+            if ($isStandardGraphqlType || $input) {
                 $resolve = null;
             } elseif ($this->isCollectionOfObjects($type)) {
                 $resolverFactory = $this->collectionResolverFactory;

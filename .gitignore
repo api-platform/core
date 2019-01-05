@@ -7,3 +7,5 @@
 /tests/Fixtures/app/var/*
 /tests/Fixtures/app/cache/*
 /tests/Fixtures/app/logs/*
+/swagger.json
+/swagger.yaml

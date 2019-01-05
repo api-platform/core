@@ -25,7 +25,6 @@ interface ResourceClassResolverInterface
     /**
      * Guesses the associated resource.
      *
-     *
      * @throws InvalidArgumentException
      */
     public function getResourceClass($value, string $resourceClass = null, bool $strict = false): string;

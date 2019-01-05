@@ -15,15 +15,16 @@ namespace ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection;
 
 use ApiPlatform\Core\Exception\FilterValidationException;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
+use Doctrine\ORM\OptimisticLockException;
 use FOS\UserBundle\FOSUserBundle;
 use GraphQL\GraphQL;
+use Symfony\Bundle\MercureBundle\MercureBundle;
 use Symfony\Bundle\TwigBundle\TwigBundle;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Mercure\Update;
 use Symfony\Component\Serializer\Exception\ExceptionInterface;
 
 /**
@@ -96,7 +97,8 @@ final class Configuration implements ConfigurationInterface
                     ->info('Enable the NelmioApiDocBundle integration.')
                 ->end()
                 ->booleanNode('enable_swagger')->defaultValue(true)->info('Enable the Swagger documentation and export.')->end()
-                ->booleanNode('enable_swagger_ui')->defaultValue(class_exists(TwigBundle::class))->info('Enable Swagger ui.')->end()
+                ->booleanNode('enable_swagger_ui')->defaultValue(class_exists(TwigBundle::class))->info('Enable Swagger UI')->end()
+                ->booleanNode('enable_re_doc')->defaultValue(class_exists(TwigBundle::class))->info('Enable ReDoc')->end()
                 ->booleanNode('enable_entrypoint')->defaultTrue()->info('Enable the entrypoint')->end()
                 ->booleanNode('enable_docs')->defaultTrue()->info('Enable the docs')->end()
                 ->booleanNode('enable_profiler')->defaultTrue()->info('Enable the data collector and the WebProfilerBundle integration.')->end()
@@ -225,7 +227,7 @@ final class Configuration implements ConfigurationInterface
                 ->end()
 
                 ->arrayNode('mercure')
-                    ->{class_exists(Update::class) ? 'canBeDisabled' : 'canBeEnabled'}()
+                    ->{class_exists(MercureBundle::class) ? 'canBeDisabled' : 'canBeEnabled'}()
                     ->children()
                         ->scalarNode('hub_url')->defaultNull()->info('The URL send in the Link HTTP header. If not set, will default to the URL for the Symfony\'s bundle default hub.')
                     ->end()
@@ -251,7 +253,6 @@ final class Configuration implements ConfigurationInterface
     /**
      * Adds an exception to status section.
      *
-     *
      * @throws InvalidConfigurationException
      */
     private function addExceptionToStatusSection(ArrayNodeDefinition $rootNode)
@@ -263,6 +264,7 @@ final class Configuration implements ConfigurationInterface
                         ExceptionInterface::class => Response::HTTP_BAD_REQUEST,
                         InvalidArgumentException::class => Response::HTTP_BAD_REQUEST,
                         FilterValidationException::class => Response::HTTP_BAD_REQUEST,
+                        OptimisticLockException::class => Response::HTTP_CONFLICT,
                     ])
                     ->info('The list of exceptions mapped to their HTTP status code.')
                     ->normalizeKeys(false)
@@ -276,7 +278,7 @@ final class Configuration implements ConfigurationInterface
                                 }
 
                                 if (\defined($httpStatusCodeConstant = sprintf('%s::%s', Response::class, $httpStatusCode))) {
-                                    @trigger_error(sprintf('Using a string "%s" as a constant of the "%s" class is deprecated since API Platform 2.1 and will not be possible anymore in API Platform 3. Use the Symfony\'s custom YAML extension for PHP constants instead (i.e. "!php/const:%s").', $httpStatusCode, Response::class, $httpStatusCodeConstant), E_USER_DEPRECATED);
+                                    @trigger_error(sprintf('Using a string "%s" as a constant of the "%s" class is deprecated since API Platform 2.1 and will not be possible anymore in API Platform 3. Use the Symfony\'s custom YAML extension for PHP constants instead (i.e. "!php/const %s").', $httpStatusCode, Response::class, $httpStatusCodeConstant), E_USER_DEPRECATED);
 
                                     $httpStatusCode = \constant($httpStatusCodeConstant);
                                 }
