@@ -181,18 +181,31 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
      */
     private function getHydraProperties(string $resourceClass, ResourceMetadata $resourceMetadata, string $shortName, string $prefixedShortName, array $context): array
     {
+        $classes = [];
+        foreach ($resourceMetadata->getCollectionOperations() as $operationName => $operation) {
+            if (false !== $class = $resourceMetadata->getCollectionOperationAttribute($operationName, 'input_class', $resourceClass, true)) {
+                $classes[$class] = true;
+            }
+
+            if (false !== $class = $resourceMetadata->getCollectionOperationAttribute($operationName, 'output_class', $resourceClass, true)) {
+                $classes[$class] = true;
+            }
+        }
+
         $properties = [];
-        foreach ($this->propertyNameCollectionFactory->create($resourceClass, $this->getPropertyNameCollectionFactoryContext($resourceMetadata)) as $propertyName) {
-            $propertyMetadata = $this->propertyMetadataFactory->create($resourceClass, $propertyName);
-            if (true === $propertyMetadata->isIdentifier() && false === $propertyMetadata->isWritable()) {
-                continue;
-            }
+        foreach ($classes as $class => $v) {
+            foreach ($this->propertyNameCollectionFactory->create($class, $this->getPropertyNameCollectionFactoryContext($resourceMetadata)) as $propertyName) {
+                $propertyMetadata = $this->propertyMetadataFactory->create($class, $propertyName);
+                if (true === $propertyMetadata->isIdentifier() && false === $propertyMetadata->isWritable()) {
+                    continue;
+                }
 
-            if ($this->nameConverter) {
-                $propertyName = $this->nameConverter->normalize($propertyName, $resourceClass, self::FORMAT, $context);
-            }
+                if ($this->nameConverter) {
+                    $propertyName = $this->nameConverter->normalize($propertyName, $class, self::FORMAT, $context);
+                }
 
-            $properties[] = $this->getProperty($propertyMetadata, $propertyName, $prefixedShortName, $shortName);
+                $properties[] = $this->getProperty($propertyMetadata, $propertyName, $prefixedShortName, $shortName);
+            }
         }
 
         return $properties;
@@ -244,6 +257,8 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
         }
 
         $shortName = $resourceMetadata->getShortName();
+        $inputClass = $resourceMetadata->getTypedOperationAttribute($operationType, $operationName, 'input_class', null, true);
+        $outputClass = $resourceMetadata->getTypedOperationAttribute($operationType, $operationName, 'output_class', null, true);
 
         if ('GET' === $method && OperationType::COLLECTION === $operationType) {
             $hydraOperation += [
@@ -255,34 +270,34 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
             $hydraOperation += [
                 '@type' => ['hydra:Operation', 'schema:FindAction'],
                 'hydra:title' => $subresourceMetadata && $subresourceMetadata->isCollection() ? "Retrieves the collection of $shortName resources." : "Retrieves a $shortName resource.",
-                'returns' => "#$shortName",
+                'returns' => false === $outputClass ? 'owl:Nothing' : "#$shortName",
             ];
         } elseif ('GET' === $method) {
             $hydraOperation += [
                 '@type' => ['hydra:Operation', 'schema:FindAction'],
                 'hydra:title' => "Retrieves $shortName resource.",
-                'returns' => $prefixedShortName,
+                'returns' => false === $outputClass ? 'owl:Nothing' : $prefixedShortName,
             ];
         } elseif ('PATCH' === $method) {
             $hydraOperation += [
                 '@type' => 'hydra:Operation',
                 'hydra:title' => "Updates the $shortName resource.",
-                'returns' => $prefixedShortName,
-                'expects' => $prefixedShortName,
+                'returns' => false === $outputClass ? 'owl:Nothing' : $prefixedShortName,
+                'expects' => false === $inputClass ? 'owl:Nothing' : $prefixedShortName,
             ];
         } elseif ('POST' === $method) {
             $hydraOperation += [
                 '@type' => ['hydra:Operation', 'schema:CreateAction'],
                 'hydra:title' => "Creates a $shortName resource.",
-                'returns' => $prefixedShortName,
-                'expects' => $prefixedShortName,
+                'returns' => false === $outputClass ? 'owl:Nothing' : $prefixedShortName,
+                'expects' => false === $inputClass ? 'owl:Nothing' : $prefixedShortName,
             ];
         } elseif ('PUT' === $method) {
             $hydraOperation += [
                 '@type' => ['hydra:Operation', 'schema:ReplaceAction'],
                 'hydra:title' => "Replaces the $shortName resource.",
-                'returns' => $prefixedShortName,
-                'expects' => $prefixedShortName,
+                'returns' => false === $outputClass ? 'owl:Nothing' : $prefixedShortName,
+                'expects' => false === $inputClass ? 'owl:Nothing' : $prefixedShortName,
             ];
         } elseif ('DELETE' === $method) {
             $hydraOperation += [
