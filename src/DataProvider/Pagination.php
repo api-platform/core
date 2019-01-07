@@ -69,7 +69,7 @@ final class Pagination
             $collectionArgs = $request->attributes->get('_graphql_collections_args', []);
 
             if (isset($collectionArgs[$resourceClass]['after'])) {
-                return false === ($after = \base64_decode($collectionArgs[$resourceClass]['after'], true)) ? 0 : (int) $after + 1;
+                return false === ($after = base64_decode($collectionArgs[$resourceClass]['after'], true)) ? 0 : (int) $after + 1;
             }
         }
 

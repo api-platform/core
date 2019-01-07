@@ -126,7 +126,7 @@ final class ElasticsearchContext implements Context
 
                 $bulk[] = $document;
 
-                if (0 === (\count($bulk) % 50)) {
+                if (0 === (count($bulk) % 50)) {
                     $this->client->bulk(['body' => $bulk]);
                     $bulk = [];
                 }
