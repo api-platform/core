@@ -86,23 +86,11 @@ final class CollectionDataProvider implements ContextAwareCollectionDataProvider
         }
 
         if (!isset($body['query']) && !isset($body['aggs'])) {
-            $body = array_merge($body, [
-                'query' => [
-                    'match_all' => new \stdClass(),
-                ],
-            ]);
+            $body['query'] = ['match_all' => new \stdClass()];
         }
 
-        $limit = $body['size'] ?? $this->pagination->getLimit($resourceClass, $operationName);
-        $offset = $body['offset'] ?? $this->pagination->getOffset($resourceClass, $operationName);
-
-        if (!isset($body['size'])) {
-            $body = array_merge($body, ['size' => $limit]);
-        }
-
-        if (!isset($body['from'])) {
-            $body = array_merge($body, ['from' => $offset]);
-        }
+        $limit = $body['size'] = $body['size'] ?? $this->pagination->getLimit($resourceClass, $operationName);
+        $offset = $body['from'] = $body['from'] ?? $this->pagination->getOffset($resourceClass, $operationName);
 
         $documents = $this->client->search([
             'index' => $documentMetadata->getIndex(),
