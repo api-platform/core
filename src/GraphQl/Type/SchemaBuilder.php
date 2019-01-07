@@ -381,8 +381,7 @@ final class SchemaBuilder implements SchemaBuilderInterface
                     return null;
                 }
 
-                $dtoClass = $resourceMetadata->getAttribute($input ? 'input_class' : 'output_class');
-                if (!empty($dtoClass)) {
+                if (false !== $dtoClass = $resourceMetadata->getAttribute($input ? 'input_class' : 'output_class', $resourceClass)) {
                     $resourceClass = $dtoClass;
                 }
                 $graphqlType = $this->getResourceObjectType(false === $dtoClass ? null : $resourceClass, $resourceMetadata, $input, $mutationName, $depth);

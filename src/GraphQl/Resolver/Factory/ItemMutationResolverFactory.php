@@ -87,12 +87,8 @@ final class ItemMutationResolverFactory implements ResolverFactoryInterface
 
             $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
             $this->canAccess($this->resourceAccessChecker, $resourceMetadata, $resourceClass, $info, $item, $operationName);
-            $dtoClass = $resourceMetadata->getAttribute('input_class');
-            if (false === $dtoClass) {
+            if (false === $resourceClass = $resourceMetadata->getAttribute('input_class', $resourceClass)) {
                 return null;
-            }
-            if (!empty($dtoClass)) {
-                $resourceClass = $dtoClass;
             }
 
             switch ($operationName) {
