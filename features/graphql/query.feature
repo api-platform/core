@@ -211,3 +211,75 @@ Feature: GraphQL query support
       }
     }
     """
+
+  Scenario: Use outputClass instead of resource class through a GraphQL query
+    Given there are 2 dummyDtoNoInput objects
+    When I send the following GraphQL request:
+    """
+    {
+      dummyDtoNoInputs {
+        edges {
+          node {
+            baz
+            bat
+          }
+        }
+      }
+    }
+    """
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/json"
+    And the JSON should be equal to:
+    """
+    {
+      "data": {
+        "dummyDtoNoInputs": {
+          "edges": [
+            {
+              "node": {
+                "baz": 0.33,
+                "bat": "DummyDtoNoInput foo #1"
+              }
+            },
+            {
+              "node": {
+                "baz": 0.67,
+                "bat": "DummyDtoNoInput foo #2"
+              }
+            }
+          ]
+        }
+      }
+    }
+    """
+
+  @createSchema
+  Scenario: Disable outputClass leads to an empty response through a GraphQL query
+    Given there are 2 dummyDtoNoOutput objects
+    When I send the following GraphQL request:
+    """
+    {
+      dummyDtoNoInputs {
+        edges {
+          node {
+            baz
+            bat
+          }
+        }
+      }
+    }
+    """
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/json"
+    And the JSON should be equal to:
+    """
+    {
+      "data": {
+        "dummyDtoNoInputs": {
+          "edges": []
+        }
+      }
+    }
+    """

@@ -93,6 +93,13 @@ services:
         tags:
             -  { name: 'api_platform.item_data_provider' }
 
+    dummy_dto_no_input.data_provider:
+        class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\DataProvider\DummyDtoNoInputCollectionDataProvider'
+        public: false
+        arguments: ['@doctrine']
+        tags:
+            -  { name: 'api_platform.collection_data_provider' }
+
     serializable.item_data_provider:
         class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\DataProvider\SerializableItemDataProvider'
         public: false
@@ -248,6 +255,13 @@ services:
 
     app.dummy_input_data_persister:
         class: ApiPlatform\Core\Tests\Fixtures\TestBundle\DataPersister\DummyInputDataPersister
+        public: false
+        tags:
+            -  { name: 'api_platform.data_persister' }
+
+    app.dummy_dto_no_output_data_persister:
+        class: ApiPlatform\Core\Tests\Fixtures\TestBundle\DataPersister\DummyDtoNoOutputDataPersister
+        arguments: ['@doctrine']
         public: false
         tags:
             -  { name: 'api_platform.data_persister' }

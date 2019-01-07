@@ -381,7 +381,10 @@ final class SchemaBuilder implements SchemaBuilderInterface
                     return null;
                 }
 
-                $graphqlType = $this->getResourceObjectType($resourceClass, $resourceMetadata, $input, $mutationName, $depth);
+                if (false !== $dtoClass = $resourceMetadata->getAttribute($input ? 'input_class' : 'output_class', $resourceClass)) {
+                    $resourceClass = $dtoClass;
+                }
+                $graphqlType = $this->getResourceObjectType(false === $dtoClass ? null : $resourceClass, $resourceMetadata, $input, $mutationName, $depth);
                 break;
             default:
                 throw new InvalidTypeException(sprintf('The type "%s" is not supported.', $builtinType));
@@ -399,7 +402,7 @@ final class SchemaBuilder implements SchemaBuilderInterface
      *
      * @return ObjectType|InputObjectType
      */
-    private function getResourceObjectType(string $resourceClass, ResourceMetadata $resourceMetadata, bool $input = false, string $mutationName = null, int $depth = 0): GraphQLType
+    private function getResourceObjectType(?string $resourceClass, ResourceMetadata $resourceMetadata, bool $input = false, string $mutationName = null, int $depth = 0): GraphQLType
     {
         $shortName = $resourceMetadata->getShortName();
         if (null !== $mutationName) {
@@ -431,7 +434,7 @@ final class SchemaBuilder implements SchemaBuilderInterface
     /**
      * Gets the fields of the type of the given resource.
      */
-    private function getResourceObjectTypeFields(string $resourceClass, ResourceMetadata $resourceMetadata, bool $input = false, string $mutationName = null, int $depth = 0): array
+    private function getResourceObjectTypeFields(?string $resourceClass, ResourceMetadata $resourceMetadata, bool $input = false, string $mutationName = null, int $depth = 0): array
     {
         $fields = [];
         $idField = ['type' => GraphQLType::nonNull(GraphQLType::id())];
@@ -448,25 +451,27 @@ final class SchemaBuilder implements SchemaBuilderInterface
             $fields['id'] = $idField;
         }
 
-        foreach ($this->propertyNameCollectionFactory->create($resourceClass) as $property) {
-            $propertyMetadata = $this->propertyMetadataFactory->create($resourceClass, $property, ['graphql_operation_name' => $mutationName ?? 'query']);
-            if (
-                null === ($propertyType = $propertyMetadata->getType())
-                || (!$input && null === $mutationName && false === $propertyMetadata->isReadable())
-                || (null !== $mutationName && false === $propertyMetadata->isWritable())
-            ) {
-                continue;
-            }
+        if (null !== $resourceClass) {
+            foreach ($this->propertyNameCollectionFactory->create($resourceClass) as $property) {
+                $propertyMetadata = $this->propertyMetadataFactory->create($resourceClass, $property, ['graphql_operation_name' => $mutationName ?? 'query']);
+                if (
+                    null === ($propertyType = $propertyMetadata->getType())
+                    || (!$input && null === $mutationName && false === $propertyMetadata->isReadable())
+                    || (null !== $mutationName && false === $propertyMetadata->isWritable())
+                ) {
+                    continue;
+                }
 
-            $rootResource = $resourceClass;
-            if (null !== $propertyMetadata->getSubresource()) {
-                $resourceClass = $propertyMetadata->getSubresource()->getResourceClass();
-                $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
+                $rootResource = $resourceClass;
+                if (null !== $propertyMetadata->getSubresource()) {
+                    $resourceClass = $propertyMetadata->getSubresource()->getResourceClass();
+                    $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
+                }
+                if ($fieldConfiguration = $this->getResourceFieldConfiguration($resourceClass, $resourceMetadata, $propertyMetadata->getDescription(), $propertyMetadata->getAttribute('deprecation_reason', ''), $propertyType, $rootResource, $input, $mutationName, ++$depth)) {
+                    $fields['id' === $property ? '_id' : $property] = $fieldConfiguration;
+                }
+                $resourceClass = $rootResource;
             }
-            if ($fieldConfiguration = $this->getResourceFieldConfiguration($resourceClass, $resourceMetadata, $propertyMetadata->getDescription(), $propertyMetadata->getAttribute('deprecation_reason', ''), $propertyType, $rootResource, $input, $mutationName, ++$depth)) {
-                $fields['id' === $property ? '_id' : $property] = $fieldConfiguration;
-            }
-            $resourceClass = $rootResource;
         }
 
         if (null !== $mutationName) {
