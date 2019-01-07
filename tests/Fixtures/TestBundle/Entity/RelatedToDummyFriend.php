@@ -73,7 +73,7 @@ class RelatedToDummyFriend
     }
 
     /**
-     * @return null|string
+     * @return string|null
      */
     public function getDescription()
     {
@@ -81,7 +81,7 @@ class RelatedToDummyFriend
     }
 
     /**
-     * @param null|string $description
+     * @param string|null $description
      */
     public function setDescription($description)
     {
