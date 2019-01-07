@@ -76,7 +76,7 @@ final class EntrypointAction
         $query = $request->query->get('query');
         $operation = $request->query->get('operation');
         if ($variables = $request->query->get('variables', [])) {
-            $variables = \json_decode($variables, true);
+            $variables = json_decode($variables, true);
         }
 
         if (!$request->isMethod('POST')) {
@@ -84,14 +84,14 @@ final class EntrypointAction
         }
 
         if ('json' === $request->getContentType()) {
-            $input = \json_decode((string) $request->getContent(), true);
+            $input = json_decode((string) $request->getContent(), true);
 
             if (isset($input['query'])) {
                 $query = $input['query'];
             }
 
             if (isset($input['variables'])) {
-                $variables = \is_array($input['variables']) ? $input['variables'] : \json_decode($input['variables'], true);
+                $variables = \is_array($input['variables']) ? $input['variables'] : json_decode($input['variables'], true);
             }
 
             if (isset($input['operation'])) {

@@ -93,7 +93,7 @@ final class DataPersister implements DataPersisterInterface
     private function isDeferredExplicit(DoctrineObjectManager $manager, $data)
     {
         $classMetadata = $manager->getClassMetadata($this->getObjectClass($data));
-        if ($classMetadata instanceof ClassMetadataInfo && \method_exists($classMetadata, 'isChangeTrackingDeferredExplicit')) {
+        if ($classMetadata instanceof ClassMetadataInfo && method_exists($classMetadata, 'isChangeTrackingDeferredExplicit')) {
             return $classMetadata->isChangeTrackingDeferredExplicit();
         }
 
