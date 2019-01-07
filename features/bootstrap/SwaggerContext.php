@@ -129,7 +129,7 @@ final class SwaggerContext implements Context
      */
     public function assertPropertyIsRequiredForSwagger(string $propertyName, string $className)
     {
-        if (!\in_array($propertyName, $this->getClassInfo($className)->required, true)) {
+        if (!in_array($propertyName, $this->getClassInfo($className)->required, true)) {
             throw new ExpectationFailedException(sprintf('Property "%s" of class "%s" should be required', $propertyName, $className));
         }
     }
