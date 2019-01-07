@@ -77,12 +77,12 @@ final class ApiProperty
     public $identifier;
 
     /**
-     * @var string
+     * @var mixed
      */
     public $default;
 
     /**
-     * @var string
+     * @var mixed
      */
     public $example;
 
