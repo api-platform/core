@@ -116,7 +116,7 @@ final class TermFilter extends AbstractFilter implements ConstantScoreFilterInte
             foreach ([$property, "${property}[]"] as $filterParameterName) {
                 $description[$filterParameterName] = [
                     'property' => $property,
-                    'type' => $hasAssociation ? 'string' : $this->getPHPType($type),
+                    'type' => $hasAssociation ? 'string' : $this->getPhpType($type),
                     'required' => false,
                 ];
             }
@@ -128,7 +128,7 @@ final class TermFilter extends AbstractFilter implements ConstantScoreFilterInte
     /**
      * Converts the given {@see Type} in PHP type.
      */
-    private function getPHPType(Type $type): string
+    private function getPhpType(Type $type): string
     {
         switch ($builtinType = $type->getBuiltinType()) {
             case Type::BUILTIN_TYPE_ARRAY:

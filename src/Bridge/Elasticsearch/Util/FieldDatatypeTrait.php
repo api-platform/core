@@ -55,6 +55,10 @@ trait FieldDatatypeTrait
         $properties = explode('.', $property);
         $currentProperty = array_shift($properties);
 
+        if (!$properties) {
+            return null;
+        }
+
         try {
             $propertyMetadata = $this->propertyMetadataFactory->create($resourceClass, $currentProperty);
         } catch (PropertyNotFoundException $e) {
@@ -62,10 +66,6 @@ trait FieldDatatypeTrait
         }
 
         if (null === $type = $propertyMetadata->getType()) {
-            return null;
-        }
-
-        if (!$properties) {
             return null;
         }
 

@@ -43,7 +43,7 @@ default:
         - '%paths.base%/features/elasticsearch'
       contexts:
         - 'ElasticsearchContext':
-            client: '@api_platform.elasticsearch.client'
+            client: '@test.api_platform.elasticsearch.client'
             elasticsearchMappingsPath: '%paths.base%/tests/Fixtures/Elasticsearch/Mappings/'
             elasticsearchFixturesPath: '%paths.base%/tests/Fixtures/Elasticsearch/Fixtures/'
         - 'HttpHeaderContext'

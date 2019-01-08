@@ -97,9 +97,7 @@ final class Paginator implements \IteratorAggregate, PaginatorInterface
     public function getIterator(): \Traversable
     {
         foreach ($this->documents['hits']['hits'] ?? [] as $document) {
-            $cacheKey = isset($document['_index'], $document['_type'], $document['_id'])
-                ? md5("${document['_index']}_${document['_type']}_${document['_id']}")
-                : null;
+            $cacheKey = isset($document['_index'], $document['_type'], $document['_id']) ? md5("${document['_index']}_${document['_type']}_${document['_id']}") : null;
 
             if ($cacheKey && array_key_exists($cacheKey, $this->cachedDenormalizedDocuments)) {
                 $object = $this->cachedDenormalizedDocuments[$cacheKey];

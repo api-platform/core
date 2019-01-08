@@ -36,7 +36,6 @@ use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
-use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
@@ -570,11 +569,6 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         }
 
         $loader->load('elasticsearch.xml');
-
-        if ($container->hasAlias('api_platform.name_converter')) {
-            $container->getDefinition('api_platform.elasticsearch.name_converter.inner_fields')
-                ->setArgument(0, new Reference('api_platform.name_converter'));
-        }
 
         $container->registerForAutoconfiguration(ElasticSearchQueryCollectionExtensionInterface::class)
             ->addTag('api_platform.elasticsearch.query_extension.collection');

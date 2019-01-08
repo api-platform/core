@@ -39,7 +39,7 @@ class FieldDatatypeTraitTest extends TestCase
 
         $fieldDatatype = static::createFieldDatatypeInstance($propertyMetadataFactoryProphecy->reveal(), $this->prophesize(ResourceClassResolverInterface::class)->reveal());
 
-        self::assertNull($fieldDatatype->getNestedFieldPath(Foo::class, 'foo'));
+        self::assertNull($fieldDatatype->getNestedFieldPath(Foo::class, 'foo.bar'));
     }
 
     public function testGetNestedFieldPathWithPropertyWithoutType()
@@ -49,7 +49,7 @@ class FieldDatatypeTraitTest extends TestCase
 
         $fieldDatatype = static::createFieldDatatypeInstance($propertyMetadataFactoryProphecy->reveal(), $this->prophesize(ResourceClassResolverInterface::class)->reveal());
 
-        self::assertNull($fieldDatatype->getNestedFieldPath(Foo::class, 'foo'));
+        self::assertNull($fieldDatatype->getNestedFieldPath(Foo::class, 'foo.bar'));
     }
 
     public function testGetNestedFieldPathWithInvalidCollectionType()
@@ -74,12 +74,10 @@ class FieldDatatypeTraitTest extends TestCase
     {
         $fooType = new Type(Type::BUILTIN_TYPE_OBJECT, false, Foo::class);
         $barType = new Type(Type::BUILTIN_TYPE_ARRAY, false, Foo::class, true, new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_OBJECT, false, Foo::class));
-        $bazType = new Type(Type::BUILTIN_TYPE_STRING);
 
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
         $propertyMetadataFactoryProphecy->create(Foo::class, 'foo')->willReturn(new PropertyMetadata($fooType))->shouldBeCalled();
         $propertyMetadataFactoryProphecy->create(Foo::class, 'bar')->willReturn(new PropertyMetadata($barType))->shouldBeCalled();
-        $propertyMetadataFactoryProphecy->create(Foo::class, 'baz')->willReturn(new PropertyMetadata($bazType))->shouldBeCalled();
 
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
         $resourceClassResolverProphecy->isResourceClass(Foo::class)->willReturn(true)->shouldBeCalled();

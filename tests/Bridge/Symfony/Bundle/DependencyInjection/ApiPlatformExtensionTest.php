@@ -61,7 +61,6 @@ use Symfony\Component\DependencyInjection\Extension\ConfigurationExtensionInterf
 use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
 use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
-use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Serializer\Exception\ExceptionInterface;
 
@@ -441,9 +440,6 @@ class ApiPlatformExtensionTest extends TestCase
 
     public function testEnableElasticsearch()
     {
-        $definitionProphecy = $this->prophesize(Definition::class);
-        $definitionProphecy->setArgument(0, Argument::type(Reference::class))->shouldBeCalled();
-
         $childDefinitionProphecy = $this->prophesize(ChildDefinition::class);
         $childDefinitionProphecy->addTag('api_platform.elasticsearch.query_extension.collection')->shouldBeCalled();
 
@@ -471,8 +467,6 @@ class ApiPlatformExtensionTest extends TestCase
         $containerBuilderProphecy->setAlias('api_platform.elasticsearch.metadata.document.metadata_factory', 'api_platform.elasticsearch.metadata.document.metadata_factory.configured')->shouldBeCalled();
         $containerBuilderProphecy->setAlias(DocumentMetadataFactoryInterface::class, 'api_platform.elasticsearch.metadata.document.metadata_factory')->shouldBeCalled();
         $containerBuilderProphecy->setAlias(IdentifierExtractorInterface::class, 'api_platform.elasticsearch.identifier_extractor')->shouldBeCalled();
-        $containerBuilderProphecy->hasAlias('api_platform.name_converter')->willReturn(true)->shouldBeCalled();
-        $containerBuilderProphecy->getDefinition('api_platform.elasticsearch.name_converter.inner_fields')->willReturn($definitionProphecy)->shouldBeCalled();
         $containerBuilderProphecy->registerForAutoconfiguration(FullBodySearchCollectionExtensionInterface::class)->willReturn($childDefinitionProphecy)->shouldBeCalled();
         $containerBuilderProphecy->setParameter('api_platform.elasticsearch.host', 'http://elasticsearch:9200')->shouldBeCalled();
         $containerBuilderProphecy->setParameter('api_platform.elasticsearch.mapping', [])->shouldBeCalled();

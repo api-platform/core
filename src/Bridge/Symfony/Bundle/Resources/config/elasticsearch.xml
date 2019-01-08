@@ -51,7 +51,9 @@
         </service>
         <service id="ApiPlatform\Core\Bridge\Elasticsearch\Api\IdentifierExtractorInterface" alias="api_platform.elasticsearch.identifier_extractor" />
 
-        <service id="api_platform.elasticsearch.name_converter.inner_fields" class="ApiPlatform\Core\Bridge\Elasticsearch\Serializer\NameConverter\InnerFieldsNameConverter" public="false" />
+        <service id="api_platform.elasticsearch.name_converter.inner_fields" class="ApiPlatform\Core\Bridge\Elasticsearch\Serializer\NameConverter\InnerFieldsNameConverter" public="false">
+            <argument type="service" id="api_platform.name_converter" on-invalid="ignore" />
+        </service>
 
         <service id="api_platform.elasticsearch.normalizer.item" class="ApiPlatform\Core\Bridge\Elasticsearch\Serializer\ItemNormalizer" public="false">
             <argument type="service" id="api_platform.elasticsearch.identifier_extractor" />
@@ -59,6 +61,7 @@
             <argument type="service" id="api_platform.elasticsearch.name_converter.inner_fields" />
             <argument type="service" id="serializer.property_accessor" />
             <argument type="service" id="property_info" on-invalid="ignore" />
+            <argument type="service" id="serializer.mapping.class_discriminator_resolver" on-invalid="ignore" />
 
             <tag name="serializer.normalizer" priority="8" />
         </service>
