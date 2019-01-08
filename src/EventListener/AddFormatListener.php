@@ -23,7 +23,7 @@ use Symfony\Component\HttpKernel\Exception\NotAcceptableHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
- * Chooses the format to user according to the Accept header and supported formats.
+ * Chooses the format to use according to the Accept header and supported formats.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
