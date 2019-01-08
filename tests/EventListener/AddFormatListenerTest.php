@@ -121,6 +121,24 @@ class AddFormatListenerTest extends TestCase
         $this->assertSame('json', $request->getRequestFormat());
     }
 
+    public function testSupportedAcceptHeaderSymfonyBuiltInFormat()
+    {
+        $request = new Request([], [], ['_api_resource_class' => 'Foo']);
+        $request->headers->set('Accept', 'application/json');
+
+        $eventProphecy = $this->prophesize(GetResponseEvent::class);
+        $eventProphecy->getRequest()->willReturn($request);
+        $event = $eventProphecy->reveal();
+
+        $formatsProviderProphecy = $this->prophesize(FormatsProviderInterface::class);
+        $formatsProviderProphecy->getFormatsFromAttributes([])->willReturn(['jsonld' => ['application/ld+json', 'application/json']]);
+
+        $listener = new AddFormatListener(new Negotiator(), $formatsProviderProphecy->reveal());
+        $listener->onKernelRequest($event);
+
+        $this->assertSame('jsonld', $request->getRequestFormat());
+    }
+
     public function testAcceptAllHeader()
     {
         $request = new Request([], [], ['_api_resource_class' => 'Foo']);
