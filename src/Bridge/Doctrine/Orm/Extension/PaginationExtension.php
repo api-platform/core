@@ -110,20 +110,10 @@ final class PaginationExtension implements ContextAwareQueryResultCollectionExte
             return;
         }
 
-        if (0 > $limit = $this->pagination->getLimit($resourceClass, $operationName)) {
-            throw new InvalidArgumentException('Limit should not be less than 0');
-        }
-
-        if (1 > $page = $this->pagination->getPage()) {
-            throw new InvalidArgumentException('Page should not be less than 1');
-        }
-
-        if (0 === $limit && 1 < $page) {
-            throw new InvalidArgumentException('Page should not be greater than 1 if limit is equal to 0');
-        }
+        [, $offset, $limit] = $this->pagination->getPagination($resourceClass, $operationName);
 
         $queryBuilder
-            ->setFirstResult($this->pagination->getOffset($resourceClass, $operationName))
+            ->setFirstResult($offset)
             ->setMaxResults($limit);
     }
 

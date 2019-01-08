@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\DataProvider;
 
+use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -50,14 +51,22 @@ final class Pagination
 
     /**
      * Gets the current page.
+     *
+     * @throws InvalidArgumentException
      */
     public function getPage(): int
     {
         if (($request = $this->requestStack->getCurrentRequest())) {
-            return (int) $this->getParameterFromRequest($request, $this->options['page_parameter_name'], $this->options['page_default']);
+            $page = (int) $this->getParameterFromRequest($request, $this->options['page_parameter_name'], $this->options['page_default']);
+        } else {
+            $page = $this->options['page_default'];
         }
 
-        return $this->options['page_default'];
+        if (1 > $page) {
+            throw new InvalidArgumentException('Page should not be less than 1');
+        }
+
+        return $page;
     }
 
     /**
@@ -78,6 +87,8 @@ final class Pagination
 
     /**
      * Gets the current limit.
+     *
+     * @throws InvalidArgumentException
      */
     public function getLimit(string $resourceClass = null, string $operationName = null): int
     {
@@ -113,7 +124,33 @@ final class Pagination
             }
         }
 
+        if (0 > $limit) {
+            throw new InvalidArgumentException('Limit should not be less than 0');
+        }
+
         return $limit;
+    }
+
+    /**
+     * Gets info about the pagination.
+     *
+     * Returns an array with the following info as values:
+     *   - the page {@see Pagination::getPage()}
+     *   - the offset {@see Pagination::getOffset()}
+     *   - the limit {@see Pagination::getLimit()}
+     *
+     * @throws InvalidArgumentException
+     */
+    public function getPagination(string $resourceClass = null, string $operationName = null): array
+    {
+        $page = $this->getPage();
+        $limit = $this->getLimit($resourceClass, $operationName);
+
+        if (0 === $limit && 1 < $page) {
+            throw new InvalidArgumentException('Page should not be greater than 1 if limit is equal to 0');
+        }
+
+        return [$page, $this->getOffset($resourceClass, $operationName), $limit];
     }
 
     /**
