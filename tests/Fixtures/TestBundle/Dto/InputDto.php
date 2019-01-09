@@ -11,22 +11,20 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity;
+namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Dto;
 
 /**
- * OutputDto.
- *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class OutputDto
+class InputDto
 {
-    /**
-     * @var float
-     */
-    public $baz;
-
     /**
      * @var string
      */
-    public $bat;
+    public $foo;
+
+    /**
+     * @var int
+     */
+    public $bar;
 }

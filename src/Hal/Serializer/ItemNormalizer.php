@@ -164,7 +164,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
     {
         $class = $this->getObjectClass($object);
 
-        $attributesMetadata = \array_key_exists($class, $this->attributesMetadataCache) ?
+        $attributesMetadata = array_key_exists($class, $this->attributesMetadataCache) ?
             $this->attributesMetadataCache[$class] :
             $this->attributesMetadataCache[$class] = $this->classMetadataFactory ? $this->classMetadataFactory->getMetadataFor($class)->getAttributesMetadata() : null;
 

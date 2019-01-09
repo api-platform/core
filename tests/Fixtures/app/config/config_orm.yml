@@ -57,3 +57,17 @@ services:
         parent:    'api_platform.doctrine.orm.search_filter'
         arguments: [ { 'name': 'ipartial', 'description': 'ipartial' } ]
         tags:      [ { name: 'api_platform.filter', id: 'related_to_dummy_friend.name' } ]
+
+    dummy_dto_no_input.data_provider:
+        class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\DataProvider\DummyDtoNoInputCollectionDataProvider'
+        public: false
+        arguments: ['@doctrine']
+        tags:
+            -  { name: 'api_platform.collection_data_provider' }
+
+    app.dummy_dto_no_output_data_persister:
+        class: ApiPlatform\Core\Tests\Fixtures\TestBundle\DataPersister\DummyDtoNoOutputDataPersister
+        arguments: ['@doctrine']
+        public: false
+        tags:
+            -  { name: 'api_platform.data_persister' }

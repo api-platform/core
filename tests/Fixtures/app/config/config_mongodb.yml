@@ -50,3 +50,17 @@ services:
         parent:    'api_platform.doctrine_mongodb.odm.search_filter'
         arguments: [ { 'name': 'ipartial', 'description': 'ipartial' } ]
         tags:      [ { name: 'api_platform.filter', id: 'related_to_dummy_friend.mongodb.name' } ]
+
+    dummy_dto_no_input.data_provider:
+        class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\DataProvider\DummyDtoNoInputCollectionDataProvider'
+        public: false
+        arguments: ['@doctrine_mongodb']
+        tags:
+            -  { name: 'api_platform.collection_data_provider' }
+
+    app.dummy_dto_no_output_data_persister:
+        class: ApiPlatform\Core\Tests\Fixtures\TestBundle\DataPersister\DummyDtoNoOutputDataPersister
+        arguments: ['@doctrine_mongodb']
+        public: false
+        tags:
+            -  { name: 'api_platform.data_persister' }

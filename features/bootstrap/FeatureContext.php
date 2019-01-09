@@ -21,6 +21,8 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\DummyAggregateOffer as D
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\DummyCar as DummyCarDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\DummyCarColor as DummyCarColorDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\DummyDate as DummyDateDocument;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\DummyDtoNoInput as DummyDtoNoInputDocument;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\DummyDtoNoOutput as DummyDtoNoOutputDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\DummyFriend as DummyFriendDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\DummyGroup as DummyGroupDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\DummyOffer as DummyOfferDocument;
@@ -57,6 +59,8 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyAggregateOffer;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyCar;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyCarColor;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyDate;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyDtoNoInput;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyDtoNoOutput;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyFriend;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyGroup;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyImmutableDate;
@@ -386,6 +390,38 @@ final class FeatureContext implements Context, SnippetAcceptingContext
     }
 
     /**
+     * @Given there are :nb dummyDtoNoInput objects
+     */
+    public function thereAreDummyDtoNoInputObjects(int $nb)
+    {
+        for ($i = 1; $i <= $nb; ++$i) {
+            $dummyDto = $this->buildDummyDtoNoInput();
+            $dummyDto->lorem = 'DummyDtoNoInput foo #'.$i;
+            $dummyDto->ipsum = round($i / 3, 2);
+
+            $this->manager->persist($dummyDto);
+        }
+
+        $this->manager->flush();
+    }
+
+    /**
+     * @Given there are :nb dummyDtoNoOutput objects
+     */
+    public function thereAreDummyDtoNoOutputObjects(int $nb)
+    {
+        for ($i = 1; $i <= $nb; ++$i) {
+            $dummyDto = $this->buildDummyDtoNoOutput();
+            $dummyDto->lorem = 'DummyDtoNoOutput foo #'.$i;
+            $dummyDto->ipsum = $i / 3;
+
+            $this->manager->persist($dummyDto);
+        }
+
+        $this->manager->flush();
+    }
+
+    /**
      * @Given there are :nb dummy objects with JSON and array data
      */
     public function thereAreDummyObjectsWithJsonData(int $nb)
@@ -507,9 +543,9 @@ final class FeatureContext implements Context, SnippetAcceptingContext
     {
         $descriptions = ['Smart dummy.', 'Not so smart dummy.'];
 
-        if (\in_array($bool, ['true', '1', 1], true)) {
+        if (in_array($bool, ['true', '1', 1], true)) {
             $bool = true;
-        } elseif (\in_array($bool, ['false', '0', 0], true)) {
+        } elseif (in_array($bool, ['false', '0', 0], true)) {
             $bool = false;
         } else {
             $expected = ['true', 'false', '1', '0'];
@@ -617,9 +653,9 @@ final class FeatureContext implements Context, SnippetAcceptingContext
      */
     public function thereAreDummyObjectsWithDummyBoolean(int $nb, string $bool)
     {
-        if (\in_array($bool, ['true', '1', 1], true)) {
+        if (in_array($bool, ['true', '1', 1], true)) {
             $bool = true;
-        } elseif (\in_array($bool, ['false', '0', 0], true)) {
+        } elseif (in_array($bool, ['false', '0', 0], true)) {
             $bool = false;
         } else {
             $expected = ['true', 'false', '1', '0'];
@@ -645,9 +681,9 @@ final class FeatureContext implements Context, SnippetAcceptingContext
      */
     public function thereAreDummyObjectsWithEmbeddedDummyBoolean(int $nb, string $bool)
     {
-        if (\in_array($bool, ['true', '1', 1], true)) {
+        if (in_array($bool, ['true', '1', 1], true)) {
             $bool = true;
-        } elseif (\in_array($bool, ['false', '0', 0], true)) {
+        } elseif (in_array($bool, ['false', '0', 0], true)) {
             $bool = false;
         } else {
             $expected = ['true', 'false', '1', '0'];
@@ -672,9 +708,9 @@ final class FeatureContext implements Context, SnippetAcceptingContext
      */
     public function thereAreDummyObjectsWithRelationEmbeddedDummyBoolean(int $nb, string $bool)
     {
-        if (\in_array($bool, ['true', '1', 1], true)) {
+        if (in_array($bool, ['true', '1', 1], true)) {
             $bool = true;
-        } elseif (\in_array($bool, ['false', '0', 0], true)) {
+        } elseif (in_array($bool, ['false', '0', 0], true)) {
             $bool = false;
         } else {
             $expected = ['true', 'false', '1', '0'];
@@ -1204,6 +1240,22 @@ final class FeatureContext implements Context, SnippetAcceptingContext
     private function buildDummyDate()
     {
         return $this->isOrm() ? new DummyDate() : new DummyDateDocument();
+    }
+
+    /**
+     * @return DummyDtoNoInput|DummyDtoNoInputDocument
+     */
+    private function buildDummyDtoNoInput()
+    {
+        return $this->isOrm() ? new DummyDtoNoInput() : new DummyDtoNoInputDocument();
+    }
+
+    /**
+     * @return DummyDtoNoOutput|DummyDtoNoOutputDocument
+     */
+    private function buildDummyDtoNoOutput()
+    {
+        return $this->isOrm() ? new DummyDtoNoOutput() : new DummyDtoNoOutputDocument();
     }
 
     /**
