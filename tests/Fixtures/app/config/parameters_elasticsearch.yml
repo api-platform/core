@@ -1,0 +1,2 @@
+parameters:
+    host: 'http://localhost:9200'

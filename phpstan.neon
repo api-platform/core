@@ -22,6 +22,7 @@ parameters:
         - '#Method ApiPlatform\\Core\\Util\\RequestParser::parseRequestParams\(\) should return array but returns array\|false\.#'
         - '#Parameter \#1 \$vars of class GraphQL\\Language\\AST\\(IntValue|ObjectField|ObjectValue|BooleanValue|ListValue|StringValue)Node constructor expects array<GraphQL\\Language\\AST\\Location\|GraphQL\\Language\\AST\\NameNode\|GraphQL\\Language\\AST\\NodeList\|GraphQL\\Language\\AST\\SelectionSetNode\|string\|null>, array<string, .+> given\.#'
         - '#Parameter \#1 \$defaultContext of class Symfony\\Component\\Serializer\\Encoder\\Json(De|En)code constructor expects array, (int|true) given\.#'
+        - '#Parameter \#(2|3) \$(resourceMetadataFactory|pagination) of class ApiPlatform\\Core\\Bridge\\Doctrine\\Orm\\Extension\\PaginationExtension constructor expects (ApiPlatform\\Core\\Metadata\\Resource\\Factory\\ResourceMetadataFactoryInterface\|Symfony\\Component\\HttpFoundation\\RequestStack|ApiPlatform\\Core\\DataProvider\\Pagination\|ApiPlatform\\Core\\Metadata\\Resource\\Factory\\ResourceMetadataFactoryInterface), stdClass given\.#'
         # Temporary fix while the PHPStan extension for Prophecy isn't compatible with 0.10
         - '#Parameter .* expects .*, .*object.* given\.#'
         - '#Parameter \#[0-9] \$filterLocator of class ApiPlatform\\Core\\Bridge\\Doctrine\\Orm\\Extension\\FilterExtension constructor expects ApiPlatform\\Core\\Api\\FilterCollection|Psr\\Container\\ContainerInterface(\|null)?, ArrayObject given\.#'

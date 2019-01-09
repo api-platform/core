@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.4.0
+
+* Elasticsearch: add reading support (including pagination, sort filter and term filter)
+
 ## 2.3.5
 
 * GraphQL: compatibility with `webonyx/graphql-php` 0.13
