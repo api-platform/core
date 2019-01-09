@@ -2374,7 +2374,7 @@ class DocumentationNormalizerV2Test extends TestCase
                                 'schema' => [
                                     'type' => 'array',
                                     'items' => [
-                                        '$ref' => '#/definitions/Dummy:493a0d3a5177c370781f2ac2c84227fc',
+                                        '$ref' => '#/definitions/Dummy:300dcd476cef011532fb0ca7683395d7',
                                     ],
                                 ],
                             ],
@@ -2399,7 +2399,7 @@ class DocumentationNormalizerV2Test extends TestCase
                             201 => [
                                 'description' => 'Dummy resource created',
                                 'schema' => [
-                                    '$ref' => '#/definitions/Dummy:493a0d3a5177c370781f2ac2c84227fc',
+                                    '$ref' => '#/definitions/Dummy:300dcd476cef011532fb0ca7683395d7',
                                 ],
                             ],
                             400 => [
@@ -2415,7 +2415,7 @@ class DocumentationNormalizerV2Test extends TestCase
                                 'in' => 'body',
                                 'description' => 'The new Dummy resource',
                                 'schema' => [
-                                    '$ref' => '#/definitions/Dummy:b8724508705e1cb0779d76040a5058e6',
+                                    '$ref' => '#/definitions/Dummy:b4f76c1a44965bd401aa23bb37618acc',
                                 ],
                             ],
                         ],
@@ -2439,7 +2439,7 @@ class DocumentationNormalizerV2Test extends TestCase
                             200 => [
                                 'description' => 'Dummy resource response',
                                 'schema' => [
-                                    '$ref' => '#/definitions/Dummy:493a0d3a5177c370781f2ac2c84227fc',
+                                    '$ref' => '#/definitions/Dummy:300dcd476cef011532fb0ca7683395d7',
                                 ],
                             ],
                             404 => [
@@ -2465,7 +2465,7 @@ class DocumentationNormalizerV2Test extends TestCase
                                 'in' => 'body',
                                 'description' => 'The updated Dummy resource',
                                 'schema' => [
-                                    '$ref' => '#/definitions/Dummy:b8724508705e1cb0779d76040a5058e6',
+                                    '$ref' => '#/definitions/Dummy:b4f76c1a44965bd401aa23bb37618acc',
                                 ],
                             ],
                         ],
@@ -2473,7 +2473,7 @@ class DocumentationNormalizerV2Test extends TestCase
                             200 => [
                                 'description' => 'Dummy resource updated',
                                 'schema' => [
-                                    '$ref' => '#/definitions/Dummy:493a0d3a5177c370781f2ac2c84227fc',
+                                    '$ref' => '#/definitions/Dummy:300dcd476cef011532fb0ca7683395d7',
                                 ],
                             ],
                             400 => [
@@ -2487,7 +2487,7 @@ class DocumentationNormalizerV2Test extends TestCase
                 ],
             ]),
             'definitions' => new \ArrayObject([
-                'Dummy:493a0d3a5177c370781f2ac2c84227fc' => new \ArrayObject([
+                'Dummy:300dcd476cef011532fb0ca7683395d7' => new \ArrayObject([
                     'type' => 'object',
                     'description' => 'This is a dummy.',
                     'externalDocs' => [
@@ -2505,7 +2505,7 @@ class DocumentationNormalizerV2Test extends TestCase
                         ]),
                     ],
                 ]),
-                'Dummy:b8724508705e1cb0779d76040a5058e6' => new \ArrayObject([
+                'Dummy:b4f76c1a44965bd401aa23bb37618acc' => new \ArrayObject([
                     'type' => 'object',
                     'description' => 'This is a dummy.',
                     'externalDocs' => [
