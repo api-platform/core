@@ -110,7 +110,7 @@ final class PaginationExtension implements AggregationResultCollectionExtensionI
         if ($request->attributes->get('_graphql')) {
             $collectionArgs = $request->attributes->get('_graphql_collections_args', []);
             if (isset($collectionArgs[$resourceClass]['after'])) {
-                $after = \base64_decode($collectionArgs[$resourceClass]['after'], true);
+                $after = base64_decode($collectionArgs[$resourceClass]['after'], true);
                 $firstResult = (int) $after;
                 $firstResult = false === $after ? $firstResult : ++$firstResult;
             }

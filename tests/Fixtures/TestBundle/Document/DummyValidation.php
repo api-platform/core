@@ -78,7 +78,7 @@ class DummyValidation
     }
 
     /**
-     * @return null|string
+     * @return string|null
      */
     public function getName()
     {
@@ -86,7 +86,7 @@ class DummyValidation
     }
 
     /**
-     * @param null|string $name
+     * @param string|null $name
      *
      * @return DummyValidation
      */
@@ -98,7 +98,7 @@ class DummyValidation
     }
 
     /**
-     * @return null|string
+     * @return string|null
      */
     public function getTitle()
     {
@@ -106,7 +106,7 @@ class DummyValidation
     }
 
     /**
-     * @param null|string $title
+     * @param string|null $title
      *
      * @return DummyValidation
      */
