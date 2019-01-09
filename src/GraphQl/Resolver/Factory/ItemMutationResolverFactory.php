@@ -23,6 +23,7 @@ use ApiPlatform\Core\GraphQl\Serializer\ItemNormalizer;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Security\ResourceAccessCheckerInterface;
+use ApiPlatform\Core\Util\ClassInfoTrait;
 use ApiPlatform\Core\Validator\Exception\ValidationException;
 use ApiPlatform\Core\Validator\ValidatorInterface;
 use GraphQL\Error\Error;
@@ -39,6 +40,7 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
  */
 final class ItemMutationResolverFactory implements ResolverFactoryInterface
 {
+    use ClassInfoTrait;
     use FieldsToAttributesTrait;
     use ResourceAccessCheckerTrait;
 
@@ -82,6 +84,10 @@ final class ItemMutationResolverFactory implements ResolverFactoryInterface
                     $item = $this->iriConverter->getItemFromIri($args['input']['id'], $normalizationContext);
                 } catch (ItemNotFoundException $e) {
                     throw Error::createLocatedError(sprintf('Item "%s" not found.', $args['input']['id']), $info->fieldNodes, $info->path);
+                }
+
+                if ($resourceClass !== $this->getObjectClass($item)) {
+                    throw Error::createLocatedError(sprintf('Item "%s" did not match expected type "%s".', $args['input']['id'], $resourceClass), $info->fieldNodes, $info->path);
                 }
             }
 
