@@ -122,6 +122,21 @@ Feature: GraphQL mutation support
     And the JSON node "data.deleteFoo.id" should be equal to "/foos/1"
     And the JSON node "data.deleteFoo.clientMutationId" should be equal to "anotherId"
 
+  Scenario: Trigger an error trying to delete item of different resource
+    When I send the following GraphQL request:
+    """
+    mutation {
+      deleteFoo(input: {id: "/dummies/1", clientMutationId: "myId"}) {
+        id
+        clientMutationId
+      }
+    }
+    """
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/json"
+    And the JSON node "errors[0].message" should be equal to 'Item "/dummies/1" did not match expected type "ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Foo".'
+
   @dropSchema
   Scenario: Delete an item with composite identifiers through a mutation
     Given there are Composite identifier objects

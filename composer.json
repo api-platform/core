@@ -66,7 +66,7 @@
         "symfony/twig-bundle": "^3.1 || ^4.0",
         "symfony/validator": "^3.3 || ^4.0",
         "symfony/yaml": "^3.3 || ^4.0",
-        "webonyx/graphql-php": ">=0.12 <1.0"
+        "webonyx/graphql-php": "^0.12"
     },
     "conflict": {
         "symfony/dependency-injection": "<3.3"
