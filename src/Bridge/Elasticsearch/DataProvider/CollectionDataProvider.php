@@ -89,8 +89,8 @@ final class CollectionDataProvider implements ContextAwareCollectionDataProvider
             $body['query'] = ['match_all' => new \stdClass()];
         }
 
-        $limit = $body['size'] = $body['size'] ?? $this->pagination->getLimit($resourceClass, $operationName);
-        $offset = $body['from'] = $body['from'] ?? $this->pagination->getOffset($resourceClass, $operationName);
+        $limit = $body['size'] = $body['size'] ?? $this->pagination->getLimit($resourceClass, $operationName, $context);
+        $offset = $body['from'] = $body['from'] ?? $this->pagination->getOffset($resourceClass, $operationName, $context);
 
         $documents = $this->client->search([
             'index' => $documentMetadata->getIndex(),
