@@ -16,6 +16,7 @@ namespace ApiPlatform\Core\Bridge\Symfony\Bundle;
 use ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\Compiler\AnnotationFilterPass;
 use ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\Compiler\DataProviderPass;
 use ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\Compiler\FilterPass;
+use ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\Compiler\GraphQlQueryResolverPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
@@ -36,5 +37,6 @@ final class ApiPlatformBundle extends Bundle
         $container->addCompilerPass(new DataProviderPass());
         $container->addCompilerPass(new AnnotationFilterPass());
         $container->addCompilerPass(new FilterPass());
+        $container->addCompilerPass(new GraphQlQueryResolverPass());
     }
 }

@@ -23,6 +23,7 @@ use ApiPlatform\Core\DataProvider\CollectionDataProviderInterface;
 use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
 use ApiPlatform\Core\DataProvider\SubresourceDataProviderInterface;
 use ApiPlatform\Core\Exception\RuntimeException;
+use ApiPlatform\Core\GraphQl\Resolver\QueryResolverInterface;
 use Doctrine\Common\Annotations\Annotation;
 use Doctrine\ORM\Version;
 use phpDocumentor\Reflection\DocBlockFactoryInterface;
@@ -111,6 +112,8 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             ->addTag('api_platform.doctrine.orm.query_extension.collection');
         $container->registerForAutoconfiguration(FilterInterface::class)
             ->addTag('api_platform.filter');
+        $container->registerForAutoconfiguration(QueryResolverInterface::class)
+            ->addTag('api_platform.graphql.query_resolver');
 
         if (interface_exists(ValidatorInterface::class)) {
             $loader->load('validator.xml');
