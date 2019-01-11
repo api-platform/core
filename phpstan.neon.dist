@@ -45,9 +45,6 @@ parameters:
 			message: '#Parameter \#9 \$nameConverter of class ApiPlatform\\Core\\Swagger\\Serializer\\DocumentationNormalizer constructor expects Symfony\\Component\\Serializer\\NameConverter\\NameConverterInterface\|null, object given\.#'
 			path: %currentWorkingDirectory%/tests/Swagger/Serializer/DocumentationNormalizer*Test.php
 		-
-			message: '#Parameter \#3 \$normalizer of class ApiPlatform\\Core\\GraphQl\\Resolver\\Factory\\ItemMutationResolverFactory constructor expects Symfony\\Component\\Serializer\\Normalizer\\NormalizerInterface, object given\.#'
-			path: %currentWorkingDirectory%/tests/GraphQl/Resolver/Factory/ItemMutationResolverFactoryTest.php
-		-
 			message: '#Parameter \#1 \$resource of method ApiPlatform\\Core\\Metadata\\Extractor\\XmlExtractor::getAttributes\(\) expects SimpleXMLElement, object given\.#'
 			path: %currentWorkingDirectory%/src/Metadata/Extractor/XmlExtractor.php
 		-

@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Resolver;
+namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\GraphQl\Resolver;
 
 use ApiPlatform\Core\GraphQl\Resolver\QueryItemResolverInterface;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\DummyCustomQuery as DummyCustomQueryDocument;

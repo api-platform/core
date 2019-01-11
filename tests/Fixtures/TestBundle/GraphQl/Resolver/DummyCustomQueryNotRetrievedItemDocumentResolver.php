@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Resolver;
+namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\GraphQl\Resolver;
 
 use ApiPlatform\Core\GraphQl\Resolver\QueryItemResolverInterface;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\DummyCustomQuery as DummyCustomQueryDocument;
@@ -22,7 +22,7 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyCustomQuery;
  *
  * @author Lukas Lücke <lukas@luecke.me>
  */
-class DummyCustomQueryItemResolver implements QueryItemResolverInterface
+class DummyCustomQueryNotRetrievedItemDocumentResolver implements QueryItemResolverInterface
 {
     /**
      * @param DummyCustomQuery|DummyCustomQueryDocument|null $item
@@ -31,7 +31,12 @@ class DummyCustomQueryItemResolver implements QueryItemResolverInterface
      */
     public function __invoke($item, array $context)
     {
-        $item->message = 'Success!';
+        if (null === $item) {
+            $item = new DummyCustomQueryDocument();
+            $item->message = 'Success (not retrieved)!';
+
+            return $item;
+        }
 
         return $item;
     }

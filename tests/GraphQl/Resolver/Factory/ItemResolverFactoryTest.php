@@ -88,7 +88,7 @@ class ItemResolverFactoryTest extends TestCase
 
         $resolveInfo = new ResolveInfo('name', [], new ObjectType(['name' => '']), new ObjectType(['name' => '']), [], new Schema([]), [], null, null, []);
 
-        $this->expectExceptionMessage('Resolver only handles items of class ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RelatedDummy but retrieved item is of class ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy');
+        $this->expectExceptionMessage('Resolver only handles items of class RelatedDummy but retrieved item is of class Dummy.');
 
         $this->assertEquals('normalizedItem', ($this->itemResolverFactory)(RelatedDummy::class)(null, ['id' => '/dummies/3'], null, $resolveInfo));
     }
@@ -107,7 +107,7 @@ class ItemResolverFactoryTest extends TestCase
             return new Dummy();
         });
 
-        $this->expectExceptionMessage('Custom query resolver "query_resolver_id" has to return an item of class ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RelatedDummy but returned an item of class ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy');
+        $this->expectExceptionMessage('Custom query resolver "query_resolver_id" has to return an item of class RelatedDummy but returned an item of class Dummy.');
 
         ($this->itemResolverFactory)(null, null, 'custom_query')(null, ['id' => '/related_dummies/3'], null, $resolveInfo);
     }
