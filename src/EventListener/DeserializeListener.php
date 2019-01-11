@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\EventListener;
 
+use ApiPlatform\Core\Api\FormatMatcher;
 use ApiPlatform\Core\Api\FormatsProviderInterface;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\Serializer\SerializerContextBuilderInterface;
@@ -34,6 +35,7 @@ final class DeserializeListener
     private $serializerContextBuilder;
     private $formats = [];
     private $formatsProvider;
+    private $formatMatcher;
 
     /**
      * @throws InvalidArgumentException
@@ -45,14 +47,13 @@ final class DeserializeListener
         if (\is_array($formatsProvider)) {
             @trigger_error('Using an array as formats provider is deprecated since API Platform 2.3 and will not be possible anymore in API Platform 3', E_USER_DEPRECATED);
             $this->formats = $formatsProvider;
+        } else {
+            if (!$formatsProvider instanceof FormatsProviderInterface) {
+                throw new InvalidArgumentException(sprintf('The "$formatsProvider" argument is expected to be an implementation of the "%s" interface.', FormatsProviderInterface::class));
+            }
 
-            return;
+            $this->formatsProvider = $formatsProvider;
         }
-        if (!$formatsProvider instanceof FormatsProviderInterface) {
-            throw new InvalidArgumentException(sprintf('The "$formatsProvider" argument is expected to be an implementation of the "%s" interface.', FormatsProviderInterface::class));
-        }
-
-        $this->formatsProvider = $formatsProvider;
     }
 
     /**
@@ -78,6 +79,7 @@ final class DeserializeListener
         if (null !== $this->formatsProvider) {
             $this->formats = $this->formatsProvider->getFormatsFromAttributes($attributes);
         }
+        $this->formatMatcher = new FormatMatcher($this->formats);
 
         $format = $this->getFormat($request);
         $context = $this->serializerContextBuilder->createFromRequest($request, false, $attributes);
@@ -110,7 +112,7 @@ final class DeserializeListener
             throw new NotAcceptableHttpException('The "Content-Type" header must exist.');
         }
 
-        $format = $request->getFormat($contentType);
+        $format = $this->formatMatcher->getFormat($contentType);
         if (null === $format || !isset($this->formats[$format])) {
             $supportedMimeTypes = [];
             foreach ($this->formats as $mimeTypes) {
