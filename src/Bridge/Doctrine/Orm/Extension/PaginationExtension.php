@@ -109,7 +109,7 @@ final class PaginationExtension implements ContextAwareQueryResultCollectionExte
     /**
      * {@inheritdoc}
      */
-    public function applyToCollection(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass = null, string $operationName = null, array $context = [])
+    public function applyToCollection(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, string $operationName = null, array $context = [])
     {
         if (null === $pagination = $this->getPagination($resourceClass, $operationName, $context)) {
             return;
@@ -167,12 +167,8 @@ final class PaginationExtension implements ContextAwareQueryResultCollectionExte
     /**
      * @throws InvalidArgumentException
      */
-    private function getPagination(?string $resourceClass, ?string $operationName, array $context): ?array
+    private function getPagination(string $resourceClass, ?string $operationName, array $context): ?array
     {
-        if (null === $resourceClass) {
-            throw new InvalidArgumentException('The "$resourceClass" parameter must not be null');
-        }
-
         $request = null;
         if (null !== $this->requestStack && null === $request = $this->requestStack->getCurrentRequest()) {
             return null;

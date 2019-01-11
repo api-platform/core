@@ -77,7 +77,9 @@ class TransformPaginationParametersListenerTest extends TestCase
 
         $this->listener->onKernelRequest($eventProphecy->reveal());
 
-        $expectedRequest = new Request(['page' => ['size' => 5, 'number' => 3, 'error' => -1]], [], ['_api_pagination' => ['size' => 5, 'number' => 3, 'error' => -1]]);
+        $filters = ['size' => 5, 'number' => 3, 'error' => -1];
+
+        $expectedRequest = new Request(['page' => $filters], [], ['_api_pagination' => $filters, '_api_filters' => $filters]);
         $expectedRequest->setRequestFormat('jsonapi');
 
         $this->assertEquals($expectedRequest, $request);
