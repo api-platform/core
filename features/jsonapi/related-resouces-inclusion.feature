@@ -662,3 +662,301 @@ Feature: JSON API Inclusion of Related Resources
         }]
     }
     """
+
+  @createSchema
+  Scenario: Request inclusion of nested resource on an item
+    Given there are 1 dummy objects with relatedDummy and its thirdLevel
+    When I send a "GET" request to "/dummies/1?include=relatedDummy.thirdLevel"
+    Then the response status code should be 200
+    And the response should be in JSON
+    And print last JSON response
+    And the JSON should be valid according to the JSON API schema
+    And the JSON should be deep equal to:
+    """
+        {
+            "data": {
+                "id": "/dummies/1",
+                "type": "Dummy",
+                "attributes": {
+                    "description": null,
+                    "dummy": null,
+                    "dummyBoolean": null,
+                    "dummyDate": null,
+                    "dummyFloat": null,
+                    "dummyPrice": null,
+                    "jsonData": [],
+                    "arrayData": [],
+                    "name_converted": null,
+                    "_id": 1,
+                    "name": "Dummy #1",
+                    "alias": "Alias #0",
+                    "foo": null
+                },
+                "relationships": {
+                    "relatedDummy": {
+                        "data": {
+                            "type": "RelatedDummy",
+                            "id": "/related_dummies/1"
+                        }
+                    }
+                }
+            },
+            "included": [
+                {
+                  "id": "/third_levels/1",
+                  "type": "ThirdLevel",
+                  "attributes": {
+                      "_id": 1,
+                      "level": 3,
+                      "test": true
+                  }
+                },
+                {
+                    "id": "/related_dummies/1",
+                    "type": "RelatedDummy",
+                    "attributes": {
+                        "name": "RelatedDummy #1",
+                        "dummyDate": null,
+                        "dummyBoolean": null,
+                        "embeddedDummy": {
+                            "dummyName": null,
+                            "dummyBoolean": null,
+                            "dummyDate": null,
+                            "dummyFloat": null,
+                            "dummyPrice": null,
+                            "symfony": null
+                        },
+                        "_id": 1,
+                        "symfony": "symfony",
+                        "age": null
+                    },
+                    "relationships": {
+                        "thirdLevel": {
+                            "data": {
+                                "id": "/third_levels/1",
+                                "type": "ThirdLevel"
+                            }
+                        }
+                    }
+                }
+            ]
+       }
+    """
+
+  @createSchema
+  Scenario: Request inclusion of nested resource on a collection
+    Given there are 3 dummy objects with relatedDummy and its thirdLevel
+    When I send a "GET" request to "/dummies?include=relatedDummy.thirdLevel"
+    Then the response status code should be 200
+    And the response should be in JSON
+    And print last JSON response
+    And the JSON should be valid according to the JSON API schema
+    And the JSON should be deep equal to:
+    """
+        {
+          "links": {
+              "self": "/dummies?include=relatedDummy.thirdLevel"
+          },
+          "meta": {
+              "totalItems": 3,
+              "itemsPerPage": 3,
+              "currentPage": 1
+          },
+          "data": [
+            {
+              "id": "/dummies/1",
+              "type": "Dummy",
+              "attributes": {
+                  "description": null,
+                  "dummy": null,
+                  "dummyBoolean": null,
+                  "dummyDate": null,
+                  "dummyFloat": null,
+                  "dummyPrice": null,
+                  "jsonData": [],
+                  "arrayData": [],
+                  "name_converted": null,
+                  "_id": 1,
+                  "name": "Dummy #1",
+                  "alias": "Alias #2",
+                  "foo": null
+              },
+              "relationships": {
+                  "relatedDummy": {
+                      "data": {
+                          "type": "RelatedDummy",
+                          "id": "/related_dummies/1"
+                      }
+                  }
+              }
+            },
+            {
+              "id": "/dummies/2",
+              "type": "Dummy",
+              "attributes": {
+                  "description": null,
+                  "dummy": null,
+                  "dummyBoolean": null,
+                  "dummyDate": null,
+                  "dummyFloat": null,
+                  "dummyPrice": null,
+                  "jsonData": [],
+                  "arrayData": [],
+                  "name_converted": null,
+                  "_id": 2,
+                  "name": "Dummy #2",
+                  "alias": "Alias #1",
+                  "foo": null
+              },
+              "relationships": {
+                  "relatedDummy": {
+                      "data": {
+                          "type": "RelatedDummy",
+                          "id": "/related_dummies/2"
+                      }
+                  }
+              }
+            },
+            {
+              "id": "/dummies/3",
+              "type": "Dummy",
+              "attributes": {
+                  "description": null,
+                  "dummy": null,
+                  "dummyBoolean": null,
+                  "dummyDate": null,
+                  "dummyFloat": null,
+                  "dummyPrice": null,
+                  "jsonData": [],
+                  "arrayData": [],
+                  "name_converted": null,
+                  "_id": 3,
+                  "name": "Dummy #3",
+                  "alias": "Alias #0",
+                  "foo": null
+              },
+              "relationships": {
+                  "relatedDummy": {
+                      "data": {
+                          "type": "RelatedDummy",
+                          "id": "/related_dummies/3"
+                      }
+                  }
+              }
+            }
+          ],
+          "included": [
+              {
+                "id": "/third_levels/1",
+                "type": "ThirdLevel",
+                "attributes": {
+                    "_id": 1,
+                    "level": 3,
+                    "test": true
+                }
+              },
+              {
+                  "id": "/related_dummies/1",
+                  "type": "RelatedDummy",
+                  "attributes": {
+                      "name": "RelatedDummy #1",
+                      "dummyDate": null,
+                      "dummyBoolean": null,
+                      "embeddedDummy": {
+                          "dummyName": null,
+                          "dummyBoolean": null,
+                          "dummyDate": null,
+                          "dummyFloat": null,
+                          "dummyPrice": null,
+                          "symfony": null
+                      },
+                      "_id": 1,
+                      "symfony": "symfony",
+                      "age": null
+                  },
+                  "relationships": {
+                      "thirdLevel": {
+                          "data": {
+                              "id": "/third_levels/1",
+                              "type": "ThirdLevel"
+                          }
+                      }
+                  }
+              },
+              {
+                "id": "/third_levels/2",
+                "type": "ThirdLevel",
+                "attributes": {
+                    "_id": 2,
+                    "level": 3,
+                    "test": true
+                }
+              },
+              {
+                  "id": "/related_dummies/2",
+                  "type": "RelatedDummy",
+                  "attributes": {
+                      "name": "RelatedDummy #2",
+                      "dummyDate": null,
+                      "dummyBoolean": null,
+                      "embeddedDummy": {
+                          "dummyName": null,
+                          "dummyBoolean": null,
+                          "dummyDate": null,
+                          "dummyFloat": null,
+                          "dummyPrice": null,
+                          "symfony": null
+                      },
+                      "_id": 2,
+                      "symfony": "symfony",
+                      "age": null
+                  },
+                  "relationships": {
+                      "thirdLevel": {
+                          "data": {
+                              "id": "/third_levels/2",
+                              "type": "ThirdLevel"
+                          }
+                      }
+                  }
+              },
+              {
+                "id": "/third_levels/3",
+                "type": "ThirdLevel",
+                "attributes": {
+                    "_id": 3,
+                    "level": 3,
+                    "test": true
+                }
+              },
+              {
+                  "id": "/related_dummies/3",
+                  "type": "RelatedDummy",
+                  "attributes": {
+                      "name": "RelatedDummy #3",
+                      "dummyDate": null,
+                      "dummyBoolean": null,
+                      "embeddedDummy": {
+                          "dummyName": null,
+                          "dummyBoolean": null,
+                          "dummyDate": null,
+                          "dummyFloat": null,
+                          "dummyPrice": null,
+                          "symfony": null
+                      },
+                      "_id": 3,
+                      "symfony": "symfony",
+                      "age": null
+                  },
+                  "relationships": {
+                      "thirdLevel": {
+                          "data": {
+                              "id": "/third_levels/3",
+                              "type": "ThirdLevel"
+                          }
+                      }
+                  }
+              }
+          ]
+       }
+    """

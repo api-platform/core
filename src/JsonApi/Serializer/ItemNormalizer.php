@@ -41,6 +41,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
 
     private $componentsCache = [];
     private $resourceMetadataFactory;
+    private $includedResources = [];
 
     public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, IriConverterInterface $iriConverter, ResourceClassResolverInterface $resourceClassResolver, PropertyAccessorInterface $propertyAccessor = null, NameConverterInterface $nameConverter = null, ResourceMetadataFactoryInterface $resourceMetadataFactory, array $defaultContext = [])
     {
@@ -366,14 +367,27 @@ final class ItemNormalizer extends AbstractItemNormalizer
             return [];
         }
 
-        $included = [];
+        $included = $firstLevelProperties = [];
+        foreach ($context['api_included'] as $property) {
+            $pos = strpos($property, '.');
+            $firstLevelProperties[] = false === $pos ? $property : substr($property, 0, $pos);
+        }
+
         foreach ($relationships as $relationshipDataArray) {
-            if (!\in_array($relationshipDataArray['name'], $context['api_included'], true)) {
+            if (!\in_array($relationshipDataArray['name'], $firstLevelProperties, true)) {
                 continue;
             }
 
             $relationshipName = $relationshipDataArray['name'];
             $relationContext = $context;
+            $relationContext['api_included'] = [];
+            foreach ($context['api_included'] as $property) {
+                if (0 !== strpos($property, "$relationshipName.")) {
+                    continue;
+                }
+                $relationContext['api_included'][] = str_replace("$relationshipName.", '', $property);
+            }
+
             $attributeValue = $this->getAttributeValue($object, $relationshipName, $format, $relationContext);
 
             if (!$attributeValue) {
@@ -394,7 +408,9 @@ final class ItemNormalizer extends AbstractItemNormalizer
             }
         }
 
-        return $included;
+        $this->includedResources = array_values(array_unique(array_merge($this->includedResources ?? [], $included), SORT_REGULAR));
+
+        return $this->includedResources;
     }
 
     /**

@@ -101,7 +101,7 @@ class TransformFieldsetsParametersListenerTest extends TestCase
     public function testOnKernelRequestWithIncludeWithoutFields()
     {
         $request = new Request(
-            ['include' => 'relatedDummy,foo'],
+            ['include' => 'relatedDummy,foo,nested.prop'],
             [],
             ['_api_resource_class' => Dummy::class]
         );
@@ -113,11 +113,11 @@ class TransformFieldsetsParametersListenerTest extends TestCase
         $this->listener->onKernelRequest($eventProphecy->reveal());
 
         $expectedRequest = new Request(
-            ['include' => 'relatedDummy,foo'],
+            ['include' => 'relatedDummy,foo,nested.prop'],
             [],
             [
                 '_api_resource_class' => Dummy::class,
-                '_api_included' => ['relatedDummy', 'foo'],
+                '_api_included' => ['relatedDummy', 'foo', 'nested.prop'],
             ]
         );
         $expectedRequest->setRequestFormat('jsonapi');

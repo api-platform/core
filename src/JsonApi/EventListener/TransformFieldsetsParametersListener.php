@@ -63,12 +63,13 @@ final class TransformFieldsetsParametersListener
 
         $resourceShortName = $this->resourceMetadataFactory->create($resourceClass)->getShortName();
 
+        $includedResourceTypes = explode('.', implode('.', $includeParameter));
         foreach ($fieldsParameter as $resourceType => $fields) {
             $fields = explode(',', $fields);
 
             if ($resourceShortName === $resourceType) {
                 $properties = array_merge($properties, $fields);
-            } elseif (\in_array($resourceType, $includeParameter, true)) {
+            } elseif (\in_array($resourceType, $includedResourceTypes, true)) {
                 $properties[$resourceType] = $fields;
 
                 $request->attributes->set('_api_included', array_merge($request->attributes->get('_api_included', []), [$resourceType]));
