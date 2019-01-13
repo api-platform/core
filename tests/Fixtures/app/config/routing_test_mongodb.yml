@@ -2,5 +2,5 @@ _main:
     resource: routing_common.yml
 
 controller:
-    resource: '@TestBundle/Controller/Orm'
+    resource: '@TestBundle/Controller/MongoDbOdm'
     type: annotation

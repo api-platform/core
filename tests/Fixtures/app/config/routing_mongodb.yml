@@ -1,6 +1,2 @@
 _main:
-    resource: routing_test.yml
-
-controller:
-    resource: '@TestBundle/Controller/MongoDbOdm'
-    type: annotation
+    resource: routing_test_mongodb.yml
