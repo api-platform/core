@@ -195,7 +195,7 @@ jobs:
           name: Run Behat tests
           command: |-
             mkdir -p build/logs/tmp build/cov
-            for f in $(find features -name '*.feature' -not -path 'features/main/exposed_state.feature' | circleci tests split --split-by=timings); do
+            for f in $(find features -name '*.feature' -not -path 'features/main/exposed_state.feature' -not -path 'features/elasticsearch/*' | circleci tests split --split-by=timings); do
               _f=${f//\//_}
               FEATURE="${_f}" phpdbg -qrr vendor/bin/behat --profile=coverage --suite=default --format=progress --out=std --format=junit --out=build/logs/tmp/"${_f}" "$f"
             done

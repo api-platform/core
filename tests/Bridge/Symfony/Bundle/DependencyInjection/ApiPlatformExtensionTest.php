@@ -15,6 +15,7 @@ namespace ApiPlatform\Core\Tests\Bridge\Symfony\Bundle\DependencyInjection;
 
 use ApiPlatform\Core\Api\FilterInterface;
 use ApiPlatform\Core\Api\IriConverterInterface;
+use ApiPlatform\Core\Api\ResourceClassResolverInterface;
 use ApiPlatform\Core\Api\UrlGeneratorInterface;
 use ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Extension\AggregationCollectionExtensionInterface;
 use ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Extension\AggregationItemExtensionInterface;
@@ -28,6 +29,9 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\OrderExtension;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\PaginationExtension;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\QueryCollectionExtensionInterface;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\QueryItemExtensionInterface;
+use ApiPlatform\Core\Bridge\Elasticsearch\Api\IdentifierExtractorInterface;
+use ApiPlatform\Core\Bridge\Elasticsearch\DataProvider\Extension\FullBodySearchCollectionExtensionInterface;
+use ApiPlatform\Core\Bridge\Elasticsearch\Metadata\Document\Factory\DocumentMetadataFactoryInterface;
 use ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\ApiPlatformExtension;
 use ApiPlatform\Core\DataPersister\DataPersisterInterface;
 use ApiPlatform\Core\DataProvider\CollectionDataProviderInterface;
@@ -101,10 +105,12 @@ class ApiPlatformExtensionTest extends TestCase
     ]];
 
     private $extension;
+    private $childDefinitionProphecy;
 
     protected function setUp()
     {
         $this->extension = new ApiPlatformExtension();
+        $this->childDefinitionProphecy = $this->prophesize(ChildDefinition::class);
     }
 
     public function tearDown()
@@ -446,33 +452,147 @@ class ApiPlatformExtensionTest extends TestCase
         $this->extension->load($config, $containerBuilder);
     }
 
+    public function testDisableDoctrine()
+    {
+        $containerBuilderProphecy = $this->getBaseContainerBuilderProphecy();
+        $containerBuilderProphecy->registerForAutoconfiguration(QueryItemExtensionInterface::class)->shouldNotBeCalled();
+        $this->childDefinitionProphecy->addTag('api_platform.doctrine.orm.query_extension.item')->shouldNotBeCalled();
+        $containerBuilderProphecy->registerForAutoconfiguration(QueryCollectionExtensionInterface::class)->shouldNotBeCalled();
+        $this->childDefinitionProphecy->addTag('api_platform.doctrine.orm.query_extension.collection')->shouldNotBeCalled();
+        $containerBuilderProphecy->setDefinition('api_platform.doctrine.listener.http_cache.purge', Argument::type(Definition::class))->shouldNotBeCalled();
+        $containerBuilderProphecy->setDefinition('api_platform.doctrine.orm.boolean_filter', Argument::type(Definition::class))->shouldNotBeCalled();
+        $containerBuilderProphecy->setDefinition('api_platform.doctrine.orm.collection_data_provider', Argument::type(Definition::class))->shouldNotBeCalled();
+        $containerBuilderProphecy->setDefinition('api_platform.doctrine.orm.data_persister', Argument::type(Definition::class))->shouldNotBeCalled();
+        $containerBuilderProphecy->setDefinition('api_platform.doctrine.orm.date_filter', Argument::type(Definition::class))->shouldNotBeCalled();
+        $containerBuilderProphecy->setDefinition('api_platform.doctrine.orm.default.collection_data_provider', Argument::type(Definition::class))->shouldNotBeCalled();
+        $containerBuilderProphecy->setDefinition('api_platform.doctrine.orm.default.item_data_provider', Argument::type(Definition::class))->shouldNotBeCalled();
+        $containerBuilderProphecy->setDefinition('api_platform.doctrine.orm.default.subresource_data_provider', Argument::type(Definition::class))->shouldNotBeCalled();
+        $containerBuilderProphecy->setDefinition('api_platform.doctrine.orm.exists_filter', Argument::type(Definition::class))->shouldNotBeCalled();
+        $containerBuilderProphecy->setDefinition('api_platform.doctrine.orm.item_data_provider', Argument::type(Definition::class))->shouldNotBeCalled();
+        $containerBuilderProphecy->setDefinition('api_platform.doctrine.orm.metadata.property.metadata_factory', Argument::type(Definition::class))->shouldNotBeCalled();
+        $containerBuilderProphecy->setDefinition('api_platform.doctrine.orm.numeric_filter', Argument::type(Definition::class))->shouldNotBeCalled();
+        $containerBuilderProphecy->setDefinition('api_platform.doctrine.orm.order_filter', Argument::type(Definition::class))->shouldNotBeCalled();
+        $containerBuilderProphecy->setDefinition('api_platform.doctrine.orm.query_extension.eager_loading', Argument::type(Definition::class))->shouldNotBeCalled();
+        $containerBuilderProphecy->setDefinition('api_platform.doctrine.orm.query_extension.filter', Argument::type(Definition::class))->shouldNotBeCalled();
+        $containerBuilderProphecy->setDefinition('api_platform.doctrine.orm.query_extension.filter_eager_loading', Argument::type(Definition::class))->shouldNotBeCalled();
+        $containerBuilderProphecy->setDefinition('api_platform.doctrine.orm.query_extension.order', Argument::type(Definition::class))->shouldNotBeCalled();
+        $containerBuilderProphecy->setDefinition('api_platform.doctrine.orm.query_extension.pagination', Argument::type(Definition::class))->shouldNotBeCalled();
+        $containerBuilderProphecy->setDefinition('api_platform.doctrine.orm.range_filter', Argument::type(Definition::class))->shouldNotBeCalled();
+        $containerBuilderProphecy->setDefinition('api_platform.doctrine.orm.search_filter', Argument::type(Definition::class))->shouldNotBeCalled();
+        $containerBuilderProphecy->setDefinition('api_platform.doctrine.orm.subresource_data_provider', Argument::type(Definition::class))->shouldNotBeCalled();
+        $containerBuilderProphecy->setDefinition('api_platform.doctrine.listener.mercure.publish', Argument::type(Definition::class))->shouldNotBeCalled();
+        $containerBuilderProphecy->setAlias(EagerLoadingExtension::class, 'api_platform.doctrine.orm.query_extension.eager_loading')->shouldNotBeCalled();
+        $containerBuilderProphecy->setAlias(FilterExtension::class, 'api_platform.doctrine.orm.query_extension.filter')->shouldNotBeCalled();
+        $containerBuilderProphecy->setAlias(FilterEagerLoadingExtension::class, 'api_platform.doctrine.orm.query_extension.filter_eager_loading')->shouldNotBeCalled();
+        $containerBuilderProphecy->setAlias(PaginationExtension::class, 'api_platform.doctrine.orm.query_extension.pagination')->shouldNotBeCalled();
+        $containerBuilderProphecy->setAlias(OrderExtension::class, 'api_platform.doctrine.orm.query_extension.order')->shouldNotBeCalled();
+        $containerBuilder = $containerBuilderProphecy->reveal();
+
+        $this->extension->load(array_merge_recursive(self::DEFAULT_CONFIG, ['api_platform' => ['doctrine' => ['enabled' => false]]]), $containerBuilder);
+    }
+
+    public function testDisableDoctrineMongoDbOdm()
+    {
+        $containerBuilderProphecy = $this->getBaseContainerBuilderProphecy();
+        $containerBuilderProphecy->registerForAutoconfiguration(AggregationItemExtensionInterface::class)->shouldNotBeCalled();
+        $this->childDefinitionProphecy->addTag('api_platform.doctrine.mongodb.aggregation_extension.item')->shouldNotBeCalled();
+        $containerBuilderProphecy->registerForAutoconfiguration(AggregationCollectionExtensionInterface::class)->shouldNotBeCalled();
+        $this->childDefinitionProphecy->addTag('api_platform.doctrine.mongodb.aggregation_extension.collection')->shouldNotBeCalled();
+        $containerBuilderProphecy->setDefinition('api_platform.doctrine_mongodb.odm.aggregation_extension.filter', Argument::type(Definition::class))->shouldNotBeCalled();
+        $containerBuilderProphecy->setDefinition('api_platform.doctrine_mongodb.odm.aggregation_extension.order', Argument::type(Definition::class))->shouldNotBeCalled();
+        $containerBuilderProphecy->setDefinition('api_platform.doctrine_mongodb.odm.aggregation_extension.pagination', Argument::type(Definition::class))->shouldNotBeCalled();
+        $containerBuilderProphecy->setDefinition('api_platform.doctrine_mongodb.odm.boolean_filter', Argument::type(Definition::class))->shouldNotBeCalled();
+        $containerBuilderProphecy->setDefinition('api_platform.doctrine_mongodb.odm.collection_data_provider', Argument::type(Definition::class))->shouldNotBeCalled();
+        $containerBuilderProphecy->setDefinition('api_platform.doctrine_mongodb.odm.data_persister', Argument::type(Definition::class))->shouldNotBeCalled();
+        $containerBuilderProphecy->setDefinition('api_platform.doctrine_mongodb.odm.date_filter', Argument::type(Definition::class))->shouldNotBeCalled();
+        $containerBuilderProphecy->setDefinition('api_platform.doctrine_mongodb.odm.default.collection_data_provider', Argument::type(Definition::class))->shouldNotBeCalled();
+        $containerBuilderProphecy->setDefinition('api_platform.doctrine_mongodb.odm.default.item_data_provider', Argument::type(Definition::class))->shouldNotBeCalled();
+        $containerBuilderProphecy->setDefinition('api_platform.doctrine_mongodb.odm.default.subresource_data_provider', Argument::type(Definition::class))->shouldNotBeCalled();
+        $containerBuilderProphecy->setDefinition('api_platform.doctrine_mongodb.odm.default_document_manager.property_info_extractor', Argument::type(Definition::class))->shouldNotBeCalled();
+        $containerBuilderProphecy->setDefinition('api_platform.doctrine_mongodb.odm.exists_filter', Argument::type(Definition::class))->shouldNotBeCalled();
+        $containerBuilderProphecy->setDefinition('api_platform.doctrine_mongodb.odm.item_data_provider', Argument::type(Definition::class))->shouldNotBeCalled();
+        $containerBuilderProphecy->setDefinition('api_platform.doctrine_mongodb.odm.metadata.property.metadata_factory', Argument::type(Definition::class))->shouldNotBeCalled();
+        $containerBuilderProphecy->setDefinition('api_platform.doctrine_mongodb.odm.numeric_filter', Argument::type(Definition::class))->shouldNotBeCalled();
+        $containerBuilderProphecy->setDefinition('api_platform.doctrine_mongodb.odm.order_filter', Argument::type(Definition::class))->shouldNotBeCalled();
+        $containerBuilderProphecy->setDefinition('api_platform.doctrine_mongodb.odm.range_filter', Argument::type(Definition::class))->shouldNotBeCalled();
+        $containerBuilderProphecy->setDefinition('api_platform.doctrine_mongodb.odm.search_filter', Argument::type(Definition::class))->shouldNotBeCalled();
+        $containerBuilderProphecy->setDefinition('api_platform.doctrine_mongodb.odm.subresource_data_provider', Argument::type(Definition::class))->shouldNotBeCalled();
+        $containerBuilderProphecy->setAlias(MongoDbOdmFilterExtension::class, 'api_platform.doctrine_mongodb.odm.aggregation_extension.filter')->shouldNotBeCalled();
+        $containerBuilderProphecy->setAlias(MongoDbOdmOrderExtension::class, 'api_platform.doctrine_mongodb.odm.aggregation_extension.order')->shouldNotBeCalled();
+        $containerBuilderProphecy->setAlias(MongoDbOdmPaginationExtension::class, 'api_platform.doctrine_mongodb.odm.aggregation_extension.pagination')->shouldNotBeCalled();
+        $containerBuilder = $containerBuilderProphecy->reveal();
+
+        $this->extension->load(array_merge_recursive(self::DEFAULT_CONFIG, ['api_platform' => ['doctrine_mongodb_odm' => ['enabled' => false]]]), $containerBuilder);
+    }
+
+    public function testEnableElasticsearch()
+    {
+        $this->childDefinitionProphecy->addTag('api_platform.elasticsearch.query_extension.collection')->shouldBeCalled();
+
+        $containerBuilderProphecy = $this->getBaseContainerBuilderProphecy();
+        $containerBuilderProphecy->setParameter('api_platform.elasticsearch.enabled', false)->shouldNotBeCalled();
+        $containerBuilderProphecy->setParameter('api_platform.elasticsearch.enabled', true)->shouldBeCalled();
+        $containerBuilderProphecy->setDefinition('api_platform.elasticsearch.client', Argument::type(Definition::class))->shouldBeCalled();
+        $containerBuilderProphecy->setDefinition('api_platform.elasticsearch.metadata.resource.metadata_factory.operation', Argument::type(Definition::class))->shouldBeCalled();
+        $containerBuilderProphecy->setDefinition('api_platform.elasticsearch.cache.metadata.document', Argument::type(Definition::class))->shouldBeCalled();
+        $containerBuilderProphecy->setDefinition('api_platform.elasticsearch.metadata.document.metadata_factory.configured', Argument::type(Definition::class))->shouldBeCalled();
+        $containerBuilderProphecy->setDefinition('api_platform.elasticsearch.metadata.document.metadata_factory.attribute', Argument::type(Definition::class))->shouldBeCalled();
+        $containerBuilderProphecy->setDefinition('api_platform.elasticsearch.metadata.document.metadata_factory.cat', Argument::type(Definition::class))->shouldBeCalled();
+        $containerBuilderProphecy->setDefinition('api_platform.elasticsearch.metadata.document.metadata_factory.cached', Argument::type(Definition::class))->shouldBeCalled();
+        $containerBuilderProphecy->setDefinition('api_platform.elasticsearch.identifier_extractor', Argument::type(Definition::class))->shouldBeCalled();
+        $containerBuilderProphecy->setDefinition('api_platform.elasticsearch.name_converter.inner_fields', Argument::type(Definition::class))->shouldBeCalled();
+        $containerBuilderProphecy->setDefinition('api_platform.elasticsearch.normalizer.item', Argument::type(Definition::class))->shouldBeCalled();
+        $containerBuilderProphecy->setDefinition('api_platform.elasticsearch.item_data_provider', Argument::type(Definition::class))->shouldBeCalled();
+        $containerBuilderProphecy->setDefinition('api_platform.elasticsearch.collection_data_provider', Argument::type(Definition::class))->shouldBeCalled();
+        $containerBuilderProphecy->setDefinition('api_platform.elasticsearch.query_extension.filter', Argument::type(Definition::class))->shouldBeCalled();
+        $containerBuilderProphecy->setDefinition('api_platform.elasticsearch.query_extension.constant_score_filter', Argument::type(Definition::class))->shouldBeCalled();
+        $containerBuilderProphecy->setDefinition('api_platform.elasticsearch.query_extension.sort_filter', Argument::type(Definition::class))->shouldBeCalled();
+        $containerBuilderProphecy->setDefinition('api_platform.elasticsearch.query_extension.sort', Argument::type(Definition::class))->shouldBeCalled();
+        $containerBuilderProphecy->setDefinition('api_platform.elasticsearch.term_filter', Argument::type(Definition::class))->shouldBeCalled();
+        $containerBuilderProphecy->setDefinition('api_platform.elasticsearch.order_filter', Argument::type(Definition::class))->shouldBeCalled();
+        $containerBuilderProphecy->setAlias('api_platform.elasticsearch.metadata.document.metadata_factory', 'api_platform.elasticsearch.metadata.document.metadata_factory.configured')->shouldBeCalled();
+        $containerBuilderProphecy->setAlias(DocumentMetadataFactoryInterface::class, 'api_platform.elasticsearch.metadata.document.metadata_factory')->shouldBeCalled();
+        $containerBuilderProphecy->setAlias(IdentifierExtractorInterface::class, 'api_platform.elasticsearch.identifier_extractor')->shouldBeCalled();
+        $containerBuilderProphecy->registerForAutoconfiguration(FullBodySearchCollectionExtensionInterface::class)->willReturn($this->childDefinitionProphecy)->shouldBeCalled();
+        $containerBuilderProphecy->setParameter('api_platform.elasticsearch.host', 'http://elasticsearch:9200')->shouldBeCalled();
+        $containerBuilderProphecy->setParameter('api_platform.elasticsearch.mapping', [])->shouldBeCalled();
+
+        $config = self::DEFAULT_CONFIG;
+        $config['api_platform']['elasticsearch'] = [
+            'enabled' => true,
+            'host' => 'http://elasticsearch:9200',
+            'mapping' => [],
+        ];
+
+        $this->extension->load($config, $containerBuilderProphecy->reveal());
+    }
+
     private function getPartialContainerBuilderProphecy()
     {
         $containerBuilderProphecy = $this->prophesize(ContainerBuilder::class);
-        $childDefinitionProphecy = $this->prophesize(ChildDefinition::class);
 
         $containerBuilderProphecy->hasParameter('kernel.debug')->willReturn(true);
         $containerBuilderProphecy->getParameter('kernel.debug')->willReturn(false);
 
         $containerBuilderProphecy->registerForAutoconfiguration(DataPersisterInterface::class)
-            ->willReturn($childDefinitionProphecy)->shouldBeCalledTimes(1);
-        $childDefinitionProphecy->addTag('api_platform.data_persister')->shouldBeCalledTimes(1);
+            ->willReturn($this->childDefinitionProphecy)->shouldBeCalledTimes(1);
+        $this->childDefinitionProphecy->addTag('api_platform.data_persister')->shouldBeCalledTimes(1);
 
         $containerBuilderProphecy->registerForAutoconfiguration(ItemDataProviderInterface::class)
-            ->willReturn($childDefinitionProphecy)->shouldBeCalledTimes(1);
-        $childDefinitionProphecy->addTag('api_platform.item_data_provider')->shouldBeCalledTimes(1);
+            ->willReturn($this->childDefinitionProphecy)->shouldBeCalledTimes(1);
+        $this->childDefinitionProphecy->addTag('api_platform.item_data_provider')->shouldBeCalledTimes(1);
 
         $containerBuilderProphecy->registerForAutoconfiguration(CollectionDataProviderInterface::class)
-            ->willReturn($childDefinitionProphecy)->shouldBeCalledTimes(1);
-        $childDefinitionProphecy->addTag('api_platform.collection_data_provider')->shouldBeCalledTimes(1);
+            ->willReturn($this->childDefinitionProphecy)->shouldBeCalledTimes(1);
+        $this->childDefinitionProphecy->addTag('api_platform.collection_data_provider')->shouldBeCalledTimes(1);
 
         $containerBuilderProphecy->registerForAutoconfiguration(SubresourceDataProviderInterface::class)
-            ->willReturn($childDefinitionProphecy)->shouldBeCalledTimes(1);
-        $childDefinitionProphecy->addTag('api_platform.subresource_data_provider')->shouldBeCalledTimes(1);
+            ->willReturn($this->childDefinitionProphecy)->shouldBeCalledTimes(1);
+        $this->childDefinitionProphecy->addTag('api_platform.subresource_data_provider')->shouldBeCalledTimes(1);
 
         $containerBuilderProphecy->registerForAutoconfiguration(FilterInterface::class)
-            ->willReturn($childDefinitionProphecy)->shouldBeCalledTimes(1);
-        $childDefinitionProphecy->addTag('api_platform.filter')->shouldBeCalledTimes(1);
+            ->willReturn($this->childDefinitionProphecy)->shouldBeCalledTimes(1);
+        $this->childDefinitionProphecy->addTag('api_platform.filter')->shouldBeCalledTimes(1);
 
         $containerBuilderProphecy->getParameter('kernel.bundles')->willReturn([
             'DoctrineBundle' => DoctrineBundle::class,
@@ -493,17 +613,6 @@ class ApiPlatformExtensionTest extends TestCase
         $parameters = [
             'api_platform.collection.order' => 'ASC',
             'api_platform.collection.order_parameter_name' => 'order',
-            'api_platform.collection.pagination.client_enabled' => false,
-            'api_platform.collection.pagination.client_items_per_page' => false,
-            'api_platform.collection.pagination.enabled' => true,
-            'api_platform.collection.pagination.enabled_parameter_name' => 'pagination',
-            'api_platform.collection.pagination.items_per_page' => 30,
-            'api_platform.collection.pagination.items_per_page_parameter_name' => 'itemsPerPage',
-            'api_platform.collection.pagination.maximum_items_per_page' => null,
-            'api_platform.collection.pagination.page_parameter_name' => 'page',
-            'api_platform.collection.pagination.partial' => false,
-            'api_platform.collection.pagination.client_partial' => false,
-            'api_platform.collection.pagination.partial_parameter_name' => 'partial',
             'api_platform.description' => 'description',
             'api_platform.error_formats' => ['jsonproblem' => ['application/problem+json'], 'jsonld' => ['application/ld+json']],
             'api_platform.formats' => ['jsonld' => ['application/ld+json'], 'jsonhal' => ['application/hal+json']],
@@ -529,6 +638,24 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.enable_entrypoint' => true,
             'api_platform.enable_docs' => true,
         ];
+
+        $pagination = [
+            'client_enabled' => false,
+            'client_items_per_page' => false,
+            'enabled' => true,
+            'enabled_parameter_name' => 'pagination',
+            'items_per_page' => 30,
+            'items_per_page_parameter_name' => 'itemsPerPage',
+            'maximum_items_per_page' => null,
+            'page_parameter_name' => 'page',
+            'partial' => false,
+            'client_partial' => false,
+            'partial_parameter_name' => 'partial',
+        ];
+        foreach ($pagination as $key => $value) {
+            $parameters["api_platform.collection.pagination.{$key}"] = $value;
+        }
+        $parameters['api_platform.collection.pagination'] = $pagination;
 
         foreach ($parameters as $key => $value) {
             $containerBuilderProphecy->setParameter($key, $value)->shouldBeCalled();
@@ -605,6 +732,7 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.operation_path_resolver.router',
             'api_platform.operation_path_resolver.generator',
             'api_platform.operation_path_resolver.underscore',
+            'api_platform.pagination',
             'api_platform.path_segment_name_generator.underscore',
             'api_platform.path_segment_name_generator.dash',
             'api_platform.resource_class_resolver',
@@ -658,6 +786,7 @@ class ApiPlatformExtensionTest extends TestCase
             PropertyNameCollectionFactoryInterface::class => 'api_platform.metadata.property.name_collection_factory',
             PropertyMetadataFactoryInterface::class => 'api_platform.metadata.property.metadata_factory',
             ValidatorInterface::class => 'api_platform.validator',
+            ResourceClassResolverInterface::class => 'api_platform.resource_class_resolver',
         ];
 
         foreach ($aliases as $alias => $service) {
@@ -676,23 +805,21 @@ class ApiPlatformExtensionTest extends TestCase
     {
         $containerBuilderProphecy = $this->getPartialContainerBuilderProphecy();
 
-        $childDefinitionProphecy = $this->prophesize(ChildDefinition::class);
-
         $containerBuilderProphecy->registerForAutoconfiguration(QueryItemExtensionInterface::class)
-            ->willReturn($childDefinitionProphecy)->shouldBeCalledTimes(1);
-        $childDefinitionProphecy->addTag('api_platform.doctrine.orm.query_extension.item')->shouldBeCalledTimes(1);
+            ->willReturn($this->childDefinitionProphecy)->shouldBeCalledTimes(1);
+        $this->childDefinitionProphecy->addTag('api_platform.doctrine.orm.query_extension.item')->shouldBeCalledTimes(1);
 
         $containerBuilderProphecy->registerForAutoconfiguration(QueryCollectionExtensionInterface::class)
-            ->willReturn($childDefinitionProphecy)->shouldBeCalledTimes(1);
-        $childDefinitionProphecy->addTag('api_platform.doctrine.orm.query_extension.collection')->shouldBeCalledTimes(1);
+            ->willReturn($this->childDefinitionProphecy)->shouldBeCalledTimes(1);
+        $this->childDefinitionProphecy->addTag('api_platform.doctrine.orm.query_extension.collection')->shouldBeCalledTimes(1);
 
         $containerBuilderProphecy->registerForAutoconfiguration(AggregationItemExtensionInterface::class)
-            ->willReturn($childDefinitionProphecy)->shouldBeCalledTimes(1);
-        $childDefinitionProphecy->addTag('api_platform.doctrine.mongodb.aggregation_extension.item')->shouldBeCalledTimes(1);
+            ->willReturn($this->childDefinitionProphecy)->shouldBeCalledTimes(1);
+        $this->childDefinitionProphecy->addTag('api_platform.doctrine.mongodb.aggregation_extension.item')->shouldBeCalledTimes(1);
 
         $containerBuilderProphecy->registerForAutoconfiguration(AggregationCollectionExtensionInterface::class)
-            ->willReturn($childDefinitionProphecy)->shouldBeCalledTimes(1);
-        $childDefinitionProphecy->addTag('api_platform.doctrine.mongodb.aggregation_extension.collection')->shouldBeCalledTimes(1);
+            ->willReturn($this->childDefinitionProphecy)->shouldBeCalledTimes(1);
+        $this->childDefinitionProphecy->addTag('api_platform.doctrine.mongodb.aggregation_extension.collection')->shouldBeCalledTimes(1);
 
         $containerBuilderProphecy->addResource(Argument::type(DirectoryResource::class))->shouldBeCalled();
 
@@ -713,6 +840,7 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.graphql.graphiql.enabled' => true,
             'api_platform.resource_class_directories' => Argument::type('array'),
             'api_platform.validator.serialize_payload_fields' => [],
+            'api_platform.elasticsearch.enabled' => false,
         ];
 
         foreach ($parameters as $key => $value) {
@@ -759,7 +887,7 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.doctrine_mongodb.odm.default.collection_data_provider',
             'api_platform.doctrine_mongodb.odm.default.item_data_provider',
             'api_platform.doctrine_mongodb.odm.default.subresource_data_provider',
-            'api_platform.doctrine_mongodb.odm.default_entity_manager.property_info_extractor',
+            'api_platform.doctrine_mongodb.odm.default_document_manager.property_info_extractor',
             'api_platform.doctrine_mongodb.odm.exists_filter',
             'api_platform.doctrine_mongodb.odm.item_data_provider',
             'api_platform.doctrine_mongodb.odm.metadata.property.metadata_factory',

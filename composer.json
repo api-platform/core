@@ -39,6 +39,7 @@
         "doctrine/mongodb-odm": "^2.0.0@beta",
         "doctrine/mongodb-odm-bundle": "^4.0.0@beta",
         "doctrine/orm": "^2.6.3",
+        "elasticsearch/elasticsearch": "^6.0",
         "friendsofsymfony/user-bundle": "dev-fix-mongodb-mapping",
         "guzzlehttp/guzzle": "^6.0",
         "justinrainbow/json-schema": "^5.0",
@@ -80,6 +81,7 @@
     },
     "suggest": {
         "doctrine/mongodb-odm-bundle": "To support MongoDB.",
+        "elasticsearch/elasticsearch": "To support Elasticsearch.",
         "friendsofsymfony/user-bundle": "To use the FOSUserBundle bridge.",
         "guzzlehttp/guzzle": "To use the HTTP cache invalidation system.",
         "phpdocumentor/reflection-docblock": "To support extracting metadata from PHPDoc.",

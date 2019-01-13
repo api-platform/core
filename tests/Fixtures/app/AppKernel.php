@@ -57,11 +57,14 @@ class AppKernel extends Kernel
             new ApiPlatformBundle(),
             new SecurityBundle(),
             new FOSUserBundle(),
-            new TestBundle(),
         ];
 
         if (class_exists(DoctrineMongoDBBundle::class)) {
             $bundles[] = new DoctrineMongoDBBundle();
+        }
+
+        if ('elasticsearch' !== $this->getEnvironment()) {
+            $bundles[] = new TestBundle();
         }
 
         if ($_SERVER['LEGACY'] ?? true) {
@@ -78,7 +81,7 @@ class AppKernel extends Kernel
 
     protected function configureRoutes(RouteCollectionBuilder $routes)
     {
-        $routes->import("config/routing_{$this->getRoutingEnvironment()}.yml");
+        $routes->import("config/routing_{$this->getEnvironment()}.yml");
 
         if ($_SERVER['LEGACY'] ?? true) {
             $routes->import('@NelmioApiDocBundle/Resources/config/routing.yml', '/nelmioapidoc');
@@ -147,14 +150,5 @@ class AppKernel extends Kernel
             ]);
             $c->loadFromExtension('api_platform', ['enable_nelmio_api_doc' => true]);
         }
-    }
-
-    private function getRoutingEnvironment(): string
-    {
-        if ('mongodb' === $environment = $this->getEnvironment()) {
-            return $environment;
-        }
-
-        return 'orm';
     }
 }

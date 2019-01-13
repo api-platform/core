@@ -1,5 +1,5 @@
-routing_common:
-    resource: 'routing_common.yml'
+_main:
+    resource: routing_test.yml
 
 controller:
     resource: '@TestBundle/Controller/MongoDbOdm'

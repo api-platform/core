@@ -18,8 +18,9 @@ use ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Extension\AggregationCollectionE
 use ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Extension\AggregationItemExtensionInterface;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\EagerLoadingExtension;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\FilterEagerLoadingExtension;
-use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\QueryCollectionExtensionInterface;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\QueryCollectionExtensionInterface as DoctrineQueryCollectionExtensionInterface;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\QueryItemExtensionInterface;
+use ApiPlatform\Core\Bridge\Elasticsearch\DataProvider\Extension\FullBodySearchCollectionExtensionInterface as ElasticSearchQueryCollectionExtensionInterface;
 use ApiPlatform\Core\DataPersister\DataPersisterInterface;
 use ApiPlatform\Core\DataProvider\CollectionDataProviderInterface;
 use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
@@ -27,6 +28,7 @@ use ApiPlatform\Core\DataProvider\SubresourceDataProviderInterface;
 use ApiPlatform\Core\Exception\RuntimeException;
 use Doctrine\Common\Annotations\Annotation;
 use Doctrine\ORM\Version;
+use Elasticsearch\Client;
 use phpDocumentor\Reflection\DocBlockFactoryInterface;
 use Ramsey\Uuid\Uuid;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
@@ -58,6 +60,8 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         if (!$frameworkConfiguration = $container->getExtensionConfig('framework')) {
             return;
         }
+
+        $serializerConfig = $propertyInfoConfig = null;
 
         foreach ($frameworkConfiguration as $frameworkParameters) {
             if (isset($frameworkParameters['serializer'])) {
@@ -145,6 +149,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $this->registerValidatorConfiguration($container, $config);
         $this->registerDataCollectorConfiguration($container, $config, $loader);
         $this->registerMercureConfiguration($container, $config, $loader, $useDoctrine);
+        $this->registerElasticsearchConfiguration($container, $config, $loader);
 
         if (interface_exists(MessageBusInterface::class)) {
             $loader->load('messenger.xml');
@@ -183,6 +188,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $container->setParameter('api_platform.collection.pagination.enabled_parameter_name', $config['collection']['pagination']['enabled_parameter_name']);
         $container->setParameter('api_platform.collection.pagination.items_per_page_parameter_name', $config['collection']['pagination']['items_per_page_parameter_name']);
         $container->setParameter('api_platform.collection.pagination.partial_parameter_name', $config['collection']['pagination']['partial_parameter_name']);
+        $container->setParameter('api_platform.collection.pagination', $config['collection']['pagination']);
         $container->setParameter('api_platform.http_cache.etag', $config['http_cache']['etag']);
         $container->setParameter('api_platform.http_cache.max_age', $config['http_cache']['max_age']);
         $container->setParameter('api_platform.http_cache.shared_max_age', $config['http_cache']['shared_max_age']);
@@ -459,7 +465,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
 
         $container->registerForAutoconfiguration(QueryItemExtensionInterface::class)
             ->addTag('api_platform.doctrine.orm.query_extension.item');
-        $container->registerForAutoconfiguration(QueryCollectionExtensionInterface::class)
+        $container->registerForAutoconfiguration(DoctrineQueryCollectionExtensionInterface::class)
             ->addTag('api_platform.doctrine.orm.query_extension.collection');
 
         $loader->load('doctrine_orm.xml');
@@ -572,5 +578,24 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         if ($useDoctrine) {
             $loader->load('doctrine_orm_mercure_publisher.xml');
         }
+    }
+
+    private function registerElasticsearchConfiguration(ContainerBuilder $container, array $config, XmlFileLoader $loader)
+    {
+        $enabled = $config['elasticsearch']['enabled'] && class_exists(Client::class);
+
+        $container->setParameter('api_platform.elasticsearch.enabled', $enabled);
+
+        if (!$enabled) {
+            return;
+        }
+
+        $loader->load('elasticsearch.xml');
+
+        $container->registerForAutoconfiguration(ElasticSearchQueryCollectionExtensionInterface::class)
+            ->addTag('api_platform.elasticsearch.query_extension.collection');
+
+        $container->setParameter('api_platform.elasticsearch.host', $config['elasticsearch']['host']);
+        $container->setParameter('api_platform.elasticsearch.mapping', $config['elasticsearch']['mapping']);
     }
 }

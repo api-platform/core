@@ -1,5 +1,38 @@
 # Changelog
 
+## 2.4.0
+
+* MongoDB: full support
+* Elasticsearch: add reading support (including pagination, sort filter and term filter)
+* Mercure: automatically push updates to clients using the [Mercure](https://mercure.rocks) protocol
+* CQRS support and async messages handling using the Symfony Messenger Component
+* OpenAPI: add support for OpenAPI v3 in addition to OpenAPI v2
+* OpenAPI: support generating a documentation using [ReDoc](https://github.com/Rebilly/ReDoc)
+* OpenAPI: basic hypermedia hints using OpenAPI v3 links
+* OpenAPI: expose the pagination controls
+* Allow to use custom classes for output and output (DTO) with the `input_class` and `output_class` attributes
+* Allow to disable the input or the output by setting `input_class` and `output_class` to false
+* Guess and automatically set the appropriate Schema.org IRIs for common validation constraints
+* Allow to set custom cache HTTP headers using the `cache_headers` attribute
+* Allow to set the HTTP status code to send to the client through the `status` attribute
+* Add support for the `Sunset` HTTP header using the `sunset` attribute
+* Set the `Content-Location` and `Location` headers when appropriate for better RFC7231 conformance
+* Display the matching data provider and data persiter in the debug panel
+* GraphQL: improve performance by lazy loading types
+* Add the `api_persist` request attribute to enable or disable the `WriteListener`
+* Allow to set a default context in all normalizers
+* Permit to use a string instead of an array when there is only one serialization group
+* Add support for setting relations using the constructor of the resource classes
+* Automatically set a [409 Conflict](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/409) HTTP status code when an `OptimisticLockException` is thrown
+* Resolve Dependency Injection Container parameters in the XML and YAML files for the resource class configuration
+* `RequestAttributesExtractor` is not internal anymore and can be used in userland code
+* Always use the user-defined metadata when set
+* OpenAPI: add a description explaining how to use the property filter
+* GraphQL: the look'n'feel of GraphiQL now match the API Platform one
+* PHPStan level 6 compliance
+* Add a `show_webby` configuration option to hide the spider in API docs
+* Add an easter egg (find it!)
+
 ## 2.3.5
 
 * GraphQL: compatibility with `webonyx/graphql-php` 0.13

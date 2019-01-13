@@ -1,0 +1,3 @@
+api:
+    resource: '.'
+    type: 'api_platform'
