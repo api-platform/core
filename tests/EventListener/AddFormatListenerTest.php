@@ -17,6 +17,7 @@ use ApiPlatform\Core\Api\FormatsProviderInterface;
 use ApiPlatform\Core\EventListener\AddFormatListener;
 use Negotiation\Negotiator;
 use PHPUnit\Framework\TestCase;
+use Prophecy\Argument;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\Exception\NotAcceptableHttpException;
@@ -32,29 +33,28 @@ class AddFormatListenerTest extends TestCase
         $request = new Request();
 
         $eventProphecy = $this->prophesize(GetResponseEvent::class);
-        $eventProphecy->getRequest()->willReturn($request)->shouldBeCalled();
+        $eventProphecy->getRequest()->willReturn($request);
         $event = $eventProphecy->reveal();
 
         $formatsProviderProphecy = $this->prophesize(FormatsProviderInterface::class);
-        $formatsProviderProphecy->getFormatsFromAttributes()->shouldNotBeCalled();
 
         $listener = new AddFormatListener(new Negotiator(), $formatsProviderProphecy->reveal());
         $listener->onKernelRequest($event);
 
-        $this->assertNull($request->getFormat('application/vnd.notexist'));
+        $this->assertNull($request->getRequestFormat(null));
     }
 
     public function testSupportedRequestFormat()
     {
-        $request = new Request([], [], ['_api_resource_class' => 'Foo']);
+        $request = new Request([], [], ['_api_resource_class' => 'Foo', '_api_collection_operation_name' => 'get']);
         $request->setRequestFormat('xml');
 
         $eventProphecy = $this->prophesize(GetResponseEvent::class);
-        $eventProphecy->getRequest()->willReturn($request)->shouldBeCalled();
+        $eventProphecy->getRequest()->willReturn($request);
         $event = $eventProphecy->reveal();
 
         $formatsProviderProphecy = $this->prophesize(FormatsProviderInterface::class);
-        $formatsProviderProphecy->getFormatsFromAttributes([])->willReturn(['xml' => ['text/xml']])->shouldBeCalled();
+        $formatsProviderProphecy->getFormatsFromAttributes(Argument::any())->willReturn(['xml' => ['text/xml']]);
 
         $listener = new AddFormatListener(new Negotiator(), $formatsProviderProphecy->reveal());
         $listener->onKernelRequest($event);
@@ -69,11 +69,11 @@ class AddFormatListenerTest extends TestCase
         $request->setRequestFormat('xml');
 
         $eventProphecy = $this->prophesize(GetResponseEvent::class);
-        $eventProphecy->getRequest()->willReturn($request)->shouldBeCalled();
+        $eventProphecy->getRequest()->willReturn($request);
         $event = $eventProphecy->reveal();
 
         $formatsProviderProphecy = $this->prophesize(FormatsProviderInterface::class);
-        $formatsProviderProphecy->getFormatsFromAttributes([])->willReturn(['xml' => ['text/xml']])->shouldBeCalled();
+        $formatsProviderProphecy->getFormatsFromAttributes(Argument::any())->willReturn(['xml' => ['text/xml']]);
 
         $listener = new AddFormatListener(new Negotiator(), $formatsProviderProphecy->reveal());
         $listener->onKernelRequest($event);
@@ -87,14 +87,15 @@ class AddFormatListenerTest extends TestCase
         $this->expectException(NotAcceptableHttpException::class);
         $this->expectExceptionMessage('Requested format "text/xml" is not supported. Supported MIME types are "application/json".');
 
-        $request = new Request([], [], ['_api_resource_class' => 'Foo']);
+        $request = new Request([], [], ['_api_resource_class' => 'Foo', '_api_collection_operation_name' => 'get']);
         $request->setRequestFormat('xml');
 
         $eventProphecy = $this->prophesize(GetResponseEvent::class);
-        $eventProphecy->getRequest()->willReturn($request)->shouldBeCalled();
+        $eventProphecy->getRequest()->willReturn($request);
         $event = $eventProphecy->reveal();
+
         $formatsProviderProphecy = $this->prophesize(FormatsProviderInterface::class);
-        $formatsProviderProphecy->getFormatsFromAttributes([])->willReturn(['json' => ['application/json']])->shouldBeCalled();
+        $formatsProviderProphecy->getFormatsFromAttributes(Argument::any())->willReturn(['json' => ['application/json']]);
 
         $listener = new AddFormatListener(new Negotiator(), $formatsProviderProphecy->reveal());
         $listener->onKernelRequest($event);
@@ -104,15 +105,15 @@ class AddFormatListenerTest extends TestCase
 
     public function testSupportedAcceptHeader()
     {
-        $request = new Request([], [], ['_api_resource_class' => 'Foo']);
+        $request = new Request([], [], ['_api_resource_class' => 'Foo', '_api_collection_operation_name' => 'get']);
         $request->headers->set('Accept', 'text/html, application/xhtml+xml, application/xml, application/json;q=0.9, */*;q=0.8');
 
         $eventProphecy = $this->prophesize(GetResponseEvent::class);
-        $eventProphecy->getRequest()->willReturn($request)->shouldBeCalled();
+        $eventProphecy->getRequest()->willReturn($request);
         $event = $eventProphecy->reveal();
 
         $formatsProviderProphecy = $this->prophesize(FormatsProviderInterface::class);
-        $formatsProviderProphecy->getFormatsFromAttributes([])->willReturn(['binary' => ['application/octet-stream'], 'json' => ['application/json']])->shouldBeCalled();
+        $formatsProviderProphecy->getFormatsFromAttributes(Argument::any())->willReturn(['binary' => ['application/octet-stream'], 'json' => ['application/json']]);
 
         $listener = new AddFormatListener(new Negotiator(), $formatsProviderProphecy->reveal());
         $listener->onKernelRequest($event);
@@ -120,17 +121,35 @@ class AddFormatListenerTest extends TestCase
         $this->assertSame('json', $request->getRequestFormat());
     }
 
-    public function testAcceptAllHeader()
+    public function testSupportedAcceptHeaderSymfonyBuiltInFormat()
     {
-        $request = new Request([], [], ['_api_resource_class' => 'Foo']);
-        $request->headers->set('Accept', 'text/html, application/xhtml+xml, application/xml;q=0.9, */*;q=0.8');
+        $request = new Request([], [], ['_api_resource_class' => 'Foo', '_api_collection_operation_name' => 'get']);
+        $request->headers->set('Accept', 'application/json');
 
         $eventProphecy = $this->prophesize(GetResponseEvent::class);
-        $eventProphecy->getRequest()->willReturn($request)->shouldBeCalled();
+        $eventProphecy->getRequest()->willReturn($request);
         $event = $eventProphecy->reveal();
 
         $formatsProviderProphecy = $this->prophesize(FormatsProviderInterface::class);
-        $formatsProviderProphecy->getFormatsFromAttributes([])->willReturn(['binary' => ['application/octet-stream'], 'json' => ['application/json']])->shouldBeCalled();
+        $formatsProviderProphecy->getFormatsFromAttributes(Argument::any())->willReturn(['jsonld' => ['application/ld+json', 'application/json']]);
+
+        $listener = new AddFormatListener(new Negotiator(), $formatsProviderProphecy->reveal());
+        $listener->onKernelRequest($event);
+
+        $this->assertSame('jsonld', $request->getRequestFormat());
+    }
+
+    public function testAcceptAllHeader()
+    {
+        $request = new Request([], [], ['_api_resource_class' => 'Foo', '_api_collection_operation_name' => 'get']);
+        $request->headers->set('Accept', 'text/html, application/xhtml+xml, application/xml;q=0.9, */*;q=0.8');
+
+        $eventProphecy = $this->prophesize(GetResponseEvent::class);
+        $eventProphecy->getRequest()->willReturn($request);
+        $event = $eventProphecy->reveal();
+
+        $formatsProviderProphecy = $this->prophesize(FormatsProviderInterface::class);
+        $formatsProviderProphecy->getFormatsFromAttributes(Argument::any())->willReturn(['binary' => ['application/octet-stream'], 'json' => ['application/json']]);
 
         $listener = new AddFormatListener(new Negotiator(), $formatsProviderProphecy->reveal());
         $listener->onKernelRequest($event);
@@ -144,15 +163,34 @@ class AddFormatListenerTest extends TestCase
         $this->expectException(NotAcceptableHttpException::class);
         $this->expectExceptionMessage('Requested format "text/html, application/xhtml+xml, application/xml;q=0.9" is not supported. Supported MIME types are "application/octet-stream", "application/json".');
 
-        $request = new Request([], [], ['_api_resource_class' => 'Foo']);
+        $request = new Request([], [], ['_api_resource_class' => 'Foo', '_api_collection_operation_name' => 'get']);
         $request->headers->set('Accept', 'text/html, application/xhtml+xml, application/xml;q=0.9');
 
         $eventProphecy = $this->prophesize(GetResponseEvent::class);
-        $eventProphecy->getRequest()->willReturn($request)->shouldBeCalled();
+        $eventProphecy->getRequest()->willReturn($request);
         $event = $eventProphecy->reveal();
 
         $formatsProviderProphecy = $this->prophesize(FormatsProviderInterface::class);
-        $formatsProviderProphecy->getFormatsFromAttributes([])->willReturn(['binary' => ['application/octet-stream'], 'json' => ['application/json']])->shouldBeCalled();
+        $formatsProviderProphecy->getFormatsFromAttributes(Argument::any())->willReturn(['binary' => ['application/octet-stream'], 'json' => ['application/json']]);
+
+        $listener = new AddFormatListener(new Negotiator(), $formatsProviderProphecy->reveal());
+        $listener->onKernelRequest($event);
+    }
+
+    public function testUnsupportedAcceptHeaderSymfonyBuiltInFormat()
+    {
+        $this->expectException(NotAcceptableHttpException::class);
+        $this->expectExceptionMessage('Requested format "text/xml" is not supported. Supported MIME types are "application/json".');
+
+        $request = new Request([], [], ['_api_resource_class' => 'Foo', '_api_collection_operation_name' => 'get']);
+        $request->headers->set('Accept', 'text/xml');
+
+        $eventProphecy = $this->prophesize(GetResponseEvent::class);
+        $eventProphecy->getRequest()->willReturn($request);
+        $event = $eventProphecy->reveal();
+
+        $formatsProviderProphecy = $this->prophesize(FormatsProviderInterface::class);
+        $formatsProviderProphecy->getFormatsFromAttributes(Argument::any())->willReturn(['json' => ['application/json']]);
 
         $listener = new AddFormatListener(new Negotiator(), $formatsProviderProphecy->reveal());
         $listener->onKernelRequest($event);
@@ -163,15 +201,15 @@ class AddFormatListenerTest extends TestCase
         $this->expectException(NotAcceptableHttpException::class);
         $this->expectExceptionMessage('Requested format "invalid" is not supported. Supported MIME types are "application/json".');
 
-        $request = new Request([], [], ['_api_resource_class' => 'Foo']);
+        $request = new Request([], [], ['_api_resource_class' => 'Foo', '_api_collection_operation_name' => 'get']);
         $request->headers->set('Accept', 'invalid');
 
         $eventProphecy = $this->prophesize(GetResponseEvent::class);
-        $eventProphecy->getRequest()->willReturn($request)->shouldBeCalled();
+        $eventProphecy->getRequest()->willReturn($request);
         $event = $eventProphecy->reveal();
 
         $formatsProviderProphecy = $this->prophesize(FormatsProviderInterface::class);
-        $formatsProviderProphecy->getFormatsFromAttributes([])->willReturn(['json' => ['application/json']])->shouldBeCalled();
+        $formatsProviderProphecy->getFormatsFromAttributes(Argument::any())->willReturn(['json' => ['application/json']]);
 
         $listener = new AddFormatListener(new Negotiator(), $formatsProviderProphecy->reveal());
         $listener->onKernelRequest($event);
@@ -179,16 +217,16 @@ class AddFormatListenerTest extends TestCase
 
     public function testAcceptHeaderTakePrecedenceOverRequestFormat()
     {
-        $request = new Request([], [], ['_api_resource_class' => 'Foo']);
+        $request = new Request([], [], ['_api_resource_class' => 'Foo', '_api_collection_operation_name' => 'get']);
         $request->headers->set('Accept', 'application/json');
         $request->setRequestFormat('xml');
 
         $eventProphecy = $this->prophesize(GetResponseEvent::class);
-        $eventProphecy->getRequest()->willReturn($request)->shouldBeCalled();
+        $eventProphecy->getRequest()->willReturn($request);
         $event = $eventProphecy->reveal();
 
         $formatsProviderProphecy = $this->prophesize(FormatsProviderInterface::class);
-        $formatsProviderProphecy->getFormatsFromAttributes([])->willReturn(['xml' => ['application/xml'], 'json' => ['application/json']])->shouldBeCalled();
+        $formatsProviderProphecy->getFormatsFromAttributes(Argument::any())->willReturn(['xml' => ['application/xml'], 'json' => ['application/json']]);
 
         $listener = new AddFormatListener(new Negotiator(), $formatsProviderProphecy->reveal());
         $listener->onKernelRequest($event);
@@ -201,14 +239,14 @@ class AddFormatListenerTest extends TestCase
         $this->expectException(NotFoundHttpException::class);
         $this->expectExceptionMessage('Format "invalid" is not supported');
 
-        $request = new Request([], [], ['_api_resource_class' => 'Foo', '_format' => 'invalid']);
+        $request = new Request([], [], ['_api_resource_class' => 'Foo', '_api_collection_operation_name' => 'get', '_format' => 'invalid']);
 
         $eventProphecy = $this->prophesize(GetResponseEvent::class);
-        $eventProphecy->getRequest()->willReturn($request)->shouldBeCalled();
+        $eventProphecy->getRequest()->willReturn($request);
         $event = $eventProphecy->reveal();
 
         $formatsProviderProphecy = $this->prophesize(FormatsProviderInterface::class);
-        $formatsProviderProphecy->getFormatsFromAttributes([])->willReturn(['json' => ['application/json']])->shouldBeCalled();
+        $formatsProviderProphecy->getFormatsFromAttributes(Argument::any())->willReturn(['json' => ['application/json']]);
 
         $listener = new AddFormatListener(new Negotiator(), $formatsProviderProphecy->reveal());
         $listener->onKernelRequest($event);

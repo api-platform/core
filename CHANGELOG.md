@@ -32,6 +32,11 @@
 * Add a `show_webby` configuration option to hide the spider in API docs
 * Add an easter egg (find it!)
 
+## 2.3.6
+
+* Fix normalization of raw collections (not API resources)
+* Fix content negotiation format matching
+
 ## 2.3.5
 
 * GraphQL: compatibility with `webonyx/graphql-php` 0.13
