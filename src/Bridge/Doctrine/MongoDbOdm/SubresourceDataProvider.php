@@ -68,7 +68,7 @@ final class SubresourceDataProvider implements SubresourceDataProviderInterface
     {
         $manager = $this->managerRegistry->getManagerForClass($resourceClass);
         if (!$manager instanceof DocumentManager) {
-            throw new ResourceClassNotSupportedException(sprintf('The manager for "%s" must be an instance of "%s" class.', $resourceClass, DocumentManager::class));
+            throw new ResourceClassNotSupportedException(sprintf('The manager for "%s" must be an instance of "%s".', $resourceClass, DocumentManager::class));
         }
 
         $repository = $manager->getRepository($resourceClass);
@@ -119,7 +119,7 @@ final class SubresourceDataProvider implements SubresourceDataProviderInterface
 
         $manager = $this->managerRegistry->getManagerForClass($identifierResourceClass);
         if (!$manager instanceof DocumentManager) {
-            throw new RuntimeException(sprintf('The manager for "%s" must be an instance of "%s" class.', $identifierResourceClass, DocumentManager::class));
+            throw new RuntimeException(sprintf('The manager for "%s" must be an instance of "%s".', $identifierResourceClass, DocumentManager::class));
         }
 
         $classMetadata = $manager->getClassMetadata($identifierResourceClass);

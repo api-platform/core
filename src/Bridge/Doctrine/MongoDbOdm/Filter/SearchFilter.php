@@ -111,6 +111,7 @@ final class SearchFilter extends AbstractFilter implements SearchFilterInterface
             foreach ($values as $inValue) {
                 $inValues[] = $this->addEqualityMatchStrategy($strategy, $field, $inValue, $caseSensitive, $metadata);
             }
+
             $aggregationBuilder
                 ->match()
                 ->field($matchField)
@@ -132,17 +133,10 @@ final class SearchFilter extends AbstractFilter implements SearchFilterInterface
             return;
         }
 
-        if (1 === \count($values)) {
-            $aggregationBuilder
-                ->match()
-                ->field("$matchField.\$id")
-                ->equals($values[0]);
-        } else {
-            $aggregationBuilder
-                ->match()
-                ->field("$matchField.\$id")
-                ->in($values);
-        }
+        $aggregationBuilder
+            ->match()
+            ->field("$matchField.\$id")
+            ->in($values);
     }
 
     /**

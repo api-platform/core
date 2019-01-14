@@ -31,8 +31,6 @@ use Doctrine\ODM\MongoDB\Iterator\Iterator;
 use Doctrine\ODM\MongoDB\Repository\DocumentRepository;
 use Doctrine\ODM\MongoDB\UnitOfWork;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * @author Alan Poulain <contact@alanpoulain.eu>
@@ -57,20 +55,19 @@ class PaginationExtensionTest extends TestCase
         $resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadata(null, null, null, [], [], $attributes));
         $resourceMetadataFactory = $resourceMetadataFactoryProphecy->reveal();
 
-        $requestStack = new RequestStack();
-        $requestStack->push(new Request(['pagination' => true, 'itemsPerPage' => 20, '_page' => 2]));
-
-        $pagination = new Pagination($requestStack, $resourceMetadataFactory, [
+        $pagination = new Pagination($resourceMetadataFactory, [
             'page_parameter_name' => '_page',
         ]);
 
         $aggregationBuilder = $this->mockAggregationBuilder(40, 40);
 
+        $context = ['filters' => ['pagination' => true, 'itemsPerPage' => 20, '_page' => 2]];
+
         $extension = new PaginationExtension(
             $this->managerRegistryProphecy->reveal(),
             $pagination
         );
-        $extension->applyToCollection($aggregationBuilder, 'Foo', 'op');
+        $extension->applyToCollection($aggregationBuilder, 'Foo', 'op', $context);
     }
 
     public function testApplyToCollectionWithItemPerPageZero()
@@ -84,21 +81,20 @@ class PaginationExtensionTest extends TestCase
         $resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadata(null, null, null, [], [], $attributes));
         $resourceMetadataFactory = $resourceMetadataFactoryProphecy->reveal();
 
-        $requestStack = new RequestStack();
-        $requestStack->push(new Request(['pagination' => true, 'itemsPerPage' => 0, '_page' => 1]));
-
-        $pagination = new Pagination($requestStack, $resourceMetadataFactory, [
+        $pagination = new Pagination($resourceMetadataFactory, [
             'items_per_page' => 0,
             'page_parameter_name' => '_page',
         ]);
 
         $aggregationBuilder = $this->mockAggregationBuilder(0, 0);
 
+        $context = ['filters' => ['pagination' => true, 'itemsPerPage' => 0, '_page' => 1]];
+
         $extension = new PaginationExtension(
             $this->managerRegistryProphecy->reveal(),
             $pagination
         );
-        $extension->applyToCollection($aggregationBuilder, 'Foo', 'op');
+        $extension->applyToCollection($aggregationBuilder, 'Foo', 'op', $context);
     }
 
     public function testApplyToCollectionWithItemPerPageZeroAndPage2()
@@ -115,10 +111,7 @@ class PaginationExtensionTest extends TestCase
         $resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadata(null, null, null, [], [], $attributes));
         $resourceMetadataFactory = $resourceMetadataFactoryProphecy->reveal();
 
-        $requestStack = new RequestStack();
-        $requestStack->push(new Request(['pagination' => true, 'itemsPerPage' => 0, '_page' => 2]));
-
-        $pagination = new Pagination($requestStack, $resourceMetadataFactory, [
+        $pagination = new Pagination($resourceMetadataFactory, [
             'items_per_page' => 0,
             'page_parameter_name' => '_page',
         ]);
@@ -127,11 +120,13 @@ class PaginationExtensionTest extends TestCase
         $aggregationBuilderProphecy->facet()->shouldNotBeCalled();
         $aggregationBuilder = $aggregationBuilderProphecy->reveal();
 
+        $context = ['filters' => ['pagination' => true, 'itemsPerPage' => 0, '_page' => 2]];
+
         $extension = new PaginationExtension(
             $this->prophesize(ManagerRegistry::class)->reveal(),
             $pagination
         );
-        $extension->applyToCollection($aggregationBuilder, 'Foo', 'op');
+        $extension->applyToCollection($aggregationBuilder, 'Foo', 'op', $context);
     }
 
     public function testApplyToCollectionWithItemPerPageLessThan0()
@@ -148,10 +143,7 @@ class PaginationExtensionTest extends TestCase
         $resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadata(null, null, null, [], [], $attributes));
         $resourceMetadataFactory = $resourceMetadataFactoryProphecy->reveal();
 
-        $requestStack = new RequestStack();
-        $requestStack->push(new Request(['pagination' => true, 'itemsPerPage' => -20, '_page' => 2]));
-
-        $pagination = new Pagination($requestStack, $resourceMetadataFactory, [
+        $pagination = new Pagination($resourceMetadataFactory, [
             'items_per_page' => -20,
             'page_parameter_name' => '_page',
         ]);
@@ -160,11 +152,13 @@ class PaginationExtensionTest extends TestCase
         $aggregationBuilderProphecy->facet()->shouldNotBeCalled();
         $aggregationBuilder = $aggregationBuilderProphecy->reveal();
 
+        $context = ['filters' => ['pagination' => true, 'itemsPerPage' => -20, '_page' => 2]];
+
         $extension = new PaginationExtension(
             $this->managerRegistryProphecy->reveal(),
             $pagination
         );
-        $extension->applyToCollection($aggregationBuilder, 'Foo', 'op');
+        $extension->applyToCollection($aggregationBuilder, 'Foo', 'op', $context);
     }
 
     public function testApplyToCollectionWithItemPerPageTooHigh()
@@ -178,21 +172,20 @@ class PaginationExtensionTest extends TestCase
         $resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadata(null, null, null, [], [], $attributes));
         $resourceMetadataFactory = $resourceMetadataFactoryProphecy->reveal();
 
-        $requestStack = new RequestStack();
-        $requestStack->push(new Request(['pagination' => true, 'itemsPerPage' => 301, '_page' => 2]));
-
-        $pagination = new Pagination($requestStack, $resourceMetadataFactory, [
+        $pagination = new Pagination($resourceMetadataFactory, [
             'page_parameter_name' => '_page',
             'maximum_items_per_page' => 300,
         ]);
 
         $aggregationBuilder = $this->mockAggregationBuilder(300, 300);
 
+        $context = ['filters' => ['pagination' => true, 'itemsPerPage' => 301, '_page' => 2]];
+
         $extension = new PaginationExtension(
             $this->managerRegistryProphecy->reveal(),
             $pagination
         );
-        $extension->applyToCollection($aggregationBuilder, 'Foo', 'op');
+        $extension->applyToCollection($aggregationBuilder, 'Foo', 'op', $context);
     }
 
     public function testApplyToCollectionWithGraphql()
@@ -206,59 +199,36 @@ class PaginationExtensionTest extends TestCase
         $resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadata(null, null, null, [], [], $attributes));
         $resourceMetadataFactory = $resourceMetadataFactoryProphecy->reveal();
 
-        $requestStack = new RequestStack();
-        $requestStack->push(new Request(['pagination' => true], [], [
-            '_graphql' => true,
-            '_graphql_collections_args' => ['Foo' => ['first' => 5, 'after' => 'OQ==']], // base64_encode('9')
-        ]));
-
-        $pagination = new Pagination($requestStack, $resourceMetadataFactory);
+        $pagination = new Pagination($resourceMetadataFactory);
 
         $aggregationBuilder = $this->mockAggregationBuilder(10, 5);
 
-        $extension = new PaginationExtension(
-            $this->managerRegistryProphecy->reveal(),
-            $pagination
-        );
-        $extension->applyToCollection($aggregationBuilder, 'Foo', 'op');
-    }
-
-    public function testApplyToCollectionNoRequest()
-    {
-        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $resourceMetadataFactory = $resourceMetadataFactoryProphecy->reveal();
-
-        $pagination = new Pagination(new RequestStack(), $resourceMetadataFactory);
-
-        $aggregationBuilderProphecy = $this->prophesize(Builder::class);
-        $aggregationBuilderProphecy->facet()->shouldNotBeCalled();
-        $aggregationBuilder = $aggregationBuilderProphecy->reveal();
+        $context = ['filters' => ['pagination' => true, 'first' => 5, 'after' => 'OQ=='], 'graphql' => true];
 
         $extension = new PaginationExtension(
             $this->managerRegistryProphecy->reveal(),
             $pagination
         );
-        $extension->applyToCollection($aggregationBuilder, 'Foo', 'op');
+        $extension->applyToCollection($aggregationBuilder, 'Foo', 'op', $context);
     }
 
-    public function testApplyToCollectionEmptyRequest()
+    public function testApplyToCollectionNoFilters()
     {
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadata(null, null, null, [], []));
         $resourceMetadataFactory = $resourceMetadataFactoryProphecy->reveal();
 
-        $requestStack = new RequestStack();
-        $requestStack->push(new Request());
-
-        $pagination = new Pagination($requestStack, $resourceMetadataFactory);
+        $pagination = new Pagination($resourceMetadataFactory);
 
         $aggregationBuilder = $this->mockAggregationBuilder(0, 30);
+
+        $context = [];
 
         $extension = new PaginationExtension(
             $this->managerRegistryProphecy->reveal(),
             $pagination
         );
-        $extension->applyToCollection($aggregationBuilder, 'Foo', 'op');
+        $extension->applyToCollection($aggregationBuilder, 'Foo', 'op', $context);
     }
 
     public function testApplyToCollectionPaginationDisabled()
@@ -267,10 +237,7 @@ class PaginationExtensionTest extends TestCase
         $resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadata(null, null, null, [], []));
         $resourceMetadataFactory = $resourceMetadataFactoryProphecy->reveal();
 
-        $requestStack = new RequestStack();
-        $requestStack->push(new Request());
-
-        $pagination = new Pagination($requestStack, $resourceMetadataFactory, [
+        $pagination = new Pagination($resourceMetadataFactory, [
             'enabled' => false,
         ]);
 
@@ -278,11 +245,13 @@ class PaginationExtensionTest extends TestCase
         $aggregationBuilderProphecy->facet()->shouldNotBeCalled();
         $aggregationBuilder = $aggregationBuilderProphecy->reveal();
 
+        $context = [];
+
         $extension = new PaginationExtension(
             $this->managerRegistryProphecy->reveal(),
             $pagination
         );
-        $extension->applyToCollection($aggregationBuilder, 'Foo', 'op');
+        $extension->applyToCollection($aggregationBuilder, 'Foo', 'op', $context);
     }
 
     public function testApplyToCollectionWithMaximumItemsPerPage()
@@ -296,10 +265,7 @@ class PaginationExtensionTest extends TestCase
         $resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadata(null, null, null, [], [], $attributes));
         $resourceMetadataFactory = $resourceMetadataFactoryProphecy->reveal();
 
-        $requestStack = new RequestStack();
-        $requestStack->push(new Request(['pagination' => true, 'itemsPerPage' => 80, 'page' => 1]));
-
-        $pagination = new Pagination($requestStack, $resourceMetadataFactory, [
+        $pagination = new Pagination($resourceMetadataFactory, [
             'client_enabled' => true,
             'client_items_per_page' => true,
             'maximum_items_per_page' => 50,
@@ -307,11 +273,13 @@ class PaginationExtensionTest extends TestCase
 
         $aggregationBuilder = $this->mockAggregationBuilder(0, 80);
 
+        $context = ['filters' => ['pagination' => true, 'itemsPerPage' => 80, 'page' => 1]];
+
         $extension = new PaginationExtension(
             $this->managerRegistryProphecy->reveal(),
             $pagination
         );
-        $extension->applyToCollection($aggregationBuilder, 'Foo', 'op');
+        $extension->applyToCollection($aggregationBuilder, 'Foo', 'op', $context);
     }
 
     public function testSupportsResult()
@@ -320,48 +288,13 @@ class PaginationExtensionTest extends TestCase
         $resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadata(null, null, null, [], []));
         $resourceMetadataFactory = $resourceMetadataFactoryProphecy->reveal();
 
-        $requestStack = new RequestStack();
-        $requestStack->push(new Request());
-
-        $pagination = new Pagination($requestStack, $resourceMetadataFactory);
+        $pagination = new Pagination($resourceMetadataFactory);
 
         $extension = new PaginationExtension(
             $this->managerRegistryProphecy->reveal(),
             $pagination
         );
-        $this->assertTrue($extension->supportsResult('Foo', 'op'));
-    }
-
-    public function testSupportsResultNoRequest()
-    {
-        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $resourceMetadataFactory = $resourceMetadataFactoryProphecy->reveal();
-
-        $pagination = new Pagination(new RequestStack(), $resourceMetadataFactory);
-
-        $extension = new PaginationExtension(
-            $this->managerRegistryProphecy->reveal(),
-            $pagination
-        );
-        $this->assertFalse($extension->supportsResult('Foo', 'op'));
-    }
-
-    public function testSupportsResultEmptyRequest()
-    {
-        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadata(null, null, null, [], []));
-        $resourceMetadataFactory = $resourceMetadataFactoryProphecy->reveal();
-
-        $requestStack = new RequestStack();
-        $requestStack->push(new Request());
-
-        $pagination = new Pagination($requestStack, $resourceMetadataFactory);
-
-        $extension = new PaginationExtension(
-            $this->managerRegistryProphecy->reveal(),
-            $pagination
-        );
-        $this->assertTrue($extension->supportsResult('Foo', 'op'));
+        $this->assertTrue($extension->supportsResult('Foo', 'op', []));
     }
 
     public function testSupportsResultClientNotAllowedToPaginate()
@@ -370,10 +303,7 @@ class PaginationExtensionTest extends TestCase
         $resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadata(null, null, null, [], []));
         $resourceMetadataFactory = $resourceMetadataFactoryProphecy->reveal();
 
-        $requestStack = new RequestStack();
-        $requestStack->push(new Request(['pagination' => true]));
-
-        $pagination = new Pagination($requestStack, $resourceMetadataFactory, [
+        $pagination = new Pagination($resourceMetadataFactory, [
             'enabled' => false,
             'client_enabled' => false,
         ]);
@@ -382,7 +312,7 @@ class PaginationExtensionTest extends TestCase
             $this->managerRegistryProphecy->reveal(),
             $pagination
         );
-        $this->assertFalse($extension->supportsResult('Foo', 'op'));
+        $this->assertFalse($extension->supportsResult('Foo', 'op', ['filters' => ['pagination' => true]]));
     }
 
     public function testSupportsResultPaginationDisabled()
@@ -391,10 +321,7 @@ class PaginationExtensionTest extends TestCase
         $resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadata(null, null, null, [], []));
         $resourceMetadataFactory = $resourceMetadataFactoryProphecy->reveal();
 
-        $requestStack = new RequestStack();
-        $requestStack->push(new Request());
-
-        $pagination = new Pagination($requestStack, $resourceMetadataFactory, [
+        $pagination = new Pagination($resourceMetadataFactory, [
             'enabled' => false,
         ]);
 
@@ -402,7 +329,7 @@ class PaginationExtensionTest extends TestCase
             $this->managerRegistryProphecy->reveal(),
             $pagination
         );
-        $this->assertFalse($extension->supportsResult('Foo', 'op'));
+        $this->assertFalse($extension->supportsResult('Foo', 'op', ['filters' => ['enabled' => false]]));
     }
 
     public function testGetResult()
@@ -418,10 +345,7 @@ class PaginationExtensionTest extends TestCase
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataFactory = $resourceMetadataFactoryProphecy->reveal();
 
-        $requestStack = new RequestStack();
-        $requestStack->push(new Request());
-
-        $pagination = new Pagination($requestStack, $resourceMetadataFactory);
+        $pagination = new Pagination($resourceMetadataFactory);
 
         $unitOfWorkProphecy = $this->prophesize(UnitOfWork::class);
 
@@ -462,7 +386,7 @@ class PaginationExtensionTest extends TestCase
             $pagination
         );
 
-        return $paginationExtension->getResult($aggregationBuilderProphecy->reveal(), 'Foo');
+        return $paginationExtension->getResult($aggregationBuilderProphecy->reveal(), 'Foo', null, []);
     }
 
     private function mockAggregationBuilder($expectedOffset, $expectedLimit)

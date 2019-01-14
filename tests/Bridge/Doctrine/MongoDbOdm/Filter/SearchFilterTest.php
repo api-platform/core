@@ -346,7 +346,11 @@ class SearchFilterTest extends DoctrineMongoDbOdmFilterTestCase
                         ],
                         [
                             '$match' => [
-                                'relatedDummy.$id' => 'foo',
+                                'relatedDummy.$id' => [
+                                    '$in' => [
+                                        'foo',
+                                    ],
+                                ],
                             ],
                         ],
                     ],
@@ -468,7 +472,11 @@ class SearchFilterTest extends DoctrineMongoDbOdmFilterTestCase
                     [
                         [
                             '$match' => [
-                                'relatedDummy.$id' => 'exact',
+                                'relatedDummy.$id' => [
+                                    '$in' => [
+                                        'exact',
+                                    ],
+                                ],
                             ],
                         ],
                     ],
@@ -513,7 +521,11 @@ class SearchFilterTest extends DoctrineMongoDbOdmFilterTestCase
                         ],
                         [
                             '$match' => [
-                                'relatedDummies.$id' => '1',
+                                'relatedDummies.$id' => [
+                                    '$in' => [
+                                        '1',
+                                    ],
+                                ],
                             ],
                         ],
                     ],

@@ -48,15 +48,15 @@ final class PaginationExtension implements AggregationResultCollectionExtensionI
      */
     public function applyToCollection(Builder $aggregationBuilder, string $resourceClass, string $operationName = null, array &$context = [])
     {
-        if (!$this->pagination->isEnabled($resourceClass, $operationName)) {
+        if (!$this->pagination->isEnabled($resourceClass, $operationName, $context)) {
             return;
         }
 
-        [, $offset, $limit] = $this->pagination->getPagination($resourceClass, $operationName);
+        [, $offset, $limit] = $this->pagination->getPagination($resourceClass, $operationName, $context);
 
         $manager = $this->managerRegistry->getManagerForClass($resourceClass);
         if (!$manager instanceof DocumentManager) {
-            throw new RuntimeException(sprintf('The manager for "%s" must be an instance of "%s" class.', $resourceClass, DocumentManager::class));
+            throw new RuntimeException(sprintf('The manager for "%s" must be an instance of "%s".', $resourceClass, DocumentManager::class));
         }
 
         $repository = $manager->getRepository($resourceClass);
@@ -82,7 +82,7 @@ final class PaginationExtension implements AggregationResultCollectionExtensionI
      */
     public function supportsResult(string $resourceClass, string $operationName = null, array $context = []): bool
     {
-        return $this->pagination->isEnabled($resourceClass, $operationName);
+        return $this->pagination->isEnabled($resourceClass, $operationName, $context);
     }
 
     /**
@@ -94,7 +94,7 @@ final class PaginationExtension implements AggregationResultCollectionExtensionI
     {
         $manager = $this->managerRegistry->getManagerForClass($resourceClass);
         if (!$manager instanceof DocumentManager) {
-            throw new RuntimeException(sprintf('The manager for "%s" must be an instance of "%s" class.', $resourceClass, DocumentManager::class));
+            throw new RuntimeException(sprintf('The manager for "%s" must be an instance of "%s".', $resourceClass, DocumentManager::class));
         }
 
         return new Paginator($aggregationBuilder->execute(), $manager->getUnitOfWork(), $resourceClass, $aggregationBuilder->getPipeline());
