@@ -31,7 +31,6 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Foo;
 use Elasticsearch\Client;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
-use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
 class CollectionDataProviderTest extends TestCase
@@ -45,7 +44,7 @@ class CollectionDataProviderTest extends TestCase
                 $this->prophesize(DocumentMetadataFactoryInterface::class)->reveal(),
                 $this->prophesize(IdentifierExtractorInterface::class)->reveal(),
                 $this->prophesize(DenormalizerInterface::class)->reveal(),
-                new Pagination(new RequestStack(), $this->prophesize(ResourceMetadataFactoryInterface::class)->reveal())
+                new Pagination($this->prophesize(ResourceMetadataFactoryInterface::class)->reveal())
             )
         );
     }
@@ -66,7 +65,7 @@ class CollectionDataProviderTest extends TestCase
             $documentMetadataFactoryProphecy->reveal(),
             $identifierExtractorProphecy->reveal(),
             $this->prophesize(DenormalizerInterface::class)->reveal(),
-            new Pagination(new RequestStack(), $this->prophesize(ResourceMetadataFactoryInterface::class)->reveal())
+            new Pagination($this->prophesize(ResourceMetadataFactoryInterface::class)->reveal())
         );
 
         self::assertTrue($collectionDataProvider->supports(Foo::class));
@@ -150,7 +149,7 @@ class CollectionDataProviderTest extends TestCase
             $documentMetadataFactoryProphecy->reveal(),
             $this->prophesize(IdentifierExtractorInterface::class)->reveal(),
             $denormalizer = $this->prophesize(DenormalizerInterface::class)->reveal(),
-            new Pagination(new RequestStack(), $resourceMetadataFactoryProphecy->reveal(), ['items_per_page' => 2]),
+            new Pagination($resourceMetadataFactoryProphecy->reveal(), ['items_per_page' => 2]),
             [$fullBodySearchCollectionExtensionProphecy->reveal()]
         );
 

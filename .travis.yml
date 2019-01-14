@@ -13,10 +13,6 @@ jobs:
         - composer remove --dev ext-mongodb doctrine/mongodb-odm doctrine/mongodb-odm-bundle
         - sed -i '26,32d' tests/Fixtures/app/config/config_common.yml
     - php: '7.2'
-    - php: '7.2'
-      services:
-        - elasticsearch
-      env: APP_ENV=elasticsearch
     - php: '7.3'
     - php: '7.3'
       env: deps=low
@@ -38,6 +34,10 @@ jobs:
       services:
         - mongodb
       env: APP_ENV=mongodb
+    - php: '7.3'
+      services:
+        - elasticsearch
+      env: APP_ENV=elasticsearch
   allow_failures:
     - env: SYMFONY_DEPRECATIONS_HELPER=0
   fast_finish: true
