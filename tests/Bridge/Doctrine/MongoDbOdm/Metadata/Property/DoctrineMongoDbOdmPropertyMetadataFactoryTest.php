@@ -18,9 +18,8 @@ use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\Dummy;
 use Doctrine\Common\Persistence\ManagerRegistry;
-use Doctrine\Common\Persistence\Mapping\ClassMetadata;
-use Doctrine\Common\Persistence\ObjectManager;
-use Doctrine\ORM\Mapping\ClassMetadataInfo;
+use Doctrine\ODM\MongoDB\DocumentManager;
+use Doctrine\ODM\MongoDB\Mapping\ClassMetadata;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -50,9 +49,9 @@ class DoctrineMongoDbOdmPropertyMetadataFactoryTest extends TestCase
         $propertyMetadataFactory = $this->prophesize(PropertyMetadataFactoryInterface::class);
         $propertyMetadataFactory->create(Dummy::class, 'id', [])->shouldBeCalled()->willReturn($propertyMetadata);
 
-        $classMetadata = $this->prophesize(ClassMetadataInfo::class);
+        $classMetadata = $this->prophesize(ClassMetadata::class);
 
-        $objectManager = $this->prophesize(ObjectManager::class);
+        $objectManager = $this->prophesize(DocumentManager::class);
         $objectManager->getClassMetadata(Dummy::class)->shouldNotBeCalled()->willReturn($classMetadata->reveal());
 
         $managerRegistry = $this->prophesize(ManagerRegistry::class);
@@ -71,10 +70,10 @@ class DoctrineMongoDbOdmPropertyMetadataFactoryTest extends TestCase
         $propertyMetadataFactory = $this->prophesize(PropertyMetadataFactoryInterface::class);
         $propertyMetadataFactory->create(Dummy::class, 'id', [])->shouldBeCalled()->willReturn($propertyMetadata);
 
-        $classMetadata = $this->prophesize(ClassMetadataInfo::class);
+        $classMetadata = $this->prophesize(ClassMetadata::class);
         $classMetadata->getIdentifier()->shouldBeCalled()->willReturn(['id']);
 
-        $objectManager = $this->prophesize(ObjectManager::class);
+        $objectManager = $this->prophesize(DocumentManager::class);
         $objectManager->getClassMetadata(Dummy::class)->shouldBeCalled()->willReturn($classMetadata->reveal());
 
         $managerRegistry = $this->prophesize(ManagerRegistry::class);
@@ -98,7 +97,7 @@ class DoctrineMongoDbOdmPropertyMetadataFactoryTest extends TestCase
         $classMetadata = $this->prophesize(ClassMetadata::class);
         $classMetadata->getIdentifier()->shouldBeCalled()->willReturn(['id']);
 
-        $objectManager = $this->prophesize(ObjectManager::class);
+        $objectManager = $this->prophesize(DocumentManager::class);
         $objectManager->getClassMetadata(Dummy::class)->shouldBeCalled()->willReturn($classMetadata->reveal());
 
         $managerRegistry = $this->prophesize(ManagerRegistry::class);

@@ -75,10 +75,6 @@ final class ExistsFilter extends AbstractFilter implements ExistsFilterInterface
 
         $field = $propertyParts['field'];
 
-        if ($metadata instanceof ClassMetadata && $metadata->hasField($field)) {
-            return $metadata->isNullable($field);
-        }
-
-        return false;
+        return $metadata instanceof ClassMetadata && $metadata->hasField($field) ? $metadata->isNullable($field) : false;
     }
 }

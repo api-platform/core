@@ -15,8 +15,11 @@ namespace ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Extension;
 
 use ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Paginator;
 use ApiPlatform\Core\DataProvider\Pagination;
+use ApiPlatform\Core\Exception\RuntimeException;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ODM\MongoDB\Aggregation\Builder;
+use Doctrine\ODM\MongoDB\DocumentManager;
+use Doctrine\ODM\MongoDB\Repository\DocumentRepository;
 
 /**
  * Applies pagination on the Doctrine aggregation for resource collection when enabled.
@@ -40,6 +43,8 @@ final class PaginationExtension implements AggregationResultCollectionExtensionI
 
     /**
      * {@inheritdoc}
+     *
+     * @throws RuntimeException
      */
     public function applyToCollection(Builder $aggregationBuilder, string $resourceClass, string $operationName = null, array &$context = [])
     {
@@ -49,7 +54,16 @@ final class PaginationExtension implements AggregationResultCollectionExtensionI
 
         [, $offset, $limit] = $this->pagination->getPagination($resourceClass, $operationName);
 
-        $repository = $this->managerRegistry->getManagerForClass($resourceClass)->getRepository($resourceClass);
+        $manager = $this->managerRegistry->getManagerForClass($resourceClass);
+        if (!$manager instanceof DocumentManager) {
+            throw new RuntimeException(sprintf('The manager for "%s" must be an instance of "%s" class.', $resourceClass, DocumentManager::class));
+        }
+
+        $repository = $manager->getRepository($resourceClass);
+        if (!$repository instanceof DocumentRepository) {
+            throw new RuntimeException(sprintf('The repository for "%s" must be an instance of "%s".', $resourceClass, DocumentRepository::class));
+        }
+
         $aggregationBuilder
             ->facet()
             ->field('results')->pipeline(
@@ -73,9 +87,16 @@ final class PaginationExtension implements AggregationResultCollectionExtensionI
 
     /**
      * {@inheritdoc}
+     *
+     * @throws RuntimeException
      */
     public function getResult(Builder $aggregationBuilder, string $resourceClass, string $operationName = null, array $context = [])
     {
-        return new Paginator($aggregationBuilder->execute(), $this->managerRegistry->getManagerForClass($resourceClass)->getUnitOfWork(), $resourceClass, $aggregationBuilder->getPipeline());
+        $manager = $this->managerRegistry->getManagerForClass($resourceClass);
+        if (!$manager instanceof DocumentManager) {
+            throw new RuntimeException(sprintf('The manager for "%s" must be an instance of "%s" class.', $resourceClass, DocumentManager::class));
+        }
+
+        return new Paginator($aggregationBuilder->execute(), $manager->getUnitOfWork(), $resourceClass, $aggregationBuilder->getPipeline());
     }
 }

@@ -275,7 +275,11 @@ class SearchFilterTest extends DoctrineMongoDbOdmFilterTestCase
                     [
                         [
                             '$match' => [
-                                'name' => 'exact',
+                                'name' => [
+                                    '$in' => [
+                                        'exact',
+                                    ],
+                                ],
                             ],
                         ],
                     ],
@@ -285,7 +289,11 @@ class SearchFilterTest extends DoctrineMongoDbOdmFilterTestCase
                     [
                         [
                             '$match' => [
-                                'name' => new Regex('^exact$', 'i'),
+                                'name' => [
+                                    '$in' => [
+                                        new Regex('^exact$', 'i'),
+                                    ],
+                                ],
                             ],
                         ],
                     ],
@@ -329,7 +337,11 @@ class SearchFilterTest extends DoctrineMongoDbOdmFilterTestCase
                     [
                         [
                             '$match' => [
-                                'name' => 'foo',
+                                'name' => [
+                                    '$in' => [
+                                        'foo',
+                                    ],
+                                ],
                             ],
                         ],
                         [
@@ -344,7 +356,11 @@ class SearchFilterTest extends DoctrineMongoDbOdmFilterTestCase
                     [
                         [
                             '$match' => [
-                                'name' => new Regex('partial'),
+                                'name' => [
+                                    '$in' => [
+                                        new Regex('partial'),
+                                    ],
+                                ],
                             ],
                         ],
                     ],
@@ -354,7 +370,11 @@ class SearchFilterTest extends DoctrineMongoDbOdmFilterTestCase
                     [
                         [
                             '$match' => [
-                                'name' => new Regex('partial', 'i'),
+                                'name' => [
+                                    '$in' => [
+                                        new Regex('partial', 'i'),
+                                    ],
+                                ],
                             ],
                         ],
                     ],
@@ -364,7 +384,11 @@ class SearchFilterTest extends DoctrineMongoDbOdmFilterTestCase
                     [
                         [
                             '$match' => [
-                                'name' => new Regex('^partial'),
+                                'name' => [
+                                    '$in' => [
+                                        new Regex('^partial'),
+                                    ],
+                                ],
                             ],
                         ],
                     ],
@@ -374,7 +398,11 @@ class SearchFilterTest extends DoctrineMongoDbOdmFilterTestCase
                     [
                         [
                             '$match' => [
-                                'name' => new Regex('^partial', 'i'),
+                                'name' => [
+                                    '$in' => [
+                                        new Regex('^partial', 'i'),
+                                    ],
+                                ],
                             ],
                         ],
                     ],
@@ -384,7 +412,11 @@ class SearchFilterTest extends DoctrineMongoDbOdmFilterTestCase
                     [
                         [
                             '$match' => [
-                                'name' => new Regex('partial$'),
+                                'name' => [
+                                    '$in' => [
+                                        new Regex('partial$'),
+                                    ],
+                                ],
                             ],
                         ],
                     ],
@@ -394,7 +426,11 @@ class SearchFilterTest extends DoctrineMongoDbOdmFilterTestCase
                     [
                         [
                             '$match' => [
-                                'name' => new Regex('partial$', 'i'),
+                                'name' => [
+                                    '$in' => [
+                                        new Regex('partial$', 'i'),
+                                    ],
+                                ],
                             ],
                         ],
                     ],
@@ -404,7 +440,11 @@ class SearchFilterTest extends DoctrineMongoDbOdmFilterTestCase
                     [
                         [
                             '$match' => [
-                                'name' => new Regex('(^partial.*|.*\spartial.*)'),
+                                'name' => [
+                                    '$in' => [
+                                        new Regex('(^partial.*|.*\spartial.*)'),
+                                    ],
+                                ],
                             ],
                         ],
                     ],
@@ -414,7 +454,11 @@ class SearchFilterTest extends DoctrineMongoDbOdmFilterTestCase
                     [
                         [
                             '$match' => [
-                                'name' => new Regex('(^partial.*|.*\spartial.*)', 'i'),
+                                'name' => [
+                                    '$in' => [
+                                        new Regex('(^partial.*|.*\spartial.*)', 'i'),
+                                    ],
+                                ],
                             ],
                         ],
                     ],
@@ -445,7 +489,11 @@ class SearchFilterTest extends DoctrineMongoDbOdmFilterTestCase
                         ],
                         [
                             '$match' => [
-                                'relatedDummy_lkup.id' => 1,
+                                'relatedDummy_lkup.id' => [
+                                    '$in' => [
+                                        1,
+                                    ],
+                                ],
                             ],
                         ],
                     ],
@@ -475,7 +523,11 @@ class SearchFilterTest extends DoctrineMongoDbOdmFilterTestCase
                     [
                         [
                             '$match' => [
-                                'name' => 'exact',
+                                'name' => [
+                                    '$in' => [
+                                        'exact',
+                                    ],
+                                ],
                             ],
                         ],
                         [
@@ -491,7 +543,11 @@ class SearchFilterTest extends DoctrineMongoDbOdmFilterTestCase
                         ],
                         [
                             '$match' => [
-                                'relatedDummy_lkup.symfony' => 'exact',
+                                'relatedDummy_lkup.symfony' => [
+                                    '$in' => [
+                                        'exact',
+                                    ],
+                                ],
                             ],
                         ],
                     ],

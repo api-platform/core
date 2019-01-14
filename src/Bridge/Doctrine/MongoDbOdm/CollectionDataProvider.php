@@ -19,7 +19,8 @@ use ApiPlatform\Core\DataProvider\CollectionDataProviderInterface;
 use ApiPlatform\Core\DataProvider\RestrictedDataProviderInterface;
 use ApiPlatform\Core\Exception\RuntimeException;
 use Doctrine\Common\Persistence\ManagerRegistry;
-use Doctrine\ODM\MongoDB\Aggregation\Builder;
+use Doctrine\ODM\MongoDB\DocumentManager;
+use Doctrine\ODM\MongoDB\Repository\DocumentRepository;
 
 /**
  * Collection data provider for the Doctrine MongoDB ODM.
@@ -44,7 +45,7 @@ final class CollectionDataProvider implements CollectionDataProviderInterface, R
 
     public function supports(string $resourceClass, string $operationName = null, array $context = []): bool
     {
-        return null !== $this->managerRegistry->getManagerForClass($resourceClass);
+        return $this->managerRegistry->getManagerForClass($resourceClass) instanceof DocumentManager;
     }
 
     /**
@@ -54,14 +55,14 @@ final class CollectionDataProvider implements CollectionDataProviderInterface, R
      */
     public function getCollection(string $resourceClass, string $operationName = null, array $context = [])
     {
+        /** @var DocumentManager $manager */
         $manager = $this->managerRegistry->getManagerForClass($resourceClass);
 
         $repository = $manager->getRepository($resourceClass);
-        if (!method_exists($repository, 'createAggregationBuilder')) {
-            throw new RuntimeException('The repository class must have a "createAggregationBuilder" method.');
+        if (!$repository instanceof DocumentRepository) {
+            throw new RuntimeException(sprintf('The repository for "%s" must be an instance of "%s".', $resourceClass, DocumentRepository::class));
         }
 
-        /** @var Builder $aggregationBuilder */
         $aggregationBuilder = $repository->createAggregationBuilder();
         foreach ($this->collectionExtensions as $extension) {
             $extension->applyToCollection($aggregationBuilder, $resourceClass, $operationName, $context);

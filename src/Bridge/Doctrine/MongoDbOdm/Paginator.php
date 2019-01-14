@@ -71,9 +71,10 @@ final class Paginator implements \IteratorAggregate, PaginatorInterface
         $resultsFacetInfo = $this->getFacetInfo('results');
         $this->getFacetInfo('count');
 
-        // See https://github.com/alcaeus/mongo-php-adapter#mongocommandcursor
-        // Since the method getCursorInfo in CommandCursor always returns 0 for 'skip' and 'limit',
-        // the values set in the facet stage are used instead.
+        /*
+         * Since the {@see \MongoDB\Driver\Cursor} class does not expose information about
+         * skip/limit parameters of the query, the values set in the facet stage are used instead.
+         */
         $this->firstResult = $this->getStageInfo($resultsFacetInfo, '$skip');
         $this->maxResults = $this->getStageInfo($resultsFacetInfo, '$limit');
         $this->totalItems = $mongoDbOdmIterator->toArray()[0]['count'][0]['count'] ?? 0;
@@ -126,7 +127,7 @@ final class Paginator implements \IteratorAggregate, PaginatorInterface
      */
     public function count(): int
     {
-        return iterator_count($this->getIterator());
+        return \count($this->mongoDbOdmIterator->toArray()[0]['results']);
     }
 
     /**

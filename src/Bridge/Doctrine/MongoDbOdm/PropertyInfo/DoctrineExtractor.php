@@ -16,7 +16,6 @@ namespace ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\PropertyInfo;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Persistence\Mapping\MappingException;
 use Doctrine\Common\Persistence\ObjectManager;
-use Doctrine\ODM\MongoDB\Mapping\MappingException as MongoDbOdmMappingException;
 use Doctrine\ODM\MongoDB\Types\Type as MongoDbType;
 use Symfony\Component\PropertyInfo\PropertyListExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyTypeExtractorInterface;
@@ -48,8 +47,6 @@ final class DoctrineExtractor implements PropertyListExtractorInterface, Propert
             $metadata = $this->objectManager->getClassMetadata($class);
         } catch (MappingException $exception) {
             return null;
-        } catch (MongoDbOdmMappingException $exception) {
-            return null;
         }
 
         return $metadata->getFieldNames();
@@ -63,8 +60,6 @@ final class DoctrineExtractor implements PropertyListExtractorInterface, Propert
         try {
             $metadata = $this->objectManager->getClassMetadata($class);
         } catch (MappingException $exception) {
-            return null;
-        } catch (MongoDbOdmMappingException $exception) {
             return null;
         }
 

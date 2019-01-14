@@ -27,7 +27,6 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\RelatedDummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\RelatedOwningDummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\ThirdLevel;
 use Doctrine\Common\Persistence\ManagerRegistry;
-use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\Common\Persistence\ObjectRepository;
 use Doctrine\ODM\MongoDB\Aggregation\Builder;
 use Doctrine\ODM\MongoDB\Aggregation\Stage\Lookup;
@@ -343,12 +342,12 @@ class SubresourceDataProviderTest extends TestCase
     public function testCannotCreateQueryBuilder()
     {
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('The repository class must have a "createAggregationBuilder" method.');
+        $this->expectExceptionMessage('The repository for "ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\Dummy" must be an instance of "Doctrine\ODM\MongoDB\Repository\DocumentRepository".');
 
         $identifiers = ['id'];
         $repositoryProphecy = $this->prophesize(ObjectRepository::class);
 
-        $managerProphecy = $this->prophesize(ObjectManager::class);
+        $managerProphecy = $this->prophesize(DocumentManager::class);
         $managerProphecy->getRepository(Dummy::class)->willReturn($repositoryProphecy->reveal())->shouldBeCalled();
 
         $managerRegistryProphecy = $this->prophesize(ManagerRegistry::class);

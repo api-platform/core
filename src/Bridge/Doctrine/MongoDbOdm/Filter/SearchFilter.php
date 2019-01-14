@@ -107,15 +107,6 @@ final class SearchFilter extends AbstractFilter implements SearchFilterInterface
                 $caseSensitive = false;
             }
 
-            if (1 === \count($values)) {
-                $aggregationBuilder
-                    ->match()
-                    ->field($matchField)
-                    ->equals($this->addEqualityMatchStrategy($strategy, $field, $values[0], $caseSensitive, $metadata));
-
-                return;
-            }
-
             $inValues = [];
             foreach ($values as $inValue) {
                 $inValues[] = $this->addEqualityMatchStrategy($strategy, $field, $inValue, $caseSensitive, $metadata);

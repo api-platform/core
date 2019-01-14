@@ -28,6 +28,7 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ODM\MongoDB\Aggregation\Builder;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Doctrine\ODM\MongoDB\Mapping\ClassMetadata;
+use Doctrine\ODM\MongoDB\Repository\DocumentRepository;
 
 /**
  * Subresource data provider for the Doctrine MongoDB ODM.
@@ -66,13 +67,13 @@ final class SubresourceDataProvider implements SubresourceDataProviderInterface
     public function getSubresource(string $resourceClass, array $identifiers, array $context, string $operationName = null)
     {
         $manager = $this->managerRegistry->getManagerForClass($resourceClass);
-        if (null === $manager) {
-            throw new ResourceClassNotSupportedException(sprintf('The object manager associated with the "%s" resource class cannot be retrieved.', $resourceClass));
+        if (!$manager instanceof DocumentManager) {
+            throw new ResourceClassNotSupportedException(sprintf('The manager for "%s" must be an instance of "%s" class.', $resourceClass, DocumentManager::class));
         }
 
         $repository = $manager->getRepository($resourceClass);
-        if (!method_exists($repository, 'createAggregationBuilder')) {
-            throw new RuntimeException('The repository class must have a "createAggregationBuilder" method.');
+        if (!$repository instanceof DocumentRepository) {
+            throw new RuntimeException(sprintf('The repository for "%s" must be an instance of "%s".', $resourceClass, DocumentRepository::class));
         }
 
         if (!isset($context['identifiers'], $context['property'])) {
@@ -117,17 +118,14 @@ final class SubresourceDataProvider implements SubresourceDataProviderInterface
         $previousAssociationProperty = $context['identifiers'][$remainingIdentifiers][0] ?? $context['property'];
 
         $manager = $this->managerRegistry->getManagerForClass($identifierResourceClass);
-
         if (!$manager instanceof DocumentManager) {
-            throw new RuntimeException("The manager for $identifierResourceClass must be a DocumentManager.");
+            throw new RuntimeException(sprintf('The manager for "%s" must be an instance of "%s" class.', $identifierResourceClass, DocumentManager::class));
         }
 
         $classMetadata = $manager->getClassMetadata($identifierResourceClass);
 
         if (!$classMetadata instanceof ClassMetadata) {
-            throw new RuntimeException(
-                "The class metadata for $identifierResourceClass must be an instance of ClassMetadata."
-            );
+            throw new RuntimeException(sprintf('The class metadata for "%s" must be an instance of "%s".', $identifierResourceClass, ClassMetadata::class));
         }
 
         $aggregation = $manager->createAggregationBuilder($identifierResourceClass);

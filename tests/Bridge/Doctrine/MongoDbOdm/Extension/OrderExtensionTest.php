@@ -18,9 +18,9 @@ use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\Dummy;
 use Doctrine\Common\Persistence\ManagerRegistry;
-use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\ODM\MongoDB\Aggregation\Builder;
 use Doctrine\ODM\MongoDB\Aggregation\Stage\Lookup;
+use Doctrine\ODM\MongoDB\DocumentManager;
 use Doctrine\ODM\MongoDB\Mapping\ClassMetadata;
 use PHPUnit\Framework\TestCase;
 
@@ -38,7 +38,7 @@ class OrderExtensionTest extends TestCase
         $classMetadataProphecy = $this->prophesize(ClassMetadata::class);
         $classMetadataProphecy->getIdentifier()->shouldBeCalled()->willReturn(['name']);
 
-        $objectManagerProphecy = $this->prophesize(ObjectManager::class);
+        $objectManagerProphecy = $this->prophesize(DocumentManager::class);
         $objectManagerProphecy->getClassMetadata(Dummy::class)->shouldBeCalled()->willReturn($classMetadataProphecy->reveal());
 
         $managerRegistryProphecy = $this->prophesize(ManagerRegistry::class);
@@ -58,7 +58,7 @@ class OrderExtensionTest extends TestCase
         $classMetadataProphecy = $this->prophesize(ClassMetadata::class);
         $classMetadataProphecy->getIdentifier()->shouldBeCalled()->willReturn(['name']);
 
-        $objectManagerProphecy = $this->prophesize(ObjectManager::class);
+        $objectManagerProphecy = $this->prophesize(DocumentManager::class);
         $objectManagerProphecy->getClassMetadata(Dummy::class)->shouldBeCalled()->willReturn($classMetadataProphecy->reveal());
 
         $managerRegistryProphecy = $this->prophesize(ManagerRegistry::class);
@@ -81,7 +81,7 @@ class OrderExtensionTest extends TestCase
 
         $resourceMetadataFactoryProphecy->create(Dummy::class)->shouldBeCalled()->willReturn(new ResourceMetadata(null, null, null, null, null, ['order' => ['foo' => 'DESC']]));
 
-        $objectManagerProphecy = $this->prophesize(ObjectManager::class);
+        $objectManagerProphecy = $this->prophesize(DocumentManager::class);
         $objectManagerProphecy->getClassMetadata(Dummy::class)->shouldBeCalled()->willReturn($classMetadataProphecy->reveal());
 
         $managerRegistryProphecy = $this->prophesize(ManagerRegistry::class);
@@ -105,7 +105,7 @@ class OrderExtensionTest extends TestCase
 
         $resourceMetadataFactoryProphecy->create(Dummy::class)->shouldBeCalled()->willReturn(new ResourceMetadata(null, null, null, null, null, ['order' => ['foo', 'bar' => 'DESC']]));
 
-        $objectManagerProphecy = $this->prophesize(ObjectManager::class);
+        $objectManagerProphecy = $this->prophesize(DocumentManager::class);
         $objectManagerProphecy->getClassMetadata(Dummy::class)->shouldBeCalled()->willReturn($classMetadataProphecy->reveal());
 
         $managerRegistryProphecy = $this->prophesize(ManagerRegistry::class);
@@ -139,7 +139,7 @@ class OrderExtensionTest extends TestCase
 
         $resourceMetadataFactoryProphecy->create(Dummy::class)->shouldBeCalled()->willReturn(new ResourceMetadata(null, null, null, null, null, ['order' => ['author.name']]));
 
-        $objectManagerProphecy = $this->prophesize(ObjectManager::class);
+        $objectManagerProphecy = $this->prophesize(DocumentManager::class);
         $objectManagerProphecy->getClassMetadata(Dummy::class)->shouldBeCalled()->willReturn($classMetadataProphecy->reveal());
 
         $managerRegistryProphecy = $this->prophesize(ManagerRegistry::class);

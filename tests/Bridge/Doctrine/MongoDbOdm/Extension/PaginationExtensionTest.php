@@ -21,7 +21,6 @@ use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use Doctrine\Common\Persistence\ManagerRegistry;
-use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\ODM\MongoDB\Aggregation\Builder;
 use Doctrine\ODM\MongoDB\Aggregation\Stage\Count;
 use Doctrine\ODM\MongoDB\Aggregation\Stage\Facet;
@@ -487,7 +486,7 @@ class PaginationExtensionTest extends TestCase
             $countAggregationBuilderProphecy->reveal()
         );
 
-        $objectManagerProphecy = $this->prophesize(ObjectManager::class);
+        $objectManagerProphecy = $this->prophesize(DocumentManager::class);
         $objectManagerProphecy->getRepository('Foo')->shouldBeCalled()->willReturn($repositoryProphecy->reveal());
 
         $this->managerRegistryProphecy->getManagerForClass('Foo')->shouldBeCalled()->willReturn($objectManagerProphecy->reveal());

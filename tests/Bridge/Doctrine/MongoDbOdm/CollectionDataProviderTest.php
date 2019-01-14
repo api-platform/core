@@ -19,9 +19,9 @@ use ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Extension\AggregationResultColle
 use ApiPlatform\Core\Exception\RuntimeException;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\Dummy;
 use Doctrine\Common\Persistence\ManagerRegistry;
-use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\Common\Persistence\ObjectRepository;
 use Doctrine\ODM\MongoDB\Aggregation\Builder;
+use Doctrine\ODM\MongoDB\DocumentManager;
 use Doctrine\ODM\MongoDB\Iterator\Iterator;
 use Doctrine\ODM\MongoDB\Repository\DocumentRepository;
 use PHPUnit\Framework\TestCase;
@@ -44,7 +44,7 @@ class CollectionDataProviderTest extends TestCase
         $repositoryProphecy = $this->prophesize(DocumentRepository::class);
         $repositoryProphecy->createAggregationBuilder()->willReturn($aggregationBuilder)->shouldBeCalled();
 
-        $managerProphecy = $this->prophesize(ObjectManager::class);
+        $managerProphecy = $this->prophesize(DocumentManager::class);
         $managerProphecy->getRepository(Dummy::class)->willReturn($repositoryProphecy->reveal())->shouldBeCalled();
 
         $managerRegistryProphecy = $this->prophesize(ManagerRegistry::class);
@@ -65,7 +65,7 @@ class CollectionDataProviderTest extends TestCase
         $repositoryProphecy = $this->prophesize(DocumentRepository::class);
         $repositoryProphecy->createAggregationBuilder()->willReturn($aggregationBuilder)->shouldBeCalled();
 
-        $managerProphecy = $this->prophesize(ObjectManager::class);
+        $managerProphecy = $this->prophesize(DocumentManager::class);
         $managerProphecy->getRepository(Dummy::class)->willReturn($repositoryProphecy->reveal())->shouldBeCalled();
 
         $managerRegistryProphecy = $this->prophesize(ManagerRegistry::class);
@@ -83,11 +83,11 @@ class CollectionDataProviderTest extends TestCase
     public function testCannotCreateAggregationBuilder()
     {
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('The repository class must have a "createAggregationBuilder" method.');
+        $this->expectExceptionMessage('The repository for "ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\Dummy" must be an instance of "Doctrine\ODM\MongoDB\Repository\DocumentRepository".');
 
         $repositoryProphecy = $this->prophesize(ObjectRepository::class);
 
-        $managerProphecy = $this->prophesize(ObjectManager::class);
+        $managerProphecy = $this->prophesize(DocumentManager::class);
         $managerProphecy->getRepository(Dummy::class)->willReturn($repositoryProphecy->reveal())->shouldBeCalled();
 
         $managerRegistryProphecy = $this->prophesize(ManagerRegistry::class);
