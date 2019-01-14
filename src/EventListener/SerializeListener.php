@@ -17,11 +17,14 @@ use ApiPlatform\Core\Exception\RuntimeException;
 use ApiPlatform\Core\Serializer\ResourceList;
 use ApiPlatform\Core\Serializer\SerializerContextBuilderInterface;
 use ApiPlatform\Core\Util\RequestAttributesExtractor;
+use Fig\Link\GenericLinkProvider;
+use Fig\Link\Link;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
 use Symfony\Component\Serializer\Encoder\EncoderInterface;
 use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Component\WebLink\EventListener\AddLinkHeaderListener;
 
 /**
  * Serializes data.
@@ -77,11 +80,26 @@ final class SerializeListener
         $resources = new ResourceList();
         $context['resources'] = &$resources;
 
+        $resourcesToPush = [];
+        if (class_exists(AddLinkHeaderListener::class)) {
+            $resourcesToPush = new ResourceList();
+            $context['resources_to_push'] = &$resourcesToPush;
+        }
+
         $request->attributes->set('_api_normalization_context', $context);
 
         $event->setControllerResult($this->serializer->serialize($controllerResult, $request->getRequestFormat(), $context));
 
         $request->attributes->set('_resources', $request->attributes->get('_resources', []) + (array) $resources);
+        if (!\count($resourcesToPush)) {
+            return;
+        }
+
+        $linkProvider = $request->attributes->get('_links', new GenericLinkProvider());
+        foreach ($resourcesToPush as $resourcesToPush) {
+            $linkProvider = $linkProvider->withLink(new Link('preload', $resourcesToPush));
+        }
+        $request->attributes->set('_links', $linkProvider);
     }
 
     /**
