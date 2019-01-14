@@ -20,9 +20,11 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Core\DataProvider\Pagination;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
+use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Tools\Pagination\Paginator as DoctrineOrmPaginator;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
@@ -34,7 +36,19 @@ use Symfony\Component\HttpFoundation\RequestStack;
 final class PaginationExtension implements ContextAwareQueryResultCollectionExtensionInterface
 {
     private $managerRegistry;
+    private $requestStack;
     private $resourceMetadataFactory;
+    private $enabled;
+    private $clientEnabled;
+    private $clientItemsPerPage;
+    private $itemsPerPage;
+    private $pageParameterName;
+    private $enabledParameterName;
+    private $itemsPerPageParameterName;
+    private $maximumItemPerPage;
+    private $partial;
+    private $clientPartial;
+    private $partialParameterName;
     private $pagination;
 
     /**
@@ -47,45 +61,40 @@ final class PaginationExtension implements ContextAwareQueryResultCollectionExte
             @trigger_error(sprintf('Passing an instance of "%s" as second argument of "%s" is deprecated since API Platform 2.4 and will not be possible anymore in API Platform 3. Pass an instance of "%s" instead.', RequestStack::class, self::class, ResourceMetadataFactoryInterface::class), E_USER_DEPRECATED);
             @trigger_error(sprintf('Passing an instance of "%s" as third argument of "%s" is deprecated since API Platform 2.4 and will not be possible anymore in API Platform 3. Pass an instance of "%s" instead.', ResourceMetadataFactoryInterface::class, self::class, Pagination::class), E_USER_DEPRECATED);
 
-            $requestStack = $resourceMetadataFactory;
+            $this->requestStack = $resourceMetadataFactory;
             $resourceMetadataFactory = $pagination;
+            $pagination = null;
 
+            $args = \array_slice(\func_get_args(), 3);
             $legacyPaginationArgs = [
-                3 => ['arg_name' => 'enabled', 'option_name' => 'enabled', 'type' => 'bool', 'default' => true],
-                4 => ['arg_name' => 'clientEnabled', 'option_name' => 'client_enabled', 'type' => 'bool', 'default' => false],
-                5 => ['arg_name' => 'clientItemsPerPage', 'option_name' => 'client_items_per_page', 'type' => 'bool', 'default' => false],
-                6 => ['arg_name' => 'itemsPerPage', 'option_name' => 'items_per_page', 'type' => 'int', 'default' => 30],
-                7 => ['arg_name' => 'pageParameterName', 'option_name' => 'page_parameter_name', 'type' => 'string', 'default' => 'page'],
-                8 => ['arg_name' => 'enabledParameterName', 'option_name' => 'enabled_parameter_name', 'type' => 'string', 'default' => 'pagination'],
-                9 => ['arg_name' => 'itemsPerPageParameterName', 'option_name' => 'items_per_page_parameter_name', 'type' => 'string', 'default' => 'itemsPerPage'],
-                10 => ['arg_name' => 'maximumItemPerPage', 'option_name' => 'maximum_items_per_page', 'type' => 'int', 'default' => null],
-                11 => ['arg_name' => 'partial', 'option_name' => 'partial', 'type' => 'bool', 'default' => false],
-                12 => ['arg_name' => 'clientPartial', 'option_name' => 'client_partial', 'type' => 'bool', 'default' => false],
-                13 => ['arg_name' => 'partialParameterName', 'option_name' => 'partial_parameter_name', 'type' => 'string', 'default' => 'partial'],
+                ['arg_name' => 'enabled', 'type' => 'bool', 'default' => true],
+                ['arg_name' => 'clientEnabled', 'type' => 'bool', 'default' => false],
+                ['arg_name' => 'clientItemsPerPage', 'type' => 'bool', 'default' => false],
+                ['arg_name' => 'itemsPerPage', 'type' => 'int', 'default' => 30],
+                ['arg_name' => 'pageParameterName', 'type' => 'string', 'default' => 'page'],
+                ['arg_name' => 'enabledParameterName', 'type' => 'string', 'default' => 'pagination'],
+                ['arg_name' => 'itemsPerPageParameterName', 'type' => 'string', 'default' => 'itemsPerPage'],
+                ['arg_name' => 'maximumItemPerPage', 'type' => 'int', 'default' => null],
+                ['arg_name' => 'partial', 'type' => 'bool', 'default' => false],
+                ['arg_name' => 'clientPartial', 'type' => 'bool', 'default' => false],
+                ['arg_name' => 'partialParameterName', 'type' => 'string', 'default' => 'partial'],
             ];
 
-            $paginationOptions = array_column($legacyPaginationArgs, 'default', 'option_name');
+            foreach ($legacyPaginationArgs as $pos => $arg) {
+                if (array_key_exists($pos, $args)) {
+                    @trigger_error(sprintf('Passing "$%s" arguments is deprecated since API Platform 2.4 and will not be possible anymore in API Platform 3. Pass an instance of "%s" as third argument instead.', implode('", "$', array_column($legacyPaginationArgs, 'arg_name')), Paginator::class), E_USER_DEPRECATED);
 
-            if (0 < \count($legacyArgs = \array_slice(\func_get_args(), 3, null, true))) {
-                @trigger_error(sprintf('Passing "$%s" arguments is deprecated since API Platform 2.4 and will not be possible anymore in API Platform 3. Pass an instance of "%s" as third argument instead.', implode('", "$', array_column($legacyPaginationArgs, 'arg_name')), Paginator::class), E_USER_DEPRECATED);
-
-                foreach ($legacyArgs as $pos => $arg) {
-                    [
-                        'arg_name' => $argName,
-                        'option_name' => $optionName,
-                        'type' => $type,
-                        'default' => $default,
-                    ] = $legacyPaginationArgs[$pos];
-
-                    if (!((null === $default && null === $arg) || \call_user_func("is_{$type}", $arg))) {
-                        throw new InvalidArgumentException(sprintf('The "$%s" argument is expected to be a %s%s.', $argName, $type, null === $default ? ' or null' : ''));
+                    if (!((null === $arg['default'] && null === $args[$pos]) || \call_user_func("is_{$arg['type']}", $args[$pos]))) {
+                        throw new InvalidArgumentException(sprintf('The "$%s" argument is expected to be a %s%s.', $arg['arg_name'], $arg['type'], null === $arg['default'] ? ' or null' : ''));
                     }
 
-                    $paginationOptions[$optionName] = $arg;
+                    $value = $args[$pos];
+                } else {
+                    $value = $arg['default'];
                 }
-            }
 
-            $pagination = new Pagination($requestStack, $resourceMetadataFactory, $paginationOptions);
+                $this->{$arg['arg_name']} = $value;
+            }
         } elseif (!$resourceMetadataFactory instanceof ResourceMetadataFactoryInterface) {
             throw new InvalidArgumentException(sprintf('The "$resourceMetadataFactory" argument is expected to be an implementation of the "%s" interface.', ResourceMetadataFactoryInterface::class));
         } elseif (!$pagination instanceof Pagination) {
@@ -100,17 +109,13 @@ final class PaginationExtension implements ContextAwareQueryResultCollectionExte
     /**
      * {@inheritdoc}
      */
-    public function applyToCollection(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass = null, string $operationName = null, array $context = [])
+    public function applyToCollection(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, string $operationName = null, array $context = [])
     {
-        if (null === $resourceClass) {
-            throw new InvalidArgumentException('The "$resourceClass" parameter must not be null');
-        }
-
-        if (!$this->pagination->isEnabled($resourceClass, $operationName)) {
+        if (null === $pagination = $this->getPagination($resourceClass, $operationName, $context)) {
             return;
         }
 
-        [, $offset, $limit] = $this->pagination->getPagination($resourceClass, $operationName);
+        [$offset, $limit] = $pagination;
 
         $queryBuilder
             ->setFirstResult($offset)
@@ -122,7 +127,15 @@ final class PaginationExtension implements ContextAwareQueryResultCollectionExte
      */
     public function supportsResult(string $resourceClass, string $operationName = null, array $context = []): bool
     {
-        return $this->pagination->isEnabled($resourceClass, $operationName);
+        if (null === $this->requestStack) {
+            return $this->pagination->isEnabled($resourceClass, $operationName, $context);
+        }
+
+        if (null === $request = $this->requestStack->getCurrentRequest()) {
+            return false;
+        }
+
+        return $this->isPaginationEnabled($request, $this->resourceMetadataFactory->create($resourceClass), $operationName);
     }
 
     /**
@@ -133,12 +146,125 @@ final class PaginationExtension implements ContextAwareQueryResultCollectionExte
         $doctrineOrmPaginator = new DoctrineOrmPaginator($queryBuilder, $this->useFetchJoinCollection($queryBuilder, $resourceClass, $operationName));
         $doctrineOrmPaginator->setUseOutputWalkers($this->useOutputWalkers($queryBuilder));
 
-        if ($this->pagination->isPartialEnabled($resourceClass, $operationName)) {
+        if (null === $this->requestStack) {
+            $isPartialEnabled = $this->pagination->isPartialEnabled($resourceClass, $operationName, $context);
+        } else {
+            $isPartialEnabled = $this->isPartialPaginationEnabled(
+                $this->requestStack->getCurrentRequest(),
+                null === $resourceClass ? null : $this->resourceMetadataFactory->create($resourceClass),
+                $operationName
+            );
+        }
+
+        if ($isPartialEnabled) {
             return new class($doctrineOrmPaginator) extends AbstractPaginator {
             };
         }
 
         return new Paginator($doctrineOrmPaginator);
+    }
+
+    /**
+     * @throws InvalidArgumentException
+     */
+    private function getPagination(string $resourceClass, ?string $operationName, array $context): ?array
+    {
+        $request = null;
+        if (null !== $this->requestStack && null === $request = $this->requestStack->getCurrentRequest()) {
+            return null;
+        }
+
+        if (null === $request) {
+            if (!$this->pagination->isEnabled($resourceClass, $operationName, $context)) {
+                return null;
+            }
+
+            return \array_slice($this->pagination->getPagination($resourceClass, $operationName, $context), 1);
+        }
+
+        $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
+        if (!$this->isPaginationEnabled($request, $resourceMetadata, $operationName)) {
+            return null;
+        }
+
+        $itemsPerPage = $resourceMetadata->getCollectionOperationAttribute($operationName, 'pagination_items_per_page', $this->itemsPerPage, true);
+        if ($request->attributes->get('_graphql')) {
+            $collectionArgs = $request->attributes->get('_graphql_collections_args', []);
+            $itemsPerPage = $collectionArgs[$resourceClass]['first'] ?? $itemsPerPage;
+        }
+
+        if ($resourceMetadata->getCollectionOperationAttribute($operationName, 'pagination_client_items_per_page', $this->clientItemsPerPage, true)) {
+            $maxItemsPerPage = $resourceMetadata->getCollectionOperationAttribute($operationName, 'maximum_items_per_page', $this->maximumItemPerPage, true);
+            $itemsPerPage = (int) $this->getPaginationParameter($request, $this->itemsPerPageParameterName, $itemsPerPage);
+            $itemsPerPage = (null !== $maxItemsPerPage && $itemsPerPage >= $maxItemsPerPage ? $maxItemsPerPage : $itemsPerPage);
+        }
+
+        if (0 > $itemsPerPage) {
+            throw new InvalidArgumentException('Item per page parameter should not be less than 0');
+        }
+
+        $page = (int) $this->getPaginationParameter($request, $this->pageParameterName, 1);
+
+        if (1 > $page) {
+            throw new InvalidArgumentException('Page should not be less than 1');
+        }
+
+        if (0 === $itemsPerPage && 1 < $page) {
+            throw new InvalidArgumentException('Page should not be greater than 1 if itemsPerPage is equal to 0');
+        }
+
+        $firstResult = ($page - 1) * $itemsPerPage;
+        if ($request->attributes->get('_graphql')) {
+            $collectionArgs = $request->attributes->get('_graphql_collections_args', []);
+            if (isset($collectionArgs[$resourceClass]['after'])) {
+                $after = base64_decode($collectionArgs[$resourceClass]['after'], true);
+                $firstResult = (int) $after;
+                $firstResult = false === $after ? $firstResult : ++$firstResult;
+            }
+        }
+
+        return [$firstResult, $itemsPerPage];
+    }
+
+    private function isPartialPaginationEnabled(Request $request = null, ResourceMetadata $resourceMetadata = null, string $operationName = null): bool
+    {
+        $enabled = $this->partial;
+        $clientEnabled = $this->clientPartial;
+
+        if ($resourceMetadata) {
+            $enabled = $resourceMetadata->getCollectionOperationAttribute($operationName, 'pagination_partial', $enabled, true);
+
+            if ($request) {
+                $clientEnabled = $resourceMetadata->getCollectionOperationAttribute($operationName, 'pagination_client_partial', $clientEnabled, true);
+            }
+        }
+
+        if ($clientEnabled && $request) {
+            $enabled = filter_var($this->getPaginationParameter($request, $this->partialParameterName, $enabled), FILTER_VALIDATE_BOOLEAN);
+        }
+
+        return $enabled;
+    }
+
+    private function isPaginationEnabled(Request $request, ResourceMetadata $resourceMetadata, string $operationName = null): bool
+    {
+        $enabled = $resourceMetadata->getCollectionOperationAttribute($operationName, 'pagination_enabled', $this->enabled, true);
+        $clientEnabled = $resourceMetadata->getCollectionOperationAttribute($operationName, 'pagination_client_enabled', $this->clientEnabled, true);
+
+        if ($clientEnabled) {
+            $enabled = filter_var($this->getPaginationParameter($request, $this->enabledParameterName, $enabled), FILTER_VALIDATE_BOOLEAN);
+        }
+
+        return $enabled;
+    }
+
+    private function getPaginationParameter(Request $request, string $parameterName, $default = null)
+    {
+        if (null !== $paginationAttribute = $request->attributes->get('_api_pagination')) {
+            return array_key_exists($parameterName, $paginationAttribute) ? $paginationAttribute[$parameterName] : $default;
+        }
+
+        return $request->query->get($parameterName, $default);
     }
 
     /**

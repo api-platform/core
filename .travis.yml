@@ -9,10 +9,6 @@ jobs:
   include:
     - php: '7.1'
     - php: '7.2'
-    - php: '7.2'
-      services:
-        - elasticsearch
-      env: APP_ENV=elasticsearch
     - php: '7.3'
     - php: '7.3'
       env: deps=low
@@ -30,6 +26,10 @@ jobs:
       before_script:
         - mysql -e 'CREATE DATABASE api_platform_test;'
       env: APP_ENV=mysql
+    - php: '7.3'
+      services:
+        - elasticsearch
+      env: APP_ENV=elasticsearch
   allow_failures:
     - env: SYMFONY_DEPRECATIONS_HELPER=0
   fast_finish: true

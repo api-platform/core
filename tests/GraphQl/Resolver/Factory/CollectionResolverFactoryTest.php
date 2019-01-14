@@ -178,8 +178,7 @@ class CollectionResolverFactoryTest extends TestCase
         $collectionDataProviderProphecy = $this->prophesize(CollectionDataProviderInterface::class);
 
         $filters = $cursor ? ['after' => $cursor] : [];
-        $collectionDataProviderProphecy->getCollection(Dummy::class, null, ['groups' => ['foo'], 'attributes' => [], 'filters' => []])->willReturn($collection);
-        $collectionDataProviderProphecy->getCollection(RelatedDummy::class, null, ['groups' => ['foo'], 'attributes' => [], 'filters' => $filters])->willReturn($collection);
+        $collectionDataProviderProphecy->getCollection(RelatedDummy::class, null, ['groups' => ['foo'], 'attributes' => [], 'filters' => $filters, 'graphql' => true])->willReturn($collection);
 
         $subresourceDataProviderProphecy = $this->prophesize(SubresourceDataProviderInterface::class);
         $subresourceDataProviderProphecy->getSubresource(RelatedDummy::class, $identifiers, [
@@ -189,6 +188,7 @@ class CollectionResolverFactoryTest extends TestCase
             'groups' => ['foo'],
             'attributes' => [],
             'filters' => [],
+            'graphql' => true,
         ])->willReturn($subcollection);
 
         $normalizerProphecy = $this->prophesize(NormalizerInterface::class);
@@ -209,7 +209,6 @@ class CollectionResolverFactoryTest extends TestCase
         $identifiersExtractorProphecy->getIdentifiersFromItem(Argument::type(Dummy::class))->willReturn($identifiers);
 
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadata('Dummy', null, null, null, null, ['normalization_context' => ['groups' => ['foo']]]));
         $resourceMetadataFactoryProphecy->create(RelatedDummy::class)->willReturn(new ResourceMetadata('RelatedDummy', null, null, null, null, ['normalization_context' => ['groups' => ['foo']]]));
 
         $request = new Request();
