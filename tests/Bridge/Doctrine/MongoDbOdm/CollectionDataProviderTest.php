@@ -36,7 +36,6 @@ class CollectionDataProviderTest extends TestCase
         $iterator = $this->prophesize(Iterator::class)->reveal();
 
         $aggregationBuilderProphecy = $this->prophesize(Builder::class);
-        $aggregationBuilderProphecy->match()->shouldBeCalled();
         $aggregationBuilderProphecy->hydrate(Dummy::class)->willReturn($aggregationBuilderProphecy)->shouldBeCalled();
         $aggregationBuilderProphecy->execute()->willReturn($iterator)->shouldBeCalled();
         $aggregationBuilder = $aggregationBuilderProphecy->reveal();

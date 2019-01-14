@@ -40,7 +40,7 @@ trait IdentifierManagerTrait
         $identifierValues = [$id];
         $doctrineClassMetadata = $manager->getClassMetadata($resourceClass);
         $doctrineIdentifierFields = $doctrineClassMetadata->getIdentifier();
-        $isOrm = interface_exists(EntityManagerInterface::class) && $manager instanceof EntityManagerInterface;
+        $isOrm = $manager instanceof EntityManagerInterface;
         $isOdm = $manager instanceof DocumentManager;
         $platform = $isOrm ? $manager->getConnection()->getDatabasePlatform() : null;
         $identifiersMap = null;

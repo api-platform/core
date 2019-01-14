@@ -155,7 +155,7 @@ final class SearchFilter extends AbstractFilter implements SearchFilterInterface
                 return MongoDbType::getType($type)->convertToDatabaseValue($value);
             case null:
             case self::STRATEGY_EXACT:
-                return $caseSensitive ? $value : new Regex("^$value$", $caseSensitive ? '' : 'i');
+                return $caseSensitive ? $value : new Regex("^$value$", 'i');
             case self::STRATEGY_PARTIAL:
                 return new Regex($value, $caseSensitive ? '' : 'i');
             case self::STRATEGY_START:
