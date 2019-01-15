@@ -80,11 +80,8 @@ final class SerializeListener
         $resources = new ResourceList();
         $context['resources'] = &$resources;
 
-        $resourcesToPush = [];
-        if (class_exists(AddLinkHeaderListener::class)) {
-            $resourcesToPush = new ResourceList();
-            $context['resources_to_push'] = &$resourcesToPush;
-        }
+        $resourcesToPush = new ResourceList();
+        $context['resources_to_push'] = &$resourcesToPush;
 
         $request->attributes->set('_api_normalization_context', $context);
 
