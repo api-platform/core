@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.2.10
+
+* /!\ Security: a vulnerability impacting the GraphQL subsystem was allowing users authorized to run mutations for a specific resource type, to execute it on any resource, of any type
+
 ## 2.2.9
 
 * Fix `ExistsFilter` for inverse side of OneToOne association
