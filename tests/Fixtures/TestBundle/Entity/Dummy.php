@@ -120,6 +120,7 @@ class Dummy
      * @var RelatedDummy A related dummy
      *
      * @ORM\ManyToOne(targetEntity="RelatedDummy")
+     * @ApiProperty(push=true)
      */
     public $relatedDummy;
 

@@ -28,6 +28,7 @@ use ApiPlatform\Core\Exception\InvalidArgumentException;
  *     @Attribute("fetchEager", type="bool"),
  *     @Attribute("openapiContext", type="array"),
  *     @Attribute("jsonldContext", type="array"),
+ *     @Attribute("push", type="bool"),
  *     @Attribute("swaggerContext", type="array")
  * )
  */
@@ -108,14 +109,21 @@ final class ApiProperty
      *
      * @var array
      */
-    private $swaggerContext;
+    private $openapiContext;
+
+    /**
+     * @see https://github.com/Haehnchen/idea-php-annotation-plugin/issues/112
+     *
+     * @var bool
+     */
+    private $push;
 
     /**
      * @see https://github.com/Haehnchen/idea-php-annotation-plugin/issues/112
      *
      * @var array
      */
-    private $openapiContext;
+    private $swaggerContext;
 
     /**
      * @throws InvalidArgumentException
