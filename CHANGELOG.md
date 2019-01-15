@@ -2,6 +2,7 @@
 
 ## 2.3.6
 
+* /!\ Security: a vulnerability impacting the GraphQL subsystem was allowing users authorized to run mutations for a specific resource type, to execute it on any resource, of any type
 * Fix normalization of raw collections (not API resources)
 * Fix content negotiation format matching
 
@@ -83,6 +84,10 @@
 * Upgrade Swagger UI and GraphiQL
 * GraphQL: Add a `totalCount` field in GraphQL paginated collections
 * JSONAPI: Allow inclusion of related resources
+
+## 2.2.10
+
+* /!\ Security: a vulnerability impacting the GraphQL subsystem was allowing users authorized to run mutations for a specific resource type, to execute it on any resource, of any type
 
 ## 2.2.9
 
