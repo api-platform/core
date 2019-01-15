@@ -5,12 +5,12 @@
 * MongoDB: full support
 * Elasticsearch: add reading support (including pagination, sort filter and term filter)
 * Mercure: automatically push updates to clients using the [Mercure](https://mercure.rocks) protocol
-* CQRS support and async messages handling using the Symfony Messenger Component
+* CQRS support and async message handling using the Symfony Messenger Component
 * OpenAPI: add support for OpenAPI v3 in addition to OpenAPI v2
-* OpenAPI: support generating a documentation using [ReDoc](https://github.com/Rebilly/ReDoc)
+* OpenAPI: support generating documentation using [ReDoc](https://github.com/Rebilly/ReDoc)
 * OpenAPI: basic hypermedia hints using OpenAPI v3 links
 * OpenAPI: expose the pagination controls
-* Allow to use custom classes for output and output (DTO) with the `input_class` and `output_class` attributes
+* Allow to use custom classes for input and output (DTO) with the `input_class` and `output_class` attributes
 * Allow to disable the input or the output by setting `input_class` and `output_class` to false
 * Guess and automatically set the appropriate Schema.org IRIs for common validation constraints
 * Allow to set custom cache HTTP headers using the `cache_headers` attribute
@@ -35,6 +35,7 @@
 
 ## 2.3.6
 
+* /!\ Security: a vulnerability impacting the GraphQL subsystem was allowing users authorized to run mutations for a specific resource type, to execute it on any resource, of any type
 * Fix normalization of raw collections (not API resources)
 * Fix content negotiation format matching
 
@@ -116,6 +117,10 @@
 * Upgrade Swagger UI and GraphiQL
 * GraphQL: Add a `totalCount` field in GraphQL paginated collections
 * JSONAPI: Allow inclusion of related resources
+
+## 2.2.10
+
+* /!\ Security: a vulnerability impacting the GraphQL subsystem was allowing users authorized to run mutations for a specific resource type, to execute it on any resource, of any type
 
 ## 2.2.9
 

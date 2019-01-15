@@ -113,7 +113,7 @@ class SerializeListenerTest extends TestCase
                 'xml',
                 Argument::allOf(
                     Argument::that(function (array $context) {
-                        return $context['resources'] instanceof ResourceList;
+                        return $context['resources'] instanceof ResourceList && $context['resources_to_push'] instanceof ResourceList;
                     }),
                     Argument::withEntry('request_uri', ''),
                     Argument::withEntry('resource_class', 'Foo'),
@@ -168,7 +168,7 @@ class SerializeListenerTest extends TestCase
                 'xml',
                 Argument::allOf(
                     Argument::that(function (array $context) {
-                        return $context['resources'] instanceof ResourceList;
+                        return $context['resources'] instanceof ResourceList && $context['resources_to_push'] instanceof ResourceList;
                     }),
                     Argument::withEntry('request_uri', ''),
                     Argument::withEntry('resource_class', 'Foo'),

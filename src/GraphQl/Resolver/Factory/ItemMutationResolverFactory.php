@@ -87,7 +87,7 @@ final class ItemMutationResolverFactory implements ResolverFactoryInterface
                 }
 
                 if ($resourceClass !== $this->getObjectClass($item)) {
-                    throw Error::createLocatedError(sprintf('Item "%s" did not match expected type "%s".', $args['input']['id'], $resourceClass), $info->fieldNodes, $info->path);
+                    throw Error::createLocatedError(sprintf('Item "%s" did not match expected type "%s".', $args['input']['id'], $resourceMetadata->getShortName()), $info->fieldNodes, $info->path);
                 }
             }
 
