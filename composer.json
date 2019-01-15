@@ -45,7 +45,7 @@
         "phpdocumentor/reflection-docblock": "^3.0 || ^4.0",
         "phpdocumentor/type-resolver": "^0.3 || ^0.4",
         "phpspec/prophecy": "^1.8",
-        "phpunit/phpunit": "^7.5.1",
+        "phpunit/phpunit": "^7.5.2",
         "psr/log": "^1.0",
         "ramsey/uuid": "^3.7",
         "ramsey/uuid-doctrine": "^1.4",
