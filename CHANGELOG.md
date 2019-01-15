@@ -4,6 +4,7 @@
 
 * Fix normalization of raw collections (not API resources)
 * Fix content negotiation format matching
+* GraphQL: check item resource class in mutation
 
 ## 2.3.5
 
