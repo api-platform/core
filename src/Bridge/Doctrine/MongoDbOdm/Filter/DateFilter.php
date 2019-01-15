@@ -107,7 +107,7 @@ class DateFilter extends AbstractFilter implements DateFilterInterface
     /**
      * Adds the match stage according to the chosen null management.
      */
-    private function addMatch(Builder $aggregationBuilder, string $field, string $operator, string $value, string $nullManagement = null)
+    private function addMatch(Builder $aggregationBuilder, string $field, string $operator, string $value, string $nullManagement = null): void
     {
         try {
             $value = new \DateTime($value);
@@ -127,10 +127,7 @@ class DateFilter extends AbstractFilter implements DateFilterInterface
             self::PARAMETER_STRICTLY_AFTER => '$gt',
         ];
 
-        if (null === $nullManagement || self::EXCLUDE_NULL === $nullManagement) {
-            $aggregationBuilder->match()->addAnd($aggregationBuilder->matchExpr()->field($field)->operator($operatorValue[$operator], $value));
-        } elseif (
-            (self::INCLUDE_NULL_BEFORE === $nullManagement && \in_array($operator, [self::PARAMETER_BEFORE, self::PARAMETER_STRICTLY_BEFORE], true)) ||
+        if ((self::INCLUDE_NULL_BEFORE === $nullManagement && \in_array($operator, [self::PARAMETER_BEFORE, self::PARAMETER_STRICTLY_BEFORE], true)) ||
             (self::INCLUDE_NULL_AFTER === $nullManagement && \in_array($operator, [self::PARAMETER_AFTER, self::PARAMETER_STRICTLY_AFTER], true)) ||
             (self::INCLUDE_NULL_BEFORE_AND_AFTER === $nullManagement && \in_array($operator, [self::PARAMETER_AFTER, self::PARAMETER_STRICTLY_AFTER, self::PARAMETER_BEFORE, self::PARAMETER_STRICTLY_BEFORE], true))
         ) {
@@ -138,11 +135,10 @@ class DateFilter extends AbstractFilter implements DateFilterInterface
                 $aggregationBuilder->matchExpr()->field($field)->operator($operatorValue[$operator], $value),
                 $aggregationBuilder->matchExpr()->field($field)->equals(null)
             );
-        } else {
-            $aggregationBuilder->match()->addAnd(
-                $aggregationBuilder->matchExpr()->field($field)->operator($operatorValue[$operator], $value),
-                $aggregationBuilder->matchExpr()->field($field)->notEqual(null)
-            );
+
+            return;
         }
+
+        $aggregationBuilder->match()->addAnd($aggregationBuilder->matchExpr()->field($field)->operator($operatorValue[$operator], $value));
     }
 }

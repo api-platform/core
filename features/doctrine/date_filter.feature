@@ -720,6 +720,54 @@ Feature: Date filter on collections
     And the JSON node "hydra:totalItems" should be equal to 3
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
 
+  @createSchema
+  Scenario: Get collection filtered by date that is not a datetime including null after
+    Given there are 3 dummydate objects with nullable dateIncludeNullAfter
+    When I send a "GET" request to "/dummy_dates?dateIncludeNullAfter[after]=2015-04-02"
+    Then the response status code should be 200
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+    And the JSON node "hydra:totalItems" should be equal to 2
+    And the JSON node "hydra:member[0].dateIncludeNullAfter" should be equal to "2015-04-02T00:00:00+00:00"
+    And the JSON node "hydra:member[1].dateIncludeNullAfter" should be null
+    When I send a "GET" request to "/dummy_dates?dateIncludeNullAfter[before]=2015-04-02"
+    Then the response status code should be 200
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+    And the JSON node "hydra:totalItems" should be equal to 2
+    And the JSON node "hydra:member[0].dateIncludeNullAfter" should be equal to "2015-04-01T00:00:00+00:00"
+    And the JSON node "hydra:member[1].dateIncludeNullAfter" should be equal to "2015-04-02T00:00:00+00:00"
+
+  @createSchema
+  Scenario: Get collection filtered by date that is not a datetime including null before
+    Given there are 3 dummydate objects with nullable dateIncludeNullBefore
+    When I send a "GET" request to "/dummy_dates?dateIncludeNullBefore[before]=2015-04-01"
+    Then the response status code should be 200
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+    And the JSON node "hydra:totalItems" should be equal to 2
+    And the JSON node "hydra:member[0].dateIncludeNullBefore" should be equal to "2015-04-01T00:00:00+00:00"
+    And the JSON node "hydra:member[1].dateIncludeNullBefore" should be null
+    When I send a "GET" request to "/dummy_dates?dateIncludeNullBefore[after]=2015-04-01"
+    Then the response status code should be 200
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+    And the JSON node "hydra:totalItems" should be equal to 2
+    And the JSON node "hydra:member[0].dateIncludeNullBefore" should be equal to "2015-04-01T00:00:00+00:00"
+    And the JSON node "hydra:member[1].dateIncludeNullBefore" should be equal to "2015-04-02T00:00:00+00:00"
+
+  @createSchema
+  Scenario: Get collection filtered by date that is not a datetime including null before and after
+    Given there are 3 dummydate objects with nullable dateIncludeNullBeforeAndAfter
+    When I send a "GET" request to "/dummy_dates?dateIncludeNullBeforeAndAfter[before]=2015-04-01"
+    Then the response status code should be 200
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+    And the JSON node "hydra:totalItems" should be equal to 2
+    And the JSON node "hydra:member[0].dateIncludeNullBeforeAndAfter" should be equal to "2015-04-01T00:00:00+00:00"
+    And the JSON node "hydra:member[1].dateIncludeNullBeforeAndAfter" should be null
+    When I send a "GET" request to "/dummy_dates?dateIncludeNullBeforeAndAfter[after]=2015-04-02"
+    Then the response status code should be 200
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+    And the JSON node "hydra:totalItems" should be equal to 2
+    And the JSON node "hydra:member[0].dateIncludeNullBeforeAndAfter" should be equal to "2015-04-02T00:00:00+00:00"
+    And the JSON node "hydra:member[1].dateIncludeNullBeforeAndAfter" should be null
+
   @!mongodb
   @createSchema
   Scenario: Get collection filtered by date that is an immutable date variant

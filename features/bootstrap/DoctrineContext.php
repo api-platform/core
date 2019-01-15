@@ -996,6 +996,63 @@ final class DoctrineContext implements Context
     }
 
     /**
+     * @Given there are :nb dummydate objects with nullable dateIncludeNullAfter
+     * @Given there is :nb dummydate object with nullable dateIncludeNullAfter
+     */
+    public function thereAreDummyDateObjectsWithNullableDateIncludeNullAfter(int $nb)
+    {
+        for ($i = 1; $i <= $nb; ++$i) {
+            $date = new \DateTime(sprintf('2015-04-%d', $i), new \DateTimeZone('UTC'));
+
+            $dummy = $this->buildDummyDate();
+            $dummy->dummyDate = $date;
+            $dummy->dateIncludeNullAfter = 0 === $i % 3 ? null : $date;
+
+            $this->manager->persist($dummy);
+        }
+
+        $this->manager->flush();
+    }
+
+    /**
+     * @Given there are :nb dummydate objects with nullable dateIncludeNullBefore
+     * @Given there is :nb dummydate object with nullable dateIncludeNullBefore
+     */
+    public function thereAreDummyDateObjectsWithNullableDateIncludeNullBefore(int $nb)
+    {
+        for ($i = 1; $i <= $nb; ++$i) {
+            $date = new \DateTime(sprintf('2015-04-%d', $i), new \DateTimeZone('UTC'));
+
+            $dummy = $this->buildDummyDate();
+            $dummy->dummyDate = $date;
+            $dummy->dateIncludeNullBefore = 0 === $i % 3 ? null : $date;
+
+            $this->manager->persist($dummy);
+        }
+
+        $this->manager->flush();
+    }
+
+    /**
+     * @Given there are :nb dummydate objects with nullable dateIncludeNullBeforeAndAfter
+     * @Given there is :nb dummydate object with nullable dateIncludeNullBeforeAndAfter
+     */
+    public function thereAreDummyDateObjectsWithNullableDateIncludeNullBeforeAndAfter(int $nb)
+    {
+        for ($i = 1; $i <= $nb; ++$i) {
+            $date = new \DateTime(sprintf('2015-04-%d', $i), new \DateTimeZone('UTC'));
+
+            $dummy = $this->buildDummyDate();
+            $dummy->dummyDate = $date;
+            $dummy->dateIncludeNullBeforeAndAfter = 0 === $i % 3 ? null : $date;
+
+            $this->manager->persist($dummy);
+        }
+
+        $this->manager->flush();
+    }
+
+    /**
      * @Given there are :nb dummyimmutabledate objects with dummyDate
      */
     public function thereAreDummyImmutableDateObjectsWithDummyDate(int $nb)
