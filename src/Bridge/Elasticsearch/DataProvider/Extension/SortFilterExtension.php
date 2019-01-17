@@ -18,7 +18,6 @@ use ApiPlatform\Core\Bridge\Elasticsearch\DataProvider\Filter\SortFilterInterfac
 /**
  * Applies filters on the sort parameter while querying resource collection.
  *
- * @see https://www.elastic.co/guide/en/elasticsearch/guide/current/_sorting.html
  * @see https://www.elastic.co/guide/en/elasticsearch/reference/current/search-request-sort.html
  *
  * @experimental

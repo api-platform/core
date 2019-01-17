@@ -32,7 +32,7 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\OrderFilter;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\RangeFilter;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 use ApiPlatform\Core\Bridge\Elasticsearch\Api\IdentifierExtractorInterface;
-use ApiPlatform\Core\Bridge\Elasticsearch\DataProvider\Extension\FullBodySearchCollectionExtensionInterface;
+use ApiPlatform\Core\Bridge\Elasticsearch\DataProvider\Extension\RequestBodySearchCollectionExtensionInterface;
 use ApiPlatform\Core\Bridge\Elasticsearch\DataProvider\Filter\OrderFilter as ElasticsearchOrderFilter;
 use ApiPlatform\Core\Bridge\Elasticsearch\DataProvider\Filter\TermFilter;
 use ApiPlatform\Core\Bridge\Elasticsearch\Metadata\Document\Factory\DocumentMetadataFactoryInterface;
@@ -452,7 +452,7 @@ class ApiPlatformExtensionTest extends TestCase
     public function testEnableElasticsearch()
     {
         $childDefinitionProphecy = $this->prophesize(ChildDefinition::class);
-        $childDefinitionProphecy->addTag('api_platform.elasticsearch.query_extension.collection')->shouldBeCalled();
+        $childDefinitionProphecy->addTag('api_platform.elasticsearch.request_body_search_extension.collection')->shouldBeCalled();
 
         $containerBuilderProphecy = $this->getBaseContainerBuilderProphecy();
         $containerBuilderProphecy->setParameter('api_platform.elasticsearch.enabled', false)->shouldNotBeCalled();
@@ -469,10 +469,10 @@ class ApiPlatformExtensionTest extends TestCase
         $containerBuilderProphecy->setDefinition('api_platform.elasticsearch.normalizer.item', Argument::type(Definition::class))->shouldBeCalled();
         $containerBuilderProphecy->setDefinition('api_platform.elasticsearch.item_data_provider', Argument::type(Definition::class))->shouldBeCalled();
         $containerBuilderProphecy->setDefinition('api_platform.elasticsearch.collection_data_provider', Argument::type(Definition::class))->shouldBeCalled();
-        $containerBuilderProphecy->setDefinition('api_platform.elasticsearch.query_extension.filter', Argument::type(Definition::class))->shouldBeCalled();
-        $containerBuilderProphecy->setDefinition('api_platform.elasticsearch.query_extension.constant_score_filter', Argument::type(Definition::class))->shouldBeCalled();
-        $containerBuilderProphecy->setDefinition('api_platform.elasticsearch.query_extension.sort_filter', Argument::type(Definition::class))->shouldBeCalled();
-        $containerBuilderProphecy->setDefinition('api_platform.elasticsearch.query_extension.sort', Argument::type(Definition::class))->shouldBeCalled();
+        $containerBuilderProphecy->setDefinition('api_platform.elasticsearch.request_body_search_extension.filter', Argument::type(Definition::class))->shouldBeCalled();
+        $containerBuilderProphecy->setDefinition('api_platform.elasticsearch.request_body_search_extension.constant_score_filter', Argument::type(Definition::class))->shouldBeCalled();
+        $containerBuilderProphecy->setDefinition('api_platform.elasticsearch.request_body_search_extension.sort_filter', Argument::type(Definition::class))->shouldBeCalled();
+        $containerBuilderProphecy->setDefinition('api_platform.elasticsearch.request_body_search_extension.sort', Argument::type(Definition::class))->shouldBeCalled();
         $containerBuilderProphecy->setDefinition('api_platform.elasticsearch.term_filter', Argument::type(Definition::class))->shouldBeCalled();
         $containerBuilderProphecy->setDefinition('api_platform.elasticsearch.order_filter', Argument::type(Definition::class))->shouldBeCalled();
         $containerBuilderProphecy->setAlias('api_platform.elasticsearch.metadata.document.metadata_factory', 'api_platform.elasticsearch.metadata.document.metadata_factory.configured')->shouldBeCalled();
@@ -480,14 +480,14 @@ class ApiPlatformExtensionTest extends TestCase
         $containerBuilderProphecy->setAlias(IdentifierExtractorInterface::class, 'api_platform.elasticsearch.identifier_extractor')->shouldBeCalled();
         $containerBuilderProphecy->setAlias(TermFilter::class, 'api_platform.elasticsearch.term_filter')->shouldBeCalled();
         $containerBuilderProphecy->setAlias(ElasticsearchOrderFilter::class, 'api_platform.elasticsearch.order_filter')->shouldBeCalled();
-        $containerBuilderProphecy->registerForAutoconfiguration(FullBodySearchCollectionExtensionInterface::class)->willReturn($childDefinitionProphecy)->shouldBeCalled();
-        $containerBuilderProphecy->setParameter('api_platform.elasticsearch.host', 'http://elasticsearch:9200')->shouldBeCalled();
+        $containerBuilderProphecy->registerForAutoconfiguration(RequestBodySearchCollectionExtensionInterface::class)->willReturn($childDefinitionProphecy)->shouldBeCalled();
+        $containerBuilderProphecy->setParameter('api_platform.elasticsearch.hosts', ['http://elasticsearch:9200'])->shouldBeCalled();
         $containerBuilderProphecy->setParameter('api_platform.elasticsearch.mapping', [])->shouldBeCalled();
 
         $config = self::DEFAULT_CONFIG;
         $config['api_platform']['elasticsearch'] = [
             'enabled' => true,
-            'host' => 'http://elasticsearch:9200',
+            'hosts' => ['http://elasticsearch:9200'],
             'mapping' => [],
         ];
 
