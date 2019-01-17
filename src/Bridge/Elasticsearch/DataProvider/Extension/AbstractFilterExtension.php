@@ -23,7 +23,7 @@ use Psr\Container\ContainerInterface;
  *
  * @author Baptiste Meyer <baptiste.meyer@gmail.com>
  */
-abstract class AbstractFilterExtension implements FullBodySearchCollectionExtensionInterface
+abstract class AbstractFilterExtension implements RequestBodySearchCollectionExtensionInterface
 {
     private $resourceMetadataFactory;
     private $filterLocator;

@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Tests\Bridge\Elasticsearch\DataProvider\Extension;
 
-use ApiPlatform\Core\Bridge\Elasticsearch\DataProvider\Extension\FullBodySearchCollectionExtensionInterface;
+use ApiPlatform\Core\Bridge\Elasticsearch\DataProvider\Extension\RequestBodySearchCollectionExtensionInterface;
 use ApiPlatform\Core\Bridge\Elasticsearch\DataProvider\Extension\SortFilterExtension;
 use ApiPlatform\Core\Bridge\Elasticsearch\DataProvider\Filter\ConstantScoreFilterInterface;
 use ApiPlatform\Core\Bridge\Elasticsearch\DataProvider\Filter\SortFilterInterface;
@@ -28,7 +28,7 @@ class SortFilterExtensionTest extends TestCase
     public function testConstruct()
     {
         self::assertInstanceOf(
-            FullBodySearchCollectionExtensionInterface::class,
+            RequestBodySearchCollectionExtensionInterface::class,
             new SortFilterExtension(
                 $this->prophesize(ResourceMetadataFactoryInterface::class)->reveal(),
                 $this->prophesize(ContainerInterface::class)->reveal()
