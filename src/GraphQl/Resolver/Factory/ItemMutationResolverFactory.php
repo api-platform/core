@@ -92,7 +92,9 @@ final class ItemMutationResolverFactory implements ResolverFactoryInterface
             }
 
             $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
-            $this->canAccess($this->resourceAccessChecker, $resourceMetadata, $resourceClass, $info, $item, $operationName);
+            if ('create' !== $operationName) {
+                $this->canAccess($this->resourceAccessChecker, $resourceMetadata, $resourceClass, $info, $item, $operationName);
+            }
 
             $inputMetadata = $resourceMetadata->getAttribute('input', ['class' => $resourceClass]);
             if (null === $resourceClass = $inputMetadata['class'] ?? null) {
@@ -105,6 +107,11 @@ final class ItemMutationResolverFactory implements ResolverFactoryInterface
                     $context = null === $item ? ['resource_class' => $resourceClass] : ['resource_class' => $resourceClass, 'object_to_populate' => $item];
                     $context += $resourceMetadata->getGraphqlAttribute($operationName, 'denormalization_context', [], true);
                     $item = $this->normalizer->denormalize($args['input'], $resourceClass, ItemNormalizer::FORMAT, $context);
+
+                    if ('create' === $operationName) {
+                        $this->canAccess($this->resourceAccessChecker, $resourceMetadata, $resourceClass, $info, $item, $operationName);
+                    }
+
                     $this->validate($item, $info, $resourceMetadata, $operationName);
                     $persistResult = $this->dataPersister->persist($item);
 
