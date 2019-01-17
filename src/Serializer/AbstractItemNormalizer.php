@@ -531,7 +531,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
      */
     protected function normalizeRelation(PropertyMetadata $propertyMetadata, $relatedObject, string $resourceClass, string $format = null, array $context)
     {
-        if (null === $relatedObject || $propertyMetadata->isReadableLink() || !empty($context['attributes'])) {
+        if (null === $relatedObject || !empty($context['attributes']) || $propertyMetadata->isReadableLink()) {
             if (null === $relatedObject) {
                 unset($context['resource_class']);
             } else {
@@ -547,6 +547,9 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
         $iri = $this->iriConverter->getIriFromItem($relatedObject);
         if (isset($context['resources'])) {
             $context['resources'][$iri] = $iri;
+        }
+        if (isset($context['resources_to_push']) && $propertyMetadata->getAttribute('push', false)) {
+            $context['resources_to_push'][$iri] = $iri;
         }
 
         return $iri;

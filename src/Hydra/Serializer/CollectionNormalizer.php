@@ -18,6 +18,7 @@ use ApiPlatform\Core\Api\OperationType;
 use ApiPlatform\Core\Api\ResourceClassResolverInterface;
 use ApiPlatform\Core\DataProvider\PaginatorInterface;
 use ApiPlatform\Core\DataProvider\PartialPaginatorInterface;
+use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\JsonLd\ContextBuilderInterface;
 use ApiPlatform\Core\JsonLd\Serializer\JsonLdContextTrait;
 use ApiPlatform\Core\Serializer\ContextTrait;
@@ -65,15 +66,18 @@ final class CollectionNormalizer implements NormalizerInterface, NormalizerAware
     public function normalize($object, $format = null, array $context = [])
     {
         if (isset($context['api_sub_level'])) {
-            $data = [];
-            foreach ($object as $index => $obj) {
-                $data[$index] = $this->normalizer->normalize($obj, $format, $context);
-            }
-
-            return $data;
+            return $this->normalizeRawCollection($object, $format, $context);
         }
 
-        $resourceClass = $this->resourceClassResolver->getResourceClass($object, $context['resource_class'] ?? null, true);
+        try {
+            $resourceClass = $this->resourceClassResolver->getResourceClass($object, $context['resource_class'] ?? null, true);
+        } catch (InvalidArgumentException $e) {
+            if (!isset($context['resource_class'])) {
+                return $this->normalizeRawCollection($object, $format, $context);
+            }
+
+            throw $e;
+        }
         $data = $this->addJsonLdContext($this->contextBuilder, $resourceClass, $context);
         $context = $this->initContext($resourceClass, $context);
 
@@ -108,5 +112,18 @@ final class CollectionNormalizer implements NormalizerInterface, NormalizerAware
     public function hasCacheableSupportsMethod(): bool
     {
         return true;
+    }
+
+    /**
+     * Normalizes a raw collection (not API resources).
+     */
+    private function normalizeRawCollection($object, $format = null, array $context = []): array
+    {
+        $data = [];
+        foreach ($object as $index => $obj) {
+            $data[$index] = $this->normalizer->normalize($obj, $format, $context);
+        }
+
+        return $data;
     }
 }
