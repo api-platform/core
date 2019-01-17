@@ -119,6 +119,7 @@
             <argument type="service" id="api_platform.property_accessor" />
             <argument type="service" id="api_platform.elasticsearch.name_converter.inner_fields" />
         </service>
+        <service id="ApiPlatform\Core\Bridge\Elasticsearch\DataProvider\Filter\TermFilter" alias="api_platform.elasticsearch.term_filter" />
 
         <service id="api_platform.elasticsearch.order_filter" class="ApiPlatform\Core\Bridge\Elasticsearch\DataProvider\Filter\OrderFilter" public="false" abstract="true">
             <argument type="service" id="api_platform.metadata.property.name_collection_factory" />
@@ -127,6 +128,7 @@
             <argument type="service" id="api_platform.elasticsearch.name_converter.inner_fields" />
             <argument>%api_platform.collection.order_parameter_name%</argument>
         </service>
+        <service id="ApiPlatform\Core\Bridge\Elasticsearch\DataProvider\Filter\OrderFilter" alias="api_platform.elasticsearch.order_filter" />
     </services>
 
 </container>

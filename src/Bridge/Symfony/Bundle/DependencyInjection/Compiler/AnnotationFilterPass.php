@@ -16,6 +16,7 @@ namespace ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\Compiler;
 use ApiPlatform\Core\Util\AnnotationFilterExtractorTrait;
 use ApiPlatform\Core\Util\ReflectionClassRecursiveIterator;
 use Doctrine\Common\Annotations\Reader;
+use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
@@ -56,8 +57,13 @@ final class AnnotationFilterPass implements CompilerPassInterface
                 continue;
             }
 
-            $definition = new Definition();
-            $definition->setClass($filterClass);
+            if ($container->has($filterClass) && $container->findDefinition($filterClass)->isAbstract()) {
+                $definition = new ChildDefinition($filterClass);
+            } else {
+                $definition = new Definition();
+                $definition->setClass($filterClass);
+            }
+
             $definition->addTag(self::TAG_FILTER_NAME);
             $definition->setAutowired(true);
 
