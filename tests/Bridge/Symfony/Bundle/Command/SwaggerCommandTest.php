@@ -81,6 +81,16 @@ YAML;
 
         $this->assertContains($expected, $result, 'arrays should be correctly formatted.');
         $this->assertContains('openapi: 3.0.2', $result);
+
+        $expected = <<<YAML
+info:
+    title: 'My Dummy API'
+    version: 0.0.0
+    description: |
+        This is a test API.
+        Made with love
+YAML;
+        $this->assertContains($expected, $result, 'multiline formatting must be preserved (using literal style).');
     }
 
     public function testExecuteOpenApiVersion2WithYaml()

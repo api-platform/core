@@ -41,7 +41,9 @@ mercure:
 
 api_platform:
     title:                             'My Dummy API'
-    description:                       'This is a test API.'
+    description: |
+        This is a test API.
+        Made with love
     allow_plain_identifiers:           true
     formats:
         jsonld:                        ['application/ld+json']
