@@ -13,8 +13,9 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Bridge\Doctrine\Orm\Filter;
 
+use ApiPlatform\Core\Bridge\Doctrine\Common\Filter\RangeFilterInterface;
+use ApiPlatform\Core\Bridge\Doctrine\Common\Filter\RangeFilterTrait;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGeneratorInterface;
-use ApiPlatform\Core\Exception\InvalidArgumentException;
 use Doctrine\ORM\QueryBuilder;
 
 /**
@@ -22,40 +23,9 @@ use Doctrine\ORM\QueryBuilder;
  *
  * @author Lee Siong Chan <ahlee2326@me.com>
  */
-class RangeFilter extends AbstractContextAwareFilter
+class RangeFilter extends AbstractContextAwareFilter implements RangeFilterInterface
 {
-    const PARAMETER_BETWEEN = 'between';
-    const PARAMETER_GREATER_THAN = 'gt';
-    const PARAMETER_GREATER_THAN_OR_EQUAL = 'gte';
-    const PARAMETER_LESS_THAN = 'lt';
-    const PARAMETER_LESS_THAN_OR_EQUAL = 'lte';
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getDescription(string $resourceClass): array
-    {
-        $description = [];
-
-        $properties = $this->properties;
-        if (null === $properties) {
-            $properties = array_fill_keys($this->getClassMetadata($resourceClass)->getFieldNames(), null);
-        }
-
-        foreach ($properties as $property => $unused) {
-            if (!$this->isPropertyMapped($property, $resourceClass)) {
-                continue;
-            }
-
-            $description += $this->getFilterDescription($property, self::PARAMETER_BETWEEN);
-            $description += $this->getFilterDescription($property, self::PARAMETER_GREATER_THAN);
-            $description += $this->getFilterDescription($property, self::PARAMETER_GREATER_THAN_OR_EQUAL);
-            $description += $this->getFilterDescription($property, self::PARAMETER_LESS_THAN);
-            $description += $this->getFilterDescription($property, self::PARAMETER_LESS_THAN_OR_EQUAL);
-        }
-
-        return $description;
-    }
+    use RangeFilterTrait;
 
     /**
      * {@inheritdoc}
@@ -67,6 +37,11 @@ class RangeFilter extends AbstractContextAwareFilter
             !$this->isPropertyEnabled($property, $resourceClass) ||
             !$this->isPropertyMapped($property, $resourceClass)
         ) {
+            return;
+        }
+
+        $values = $this->normalizeValues($values, $property);
+        if (null === $values) {
             return;
         }
 
@@ -105,19 +80,8 @@ class RangeFilter extends AbstractContextAwareFilter
             case self::PARAMETER_BETWEEN:
                 $rangeValue = explode('..', $value);
 
-                if (2 !== \count($rangeValue)) {
-                    $this->logger->notice('Invalid filter ignored', [
-                        'exception' => new InvalidArgumentException(sprintf('Invalid format for "[%s]", expected "<min>..<max>"', $operator)),
-                    ]);
-
-                    return;
-                }
-
-                if (!is_numeric($rangeValue[0]) || !is_numeric($rangeValue[1])) {
-                    $this->logger->notice('Invalid filter ignored', [
-                        'exception' => new InvalidArgumentException(sprintf('Invalid values for "[%s]" range, expected numbers', $operator)),
-                    ]);
-
+                $rangeValue = $this->normalizeBetweenValues($rangeValue, $field);
+                if (null === $rangeValue) {
                     return;
                 }
 
@@ -128,11 +92,8 @@ class RangeFilter extends AbstractContextAwareFilter
 
                 break;
             case self::PARAMETER_GREATER_THAN:
-                if (!is_numeric($value)) {
-                    $this->logger->notice('Invalid filter ignored', [
-                        'exception' => new InvalidArgumentException(sprintf('Invalid value for "[%s]", expected number', $operator)),
-                    ]);
-
+                $value = $this->normalizeValue($value, $field, $operator);
+                if (null === $value) {
                     return;
                 }
 
@@ -142,11 +103,8 @@ class RangeFilter extends AbstractContextAwareFilter
 
                 break;
             case self::PARAMETER_GREATER_THAN_OR_EQUAL:
-                if (!is_numeric($value)) {
-                    $this->logger->notice('Invalid filter ignored', [
-                        'exception' => new InvalidArgumentException(sprintf('Invalid value for "[%s]", expected number', $operator)),
-                    ]);
-
+                $value = $this->normalizeValue($value, $field, $operator);
+                if (null === $value) {
                     return;
                 }
 
@@ -156,11 +114,8 @@ class RangeFilter extends AbstractContextAwareFilter
 
                 break;
             case self::PARAMETER_LESS_THAN:
-                if (!is_numeric($value)) {
-                    $this->logger->notice('Invalid filter ignored', [
-                        'exception' => new InvalidArgumentException(sprintf('Invalid value for "[%s]", expected number', $operator)),
-                    ]);
-
+                $value = $this->normalizeValue($value, $field, $operator);
+                if (null === $value) {
                     return;
                 }
 
@@ -170,11 +125,8 @@ class RangeFilter extends AbstractContextAwareFilter
 
                 break;
             case self::PARAMETER_LESS_THAN_OR_EQUAL:
-                if (!is_numeric($value)) {
-                    $this->logger->notice('Invalid filter ignored', [
-                        'exception' => new InvalidArgumentException(sprintf('Invalid value for "[%s]", expected number', $operator)),
-                    ]);
-
+                $value = $this->normalizeValue($value, $field, $operator);
+                if (null === $value) {
                     return;
                 }
 
@@ -184,19 +136,5 @@ class RangeFilter extends AbstractContextAwareFilter
 
                 break;
         }
-    }
-
-    /**
-     * Gets filter description.
-     */
-    protected function getFilterDescription(string $fieldName, string $operator): array
-    {
-        return [
-            sprintf('%s[%s]', $fieldName, $operator) => [
-                'property' => $fieldName,
-                'type' => 'string',
-                'required' => false,
-            ],
-        ];
     }
 }

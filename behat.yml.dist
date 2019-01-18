@@ -38,6 +38,25 @@ default:
         - 'Behatch\Context\RestContext'
       filters:
         tags: '~@sqlite&&~@elasticsearch'
+    mongodb:
+      contexts:
+        - 'DoctrineContext':
+            doctrine: '@doctrine_mongodb'
+        - 'HttpHeaderContext'
+        - 'GraphqlContext'
+        - 'JsonContext'
+        - 'HydraContext'
+        - 'SwaggerContext'
+        - 'HttpCacheContext'
+        - 'JsonApiContext':
+            doctrine: '@doctrine_mongodb'
+            jsonApiSchemaFile: '%paths.base%/tests/Fixtures/JsonSchema/jsonapi.json'
+        - 'JsonHalContext':
+            schemaFile: '%paths.base%/tests/Fixtures/JsonHal/jsonhal.json'
+        - 'Behat\MinkExtension\Context\MinkContext'
+        - 'Behatch\Context\RestContext'
+      filters:
+        tags: '~@sqlite&&~@elasticsearch&&~@!mongodb'
     elasticsearch:
       paths:
         - '%paths.base%/features/elasticsearch'

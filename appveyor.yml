@@ -9,7 +9,13 @@ install:
   - ps: Set-Service wuauserv -StartupType Manual
   - cinst -y php composer
   - refreshenv
-  - cd c:\tools\php73
+  - cd c:\tools\php73\ext
+  - ps: |
+      $web = New-Object Net.WebClient
+      $web.Headers.Add('user-agent', 'AppVeyor')
+      $web.DownloadFile('https://windows.php.net/downloads/pecl/releases/mongodb/1.5.3/php_mongodb-1.5.3-7.3-nts-vc15-x64.zip', 'c:\tools\php73\ext\php_mongodb.zip')
+  - 7z x php_mongodb.zip -y >nul
+  - cd ..
   - copy php.ini-production php.ini /Y
   - echo date.timezone="UTC" >> php.ini
   - echo extension_dir=ext >> php.ini
@@ -17,9 +23,13 @@ install:
   - echo extension=php_mbstring.dll >> php.ini
   - echo extension=php_intl.dll >> php.ini
   - echo extension=php_pdo_sqlite.dll >> php.ini
+  - echo extension=php_mongodb.dll >> php.ini
   - echo memory_limit=3G >> php.ini
   - cd %APPVEYOR_BUILD_FOLDER%
-  - composer install --no-interaction --no-progress --no-suggest
+  - composer install --no-interaction --no-progress --no-suggest --ignore-platform-reqs
+
+services:
+  - mongodb
 
 test_script:
   - cd %APPVEYOR_BUILD_FOLDER%

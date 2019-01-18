@@ -151,6 +151,12 @@ class ConfigurationTest extends TestCase
                 'vary' => ['Accept'],
                 'public' => null,
             ],
+            'doctrine' => [
+                'enabled' => true,
+            ],
+            'doctrine_mongodb_odm' => [
+                'enabled' => true,
+            ],
             'mercure' => [
                 'enabled' => true,
                 'hub_url' => null,

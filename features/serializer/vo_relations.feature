@@ -132,7 +132,7 @@ Feature: Value object as ApiResource
           "enum": ["An error occurred"]
         },
         "hydra:description": {
-          "enum": ["Cannot create an instance of ApiPlatform\\Core\\Tests\\Fixtures\\TestBundle\\Entity\\VoDummyCar from serialized data because its constructor requires parameter \"drivers\" to be present."]
+          "pattern": "^Cannot create an instance of ApiPlatform\\\\Core\\\\Tests\\\\Fixtures\\\\TestBundle\\\\(Document|Entity)\\\\VoDummyCar from serialized data because its constructor requires parameter \"drivers\" to be present.$"
         }
       }
     }

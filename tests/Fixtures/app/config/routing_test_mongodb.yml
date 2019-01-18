@@ -1,0 +1,6 @@
+_main:
+    resource: routing_common.yml
+
+controller:
+    resource: '@TestBundle/Controller/MongoDbOdm'
+    type: annotation

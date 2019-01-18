@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Bridge\Doctrine\Orm\Filter;
 
+use ApiPlatform\Core\Bridge\Doctrine\Common\Filter\BooleanFilterTrait;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGeneratorInterface;
-use ApiPlatform\Core\Exception\InvalidArgumentException;
 use Doctrine\DBAL\Types\Type as DBALType;
 use Doctrine\ORM\QueryBuilder;
 
@@ -32,32 +32,11 @@ use Doctrine\ORM\QueryBuilder;
  */
 class BooleanFilter extends AbstractContextAwareFilter
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function getDescription(string $resourceClass): array
-    {
-        $description = [];
+    use BooleanFilterTrait;
 
-        $properties = $this->properties;
-        if (null === $properties) {
-            $properties = array_fill_keys($this->getClassMetadata($resourceClass)->getFieldNames(), null);
-        }
-
-        foreach ($properties as $property => $unused) {
-            if (!$this->isPropertyMapped($property, $resourceClass) || !$this->isBooleanField($property, $resourceClass)) {
-                continue;
-            }
-
-            $description[$property] = [
-                'property' => $property,
-                'type' => 'bool',
-                'required' => false,
-            ];
-        }
-
-        return $description;
-    }
+    const DOCTRINE_BOOLEAN_TYPES = [
+        DBALType::BOOLEAN => true,
+    ];
 
     /**
      * {@inheritdoc}
@@ -72,20 +51,8 @@ class BooleanFilter extends AbstractContextAwareFilter
             return;
         }
 
-        if (\in_array($value, [true, 'true', '1'], true)) {
-            $value = true;
-        } elseif (\in_array($value, [false, 'false', '0'], true)) {
-            $value = false;
-        } else {
-            $this->logger->notice('Invalid filter ignored', [
-                'exception' => new InvalidArgumentException(sprintf('Invalid boolean value for "%s" property, expected one of ( "%s" )', $property, implode('" | "', [
-                    'true',
-                    'false',
-                    '1',
-                    '0',
-                ]))),
-            ]);
-
+        $value = $this->normalizeValue($value, $property);
+        if (null === $value) {
             return;
         }
 
@@ -101,16 +68,5 @@ class BooleanFilter extends AbstractContextAwareFilter
         $queryBuilder
             ->andWhere(sprintf('%s.%s = :%s', $alias, $field, $valueParameter))
             ->setParameter($valueParameter, $value);
-    }
-
-    /**
-     * Determines whether the given property refers to a boolean field.
-     */
-    protected function isBooleanField(string $property, string $resourceClass): bool
-    {
-        $propertyParts = $this->splitPropertyParts($property, $resourceClass);
-        $metadata = $this->getNestedMetadata($resourceClass, $propertyParts['associations']);
-
-        return DBALType::BOOLEAN === $metadata->getTypeOfField($propertyParts['field']);
     }
 }

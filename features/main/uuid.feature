@@ -107,6 +107,7 @@ Feature: Using uuid identifier on resource
     Then the response status code should be 204
     And the response should be empty
 
+  @!mongodb
   @createSchema
   Scenario: Retrieve a resource identified by Ramsey\Uuid\Uuid
     Given there is a ramsey identified resource with uuid "41B29566-144B-11E6-A148-3E1D05DEFE78"
@@ -116,11 +117,13 @@ Feature: Using uuid identifier on resource
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
 
+  @!mongodb
   Scenario: Delete a resource identified by a Ramsey\Uuid\Uuid
     When I send a "DELETE" request to "/ramsey_uuid_dummies/41B29566-144B-11E6-A148-3E1D05DEFE78"
     Then the response status code should be 204
     And the response should be empty
 
+  @!mongodb
   Scenario: Retrieve a resource identified by a bad Ramsey\Uuid\Uuid
     When I add "Content-Type" header equal to "application/ld+json"
     And I send a "GET" request to "/ramsey_uuid_dummies/41B29566-144B-E1D05DEFE78"

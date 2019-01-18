@@ -164,6 +164,7 @@ Feature: Collections support
     }
     """
 
+  @!mongodb
   Scenario: Enable the partial pagination client side
     When I send a "GET" request to "/dummies?page=7&partial=1"
     Then the response status code should be 200
@@ -395,6 +396,7 @@ Feature: Collections support
     }
     """
 
+  @!mongodb
   @createSchema
   Scenario: Allow passing 0 to `itemsPerPage`
     When I send a "GET" request to "/dummies?itemsPerPage=0"

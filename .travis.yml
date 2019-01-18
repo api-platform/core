@@ -8,6 +8,10 @@ cache:
 jobs:
   include:
     - php: '7.1'
+      env: NO_UNIT_TESTS=true
+      before_install:
+        - composer remove --dev ext-mongodb doctrine/mongodb-odm doctrine/mongodb-odm-bundle
+        - sed -i '26,32d' tests/Fixtures/app/config/config_common.yml
     - php: '7.2'
     - php: '7.3'
     - php: '7.3'
@@ -28,6 +32,10 @@ jobs:
       env: APP_ENV=mysql
     - php: '7.3'
       services:
+        - mongodb
+      env: APP_ENV=mongodb
+    - php: '7.3'
+      services:
         - elasticsearch
       env: APP_ENV=elasticsearch
   allow_failures:
@@ -40,6 +48,7 @@ before_install:
     fi
   - phpenv config-rm xdebug.ini || echo "xdebug not available"
   - echo "memory_limit=-1" >> ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/travis.ini
+  - echo "extension=mongodb.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
   - export PATH="$PATH:$HOME/.composer/vendor/bin"
 
 install:
@@ -51,10 +60,17 @@ install:
 
 script:
   - tests/Fixtures/app/console cache:clear
-  - vendor/bin/phpunit
+  - if [[ $NO_UNIT_TESTS != true ]]; then
+      vendor/bin/phpunit;
+    fi
+  - if [[ $APP_ENV = 'mongodb' ]]; then
+      vendor/bin/phpunit -c phpunit.mongo.xml;
+    fi
   - tests/Fixtures/app/console cache:clear
   - if [[ $APP_ENV = 'postgres' ]]; then
       vendor/bin/behat --suite=postgres --format=progress;
+    elif [[ $APP_ENV = 'mongodb' ]]; then
+      vendor/bin/behat --suite=mongodb --format=progress;
     elif [[ $APP_ENV = 'elasticsearch' ]]; then
       vendor/bin/behat --suite=elasticsearch --format=progress;
     else

@@ -2,6 +2,7 @@
 
 ## 2.4.0
 
+* MongoDB: full support
 * Elasticsearch: add reading support (including pagination, sort filter and term filter)
 * Mercure: automatically push updates to clients using the [Mercure](https://mercure.rocks) protocol
 * CQRS support and async message handling using the Symfony Messenger Component

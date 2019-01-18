@@ -66,7 +66,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             $this->setCircularReferenceHandler($defaultContext['circular_reference_handler']);
         }
 
-        parent::__construct($classMetadataFactory, $nameConverter, null, null, null, $defaultContext);
+        parent::__construct($classMetadataFactory, $nameConverter, null, null, \Closure::fromCallable([$this, 'getObjectClass']), $defaultContext);
 
         $this->propertyNameCollectionFactory = $propertyNameCollectionFactory;
         $this->propertyMetadataFactory = $propertyMetadataFactory;
