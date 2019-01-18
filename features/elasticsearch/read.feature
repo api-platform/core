@@ -121,7 +121,7 @@ Feature: Retrieve from Elasticsearch
       },
       "hydra:search": {
         "@type": "hydra:IriTemplate",
-        "hydra:template": "\/tweets{?order[id],order[author.id]}",
+        "hydra:template": "/tweets{?order[id],order[author.id],message,message[],author.firstName,author.firstName[]}",
         "hydra:variableRepresentation": "BasicRepresentation",
         "hydra:mapping": [
           {
@@ -134,6 +134,30 @@ Feature: Retrieve from Elasticsearch
             "@type": "IriTemplateMapping",
             "variable": "order[author.id]",
             "property": "author.id",
+            "required": false
+          },
+          {
+            "@type": "IriTemplateMapping",
+            "variable": "message",
+            "property": "message",
+            "required": false
+          },
+          {
+            "@type": "IriTemplateMapping",
+            "variable": "message[]",
+            "property": "message",
+            "required": false
+          },
+          {
+            "@type": "IriTemplateMapping",
+            "variable": "author.firstName",
+            "property": "author.firstName",
+            "required": false
+          },
+          {
+            "@type": "IriTemplateMapping",
+            "variable": "author.firstName[]",
+            "property": "author.firstName",
             "required": false
           }
         ]
@@ -213,7 +237,7 @@ Feature: Retrieve from Elasticsearch
       },
       "hydra:search": {
         "@type": "hydra:IriTemplate",
-        "hydra:template": "\/tweets{?order[id],order[author.id]}",
+        "hydra:template": "/tweets{?order[id],order[author.id],message,message[],author.firstName,author.firstName[]}",
         "hydra:variableRepresentation": "BasicRepresentation",
         "hydra:mapping": [
           {
@@ -226,6 +250,30 @@ Feature: Retrieve from Elasticsearch
             "@type": "IriTemplateMapping",
             "variable": "order[author.id]",
             "property": "author.id",
+            "required": false
+          },
+          {
+            "@type": "IriTemplateMapping",
+            "variable": "message",
+            "property": "message",
+            "required": false
+          },
+          {
+            "@type": "IriTemplateMapping",
+            "variable": "message[]",
+            "property": "message",
+            "required": false
+          },
+          {
+            "@type": "IriTemplateMapping",
+            "variable": "author.firstName",
+            "property": "author.firstName",
+            "required": false
+          },
+          {
+            "@type": "IriTemplateMapping",
+            "variable": "author.firstName[]",
+            "property": "author.firstName",
             "required": false
           }
         ]
@@ -288,7 +336,7 @@ Feature: Retrieve from Elasticsearch
       },
       "hydra:search": {
         "@type": "hydra:IriTemplate",
-        "hydra:template": "\/tweets{?order[id],order[author.id]}",
+        "hydra:template": "/tweets{?order[id],order[author.id],message,message[],author.firstName,author.firstName[]}",
         "hydra:variableRepresentation": "BasicRepresentation",
         "hydra:mapping": [
           {
@@ -301,6 +349,30 @@ Feature: Retrieve from Elasticsearch
             "@type": "IriTemplateMapping",
             "variable": "order[author.id]",
             "property": "author.id",
+            "required": false
+          },
+          {
+            "@type": "IriTemplateMapping",
+            "variable": "message",
+            "property": "message",
+            "required": false
+          },
+          {
+            "@type": "IriTemplateMapping",
+            "variable": "message[]",
+            "property": "message",
+            "required": false
+          },
+          {
+            "@type": "IriTemplateMapping",
+            "variable": "author.firstName",
+            "property": "author.firstName",
+            "required": false
+          },
+          {
+            "@type": "IriTemplateMapping",
+            "variable": "author.firstName[]",
+            "property": "author.firstName",
             "required": false
           }
         ]

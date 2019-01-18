@@ -16,6 +16,7 @@ namespace ApiPlatform\Core\Tests\Fixtures\Elasticsearch\Model;
 use ApiPlatform\Core\Annotation\ApiFilter;
 use ApiPlatform\Core\Annotation\ApiProperty;
 use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Core\Bridge\Elasticsearch\DataProvider\Filter\MatchFilter;
 use ApiPlatform\Core\Bridge\Elasticsearch\DataProvider\Filter\OrderFilter;
 use Symfony\Component\Serializer\Annotation\Groups;
 
@@ -26,6 +27,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
  *     }
  * )
  * @ApiFilter(OrderFilter::class, properties={"id", "author.id"})
+ * @ApiFilter(MatchFilter::class, properties={"message", "author.firstName"})
  */
 class Tweet
 {

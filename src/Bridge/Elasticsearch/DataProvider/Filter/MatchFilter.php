@@ -14,32 +14,33 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Bridge\Elasticsearch\DataProvider\Filter;
 
 /**
- * Filter the collection by given properties using a term level query.
+ * Filter the collection by given properties using a full text query.
  *
- * @see https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-term-query.html
- * @see https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-terms-query.html
+ * @see https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-match-query.html
  *
  * @experimental
  *
  * @author Baptiste Meyer <baptiste.meyer@gmail.com>
  */
-final class TermFilter extends AbstractSearchFilter
+final class MatchFilter extends AbstractSearchFilter
 {
     /**
      * {@inheritdoc}
      */
     protected function getQuery(string $property, array $values, ?string $nestedPath): array
     {
-        if (1 === \count($values)) {
-            $termQuery = ['term' => [$property => reset($values)]];
-        } else {
-            $termQuery = ['terms' => [$property => $values]];
+        $matches = [];
+
+        foreach ($values as $value) {
+            $matches[] = ['match' => [$property => $value]];
         }
+
+        $matchQuery = isset($matches[1]) ? ['bool' => ['should' => $matches]] : $matches[0];
 
         if (null !== $nestedPath) {
-            $termQuery = ['nested' => ['path' => $nestedPath, 'query' => $termQuery]];
+            $matchQuery = ['nested' => ['path' => $nestedPath, 'query' => $matchQuery]];
         }
 
-        return $termQuery;
+        return $matchQuery;
     }
 }
