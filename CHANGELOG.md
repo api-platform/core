@@ -1,6 +1,6 @@
 # Changelog
 
-## 2.4.0
+## 2.4.0 beta 1
 
 * MongoDB: full support
 * Elasticsearch: add reading support (including pagination, sort filter and term filter)
