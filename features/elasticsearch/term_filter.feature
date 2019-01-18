@@ -6,7 +6,6 @@ Feature: Term filter on collections from Elasticsearch
 
   Scenario: Term filter on an identifier property
     When I send a "GET" request to "/users?id=%2Fusers%2Fcf875c95-41ab-48df-af66-38c74db18f72"
-    Then the response should be in JSON
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"

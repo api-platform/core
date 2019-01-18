@@ -103,7 +103,7 @@
             <tag name="api_platform.elasticsearch.request_body_search_extension.collection" priority="10" />
         </service>
 
-        <service id="api_platform.elasticsearch.term_filter" class="ApiPlatform\Core\Bridge\Elasticsearch\DataProvider\Filter\TermFilter" public="false" abstract="true">
+        <service id="api_platform.elasticsearch.search_filter" public="false" abstract="true">
             <argument type="service" id="api_platform.metadata.property.name_collection_factory" />
             <argument type="service" id="api_platform.metadata.property.metadata_factory" />
             <argument type="service" id="api_platform.resource_class_resolver" />
@@ -112,7 +112,12 @@
             <argument type="service" id="api_platform.property_accessor" />
             <argument type="service" id="api_platform.elasticsearch.name_converter.inner_fields" />
         </service>
+
+        <service id="api_platform.elasticsearch.term_filter" class="ApiPlatform\Core\Bridge\Elasticsearch\DataProvider\Filter\TermFilter" parent="api_platform.elasticsearch.search_filter" public="false" abstract="true" />
         <service id="ApiPlatform\Core\Bridge\Elasticsearch\DataProvider\Filter\TermFilter" alias="api_platform.elasticsearch.term_filter" />
+
+        <service id="api_platform.elasticsearch.match_filter" class="ApiPlatform\Core\Bridge\Elasticsearch\DataProvider\Filter\MatchFilter" parent="api_platform.elasticsearch.search_filter" public="false" abstract="true" />
+        <service id="ApiPlatform\Core\Bridge\Elasticsearch\DataProvider\Filter\MatchFilter" alias="api_platform.elasticsearch.match_filter" />
 
         <service id="api_platform.elasticsearch.order_filter" class="ApiPlatform\Core\Bridge\Elasticsearch\DataProvider\Filter\OrderFilter" public="false" abstract="true">
             <argument type="service" id="api_platform.metadata.property.name_collection_factory" />
