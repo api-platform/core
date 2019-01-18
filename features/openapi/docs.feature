@@ -13,7 +13,8 @@ Feature: Documentation support
     And the JSON node "openapi" should be equal to "3.0.2"
     # Root properties
     And the JSON node "info.title" should be equal to "My Dummy API"
-    And the JSON node "info.description" should be equal to "This is a test API."
+    And the JSON node "info.description" should contain "This is a test API."
+    And the JSON node "info.description" should contain "Made with love"
     # Supported classes
     And the OpenAPI class "AbstractDummy" exists
     And the OpenAPI class "CircularReference" exists
