@@ -97,6 +97,7 @@ class ConfigurationTest extends TestCase
             ],
             'elasticsearch' => [
                 'enabled' => false,
+                'hosts' => [],
                 'mapping' => [],
             ],
             'oauth' => [

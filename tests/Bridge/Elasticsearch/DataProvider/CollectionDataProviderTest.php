@@ -15,7 +15,7 @@ namespace ApiPlatform\Core\Tests\Bridge\Elasticsearch\DataProvider;
 
 use ApiPlatform\Core\Bridge\Elasticsearch\Api\IdentifierExtractorInterface;
 use ApiPlatform\Core\Bridge\Elasticsearch\DataProvider\CollectionDataProvider;
-use ApiPlatform\Core\Bridge\Elasticsearch\DataProvider\Extension\FullBodySearchCollectionExtensionInterface;
+use ApiPlatform\Core\Bridge\Elasticsearch\DataProvider\Extension\RequestBodySearchCollectionExtensionInterface;
 use ApiPlatform\Core\Bridge\Elasticsearch\DataProvider\Paginator;
 use ApiPlatform\Core\Bridge\Elasticsearch\Exception\IndexNotFoundException;
 use ApiPlatform\Core\Bridge\Elasticsearch\Exception\NonUniqueIdentifierException;
@@ -141,8 +141,8 @@ class CollectionDataProviderTest extends TestCase
             ->willReturn($documents)
             ->shouldBeCalled();
 
-        $fullBodySearchCollectionExtensionProphecy = $this->prophesize(FullBodySearchCollectionExtensionInterface::class);
-        $fullBodySearchCollectionExtensionProphecy->applyToCollection([], Foo::class, null, [])->wilLReturn([])->shouldBeCalled();
+        $requestBodySearchCollectionExtensionProphecy = $this->prophesize(RequestBodySearchCollectionExtensionInterface::class);
+        $requestBodySearchCollectionExtensionProphecy->applyToCollection([], Foo::class, null, [])->wilLReturn([])->shouldBeCalled();
 
         $collectionDataProvider = new CollectionDataProvider(
             $clientProphecy->reveal(),
@@ -150,7 +150,7 @@ class CollectionDataProviderTest extends TestCase
             $this->prophesize(IdentifierExtractorInterface::class)->reveal(),
             $denormalizer = $this->prophesize(DenormalizerInterface::class)->reveal(),
             new Pagination($resourceMetadataFactoryProphecy->reveal(), ['items_per_page' => 2]),
-            [$fullBodySearchCollectionExtensionProphecy->reveal()]
+            [$requestBodySearchCollectionExtensionProphecy->reveal()]
         );
 
         self::assertEquals(

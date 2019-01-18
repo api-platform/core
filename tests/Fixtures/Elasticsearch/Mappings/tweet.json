@@ -16,10 +16,10 @@
             "age": {
               "type": "integer"
             },
-            "firstName": {
+            "first_name": {
               "type": "text"
             },
-            "lastName": {
+            "last_name": {
               "type": "text"
             }
           },
@@ -32,7 +32,8 @@
         "message": {
           "type": "text"
         }
-      }
+      },
+      "dynamic": "strict"
     }
   }
 }

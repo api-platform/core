@@ -15,7 +15,7 @@ namespace ApiPlatform\Core\Tests\Bridge\Elasticsearch\DataProvider\Extension;
 
 use ApiPlatform\Core\Api\ResourceClassResolverInterface;
 use ApiPlatform\Core\Bridge\Elasticsearch\Api\IdentifierExtractorInterface;
-use ApiPlatform\Core\Bridge\Elasticsearch\DataProvider\Extension\FullBodySearchCollectionExtensionInterface;
+use ApiPlatform\Core\Bridge\Elasticsearch\DataProvider\Extension\RequestBodySearchCollectionExtensionInterface;
 use ApiPlatform\Core\Bridge\Elasticsearch\DataProvider\Extension\SortExtension;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
@@ -31,7 +31,7 @@ class SortExtensionTest extends TestCase
     public function testConstruct()
     {
         self::assertInstanceOf(
-            FullBodySearchCollectionExtensionInterface::class,
+            RequestBodySearchCollectionExtensionInterface::class,
             new SortExtension(
                 $this->prophesize(ResourceMetadataFactoryInterface::class)->reveal(),
                 $this->prophesize(IdentifierExtractorInterface::class)->reveal(),

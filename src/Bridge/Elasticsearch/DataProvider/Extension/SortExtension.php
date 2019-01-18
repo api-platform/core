@@ -23,14 +23,13 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 /**
  * Applies selected sorting while querying resource collection.
  *
- * @see https://www.elastic.co/guide/en/elasticsearch/guide/current/_sorting.html
  * @see https://www.elastic.co/guide/en/elasticsearch/reference/current/search-request-sort.html
  *
  * @experimental
  *
  * @author Baptiste Meyer <baptiste.meyer@gmail.com>
  */
-final class SortExtension implements FullBodySearchCollectionExtensionInterface
+final class SortExtension implements RequestBodySearchCollectionExtensionInterface
 {
     use FieldDatatypeTrait;
 

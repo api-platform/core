@@ -20,7 +20,7 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\EagerLoadingExtension;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\FilterEagerLoadingExtension;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\QueryCollectionExtensionInterface as DoctrineQueryCollectionExtensionInterface;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\QueryItemExtensionInterface;
-use ApiPlatform\Core\Bridge\Elasticsearch\DataProvider\Extension\FullBodySearchCollectionExtensionInterface as ElasticSearchQueryCollectionExtensionInterface;
+use ApiPlatform\Core\Bridge\Elasticsearch\DataProvider\Extension\RequestBodySearchCollectionExtensionInterface;
 use ApiPlatform\Core\DataPersister\DataPersisterInterface;
 use ApiPlatform\Core\DataProvider\CollectionDataProviderInterface;
 use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
@@ -592,10 +592,10 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
 
         $loader->load('elasticsearch.xml');
 
-        $container->registerForAutoconfiguration(ElasticSearchQueryCollectionExtensionInterface::class)
-            ->addTag('api_platform.elasticsearch.query_extension.collection');
+        $container->registerForAutoconfiguration(RequestBodySearchCollectionExtensionInterface::class)
+            ->addTag('api_platform.elasticsearch.request_body_search_extension.collection');
 
-        $container->setParameter('api_platform.elasticsearch.host', $config['elasticsearch']['host']);
+        $container->setParameter('api_platform.elasticsearch.hosts', $config['elasticsearch']['hosts']);
         $container->setParameter('api_platform.elasticsearch.mapping', $config['elasticsearch']['mapping']);
     }
 }

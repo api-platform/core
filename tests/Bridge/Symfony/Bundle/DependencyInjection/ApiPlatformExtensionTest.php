@@ -22,6 +22,13 @@ use ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Extension\AggregationItemExtensi
 use ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Extension\FilterExtension as MongoDbOdmFilterExtension;
 use ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Extension\OrderExtension as MongoDbOdmOrderExtension;
 use ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Extension\PaginationExtension as MongoDbOdmPaginationExtension;
+use ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Filter\BooleanFilter as MongoDbOdmBooleanFilter;
+use ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Filter\DateFilter as MongoDbOdmDateFilter;
+use ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Filter\ExistsFilter as MongoDbOdmExistsFilter;
+use ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Filter\NumericFilter as MongoDbOdmNumericFilter;
+use ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Filter\OrderFilter as MongoDbOdmOrderFilter;
+use ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Filter\RangeFilter as MongoDbOdmRangeFilter;
+use ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Filter\SearchFilter as MongoDbOdmSearchFilter;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\EagerLoadingExtension;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\FilterEagerLoadingExtension;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\FilterExtension;
@@ -29,8 +36,17 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\OrderExtension;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\PaginationExtension;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\QueryCollectionExtensionInterface;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\QueryItemExtensionInterface;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\BooleanFilter;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\DateFilter;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\ExistsFilter;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\NumericFilter;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\OrderFilter;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\RangeFilter;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 use ApiPlatform\Core\Bridge\Elasticsearch\Api\IdentifierExtractorInterface;
-use ApiPlatform\Core\Bridge\Elasticsearch\DataProvider\Extension\FullBodySearchCollectionExtensionInterface;
+use ApiPlatform\Core\Bridge\Elasticsearch\DataProvider\Extension\RequestBodySearchCollectionExtensionInterface;
+use ApiPlatform\Core\Bridge\Elasticsearch\DataProvider\Filter\OrderFilter as ElasticsearchOrderFilter;
+use ApiPlatform\Core\Bridge\Elasticsearch\DataProvider\Filter\TermFilter;
 use ApiPlatform\Core\Bridge\Elasticsearch\Metadata\Document\Factory\DocumentMetadataFactoryInterface;
 use ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\ApiPlatformExtension;
 use ApiPlatform\Core\DataPersister\DataPersisterInterface;
@@ -45,6 +61,8 @@ use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInte
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
 use ApiPlatform\Core\Security\ResourceAccessCheckerInterface;
+use ApiPlatform\Core\Serializer\Filter\GroupFilter;
+use ApiPlatform\Core\Serializer\Filter\PropertyFilter;
 use ApiPlatform\Core\Serializer\SerializerContextBuilderInterface;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\TestBundle;
 use ApiPlatform\Core\Validator\ValidatorInterface;
@@ -486,6 +504,13 @@ class ApiPlatformExtensionTest extends TestCase
         $containerBuilderProphecy->setAlias(FilterEagerLoadingExtension::class, 'api_platform.doctrine.orm.query_extension.filter_eager_loading')->shouldNotBeCalled();
         $containerBuilderProphecy->setAlias(PaginationExtension::class, 'api_platform.doctrine.orm.query_extension.pagination')->shouldNotBeCalled();
         $containerBuilderProphecy->setAlias(OrderExtension::class, 'api_platform.doctrine.orm.query_extension.order')->shouldNotBeCalled();
+        $containerBuilderProphecy->setAlias(SearchFilter::class, 'api_platform.doctrine.orm.search_filter')->shouldNotBeCalled();
+        $containerBuilderProphecy->setAlias(OrderFilter::class, 'api_platform.doctrine.orm.order_filter')->shouldNotBeCalled();
+        $containerBuilderProphecy->setAlias(RangeFilter::class, 'api_platform.doctrine.orm.range_filter')->shouldNotBeCalled();
+        $containerBuilderProphecy->setAlias(DateFilter::class, 'api_platform.doctrine.orm.date_filter')->shouldNotBeCalled();
+        $containerBuilderProphecy->setAlias(BooleanFilter::class, 'api_platform.doctrine.orm.boolean_filter')->shouldNotBeCalled();
+        $containerBuilderProphecy->setAlias(NumericFilter::class, 'api_platform.doctrine.orm.numeric_filter')->shouldNotBeCalled();
+        $containerBuilderProphecy->setAlias(ExistsFilter::class, 'api_platform.doctrine.orm.exists_filter')->shouldNotBeCalled();
         $containerBuilder = $containerBuilderProphecy->reveal();
 
         $this->extension->load(array_merge_recursive(self::DEFAULT_CONFIG, ['api_platform' => ['doctrine' => ['enabled' => false]]]), $containerBuilder);
@@ -520,6 +545,13 @@ class ApiPlatformExtensionTest extends TestCase
         $containerBuilderProphecy->setAlias(MongoDbOdmFilterExtension::class, 'api_platform.doctrine_mongodb.odm.aggregation_extension.filter')->shouldNotBeCalled();
         $containerBuilderProphecy->setAlias(MongoDbOdmOrderExtension::class, 'api_platform.doctrine_mongodb.odm.aggregation_extension.order')->shouldNotBeCalled();
         $containerBuilderProphecy->setAlias(MongoDbOdmPaginationExtension::class, 'api_platform.doctrine_mongodb.odm.aggregation_extension.pagination')->shouldNotBeCalled();
+        $containerBuilderProphecy->setAlias(MongoDbOdmSearchFilter::class, 'api_platform.doctrine_mongodb.odm.search_filter')->shouldNotBeCalled();
+        $containerBuilderProphecy->setAlias(MongoDbOdmBooleanFilter::class, 'api_platform.doctrine_mongodb.odm.boolean_filter')->shouldNotBeCalled();
+        $containerBuilderProphecy->setAlias(MongoDbOdmDateFilter::class, 'api_platform.doctrine_mongodb.odm.date_filter')->shouldNotBeCalled();
+        $containerBuilderProphecy->setAlias(MongoDbOdmExistsFilter::class, 'api_platform.doctrine_mongodb.odm.exists_filter')->shouldNotBeCalled();
+        $containerBuilderProphecy->setAlias(MongoDbOdmNumericFilter::class, 'api_platform.doctrine_mongodb.odm.numeric_filter')->shouldNotBeCalled();
+        $containerBuilderProphecy->setAlias(MongoDbOdmOrderFilter::class, 'api_platform.doctrine_mongodb.odm.order_filter')->shouldNotBeCalled();
+        $containerBuilderProphecy->setAlias(MongoDbOdmRangeFilter::class, 'api_platform.doctrine_mongodb.odm.range_filter')->shouldNotBeCalled();
         $containerBuilder = $containerBuilderProphecy->reveal();
 
         $this->extension->load(array_merge_recursive(self::DEFAULT_CONFIG, ['api_platform' => ['doctrine_mongodb_odm' => ['enabled' => false]]]), $containerBuilder);
@@ -527,7 +559,7 @@ class ApiPlatformExtensionTest extends TestCase
 
     public function testEnableElasticsearch()
     {
-        $this->childDefinitionProphecy->addTag('api_platform.elasticsearch.query_extension.collection')->shouldBeCalled();
+        $this->childDefinitionProphecy->addTag('api_platform.elasticsearch.request_body_search_extension.collection')->shouldBeCalled();
 
         $containerBuilderProphecy = $this->getBaseContainerBuilderProphecy();
         $containerBuilderProphecy->setParameter('api_platform.elasticsearch.enabled', false)->shouldNotBeCalled();
@@ -544,23 +576,25 @@ class ApiPlatformExtensionTest extends TestCase
         $containerBuilderProphecy->setDefinition('api_platform.elasticsearch.normalizer.item', Argument::type(Definition::class))->shouldBeCalled();
         $containerBuilderProphecy->setDefinition('api_platform.elasticsearch.item_data_provider', Argument::type(Definition::class))->shouldBeCalled();
         $containerBuilderProphecy->setDefinition('api_platform.elasticsearch.collection_data_provider', Argument::type(Definition::class))->shouldBeCalled();
-        $containerBuilderProphecy->setDefinition('api_platform.elasticsearch.query_extension.filter', Argument::type(Definition::class))->shouldBeCalled();
-        $containerBuilderProphecy->setDefinition('api_platform.elasticsearch.query_extension.constant_score_filter', Argument::type(Definition::class))->shouldBeCalled();
-        $containerBuilderProphecy->setDefinition('api_platform.elasticsearch.query_extension.sort_filter', Argument::type(Definition::class))->shouldBeCalled();
-        $containerBuilderProphecy->setDefinition('api_platform.elasticsearch.query_extension.sort', Argument::type(Definition::class))->shouldBeCalled();
+        $containerBuilderProphecy->setDefinition('api_platform.elasticsearch.request_body_search_extension.filter', Argument::type(Definition::class))->shouldBeCalled();
+        $containerBuilderProphecy->setDefinition('api_platform.elasticsearch.request_body_search_extension.constant_score_filter', Argument::type(Definition::class))->shouldBeCalled();
+        $containerBuilderProphecy->setDefinition('api_platform.elasticsearch.request_body_search_extension.sort_filter', Argument::type(Definition::class))->shouldBeCalled();
+        $containerBuilderProphecy->setDefinition('api_platform.elasticsearch.request_body_search_extension.sort', Argument::type(Definition::class))->shouldBeCalled();
         $containerBuilderProphecy->setDefinition('api_platform.elasticsearch.term_filter', Argument::type(Definition::class))->shouldBeCalled();
         $containerBuilderProphecy->setDefinition('api_platform.elasticsearch.order_filter', Argument::type(Definition::class))->shouldBeCalled();
         $containerBuilderProphecy->setAlias('api_platform.elasticsearch.metadata.document.metadata_factory', 'api_platform.elasticsearch.metadata.document.metadata_factory.configured')->shouldBeCalled();
         $containerBuilderProphecy->setAlias(DocumentMetadataFactoryInterface::class, 'api_platform.elasticsearch.metadata.document.metadata_factory')->shouldBeCalled();
         $containerBuilderProphecy->setAlias(IdentifierExtractorInterface::class, 'api_platform.elasticsearch.identifier_extractor')->shouldBeCalled();
-        $containerBuilderProphecy->registerForAutoconfiguration(FullBodySearchCollectionExtensionInterface::class)->willReturn($this->childDefinitionProphecy)->shouldBeCalled();
-        $containerBuilderProphecy->setParameter('api_platform.elasticsearch.host', 'http://elasticsearch:9200')->shouldBeCalled();
+        $containerBuilderProphecy->setAlias(TermFilter::class, 'api_platform.elasticsearch.term_filter')->shouldBeCalled();
+        $containerBuilderProphecy->setAlias(ElasticsearchOrderFilter::class, 'api_platform.elasticsearch.order_filter')->shouldBeCalled();
+        $containerBuilderProphecy->registerForAutoconfiguration(RequestBodySearchCollectionExtensionInterface::class)->willReturn($this->childDefinitionProphecy)->shouldBeCalled();
+        $containerBuilderProphecy->setParameter('api_platform.elasticsearch.hosts', ['http://elasticsearch:9200'])->shouldBeCalled();
         $containerBuilderProphecy->setParameter('api_platform.elasticsearch.mapping', [])->shouldBeCalled();
 
         $config = self::DEFAULT_CONFIG;
         $config['api_platform']['elasticsearch'] = [
             'enabled' => true,
-            'host' => 'http://elasticsearch:9200',
+            'hosts' => ['http://elasticsearch:9200'],
             'mapping' => [],
         ];
 
@@ -787,6 +821,8 @@ class ApiPlatformExtensionTest extends TestCase
             PropertyMetadataFactoryInterface::class => 'api_platform.metadata.property.metadata_factory',
             ValidatorInterface::class => 'api_platform.validator',
             ResourceClassResolverInterface::class => 'api_platform.resource_class_resolver',
+            PropertyFilter::class => 'api_platform.serializer.property_filter',
+            GroupFilter::class => 'api_platform.serializer.group_filter',
         ];
 
         foreach ($aliases as $alias => $service) {
@@ -974,6 +1010,20 @@ class ApiPlatformExtensionTest extends TestCase
             PaginationExtension::class => 'api_platform.doctrine.orm.query_extension.pagination',
             OrderExtension::class => 'api_platform.doctrine.orm.query_extension.order',
             ValidatorInterface::class => 'api_platform.validator',
+            SearchFilter::class => 'api_platform.doctrine.orm.search_filter',
+            OrderFilter::class => 'api_platform.doctrine.orm.order_filter',
+            RangeFilter::class => 'api_platform.doctrine.orm.range_filter',
+            DateFilter::class => 'api_platform.doctrine.orm.date_filter',
+            BooleanFilter::class => 'api_platform.doctrine.orm.boolean_filter',
+            NumericFilter::class => 'api_platform.doctrine.orm.numeric_filter',
+            ExistsFilter::class => 'api_platform.doctrine.orm.exists_filter',
+            MongoDbOdmSearchFilter::class => 'api_platform.doctrine_mongodb.odm.search_filter',
+            MongoDbOdmBooleanFilter::class => 'api_platform.doctrine_mongodb.odm.boolean_filter',
+            MongoDbOdmDateFilter::class => 'api_platform.doctrine_mongodb.odm.date_filter',
+            MongoDbOdmExistsFilter::class => 'api_platform.doctrine_mongodb.odm.exists_filter',
+            MongoDbOdmNumericFilter::class => 'api_platform.doctrine_mongodb.odm.numeric_filter',
+            MongoDbOdmOrderFilter::class => 'api_platform.doctrine_mongodb.odm.order_filter',
+            MongoDbOdmRangeFilter::class => 'api_platform.doctrine_mongodb.odm.range_filter',
         ];
 
         foreach ($aliases as $alias => $service) {
