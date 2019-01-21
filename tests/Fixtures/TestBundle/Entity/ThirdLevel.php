@@ -60,6 +60,11 @@ class ThirdLevel
     public $fourthLevel;
 
     /**
+     * @ORM\ManyToOne(targetEntity=FourthLevel::class, cascade={"persist"})
+     */
+    public $badFourthLevel;
+
+    /**
      * @return int
      */
     public function getId()

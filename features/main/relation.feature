@@ -20,6 +20,7 @@ Feature: Relations support
       "@id": "/third_levels/1",
       "@type": "ThirdLevel",
       "fourthLevel": null,
+      "badFourthLevel": null,
       "id": 1,
       "level": 3,
       "test": true

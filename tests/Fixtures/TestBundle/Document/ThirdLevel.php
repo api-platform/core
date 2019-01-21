@@ -59,7 +59,7 @@ class ThirdLevel
     public $fourthLevel;
 
     /**
-     * @ODM\ReferenceMany(targetDocument=FourthLevel::class, cascade={"persist"})
+     * @ODM\ReferenceOne(targetDocument=FourthLevel::class, cascade={"persist"})
      */
     public $badFourthLevel;
 
