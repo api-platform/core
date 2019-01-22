@@ -4,10 +4,12 @@
     <meta charset="UTF-8">
     <title>{% if title %}{{ title }} - {% endif %}API Platform</title>
 
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:400,700|Source+Code+Pro:300,600|Titillium+Web:400,600,700">
-    <link rel="stylesheet" href="{{ asset('bundles/apiplatform/swagger-ui/swagger-ui.css') }}">
-    <link rel="stylesheet" href="{{ asset('bundles/apiplatform/style.css') }}">
-
+    {% block stylesheet %}
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:400,700|Source+Code+Pro:300,600|Titillium+Web:400,600,700">
+        <link rel="stylesheet" href="{{ asset('bundles/apiplatform/swagger-ui/swagger-ui.css') }}">
+        <link rel="stylesheet" href="{{ asset('bundles/apiplatform/style.css') }}">
+    {% endblock %}
+    
     {# json_encode(65) is for JSON_UNESCAPED_SLASHES|JSON_HEX_TAG to avoid JS XSS #}
     <script id="swagger-data" type="application/json">{{ swagger_data|json_encode(65)|raw }}</script>
 </head>
@@ -74,14 +76,16 @@
     </div>
 </div>
 
-{% if (reDocEnabled and not swaggerUiEnabled) or (reDocEnabled and 're_doc' == active_ui) %}
-    <script src="{{ asset('bundles/apiplatform/redoc/redoc.standalone.js') }}"></script>
-    <script src="{{ asset('bundles/apiplatform/init-redoc-ui.js') }}"></script>
-{% elseif (swaggerUiEnabled) %}
-    <script src="{{ asset('bundles/apiplatform/swagger-ui/swagger-ui-bundle.js') }}"></script>
-    <script src="{{ asset('bundles/apiplatform/swagger-ui/swagger-ui-standalone-preset.js') }}"></script>
-    <script src="{{ asset('bundles/apiplatform/init-swagger-ui.js') }}"></script>
-{% endif %}
+{% block javascript %}
+    {% if (reDocEnabled and not swaggerUiEnabled) or (reDocEnabled and 're_doc' == active_ui) %}
+        <script src="{{ asset('bundles/apiplatform/redoc/redoc.standalone.js') }}"></script>
+        <script src="{{ asset('bundles/apiplatform/init-redoc-ui.js') }}"></script>
+    {% elseif (swaggerUiEnabled) %}
+        <script src="{{ asset('bundles/apiplatform/swagger-ui/swagger-ui-bundle.js') }}"></script>
+        <script src="{{ asset('bundles/apiplatform/swagger-ui/swagger-ui-standalone-preset.js') }}"></script>
+        <script src="{{ asset('bundles/apiplatform/init-swagger-ui.js') }}"></script>
+    {% endif %}
+{% endblock %}
 
 </body>
 </html>
