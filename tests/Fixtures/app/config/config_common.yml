@@ -197,3 +197,9 @@ services:
 
     mercure.hub.default.publisher:
         class: ApiPlatform\Core\Tests\Fixtures\DummyMercurePublisher
+
+    app.serializer.normalizer.override_documentation:
+        class: ApiPlatform\Core\Tests\Fixtures\TestBundle\Serializer\Normalizer\OverrideDocumentationNormalizer
+        decorates: api_platform.swagger.normalizer.documentation
+        public: false
+        arguments: ['@app.serializer.normalizer.override_documentation.inner']
