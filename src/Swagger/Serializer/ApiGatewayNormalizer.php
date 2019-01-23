@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Swagger\Serializer;
 
 use Symfony\Component\Serializer\Normalizer\CacheableSupportsMethodInterface;
-use Symfony\Component\Serializer\Normalizer\ContextAwareNormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 /**
@@ -26,7 +25,7 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
  *
  * @author Vincent Chalamon <vincentchalamon@gmail.com>
  */
-final class ApiGatewayNormalizer implements ContextAwareNormalizerInterface, CacheableSupportsMethodInterface
+final class ApiGatewayNormalizer implements NormalizerInterface, CacheableSupportsMethodInterface
 {
     const API_GATEWAY = 'api_gateway';
 
@@ -44,8 +43,10 @@ final class ApiGatewayNormalizer implements ContextAwareNormalizerInterface, Cac
      */
     public function normalize($object, $format = null, array $context = [])
     {
-        unset($context[self::API_GATEWAY]);
         $data = $this->documentationNormalizer->normalize($object, $format, $context);
+        if (!($context[self::API_GATEWAY] ?? $this->defaultContext[self::API_GATEWAY])) {
+            return $data;
+        }
 
         if (empty($data['basePath'])) {
             $data['basePath'] = '/';
@@ -108,9 +109,9 @@ final class ApiGatewayNormalizer implements ContextAwareNormalizerInterface, Cac
     /**
      * {@inheritdoc}
      */
-    public function supportsNormalization($data, $format = null, array $context = [])
+    public function supportsNormalization($data, $format = null)
     {
-        return $this->documentationNormalizer->supportsNormalization($data, $format) && ($context[self::API_GATEWAY] ?? ($this->defaultContext[self::API_GATEWAY] ?? false));
+        return $this->documentationNormalizer->supportsNormalization($data, $format);
     }
 
     /**
