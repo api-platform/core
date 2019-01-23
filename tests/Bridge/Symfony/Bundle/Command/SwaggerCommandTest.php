@@ -85,7 +85,7 @@ YAML;
         $expected = <<<YAML
 info:
   title: 'My Dummy API'
-  version: 0.0.0
+  version: 1.0.0
   description: |
     This is a test API.
     Made with love

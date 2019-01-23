@@ -110,4 +110,4 @@ Feature: Documentation support
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/json; charset=utf-8"
     And the JSON node "basePath" should be equal to "/"
-    And the JSON node "foo" should be equal to "bar"
+    And the JSON node "info.version" should be equal to "1.0.0"

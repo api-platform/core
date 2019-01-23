@@ -30,7 +30,7 @@ final class OverrideDocumentationNormalizer implements NormalizerInterface
     public function normalize($object, $format = null, array $context = [])
     {
         $data = $this->documentationNormalizer->normalize($object, $format, $context);
-        $data['foo'] = 'bar';
+        $data['info']['version'] = '1.0.0';
 
         return $data;
     }
