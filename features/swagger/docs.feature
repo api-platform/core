@@ -9,6 +9,10 @@ Feature: Documentation support
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/json; charset=utf-8"
+    # OverrideDocumentationNormalizer
+    And the JSON node "definitions.RamseyUuidDummy.properties.id.description" should be equal to "The dummy id"
+    And the JSON node "definitions.RelatedDummy-barcelona" should exist
+    And the JSON node "definitions.RelatedDummybarcelona" should not exist
     # Context
     And the JSON node "swagger" should be equal to "2.0"
     # Root properties
@@ -103,3 +107,13 @@ Feature: Documentation support
     And I should see text matching "My Dummy API"
     And I should see text matching "swagger"
     And I should see text matching "2.0"
+
+  Scenario: Retrieve the Swagger/OpenAPI documentation with API Gateway compatibility
+    Given I send a "GET" request to "/docs.json?api_gateway=true"
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/json; charset=utf-8"
+    And the JSON node "basePath" should be equal to "/"
+    And the JSON node "definitions.RamseyUuidDummy.properties.id.description" should be equal to "The dummy id"
+    And the JSON node "definitions.RelatedDummy-barcelona" should not exist
+    And the JSON node "definitions.RelatedDummybarcelona" should exist

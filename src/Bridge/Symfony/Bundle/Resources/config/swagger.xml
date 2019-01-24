@@ -34,7 +34,7 @@
             <tag name="serializer.normalizer" priority="16" />
         </service>
 
-        <service id="api_platform.swagger.normalizer.api_gateway" class="ApiPlatform\Core\Swagger\Serializer\ApiGatewayNormalizer" public="false" decorates="api_platform.swagger.normalizer.documentation">
+        <service id="api_platform.swagger.normalizer.api_gateway" class="ApiPlatform\Core\Swagger\Serializer\ApiGatewayNormalizer" public="false" decorates="api_platform.swagger.normalizer.documentation" decoration-priority="-1">
             <argument type="service" id="api_platform.swagger.normalizer.api_gateway.inner" />
             <tag name="serializer.normalizer" priority="17" />
         </service>
