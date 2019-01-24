@@ -30,7 +30,11 @@ final class OverrideDocumentationNormalizer implements NormalizerInterface
     public function normalize($object, $format = null, array $context = [])
     {
         $data = $this->documentationNormalizer->normalize($object, $format, $context);
-        $data['info']['version'] = '1.0.0';
+        if (isset($data['definitions'])) {
+            $data['definitions']['RamseyUuidDummy']['properties']['id']['description'] = 'The dummy id';
+        } else {
+            $data['components']['schemas']['RamseyUuidDummy']['properties']['id']['description'] = 'The dummy id';
+        }
 
         return $data;
     }
