@@ -76,10 +76,11 @@
         "webonyx/graphql-php": ">=0.13 <1.0"
     },
     "conflict": {
-        "doctrine/common": "<2.7"
+        "doctrine/common": "<2.7",
+        "doctrine/mongodb-odm": "<2.0"
     },
     "suggest": {
-        "doctrine/mongodb-odm-bundle": "To support MongoDB.",
+        "doctrine/mongodb-odm-bundle": "To support MongoDB. Only versions 4.0 and later are supported.",
         "elasticsearch/elasticsearch": "To support Elasticsearch.",
         "friendsofsymfony/user-bundle": "To use the FOSUserBundle bridge.",
         "guzzlehttp/guzzle": "To use the HTTP cache invalidation system.",
