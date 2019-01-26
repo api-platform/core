@@ -15,6 +15,7 @@ namespace ApiPlatform\Core\Bridge\Symfony\Bundle\Command;
 
 use ApiPlatform\Core\Documentation\Documentation;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
+use ApiPlatform\Core\Swagger\Serializer\ApiGatewayNormalizer;
 use ApiPlatform\Core\Swagger\Serializer\DocumentationNormalizer;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Exception\InvalidOptionException;
@@ -62,7 +63,8 @@ final class SwaggerCommand extends Command
             ->setDescription('Dump the OpenAPI documentation')
             ->addOption('yaml', 'y', InputOption::VALUE_NONE, 'Dump the documentation in YAML')
             ->addOption('spec-version', null, InputOption::VALUE_OPTIONAL, 'OpenAPI version to use ("2" or "3")', '2')
-            ->addOption('output', 'o', InputOption::VALUE_OPTIONAL, 'Write output to file');
+            ->addOption('output', 'o', InputOption::VALUE_OPTIONAL, 'Write output to file')
+            ->addOption('api-gateway', null, InputOption::VALUE_NONE, 'API Gateway compatibility');
     }
 
     /**
@@ -79,7 +81,7 @@ final class SwaggerCommand extends Command
         }
 
         $documentation = new Documentation($this->resourceNameCollectionFactory->create(), $this->apiTitle, $this->apiDescription, $this->apiVersion, $this->apiFormats);
-        $data = $this->normalizer->normalize($documentation, DocumentationNormalizer::FORMAT, ['spec_version' => (int) $version]);
+        $data = $this->normalizer->normalize($documentation, DocumentationNormalizer::FORMAT, ['spec_version' => (int) $version, ApiGatewayNormalizer::API_GATEWAY => $input->getOption('api-gateway')]);
         $content = $input->getOption('yaml') ? Yaml::dump($data, 10, 2, Yaml::DUMP_OBJECT_AS_MAP | Yaml::DUMP_EMPTY_ARRAY_AS_SEQUENCE | Yaml::DUMP_MULTI_LINE_LITERAL_BLOCK) : (json_encode($data, JSON_PRETTY_PRINT) ?: '');
 
         if (!empty($filename = $input->getOption('output')) && \is_string($filename)) {
