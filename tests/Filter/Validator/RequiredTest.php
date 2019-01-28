@@ -15,7 +15,6 @@ namespace ApiPlatform\Core\Tests\Filter\Validator;
 
 use ApiPlatform\Core\Filter\Validator\Required;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Class RequiredTest.
@@ -26,11 +25,11 @@ class RequiredTest extends TestCase
 {
     public function testNonRequiredFilter()
     {
-        $request = new Request();
+        $request = [];
         $filter = new Required();
 
         $this->assertEmpty(
-            $filter->validate('some_filter', [], $request)
+            $filter->validate('some_filter', [], [])
         );
 
         $this->assertEmpty(
@@ -40,7 +39,7 @@ class RequiredTest extends TestCase
 
     public function testRequiredFilterNotInQuery()
     {
-        $request = new Request();
+        $request = [];
         $filter = new Required();
 
         $this->assertEquals(
@@ -51,7 +50,7 @@ class RequiredTest extends TestCase
 
     public function testRequiredFilterIsPresent()
     {
-        $request = new Request(['some_filter' => 'some_value']);
+        $request = ['some_filter' => 'some_value'];
         $filter = new Required();
 
         $this->assertEmpty(
@@ -61,7 +60,7 @@ class RequiredTest extends TestCase
 
     public function testEmptyValueNotAllowed()
     {
-        $request = new Request(['some_filter' => '']);
+        $request = ['some_filter' => ''];
         $filter = new Required();
 
         $explicitFilterDefinition = [
@@ -88,7 +87,7 @@ class RequiredTest extends TestCase
 
     public function testEmptyValueAllowed()
     {
-        $request = new Request(['some_filter' => '']);
+        $request = ['some_filter' => ''];
         $filter = new Required();
 
         $explicitFilterDefinition = [

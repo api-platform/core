@@ -13,13 +13,14 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Filter\Validator;
 
-use Symfony\Component\HttpFoundation\Request;
-
 final class ArrayItems implements ValidatorInterface
 {
-    public function validate(string $name, array $filterDescription, Request $request): array
+    /**
+     * {@inheritdoc}
+     */
+    public function validate(string $name, array $filterDescription, array $queryParameters): array
     {
-        if (!$request->query->has($name)) {
+        if (!\array_key_exists($name, $queryParameters)) {
             return [];
         }
 
@@ -29,7 +30,7 @@ final class ArrayItems implements ValidatorInterface
 
         $errorList = [];
 
-        $value = $this->getValue($name, $filterDescription, $request);
+        $value = $this->getValue($name, $filterDescription, $queryParameters);
         $nbItems = \count($value);
 
         if (null !== $maxItems && $nbItems > $maxItems) {
@@ -47,9 +48,9 @@ final class ArrayItems implements ValidatorInterface
         return $errorList;
     }
 
-    private function getValue(string $name, array $filterDescription, Request $request): array
+    private function getValue(string $name, array $filterDescription, array $queryParameters): array
     {
-        $value = $request->query->get($name);
+        $value = $queryParameters[$name] ?? null;
 
         if (empty($value) && '0' !== $value) {
             return [];

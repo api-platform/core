@@ -54,7 +54,7 @@ class QueryParameterValidator
 
             foreach ($filter->getDescription($resourceClass) as $name => $data) {
                 foreach ($this->validators as $validator) {
-                    $errorList = array_merge($errorList, $validator->validate($name, $data, $request));
+                    $errorList = array_merge($errorList, $validator->validate($name, $data, $request->query->all()));
                 }
             }
         }

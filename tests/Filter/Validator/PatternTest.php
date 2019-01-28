@@ -15,7 +15,6 @@ namespace ApiPlatform\Core\Tests\Filter\Validator;
 
 use ApiPlatform\Core\Filter\Validator\Pattern;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\HttpFoundation\Request;
 
 /**
  * @author Julien Deniau <julien.deniau@mapado.com>
@@ -24,11 +23,10 @@ class PatternTest extends TestCase
 {
     public function testNonDefinedFilter()
     {
-        $request = new Request();
         $filter = new Pattern();
 
         $this->assertEmpty(
-            $filter->validate('some_filter', [], $request)
+            $filter->validate('some_filter', [], [])
         );
     }
 
@@ -43,13 +41,13 @@ class PatternTest extends TestCase
         ];
 
         $this->assertEmpty(
-            $filter->validate('some_filter', $explicitFilterDefinition, new Request(['some_filter' => '']))
+            $filter->validate('some_filter', $explicitFilterDefinition, ['some_filter' => ''])
         );
 
         $weirdParameter = new \stdClass();
         $weirdParameter->foo = 'non string value should not exists';
         $this->assertEmpty(
-            $filter->validate('some_filter', $explicitFilterDefinition, new Request(['some_filter' => $weirdParameter]))
+            $filter->validate('some_filter', $explicitFilterDefinition, ['some_filter' => $weirdParameter])
         );
     }
 
@@ -65,7 +63,7 @@ class PatternTest extends TestCase
 
         $this->assertEquals(
             ['Query parameter "some_filter" must match pattern /foo/'],
-            $filter->validate('some_filter', $explicitFilterDefinition, new Request(['some_filter' => '0']))
+            $filter->validate('some_filter', $explicitFilterDefinition, ['some_filter' => '0'])
         );
     }
 
@@ -81,7 +79,7 @@ class PatternTest extends TestCase
 
         $this->assertEquals(
             ['Query parameter "some_filter" must match pattern /foo/'],
-            $filter->validate('some_filter', $explicitFilterDefinition, new Request(['some_filter' => 'bar']))
+            $filter->validate('some_filter', $explicitFilterDefinition, ['some_filter' => 'bar'])
         );
     }
 
@@ -96,7 +94,7 @@ class PatternTest extends TestCase
         ];
 
         $this->assertEmpty(
-            $filter->validate('some_filter', $explicitFilterDefinition, new Request(['some_filter' => 'this is a foo '.random_int(0, 10).' and it should match']))
+            $filter->validate('some_filter', $explicitFilterDefinition, ['some_filter' => 'this is a foo '.random_int(0, 10).' and it should match'])
         );
     }
 }

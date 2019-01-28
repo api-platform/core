@@ -15,7 +15,6 @@ namespace ApiPlatform\Core\Tests\Filter\Validator;
 
 use ApiPlatform\Core\Filter\Validator\Length;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\HttpFoundation\Request;
 
 /**
  * @author Julien Deniau <julien.deniau@mapado.com>
@@ -24,21 +23,19 @@ class LengthTest extends TestCase
 {
     public function testNonDefinedFilter()
     {
-        $request = new Request();
         $filter = new Length();
 
         $this->assertEmpty(
-            $filter->validate('some_filter', [], $request)
+            $filter->validate('some_filter', [], [])
         );
     }
 
     public function testEmptyQueryParameter()
     {
-        $request = new Request(['some_filter' => '']);
         $filter = new Length();
 
         $this->assertEmpty(
-            $filter->validate('some_filter', [], $request)
+            $filter->validate('some_filter', [], ['some_filter' => ''])
         );
     }
 
@@ -55,12 +52,12 @@ class LengthTest extends TestCase
 
         $this->assertEquals(
             ['Query parameter "some_filter" length must be greater than or equal to 3'],
-            $filter->validate('some_filter', $filterDefinition, new Request(['some_filter' => 'ab']))
+            $filter->validate('some_filter', $filterDefinition, ['some_filter' => 'ab'])
         );
 
         $this->assertEquals(
             ['Query parameter "some_filter" length must be lower than or equal to 5'],
-            $filter->validate('some_filter', $filterDefinition, new Request(['some_filter' => 'abcdef']))
+            $filter->validate('some_filter', $filterDefinition, ['some_filter' => 'abcdef'])
         );
     }
 
@@ -76,7 +73,7 @@ class LengthTest extends TestCase
 
         $this->assertEquals(
             ['Query parameter "some_filter" length must be greater than or equal to 3'],
-            $filter->validate('some_filter', $filterDefinition, new Request(['some_filter' => 'ab']))
+            $filter->validate('some_filter', $filterDefinition, ['some_filter' => 'ab'])
         );
 
         $filterDefinition = [
@@ -87,7 +84,7 @@ class LengthTest extends TestCase
 
         $this->assertEquals(
             ['Query parameter "some_filter" length must be lower than or equal to 5'],
-            $filter->validate('some_filter', $filterDefinition, new Request(['some_filter' => 'abcdef']))
+            $filter->validate('some_filter', $filterDefinition, ['some_filter' => 'abcdef'])
         );
     }
 
@@ -103,15 +100,15 @@ class LengthTest extends TestCase
         ];
 
         $this->assertEmpty(
-            $filter->validate('some_filter', $filterDefinition, new Request(['some_filter' => 'abc']))
+            $filter->validate('some_filter', $filterDefinition, ['some_filter' => 'abc'])
         );
 
         $this->assertEmpty(
-            $filter->validate('some_filter', $filterDefinition, new Request(['some_filter' => 'abcd']))
+            $filter->validate('some_filter', $filterDefinition, ['some_filter' => 'abcd'])
         );
 
         $this->assertEmpty(
-            $filter->validate('some_filter', $filterDefinition, new Request(['some_filter' => 'abcde']))
+            $filter->validate('some_filter', $filterDefinition, ['some_filter' => 'abcde'])
         );
     }
 
@@ -126,7 +123,7 @@ class LengthTest extends TestCase
         ];
 
         $this->assertEmpty(
-            $filter->validate('some_filter', $filterDefinition, new Request(['some_filter' => 'abc']))
+            $filter->validate('some_filter', $filterDefinition, ['some_filter' => 'abc'])
         );
 
         $filterDefinition = [
@@ -136,7 +133,7 @@ class LengthTest extends TestCase
         ];
 
         $this->assertEmpty(
-            $filter->validate('some_filter', $filterDefinition, new Request(['some_filter' => 'abcde']))
+            $filter->validate('some_filter', $filterDefinition, ['some_filter' => 'abcde'])
         );
     }
 }

@@ -13,9 +13,12 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Filter\Validator;
 
-use Symfony\Component\HttpFoundation\Request;
-
 interface ValidatorInterface
 {
-    public function validate(string $name, array $filterDescription, Request $request): array;
+    /**
+     * @var string        the parameter name to validate
+     * @var array<string, mixed> $filterDescription the filter descriptions as returned by `ApiPlatform\Core\Api\FilterInterface::getDescription()`
+     * @var array<string, mixed> $queryParameters the list of query parameter
+     */
+    public function validate(string $name, array $filterDescription, array $queryParameters): array;
 }

@@ -13,11 +13,12 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Filter\Validator;
 
-use Symfony\Component\HttpFoundation\Request;
-
 final class Required implements ValidatorInterface
 {
-    public function validate(string $name, array $filterDescription, Request $request): array
+    /**
+     * {@inheritdoc}
+     */
+    public function validate(string $name, array $filterDescription, array $queryParameters): array
     {
         // filter is not required, the `checkRequired` method can not break
         if (!($filterDescription['required'] ?? false)) {
@@ -25,14 +26,14 @@ final class Required implements ValidatorInterface
         }
 
         // if query param is not given, then break
-        if (!$this->requestHasQueryParameter($request, $name)) {
+        if (!$this->requestHasQueryParameter($queryParameters, $name)) {
             return [
                 sprintf('Query parameter "%s" is required', $name),
             ];
         }
 
         // if query param is empty and the configuration does not allow it
-        if (!($filterDescription['swagger']['allowEmptyValue'] ?? false) && empty($this->requestGetQueryParameter($request, $name))) {
+        if (!($filterDescription['swagger']['allowEmptyValue'] ?? false) && empty($this->requestGetQueryParameter($queryParameters, $name))) {
             return [
                 sprintf('Query parameter "%s" does not allow empty value', $name),
             ];
@@ -44,7 +45,7 @@ final class Required implements ValidatorInterface
     /**
      * Test if request has required parameter.
      */
-    private function requestHasQueryParameter(Request $request, string $name): bool
+    private function requestHasQueryParameter(array $queryParameters, string $name): bool
     {
         $matches = [];
         parse_str($name, $matches);
@@ -60,18 +61,20 @@ final class Required implements ValidatorInterface
         if (\is_array($matches[$rootName])) {
             $keyName = array_keys($matches[$rootName])[0];
 
-            $queryParameter = $request->query->get((string) $rootName);
+            $queryParameter = $queryParameters[(string) $rootName];
 
             return \is_array($queryParameter) && isset($queryParameter[$keyName]);
         }
 
-        return $request->query->has((string) $rootName);
+        return \array_key_exists((string) $rootName, $queryParameters);
     }
 
     /**
      * Test if required filter is valid. It validates array notation too like "required[bar]".
+     *
+     * @return ?mixed
      */
-    private function requestGetQueryParameter(Request $request, string $name)
+    private function requestGetQueryParameter(array $queryParameters, string $name)
     {
         $matches = [];
         parse_str($name, $matches);
@@ -87,7 +90,7 @@ final class Required implements ValidatorInterface
         if (\is_array($matches[$rootName])) {
             $keyName = array_keys($matches[$rootName])[0];
 
-            $queryParameter = $request->query->get((string) $rootName);
+            $queryParameter = $queryParameters[(string) $rootName];
 
             if (\is_array($queryParameter) && isset($queryParameter[$keyName])) {
                 return $queryParameter[$keyName];
@@ -96,6 +99,6 @@ final class Required implements ValidatorInterface
             return null;
         }
 
-        return $request->query->get((string) $rootName);
+        return $queryParameters[(string) $rootName];
     }
 }

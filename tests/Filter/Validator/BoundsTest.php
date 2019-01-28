@@ -15,7 +15,6 @@ namespace ApiPlatform\Core\Tests\Filter\Validator;
 
 use ApiPlatform\Core\Filter\Validator\Bounds;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\HttpFoundation\Request;
 
 /**
  * @author Julien Deniau <julien.deniau@mapado.com>
@@ -24,27 +23,25 @@ class BoundsTest extends TestCase
 {
     public function testNonDefinedFilter()
     {
-        $request = new Request();
         $filter = new Bounds();
 
         $this->assertEmpty(
-            $filter->validate('some_filter', [], $request)
+            $filter->validate('some_filter', [], [])
         );
     }
 
     public function testEmptyQueryParameter()
     {
-        $request = new Request(['some_filter' => '']);
         $filter = new Bounds();
 
         $this->assertEmpty(
-            $filter->validate('some_filter', [], $request)
+            $filter->validate('some_filter', [], ['some_filter' => ''])
         );
     }
 
     public function testNonMatchingMinimum()
     {
-        $request = new Request(['some_filter' => '9']);
+        $request = ['some_filter' => '9'];
         $filter = new Bounds();
 
         $filterDefinition = [
@@ -85,7 +82,7 @@ class BoundsTest extends TestCase
 
     public function testMatchingMinimum()
     {
-        $request = new Request(['some_filter' => '10']);
+        $request = ['some_filter' => '10'];
         $filter = new Bounds();
 
         $filterDefinition = [
@@ -112,7 +109,7 @@ class BoundsTest extends TestCase
 
     public function testNonMatchingMaximum()
     {
-        $request = new Request(['some_filter' => '11']);
+        $request = ['some_filter' => '11'];
         $filter = new Bounds();
 
         $filterDefinition = [
@@ -153,7 +150,7 @@ class BoundsTest extends TestCase
 
     public function testMatchingMaximum()
     {
-        $request = new Request(['some_filter' => '10']);
+        $request = ['some_filter' => '10'];
         $filter = new Bounds();
 
         $filterDefinition = [

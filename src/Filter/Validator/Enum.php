@@ -13,13 +13,14 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Filter\Validator;
 
-use Symfony\Component\HttpFoundation\Request;
-
 final class Enum implements ValidatorInterface
 {
-    public function validate(string $name, array $filterDescription, Request $request): array
+    /**
+     * {@inheritdoc}
+     */
+    public function validate(string $name, array $filterDescription, array $queryParameters): array
     {
-        $value = $request->query->get($name);
+        $value = $queryParameters[$name] ?? null;
         if (empty($value) && '0' !== $value || !\is_string($value)) {
             return [];
         }

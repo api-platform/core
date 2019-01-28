@@ -15,7 +15,6 @@ namespace ApiPlatform\Core\Tests\Filter\Validator;
 
 use ApiPlatform\Core\Filter\Validator\Enum;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\HttpFoundation\Request;
 
 /**
  * @author Julien Deniau <julien.deniau@mapado.com>
@@ -24,27 +23,24 @@ class EnumTest extends TestCase
 {
     public function testNonDefinedFilter()
     {
-        $request = new Request();
         $filter = new Enum();
 
         $this->assertEmpty(
-            $filter->validate('some_filter', [], $request)
+            $filter->validate('some_filter', [], [])
         );
     }
 
     public function testEmptyQueryParameter()
     {
-        $request = new Request(['some_filter' => '']);
         $filter = new Enum();
 
         $this->assertEmpty(
-            $filter->validate('some_filter', [], $request)
+            $filter->validate('some_filter', [], ['some_filter' => ''])
         );
     }
 
     public function testNonMatchingParameter()
     {
-        $request = new Request(['some_filter' => 'foobar']);
         $filter = new Enum();
 
         $filterDefinition = [
@@ -55,13 +51,12 @@ class EnumTest extends TestCase
 
         $this->assertEquals(
             ['Query parameter "some_filter" must be one of "foo, bar"'],
-            $filter->validate('some_filter', $filterDefinition, $request)
+            $filter->validate('some_filter', $filterDefinition, ['some_filter' => 'foobar'])
         );
     }
 
     public function testMatchingParameter()
     {
-        $request = new Request(['some_filter' => 'foo']);
         $filter = new Enum();
 
         $filterDefinition = [
@@ -71,7 +66,7 @@ class EnumTest extends TestCase
         ];
 
         $this->assertEmpty(
-            $filter->validate('some_filter', $filterDefinition, $request)
+            $filter->validate('some_filter', $filterDefinition, ['some_filter' => 'foo'])
         );
     }
 }

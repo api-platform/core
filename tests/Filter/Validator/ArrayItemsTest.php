@@ -15,7 +15,6 @@ namespace ApiPlatform\Core\Tests\Filter\Validator;
 
 use ApiPlatform\Core\Filter\Validator\ArrayItems;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\HttpFoundation\Request;
 
 /**
  * @author Julien Deniau <julien.deniau@mapado.com>
@@ -24,7 +23,7 @@ class ArrayItemsTest extends TestCase
 {
     public function testNonDefinedFilter()
     {
-        $request = new Request();
+        $request = [];
         $filter = new ArrayItems();
 
         $this->assertEmpty(
@@ -34,7 +33,7 @@ class ArrayItemsTest extends TestCase
 
     public function testEmptyQueryParameter()
     {
-        $request = new Request(['some_filter' => '']);
+        $request = ['some_filter' => ''];
         $filter = new ArrayItems();
 
         $this->assertEmpty(
@@ -53,13 +52,13 @@ class ArrayItemsTest extends TestCase
             ],
         ];
 
-        $request = new Request(['some_filter' => ['foo', 'bar', 'bar', 'foo']]);
+        $request = ['some_filter' => ['foo', 'bar', 'bar', 'foo']];
         $this->assertEquals(
             ['Query parameter "some_filter" must contain less than 3 values'],
             $filter->validate('some_filter', $filterDefinition, $request)
         );
 
-        $request = new Request(['some_filter' => ['foo']]);
+        $request = ['some_filter' => ['foo']];
         $this->assertEquals(
             ['Query parameter "some_filter" must contain more than 2 values'],
             $filter->validate('some_filter', $filterDefinition, $request)
@@ -77,12 +76,12 @@ class ArrayItemsTest extends TestCase
             ],
         ];
 
-        $request = new Request(['some_filter' => ['foo', 'bar']]);
+        $request = ['some_filter' => ['foo', 'bar']];
         $this->assertEmpty(
             $filter->validate('some_filter', $filterDefinition, $request)
         );
 
-        $request = new Request(['some_filter' => ['foo', 'bar', 'baz']]);
+        $request = ['some_filter' => ['foo', 'bar', 'baz']];
         $this->assertEmpty(
             $filter->validate('some_filter', $filterDefinition, $request)
         );
@@ -98,7 +97,7 @@ class ArrayItemsTest extends TestCase
             ],
         ];
 
-        $request = new Request(['some_filter' => ['foo', 'bar', 'bar', 'foo']]);
+        $request = ['some_filter' => ['foo', 'bar', 'bar', 'foo']];
         $this->assertEquals(
             ['Query parameter "some_filter" must contain unique values'],
             $filter->validate('some_filter', $filterDefinition, $request)
@@ -115,7 +114,7 @@ class ArrayItemsTest extends TestCase
             ],
         ];
 
-        $request = new Request(['some_filter' => ['foo', 'bar', 'baz']]);
+        $request = ['some_filter' => ['foo', 'bar', 'baz']];
         $this->assertEmpty(
             $filter->validate('some_filter', $filterDefinition, $request)
         );
@@ -133,7 +132,7 @@ class ArrayItemsTest extends TestCase
             ],
         ];
 
-        $request = new Request(['some_filter' => 'foo,bar,bar']);
+        $request = ['some_filter' => 'foo,bar,bar'];
         $this->assertEquals(
             [
                 'Query parameter "some_filter" must contain less than 2 values',
@@ -148,7 +147,7 @@ class ArrayItemsTest extends TestCase
         );
 
         $filterDefinition['swagger']['collectionFormat'] = 'ssv';
-        $request = new Request(['some_filter' => 'foo bar bar']);
+        $request = ['some_filter' => 'foo bar bar'];
         $this->assertEquals(
             [
                 'Query parameter "some_filter" must contain less than 2 values',
@@ -158,7 +157,7 @@ class ArrayItemsTest extends TestCase
         );
 
         $filterDefinition['swagger']['collectionFormat'] = 'tsv';
-        $request = new Request(['some_filter' => 'foo\tbar\tbar']);
+        $request = ['some_filter' => 'foo\tbar\tbar'];
         $this->assertEquals(
             [
                 'Query parameter "some_filter" must contain less than 2 values',
@@ -168,7 +167,7 @@ class ArrayItemsTest extends TestCase
         );
 
         $filterDefinition['swagger']['collectionFormat'] = 'pipes';
-        $request = new Request(['some_filter' => 'foo|bar|bar']);
+        $request = ['some_filter' => 'foo|bar|bar'];
         $this->assertEquals(
             [
                 'Query parameter "some_filter" must contain less than 2 values',
@@ -189,7 +188,7 @@ class ArrayItemsTest extends TestCase
                 'collectionFormat' => 'unknownFormat',
             ],
         ];
-        $request = new Request(['some_filter' => 'foo,bar,bar']);
+        $request = ['some_filter' => 'foo,bar,bar'];
 
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Unknown collection format unknownFormat');

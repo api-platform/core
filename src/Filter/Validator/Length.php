@@ -13,19 +13,20 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Filter\Validator;
 
-use Symfony\Component\HttpFoundation\Request;
-
 final class Length implements ValidatorInterface
 {
-    public function validate(string $name, array $filterDescription, Request $request): array
+    /**
+     * {@inheritdoc}
+     */
+    public function validate(string $name, array $filterDescription, array $queryParameters): array
     {
-        $maxLength = $filterDescription['swagger']['maxLength'] ?? null;
-        $minLength = $filterDescription['swagger']['minLength'] ?? null;
-
-        $value = $request->query->get($name);
+        $value = $queryParameters[$name] ?? null;
         if (empty($value) && '0' !== $value || !\is_string($value)) {
             return [];
         }
+
+        $maxLength = $filterDescription['swagger']['maxLength'] ?? null;
+        $minLength = $filterDescription['swagger']['minLength'] ?? null;
 
         $errorList = [];
 

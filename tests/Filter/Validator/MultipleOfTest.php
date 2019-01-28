@@ -15,7 +15,6 @@ namespace ApiPlatform\Core\Tests\Filter\Validator;
 
 use ApiPlatform\Core\Filter\Validator\MultipleOf;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\HttpFoundation\Request;
 
 /**
  * @author Julien Deniau <julien.deniau@mapado.com>
@@ -24,17 +23,16 @@ class MultipleOfTest extends TestCase
 {
     public function testNonDefinedFilter()
     {
-        $request = new Request();
         $filter = new MultipleOf();
 
         $this->assertEmpty(
-            $filter->validate('some_filter', [], $request)
+            $filter->validate('some_filter', [], [])
         );
     }
 
     public function testEmptyQueryParameter()
     {
-        $request = new Request(['some_filter' => '']);
+        $request = ['some_filter' => ''];
         $filter = new MultipleOf();
 
         $this->assertEmpty(
@@ -44,7 +42,7 @@ class MultipleOfTest extends TestCase
 
     public function testNonMatchingParameter()
     {
-        $request = new Request(['some_filter' => '8']);
+        $request = ['some_filter' => '8'];
         $filter = new MultipleOf();
 
         $filterDefinition = [
@@ -61,7 +59,7 @@ class MultipleOfTest extends TestCase
 
     public function testMatchingParameter()
     {
-        $request = new Request(['some_filter' => '8']);
+        $request = ['some_filter' => '8'];
         $filter = new MultipleOf();
 
         $filterDefinition = [
