@@ -50,4 +50,16 @@ class AddLinkHeaderListenerTest extends TestCase
             ['<https://demo.mercure.rocks/hub>; rel="mercure",<http://example.com/docs>; rel="http://www.w3.org/ns/hydra/core#apiDocumentation"', new Request([], [], ['_links' => new GenericLinkProvider([new Link('mercure', 'https://demo.mercure.rocks/hub')])])],
         ];
     }
+
+    public function testDoesNotAddLinkHeaderOnRequestOptions()
+    {
+        $urlGenerator = $this->prophesize(UrlGeneratorInterface::class);
+        $urlGenerator->generate('api_doc', ['_format' => 'jsonld'], UrlGeneratorInterface::ABS_URL)->shouldNotBeCalled();
+
+        $event = $this->prophesize(FilterResponseEvent::class);
+        $event->getRequest()->willReturn(Request::create('/', 'OPTIONS'))->shouldBeCalled();
+
+        $listener = new AddLinkHeaderListener($urlGenerator->reveal());
+        $listener->onKernelResponse($event->reveal());
+    }
 }

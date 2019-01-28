@@ -38,10 +38,14 @@ final class AddLinkHeaderListener
      */
     public function onKernelResponse(FilterResponseEvent $event)
     {
+        $request = $event->getRequest();
+        if ($request->isMethod('OPTIONS')) {
+            return;
+        }
         $apiDocUrl = $this->urlGenerator->generate('api_doc', ['_format' => 'jsonld'], UrlGeneratorInterface::ABS_URL);
         $link = new Link(ContextBuilder::HYDRA_NS.'apiDocumentation', $apiDocUrl);
 
-        $attributes = $event->getRequest()->attributes;
+        $attributes = $request->attributes;
         if (null === $linkProvider = $attributes->get('_links')) {
             $attributes->set('_links', new GenericLinkProvider([$link]));
 
