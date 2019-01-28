@@ -49,7 +49,7 @@ final class SerializeListener
         $controllerResult = $event->getControllerResult();
         $request = $event->getRequest();
 
-        if ($controllerResult instanceof Response) {
+        if ($controllerResult instanceof Response || !$request->attributes->getBoolean('_api_respond', true)) {
             return;
         }
 
@@ -107,10 +107,6 @@ final class SerializeListener
      */
     private function serializeRawData(GetResponseForControllerResultEvent $event, Request $request, $controllerResult)
     {
-        if (!$request->attributes->get('_api_respond')) {
-            return;
-        }
-
         if (\is_object($controllerResult)) {
             $event->setControllerResult($this->serializer->serialize($controllerResult, $request->getRequestFormat(), $request->attributes->get('_api_normalization_context', [])));
 
