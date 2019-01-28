@@ -16,7 +16,6 @@ namespace ApiPlatform\Core\Filter;
 use ApiPlatform\Core\Api\FilterLocatorTrait;
 use ApiPlatform\Core\Exception\FilterValidationException;
 use Psr\Container\ContainerInterface;
-use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Validates query parameters depending on filter description.
@@ -44,9 +43,10 @@ class QueryParameterValidator
         ];
     }
 
-    public function validateFilters(string $resourceClass, array $resourceFilters, Request $request): void
+    public function validateFilters(string $resourceClass, array $resourceFilters, array $queryParameters): void
     {
         $errorList = [];
+
         foreach ($resourceFilters as $filterId) {
             if (!$filter = $this->getFilter($filterId)) {
                 continue;
@@ -54,7 +54,7 @@ class QueryParameterValidator
 
             foreach ($filter->getDescription($resourceClass) as $name => $data) {
                 foreach ($this->validators as $validator) {
-                    $errorList = array_merge($errorList, $validator->validate($name, $data, $request->query->all()));
+                    $errorList = array_merge($errorList, $validator->validate($name, $data, $queryParameters));
                 }
             }
         }

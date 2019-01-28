@@ -59,7 +59,7 @@ class QueryParameterValidateListenerTest extends TestCase
         $eventProphecy = $this->prophesize(RequestEvent::class);
         $eventProphecy->getRequest()->willReturn($request)->shouldBeCalled();
 
-        $this->queryParameterValidor->validateFilters(Dummy::class, ['some_inexistent_filter'], $request)->shouldBeCalled();
+        $this->queryParameterValidor->validateFilters(Dummy::class, ['some_inexistent_filter'], [])->shouldBeCalled();
 
         $this->assertNull(
             $this->testedInstance->onKernelRequest($eventProphecy->reveal())
@@ -80,7 +80,7 @@ class QueryParameterValidateListenerTest extends TestCase
         $eventProphecy->getRequest()->willReturn($request)->shouldBeCalled();
 
         $this->queryParameterValidor
-            ->validateFilters(Dummy::class, ['some_filter'], $request)
+            ->validateFilters(Dummy::class, ['some_filter'], [])
             ->shouldBeCalled()
             ->willThrow(new FilterValidationException(['Query parameter "required" is required']));
         $this->expectException(FilterValidationException::class);
@@ -96,9 +96,12 @@ class QueryParameterValidateListenerTest extends TestCase
         $this->setUpWithFilters(['some_filter']);
 
         $request = new Request(
-            ['required' => 'foo'],
             [],
-            ['_api_resource_class' => Dummy::class, '_api_collection_operation_name' => 'get']
+            [],
+            ['_api_resource_class' => Dummy::class, '_api_collection_operation_name' => 'get'],
+            [],
+            [],
+            ['QUERY_STRING' => 'required=foo']
         );
         $request->setMethod('GET');
 
@@ -106,7 +109,7 @@ class QueryParameterValidateListenerTest extends TestCase
         $eventProphecy->getRequest()->willReturn($request)->shouldBeCalled();
 
         $this->queryParameterValidor
-            ->validateFilters(Dummy::class, ['some_filter'], $request)
+            ->validateFilters(Dummy::class, ['some_filter'], ['required' => 'foo'])
             ->shouldBeCalled();
 
         $this->assertNull(

@@ -19,7 +19,6 @@ use ApiPlatform\Core\Filter\QueryParameterValidator;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
-use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Class QueryParameterValidatorTest.
@@ -48,7 +47,7 @@ class QueryParameterValidatorTest extends TestCase
      */
     public function testOnKernelRequestWithUnsafeMethod()
     {
-        $request = new Request();
+        $request = [];
 
         $this->assertNull(
             $this->testedInstance->validateFilters(Dummy::class, [], $request)
@@ -60,7 +59,7 @@ class QueryParameterValidatorTest extends TestCase
      */
     public function testOnKernelRequestWithWrongFilter()
     {
-        $request = new Request();
+        $request = [];
 
         $this->assertNull(
             $this->testedInstance->validateFilters(Dummy::class, ['some_inexistent_filter'], $request)
@@ -72,7 +71,7 @@ class QueryParameterValidatorTest extends TestCase
      */
     public function testOnKernelRequestWithRequiredFilterNotSet()
     {
-        $request = new Request();
+        $request = [];
 
         $filterProphecy = $this->prophesize(FilterInterface::class);
         $filterProphecy
@@ -102,9 +101,7 @@ class QueryParameterValidatorTest extends TestCase
      */
     public function testOnKernelRequestWithRequiredFilter()
     {
-        $request = new Request(
-            ['required' => 'foo']
-        );
+        $request = ['required' => 'foo'];
 
         $this->filterLocatorProphecy
             ->has('some_filter')
