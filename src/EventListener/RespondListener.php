@@ -36,7 +36,7 @@ final class RespondListener
         $controllerResult = $event->getControllerResult();
         $request = $event->getRequest();
 
-        if ($controllerResult instanceof Response || !$request->attributes->get('_api_respond')) {
+        if ($controllerResult instanceof Response || !$request->attributes->getBoolean('_api_respond', true)) {
             return;
         }
 
