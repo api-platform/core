@@ -15,7 +15,7 @@ namespace ApiPlatform\Core\Filter\Validator;
 
 use Symfony\Component\HttpFoundation\Request;
 
-class Enum implements ValidatorInterface
+final class Enum implements ValidatorInterface
 {
     public function validate(string $name, array $filterDescription, Request $request): array
     {

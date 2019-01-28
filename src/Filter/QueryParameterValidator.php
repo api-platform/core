@@ -44,7 +44,7 @@ class QueryParameterValidator
         ];
     }
 
-    public function validateFilters(string $resourceClass, array $resourceFilters, Request $request)
+    public function validateFilters(string $resourceClass, array $resourceFilters, Request $request): void
     {
         $errorList = [];
         foreach ($resourceFilters as $filterId) {

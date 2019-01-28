@@ -15,7 +15,7 @@ namespace ApiPlatform\Core\Filter\Validator;
 
 use Symfony\Component\HttpFoundation\Request;
 
-class Required implements ValidatorInterface
+final class Required implements ValidatorInterface
 {
     public function validate(string $name, array $filterDescription, Request $request): array
     {
