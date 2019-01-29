@@ -63,32 +63,32 @@ class ApiLoaderTest extends TestCase
         $routeCollection = $this->getApiLoaderWithResourceMetadata($resourceMetadata)->load(null);
 
         $this->assertEquals(
-            $this->getRoute('/dummies/{id}.{_format}', 'api_platform.action.get_item', DummyEntity::class, 'get', ['GET'], false, ['id' => '\d+'], ['my_default' => 'default_value']),
+            $this->getRoute('/dummies/{id}.{_format}', 'api_platform.action.get_item', DummyEntity::class, DummyEntity::class, DummyEntity::class, 'get', ['GET'], false, ['id' => '\d+'], ['my_default' => 'default_value']),
             $routeCollection->get('api_dummies_get_item')
         );
 
         $this->assertEquals(
-            $this->getRoute('/dummies/{id}.{_format}', 'api_platform.action.delete_item', DummyEntity::class, 'delete', ['DELETE']),
+            $this->getRoute('/dummies/{id}.{_format}', 'api_platform.action.delete_item', DummyEntity::class, DummyEntity::class, DummyEntity::class, 'delete', ['DELETE']),
             $routeCollection->get('api_dummies_delete_item')
         );
 
         $this->assertEquals(
-            $this->getRoute('/dummies/{id}.{_format}', 'api_platform.action.put_item', DummyEntity::class, 'put', ['PUT']),
+            $this->getRoute('/dummies/{id}.{_format}', 'api_platform.action.put_item', DummyEntity::class, DummyEntity::class, DummyEntity::class, 'put', ['PUT']),
             $routeCollection->get('api_dummies_put_item')
         );
 
         $this->assertEquals(
-            $this->getRoute('/dummies.{_format}', 'some.service.name', DummyEntity::class, 'my_op', ['GET'], true, ['_format' => 'a valid format'], ['my_default' => 'default_value'], [], '', [], "request.headers.get('User-Agent') matches '/firefox/i'"),
+            $this->getRoute('/dummies.{_format}', 'some.service.name', DummyEntity::class, DummyEntity::class, DummyEntity::class, 'my_op', ['GET'], true, ['_format' => 'a valid format'], ['my_default' => 'default_value'], [], '', [], "request.headers.get('User-Agent') matches '/firefox/i'"),
             $routeCollection->get('api_dummies_my_op_collection')
         );
 
         $this->assertEquals(
-            $this->getRoute('/dummies.{_format}', 'api_platform.action.post_collection', DummyEntity::class, 'my_second_op', ['POST'], true, [], [], ['option' => 'option_value'], '{subdomain}.api-platform.com', ['https']),
+            $this->getRoute('/dummies.{_format}', 'api_platform.action.post_collection', DummyEntity::class, DummyEntity::class, DummyEntity::class, 'my_second_op', ['POST'], true, [], [], ['option' => 'option_value'], '{subdomain}.api-platform.com', ['https']),
             $routeCollection->get('api_dummies_my_second_op_collection')
         );
 
         $this->assertEquals(
-            $this->getRoute('/some/custom/path', 'api_platform.action.get_collection', DummyEntity::class, 'my_path_op', ['GET'], true),
+            $this->getRoute('/some/custom/path', 'api_platform.action.get_collection', DummyEntity::class, DummyEntity::class, DummyEntity::class, 'my_path_op', ['GET'], true),
             $routeCollection->get('api_dummies_my_path_op_collection')
         );
 
@@ -112,17 +112,17 @@ class ApiLoaderTest extends TestCase
         $routeCollection = $this->getApiLoaderWithResourceMetadata($resourceMetadata)->load(null);
 
         $this->assertEquals(
-            $this->getRoute('/foobar-prefix/dummies/{id}.{_format}', 'api_platform.action.get_item', DummyEntity::class, 'get', ['GET'], false, ['id' => '\d+'], ['my_default' => 'default_value']),
+            $this->getRoute('/foobar-prefix/dummies/{id}.{_format}', 'api_platform.action.get_item', DummyEntity::class, DummyEntity::class, DummyEntity::class, 'get', ['GET'], false, ['id' => '\d+'], ['my_default' => 'default_value']),
             $routeCollection->get('api_dummies_get_item')
         );
 
         $this->assertEquals(
-            $this->getRoute('/foobar-prefix/dummies/{id}.{_format}', 'api_platform.action.delete_item', DummyEntity::class, 'delete', ['DELETE']),
+            $this->getRoute('/foobar-prefix/dummies/{id}.{_format}', 'api_platform.action.delete_item', DummyEntity::class, DummyEntity::class, DummyEntity::class, 'delete', ['DELETE']),
             $routeCollection->get('api_dummies_delete_item')
         );
 
         $this->assertEquals(
-            $this->getRoute('/foobar-prefix/dummies/{id}.{_format}', 'api_platform.action.put_item', DummyEntity::class, 'put', ['PUT']),
+            $this->getRoute('/foobar-prefix/dummies/{id}.{_format}', 'api_platform.action.put_item', DummyEntity::class, DummyEntity::class, DummyEntity::class, 'put', ['PUT']),
             $routeCollection->get('api_dummies_put_item')
         );
     }
@@ -297,7 +297,80 @@ class ApiLoaderTest extends TestCase
         return $apiLoader;
     }
 
-    private function getRoute(string $path, string $controller, string $resourceClass, string $operationName, array $methods, bool $collection = false, array $requirements = [], array $extraDefaults = [], array $options = [], string $host = '', array $schemes = [], string $condition = ''): Route
+    public function inputAndOutputClassDataProvider(): \Generator
+    {
+        yield 'fall back to resource class' => [
+            (function (): ResourceMetadata {
+                $resourceMetadata = new ResourceMetadata();
+                $resourceMetadata = $resourceMetadata->withShortName('dummy');
+                $resourceMetadata = $resourceMetadata->withItemOperations([
+                    'get' => ['method' => 'GET'],
+                ]);
+                $resourceMetadata = $resourceMetadata->withCollectionOperations([
+                    'get' => ['method' => 'GET'],
+                ]);
+
+                return $resourceMetadata;
+            })(),
+            $this->getRoute('/dummies/{id}.{_format}', 'api_platform.action.get_item', DummyEntity::class, DummyEntity::class, DummyEntity::class, 'get', ['GET']),
+            $this->getRoute('/dummies.{_format}', 'api_platform.action.get_collection', DummyEntity::class, DummyEntity::class, DummyEntity::class, 'get', ['GET'], true),
+        ];
+
+        yield 'resource specified' => [
+            (function (): ResourceMetadata {
+                $resourceMetadata = new ResourceMetadata();
+                $resourceMetadata = $resourceMetadata->withShortName('dummy');
+                $resourceMetadata = $resourceMetadata->withItemOperations([
+                    'get' => ['method' => 'GET'],
+                ]);
+                $resourceMetadata = $resourceMetadata->withCollectionOperations([
+                    'get' => ['method' => 'GET'],
+                ]);
+                $resourceMetadata = $resourceMetadata->withAttributes(['input_class' => 'FooInput', 'output_class' => 'FooOutput']);
+
+                return $resourceMetadata;
+            })(),
+            $this->getRoute('/dummies/{id}.{_format}', 'api_platform.action.get_item', DummyEntity::class, 'FooInput', 'FooOutput', 'get', ['GET']),
+            $this->getRoute('/dummies.{_format}', 'api_platform.action.get_collection', DummyEntity::class, 'FooInput', 'FooOutput', 'get', ['GET'], true),
+        ];
+
+        yield 'operation specified' => [
+            (function (): ResourceMetadata {
+                $resourceMetadata = new ResourceMetadata();
+                $resourceMetadata = $resourceMetadata->withShortName('dummy');
+                $resourceMetadata = $resourceMetadata->withItemOperations([
+                    'get' => ['method' => 'GET', 'input_class' => 'FooInputGet', 'output_class' => 'FooOutputGet'],
+                ]);
+                $resourceMetadata = $resourceMetadata->withCollectionOperations([
+                    'get' => ['method' => 'GET', 'input_class' => 'FooInputCollectionGet', 'output_class' => 'FooOutputCollectionGet'],
+                ]);
+                $resourceMetadata = $resourceMetadata->withAttributes(['input_class' => 'FooInput', 'output_class' => 'FooOutput']);
+
+                return $resourceMetadata;
+            })(),
+            $this->getRoute('/dummies/{id}.{_format}', 'api_platform.action.get_item', DummyEntity::class, 'FooInputGet', 'FooOutputGet', 'get', ['GET']),
+            $this->getRoute('/dummies.{_format}', 'api_platform.action.get_collection', DummyEntity::class, 'FooInputCollectionGet', 'FooOutputCollectionGet', 'get', ['GET'], true),
+        ];
+    }
+
+    /**
+     * @dataProvider inputAndOutputClassDataProvider
+     */
+    public function testInputAndOutputClassesAreResolved(ResourceMetadata $resourceMetadata, Route $expectedItem, Route $expectedCollection)
+    {
+        $routeCollection = $this->getApiLoaderWithResourceMetadata($resourceMetadata)->load(null);
+
+        $this->assertEquals(
+            $expectedItem,
+            $routeCollection->get('api_dummies_get_item')
+        );
+        $this->assertEquals(
+            $expectedCollection,
+            $routeCollection->get('api_dummies_get_collection')
+        );
+    }
+
+    private function getRoute(string $path, string $controller, string $resourceClass, string $inputClass, string $outputClass, string $operationName, array $methods, bool $collection = false, array $requirements = [], array $extraDefaults = [], array $options = [], string $host = '', array $schemes = [], string $condition = ''): Route
     {
         return new Route(
             $path,
@@ -305,8 +378,8 @@ class ApiLoaderTest extends TestCase
                 '_controller' => $controller,
                 '_format' => null,
                 '_api_resource_class' => $resourceClass,
-                '_api_input_class' => $resourceClass,
-                '_api_output_class' => $resourceClass,
+                '_api_input_class' => $inputClass,
+                '_api_output_class' => $outputClass,
                 sprintf('_api_%s_operation_name', $collection ? 'collection' : 'item') => $operationName,
             ] + $extraDefaults,
             $requirements,

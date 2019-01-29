@@ -206,14 +206,25 @@ final class ApiLoader extends Loader
         $path = trim(trim($resourceMetadata->getAttribute('route_prefix', '')), '/');
         $path .= $this->operationPathResolver->resolveOperationPath($resourceShortName, $operation, $operationType, $operationName);
 
+        $inputClass = $resourceMetadata->getAttribute('input_class', $resourceClass);
+        $outputClass = $resourceMetadata->getAttribute('output_class', $resourceClass);
+
+        if (OperationType::ITEM === $operationType) {
+            $inputClass = $resourceMetadata->getItemOperationAttribute($operationName, 'input_class', $inputClass);
+            $outputClass = $resourceMetadata->getItemOperationAttribute($operationName, 'output_class', $outputClass);
+        } else {
+            $inputClass = $resourceMetadata->getCollectionOperationAttribute($operationName, 'input_class', $inputClass);
+            $outputClass = $resourceMetadata->getCollectionOperationAttribute($operationName, 'output_class', $outputClass);
+        }
+
         $route = new Route(
             $path,
             [
                 '_controller' => $controller,
                 '_format' => null,
                 '_api_resource_class' => $resourceClass,
-                '_api_input_class' => $resourceMetadata->getAttribute('input_class', $resourceClass),
-                '_api_output_class' => $resourceMetadata->getAttribute('output_class', $resourceClass),
+                '_api_input_class' => $inputClass,
+                '_api_output_class' => $outputClass,
                 sprintf('_api_%s_operation_name', $operationType) => $operationName,
             ] + ($operation['defaults'] ?? []),
             $operation['requirements'] ?? [],
