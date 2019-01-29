@@ -151,7 +151,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $this->registerMercureConfiguration($container, $config, $loader, $useDoctrine);
         $this->registerElasticsearchConfiguration($container, $config, $loader);
 
-        if (interface_exists(MessageBusInterface::class)) {
+        if (interface_exists(MessageBusInterface::class) && $container->has('message_bus')) {
             $loader->load('messenger.xml');
         }
     }

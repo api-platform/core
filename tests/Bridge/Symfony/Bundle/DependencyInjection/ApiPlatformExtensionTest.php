@@ -837,6 +837,7 @@ class ApiPlatformExtensionTest extends TestCase
         $containerBuilderProphecy->getParameter('kernel.debug')->willReturn(false);
 
         $containerBuilderProphecy->getDefinition('api_platform.http_cache.purger.varnish')->willReturn(new Definition());
+        $containerBuilderProphecy->has('message_bus')->willReturn(true);
 
         return $containerBuilderProphecy;
     }
