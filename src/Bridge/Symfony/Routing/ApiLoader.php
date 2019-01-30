@@ -206,15 +206,12 @@ final class ApiLoader extends Loader
         $path = trim(trim($resourceMetadata->getAttribute('route_prefix', '')), '/');
         $path .= $this->operationPathResolver->resolveOperationPath($resourceShortName, $operation, $operationType, $operationName);
 
-        $inputClass = $resourceMetadata->getAttribute('input_class', $resourceClass);
-        $outputClass = $resourceMetadata->getAttribute('output_class', $resourceClass);
-
         if (OperationType::ITEM === $operationType) {
-            $inputClass = $resourceMetadata->getItemOperationAttribute($operationName, 'input_class', $inputClass);
-            $outputClass = $resourceMetadata->getItemOperationAttribute($operationName, 'output_class', $outputClass);
+            $inputClass = $resourceMetadata->getItemOperationAttribute($operationName, 'input_class', $resourceClass, true);
+            $outputClass = $resourceMetadata->getItemOperationAttribute($operationName, 'output_class', $resourceClass, true);
         } else {
-            $inputClass = $resourceMetadata->getCollectionOperationAttribute($operationName, 'input_class', $inputClass);
-            $outputClass = $resourceMetadata->getCollectionOperationAttribute($operationName, 'output_class', $outputClass);
+            $inputClass = $resourceMetadata->getCollectionOperationAttribute($operationName, 'input_class', $resourceClass, true);
+            $outputClass = $resourceMetadata->getCollectionOperationAttribute($operationName, 'output_class', $resourceClass, true);
         }
 
         $route = new Route(
