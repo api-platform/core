@@ -65,9 +65,6 @@ final class WriteListener
 
                 $event->setControllerResult($persistResult ?? $controllerResult);
 
-                // Controller result must be immutable for _api_write_item_iri
-                // if it's class changed compared to the base class let's avoid calling the IriConverter
-                // especially that the Output class could be a DTO that's not referencing any route
                 if (null === $this->iriConverter) {
                     return;
                 }
@@ -79,8 +76,7 @@ final class WriteListener
                     $hasOutput = \array_key_exists('class', $outputMetadata) && null !== $outputMetadata['class'];
                 }
 
-                $class = \get_class($controllerResult);
-                if ($hasOutput && $attributes['resource_class'] === $class && $class === \get_class($event->getControllerResult())) {
+                if ($hasOutput) {
                     $request->attributes->set('_api_write_item_iri', $this->iriConverter->getIriFromItem($controllerResult));
                 }
             break;
