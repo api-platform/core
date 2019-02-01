@@ -22,8 +22,14 @@ use Symfony\Component\Validator\Constraints as Assert;
  * Abstract Dummy.
  *
  * @author Jérémy Derussé <jeremy@derusse.com>
- *
- * @ApiResource(attributes={"filters"={"my_dummy.mongodb.search", "my_dummy.mongodb.order", "my_dummy.mongodb.date"}})
+ * @ApiResource(
+ *     itemOperations={
+ *         "get",
+ *         "put",
+ *         "delete",
+ *     },
+ *     attributes={"filters"={"my_dummy.mongodb.search", "my_dummy.mongodb.order", "my_dummy.mongodb.date"}}
+ * )
  * @ODM\Document
  * @ODM\InheritanceType("SINGLE_COLLECTION")
  * @ODM\DiscriminatorField(value="discr")
