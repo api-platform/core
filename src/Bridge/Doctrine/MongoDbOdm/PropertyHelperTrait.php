@@ -68,12 +68,16 @@ trait PropertyHelperTrait
                 $alias .= $propertyAlias;
                 $referenceMapping = $classMetadata->getFieldMapping($association);
 
-                if (($isOwningSide = $referenceMapping['isOwningSide']) && !\in_array($referenceMapping['storeAs'], [MongoDbOdmClassMetadata::REFERENCE_STORE_AS_ID, MongoDbOdmClassMetadata::REFERENCE_STORE_AS_REF], true)) {
+                if (($isOwningSide = $referenceMapping['isOwningSide']) && MongoDbOdmClassMetadata::REFERENCE_STORE_AS_ID !== $referenceMapping['storeAs']) {
                     throw MappingException::cannotLookupDbRefReference($classMetadata->getReflectionClass()->getShortName(), $association);
                 }
                 if (!$isOwningSide) {
+                    if (isset($referenceMapping['repositoryMethod']) || !isset($referenceMapping['mappedBy'])) {
+                        throw MappingException::repositoryMethodLookupNotAllowed($classMetadata->getReflectionClass()->getShortName(), $association);
+                    }
+
                     $targetClassMetadata = $this->getClassMetadata($referenceMapping['targetDocument']);
-                    if ($targetClassMetadata instanceof MongoDbOdmClassMetadata && !\in_array($targetClassMetadata->getFieldMapping($referenceMapping['mappedBy'])['storeAs'], [MongoDbOdmClassMetadata::REFERENCE_STORE_AS_ID, MongoDbOdmClassMetadata::REFERENCE_STORE_AS_REF], true)) {
+                    if ($targetClassMetadata instanceof MongoDbOdmClassMetadata && MongoDbOdmClassMetadata::REFERENCE_STORE_AS_ID !== $targetClassMetadata->getFieldMapping($referenceMapping['mappedBy'])['storeAs']) {
                         throw MappingException::cannotLookupDbRefReference($classMetadata->getReflectionClass()->getShortName(), $association);
                     }
                 }
