@@ -24,11 +24,8 @@ use Symfony\Component\Validator\Constraints as Assert;
  * @author Jérémy Derussé <jeremy@derusse.com>
  *
  * @ApiResource(
- *     itemOperations={
- *         "get",
- *         "put",
- *         "delete",
- *     },
+ *     collectionOperations={"get", "post"},
+ *     itemOperations={"get", "put", "delete"},
  *     attributes={"filters"={"my_dummy.search", "my_dummy.order", "my_dummy.date"}}
  * )
  * @ORM\Entity

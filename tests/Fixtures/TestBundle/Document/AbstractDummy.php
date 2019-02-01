@@ -23,11 +23,8 @@ use Symfony\Component\Validator\Constraints as Assert;
  *
  * @author Jérémy Derussé <jeremy@derusse.com>
  * @ApiResource(
- *     itemOperations={
- *         "get",
- *         "put",
- *         "delete",
- *     },
+ *     collectionOperations={"get", "post"},
+ *     itemOperations={"get", "put", "delete"},
  *     attributes={"filters"={"my_dummy.mongodb.search", "my_dummy.mongodb.order", "my_dummy.mongodb.date"}}
  * )
  * @ODM\Document
