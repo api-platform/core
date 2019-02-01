@@ -46,12 +46,15 @@ before_install:
   - if [[ $APP_ENV = 'elasticsearch' ]]; then
       curl -O https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-6.5.0.deb && sudo dpkg -i --force-confnew elasticsearch-6.5.0.deb && sudo service elasticsearch restart;
     fi
-  - phpenv config-rm xdebug.ini || echo "xdebug not available"
   - echo "memory_limit=-1" >> ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/travis.ini
-  - echo "extension=mongodb.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
+  - if [[ $APP_ENV = 'mongodb' ]]; then
+      echo "extension=mongodb.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini;
+    fi
+  - phpenv config-rm xdebug.ini || echo "xdebug not available"
   - export PATH="$PATH:$HOME/.composer/vendor/bin"
 
 install:
+  - if [[ $APP_ENV = 'mongodb' ]]; then composer require "doctrine/mongodb-odm:^2.0.0@beta doctrine/mongodb-odm-bundle:^4.0.0@beta"; fi
   - if [[ $deps = 'low' ]]; then
       composer update --prefer-dist --no-progress --no-suggest --prefer-stable --prefer-lowest --ansi;
     else
