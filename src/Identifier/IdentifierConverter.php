@@ -16,6 +16,7 @@ namespace ApiPlatform\Core\Identifier;
 use ApiPlatform\Core\Api\IdentifiersExtractorInterface;
 use ApiPlatform\Core\Exception\InvalidIdentifierException;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
+use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use Symfony\Component\PropertyInfo\Type;
 
 /**
@@ -23,24 +24,31 @@ use Symfony\Component\PropertyInfo\Type;
  *
  * @author Antoine Bluchet <soyuka@gmail.com>
  */
-final class IdentifierConverter implements IdentifierConverterInterface
+final class IdentifierConverter implements ContextAwareIdentifierConverterInterface
 {
     private $propertyMetadataFactory;
     private $identifiersExtractor;
     private $identifierDenormalizers;
+    private $resourceMetadataFactory;
 
-    public function __construct(IdentifiersExtractorInterface $identifiersExtractor, PropertyMetadataFactoryInterface $propertyMetadataFactory, $identifierDenormalizers)
+    public function __construct(IdentifiersExtractorInterface $identifiersExtractor, PropertyMetadataFactoryInterface $propertyMetadataFactory, $identifierDenormalizers, ResourceMetadataFactoryInterface $resourceMetadataFactory = null)
     {
         $this->propertyMetadataFactory = $propertyMetadataFactory;
         $this->identifiersExtractor = $identifiersExtractor;
         $this->identifierDenormalizers = $identifierDenormalizers;
+        $this->resourceMetadataFactory = $resourceMetadataFactory;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function convert(string $data, string $class): array
+    public function convert(string $data, string $class, array $context = []): array
     {
+        if (null !== $this->resourceMetadataFactory) {
+            $resourceMetadata = $this->resourceMetadataFactory->create($class);
+            $class = $resourceMetadata->getOperationAttribute($context, 'output_class', $class, true);
+        }
+
         $keys = $this->identifiersExtractor->getIdentifiersFromResourceClass($class);
 
         if (($numIdentifiers = \count($keys)) > 1) {
