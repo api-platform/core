@@ -185,6 +185,12 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
      */
     protected function instantiateObject(array &$data, $class, array &$context, \ReflectionClass $reflectionClass, $allowedAttributes, string $format = null)
     {
+        if (null !== $object = $this->extractObjectToPopulate($class, $context, static::OBJECT_TO_POPULATE)) {
+            unset($context[static::OBJECT_TO_POPULATE]);
+
+            return $object;
+        }
+
         if ($this->classDiscriminatorResolver && $mapping = $this->classDiscriminatorResolver->getMappingForClass($class)) {
             if (!isset($data[$mapping->getTypeProperty()])) {
                 throw new RuntimeException(sprintf('Type property "%s" not found for the abstract object "%s"', $mapping->getTypeProperty(), $class));
@@ -197,12 +203,6 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
 
             $class = $mappedClass;
             $reflectionClass = new \ReflectionClass($class);
-        }
-
-        if (null !== $object = $this->extractObjectToPopulate($class, $context, static::OBJECT_TO_POPULATE)) {
-            unset($context[static::OBJECT_TO_POPULATE]);
-
-            return $object;
         }
 
         $constructor = $this->getConstructor($data, $class, $context, $reflectionClass, $allowedAttributes);
