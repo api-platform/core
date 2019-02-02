@@ -62,7 +62,7 @@ trait EagerLoadingTrait
     }
 
     /**
-     * Checkes if the class has an associationMapping with FETCH=EAGER.
+     * Checks if the class has an associationMapping with FETCH=EAGER.
      *
      * @param array $checked array cache of tested metadata classes
      */

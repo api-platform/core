@@ -155,7 +155,7 @@ abstract class ExtractorTestCase extends TestCase
         ], $resources);
     }
 
-    final public function testResourcesParamatersResolution()
+    final public function testResourcesParametersResolution()
     {
         $containerProphecy = $this->prophesize(ContainerInterface::class);
         $containerProphecy->get('dummy_class')->willReturn(\ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy::class);
@@ -281,7 +281,7 @@ abstract class ExtractorTestCase extends TestCase
         $containerProphecy->get(Argument::cetera())->shouldHaveBeenCalledTimes(2);
     }
 
-    final public function testResourcesParamatersResolutionWithTheSymfonyContainer()
+    final public function testResourcesParametersResolutionWithTheSymfonyContainer()
     {
         $containerProphecy = $this->prophesize(SymfonyContainerInterface::class);
         $containerProphecy->getParameter('dummy_class')->willReturn(\ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy::class);
@@ -407,7 +407,7 @@ abstract class ExtractorTestCase extends TestCase
         $containerProphecy->getParameter(Argument::cetera())->shouldHaveBeenCalledTimes(2);
     }
 
-    final public function testResourcesParamatersResolutionWithoutAContainer()
+    final public function testResourcesParametersResolutionWithoutAContainer()
     {
         $resources = $this->createExtractor([$this->getResourceWithParametersFile()])->getResources();
 
