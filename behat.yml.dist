@@ -18,7 +18,7 @@ default:
         - 'Behat\MinkExtension\Context\MinkContext'
         - 'Behatch\Context\RestContext'
       filters:
-        tags: '~@postgres&&~@elasticsearch'
+        tags: '~@postgres&&~@mongodb&&~@elasticsearch'
     postgres:
       contexts:
         - 'DoctrineContext':
@@ -37,7 +37,7 @@ default:
         - 'Behat\MinkExtension\Context\MinkContext'
         - 'Behatch\Context\RestContext'
       filters:
-        tags: '~@sqlite&&~@elasticsearch'
+        tags: '~@sqlite&&~@mongodb&&~@elasticsearch'
     mongodb:
       contexts:
         - 'DoctrineContext':
@@ -106,4 +106,4 @@ coverage:
         - 'Behat\MinkExtension\Context\MinkContext'
         - 'Behatch\Context\RestContext'
       filters:
-        tags: '~@postgres&&~@elasticsearch'
+        tags: '~@postgres&&~@mongodb&&~@elasticsearch'

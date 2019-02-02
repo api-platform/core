@@ -135,7 +135,7 @@ class OrderExtensionTest extends TestCase
         $classMetadataProphecy->hasAssociation('name')->shouldBeCalled()->willReturn(false);
         $classMetadataProphecy->getAssociationTargetClass('author')->shouldBeCalled()->willReturn(Dummy::class);
         $classMetadataProphecy->hasReference('author')->shouldBeCalled()->willReturn(true);
-        $classMetadataProphecy->getFieldMapping('author')->shouldBeCalled()->willReturn(['isOwningSide' => true]);
+        $classMetadataProphecy->getFieldMapping('author')->shouldBeCalled()->willReturn(['isOwningSide' => true, 'storeAs' => ClassMetadata::REFERENCE_STORE_AS_ID]);
 
         $resourceMetadataFactoryProphecy->create(Dummy::class)->shouldBeCalled()->willReturn(new ResourceMetadata(null, null, null, null, null, ['order' => ['author.name']]));
 

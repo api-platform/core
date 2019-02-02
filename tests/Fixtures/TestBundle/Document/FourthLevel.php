@@ -43,6 +43,11 @@ class FourthLevel
     private $level = 4;
 
     /**
+     * @ODM\ReferenceMany(targetDocument=ThirdLevel::class, cascade={"persist"}, mappedBy="badFourthLevel", storeAs="id")
+     */
+    public $badThirdLevel;
+
+    /**
      * @return int
      */
     public function getId()

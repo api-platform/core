@@ -36,7 +36,7 @@ services:
         tags:      [ { name: 'api_platform.filter', id: 'my_dummy.mongodb.range' } ]
     app.my_dummy_resource.mongodb.search_filter:
         parent:    'api_platform.doctrine_mongodb.odm.search_filter'
-        arguments: [ { 'id': 'exact', 'name': 'partial', 'alias': 'start', 'description': 'word_start', 'relatedDummy.name': 'exact', 'relatedDummies': 'exact', 'dummy': 'ipartial', 'relatedDummies.name': 'start', 'embeddedDummy.dummyName': 'partial', 'relatedDummy.thirdLevel.level': 'exact', 'relatedDummy.thirdLevel.fourthLevel.level': 'exact' } ]
+        arguments: [ { 'id': 'exact', 'name': 'partial', 'alias': 'start', 'description': 'word_start', 'relatedDummy.name': 'exact', 'relatedDummies': 'exact', 'dummy': 'ipartial', 'relatedDummies.name': 'start', 'embeddedDummy.dummyName': 'partial', 'relatedDummy.thirdLevel.level': 'exact', 'relatedDummy.thirdLevel.fourthLevel.level': 'exact', 'relatedDummy.thirdLevel.badFourthLevel.level': 'exact', 'relatedDummy.thirdLevel.fourthLevel.badThirdLevel.level': 'exact' } ]
         tags:      [ { name: 'api_platform.filter', id: 'my_dummy.mongodb.search' } ]
     app.related_dummy_resource.mongodb.search_filter:
         parent:    'api_platform.doctrine_mongodb.odm.search_filter'
