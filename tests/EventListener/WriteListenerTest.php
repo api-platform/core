@@ -16,6 +16,8 @@ namespace ApiPlatform\Core\Tests\EventListener;
 use ApiPlatform\Core\Api\IriConverterInterface;
 use ApiPlatform\Core\DataPersister\DataPersisterInterface;
 use ApiPlatform\Core\EventListener\WriteListener;
+use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
+use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyTableInheritance;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyTableInheritanceChild;
@@ -145,6 +147,9 @@ class WriteListenerTest extends TestCase
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
         $iriConverterProphecy->getIriFromItem($dummy)->shouldNotBeCalled();
 
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
+        $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadata(null, null, null, null, null, ['output_class' => false]));
+
         $dataPersisterProphecy->persist($dummy)->willReturn($dummy)->shouldBeCalled();
 
         $request = new Request([], [], ['_api_resource_class' => Dummy::class, '_api_collection_operation_name' => 'post', '_api_output_class' => false]);
@@ -157,7 +162,7 @@ class WriteListenerTest extends TestCase
             $dummy
         );
 
-        (new WriteListener($dataPersisterProphecy->reveal(), $iriConverterProphecy->reveal()))->onKernelView($event);
+        (new WriteListener($dataPersisterProphecy->reveal(), $iriConverterProphecy->reveal(), $resourceMetadataFactoryProphecy->reveal()))->onKernelView($event);
     }
 
     public function testOnKernelViewWithControllerResultAndRemove()
