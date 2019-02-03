@@ -550,7 +550,9 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
     {
         $keyPrefix = $resourceMetadata->getShortName();
         if (null !== $publicClass) {
-            $keyPrefix .= ':'.md5($publicClass);
+            $parts = explode('\\', $publicClass);
+            $shortName = end($parts);
+            $keyPrefix .= ':'.$shortName;
         }
 
         if (isset($serializerContext[self::SWAGGER_DEFINITION_NAME])) {
