@@ -17,7 +17,7 @@
 * Allow to set the HTTP status code to send to the client through the `status` attribute
 * Add support for the `Sunset` HTTP header using the `sunset` attribute
 * Set the `Content-Location` and `Location` headers when appropriate for better RFC7231 conformance
-* Display the matching data provider and data persiter in the debug panel
+* Display the matching data provider and data persister in the debug panel
 * GraphQL: improve performance by lazy loading types
 * Add the `api_persist` request attribute to enable or disable the `WriteListener`
 * Allow to set a default context in all normalizers

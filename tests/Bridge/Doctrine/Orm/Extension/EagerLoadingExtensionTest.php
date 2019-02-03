@@ -880,20 +880,20 @@ class EagerLoadingExtensionTest extends TestCase
         $eagerExtensionTest->applyToCollection($queryBuilder, new QueryNameGenerator(), Dummy::class);
     }
 
-    public function testApplyToCollectionWithANonRedableButFetchEagerProperty()
+    public function testApplyToCollectionWithANonReadableButFetchEagerProperty()
     {
-        $this->doTestApplyToCollectionWithANonRedableButFetchEagerProperty(false);
+        $this->doTestApplyToCollectionWithANonReadableButFetchEagerProperty(false);
     }
 
     /**
      * @group legacy
      */
-    public function testLegacyApplyToCollectionWithANonRedableButFetchEagerProperty()
+    public function testLegacyApplyToCollectionWithANonReadableButFetchEagerProperty()
     {
-        $this->doTestApplyToCollectionWithANonRedableButFetchEagerProperty(true);
+        $this->doTestApplyToCollectionWithANonReadableButFetchEagerProperty(true);
     }
 
-    private function doTestApplyToCollectionWithANonRedableButFetchEagerProperty(bool $legacy)
+    private function doTestApplyToCollectionWithANonReadableButFetchEagerProperty(bool $legacy)
     {
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn((new ResourceMetadata())->withAttributes(['normalization_context' => ['groups' => ['foo']]]));
@@ -936,20 +936,20 @@ class EagerLoadingExtensionTest extends TestCase
         $eagerExtensionTest->applyToCollection($queryBuilder, new QueryNameGenerator(), Dummy::class);
     }
 
-    public function testApplyToCollectionWithARedableButNotFetchEagerProperty()
+    public function testApplyToCollectionWithAReadableButNotFetchEagerProperty()
     {
-        $this->doTestApplyToCollectionWithARedableButNotFetchEagerProperty(false);
+        $this->doTestApplyToCollectionWithAReadableButNotFetchEagerProperty(false);
     }
 
     /**
      * @group legacy
      */
-    public function testLeacyApplyToCollectionWithARedableButNotFetchEagerProperty()
+    public function testLegacyApplyToCollectionWithAReadableButNotFetchEagerProperty()
     {
-        $this->doTestApplyToCollectionWithARedableButNotFetchEagerProperty(true);
+        $this->doTestApplyToCollectionWithAReadableButNotFetchEagerProperty(true);
     }
 
-    private function doTestApplyToCollectionWithARedableButNotFetchEagerProperty(bool $legacy)
+    private function doTestApplyToCollectionWithAReadableButNotFetchEagerProperty(bool $legacy)
     {
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn((new ResourceMetadata())->withAttributes(['normalization_context' => ['groups' => ['foo']]]));

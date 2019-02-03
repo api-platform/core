@@ -261,7 +261,7 @@ final class EagerLoadingExtension implements ContextAwareQueryCollectionExtensio
                 continue;
             }
 
-            // It's an embedded property, select relevent subfields
+            // It's an embedded property, select relevant subfields
             foreach ($this->propertyNameCollectionFactory->create($targetClassMetadata->embeddedClasses[$property]['class']) as $embeddedProperty) {
                 $propertyMetadata = $this->propertyMetadataFactory->create($entity, $property, $propertyMetadataOptions);
                 $propertyName = "$property.$embeddedProperty";

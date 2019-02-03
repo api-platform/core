@@ -64,7 +64,7 @@ class PartialCollectionViewNormalizerTest extends TestCase
         );
     }
 
-    public function testNormalizePartialaginator()
+    public function testNormalizePartialPaginator()
     {
         $this->assertEquals(
             [

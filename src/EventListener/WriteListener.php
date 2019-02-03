@@ -19,7 +19,7 @@ use ApiPlatform\Core\Util\RequestAttributesExtractor;
 use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
 
 /**
- * Bridges persistense and the API system.
+ * Bridges persistence and the API system.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  * @author Baptiste Meyer <baptiste.meyer@gmail.com>
