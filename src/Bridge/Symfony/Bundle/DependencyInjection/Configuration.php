@@ -28,6 +28,7 @@ use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Serializer\Exception\ExceptionInterface;
 
 /**
@@ -243,6 +244,10 @@ final class Configuration implements ConfigurationInterface
                             ->info('The URL send in the Link HTTP header. If not set, will default to the URL for the Symfony\'s bundle default hub.')
                         ->end()
                     ->end()
+                ->end()
+
+                ->arrayNode('messenger')
+                    ->{interface_exists(MessageBusInterface::class) ? 'canBeDisabled' : 'canBeEnabled'}()
                 ->end()
 
                 ->arrayNode('elasticsearch')

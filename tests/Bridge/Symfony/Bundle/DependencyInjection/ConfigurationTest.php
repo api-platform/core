@@ -157,6 +157,9 @@ class ConfigurationTest extends TestCase
             'doctrine_mongodb_odm' => [
                 'enabled' => true,
             ],
+            'messenger' => [
+                'enabled' => true,
+            ],
             'mercure' => [
                 'enabled' => true,
                 'hub_url' => null,
