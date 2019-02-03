@@ -31,6 +31,13 @@ use PHPUnit\Framework\TestCase;
  */
 class IterableTypeTest extends TestCase
 {
+    public function testGetName()
+    {
+        $iterableType = new IterableType();
+
+        $this->assertEquals('Iterable', $iterableType->getName());
+    }
+
     public function testSerialize()
     {
         $iterableType = new IterableType();
