@@ -128,9 +128,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
     public function denormalize($data, $class, $format = null, array $context = [])
     {
         $context['api_denormalize'] = true;
-        if (!isset($context['resource_class'])) {
-            $context['resource_class'] = $class;
-        }
+        $context['resource_class'] = $class;
 
         return parent::denormalize($data, $class, $format, $context);
     }
