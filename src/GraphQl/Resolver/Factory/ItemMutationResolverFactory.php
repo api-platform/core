@@ -16,6 +16,7 @@ namespace ApiPlatform\Core\GraphQl\Resolver\Factory;
 use ApiPlatform\Core\Api\IriConverterInterface;
 use ApiPlatform\Core\DataPersister\DataPersisterInterface;
 use ApiPlatform\Core\Event\PostWriteEvent;
+use ApiPlatform\Core\Event\PreValidateEvent;
 use ApiPlatform\Core\Event\PreWriteEvent;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\Exception\ItemNotFoundException;
@@ -108,6 +109,7 @@ final class ItemMutationResolverFactory implements ResolverFactoryInterface
                     $context = null === $item ? ['resource_class' => $resourceClass] : ['resource_class' => $resourceClass, 'object_to_populate' => $item];
                     $context += $resourceMetadata->getGraphqlAttribute($operationName, 'denormalization_context', [], true);
                     $item = $this->normalizer->denormalize($args['input'], $resourceClass, ItemNormalizer::FORMAT, $context);
+                    $this->dispatcher->dispatch(PreValidateEvent::class, new PreValidateEvent($item));
                     $this->validate($item, $info, $resourceMetadata, $operationName);
 
                     if (null !== $this->dispatcher) {
