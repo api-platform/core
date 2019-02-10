@@ -13,6 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Tests\Validator\EventListener;
 
+use ApiPlatform\Core\Event\EventInterface;
+use ApiPlatform\Core\Event\RespondEvent;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Tests\Fixtures\DummyEntity;
@@ -22,7 +24,6 @@ use ApiPlatform\Core\Validator\ValidatorInterface;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
-use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 /**
  * @author Samuel ROZE <samuel.roze@gmail.com>
@@ -45,11 +46,11 @@ class ValidateListenerTest extends TestCase
         $request = new Request();
         $request->setMethod('POST');
 
-        $event = $this->prophesize(GetResponseForControllerResultEvent::class);
-        $event->getRequest()->willReturn($request)->shouldBeCalled();
+        $event = $this->prophesize(EventInterface::class);
+        $event->getContext()->willReturn(['request' => $request])->shouldBeCalled();
 
         $listener = new ValidateListener($validator, $resourceMetadataFactory);
-        $listener->onKernelView($event->reveal());
+        $listener->handleEvent($event->reveal());
     }
 
     public function testValidatorIsCalled()
@@ -64,7 +65,7 @@ class ValidateListenerTest extends TestCase
         [$resourceMetadataFactory, $event] = $this->createEventObject($expectedValidationGroups, $data);
 
         $validationViewListener = new ValidateListener($validator, $resourceMetadataFactory);
-        $validationViewListener->onKernelView($event);
+        $validationViewListener->handleEvent($event);
     }
 
     public function testDoNotCallWhenReceiveFlagIsFalse()
@@ -79,7 +80,7 @@ class ValidateListenerTest extends TestCase
         [$resourceMetadataFactory, $event] = $this->createEventObject($expectedValidationGroups, $data, false);
 
         $validationViewListener = new ValidateListener($validator, $resourceMetadataFactory);
-        $validationViewListener->onKernelView($event);
+        $validationViewListener->handleEvent($event);
     }
 
     public function testThrowsValidationExceptionWithViolationsFound()
@@ -96,7 +97,25 @@ class ValidateListenerTest extends TestCase
         [$resourceMetadataFactory, $event] = $this->createEventObject($expectedValidationGroups, $data);
 
         $validationViewListener = new ValidateListener($validator, $resourceMetadataFactory);
-        $validationViewListener->onKernelView($event);
+        $validationViewListener->handleEvent($event);
+    }
+
+    /**
+     * @group legacy
+     *
+     * @expectedDeprecation The method ApiPlatform\Core\Validator\EventListener\ValidateListener::onKernelView() is deprecated since 2.5 and will be removed in 3.0.
+     * @expectedDeprecation Passing an instance of "Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent" as argument of "ApiPlatform\Core\Validator\EventListener\ValidateListener::handleEvent" is deprecated since 2.5 and will not be possible anymore in 3.0. Pass an instance of "ApiPlatform\Core\Event\EventInterface" instead.
+     */
+    public function testLegacyOnKernelView()
+    {
+        $validatorProphecy = $this->prophesize(ValidatorInterface::class);
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
+
+        $eventProphecy = $this->prophesize(GetResponseForControllerResultEvent::class);
+        $eventProphecy->getRequest()->willReturn(new Request());
+
+        $listener = new ValidateListener($validatorProphecy->reveal(), $resourceMetadataFactoryProphecy->reveal());
+        $listener->onKernelView($eventProphecy->reveal());
     }
 
     private function createEventObject($expectedValidationGroups, $data, bool $receive = true): array
@@ -111,7 +130,6 @@ class ValidateListenerTest extends TestCase
         }
         $resourceMetadataFactory = $resourceMetadataFactoryProphecy->reveal();
 
-        $kernel = $this->prophesize(HttpKernelInterface::class)->reveal();
         $request = new Request([], [], [
             '_api_resource_class' => DummyEntity::class,
             '_api_item_operation_name' => 'create',
@@ -121,7 +139,7 @@ class ValidateListenerTest extends TestCase
         ]);
 
         $request->setMethod('POST');
-        $event = new GetResponseForControllerResultEvent($kernel, $request, HttpKernelInterface::MASTER_REQUEST, $data);
+        $event = new RespondEvent($data, ['request' => $request]);
 
         return [$resourceMetadataFactory, $event];
     }

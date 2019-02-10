@@ -13,7 +13,7 @@
             <argument>%api_platform.http_cache.public%</argument>
             <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
 
-            <tag name="kernel.event_listener" event="kernel.response" method="onKernelResponse" priority="-1" />
+            <tag name="kernel.event_listener" event="api_platform.post_respond" method="handleEvent" priority="-1" />
         </service>
     </services>
 </container>

@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\Hydra\EventListener;
 
 use ApiPlatform\Core\Api\UrlGeneratorInterface;
+use ApiPlatform\Core\Event\EventInterface;
 use ApiPlatform\Core\Hydra\EventListener\AddLinkHeaderListener;
 use Fig\Link\GenericLinkProvider;
 use Fig\Link\Link;
@@ -35,12 +36,30 @@ class AddLinkHeaderListenerTest extends TestCase
         $urlGenerator = $this->prophesize(UrlGeneratorInterface::class);
         $urlGenerator->generate('api_doc', ['_format' => 'jsonld'], UrlGeneratorInterface::ABS_URL)->willReturn('http://example.com/docs')->shouldBeCalled();
 
+        $event = $this->prophesize(EventInterface::class);
+        $event->getContext()->willReturn(['request' => $request])->shouldBeCalled();
+
+        $listener = new AddLinkHeaderListener($urlGenerator->reveal());
+        $listener->handleEvent($event->reveal());
+        $this->assertSame($expected, (new HttpHeaderSerializer())->serialize($request->attributes->get('_links')->getLinks()));
+    }
+
+    /**
+     * @group legacy
+     *
+     * @expectedDeprecation The method ApiPlatform\Core\Hydra\EventListener\AddLinkHeaderListener::onKernelResponse() is deprecated since 2.5 and will be removed in 3.0.
+     * @expectedDeprecation Passing an instance of "Symfony\Component\HttpKernel\Event\FilterResponseEvent" as argument of "ApiPlatform\Core\Hydra\EventListener\AddLinkHeaderListener::handleEvent" is deprecated since 2.5 and will not be possible anymore in 3.0. Pass an instance of "ApiPlatform\Core\Event\EventInterface" instead.
+     */
+    public function testLegacyOnKernelResponse()
+    {
+        $urlGenerator = $this->prophesize(UrlGeneratorInterface::class);
+        $urlGenerator->generate('api_doc', ['_format' => 'jsonld'], UrlGeneratorInterface::ABS_URL)->willReturn('http://example.com/docs');
+
         $event = $this->prophesize(FilterResponseEvent::class);
-        $event->getRequest()->willReturn($request)->shouldBeCalled();
+        $event->getRequest()->willReturn(new Request())->shouldBeCalled();
 
         $listener = new AddLinkHeaderListener($urlGenerator->reveal());
         $listener->onKernelResponse($event->reveal());
-        $this->assertSame($expected, (new HttpHeaderSerializer())->serialize($request->attributes->get('_links')->getLinks()));
     }
 
     public function provider(): array

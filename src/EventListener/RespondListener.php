@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\EventListener;
 
+use ApiPlatform\Core\Event\EventInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Util\RequestAttributesExtractor;
 use Symfony\Component\HttpFoundation\Response;
@@ -39,15 +40,40 @@ final class RespondListener
 
     /**
      * Creates a Response to send to the client according to the requested format.
+     *
+     * @deprecated since version 2.5, to be removed in 3.0.
      */
     public function onKernelView(GetResponseForControllerResultEvent $event): void
     {
-        $controllerResult = $event->getControllerResult();
-        $request = $event->getRequest();
+        @trigger_error(sprintf('The method %s() is deprecated since 2.5 and will be removed in 3.0.', __METHOD__), E_USER_DEPRECATED);
+
+        $this->handleEvent($event);
+    }
+
+    /**
+     * Creates a Response to send to the client according to the requested format.
+     */
+    public function handleEvent(/*EventInterface */$event): void
+    {
+        if ($event instanceof EventInterface) {
+            $controllerResult = $event->getData();
+            $request = $event->getContext()['request'];
+        } elseif ($event instanceof GetResponseForControllerResultEvent) {
+            @trigger_error(sprintf('Passing an instance of "%s" as argument of "%s" is deprecated since 2.5 and will not be possible anymore in 3.0. Pass an instance of "%s" instead.', GetResponseForControllerResultEvent::class, __METHOD__, EventInterface::class), E_USER_DEPRECATED);
+
+            $controllerResult = $event->getControllerResult();
+            $request = $event->getRequest();
+        } else {
+            return;
+        }
 
         $attributes = RequestAttributesExtractor::extractAttributes($request);
         if ($controllerResult instanceof Response && ($attributes['respond'] ?? false)) {
-            $event->setResponse($controllerResult);
+            if ($event instanceof EventInterface) {
+                $event->setContext($event->getContext() + ['response' => $controllerResult]);
+            } elseif ($event instanceof GetResponseForControllerResultEvent) {
+                $event->setResponse($controllerResult);
+            }
 
             return;
         }
@@ -81,10 +107,16 @@ final class RespondListener
             $status = $resourceMetadata->getOperationAttribute($attributes, 'status');
         }
 
-        $event->setResponse(new Response(
+        $response = new Response(
             $controllerResult,
             $status ?? self::METHOD_TO_CODE[$request->getMethod()] ?? Response::HTTP_OK,
             $headers
-        ));
+        );
+
+        if ($event instanceof EventInterface) {
+            $event->setContext($event->getContext() + ['response' => $response]);
+        } elseif ($event instanceof GetResponseForControllerResultEvent) {
+            $event->setResponse($response);
+        }
     }
 }

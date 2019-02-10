@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\HttpCache\EventListener;
 
 use ApiPlatform\Core\Api\IriConverterInterface;
+use ApiPlatform\Core\Event\EventInterface;
 use ApiPlatform\Core\Util\RequestAttributesExtractor;
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
 
@@ -39,11 +40,32 @@ final class AddTagsListener
 
     /**
      * Adds the "Cache-Tags" header.
+     *
+     * @deprecated since version 2.5, to be removed in 3.0.
      */
     public function onKernelResponse(FilterResponseEvent $event): void
     {
-        $request = $event->getRequest();
-        $response = $event->getResponse();
+        @trigger_error(sprintf('The method %s() is deprecated since 2.5 and will be removed in 3.0.', __METHOD__), E_USER_DEPRECATED);
+
+        $this->handleEvent($event);
+    }
+
+    /**
+     * Adds the "Cache-Tags" header.
+     */
+    public function handleEvent(/*EventInterface */ $event): void
+    {
+        if ($event instanceof EventInterface) {
+            $request = $event->getContext()['request'];
+            $response = $event->getContext()['response'];
+        } elseif ($event instanceof FilterResponseEvent) {
+            @trigger_error(sprintf('Passing an instance of "%s" as argument of "%s" is deprecated since 2.5 and will not be possible anymore in 3.0. Pass an instance of "%s" instead.', FilterResponseEvent::class, __METHOD__, EventInterface::class), E_USER_DEPRECATED);
+
+            $request = $event->getRequest();
+            $response = $event->getResponse();
+        } else {
+            return;
+        }
 
         if (
             !$request->isMethodCacheable()

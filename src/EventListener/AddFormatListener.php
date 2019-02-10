@@ -15,6 +15,7 @@ namespace ApiPlatform\Core\EventListener;
 
 use ApiPlatform\Core\Api\FormatMatcher;
 use ApiPlatform\Core\Api\FormatsProviderInterface;
+use ApiPlatform\Core\Event\EventInterface;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\Util\RequestAttributesExtractor;
 use Negotiation\Negotiator;
@@ -59,10 +60,33 @@ final class AddFormatListener
      *
      * @throws NotFoundHttpException
      * @throws NotAcceptableHttpException
+     *
+     * @deprecated since version 2.5, to be removed in 3.0.
      */
     public function onKernelRequest(GetResponseEvent $event): void
     {
-        $request = $event->getRequest();
+        @trigger_error(sprintf('The method %s() is deprecated since 2.5 and will be removed in 3.0.', __METHOD__), E_USER_DEPRECATED);
+
+        $this->handleEvent($event);
+    }
+
+    /**
+     * Sets the applicable format to the HttpFoundation Request.
+     *
+     * @throws NotFoundHttpException
+     * @throws NotAcceptableHttpException
+     */
+    public function handleEvent(/*EventInterface */$event): void
+    {
+        if ($event instanceof EventInterface) {
+            $request = $event->getContext()['request'];
+        } elseif ($event instanceof GetResponseEvent) {
+            @trigger_error(sprintf('Passing an instance of "%s" as argument of "%s" is deprecated since 2.5 and will not be possible anymore in 3.0. Pass an instance of "%s" instead.', GetResponseEvent::class, __METHOD__, EventInterface::class), E_USER_DEPRECATED);
+
+            $request = $event->getRequest();
+        } else {
+            return;
+        }
         if (!($request->attributes->has('_api_resource_class') || $request->attributes->getBoolean('_api_respond', false) || $request->attributes->getBoolean('_graphql', false))) {
             return;
         }

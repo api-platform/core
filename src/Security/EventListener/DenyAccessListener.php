@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Security\EventListener;
 
+use ApiPlatform\Core\Event\EventInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Security\ExpressionLanguage;
 use ApiPlatform\Core\Security\ResourceAccessChecker;
@@ -52,11 +53,31 @@ final class DenyAccessListener
     /**
      * Sets the applicable format to the HttpFoundation Request.
      *
-     * @throws AccessDeniedException
+     * @deprecated since version 2.5, to be removed in 3.0.
      */
     public function onKernelRequest(GetResponseEvent $event): void
     {
-        $request = $event->getRequest();
+        @trigger_error(sprintf('The method %s() is deprecated since 2.5 and will be removed in 3.0.', __METHOD__), E_USER_DEPRECATED);
+
+        $this->handleEvent($event);
+    }
+
+    /**
+     * Sets the applicable format to the HttpFoundation Request.
+     *
+     * @throws AccessDeniedException
+     */
+    public function handleEvent(/*EventInterface */$event): void
+    {
+        if ($event instanceof EventInterface) {
+            $request = $event->getContext()['request'];
+        } elseif ($event instanceof GetResponseEvent) {
+            @trigger_error(sprintf('Passing an instance of "%s" as argument of "%s" is deprecated since 2.5 and will not be possible anymore in 3.0. Pass an instance of "%s" instead.', GetResponseEvent::class, __METHOD__, EventInterface::class), E_USER_DEPRECATED);
+
+            $request = $event->getRequest();
+        } else {
+            return;
+        }
         if (!$attributes = RequestAttributesExtractor::extractAttributes($request)) {
             return;
         }

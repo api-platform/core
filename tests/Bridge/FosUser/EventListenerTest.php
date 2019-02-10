@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\Bridge\FosUser;
 
 use ApiPlatform\Core\Bridge\FosUser\EventListener;
+use ApiPlatform\Core\Event\EventInterface;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\User;
 use FOS\UserBundle\Model\UserInterface;
 use FOS\UserBundle\Model\UserManagerInterface;
@@ -36,13 +37,13 @@ class EventListenerTest extends TestCase
         $manager = $this->prophesize(UserManagerInterface::class);
         $manager->deleteUser($user)->shouldBeCalled();
 
-        $event = $this->prophesize(GetResponseForControllerResultEvent::class);
-        $event->getControllerResult()->willReturn($user)->shouldBeCalled();
-        $event->getRequest()->willReturn($request)->shouldBeCalled();
-        $event->setControllerResult(null)->shouldBeCalled();
+        $event = $this->prophesize(EventInterface::class);
+        $event->getData()->willReturn($user)->shouldBeCalled();
+        $event->getContext()->willReturn(['request' => $request])->shouldBeCalled();
+        $event->setData(null)->shouldBeCalled();
 
         $listener = new EventListener($manager->reveal());
-        $listener->onKernelView($event->reveal());
+        $listener->handleEvent($event->reveal());
     }
 
     public function testUpdate()
@@ -55,13 +56,13 @@ class EventListenerTest extends TestCase
         $manager = $this->prophesize(UserManagerInterface::class);
         $manager->updateUser($user)->shouldBeCalled();
 
-        $event = $this->prophesize(GetResponseForControllerResultEvent::class);
-        $event->getControllerResult()->willReturn($user)->shouldBeCalled();
-        $event->getRequest()->willReturn($request)->shouldBeCalled();
-        $event->setControllerResult()->shouldNotBeCalled();
+        $event = $this->prophesize(EventInterface::class);
+        $event->getData()->willReturn($user)->shouldBeCalled();
+        $event->getContext()->willReturn(['request' => $request])->shouldBeCalled();
+        $event->setData()->shouldNotBeCalled();
 
         $listener = new EventListener($manager->reveal());
-        $listener->onKernelView($event->reveal());
+        $listener->handleEvent($event->reveal());
     }
 
     public function testNotApiRequest()
@@ -72,11 +73,11 @@ class EventListenerTest extends TestCase
         $manager->deleteUser()->shouldNotBeCalled();
         $manager->updateUser()->shouldNotBeCalled();
 
-        $event = $this->prophesize(GetResponseForControllerResultEvent::class);
-        $event->getRequest()->willReturn($request)->shouldBeCalled();
+        $event = $this->prophesize(EventInterface::class);
+        $event->getContext()->willReturn(['request' => $request])->shouldBeCalled();
 
         $listener = new EventListener($manager->reveal());
-        $listener->onKernelView($event->reveal());
+        $listener->handleEvent($event->reveal());
     }
 
     public function testNotUser()
@@ -88,12 +89,12 @@ class EventListenerTest extends TestCase
         $manager->deleteUser()->shouldNotBeCalled();
         $manager->updateUser()->shouldNotBeCalled();
 
-        $event = $this->prophesize(GetResponseForControllerResultEvent::class);
-        $event->getRequest()->willReturn($request)->shouldBeCalled();
-        $event->getControllerResult()->willReturn(new \stdClass());
+        $event = $this->prophesize(EventInterface::class);
+        $event->getContext()->willReturn(['request' => $request])->shouldBeCalled();
+        $event->getData()->willReturn(new \stdClass());
 
         $listener = new EventListener($manager->reveal());
-        $listener->onKernelView($event->reveal());
+        $listener->handleEvent($event->reveal());
     }
 
     public function testSafeMethod()
@@ -104,9 +105,30 @@ class EventListenerTest extends TestCase
         $manager->deleteUser()->shouldNotBeCalled();
         $manager->updateUser()->shouldNotBeCalled();
 
+        $event = $this->prophesize(EventInterface::class);
+        $event->getContext()->willReturn(['request' => $request])->shouldBeCalled();
+        $event->getData()->willReturn(new User());
+
+        $listener = new EventListener($manager->reveal());
+        $listener->handleEvent($event->reveal());
+    }
+
+    /**
+     * @group legacy
+     *
+     * @expectedDeprecation The method ApiPlatform\Core\Bridge\FosUser\EventListener::onKernelView() is deprecated since 2.5 and will be removed in 3.0.
+     * @expectedDeprecation Passing an instance of "Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent" as argument of "ApiPlatform\Core\Bridge\FosUser\EventListener::handleEvent" is deprecated since 2.5 and will not be possible anymore in 3.0. Pass an instance of "ApiPlatform\Core\Event\EventInterface" instead.
+     */
+    public function testLegacyOnKernelView()
+    {
+        $request = new Request();
+
+        $manager = $this->prophesize(UserManagerInterface::class);
+        $manager->deleteUser()->shouldNotBeCalled();
+        $manager->updateUser()->shouldNotBeCalled();
+
         $event = $this->prophesize(GetResponseForControllerResultEvent::class);
         $event->getRequest()->willReturn($request)->shouldBeCalled();
-        $event->getControllerResult()->willReturn(new User());
 
         $listener = new EventListener($manager->reveal());
         $listener->onKernelView($event->reveal());

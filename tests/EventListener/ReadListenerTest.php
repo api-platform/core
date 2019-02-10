@@ -16,6 +16,7 @@ namespace ApiPlatform\Core\Tests\EventListener;
 use ApiPlatform\Core\DataProvider\CollectionDataProviderInterface;
 use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
 use ApiPlatform\Core\DataProvider\SubresourceDataProviderInterface;
+use ApiPlatform\Core\Event\EventInterface;
 use ApiPlatform\Core\EventListener\ReadListener;
 use ApiPlatform\Core\Exception\InvalidIdentifierException;
 use ApiPlatform\Core\Exception\RuntimeException;
@@ -44,11 +45,11 @@ class ReadListenerTest extends TestCase
         $subresourceDataProvider = $this->prophesize(SubresourceDataProviderInterface::class);
         $subresourceDataProvider->getSubresource()->shouldNotBeCalled();
 
-        $event = $this->prophesize(GetResponseEvent::class);
-        $event->getRequest()->willReturn(new Request())->shouldBeCalled();
+        $eventProphecy = $this->prophesize(EventInterface::class);
+        $eventProphecy->getContext()->willReturn(['request' => new Request()]);
 
         $listener = new ReadListener($collectionDataProvider->reveal(), $itemDataProvider->reveal(), $subresourceDataProvider->reveal(), null, $identifierConverter->reveal());
-        $listener->onKernelRequest($event->reveal());
+        $listener->handleEvent($eventProphecy->reveal());
     }
 
     /**
@@ -65,11 +66,11 @@ class ReadListenerTest extends TestCase
         $subresourceDataProvider = $this->prophesize(SubresourceDataProviderInterface::class);
         $subresourceDataProvider->getSubresource()->shouldNotBeCalled();
 
-        $event = $this->prophesize(GetResponseEvent::class);
-        $event->getRequest()->willReturn(new Request())->shouldBeCalled();
+        $eventProphecy = $this->prophesize(EventInterface::class);
+        $eventProphecy->getContext()->willReturn(['request' => new Request()]);
 
         $listener = new ReadListener($collectionDataProvider->reveal(), $itemDataProvider->reveal(), $subresourceDataProvider->reveal());
-        $listener->onKernelRequest($event->reveal());
+        $listener->handleEvent($eventProphecy->reveal());
     }
 
     public function testDoNotCallWhenReceiveFlagIsFalse()
@@ -88,11 +89,11 @@ class ReadListenerTest extends TestCase
         $request = new Request([], [], ['data' => new \stdClass(), '_api_resource_class' => 'Foo', '_api_collection_operation_name' => 'post', '_api_receive' => false]);
         $request->setMethod('PUT');
 
-        $event = $this->prophesize(GetResponseEvent::class);
-        $event->getRequest()->willReturn($request)->shouldBeCalled();
+        $eventProphecy = $this->prophesize(EventInterface::class);
+        $eventProphecy->getContext()->willReturn(['request' => $request]);
 
         $listener = new ReadListener($collectionDataProvider->reveal(), $itemDataProvider->reveal(), $subresourceDataProvider->reveal(), null, $identifierConverter->reveal());
-        $listener->onKernelRequest($event->reveal());
+        $listener->handleEvent($eventProphecy->reveal());
     }
 
     public function testRetrieveCollectionPost()
@@ -111,11 +112,11 @@ class ReadListenerTest extends TestCase
         $request = new Request([], [], ['_api_resource_class' => 'Foo', '_api_collection_operation_name' => 'post', '_api_format' => 'json', '_api_mime_type' => 'application/json'], [], [], [], '{}');
         $request->setMethod('POST');
 
-        $event = $this->prophesize(GetResponseEvent::class);
-        $event->getRequest()->willReturn($request)->shouldBeCalled();
+        $eventProphecy = $this->prophesize(EventInterface::class);
+        $eventProphecy->getContext()->willReturn(['request' => $request]);
 
         $listener = new ReadListener($collectionDataProvider->reveal(), $itemDataProvider->reveal(), $subresourceDataProvider->reveal(), null, $identifierConverter->reveal());
-        $listener->onKernelRequest($event->reveal());
+        $listener->handleEvent($eventProphecy->reveal());
 
         $this->assertTrue($request->attributes->has('data'));
         $this->assertNull($request->attributes->get('data'));
@@ -137,11 +138,11 @@ class ReadListenerTest extends TestCase
         $request = new Request([], [], ['_api_resource_class' => 'Foo', '_api_collection_operation_name' => 'get', '_api_format' => 'json', '_api_mime_type' => 'application/json'], [], [], ['QUERY_STRING' => 'foo=bar']);
         $request->setMethod('GET');
 
-        $event = $this->prophesize(GetResponseEvent::class);
-        $event->getRequest()->willReturn($request)->shouldBeCalled();
+        $eventProphecy = $this->prophesize(EventInterface::class);
+        $eventProphecy->getContext()->willReturn(['request' => $request]);
 
         $listener = new ReadListener($collectionDataProvider->reveal(), $itemDataProvider->reveal(), $subresourceDataProvider->reveal(), null, $identifierConverter->reveal());
-        $listener->onKernelRequest($event->reveal());
+        $listener->handleEvent($eventProphecy->reveal());
 
         $this->assertSame([], $request->attributes->get('data'));
     }
@@ -164,11 +165,11 @@ class ReadListenerTest extends TestCase
         $request = new Request([], [], ['id' => 1, '_api_resource_class' => 'Foo', '_api_item_operation_name' => 'get', '_api_format' => 'json', '_api_mime_type' => 'application/json']);
         $request->setMethod('GET');
 
-        $event = $this->prophesize(GetResponseEvent::class);
-        $event->getRequest()->willReturn($request)->shouldBeCalled();
+        $eventProphecy = $this->prophesize(EventInterface::class);
+        $eventProphecy->getContext()->willReturn(['request' => $request]);
 
         $listener = new ReadListener($collectionDataProvider->reveal(), $itemDataProvider->reveal(), $subresourceDataProvider->reveal(), null, $identifierConverter->reveal());
-        $listener->onKernelRequest($event->reveal());
+        $listener->handleEvent($eventProphecy->reveal());
 
         $this->assertSame($data, $request->attributes->get('data'));
     }
@@ -189,11 +190,11 @@ class ReadListenerTest extends TestCase
         $request = new Request([], [], ['_api_resource_class' => 'Foo', '_api_item_operation_name' => 'get', '_api_format' => 'json', '_api_mime_type' => 'application/json']);
         $request->setMethod('GET');
 
-        $event = $this->prophesize(GetResponseEvent::class);
-        $event->getRequest()->willReturn($request)->shouldBeCalled();
+        $eventProphecy = $this->prophesize(EventInterface::class);
+        $eventProphecy->getContext()->willReturn(['request' => $request]);
 
         $listener = new ReadListener($collectionDataProvider->reveal(), $itemDataProvider->reveal(), $subresourceDataProvider->reveal());
-        $listener->onKernelRequest($event->reveal());
+        $listener->handleEvent($eventProphecy->reveal());
 
         $request->attributes->get('data');
     }
@@ -216,11 +217,11 @@ class ReadListenerTest extends TestCase
         $request = new Request([], [], ['id' => 1, '_api_resource_class' => 'Foo', '_api_subresource_operation_name' => 'get', '_api_format' => 'json', '_api_mime_type' => 'application/json', '_api_subresource_context' => ['identifiers' => [['id', 'Bar', true]], 'property' => 'bar']]);
         $request->setMethod('GET');
 
-        $event = $this->prophesize(GetResponseEvent::class);
-        $event->getRequest()->willReturn($request)->shouldBeCalled();
+        $eventProphecy = $this->prophesize(EventInterface::class);
+        $eventProphecy->getContext()->willReturn(['request' => $request]);
 
         $listener = new ReadListener($collectionDataProvider->reveal(), $itemDataProvider->reveal(), $subresourceDataProvider->reveal(), null, $identifierConverter->reveal());
-        $listener->onKernelRequest($event->reveal());
+        $listener->handleEvent($eventProphecy->reveal());
 
         $this->assertSame($data, $request->attributes->get('data'));
     }
@@ -238,11 +239,11 @@ class ReadListenerTest extends TestCase
         $request = new Request([], [], ['id' => 1, '_api_resource_class' => 'Foo', '_api_subresource_operation_name' => 'get', '_api_format' => 'json', '_api_mime_type' => 'application/json', '_api_subresource_context' => ['identifiers' => [['id', 'Bar', true]], 'property' => 'bar']]);
         $request->setMethod('GET');
 
-        $event = $this->prophesize(GetResponseEvent::class);
-        $event->getRequest()->willReturn($request)->shouldBeCalled();
+        $eventProphecy = $this->prophesize(EventInterface::class);
+        $eventProphecy->getContext()->willReturn(['request' => $request]);
 
         $listener = new ReadListener($collectionDataProvider->reveal(), $itemDataProvider->reveal());
-        $listener->onKernelRequest($event->reveal());
+        $listener->handleEvent($eventProphecy->reveal());
 
         $request->attributes->get('data');
     }
@@ -262,11 +263,11 @@ class ReadListenerTest extends TestCase
         $request = new Request([], [], ['id' => 1, '_api_resource_class' => 'Foo', '_api_subresource_operation_name' => 'get', '_api_format' => 'json', '_api_mime_type' => 'application/json', '_api_subresource_context' => ['identifiers' => [['id', 'Bar', true]], 'property' => 'bar']]);
         $request->setMethod('GET');
 
-        $event = $this->prophesize(GetResponseEvent::class);
-        $event->getRequest()->willReturn($request)->shouldBeCalled();
+        $eventProphecy = $this->prophesize(EventInterface::class);
+        $eventProphecy->getContext()->willReturn(['request' => $request]);
 
         $listener = new ReadListener($collectionDataProvider->reveal(), $itemDataProvider->reveal(), $this->prophesize(SubresourceDataProviderInterface::class)->reveal(), null, $identifierConverter->reveal());
-        $listener->onKernelRequest($event->reveal());
+        $listener->handleEvent($eventProphecy->reveal());
     }
 
     public function testRetrieveItemNotFound()
@@ -285,11 +286,11 @@ class ReadListenerTest extends TestCase
         $request = new Request([], [], ['id' => 22, '_api_resource_class' => 'Foo', '_api_item_operation_name' => 'get', '_api_format' => 'json', '_api_mime_type' => 'application/json']);
         $request->setMethod('GET');
 
-        $event = $this->prophesize(GetResponseEvent::class);
-        $event->getRequest()->willReturn($request)->shouldBeCalled();
+        $eventProphecy = $this->prophesize(EventInterface::class);
+        $eventProphecy->getContext()->willReturn(['request' => $request]);
 
         $listener = new ReadListener($collectionDataProvider->reveal(), $itemDataProvider->reveal(), $subresourceDataProvider->reveal(), null, $identifierConverter->reveal());
-        $listener->onKernelRequest($event->reveal());
+        $listener->handleEvent($eventProphecy->reveal());
     }
 
     public function testRetrieveBadItemNormalizedIdentifiers()
@@ -306,11 +307,11 @@ class ReadListenerTest extends TestCase
         $request = new Request([], [], ['id' => 1, '_api_resource_class' => 'Foo', '_api_item_operation_name' => 'get', '_api_format' => 'json', '_api_mime_type' => 'application/json']);
         $request->setMethod(Request::METHOD_GET);
 
-        $event = $this->prophesize(GetResponseEvent::class);
-        $event->getRequest()->willReturn($request)->shouldBeCalled();
+        $eventProphecy = $this->prophesize(EventInterface::class);
+        $eventProphecy->getContext()->willReturn(['request' => $request]);
 
         $listener = new ReadListener($collectionDataProvider->reveal(), $itemDataProvider->reveal(), $subresourceDataProvider->reveal(), null, $identifierConverter->reveal());
-        $listener->onKernelRequest($event->reveal());
+        $listener->handleEvent($eventProphecy->reveal());
     }
 
     public function testRetrieveBadSubresourceNormalizedIdentifiers()
@@ -332,10 +333,30 @@ class ReadListenerTest extends TestCase
         $request = new Request([], [], ['id' => 1, '_api_resource_class' => 'Foo', '_api_subresource_operation_name' => 'get', '_api_format' => 'json', '_api_mime_type' => 'application/json', '_api_subresource_context' => ['identifiers' => [['id', 'Bar', true]], 'property' => 'bar']]);
         $request->setMethod(Request::METHOD_GET);
 
-        $event = $this->prophesize(GetResponseEvent::class);
-        $event->getRequest()->willReturn($request)->shouldBeCalled();
+        $eventProphecy = $this->prophesize(EventInterface::class);
+        $eventProphecy->getContext()->willReturn(['request' => $request]);
 
         $listener = new ReadListener($collectionDataProvider->reveal(), $itemDataProvider->reveal(), $subresourceDataProvider->reveal(), null, $identifierConverter->reveal());
-        $listener->onKernelRequest($event->reveal());
+        $listener->handleEvent($eventProphecy->reveal());
+    }
+
+    /**
+     * @group legacy
+     *
+     * @expectedDeprecation The method ApiPlatform\Core\EventListener\ReadListener::onKernelRequest() is deprecated since 2.5 and will be removed in 3.0.
+     * @expectedDeprecation Passing an instance of "Symfony\Component\HttpKernel\Event\GetResponseEvent" as argument of "ApiPlatform\Core\EventListener\ReadListener::handleEvent" is deprecated since 2.5 and will not be possible anymore in 3.0. Pass an instance of "ApiPlatform\Core\Event\EventInterface" instead.
+     */
+    public function testLegacyOnKernelRequest()
+    {
+        $collectionDataProvider = $this->prophesize(CollectionDataProviderInterface::class);
+        $itemDataProvider = $this->prophesize(ItemDataProviderInterface::class);
+        $subresourceDataProvider = $this->prophesize(SubresourceDataProviderInterface::class);
+        $identifierConverter = $this->prophesize(IdentifierConverterInterface::class);
+
+        $eventProphecy = $this->prophesize(GetResponseEvent::class);
+        $eventProphecy->getRequest()->willReturn(new Request());
+
+        $listener = new ReadListener($collectionDataProvider->reveal(), $itemDataProvider->reveal(), $subresourceDataProvider->reveal(), null, $identifierConverter->reveal());
+        $listener->onKernelRequest($eventProphecy->reveal());
     }
 }

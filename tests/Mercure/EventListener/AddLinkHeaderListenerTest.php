@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Tests\Mercure\EventListener;
 
+use ApiPlatform\Core\Event\EventInterface;
 use ApiPlatform\Core\Mercure\EventListener\AddLinkHeaderListener;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
@@ -39,10 +40,10 @@ class AddLinkHeaderListenerTest extends TestCase
 
         $listener = new AddLinkHeaderListener($resourceMetadataFactoryProphecy->reveal(), 'https://demo.mercure.rocks/hub');
 
-        $eventProphecy = $this->prophesize(FilterResponseEvent::class);
-        $eventProphecy->getRequest()->willReturn($request)->shouldBeCalled();
+        $eventProphecy = $this->prophesize(EventInterface::class);
+        $eventProphecy->getContext()->willReturn(['request' => $request])->shouldBeCalled();
 
-        $listener->onKernelResponse($eventProphecy->reveal());
+        $listener->handleEvent($eventProphecy->reveal());
 
         $this->assertSame($expected, (new HttpHeaderSerializer())->serialize($request->attributes->get('_links')->getLinks()));
     }
@@ -65,10 +66,10 @@ class AddLinkHeaderListenerTest extends TestCase
 
         $listener = new AddLinkHeaderListener($resourceMetadataFactoryProphecy->reveal(), 'https://demo.mercure.rocks/hub');
 
-        $eventProphecy = $this->prophesize(FilterResponseEvent::class);
-        $eventProphecy->getRequest()->willReturn($request)->shouldBeCalled();
+        $eventProphecy = $this->prophesize(EventInterface::class);
+        $eventProphecy->getContext()->willReturn(['request' => $request])->shouldBeCalled();
 
-        $listener->onKernelResponse($eventProphecy->reveal());
+        $listener->handleEvent($eventProphecy->reveal());
 
         $this->assertNull($request->attributes->get('_links'));
     }
@@ -79,5 +80,24 @@ class AddLinkHeaderListenerTest extends TestCase
             [new Request()],
             [new Request([], [], ['_api_resource_class' => Dummy::class])],
         ];
+    }
+
+    /**
+     * @group legacy
+     *
+     * @expectedDeprecation The method ApiPlatform\Core\Mercure\EventListener\AddLinkHeaderListener::onKernelResponse() is deprecated since 2.5 and will be removed in 3.0.
+     * @expectedDeprecation Passing an instance of "Symfony\Component\HttpKernel\Event\FilterResponseEvent" as argument of "ApiPlatform\Core\Mercure\EventListener\AddLinkHeaderListener::handleEvent" is deprecated since 2.5 and will not be possible anymore in 3.0. Pass an instance of "ApiPlatform\Core\Event\EventInterface" instead.
+     */
+    public function testLegacyOnKernelResponse()
+    {
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
+        $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadata(null, null, null, null, null, ['mercure' => true]));
+
+        $listener = new AddLinkHeaderListener($resourceMetadataFactoryProphecy->reveal(), 'https://demo.mercure.rocks/hub');
+
+        $eventProphecy = $this->prophesize(FilterResponseEvent::class);
+        $eventProphecy->getRequest()->willReturn(new Request());
+
+        $listener->onKernelResponse($eventProphecy->reveal());
     }
 }

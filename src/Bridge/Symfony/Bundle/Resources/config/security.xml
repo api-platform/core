@@ -21,7 +21,7 @@
             <argument type="service" id="api_platform.security.resource_access_checker" />
 
             <!-- This listener must be executed only when the current object is available -->
-            <tag name="kernel.event_listener" event="kernel.request" method="onKernelRequest" priority="1" />
+            <tag name="kernel.event_listener" event="api_platform.post_deserialize" method="handleEvent" />
         </service>
 
         <service id="api_platform.security.expression_language_provider" class="ApiPlatform\Core\Security\Core\Authorization\ExpressionLanguageProvider" public="false">

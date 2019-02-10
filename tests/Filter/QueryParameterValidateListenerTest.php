@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\Filter;
 
 use ApiPlatform\Core\Api\FilterInterface;
+use ApiPlatform\Core\Event\EventInterface;
 use ApiPlatform\Core\Exception\FilterValidationException;
 use ApiPlatform\Core\Filter\QueryParameterValidateListener;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
@@ -26,60 +27,59 @@ use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 
 class QueryParameterValidateListenerTest extends TestCase
 {
+    /** @var QueryParameterValidateListener */
     private $testedInstance;
     private $filterLocatorProphecy;
 
     /**
      * unsafe method should not use filter validations.
      */
-    public function testOnKernelRequestWithUnsafeMethod()
+    public function testWithUnsafeMethod()
     {
-        $this->setUpWithFilters();
+        $this->setUpWithFilters(['some_filter']);
 
-        $request = new Request();
+        $request = new Request([], [], ['_api_resource_class' => Dummy::class, '_api_collection_operation_name' => 'get']);
         $request->setMethod('POST');
 
-        $eventProphecy = $this->prophesize(GetResponseEvent::class);
-        $eventProphecy->getRequest()->willReturn($request)->shouldBeCalled();
+        $eventProphecy = $this->prophesize(EventInterface::class);
+        $eventProphecy->getContext()->willReturn(['request' => $request]);
 
-        $this->assertNull(
-            $this->testedInstance->onKernelRequest($eventProphecy->reveal())
-        );
+        $this->filterLocatorProphecy->has('some_filter')->shouldNotBeCalled();
+
+        $this->testedInstance->handleEvent($eventProphecy->reveal());
     }
 
     /**
      * If the tested filter is non-existent, then nothing should append.
      */
-    public function testOnKernelRequestWithWrongFilter()
+    public function testWithWrongFilter()
     {
         $this->setUpWithFilters(['some_inexistent_filter']);
 
         $request = new Request([], [], ['_api_resource_class' => Dummy::class, '_api_collection_operation_name' => 'get']);
         $request->setMethod('GET');
 
-        $eventProphecy = $this->prophesize(GetResponseEvent::class);
-        $eventProphecy->getRequest()->willReturn($request)->shouldBeCalled();
+        $eventProphecy = $this->prophesize(EventInterface::class);
+        $eventProphecy->getContext()->willReturn(['request' => $request]);
 
         $this->filterLocatorProphecy->has('some_inexistent_filter')->shouldBeCalled();
         $this->filterLocatorProphecy->get('some_inexistent_filter')->shouldNotBeCalled();
 
-        $this->assertNull(
-            $this->testedInstance->onKernelRequest($eventProphecy->reveal())
-        );
+        $this->testedInstance->handleEvent($eventProphecy->reveal());
     }
 
     /**
      * if the required parameter is not set, throw an FilterValidationException.
      */
-    public function testOnKernelRequestWithRequiredFilterNotSet()
+    public function testWithRequiredFilterNotSet()
     {
         $this->setUpWithFilters(['some_filter']);
 
         $request = new Request([], [], ['_api_resource_class' => Dummy::class, '_api_collection_operation_name' => 'get']);
         $request->setMethod('GET');
 
-        $eventProphecy = $this->prophesize(GetResponseEvent::class);
-        $eventProphecy->getRequest()->willReturn($request)->shouldBeCalled();
+        $eventProphecy = $this->prophesize(EventInterface::class);
+        $eventProphecy->getContext()->willReturn(['request' => $request]);
 
         $this->filterLocatorProphecy
             ->has('some_filter')
@@ -101,13 +101,13 @@ class QueryParameterValidateListenerTest extends TestCase
 
         $this->expectException(FilterValidationException::class);
         $this->expectExceptionMessage('Query parameter "required" is required');
-        $this->testedInstance->onKernelRequest($eventProphecy->reveal());
+        $this->testedInstance->handleEvent($eventProphecy->reveal());
     }
 
     /**
      * if the required parameter is set, no exception should be thrown.
      */
-    public function testOnKernelRequestWithRequiredFilter()
+    public function testWithRequiredFilter()
     {
         $this->setUpWithFilters(['some_filter']);
 
@@ -118,8 +118,8 @@ class QueryParameterValidateListenerTest extends TestCase
         );
         $request->setMethod('GET');
 
-        $eventProphecy = $this->prophesize(GetResponseEvent::class);
-        $eventProphecy->getRequest()->willReturn($request)->shouldBeCalled();
+        $eventProphecy = $this->prophesize(EventInterface::class);
+        $eventProphecy->getContext()->willReturn(['request' => $request]);
 
         $this->filterLocatorProphecy
             ->has('some_filter')
@@ -139,9 +139,26 @@ class QueryParameterValidateListenerTest extends TestCase
             ->shouldBeCalled()
             ->willReturn($filterProphecy->reveal());
 
-        $this->assertNull(
-            $this->testedInstance->onKernelRequest($eventProphecy->reveal())
-        );
+        $this->testedInstance->handleEvent($eventProphecy->reveal());
+    }
+
+    /**
+     * @group legacy
+     *
+     * @expectedDeprecation The method ApiPlatform\Core\Filter\QueryParameterValidateListener::onKernelRequest() is deprecated since 2.5 and will be removed in 3.0.
+     * @expectedDeprecation Passing an instance of "Symfony\Component\HttpKernel\Event\GetResponseEvent" as argument of "ApiPlatform\Core\Filter\QueryParameterValidateListener::handleEvent" is deprecated since 2.5 and will not be possible anymore in 3.0. Pass an instance of "ApiPlatform\Core\Event\EventInterface" instead.
+     */
+    public function testLegacyOnKernelRequest()
+    {
+        $this->setUpWithFilters();
+
+        $request = new Request();
+        $request->setMethod('POST');
+
+        $eventProphecy = $this->prophesize(GetResponseEvent::class);
+        $eventProphecy->getRequest()->willReturn($request)->shouldBeCalled();
+
+        $this->testedInstance->onKernelRequest($eventProphecy->reveal());
     }
 
     private function setUpWithFilters(array $filters = [])

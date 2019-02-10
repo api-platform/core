@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Validator\EventListener;
 
 use ApiPlatform\Core\Bridge\Symfony\Validator\Exception\ValidationException;
+use ApiPlatform\Core\Event\EventInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Util\RequestAttributesExtractor;
 use ApiPlatform\Core\Validator\ValidatorInterface;
@@ -39,10 +40,33 @@ final class ValidateListener
      * Validates data returned by the controller if applicable.
      *
      * @throws ValidationException
+     *
+     * @deprecated since version 2.5, to be removed in 3.0
      */
     public function onKernelView(GetResponseForControllerResultEvent $event): void
     {
-        $request = $event->getRequest();
+        @trigger_error(sprintf('The method %s() is deprecated since 2.5 and will be removed in 3.0.', __METHOD__), E_USER_DEPRECATED);
+
+        $this->handleEvent($event);
+    }
+
+    /**
+     * Validates data returned by the controller if applicable.
+     *
+     * @throws ValidationException
+     */
+    public function handleEvent(/*EventInterface */$event): void
+    {
+        if ($event instanceof EventInterface) {
+            $request = $event->getContext()['request'];
+        } elseif ($event instanceof GetResponseForControllerResultEvent) {
+            @trigger_error(sprintf('Passing an instance of "%s" as argument of "%s" is deprecated since 2.5 and will not be possible anymore in 3.0. Pass an instance of "%s" instead.', GetResponseForControllerResultEvent::class, __METHOD__, EventInterface::class), E_USER_DEPRECATED);
+
+            $request = $event->getRequest();
+        } else {
+            return;
+        }
+
         if (
             $request->isMethodSafe(false)
             || $request->isMethod('DELETE')
@@ -58,7 +82,14 @@ final class ValidateListener
             return;
         }
 
+        if ($event instanceof EventInterface) {
+            $data = $event->getData();
+        } elseif ($event instanceof GetResponseForControllerResultEvent) {
+            $data = $event->getControllerResult();
+        } else {
+            return;
+        }
         $validationGroups = $resourceMetadata->getOperationAttribute($attributes, 'validation_groups', null, true);
-        $this->validator->validate($event->getControllerResult(), ['groups' => $validationGroups]);
+        $this->validator->validate($data, ['groups' => $validationGroups]);
     }
 }

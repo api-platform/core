@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Tests\HttpCache\EventListener;
 
+use ApiPlatform\Core\Event\EventInterface;
 use ApiPlatform\Core\HttpCache\EventListener\AddHeadersListener;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
@@ -34,12 +35,11 @@ class AddHeadersListenerTest extends TestCase
 
         $response = new Response();
 
-        $event = $this->prophesize(FilterResponseEvent::class);
-        $event->getRequest()->willReturn($request)->shouldBeCalled();
-        $event->getResponse()->willReturn($response)->shouldNotBeCalled();
+        $event = $this->prophesize(EventInterface::class);
+        $event->getContext()->willReturn(['request' => $request, 'response' => $response])->shouldBeCalled();
 
         $listener = new AddHeadersListener(true);
-        $listener->onKernelResponse($event->reveal());
+        $listener->handleEvent($event->reveal());
 
         $this->assertNull($response->getEtag());
     }
@@ -50,12 +50,11 @@ class AddHeadersListenerTest extends TestCase
 
         $response = new Response('{}', Response::HTTP_BAD_REQUEST);
 
-        $event = $this->prophesize(FilterResponseEvent::class);
-        $event->getRequest()->willReturn($request)->shouldBeCalled();
-        $event->getResponse()->willReturn($response)->shouldBeCalled();
+        $event = $this->prophesize(EventInterface::class);
+        $event->getContext()->willReturn(['request' => $request, 'response' => $response])->shouldBeCalled();
 
         $listener = new AddHeadersListener(true);
-        $listener->onKernelResponse($event->reveal());
+        $listener->handleEvent($event->reveal());
 
         $this->assertNull($response->getEtag());
     }
@@ -65,12 +64,11 @@ class AddHeadersListenerTest extends TestCase
         $request = new Request();
         $response = new Response();
 
-        $event = $this->prophesize(FilterResponseEvent::class);
-        $event->getRequest()->willReturn($request)->shouldBeCalled();
-        $event->getResponse()->willReturn($response)->shouldNotBeCalled();
+        $event = $this->prophesize(EventInterface::class);
+        $event->getContext()->willReturn(['request' => $request, 'response' => $response])->shouldBeCalled();
 
         $listener = new AddHeadersListener(true);
-        $listener->onKernelResponse($event->reveal());
+        $listener->handleEvent($event->reveal());
 
         $this->assertNull($response->getEtag());
     }
@@ -80,12 +78,11 @@ class AddHeadersListenerTest extends TestCase
         $request = new Request([], [], ['_api_resource_class' => Dummy::class, '_api_item_operation_name' => 'get']);
         $response = new Response();
 
-        $event = $this->prophesize(FilterResponseEvent::class);
-        $event->getRequest()->willReturn($request)->shouldBeCalled();
-        $event->getResponse()->willReturn($response)->shouldBeCalled();
+        $event = $this->prophesize(EventInterface::class);
+        $event->getContext()->willReturn(['request' => $request, 'response' => $response])->shouldBeCalled();
 
         $listener = new AddHeadersListener(true);
-        $listener->onKernelResponse($event->reveal());
+        $listener->handleEvent($event->reveal());
 
         $this->assertNull($response->getEtag());
     }
@@ -95,15 +92,14 @@ class AddHeadersListenerTest extends TestCase
         $request = new Request([], [], ['_api_resource_class' => Dummy::class, '_api_item_operation_name' => 'get']);
         $response = new Response('some content', 200, ['Vary' => ['Accept', 'Cookie']]);
 
-        $event = $this->prophesize(FilterResponseEvent::class);
-        $event->getRequest()->willReturn($request)->shouldBeCalled();
-        $event->getResponse()->willReturn($response)->shouldBeCalled();
+        $event = $this->prophesize(EventInterface::class);
+        $event->getContext()->willReturn(['request' => $request, 'response' => $response])->shouldBeCalled();
 
         $factory = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $factory->create(Dummy::class)->willReturn(new ResourceMetadata())->shouldBeCalled();
 
         $listener = new AddHeadersListener(true, 100, 200, ['Accept', 'Accept-Encoding'], true, $factory->reveal());
-        $listener->onKernelResponse($event->reveal());
+        $listener->handleEvent($event->reveal());
 
         $this->assertSame('"9893532233caff98cd083a116b013c0b"', $response->getEtag());
         $this->assertSame('max-age=100, public, s-maxage=200', $response->headers->get('Cache-Control'));
@@ -119,15 +115,14 @@ class AddHeadersListenerTest extends TestCase
         // This also calls setPublic
         $response->setSharedMaxAge(400);
 
-        $event = $this->prophesize(FilterResponseEvent::class);
-        $event->getRequest()->willReturn($request)->shouldBeCalled();
-        $event->getResponse()->willReturn($response)->shouldBeCalled();
+        $event = $this->prophesize(EventInterface::class);
+        $event->getContext()->willReturn(['request' => $request, 'response' => $response])->shouldBeCalled();
 
         $factory = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $factory->create(Dummy::class)->willReturn(new ResourceMetadata())->shouldBeCalled();
 
         $listener = new AddHeadersListener(true, 100, 200, [], true, $factory->reveal());
-        $listener->onKernelResponse($event->reveal());
+        $listener->handleEvent($event->reveal());
 
         $this->assertSame('"etag"', $response->getEtag());
         $this->assertSame('max-age=300, public, s-maxage=400', $response->headers->get('Cache-Control'));
@@ -138,17 +133,37 @@ class AddHeadersListenerTest extends TestCase
         $request = new Request([], [], ['_api_resource_class' => Dummy::class, '_api_item_operation_name' => 'get']);
         $response = new Response('some content', 200, ['Vary' => ['Accept', 'Cookie']]);
 
-        $event = $this->prophesize(FilterResponseEvent::class);
-        $event->getRequest()->willReturn($request)->shouldBeCalled();
-        $event->getResponse()->willReturn($response)->shouldBeCalled();
+        $event = $this->prophesize(EventInterface::class);
+        $event->getContext()->willReturn(['request' => $request, 'response' => $response])->shouldBeCalled();
 
         $metadata = new ResourceMetadata(null, null, null, null, null, ['cache_headers' => ['max_age' => 123, 'shared_max_age' => 456]]);
         $factory = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $factory->create(Dummy::class)->willReturn($metadata)->shouldBeCalled();
 
         $listener = new AddHeadersListener(true, 100, 200, ['Accept', 'Accept-Encoding'], true, $factory->reveal());
-        $listener->onKernelResponse($event->reveal());
+        $listener->handleEvent($event->reveal());
 
         $this->assertSame('max-age=123, public, s-maxage=456', $response->headers->get('Cache-Control'));
+    }
+
+    /**
+     * @group legacy
+     *
+     * @expectedDeprecation The method ApiPlatform\Core\HttpCache\EventListener\AddHeadersListener::onKernelResponse() is deprecated since 2.5 and will be removed in 3.0.
+     * @expectedDeprecation Passing an instance of "Symfony\Component\HttpKernel\Event\FilterResponseEvent" as argument of "ApiPlatform\Core\HttpCache\EventListener\AddHeadersListener::handleEvent" is deprecated since 2.5 and will not be possible anymore in 3.0. Pass an instance of "ApiPlatform\Core\Event\EventInterface" instead.
+     */
+    public function testLegacyOnKernelResponse()
+    {
+        $request = new Request();
+        $request->setMethod('PUT');
+
+        $response = new Response();
+
+        $event = $this->prophesize(FilterResponseEvent::class);
+        $event->getRequest()->willReturn($request)->shouldBeCalled();
+        $event->getResponse()->willReturn($response)->shouldBeCalled();
+
+        $listener = new AddHeadersListener();
+        $listener->onKernelResponse($event->reveal());
     }
 }

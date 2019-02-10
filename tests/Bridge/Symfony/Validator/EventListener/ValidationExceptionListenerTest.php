@@ -15,6 +15,7 @@ namespace ApiPlatform\Core\Tests\Bridge\Symfony\Validator\EventListener;
 
 use ApiPlatform\Core\Bridge\Symfony\Validator\EventListener\ValidationExceptionListener;
 use ApiPlatform\Core\Bridge\Symfony\Validator\Exception\ValidationException;
+use ApiPlatform\Core\Event\EventInterface;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Symfony\Component\HttpFoundation\Request;
@@ -30,14 +31,14 @@ class ValidationExceptionListenerTest extends TestCase
 {
     public function testNotValidationException()
     {
-        $eventProphecy = $this->prophesize(GetResponseForExceptionEvent::class);
-        $eventProphecy->getException()->willReturn(new \Exception())->shouldBeCalled();
-        $eventProphecy->setResponse()->shouldNotBeCalled();
+        $eventProphecy = $this->prophesize(EventInterface::class);
+        $eventProphecy->getContext()->willReturn(['exception' => new \Exception()])->shouldBeCalled();
+        $eventProphecy->setData()->shouldNotBeCalled();
 
         $serializerProphecy = $this->prophesize(SerializerInterface::class);
 
         $listener = new ValidationExceptionListener($serializerProphecy->reveal(), ['hydra' => ['application/ld+json']]);
-        $listener->onKernelException($eventProphecy->reveal());
+        $listener->handleEvent($eventProphecy->reveal());
     }
 
     public function testValidationException()
@@ -45,10 +46,9 @@ class ValidationExceptionListenerTest extends TestCase
         $exceptionJson = '{"foo": "bar"}';
         $list = new ConstraintViolationList([]);
 
-        $eventProphecy = $this->prophesize(GetResponseForExceptionEvent::class);
-        $eventProphecy->getException()->willReturn(new ValidationException($list))->shouldBeCalled();
-        $eventProphecy->getRequest()->willReturn(new Request())->shouldBeCalled();
-        $eventProphecy->setResponse(Argument::allOf(
+        $eventProphecy = $this->prophesize(EventInterface::class);
+        $eventProphecy->getContext()->willReturn(['request' => new Request(), 'exception' => new ValidationException($list)])->shouldBeCalledTimes(2);
+        $eventProphecy->setData(Argument::allOf(
             Argument::type(Response::class),
             Argument::which('getContent', $exceptionJson),
             Argument::which('getStatusCode', Response::HTTP_BAD_REQUEST),
@@ -64,6 +64,26 @@ class ValidationExceptionListenerTest extends TestCase
         $serializerProphecy->serialize($list, 'hydra')->willReturn($exceptionJson)->shouldBeCalled();
 
         $listener = new ValidationExceptionListener($serializerProphecy->reveal(), ['hydra' => ['application/ld+json']]);
+        $listener->handleEvent($eventProphecy->reveal());
+    }
+
+    /**
+     * @group legacy
+     *
+     * @expectedDeprecation The method ApiPlatform\Core\Bridge\Symfony\Validator\EventListener\ValidationExceptionListener::onKernelException() is deprecated since 2.5 and will be removed in 3.0.
+     * @expectedDeprecation Passing an instance of "Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent" as argument of "ApiPlatform\Core\Bridge\Symfony\Validator\EventListener\ValidationExceptionListener::handleEvent" is deprecated since 2.5 and will not be possible anymore in 3.0. Pass an instance of "ApiPlatform\Core\Event\EventInterface" instead.
+     */
+    public function testLegacyOnKernelException()
+    {
+        $serializerProphecy = $this->prophesize(SerializerInterface::class);
+
+        $eventProphecy = $this->prophesize(GetResponseForExceptionEvent::class);
+        $eventProphecy->getException()->willReturn(new \Exception());
+
+        $listener = new ValidationExceptionListener(
+            $serializerProphecy->reveal(),
+            ['hydra' => ['application/ld+json']]
+        );
         $listener->onKernelException($eventProphecy->reveal());
     }
 }

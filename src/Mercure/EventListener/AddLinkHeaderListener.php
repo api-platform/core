@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Mercure\EventListener;
 
+use ApiPlatform\Core\Event\EventInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use Fig\Link\GenericLinkProvider;
 use Fig\Link\Link;
@@ -36,12 +37,34 @@ final class AddLinkHeaderListener
 
     /**
      * Sends the Mercure header on each response.
+     *
+     * @deprecated since version 2.5, to be removed in 3.0.
      */
     public function onKernelResponse(FilterResponseEvent $event): void
     {
+        @trigger_error(sprintf('The method %s() is deprecated since 2.5 and will be removed in 3.0.', __METHOD__), E_USER_DEPRECATED);
+
+        $this->handleEvent($event);
+    }
+
+    /**
+     * Sends the Mercure header on each response.
+     */
+    public function handleEvent(/*EventInterface */$event): void
+    {
         $link = new Link('mercure', $this->hub);
 
-        $attributes = $event->getRequest()->attributes;
+        if ($event instanceof EventInterface) {
+            $request = $event->getContext()['request'];
+        } elseif ($event instanceof FilterResponseEvent) {
+            @trigger_error(sprintf('Passing an instance of "%s" as argument of "%s" is deprecated since 2.5 and will not be possible anymore in 3.0. Pass an instance of "%s" instead.', FilterResponseEvent::class, __METHOD__, EventInterface::class), E_USER_DEPRECATED);
+
+            $request = $event->getRequest();
+        } else {
+            return;
+        }
+
+        $attributes = $request->attributes;
         if (
             null === ($resourceClass = $attributes->get('_api_resource_class')) ||
             false === $this->resourceMetadataFactory->create($resourceClass)->getAttribute('mercure', false)

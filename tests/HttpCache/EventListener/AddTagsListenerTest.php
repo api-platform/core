@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\HttpCache\EventListener;
 
 use ApiPlatform\Core\Api\IriConverterInterface;
+use ApiPlatform\Core\Event\EventInterface;
 use ApiPlatform\Core\HttpCache\EventListener\AddTagsListener;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use PHPUnit\Framework\TestCase;
@@ -37,12 +38,11 @@ class AddTagsListenerTest extends TestCase
         $response->setPublic();
         $response->setEtag('foo');
 
-        $event = $this->prophesize(FilterResponseEvent::class);
-        $event->getRequest()->willReturn($request)->shouldBeCalled();
-        $event->getResponse()->willReturn($response)->shouldBeCalled();
+        $event = $this->prophesize(EventInterface::class);
+        $event->getContext()->willReturn(['request' => $request, 'response' => $response])->shouldBeCalled();
 
         $listener = new AddTagsListener($iriConverterProphecy->reveal());
-        $listener->onKernelResponse($event->reveal());
+        $listener->handleEvent($event->reveal());
 
         $this->assertFalse($response->headers->has('Cache-Tags'));
     }
@@ -55,12 +55,11 @@ class AddTagsListenerTest extends TestCase
 
         $response = new Response();
 
-        $event = $this->prophesize(FilterResponseEvent::class);
-        $event->getRequest()->willReturn($request)->shouldBeCalled();
-        $event->getResponse()->willReturn($response)->shouldBeCalled();
+        $event = $this->prophesize(EventInterface::class);
+        $event->getContext()->willReturn(['request' => $request, 'response' => $response])->shouldBeCalled();
 
         $listener = new AddTagsListener($iriConverterProphecy->reveal());
-        $listener->onKernelResponse($event->reveal());
+        $listener->handleEvent($event->reveal());
 
         $this->assertFalse($response->headers->has('Cache-Tags'));
     }
@@ -75,12 +74,11 @@ class AddTagsListenerTest extends TestCase
         $response->setPublic();
         $response->setEtag('foo');
 
-        $event = $this->prophesize(FilterResponseEvent::class);
-        $event->getRequest()->willReturn($request)->shouldBeCalled();
-        $event->getResponse()->willReturn($response)->shouldBeCalled();
+        $event = $this->prophesize(EventInterface::class);
+        $event->getContext()->willReturn(['request' => $request, 'response' => $response])->shouldBeCalled();
 
         $listener = new AddTagsListener($iriConverterProphecy->reveal());
-        $listener->onKernelResponse($event->reveal());
+        $listener->handleEvent($event->reveal());
 
         $this->assertFalse($response->headers->has('Cache-Tags'));
     }
@@ -95,12 +93,11 @@ class AddTagsListenerTest extends TestCase
         $response->setPublic();
         $response->setEtag('foo');
 
-        $event = $this->prophesize(FilterResponseEvent::class);
-        $event->getRequest()->willReturn($request)->shouldBeCalled();
-        $event->getResponse()->willReturn($response)->shouldBeCalled();
+        $event = $this->prophesize(EventInterface::class);
+        $event->getContext()->willReturn(['request' => $request, 'response' => $response])->shouldBeCalled();
 
         $listener = new AddTagsListener($iriConverterProphecy->reveal());
-        $listener->onKernelResponse($event->reveal());
+        $listener->handleEvent($event->reveal());
 
         $this->assertFalse($response->headers->has('Cache-Tags'));
     }
@@ -115,12 +112,11 @@ class AddTagsListenerTest extends TestCase
         $response->setPublic();
         $response->setEtag('foo');
 
-        $event = $this->prophesize(FilterResponseEvent::class);
-        $event->getRequest()->willReturn($request)->shouldBeCalled();
-        $event->getResponse()->willReturn($response)->shouldBeCalled();
+        $event = $this->prophesize(EventInterface::class);
+        $event->getContext()->willReturn(['request' => $request, 'response' => $response])->shouldBeCalled();
 
         $listener = new AddTagsListener($iriConverterProphecy->reveal());
-        $listener->onKernelResponse($event->reveal());
+        $listener->handleEvent($event->reveal());
 
         $this->assertSame('/foo,/bar', $response->headers->get('Cache-Tags'));
     }
@@ -136,12 +132,11 @@ class AddTagsListenerTest extends TestCase
         $response->setPublic();
         $response->setEtag('foo');
 
-        $event = $this->prophesize(FilterResponseEvent::class);
-        $event->getRequest()->willReturn($request)->shouldBeCalled();
-        $event->getResponse()->willReturn($response)->shouldBeCalled();
+        $event = $this->prophesize(EventInterface::class);
+        $event->getContext()->willReturn(['request' => $request, 'response' => $response])->shouldBeCalled();
 
         $listener = new AddTagsListener($iriConverterProphecy->reveal());
-        $listener->onKernelResponse($event->reveal());
+        $listener->handleEvent($event->reveal());
 
         $this->assertSame('/foo,/bar,/dummies', $response->headers->get('Cache-Tags'));
     }
@@ -157,12 +152,11 @@ class AddTagsListenerTest extends TestCase
         $response->setPublic();
         $response->setEtag('foo');
 
-        $event = $this->prophesize(FilterResponseEvent::class);
-        $event->getRequest()->willReturn($request)->shouldBeCalled();
-        $event->getResponse()->willReturn($response)->shouldBeCalled();
+        $event = $this->prophesize(EventInterface::class);
+        $event->getContext()->willReturn(['request' => $request, 'response' => $response])->shouldBeCalled();
 
         $listener = new AddTagsListener($iriConverterProphecy->reveal());
-        $listener->onKernelResponse($event->reveal());
+        $listener->handleEvent($event->reveal());
 
         $this->assertSame('/dummies', $response->headers->get('Cache-Tags'));
     }
@@ -178,13 +172,35 @@ class AddTagsListenerTest extends TestCase
         $response->setPublic();
         $response->setEtag('foo');
 
+        $event = $this->prophesize(EventInterface::class);
+        $event->getContext()->willReturn(['request' => $request, 'response' => $response])->shouldBeCalled();
+
+        $listener = new AddTagsListener($iriConverterProphecy->reveal());
+        $listener->handleEvent($event->reveal());
+
+        $this->assertSame('/foo,/bar,/dummies', $response->headers->get('Cache-Tags'));
+    }
+
+    /**
+     * @group legacy
+     *
+     * @expectedDeprecation The method ApiPlatform\Core\HttpCache\EventListener\AddTagsListener::onKernelResponse() is deprecated since 2.5 and will be removed in 3.0.
+     * @expectedDeprecation Passing an instance of "Symfony\Component\HttpKernel\Event\FilterResponseEvent" as argument of "ApiPlatform\Core\HttpCache\EventListener\AddTagsListener::handleEvent" is deprecated since 2.5 and will not be possible anymore in 3.0. Pass an instance of "ApiPlatform\Core\Event\EventInterface" instead.
+     */
+    public function testLegacyOnKernelResponse()
+    {
+        $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
+
+        $request = new Request();
+        $request->setMethod('PUT');
+
+        $response = new Response();
+
         $event = $this->prophesize(FilterResponseEvent::class);
         $event->getRequest()->willReturn($request)->shouldBeCalled();
         $event->getResponse()->willReturn($response)->shouldBeCalled();
 
         $listener = new AddTagsListener($iriConverterProphecy->reveal());
         $listener->onKernelResponse($event->reveal());
-
-        $this->assertSame('/foo,/bar,/dummies', $response->headers->get('Cache-Tags'));
     }
 }

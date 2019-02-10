@@ -17,6 +17,7 @@ use ApiPlatform\Core\DataProvider\CollectionDataProviderInterface;
 use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
 use ApiPlatform\Core\DataProvider\OperationDataProviderTrait;
 use ApiPlatform\Core\DataProvider\SubresourceDataProviderInterface;
+use ApiPlatform\Core\Event\EventInterface;
 use ApiPlatform\Core\Exception\InvalidIdentifierException;
 use ApiPlatform\Core\Exception\RuntimeException;
 use ApiPlatform\Core\Identifier\IdentifierConverterInterface;
@@ -50,10 +51,33 @@ final class ReadListener
      * Calls the data provider and sets the data attribute.
      *
      * @throws NotFoundHttpException
+     *
+     * @deprecated since version 2.5, to be removed in 3.0.
      */
     public function onKernelRequest(GetResponseEvent $event): void
     {
-        $request = $event->getRequest();
+        @trigger_error(sprintf('The method %s() is deprecated since 2.5 and will be removed in 3.0.', __METHOD__), E_USER_DEPRECATED);
+
+        $this->handleEvent($event);
+    }
+
+    /**
+     * Calls the data provider and sets the data attribute.
+     *
+     * @throws NotFoundHttpException
+     */
+    public function handleEvent(/*EventInterface */$event): void
+    {
+        if ($event instanceof EventInterface) {
+            $request = $event->getContext()['request'];
+        } elseif ($event instanceof GetResponseEvent) {
+            @trigger_error(sprintf('Passing an instance of "%s" as argument of "%s" is deprecated since 2.5 and will not be possible anymore in 3.0. Pass an instance of "%s" instead.', GetResponseEvent::class, __METHOD__, EventInterface::class), E_USER_DEPRECATED);
+
+            $request = $event->getRequest();
+        } else {
+            return;
+        }
+
         if (
             !($attributes = RequestAttributesExtractor::extractAttributes($request))
             || !$attributes['receive']

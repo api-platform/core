@@ -7,7 +7,7 @@
     <services>
 
         <service id="api_platform.swagger.listener.ui" class="ApiPlatform\Core\Bridge\Symfony\Bundle\EventListener\SwaggerUiListener">
-            <tag name="kernel.event_listener" event="kernel.request" method="onKernelRequest" />
+            <tag name="kernel.event_listener" event="api_platform.post_deserialize" method="handleEvent" />
         </service>
 
         <service id="api_platform.swagger.action.ui" class="ApiPlatform\Core\Bridge\Symfony\Bundle\Action\SwaggerUiAction" public="true">

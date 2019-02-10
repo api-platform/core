@@ -292,12 +292,9 @@ class ApiPlatformExtensionTest extends TestCase
         $fosListener = $builder->getDefinition('api_platform.fos_user.event_listener');
         $viewListener = $builder->getDefinition('api_platform.listener.view.serialize');
 
-        // Ensure FOSUser event listener priority is always greater than the view serialize listener
-        $this->assertGreaterThan(
-            $viewListener->getTag('kernel.event_listener')[0]['priority'],
-            $fosListener->getTag('kernel.event_listener')[0]['priority'],
-            'api_platform.fos_user.event_listener priority needs to be greater than that of api_platform.listener.view.serialize'
-        );
+        // Ensure FOSUser event listener is executed before the view serialize listener
+        $this->assertEquals('api_platform.post_write', $fosListener->getTag('kernel.event_listener')[0]['event']);
+        $this->assertEquals('api_platform.serialize', $viewListener->getTag('kernel.event_listener')[0]['event']);
     }
 
     /**
@@ -824,6 +821,7 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.identifier.integer',
             'api_platform.identifier.uuid_normalizer',
             'api_platform.item_data_provider',
+            'api_platform.dispatcher.internal_events',
             'api_platform.listener.exception',
             'api_platform.listener.exception.validation',
             'api_platform.listener.request.add_format',

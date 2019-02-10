@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Tests\JsonApi\EventListener;
 
+use ApiPlatform\Core\Event\EventInterface;
 use ApiPlatform\Core\JsonApi\EventListener\TransformPaginationParametersListener;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
@@ -23,6 +24,7 @@ use Symfony\Component\HttpKernel\Event\GetResponseEvent;
  */
 class TransformPaginationParametersListenerTest extends TestCase
 {
+    /** @var TransformPaginationParametersListener */
     private $listener;
 
     protected function setUp()
@@ -30,52 +32,52 @@ class TransformPaginationParametersListenerTest extends TestCase
         $this->listener = new TransformPaginationParametersListener();
     }
 
-    public function testOnKernelRequestWithInvalidFormat()
+    public function testWithInvalidFormat()
     {
         $expectedRequest = new Request();
         $expectedRequest->setRequestFormat('badformat');
 
         $request = $expectedRequest->duplicate();
 
-        $eventProphecy = $this->prophesize(GetResponseEvent::class);
-        $eventProphecy->getRequest()->willReturn($request)->shouldBeCalled();
+        $eventProphecy = $this->prophesize(EventInterface::class);
+        $eventProphecy->getContext()->willReturn(['request' => $request]);
 
-        $this->listener->onKernelRequest($eventProphecy->reveal());
+        $this->listener->handleEvent($eventProphecy->reveal());
 
         $this->assertEquals($expectedRequest, $request);
     }
 
-    public function testOnKernelRequestWithInvalidPage()
+    public function testWithInvalidPage()
     {
-        $eventProphecy = $this->prophesize(GetResponseEvent::class);
+        $eventProphecy = $this->prophesize(EventInterface::class);
 
         $expectedRequest = new Request();
         $expectedRequest->setRequestFormat('jsonapi');
 
         $request = $expectedRequest->duplicate();
-        $eventProphecy->getRequest()->willReturn($request)->shouldBeCalled();
-        $this->listener->onKernelRequest($eventProphecy->reveal());
+        $eventProphecy->getContext()->willReturn(['request' => $request]);
+        $this->listener->handleEvent($eventProphecy->reveal());
 
         $this->assertEquals($expectedRequest, $request);
 
         $expectedRequest = $expectedRequest->duplicate(['page' => 'foo']);
 
         $request = $expectedRequest->duplicate();
-        $eventProphecy->getRequest()->willReturn($request)->shouldBeCalled();
-        $this->listener->onKernelRequest($eventProphecy->reveal());
+        $eventProphecy->getContext()->willReturn(['request' => $request]);
+        $this->listener->handleEvent($eventProphecy->reveal());
 
         $this->assertEquals($expectedRequest, $request);
     }
 
-    public function testOnKernelRequest()
+    public function testWithValidFilter()
     {
         $request = new Request(['page' => ['size' => 5, 'number' => 3, 'error' => -1]]);
         $request->setRequestFormat('jsonapi');
 
-        $eventProphecy = $this->prophesize(GetResponseEvent::class);
-        $eventProphecy->getRequest()->willReturn($request)->shouldBeCalled();
+        $eventProphecy = $this->prophesize(EventInterface::class);
+        $eventProphecy->getContext()->willReturn(['request' => $request]);
 
-        $this->listener->onKernelRequest($eventProphecy->reveal());
+        $this->listener->handleEvent($eventProphecy->reveal());
 
         $filters = ['size' => 5, 'number' => 3, 'error' => -1];
 
@@ -83,5 +85,19 @@ class TransformPaginationParametersListenerTest extends TestCase
         $expectedRequest->setRequestFormat('jsonapi');
 
         $this->assertEquals($expectedRequest, $request);
+    }
+
+    /**
+     * @group legacy
+     *
+     * @expectedDeprecation The method ApiPlatform\Core\JsonApi\EventListener\TransformPaginationParametersListener::onKernelRequest() is deprecated since 2.5 and will be removed in 3.0.
+     * @expectedDeprecation Passing an instance of "Symfony\Component\HttpKernel\Event\GetResponseEvent" as argument of "ApiPlatform\Core\JsonApi\EventListener\TransformPaginationParametersListener::handleEvent" is deprecated since 2.5 and will not be possible anymore in 3.0. Pass an instance of "ApiPlatform\Core\Event\EventInterface" instead.
+     */
+    public function testLegacyOnKernelRequest()
+    {
+        $eventProphecy = $this->prophesize(GetResponseEvent::class);
+        $eventProphecy->getRequest()->willReturn(new Request())->shouldBeCalled();
+
+        $this->listener->onKernelRequest($eventProphecy->reveal());
     }
 }

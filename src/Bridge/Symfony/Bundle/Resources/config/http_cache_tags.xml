@@ -11,7 +11,7 @@
         <service id="api_platform.http_cache.listener.response.add_tags" class="ApiPlatform\Core\HttpCache\EventListener\AddTagsListener">
             <argument type="service" id="api_platform.iri_converter" />
 
-            <tag name="kernel.event_listener" event="kernel.response" method="onKernelResponse" priority="-2" />
+            <tag name="kernel.event_listener" event="api_platform.post_respond" method="handleEvent" priority="-2" />
         </service>
     </services>
 </container>
