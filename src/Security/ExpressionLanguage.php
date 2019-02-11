@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Security;
 
+use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Security\Core\Authorization\ExpressionLanguage as BaseExpressionLanguage;
 
 /**
@@ -25,6 +26,16 @@ use Symfony\Component\Security\Core\Authorization\ExpressionLanguage as BaseExpr
  */
 class ExpressionLanguage extends BaseExpressionLanguage
 {
+    /**
+     * {@inheritdoc}
+     */
+    public function __construct(CacheItemPoolInterface $cache = null, array $providers = [])
+    {
+        @trigger_error('Using the ExpressionLanguage class directly is deprecated since API Platform 2.4 and will not be possible anymore in API Platform 3. Use the "api_platform.security.expression_language" service instead.', E_USER_DEPRECATED);
+
+        parent::__construct($cache, $providers);
+    }
+
     protected function registerFunctions()
     {
         parent::registerFunctions();

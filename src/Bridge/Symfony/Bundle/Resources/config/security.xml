@@ -5,6 +5,8 @@
            xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <services>
+        <service id="api_platform.security.expression_language" alias="security.expression_language" />
+
         <service id="api_platform.security.resource_access_checker" class="ApiPlatform\Core\Security\ResourceAccessChecker" public="false">
             <argument type="service" id="api_platform.security.expression_language" on-invalid="null" />
             <argument type="service" id="security.authentication.trust_resolver" on-invalid="null" />
@@ -20,6 +22,10 @@
 
             <!-- This listener must be executed only when the current object is available -->
             <tag name="kernel.event_listener" event="kernel.request" method="onKernelRequest" priority="1" />
+        </service>
+
+        <service id="api_platform.security.expression_language_provider" class="ApiPlatform\Core\Security\Core\Authorization\ExpressionLanguageProvider" public="false">
+            <tag name="security.expression_language_provider" />
         </service>
     </services>
 

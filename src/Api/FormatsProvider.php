@@ -92,7 +92,7 @@ final class FormatsProvider implements FormatsProviderInterface, OperationAwareF
             if (!\is_string($value)) {
                 throw new InvalidArgumentException(sprintf("The 'formats' attributes value must be a string when trying to include an already configured format, %s given.", \gettype($value)));
             }
-            if (array_key_exists($value, $this->configuredFormats)) {
+            if (\array_key_exists($value, $this->configuredFormats)) {
                 $resourceFormats[$value] = $this->configuredFormats[$value];
                 continue;
             }

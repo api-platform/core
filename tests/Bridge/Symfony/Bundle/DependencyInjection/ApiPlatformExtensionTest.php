@@ -78,6 +78,7 @@ use Symfony\Bundle\SecurityBundle\SecurityBundle;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Resource\DirectoryResource;
 use Symfony\Component\Config\Resource\ResourceInterface;
+use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
@@ -163,7 +164,7 @@ class ApiPlatformExtensionTest extends TestCase
         $containerBuilderProphecy->getExtensionConfig('framework')->willReturn([0 => ['serializer' => ['enabled' => false]]])->shouldBeCalled();
         $containerBuilderProphecy->prependExtensionConfig('framework', Argument::any())->willReturn(null)->shouldBeCalled();
         $containerBuilderProphecy->prependExtensionConfig('framework', Argument::that(function (array $config) {
-            return array_key_exists('serializer', $config);
+            return \array_key_exists('serializer', $config);
         }))->shouldNotBeCalled();
         $containerBuilder = $containerBuilderProphecy->reveal();
 
@@ -176,7 +177,7 @@ class ApiPlatformExtensionTest extends TestCase
         $containerBuilderProphecy->getExtensionConfig('framework')->willReturn([0 => ['property_info' => ['enabled' => false]]])->shouldBeCalled();
         $containerBuilderProphecy->prependExtensionConfig('framework', Argument::any())->willReturn(null)->shouldBeCalled();
         $containerBuilderProphecy->prependExtensionConfig('framework', Argument::that(function (array $config) {
-            return array_key_exists('property_info', $config);
+            return \array_key_exists('property_info', $config);
         }))->shouldNotBeCalled();
         $containerBuilder = $containerBuilderProphecy->reveal();
 
@@ -354,7 +355,8 @@ class ApiPlatformExtensionTest extends TestCase
         $containerBuilderProphecy->setDefinition('api_platform.security.resource_access_checker', Argument::type(Definition::class))->shouldBeCalled();
         $containerBuilderProphecy->setAlias(ResourceAccessCheckerInterface::class, 'api_platform.security.resource_access_checker')->shouldBeCalled();
         $containerBuilderProphecy->setDefinition('api_platform.security.listener.request.deny_access', Argument::type(Definition::class))->shouldBeCalled();
-        $containerBuilderProphecy->setDefinition('api_platform.security.expression_language', Argument::type(Definition::class))->shouldBeCalled();
+        $containerBuilderProphecy->setDefinition('api_platform.security.expression_language_provider', Argument::type(Definition::class))->shouldBeCalled();
+        $containerBuilderProphecy->setAlias('api_platform.security.expression_language', Argument::type(Alias::class))->shouldBeCalled();
         $containerBuilder = $containerBuilderProphecy->reveal();
 
         $this->extension->load(self::DEFAULT_CONFIG, $containerBuilder);

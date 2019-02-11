@@ -185,6 +185,6 @@ final class Pagination
     {
         $filters = $context['filters'] ?? [];
 
-        return array_key_exists($parameterName, $filters) ? $filters[$parameterName] : $default;
+        return \array_key_exists($parameterName, $filters) ? $filters[$parameterName] : $default;
     }
 }

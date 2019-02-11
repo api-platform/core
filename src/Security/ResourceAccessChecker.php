@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Security;
 
 use ApiPlatform\Core\Util\ClassInfoTrait;
+use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolverInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;

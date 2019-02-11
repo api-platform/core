@@ -27,7 +27,7 @@ trait CachedTrait
 
     private function getCached(string $cacheKey, callable $getValue)
     {
-        if (array_key_exists($cacheKey, $this->localCache)) {
+        if (\array_key_exists($cacheKey, $this->localCache)) {
             return $this->localCache[$cacheKey];
         }
 
