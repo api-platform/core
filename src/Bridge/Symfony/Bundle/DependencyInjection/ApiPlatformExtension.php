@@ -26,6 +26,7 @@ use ApiPlatform\Core\DataProvider\CollectionDataProviderInterface;
 use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
 use ApiPlatform\Core\DataProvider\SubresourceDataProviderInterface;
 use ApiPlatform\Core\Exception\RuntimeException;
+use ApiPlatform\Core\GraphQl\Type\Definition\TypeInterface as GraphQlTypeInterface;
 use Doctrine\Common\Annotations\Annotation;
 use Doctrine\ORM\Version;
 use Elasticsearch\Client;
@@ -112,6 +113,8 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             ->addTag('api_platform.subresource_data_provider');
         $container->registerForAutoconfiguration(FilterInterface::class)
             ->addTag('api_platform.filter');
+        $container->registerForAutoconfiguration(GraphQlTypeInterface::class)
+            ->addTag('api_platform.graphql.type');
 
         if (interface_exists(ValidatorInterface::class)) {
             $loader->load('validator.xml');

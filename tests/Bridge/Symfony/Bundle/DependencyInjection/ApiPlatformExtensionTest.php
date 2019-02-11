@@ -57,6 +57,7 @@ use ApiPlatform\Core\DataProvider\SubresourceDataProviderInterface;
 use ApiPlatform\Core\Exception\FilterValidationException;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\Exception\RuntimeException;
+use ApiPlatform\Core\GraphQl\Type\Definition\TypeInterface as GraphQlTypeInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
@@ -634,6 +635,10 @@ class ApiPlatformExtensionTest extends TestCase
             ->willReturn($this->childDefinitionProphecy)->shouldBeCalledTimes(1);
         $this->childDefinitionProphecy->addTag('api_platform.filter')->shouldBeCalledTimes(1);
 
+        $containerBuilderProphecy->registerForAutoconfiguration(GraphQlTypeInterface::class)
+            ->willReturn($this->childDefinitionProphecy)->shouldBeCalledTimes(1);
+        $this->childDefinitionProphecy->addTag('api_platform.graphql.type')->shouldBeCalledTimes(1);
+
         $containerBuilderProphecy->getParameter('kernel.bundles')->willReturn([
             'DoctrineBundle' => DoctrineBundle::class,
         ])->shouldBeCalled();
@@ -946,6 +951,9 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.graphql.resolver.factory.item_mutation',
             'api_platform.graphql.resolver.item',
             'api_platform.graphql.resolver.resource_field',
+            'api_platform.graphql.iterable_type',
+            'api_platform.graphql.type_locator',
+            'api_platform.graphql.types_factory',
             'api_platform.graphql.normalizer.item',
             'api_platform.jsonld.normalizer.item',
             'api_platform.jsonld.encoder',
