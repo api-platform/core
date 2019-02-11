@@ -476,6 +476,7 @@ Feature: Create-Retrieve-Update-Delete
     {
       "@id": "/dummies/1",
       "name": "A nice dummy",
+      "dummyDate": "2018-12-01 13:12",
       "jsonData": [{
           "key": "value1"
         },
@@ -498,7 +499,7 @@ Feature: Create-Retrieve-Update-Delete
       "description": null,
       "dummy": null,
       "dummyBoolean": null,
-      "dummyDate": "2015-03-01T10:00:00+00:00",
+      "dummyDate": "2018-12-01T13:12:00+00:00",
       "dummyFloat": null,
       "dummyPrice": null,
       "relatedDummy": null,
@@ -538,7 +539,7 @@ Feature: Create-Retrieve-Update-Delete
       "description": null,
       "dummy": null,
       "dummyBoolean": null,
-      "dummyDate": "2015-03-01T10:00:00+00:00",
+      "dummyDate": "2018-12-01T13:12:00+00:00",
       "dummyFloat": null,
       "dummyPrice": null,
       "relatedDummy": null,
