@@ -246,7 +246,7 @@ final class SchemaBuilder implements SchemaBuilderInterface
                         }
 
                         parse_str($key, $parsed);
-                        if (array_key_exists($key, $parsed) && \is_array($parsed[$key])) {
+                        if (\array_key_exists($key, $parsed) && \is_array($parsed[$key])) {
                             $parsed = [$key => ''];
                         }
                         array_walk_recursive($parsed, function (&$value) use ($graphqlFilterType) {
