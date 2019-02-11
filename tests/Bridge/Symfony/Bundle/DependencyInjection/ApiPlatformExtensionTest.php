@@ -164,7 +164,7 @@ class ApiPlatformExtensionTest extends TestCase
         $containerBuilderProphecy->getExtensionConfig('framework')->willReturn([0 => ['serializer' => ['enabled' => false]]])->shouldBeCalled();
         $containerBuilderProphecy->prependExtensionConfig('framework', Argument::any())->willReturn(null)->shouldBeCalled();
         $containerBuilderProphecy->prependExtensionConfig('framework', Argument::that(function (array $config) {
-            return array_key_exists('serializer', $config);
+            return \array_key_exists('serializer', $config);
         }))->shouldNotBeCalled();
         $containerBuilder = $containerBuilderProphecy->reveal();
 
@@ -177,7 +177,7 @@ class ApiPlatformExtensionTest extends TestCase
         $containerBuilderProphecy->getExtensionConfig('framework')->willReturn([0 => ['property_info' => ['enabled' => false]]])->shouldBeCalled();
         $containerBuilderProphecy->prependExtensionConfig('framework', Argument::any())->willReturn(null)->shouldBeCalled();
         $containerBuilderProphecy->prependExtensionConfig('framework', Argument::that(function (array $config) {
-            return array_key_exists('property_info', $config);
+            return \array_key_exists('property_info', $config);
         }))->shouldNotBeCalled();
         $containerBuilder = $containerBuilderProphecy->reveal();
 

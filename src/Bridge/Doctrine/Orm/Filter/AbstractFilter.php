@@ -115,7 +115,7 @@ abstract class AbstractFilter implements FilterInterface
             return !$this->isPropertyNested($property, $resourceClass);
         }
 
-        return array_key_exists($property, $this->properties);
+        return \array_key_exists($property, $this->properties);
     }
 
     /**

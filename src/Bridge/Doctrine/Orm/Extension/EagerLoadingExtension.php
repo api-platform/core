@@ -252,7 +252,7 @@ final class EagerLoadingExtension implements ContextAwareQueryCollectionExtensio
             }
 
             // If it's an embedded property see below
-            if (!array_key_exists($property, $targetClassMetadata->embeddedClasses)) {
+            if (!\array_key_exists($property, $targetClassMetadata->embeddedClasses)) {
                 //the field test allows to add methods to a Resource which do not reflect real database fields
                 if ($targetClassMetadata->hasField($property) && (true === $propertyMetadata->getAttribute('fetchable') || $propertyMetadata->isReadable())) {
                     $select[] = $property;

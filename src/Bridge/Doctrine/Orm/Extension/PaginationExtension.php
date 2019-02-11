@@ -81,7 +81,7 @@ final class PaginationExtension implements ContextAwareQueryResultCollectionExte
             ];
 
             foreach ($legacyPaginationArgs as $pos => $arg) {
-                if (array_key_exists($pos, $args)) {
+                if (\array_key_exists($pos, $args)) {
                     @trigger_error(sprintf('Passing "$%s" arguments is deprecated since API Platform 2.4 and will not be possible anymore in API Platform 3. Pass an instance of "%s" as third argument instead.', implode('", "$', array_column($legacyPaginationArgs, 'arg_name')), Paginator::class), E_USER_DEPRECATED);
 
                     if (!((null === $arg['default'] && null === $args[$pos]) || \call_user_func("is_{$arg['type']}", $args[$pos]))) {
@@ -261,7 +261,7 @@ final class PaginationExtension implements ContextAwareQueryResultCollectionExte
     private function getPaginationParameter(Request $request, string $parameterName, $default = null)
     {
         if (null !== $paginationAttribute = $request->attributes->get('_api_pagination')) {
-            return array_key_exists($parameterName, $paginationAttribute) ? $paginationAttribute[$parameterName] : $default;
+            return \array_key_exists($parameterName, $paginationAttribute) ? $paginationAttribute[$parameterName] : $default;
         }
 
         return $request->query->get($parameterName, $default);
