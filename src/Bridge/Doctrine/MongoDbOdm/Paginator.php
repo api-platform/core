@@ -136,7 +136,7 @@ final class Paginator implements \IteratorAggregate, PaginatorInterface
     private function getFacetInfo(string $field): array
     {
         foreach ($this->pipeline as $indexStage => $infoStage) {
-            if (array_key_exists('$facet', $infoStage)) {
+            if (\array_key_exists('$facet', $infoStage)) {
                 if (!isset($this->pipeline[$indexStage]['$facet'][$field])) {
                     throw new InvalidArgumentException("\"$field\" facet was not applied to the aggregation pipeline.");
                 }

@@ -41,7 +41,7 @@ final class PropertyFilter implements FilterInterface
     {
         if (null !== $propertyAttribute = $request->attributes->get('_api_filter_property')) {
             $properties = $propertyAttribute;
-        } elseif (array_key_exists($this->parameterName, $commonAttribute = $request->attributes->get('_api_filters', []))) {
+        } elseif (\array_key_exists($this->parameterName, $commonAttribute = $request->attributes->get('_api_filters', []))) {
             $properties = $commonAttribute[$this->parameterName];
         } else {
             $properties = $request->query->get($this->parameterName);
