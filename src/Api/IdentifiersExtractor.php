@@ -34,15 +34,13 @@ final class IdentifiersExtractor implements IdentifiersExtractorInterface
     private $propertyMetadataFactory;
     private $propertyAccessor;
     private $resourceClassResolver;
-    private $resourceMetadataFactory;
 
-    public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, PropertyAccessorInterface $propertyAccessor = null, ResourceClassResolverInterface $resourceClassResolver = null, ResourceMetadataFactoryInterface $resourceMetadataFactory = null)
+    public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, PropertyAccessorInterface $propertyAccessor = null, ResourceClassResolverInterface $resourceClassResolver = null)
     {
         $this->propertyNameCollectionFactory = $propertyNameCollectionFactory;
         $this->propertyMetadataFactory = $propertyMetadataFactory;
         $this->propertyAccessor = $propertyAccessor ?? PropertyAccess::createPropertyAccessor();
         $this->resourceClassResolver = $resourceClassResolver;
-        $this->resourceMetadataFactory = $resourceMetadataFactory;
 
         if (null === $this->resourceClassResolver) {
             @trigger_error(sprintf('Not injecting %s in the CachedIdentifiersExtractor might introduce cache issues with object identifiers.', ResourceClassResolverInterface::class), E_USER_DEPRECATED);

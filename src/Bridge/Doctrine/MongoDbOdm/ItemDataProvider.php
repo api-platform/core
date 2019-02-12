@@ -72,7 +72,7 @@ final class ItemDataProvider implements DenormalizedIdentifiersAwareItemDataProv
 
         $id = (array) $id;
 
-        if (!$fetchData = $context['fetch_data'] ?? true) {
+        if (!($context['fetch_data'] ?? true)) {
             return $manager->getReference($resourceClass, reset($id));
         }
 

@@ -112,31 +112,6 @@ final class DoctrineExtractor implements PropertyListExtractorInterface, Propert
     }
 
     /**
-     * Determines whether an association is nullable.
-     *
-     * @see https://github.com/doctrine/doctrine2/blob/v2.5.4/lib/Doctrine/ORM/Tools/EntityGenerator.php#L1221-L1246
-     */
-    private function isAssociationNullable(array $associationMapping): bool
-    {
-        if (isset($associationMapping['id']) && $associationMapping['id']) {
-            return false;
-        }
-
-        if (!isset($associationMapping['joinColumns'])) {
-            return true;
-        }
-
-        $joinColumns = $associationMapping['joinColumns'];
-        foreach ($joinColumns as $joinColumn) {
-            if (isset($joinColumn['nullable']) && !$joinColumn['nullable']) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    /**
      * Gets the corresponding built-in PHP type.
      */
     private function getPhpType(string $doctrineType): ?string
