@@ -34,4 +34,5 @@ services:
 test_script:
   - cd %APPVEYOR_BUILD_FOLDER%
   - php vendor\behat\behat\bin\behat --format=progress --suite=default
+  - rmdir tests\Fixtures\app\var\cache /s /q
   - php vendor\phpunit\phpunit\phpunit

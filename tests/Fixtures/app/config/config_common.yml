@@ -10,6 +10,13 @@ framework:
     form:                              ~ # For FOSUser
     templating:
         engines:                       ['twig'] # For Swagger UI
+    profiler:
+        enabled:                        true
+        collect:                        false
+
+web_profiler:
+    toolbar: true
+    intercept_redirects: false
 
 doctrine:
     dbal:
