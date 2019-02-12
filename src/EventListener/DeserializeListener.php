@@ -40,7 +40,7 @@ final class DeserializeListener
     /**
      * @throws InvalidArgumentException
      */
-    public function __construct(SerializerInterface $serializer, SerializerContextBuilderInterface $serializerContextBuilder, /* FormatsProviderInterface */ $formatsProvider)
+    public function __construct(SerializerInterface $serializer, SerializerContextBuilderInterface $serializerContextBuilder, /* FormatsProviderInterface */$formatsProvider)
     {
         $this->serializer = $serializer;
         $this->serializerContextBuilder = $serializerContextBuilder;
@@ -78,7 +78,7 @@ final class DeserializeListener
         }
 
         $context = $this->serializerContextBuilder->createFromRequest($request, false, $attributes);
-        if (false === $context['input_class']) {
+        if (isset($context['input']) && \array_key_exists('class', $context['input']) && null === $context['input']['class']) {
             return;
         }
 
@@ -97,7 +97,7 @@ final class DeserializeListener
         $request->attributes->set(
             'data',
             $this->serializer->deserialize(
-                $requestContent, $context['input_class'], $format, $context
+                $requestContent, $context['resource_class'], $format, $context
             )
         );
     }

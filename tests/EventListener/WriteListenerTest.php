@@ -148,11 +148,11 @@ class WriteListenerTest extends TestCase
         $iriConverterProphecy->getIriFromItem($dummy)->shouldNotBeCalled();
 
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadata(null, null, null, null, null, ['output_class' => false]));
+        $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadata(null, null, null, null, null, ['output' => ['class' => null]]));
 
         $dataPersisterProphecy->persist($dummy)->willReturn($dummy)->shouldBeCalled();
 
-        $request = new Request([], [], ['_api_resource_class' => Dummy::class, '_api_collection_operation_name' => 'post', '_api_output_class' => false]);
+        $request = new Request([], [], ['_api_resource_class' => Dummy::class, '_api_collection_operation_name' => 'post']);
         $request->setMethod('POST');
 
         $event = new GetResponseForControllerResultEvent(

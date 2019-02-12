@@ -37,7 +37,7 @@ use ApiPlatform\Core\Exception\InvalidArgumentException;
  *     @Attribute("filters", type="string[]"),
  *     @Attribute("graphql", type="array"),
  *     @Attribute("hydraContext", type="array"),
- *     @Attribute("inputClass", type="mixed"),
+ *     @Attribute("input", type="mixed"),
  *     @Attribute("iri", type="string"),
  *     @Attribute("itemOperations", type="array"),
  *     @Attribute("maximumItemsPerPage", type="int"),
@@ -46,7 +46,7 @@ use ApiPlatform\Core\Exception\InvalidArgumentException;
  *     @Attribute("normalizationContext", type="array"),
  *     @Attribute("openapiContext", type="array"),
  *     @Attribute("order", type="array"),
- *     @Attribute("outputClass", type="mixed"),
+ *     @Attribute("output", type="mixed"),
  *     @Attribute("paginationClientEnabled", type="bool"),
  *     @Attribute("paginationClientItemsPerPage", type="bool"),
  *     @Attribute("paginationClientPartial", type="bool"),
@@ -288,14 +288,14 @@ final class ApiResource
      *
      * @var string|false
      */
-    private $inputClass;
+    private $input;
 
     /**
      * @see https://github.com/Haehnchen/idea-php-annotation-plugin/issues/112
      *
      * @var string|false
      */
-    private $outputClass;
+    private $output;
 
     /**
      * @see https://github.com/Haehnchen/idea-php-annotation-plugin/issues/112

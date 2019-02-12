@@ -363,11 +363,11 @@ Feature: JSON API Inclusion of Related Resources
                         "dummyDate": null,
                         "dummyBoolean": null,
                         "embeddedDummy": {
-                            "dummyName": null,
                             "dummyBoolean": null,
                             "dummyDate": null,
                             "dummyFloat": null,
                             "dummyPrice": null,
+                            "dummyName": null,
                             "symfony": null
                         },
                         "_id": 1,

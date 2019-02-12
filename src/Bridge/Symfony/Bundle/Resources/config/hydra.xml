@@ -15,7 +15,7 @@
             <argument type="service" id="api_platform.subresource_operation_factory" />
             <argument type="service" id="api_platform.name_converter" on-invalid="ignore" />
 
-            <tag name="serializer.normalizer" priority="32" />
+            <tag name="serializer.normalizer" priority="-800" />
         </service>
 
 
@@ -34,7 +34,7 @@
             <argument>%api_platform.validator.serialize_payload_fields%</argument>
             <argument type="service" id="api_platform.name_converter" on-invalid="ignore" />
 
-            <tag name="serializer.normalizer" priority="64" />
+            <tag name="serializer.normalizer" priority="-780" />
         </service>
 
         <service id="api_platform.hydra.normalizer.entrypoint" class="ApiPlatform\Core\Hydra\Serializer\EntrypointNormalizer" public="false">
@@ -42,14 +42,14 @@
             <argument type="service" id="api_platform.iri_converter" />
             <argument type="service" id="api_platform.router" />
 
-            <tag name="serializer.normalizer" priority="32" />
+            <tag name="serializer.normalizer" priority="-800" />
         </service>
 
         <service id="api_platform.hydra.normalizer.error" class="ApiPlatform\Core\Hydra\Serializer\ErrorNormalizer" public="false">
             <argument type="service" id="api_platform.router" />
             <argument>%kernel.debug%</argument>
 
-            <tag name="serializer.normalizer" priority="32" />
+            <tag name="serializer.normalizer" priority="-800" />
         </service>
 
         <service id="api_platform.hydra.normalizer.collection" class="ApiPlatform\Core\Hydra\Serializer\CollectionNormalizer" public="false">
@@ -57,7 +57,7 @@
             <argument type="service" id="api_platform.resource_class_resolver" />
             <argument type="service" id="api_platform.iri_converter" />
 
-            <tag name="serializer.normalizer" priority="16" />
+            <tag name="serializer.normalizer" priority="-790" />
         </service>
 
         <service id="api_platform.hydra.normalizer.partial_collection_view" class="ApiPlatform\Core\Hydra\Serializer\PartialCollectionViewNormalizer" decorates="api_platform.hydra.normalizer.collection" public="false">
