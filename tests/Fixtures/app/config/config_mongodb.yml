@@ -8,3 +8,6 @@ doctrine_mongodb:
             server: '%server%'
             options: {}
     default_database: '%dbname%'
+    document_managers:
+        default:
+            auto_mapping:              true
