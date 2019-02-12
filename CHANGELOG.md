@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.5.0 beta 1
+
+* GraphQL: Add support for custom types
+
 ## 2.4.0 beta 1
 
 * MongoDB: full support
