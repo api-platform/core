@@ -35,7 +35,7 @@
 
 ## 2.3.6
 
-* /!\ Security: a vulnerability impacting the GraphQL subsystem was allowing users authorized to run mutations for a specific resource type, to execute it on any resource, of any type
+* /!\ Security: a vulnerability impacting the GraphQL subsystem was allowing users authorized to run mutations for a specific resource type, to execute it on any resource, of any type (CVE-2019-1000011)
 * Fix normalization of raw collections (not API resources)
 * Fix content negotiation format matching
 
@@ -120,7 +120,7 @@
 
 ## 2.2.10
 
-* /!\ Security: a vulnerability impacting the GraphQL subsystem was allowing users authorized to run mutations for a specific resource type, to execute it on any resource, of any type
+* /!\ Security: a vulnerability impacting the GraphQL subsystem was allowing users authorized to run mutations for a specific resource type, to execute it on any resource, of any type (CVE-2019-1000011)
 
 ## 2.2.9
 
