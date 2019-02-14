@@ -59,6 +59,11 @@ class ThirdLevel
     public $fourthLevel;
 
     /**
+     * @ODM\ReferenceOne(targetDocument=FourthLevel::class, cascade={"persist"})
+     */
+    public $badFourthLevel;
+
+    /**
      * @return int
      */
     public function getId()

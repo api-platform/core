@@ -1,5 +1,5 @@
 imports:
-    - { resource: config_common.yml }
+    - { resource: config_services_mongodb.yml }
 
 api_platform:
     doctrine: false

@@ -23,6 +23,8 @@ use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 use ApiPlatform\Core\Metadata\Property\PropertyNameCollection;
 use ApiPlatform\Core\Serializer\AbstractItemNormalizer;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyForAdditionalFields;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyForAdditionalFieldsInput;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyTableInheritance;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyTableInheritanceChild;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RelatedDummy;
@@ -288,6 +290,48 @@ class AbstractItemNormalizerTest extends TestCase
             'relatedDummy' => '/dummies/1',
             'relatedDummies' => ['/dummies/2'],
         ], Dummy::class);
+    }
+
+    public function testCanDenormalizeInputClassWithDifferentFieldsThanResourceClass()
+    {
+        $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
+        $propertyNameCollectionFactoryProphecy->create(DummyForAdditionalFieldsInput::class, [])->willReturn(
+            new PropertyNameCollection(['dummyName'])
+        );
+        $propertyNameCollectionFactoryProphecy->create(DummyForAdditionalFields::class, [])->willReturn(
+            new PropertyNameCollection(['id', 'name', 'slug'])
+        );
+
+        $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
+        // Create DummyForAdditionalFieldsInput mocks
+        $propertyMetadataFactoryProphecy->create(DummyForAdditionalFieldsInput::class, 'dummyName', [])->willReturn(
+            (new PropertyMetadata(new Type(Type::BUILTIN_TYPE_STRING), '', true, false))->withInitializable(true)
+        );
+        // Create DummyForAdditionalFields mocks
+        $propertyMetadataFactoryProphecy->create(DummyForAdditionalFields::class, 'id', [])->willReturn(
+            (new PropertyMetadata(new Type(Type::BUILTIN_TYPE_INT), '', true, false))->withInitializable(false)
+        );
+        $propertyMetadataFactoryProphecy->create(DummyForAdditionalFields::class, 'name', [])->willReturn(
+            (new PropertyMetadata(new Type(Type::BUILTIN_TYPE_STRING), '', true, false))->withInitializable(true)
+        );
+        $propertyMetadataFactoryProphecy->create(DummyForAdditionalFields::class, 'slug', [])->willReturn(
+            (new PropertyMetadata(new Type(Type::BUILTIN_TYPE_STRING), '', true, false))->withInitializable(true)
+        );
+
+        $normalizer = new class($propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), $this->prophesize(IriConverterInterface::class)->reveal(), $this->prophesize(ResourceClassResolverInterface::class)->reveal()) extends AbstractItemNormalizer {
+        };
+
+        /** @var DummyForAdditionalFieldsInput $res */
+        $res = $normalizer->denormalize([
+            'dummyName' => 'Dummy Name',
+        ], DummyForAdditionalFieldsInput::class, 'json', [
+            'resource_class' => DummyForAdditionalFields::class,
+            'input_class' => DummyForAdditionalFieldsInput::class,
+            'output_class' => DummyForAdditionalFields::class,
+        ]);
+
+        $this->assertInstanceOf(DummyForAdditionalFieldsInput::class, $res);
+        $this->assertEquals('Dummy Name', $res->getDummyName());
     }
 
     public function testDenormalizeWritableLinks()

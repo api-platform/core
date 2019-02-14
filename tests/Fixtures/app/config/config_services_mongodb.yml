@@ -1,0 +1,58 @@
+imports:
+    - { resource: config_common.yml }
+
+services:
+    app.my_dummy_resource.mongodb.boolean_filter:
+        parent:    'api_platform.doctrine_mongodb.odm.boolean_filter'
+        arguments: [ { 'dummyBoolean': ~, 'embeddedDummy.dummyBoolean': ~, 'relatedDummy.embeddedDummy.dummyBoolean': ~ } ]
+        tags:      [ { name: 'api_platform.filter', id: 'my_dummy.mongodb.boolean' } ]
+    app.my_dummy_resource.mongodb.date_filter:
+        parent:    'api_platform.doctrine_mongodb.odm.date_filter'
+        arguments: [ { 'dummyDate': ~, 'relatedDummy.dummyDate': ~, 'embeddedDummy.dummyDate': ~ } ]
+        tags:      [ { name: 'api_platform.filter', id: 'my_dummy.mongodb.date' } ]
+    app.my_dummy_resource.mongodb.exists_filter:
+        parent:    'api_platform.doctrine_mongodb.odm.exists_filter'
+        arguments: [ { 'description': ~, 'relatedDummy.name': ~, 'dummyBoolean': ~, 'relatedDummy': ~ } ]
+        tags:      [ { name: 'api_platform.filter', id: 'my_dummy.mongodb.exists' } ]
+    app.my_dummy_resource.mongodb.numeric_filter:
+        parent:    'api_platform.doctrine_mongodb.odm.numeric_filter'
+        arguments: [ { 'dummyFloat': ~, 'dummyPrice': ~ } ]
+        tags:      [ { name: 'api_platform.filter', id: 'my_dummy.mongodb.numeric' } ]
+    app.my_dummy_resource.mongodb.order_filter:
+        parent:    'api_platform.doctrine_mongodb.odm.order_filter'
+        arguments: [ { 'id': ~, 'name': 'desc', 'description': ~, 'relatedDummy.name': ~, 'embeddedDummy.dummyName': 'desc', 'relatedDummy.symfony': ~, 'dummyDate': ~ } ]
+        tags:      [ { name: 'api_platform.filter', id: 'my_dummy.mongodb.order' } ]
+    app.my_dummy_resource.mongodb.range_filter:
+        parent:    'api_platform.doctrine_mongodb.odm.range_filter'
+        arguments: [ { 'dummyFloat': ~, 'dummyPrice': ~ } ]
+        tags:      [ { name: 'api_platform.filter', id: 'my_dummy.mongodb.range' } ]
+    app.my_dummy_resource.mongodb.search_filter:
+        parent:    'api_platform.doctrine_mongodb.odm.search_filter'
+        arguments: [ { 'id': 'exact', 'name': 'partial', 'alias': 'start', 'description': 'word_start', 'relatedDummy.name': 'exact', 'relatedDummies': 'exact', 'dummy': 'ipartial', 'relatedDummies.name': 'start', 'embeddedDummy.dummyName': 'partial', 'relatedDummy.thirdLevel.level': 'exact', 'relatedDummy.thirdLevel.fourthLevel.level': 'exact', 'relatedDummy.thirdLevel.badFourthLevel.level': 'exact', 'relatedDummy.thirdLevel.fourthLevel.badThirdLevel.level': 'exact' } ]
+        tags:      [ { name: 'api_platform.filter', id: 'my_dummy.mongodb.search' } ]
+    app.related_dummy_resource.mongodb.search_filter:
+        parent:    'api_platform.doctrine_mongodb.odm.search_filter'
+        arguments: [ { 'relatedToDummyFriend.dummyFriend': 'exact', 'name': 'partial' } ]
+        tags:      [ { name: 'api_platform.filter', id: 'related_dummy.mongodb.friends' } ]
+    app.my_dummy_date_resource.mongodb.date_filter:
+        parent:    'api_platform.doctrine_mongodb.odm.date_filter'
+        arguments: [ { 'dummyDate': ~ } ]
+        tags:      [ { name: 'api_platform.filter', id: 'my_dummy_date.mongodb.date' } ]
+    app.related_dummy_to_friend_resource.mongodb.search_filter:
+        parent:    'api_platform.doctrine_mongodb.odm.search_filter'
+        arguments: [ { 'name': 'ipartial', 'description': 'ipartial' } ]
+        tags:      [ { name: 'api_platform.filter', id: 'related_to_dummy_friend.mongodb.name' } ]
+
+    dummy_dto_no_input.data_provider:
+        class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\DataProvider\DummyDtoNoInputCollectionDataProvider'
+        public: false
+        arguments: ['@doctrine_mongodb']
+        tags:
+            -  { name: 'api_platform.collection_data_provider' }
+
+    app.dummy_dto_no_output_data_persister:
+        class: ApiPlatform\Core\Tests\Fixtures\TestBundle\DataPersister\DummyDtoNoOutputDataPersister
+        arguments: ['@doctrine_mongodb']
+        public: false
+        tags:
+            -  { name: 'api_platform.data_persister' }

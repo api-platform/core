@@ -4,7 +4,6 @@ Feature: Create-Retrieve-Update-Delete
   I need to be able to retrieve, create, update and delete JSON-LD encoded resources.
 
   @createSchema
-  @mongodb
   Scenario: Create a resource
     When I add "Content-Type" header equal to "application/ld+json"
     And I send a "POST" request to "/dummies" with body:
@@ -56,7 +55,6 @@ Feature: Create-Retrieve-Update-Delete
     }
     """
 
-  @mongodb
   Scenario: Get a resource
     When I send a "GET" request to "/dummies/1"
     Then the response status code should be 200
@@ -93,7 +91,6 @@ Feature: Create-Retrieve-Update-Delete
     }
     """
 
-  @mongodb
   Scenario: Get a not found exception
     When I send a "GET" request to "/dummies/42"
     Then the response status code should be 404
@@ -140,7 +137,7 @@ Feature: Create-Retrieve-Update-Delete
       "hydra:totalItems": 1,
       "hydra:search": {
         "@type": "hydra:IriTemplate",
-        "hydra:template": "/dummies{?dummyBoolean,relatedDummy.embeddedDummy.dummyBoolean,dummyDate[before],dummyDate[strictly_before],dummyDate[after],dummyDate[strictly_after],relatedDummy.dummyDate[before],relatedDummy.dummyDate[strictly_before],relatedDummy.dummyDate[after],relatedDummy.dummyDate[strictly_after],description[exists],relatedDummy.name[exists],dummyBoolean[exists],relatedDummy[exists],dummyFloat,dummyFloat[],dummyPrice,dummyPrice[],order[id],order[name],order[description],order[relatedDummy.name],order[relatedDummy.symfony],order[dummyDate],dummyFloat[between],dummyFloat[gt],dummyFloat[gte],dummyFloat[lt],dummyFloat[lte],dummyPrice[between],dummyPrice[gt],dummyPrice[gte],dummyPrice[lt],dummyPrice[lte],id,id[],name,alias,description,relatedDummy.name,relatedDummy.name[],relatedDummies,relatedDummies[],dummy,relatedDummies.name,relatedDummy.thirdLevel.level,relatedDummy.thirdLevel.level[],relatedDummy.thirdLevel.fourthLevel.level,relatedDummy.thirdLevel.fourthLevel.level[],properties[]}",
+        "hydra:template": "/dummies{?dummyBoolean,relatedDummy.embeddedDummy.dummyBoolean,dummyDate[before],dummyDate[strictly_before],dummyDate[after],dummyDate[strictly_after],relatedDummy.dummyDate[before],relatedDummy.dummyDate[strictly_before],relatedDummy.dummyDate[after],relatedDummy.dummyDate[strictly_after],description[exists],relatedDummy.name[exists],dummyBoolean[exists],relatedDummy[exists],dummyFloat,dummyFloat[],dummyPrice,dummyPrice[],order[id],order[name],order[description],order[relatedDummy.name],order[relatedDummy.symfony],order[dummyDate],dummyFloat[between],dummyFloat[gt],dummyFloat[gte],dummyFloat[lt],dummyFloat[lte],dummyPrice[between],dummyPrice[gt],dummyPrice[gte],dummyPrice[lt],dummyPrice[lte],id,id[],name,alias,description,relatedDummy.name,relatedDummy.name[],relatedDummies,relatedDummies[],dummy,relatedDummies.name,relatedDummy.thirdLevel.level,relatedDummy.thirdLevel.level[],relatedDummy.thirdLevel.fourthLevel.level,relatedDummy.thirdLevel.fourthLevel.level[],relatedDummy.thirdLevel.badFourthLevel.level,relatedDummy.thirdLevel.badFourthLevel.level[],relatedDummy.thirdLevel.fourthLevel.badThirdLevel.level,relatedDummy.thirdLevel.fourthLevel.badThirdLevel.level[],properties[]}",
         "hydra:variableRepresentation": "BasicRepresentation",
         "hydra:mapping": [
           {
@@ -438,6 +435,30 @@ Feature: Create-Retrieve-Update-Delete
             "required": false
           },
           {
+            "@type": "IriTemplateMapping",
+            "variable": "relatedDummy.thirdLevel.badFourthLevel.level",
+            "property": "relatedDummy.thirdLevel.badFourthLevel.level",
+            "required": false
+          },
+          {
+            "@type": "IriTemplateMapping",
+            "variable": "relatedDummy.thirdLevel.badFourthLevel.level[]",
+            "property": "relatedDummy.thirdLevel.badFourthLevel.level",
+            "required": false
+          },
+          {
+            "@type": "IriTemplateMapping",
+            "variable": "relatedDummy.thirdLevel.fourthLevel.badThirdLevel.level",
+            "property": "relatedDummy.thirdLevel.fourthLevel.badThirdLevel.level",
+            "required": false
+          },
+          {
+            "@type": "IriTemplateMapping",
+            "variable": "relatedDummy.thirdLevel.fourthLevel.badThirdLevel.level[]",
+            "property": "relatedDummy.thirdLevel.fourthLevel.badThirdLevel.level",
+            "required": false
+          },
+          {
               "@type": "IriTemplateMapping",
               "variable": "properties[]",
               "property": null,
@@ -448,7 +469,6 @@ Feature: Create-Retrieve-Update-Delete
     }
     """
 
-  @mongodb
   Scenario: Update a resource
     When I add "Content-Type" header equal to "application/ld+json"
     And I send a "PUT" request to "/dummies/1" with body:
@@ -456,6 +476,7 @@ Feature: Create-Retrieve-Update-Delete
     {
       "@id": "/dummies/1",
       "name": "A nice dummy",
+      "dummyDate": "2018-12-01 13:12",
       "jsonData": [{
           "key": "value1"
         },
@@ -478,7 +499,7 @@ Feature: Create-Retrieve-Update-Delete
       "description": null,
       "dummy": null,
       "dummyBoolean": null,
-      "dummyDate": "2015-03-01T10:00:00+00:00",
+      "dummyDate": "2018-12-01T13:12:00+00:00",
       "dummyFloat": null,
       "dummyPrice": null,
       "relatedDummy": null,
@@ -502,7 +523,6 @@ Feature: Create-Retrieve-Update-Delete
     }
     """
 
-  @mongodb
   Scenario: Update a resource with empty body
     When I add "Content-Type" header equal to "application/ld+json"
     And I send a "PUT" request to "/dummies/1"
@@ -519,7 +539,7 @@ Feature: Create-Retrieve-Update-Delete
       "description": null,
       "dummy": null,
       "dummyBoolean": null,
-      "dummyDate": "2015-03-01T10:00:00+00:00",
+      "dummyDate": "2018-12-01T13:12:00+00:00",
       "dummyFloat": null,
       "dummyPrice": null,
       "relatedDummy": null,
@@ -543,7 +563,6 @@ Feature: Create-Retrieve-Update-Delete
     }
     """
 
-  @mongodb
   Scenario: Delete a resource
     When I send a "DELETE" request to "/dummies/1"
     Then the response status code should be 204

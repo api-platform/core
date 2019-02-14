@@ -474,6 +474,19 @@ class ApiPlatformExtensionTest extends TestCase
         $this->extension->load($config, $containerBuilder);
     }
 
+    public function testDisabledMessenger()
+    {
+        $containerBuilderProphecy = $this->getBaseContainerBuilderProphecy();
+        $containerBuilderProphecy->setAlias('api_platform.message_bus', 'message_bus')->shouldNotBeCalled();
+        $containerBuilderProphecy->setDefinition('api_platform.messenger.data_persister', Argument::type(Definition::class))->shouldNotBeCalled();
+        $containerBuilder = $containerBuilderProphecy->reveal();
+
+        $config = self::DEFAULT_CONFIG;
+        $config['api_platform']['messenger']['enabled'] = false;
+
+        $this->extension->load($config, $containerBuilder);
+    }
+
     public function testDisableDoctrine()
     {
         $containerBuilderProphecy = $this->getBaseContainerBuilderProphecy();
@@ -844,7 +857,6 @@ class ApiPlatformExtensionTest extends TestCase
         $containerBuilderProphecy->getParameter('kernel.debug')->willReturn(false);
 
         $containerBuilderProphecy->getDefinition('api_platform.http_cache.purger.varnish')->willReturn(new Definition());
-        $containerBuilderProphecy->has('message_bus')->willReturn(true);
 
         return $containerBuilderProphecy;
     }

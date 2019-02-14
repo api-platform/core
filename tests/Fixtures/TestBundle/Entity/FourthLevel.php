@@ -45,6 +45,11 @@ class FourthLevel
     private $level = 4;
 
     /**
+     * @ORM\OneToMany(targetEntity=ThirdLevel::class, cascade={"persist"}, mappedBy="badFourthLevel")
+     */
+    public $badThirdLevel;
+
+    /**
      * @return int
      */
     public function getId()

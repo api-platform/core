@@ -80,7 +80,7 @@ class RangeFilter extends AbstractContextAwareFilter implements RangeFilterInter
             case self::PARAMETER_BETWEEN:
                 $rangeValue = explode('..', $value);
 
-                $rangeValue = $this->normalizeBetweenValues($rangeValue, $field);
+                $rangeValue = $this->normalizeBetweenValues($rangeValue);
                 if (null === $rangeValue) {
                     return;
                 }
@@ -92,7 +92,7 @@ class RangeFilter extends AbstractContextAwareFilter implements RangeFilterInter
 
                 break;
             case self::PARAMETER_GREATER_THAN:
-                $value = $this->normalizeValue($value, $field, $operator);
+                $value = $this->normalizeValue($value, $operator);
                 if (null === $value) {
                     return;
                 }
@@ -103,7 +103,7 @@ class RangeFilter extends AbstractContextAwareFilter implements RangeFilterInter
 
                 break;
             case self::PARAMETER_GREATER_THAN_OR_EQUAL:
-                $value = $this->normalizeValue($value, $field, $operator);
+                $value = $this->normalizeValue($value, $operator);
                 if (null === $value) {
                     return;
                 }
@@ -114,7 +114,7 @@ class RangeFilter extends AbstractContextAwareFilter implements RangeFilterInter
 
                 break;
             case self::PARAMETER_LESS_THAN:
-                $value = $this->normalizeValue($value, $field, $operator);
+                $value = $this->normalizeValue($value, $operator);
                 if (null === $value) {
                     return;
                 }
@@ -125,7 +125,7 @@ class RangeFilter extends AbstractContextAwareFilter implements RangeFilterInter
 
                 break;
             case self::PARAMETER_LESS_THAN_OR_EQUAL:
-                $value = $this->normalizeValue($value, $field, $operator);
+                $value = $this->normalizeValue($value, $operator);
                 if (null === $value) {
                     return;
                 }

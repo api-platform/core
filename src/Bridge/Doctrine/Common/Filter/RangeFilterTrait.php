@@ -96,7 +96,7 @@ trait RangeFilterTrait
     /**
      * Normalize the values array for between operator.
      */
-    private function normalizeBetweenValues(array $values, string $property): ?array
+    private function normalizeBetweenValues(array $values): ?array
     {
         if (2 !== \count($values)) {
             $this->getLogger()->notice('Invalid filter ignored', [
@@ -120,7 +120,7 @@ trait RangeFilterTrait
     /**
      * Normalize the value.
      */
-    private function normalizeValue(string $value, string $property, string $operator): ?string
+    private function normalizeValue(string $value, string $operator): ?string
     {
         if (!is_numeric($value)) {
             $this->getLogger()->notice('Invalid filter ignored', [
