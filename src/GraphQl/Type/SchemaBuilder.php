@@ -59,7 +59,7 @@ final class SchemaBuilder implements SchemaBuilderInterface
     private $paginationEnabled;
     private $graphqlTypes = [];
 
-    public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, ResourceMetadataFactoryInterface $resourceMetadataFactory, ResolverFactoryInterface $collectionResolverFactory, ResolverFactoryInterface $itemMutationResolverFactory, callable $itemResolver, callable $defaultFieldResolver, ContainerInterface $filterLocator = null, bool $paginationEnabled = true, TypesFactoryInterface $typesFactory = null)
+    public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, ResourceMetadataFactoryInterface $resourceMetadataFactory, ResolverFactoryInterface $collectionResolverFactory, ResolverFactoryInterface $itemMutationResolverFactory, callable $itemResolver, callable $defaultFieldResolver, TypesFactoryInterface $typesFactory, ContainerInterface $filterLocator = null, bool $paginationEnabled = true)
     {
         $this->propertyNameCollectionFactory = $propertyNameCollectionFactory;
         $this->propertyMetadataFactory = $propertyMetadataFactory;
@@ -69,8 +69,8 @@ final class SchemaBuilder implements SchemaBuilderInterface
         $this->itemResolver = $itemResolver;
         $this->itemMutationResolverFactory = $itemMutationResolverFactory;
         $this->defaultFieldResolver = $defaultFieldResolver;
-        $this->filterLocator = $filterLocator;
         $this->typesFactory = $typesFactory;
+        $this->filterLocator = $filterLocator;
         $this->paginationEnabled = $paginationEnabled;
     }
 
