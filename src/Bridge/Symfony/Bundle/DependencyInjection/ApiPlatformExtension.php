@@ -134,11 +134,11 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $this->registerOAuthConfiguration($container, $config);
         $this->registerApiKeysConfiguration($container, $config);
         $this->registerSwaggerConfiguration($container, $config, $loader);
-        $this->registerJsonApiConfiguration($formats, $loader);
         $this->registerJsonLdConfiguration($container, $formats, $loader, $config['enable_docs']);
+        $this->registerGraphqlConfiguration($container, $config, $loader);
         $this->registerJsonHalConfiguration($formats, $loader);
         $this->registerJsonProblemConfiguration($errorFormats, $loader);
-        $this->registerGraphqlConfiguration($container, $config, $loader);
+        $this->registerJsonApiConfiguration($formats, $loader);
         $this->registerBundlesConfiguration($bundles, $config, $loader);
         $this->registerCacheConfiguration($container);
         $this->registerDoctrineConfiguration($container, $config, $loader, $useDoctrine);
