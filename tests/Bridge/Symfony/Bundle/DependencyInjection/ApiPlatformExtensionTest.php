@@ -203,24 +203,6 @@ class ApiPlatformExtensionTest extends TestCase
         $this->extension->prepend($containerBuilder);
     }
 
-    public function testPrependWhenNameConverterIsConfigured()
-    {
-        $containerBuilderProphecy = $this->prophesize(ContainerBuilder::class);
-        $containerBuilderProphecy->getExtensionConfig('framework')->willReturn([0 => ['serializer' => ['enabled' => true, 'name_converter' => 'foo'], 'property_info' => ['enabled' => false]]]);
-        $containerBuilderProphecy->prependExtensionConfig('api_platform', ['name_converter' => 'foo'])->shouldBeCalled();
-
-        $this->extension->prepend($containerBuilderProphecy->reveal());
-    }
-
-    public function testNotPrependWhenNameConverterIsNotConfigured()
-    {
-        $containerBuilderProphecy = $this->prophesize(ContainerBuilder::class);
-        $containerBuilderProphecy->getExtensionConfig('framework')->willReturn([0 => ['serializer' => ['enabled' => true], 'property_info' => ['enabled' => false]]])->shouldBeCalled();
-        $containerBuilderProphecy->prependExtensionConfig('api_platform', Argument::type('array'))->shouldNotBeCalled();
-
-        $this->extension->prepend($containerBuilderProphecy->reveal());
-    }
-
     public function testLoadDefaultConfig()
     {
         $containerBuilderProphecy = $this->getBaseContainerBuilderProphecy();

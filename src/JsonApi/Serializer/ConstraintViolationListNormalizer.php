@@ -77,15 +77,16 @@ final class ConstraintViolationListNormalizer implements NormalizerInterface, Ca
             return 'data';
         }
 
+        $class = \get_class($violation->getRoot());
         $propertyMetadata = $this->propertyMetadataFactory
             ->create(
                 // Im quite sure this requires some thought in case of validations over relationships
-                \get_class($violation->getRoot()),
+                $class,
                 $fieldName
             );
 
         if (null !== $this->nameConverter) {
-            $fieldName = $this->nameConverter->normalize($fieldName);
+            $fieldName = $this->nameConverter->normalize($fieldName, $class, self::FORMAT);
         }
 
         if (null !== $propertyMetadata->getType()->getClassName()) {

@@ -439,7 +439,7 @@ class ApiPlatformParserTest extends TestCase
         $propertyMetadataFactory = $propertyMetadataFactoryProphecy->reveal();
 
         $nameConverterProphecy = $this->prophesize(NameConverterInterface::class);
-        $nameConverterProphecy->normalize('nameConverted')->willReturn('name_converted')->shouldBeCalled();
+        $nameConverterProphecy->normalize('nameConverted', Dummy::class)->willReturn('name_converted')->shouldBeCalled();
         $nameConverter = $nameConverterProphecy->reveal();
 
         $apiPlatformParser = new ApiPlatformParser($resourceMetadataFactory, $propertyNameCollectionFactory, $propertyMetadataFactory, $nameConverter);
