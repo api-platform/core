@@ -167,6 +167,10 @@ final class SchemaBuilder implements SchemaBuilderInterface
             $queryFields[lcfirst($shortName)] = $fieldConfiguration;
         }
 
+        if (!\array_key_exists('get', $resourceMetadata->getCollectionOperations() ?? ['get' => []])) {
+            return $queryFields;
+        }
+
         if ($fieldConfiguration = $this->getResourceFieldConfiguration($resourceClass, $resourceMetadata, null, $deprecationReason, new Type(Type::BUILTIN_TYPE_OBJECT, false, null, true, null, new Type(Type::BUILTIN_TYPE_OBJECT, false, $resourceClass)), $resourceClass)) {
             $queryFields[lcfirst(Inflector::pluralize($shortName))] = $fieldConfiguration;
         }
