@@ -118,6 +118,7 @@ class GroupFilterTest extends TestCase
             'custom_groups[]' => [
                 'property' => null,
                 'type' => 'string',
+                'is_collection' => true,
                 'required' => false,
             ],
         ];

@@ -15,6 +15,7 @@ namespace ApiPlatform\Core\Tests\Bridge\Doctrine\Orm\Filter;
 
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\RangeFilter;
 use ApiPlatform\Core\Test\DoctrineOrmFilterTestCase;
+use ApiPlatform\Core\Tests\Bridge\Doctrine\Common\Filter\RangeFilterTestTrait;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 
 /**
@@ -22,11 +23,13 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
  */
 class RangeFilterTest extends DoctrineOrmFilterTestCase
 {
+    use RangeFilterTestTrait;
+
     protected $filterClass = RangeFilter::class;
 
-    public function testGetDescription()
+    public function testGetDescriptionDefaultFields()
     {
-        $filter = new RangeFilter($this->managerRegistry);
+        $filter = $this->buildFilter();
 
         $this->assertEquals([
             'id[between]' => [
@@ -334,125 +337,49 @@ class RangeFilterTest extends DoctrineOrmFilterTestCase
 
     public function provideApplyTestData(): array
     {
-        return [
-            'between' => [
-                null,
-                [
-                    'dummyPrice' => [
-                        'between' => '9.99..15.99',
-                    ],
+        return array_merge_recursive(
+            $this->provideApplyTestArguments(),
+            [
+                'between' => [
+                    sprintf('SELECT o FROM %s o WHERE o.dummyPrice BETWEEN :dummyPrice_p1_1 AND :dummyPrice_p1_2', Dummy::class),
                 ],
-                sprintf('SELECT o FROM %s o WHERE o.dummyPrice BETWEEN :dummyPrice_p1_1 AND :dummyPrice_p1_2', Dummy::class),
-            ],
-            'between (too many operands)' => [
-                null,
-                [
-                    'dummyPrice' => [
-                        'between' => '9.99..15.99..99.99',
-                    ],
+                'between (too many operands)' => [
+                    sprintf('SELECT o FROM %s o', Dummy::class),
                 ],
-                sprintf('SELECT o FROM %s o', Dummy::class),
-            ],
-            'between (too few operands)' => [
-                null,
-                [
-                    'dummyPrice' => [
-                        'between' => '15.99',
-                    ],
+                'between (too few operands)' => [
+                    sprintf('SELECT o FROM %s o', Dummy::class),
                 ],
-                sprintf('SELECT o FROM %s o', Dummy::class),
-            ],
-            'between (non-numeric operands)' => [
-                null,
-                [
-                    'dummyPrice' => [
-                        'between' => 'abc..def',
-                    ],
+                'between (non-numeric operands)' => [
+                    sprintf('SELECT o FROM %s o', Dummy::class),
                 ],
-                sprintf('SELECT o FROM %s o', Dummy::class),
-            ],
-            'lt' => [
-                null,
-                [
-                    'dummyPrice' => [
-                        'lt' => '9.99',
-                    ],
+                'lt' => [
+                    sprintf('SELECT o FROM %s o WHERE o.dummyPrice < :dummyPrice_p1', Dummy::class),
                 ],
-                sprintf('SELECT o FROM %s o WHERE o.dummyPrice < :dummyPrice_p1', Dummy::class),
-            ],
-            'lt (non-numeric)' => [
-                null,
-                [
-                    'dummyPrice' => [
-                        'lt' => '127.0.0.1',
-                    ],
+                'lt (non-numeric)' => [
+                    sprintf('SELECT o FROM %s o', Dummy::class),
                 ],
-                sprintf('SELECT o FROM %s o', Dummy::class),
-            ],
-            'lte' => [
-                null,
-                [
-                    'dummyPrice' => [
-                        'lte' => '9.99',
-                    ],
+                'lte' => [
+                    sprintf('SELECT o FROM %s o WHERE o.dummyPrice <= :dummyPrice_p1', Dummy::class),
                 ],
-                sprintf('SELECT o FROM %s o WHERE o.dummyPrice <= :dummyPrice_p1', Dummy::class),
-            ],
-            'lte (non-numeric)' => [
-                null,
-                [
-                    'dummyPrice' => [
-                        'lte' => '127.0.0.1',
-                    ],
+                'lte (non-numeric)' => [
+                    sprintf('SELECT o FROM %s o', Dummy::class),
                 ],
-                sprintf('SELECT o FROM %s o', Dummy::class),
-            ],
-            'gt' => [
-                null,
-                [
-                    'dummyPrice' => [
-                        'gt' => '9.99',
-                    ],
+                'gt' => [
+                    sprintf('SELECT o FROM %s o WHERE o.dummyPrice > :dummyPrice_p1', Dummy::class),
                 ],
-                sprintf('SELECT o FROM %s o WHERE o.dummyPrice > :dummyPrice_p1', Dummy::class),
-            ],
-            'gt (non-numeric)' => [
-                null,
-                [
-                    'dummyPrice' => [
-                        'gt' => '127.0.0.1',
-                    ],
+                'gt (non-numeric)' => [
+                    sprintf('SELECT o FROM %s o', Dummy::class),
                 ],
-                sprintf('SELECT o FROM %s o', Dummy::class),
-            ],
-            'gte' => [
-                null,
-                [
-                    'dummyPrice' => [
-                        'gte' => '9.99',
-                    ],
+                'gte' => [
+                    sprintf('SELECT o FROM %s o WHERE o.dummyPrice >= :dummyPrice_p1', Dummy::class),
                 ],
-                sprintf('SELECT o FROM %s o WHERE o.dummyPrice >= :dummyPrice_p1', Dummy::class),
-            ],
-            'gte (non-numeric)' => [
-                null,
-                [
-                    'dummyPrice' => [
-                        'gte' => '127.0.0.1',
-                    ],
+                'gte (non-numeric)' => [
+                    sprintf('SELECT o FROM %s o', Dummy::class),
                 ],
-                sprintf('SELECT o FROM %s o', Dummy::class),
-            ],
-            'lte + gte' => [
-                null,
-                [
-                    'dummyPrice' => [
-                        'gte' => '9.99',
-                        'lte' => '19.99',
-                    ],
+                'lte + gte' => [
+                    sprintf('SELECT o FROM %s o WHERE o.dummyPrice >= :dummyPrice_p1 AND o.dummyPrice <= :dummyPrice_p2', Dummy::class),
                 ],
-                sprintf('SELECT o FROM %s o WHERE o.dummyPrice >= :dummyPrice_p1 AND o.dummyPrice <= :dummyPrice_p2', Dummy::class),
-            ],
-        ];
+            ]
+        );
     }
 }

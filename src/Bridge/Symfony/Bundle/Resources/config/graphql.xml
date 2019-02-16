@@ -40,6 +40,20 @@
             <argument type="service" id="api_platform.iri_converter" />
         </service>
 
+        <!-- Type -->
+
+        <service id="api_platform.graphql.iterable_type" class="ApiPlatform\Core\GraphQl\Type\Definition\IterableType">
+            <tag name="api_platform.graphql.type" />
+        </service>
+
+        <service id="api_platform.graphql.type_locator" class="Symfony\Component\DependencyInjection\ServiceLocator">
+            <tag name="container.service_locator" />
+        </service>
+
+        <service id="api_platform.graphql.types_factory" class="ApiPlatform\Core\GraphQl\Type\TypesFactory">
+            <argument type="service" id="api_platform.graphql.type_locator" />
+        </service>
+
         <service id="api_platform.graphql.schema_builder" class="ApiPlatform\Core\GraphQl\Type\SchemaBuilder" public="false">
             <argument type="service" id="api_platform.metadata.property.name_collection_factory" />
             <argument type="service" id="api_platform.metadata.property.metadata_factory" />
@@ -49,6 +63,7 @@
             <argument type="service" id="api_platform.graphql.resolver.factory.item_mutation" />
             <argument type="service" id="api_platform.graphql.resolver.item" />
             <argument type="service" id="api_platform.graphql.resolver.resource_field" />
+            <argument type="service" id="api_platform.graphql.types_factory" />
             <argument type="service" id="api_platform.filter_locator" />
             <argument>%api_platform.collection.pagination.enabled%</argument>
         </service>

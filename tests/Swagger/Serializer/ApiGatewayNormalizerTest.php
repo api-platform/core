@@ -58,9 +58,9 @@ final class ApiGatewayNormalizerTest extends TestCase
     public function testNormalizeWithoutApiGateway()
     {
         $this->documentationNormalizerMock->normalize($this->objectMock, 'jsonld', [])
-            ->willReturn(['basePath' => ''])
+            ->willReturn(['basePath' => '/api'])
             ->shouldBeCalledTimes(1);
-        $this->assertEquals(['basePath' => '/'], $this->normalizer->normalize($this->objectMock->reveal(), 'jsonld'));
+        $this->assertEquals(['basePath' => '/api'], $this->normalizer->normalize($this->objectMock->reveal(), 'jsonld'));
     }
 
     public function testNormalizeWithApiGateway()

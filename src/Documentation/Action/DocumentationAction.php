@@ -62,7 +62,7 @@ final class DocumentationAction
     public function __invoke(Request $request = null): Documentation
     {
         if (null !== $request) {
-            $context = ['base_url' => $request->getBaseUrl()];
+            $context = ['base_url' => $request->getBaseUrl(), 'spec_version' => $request->query->getInt('spec_version', 2)];
             if ($request->query->getBoolean('api_gateway', false)) {
                 $context['api_gateway'] = true;
             }

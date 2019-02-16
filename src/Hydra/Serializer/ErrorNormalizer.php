@@ -27,17 +27,20 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
  */
 final class ErrorNormalizer implements NormalizerInterface, CacheableSupportsMethodInterface
 {
-    const FORMAT = 'jsonld';
-
     use ErrorNormalizerTrait;
+
+    const FORMAT = 'jsonld';
+    const TITLE = 'title';
 
     private $urlGenerator;
     private $debug;
+    private $defaultContext = [self::TITLE => 'An error occurred'];
 
-    public function __construct(UrlGeneratorInterface $urlGenerator, bool $debug = false)
+    public function __construct(UrlGeneratorInterface $urlGenerator, bool $debug = false, array $defaultContext = [])
     {
         $this->urlGenerator = $urlGenerator;
         $this->debug = $debug;
+        $this->defaultContext = array_merge($this->defaultContext, $defaultContext);
     }
 
     /**
@@ -48,7 +51,7 @@ final class ErrorNormalizer implements NormalizerInterface, CacheableSupportsMet
         $data = [
             '@context' => $this->urlGenerator->generate('api_jsonld_context', ['shortName' => 'Error']),
             '@type' => 'hydra:Error',
-            'hydra:title' => $context['title'] ?? 'An error occurred',
+            'hydra:title' => $context[self::TITLE] ?? $this->defaultContext[self::TITLE],
             'hydra:description' => $this->getErrorMessage($object, $context, $this->debug),
         ];
 

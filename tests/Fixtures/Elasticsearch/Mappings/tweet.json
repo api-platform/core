@@ -1,0 +1,39 @@
+{
+  "mappings": {
+    "_doc": {
+      "properties": {
+        "id": {
+          "type": "keyword"
+        },
+        "author": {
+          "properties": {
+            "id": {
+              "type": "keyword"
+            },
+            "gender": {
+              "type": "keyword"
+            },
+            "age": {
+              "type": "integer"
+            },
+            "first_name": {
+              "type": "text"
+            },
+            "last_name": {
+              "type": "text"
+            }
+          },
+          "dynamic": "strict"
+        },
+        "date": {
+          "type": "date",
+          "format": "yyyy-MM-dd HH:mm:ss"
+        },
+        "message": {
+          "type": "text"
+        }
+      },
+      "dynamic": "strict"
+    }
+  }
+}

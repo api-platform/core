@@ -14,14 +14,19 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\Hydra\Serializer;
 
 use ApiPlatform\Core\Api\FilterCollection;
+use ApiPlatform\Core\Api\OperationType;
 use ApiPlatform\Core\Api\ResourceClassResolverInterface;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\FilterInterface;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\Hydra\Serializer\CollectionFiltersNormalizer;
+use ApiPlatform\Core\Hydra\Serializer\CollectionNormalizer;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
+use ApiPlatform\Core\Tests\Fixtures\Foo;
+use ApiPlatform\Core\Tests\Fixtures\NotAResource;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use PHPUnit\Framework\TestCase;
+use Prophecy\Argument;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\Serializer\Normalizer\CacheableSupportsMethodInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
@@ -49,24 +54,141 @@ class CollectionFiltersNormalizerTest extends TestCase
         $this->assertTrue($normalizer->hasCacheableSupportsMethod());
     }
 
-    public function testDoNothingIfSubLevel()
+    public function testNormalizeNonResourceCollection()
     {
-        $dummy = new Dummy();
+        $notAResourceA = new NotAResource('A', 'buzz');
+        $notAResourceB = new NotAResource('B', 'bzzt');
+
+        $data = [$notAResourceA, $notAResourceB];
+
+        $normalizedNotAResourceA = [
+            'foo' => 'A',
+            'bar' => 'buzz',
+        ];
+
+        $normalizedNotAResourceB = [
+            'foo' => 'B',
+            'bar' => 'bzzt',
+        ];
 
         $decoratedProphecy = $this->prophesize(NormalizerInterface::class);
-        $decoratedProphecy->normalize($dummy, null, ['api_sub_level' => true])->willReturn(['name' => 'foo'])->shouldBeCalled();
+        $decoratedProphecy->normalize($data, CollectionNormalizer::FORMAT, Argument::any())->willReturn([
+            $normalizedNotAResourceA,
+            $normalizedNotAResourceB,
+        ]);
+
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
 
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
-        $resourceClassResolverProphecy->getResourceClass()->shouldNotBeCalled();
+        $resourceClassResolverProphecy->getResourceClass($data, null, true)->willThrow(InvalidArgumentException::class);
 
-        $normalizer = new CollectionFiltersNormalizer(
-            $decoratedProphecy->reveal(),
-            $this->prophesize(ResourceMetadataFactoryInterface::class)->reveal(),
-            $resourceClassResolverProphecy->reveal(),
-            $this->prophesize(ContainerInterface::class)->reveal()
-        );
+        $filterLocatorProphecy = $this->prophesize(ContainerInterface::class);
 
-        $this->assertEquals(['name' => 'foo'], $normalizer->normalize($dummy, null, ['api_sub_level' => true]));
+        $normalizer = new CollectionFiltersNormalizer($decoratedProphecy->reveal(), $resourceMetadataFactoryProphecy->reveal(), $resourceClassResolverProphecy->reveal(), $filterLocatorProphecy->reveal());
+
+        $actual = $normalizer->normalize($data, CollectionNormalizer::FORMAT, [
+        ]);
+
+        $this->assertEquals([
+            $normalizedNotAResourceA,
+            $normalizedNotAResourceB,
+        ], $actual);
+    }
+
+    public function testNormalizeSubLevelResourceCollection()
+    {
+        $fooOne = new Foo();
+        $fooOne->id = 1;
+        $fooOne->bar = 'baz';
+
+        $fooThree = new Foo();
+        $fooThree->id = 3;
+        $fooThree->bar = 'bzz';
+
+        $data = [$fooOne, $fooThree];
+
+        $normalizedFooOne = [
+            '@id' => '/foos/1',
+            '@type' => 'Foo',
+            'bar' => 'baz',
+        ];
+
+        $normalizedFooThree = [
+            '@id' => '/foos/3',
+            '@type' => 'Foo',
+            'bar' => 'bzz',
+        ];
+
+        $decoratedProphecy = $this->prophesize(NormalizerInterface::class);
+        $decoratedProphecy->normalize($data, CollectionNormalizer::FORMAT, Argument::allOf(
+            Argument::withEntry('resource_class', Foo::class),
+            Argument::withEntry('api_sub_level', true)
+        ))->willReturn([
+            $normalizedFooOne,
+            $normalizedFooThree,
+        ]);
+
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
+
+        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
+
+        $filterLocatorProphecy = $this->prophesize(ContainerInterface::class);
+
+        $normalizer = new CollectionFiltersNormalizer($decoratedProphecy->reveal(), $resourceMetadataFactoryProphecy->reveal(), $resourceClassResolverProphecy->reveal(), $filterLocatorProphecy->reveal());
+
+        $actual = $normalizer->normalize($data, CollectionNormalizer::FORMAT, [
+            'collection_operation_name' => 'get',
+            'operation_type' => OperationType::COLLECTION,
+            'resource_class' => Foo::class,
+            'api_sub_level' => true,
+        ]);
+
+        $this->assertEquals([
+            $normalizedFooOne,
+            $normalizedFooThree,
+        ], $actual);
+    }
+
+    public function testNormalizeSubLevelNonResourceCollection()
+    {
+        $notAResourceA = new NotAResource('A', 'buzz');
+        $notAResourceB = new NotAResource('B', 'bzzt');
+
+        $data = [$notAResourceA, $notAResourceB];
+
+        $normalizedNotAResourceA = [
+            'foo' => 'A',
+            'bar' => 'buzz',
+        ];
+
+        $normalizedNotAResourceB = [
+            'foo' => 'B',
+            'bar' => 'bzzt',
+        ];
+
+        $decoratedProphecy = $this->prophesize(NormalizerInterface::class);
+        $decoratedProphecy->normalize($data, CollectionNormalizer::FORMAT, Argument::any())->willReturn([
+            $normalizedNotAResourceA,
+            $normalizedNotAResourceB,
+        ]);
+
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
+
+        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
+        $resourceClassResolverProphecy->getResourceClass($data, null, true)->willThrow(InvalidArgumentException::class);
+
+        $filterLocatorProphecy = $this->prophesize(ContainerInterface::class);
+
+        $normalizer = new CollectionFiltersNormalizer($decoratedProphecy->reveal(), $resourceMetadataFactoryProphecy->reveal(), $resourceClassResolverProphecy->reveal(), $filterLocatorProphecy->reveal());
+
+        $actual = $normalizer->normalize($data, CollectionNormalizer::FORMAT, [
+            'api_sub_level' => true,
+        ]);
+
+        $this->assertEquals([
+            $normalizedNotAResourceA,
+            $normalizedNotAResourceB,
+        ], $actual);
     }
 
     public function testDoNothingIfNoFilter()

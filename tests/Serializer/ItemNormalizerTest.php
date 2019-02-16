@@ -186,4 +186,38 @@ class ItemNormalizerTest extends TestCase
         $normalizer->setSerializer($serializerProphecy->reveal());
         $normalizer->denormalize(['id' => '12', 'name' => 'hello'], Dummy::class, null, $context);
     }
+
+    public function testDenormalizeWithIdAndNoResourceClass()
+    {
+        $context = [];
+
+        $propertyNameCollection = new PropertyNameCollection(['id', 'name']);
+        $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
+        $propertyNameCollectionFactoryProphecy->create(Dummy::class, [])->willReturn($propertyNameCollection)->shouldBeCalled();
+
+        $propertyMetadataFactory = new PropertyMetadata(null, null, true, true);
+        $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
+        $propertyMetadataFactoryProphecy->create(Dummy::class, 'id', [])->willReturn($propertyMetadataFactory)->shouldBeCalled();
+        $propertyMetadataFactoryProphecy->create(Dummy::class, 'name', [])->willReturn($propertyMetadataFactory)->shouldBeCalled();
+
+        $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
+
+        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
+
+        $serializerProphecy = $this->prophesize(SerializerInterface::class);
+        $serializerProphecy->willImplement(DenormalizerInterface::class);
+
+        $normalizer = new ItemNormalizer(
+            $propertyNameCollectionFactoryProphecy->reveal(),
+            $propertyMetadataFactoryProphecy->reveal(),
+            $iriConverterProphecy->reveal(),
+            $resourceClassResolverProphecy->reveal()
+        );
+        $normalizer->setSerializer($serializerProphecy->reveal());
+
+        $object = $normalizer->denormalize(['id' => '42', 'name' => 'hello'], Dummy::class, null, $context);
+        $this->assertInstanceOf(Dummy::class, $object);
+        $this->assertSame('42', $object->getId());
+        $this->assertSame('hello', $object->getName());
+    }
 }

@@ -43,7 +43,6 @@ interface ContextBuilderInterface
     /**
      * Builds the JSON-LD context for the given resource.
      *
-     *
      * @throws ResourceClassNotFoundException
      */
     public function getResourceContext(string $resourceClass, int $referenceType = UrlGeneratorInterface::ABS_PATH): array;

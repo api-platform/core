@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
 /**
@@ -21,7 +21,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class CustomController extends Controller
+class CustomController extends AbstractController
 {
     public function customAction(int $id): JsonResponse
     {

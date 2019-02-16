@@ -20,6 +20,7 @@ Feature: Relations support
       "@id": "/third_levels/1",
       "@type": "ThirdLevel",
       "fourthLevel": null,
+      "badFourthLevel": null,
       "id": 1,
       "level": 3,
       "test": true
@@ -77,6 +78,7 @@ Feature: Relations support
     }
     """
 
+  @!mongodb
   Scenario: Create a friend relationship
     When I add "Content-Type" header equal to "application/ld+json"
     And I send a "POST" request to "/related_to_dummy_friends" with body:
@@ -106,6 +108,7 @@ Feature: Relations support
     }
     """
 
+  @!mongodb
   Scenario: Get the relationship
     When I send a "GET" request to "/related_to_dummy_friends/dummyFriend=1;relatedDummy=1"
     And the response status code should be 200
@@ -555,7 +558,6 @@ Feature: Relations support
     }
     """
 
-  @dropSchema
   Scenario: Passing an invalid IRI to a relation
     When I add "Content-Type" header equal to "application/ld+json"
     And I send a "POST" request to "/relation_embedders" with body:
@@ -569,7 +571,6 @@ Feature: Relations support
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
     And the JSON node "hydra:description" should contain "Invalid value provided (invalid IRI?)."
 
-  @dropSchema
   Scenario: Passing an invalid type to a relation
     When I add "Content-Type" header equal to "application/ld+json"
     And I send a "POST" request to "/relation_embedders" with body:

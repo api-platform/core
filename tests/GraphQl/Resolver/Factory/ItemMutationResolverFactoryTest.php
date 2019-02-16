@@ -22,7 +22,10 @@ use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use GraphQL\Error\Error;
+use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\ResolveInfo;
+use GraphQL\Type\Definition\Type;
+use GraphQL\Type\Schema;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
@@ -44,8 +47,7 @@ class ItemMutationResolverFactoryTest extends TestCase
         $resolverFactory = $this->createItemMutationResolverFactory(null, $dataPersisterProphecy);
         $resolver = $resolverFactory(Dummy::class, Dummy::class, 'delete');
 
-        $resolveInfo = new ResolveInfo([]);
-        $resolveInfo->fieldNodes = [];
+        $resolveInfo = new ResolveInfo('', [], null, new ObjectType(['name' => '']), '', new Schema([]), null, null, null, null);
 
         $resolver(null, ['input' => ['id' => '/dummies/3', 'clientMutationId' => '1936']], null, $resolveInfo);
     }
@@ -59,8 +61,7 @@ class ItemMutationResolverFactoryTest extends TestCase
         $resolverFactory = $this->createItemMutationResolverFactory($dummy, $dataPersisterProphecy);
         $resolver = $resolverFactory(Dummy::class, null, 'delete');
 
-        $resolveInfo = new ResolveInfo([]);
-        $resolveInfo->fieldNodes = [];
+        $resolveInfo = new ResolveInfo('', [], null, new ObjectType(['name' => '']), '', new Schema([]), null, null, null, null);
 
         $this->assertEquals(['id' => '/dummies/3', 'clientMutationId' => '1936'], $resolver(null, ['input' => ['id' => '/dummies/3', 'clientMutationId' => '1936']], null, $resolveInfo));
     }

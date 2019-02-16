@@ -27,11 +27,15 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
  */
 final class ApiGatewayNormalizer implements NormalizerInterface, CacheableSupportsMethodInterface
 {
-    private $documentationNormalizer;
+    const API_GATEWAY = 'api_gateway';
 
-    public function __construct(NormalizerInterface $documentationNormalizer)
+    private $documentationNormalizer;
+    private $defaultContext = [self::API_GATEWAY => false];
+
+    public function __construct(NormalizerInterface $documentationNormalizer, $defaultContext = [])
     {
         $this->documentationNormalizer = $documentationNormalizer;
+        $this->defaultContext = array_merge($this->defaultContext, $defaultContext);
     }
 
     /**
@@ -40,12 +44,12 @@ final class ApiGatewayNormalizer implements NormalizerInterface, CacheableSuppor
     public function normalize($object, $format = null, array $context = [])
     {
         $data = $this->documentationNormalizer->normalize($object, $format, $context);
-        if (empty($data['basePath'])) {
-            $data['basePath'] = '/';
+        if (!($context[self::API_GATEWAY] ?? $this->defaultContext[self::API_GATEWAY])) {
+            return $data;
         }
 
-        if (!($context['api_gateway'] ?? false)) {
-            return $data;
+        if (empty($data['basePath'])) {
+            $data['basePath'] = '/';
         }
 
         foreach ($data['paths'] as $path => $operations) {

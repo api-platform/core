@@ -15,6 +15,7 @@ namespace ApiPlatform\Core\GraphQl\Action;
 
 use ApiPlatform\Core\GraphQl\ExecutorInterface;
 use ApiPlatform\Core\GraphQl\Type\SchemaBuilderInterface;
+use GraphQL\Error\Debug;
 use GraphQL\Error\Error;
 use GraphQL\Executor\ExecutionResult;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -40,7 +41,7 @@ final class EntrypointAction
         $this->schemaBuilder = $schemaBuilder;
         $this->executor = $executor;
         $this->twig = $twig;
-        $this->debug = $debug;
+        $this->debug = $debug ? Debug::INCLUDE_DEBUG_MESSAGE | Debug::INCLUDE_TRACE : false;
         $this->graphiqlEnabled = $graphiqlEnabled;
         $this->title = $title;
     }
@@ -64,7 +65,7 @@ final class EntrypointAction
         try {
             $executionResult = $this->executor->executeQuery($this->schemaBuilder->getSchema(), $query, null, null, $variables, $operation);
         } catch (\Exception $e) {
-            $executionResult = new ExecutionResult(null, [$e] + ($this->debug ? ['trace' => $e->getTraceAsString()] : []));
+            $executionResult = new ExecutionResult(null, [new Error($e->getMessage(), null, null, null, null, $e)]);
         }
 
         return new JsonResponse($executionResult->toArray($this->debug));
@@ -75,7 +76,7 @@ final class EntrypointAction
         $query = $request->query->get('query');
         $operation = $request->query->get('operation');
         if ($variables = $request->query->get('variables', [])) {
-            $variables = \json_decode($variables, true);
+            $variables = json_decode($variables, true);
         }
 
         if (!$request->isMethod('POST')) {
@@ -83,14 +84,14 @@ final class EntrypointAction
         }
 
         if ('json' === $request->getContentType()) {
-            $input = \json_decode((string) $request->getContent(), true);
+            $input = json_decode((string) $request->getContent(), true);
 
             if (isset($input['query'])) {
                 $query = $input['query'];
             }
 
             if (isset($input['variables'])) {
-                $variables = \is_array($input['variables']) ? $input['variables'] : \json_decode($input['variables'], true);
+                $variables = \is_array($input['variables']) ? $input['variables'] : json_decode($input['variables'], true);
             }
 
             if (isset($input['operation'])) {

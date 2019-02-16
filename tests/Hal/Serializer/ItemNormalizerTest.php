@@ -128,8 +128,8 @@ class ItemNormalizerTest extends TestCase
         $serializerProphecy->normalize('hello', null, Argument::type('array'))->willReturn('hello')->shouldBeCalled();
 
         $nameConverter = $this->prophesize(NameConverterInterface::class);
-        $nameConverter->normalize('name')->shouldBeCalled()->willReturn('name');
-        $nameConverter->normalize('relatedDummy')->shouldBeCalled()->willReturn('related_dummy');
+        $nameConverter->normalize('name', Argument::any(), Argument::any(), Argument::any())->shouldBeCalled()->willReturn('name');
+        $nameConverter->normalize('relatedDummy', Argument::any(), Argument::any(), Argument::any())->shouldBeCalled()->willReturn('related_dummy');
 
         $normalizer = new ItemNormalizer(
             $propertyNameCollectionFactoryProphecy->reveal(),
@@ -188,8 +188,8 @@ class ItemNormalizerTest extends TestCase
         $serializerProphecy->normalize('hello', null, Argument::type('array'))->willReturn('hello')->shouldBeCalled();
 
         $nameConverter = $this->prophesize(NameConverterInterface::class);
-        $nameConverter->normalize('name')->shouldBeCalled()->willReturn('name');
-        $nameConverter->normalize('relatedDummy')->shouldBeCalled()->willReturn('related_dummy');
+        $nameConverter->normalize('name', Argument::any(), Argument::any(), Argument::any())->shouldBeCalled()->willReturn('name');
+        $nameConverter->normalize('relatedDummy', Argument::any(), Argument::any(), Argument::any())->shouldBeCalled()->willReturn('related_dummy');
 
         $normalizer = new ItemNormalizer(
             $propertyNameCollectionFactoryProphecy->reveal(),

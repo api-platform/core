@@ -67,15 +67,15 @@ class SwaggerUiActionTest extends TestCase
 
     public function getInvokeParameters()
     {
-        $postRequest = new Request([], [], ['_api_resource_class' => 'Foo', '_api_item_operation_name' => 'post']);
-        $postRequest->setMethod('POST');
-
         $twigCollectionProphecy = $this->prophesize(\Twig_Environment::class);
         $twigCollectionProphecy->render('@ApiPlatform/SwaggerUi/index.html.twig', [
             'title' => '',
             'description' => '',
             'formats' => [],
             'showWebby' => true,
+            'swaggerUiEnabled' => false,
+            'reDocEnabled' => false,
+            'graphqlEnabled' => false,
             'swagger_data' => [
                 'url' => '/url',
                 'spec' => self::SPEC,
@@ -103,7 +103,10 @@ class SwaggerUiActionTest extends TestCase
             'title' => '',
             'description' => '',
             'formats' => [],
+            'swaggerUiEnabled' => false,
             'showWebby' => true,
+            'reDocEnabled' => false,
+            'graphqlEnabled' => false,
             'swagger_data' => [
                 'url' => '/url',
                 'spec' => self::SPEC,
@@ -129,6 +132,7 @@ class SwaggerUiActionTest extends TestCase
         return [
             [new Request([], [], ['_api_resource_class' => 'Foo', '_api_collection_operation_name' => 'get']), $twigCollectionProphecy],
             [new Request([], [], ['_api_resource_class' => 'Foo', '_api_item_operation_name' => 'get']), $twigItemProphecy],
+            [new Request([], [], ['_api_resource_class' => 'Foo', '_api_item_operation_name' => 'get'], [], [], ['REQUEST_URI' => '/docs', 'SCRIPT_FILENAME' => '/docs']), $twigItemProphecy],
         ];
     }
 
@@ -151,6 +155,9 @@ class SwaggerUiActionTest extends TestCase
             'description' => '',
             'formats' => [],
             'showWebby' => true,
+            'swaggerUiEnabled' => false,
+            'reDocEnabled' => false,
+            'graphqlEnabled' => false,
             'swagger_data' => [
                 'url' => '/url',
                 'spec' => self::SPEC,

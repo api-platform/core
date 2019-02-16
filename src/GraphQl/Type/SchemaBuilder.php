@@ -16,7 +16,6 @@ namespace ApiPlatform\Core\GraphQl\Type;
 use ApiPlatform\Core\Exception\ResourceClassNotFoundException;
 use ApiPlatform\Core\GraphQl\Resolver\Factory\ResolverFactoryInterface;
 use ApiPlatform\Core\GraphQl\Serializer\ItemNormalizer;
-use ApiPlatform\Core\GraphQl\Type\Definition\IterableType;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
@@ -56,10 +55,11 @@ final class SchemaBuilder implements SchemaBuilderInterface
     private $itemMutationResolverFactory;
     private $defaultFieldResolver;
     private $filterLocator;
+    private $typesFactory;
     private $paginationEnabled;
     private $graphqlTypes = [];
 
-    public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, ResourceMetadataFactoryInterface $resourceMetadataFactory, ResolverFactoryInterface $collectionResolverFactory, ResolverFactoryInterface $itemMutationResolverFactory, callable $itemResolver, callable $defaultFieldResolver, ContainerInterface $filterLocator = null, bool $paginationEnabled = true)
+    public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, ResourceMetadataFactoryInterface $resourceMetadataFactory, ResolverFactoryInterface $collectionResolverFactory, ResolverFactoryInterface $itemMutationResolverFactory, callable $itemResolver, callable $defaultFieldResolver, TypesFactoryInterface $typesFactory, ContainerInterface $filterLocator = null, bool $paginationEnabled = true)
     {
         $this->propertyNameCollectionFactory = $propertyNameCollectionFactory;
         $this->propertyMetadataFactory = $propertyMetadataFactory;
@@ -69,13 +69,15 @@ final class SchemaBuilder implements SchemaBuilderInterface
         $this->itemResolver = $itemResolver;
         $this->itemMutationResolverFactory = $itemMutationResolverFactory;
         $this->defaultFieldResolver = $defaultFieldResolver;
+        $this->typesFactory = $typesFactory;
         $this->filterLocator = $filterLocator;
         $this->paginationEnabled = $paginationEnabled;
     }
 
     public function getSchema(): Schema
     {
-        $this->graphqlTypes['Iterable'] = new IterableType();
+        $this->graphqlTypes += $this->typesFactory->getTypes();
+
         $queryFields = ['node' => $this->getNodeQueryField()];
         $mutationFields = [];
 
@@ -208,15 +210,15 @@ final class SchemaBuilder implements SchemaBuilderInterface
             }
 
             $graphqlWrappedType = $graphqlType instanceof WrappingType ? $graphqlType->getWrappedType() : $graphqlType;
-            $isInternalGraphqlType = \in_array($graphqlWrappedType, GraphQLType::getInternalTypes(), true);
-            if ($isInternalGraphqlType) {
+            $isStandardGraphqlType = \in_array($graphqlWrappedType, GraphQLType::getStandardTypes(), true);
+            if ($isStandardGraphqlType) {
                 $className = '';
             } else {
                 $className = $this->isCollection($type) ? $type->getCollectionValueType()->getClassName() : $type->getClassName();
             }
 
             $args = [];
-            if (!$input && null === $mutationName && !$isInternalGraphqlType && $this->isCollection($type)) {
+            if (!$input && null === $mutationName && !$isStandardGraphqlType && $this->isCollection($type)) {
                 if ($this->paginationEnabled) {
                     $args = [
                         'first' => [
@@ -254,7 +256,7 @@ final class SchemaBuilder implements SchemaBuilderInterface
                         }
 
                         parse_str($key, $parsed);
-                        if (array_key_exists($key, $parsed) && \is_array($parsed[$key])) {
+                        if (\array_key_exists($key, $parsed) && \is_array($parsed[$key])) {
                             $parsed = [$key => ''];
                         }
                         array_walk_recursive($parsed, function (&$value) use ($graphqlFilterType) {
@@ -266,7 +268,7 @@ final class SchemaBuilder implements SchemaBuilderInterface
                 $args = $this->convertFilterArgsToTypes($args);
             }
 
-            if ($isInternalGraphqlType || $input) {
+            if ($isStandardGraphqlType || $input) {
                 $resolve = null;
             } elseif ($this->isCollection($type)) {
                 $resolverFactory = $this->collectionResolverFactory;
@@ -389,7 +391,10 @@ final class SchemaBuilder implements SchemaBuilderInterface
                     return null;
                 }
 
-                $graphqlType = $this->getResourceObjectType($resourceClass, $resourceMetadata, $input, $mutationName, $depth);
+                if (false !== $dtoClass = $resourceMetadata->getAttribute($input ? 'input_class' : 'output_class', $resourceClass)) {
+                    $resourceClass = $dtoClass;
+                }
+                $graphqlType = $this->getResourceObjectType(false === $dtoClass ? null : $resourceClass, $resourceMetadata, $input, $mutationName, $depth);
                 break;
             default:
                 throw new InvalidTypeException(sprintf('The type "%s" is not supported.', $builtinType));
@@ -407,7 +412,7 @@ final class SchemaBuilder implements SchemaBuilderInterface
      *
      * @return ObjectType|InputObjectType
      */
-    private function getResourceObjectType(string $resourceClass, ResourceMetadata $resourceMetadata, bool $input = false, string $mutationName = null, int $depth = 0): GraphQLType
+    private function getResourceObjectType(?string $resourceClass, ResourceMetadata $resourceMetadata, bool $input = false, string $mutationName = null, int $depth = 0): GraphQLType
     {
         $shortName = $resourceMetadata->getShortName();
         if (null !== $mutationName) {
@@ -439,7 +444,7 @@ final class SchemaBuilder implements SchemaBuilderInterface
     /**
      * Gets the fields of the type of the given resource.
      */
-    private function getResourceObjectTypeFields(string $resourceClass, ResourceMetadata $resourceMetadata, bool $input = false, string $mutationName = null, int $depth = 0): array
+    private function getResourceObjectTypeFields(?string $resourceClass, ResourceMetadata $resourceMetadata, bool $input = false, string $mutationName = null, int $depth = 0): array
     {
         $fields = [];
         $idField = ['type' => GraphQLType::nonNull(GraphQLType::id())];
@@ -456,25 +461,27 @@ final class SchemaBuilder implements SchemaBuilderInterface
             $fields['id'] = $idField;
         }
 
-        foreach ($this->propertyNameCollectionFactory->create($resourceClass) as $property) {
-            $propertyMetadata = $this->propertyMetadataFactory->create($resourceClass, $property, ['graphql_operation_name' => $mutationName ?? 'query']);
-            if (
-                null === ($propertyType = $propertyMetadata->getType())
-                || (!$input && null === $mutationName && false === $propertyMetadata->isReadable())
-                || (null !== $mutationName && false === $propertyMetadata->isWritable())
-            ) {
-                continue;
-            }
+        if (null !== $resourceClass) {
+            foreach ($this->propertyNameCollectionFactory->create($resourceClass) as $property) {
+                $propertyMetadata = $this->propertyMetadataFactory->create($resourceClass, $property, ['graphql_operation_name' => $mutationName ?? 'query']);
+                if (
+                    null === ($propertyType = $propertyMetadata->getType())
+                    || (!$input && null === $mutationName && false === $propertyMetadata->isReadable())
+                    || (null !== $mutationName && false === $propertyMetadata->isWritable())
+                ) {
+                    continue;
+                }
 
-            $rootResource = $resourceClass;
-            if (null !== $propertyMetadata->getSubresource()) {
-                $resourceClass = $propertyMetadata->getSubresource()->getResourceClass();
-                $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
+                $rootResource = $resourceClass;
+                if (null !== $propertyMetadata->getSubresource()) {
+                    $resourceClass = $propertyMetadata->getSubresource()->getResourceClass();
+                    $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
+                }
+                if ($fieldConfiguration = $this->getResourceFieldConfiguration($resourceClass, $resourceMetadata, $propertyMetadata->getDescription(), $propertyMetadata->getAttribute('deprecation_reason', ''), $propertyType, $rootResource, $input, $mutationName, ++$depth)) {
+                    $fields['id' === $property ? '_id' : $property] = $fieldConfiguration;
+                }
+                $resourceClass = $rootResource;
             }
-            if ($fieldConfiguration = $this->getResourceFieldConfiguration($resourceClass, $resourceMetadata, $propertyMetadata->getDescription(), $propertyMetadata->getAttribute('deprecation_reason', ''), $propertyType, $rootResource, $input, $mutationName, ++$depth)) {
-                $fields['id' === $property ? '_id' : $property] = $fieldConfiguration;
-            }
-            $resourceClass = $rootResource;
         }
 
         if (null !== $mutationName) {

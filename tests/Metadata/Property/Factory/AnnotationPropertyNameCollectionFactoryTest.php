@@ -31,7 +31,7 @@ use Prophecy\Prophecy\ObjectProphecy;
 class AnnotationPropertyNameCollectionFactoryTest extends TestCase
 {
     /**
-     * @dataProvider getDependencies
+     * @dataProvider dependenciesProvider
      */
     public function testCreate(PropertyNameCollectionFactoryInterface $decorated = null, array $results)
     {
@@ -49,7 +49,7 @@ class AnnotationPropertyNameCollectionFactoryTest extends TestCase
         $this->assertEquals($results, iterator_to_array($metadata));
     }
 
-    public function getDependencies()
+    public function dependenciesProvider(): array
     {
         $decoratedThrowsNotFound = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $decoratedThrowsNotFound->create(Dummy::class, [])->willThrow(new ResourceClassNotFoundException())->shouldBeCalled();
@@ -65,7 +65,7 @@ class AnnotationPropertyNameCollectionFactoryTest extends TestCase
     }
 
     /**
-     * @dataProvider getUpperCaseDependencies
+     * @dataProvider upperCaseDependenciesProvider
      */
     public function testUpperCaseCreate(ObjectProphecy $decorated = null, array $results)
     {
@@ -83,7 +83,7 @@ class AnnotationPropertyNameCollectionFactoryTest extends TestCase
         $this->assertEquals($results, iterator_to_array($metadata));
     }
 
-    public function getUpperCaseDependencies()
+    public function upperCaseDependenciesProvider(): array
     {
         $decoratedThrowsNotFound = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $decoratedThrowsNotFound->create(UpperCaseIdentifierDummy::class, [])->willThrow(new ResourceClassNotFoundException())->shouldBeCalled();

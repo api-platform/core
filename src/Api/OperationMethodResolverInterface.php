@@ -25,14 +25,12 @@ interface OperationMethodResolverInterface
     /**
      * Resolves the uppercased HTTP method associated with a collection operation.
      *
-     *
      * @throws RuntimeException
      */
     public function getCollectionOperationMethod(string $resourceClass, string $operationName): string;
 
     /**
      * Resolves the uppercased HTTP method associated with an item operation.
-     *
      *
      * @throws RuntimeException
      */

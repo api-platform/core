@@ -23,5 +23,8 @@ use Doctrine\ORM\QueryBuilder;
  */
 interface ContextAwareQueryCollectionExtensionInterface extends QueryCollectionExtensionInterface
 {
+    /**
+     * {@inheritdoc}
+     */
     public function applyToCollection(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, string $operationName = null, array $context = []);
 }

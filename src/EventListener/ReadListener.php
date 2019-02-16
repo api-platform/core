@@ -50,7 +50,6 @@ final class ReadListener
     /**
      * Calls the data provider and sets the data attribute.
      *
-     *
      * @throws NotFoundHttpException
      */
     public function onKernelRequest(GetResponseEvent $event)
@@ -101,7 +100,7 @@ final class ReadListener
                 $data = $this->getSubresourceData($identifiers, $attributes, $context);
             }
         } catch (InvalidIdentifierException $e) {
-            $data = null;
+            throw new NotFoundHttpException('Not found, because of an invalid identifier configuration', $e);
         }
 
         if (null === $data) {

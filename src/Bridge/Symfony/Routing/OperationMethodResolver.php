@@ -96,7 +96,6 @@ final class OperationMethodResolver implements OperationMethodResolverInterface
     /**
      * Gets the route related to the given operation.
      *
-     *
      * @throws RuntimeException
      */
     private function getOperationRoute(string $resourceClass, string $operationName, string $operationType): Route
@@ -123,7 +122,6 @@ final class OperationMethodResolver implements OperationMethodResolverInterface
     /**
      * Gets the route name or null if not defined.
      *
-     *
      * @return string|null
      */
     private function getRouteName(ResourceMetadata $resourceMetadata, string $operationName, string $operationType)
@@ -137,7 +135,6 @@ final class OperationMethodResolver implements OperationMethodResolverInterface
 
     /**
      * Gets the route with the given name.
-     *
      *
      * @throws RuntimeException
      */

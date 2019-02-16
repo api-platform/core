@@ -9,11 +9,16 @@ Feature: Documentation support
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/json; charset=utf-8"
+    # OverrideDocumentationNormalizer
+    And the JSON node "definitions.RamseyUuidDummy.properties.id.description" should be equal to "The dummy id"
+    And the JSON node "definitions.RelatedDummy-barcelona" should exist
+    And the JSON node "definitions.RelatedDummybarcelona" should not exist
     # Context
     And the JSON node "swagger" should be equal to "2.0"
     # Root properties
     And the JSON node "info.title" should be equal to "My Dummy API"
-    And the JSON node "info.description" should be equal to "This is a test API."
+    And the JSON node "info.description" should contain "This is a test API."
+    And the JSON node "info.description" should contain "Made with love"
     # Supported classes
     And the Swagger class "AbstractDummy" exists
     And the Swagger class "CircularReference" exists
@@ -92,9 +97,23 @@ Feature: Documentation support
     And I send a "GET" request to "/docs"
     Then the response status code should be 200
     And I should see text matching "My Dummy API"
+    And I should see text matching "swagger"
+    And I should see text matching "2.0"
 
   Scenario: Swagger UI is enabled for an arbitrary endpoint
     Given I add "Accept" header equal to "text/html"
     And I send a "GET" request to "/dummies"
     Then the response status code should be 200
     And I should see text matching "My Dummy API"
+    And I should see text matching "swagger"
+    And I should see text matching "2.0"
+
+  Scenario: Retrieve the Swagger/OpenAPI documentation with API Gateway compatibility
+    Given I send a "GET" request to "/docs.json?api_gateway=true"
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/json; charset=utf-8"
+    And the JSON node "basePath" should be equal to "/"
+    And the JSON node "definitions.RamseyUuidDummy.properties.id.description" should be equal to "The dummy id"
+    And the JSON node "definitions.RelatedDummy-barcelona" should not exist
+    And the JSON node "definitions.RelatedDummybarcelona" should exist

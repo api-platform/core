@@ -11,6 +11,9 @@
 
 declare(strict_types=1);
 
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\CircularReference as CircularReferenceDocument;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\DummyFriend as DummyFriendDocument;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\RelatedDummy as RelatedDummyDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\CircularReference;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyFriend;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RelatedDummy;
@@ -21,6 +24,7 @@ use Behatch\Context\RestContext;
 use Behatch\Json\Json;
 use Behatch\Json\JsonInspector;
 use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\ORM\EntityManagerInterface;
 use JsonSchema\Validator;
 use PHPUnit\Framework\ExpectationFailedException;
 
@@ -65,7 +69,7 @@ final class JsonApiContext implements Context
     public function theJsonShouldBeValidAccordingToTheJsonApiSchema()
     {
         $json = $this->getJson()->getContent();
-        $this->validator->validate($json, (object) ['$ref' => 'file://'.__DIR__.'/../../'.$this->jsonApiSchemaFile]);
+        $this->validator->validate($json, (object) ['$ref' => "file://{$this->jsonApiSchemaFile}"]);
 
         if (!$this->validator->isValid()) {
             throw new ExpectationFailedException(sprintf('The JSON is not valid according to the JSON API schema.'));
@@ -108,7 +112,7 @@ final class JsonApiContext implements Context
      */
     public function thereIsARelatedDummy()
     {
-        $relatedDummy = new RelatedDummy();
+        $relatedDummy = $this->buildRelatedDummy();
         $relatedDummy->setName('RelatedDummy with no friends');
 
         $this->manager->persist($relatedDummy);
@@ -120,7 +124,7 @@ final class JsonApiContext implements Context
      */
     public function thereIsADummyFriend()
     {
-        $friend = new DummyFriend();
+        $friend = $this->buildDummyFriend();
         $friend->setName('DummyFriend');
 
         $this->manager->persist($friend);
@@ -132,10 +136,10 @@ final class JsonApiContext implements Context
      */
     public function thereIsACircularReference()
     {
-        $circularReference = new CircularReference();
+        $circularReference = $this->buildCircularReference();
         $circularReference->parent = $circularReference;
 
-        $circularReferenceBis = new CircularReference();
+        $circularReferenceBis = $this->buildCircularReference();
         $circularReferenceBis->parent = $circularReference;
 
         $circularReference->children->add($circularReference);
@@ -159,5 +163,34 @@ final class JsonApiContext implements Context
     private function getContent()
     {
         return $this->restContext->getMink()->getSession()->getDriver()->getContent();
+    }
+
+    private function isOrm(): bool
+    {
+        return $this->manager instanceof EntityManagerInterface;
+    }
+
+    /**
+     * @return CircularReference|CircularReferenceDocument
+     */
+    private function buildCircularReference()
+    {
+        return $this->isOrm() ? new CircularReference() : new CircularReferenceDocument();
+    }
+
+    /**
+     * @return DummyFriend|DummyFriendDocument
+     */
+    private function buildDummyFriend()
+    {
+        return $this->isOrm() ? new DummyFriend() : new DummyFriendDocument();
+    }
+
+    /**
+     * @return RelatedDummy|RelatedDummyDocument
+     */
+    private function buildRelatedDummy()
+    {
+        return $this->isOrm() ? new RelatedDummy() : new RelatedDummyDocument();
     }
 }

@@ -45,36 +45,28 @@ final class SerializerContextBuilder implements SerializerContextBuilderInterfac
 
         $resourceMetadata = $this->resourceMetadataFactory->create($attributes['resource_class']);
         $key = $normalization ? 'normalization_context' : 'denormalization_context';
-
-        $operationKey = null;
-        $operationType = null;
-
         if (isset($attributes['collection_operation_name'])) {
             $operationKey = 'collection_operation_name';
             $operationType = OperationType::COLLECTION;
-        } elseif (isset($attributes['subresource_operation_name'])) {
+        } elseif (isset($attributes['item_operation_name'])) {
+            $operationKey = 'item_operation_name';
+            $operationType = OperationType::ITEM;
+        } else {
             $operationKey = 'subresource_operation_name';
             $operationType = OperationType::SUBRESOURCE;
         }
 
-        if (null !== $operationKey) {
-            $attribute = $attributes[$operationKey];
-            $context = $resourceMetadata->getCollectionOperationAttribute($attribute, $key, [], true);
-            $context[$operationKey] = $attribute;
-        } else {
-            $context = $resourceMetadata->getItemOperationAttribute($attributes['item_operation_name'], $key, [], true);
-            $context['item_operation_name'] = $attributes['item_operation_name'];
-        }
-
-        $context['operation_type'] = $operationType ?: OperationType::ITEM;
+        $context = $resourceMetadata->getTypedOperationAttribute($operationType, $attributes[$operationKey], $key, [], true);
+        $context['operation_type'] = $operationType;
+        $context[$operationKey] = $attributes[$operationKey];
 
         if (!$normalization && !isset($context['api_allow_update'])) {
             $context['api_allow_update'] = \in_array($request->getMethod(), ['PUT', 'PATCH'], true);
         }
 
         $context['resource_class'] = $attributes['resource_class'];
-        $context['input_class'] = $attributes['input_class'] ?? $attributes['resource_class'];
-        $context['output_class'] = $attributes['output_class'] ?? $attributes['resource_class'];
+        $context['input_class'] = $resourceMetadata->getTypedOperationAttribute($operationType, $attributes[$operationKey], 'input_class', $attributes['resource_class'], true);
+        $context['output_class'] = $resourceMetadata->getTypedOperationAttribute($operationType, $attributes[$operationKey], 'output_class', $attributes['resource_class'], true);
         $context['request_uri'] = $request->getRequestUri();
         $context['uri'] = $request->getUri();
 

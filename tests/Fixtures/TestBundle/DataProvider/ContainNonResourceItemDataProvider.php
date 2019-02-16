@@ -16,6 +16,7 @@ namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\DataProvider;
 use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
 use ApiPlatform\Core\DataProvider\RestrictedDataProviderInterface;
 use ApiPlatform\Core\Tests\Fixtures\NotAResource;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\ContainNonResource as ContainNonResourceDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\ContainNonResource;
 
 /**
@@ -25,7 +26,7 @@ class ContainNonResourceItemDataProvider implements ItemDataProviderInterface, R
 {
     public function supports(string $resourceClass, string $operationName = null, array $context = []): bool
     {
-        return ContainNonResource::class === $resourceClass;
+        return \in_array($resourceClass, [ContainNonResource::class, ContainNonResourceDocument::class], true);
     }
 
     /**
@@ -38,10 +39,10 @@ class ContainNonResourceItemDataProvider implements ItemDataProviderInterface, R
         }
 
         // Retrieve the blog post item from somewhere
-        $cnr = new ContainNonResource();
+        $cnr = new $resourceClass();
         $cnr->id = $id;
         $cnr->notAResource = new NotAResource('f1', 'b1');
-        $cnr->nested = new ContainNonResource();
+        $cnr->nested = new $resourceClass();
         $cnr->nested->id = "$id-nested";
         $cnr->nested->notAResource = new NotAResource('f2', 'b2');
 

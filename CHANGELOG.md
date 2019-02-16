@@ -1,5 +1,77 @@
 # Changelog
 
+## 2.5.0 beta 1
+
+* GraphQL: Add support for custom types
+
+## 2.4.0 beta 1
+
+* MongoDB: full support
+* Elasticsearch: add reading support (including pagination, sort filter and term filter)
+* Mercure: automatically push updates to clients using the [Mercure](https://mercure.rocks) protocol
+* CQRS support and async message handling using the Symfony Messenger Component
+* OpenAPI: add support for OpenAPI v3 in addition to OpenAPI v2
+* OpenAPI: support generating documentation using [ReDoc](https://github.com/Rebilly/ReDoc)
+* OpenAPI: basic hypermedia hints using OpenAPI v3 links
+* OpenAPI: expose the pagination controls
+* Allow to use custom classes for input and output (DTO) with the `input_class` and `output_class` attributes
+* Allow to disable the input or the output by setting `input_class` and `output_class` to false
+* Guess and automatically set the appropriate Schema.org IRIs for common validation constraints
+* Allow to set custom cache HTTP headers using the `cache_headers` attribute
+* Allow to set the HTTP status code to send to the client through the `status` attribute
+* Add support for the `Sunset` HTTP header using the `sunset` attribute
+* Set the `Content-Location` and `Location` headers when appropriate for better RFC7231 conformance
+* Display the matching data provider and data persister in the debug panel
+* GraphQL: improve performance by lazy loading types
+* Add the `api_persist` request attribute to enable or disable the `WriteListener`
+* Allow to set a default context in all normalizers
+* Permit to use a string instead of an array when there is only one serialization group
+* Add support for setting relations using the constructor of the resource classes
+* Automatically set a [409 Conflict](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/409) HTTP status code when an `OptimisticLockException` is thrown
+* Resolve Dependency Injection Container parameters in the XML and YAML files for the resource class configuration
+* `RequestAttributesExtractor` is not internal anymore and can be used in userland code
+* Always use the user-defined metadata when set
+* OpenAPI: add a description explaining how to use the property filter
+* GraphQL: the look'n'feel of GraphiQL now match the API Platform one
+* PHPStan level 6 compliance
+* Add a `show_webby` configuration option to hide the spider in API docs
+* Add an easter egg (find it!)
+
+## 2.3.6
+
+* /!\ Security: a vulnerability impacting the GraphQL subsystem was allowing users authorized to run mutations for a specific resource type, to execute it on any resource, of any type (CVE-2019-1000011)
+* Fix normalization of raw collections (not API resources)
+* Fix content negotiation format matching
+
+## 2.3.5
+
+* GraphQL: compatibility with `webonyx/graphql-php` 0.13
+* OpenAPI/Swagger: expose `properties[]` as a collection parameter
+* OpenAPI/Swagger: add a description for the `properties[]` filter
+* OpenAPI/Swagger: Leverage advanced name converters
+* JSON-LD: Prevent an error in `ItemNormalizer` when `$context['resource_class']` is not defined
+* Allow to pass a the serialization group to use a string instead of as an array of one element
+* Modernize the code base to use PHP 7.1 features when possible
+* Bump minimal dependencies of the used Symfony components
+* Improve the Packagist description
+
+## 2.3.4
+
+* Open API/Swagger: fix YAML export
+* Open API/Swagger: Correctly expose overridden formats
+* GraphQL: display the stack trace when in debug mode
+* GraphQL: prevent a crash when the class name isn't provided
+* Fix handling of one-to-one relations in subresources
+* Fix max depth handling when eager fetching is disabled
+* Compatibility with Symfony 4.2
+* Prevent calling the remove method from all data persisters
+* Persist Doctrine entities with the `DEFERRED_EXPLICIT` change tracking policy
+* Throw an `InvalidArgumentException` when trying to get an item from a collection route
+* Improve the debug bar panel visibility
+* Take into account the `route_prefix` attribute in subresources
+* Allow to use multiple values with `NumericFilter`
+* Improve exception handling in `ReadListener` by adding the previous exception
+
 ## 2.3.3
 
 * Doctrine: revert "prevent data duplication in Eager loaded relations"
@@ -49,6 +121,10 @@
 * Upgrade Swagger UI and GraphiQL
 * GraphQL: Add a `totalCount` field in GraphQL paginated collections
 * JSONAPI: Allow inclusion of related resources
+
+## 2.2.10
+
+* /!\ Security: a vulnerability impacting the GraphQL subsystem was allowing users authorized to run mutations for a specific resource type, to execute it on any resource, of any type (CVE-2019-1000011)
 
 ## 2.2.9
 

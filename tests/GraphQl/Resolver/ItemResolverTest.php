@@ -20,7 +20,9 @@ use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RelatedDummy;
+use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\ResolveInfo;
+use GraphQL\Type\Schema;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
@@ -35,9 +37,7 @@ class ItemResolverTest extends TestCase
     {
         $resolver = $this->createItemResolver(null);
 
-        $resolveInfo = new ResolveInfo([]);
-        $resolveInfo->fieldName = 'name';
-        $resolveInfo->fieldNodes = [];
+        $resolveInfo = new ResolveInfo('name', [], null, new ObjectType(['name' => '']), '', new Schema([]), null, null, null, null);
 
         $this->assertNull($resolver(null, ['id' => '/related_dummies/3'], null, $resolveInfo));
     }
@@ -46,9 +46,7 @@ class ItemResolverTest extends TestCase
     {
         $resolver = $this->createItemResolver(new RelatedDummy());
 
-        $resolveInfo = new ResolveInfo([]);
-        $resolveInfo->fieldName = 'name';
-        $resolveInfo->fieldNodes = [];
+        $resolveInfo = new ResolveInfo('name', [], null, new ObjectType(['name' => '']), '', new Schema([]), null, null, null, null);
 
         $this->assertEquals('normalizedItem', $resolver(null, ['id' => '/related_dummies/3'], null, $resolveInfo));
     }
@@ -60,9 +58,7 @@ class ItemResolverTest extends TestCase
     {
         $resolver = $this->createItemResolver(new Dummy());
 
-        $resolveInfo = new ResolveInfo([]);
-        $resolveInfo->fieldName = 'relatedDummy';
-        $resolveInfo->fieldNodes = [];
+        $resolveInfo = new ResolveInfo('relatedDummy', [], null, new ObjectType(['name' => '']), '', new Schema([]), null, null, null, null);
 
         $this->assertEquals($normalizedSubresource, $resolver(['relatedDummy' => $normalizedSubresource], [], null, $resolveInfo));
     }

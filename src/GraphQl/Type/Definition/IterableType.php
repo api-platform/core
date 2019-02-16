@@ -31,7 +31,7 @@ use GraphQL\Utils\Utils;
  *
  * @author Alan Poulain <contact@alanpoulain.eu>
  */
-final class IterableType extends ScalarType
+final class IterableType extends ScalarType implements TypeInterface
 {
     public function __construct()
     {
@@ -41,13 +41,17 @@ final class IterableType extends ScalarType
         parent::__construct();
     }
 
+    public function getName(): string
+    {
+        return $this->name;
+    }
+
     /**
      * {@inheritdoc}
      */
     public function serialize($value)
     {
-        // is_iterable
-        if (!(\is_array($value) || $value instanceof \Traversable)) {
+        if (!is_iterable($value)) {
             throw new Error(sprintf('Iterable cannot represent non iterable value: %s', Utils::printSafe($value)));
         }
 
@@ -59,8 +63,7 @@ final class IterableType extends ScalarType
      */
     public function parseValue($value)
     {
-        // is_iterable
-        if (!(\is_array($value) || $value instanceof \Traversable)) {
+        if (!is_iterable($value)) {
             throw new Error(sprintf('Iterable cannot represent non iterable value: %s', Utils::printSafeJson($value)));
         }
 

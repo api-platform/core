@@ -103,7 +103,7 @@ abstract class AbstractExtractor implements ExtractorInterface
                 throw new \RuntimeException(sprintf('Using "%%%s%%" is not allowed in routing configuration.', $parameter));
             }
 
-            if (array_key_exists($parameter, $this->collectedParameters)) {
+            if (\array_key_exists($parameter, $this->collectedParameters)) {
                 return $this->collectedParameters[$parameter];
             }
 

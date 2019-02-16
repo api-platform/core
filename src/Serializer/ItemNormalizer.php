@@ -13,7 +13,17 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Serializer;
 
+use ApiPlatform\Core\Api\IriConverterInterface;
+use ApiPlatform\Core\Api\ResourceClassResolverInterface;
+use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
+use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
+use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
+use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
+use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
+use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
+use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 
 /**
  * Generic item normalizer.
@@ -24,6 +34,15 @@ use ApiPlatform\Core\Exception\InvalidArgumentException;
  */
 class ItemNormalizer extends AbstractItemNormalizer
 {
+    private $logger;
+
+    public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, IriConverterInterface $iriConverter, ResourceClassResolverInterface $resourceClassResolver, PropertyAccessorInterface $propertyAccessor = null, NameConverterInterface $nameConverter = null, ClassMetadataFactoryInterface $classMetadataFactory = null, ItemDataProviderInterface $itemDataProvider = null, bool $allowPlainIdentifiers = false, LoggerInterface $logger = null)
+    {
+        parent::__construct($propertyNameCollectionFactory, $propertyMetadataFactory, $iriConverter, $resourceClassResolver, $propertyAccessor, $nameConverter, $classMetadataFactory, $itemDataProvider, $allowPlainIdentifiers);
+
+        $this->logger = $logger ?: new NullLogger();
+    }
+
     /**
      * {@inheritdoc}
      *
@@ -37,7 +56,14 @@ class ItemNormalizer extends AbstractItemNormalizer
                 throw new InvalidArgumentException('Update is not allowed for this operation.');
             }
 
-            $this->updateObjectToPopulate($data, $context);
+            if (isset($context['resource_class'])) {
+                $this->updateObjectToPopulate($data, $context);
+            } else {
+                // See https://github.com/api-platform/core/pull/2326 to understand this message.
+                $this->logger->warning('The "resource_class" key is missing from the context.', [
+                    'context' => $context,
+                ]);
+            }
         }
 
         return parent::denormalize($data, $class, $format, $context);

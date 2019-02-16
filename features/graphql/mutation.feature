@@ -59,7 +59,7 @@ Feature: GraphQL mutation support
     When I send the following GraphQL request:
     """
     mutation {
-      createDummy(input: {_id: 1, name: "A dummy", foo: [], relatedDummy: "/related_dummies/1", clientMutationId: "myId"}) {
+      createDummy(input: {name: "A dummy", foo: [], relatedDummy: "/related_dummies/1", clientMutationId: "myId"}) {
         id
         name
         foo
@@ -83,7 +83,7 @@ Feature: GraphQL mutation support
     When I send the following GraphQL request:
     """
     mutation {
-      createDummy(input: {_id: 2, name: "A dummy", foo: [], jsonData: {bar:{baz:3,qux:[7.6,false,null]}}, arrayData: ["bar", "baz"], clientMutationId: "myId"}) {
+      createDummy(input: {name: "A dummy", foo: [], jsonData: {bar:{baz:3,qux:[7.6,false,null]}}, arrayData: ["bar", "baz"], clientMutationId: "myId"}) {
         id
         name
         foo
@@ -122,7 +122,22 @@ Feature: GraphQL mutation support
     And the JSON node "data.deleteFoo.id" should be equal to "/foos/1"
     And the JSON node "data.deleteFoo.clientMutationId" should be equal to "anotherId"
 
-  @dropSchema
+  Scenario: Trigger an error trying to delete item of different resource
+    When I send the following GraphQL request:
+    """
+    mutation {
+      deleteFoo(input: {id: "/dummies/1", clientMutationId: "myId"}) {
+        id
+        clientMutationId
+      }
+    }
+    """
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/json"
+    And the JSON node "errors[0].message" should be equal to 'Item "/dummies/1" did not match expected type "Foo".'
+
+  @!mongodb
   Scenario: Delete an item with composite identifiers through a mutation
     Given there are Composite identifier objects
     When I send the following GraphQL request:
@@ -172,6 +187,7 @@ Feature: GraphQL mutation support
     And the JSON node "data.updateDummy.relatedDummies.edges[0].node.name" should be equal to "RelatedDummy11"
     And the JSON node "data.updateDummy.clientMutationId" should be equal to "myId"
 
+  @!mongodb
   Scenario: Modify an item with composite identifiers through a mutation
     Given there are Composite identifier objects
     When I send the following GraphQL request:
@@ -210,6 +226,7 @@ Feature: GraphQL mutation support
     And the JSON node "data.createWritableId.name" should be equal to "Foo"
     And the JSON node "data.createWritableId.clientMutationId" should be equal to "m"
 
+  @!mongodb
   Scenario: Update an item with a custom UUID
     When I send the following GraphQL request:
     """
@@ -250,7 +267,6 @@ Feature: GraphQL mutation support
     And the JSON node "data.createDummyGroup.baz" should be null
     And the JSON node "data.createDummyGroup.clientMutationId" should be equal to "myId"
 
-  @dropSchema
   Scenario: Trigger a validation error
     When I send the following GraphQL request:
     """
@@ -264,3 +280,72 @@ Feature: GraphQL mutation support
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/json"
     And the JSON node "errors[0].message" should be equal to "name: This value should not be blank."
+
+  Scenario: Create an item using custom inputClass & disabled outputClass
+    Given there are 2 dummyDtoNoOutput objects
+    When I send the following GraphQL request:
+    """
+    mutation {
+      createDummyDtoNoOutput(input: {foo: "A new one", bar: 3, clientMutationId: "myId"}) {
+        clientMutationId
+      }
+    }
+    """
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/json"
+    And the JSON should be equal to:
+    """
+    {
+      "data": {
+        "createDummyDtoNoOutput": {
+          "clientMutationId": "myId"
+        }
+      }
+    }
+    """
+
+  Scenario: Cannot create an item using disabled inputClass
+    Given there are 2 dummyDtoNoInput objects
+    When I send the following GraphQL request:
+    """
+    mutation {
+      createDummyDtoNoInput(input: {foo: "A new one", bar: 3, clientMutationId: "myId"}) {
+        clientMutationId
+      }
+    }
+    """
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/json"
+    And the JSON should be equal to:
+    """
+    {
+      "errors": [
+        {
+          "message": "Field \"foo\" is not defined by type createDummyDtoNoInputInput.",
+          "extensions": {
+            "category": "graphql"
+          },
+          "locations": [
+            {
+              "line": 2,
+              "column": 33
+            }
+          ]
+        },
+        {
+          "message": "Field \"bar\" is not defined by type createDummyDtoNoInputInput.",
+          "extensions": {
+            "category": "graphql"
+          },
+          "locations": [
+            {
+              "line": 2,
+              "column": 51
+            }
+          ]
+        }
+      ]
+    }
+    """

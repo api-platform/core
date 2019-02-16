@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Exception;
 
 /**
- * Indentifier is not valid exception.
+ * Identifier is not valid exception.
  *
  * @author Antoine Bluchet <soyuka@gmail.com>
  */

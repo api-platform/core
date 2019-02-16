@@ -107,7 +107,7 @@ class ChainSubresourcedataProviderTest extends TestCase
      * @group legacy
      * @expectedDeprecation Throwing a "ApiPlatform\Core\Exception\ResourceClassNotSupportedException" in a data provider is deprecated in favor of implementing "ApiPlatform\Core\DataProvider\RestrictedDataProviderInterface"
      */
-    public function testLegacyGetCollectionExeptions()
+    public function testLegacyGetCollectionExceptions()
     {
         $firstDataProvider = $this->prophesize(SubresourceDataProviderInterface::class);
         $firstDataProvider->getSubresource('notfound', ['id' => 1], [], 'get')->willThrow(ResourceClassNotSupportedException::class);

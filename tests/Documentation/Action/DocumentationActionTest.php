@@ -40,9 +40,10 @@ class DocumentationActionTest extends TestCase
         $requestProphecy->query = $queryProphecy->reveal();
         $requestProphecy->getBaseUrl()->willReturn('/api')->shouldBeCalledTimes(1);
         $queryProphecy->getBoolean('api_gateway', false)->willReturn(true)->shouldBeCalledTimes(1);
-        $attributesProphecy->all()->willReturn(['_api_normalization_context' => ['foo' => 'bar', 'base_url' => '/api', 'api_gateway' => true]])->shouldBeCalledTimes(1);
+        $queryProphecy->getInt('spec_version', 2)->willReturn(2)->shouldBeCalledTimes(1);
+        $attributesProphecy->all()->willReturn(['_api_normalization_context' => ['foo' => 'bar', 'base_url' => '/api', 'api_gateway' => true, 'spec_version' => 2]])->shouldBeCalledTimes(1);
         $attributesProphecy->get('_api_normalization_context', [])->willReturn(['foo' => 'bar'])->shouldBeCalledTimes(1);
-        $attributesProphecy->set('_api_normalization_context', ['foo' => 'bar', 'base_url' => '/api', 'api_gateway' => true])->shouldBeCalledTimes(1);
+        $attributesProphecy->set('_api_normalization_context', ['foo' => 'bar', 'base_url' => '/api', 'api_gateway' => true, 'spec_version' => 2])->shouldBeCalledTimes(1);
         $formatsProviderProphecy = $this->prophesize(FormatsProviderInterface::class);
         $formatsProviderProphecy->getFormatsFromAttributes(Argument::type('array'))->willReturn(['formats' => ['jsonld' => 'application/ld+json']])->shouldBeCalled();
 

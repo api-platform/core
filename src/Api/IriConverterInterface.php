@@ -27,7 +27,6 @@ interface IriConverterInterface
     /**
      * Retrieves an item from its IRI.
      *
-     *
      * @throws InvalidArgumentException
      * @throws ItemNotFoundException
      *
@@ -48,7 +47,6 @@ interface IriConverterInterface
     /**
      * Gets the IRI associated with the given resource collection.
      *
-     *
      * @throws InvalidArgumentException
      */
     public function getIriFromResourceClass(string $resourceClass, int $referenceType = UrlGeneratorInterface::ABS_PATH): string;
@@ -56,14 +54,12 @@ interface IriConverterInterface
     /**
      * Gets the item IRI associated with the given resource.
      *
-     *
      * @throws InvalidArgumentException
      */
     public function getItemIriFromResourceClass(string $resourceClass, array $identifiers, int $referenceType = UrlGeneratorInterface::ABS_PATH): string;
 
     /**
      * Gets the IRI associated with the given resource subresource.
-     *
      *
      * @throws InvalidArgumentException
      */

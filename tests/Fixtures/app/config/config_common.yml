@@ -1,0 +1,212 @@
+framework:
+    secret:                           'dunglas.fr'
+    validation:
+        enable_annotations:            true
+    serializer:
+        enable_annotations:            true
+    test:                              ~
+    session:
+        storage_id:                    'session.storage.mock_file'
+    form:                              ~ # For FOSUser
+    templating:
+        engines:                       ['twig'] # For Swagger UI
+    profiler:
+        enabled:                        true
+        collect:                        false
+
+web_profiler:
+    toolbar: true
+    intercept_redirects: false
+
+doctrine:
+    dbal:
+        driver:                       'pdo_sqlite'
+        path:                         '%kernel.cache_dir%/db.sqlite'
+        charset:                      'UTF8'
+        types:
+            uuid:  Ramsey\Uuid\Doctrine\UuidType
+
+    orm:
+        auto_generate_proxy_classes:   '%kernel.debug%'
+        auto_mapping:                  true
+
+doctrine_mongodb:
+    connections:
+        default:                       ~
+    document_managers:
+        default:
+            auto_mapping:              true
+
+twig:
+    strict_variables: '%kernel.debug%'
+
+mercure:
+    hubs:
+        default:
+            url: https://demo.mercure.rocks/hub
+            jwt: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJtZXJjdXJlIjp7InN1YnNjcmliZSI6WyJmb28iLCJiYXIiXSwicHVibGlzaCI6WyJmb28iXX19.LRLvirgONK13JgacQ_VbcjySbVhkSmHy3IznH3tA9PM
+
+api_platform:
+    title:                             'My Dummy API'
+    description: |
+        This is a test API.
+        Made with love
+    allow_plain_identifiers:           true
+    formats:
+        jsonld:                        ['application/ld+json']
+        jsonhal:                       ['application/hal+json']
+        jsonapi:                       ['application/vnd.api+json']
+        xml:                           ['application/xml', 'text/xml']
+        json:                          ['application/json']
+        html:                          ['text/html']
+    error_formats:
+        jsonproblem:                   ['application/problem+json']
+        jsonld:                        ['application/ld+json']
+        jsonapi:                       ['application/vnd.api+json']
+    graphql:                           true
+    name_converter:                    'app.name_converter'
+    enable_fos_user:                   true
+    collection:
+        order_parameter_name:          'order'
+        order:                         'ASC'
+        pagination:
+            client_enabled:            true
+            client_items_per_page:     true
+            client_partial:            true
+            items_per_page:            3
+    exception_to_status:
+        Symfony\Component\Serializer\Exception\ExceptionInterface: !php/const Symfony\Component\HttpFoundation\Response::HTTP_BAD_REQUEST
+        ApiPlatform\Core\Exception\InvalidArgumentException: !php/const Symfony\Component\HttpFoundation\Response::HTTP_BAD_REQUEST
+        ApiPlatform\Core\Exception\FilterValidationException: !php/const Symfony\Component\HttpFoundation\Response::HTTP_BAD_REQUEST
+    http_cache:
+        invalidation:
+            enabled: true
+        max_age:        60
+        shared_max_age: 3600
+        vary:           ['Accept', 'Cookie']
+        public:         true
+
+parameters:
+    container.autowiring.strict_mode: true
+    container.dumper.inline_class_loader: true
+    # Enable the metadata cache to speedup the builds
+    api_platform.metadata_cache: true
+
+services:
+    contain_non_resource.item_data_provider:
+        class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\DataProvider\ContainNonResourceItemDataProvider'
+        public: false
+        tags:
+            -  { name: 'api_platform.item_data_provider' }
+
+    serializable.item_data_provider:
+        class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\DataProvider\SerializableItemDataProvider'
+        public: false
+        tags:
+            -  { name: 'api_platform.item_data_provider' }
+
+    resource_interface.data_provider:
+        class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\DataProvider\ResourceInterfaceImplementationDataProvider'
+        public: false
+        tags:
+            -  { name: 'api_platform.item_data_provider' }
+            -  { name: 'api_platform.collection_data_provider' }
+
+    app.serializer.denormalizer.serializable_resource:
+        class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\Serializer\Denormalizer\SerializableResourceDenormalizer'
+        public: false
+        tags:
+            -  { name: 'serializer.normalizer' }
+
+    fos_user.mailer.default:
+        class: 'ApiPlatform\Core\Tests\Mock\FosUser\MailerMock'
+
+    app.name_converter:
+        class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\Serializer\NameConverter\CustomConverter'
+
+    app.my_dummy_resource.property_filter:
+        parent:    'api_platform.serializer.property_filter'
+        tags:      [ { name: 'api_platform.filter', id: 'my_dummy.property' } ]
+
+    ApiPlatform\Core\Tests\Fixtures\TestBundle\Filter\RequiredFilter:
+        arguments: ['@doctrine']
+        tags: ['api_platform.filter']
+
+    ApiPlatform\Core\Tests\Fixtures\TestBundle\Filter\ArrayRequiredFilter:
+        arguments: ['@doctrine']
+        tags: ['api_platform.filter']
+
+    app.config_dummy_resource.action:
+        class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\Action\ConfigCustom'
+        arguments: ['@api_platform.item_data_provider']
+        public: true
+
+    app.entity.filter.dummy_property.property:
+        parent:    'api_platform.serializer.property_filter'
+        tags:      [ { name: 'api_platform.filter', id: 'dummy_property.property' } ]
+
+    app.entity.filter.dummy_property.whitelist_property:
+        parent:    'api_platform.serializer.property_filter'
+        arguments: [ 'whitelisted_properties', false, [foo] ]
+        tags:      [ { name: 'api_platform.filter', id: 'dummy_property.whitelist_property' } ]
+
+    app.entity.filter.dummy_property.whitelist_nested_property:
+        parent:    'api_platform.serializer.property_filter'
+        arguments: [ 'whitelisted_nested_properties', false, {foo: ~, group: [baz, qux]} ]
+        tags:      [ { name: 'api_platform.filter', id: 'dummy_property.whitelisted_properties' } ]
+
+    app.entity.filter.dummy_group.group:
+        parent:    'api_platform.serializer.group_filter'
+        tags:      [ { name: 'api_platform.filter', id: 'dummy_group.group' } ]
+
+    app.entity.filter.dummy_group.override_group:
+        parent:    'api_platform.serializer.group_filter'
+        arguments: [ 'override_groups', true ]
+        tags:      [ { name: 'api_platform.filter', id: 'dummy_group.override_group' } ]
+
+    app.entity.filter.dummy_group.whitelist_group:
+        parent:    'api_platform.serializer.group_filter'
+        arguments: [ 'whitelisted_groups', false, ['dummy_foo', 'dummy_baz'] ]
+        tags:      [ { name: 'api_platform.filter', id: 'dummy_group.whitelist_group' } ]
+
+    app.entity.filter.dummy_group.override_whitelist_group:
+        parent:    'api_platform.serializer.group_filter'
+        arguments: [ 'override_whitelisted_groups', true, ['dummy_foo', 'dummy_baz'] ]
+        tags:      [ { name: 'api_platform.filter', id: 'dummy_group.override_whitelist_group' } ]
+
+    logger:
+        class: Psr\Log\NullLogger
+
+    api_platform.http_cache.purger:
+        class: ApiPlatform\Core\Tests\Fixtures\NullPurger
+
+    test.api_platform.http_cache.purger:
+        alias: api_platform.http_cache.purger
+        public: true
+
+    test.property_accessor:
+        alias: property_accessor
+        public: true
+
+    test.annotation_reader:
+        alias: annotation_reader
+        public: true
+
+    app.dummy_validation.group_generator:
+        class: ApiPlatform\Core\Tests\Fixtures\TestBundle\Validator\DummyValidationGroupsGenerator
+        public: true
+
+    app.dummy_input_data_persister:
+        class: ApiPlatform\Core\Tests\Fixtures\TestBundle\DataPersister\DummyInputDataPersister
+        public: false
+        tags:
+            -  { name: 'api_platform.data_persister' }
+
+    mercure.hub.default.publisher:
+        class: ApiPlatform\Core\Tests\Fixtures\DummyMercurePublisher
+
+    app.serializer.normalizer.override_documentation:
+        class: ApiPlatform\Core\Tests\Fixtures\TestBundle\Serializer\Normalizer\OverrideDocumentationNormalizer
+        decorates: api_platform.swagger.normalizer.documentation
+        public: false
+        arguments: ['@app.serializer.normalizer.override_documentation.inner']

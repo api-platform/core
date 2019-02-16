@@ -164,6 +164,7 @@ Feature: Collections support
     }
     """
 
+  @!mongodb
   Scenario: Enable the partial pagination client side
     When I send a "GET" request to "/dummies?page=7&partial=1"
     Then the response status code should be 200
@@ -395,6 +396,7 @@ Feature: Collections support
     }
     """
 
+  @!mongodb
   @createSchema
   Scenario: Allow passing 0 to `itemsPerPage`
     When I send a "GET" request to "/dummies?itemsPerPage=0"
@@ -434,4 +436,4 @@ Feature: Collections support
 
     When I send a "GET" request to "/dummies?itemsPerPage=0&page=2"
     Then the response status code should be 400
-    And the JSON node "hydra:description" should be equal to "Page should not be greater than 1 if itemsPerPage is equal to 0"
+    And the JSON node "hydra:description" should be equal to "Page should not be greater than 1 if limit is equal to 0"

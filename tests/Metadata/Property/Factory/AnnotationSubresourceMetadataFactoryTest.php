@@ -31,7 +31,7 @@ use Symfony\Component\PropertyInfo\Type;
 class AnnotationSubresourceMetadataFactoryTest extends TestCase
 {
     /**
-     * @dataProvider getDependencies
+     * @dataProvider dependenciesProvider
      */
     public function testCreateProperty(ProphecyInterface $reader, ProphecyInterface $decorated = null)
     {
@@ -41,7 +41,7 @@ class AnnotationSubresourceMetadataFactoryTest extends TestCase
         $this->assertEquals(new SubresourceMetadata(RelatedDummy::class, true, null), $metadata->getSubresource());
     }
 
-    public function getDependencies()
+    public function dependenciesProvider(): array
     {
         $annotation = new ApiSubresource();
 

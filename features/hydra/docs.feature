@@ -32,7 +32,8 @@ Feature: Documentation support
     # Root properties
     And the JSON node "@id" should be equal to "/docs.jsonld"
     And the JSON node "hydra:title" should be equal to "My Dummy API"
-    And the JSON node "hydra:description" should be equal to "This is a test API."
+    And the JSON node "hydra:description" should contain "This is a test API."
+    And the JSON node "hydra:description" should contain "Made with love"
     And the JSON node "hydra:entrypoint" should be equal to "/"
     # Supported classes
     And the Hydra class "The API entrypoint" exists

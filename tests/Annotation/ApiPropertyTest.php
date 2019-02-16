@@ -53,6 +53,8 @@ class ApiPropertyTest extends TestCase
             'fetchEager' => false,
             'jsonldContext' => ['foo' => 'bar'],
             'swaggerContext' => ['foo' => 'baz'],
+            'openapiContext' => ['foo' => 'baz'],
+            'push' => true,
             'attributes' => ['unknown' => 'unknown', 'fetchable' => false],
         ]);
         $this->assertEquals([
@@ -61,6 +63,8 @@ class ApiPropertyTest extends TestCase
             'fetch_eager' => false,
             'jsonld_context' => ['foo' => 'bar'],
             'swagger_context' => ['foo' => 'baz'],
+            'openapi_context' => ['foo' => 'baz'],
+            'push' => true,
             'unknown' => 'unknown',
         ], $property->attributes);
     }

@@ -26,7 +26,9 @@ use ApiPlatform\Core\Exception\InvalidArgumentException;
  *     @Attribute("deprecationReason", type="string"),
  *     @Attribute("fetchable", type="bool"),
  *     @Attribute("fetchEager", type="bool"),
+ *     @Attribute("openapiContext", type="array"),
  *     @Attribute("jsonldContext", type="array"),
+ *     @Attribute("push", type="bool"),
  *     @Attribute("swaggerContext", type="array")
  * )
  */
@@ -101,6 +103,20 @@ final class ApiProperty
      * @var array
      */
     private $jsonldContext;
+
+    /**
+     * @see https://github.com/Haehnchen/idea-php-annotation-plugin/issues/112
+     *
+     * @var array
+     */
+    private $openapiContext;
+
+    /**
+     * @see https://github.com/Haehnchen/idea-php-annotation-plugin/issues/112
+     *
+     * @var bool
+     */
+    private $push;
 
     /**
      * @see https://github.com/Haehnchen/idea-php-annotation-plugin/issues/112

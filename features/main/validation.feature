@@ -3,7 +3,6 @@ Feature: Using validations groups
   I need to be able to use validation groups
 
   @createSchema
-  @dropSchema
   Scenario: Create a resource
     When I add "Content-Type" header equal to "application/ld+json"
     And I send a "POST" request to "/dummy_validation" with body:
@@ -17,7 +16,6 @@ Feature: Using validations groups
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
 
   @createSchema
-  @dropSchema
   Scenario: Create a resource with validation
     When I add "Content-Type" header equal to "application/ld+json"
     And I send a "POST" request to "/dummy_validation/validation_groups" with body:
@@ -46,7 +44,6 @@ Feature: Using validations groups
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
 
   @createSchema
-  @dropSchema
   Scenario: Create a resource with validation group sequence
     When I add "Content-Type" header equal to "application/ld+json"
     And I send a "POST" request to "/dummy_validation/validation_sequence" with body:

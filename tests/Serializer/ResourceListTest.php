@@ -37,6 +37,6 @@ class ResourceListTest extends TestCase
     {
         $this->resourceList['foo'] = 'bar';
 
-        $this->assertEquals('N;', \serialize($this->resourceList));
+        $this->assertEquals('N;', serialize($this->resourceList));
     }
 }

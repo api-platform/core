@@ -138,7 +138,6 @@ Feature: GraphQL query support
     And the header "Content-Type" should be equal to "application/json"
     And the JSON node "data.dummy._id" should be equal to "1"
 
-  @dropSchema
   Scenario: Retrieve an nonexistent item through a GraphQL query
     When I send the following GraphQL request:
     """
@@ -152,3 +151,135 @@ Feature: GraphQL query support
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/json"
     And the JSON node "data.dummy" should be null
+
+  Scenario: Retrieve an nonexistent IRI through a GraphQL query
+    When I send the following GraphQL request:
+    """
+    {
+      foo(id: "/foo/1") {
+        name
+      }
+    }
+    """
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/json"
+    And the JSON node "errors[0].debugMessage" should be equal to 'No route matches "/foo/1".'
+    And the JSON should be valid according to this schema:
+    """
+    {
+      "type": "object",
+      "properties": {
+        "errors": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "debugMessage": {"type": "string"},
+              "message": {"type": "string"},
+              "extensions": {"type": "object"},
+              "locations": {"type": "array"},
+              "path": {"type": "array"},
+              "trace": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "file": {"type": "string"},
+                    "line": {"type": "integer"},
+                    "call": {"type": ["string", "null"]},
+                    "function": {"type": ["string", "null"]}
+                  },
+                  "additionalProperties": false
+                },
+                "minItems": 1
+              }
+            },
+            "required": [
+              "debugMessage",
+              "message",
+              "extensions",
+              "locations",
+              "path",
+              "trace"
+            ],
+            "additionalProperties": false
+          },
+          "minItems": 1,
+          "maxItems": 1
+        }
+      }
+    }
+    """
+
+  Scenario: Use outputClass instead of resource class through a GraphQL query
+    Given there are 2 dummyDtoNoInput objects
+    When I send the following GraphQL request:
+    """
+    {
+      dummyDtoNoInputs {
+        edges {
+          node {
+            baz
+            bat
+          }
+        }
+      }
+    }
+    """
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/json"
+    And the JSON should be equal to:
+    """
+    {
+      "data": {
+        "dummyDtoNoInputs": {
+          "edges": [
+            {
+              "node": {
+                "baz": 0.33,
+                "bat": "DummyDtoNoInput foo #1"
+              }
+            },
+            {
+              "node": {
+                "baz": 0.67,
+                "bat": "DummyDtoNoInput foo #2"
+              }
+            }
+          ]
+        }
+      }
+    }
+    """
+
+  @createSchema
+  Scenario: Disable outputClass leads to an empty response through a GraphQL query
+    Given there are 2 dummyDtoNoOutput objects
+    When I send the following GraphQL request:
+    """
+    {
+      dummyDtoNoInputs {
+        edges {
+          node {
+            baz
+            bat
+          }
+        }
+      }
+    }
+    """
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/json"
+    And the JSON should be equal to:
+    """
+    {
+      "data": {
+        "dummyDtoNoInputs": {
+          "edges": []
+        }
+      }
+    }
+    """

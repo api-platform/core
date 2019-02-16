@@ -142,7 +142,7 @@ final class HydraContext implements Context
      */
     public function assertNbOperationsExist(int $nb, string $className)
     {
-        Assert::assertEquals($nb, \count($this->getOperations($className)));
+        Assert::assertEquals($nb, count($this->getOperations($className)));
     }
 
     /**
@@ -150,7 +150,7 @@ final class HydraContext implements Context
      */
     public function assertNbPropertiesExist(int $nb, string $className)
     {
-        Assert::assertEquals($nb, \count($this->getProperties($className)));
+        Assert::assertEquals($nb, count($this->getProperties($className)));
     }
 
     /**

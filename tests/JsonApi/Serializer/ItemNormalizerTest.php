@@ -32,6 +32,7 @@ use Prophecy\Argument;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\PropertyInfo\Type;
+use Symfony\Component\Serializer\NameConverter\AdvancedNameConverterInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Serializer\SerializerInterface;
@@ -168,19 +169,29 @@ class ItemNormalizerTest extends TestCase
         );
 
         $normalizer->setSerializer(new Serializer([$normalizer]));
-        $normalizer->setCircularReferenceLimit(2);
-        $normalizer->setCircularReferenceHandler(function () {
-            return 'object';
-        });
 
-        $this->assertEquals('object', $normalizer->normalize(
-            $object,
-            ItemNormalizer::FORMAT,
-            [
+        $circularReferenceLimit = 2;
+        $circularReferenceHandler = function () {
+            return 'object';
+        };
+        if (interface_exists(AdvancedNameConverterInterface::class)) {
+            $context = [
+                'circular_reference_limit' => $circularReferenceLimit,
+                'circular_reference_handler' => $circularReferenceHandler,
+                'circular_reference_limit_counters' => [spl_object_hash($object) => 2],
+                'cache_error' => function () {},
+            ];
+        } else {
+            $normalizer->setCircularReferenceLimit($circularReferenceLimit);
+            $normalizer->setCircularReferenceHandler($circularReferenceHandler);
+
+            $context = [
                 'circular_reference_limit' => [spl_object_hash($object) => 2],
                 'cache_error' => function () {},
-            ]
-        ));
+            ];
+        }
+
+        $this->assertEquals('object', $normalizer->normalize($object, ItemNormalizer::FORMAT, $context));
     }
 
     public function testNormalizeThrowsNoSuchPropertyException()

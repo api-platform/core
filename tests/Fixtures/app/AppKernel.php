@@ -12,9 +12,11 @@
 declare(strict_types=1);
 
 use ApiPlatform\Core\Bridge\Symfony\Bundle\ApiPlatformBundle;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\User as UserDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\User;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\TestBundle;
 use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
+use Doctrine\Bundle\MongoDBBundle\DoctrineMongoDBBundle;
 use FOS\UserBundle\FOSUserBundle;
 use Nelmio\ApiDocBundle\NelmioApiDocBundle;
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
@@ -22,6 +24,7 @@ use Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait;
 use Symfony\Bundle\MercureBundle\MercureBundle;
 use Symfony\Bundle\SecurityBundle\SecurityBundle;
 use Symfony\Bundle\TwigBundle\TwigBundle;
+use Symfony\Bundle\WebProfilerBundle\WebProfilerBundle;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Kernel;
@@ -55,8 +58,16 @@ class AppKernel extends Kernel
             new ApiPlatformBundle(),
             new SecurityBundle(),
             new FOSUserBundle(),
-            new TestBundle(),
+            new WebProfilerBundle(),
         ];
+
+        if (class_exists(DoctrineMongoDBBundle::class)) {
+            $bundles[] = new DoctrineMongoDBBundle();
+        }
+
+        if ('elasticsearch' !== $this->getEnvironment()) {
+            $bundles[] = new TestBundle();
+        }
 
         if ($_SERVER['LEGACY'] ?? true) {
             $bundles[] = new NelmioApiDocBundle();
@@ -65,9 +76,14 @@ class AppKernel extends Kernel
         return $bundles;
     }
 
+    public function getProjectDir()
+    {
+        return __DIR__;
+    }
+
     protected function configureRoutes(RouteCollectionBuilder $routes)
     {
-        $routes->import('config/routing.yml');
+        $routes->import("config/routing_{$this->getEnvironment()}.yml");
 
         if ($_SERVER['LEGACY'] ?? true) {
             $routes->import('@NelmioApiDocBundle/Resources/config/routing.yml', '/nelmioapidoc');
@@ -78,11 +94,12 @@ class AppKernel extends Kernel
     {
         $c->setParameter('kernel.project_dir', __DIR__);
 
-        $loader->load("{$this->getRootDir()}/config/config_{$this->getEnvironment()}.yml");
+        $loader->load(__DIR__."/config/config_{$this->getEnvironment()}.yml");
 
         $securityConfig = [
             'encoders' => [
                 User::class => 'bcrypt',
+                UserDocument::class => 'bcrypt',
                 // Don't use plaintext in production!
                 UserInterface::class => 'plaintext',
             ],

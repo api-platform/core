@@ -13,17 +13,22 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection;
 
+use ApiPlatform\Core\Bridge\Elasticsearch\Metadata\Document\DocumentMetadata;
 use ApiPlatform\Core\Exception\FilterValidationException;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
+use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
+use Doctrine\Bundle\MongoDBBundle\DoctrineMongoDBBundle;
+use Doctrine\ORM\OptimisticLockException;
 use FOS\UserBundle\FOSUserBundle;
 use GraphQL\GraphQL;
+use Symfony\Bundle\MercureBundle\MercureBundle;
 use Symfony\Bundle\TwigBundle\TwigBundle;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Mercure\Update;
+use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Serializer\Exception\ExceptionInterface;
 
 /**
@@ -39,8 +44,13 @@ final class Configuration implements ConfigurationInterface
      */
     public function getConfigTreeBuilder()
     {
-        $treeBuilder = new TreeBuilder();
-        $rootNode = $treeBuilder->root('api_platform');
+        if (method_exists(TreeBuilder::class, 'getRootNode')) {
+            $treeBuilder = new TreeBuilder('api_platform');
+            $rootNode = $treeBuilder->getRootNode();
+        } else {
+            $treeBuilder = new TreeBuilder();
+            $rootNode = $treeBuilder->root('api_platform');
+        }
 
         $rootNode
             ->children()
@@ -84,6 +94,12 @@ final class Configuration implements ConfigurationInterface
                         ->booleanNode('force_eager')->defaultTrue()->info('Force join on every relation. If disabled, it will only join relations having the EAGER fetch mode.')->end()
                     ->end()
                 ->end()
+                ->arrayNode('doctrine')
+                    ->{class_exists(DoctrineBundle::class) ? 'canBeDisabled' : 'canBeEnabled'}()
+                ->end()
+                ->arrayNode('doctrine_mongodb_odm')
+                    ->{class_exists(DoctrineMongoDBBundle::class) ? 'canBeDisabled' : 'canBeEnabled'}()
+                ->end()
                 ->booleanNode('enable_fos_user')->defaultValue(class_exists(FOSUserBundle::class))->info('Enable the FOSUserBundle integration.')->end()
                 ->booleanNode('enable_nelmio_api_doc')
                     ->defaultValue(false)
@@ -91,7 +107,8 @@ final class Configuration implements ConfigurationInterface
                     ->info('Enable the NelmioApiDocBundle integration.')
                 ->end()
                 ->booleanNode('enable_swagger')->defaultValue(true)->info('Enable the Swagger documentation and export.')->end()
-                ->booleanNode('enable_swagger_ui')->defaultValue(class_exists(TwigBundle::class))->info('Enable Swagger ui.')->end()
+                ->booleanNode('enable_swagger_ui')->defaultValue(class_exists(TwigBundle::class))->info('Enable Swagger UI')->end()
+                ->booleanNode('enable_re_doc')->defaultValue(class_exists(TwigBundle::class))->info('Enable ReDoc')->end()
                 ->booleanNode('enable_entrypoint')->defaultTrue()->info('Enable the entrypoint')->end()
                 ->booleanNode('enable_docs')->defaultTrue()->info('Enable the docs')->end()
                 ->booleanNode('enable_profiler')->defaultTrue()->info('Enable the data collector and the WebProfilerBundle integration.')->end()
@@ -220,9 +237,38 @@ final class Configuration implements ConfigurationInterface
                 ->end()
 
                 ->arrayNode('mercure')
-                    ->{class_exists(Update::class) ? 'canBeDisabled' : 'canBeEnabled'}()
+                    ->{class_exists(MercureBundle::class) ? 'canBeDisabled' : 'canBeEnabled'}()
                     ->children()
-                        ->scalarNode('hub_url')->defaultNull()->info('The URL send in the Link HTTP header. If not set, will default to the URL for the Symfony\'s bundle default hub.')
+                        ->scalarNode('hub_url')
+                            ->defaultNull()
+                            ->info('The URL send in the Link HTTP header. If not set, will default to the URL for the Symfony\'s bundle default hub.')
+                        ->end()
+                    ->end()
+                ->end()
+
+                ->arrayNode('messenger')
+                    ->{interface_exists(MessageBusInterface::class) ? 'canBeDisabled' : 'canBeEnabled'}()
+                ->end()
+
+                ->arrayNode('elasticsearch')
+                    ->canBeEnabled()
+                    ->addDefaultsIfNotSet()
+                    ->children()
+                        ->arrayNode('hosts')
+                            ->beforeNormalization()->castToArray()->end()
+                            ->defaultValue([])
+                            ->prototype('scalar')->end()
+                        ->end()
+                        ->arrayNode('mapping')
+                            ->normalizeKeys(false)
+                            ->useAttributeAsKey('resource_class')
+                            ->prototype('array')
+                                ->children()
+                                    ->scalarNode('index')->defaultNull()->end()
+                                    ->scalarNode('type')->defaultValue(DocumentMetadata::DEFAULT_TYPE)->end()
+                                ->end()
+                            ->end()
+                        ->end()
                     ->end()
                 ->end()
 
@@ -246,7 +292,6 @@ final class Configuration implements ConfigurationInterface
     /**
      * Adds an exception to status section.
      *
-     *
      * @throws InvalidConfigurationException
      */
     private function addExceptionToStatusSection(ArrayNodeDefinition $rootNode)
@@ -258,6 +303,7 @@ final class Configuration implements ConfigurationInterface
                         ExceptionInterface::class => Response::HTTP_BAD_REQUEST,
                         InvalidArgumentException::class => Response::HTTP_BAD_REQUEST,
                         FilterValidationException::class => Response::HTTP_BAD_REQUEST,
+                        OptimisticLockException::class => Response::HTTP_CONFLICT,
                     ])
                     ->info('The list of exceptions mapped to their HTTP status code.')
                     ->normalizeKeys(false)
@@ -271,7 +317,7 @@ final class Configuration implements ConfigurationInterface
                                 }
 
                                 if (\defined($httpStatusCodeConstant = sprintf('%s::%s', Response::class, $httpStatusCode))) {
-                                    @trigger_error(sprintf('Using a string "%s" as a constant of the "%s" class is deprecated since API Platform 2.1 and will not be possible anymore in API Platform 3. Use the Symfony\'s custom YAML extension for PHP constants instead (i.e. "!php/const:%s").', $httpStatusCode, Response::class, $httpStatusCodeConstant), E_USER_DEPRECATED);
+                                    @trigger_error(sprintf('Using a string "%s" as a constant of the "%s" class is deprecated since API Platform 2.1 and will not be possible anymore in API Platform 3. Use the Symfony\'s custom YAML extension for PHP constants instead (i.e. "!php/const %s").', $httpStatusCode, Response::class, $httpStatusCodeConstant), E_USER_DEPRECATED);
 
                                     $httpStatusCode = \constant($httpStatusCodeConstant);
                                 }

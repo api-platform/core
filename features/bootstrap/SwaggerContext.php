@@ -50,6 +50,18 @@ final class SwaggerContext implements Context
     }
 
     /**
+     * @Then the OpenAPI class :class exists
+     */
+    public function assertTheOpenApiClassExist(string $className)
+    {
+        try {
+            $this->getClassInfo($className, 3);
+        } catch (\InvalidArgumentException $e) {
+            throw new ExpectationFailedException(sprintf('The class "%s" doesn\'t exist.', $className), null, $e);
+        }
+    }
+
+    /**
      * @Then the Swagger class :class doesn't exist
      */
     public function assertTheSwaggerClassNotExist(string $className)
@@ -64,7 +76,22 @@ final class SwaggerContext implements Context
     }
 
     /**
+     * @Then the OpenAPI class :class doesn't exist
+     */
+    public function assertTheOPenAPIClassNotExist(string $className)
+    {
+        try {
+            $this->getClassInfo($className, 3);
+        } catch (\InvalidArgumentException $e) {
+            return;
+        }
+
+        throw new ExpectationFailedException(sprintf('The class "%s" exists.', $className));
+    }
+
+    /**
      * @Then the Swagger path :arg1 exists
+     * @Then the OpenAPI path :arg1 exists
      */
     public function assertThePathExist(string $path)
     {
@@ -76,7 +103,7 @@ final class SwaggerContext implements Context
     /**
      * @Then :prop property exists for the Swagger class :class
      */
-    public function assertPropertyExist(string $propertyName, string $className)
+    public function assertPropertyExistForTheSwaggerClass(string $propertyName, string $className)
     {
         try {
             $this->getPropertyInfo($propertyName, $className);
@@ -86,11 +113,33 @@ final class SwaggerContext implements Context
     }
 
     /**
+     * @Then :prop property exists for the OpenAPI class :class
+     */
+    public function assertPropertyExistForTheOpenApiClass(string $propertyName, string $className)
+    {
+        try {
+            $this->getPropertyInfo($propertyName, $className, 3);
+        } catch (\InvalidArgumentException $e) {
+            throw new ExpectationFailedException(sprintf('Property "%s" of class "%s" exists.', $propertyName, $className), null, $e);
+        }
+    }
+
+    /**
      * @Then :prop property is required for Swagger class :class
      */
-    public function assertPropertyIsRequired(string $propertyName, string $className)
+    public function assertPropertyIsRequiredForSwagger(string $propertyName, string $className)
     {
-        if (!\in_array($propertyName, $this->getClassInfo($className)->required, true)) {
+        if (!in_array($propertyName, $this->getClassInfo($className)->required, true)) {
+            throw new ExpectationFailedException(sprintf('Property "%s" of class "%s" should be required', $propertyName, $className));
+        }
+    }
+
+    /**
+     * @Then :prop property is required for OpenAPi class :class
+     */
+    public function assertPropertyIsRequiredForOpenAPi(string $propertyName, string $className)
+    {
+        if (!in_array($propertyName, $this->getClassInfo($className, 3)->required, true)) {
             throw new ExpectationFailedException(sprintf('Property "%s" of class "%s" should be required', $propertyName, $className));
         }
     }
@@ -100,9 +149,9 @@ final class SwaggerContext implements Context
      *
      * @throws \InvalidArgumentException
      */
-    private function getPropertyInfo(string $propertyName, string $className): \stdClass
+    private function getPropertyInfo(string $propertyName, string $className, int $specVersion = 2): \stdClass
     {
-        foreach ($this->getProperties($className) as $classPropertyName => $property) {
+        foreach ($this->getProperties($className, $specVersion) as $classPropertyName => $property) {
             if ($classPropertyName === $propertyName) {
                 return $property;
             }
@@ -114,9 +163,9 @@ final class SwaggerContext implements Context
     /**
      * Gets all operations of a given class.
      */
-    private function getProperties(string $className): \stdClass
+    private function getProperties(string $className, int $specVersion = 2): \stdClass
     {
-        return $this->getClassInfo($className)->{'properties'} ?? new \stdClass();
+        return $this->getClassInfo($className, $specVersion)->{'properties'} ?? new \stdClass();
     }
 
     /**
@@ -124,9 +173,10 @@ final class SwaggerContext implements Context
      *
      * @throws \InvalidArgumentException
      */
-    private function getClassInfo(string $className): \stdClass
+    private function getClassInfo(string $className, int $specVersion = 2): \stdClass
     {
-        foreach ($this->getLastJsonResponse()->{'definitions'} as $classTitle => $classData) {
+        $nodes = 2 === $specVersion ? $this->getLastJsonResponse()->{'definitions'} : $this->getLastJsonResponse()->{'components'}->{'schemas'};
+        foreach ($nodes as $classTitle => $classData) {
             if ($classTitle === $className) {
                 return $classData;
             }

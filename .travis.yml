@@ -1,5 +1,4 @@
 language: php
-sudo: false
 
 cache:
   directories:
@@ -9,30 +8,47 @@ cache:
 jobs:
   include:
     - php: '7.1'
+      env: NO_UNIT_TESTS=true
+      before_install:
+        - composer remove --dev ext-mongodb doctrine/mongodb-odm doctrine/mongodb-odm-bundle
+        - sed -i '33,39d' tests/Fixtures/app/config/config_common.yml
     - php: '7.2'
-    - php: '7.2'
+    - php: '7.3'
+    - php: '7.3'
       env: deps=low
-    - php: '7.2'
+    - php: '7.3'
       env: SYMFONY_DEPRECATIONS_HELPER=0
-    - php: '7.2'
+    - php: '7.3'
       services:
         - postgresql
       before_script:
         - psql -c 'create database api_platform_test;' -U postgres
       env: APP_ENV=postgres
-    - php: '7.2'
+    - php: '7.3'
       services:
         - mysql
       before_script:
         - mysql -e 'CREATE DATABASE api_platform_test;'
       env: APP_ENV=mysql
+    - php: '7.3'
+      services:
+        - mongodb
+      env: APP_ENV=mongodb
+    - php: '7.3'
+      services:
+        - elasticsearch
+      env: APP_ENV=elasticsearch
   allow_failures:
     - env: SYMFONY_DEPRECATIONS_HELPER=0
   fast_finish: true
 
 before_install:
+  - if [[ $APP_ENV = 'elasticsearch' ]]; then
+      curl -O https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-6.5.0.deb && sudo dpkg -i --force-confnew elasticsearch-6.5.0.deb && sudo service elasticsearch restart;
+    fi
   - phpenv config-rm xdebug.ini || echo "xdebug not available"
   - echo "memory_limit=-1" >> ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/travis.ini
+  - echo "extension=mongodb.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
   - export PATH="$PATH:$HOME/.composer/vendor/bin"
 
 install:
@@ -44,12 +60,23 @@ install:
 
 script:
   - tests/Fixtures/app/console cache:clear
-  - vendor/bin/phpunit
+  - if [[ $NO_UNIT_TESTS != true ]]; then
+      vendor/bin/phpunit;
+    fi
+  - if [[ $APP_ENV = 'mongodb' ]]; then
+      vendor/bin/phpunit -c phpunit.mongo.xml;
+    fi
   - tests/Fixtures/app/console cache:clear
   - if [[ $APP_ENV = 'postgres' ]]; then
       vendor/bin/behat --suite=postgres --format=progress;
+    elif [[ $APP_ENV = 'mongodb' ]]; then
+      vendor/bin/behat --suite=mongodb --format=progress;
+    elif [[ $APP_ENV = 'elasticsearch' ]]; then
+      vendor/bin/behat --suite=elasticsearch --format=progress;
     else
       vendor/bin/behat --suite=default --format=progress;
     fi
   - tests/Fixtures/app/console api:swagger:export > swagger.json && npx swagger-cli validate swagger.json && rm swagger.json
   - tests/Fixtures/app/console api:swagger:export --yaml > swagger.yaml && npx swagger-cli validate swagger.yaml && rm swagger.yaml
+  - tests/Fixtures/app/console api:openapi:export --spec-version 3 > swagger.json && npx swagger-cli validate swagger.json && rm swagger.json
+  - tests/Fixtures/app/console api:openapi:export --spec-version 3 --yaml > swagger.yaml && npx swagger-cli validate swagger.yaml && rm swagger.yaml

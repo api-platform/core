@@ -50,10 +50,14 @@ final class SerializerPropertyMetadataFactory implements PropertyMetadataFactory
             $resourceClass = $childResourceClass;
         }
 
-        list($normalizationGroups, $denormalizationGroups) = $this->getEffectiveSerializerGroups($options, $resourceClass);
+        try {
+            list($normalizationGroups, $denormalizationGroups) = $this->getEffectiveSerializerGroups($options, $resourceClass);
 
-        $propertyMetadata = $this->transformReadWrite($propertyMetadata, $resourceClass, $property, $normalizationGroups, $denormalizationGroups);
-        $propertyMetadata = $this->transformLinkStatus($propertyMetadata, $normalizationGroups, $denormalizationGroups);
+            $propertyMetadata = $this->transformReadWrite($propertyMetadata, $resourceClass, $property, $normalizationGroups, $denormalizationGroups);
+            $propertyMetadata = $this->transformLinkStatus($propertyMetadata, $normalizationGroups, $denormalizationGroups);
+        } catch (ResourceClassNotFoundException $e) {
+            // No need to check link status if related class is not a resource
+        }
 
         return $propertyMetadata;
     }
@@ -90,6 +94,8 @@ final class SerializerPropertyMetadataFactory implements PropertyMetadataFactory
      *
      * @param string[]|null $normalizationGroups
      * @param string[]|null $denormalizationGroups
+     *
+     * @throws ResourceClassNotFoundException
      */
     private function transformLinkStatus(PropertyMetadata $propertyMetadata, array $normalizationGroups = null, array $denormalizationGroups = null): PropertyMetadata
     {
@@ -109,13 +115,7 @@ final class SerializerPropertyMetadataFactory implements PropertyMetadataFactory
             return $propertyMetadata->withReadableLink(true)->withWritableLink(true);
         }
 
-        // No need to check link status if related class is not a resource
-        try {
-            $this->resourceMetadataFactory->create($relatedClass);
-        } catch (ResourceClassNotFoundException $e) {
-            return $propertyMetadata;
-        }
-
+        $this->resourceMetadataFactory->create($relatedClass);
         $relatedGroups = $this->getResourceSerializerGroups($relatedClass);
 
         if (null === $propertyMetadata->isReadableLink()) {
@@ -138,13 +138,14 @@ final class SerializerPropertyMetadataFactory implements PropertyMetadataFactory
      * - From metadata of the given operation ("collection_operation_name" and "item_operation_name" keys).
      * - From metadata of the current resource.
      *
-     *
      * @return (string[]|null)[]
      */
     private function getEffectiveSerializerGroups(array $options, string $resourceClass): array
     {
         if (isset($options['serializer_groups'])) {
-            return [$options['serializer_groups'], $options['serializer_groups']];
+            $groups = (array) $options['serializer_groups'];
+
+            return [$groups, $groups];
         }
 
         $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
@@ -162,12 +163,14 @@ final class SerializerPropertyMetadataFactory implements PropertyMetadataFactory
             $denormalizationContext = $resourceMetadata->getAttribute('denormalization_context');
         }
 
-        return [$normalizationContext['groups'] ?? null, $denormalizationContext['groups'] ?? null];
+        return [
+            isset($normalizationContext['groups']) ? (array) $normalizationContext['groups'] : null,
+            isset($denormalizationContext['groups']) ? (array) $denormalizationContext['groups'] : null,
+        ];
     }
 
     /**
      * Gets the serializer groups defined on a property.
-     *
      *
      * @return string[]
      */
@@ -187,7 +190,6 @@ final class SerializerPropertyMetadataFactory implements PropertyMetadataFactory
     /**
      * Gets the serializer groups defined in a resource.
      *
-     *
      * @return string[]
      */
     private function getResourceSerializerGroups(string $resourceClass): array
@@ -195,11 +197,10 @@ final class SerializerPropertyMetadataFactory implements PropertyMetadataFactory
         $serializerClassMetadata = $this->serializerClassMetadataFactory->getMetadataFor($resourceClass);
 
         $groups = [];
-
         foreach ($serializerClassMetadata->getAttributesMetadata() as $serializerAttributeMetadata) {
-            $groups = array_merge($groups, $serializerAttributeMetadata->getGroups());
+            $groups += array_flip($serializerAttributeMetadata->getGroups());
         }
 
-        return array_unique($groups);
+        return array_keys($groups);
     }
 }

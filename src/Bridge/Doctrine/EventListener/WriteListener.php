@@ -72,7 +72,6 @@ final class WriteListener
     /**
      * Gets the manager if applicable.
      *
-     *
      * @return ObjectManager|null
      */
     private function getManager(string $resourceClass, $data)

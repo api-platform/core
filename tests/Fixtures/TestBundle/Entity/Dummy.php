@@ -44,7 +44,7 @@ class Dummy
     /**
      * @var int The id
      *
-     * @ORM\Column(type="integer")
+     * @ORM\Column(type="integer", nullable=true)
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
      */
@@ -120,6 +120,7 @@ class Dummy
      * @var RelatedDummy A related dummy
      *
      * @ORM\ManyToOne(targetEntity="RelatedDummy")
+     * @ApiProperty(push=true)
      */
     public $relatedDummy;
 

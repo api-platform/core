@@ -1,0 +1,73 @@
+imports:
+    - { resource: config_common.yml }
+
+services:
+    app.my_dummy_resource.search_filter:
+        parent:    'api_platform.doctrine.orm.search_filter'
+        arguments: [ { 'id': 'exact', 'name': 'partial', 'alias': 'start', 'description': 'word_start', 'relatedDummy.name': 'exact', 'relatedDummies': 'exact', 'dummy': 'ipartial', 'relatedDummies.name': 'start', 'embeddedDummy.dummyName': 'partial', 'relatedDummy.thirdLevel.level': 'exact', 'relatedDummy.thirdLevel.fourthLevel.level': 'exact', 'relatedDummy.thirdLevel.badFourthLevel.level': 'exact', 'relatedDummy.thirdLevel.fourthLevel.badThirdLevel.level': 'exact' } ]
+        tags:      [ { name: 'api_platform.filter', id: 'my_dummy.search' } ]
+
+    # Tests if the id default to the service name, do not add id attributes here
+    app.my_dummy_resource.order_filter:
+        parent:    'api_platform.doctrine.orm.order_filter'
+        arguments: [ { 'id': ~, 'name': 'desc', 'description': ~, 'relatedDummy.name': ~, 'embeddedDummy.dummyName': 'desc', 'relatedDummy.symfony': ~, 'dummyDate': ~} ]
+        tags:      [ { name: 'api_platform.filter', id: 'my_dummy.order' } ]
+
+    app.my_dummy_resource.date_filter:
+        parent:    'api_platform.doctrine.orm.date_filter'
+        arguments: [ { 'dummyDate': ~, 'relatedDummy.dummyDate': ~, 'embeddedDummy.dummyDate': ~ } ]
+        tags:      [ { name: 'api_platform.filter', id: 'my_dummy.date' } ]
+
+    app.my_dummy_date_resource.date_filter:
+        parent:    'api_platform.doctrine.orm.date_filter'
+        arguments: [ { 'dummyDate': ~ } ]
+        tags:      [ { name: 'api_platform.filter', id: 'my_dummy_date.date' } ]
+
+    my_dummy_immutable_date.date:
+        parent:    'api_platform.doctrine.orm.date_filter'
+        arguments: [ { 'dummyDate': ~ } ]
+        tags:      [ { name: 'api_platform.filter' } ]
+
+    app.my_dummy_resource.range_filter:
+        parent:    'api_platform.doctrine.orm.range_filter'
+        arguments: [ { 'dummyFloat': ~, 'dummyPrice': ~ } ]
+        tags:      [ { name: 'api_platform.filter', id: 'my_dummy.range' } ]
+
+    app.my_dummy_resource.boolean_filter:
+        parent:    'api_platform.doctrine.orm.boolean_filter'
+        arguments: [ { 'dummyBoolean': ~, 'embeddedDummy.dummyBoolean': ~, 'relatedDummy.embeddedDummy.dummyBoolean': ~ } ]
+        tags:      [ { name: 'api_platform.filter', id: 'my_dummy.boolean' } ]
+
+    app.my_dummy_resource.numeric_filter:
+        parent:    'api_platform.doctrine.orm.numeric_filter'
+        arguments: [ { 'dummyFloat': ~, 'dummyPrice': ~ } ]
+        tags:      [ { name: 'api_platform.filter', id: 'my_dummy.numeric' } ]
+
+    app.my_dummy_resource.exists_filter:
+        parent:    'api_platform.doctrine.orm.exists_filter'
+        arguments: [ { 'description': ~, 'relatedDummy.name': ~, 'dummyBoolean': ~, 'relatedDummy': ~ } ]
+        tags:      [ { name: 'api_platform.filter', id: 'my_dummy.exists' } ]
+
+    app.related_dummy_resource.search_filter:
+        parent:    'api_platform.doctrine.orm.search_filter'
+        arguments: [ { 'relatedToDummyFriend.dummyFriend': 'exact', 'name': 'partial' } ]
+        tags:      [ { name: 'api_platform.filter', id: 'related_dummy.friends' } ]
+
+    app.related_dummy_to_friend_resource.search_filter:
+        parent:    'api_platform.doctrine.orm.search_filter'
+        arguments: [ { 'name': 'ipartial', 'description': 'ipartial' } ]
+        tags:      [ { name: 'api_platform.filter', id: 'related_to_dummy_friend.name' } ]
+
+    dummy_dto_no_input.data_provider:
+        class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\DataProvider\DummyDtoNoInputCollectionDataProvider'
+        public: false
+        arguments: ['@doctrine']
+        tags:
+            -  { name: 'api_platform.collection_data_provider' }
+
+    app.dummy_dto_no_output_data_persister:
+        class: ApiPlatform\Core\Tests\Fixtures\TestBundle\DataPersister\DummyDtoNoOutputDataPersister
+        arguments: ['@doctrine']
+        public: false
+        tags:
+            -  { name: 'api_platform.data_persister' }

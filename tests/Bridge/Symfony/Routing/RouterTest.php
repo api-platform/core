@@ -16,6 +16,7 @@ namespace ApiPlatform\Core\Tests\Bridge\Symfony\Routing;
 use ApiPlatform\Core\Bridge\Symfony\Routing\Router;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
+use Symfony\Component\Routing\Exception\ExceptionInterface as RoutingExceptionInterface;
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\RouterInterface;
@@ -71,5 +72,18 @@ class RouterTest extends TestCase
         $router = new Router($mockedRouter->reveal());
 
         $this->assertEquals(['bar'], $router->match('/app_dev.php/foo'));
+    }
+
+    public function testWithinvalidContext()
+    {
+        $this->expectException(RoutingExceptionInterface::class);
+        $this->expectExceptionMessage('Invalid request context.');
+        $context = new RequestContext('/app_dev.php', 'GET', 'localhost', 'https');
+
+        $mockedRouter = $this->prophesize('Symfony\Component\Routing\RouterInterface');
+        $mockedRouter->getContext()->willReturn($context)->shouldBeCalled();
+
+        $router = new Router($mockedRouter->reveal());
+        $router->match('28-01-2018 10:10');
     }
 }

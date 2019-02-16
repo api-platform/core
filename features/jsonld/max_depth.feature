@@ -35,7 +35,6 @@ Feature: Max depth handling
     }
     """
 
-  @dropSchema
   Scenario: Add a 2nd level of descendants
     When I add "Content-Type" header equal to "application/ld+json"
     And I send a "PUT" request to "max_depth_eager_dummies/1" with body:

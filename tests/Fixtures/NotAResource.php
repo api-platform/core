@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\Fixtures;
 
 /**
- * This class is mapped as an API resource.
+ * This class is not mapped as an API resource.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
