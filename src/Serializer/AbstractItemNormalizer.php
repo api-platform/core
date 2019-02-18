@@ -393,7 +393,9 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             // repeat the code so that IRIs keep working with the json format
             if (true === $this->allowPlainIdentifiers && $this->itemDataProvider) {
                 try {
-                    return $this->itemDataProvider->getItem($className, $value, null, $context + ['fetch_data' => true]);
+                    if (null !== $item = $this->itemDataProvider->getItem($className, $value, null, $context + ['fetch_data' => true])) {
+                        return $item;
+                    }
                 } catch (ItemNotFoundException $e) {
                     throw new InvalidArgumentException($e->getMessage(), $e->getCode(), $e);
                 } catch (InvalidArgumentException $e) {
