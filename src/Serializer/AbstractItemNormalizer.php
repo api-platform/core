@@ -35,6 +35,7 @@ use Symfony\Component\Serializer\Exception\RuntimeException;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
 use Symfony\Component\Serializer\NameConverter\AdvancedNameConverterInterface;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
+use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
@@ -75,6 +76,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
         if (false === $allowUnmappedClass) {
             @trigger_error(sprintf('Passing a falsy $allowUnmappedClass flag in %s is deprecated since version 2.4 and will default to true in 3.0.', self::class), E_USER_DEPRECATED);
         }
+        $defaultContext[AbstractNormalizer::ALLOW_EXTRA_ATTRIBUTES] = false;
 
         parent::__construct($classMetadataFactory, $nameConverter, null, null, \Closure::fromCallable([$this, 'getObjectClass']), $defaultContext);
 
