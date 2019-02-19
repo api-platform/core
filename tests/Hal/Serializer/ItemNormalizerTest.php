@@ -41,6 +41,10 @@ use Symfony\Component\Serializer\SerializerInterface;
  */
 class ItemNormalizerTest extends TestCase
 {
+    /**
+     * @group legacy
+     * @expectedDeprecation Passing a falsy $allowUnmappedClass flag in ApiPlatform\Core\Serializer\AbstractItemNormalizer is deprecated since version 2.4 and will default to true in 3.0.
+     */
     public function testDoesNotSupportDenormalization()
     {
         $this->expectException(RuntimeException::class);
@@ -64,6 +68,10 @@ class ItemNormalizerTest extends TestCase
         $normalizer->denormalize(['foo'], 'Foo');
     }
 
+    /**
+     * @group legacy
+     * @expectedDeprecation Passing a falsy $allowUnmappedClass flag in ApiPlatform\Core\Serializer\AbstractItemNormalizer is deprecated since version 2.4 and will default to true in 3.0.
+     */
     public function testSupportsNormalization()
     {
         $std = new \stdClass();
@@ -137,7 +145,14 @@ class ItemNormalizerTest extends TestCase
             $iriConverterProphecy->reveal(),
             $resourceClassResolverProphecy->reveal(),
             null,
-            $nameConverter->reveal()
+            $nameConverter->reveal(),
+            null,
+            null,
+            false,
+            [],
+            null,
+            null,
+            true
         );
         $normalizer->setSerializer($serializerProphecy->reveal());
 
@@ -197,7 +212,14 @@ class ItemNormalizerTest extends TestCase
             $iriConverterProphecy->reveal(),
             $resourceClassResolverProphecy->reveal(),
             null,
-            $nameConverter->reveal()
+            $nameConverter->reveal(),
+            null,
+            null,
+            false,
+            [],
+            null,
+            null,
+            true
         );
         $normalizer->setSerializer($serializerProphecy->reveal());
 
@@ -271,7 +293,13 @@ class ItemNormalizerTest extends TestCase
             $resourceClassResolverProphecy->reveal(),
             null,
             null,
-            $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()))
+            $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader())),
+            null,
+            false,
+            [],
+            null,
+            null,
+            true
         );
         $serializer = new Serializer([$normalizer]);
         $normalizer->setSerializer($serializer);

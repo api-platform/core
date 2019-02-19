@@ -155,7 +155,8 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
                 $serializerContext = $this->getSerializerContext(OperationType::SUBRESOURCE, false, $subResourceMetadata, $operationName);
 
                 $responseDefinitionKey = false;
-                if (false !== $outputClass = $subResourceMetadata->getSubresourceOperationAttribute($operationName, 'output_class')) {
+                $outputMetadata = $resourceMetadata->getTypedOperationAttribute(OperationType::SUBRESOURCE, $operationName, 'output', ['class' => $subresourceOperation['resource_class']], true);
+                if (null !== $outputClass = $outputMetadata['class'] ?? null) {
                     $responseDefinitionKey = $this->getDefinition($v3, $definitions, $subResourceMetadata, $subresourceOperation['resource_class'], $outputClass, $serializerContext);
                 }
 
@@ -315,7 +316,8 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
         $serializerContext = $this->getSerializerContext($operationType, false, $resourceMetadata, $operationName);
 
         $responseDefinitionKey = false;
-        if (false !== $outputClass = $resourceMetadata->getTypedOperationAttribute($operationType, $operationName, 'output_class', null, true)) {
+        $outputMetadata = $resourceMetadata->getTypedOperationAttribute($operationType, $operationName, 'output', ['class' => $resourceClass], true);
+        if (null !== $outputClass = $outputMetadata['class'] ?? null) {
             $responseDefinitionKey = $this->getDefinition($v3, $definitions, $resourceMetadata, $resourceClass, $outputClass, $serializerContext);
         }
 
@@ -423,7 +425,8 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
         $pathOperation['summary'] ?? $pathOperation['summary'] = sprintf('Creates a %s resource.', $resourceShortName);
 
         $responseDefinitionKey = false;
-        if (false !== $outputClass = $resourceMetadata->getTypedOperationAttribute($operationType, $operationName, 'output_class', null, true)) {
+        $outputMetadata = $resourceMetadata->getTypedOperationAttribute($operationType, $operationName, 'output', ['class' => $resourceClass], true);
+        if (null !== $outputClass = $outputMetadata['class'] ?? null) {
             $responseDefinitionKey = $this->getDefinition($v3, $definitions, $resourceMetadata, $resourceClass, $outputClass, $this->getSerializerContext($operationType, false, $resourceMetadata, $operationName));
         }
 
@@ -445,7 +448,8 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
             '404' => ['description' => 'Resource not found'],
         ];
 
-        if (false === $inputClass = $resourceMetadata->getTypedOperationAttribute($operationType, $operationName, 'input_class', null, true)) {
+        $inputMetadata = $resourceMetadata->getTypedOperationAttribute($operationType, $operationName, 'input', ['class' => $resourceClass], true);
+        if (null === $inputClass = $inputMetadata['class'] ?? null) {
             return $pathOperation;
         }
 
@@ -485,7 +489,8 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
         $pathOperation['parameters'] ?? $pathOperation['parameters'] = [$parameter];
 
         $responseDefinitionKey = false;
-        if (false !== $outputClass = $resourceMetadata->getTypedOperationAttribute($operationType, $operationName, 'output_class', null, true)) {
+        $outputMetadata = $resourceMetadata->getTypedOperationAttribute($operationType, $operationName, 'output', ['class' => $resourceClass], true);
+        if (null !== $outputClass = $outputMetadata['class'] ?? null) {
             $responseDefinitionKey = $this->getDefinition($v3, $definitions, $resourceMetadata, $resourceClass, $outputClass, $this->getSerializerContext($operationType, false, $resourceMetadata, $operationName));
         }
 
@@ -504,7 +509,8 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
             '404' => ['description' => 'Resource not found'],
         ];
 
-        if (false === $inputClass = $resourceMetadata->getTypedOperationAttribute($operationType, $operationName, 'input_class', null, true)) {
+        $inputMetadata = $resourceMetadata->getTypedOperationAttribute($operationType, $operationName, 'input', ['class' => $resourceClass], true);
+        if (null === $inputClass = $inputMetadata['class'] ?? null) {
             return $pathOperation;
         }
 
@@ -549,7 +555,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
     private function getDefinition(bool $v3, \ArrayObject $definitions, ResourceMetadata $resourceMetadata, string $resourceClass, ?string $publicClass, array $serializerContext = null): string
     {
         $keyPrefix = $resourceMetadata->getShortName();
-        if (null !== $publicClass) {
+        if (null !== $publicClass && $resourceClass !== $publicClass) {
             $keyPrefix .= ':'.md5($publicClass);
         }
 
@@ -680,7 +686,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
                 return [
                     '$ref' => sprintf(
                         $v3 ? '#/components/schemas/%s' : '#/definitions/%s',
-                        $this->getDefinition($v3, $definitions, $resourceMetadata = $this->resourceMetadataFactory->create($className), $className, $resourceMetadata->getAttribute('output_class'), $serializerContext)
+                        $this->getDefinition($v3, $definitions, $resourceMetadata = $this->resourceMetadataFactory->create($className), $className, $resourceMetadata->getAttribute('output')['class'] ?? $className, $serializerContext)
                     ),
                 ];
             }

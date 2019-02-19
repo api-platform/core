@@ -13,34 +13,30 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity;
 
-use ApiPlatform\Core\Annotation\ApiProperty;
 use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Dto\NonResourceClass;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * Dummy Output.
- *
- * @author Kévin Dunglas <dunglas@gmail.com>
- *
  * @ApiResource
  * @ORM\Entity
  */
-class DummyOutput
+class NonRelationResource
 {
     /**
-     * @var int The id
-     *
      * @ORM\Column(type="integer")
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
      */
-    public $id;
+    private $id;
 
     /**
-     * @var string The dummy name
-     *
-     * @ORM\Column
-     * @ApiProperty(iri="http://schema.org/name")
+     * @var NonResourceClass
      */
-    public $name;
+    public $relation;
+
+    public function getId()
+    {
+        return $this->id;
+    }
 }

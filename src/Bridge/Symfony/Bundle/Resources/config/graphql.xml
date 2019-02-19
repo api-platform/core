@@ -91,8 +91,13 @@
             <argument type="service" id="serializer.mapping.class_metadata_factory" on-invalid="ignore" />
             <argument type="service" id="api_platform.item_data_provider" on-invalid="ignore" />
             <argument>%api_platform.allow_plain_identifiers%</argument>
+            <argument>null</argument>
+            <argument type="service" id="api_platform.data_transformer" on-invalid="ignore" />
+            <argument type="service" id="api_platform.metadata.resource.metadata_factory" on-invalid="ignore" />
+            <argument>true</argument>
 
-            <tag name="serializer.normalizer" priority="8" />
+            <!-- After the DataURINormalizer but before the object denormalizer -->
+            <tag name="serializer.normalizer" priority="-922" />
         </service>
     </services>
 

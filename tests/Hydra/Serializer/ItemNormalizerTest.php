@@ -34,6 +34,10 @@ use Symfony\Component\Serializer\SerializerInterface;
  */
 class ItemNormalizerTest extends TestCase
 {
+    /**
+     * @group legacy
+     * @expectedDeprecation Passing a falsy $allowUnmappedClass flag in ApiPlatform\Core\Serializer\AbstractItemNormalizer is deprecated since version 2.4 and will default to true in 3.0.
+     */
     public function testDontSupportDenormalization()
     {
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
@@ -51,6 +55,10 @@ class ItemNormalizerTest extends TestCase
         $this->assertTrue($normalizer->hasCacheableSupportsMethod());
     }
 
+    /**
+     * @group legacy
+     * @expectedDeprecation Passing a falsy $allowUnmappedClass flag in ApiPlatform\Core\Serializer\AbstractItemNormalizer is deprecated since version 2.4 and will default to true in 3.0.
+     */
     public function testSupportNormalization()
     {
         $std = new \stdClass();
@@ -116,7 +124,13 @@ class ItemNormalizerTest extends TestCase
             $propertyMetadataFactoryProphecy->reveal(),
             $iriConverterProphecy->reveal(),
             $resourceClassResolverProphecy->reveal(),
-            $contextBuilderProphecy->reveal()
+            $contextBuilderProphecy->reveal(),
+            null,
+            null,
+            null,
+            [],
+            null,
+            true
         );
         $normalizer->setSerializer($serializerProphecy->reveal());
 
