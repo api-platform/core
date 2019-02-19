@@ -26,8 +26,8 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
  *
  * @ApiResource(
  *     attributes={
- *         "input_class"=InputDto::class,
- *         "output_class"=false
+ *         "input"=InputDto::class,
+ *         "output"=false
  *     }
  * )
  */

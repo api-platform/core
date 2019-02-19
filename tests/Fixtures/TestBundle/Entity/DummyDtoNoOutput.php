@@ -26,8 +26,8 @@ use Doctrine\ORM\Mapping as ORM;
  *
  * @ApiResource(
  *     attributes={
- *         "input_class"=InputDto::class,
- *         "output_class"=false
+ *         "input"=InputDto::class,
+ *         "output"=false
  *     }
  * )
  */

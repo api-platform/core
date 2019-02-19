@@ -14,6 +14,8 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Document;
 
 use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Dto\RecoverPasswordInput;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Dto\RecoverPasswordOutput;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 use FOS\UserBundle\Model\User as BaseUser;
 use FOS\UserBundle\Model\UserInterface;
@@ -23,10 +25,17 @@ use Symfony\Component\Serializer\Annotation\Groups;
  * A User.
  *
  * @ODM\Document(collection="user_test")
- * @ApiResource(attributes={
- *     "normalization_context"={"groups"={"user", "user-read"}},
- *     "denormalization_context"={"groups"={"user", "user-write"}}
- * })
+ * @ApiResource(
+ *     attributes={
+ *         "normalization_context"={"groups"={"user", "user-read"}},
+ *         "denormalization_context"={"groups"={"user", "user-write"}}
+ *     },
+ *     itemOperations={"get", "put", "delete",
+ *         "recover_password"={
+ *             "input"=RecoverPasswordInput::class, "output"=RecoverPasswordOutput::class, "method"="PUT", "path"="users/recover/{id}"
+ *         }
+ *     }
+ * )
  *
  * @author Théo FIDRY <theo.fidry@gmail.com>
  * @author Kévin Dunglas <dunglas@gmail.com>

@@ -364,7 +364,7 @@ class DocumentationNormalizerTest extends TestCase
         $propertyNameCollectionFactoryProphecy->create('inputClass', [])->shouldBeCalled()->willReturn(new PropertyNameCollection(['a', 'b']));
         $propertyNameCollectionFactoryProphecy->create('outputClass', [])->shouldBeCalled()->willReturn(new PropertyNameCollection(['c', 'd']));
 
-        $dummyMetadata = new ResourceMetadata('dummy', 'dummy', '#dummy', ['get' => [], 'put' => ['input_class' => false]], ['get' => [], 'post' => ['output_class' => false]], ['input_class' => 'inputClass', 'output_class' => 'outputClass']);
+        $dummyMetadata = new ResourceMetadata('dummy', 'dummy', '#dummy', ['get' => [], 'put' => ['input' => ['class' => null]]], ['get' => [], 'post' => ['output' => ['class' => null]]], ['input' => ['class' => 'inputClass'], 'output' => ['class' => 'outputClass']]);
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create('dummy')->shouldBeCalled()->willReturn($dummyMetadata);
 

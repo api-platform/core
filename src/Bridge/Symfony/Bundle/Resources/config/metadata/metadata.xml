@@ -14,6 +14,9 @@
         <service id="ApiPlatform\Core\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface" alias="api_platform.metadata.resource.name_collection_factory" />
 
         <!-- Resource metadata -->
+        <service id="api_platform.metadata.resource.metadata_factory.input_output" class="ApiPlatform\Core\Metadata\Resource\Factory\InputOutputResourceMetadataFactory" decorates="api_platform.metadata.resource.metadata_factory" decoration-priority="30" public="false">
+            <argument type="service" id="api_platform.metadata.resource.metadata_factory.input_output.inner" />
+        </service>
 
         <service id="api_platform.metadata.resource.metadata_factory.short_name" class="ApiPlatform\Core\Metadata\Resource\Factory\ShortNameResourceMetadataFactory" decorates="api_platform.metadata.resource.metadata_factory" decoration-priority="20" public="false">
             <argument type="service" id="api_platform.metadata.resource.metadata_factory.short_name.inner" />
