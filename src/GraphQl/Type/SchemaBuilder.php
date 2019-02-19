@@ -381,10 +381,7 @@ final class SchemaBuilder implements SchemaBuilderInterface
                     return null;
                 }
 
-                if (false !== $dtoClass = $resourceMetadata->getAttribute($input ? 'input_class' : 'output_class', $resourceClass)) {
-                    $resourceClass = $dtoClass;
-                }
-                $graphqlType = $this->getResourceObjectType(false === $dtoClass ? null : $resourceClass, $resourceMetadata, $input, $mutationName, $depth);
+                $graphqlType = $this->getResourceObjectType($resourceClass, $resourceMetadata, $input, $mutationName, $depth);
                 break;
             default:
                 throw new InvalidTypeException(sprintf('The type "%s" is not supported.', $builtinType));
@@ -418,12 +415,18 @@ final class SchemaBuilder implements SchemaBuilderInterface
             return $this->graphqlTypes[$shortName];
         }
 
+        $ioMetadata = $resourceMetadata->getAttribute($input ? 'input' : 'output');
+
+        if (null !== $ioMetadata && \array_key_exists('class', $ioMetadata) && null !== $ioMetadata['class']) {
+            $resourceClass = $ioMetadata['class'];
+        }
+
         $configuration = [
             'name' => $shortName,
             'description' => $resourceMetadata->getDescription(),
             'resolveField' => $this->defaultFieldResolver,
-            'fields' => function () use ($resourceClass, $resourceMetadata, $input, $mutationName, $depth) {
-                return $this->getResourceObjectTypeFields($resourceClass, $resourceMetadata, $input, $mutationName, $depth);
+            'fields' => function () use ($resourceClass, $resourceMetadata, $input, $mutationName, $depth, $ioMetadata) {
+                return $this->getResourceObjectTypeFields($resourceClass, $resourceMetadata, $input, $mutationName, $depth, $ioMetadata);
             },
             'interfaces' => [$this->getNodeInterface()],
         ];
@@ -434,13 +437,13 @@ final class SchemaBuilder implements SchemaBuilderInterface
     /**
      * Gets the fields of the type of the given resource.
      */
-    private function getResourceObjectTypeFields(?string $resourceClass, ResourceMetadata $resourceMetadata, bool $input = false, string $mutationName = null, int $depth = 0): array
+    private function getResourceObjectTypeFields(?string $resourceClass, ResourceMetadata $resourceMetadata, bool $input = false, string $mutationName = null, int $depth = 0, ?array $ioMetadata = null): array
     {
         $fields = [];
         $idField = ['type' => GraphQLType::nonNull(GraphQLType::id())];
         $clientMutationId = GraphQLType::nonNull(GraphQLType::string());
 
-        if ('delete' === $mutationName) {
+        if ('delete' === $mutationName || (null !== $ioMetadata && null === $ioMetadata['class'])) {
             return [
                 'id' => $idField,
                 'clientMutationId' => $clientMutationId,

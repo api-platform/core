@@ -31,12 +31,12 @@
             <argument type="service" id="api_platform.formats_provider" on-invalid="ignore" />
             <argument>%api_platform.collection.pagination.client_enabled%</argument>
             <argument>%api_platform.collection.pagination.enabled_parameter_name%</argument>
-            <tag name="serializer.normalizer" priority="16" />
+            <tag name="serializer.normalizer" priority="-790" />
         </service>
 
         <service id="api_platform.swagger.normalizer.api_gateway" class="ApiPlatform\Core\Swagger\Serializer\ApiGatewayNormalizer" public="false" decorates="api_platform.swagger.normalizer.documentation" decoration-priority="-1">
             <argument type="service" id="api_platform.swagger.normalizer.api_gateway.inner" />
-            <tag name="serializer.normalizer" priority="17" />
+            <tag name="serializer.normalizer" priority="-780" />
         </service>
 
         <service id="api_platform.swagger.command.swagger_command" class="ApiPlatform\Core\Bridge\Symfony\Bundle\Command\SwaggerCommand">

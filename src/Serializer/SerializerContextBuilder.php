@@ -65,8 +65,8 @@ final class SerializerContextBuilder implements SerializerContextBuilderInterfac
         }
 
         $context['resource_class'] = $attributes['resource_class'];
-        $context['input_class'] = $resourceMetadata->getTypedOperationAttribute($operationType, $attributes[$operationKey], 'input_class', $attributes['resource_class'], true);
-        $context['output_class'] = $resourceMetadata->getTypedOperationAttribute($operationType, $attributes[$operationKey], 'output_class', $attributes['resource_class'], true);
+        $context['input'] = $resourceMetadata->getTypedOperationAttribute($operationType, $attributes[$operationKey], 'input', $resourceMetadata->getAttribute('input'));
+        $context['output'] = $resourceMetadata->getTypedOperationAttribute($operationType, $attributes[$operationKey], 'output', $resourceMetadata->getAttribute('output'));
         $context['request_uri'] = $request->getRequestUri();
         $context['uri'] = $request->getUri();
 

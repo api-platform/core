@@ -104,7 +104,7 @@ class SerializeListenerTest extends TestCase
 
     public function testSerializeCollectionOperationWithOutputClassDisabled()
     {
-        $expectedContext = ['request_uri' => '', 'resource_class' => 'Foo', 'collection_operation_name' => 'post', 'output_class' => false];
+        $expectedContext = ['request_uri' => '', 'resource_class' => 'Foo', 'collection_operation_name' => 'post', 'output' => ['class' => null]];
         $serializerProphecy = $this->prophesize(SerializerInterface::class);
 
         $request = new Request([], [], ['_api_resource_class' => 'Foo', '_api_collection_operation_name' => 'get', '_api_output_class' => false]);
