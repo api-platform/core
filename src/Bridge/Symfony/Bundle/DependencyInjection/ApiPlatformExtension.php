@@ -25,6 +25,7 @@ use ApiPlatform\Core\DataPersister\DataPersisterInterface;
 use ApiPlatform\Core\DataProvider\CollectionDataProviderInterface;
 use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
 use ApiPlatform\Core\DataProvider\SubresourceDataProviderInterface;
+use ApiPlatform\Core\DataTransformer\DataTransformerInterface;
 use ApiPlatform\Core\Exception\RuntimeException;
 use Doctrine\Common\Annotations\Annotation;
 use Doctrine\ORM\Version;
@@ -150,6 +151,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $this->registerMercureConfiguration($container, $config, $loader, $useDoctrine);
         $this->registerMessengerConfiguration($config, $loader);
         $this->registerElasticsearchConfiguration($container, $config, $loader);
+        $this->registerDataTransformerConfiguration($container);
     }
 
     /**
@@ -602,5 +604,11 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
 
         $container->setParameter('api_platform.elasticsearch.hosts', $config['elasticsearch']['hosts']);
         $container->setParameter('api_platform.elasticsearch.mapping', $config['elasticsearch']['mapping']);
+    }
+
+    private function registerDataTransformerConfiguration(ContainerBuilder $container)
+    {
+        $container->registerForAutoconfiguration(DataTransformerInterface::class)
+            ->addTag('api_platform.data_transformer');
     }
 }
