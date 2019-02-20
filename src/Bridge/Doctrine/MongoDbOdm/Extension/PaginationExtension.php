@@ -64,12 +64,18 @@ final class PaginationExtension implements AggregationResultCollectionExtensionI
             throw new RuntimeException(sprintf('The repository for "%s" must be an instance of "%s".', $resourceClass, DocumentRepository::class));
         }
 
+        $resultsAggregationBuilder = $repository->createAggregationBuilder()->skip($offset);
+        if ($limit > 0) {
+            $resultsAggregationBuilder->limit($limit);
+        } else {
+            // Results have to be 0 but MongoDB does not support a limit equal to 0.
+            $resultsAggregationBuilder->match()->field(Paginator::LIMIT_ZERO_MARKER_FIELD)->equals(Paginator::LIMIT_ZERO_MARKER);
+        }
+
         $aggregationBuilder
             ->facet()
             ->field('results')->pipeline(
-                $repository->createAggregationBuilder()
-                    ->skip($offset)
-                    ->limit($limit)
+                $resultsAggregationBuilder
             )
             ->field('count')->pipeline(
                 $repository->createAggregationBuilder()
