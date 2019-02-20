@@ -54,6 +54,7 @@ use ApiPlatform\Core\Exception\InvalidArgumentException;
  *     @Attribute("paginationFetchJoinCollection", type="bool"),
  *     @Attribute("paginationItemsPerPage", type="int"),
  *     @Attribute("paginationPartial", type="bool"),
+ *     @Attribute("paginationViaCursor", type="array"),
  *     @Attribute("routePrefix", type="string"),
  *     @Attribute("shortName", type="string"),
  *     @Attribute("subresourceOperations", type="array"),
@@ -303,6 +304,13 @@ final class ApiResource
      * @var array
      */
     private $openapiContext;
+
+    /**
+     * @see https://github.com/Haehnchen/idea-php-annotation-plugin/issues/112
+     *
+     * @var array
+     */
+    private $paginationViaCursor;
 
     /**
      * @throws InvalidArgumentException
