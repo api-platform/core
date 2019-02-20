@@ -58,6 +58,7 @@ use ApiPlatform\Core\DataTransformer\DataTransformerInterface;
 use ApiPlatform\Core\Exception\FilterValidationException;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\Exception\RuntimeException;
+use ApiPlatform\Core\GraphQl\Type\Definition\TypeInterface as GraphQlTypeInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
@@ -79,6 +80,7 @@ use Symfony\Bundle\SecurityBundle\SecurityBundle;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Resource\DirectoryResource;
 use Symfony\Component\Config\Resource\ResourceInterface;
+use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
@@ -355,7 +357,8 @@ class ApiPlatformExtensionTest extends TestCase
         $containerBuilderProphecy->setDefinition('api_platform.security.resource_access_checker', Argument::type(Definition::class))->shouldBeCalled();
         $containerBuilderProphecy->setAlias(ResourceAccessCheckerInterface::class, 'api_platform.security.resource_access_checker')->shouldBeCalled();
         $containerBuilderProphecy->setDefinition('api_platform.security.listener.request.deny_access', Argument::type(Definition::class))->shouldBeCalled();
-        $containerBuilderProphecy->setDefinition('api_platform.security.expression_language', Argument::type(Definition::class))->shouldBeCalled();
+        $containerBuilderProphecy->setDefinition('api_platform.security.expression_language_provider', Argument::type(Definition::class))->shouldBeCalled();
+        $containerBuilderProphecy->setAlias('api_platform.security.expression_language', Argument::type(Alias::class))->shouldBeCalled();
         $containerBuilder = $containerBuilderProphecy->reveal();
 
         $this->extension->load(self::DEFAULT_CONFIG, $containerBuilder);
@@ -645,6 +648,10 @@ class ApiPlatformExtensionTest extends TestCase
         $containerBuilderProphecy->registerForAutoconfiguration(FilterInterface::class)
             ->willReturn($this->childDefinitionProphecy)->shouldBeCalledTimes(1);
         $this->childDefinitionProphecy->addTag('api_platform.filter')->shouldBeCalledTimes(1);
+
+        $containerBuilderProphecy->registerForAutoconfiguration(GraphQlTypeInterface::class)
+            ->willReturn($this->childDefinitionProphecy)->shouldBeCalledTimes(1);
+        $this->childDefinitionProphecy->addTag('api_platform.graphql.type')->shouldBeCalledTimes(1);
 
         $containerBuilderProphecy->getParameter('kernel.bundles')->willReturn([
             'DoctrineBundle' => DoctrineBundle::class,
@@ -964,6 +971,9 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.graphql.resolver.factory.item_mutation',
             'api_platform.graphql.resolver.item',
             'api_platform.graphql.resolver.resource_field',
+            'api_platform.graphql.iterable_type',
+            'api_platform.graphql.type_locator',
+            'api_platform.graphql.types_factory',
             'api_platform.graphql.normalizer.item',
             'api_platform.jsonld.normalizer.item',
             'api_platform.jsonld.encoder',

@@ -11,13 +11,16 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Exception;
+namespace ApiPlatform\Core\GraphQl\Type;
 
 /**
- * Identifier is not valid exception.
+ * Get the GraphQL types.
  *
- * @author Antoine Bluchet <soyuka@gmail.com>
+ * @experimental
+ *
+ * @author Alan Poulain <contact@alanpoulain.eu>
  */
-final class InvalidIdentifierException extends \Exception implements ExceptionInterface
+interface TypesFactoryInterface
 {
+    public function getTypes(): array;
 }

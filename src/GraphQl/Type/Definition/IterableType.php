@@ -31,7 +31,7 @@ use GraphQL\Utils\Utils;
  *
  * @author Alan Poulain <contact@alanpoulain.eu>
  */
-final class IterableType extends ScalarType
+final class IterableType extends ScalarType implements TypeInterface
 {
     public function __construct()
     {
@@ -39,6 +39,11 @@ final class IterableType extends ScalarType
         $this->description = 'The `Iterable` scalar type represents an array or a Traversable with any kind of data.';
 
         parent::__construct();
+    }
+
+    public function getName(): string
+    {
+        return $this->name;
     }
 
     /**

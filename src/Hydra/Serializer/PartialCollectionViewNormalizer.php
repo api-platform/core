@@ -15,7 +15,10 @@ namespace ApiPlatform\Core\Hydra\Serializer;
 
 use ApiPlatform\Core\DataProvider\PaginatorInterface;
 use ApiPlatform\Core\DataProvider\PartialPaginatorInterface;
+use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Util\IriHelper;
+use Symfony\Component\PropertyAccess\PropertyAccess;
+use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\Serializer\Normalizer\CacheableSupportsMethodInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerAwareInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
@@ -31,12 +34,16 @@ final class PartialCollectionViewNormalizer implements NormalizerInterface, Norm
     private $collectionNormalizer;
     private $pageParameterName;
     private $enabledParameterName;
+    private $resourceMetadataFactory;
+    private $propertyAccessor;
 
-    public function __construct(NormalizerInterface $collectionNormalizer, string $pageParameterName = 'page', string $enabledParameterName = 'pagination')
+    public function __construct(NormalizerInterface $collectionNormalizer, string $pageParameterName = 'page', string $enabledParameterName = 'pagination', ResourceMetadataFactoryInterface $resourceMetadataFactory = null, PropertyAccessorInterface $propertyAccessor = null)
     {
         $this->collectionNormalizer = $collectionNormalizer;
         $this->pageParameterName = $pageParameterName;
         $this->enabledParameterName = $enabledParameterName;
+        $this->resourceMetadataFactory = $resourceMetadataFactory;
+        $this->propertyAccessor = $propertyAccessor ?? PropertyAccess::createPropertyAccessor();
     }
 
     /**
@@ -69,12 +76,29 @@ final class PartialCollectionViewNormalizer implements NormalizerInterface, Norm
             return $data;
         }
 
+        $metadata = isset($context['resource_class']) && null !== $this->resourceMetadataFactory ? $this->resourceMetadataFactory->create($context['resource_class']) : null;
+        $isPaginatedWithCursor = $paginated && null !== $metadata && null !== $cursorPaginationAttribute = $metadata->getCollectionOperationAttribute($context['collection_operation_name'], 'pagination_via_cursor', null, true);
+
         $data['hydra:view'] = [
-            '@id' => IriHelper::createIri($parsed['parts'], $parsed['parameters'], $this->pageParameterName, $paginated ? $currentPage : null),
+            '@id' => IriHelper::createIri($parsed['parts'], $parsed['parameters'], $this->pageParameterName, $paginated && !$isPaginatedWithCursor ? $currentPage : null),
             '@type' => 'hydra:PartialCollectionView',
         ];
 
-        if ($paginated) {
+        if ($isPaginatedWithCursor) {
+            $objects = iterator_to_array($object);
+            $firstObject = current($objects);
+            $lastObject = end($objects);
+
+            $data['hydra:view']['@id'] = IriHelper::createIri($parsed['parts'], $parsed['parameters']);
+
+            if (false !== $lastObject) {
+                $data['hydra:view']['hydra:next'] = IriHelper::createIri($parsed['parts'], array_merge($parsed['parameters'], $this->cursorPaginationFields($cursorPaginationAttribute, 1, $lastObject)));
+            }
+
+            if (false !== $firstObject) {
+                $data['hydra:view']['hydra:previous'] = IriHelper::createIri($parsed['parts'], array_merge($parsed['parameters'], $this->cursorPaginationFields($cursorPaginationAttribute, -1, $firstObject)));
+            }
+        } elseif ($paginated) {
             if (null !== $lastPage) {
                 $data['hydra:view']['hydra:first'] = IriHelper::createIri($parsed['parts'], $parsed['parameters'], $this->pageParameterName, 1.);
                 $data['hydra:view']['hydra:last'] = IriHelper::createIri($parsed['parts'], $parsed['parameters'], $this->pageParameterName, $lastPage);
@@ -116,5 +140,23 @@ final class PartialCollectionViewNormalizer implements NormalizerInterface, Norm
         if ($this->collectionNormalizer instanceof NormalizerAwareInterface) {
             $this->collectionNormalizer->setNormalizer($normalizer);
         }
+    }
+
+    private function cursorPaginationFields(array $fields, int $direction, $object)
+    {
+        $paginationFilters = [];
+
+        foreach ($fields as $field) {
+            $forwardRangeOperator = 'desc' === strtolower($field['direction']) ? 'lt' : 'gt';
+            $backwardRangeOperator = 'gt' === $forwardRangeOperator ? 'lt' : 'gt';
+
+            $operator = $direction > 0 ? $forwardRangeOperator : $backwardRangeOperator;
+
+            $paginationFilters[$field['field']] = [
+                $operator => (string) $this->propertyAccessor->getValue($object, $field['field']),
+            ];
+        }
+
+        return $paginationFilters;
     }
 }

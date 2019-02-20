@@ -11,13 +11,16 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Exception;
+namespace ApiPlatform\Core\GraphQl\Type\Definition;
+
+use GraphQL\Type\Definition\LeafType;
 
 /**
- * Identifier is not valid exception.
+ * @experimental
  *
- * @author Antoine Bluchet <soyuka@gmail.com>
+ * @author Alan Poulain <contact@alanpoulain.eu>
  */
-final class InvalidIdentifierException extends \Exception implements ExceptionInterface
+interface TypeInterface extends LeafType
 {
+    public function getName(): string;
 }

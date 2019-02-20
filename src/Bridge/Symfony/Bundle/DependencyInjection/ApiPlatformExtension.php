@@ -27,6 +27,7 @@ use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
 use ApiPlatform\Core\DataProvider\SubresourceDataProviderInterface;
 use ApiPlatform\Core\DataTransformer\DataTransformerInterface;
 use ApiPlatform\Core\Exception\RuntimeException;
+use ApiPlatform\Core\GraphQl\Type\Definition\TypeInterface as GraphQlTypeInterface;
 use Doctrine\Common\Annotations\Annotation;
 use Doctrine\ORM\Version;
 use Elasticsearch\Client;
@@ -39,7 +40,6 @@ use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
-use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
@@ -113,6 +113,8 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             ->addTag('api_platform.subresource_data_provider');
         $container->registerForAutoconfiguration(FilterInterface::class)
             ->addTag('api_platform.filter');
+        $container->registerForAutoconfiguration(GraphQlTypeInterface::class)
+            ->addTag('api_platform.graphql.type');
 
         if (interface_exists(ValidatorInterface::class)) {
             $loader->load('validator.xml');
@@ -120,9 +122,6 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
 
         $bundles = $container->getParameter('kernel.bundles');
         if (isset($bundles['SecurityBundle'])) {
-            if (class_exists(ExpressionLanguage::class)) {
-                $loader->load('security_expression_language.xml');
-            }
             $loader->load('security.xml');
         }
 
@@ -136,11 +135,11 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $this->registerOAuthConfiguration($container, $config);
         $this->registerApiKeysConfiguration($container, $config);
         $this->registerSwaggerConfiguration($container, $config, $loader);
-        $this->registerJsonApiConfiguration($formats, $loader);
         $this->registerJsonLdConfiguration($container, $formats, $loader, $config['enable_docs']);
+        $this->registerGraphqlConfiguration($container, $config, $loader);
         $this->registerJsonHalConfiguration($formats, $loader);
         $this->registerJsonProblemConfiguration($errorFormats, $loader);
-        $this->registerGraphqlConfiguration($container, $config, $loader);
+        $this->registerJsonApiConfiguration($formats, $loader);
         $this->registerBundlesConfiguration($bundles, $config, $loader);
         $this->registerCacheConfiguration($container);
         $this->registerDoctrineConfiguration($container, $config, $loader, $useDoctrine);

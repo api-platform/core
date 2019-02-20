@@ -16,7 +16,6 @@ namespace ApiPlatform\Core\GraphQl\Type;
 use ApiPlatform\Core\Exception\ResourceClassNotFoundException;
 use ApiPlatform\Core\GraphQl\Resolver\Factory\ResolverFactoryInterface;
 use ApiPlatform\Core\GraphQl\Serializer\ItemNormalizer;
-use ApiPlatform\Core\GraphQl\Type\Definition\IterableType;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
@@ -56,10 +55,11 @@ final class SchemaBuilder implements SchemaBuilderInterface
     private $itemMutationResolverFactory;
     private $defaultFieldResolver;
     private $filterLocator;
+    private $typesFactory;
     private $paginationEnabled;
     private $graphqlTypes = [];
 
-    public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, ResourceMetadataFactoryInterface $resourceMetadataFactory, ResolverFactoryInterface $collectionResolverFactory, ResolverFactoryInterface $itemMutationResolverFactory, callable $itemResolver, callable $defaultFieldResolver, ContainerInterface $filterLocator = null, bool $paginationEnabled = true)
+    public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, ResourceMetadataFactoryInterface $resourceMetadataFactory, ResolverFactoryInterface $collectionResolverFactory, ResolverFactoryInterface $itemMutationResolverFactory, callable $itemResolver, callable $defaultFieldResolver, TypesFactoryInterface $typesFactory, ContainerInterface $filterLocator = null, bool $paginationEnabled = true)
     {
         $this->propertyNameCollectionFactory = $propertyNameCollectionFactory;
         $this->propertyMetadataFactory = $propertyMetadataFactory;
@@ -69,13 +69,15 @@ final class SchemaBuilder implements SchemaBuilderInterface
         $this->itemResolver = $itemResolver;
         $this->itemMutationResolverFactory = $itemMutationResolverFactory;
         $this->defaultFieldResolver = $defaultFieldResolver;
+        $this->typesFactory = $typesFactory;
         $this->filterLocator = $filterLocator;
         $this->paginationEnabled = $paginationEnabled;
     }
 
     public function getSchema(): Schema
     {
-        $this->graphqlTypes['Iterable'] = new IterableType();
+        $this->graphqlTypes += $this->typesFactory->getTypes();
+
         $queryFields = ['node' => $this->getNodeQueryField()];
         $mutationFields = [];
 

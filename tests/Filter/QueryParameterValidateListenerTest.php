@@ -48,7 +48,7 @@ class QueryParameterValidateListenerTest extends TestCase
     }
 
     /**
-     * If the tested filter is non-existant, then nothing should append.
+     * If the tested filter is non-existent, then nothing should append.
      */
     public function testOnKernelRequestWithWrongFilter()
     {
@@ -108,7 +108,7 @@ class QueryParameterValidateListenerTest extends TestCase
     }
 
     /**
-     * if the required parameter is set, no exception should be throwned.
+     * if the required parameter is set, no exception should be thrown.
      */
     public function testOnKernelRequestWithRequiredFilter()
     {
