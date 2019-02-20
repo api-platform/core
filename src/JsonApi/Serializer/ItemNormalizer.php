@@ -68,8 +68,8 @@ final class ItemNormalizer extends AbstractItemNormalizer
         }
 
         $outputClass = $this->getOutputClass($this->getObjectClass($object), $context);
-        if (null !== $outputClass && null !== $this->dataTransformer && $this->dataTransformer->supportsTransformation($object, $context)) {
-            $object = $this->dataTransformer->transform($object, $context);
+        if (null !== $outputClass && null !== $this->dataTransformer && $this->dataTransformer->supportsTransformation($object, $outputClass, $context)) {
+            $object = $this->dataTransformer->transform($object, $outputClass, $context);
         }
 
         // Get and populate attributes data
