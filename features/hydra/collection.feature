@@ -396,7 +396,6 @@ Feature: Collections support
     }
     """
 
-  @!mongodb
   @createSchema
   Scenario: Allow passing 0 to `itemsPerPage`
     When I send a "GET" request to "/dummies?itemsPerPage=0"

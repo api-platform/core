@@ -74,6 +74,15 @@ class PaginatorTest extends TestCase
         $this->getPaginatorWithMissingStage(true, true, true, true);
     }
 
+    public function testInitializeWithLimitZeroStageApplied()
+    {
+        $paginator = $this->getPaginator(0, 5, 0, true);
+
+        $this->assertEquals(1, $paginator->getCurrentPage());
+        $this->assertEquals(1, $paginator->getLastPage());
+        $this->assertEquals(0, $paginator->getItemsPerPage());
+    }
+
     public function testInitializeWithNoCount()
     {
         $paginator = $this->getPaginatorWithNoCount();
@@ -90,7 +99,7 @@ class PaginatorTest extends TestCase
         $this->assertSame($paginator->getIterator(), $paginator->getIterator(), 'Iterator should be cached');
     }
 
-    private function getPaginator($firstResult = 1, $maxResults = 15, $totalItems = 42)
+    private function getPaginator($firstResult = 1, $maxResults = 15, $totalItems = 42, $limitZero = false)
     {
         $iterator = $this->prophesize(Iterator::class);
         $pipeline = [
@@ -98,7 +107,7 @@ class PaginatorTest extends TestCase
                 '$facet' => [
                     'results' => [
                         ['$skip' => $firstResult],
-                        ['$limit' => $maxResults],
+                        $limitZero ? ['$match' => [Paginator::LIMIT_ZERO_MARKER_FIELD => Paginator::LIMIT_ZERO_MARKER]] : ['$limit' => $maxResults],
                     ],
                     'count' => [
                         ['$count' => 'count'],
