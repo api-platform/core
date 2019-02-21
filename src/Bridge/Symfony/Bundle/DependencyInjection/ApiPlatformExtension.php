@@ -450,6 +450,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $container->register('api_platform.cache.route_name_resolver', ArrayAdapter::class);
         $container->register('api_platform.cache.identifiers_extractor', ArrayAdapter::class);
         $container->register('api_platform.cache.subresource_operation_factory', ArrayAdapter::class);
+        $container->register('api_platform.elasticsearch.cache.metadata.document', ArrayAdapter::class);
     }
 
     /**
