@@ -18,6 +18,7 @@ use ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\Compiler\Annotati
 use ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\Compiler\DataProviderPass;
 use ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\Compiler\ElasticsearchClientPass;
 use ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\Compiler\FilterPass;
+use ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\Compiler\GraphQlQueryResolverPass;
 use ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\Compiler\GraphQlTypePass;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
@@ -36,6 +37,7 @@ class ApiPlatformBundleTest extends TestCase
         $containerProphecy->addCompilerPass(Argument::type(FilterPass::class))->shouldBeCalled();
         $containerProphecy->addCompilerPass(Argument::type(ElasticsearchClientPass::class))->shouldBeCalled();
         $containerProphecy->addCompilerPass(Argument::type(GraphQlTypePass::class))->shouldBeCalled();
+        $containerProphecy->addCompilerPass(Argument::type(GraphQlQueryResolverPass::class))->shouldBeCalled();
 
         $bundle = new ApiPlatformBundle();
         $bundle->build($containerProphecy->reveal());
