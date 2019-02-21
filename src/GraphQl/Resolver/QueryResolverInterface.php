@@ -17,6 +17,7 @@ use GraphQL\Type\Definition\ResolveInfo;
 
 /**
  * A function retrieving an item to resolve a GraphQL query.
+ * Should return the normalized item or collection.
  *
  * @experimental
  *
@@ -24,12 +25,5 @@ use GraphQL\Type\Definition\ResolveInfo;
  */
 interface QueryResolverInterface
 {
-    /**
-     * @param $source
-     * @param $args
-     * @param $context
-     * @param ResolveInfo $info
-     * @return array|string|int|float|bool|null
-     */
     public function __invoke($source, $args, $context, ResolveInfo $info);
 }

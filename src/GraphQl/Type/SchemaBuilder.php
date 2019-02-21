@@ -93,7 +93,7 @@ final class SchemaBuilder implements SchemaBuilderInterface
                     continue;
                 }
 
-                if($item = $resourceMetadata->getGraphqlAttribute($operationName, 'item_query')) {
+                if ($item = $resourceMetadata->getGraphqlAttribute($operationName, 'item_query')) {
                     $value['resolve'] = $this->queryResolverLocator->get($item);
                     unset($value['item_query']);
 
@@ -101,7 +101,7 @@ final class SchemaBuilder implements SchemaBuilderInterface
                     continue;
                 }
 
-                if($collection = $resourceMetadata->getGraphqlAttribute($operationName, 'collection_query')) {
+                if ($collection = $resourceMetadata->getGraphqlAttribute($operationName, 'collection_query')) {
                     $value['resolve'] = $this->queryResolverLocator->get($collection);
                     unset($value['collection_query']);
 
@@ -178,17 +178,21 @@ final class SchemaBuilder implements SchemaBuilderInterface
     {
         $queryFields = [];
         $shortName = $resourceMetadata->getShortName();
-        $fieldName = lcfirst($operationName === 'query' ? $shortName : $operationName.$shortName);
+        $fieldName = lcfirst('query' === $operationName ? $shortName : $operationName.$shortName);
 
         $deprecationReason = $resourceMetadata->getGraphqlAttribute($operationName, 'deprecation_reason', '', true);
 
         if ($item && $fieldConfiguration = $this->getResourceFieldConfiguration($resourceClass, $resourceMetadata, null, $deprecationReason, new Type(Type::BUILTIN_TYPE_OBJECT, true, $resourceClass), $resourceClass)) {
-            if(is_array($item)) $fieldConfiguration = array_merge($fieldConfiguration, $item);
+            if (\is_array($item)) {
+                $fieldConfiguration = array_merge($fieldConfiguration, $item);
+            }
             $queryFields[$fieldName] = $fieldConfiguration;
         }
 
         if ($collection && $fieldConfiguration = $this->getResourceFieldConfiguration($resourceClass, $resourceMetadata, null, $deprecationReason, new Type(Type::BUILTIN_TYPE_OBJECT, false, null, true, null, new Type(Type::BUILTIN_TYPE_OBJECT, false, $resourceClass)), $resourceClass)) {
-            if(is_array($collection)) $fieldConfiguration = array_merge($fieldConfiguration, $collection);
+            if (\is_array($collection)) {
+                $fieldConfiguration = array_merge($fieldConfiguration, $collection);
+            }
             $queryFields[Inflector::pluralize($fieldName)] = $fieldConfiguration;
         }
 
