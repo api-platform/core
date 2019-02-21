@@ -54,13 +54,13 @@ final class SchemaBuilder implements SchemaBuilderInterface
     private $itemResolver;
     private $itemMutationResolverFactory;
     private $defaultFieldResolver;
-    private $filterLocator;
     private $queryResolverLocator;
+    private $filterLocator;
     private $typesFactory;
     private $paginationEnabled;
     private $graphqlTypes = [];
 
-    public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, ResourceMetadataFactoryInterface $resourceMetadataFactory, ResolverFactoryInterface $collectionResolverFactory, ResolverFactoryInterface $itemMutationResolverFactory, callable $itemResolver, callable $defaultFieldResolver, TypesFactoryInterface $typesFactory, ContainerInterface $filterLocator = null, ContainerInterface $queryResolverLocator = null, bool $paginationEnabled = true)
+    public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, ResourceMetadataFactoryInterface $resourceMetadataFactory, ResolverFactoryInterface $collectionResolverFactory, ResolverFactoryInterface $itemMutationResolverFactory, callable $itemResolver, callable $defaultFieldResolver, ContainerInterface $queryResolverLocator, TypesFactoryInterface $typesFactory, ContainerInterface $filterLocator = null, bool $paginationEnabled = true)
     {
         $this->propertyNameCollectionFactory = $propertyNameCollectionFactory;
         $this->propertyMetadataFactory = $propertyMetadataFactory;
@@ -70,9 +70,9 @@ final class SchemaBuilder implements SchemaBuilderInterface
         $this->itemResolver = $itemResolver;
         $this->itemMutationResolverFactory = $itemMutationResolverFactory;
         $this->defaultFieldResolver = $defaultFieldResolver;
+        $this->queryResolverLocator = $queryResolverLocator;
         $this->typesFactory = $typesFactory;
         $this->filterLocator = $filterLocator;
-        $this->queryResolverLocator = $queryResolverLocator;
         $this->paginationEnabled = $paginationEnabled;
     }
 
@@ -88,21 +88,21 @@ final class SchemaBuilder implements SchemaBuilderInterface
             $graphqlConfiguration = $resourceMetadata->getGraphql() ?? [];
             foreach ($graphqlConfiguration as $operationName => $value) {
                 if ('query' === $operationName) {
-                    $queryFields += $this->getQueryFields($resourceClass, $resourceMetadata, $operationName, ['args' => ['id' => ['type' => GraphQLType::id()]]], true);
+                    $queryFields += $this->getQueryFields($resourceClass, $resourceMetadata, $operationName, ['args' => ['id' => ['type' => GraphQLType::id()]]], []);
 
                     continue;
                 }
 
-                if ($item = $resourceMetadata->getGraphqlAttribute($operationName, 'item_query')) {
-                    $value['resolve'] = $this->queryResolverLocator->get($item);
+                if ($itemQuery = $resourceMetadata->getGraphqlAttribute($operationName, 'item_query')) {
+                    $value['resolve'] = $this->queryResolverLocator->get($itemQuery);
                     unset($value['item_query']);
 
                     $queryFields += $this->getQueryFields($resourceClass, $resourceMetadata, $operationName, $value, false);
                     continue;
                 }
 
-                if ($collection = $resourceMetadata->getGraphqlAttribute($operationName, 'collection_query')) {
-                    $value['resolve'] = $this->queryResolverLocator->get($collection);
+                if ($collectionQuery = $resourceMetadata->getGraphqlAttribute($operationName, 'collection_query')) {
+                    $value['resolve'] = $this->queryResolverLocator->get($collectionQuery);
                     unset($value['collection_query']);
 
                     $queryFields += $this->getQueryFields($resourceClass, $resourceMetadata, $operationName, false, $value);
@@ -173,8 +173,11 @@ final class SchemaBuilder implements SchemaBuilderInterface
 
     /**
      * Gets the query fields of the schema.
+     *
+     * @param array|bool $itemConfiguration false if not configured
+     * @param array|bool $collectionConfiguration false if not configured
      */
-    private function getQueryFields(string $resourceClass, ResourceMetadata $resourceMetadata, string $operationName = 'query', $item, $collection): array
+    private function getQueryFields(string $resourceClass, ResourceMetadata $resourceMetadata, string $operationName, $itemConfiguration, $collectionConfiguration): array
     {
         $queryFields = [];
         $shortName = $resourceMetadata->getShortName();
@@ -182,18 +185,12 @@ final class SchemaBuilder implements SchemaBuilderInterface
 
         $deprecationReason = $resourceMetadata->getGraphqlAttribute($operationName, 'deprecation_reason', '', true);
 
-        if ($item && $fieldConfiguration = $this->getResourceFieldConfiguration($resourceClass, $resourceMetadata, null, $deprecationReason, new Type(Type::BUILTIN_TYPE_OBJECT, true, $resourceClass), $resourceClass)) {
-            if (\is_array($item)) {
-                $fieldConfiguration = array_merge($fieldConfiguration, $item);
-            }
-            $queryFields[$fieldName] = $fieldConfiguration;
+        if (false !== $itemConfiguration && $fieldConfiguration = $this->getResourceFieldConfiguration($resourceClass, $resourceMetadata, null, $deprecationReason, new Type(Type::BUILTIN_TYPE_OBJECT, true, $resourceClass), $resourceClass)) {
+            $queryFields[$fieldName] = array_merge($fieldConfiguration, $itemConfiguration);;
         }
 
-        if ($collection && $fieldConfiguration = $this->getResourceFieldConfiguration($resourceClass, $resourceMetadata, null, $deprecationReason, new Type(Type::BUILTIN_TYPE_OBJECT, false, null, true, null, new Type(Type::BUILTIN_TYPE_OBJECT, false, $resourceClass)), $resourceClass)) {
-            if (\is_array($collection)) {
-                $fieldConfiguration = array_merge($fieldConfiguration, $collection);
-            }
-            $queryFields[Inflector::pluralize($fieldName)] = $fieldConfiguration;
+        if (false !== $collectionConfiguration && $fieldConfiguration = $this->getResourceFieldConfiguration($resourceClass, $resourceMetadata, null, $deprecationReason, new Type(Type::BUILTIN_TYPE_OBJECT, false, null, true, null, new Type(Type::BUILTIN_TYPE_OBJECT, false, $resourceClass)), $resourceClass)) {
+            $queryFields[Inflector::pluralize($fieldName)] = array_merge($fieldConfiguration, $collectionConfiguration);
         }
 
         return $queryFields;

@@ -34,11 +34,7 @@ final class GraphQlQueryResolverPass implements CompilerPassInterface
         $resolvers = [];
         foreach ($container->findTaggedServiceIds('api_platform.graphql.query_resolver', true) as $serviceId => $tags) {
             foreach ($tags as $tag) {
-                if (!isset($tag['id'])) {
-                    $tag['id'] = $serviceId;
-                }
-
-                $resolvers[$tag['id']] = new Reference($serviceId);
+                $resolvers[$tag['id'] ?? $serviceId] = new Reference($serviceId);
             }
         }
 

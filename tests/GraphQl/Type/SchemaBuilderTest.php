@@ -309,8 +309,8 @@ class SchemaBuilderTest extends TestCase
             },
             function () {
             },
-            $typesFactoryProphecy->reveal(),
             null,
+            $typesFactoryProphecy->reveal(),
             null,
             $paginationEnabled
         );

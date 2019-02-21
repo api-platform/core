@@ -25,5 +25,8 @@ use GraphQL\Type\Definition\ResolveInfo;
  */
 interface QueryResolverInterface
 {
+    /**
+     * @return mixed The normalized query result (item or collection)
+     */
     public function __invoke($source, $args, $context, ResolveInfo $info);
 }

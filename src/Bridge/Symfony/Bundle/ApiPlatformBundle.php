@@ -39,8 +39,8 @@ final class ApiPlatformBundle extends Bundle
         $container->addCompilerPass(new DataProviderPass());
         $container->addCompilerPass(new AnnotationFilterPass());
         $container->addCompilerPass(new FilterPass());
-        $container->addCompilerPass(new GraphQlQueryResolverPass());
         $container->addCompilerPass(new ElasticsearchClientPass());
         $container->addCompilerPass(new GraphQlTypePass());
+        $container->addCompilerPass(new GraphQlQueryResolverPass());
     }
 }
