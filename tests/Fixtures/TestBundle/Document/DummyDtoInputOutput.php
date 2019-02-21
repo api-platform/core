@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Document;
 
-use ApiPlatform\Core\Annotation\ApiProperty;
 use ApiPlatform\Core\Annotation\ApiResource;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Dto\InputDto;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Dto\OutputDto;
@@ -31,10 +30,9 @@ class DummyDtoInputOutput
 {
     /**
      * @var int The id
-     * @ApiProperty(identifier=true)
-     * @ODM\Id(strategy="INCREMENT", type="integer")
+     * @ODM\Id(strategy="INCREMENT", type="integer", nullable=true)
      */
-    public $id;
+    private $id;
 
     /**
      * @var int The id
@@ -47,4 +45,9 @@ class DummyDtoInputOutput
      * @ODM\Field(type="float")
      */
     public $num;
+
+    public function getId()
+    {
+        return $this->id;
+    }
 }

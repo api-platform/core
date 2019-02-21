@@ -100,7 +100,7 @@ class ItemNormalizerTest extends TestCase
             null,
             false,
             null,
-            null,
+            [],
             null,
             true
         );
@@ -139,7 +139,7 @@ class ItemNormalizerTest extends TestCase
             null,
             false,
             null,
-            null,
+            [],
             null,
             true
         );

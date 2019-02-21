@@ -52,10 +52,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
             $context['cache_key'] = $this->getHalCacheKey($format, $context);
         }
 
-        $outputClass = $this->getOutputClass($this->getObjectClass($object), $context);
-        if (null !== $outputClass && null !== $this->dataTransformer && $this->dataTransformer->supportsTransformation($object, $outputClass, $context)) {
-            $object = $this->dataTransformer->transform($object, $outputClass, $context);
-        }
+        $object = $this->transformOutput($object, $context);
 
         try {
             $resourceClass = $this->resourceClassResolver->getResourceClass($object, $context['resource_class'] ?? null, true);
