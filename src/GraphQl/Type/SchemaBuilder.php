@@ -93,17 +93,17 @@ final class SchemaBuilder implements SchemaBuilderInterface
                     continue;
                 }
 
-                if($item = $resourceMetadata->getGraphqlAttribute($operationName, 'item')) {
+                if($item = $resourceMetadata->getGraphqlAttribute($operationName, 'item_query')) {
                     $value['resolve'] = $this->queryResolverLocator->get($item);
-                    unset($value['item']);
+                    unset($value['item_query']);
 
                     $queryFields += $this->getQueryFields($resourceClass, $resourceMetadata, $operationName, $value, false);
                     continue;
                 }
 
-                if($collection = $resourceMetadata->getGraphqlAttribute($operationName, 'collection')) {
+                if($collection = $resourceMetadata->getGraphqlAttribute($operationName, 'collection_query')) {
                     $value['resolve'] = $this->queryResolverLocator->get($collection);
-                    unset($value['collection']);
+                    unset($value['collection_query']);
 
                     $queryFields += $this->getQueryFields($resourceClass, $resourceMetadata, $operationName, false, $value);
                     continue;
