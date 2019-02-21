@@ -111,7 +111,7 @@ final class PaginationExtension implements ContextAwareQueryResultCollectionExte
      */
     public function applyToCollection(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, string $operationName = null, array $context = [])
     {
-        if (null === $pagination = $this->getPagination($resourceClass, $operationName, $context)) {
+        if (null === $pagination = $this->getPagination($queryBuilder, $resourceClass, $operationName, $context)) {
             return;
         }
 
@@ -167,7 +167,7 @@ final class PaginationExtension implements ContextAwareQueryResultCollectionExte
     /**
      * @throws InvalidArgumentException
      */
-    private function getPagination(string $resourceClass, ?string $operationName, array $context): ?array
+    private function getPagination(QueryBuilder $queryBuilder, string $resourceClass, ?string $operationName, array $context): ?array
     {
         $request = null;
         if (null !== $this->requestStack && null === $request = $this->requestStack->getCurrentRequest()) {
@@ -178,6 +178,8 @@ final class PaginationExtension implements ContextAwareQueryResultCollectionExte
             if (!$this->pagination->isEnabled($resourceClass, $operationName, $context)) {
                 return null;
             }
+
+            $context = $this->addCountToContext($queryBuilder, $context);
 
             return \array_slice($this->pagination->getPagination($resourceClass, $operationName, $context), 1);
         }
@@ -190,7 +192,6 @@ final class PaginationExtension implements ContextAwareQueryResultCollectionExte
         $itemsPerPage = $resourceMetadata->getCollectionOperationAttribute($operationName, 'pagination_items_per_page', $this->itemsPerPage, true);
         if ($request->attributes->get('_graphql')) {
             $collectionArgs = $request->attributes->get('_graphql_collections_args', []);
-            $itemsPerPage = $collectionArgs[$resourceClass]['last'] ?? $itemsPerPage;
             $itemsPerPage = $collectionArgs[$resourceClass]['first'] ?? $itemsPerPage;
         }
 
@@ -221,19 +222,6 @@ final class PaginationExtension implements ContextAwareQueryResultCollectionExte
                 $after = base64_decode($collectionArgs[$resourceClass]['after'], true);
                 $firstResult = (int) $after;
                 $firstResult = false === $after ? $firstResult : ++$firstResult;
-            }
-            if (isset($collectionArgs[$resourceClass]['last'])) {
-                $firstResult = \count($queryBuilder->getQuery()->getArrayResult()) - $collectionArgs[$resourceClass]['last'];
-                $firstResult = 0 > $firstResult ? 0 : $firstResult;
-            }
-            if (isset($collectionArgs[$resourceClass]['before'])) {
-                $before = \base64_decode($collectionArgs[$resourceClass]['before'], true);
-                $firstResult = (int) $before - $itemsPerPage;
-                $firstResult = (false === $before) ? 0 : $firstResult;
-                if (0 > $firstResult) {
-                    $firstResult = 0;
-                    $itemsPerPage = (int) $before;
-                }
             }
         }
 
@@ -279,6 +267,19 @@ final class PaginationExtension implements ContextAwareQueryResultCollectionExte
         }
 
         return $request->query->get($parameterName, $default);
+    }
+
+    private function addCountToContext(QueryBuilder $queryBuilder, array $context): array
+    {
+        if (!($context['graphql'] ?? false)) {
+            return $context;
+        }
+
+        if (isset($context['filters']['last']) && !isset($context['filters']['before'])) {
+            $context['count'] = (new DoctrineOrmPaginator($queryBuilder))->count();
+        }
+
+        return $context;
     }
 
     /**
