@@ -16,7 +16,7 @@ namespace ApiPlatform\Core\Bridge\Elasticsearch\Metadata\Document;
 /**
  * Document metadata.
  *
- * @see https://www.elastic.co/guide/en/elasticsearch/guide/current/_document_metadata.html
+ * @see https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-fields.html
  *
  * @experimental
  *

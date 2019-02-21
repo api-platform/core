@@ -14,17 +14,20 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection;
 
 use ApiPlatform\Core\Api\FilterInterface;
+use ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Extension\AggregationCollectionExtensionInterface;
+use ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Extension\AggregationItemExtensionInterface;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\EagerLoadingExtension;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\FilterEagerLoadingExtension;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\QueryCollectionExtensionInterface as DoctrineQueryCollectionExtensionInterface;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\QueryItemExtensionInterface;
-use ApiPlatform\Core\Bridge\Elasticsearch\DataProvider\Extension\FullBodySearchCollectionExtensionInterface as ElasticSearchQueryCollectionExtensionInterface;
+use ApiPlatform\Core\Bridge\Elasticsearch\DataProvider\Extension\RequestBodySearchCollectionExtensionInterface;
 use ApiPlatform\Core\DataPersister\DataPersisterInterface;
 use ApiPlatform\Core\DataProvider\CollectionDataProviderInterface;
 use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
 use ApiPlatform\Core\DataProvider\SubresourceDataProviderInterface;
 use ApiPlatform\Core\Exception\RuntimeException;
 use ApiPlatform\Core\GraphQl\Resolver\QueryResolverInterface;
+use ApiPlatform\Core\GraphQl\Type\Definition\TypeInterface as GraphQlTypeInterface;
 use Doctrine\Common\Annotations\Annotation;
 use Doctrine\ORM\Version;
 use Elasticsearch\Client;
@@ -37,10 +40,8 @@ use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
-use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
-use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\Yaml\Yaml;
 
@@ -114,6 +115,8 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             ->addTag('api_platform.filter');
         $container->registerForAutoconfiguration(QueryResolverInterface::class)
             ->addTag('api_platform.graphql.query_resolver');
+        $container->registerForAutoconfiguration(GraphQlTypeInterface::class)
+            ->addTag('api_platform.graphql.type');
 
         if (interface_exists(ValidatorInterface::class)) {
             $loader->load('validator.xml');
@@ -121,9 +124,6 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
 
         $bundles = $container->getParameter('kernel.bundles');
         if (isset($bundles['SecurityBundle'])) {
-            if (class_exists(ExpressionLanguage::class)) {
-                $loader->load('security_expression_language.xml');
-            }
             $loader->load('security.xml');
         }
 
@@ -131,29 +131,27 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             $loader->load('ramsey_uuid.xml');
         }
 
-        $useDoctrine = isset($bundles['DoctrineBundle']) && class_exists(Version::class);
+        $useDoctrine = $config['doctrine']['enabled'] && isset($bundles['DoctrineBundle']) && class_exists(Version::class);
 
         $this->registerMetadataConfiguration($container, $config, $loader);
         $this->registerOAuthConfiguration($container, $config);
         $this->registerApiKeysConfiguration($container, $config);
         $this->registerSwaggerConfiguration($container, $config, $loader);
-        $this->registerJsonApiConfiguration($formats, $loader);
         $this->registerJsonLdConfiguration($container, $formats, $loader, $config['enable_docs']);
+        $this->registerGraphqlConfiguration($container, $config, $loader);
         $this->registerJsonHalConfiguration($formats, $loader);
         $this->registerJsonProblemConfiguration($errorFormats, $loader);
-        $this->registerGraphqlConfiguration($container, $config, $loader);
-        $this->registerBundlesConfiguration($bundles, $config, $loader, $useDoctrine);
+        $this->registerJsonApiConfiguration($formats, $loader);
+        $this->registerBundlesConfiguration($bundles, $config, $loader);
         $this->registerCacheConfiguration($container);
-        $this->registerDoctrineExtensionConfiguration($container, $config, $useDoctrine);
+        $this->registerDoctrineConfiguration($container, $config, $loader, $useDoctrine);
+        $this->registerDoctrineMongoDbOdmConfiguration($container, $config, $loader);
         $this->registerHttpCacheConfiguration($container, $config, $loader, $useDoctrine);
         $this->registerValidatorConfiguration($container, $config);
         $this->registerDataCollectorConfiguration($container, $config, $loader);
         $this->registerMercureConfiguration($container, $config, $loader, $useDoctrine);
+        $this->registerMessengerConfiguration($config, $loader);
         $this->registerElasticsearchConfiguration($container, $config, $loader);
-
-        if (interface_exists(MessageBusInterface::class)) {
-            $loader->load('messenger.xml');
-        }
     }
 
     /**
@@ -211,7 +209,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $loader->load('metadata/metadata.xml');
         $loader->load('metadata/xml.xml');
 
-        list($xmlResources, $yamlResources) = $this->getResourcesToWatch($container, $config['mapping']['paths']);
+        list($xmlResources, $yamlResources) = $this->getResourcesToWatch($container, $config);
 
         if (!empty($config['resource_class_directories'])) {
             $container->setParameter('api_platform.resource_class_directories', array_merge(
@@ -235,7 +233,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         }
     }
 
-    private function getBundlesResourcesPaths(ContainerBuilder $container): array
+    private function getBundlesResourcesPaths(ContainerBuilder $container, array $config): array
     {
         $bundlesResourcesPaths = [];
 
@@ -245,7 +243,12 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             foreach (['.yaml', '.yml', '.xml', ''] as $extension) {
                 $paths[] = "$dirname/Resources/config/api_resources$extension";
             }
-            $paths[] = "$dirname/Entity";
+            if ($config['doctrine']['enabled']) {
+                $paths[] = "$dirname/Entity";
+            }
+            if ($config['doctrine_mongodb_odm']['enabled']) {
+                $paths[] = "$dirname/Document";
+            }
 
             foreach ($paths as $path) {
                 if ($container->fileExists($path, false)) {
@@ -257,9 +260,9 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         return $bundlesResourcesPaths;
     }
 
-    private function getResourcesToWatch(ContainerBuilder $container, array $resourcesPaths): array
+    private function getResourcesToWatch(ContainerBuilder $container, array $config): array
     {
-        $paths = array_unique(array_merge($resourcesPaths, $this->getBundlesResourcesPaths($container)));
+        $paths = array_unique(array_merge($config['mapping']['paths'], $this->getBundlesResourcesPaths($container, $config)));
 
         // Flex structure (only if nothing specified)
         $projectDir = $container->getParameter('kernel.project_dir');
@@ -419,13 +422,8 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
      *
      * @param string[] $bundles
      */
-    private function registerBundlesConfiguration(array $bundles, array $config, XmlFileLoader $loader, bool $useDoctrine)
+    private function registerBundlesConfiguration(array $bundles, array $config, XmlFileLoader $loader)
     {
-        // Doctrine ORM support
-        if ($useDoctrine) {
-            $loader->load('doctrine_orm.xml');
-        }
-
         // FOSUser support
         if (isset($bundles['FOSUserBundle']) && $config['enable_fos_user']) {
             $loader->load('fos_user.xml');
@@ -455,9 +453,9 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
     }
 
     /**
-     * Manipulate doctrine extension services according to the configuration.
+     * Manipulate doctrine services according to the configuration.
      */
-    private function registerDoctrineExtensionConfiguration(ContainerBuilder $container, array $config, bool $useDoctrine)
+    private function registerDoctrineConfiguration(ContainerBuilder $container, array $config, XmlFileLoader $loader, bool $useDoctrine)
     {
         if (!$useDoctrine) {
             return;
@@ -468,6 +466,8 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $container->registerForAutoconfiguration(DoctrineQueryCollectionExtensionInterface::class)
             ->addTag('api_platform.doctrine.orm.query_extension.collection');
 
+        $loader->load('doctrine_orm.xml');
+
         if ($config['eager_loading']['enabled']) {
             return;
         }
@@ -476,6 +476,23 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $container->removeDefinition('api_platform.doctrine.orm.query_extension.eager_loading');
         $container->removeAlias(FilterEagerLoadingExtension::class);
         $container->removeDefinition('api_platform.doctrine.orm.query_extension.filter_eager_loading');
+    }
+
+    /**
+     * Register the Doctrine MongoDB ODM configuration.
+     */
+    private function registerDoctrineMongoDbOdmConfiguration(ContainerBuilder $container, array $config, XmlFileLoader $loader)
+    {
+        if (!$config['doctrine_mongodb_odm']['enabled']) {
+            return;
+        }
+
+        $container->registerForAutoconfiguration(AggregationItemExtensionInterface::class)
+            ->addTag('api_platform.doctrine.mongodb.aggregation_extension.item');
+        $container->registerForAutoconfiguration(AggregationCollectionExtensionInterface::class)
+            ->addTag('api_platform.doctrine.mongodb.aggregation_extension.collection');
+
+        $loader->load('doctrine_mongodb_odm.xml');
     }
 
     private function registerHttpCacheConfiguration(ContainerBuilder $container, array $config, XmlFileLoader $loader, bool $useDoctrine)
@@ -561,6 +578,15 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         }
     }
 
+    private function registerMessengerConfiguration(array $config, XmlFileLoader $loader)
+    {
+        if (!$config['messenger']['enabled']) {
+            return;
+        }
+
+        $loader->load('messenger.xml');
+    }
+
     private function registerElasticsearchConfiguration(ContainerBuilder $container, array $config, XmlFileLoader $loader)
     {
         $enabled = $config['elasticsearch']['enabled'] && class_exists(Client::class);
@@ -573,10 +599,10 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
 
         $loader->load('elasticsearch.xml');
 
-        $container->registerForAutoconfiguration(ElasticSearchQueryCollectionExtensionInterface::class)
-            ->addTag('api_platform.elasticsearch.query_extension.collection');
+        $container->registerForAutoconfiguration(RequestBodySearchCollectionExtensionInterface::class)
+            ->addTag('api_platform.elasticsearch.request_body_search_extension.collection');
 
-        $container->setParameter('api_platform.elasticsearch.host', $config['elasticsearch']['host']);
+        $container->setParameter('api_platform.elasticsearch.hosts', $config['elasticsearch']['hosts']);
         $container->setParameter('api_platform.elasticsearch.mapping', $config['elasticsearch']['mapping']);
     }
 }

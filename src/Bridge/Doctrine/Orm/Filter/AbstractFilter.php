@@ -13,13 +13,11 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Bridge\Doctrine\Orm\Filter;
 
-use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryBuilderHelper;
+use ApiPlatform\Core\Bridge\Doctrine\Common\PropertyHelperTrait;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\PropertyHelperTrait as OrmPropertyHelperTrait;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGeneratorInterface;
-use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\Util\RequestParser;
 use Doctrine\Common\Persistence\ManagerRegistry;
-use Doctrine\DBAL\Types\Type;
-use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\QueryBuilder;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
@@ -36,6 +34,9 @@ use Symfony\Component\HttpFoundation\RequestStack;
  */
 abstract class AbstractFilter implements FilterInterface
 {
+    use PropertyHelperTrait;
+    use OrmPropertyHelperTrait;
+
     protected $managerRegistry;
     protected $requestStack;
     protected $logger;
@@ -77,15 +78,19 @@ abstract class AbstractFilter implements FilterInterface
      */
     abstract protected function filterProperty(string $property, $value, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, string $operationName = null/*, array $context = []*/);
 
-    /**
-     * Gets class metadata for the given resource.
-     */
-    protected function getClassMetadata(string $resourceClass): ClassMetadata
+    protected function getManagerRegistry(): ManagerRegistry
     {
-        return $this
-            ->managerRegistry
-            ->getManagerForClass($resourceClass)
-            ->getClassMetadata($resourceClass);
+        return $this->managerRegistry;
+    }
+
+    protected function getProperties(): ?array
+    {
+        return $this->properties;
+    }
+
+    protected function getLogger(): LoggerInterface
+    {
+        return $this->logger;
     }
 
     /**
@@ -110,129 +115,7 @@ abstract class AbstractFilter implements FilterInterface
             return !$this->isPropertyNested($property, $resourceClass);
         }
 
-        return array_key_exists($property, $this->properties);
-    }
-
-    /**
-     * Determines whether the given property is mapped.
-     */
-    protected function isPropertyMapped(string $property, string $resourceClass, bool $allowAssociation = false): bool
-    {
-        if ($this->isPropertyNested($property, $resourceClass)) {
-            $propertyParts = $this->splitPropertyParts($property, $resourceClass);
-            $metadata = $this->getNestedMetadata($resourceClass, $propertyParts['associations']);
-            $property = $propertyParts['field'];
-        } else {
-            $metadata = $this->getClassMetadata($resourceClass);
-        }
-
-        return $metadata->hasField($property) || ($allowAssociation && $metadata->hasAssociation($property));
-    }
-
-    /**
-     * Determines whether the given property is nested.
-     */
-    protected function isPropertyNested(string $property/*, string $resourceClass*/): bool
-    {
-        if (\func_num_args() > 1) {
-            $resourceClass = (string) func_get_arg(1);
-        } else {
-            if (__CLASS__ !== \get_class($this)) {
-                $r = new \ReflectionMethod($this, __FUNCTION__);
-                if (__CLASS__ !== $r->getDeclaringClass()->getName()) {
-                    @trigger_error(sprintf('Method %s() will have a second `$resourceClass` argument in version API Platform 3.0. Not defining it is deprecated since API Platform 2.1.', __FUNCTION__), E_USER_DEPRECATED);
-                }
-            }
-            $resourceClass = null;
-        }
-
-        $pos = strpos($property, '.');
-        if (false === $pos) {
-            return false;
-        }
-
-        return null !== $resourceClass && $this->getClassMetadata($resourceClass)->hasAssociation(substr($property, 0, $pos));
-    }
-
-    /**
-     * Determines whether the given property is embedded.
-     */
-    protected function isPropertyEmbedded(string $property, string $resourceClass): bool
-    {
-        return false !== strpos($property, '.') && $this->getClassMetadata($resourceClass)->hasField($property);
-    }
-
-    /**
-     * Gets nested class metadata for the given resource.
-     *
-     * @param string[] $associations
-     */
-    protected function getNestedMetadata(string $resourceClass, array $associations): ClassMetadata
-    {
-        $metadata = $this->getClassMetadata($resourceClass);
-
-        foreach ($associations as $association) {
-            if ($metadata->hasAssociation($association)) {
-                $associationClass = $metadata->getAssociationTargetClass($association);
-
-                $metadata = $this
-                    ->managerRegistry
-                    ->getManagerForClass($associationClass)
-                    ->getClassMetadata($associationClass);
-            }
-        }
-
-        return $metadata;
-    }
-
-    /**
-     * Splits the given property into parts.
-     *
-     * Returns an array with the following keys:
-     *   - associations: array of associations according to nesting order
-     *   - field: string holding the actual field (leaf node)
-     */
-    protected function splitPropertyParts(string $property/*, string $resourceClass*/): array
-    {
-        $resourceClass = null;
-        $parts = explode('.', $property);
-
-        if (\func_num_args() > 1) {
-            $resourceClass = func_get_arg(1);
-        } else {
-            if (__CLASS__ !== \get_class($this)) {
-                $r = new \ReflectionMethod($this, __FUNCTION__);
-                if (__CLASS__ !== $r->getDeclaringClass()->getName()) {
-                    @trigger_error(sprintf('Method %s() will have a second `$resourceClass` argument in version API Platform 3.0. Not defining it is deprecated since API Platform 2.1.', __FUNCTION__), E_USER_DEPRECATED);
-                }
-            }
-        }
-
-        if (null === $resourceClass) {
-            return [
-                'associations' => \array_slice($parts, 0, -1),
-                'field' => end($parts),
-            ];
-        }
-
-        $metadata = $this->getClassMetadata($resourceClass);
-        $slice = 0;
-
-        foreach ($parts as $part) {
-            if ($metadata->hasAssociation($part)) {
-                $metadata = $this->getClassMetadata($metadata->getAssociationTargetClass($part));
-                ++$slice;
-            }
-        }
-
-        if ($slice === \count($parts)) {
-            --$slice;
-        }
-
-        return [
-            'associations' => \array_slice($parts, 0, $slice),
-            'field' => implode('.', \array_slice($parts, $slice)),
-        ];
+        return \array_key_exists($property, $this->properties);
     }
 
     /**
@@ -257,69 +140,5 @@ abstract class AbstractFilter implements FilterInterface
         }
 
         return $request->query->all();
-    }
-
-    /**
-     * Adds the necessary joins for a nested property.
-     *
-     * @throws InvalidArgumentException If property is not nested
-     *
-     * @return array An array where the first element is the join $alias of the leaf entity,
-     *               the second element is the $field name
-     *               the third element is the $associations array
-     */
-    protected function addJoinsForNestedProperty(string $property, string $rootAlias, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator/*, string $resourceClass, string $joinType*/): array
-    {
-        if (\func_num_args() > 4) {
-            $resourceClass = func_get_arg(4);
-        } else {
-            if (__CLASS__ !== \get_class($this)) {
-                $r = new \ReflectionMethod($this, __FUNCTION__);
-                if (__CLASS__ !== $r->getDeclaringClass()->getName()) {
-                    @trigger_error(sprintf('Method %s() will have a fifth `$resourceClass` argument in version API Platform 3.0. Not defining it is deprecated since API Platform 2.1.', __FUNCTION__), E_USER_DEPRECATED);
-                }
-            }
-            $resourceClass = null;
-        }
-
-        if (\func_num_args() > 5) {
-            $joinType = func_get_arg(5);
-        } else {
-            if (__CLASS__ !== \get_class($this)) {
-                $r = new \ReflectionMethod($this, __FUNCTION__);
-                if (__CLASS__ !== $r->getDeclaringClass()->getName()) {
-                    @trigger_error(sprintf('Method %s() will have a sixth `$joinType` argument in version API Platform 3.0. Not defining it is deprecated since API Platform 2.3.', __FUNCTION__), E_USER_DEPRECATED);
-                }
-            }
-            $joinType = null;
-        }
-
-        $propertyParts = $this->splitPropertyParts($property, $resourceClass);
-        $parentAlias = $rootAlias;
-        $alias = null;
-
-        foreach ($propertyParts['associations'] as $association) {
-            $alias = QueryBuilderHelper::addJoinOnce($queryBuilder, $queryNameGenerator, $parentAlias, $association, $joinType);
-            $parentAlias = $alias;
-        }
-
-        if (null === $alias) {
-            throw new InvalidArgumentException(sprintf('Cannot add joins for property "%s" - property is not nested.', $property));
-        }
-
-        return [$alias, $propertyParts['field'], $propertyParts['associations']];
-    }
-
-    /**
-     * Gets the Doctrine Type of a given property/resourceClass.
-     *
-     * @return Type|string|null
-     */
-    protected function getDoctrineFieldType(string $property, string $resourceClass)
-    {
-        $propertyParts = $this->splitPropertyParts($property, $resourceClass);
-        $metadata = $this->getNestedMetadata($resourceClass, $propertyParts['associations']);
-
-        return $metadata->getTypeOfField($propertyParts['field']);
     }
 }

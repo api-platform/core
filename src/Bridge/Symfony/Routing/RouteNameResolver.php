@@ -67,8 +67,8 @@ final class RouteNameResolver implements RouteNameResolverInterface
         $subresources = array_keys($context['subresource_resources']);
         $currentSubresources = [];
 
-        foreach ($currentContext['identifiers'] as $identiferContext) {
-            $currentSubresources[] = $identiferContext[1];
+        foreach ($currentContext['identifiers'] as $identifierContext) {
+            $currentSubresources[] = $identifierContext[1];
         }
 
         return $currentSubresources === $subresources;

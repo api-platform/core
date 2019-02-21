@@ -14,8 +14,9 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\DataPersister;
 
 use ApiPlatform\Core\DataPersister\DataPersisterInterface;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\DummyDtoNoOutput as DummyDtoNoOutputDocument;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Dto\InputDto;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyDtoNoOutput;
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\InputDto;
 use Doctrine\Common\Persistence\ManagerRegistry;
 
 class DummyDtoNoOutputDataPersister implements DataPersisterInterface
@@ -40,11 +41,17 @@ class DummyDtoNoOutputDataPersister implements DataPersisterInterface
      */
     public function persist($data)
     {
-        $output = new DummyDtoNoOutput();
+        $isOrm = true;
+        $em = $this->registry->getManagerForClass(DummyDtoNoOutput::class);
+        if (null === $em) {
+            $em = $this->registry->getManagerForClass(DummyDtoNoOutputDocument::class);
+            $isOrm = false;
+        }
+
+        $output = $isOrm ? new DummyDtoNoOutput() : new DummyDtoNoOutputDocument();
         $output->lorem = $data->foo;
         $output->ipsum = (string) $data->bar;
 
-        $em = $this->registry->getManagerForClass(DummyDtoNoOutput::class);
         $em->persist($output);
         $em->flush();
 

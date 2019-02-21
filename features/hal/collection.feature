@@ -294,6 +294,7 @@ Feature: HAL Collections support
     }
     """
 
+  @!mongodb
   Scenario: Enable the partial pagination client side
     When I add "Accept" header equal to "application/hal+json"
     And I send a "GET" request to "/dummies?page=2&partial=1"
@@ -401,251 +402,57 @@ Feature: HAL Collections support
     And the response should be in JSON
     And the JSON should be valid according to the JSON HAL schema
     And the header "Content-Type" should be equal to "application/hal+json; charset=utf-8"
-    And the JSON should be equal to:
+    And the JSON should be valid according to this schema:
     """
     {
-      "_links": {
-        "self": {
-          "href": "/dummies?pagination=0"
+      "type": "object",
+      "properties": {
+        "_links": {
+          "type": "object",
+          "properties": {
+            "self": {
+              "type": "object",
+              "properties": {"href": {"pattern": "^/dummies\\?pagination=0$"}}
+            },
+            "item": {
+              "type": "array",
+              "minItems": 10,
+              "maxItems": 10,
+              "items": {
+                "type": "object",
+                "properties": {"href": {"pattern": "^/dummies/[0-9]+$"}}
+              }
+            }
+          }
         },
-        "item": [
-          {
-            "href": "/dummies/1"
-          },
-          {
-            "href": "/dummies/2"
-          },
-          {
-            "href": "/dummies/3"
-          },
-          {
-            "href": "/dummies/4"
-          },
-          {
-            "href": "/dummies/5"
-          },
-          {
-            "href": "/dummies/6"
-          },
-          {
-            "href": "/dummies/7"
-          },
-          {
-            "href": "/dummies/8"
-          },
-          {
-            "href": "/dummies/9"
-          },
-          {
-            "href": "/dummies/10"
+        "totalItems": {"type":"number", "minimum": 10, "maximum": 10},
+        "_embedded": {
+          "type": "object",
+          "properties": {
+            "item": {
+              "type": "array",
+              "minItems": 10,
+              "maxItems": 10,
+              "items": {
+                "type": "object",
+                "properties": {
+                  "_links": {
+                    "type": "object",
+                    "properties": {
+                      "self": {
+                        "type": "object",
+                        "properties": {"href": {"pattern": "^/dummies/[0-9]+$"}}
+                      }
+                    }
+                  },
+                  "description": {"pattern": "(Smart dummy.|Not so smart dummy.)"}
+                }
+              }
+            }
           }
-        ]
+        }
       },
-      "totalItems": 10,
-      "_embedded": {
-        "item": [
-          {
-            "_links": {
-              "self": {
-                "href": "/dummies/1"
-              }
-            },
-            "description": "Smart dummy.",
-            "dummy": "SomeDummyTest1",
-            "dummyBoolean": null,
-            "dummyDate": null,
-            "dummyFloat": null,
-            "dummyPrice": null,
-            "jsonData": [],
-            "arrayData": [],
-            "name_converted": null,
-            "id": 1,
-            "name": "Dummy #1",
-            "alias": "Alias #9",
-            "foo": null
-          },
-          {
-            "_links": {
-              "self": {
-                "href": "/dummies/2"
-              }
-            },
-            "description": "Not so smart dummy.",
-            "dummy": "SomeDummyTest2",
-            "dummyBoolean": null,
-            "dummyDate": null,
-            "dummyFloat": null,
-            "dummyPrice": null,
-            "jsonData": [],
-            "arrayData": [],
-            "name_converted": null,
-            "id": 2,
-            "name": "Dummy #2",
-            "alias": "Alias #8",
-            "foo": null
-          },
-          {
-            "_links": {
-              "self": {
-                "href": "/dummies/3"
-              }
-            },
-            "description": "Smart dummy.",
-            "dummy": "SomeDummyTest3",
-            "dummyBoolean": null,
-            "dummyDate": null,
-            "dummyFloat": null,
-            "dummyPrice": null,
-            "jsonData": [],
-            "arrayData": [],
-            "name_converted": null,
-            "id": 3,
-            "name": "Dummy #3",
-            "alias": "Alias #7",
-            "foo": null
-          },
-          {
-            "_links": {
-              "self": {
-                "href": "/dummies/4"
-              }
-            },
-            "description": "Not so smart dummy.",
-            "dummy": "SomeDummyTest4",
-            "dummyBoolean": null,
-            "dummyDate": null,
-            "dummyFloat": null,
-            "dummyPrice": null,
-            "jsonData": [],
-            "arrayData": [],
-            "name_converted": null,
-            "id": 4,
-            "name": "Dummy #4",
-            "alias": "Alias #6",
-            "foo": null
-          },
-          {
-            "_links": {
-              "self": {
-                "href": "/dummies/5"
-              }
-            },
-            "description": "Smart dummy.",
-            "dummy": "SomeDummyTest5",
-            "dummyBoolean": null,
-            "dummyDate": null,
-            "dummyFloat": null,
-            "dummyPrice": null,
-            "jsonData": [],
-            "arrayData": [],
-            "name_converted": null,
-            "id": 5,
-            "name": "Dummy #5",
-            "alias": "Alias #5",
-            "foo": null
-          },
-          {
-            "_links": {
-              "self": {
-                "href": "/dummies/6"
-              }
-            },
-            "description": "Not so smart dummy.",
-            "dummy": "SomeDummyTest6",
-            "dummyBoolean": null,
-            "dummyDate": null,
-            "dummyFloat": null,
-            "dummyPrice": null,
-            "jsonData": [],
-            "arrayData": [],
-            "name_converted": null,
-            "id": 6,
-            "name": "Dummy #6",
-            "alias": "Alias #4",
-            "foo": null
-          },
-          {
-            "_links": {
-              "self": {
-                "href": "/dummies/7"
-              }
-            },
-            "description": "Smart dummy.",
-            "dummy": "SomeDummyTest7",
-            "dummyBoolean": null,
-            "dummyDate": null,
-            "dummyFloat": null,
-            "dummyPrice": null,
-            "jsonData": [],
-            "arrayData": [],
-            "name_converted": null,
-            "id": 7,
-            "name": "Dummy #7",
-            "alias": "Alias #3",
-            "foo": null
-          },
-          {
-            "_links": {
-              "self": {
-                "href": "/dummies/8"
-              }
-            },
-            "description": "Not so smart dummy.",
-            "dummy": "SomeDummyTest8",
-            "dummyBoolean": null,
-            "dummyDate": null,
-            "dummyFloat": null,
-            "dummyPrice": null,
-            "jsonData": [],
-            "arrayData": [],
-            "name_converted": null,
-            "id": 8,
-            "name": "Dummy #8",
-            "alias": "Alias #2",
-            "foo": null
-          },
-          {
-            "_links": {
-              "self": {
-                "href": "/dummies/9"
-              }
-            },
-            "description": "Smart dummy.",
-            "dummy": "SomeDummyTest9",
-            "dummyBoolean": null,
-            "dummyDate": null,
-            "dummyFloat": null,
-            "dummyPrice": null,
-            "jsonData": [],
-            "arrayData": [],
-            "name_converted": null,
-            "id": 9,
-            "name": "Dummy #9",
-            "alias": "Alias #1",
-            "foo": null
-          },
-          {
-            "_links": {
-              "self": {
-                "href": "/dummies/10"
-              }
-            },
-            "description": "Not so smart dummy.",
-            "dummy": "SomeDummyTest10",
-            "dummyBoolean": null,
-            "dummyDate": null,
-            "dummyFloat": null,
-            "dummyPrice": null,
-            "jsonData": [],
-            "arrayData": [],
-            "name_converted": null,
-            "id": 10,
-            "name": "Dummy #10",
-            "alias": "Alias #0",
-            "foo": null
-          }
-        ]
-      }
+      "additionalProperties": false
     }
     """
 
@@ -808,6 +615,7 @@ Feature: HAL Collections support
     }
     """
 
+  @!mongodb
   Scenario: Allow passing 0 to `itemsPerPage`
     When I add "Accept" header equal to "application/hal+json"
     And I send a "GET" request to "/dummies?itemsPerPage=0"

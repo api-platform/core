@@ -99,7 +99,7 @@ final class Paginator implements \IteratorAggregate, PaginatorInterface
         foreach ($this->documents['hits']['hits'] ?? [] as $document) {
             $cacheKey = isset($document['_index'], $document['_type'], $document['_id']) ? md5("${document['_index']}_${document['_type']}_${document['_id']}") : null;
 
-            if ($cacheKey && array_key_exists($cacheKey, $this->cachedDenormalizedDocuments)) {
+            if ($cacheKey && \array_key_exists($cacheKey, $this->cachedDenormalizedDocuments)) {
                 $object = $this->cachedDenormalizedDocuments[$cacheKey];
             } else {
                 $object = $this->denormalizer->denormalize(

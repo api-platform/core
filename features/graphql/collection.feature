@@ -317,6 +317,7 @@ Feature: GraphQL collection support
     And the header "Content-Type" should be equal to "application/json"
     And the JSON node "data.dummies.edges" should have 0 element
 
+  @!mongodb
   @createSchema
   Scenario: Retrieve an item with composite primitive identifiers through a GraphQL query
     Given there are composite primitive identifiers objects
@@ -333,6 +334,7 @@ Feature: GraphQL collection support
     And the header "Content-Type" should be equal to "application/json"
     And the JSON node "data.compositePrimitiveItem.description" should be equal to "This is bar."
 
+  @!mongodb
   @createSchema
   Scenario: Retrieve an item with composite identifiers through a GraphQL query
     Given there are Composite identifier objects

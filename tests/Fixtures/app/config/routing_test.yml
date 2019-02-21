@@ -1,12 +1,14 @@
 _main:
-    resource: routing.yml
-
-relation_embedded.custom_get:
-    path: '/relation_embedders/{id}/custom'
-    methods: ['GET', 'HEAD']
-    defaults:
-        _controller: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\Controller\CustomController::customAction'
+    resource: routing_common.yml
 
 controller:
-    resource: '@TestBundle/Controller'
+    resource: '@TestBundle/Controller/Orm'
     type: annotation
+
+web_profiler_wdt:
+    resource: '@WebProfilerBundle/Resources/config/routing/wdt.xml'
+    prefix: /_wdt
+
+web_profiler_profiler:
+    resource: '@WebProfilerBundle/Resources/config/routing/profiler.xml'
+    prefix: /_profiler

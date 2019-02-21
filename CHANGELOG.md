@@ -1,7 +1,12 @@
 # Changelog
 
-## 2.4.0
+## 2.5.0 beta 1
 
+* GraphQL: Add support for custom types
+
+## 2.4.0 beta 1
+
+* MongoDB: full support
 * Elasticsearch: add reading support (including pagination, sort filter and term filter)
 * Mercure: automatically push updates to clients using the [Mercure](https://mercure.rocks) protocol
 * CQRS support and async message handling using the Symfony Messenger Component
@@ -16,7 +21,7 @@
 * Allow to set the HTTP status code to send to the client through the `status` attribute
 * Add support for the `Sunset` HTTP header using the `sunset` attribute
 * Set the `Content-Location` and `Location` headers when appropriate for better RFC7231 conformance
-* Display the matching data provider and data persiter in the debug panel
+* Display the matching data provider and data persister in the debug panel
 * GraphQL: improve performance by lazy loading types
 * Add the `api_persist` request attribute to enable or disable the `WriteListener`
 * Allow to set a default context in all normalizers
@@ -34,7 +39,7 @@
 
 ## 2.3.6
 
-* /!\ Security: a vulnerability impacting the GraphQL subsystem was allowing users authorized to run mutations for a specific resource type, to execute it on any resource, of any type
+* /!\ Security: a vulnerability impacting the GraphQL subsystem was allowing users authorized to run mutations for a specific resource type, to execute it on any resource, of any type (CVE-2019-1000011)
 * Fix normalization of raw collections (not API resources)
 * Fix content negotiation format matching
 
@@ -119,7 +124,7 @@
 
 ## 2.2.10
 
-* /!\ Security: a vulnerability impacting the GraphQL subsystem was allowing users authorized to run mutations for a specific resource type, to execute it on any resource, of any type
+* /!\ Security: a vulnerability impacting the GraphQL subsystem was allowing users authorized to run mutations for a specific resource type, to execute it on any resource, of any type (CVE-2019-1000011)
 
 ## 2.2.9
 

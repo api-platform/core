@@ -27,7 +27,7 @@ Feature: GraphQL mutation support
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/json"
     And the JSON node "data.__type.fields[0].name" should contain "delete"
-    And the JSON node "data.__type.fields[0].description" should match '/^Deletes a [A-z0-9]+\.$/'
+    And the JSON node "data.__type.fields[0].description" should match '/^Deletes a [A-z0-9]+.$/'
     And the JSON node "data.__type.fields[0].type.name" should match "/^delete[A-z0-9]+Payload$/"
     And the JSON node "data.__type.fields[0].type.kind" should be equal to "OBJECT"
     And the JSON node "data.__type.fields[0].args[0].name" should be equal to "input"
@@ -59,7 +59,7 @@ Feature: GraphQL mutation support
     When I send the following GraphQL request:
     """
     mutation {
-      createDummy(input: {_id: 1, name: "A dummy", foo: [], relatedDummy: "/related_dummies/1", clientMutationId: "myId"}) {
+      createDummy(input: {name: "A dummy", foo: [], relatedDummy: "/related_dummies/1", clientMutationId: "myId"}) {
         id
         name
         foo
@@ -83,7 +83,7 @@ Feature: GraphQL mutation support
     When I send the following GraphQL request:
     """
     mutation {
-      createDummy(input: {_id: 2, name: "A dummy", foo: [], jsonData: {bar:{baz:3,qux:[7.6,false,null]}}, arrayData: ["bar", "baz"], clientMutationId: "myId"}) {
+      createDummy(input: {name: "A dummy", foo: [], jsonData: {bar:{baz:3,qux:[7.6,false,null]}}, arrayData: ["bar", "baz"], clientMutationId: "myId"}) {
         id
         name
         foo
@@ -137,6 +137,7 @@ Feature: GraphQL mutation support
     And the header "Content-Type" should be equal to "application/json"
     And the JSON node "errors[0].message" should be equal to 'Item "/dummies/1" did not match expected type "Foo".'
 
+  @!mongodb
   Scenario: Delete an item with composite identifiers through a mutation
     Given there are Composite identifier objects
     When I send the following GraphQL request:
@@ -186,6 +187,7 @@ Feature: GraphQL mutation support
     And the JSON node "data.updateDummy.relatedDummies.edges[0].node.name" should be equal to "RelatedDummy11"
     And the JSON node "data.updateDummy.clientMutationId" should be equal to "myId"
 
+  @!mongodb
   Scenario: Modify an item with composite identifiers through a mutation
     Given there are Composite identifier objects
     When I send the following GraphQL request:
@@ -224,6 +226,7 @@ Feature: GraphQL mutation support
     And the JSON node "data.createWritableId.name" should be equal to "Foo"
     And the JSON node "data.createWritableId.clientMutationId" should be equal to "m"
 
+  @!mongodb
   Scenario: Update an item with a custom UUID
     When I send the following GraphQL request:
     """
@@ -307,7 +310,7 @@ Feature: GraphQL mutation support
     When I send the following GraphQL request:
     """
     mutation {
-      createDummyDtoNoInput(input: {foo: "A new one", bar: 3, clientMutationId: "myId"}) {
+      createDummyDtoNoInput(input: {lorem: "A new one", ipsum: 3, clientMutationId: "myId"}) {
         clientMutationId
       }
     }
@@ -320,7 +323,19 @@ Feature: GraphQL mutation support
     {
       "errors": [
         {
-          "message": "Field \"foo\" is not defined by type createDummyDtoNoInputInput.",
+          "message": "Field createDummyDtoNoInputInput.id of required type ID! was not provided.",
+          "extensions": {
+            "category": "graphql"
+          },
+          "locations": [
+            {
+              "line": 2,
+              "column": 32
+            }
+          ]
+        },
+        {
+          "message": "Field \"lorem\" is not defined by type createDummyDtoNoInputInput.",
           "extensions": {
             "category": "graphql"
           },
@@ -332,14 +347,14 @@ Feature: GraphQL mutation support
           ]
         },
         {
-          "message": "Field \"bar\" is not defined by type createDummyDtoNoInputInput.",
+          "message": "Field \"ipsum\" is not defined by type createDummyDtoNoInputInput.",
           "extensions": {
             "category": "graphql"
           },
           "locations": [
             {
               "line": 2,
-              "column": 51
+              "column": 53
             }
           ]
         }

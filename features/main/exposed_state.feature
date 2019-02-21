@@ -4,6 +4,7 @@ Feature: Expose persisted object state
   As a client software developer
   I need to be able to retrieve the exact state of resources after persistence.
 
+  @!mongodb
   @createSchema
   Scenario: Create a resource with truncable value should return the correct object state
     When I add "Content-Type" header equal to "application/ld+json"
@@ -25,6 +26,7 @@ Feature: Expose persisted object state
     }
     """
 
+  @!mongodb
   Scenario: Update a resource with truncable value value should return the correct object state
     When I add "Content-Type" header equal to "application/ld+json"
     And I send a "PUT" request to "/truncated_dummies/1" with body:

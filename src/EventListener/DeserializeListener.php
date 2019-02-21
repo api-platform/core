@@ -40,7 +40,7 @@ final class DeserializeListener
     /**
      * @throws InvalidArgumentException
      */
-    public function __construct(SerializerInterface $serializer, SerializerContextBuilderInterface $serializerContextBuilder, /* FormatsProviderInterface */ $formatsProvider)
+    public function __construct(SerializerInterface $serializer, SerializerContextBuilderInterface $serializerContextBuilder, /* FormatsProviderInterface */$formatsProvider)
     {
         $this->serializer = $serializer;
         $this->serializerContextBuilder = $serializerContextBuilder;
@@ -63,11 +63,11 @@ final class DeserializeListener
     {
         $request = $event->getRequest();
         $method = $request->getMethod();
+
         if (
             'DELETE' === $method
             || $request->isMethodSafe(false)
             || !($attributes = RequestAttributesExtractor::extractAttributes($request))
-            || false === ($attributes['input_class'] ?? null)
             || !$attributes['receive']
             || (
                     '' === ($requestContent = $request->getContent())
@@ -76,17 +76,18 @@ final class DeserializeListener
         ) {
             return;
         }
+
+        $context = $this->serializerContextBuilder->createFromRequest($request, false, $attributes);
+        if (isset($context['input']) && \array_key_exists('class', $context['input']) && null === $context['input']['class']) {
+            return;
+        }
+
         // BC check to be removed in 3.0
         if (null !== $this->formatsProvider) {
             $this->formats = $this->formatsProvider->getFormatsFromAttributes($attributes);
         }
         $this->formatMatcher = new FormatMatcher($this->formats);
-
         $format = $this->getFormat($request);
-        $context = $this->serializerContextBuilder->createFromRequest($request, false, $attributes);
-        if (isset($context['input_class'])) {
-            $context['resource_class'] = $context['input_class'];
-        }
 
         $data = $request->attributes->get('data');
         if (null !== $data) {
@@ -96,7 +97,7 @@ final class DeserializeListener
         $request->attributes->set(
             'data',
             $this->serializer->deserialize(
-                $requestContent, $attributes['input_class'], $format, $context
+                $requestContent, $context['resource_class'], $format, $context
             )
         );
     }

@@ -97,6 +97,7 @@ class ConfigurationTest extends TestCase
             ],
             'elasticsearch' => [
                 'enabled' => false,
+                'hosts' => [],
                 'mapping' => [],
             ],
             'oauth' => [
@@ -149,6 +150,15 @@ class ConfigurationTest extends TestCase
                 'shared_max_age' => null,
                 'vary' => ['Accept'],
                 'public' => null,
+            ],
+            'doctrine' => [
+                'enabled' => true,
+            ],
+            'doctrine_mongodb_odm' => [
+                'enabled' => true,
+            ],
+            'messenger' => [
+                'enabled' => true,
             ],
             'mercure' => [
                 'enabled' => true,

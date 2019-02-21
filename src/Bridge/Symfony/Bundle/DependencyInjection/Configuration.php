@@ -16,6 +16,8 @@ namespace ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection;
 use ApiPlatform\Core\Bridge\Elasticsearch\Metadata\Document\DocumentMetadata;
 use ApiPlatform\Core\Exception\FilterValidationException;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
+use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
+use Doctrine\Bundle\MongoDBBundle\DoctrineMongoDBBundle;
 use Doctrine\ORM\OptimisticLockException;
 use FOS\UserBundle\FOSUserBundle;
 use GraphQL\GraphQL;
@@ -26,6 +28,7 @@ use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Serializer\Exception\ExceptionInterface;
 
 /**
@@ -90,6 +93,12 @@ final class Configuration implements ConfigurationInterface
                         ->integerNode('max_joins')->defaultValue(30)->info('Max number of joined relations before EagerLoading throws a RuntimeException')->end()
                         ->booleanNode('force_eager')->defaultTrue()->info('Force join on every relation. If disabled, it will only join relations having the EAGER fetch mode.')->end()
                     ->end()
+                ->end()
+                ->arrayNode('doctrine')
+                    ->{class_exists(DoctrineBundle::class) ? 'canBeDisabled' : 'canBeEnabled'}()
+                ->end()
+                ->arrayNode('doctrine_mongodb_odm')
+                    ->{class_exists(DoctrineMongoDBBundle::class) ? 'canBeDisabled' : 'canBeEnabled'}()
                 ->end()
                 ->booleanNode('enable_fos_user')->defaultValue(class_exists(FOSUserBundle::class))->info('Enable the FOSUserBundle integration.')->end()
                 ->booleanNode('enable_nelmio_api_doc')
@@ -237,13 +246,18 @@ final class Configuration implements ConfigurationInterface
                     ->end()
                 ->end()
 
+                ->arrayNode('messenger')
+                    ->{interface_exists(MessageBusInterface::class) ? 'canBeDisabled' : 'canBeEnabled'}()
+                ->end()
+
                 ->arrayNode('elasticsearch')
                     ->canBeEnabled()
                     ->addDefaultsIfNotSet()
                     ->children()
-                        ->scalarNode('host')
-                            ->isRequired()
-                            ->cannotBeEmpty()
+                        ->arrayNode('hosts')
+                            ->beforeNormalization()->castToArray()->end()
+                            ->defaultValue([])
+                            ->prototype('scalar')->end()
                         ->end()
                         ->arrayNode('mapping')
                             ->normalizeKeys(false)

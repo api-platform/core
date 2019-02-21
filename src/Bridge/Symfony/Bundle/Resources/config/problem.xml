@@ -15,14 +15,14 @@
         <service id="api_platform.problem.normalizer.constraint_violation_list" class="ApiPlatform\Core\Problem\Serializer\ConstraintViolationListNormalizer" public="false">
             <argument>%api_platform.validator.serialize_payload_fields%</argument>
             <argument type="service" id="api_platform.name_converter" on-invalid="ignore" />
-            
-            <tag name="serializer.normalizer" priority="16" />
+
+            <tag name="serializer.normalizer" priority="-780" />
         </service>
 
         <service id="api_platform.problem.normalizer.error" class="ApiPlatform\Core\Problem\Serializer\ErrorNormalizer" public="false">
             <argument>%kernel.debug%</argument>
 
-            <tag name="serializer.normalizer" priority="8" />
+            <tag name="serializer.normalizer" priority="-810" />
         </service>
     </services>
 

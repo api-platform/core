@@ -16,12 +16,17 @@ namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\OtherResources;
 /**
  * @author Maxime Veber <maxime.veber@nekland.fr>
  */
-class ResourceInterfaceImplementation implements ResourceInterface
+class ResourceInterfaceImplementation implements ResourceInterface, ResourceBarInterface
 {
     /**
      * @var string
      */
     private $foo;
+
+    /**
+     * @var ?string
+     */
+    private $bar;
 
     public function setFoo(string $foo)
     {
@@ -33,5 +38,17 @@ class ResourceInterfaceImplementation implements ResourceInterface
     public function getFoo(): string
     {
         return $this->foo;
+    }
+
+    public function setBar(?string $bar)
+    {
+        $this->bar = $bar;
+
+        return $this;
+    }
+
+    public function getBar(): ?string
+    {
+        return $this->bar;
     }
 }

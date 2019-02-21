@@ -1,0 +1,15 @@
+imports:
+    - { resource: config_services_mongodb.yml }
+
+api_platform:
+    doctrine: false
+    mapping:
+        paths: ['%kernel.project_dir%/config/api_platform_mongodb_odm']
+
+fos_user:
+    db_driver:       'mongodb'
+    firewall_name:   'api'
+    user_class:      'ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\User'
+    from_email:
+        address:     'no-reply@les-tilleuls.coop'
+        sender_name: 'Kévin Dunglas'

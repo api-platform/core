@@ -404,7 +404,7 @@ Feature: Date filter on collections
       },
       "hydra:search": {
         "@type": "hydra:IriTemplate",
-        "hydra:template": "/dummies{?dummyBoolean,relatedDummy.embeddedDummy.dummyBoolean,dummyDate[before],dummyDate[strictly_before],dummyDate[after],dummyDate[strictly_after],relatedDummy.dummyDate[before],relatedDummy.dummyDate[strictly_before],relatedDummy.dummyDate[after],relatedDummy.dummyDate[strictly_after],description[exists],relatedDummy.name[exists],dummyBoolean[exists],relatedDummy[exists],dummyFloat,dummyFloat[],dummyPrice,dummyPrice[],order[id],order[name],order[description],order[relatedDummy.name],order[relatedDummy.symfony],order[dummyDate],dummyFloat[between],dummyFloat[gt],dummyFloat[gte],dummyFloat[lt],dummyFloat[lte],dummyPrice[between],dummyPrice[gt],dummyPrice[gte],dummyPrice[lt],dummyPrice[lte],id,id[],name,alias,description,relatedDummy.name,relatedDummy.name[],relatedDummies,relatedDummies[],dummy,relatedDummies.name,properties[]}",
+        "hydra:template": "/dummies{?dummyBoolean,relatedDummy.embeddedDummy.dummyBoolean,dummyDate[before],dummyDate[strictly_before],dummyDate[after],dummyDate[strictly_after],relatedDummy.dummyDate[before],relatedDummy.dummyDate[strictly_before],relatedDummy.dummyDate[after],relatedDummy.dummyDate[strictly_after],description[exists],relatedDummy.name[exists],dummyBoolean[exists],relatedDummy[exists],dummyFloat,dummyFloat[],dummyPrice,dummyPrice[],order[id],order[name],order[description],order[relatedDummy.name],order[relatedDummy.symfony],order[dummyDate],dummyFloat[between],dummyFloat[gt],dummyFloat[gte],dummyFloat[lt],dummyFloat[lte],dummyPrice[between],dummyPrice[gt],dummyPrice[gte],dummyPrice[lt],dummyPrice[lte],id,id[],name,alias,description,relatedDummy.name,relatedDummy.name[],relatedDummies,relatedDummies[],dummy,relatedDummies.name,relatedDummy.thirdLevel.level,relatedDummy.thirdLevel.level[],relatedDummy.thirdLevel.fourthLevel.level,relatedDummy.thirdLevel.fourthLevel.level[],relatedDummy.thirdLevel.badFourthLevel.level,relatedDummy.thirdLevel.badFourthLevel.level[],relatedDummy.thirdLevel.fourthLevel.badThirdLevel.level,relatedDummy.thirdLevel.fourthLevel.badThirdLevel.level[],properties[]}",
         "hydra:variableRepresentation": "BasicRepresentation",
         "hydra:mapping": [
           {
@@ -678,6 +678,54 @@ Feature: Date filter on collections
             "required": false
           },
           {
+            "@type": "IriTemplateMapping",
+            "variable": "relatedDummy.thirdLevel.level",
+            "property": "relatedDummy.thirdLevel.level",
+            "required": false
+          },
+          {
+            "@type": "IriTemplateMapping",
+            "variable": "relatedDummy.thirdLevel.level[]",
+            "property": "relatedDummy.thirdLevel.level",
+            "required": false
+          },
+          {
+            "@type": "IriTemplateMapping",
+            "variable": "relatedDummy.thirdLevel.fourthLevel.level",
+            "property": "relatedDummy.thirdLevel.fourthLevel.level",
+            "required": false
+          },
+          {
+            "@type": "IriTemplateMapping",
+            "variable": "relatedDummy.thirdLevel.fourthLevel.level[]",
+            "property": "relatedDummy.thirdLevel.fourthLevel.level",
+            "required": false
+          },
+          {
+            "@type": "IriTemplateMapping",
+            "variable": "relatedDummy.thirdLevel.badFourthLevel.level",
+            "property": "relatedDummy.thirdLevel.badFourthLevel.level",
+            "required": false
+          },
+          {
+            "@type": "IriTemplateMapping",
+            "variable": "relatedDummy.thirdLevel.badFourthLevel.level[]",
+            "property": "relatedDummy.thirdLevel.badFourthLevel.level",
+            "required": false
+          },
+          {
+            "@type": "IriTemplateMapping",
+            "variable": "relatedDummy.thirdLevel.fourthLevel.badThirdLevel.level",
+            "property": "relatedDummy.thirdLevel.fourthLevel.badThirdLevel.level",
+            "required": false
+          },
+          {
+            "@type": "IriTemplateMapping",
+            "variable": "relatedDummy.thirdLevel.fourthLevel.badThirdLevel.level[]",
+            "property": "relatedDummy.thirdLevel.fourthLevel.badThirdLevel.level",
+            "required": false
+          },
+          {
               "@type": "IriTemplateMapping",
               "variable": "properties[]",
               "property": null,
@@ -696,6 +744,55 @@ Feature: Date filter on collections
     And the JSON node "hydra:totalItems" should be equal to 3
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
 
+  @createSchema
+  Scenario: Get collection filtered by date that is not a datetime including null after
+    Given there are 3 dummydate objects with nullable dateIncludeNullAfter
+    When I send a "GET" request to "/dummy_dates?dateIncludeNullAfter[after]=2015-04-02"
+    Then the response status code should be 200
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+    And the JSON node "hydra:totalItems" should be equal to 2
+    And the JSON node "hydra:member[0].dateIncludeNullAfter" should be equal to "2015-04-02T00:00:00+00:00"
+    And the JSON node "hydra:member[1].dateIncludeNullAfter" should be null
+    When I send a "GET" request to "/dummy_dates?dateIncludeNullAfter[before]=2015-04-02"
+    Then the response status code should be 200
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+    And the JSON node "hydra:totalItems" should be equal to 2
+    And the JSON node "hydra:member[0].dateIncludeNullAfter" should be equal to "2015-04-01T00:00:00+00:00"
+    And the JSON node "hydra:member[1].dateIncludeNullAfter" should be equal to "2015-04-02T00:00:00+00:00"
+
+  @createSchema
+  Scenario: Get collection filtered by date that is not a datetime including null before
+    Given there are 3 dummydate objects with nullable dateIncludeNullBefore
+    When I send a "GET" request to "/dummy_dates?dateIncludeNullBefore[before]=2015-04-01"
+    Then the response status code should be 200
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+    And the JSON node "hydra:totalItems" should be equal to 2
+    And the JSON node "hydra:member[0].dateIncludeNullBefore" should be equal to "2015-04-01T00:00:00+00:00"
+    And the JSON node "hydra:member[1].dateIncludeNullBefore" should be null
+    When I send a "GET" request to "/dummy_dates?dateIncludeNullBefore[after]=2015-04-01"
+    Then the response status code should be 200
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+    And the JSON node "hydra:totalItems" should be equal to 2
+    And the JSON node "hydra:member[0].dateIncludeNullBefore" should be equal to "2015-04-01T00:00:00+00:00"
+    And the JSON node "hydra:member[1].dateIncludeNullBefore" should be equal to "2015-04-02T00:00:00+00:00"
+
+  @createSchema
+  Scenario: Get collection filtered by date that is not a datetime including null before and after
+    Given there are 3 dummydate objects with nullable dateIncludeNullBeforeAndAfter
+    When I send a "GET" request to "/dummy_dates?dateIncludeNullBeforeAndAfter[before]=2015-04-01"
+    Then the response status code should be 200
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+    And the JSON node "hydra:totalItems" should be equal to 2
+    And the JSON node "hydra:member[0].dateIncludeNullBeforeAndAfter" should be equal to "2015-04-01T00:00:00+00:00"
+    And the JSON node "hydra:member[1].dateIncludeNullBeforeAndAfter" should be null
+    When I send a "GET" request to "/dummy_dates?dateIncludeNullBeforeAndAfter[after]=2015-04-02"
+    Then the response status code should be 200
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+    And the JSON node "hydra:totalItems" should be equal to 2
+    And the JSON node "hydra:member[0].dateIncludeNullBeforeAndAfter" should be equal to "2015-04-02T00:00:00+00:00"
+    And the JSON node "hydra:member[1].dateIncludeNullBeforeAndAfter" should be null
+
+  @!mongodb
   @createSchema
   Scenario: Get collection filtered by date that is an immutable date variant
     Given there are 30 dummyimmutabledate objects with dummyDate

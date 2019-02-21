@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Identifier;
 
 /**
- * Normalizes a composite identifer.
+ * Normalizes a composite identifier.
  *
  * @author Antoine Bluchet <soyuka@gmail.com>
  */

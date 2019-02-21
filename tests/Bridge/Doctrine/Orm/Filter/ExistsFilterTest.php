@@ -15,6 +15,7 @@ namespace ApiPlatform\Core\Tests\Bridge\Doctrine\Orm\Filter;
 
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\ExistsFilter;
 use ApiPlatform\Core\Test\DoctrineOrmFilterTestCase;
+use ApiPlatform\Core\Tests\Bridge\Doctrine\Common\Filter\ExistsFilterTestTrait;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 
 /**
@@ -22,26 +23,20 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
  */
 class ExistsFilterTest extends DoctrineOrmFilterTestCase
 {
+    use ExistsFilterTestTrait;
+
     protected $filterClass = ExistsFilter::class;
-
-    public function testGetDescription()
-    {
-        $filter = new ExistsFilter($this->managerRegistry, null, null, ['name' => null, 'description' => null]);
-
-        $this->assertEquals([
-            'description[exists]' => [
-                'property' => 'description',
-                'type' => 'bool',
-                'required' => false,
-            ],
-        ], $filter->getDescription($this->resourceClass));
-    }
 
     public function testGetDescriptionDefaultFields()
     {
-        $filter = new ExistsFilter($this->managerRegistry);
+        $filter = $this->buildFilter();
 
         $this->assertEquals([
+            'id[exists]' => [
+                'property' => 'id',
+                'type' => 'bool',
+                'required' => false,
+            ],
             'alias[exists]' => [
                 'property' => 'alias',
                 'type' => 'bool',
@@ -97,222 +92,73 @@ class ExistsFilterTest extends DoctrineOrmFilterTestCase
 
     public function provideApplyTestData(): array
     {
-        return [
-            'valid values' => [
-                [
-                    'description' => null,
+        return array_merge_recursive(
+            $this->provideApplyTestArguments(),
+            [
+                'valid values' => [
+                    sprintf('SELECT o FROM %s o WHERE o.description IS NOT NULL', Dummy::class),
                 ],
-                [
-                    'description' => [
-                        'exists' => 'true',
-                    ],
-                ],
-                sprintf('SELECT o FROM %s o WHERE o.description IS NOT NULL', Dummy::class),
-            ],
 
-            'valid values (empty for true)' => [
-                [
-                    'description' => null,
+                'valid values (empty for true)' => [
+                    sprintf('SELECT o FROM %s o WHERE o.description IS NOT NULL', Dummy::class),
                 ],
-                [
-                    'description' => [
-                        'exists' => '',
-                    ],
-                ],
-                sprintf('SELECT o FROM %s o WHERE o.description IS NOT NULL', Dummy::class),
-            ],
 
-            'valid values (1 for true)' => [
-                [
-                    'description' => null,
+                'valid values (1 for true)' => [
+                    sprintf('SELECT o FROM %s o WHERE o.description IS NOT NULL', Dummy::class),
                 ],
-                [
-                    'description' => [
-                        'exists' => '1',
-                    ],
-                ],
-                sprintf('SELECT o FROM %s o WHERE o.description IS NOT NULL', Dummy::class),
-            ],
 
-            'invalid values' => [
-                [
-                    'description' => null,
+                'invalid values' => [
+                    sprintf('SELECT o FROM %s o', Dummy::class),
                 ],
-                [
-                    'description' => [
-                        'exists' => 'invalid',
-                    ],
-                ],
-                sprintf('SELECT o FROM %s o', Dummy::class),
-            ],
 
-            'negative values' => [
-                [
-                    'description' => null,
+                'negative values' => [
+                    sprintf('SELECT o FROM %s o WHERE o.description IS NULL', Dummy::class),
                 ],
-                [
-                    'description' => [
-                        'exists' => 'false',
-                    ],
-                ],
-                sprintf('SELECT o FROM %s o WHERE o.description IS NULL', Dummy::class),
-            ],
 
-            'negative values (0)' => [
-                [
-                    'description' => null,
+                'negative values (0)' => [
+                    sprintf('SELECT o FROM %s o WHERE o.description IS NULL', Dummy::class),
                 ],
-                [
-                    'description' => [
-                        'exists' => '0',
-                    ],
-                ],
-                sprintf('SELECT o FROM %s o WHERE o.description IS NULL', Dummy::class),
-            ],
 
-            'related values' => [
-                [
-                    'description' => null,
-                    'relatedDummy.name' => null,
+                'related values' => [
+                    sprintf('SELECT o FROM %s o INNER JOIN o.relatedDummy relatedDummy_a1 WHERE o.description IS NOT NULL AND relatedDummy_a1.name IS NOT NULL', Dummy::class),
                 ],
-                [
-                    'description' => [
-                        'exists' => '1',
-                    ],
-                    'relatedDummy.name' => [
-                        'exists' => '1',
-                    ],
-                ],
-                sprintf('SELECT o FROM %s o INNER JOIN o.relatedDummy relatedDummy_a1 WHERE o.description IS NOT NULL AND relatedDummy_a1.name IS NOT NULL', Dummy::class),
-            ],
 
-            'not nullable values' => [
-                [
-                    'description' => null,
-                    'name' => null,
+                'not nullable values' => [
+                    sprintf('SELECT o FROM %s o WHERE o.description IS NOT NULL', Dummy::class),
                 ],
-                [
-                    'description' => [
-                        'exists' => '1',
-                    ],
-                    'name' => [
-                        'exists' => '0',
-                    ],
-                ],
-                sprintf('SELECT o FROM %s o WHERE o.description IS NOT NULL', Dummy::class),
-            ],
 
-            'related collection not empty' => [
-                [
-                    'description' => null,
-                    'relatedDummies' => null,
+                'related collection not empty' => [
+                    sprintf('SELECT o FROM %s o WHERE o.description IS NOT NULL AND o.relatedDummies IS NOT EMPTY', Dummy::class),
                 ],
-                [
-                    'description' => [
-                        'exists' => '1',
-                    ],
-                    'relatedDummies' => [
-                        'exists' => '1',
-                    ],
-                ],
-                sprintf('SELECT o FROM %s o WHERE o.description IS NOT NULL AND o.relatedDummies IS NOT EMPTY', Dummy::class),
-            ],
 
-            'related collection empty' => [
-                [
-                    'description' => null,
-                    'relatedDummies' => null,
+                'related collection empty' => [
+                    sprintf('SELECT o FROM %s o WHERE o.description IS NOT NULL AND o.relatedDummies IS EMPTY', Dummy::class),
                 ],
-                [
-                    'description' => [
-                        'exists' => '1',
-                    ],
-                    'relatedDummies' => [
-                        'exists' => '0',
-                    ],
-                ],
-                sprintf('SELECT o FROM %s o WHERE o.description IS NOT NULL AND o.relatedDummies IS EMPTY', Dummy::class),
-            ],
 
-            'related association exists' => [
-                [
-                    'description' => null,
-                    'relatedDummy' => null,
+                'related association exists' => [
+                    sprintf('SELECT o FROM %s o WHERE o.description IS NOT NULL AND o.relatedDummy IS NOT NULL', Dummy::class),
                 ],
-                [
-                    'description' => [
-                        'exists' => '1',
-                    ],
-                    'relatedDummy' => [
-                        'exists' => '1',
-                    ],
-                ],
-                sprintf('SELECT o FROM %s o WHERE o.description IS NOT NULL AND o.relatedDummy IS NOT NULL', Dummy::class),
-            ],
 
-            'related association does not exist' => [
-                [
-                    'description' => null,
-                    'relatedDummy' => null,
+                'related association does not exist' => [
+                    sprintf('SELECT o FROM %s o WHERE o.description IS NOT NULL AND o.relatedDummy IS NULL', Dummy::class),
                 ],
-                [
-                    'description' => [
-                        'exists' => '1',
-                    ],
-                    'relatedDummy' => [
-                        'exists' => '0',
-                    ],
-                ],
-                sprintf('SELECT o FROM %s o WHERE o.description IS NOT NULL AND o.relatedDummy IS NULL', Dummy::class),
-            ],
 
-            'related owned association does not exist' => [
-                [
-                    'relatedOwnedDummy' => null,
+                'related owned association does not exist' => [
+                    sprintf('SELECT o FROM %s o LEFT JOIN o.relatedOwnedDummy relatedOwnedDummy_a1 WHERE relatedOwnedDummy_a1 IS NULL', Dummy::class),
                 ],
-                [
-                    'relatedOwnedDummy' => [
-                        'exists' => '0',
-                    ],
-                ],
-                sprintf('SELECT o FROM %s o LEFT JOIN o.relatedOwnedDummy relatedOwnedDummy_a1 WHERE relatedOwnedDummy_a1 IS NULL', Dummy::class),
-            ],
 
-            'related owned association exists' => [
-                [
-                    'relatedOwnedDummy' => null,
+                'related owned association exists' => [
+                    sprintf('SELECT o FROM %s o LEFT JOIN o.relatedOwnedDummy relatedOwnedDummy_a1 WHERE relatedOwnedDummy_a1 IS NOT NULL', Dummy::class),
                 ],
-                [
-                    'relatedOwnedDummy' => [
-                        'exists' => '1',
-                    ],
-                ],
-                sprintf('SELECT o FROM %s o LEFT JOIN o.relatedOwnedDummy relatedOwnedDummy_a1 WHERE relatedOwnedDummy_a1 IS NOT NULL', Dummy::class),
-            ],
 
-            'related owning association does not exist' => [
-                [
-                    'relatedOwningDummy' => null,
+                'related owning association does not exist' => [
+                    sprintf('SELECT o FROM %s o WHERE o.relatedOwningDummy IS NULL', Dummy::class),
                 ],
-                [
-                    'relatedOwningDummy' => [
-                        'exists' => '0',
-                    ],
-                ],
-                sprintf('SELECT o FROM %s o WHERE o.relatedOwningDummy IS NULL', Dummy::class),
-            ],
 
-            'related owning association exists' => [
-                [
-                    'relatedOwningDummy' => null,
+                'related owning association exists' => [
+                    sprintf('SELECT o FROM %s o WHERE o.relatedOwningDummy IS NOT NULL', Dummy::class),
                 ],
-                [
-                    'relatedOwningDummy' => [
-                        'exists' => '1',
-                    ],
-                ],
-                sprintf('SELECT o FROM %s o WHERE o.relatedOwningDummy IS NOT NULL', Dummy::class),
-            ],
-        ];
+            ]
+        );
     }
 }

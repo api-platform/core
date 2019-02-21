@@ -12,9 +12,11 @@
 declare(strict_types=1);
 
 use ApiPlatform\Core\Bridge\Symfony\Bundle\ApiPlatformBundle;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\User as UserDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\User;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\TestBundle;
 use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
+use Doctrine\Bundle\MongoDBBundle\DoctrineMongoDBBundle;
 use FOS\UserBundle\FOSUserBundle;
 use Nelmio\ApiDocBundle\NelmioApiDocBundle;
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
@@ -22,6 +24,7 @@ use Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait;
 use Symfony\Bundle\MercureBundle\MercureBundle;
 use Symfony\Bundle\SecurityBundle\SecurityBundle;
 use Symfony\Bundle\TwigBundle\TwigBundle;
+use Symfony\Bundle\WebProfilerBundle\WebProfilerBundle;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Kernel;
@@ -55,7 +58,12 @@ class AppKernel extends Kernel
             new ApiPlatformBundle(),
             new SecurityBundle(),
             new FOSUserBundle(),
+            new WebProfilerBundle(),
         ];
+
+        if (class_exists(DoctrineMongoDBBundle::class)) {
+            $bundles[] = new DoctrineMongoDBBundle();
+        }
 
         if ('elasticsearch' !== $this->getEnvironment()) {
             $bundles[] = new TestBundle();
@@ -91,6 +99,7 @@ class AppKernel extends Kernel
         $securityConfig = [
             'encoders' => [
                 User::class => 'bcrypt',
+                UserDocument::class => 'bcrypt',
                 // Don't use plaintext in production!
                 UserInterface::class => 'plaintext',
             ],

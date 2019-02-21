@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity;
 
 use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Dto\OutputDto;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -25,8 +26,8 @@ use Doctrine\ORM\Mapping as ORM;
  *
  * @ApiResource(
  *     attributes={
- *         "input_class"=false,
- *         "output_class"=OutputDto::class
+ *         "input"=false,
+ *         "output"=OutputDto::class
  *     }
  * )
  */

@@ -27,7 +27,7 @@ class QueryNameGeneratorTest extends TestCase
         $this->assertEquals('related_a1', $queryNameGenerator->generateJoinAlias('related'));
     }
 
-    public function testGenerateParemeterName()
+    public function testGenerateParameterName()
     {
         $queryNameGenerator = new QueryNameGenerator();
         $this->assertEquals('name_p1', $queryNameGenerator->generateParameterName('name'));

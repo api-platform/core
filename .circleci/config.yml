@@ -13,6 +13,12 @@ reusable-steps:
     run:
       name: Disable Xdebug PHP extension
       command: sudo rm /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
+  - &install-php-extensions
+    run:
+      name: Install PHP extensions
+      command: |
+        sudo pecl install mongodb
+        echo 'extension=mongodb.so' | sudo tee /usr/local/etc/php/conf.d/mongodb.ini
   - &restore-composer-cache
     restore_cache:
       keys:
@@ -106,6 +112,7 @@ jobs:
       - *restore-composer-cache
       - *disable-xdebug-php-extension
       - *disable-php-memory-limit
+      - *install-php-extensions
       - *update-composer
       - *update-project-dependencies
       - run:
@@ -132,6 +139,7 @@ jobs:
       - *restore-npm-cache
       - *disable-xdebug-php-extension
       - *disable-php-memory-limit
+      - *install-php-extensions
       - *update-composer
       - *update-project-dependencies
       - *save-composer-cache-by-revision
@@ -177,6 +185,7 @@ jobs:
       - *restore-npm-cache
       - *disable-xdebug-php-extension
       - *disable-php-memory-limit
+      - *install-php-extensions
       - *update-composer
       - *update-project-dependencies
       - *save-composer-cache-by-revision
@@ -186,7 +195,7 @@ jobs:
           name: Run Behat tests
           command: |-
             mkdir -p build/logs/tmp build/cov
-            for f in $(find features -name '*.feature' -not -path 'features/main/exposed_state.feature' -not -path 'features/elasticsearch/*' | circleci tests split --split-by=timings); do
+            for f in $(find features -name '*.feature' -not -path 'features/main/exposed_state.feature' -not -path 'features/elasticsearch/*' -not -path 'features/mongodb/*' | circleci tests split --split-by=timings); do
               _f=${f//\//_}
               FEATURE="${_f}" phpdbg -qrr vendor/bin/behat --profile=coverage --suite=default --format=progress --out=std --format=junit --out=build/logs/tmp/"${_f}" "$f"
             done

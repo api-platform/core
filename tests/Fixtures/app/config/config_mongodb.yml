@@ -1,0 +1,10 @@
+imports:
+    - { resource: parameters_mongodb.yml }
+    - { resource: config_test_mongodb.yml }
+
+doctrine_mongodb:
+    connections:
+        default:
+            server: '%server%'
+            options: {}
+    default_database: '%dbname%'

@@ -83,8 +83,10 @@
         </service>
 
         <service id="api_platform.serializer.property_filter" class="ApiPlatform\Core\Serializer\Filter\PropertyFilter" public="false" abstract="true" />
+        <service id="ApiPlatform\Core\Serializer\Filter\PropertyFilter" alias="api_platform.serializer.property_filter" />
 
         <service id="api_platform.serializer.group_filter" class="ApiPlatform\Core\Serializer\Filter\GroupFilter" public="false" abstract="true" />
+        <service id="ApiPlatform\Core\Serializer\Filter\GroupFilter" alias="api_platform.serializer.group_filter" />
 
         <service id="api_platform.serializer.normalizer.item" class="ApiPlatform\Core\Serializer\ItemNormalizer" public="false">
             <argument type="service" id="api_platform.metadata.property.name_collection_factory" />
@@ -96,8 +98,13 @@
             <argument type="service" id="serializer.mapping.class_metadata_factory" on-invalid="ignore" />
             <argument type="service" id="api_platform.item_data_provider" on-invalid="ignore" />
             <argument>%api_platform.allow_plain_identifiers%</argument>
+            <argument>null</argument>
+            <argument type="service" id="api_platform.data_transformer" on-invalid="ignore" />
+            <argument type="service" id="api_platform.metadata.resource.metadata_factory" on-invalid="ignore" />
+            <argument>true</argument>
 
-            <tag name="serializer.normalizer" />
+              <!-- After the DataURINormalizer but before the object denormalizer -->
+            <tag name="serializer.normalizer" priority="-923" />
         </service>
 
         <!-- Resources Operations path resolver -->
@@ -154,6 +161,7 @@
         <service id="api_platform.listener.view.write" class="ApiPlatform\Core\EventListener\WriteListener">
             <argument type="service" id="api_platform.data_persister" />
             <argument type="service" id="api_platform.iri_converter" on-invalid="null" />
+            <argument type="service" id="api_platform.metadata.resource.metadata_factory" on-invalid="null" />
 
             <tag name="kernel.event_listener" event="kernel.view" method="onKernelView" priority="32" />
         </service>
@@ -279,6 +287,12 @@
         <service id="api_platform.cache.subresource_operation_factory" parent="cache.system" public="false">
             <tag name="cache.pool" />
         </service>
+
+        <service id="api_platform.data_transformer.chain_transformer" class="ApiPlatform\Core\DataTransformer\ChainDataTransformer" public="false">
+            <argument type="tagged" tag="api_platform.data_transformer" />
+        </service>
+
+        <service id="api_platform.data_transformer" alias="api_platform.data_transformer.chain_transformer" />
     </services>
 
 </container>

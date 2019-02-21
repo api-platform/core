@@ -15,7 +15,9 @@ namespace ApiPlatform\Core\Tests\GraphQl\Type;
 
 use ApiPlatform\Core\Exception\ResourceClassNotFoundException;
 use ApiPlatform\Core\GraphQl\Resolver\Factory\ResolverFactoryInterface;
+use ApiPlatform\Core\GraphQl\Type\Definition\IterableType;
 use ApiPlatform\Core\GraphQl\Type\SchemaBuilder;
+use ApiPlatform\Core\GraphQl\Type\TypesFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
@@ -257,6 +259,7 @@ class SchemaBuilderTest extends TestCase
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $collectionResolverFactoryProphecy = $this->prophesize(ResolverFactoryInterface::class);
         $itemMutationResolverFactoryProphecy = $this->prophesize(ResolverFactoryInterface::class);
+        $typesFactoryProphecy = $this->prophesize(TypesFactoryInterface::class);
 
         $resourceClassNames = [];
         for ($i = 1; $i <= 3; ++$i) {
@@ -293,6 +296,8 @@ class SchemaBuilderTest extends TestCase
         $itemMutationResolverFactoryProphecy->__invoke(Argument::cetera())->willReturn(function () {
         });
 
+        $typesFactoryProphecy->getTypes()->willReturn(['Iterable' => new IterableType()]);
+
         return new SchemaBuilder(
             $propertyNameCollectionFactoryProphecy->reveal(),
             $propertyMetadataFactoryProphecy->reveal(),
@@ -304,6 +309,7 @@ class SchemaBuilderTest extends TestCase
             },
             function () {
             },
+            $typesFactoryProphecy->reveal(),
             null,
             $paginationEnabled
         );

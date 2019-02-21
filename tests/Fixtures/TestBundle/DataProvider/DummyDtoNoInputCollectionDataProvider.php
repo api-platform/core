@@ -15,8 +15,9 @@ namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\DataProvider;
 
 use ApiPlatform\Core\DataProvider\ContextAwareCollectionDataProviderInterface;
 use ApiPlatform\Core\DataProvider\RestrictedDataProviderInterface;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\DummyDtoNoInput as DummyDtoNoInputDocument;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Dto\OutputDto;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyDtoNoInput;
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\OutputDto;
 use Doctrine\Common\Persistence\ManagerRegistry;
 
 /**
@@ -36,7 +37,7 @@ final class DummyDtoNoInputCollectionDataProvider implements ContextAwareCollect
      */
     public function supports(string $resourceClass, string $operationName = null, array $context = []): bool
     {
-        return DummyDtoNoInput::class === $resourceClass;
+        return \in_array($resourceClass, [DummyDtoNoInput::class, DummyDtoNoInputDocument::class], true);
     }
 
     /**
@@ -44,7 +45,7 @@ final class DummyDtoNoInputCollectionDataProvider implements ContextAwareCollect
      */
     public function getCollection(string $resourceClass, string $operationName = null, array $context = [])
     {
-        $dummyDtos = $this->registry->getManagerForClass(DummyDtoNoInput::class)->getRepository(DummyDtoNoInput::class)->findAll();
+        $dummyDtos = $this->registry->getManagerForClass($resourceClass)->getRepository($resourceClass)->findAll();
         $objects = [];
         foreach ($dummyDtos as $dummyDto) {
             $object = new OutputDto();

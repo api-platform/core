@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\Bridge\Elasticsearch\DataProvider\Extension;
 
 use ApiPlatform\Core\Bridge\Elasticsearch\DataProvider\Extension\ConstantScoreFilterExtension;
-use ApiPlatform\Core\Bridge\Elasticsearch\DataProvider\Extension\FullBodySearchCollectionExtensionInterface;
+use ApiPlatform\Core\Bridge\Elasticsearch\DataProvider\Extension\RequestBodySearchCollectionExtensionInterface;
 use ApiPlatform\Core\Bridge\Elasticsearch\DataProvider\Filter\ConstantScoreFilterInterface;
 use ApiPlatform\Core\Bridge\Elasticsearch\DataProvider\Filter\SortFilterInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
@@ -28,7 +28,7 @@ class ConstantScoreFilterExtensionTest extends TestCase
     public function testConstruct()
     {
         self::assertInstanceOf(
-            FullBodySearchCollectionExtensionInterface::class,
+            RequestBodySearchCollectionExtensionInterface::class,
             new ConstantScoreFilterExtension(
                 $this->prophesize(ResourceMetadataFactoryInterface::class)->reveal(),
                 $this->prophesize(ContainerInterface::class)->reveal()

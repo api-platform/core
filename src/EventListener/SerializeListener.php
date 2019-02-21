@@ -49,7 +49,7 @@ final class SerializeListener
         $controllerResult = $event->getControllerResult();
         $request = $event->getRequest();
 
-        if ($controllerResult instanceof Response) {
+        if ($controllerResult instanceof Response || !$request->attributes->getBoolean('_api_respond', true)) {
             return;
         }
 
@@ -62,15 +62,10 @@ final class SerializeListener
         $request->attributes->set('_api_respond', true);
         $context = $this->serializerContextBuilder->createFromRequest($request, true, $attributes);
 
-        if (isset($context['output_class'])) {
-            if (false === $context['output_class']) {
-                // If the output class is explicitly set to false, the response must be empty
-                $event->setControllerResult('');
+        if (isset($context['output']) && \array_key_exists('class', $context['output']) && null === $context['output']['class']) {
+            $event->setControllerResult('');
 
-                return;
-            }
-
-            $context['resource_class'] = $context['output_class'];
+            return;
         }
 
         if ($included = $request->attributes->get('_api_included')) {
@@ -107,10 +102,6 @@ final class SerializeListener
      */
     private function serializeRawData(GetResponseForControllerResultEvent $event, Request $request, $controllerResult)
     {
-        if (!$request->attributes->get('_api_respond')) {
-            return;
-        }
-
         if (\is_object($controllerResult)) {
             $event->setControllerResult($this->serializer->serialize($controllerResult, $request->getRequestFormat(), $request->attributes->get('_api_normalization_context', [])));
 

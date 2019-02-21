@@ -245,6 +245,7 @@ Feature: Subresource support
       "@id": "/third_levels/1",
       "@type": "ThirdLevel",
       "fourthLevel": "/fourth_levels/1",
+      "badFourthLevel": null,
       "id": 1,
       "level": 3,
       "test": true
@@ -262,6 +263,7 @@ Feature: Subresource support
       "@context": "/contexts/FourthLevel",
       "@id": "/fourth_levels/1",
       "@type": "FourthLevel",
+      "badThirdLevel": [],
       "id": 1,
       "level": 4
     }
