@@ -108,7 +108,7 @@ final class ContextBuilder implements AnonymousContextBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function getAnonymousResourceContext($object, array $context, int $referenceType = UrlGeneratorInterface::ABS_PATH): array
+    public function getAnonymousResourceContext($object, array $context = [], int $referenceType = UrlGeneratorInterface::ABS_PATH): array
     {
         $id = $context['iri'] ?? '_:'.(\function_exists('spl_object_id') ? spl_object_id($object) : spl_object_hash($object));
         $jsonLdContext = [
