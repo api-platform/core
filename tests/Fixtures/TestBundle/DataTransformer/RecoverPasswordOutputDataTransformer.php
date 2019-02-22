@@ -25,10 +25,6 @@ final class RecoverPasswordOutputDataTransformer implements DataTransformerInter
      */
     public function transform($object, string $to, array $context = [])
     {
-        if (!$object instanceof User) {
-            throw new \InvalidArgumentException();
-        }
-
         $output = new RecoverPasswordOutput();
         $output->dummy = new Dummy();
         $output->dummy->setId(1);

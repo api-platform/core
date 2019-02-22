@@ -26,7 +26,7 @@
             <argument type="service" id="api_platform.name_converter" on-invalid="ignore" />
             <argument type="service" id="serializer.mapping.class_metadata_factory" on-invalid="ignore" />
             <argument type="collection" />
-            <argument type="service" id="api_platform.data_transformer" on-invalid="ignore" />
+            <argument type="tagged" tag="api_platform.data_transformer" on-invalid="ignore" />
             <argument>true</argument>
 
             <!-- After the DataURINormalizer but before the object denormalizer -->

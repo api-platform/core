@@ -77,7 +77,7 @@
             <argument type="service" id="api_platform.item_data_provider" on-invalid="ignore" />
             <argument>%api_platform.allow_plain_identifiers%</argument>
             <argument>null</argument>
-            <argument type="service" id="api_platform.data_transformer" on-invalid="ignore" />
+            <argument type="tagged" tag="api_platform.data_transformer" on-invalid="ignore" />
             <argument type="service" id="api_platform.metadata.resource.metadata_factory" on-invalid="ignore" />
             <argument>true</argument>
 

@@ -16,7 +16,6 @@ namespace ApiPlatform\Core\JsonApi\Serializer;
 use ApiPlatform\Core\Api\IriConverterInterface;
 use ApiPlatform\Core\Api\OperationType;
 use ApiPlatform\Core\Api\ResourceClassResolverInterface;
-use ApiPlatform\Core\DataTransformer\DataTransformerInterface;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\Exception\ItemNotFoundException;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
@@ -24,7 +23,6 @@ use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInte
 use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Serializer\AbstractItemNormalizer;
-use ApiPlatform\Core\Util\ClassInfoTrait;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
@@ -39,15 +37,13 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
  */
 final class ItemNormalizer extends AbstractItemNormalizer
 {
-    use ClassInfoTrait;
-
     const FORMAT = 'jsonapi';
 
     private $componentsCache = [];
 
-    public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, IriConverterInterface $iriConverter, ResourceClassResolverInterface $resourceClassResolver, PropertyAccessorInterface $propertyAccessor = null, NameConverterInterface $nameConverter = null, ResourceMetadataFactoryInterface $resourceMetadataFactory, array $defaultContext = [], DataTransformerInterface $dataTransformer = null, bool $allowUnmappedClass = false)
+    public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, IriConverterInterface $iriConverter, ResourceClassResolverInterface $resourceClassResolver, PropertyAccessorInterface $propertyAccessor = null, NameConverterInterface $nameConverter = null, ResourceMetadataFactoryInterface $resourceMetadataFactory, array $defaultContext = [], iterable $dataTransformers = [], bool $allowUnmappedClass = false)
     {
-        parent::__construct($propertyNameCollectionFactory, $propertyMetadataFactory, $iriConverter, $resourceClassResolver, $propertyAccessor, $nameConverter, null, null, false, $defaultContext, $dataTransformer, $resourceMetadataFactory, $allowUnmappedClass);
+        parent::__construct($propertyNameCollectionFactory, $propertyMetadataFactory, $iriConverter, $resourceClassResolver, $propertyAccessor, $nameConverter, null, null, false, $defaultContext, $dataTransformers, $resourceMetadataFactory, $allowUnmappedClass);
     }
 
     /**
@@ -67,10 +63,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
             $context['cache_key'] = $this->getJsonApiCacheKey($format, $context);
         }
 
-        $outputClass = $this->getOutputClass($this->getObjectClass($object), $context);
-        if (null !== $outputClass && null !== $this->dataTransformer && $this->dataTransformer->supportsTransformation($object, $outputClass, $context)) {
-            $object = $this->dataTransformer->transform($object, $outputClass, $context);
-        }
+        $object = $this->transformOutput($object, $context);
 
         // Get and populate attributes data
         $objectAttributesData = parent::normalize($object, $format, $context);

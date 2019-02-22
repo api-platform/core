@@ -59,9 +59,9 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
     protected $itemDataProvider;
     protected $allowPlainIdentifiers;
     protected $allowUnmappedClass;
-    protected $dataTransformer;
+    protected $dataTransformers = [];
 
-    public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, IriConverterInterface $iriConverter, ResourceClassResolverInterface $resourceClassResolver, PropertyAccessorInterface $propertyAccessor = null, NameConverterInterface $nameConverter = null, ClassMetadataFactoryInterface $classMetadataFactory = null, ItemDataProviderInterface $itemDataProvider = null, bool $allowPlainIdentifiers = false, array $defaultContext = [], DataTransformerInterface $dataTransformer = null, ResourceMetadataFactoryInterface $resourceMetadataFactory = null, bool $allowUnmappedClass = false)
+    public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, IriConverterInterface $iriConverter, ResourceClassResolverInterface $resourceClassResolver, PropertyAccessorInterface $propertyAccessor = null, NameConverterInterface $nameConverter = null, ClassMetadataFactoryInterface $classMetadataFactory = null, ItemDataProviderInterface $itemDataProvider = null, bool $allowPlainIdentifiers = false, array $defaultContext = [], iterable $dataTransformers = [], ResourceMetadataFactoryInterface $resourceMetadataFactory = null, bool $allowUnmappedClass = false)
     {
         if (!isset($defaultContext['circular_reference_handler'])) {
             $defaultContext['circular_reference_handler'] = function ($object) {
@@ -85,7 +85,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
         $this->propertyAccessor = $propertyAccessor ?: PropertyAccess::createPropertyAccessor();
         $this->itemDataProvider = $itemDataProvider;
         $this->allowPlainIdentifiers = $allowPlainIdentifiers;
-        $this->dataTransformer = $dataTransformer;
+        $this->dataTransformers = $dataTransformers;
         $this->resourceMetadataFactory = $resourceMetadataFactory;
         $this->allowUnmappedClass = $allowUnmappedClass;
     }
@@ -164,14 +164,12 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
         $context['resource_class'] = $class;
         $inputClass = $this->getInputClass($class, $context);
 
-        if (null !== $inputClass) {
-            $data = parent::denormalize($data, $inputClass, $format, ['resource_class' => $inputClass] + $context);
-
-            if (null !== $this->dataTransformer && $this->dataTransformer->supportsTransformation($data, $class, $context)) {
-                $data = $this->dataTransformer->transform($data, $class, $context);
-            }
-
-            return $data;
+        if (null !== $inputClass && null !== $dataTransformer = $this->getDataTransformer($data, $class, $context)) {
+            $data = $dataTransformer->transform(
+                parent::denormalize($data, $inputClass, $format, ['resource_class' => $inputClass] + $context),
+                $class,
+                $context
+            );
         }
 
         return parent::denormalize($data, $class, $format, $context);
@@ -594,5 +592,33 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
         }
 
         return $iri;
+    }
+
+    /**
+     * Finds the first supported data transformer if any.
+     */
+    protected function getDataTransformer($object, string $to, array $context = []): ?DataTransformerInterface
+    {
+        foreach ($this->dataTransformers as $dataTransformer) {
+            if ($dataTransformer->supportsTransformation($object, $to, $context)) {
+                return $dataTransformer;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * For a given resource, it returns an output representation if any
+     * If not, the resource is returned.
+     */
+    protected function transformOutput($object, array $context = [])
+    {
+        $outputClass = $this->getOutputClass($this->getObjectClass($object), $context);
+        if (null !== $outputClass && null !== $dataTransformer = $this->getDataTransformer($object, $outputClass, $context)) {
+            return $dataTransformer->transform($object, $outputClass, $context);
+        }
+
+        return $object;
     }
 }
