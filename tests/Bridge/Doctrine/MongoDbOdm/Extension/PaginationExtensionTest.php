@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\Bridge\Doctrine\MongoDbOdm\Extension;
 
 use ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Extension\PaginationExtension;
+use ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Paginator;
 use ApiPlatform\Core\DataProvider\Pagination;
 use ApiPlatform\Core\DataProvider\PaginatorInterface;
 use ApiPlatform\Core\DataProvider\PartialPaginatorInterface;
@@ -24,7 +25,7 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ODM\MongoDB\Aggregation\Builder;
 use Doctrine\ODM\MongoDB\Aggregation\Stage\Count;
 use Doctrine\ODM\MongoDB\Aggregation\Stage\Facet;
-use Doctrine\ODM\MongoDB\Aggregation\Stage\Limit;
+use Doctrine\ODM\MongoDB\Aggregation\Stage\Match;
 use Doctrine\ODM\MongoDB\Aggregation\Stage\Skip;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Doctrine\ODM\MongoDB\Iterator\Iterator;
@@ -391,10 +392,15 @@ class PaginationExtensionTest extends TestCase
 
     private function mockAggregationBuilder($expectedOffset, $expectedLimit)
     {
-        $limitProphecy = $this->prophesize(Limit::class);
-
         $skipProphecy = $this->prophesize(Skip::class);
-        $skipProphecy->limit($expectedLimit)->shouldBeCalled()->willReturn($limitProphecy->reveal());
+        if ($expectedLimit > 0) {
+            $skipProphecy->limit($expectedLimit)->shouldBeCalled();
+        } else {
+            $matchProphecy = $this->prophesize(Match::class);
+            $matchProphecy->field(Paginator::LIMIT_ZERO_MARKER_FIELD)->shouldBeCalled()->willReturn($matchProphecy);
+            $matchProphecy->equals(Paginator::LIMIT_ZERO_MARKER)->shouldBeCalled();
+            $skipProphecy->match()->shouldBeCalled()->willReturn($matchProphecy->reveal());
+        }
 
         $resultsAggregationBuilderProphecy = $this->prophesize(Builder::class);
         $resultsAggregationBuilderProphecy->skip($expectedOffset)->shouldBeCalled()->willReturn($skipProphecy->reveal());
@@ -416,7 +422,7 @@ class PaginationExtensionTest extends TestCase
         $this->managerRegistryProphecy->getManagerForClass('Foo')->shouldBeCalled()->willReturn($objectManagerProphecy->reveal());
 
         $facetProphecy = $this->prophesize(Facet::class);
-        $facetProphecy->pipeline($limitProphecy)->shouldBeCalled()->willReturn($facetProphecy);
+        $facetProphecy->pipeline($skipProphecy)->shouldBeCalled()->willReturn($facetProphecy);
         $facetProphecy->pipeline($countProphecy)->shouldBeCalled()->willReturn($facetProphecy);
         $facetProphecy->field('count')->shouldBeCalled()->willReturn($facetProphecy);
         $facetProphecy->field('results')->shouldBeCalled()->willReturn($facetProphecy);
