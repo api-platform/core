@@ -49,8 +49,8 @@ class SortExtensionTest extends TestCase
         $resourceMetadataFactoryProphecy->create(Foo::class)->willReturn(new ResourceMetadata(null, null, null, null, null, ['order' => ['name', 'bar' => 'desc']]))->shouldBeCalled();
 
         $nameConverterProphecy = $this->prophesize(NameConverterInterface::class);
-        $nameConverterProphecy->normalize('name')->willReturn('name')->shouldBeCalled();
-        $nameConverterProphecy->normalize('bar')->willReturn('bar')->shouldBeCalled();
+        $nameConverterProphecy->normalize('name', Foo::class)->willReturn('name')->shouldBeCalled();
+        $nameConverterProphecy->normalize('bar', Foo::class)->willReturn('bar')->shouldBeCalled();
 
         $sortExtension = new SortExtension($resourceMetadataFactoryProphecy->reveal(), $this->prophesize(IdentifierExtractorInterface::class)->reveal(), $this->prophesize(PropertyMetadataFactoryInterface::class)->reveal(), $this->prophesize(ResourceClassResolverInterface::class)->reveal(), $nameConverterProphecy->reveal(), 'asc');
 
@@ -71,8 +71,8 @@ class SortExtensionTest extends TestCase
         $resourceClassResolverProphecy->isResourceClass(Foo::class)->willReturn(true)->shouldBeCalled();
 
         $nameConverterProphecy = $this->prophesize(NameConverterInterface::class);
-        $nameConverterProphecy->normalize('foo.bar')->willReturn('foo.bar')->shouldBeCalled();
-        $nameConverterProphecy->normalize('foo')->willReturn('foo')->shouldBeCalled();
+        $nameConverterProphecy->normalize('foo.bar', Foo::class)->willReturn('foo.bar')->shouldBeCalled();
+        $nameConverterProphecy->normalize('foo', Foo::class)->willReturn('foo')->shouldBeCalled();
 
         $sortExtension = new SortExtension($resourceMetadataFactoryProphecy->reveal(), $this->prophesize(IdentifierExtractorInterface::class)->reveal(), $propertyMetadataFactoryProphecy->reveal(), $resourceClassResolverProphecy->reveal(), $nameConverterProphecy->reveal(), 'asc');
 
@@ -88,7 +88,7 @@ class SortExtensionTest extends TestCase
         $identifierExtractorProphecy->getIdentifierFromResourceClass(Foo::class)->willReturn('id')->shouldBeCalled();
 
         $nameConverterProphecy = $this->prophesize(NameConverterInterface::class);
-        $nameConverterProphecy->normalize('id')->willReturn('id')->shouldBeCalled();
+        $nameConverterProphecy->normalize('id', Foo::class)->willReturn('id')->shouldBeCalled();
 
         $sortExtension = new SortExtension($resourceMetadataFactoryProphecy->reveal(), $identifierExtractorProphecy->reveal(), $this->prophesize(PropertyMetadataFactoryInterface::class)->reveal(), $this->prophesize(ResourceClassResolverInterface::class)->reveal(), $nameConverterProphecy->reveal(), 'asc');
 

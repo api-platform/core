@@ -134,7 +134,7 @@ final class ContextBuilder implements AnonymousContextBuilderInterface
                 continue;
             }
 
-            $convertedName = $this->nameConverter ? $this->nameConverter->normalize($propertyName) : $propertyName;
+            $convertedName = $this->nameConverter ? $this->nameConverter->normalize($propertyName, $resourceClass, self::FORMAT) : $propertyName;
             $jsonldContext = $propertyMetadata->getAttributes()['jsonld_context'] ?? [];
 
             if (!$id = $propertyMetadata->getIri()) {

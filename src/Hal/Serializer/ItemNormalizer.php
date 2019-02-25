@@ -195,7 +195,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
 
             $relationName = $relation['name'];
             if ($this->nameConverter) {
-                $relationName = $this->nameConverter->normalize($relationName);
+                $relationName = $this->nameConverter->normalize($relationName, $class, $format, $context);
             }
 
             if ('one' === $relation['cardinality']) {

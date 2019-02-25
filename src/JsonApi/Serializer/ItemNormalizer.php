@@ -329,7 +329,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
             $attributeValue = $this->getAttributeValue($object, $relationshipName, $format, $context);
 
             if ($this->nameConverter) {
-                $relationshipName = $this->nameConverter->normalize($relationshipName);
+                $relationshipName = $this->nameConverter->normalize($relationshipName, $context['resource_class'], self::FORMAT, $context);
             }
 
             if (!$attributeValue) {
