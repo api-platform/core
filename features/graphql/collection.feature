@@ -197,12 +197,12 @@ Feature: GraphQL collection support
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/json"
-    And the JSON node "data.dummies.pageInfo.endCursor" should be equal to "Mw=="
+    And the JSON node "data.dummies.pageInfo.endCursor" should be equal to "MQ=="
     And the JSON node "data.dummies.pageInfo.hasNextPage" should be true
     And the JSON node "data.dummies.totalCount" should be equal to 4
     And the JSON node "data.dummies.edges[1].node.name" should be equal to "Dummy #2"
     And the JSON node "data.dummies.edges[1].cursor" should be equal to "MQ=="
-    And the JSON node "data.dummies.edges[1].node.relatedDummies.pageInfo.endCursor" should be equal to "Mw=="
+    And the JSON node "data.dummies.edges[1].node.relatedDummies.pageInfo.endCursor" should be equal to "MQ=="
     And the JSON node "data.dummies.edges[1].node.relatedDummies.pageInfo.hasNextPage" should be true
     And the JSON node "data.dummies.edges[1].node.relatedDummies.totalCount" should be equal to 4
     And the JSON node "data.dummies.edges[1].node.relatedDummies.edges[0].node.name" should be equal to "RelatedDummy12"
@@ -277,9 +277,11 @@ Feature: GraphQL collection support
     And the header "Content-Type" should be equal to "application/json"
     And the JSON node "data.dummies.edges" should have 1 element
     And the JSON node "data.dummies.pageInfo.hasNextPage" should be false
+    And the JSON node "data.dummies.pageInfo.endCursor" should be equal to "Mw=="
     And the JSON node "data.dummies.edges[0].node.name" should be equal to "Dummy #4"
     And the JSON node "data.dummies.edges[0].cursor" should be equal to "Mw=="
     And the JSON node "data.dummies.edges[0].node.relatedDummies.pageInfo.hasNextPage" should be false
+    And the JSON node "data.dummies.edges[0].node.relatedDummies.pageInfo.endCursor" should be equal to "Mw=="
     And the JSON node "data.dummies.edges[0].node.relatedDummies.edges" should have 2 elements
     And the JSON node "data.dummies.edges[0].node.relatedDummies.edges[1].node.name" should be equal to "RelatedDummy44"
     And the JSON node "data.dummies.edges[0].node.relatedDummies.edges[1].cursor" should be equal to "Mw=="
