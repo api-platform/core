@@ -23,7 +23,11 @@ use Symfony\Component\Validator\Constraints as Assert;
  *
  * @author Jérémy Derussé <jeremy@derusse.com>
  *
- * @ApiResource(attributes={"filters"={"my_dummy.search", "my_dummy.order", "my_dummy.date"}})
+ * @ApiResource(
+ *     collectionOperations={"get", "post"},
+ *     itemOperations={"get", "put", "delete"},
+ *     attributes={"filters"={"my_dummy.search", "my_dummy.order", "my_dummy.date"}}
+ * )
  * @ORM\Entity
  * @ORM\InheritanceType("SINGLE_TABLE")
  * @ORM\DiscriminatorColumn(name="discr", type="string", length=16)
