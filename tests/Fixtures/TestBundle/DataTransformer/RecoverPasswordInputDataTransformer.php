@@ -39,6 +39,6 @@ final class RecoverPasswordInputDataTransformer implements DataTransformerInterf
      */
     public function supportsTransformation($data, string $to, array $context = []): bool
     {
-        return (User::class === $to || UserDocument::class === $to) && $data instanceof RecoverPasswordInput;
+        return (User::class === $to || UserDocument::class === $to) && RecoverPasswordInput::class === ($context['input']['class'] ?? null);
     }
 }

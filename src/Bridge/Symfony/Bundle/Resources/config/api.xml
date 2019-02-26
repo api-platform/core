@@ -99,7 +99,7 @@
             <argument type="service" id="api_platform.item_data_provider" on-invalid="ignore" />
             <argument>%api_platform.allow_plain_identifiers%</argument>
             <argument>null</argument>
-            <argument type="service" id="api_platform.data_transformer" on-invalid="ignore" />
+            <argument type="tagged" tag="api_platform.data_transformer" on-invalid="ignore" />
             <argument type="service" id="api_platform.metadata.resource.metadata_factory" on-invalid="ignore" />
             <argument>true</argument>
 
@@ -287,12 +287,6 @@
         <service id="api_platform.cache.subresource_operation_factory" parent="cache.system" public="false">
             <tag name="cache.pool" />
         </service>
-
-        <service id="api_platform.data_transformer.chain_transformer" class="ApiPlatform\Core\DataTransformer\ChainDataTransformer" public="false">
-            <argument type="tagged" tag="api_platform.data_transformer" />
-        </service>
-
-        <service id="api_platform.data_transformer" alias="api_platform.data_transformer.chain_transformer" />
     </services>
 
 </container>

@@ -140,7 +140,7 @@ class ItemNormalizerTest extends TestCase
             new ReservedAttributeNameConverter(),
             $resourceMetadataFactoryProphecy->reveal(),
             [],
-            null,
+            [],
             true
         );
 
@@ -181,7 +181,7 @@ class ItemNormalizerTest extends TestCase
             new ReservedAttributeNameConverter(),
             $resourceMetadataFactory->reveal(),
             [],
-            null,
+            [],
             true
         );
 
@@ -241,7 +241,7 @@ class ItemNormalizerTest extends TestCase
             new ReservedAttributeNameConverter(),
             $resourceMetadataFactory->reveal(),
             [],
-            null,
+            [],
             true
         );
 
@@ -326,7 +326,7 @@ class ItemNormalizerTest extends TestCase
             new ReservedAttributeNameConverter(),
             $resourceMetadataFactory->reveal(),
             [],
-            null,
+            [],
             true
         );
         $normalizer->setSerializer($serializerProphecy->reveal());
@@ -379,7 +379,7 @@ class ItemNormalizerTest extends TestCase
             null,
             $this->prophesize(ResourceMetadataFactoryInterface::class)->reveal(),
             [],
-            null,
+            [],
             true
         );
 
@@ -436,7 +436,7 @@ class ItemNormalizerTest extends TestCase
             new ReservedAttributeNameConverter(),
             $resourceMetadataFactory->reveal(),
             [],
-            null,
+            [],
             true
         );
 
@@ -494,7 +494,7 @@ class ItemNormalizerTest extends TestCase
             new ReservedAttributeNameConverter(),
             $resourceMetadataFactory->reveal(),
             [],
-            null,
+            [],
             true
         );
 
@@ -554,7 +554,7 @@ class ItemNormalizerTest extends TestCase
             new ReservedAttributeNameConverter(),
             $resourceMetadataFactory->reveal(),
             [],
-            null,
+            [],
             true
         );
 

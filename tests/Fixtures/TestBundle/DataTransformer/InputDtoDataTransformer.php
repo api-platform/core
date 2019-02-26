@@ -26,16 +26,17 @@ final class InputDtoDataTransformer implements DataTransformerInterface
      */
     public function transform($object, string $to, array $context = [])
     {
-        if (!$object instanceof InputDto) {
-            throw new \InvalidArgumentException();
-        }
+        /**
+         * @var \ApiPlatform\Core\Tests\Fixtures\TestBundle\Dto\InputDto
+         */
+        $data = $object;
 
         /**
          * @var \ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyDtoInputOutput
          */
         $resourceObject = $context[AbstractItemNormalizer::OBJECT_TO_POPULATE] ?? new $context['resource_class']();
-        $resourceObject->str = $object->foo;
-        $resourceObject->num = $object->bar;
+        $resourceObject->str = $data->foo;
+        $resourceObject->num = $data->bar;
 
         return $resourceObject;
     }
@@ -45,6 +46,10 @@ final class InputDtoDataTransformer implements DataTransformerInterface
      */
     public function supportsTransformation($object, string $to, array $context = []): bool
     {
-        return (DummyDtoInputOutput::class === $to || DummyDtoInputOutputDocument::class === $to) && $object instanceof InputDto;
+        if ($object instanceof DummyDtoInputOutput || $object instanceof DummyDtoInputOutputDocument) {
+            return false;
+        }
+
+        return (DummyDtoInputOutput::class === $to || DummyDtoInputOutputDocument::class === $to) && (InputDto::class === $context['input']['class']);
     }
 }
