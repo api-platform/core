@@ -89,11 +89,11 @@ final class SortExtension implements RequestBodySearchCollectionExtensionInterfa
         $order = ['order' => strtolower($direction)];
 
         if (null !== $nestedPath = $this->getNestedFieldPath($resourceClass, $property)) {
-            $nestedPath = null === $this->nameConverter ? $nestedPath : $this->nameConverter->normalize($nestedPath);
+            $nestedPath = null === $this->nameConverter ? $nestedPath : $this->nameConverter->normalize($nestedPath, $resourceClass);
             $order['nested'] = ['path' => $nestedPath];
         }
 
-        $property = null === $this->nameConverter ? $property : $this->nameConverter->normalize($property);
+        $property = null === $this->nameConverter ? $property : $this->nameConverter->normalize($property, $resourceClass);
 
         return [$property => $order];
     }

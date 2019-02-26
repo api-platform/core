@@ -27,7 +27,7 @@ Feature: GraphQL mutation support
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/json"
     And the JSON node "data.__type.fields[0].name" should contain "delete"
-    And the JSON node "data.__type.fields[0].description" should match '/^Deletes a [A-z0-9]+\.$/'
+    And the JSON node "data.__type.fields[0].description" should match '/^Deletes a [A-z0-9]+.$/'
     And the JSON node "data.__type.fields[0].type.name" should match "/^delete[A-z0-9]+Payload$/"
     And the JSON node "data.__type.fields[0].type.kind" should be equal to "OBJECT"
     And the JSON node "data.__type.fields[0].args[0].name" should be equal to "input"
@@ -310,7 +310,7 @@ Feature: GraphQL mutation support
     When I send the following GraphQL request:
     """
     mutation {
-      createDummyDtoNoInput(input: {foo: "A new one", bar: 3, clientMutationId: "myId"}) {
+      createDummyDtoNoInput(input: {lorem: "A new one", ipsum: 3, clientMutationId: "myId"}) {
         clientMutationId
       }
     }
@@ -323,7 +323,19 @@ Feature: GraphQL mutation support
     {
       "errors": [
         {
-          "message": "Field \"foo\" is not defined by type createDummyDtoNoInputInput.",
+          "message": "Field createDummyDtoNoInputInput.id of required type ID! was not provided.",
+          "extensions": {
+            "category": "graphql"
+          },
+          "locations": [
+            {
+              "line": 2,
+              "column": 32
+            }
+          ]
+        },
+        {
+          "message": "Field \"lorem\" is not defined by type createDummyDtoNoInputInput.",
           "extensions": {
             "category": "graphql"
           },
@@ -335,14 +347,14 @@ Feature: GraphQL mutation support
           ]
         },
         {
-          "message": "Field \"bar\" is not defined by type createDummyDtoNoInputInput.",
+          "message": "Field \"ipsum\" is not defined by type createDummyDtoNoInputInput.",
           "extensions": {
             "category": "graphql"
           },
           "locations": [
             {
               "line": 2,
-              "column": 51
+              "column": 53
             }
           ]
         }

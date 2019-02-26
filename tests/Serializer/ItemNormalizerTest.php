@@ -15,12 +15,14 @@ namespace ApiPlatform\Core\Tests\Serializer;
 
 use ApiPlatform\Core\Api\IriConverterInterface;
 use ApiPlatform\Core\Api\ResourceClassResolverInterface;
+use ApiPlatform\Core\DataTransformer\DataTransformerInterface;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 use ApiPlatform\Core\Metadata\Property\PropertyNameCollection;
 use ApiPlatform\Core\Serializer\ItemNormalizer;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Dto\OutputDto;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
@@ -33,6 +35,10 @@ use Symfony\Component\Serializer\SerializerInterface;
  */
 class ItemNormalizerTest extends TestCase
 {
+    /**
+     * @group legacy
+     * @expectedDeprecation Passing a falsy $allowUnmappedClass flag in ApiPlatform\Core\Serializer\AbstractItemNormalizer is deprecated since version 2.4 and will default to true in 3.0.
+     */
     public function testSupportNormalization()
     {
         $std = new \stdClass();
@@ -91,7 +97,16 @@ class ItemNormalizerTest extends TestCase
             $propertyNameCollectionFactoryProphecy->reveal(),
             $propertyMetadataFactoryProphecy->reveal(),
             $iriConverterProphecy->reveal(),
-            $resourceClassResolverProphecy->reveal()
+            $resourceClassResolverProphecy->reveal(),
+            null,
+            null,
+            null,
+            null,
+            false,
+            null,
+            [],
+            null,
+            true
         );
         $normalizer->setSerializer($serializerProphecy->reveal());
 
@@ -121,7 +136,16 @@ class ItemNormalizerTest extends TestCase
             $propertyNameCollectionFactoryProphecy->reveal(),
             $propertyMetadataFactoryProphecy->reveal(),
             $iriConverterProphecy->reveal(),
-            $resourceClassResolverProphecy->reveal()
+            $resourceClassResolverProphecy->reveal(),
+            null,
+            null,
+            null,
+            null,
+            false,
+            null,
+            [],
+            null,
+            true
         );
         $normalizer->setSerializer($serializerProphecy->reveal());
 
@@ -152,7 +176,16 @@ class ItemNormalizerTest extends TestCase
             $propertyNameCollectionFactoryProphecy->reveal(),
             $propertyMetadataFactoryProphecy->reveal(),
             $iriConverterProphecy->reveal(),
-            $resourceClassResolverProphecy->reveal()
+            $resourceClassResolverProphecy->reveal(),
+            null,
+            null,
+            null,
+            null,
+            false,
+            null,
+            [],
+            null,
+            true
         );
         $normalizer->setSerializer($serializerProphecy->reveal());
 
@@ -181,7 +214,16 @@ class ItemNormalizerTest extends TestCase
             $propertyNameCollectionFactoryProphecy->reveal(),
             $propertyMetadataFactoryProphecy->reveal(),
             $iriConverterProphecy->reveal(),
-            $resourceClassResolverProphecy->reveal()
+            $resourceClassResolverProphecy->reveal(),
+            null,
+            null,
+            null,
+            null,
+            false,
+            null,
+            [],
+            null,
+            true
         );
         $normalizer->setSerializer($serializerProphecy->reveal());
         $normalizer->denormalize(['id' => '12', 'name' => 'hello'], Dummy::class, null, $context);
@@ -211,7 +253,16 @@ class ItemNormalizerTest extends TestCase
             $propertyNameCollectionFactoryProphecy->reveal(),
             $propertyMetadataFactoryProphecy->reveal(),
             $iriConverterProphecy->reveal(),
-            $resourceClassResolverProphecy->reveal()
+            $resourceClassResolverProphecy->reveal(),
+            null,
+            null,
+            null,
+            null,
+            false,
+            null,
+            [],
+            null,
+            true
         );
         $normalizer->setSerializer($serializerProphecy->reveal());
 
@@ -219,5 +270,52 @@ class ItemNormalizerTest extends TestCase
         $this->assertInstanceOf(Dummy::class, $object);
         $this->assertSame('42', $object->getId());
         $this->assertSame('hello', $object->getName());
+    }
+
+    public function testNormalizeWithDataTransformers()
+    {
+        $dummy = new Dummy();
+        $dummy->setName('hello');
+        $output = new OutputDto();
+
+        $propertyNameCollection = new PropertyNameCollection(['baz']);
+        $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
+        $propertyNameCollectionFactoryProphecy->create(OutputDto::class, [])->willReturn($propertyNameCollection)->shouldBeCalled();
+
+        $propertyMetadataFactory = new PropertyMetadata(null, null, true);
+        $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
+        $propertyMetadataFactoryProphecy->create(OutputDto::class, 'baz', [])->willReturn($propertyMetadataFactory)->shouldBeCalled();
+
+        $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
+
+        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
+        $resourceClassResolverProphecy->getResourceClass($output, null, true)->willThrow(InvalidArgumentException::class);
+
+        $serializerProphecy = $this->prophesize(SerializerInterface::class);
+        $serializerProphecy->willImplement(NormalizerInterface::class);
+        $serializerProphecy->normalize(null, null, Argument::type('array'))->willReturn('hello')->shouldBeCalled();
+
+        $dataTransformer = $this->prophesize(DataTransformerInterface::class);
+        $dataTransformer->supportsTransformation($dummy, OutputDto::class, Argument::any())->shouldBeCalled()->willReturn(true);
+        $dataTransformer->transform($dummy, OutputDto::class, Argument::any())->shouldBeCalled()->willReturn($output);
+
+        $normalizer = new ItemNormalizer(
+            $propertyNameCollectionFactoryProphecy->reveal(),
+            $propertyMetadataFactoryProphecy->reveal(),
+            $iriConverterProphecy->reveal(),
+            $resourceClassResolverProphecy->reveal(),
+            null,
+            null,
+            null,
+            null,
+            false,
+            null,
+            [$dataTransformer->reveal()],
+            null,
+            true
+        );
+        $normalizer->setSerializer($serializerProphecy->reveal());
+
+        $this->assertEquals(['baz' => 'hello'], $normalizer->normalize($dummy, null, ['resources' => [], 'output' => ['class' => OutputDto::class]]));
     }
 }

@@ -40,13 +40,10 @@ final class ItemNormalizer extends AbstractItemNormalizer
     const FORMAT = 'jsonapi';
 
     private $componentsCache = [];
-    private $resourceMetadataFactory;
 
-    public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, IriConverterInterface $iriConverter, ResourceClassResolverInterface $resourceClassResolver, PropertyAccessorInterface $propertyAccessor = null, NameConverterInterface $nameConverter = null, ResourceMetadataFactoryInterface $resourceMetadataFactory, array $defaultContext = [])
+    public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, IriConverterInterface $iriConverter, ResourceClassResolverInterface $resourceClassResolver, PropertyAccessorInterface $propertyAccessor = null, NameConverterInterface $nameConverter = null, ResourceMetadataFactoryInterface $resourceMetadataFactory, array $defaultContext = [], iterable $dataTransformers = [], bool $allowUnmappedClass = false)
     {
-        parent::__construct($propertyNameCollectionFactory, $propertyMetadataFactory, $iriConverter, $resourceClassResolver, $propertyAccessor, $nameConverter, null, null, false, $defaultContext);
-
-        $this->resourceMetadataFactory = $resourceMetadataFactory;
+        parent::__construct($propertyNameCollectionFactory, $propertyMetadataFactory, $iriConverter, $resourceClassResolver, $propertyAccessor, $nameConverter, null, null, false, $defaultContext, $dataTransformers, $resourceMetadataFactory, $allowUnmappedClass);
     }
 
     /**
@@ -66,6 +63,8 @@ final class ItemNormalizer extends AbstractItemNormalizer
             $context['cache_key'] = $this->getJsonApiCacheKey($format, $context);
         }
 
+        $object = $this->transformOutput($object, $context);
+
         // Get and populate attributes data
         $objectAttributesData = parent::normalize($object, $format, $context);
 
@@ -74,7 +73,12 @@ final class ItemNormalizer extends AbstractItemNormalizer
         }
 
         // Get and populate item type
-        $resourceClass = $this->resourceClassResolver->getResourceClass($object, $context['resource_class'] ?? null, true);
+        try {
+            $resourceClass = $this->resourceClassResolver->getResourceClass($object, $context['resource_class'] ?? null, true);
+        } catch (InvalidArgumentException $e) {
+            return parent::normalize($object, $format, $context);
+        }
+
         $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
 
         // Get and populate relations
@@ -325,7 +329,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
             $attributeValue = $this->getAttributeValue($object, $relationshipName, $format, $context);
 
             if ($this->nameConverter) {
-                $relationshipName = $this->nameConverter->normalize($relationshipName);
+                $relationshipName = $this->nameConverter->normalize($relationshipName, $context['resource_class'], self::FORMAT, $context);
             }
 
             if (!$attributeValue) {

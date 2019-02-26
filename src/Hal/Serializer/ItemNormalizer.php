@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Hal\Serializer;
 
+use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\Exception\RuntimeException;
 use ApiPlatform\Core\Serializer\AbstractItemNormalizer;
 use ApiPlatform\Core\Serializer\ContextTrait;
@@ -51,7 +52,20 @@ final class ItemNormalizer extends AbstractItemNormalizer
             $context['cache_key'] = $this->getHalCacheKey($format, $context);
         }
 
-        $resourceClass = $this->resourceClassResolver->getResourceClass($object, $context['resource_class'] ?? null, true);
+        $object = $this->transformOutput($object, $context);
+
+        try {
+            $resourceClass = $this->resourceClassResolver->getResourceClass($object, $context['resource_class'] ?? null, true);
+        } catch (InvalidArgumentException $e) {
+            $data = $this->initContext(\get_class($object), $context);
+            $rawData = parent::normalize($object, $format, $context);
+            if (!\is_array($rawData)) {
+                return $rawData;
+            }
+
+            return $data + $rawData;
+        }
+
         $context = $this->initContext($resourceClass, $context);
         $context['iri'] = $this->iriConverter->getIriFromItem($object);
         $context['api_normalize'] = true;
@@ -181,7 +195,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
 
             $relationName = $relation['name'];
             if ($this->nameConverter) {
-                $relationName = $this->nameConverter->normalize($relationName);
+                $relationName = $this->nameConverter->normalize($relationName, $class, $format, $context);
             }
 
             if ('one' === $relation['cardinality']) {

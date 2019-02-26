@@ -39,6 +39,7 @@ final class ItemNormalizer extends BaseItemNormalizer
      */
     public function normalize($object, $format = null, array $context = [])
     {
+        $object = $this->transformOutput($object, $context);
         $data = parent::normalize($object, $format, $context);
         $data[self::ITEM_KEY] = serialize($object); // calling serialize prevent weird normalization process done by Webonyx's GraphQL PHP
 

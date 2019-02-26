@@ -54,6 +54,7 @@ use ApiPlatform\Core\DataPersister\DataPersisterInterface;
 use ApiPlatform\Core\DataProvider\CollectionDataProviderInterface;
 use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
 use ApiPlatform\Core\DataProvider\SubresourceDataProviderInterface;
+use ApiPlatform\Core\DataTransformer\DataTransformerInterface;
 use ApiPlatform\Core\Exception\FilterValidationException;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\Exception\RuntimeException;
@@ -203,24 +204,6 @@ class ApiPlatformExtensionTest extends TestCase
         $containerBuilder = $containerBuilderProphecy->reveal();
 
         $this->extension->prepend($containerBuilder);
-    }
-
-    public function testPrependWhenNameConverterIsConfigured()
-    {
-        $containerBuilderProphecy = $this->prophesize(ContainerBuilder::class);
-        $containerBuilderProphecy->getExtensionConfig('framework')->willReturn([0 => ['serializer' => ['enabled' => true, 'name_converter' => 'foo'], 'property_info' => ['enabled' => false]]]);
-        $containerBuilderProphecy->prependExtensionConfig('api_platform', ['name_converter' => 'foo'])->shouldBeCalled();
-
-        $this->extension->prepend($containerBuilderProphecy->reveal());
-    }
-
-    public function testNotPrependWhenNameConverterIsNotConfigured()
-    {
-        $containerBuilderProphecy = $this->prophesize(ContainerBuilder::class);
-        $containerBuilderProphecy->getExtensionConfig('framework')->willReturn([0 => ['serializer' => ['enabled' => true], 'property_info' => ['enabled' => false]]])->shouldBeCalled();
-        $containerBuilderProphecy->prependExtensionConfig('api_platform', Argument::type('array'))->shouldNotBeCalled();
-
-        $this->extension->prepend($containerBuilderProphecy->reveal());
     }
 
     public function testLoadDefaultConfig()
@@ -779,6 +762,7 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.metadata.property.name_collection_factory.xml',
             'api_platform.metadata.resource.metadata_factory.cached',
             'api_platform.metadata.resource.metadata_factory.operation',
+            'api_platform.metadata.resource.metadata_factory.input_output',
             'api_platform.metadata.resource.metadata_factory.short_name',
             'api_platform.metadata.resource.metadata_factory.xml',
             'api_platform.metadata.resource.name_collection_factory.cached',
@@ -880,6 +864,10 @@ class ApiPlatformExtensionTest extends TestCase
         $containerBuilderProphecy->registerForAutoconfiguration(AggregationCollectionExtensionInterface::class)
             ->willReturn($this->childDefinitionProphecy)->shouldBeCalledTimes(1);
         $this->childDefinitionProphecy->addTag('api_platform.doctrine.mongodb.aggregation_extension.collection')->shouldBeCalledTimes(1);
+
+        $containerBuilderProphecy->registerForAutoconfiguration(DataTransformerInterface::class)
+            ->willReturn($this->childDefinitionProphecy)->shouldBeCalledTimes(1);
+        $this->childDefinitionProphecy->addTag('api_platform.data_transformer')->shouldBeCalledTimes(1);
 
         $containerBuilderProphecy->addResource(Argument::type(DirectoryResource::class))->shouldBeCalled();
 

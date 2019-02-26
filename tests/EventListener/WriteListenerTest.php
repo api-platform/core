@@ -18,9 +18,8 @@ use ApiPlatform\Core\DataPersister\DataPersisterInterface;
 use ApiPlatform\Core\EventListener\WriteListener;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\ConcreteDummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyTableInheritance;
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyTableInheritanceChild;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
@@ -148,11 +147,11 @@ class WriteListenerTest extends TestCase
         $iriConverterProphecy->getIriFromItem($dummy)->shouldNotBeCalled();
 
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadata(null, null, null, null, null, ['output_class' => false]));
+        $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadata(null, null, null, null, null, ['output' => ['class' => null]]));
 
         $dataPersisterProphecy->persist($dummy)->willReturn($dummy)->shouldBeCalled();
 
-        $request = new Request([], [], ['_api_resource_class' => Dummy::class, '_api_collection_operation_name' => 'post', '_api_output_class' => false]);
+        $request = new Request([], [], ['_api_resource_class' => Dummy::class, '_api_collection_operation_name' => 'post']);
         $request->setMethod('POST');
 
         $event = new GetResponseForControllerResultEvent(
@@ -270,16 +269,16 @@ class WriteListenerTest extends TestCase
 
     public function testOnKernelViewWithParentResourceClass()
     {
-        $dummy = new DummyTableInheritanceChild();
+        $dummy = new ConcreteDummy();
 
         $dataPersisterProphecy = $this->prophesize(DataPersisterInterface::class);
         $dataPersisterProphecy->supports($dummy)->willReturn(true)->shouldBeCalled();
         $dataPersisterProphecy->persist($dummy)->willReturn($dummy)->shouldBeCalled();
 
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
-        $iriConverterProphecy->getIriFromItem($dummy)->shouldNotBeCalled();
+        $iriConverterProphecy->getIriFromItem($dummy)->willReturn('/dummy/1')->shouldBeCalled();
 
-        $request = new Request([], [], ['_api_resource_class' => DummyTableInheritance::class, '_api_item_operation_name' => 'put', '_api_persist' => true]);
+        $request = new Request([], [], ['_api_resource_class' => ConcreteDummy::class, '_api_item_operation_name' => 'put', '_api_persist' => true]);
         $request->setMethod('PUT');
 
         $event = new GetResponseForControllerResultEvent(

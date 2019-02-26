@@ -54,6 +54,11 @@ final class ResourceClassResolver implements ResourceClassResolverInterface
             return $resourceClass;
         }
 
+        // The Resource is an interface
+        if ($value instanceof $resourceClass && $type !== $resourceClass && interface_exists($resourceClass)) {
+            throw new InvalidArgumentException(sprintf('The given object\'s resource is the interface "%s", finding a class is not possible.', $resourceClass));
+        }
+
         if (
             ($isResourceClass ?? $this->isResourceClass($type))
             || (is_subclass_of($type, $resourceClass) && $this->isResourceClass($resourceClass))

@@ -37,7 +37,7 @@ use ApiPlatform\Core\Exception\InvalidArgumentException;
  *     @Attribute("filters", type="string[]"),
  *     @Attribute("graphql", type="array"),
  *     @Attribute("hydraContext", type="array"),
- *     @Attribute("inputClass", type="mixed"),
+ *     @Attribute("input", type="mixed"),
  *     @Attribute("iri", type="string"),
  *     @Attribute("itemOperations", type="array"),
  *     @Attribute("maximumItemsPerPage", type="int"),
@@ -46,7 +46,7 @@ use ApiPlatform\Core\Exception\InvalidArgumentException;
  *     @Attribute("normalizationContext", type="array"),
  *     @Attribute("openapiContext", type="array"),
  *     @Attribute("order", type="array"),
- *     @Attribute("outputClass", type="mixed"),
+ *     @Attribute("output", type="mixed"),
  *     @Attribute("paginationClientEnabled", type="bool"),
  *     @Attribute("paginationClientItemsPerPage", type="bool"),
  *     @Attribute("paginationClientPartial", type="bool"),
@@ -54,6 +54,7 @@ use ApiPlatform\Core\Exception\InvalidArgumentException;
  *     @Attribute("paginationFetchJoinCollection", type="bool"),
  *     @Attribute("paginationItemsPerPage", type="int"),
  *     @Attribute("paginationPartial", type="bool"),
+ *     @Attribute("paginationViaCursor", type="array"),
  *     @Attribute("routePrefix", type="string"),
  *     @Attribute("shortName", type="string"),
  *     @Attribute("subresourceOperations", type="array"),
@@ -288,14 +289,14 @@ final class ApiResource
      *
      * @var string|false
      */
-    private $inputClass;
+    private $input;
 
     /**
      * @see https://github.com/Haehnchen/idea-php-annotation-plugin/issues/112
      *
      * @var string|false
      */
-    private $outputClass;
+    private $output;
 
     /**
      * @see https://github.com/Haehnchen/idea-php-annotation-plugin/issues/112
@@ -303,6 +304,13 @@ final class ApiResource
      * @var array
      */
     private $openapiContext;
+
+    /**
+     * @see https://github.com/Haehnchen/idea-php-annotation-plugin/issues/112
+     *
+     * @var array
+     */
+    private $paginationViaCursor;
 
     /**
      * @throws InvalidArgumentException

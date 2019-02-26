@@ -46,7 +46,7 @@ final class IdentifierConverter implements ContextAwareIdentifierConverterInterf
     {
         if (null !== $this->resourceMetadataFactory) {
             $resourceMetadata = $this->resourceMetadataFactory->create($class);
-            $class = $resourceMetadata->getOperationAttribute($context, 'output_class', $class, true);
+            $class = $resourceMetadata->getOperationAttribute($context, 'output', ['class' => $class], true)['class'];
         }
 
         $keys = $this->identifiersExtractor->getIdentifiersFromResourceClass($class);

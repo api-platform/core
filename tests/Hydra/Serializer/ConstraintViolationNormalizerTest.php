@@ -46,7 +46,7 @@ class ConstraintViolationNormalizerTest extends TestCase
         $nameConverterProphecy = $this->prophesize(NameConverterInterface::class);
 
         $urlGeneratorProphecy->generate('api_jsonld_context', ['shortName' => 'ConstraintViolationList'])->willReturn('/context/foo')->shouldBeCalled();
-        $nameConverterProphecy->normalize(Argument::type('string'))->will(function ($args) {
+        $nameConverterProphecy->normalize(Argument::type('string'), null, Argument::type('string'))->will(function ($args) {
             return '_'.$args[0];
         });
 

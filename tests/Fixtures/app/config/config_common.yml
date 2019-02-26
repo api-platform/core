@@ -196,12 +196,6 @@ services:
         class: ApiPlatform\Core\Tests\Fixtures\TestBundle\Validator\DummyValidationGroupsGenerator
         public: true
 
-    app.dummy_input_data_persister:
-        class: ApiPlatform\Core\Tests\Fixtures\TestBundle\DataPersister\DummyInputDataPersister
-        public: false
-        tags:
-            -  { name: 'api_platform.data_persister' }
-
     mercure.hub.default.publisher:
         class: ApiPlatform\Core\Tests\Fixtures\DummyMercurePublisher
 
@@ -210,3 +204,39 @@ services:
         decorates: api_platform.swagger.normalizer.documentation
         public: false
         arguments: ['@app.serializer.normalizer.override_documentation.inner']
+
+    app.data_transformer.custom_input_dto:
+        class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\DataTransformer\CustomInputDtoDataTransformer'
+        public: false
+        tags:
+            -  { name: 'api_platform.data_transformer' }
+
+    app.data_transformer.custom_output_dto:
+        class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\DataTransformer\CustomOutputDtoDataTransformer'
+        public: false
+        tags:
+            -  { name: 'api_platform.data_transformer' }
+
+    app.data_transformer.input_dto:
+        class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\DataTransformer\InputDtoDataTransformer'
+        public: false
+        tags:
+            -  { name: 'api_platform.data_transformer' }
+
+    app.data_transformer.output_dto:
+        class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\DataTransformer\OutputDtoDataTransformer'
+        public: false
+        tags:
+            -  { name: 'api_platform.data_transformer' }
+
+    app.data_transformer.recover_password_input:
+        class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\DataTransformer\RecoverPasswordInputDataTransformer'
+        public: false
+        tags:
+            -  { name: 'api_platform.data_transformer' }
+
+    app.data_transformer.recover_password_output:
+        class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\DataTransformer\RecoverPasswordOutputDataTransformer'
+        public: false
+        tags:
+            -  { name: 'api_platform.data_transformer' }

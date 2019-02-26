@@ -175,12 +175,12 @@ class ResourceClassResolverTest extends TestCase
 
     public function testGetResourceClassWithInterfaceResource()
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage("The given object's resource is the interface \"ApiPlatform\Core\Tests\Fixtures\DummyResourceInterface\", finding a class is not possible.");
         $dummy = new DummyResourceImplementation();
         $resourceNameCollectionFactoryProphecy = $this->prophesize(ResourceNameCollectionFactoryInterface::class);
-        $resourceNameCollectionFactoryProphecy->create()->willReturn(new ResourceNameCollection([DummyResourceInterface::class]))->shouldBeCalled();
 
         $resourceClassResolver = new ResourceClassResolver($resourceNameCollectionFactoryProphecy->reveal());
         $resourceClass = $resourceClassResolver->getResourceClass($dummy, DummyResourceInterface::class, true);
-        $this->assertEquals(DummyResourceImplementation::class, $resourceClass);
     }
 }

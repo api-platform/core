@@ -56,7 +56,8 @@
             <argument type="service" id="property_info" on-invalid="ignore" />
             <argument type="service" id="serializer.mapping.class_discriminator_resolver" on-invalid="ignore" />
 
-            <tag name="serializer.normalizer" priority="8" />
+            <!-- After the DataURINormalizer but before the object denormalizer -->
+            <tag name="serializer.normalizer" priority="-922" />
         </service>
 
         <service id="api_platform.elasticsearch.item_data_provider" class="ApiPlatform\Core\Bridge\Elasticsearch\DataProvider\ItemDataProvider" public="false">

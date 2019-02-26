@@ -21,6 +21,7 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\DummyAggregateOffer as D
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\DummyCar as DummyCarDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\DummyCarColor as DummyCarColorDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\DummyDate as DummyDateDocument;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\DummyDtoCustom as DummyDtoCustomDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\DummyDtoNoInput as DummyDtoNoInputDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\DummyDtoNoOutput as DummyDtoNoOutputDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\DummyFriend as DummyFriendDocument;
@@ -46,6 +47,7 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\RelatedOwningDummy as Re
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\RelatedToDummyFriend as RelatedToDummyFriendDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\RelationEmbedder as RelationEmbedderDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\SecuredDummy as SecuredDummyDocument;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\SoMany as SoManyDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\ThirdLevel as ThirdLevelDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\User as UserDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Answer;
@@ -59,6 +61,7 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyAggregateOffer;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyCar;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyCarColor;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyDate;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyDtoCustom;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyDtoNoInput;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyDtoNoOutput;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyFriend;
@@ -87,6 +90,7 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RelatedOwningDummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RelatedToDummyFriend;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RelationEmbedder;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\SecuredDummy;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\SoMany;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\ThirdLevel;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\User;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\UuidIdentifierDummy;
@@ -150,6 +154,21 @@ final class DoctrineContext implements Context
             $dummy->setAlias('Alias #'.($nb - $i));
             $dummy->setDummy('SomeDummyTest'.$i);
             $dummy->setDescription($descriptions[($i - 1) % 2]);
+
+            $this->manager->persist($dummy);
+        }
+
+        $this->manager->flush();
+    }
+
+    /**
+     * @Given there are :nb of these so many objects
+     */
+    public function thereAreOfTheseSoManyObjects(int $nb)
+    {
+        for ($i = 1; $i <= $nb; ++$i) {
+            $dummy = $this->isOrm() ? new SoMany() : new SoManyDocument();
+            $dummy->content = 'Many #'.$i;
 
             $this->manager->persist($dummy);
         }
@@ -1180,6 +1199,30 @@ final class DoctrineContext implements Context
         }
 
         $this->manager->flush();
+    }
+
+    /**
+     * @Given there is a DummyCustomDto
+     */
+    public function thereIsADummyCustomDto()
+    {
+        $this->thereAreNbDummyCustomDto(1);
+    }
+
+    /**
+     * @Given there are :nb DummyCustomDto
+     */
+    public function thereAreNbDummyCustomDto($nb)
+    {
+        for ($i = 0; $i < $nb; ++$i) {
+            $dto = $this->isOrm() ? new DummyDtoCustom() : new DummyDtoCustomDocument();
+            $dto->lorem = 'test';
+            $dto->ipsum = (string) $i + 1;
+            $this->manager->persist($dto);
+        }
+
+        $this->manager->flush();
+        $this->manager->clear();
     }
 
     private function isOrm(): bool

@@ -13,34 +13,38 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity;
 
-use ApiPlatform\Core\Annotation\ApiProperty;
 use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Dto\InputDto;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Dto\OutputDto;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * Dummy Output.
+ * Dummy InputOutput.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  *
- * @ApiResource
+ * @ApiResource(attributes={"input"=InputDto::class, "output"=OutputDto::class})
  * @ORM\Entity
  */
-class DummyOutput
+class DummyDtoInputOutput
 {
     /**
      * @var int The id
-     *
-     * @ORM\Column(type="integer")
+     * @ORM\Column(type="integer", nullable=true)
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
      */
     public $id;
 
     /**
-     * @var string The dummy name
-     *
-     * @ORM\Column
-     * @ApiProperty(iri="http://schema.org/name")
+     * @var string
+     * @ORM\Column(type="string")
      */
-    public $name;
+    public $str;
+
+    /**
+     * @var int
+     * @ORM\Column(type="float")
+     */
+    public $num;
 }

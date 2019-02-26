@@ -15,23 +15,23 @@ namespace ApiPlatform\Core\Tests\Bridge\Elasticsearch\Serializer\NameConverter;
 
 use ApiPlatform\Core\Bridge\Elasticsearch\Serializer\NameConverter\InnerFieldsNameConverter;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
+use Symfony\Component\Serializer\NameConverter\AdvancedNameConverterInterface;
 
 class InnerFieldsNameConverterTest extends TestCase
 {
     public function testConstruct()
     {
         self::assertInstanceOf(
-            NameConverterInterface::class,
-            new InnerFieldsNameConverter($this->prophesize(NameConverterInterface::class)->reveal())
+            AdvancedNameConverterInterface::class,
+            new InnerFieldsNameConverter($this->prophesize(AdvancedNameConverterInterface::class)->reveal())
         );
     }
 
     public function testNormalize()
     {
-        $decoratedProphecy = $this->prophesize(NameConverterInterface::class);
-        $decoratedProphecy->normalize('fooBar')->willReturn('foo_bar')->shouldBeCalled();
-        $decoratedProphecy->normalize('bazQux')->willReturn('baz_qux')->shouldBeCalled();
+        $decoratedProphecy = $this->prophesize(AdvancedNameConverterInterface::class);
+        $decoratedProphecy->normalize('fooBar', null, null, [])->willReturn('foo_bar')->shouldBeCalled();
+        $decoratedProphecy->normalize('bazQux', null, null, [])->willReturn('baz_qux')->shouldBeCalled();
 
         $innerFieldsNameConverter = new InnerFieldsNameConverter($decoratedProphecy->reveal());
 
@@ -40,9 +40,9 @@ class InnerFieldsNameConverterTest extends TestCase
 
     public function testDenormalize()
     {
-        $decoratedProphecy = $this->prophesize(NameConverterInterface::class);
-        $decoratedProphecy->denormalize('foo_bar')->willReturn('fooBar')->shouldBeCalled();
-        $decoratedProphecy->denormalize('baz_qux')->willReturn('bazQux')->shouldBeCalled();
+        $decoratedProphecy = $this->prophesize(AdvancedNameConverterInterface::class);
+        $decoratedProphecy->denormalize('foo_bar', null, null, [])->willReturn('fooBar')->shouldBeCalled();
+        $decoratedProphecy->denormalize('baz_qux', null, null, [])->willReturn('bazQux')->shouldBeCalled();
 
         $innerFieldsNameConverter = new InnerFieldsNameConverter($decoratedProphecy->reveal());
 

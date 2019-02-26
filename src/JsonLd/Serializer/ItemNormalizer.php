@@ -22,6 +22,7 @@ use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInte
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Serializer\AbstractItemNormalizer;
 use ApiPlatform\Core\Serializer\ContextTrait;
+use ApiPlatform\Core\Util\ClassInfoTrait;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
@@ -33,19 +34,18 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
  */
 final class ItemNormalizer extends AbstractItemNormalizer
 {
+    use ClassInfoTrait;
     use ContextTrait;
     use JsonLdContextTrait;
 
     const FORMAT = 'jsonld';
 
-    private $resourceMetadataFactory;
     private $contextBuilder;
 
-    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, IriConverterInterface $iriConverter, ResourceClassResolverInterface $resourceClassResolver, ContextBuilderInterface $contextBuilder, PropertyAccessorInterface $propertyAccessor = null, NameConverterInterface $nameConverter = null, ClassMetadataFactoryInterface $classMetadataFactory = null, array $defaultContext = [])
+    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, IriConverterInterface $iriConverter, ResourceClassResolverInterface $resourceClassResolver, ContextBuilderInterface $contextBuilder, PropertyAccessorInterface $propertyAccessor = null, NameConverterInterface $nameConverter = null, ClassMetadataFactoryInterface $classMetadataFactory = null, array $defaultContext = [], iterable $dataTransformers = [], bool $allowUnmappedClass = false)
     {
-        parent::__construct($propertyNameCollectionFactory, $propertyMetadataFactory, $iriConverter, $resourceClassResolver, $propertyAccessor, $nameConverter, $classMetadataFactory, null, false, $defaultContext);
+        parent::__construct($propertyNameCollectionFactory, $propertyMetadataFactory, $iriConverter, $resourceClassResolver, $propertyAccessor, $nameConverter, $classMetadataFactory, null, false, $defaultContext, $dataTransformers, $resourceMetadataFactory, $allowUnmappedClass);
 
-        $this->resourceMetadataFactory = $resourceMetadataFactory;
         $this->contextBuilder = $contextBuilder;
     }
 
@@ -62,7 +62,20 @@ final class ItemNormalizer extends AbstractItemNormalizer
      */
     public function normalize($object, $format = null, array $context = [])
     {
-        $resourceClass = $this->resourceClassResolver->getResourceClass($object, $context['resource_class'] ?? null, true);
+        $object = $this->transformOutput($object, $context);
+
+        try {
+            $resourceClass = $this->resourceClassResolver->getResourceClass($object, $context['resource_class'] ?? null, true);
+        } catch (InvalidArgumentException $e) {
+            $data = $this->createJsonLdContext($this->contextBuilder, $object, $context);
+            $rawData = parent::normalize($object, $format, $context);
+            if (!\is_array($rawData)) {
+                return $rawData;
+            }
+
+            return $data + $rawData;
+        }
+
         $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
         $data = $this->addJsonLdContext($this->contextBuilder, $resourceClass, $context);
 

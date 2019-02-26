@@ -25,8 +25,12 @@
             <argument type="service" id="api_platform.property_accessor" />
             <argument type="service" id="api_platform.name_converter" on-invalid="ignore" />
             <argument type="service" id="serializer.mapping.class_metadata_factory" on-invalid="ignore" />
+            <argument type="collection" />
+            <argument type="tagged" tag="api_platform.data_transformer" on-invalid="ignore" />
+            <argument>true</argument>
 
-            <tag name="serializer.normalizer" priority="8" />
+            <!-- After the DataURINormalizer but before the object denormalizer -->
+            <tag name="serializer.normalizer" priority="-922" />
         </service>
 
         <service id="api_platform.jsonld.encoder" class="ApiPlatform\Core\Serializer\JsonEncoder" public="false">
