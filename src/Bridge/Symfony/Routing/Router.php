@@ -16,7 +16,7 @@ namespace ApiPlatform\Core\Bridge\Symfony\Routing;
 use ApiPlatform\Core\Api\UrlGeneratorInterface;
 use Symfony\Component\HttpFoundation\Exception\RequestExceptionInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Routing\Exception\RouteNotFoundException;
+use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\RouterInterface;
 
@@ -77,7 +77,7 @@ final class Router implements RouterInterface, UrlGeneratorInterface
         try {
             $context = (new RequestContext())->fromRequest($request);
         } catch (RequestExceptionInterface $e) {
-            throw new RouteNotFoundException('Invalid request context.');
+            throw new ResourceNotFoundException('Invalid request context.');
         }
 
         $context->setPathInfo($pathInfo);

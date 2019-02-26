@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\JsonApi\Serializer;
 
+use Symfony\Component\Serializer\NameConverter\AdvancedNameConverterInterface;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 
 /**
@@ -20,7 +21,7 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
  *
  * @author Baptiste Meyer <baptiste.meyer@gmail.com>
  */
-final class ReservedAttributeNameConverter implements NameConverterInterface
+final class ReservedAttributeNameConverter implements AdvancedNameConverterInterface
 {
     const JSON_API_RESERVED_ATTRIBUTES = [
         'id' => '_id',
@@ -40,10 +41,10 @@ final class ReservedAttributeNameConverter implements NameConverterInterface
     /**
      * {@inheritdoc}
      */
-    public function normalize($propertyName)
+    public function normalize($propertyName, string $class = null, string $format = null, array $context = [])
     {
         if (null !== $this->nameConverter) {
-            $propertyName = $this->nameConverter->normalize($propertyName);
+            $propertyName = $this->nameConverter->normalize($propertyName, $class, $format, $context);
         }
 
         if (isset(self::JSON_API_RESERVED_ATTRIBUTES[$propertyName])) {
@@ -56,14 +57,14 @@ final class ReservedAttributeNameConverter implements NameConverterInterface
     /**
      * {@inheritdoc}
      */
-    public function denormalize($propertyName)
+    public function denormalize($propertyName, string $class = null, string $format = null, array $context = [])
     {
         if (\in_array($propertyName, self::JSON_API_RESERVED_ATTRIBUTES, true)) {
             $propertyName = substr($propertyName, 1);
         }
 
         if (null !== $this->nameConverter) {
-            $propertyName = $this->nameConverter->denormalize($propertyName);
+            $propertyName = $this->nameConverter->denormalize($propertyName, $class, $format, $context);
         }
 
         return $propertyName;

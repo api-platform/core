@@ -180,7 +180,7 @@ final class ApiPlatformParser implements ParserInterface
                 ($propertyMetadata->isReadable() && self::OUT_PREFIX === $io) ||
                 ($propertyMetadata->isWritable() && self::IN_PREFIX === $io)
             ) {
-                $normalizedPropertyName = $this->nameConverter ? $this->nameConverter->normalize($propertyName) : $propertyName;
+                $normalizedPropertyName = $this->nameConverter ? $this->nameConverter->normalize($propertyName, $resourceClass) : $propertyName;
                 $data[$normalizedPropertyName] = $this->parseProperty($resourceMetadata, $propertyMetadata, $io, null, $visited);
             }
         }

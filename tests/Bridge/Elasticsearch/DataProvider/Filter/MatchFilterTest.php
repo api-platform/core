@@ -25,6 +25,7 @@ use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 use ApiPlatform\Core\Metadata\Property\PropertyNameCollection;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Foo;
 use PHPUnit\Framework\TestCase;
+use Prophecy\Argument;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
@@ -70,8 +71,8 @@ class MatchFilterTest extends TestCase
         $propertyAccessorProphecy->getValue($foo, 'id')->willReturn(1)->shouldBeCalled();
 
         $nameConverterProphecy = $this->prophesize(NameConverterInterface::class);
-        $nameConverterProphecy->normalize('id')->willReturn('id')->shouldBeCalled();
-        $nameConverterProphecy->normalize('name')->willReturn('name')->shouldBeCalled();
+        $nameConverterProphecy->normalize('id', Foo::class, null, Argument::type('array'))->willReturn('id')->shouldBeCalled();
+        $nameConverterProphecy->normalize('name', Foo::class, null, Argument::type('array'))->willReturn('name')->shouldBeCalled();
 
         $matchFilter = new MatchFilter(
             $propertyNameCollectionFactoryProphecy->reveal(),
@@ -105,8 +106,8 @@ class MatchFilterTest extends TestCase
         $identifierExtractorProphecy->getIdentifierFromResourceClass(Foo::class)->willReturn('id')->shouldBeCalled();
 
         $nameConverterProphecy = $this->prophesize(NameConverterInterface::class);
-        $nameConverterProphecy->normalize('foo.bar')->willReturn('foo.bar')->shouldBeCalled();
-        $nameConverterProphecy->normalize('foo')->willReturn('foo')->shouldBeCalled();
+        $nameConverterProphecy->normalize('foo.bar', Foo::class, null, Argument::type('array'))->willReturn('foo.bar')->shouldBeCalled();
+        $nameConverterProphecy->normalize('foo', Foo::class, null, Argument::type('array'))->willReturn('foo')->shouldBeCalled();
 
         $matchFilter = new MatchFilter(
             $this->prophesize(PropertyNameCollectionFactoryInterface::class)->reveal(),

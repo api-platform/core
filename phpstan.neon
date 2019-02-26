@@ -49,3 +49,5 @@ parameters:
         - '#Method ApiPlatform\\Core\\Bridge\\Doctrine\\MongoDbOdm\\Filter\\(Abstract|Boolean|Date|Exists|Numeric|Order|Range|Search)Filter::isPropertyNested\(\) invoked with 2 parameters, 1 required\.#'
         - '#Method ApiPlatform\\Core\\Bridge\\Doctrine\\MongoDbOdm\\Filter\\(Abstract|Boolean|Date|Exists|Numeric|Order|Range|Search)Filter::splitPropertyParts\(\) invoked with 2 parameters, 1 required\.#'
         - '#Method ApiPlatform\\Core\\DataProvider\\CollectionDataProviderInterface::getCollection\(\) invoked with 3 parameters, 1-2 required\.#'
+        - '#Method Symfony\\Component\\Serializer\\NameConverter\\NameConverterInterface::normalize\(\) invoked with 3 parameters, 1 required\.#'
+        - '#Method Symfony\\Component\\Serializer\\NameConverter\\NameConverterInterface::normalize\(\) invoked with 4 parameters, 1 required\.#'

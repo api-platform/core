@@ -59,9 +59,9 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
     protected $itemDataProvider;
     protected $allowPlainIdentifiers;
     protected $allowUnmappedClass;
-    protected $dataTransformer;
+    protected $dataTransformers = [];
 
-    public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, IriConverterInterface $iriConverter, ResourceClassResolverInterface $resourceClassResolver, PropertyAccessorInterface $propertyAccessor = null, NameConverterInterface $nameConverter = null, ClassMetadataFactoryInterface $classMetadataFactory = null, ItemDataProviderInterface $itemDataProvider = null, bool $allowPlainIdentifiers = false, array $defaultContext = [], DataTransformerInterface $dataTransformer = null, ResourceMetadataFactoryInterface $resourceMetadataFactory = null, bool $allowUnmappedClass = false)
+    public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, IriConverterInterface $iriConverter, ResourceClassResolverInterface $resourceClassResolver, PropertyAccessorInterface $propertyAccessor = null, NameConverterInterface $nameConverter = null, ClassMetadataFactoryInterface $classMetadataFactory = null, ItemDataProviderInterface $itemDataProvider = null, bool $allowPlainIdentifiers = false, array $defaultContext = [], iterable $dataTransformers = [], ResourceMetadataFactoryInterface $resourceMetadataFactory = null, bool $allowUnmappedClass = false)
     {
         if (!isset($defaultContext['circular_reference_handler'])) {
             $defaultContext['circular_reference_handler'] = function ($object) {
@@ -85,7 +85,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
         $this->propertyAccessor = $propertyAccessor ?: PropertyAccess::createPropertyAccessor();
         $this->itemDataProvider = $itemDataProvider;
         $this->allowPlainIdentifiers = $allowPlainIdentifiers;
-        $this->dataTransformer = $dataTransformer;
+        $this->dataTransformers = $dataTransformers;
         $this->resourceMetadataFactory = $resourceMetadataFactory;
         $this->allowUnmappedClass = $allowUnmappedClass;
     }
@@ -164,14 +164,12 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
         $context['resource_class'] = $class;
         $inputClass = $this->getInputClass($class, $context);
 
-        if (null !== $inputClass) {
-            $data = parent::denormalize($data, $inputClass, $format, ['resource_class' => $inputClass] + $context);
-
-            if (null !== $this->dataTransformer && $this->dataTransformer->supportsTransformation($data, $class, $context)) {
-                $data = $this->dataTransformer->transform($data, $class, $context);
-            }
-
-            return $data;
+        if (null !== $inputClass && null !== $dataTransformer = $this->getDataTransformer($data, $class, $context)) {
+            $data = $dataTransformer->transform(
+                parent::denormalize($data, $inputClass, $format, ['resource_class' => $inputClass] + $context),
+                $class,
+                $context
+            );
         }
 
         return parent::denormalize($data, $class, $format, $context);
@@ -187,6 +185,12 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
      */
     protected function instantiateObject(array &$data, $class, array &$context, \ReflectionClass $reflectionClass, $allowedAttributes, string $format = null)
     {
+        if (null !== $object = $this->extractObjectToPopulate($class, $context, static::OBJECT_TO_POPULATE)) {
+            unset($context[static::OBJECT_TO_POPULATE]);
+
+            return $object;
+        }
+
         if ($this->classDiscriminatorResolver && $mapping = $this->classDiscriminatorResolver->getMappingForClass($class)) {
             if (!isset($data[$mapping->getTypeProperty()])) {
                 throw new RuntimeException(sprintf('Type property "%s" not found for the abstract object "%s"', $mapping->getTypeProperty(), $class));
@@ -201,12 +205,6 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             $reflectionClass = new \ReflectionClass($class);
         }
 
-        if (null !== $object = $this->extractObjectToPopulate($class, $context, static::OBJECT_TO_POPULATE)) {
-            unset($context[static::OBJECT_TO_POPULATE]);
-
-            return $object;
-        }
-
         $constructor = $this->getConstructor($data, $class, $context, $reflectionClass, $allowedAttributes);
         if ($constructor) {
             $constructorParameters = $constructor->getParameters();
@@ -214,7 +212,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             $params = [];
             foreach ($constructorParameters as $constructorParameter) {
                 $paramName = $constructorParameter->name;
-                $key = $this->nameConverter ? $this->nameConverter->normalize($paramName) : $paramName;
+                $key = $this->nameConverter ? $this->nameConverter->normalize($paramName, $class, $format, $context) : $paramName;
 
                 $allowed = false === $allowedAttributes || (\is_array($allowedAttributes) && \in_array($paramName, $allowedAttributes, true));
                 $ignored = !$this->isAllowedAttribute($class, $paramName, $format, $context);
@@ -436,13 +434,12 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
         if (!\is_array($value)) {
             // repeat the code so that IRIs keep working with the json format
             if (true === $this->allowPlainIdentifiers && $this->itemDataProvider) {
-                try {
-                    return $this->itemDataProvider->getItem($className, $value, null, $context + ['fetch_data' => true]);
-                } catch (ItemNotFoundException $e) {
-                    throw new InvalidArgumentException($e->getMessage(), $e->getCode(), $e);
-                } catch (InvalidArgumentException $e) {
-                    // Give a chance to other normalizers (e.g.: DateTimeNormalizer)
+                $item = $this->itemDataProvider->getItem($className, $value, null, $context + ['fetch_data' => true]);
+                if (null === $item) {
+                    throw new ItemNotFoundException(sprintf('Item not found for "%s".', $value));
                 }
+
+                return $item;
             }
 
             throw new InvalidArgumentException(sprintf(
@@ -595,5 +592,33 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
         }
 
         return $iri;
+    }
+
+    /**
+     * Finds the first supported data transformer if any.
+     */
+    protected function getDataTransformer($object, string $to, array $context = []): ?DataTransformerInterface
+    {
+        foreach ($this->dataTransformers as $dataTransformer) {
+            if ($dataTransformer->supportsTransformation($object, $to, $context)) {
+                return $dataTransformer;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * For a given resource, it returns an output representation if any
+     * If not, the resource is returned.
+     */
+    protected function transformOutput($object, array $context = [])
+    {
+        $outputClass = $this->getOutputClass($this->getObjectClass($object), $context);
+        if (null !== $outputClass && null !== $dataTransformer = $this->getDataTransformer($object, $outputClass, $context)) {
+            return $dataTransformer->transform($object, $outputClass, $context);
+        }
+
+        return $object;
     }
 }

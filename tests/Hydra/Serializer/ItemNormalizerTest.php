@@ -129,7 +129,7 @@ class ItemNormalizerTest extends TestCase
             null,
             null,
             [],
-            null,
+            [],
             true
         );
         $normalizer->setSerializer($serializerProphecy->reveal());

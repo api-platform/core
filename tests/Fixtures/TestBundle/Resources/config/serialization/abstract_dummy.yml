@@ -1,0 +1,11 @@
+ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\AbstractDummy:
+  discriminator_map:
+    type_property: discr
+    mapping:
+      concrete: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\ConcreteDummy'
+
+ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\AbstractDummy:
+  discriminator_map:
+    type_property: discr
+    mapping:
+      concrete: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\ConcreteDummy'

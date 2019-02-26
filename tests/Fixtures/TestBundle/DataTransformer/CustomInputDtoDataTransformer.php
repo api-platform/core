@@ -45,6 +45,6 @@ final class CustomInputDtoDataTransformer implements DataTransformerInterface
      */
     public function supportsTransformation($object, string $to, array $context = []): bool
     {
-        return (DummyDtoCustom::class === $to || DummyDtoCustomDocument::class === $to) && $object instanceof CustomInputDto;
+        return (DummyDtoCustom::class === $to || DummyDtoCustomDocument::class === $to) && CustomInputDto::class === ($context['input']['class'] ?? null);
     }
 }
