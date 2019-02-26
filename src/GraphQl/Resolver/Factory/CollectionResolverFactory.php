@@ -127,13 +127,14 @@ final class CollectionResolverFactory implements ResolverFactoryInterface
             }
             $offset = 0 > $offset ? 0 : $offset;
 
-            $data = ['totalCount' => 0., 'edges' => [], 'pageInfo' => ['startCursor' => null, 'endCursor' => null, 'hasNextPage' => false]];
+            $data = ['totalCount' => 0., 'edges' => [], 'pageInfo' => ['startCursor' => null, 'endCursor' => null, 'hasNextPage' => false, 'hasPreviousPage' => false]];
 
             if ($totalItems > 0) {
                 $data['totalCount'] = $totalItems;
                 $data['pageInfo']['startCursor'] = base64_encode((string) $offset);
                 $data['pageInfo']['endCursor'] = base64_encode((string) ($offset + $nbPageItems - 1));
                 $data['pageInfo']['hasNextPage'] = $collection->getCurrentPage() !== $collection->getLastPage() && (float) $nbPageItems === $collection->getItemsPerPage();
+                $data['pageInfo']['hasPreviousPage'] = $collection->getCurrentPage() > 1 && (float) $nbPageItems === $collection->getItemsPerPage();
             }
 
             foreach ($collection as $index => $object) {

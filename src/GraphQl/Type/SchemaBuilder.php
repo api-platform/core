@@ -527,6 +527,7 @@ final class SchemaBuilder implements SchemaBuilderInterface
                 'endCursor' => GraphQLType::string(),
                 'startCursor' => GraphQLType::string(),
                 'hasNextPage' => GraphQLType::nonNull(GraphQLType::boolean()),
+                'hasPreviousPage' => GraphQLType::nonNull(GraphQLType::boolean()),
             ],
         ];
         $pageInfoObjectType = new ObjectType($pageInfoObjectTypeConfiguration);
