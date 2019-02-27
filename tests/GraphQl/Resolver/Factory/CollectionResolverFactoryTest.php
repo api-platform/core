@@ -165,7 +165,7 @@ class CollectionResolverFactoryTest extends TestCase
         $resolveInfo = new ResolveInfo('relatedDummies', [], null, new ObjectType(['name' => '']), '', new Schema([]), null, null, null, null);
 
         $this->assertEquals(
-            ['edges' => [['node' => 'normalizedObject1', 'cursor' => 'Mg==']], 'pageInfo' => ['endCursor' => 'MTY=', 'hasNextPage' => true], 'totalCount' => 17],
+            ['edges' => [['node' => 'normalizedObject1', 'cursor' => 'Mg==']], 'pageInfo' => ['endCursor' => 'OQ==', 'hasNextPage' => true], 'totalCount' => 17.],
             $resolver(null, ['after' => $cursor], null, $resolveInfo)
         );
     }
