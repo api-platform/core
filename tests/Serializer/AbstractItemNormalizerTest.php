@@ -76,11 +76,11 @@ class AbstractItemNormalizerTest extends TestCase
             $propertyAccessorProphecy->reveal(),
         ]);
 
-        $this->assertTrue($normalizer->supportsNormalization($dummy));
-        $this->assertFalse($normalizer->supportsNormalization($std));
+        $this->assertTrue($normalizer->supportsNormalization($dummy, null, [AbstractItemNormalizer::USE_API_PLATFORM => true]));
+        $this->assertFalse($normalizer->supportsNormalization($std, null, [AbstractItemNormalizer::USE_API_PLATFORM => true]));
         $this->assertTrue($normalizer->supportsDenormalization($dummy, Dummy::class));
         $this->assertFalse($normalizer->supportsDenormalization($std, \stdClass::class));
-        $this->assertTrue($normalizer->hasCacheableSupportsMethod());
+        $this->assertFalse($normalizer->hasCacheableSupportsMethod());
     }
 
     public function testSupportNormalizationAndSupportDenormalization()
@@ -111,11 +111,11 @@ class AbstractItemNormalizerTest extends TestCase
             true,
         ]);
 
-        $this->assertTrue($normalizer->supportsNormalization($dummy));
-        $this->assertTrue($normalizer->supportsNormalization($std));
+        $this->assertTrue($normalizer->supportsNormalization($dummy, null, [AbstractItemNormalizer::USE_API_PLATFORM => true]));
+        $this->assertTrue($normalizer->supportsNormalization($std, null, [AbstractItemNormalizer::USE_API_PLATFORM => true]));
         $this->assertTrue($normalizer->supportsDenormalization($dummy, Dummy::class));
         $this->assertTrue($normalizer->supportsDenormalization($std, \stdClass::class));
-        $this->assertTrue($normalizer->hasCacheableSupportsMethod());
+        $this->assertFalse($normalizer->hasCacheableSupportsMethod());
     }
 
     public function testNormalize()
