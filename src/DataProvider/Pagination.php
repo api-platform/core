@@ -70,11 +70,23 @@ final class Pagination
      */
     public function getOffset(string $resourceClass = null, string $operationName = null, array $context = []): int
     {
-        if (($context['graphql'] ?? false) && null !== ($after = $this->getParameterFromContext($context, 'after'))) {
+        $graphql = $context['graphql'] ?? false;
+
+        $limit = $this->getLimit($resourceClass, $operationName, $context);
+
+        if ($graphql && null !== ($after = $this->getParameterFromContext($context, 'after'))) {
             return false === ($after = base64_decode($after, true)) ? 0 : (int) $after + 1;
         }
 
-        return ($this->getPage($context) - 1) * $this->getLimit($resourceClass, $operationName, $context);
+        if ($graphql && null !== ($before = $this->getParameterFromContext($context, 'before'))) {
+            return ($offset = (false === ($before = base64_decode($before, true)) ? 0 : (int) $before - $limit)) < 0 ? 0 : $offset;
+        }
+
+        if ($graphql && null !== ($last = $this->getParameterFromContext($context, 'last'))) {
+            return ($offset = ($context['count'] ?? 0) - $last) < 0 ? 0 : $offset;
+        }
+
+        return ($this->getPage($context) - 1) * $limit;
     }
 
     /**
@@ -84,6 +96,8 @@ final class Pagination
      */
     public function getLimit(string $resourceClass = null, string $operationName = null, array $context = []): int
     {
+        $graphql = $context['graphql'] ?? false;
+
         $limit = $this->options['items_per_page'];
         $clientLimit = $this->options['client_items_per_page'];
 
@@ -93,8 +107,17 @@ final class Pagination
             $clientLimit = $resourceMetadata->getCollectionOperationAttribute($operationName, 'pagination_client_items_per_page', $clientLimit, true);
         }
 
-        if ($context['graphql'] ?? false) {
-            $limit = $this->getParameterFromContext($context, 'first', $limit);
+        if ($graphql && null !== ($first = $this->getParameterFromContext($context, 'first'))) {
+            $limit = $first;
+        }
+
+        if ($graphql && null !== ($last = $this->getParameterFromContext($context, 'last'))) {
+            $limit = $last;
+        }
+
+        if ($graphql && null !== ($before = $this->getParameterFromContext($context, 'before'))
+            && (false === ($before = base64_decode($before, true)) ? 0 : (int) $before - $limit) < 0) {
+            $limit = (int) $before;
         }
 
         if ($clientLimit) {

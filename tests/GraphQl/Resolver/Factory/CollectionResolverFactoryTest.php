@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\GraphQl\Resolver\Factory;
 
 use ApiPlatform\Core\Api\IdentifiersExtractorInterface;
+use ApiPlatform\Core\DataProvider\ArrayPaginator;
 use ApiPlatform\Core\DataProvider\CollectionDataProviderInterface;
 use ApiPlatform\Core\DataProvider\PaginatorInterface;
 use ApiPlatform\Core\DataProvider\SubresourceDataProviderInterface;
@@ -55,7 +56,7 @@ class CollectionResolverFactoryTest extends TestCase
     public function paginationProvider(): array
     {
         return [
-            [true, ['totalCount' => 0.0, 'edges' => [], 'pageInfo' => ['endCursor' => null, 'hasNextPage' => false]]],
+            [true, ['totalCount' => 0., 'edges' => [], 'pageInfo' => ['startCursor' => null, 'endCursor' => null, 'hasNextPage' => false, 'hasPreviousPage' => false]]],
             [false, []],
         ];
     }
@@ -128,9 +129,9 @@ class CollectionResolverFactoryTest extends TestCase
 
         $this->assertEquals(
             [
-                'totalCount' => 0.0,
+                'totalCount' => 2.0,
                 'edges' => [['node' => 'normalizedObject1', 'cursor' => $expectedCursors[0]], ['node' => 'normalizedObject2', 'cursor' => $expectedCursors[1]]],
-                'pageInfo' => ['endCursor' => null, 'hasNextPage' => false],
+                'pageInfo' => ['startCursor' => $expectedCursors[0], 'endCursor' => $expectedCursors[1], 'hasNextPage' => false, 'hasPreviousPage' => false],
             ],
             $resolver(null, ['after' => $cursor], null, $resolveInfo)
         );
@@ -165,7 +166,7 @@ class CollectionResolverFactoryTest extends TestCase
         $resolveInfo = new ResolveInfo('relatedDummies', [], null, new ObjectType(['name' => '']), '', new Schema([]), null, null, null, null);
 
         $this->assertEquals(
-            ['edges' => [['node' => 'normalizedObject1', 'cursor' => 'Mg==']], 'pageInfo' => ['endCursor' => 'MTY=', 'hasNextPage' => true], 'totalCount' => 17],
+            ['edges' => [['node' => 'normalizedObject1', 'cursor' => 'Mg==']], 'pageInfo' => ['startCursor' => 'Mg==', 'endCursor' => 'OQ==', 'hasNextPage' => true, 'hasPreviousPage' => true], 'totalCount' => 17.],
             $resolver(null, ['after' => $cursor], null, $resolveInfo)
         );
     }
@@ -178,7 +179,7 @@ class CollectionResolverFactoryTest extends TestCase
         $collectionDataProviderProphecy = $this->prophesize(CollectionDataProviderInterface::class);
 
         $filters = $cursor ? ['after' => $cursor] : [];
-        $collectionDataProviderProphecy->getCollection(RelatedDummy::class, null, ['groups' => ['foo'], 'attributes' => [], 'filters' => $filters, 'graphql' => true])->willReturn($collection);
+        $collectionDataProviderProphecy->getCollection(RelatedDummy::class, null, ['groups' => ['foo'], 'attributes' => [], 'filters' => $filters, 'graphql' => true])->willReturn($paginationEnabled && \is_array($collection) ? new ArrayPaginator($collection, 0, \count($collection)) : $collection);
 
         $subresourceDataProviderProphecy = $this->prophesize(SubresourceDataProviderInterface::class);
         $subresourceDataProviderProphecy->getSubresource(RelatedDummy::class, $identifiers, [

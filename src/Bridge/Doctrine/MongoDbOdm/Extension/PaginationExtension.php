@@ -52,6 +52,8 @@ final class PaginationExtension implements AggregationResultCollectionExtensionI
             return;
         }
 
+        $context = $this->addCountToContext(clone $aggregationBuilder, $context);
+
         [, $offset, $limit] = $this->pagination->getPagination($resourceClass, $operationName, $context);
 
         $manager = $this->managerRegistry->getManagerForClass($resourceClass);
@@ -104,5 +106,18 @@ final class PaginationExtension implements AggregationResultCollectionExtensionI
         }
 
         return new Paginator($aggregationBuilder->execute(), $manager->getUnitOfWork(), $resourceClass, $aggregationBuilder->getPipeline());
+    }
+
+    private function addCountToContext(Builder $aggregationBuilder, array $context): array
+    {
+        if (!($context['graphql'] ?? false)) {
+            return $context;
+        }
+
+        if (isset($context['filters']['last']) && !isset($context['filters']['before'])) {
+            $context['count'] = $aggregationBuilder->count('count')->execute()->toArray()[0]['count'];
+        }
+
+        return $context;
     }
 }
