@@ -72,4 +72,14 @@ class DataPersisterTest extends TestCase
         $dataPersister = new DataPersister($this->prophesize(ResourceMetadataFactoryInterface::class)->reveal(), $messageBus->reveal());
         $this->assertSame('result', $dataPersister->persist($dummy));
     }
+
+    public function testSupportsPerOperation()
+    {
+        $resourceMetadata = (new ResourceMetadata())->withCollectionOperations(['operation' => ['messenger' => true]]);
+        $metadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
+        $metadataFactoryProphecy->create(Dummy::class)->willReturn($resourceMetadata);
+
+        $dataPersister = new DataPersister($metadataFactoryProphecy->reveal(), $this->prophesize(MessageBusInterface::class)->reveal());
+        $this->assertTrue($dataPersister->supports(new Dummy(), ['collection_operation_name' => 'operation']));
+    }
 }
