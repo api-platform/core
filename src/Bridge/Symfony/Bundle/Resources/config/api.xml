@@ -65,7 +65,7 @@
         <service id="ApiPlatform\Core\Api\IriConverterInterface" alias="api_platform.iri_converter" />
 
         <service id="api_platform.formats_provider" class="ApiPlatform\Core\Api\FormatsProvider">
-            <argument type="service" id="api_platform.metadata.resource.metadata_factory"></argument>
+            <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
             <argument>%api_platform.formats%</argument>
         </service>
 
@@ -143,7 +143,7 @@
         <!-- kernel.request priority must be < 8 to be executed after the Firewall -->
         <service id="api_platform.listener.request.add_format" class="ApiPlatform\Core\EventListener\AddFormatListener">
             <argument type="service" id="api_platform.negotiator" />
-            <argument type="service" id="api_platform.formats_provider"></argument>
+            <argument type="service" id="api_platform.formats_provider" />
 
             <tag name="kernel.event_listener" event="kernel.request" method="onKernelRequest" priority="7" />
         </service>

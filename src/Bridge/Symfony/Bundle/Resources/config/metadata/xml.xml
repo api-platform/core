@@ -6,7 +6,7 @@
 
     <services>
         <service id="api_platform.metadata.extractor.xml" class="ApiPlatform\Core\Metadata\Extractor\XmlExtractor" public="false">
-            <argument type="collection"></argument>
+            <argument type="collection" />
             <argument type="service" id="service_container" />
         </service>
 
