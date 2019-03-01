@@ -170,6 +170,8 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
                 $class,
                 $context
             );
+
+            return $data;
         }
 
         return parent::denormalize($data, $class, $format, $context);
