@@ -441,7 +441,7 @@ final class SchemaBuilder implements SchemaBuilderInterface
     {
         $fields = [];
         $idField = ['type' => GraphQLType::nonNull(GraphQLType::id())];
-        $clientMutationId = GraphQLType::nonNull(GraphQLType::string());
+        $clientMutationId = GraphQLType::string();
 
         if ('delete' === $mutationName || (null !== $ioMetadata && null === $ioMetadata['class'])) {
             return [
