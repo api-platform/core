@@ -54,6 +54,24 @@ Feature: GraphQL mutation support
     And the JSON node "data.createFoo.bar" should be equal to "new"
     And the JSON node "data.createFoo.clientMutationId" should be equal to "myId"
 
+  Scenario: Create an item without a clientMutationId
+    When I send the following GraphQL request:
+    """
+    mutation {
+      createFoo(input: {name: "Created without mutation id", bar: "works"}) {
+        id
+        name
+        bar
+      }
+    }
+    """
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/json"
+    And the JSON node "data.createFoo.id" should be equal to "/foos/2"
+    And the JSON node "data.createFoo.name" should be equal to "Created without mutation id"
+    And the JSON node "data.createFoo.bar" should be equal to "works"
+
   Scenario: Create an item with a subresource
     Given there are 1 dummy objects with relatedDummy
     When I send the following GraphQL request:
