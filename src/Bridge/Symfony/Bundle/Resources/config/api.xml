@@ -68,6 +68,7 @@
             <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
             <argument>%api_platform.formats%</argument>
         </service>
+        <service id="ApiPlatform\Core\Api\OperationAwareFormatsProviderInterface" alias="api_platform.formats_provider" />
 
         <!-- Serializer -->
 
