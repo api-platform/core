@@ -40,6 +40,7 @@ Feature: GraphQL mutation support
     mutation {
       createFoo(input: {name: "A new one", bar: "new", clientMutationId: "myId"}) {
         id
+        _id
         name
         bar
         clientMutationId
@@ -50,6 +51,7 @@ Feature: GraphQL mutation support
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/json"
     And the JSON node "data.createFoo.id" should be equal to "/foos/1"
+    And the JSON node "data.createFoo._id" should be equal to 1
     And the JSON node "data.createFoo.name" should be equal to "A new one"
     And the JSON node "data.createFoo.bar" should be equal to "new"
     And the JSON node "data.createFoo.clientMutationId" should be equal to "myId"
@@ -272,7 +274,6 @@ Feature: GraphQL mutation support
       createDummyGroup(input: {bar: "Bar", baz: "Baz", clientMutationId: "myId"}) {
         id
         bar
-        baz
         clientMutationId
       }
     }
@@ -282,7 +283,6 @@ Feature: GraphQL mutation support
     And the header "Content-Type" should be equal to "application/json"
     And the JSON node "data.createDummyGroup.id" should be equal to "/dummy_groups/2"
     And the JSON node "data.createDummyGroup.bar" should be equal to "Bar"
-    And the JSON node "data.createDummyGroup.baz" should be null
     And the JSON node "data.createDummyGroup.clientMutationId" should be equal to "myId"
 
   Scenario: Trigger a validation error
