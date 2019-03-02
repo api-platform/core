@@ -1,0 +1,82 @@
+<?xml version="1.0"?>
+<resources xmlns="https://api-platform.com/schema/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="https://api-platform.com/schema/metadata https://api-platform.com/schema/metadata/metadata-2.0.xsd">
+    <resource xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="https://api-platform.com/schema/metadata https://api-platform.com/schema/metadata/metadata-2.0.xsd" class="App\Entity\Book">
+        <attribute>
+            <attribute name="normalization_context">
+                <attribute name="groups">
+                    <attribute>read</attribute>
+                </attribute>
+            </attribute>
+            <attribute name="denormalization_context">
+                <attribute name="groups">
+                    <attribute>write</attribute>
+                </attribute>
+            </attribute>
+            <attribute name="Create a Book instead"/>
+        </attribute>
+        <graphql>
+            <operation name="query">
+                <attribute name="normalization_context">
+                    <attribute name="groups">
+                        <attribute>query</attribute>
+                    </attribute>
+                </attribute>
+            </operation>
+            <operation name="create">
+                <attribute name="normalization_context">
+                    <attribute name="groups">
+                        <attribute>query</attribute>
+                    </attribute>
+                </attribute>
+                <attribute name="denormalization_context">
+                    <attribute name="groups">
+                        <attribute>mutation</attribute>
+                    </attribute>
+                </attribute>
+            </operation>
+            <operation name="delete"/>
+        </graphql>
+        <itemOperations>
+            <itemOperation name="get">
+                <attribute name="method">GET</attribute>
+                <attribute name="path">/grimoire/{id}</attribute>
+                <attribute name="requirements">
+                    <attribute name="id">\d+</attribute>
+                </attribute>
+                <attribute name="defaults">
+                    <attribute name="color">brown</attribute>
+                </attribute>
+                <attribute name="options">
+                    <attribute name="my_option">my_option_value</attribute>
+                </attribute>
+                <attribute name="schemes">
+                    <attribute>https</attribute>
+                </attribute>
+                <attribute name="host">{subdomain}.api-platform.com</attribute>
+            </itemOperation>
+            <itemOperation name="put">
+                <attribute name="method">PUT</attribute>
+                <attribute name="path">/grimoire/{id}/update</attribute>
+                <attribute name="hydra_context">
+                    <attribute name="foo">bar</attribute>
+                </attribute>
+            </itemOperation>
+            <itemOperation name="post_publication">
+                <attribute name="route_name">book_post_publication</attribute>
+                <attribute name="deprecation_reason">Retrieve a Book instead</attribute>
+                <attribute name="sunset">01/01/2020</attribute>
+            </itemOperation>
+            <itemOperation name="book_post_discontinuation"/>
+        </itemOperations>
+        <property name="id" description="identifiant unique" iri="http://schema.org/id" identifier="1"/>
+        <property name="name" readable="1" writable="1"/>
+        <property name="author" readable="1">
+            <subresource resourceClass="App\Entity\Holder"/>
+        </property>
+        <property name="scribus">
+            <attribute>
+                <attribute name="Use the author property instead"/>
+            </attribute>
+        </property>
+    </resource>
+</resources>
