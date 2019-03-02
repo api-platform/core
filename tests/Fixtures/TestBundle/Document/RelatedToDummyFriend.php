@@ -51,7 +51,7 @@ class RelatedToDummyFriend
     private $description;
 
     /**
-     * @ODM\ReferenceOne(targetDocument=DummyFriend::class)
+     * @ODM\ReferenceOne(targetDocument=DummyFriend::class, storeAs="id")
      * @Groups({"fakemanytomany", "friends"})
      * @Assert\NotNull
      */
