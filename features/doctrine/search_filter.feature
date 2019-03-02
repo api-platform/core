@@ -416,6 +416,17 @@ Feature: Search filter on collections
     And the JSON node "_embedded.item[2]._links.relatedDummies" should have 3 elements
 
   @createSchema
+  Scenario: Search by related collection id
+    Given there are 2 dummy objects having each 2 relatedDummies
+    When I add "Accept" header equal to "application/hal+json"
+    And I send a "GET" request to "/dummies?relatedDummies=3"
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the JSON node "totalItems" should be equal to "1"
+    And the JSON node "_links.item" should have 1 element
+    And the JSON node "_links.item[0].href" should be equal to "/dummies/2"
+
+  @createSchema
   Scenario: Get collection by id equals 9.99 which is not possible
     Given there are 30 dummy objects
     When I send a "GET" request to "/dummies?id=9.99"
