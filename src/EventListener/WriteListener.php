@@ -49,7 +49,7 @@ final class WriteListener
         }
 
         $controllerResult = $event->getControllerResult();
-        if (!$this->dataPersister->supports($controllerResult)) {
+        if (!$this->dataPersister->supports($controllerResult, $attributes)) {
             return;
         }
 
