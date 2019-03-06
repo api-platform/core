@@ -21,6 +21,7 @@ use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\ConcreteDummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use PHPUnit\Framework\TestCase;
+use Prophecy\Argument;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
@@ -36,8 +37,8 @@ class WriteListenerTest extends TestCase
         $dummy->setName('Dummyrino');
 
         $dataPersisterProphecy = $this->prophesize(DataPersisterInterface::class);
-        $dataPersisterProphecy->supports($dummy)->willReturn(true)->shouldBeCalled();
-        $dataPersisterProphecy->persist($dummy)->willReturn($dummy)->shouldBeCalled();
+        $dataPersisterProphecy->supports($dummy, Argument::type('array'))->willReturn(true)->shouldBeCalled();
+        $dataPersisterProphecy->persist($dummy, Argument::type('array'))->willReturn($dummy)->shouldBeCalled();
 
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
         $iriConverterProphecy->getIriFromItem($dummy)->willReturn('/dummy/1')->shouldBeCalled();
@@ -71,8 +72,8 @@ class WriteListenerTest extends TestCase
         $dummy->setName('Dummyrino');
 
         $dataPersisterProphecy = $this->prophesize(DataPersisterInterface::class);
-        $dataPersisterProphecy->supports($dummy)->willReturn(true)->shouldBeCalled();
-        $dataPersisterProphecy->persist($dummy)->shouldBeCalled();
+        $dataPersisterProphecy->supports($dummy, Argument::type('array'))->willReturn(true)->shouldBeCalled();
+        $dataPersisterProphecy->persist($dummy, Argument::type('array'))->shouldBeCalled();
 
         $request = new Request([], [], ['_api_resource_class' => Dummy::class]);
 
@@ -104,13 +105,13 @@ class WriteListenerTest extends TestCase
         $dummy2->setName('Dummyferoce');
 
         $dataPersisterProphecy = $this->prophesize(DataPersisterInterface::class);
-        $dataPersisterProphecy->supports($dummy)->willReturn(true)->shouldBeCalled();
+        $dataPersisterProphecy->supports($dummy, Argument::type('array'))->willReturn(true)->shouldBeCalled();
 
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
         $iriConverterProphecy->getIriFromItem($dummy)->willReturn('/dummy/1')->shouldBeCalled();
 
         $dataPersisterProphecy
-            ->persist($dummy)
+            ->persist($dummy, Argument::type('array'))
             ->willReturn($dummy2) // Persist is not mutating $dummy, but return a brand new technically unrelated object instead
             ->shouldBeCalled()
         ;
@@ -141,7 +142,7 @@ class WriteListenerTest extends TestCase
         $dummy->setName('Dummyrino');
 
         $dataPersisterProphecy = $this->prophesize(DataPersisterInterface::class);
-        $dataPersisterProphecy->supports($dummy)->willReturn(true)->shouldBeCalled();
+        $dataPersisterProphecy->supports($dummy, Argument::type('array'))->willReturn(true)->shouldBeCalled();
 
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
         $iriConverterProphecy->getIriFromItem($dummy)->shouldNotBeCalled();
@@ -149,7 +150,7 @@ class WriteListenerTest extends TestCase
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadata(null, null, null, null, null, ['output' => ['class' => null]]));
 
-        $dataPersisterProphecy->persist($dummy)->willReturn($dummy)->shouldBeCalled();
+        $dataPersisterProphecy->persist($dummy, Argument::type('array'))->willReturn($dummy)->shouldBeCalled();
 
         $request = new Request([], [], ['_api_resource_class' => Dummy::class, '_api_collection_operation_name' => 'post']);
         $request->setMethod('POST');
@@ -170,7 +171,7 @@ class WriteListenerTest extends TestCase
         $dummy->setName('Dummyrino');
 
         $dataPersisterProphecy = $this->prophesize(DataPersisterInterface::class);
-        $dataPersisterProphecy->supports($dummy)->willReturn(true)->shouldBeCalled();
+        $dataPersisterProphecy->supports($dummy, Argument::type('array'))->willReturn(true)->shouldBeCalled();
         $dataPersisterProphecy->remove($dummy)->shouldBeCalled();
 
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
@@ -195,9 +196,9 @@ class WriteListenerTest extends TestCase
         $dummy->setName('Dummyrino');
 
         $dataPersisterProphecy = $this->prophesize(DataPersisterInterface::class);
-        $dataPersisterProphecy->supports($dummy)->shouldNotBeCalled();
-        $dataPersisterProphecy->persist($dummy)->shouldNotBeCalled();
-        $dataPersisterProphecy->remove($dummy)->shouldNotBeCalled();
+        $dataPersisterProphecy->supports($dummy, Argument::type('array'))->shouldNotBeCalled();
+        $dataPersisterProphecy->persist($dummy, Argument::type('array'))->shouldNotBeCalled();
+        $dataPersisterProphecy->remove($dummy, Argument::type('array'))->shouldNotBeCalled();
 
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
         $iriConverterProphecy->getIriFromItem($dummy)->shouldNotBeCalled();
@@ -221,9 +222,9 @@ class WriteListenerTest extends TestCase
         $dummy->setName('Dummyrino');
 
         $dataPersisterProphecy = $this->prophesize(DataPersisterInterface::class);
-        $dataPersisterProphecy->supports($dummy)->shouldNotBeCalled();
-        $dataPersisterProphecy->persist($dummy)->shouldNotBeCalled();
-        $dataPersisterProphecy->remove($dummy)->shouldNotBeCalled();
+        $dataPersisterProphecy->supports($dummy, Argument::type('array'))->shouldNotBeCalled();
+        $dataPersisterProphecy->persist($dummy, Argument::type('array'))->shouldNotBeCalled();
+        $dataPersisterProphecy->remove($dummy, Argument::type('array'))->shouldNotBeCalled();
 
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
         $iriConverterProphecy->getIriFromItem($dummy)->shouldNotBeCalled();
@@ -247,9 +248,9 @@ class WriteListenerTest extends TestCase
         $dummy->setName('Dummyrino');
 
         $dataPersisterProphecy = $this->prophesize(DataPersisterInterface::class);
-        $dataPersisterProphecy->supports($dummy)->shouldNotBeCalled();
-        $dataPersisterProphecy->persist($dummy)->shouldNotBeCalled();
-        $dataPersisterProphecy->remove($dummy)->shouldNotBeCalled();
+        $dataPersisterProphecy->supports($dummy, Argument::type('array'))->shouldNotBeCalled();
+        $dataPersisterProphecy->persist($dummy, Argument::type('array'))->shouldNotBeCalled();
+        $dataPersisterProphecy->remove($dummy, Argument::type('array'))->shouldNotBeCalled();
 
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
         $iriConverterProphecy->getIriFromItem($dummy)->shouldNotBeCalled();
@@ -272,8 +273,8 @@ class WriteListenerTest extends TestCase
         $dummy = new ConcreteDummy();
 
         $dataPersisterProphecy = $this->prophesize(DataPersisterInterface::class);
-        $dataPersisterProphecy->supports($dummy)->willReturn(true)->shouldBeCalled();
-        $dataPersisterProphecy->persist($dummy)->willReturn($dummy)->shouldBeCalled();
+        $dataPersisterProphecy->supports($dummy, Argument::type('array'))->willReturn(true)->shouldBeCalled();
+        $dataPersisterProphecy->persist($dummy, Argument::type('array'))->willReturn($dummy)->shouldBeCalled();
 
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
         $iriConverterProphecy->getIriFromItem($dummy)->willReturn('/dummy/1')->shouldBeCalled();
@@ -297,9 +298,9 @@ class WriteListenerTest extends TestCase
         $dummy->setName('Dummyrino');
 
         $dataPersisterProphecy = $this->prophesize(DataPersisterInterface::class);
-        $dataPersisterProphecy->supports($dummy)->willReturn(false)->shouldBeCalled();
-        $dataPersisterProphecy->persist($dummy)->shouldNotBeCalled();
-        $dataPersisterProphecy->remove($dummy)->shouldNotBeCalled();
+        $dataPersisterProphecy->supports($dummy, Argument::type('array'))->willReturn(false)->shouldBeCalled();
+        $dataPersisterProphecy->persist($dummy, Argument::type('array'))->shouldNotBeCalled();
+        $dataPersisterProphecy->remove($dummy, Argument::type('array'))->shouldNotBeCalled();
 
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
         $iriConverterProphecy->getIriFromItem($dummy)->shouldNotBeCalled();
