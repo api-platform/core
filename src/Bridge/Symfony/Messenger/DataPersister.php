@@ -13,7 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Bridge\Symfony\Messenger;
 
-use ApiPlatform\Core\DataPersister\DataPersisterInterface;
+use ApiPlatform\Core\Api\OperationType;
+use ApiPlatform\Core\DataPersister\ContextAwareDataPersisterInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Util\ClassInfoTrait;
 use Symfony\Component\Messenger\Envelope;
@@ -27,7 +28,7 @@ use Symfony\Component\Messenger\Stamp\HandledStamp;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-final class DataPersister implements DataPersisterInterface
+final class DataPersister implements ContextAwareDataPersisterInterface
 {
     use ClassInfoTrait;
 
@@ -43,15 +44,26 @@ final class DataPersister implements DataPersisterInterface
     /**
      * {@inheritdoc}
      */
-    public function supports($data): bool
+    public function supports($data, array $context = []): bool
     {
-        return true === $this->resourceMetadataFactory->create($this->getObjectClass($data))->getAttribute('messenger');
+        $resourceMetadata = $this->resourceMetadataFactory->create($this->getObjectClass($data));
+        if (null !== $operationName = $context['collection_operation_name'] ?? $context['item_operation_name'] ?? null) {
+            return true === $resourceMetadata->getTypedOperationAttribute(
+                $context['collection_operation_name'] ?? false ? OperationType::COLLECTION : OperationType::ITEM,
+                $operationName,
+                'messenger',
+                false,
+                true
+            );
+        }
+
+        return true === $resourceMetadata->getAttribute('messenger');
     }
 
     /**
      * {@inheritdoc}
      */
-    public function persist($data)
+    public function persist($data, array $context = [])
     {
         $envelope = $this->messageBus->dispatch($data);
         if (null === $stamp = $envelope->last(HandledStamp::class)) {
@@ -64,7 +76,7 @@ final class DataPersister implements DataPersisterInterface
     /**
      * {@inheritdoc}
      */
-    public function remove($data)
+    public function remove($data, array $context = [])
     {
         $this->messageBus->dispatch(new Envelope($data, new RemoveStamp()));
     }

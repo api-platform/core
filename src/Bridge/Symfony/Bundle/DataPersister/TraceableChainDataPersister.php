@@ -14,12 +14,13 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Bridge\Symfony\Bundle\DataPersister;
 
 use ApiPlatform\Core\DataPersister\ChainDataPersister;
+use ApiPlatform\Core\DataPersister\ContextAwareDataPersisterInterface;
 use ApiPlatform\Core\DataPersister\DataPersisterInterface;
 
 /**
  * @author Anthony GRASSIOT <antograssiot@free.fr>
  */
-final class TraceableChainDataPersister implements DataPersisterInterface
+final class TraceableChainDataPersister implements ContextAwareDataPersisterInterface
 {
     private $persisters = [];
     private $persistersResponse = [];
@@ -41,37 +42,37 @@ final class TraceableChainDataPersister implements DataPersisterInterface
     /**
      * {@inheritdoc}
      */
-    public function supports($data): bool
+    public function supports($data, array $context = []): bool
     {
-        return $this->decorated->supports($data);
+        return $this->decorated->supports($data, $context);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function persist($data)
+    public function persist($data, array $context = [])
     {
-        if ($match = $this->tracePersisters($data)) {
-            return $match->persist($data) ?? $data;
+        if ($match = $this->tracePersisters($data, $context)) {
+            return $match->persist($data, $context) ?? $data;
         }
     }
 
     /**
      * {@inheritdoc}
      */
-    public function remove($data)
+    public function remove($data, array $context = [])
     {
-        if ($match = $this->tracePersisters($data)) {
-            return $match->remove($data);
+        if ($match = $this->tracePersisters($data, $context)) {
+            return $match->remove($data, $context);
         }
     }
 
-    private function tracePersisters($data)
+    private function tracePersisters($data, array $context = [])
     {
         $match = null;
         foreach ($this->persisters as $persister) {
             $this->persistersResponse[\get_class($persister)] = $match ? null : false;
-            if (!$match && $persister->supports($data)) {
+            if (!$match && $persister->supports($data, $context)) {
                 $match = $persister;
                 $this->persistersResponse[\get_class($persister)] = true;
             }

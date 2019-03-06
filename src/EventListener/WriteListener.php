@@ -49,7 +49,7 @@ final class WriteListener
         }
 
         $controllerResult = $event->getControllerResult();
-        if (!$this->dataPersister->supports($controllerResult)) {
+        if (!$this->dataPersister->supports($controllerResult, $attributes)) {
             return;
         }
 
@@ -57,7 +57,7 @@ final class WriteListener
             case 'PUT':
             case 'PATCH':
             case 'POST':
-                $persistResult = $this->dataPersister->persist($controllerResult);
+                $persistResult = $this->dataPersister->persist($controllerResult, $attributes);
 
                 if (null === $persistResult) {
                     @trigger_error(sprintf('Returning void from %s::persist() is deprecated since API Platform 2.3 and will not be supported in API Platform 3, an object should always be returned.', DataPersisterInterface::class), E_USER_DEPRECATED);
