@@ -30,7 +30,7 @@ Feature: Collections filtering
     When I send the following GraphQL request:
     """
     {
-      dummies(relatedDummy: {exists: true}) {
+      dummies(exists: {relatedDummy: true}) {
         edges {
           node {
             id

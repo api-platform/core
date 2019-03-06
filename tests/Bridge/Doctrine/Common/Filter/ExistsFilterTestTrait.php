@@ -23,7 +23,7 @@ trait ExistsFilterTestTrait
         $filter = $filter = $this->buildFilter(['name' => null, 'description' => null]);
 
         $this->assertEquals([
-            'description[exists]' => [
+            'exists[description]' => [
                 'property' => 'description',
                 'type' => 'bool',
                 'required' => false,
@@ -39,8 +39,8 @@ trait ExistsFilterTestTrait
                     'description' => null,
                 ],
                 [
-                    'description' => [
-                        'exists' => 'true',
+                    'exists' => [
+                        'description' => 'true',
                     ],
                 ],
             ],
@@ -50,8 +50,8 @@ trait ExistsFilterTestTrait
                     'description' => null,
                 ],
                 [
-                    'description' => [
-                        'exists' => '',
+                    'exists' => [
+                        'description' => '',
                     ],
                 ],
             ],
@@ -61,8 +61,8 @@ trait ExistsFilterTestTrait
                     'description' => null,
                 ],
                 [
-                    'description' => [
-                        'exists' => '1',
+                    'exists' => [
+                        'description' => '1',
                     ],
                 ],
             ],
@@ -72,8 +72,8 @@ trait ExistsFilterTestTrait
                     'description' => null,
                 ],
                 [
-                    'description' => [
-                        'exists' => 'invalid',
+                    'exists' => [
+                        'description' => 'invalid',
                     ],
                 ],
             ],
@@ -83,8 +83,8 @@ trait ExistsFilterTestTrait
                     'description' => null,
                 ],
                 [
-                    'description' => [
-                        'exists' => 'false',
+                    'exists' => [
+                        'description' => 'false',
                     ],
                 ],
             ],
@@ -94,8 +94,62 @@ trait ExistsFilterTestTrait
                     'description' => null,
                 ],
                 [
-                    'description' => [
-                        'exists' => '0',
+                    'exists' => [
+                        'description' => '0',
+                    ],
+                ],
+            ],
+
+            'multiple values (true and true)' => [
+                [
+                    'alias' => null,
+                    'description' => null,
+                ],
+                [
+                    'exists' => [
+                        'alias' => 'true',
+                        'description' => 'true',
+                    ],
+                ],
+            ],
+
+            'multiple values (1 and 0)' => [
+                [
+                    'alias' => null,
+                    'description' => null,
+                ],
+                [
+                    'exists' => [
+                        'alias' => '1',
+                        'description' => '0',
+                    ],
+                ],
+            ],
+
+            'multiple values (false and 0)' => [
+                [
+                    'alias' => null,
+                    'description' => null,
+                ],
+                [
+                    'exists' => [
+                        'alias' => 'false',
+                        'description' => '0',
+                    ],
+                ],
+            ],
+
+            'custom exists parameter name' => [
+                [
+                    'alias' => null,
+                    'description' => null,
+                ],
+                [
+                    'exists' => [
+                        'alias' => 'true',
+                    ],
+                    'customExists' => [
+                        'description' => 'true',
                     ],
                 ],
             ],
@@ -106,11 +160,9 @@ trait ExistsFilterTestTrait
                     'relatedDummy.name' => null,
                 ],
                 [
-                    'description' => [
-                        'exists' => '1',
-                    ],
-                    'relatedDummy.name' => [
-                        'exists' => '1',
+                    'exists' => [
+                        'description' => '1',
+                        'relatedDummy.name' => '1',
                     ],
                 ],
             ],
@@ -121,11 +173,9 @@ trait ExistsFilterTestTrait
                     'name' => null,
                 ],
                 [
-                    'description' => [
-                        'exists' => '1',
-                    ],
-                    'name' => [
-                        'exists' => '0',
+                    'exists' => [
+                        'description' => '1',
+                        'name' => '0',
                     ],
                 ],
             ],
@@ -136,11 +186,9 @@ trait ExistsFilterTestTrait
                     'relatedDummies' => null,
                 ],
                 [
-                    'description' => [
-                        'exists' => '1',
-                    ],
-                    'relatedDummies' => [
-                        'exists' => '1',
+                    'exists' => [
+                        'description' => '1',
+                        'relatedDummies' => '1',
                     ],
                 ],
             ],
@@ -151,11 +199,9 @@ trait ExistsFilterTestTrait
                     'relatedDummies' => null,
                 ],
                 [
-                    'description' => [
-                        'exists' => '1',
-                    ],
-                    'relatedDummies' => [
-                        'exists' => '0',
+                    'exists' => [
+                        'description' => '1',
+                        'relatedDummies' => '0',
                     ],
                 ],
             ],
@@ -166,11 +212,9 @@ trait ExistsFilterTestTrait
                     'relatedDummy' => null,
                 ],
                 [
-                    'description' => [
-                        'exists' => '1',
-                    ],
-                    'relatedDummy' => [
-                        'exists' => '1',
+                    'exists' => [
+                        'description' => '1',
+                        'relatedDummy' => '1',
                     ],
                 ],
             ],
@@ -181,11 +225,9 @@ trait ExistsFilterTestTrait
                     'relatedDummy' => null,
                 ],
                 [
-                    'description' => [
-                        'exists' => '1',
-                    ],
-                    'relatedDummy' => [
-                        'exists' => '0',
+                    'exists' => [
+                        'description' => '1',
+                        'relatedDummy' => '0',
                     ],
                 ],
             ],
@@ -195,8 +237,8 @@ trait ExistsFilterTestTrait
                     'relatedOwnedDummy' => null,
                 ],
                 [
-                    'relatedOwnedDummy' => [
-                        'exists' => '0',
+                    'exists' => [
+                        'relatedOwnedDummy' => '0',
                     ],
                 ],
             ],
@@ -206,8 +248,8 @@ trait ExistsFilterTestTrait
                     'relatedOwnedDummy' => null,
                 ],
                 [
-                    'relatedOwnedDummy' => [
-                        'exists' => '1',
+                    'exists' => [
+                        'relatedOwnedDummy' => '1',
                     ],
                 ],
             ],
@@ -217,8 +259,8 @@ trait ExistsFilterTestTrait
                     'relatedOwningDummy' => null,
                 ],
                 [
-                    'relatedOwningDummy' => [
-                        'exists' => '0',
+                    'exists' => [
+                        'relatedOwningDummy' => '0',
                     ],
                 ],
             ],
@@ -228,8 +270,8 @@ trait ExistsFilterTestTrait
                     'relatedOwningDummy' => null,
                 ],
                 [
-                    'relatedOwningDummy' => [
-                        'exists' => '1',
+                    'exists' => [
+                        'relatedOwningDummy' => '1',
                     ],
                 ],
             ],
