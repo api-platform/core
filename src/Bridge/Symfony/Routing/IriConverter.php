@@ -116,23 +116,17 @@ final class IriConverter implements IriConverterInterface
     public function getIriFromItem($item, int $referenceType = UrlGeneratorInterface::ABS_PATH): string
     {
         $resourceClass = $this->getObjectClass($item);
-        $routeName = $this->routeNameResolver->getRouteName($resourceClass, OperationType::ITEM);
 
         try {
-            $identifiers = $this->generateIdentifiersUrl($this->identifiersExtractor->getIdentifiersFromItem($item), $resourceClass);
-
-            return $this->router->generate($routeName, ['id' => implode(';', $identifiers)], $referenceType);
+            $identifiers = $this->identifiersExtractor->getIdentifiersFromItem($item);
         } catch (RuntimeException $e) {
             throw new InvalidArgumentException(sprintf(
                 'Unable to generate an IRI for the item of type "%s"',
                 $resourceClass
             ), $e->getCode(), $e);
-        } catch (RoutingExceptionInterface $e) {
-            throw new InvalidArgumentException(sprintf(
-                'Unable to generate an IRI for the item of type "%s"',
-                $resourceClass
-            ), $e->getCode(), $e);
         }
+
+        return $this->getItemIriFromResourceClass($resourceClass, $identifiers, $referenceType);
     }
 
     /**
@@ -152,10 +146,17 @@ final class IriConverter implements IriConverterInterface
      */
     public function getItemIriFromResourceClass(string $resourceClass, array $identifiers, int $referenceType = UrlGeneratorInterface::ABS_PATH): string
     {
+        $routeName = $this->routeNameResolver->getRouteName($resourceClass, OperationType::ITEM);
+
         try {
-            return $this->router->generate($this->routeNameResolver->getRouteName($resourceClass, OperationType::ITEM), $identifiers, $referenceType);
+            $identifiers = $this->generateIdentifiersUrl($identifiers, $resourceClass);
+
+            return $this->router->generate($routeName, ['id' => implode(';', $identifiers)], $referenceType);
         } catch (RoutingExceptionInterface $e) {
-            throw new InvalidArgumentException(sprintf('Unable to generate an IRI for "%s".', $resourceClass), $e->getCode(), $e);
+            throw new InvalidArgumentException(sprintf(
+                'Unable to generate an IRI for "%s".',
+                $resourceClass
+            ), $e->getCode(), $e);
         }
     }
 
