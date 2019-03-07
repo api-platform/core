@@ -65,6 +65,7 @@
             <argument type="service" id="api_platform.elasticsearch.metadata.document.metadata_factory" />
             <argument type="service" id="api_platform.elasticsearch.identifier_extractor" />
             <argument type="service" id="serializer" />
+            <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
 
             <tag name="api_platform.item_data_provider" priority="5" />
         </service>
@@ -75,6 +76,7 @@
             <argument type="service" id="api_platform.elasticsearch.identifier_extractor" />
             <argument type="service" id="serializer" />
             <argument type="service" id="api_platform.pagination" />
+            <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
             <argument type="tagged" tag="api_platform.elasticsearch.request_body_search_extension.collection" />
 
             <tag name="api_platform.collection_data_provider" priority="5" />
