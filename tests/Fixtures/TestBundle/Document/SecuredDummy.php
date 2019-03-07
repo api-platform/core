@@ -30,7 +30,8 @@ use Symfony\Component\Validator\Constraints as Assert;
  *         "post"={"access_control"="has_role('ROLE_ADMIN')"}
  *     },
  *     itemOperations={
- *         "get"={"access_control"="has_role('ROLE_USER') and object.getOwner() == user"}
+ *         "get"={"access_control"="has_role('ROLE_USER') and object.getOwner() == user"},
+ *         "put"={"access_control"="has_role('ROLE_USER') and previous_object.getOwner() == user"},
  *     },
  *     graphql={
  *         "query"={},

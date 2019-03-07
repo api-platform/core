@@ -153,6 +153,7 @@ class ReadListenerTest extends TestCase
         $listener->onKernelRequest($event->reveal());
 
         $this->assertFalse($request->attributes->has('data'));
+        $this->assertFalse($request->attributes->has('previous_data'));
     }
 
     public function testRetrieveCollectionGet()
@@ -178,6 +179,7 @@ class ReadListenerTest extends TestCase
         $listener->onKernelRequest($event->reveal());
 
         $this->assertSame([], $request->attributes->get('data'));
+        $this->assertFalse($request->attributes->has('previous_data'));
     }
 
     public function testRetrieveItem()
@@ -205,6 +207,7 @@ class ReadListenerTest extends TestCase
         $listener->onKernelRequest($event->reveal());
 
         $this->assertSame($data, $request->attributes->get('data'));
+        $this->assertEquals($data, $request->attributes->get('previous_data'));
     }
 
     public function testRetrieveItemNoIdentifier()
@@ -257,6 +260,7 @@ class ReadListenerTest extends TestCase
         $listener->onKernelRequest($event->reveal());
 
         $this->assertSame($data, $request->attributes->get('data'));
+        $this->assertSame($data, $request->attributes->get('previous_data'));
     }
 
     public function testRetrieveSubresourceNoDataProvider()
