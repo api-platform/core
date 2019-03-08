@@ -29,9 +29,9 @@ final class ItemNormalizer extends BaseItemNormalizer
     /**
      * {@inheritdoc}
      */
-    public function supportsNormalization($data, $format = null, array $context = [])
+    public function supportsNormalization($data, $format = null)
     {
-        return self::FORMAT === $format && parent::supportsNormalization($data, $format, $context);
+        return self::FORMAT === $format && parent::supportsNormalization($data, $format);
     }
 
     /**

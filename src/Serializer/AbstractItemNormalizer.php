@@ -15,16 +15,12 @@ namespace ApiPlatform\Core\Serializer;
 
 use ApiPlatform\Core\Api\IriConverterInterface;
 use ApiPlatform\Core\Api\ResourceClassResolverInterface;
-use ApiPlatform\Core\Bridge\Elasticsearch\Serializer\ItemNormalizer as ElasticsearchItemNormalizer;
+use ApiPlatform\Core\Bridge\Elasticsearch\Serializer\ItemNormalizer;
 use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
 use ApiPlatform\Core\DataTransformer\DataTransformerInterface;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\Exception\InvalidValueException;
 use ApiPlatform\Core\Exception\ItemNotFoundException;
-use ApiPlatform\Core\GraphQl\Serializer\ItemNormalizer as GraphQlItemNormalizer;
-use ApiPlatform\Core\Hal\Serializer\ItemNormalizer as HalItemNormalizer;
-use ApiPlatform\Core\JsonApi\Serializer\ItemNormalizer as JsonApiItemNormalizer;
-use ApiPlatform\Core\JsonLd\Serializer\ItemNormalizer as JsonLdItemNormalizer;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
@@ -40,7 +36,6 @@ use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
 use Symfony\Component\Serializer\NameConverter\AdvancedNameConverterInterface;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
-use Symfony\Component\Serializer\Normalizer\ContextAwareNormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
@@ -49,11 +44,8 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-abstract class AbstractItemNormalizer extends AbstractObjectNormalizer implements ContextAwareNormalizerInterface
+abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
 {
-    private const FORMATS = [GraphQlItemNormalizer::FORMAT, HalItemNormalizer::FORMAT, JsonApiItemNormalizer::FORMAT, JsonLdItemNormalizer::FORMAT];
-    const USE_API_PLATFORM = 'use_api_platform';
-
     use ClassInfoTrait;
     use ContextTrait;
     use InputOutputMetadataTrait;
@@ -101,12 +93,8 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer implement
     /**
      * {@inheritdoc}
      */
-    public function supportsNormalization($data, $format = null, array $context = [])
+    public function supportsNormalization($data, $format = null)
     {
-        if (!(($context[static::USE_API_PLATFORM] ?? false) || \in_array($format, self::FORMATS, true))) {
-            return false;
-        }
-
         if (!\is_object($data) || $data instanceof \Traversable) {
             return false;
         }
@@ -123,7 +111,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer implement
      */
     public function hasCacheableSupportsMethod(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -156,7 +144,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer implement
      */
     public function supportsDenormalization($data, $type, $format = null)
     {
-        if (ElasticsearchItemNormalizer::FORMAT === $format) {
+        if (ItemNormalizer::FORMAT === $format) {
             return false;
         }
 

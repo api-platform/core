@@ -52,7 +52,7 @@ class ItemNormalizerTest extends TestCase
         $normalizer = new ItemNormalizer($resourceMetadataFactoryProphecy->reveal(), $propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), $iriConverterProphecy->reveal(), $resourceClassResolverProphecy->reveal(), $contextBuilderProphecy->reveal());
 
         $this->assertFalse($normalizer->supportsDenormalization('foo', ItemNormalizer::FORMAT));
-        $this->assertFalse($normalizer->hasCacheableSupportsMethod());
+        $this->assertTrue($normalizer->hasCacheableSupportsMethod());
     }
 
     /**
@@ -87,7 +87,7 @@ class ItemNormalizerTest extends TestCase
         $this->assertTrue($normalizer->supportsNormalization($dummy, 'jsonld'));
         $this->assertFalse($normalizer->supportsNormalization($dummy, 'xml'));
         $this->assertFalse($normalizer->supportsNormalization($std, 'jsonld'));
-        $this->assertFalse($normalizer->hasCacheableSupportsMethod());
+        $this->assertTrue($normalizer->hasCacheableSupportsMethod());
     }
 
     public function testNormalize()

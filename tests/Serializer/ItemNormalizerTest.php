@@ -60,14 +60,14 @@ class ItemNormalizerTest extends TestCase
             $resourceClassResolverProphecy->reveal()
         );
 
-        $this->assertTrue($normalizer->supportsNormalization($dummy, 'jsonld'));
-        $this->assertTrue($normalizer->supportsNormalization($dummy, 'jsonld'));
-        $this->assertFalse($normalizer->supportsNormalization($std, 'jsonld'));
+        $this->assertTrue($normalizer->supportsNormalization($dummy));
+        $this->assertTrue($normalizer->supportsNormalization($dummy));
+        $this->assertFalse($normalizer->supportsNormalization($std));
 
         $this->assertTrue($normalizer->supportsDenormalization($dummy, Dummy::class));
         $this->assertTrue($normalizer->supportsDenormalization($dummy, Dummy::class));
         $this->assertFalse($normalizer->supportsDenormalization($std, \stdClass::class));
-        $this->assertFalse($normalizer->hasCacheableSupportsMethod());
+        $this->assertTrue($normalizer->hasCacheableSupportsMethod());
     }
 
     public function testNormalize()
