@@ -15,6 +15,7 @@ namespace ApiPlatform\Core\Bridge\Symfony\Messenger;
 
 use ApiPlatform\Core\Api\OperationType;
 use ApiPlatform\Core\DataPersister\ContextAwareDataPersisterInterface;
+use ApiPlatform\Core\Exception\ResourceClassNotFoundException;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Util\ClassInfoTrait;
 use Symfony\Component\Messenger\Envelope;
@@ -46,7 +47,12 @@ final class DataPersister implements ContextAwareDataPersisterInterface
      */
     public function supports($data, array $context = []): bool
     {
-        $resourceMetadata = $this->resourceMetadataFactory->create($this->getObjectClass($data));
+        try {
+            $resourceMetadata = $this->resourceMetadataFactory->create($context['resource_class'] ?? $this->getObjectClass($data));
+        } catch (ResourceClassNotFoundException $e) {
+            return false;
+        }
+
         if (null !== $operationName = $context['collection_operation_name'] ?? $context['item_operation_name'] ?? null) {
             return true === $resourceMetadata->getTypedOperationAttribute(
                 $context['collection_operation_name'] ?? false ? OperationType::COLLECTION : OperationType::ITEM,
