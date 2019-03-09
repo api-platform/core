@@ -56,7 +56,7 @@
             <argument type="service" id="property_info" on-invalid="ignore" />
             <argument type="service" id="serializer.mapping.class_discriminator_resolver" on-invalid="ignore" />
 
-            <!-- After the DataURINormalizer but before the object denormalizer -->
+            <!-- After the DataUriNormalizer but before the ObjectNormalizer -->
             <tag name="serializer.normalizer" priority="-922" />
         </service>
 

@@ -57,7 +57,6 @@ final class SerializerContextBuilder implements SerializerContextBuilderInterfac
         }
 
         $context = $resourceMetadata->getTypedOperationAttribute($operationType, $attributes[$operationKey], $key, [], true);
-        $context[AbstractItemNormalizer::USE_API_PLATFORM] = true;
         $context['operation_type'] = $operationType;
         $context[$operationKey] = $attributes[$operationKey];
 
