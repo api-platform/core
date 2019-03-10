@@ -15,9 +15,11 @@ namespace ApiPlatform\Core\Tests\Bridge\Symfony\Messenger;
 
 use ApiPlatform\Core\Bridge\Symfony\Messenger\DataPersister;
 use ApiPlatform\Core\Bridge\Symfony\Messenger\RemoveStamp;
+use ApiPlatform\Core\Exception\ResourceClassNotFoundException;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyCar;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Symfony\Component\Messenger\Envelope;
@@ -36,6 +38,17 @@ class DataPersisterTest extends TestCase
 
         $dataPersister = new DataPersister($metadataFactoryProphecy->reveal(), $this->prophesize(MessageBusInterface::class)->reveal());
         $this->assertTrue($dataPersister->supports(new Dummy()));
+    }
+
+    public function testSupportWithContext()
+    {
+        $metadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
+        $metadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadata(null, null, null, null, null, ['messenger' => true]));
+        $metadataFactoryProphecy->create(DummyCar::class)->willThrow(new ResourceClassNotFoundException());
+
+        $dataPersister = new DataPersister($metadataFactoryProphecy->reveal(), $this->prophesize(MessageBusInterface::class)->reveal());
+        $this->assertTrue($dataPersister->supports(new DummyCar(), ['resource_class' => Dummy::class]));
+        $this->assertFalse($dataPersister->supports(new DummyCar()));
     }
 
     public function testPersist()
