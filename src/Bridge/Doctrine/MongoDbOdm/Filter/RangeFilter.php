@@ -78,7 +78,7 @@ final class RangeFilter extends AbstractFilter implements RangeFilterInterface
                     return;
                 }
 
-                $aggregationBuilder->match()->field($matchField)->lte($rangeValue[0])->gte($rangeValue[1]);
+                $aggregationBuilder->match()->field($matchField)->gte($rangeValue[0])->lte($rangeValue[1]);
 
                 break;
             case self::PARAMETER_GREATER_THAN:
