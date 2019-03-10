@@ -111,7 +111,7 @@ class Dummy
     /**
      * @var string A dummy price
      *
-     * @ODM\Field(type="int", nullable=true)
+     * @ODM\Field(type="float", nullable=true)
      */
     public $dummyPrice;
 

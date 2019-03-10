@@ -137,14 +137,14 @@ class SearchFilterTest extends DoctrineMongoDbOdmFilterTestCase
             ],
             'dummyPrice' => [
                 'property' => 'dummyPrice',
-                'type' => 'int',
+                'type' => 'float',
                 'required' => false,
                 'strategy' => 'exact',
                 'is_collection' => false,
             ],
             'dummyPrice[]' => [
                 'property' => 'dummyPrice',
-                'type' => 'int',
+                'type' => 'float',
                 'required' => false,
                 'strategy' => 'exact',
                 'is_collection' => true,

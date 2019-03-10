@@ -36,6 +36,11 @@ parameters:
         - '#Strict comparison using === between null and int will always evaluate to false\.#'
         - '#Strict comparison using !== between null and null will always evaluate to false\.#'
         - '#Method ApiPlatform\\Core\\(Serializer\\Abstract|JsonApi\\Serializer\\)ItemNormalizer::normalizeRelation\(\) should return array\|string but returns array\|bool\|float\|int\|string\.#'
+        - '#Binary operation "\+" between (float\|int\|)?string and 0 results in an error\.#'
+        # PHPStan 0.11:
+        #-
+        #    message: '#Binary operation "\+" between (float\|int\|)?string and 0 results in an error\.#'
+        #    path: %currentWorkingDirectory%/src/Bridge/Doctrine/Common/Filter/RangeFilterTrait.php
 
         # Expected, due to deprecations
         - '#Method ApiPlatform\\Core\\Bridge\\Doctrine\\Orm\\Extension\\QueryResult(Item|Collection)ExtensionInterface::getResult\(\) invoked with 4 parameters, 1 required\.#'
