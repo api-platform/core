@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Hal\Serializer;
 
-use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\Exception\RuntimeException;
 use ApiPlatform\Core\Serializer\AbstractItemNormalizer;
 use ApiPlatform\Core\Serializer\ContextTrait;
@@ -38,9 +37,9 @@ final class ItemNormalizer extends AbstractItemNormalizer
     /**
      * {@inheritdoc}
      */
-    public function supportsNormalization($data, $format = null)
+    public function supportsNormalization($data, $format = null, array $context = [])
     {
-        return self::FORMAT === $format && parent::supportsNormalization($data, $format);
+        return self::FORMAT === $format && parent::supportsNormalization($data, $format, $context);
     }
 
     /**
@@ -48,16 +47,12 @@ final class ItemNormalizer extends AbstractItemNormalizer
      */
     public function normalize($object, $format = null, array $context = [])
     {
-        if (!isset($context['cache_key'])) {
-            $context['cache_key'] = $this->getHalCacheKey($format, $context);
-        }
+        if ($this->handleNonResource && ($context['api_normalize'] ?? false) || null !== $outputClass = $this->getOutputClass($this->getObjectClass($object), $context)) {
+            if (isset($outputClass)) {
+                $object = $this->transformOutput($object, $context);
+            }
 
-        $object = $this->transformOutput($object, $context);
-
-        try {
-            $resourceClass = $this->resourceClassResolver->getResourceClass($object, $context['resource_class'] ?? null, true);
-        } catch (InvalidArgumentException $e) {
-            $data = $this->initContext(\get_class($object), $context);
+            $data = $this->initContext($this->getObjectClass($object), $context);
             $rawData = parent::normalize($object, $format, $context);
             if (!\is_array($rawData)) {
                 return $rawData;
@@ -66,6 +61,11 @@ final class ItemNormalizer extends AbstractItemNormalizer
             return $data + $rawData;
         }
 
+        if (!isset($context['cache_key'])) {
+            $context['cache_key'] = $this->getHalCacheKey($format, $context);
+        }
+
+        $resourceClass = $this->resourceClassResolver->getResourceClass($object, $context['resource_class'] ?? null, true);
         $context = $this->initContext($resourceClass, $context);
         $context['iri'] = $this->iriConverter->getIriFromItem($object);
         $context['api_normalize'] = true;
@@ -86,7 +86,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
     /**
      * {@inheritdoc}
      */
-    public function supportsDenormalization($data, $type, $format = null)
+    public function supportsDenormalization($data, $type, $format = null, array $context = [])
     {
         return false;
     }

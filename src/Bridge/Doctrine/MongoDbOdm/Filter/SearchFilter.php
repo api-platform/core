@@ -135,7 +135,7 @@ final class SearchFilter extends AbstractFilter implements SearchFilterInterface
 
         $aggregationBuilder
             ->match()
-            ->field("$matchField.\$id")
+            ->field($matchField)
             ->in($values);
     }
 

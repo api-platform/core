@@ -17,6 +17,7 @@ use ApiPlatform\Core\DataPersister\ChainDataPersister;
 use ApiPlatform\Core\DataPersister\DataPersisterInterface;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use PHPUnit\Framework\TestCase;
+use Prophecy\Argument;
 
 /**
  * @author Baptiste Meyer <baptiste.meyer@gmail.com>
@@ -33,7 +34,7 @@ class ChainDataPersisterTest extends TestCase
         $dummy = new Dummy();
 
         $persisterProphecy = $this->prophesize(DataPersisterInterface::class);
-        $persisterProphecy->supports($dummy)->willReturn(true)->shouldBeCalled();
+        $persisterProphecy->supports($dummy, Argument::type('array'))->willReturn(true)->shouldBeCalled();
 
         $this->assertTrue((new ChainDataPersister([$persisterProphecy->reveal()]))->supports($dummy));
     }
@@ -43,7 +44,7 @@ class ChainDataPersisterTest extends TestCase
         $dummy = new Dummy();
 
         $persisterProphecy = $this->prophesize(DataPersisterInterface::class);
-        $persisterProphecy->supports($dummy)->willReturn(false)->shouldBeCalled();
+        $persisterProphecy->supports($dummy, Argument::type('array'))->willReturn(false)->shouldBeCalled();
 
         $this->assertFalse((new ChainDataPersister([$persisterProphecy->reveal()]))->supports($dummy));
     }
@@ -53,16 +54,16 @@ class ChainDataPersisterTest extends TestCase
         $dummy = new Dummy();
 
         $fooPersisterProphecy = $this->prophesize(DataPersisterInterface::class);
-        $fooPersisterProphecy->supports($dummy)->willReturn(false)->shouldBeCalled();
-        $fooPersisterProphecy->persist($dummy)->shouldNotBeCalled();
+        $fooPersisterProphecy->supports($dummy, Argument::type('array'))->willReturn(false)->shouldBeCalled();
+        $fooPersisterProphecy->persist($dummy, Argument::type('array'))->shouldNotBeCalled();
 
         $barPersisterProphecy = $this->prophesize(DataPersisterInterface::class);
-        $barPersisterProphecy->supports($dummy)->willReturn(true)->shouldBeCalled();
-        $barPersisterProphecy->persist($dummy)->shouldBeCalled();
+        $barPersisterProphecy->supports($dummy, Argument::type('array'))->willReturn(true)->shouldBeCalled();
+        $barPersisterProphecy->persist($dummy, Argument::type('array'))->shouldBeCalled();
 
         $foobarPersisterProphecy = $this->prophesize(DataPersisterInterface::class);
-        $foobarPersisterProphecy->supports($dummy)->shouldNotBeCalled();
-        $foobarPersisterProphecy->persist($dummy)->shouldNotBeCalled();
+        $foobarPersisterProphecy->supports($dummy, Argument::type('array'))->shouldNotBeCalled();
+        $foobarPersisterProphecy->persist($dummy, Argument::type('array'))->shouldNotBeCalled();
 
         (new ChainDataPersister([$fooPersisterProphecy->reveal(), $barPersisterProphecy->reveal(), $foobarPersisterProphecy->reveal()]))->persist($dummy);
     }
@@ -72,16 +73,16 @@ class ChainDataPersisterTest extends TestCase
         $dummy = new Dummy();
 
         $fooPersisterProphecy = $this->prophesize(DataPersisterInterface::class);
-        $fooPersisterProphecy->supports($dummy)->willReturn(false)->shouldBeCalled();
-        $fooPersisterProphecy->remove($dummy)->shouldNotBeCalled();
+        $fooPersisterProphecy->supports($dummy, Argument::type('array'))->willReturn(false)->shouldBeCalled();
+        $fooPersisterProphecy->remove($dummy, Argument::type('array'))->shouldNotBeCalled();
 
         $barPersisterProphecy = $this->prophesize(DataPersisterInterface::class);
-        $barPersisterProphecy->supports($dummy)->willReturn(true)->shouldBeCalled();
-        $barPersisterProphecy->remove($dummy)->shouldBeCalled();
+        $barPersisterProphecy->supports($dummy, Argument::type('array'))->willReturn(true)->shouldBeCalled();
+        $barPersisterProphecy->remove($dummy, Argument::type('array'))->shouldBeCalled();
 
         $foobarPersisterProphecy = $this->prophesize(DataPersisterInterface::class);
-        $foobarPersisterProphecy->supports($dummy)->shouldNotBeCalled();
-        $foobarPersisterProphecy->remove($dummy)->shouldNotBeCalled();
+        $foobarPersisterProphecy->supports($dummy, Argument::type('array'))->shouldNotBeCalled();
+        $foobarPersisterProphecy->remove($dummy, Argument::type('array'))->shouldNotBeCalled();
 
         (new ChainDataPersister([$fooPersisterProphecy->reveal(), $barPersisterProphecy->reveal(), $foobarPersisterProphecy->reveal()]))->remove($dummy);
     }

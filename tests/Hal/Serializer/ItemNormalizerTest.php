@@ -43,7 +43,6 @@ class ItemNormalizerTest extends TestCase
 {
     /**
      * @group legacy
-     * @expectedDeprecation Passing a falsy $allowUnmappedClass flag in ApiPlatform\Core\Serializer\AbstractItemNormalizer is deprecated since version 2.4 and will default to true in 3.0.
      */
     public function testDoesNotSupportDenormalization()
     {
@@ -70,7 +69,6 @@ class ItemNormalizerTest extends TestCase
 
     /**
      * @group legacy
-     * @expectedDeprecation Passing a falsy $allowUnmappedClass flag in ApiPlatform\Core\Serializer\AbstractItemNormalizer is deprecated since version 2.4 and will default to true in 3.0.
      */
     public function testSupportsNormalization()
     {
@@ -152,7 +150,7 @@ class ItemNormalizerTest extends TestCase
             [],
             [],
             null,
-            true
+            false
         );
         $normalizer->setSerializer($serializerProphecy->reveal());
 
@@ -219,7 +217,7 @@ class ItemNormalizerTest extends TestCase
             [],
             [],
             null,
-            true
+            false
         );
         $normalizer->setSerializer($serializerProphecy->reveal());
 
@@ -299,7 +297,7 @@ class ItemNormalizerTest extends TestCase
             [],
             [],
             null,
-            true
+            false
         );
         $serializer = new Serializer([$normalizer]);
         $normalizer->setSerializer($serializer);
