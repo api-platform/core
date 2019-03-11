@@ -188,7 +188,7 @@ final class PaginationExtension implements ContextAwareQueryResultCollectionExte
         }
 
         $itemsPerPage = $resourceMetadata->getCollectionOperationAttribute($operationName, 'pagination_items_per_page', $this->itemsPerPage, true);
-        if ($request->attributes->get('_graphql')) {
+        if ($request->attributes->getBoolean('_graphql', false)) {
             $collectionArgs = $request->attributes->get('_graphql_collections_args', []);
             $itemsPerPage = $collectionArgs[$resourceClass]['first'] ?? $itemsPerPage;
         }
@@ -214,7 +214,7 @@ final class PaginationExtension implements ContextAwareQueryResultCollectionExte
         }
 
         $firstResult = ($page - 1) * $itemsPerPage;
-        if ($request->attributes->get('_graphql')) {
+        if ($request->attributes->getBoolean('_graphql', false)) {
             $collectionArgs = $request->attributes->get('_graphql_collections_args', []);
             if (isset($collectionArgs[$resourceClass]['after'])) {
                 $after = base64_decode($collectionArgs[$resourceClass]['after'], true);
