@@ -35,7 +35,7 @@ final class RequestParser
     public static function parseAndDuplicateRequest(Request $request): Request
     {
         $query = self::parseRequestParams(self::getQueryString($request) ?? '');
-        $body = self::parseRequestParams((string) $request->getContent());
+        $body = self::parseRequestParams($request->getContent());
 
         return $request->duplicate($query, $body);
     }

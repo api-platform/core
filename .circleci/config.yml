@@ -37,6 +37,12 @@ reusable-steps:
         - php-cs-fixer-cache-{{ .Revision }}
         - php-cs-fixer-cache-{{ .Branch }}
         - php-cs-fixer-cache
+  - &restore-phpstan-cache
+    restore_cache:
+      keys:
+        - phpstan-cache-{{ .Revision }}
+        - phpstan-cache-{{ .Branch }}
+        - phpstan-cache
   - &save-composer-cache-by-branch
     save_cache:
       paths:
@@ -67,6 +73,16 @@ reusable-steps:
       paths:
         - .php_cs.cache
       key: php-cs-fixer-cache-{{ .Revision }}-{{ .BuildNum }}
+  - &save-phpstan-cache-by-branch
+    save_cache:
+      paths:
+        - /tmp/phpstan/cache
+      key: phpstan-cache-{{ .Branch }}-{{ .BuildNum }}
+  - &save-phpstan-cache-by-revision
+    save_cache:
+      paths:
+        - /tmp/phpstan/cache
+      key: phpstan-cache-{{ .Revision }}-{{ .BuildNum }}
   - &update-composer
     run:
       name: Update Composer
@@ -106,25 +122,27 @@ jobs:
   phpstan:
     docker:
       - image: circleci/php:7.2-node-browsers
+    environment:
+      # https://github.com/phpstan/phpstan-symfony/issues/37
+      APP_DEBUG: 1
     working_directory: ~/api-platform/core
     steps:
       - checkout
       - *restore-composer-cache
+      - *restore-phpstan-cache
       - *disable-xdebug-php-extension
       - *disable-php-memory-limit
       - *install-php-extensions
       - *update-composer
       - *update-project-dependencies
-      - run:
-          name: Install PHPStan
-          command: composer global require phpstan/phpstan:0.10.5
       - *save-composer-cache-by-revision
       - *save-composer-cache-by-branch
+      - *clear-test-app-cache
       - run:
           name: Run PHPStan
-          command: |-
-            export PATH="$PATH:$HOME/.composer/vendor/bin"
-            phpstan analyse -c phpstan.neon -l6 --ansi src tests
+          command: vendor/bin/phpstan analyse -c phpstan.neon -l6 --ansi src tests
+      - *save-phpstan-cache-by-revision
+      - *save-phpstan-cache-by-branch
 
   phpunit-coverage:
     docker:
