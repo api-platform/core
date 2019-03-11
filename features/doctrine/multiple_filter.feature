@@ -32,6 +32,7 @@ Feature: Multiple filters on collections
               }
             }
           },
+          "minItems": 2,
           "maxItems": 2
         },
         "hydra:view": {

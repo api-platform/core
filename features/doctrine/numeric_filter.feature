@@ -32,10 +32,11 @@ Feature: Numeric filter on collections
               }
             }
           },
+          "minItems": 3,
           "maxItems": 3,
           "uniqueItems": true
         },
-        "hydra:totalItems": {"pattern": "^3$"},
+        "hydra:totalItems": {"type": "number", "minimum": 3, "maximum": 3},
         "hydra:view": {
           "type": "object",
           "properties": {
@@ -76,10 +77,11 @@ Feature: Numeric filter on collections
               }
             }
           },
+          "minItems": 3,
           "maxItems": 3,
           "uniqueItems": true
         },
-        "hydra:totalItems": {"pattern": "^6$"},
+        "hydra:totalItems": {"type": "number", "minimum": 6, "maximum": 6},
         "hydra:view": {
           "type": "object",
           "properties": {
@@ -119,10 +121,11 @@ Feature: Numeric filter on collections
               }
             }
           },
+          "minItems": 3,
           "maxItems": 3,
           "uniqueItems": true
         },
-        "hydra:totalItems": {"pattern": "^20$"},
+        "hydra:totalItems": {"type": "number", "minimum": 20, "maximum": 20},
         "hydra:view": {
           "type": "object",
           "properties": {
