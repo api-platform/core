@@ -175,8 +175,6 @@ final class IriConverter implements IriConverterInterface
      * Generate the identifier url.
      *
      * @throws InvalidArgumentException
-     *
-     * @return string[]
      */
     private function generateIdentifiersUrl(array $identifiers, string $resourceClass): array
     {

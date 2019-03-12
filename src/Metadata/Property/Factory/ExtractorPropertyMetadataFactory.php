@@ -123,7 +123,7 @@ final class ExtractorPropertyMetadataFactory implements PropertyMetadataFactoryI
     /**
      * Creates a SubresourceMetadata.
      *
-     * @param bool|array|null  $subresource      the subresource metadata coming from XML or YAML
+     * @param array|null  $subresource      the subresource metadata coming from XML or YAML
      * @param PropertyMetadata $propertyMetadata the current property metadata
      *
      * @return SubresourceMetadata|null

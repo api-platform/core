@@ -229,7 +229,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
      */
     private function getRelationIri($rel): string
     {
-        return $rel['_links']['self']['href'] ?? $rel;
+        return \is_string($rel) ? $rel : $rel['_links']['self']['href'] ?? $rel;
     }
 
     /**

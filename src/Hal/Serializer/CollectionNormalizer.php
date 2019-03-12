@@ -74,8 +74,10 @@ final class CollectionNormalizer extends AbstractCollectionNormalizer
         $data = [];
 
         foreach ($object as $obj) {
+            /**
+             * @var array
+             */
             $item = $this->normalizer->normalize($obj, $format, $context);
-
             $data['_embedded']['item'][] = $item;
             $data['_links']['item'][] = $item['_links']['self'];
         }

@@ -81,6 +81,9 @@ final class CollectionNormalizer extends AbstractCollectionNormalizer
         ];
 
         foreach ($object as $obj) {
+            /**
+             * @var array
+             */
             $item = $this->normalizer->normalize($obj, $format, $context);
 
             if (!isset($item['data'])) {

@@ -25,7 +25,7 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 final class ApiGatewayNormalizerTest extends TestCase
 {
     /**
-     * @var ObjectProphecy|NormalizerInterface
+     * @var ObjectProphecy
      */
     private $documentationNormalizerMock;
 

@@ -265,6 +265,9 @@ class ItemNormalizerTest extends TestCase
         );
         $normalizer->setSerializer($serializerProphecy->reveal());
 
+        /**
+         * @var Dummy
+         */
         $object = $normalizer->denormalize(['id' => '42', 'name' => 'hello'], Dummy::class, null, $context);
         $this->assertInstanceOf(Dummy::class, $object);
         $this->assertSame('42', $object->getId());

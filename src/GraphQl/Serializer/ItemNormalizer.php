@@ -40,6 +40,9 @@ final class ItemNormalizer extends BaseItemNormalizer
     public function normalize($object, $format = null, array $context = [])
     {
         $object = $this->transformOutput($object, $context);
+        /**
+         * @var array
+         */
         $data = parent::normalize($object, $format, $context);
         $data[self::ITEM_KEY] = serialize($object); // calling serialize prevent weird normalization process done by Webonyx's GraphQL PHP
 
@@ -68,6 +71,9 @@ final class ItemNormalizer extends BaseItemNormalizer
      */
     protected function getAllowedAttributes($classOrObject, array $context, $attributesAsString = false)
     {
+        /**
+         * @var array
+         */
         $allowedAttributes = parent::getAllowedAttributes($classOrObject, $context, $attributesAsString);
 
         if (($context['api_denormalize'] ?? false) && false !== ($indexId = array_search('id', $allowedAttributes, true))) {
