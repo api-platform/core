@@ -7,8 +7,8 @@
 
     <route id="api_doc" path="/docs.{_format}">
         <default key="_controller">api_platform.action.documentation</default>
-        <default key="_api_respond">1</default>
         <default key="_format" />
+        <default key="_api_respond">true</default>
     </route>
 
 </routes>

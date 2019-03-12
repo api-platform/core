@@ -45,7 +45,7 @@ final class RespondListener
         $controllerResult = $event->getControllerResult();
         $request = $event->getRequest();
 
-        if ($controllerResult instanceof Response || !$request->attributes->getBoolean('_api_respond', true)) {
+        if ($controllerResult instanceof Response || !(($attributes = RequestAttributesExtractor::extractAttributes($request))['respond'] ?? $request->attributes->getBoolean('_api_respond', false))) {
             return;
         }
 
@@ -65,7 +65,7 @@ final class RespondListener
         }
 
         $status = null;
-        if ($this->resourceMetadataFactory && $attributes = RequestAttributesExtractor::extractAttributes($request)) {
+        if ($this->resourceMetadataFactory && $attributes) {
             $resourceMetadata = $this->resourceMetadataFactory->create($attributes['resource_class']);
 
             if ($sunset = $resourceMetadata->getOperationAttribute($attributes, 'sunset', null, true)) {

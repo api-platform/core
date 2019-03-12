@@ -7,8 +7,8 @@
 
     <route id="api_jsonld_context" path="/contexts/{shortName}.{_format}">
         <default key="_controller">api_platform.jsonld.action.context</default>
-        <default key="_api_respond">1</default>
         <default key="_format">jsonld</default>
+        <default key="_api_respond">true</default>
 
         <requirement key="shortName">.+</requirement>
     </route>
