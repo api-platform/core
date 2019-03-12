@@ -17,6 +17,7 @@ use ApiPlatform\Core\Exception\RuntimeException;
 use ApiPlatform\Core\Serializer\AbstractItemNormalizer;
 use ApiPlatform\Core\Serializer\ContextTrait;
 use ApiPlatform\Core\Util\ClassInfoTrait;
+use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 use Symfony\Component\Serializer\Mapping\AttributeMetadataInterface;
 
 /**
@@ -225,11 +226,15 @@ final class ItemNormalizer extends AbstractItemNormalizer
     /**
      * Gets the IRI of the given relation.
      *
-     * @param array|string $rel
+     * @throws UnexpectedValueException
      */
     private function getRelationIri($rel): string
     {
-        return $rel['_links']['self']['href'] ?? $rel;
+        if (!(\is_array($rel) || \is_string($rel))) {
+            throw new UnexpectedValueException('Expected relation to be an IRI or array');
+        }
+
+        return \is_string($rel) ? $rel : $rel['_links']['self']['href'];
     }
 
     /**

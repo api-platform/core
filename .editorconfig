@@ -66,7 +66,7 @@ indent_size = 2
 indent_style = space
 indent_size = 2
 
-[behat.yml]
+[behat.yml{,.dist}]
 indent_style = space
 indent_size = 2
 
@@ -74,6 +74,10 @@ indent_size = 2
 indent_style = space
 indent_size = 4
 
-[phpunit.xml.dist]
+[phpstan.neon{,.dist}]
+indent_style = tab
+indent_size = 4
+
+[phpunit.xml{,.dist}]
 indent_style = space
 indent_size = 4

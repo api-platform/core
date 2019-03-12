@@ -140,7 +140,7 @@ jobs:
       - *clear-test-app-cache
       - run:
           name: Run PHPStan
-          command: vendor/bin/phpstan analyse -c phpstan.neon -l6 --ansi src tests
+          command: vendor/bin/phpstan analyse --ansi
       - *save-phpstan-cache-by-revision
       - *save-phpstan-cache-by-branch
 

@@ -135,12 +135,12 @@ final class ExtractorPropertyMetadataFactory implements PropertyMetadataFactoryI
         }
 
         $type = $propertyMetadata->getType();
-        $maxDepth = $subresource['maxDepth'] ?? null;
+        $maxDepth = \is_array($subresource) ? $subresource['maxDepth'] ?? null : null;
 
         if (null !== $type) {
             $isCollection = $type->isCollection();
             $resourceClass = $isCollection ? $type->getCollectionValueType()->getClassName() : $type->getClassName();
-        } elseif (isset($subresource['resourceClass'])) {
+        } elseif (\is_array($subresource) && isset($subresource['resourceClass'])) {
             $resourceClass = $subresource['resourceClass'];
             $isCollection = $subresource['collection'] ?? true;
         } else {
