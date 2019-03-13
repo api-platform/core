@@ -119,6 +119,13 @@
             <!-- After the DataUriNormalizer but before the ObjectNormalizer -->
             <tag name="serializer.normalizer" priority="-924" />
         </service>
+
+        <!-- Command -->
+
+        <service id="api_platform.graphql.command.export_command" class="ApiPlatform\Core\Bridge\Symfony\Bundle\Command\GraphQlExportCommand">
+            <argument type="service" id="api_platform.graphql.schema_builder" />
+            <tag name="console.command" />
+        </service>
     </services>
 
 </container>
