@@ -27,6 +27,7 @@ use Doctrine\ORM\Configuration;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
+use Doctrine\ORM\Tools\Pagination\CountWalker;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Symfony\Component\HttpFoundation\Request;
@@ -887,6 +888,35 @@ class PaginationExtensionTest extends TestCase
         $this->assertInstanceOf(PaginatorInterface::class, $result);
     }
 
+    public function testGetResultWithoutDistinct()
+    {
+        $configuration = new Configuration();
+
+        $entityManagerProphecy = $this->prophesize(EntityManagerInterface::class);
+        $entityManagerProphecy->getConfiguration()->willReturn($configuration)->shouldBeCalled();
+
+        $query = new Query($entityManagerProphecy->reveal());
+        $query->setFirstResult(0);
+        $query->setMaxResults(42);
+
+        $queryBuilderProphecy = $this->prophesize(QueryBuilder::class);
+        $queryBuilderProphecy->getRootEntities()->willReturn([])->shouldBeCalled();
+        $queryBuilderProphecy->getAllAliases()->willReturn(['o'])->shouldBeCalled();
+        $queryBuilderProphecy->getQuery()->willReturn($query)->shouldBeCalled();
+        $queryBuilderProphecy->getDQLPart(Argument::that(function ($arg) {
+            return \in_array($arg, ['having', 'orderBy', 'join'], true);
+        }))->willReturn('')->shouldBeCalled();
+        $queryBuilderProphecy->getMaxResults()->willReturn(42)->shouldBeCalled();
+        $queryBuilder = $queryBuilderProphecy->reveal();
+
+        $result = $this->getPaginationExtensionResult(false, false, true, $queryBuilder);
+
+        $this->assertInstanceOf(PartialPaginatorInterface::class, $result);
+        $this->assertInstanceOf(PaginatorInterface::class, $result);
+
+        $this->assertFalse($query->getHint(CountWalker::HINT_DISTINCT));
+    }
+
     /**
      * @group legacy
      * @expectedDeprecation Passing an instance of "Symfony\Component\HttpFoundation\RequestStack" as second argument of "ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\PaginationExtension" is deprecated since API Platform 2.4 and will not be possible anymore in API Platform 3. Pass an instance of "ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface" instead.
@@ -963,7 +993,7 @@ class PaginationExtensionTest extends TestCase
         $this->assertInstanceOf(PaginatorInterface::class, $result);
     }
 
-    private function getPaginationExtensionResult(bool $partial = false, bool $legacy = false, bool $fetchJoinCollection = true)
+    private function getPaginationExtensionResult(bool $partial = false, bool $legacy = false, bool $fetchJoinCollection = true, QueryBuilder $queryBuilder = null)
     {
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataFactory = $resourceMetadataFactoryProphecy->reveal();
@@ -979,17 +1009,21 @@ class PaginationExtensionTest extends TestCase
         $entityManagerProphecy = $this->prophesize(EntityManagerInterface::class);
         $entityManagerProphecy->getConfiguration()->willReturn($configuration);
 
-        $query = new Query($entityManagerProphecy->reveal());
-        $query->setFirstResult(0);
-        $query->setMaxResults(42);
+        if (null === $queryBuilder) {
+            $query = new Query($entityManagerProphecy->reveal());
+            $query->setFirstResult(0);
+            $query->setMaxResults(42);
 
-        $queryBuilderProphecy = $this->prophesize(QueryBuilder::class);
-        $queryBuilderProphecy->getRootEntities()->willReturn([]);
-        $queryBuilderProphecy->getQuery()->willReturn($query);
-        $queryBuilderProphecy->getDQLPart(Argument::that(function ($arg) {
-            return \in_array($arg, ['having', 'orderBy', 'join'], true);
-        }))->willReturn('');
-        $queryBuilderProphecy->getMaxResults()->willReturn(42);
+            $queryBuilderProphecy = $this->prophesize(QueryBuilder::class);
+            $queryBuilderProphecy->getRootEntities()->willReturn([])->shouldBeCalled();
+            $queryBuilderProphecy->getAllAliases()->willReturn([])->shouldBeCalled();
+            $queryBuilderProphecy->getQuery()->willReturn($query)->shouldBeCalled();
+            $queryBuilderProphecy->getDQLPart(Argument::that(function ($arg) {
+                return \in_array($arg, ['having', 'orderBy', 'join'], true);
+            }))->willReturn('')->shouldBeCalled();
+            $queryBuilderProphecy->getMaxResults()->willReturn(42)->shouldBeCalled();
+            $queryBuilder = $queryBuilderProphecy->reveal();
+        }
 
         $paginationExtension = new PaginationExtension(
             $this->prophesize(ManagerRegistry::class)->reveal(),
@@ -997,7 +1031,7 @@ class PaginationExtensionTest extends TestCase
             $pagination
         );
 
-        $args = [$queryBuilderProphecy->reveal(), null, null, ['filters' => ['partial' => $partial]]];
+        $args = [$queryBuilder, null, null, ['filters' => ['partial' => $partial]]];
 
         if (!$legacy) {
             $args[1] = 'Foo';
@@ -1029,6 +1063,7 @@ class PaginationExtensionTest extends TestCase
 
         $queryBuilderProphecy = $this->prophesize(QueryBuilder::class);
         $queryBuilderProphecy->getRootEntities()->willReturn([])->shouldBeCalled();
+        $queryBuilderProphecy->getAllAliases()->willReturn([])->shouldBeCalled();
         $queryBuilderProphecy->getQuery()->willReturn($query)->shouldBeCalled();
         $queryBuilderProphecy->getDQLPart(Argument::that(function ($arg) {
             return \in_array($arg, ['having', 'orderBy', 'join'], true);

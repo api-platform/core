@@ -23,6 +23,7 @@ use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\QueryBuilder;
+use Doctrine\ORM\Tools\Pagination\CountWalker;
 use Doctrine\ORM\Tools\Pagination\Paginator as DoctrineOrmPaginator;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -143,7 +144,14 @@ final class PaginationExtension implements ContextAwareQueryResultCollectionExte
      */
     public function getResult(QueryBuilder $queryBuilder, string $resourceClass = null, string $operationName = null, array $context = [])
     {
-        $doctrineOrmPaginator = new DoctrineOrmPaginator($queryBuilder, $this->useFetchJoinCollection($queryBuilder, $resourceClass, $operationName));
+        $query = $queryBuilder->getQuery();
+
+        // Only one alias, without joins, disable the DISTINCT on the COUNT
+        if (1 === \count($queryBuilder->getAllAliases())) {
+            $query->setHint(CountWalker::HINT_DISTINCT, false);
+        }
+
+        $doctrineOrmPaginator = new DoctrineOrmPaginator($query, $this->useFetchJoinCollection($queryBuilder, $resourceClass, $operationName));
         $doctrineOrmPaginator->setUseOutputWalkers($this->useOutputWalkers($queryBuilder));
 
         if (null === $this->requestStack) {
