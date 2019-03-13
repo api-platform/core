@@ -174,7 +174,7 @@ final class SchemaBuilder implements SchemaBuilderInterface
     /**
      * Gets the query fields of the schema.
      *
-     * @param array|bool $itemConfiguration false if not configured
+     * @param array|bool $itemConfiguration       false if not configured
      * @param array|bool $collectionConfiguration false if not configured
      */
     private function getQueryFields(string $resourceClass, ResourceMetadata $resourceMetadata, string $operationName, $itemConfiguration, $collectionConfiguration): array
@@ -186,7 +186,7 @@ final class SchemaBuilder implements SchemaBuilderInterface
         $deprecationReason = $resourceMetadata->getGraphqlAttribute($operationName, 'deprecation_reason', '', true);
 
         if (false !== $itemConfiguration && $fieldConfiguration = $this->getResourceFieldConfiguration($resourceClass, $resourceMetadata, null, $deprecationReason, new Type(Type::BUILTIN_TYPE_OBJECT, true, $resourceClass), $resourceClass)) {
-            $queryFields[$fieldName] = array_merge($fieldConfiguration, $itemConfiguration);;
+            $queryFields[$fieldName] = array_merge($fieldConfiguration, $itemConfiguration);
         }
 
         if (false !== $collectionConfiguration && $fieldConfiguration = $this->getResourceFieldConfiguration($resourceClass, $resourceMetadata, null, $deprecationReason, new Type(Type::BUILTIN_TYPE_OBJECT, false, null, true, null, new Type(Type::BUILTIN_TYPE_OBJECT, false, $resourceClass)), $resourceClass)) {
