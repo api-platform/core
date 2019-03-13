@@ -19,6 +19,9 @@ use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
 final class IntegerDenormalizer implements DenormalizerInterface, CacheableSupportsMethodInterface
 {
+    /**
+     * {@inheritdoc}
+     */
     public function denormalize($data, $class, $format = null, array $context = []): int
     {
         return (int) $data;

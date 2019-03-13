@@ -21,6 +21,7 @@ use GraphQL\Executor\ExecutionResult;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Twig\Environment as TwigEnvironment;
 
 /**
  * GraphQL API entrypoint.
@@ -36,7 +37,7 @@ final class EntrypointAction
     private $title;
     private $graphiqlEnabled;
 
-    public function __construct(SchemaBuilderInterface $schemaBuilder, ExecutorInterface $executor, \Twig_Environment $twig, bool $debug = false, bool $graphiqlEnabled = false, string $title = '')
+    public function __construct(SchemaBuilderInterface $schemaBuilder, ExecutorInterface $executor, TwigEnvironment $twig, bool $debug = false, bool $graphiqlEnabled = false, string $title = '')
     {
         $this->schemaBuilder = $schemaBuilder;
         $this->executor = $executor;
@@ -84,7 +85,7 @@ final class EntrypointAction
         }
 
         if ('json' === $request->getContentType()) {
-            $input = json_decode((string) $request->getContent(), true);
+            $input = json_decode($request->getContent(), true);
 
             if (isset($input['query'])) {
                 $query = $input['query'];

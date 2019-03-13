@@ -1,0 +1,84 @@
+includes:
+	- vendor/jangregor/phpstan-prophecy/src/extension.neon
+	- vendor/phpstan/phpstan-doctrine/extension.neon
+	- vendor/phpstan/phpstan-phpunit/extension.neon
+	- vendor/phpstan/phpstan-symfony/extension.neon
+
+parameters:
+	level: 6
+	paths:
+		- src
+		- tests
+	symfony:
+		container_xml_path: %rootDir%/../../../tests/Fixtures/app/var/cache/test/appAppKernelTestDebugContainer.xml
+		constant_hassers: false
+	autoload_files:
+		- %rootDir%/../../../tests/Fixtures/app/AppKernel.php
+	excludes_analyse:
+		- %rootDir%/../../../tests/Fixtures/app/var/cache
+		# The Symfony Configuration API isn't good enough to be analysed
+		- %rootDir%/../../../src/Bridge/Symfony/Bundle/DependencyInjection/Configuration.php
+	ignoreErrors:
+		# Real problems, hard to fix
+		- '#Parameter \#2 \$dqlPart of method Doctrine\\ORM\\QueryBuilder::add\(\) expects array\|object, string given\.#'
+		-
+			message: '#Return type \(int\) of method ApiPlatform\\Core\\Identifier\\Normalizer\\IntegerDenormalizer::denormalize\(\) should be compatible with return type \(object\) of method Symfony\\Component\\Serializer\\Normalizer\\DenormalizerInterface::denormalize\(\)#'
+			path: %currentWorkingDirectory%/src/Identifier/Normalizer/IntegerDenormalizer.php
+
+		# False positives
+		-
+			message: '#Variable \$positionPm might not be defined\.#'
+			path: %currentWorkingDirectory%/src/Util/ClassInfoTrait.php
+		-
+			message: '#Cannot assign offset .+ to bool\.#'
+			path: %currentWorkingDirectory%/src/GraphQl/Resolver/FieldsToAttributesTrait.php
+		-
+			message: '#Access to an undefined property GraphQL\\Language\\AST\\ValueNode::\$value\.#'
+			path: %currentWorkingDirectory%/src/GraphQl/Type/Definition/IterableType.php
+		- '#Access to an undefined property Prophecy\\Prophecy\\ObjectProphecy<(\\?[a-zA-Z0-9_]+)+>::\$[a-zA-Z0-9_]+#'
+		- '#Call to an undefined method Doctrine\\Common\\Persistence\\ObjectManager::getConnection\(\)#'
+		- '#Parameter \#1 \$function of function call_user_func expects callable\(\): mixed, .+ given\.#'
+		- '#Parameter \#1 \$exception of static method Symfony\\Component\\Debug\\Exception\\FlattenException::create\(\) expects Exception, Symfony\\Component\\Serializer\\Exception\\ExceptionInterface given\.#'
+		- '#Parameter \#1 \$classes of class ApiPlatform\\Core\\Metadata\\Resource\\ResourceNameCollection constructor expects array<string>, array<int, int\|string> given\.#'
+		- '#Parameter \#1 \$vars of class GraphQL\\Language\\AST\\(IntValue|ObjectField|ObjectValue|BooleanValue|ListValue|StringValue)Node constructor expects array<bool\|float\|GraphQL\\Language\\AST\\Location\|GraphQL\\Language\\AST\\NameNode\|GraphQL\\Language\\AST\\NodeList\|GraphQL\\Language\\AST\\SelectionSetNode\|int\|string\|null>, array<string, .+> given\.#'
+		- '#Parameter \#1 \$defaultContext of class Symfony\\Component\\Serializer\\Encoder\\Json(De|En)code constructor expects array, (int|true) given\.#'
+		- '#Parameter \#(2|3) \$(resourceMetadataFactory|pagination) of class ApiPlatform\\Core\\Bridge\\Doctrine\\Orm\\Extension\\PaginationExtension constructor expects (ApiPlatform\\Core\\Metadata\\Resource\\Factory\\ResourceMetadataFactoryInterface\|Symfony\\Component\\HttpFoundation\\RequestStack|ApiPlatform\\Core\\DataProvider\\Pagination\|ApiPlatform\\Core\\Metadata\\Resource\\Factory\\ResourceMetadataFactoryInterface), stdClass given\.#'
+		- '#Parameter \#[0-9] \$filterLocator of class ApiPlatform\\Core\\Bridge\\Doctrine\\Orm\\Extension\\FilterExtension constructor expects ApiPlatform\\Core\\Api\\FilterCollection|Psr\\Container\\ContainerInterface(\|null)?, ArrayObject given\.#'
+		-
+			message: '#Parameter \#9 \$nameConverter of class ApiPlatform\\Core\\Swagger\\Serializer\\DocumentationNormalizer constructor expects Symfony\\Component\\Serializer\\NameConverter\\NameConverterInterface\|null, object given\.#'
+			path: %currentWorkingDirectory%/tests/Swagger/Serializer/DocumentationNormalizer*Test.php
+		-
+			message: '#Parameter \#3 \$normalizer of class ApiPlatform\\Core\\GraphQl\\Resolver\\Factory\\ItemMutationResolverFactory constructor expects Symfony\\Component\\Serializer\\Normalizer\\NormalizerInterface, object given\.#'
+			path: %currentWorkingDirectory%/tests/GraphQl/Resolver/Factory/ItemMutationResolverFactoryTest.php
+		-
+			message: '#Parameter \#1 \$resource of method ApiPlatform\\Core\\Metadata\\Extractor\\XmlExtractor::getAttributes\(\) expects SimpleXMLElement, object given\.#'
+			path: %currentWorkingDirectory%/src/Metadata/Extractor/XmlExtractor.php
+		-
+			message: '#Parameter \#1 \$collection of method ApiPlatform\\Core\\Tests\\GraphQl\\Resolver\\Factory\\CollectionResolverFactoryTest::createCollectionResolverFactory\(\) expects array\|Iterator, object given\.#'
+			path: %currentWorkingDirectory%/tests/GraphQl/Resolver/Factory/CollectionResolverFactoryTest.php
+		-
+			message: '#Property ApiPlatform\\Core\\Test\\DoctrineMongoDbOdmFilterTestCase::\$repository \(Doctrine\\ODM\\MongoDB\\Repository\\DocumentRepository\) does not accept Doctrine\\ORM\\EntityRepository<ApiPlatform\\Core\\Tests\\Fixtures\\TestBundle\\Document\\Dummy>\.#'
+			path: %currentWorkingDirectory%/src/Test/DoctrineMongoDbOdmFilterTestCase.php
+		- '#Method ApiPlatform\\Core\\(Serializer\\Abstract|JsonApi\\Serializer\\)ItemNormalizer::normalizeRelation\(\) should return array\|string but returns array\|bool\|float\|int\|string\.#'
+		- '#Method ApiPlatform\\Core\\Util\\RequestParser::parseRequestParams\(\) should return array but returns array\|false\.#'
+		- "#Call to method PHPUnit\\\\Framework\\\\Assert::assertSame\\(\\) with array\\('(collection_context|item_context|subresource_context)'\\) and array<Symfony\\\\Component\\\\VarDumper\\\\Cloner\\\\Data>\\|bool\\|float\\|int\\|string\\|null will always evaluate to false\\.#"
+		# https://github.com/symfony/symfony/pull/30535
+		-
+			message: '#Call to method PHPUnit\\Framework\\Assert::assertNull\(\) with string will always evaluate to false\.#'
+			path: %currentWorkingDirectory%/tests/EventListener/AddFormatListenerTest.php
+		# https://github.com/doctrine/doctrine2/pull/7298/files
+		- '#Strict comparison using === between null and int will always evaluate to false\.#'
+		-
+			message: '#Binary operation "\+" between (float\|int\|)?string and 0 results in an error\.#'
+			path: %currentWorkingDirectory%/src/Bridge/Doctrine/Common/Filter/RangeFilterTrait.php
+
+		# Expected, due to deprecations
+		- '#Method ApiPlatform\\Core\\Bridge\\Doctrine\\Orm\\Extension\\QueryResult(Item|Collection)ExtensionInterface::getResult\(\) invoked with 4 parameters, 1 required\.#'
+		- '#Method ApiPlatform\\Core\\Bridge\\Doctrine\\Orm\\Extension\\QueryResult(Item|Collection)ExtensionInterface::supportsResult\(\) invoked with 3 parameters, 1-2 required\.#'
+		- '#Method ApiPlatform\\Core\\Bridge\\Doctrine\\Orm\\Filter\\AbstractFilter::apply\(\) invoked with 5 parameters, 3-4 required\.#'
+		- '#Method ApiPlatform\\Core\\Bridge\\Doctrine\\Orm\\Filter\\AbstractFilter::filterProperty\(\) invoked with 7 parameters, 5-6 required\.#'
+		- '#Method ApiPlatform\\Core\\Bridge\\Doctrine\\Orm\\Filter\\FilterInterface::apply\(\) invoked with 5 parameters, 3-4 required\.#'
+		- '#Method ApiPlatform\\Core\\Bridge\\Doctrine\\Orm\\Filter\\OrderFilter::filterProperty\(\) invoked with 7 parameters, 5-6 required\.#'
+		- '#Method ApiPlatform\\Core\\DataProvider\\CollectionDataProviderInterface::getCollection\(\) invoked with 3 parameters, 1-2 required\.#'
+		- '#Method Symfony\\Component\\Serializer\\NameConverter\\NameConverterInterface::normalize\(\) invoked with 3 parameters, 1 required\.#'
+		- '#Method Symfony\\Component\\Serializer\\NameConverter\\NameConverterInterface::normalize\(\) invoked with 4 parameters, 1 required\.#'
