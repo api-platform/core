@@ -22,7 +22,7 @@ parameters:
         - '#Parameter \#1 \$function of function call_user_func expects callable, .+ given\.#'
         - '#Parameter \#1 \$classes of class ApiPlatform\\Core\\Metadata\\Resource\\ResourceNameCollection constructor expects array<string>, array<int, int\|string> given\.#'
         - '#Method ApiPlatform\\Core\\Util\\RequestParser::parseRequestParams\(\) should return array but returns array\|false\.#'
-        - '#Parameter \#1 \$vars of class GraphQL\\Language\\AST\\(IntValue|ObjectField|ObjectValue|BooleanValue|ListValue|StringValue)Node constructor expects array<GraphQL\\Language\\AST\\Location\|GraphQL\\Language\\AST\\NameNode\|GraphQL\\Language\\AST\\NodeList\|GraphQL\\Language\\AST\\SelectionSetNode\|string\|null>, array<string, .+> given\.#'
+        - '#Parameter \#1 \$vars of class GraphQL\\Language\\AST\\(IntValue|ObjectField|ObjectValue|BooleanValue|ListValue|StringValue)Node constructor expects array<bool\|float\|GraphQL\\Language\\AST\\Location\|GraphQL\\Language\\AST\\NameNode\|GraphQL\\Language\\AST\\NodeList\|GraphQL\\Language\\AST\\SelectionSetNode\|int\|string\|null>, array<string, .+> given\.#'
         - '#Parameter \#1 \$defaultContext of class Symfony\\Component\\Serializer\\Encoder\\Json(De|En)code constructor expects array, (int|true) given\.#'
         - '#Parameter \#(2|3) \$(resourceMetadataFactory|pagination) of class ApiPlatform\\Core\\Bridge\\Doctrine\\Orm\\Extension\\PaginationExtension constructor expects (ApiPlatform\\Core\\Metadata\\Resource\\Factory\\ResourceMetadataFactoryInterface\|Symfony\\Component\\HttpFoundation\\RequestStack|ApiPlatform\\Core\\DataProvider\\Pagination\|ApiPlatform\\Core\\Metadata\\Resource\\Factory\\ResourceMetadataFactoryInterface), stdClass given\.#'
         # Temporary fix while the PHPStan extension for Prophecy isn't compatible with 0.10
@@ -49,3 +49,5 @@ parameters:
         - '#Method ApiPlatform\\Core\\Bridge\\Doctrine\\MongoDbOdm\\Filter\\(Abstract|Boolean|Date|Exists|Numeric|Order|Range|Search)Filter::isPropertyNested\(\) invoked with 2 parameters, 1 required\.#'
         - '#Method ApiPlatform\\Core\\Bridge\\Doctrine\\MongoDbOdm\\Filter\\(Abstract|Boolean|Date|Exists|Numeric|Order|Range|Search)Filter::splitPropertyParts\(\) invoked with 2 parameters, 1 required\.#'
         - '#Method ApiPlatform\\Core\\DataProvider\\CollectionDataProviderInterface::getCollection\(\) invoked with 3 parameters, 1-2 required\.#'
+        - '#Method Symfony\\Component\\Serializer\\NameConverter\\NameConverterInterface::normalize\(\) invoked with 3 parameters, 1 required\.#'
+        - '#Method Symfony\\Component\\Serializer\\NameConverter\\NameConverterInterface::normalize\(\) invoked with 4 parameters, 1 required\.#'

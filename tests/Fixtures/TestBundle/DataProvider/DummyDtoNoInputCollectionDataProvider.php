@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\DataProvider;
 
+use ApiPlatform\Core\DataProvider\ArrayPaginator;
 use ApiPlatform\Core\DataProvider\ContextAwareCollectionDataProviderInterface;
 use ApiPlatform\Core\DataProvider\RestrictedDataProviderInterface;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\DummyDtoNoInput as DummyDtoNoInputDocument;
@@ -54,6 +55,6 @@ final class DummyDtoNoInputCollectionDataProvider implements ContextAwareCollect
             $objects[] = $object;
         }
 
-        return $objects;
+        return new ArrayPaginator($objects, 0, \count($objects));
     }
 }

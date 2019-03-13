@@ -20,6 +20,8 @@ use ApiPlatform\Core\Bridge\Elasticsearch\Metadata\Document\Factory\DocumentMeta
 use ApiPlatform\Core\Bridge\Elasticsearch\Serializer\ItemNormalizer;
 use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
 use ApiPlatform\Core\DataProvider\RestrictedDataProviderInterface;
+use ApiPlatform\Core\Exception\ResourceClassNotFoundException;
+use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use Elasticsearch\Client;
 use Elasticsearch\Common\Exceptions\Missing404Exception;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
@@ -38,13 +40,15 @@ final class ItemDataProvider implements ItemDataProviderInterface, RestrictedDat
     private $documentMetadataFactory;
     private $identifierExtractor;
     private $denormalizer;
+    private $resourceMetadataFactory;
 
-    public function __construct(Client $client, DocumentMetadataFactoryInterface $documentMetadataFactory, IdentifierExtractorInterface $identifierExtractor, DenormalizerInterface $denormalizer)
+    public function __construct(Client $client, DocumentMetadataFactoryInterface $documentMetadataFactory, IdentifierExtractorInterface $identifierExtractor, DenormalizerInterface $denormalizer, ResourceMetadataFactoryInterface $resourceMetadataFactory)
     {
         $this->client = $client;
         $this->documentMetadataFactory = $documentMetadataFactory;
         $this->identifierExtractor = $identifierExtractor;
         $this->denormalizer = $denormalizer;
+        $this->resourceMetadataFactory = $resourceMetadataFactory;
     }
 
     /**
@@ -52,6 +56,15 @@ final class ItemDataProvider implements ItemDataProviderInterface, RestrictedDat
      */
     public function supports(string $resourceClass, ?string $operationName = null, array $context = []): bool
     {
+        try {
+            $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
+            if (false === $resourceMetadata->getItemOperationAttribute($operationName, 'elasticsearch', true, true)) {
+                return false;
+            }
+        } catch (ResourceClassNotFoundException $e) {
+            return false;
+        }
+
         try {
             $this->documentMetadataFactory->create($resourceClass);
         } catch (IndexNotFoundException $e) {

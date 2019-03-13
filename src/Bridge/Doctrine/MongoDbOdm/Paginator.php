@@ -28,6 +28,9 @@ use Doctrine\ODM\MongoDB\UnitOfWork;
  */
 final class Paginator implements \IteratorAggregate, PaginatorInterface
 {
+    public const LIMIT_ZERO_MARKER_FIELD = '___';
+    public const LIMIT_ZERO_MARKER = 'limit0';
+
     /**
      * @var Iterator
      */
@@ -76,7 +79,7 @@ final class Paginator implements \IteratorAggregate, PaginatorInterface
          * skip/limit parameters of the query, the values set in the facet stage are used instead.
          */
         $this->firstResult = $this->getStageInfo($resultsFacetInfo, '$skip');
-        $this->maxResults = $this->getStageInfo($resultsFacetInfo, '$limit');
+        $this->maxResults = $this->hasLimitZeroStage($resultsFacetInfo) ? 0 : $this->getStageInfo($resultsFacetInfo, '$limit');
         $this->totalItems = $mongoDbOdmIterator->toArray()[0]['count'][0]['count'] ?? 0;
     }
 
@@ -85,6 +88,10 @@ final class Paginator implements \IteratorAggregate, PaginatorInterface
      */
     public function getCurrentPage(): float
     {
+        if (0 >= $this->maxResults) {
+            return 1.;
+        }
+
         return floor($this->firstResult / $this->maxResults) + 1.;
     }
 
@@ -93,6 +100,10 @@ final class Paginator implements \IteratorAggregate, PaginatorInterface
      */
     public function getLastPage(): float
     {
+        if (0 >= $this->maxResults) {
+            return 1.;
+        }
+
         return ceil($this->totalItems / $this->maxResults) ?: 1.;
     }
 
@@ -160,5 +171,16 @@ final class Paginator implements \IteratorAggregate, PaginatorInterface
         }
 
         throw new InvalidArgumentException("$stage stage was not applied to the facet stage of the aggregation pipeline.");
+    }
+
+    private function hasLimitZeroStage(array $resultsFacetInfo): bool
+    {
+        foreach ($resultsFacetInfo as $resultFacetInfo) {
+            if (self::LIMIT_ZERO_MARKER === ($resultFacetInfo['$match'][self::LIMIT_ZERO_MARKER_FIELD] ?? null)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

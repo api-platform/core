@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Bridge\Doctrine\Common;
 
-use ApiPlatform\Core\DataPersister\DataPersisterInterface;
+use ApiPlatform\Core\DataPersister\ContextAwareDataPersisterInterface;
 use ApiPlatform\Core\Util\ClassInfoTrait;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Persistence\ObjectManager as DoctrineObjectManager;
@@ -24,7 +24,7 @@ use Doctrine\ORM\Mapping\ClassMetadataInfo;
  *
  * @author Baptiste Meyer <baptiste.meyer@gmail.com>
  */
-final class DataPersister implements DataPersisterInterface
+final class DataPersister implements ContextAwareDataPersisterInterface
 {
     use ClassInfoTrait;
 
@@ -38,7 +38,7 @@ final class DataPersister implements DataPersisterInterface
     /**
      * {@inheritdoc}
      */
-    public function supports($data): bool
+    public function supports($data, array $context = []): bool
     {
         return null !== $this->getManager($data);
     }
@@ -46,7 +46,7 @@ final class DataPersister implements DataPersisterInterface
     /**
      * {@inheritdoc}
      */
-    public function persist($data)
+    public function persist($data, array $context = [])
     {
         if (!$manager = $this->getManager($data)) {
             return $data;
@@ -65,7 +65,7 @@ final class DataPersister implements DataPersisterInterface
     /**
      * {@inheritdoc}
      */
-    public function remove($data)
+    public function remove($data, array $context = [])
     {
         if (!$manager = $this->getManager($data)) {
             return;

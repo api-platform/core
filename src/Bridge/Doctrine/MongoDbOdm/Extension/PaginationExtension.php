@@ -52,6 +52,8 @@ final class PaginationExtension implements AggregationResultCollectionExtensionI
             return;
         }
 
+        $context = $this->addCountToContext(clone $aggregationBuilder, $context);
+
         [, $offset, $limit] = $this->pagination->getPagination($resourceClass, $operationName, $context);
 
         $manager = $this->managerRegistry->getManagerForClass($resourceClass);
@@ -64,12 +66,18 @@ final class PaginationExtension implements AggregationResultCollectionExtensionI
             throw new RuntimeException(sprintf('The repository for "%s" must be an instance of "%s".', $resourceClass, DocumentRepository::class));
         }
 
+        $resultsAggregationBuilder = $repository->createAggregationBuilder()->skip($offset);
+        if ($limit > 0) {
+            $resultsAggregationBuilder->limit($limit);
+        } else {
+            // Results have to be 0 but MongoDB does not support a limit equal to 0.
+            $resultsAggregationBuilder->match()->field(Paginator::LIMIT_ZERO_MARKER_FIELD)->equals(Paginator::LIMIT_ZERO_MARKER);
+        }
+
         $aggregationBuilder
             ->facet()
             ->field('results')->pipeline(
-                $repository->createAggregationBuilder()
-                    ->skip($offset)
-                    ->limit($limit)
+                $resultsAggregationBuilder
             )
             ->field('count')->pipeline(
                 $repository->createAggregationBuilder()
@@ -98,5 +106,18 @@ final class PaginationExtension implements AggregationResultCollectionExtensionI
         }
 
         return new Paginator($aggregationBuilder->execute(), $manager->getUnitOfWork(), $resourceClass, $aggregationBuilder->getPipeline());
+    }
+
+    private function addCountToContext(Builder $aggregationBuilder, array $context): array
+    {
+        if (!($context['graphql'] ?? false)) {
+            return $context;
+        }
+
+        if (isset($context['filters']['last']) && !isset($context['filters']['before'])) {
+            $context['count'] = $aggregationBuilder->count('count')->execute()->toArray()[0]['count'];
+        }
+
+        return $context;
     }
 }

@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Bridge\Elasticsearch\Serializer\NameConverter;
 
+use Symfony\Component\Serializer\NameConverter\AdvancedNameConverterInterface;
 use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 
@@ -23,7 +24,7 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
  *
  * @author Baptiste Meyer <baptiste.meyer@gmail.com>
  */
-final class InnerFieldsNameConverter implements NameConverterInterface
+final class InnerFieldsNameConverter implements AdvancedNameConverterInterface
 {
     private $decorated;
 
@@ -35,25 +36,25 @@ final class InnerFieldsNameConverter implements NameConverterInterface
     /**
      * {@inheritdoc}
      */
-    public function normalize($propertyName)
+    public function normalize($propertyName, string $class = null, string $format = null, array $context = [])
     {
-        return $this->convertInnerFields($propertyName, true);
+        return $this->convertInnerFields($propertyName, true, $class, $format, $context);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function denormalize($propertyName)
+    public function denormalize($propertyName, string $class = null, string $format = null, array $context = [])
     {
-        return $this->convertInnerFields($propertyName, false);
+        return $this->convertInnerFields($propertyName, false, $class, $format, $context);
     }
 
-    private function convertInnerFields(string $propertyName, bool $normalization): string
+    private function convertInnerFields(string $propertyName, bool $normalization, string $class = null, string $format = null, $context = []): string
     {
         $convertedProperties = [];
 
         foreach (explode('.', $propertyName) as $decomposedProperty) {
-            $convertedProperties[] = $this->decorated->{$normalization ? 'normalize' : 'denormalize'}($decomposedProperty);
+            $convertedProperties[] = $this->decorated->{$normalization ? 'normalize' : 'denormalize'}($decomposedProperty, $class, $format, $context);
         }
 
         return implode('.', $convertedProperties);

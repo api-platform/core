@@ -23,10 +23,13 @@ use ApiPlatform\Core\Bridge\Elasticsearch\Metadata\Document\DocumentMetadata;
 use ApiPlatform\Core\Bridge\Elasticsearch\Metadata\Document\Factory\DocumentMetadataFactoryInterface;
 use ApiPlatform\Core\DataProvider\CollectionDataProviderInterface;
 use ApiPlatform\Core\DataProvider\Pagination;
+use ApiPlatform\Core\Exception\ResourceClassNotFoundException;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\CompositeRelation;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyCar;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyCarColor;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Foo;
 use Elasticsearch\Client;
 use PHPUnit\Framework\TestCase;
@@ -44,7 +47,8 @@ class CollectionDataProviderTest extends TestCase
                 $this->prophesize(DocumentMetadataFactoryInterface::class)->reveal(),
                 $this->prophesize(IdentifierExtractorInterface::class)->reveal(),
                 $this->prophesize(DenormalizerInterface::class)->reveal(),
-                new Pagination($this->prophesize(ResourceMetadataFactoryInterface::class)->reveal())
+                new Pagination($this->prophesize(ResourceMetadataFactoryInterface::class)->reveal()),
+                $this->prophesize(ResourceMetadataFactoryInterface::class)->reveal()
             )
         );
     }
@@ -60,17 +64,27 @@ class CollectionDataProviderTest extends TestCase
         $identifierExtractorProphecy->getIdentifierFromResourceClass(Foo::class)->willReturn('id')->shouldBeCalled();
         $identifierExtractorProphecy->getIdentifierFromResourceClass(CompositeRelation::class)->willThrow(new NonUniqueIdentifierException())->shouldBeCalled();
 
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
+        $resourceMetadataFactoryProphecy->create(Foo::class)->shouldBeCalled()->willReturn(new ResourceMetadata());
+        $resourceMetadataFactoryProphecy->create(DummyCar::class)->shouldBeCalled()->willReturn((new ResourceMetadata())->withAttributes(['elasticsearch' => false]));
+        $resourceMetadataFactoryProphecy->create(Dummy::class)->shouldBeCalled()->willReturn(new ResourceMetadata());
+        $resourceMetadataFactoryProphecy->create(CompositeRelation::class)->shouldBeCalled()->willReturn(new ResourceMetadata());
+        $resourceMetadataFactoryProphecy->create(DummyCarColor::class)->shouldBeCalled()->willThrow(new ResourceClassNotFoundException());
+
         $collectionDataProvider = new CollectionDataProvider(
             $this->prophesize(Client::class)->reveal(),
             $documentMetadataFactoryProphecy->reveal(),
             $identifierExtractorProphecy->reveal(),
             $this->prophesize(DenormalizerInterface::class)->reveal(),
-            new Pagination($this->prophesize(ResourceMetadataFactoryInterface::class)->reveal())
+            new Pagination($this->prophesize(ResourceMetadataFactoryInterface::class)->reveal()),
+            $resourceMetadataFactoryProphecy->reveal()
         );
 
         self::assertTrue($collectionDataProvider->supports(Foo::class));
         self::assertFalse($collectionDataProvider->supports(Dummy::class));
         self::assertFalse($collectionDataProvider->supports(CompositeRelation::class));
+        self::assertFalse($collectionDataProvider->supports(DummyCar::class));
+        self::assertFalse($collectionDataProvider->supports(DummyCarColor::class));
     }
 
     public function testGetCollection()
@@ -150,6 +164,7 @@ class CollectionDataProviderTest extends TestCase
             $this->prophesize(IdentifierExtractorInterface::class)->reveal(),
             $denormalizer = $this->prophesize(DenormalizerInterface::class)->reveal(),
             new Pagination($resourceMetadataFactoryProphecy->reveal(), ['items_per_page' => 2]),
+            $resourceMetadataFactoryProphecy->reveal(),
             [$requestBodySearchCollectionExtensionProphecy->reveal()]
         );
 

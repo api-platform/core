@@ -65,9 +65,10 @@
         <service id="ApiPlatform\Core\Api\IriConverterInterface" alias="api_platform.iri_converter" />
 
         <service id="api_platform.formats_provider" class="ApiPlatform\Core\Api\FormatsProvider">
-            <argument type="service" id="api_platform.metadata.resource.metadata_factory"></argument>
+            <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
             <argument>%api_platform.formats%</argument>
         </service>
+        <service id="ApiPlatform\Core\Api\OperationAwareFormatsProviderInterface" alias="api_platform.formats_provider" />
 
         <!-- Serializer -->
 
@@ -99,12 +100,31 @@
             <argument type="service" id="api_platform.item_data_provider" on-invalid="ignore" />
             <argument>%api_platform.allow_plain_identifiers%</argument>
             <argument>null</argument>
-            <argument type="service" id="api_platform.data_transformer" on-invalid="ignore" />
+            <argument type="tagged" tag="api_platform.data_transformer" on-invalid="ignore" />
+            <argument type="service" id="api_platform.metadata.resource.metadata_factory" on-invalid="ignore" />
+            <argument>false</argument>
+
+            <!-- After the DataUriNormalizer but before the ObjectNormalizer -->
+            <tag name="serializer.normalizer" priority="-923" />
+        </service>
+
+        <service id="api_platform.serializer.normalizer.item.non_resource" class="ApiPlatform\Core\Serializer\ItemNormalizer" public="false">
+            <argument type="service" id="api_platform.metadata.property.name_collection_factory" />
+            <argument type="service" id="api_platform.metadata.property.metadata_factory" />
+            <argument type="service" id="api_platform.iri_converter" />
+            <argument type="service" id="api_platform.resource_class_resolver" />
+            <argument type="service" id="api_platform.property_accessor" />
+            <argument type="service" id="api_platform.name_converter" on-invalid="ignore" />
+            <argument type="service" id="serializer.mapping.class_metadata_factory" on-invalid="ignore" />
+            <argument type="service" id="api_platform.item_data_provider" on-invalid="ignore" />
+            <argument>%api_platform.allow_plain_identifiers%</argument>
+            <argument>null</argument>
+            <argument type="tagged" tag="api_platform.data_transformer" on-invalid="ignore" />
             <argument type="service" id="api_platform.metadata.resource.metadata_factory" on-invalid="ignore" />
             <argument>true</argument>
 
-              <!-- After the DataURINormalizer but before the object denormalizer -->
-            <tag name="serializer.normalizer" priority="-923" />
+            <!-- After the DataUriNormalizer but before the ObjectNormalizer -->
+            <tag name="serializer.normalizer" priority="-925" />
         </service>
 
         <!-- Resources Operations path resolver -->
@@ -143,7 +163,7 @@
         <!-- kernel.request priority must be < 8 to be executed after the Firewall -->
         <service id="api_platform.listener.request.add_format" class="ApiPlatform\Core\EventListener\AddFormatListener">
             <argument type="service" id="api_platform.negotiator" />
-            <argument type="service" id="api_platform.formats_provider"></argument>
+            <argument type="service" id="api_platform.formats_provider" />
 
             <tag name="kernel.event_listener" event="kernel.request" method="onKernelRequest" priority="7" />
         </service>
@@ -287,12 +307,6 @@
         <service id="api_platform.cache.subresource_operation_factory" parent="cache.system" public="false">
             <tag name="cache.pool" />
         </service>
-
-        <service id="api_platform.data_transformer.chain_transformer" class="ApiPlatform\Core\DataTransformer\ChainDataTransformer" public="false">
-            <argument type="tagged" tag="api_platform.data_transformer" />
-        </service>
-
-        <service id="api_platform.data_transformer" alias="api_platform.data_transformer.chain_transformer" />
     </services>
 
 </container>

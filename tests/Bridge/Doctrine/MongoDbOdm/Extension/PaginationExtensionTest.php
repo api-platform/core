@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\Bridge\Doctrine\MongoDbOdm\Extension;
 
 use ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Extension\PaginationExtension;
+use ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Paginator;
 use ApiPlatform\Core\DataProvider\Pagination;
 use ApiPlatform\Core\DataProvider\PaginatorInterface;
 use ApiPlatform\Core\DataProvider\PartialPaginatorInterface;
@@ -24,7 +25,7 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ODM\MongoDB\Aggregation\Builder;
 use Doctrine\ODM\MongoDB\Aggregation\Stage\Count;
 use Doctrine\ODM\MongoDB\Aggregation\Stage\Facet;
-use Doctrine\ODM\MongoDB\Aggregation\Stage\Limit;
+use Doctrine\ODM\MongoDB\Aggregation\Stage\Match;
 use Doctrine\ODM\MongoDB\Aggregation\Stage\Skip;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Doctrine\ODM\MongoDB\Iterator\Iterator;
@@ -59,7 +60,7 @@ class PaginationExtensionTest extends TestCase
             'page_parameter_name' => '_page',
         ]);
 
-        $aggregationBuilder = $this->mockAggregationBuilder(40, 40);
+        $aggregationBuilderProphecy = $this->mockAggregationBuilder(40, 40);
 
         $context = ['filters' => ['pagination' => true, 'itemsPerPage' => 20, '_page' => 2]];
 
@@ -67,7 +68,7 @@ class PaginationExtensionTest extends TestCase
             $this->managerRegistryProphecy->reveal(),
             $pagination
         );
-        $extension->applyToCollection($aggregationBuilder, 'Foo', 'op', $context);
+        $extension->applyToCollection($aggregationBuilderProphecy->reveal(), 'Foo', 'op', $context);
     }
 
     public function testApplyToCollectionWithItemPerPageZero()
@@ -86,7 +87,7 @@ class PaginationExtensionTest extends TestCase
             'page_parameter_name' => '_page',
         ]);
 
-        $aggregationBuilder = $this->mockAggregationBuilder(0, 0);
+        $aggregationBuilderProphecy = $this->mockAggregationBuilder(0, 0);
 
         $context = ['filters' => ['pagination' => true, 'itemsPerPage' => 0, '_page' => 1]];
 
@@ -94,7 +95,7 @@ class PaginationExtensionTest extends TestCase
             $this->managerRegistryProphecy->reveal(),
             $pagination
         );
-        $extension->applyToCollection($aggregationBuilder, 'Foo', 'op', $context);
+        $extension->applyToCollection($aggregationBuilderProphecy->reveal(), 'Foo', 'op', $context);
     }
 
     public function testApplyToCollectionWithItemPerPageZeroAndPage2()
@@ -118,7 +119,6 @@ class PaginationExtensionTest extends TestCase
 
         $aggregationBuilderProphecy = $this->prophesize(Builder::class);
         $aggregationBuilderProphecy->facet()->shouldNotBeCalled();
-        $aggregationBuilder = $aggregationBuilderProphecy->reveal();
 
         $context = ['filters' => ['pagination' => true, 'itemsPerPage' => 0, '_page' => 2]];
 
@@ -126,7 +126,7 @@ class PaginationExtensionTest extends TestCase
             $this->prophesize(ManagerRegistry::class)->reveal(),
             $pagination
         );
-        $extension->applyToCollection($aggregationBuilder, 'Foo', 'op', $context);
+        $extension->applyToCollection($aggregationBuilderProphecy->reveal(), 'Foo', 'op', $context);
     }
 
     public function testApplyToCollectionWithItemPerPageLessThan0()
@@ -150,7 +150,6 @@ class PaginationExtensionTest extends TestCase
 
         $aggregationBuilderProphecy = $this->prophesize(Builder::class);
         $aggregationBuilderProphecy->facet()->shouldNotBeCalled();
-        $aggregationBuilder = $aggregationBuilderProphecy->reveal();
 
         $context = ['filters' => ['pagination' => true, 'itemsPerPage' => -20, '_page' => 2]];
 
@@ -158,7 +157,7 @@ class PaginationExtensionTest extends TestCase
             $this->managerRegistryProphecy->reveal(),
             $pagination
         );
-        $extension->applyToCollection($aggregationBuilder, 'Foo', 'op', $context);
+        $extension->applyToCollection($aggregationBuilderProphecy->reveal(), 'Foo', 'op', $context);
     }
 
     public function testApplyToCollectionWithItemPerPageTooHigh()
@@ -177,7 +176,7 @@ class PaginationExtensionTest extends TestCase
             'maximum_items_per_page' => 300,
         ]);
 
-        $aggregationBuilder = $this->mockAggregationBuilder(300, 300);
+        $aggregationBuilderProphecy = $this->mockAggregationBuilder(300, 300);
 
         $context = ['filters' => ['pagination' => true, 'itemsPerPage' => 301, '_page' => 2]];
 
@@ -185,7 +184,7 @@ class PaginationExtensionTest extends TestCase
             $this->managerRegistryProphecy->reveal(),
             $pagination
         );
-        $extension->applyToCollection($aggregationBuilder, 'Foo', 'op', $context);
+        $extension->applyToCollection($aggregationBuilderProphecy->reveal(), 'Foo', 'op', $context);
     }
 
     public function testApplyToCollectionWithGraphql()
@@ -201,7 +200,7 @@ class PaginationExtensionTest extends TestCase
 
         $pagination = new Pagination($resourceMetadataFactory);
 
-        $aggregationBuilder = $this->mockAggregationBuilder(10, 5);
+        $aggregationBuilderProphecy = $this->mockAggregationBuilder(10, 5);
 
         $context = ['filters' => ['pagination' => true, 'first' => 5, 'after' => 'OQ=='], 'graphql' => true];
 
@@ -209,7 +208,40 @@ class PaginationExtensionTest extends TestCase
             $this->managerRegistryProphecy->reveal(),
             $pagination
         );
-        $extension->applyToCollection($aggregationBuilder, 'Foo', 'op', $context);
+        $extension->applyToCollection($aggregationBuilderProphecy->reveal(), 'Foo', 'op', $context);
+    }
+
+    public function testApplyToCollectionWithGraphqlAndCountContext()
+    {
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
+        $attributes = [
+            'pagination_enabled' => true,
+            'pagination_client_enabled' => true,
+            'pagination_client_items_per_page' => 20,
+        ];
+        $resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadata(null, null, null, [], [], $attributes));
+        $resourceMetadataFactory = $resourceMetadataFactoryProphecy->reveal();
+
+        $pagination = new Pagination($resourceMetadataFactory);
+
+        $aggregationBuilderProphecy = $this->mockAggregationBuilder(4, 5);
+        $iteratorProphecy = $this->prophesize(Iterator::class);
+        $iteratorProphecy->toArray()->willReturn([
+            [
+                'count' => 9,
+            ],
+        ]);
+        $countProphecy = $this->prophesize(Count::class);
+        $countProphecy->execute()->shouldBeCalled()->willReturn($iteratorProphecy->reveal());
+        $aggregationBuilderProphecy->count('count')->shouldBeCalled()->willReturn($countProphecy->reveal());
+
+        $context = ['filters' => ['pagination' => true, 'last' => 5], 'graphql' => true];
+
+        $extension = new PaginationExtension(
+            $this->managerRegistryProphecy->reveal(),
+            $pagination
+        );
+        $extension->applyToCollection($aggregationBuilderProphecy->reveal(), 'Foo', 'op', $context);
     }
 
     public function testApplyToCollectionNoFilters()
@@ -220,7 +252,7 @@ class PaginationExtensionTest extends TestCase
 
         $pagination = new Pagination($resourceMetadataFactory);
 
-        $aggregationBuilder = $this->mockAggregationBuilder(0, 30);
+        $aggregationBuilderProphecy = $this->mockAggregationBuilder(0, 30);
 
         $context = [];
 
@@ -228,7 +260,7 @@ class PaginationExtensionTest extends TestCase
             $this->managerRegistryProphecy->reveal(),
             $pagination
         );
-        $extension->applyToCollection($aggregationBuilder, 'Foo', 'op', $context);
+        $extension->applyToCollection($aggregationBuilderProphecy->reveal(), 'Foo', 'op', $context);
     }
 
     public function testApplyToCollectionPaginationDisabled()
@@ -243,7 +275,6 @@ class PaginationExtensionTest extends TestCase
 
         $aggregationBuilderProphecy = $this->prophesize(Builder::class);
         $aggregationBuilderProphecy->facet()->shouldNotBeCalled();
-        $aggregationBuilder = $aggregationBuilderProphecy->reveal();
 
         $context = [];
 
@@ -251,7 +282,7 @@ class PaginationExtensionTest extends TestCase
             $this->managerRegistryProphecy->reveal(),
             $pagination
         );
-        $extension->applyToCollection($aggregationBuilder, 'Foo', 'op', $context);
+        $extension->applyToCollection($aggregationBuilderProphecy->reveal(), 'Foo', 'op', $context);
     }
 
     public function testApplyToCollectionWithMaximumItemsPerPage()
@@ -271,7 +302,7 @@ class PaginationExtensionTest extends TestCase
             'maximum_items_per_page' => 50,
         ]);
 
-        $aggregationBuilder = $this->mockAggregationBuilder(0, 80);
+        $aggregationBuilderProphecy = $this->mockAggregationBuilder(0, 80);
 
         $context = ['filters' => ['pagination' => true, 'itemsPerPage' => 80, 'page' => 1]];
 
@@ -279,7 +310,7 @@ class PaginationExtensionTest extends TestCase
             $this->managerRegistryProphecy->reveal(),
             $pagination
         );
-        $extension->applyToCollection($aggregationBuilder, 'Foo', 'op', $context);
+        $extension->applyToCollection($aggregationBuilderProphecy->reveal(), 'Foo', 'op', $context);
     }
 
     public function testSupportsResult()
@@ -391,10 +422,15 @@ class PaginationExtensionTest extends TestCase
 
     private function mockAggregationBuilder($expectedOffset, $expectedLimit)
     {
-        $limitProphecy = $this->prophesize(Limit::class);
-
         $skipProphecy = $this->prophesize(Skip::class);
-        $skipProphecy->limit($expectedLimit)->shouldBeCalled()->willReturn($limitProphecy->reveal());
+        if ($expectedLimit > 0) {
+            $skipProphecy->limit($expectedLimit)->shouldBeCalled();
+        } else {
+            $matchProphecy = $this->prophesize(Match::class);
+            $matchProphecy->field(Paginator::LIMIT_ZERO_MARKER_FIELD)->shouldBeCalled()->willReturn($matchProphecy);
+            $matchProphecy->equals(Paginator::LIMIT_ZERO_MARKER)->shouldBeCalled();
+            $skipProphecy->match()->shouldBeCalled()->willReturn($matchProphecy->reveal());
+        }
 
         $resultsAggregationBuilderProphecy = $this->prophesize(Builder::class);
         $resultsAggregationBuilderProphecy->skip($expectedOffset)->shouldBeCalled()->willReturn($skipProphecy->reveal());
@@ -416,7 +452,7 @@ class PaginationExtensionTest extends TestCase
         $this->managerRegistryProphecy->getManagerForClass('Foo')->shouldBeCalled()->willReturn($objectManagerProphecy->reveal());
 
         $facetProphecy = $this->prophesize(Facet::class);
-        $facetProphecy->pipeline($limitProphecy)->shouldBeCalled()->willReturn($facetProphecy);
+        $facetProphecy->pipeline($skipProphecy)->shouldBeCalled()->willReturn($facetProphecy);
         $facetProphecy->pipeline($countProphecy)->shouldBeCalled()->willReturn($facetProphecy);
         $facetProphecy->field('count')->shouldBeCalled()->willReturn($facetProphecy);
         $facetProphecy->field('results')->shouldBeCalled()->willReturn($facetProphecy);
@@ -424,6 +460,6 @@ class PaginationExtensionTest extends TestCase
         $aggregationBuilderProphecy = $this->prophesize(Builder::class);
         $aggregationBuilderProphecy->facet()->shouldBeCalled()->willReturn($facetProphecy->reveal());
 
-        return $aggregationBuilderProphecy->reveal();
+        return $aggregationBuilderProphecy;
     }
 }

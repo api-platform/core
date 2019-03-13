@@ -111,7 +111,7 @@ final class PaginationExtension implements ContextAwareQueryResultCollectionExte
      */
     public function applyToCollection(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, string $operationName = null, array $context = [])
     {
-        if (null === $pagination = $this->getPagination($resourceClass, $operationName, $context)) {
+        if (null === $pagination = $this->getPagination($queryBuilder, $resourceClass, $operationName, $context)) {
             return;
         }
 
@@ -167,7 +167,7 @@ final class PaginationExtension implements ContextAwareQueryResultCollectionExte
     /**
      * @throws InvalidArgumentException
      */
-    private function getPagination(string $resourceClass, ?string $operationName, array $context): ?array
+    private function getPagination(QueryBuilder $queryBuilder, string $resourceClass, ?string $operationName, array $context): ?array
     {
         $request = null;
         if (null !== $this->requestStack && null === $request = $this->requestStack->getCurrentRequest()) {
@@ -178,6 +178,8 @@ final class PaginationExtension implements ContextAwareQueryResultCollectionExte
             if (!$this->pagination->isEnabled($resourceClass, $operationName, $context)) {
                 return null;
             }
+
+            $context = $this->addCountToContext($queryBuilder, $context);
 
             return \array_slice($this->pagination->getPagination($resourceClass, $operationName, $context), 1);
         }
@@ -265,6 +267,19 @@ final class PaginationExtension implements ContextAwareQueryResultCollectionExte
         }
 
         return $request->query->get($parameterName, $default);
+    }
+
+    private function addCountToContext(QueryBuilder $queryBuilder, array $context): array
+    {
+        if (!($context['graphql'] ?? false)) {
+            return $context;
+        }
+
+        if (isset($context['filters']['last']) && !isset($context['filters']['before'])) {
+            $context['count'] = (new DoctrineOrmPaginator($queryBuilder))->count();
+        }
+
+        return $context;
     }
 
     /**

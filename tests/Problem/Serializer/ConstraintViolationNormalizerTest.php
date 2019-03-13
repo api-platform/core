@@ -42,7 +42,7 @@ class ConstraintViolationNormalizerTest extends TestCase
         $nameConverterProphecy = $this->prophesize(NameConverterInterface::class);
         $normalizer = new ConstraintViolationListNormalizer(['severity', 'anotherField1'], $nameConverterProphecy->reveal());
 
-        $nameConverterProphecy->normalize(Argument::type('string'))->will(function ($args) {
+        $nameConverterProphecy->normalize(Argument::type('string'), null, Argument::type('string'))->will(function ($args) {
             return '_'.$args[0];
         });
 

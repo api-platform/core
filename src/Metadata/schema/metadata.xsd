@@ -65,7 +65,7 @@
     </xsd:complexType>
 
     <xsd:complexType name="operation">
-        <xsd:sequence maxOccurs="unbounded">
+        <xsd:sequence minOccurs="0" maxOccurs="unbounded">
             <xsd:element name="attribute" maxOccurs="unbounded" type="attribute"/>
         </xsd:sequence>
         <xsd:attribute type="xsd:string" name="name"/>

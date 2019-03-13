@@ -6,7 +6,7 @@
 
     <services>
         <service id="api_platform.metadata.extractor.yaml" class="ApiPlatform\Core\Metadata\Extractor\YamlExtractor" public="false">
-            <argument type="collection"></argument>
+            <argument type="collection" />
             <argument type="service" id="service_container" />
         </service>
 

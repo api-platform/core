@@ -15,8 +15,10 @@ namespace ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Filter;
 
 use ApiPlatform\Core\Bridge\Doctrine\Common\Filter\ExistsFilterInterface;
 use ApiPlatform\Core\Bridge\Doctrine\Common\Filter\ExistsFilterTrait;
+use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ODM\MongoDB\Aggregation\Builder;
 use Doctrine\ODM\MongoDB\Mapping\ClassMetadata;
+use Psr\Log\LoggerInterface;
 
 /**
  * Filters the collection by whether a property value exists or not.
@@ -25,7 +27,7 @@ use Doctrine\ODM\MongoDB\Mapping\ClassMetadata;
  * the value is not one of ( "true" | "false" | "1" | "0" ) the property is ignored.
  *
  * A query parameter with key but no value is treated as `true`, e.g.:
- * Request: GET /products?brand[exists]
+ * Request: GET /products?exists[brand]
  * Interpretation: filter products which have a brand
  *
  * @experimental
@@ -37,13 +39,37 @@ final class ExistsFilter extends AbstractFilter implements ExistsFilterInterface
 {
     use ExistsFilterTrait;
 
+    public function __construct(ManagerRegistry $managerRegistry, LoggerInterface $logger = null, string $existsParameterName = self::QUERY_PARAMETER_KEY, array $properties = null)
+    {
+        parent::__construct($managerRegistry, $logger, $properties);
+
+        $this->existsParameterName = $existsParameterName;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function apply(Builder $aggregationBuilder, string $resourceClass, string $operationName = null, array &$context = [])
+    {
+        if (!\is_array($context['filters'][$this->existsParameterName] ?? null)) {
+            $context['exists_deprecated_syntax'] = true;
+            parent::apply($aggregationBuilder, $resourceClass, $operationName, $context);
+
+            return;
+        }
+
+        foreach ($context['filters'][$this->existsParameterName] as $property => $value) {
+            $this->filterProperty($property, $value, $aggregationBuilder, $resourceClass, $operationName, $context);
+        }
+    }
+
     /**
      * {@inheritdoc}
      */
     protected function filterProperty(string $property, $value, Builder $aggregationBuilder, string $resourceClass, string $operationName = null, array &$context = [])
     {
         if (
-            !isset($value[self::QUERY_PARAMETER_KEY]) ||
+            (($context['exists_deprecated_syntax'] ?? false) && !isset($value[self::QUERY_PARAMETER_KEY])) ||
             !$this->isPropertyEnabled($property, $resourceClass) ||
             !$this->isPropertyMapped($property, $resourceClass, true) ||
             !$this->isNullableField($property, $resourceClass)

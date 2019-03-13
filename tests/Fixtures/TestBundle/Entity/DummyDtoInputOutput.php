@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity;
 
-use ApiPlatform\Core\Annotation\ApiProperty;
 use ApiPlatform\Core\Annotation\ApiResource;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Dto\InputDto;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Dto\OutputDto;
@@ -31,8 +30,7 @@ class DummyDtoInputOutput
 {
     /**
      * @var int The id
-     * @ApiProperty(identifier=true)
-     * @ORM\Column(type="integer")
+     * @ORM\Column(type="integer", nullable=true)
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
      */
@@ -46,7 +44,7 @@ class DummyDtoInputOutput
 
     /**
      * @var int
-     * @ORM\Column(type="decimal")
+     * @ORM\Column(type="float")
      */
     public $num;
 }

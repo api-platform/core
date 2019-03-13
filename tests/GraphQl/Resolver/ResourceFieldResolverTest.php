@@ -26,22 +26,20 @@ class ResourceFieldResolverTest extends TestCase
 {
     public function testId()
     {
-        $dummy = new Dummy();
-
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
-        $iriConverterProphecy->getIriFromItem($dummy)->willReturn('/dummies/1')->shouldBeCalled();
+        $iriConverterProphecy->getItemIriFromResourceClass(Dummy::class, ['id' => 1])->willReturn('/dummies/1')->shouldBeCalled();
 
-        $resolveInfo = new ResolveInfo('id', [], null, new ObjectType(['name' => '']), '', new Schema([]), null, null, null, null);
+        $resolveInfo = new ResolveInfo('id', [], new ObjectType(['name' => '']), new ObjectType(['name' => '']), [], new Schema([]), [], null, null, []);
 
         $resolver = new ResourceFieldResolver($iriConverterProphecy->reveal());
-        $this->assertEquals('/dummies/1', $resolver([ItemNormalizer::ITEM_KEY => serialize($dummy)], [], [], $resolveInfo));
+        $this->assertEquals('/dummies/1', $resolver([ItemNormalizer::ITEM_RESOURCE_CLASS_KEY => Dummy::class, ItemNormalizer::ITEM_IDENTIFIERS_KEY => ['id' => 1]], [], [], $resolveInfo));
     }
 
     public function testOriginalId()
     {
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
 
-        $resolveInfo = new ResolveInfo('_id', [], null, new ObjectType(['name' => '']), '', new Schema([]), null, null, null, null);
+        $resolveInfo = new ResolveInfo('_id', [], new ObjectType(['name' => '']), new ObjectType(['name' => '']), [], new Schema([]), [], null, null, []);
 
         $resolver = new ResourceFieldResolver($iriConverterProphecy->reveal());
         $this->assertEquals(1, $resolver(['id' => 1], [], [], $resolveInfo));
@@ -51,7 +49,7 @@ class ResourceFieldResolverTest extends TestCase
     {
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
 
-        $resolveInfo = new ResolveInfo('foo', [], null, new ObjectType(['name' => '']), '', new Schema([]), null, null, null, null);
+        $resolveInfo = new ResolveInfo('foo', [], new ObjectType(['name' => '']), new ObjectType(['name' => '']), [], new Schema([]), [], null, null, []);
 
         $resolver = new ResourceFieldResolver($iriConverterProphecy->reveal());
         $this->assertEquals('bar', $resolver(['foo' => 'bar'], [], [], $resolveInfo));

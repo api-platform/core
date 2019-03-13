@@ -149,11 +149,11 @@ final class SchemaBuilder implements SchemaBuilderInterface
                 ],
             ],
             'resolveType' => function ($value) {
-                if (!isset($value[ItemNormalizer::ITEM_KEY])) {
+                if (!isset($value[ItemNormalizer::ITEM_RESOURCE_CLASS_KEY])) {
                     return null;
                 }
 
-                $shortName = (new \ReflectionObject(unserialize($value[ItemNormalizer::ITEM_KEY])))->getShortName();
+                $shortName = (new \ReflectionClass($value[ItemNormalizer::ITEM_RESOURCE_CLASS_KEY]))->getShortName();
 
                 return $this->graphqlTypes[$shortName] ?? null;
             },
@@ -246,6 +246,14 @@ final class SchemaBuilder implements SchemaBuilderInterface
                         'first' => [
                             'type' => GraphQLType::int(),
                             'description' => 'Returns the first n elements from the list.',
+                        ],
+                        'last' => [
+                            'type' => GraphQLType::int(),
+                            'description' => 'Returns the last n elements from the list.',
+                        ],
+                        'before' => [
+                            'type' => GraphQLType::string(),
+                            'description' => 'Returns the elements in the list that come before the specified cursor.',
                         ],
                         'after' => [
                             'type' => GraphQLType::string(),
@@ -465,7 +473,7 @@ final class SchemaBuilder implements SchemaBuilderInterface
     {
         $fields = [];
         $idField = ['type' => GraphQLType::nonNull(GraphQLType::id())];
-        $clientMutationId = GraphQLType::nonNull(GraphQLType::string());
+        $clientMutationId = GraphQLType::string();
 
         if ('delete' === $mutationName || (null !== $ioMetadata && null === $ioMetadata['class'])) {
             return [
@@ -483,8 +491,8 @@ final class SchemaBuilder implements SchemaBuilderInterface
                 $propertyMetadata = $this->propertyMetadataFactory->create($resourceClass, $property, ['graphql_operation_name' => $mutationName ?? 'query']);
                 if (
                     null === ($propertyType = $propertyMetadata->getType())
-                    || (!$input && null === $mutationName && false === $propertyMetadata->isReadable())
-                    || (null !== $mutationName && false === $propertyMetadata->isWritable())
+                    || (!$input && false === $propertyMetadata->isReadable())
+                    || ($input && null !== $mutationName && false === $propertyMetadata->isWritable())
                 ) {
                     continue;
                 }
@@ -539,7 +547,9 @@ final class SchemaBuilder implements SchemaBuilderInterface
             'description' => 'Information about the current page.',
             'fields' => [
                 'endCursor' => GraphQLType::string(),
+                'startCursor' => GraphQLType::string(),
                 'hasNextPage' => GraphQLType::nonNull(GraphQLType::boolean()),
+                'hasPreviousPage' => GraphQLType::nonNull(GraphQLType::boolean()),
             ],
         ];
         $pageInfoObjectType = new ObjectType($pageInfoObjectTypeConfiguration);

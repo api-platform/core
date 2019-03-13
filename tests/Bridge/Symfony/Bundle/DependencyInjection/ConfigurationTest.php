@@ -120,6 +120,7 @@ class ConfigurationTest extends TestCase
                 'fetch_partial' => false,
             ],
             'collection' => [
+                'exists_parameter_name' => 'exists',
                 'order' => 'ASC',
                 'order_parameter_name' => 'order',
                 'pagination' => [

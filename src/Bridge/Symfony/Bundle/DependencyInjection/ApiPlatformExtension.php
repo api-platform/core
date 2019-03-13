@@ -25,6 +25,7 @@ use ApiPlatform\Core\DataPersister\DataPersisterInterface;
 use ApiPlatform\Core\DataProvider\CollectionDataProviderInterface;
 use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
 use ApiPlatform\Core\DataProvider\SubresourceDataProviderInterface;
+use ApiPlatform\Core\DataTransformer\DataTransformerInterface;
 use ApiPlatform\Core\Exception\RuntimeException;
 use ApiPlatform\Core\GraphQl\Resolver\QueryResolverInterface;
 use ApiPlatform\Core\GraphQl\Type\Definition\TypeInterface as GraphQlTypeInterface;
@@ -79,10 +80,6 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
 
         if (!isset($propertyInfoConfig['enabled'])) {
             $container->prependExtensionConfig('framework', ['property_info' => ['enabled' => true]]);
-        }
-
-        if (isset($serializerConfig['name_converter'])) {
-            $container->prependExtensionConfig('api_platform', ['name_converter' => $serializerConfig['name_converter']]);
         }
     }
 
@@ -152,6 +149,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $this->registerMercureConfiguration($container, $config, $loader, $useDoctrine);
         $this->registerMessengerConfiguration($config, $loader);
         $this->registerElasticsearchConfiguration($container, $config, $loader);
+        $this->registerDataTransformerConfiguration($container);
     }
 
     /**
@@ -173,6 +171,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $container->setParameter('api_platform.eager_loading.max_joins', $config['eager_loading']['max_joins']);
         $container->setParameter('api_platform.eager_loading.fetch_partial', $config['eager_loading']['fetch_partial']);
         $container->setParameter('api_platform.eager_loading.force_eager', $config['eager_loading']['force_eager']);
+        $container->setParameter('api_platform.collection.exists_parameter_name', $config['collection']['exists_parameter_name']);
         $container->setParameter('api_platform.collection.order', $config['collection']['order']);
         $container->setParameter('api_platform.collection.order_parameter_name', $config['collection']['order_parameter_name']);
         $container->setParameter('api_platform.collection.pagination.enabled', $config['collection']['pagination']['enabled']);
@@ -450,6 +449,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $container->register('api_platform.cache.route_name_resolver', ArrayAdapter::class);
         $container->register('api_platform.cache.identifiers_extractor', ArrayAdapter::class);
         $container->register('api_platform.cache.subresource_operation_factory', ArrayAdapter::class);
+        $container->register('api_platform.elasticsearch.cache.metadata.document', ArrayAdapter::class);
     }
 
     /**
@@ -604,5 +604,11 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
 
         $container->setParameter('api_platform.elasticsearch.hosts', $config['elasticsearch']['hosts']);
         $container->setParameter('api_platform.elasticsearch.mapping', $config['elasticsearch']['mapping']);
+    }
+
+    private function registerDataTransformerConfiguration(ContainerBuilder $container)
+    {
+        $container->registerForAutoconfiguration(DataTransformerInterface::class)
+            ->addTag('api_platform.data_transformer');
     }
 }

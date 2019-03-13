@@ -17,6 +17,8 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\ExistsFilter;
 use ApiPlatform\Core\Test\DoctrineOrmFilterTestCase;
 use ApiPlatform\Core\Tests\Bridge\Doctrine\Common\Filter\ExistsFilterTestTrait;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
+use Doctrine\Common\Persistence\ManagerRegistry;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * @author Antoine Bluchet <soyuka@gmail.com>
@@ -32,57 +34,57 @@ class ExistsFilterTest extends DoctrineOrmFilterTestCase
         $filter = $this->buildFilter();
 
         $this->assertEquals([
-            'id[exists]' => [
+            'exists[id]' => [
                 'property' => 'id',
                 'type' => 'bool',
                 'required' => false,
             ],
-            'alias[exists]' => [
+            'exists[alias]' => [
                 'property' => 'alias',
                 'type' => 'bool',
                 'required' => false,
             ],
-            'description[exists]' => [
+            'exists[description]' => [
                 'property' => 'description',
                 'type' => 'bool',
                 'required' => false,
             ],
-            'dummy[exists]' => [
+            'exists[dummy]' => [
                 'property' => 'dummy',
                 'type' => 'bool',
                 'required' => false,
             ],
-            'dummyDate[exists]' => [
+            'exists[dummyDate]' => [
                 'property' => 'dummyDate',
                 'type' => 'bool',
                 'required' => false,
             ],
-            'dummyFloat[exists]' => [
+            'exists[dummyFloat]' => [
                 'property' => 'dummyFloat',
                 'type' => 'bool',
                 'required' => false,
             ],
-            'dummyPrice[exists]' => [
+            'exists[dummyPrice]' => [
                 'property' => 'dummyPrice',
                 'type' => 'bool',
                 'required' => false,
             ],
-            'jsonData[exists]' => [
+            'exists[jsonData]' => [
                 'property' => 'jsonData',
                 'type' => 'bool',
                 'required' => false,
             ],
-            'arrayData[exists]' => [
+            'exists[arrayData]' => [
                 'property' => 'arrayData',
                 'type' => 'bool',
                 'required' => false,
             ],
-            'nameConverted[exists]' => [
+            'exists[nameConverted]' => [
                 'property' => 'nameConverted',
                 'type' => 'bool',
                 'required' => false,
             ],
-            'dummyBoolean[exists]' => [
+            'exists[dummyBoolean]' => [
                 'property' => 'dummyBoolean',
                 'type' => 'bool',
                 'required' => false,
@@ -92,73 +94,194 @@ class ExistsFilterTest extends DoctrineOrmFilterTestCase
 
     public function provideApplyTestData(): array
     {
+        $existsFilterFactory = function (ManagerRegistry $managerRegistry, array $properties = null, RequestStack $requestStack = null): ExistsFilter {
+            return new ExistsFilter($managerRegistry, $requestStack, null, 'exists', $properties);
+        };
+        $customExistsFilterFactory = function (ManagerRegistry $managerRegistry, array $properties = null, RequestStack $requestStack = null): ExistsFilter {
+            return new ExistsFilter($managerRegistry, $requestStack, null, 'customExists', $properties);
+        };
+
         return array_merge_recursive(
             $this->provideApplyTestArguments(),
             [
                 'valid values' => [
                     sprintf('SELECT o FROM %s o WHERE o.description IS NOT NULL', Dummy::class),
+                    null,
+                    $existsFilterFactory,
                 ],
 
                 'valid values (empty for true)' => [
                     sprintf('SELECT o FROM %s o WHERE o.description IS NOT NULL', Dummy::class),
+                    null,
+                    $existsFilterFactory,
                 ],
 
                 'valid values (1 for true)' => [
                     sprintf('SELECT o FROM %s o WHERE o.description IS NOT NULL', Dummy::class),
+                    null,
+                    $existsFilterFactory,
                 ],
 
                 'invalid values' => [
                     sprintf('SELECT o FROM %s o', Dummy::class),
+                    null,
+                    $existsFilterFactory,
                 ],
 
                 'negative values' => [
                     sprintf('SELECT o FROM %s o WHERE o.description IS NULL', Dummy::class),
+                    null,
+                    $existsFilterFactory,
                 ],
 
                 'negative values (0)' => [
                     sprintf('SELECT o FROM %s o WHERE o.description IS NULL', Dummy::class),
+                    null,
+                    $existsFilterFactory,
+                ],
+
+                'multiple values (true and true)' => [
+                    sprintf('SELECT o FROM %s o WHERE o.alias IS NOT NULL AND o.description IS NOT NULL', Dummy::class),
+                    null,
+                    $existsFilterFactory,
+                ],
+
+                'multiple values (1 and 0)' => [
+                    sprintf('SELECT o FROM %s o WHERE o.alias IS NOT NULL AND o.description IS NULL', Dummy::class),
+                    null,
+                    $existsFilterFactory,
+                ],
+
+                'multiple values (false and 0)' => [
+                    sprintf('SELECT o FROM %s o WHERE o.alias IS NULL AND o.description IS NULL', Dummy::class),
+                    null,
+                    $existsFilterFactory,
+                ],
+
+                'custom exists parameter name' => [
+                    sprintf('SELECT o FROM %s o WHERE o.description IS NOT NULL', Dummy::class),
+                    null,
+                    $customExistsFilterFactory,
                 ],
 
                 'related values' => [
                     sprintf('SELECT o FROM %s o INNER JOIN o.relatedDummy relatedDummy_a1 WHERE o.description IS NOT NULL AND relatedDummy_a1.name IS NOT NULL', Dummy::class),
+                    null,
+                    $existsFilterFactory,
                 ],
 
                 'not nullable values' => [
                     sprintf('SELECT o FROM %s o WHERE o.description IS NOT NULL', Dummy::class),
+                    null,
+                    $existsFilterFactory,
                 ],
 
                 'related collection not empty' => [
                     sprintf('SELECT o FROM %s o WHERE o.description IS NOT NULL AND o.relatedDummies IS NOT EMPTY', Dummy::class),
+                    null,
+                    $existsFilterFactory,
                 ],
 
                 'related collection empty' => [
                     sprintf('SELECT o FROM %s o WHERE o.description IS NOT NULL AND o.relatedDummies IS EMPTY', Dummy::class),
+                    null,
+                    $existsFilterFactory,
                 ],
 
                 'related association exists' => [
                     sprintf('SELECT o FROM %s o WHERE o.description IS NOT NULL AND o.relatedDummy IS NOT NULL', Dummy::class),
+                    null,
+                    $existsFilterFactory,
                 ],
 
                 'related association does not exist' => [
                     sprintf('SELECT o FROM %s o WHERE o.description IS NOT NULL AND o.relatedDummy IS NULL', Dummy::class),
+                    null,
+                    $existsFilterFactory,
                 ],
 
                 'related owned association does not exist' => [
                     sprintf('SELECT o FROM %s o LEFT JOIN o.relatedOwnedDummy relatedOwnedDummy_a1 WHERE relatedOwnedDummy_a1 IS NULL', Dummy::class),
+                    null,
+                    $existsFilterFactory,
                 ],
 
                 'related owned association exists' => [
                     sprintf('SELECT o FROM %s o LEFT JOIN o.relatedOwnedDummy relatedOwnedDummy_a1 WHERE relatedOwnedDummy_a1 IS NOT NULL', Dummy::class),
+                    null,
+                    $existsFilterFactory,
                 ],
 
                 'related owning association does not exist' => [
                     sprintf('SELECT o FROM %s o WHERE o.relatedOwningDummy IS NULL', Dummy::class),
+                    null,
+                    $existsFilterFactory,
                 ],
 
                 'related owning association exists' => [
                     sprintf('SELECT o FROM %s o WHERE o.relatedOwningDummy IS NOT NULL', Dummy::class),
+                    null,
+                    $existsFilterFactory,
                 ],
             ]
         );
+    }
+
+    /**
+     * @group legacy
+     * @expectedDeprecation The ExistsFilter syntax "description[exists]=true/false" is deprecated since 2.5. Use the syntax "exists[description]=true/false" instead.
+     */
+    public function testLegacyExistsAfterSyntax()
+    {
+        $args = [
+            [
+                'description' => null,
+            ],
+            [
+                'description' => [
+                    'exists' => 'true',
+                ],
+            ],
+            sprintf('SELECT o FROM %s o WHERE o.description IS NOT NULL', Dummy::class),
+            null,
+            function (ManagerRegistry $managerRegistry, array $properties = null, RequestStack $requestStack = null): ExistsFilter {
+                return new ExistsFilter($managerRegistry, $requestStack, null, 'exists', $properties);
+            },
+        ];
+
+        $this->testApply(...$args);
+    }
+
+    /**
+     * @group legacy
+     * @expectedDeprecation Passing an instance of "Symfony\Component\HttpFoundation\RequestStack" is deprecated since 2.2. Use "filters" context key instead.
+     * @expectedDeprecation Using "ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\AbstractFilter::apply()" is deprecated since 2.2. Use "ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\AbstractContextAwareFilter::apply()" with the "filters" context key instead.
+     * @expectedDeprecation The use of "ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\AbstractFilter::extractProperties()" is deprecated since 2.2. Use the "filters" key of the context instead.
+     * @expectedDeprecation The ExistsFilter syntax "description[exists]=true/false" is deprecated since 2.5. Use the syntax "exists[description]=true/false" instead.
+     */
+    public function testLegacyRequest()
+    {
+        $args = [
+            [
+                'description' => null,
+            ],
+            [
+                'description' => [
+                    'exists' => 'true',
+                ],
+            ],
+            sprintf('SELECT o FROM %s o WHERE o.description IS NOT NULL', Dummy::class),
+            null,
+            function (ManagerRegistry $managerRegistry, array $properties = null, RequestStack $requestStack = null): ExistsFilter {
+                return new ExistsFilter($managerRegistry, $requestStack, null, 'exists', $properties);
+            },
+        ];
+
+        $this->testApplyRequest(...$args);
+    }
+
+    protected function buildFilter(?array $properties = null)
+    {
+        return new $this->filterClass($this->managerRegistry, null, null, 'exists', $properties);
     }
 }

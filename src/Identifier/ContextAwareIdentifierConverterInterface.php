@@ -14,17 +14,9 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Identifier;
 
 /**
- * Identifier converter.
+ * Gives access to the context in the IdentifierConverter.
  *
  * @author Antoine Bluchet <soyuka@gmail.com>
- */
-
-namespace ApiPlatform\Core\Identifier;
-
-/**
- * Gives access to the context.
- *
- * @author Kévin Dunglas <dunglas@gmail.com>
  */
 interface ContextAwareIdentifierConverterInterface extends IdentifierConverterInterface
 {
