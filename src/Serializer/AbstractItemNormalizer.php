@@ -31,6 +31,7 @@ use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Serializer\Exception\MissingConstructorArgumentsException;
 use Symfony\Component\Serializer\Exception\RuntimeException;
+use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
 use Symfony\Component\Serializer\NameConverter\AdvancedNameConverterInterface;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
@@ -116,9 +117,11 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer implement
      */
     public function normalize($object, $format = null, array $context = [])
     {
-        if ($this->handleNonResource && ($context['api_normalize'] ?? false) || null !== $outputClass = $this->getOutputClass($this->getObjectClass($object), $context)) {
+        if ($this->handleNonResource) {
             $context = $this->initContext($this->getObjectClass($object), $context);
-            $context['api_normalize'] = true;
+            if (!($context['api_normalize'] ?? false)) {
+                throw new UnexpectedValueException('"api_normalize" must be set to true in context to normalize non-resource');
+            }
 
             return parent::normalize($object, $format, $context);
         }
