@@ -451,7 +451,7 @@ final class SchemaBuilder implements SchemaBuilderInterface
     {
         $fields = [];
         $idField = ['type' => GraphQLType::nonNull(GraphQLType::id())];
-        $clientMutationId = GraphQLType::nonNull(GraphQLType::string());
+        $clientMutationId = GraphQLType::string();
 
         if ('delete' === $mutationName || (null !== $ioMetadata && null === $ioMetadata['class'])) {
             return [
@@ -469,8 +469,8 @@ final class SchemaBuilder implements SchemaBuilderInterface
                 $propertyMetadata = $this->propertyMetadataFactory->create($resourceClass, $property, ['graphql_operation_name' => $mutationName ?? 'query']);
                 if (
                     null === ($propertyType = $propertyMetadata->getType())
-                    || (!$input && null === $mutationName && false === $propertyMetadata->isReadable())
-                    || (null !== $mutationName && false === $propertyMetadata->isWritable())
+                    || (!$input && false === $propertyMetadata->isReadable())
+                    || ($input && null !== $mutationName && false === $propertyMetadata->isWritable())
                 ) {
                     continue;
                 }

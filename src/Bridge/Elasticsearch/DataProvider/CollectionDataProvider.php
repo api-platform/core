@@ -21,6 +21,8 @@ use ApiPlatform\Core\Bridge\Elasticsearch\Metadata\Document\Factory\DocumentMeta
 use ApiPlatform\Core\DataProvider\ContextAwareCollectionDataProviderInterface;
 use ApiPlatform\Core\DataProvider\Pagination;
 use ApiPlatform\Core\DataProvider\RestrictedDataProviderInterface;
+use ApiPlatform\Core\Exception\ResourceClassNotFoundException;
+use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use Elasticsearch\Client;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
@@ -38,18 +40,20 @@ final class CollectionDataProvider implements ContextAwareCollectionDataProvider
     private $identifierExtractor;
     private $denormalizer;
     private $pagination;
+    private $resourceMetadataFactory;
     private $collectionExtensions;
 
     /**
      * @param RequestBodySearchCollectionExtensionInterface[] $collectionExtensions
      */
-    public function __construct(Client $client, DocumentMetadataFactoryInterface $documentMetadataFactory, IdentifierExtractorInterface $identifierExtractor, DenormalizerInterface $denormalizer, Pagination $pagination, iterable $collectionExtensions = [])
+    public function __construct(Client $client, DocumentMetadataFactoryInterface $documentMetadataFactory, IdentifierExtractorInterface $identifierExtractor, DenormalizerInterface $denormalizer, Pagination $pagination, ResourceMetadataFactoryInterface $resourceMetadataFactory, iterable $collectionExtensions = [])
     {
         $this->client = $client;
         $this->documentMetadataFactory = $documentMetadataFactory;
         $this->identifierExtractor = $identifierExtractor;
         $this->denormalizer = $denormalizer;
         $this->pagination = $pagination;
+        $this->resourceMetadataFactory = $resourceMetadataFactory;
         $this->collectionExtensions = $collectionExtensions;
     }
 
@@ -58,6 +62,15 @@ final class CollectionDataProvider implements ContextAwareCollectionDataProvider
      */
     public function supports(string $resourceClass, ?string $operationName = null, array $context = []): bool
     {
+        try {
+            $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
+            if (false === $resourceMetadata->getCollectionOperationAttribute($operationName, 'elasticsearch', true, true)) {
+                return false;
+            }
+        } catch (ResourceClassNotFoundException $e) {
+            return false;
+        }
+
         try {
             $this->documentMetadataFactory->create($resourceClass);
         } catch (IndexNotFoundException $e) {

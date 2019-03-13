@@ -323,6 +323,7 @@ class ApiPlatformExtensionTest extends TestCase
         $containerBuilderProphecy->setDefinition('api_platform.graphql.executor')->shouldNotBeCalled();
         $containerBuilderProphecy->setDefinition('api_platform.graphql.schema_builder')->shouldNotBeCalled();
         $containerBuilderProphecy->setDefinition('api_platform.graphql.normalizer.item')->shouldNotBeCalled();
+        $containerBuilderProphecy->setDefinition('api_platform.graphql.normalizer.item.non_resource')->shouldNotBeCalled();
         $containerBuilderProphecy->setParameter('api_platform.graphql.enabled', true)->shouldNotBeCalled();
         $containerBuilderProphecy->setParameter('api_platform.graphql.enabled', false)->shouldBeCalled();
         $containerBuilder = $containerBuilderProphecy->reveal();
@@ -789,6 +790,7 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.serializer.property_filter',
             'api_platform.serializer.group_filter',
             'api_platform.serializer.normalizer.item',
+            'api_platform.serializer.normalizer.item.non_resource',
             'api_platform.subresource_data_provider',
             'api_platform.subresource_operation_factory',
             'api_platform.subresource_operation_factory.cached',
@@ -907,6 +909,7 @@ class ApiPlatformExtensionTest extends TestCase
         $definitions = [
             'api_platform.data_collector.request',
             'api_platform.doctrine.listener.http_cache.purge',
+            'api_platform.doctrine.listener.mercure.publish',
             'api_platform.doctrine.metadata_factory',
             'api_platform.doctrine.orm.boolean_filter',
             'api_platform.doctrine.orm.collection_data_provider',
@@ -958,20 +961,16 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.graphql.type_locator',
             'api_platform.graphql.types_factory',
             'api_platform.graphql.normalizer.item',
-            'api_platform.jsonld.normalizer.item',
-            'api_platform.jsonld.encoder',
-            'api_platform.jsonld.action.context',
-            'api_platform.jsonld.context_builder',
-            'api_platform.jsonld.normalizer.item',
-            'api_platform.swagger.normalizer.documentation',
-            'api_platform.swagger.normalizer.api_gateway',
-            'api_platform.swagger.command.swagger_command',
-            'api_platform.swagger.action.ui',
-            'api_platform.swagger.listener.ui',
+            'api_platform.graphql.normalizer.item.non_resource',
             'api_platform.hal.encoder',
             'api_platform.hal.normalizer.collection',
             'api_platform.hal.normalizer.entrypoint',
             'api_platform.hal.normalizer.item',
+            'api_platform.hal.normalizer.item.non_resource',
+            'api_platform.http_cache.listener.response.add_tags',
+            'api_platform.http_cache.listener.response.configure',
+            'api_platform.http_cache.purger.varnish_client',
+            'api_platform.http_cache.purger.varnish',
             'api_platform.hydra.listener.response.add_link_header',
             'api_platform.hydra.normalizer.collection',
             'api_platform.hydra.normalizer.collection_filters',
@@ -984,7 +983,9 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.jsonld.context_builder',
             'api_platform.jsonld.encoder',
             'api_platform.jsonld.normalizer.item',
-            'api_platform.jsonld.normalizer.item',
+            'api_platform.jsonld.normalizer.item.non_resource',
+            'api_platform.mercure.listener.response.add_link_header',
+            'api_platform.messenger.data_persister',
             'api_platform.metadata.extractor.yaml',
             'api_platform.metadata.property.metadata_factory.annotation',
             'api_platform.metadata.property.metadata_factory.yaml',
@@ -1001,15 +1002,12 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.problem.encoder',
             'api_platform.problem.normalizer.constraint_violation_list',
             'api_platform.problem.normalizer.error',
+            'api_platform.swagger.action.ui',
             'api_platform.swagger.command.swagger_command',
-            'api_platform.http_cache.listener.response.configure',
-            'api_platform.http_cache.purger.varnish',
-            'api_platform.http_cache.purger.varnish_client',
-            'api_platform.http_cache.listener.response.add_tags',
+            'api_platform.swagger.listener.ui',
+            'api_platform.swagger.normalizer.api_gateway',
+            'api_platform.swagger.normalizer.documentation',
             'api_platform.validator',
-            'api_platform.mercure.listener.response.add_link_header',
-            'api_platform.doctrine.listener.mercure.publish',
-            'api_platform.messenger.data_persister',
         ];
 
         foreach ($definitions as $definition) {

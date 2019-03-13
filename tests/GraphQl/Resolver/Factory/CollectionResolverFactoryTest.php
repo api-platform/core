@@ -46,7 +46,7 @@ class CollectionResolverFactoryTest extends TestCase
         $factory = $this->createCollectionResolverFactory([], [], ['id' => 1], $paginationEnabled);
         $resolver = $factory(RelatedDummy::class, Dummy::class, 'operationName');
 
-        $resolveInfo = new ResolveInfo('relatedDummies', [], null, new ObjectType(['name' => '']), '', new Schema([]), null, null, null, null);
+        $resolveInfo = new ResolveInfo('relatedDummies', [], new ObjectType(['name' => '']), new ObjectType(['name' => '']), [], new Schema([]), [], null, null, []);
 
         $this->assertEquals($expected, $resolver(null, [], null, $resolveInfo));
     }
@@ -68,7 +68,7 @@ class CollectionResolverFactoryTest extends TestCase
 
         $resolver = $factory(RelatedDummy::class, Dummy::class, 'operationName');
 
-        $resolveInfo = new ResolveInfo('rootProperty', [], null, new ObjectType(['name' => '']), '', new Schema([]), null, null, null, null);
+        $resolveInfo = new ResolveInfo('rootProperty', [], new ObjectType(['name' => '']), new ObjectType(['name' => '']), [], new Schema([]), [], null, null, []);
 
         $this->assertEquals(['normalizedObject1', 'normalizedObject2'], $resolver(null, [], null, $resolveInfo));
     }
@@ -86,7 +86,7 @@ class CollectionResolverFactoryTest extends TestCase
 
         $resolver = $factory(RelatedDummy::class, Dummy::class, 'operationName');
 
-        $resolveInfo = new ResolveInfo('relatedDummies', [], null, new ObjectType(['name' => '']), '', new Schema([]), null, null, null, null);
+        $resolveInfo = new ResolveInfo('relatedDummies', [], new ObjectType(['name' => '']), new ObjectType(['name' => '']), [], new Schema([]), [], null, null, []);
 
         $source = [
             'relatedDummies' => [],
@@ -116,7 +116,7 @@ class CollectionResolverFactoryTest extends TestCase
 
         $resolver = $factory(RelatedDummy::class, Dummy::class, 'operationName');
 
-        $resolveInfo = new ResolveInfo('relatedDummies', [], null, new ObjectType(['name' => '']), '', new Schema([]), null, null, null, null);
+        $resolveInfo = new ResolveInfo('relatedDummies', [], new ObjectType(['name' => '']), new ObjectType(['name' => '']), [], new Schema([]), [], null, null, []);
 
         if ('$bad$' === $cursor) {
             $this->expectException(\Exception::class);
@@ -159,7 +159,7 @@ class CollectionResolverFactoryTest extends TestCase
         $resolverFactory = $this->createCollectionResolverFactory($collectionPaginatorProphecy->reveal(), [], [], true, $cursor);
         $resolver = $resolverFactory(RelatedDummy::class, Dummy::class, 'operationName');
 
-        $resolveInfo = new ResolveInfo('relatedDummies', [], null, new ObjectType(['name' => '']), '', new Schema([]), null, null, null, null);
+        $resolveInfo = new ResolveInfo('relatedDummies', [], new ObjectType(['name' => '']), new ObjectType(['name' => '']), [], new Schema([]), [], null, null, []);
 
         $this->assertEquals(
             ['edges' => [['node' => 'normalizedObject1', 'cursor' => 'Mg==']], 'pageInfo' => ['startCursor' => 'Mg==', 'endCursor' => 'OQ==', 'hasNextPage' => true, 'hasPreviousPage' => true], 'totalCount' => 17.],

@@ -33,8 +33,16 @@ final class MetadataAwareNameConverterPass implements CompilerPassInterface
      */
     public function process(ContainerBuilder $container)
     {
-        if (!$container->hasAlias('api_platform.name_converter') && $container->hasDefinition('serializer.name_converter.metadata_aware')) {
-            $container->setAlias('api_platform.name_converter', 'serializer.name_converter.metadata_aware');
+        if ($container->hasAlias('api_platform.name_converter') || !$container->hasDefinition('serializer.name_converter.metadata_aware')) {
+            return;
         }
+
+        $definition = $container->getDefinition('serializer.name_converter.metadata_aware');
+
+        if (1 >= \count($definition->getArguments()) || null === $definition->getArgument(1)) {
+            return;
+        }
+
+        $container->setAlias('api_platform.name_converter', 'serializer.name_converter.metadata_aware');
     }
 }

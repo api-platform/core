@@ -35,7 +35,6 @@ class ItemNormalizerTest extends TestCase
 {
     /**
      * @group legacy
-     * @expectedDeprecation Passing a falsy $allowUnmappedClass flag in ApiPlatform\Core\Serializer\AbstractItemNormalizer is deprecated since version 2.4 and will default to true in 3.0.
      */
     public function testSupportNormalization()
     {
@@ -78,9 +77,9 @@ class ItemNormalizerTest extends TestCase
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyNameCollectionFactoryProphecy->create(Dummy::class, [])->willReturn($propertyNameCollection)->shouldBeCalled();
 
-        $propertyMetadataFactory = new PropertyMetadata(null, null, true);
+        $propertyMetadata = new PropertyMetadata(null, null, true);
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
-        $propertyMetadataFactoryProphecy->create(Dummy::class, 'name', [])->willReturn($propertyMetadataFactory)->shouldBeCalled();
+        $propertyMetadataFactoryProphecy->create(Dummy::class, 'name', [])->willReturn($propertyMetadata)->shouldBeCalled();
 
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
         $iriConverterProphecy->getIriFromItem($dummy)->willReturn('/dummies/1')->shouldBeCalled();
@@ -109,7 +108,7 @@ class ItemNormalizerTest extends TestCase
             null,
             [],
             null,
-            true
+            false
         );
         $normalizer->setSerializer($serializerProphecy->reveal());
 
@@ -124,9 +123,9 @@ class ItemNormalizerTest extends TestCase
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyNameCollectionFactoryProphecy->create(Dummy::class, [])->willReturn($propertyNameCollection)->shouldBeCalled();
 
-        $propertyMetadataFactory = new PropertyMetadata(null, null, true, true);
+        $propertyMetadata = new PropertyMetadata(null, null, true, true);
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
-        $propertyMetadataFactoryProphecy->create(Dummy::class, 'name', [])->willReturn($propertyMetadataFactory)->shouldBeCalled();
+        $propertyMetadataFactoryProphecy->create(Dummy::class, 'name', [])->willReturn($propertyMetadata)->shouldBeCalled();
 
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
 
@@ -151,7 +150,7 @@ class ItemNormalizerTest extends TestCase
             null,
             [],
             null,
-            true
+            false
         );
         $normalizer->setSerializer($serializerProphecy->reveal());
 

@@ -125,8 +125,7 @@ final class CollectionResolverFactory implements ResolverFactoryInterface
             $offset = 0 > $offset ? 0 : $offset;
 
             $data = ['totalCount' => 0., 'edges' => [], 'pageInfo' => ['startCursor' => null, 'endCursor' => null, 'hasNextPage' => false, 'hasPreviousPage' => false]];
-
-            if ($totalItems > 0) {
+            if ($collection instanceof PaginatorInterface && ($totalItems = $collection->getTotalItems()) > 0) {
                 $data['totalCount'] = $totalItems;
                 $data['pageInfo']['startCursor'] = base64_encode((string) $offset);
                 $data['pageInfo']['endCursor'] = base64_encode((string) ($offset + $nbPageItems - 1));

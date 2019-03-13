@@ -47,7 +47,7 @@ class ItemMutationResolverFactoryTest extends TestCase
         $resolverFactory = $this->createItemMutationResolverFactory(null, $dataPersisterProphecy);
         $resolver = $resolverFactory(Dummy::class, Dummy::class, 'delete');
 
-        $resolveInfo = new ResolveInfo('', [], null, new ObjectType(['name' => '']), '', new Schema([]), null, null, null, null);
+        $resolveInfo = new ResolveInfo('', [], new ObjectType(['name' => '']), new ObjectType(['name' => '']), [], new Schema([]), [], null, null, []);
 
         $resolver(null, ['input' => ['id' => '/dummies/3', 'clientMutationId' => '1936']], null, $resolveInfo);
     }
@@ -61,7 +61,7 @@ class ItemMutationResolverFactoryTest extends TestCase
         $resolverFactory = $this->createItemMutationResolverFactory($dummy, $dataPersisterProphecy);
         $resolver = $resolverFactory(Dummy::class, null, 'delete');
 
-        $resolveInfo = new ResolveInfo('', [], null, new ObjectType(['name' => '']), '', new Schema([]), null, null, null, null);
+        $resolveInfo = new ResolveInfo('', [], new ObjectType(['name' => '']), new ObjectType(['name' => '']), [], new Schema([]), [], null, null, []);
 
         $this->assertEquals(['id' => '/dummies/3', 'clientMutationId' => '1936'], $resolver(null, ['input' => ['id' => '/dummies/3', 'clientMutationId' => '1936']], null, $resolveInfo));
     }
