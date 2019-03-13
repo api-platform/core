@@ -421,14 +421,22 @@ final class SchemaBuilder implements SchemaBuilderInterface
             $resourceClass = $ioMetadata['class'];
         }
 
+        $wrapObject = null !== $mutationName && 'delete' !== $mutationName && !$input;
+
         $configuration = [
             'name' => $shortName,
             'description' => $resourceMetadata->getDescription(),
             'resolveField' => $this->defaultFieldResolver,
-            'fields' => function () use ($resourceClass, $resourceMetadata, $input, $mutationName, $depth, $ioMetadata) {
+            'fields' => function () use ($resourceClass, $resourceMetadata, $input, $mutationName, $depth, $ioMetadata, $wrapObject) {
+                if ($wrapObject) {
+                    return [
+                        lcfirst($resourceMetadata->getShortName()) => $this->getResourceObjectType($resourceClass, $resourceMetadata),
+                        'clientMutationId' => GraphQLType::string(),
+                    ];
+                }
                 return $this->getResourceObjectTypeFields($resourceClass, $resourceMetadata, $input, $mutationName, $depth, $ioMetadata);
             },
-            'interfaces' => [$this->getNodeInterface()],
+            'interfaces' => $wrapObject ? [] : [$this->getNodeInterface()],
         ];
 
         return $this->graphqlTypes[$shortName] = $input ? new InputObjectType($configuration) : new ObjectType($configuration);

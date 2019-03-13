@@ -45,8 +45,10 @@ Feature: Authorization checking
     """
     mutation {
       createSecuredDummy(input: {owner: "me", title: "Hi", description: "Desc", clientMutationId: "auth"}) {
-        title
-        owner
+        securedDummy {
+          title
+          owner
+        }
       }
     }
     """

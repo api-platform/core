@@ -79,6 +79,10 @@ final class ItemMutationResolverFactory implements ResolverFactoryInterface
             $normalizationContext = $resourceMetadata->getGraphqlAttribute($operationName ?? '', 'normalization_context', [], true);
             $normalizationContext['attributes'] = $this->fieldsToAttributes($info);
 
+            if ('delete' !== $operationName && isset($normalizationContext['attributes'][lcfirst($resourceMetadata->getShortName())])) {
+                $normalizationContext['attributes'] = $normalizationContext['attributes'][lcfirst($resourceMetadata->getShortName())];
+            }
+
             if (isset($args['input']['id'])) {
                 try {
                     $item = $this->iriConverter->getItemFromIri($args['input']['id'], $normalizationContext);
@@ -112,7 +116,7 @@ final class ItemMutationResolverFactory implements ResolverFactoryInterface
                         @trigger_error(sprintf('Returning void from %s::persist() is deprecated since API Platform 2.3 and will not be supported in API Platform 3, an object should always be returned.', DataPersisterInterface::class), E_USER_DEPRECATED);
                     }
 
-                    return $this->normalizer->normalize($persistResult ?? $item, ItemNormalizer::FORMAT, $normalizationContext) + $data;
+                    return [lcfirst($resourceMetadata->getShortName()) => $this->normalizer->normalize($persistResult ?? $item, ItemNormalizer::FORMAT, $normalizationContext)] + $data;
                 case 'delete':
                     if ($item) {
                         $this->dataPersister->remove($item);
