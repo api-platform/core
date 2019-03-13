@@ -29,9 +29,9 @@ final class ItemNormalizer extends BaseItemNormalizer
     /**
      * {@inheritdoc}
      */
-    public function supportsNormalization($data, $format = null)
+    public function supportsNormalization($data, $format = null, array $context = [])
     {
-        return self::FORMAT === $format && parent::supportsNormalization($data, $format);
+        return self::FORMAT === $format && parent::supportsNormalization($data, $format, $context);
     }
 
     /**
@@ -58,9 +58,9 @@ final class ItemNormalizer extends BaseItemNormalizer
     /**
      * {@inheritdoc}
      */
-    public function supportsDenormalization($data, $type, $format = null)
+    public function supportsDenormalization($data, $type, $format = null, array $context = [])
     {
-        return self::FORMAT === $format && parent::supportsDenormalization($data, $type, $format);
+        return self::FORMAT === $format && parent::supportsDenormalization($data, $type, $format, $context);
     }
 
     /**

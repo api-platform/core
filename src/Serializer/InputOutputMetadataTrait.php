@@ -14,11 +14,12 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Serializer;
 
 use ApiPlatform\Core\Exception\ResourceClassNotFoundException;
+use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 
 trait InputOutputMetadataTrait
 {
     /**
-     * @var \ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface
+     * @var ResourceMetadataFactoryInterface
      */
     protected $resourceMetadataFactory;
 

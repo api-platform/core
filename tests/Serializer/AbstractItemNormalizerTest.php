@@ -52,7 +52,6 @@ class AbstractItemNormalizerTest extends TestCase
 {
     /**
      * @group legacy
-     * @expectedDeprecation Passing a falsy $allowUnmappedClass flag in ApiPlatform\Core\Serializer\AbstractItemNormalizer is deprecated since version 2.4 and will default to true in 3.0.
      */
     public function testLegacySupportNormalizationAndSupportDenormalization()
     {
@@ -94,6 +93,8 @@ class AbstractItemNormalizerTest extends TestCase
         $propertyAccessorProphecy = $this->prophesize(PropertyAccessorInterface::class);
 
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
+        $resourceClassResolverProphecy->isResourceClass(Dummy::class)->willReturn(true);
+        $resourceClassResolverProphecy->isResourceClass(\stdClass::class)->willReturn(false);
 
         $normalizer = $this->getMockForAbstractClass(AbstractItemNormalizer::class, [
             $propertyNameCollectionFactoryProphecy->reveal(),
@@ -108,13 +109,13 @@ class AbstractItemNormalizerTest extends TestCase
             [],
             [],
             null,
-            true,
+            false,
         ]);
 
         $this->assertTrue($normalizer->supportsNormalization($dummy));
-        $this->assertTrue($normalizer->supportsNormalization($std));
+        $this->assertFalse($normalizer->supportsNormalization($std));
         $this->assertTrue($normalizer->supportsDenormalization($dummy, Dummy::class));
-        $this->assertTrue($normalizer->supportsDenormalization($std, \stdClass::class));
+        $this->assertFalse($normalizer->supportsDenormalization($std, \stdClass::class));
         $this->assertTrue($normalizer->hasCacheableSupportsMethod());
     }
 
@@ -192,7 +193,7 @@ class AbstractItemNormalizerTest extends TestCase
             [],
             [],
             null,
-            true,
+            false,
         ]);
         $normalizer->setSerializer($serializerProphecy->reveal());
 
@@ -271,7 +272,7 @@ class AbstractItemNormalizerTest extends TestCase
             [],
             [],
             null,
-            true,
+            false,
         ]);
         $normalizer->setSerializer($serializerProphecy->reveal());
 
@@ -349,7 +350,7 @@ class AbstractItemNormalizerTest extends TestCase
             [],
             [],
             null,
-            true,
+            false,
         ]);
         $normalizer->setSerializer($serializerProphecy->reveal());
 
@@ -386,7 +387,7 @@ class AbstractItemNormalizerTest extends TestCase
             (new PropertyMetadata(new Type(Type::BUILTIN_TYPE_STRING), '', true, false))->withInitializable(true)
         );
 
-        $normalizer = new class($propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), $this->prophesize(IriConverterInterface::class)->reveal(), $this->prophesize(ResourceClassResolverInterface::class)->reveal(), null, null, null, null, false, [], [], null, true) extends AbstractItemNormalizer {
+        $normalizer = new class($propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), $this->prophesize(IriConverterInterface::class)->reveal(), $this->prophesize(ResourceClassResolverInterface::class)->reveal(), null, null, null, null, false, [], [], null, false) extends AbstractItemNormalizer {
         };
 
         /** @var DummyForAdditionalFieldsInput $res */
@@ -471,7 +472,7 @@ class AbstractItemNormalizerTest extends TestCase
             [],
             [],
             null,
-            true,
+            false,
         ]);
         $normalizer->setSerializer($serializerProphecy->reveal());
 
@@ -526,7 +527,7 @@ class AbstractItemNormalizerTest extends TestCase
             [],
             [],
             null,
-            true,
+            false,
         ]);
         $normalizer->setSerializer($serializerProphecy->reveal());
 
@@ -577,7 +578,7 @@ class AbstractItemNormalizerTest extends TestCase
             [],
             [],
             null,
-            true,
+            false,
         ]);
         $normalizer->setSerializer($serializerProphecy->reveal());
 
@@ -619,7 +620,7 @@ class AbstractItemNormalizerTest extends TestCase
             [],
             [],
             null,
-            true,
+            false,
         ]);
         $normalizer->setSerializer($serializerProphecy->reveal());
 
@@ -658,7 +659,7 @@ class AbstractItemNormalizerTest extends TestCase
             [],
             [],
             null,
-            true,
+            false,
         ]);
         $normalizer->setSerializer($serializerProphecy->reveal());
 
@@ -698,7 +699,7 @@ class AbstractItemNormalizerTest extends TestCase
             [],
             [],
             null,
-            true,
+            false,
         ]);
         $normalizer->setSerializer($serializerProphecy->reveal());
 
@@ -755,7 +756,7 @@ class AbstractItemNormalizerTest extends TestCase
             [],
             [],
             null,
-            true,
+            false,
         ]);
         $normalizer->setSerializer($serializerProphecy->reveal());
 
@@ -798,7 +799,7 @@ class AbstractItemNormalizerTest extends TestCase
             [],
             [],
             null,
-            true,
+            false,
         ]);
         $normalizer->setSerializer($serializerProphecy->reveal());
 
@@ -851,7 +852,7 @@ class AbstractItemNormalizerTest extends TestCase
             [],
             [],
             null,
-            true,
+            false,
         ]);
         $normalizer->setSerializer($serializerProphecy->reveal());
 
@@ -908,7 +909,7 @@ class AbstractItemNormalizerTest extends TestCase
             [],
             [],
             null,
-            true,
+            false,
         ]);
         $normalizer->setSerializer($serializerProphecy->reveal());
 
@@ -1016,32 +1017,11 @@ class AbstractItemNormalizerTest extends TestCase
             [],
             [],
             null,
-            true,
+            false,
         ]);
         $normalizer->setSerializer($serializerProphecy->reveal());
 
         $normalizer->denormalize(['relatedDummy' => 1], Dummy::class, 'jsonld');
-    }
-
-    /**
-     * @group legacy
-     * @expectedDeprecation Passing a falsy $allowUnmappedClass flag in ApiPlatform\Core\Serializer\AbstractItemNormalizer is deprecated since version 2.4 and will default to true in 3.0.
-     */
-    public function testDisallowUnmappedClass()
-    {
-        $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
-        $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
-        $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
-        $propertyAccessorProphecy = $this->prophesize(PropertyAccessorInterface::class);
-        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
-
-        $this->getMockForAbstractClass(AbstractItemNormalizer::class, [
-            $propertyNameCollectionFactoryProphecy->reveal(),
-            $propertyMetadataFactoryProphecy->reveal(),
-            $iriConverterProphecy->reveal(),
-            $resourceClassResolverProphecy->reveal(),
-            $propertyAccessorProphecy->reveal(),
-        ]);
     }
 
     /**
@@ -1124,7 +1104,7 @@ class AbstractItemNormalizerTest extends TestCase
             [],
             [$dataTransformerProphecy->reveal(), $secondDataTransformerProphecy->reveal()],
             $resourceMetadataFactoryProphecy->reveal(),
-            true,
+            false,
         ]);
         $normalizer->setSerializer($serializerProphecy->reveal());
 

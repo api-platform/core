@@ -44,12 +44,12 @@ final class WriteListener
     public function onKernelView(GetResponseForControllerResultEvent $event)
     {
         $request = $event->getRequest();
-        if ($request->isMethodSafe(false) || !$request->attributes->getBoolean('_api_persist', true) || !$attributes = RequestAttributesExtractor::extractAttributes($request)) {
+        if ($request->isMethodSafe(false) || !($attributes = RequestAttributesExtractor::extractAttributes($request)) || !$attributes['persist']) {
             return;
         }
 
         $controllerResult = $event->getControllerResult();
-        if (!$this->dataPersister->supports($controllerResult)) {
+        if (!$this->dataPersister->supports($controllerResult, $attributes)) {
             return;
         }
 
@@ -57,7 +57,7 @@ final class WriteListener
             case 'PUT':
             case 'PATCH':
             case 'POST':
-                $persistResult = $this->dataPersister->persist($controllerResult);
+                $persistResult = $this->dataPersister->persist($controllerResult, $attributes);
 
                 if (null === $persistResult) {
                     @trigger_error(sprintf('Returning void from %s::persist() is deprecated since API Platform 2.3 and will not be supported in API Platform 3, an object should always be returned.', DataPersisterInterface::class), E_USER_DEPRECATED);

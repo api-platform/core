@@ -22,7 +22,7 @@ parameters:
         - '#Parameter \#1 \$function of function call_user_func expects callable, .+ given\.#'
         - '#Parameter \#1 \$classes of class ApiPlatform\\Core\\Metadata\\Resource\\ResourceNameCollection constructor expects array<string>, array<int, int\|string> given\.#'
         - '#Method ApiPlatform\\Core\\Util\\RequestParser::parseRequestParams\(\) should return array but returns array\|false\.#'
-        - '#Parameter \#1 \$vars of class GraphQL\\Language\\AST\\(IntValue|ObjectField|ObjectValue|BooleanValue|ListValue|StringValue)Node constructor expects array<GraphQL\\Language\\AST\\Location\|GraphQL\\Language\\AST\\NameNode\|GraphQL\\Language\\AST\\NodeList\|GraphQL\\Language\\AST\\SelectionSetNode\|string\|null>, array<string, .+> given\.#'
+        - '#Parameter \#1 \$vars of class GraphQL\\Language\\AST\\(IntValue|ObjectField|ObjectValue|BooleanValue|ListValue|StringValue)Node constructor expects array<bool\|float\|GraphQL\\Language\\AST\\Location\|GraphQL\\Language\\AST\\NameNode\|GraphQL\\Language\\AST\\NodeList\|GraphQL\\Language\\AST\\SelectionSetNode\|int\|string\|null>, array<string, .+> given\.#'
         - '#Parameter \#1 \$defaultContext of class Symfony\\Component\\Serializer\\Encoder\\Json(De|En)code constructor expects array, (int|true) given\.#'
         - '#Parameter \#(2|3) \$(resourceMetadataFactory|pagination) of class ApiPlatform\\Core\\Bridge\\Doctrine\\Orm\\Extension\\PaginationExtension constructor expects (ApiPlatform\\Core\\Metadata\\Resource\\Factory\\ResourceMetadataFactoryInterface\|Symfony\\Component\\HttpFoundation\\RequestStack|ApiPlatform\\Core\\DataProvider\\Pagination\|ApiPlatform\\Core\\Metadata\\Resource\\Factory\\ResourceMetadataFactoryInterface), stdClass given\.#'
         # Temporary fix while the PHPStan extension for Prophecy isn't compatible with 0.10
@@ -36,6 +36,11 @@ parameters:
         - '#Strict comparison using === between null and int will always evaluate to false\.#'
         - '#Strict comparison using !== between null and null will always evaluate to false\.#'
         - '#Method ApiPlatform\\Core\\(Serializer\\Abstract|JsonApi\\Serializer\\)ItemNormalizer::normalizeRelation\(\) should return array\|string but returns array\|bool\|float\|int\|string\.#'
+        - '#Binary operation "\+" between (float\|int\|)?string and 0 results in an error\.#'
+        # PHPStan 0.11:
+        #-
+        #    message: '#Binary operation "\+" between (float\|int\|)?string and 0 results in an error\.#'
+        #    path: %currentWorkingDirectory%/src/Bridge/Doctrine/Common/Filter/RangeFilterTrait.php
 
         # Expected, due to deprecations
         - '#Method ApiPlatform\\Core\\Bridge\\Doctrine\\Orm\\Extension\\QueryResult(Item|Collection)ExtensionInterface::getResult\(\) invoked with 4 parameters, 1 required\.#'

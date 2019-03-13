@@ -37,7 +37,7 @@ class ItemResolverTest extends TestCase
     {
         $resolver = $this->createItemResolver(null);
 
-        $resolveInfo = new ResolveInfo('name', [], null, new ObjectType(['name' => '']), '', new Schema([]), null, null, null, null);
+        $resolveInfo = new ResolveInfo('name', [], new ObjectType(['name' => '']), new ObjectType(['name' => '']), [], new Schema([]), [], null, null, []);
 
         $this->assertNull($resolver(null, ['id' => '/related_dummies/3'], null, $resolveInfo));
     }
@@ -46,7 +46,7 @@ class ItemResolverTest extends TestCase
     {
         $resolver = $this->createItemResolver(new RelatedDummy());
 
-        $resolveInfo = new ResolveInfo('name', [], null, new ObjectType(['name' => '']), '', new Schema([]), null, null, null, null);
+        $resolveInfo = new ResolveInfo('name', [], new ObjectType(['name' => '']), new ObjectType(['name' => '']), [], new Schema([]), [], null, null, []);
 
         $this->assertEquals('normalizedItem', $resolver(null, ['id' => '/related_dummies/3'], null, $resolveInfo));
     }
@@ -58,7 +58,7 @@ class ItemResolverTest extends TestCase
     {
         $resolver = $this->createItemResolver(new Dummy());
 
-        $resolveInfo = new ResolveInfo('relatedDummy', [], null, new ObjectType(['name' => '']), '', new Schema([]), null, null, null, null);
+        $resolveInfo = new ResolveInfo('relatedDummy', [], new ObjectType(['name' => '']), new ObjectType(['name' => '']), [], new Schema([]), [], null, null, []);
 
         $this->assertEquals($normalizedSubresource, $resolver(['relatedDummy' => $normalizedSubresource], [], null, $resolveInfo));
     }
