@@ -14,7 +14,9 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\GraphQl\Resolver;
 
 use ApiPlatform\Core\Api\IriConverterInterface;
+use ApiPlatform\Core\Api\ResourceClassResolverInterface;
 use ApiPlatform\Core\GraphQl\Serializer\ItemNormalizer;
+use ApiPlatform\Core\Util\ClassInfoTrait;
 use GraphQL\Type\Definition\ResolveInfo;
 
 /**
@@ -26,22 +28,29 @@ use GraphQL\Type\Definition\ResolveInfo;
  */
 final class ResourceFieldResolver
 {
-    private $iriConverter;
+    use ClassInfoTrait;
 
-    public function __construct(IriConverterInterface $iriConverter)
+    private $iriConverter;
+    private $resourceClassResolver;
+
+    public function __construct(IriConverterInterface $iriConverter, ResourceClassResolverInterface $resourceClassResolver)
     {
         $this->iriConverter = $iriConverter;
+        $this->resourceClassResolver = $resourceClassResolver;
     }
 
     public function __invoke($source, $args, $context, ResolveInfo $info)
     {
         $property = null;
         if ('id' === $info->fieldName && isset($source[ItemNormalizer::ITEM_KEY])) {
-            return $this->iriConverter->getIriFromItem(unserialize($source[ItemNormalizer::ITEM_KEY]));
+            $object = unserialize($source[ItemNormalizer::ITEM_KEY]);
+            if ($this->resourceClassResolver->isResourceClass($this->getObjectClass($object))) {
+                return $this->iriConverter->getIriFromItem($object);
+            }
         }
 
         if ('_id' === $info->fieldName && isset($source['id'])) {
-            $property = $source['id'];
+            $property = $source['_id'] ?? $source['id'];
         } elseif (\is_array($source) && isset($source[$info->fieldName])) {
             $property = $source[$info->fieldName];
         } elseif (isset($source->{$info->fieldName})) {

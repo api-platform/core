@@ -54,6 +54,7 @@ final class ItemNormalizer extends BaseItemNormalizer
 
             $context['api_normalize'] = true;
             $context['resource_class'] = $this->getObjectClass($transformed);
+            $context['origin_resource'] = $object;
 
             return $this->serializer->normalize($transformed, $format, $context);
         }
@@ -61,6 +62,12 @@ final class ItemNormalizer extends BaseItemNormalizer
         $data = parent::normalize($object, $format, $context);
         if (!\is_array($data)) {
             throw new UnexpectedValueException('Expected data to be an array');
+        }
+
+        if (($context['origin_resource'] ?? false) && isset($data['id'])) {
+            $data['_id'] = $data['id'];
+            $data['id'] = $this->iriConverter->getIriFromItem($context['origin_resource']);
+            unset($context['origin_resource']);
         }
 
         $data[self::ITEM_KEY] = serialize($object); // calling serialize prevent weird normalization process done by Webonyx's GraphQL PHP

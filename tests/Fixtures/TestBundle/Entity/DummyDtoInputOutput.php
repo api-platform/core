@@ -30,7 +30,7 @@ class DummyDtoInputOutput
 {
     /**
      * @var int The id
-     * @ORM\Column(type="integer", nullable=true)
+     * @ORM\Column(type="integer")
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
      */

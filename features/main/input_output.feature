@@ -244,7 +244,7 @@ Feature: DTO input and output
     """
     {
       dummyDtoInputOutput(id: "/dummy_dto_input_outputs/1") {
-        baz
+        _id, id, baz
       }
     }
     """
@@ -254,6 +254,8 @@ Feature: DTO input and output
     {
       "data": {
         "dummyDtoInputOutput": {
+          "_id": 1,
+          "id": "/dummy_dto_input_outputs/1",
           "baz": 1
         }
       }

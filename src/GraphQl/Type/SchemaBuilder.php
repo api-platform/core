@@ -342,7 +342,6 @@ final class SchemaBuilder implements SchemaBuilderInterface
      */
     private function convertType(Type $type, bool $input = false, string $mutationName = null, int $depth = 0)
     {
-        $resourceClass = null;
         switch ($builtinType = $type->getBuiltinType()) {
             case Type::BUILTIN_TYPE_BOOL:
                 $graphqlType = GraphQLType::boolean();
@@ -402,6 +401,12 @@ final class SchemaBuilder implements SchemaBuilderInterface
     private function getResourceObjectType(?string $resourceClass, ResourceMetadata $resourceMetadata, bool $input = false, string $mutationName = null, int $depth = 0): GraphQLType
     {
         $shortName = $resourceMetadata->getShortName();
+        $ioMetadata = $resourceMetadata->getAttribute($input ? 'input' : 'output');
+
+        if (null !== $ioMetadata && \array_key_exists('class', $ioMetadata) && null !== $ioMetadata['class']) {
+            $resourceClass = $ioMetadata['class'];
+            $shortName = $ioMetadata['name'];
+        }
         if (null !== $mutationName) {
             $shortName = $mutationName.ucfirst($shortName);
         }
@@ -413,12 +418,6 @@ final class SchemaBuilder implements SchemaBuilderInterface
 
         if (isset($this->graphqlTypes[$shortName])) {
             return $this->graphqlTypes[$shortName];
-        }
-
-        $ioMetadata = $resourceMetadata->getAttribute($input ? 'input' : 'output');
-
-        if (null !== $ioMetadata && \array_key_exists('class', $ioMetadata) && null !== $ioMetadata['class']) {
-            $resourceClass = $ioMetadata['class'];
         }
 
         $configuration = [

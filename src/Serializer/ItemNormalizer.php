@@ -54,7 +54,6 @@ class ItemNormalizer extends AbstractItemNormalizer
      */
     public function normalize($object, $format = null, array $context = [])
     {
-        $context['api_normalize'] = true;
         if (!$this->handleNonResource && $object !== $transformed = $this->transformOutput($object, $context)) {
             if (!$this->serializer instanceof NormalizerInterface) {
                 throw new LogicException('Cannot normalize the transformed value because the injected serializer is not a normalizer');
