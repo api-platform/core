@@ -15,7 +15,6 @@ namespace ApiPlatform\Core\JsonLd\Serializer;
 
 use ApiPlatform\Core\Api\IriConverterInterface;
 use ApiPlatform\Core\Api\ResourceClassResolverInterface;
-use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\JsonLd\ContextBuilderInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
@@ -25,9 +24,9 @@ use ApiPlatform\Core\Serializer\ContextTrait;
 use ApiPlatform\Core\Util\ClassInfoTrait;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\Serializer\Exception\LogicException;
+use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
-use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 /**
  * Converts between objects and array including JSON-LD and Hydra metadata.
@@ -61,24 +60,22 @@ final class ItemNormalizer extends AbstractItemNormalizer
 
     /**
      * {@inheritdoc}
+     *
+     * @throws LogicException
      */
     public function normalize($object, $format = null, array $context = [])
     {
-        if (!$this->handleNonResource && $object !== $transformed = $this->transformOutput($object, $context)) {
-            if (!$this->serializer instanceof NormalizerInterface) {
-                throw new LogicException('Cannot normalize the transformed value because the injected serializer is not a normalizer');
-            }
-
-            $context['api_normalize'] = true;
-            $context['resource_class'] = $this->getObjectClass($transformed);
-            $context['origin_resource'] = $object;
-
-            return $this->serializer->normalize($transformed, $format, $context);
+        if (!$this->handleNonResource && null !== $outputClass = $this->getOutputClass($this->getObjectClass($object), $context)) {
+            return parent::normalize($object, $format, $context);
         }
 
-        if ($this->handleNonResource && $context['api_normalize'] ?? false) {
-            if (($context['origin_resource'] ?? false)) {
-                $context['output']['iri'] = $this->iriConverter->getIriFromItem($context['origin_resource']);
+        if ($this->handleNonResource) {
+            if (!($context['api_normalize'] ?? false)) {
+                throw new LogicException('"api_normalize" must be set to true in context to normalize non-resource');
+            }
+
+            if (isset($context['api_resource'])) {
+                $context['output']['iri'] = $this->iriConverter->getIriFromItem($context['api_resource']);
             }
 
             $data = $this->createJsonLdContext($this->contextBuilder, $object, $context);
@@ -120,14 +117,14 @@ final class ItemNormalizer extends AbstractItemNormalizer
     /**
      * {@inheritdoc}
      *
-     * @throws InvalidArgumentException
+     * @throws NotNormalizableValueException
      */
     public function denormalize($data, $class, $format = null, array $context = [])
     {
         // Avoid issues with proxies if we populated the object
         if (isset($data['@id']) && !isset($context[self::OBJECT_TO_POPULATE])) {
             if (isset($context['api_allow_update']) && true !== $context['api_allow_update']) {
-                throw new InvalidArgumentException('Update is not allowed for this operation.');
+                throw new NotNormalizableValueException('Update is not allowed for this operation.');
             }
 
             $context[self::OBJECT_TO_POPULATE] = $this->iriConverter->getItemFromIri($data['@id'], $context + ['fetch_data' => true]);

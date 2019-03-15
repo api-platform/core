@@ -42,16 +42,15 @@ final class ResourceFieldResolver
     public function __invoke($source, $args, $context, ResolveInfo $info)
     {
         $property = null;
-        if ('id' === $info->fieldName && isset($source[ItemNormalizer::ITEM_KEY])) {
+        if ('id' === $info->fieldName && !isset($source['_id']) && isset($source[ItemNormalizer::ITEM_KEY])) {
             $object = unserialize($source[ItemNormalizer::ITEM_KEY]);
             if ($this->resourceClassResolver->isResourceClass($this->getObjectClass($object))) {
                 return $this->iriConverter->getIriFromItem($object);
             }
         }
 
-        if ('_id' === $info->fieldName && isset($source['id'])) {
-            // if we set _id in the normalizer we take it
-            $property = $source['_id'] ?? $source['id'];
+        if ('_id' === $info->fieldName && !isset($source['_id']) && isset($source['id'])) {
+            $property = $source['id'];
         } elseif (\is_array($source) && isset($source[$info->fieldName])) {
             $property = $source[$info->fieldName];
         } elseif (isset($source->{$info->fieldName})) {

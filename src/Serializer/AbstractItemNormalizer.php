@@ -29,6 +29,7 @@ use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\PropertyInfo\Type;
+use Symfony\Component\Serializer\Exception\LogicException;
 use Symfony\Component\Serializer\Exception\MissingConstructorArgumentsException;
 use Symfony\Component\Serializer\Exception\RuntimeException;
 use Symfony\Component\Serializer\Exception\UnexpectedValueException;
@@ -114,14 +115,29 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer implement
 
     /**
      * {@inheritdoc}
+     *
+     * @throws LogicException
      */
     public function normalize($object, $format = null, array $context = [])
     {
-        if ($this->handleNonResource) {
-            $context = $this->initContext($this->getObjectClass($object), $context);
-            if (!($context['api_normalize'] ?? false)) {
-                throw new UnexpectedValueException('"api_normalize" must be set to true in context to normalize non-resource');
+        if (!$this->handleNonResource && $object !== $transformed = $this->transformOutput($object, $context)) {
+            if (!$this->serializer instanceof NormalizerInterface) {
+                throw new RuntimeException('Cannot normalize the transformed value because the injected serializer is not a normalizer');
             }
+
+            $context['api_normalize'] = true;
+            $context['resource_class'] = $this->getObjectClass($transformed);
+            $context['api_resource'] = $object;
+
+            return $this->serializer->normalize($transformed, $format, $context);
+        }
+
+        if ($this->handleNonResource) {
+            if (!($context['api_normalize'] ?? false)) {
+                throw new LogicException('"api_normalize" must be set to true in context to normalize non-resource');
+            }
+
+            $context = $this->initContext($this->getObjectClass($object), $context);
 
             return parent::normalize($object, $format, $context);
         }
@@ -397,7 +413,8 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer implement
     /**
      * Denormalizes a relation.
      *
-     * @throws InvalidArgumentException
+     * @throws RuntimeException
+     * @throws UnexpectedValueException
      *
      * @return object|null
      */
@@ -421,10 +438,11 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer implement
             $context['api_allow_update'] = true;
 
             try {
-                if ($this->serializer instanceof DenormalizerInterface) {
-                    return $this->serializer->denormalize($value, $className, $format, $context);
+                if (!$this->serializer instanceof DenormalizerInterface) {
+                    throw new RuntimeException(sprintf('The injected serializer must be an instance of "%s".', DenormalizerInterface::class));
                 }
-                throw new InvalidArgumentException(sprintf('The injected serializer must be an instance of "%s".', DenormalizerInterface::class));
+
+                return $this->serializer->denormalize($value, $className, $format, $context);
             } catch (InvalidValueException $e) {
                 if (!$this->allowPlainIdentifiers || null === $this->itemDataProvider) {
                     throw $e;
@@ -443,12 +461,12 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer implement
                 return $item;
             }
 
-            throw new InvalidArgumentException(sprintf(
+            throw new UnexpectedValueException(sprintf(
                 'Expected IRI or nested document for attribute "%s", "%s" given.', $attributeName, \gettype($value)
             ));
         }
 
-        throw new InvalidArgumentException(sprintf('Nested documents for attribute "%s" are not allowed. Use IRIs instead.', $attributeName));
+        throw new UnexpectedValueException(sprintf('Nested documents for attribute "%s" are not allowed. Use IRIs instead.', $attributeName));
     }
 
     /**
@@ -505,6 +523,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer implement
      * {@inheritdoc}
      *
      * @throws NoSuchPropertyException
+     * @throws RuntimeException
      */
     protected function getAttributeValue($object, $attribute, $format = null, array $context = [])
     {
@@ -543,10 +562,11 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer implement
 
         unset($context['resource_class']);
 
-        if ($this->serializer instanceof NormalizerInterface) {
-            return $this->serializer->normalize($attributeValue, $format, $context);
+        if (!$this->serializer instanceof NormalizerInterface) {
+            throw new RuntimeException(sprintf('The injected serializer must be an instance of "%s".', NormalizerInterface::class));
         }
-        throw new InvalidArgumentException(sprintf('The injected serializer must be an instance of "%s".', NormalizerInterface::class));
+
+        return $this->serializer->normalize($attributeValue, $format, $context);
     }
 
     /**
@@ -567,6 +587,8 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer implement
     /**
      * Normalizes a relation as an object if is a Link or as an URI.
      *
+     * @throws RuntimeException
+     *
      * @return string|array
      */
     protected function normalizeRelation(PropertyMetadata $propertyMetadata, $relatedObject, string $resourceClass, string $format = null, array $context)
@@ -578,10 +600,11 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer implement
                 $context['resource_class'] = $resourceClass;
             }
 
-            if ($this->serializer instanceof NormalizerInterface) {
-                return $this->serializer->normalize($relatedObject, $format, $context);
+            if (!$this->serializer instanceof NormalizerInterface) {
+                throw new RuntimeException(sprintf('The injected serializer must be an instance of "%s".', NormalizerInterface::class));
             }
-            throw new InvalidArgumentException(sprintf('The injected serializer must be an instance of "%s".', NormalizerInterface::class));
+
+            return $this->serializer->normalize($relatedObject, $format, $context);
         }
 
         $iri = $this->iriConverter->getIriFromItem($relatedObject);
