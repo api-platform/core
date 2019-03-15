@@ -42,13 +42,16 @@ Feature: DTO input and output
         "@vocab": "http://example.com/docs.jsonld#",
         "hydra": "http://www.w3.org/ns/hydra/core#",
         "foo": {
+          "@id": "/dummy_dto_customs/1/foo",
           "@type": "@id"
         },
         "bar": {
+          "@id": "/dummy_dto_customs/1/bar",
           "@type": "@id"
         }
       },
       "@type": "CustomOutputDto",
+      "@id": "/dummy_dto_customs/1",
       "foo": "test",
       "bar": 1
     }
@@ -69,10 +72,12 @@ Feature: DTO input and output
       "@type": "hydra:Collection",
       "hydra:member": [
         {
+          "@id": "/dummy_dto_customs/1",
           "foo": "test",
           "bar": 1
         },
         {
+          "@id": "/dummy_dto_customs/2",
           "foo": "test",
           "bar": 2
         }

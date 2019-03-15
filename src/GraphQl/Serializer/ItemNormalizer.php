@@ -64,6 +64,7 @@ final class ItemNormalizer extends BaseItemNormalizer
             throw new UnexpectedValueException('Expected data to be an array');
         }
 
+        // we're handling the case where we have an Output class, we need the IRI from the origin resource
         if (($context['origin_resource'] ?? false) && isset($data['id'])) {
             $data['_id'] = $data['id'];
             $data['id'] = $this->iriConverter->getIriFromItem($context['origin_resource']);

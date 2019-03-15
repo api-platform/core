@@ -71,11 +71,16 @@ final class ItemNormalizer extends AbstractItemNormalizer
 
             $context['api_normalize'] = true;
             $context['resource_class'] = $this->getObjectClass($transformed);
+            $context['origin_resource'] = $object;
 
             return $this->serializer->normalize($transformed, $format, $context);
         }
 
         if ($this->handleNonResource && $context['api_normalize'] ?? false) {
+            if (($context['origin_resource'] ?? false)) {
+                $context['output']['iri'] = $this->iriConverter->getIriFromItem($context['origin_resource']);
+            }
+
             $data = $this->createJsonLdContext($this->contextBuilder, $object, $context);
             $rawData = parent::normalize($object, $format, $context);
             if (!\is_array($rawData)) {

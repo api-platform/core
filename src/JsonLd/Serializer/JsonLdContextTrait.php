@@ -49,8 +49,9 @@ trait JsonLdContextTrait
 
     private function createJsonLdContext(AnonymousContextBuilderInterface $contextBuilder, $object, array &$context, array $data = []): array
     {
+        // We're in a collection, just add the IRI if available
         if (isset($context['jsonld_has_context'])) {
-            return $data;
+            return isset($context['output']['iri']) ? ['@id' => $context['output']['iri']] : $data;
         }
 
         $context['jsonld_has_context'] = true;

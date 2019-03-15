@@ -50,6 +50,7 @@ final class ResourceFieldResolver
         }
 
         if ('_id' === $info->fieldName && isset($source['id'])) {
+            // if we set _id in the normalizer we take it
             $property = $source['_id'] ?? $source['id'];
         } elseif (\is_array($source) && isset($source[$info->fieldName])) {
             $property = $source[$info->fieldName];
