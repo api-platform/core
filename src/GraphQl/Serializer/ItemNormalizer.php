@@ -15,7 +15,10 @@ namespace ApiPlatform\Core\GraphQl\Serializer;
 
 use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 use ApiPlatform\Core\Serializer\ItemNormalizer as BaseItemNormalizer;
+use ApiPlatform\Core\Util\ClassInfoTrait;
+use Symfony\Component\Serializer\Exception\LogicException;
 use Symfony\Component\Serializer\Exception\UnexpectedValueException;
+use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 /**
  * GraphQL normalizer.
@@ -24,6 +27,8 @@ use Symfony\Component\Serializer\Exception\UnexpectedValueException;
  */
 final class ItemNormalizer extends BaseItemNormalizer
 {
+    use ClassInfoTrait;
+
     const FORMAT = 'graphql';
     const ITEM_KEY = '#item';
 
@@ -42,11 +47,22 @@ final class ItemNormalizer extends BaseItemNormalizer
      */
     public function normalize($object, $format = null, array $context = [])
     {
-        $object = $this->transformOutput($object, $context);
+        if (!$this->handleNonResource && $object !== $transformed = $this->transformOutput($object, $context)) {
+            if (!$this->serializer instanceof NormalizerInterface) {
+                throw new LogicException('Cannot normalize the transformed value because the injected serializer is not a normalizer');
+            }
+
+            $context['api_normalize'] = true;
+            $context['resource_class'] = $this->getObjectClass($transformed);
+
+            return $this->serializer->normalize($transformed, $format, $context);
+        }
+
         $data = parent::normalize($object, $format, $context);
         if (!\is_array($data)) {
             throw new UnexpectedValueException('Expected data to be an array');
         }
+
         $data[self::ITEM_KEY] = serialize($object); // calling serialize prevent weird normalization process done by Webonyx's GraphQL PHP
 
         return $data;
