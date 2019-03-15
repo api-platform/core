@@ -25,7 +25,6 @@ use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Serializer\AbstractItemNormalizer;
 use ApiPlatform\Core\Util\ClassInfoTrait;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
-use Symfony\Component\Serializer\Exception\LogicException;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
@@ -63,21 +62,10 @@ final class ItemNormalizer extends AbstractItemNormalizer
      */
     public function normalize($object, $format = null, array $context = [])
     {
-        if (!$this->handleNonResource && $object !== $transformed = $this->transformOutput($object, $context)) {
-            if (!$this->serializer instanceof NormalizerInterface) {
-                throw new LogicException('Cannot normalize the transformed value because the injected serializer is not a normalizer');
+        if ($this->handleNonResource && ($context['api_normalize'] ?? false) || null !== $outputClass = $this->getOutputClass($this->getObjectClass($object), $context)) {
+            if (isset($outputClass)) {
+                $object = $this->transformOutput($object, $context);
             }
-
-            $context['api_normalize'] = true;
-            $context['resource_class'] = $this->getObjectClass($transformed);
-
-            return $this->serializer->normalize($transformed, $format, $context);
-        }
-
-        if ($this->handleNonResource && $context['api_normalize'] ?? false) {
-            $object = $this->transformOutput($object, $context);
-            $context['api_normalize'] = true;
-            $context['resource_class'] = $this->getObjectClass($object);
 
             return parent::normalize($object, $format, $context);
         }
