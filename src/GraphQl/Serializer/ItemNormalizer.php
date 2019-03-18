@@ -16,9 +16,7 @@ namespace ApiPlatform\Core\GraphQl\Serializer;
 use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 use ApiPlatform\Core\Serializer\ItemNormalizer as BaseItemNormalizer;
 use ApiPlatform\Core\Util\ClassInfoTrait;
-use Symfony\Component\Serializer\Exception\LogicException;
 use Symfony\Component\Serializer\Exception\UnexpectedValueException;
-use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 /**
  * GraphQL normalizer.
@@ -47,20 +45,21 @@ final class ItemNormalizer extends BaseItemNormalizer
      */
     public function normalize($object, $format = null, array $context = [])
     {
-        if (!$this->handleNonResource && $object !== $transformed = $this->transformOutput($object, $context)) {
-            if (!$this->serializer instanceof NormalizerInterface) {
-                throw new LogicException('Cannot normalize the transformed value because the injected serializer is not a normalizer');
-            }
-
-            $context['api_normalize'] = true;
-            $context['resource_class'] = $this->getObjectClass($transformed);
-
-            return $this->serializer->normalize($transformed, $format, $context);
+        if (!$this->handleNonResource && null !== $outputClass = $this->getOutputClass($this->getObjectClass($object), $context)) {
+            return parent::normalize($object, $format, $context);
         }
 
         $data = parent::normalize($object, $format, $context);
         if (!\is_array($data)) {
             throw new UnexpectedValueException('Expected data to be an array');
+        }
+
+        if ($this->handleNonResource) {
+            // when using an output class, get the IRI from the resource
+            if (isset($context['api_resource']) && isset($data['id'])) {
+                $data['_id'] = $data['id'];
+                $data['id'] = $this->iriConverter->getIriFromItem($context['api_resource']);
+            }
         }
 
         $data[self::ITEM_KEY] = serialize($object); // calling serialize prevent weird normalization process done by Webonyx's GraphQL PHP

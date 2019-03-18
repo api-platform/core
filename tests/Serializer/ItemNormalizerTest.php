@@ -26,6 +26,7 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Dto\OutputDto;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
+use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\SerializerInterface;
@@ -193,7 +194,7 @@ class ItemNormalizerTest extends TestCase
 
     public function testDenormalizeWithIdAndUpdateNotAllowed()
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(NotNormalizableValueException::class);
         $this->expectExceptionMessage('Update is not allowed for this operation.');
 
         $context = ['resource_class' => Dummy::class, 'api_allow_update' => false];

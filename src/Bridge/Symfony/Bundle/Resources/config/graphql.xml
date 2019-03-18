@@ -38,6 +38,7 @@
 
         <service id="api_platform.graphql.resolver.resource_field" class="ApiPlatform\Core\GraphQl\Resolver\ResourceFieldResolver" public="false">
             <argument type="service" id="api_platform.iri_converter" />
+            <argument type="service" id="api_platform.resource_class_resolver" />
         </service>
 
         <service id="api_platform.graphql.schema_builder" class="ApiPlatform\Core\GraphQl\Type\SchemaBuilder" public="false">
