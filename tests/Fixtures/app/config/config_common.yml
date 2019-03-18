@@ -240,3 +240,10 @@ services:
         public: false
         tags:
             -  { name: 'api_platform.data_transformer' }
+
+    app.graphql.query_resolver.dummy_custom:
+        class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\Resolver\DummyCustomQueryResolver'
+        public: false
+        arguments: ['@api_platform.graphql.normalizer.item']
+        tags:
+            -  { name: 'api_platform.graphql.query_resolver' }
