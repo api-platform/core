@@ -388,7 +388,7 @@ final class SchemaBuilder implements SchemaBuilderInterface
         }
 
         if ($this->isCollection($type)) {
-            return $this->paginationEnabled && !$input ? $this->getResourcePaginatedCollectionType($resourceClass, $graphqlType) : GraphQLType::listOf($graphqlType);
+            return $this->paginationEnabled && !$input ? $this->getResourcePaginatedCollectionType($graphqlType) : GraphQLType::listOf($graphqlType);
         }
 
         return $type->isNullable() || (null !== $mutationName && 'update' === $mutationName) ? $graphqlType : GraphQLType::nonNull($graphqlType);
@@ -491,7 +491,7 @@ final class SchemaBuilder implements SchemaBuilderInterface
      *
      * @return ObjectType
      */
-    private function getResourcePaginatedCollectionType(string $resourceClass, GraphQLType $resourceType): GraphQLType
+    private function getResourcePaginatedCollectionType(GraphQLType $resourceType): GraphQLType
     {
         $shortName = $resourceType->name;
 
