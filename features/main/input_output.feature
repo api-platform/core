@@ -30,7 +30,7 @@ Feature: DTO input and output
 
   @createSchema
   Scenario: Get an item with a custom output
-    Given there is a DummyCustomDto
+    Given there is a DummyDtoCustom
     When I send a "GET" request to "/dummy_dto_custom_output/1"
     Then the response status code should be 200
     And the response should be in JSON
@@ -59,7 +59,7 @@ Feature: DTO input and output
 
   @createSchema
   Scenario: Get a collection with a custom output
-    Given there are 2 DummyCustomDto
+    Given there are 2 DummyDtoCustom
     When I send a "GET" request to "/dummy_dto_custom_output"
     Then the response status code should be 200
     And the response should be in JSON
@@ -87,7 +87,7 @@ Feature: DTO input and output
     """
 
   @createSchema
-  Scenario: Create a DummyCustomDto object without output
+  Scenario: Create a DummyDtoCustom object without output
     When I add "Content-Type" header equal to "application/ld+json"
     And I send a "POST" request to "/dummy_dto_custom_post_without_output" with body:
     """
@@ -189,30 +189,6 @@ Feature: DTO input and output
       },
       "@type": "RecoverPasswordOutput",
       "dummy": "/dummies/1"
-    }
-    """
-
-  @!mongodb
-  @createSchema
-  Scenario: Create a resource that has a non-resource DTO relation.
-    When I add "Content-Type" header equal to "application/ld+json"
-    And I send a "POST" request to "/non_relation_resources" with body:
-    """
-    {"relation": {"foo": "test"}}
-    """
-    Then the response status code should be 201
-    And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
-    And the JSON should be equal to:
-    """
-    {
-      "@context": "/contexts/NonRelationResource",
-      "@id": "/non_relation_resources/1",
-      "@type": "NonRelationResource",
-      "relation": {
-        "foo": "test"
-      },
-      "id": 1
     }
     """
 
