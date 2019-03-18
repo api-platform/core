@@ -139,6 +139,7 @@
         <service id="api_platform.doctrine.orm.query_extension.filter_eager_loading" class="ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\FilterEagerLoadingExtension" public="false">
             <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
             <argument>%api_platform.eager_loading.force_eager%</argument>
+            <argument type="service" id="api_platform.resource_class_resolver" />
 
             <tag name="api_platform.doctrine.orm.query_extension.collection" priority="-17" />
         </service>
