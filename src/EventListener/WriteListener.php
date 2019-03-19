@@ -73,7 +73,7 @@ final class WriteListener
                 if (null !== $this->resourceMetadataFactory) {
                     $resourceMetadata = $this->resourceMetadataFactory->create($attributes['resource_class']);
                     $outputMetadata = $resourceMetadata->getOperationAttribute($attributes, 'output', ['class' => $attributes['resource_class']], true);
-                    $hasOutput = \array_key_exists('class', $outputMetadata) && null !== $outputMetadata['class'];
+                    $hasOutput = \array_key_exists('class', $outputMetadata) && null !== $outputMetadata['class'] && $controllerResult instanceof $outputMetadata['class'];
                 }
 
                 if ($hasOutput) {

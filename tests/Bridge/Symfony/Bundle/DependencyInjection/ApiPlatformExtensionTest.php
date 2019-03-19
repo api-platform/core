@@ -460,6 +460,7 @@ class ApiPlatformExtensionTest extends TestCase
         $containerBuilderProphecy = $this->getBaseContainerBuilderProphecy();
         $containerBuilderProphecy->setAlias('api_platform.message_bus', 'message_bus')->shouldNotBeCalled();
         $containerBuilderProphecy->setDefinition('api_platform.messenger.data_persister', Argument::type(Definition::class))->shouldNotBeCalled();
+        $containerBuilderProphecy->setDefinition('api_platform.messenger.data_transformer', Argument::type(Definition::class))->shouldNotBeCalled();
         $containerBuilder = $containerBuilderProphecy->reveal();
 
         $config = self::DEFAULT_CONFIG;
@@ -973,6 +974,7 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.jsonld.normalizer.item.non_resource',
             'api_platform.mercure.listener.response.add_link_header',
             'api_platform.messenger.data_persister',
+            'api_platform.messenger.data_transformer',
             'api_platform.metadata.extractor.yaml',
             'api_platform.metadata.property.metadata_factory.annotation',
             'api_platform.metadata.property.metadata_factory.yaml',
