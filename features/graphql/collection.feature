@@ -113,7 +113,7 @@ Feature: GraphQL collection support
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/json"
     And the JSON node "data.dummies.edges[1].node.name" should be equal to "Dummy #2"
-    And the JSON node "data.dummies.edges[1].node.dummyDate" should be equal to "2015-04-02T00:00:00+00:00"
+    And the JSON node "data.dummies.edges[1].node.dummyDate" should be equal to "2015-04-02"
     And the JSON node "data.dummyGroup.foo" should be equal to "Foo #2"
 
   @createSchema

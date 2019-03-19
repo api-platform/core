@@ -228,7 +228,7 @@ Feature: GraphQL mutation support
     And the JSON node "data.updateDummy.dummy.id" should be equal to "/dummies/1"
     And the JSON node "data.updateDummy.dummy.name" should be equal to "Dummy #1"
     And the JSON node "data.updateDummy.dummy.description" should be equal to "Modified description."
-    And the JSON node "data.updateDummy.dummy.dummyDate" should be equal to "2018-06-05T00:00:00+00:00"
+    And the JSON node "data.updateDummy.dummy.dummyDate" should be equal to "2018-06-05"
     And the JSON node "data.updateDummy.dummy.relatedDummies.edges[0].node.name" should be equal to "RelatedDummy11"
     And the JSON node "data.updateDummy.clientMutationId" should be equal to "myId"
 
