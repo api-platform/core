@@ -139,7 +139,9 @@ Feature: GraphQL mutation support
     """
     mutation {
       deleteFoo(input: {id: "/foos/1", clientMutationId: "anotherId"}) {
-        id
+        foo {
+          id
+        }
         clientMutationId
       }
     }
@@ -147,7 +149,7 @@ Feature: GraphQL mutation support
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/json"
-    And the JSON node "data.deleteFoo.id" should be equal to "/foos/1"
+    And the JSON node "data.deleteFoo.foo.id" should be equal to "/foos/1"
     And the JSON node "data.deleteFoo.clientMutationId" should be equal to "anotherId"
 
   Scenario: Trigger an error trying to delete item of different resource
@@ -155,7 +157,9 @@ Feature: GraphQL mutation support
     """
     mutation {
       deleteFoo(input: {id: "/dummies/1", clientMutationId: "myId"}) {
-        id
+        foo {
+          id
+        }
         clientMutationId
       }
     }
@@ -172,7 +176,9 @@ Feature: GraphQL mutation support
     """
     mutation {
       deleteCompositeRelation(input: {id: "/composite_relations/compositeItem=1;compositeLabel=1", clientMutationId: "myId"}) {
-        id
+        compositeRelation {
+          id
+        }
         clientMutationId
       }
     }
@@ -180,7 +186,7 @@ Feature: GraphQL mutation support
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/json"
-    And the JSON node "data.deleteCompositeRelation.id" should be equal to "/composite_relations/compositeItem=1;compositeLabel=1"
+    And the JSON node "data.deleteCompositeRelation.compositeRelation.id" should be equal to "/composite_relations/compositeItem=1;compositeLabel=1"
     And the JSON node "data.deleteCompositeRelation.clientMutationId" should be equal to "myId"
 
   @createSchema
@@ -290,7 +296,7 @@ Feature: GraphQL mutation support
       createDummyGroup(input: {bar: "Bar", baz: "Baz", clientMutationId: "myId"}) {
         dummyGroup {
           id
-          foo
+          bar
         }
         clientMutationId
       }
@@ -300,7 +306,7 @@ Feature: GraphQL mutation support
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/json"
     And the JSON node "data.createDummyGroup.dummyGroup.id" should be equal to "/dummy_groups/2"
-    And the JSON node "data.createDummyGroup.dummyGroup.foo" should be null
+    And the JSON node "data.createDummyGroup.dummyGroup.bar" should be equal to "Bar"
     And the JSON node "data.createDummyGroup.clientMutationId" should be equal to "myId"
 
   Scenario: Trigger a validation error
@@ -323,6 +329,9 @@ Feature: GraphQL mutation support
     """
     mutation {
       createDummyDtoNoOutput(input: {foo: "A new one", bar: 3, clientMutationId: "myId"}) {
+        dummyDtoNoOutput {
+          id
+        }
         clientMutationId
       }
     }
@@ -333,16 +342,24 @@ Feature: GraphQL mutation support
     And the JSON should be equal to:
     """
     {
-      "data": {
-        "createDummyDtoNoOutput": {
-          "clientMutationId": "myId"
+      "errors": [
+        {
+          "message": "Cannot query field \"id\" on type \"createDummyDtoNoOutputPayloadData\".",
+          "extensions": {
+            "category": "graphql"
+          },
+          "locations": [
+            {
+              "line": 4,
+              "column": 7
+            }
+          ]
         }
-      }
+      ]
     }
     """
 
-  Scenario: Cannot create an item using disabled inputClass
-    Given there are 2 dummyDtoNoInput objects
+  Scenario: Cannot create an item with input fields using disabled inputClass
     When I send the following GraphQL request:
     """
     mutation {
@@ -358,18 +375,6 @@ Feature: GraphQL mutation support
     """
     {
       "errors": [
-        {
-          "message": "Field createDummyDtoNoInputInput.id of required type ID! was not provided.",
-          "extensions": {
-            "category": "graphql"
-          },
-          "locations": [
-            {
-              "line": 2,
-              "column": 32
-            }
-          ]
-        },
         {
           "message": "Field \"lorem\" is not defined by type createDummyDtoNoInputInput.",
           "extensions": {
@@ -395,5 +400,32 @@ Feature: GraphQL mutation support
           ]
         }
       ]
+    }
+    """
+
+  Scenario: Create an item with empty input fields using disabled inputClass (no persist done)
+    When I send the following GraphQL request:
+    """
+    mutation {
+      createDummyDtoNoInput(input: {clientMutationId: "myId"}) {
+        dummyDtoNoInput {
+          id
+        }
+        clientMutationId
+      }
+    }
+    """
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/json"
+    And the JSON should be equal to:
+    """
+    {
+      "data": {
+        "createDummyDtoNoInput": {
+          "dummyDtoNoInput": null,
+          "clientMutationId": "myId"
+        }
+      }
     }
     """

@@ -292,6 +292,20 @@ Feature: GraphQL introspection support
           }
         }
       }
+      typeCreatePayloadData: __type(name: "createDummyGroupPayloadData") {
+        description,
+        fields {
+          name
+          type {
+            name
+            kind
+            ofType {
+              name
+              kind
+            }
+          }
+        }
+      }
     }
     """
     Then the response status code should be 200
@@ -306,7 +320,70 @@ Feature: GraphQL introspection support
     And the JSON node "data.typeCreateInput.inputFields[2].name" should be equal to "clientMutationId"
     And the JSON node "data.typeCreatePayload.fields" should have 2 elements
     And the JSON node "data.typeCreatePayload.fields[0].name" should be equal to "dummyGroup"
+    And the JSON node "data.typeCreatePayload.fields[0].type.name" should be equal to "createDummyGroupPayloadData"
     And the JSON node "data.typeCreatePayload.fields[1].name" should be equal to "clientMutationId"
+    And the JSON node "data.typeCreatePayloadData.fields" should have 2 elements
+    And the JSON node "data.typeCreatePayloadData.fields[0].name" should be equal to "id"
+    And the JSON node "data.typeCreatePayloadData.fields[1].name" should be equal to "bar"
+
+  Scenario: Retrieve nested mutation payload data fields
+    When I send the following GraphQL request:
+    """
+    {
+      typeCreatePayload: __type(name: "createDummyPayload") {
+        description,
+        fields {
+          name
+          type {
+            name
+            kind
+            ofType {
+              name
+              kind
+            }
+          }
+        }
+      }
+      typeCreatePayloadData: __type(name: "createDummyPayloadData") {
+        description,
+        fields {
+          name
+          type {
+            name
+            kind
+            ofType {
+              name
+              kind
+            }
+          }
+        }
+      }
+      typeCreateNestedPayload: __type(name: "createRelatedDummyNestedPayload") {
+        description,
+        fields {
+          name
+          type {
+            name
+            kind
+            ofType {
+              name
+              kind
+            }
+          }
+        }
+      }
+    }
+    """
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/json"
+    And the JSON node "data.typeCreatePayload.fields" should have 2 elements
+    And the JSON node "data.typeCreatePayload.fields[0].name" should be equal to "dummy"
+    And the JSON node "data.typeCreatePayload.fields[0].type.name" should be equal to "createDummyPayloadData"
+    And the JSON node "data.typeCreatePayload.fields[1].name" should be equal to "clientMutationId"
+    And the JSON node "data.typeCreatePayloadData.fields[7].name" should be equal to "relatedDummy"
+    And the JSON node "data.typeCreatePayloadData.fields[7].type.name" should be equal to "createRelatedDummyNestedPayload"
+    And the JSON node "data.typeCreateNestedPayload.fields[0].name" should be equal to "id"
 
   Scenario: Retrieve an item through a GraphQL query
     Given there are 4 dummy objects with relatedDummy

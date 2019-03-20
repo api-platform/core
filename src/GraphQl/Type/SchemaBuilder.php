@@ -381,7 +381,7 @@ final class SchemaBuilder implements SchemaBuilderInterface
                     return null;
                 }
 
-                $graphqlType = $this->getResourceObjectType($resourceClass, $resourceMetadata, $input, $mutationName, $depth);
+                $graphqlType = $this->getResourceObjectType($resourceClass, $resourceMetadata, $input, $mutationName, false, $depth);
                 break;
             default:
                 throw new InvalidTypeException(sprintf('The type "%s" is not supported.', $builtinType));
@@ -399,7 +399,7 @@ final class SchemaBuilder implements SchemaBuilderInterface
      *
      * @return ObjectType|InputObjectType
      */
-    private function getResourceObjectType(?string $resourceClass, ResourceMetadata $resourceMetadata, bool $input = false, string $mutationName = null, int $depth = 0): GraphQLType
+    private function getResourceObjectType(?string $resourceClass, ResourceMetadata $resourceMetadata, bool $input = false, string $mutationName = null, bool $wrapped = false, int $depth = 0): GraphQLType
     {
         $shortName = $resourceMetadata->getShortName();
         if (null !== $mutationName) {
@@ -408,7 +408,13 @@ final class SchemaBuilder implements SchemaBuilderInterface
         if ($input) {
             $shortName .= 'Input';
         } elseif (null !== $mutationName) {
+            if ($depth > 0) {
+                $shortName .= 'Nested';
+            }
             $shortName .= 'Payload';
+        }
+        if ($wrapped) {
+            $shortName .= 'Data';
         }
 
         if (isset($this->graphqlTypes[$shortName])) {
@@ -421,22 +427,23 @@ final class SchemaBuilder implements SchemaBuilderInterface
             $resourceClass = $ioMetadata['class'];
         }
 
-        $wrapObject = null !== $mutationName && 'delete' !== $mutationName && !$input;
+        $wrapData = !$wrapped && null !== $mutationName && !$input && $depth < 1;
 
         $configuration = [
             'name' => $shortName,
             'description' => $resourceMetadata->getDescription(),
             'resolveField' => $this->defaultFieldResolver,
-            'fields' => function () use ($resourceClass, $resourceMetadata, $input, $mutationName, $depth, $ioMetadata, $wrapObject) {
-                if ($wrapObject) {
+            'fields' => function () use ($resourceClass, $resourceMetadata, $input, $mutationName, $wrapData, $depth, $ioMetadata) {
+                if ($wrapData) {
                     return [
-                        lcfirst($resourceMetadata->getShortName()) => $this->getResourceObjectType($resourceClass, $resourceMetadata),
+                        lcfirst($resourceMetadata->getShortName()) => $this->getResourceObjectType($resourceClass, $resourceMetadata, $input, $mutationName, true, $depth),
                         'clientMutationId' => GraphQLType::string(),
                     ];
                 }
+
                 return $this->getResourceObjectTypeFields($resourceClass, $resourceMetadata, $input, $mutationName, $depth, $ioMetadata);
             },
-            'interfaces' => $wrapObject ? [] : [$this->getNodeInterface()],
+            'interfaces' => $wrapData ? [] : [$this->getNodeInterface()],
         ];
 
         return $this->graphqlTypes[$shortName] = $input ? new InputObjectType($configuration) : new ObjectType($configuration);
@@ -451,16 +458,31 @@ final class SchemaBuilder implements SchemaBuilderInterface
         $idField = ['type' => GraphQLType::nonNull(GraphQLType::id())];
         $clientMutationId = GraphQLType::string();
 
-        if ('delete' === $mutationName || (null !== $ioMetadata && null === $ioMetadata['class'])) {
-            return [
+        if (null !== $ioMetadata && null === $ioMetadata['class']) {
+            if ($input) {
+                return ['clientMutationId' => $clientMutationId];
+            }
+
+            return [];
+        }
+
+        if ('delete' === $mutationName) {
+            $fields = [
                 'id' => $idField,
-                'clientMutationId' => $clientMutationId,
             ];
+
+            if ($input) {
+                $fields['clientMutationId'] = $clientMutationId;
+            }
+
+            return $fields;
         }
 
         if (!$input || 'create' !== $mutationName) {
             $fields['id'] = $idField;
         }
+
+        ++$depth; // increment the depth for the call to getResourceFieldConfiguration.
 
         if (null !== $resourceClass) {
             foreach ($this->propertyNameCollectionFactory->create($resourceClass) as $property) {
@@ -478,14 +500,14 @@ final class SchemaBuilder implements SchemaBuilderInterface
                     $resourceClass = $propertyMetadata->getSubresource()->getResourceClass();
                     $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
                 }
-                if ($fieldConfiguration = $this->getResourceFieldConfiguration($resourceClass, $resourceMetadata, $propertyMetadata->getDescription(), $propertyMetadata->getAttribute('deprecation_reason', ''), $propertyType, $rootResource, $input, $mutationName, ++$depth)) {
+                if ($fieldConfiguration = $this->getResourceFieldConfiguration($resourceClass, $resourceMetadata, $propertyMetadata->getDescription(), $propertyMetadata->getAttribute('deprecation_reason', ''), $propertyType, $rootResource, $input, $mutationName, $depth)) {
                     $fields['id' === $property ? '_id' : $property] = $fieldConfiguration;
                 }
                 $resourceClass = $rootResource;
             }
         }
 
-        if (null !== $mutationName) {
+        if (null !== $mutationName && $input) {
             $fields['clientMutationId'] = $clientMutationId;
         }
 

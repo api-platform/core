@@ -40,7 +40,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
  *         "query"={"normalization_context"={"groups"={"dummy_foo"}}},
  *         "delete",
  *         "create"={
- *             "normalization_context"={"groups"={"dummy_foo"}},
+ *             "normalization_context"={"groups"={"dummy_bar"}},
  *             "denormalization_context"={"groups"={"dummy_bar", "dummy_baz"}}
  *         }
  *     }
