@@ -56,6 +56,6 @@ trait JsonLdContextTrait
 
         $context['jsonld_has_context'] = true;
 
-        return $contextBuilder->getAnonymousResourceContext($object, $context['output'] ?? []);
+        return $contextBuilder->getAnonymousResourceContext($object, ($context['output'] ?? []) + ['api_resource' => $context['api_resource'] ?? null]);
     }
 }

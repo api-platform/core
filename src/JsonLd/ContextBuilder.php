@@ -18,6 +18,7 @@ use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
+use ApiPlatform\Core\Util\ClassInfoTrait;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 
 /**
@@ -27,6 +28,8 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
  */
 final class ContextBuilder implements AnonymousContextBuilderInterface
 {
+    use ClassInfoTrait;
+
     public const FORMAT = 'jsonld';
 
     private $resourceNameCollectionFactory;
@@ -110,14 +113,22 @@ final class ContextBuilder implements AnonymousContextBuilderInterface
      */
     public function getAnonymousResourceContext($object, array $context = [], int $referenceType = UrlGeneratorInterface::ABS_PATH): array
     {
-        $id = $context['iri'] ?? '_:'.(\function_exists('spl_object_id') ? spl_object_id($object) : spl_object_hash($object));
+        $outputClass = $this->getObjectClass($object);
+        $shortName = (new \ReflectionClass($outputClass))->getShortName();
+
         $jsonLdContext = [
-            '@context' => $this->getResourceContextWithShortname(\get_class($object), $referenceType, $id),
-            '@id' => $id,
+            '@context' => $this->getResourceContextWithShortname(
+                $outputClass,
+                $referenceType,
+                $shortName
+            ),
+            '@type' => $shortName,
+            '@id' => $context['iri'] ?? '_:'.(\function_exists('spl_object_id') ? spl_object_id($object) : spl_object_hash($object)),
         ];
 
-        if ($context['name'] ?? false) {
-            $jsonLdContext['@type'] = $context['name'];
+        // here the object can be different from the resource given by the $context['api_resource'] value
+        if (isset($context['api_resource'])) {
+            $jsonLdContext['@type'] = $this->resourceMetadataFactory->create($this->getObjectClass($context['api_resource']))->getShortName();
         }
 
         return $jsonLdContext;
@@ -141,7 +152,7 @@ final class ContextBuilder implements AnonymousContextBuilderInterface
                 $id = sprintf('%s/%s', $shortName, $convertedName);
             }
 
-            if (true !== $propertyMetadata->isReadableLink()) {
+            if (false === $propertyMetadata->isReadableLink()) {
                 $jsonldContext += [
                     '@id' => $id,
                     '@type' => '@id',
