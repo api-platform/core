@@ -27,7 +27,7 @@ use Symfony\Component\Validator\ConstraintViolationListInterface;
  */
 abstract class AbstractConstraintViolationListNormalizer implements NormalizerInterface, CacheableSupportsMethodInterface
 {
-    const FORMAT = null; // Must be overrode
+    public const FORMAT = null; // Must be overrode
 
     private $serializePayloadFields;
     private $nameConverter;

@@ -39,7 +39,7 @@ final class DataProviderPass implements CompilerPassInterface
         }
     }
 
-    private function addSerializerLocator(ContainerBuilder $container, string $type)
+    private function addSerializerLocator(ContainerBuilder $container, string $type): void
     {
         $services = $container->findTaggedServiceIds("api_platform.{$type}_data_provider", true);
 

@@ -39,7 +39,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
     use ContextTrait;
     use JsonLdContextTrait;
 
-    const FORMAT = 'jsonld';
+    public const FORMAT = 'jsonld';
 
     private $contextBuilder;
 

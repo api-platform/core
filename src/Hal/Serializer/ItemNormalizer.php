@@ -30,7 +30,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
     use ContextTrait;
     use ClassInfoTrait;
 
-    const FORMAT = 'jsonhal';
+    public const FORMAT = 'jsonhal';
 
     private $componentsCache = [];
     private $attributesMetadataCache = [];
@@ -136,10 +136,8 @@ final class ItemNormalizer extends AbstractItemNormalizer
      * Gets HAL components of the resource: states, links and embedded.
      *
      * @param object $object
-     *
-     * @return array
      */
-    private function getComponents($object, string $format = null, array $context)
+    private function getComponents($object, ?string $format, array $context): array
     {
         $cacheKey = $this->getObjectClass($object).'-'.$context['cache_key'];
 
@@ -197,7 +195,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
      *
      * @param object $object
      */
-    private function populateRelation(array $data, $object, string $format = null, array $context, array $components, string $type): array
+    private function populateRelation(array $data, $object, ?string $format, array $context, array $components, string $type): array
     {
         $class = $this->getObjectClass($object);
 
@@ -264,7 +262,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
      *
      * @return bool|string
      */
-    private function getHalCacheKey(string $format = null, array $context)
+    private function getHalCacheKey(?string $format, array $context)
     {
         try {
             return md5($format.serialize($context));

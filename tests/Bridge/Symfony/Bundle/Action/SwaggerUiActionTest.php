@@ -31,7 +31,7 @@ use Twig\Environment as TwigEnvironment;
  */
 class SwaggerUiActionTest extends TestCase
 {
-    const SPEC = [
+    public const SPEC = [
         'paths' => [
             '/fs' => ['get' => ['operationId' => 'getFCollection']],
             '/fs/{id}' => ['get' => ['operationId' => 'getFItem']],

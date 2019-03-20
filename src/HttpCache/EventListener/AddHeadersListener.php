@@ -43,7 +43,7 @@ final class AddHeadersListener
         $this->resourceMetadataFactory = $resourceMetadataFactory;
     }
 
-    public function onKernelResponse(FilterResponseEvent $event)
+    public function onKernelResponse(FilterResponseEvent $event): void
     {
         $request = $event->getRequest();
         if (!$request->isMethodCacheable() || !RequestAttributesExtractor::extractAttributes($request)) {

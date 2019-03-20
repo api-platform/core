@@ -72,10 +72,8 @@ final class RequestParser
      *
      * It builds a normalized query string, where keys/value pairs are alphabetized
      * and have consistent escaping.
-     *
-     * @return string|null A normalized query string for the Request
      */
-    public static function getQueryString(Request $request)
+    public static function getQueryString(Request $request): ?string
     {
         $qs = $request->server->get('QUERY_STRING', '');
         if ('' === $qs) {

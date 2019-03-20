@@ -158,7 +158,6 @@ class SerializerPropertyMetadataFactoryTest extends TestCase
 
         $actual = $serializerPropertyMetadataFactory->create(DummyTableInheritance::class, 'nickname');
 
-        $this->assertInstanceOf(PropertyMetadata::class, $actual);
-        $this->assertEquals($actual->isChildInherited(), DummyTableInheritanceChild::class);
+        $this->assertEquals($actual->getChildInherited(), DummyTableInheritanceChild::class);
     }
 }

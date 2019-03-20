@@ -79,7 +79,7 @@ final class ExtractorPropertyMetadataFactory implements PropertyMetadataFactoryI
      *
      * @throws PropertyNotFoundException
      */
-    private function handleNotFound(PropertyMetadata $parentPropertyMetadata = null, string $resourceClass, string $property): PropertyMetadata
+    private function handleNotFound(?PropertyMetadata $parentPropertyMetadata, string $resourceClass, string $property): PropertyMetadata
     {
         if ($parentPropertyMetadata) {
             return $parentPropertyMetadata;
@@ -125,10 +125,8 @@ final class ExtractorPropertyMetadataFactory implements PropertyMetadataFactoryI
      *
      * @param bool|array|null  $subresource      the subresource metadata coming from XML or YAML
      * @param PropertyMetadata $propertyMetadata the current property metadata
-     *
-     * @return SubresourceMetadata|null
      */
-    private function createSubresourceMetadata($subresource, PropertyMetadata $propertyMetadata)
+    private function createSubresourceMetadata($subresource, PropertyMetadata $propertyMetadata): ?SubresourceMetadata
     {
         if (!$subresource) {
             return null;
@@ -139,7 +137,7 @@ final class ExtractorPropertyMetadataFactory implements PropertyMetadataFactoryI
 
         if (null !== $type) {
             $isCollection = $type->isCollection();
-            $resourceClass = $isCollection ? $type->getCollectionValueType()->getClassName() : $type->getClassName();
+            $resourceClass = $isCollection && ($collectionValueType = $type->getCollectionValueType()) ? $collectionValueType->getClassName() : $type->getClassName();
         } elseif (\is_array($subresource) && isset($subresource['resourceClass'])) {
             $resourceClass = $subresource['resourceClass'];
             $isCollection = $subresource['collection'] ?? true;

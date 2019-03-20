@@ -41,7 +41,6 @@ class CachedResourceMetadataFactoryTest extends TestCase
         $cachedResourceMetadataFactory = new CachedResourceMetadataFactory($cacheItemPool->reveal(), $decoratedResourceMetadataFactory->reveal());
         $resultedResourceMetadata = $cachedResourceMetadataFactory->create(Dummy::class);
 
-        $this->assertInstanceOf(ResourceMetadata::class, $resultedResourceMetadata);
         $this->assertEquals(new ResourceMetadata(null, 'Dummy.'), $resultedResourceMetadata);
     }
 
@@ -63,8 +62,6 @@ class CachedResourceMetadataFactoryTest extends TestCase
         $cachedResourceMetadataFactory = new CachedResourceMetadataFactory($cacheItemPool->reveal(), $decoratedResourceMetadataFactory->reveal());
         $resultedResourceMetadata = $cachedResourceMetadataFactory->create(Dummy::class);
 
-        $this->assertInstanceOf(ResourceMetadata::class, $resultedResourceMetadata);
-
         $expectedResult = new ResourceMetadata(null, 'Dummy.');
         $this->assertEquals($expectedResult, $resultedResourceMetadata);
         $this->assertEquals($expectedResult, $cachedResourceMetadataFactory->create(Dummy::class), 'Trigger the local cache');
@@ -83,8 +80,6 @@ class CachedResourceMetadataFactoryTest extends TestCase
 
         $cachedResourceMetadataFactory = new CachedResourceMetadataFactory($cacheItemPool->reveal(), $decoratedResourceMetadataFactory->reveal());
         $resultedResourceMetadata = $cachedResourceMetadataFactory->create(Dummy::class);
-
-        $this->assertInstanceOf(ResourceMetadata::class, $resultedResourceMetadata);
 
         $expectedResult = new ResourceMetadata(null, 'Dummy.');
         $this->assertEquals($expectedResult, $resultedResourceMetadata);

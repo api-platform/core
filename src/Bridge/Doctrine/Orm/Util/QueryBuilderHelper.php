@@ -52,10 +52,8 @@ final class QueryBuilderHelper
 
     /**
      * Get the existing join from queryBuilder DQL parts.
-     *
-     * @return Join|null
      */
-    private static function getExistingJoin(QueryBuilder $queryBuilder, string $alias, string $association, string $originAlias = null)
+    private static function getExistingJoin(QueryBuilder $queryBuilder, string $alias, string $association, string $originAlias = null): ?Join
     {
         $parts = $queryBuilder->getDQLPart('join');
         $rootAlias = $originAlias ?? $queryBuilder->getRootAliases()[0];

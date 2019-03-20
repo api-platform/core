@@ -28,11 +28,8 @@ trait FieldsToAttributesTrait
     private function fieldsToAttributes(ResolveInfo $info): array
     {
         $fields = $info->getFieldSelection(PHP_INT_MAX);
-        if (isset($fields['edges']['node'])) {
-            $fields = $fields['edges']['node'];
-        }
 
-        return $this->replaceIdKeys($fields);
+        return $this->replaceIdKeys($fields['edges']['node'] ?? $fields);
     }
 
     private function replaceIdKeys(array $fields): array

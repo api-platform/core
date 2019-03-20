@@ -41,8 +41,6 @@ class CachedPropertyNameCollectionFactoryTest extends TestCase
         $cachedPropertyNameCollectionFactory = new CachedPropertyNameCollectionFactory($cacheItemPool->reveal(), $decoratedPropertyNameCollectionFactory->reveal());
         $resultedPropertyNameCollection = $cachedPropertyNameCollectionFactory->create(Dummy::class);
 
-        $this->assertInstanceOf(PropertyNameCollection::class, $resultedPropertyNameCollection);
-
         $expectedResult = new PropertyNameCollection(['id', 'name', 'description', 'dummy']);
         $this->assertEquals($expectedResult, $resultedPropertyNameCollection);
         $this->assertEquals($expectedResult, $cachedPropertyNameCollectionFactory->create(Dummy::class), 'Trigger the local cache');
@@ -66,8 +64,6 @@ class CachedPropertyNameCollectionFactoryTest extends TestCase
         $cachedPropertyNameCollectionFactory = new CachedPropertyNameCollectionFactory($cacheItemPool->reveal(), $decoratedPropertyNameCollectionFactory->reveal());
         $resultedPropertyNameCollection = $cachedPropertyNameCollectionFactory->create(Dummy::class);
 
-        $this->assertInstanceOf(PropertyNameCollection::class, $resultedPropertyNameCollection);
-
         $expectedResult = new PropertyNameCollection(['id', 'name', 'description', 'dummy']);
         $this->assertEquals($expectedResult, $resultedPropertyNameCollection);
         $this->assertEquals($expectedResult, $cachedPropertyNameCollectionFactory->create(Dummy::class), 'Trigger the local cache');
@@ -86,8 +82,6 @@ class CachedPropertyNameCollectionFactoryTest extends TestCase
 
         $cachedPropertyNameCollectionFactory = new CachedPropertyNameCollectionFactory($cacheItemPool->reveal(), $decoratedPropertyNameCollectionFactory->reveal());
         $resultedPropertyNameCollection = $cachedPropertyNameCollectionFactory->create(Dummy::class);
-
-        $this->assertInstanceOf(PropertyNameCollection::class, $resultedPropertyNameCollection);
 
         $expectedResult = new PropertyNameCollection(['id', 'name', 'description', 'dummy']);
         $this->assertEquals($expectedResult, $resultedPropertyNameCollection);

@@ -177,7 +177,6 @@ class ApiPlatformProviderTest extends TestCase
 
         $annotations = $apiPlatformProvider->getAnnotations();
 
-        $this->assertInternalType('array', $annotations);
         $this->assertCount(5, $annotations);
 
         $expectedResults = [

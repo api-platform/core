@@ -27,7 +27,7 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
  */
 final class ContextBuilder implements AnonymousContextBuilderInterface
 {
-    const FORMAT = 'jsonld';
+    public const FORMAT = 'jsonld';
 
     private $resourceNameCollectionFactory;
     private $resourceMetadataFactory;
@@ -123,7 +123,7 @@ final class ContextBuilder implements AnonymousContextBuilderInterface
         return $jsonLdContext;
     }
 
-    private function getResourceContextWithShortname(string $resourceClass, int $referenceType = UrlGeneratorInterface::ABS_PATH, string $shortName)
+    private function getResourceContextWithShortname(string $resourceClass, int $referenceType, string $shortName): array
     {
         $context = $this->getBaseContext($referenceType);
 

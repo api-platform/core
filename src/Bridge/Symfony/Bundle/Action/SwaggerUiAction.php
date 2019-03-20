@@ -161,7 +161,7 @@ final class SwaggerUiAction
                 $swaggerData['operationId'] = $subresourceOperationContext['operationId'];
             }
 
-            list($swaggerData['path'], $swaggerData['method']) = $this->getPathAndMethod($swaggerData);
+            [$swaggerData['path'], $swaggerData['method']] = $this->getPathAndMethod($swaggerData);
         }
 
         return $context + ['swagger_data' => $swaggerData];

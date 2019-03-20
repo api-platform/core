@@ -24,6 +24,7 @@ use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RelatedDummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\UnknownDummy;
+use Doctrine\Common\Collections\Collection;
 use Nelmio\ApiDocBundle\DataTypes;
 use Nelmio\ApiDocBundle\Parser\ParserInterface;
 use PHPUnit\Framework\TestCase;
@@ -352,7 +353,7 @@ class ApiPlatformParserTest extends TestCase
             ->withRequired(false);
         $propertyMetadataFactoryProphecy->create(Dummy::class, 'relatedDummy')->willReturn($relatedDummyPropertyMetadata)->shouldBeCalled();
         $relatedDummiesPropertyMetadata = (new PropertyMetadata())
-            ->withType(new Type(Type::BUILTIN_TYPE_OBJECT, false, 'Doctrine\Common\Collections\Collection', true, new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_OBJECT, false, RelatedDummy::class)))
+            ->withType(new Type(Type::BUILTIN_TYPE_OBJECT, false, Collection::class, true, new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_OBJECT, false, RelatedDummy::class)))
             ->withDescription('Several dummies.')
             ->withReadable(true)
             ->withWritable(true)

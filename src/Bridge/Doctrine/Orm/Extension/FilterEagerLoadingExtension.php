@@ -107,10 +107,8 @@ final class FilterEagerLoadingExtension implements ContextAwareQueryCollectionEx
      *
      * @param string $originAlias the base alias
      * @param string $replacement the replacement for the base alias, will change the from alias
-     *
-     * @return QueryBuilder
      */
-    private function getQueryBuilderWithNewAliases(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $originAlias = 'o', string $replacement = 'o_2')
+    private function getQueryBuilderWithNewAliases(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $originAlias = 'o', string $replacement = 'o_2'): QueryBuilder
     {
         $queryBuilderClone = clone $queryBuilder;
 

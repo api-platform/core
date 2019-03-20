@@ -38,7 +38,7 @@ class PaginatorTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('"Doctrine\\ORM\\Query::setFirstResult()" or/and "Doctrine\\ORM\\Query::setMaxResults()" was/were not applied to the query.');
 
-        $this->getPaginatorWithMalformedQuery(false);
+        $this->getPaginatorWithMalformedQuery();
     }
 
     public function testInitializeWithQueryMaxResultsNotApplied()

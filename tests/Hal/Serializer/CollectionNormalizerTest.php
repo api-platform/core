@@ -78,7 +78,7 @@ class CollectionNormalizerTest extends TestCase
                 'totalItems' => 1312,
                 'itemsPerPage' => 12,
             ],
-            $this->normalizePaginator(false)
+            $this->normalizePaginator()
         );
     }
 

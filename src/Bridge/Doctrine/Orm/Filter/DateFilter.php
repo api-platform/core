@@ -30,7 +30,7 @@ class DateFilter extends AbstractContextAwareFilter implements DateFilterInterfa
 {
     use DateFilterTrait;
 
-    const DOCTRINE_DATE_TYPES = [
+    public const DOCTRINE_DATE_TYPES = [
         DBALType::DATE => true,
         DBALType::DATETIME => true,
         DBALType::DATETIMETZ => true,
@@ -60,7 +60,7 @@ class DateFilter extends AbstractContextAwareFilter implements DateFilterInterfa
         $field = $property;
 
         if ($this->isPropertyNested($property, $resourceClass)) {
-            list($alias, $field) = $this->addJoinsForNestedProperty($property, $alias, $queryBuilder, $queryNameGenerator, $resourceClass);
+            [$alias, $field] = $this->addJoinsForNestedProperty($property, $alias, $queryBuilder, $queryNameGenerator, $resourceClass);
         }
 
         $nullManagement = $this->properties[$property] ?? null;

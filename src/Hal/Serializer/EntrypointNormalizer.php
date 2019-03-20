@@ -28,7 +28,7 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
  */
 final class EntrypointNormalizer implements NormalizerInterface, CacheableSupportsMethodInterface
 {
-    const FORMAT = 'jsonhal';
+    public const FORMAT = 'jsonhal';
 
     private $resourceMetadataFactory;
     private $iriConverter;

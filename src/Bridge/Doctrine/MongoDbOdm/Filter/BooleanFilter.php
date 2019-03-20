@@ -36,7 +36,7 @@ final class BooleanFilter extends AbstractFilter
 {
     use BooleanFilterTrait;
 
-    const DOCTRINE_BOOLEAN_TYPES = [
+    public const DOCTRINE_BOOLEAN_TYPES = [
         MongoDbType::BOOL => true,
         MongoDbType::BOOLEAN => true,
     ];

@@ -25,7 +25,7 @@ final class CachedRouteNameResolver implements RouteNameResolverInterface
 {
     use CachedTrait;
 
-    const CACHE_KEY_PREFIX = 'route_name_';
+    public const CACHE_KEY_PREFIX = 'route_name_';
 
     private $decorated;
 

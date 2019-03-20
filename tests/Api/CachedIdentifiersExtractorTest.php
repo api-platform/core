@@ -189,18 +189,14 @@ class CachedIdentifiersExtractorTest extends TestCase
         $cacheItemPool = $this->prophesize(CacheItemPoolInterface::class);
         $decoration = $this->prophesize(IdentifiersExtractorInterface::class);
 
-        $identifiersExtractor = new CachedIdentifiersExtractor($cacheItemPool->reveal(), $decoration->reveal(), null);
+        new CachedIdentifiersExtractor($cacheItemPool->reveal(), $decoration->reveal(), null);
     }
 
     private function getResourceClassResolver()
     {
         $resourceClassResolver = $this->prophesize(ResourceClassResolverInterface::class);
         $resourceClassResolver->isResourceClass(Argument::type('string'))->will(function ($args) {
-            if (Uuid::class === $args[0]) {
-                return false;
-            }
-
-            return true;
+            return !(Uuid::class === $args[0]);
         });
 
         return $resourceClassResolver->reveal();

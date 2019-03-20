@@ -383,7 +383,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer implement
      *
      * @throws InvalidArgumentException
      */
-    protected function denormalizeCollection(string $attribute, PropertyMetadata $propertyMetadata, Type $type, string $className, $value, string $format = null, array $context): array
+    protected function denormalizeCollection(string $attribute, PropertyMetadata $propertyMetadata, Type $type, string $className, $value, ?string $format, array $context): array
     {
         if (!\is_array($value)) {
             throw new InvalidArgumentException(sprintf(
@@ -417,7 +417,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer implement
      *
      * @return object|null
      */
-    protected function denormalizeRelation(string $attributeName, PropertyMetadata $propertyMetadata, string $className, $value, string $format = null, array $context)
+    protected function denormalizeRelation(string $attributeName, PropertyMetadata $propertyMetadata, string $className, $value, ?string $format, array $context)
     {
         if (\is_string($value)) {
             try {
@@ -532,7 +532,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer implement
         try {
             $attributeValue = $this->propertyAccessor->getValue($object, $attribute);
         } catch (NoSuchPropertyException $e) {
-            if (null === $propertyMetadata->isChildInherited()) {
+            if (!$propertyMetadata->hasChildInherited()) {
                 throw $e;
             }
 
@@ -574,7 +574,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer implement
      *
      * @param iterable $attributeValue
      */
-    protected function normalizeCollectionOfRelations(PropertyMetadata $propertyMetadata, $attributeValue, string $resourceClass, string $format = null, array $context): array
+    protected function normalizeCollectionOfRelations(PropertyMetadata $propertyMetadata, $attributeValue, string $resourceClass, ?string $format, array $context): array
     {
         $value = [];
         foreach ($attributeValue as $index => $obj) {
@@ -591,7 +591,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer implement
      *
      * @return string|array
      */
-    protected function normalizeRelation(PropertyMetadata $propertyMetadata, $relatedObject, string $resourceClass, string $format = null, array $context)
+    protected function normalizeRelation(PropertyMetadata $propertyMetadata, $relatedObject, string $resourceClass, ?string $format, array $context)
     {
         if (null === $relatedObject || !empty($context['attributes']) || $propertyMetadata->isReadableLink()) {
             if (null === $relatedObject) {

@@ -26,7 +26,7 @@ final class CachedResourceMetadataFactory implements ResourceMetadataFactoryInte
 {
     use CachedTrait;
 
-    const CACHE_KEY_PREFIX = 'resource_metadata_';
+    public const CACHE_KEY_PREFIX = 'resource_metadata_';
 
     private $decorated;
 

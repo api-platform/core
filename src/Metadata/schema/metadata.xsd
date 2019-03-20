@@ -78,8 +78,8 @@
     </xsd:complexType>
 
     <xsd:complexType name="subresourceOperation">
-        <xsd:sequence minOccurs="1" maxOccurs="unbounded">
-            <xsd:element name="attribute" minOccurs="1" maxOccurs="unbounded" type="attribute"/>
+        <xsd:sequence maxOccurs="unbounded">
+            <xsd:element name="attribute" maxOccurs="unbounded" type="attribute"/>
         </xsd:sequence>
         <xsd:attribute type="xsd:string" name="name"/>
     </xsd:complexType>

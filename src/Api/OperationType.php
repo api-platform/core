@@ -15,8 +15,8 @@ namespace ApiPlatform\Core\Api;
 
 final class OperationType
 {
-    const ITEM = 'item';
-    const COLLECTION = 'collection';
-    const SUBRESOURCE = 'subresource';
-    const TYPES = [self::ITEM, self::COLLECTION, self::SUBRESOURCE];
+    public const ITEM = 'item';
+    public const COLLECTION = 'collection';
+    public const SUBRESOURCE = 'subresource';
+    public const TYPES = [self::ITEM, self::COLLECTION, self::SUBRESOURCE];
 }

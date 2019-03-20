@@ -34,7 +34,7 @@ final class AnnotationFilterPass implements CompilerPassInterface
 {
     use AnnotationFilterExtractorTrait;
 
-    const TAG_FILTER_NAME = 'api_platform.filter';
+    public const TAG_FILTER_NAME = 'api_platform.filter';
 
     /**
      * {@inheritdoc}
@@ -52,9 +52,9 @@ final class AnnotationFilterPass implements CompilerPassInterface
         }
     }
 
-    private function createFilterDefinitions(\ReflectionClass $reflectionClass, Reader $reader, ContainerBuilder $container)
+    private function createFilterDefinitions(\ReflectionClass $reflectionClass, Reader $reader, ContainerBuilder $container): void
     {
-        foreach ($this->readFilterAnnotations($reflectionClass, $reader) as $id => list($arguments, $filterClass)) {
+        foreach ($this->readFilterAnnotations($reflectionClass, $reader) as $id => [$arguments, $filterClass]) {
             if ($container->hasDefinition($id)) {
                 continue;
             }
