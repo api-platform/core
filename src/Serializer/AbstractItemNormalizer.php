@@ -126,7 +126,6 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer implement
             }
 
             $context['api_normalize'] = true;
-            $context['resource_class'] = $this->getObjectClass($transformed);
             $context['api_resource'] = $object;
 
             return $this->serializer->normalize($transformed, $format, $context);
@@ -527,6 +526,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer implement
      */
     protected function getAttributeValue($object, $attribute, $format = null, array $context = [])
     {
+        $context['api_attribute'] = $attribute;
         $propertyMetadata = $this->propertyMetadataFactory->create($context['resource_class'], $attribute, $this->getFactoryOptions($context));
 
         try {

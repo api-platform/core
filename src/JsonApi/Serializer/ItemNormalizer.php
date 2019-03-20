@@ -64,7 +64,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
      */
     public function normalize($object, $format = null, array $context = [])
     {
-        if ($this->handleNonResource || null !== $outputClass = $this->getOutputClass($this->getObjectClass($object), $context)) {
+        if (!$this->handleNonResource && null !== $outputClass = $this->getOutputClass($this->getObjectClass($object), $context)) {
             return parent::normalize($object, $format, $context);
         }
 
@@ -72,43 +72,79 @@ final class ItemNormalizer extends AbstractItemNormalizer
             $context['cache_key'] = $this->getJsonApiCacheKey($format, $context);
         }
 
-        // Get and populate attributes data
-        $objectAttributesData = parent::normalize($object, $format, $context);
+        if ($this->handleNonResource) {
+            if (isset($context['api_resource'])) {
+                $originalResource = $context['api_resource'];
+                unset($context['api_resource']);
+            }
 
-        if (!\is_array($objectAttributesData)) {
-            return $objectAttributesData;
+            $attributesData = parent::normalize($object, $format, $context);
+            if (!\is_array($attributesData)) {
+                return $attributesData;
+            }
+
+            if (isset($context['api_attribute'])) {
+                return $attributesData;
+            }
+
+            if (isset($originalResource)) {
+                $resourceClass = $this->resourceClassResolver->getResourceClass($originalResource, $context['resource_class'] ?? null, true);
+                $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
+
+                $resourceData = [
+                    'id' => $this->iriConverter->getIriFromItem($originalResource),
+                    'type' => $resourceMetadata->getShortName(),
+                ];
+            } else {
+                $resourceData = [
+                    'id' => \function_exists('spl_object_id') ? spl_object_id($object) : spl_object_hash($object),
+                    'type' => (new \ReflectionClass($this->getObjectClass($object)))->getShortName(),
+                ];
+            }
+
+            if ($attributesData) {
+                $resourceData['attributes'] = $attributesData;
+            }
+
+            $document = ['data' => $resourceData];
+
+            return $document;
         }
 
-        // Get and populate item type
+        $attributesData = parent::normalize($object, $format, $context);
+        if (!\is_array($attributesData)) {
+            return $attributesData;
+        }
+
         $resourceClass = $this->resourceClassResolver->getResourceClass($object, $context['resource_class'] ?? null, true);
         $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
 
         // Get and populate relations
-        $components = $this->getComponents($object, $format, $context);
+        $allRelationshipsData = $this->getComponents($object, $format, $context)['relationships'];
         $populatedRelationContext = $context;
-        $objectRelationshipsData = $this->getPopulatedRelations($object, $format, $populatedRelationContext, $components['relationships']);
-        $objectRelatedResources = $this->getRelatedResources($object, $format, $context, $components['relationships']);
+        $relationshipsData = $this->getPopulatedRelations($object, $format, $populatedRelationContext, $allRelationshipsData);
+        $includedResourcesData = $this->getRelatedResources($object, $format, $context, $allRelationshipsData);
 
-        $item = [
+        $resourceData = [
             'id' => $this->iriConverter->getIriFromItem($object),
             'type' => $resourceMetadata->getShortName(),
         ];
 
-        if ($objectAttributesData) {
-            $item['attributes'] = $objectAttributesData;
+        if ($attributesData) {
+            $resourceData['attributes'] = $attributesData;
         }
 
-        if ($objectRelationshipsData) {
-            $item['relationships'] = $objectRelationshipsData;
+        if ($relationshipsData) {
+            $resourceData['relationships'] = $relationshipsData;
         }
 
-        $data = ['data' => $item];
+        $document = ['data' => $resourceData];
 
-        if ($objectRelatedResources) {
-            $data['included'] = $objectRelatedResources;
+        if ($includedResourcesData) {
+            $document['included'] = $includedResourcesData;
         }
 
-        return $data;
+        return $document;
     }
 
     /**

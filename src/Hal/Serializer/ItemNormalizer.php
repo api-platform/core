@@ -48,12 +48,38 @@ final class ItemNormalizer extends AbstractItemNormalizer
      */
     public function normalize($object, $format = null, array $context = [])
     {
-        if ($this->handleNonResource || null !== $outputClass = $this->getOutputClass($this->getObjectClass($object), $context)) {
+        if (!$this->handleNonResource && null !== $outputClass = $this->getOutputClass($this->getObjectClass($object), $context)) {
             return parent::normalize($object, $format, $context);
         }
 
         if (!isset($context['cache_key'])) {
             $context['cache_key'] = $this->getHalCacheKey($format, $context);
+        }
+
+        if ($this->handleNonResource) {
+            if (isset($context['api_resource'])) {
+                $originalResource = $context['api_resource'];
+                unset($context['api_resource']);
+            }
+
+            $rawData = parent::normalize($object, $format, $context);
+            if (!\is_array($rawData)) {
+                return $rawData;
+            }
+
+            if (!isset($originalResource)) {
+                return $rawData;
+            }
+
+            $metadataData = [
+                '_links' => [
+                    'self' => [
+                        'href' => $this->iriConverter->getIriFromItem($originalResource),
+                    ],
+                ],
+            ];
+
+            return $metadataData + $rawData;
         }
 
         $resourceClass = $this->resourceClassResolver->getResourceClass($object, $context['resource_class'] ?? null, true);
@@ -66,12 +92,18 @@ final class ItemNormalizer extends AbstractItemNormalizer
             return $rawData;
         }
 
-        $data = ['_links' => ['self' => ['href' => $context['iri']]]];
+        $metadataData = [
+            '_links' => [
+                'self' => [
+                    'href' => $context['iri'],
+                ],
+            ],
+        ];
         $components = $this->getComponents($object, $format, $context);
-        $data = $this->populateRelation($data, $object, $format, $context, $components, 'links');
-        $data = $this->populateRelation($data, $object, $format, $context, $components, 'embedded');
+        $metadataData = $this->populateRelation($metadataData, $object, $format, $context, $components, 'links');
+        $metadataData = $this->populateRelation($metadataData, $object, $format, $context, $components, 'embedded');
 
-        return $data + $rawData;
+        return $metadataData + $rawData;
     }
 
     /**
