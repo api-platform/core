@@ -22,12 +22,12 @@ namespace ApiPlatform\Core\Bridge\Doctrine\Common\Filter;
  */
 interface DateFilterInterface
 {
-    const PARAMETER_BEFORE = 'before';
-    const PARAMETER_STRICTLY_BEFORE = 'strictly_before';
-    const PARAMETER_AFTER = 'after';
-    const PARAMETER_STRICTLY_AFTER = 'strictly_after';
-    const EXCLUDE_NULL = 'exclude_null';
-    const INCLUDE_NULL_BEFORE = 'include_null_before';
-    const INCLUDE_NULL_AFTER = 'include_null_after';
-    const INCLUDE_NULL_BEFORE_AND_AFTER = 'include_null_before_and_after';
+    public const PARAMETER_BEFORE = 'before';
+    public const PARAMETER_STRICTLY_BEFORE = 'strictly_before';
+    public const PARAMETER_AFTER = 'after';
+    public const PARAMETER_STRICTLY_AFTER = 'strictly_after';
+    public const EXCLUDE_NULL = 'exclude_null';
+    public const INCLUDE_NULL_BEFORE = 'include_null_before';
+    public const INCLUDE_NULL_AFTER = 'include_null_after';
+    public const INCLUDE_NULL_BEFORE_AND_AFTER = 'include_null_before_and_after';
 }

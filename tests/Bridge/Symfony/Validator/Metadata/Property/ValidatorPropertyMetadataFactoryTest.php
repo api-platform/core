@@ -51,7 +51,6 @@ class ValidatorPropertyMetadataFactoryTest extends TestCase
         $validatorPropertyMetadataFactory = new ValidatorPropertyMetadataFactory($validatorMetadataFactory->reveal(), $decoratedPropertyMetadataFactory->reveal());
         $resultedPropertyMetadata = $validatorPropertyMetadataFactory->create(DummyValidatedEntity::class, 'dummy');
 
-        $this->assertInstanceOf(PropertyMetadata::class, $resultedPropertyMetadata);
         $this->assertEquals($expectedPropertyMetadata, $resultedPropertyMetadata);
     }
 
@@ -70,7 +69,6 @@ class ValidatorPropertyMetadataFactoryTest extends TestCase
         $validatorPropertyMetadataFactory = new ValidatorPropertyMetadataFactory($validatorMetadataFactory->reveal(), $decoratedPropertyMetadataFactory->reveal());
         $resultedPropertyMetadata = $validatorPropertyMetadataFactory->create(DummyValidatedEntity::class, 'dummyDate');
 
-        $this->assertInstanceOf(PropertyMetadata::class, $resultedPropertyMetadata);
         $this->assertEquals($expectedPropertyMetadata, $resultedPropertyMetadata);
     }
 
@@ -88,7 +86,6 @@ class ValidatorPropertyMetadataFactoryTest extends TestCase
         $validatorPropertyMetadataFactory = new ValidatorPropertyMetadataFactory($validatorMetadataFactory->reveal(), $decoratedPropertyMetadataFactory->reveal());
         $resultedPropertyMetadata = $validatorPropertyMetadataFactory->create(DummyValidatedEntity::class, 'dummyId');
 
-        $this->assertInstanceOf(PropertyMetadata::class, $resultedPropertyMetadata);
         $this->assertEquals($expectedPropertyMetadata, $resultedPropertyMetadata);
     }
 
@@ -106,7 +103,6 @@ class ValidatorPropertyMetadataFactoryTest extends TestCase
         $validatorPropertyMetadataFactory = new ValidatorPropertyMetadataFactory($validatorMetadataFactory->reveal(), $decoratedPropertyMetadataFactory->reveal());
         $resultedPropertyMetadata = $validatorPropertyMetadataFactory->create(DummyValidatedEntity::class, 'dummyGroup', ['validation_groups' => ['dummy']]);
 
-        $this->assertInstanceOf(PropertyMetadata::class, $resultedPropertyMetadata);
         $this->assertEquals($expectedPropertyMetadata, $resultedPropertyMetadata);
     }
 
@@ -124,7 +120,6 @@ class ValidatorPropertyMetadataFactoryTest extends TestCase
         $validatorPropertyMetadataFactory = new ValidatorPropertyMetadataFactory($validatorMetadataFactory->reveal(), $decoratedPropertyMetadataFactory->reveal());
         $resultedPropertyMetadata = $validatorPropertyMetadataFactory->create(DummyValidatedEntity::class, 'dummyGroup', ['validation_groups' => ['ymmud']]);
 
-        $this->assertInstanceOf(PropertyMetadata::class, $resultedPropertyMetadata);
         $this->assertEquals($expectedPropertyMetadata, $resultedPropertyMetadata);
     }
 
@@ -142,7 +137,6 @@ class ValidatorPropertyMetadataFactoryTest extends TestCase
         $validatorPropertyMetadataFactory = new ValidatorPropertyMetadataFactory($validatorMetadataFactory->reveal(), $decoratedPropertyMetadataFactory->reveal());
         $resultedPropertyMetadata = $validatorPropertyMetadataFactory->create(DummyValidatedEntity::class, 'dummyGroup', ['validation_groups' => [1312]]);
 
-        $this->assertInstanceOf(PropertyMetadata::class, $resultedPropertyMetadata);
         $this->assertEquals($expectedPropertyMetadata, $resultedPropertyMetadata);
     }
 
@@ -159,7 +153,6 @@ class ValidatorPropertyMetadataFactoryTest extends TestCase
         $validatorPropertyMetadataFactory = new ValidatorPropertyMetadataFactory($validatorMetadataFactory->reveal(), $decoratedPropertyMetadataFactory->reveal());
         $resultedPropertyMetadata = $validatorPropertyMetadataFactory->create(DummyValidatedEntity::class, 'dummyDate');
 
-        $this->assertInstanceOf(PropertyMetadata::class, $resultedPropertyMetadata);
         $this->assertEquals($expectedPropertyMetadata, $resultedPropertyMetadata);
     }
 

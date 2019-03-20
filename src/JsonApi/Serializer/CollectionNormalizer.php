@@ -26,14 +26,14 @@ use Symfony\Component\Serializer\Exception\UnexpectedValueException;
  */
 final class CollectionNormalizer extends AbstractCollectionNormalizer
 {
-    const FORMAT = 'jsonapi';
+    public const FORMAT = 'jsonapi';
 
     /**
      * {@inheritdoc}
      */
     protected function getPaginationData($object, array $context = []): array
     {
-        list($paginator, $paginated, $currentPage, $itemsPerPage, $lastPage, $pageTotalItems, $totalItems) = $this->getPaginationConfig($object, $context);
+        [$paginator, $paginated, $currentPage, $itemsPerPage, $lastPage, $pageTotalItems, $totalItems] = $this->getPaginationConfig($object, $context);
         $parsed = IriHelper::parseIri($context['request_uri'] ?? '/', $this->pageParameterName);
 
         $data = [

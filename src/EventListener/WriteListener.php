@@ -41,7 +41,7 @@ final class WriteListener
     /**
      * Persists, updates or delete data return by the controller if applicable.
      */
-    public function onKernelView(GetResponseForControllerResultEvent $event)
+    public function onKernelView(GetResponseForControllerResultEvent $event): void
     {
         $request = $event->getRequest();
         if ($request->isMethodSafe(false) || !($attributes = RequestAttributesExtractor::extractAttributes($request)) || !$attributes['persist']) {

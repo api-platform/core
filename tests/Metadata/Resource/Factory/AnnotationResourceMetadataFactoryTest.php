@@ -31,7 +31,7 @@ class AnnotationResourceMetadataFactoryTest extends TestCase
     /**
      * @dataProvider getCreateDependencies
      */
-    public function testCreate($reader, $decorated = null, string $expectedShortName, string $expectedDescription)
+    public function testCreate($reader, $decorated, string $expectedShortName, string $expectedDescription)
     {
         $factory = new AnnotationResourceMetadataFactory($reader->reveal(), $decorated ? $decorated->reveal() : null);
         $metadata = $factory->create(Dummy::class);

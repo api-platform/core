@@ -29,7 +29,7 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
  */
 final class EntrypointNormalizer implements NormalizerInterface, CacheableSupportsMethodInterface
 {
-    const FORMAT = 'jsonapi';
+    public const FORMAT = 'jsonapi';
 
     private $resourceMetadataFactory;
     private $iriConverter;

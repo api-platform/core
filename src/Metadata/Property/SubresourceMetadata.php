@@ -57,10 +57,7 @@ final class SubresourceMetadata
         return $metadata;
     }
 
-    /**
-     * @return int|null
-     */
-    public function getMaxDepth()
+    public function getMaxDepth(): ?int
     {
         return $this->maxDepth;
     }

@@ -27,7 +27,7 @@ use Symfony\Component\Routing\RouterInterface;
  */
 final class Router implements RouterInterface, UrlGeneratorInterface
 {
-    const CONST_MAP = [
+    public const CONST_MAP = [
         UrlGeneratorInterface::ABS_URL => RouterInterface::ABSOLUTE_URL,
         UrlGeneratorInterface::ABS_PATH => RouterInterface::ABSOLUTE_PATH,
         UrlGeneratorInterface::REL_PATH => RouterInterface::RELATIVE_PATH,

@@ -22,7 +22,7 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
  */
 class FileConfigDummy
 {
-    const HYDRA_TITLE = 'File config Dummy';
+    public const HYDRA_TITLE = 'File config Dummy';
 
     /**
      * @var int The id

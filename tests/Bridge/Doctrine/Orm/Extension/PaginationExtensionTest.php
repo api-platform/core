@@ -546,7 +546,7 @@ class PaginationExtensionTest extends TestCase
             $resourceMetadataFactory,
             $pagination
         );
-        $extension->applyToCollection($queryBuilder, new QueryNameGenerator(), 'Foo', 'op', []);
+        $extension->applyToCollection($queryBuilder, new QueryNameGenerator(), 'Foo', 'op');
     }
 
     /**
@@ -616,7 +616,7 @@ class PaginationExtensionTest extends TestCase
             $resourceMetadataFactory,
             $pagination
         );
-        $extension->applyToCollection($queryBuilder, new QueryNameGenerator(), 'Foo', 'op', []);
+        $extension->applyToCollection($queryBuilder, new QueryNameGenerator(), 'Foo', 'op');
     }
 
     /**
@@ -732,7 +732,7 @@ class PaginationExtensionTest extends TestCase
             $resourceMetadataFactory,
             $pagination
         );
-        $this->assertTrue($extension->supportsResult('Foo', 'op', []));
+        $this->assertTrue($extension->supportsResult('Foo', 'op'));
     }
 
     /**
@@ -853,7 +853,7 @@ class PaginationExtensionTest extends TestCase
             $resourceMetadataFactory,
             $pagination
         );
-        $this->assertFalse($extension->supportsResult('Foo', 'op', []));
+        $this->assertFalse($extension->supportsResult('Foo', 'op'));
     }
 
     /**
@@ -882,7 +882,7 @@ class PaginationExtensionTest extends TestCase
 
     public function testGetResult()
     {
-        $result = $this->getPaginationExtensionResult(false);
+        $result = $this->getPaginationExtensionResult();
 
         $this->assertInstanceOf(PartialPaginatorInterface::class, $result);
         $this->assertInstanceOf(PaginatorInterface::class, $result);
@@ -924,7 +924,7 @@ class PaginationExtensionTest extends TestCase
      */
     public function testLegacyGetResult()
     {
-        $result = $this->getLegacyPaginationExtensionResult(false);
+        $result = $this->getLegacyPaginationExtensionResult();
 
         $this->assertInstanceOf(PartialPaginatorInterface::class, $result);
         $this->assertInstanceOf(PaginatorInterface::class, $result);

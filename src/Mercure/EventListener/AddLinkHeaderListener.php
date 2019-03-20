@@ -37,7 +37,7 @@ final class AddLinkHeaderListener
     /**
      * Sends the Mercure header on each response.
      */
-    public function onKernelResponse(FilterResponseEvent $event)
+    public function onKernelResponse(FilterResponseEvent $event): void
     {
         $link = new Link('mercure', $this->hub);
 

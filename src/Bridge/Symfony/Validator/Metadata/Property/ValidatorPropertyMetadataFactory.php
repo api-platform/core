@@ -45,9 +45,9 @@ final class ValidatorPropertyMetadataFactory implements PropertyMetadataFactoryI
     /**
      * @var string[] A list of constraint classes making the entity required
      */
-    const REQUIRED_CONSTRAINTS = [NotBlank::class, NotNull::class];
+    public const REQUIRED_CONSTRAINTS = [NotBlank::class, NotNull::class];
 
-    const SCHEMA_MAPPED_CONSTRAINTS = [
+    public const SCHEMA_MAPPED_CONSTRAINTS = [
         Url::class => 'http://schema.org/url',
         Email::class => 'http://schema.org/email',
         Uuid::class => 'http://schema.org/identifier',

@@ -28,7 +28,7 @@ class ApiFilterTest extends TestCase
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('This annotation needs a value representing the filter class.');
 
-        $resource = new ApiFilter();
+        new ApiFilter();
     }
 
     public function testInvalidFilter()
@@ -36,7 +36,7 @@ class ApiFilterTest extends TestCase
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('The filter class "ApiPlatform\\Core\\Tests\\Fixtures\\TestBundle\\Entity\\Dummy" does not implement "ApiPlatform\\Core\\Api\\FilterInterface".');
 
-        $resource = new ApiFilter(['value' => Dummy::class]);
+        new ApiFilter(['value' => Dummy::class]);
     }
 
     public function testInvalidProperty()
@@ -44,7 +44,7 @@ class ApiFilterTest extends TestCase
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Property "foo" does not exist on the ApiFilter annotation.');
 
-        $resource = new ApiFilter(['value' => DummyFilter::class, 'foo' => 'bar']);
+        new ApiFilter(['value' => DummyFilter::class, 'foo' => 'bar']);
     }
 
     public function testAssignation()

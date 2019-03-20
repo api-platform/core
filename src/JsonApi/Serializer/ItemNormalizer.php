@@ -42,11 +42,11 @@ final class ItemNormalizer extends AbstractItemNormalizer
 {
     use ClassInfoTrait;
 
-    const FORMAT = 'jsonapi';
+    public const FORMAT = 'jsonapi';
 
     private $componentsCache = [];
 
-    public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, IriConverterInterface $iriConverter, ResourceClassResolverInterface $resourceClassResolver, PropertyAccessorInterface $propertyAccessor = null, NameConverterInterface $nameConverter = null, ResourceMetadataFactoryInterface $resourceMetadataFactory, array $defaultContext = [], iterable $dataTransformers = [], bool $handleNonResource = false)
+    public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, IriConverterInterface $iriConverter, ResourceClassResolverInterface $resourceClassResolver, ?PropertyAccessorInterface $propertyAccessor, ?NameConverterInterface $nameConverter, ResourceMetadataFactoryInterface $resourceMetadataFactory, array $defaultContext = [], iterable $dataTransformers = [], bool $handleNonResource = false)
     {
         parent::__construct($propertyNameCollectionFactory, $propertyMetadataFactory, $iriConverter, $resourceClassResolver, $propertyAccessor, $nameConverter, null, null, false, $defaultContext, $dataTransformers, $resourceMetadataFactory, $handleNonResource);
     }
@@ -212,7 +212,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
      * @throws RuntimeException
      * @throws NotNormalizableValueException
      */
-    protected function denormalizeRelation(string $attributeName, PropertyMetadata $propertyMetadata, string $className, $value, string $format = null, array $context)
+    protected function denormalizeRelation(string $attributeName, PropertyMetadata $propertyMetadata, string $className, $value, ?string $format, array $context)
     {
         // Give a chance to other normalizers (e.g.: DateTimeNormalizer)
         if (!$this->resourceClassResolver->isResourceClass($className)) {
@@ -242,7 +242,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
      *
      * @throws RuntimeException
      */
-    protected function normalizeRelation(PropertyMetadata $propertyMetadata, $relatedObject, string $resourceClass, string $format = null, array $context)
+    protected function normalizeRelation(PropertyMetadata $propertyMetadata, $relatedObject, string $resourceClass, ?string $format, array $context)
     {
         if (null === $relatedObject) {
             if (isset($context['operation_type'], $context['subresource_resources'][$resourceClass]) && OperationType::SUBRESOURCE === $context['operation_type']) {
@@ -292,10 +292,8 @@ final class ItemNormalizer extends AbstractItemNormalizer
      * Gets JSON API components of the resource: attributes, relationships, meta and links.
      *
      * @param object $object
-     *
-     * @return array
      */
-    private function getComponents($object, string $format = null, array $context)
+    private function getComponents($object, ?string $format, array $context): array
     {
         $cacheKey = $this->getObjectClass($object).'-'.$context['cache_key'];
 
@@ -359,7 +357,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
      *
      * @throws UnexpectedValueException
      */
-    private function getPopulatedRelations($object, string $format = null, array $context, array $relationships): array
+    private function getPopulatedRelations($object, ?string $format, array $context, array $relationships): array
     {
         $data = [];
 
@@ -409,7 +407,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
     /**
      * Populates included keys.
      */
-    private function getRelatedResources($object, string $format = null, array $context, array $relationships): array
+    private function getRelatedResources($object, ?string $format, array $context, array $relationships): array
     {
         if (!isset($context['api_included'])) {
             return [];
@@ -451,7 +449,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
      *
      * @return bool|string
      */
-    private function getJsonApiCacheKey(string $format = null, array $context)
+    private function getJsonApiCacheKey(?string $format, array $context)
     {
         try {
             return md5($format.serialize($context));

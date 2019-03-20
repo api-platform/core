@@ -31,7 +31,7 @@ class AnnotationPropertyMetadataFactoryTest extends TestCase
     /**
      * @dataProvider dependenciesProvider
      */
-    public function testCreateProperty($reader, $decorated = null, string $description)
+    public function testCreateProperty($reader, $decorated, string $description)
     {
         $factory = new AnnotationPropertyMetadataFactory($reader->reveal(), $decorated ? $decorated->reveal() : null);
         $metadata = $factory->create(Dummy::class, 'name');

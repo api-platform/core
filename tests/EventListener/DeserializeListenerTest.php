@@ -29,7 +29,7 @@ use Symfony\Component\Serializer\SerializerInterface;
  */
 class DeserializeListenerTest extends TestCase
 {
-    const FORMATS = ['json' => ['application/json']];
+    public const FORMATS = ['json' => ['application/json']];
 
     public function testDoNotCallWhenRequestMethodIsSafe()
     {

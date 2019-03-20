@@ -67,7 +67,7 @@ final class AnnotationResourceMetadataFactory implements ResourceMetadataFactory
      *
      * @throws ResourceClassNotFoundException
      */
-    private function handleNotFound(ResourceMetadata $parentPropertyMetadata = null, string $resourceClass): ResourceMetadata
+    private function handleNotFound(?ResourceMetadata $parentPropertyMetadata, string $resourceClass): ResourceMetadata
     {
         if (null !== $parentPropertyMetadata) {
             return $parentPropertyMetadata;

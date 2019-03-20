@@ -78,6 +78,13 @@ return PhpCsFixer\Config::create()
         'phpdoc_trim_consecutive_blank_line_separation' => true,
         'strict_comparison' => true,
         'strict_param' => true,
+        'visibility_required' => [
+            'elements' => [
+                'const',
+                'method',
+                'property',
+            ],
+        ],
         'void_return' => false, // BC breaks; to be done in API Platform 3.0
     ])
     ->setFinder($finder)

@@ -40,7 +40,7 @@ class IdentifiersExtractorTest extends TestCase
             $prophecies = [$this->prophesize(PropertyNameCollectionFactoryInterface::class), $this->prophesize(PropertyMetadataFactoryInterface::class)];
         }
 
-        list($propertyNameCollectionFactoryProphecy, $propertyMetadataFactoryProphecy) = $prophecies;
+        [$propertyNameCollectionFactoryProphecy, $propertyMetadataFactoryProphecy] = $prophecies;
 
         $propertyNameCollectionFactoryProphecy->create($class)->shouldBeCalled()->willReturn(new PropertyNameCollection($properties));
 
@@ -54,7 +54,7 @@ class IdentifiersExtractorTest extends TestCase
 
     public function testGetIdentifiersFromResourceClass()
     {
-        list($propertyNameCollectionFactoryProphecy, $propertyMetadataFactoryProphecy) = $this->getMetadataFactoryProphecies(Dummy::class, ['id']);
+        [$propertyNameCollectionFactoryProphecy, $propertyMetadataFactoryProphecy] = $this->getMetadataFactoryProphecies(Dummy::class, ['id']);
 
         $identifiersExtractor = new IdentifiersExtractor($propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), null, $this->getResourceClassResolver());
 
@@ -63,7 +63,7 @@ class IdentifiersExtractorTest extends TestCase
 
     public function testGetCompositeIdentifiersFromResourceClass()
     {
-        list($propertyNameCollectionFactoryProphecy, $propertyMetadataFactoryProphecy) = $this->getMetadataFactoryProphecies(Dummy::class, ['id', 'name']);
+        [$propertyNameCollectionFactoryProphecy, $propertyMetadataFactoryProphecy] = $this->getMetadataFactoryProphecies(Dummy::class, ['id', 'name']);
 
         $identifiersExtractor = new IdentifiersExtractor($propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), null, $this->getResourceClassResolver());
 
@@ -87,7 +87,7 @@ class IdentifiersExtractorTest extends TestCase
      */
     public function testGetIdentifiersFromItem($item, $expected)
     {
-        list($propertyNameCollectionFactoryProphecy, $propertyMetadataFactoryProphecy) = $this->getMetadataFactoryProphecies(Dummy::class, ['id']);
+        [$propertyNameCollectionFactoryProphecy, $propertyMetadataFactoryProphecy] = $this->getMetadataFactoryProphecies(Dummy::class, ['id']);
 
         $identifiersExtractor = new IdentifiersExtractor($propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), null, $this->getResourceClassResolver());
 
@@ -112,7 +112,7 @@ class IdentifiersExtractorTest extends TestCase
      */
     public function testGetCompositeIdentifiersFromItem($item, $expected)
     {
-        list($propertyNameCollectionFactoryProphecy, $propertyMetadataFactoryProphecy) = $this->getMetadataFactoryProphecies(Dummy::class, ['id', 'name']);
+        [$propertyNameCollectionFactoryProphecy, $propertyMetadataFactoryProphecy] = $this->getMetadataFactoryProphecies(Dummy::class, ['id', 'name']);
 
         $identifiersExtractor = new IdentifiersExtractor($propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), null, $this->getResourceClassResolver());
 
@@ -146,7 +146,7 @@ class IdentifiersExtractorTest extends TestCase
     public function testGetRelatedIdentifiersFromItem($item, $expected)
     {
         $prophecies = $this->getMetadataFactoryProphecies(Dummy::class, ['id', 'relatedDummy']);
-        list($propertyNameCollectionFactoryProphecy, $propertyMetadataFactoryProphecy) = $this->getMetadataFactoryProphecies(RelatedDummy::class, ['id'], $prophecies);
+        [$propertyNameCollectionFactoryProphecy, $propertyMetadataFactoryProphecy] = $this->getMetadataFactoryProphecies(RelatedDummy::class, ['id'], $prophecies);
 
         $identifiersExtractor = new IdentifiersExtractor($propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), null, $this->getResourceClassResolver());
 
@@ -159,7 +159,7 @@ class IdentifiersExtractorTest extends TestCase
         $this->expectExceptionMessage('No identifier found in "ApiPlatform\\Core\\Tests\\Fixtures\\TestBundle\\Entity\\RelatedDummy" through relation "relatedDummy" of "ApiPlatform\\Core\\Tests\\Fixtures\\TestBundle\\Entity\\Dummy" used as identifier');
 
         $prophecies = $this->getMetadataFactoryProphecies(Dummy::class, ['id', 'relatedDummy']);
-        list($propertyNameCollectionFactoryProphecy, $propertyMetadataFactoryProphecy) = $this->getMetadataFactoryProphecies(RelatedDummy::class, [], $prophecies);
+        [$propertyNameCollectionFactoryProphecy, $propertyMetadataFactoryProphecy] = $this->getMetadataFactoryProphecies(RelatedDummy::class, [], $prophecies);
 
         $identifiersExtractor = new IdentifiersExtractor($propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), null, $this->getResourceClassResolver());
 
@@ -177,11 +177,7 @@ class IdentifiersExtractorTest extends TestCase
     {
         $resourceClassResolver = $this->prophesize(ResourceClassResolverInterface::class);
         $resourceClassResolver->isResourceClass(Argument::type('string'))->will(function ($args) {
-            if (Uuid::class === $args[0]) {
-                return false;
-            }
-
-            return true;
+            return !(Uuid::class === $args[0]);
         });
 
         return $resourceClassResolver->reveal();
@@ -193,7 +189,7 @@ class IdentifiersExtractorTest extends TestCase
      */
     public function testLegacyGetIdentifiersFromItem()
     {
-        list($propertyNameCollectionFactoryProphecy, $propertyMetadataFactoryProphecy) = $this->getMetadataFactoryProphecies(Dummy::class, ['id']);
+        [$propertyNameCollectionFactoryProphecy, $propertyMetadataFactoryProphecy] = $this->getMetadataFactoryProphecies(Dummy::class, ['id']);
 
         $identifiersExtractor = new IdentifiersExtractor($propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal());
 

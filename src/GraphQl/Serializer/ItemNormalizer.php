@@ -27,8 +27,8 @@ final class ItemNormalizer extends BaseItemNormalizer
 {
     use ClassInfoTrait;
 
-    const FORMAT = 'graphql';
-    const ITEM_KEY = '#item';
+    public const FORMAT = 'graphql';
+    public const ITEM_KEY = '#item';
 
     /**
      * {@inheritdoc}
@@ -70,7 +70,7 @@ final class ItemNormalizer extends BaseItemNormalizer
     /**
      * {@inheritdoc}
      */
-    protected function normalizeCollectionOfRelations(PropertyMetadata $propertyMetadata, $attributeValue, string $resourceClass, string $format = null, array $context): array
+    protected function normalizeCollectionOfRelations(PropertyMetadata $propertyMetadata, $attributeValue, string $resourceClass, ?string $format, array $context): array
     {
         // to-many are handled directly by the GraphQL resolver
         return [];

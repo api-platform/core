@@ -75,7 +75,7 @@ class FilterEagerLoadingExtensionTest extends TestCase
         $queryNameGenerator = $this->prophesize(QueryNameGeneratorInterface::class);
 
         $filterEagerLoadingExtension = new FilterEagerLoadingExtension($resourceMetadataFactoryProphecy->reveal(), true);
-        $filterEagerLoadingExtension->applyToCollection($qb->reveal(), $queryNameGenerator->reveal(), DummyCar::class, null);
+        $filterEagerLoadingExtension->applyToCollection($qb->reveal(), $queryNameGenerator->reveal(), DummyCar::class);
     }
 
     public function testIsForceEagerConfig()

@@ -234,7 +234,7 @@ class CollectionFiltersNormalizerTest extends TestCase
             $this->prophesize(ContainerInterface::class)->reveal()
         );
 
-        $this->assertEquals(['name' => 'foo'], $normalizer->normalize($dummy, null, []));
+        $this->assertEquals(['name' => 'foo'], $normalizer->normalize($dummy));
     }
 
     public function testNormalize()

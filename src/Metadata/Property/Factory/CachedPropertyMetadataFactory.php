@@ -26,7 +26,7 @@ final class CachedPropertyMetadataFactory implements PropertyMetadataFactoryInte
 {
     use CachedTrait;
 
-    const CACHE_KEY_PREFIX = 'property_metadata_';
+    public const CACHE_KEY_PREFIX = 'property_metadata_';
 
     private $decorated;
 

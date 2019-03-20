@@ -24,7 +24,7 @@ use Symfony\Component\HttpKernel\Event\GetResponseEvent;
  */
 final class TransformPaginationParametersListener
 {
-    public function onKernelRequest(GetResponseEvent $event)
+    public function onKernelRequest(GetResponseEvent $event): void
     {
         $request = $event->getRequest();
 

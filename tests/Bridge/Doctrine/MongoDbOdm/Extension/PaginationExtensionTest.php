@@ -295,7 +295,7 @@ class PaginationExtensionTest extends TestCase
             $this->managerRegistryProphecy->reveal(),
             $pagination
         );
-        $this->assertTrue($extension->supportsResult('Foo', 'op', []));
+        $this->assertTrue($extension->supportsResult('Foo', 'op'));
     }
 
     public function testSupportsResultClientNotAllowedToPaginate()
@@ -387,7 +387,7 @@ class PaginationExtensionTest extends TestCase
             $pagination
         );
 
-        return $paginationExtension->getResult($aggregationBuilderProphecy->reveal(), 'Foo', null, []);
+        return $paginationExtension->getResult($aggregationBuilderProphecy->reveal(), 'Foo');
     }
 
     private function mockAggregationBuilder($expectedOffset, $expectedLimit)

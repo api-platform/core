@@ -25,7 +25,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  */
 final class ContextAction
 {
-    const RESERVED_SHORT_NAMES = [
+    public const RESERVED_SHORT_NAMES = [
         'ConstraintViolationList' => true,
         'Error' => true,
     ];
