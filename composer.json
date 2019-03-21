@@ -39,14 +39,19 @@
         "doctrine/mongodb-odm-bundle": "^4.0.0@beta",
         "doctrine/orm": "^2.6.3",
         "elasticsearch/elasticsearch": "^6.0",
-        "friendsofsymfony/user-bundle": "dev-fix-mongodb-mapping",
+        "friendsofsymfony/user-bundle": "^2.2@dev",
         "guzzlehttp/guzzle": "^6.0",
+        "jangregor/phpstan-prophecy": "^0.3",
         "justinrainbow/json-schema": "^5.0",
         "nelmio/api-doc-bundle": "^2.13.3",
         "php-mock/php-mock-phpunit": "^2.0",
         "phpdocumentor/reflection-docblock": "^3.0 || ^4.0",
         "phpdocumentor/type-resolver": "^0.3 || ^0.4",
         "phpspec/prophecy": "^1.8",
+        "phpstan/phpstan": "^0.11.3",
+        "phpstan/phpstan-doctrine": "^0.11.2",
+        "phpstan/phpstan-phpunit": "^0.11",
+        "phpstan/phpstan-symfony": "^0.11.2",
         "phpunit/phpunit": "^7.5.2",
         "psr/log": "^1.0",
         "ramsey/uuid": "^3.7",
@@ -111,12 +116,5 @@
     },
     "config": {
         "sort-packages": true
-    },
-    "repositories": [
-        {
-            "type": "vcs",
-            "url": "https://github.com/alanpoulain/FOSUserBundle",
-            "no-api": true
-        }
-    ]
+    }
 }

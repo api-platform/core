@@ -26,9 +26,9 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
  */
 final class ErrorNormalizer implements NormalizerInterface, CacheableSupportsMethodInterface
 {
-    const FORMAT = 'jsonproblem';
-    const TYPE = 'type';
-    const TITLE = 'title';
+    public const FORMAT = 'jsonproblem';
+    public const TYPE = 'type';
+    public const TITLE = 'title';
 
     use ErrorNormalizerTrait;
 

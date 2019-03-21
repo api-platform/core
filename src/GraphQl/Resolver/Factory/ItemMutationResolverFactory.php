@@ -131,7 +131,7 @@ final class ItemMutationResolverFactory implements ResolverFactoryInterface
      *
      * @throws Error
      */
-    private function validate($item, ResolveInfo $info, ResourceMetadata $resourceMetadata, string $operationName = null)
+    private function validate($item, ResolveInfo $info, ResourceMetadata $resourceMetadata, string $operationName = null): void
     {
         if (null === $this->validator) {
             return;

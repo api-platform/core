@@ -21,5 +21,5 @@ namespace ApiPlatform\Core\Bridge\Doctrine\Common\Filter;
  */
 interface ExistsFilterInterface
 {
-    const QUERY_PARAMETER_KEY = 'exists';
+    public const QUERY_PARAMETER_KEY = 'exists';
 }

@@ -24,7 +24,7 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
  */
 final class ConstraintViolationListNormalizer extends AbstractConstraintViolationListNormalizer
 {
-    const FORMAT = 'jsonld';
+    public const FORMAT = 'jsonld';
 
     private $urlGenerator;
 
@@ -40,7 +40,7 @@ final class ConstraintViolationListNormalizer extends AbstractConstraintViolatio
      */
     public function normalize($object, $format = null, array $context = [])
     {
-        list($messages, $violations) = $this->getMessagesAndViolations($object);
+        [$messages, $violations] = $this->getMessagesAndViolations($object);
 
         return [
             '@context' => $this->urlGenerator->generate('api_jsonld_context', ['shortName' => 'ConstraintViolationList']),

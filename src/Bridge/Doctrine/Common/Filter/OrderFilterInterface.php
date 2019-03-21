@@ -22,11 +22,11 @@ namespace ApiPlatform\Core\Bridge\Doctrine\Common\Filter;
  */
 interface OrderFilterInterface
 {
-    const DIRECTION_ASC = 'ASC';
-    const DIRECTION_DESC = 'DESC';
-    const NULLS_SMALLEST = 'nulls_smallest';
-    const NULLS_LARGEST = 'nulls_largest';
-    const NULLS_DIRECTION_MAP = [
+    public const DIRECTION_ASC = 'ASC';
+    public const DIRECTION_DESC = 'DESC';
+    public const NULLS_SMALLEST = 'nulls_smallest';
+    public const NULLS_LARGEST = 'nulls_largest';
+    public const NULLS_DIRECTION_MAP = [
         self::NULLS_SMALLEST => [
             'ASC' => 'ASC',
             'DESC' => 'DESC',

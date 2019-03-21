@@ -42,7 +42,6 @@ class ExtractorResourceMetadataFactoryTest extends FileConfigurationMetadataFact
         $resourceMetadataFactory = new ExtractorResourceMetadataFactory(new XmlExtractor([$configPath]));
         $resourceMetadata = $resourceMetadataFactory->create(FileConfigDummy::class);
 
-        $this->assertInstanceOf(ResourceMetadata::class, $resourceMetadata);
         $this->assertEquals($expectedResourceMetadata, $resourceMetadata);
     }
 
@@ -70,8 +69,6 @@ class ExtractorResourceMetadataFactoryTest extends FileConfigurationMetadataFact
         $resourceMetadataFactory = new ExtractorResourceMetadataFactory(new XmlExtractor([$configPath]));
         $resourceMetadata = $resourceMetadataFactory->create(FileConfigDummy::class);
 
-        $this->assertInstanceOf(ResourceMetadata::class, $resourceMetadata);
-
         $this->assertEquals($expectedResourceMetadata, $resourceMetadata);
     }
 
@@ -87,8 +84,6 @@ class ExtractorResourceMetadataFactoryTest extends FileConfigurationMetadataFact
         $resourceMetadataFactory = new ExtractorResourceMetadataFactory(new XmlExtractor([$configPath]));
         $resourceMetadata = $resourceMetadataFactory->create(FileConfigDummy::class);
 
-        $this->assertInstanceOf(ResourceMetadata::class, $resourceMetadata);
-
         $this->assertEquals($expectedResourceMetadata, $resourceMetadata);
     }
 
@@ -102,8 +97,6 @@ class ExtractorResourceMetadataFactoryTest extends FileConfigurationMetadataFact
         $resourceMetadataFactory = new ExtractorResourceMetadataFactory(new XmlExtractor([$configPath]));
         $resourceMetadata = $resourceMetadataFactory->create(FileConfigDummy::class);
 
-        $this->assertInstanceOf(ResourceMetadata::class, $resourceMetadata);
-
         $this->assertEquals($expectedResourceMetadata, $resourceMetadata);
     }
 
@@ -116,8 +109,6 @@ class ExtractorResourceMetadataFactoryTest extends FileConfigurationMetadataFact
 
         $resourceMetadataFactory = new ExtractorResourceMetadataFactory(new XmlExtractor([$configPath]));
         $resourceMetadata = $resourceMetadataFactory->create(FileConfigDummy::class);
-
-        $this->assertInstanceOf(ResourceMetadata::class, $resourceMetadata);
 
         $this->assertEquals($expectedResourceMetadata, $resourceMetadata);
     }
@@ -177,7 +168,6 @@ class ExtractorResourceMetadataFactoryTest extends FileConfigurationMetadataFact
         $resourceMetadataFactory = new ExtractorResourceMetadataFactory(new YamlExtractor([$configPath]));
         $resourceMetadata = $resourceMetadataFactory->create(FileConfigDummy::class);
 
-        $this->assertInstanceOf(ResourceMetadata::class, $resourceMetadata);
         $this->assertEquals($expectedResourceMetadata, $resourceMetadata);
     }
 
@@ -205,7 +195,6 @@ class ExtractorResourceMetadataFactoryTest extends FileConfigurationMetadataFact
         $resourceMetadataFactory = new ExtractorResourceMetadataFactory(new YamlExtractor([$configPath]));
         $resourceMetadata = $resourceMetadataFactory->create(FileConfigDummy::class);
 
-        $this->assertInstanceOf(ResourceMetadata::class, $resourceMetadata);
         $this->assertEquals($expectedResourceMetadata, $resourceMetadata);
     }
 
@@ -219,7 +208,6 @@ class ExtractorResourceMetadataFactoryTest extends FileConfigurationMetadataFact
         $resourceMetadataFactory = new ExtractorResourceMetadataFactory(new YamlExtractor([$configPath]));
         $resourceMetadata = $resourceMetadataFactory->create(FileConfigDummy::class);
 
-        $this->assertInstanceOf(ResourceMetadata::class, $resourceMetadata);
         $this->assertEquals($expectedResourceMetadata, $resourceMetadata);
     }
 
@@ -285,7 +273,6 @@ class ExtractorResourceMetadataFactoryTest extends FileConfigurationMetadataFact
         $shortNameResourceMetadataFactory = new ShortNameResourceMetadataFactory($resourceMetadataFactory);
 
         $resourceMetadata = $shortNameResourceMetadataFactory->create(\DateTime::class);
-        $this->assertInstanceOf(ResourceMetadata::class, $resourceMetadata);
         $this->assertSame(\DateTime::class, $resourceMetadata->getShortName());
     }
 
@@ -297,7 +284,6 @@ class ExtractorResourceMetadataFactoryTest extends FileConfigurationMetadataFact
         $shortNameResourceMetadataFactory = new ShortNameResourceMetadataFactory($resourceMetadataFactory);
 
         $resourceMetadata = $shortNameResourceMetadataFactory->create(DummyResourceInterface::class);
-        $this->assertInstanceOf(ResourceMetadata::class, $resourceMetadata);
         $this->assertSame('DummyResourceInterface', $resourceMetadata->getShortName());
     }
 }

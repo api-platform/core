@@ -25,9 +25,9 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
  */
 final class ConstraintViolationListNormalizer extends AbstractConstraintViolationListNormalizer
 {
-    const FORMAT = 'jsonproblem';
-    const TYPE = 'type';
-    const TITLE = 'title';
+    public const FORMAT = 'jsonproblem';
+    public const TYPE = 'type';
+    public const TITLE = 'title';
 
     private $defaultContext = [
         self::TYPE => 'https://tools.ietf.org/html/rfc2616#section-10',
@@ -46,7 +46,7 @@ final class ConstraintViolationListNormalizer extends AbstractConstraintViolatio
      */
     public function normalize($object, $format = null, array $context = [])
     {
-        list($messages, $violations) = $this->getMessagesAndViolations($object);
+        [$messages, $violations] = $this->getMessagesAndViolations($object);
 
         return [
             'type' => $context[self::TYPE] ?? $this->defaultContext[self::TYPE],

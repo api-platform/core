@@ -56,7 +56,7 @@ class DataPersisterTest extends TestCase
         $dummy = new Dummy();
 
         $messageBus = $this->prophesize(MessageBusInterface::class);
-        $messageBus->dispatch($dummy)->willReturn(new Envelope(new \stdClass()))->shouldBeCalled();
+        $messageBus->dispatch($dummy)->willReturn(new Envelope($dummy))->shouldBeCalled();
 
         $dataPersister = new DataPersister($this->prophesize(ResourceMetadataFactoryInterface::class)->reveal(), $messageBus->reveal());
         $this->assertSame($dummy, $dataPersister->persist($dummy));
@@ -67,9 +67,9 @@ class DataPersisterTest extends TestCase
         $dummy = new Dummy();
 
         $messageBus = $this->prophesize(MessageBusInterface::class);
-        $messageBus->dispatch(Argument::that(function (Envelope $envelope) {
-            return null !== $envelope->last(RemoveStamp::class);
-        }))->willReturn(new Envelope(new \stdClass()))->shouldBeCalled();
+        $messageBus->dispatch(Argument::that(function (Envelope $envelope) use ($dummy) {
+            return $dummy === $envelope->getMessage() && null !== $envelope->last(RemoveStamp::class);
+        }))->willReturn(new Envelope($dummy))->shouldBeCalled();
 
         $dataPersister = new DataPersister($this->prophesize(ResourceMetadataFactoryInterface::class)->reveal(), $messageBus->reveal());
         $dataPersister->remove($dummy);
@@ -80,9 +80,9 @@ class DataPersisterTest extends TestCase
         $dummy = new Dummy();
 
         $messageBus = $this->prophesize(MessageBusInterface::class);
-        $messageBus->dispatch($dummy)->willReturn(new Envelope(new \stdClass(), new HandledStamp('result', 'DummyHandler::__invoke')))->shouldBeCalled();
+        $messageBus->dispatch($dummy)->willReturn(new Envelope($dummy, new HandledStamp($dummy, 'DummyHandler::__invoke')))->shouldBeCalled();
 
         $dataPersister = new DataPersister($this->prophesize(ResourceMetadataFactoryInterface::class)->reveal(), $messageBus->reveal());
-        $this->assertSame('result', $dataPersister->persist($dummy));
+        $this->assertSame($dummy, $dataPersister->persist($dummy));
     }
 }

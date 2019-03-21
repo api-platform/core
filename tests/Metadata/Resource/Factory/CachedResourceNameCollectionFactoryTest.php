@@ -41,8 +41,6 @@ class CachedResourceNameCollectionFactoryTest extends TestCase
         $cachedResourceNameCollectionFactory = new CachedResourceNameCollectionFactory($cacheItemPool->reveal(), $decoratedResourceNameCollectionFactory->reveal());
         $resultedResourceNameCollection = $cachedResourceNameCollectionFactory->create();
 
-        $this->assertInstanceOf(ResourceNameCollection::class, $resultedResourceNameCollection);
-
         $expectedResult = new ResourceNameCollection([Dummy::class]);
         $this->assertEquals($expectedResult, $resultedResourceNameCollection);
         $this->assertEquals($expectedResult, $cachedResourceNameCollectionFactory->create(), 'Trigger the local cache');
@@ -66,8 +64,6 @@ class CachedResourceNameCollectionFactoryTest extends TestCase
         $cachedResourceNameCollectionFactory = new CachedResourceNameCollectionFactory($cacheItemPool->reveal(), $decoratedResourceNameCollectionFactory->reveal());
         $resultedResourceNameCollection = $cachedResourceNameCollectionFactory->create();
 
-        $this->assertInstanceOf(ResourceNameCollection::class, $resultedResourceNameCollection);
-
         $expectedResult = new ResourceNameCollection([Dummy::class]);
         $this->assertEquals($expectedResult, $resultedResourceNameCollection);
         $this->assertEquals($expectedResult, $cachedResourceNameCollectionFactory->create(), 'Trigger the local cache');
@@ -86,8 +82,6 @@ class CachedResourceNameCollectionFactoryTest extends TestCase
 
         $cachedResourceNameCollectionFactory = new CachedResourceNameCollectionFactory($cacheItemPool->reveal(), $decoratedResourceNameCollectionFactory->reveal());
         $resultedResourceNameCollection = $cachedResourceNameCollectionFactory->create();
-
-        $this->assertInstanceOf(ResourceNameCollection::class, $resultedResourceNameCollection);
 
         $expectedResult = new ResourceNameCollection([Dummy::class]);
         $this->assertEquals($expectedResult, $resultedResourceNameCollection);

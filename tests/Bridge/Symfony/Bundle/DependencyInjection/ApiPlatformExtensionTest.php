@@ -94,7 +94,7 @@ use Symfony\Component\Serializer\Exception\ExceptionInterface;
  */
 class ApiPlatformExtensionTest extends TestCase
 {
-    const DEFAULT_CONFIG = ['api_platform' => [
+    public const DEFAULT_CONFIG = ['api_platform' => [
         'title' => 'title',
         'description' => 'description',
         'version' => 'version',
@@ -350,7 +350,7 @@ class ApiPlatformExtensionTest extends TestCase
         $containerBuilderProphecy->getParameter('api_platform.resource_class_directories')->shouldBeCalled()->willReturn([]);
         $i = 0;
         // it's called once from getResourcesToWatch and then if the configuration exists
-        $containerBuilderProphecy->setParameter('api_platform.resource_class_directories', Argument::that(function ($arg) use ($i) {
+        $containerBuilderProphecy->setParameter('api_platform.resource_class_directories', Argument::that(function ($arg) use (&$i) {
             if (0 === $i++) {
                 return $arg;
             }
@@ -1033,8 +1033,7 @@ class ApiPlatformExtensionTest extends TestCase
             $containerBuilderProphecy->setAlias($alias, $service)->shouldBeCalled();
         }
 
-        $containerBuilderProphecy->hasParameter('api_platform.metadata_cache')->willReturn(true)->shouldBeCalled();
-        $containerBuilderProphecy->getParameter('api_platform.metadata_cache')->willReturn(true)->shouldBeCalled();
+        $containerBuilderProphecy->hasParameter('api_platform.metadata_cache')->willReturn(false);
 
         $containerBuilderProphecy->getDefinition('api_platform.mercure.listener.response.add_link_header')->willReturn(new Definition());
 

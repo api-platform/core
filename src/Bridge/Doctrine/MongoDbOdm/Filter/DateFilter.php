@@ -32,7 +32,7 @@ class DateFilter extends AbstractFilter implements DateFilterInterface
 {
     use DateFilterTrait;
 
-    const DOCTRINE_DATE_TYPES = [
+    public const DOCTRINE_DATE_TYPES = [
         MongoDbType::DATE => true,
     ];
 

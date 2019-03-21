@@ -26,10 +26,8 @@ trait ClassInfoTrait
      * Get class name of the given object.
      *
      * @param object $object
-     *
-     * @return string
      */
-    private function getObjectClass($object)
+    private function getObjectClass($object): string
     {
         return $this->getRealClassName(\get_class($object));
     }

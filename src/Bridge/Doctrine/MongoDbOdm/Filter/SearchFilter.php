@@ -38,7 +38,7 @@ final class SearchFilter extends AbstractFilter implements SearchFilterInterface
 {
     use SearchFilterTrait;
 
-    const DOCTRINE_INTEGER_TYPE = MongoDbType::INTEGER;
+    public const DOCTRINE_INTEGER_TYPE = MongoDbType::INTEGER;
 
     public function __construct(ManagerRegistry $managerRegistry, IriConverterInterface $iriConverter, PropertyAccessorInterface $propertyAccessor = null, LoggerInterface $logger = null, array $properties = null)
     {

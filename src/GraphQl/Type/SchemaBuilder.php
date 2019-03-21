@@ -197,10 +197,8 @@ final class SchemaBuilder implements SchemaBuilderInterface
      * Get the field configuration of a resource.
      *
      * @see http://webonyx.github.io/graphql-php/type-system/object-types/
-     *
-     * @return array|null
      */
-    private function getResourceFieldConfiguration(string $resourceClass, ResourceMetadata $resourceMetadata, string $fieldDescription = null, string $deprecationReason = '', Type $type, string $rootResource, bool $input = false, string $mutationName = null, int $depth = 0)
+    private function getResourceFieldConfiguration(string $resourceClass, ResourceMetadata $resourceMetadata, ?string $fieldDescription, string $deprecationReason, Type $type, string $rootResource, bool $input = false, string $mutationName = null, int $depth = 0): ?array
     {
         try {
             if (null === $graphqlType = $this->convertType($type, $input, $mutationName, $depth)) {
@@ -212,7 +210,7 @@ final class SchemaBuilder implements SchemaBuilderInterface
             if ($isStandardGraphqlType) {
                 $className = '';
             } else {
-                $className = $this->isCollection($type) ? $type->getCollectionValueType()->getClassName() : $type->getClassName();
+                $className = $this->isCollection($type) && ($collectionValueType = $type->getCollectionValueType()) ? $collectionValueType->getClassName() : $type->getClassName();
             }
 
             $args = [];
@@ -342,7 +340,6 @@ final class SchemaBuilder implements SchemaBuilderInterface
      */
     private function convertType(Type $type, bool $input = false, string $mutationName = null, int $depth = 0)
     {
-        $resourceClass = null;
         switch ($builtinType = $type->getBuiltinType()) {
             case Type::BUILTIN_TYPE_BOOL:
                 $graphqlType = GraphQLType::boolean();
@@ -366,7 +363,7 @@ final class SchemaBuilder implements SchemaBuilderInterface
                     break;
                 }
 
-                $resourceClass = $this->isCollection($type) ? $type->getCollectionValueType()->getClassName() : $type->getClassName();
+                $resourceClass = $this->isCollection($type) && ($collectionValueType = $type->getCollectionValueType()) ? $collectionValueType->getClassName() : $type->getClassName();
                 if (null === $resourceClass) {
                     return null;
                 }
@@ -388,7 +385,7 @@ final class SchemaBuilder implements SchemaBuilderInterface
         }
 
         if ($this->isCollection($type)) {
-            return $this->paginationEnabled && !$input ? $this->getResourcePaginatedCollectionType($resourceClass, $graphqlType) : GraphQLType::listOf($graphqlType);
+            return $this->paginationEnabled && !$input ? $this->getResourcePaginatedCollectionType($graphqlType) : GraphQLType::listOf($graphqlType);
         }
 
         return $type->isNullable() || (null !== $mutationName && 'update' === $mutationName) ? $graphqlType : GraphQLType::nonNull($graphqlType);
@@ -521,7 +518,7 @@ final class SchemaBuilder implements SchemaBuilderInterface
      *
      * @return ObjectType
      */
-    private function getResourcePaginatedCollectionType(string $resourceClass, GraphQLType $resourceType): GraphQLType
+    private function getResourcePaginatedCollectionType(GraphQLType $resourceType): GraphQLType
     {
         $shortName = $resourceType->name;
 

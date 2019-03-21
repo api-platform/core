@@ -205,7 +205,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $loader->load('metadata/metadata.xml');
         $loader->load('metadata/xml.xml');
 
-        list($xmlResources, $yamlResources) = $this->getResourcesToWatch($container, $config);
+        [$xmlResources, $yamlResources] = $this->getResourcesToWatch($container, $config);
 
         if (!empty($config['resource_class_directories'])) {
             $container->setParameter('api_platform.resource_class_directories', array_merge(
@@ -436,17 +436,21 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
      */
     private function registerCacheConfiguration(ContainerBuilder $container)
     {
-        // Don't use system cache pool in dev
-        if ($container->hasParameter('api_platform.metadata_cache') ? $container->getParameter('api_platform.metadata_cache') : !$container->getParameter('kernel.debug')) {
+        if (!$container->hasParameter('api_platform.metadata_cache')) {
             return;
         }
 
-        $container->register('api_platform.cache.metadata.property', ArrayAdapter::class);
-        $container->register('api_platform.cache.metadata.resource', ArrayAdapter::class);
-        $container->register('api_platform.cache.route_name_resolver', ArrayAdapter::class);
-        $container->register('api_platform.cache.identifiers_extractor', ArrayAdapter::class);
-        $container->register('api_platform.cache.subresource_operation_factory', ArrayAdapter::class);
-        $container->register('api_platform.elasticsearch.cache.metadata.document', ArrayAdapter::class);
+        @trigger_error('The "api_platform.metadata_cache" parameter is deprecated since version 2.4 and will have no effect in 3.0.', E_USER_DEPRECATED);
+
+        // BC
+        if (!$container->getParameter('api_platform.metadata_cache')) {
+            $container->register('api_platform.cache.metadata.property', ArrayAdapter::class);
+            $container->register('api_platform.cache.metadata.resource', ArrayAdapter::class);
+            $container->register('api_platform.cache.route_name_resolver', ArrayAdapter::class);
+            $container->register('api_platform.cache.identifiers_extractor', ArrayAdapter::class);
+            $container->register('api_platform.cache.subresource_operation_factory', ArrayAdapter::class);
+            $container->register('api_platform.elasticsearch.cache.metadata.document', ArrayAdapter::class);
+        }
     }
 
     /**

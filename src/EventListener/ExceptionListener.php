@@ -25,7 +25,7 @@ use Symfony\Component\HttpKernel\EventListener\ExceptionListener as BaseExceptio
  */
 final class ExceptionListener extends BaseExceptionListener
 {
-    public function onKernelException(GetResponseForExceptionEvent $event)
+    public function onKernelException(GetResponseForExceptionEvent $event): void
     {
         $request = $event->getRequest();
         // Normalize exceptions only for routes managed by API Platform

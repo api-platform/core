@@ -101,7 +101,7 @@ class EagerLoadingExtensionTest extends TestCase
 
         foreach ($relatedNameCollection as $property) {
             if ('id' !== $property && 'embeddedDummy' !== $property) {
-                $relatedClassMetadataProphecy->hasField($property)->willReturn(!\in_array($property, ['notindatabase'], true))->shouldBeCalled();
+                $relatedClassMetadataProphecy->hasField($property)->willReturn('notindatabase' !== $property)->shouldBeCalled();
             }
         }
         $relatedClassMetadataProphecy->hasField('embeddedDummy.name')->willReturn(true)->shouldBeCalled();
@@ -190,7 +190,7 @@ class EagerLoadingExtensionTest extends TestCase
 
         foreach ($relatedNameCollection as $property) {
             if ('id' !== $property && 'embeddedDummy' !== $property) {
-                $relatedClassMetadataProphecy->hasField($property)->willReturn(!\in_array($property, ['notindatabase'], true))->shouldBeCalled();
+                $relatedClassMetadataProphecy->hasField($property)->willReturn('notindatabase' !== $property)->shouldBeCalled();
             }
         }
         $relatedClassMetadataProphecy->hasField('embeddedDummy.name')->willReturn(true)->shouldBeCalled();
@@ -548,7 +548,7 @@ class EagerLoadingExtensionTest extends TestCase
         $queryBuilderProphecy->getEntityManager()->willReturn($emProphecy);
 
         $orderExtensionTest = new EagerLoadingExtension($propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), $resourceMetadataFactoryProphecy->reveal(), 30, true, null, null, true);
-        $orderExtensionTest->applyToItem($queryBuilderProphecy->reveal(), new QueryNameGenerator(), Dummy::class, [], null);
+        $orderExtensionTest->applyToItem($queryBuilderProphecy->reveal(), new QueryNameGenerator(), Dummy::class, []);
     }
 
     public function testPropertyNotFoundException()

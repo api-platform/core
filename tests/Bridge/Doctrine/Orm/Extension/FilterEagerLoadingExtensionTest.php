@@ -13,14 +13,18 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Tests\Bridge\Doctrine\Orm\Extension;
 
+use ApiPlatform\Core\Api\ResourceClassResolver;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\FilterEagerLoadingExtension;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
+use ApiPlatform\Core\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
+use ApiPlatform\Core\Metadata\Resource\ResourceNameCollection;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\CompositeItem;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\CompositeLabel;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\CompositeRelation;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyCar;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyTravel;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\Query\Expr;
@@ -71,7 +75,7 @@ class FilterEagerLoadingExtensionTest extends TestCase
         $queryNameGenerator = $this->prophesize(QueryNameGeneratorInterface::class);
 
         $filterEagerLoadingExtension = new FilterEagerLoadingExtension($resourceMetadataFactoryProphecy->reveal(), true);
-        $filterEagerLoadingExtension->applyToCollection($qb->reveal(), $queryNameGenerator->reveal(), DummyCar::class, null);
+        $filterEagerLoadingExtension->applyToCollection($qb->reveal(), $queryNameGenerator->reveal(), DummyCar::class);
     }
 
     public function testIsForceEagerConfig()
@@ -157,6 +161,55 @@ class FilterEagerLoadingExtensionTest extends TestCase
         $filterEagerLoadingExtension->applyToCollection($qb, $queryNameGenerator->reveal(), DummyCar::class, 'get');
 
         $this->assertEquals('SELECT o FROM ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyCar o LEFT JOIN o.colors colors WHERE o IN(SELECT o_2 FROM ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyCar o_2 LEFT JOIN o_2.colors colors_2 WHERE o_2.colors = :foo)', $qb->getDQL());
+    }
+
+    public function testApplyCollectionWithManualJoin()
+    {
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
+        $resourceMetadataFactoryProphecy->create(DummyCar::class)->willReturn(new ResourceMetadata(DummyCar::class));
+
+        $resourceNameCollectionFactoryProphecy = $this->prophesize(ResourceNameCollectionFactoryInterface::class);
+        $resourceNameCollectionFactoryProphecy->create()->willReturn(new ResourceNameCollection([DummyTravel::class]));
+
+        $em = $this->prophesize(EntityManager::class);
+        $em->getExpressionBuilder()->shouldBeCalled()->willReturn(new Expr());
+        $em->getClassMetadata(DummyCar::class)->shouldBeCalled()->willReturn(new ClassMetadataInfo(DummyCar::class));
+
+        $qb = new QueryBuilder($em->reveal());
+
+        $qb->select('o')
+            ->from(DummyCar::class, 'o')
+            ->leftJoin('o.colors', 'colors')
+            ->join(DummyTravel::class, 't_a3', Expr\Join::WITH, 'o.id = t_a3.car AND t_a3.passenger = :user')
+            ->where('o.colors = :foo')
+            ->andwhere('t_a3.confirmed = :confirmation')
+            ->setParameter('foo', 1)
+            ->setParameter('user', 2)
+            ->setParameter('confirmation', true)
+        ;
+
+        $queryNameGenerator = $this->prophesize(QueryNameGeneratorInterface::class);
+        $queryNameGenerator->generateJoinAlias('colors')->shouldBeCalled()->willReturn('colors_2');
+        $queryNameGenerator->generateJoinAlias('o')->shouldBeCalled()->willReturn('o_2');
+        $queryNameGenerator->generateJoinAlias('t_a3')->shouldBeCalled()->willReturn('t_a3_a20');
+
+        $filterEagerLoadingExtension = new FilterEagerLoadingExtension($resourceMetadataFactoryProphecy->reveal(), true, new ResourceClassResolver($resourceNameCollectionFactoryProphecy->reveal()));
+        $filterEagerLoadingExtension->applyToCollection($qb, $queryNameGenerator->reveal(), DummyCar::class, 'get');
+
+        $expected = <<<'SQL'
+SELECT o
+FROM ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyCar o
+LEFT JOIN o.colors colors
+INNER JOIN ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyTravel t_a3 WITH o.id = t_a3.car AND t_a3.passenger = :user
+WHERE o IN(
+  SELECT o_2 FROM ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyCar o_2
+  LEFT JOIN o_2.colors colors_2
+  INNER JOIN ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyTravel t_a3_a20 WITH o_2.id = t_a3_a20.car AND t_a3_a20.passenger = :user
+  WHERE o_2.colors = :foo AND t_a3_a20.confirmed = :confirmation
+)
+SQL;
+
+        $this->assertEquals($this->toDQLString($expected), $qb->getDQL());
     }
 
     /**

@@ -25,7 +25,7 @@ interface IdentifierConverterInterface
     /**
      * @internal
      */
-    const HAS_IDENTIFIER_CONVERTER = 'has_identifier_converter';
+    public const HAS_IDENTIFIER_CONVERTER = 'has_identifier_converter';
 
     /**
      * @param string $data  Identifier to convert to php values

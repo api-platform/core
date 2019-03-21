@@ -41,7 +41,6 @@ class ExtractorPropertyMetadataFactoryTest extends FileConfigurationMetadataFact
         $propertyMetadataFactory = new ExtractorPropertyMetadataFactory(new XmlExtractor([$configPath]));
         $propertyMetadata = $propertyMetadataFactory->create(FileConfigDummy::class, 'foo');
 
-        $this->assertInstanceOf(PropertyMetadata::class, $propertyMetadata);
         $this->assertEquals($expectedPropertyMetadata, $propertyMetadata);
     }
 
@@ -61,7 +60,6 @@ class ExtractorPropertyMetadataFactoryTest extends FileConfigurationMetadataFact
         $propertyMetadataFactory = new ExtractorPropertyMetadataFactory(new XmlExtractor([$configPath]), $decorated->reveal());
         $propertyMetadata = $propertyMetadataFactory->create(FileConfigDummy::class, 'foo');
 
-        $this->assertInstanceOf(PropertyMetadata::class, $propertyMetadata);
         $this->assertEquals($expectedPropertyMetadata, $propertyMetadata);
     }
 
@@ -105,7 +103,6 @@ class ExtractorPropertyMetadataFactoryTest extends FileConfigurationMetadataFact
         $propertyMetadataFactory = new ExtractorPropertyMetadataFactory(new YamlExtractor([$configPath]));
         $propertyMetadata = $propertyMetadataFactory->create(FileConfigDummy::class, 'foo');
 
-        $this->assertInstanceOf(PropertyMetadata::class, $propertyMetadata);
         $this->assertEquals($expectedPropertyMetadata, $propertyMetadata);
     }
 
@@ -125,7 +122,6 @@ class ExtractorPropertyMetadataFactoryTest extends FileConfigurationMetadataFact
         $propertyMetadataFactory = new ExtractorPropertyMetadataFactory(new YamlExtractor([$configPath]), $decorated->reveal());
         $propertyMetadata = $propertyMetadataFactory->create(FileConfigDummy::class, 'foo');
 
-        $this->assertInstanceOf(PropertyMetadata::class, $propertyMetadata);
         $this->assertEquals($expectedPropertyMetadata, $propertyMetadata);
     }
 
@@ -156,7 +152,6 @@ class ExtractorPropertyMetadataFactoryTest extends FileConfigurationMetadataFact
         $propertyMetadataFactory = new ExtractorPropertyMetadataFactory(new YamlExtractor([$configPath]), $decorated->reveal());
         $propertyMetadata = $propertyMetadataFactory->create(FileConfigDummy::class, 'foo');
 
-        $this->assertInstanceOf(PropertyMetadata::class, $propertyMetadata);
         $this->assertEquals($expectedPropertyMetadata, $propertyMetadata);
     }
 
@@ -181,7 +176,6 @@ class ExtractorPropertyMetadataFactoryTest extends FileConfigurationMetadataFact
         $propertyMetadataFactory = new ExtractorPropertyMetadataFactory(new YamlExtractor([$configPath]), $decorated->reveal());
         $propertyMetadata = $propertyMetadataFactory->create(FileConfigDummy::class, 'foo');
 
-        $this->assertInstanceOf(PropertyMetadata::class, $propertyMetadata);
         $this->assertEquals($expectedPropertyMetadata, $propertyMetadata);
     }
 

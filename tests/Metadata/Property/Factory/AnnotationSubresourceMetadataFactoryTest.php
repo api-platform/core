@@ -25,7 +25,6 @@ use Doctrine\Common\Annotations\Reader;
 use Doctrine\Common\Collections\ArrayCollection;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
-use Prophecy\Prophecy\ProphecyInterface;
 use Symfony\Component\PropertyInfo\Type;
 
 class AnnotationSubresourceMetadataFactoryTest extends TestCase
@@ -33,7 +32,7 @@ class AnnotationSubresourceMetadataFactoryTest extends TestCase
     /**
      * @dataProvider dependenciesProvider
      */
-    public function testCreateProperty(ProphecyInterface $reader, ProphecyInterface $decorated = null)
+    public function testCreateProperty($reader, $decorated = null)
     {
         $factory = new AnnotationSubresourceMetadataFactory($reader->reveal(), $decorated->reveal());
         $metadata = $factory->create(Dummy::class, 'relatedDummies');

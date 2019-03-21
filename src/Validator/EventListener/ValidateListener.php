@@ -40,7 +40,7 @@ final class ValidateListener
      *
      * @throws ValidationException
      */
-    public function onKernelView(GetResponseForControllerResultEvent $event)
+    public function onKernelView(GetResponseForControllerResultEvent $event): void
     {
         $request = $event->getRequest();
         if (
@@ -52,10 +52,13 @@ final class ValidateListener
             return;
         }
 
-        $data = $event->getControllerResult();
         $resourceMetadata = $this->resourceMetadataFactory->create($attributes['resource_class']);
-        $validationGroups = $resourceMetadata->getOperationAttribute($attributes, 'validation_groups', null, true);
+        $inputMetadata = $resourceMetadata->getOperationAttribute($attributes, 'input', [], true);
+        if (\array_key_exists('class', $inputMetadata) && null === $inputMetadata['class']) {
+            return;
+        }
 
-        $this->validator->validate($data, ['groups' => $validationGroups]);
+        $validationGroups = $resourceMetadata->getOperationAttribute($attributes, 'validation_groups', null, true);
+        $this->validator->validate($event->getControllerResult(), ['groups' => $validationGroups]);
     }
 }

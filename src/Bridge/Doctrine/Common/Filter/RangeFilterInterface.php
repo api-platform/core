@@ -21,9 +21,9 @@ namespace ApiPlatform\Core\Bridge\Doctrine\Common\Filter;
  */
 interface RangeFilterInterface
 {
-    const PARAMETER_BETWEEN = 'between';
-    const PARAMETER_GREATER_THAN = 'gt';
-    const PARAMETER_GREATER_THAN_OR_EQUAL = 'gte';
-    const PARAMETER_LESS_THAN = 'lt';
-    const PARAMETER_LESS_THAN_OR_EQUAL = 'lte';
+    public const PARAMETER_BETWEEN = 'between';
+    public const PARAMETER_GREATER_THAN = 'gt';
+    public const PARAMETER_GREATER_THAN_OR_EQUAL = 'gte';
+    public const PARAMETER_LESS_THAN = 'lt';
+    public const PARAMETER_LESS_THAN_OR_EQUAL = 'lte';
 }

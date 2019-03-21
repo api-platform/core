@@ -66,7 +66,7 @@ class ItemDataProviderTest extends TestCase
 
         $queryBuilder = $queryBuilderProphecy->reveal();
 
-        list($propertyNameCollectionFactory, $propertyMetadataFactory) = $this->getMetadataFactories(Dummy::class, [
+        [$propertyNameCollectionFactory, $propertyMetadataFactory] = $this->getMetadataFactories(Dummy::class, [
             'id',
         ]);
         $managerRegistry = $this->getManagerRegistry(Dummy::class, [
@@ -106,7 +106,7 @@ class ItemDataProviderTest extends TestCase
 
         $queryBuilder = $queryBuilderProphecy->reveal();
 
-        list($propertyNameCollectionFactory, $propertyMetadataFactory) = $this->getMetadataFactories(Dummy::class, [
+        [$propertyNameCollectionFactory, $propertyMetadataFactory] = $this->getMetadataFactories(Dummy::class, [
             'ida',
             'idb',
         ]);
@@ -135,7 +135,7 @@ class ItemDataProviderTest extends TestCase
     {
         $this->expectException(PropertyNotFoundException::class);
 
-        list($propertyNameCollectionFactory, $propertyMetadataFactory) = $this->getMetadataFactories(Dummy::class, [
+        [$propertyNameCollectionFactory, $propertyMetadataFactory] = $this->getMetadataFactories(Dummy::class, [
             'ida',
             'idb',
         ]);
@@ -168,7 +168,7 @@ class ItemDataProviderTest extends TestCase
 
         $queryBuilder = $queryBuilderProphecy->reveal();
 
-        list($propertyNameCollectionFactory, $propertyMetadataFactory) = $this->getMetadataFactories(Dummy::class, [
+        [$propertyNameCollectionFactory, $propertyMetadataFactory] = $this->getMetadataFactories(Dummy::class, [
             'id',
         ]);
         $managerRegistry = $this->getManagerRegistry(Dummy::class, [
@@ -195,7 +195,7 @@ class ItemDataProviderTest extends TestCase
 
         $extensionProphecy = $this->prophesize(QueryItemExtensionInterface::class);
 
-        list($propertyNameCollectionFactory, $propertyMetadataFactory) = $this->getMetadataFactories(Dummy::class, [
+        [$propertyNameCollectionFactory, $propertyMetadataFactory] = $this->getMetadataFactories(Dummy::class, [
             'id',
         ]);
 
@@ -230,7 +230,7 @@ class ItemDataProviderTest extends TestCase
 
         $extensionProphecy = $this->prophesize(QueryItemExtensionInterface::class);
 
-        list($propertyNameCollectionFactory, $propertyMetadataFactory) = $this->getMetadataFactories(Dummy::class, [
+        [$propertyNameCollectionFactory, $propertyMetadataFactory] = $this->getMetadataFactories(Dummy::class, [
             'id',
         ]);
 

@@ -267,7 +267,7 @@ class CollectionNormalizerTest extends TestCase
                 ],
                 'hydra:totalItems' => 1312.,
             ],
-            $this->normalizePaginator(false)
+            $this->normalizePaginator()
         );
     }
 

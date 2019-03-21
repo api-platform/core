@@ -42,8 +42,8 @@ abstract class ExtractorTestCase extends TestCase
         // There is a difference between XML & YAML here for example, one will parse `null` or the lack of value as `null`
         // whilst the other will parse it as an empty array. Since it doesn't affect the processing of those values, there is no
         // real need to fix this.
-        $this->assertTrue([] === $resources['App\Entity\Greeting']['collectionOperations']['post']);
-        $this->assertTrue(['get' => [], 'put' => []] === $resources['App\Entity\Greeting']['itemOperations']);
+        $this->assertSame([], $resources['App\Entity\Greeting']['collectionOperations']['post']);
+        $this->assertSame(['get' => [], 'put' => []], $resources['App\Entity\Greeting']['itemOperations']);
     }
 
     final public function testCorrectResources()

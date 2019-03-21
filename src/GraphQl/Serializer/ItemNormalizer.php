@@ -15,6 +15,8 @@ namespace ApiPlatform\Core\GraphQl\Serializer;
 
 use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 use ApiPlatform\Core\Serializer\ItemNormalizer as BaseItemNormalizer;
+use ApiPlatform\Core\Util\ClassInfoTrait;
+use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 
 /**
  * GraphQL normalizer.
@@ -23,8 +25,10 @@ use ApiPlatform\Core\Serializer\ItemNormalizer as BaseItemNormalizer;
  */
 final class ItemNormalizer extends BaseItemNormalizer
 {
-    const FORMAT = 'graphql';
-    const ITEM_KEY = '#item';
+    use ClassInfoTrait;
+
+    public const FORMAT = 'graphql';
+    public const ITEM_KEY = '#item';
 
     /**
      * {@inheritdoc}
@@ -36,11 +40,29 @@ final class ItemNormalizer extends BaseItemNormalizer
 
     /**
      * {@inheritdoc}
+     *
+     * @throws UnexpectedValueException
      */
     public function normalize($object, $format = null, array $context = [])
     {
-        $object = $this->transformOutput($object, $context);
+        if (!$this->handleNonResource && null !== $outputClass = $this->getOutputClass($this->getObjectClass($object), $context)) {
+            return parent::normalize($object, $format, $context);
+        }
+
         $data = parent::normalize($object, $format, $context);
+        if (!\is_array($data)) {
+            throw new UnexpectedValueException('Expected data to be an array');
+        }
+
+        if ($this->handleNonResource) {
+            // when using an output class, get the IRI from the resource
+            if (isset($context['api_resource']) && isset($data['id'])) {
+                $data['_id'] = $data['id'];
+                $data['id'] = $this->iriConverter->getIriFromItem($context['api_resource']);
+                unset($context['api_resource']);
+            }
+        }
+
         $data[self::ITEM_KEY] = serialize($object); // calling serialize prevent weird normalization process done by Webonyx's GraphQL PHP
 
         return $data;
@@ -49,7 +71,7 @@ final class ItemNormalizer extends BaseItemNormalizer
     /**
      * {@inheritdoc}
      */
-    protected function normalizeCollectionOfRelations(PropertyMetadata $propertyMetadata, $attributeValue, string $resourceClass, string $format = null, array $context): array
+    protected function normalizeCollectionOfRelations(PropertyMetadata $propertyMetadata, $attributeValue, string $resourceClass, ?string $format, array $context): array
     {
         // to-many are handled directly by the GraphQL resolver
         return [];
@@ -70,7 +92,7 @@ final class ItemNormalizer extends BaseItemNormalizer
     {
         $allowedAttributes = parent::getAllowedAttributes($classOrObject, $context, $attributesAsString);
 
-        if (($context['api_denormalize'] ?? false) && false !== ($indexId = array_search('id', $allowedAttributes, true))) {
+        if (($context['api_denormalize'] ?? false) && \is_array($allowedAttributes) && false !== ($indexId = array_search('id', $allowedAttributes, true))) {
             $allowedAttributes[] = '_id';
             array_splice($allowedAttributes, (int) $indexId, 1);
         }

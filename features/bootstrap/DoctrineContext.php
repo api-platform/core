@@ -1185,17 +1185,17 @@ final class DoctrineContext implements Context
     }
 
     /**
-     * @Given there is a DummyCustomDto
+     * @Given there is a DummyDtoCustom
      */
-    public function thereIsADummyCustomDto()
+    public function thereIsADummyDtoCustom()
     {
-        $this->thereAreNbDummyCustomDto(1);
+        $this->thereAreNbDummyDtoCustom(1);
     }
 
     /**
-     * @Given there are :nb DummyCustomDto
+     * @Given there are :nb DummyDtoCustom
      */
-    public function thereAreNbDummyCustomDto($nb)
+    public function thereAreNbDummyDtoCustom($nb)
     {
         for ($i = 0; $i < $nb; ++$i) {
             $dto = $this->isOrm() ? new DummyDtoCustom() : new DummyDtoCustomDocument();

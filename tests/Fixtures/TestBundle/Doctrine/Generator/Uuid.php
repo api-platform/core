@@ -29,6 +29,6 @@ class Uuid implements \JsonSerializable
 
     public function jsonSerialize()
     {
-        return (string) $this->id;
+        return $this->id;
     }
 }

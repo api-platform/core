@@ -28,3 +28,27 @@ Feature: Non-resources handling
         }
     }
     """
+
+  @!mongodb
+  @createSchema
+  Scenario: Create a resource that has a non-resource relation.
+    When I add "Content-Type" header equal to "application/ld+json"
+    And I send a "POST" request to "/non_relation_resources" with body:
+    """
+    {"relation": {"foo": "test"}}
+    """
+    Then the response status code should be 201
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+    And the JSON should be equal to:
+    """
+    {
+      "@context": "/contexts/NonRelationResource",
+      "@id": "/non_relation_resources/1",
+      "@type": "NonRelationResource",
+      "relation": {
+        "foo": "test"
+      },
+      "id": 1
+    }
+    """

@@ -22,7 +22,6 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use Doctrine\Common\Annotations\Reader;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
-use Prophecy\Prophecy\ProphecyInterface;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
@@ -32,7 +31,7 @@ class AnnotationPropertyMetadataFactoryTest extends TestCase
     /**
      * @dataProvider dependenciesProvider
      */
-    public function testCreateProperty(ProphecyInterface $reader, ProphecyInterface $decorated = null, string $description)
+    public function testCreateProperty($reader, $decorated, string $description)
     {
         $factory = new AnnotationPropertyMetadataFactory($reader->reveal(), $decorated ? $decorated->reveal() : null);
         $metadata = $factory->create(Dummy::class, 'name');

@@ -23,6 +23,7 @@ use Prophecy\Argument;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Twig\Environment as TwigEnvironment;
 
 /**
  * @author Alan Poulain <contact@alanpoulain.eu>
@@ -110,7 +111,7 @@ class EntrypointActionTest extends TestCase
         $executorProphecy = $this->prophesize(ExecutorInterface::class);
         $executorProphecy->executeQuery(Argument::is($schema->reveal()), 'graphqlQuery', null, null, ['graphqlVariable'], 'graphqlOperationName')->willReturn($executionResultProphecy->reveal());
 
-        $twigProphecy = $this->prophesize(\Twig_Environment::class);
+        $twigProphecy = $this->prophesize(TwigEnvironment::class);
 
         return new EntrypointAction($schemaBuilderProphecy->reveal(), $executorProphecy->reveal(), $twigProphecy->reveal(), true, true, '');
     }

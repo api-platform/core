@@ -45,10 +45,8 @@ final class ResourceMetadata
 
     /**
      * Gets the short name.
-     *
-     * @return string|null
      */
-    public function getShortName()
+    public function getShortName(): ?string
     {
         return $this->shortName;
     }
@@ -66,10 +64,8 @@ final class ResourceMetadata
 
     /**
      * Gets the description.
-     *
-     * @return string|null
      */
-    public function getDescription()
+    public function getDescription(): ?string
     {
         return $this->description;
     }
@@ -87,10 +83,8 @@ final class ResourceMetadata
 
     /**
      * Gets the associated IRI.
-     *
-     * @return string|null
      */
-    public function getIri()
+    public function getIri(): ?string
     {
         return $this->iri;
     }
@@ -108,10 +102,8 @@ final class ResourceMetadata
 
     /**
      * Gets item operations.
-     *
-     * @return array|null
      */
-    public function getItemOperations()
+    public function getItemOperations(): ?array
     {
         return $this->itemOperations;
     }
@@ -129,10 +121,8 @@ final class ResourceMetadata
 
     /**
      * Gets collection operations.
-     *
-     * @return array|null
      */
-    public function getCollectionOperations()
+    public function getCollectionOperations(): ?array
     {
         return $this->collectionOperations;
     }
@@ -150,10 +140,8 @@ final class ResourceMetadata
 
     /**
      * Gets subresource operations.
-     *
-     * @return array|null
      */
-    public function getSubresourceOperations()
+    public function getSubresourceOperations(): ?array
     {
         return $this->subresourceOperations;
     }
@@ -172,7 +160,7 @@ final class ResourceMetadata
     /**
      * Gets a collection operation attribute, optionally fallback to a resource attribute.
      */
-    public function getCollectionOperationAttribute(string $operationName = null, string $key, $defaultValue = null, bool $resourceFallback = false)
+    public function getCollectionOperationAttribute(?string $operationName, string $key, $defaultValue = null, bool $resourceFallback = false)
     {
         return $this->findOperationAttribute($this->collectionOperations, $operationName, $key, $defaultValue, $resourceFallback);
     }
@@ -180,7 +168,7 @@ final class ResourceMetadata
     /**
      * Gets an item operation attribute, optionally fallback to a resource attribute.
      */
-    public function getItemOperationAttribute(string $operationName = null, string $key, $defaultValue = null, bool $resourceFallback = false)
+    public function getItemOperationAttribute(?string $operationName, string $key, $defaultValue = null, bool $resourceFallback = false)
     {
         return $this->findOperationAttribute($this->itemOperations, $operationName, $key, $defaultValue, $resourceFallback);
     }
@@ -188,7 +176,7 @@ final class ResourceMetadata
     /**
      * Gets a subresource operation attribute, optionally fallback to a resource attribute.
      */
-    public function getSubresourceOperationAttribute(string $operationName = null, string $key, $defaultValue = null, bool $resourceFallback = false)
+    public function getSubresourceOperationAttribute(?string $operationName, string $key, $defaultValue = null, bool $resourceFallback = false)
     {
         return $this->findOperationAttribute($this->subresourceOperations, $operationName, $key, $defaultValue, $resourceFallback);
     }
@@ -196,7 +184,7 @@ final class ResourceMetadata
     /**
      * Gets an operation attribute, optionally fallback to a resource attribute.
      */
-    private function findOperationAttribute(array $operations = null, string $operationName = null, string $key, $defaultValue = null, bool $resourceFallback = false)
+    private function findOperationAttribute(?array $operations, ?string $operationName, string $key, $defaultValue = null, bool $resourceFallback = false)
     {
         if (null !== $operationName && isset($operations[$operationName][$key])) {
             return $operations[$operationName][$key];
@@ -263,10 +251,8 @@ final class ResourceMetadata
 
     /**
      * Gets attributes.
-     *
-     * @return array|null
      */
-    public function getAttributes()
+    public function getAttributes(): ?array
     {
         return $this->attributes;
     }
@@ -276,11 +262,7 @@ final class ResourceMetadata
      */
     public function getAttribute(string $key, $defaultValue = null)
     {
-        if (isset($this->attributes[$key])) {
-            return $this->attributes[$key];
-        }
-
-        return $defaultValue;
+        return $this->attributes[$key] ?? $defaultValue;
     }
 
     /**
@@ -296,10 +278,8 @@ final class ResourceMetadata
 
     /**
      * Gets options of for the GraphQL query.
-     *
-     * @return array|null
      */
-    public function getGraphql()
+    public function getGraphql(): ?array
     {
         return $this->graphql;
     }

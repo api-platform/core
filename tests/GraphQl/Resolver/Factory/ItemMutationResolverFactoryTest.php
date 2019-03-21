@@ -24,11 +24,9 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use GraphQL\Error\Error;
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\ResolveInfo;
-use GraphQL\Type\Definition\Type;
 use GraphQL\Type\Schema;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
-use Prophecy\Prophecy\ObjectProphecy;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
@@ -66,7 +64,7 @@ class ItemMutationResolverFactoryTest extends TestCase
         $this->assertEquals(['id' => '/dummies/3', 'clientMutationId' => '1936'], $resolver(null, ['input' => ['id' => '/dummies/3', 'clientMutationId' => '1936']], null, $resolveInfo));
     }
 
-    private function createItemMutationResolverFactory($item, ObjectProphecy $dataPersisterProphecy): ResolverFactoryInterface
+    private function createItemMutationResolverFactory($item, $dataPersisterProphecy): ResolverFactoryInterface
     {
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
         $getItemFromIri = $iriConverterProphecy->getItemFromIri('/dummies/3', ['attributes' => []]);

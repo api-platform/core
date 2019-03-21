@@ -15,6 +15,7 @@ namespace ApiPlatform\Core\Hal\Serializer;
 
 use ApiPlatform\Core\Serializer\AbstractCollectionNormalizer;
 use ApiPlatform\Core\Util\IriHelper;
+use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 
 /**
  * Normalizes collections in the HAL format.
@@ -24,14 +25,14 @@ use ApiPlatform\Core\Util\IriHelper;
  */
 final class CollectionNormalizer extends AbstractCollectionNormalizer
 {
-    const FORMAT = 'jsonhal';
+    public const FORMAT = 'jsonhal';
 
     /**
      * {@inheritdoc}
      */
     protected function getPaginationData($object, array $context = []): array
     {
-        list($paginator, $paginated, $currentPage, $itemsPerPage, $lastPage, $pageTotalItems, $totalItems) = $this->getPaginationConfig($object, $context);
+        [$paginator, $paginated, $currentPage, $itemsPerPage, $lastPage, $pageTotalItems, $totalItems] = $this->getPaginationConfig($object, $context);
         $parsed = IriHelper::parseIri($context['request_uri'] ?? '/', $this->pageParameterName);
 
         $data = [
@@ -68,6 +69,8 @@ final class CollectionNormalizer extends AbstractCollectionNormalizer
 
     /**
      * {@inheritdoc}
+     *
+     * @throws UnexpectedValueException
      */
     protected function getItemsData($object, string $format = null, array $context = []): array
     {
@@ -75,7 +78,9 @@ final class CollectionNormalizer extends AbstractCollectionNormalizer
 
         foreach ($object as $obj) {
             $item = $this->normalizer->normalize($obj, $format, $context);
-
+            if (!\is_array($item)) {
+                throw new UnexpectedValueException('Expected item to be an array');
+            }
             $data['_embedded']['item'][] = $item;
             $data['_links']['item'][] = $item['_links']['self'];
         }

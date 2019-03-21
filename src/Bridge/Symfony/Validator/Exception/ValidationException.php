@@ -34,10 +34,8 @@ final class ValidationException extends BaseValidationException
 
     /**
      * Gets constraint violations related to this exception.
-     *
-     * @return ConstraintViolationListInterface
      */
-    public function getConstraintViolationList()
+    public function getConstraintViolationList(): ConstraintViolationListInterface
     {
         return $this->constraintViolationList;
     }

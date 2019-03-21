@@ -39,7 +39,7 @@ final class WriteListener
     /**
      * Persists, updates or delete data return by the controller if applicable.
      */
-    public function onKernelView(GetResponseForControllerResultEvent $event)
+    public function onKernelView(GetResponseForControllerResultEvent $event): void
     {
         $request = $event->getRequest();
         if ($request->isMethodSafe(false)) {
@@ -71,10 +71,8 @@ final class WriteListener
 
     /**
      * Gets the manager if applicable.
-     *
-     * @return ObjectManager|null
      */
-    private function getManager(string $resourceClass, $data)
+    private function getManager(string $resourceClass, $data): ?ObjectManager
     {
         $objectManager = $this->managerRegistry->getManagerForClass($resourceClass);
         if (null === $objectManager || !\is_object($data)) {

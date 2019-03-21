@@ -38,7 +38,7 @@ final class NumericFilter extends AbstractFilter
     /**
      * Type of numeric in Doctrine.
      */
-    const DOCTRINE_NUMERIC_TYPES = [
+    public const DOCTRINE_NUMERIC_TYPES = [
         MongoDbType::INT => true,
         MongoDbType::INTEGER => true,
         MongoDbType::FLOAT => true,
