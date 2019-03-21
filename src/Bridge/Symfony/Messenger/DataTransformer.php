@@ -48,7 +48,7 @@ final class DataTransformer implements DataTransformerInterface
         if (
             \is_object($data) // data is not normalized yet, it should be an array
             ||
-            null === $className = $context['input']['class'] ?? null
+            null === ($context['input']['class'] ?? null)
         ) {
             return false;
         }
