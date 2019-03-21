@@ -79,6 +79,11 @@ final class ItemNormalizer extends AbstractItemNormalizer
             }
 
             $data = $this->createJsonLdContext($this->contextBuilder, $object, $context);
+
+            if (isset($context['api_resource'])) {
+                unset($context['api_resource']);
+            }
+
             $rawData = parent::normalize($object, $format, $context);
             if (!\is_array($rawData)) {
                 return $rawData;

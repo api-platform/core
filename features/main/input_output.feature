@@ -35,22 +35,16 @@ Feature: DTO input and output
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
-    And the JSON should be a superset of:
+    And the JSON should be equal to:
     """
     {
       "@context": {
         "@vocab": "http://example.com/docs.jsonld#",
         "hydra": "http://www.w3.org/ns/hydra/core#",
-        "foo": {
-          "@id": "/dummy_dto_customs/1/foo",
-          "@type": "@id"
-        },
-        "bar": {
-          "@id": "/dummy_dto_customs/1/bar",
-          "@type": "@id"
-        }
+        "foo": "CustomOutputDto/foo",
+        "bar": "CustomOutputDto/bar"
       },
-      "@type": "CustomOutputDto",
+      "@type": "DummyDtoCustom",
       "@id": "/dummy_dto_customs/1",
       "foo": "test",
       "bar": 1
@@ -64,7 +58,7 @@ Feature: DTO input and output
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
-    And the JSON should be a superset of:
+    And the JSON should be equal to:
     """
     {
       "@context": "/contexts/DummyDtoCustom",
@@ -110,20 +104,19 @@ Feature: DTO input and output
     }
     """
     Then the response status code should be 201
-    And the JSON should be a superset of:
+    And the JSON should be equal to:
     """
     {
       "@context": {
         "@vocab": "http://example.com/docs.jsonld#",
         "hydra": "http://www.w3.org/ns/hydra/core#",
-        "baz": {
-          "@type": "@id"
-        },
-        "bat": {
-          "@type": "@id"
-        }
+        "id": "OutputDto/id",
+        "baz": "OutputDto/baz",
+        "bat": "OutputDto/bat"
       },
-      "@type": "OutputDto",
+      "@type": "DummyDtoInputOutput",
+      "@id": "/dummy_dto_input_outputs/1",
+      "id": 1,
       "baz": 1,
       "bat": "test"
     }
@@ -137,20 +130,19 @@ Feature: DTO input and output
     }
     """
     Then the response status code should be 200
-    And the JSON should be a superset of:
+    And the JSON should be equal to:
     """
     {
       "@context": {
-        "@vocab": "http:\/\/example.com\/docs.jsonld#",
-        "hydra": "http:\/\/www.w3.org\/ns\/hydra\/core#",
-        "baz": {
-          "@type": "@id"
-        },
-        "bat": {
-          "@type": "@id"
-        }
+        "@vocab": "http://example.com/docs.jsonld#",
+        "hydra": "http://www.w3.org/ns/hydra/core#",
+        "id": "OutputDto/id",
+        "baz": "OutputDto/baz",
+        "bat": "OutputDto/bat"
       },
-      "@type": "OutputDto",
+      "@type": "DummyDtoInputOutput",
+      "@id": "/dummy_dto_input_outputs/1",
+      "id": 1,
       "baz": 2,
       "bat": "test"
     }
@@ -177,17 +169,16 @@ Feature: DTO input and output
     }
     """
     Then the response status code should be 200
-    And the JSON should be a superset of:
+    And the JSON should be equal to:
     """
     {
       "@context": {
         "@vocab": "http://example.com/docs.jsonld#",
         "hydra": "http://www.w3.org/ns/hydra/core#",
-        "dummy": {
-            "@type": "@id"
-        }
+        "dummy": "RecoverPasswordOutput/dummy"
       },
-      "@type": "RecoverPasswordOutput",
+      "@type": "User",
+      "@id": "/users/1",
       "dummy": "/dummies/1"
     }
     """
@@ -203,20 +194,19 @@ Feature: DTO input and output
     }
     """
     Then the response status code should be 201
-    And the JSON should be a superset of:
+    And the JSON should be equal to:
     """
     {
       "@context": {
         "@vocab": "http://example.com/docs.jsonld#",
         "hydra": "http://www.w3.org/ns/hydra/core#",
-        "baz": {
-          "@type": "@id"
-        },
-        "bat": {
-          "@type": "@id"
-        }
+        "id": "OutputDto/id",
+        "baz": "OutputDto/baz",
+        "bat": "OutputDto/bat"
       },
-      "@type": "OutputDto",
+      "@type": "DummyDtoInputOutput",
+      "@id": "/dummy_dto_input_outputs/1",
+      "id": 1,
       "baz": 1,
       "bat": "test"
     }

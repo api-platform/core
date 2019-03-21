@@ -59,6 +59,7 @@ final class ItemNormalizer extends BaseItemNormalizer
             if (isset($context['api_resource']) && isset($data['id'])) {
                 $data['_id'] = $data['id'];
                 $data['id'] = $this->iriConverter->getIriFromItem($context['api_resource']);
+                unset($context['api_resource']);
             }
         }
 
