@@ -24,15 +24,25 @@ use Symfony\Component\Serializer\Annotation\Groups;
  *
  * @ORM\Entity
  *
- * @ApiResource(attributes={
- *     "normalization_context"={"groups"={"dummy_read"}},
- *     "denormalization_context"={"groups"={"dummy_write"}},
- *     "filters"={
- *         "dummy_property.property",
- *         "dummy_property.whitelist_property",
- *         "dummy_property.whitelisted_properties"
+ * @ApiResource(
+ *     attributes={
+ *         "normalization_context"={"groups"={"dummy_read"}},
+ *         "denormalization_context"={"groups"={"dummy_write"}},
+ *         "filters"={
+ *             "dummy_property.property",
+ *             "dummy_property.whitelist_property",
+ *             "dummy_property.whitelisted_properties"
+ *         }
+ *     },
+ *     graphql={
+ *         "query",
+ *         "update",
+ *         "delete",
+ *         "create"={
+ *             "normalization_context"={"groups"={"dummy_graphql_read"}},
+ *         }
  *     }
- * })
+ * )
  */
 class DummyProperty
 {
@@ -43,7 +53,7 @@ class DummyProperty
      * @ORM\Column(type="integer")
      * @ORM\GeneratedValue(strategy="AUTO")
      *
-     * @Groups("dummy_read")
+     * @Groups({"dummy_read", "dummy_graphql_read"})
      */
     private $id;
 
@@ -61,7 +71,7 @@ class DummyProperty
      *
      * @ORM\Column(nullable=true)
      *
-     * @Groups({"dummy_read", "dummy_write"})
+     * @Groups({"dummy_read", "dummy_graphql_read", "dummy_write"})
      */
     public $bar;
 
@@ -70,7 +80,7 @@ class DummyProperty
      *
      * @ORM\Column(nullable=true)
      *
-     * @Groups({"dummy_read", "dummy_write"})
+     * @Groups({"dummy_read", "dummy_graphql_read", "dummy_write"})
      */
     public $baz;
 
@@ -79,7 +89,7 @@ class DummyProperty
      *
      * @ORM\ManyToOne(targetEntity=DummyGroup::class, cascade={"persist"})
      *
-     * @Groups({"dummy_read", "dummy_write"})
+     * @Groups({"dummy_read", "dummy_graphql_read", "dummy_write"})
      */
     public $group;
 
@@ -87,7 +97,7 @@ class DummyProperty
      * @var DummyGroup[]
      *
      * @ORM\ManyToMany(targetEntity=DummyGroup::class, cascade={"persist"})
-     * @Groups({"dummy_read", "dummy_write"})
+     * @Groups({"dummy_read", "dummy_graphql_read", "dummy_write"})
      */
     public $groups;
 

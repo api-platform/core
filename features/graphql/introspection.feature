@@ -330,7 +330,7 @@ Feature: GraphQL introspection support
     When I send the following GraphQL request:
     """
     {
-      typeCreatePayload: __type(name: "createDummyPayload") {
+      typeCreatePayload: __type(name: "createDummyPropertyPayload") {
         description,
         fields {
           name
@@ -344,7 +344,7 @@ Feature: GraphQL introspection support
           }
         }
       }
-      typeCreatePayloadData: __type(name: "createDummyPayloadData") {
+      typeCreatePayloadData: __type(name: "createDummyPropertyPayloadData") {
         description,
         fields {
           name
@@ -358,7 +358,7 @@ Feature: GraphQL introspection support
           }
         }
       }
-      typeCreateNestedPayload: __type(name: "createRelatedDummyNestedPayload") {
+      typeCreateNestedPayload: __type(name: "createDummyGroupNestedPayload") {
         description,
         fields {
           name
@@ -378,11 +378,11 @@ Feature: GraphQL introspection support
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/json"
     And the JSON node "data.typeCreatePayload.fields" should have 2 elements
-    And the JSON node "data.typeCreatePayload.fields[0].name" should be equal to "dummy"
-    And the JSON node "data.typeCreatePayload.fields[0].type.name" should be equal to "createDummyPayloadData"
+    And the JSON node "data.typeCreatePayload.fields[0].name" should be equal to "dummyProperty"
+    And the JSON node "data.typeCreatePayload.fields[0].type.name" should be equal to "createDummyPropertyPayloadData"
     And the JSON node "data.typeCreatePayload.fields[1].name" should be equal to "clientMutationId"
-    And the JSON node "data.typeCreatePayloadData.fields[7].name" should be equal to "relatedDummy"
-    And the JSON node "data.typeCreatePayloadData.fields[7].type.name" should be equal to "createRelatedDummyNestedPayload"
+    And the JSON node "data.typeCreatePayloadData.fields[3].name" should be equal to "group"
+    And the JSON node "data.typeCreatePayloadData.fields[3].type.name" should be equal to "createDummyGroupNestedPayload"
     And the JSON node "data.typeCreateNestedPayload.fields[0].name" should be equal to "id"
 
   Scenario: Retrieve an item through a GraphQL query

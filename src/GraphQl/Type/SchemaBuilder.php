@@ -399,6 +399,7 @@ final class SchemaBuilder implements SchemaBuilderInterface
     private function getResourceObjectType(?string $resourceClass, ResourceMetadata $resourceMetadata, bool $input = false, string $mutationName = null, bool $wrapped = false, int $depth = 0): GraphQLType
     {
         $shortName = $resourceMetadata->getShortName();
+
         if (null !== $mutationName) {
             $shortName = $mutationName.ucfirst($shortName);
         }
@@ -410,7 +411,7 @@ final class SchemaBuilder implements SchemaBuilderInterface
             }
             $shortName .= 'Payload';
         }
-        if ($wrapped) {
+        if ($wrapped && null !== $mutationName) {
             $shortName .= 'Data';
         }
 
@@ -432,8 +433,16 @@ final class SchemaBuilder implements SchemaBuilderInterface
             'resolveField' => $this->defaultFieldResolver,
             'fields' => function () use ($resourceClass, $resourceMetadata, $input, $mutationName, $wrapData, $depth, $ioMetadata) {
                 if ($wrapData) {
+                    $queryNormalizationContext = $resourceMetadata->getGraphqlAttribute('query', 'normalization_context', [], true);
+                    $mutationNormalizationContext = $resourceMetadata->getGraphqlAttribute($mutationName ?? '', 'normalization_context', [], true);
+                    // Use a new type for the wrapped object only if there is a specific normalization context for the mutation.
+                    // If not, use the query type in order to ensure the client cache could be used.
+                    $useWrappedType = $queryNormalizationContext !== $mutationNormalizationContext;
+
                     return [
-                        lcfirst($resourceMetadata->getShortName()) => $this->getResourceObjectType($resourceClass, $resourceMetadata, $input, $mutationName, true, $depth),
+                        lcfirst($resourceMetadata->getShortName()) => $useWrappedType ?
+                            $this->getResourceObjectType($resourceClass, $resourceMetadata, $input, $mutationName, true, $depth) :
+                            $this->getResourceObjectType($resourceClass, $resourceMetadata, $input, null, true, $depth),
                         'clientMutationId' => GraphQLType::string(),
                     ];
                 }
