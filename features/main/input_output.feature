@@ -245,3 +245,25 @@ Feature: DTO input and output
     """
     Then the response status code should be 201
     And the response should be empty
+
+  Scenario: Use messenger with an input where the handler gives a synchronous result
+    When I add "Content-Type" header equal to "application/ld+json"
+    And I send a "POST" request to "/messenger_with_inputs" with body:
+    """
+    {
+      "var": "test"
+    }
+    """
+    Then the response status code should be 201
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+    And the JSON should be equal to:
+    """
+    {
+      "@context": "/contexts/MessengerWithInput",
+      "@id": "/messenger_with_inputs/1",
+      "@type": "MessengerWithInput",
+      "id": 1,
+      "name": "test"
+    }
+    """
