@@ -61,7 +61,14 @@ final class SerializeListener
 
         $context = $this->serializerContextBuilder->createFromRequest($request, true, $attributes);
 
-        if (isset($context['output']) && \array_key_exists('class', $context['output']) && null === $context['output']['class']) {
+        if (
+            (isset($context['output']) && \array_key_exists('class', $context['output']) && null === $context['output']['class'])
+            ||
+            (
+                null === $controllerResult && isset($context['input']) && \array_key_exists('class', $context['input']) &&
+                null === $context['input']['class']
+            )
+        ) {
             $event->setControllerResult('');
 
             return;

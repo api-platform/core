@@ -232,3 +232,16 @@ Feature: DTO input and output
       }
     }
     """
+
+  @createSchema
+  Scenario: Create a resource with no input
+    When I add "Content-Type" header equal to "application/ld+json"
+    And I send a "POST" request to "/dummy_dto_no_inputs" with body:
+    """
+    {
+      "foo": "test",
+      "bar": 1
+    }
+    """
+    Then the response status code should be 201
+    And the response should be empty
