@@ -14,12 +14,12 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\Bridge\Doctrine\Orm\Util;
 
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryChecker;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RelatedDummy;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
-use Doctrine\ORM\Query\Expr\Join;
-use Doctrine\ORM\Query\Expr\OrderBy;
 use Doctrine\ORM\QueryBuilder;
 use PHPUnit\Framework\TestCase;
 
@@ -32,10 +32,10 @@ class QueryCheckerTest extends TestCase
         $this->assertTrue(QueryChecker::hasHavingClause($queryBuilder->reveal()));
     }
 
-    public function testHasHavingClauseWithEmptyHavingClause()
+    public function testHasHavingClauseWithoutHavingClause()
     {
         $queryBuilder = $this->prophesize(QueryBuilder::class);
-        $queryBuilder->getDQLPart('having')->willReturn([]);
+        $queryBuilder->getDQLPart('having')->willReturn(null);
         $this->assertFalse(QueryChecker::hasHavingClause($queryBuilder->reveal()));
     }
 
@@ -114,92 +114,232 @@ class QueryCheckerTest extends TestCase
         $this->assertFalse(QueryChecker::hasRootEntityWithForeignKeyIdentifier($queryBuilder->reveal(), $managerRegistry->reveal()));
     }
 
-    public function testHasOrderByOnToManyJoinWithoutJoin()
+    public function testHasOrderByOnFetchJoinedToManyAssociationWithoutJoin()
     {
-        $queryBuilder = $this->prophesize(QueryBuilder::class);
-        $queryBuilder->getRootEntities()->willReturn(['Dummy']);
-        $queryBuilder->getRootAliases()->willReturn(['d']);
-        $queryBuilder->getDQLPart('join')->willReturn([]);
-        $queryBuilder->getDQLPart('orderBy')->willReturn(['name' => new OrderBy('name', 'asc')]);
-        $classMetadata = $this->prophesize(ClassMetadata::class);
-        $objectManager = $this->prophesize(ObjectManager::class);
-        $objectManager->getClassMetadata('Dummy')->willReturn($classMetadata->reveal());
-        $managerRegistry = $this->prophesize(ManagerRegistry::class);
-        $managerRegistry->getManagerForClass('Dummy')->willReturn($objectManager->reveal());
+        $entityManagerProphecy = $this->prophesize(EntityManagerInterface::class);
 
-        $this->assertFalse(QueryChecker::hasOrderByOnToManyJoin($queryBuilder->reveal(), $managerRegistry->reveal()));
+        $queryBuilder = new QueryBuilder($entityManagerProphecy->reveal());
+        $queryBuilder->select(['d']);
+        $queryBuilder->from(Dummy::class, 'd');
+        $queryBuilder->orderBy('d.name', 'ASC');
+
+        $managerRegistryProphecy = $this->prophesize(ManagerRegistry::class);
+
+        $this->assertFalse(QueryChecker::hasOrderByOnFetchJoinedToManyAssociation($queryBuilder, $managerRegistryProphecy->reveal()));
     }
 
-    public function testHasOrderByOnToManyJoinWithoutOrderBy()
+    public function testHasOrderByOnFetchJoinedToManyAssociationWithoutOrderBy()
     {
-        $queryBuilder = $this->prophesize(QueryBuilder::class);
-        $queryBuilder->getRootEntities()->willReturn(['Dummy']);
-        $queryBuilder->getRootAliases()->willReturn(['d']);
-        $queryBuilder->getDQLPart('join')->willReturn(['a_1' => new Join('INNER_JOIN', 'relatedDummy', 'a_1', null, 'a_1.name = r.name')]);
-        $queryBuilder->getDQLPart('orderBy')->willReturn([]);
-        $classMetadata = $this->prophesize(ClassMetadata::class);
-        $objectManager = $this->prophesize(ObjectManager::class);
-        $objectManager->getClassMetadata('Dummy')->willReturn($classMetadata->reveal());
-        $managerRegistry = $this->prophesize(ManagerRegistry::class);
-        $managerRegistry->getManagerForClass('Dummy')->willReturn($objectManager->reveal());
+        $entityManagerProphecy = $this->prophesize(EntityManagerInterface::class);
 
-        $this->assertFalse(QueryChecker::hasOrderByOnToManyJoin($queryBuilder->reveal(), $managerRegistry->reveal()));
+        $queryBuilder = new QueryBuilder($entityManagerProphecy->reveal());
+        $queryBuilder->select(['d', 'a_1']);
+        $queryBuilder->from(Dummy::class, 'd');
+        $queryBuilder->leftJoin('d.relatedDummies', 'a_1');
+
+        $managerRegistryProphecy = $this->prophesize(ManagerRegistry::class);
+
+        $this->assertFalse(QueryChecker::hasOrderByOnFetchJoinedToManyAssociation($queryBuilder, $managerRegistryProphecy->reveal()));
     }
 
-    public function testHasOrderByOnToManyJoinWithoutJoinAndWithoutOrderBy()
+    public function testHasOrderByOnFetchJoinedToManyAssociationNotFetchJoined()
     {
-        $queryBuilder = $this->prophesize(QueryBuilder::class);
-        $queryBuilder->getRootEntities()->willReturn(['Dummy']);
-        $queryBuilder->getRootAliases()->willReturn(['d']);
-        $queryBuilder->getDQLPart('join')->willReturn([]);
-        $queryBuilder->getDQLPart('orderBy')->willReturn([]);
-        $classMetadata = $this->prophesize(ClassMetadata::class);
-        $objectManager = $this->prophesize(ObjectManager::class);
-        $objectManager->getClassMetadata('Dummy')->willReturn($classMetadata->reveal());
-        $managerRegistry = $this->prophesize(ManagerRegistry::class);
-        $managerRegistry->getManagerForClass('Dummy')->willReturn($objectManager->reveal());
+        $dummyMetadata = new ClassMetadata(Dummy::class);
+        $dummyMetadata->mapManyToMany([
+            'fieldName' => 'relatedDummies',
+            'targetEntity' => RelatedDummy::class,
+        ]);
+        $dummyMetadata->mapManyToOne([
+            'fieldName' => 'relatedDummy',
+            'targetEntity' => RelatedDummy::class,
+        ]);
 
-        $this->assertFalse(QueryChecker::hasOrderByOnToManyJoin($queryBuilder->reveal(), $managerRegistry->reveal()));
+        $relatedDummyMetadata = new ClassMetadata(RelatedDummy::class);
+
+        $entityManagerProphecy = $this->prophesize(EntityManagerInterface::class);
+        $entityManagerProphecy->getClassMetadata(Dummy::class)->willReturn($dummyMetadata);
+        $entityManagerProphecy->getClassMetadata(RelatedDummy::class)->willReturn($relatedDummyMetadata);
+
+        $queryBuilder = new QueryBuilder($entityManagerProphecy->reveal());
+        $queryBuilder->select(['d', 'a_2']);
+        $queryBuilder->from(Dummy::class, 'd');
+        $queryBuilder->leftJoin('d.relatedDummies', 'a_1');
+        $queryBuilder->leftJoin('d.relatedDummy', 'a_2');
+        $queryBuilder->orderBy('a_1.name', 'ASC');
+
+        $managerRegistryProphecy = $this->prophesize(ManagerRegistry::class);
+        $managerRegistryProphecy->getManagerForClass(Dummy::class)->willReturn($entityManagerProphecy);
+        $managerRegistryProphecy->getManagerForClass(RelatedDummy::class)->willReturn($entityManagerProphecy);
+
+        $this->assertFalse(QueryChecker::hasOrderByOnFetchJoinedToManyAssociation($queryBuilder, $managerRegistryProphecy->reveal()));
     }
 
-    public function testHasOrderByOnToManyJoinWithClassLeftJoin()
+    public function testHasOrderByOnFetchJoinedToManyAssociationWithJoinByAssociation()
     {
-        $queryBuilder = $this->prophesize(QueryBuilder::class);
-        $queryBuilder->getRootEntities()->willReturn(['Dummy']);
-        $queryBuilder->getRootAliases()->willReturn(['d']);
-        $queryBuilder->getDQLPart('join')->willReturn(['a_1' => [new Join('LEFT_JOIN', RelatedDummy::class, 'a_1', null, 'a_1.name = d.name')]]);
-        $queryBuilder->getDQLPart('orderBy')->willReturn(['a_1.name' => new OrderBy('a_1.name', 'asc')]);
-        $classMetadata = $this->prophesize(ClassMetadata::class);
-        $classMetadata->getAssociationsByTargetClass(RelatedDummy::class)->willReturn(['relatedDummy' => ['targetEntity' => RelatedDummy::class]]);
-        $relatedClassMetadata = $this->prophesize(ClassMetadata::class);
-        $relatedClassMetadata->isCollectionValuedAssociation('relatedDummy')->willReturn(true);
-        $objectManager = $this->prophesize(ObjectManager::class);
-        $objectManager->getClassMetadata('Dummy')->willReturn($classMetadata->reveal());
-        $objectManager->getClassMetadata(RelatedDummy::class)->willReturn($relatedClassMetadata->reveal());
-        $managerRegistry = $this->prophesize(ManagerRegistry::class);
-        $managerRegistry->getManagerForClass('Dummy')->willReturn($objectManager->reveal());
-        $managerRegistry->getManagerForClass(RelatedDummy::class)->willReturn($objectManager->reveal());
+        $dummyMetadata = new ClassMetadata(Dummy::class);
+        $dummyMetadata->mapManyToMany([
+            'fieldName' => 'relatedDummies',
+            'targetEntity' => RelatedDummy::class,
+        ]);
 
-        $this->assertTrue(QueryChecker::hasOrderByOnToManyJoin($queryBuilder->reveal(), $managerRegistry->reveal()));
+        $relatedDummyMetadata = new ClassMetadata(RelatedDummy::class);
+
+        $entityManagerProphecy = $this->prophesize(EntityManagerInterface::class);
+        $entityManagerProphecy->getClassMetadata(Dummy::class)->willReturn($dummyMetadata);
+        $entityManagerProphecy->getClassMetadata(RelatedDummy::class)->willReturn($relatedDummyMetadata);
+
+        $queryBuilder = new QueryBuilder($entityManagerProphecy->reveal());
+        $queryBuilder->select(['d', 'a_1']);
+        $queryBuilder->from(Dummy::class, 'd');
+        $queryBuilder->leftJoin('d.relatedDummies', 'a_1');
+        $queryBuilder->orderBy('a_1.name', 'ASC');
+
+        $managerRegistryProphecy = $this->prophesize(ManagerRegistry::class);
+        $managerRegistryProphecy->getManagerForClass(Dummy::class)->willReturn($entityManagerProphecy);
+        $managerRegistryProphecy->getManagerForClass(RelatedDummy::class)->willReturn($entityManagerProphecy);
+
+        $this->assertTrue(QueryChecker::hasOrderByOnFetchJoinedToManyAssociation($queryBuilder, $managerRegistryProphecy->reveal()));
     }
 
     /**
-     * Adds a test on the fix referenced in https://github.com/api-platform/core/pull/1449.
+     * @group legacy
+     * @expectedDeprecation The use of "ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryChecker::hasOrderByOnToManyJoin()" is deprecated since 2.4 and will be removed in 3.0. Use "ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryChecker::hasOrderByOnFetchJoinedToManyAssociation()" instead.
      */
-    public function testOrderByOnToManyWithRelationAsBasis()
+    public function testHasOrderByOnToManyJoinWithoutJoin()
     {
-        $queryBuilder = $this->prophesize(QueryBuilder::class);
-        $queryBuilder->getRootEntities()->willReturn(['Dummy']);
-        $queryBuilder->getRootAliases()->willReturn(['d']);
-        $queryBuilder->getDQLPart('join')->willReturn(['d' => [new Join('LEFT_JOIN', 'd.relatedDummy', 'a_1')]]);
-        $queryBuilder->getDQLPart('orderBy')->willReturn(['a_1.name' => new OrderBy('a_1.name', 'asc')]);
-        $classMetadata = $this->prophesize(ClassMetadata::class);
-        $classMetadata->isCollectionValuedAssociation('relatedDummy')->willReturn(true);
-        $objectManager = $this->prophesize(ObjectManager::class);
-        $objectManager->getClassMetadata('Dummy')->willReturn($classMetadata->reveal());
-        $managerRegistry = $this->prophesize(ManagerRegistry::class);
-        $managerRegistry->getManagerForClass('Dummy')->willReturn($objectManager->reveal());
+        $entityManagerProphecy = $this->prophesize(EntityManagerInterface::class);
 
-        $this->assertTrue(QueryChecker::hasOrderByOnToManyJoin($queryBuilder->reveal(), $managerRegistry->reveal()));
+        $queryBuilder = new QueryBuilder($entityManagerProphecy->reveal());
+        $queryBuilder->select(['d']);
+        $queryBuilder->from(Dummy::class, 'd');
+        $queryBuilder->orderBy('d.name', 'ASC');
+
+        $managerRegistryProphecy = $this->prophesize(ManagerRegistry::class);
+
+        $this->assertFalse(QueryChecker::hasOrderByOnToManyJoin($queryBuilder, $managerRegistryProphecy->reveal()));
+    }
+
+    /**
+     * @group legacy
+     * @expectedDeprecation The use of "ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryChecker::hasOrderByOnToManyJoin()" is deprecated since 2.4 and will be removed in 3.0. Use "ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryChecker::hasOrderByOnFetchJoinedToManyAssociation()" instead.
+     */
+    public function testHasOrderByOnToManyJoinWithoutOrderBy()
+    {
+        $entityManagerProphecy = $this->prophesize(EntityManagerInterface::class);
+
+        $queryBuilder = new QueryBuilder($entityManagerProphecy->reveal());
+        $queryBuilder->select(['d', 'a_1']);
+        $queryBuilder->from(Dummy::class, 'd');
+        $queryBuilder->leftJoin('d.relatedDummies', 'a_1');
+
+        $managerRegistryProphecy = $this->prophesize(ManagerRegistry::class);
+
+        $this->assertFalse(QueryChecker::hasOrderByOnToManyJoin($queryBuilder, $managerRegistryProphecy->reveal()));
+    }
+
+    /**
+     * @group legacy
+     * @expectedDeprecation The use of "ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryChecker::hasOrderByOnToManyJoin()" is deprecated since 2.4 and will be removed in 3.0. Use "ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryChecker::hasOrderByOnFetchJoinedToManyAssociation()" instead.
+     */
+    public function testHasOrderByOnToManyJoinNotFetchJoined()
+    {
+        $dummyMetadata = new ClassMetadata(Dummy::class);
+        $dummyMetadata->mapManyToMany([
+            'fieldName' => 'relatedDummies',
+            'targetEntity' => RelatedDummy::class,
+        ]);
+        $dummyMetadata->mapManyToOne([
+            'fieldName' => 'relatedDummy',
+            'targetEntity' => RelatedDummy::class,
+        ]);
+
+        $relatedDummyMetadata = new ClassMetadata(RelatedDummy::class);
+
+        $entityManagerProphecy = $this->prophesize(EntityManagerInterface::class);
+        $entityManagerProphecy->getClassMetadata(Dummy::class)->willReturn($dummyMetadata);
+        $entityManagerProphecy->getClassMetadata(RelatedDummy::class)->willReturn($relatedDummyMetadata);
+
+        $queryBuilder = new QueryBuilder($entityManagerProphecy->reveal());
+        $queryBuilder->select(['d', 'a_2']);
+        $queryBuilder->from(Dummy::class, 'd');
+        $queryBuilder->leftJoin('d.relatedDummies', 'a_1');
+        $queryBuilder->leftJoin('d.relatedDummy', 'a_2');
+        $queryBuilder->orderBy('a_1.name', 'ASC');
+
+        $managerRegistryProphecy = $this->prophesize(ManagerRegistry::class);
+        $managerRegistryProphecy->getManagerForClass(Dummy::class)->willReturn($entityManagerProphecy);
+        $managerRegistryProphecy->getManagerForClass(RelatedDummy::class)->willReturn($entityManagerProphecy);
+
+        $this->assertFalse(QueryChecker::hasOrderByOnToManyJoin($queryBuilder, $managerRegistryProphecy->reveal()));
+    }
+
+    /**
+     * @group legacy
+     * @expectedDeprecation The use of "ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryChecker::hasOrderByOnToManyJoin()" is deprecated since 2.4 and will be removed in 3.0. Use "ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryChecker::hasOrderByOnFetchJoinedToManyAssociation()" instead.
+     */
+    public function testHasOrderByOnToManyWithJoinByAssociation()
+    {
+        $dummyMetadata = new ClassMetadata(Dummy::class);
+        $dummyMetadata->mapManyToMany([
+            'fieldName' => 'relatedDummies',
+            'targetEntity' => RelatedDummy::class,
+        ]);
+
+        $relatedDummyMetadata = new ClassMetadata(RelatedDummy::class);
+
+        $entityManagerProphecy = $this->prophesize(EntityManagerInterface::class);
+        $entityManagerProphecy->getClassMetadata(Dummy::class)->willReturn($dummyMetadata);
+        $entityManagerProphecy->getClassMetadata(RelatedDummy::class)->willReturn($relatedDummyMetadata);
+
+        $queryBuilder = new QueryBuilder($entityManagerProphecy->reveal());
+        $queryBuilder->select(['d', 'a_1']);
+        $queryBuilder->from(Dummy::class, 'd');
+        $queryBuilder->leftJoin('d.relatedDummies', 'a_1');
+        $queryBuilder->orderBy('a_1.name', 'ASC');
+
+        $managerRegistryProphecy = $this->prophesize(ManagerRegistry::class);
+        $managerRegistryProphecy->getManagerForClass(Dummy::class)->willReturn($entityManagerProphecy);
+        $managerRegistryProphecy->getManagerForClass(RelatedDummy::class)->willReturn($entityManagerProphecy);
+
+        $this->assertTrue(QueryChecker::hasOrderByOnToManyJoin($queryBuilder, $managerRegistryProphecy->reveal()));
+    }
+
+    public function testHasJoinedToManyAssociationWithoutJoin()
+    {
+        $entityManagerProphecy = $this->prophesize(EntityManagerInterface::class);
+
+        $queryBuilder = new QueryBuilder($entityManagerProphecy->reveal());
+        $queryBuilder->select(['d']);
+        $queryBuilder->from(Dummy::class, 'd');
+
+        $managerRegistryProphecy = $this->prophesize(ManagerRegistry::class);
+
+        $this->assertFalse(QueryChecker::hasJoinedToManyAssociation($queryBuilder, $managerRegistryProphecy->reveal()));
+    }
+
+    public function testHasJoinedToManyAssociationWithJoinByAssociation()
+    {
+        $dummyMetadata = new ClassMetadata(Dummy::class);
+        $dummyMetadata->mapManyToMany([
+            'fieldName' => 'relatedDummies',
+            'targetEntity' => RelatedDummy::class,
+        ]);
+
+        $relatedDummyMetadata = new ClassMetadata(RelatedDummy::class);
+
+        $entityManagerProphecy = $this->prophesize(EntityManagerInterface::class);
+        $entityManagerProphecy->getClassMetadata(Dummy::class)->willReturn($dummyMetadata);
+        $entityManagerProphecy->getClassMetadata(RelatedDummy::class)->willReturn($relatedDummyMetadata);
+
+        $queryBuilder = new QueryBuilder($entityManagerProphecy->reveal());
+        $queryBuilder->select(['d']);
+        $queryBuilder->from(Dummy::class, 'd');
+        $queryBuilder->leftJoin('d.relatedDummies', 'a_1');
+
+        $managerRegistryProphecy = $this->prophesize(ManagerRegistry::class);
+        $managerRegistryProphecy->getManagerForClass(Dummy::class)->willReturn($entityManagerProphecy);
+        $managerRegistryProphecy->getManagerForClass(RelatedDummy::class)->willReturn($entityManagerProphecy);
+
+        $this->assertTrue(QueryChecker::hasJoinedToManyAssociation($queryBuilder, $managerRegistryProphecy->reveal()));
     }
 }
