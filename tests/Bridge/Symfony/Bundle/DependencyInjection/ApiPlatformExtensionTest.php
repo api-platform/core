@@ -968,6 +968,7 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.graphql.query_resolver_locator',
             'api_platform.graphql.normalizer.item',
             'api_platform.graphql.normalizer.item.non_resource',
+            'api_platform.graphql.command.export_command',
             'api_platform.hal.encoder',
             'api_platform.hal.normalizer.collection',
             'api_platform.hal.normalizer.entrypoint',

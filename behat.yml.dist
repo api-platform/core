@@ -2,6 +2,7 @@ default:
   suites:
     default:
       contexts:
+        - 'CommandContext'
         - 'DoctrineContext':
             doctrine: '@doctrine'
         - 'HttpHeaderContext'
@@ -21,6 +22,7 @@ default:
         tags: '~@postgres&&~@mongodb&&~@elasticsearch'
     postgres:
       contexts:
+        - 'CommandContext'
         - 'DoctrineContext':
             doctrine: '@doctrine'
         - 'HttpHeaderContext'
@@ -40,6 +42,7 @@ default:
         tags: '~@sqlite&&~@mongodb&&~@elasticsearch'
     mongodb:
       contexts:
+        - 'CommandContext'
         - 'DoctrineContext':
             doctrine: '@doctrine_mongodb'
         - 'HttpHeaderContext'
@@ -89,6 +92,7 @@ coverage:
   suites:
     default:
       contexts:
+        - 'CommandContext'
         - 'DoctrineContext':
             doctrine: '@doctrine'
         - 'HttpHeaderContext'
