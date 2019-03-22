@@ -54,7 +54,7 @@ final class DataPersister implements ContextAwareDataPersisterInterface
         }
 
         if (null !== $operationName = $context['collection_operation_name'] ?? $context['item_operation_name'] ?? null) {
-            return true === $resourceMetadata->getTypedOperationAttribute(
+            return false !== $resourceMetadata->getTypedOperationAttribute(
                 $context['collection_operation_name'] ?? false ? OperationType::COLLECTION : OperationType::ITEM,
                 $operationName,
                 'messenger',
@@ -63,7 +63,7 @@ final class DataPersister implements ContextAwareDataPersisterInterface
             );
         }
 
-        return true === $resourceMetadata->getAttribute('messenger');
+        return false !== $resourceMetadata->getAttribute('messenger', false);
     }
 
     /**

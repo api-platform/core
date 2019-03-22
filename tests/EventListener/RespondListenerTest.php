@@ -180,4 +180,17 @@ class RespondListenerTest extends TestCase
 
         $this->assertSame(Response::HTTP_ACCEPTED, $event->getResponse()->getStatusCode());
     }
+
+    public function testHandleResponse()
+    {
+        $request = new Request([], [], ['_api_resource_class' => Dummy::class, '_api_item_operation_name' => 'get', '_api_respond' => true]);
+        $response = new Response();
+        $eventProphecy = $this->prophesize(GetResponseForControllerResultEvent::class);
+        $eventProphecy->getControllerResult()->willReturn($response);
+        $eventProphecy->getRequest()->willReturn($request);
+        $eventProphecy->setResponse($response)->shouldBeCalled();
+
+        $listener = new RespondListener();
+        $listener->onKernelView($eventProphecy->reveal());
+    }
 }

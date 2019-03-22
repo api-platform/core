@@ -238,3 +238,15 @@ services:
         public: false
         tags:
             -  { name: 'api_platform.data_transformer' }
+
+    app.messenger_handler.messenger_with_inputs:
+        class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\MessengerHandler\MessengerWithInputHandler'
+        public: false
+        tags:
+            -  { name: 'messenger.message_handler' }
+
+    app.messenger_handler.messenger_with_response:
+        class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\MessengerHandler\MessengerWithResponseHandler'
+        public: false
+        tags:
+            -  { name: 'messenger.message_handler' }
