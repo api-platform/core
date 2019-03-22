@@ -56,12 +56,14 @@ class ItemMutationResolverFactoryTest extends TestCase
 
         $dataPersisterProphecy = $this->prophesize(DataPersisterInterface::class);
         $dataPersisterProphecy->remove($dummy)->shouldBeCalled();
+
         $resolverFactory = $this->createItemMutationResolverFactory($dummy, $dataPersisterProphecy);
         $resolver = $resolverFactory(Dummy::class, null, 'delete');
 
-        $resolveInfo = new ResolveInfo('', [], new ObjectType(['name' => '']), new ObjectType(['name' => '']), [], new Schema([]), [], null, null, []);
+        $resolveInfo = $this->prophesize(ResolveInfo::class);
+        $resolveInfo->getFieldSelection(PHP_INT_MAX)->shouldBeCalled()->willReturn(['shortName' => []]);
 
-        $this->assertEquals(['id' => '/dummies/3', 'clientMutationId' => '1936'], $resolver(null, ['input' => ['id' => '/dummies/3', 'clientMutationId' => '1936']], null, $resolveInfo));
+        $this->assertEquals(['shortName' => ['id' => '/dummies/3'], 'clientMutationId' => '1936'], $resolver(null, ['input' => ['id' => '/dummies/3', 'clientMutationId' => '1936']], null, $resolveInfo->reveal()));
     }
 
     private function createItemMutationResolverFactory($item, $dataPersisterProphecy): ResolverFactoryInterface
@@ -73,7 +75,7 @@ class ItemMutationResolverFactoryTest extends TestCase
         $normalizerProphecy = $this->prophesize(NormalizerInterface::class)->willImplement(DenormalizerInterface::class);
 
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $resourceMetadataFactoryProphecy->create(Argument::type('string'))->willReturn(new ResourceMetadata());
+        $resourceMetadataFactoryProphecy->create(Argument::type('string'))->willReturn(new ResourceMetadata('shortName'));
 
         return new ItemMutationResolverFactory(
             $iriConverterProphecy->reveal(),
