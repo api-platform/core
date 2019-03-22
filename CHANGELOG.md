@@ -1,5 +1,33 @@
 # Changelog
 
+## 2.4.0
+
+* Listeners are now opt-in when not handling API Platform operations
+* `DISTINCT` is not used when there are no joins
+* Preserve manual join in FilterEagerLoadingExtension
+* The `elasticsearch` attribute can be disabled resource-wise or per-operation
+* The `messenger` attribute can now take the `input` string as a value (`messenger="input"`). This will use a default transformer so that the given `input` is directly sent to the messenger handler.
+* The `messenger` attribute can be declared per-operation
+* Mercure updates are now published after the Doctrine flush event instead of on `kernel.terminate`, so the Mercure and the Messenger integration can be used together
+* Use Symfony's MetadataAwareNameConverter when available
+* Change the extension's priorities (`<0`) for improved compatibility with Symfony's autoconfiguration feature. If you have custom extensions we recommend to use positive priorities.
+
+| Service name                                               | Priority | Class                                              |
+|------------------------------------------------------------|------|---------------------------------------------------------|
+| api_platform.doctrine.orm.query_extension.eager_loading (collection) | -8 | ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\EagerLoadingExtension |
+| api_platform.doctrine.orm.query_extension.eager_loading (item) | -8 | ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\EagerLoadingExtension |
+| api_platform.doctrine.orm.query_extension.filter | -16 | ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\FilterExtension |
+| api_platform.doctrine.orm.query_extension.filter_eager_loading | -17 | ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\FilterEagerLoadingExtension |
+| api_platform.doctrine.orm.query_extension.order | -32 | ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\OrderExtension |
+| api_platform.doctrine.orm.query_extension.pagination | -64 | ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\PaginationExtension |
+
+* Fix JSON-LD contexts when using output classes
+* GraphQl: Fix pagination (the `endCursor` behavior was wrong)
+* GraphQl: Improve output/input behavior
+* GraphQl: Improve mutations (make the `clientMutationId` nullable and return mutation payload as an object)
+* MongoDB: Fix search filter when searching by related collection id
+* MongoDB: Fix numeric and range filters
+
 ## 2.4.0 beta 2
 
 * Fix version constraints for Doctrine MongoDB ODM
