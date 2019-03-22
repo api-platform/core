@@ -38,7 +38,7 @@ class NumericFilter extends AbstractContextAwareFilter
      *
      * @see http://doctrine-orm.readthedocs.org/projects/doctrine-dbal/en/latest/reference/types.html
      */
-    const DOCTRINE_NUMERIC_TYPES = [
+    public const DOCTRINE_NUMERIC_TYPES = [
         DBALType::BIGINT => true,
         DBALType::DECIMAL => true,
         DBALType::FLOAT => true,
@@ -68,7 +68,7 @@ class NumericFilter extends AbstractContextAwareFilter
         $field = $property;
 
         if ($this->isPropertyNested($property, $resourceClass)) {
-            list($alias, $field) = $this->addJoinsForNestedProperty($property, $alias, $queryBuilder, $queryNameGenerator, $resourceClass);
+            [$alias, $field] = $this->addJoinsForNestedProperty($property, $alias, $queryBuilder, $queryNameGenerator, $resourceClass);
         }
 
         $valueParameter = $queryNameGenerator->generateParameterName($field);

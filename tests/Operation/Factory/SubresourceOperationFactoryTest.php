@@ -56,7 +56,7 @@ class SubresourceOperationFactoryTest extends TestCase
         $pathSegmentNameGeneratorProphecy = $this->prophesize(PathSegmentNameGeneratorInterface::class);
         $pathSegmentNameGeneratorProphecy->getSegmentName('subresource', false)->shouldBeCalled()->willReturn('subresource');
         $pathSegmentNameGeneratorProphecy->getSegmentName('subcollection', true)->shouldBeCalled()->willReturn('subcollections');
-        $pathSegmentNameGeneratorProphecy->getSegmentName('dummyEntity', true)->shouldBeCalled()->willReturn('dummy_entities');
+        $pathSegmentNameGeneratorProphecy->getSegmentName('dummyEntity')->shouldBeCalled()->willReturn('dummy_entities');
         $pathSegmentNameGeneratorProphecy->getSegmentName('anotherSubresource', false)->shouldBeCalled()->willReturn('another_subresource');
 
         $subresourceOperationFactory = new SubresourceOperationFactory($resourceMetadataFactoryProphecy->reveal(), $propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), $pathSegmentNameGeneratorProphecy->reveal());
@@ -174,7 +174,7 @@ class SubresourceOperationFactoryTest extends TestCase
         $pathSegmentNameGeneratorProphecy = $this->prophesize(PathSegmentNameGeneratorInterface::class);
         $pathSegmentNameGeneratorProphecy->getSegmentName('subresource', false)->shouldBeCalled()->willReturn('subresource');
         $pathSegmentNameGeneratorProphecy->getSegmentName('subcollection', true)->shouldBeCalled()->willReturn('subcollections');
-        $pathSegmentNameGeneratorProphecy->getSegmentName('dummyEntity', true)->shouldBeCalled()->willReturn('dummy_entities');
+        $pathSegmentNameGeneratorProphecy->getSegmentName('dummyEntity')->shouldBeCalled()->willReturn('dummy_entities');
         $pathSegmentNameGeneratorProphecy->getSegmentName('anotherSubresource', false)->shouldBeCalled()->willReturn('another_subresource');
 
         $subresourceOperationFactory = new SubresourceOperationFactory($resourceMetadataFactoryProphecy->reveal(), $propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), $pathSegmentNameGeneratorProphecy->reveal());
@@ -280,7 +280,7 @@ class SubresourceOperationFactoryTest extends TestCase
         $propertyMetadataFactoryProphecy->create(RelatedDummyEntity::class, 'anotherSubresource')->shouldBeCalled()->willReturn($anotherSubresourceMetadata);
 
         $pathSegmentNameGeneratorProphecy = $this->prophesize(PathSegmentNameGeneratorInterface::class);
-        $pathSegmentNameGeneratorProphecy->getSegmentName('dummyEntity', true)->shouldBeCalled()->willReturn('dummy_entities');
+        $pathSegmentNameGeneratorProphecy->getSegmentName('dummyEntity')->shouldBeCalled()->willReturn('dummy_entities');
         $pathSegmentNameGeneratorProphecy->getSegmentName('subresource', false)->shouldBeCalled()->willReturn('subresource');
 
         $subresourceOperationFactory = new SubresourceOperationFactory(
@@ -338,7 +338,7 @@ class SubresourceOperationFactoryTest extends TestCase
         $propertyMetadataFactoryProphecy->create(DummyValidatedEntity::class, 'moreSubresource')->shouldBeCalled()->willReturn($moreSubresourceMetadata);
 
         $pathSegmentNameGeneratorProphecy = $this->prophesize(PathSegmentNameGeneratorInterface::class);
-        $pathSegmentNameGeneratorProphecy->getSegmentName('dummyEntity', true)->shouldBeCalled()->willReturn('dummy_entities');
+        $pathSegmentNameGeneratorProphecy->getSegmentName('dummyEntity')->shouldBeCalled()->willReturn('dummy_entities');
         $pathSegmentNameGeneratorProphecy->getSegmentName('subresource', false)->shouldBeCalled()->willReturn('subresources');
         $pathSegmentNameGeneratorProphecy->getSegmentName('secondSubresource', false)->shouldBeCalled()->willReturn('second_subresources');
         $pathSegmentNameGeneratorProphecy->getSegmentName('moreSubresource', false)->shouldBeCalled()->willReturn('mode_subresources');
@@ -423,7 +423,7 @@ class SubresourceOperationFactoryTest extends TestCase
         $propertyMetadataFactoryProphecy->create(DummyValidatedEntity::class, 'moreSubresource')->shouldBeCalled()->willReturn($moreSubresourceMetadata);
 
         $pathSegmentNameGeneratorProphecy = $this->prophesize(PathSegmentNameGeneratorInterface::class);
-        $pathSegmentNameGeneratorProphecy->getSegmentName('dummyEntity', true)->shouldBeCalled()->willReturn('dummy_entities');
+        $pathSegmentNameGeneratorProphecy->getSegmentName('dummyEntity')->shouldBeCalled()->willReturn('dummy_entities');
         $pathSegmentNameGeneratorProphecy->getSegmentName('subresource', false)->shouldBeCalled()->willReturn('subresources');
         $pathSegmentNameGeneratorProphecy->getSegmentName('secondSubresource', false)->shouldBeCalled()->willReturn('second_subresources');
 
@@ -479,7 +479,7 @@ class SubresourceOperationFactoryTest extends TestCase
         $propertyMetadataFactoryProphecy->create(DummyEntity::class, 'subresource')->shouldBeCalled()->willReturn($subresource);
 
         $pathSegmentNameGeneratorProphecy = $this->prophesize(PathSegmentNameGeneratorInterface::class);
-        $pathSegmentNameGeneratorProphecy->getSegmentName('dummyEntity', true)->shouldBeCalled()->willReturn('dummy_entities');
+        $pathSegmentNameGeneratorProphecy->getSegmentName('dummyEntity')->shouldBeCalled()->willReturn('dummy_entities');
         $pathSegmentNameGeneratorProphecy->getSegmentName('subresource', false)->shouldBeCalled()->willReturn('subresources');
 
         $subresourceOperationFactory = new SubresourceOperationFactory(
@@ -523,7 +523,7 @@ class SubresourceOperationFactoryTest extends TestCase
         $propertyMetadataFactoryProphecy->create(RelatedDummyEntity::class, 'id')->shouldBeCalled()->willReturn($identifierSubresourceMetadata);
 
         $pathSegmentNameGeneratorProphecy = $this->prophesize(PathSegmentNameGeneratorInterface::class);
-        $pathSegmentNameGeneratorProphecy->getSegmentName('dummyEntity', true)->shouldBeCalled()->willReturn('dummy_entities');
+        $pathSegmentNameGeneratorProphecy->getSegmentName('dummyEntity')->shouldBeCalled()->willReturn('dummy_entities');
         $pathSegmentNameGeneratorProphecy->getSegmentName('subresource', true)->shouldBeCalled()->willReturn('subresource');
 
         $subresourceOperationFactory = new SubresourceOperationFactory(
@@ -581,7 +581,7 @@ class SubresourceOperationFactoryTest extends TestCase
         $propertyMetadataFactoryProphecy->create(RelatedDummyEntity::class, 'id')->shouldBeCalled()->willReturn($identifierSubresourceMetadata);
 
         $pathSegmentNameGeneratorProphecy = $this->prophesize(PathSegmentNameGeneratorInterface::class);
-        $pathSegmentNameGeneratorProphecy->getSegmentName('dummyEntity', true)->shouldBeCalled()->willReturn('dummy_entities');
+        $pathSegmentNameGeneratorProphecy->getSegmentName('dummyEntity')->shouldBeCalled()->willReturn('dummy_entities');
         $pathSegmentNameGeneratorProphecy->getSegmentName('subresource', false)->shouldBeCalled()->willReturn('subresource');
 
         $subresourceOperationFactory = new SubresourceOperationFactory(
@@ -627,7 +627,7 @@ class SubresourceOperationFactoryTest extends TestCase
         $propertyMetadataFactoryProphecy->create(RelatedDummyEntity::class, 'anotherSubresource')->shouldBeCalled()->willReturn($anotherSubresourceMetadata);
 
         $pathSegmentNameGeneratorProphecy = $this->prophesize(PathSegmentNameGeneratorInterface::class);
-        $pathSegmentNameGeneratorProphecy->getSegmentName('dummyEntity', true)->shouldBeCalled()->willReturn('dummy_entities');
+        $pathSegmentNameGeneratorProphecy->getSegmentName('dummyEntity')->shouldBeCalled()->willReturn('dummy_entities');
         $pathSegmentNameGeneratorProphecy->getSegmentName('subresource', false)->shouldBeCalled()->willReturn('subresource');
 
         $subresourceOperationFactory = new SubresourceOperationFactory(

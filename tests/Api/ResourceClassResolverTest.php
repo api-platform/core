@@ -63,7 +63,7 @@ class ResourceClassResolverTest extends TestCase
         $resourceNameCollectionFactoryProphecy->create()->willReturn(new ResourceNameCollection([Dummy::class]))->shouldBeCalled();
 
         $resourceClassResolver = new ResourceClassResolver($resourceNameCollectionFactoryProphecy->reveal());
-        $resourceClass = $resourceClassResolver->getResourceClass($dummy, null);
+        $resourceClass = $resourceClassResolver->getResourceClass($dummy);
         $this->assertEquals($resourceClass, Dummy::class);
     }
 
@@ -105,7 +105,7 @@ class ResourceClassResolverTest extends TestCase
         $resourceNameCollectionFactoryProphecy->create()->willReturn(new ResourceNameCollection([Dummy::class]))->shouldBeCalled();
 
         $resourceClassResolver = new ResourceClassResolver($resourceNameCollectionFactoryProphecy->reveal());
-        $resourceClassResolver->getResourceClass(new \stdClass(), null);
+        $resourceClassResolver->getResourceClass(new \stdClass());
     }
 
     public function testGetResourceClassWithNoResourceClassName()
@@ -116,7 +116,7 @@ class ResourceClassResolverTest extends TestCase
         $resourceNameCollectionFactoryProphecy = $this->prophesize(ResourceNameCollectionFactoryInterface::class);
 
         $resourceClassResolver = new ResourceClassResolver($resourceNameCollectionFactoryProphecy->reveal());
-        $resourceClassResolver->getResourceClass(new \ArrayIterator([]), null);
+        $resourceClassResolver->getResourceClass(new \ArrayIterator([]));
     }
 
     public function testIsResourceClassWithIntendedClassName()
@@ -149,7 +149,7 @@ class ResourceClassResolverTest extends TestCase
         $resourceNameCollectionFactoryProphecy = $this->prophesize(ResourceNameCollectionFactoryInterface::class);
 
         $resourceClassResolver = new ResourceClassResolver($resourceNameCollectionFactoryProphecy->reveal());
-        $resourceClassResolver->getResourceClass(false, null);
+        $resourceClassResolver->getResourceClass(false);
     }
 
     public function testGetResourceClassWithResourceClassNameAndNoObject()
@@ -181,6 +181,6 @@ class ResourceClassResolverTest extends TestCase
         $resourceNameCollectionFactoryProphecy = $this->prophesize(ResourceNameCollectionFactoryInterface::class);
 
         $resourceClassResolver = new ResourceClassResolver($resourceNameCollectionFactoryProphecy->reveal());
-        $resourceClass = $resourceClassResolver->getResourceClass($dummy, DummyResourceInterface::class, true);
+        $resourceClassResolver->getResourceClass($dummy, DummyResourceInterface::class, true);
     }
 }

@@ -32,7 +32,7 @@ class DummyDtoInputOutput
      * @var int The id
      * @ODM\Id(strategy="INCREMENT", type="integer", nullable=true)
      */
-    private $id;
+    public $id;
 
     /**
      * @var int The id
@@ -45,9 +45,4 @@ class DummyDtoInputOutput
      * @ODM\Field(type="float")
      */
     public $num;
-
-    public function getId()
-    {
-        return $this->id;
-    }
 }

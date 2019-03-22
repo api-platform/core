@@ -28,7 +28,7 @@ final class CachedIdentifiersExtractor implements IdentifiersExtractorInterface
 {
     use ClassInfoTrait;
 
-    const CACHE_KEY_PREFIX = 'iri_identifiers';
+    public const CACHE_KEY_PREFIX = 'iri_identifiers';
 
     private $cacheItemPool;
     private $propertyAccessor;

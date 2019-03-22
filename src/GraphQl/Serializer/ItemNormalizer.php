@@ -26,6 +26,7 @@ use ApiPlatform\Core\Util\ClassInfoTrait;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
+use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 
@@ -61,11 +62,29 @@ final class ItemNormalizer extends BaseItemNormalizer
 
     /**
      * {@inheritdoc}
+     *
+     * @throws UnexpectedValueException
      */
     public function normalize($object, $format = null, array $context = [])
     {
-        $object = $this->transformOutput($object, $context);
+        if (!$this->handleNonResource && null !== $outputClass = $this->getOutputClass($this->getObjectClass($object), $context)) {
+            return parent::normalize($object, $format, $context);
+        }
+
         $data = parent::normalize($object, $format, $context);
+        if (!\is_array($data)) {
+            throw new UnexpectedValueException('Expected data to be an array');
+        }
+
+        if ($this->handleNonResource) {
+            // when using an output class, get the IRI from the resource
+            if (isset($context['api_resource']) && isset($data['id'])) {
+                $data['_id'] = $data['id'];
+                $data['id'] = $this->iriConverter->getIriFromItem($context['api_resource']);
+                unset($context['api_resource']);
+            }
+        }
+
         $data[self::ITEM_RESOURCE_CLASS_KEY] = $this->getObjectClass($object);
         $data[self::ITEM_IDENTIFIERS_KEY] = $this->identifiersExtractor->getIdentifiersFromItem($object);
 
@@ -75,7 +94,7 @@ final class ItemNormalizer extends BaseItemNormalizer
     /**
      * {@inheritdoc}
      */
-    protected function normalizeCollectionOfRelations(PropertyMetadata $propertyMetadata, $attributeValue, string $resourceClass, string $format = null, array $context): array
+    protected function normalizeCollectionOfRelations(PropertyMetadata $propertyMetadata, $attributeValue, string $resourceClass, ?string $format, array $context): array
     {
         // to-many are handled directly by the GraphQL resolver
         return [];
@@ -96,7 +115,7 @@ final class ItemNormalizer extends BaseItemNormalizer
     {
         $allowedAttributes = parent::getAllowedAttributes($classOrObject, $context, $attributesAsString);
 
-        if (($context['api_denormalize'] ?? false) && false !== ($indexId = array_search('id', $allowedAttributes, true))) {
+        if (($context['api_denormalize'] ?? false) && \is_array($allowedAttributes) && false !== ($indexId = array_search('id', $allowedAttributes, true))) {
             $allowedAttributes[] = '_id';
             array_splice($allowedAttributes, (int) $indexId, 1);
         }

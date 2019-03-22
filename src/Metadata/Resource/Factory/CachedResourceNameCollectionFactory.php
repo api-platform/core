@@ -26,7 +26,7 @@ final class CachedResourceNameCollectionFactory implements ResourceNameCollectio
 {
     use CachedTrait;
 
-    const CACHE_KEY = 'resource_name_collection';
+    public const CACHE_KEY = 'resource_name_collection';
 
     private $decorated;
 

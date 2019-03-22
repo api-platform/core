@@ -55,4 +55,16 @@ class ResourceFieldResolverTest extends TestCase
         $this->assertEquals('bar', $resolver(['foo' => 'bar'], [], [], $resolveInfo));
         $this->assertEquals('bar', $resolver((object) ['foo' => 'bar'], [], [], $resolveInfo));
     }
+
+    public function testNonResource()
+    {
+        $dummy = new Dummy();
+        $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
+        $iriConverterProphecy->getIriFromItem($dummy)->willReturn('/dummies/1')->shouldNotBeCalled();
+
+        $resolveInfo = new ResolveInfo('id', [], new ObjectType(['name' => '']), new ObjectType(['name' => '']), [], new Schema([]), [], null, null, []);
+
+        $resolver = new ResourceFieldResolver($iriConverterProphecy->reveal());
+        $this->assertNull($resolver([], [], [], $resolveInfo));
+    }
 }

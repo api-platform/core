@@ -20,12 +20,12 @@ final class SwaggerUiListener
     /**
      * Sets SwaggerUiAction as controller if the requested format is HTML.
      */
-    public function onKernelRequest(GetResponseEvent $event)
+    public function onKernelRequest(GetResponseEvent $event): void
     {
         $request = $event->getRequest();
         if (
             'html' !== $request->getRequestFormat('') ||
-            (!$request->attributes->has('_api_resource_class') && !$request->attributes->has('_api_respond'))
+            !($request->attributes->has('_api_resource_class') || $request->attributes->getBoolean('_api_respond', false))
         ) {
             return;
         }

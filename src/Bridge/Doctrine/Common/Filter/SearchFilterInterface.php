@@ -24,25 +24,25 @@ interface SearchFilterInterface
     /**
      * @var string Exact matching
      */
-    const STRATEGY_EXACT = 'exact';
+    public const STRATEGY_EXACT = 'exact';
 
     /**
      * @var string The value must be contained in the field
      */
-    const STRATEGY_PARTIAL = 'partial';
+    public const STRATEGY_PARTIAL = 'partial';
 
     /**
      * @var string Finds fields that are starting with the value
      */
-    const STRATEGY_START = 'start';
+    public const STRATEGY_START = 'start';
 
     /**
      * @var string Finds fields that are ending with the value
      */
-    const STRATEGY_END = 'end';
+    public const STRATEGY_END = 'end';
 
     /**
      * @var string Finds fields that are starting with the word
      */
-    const STRATEGY_WORD_START = 'word_start';
+    public const STRATEGY_WORD_START = 'word_start';
 }

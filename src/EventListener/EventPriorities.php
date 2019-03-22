@@ -21,18 +21,18 @@ namespace ApiPlatform\Core\EventListener;
 final class EventPriorities
 {
     // kernel.request
-    const PRE_READ = 5;
-    const POST_READ = 3;
-    const PRE_DESERIALIZE = 3;
-    const POST_DESERIALIZE = 1;
+    public const PRE_READ = 5;
+    public const POST_READ = 3;
+    public const PRE_DESERIALIZE = 3;
+    public const POST_DESERIALIZE = 1;
     // kernel.view
-    const PRE_VALIDATE = 65;
-    const POST_VALIDATE = 63;
-    const PRE_WRITE = 33;
-    const POST_WRITE = 31;
-    const PRE_SERIALIZE = 17;
-    const POST_SERIALIZE = 15;
-    const PRE_RESPOND = 9;
+    public const PRE_VALIDATE = 65;
+    public const POST_VALIDATE = 63;
+    public const PRE_WRITE = 33;
+    public const POST_WRITE = 31;
+    public const PRE_SERIALIZE = 17;
+    public const POST_SERIALIZE = 15;
+    public const PRE_RESPOND = 9;
     // kernel.response
-    const POST_RESPOND = 0;
+    public const POST_RESPOND = 0;
 }

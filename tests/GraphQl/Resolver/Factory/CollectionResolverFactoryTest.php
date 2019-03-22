@@ -143,7 +143,7 @@ class CollectionResolverFactoryTest extends TestCase
 
     public function testCreatePaginatorCollectionResolver()
     {
-        $collectionPaginatorProphecy = $this->prophesize(PaginatorInterface::class);
+        $collectionPaginatorProphecy = $this->prophesize(PaginatorInterface::class)->willImplement(\Iterator::class);
         $collectionPaginatorProphecy->rewind()->shouldBeCalled();
         $collectionPaginatorProphecy->valid()->willReturn(true, false);
         $collectionPaginatorProphecy->key()->willReturn(0);

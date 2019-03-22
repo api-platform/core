@@ -21,6 +21,11 @@ namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Dto;
 class OutputDto
 {
     /**
+     * @var int
+     */
+    public $id;
+
+    /**
      * @var float
      */
     public $baz;

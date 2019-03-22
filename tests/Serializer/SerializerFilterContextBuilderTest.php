@@ -66,9 +66,7 @@ class SerializerFilterContextBuilderTest extends TestCase
         $filterLocatorProphecy->has('dummy_group.nonexistent')->willReturn(false)->shouldBeCalled();
 
         $serializerContextBuilderFilter = new SerializerFilterContextBuilder($resourceMetadataFactoryProphecy->reveal(), $filterLocatorProphecy->reveal(), $decoratedProphecy->reveal());
-        $context = $serializerContextBuilderFilter->createFromRequest($request, true, $attributes);
-
-        $this->assertInternalType('array', $context);
+        $serializerContextBuilderFilter->createFromRequest($request, true, $attributes);
     }
 
     public function testCreateFromRequestWithItemOperation()
@@ -107,9 +105,7 @@ class SerializerFilterContextBuilderTest extends TestCase
         $filterLocatorProphecy->has('dummy_group.nonexistent')->willReturn(false)->shouldBeCalled();
 
         $serializerContextBuilderFilter = new SerializerFilterContextBuilder($resourceMetadataFactoryProphecy->reveal(), $filterLocatorProphecy->reveal(), $decoratedProphecy->reveal());
-        $context = $serializerContextBuilderFilter->createFromRequest($request, true, $attributes);
-
-        $this->assertInternalType('array', $context);
+        $serializerContextBuilderFilter->createFromRequest($request, true, $attributes);
     }
 
     public function testCreateFromRequestWithoutFilters()
@@ -138,9 +134,7 @@ class SerializerFilterContextBuilderTest extends TestCase
         $filterLocatorProphecy = $this->prophesize(ContainerInterface::class);
 
         $serializerContextBuilderFilter = new SerializerFilterContextBuilder($resourceMetadataFactoryProphecy->reveal(), $filterLocatorProphecy->reveal(), $decoratedProphecy->reveal());
-        $context = $serializerContextBuilderFilter->createFromRequest($request, false, $attributes);
-
-        $this->assertInternalType('array', $context);
+        $serializerContextBuilderFilter->createFromRequest($request, false, $attributes);
     }
 
     public function testCreateFromRequestWithoutAttributes()
@@ -154,6 +148,7 @@ class SerializerFilterContextBuilderTest extends TestCase
             'resource_class' => DummyGroup::class,
             'collection_operation_name' => 'get',
             'receive' => true,
+            'respond' => true,
             'persist' => true,
         ];
 
@@ -184,9 +179,7 @@ class SerializerFilterContextBuilderTest extends TestCase
         $filterLocatorProphecy->has('dummy_group.nonexistent')->willReturn(false)->shouldBeCalled();
 
         $serializerContextBuilderFilter = new SerializerFilterContextBuilder($resourceMetadataFactoryProphecy->reveal(), $filterLocatorProphecy->reveal(), $decoratedProphecy->reveal());
-        $context = $serializerContextBuilderFilter->createFromRequest($request, true, null);
-
-        $this->assertInternalType('array', $context);
+        $serializerContextBuilderFilter->createFromRequest($request, true);
     }
 
     public function testCreateFromRequestThrowsExceptionWithoutAttributesAndRequestAttributes()
@@ -201,6 +194,6 @@ class SerializerFilterContextBuilderTest extends TestCase
         $decoratedProphecy = $this->prophesize(SerializerContextBuilderInterface::class);
 
         $serializerContextBuilderFilter = new SerializerFilterContextBuilder($resourceMetadataFactoryProphecy->reveal(), $filterLocatorProphecy->reveal(), $decoratedProphecy->reveal());
-        $serializerContextBuilderFilter->createFromRequest($request, true, null);
+        $serializerContextBuilderFilter->createFromRequest($request, true);
     }
 }

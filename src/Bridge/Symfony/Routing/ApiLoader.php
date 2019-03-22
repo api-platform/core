@@ -40,8 +40,8 @@ final class ApiLoader extends Loader
     /**
      * @deprecated since version 2.1, to be removed in 3.0. Use {@see RouteNameGenerator::ROUTE_NAME_PREFIX} instead.
      */
-    const ROUTE_NAME_PREFIX = 'api_';
-    const DEFAULT_ACTION_PATTERN = 'api_platform.action.';
+    public const ROUTE_NAME_PREFIX = 'api_';
+    public const DEFAULT_ACTION_PATTERN = 'api_platform.action.';
 
     private $fileLoader;
     private $resourceNameCollectionFactory;
@@ -155,7 +155,7 @@ final class ApiLoader extends Loader
     /**
      * Load external files.
      */
-    private function loadExternalFiles(RouteCollection $routeCollection)
+    private function loadExternalFiles(RouteCollection $routeCollection): void
     {
         if ($this->entrypointEnabled) {
             $routeCollection->addCollection($this->fileLoader->load('api.xml'));
@@ -181,7 +181,7 @@ final class ApiLoader extends Loader
      *
      * @throws RuntimeException
      */
-    private function addRoute(RouteCollection $routeCollection, string $resourceClass, string $operationName, array $operation, ResourceMetadata $resourceMetadata, string $operationType)
+    private function addRoute(RouteCollection $routeCollection, string $resourceClass, string $operationName, array $operation, ResourceMetadata $resourceMetadata, string $operationType): void
     {
         $resourceShortName = $resourceMetadata->getShortName();
 

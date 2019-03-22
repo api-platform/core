@@ -23,6 +23,7 @@ use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
+use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 
@@ -46,23 +47,15 @@ class ItemNormalizer extends AbstractItemNormalizer
 
     /**
      * {@inheritdoc}
-     */
-    public function normalize($object, $format = null, array $context = [])
-    {
-        return parent::normalize($this->transformOutput($object, $context), $format, $context);
-    }
-
-    /**
-     * {@inheritdoc}
      *
-     * @throws InvalidArgumentException
+     * @throws NotNormalizableValueException
      */
     public function denormalize($data, $class, $format = null, array $context = [])
     {
         // Avoid issues with proxies if we populated the object
         if (isset($data['id']) && !isset($context[self::OBJECT_TO_POPULATE])) {
             if (isset($context['api_allow_update']) && true !== $context['api_allow_update']) {
-                throw new InvalidArgumentException('Update is not allowed for this operation.');
+                throw new NotNormalizableValueException('Update is not allowed for this operation.');
             }
 
             if (isset($context['resource_class'])) {
@@ -78,7 +71,7 @@ class ItemNormalizer extends AbstractItemNormalizer
         return parent::denormalize($data, $class, $format, $context);
     }
 
-    private function updateObjectToPopulate(array $data, array &$context)
+    private function updateObjectToPopulate(array $data, array &$context): void
     {
         try {
             $context[self::OBJECT_TO_POPULATE] = $this->iriConverter->getItemFromIri((string) $data['id'], $context + ['fetch_data' => true]);

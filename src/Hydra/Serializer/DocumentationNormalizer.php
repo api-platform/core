@@ -39,7 +39,7 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
  */
 final class DocumentationNormalizer implements NormalizerInterface, CacheableSupportsMethodInterface
 {
-    const FORMAT = 'jsonld';
+    public const FORMAT = 'jsonld';
 
     private $resourceMetadataFactory;
     private $propertyNameCollectionFactory;
@@ -324,10 +324,8 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
 
     /**
      * Gets the range of the property.
-     *
-     * @return string|null
      */
-    private function getRange(PropertyMetadata $propertyMetadata)
+    private function getRange(PropertyMetadata $propertyMetadata): ?string
     {
         $jsonldContext = $propertyMetadata->getAttributes()['jsonld_context'] ?? [];
 

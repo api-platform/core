@@ -24,15 +24,25 @@ use Symfony\Component\Serializer\Annotation\Groups;
  *
  * @ODM\Document
  *
- * @ApiResource(attributes={
- *     "normalization_context"={"groups"={"dummy_read"}},
- *     "denormalization_context"={"groups"={"dummy_write"}},
- *     "filters"={
- *         "dummy_property.property",
- *         "dummy_property.whitelist_property",
- *         "dummy_property.whitelisted_properties"
+ * @ApiResource(
+ *     attributes={
+ *         "normalization_context"={"groups"={"dummy_read"}},
+ *         "denormalization_context"={"groups"={"dummy_write"}},
+ *         "filters"={
+ *             "dummy_property.property",
+ *             "dummy_property.whitelist_property",
+ *             "dummy_property.whitelisted_properties"
+ *         }
+ *     },
+ *     graphql={
+ *         "query",
+ *         "update",
+ *         "delete",
+ *         "create"={
+ *             "normalization_context"={"groups"={"dummy_graphql_read"}},
+ *         }
  *     }
- * })
+ * )
  */
 class DummyProperty
 {
@@ -41,7 +51,7 @@ class DummyProperty
      *
      * @ODM\Id(strategy="INCREMENT", type="integer")
      *
-     * @Groups("dummy_read")
+     * @Groups({"dummy_read", "dummy_graphql_read"})
      */
     private $id;
 
@@ -59,7 +69,7 @@ class DummyProperty
      *
      * @ODM\Field(nullable=true)
      *
-     * @Groups({"dummy_read", "dummy_write"})
+     * @Groups({"dummy_read", "dummy_graphql_read", "dummy_write"})
      */
     public $bar;
 
@@ -68,16 +78,16 @@ class DummyProperty
      *
      * @ODM\Field(nullable=true)
      *
-     * @Groups({"dummy_read", "dummy_write"})
+     * @Groups({"dummy_read", "dummy_graphql_read", "dummy_write"})
      */
     public $baz;
 
     /**
      * @var DummyGroup
      *
-     * @ODM\ReferenceOne(targetDocument=DummyGroup::class, cascade={"persist"})
+     * @ODM\ReferenceOne(targetDocument=DummyGroup::class, cascade={"persist"}, nullable=true)
      *
-     * @Groups({"dummy_read", "dummy_write"})
+     * @Groups({"dummy_read", "dummy_graphql_read", "dummy_write"})
      */
     public $group;
 
@@ -85,7 +95,7 @@ class DummyProperty
      * @var DummyGroup[]
      *
      * @ODM\ReferenceMany(targetDocument=DummyGroup::class, cascade={"persist"})
-     * @Groups({"dummy_read", "dummy_write"})
+     * @Groups({"dummy_read", "dummy_graphql_read", "dummy_write"})
      */
     public $groups;
 

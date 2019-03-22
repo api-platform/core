@@ -13,9 +13,9 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\JsonApi\Serializer;
 
-use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\Serializer\AbstractCollectionNormalizer;
 use ApiPlatform\Core\Util\IriHelper;
+use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 
 /**
  * Normalizes collections in the JSON API format.
@@ -26,14 +26,14 @@ use ApiPlatform\Core\Util\IriHelper;
  */
 final class CollectionNormalizer extends AbstractCollectionNormalizer
 {
-    const FORMAT = 'jsonapi';
+    public const FORMAT = 'jsonapi';
 
     /**
      * {@inheritdoc}
      */
     protected function getPaginationData($object, array $context = []): array
     {
-        list($paginator, $paginated, $currentPage, $itemsPerPage, $lastPage, $pageTotalItems, $totalItems) = $this->getPaginationConfig($object, $context);
+        [$paginator, $paginated, $currentPage, $itemsPerPage, $lastPage, $pageTotalItems, $totalItems] = $this->getPaginationConfig($object, $context);
         $parsed = IriHelper::parseIri($context['request_uri'] ?? '/', $this->pageParameterName);
 
         $data = [
@@ -72,7 +72,7 @@ final class CollectionNormalizer extends AbstractCollectionNormalizer
     /**
      * {@inheritdoc}
      *
-     * @throws InvalidArgumentException
+     * @throws UnexpectedValueException
      */
     protected function getItemsData($object, string $format = null, array $context = []): array
     {
@@ -82,9 +82,12 @@ final class CollectionNormalizer extends AbstractCollectionNormalizer
 
         foreach ($object as $obj) {
             $item = $this->normalizer->normalize($obj, $format, $context);
+            if (!\is_array($item)) {
+                throw new UnexpectedValueException('Expected item to be an array');
+            }
 
             if (!isset($item['data'])) {
-                throw new InvalidArgumentException('The JSON API document must contain a "data" key.');
+                throw new UnexpectedValueException('The JSON API document must contain a "data" key.');
             }
 
             $data['data'][] = $item['data'];

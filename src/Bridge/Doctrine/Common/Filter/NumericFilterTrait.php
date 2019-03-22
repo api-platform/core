@@ -92,7 +92,10 @@ trait NumericFilterTrait
         foreach ($values as $key => $val) {
             if (!\is_int($key)) {
                 unset($values[$key]);
+
+                continue;
             }
+            $values[$key] = $val + 0; // coerce $val to the right type.
         }
 
         if (empty($values)) {

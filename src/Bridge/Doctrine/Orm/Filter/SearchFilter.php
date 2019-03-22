@@ -36,12 +36,12 @@ class SearchFilter extends AbstractContextAwareFilter implements SearchFilterInt
 {
     use SearchFilterTrait;
 
-    const DOCTRINE_INTEGER_TYPE = DBALType::INTEGER;
+    public const DOCTRINE_INTEGER_TYPE = DBALType::INTEGER;
 
     /**
      * @param RequestStack|null $requestStack No prefix to prevent autowiring of this deprecated property
      */
-    public function __construct(ManagerRegistry $managerRegistry, $requestStack = null, IriConverterInterface $iriConverter, PropertyAccessorInterface $propertyAccessor = null, LoggerInterface $logger = null, array $properties = null)
+    public function __construct(ManagerRegistry $managerRegistry, $requestStack, IriConverterInterface $iriConverter, PropertyAccessorInterface $propertyAccessor = null, LoggerInterface $logger = null, array $properties = null)
     {
         parent::__construct($managerRegistry, $requestStack, $logger, $properties);
 
@@ -77,7 +77,7 @@ class SearchFilter extends AbstractContextAwareFilter implements SearchFilterInt
 
         $associations = [];
         if ($this->isPropertyNested($property, $resourceClass)) {
-            list($alias, $field, $associations) = $this->addJoinsForNestedProperty($property, $alias, $queryBuilder, $queryNameGenerator, $resourceClass);
+            [$alias, $field, $associations] = $this->addJoinsForNestedProperty($property, $alias, $queryBuilder, $queryNameGenerator, $resourceClass);
         }
         $metadata = $this->getNestedMetadata($resourceClass, $associations);
 

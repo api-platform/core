@@ -29,7 +29,7 @@ use Symfony\Component\Serializer\SerializerInterface;
  */
 class DeserializeListenerTest extends TestCase
 {
-    const FORMATS = ['json' => ['application/json']];
+    public const FORMATS = ['json' => ['application/json']];
 
     public function testDoNotCallWhenRequestMethodIsSafe()
     {
@@ -199,7 +199,13 @@ class DeserializeListenerTest extends TestCase
         $serializerContextBuilderProphecy->createFromRequest(Argument::type(Request::class), false, Argument::type('array'))->willReturn(['input' => ['class' => 'Foo'], 'output' => ['class' => 'Foo'], 'resource_class' => 'Foo'])->shouldBeCalled();
 
         $formatsProviderProphecy = $this->prophesize(FormatsProviderInterface::class);
-        $formatsProviderProphecy->getFormatsFromAttributes(['resource_class' => 'Foo', 'collection_operation_name' => 'post', 'receive' => true, 'persist' => true])->willReturn(self::FORMATS)->shouldBeCalled();
+        $formatsProviderProphecy->getFormatsFromAttributes([
+            'resource_class' => 'Foo',
+            'collection_operation_name' => 'post',
+            'receive' => true,
+            'respond' => true,
+            'persist' => true,
+        ])->willReturn(self::FORMATS)->shouldBeCalled();
 
         $listener = new DeserializeListener($serializerProphecy->reveal(), $serializerContextBuilderProphecy->reveal(), $formatsProviderProphecy->reveal());
 

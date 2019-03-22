@@ -151,10 +151,8 @@ final class ApiPlatformProvider implements AnnotationsProviderInterface
 
     /**
      * Gets Hydra documentation for the given resource.
-     *
-     * @return array|null
      */
-    private function getResourceHydraDoc(array $hydraApiDoc, string $prefixedShortName)
+    private function getResourceHydraDoc(array $hydraApiDoc, string $prefixedShortName): ?array
     {
         if (!isset($hydraApiDoc['hydra:supportedClass']) || !\is_array($hydraApiDoc['hydra:supportedClass'])) {
             return null;

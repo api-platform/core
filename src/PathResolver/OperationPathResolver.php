@@ -47,7 +47,7 @@ final class OperationPathResolver implements OperationPathResolverInterface
             throw new InvalidArgumentException('Subresource operations are not supported by the OperationPathResolver.');
         }
 
-        $path = '/'.$this->pathSegmentNameGenerator->getSegmentName($resourceShortName, true);
+        $path = '/'.$this->pathSegmentNameGenerator->getSegmentName($resourceShortName);
 
         if (OperationType::ITEM === $operationType) {
             $path .= '/{id}';

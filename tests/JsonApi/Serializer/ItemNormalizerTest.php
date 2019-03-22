@@ -33,6 +33,7 @@ use Prophecy\Argument;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\PropertyInfo\Type;
+use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
 use Symfony\Component\Serializer\NameConverter\AdvancedNameConverterInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\Serializer;
@@ -365,7 +366,7 @@ class ItemNormalizerTest extends TestCase
 
     public function testDenormalizeUpdateOperationNotAllowed()
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(NotNormalizableValueException::class);
         $this->expectExceptionMessage('Update is not allowed for this operation.');
 
         $normalizer = new ItemNormalizer(
@@ -519,7 +520,7 @@ class ItemNormalizerTest extends TestCase
 
     public function testDenormalizeRelationIsNotResourceLinkage()
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(NotNormalizableValueException::class);
         $this->expectExceptionMessage('Only resource linkage supported currently, see: http://jsonapi.org/format/#document-resource-object-linkage.');
 
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);

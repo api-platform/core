@@ -91,12 +91,10 @@ trait PropertyHelperTrait
 
         if (\func_num_args() > 1) {
             $resourceClass = func_get_arg(1);
-        } else {
-            if (__CLASS__ !== \get_class($this)) {
-                $r = new \ReflectionMethod($this, __FUNCTION__);
-                if (__CLASS__ !== $r->getDeclaringClass()->getName()) {
-                    @trigger_error(sprintf('Method %s() will have a second `$resourceClass` argument in version API Platform 3.0. Not defining it is deprecated since API Platform 2.1.', __FUNCTION__), E_USER_DEPRECATED);
-                }
+        } elseif (__CLASS__ !== \get_class($this)) {
+            $r = new \ReflectionMethod($this, __FUNCTION__);
+            if (__CLASS__ !== $r->getDeclaringClass()->getName()) {
+                @trigger_error(sprintf('Method %s() will have a second `$resourceClass` argument in version API Platform 3.0. Not defining it is deprecated since API Platform 2.1.', __FUNCTION__), E_USER_DEPRECATED);
             }
         }
 

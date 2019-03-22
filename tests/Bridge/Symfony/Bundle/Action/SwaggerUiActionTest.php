@@ -21,17 +21,17 @@ use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Metadata\Resource\ResourceNameCollection;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
-use Prophecy\Prophecy\ProphecyInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Generator\UrlGenerator;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
+use Twig\Environment as TwigEnvironment;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
 class SwaggerUiActionTest extends TestCase
 {
-    const SPEC = [
+    public const SPEC = [
         'paths' => [
             '/fs' => ['get' => ['operationId' => 'getFCollection']],
             '/fs/{id}' => ['get' => ['operationId' => 'getFItem']],
@@ -41,7 +41,7 @@ class SwaggerUiActionTest extends TestCase
     /**
      * @dataProvider getInvokeParameters
      */
-    public function testInvoke(Request $request, ProphecyInterface $twigProphecy)
+    public function testInvoke(Request $request, $twigProphecy)
     {
         $resourceNameCollectionFactoryProphecy = $this->prophesize(ResourceNameCollectionFactoryInterface::class);
         $resourceNameCollectionFactoryProphecy->create()->willReturn(new ResourceNameCollection(['Foo', 'Bar']))->shouldBeCalled();
@@ -67,7 +67,7 @@ class SwaggerUiActionTest extends TestCase
 
     public function getInvokeParameters()
     {
-        $twigCollectionProphecy = $this->prophesize(\Twig_Environment::class);
+        $twigCollectionProphecy = $this->prophesize(TwigEnvironment::class);
         $twigCollectionProphecy->render('@ApiPlatform/SwaggerUi/index.html.twig', [
             'title' => '',
             'description' => '',
@@ -98,7 +98,7 @@ class SwaggerUiActionTest extends TestCase
             ],
         ])->shouldBeCalled();
 
-        $twigItemProphecy = $this->prophesize(\Twig_Environment::class);
+        $twigItemProphecy = $this->prophesize(TwigEnvironment::class);
         $twigItemProphecy->render('@ApiPlatform/SwaggerUi/index.html.twig', [
             'title' => '',
             'description' => '',
@@ -149,7 +149,7 @@ class SwaggerUiActionTest extends TestCase
         $normalizerProphecy = $this->prophesize(NormalizerInterface::class);
         $normalizerProphecy->normalize(Argument::type(Documentation::class), 'json', Argument::type('array'))->willReturn(self::SPEC)->shouldBeCalled();
 
-        $twigProphecy = $this->prophesize(\Twig_Environment::class);
+        $twigProphecy = $this->prophesize(TwigEnvironment::class);
         $twigProphecy->render('@ApiPlatform/SwaggerUi/index.html.twig', [
             'title' => '',
             'description' => '',

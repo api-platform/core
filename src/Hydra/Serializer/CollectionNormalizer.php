@@ -39,7 +39,7 @@ final class CollectionNormalizer implements NormalizerInterface, NormalizerAware
     use JsonLdContextTrait;
     use NormalizerAwareTrait;
 
-    const FORMAT = 'jsonld';
+    public const FORMAT = 'jsonld';
 
     private $contextBuilder;
     private $resourceClassResolver;

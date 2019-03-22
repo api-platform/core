@@ -25,14 +25,14 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 final class ApiGatewayNormalizerTest extends TestCase
 {
     /**
-     * @var ObjectProphecy|NormalizerInterface
+     * @var ObjectProphecy
      */
-    private $documentationNormalizerMock;
+    private $documentationNormalizerProphecy;
 
     /**
      * @var ObjectProphecy
      */
-    private $objectMock;
+    private $objectProphecy;
 
     /**
      * @var ApiGatewayNormalizer
@@ -41,31 +41,31 @@ final class ApiGatewayNormalizerTest extends TestCase
 
     protected function setUp()
     {
-        $this->documentationNormalizerMock = $this->prophesize(NormalizerInterface::class);
-        $this->documentationNormalizerMock->willImplement(CacheableSupportsMethodInterface::class);
-        $this->documentationNormalizerMock->hasCacheableSupportsMethod()->willReturn(true);
-        $this->objectMock = $this->prophesize(\stdClass::class);
-        $this->normalizer = new ApiGatewayNormalizer($this->documentationNormalizerMock->reveal());
+        $this->documentationNormalizerProphecy = $this->prophesize(NormalizerInterface::class);
+        $this->documentationNormalizerProphecy->willImplement(CacheableSupportsMethodInterface::class);
+        $this->documentationNormalizerProphecy->hasCacheableSupportsMethod()->willReturn(true);
+        $this->objectProphecy = $this->prophesize(\stdClass::class);
+        $this->normalizer = new ApiGatewayNormalizer($this->documentationNormalizerProphecy->reveal());
     }
 
     public function testSupportsNormalization()
     {
-        $this->documentationNormalizerMock->supportsNormalization('foo', 'bar')->willReturn(true)->shouldBeCalledTimes(1);
+        $this->documentationNormalizerProphecy->supportsNormalization('foo', 'bar')->willReturn(true)->shouldBeCalledTimes(1);
         $this->assertTrue($this->normalizer->supportsNormalization('foo', 'bar'));
         $this->assertTrue($this->normalizer->hasCacheableSupportsMethod());
     }
 
     public function testNormalizeWithoutApiGateway()
     {
-        $this->documentationNormalizerMock->normalize($this->objectMock, 'jsonld', [])
+        $this->documentationNormalizerProphecy->normalize($this->objectProphecy, 'jsonld', [])
             ->willReturn(['basePath' => '/api'])
             ->shouldBeCalledTimes(1);
-        $this->assertEquals(['basePath' => '/api'], $this->normalizer->normalize($this->objectMock->reveal(), 'jsonld'));
+        $this->assertEquals(['basePath' => '/api'], $this->normalizer->normalize($this->objectProphecy->reveal(), 'jsonld'));
     }
 
     public function testNormalizeWithApiGateway()
     {
-        $this->documentationNormalizerMock->normalize($this->objectMock, 'jsonld', ['api_gateway' => true])
+        $this->documentationNormalizerProphecy->normalize($this->objectProphecy, 'jsonld', ['api_gateway' => true])
             ->willReturn([
                 'basePath' => '',
                 'paths' => [
@@ -227,6 +227,6 @@ final class ApiGatewayNormalizerTest extends TestCase
                     ],
                 ],
             ]),
-        ], $this->normalizer->normalize($this->objectMock->reveal(), 'jsonld', ['api_gateway' => true]));
+        ], $this->normalizer->normalize($this->objectProphecy->reveal(), 'jsonld', ['api_gateway' => true]));
     }
 }

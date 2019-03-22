@@ -22,17 +22,13 @@ namespace ApiPlatform\Core\Util;
  */
 final class Reflection
 {
-    const ACCESSOR_PREFIXES = ['get', 'is', 'has', 'can'];
-    const MUTATOR_PREFIXES = ['set', 'add', 'remove'];
+    public const ACCESSOR_PREFIXES = ['get', 'is', 'has', 'can'];
+    public const MUTATOR_PREFIXES = ['set', 'add', 'remove'];
 
     /**
      * Gets the property name associated with an accessor method.
-     *
-     * @param string $methodName
-     *
-     * @return string|null
      */
-    public function getProperty($methodName)
+    public function getProperty(string $methodName): ?string
     {
         $pattern = implode('|', array_merge(self::ACCESSOR_PREFIXES, self::MUTATOR_PREFIXES));
 

@@ -326,7 +326,6 @@ class ReadListenerTest extends TestCase
         $itemDataProvider = $this->prophesize(ItemDataProviderInterface::class);
         $itemDataProvider->getItem()->shouldNotBeCalled();
 
-        $data = [new \stdClass()];
         $subresourceDataProvider = $this->prophesize(SubresourceDataProviderInterface::class);
         $subresourceDataProvider->getSubresource()->shouldNotBeCalled();
 

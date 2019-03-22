@@ -30,6 +30,7 @@ final class OutputDtoDataTransformer implements DataTransformerInterface
         }
 
         $output = new OutputDto();
+        $output->id = $object->id;
         $output->bat = (string) $object->str;
         $output->baz = (float) $object->num;
 

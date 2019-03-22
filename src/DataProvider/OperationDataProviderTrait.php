@@ -105,7 +105,7 @@ trait OperationDataProviderTrait
 
         $identifiers = [];
 
-        foreach ($attributes['subresource_context']['identifiers'] as $key => list($id, $resourceClass, $hasIdentifier)) {
+        foreach ($attributes['subresource_context']['identifiers'] as $key => [$id, $resourceClass, $hasIdentifier]) {
             if (false === $hasIdentifier) {
                 continue;
             }

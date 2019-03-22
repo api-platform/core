@@ -101,7 +101,7 @@ class OrderFilter extends AbstractContextAwareFilter implements OrderFilterInter
         $field = $property;
 
         if ($this->isPropertyNested($property, $resourceClass)) {
-            list($alias, $field) = $this->addJoinsForNestedProperty($property, $alias, $queryBuilder, $queryNameGenerator, $resourceClass, Join::LEFT_JOIN);
+            [$alias, $field] = $this->addJoinsForNestedProperty($property, $alias, $queryBuilder, $queryNameGenerator, $resourceClass, Join::LEFT_JOIN);
         }
 
         if (null !== $nullsComparison = $this->properties[$property]['nulls_comparison'] ?? null) {

@@ -23,12 +23,12 @@ use ApiPlatform\Core\Exception\ResourceClassNotFoundException;
  */
 interface ContextBuilderInterface
 {
-    const HYDRA_NS = 'http://www.w3.org/ns/hydra/core#';
-    const RDF_NS = 'http://www.w3.org/1999/02/22-rdf-syntax-ns#';
-    const RDFS_NS = 'http://www.w3.org/2000/01/rdf-schema#';
-    const XML_NS = 'http://www.w3.org/2001/XMLSchema#';
-    const OWL_NS = 'http://www.w3.org/2002/07/owl#';
-    const SCHEMA_ORG_NS = 'http://schema.org/';
+    public const HYDRA_NS = 'http://www.w3.org/ns/hydra/core#';
+    public const RDF_NS = 'http://www.w3.org/1999/02/22-rdf-syntax-ns#';
+    public const RDFS_NS = 'http://www.w3.org/2000/01/rdf-schema#';
+    public const XML_NS = 'http://www.w3.org/2001/XMLSchema#';
+    public const OWL_NS = 'http://www.w3.org/2002/07/owl#';
+    public const SCHEMA_ORG_NS = 'http://schema.org/';
 
     /**
      * Gets the base context.

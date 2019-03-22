@@ -63,7 +63,7 @@ final class DocumentationAction
     {
         if (null !== $request) {
             $context = ['base_url' => $request->getBaseUrl(), 'spec_version' => $request->query->getInt('spec_version', 2)];
-            if ($request->query->getBoolean('api_gateway', false)) {
+            if ($request->query->getBoolean('api_gateway')) {
                 $context['api_gateway'] = true;
             }
             $request->attributes->set('_api_normalization_context', $request->attributes->get('_api_normalization_context', []) + $context);

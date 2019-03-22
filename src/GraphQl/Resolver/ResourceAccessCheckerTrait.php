@@ -30,7 +30,7 @@ trait ResourceAccessCheckerTrait
     /**
      * @throws Error
      */
-    public function canAccess(ResourceAccessCheckerInterface $resourceAccessChecker = null, ResourceMetadata $resourceMetadata, string $resourceClass, ResolveInfo $info, $object = null, string $operationName = null)
+    public function canAccess(?ResourceAccessCheckerInterface $resourceAccessChecker, ResourceMetadata $resourceMetadata, string $resourceClass, ResolveInfo $info, $object = null, string $operationName = null): void
     {
         if (null === $resourceAccessChecker) {
             return;

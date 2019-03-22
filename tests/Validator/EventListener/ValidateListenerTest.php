@@ -61,7 +61,7 @@ class ValidateListenerTest extends TestCase
         $validatorProphecy->validate($data, ['groups' => $expectedValidationGroups])->shouldBeCalled();
         $validator = $validatorProphecy->reveal();
 
-        list($resourceMetadataFactory, $event) = $this->createEventObject($expectedValidationGroups, $data);
+        [$resourceMetadataFactory, $event] = $this->createEventObject($expectedValidationGroups, $data);
 
         $validationViewListener = new ValidateListener($validator, $resourceMetadataFactory);
         $validationViewListener->onKernelView($event);
@@ -76,7 +76,7 @@ class ValidateListenerTest extends TestCase
         $validatorProphecy->validate($data, ['groups' => $expectedValidationGroups])->shouldNotBeCalled();
         $validator = $validatorProphecy->reveal();
 
-        list($resourceMetadataFactory, $event) = $this->createEventObject($expectedValidationGroups, $data, false);
+        [$resourceMetadataFactory, $event] = $this->createEventObject($expectedValidationGroups, $data, false);
 
         $validationViewListener = new ValidateListener($validator, $resourceMetadataFactory);
         $validationViewListener->onKernelView($event);
@@ -93,7 +93,7 @@ class ValidateListenerTest extends TestCase
         $validatorProphecy->validate($data, ['groups' => $expectedValidationGroups])->willThrow(new ValidationException())->shouldBeCalled();
         $validator = $validatorProphecy->reveal();
 
-        list($resourceMetadataFactory, $event) = $this->createEventObject($expectedValidationGroups, $data);
+        [$resourceMetadataFactory, $event] = $this->createEventObject($expectedValidationGroups, $data);
 
         $validationViewListener = new ValidateListener($validator, $resourceMetadataFactory);
         $validationViewListener->onKernelView($event);

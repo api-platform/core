@@ -60,10 +60,10 @@ final class AddFormatListener
      * @throws NotFoundHttpException
      * @throws NotAcceptableHttpException
      */
-    public function onKernelRequest(GetResponseEvent $event)
+    public function onKernelRequest(GetResponseEvent $event): void
     {
         $request = $event->getRequest();
-        if (!$request->attributes->has('_api_resource_class') && !$request->attributes->has('_api_respond') && !$request->attributes->has('_graphql')) {
+        if (!($request->attributes->has('_api_resource_class') || $request->attributes->getBoolean('_api_respond', false) || $request->attributes->getBoolean('_graphql', false))) {
             return;
         }
         // BC check to be removed in 3.0
@@ -122,7 +122,7 @@ final class AddFormatListener
      *
      * This is necessary for {@see Request::getMimeType} and {@see Request::getMimeTypes} to work.
      */
-    private function addRequestFormats(Request $request, array $formats)
+    private function addRequestFormats(Request $request, array $formats): void
     {
         foreach ($formats as $format => $mimeTypes) {
             $request->setFormat($format, (array) $mimeTypes);
@@ -132,7 +132,7 @@ final class AddFormatListener
     /**
      * Populates the $mimeTypes property.
      */
-    private function populateMimeTypes()
+    private function populateMimeTypes(): void
     {
         if (null !== $this->mimeTypes) {
             return;

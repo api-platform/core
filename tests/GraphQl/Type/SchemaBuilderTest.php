@@ -148,6 +148,7 @@ class SchemaBuilderTest extends TestCase
         };
         $mockedSchemaBuilder = $this->createSchemaBuilder($propertyMetadataMockBuilder, $paginationEnabled);
         $schema = $mockedSchemaBuilder->getSchema();
+
         $queryFields = $schema->getConfig()->getQuery()->getFields();
         $mutationFields = $schema->getConfig()->getMutation()->getFields();
 
@@ -207,7 +208,7 @@ class SchemaBuilderTest extends TestCase
         $type = $mutationFields['createShortName2']->getType();
         $resourceTypeFields = $type->getFields();
         $this->assertEquals(
-            ['id', '_id', 'floatProperty', 'stringProperty', 'boolProperty', 'objectProperty', 'arrayProperty', 'iterableProperty', 'clientMutationId'],
+            ['shortName2', 'clientMutationId'],
             array_keys($resourceTypeFields)
         );
     }
