@@ -284,11 +284,11 @@ Feature: GraphQL query support
     }
     """
 
-  Scenario: Custom query
+  Scenario: Custom item query
     When I send the following GraphQL request:
     """
     {
-      testDummyCustomQuery {
+      testItemDummyCustomQuery {
         message
       }
     }
@@ -296,13 +296,43 @@ Feature: GraphQL query support
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/json"
-    And print last JSON response
     And the JSON should be equal to:
     """
     {
       "data": {
-        "testDummyCustomQuery": {
+        "testItemDummyCustomQuery": {
           "message": "Success!"
+        }
+      }
+    }
+    """
+
+  Scenario: Custom collection query
+    When I send the following GraphQL request:
+    """
+    {
+      testCollectionDummyCustomQueries {
+        edges {
+          node {
+            message
+          }
+        }
+      }
+    }
+    """
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/json"
+    And the JSON should be equal to:
+    """
+    {
+      "data": {
+        "testCollectionDummyCustomQueries": {
+          "edges": [
+            {
+              "node": {"message": "Success!"}
+            }
+          ]
         }
       }
     }

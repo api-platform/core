@@ -95,17 +95,17 @@ final class SchemaBuilder implements SchemaBuilderInterface
 
                 if ($itemQuery = $resourceMetadata->getGraphqlAttribute($operationName, 'item_query')) {
                     $value['resolve'] = $this->queryResolverLocator->get($itemQuery);
-                    unset($value['item_query']);
 
                     $queryFields += $this->getQueryFields($resourceClass, $resourceMetadata, $operationName, $value, false);
+
                     continue;
                 }
 
                 if ($collectionQuery = $resourceMetadata->getGraphqlAttribute($operationName, 'collection_query')) {
                     $value['resolve'] = $this->queryResolverLocator->get($collectionQuery);
-                    unset($value['collection_query']);
 
                     $queryFields += $this->getQueryFields($resourceClass, $resourceMetadata, $operationName, false, $value);
+
                     continue;
                 }
 
@@ -174,8 +174,8 @@ final class SchemaBuilder implements SchemaBuilderInterface
     /**
      * Gets the query fields of the schema.
      *
-     * @param array|bool $itemConfiguration       false if not configured
-     * @param array|bool $collectionConfiguration false if not configured
+     * @param array|false $itemConfiguration       false if not configured
+     * @param array|false $collectionConfiguration false if not configured
      */
     private function getQueryFields(string $resourceClass, ResourceMetadata $resourceMetadata, string $operationName, $itemConfiguration, $collectionConfiguration): array
     {

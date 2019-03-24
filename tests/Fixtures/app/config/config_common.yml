@@ -241,9 +241,14 @@ services:
         tags:
             -  { name: 'api_platform.data_transformer' }
 
-    app.graphql.query_resolver.dummy_custom:
-        class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\Resolver\DummyCustomQueryResolver'
+    app.graphql.query_resolver.dummy_custom_item:
+        class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\Resolver\DummyCustomItemQueryResolver'
         public: false
-        arguments: ['@api_platform.graphql.normalizer.item']
         tags:
-            -  { name: 'api_platform.graphql.query_resolver' }
+            - { name: 'api_platform.graphql.query_resolver' }
+
+    app.graphql.query_resolver.dummy_custom_collection:
+        class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\Resolver\DummyCustomCollectionQueryResolver'
+        public: false
+        tags:
+            - { name: 'api_platform.graphql.query_resolver' }
