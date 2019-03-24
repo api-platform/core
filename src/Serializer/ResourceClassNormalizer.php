@@ -14,7 +14,7 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 /**
  * Add resource class to the context
  */
-final class AddResourceClassNormalizer implements NormalizerInterface, DenormalizerInterface, CacheableSupportsMethodInterface
+final class ResourceClassNormalizer implements NormalizerInterface, DenormalizerInterface, CacheableSupportsMethodInterface
 {
     use ContextTrait;
     use ClassInfoTrait;
@@ -25,6 +25,8 @@ final class AddResourceClassNormalizer implements NormalizerInterface, Denormali
     private $resourceClassResolver;
 
     private $iriConverter;
+
+    private $localCache = [];
 
     public function __construct(NormalizerInterface $normalizer, ResourceClassResolverInterface $resourceClassResolver, IriConverterInterface $iriConverter)
     {
@@ -53,11 +55,7 @@ final class AddResourceClassNormalizer implements NormalizerInterface, Denormali
      */
     public function supportsDenormalization($data, $type, $format = null)
     {
-        if (ElasticsearchItemNormalizer::FORMAT === $format) {
-            return false;
-        }
-
-        return $this->normalizer->supportsDenormalization($data, $type, $format);
+        return $this->localCache[$type] ?? $this->localCache[$type] = $this->resourceClassResolver->isResourceClass($type);
     }
 
     /**
@@ -94,7 +92,11 @@ final class AddResourceClassNormalizer implements NormalizerInterface, Denormali
             return false;
         }
 
-        return $this->normalizer->supportsNormalization($data, $format);
+        return
+            $this->resourceClassResolver->isResourceClass($this->getObjectClass($data))
+            &&
+            $this->normalizer->supportsNormalization($data, $format)
+        ;
     }
 
     /**
