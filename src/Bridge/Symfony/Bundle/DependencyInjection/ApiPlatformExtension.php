@@ -27,6 +27,7 @@ use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
 use ApiPlatform\Core\DataProvider\SubresourceDataProviderInterface;
 use ApiPlatform\Core\DataTransformer\DataTransformerInterface;
 use ApiPlatform\Core\Exception\RuntimeException;
+use ApiPlatform\Core\GraphQl\Resolver\QueryResolverInterface;
 use ApiPlatform\Core\GraphQl\Type\Definition\TypeInterface as GraphQlTypeInterface;
 use Doctrine\Common\Annotations\Annotation;
 use Doctrine\ORM\Version;
@@ -109,6 +110,8 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             ->addTag('api_platform.subresource_data_provider');
         $container->registerForAutoconfiguration(FilterInterface::class)
             ->addTag('api_platform.filter');
+        $container->registerForAutoconfiguration(QueryResolverInterface::class)
+            ->addTag('api_platform.graphql.query_resolver');
         $container->registerForAutoconfiguration(GraphQlTypeInterface::class)
             ->addTag('api_platform.graphql.type');
 
