@@ -20,6 +20,7 @@ use ApiPlatform\Core\JsonLd\ContextBuilderInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
+use ApiPlatform\Core\Serializer\DataTransformerNormalizer;
 use ApiPlatform\Core\Serializer\ObjectClassResolver;
 use ApiPlatform\Core\Serializer\ResourceClassNormalizer;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
@@ -66,8 +67,14 @@ final class ItemNormalizer implements NormalizerInterface, DenormalizerInterface
             $defaultContext
         );
 
-        $jsonLdItemNormalizer = new JsonLdItemNormalizer(
+        $dataTransformerNormalizer = new DataTransformerNormalizer(
             $this->objectNormalizer,
+            $resourceMetadataFactory,
+            $dataTransformers
+        );
+
+        $jsonLdItemNormalizer = new JsonLdItemNormalizer(
+            $dataTransformerNormalizer,
             $iriConverter,
             $resourceMetadataFactory,
             $contextBuilder
