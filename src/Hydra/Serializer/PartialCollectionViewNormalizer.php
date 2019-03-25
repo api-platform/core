@@ -91,11 +91,11 @@ final class PartialCollectionViewNormalizer implements NormalizerInterface, Norm
 
             $data['hydra:view']['@id'] = IriHelper::createIri($parsed['parts'], $parsed['parameters']);
 
-            if (false !== $lastObject) {
+            if (false !== $lastObject && isset($cursorPaginationAttribute)) {
                 $data['hydra:view']['hydra:next'] = IriHelper::createIri($parsed['parts'], array_merge($parsed['parameters'], $this->cursorPaginationFields($cursorPaginationAttribute, 1, $lastObject)));
             }
 
-            if (false !== $firstObject) {
+            if (false !== $firstObject && isset($cursorPaginationAttribute)) {
                 $data['hydra:view']['hydra:previous'] = IriHelper::createIri($parsed['parts'], array_merge($parsed['parameters'], $this->cursorPaginationFields($cursorPaginationAttribute, -1, $firstObject)));
             }
         } elseif ($paginated) {
