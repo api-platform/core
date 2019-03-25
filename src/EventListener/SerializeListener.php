@@ -44,25 +44,31 @@ final class SerializeListener
     /**
      * Serializes the data to the requested format.
      */
-    public function onKernelView(GetResponseForControllerResultEvent $event)
+    public function onKernelView(GetResponseForControllerResultEvent $event): void
     {
         $controllerResult = $event->getControllerResult();
         $request = $event->getRequest();
 
-        if ($controllerResult instanceof Response || !$request->attributes->getBoolean('_api_respond', true)) {
+        if ($controllerResult instanceof Response || !(($attributes = RequestAttributesExtractor::extractAttributes($request))['respond'] ?? $request->attributes->getBoolean('_api_respond', false))) {
             return;
         }
 
-        if (!$attributes = RequestAttributesExtractor::extractAttributes($request)) {
+        if (!$attributes) {
             $this->serializeRawData($event, $request, $controllerResult);
 
             return;
         }
 
-        $request->attributes->set('_api_respond', true);
         $context = $this->serializerContextBuilder->createFromRequest($request, true, $attributes);
 
-        if (isset($context['output']) && \array_key_exists('class', $context['output']) && null === $context['output']['class']) {
+        if (
+            (isset($context['output']) && \array_key_exists('class', $context['output']) && null === $context['output']['class'])
+            ||
+            (
+                null === $controllerResult && isset($context['input']) && \array_key_exists('class', $context['input']) &&
+                null === $context['input']['class']
+            )
+        ) {
             $event->setControllerResult('');
 
             return;
@@ -100,7 +106,7 @@ final class SerializeListener
      *
      * @throws RuntimeException
      */
-    private function serializeRawData(GetResponseForControllerResultEvent $event, Request $request, $controllerResult)
+    private function serializeRawData(GetResponseForControllerResultEvent $event, Request $request, $controllerResult): void
     {
         if (\is_object($controllerResult)) {
             $event->setControllerResult($this->serializer->serialize($controllerResult, $request->getRequestFormat(), $request->attributes->get('_api_normalization_context', [])));

@@ -117,16 +117,10 @@ class IriConverterTest extends TestCase
 
     public function testGetItemFromIriWithOperationName()
     {
-        $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
-
-        $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
-
         $itemDataProviderProphecy = $this->prophesize(ItemDataProviderInterface::class);
         $itemDataProviderProphecy->getItem('AppBundle\Entity\User', '3', 'operation_name', ['fetch_data' => true])
             ->willReturn('foo')
             ->shouldBeCalledTimes(1);
-
-        $routeNameResolverProphecy = $this->prophesize(RouteNameResolverInterface::class);
 
         $routerProphecy = $this->prophesize(RouterInterface::class);
         $routerProphecy->match('/users/3')->willReturn([
@@ -242,7 +236,6 @@ class IriConverterTest extends TestCase
     {
         $item = new \stdClass();
         $subresourceContext = ['identifiers' => [['id', Dummy::class, true]]];
-        $itemDataProviderProphecy = $this->prophesize(ItemDataProviderInterface::class);
         $routeNameResolverProphecy = $this->prophesize(RouteNameResolverInterface::class);
         $routerProphecy = $this->prophesize(RouterInterface::class);
         $routerProphecy->match('/users/3/adresses')->willReturn([
@@ -263,7 +256,6 @@ class IriConverterTest extends TestCase
         $this->expectExceptionMessage('Item not found for "/users/3/adresses".');
 
         $subresourceContext = ['identifiers' => [['id', Dummy::class, true]]];
-        $itemDataProviderProphecy = $this->prophesize(ItemDataProviderInterface::class);
         $routeNameResolverProphecy = $this->prophesize(RouteNameResolverInterface::class);
         $routerProphecy = $this->prophesize(RouterInterface::class);
         $routerProphecy->match('/users/3/adresses')->willReturn([
@@ -307,7 +299,7 @@ class IriConverterTest extends TestCase
         $routeNameResolverProphecy = $this->prophesize(RouteNameResolverInterface::class);
         $routerProphecy = $this->prophesize(RouterInterface::class);
 
-        $converter = $this->getIriConverter($routerProphecy, $routeNameResolverProphecy, null);
+        $converter = $this->getIriConverter($routerProphecy, $routeNameResolverProphecy);
 
         $method = new \ReflectionMethod(IriConverter::class, 'generateIdentifiersUrl');
         $method->setAccessible(true);

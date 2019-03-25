@@ -42,10 +42,6 @@ final class CustomOperationPathResolver implements OperationPathResolverInterfac
             $operationName = null;
         }
 
-        if (isset($operation['path'])) {
-            return $operation['path'];
-        }
-
-        return $this->deferred->resolveOperationPath($resourceShortName, $operation, OperationTypeDeprecationHelper::getOperationType($operationType), $operationName);
+        return $operation['path'] ?? $this->deferred->resolveOperationPath($resourceShortName, $operation, OperationTypeDeprecationHelper::getOperationType($operationType), $operationName);
     }
 }

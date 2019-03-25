@@ -31,7 +31,7 @@ final class TransformFieldsetsParametersListener
         $this->resourceMetadataFactory = $resourceMetadataFactory;
     }
 
-    public function onKernelRequest(GetResponseEvent $event)
+    public function onKernelRequest(GetResponseEvent $event): void
     {
         $request = $event->getRequest();
 

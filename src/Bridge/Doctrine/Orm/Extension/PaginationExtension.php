@@ -23,6 +23,7 @@ use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\QueryBuilder;
+use Doctrine\ORM\Tools\Pagination\CountWalker;
 use Doctrine\ORM\Tools\Pagination\Paginator as DoctrineOrmPaginator;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -143,7 +144,14 @@ final class PaginationExtension implements ContextAwareQueryResultCollectionExte
      */
     public function getResult(QueryBuilder $queryBuilder, string $resourceClass = null, string $operationName = null, array $context = [])
     {
-        $doctrineOrmPaginator = new DoctrineOrmPaginator($queryBuilder, $this->useFetchJoinCollection($queryBuilder, $resourceClass, $operationName));
+        $query = $queryBuilder->getQuery();
+
+        // Only one alias, without joins, disable the DISTINCT on the COUNT
+        if (1 === \count($queryBuilder->getAllAliases())) {
+            $query->setHint(CountWalker::HINT_DISTINCT, false);
+        }
+
+        $doctrineOrmPaginator = new DoctrineOrmPaginator($query, $this->useFetchJoinCollection($queryBuilder, $resourceClass, $operationName));
         $doctrineOrmPaginator->setUseOutputWalkers($this->useOutputWalkers($queryBuilder));
 
         if (null === $this->requestStack) {
@@ -190,7 +198,7 @@ final class PaginationExtension implements ContextAwareQueryResultCollectionExte
         }
 
         $itemsPerPage = $resourceMetadata->getCollectionOperationAttribute($operationName, 'pagination_items_per_page', $this->itemsPerPage, true);
-        if ($request->attributes->get('_graphql')) {
+        if ($request->attributes->getBoolean('_graphql', false)) {
             $collectionArgs = $request->attributes->get('_graphql_collections_args', []);
             $itemsPerPage = $collectionArgs[$resourceClass]['first'] ?? $itemsPerPage;
         }
@@ -216,7 +224,7 @@ final class PaginationExtension implements ContextAwareQueryResultCollectionExte
         }
 
         $firstResult = ($page - 1) * $itemsPerPage;
-        if ($request->attributes->get('_graphql')) {
+        if ($request->attributes->getBoolean('_graphql', false)) {
             $collectionArgs = $request->attributes->get('_graphql_collections_args', []);
             if (isset($collectionArgs[$resourceClass]['after'])) {
                 $after = base64_decode($collectionArgs[$resourceClass]['after'], true);

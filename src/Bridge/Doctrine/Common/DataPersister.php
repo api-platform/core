@@ -77,20 +77,16 @@ final class DataPersister implements ContextAwareDataPersisterInterface
 
     /**
      * Gets the Doctrine object manager associated with given data.
-     *
-     * @return DoctrineObjectManager|null
      */
-    private function getManager($data)
+    private function getManager($data): ?DoctrineObjectManager
     {
         return \is_object($data) ? $this->managerRegistry->getManagerForClass($this->getObjectClass($data)) : null;
     }
 
     /**
      * Checks if doctrine does not manage data automatically.
-     *
-     * @return bool
      */
-    private function isDeferredExplicit(DoctrineObjectManager $manager, $data)
+    private function isDeferredExplicit(DoctrineObjectManager $manager, $data): bool
     {
         $classMetadata = $manager->getClassMetadata($this->getObjectClass($data));
         if ($classMetadata instanceof ClassMetadataInfo && method_exists($classMetadata, 'isChangeTrackingDeferredExplicit')) {

@@ -22,7 +22,6 @@ use ApiPlatform\Core\Serializer\Filter\PropertyFilter;
 use ApiPlatform\Core\Tests\Fixtures\DummyEntityFilterAnnotated;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyCar;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Util\AnnotationFilterExtractor;
-use Doctrine\Common\Annotations\Reader;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
 class AnnotationFilterExtractorTraitTest extends KernelTestCase
@@ -38,8 +37,6 @@ class AnnotationFilterExtractorTraitTest extends KernelTestCase
     public function testReadAnnotations()
     {
         $reflectionClass = new \ReflectionClass(DummyCar::class);
-        $readerProphecy = $this->prophesize(Reader::class);
-        $services = [];
 
         $this->assertEquals($this->extractor->getFilters($reflectionClass), [
             'annotated_api_platform_core_tests_fixtures_test_bundle_entity_dummy_car_api_platform_core_bridge_doctrine_orm_filter_date_filter' => [
@@ -72,8 +69,6 @@ class AnnotationFilterExtractorTraitTest extends KernelTestCase
     public function testReadOrderAnnotations()
     {
         $reflectionClass = new \ReflectionClass(DummyEntityFilterAnnotated::class);
-        $readerProphecy = $this->prophesize(Reader::class);
-        $services = [];
 
         $this->assertEquals($this->extractor->getFilters($reflectionClass), [
             'annotated_api_platform_core_tests_fixtures_dummy_entity_filter_annotated_api_platform_core_bridge_doctrine_orm_filter_order_filter' => [

@@ -84,7 +84,7 @@ class DoctrineExtractorTest extends TestCase
      */
     public function testExtract(string $property, array $type = null): void
     {
-        $this->assertEquals($type, $this->createExtractor()->getTypes(DoctrineDummy::class, $property, []));
+        $this->assertEquals($type, $this->createExtractor()->getTypes(DoctrineDummy::class, $property));
     }
 
     public function testExtractWithEmbedOne(): void
@@ -99,8 +99,7 @@ class DoctrineExtractorTest extends TestCase
 
         $actualTypes = $this->createExtractor()->getTypes(
             DoctrineWithEmbedded::class,
-            'embedOne',
-            []
+            'embedOne'
         );
 
         $this->assertEquals($expectedTypes, $actualTypes);
@@ -121,8 +120,7 @@ class DoctrineExtractorTest extends TestCase
 
         $actualTypes = $this->createExtractor()->getTypes(
             DoctrineWithEmbedded::class,
-            'embedMany',
-            []
+            'embedMany'
         );
 
         $this->assertEquals($expectedTypes, $actualTypes);

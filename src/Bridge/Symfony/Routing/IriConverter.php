@@ -189,13 +189,13 @@ final class IriConverter implements IriConverterInterface
         }
 
         if (1 === \count($identifiers)) {
-            return [rawurlencode((string) array_values($identifiers)[0])];
+            return [rawurlencode((string) reset($identifiers))];
         }
 
         foreach ($identifiers as $name => $value) {
             $identifiers[$name] = sprintf('%s=%s', $name, $value);
         }
 
-        return $identifiers;
+        return array_values($identifiers);
     }
 }

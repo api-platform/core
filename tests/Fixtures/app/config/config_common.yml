@@ -89,8 +89,6 @@ api_platform:
 parameters:
     container.autowiring.strict_mode: true
     container.dumper.inline_class_loader: true
-    # Enable the metadata cache to speedup the builds
-    api_platform.metadata_cache: true
 
 services:
     contain_non_resource.item_data_provider:
@@ -240,6 +238,18 @@ services:
         public: false
         tags:
             -  { name: 'api_platform.data_transformer' }
+
+    app.messenger_handler.messenger_with_inputs:
+        class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\MessengerHandler\MessengerWithInputHandler'
+        public: false
+        tags:
+            -  { name: 'messenger.message_handler' }
+
+    app.messenger_handler.messenger_with_response:
+        class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\MessengerHandler\MessengerWithResponseHandler'
+        public: false
+        tags:
+            -  { name: 'messenger.message_handler' }
 
     app.graphql.query_resolver.dummy_custom_item:
         class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\Resolver\DummyCustomItemQueryResolver'

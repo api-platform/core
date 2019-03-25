@@ -121,10 +121,8 @@ final class OperationMethodResolver implements OperationMethodResolverInterface
 
     /**
      * Gets the route name or null if not defined.
-     *
-     * @return string|null
      */
-    private function getRouteName(ResourceMetadata $resourceMetadata, string $operationName, string $operationType)
+    private function getRouteName(ResourceMetadata $resourceMetadata, string $operationName, string $operationType): ?string
     {
         if (OperationType::ITEM === $operationType) {
             return $resourceMetadata->getItemOperationAttribute($operationName, 'route_name');

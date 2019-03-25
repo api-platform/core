@@ -27,7 +27,7 @@ use Doctrine\Common\Inflector\Inflector;
  */
 final class RouteNameGenerator
 {
-    const ROUTE_NAME_PREFIX = 'api_';
+    public const ROUTE_NAME_PREFIX = 'api_';
 
     private function __construct()
     {

@@ -46,12 +46,12 @@ final class SerializerPropertyMetadataFactory implements PropertyMetadataFactory
 
         // in case of a property inherited (in a child class), we need it's properties
         // to be mapped against serialization groups instead of the parent ones.
-        if (null !== ($childResourceClass = $propertyMetadata->isChildInherited())) {
+        if (null !== ($childResourceClass = $propertyMetadata->getChildInherited())) {
             $resourceClass = $childResourceClass;
         }
 
         try {
-            list($normalizationGroups, $denormalizationGroups) = $this->getEffectiveSerializerGroups($options, $resourceClass);
+            [$normalizationGroups, $denormalizationGroups] = $this->getEffectiveSerializerGroups($options, $resourceClass);
 
             $propertyMetadata = $this->transformReadWrite($propertyMetadata, $resourceClass, $property, $normalizationGroups, $denormalizationGroups);
             $propertyMetadata = $this->transformLinkStatus($propertyMetadata, $normalizationGroups, $denormalizationGroups);

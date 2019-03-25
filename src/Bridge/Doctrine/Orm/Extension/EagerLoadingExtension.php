@@ -88,7 +88,7 @@ final class EagerLoadingExtension implements ContextAwareQueryCollectionExtensio
         $this->apply(false, $queryBuilder, $queryNameGenerator, $resourceClass, $operationName, $context);
     }
 
-    private function apply(bool $collection, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass = null, string $operationName = null, array $context)
+    private function apply(bool $collection, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, ?string $resourceClass, ?string $operationName, array $context)
     {
         if (null === $resourceClass) {
             throw new InvalidArgumentException('The "$resourceClass" parameter must not be null');

@@ -59,6 +59,7 @@ final class AttributesExtractor
 
         $result += [
             'receive' => (bool) ($attributes['_api_receive'] ?? true),
+            'respond' => (bool) ($attributes['_api_respond'] ?? true),
             'persist' => (bool) ($attributes['_api_persist'] ?? true),
         ];
 

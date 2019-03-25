@@ -27,7 +27,7 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
  */
 final class ApiGatewayNormalizer implements NormalizerInterface, CacheableSupportsMethodInterface
 {
-    const API_GATEWAY = 'api_gateway';
+    public const API_GATEWAY = 'api_gateway';
 
     private $documentationNormalizer;
     private $defaultContext = [self::API_GATEWAY => false];

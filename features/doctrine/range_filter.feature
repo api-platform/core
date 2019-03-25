@@ -44,10 +44,11 @@ Feature: Range filter on collections
               }
             }
           },
-          "maxItems": 15,
+          "minItems": 3,
+          "maxItems": 3,
           "uniqueItems": true
         },
-        "hydra:totalItems": {"pattern": "^15$"},
+        "hydra:totalItems": {"type": "number", "minimum": 15, "maximum": 15},
         "hydra:view": {
           "type": "object",
           "properties": {
@@ -82,10 +83,11 @@ Feature: Range filter on collections
               }
             }
           },
-          "maxItems": 30,
+          "minItems": 3,
+          "maxItems": 3,
           "uniqueItems": true
         },
-        "hydra:totalItems": {"pattern": "^30$"},
+        "hydra:totalItems": {"type": "number", "minimum": 30, "maximum": 30},
         "hydra:view": {
           "type": "object",
           "properties": {
@@ -129,10 +131,11 @@ Feature: Range filter on collections
               }
             }
           },
-          "maxItems": 8,
+          "minItems": 3,
+          "maxItems": 3,
           "uniqueItems": true
         },
-        "hydra:totalItems": {"pattern": "^8$"},
+        "hydra:totalItems": {"type": "number", "minimum": 8, "maximum": 8},
         "hydra:view": {
           "type": "object",
           "properties": {
@@ -184,10 +187,11 @@ Feature: Range filter on collections
               }
             }
           },
-          "maxItems": 16,
+          "minItems": 3,
+          "maxItems": 3,
           "uniqueItems": true
         },
-        "hydra:totalItems": {"pattern": "^16$"},
+        "hydra:totalItems": {"type": "number", "minimum": 16, "maximum": 16},
         "hydra:view": {
           "type": "object",
           "properties": {
@@ -230,10 +234,11 @@ Feature: Range filter on collections
               }
             }
           },
-          "maxItems": 7,
+          "minItems": 3,
+          "maxItems": 3,
           "uniqueItems": true
         },
-        "hydra:totalItems": {"pattern": "^7$"},
+        "hydra:totalItems": {"type": "number", "minimum": 7, "maximum": 7},
         "hydra:view": {
           "type": "object",
           "properties": {
@@ -283,10 +288,11 @@ Feature: Range filter on collections
               }
             }
           },
-          "maxItems": 14,
+          "minItems": 3,
+          "maxItems": 3,
           "uniqueItems": true
         },
-        "hydra:totalItems": {"pattern": "^14$"},
+        "hydra:totalItems": {"type": "number", "minimum": 14, "maximum": 14},
         "hydra:view": {
           "type": "object",
           "properties": {
@@ -329,10 +335,11 @@ Feature: Range filter on collections
               }
             }
           },
-          "maxItems": 7,
+          "minItems": 3,
+          "maxItems": 3,
           "uniqueItems": true
         },
-        "hydra:totalItems": {"pattern": "^7$"},
+        "hydra:totalItems": {"type": "number", "minimum": 7, "maximum": 7},
         "hydra:view": {
           "type": "object",
           "properties": {
@@ -361,7 +368,7 @@ Feature: Range filter on collections
           "type": "array",
           "maxItems": 0
         },
-        "hydra:totalItems": {"pattern": "^0$"},
+        "hydra:totalItems": {"type": "number", "maximum": 0},
         "hydra:view": {
           "type": "object",
           "properties": {

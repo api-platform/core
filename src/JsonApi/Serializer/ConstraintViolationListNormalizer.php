@@ -27,7 +27,7 @@ use Symfony\Component\Validator\ConstraintViolationListInterface;
  */
 final class ConstraintViolationListNormalizer implements NormalizerInterface, CacheableSupportsMethodInterface
 {
-    const FORMAT = 'jsonapi';
+    public const FORMAT = 'jsonapi';
 
     private $nameConverter;
     private $propertyMetadataFactory;
@@ -89,7 +89,7 @@ final class ConstraintViolationListNormalizer implements NormalizerInterface, Ca
             $fieldName = $this->nameConverter->normalize($fieldName, $class, self::FORMAT);
         }
 
-        if (null !== $propertyMetadata->getType()->getClassName()) {
+        if (($type = $propertyMetadata->getType()) && null !== $type->getClassName()) {
             return "data/relationships/$fieldName";
         }
 

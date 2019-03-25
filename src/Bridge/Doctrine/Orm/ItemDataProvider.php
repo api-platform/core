@@ -25,6 +25,7 @@ use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Persistence\Mapping\ClassMetadata;
+use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\QueryBuilder;
 
@@ -67,6 +68,7 @@ class ItemDataProvider implements DenormalizedIdentifiersAwareItemDataProviderIn
      */
     public function getItem(string $resourceClass, $id, string $operationName = null, array $context = [])
     {
+        /** @var ObjectManager $manager */
         $manager = $this->managerRegistry->getManagerForClass($resourceClass);
 
         if (!\is_array($id) && !($context[IdentifierConverterInterface::HAS_IDENTIFIER_CONVERTER] ?? false)) {

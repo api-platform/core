@@ -76,7 +76,7 @@ class CachedDocumentMetadataFactoryTest extends TestCase
         $decoratedProphecy = $this->prophesize(DocumentMetadataFactoryInterface::class);
         $decoratedProphecy->create(Foo::class)->willReturn($originalDocumentMetadata)->shouldBeCalledTimes(1);
 
-        $documentMetadataFactory = (new CachedDocumentMetadataFactory($cacheItemPoolProphecy->reveal(), $decoratedProphecy->reveal()));
+        $documentMetadataFactory = new CachedDocumentMetadataFactory($cacheItemPoolProphecy->reveal(), $decoratedProphecy->reveal());
         $documentMetadataFactory->create(Foo::class);
 
         $documentMetadata = $documentMetadataFactory->create(Foo::class);

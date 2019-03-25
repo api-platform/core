@@ -55,10 +55,8 @@ final class PropertyMetadata
 
     /**
      * Gets type.
-     *
-     * @return Type|null
      */
-    public function getType()
+    public function getType(): ?Type
     {
         return $this->type;
     }
@@ -76,20 +74,16 @@ final class PropertyMetadata
 
     /**
      * Gets description.
-     *
-     * @return string|null
      */
-    public function getDescription()
+    public function getDescription(): ?string
     {
         return $this->description;
     }
 
     /**
      * Returns a new instance with the given description.
-     *
-     * @param string $description
      */
-    public function withDescription($description): self
+    public function withDescription(string $description): self
     {
         $metadata = clone $this;
         $metadata->description = $description;
@@ -99,10 +93,8 @@ final class PropertyMetadata
 
     /**
      * Is readable?
-     *
-     * @return bool|null
      */
-    public function isReadable()
+    public function isReadable(): ?bool
     {
         return $this->readable;
     }
@@ -120,10 +112,8 @@ final class PropertyMetadata
 
     /**
      * Is writable?
-     *
-     * @return bool|null
      */
-    public function isWritable()
+    public function isWritable(): ?bool
     {
         return $this->writable;
     }
@@ -141,10 +131,8 @@ final class PropertyMetadata
 
     /**
      * Is required?
-     *
-     * @return bool|null
      */
-    public function isRequired()
+    public function isRequired(): ?bool
     {
         if (true === $this->required && false === $this->writable) {
             return false;
@@ -166,10 +154,8 @@ final class PropertyMetadata
 
     /**
      * Should an IRI or an object be provided in write context?
-     *
-     * @return bool|null
      */
-    public function isWritableLink()
+    public function isWritableLink(): ?bool
     {
         return $this->writableLink;
     }
@@ -187,10 +173,8 @@ final class PropertyMetadata
 
     /**
      * Is an IRI or an object generated in read context?
-     *
-     * @return bool|null
      */
-    public function isReadableLink()
+    public function isReadableLink(): ?bool
     {
         return $this->readableLink;
     }
@@ -208,10 +192,8 @@ final class PropertyMetadata
 
     /**
      * Gets IRI of this property.
-     *
-     * @return string|null
      */
-    public function getIri()
+    public function getIri(): ?string
     {
         return $this->iri;
     }
@@ -229,10 +211,8 @@ final class PropertyMetadata
 
     /**
      * Is this attribute an identifier?
-     *
-     * @return bool|null
      */
-    public function isIdentifier()
+    public function isIdentifier(): ?bool
     {
         return $this->identifier;
     }
@@ -250,10 +230,8 @@ final class PropertyMetadata
 
     /**
      * Gets attributes.
-     *
-     * @return array|null
      */
-    public function getAttributes()
+    public function getAttributes(): ?array
     {
         return $this->attributes;
     }
@@ -263,11 +241,7 @@ final class PropertyMetadata
      */
     public function getAttribute(string $key, $defaultValue = null)
     {
-        if (isset($this->attributes[$key])) {
-            return $this->attributes[$key];
-        }
-
-        return $defaultValue;
+        return $this->attributes[$key] ?? $defaultValue;
     }
 
     /**
@@ -282,13 +256,31 @@ final class PropertyMetadata
     }
 
     /**
-     * Is the property inherited from a child class?
-     *
-     * @return string|null
+     * Gets child inherited.
      */
-    public function isChildInherited()
+    public function getChildInherited(): ?string
     {
         return $this->childInherited;
+    }
+
+    /**
+     * Is the property inherited from a child class?
+     */
+    public function hasChildInherited(): bool
+    {
+        return null !== $this->childInherited;
+    }
+
+    /**
+     * Is the property inherited from a child class?
+     *
+     * @deprecated since version 2.4, to be removed in 3.0.
+     */
+    public function isChildInherited(): ?string
+    {
+        @trigger_error(sprintf('The use of "%1$s::isChildInherited()" is deprecated since 2.4 and will be removed in 3.0. Use "%1$s::getChildInherited()" or "%1$s::hasChildInherited()" directly instead.', __CLASS__), E_USER_DEPRECATED);
+
+        return $this->getChildInherited();
     }
 
     /**
@@ -312,10 +304,8 @@ final class PropertyMetadata
 
     /**
      * Gets the subresource metadata.
-     *
-     * @return SubresourceMetadata|null
      */
-    public function getSubresource()
+    public function getSubresource(): ?SubresourceMetadata
     {
         return $this->subresource;
     }
@@ -335,10 +325,8 @@ final class PropertyMetadata
 
     /**
      * Is initializable?
-     *
-     * @return bool|null
      */
-    public function isInitializable()
+    public function isInitializable(): ?bool
     {
         return $this->initializable;
     }

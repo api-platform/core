@@ -41,10 +41,10 @@ final class WriteListener
     /**
      * Persists, updates or delete data return by the controller if applicable.
      */
-    public function onKernelView(GetResponseForControllerResultEvent $event)
+    public function onKernelView(GetResponseForControllerResultEvent $event): void
     {
         $request = $event->getRequest();
-        if ($request->isMethodSafe(false) || !$request->attributes->getBoolean('_api_persist', true) || !$attributes = RequestAttributesExtractor::extractAttributes($request)) {
+        if ($request->isMethodSafe(false) || !($attributes = RequestAttributesExtractor::extractAttributes($request)) || !$attributes['persist']) {
             return;
         }
 
@@ -73,7 +73,7 @@ final class WriteListener
                 if (null !== $this->resourceMetadataFactory) {
                     $resourceMetadata = $this->resourceMetadataFactory->create($attributes['resource_class']);
                     $outputMetadata = $resourceMetadata->getOperationAttribute($attributes, 'output', ['class' => $attributes['resource_class']], true);
-                    $hasOutput = \array_key_exists('class', $outputMetadata) && null !== $outputMetadata['class'];
+                    $hasOutput = \array_key_exists('class', $outputMetadata) && null !== $outputMetadata['class'] && $controllerResult instanceof $outputMetadata['class'];
                 }
 
                 if ($hasOutput) {

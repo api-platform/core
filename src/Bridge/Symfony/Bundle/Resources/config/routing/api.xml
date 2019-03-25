@@ -8,8 +8,9 @@
     <route id="api_entrypoint" path="/{index}.{_format}">
         <default key="_controller">api_platform.action.entrypoint</default>
         <default key="_format" />
-        <default key="_api_respond">1</default>
+        <default key="_api_respond">true</default>
         <default key="index">index</default>
+
         <requirement key="index">index</requirement>
     </route>
 

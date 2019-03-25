@@ -85,7 +85,7 @@ final class AnnotationSubresourceMetadataFactory implements PropertyMetadataFact
             throw new InvalidResourceException(sprintf('Property "%s" on resource "%s" is declared as a subresource, but its type could not be determined.', $propertyName, $originResourceClass));
         }
         $isCollection = $type->isCollection();
-        $resourceClass = $isCollection ? $type->getCollectionValueType()->getClassName() : $type->getClassName();
+        $resourceClass = $isCollection && ($collectionValueType = $type->getCollectionValueType()) ? $collectionValueType->getClassName() : $type->getClassName();
         $maxDepth = $annotation->maxDepth;
         // @ApiSubresource is on the class identifier (/collection/{id}/subcollection/{subcollectionId})
         if (null === $resourceClass) {

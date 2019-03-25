@@ -29,8 +29,8 @@ final class ErrorNormalizer implements NormalizerInterface, CacheableSupportsMet
 {
     use ErrorNormalizerTrait;
 
-    const FORMAT = 'jsonld';
-    const TITLE = 'title';
+    public const FORMAT = 'jsonld';
+    public const TITLE = 'title';
 
     private $urlGenerator;
     private $debug;

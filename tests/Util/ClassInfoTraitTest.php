@@ -46,6 +46,6 @@ class ClassInfoTraitTest extends TestCase
     {
         $classInfo = $this->getClassInfoTraitImplementation();
 
-        $this->assertEquals(Dummy::class, $classInfo->getRealClassName('ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy'));
+        $this->assertEquals(Dummy::class, $classInfo->getRealClassName(Dummy::class));
     }
 }

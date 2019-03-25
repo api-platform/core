@@ -24,9 +24,9 @@ use ApiPlatform\Core\Operation\PathSegmentNameGeneratorInterface;
  */
 final class SubresourceOperationFactory implements SubresourceOperationFactoryInterface
 {
-    const SUBRESOURCE_SUFFIX = '_subresource';
-    const FORMAT_SUFFIX = '.{_format}';
-    const ROUTE_OPTIONS = ['defaults' => [], 'requirements' => [], 'options' => [], 'host' => '', 'schemes' => [], 'condition' => '', 'controller' => null];
+    public const SUBRESOURCE_SUFFIX = '_subresource';
+    public const FORMAT_SUFFIX = '.{_format}';
+    public const ROUTE_OPTIONS = ['defaults' => [], 'requirements' => [], 'options' => [], 'host' => '', 'schemes' => [], 'condition' => '', 'controller' => null];
 
     private $resourceMetadataFactory;
     private $propertyNameCollectionFactory;
@@ -60,7 +60,7 @@ final class SubresourceOperationFactory implements SubresourceOperationFactoryIn
      * @param int    $depth             the number of visited
      * @param int    $maxDepth
      */
-    private function computeSubresourceOperations(string $resourceClass, array &$tree, string $rootResourceClass = null, array $parentOperation = null, array $visited = [], int $depth = 0, int $maxDepth = null)
+    private function computeSubresourceOperations(string $resourceClass, array &$tree, string $rootResourceClass = null, array $parentOperation = null, array $visited = [], int $depth = 0, int $maxDepth = null): void
     {
         if (null === $rootResourceClass) {
             $rootResourceClass = $resourceClass;
@@ -69,11 +69,10 @@ final class SubresourceOperationFactory implements SubresourceOperationFactoryIn
         foreach ($this->propertyNameCollectionFactory->create($resourceClass) as $property) {
             $propertyMetadata = $this->propertyMetadataFactory->create($resourceClass, $property);
 
-            if (!$propertyMetadata->hasSubresource()) {
+            if (!$subresource = $propertyMetadata->getSubresource()) {
                 continue;
             }
 
-            $subresource = $propertyMetadata->getSubresource();
             $subresourceClass = $subresource->getResourceClass();
             $subresourceMetadata = $this->resourceMetadataFactory->create($subresourceClass);
             $isLastItem = $resourceClass === $parentOperation['resource_class'] && $propertyMetadata->isIdentifier();
@@ -135,7 +134,7 @@ final class SubresourceOperationFactory implements SubresourceOperationFactoryIn
                 $operation['path'] = $subresourceOperation['path'] ?? sprintf(
                     '/%s%s/{id}/%s%s',
                     $prefix,
-                    $this->pathSegmentNameGenerator->getSegmentName($rootShortname, true),
+                    $this->pathSegmentNameGenerator->getSegmentName($rootShortname),
                     $this->pathSegmentNameGenerator->getSegmentName($operation['property'], $operation['collection']),
                     self::FORMAT_SUFFIX
                 );

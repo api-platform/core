@@ -41,7 +41,6 @@ class CachedPropertyMetadataFactoryTest extends TestCase
         $cachedPropertyMetadataFactory = new CachedPropertyMetadataFactory($cacheItemPool->reveal(), $decoratedPropertyMetadataFactory->reveal());
         $resultedPropertyMetadata = $cachedPropertyMetadataFactory->create(Dummy::class, 'dummy');
 
-        $this->assertInstanceOf(PropertyMetadata::class, $resultedPropertyMetadata);
         $expectedResult = new PropertyMetadata(null, 'A dummy', true, true, null, null, false, false);
         $this->assertEquals($expectedResult, $resultedPropertyMetadata);
         $this->assertEquals($expectedResult, $cachedPropertyMetadataFactory->create(Dummy::class, 'dummy'), 'Trigger the local cache');
@@ -65,7 +64,6 @@ class CachedPropertyMetadataFactoryTest extends TestCase
         $cachedPropertyMetadataFactory = new CachedPropertyMetadataFactory($cacheItemPool->reveal(), $decoratedPropertyMetadataFactory->reveal());
         $resultedPropertyMetadata = $cachedPropertyMetadataFactory->create(Dummy::class, 'dummy');
 
-        $this->assertInstanceOf(PropertyMetadata::class, $resultedPropertyMetadata);
         $expectedResult = new PropertyMetadata(null, 'A dummy', true, true, null, null, false, false);
         $this->assertEquals($expectedResult, $resultedPropertyMetadata);
         $this->assertEquals($expectedResult, $cachedPropertyMetadataFactory->create(Dummy::class, 'dummy'), 'Trigger the local cache');
@@ -84,8 +82,6 @@ class CachedPropertyMetadataFactoryTest extends TestCase
 
         $cachedPropertyMetadataFactory = new CachedPropertyMetadataFactory($cacheItemPool->reveal(), $decoratedPropertyMetadataFactory->reveal());
         $resultedPropertyMetadata = $cachedPropertyMetadataFactory->create(Dummy::class, 'dummy');
-
-        $this->assertInstanceOf(PropertyMetadata::class, $resultedPropertyMetadata);
 
         $expectedResult = new PropertyMetadata(null, 'A dummy', true, true, null, null, false, false);
         $this->assertEquals($expectedResult, $resultedPropertyMetadata);

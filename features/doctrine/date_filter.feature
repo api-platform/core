@@ -31,6 +31,7 @@ Feature: Date filter on collections
               }
             }
           },
+          "minItems": 2,
           "maxItems": 2
         },
         "hydra:view": {
@@ -70,6 +71,7 @@ Feature: Date filter on collections
               }
             }
           },
+          "minItems": 3,
           "maxItems": 3
         },
         "hydra:view": {
@@ -108,6 +110,7 @@ Feature: Date filter on collections
               }
             }
           },
+          "minItems": 2,
           "maxItems": 2
         },
         "hydra:view": {
@@ -147,6 +150,7 @@ Feature: Date filter on collections
               }
             }
           },
+          "minItems": 3,
           "maxItems": 3
         },
         "hydra:view": {
@@ -186,6 +190,7 @@ Feature: Date filter on collections
               }
             }
           },
+          "minItems": 1,
           "maxItems": 1
         },
         "hydra:view": {
@@ -223,6 +228,7 @@ Feature: Date filter on collections
               }
             }
           },
+          "minItems": 1,
           "maxItems": 1
         },
         "hydra:view": {
@@ -292,6 +298,7 @@ Feature: Date filter on collections
               }
             }
           },
+          "minItems": 3,
           "maxItems": 3
         },
         "hydra:view": {
@@ -331,6 +338,7 @@ Feature: Date filter on collections
               }
             }
           },
+          "minItems": 3,
           "maxItems": 3
         },
         "hydra:view": {
@@ -370,6 +378,7 @@ Feature: Date filter on collections
               }
             }
           },
+          "minItems": 3,
           "maxItems": 3
         },
         "hydra:view": {

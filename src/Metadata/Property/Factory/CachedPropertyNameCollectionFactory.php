@@ -26,7 +26,7 @@ final class CachedPropertyNameCollectionFactory implements PropertyNameCollectio
 {
     use CachedTrait;
 
-    const CACHE_KEY_PREFIX = 'property_name_collection_';
+    public const CACHE_KEY_PREFIX = 'property_name_collection_';
 
     private $decorated;
 

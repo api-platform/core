@@ -27,8 +27,8 @@ final class ErrorNormalizer implements NormalizerInterface, CacheableSupportsMet
 {
     use ErrorNormalizerTrait;
 
-    const FORMAT = 'jsonapi';
-    const TITLE = 'title';
+    public const FORMAT = 'jsonapi';
+    public const TITLE = 'title';
 
     private $debug;
     private $defaultContext = [

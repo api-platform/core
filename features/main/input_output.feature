@@ -30,25 +30,22 @@ Feature: DTO input and output
 
   @createSchema
   Scenario: Get an item with a custom output
-    Given there is a DummyCustomDto
+    Given there is a DummyDtoCustom
     When I send a "GET" request to "/dummy_dto_custom_output/1"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
-    And the JSON should be a superset of:
+    And the JSON should be equal to:
     """
     {
       "@context": {
         "@vocab": "http://example.com/docs.jsonld#",
         "hydra": "http://www.w3.org/ns/hydra/core#",
-        "foo": {
-          "@type": "@id"
-        },
-        "bar": {
-          "@type": "@id"
-        }
+        "foo": "CustomOutputDto/foo",
+        "bar": "CustomOutputDto/bar"
       },
-      "@type": "CustomOutputDto",
+      "@type": "DummyDtoCustom",
+      "@id": "/dummy_dto_customs/1",
       "foo": "test",
       "bar": 1
     }
@@ -56,12 +53,12 @@ Feature: DTO input and output
 
   @createSchema
   Scenario: Get a collection with a custom output
-    Given there are 2 DummyCustomDto
+    Given there are 2 DummyDtoCustom
     When I send a "GET" request to "/dummy_dto_custom_output"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
-    And the JSON should be a superset of:
+    And the JSON should be equal to:
     """
     {
       "@context": "/contexts/DummyDtoCustom",
@@ -69,10 +66,12 @@ Feature: DTO input and output
       "@type": "hydra:Collection",
       "hydra:member": [
         {
+          "@id": "/dummy_dto_customs/1",
           "foo": "test",
           "bar": 1
         },
         {
+          "@id": "/dummy_dto_customs/2",
           "foo": "test",
           "bar": 2
         }
@@ -82,7 +81,7 @@ Feature: DTO input and output
     """
 
   @createSchema
-  Scenario: Create a DummyCustomDto object without output
+  Scenario: Create a DummyDtoCustom object without output
     When I add "Content-Type" header equal to "application/ld+json"
     And I send a "POST" request to "/dummy_dto_custom_post_without_output" with body:
     """
@@ -105,20 +104,19 @@ Feature: DTO input and output
     }
     """
     Then the response status code should be 201
-    And the JSON should be a superset of:
+    And the JSON should be equal to:
     """
     {
       "@context": {
         "@vocab": "http://example.com/docs.jsonld#",
         "hydra": "http://www.w3.org/ns/hydra/core#",
-        "baz": {
-          "@type": "@id"
-        },
-        "bat": {
-          "@type": "@id"
-        }
+        "id": "OutputDto/id",
+        "baz": "OutputDto/baz",
+        "bat": "OutputDto/bat"
       },
-      "@type": "OutputDto",
+      "@type": "DummyDtoInputOutput",
+      "@id": "/dummy_dto_input_outputs/1",
+      "id": 1,
       "baz": 1,
       "bat": "test"
     }
@@ -132,20 +130,19 @@ Feature: DTO input and output
     }
     """
     Then the response status code should be 200
-    And the JSON should be a superset of:
+    And the JSON should be equal to:
     """
     {
       "@context": {
-        "@vocab": "http:\/\/example.com\/docs.jsonld#",
-        "hydra": "http:\/\/www.w3.org\/ns\/hydra\/core#",
-        "baz": {
-          "@type": "@id"
-        },
-        "bat": {
-          "@type": "@id"
-        }
+        "@vocab": "http://example.com/docs.jsonld#",
+        "hydra": "http://www.w3.org/ns/hydra/core#",
+        "id": "OutputDto/id",
+        "baz": "OutputDto/baz",
+        "bat": "OutputDto/bat"
       },
-      "@type": "OutputDto",
+      "@type": "DummyDtoInputOutput",
+      "@id": "/dummy_dto_input_outputs/1",
+      "id": 1,
       "baz": 2,
       "bat": "test"
     }
@@ -172,28 +169,91 @@ Feature: DTO input and output
     }
     """
     Then the response status code should be 200
-    And the JSON should be a superset of:
+    And the JSON should be equal to:
     """
     {
       "@context": {
         "@vocab": "http://example.com/docs.jsonld#",
         "hydra": "http://www.w3.org/ns/hydra/core#",
-        "dummy": {
-            "@type": "@id"
-        }
+        "dummy": "RecoverPasswordOutput/dummy"
       },
-      "@type": "RecoverPasswordOutput",
+      "@type": "User",
+      "@id": "/users/1",
       "dummy": "/dummies/1"
     }
     """
 
-  @!mongodb
   @createSchema
-  Scenario: Create a resource that has a non-resource DTO relation.
+  Scenario: Retrieve an Output with GraphQl
     When I add "Content-Type" header equal to "application/ld+json"
-    And I send a "POST" request to "/non_relation_resources" with body:
+    And I send a "POST" request to "/dummy_dto_input_outputs" with body:
     """
-    {"relation": {"foo": "test"}}
+    {
+      "foo": "test",
+      "bar": 1
+    }
+    """
+    Then the response status code should be 201
+    And the JSON should be equal to:
+    """
+    {
+      "@context": {
+        "@vocab": "http://example.com/docs.jsonld#",
+        "hydra": "http://www.w3.org/ns/hydra/core#",
+        "id": "OutputDto/id",
+        "baz": "OutputDto/baz",
+        "bat": "OutputDto/bat"
+      },
+      "@type": "DummyDtoInputOutput",
+      "@id": "/dummy_dto_input_outputs/1",
+      "id": 1,
+      "baz": 1,
+      "bat": "test"
+    }
+    """
+    When I send the following GraphQL request:
+    """
+    {
+      dummyDtoInputOutput(id: "/dummy_dto_input_outputs/1") {
+        _id, id, baz
+      }
+    }
+    """
+    Then the response status code should be 200
+    And the JSON should be equal to:
+    """
+    {
+      "data": {
+        "dummyDtoInputOutput": {
+          "_id": 1,
+          "id": "/dummy_dto_input_outputs/1",
+          "baz": 1
+        }
+      }
+    }
+    """
+
+  @createSchema
+  Scenario: Create a resource with no input
+    When I add "Content-Type" header equal to "application/ld+json"
+    And I send a "POST" request to "/dummy_dto_no_inputs" with body:
+    """
+    {
+      "foo": "test",
+      "bar": 1
+    }
+    """
+    Then the response status code should be 201
+    And the response should be empty
+
+  @!mongodb
+  Scenario: Use messenger with an input where the handler gives a synchronous result
+    When I add "Content-Type" header equal to "application/ld+json"
+    And I send a "POST" request to "/messenger_with_inputs" with body:
+    """
+    {
+      "var": "test"
+    }
     """
     Then the response status code should be 201
     And the response should be in JSON
@@ -201,12 +261,29 @@ Feature: DTO input and output
     And the JSON should be equal to:
     """
     {
-      "@context": "/contexts/NonRelationResource",
-      "@id": "/non_relation_resources/1",
-      "@type": "NonRelationResource",
-      "relation": {
-        "foo": "test"
-      },
-      "id": 1
+      "@context": "/contexts/MessengerWithInput",
+      "@id": "/messenger_with_inputs/1",
+      "@type": "MessengerWithInput",
+      "id": 1,
+      "name": "test"
+    }
+    """
+
+  @!mongodb
+  Scenario: Use messenger with an input where the handler gives a synchronous Response result
+    When I add "Content-Type" header equal to "application/ld+json"
+    And I send a "POST" request to "/messenger_with_responses" with body:
+    """
+    {
+      "var": "test"
+    }
+    """
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/json"
+    And the JSON should be equal to:
+    """
+    {
+      "data": 123
     }
     """

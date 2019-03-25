@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Bridge\Doctrine\Orm\Extension;
 
+use ApiPlatform\Core\Api\ResourceClassResolver;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\EagerLoadingTrait;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryBuilderHelper;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGeneratorInterface;
@@ -29,10 +30,13 @@ final class FilterEagerLoadingExtension implements ContextAwareQueryCollectionEx
 {
     use EagerLoadingTrait;
 
-    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, bool $forceEager = true)
+    private $resourceClassResolver;
+
+    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, bool $forceEager = true, ResourceClassResolver $resourceClassResolver = null)
     {
         $this->resourceMetadataFactory = $resourceMetadataFactory;
         $this->forceEager = $forceEager;
+        $this->resourceClassResolver = $resourceClassResolver;
     }
 
     /**
@@ -103,10 +107,8 @@ final class FilterEagerLoadingExtension implements ContextAwareQueryCollectionEx
      *
      * @param string $originAlias the base alias
      * @param string $replacement the replacement for the base alias, will change the from alias
-     *
-     * @return QueryBuilder
      */
-    private function getQueryBuilderWithNewAliases(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $originAlias = 'o', string $replacement = 'o_2')
+    private function getQueryBuilderWithNewAliases(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $originAlias = 'o', string $replacement = 'o_2'): QueryBuilder
     {
         $queryBuilderClone = clone $queryBuilder;
 
@@ -134,6 +136,15 @@ final class FilterEagerLoadingExtension implements ContextAwareQueryCollectionEx
             $joinString = str_replace($aliases, $replacements, $joinPart->getJoin());
             $pos = strpos($joinString, '.');
             if (false === $pos) {
+                if (null !== $joinPart->getCondition() && null !== $this->resourceClassResolver && $this->resourceClassResolver->isResourceClass($joinString)) {
+                    $newAlias = $queryNameGenerator->generateJoinAlias($joinPart->getAlias());
+                    $aliases[] = "{$joinPart->getAlias()}.";
+                    $replacements[] = "$newAlias.";
+                    $condition = str_replace($aliases, $replacements, $joinPart->getCondition());
+                    $join = new Join($joinPart->getJoinType(), $joinPart->getJoin(), $newAlias, $joinPart->getConditionType(), $condition);
+                    $queryBuilderClone->add('join', [$replacement => $join], true);
+                }
+
                 continue;
             }
             $alias = substr($joinString, 0, $pos);

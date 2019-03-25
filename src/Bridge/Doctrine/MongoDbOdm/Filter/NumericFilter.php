@@ -38,7 +38,7 @@ final class NumericFilter extends AbstractFilter
     /**
      * Type of numeric in Doctrine.
      */
-    const DOCTRINE_NUMERIC_TYPES = [
+    public const DOCTRINE_NUMERIC_TYPES = [
         MongoDbType::INT => true,
         MongoDbType::INTEGER => true,
         MongoDbType::FLOAT => true,
@@ -62,14 +62,14 @@ final class NumericFilter extends AbstractFilter
             return;
         }
 
-        $matchField = $field = $property;
+        $matchField = $property;
 
         if ($this->isPropertyNested($property, $resourceClass)) {
             [$matchField] = $this->addLookupsForNestedProperty($property, $aggregationBuilder, $resourceClass);
         }
 
         if (1 === \count($values)) {
-            $aggregationBuilder->match()->field($matchField)->equals($values[0])->type((string) $this->getDoctrineFieldType($field, $resourceClass));
+            $aggregationBuilder->match()->field($matchField)->equals($values[0]);
         } else {
             $aggregationBuilder->match()->field($matchField)->in($values);
         }

@@ -23,7 +23,8 @@ final class CachedSubresourceOperationFactory implements SubresourceOperationFac
 {
     use CachedTrait;
 
-    const CACHE_KEY_PREFIX = 'subresource_operations_';
+    public const CACHE_KEY_PREFIX = 'subresource_operations_';
+
     private $decorated;
 
     public function __construct(CacheItemPoolInterface $cacheItemPool, SubresourceOperationFactoryInterface $decorated)

@@ -67,7 +67,7 @@ final class PublishMercureUpdatesListener
     /**
      * Collects created, updated and deleted entities.
      */
-    public function onFlush(OnFlushEventArgs $eventArgs)
+    public function onFlush(OnFlushEventArgs $eventArgs): void
     {
         $uow = $eventArgs->getEntityManager()->getUnitOfWork();
 
@@ -87,7 +87,7 @@ final class PublishMercureUpdatesListener
     /**
      * Publishes updates for changes collected on flush, and resets the store.
      */
-    public function postFlush()
+    public function postFlush(): void
     {
         try {
             foreach ($this->createdEntities as $entity) {
