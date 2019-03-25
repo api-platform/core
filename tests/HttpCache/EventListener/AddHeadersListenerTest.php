@@ -44,6 +44,22 @@ class AddHeadersListenerTest extends TestCase
         $this->assertNull($response->getEtag());
     }
 
+    public function testDoNotSetHeaderOnUnsuccessfulResponse()
+    {
+        $request = new Request([], [], ['_api_resource_class' => Dummy::class, '_api_item_operation_name' => 'get']);
+
+        $response = new Response('{}', Response::HTTP_BAD_REQUEST);
+
+        $event = $this->prophesize(FilterResponseEvent::class);
+        $event->getRequest()->willReturn($request)->shouldBeCalled();
+        $event->getResponse()->willReturn($response)->shouldBeCalled();
+
+        $listener = new AddHeadersListener(true);
+        $listener->onKernelResponse($event->reveal());
+
+        $this->assertNull($response->getEtag());
+    }
+
     public function testDoNotSetHeaderWhenNotAnApiOperation()
     {
         $request = new Request();
