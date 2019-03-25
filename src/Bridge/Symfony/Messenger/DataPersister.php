@@ -63,6 +63,10 @@ final class DataPersister implements ContextAwareDataPersisterInterface
             );
         }
 
+        if (isset($context['graphql_operation_name'])) {
+            return false !== $resourceMetadata->getGraphqlAttribute($context['graphql_operation_name'], 'messenger', false, true);
+        }
+
         return false !== $resourceMetadata->getAttribute('messenger', false);
     }
 

@@ -24,15 +24,29 @@ class InputOutputResourceMetadataFactoryTest extends TestCase
     /**
      * @dataProvider getAttributes
      */
-    public function testExistingDescription($attributes, $expected)
+    public function testInputOutputMetadata($attributes, $expected)
     {
-        $resourceMetadata = (new ResourceMetadata(null, 'My desc'))->withAttributes($attributes);
+        $resourceMetadata = (new ResourceMetadata(null))->withAttributes($attributes);
         $decoratedProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $decoratedProphecy->create('Foo')->willReturn($resourceMetadata)->shouldBeCalled();
         $decorated = $decoratedProphecy->reveal();
 
         $factory = new InputOutputResourceMetadataFactory($decorated);
         $this->assertSame($expected, $factory->create('Foo')->getAttributes()['input']);
+    }
+
+    /**
+     * @dataProvider getAttributes
+     */
+    public function testInputOutputViaGraphQlMetadata($attributes, $expected)
+    {
+        $resourceMetadata = (new ResourceMetadata(null))->withGraphQl(['create' => $attributes]);
+        $decoratedProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
+        $decoratedProphecy->create('Foo')->willReturn($resourceMetadata)->shouldBeCalled();
+        $decorated = $decoratedProphecy->reveal();
+
+        $factory = new InputOutputResourceMetadataFactory($decorated);
+        $this->assertSame($expected, $factory->create('Foo')->getGraphqlAttribute('create', 'input'));
     }
 
     public function getAttributes(): array
