@@ -30,7 +30,7 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
  * @author Alan Poulain <contact@alanpoulain.eu>
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-final class ItemResolver
+final class ItemResolver implements QueryResolverInterface
 {
     use ClassInfoTrait;
     use FieldsToAttributesTrait;

@@ -31,6 +31,7 @@ use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\Type as GraphQLType;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
+use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\PropertyInfo\Type;
 
 /**
@@ -261,6 +262,7 @@ class SchemaBuilderTest extends TestCase
         $collectionResolverFactoryProphecy = $this->prophesize(ResolverFactoryInterface::class);
         $itemMutationResolverFactoryProphecy = $this->prophesize(ResolverFactoryInterface::class);
         $typesFactoryProphecy = $this->prophesize(TypesFactoryInterface::class);
+        $queryResolverLocatorProphecy = $this->prophesize(ServiceLocator::class);
 
         $resourceClassNames = [];
         for ($i = 1; $i <= 3; ++$i) {
@@ -310,6 +312,7 @@ class SchemaBuilderTest extends TestCase
             },
             function () {
             },
+            $queryResolverLocatorProphecy->reveal(),
             $typesFactoryProphecy->reveal(),
             null,
             $paginationEnabled
