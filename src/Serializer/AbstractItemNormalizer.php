@@ -175,7 +175,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer implement
 
         if (null !== $inputClass && null !== $dataTransformer = $this->getDataTransformer($data, $context['resource_class'], $context)) {
             $data = $dataTransformer->transform(
-                parent::denormalize($data, $inputClass, $format, ['input' => ['class' => null]] + $context), // ensure we don't transformData for nested relations
+                parent::denormalize($data, $inputClass, $format, ['input' => null] + $context), // ensure we don't transformData for nested relations
                 $class,
                 $context
             );
