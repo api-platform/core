@@ -136,7 +136,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $this->registerJsonLdConfiguration($container, $formats, $loader, $config['enable_docs']);
         $this->registerJsonHalConfiguration($formats, $loader);
         $this->registerJsonProblemConfiguration($errorFormats, $loader);
-        $this->registerGraphqlConfiguration($container, $config, $loader);
+        $this->registerGraphQlConfiguration($container, $config, $loader);
         $this->registerBundlesConfiguration($bundles, $config, $loader);
         $this->registerCacheConfiguration($container);
         $this->registerDoctrineConfiguration($container, $config, $loader, $useDoctrine);
@@ -401,13 +401,16 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
     /**
      * Registers the GraphQL configuration.
      */
-    private function registerGraphqlConfiguration(ContainerBuilder $container, array $config, XmlFileLoader $loader)
+    private function registerGraphQlConfiguration(ContainerBuilder $container, array $config, XmlFileLoader $loader)
     {
-        if (!$config['graphql']) {
+        $enabled = $config['graphql']['enabled'];
+
+        $container->setParameter('api_platform.graphql.enabled', $enabled);
+
+        if (!$enabled) {
             return;
         }
 
-        $container->setParameter('api_platform.graphql.enabled', $config['graphql']['enabled']);
         $container->setParameter('api_platform.graphql.graphiql.enabled', $config['graphql']['graphiql']['enabled']);
 
         $loader->load('graphql.xml');
