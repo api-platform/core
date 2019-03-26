@@ -76,6 +76,7 @@ use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\Exception\Doubler\MethodNotFoundException;
 use Symfony\Bundle\SecurityBundle\SecurityBundle;
+use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Resource\DirectoryResource;
 use Symfony\Component\Config\Resource\ResourceInterface;
@@ -133,7 +134,7 @@ class ApiPlatformExtensionTest extends TestCase
         $this->childDefinitionProphecy = $this->prophesize(ChildDefinition::class);
     }
 
-    public function tearDown()
+    protected function tearDown()
     {
         unset($this->extension);
     }
@@ -603,6 +604,58 @@ class ApiPlatformExtensionTest extends TestCase
         $this->extension->load($config, $containerBuilderProphecy->reveal());
     }
 
+    /**
+     * @group legacy
+     * @expectedDeprecation The "api_platform.metadata_cache" parameter is deprecated since version 2.4 and will have no effect in 3.0.
+     */
+    public function testDisableMetadataCache()
+    {
+        $containerBuilderProphecy = $this->getBaseContainerBuilderProphecy();
+        $containerBuilderProphecy->hasParameter('api_platform.metadata_cache')->willReturn(true);
+        $containerBuilderProphecy->getParameter('api_platform.metadata_cache')->willReturn(false);
+        $containerBuilderProphecy->removeDefinition('api_platform.cache_warmer.cache_pool_clearer')->shouldBeCalled();
+        $containerBuilderProphecy->register('api_platform.cache.metadata.property', ArrayAdapter::class)->shouldBeCalled();
+        $containerBuilderProphecy->register('api_platform.cache.metadata.resource', ArrayAdapter::class)->shouldBeCalled();
+        $containerBuilderProphecy->register('api_platform.cache.route_name_resolver', ArrayAdapter::class)->shouldBeCalled();
+        $containerBuilderProphecy->register('api_platform.cache.identifiers_extractor', ArrayAdapter::class)->shouldBeCalled();
+        $containerBuilderProphecy->register('api_platform.cache.subresource_operation_factory', ArrayAdapter::class)->shouldBeCalled();
+        $containerBuilderProphecy->register('api_platform.elasticsearch.cache.metadata.document', ArrayAdapter::class)->shouldBeCalled();
+
+        $containerBuilder = $containerBuilderProphecy->reveal();
+
+        $this->extension->load(self::DEFAULT_CONFIG, $containerBuilder);
+    }
+
+    public function testRemoveCachePoolClearerCacheWarmerWithoutDebug()
+    {
+        $containerBuilderProphecy = $this->getBaseContainerBuilderProphecy();
+        $containerBuilderProphecy->hasParameter('kernel.debug')->willReturn(true);
+        $containerBuilderProphecy->getParameter('kernel.debug')->willReturn(false);
+        $containerBuilderProphecy->removeDefinition('api_platform.cache_warmer.cache_pool_clearer')->shouldBeCalled();
+
+        $containerBuilder = $containerBuilderProphecy->reveal();
+
+        $this->extension->load(self::DEFAULT_CONFIG, $containerBuilder);
+    }
+
+    public function testKeepCachePoolClearerCacheWarmerWithDebug()
+    {
+        $containerBuilderProphecy = $this->getBaseContainerBuilderProphecy();
+        $containerBuilderProphecy->hasParameter('kernel.debug')->willReturn(true);
+        $containerBuilderProphecy->getParameter('kernel.debug')->willReturn(true);
+        $containerBuilderProphecy->removeDefinition('api_platform.cache_warmer.cache_pool_clearer')->shouldNotBeCalled();
+
+        // irrelevant, but to prevent errors
+        $containerBuilderProphecy->setDefinition('debug.api_platform.collection_data_provider', Argument::type(Definition::class))->will(function () {});
+        $containerBuilderProphecy->setDefinition('debug.api_platform.item_data_provider', Argument::type(Definition::class))->will(function () {});
+        $containerBuilderProphecy->setDefinition('debug.api_platform.subresource_data_provider', Argument::type(Definition::class))->will(function () {});
+        $containerBuilderProphecy->setDefinition('debug.api_platform.data_persister', Argument::type(Definition::class))->will(function () {});
+
+        $containerBuilder = $containerBuilderProphecy->reveal();
+
+        $this->extension->load(self::DEFAULT_CONFIG, $containerBuilder);
+    }
+
     private function getPartialContainerBuilderProphecy()
     {
         $containerBuilderProphecy = $this->prophesize(ContainerBuilder::class);
@@ -708,31 +761,29 @@ class ApiPlatformExtensionTest extends TestCase
         $containerBuilderProphecy->hasExtension('http://symfony.com/schema/dic/services')->shouldBeCalled();
 
         $definitions = [
-            'api_platform.data_persister',
             'api_platform.action.documentation',
-            'api_platform.action.placeholder',
             'api_platform.action.entrypoint',
             'api_platform.action.exception',
             'api_platform.action.placeholder',
-            'api_platform.cache.metadata.property',
             'api_platform.cache.identifiers_extractor',
+            'api_platform.cache.metadata.property',
             'api_platform.cache.metadata.resource',
             'api_platform.cache.route_name_resolver',
             'api_platform.cache.subresource_operation_factory',
+            'api_platform.cache_warmer.cache_pool_clearer',
             'api_platform.collection_data_provider',
-            'api_platform.formats_provider',
-            'api_platform.filter_locator',
+            'api_platform.data_persister',
             'api_platform.filter_collection_factory',
+            'api_platform.filter_locator',
             'api_platform.filters',
+            'api_platform.formats_provider',
             'api_platform.identifiers_extractor',
             'api_platform.identifiers_extractor.cached',
             'api_platform.iri_converter',
             'api_platform.identifier.converter',
-            'api_platform.identifier.integer',
             'api_platform.identifier.date_normalizer',
+            'api_platform.identifier.integer',
             'api_platform.identifier.uuid_normalizer',
-            'api_platform.identifiers_extractor',
-            'api_platform.identifiers_extractor.cached',
             'api_platform.item_data_provider',
             'api_platform.listener.exception',
             'api_platform.listener.exception.validation',
@@ -779,14 +830,14 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.router',
             'api_platform.serializer.context_builder',
             'api_platform.serializer.context_builder.filter',
-            'api_platform.serializer.property_filter',
             'api_platform.serializer.group_filter',
             'api_platform.serializer.normalizer.item',
             'api_platform.serializer.normalizer.item.non_resource',
+            'api_platform.serializer.property_filter',
+            'api_platform.serializer_locator',
             'api_platform.subresource_data_provider',
             'api_platform.subresource_operation_factory',
             'api_platform.subresource_operation_factory.cached',
-            'api_platform.serializer_locator',
             'api_platform.validator',
         ];
 
@@ -1036,6 +1087,9 @@ class ApiPlatformExtensionTest extends TestCase
         }
 
         $containerBuilderProphecy->hasParameter('api_platform.metadata_cache')->willReturn(false);
+
+        // irrelevant, but to prevent errors
+        $containerBuilderProphecy->removeDefinition('api_platform.cache_warmer.cache_pool_clearer')->will(function () {});
 
         $containerBuilderProphecy->getDefinition('api_platform.mercure.listener.response.add_link_header')->willReturn(new Definition());
 

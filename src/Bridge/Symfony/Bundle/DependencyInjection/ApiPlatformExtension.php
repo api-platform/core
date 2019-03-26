@@ -436,6 +436,10 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
      */
     private function registerCacheConfiguration(ContainerBuilder $container)
     {
+        if (!$container->hasParameter('kernel.debug') || !$container->getParameter('kernel.debug')) {
+            $container->removeDefinition('api_platform.cache_warmer.cache_pool_clearer');
+        }
+
         if (!$container->hasParameter('api_platform.metadata_cache')) {
             return;
         }
@@ -444,6 +448,8 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
 
         // BC
         if (!$container->getParameter('api_platform.metadata_cache')) {
+            $container->removeDefinition('api_platform.cache_warmer.cache_pool_clearer');
+
             $container->register('api_platform.cache.metadata.property', ArrayAdapter::class);
             $container->register('api_platform.cache.metadata.resource', ArrayAdapter::class);
             $container->register('api_platform.cache.route_name_resolver', ArrayAdapter::class);
