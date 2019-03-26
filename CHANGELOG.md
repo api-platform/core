@@ -2,11 +2,11 @@
 
 ## 2.4.1
 
-* Removes the `metadata_cache` parameter and add a cache warmer to clear cache pools in dev
-* Fix an autowiring BC break in the SearchFilter constructor
-* GraphQl: parse input and messenger metadata on the GraphQl operation
-* Skip the cache for unsuccessful request
-* GraphQl: do not enable graphql when `webonyx/graphql-php` is not installed
+* Imrpove performance of the dev environment and deprecate the `api_platform.metadata_cache` parameter
+* Fix a BC break in `SearchFilter`
+* Don't send HTTP cache headers for unsuccessful responses
+* GraphQL: parse input and messenger metadata on the GraphQl operation
+* GraphQL: do not enable graphql when `webonyx/graphql-php` is not installed
 
 ## 2.4.0
 
