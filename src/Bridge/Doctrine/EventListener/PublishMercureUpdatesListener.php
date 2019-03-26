@@ -153,7 +153,7 @@ final class PublishMercureUpdatesListener
             return;
         }
 
-        $this->$property[$entity] = $value;
+        $this->{$property}[$entity] = $value;
     }
 
     /**

@@ -72,11 +72,11 @@ final class XmlExtractor extends AbstractExtractor
         }
 
         $operationsParent = $graphql ? 'graphql' : "{$operationType}s";
-        if (!isset($resource->$operationsParent)) {
+        if (!isset($resource->{$operationsParent})) {
             return null;
         }
 
-        return $this->getAttributes($resource->$operationsParent, $operationType, true);
+        return $this->getAttributes($resource->{$operationsParent}, $operationType, true);
     }
 
     /**
@@ -85,7 +85,7 @@ final class XmlExtractor extends AbstractExtractor
     private function getAttributes(\SimpleXMLElement $resource, string $elementName, bool $topLevel = false): array
     {
         $attributes = [];
-        foreach ($resource->$elementName as $attribute) {
+        foreach ($resource->{$elementName} as $attribute) {
             $value = isset($attribute->attribute[0]) ? $this->getAttributes($attribute, 'attribute') : XmlUtils::phpize($attribute);
             // allow empty operations definition, like <collectionOperation name="post" />
             if ($topLevel && '' === $value) {

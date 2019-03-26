@@ -65,7 +65,7 @@ abstract class FileConfigurationMetadataFactoryProvider extends TestCase
 
         foreach (['shortName', 'description', 'itemOperations', 'collectionOperations', 'subresourceOperations', 'graphql', 'iri', 'attributes'] as $property) {
             $wither = 'with'.ucfirst($property);
-            $resourceMetadata = $resourceMetadata->$wither($metadata[$property]);
+            $resourceMetadata = $resourceMetadata->{$wither}($metadata[$property]);
         }
 
         return [[$resourceMetadata]];

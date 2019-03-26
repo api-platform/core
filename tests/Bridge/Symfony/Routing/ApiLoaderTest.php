@@ -292,9 +292,7 @@ class ApiLoaderTest extends TestCase
 
         $subresourceOperationFactory = new SubresourceOperationFactory($resourceMetadataFactory, $propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), new UnderscorePathSegmentNameGenerator());
 
-        $apiLoader = new ApiLoader($kernelProphecy->reveal(), $resourceNameCollectionFactoryProphecy->reveal(), $resourceMetadataFactory, $operationPathResolver, $containerProphecy->reveal(), ['jsonld' => ['application/ld+json']], [], $subresourceOperationFactory, false, true, true);
-
-        return $apiLoader;
+        return new ApiLoader($kernelProphecy->reveal(), $resourceNameCollectionFactoryProphecy->reveal(), $resourceMetadataFactory, $operationPathResolver, $containerProphecy->reveal(), ['jsonld' => ['application/ld+json']], [], $subresourceOperationFactory, false, true, true);
     }
 
     private function getRoute(string $path, string $controller, string $resourceClass, string $operationName, array $methods, bool $collection = false, array $requirements = [], array $extraDefaults = [], array $options = [], string $host = '', array $schemes = [], string $condition = ''): Route
