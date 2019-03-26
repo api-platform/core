@@ -1,5 +1,13 @@
 # Changelog
 
+## 2.4.1
+
+* Improve performance of the dev environment and deprecate the `api_platform.metadata_cache` parameter
+* Fix a BC break in `SearchFilter`
+* Don't send HTTP cache headers for unsuccessful responses
+* GraphQL: parse input and messenger metadata on the GraphQl operation
+* GraphQL: do not enable graphql when `webonyx/graphql-php` is not installed
+
 ## 2.4.0
 
 * Listeners are now opt-in when not handling API Platform operations
