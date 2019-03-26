@@ -85,4 +85,13 @@ class DataPersisterTest extends TestCase
         $dataPersister = new DataPersister($this->prophesize(ResourceMetadataFactoryInterface::class)->reveal(), $messageBus->reveal());
         $this->assertSame($dummy, $dataPersister->persist($dummy));
     }
+
+    public function testSupportWithGraphqlContext()
+    {
+        $metadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
+        $metadataFactoryProphecy->create(Dummy::class)->willReturn((new ResourceMetadata(null, null, null, null, null, []))->withGraphQl(['create' => ['messenger' => 'input']]));
+
+        $dataPersister = new DataPersister($metadataFactoryProphecy->reveal(), $this->prophesize(MessageBusInterface::class)->reveal());
+        $this->assertTrue($dataPersister->supports(new DummyCar(), ['resource_class' => Dummy::class, 'graphql_operation_name' => 'create']));
+    }
 }

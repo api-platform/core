@@ -48,6 +48,10 @@ final class InputOutputResourceMetadataFactory implements ResourceMetadataFactor
             $resourceMetadata = $resourceMetadata->withItemOperations($this->getTransformedOperations($itemOperations, $attributes));
         }
 
+        if (null !== $graphQlAttributes = $resourceMetadata->getGraphql()) {
+            $resourceMetadata = $resourceMetadata->withGraphql($this->getTransformedOperations($graphQlAttributes, $attributes));
+        }
+
         return $resourceMetadata->withAttributes($attributes);
     }
 

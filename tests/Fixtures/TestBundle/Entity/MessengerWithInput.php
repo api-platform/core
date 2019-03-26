@@ -18,7 +18,7 @@ use ApiPlatform\Core\Annotation\ApiResource;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Dto\MessengerInput;
 
 /**
- * @ApiResource(messenger="input", input=MessengerInput::class)
+ * @ApiResource(messenger="input", input=MessengerInput::class, graphql={"create"={"input"=MessengerInput::class, "messenger"="input"}})
  */
 class MessengerWithInput
 {

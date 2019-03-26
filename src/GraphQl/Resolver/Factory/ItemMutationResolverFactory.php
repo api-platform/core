@@ -94,19 +94,27 @@ final class ItemMutationResolverFactory implements ResolverFactoryInterface
 
             $this->canAccess($this->resourceAccessChecker, $resourceMetadata, $resourceClass, $info, $item, $operationName);
 
-            $inputMetadata = $resourceMetadata->getAttribute('input', ['class' => $resourceClass]);
-            if (null === $resourceClass = $inputMetadata['class'] ?? null) {
-                return $data;
+            $inputMetadata = $resourceMetadata->getGraphqlAttribute($operationName, 'input', null, true);
+            $inputClass = null;
+            if (\is_array($inputMetadata) && \array_key_exists('class', $inputMetadata)) {
+                if (null === $inputMetadata['class']) {
+                    return $data;
+                }
+
+                $inputClass = $inputMetadata['class'];
             }
 
             switch ($operationName) {
                 case 'create':
                 case 'update':
-                    $context = null === $item ? ['resource_class' => $resourceClass] : ['resource_class' => $resourceClass, 'object_to_populate' => $item];
+                    $context = ['resource_class' => $resourceClass, 'graphql_operation_name' => $operationName];
+                    if (null !== $item) {
+                        $context['object_to_populate'] = $item;
+                    }
                     $context += $resourceMetadata->getGraphqlAttribute($operationName, 'denormalization_context', [], true);
-                    $item = $this->normalizer->denormalize($args['input'], $resourceClass, ItemNormalizer::FORMAT, $context);
+                    $item = $this->normalizer->denormalize($args['input'], $inputClass ?: $resourceClass, ItemNormalizer::FORMAT, $context);
                     $this->validate($item, $info, $resourceMetadata, $operationName);
-                    $persistResult = $this->dataPersister->persist($item);
+                    $persistResult = $this->dataPersister->persist($item, $context);
 
                     if (null === $persistResult) {
                         @trigger_error(sprintf('Returning void from %s::persist() is deprecated since API Platform 2.3 and will not be supported in API Platform 3, an object should always be returned.', DataPersisterInterface::class), E_USER_DEPRECATED);
