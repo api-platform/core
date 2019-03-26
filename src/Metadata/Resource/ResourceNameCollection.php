@@ -32,8 +32,10 @@ final class ResourceNameCollection implements \IteratorAggregate, \Countable
 
     /**
      * {@inheritdoc}
+     *
+     * @return \Traversable<string>
      */
-    public function getIterator()
+    public function getIterator(): \Traversable
     {
         return new \ArrayIterator($this->classes);
     }
@@ -41,7 +43,7 @@ final class ResourceNameCollection implements \IteratorAggregate, \Countable
     /**
      * {@inheritdoc}
      */
-    public function count()
+    public function count(): int
     {
         return \count($this->classes);
     }
