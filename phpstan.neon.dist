@@ -32,9 +32,6 @@ parameters:
 		-
 			message: '#Cannot assign offset .+ to bool\.#'
 			path: %currentWorkingDirectory%/src/GraphQl/Resolver/FieldsToAttributesTrait.php
-		-
-			message: '#Access to an undefined property GraphQL\\Language\\AST\\ValueNode::\$value\.#'
-			path: %currentWorkingDirectory%/src/GraphQl/Type/Definition/IterableType.php
 		- '#Access to an undefined property Prophecy\\Prophecy\\ObjectProphecy<(\\?[a-zA-Z0-9_]+)+>::\$[a-zA-Z0-9_]+#'
 		- '#Call to an undefined method Doctrine\\Common\\Persistence\\ObjectManager::getConnection\(\)#'
 		- '#Parameter \#1 \$function of function call_user_func expects callable\(\): mixed, .+ given\.#'
@@ -57,6 +54,15 @@ parameters:
 			message: '#Parameter \#1 \$collection of method ApiPlatform\\Core\\Tests\\GraphQl\\Resolver\\Factory\\CollectionResolverFactoryTest::createCollectionResolverFactory\(\) expects array\|Iterator, object given\.#'
 			path: %currentWorkingDirectory%/tests/GraphQl/Resolver/Factory/CollectionResolverFactoryTest.php
 		-
+			message: '#Parameter \#1 \$resourceClass of method ApiPlatform\\Core\\Metadata\\Property\\Factory\\InheritedPropertyMetadataFactory::create\(\) expects string, object\|string given\.#'
+			path: %currentWorkingDirectory%/src/Metadata/Property/Factory/InheritedPropertyMetadataFactory.php
+		-
+			message: '#Parameter \#1 \$childInherited of method ApiPlatform\\Core\\Metadata\\Property\\PropertyMetadata::withChildInherited\(\) expects string, object\|string given\.#'
+			path: %currentWorkingDirectory%/src/Metadata/Property/Factory/InheritedPropertyMetadataFactory.php
+		-
+			message: '#Parameter \#1 \$resourceClass of method ApiPlatform\\Core\\Metadata\\Property\\Factory\\InheritedPropertyNameCollectionFactory::create\(\) expects string, object\|string given\.#'
+			path: %currentWorkingDirectory%/src/Metadata/Property/Factory/InheritedPropertyNameCollectionFactory.php
+		-
 			message: '#Property ApiPlatform\\Core\\Test\\DoctrineMongoDbOdmFilterTestCase::\$repository \(Doctrine\\ODM\\MongoDB\\Repository\\DocumentRepository\) does not accept Doctrine\\ORM\\EntityRepository<ApiPlatform\\Core\\Tests\\Fixtures\\TestBundle\\Document\\Dummy>\.#'
 			path: %currentWorkingDirectory%/src/Test/DoctrineMongoDbOdmFilterTestCase.php
 		- '#Method ApiPlatform\\Core\\(Serializer\\Abstract|JsonApi\\Serializer\\)ItemNormalizer::normalizeRelation\(\) should return array\|string but returns array\|bool\|float\|int\|string\.#'
@@ -73,6 +79,7 @@ parameters:
 			path: %currentWorkingDirectory%/src/Bridge/Doctrine/Common/Filter/RangeFilterTrait.php
 
 		# Expected, due to deprecations
+		- '#Method ApiPlatform\\Core\\Bridge\\Doctrine\\Orm\\Filter\\ExistsFilter::filterProperty\(\) invoked with 7 parameters, 5-6 required\.#'
 		- '#Method ApiPlatform\\Core\\Bridge\\Doctrine\\Orm\\Extension\\QueryResult(Item|Collection)ExtensionInterface::getResult\(\) invoked with 4 parameters, 1 required\.#'
 		- '#Method ApiPlatform\\Core\\Bridge\\Doctrine\\Orm\\Extension\\QueryResult(Item|Collection)ExtensionInterface::supportsResult\(\) invoked with 3 parameters, 1-2 required\.#'
 		- '#Method ApiPlatform\\Core\\Bridge\\Doctrine\\Orm\\Filter\\AbstractFilter::apply\(\) invoked with 5 parameters, 3-4 required\.#'

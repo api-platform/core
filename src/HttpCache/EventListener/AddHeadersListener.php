@@ -52,7 +52,7 @@ final class AddHeadersListener
 
         $response = $event->getResponse();
 
-        if (!$response->getContent()) {
+        if (!$response->getContent() || !$response->isSuccessful()) {
             return;
         }
 

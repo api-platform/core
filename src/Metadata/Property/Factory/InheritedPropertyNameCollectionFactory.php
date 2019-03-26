@@ -23,12 +23,12 @@ use ApiPlatform\Core\Metadata\Resource\Factory\ResourceNameCollectionFactoryInte
  */
 final class InheritedPropertyNameCollectionFactory implements PropertyNameCollectionFactoryInterface
 {
-    private $resourceNameCollection;
+    private $resourceNameCollectionFactory;
     private $decorated;
 
-    public function __construct(ResourceNameCollectionFactoryInterface $resourceNameCollection, PropertyNameCollectionFactoryInterface $decorated = null)
+    public function __construct(ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, PropertyNameCollectionFactoryInterface $decorated = null)
     {
-        $this->resourceNameCollection = $resourceNameCollection;
+        $this->resourceNameCollectionFactory = $resourceNameCollectionFactory;
         $this->decorated = $decorated;
     }
 
@@ -46,7 +46,7 @@ final class InheritedPropertyNameCollectionFactory implements PropertyNameCollec
             }
         }
 
-        foreach ($this->resourceNameCollection->create() as $knownResourceClass) {
+        foreach ($this->resourceNameCollectionFactory->create() as $knownResourceClass) {
             if ($resourceClass === $knownResourceClass) {
                 continue;
             }
