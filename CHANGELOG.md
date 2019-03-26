@@ -2,7 +2,7 @@
 
 ## 2.4.1
 
-* Imrpove performance of the dev environment and deprecate the `api_platform.metadata_cache` parameter
+* Improve performance of the dev environment and deprecate the `api_platform.metadata_cache` parameter
 * Fix a BC break in `SearchFilter`
 * Don't send HTTP cache headers for unsuccessful responses
 * GraphQL: parse input and messenger metadata on the GraphQl operation
