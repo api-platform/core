@@ -159,6 +159,8 @@ final class ResourceMetadata
 
     /**
      * Gets a collection operation attribute, optionally fallback to a resource attribute.
+     *
+     * @param mixed|null $defaultValue
      */
     public function getCollectionOperationAttribute(?string $operationName, string $key, $defaultValue = null, bool $resourceFallback = false)
     {
@@ -167,6 +169,8 @@ final class ResourceMetadata
 
     /**
      * Gets an item operation attribute, optionally fallback to a resource attribute.
+     *
+     * @param mixed|null $defaultValue
      */
     public function getItemOperationAttribute(?string $operationName, string $key, $defaultValue = null, bool $resourceFallback = false)
     {
@@ -175,26 +179,12 @@ final class ResourceMetadata
 
     /**
      * Gets a subresource operation attribute, optionally fallback to a resource attribute.
+     *
+     * @param mixed|null $defaultValue
      */
     public function getSubresourceOperationAttribute(?string $operationName, string $key, $defaultValue = null, bool $resourceFallback = false)
     {
         return $this->findOperationAttribute($this->subresourceOperations, $operationName, $key, $defaultValue, $resourceFallback);
-    }
-
-    /**
-     * Gets an operation attribute, optionally fallback to a resource attribute.
-     */
-    private function findOperationAttribute(?array $operations, ?string $operationName, string $key, $defaultValue = null, bool $resourceFallback = false)
-    {
-        if (null !== $operationName && isset($operations[$operationName][$key])) {
-            return $operations[$operationName][$key];
-        }
-
-        if ($resourceFallback && isset($this->attributes[$key])) {
-            return $this->attributes[$key];
-        }
-
-        return $defaultValue;
     }
 
     public function getGraphqlAttribute(string $operationName, string $key, $defaultValue = null, bool $resourceFallback = false)
@@ -212,6 +202,8 @@ final class ResourceMetadata
 
     /**
      * Gets the first available operation attribute according to the following order: collection, item, subresource, optionally fallback to a default value.
+     *
+     * @param mixed|null $defaultValue
      */
     public function getOperationAttribute(array $attributes, string $key, $defaultValue = null, bool $resourceFallback = false)
     {
@@ -236,6 +228,8 @@ final class ResourceMetadata
 
     /**
      * Gets an attribute for a given operation type and operation name.
+     *
+     * @param mixed|null $defaultValue
      */
     public function getTypedOperationAttribute(string $operationType, string $operationName, string $key, $defaultValue = null, bool $resourceFallback = false)
     {
@@ -259,6 +253,8 @@ final class ResourceMetadata
 
     /**
      * Gets an attribute.
+     *
+     * @param mixed|null $defaultValue
      */
     public function getAttribute(string $key, $defaultValue = null)
     {
@@ -293,5 +289,23 @@ final class ResourceMetadata
         $metadata->graphql = $graphql;
 
         return $metadata;
+    }
+
+    /**
+     * Gets an operation attribute, optionally fallback to a resource attribute.
+     *
+     * @param mixed|null $defaultValue
+     */
+    private function findOperationAttribute(?array $operations, ?string $operationName, string $key, $defaultValue, bool $resourceFallback)
+    {
+        if (null !== $operationName && isset($operations[$operationName][$key])) {
+            return $operations[$operationName][$key];
+        }
+
+        if ($resourceFallback && isset($this->attributes[$key])) {
+            return $this->attributes[$key];
+        }
+
+        return $defaultValue;
     }
 }

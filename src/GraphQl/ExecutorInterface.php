@@ -27,6 +27,9 @@ interface ExecutorInterface
 {
     /**
      * @see http://webonyx.github.io/graphql-php/executing-queries/#using-facade-method
+     *
+     * @param mixed|null $rootValue
+     * @param mixed|null $context
      */
     public function executeQuery(Schema $schema, $source, $rootValue = null, $context = null, array $variableValues = null, string $operationName = null, callable $fieldResolver = null, array $validationRules = null): ExecutionResult;
 }
