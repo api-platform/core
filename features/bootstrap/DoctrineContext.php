@@ -20,6 +20,7 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\Dummy as DummyDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\DummyAggregateOffer as DummyAggregateOfferDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\DummyCar as DummyCarDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\DummyCarColor as DummyCarColorDocument;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\DummyCustomQuery as DummyCustomQueryDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\DummyDate as DummyDateDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\DummyDtoCustom as DummyDtoCustomDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\DummyDtoNoInput as DummyDtoNoInputDocument;
@@ -60,6 +61,7 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyAggregateOffer;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyCar;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyCarColor;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyCustomQuery;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyDate;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyDtoCustom;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyDtoNoInput;
@@ -408,6 +410,20 @@ final class DoctrineContext implements Context
             $dummyDto->ipsum = $i / 3;
 
             $this->manager->persist($dummyDto);
+        }
+
+        $this->manager->flush();
+    }
+
+    /**
+     * @Given there are :nb dummyCustomQuery objects
+     */
+    public function thereAreDummyCustomQueryObjects(int $nb)
+    {
+        for ($i = 1; $i <= $nb; ++$i) {
+            $dummyCustomQuery = $this->buildDummyCustomQuery();
+
+            $this->manager->persist($dummyCustomQuery);
         }
 
         $this->manager->flush();
@@ -1329,6 +1345,14 @@ final class DoctrineContext implements Context
     private function buildDummyDtoNoOutput()
     {
         return $this->isOrm() ? new DummyDtoNoOutput() : new DummyDtoNoOutputDocument();
+    }
+
+    /**
+     * @return DummyCustomQuery|DummyCustomQueryDocument
+     */
+    private function buildDummyCustomQuery()
+    {
+        return $this->isOrm() ? new DummyCustomQuery() : new DummyCustomQueryDocument();
     }
 
     /**

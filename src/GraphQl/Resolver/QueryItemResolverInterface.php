@@ -13,20 +13,19 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\GraphQl\Resolver;
 
-use GraphQL\Type\Definition\ResolveInfo;
-
 /**
- * A function retrieving an item to resolve a GraphQL query.
- * Should return the normalized item or collection.
+ * A function resolving a GraphQL query of an item.
  *
  * @experimental
  *
  * @author Lukas Lücke <lukas@luecke.me>
  */
-interface QueryResolverInterface
+interface QueryItemResolverInterface
 {
     /**
-     * @return mixed|null The normalized query result (item or collection)
+     * @param object|null $item
+     *
+     * @return object
      */
-    public function __invoke($source, $args, $context, ResolveInfo $info);
+    public function __invoke($item, array $context);
 }
