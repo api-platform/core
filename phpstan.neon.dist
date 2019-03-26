@@ -79,6 +79,7 @@ parameters:
 			path: %currentWorkingDirectory%/src/Bridge/Doctrine/Common/Filter/RangeFilterTrait.php
 
 		# Expected, due to deprecations
+		- '#Method ApiPlatform\\Core\\Bridge\\Doctrine\\Orm\\Filter\\ExistsFilter::filterProperty\(\) invoked with 7 parameters, 5-6 required\.#'
 		- '#Method ApiPlatform\\Core\\Bridge\\Doctrine\\Orm\\Extension\\QueryResult(Item|Collection)ExtensionInterface::getResult\(\) invoked with 4 parameters, 1 required\.#'
 		- '#Method ApiPlatform\\Core\\Bridge\\Doctrine\\Orm\\Extension\\QueryResult(Item|Collection)ExtensionInterface::supportsResult\(\) invoked with 3 parameters, 1-2 required\.#'
 		- '#Method ApiPlatform\\Core\\Bridge\\Doctrine\\Orm\\Filter\\AbstractFilter::apply\(\) invoked with 5 parameters, 3-4 required\.#'
