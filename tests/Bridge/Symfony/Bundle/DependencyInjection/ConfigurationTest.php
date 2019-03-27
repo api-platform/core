@@ -42,7 +42,7 @@ class ConfigurationTest extends TestCase
      */
     private $processor;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->configuration = new Configuration();
         $this->processor = new Processor();

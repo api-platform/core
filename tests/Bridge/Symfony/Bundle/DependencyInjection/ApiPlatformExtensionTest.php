@@ -136,7 +136,7 @@ class ApiPlatformExtensionTest extends TestCase
 
     protected function tearDown()
     {
-        unset($this->extension);
+        $this->extension = null;
     }
 
     public function testConstruct()

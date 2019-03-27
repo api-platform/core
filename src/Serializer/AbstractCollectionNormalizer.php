@@ -96,6 +96,8 @@ abstract class AbstractCollectionNormalizer implements NormalizerInterface, Norm
 
     /**
      * Normalizes a raw collection (not API resources).
+     *
+     * @param string|null $format
      */
     protected function normalizeRawCollection($object, $format = null, array $context = []): array
     {

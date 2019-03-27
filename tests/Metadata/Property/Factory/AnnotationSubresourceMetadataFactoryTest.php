@@ -32,7 +32,7 @@ class AnnotationSubresourceMetadataFactoryTest extends TestCase
     /**
      * @dataProvider dependenciesProvider
      */
-    public function testCreateProperty($reader, $decorated = null)
+    public function testCreateProperty($reader, $decorated)
     {
         $factory = new AnnotationSubresourceMetadataFactory($reader->reveal(), $decorated->reveal());
         $metadata = $factory->create(Dummy::class, 'relatedDummies');

@@ -29,5 +29,5 @@ interface RouteNameResolverInterface
      *
      * @throws InvalidArgumentException
      */
-    public function getRouteName(string $resourceClass, $operationType /**, array $context = [] **/): string;
+    public function getRouteName(string $resourceClass, $operationType /*, array $context = [] */): string;
 }
