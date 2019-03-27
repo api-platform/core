@@ -89,12 +89,17 @@ final class ItemNormalizer implements NormalizerInterface, DenormalizerInterface
         $this->normalizer = $resourceClassNormalizer;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function setSerializer(SerializerInterface $serializer)
     {
         $this->objectNormalizer->setSerializer($serializer);
     }
 
-
+    /**
+     * {@inheritdoc}
+     */
     public function hasCacheableSupportsMethod(): bool
     {
         return $this->normalizer->hasCacheableSupportsMethod();
