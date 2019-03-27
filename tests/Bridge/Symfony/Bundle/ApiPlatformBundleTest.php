@@ -21,6 +21,7 @@ use ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\Compiler\FilterPa
 use ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\Compiler\MetadataAwareNameConverterPass;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
+use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 /**
@@ -32,7 +33,7 @@ class ApiPlatformBundleTest extends TestCase
     {
         $containerProphecy = $this->prophesize(ContainerBuilder::class);
         $containerProphecy->addCompilerPass(Argument::type(DataProviderPass::class))->shouldBeCalled();
-        $containerProphecy->addCompilerPass(Argument::type(AnnotationFilterPass::class))->shouldBeCalled();
+        $containerProphecy->addCompilerPass(Argument::type(AnnotationFilterPass::class), PassConfig::TYPE_BEFORE_OPTIMIZATION, 101)->shouldBeCalled();
         $containerProphecy->addCompilerPass(Argument::type(FilterPass::class))->shouldBeCalled();
         $containerProphecy->addCompilerPass(Argument::type(ElasticsearchClientPass::class))->shouldBeCalled();
         $containerProphecy->addCompilerPass(Argument::type(MetadataAwareNameConverterPass::class))->shouldBeCalled();
