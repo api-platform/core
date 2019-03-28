@@ -9,9 +9,18 @@
 
         <!-- Resolvers -->
 
+        <service id="api_platform.graphql.resolver.factory.item" class="ApiPlatform\Core\GraphQl\Resolver\Factory\ItemResolverFactory" public="false">
+            <argument type="service" id="api_platform.iri_converter" />
+            <argument type="service" id="api_platform.graphql.query_resolver_locator" />
+            <argument type="service" id="serializer" />
+            <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
+            <argument type="service" id="api_platform.security.resource_access_checker" on-invalid="ignore" />
+        </service>
+
         <service id="api_platform.graphql.resolver.factory.collection" class="ApiPlatform\Core\GraphQl\Resolver\Factory\CollectionResolverFactory" public="false">
             <argument type="service" id="api_platform.collection_data_provider" />
             <argument type="service" id="api_platform.subresource_data_provider" />
+            <argument type="service" id="api_platform.graphql.query_resolver_locator" />
             <argument type="service" id="serializer" />
             <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
             <argument type="service" id="api_platform.security.resource_access_checker" on-invalid="null" />
@@ -26,13 +35,6 @@
             <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
             <argument type="service" id="api_platform.security.resource_access_checker" on-invalid="null" />
             <argument type="service" id="api_platform.validator" on-invalid="null" />
-        </service>
-
-        <service id="api_platform.graphql.resolver.item" class="ApiPlatform\Core\GraphQl\Resolver\ItemResolver" public="false">
-            <argument type="service" id="api_platform.iri_converter" />
-            <argument type="service" id="serializer" />
-            <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
-            <argument type="service" id="api_platform.security.resource_access_checker" on-invalid="ignore" />
         </service>
 
         <service id="api_platform.graphql.resolver.resource_field" class="ApiPlatform\Core\GraphQl\Resolver\ResourceFieldResolver" public="false">
@@ -62,11 +64,10 @@
             <argument type="service" id="api_platform.metadata.property.metadata_factory" />
             <argument type="service" id="api_platform.metadata.resource.name_collection_factory" />
             <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
+            <argument type="service" id="api_platform.graphql.resolver.factory.item" />
             <argument type="service" id="api_platform.graphql.resolver.factory.collection" />
             <argument type="service" id="api_platform.graphql.resolver.factory.item_mutation" />
-            <argument type="service" id="api_platform.graphql.resolver.item" />
             <argument type="service" id="api_platform.graphql.resolver.resource_field" />
-            <argument type="service" id="api_platform.graphql.query_resolver_locator" />
             <argument type="service" id="api_platform.graphql.types_factory" />
             <argument type="service" id="api_platform.filter_locator" />
             <argument>%api_platform.collection.pagination.enabled%</argument>

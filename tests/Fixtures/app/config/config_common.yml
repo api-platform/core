@@ -254,13 +254,13 @@ services:
             -  { name: 'messenger.message_handler' }
 
     app.graphql.query_resolver.dummy_custom_item:
-        class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\Resolver\DummyCustomItemQueryResolver'
+        class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\Resolver\DummyCustomQueryItemResolver'
         public: false
         tags:
             - { name: 'api_platform.graphql.query_resolver' }
 
     app.graphql.query_resolver.dummy_custom_collection:
-        class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\Resolver\DummyCustomCollectionQueryResolver'
+        class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\Resolver\DummyCustomQueryCollectionResolver'
         public: false
         tags:
             - { name: 'api_platform.graphql.query_resolver' }

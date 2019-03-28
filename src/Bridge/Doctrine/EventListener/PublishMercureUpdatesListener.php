@@ -25,6 +25,7 @@ use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\Mercure\Update;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * Publishes resources updates to the Mercure hub.
@@ -47,8 +48,10 @@ final class PublishMercureUpdatesListener
     private $createdEntities;
     private $updatedEntities;
     private $deletedEntities;
+    private $requestStack;
+    private $formats;
 
-    public function __construct(ResourceClassResolverInterface $resourceClassResolver, IriConverterInterface $iriConverter, ResourceMetadataFactoryInterface $resourceMetadataFactory, SerializerInterface $serializer, MessageBusInterface $messageBus = null, callable $publisher = null, ExpressionLanguage $expressionLanguage = null)
+    public function __construct(ResourceClassResolverInterface $resourceClassResolver, IriConverterInterface $iriConverter, ResourceMetadataFactoryInterface $resourceMetadataFactory, SerializerInterface $serializer, MessageBusInterface $messageBus = null, callable $publisher = null, RequestStack $requestStack, array $formats, ExpressionLanguage $expressionLanguage = null)
     {
         if (null === $messageBus && null === $publisher) {
             throw new InvalidArgumentException('A message bus or a publisher must be provided.');
@@ -60,6 +63,8 @@ final class PublishMercureUpdatesListener
         $this->serializer = $serializer;
         $this->messageBus = $messageBus;
         $this->publisher = $publisher;
+        $this->requestStack = $requestStack;
+        $this->formats = $formats;
         $this->expressionLanguage = $expressionLanguage ?? class_exists(ExpressionLanguage::class) ? new ExpressionLanguage() : null;
         $this->reset();
     }
@@ -168,8 +173,14 @@ final class PublishMercureUpdatesListener
             $iri = $entity->iri;
             $data = json_encode(['@id' => $entity->id]);
         } else {
+            // publish the message in the request's format
+            // respect the entity's serializer context
+            $request = $this->requestStack->getCurrentRequest();
+            $attributes = $request->attributes->get('_api_normalization_context');
+            $context = $attributes['groups'];
+
             $iri = $this->iriConverter->getIriFromItem($entity, UrlGeneratorInterface::ABS_URL);
-            $data = $this->serializer->serialize($entity, 'jsonld');
+            $data = $this->serializer->serialize($entity, key($this->formats), ['groups' => $context]);
         }
 
         $update = new Update($iri, $data, $targets);
