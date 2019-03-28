@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.4.2
+
+* Fix a dependency injection injection problem in `FilterEagerLoadingExtension`
+* Improve performance by adding a `NoOpScalarNormalizer` handling scalar values
+
 ## 2.4.1
 
 * Improve performance of the dev environment and deprecate the `api_platform.metadata_cache` parameter
