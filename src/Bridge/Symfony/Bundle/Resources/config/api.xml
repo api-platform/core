@@ -126,6 +126,11 @@
             <tag name="serializer.normalizer" priority="-925" />
         </service>
 
+        <service id="api_platform.serializer.normalizer.no_op_scalar" class="ApiPlatform\Core\Serializer\NoOpScalarNormalizer" public="false">
+            <!-- Run before our non-cacheable normalizers -->
+            <tag name="serializer.normalizer" priority="-900" />
+        </service>
+
         <!-- Resources Operations path resolver -->
 
         <service id="api_platform.operation_path_resolver" alias="api_platform.operation_path_resolver.router" public="false" />
