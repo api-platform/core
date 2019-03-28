@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Bridge\Doctrine\Orm\Extension;
 
-use ApiPlatform\Core\Api\ResourceClassResolver;
+use ApiPlatform\Core\Api\ResourceClassResolverInterface;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\EagerLoadingTrait;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryBuilderHelper;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGeneratorInterface;
@@ -32,7 +32,7 @@ final class FilterEagerLoadingExtension implements ContextAwareQueryCollectionEx
 
     private $resourceClassResolver;
 
-    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, bool $forceEager = true, ResourceClassResolver $resourceClassResolver = null)
+    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, bool $forceEager = true, ResourceClassResolverInterface $resourceClassResolver = null)
     {
         $this->resourceMetadataFactory = $resourceMetadataFactory;
         $this->forceEager = $forceEager;
