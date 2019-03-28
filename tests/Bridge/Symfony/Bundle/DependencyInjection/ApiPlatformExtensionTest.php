@@ -59,7 +59,8 @@ use ApiPlatform\Core\DataTransformer\DataTransformerInterface;
 use ApiPlatform\Core\Exception\FilterValidationException;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\Exception\RuntimeException;
-use ApiPlatform\Core\GraphQl\Resolver\QueryResolverInterface;
+use ApiPlatform\Core\GraphQl\Resolver\QueryCollectionResolverInterface;
+use ApiPlatform\Core\GraphQl\Resolver\QueryItemResolverInterface;
 use ApiPlatform\Core\GraphQl\Type\Definition\TypeInterface as GraphQlTypeInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
@@ -317,9 +318,9 @@ class ApiPlatformExtensionTest extends TestCase
     {
         $containerBuilderProphecy = $this->getBaseContainerBuilderProphecy();
         $containerBuilderProphecy->setDefinition('api_platform.action.graphql_entrypoint')->shouldNotBeCalled();
+        $containerBuilderProphecy->setDefinition('api_platform.graphql.resolver.factory.item')->shouldNotBeCalled();
         $containerBuilderProphecy->setDefinition('api_platform.graphql.resolver.factory.collection')->shouldNotBeCalled();
         $containerBuilderProphecy->setDefinition('api_platform.graphql.resolver.factory.item_mutation')->shouldNotBeCalled();
-        $containerBuilderProphecy->setDefinition('api_platform.graphql.resolver.item')->shouldNotBeCalled();
         $containerBuilderProphecy->setDefinition('api_platform.graphql.resolver.resource_field')->shouldNotBeCalled();
         $containerBuilderProphecy->setDefinition('api_platform.graphql.executor')->shouldNotBeCalled();
         $containerBuilderProphecy->setDefinition('api_platform.graphql.schema_builder')->shouldNotBeCalled();
@@ -639,9 +640,11 @@ class ApiPlatformExtensionTest extends TestCase
             ->willReturn($this->childDefinitionProphecy)->shouldBeCalledTimes(1);
         $this->childDefinitionProphecy->addTag('api_platform.graphql.type')->shouldBeCalledTimes(1);
 
-        $containerBuilderProphecy->registerForAutoconfiguration(QueryResolverInterface::class)
+        $containerBuilderProphecy->registerForAutoconfiguration(QueryItemResolverInterface::class)
             ->willReturn($this->childDefinitionProphecy)->shouldBeCalledTimes(1);
-        $this->childDefinitionProphecy->addTag('api_platform.graphql.query_resolver')->shouldBeCalledTimes(1);
+        $containerBuilderProphecy->registerForAutoconfiguration(QueryCollectionResolverInterface::class)
+            ->willReturn($this->childDefinitionProphecy)->shouldBeCalledTimes(1);
+        $this->childDefinitionProphecy->addTag('api_platform.graphql.query_resolver')->shouldBeCalledTimes(2);
 
         $containerBuilderProphecy->getParameter('kernel.bundles')->willReturn([
             'DoctrineBundle' => DoctrineBundle::class,
@@ -959,9 +962,9 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.graphql.action.entrypoint',
             'api_platform.graphql.executor',
             'api_platform.graphql.schema_builder',
+            'api_platform.graphql.resolver.factory.item',
             'api_platform.graphql.resolver.factory.collection',
             'api_platform.graphql.resolver.factory.item_mutation',
-            'api_platform.graphql.resolver.item',
             'api_platform.graphql.resolver.resource_field',
             'api_platform.graphql.iterable_type',
             'api_platform.graphql.type_locator',

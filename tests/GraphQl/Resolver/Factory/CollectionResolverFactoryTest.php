@@ -28,6 +28,7 @@ use GraphQL\Type\Definition\ResolveInfo;
 use GraphQL\Type\Schema;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
+use Psr\Container\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
@@ -167,10 +168,31 @@ class CollectionResolverFactoryTest extends TestCase
         );
     }
 
+    public function testCreateCollectionResolverCustom(): void
+    {
+        $factory = $this->createCollectionResolverFactory([
+            'Object1',
+            'Object2',
+        ], [], [], true, null, ['custom_query' => ['collection_query' => 'query_resolver_id']]);
+
+        $resolver = $factory(RelatedDummy::class, Dummy::class, 'custom_query');
+
+        $resolveInfo = new ResolveInfo('relatedDummies', [], new ObjectType(['name' => '']), new ObjectType(['name' => '']), [], new Schema([]), [], null, null, []);
+
+        $this->assertEquals(
+            [
+                'totalCount' => 2.0,
+                'edges' => [['node' => 'normalizedReturnedObject1', 'cursor' => 'MA=='], ['node' => 'normalizedReturnedObject2', 'cursor' => 'MQ==']],
+                'pageInfo' => ['startCursor' => 'MA==', 'endCursor' => 'MQ==', 'hasNextPage' => false, 'hasPreviousPage' => false],
+            ],
+            $resolver(null, [], null, $resolveInfo)
+        );
+    }
+
     /**
      * @param array|\Iterator $collection
      */
-    private function createCollectionResolverFactory($collection, array $subcollection, array $identifiers, bool $paginationEnabled, string $cursor = null): CollectionResolverFactory
+    private function createCollectionResolverFactory($collection, array $subcollection, array $identifiers, bool $paginationEnabled, string $cursor = null, array $graphqlAttribute = []): CollectionResolverFactory
     {
         $collectionDataProviderProphecy = $this->prophesize(CollectionDataProviderInterface::class);
 
@@ -188,6 +210,12 @@ class CollectionResolverFactoryTest extends TestCase
             'graphql' => true,
         ])->willReturn($subcollection);
 
+        $queryResolverLocatorProphecy = $this->prophesize(ContainerInterface::class);
+        $returnedCollection = ['ReturnedObject1', 'ReturnedObject2'];
+        $queryResolverLocatorProphecy->get('query_resolver_id')->willReturn(function () use ($returnedCollection) {
+            return new ArrayPaginator($returnedCollection, 0, 2);
+        });
+
         $normalizerProphecy = $this->prophesize(NormalizerInterface::class);
 
         if (\is_array($collection)) {
@@ -198,12 +226,16 @@ class CollectionResolverFactoryTest extends TestCase
             $normalizerProphecy->normalize($collection->current(), Argument::cetera())->willReturn('normalized'.$collection->current());
         }
 
+        foreach ($returnedCollection as $returnedObject) {
+            $normalizerProphecy->normalize($returnedObject, Argument::cetera())->willReturn('normalized'.$returnedObject);
+        }
+
         foreach ($subcollection as $object) {
             $normalizerProphecy->normalize($object, Argument::cetera())->willReturn('normalized'.$object);
         }
 
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $resourceMetadataFactoryProphecy->create(RelatedDummy::class)->willReturn(new ResourceMetadata('RelatedDummy', null, null, null, null, ['normalization_context' => ['groups' => ['foo']]]));
+        $resourceMetadataFactoryProphecy->create(RelatedDummy::class)->willReturn(new ResourceMetadata('RelatedDummy', null, null, null, null, ['normalization_context' => ['groups' => ['foo']]], [], $graphqlAttribute));
 
         $request = new Request();
 
@@ -213,6 +245,7 @@ class CollectionResolverFactoryTest extends TestCase
         return new CollectionResolverFactory(
             $collectionDataProviderProphecy->reveal(),
             $subresourceDataProviderProphecy->reveal(),
+            $queryResolverLocatorProphecy->reveal(),
             $normalizerProphecy->reveal(),
             $resourceMetadataFactoryProphecy->reveal(),
             null,

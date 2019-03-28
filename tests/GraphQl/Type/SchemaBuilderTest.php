@@ -31,7 +31,6 @@ use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\Type as GraphQLType;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
-use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\PropertyInfo\Type;
 
 /**
@@ -259,10 +258,10 @@ class SchemaBuilderTest extends TestCase
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
         $resourceNameCollectionFactoryProphecy = $this->prophesize(ResourceNameCollectionFactoryInterface::class);
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
+        $itemResolverFactoryProphecy = $this->prophesize(ResolverFactoryInterface::class);
         $collectionResolverFactoryProphecy = $this->prophesize(ResolverFactoryInterface::class);
         $itemMutationResolverFactoryProphecy = $this->prophesize(ResolverFactoryInterface::class);
         $typesFactoryProphecy = $this->prophesize(TypesFactoryInterface::class);
-        $queryResolverLocatorProphecy = $this->prophesize(ServiceLocator::class);
 
         $resourceClassNames = [];
         for ($i = 1; $i <= 3; ++$i) {
@@ -294,6 +293,8 @@ class SchemaBuilderTest extends TestCase
         $resourceNameCollection = new ResourceNameCollection($resourceClassNames);
         $resourceNameCollectionFactoryProphecy->create()->willReturn($resourceNameCollection);
 
+        $itemResolverFactoryProphecy->__invoke(Argument::cetera())->willReturn(function () {
+        });
         $collectionResolverFactoryProphecy->__invoke(Argument::cetera())->willReturn(function () {
         });
         $itemMutationResolverFactoryProphecy->__invoke(Argument::cetera())->willReturn(function () {
@@ -306,13 +307,11 @@ class SchemaBuilderTest extends TestCase
             $propertyMetadataFactoryProphecy->reveal(),
             $resourceNameCollectionFactoryProphecy->reveal(),
             $resourceMetadataFactoryProphecy->reveal(),
+            $itemResolverFactoryProphecy->reveal(),
             $collectionResolverFactoryProphecy->reveal(),
             $itemMutationResolverFactoryProphecy->reveal(),
             function () {
             },
-            function () {
-            },
-            $queryResolverLocatorProphecy->reveal(),
             $typesFactoryProphecy->reveal(),
             null,
             $paginationEnabled
