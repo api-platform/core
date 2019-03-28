@@ -22,6 +22,8 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
  * When there are non-cacheable normalizers in use, and you don't need to normalize
  * scalar values, register this normalizer with a higher priority than the non-cacheable
  * normalizers. This allows caching supportsNormalization calls for scalar values.
+ *
+ * @internal
  */
 final class NoOpScalarNormalizer implements NormalizerInterface, CacheableSupportsMethodInterface
 {
