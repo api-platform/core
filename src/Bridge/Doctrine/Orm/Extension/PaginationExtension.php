@@ -151,8 +151,8 @@ final class PaginationExtension implements ContextAwareQueryResultCollectionExte
             $query->setHint(CountWalker::HINT_DISTINCT, false);
         }
 
-        $doctrineOrmPaginator = new DoctrineOrmPaginator($query, $this->useFetchJoinCollection($queryBuilder, $resourceClass, $operationName));
-        $doctrineOrmPaginator->setUseOutputWalkers($this->useOutputWalkers($queryBuilder));
+        $doctrineOrmPaginator = new DoctrineOrmPaginator($query, $this->shouldDoctrinePaginatorFetchJoinCollection($queryBuilder, $resourceClass, $operationName));
+        $doctrineOrmPaginator->setUseOutputWalkers($this->shouldDoctrinePaginatorUseOutputWalkers($queryBuilder, $resourceClass, $operationName));
 
         if (null === $this->requestStack) {
             $isPartialEnabled = $this->pagination->isPartialEnabled($resourceClass, $operationName, $context);
@@ -276,43 +276,71 @@ final class PaginationExtension implements ContextAwareQueryResultCollectionExte
     }
 
     /**
-     * Determines whether the Paginator should fetch join collections, if the root entity uses composite identifiers it should not.
-     *
-     * @see https://github.com/doctrine/doctrine2/issues/2910
+     * Determines the value of the $fetchJoinCollection argument passed to the Doctrine ORM Paginator.
      */
-    private function useFetchJoinCollection(QueryBuilder $queryBuilder, string $resourceClass = null, string $operationName = null): bool
+    private function shouldDoctrinePaginatorFetchJoinCollection(QueryBuilder $queryBuilder, string $resourceClass = null, string $operationName = null): bool
     {
+        if (null !== $resourceClass) {
+            $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
+
+            if (null !== $fetchJoinCollection = $resourceMetadata->getCollectionOperationAttribute($operationName, 'pagination_fetch_join_collection', null, true)) {
+                return $fetchJoinCollection;
+            }
+        }
+
+        /*
+         * "Cannot count query which selects two FROM components, cannot make distinction"
+         *
+         * @see https://github.com/doctrine/orm/blob/v2.6.3/lib/Doctrine/ORM/Tools/Pagination/WhereInWalker.php#L81
+         * @see https://github.com/doctrine/doctrine2/issues/2910
+         */
         if (QueryChecker::hasRootEntityWithCompositeIdentifier($queryBuilder, $this->managerRegistry)) {
             return false;
         }
 
-        if (null === $resourceClass) {
+        if (QueryChecker::hasJoinedToManyAssociation($queryBuilder, $this->managerRegistry)) {
             return true;
         }
 
-        $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
-
-        return $resourceMetadata->getCollectionOperationAttribute($operationName, 'pagination_fetch_join_collection', true, true);
+        // disable $fetchJoinCollection by default (performance)
+        return false;
     }
 
     /**
-     * Determines whether output walkers should be used.
+     * Determines whether the Doctrine ORM Paginator should use output walkers.
      */
-    private function useOutputWalkers(QueryBuilder $queryBuilder): bool
+    private function shouldDoctrinePaginatorUseOutputWalkers(QueryBuilder $queryBuilder, string $resourceClass = null, string $operationName = null): bool
     {
+        if (null !== $resourceClass) {
+            $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
+
+            if (null !== $useOutputWalkers = $resourceMetadata->getCollectionOperationAttribute($operationName, 'pagination_use_output_walkers', null, true)) {
+                return $useOutputWalkers;
+            }
+        }
+
         /*
          * "Cannot count query that uses a HAVING clause. Use the output walkers for pagination"
          *
-         * @see https://github.com/doctrine/doctrine2/blob/900b55d16afdcdeb5100d435a7166d3a425b9873/lib/Doctrine/ORM/Tools/Pagination/CountWalker.php#L50
+         * @see https://github.com/doctrine/orm/blob/v2.6.3/lib/Doctrine/ORM/Tools/Pagination/CountWalker.php#L56
          */
         if (QueryChecker::hasHavingClause($queryBuilder)) {
             return true;
         }
 
         /*
+         * "Cannot count query which selects two FROM components, cannot make distinction"
+         *
+         * @see https://github.com/doctrine/orm/blob/v2.6.3/lib/Doctrine/ORM/Tools/Pagination/CountWalker.php#L64
+         */
+        if (QueryChecker::hasRootEntityWithCompositeIdentifier($queryBuilder, $this->managerRegistry)) {
+            return true;
+        }
+
+        /*
          * "Paginating an entity with foreign key as identifier only works when using the Output Walkers. Call Paginator#setUseOutputWalkers(true) before iterating the paginator."
          *
-         * @see https://github.com/doctrine/doctrine2/blob/900b55d16afdcdeb5100d435a7166d3a425b9873/lib/Doctrine/ORM/Tools/Pagination/LimitSubqueryWalker.php#L87
+         * @see https://github.com/doctrine/orm/blob/v2.6.3/lib/Doctrine/ORM/Tools/Pagination/LimitSubqueryWalker.php#L77
          */
         if (QueryChecker::hasRootEntityWithForeignKeyIdentifier($queryBuilder, $this->managerRegistry)) {
             return true;
@@ -321,19 +349,9 @@ final class PaginationExtension implements ContextAwareQueryResultCollectionExte
         /*
          * "Cannot select distinct identifiers from query with LIMIT and ORDER BY on a column from a fetch joined to-many association. Use output walkers."
          *
-         * @see https://github.com/doctrine/doctrine2/blob/900b55d16afdcdeb5100d435a7166d3a425b9873/lib/Doctrine/ORM/Tools/Pagination/LimitSubqueryWalker.php#L149
+         * @see https://github.com/doctrine/orm/blob/v2.6.3/lib/Doctrine/ORM/Tools/Pagination/LimitSubqueryWalker.php#L150
          */
-        if (
-            QueryChecker::hasMaxResults($queryBuilder) &&
-            QueryChecker::hasOrderByOnToManyJoin($queryBuilder, $this->managerRegistry)
-        ) {
-            return true;
-        }
-
-        /*
-         * When using composite identifiers pagination will need Output walkers
-         */
-        if (QueryChecker::hasRootEntityWithCompositeIdentifier($queryBuilder, $this->managerRegistry)) {
+        if (QueryChecker::hasMaxResults($queryBuilder) && QueryChecker::hasOrderByOnFetchJoinedToManyAssociation($queryBuilder, $this->managerRegistry)) {
             return true;
         }
 

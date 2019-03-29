@@ -14,33 +14,73 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\Bridge\Doctrine\Orm\Util;
 
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryJoinParser;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RelatedDummy;
 use Doctrine\Common\Persistence\ManagerRegistry;
-use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\Query\Expr\OrderBy;
 use Doctrine\ORM\QueryBuilder;
-use phpmock\phpunit\PHPMock;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @group legacy
+ */
 class QueryJoinParserTest extends TestCase
 {
-    use PHPMock;
-
-    public function testGetClassMetadataFromJoinAlias()
+    /**
+     * @group legacy
+     * @expectedDeprecation The use of "ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryJoinParser::getClassMetadataFromJoinAlias()" is deprecated since 2.4 and will be removed in 3.0. Use "ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryBuilderHelper::getEntityClassByAlias()" instead.
+     */
+    public function testGetClassMetadataFromJoinAliasWithJoinByAssociation(): void
     {
-        $queryBuilder = $this->prophesize(QueryBuilder::class);
-        $queryBuilder->getRootEntities()->willReturn(['Dummy']);
-        $queryBuilder->getRootAliases()->willReturn(['d']);
-        $queryBuilder->getDQLPart('join')->willReturn(['a_1' => [new Join('INNER_JOIN', 'relatedDummy', 'a_1', null, 'a_1.name = r.name')]]);
-        $classMetadata = $this->prophesize(ClassMetadata::class);
-        $objectManager = $this->prophesize(ObjectManager::class);
-        $objectManager->getClassMetadata('Dummy')->willReturn($classMetadata->reveal());
-        $managerRegistry = $this->prophesize(ManagerRegistry::class);
-        $managerRegistry->getManagerForClass('Dummy')->willReturn($objectManager->reveal());
-        $metadata = QueryJoinParser::getClassMetadataFromJoinAlias('a_1', $queryBuilder->reveal(), $managerRegistry->reveal());
-        $this->assertEquals($metadata, $classMetadata->reveal());
+        $dummyMetadata = new ClassMetadata(Dummy::class);
+        $dummyMetadata->mapManyToMany([
+            'fieldName' => 'relatedDummies',
+            'targetEntity' => RelatedDummy::class,
+        ]);
+
+        $relatedDummyMetadata = new ClassMetadata(RelatedDummy::class);
+
+        $entityManagerProphecy = $this->prophesize(EntityManagerInterface::class);
+        $entityManagerProphecy->getClassMetadata(Dummy::class)->willReturn($dummyMetadata);
+        $entityManagerProphecy->getClassMetadata(RelatedDummy::class)->willReturn($relatedDummyMetadata);
+
+        $queryBuilder = new QueryBuilder($entityManagerProphecy->reveal());
+        $queryBuilder->from(Dummy::class, 'd');
+        $queryBuilder->innerJoin('d.relatedDummies', 'a_1');
+
+        $managerRegistryProphecy = $this->prophesize(ManagerRegistry::class);
+        $managerRegistryProphecy->getManagerForClass(Dummy::class)->willReturn($entityManagerProphecy);
+        $managerRegistryProphecy->getManagerForClass(RelatedDummy::class)->willReturn($entityManagerProphecy);
+
+        $actual = QueryJoinParser::getClassMetadataFromJoinAlias('a_1', $queryBuilder, $managerRegistryProphecy->reveal());
+
+        $this->assertEquals($relatedDummyMetadata, $actual);
+    }
+
+    /**
+     * @group legacy
+     * @expectedDeprecation The use of "ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryJoinParser::getClassMetadataFromJoinAlias()" is deprecated since 2.4 and will be removed in 3.0. Use "ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryBuilderHelper::getEntityClassByAlias()" instead.
+     */
+    public function testGetClassMetadataFromJoinAliasWithJoinByClass(): void
+    {
+        $relatedDummyMetadata = new ClassMetadata(RelatedDummy::class);
+
+        $entityManagerProphecy = $this->prophesize(EntityManagerInterface::class);
+        $entityManagerProphecy->getClassMetadata(RelatedDummy::class)->willReturn($relatedDummyMetadata);
+
+        $queryBuilder = new QueryBuilder($entityManagerProphecy->reveal());
+        $queryBuilder->from(Dummy::class, 'd');
+        $queryBuilder->innerJoin(RelatedDummy::class, 'a_1', null, 'd.name = a_1.name');
+
+        $managerRegistryProphecy = $this->prophesize(ManagerRegistry::class);
+        $managerRegistryProphecy->getManagerForClass(RelatedDummy::class)->willReturn($entityManagerProphecy);
+
+        $actual = QueryJoinParser::getClassMetadataFromJoinAlias('a_1', $queryBuilder, $managerRegistryProphecy->reveal());
+
+        $this->assertEquals($relatedDummyMetadata, $actual);
     }
 
     /**

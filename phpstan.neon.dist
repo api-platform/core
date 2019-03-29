@@ -67,6 +67,9 @@ parameters:
 			path: %currentWorkingDirectory%/src/Test/DoctrineMongoDbOdmFilterTestCase.php
 		- '#Method ApiPlatform\\Core\\(Serializer\\Abstract|JsonApi\\Serializer\\)ItemNormalizer::normalizeRelation\(\) should return array\|string but returns array\|bool\|float\|int\|string\.#'
 		- '#Method ApiPlatform\\Core\\Util\\RequestParser::parseRequestParams\(\) should return array but returns array\|false\.#'
+		-
+			message: '#Method ApiPlatform\\Core\\Bridge\\Doctrine\\Orm\\Util\\QueryBuilderHelper::mapJoinAliases() should return array<string, array<string>\|string> but returns array<int|string, mixed>\.#'
+			path: %currentWorkingDirectory%/src/Bridge/Doctrine/Orm/Util/QueryBuilderHelper.php
 		- "#Call to method PHPUnit\\\\Framework\\\\Assert::assertSame\\(\\) with array\\('(collection_context|item_context|subresource_context)'\\) and array<Symfony\\\\Component\\\\VarDumper\\\\Cloner\\\\Data>\\|bool\\|float\\|int\\|string\\|null will always evaluate to false\\.#"
 		# https://github.com/symfony/symfony/pull/30535
 		-
