@@ -49,8 +49,9 @@ final class PublishMercureUpdatesListener
     private $updatedEntities;
     private $deletedEntities;
     private $requestStack;
+    private $formats;
 
-    public function __construct(ResourceClassResolverInterface $resourceClassResolver, IriConverterInterface $iriConverter, ResourceMetadataFactoryInterface $resourceMetadataFactory, SerializerInterface $serializer, MessageBusInterface $messageBus = null, callable $publisher = null, RequestStack $requestStack, ExpressionLanguage $expressionLanguage = null)
+    public function __construct(ResourceClassResolverInterface $resourceClassResolver, IriConverterInterface $iriConverter, ResourceMetadataFactoryInterface $resourceMetadataFactory, SerializerInterface $serializer, MessageBusInterface $messageBus = null, callable $publisher = null, RequestStack $requestStack, array $formats, ExpressionLanguage $expressionLanguage = null)
     {
         if (null === $messageBus && null === $publisher) {
             throw new InvalidArgumentException('A message bus or a publisher must be provided.');
@@ -63,6 +64,7 @@ final class PublishMercureUpdatesListener
         $this->messageBus = $messageBus;
         $this->publisher = $publisher;
         $this->requestStack = $requestStack;
+        $this->formats = $formats;
         $this->expressionLanguage = $expressionLanguage ?? class_exists(ExpressionLanguage::class) ? new ExpressionLanguage() : null;
         $this->reset();
     }
@@ -178,7 +180,7 @@ final class PublishMercureUpdatesListener
             $context = $attributes['groups'];
 
             $iri = $this->iriConverter->getIriFromItem($entity, UrlGeneratorInterface::ABS_URL);
-            $data = $this->serializer->serialize($entity, $request->getRequestFormat(), ['groups' => $context]);
+            $data = $this->serializer->serialize($entity, key($this->formats), ['groups' => $context]);
         }
 
         $update = new Update($iri, $data, $targets);
