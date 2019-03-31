@@ -702,7 +702,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
         if ($v3) {
             $docs = ['openapi' => self::OPENAPI_VERSION];
             if ('/' !== $baseUrl) {
-                $docs['servers'] = [['url' => $context[self::BASE_URL] ?? $this->defaultContext[self::BASE_URL]]];
+                $docs['servers'] = [['url' => $baseUrl]];
             }
         } else {
             $docs = [
