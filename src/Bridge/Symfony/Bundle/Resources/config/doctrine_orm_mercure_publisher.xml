@@ -15,7 +15,6 @@
             <argument type="service" id="api_platform.serializer" />
             <argument type="service" id="message_bus" on-invalid="ignore" />
             <argument type="service" id="mercure.hub.default.publisher" />
-            <argument type="service" id="request_stack" />
             <argument>%api_platform.formats%</argument>
 
             <tag name="doctrine.event_listener" event="onFlush" />
