@@ -47,8 +47,9 @@ final class PublishMercureUpdatesListener
     private $createdEntities;
     private $updatedEntities;
     private $deletedEntities;
+    private $formats;
 
-    public function __construct(ResourceClassResolverInterface $resourceClassResolver, IriConverterInterface $iriConverter, ResourceMetadataFactoryInterface $resourceMetadataFactory, SerializerInterface $serializer, MessageBusInterface $messageBus = null, callable $publisher = null, ExpressionLanguage $expressionLanguage = null)
+    public function __construct(ResourceClassResolverInterface $resourceClassResolver, IriConverterInterface $iriConverter, ResourceMetadataFactoryInterface $resourceMetadataFactory, SerializerInterface $serializer, array $formats, MessageBusInterface $messageBus = null, callable $publisher = null, ExpressionLanguage $expressionLanguage = null)
     {
         if (null === $messageBus && null === $publisher) {
             throw new InvalidArgumentException('A message bus or a publisher must be provided.');
@@ -58,6 +59,7 @@ final class PublishMercureUpdatesListener
         $this->iriConverter = $iriConverter;
         $this->resourceMetadataFactory = $resourceMetadataFactory;
         $this->serializer = $serializer;
+        $this->formats = $formats;
         $this->messageBus = $messageBus;
         $this->publisher = $publisher;
         $this->expressionLanguage = $expressionLanguage ?? class_exists(ExpressionLanguage::class) ? new ExpressionLanguage() : null;
@@ -157,7 +159,7 @@ final class PublishMercureUpdatesListener
     }
 
     /**
-     * @param object|string $entity
+     * @param object $entity
      */
     private function publishUpdate($entity, array $targets): void
     {
@@ -168,8 +170,11 @@ final class PublishMercureUpdatesListener
             $iri = $entity->iri;
             $data = json_encode(['@id' => $entity->id]);
         } else {
+            $resourceClass = $this->getObjectClass($entity);
+            $context = $this->resourceMetadataFactory->create($resourceClass)->getAttribute('normalization_context', []);
+
             $iri = $this->iriConverter->getIriFromItem($entity, UrlGeneratorInterface::ABS_URL);
-            $data = $this->serializer->serialize($entity, 'jsonld');
+            $data = $this->serializer->serialize($entity, key($this->formats), $context);
         }
 
         $update = new Update($iri, $data, $targets);
