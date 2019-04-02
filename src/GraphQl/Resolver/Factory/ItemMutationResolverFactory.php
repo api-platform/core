@@ -18,6 +18,7 @@ use ApiPlatform\Core\DataPersister\DataPersisterInterface;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\Exception\ItemNotFoundException;
 use ApiPlatform\Core\GraphQl\Resolver\FieldsToAttributesTrait;
+use ApiPlatform\Core\GraphQl\Resolver\MutationResolverInterface;
 use ApiPlatform\Core\GraphQl\Resolver\ResourceAccessCheckerTrait;
 use ApiPlatform\Core\GraphQl\Serializer\ItemNormalizer;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
@@ -28,6 +29,7 @@ use ApiPlatform\Core\Validator\Exception\ValidationException;
 use ApiPlatform\Core\Validator\ValidatorInterface;
 use GraphQL\Error\Error;
 use GraphQL\Type\Definition\ResolveInfo;
+use Psr\Container\ContainerInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
@@ -46,12 +48,13 @@ final class ItemMutationResolverFactory implements ResolverFactoryInterface
 
     private $iriConverter;
     private $dataPersister;
+    private $mutationResolverLocator;
     private $normalizer;
     private $resourceMetadataFactory;
     private $resourceAccessChecker;
     private $validator;
 
-    public function __construct(IriConverterInterface $iriConverter, DataPersisterInterface $dataPersister, NormalizerInterface $normalizer, ResourceMetadataFactoryInterface $resourceMetadataFactory, ResourceAccessCheckerInterface $resourceAccessChecker = null, ValidatorInterface $validator = null)
+    public function __construct(IriConverterInterface $iriConverter, DataPersisterInterface $dataPersister, ContainerInterface $mutationResolverLocator, NormalizerInterface $normalizer, ResourceMetadataFactoryInterface $resourceMetadataFactory, ResourceAccessCheckerInterface $resourceAccessChecker = null, ValidatorInterface $validator = null)
     {
         if (!$normalizer instanceof DenormalizerInterface) {
             throw new InvalidArgumentException(sprintf('The normalizer must implements the "%s" interface', DenormalizerInterface::class));
@@ -59,6 +62,7 @@ final class ItemMutationResolverFactory implements ResolverFactoryInterface
 
         $this->iriConverter = $iriConverter;
         $this->dataPersister = $dataPersister;
+        $this->mutationResolverLocator = $mutationResolverLocator;
         $this->normalizer = $normalizer;
         $this->resourceMetadataFactory = $resourceMetadataFactory;
         $this->resourceAccessChecker = $resourceAccessChecker;
@@ -67,7 +71,7 @@ final class ItemMutationResolverFactory implements ResolverFactoryInterface
 
     public function __invoke(string $resourceClass = null, string $rootClass = null, string $operationName = null): callable
     {
-        return function ($root, $args, $context, ResolveInfo $info) use ($resourceClass, $operationName) {
+        return function ($source, $args, $context, ResolveInfo $info) use ($resourceClass, $operationName) {
             if (null === $resourceClass) {
                 return null;
             }
@@ -99,30 +103,41 @@ final class ItemMutationResolverFactory implements ResolverFactoryInterface
                 return $data;
             }
 
-            switch ($operationName) {
-                case 'create':
-                case 'update':
-                    $context = null === $item ? ['resource_class' => $resourceClass] : ['resource_class' => $resourceClass, 'object_to_populate' => $item];
-                    $context += $resourceMetadata->getGraphqlAttribute($operationName, 'denormalization_context', [], true);
-                    $item = $this->normalizer->denormalize($args['input'], $resourceClass, ItemNormalizer::FORMAT, $context);
-                    $this->validate($item, $info, $resourceMetadata, $operationName);
-                    $persistResult = $this->dataPersister->persist($item);
+            if ('delete' === $operationName) {
+                if ($item) {
+                    $this->dataPersister->remove($item);
+                    $data[$wrapFieldName]['id'] = $args['input']['id'];
+                } else {
+                    $data[$wrapFieldName]['id'] = null;
+                }
 
-                    if (null === $persistResult) {
-                        @trigger_error(sprintf('Returning void from %s::persist() is deprecated since API Platform 2.3 and will not be supported in API Platform 3, an object should always be returned.', DataPersisterInterface::class), E_USER_DEPRECATED);
-                    }
-
-                    return [$wrapFieldName => $this->normalizer->normalize($persistResult ?? $item, ItemNormalizer::FORMAT, $normalizationContext)] + $data;
-                case 'delete':
-                    if ($item) {
-                        $this->dataPersister->remove($item);
-                        $data[$wrapFieldName]['id'] = $args['input']['id'];
-                    } else {
-                        $data[$wrapFieldName]['id'] = null;
-                    }
+                return $data;
             }
 
-            return $data;
+            $denormalizationContext = null === $item ? ['resource_class' => $resourceClass] : ['resource_class' => $resourceClass, 'object_to_populate' => $item];
+            $denormalizationContext += $resourceMetadata->getGraphqlAttribute($operationName, 'denormalization_context', [], true);
+            $item = $this->normalizer->denormalize($args['input'], $resourceClass, ItemNormalizer::FORMAT, $denormalizationContext);
+
+            $mutationResolverId = $resourceMetadata->getGraphqlAttribute($operationName, 'mutation');
+            if (null !== $mutationResolverId) {
+                /** @var MutationResolverInterface $mutationResolver */
+                $mutationResolver = $this->mutationResolverLocator->get($mutationResolverId);
+                $item = $mutationResolver($item, ['source' => $source, 'args' => $args, 'info' => $info]);
+                if (null !== $item && $resourceClass !== $itemClass = $this->getObjectClass($item)) {
+                    throw Error::createLocatedError(sprintf('Custom mutation resolver "%s" has to return an item of class %s but returned an item of class %s.', $mutationResolverId, $resourceMetadata->getShortName(), (new \ReflectionClass($itemClass))->getShortName()), $info->fieldNodes, $info->path);
+                }
+            }
+
+            if (null !== $item) {
+                $this->validate($item, $info, $resourceMetadata, $operationName);
+                $persistResult = $this->dataPersister->persist($item);
+
+                if (null === $persistResult) {
+                    @trigger_error(sprintf('Returning void from %s::persist() is deprecated since API Platform 2.3 and will not be supported in API Platform 3, an object should always be returned.', DataPersisterInterface::class), E_USER_DEPRECATED);
+                }
+            }
+
+            return [$wrapFieldName => $this->normalizer->normalize($persistResult ?? $item, ItemNormalizer::FORMAT, $normalizationContext)] + $data;
         };
     }
 

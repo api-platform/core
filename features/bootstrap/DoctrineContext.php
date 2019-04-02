@@ -20,6 +20,7 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\Dummy as DummyDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\DummyAggregateOffer as DummyAggregateOfferDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\DummyCar as DummyCarDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\DummyCarColor as DummyCarColorDocument;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\DummyCustomMutation as DummyCustomMutationDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\DummyCustomQuery as DummyCustomQueryDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\DummyDate as DummyDateDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\DummyDtoCustom as DummyDtoCustomDocument;
@@ -61,6 +62,7 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyAggregateOffer;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyCar;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyCarColor;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyCustomMutation;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyCustomQuery;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyDate;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyDtoCustom;
@@ -424,6 +426,21 @@ final class DoctrineContext implements Context
             $dummyCustomQuery = $this->buildDummyCustomQuery();
 
             $this->manager->persist($dummyCustomQuery);
+        }
+
+        $this->manager->flush();
+    }
+
+    /**
+     * @Given there are :nb dummyCustomMutation objects
+     */
+    public function thereAreDummyCustomMutationObjects(int $nb)
+    {
+        for ($i = 1; $i <= $nb; ++$i) {
+            $customMutationDummy = $this->buildDummyCustomMutation();
+            $customMutationDummy->setOperandA(3);
+
+            $this->manager->persist($customMutationDummy);
         }
 
         $this->manager->flush();
@@ -1353,6 +1370,14 @@ final class DoctrineContext implements Context
     private function buildDummyCustomQuery()
     {
         return $this->isOrm() ? new DummyCustomQuery() : new DummyCustomQueryDocument();
+    }
+
+    /**
+     * @return DummyCustomMutation|DummyCustomMutationDocument
+     */
+    private function buildDummyCustomMutation()
+    {
+        return $this->isOrm() ? new DummyCustomMutation() : new DummyCustomMutationDocument();
     }
 
     /**

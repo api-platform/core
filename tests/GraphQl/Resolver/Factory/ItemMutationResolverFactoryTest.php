@@ -17,16 +17,17 @@ use ApiPlatform\Core\Api\IriConverterInterface;
 use ApiPlatform\Core\DataPersister\DataPersisterInterface;
 use ApiPlatform\Core\Exception\ItemNotFoundException;
 use ApiPlatform\Core\GraphQl\Resolver\Factory\ItemMutationResolverFactory;
-use ApiPlatform\Core\GraphQl\Resolver\Factory\ResolverFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RelatedDummy;
 use GraphQL\Error\Error;
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\ResolveInfo;
 use GraphQL\Type\Schema;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
+use Psr\Container\ContainerInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
@@ -35,53 +36,159 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
  */
 class ItemMutationResolverFactoryTest extends TestCase
 {
-    public function testCreateItemMutationResolverNoItem()
+    private $itemMutationResolverFactory;
+    private $iriConverterProphecy;
+    private $dataPersisterProphecy;
+    private $mutationResolverLocatorProphecy;
+    private $normalizerProphecy;
+    private $resourceMetadataFactoryProphecy;
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function setUp(): void
     {
+        $this->iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
+        $this->dataPersisterProphecy = $this->prophesize(DataPersisterInterface::class);
+        $this->mutationResolverLocatorProphecy = $this->prophesize(ContainerInterface::class);
+        $this->normalizerProphecy = $this->prophesize(NormalizerInterface::class);
+        $this->normalizerProphecy->willImplement(DenormalizerInterface::class);
+        $this->resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
+
+        $this->resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadata('Dummy'));
+        $this->resourceMetadataFactoryProphecy->create(RelatedDummy::class)->willReturn(new ResourceMetadata('RelatedDummy'));
+
+        $this->itemMutationResolverFactory = new ItemMutationResolverFactory(
+            $this->iriConverterProphecy->reveal(),
+            $this->dataPersisterProphecy->reveal(),
+            $this->mutationResolverLocatorProphecy->reveal(),
+            $this->normalizerProphecy->reveal(),
+            $this->resourceMetadataFactoryProphecy->reveal()
+        );
+    }
+
+    public function testCreateItemMutationResolverNoItem(): void
+    {
+        $this->iriConverterProphecy->getItemFromIri('/dummies/3', ['attributes' => []])->willThrow(new ItemNotFoundException());
+
         $this->expectException(Error::class);
+        $this->expectExceptionMessage('Item "/dummies/3" not found.');
 
-        $dataPersisterProphecy = $this->prophesize(DataPersisterInterface::class);
-        $dataPersisterProphecy->remove(Argument::any())->shouldNotBeCalled();
+        $this->dataPersisterProphecy->remove(Argument::any())->shouldNotBeCalled();
 
-        $resolverFactory = $this->createItemMutationResolverFactory(null, $dataPersisterProphecy);
-        $resolver = $resolverFactory(Dummy::class, Dummy::class, 'delete');
+        $resolver = ($this->itemMutationResolverFactory)(Dummy::class, Dummy::class, 'delete');
 
         $resolveInfo = new ResolveInfo('', [], new ObjectType(['name' => '']), new ObjectType(['name' => '']), [], new Schema([]), [], null, null, []);
 
         $resolver(null, ['input' => ['id' => '/dummies/3', 'clientMutationId' => '1936']], null, $resolveInfo);
     }
 
-    public function testCreateItemDeleteMutationResolver()
+    public function testCreateItemMutationResolverInvalidItem(): void
+    {
+        $relatedDummy = new RelatedDummy();
+
+        $this->iriConverterProphecy->getItemFromIri('/dummies/3', ['attributes' => []])->willReturn($relatedDummy);
+
+        $this->expectException(Error::class);
+        $this->expectExceptionMessage('Item "/dummies/3" did not match expected type "Dummy".');
+
+        $this->dataPersisterProphecy->remove(Argument::any())->shouldNotBeCalled();
+
+        $resolver = ($this->itemMutationResolverFactory)(Dummy::class, Dummy::class, 'delete');
+
+        $resolveInfo = new ResolveInfo('', [], new ObjectType(['name' => '']), new ObjectType(['name' => '']), [], new Schema([]), [], null, null, []);
+
+        $resolver(null, ['input' => ['id' => '/dummies/3', 'clientMutationId' => '1936']], null, $resolveInfo);
+    }
+
+    public function testCreateItemDeleteMutationResolver(): void
     {
         $dummy = new Dummy();
 
-        $dataPersisterProphecy = $this->prophesize(DataPersisterInterface::class);
-        $dataPersisterProphecy->remove($dummy)->shouldBeCalled();
+        $this->iriConverterProphecy->getItemFromIri('/dummies/3', ['attributes' => []])->willReturn($dummy);
 
-        $resolverFactory = $this->createItemMutationResolverFactory($dummy, $dataPersisterProphecy);
-        $resolver = $resolverFactory(Dummy::class, null, 'delete');
+        $this->dataPersisterProphecy->remove($dummy)->shouldBeCalled();
+
+        $resolver = ($this->itemMutationResolverFactory)(Dummy::class, null, 'delete');
 
         $resolveInfo = $this->prophesize(ResolveInfo::class);
         $resolveInfo->getFieldSelection(PHP_INT_MAX)->shouldBeCalled()->willReturn(['shortName' => []]);
 
-        $this->assertEquals(['shortName' => ['id' => '/dummies/3'], 'clientMutationId' => '1936'], $resolver(null, ['input' => ['id' => '/dummies/3', 'clientMutationId' => '1936']], null, $resolveInfo->reveal()));
+        $this->assertEquals(['dummy' => ['id' => '/dummies/3'], 'clientMutationId' => '1936'], $resolver(null, ['input' => ['id' => '/dummies/3', 'clientMutationId' => '1936']], null, $resolveInfo->reveal()));
     }
 
-    private function createItemMutationResolverFactory($item, $dataPersisterProphecy): ResolverFactoryInterface
+    public function testCreateItemMutationResolverCustom(): void
     {
-        $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
-        $getItemFromIri = $iriConverterProphecy->getItemFromIri('/dummies/3', ['attributes' => []]);
-        null === $item ? $getItemFromIri->willThrow(new ItemNotFoundException()) : $getItemFromIri->willReturn($item);
+        $item = new RelatedDummy();
+        $returnedItem = new RelatedDummy();
+        $returnedItem->setName('returned');
 
-        $normalizerProphecy = $this->prophesize(NormalizerInterface::class)->willImplement(DenormalizerInterface::class);
+        $this->iriConverterProphecy->getItemFromIri('/related_dummies/3', ['attributes' => []])->willReturn($item);
 
-        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $resourceMetadataFactoryProphecy->create(Argument::type('string'))->willReturn(new ResourceMetadata('shortName'));
+        $this->resourceMetadataFactoryProphecy->create(RelatedDummy::class)->willReturn(new ResourceMetadata('RelatedDummy', null, null, null, null, null, null, ['custom_mutation' => ['mutation' => 'mutation_resolver_id']]));
 
-        return new ItemMutationResolverFactory(
-            $iriConverterProphecy->reveal(),
-            $dataPersisterProphecy->reveal(),
-            $normalizerProphecy->reveal(),
-            $resourceMetadataFactoryProphecy->reveal()
-        );
+        $this->normalizerProphecy->denormalize(Argument::cetera())->willReturn(null);
+
+        $this->mutationResolverLocatorProphecy->get('mutation_resolver_id')->shouldBeCalled()->willReturn(function () use ($returnedItem) {
+            return $returnedItem;
+        });
+
+        $this->dataPersisterProphecy->persist($returnedItem)->shouldBeCalled()->willReturn($returnedItem);
+        $this->normalizerProphecy->normalize($returnedItem, Argument::cetera())->shouldBeCalled()->willReturn(['id' => '/related_dummies/3']);
+
+        $resolver = ($this->itemMutationResolverFactory)(RelatedDummy::class, null, 'custom_mutation');
+
+        $resolveInfo = $this->prophesize(ResolveInfo::class);
+        $resolveInfo->getFieldSelection(PHP_INT_MAX)->shouldBeCalled()->willReturn(['shortName' => []]);
+
+        $this->assertEquals(['relatedDummy' => ['id' => '/related_dummies/3'], 'clientMutationId' => '1936'], $resolver(null, ['input' => ['id' => '/related_dummies/3', 'clientMutationId' => '1936']], null, $resolveInfo->reveal()));
+    }
+
+    public function testCreateItemMutationResolverCustomNoPersist(): void
+    {
+        $item = new RelatedDummy();
+
+        $this->iriConverterProphecy->getItemFromIri('/related_dummies/3', ['attributes' => []])->willReturn($item);
+
+        $this->resourceMetadataFactoryProphecy->create(RelatedDummy::class)->willReturn(new ResourceMetadata('RelatedDummy', null, null, null, null, null, null, ['custom_mutation' => ['mutation' => 'mutation_resolver_id']]));
+
+        $this->normalizerProphecy->denormalize(Argument::cetera())->willReturn(null);
+
+        $this->mutationResolverLocatorProphecy->get('mutation_resolver_id')->shouldBeCalled()->willReturn(function () {
+            return null;
+        });
+
+        $this->dataPersisterProphecy->persist(Argument::any())->shouldNotBeCalled();
+        $this->normalizerProphecy->normalize(null, Argument::cetera())->shouldBeCalled()->willReturn(null);
+
+        $resolver = ($this->itemMutationResolverFactory)(RelatedDummy::class, null, 'custom_mutation');
+
+        $resolveInfo = $this->prophesize(ResolveInfo::class);
+        $resolveInfo->getFieldSelection(PHP_INT_MAX)->shouldBeCalled()->willReturn(['shortName' => []]);
+
+        $this->assertEquals(['relatedDummy' => null, 'clientMutationId' => '1936'], $resolver(null, ['input' => ['id' => '/related_dummies/3', 'clientMutationId' => '1936']], null, $resolveInfo->reveal()));
+    }
+
+    public function testCreateItemMutationResolverCustomInvalidReturnedClass(): void
+    {
+        $item = new RelatedDummy();
+
+        $this->iriConverterProphecy->getItemFromIri('/related_dummies/3', ['attributes' => []])->willReturn($item);
+
+        $this->resourceMetadataFactoryProphecy->create(RelatedDummy::class)->willReturn(new ResourceMetadata('RelatedDummy', null, null, null, null, null, null, ['custom_mutation' => ['mutation' => 'mutation_resolver_id']]));
+
+        $this->mutationResolverLocatorProphecy->get('mutation_resolver_id')->shouldBeCalled()->willReturn(function () {
+            return new Dummy();
+        });
+
+        $resolver = ($this->itemMutationResolverFactory)(RelatedDummy::class, null, 'custom_mutation');
+
+        $resolveInfo = $this->prophesize(ResolveInfo::class);
+        $resolveInfo->getFieldSelection(PHP_INT_MAX)->shouldBeCalled()->willReturn(['shortName' => []]);
+
+        $this->expectException(Error::class);
+        $this->expectExceptionMessage('Custom mutation resolver "mutation_resolver_id" has to return an item of class RelatedDummy but returned an item of class Dummy.');
+
+        $this->assertEquals(['relatedDummy' => ['id' => '/related_dummies/3'], 'clientMutationId' => '1936'], $resolver(null, ['input' => ['id' => '/related_dummies/3', 'clientMutationId' => '1936']], null, $resolveInfo->reveal()));
     }
 }

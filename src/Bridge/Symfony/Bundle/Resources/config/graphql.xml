@@ -31,6 +31,7 @@
         <service id="api_platform.graphql.resolver.factory.item_mutation" class="ApiPlatform\Core\GraphQl\Resolver\Factory\ItemMutationResolverFactory" public="false">
             <argument type="service" id="api_platform.iri_converter" />
             <argument type="service" id="api_platform.data_persister" />
+            <argument type="service" id="api_platform.graphql.mutation_resolver_locator" />
             <argument type="service" id="serializer" />
             <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
             <argument type="service" id="api_platform.security.resource_access_checker" on-invalid="null" />
@@ -42,6 +43,10 @@
         </service>
 
         <service id="api_platform.graphql.query_resolver_locator" class="Symfony\Component\DependencyInjection\ServiceLocator">
+            <tag name="container.service_locator" />
+        </service>
+
+        <service id="api_platform.graphql.mutation_resolver_locator" class="Symfony\Component\DependencyInjection\ServiceLocator">
             <tag name="container.service_locator" />
         </service>
 
@@ -132,6 +137,7 @@
             <argument type="service" id="api_platform.graphql.schema_builder" />
             <tag name="console.command" />
         </service>
+
     </services>
 
 </container>

@@ -15,7 +15,6 @@ namespace ApiPlatform\Core\GraphQl\Resolver\Factory;
 
 use ApiPlatform\Core\Api\IriConverterInterface;
 use ApiPlatform\Core\Exception\ItemNotFoundException;
-use ApiPlatform\Core\Exception\RuntimeException;
 use ApiPlatform\Core\GraphQl\Resolver\FieldsToAttributesTrait;
 use ApiPlatform\Core\GraphQl\Resolver\QueryItemResolverInterface;
 use ApiPlatform\Core\GraphQl\Resolver\ResourceAccessCheckerTrait;
@@ -23,6 +22,7 @@ use ApiPlatform\Core\GraphQl\Serializer\ItemNormalizer;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Security\ResourceAccessCheckerInterface;
 use ApiPlatform\Core\Util\ClassInfoTrait;
+use GraphQL\Error\Error;
 use GraphQL\Type\Definition\ResolveInfo;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
@@ -66,7 +66,7 @@ final class ItemResolverFactory implements ResolverFactoryInterface
 
             $baseNormalizationContext = ['attributes' => $this->fieldsToAttributes($info)];
             $item = $this->getItem($args, $baseNormalizationContext);
-            $resourceClass = $this->getResourceClass($item, $resourceClass);
+            $resourceClass = $this->getResourceClass($item, $resourceClass, $info);
 
             $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
 
@@ -75,7 +75,7 @@ final class ItemResolverFactory implements ResolverFactoryInterface
                 /** @var QueryItemResolverInterface $queryResolver */
                 $queryResolver = $this->queryResolverLocator->get($queryResolverId);
                 $item = $queryResolver($item, ['source' => $source, 'args' => $args, 'info' => $info]);
-                $resourceClass = $this->getResourceClass($item, $resourceClass, sprintf('Custom query resolver "%s"', $queryResolverId).' has to return an item of class %s but returned an item of class %s');
+                $resourceClass = $this->getResourceClass($item, $resourceClass, $info, sprintf('Custom query resolver "%s"', $queryResolverId).' has to return an item of class %s but returned an item of class %s.');
             }
 
             $this->canAccess($this->resourceAccessChecker, $resourceMetadata, $resourceClass, $info, $item, $operationName ?? 'query');
@@ -107,9 +107,9 @@ final class ItemResolverFactory implements ResolverFactoryInterface
     /**
      * @param object|null $item
      *
-     * @throws RuntimeException
+     * @throws Error
      */
-    private function getResourceClass($item, ?string $resourceClass, string $errorMessage = 'Resolver only handles items of class %s but retrieved item is of class %s'): ?string
+    private function getResourceClass($item, ?string $resourceClass, ResolveInfo $info, string $errorMessage = 'Resolver only handles items of class %s but retrieved item is of class %s.'): ?string
     {
         if (null === $item) {
             return $resourceClass;
@@ -122,7 +122,7 @@ final class ItemResolverFactory implements ResolverFactoryInterface
         }
 
         if ($resourceClass !== $itemClass) {
-            throw new RuntimeException(sprintf($errorMessage, $resourceClass, $itemClass));
+            throw Error::createLocatedError(sprintf($errorMessage, (new \ReflectionClass($resourceClass))->getShortName(), (new \ReflectionClass($itemClass))->getShortName()), $info->fieldNodes, $info->path);
         }
 
         return $resourceClass;

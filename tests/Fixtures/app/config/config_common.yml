@@ -254,13 +254,25 @@ services:
             -  { name: 'messenger.message_handler' }
 
     app.graphql.query_resolver.dummy_custom_item:
-        class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\Resolver\DummyCustomQueryItemResolver'
+        class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\GraphQl\Resolver\DummyCustomQueryItemResolver'
         public: false
         tags:
             - { name: 'api_platform.graphql.query_resolver' }
 
     app.graphql.query_resolver.dummy_custom_collection:
-        class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\Resolver\DummyCustomQueryCollectionResolver'
+        class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\GraphQl\Resolver\DummyCustomQueryCollectionResolver'
         public: false
         tags:
             - { name: 'api_platform.graphql.query_resolver' }
+
+    app.graphql.mutation_resolver.dummy_custom:
+        class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\GraphQl\Resolver\SumMutationResolver'
+        public: false
+        tags:
+            - { name: 'api_platform.graphql.mutation_resolver' }
+
+    app.graphql.mutation_resolver.dummy_custom_not_persisted:
+        class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\GraphQl\Resolver\SumNotPersistedMutationResolver'
+        public: false
+        tags:
+            - { name: 'api_platform.graphql.mutation_resolver' }
