@@ -150,8 +150,7 @@ class ItemNormalizerTest extends TestCase
             false,
             [],
             [],
-            null,
-            false
+            null
         );
         $normalizer->setSerializer($serializerProphecy->reveal());
 
@@ -217,8 +216,7 @@ class ItemNormalizerTest extends TestCase
             false,
             [],
             [],
-            null,
-            false
+            null
         );
         $normalizer->setSerializer($serializerProphecy->reveal());
 
@@ -297,8 +295,7 @@ class ItemNormalizerTest extends TestCase
             false,
             [],
             [],
-            null,
-            false
+            null
         );
         $serializer = new Serializer([$normalizer]);
         $normalizer->setSerializer($serializer);

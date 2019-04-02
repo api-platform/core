@@ -43,23 +43,17 @@
             <argument type="tagged" tag="api_platform.data_transformer" on-invalid="ignore" />
             <argument>false</argument>
 
-            <!-- After the DataUriNormalizer but before the ObjectNormalizer -->
+            <!-- Run after serializer.normalizer.data_uri but before serializer.normalizer.object -->
             <tag name="serializer.normalizer" priority="-922" />
         </service>
 
-        <service id="api_platform.jsonapi.normalizer.item.non_resource" class="ApiPlatform\Core\JsonApi\Serializer\ItemNormalizer" public="false">
-            <argument type="service" id="api_platform.metadata.property.name_collection_factory" />
-            <argument type="service" id="api_platform.metadata.property.metadata_factory" />
+        <service id="api_platform.jsonapi.normalizer.object" class="ApiPlatform\Core\JsonApi\Serializer\ObjectNormalizer" public="false">
+            <argument type="service" id="serializer.normalizer.object" />
             <argument type="service" id="api_platform.iri_converter" />
             <argument type="service" id="api_platform.resource_class_resolver" />
-            <argument type="service" id="api_platform.property_accessor" />
-            <argument type="service" id="api_platform.jsonapi.name_converter.reserved_attribute_name" />
             <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
-            <argument type="collection" />
-            <argument type="tagged" tag="api_platform.data_transformer" on-invalid="ignore" />
-            <argument>true</argument>
 
-            <!-- After the DataUriNormalizer but before the ObjectNormalizer -->
+            <!-- Run after serializer.normalizer.data_uri but before serializer.normalizer.object -->
             <tag name="serializer.normalizer" priority="-924" />
         </service>
 

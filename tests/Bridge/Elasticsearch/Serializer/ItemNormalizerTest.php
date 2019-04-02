@@ -15,9 +15,9 @@ namespace ApiPlatform\Core\Tests\Bridge\Elasticsearch\Serializer;
 
 use ApiPlatform\Core\Bridge\Elasticsearch\Api\IdentifierExtractorInterface;
 use ApiPlatform\Core\Bridge\Elasticsearch\Serializer\ItemNormalizer;
-use ApiPlatform\Core\Exception\RuntimeException;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Foo;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Serializer\Exception\LogicException;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
@@ -82,13 +82,13 @@ class ItemNormalizerTest extends TestCase
     {
         $itemNormalizer = new ItemNormalizer($this->prophesize(IdentifierExtractorInterface::class)->reveal());
 
-        self::assertFalse($itemNormalizer->supportsNormalization(new Foo(), ItemNormalizer::FORMAT));
+        self::assertTrue($itemNormalizer->supportsNormalization(new Foo(), ItemNormalizer::FORMAT));
     }
 
     public function testNormalize()
     {
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage(sprintf('%s is a read-only format.', ItemNormalizer::FORMAT));
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage(sprintf('%s is a write-only format.', ItemNormalizer::FORMAT));
 
         (new ItemNormalizer($this->prophesize(IdentifierExtractorInterface::class)->reveal()))->normalize(new Foo(), ItemNormalizer::FORMAT);
     }
