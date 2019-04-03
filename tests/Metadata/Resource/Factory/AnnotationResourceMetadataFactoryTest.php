@@ -46,6 +46,17 @@ class AnnotationResourceMetadataFactoryTest extends TestCase
         $this->assertEquals(['foo' => 'bar'], $metadata->getGraphql());
     }
 
+    public function testCreateWithoutAttributes()
+    {
+        $annotation = new ApiResource([]);
+        $reader = $this->prophesize(Reader::class);
+        $reader->getClassAnnotation(Argument::type(\ReflectionClass::class), ApiResource::class)->willReturn($annotation)->shouldBeCalled();
+        $factory = new AnnotationResourceMetadataFactory($reader->reveal(), null);
+        $metadata = $factory->create(Dummy::class);
+
+        $this->assertNull($metadata->getAttributes());
+    }
+
     public function getCreateDependencies()
     {
         $annotation = new ApiResource([

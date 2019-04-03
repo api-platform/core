@@ -85,7 +85,7 @@ final class AnnotationResourceMetadataFactory implements ResourceMetadataFactory
                 $annotation->iri,
                 $annotation->itemOperations,
                 $annotation->collectionOperations,
-                $annotation->attributes,
+                $annotation->attributes ?: null,
                 $annotation->subresourceOperations,
                 $annotation->graphql
             );
