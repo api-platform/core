@@ -40,10 +40,17 @@ class OrderFilter extends AbstractContextAwareFilter implements OrderFilterInter
 {
     use OrderFilterTrait;
 
-    public function __construct(ManagerRegistry $managerRegistry, ?RequestStack $requestStack = null, string $orderParameterName = 'order', LoggerInterface $logger = null, array $properties = null)
+    /**
+     * {@inheritdoc}
+     */
+    public function __construct(ManagerRegistry $managerRegistry, ?RequestStack $requestStack = null, string $orderParameterName = 'order', LoggerInterface $logger = null, /*PropertyMetadataFactoryInterface*/ $propertyMetadataFactory = null, /*array*/ $properties = null)
     {
-        if (null !== $properties) {
-            $properties = array_map(function ($propertyOptions) {
+        parent::__construct($managerRegistry, $requestStack, $logger, $propertyMetadataFactory, $properties);
+
+        $this->orderParameterName = $orderParameterName;
+
+        if (null !== $this->properties) {
+            $this->properties = array_map(function ($propertyOptions) {
                 // shorthand for default direction
                 if (\is_string($propertyOptions)) {
                     $propertyOptions = [
@@ -52,12 +59,8 @@ class OrderFilter extends AbstractContextAwareFilter implements OrderFilterInter
                 }
 
                 return $propertyOptions;
-            }, $properties);
+            }, $this->properties);
         }
-
-        parent::__construct($managerRegistry, $requestStack, $logger, $properties);
-
-        $this->orderParameterName = $orderParameterName;
     }
 
     /**
@@ -83,9 +86,15 @@ class OrderFilter extends AbstractContextAwareFilter implements OrderFilterInter
     /**
      * {@inheritdoc}
      */
-    protected function filterProperty(string $property, $direction, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, string $operationName = null)
+    protected function filterProperty(string $property, $direction, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, string $operationName = null/*, array $context = []*/)
     {
-        if (!$this->isPropertyEnabled($property, $resourceClass) || !$this->isPropertyMapped($property, $resourceClass)) {
+        if (\func_num_args() < 7 && __CLASS__ !== \get_class($this) && __CLASS__ !== (new \ReflectionMethod($this, __FUNCTION__))->getDeclaringClass()->getName()) {
+            @trigger_error(sprintf('Method %s() will have a sixth "$context" argument in API Platform 3.0. Not defining it is deprecated since API Platform 2.4.', __FUNCTION__), E_USER_DEPRECATED);
+        }
+
+        $context = 6 < \func_num_args() ? (array) func_get_arg(6) : [];
+
+        if (!$this->isPropertyEnabled($property, $resourceClass, $context) || !$this->isPropertyMapped($property, $resourceClass)) {
             return;
         }
 

@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Filter;
 
-use ApiPlatform\Core\Api\FilterInterface as BaseFilterInterface;
+use ApiPlatform\Core\Api\ContextAwareFilterInterface as BaseFilterInterface;
 use Doctrine\ODM\MongoDB\Aggregation\Builder;
 
 /**

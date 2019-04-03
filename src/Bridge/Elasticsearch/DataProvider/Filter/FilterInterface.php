@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Bridge\Elasticsearch\DataProvider\Filter;
 
-use ApiPlatform\Core\Api\FilterInterface as BaseFilterInterface;
+use ApiPlatform\Core\Api\ContextAwareFilterInterface as BaseFilterInterface;
 
 /**
  * Elasticsearch filter interface.
@@ -24,5 +24,8 @@ use ApiPlatform\Core\Api\FilterInterface as BaseFilterInterface;
  */
 interface FilterInterface extends BaseFilterInterface
 {
+    /**
+     * Applies the filter.
+     */
     public function apply(array $clauseBody, string $resourceClass, ?string $operationName = null, array $context = []): array;
 }

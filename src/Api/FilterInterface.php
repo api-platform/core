@@ -47,5 +47,5 @@ interface FilterInterface
      *
      * @see \ApiPlatform\Core\Swagger\Serializer\DocumentationNormalizer::getFiltersParameters
      */
-    public function getDescription(string $resourceClass): array;
+    public function getDescription(string $resourceClass/*, array $context = []*/): array;
 }

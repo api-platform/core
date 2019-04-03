@@ -23,6 +23,7 @@ use ApiPlatform\Core\Exception\ItemNotFoundException;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
+use ApiPlatform\Core\Metadata\Property\PropertyMetadataFactoryOptionsTrait;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Util\ClassInfoTrait;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
@@ -52,6 +53,9 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer implement
     use ClassInfoTrait;
     use ContextTrait;
     use InputOutputMetadataTrait;
+    use PropertyMetadataFactoryOptionsTrait {
+        getPropertyMetadataFactoryOptions as protected getFactoryOptions;
+    }
 
     protected $propertyNameCollectionFactory;
     protected $propertyMetadataFactory;
@@ -478,30 +482,6 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer implement
         } catch (NoSuchPropertyException $exception) {
             // Properties not found are ignored
         }
-    }
-
-    /**
-     * Gets a valid context for property metadata factories.
-     *
-     * @see https://github.com/symfony/symfony/blob/master/src/Symfony/Component/PropertyInfo/Extractor/SerializerExtractor.php
-     */
-    protected function getFactoryOptions(array $context): array
-    {
-        $options = [];
-
-        if (isset($context[self::GROUPS])) {
-            $options['serializer_groups'] = $context[self::GROUPS];
-        }
-
-        if (isset($context['collection_operation_name'])) {
-            $options['collection_operation_name'] = $context['collection_operation_name'];
-        }
-
-        if (isset($context['item_operation_name'])) {
-            $options['item_operation_name'] = $context['item_operation_name'];
-        }
-
-        return $options;
     }
 
     /**

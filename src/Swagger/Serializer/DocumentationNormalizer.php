@@ -795,7 +795,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
                 continue;
             }
 
-            foreach ($filter->getDescription($resourceClass) as $name => $data) {
+            foreach ($filter->getDescription($resourceClass, ['collection_operation_name' => $operationName]) as $name => $data) {
                 $parameter = [
                     'name' => $name,
                     'in' => 'query',

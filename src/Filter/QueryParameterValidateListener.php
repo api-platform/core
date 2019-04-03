@@ -59,7 +59,7 @@ final class QueryParameterValidateListener
                 continue;
             }
 
-            foreach ($filter->getDescription($attributes['resource_class']) as $name => $data) {
+            foreach ($filter->getDescription($attributes['resource_class'], ['collection_operation_name' => $operationName]) as $name => $data) {
                 if (!($data['required'] ?? false)) { // property is not required
                     continue;
                 }

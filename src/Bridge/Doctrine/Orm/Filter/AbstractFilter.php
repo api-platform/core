@@ -16,6 +16,8 @@ namespace ApiPlatform\Core\Bridge\Doctrine\Orm\Filter;
 use ApiPlatform\Core\Bridge\Doctrine\Common\PropertyHelperTrait;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\PropertyHelperTrait as OrmPropertyHelperTrait;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGeneratorInterface;
+use ApiPlatform\Core\Exception\InvalidArgumentException;
+use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Util\RequestParser;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\QueryBuilder;
@@ -42,15 +44,37 @@ abstract class AbstractFilter implements FilterInterface
     protected $logger;
     protected $properties;
 
-    public function __construct(ManagerRegistry $managerRegistry, ?RequestStack $requestStack = null, LoggerInterface $logger = null, array $properties = null)
+    /**
+     * @param PropertyMetadataFactoryInterface|null $propertyMetadataFactory
+     * @param array|null                            $properties
+     */
+    public function __construct(ManagerRegistry $managerRegistry, ?RequestStack $requestStack = null, LoggerInterface $logger = null, /*PropertyMetadataFactoryInterface*/ $propertyMetadataFactory = null, /*array*/ $properties = null)
     {
         if (null !== $requestStack) {
             @trigger_error(sprintf('Passing an instance of "%s" is deprecated since 2.2. Use "filters" context key instead.', RequestStack::class), E_USER_DEPRECATED);
         }
 
+        if (null === $properties && \is_array($propertyMetadataFactory)) {
+            @trigger_error(sprintf('Passing the "$properties" argument as fourth argument to the %s() method is deprecated since API Platform 2.4 and will not be possible anymore in API Platform 3. Use the fifth argument instead.', __METHOD__), E_USER_DEPRECATED);
+
+            $properties = $propertyMetadataFactory;
+            $propertyMetadataFactory = null;
+        }
+
+        if (null !== $properties && !\is_array($properties)) {
+            throw new InvalidArgumentException('The "$properties" argument is expected to be an array or null.');
+        }
+
+        if (null === $propertyMetadataFactory) {
+            @trigger_error(sprintf('Not injecting an implementation of "%s" as fourth argument to the %s() method is deprecated since API Platform 2.4 and will not be possible anymore in API Platform 3.', PropertyMetadataFactoryInterface::class, __METHOD__), E_USER_DEPRECATED);
+        } elseif (!$propertyMetadataFactory instanceof PropertyMetadataFactoryInterface) {
+            throw new InvalidArgumentException(sprintf('The "$propertyMetadataFactory" argument is expected to be an implementation of the "%s" interface.', PropertyMetadataFactoryInterface::class));
+        }
+
         $this->managerRegistry = $managerRegistry;
         $this->requestStack = $requestStack;
         $this->logger = $logger ?? new NullLogger();
+        $this->propertyMetadataFactory = $propertyMetadataFactory;
         $this->properties = $properties;
     }
 
@@ -88,31 +112,6 @@ abstract class AbstractFilter implements FilterInterface
     protected function getLogger(): LoggerInterface
     {
         return $this->logger;
-    }
-
-    /**
-     * Determines whether the given property is enabled.
-     */
-    protected function isPropertyEnabled(string $property/*, string $resourceClass*/): bool
-    {
-        if (\func_num_args() > 1) {
-            $resourceClass = func_get_arg(1);
-        } else {
-            if (__CLASS__ !== \get_class($this)) {
-                $r = new \ReflectionMethod($this, __FUNCTION__);
-                if (__CLASS__ !== $r->getDeclaringClass()->getName()) {
-                    @trigger_error(sprintf('Method %s() will have a second `$resourceClass` argument in version API Platform 3.0. Not defining it is deprecated since API Platform 2.1.', __FUNCTION__), E_USER_DEPRECATED);
-                }
-            }
-            $resourceClass = null;
-        }
-
-        if (null === $this->properties) {
-            // to ensure sanity, nested properties must still be explicitly enabled
-            return !$this->isPropertyNested($property, $resourceClass);
-        }
-
-        return \array_key_exists($property, $this->properties);
     }
 
     /**

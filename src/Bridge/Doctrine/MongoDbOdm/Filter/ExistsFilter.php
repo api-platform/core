@@ -35,7 +35,17 @@ use Doctrine\ODM\MongoDB\Mapping\ClassMetadata;
  */
 final class ExistsFilter extends AbstractFilter implements ExistsFilterInterface
 {
-    use ExistsFilterTrait;
+    use ExistsFilterTrait {
+        getDescription as private getDescriptionLegacy;
+    }
+
+    /**
+     * @inheritdoc}
+     */
+    public function getDescription(string $resourceClass, array $context = []): array
+    {
+        return $this->getDescriptionLegacy($resourceClass, $context);
+    }
 
     /**
      * {@inheritdoc}
@@ -44,7 +54,7 @@ final class ExistsFilter extends AbstractFilter implements ExistsFilterInterface
     {
         if (
             !isset($value[self::QUERY_PARAMETER_KEY]) ||
-            !$this->isPropertyEnabled($property, $resourceClass) ||
+            !$this->isPropertyEnabled($property, $resourceClass, $context) ||
             !$this->isPropertyMapped($property, $resourceClass, true) ||
             !$this->isNullableField($property, $resourceClass)
         ) {

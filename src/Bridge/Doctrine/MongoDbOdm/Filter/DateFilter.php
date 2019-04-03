@@ -30,11 +30,21 @@ use Doctrine\ODM\MongoDB\Types\Type as MongoDbType;
  */
 class DateFilter extends AbstractFilter implements DateFilterInterface
 {
-    use DateFilterTrait;
+    use DateFilterTrait {
+        getDescription as private getDescriptionLegacy;
+    }
 
     public const DOCTRINE_DATE_TYPES = [
         MongoDbType::DATE => true,
     ];
+
+    /**
+     * @inheritdoc}
+     */
+    public function getDescription(string $resourceClass, array $context = []): array
+    {
+        return $this->getDescriptionLegacy($resourceClass, $context);
+    }
 
     /**
      * {@inheritdoc}
@@ -44,7 +54,7 @@ class DateFilter extends AbstractFilter implements DateFilterInterface
         // Expect $values to be an array having the period as keys and the date value as values
         if (
             !\is_array($values) ||
-            !$this->isPropertyEnabled($property, $resourceClass) ||
+            !$this->isPropertyEnabled($property, $resourceClass, $context) ||
             !$this->isPropertyMapped($property, $resourceClass) ||
             !$this->isDateField($property, $resourceClass)
         ) {

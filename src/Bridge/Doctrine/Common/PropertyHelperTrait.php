@@ -13,6 +13,9 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Bridge\Doctrine\Common;
 
+use ApiPlatform\Core\Exception\PropertyNotFoundException;
+use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
+use ApiPlatform\Core\Metadata\Property\PropertyMetadataFactoryOptionsTrait;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Persistence\Mapping\ClassMetadata;
 use Doctrine\DBAL\Types\Type;
@@ -26,7 +29,53 @@ use Doctrine\DBAL\Types\Type;
  */
 trait PropertyHelperTrait
 {
+    use PropertyMetadataFactoryOptionsTrait;
+
+    /** @var PropertyMetadataFactoryInterface|null */
+    protected $propertyMetadataFactory;
+
     abstract protected function getManagerRegistry(): ManagerRegistry;
+
+    /**
+     * Determines whether the given property is enabled.
+     */
+    protected function isPropertyEnabled(string $property/*, string $resourceClass, array $context = []*/): bool
+    {
+        if (\func_num_args() < 3 && __CLASS__ !== \get_class($this) && __CLASS__ !== (new \ReflectionMethod($this, __FUNCTION__))->getDeclaringClass()->getName()) {
+            if (\func_num_args() < 2) {
+                @trigger_error(sprintf('Method %s() will have a second `$resourceClass` argument in version API Platform 3.0. Not defining it is deprecated since API Platform 2.1.', __FUNCTION__), E_USER_DEPRECATED);
+            }
+
+            @trigger_error(sprintf('Method %s() will have a third "$context" argument in API Platform 3.0. Not defining it is deprecated since API Platform 2.4.', __FUNCTION__), E_USER_DEPRECATED);
+        }
+
+        $resourceClass = 1 < \func_num_args() ? (string) func_get_arg(1) : null;
+        $context = 2 < \func_num_args() ? (array) func_get_arg(2) : [];
+
+        if (null !== $this->properties) {
+            return \array_key_exists($property, $this->properties);
+        }
+
+        if (null !== $resourceClass && null !== $this->propertyMetadataFactory) {
+            try {
+                $propertyMetadata = $this->propertyMetadataFactory->create($resourceClass, $property, $this->getPropertyMetadataFactoryOptions($context));
+            } catch (PropertyNotFoundException $e) {
+                return false;
+            }
+
+            // to ensure sanity, unreadable properties must still be explicitly enabled
+            if (!$propertyMetadata->isReadable()) {
+                return false;
+            }
+        }
+
+        // to ensure sanity, nested properties must still be explicitly enabled
+        if (null === $resourceClass) {
+            return !$this->isPropertyNested($property);
+        }
+
+        return !$this->isPropertyNested($property, $resourceClass);
+    }
 
     /**
      * Determines whether the given property is mapped.

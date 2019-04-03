@@ -22,6 +22,8 @@ use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 /**
  * Trait for filtering the collection by given properties.
  *
+ * @internal
+ *
  * @author Kévin Dunglas <dunglas@gmail.com>
  * @author Alan Poulain <contact@alanpoulain.eu>
  */
@@ -35,8 +37,13 @@ trait SearchFilterTrait
     /**
      * {@inheritdoc}
      */
-    public function getDescription(string $resourceClass): array
+    public function getDescription(string $resourceClass/*, array $context = []*/): array
     {
+        if (\func_num_args() < 2 && __CLASS__ !== \get_class($this) && __CLASS__ !== (new \ReflectionMethod($this, __FUNCTION__))->getDeclaringClass()->getName()) {
+            @trigger_error(sprintf('Method %s() will have a second `$context` argument in version API Platform 3.0. Not defining it is deprecated since API Platform 2.4.', __FUNCTION__), E_USER_DEPRECATED);
+        }
+
+        $context = 1 < \func_num_args() ? (array) func_get_arg(1) : [];
         $description = [];
 
         $properties = $this->getProperties();
@@ -45,7 +52,10 @@ trait SearchFilterTrait
         }
 
         foreach ($properties as $property => $strategy) {
-            if (!$this->isPropertyMapped($property, $resourceClass, true)) {
+            if (
+                !$this->isPropertyEnabled($property, $resourceClass, $context) ||
+                !$this->isPropertyMapped($property, $resourceClass, true)
+            ) {
                 continue;
             }
 
