@@ -41,6 +41,7 @@ class GraphQlTypePassTest extends TestCase
         $typesFactoryDefinitionProphecy->addArgument(['my_id'])->shouldBeCalled();
 
         $containerBuilderProphecy = $this->prophesize(ContainerBuilder::class);
+        $containerBuilderProphecy->getParameter('api_platform.graphql.enabled')->willReturn(true)->shouldBeCalled();
         $containerBuilderProphecy->findTaggedServiceIds('api_platform.graphql.type', true)->willReturn(['foo' => [], 'bar' => [['id' => 'my_id']]])->shouldBeCalled();
         $containerBuilderProphecy->getDefinition('api_platform.graphql.type_locator')->willReturn($typeLocatorDefinitionProphecy->reveal())->shouldBeCalled();
         $containerBuilderProphecy->getDefinition('api_platform.graphql.types_factory')->willReturn($typesFactoryDefinitionProphecy->reveal())->shouldBeCalled();
@@ -63,9 +64,31 @@ class GraphQlTypePassTest extends TestCase
         $typesFactoryDefinitionProphecy->addArgument(['bar'])->shouldBeCalled();
 
         $containerBuilderProphecy = $this->prophesize(ContainerBuilder::class);
+        $containerBuilderProphecy->getParameter('api_platform.graphql.enabled')->willReturn(true)->shouldBeCalled();
         $containerBuilderProphecy->findTaggedServiceIds('api_platform.graphql.type', true)->willReturn(['foo' => [], 'bar' => [['hi' => 'hello']]])->shouldBeCalled();
         $containerBuilderProphecy->getDefinition('api_platform.graphql.type_locator')->willReturn($typeLocatorDefinitionProphecy->reveal())->shouldBeCalled();
         $containerBuilderProphecy->getDefinition('api_platform.graphql.types_factory')->willReturn($typesFactoryDefinitionProphecy->reveal())->shouldBeCalled();
+
+        $filterPass->process($containerBuilderProphecy->reveal());
+    }
+
+    public function testDisabled()
+    {
+        $filterPass = new GraphQlTypePass();
+
+        $this->assertInstanceOf(CompilerPassInterface::class, $filterPass);
+
+        $typeLocatorDefinitionProphecy = $this->prophesize(Definition::class);
+        $typeLocatorDefinitionProphecy->addArgument(Argument::any())->shouldNotBeCalled();
+
+        $typesFactoryDefinitionProphecy = $this->prophesize(Definition::class);
+        $typesFactoryDefinitionProphecy->addArgument(['my_id'])->shouldNotBeCalled();
+
+        $containerBuilderProphecy = $this->prophesize(ContainerBuilder::class);
+        $containerBuilderProphecy->getParameter('api_platform.graphql.enabled')->willReturn(false)->shouldBeCalled();
+        $containerBuilderProphecy->findTaggedServiceIds('api_platform.graphql.type', true)->willReturn(['foo' => [], 'bar' => [['id' => 'my_id']]])->shouldNotBeCalled();
+        $containerBuilderProphecy->getDefinition('api_platform.graphql.type_locator')->willReturn($typeLocatorDefinitionProphecy->reveal())->shouldNotBeCalled();
+        $containerBuilderProphecy->getDefinition('api_platform.graphql.types_factory')->willReturn($typesFactoryDefinitionProphecy->reveal())->shouldNotBeCalled();
 
         $filterPass->process($containerBuilderProphecy->reveal());
     }
