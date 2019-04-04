@@ -238,6 +238,8 @@ final class PropertyMetadata
 
     /**
      * Gets an attribute.
+     *
+     * @param mixed|null $defaultValue
      */
     public function getAttribute(string $key, $defaultValue = null)
     {

@@ -86,4 +86,12 @@ class DataTransformerTest extends TestCase
         $dataTransformer = new DataTransformer($metadataFactoryProphecy->reveal());
         $this->assertSame($dummy, $dataTransformer->transform($dummy, Dummy::class));
     }
+
+    public function testSupportWithGraphqlContext()
+    {
+        $metadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
+        $metadataFactoryProphecy->create(Dummy::class)->willReturn((new ResourceMetadata(null, null, null, null, null, []))->withGraphQl(['create' => ['messenger' => 'input']]));
+        $dataTransformer = new DataTransformer($metadataFactoryProphecy->reveal());
+        $this->assertTrue($dataTransformer->supportsTransformation([], Dummy::class, ['input' => ['class' => 'smth'], 'graphql_operation_name' => 'create']));
+    }
 }

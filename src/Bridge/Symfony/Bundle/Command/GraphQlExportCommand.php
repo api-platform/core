@@ -49,8 +49,7 @@ class GraphQlExportCommand extends Command
         $this
             ->setDescription('Export the GraphQL schema in Schema Definition Language (SDL)')
             ->addOption('comment-descriptions', null, InputOption::VALUE_NONE, 'Use preceding comments as the description')
-            ->addOption('output', 'o', InputOption::VALUE_REQUIRED, 'Write output to file')
-        ;
+            ->addOption('output', 'o', InputOption::VALUE_REQUIRED, 'Write output to file');
     }
 
     /**

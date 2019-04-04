@@ -129,6 +129,6 @@ final class AnnotationPropertyMetadataFactory implements PropertyMetadataFactory
     {
         $wither = 'with'.ucfirst($property[1]);
 
-        return $propertyMetadata->$wither($value);
+        return $propertyMetadata->{$wither}($value);
     }
 }

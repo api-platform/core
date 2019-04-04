@@ -108,7 +108,7 @@ jobs:
       - *update-composer
       - run:
           name: Install PHP-CS-Fixer
-          command: composer global require friendsofphp/php-cs-fixer:^2.13
+          command: composer global require friendsofphp/php-cs-fixer:^2.14
       - *save-composer-cache-by-revision
       - *save-composer-cache-by-branch
       - run:

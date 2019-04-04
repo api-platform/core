@@ -230,7 +230,7 @@ final class DoctrineContext implements Context
             $dummyGroup = $this->buildDummyGroup();
 
             foreach (['foo', 'bar', 'baz', 'qux'] as $property) {
-                $dummyGroup->$property = ucfirst($property).' #'.$i;
+                $dummyGroup->{$property} = ucfirst($property).' #'.$i;
             }
 
             $this->manager->persist($dummyGroup);
@@ -249,7 +249,7 @@ final class DoctrineContext implements Context
             $dummyGroup = $this->buildDummyGroup();
 
             foreach (['foo', 'bar', 'baz'] as $property) {
-                $dummyProperty->$property = $dummyGroup->$property = ucfirst($property).' #'.$i;
+                $dummyProperty->{$property} = $dummyGroup->{$property} = ucfirst($property).' #'.$i;
             }
 
             $dummyProperty->group = $dummyGroup;
@@ -268,7 +268,7 @@ final class DoctrineContext implements Context
     {
         $dummyGroup = $this->buildDummyGroup();
         foreach (['foo', 'bar', 'baz'] as $property) {
-            $dummyGroup->$property = ucfirst($property).' #shared';
+            $dummyGroup->{$property} = ucfirst($property).' #shared';
         }
         $this->manager->persist($dummyGroup);
 
@@ -276,7 +276,7 @@ final class DoctrineContext implements Context
             $dummyProperty = $this->buildDummyProperty();
 
             foreach (['foo', 'bar', 'baz'] as $property) {
-                $dummyProperty->$property = ucfirst($property).' #'.$i;
+                $dummyProperty->{$property} = ucfirst($property).' #'.$i;
             }
 
             $dummyProperty->group = $dummyGroup;
@@ -296,7 +296,7 @@ final class DoctrineContext implements Context
             $dummyProperty = $this->buildDummyProperty();
 
             foreach (['foo', 'bar', 'baz'] as $property) {
-                $dummyProperty->$property = $dummyGroup->$property = ucfirst($property).' #'.$i;
+                $dummyProperty->{$property} = $dummyGroup->{$property} = ucfirst($property).' #'.$i;
             }
 
             $this->manager->persist($dummyGroup);
@@ -322,7 +322,7 @@ final class DoctrineContext implements Context
             $dummyGroup = $this->buildDummyGroup();
 
             foreach (['foo', 'bar', 'baz'] as $property) {
-                $dummyProperty->$property = $dummyGroup->$property = ucfirst($property).' #'.$i;
+                $dummyProperty->{$property} = $dummyGroup->{$property} = ucfirst($property).' #'.$i;
             }
 
             $dummyProperty->group = $dummyGroup;
@@ -332,7 +332,7 @@ final class DoctrineContext implements Context
                 $dummyGroup = $this->buildDummyGroup();
 
                 foreach (['foo', 'bar', 'baz'] as $property) {
-                    $dummyGroup->$property = ucfirst($property).' #'.$i.$j;
+                    $dummyGroup->{$property} = ucfirst($property).' #'.$i.$j;
                 }
 
                 $dummyProperty->groups[] = $dummyGroup;

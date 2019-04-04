@@ -175,13 +175,11 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer implement
         $inputClass = $this->getInputClass($class, $context);
 
         if (null !== $inputClass && null !== $dataTransformer = $this->getDataTransformer($data, $class, $context)) {
-            $data = $dataTransformer->transform(
+            return $dataTransformer->transform(
                 parent::denormalize($data, $inputClass, $format, ['resource_class' => $inputClass] + $context),
                 $class,
                 $context
             );
-
-            return $data;
         }
 
         return parent::denormalize($data, $class, $format, $context);

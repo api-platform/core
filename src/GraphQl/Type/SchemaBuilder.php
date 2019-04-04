@@ -445,8 +445,7 @@ final class SchemaBuilder implements SchemaBuilderInterface
             return $this->graphqlTypes[$shortName];
         }
 
-        $ioMetadata = $resourceMetadata->getAttribute($input ? 'input' : 'output');
-
+        $ioMetadata = $resourceMetadata->getGraphqlAttribute(null === $mutationName ? 'query' : $mutationName, $input ? 'input' : 'output', null, true);
         if (null !== $ioMetadata && \array_key_exists('class', $ioMetadata) && null !== $ioMetadata['class']) {
             $resourceClass = $ioMetadata['class'];
         }

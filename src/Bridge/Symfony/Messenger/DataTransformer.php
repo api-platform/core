@@ -55,6 +55,10 @@ final class DataTransformer implements DataTransformerInterface
 
         $metadata = $this->resourceMetadataFactory->create($context['resource_class'] ?? $to);
 
+        if (isset($context['graphql_operation_name'])) {
+            return 'input' === $metadata->getGraphqlAttribute($context['graphql_operation_name'], 'messenger', null, true);
+        }
+
         if (!isset($context['operation_type'])) {
             return 'input' === $metadata->getAttribute('messenger');
         }

@@ -84,8 +84,7 @@ class QueryParameterValidateListenerTest extends TestCase
         $this->filterLocatorProphecy
             ->has('some_filter')
             ->shouldBeCalled()
-            ->willReturn(true)
-        ;
+            ->willReturn(true);
         $filterProphecy = $this->prophesize(FilterInterface::class);
         $filterProphecy
             ->getDescription(Dummy::class)
@@ -94,13 +93,11 @@ class QueryParameterValidateListenerTest extends TestCase
                 'required' => [
                     'required' => true,
                 ],
-            ])
-        ;
+            ]);
         $this->filterLocatorProphecy
             ->get('some_filter')
             ->shouldBeCalled()
-            ->willReturn($filterProphecy->reveal())
-        ;
+            ->willReturn($filterProphecy->reveal());
 
         $this->expectException(FilterValidationException::class);
         $this->expectExceptionMessage('Query parameter "required" is required');
@@ -127,8 +124,7 @@ class QueryParameterValidateListenerTest extends TestCase
         $this->filterLocatorProphecy
             ->has('some_filter')
             ->shouldBeCalled()
-            ->willReturn(true)
-        ;
+            ->willReturn(true);
         $filterProphecy = $this->prophesize(FilterInterface::class);
         $filterProphecy
             ->getDescription(Dummy::class)
@@ -137,13 +133,11 @@ class QueryParameterValidateListenerTest extends TestCase
                 'required' => [
                     'required' => true,
                 ],
-            ])
-        ;
+            ]);
         $this->filterLocatorProphecy
             ->get('some_filter')
             ->shouldBeCalled()
-            ->willReturn($filterProphecy->reveal())
-        ;
+            ->willReturn($filterProphecy->reveal());
 
         $this->assertNull(
             $this->testedInstance->onKernelRequest($eventProphecy->reveal())
@@ -160,8 +154,7 @@ class QueryParameterValidateListenerTest extends TestCase
                 ->withAttributes([
                     'filters' => $filters,
                 ])
-            )
-        ;
+            );
 
         $this->filterLocatorProphecy = $this->prophesize(ContainerInterface::class);
 

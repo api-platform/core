@@ -113,8 +113,7 @@ class WriteListenerTest extends TestCase
         $dataPersisterProphecy
             ->persist($dummy, Argument::type('array'))
             ->willReturn($dummy2) // Persist is not mutating $dummy, but return a brand new technically unrelated object instead
-            ->shouldBeCalled()
-        ;
+            ->shouldBeCalled();
 
         $request = new Request([], [], ['_api_resource_class' => Dummy::class]);
 

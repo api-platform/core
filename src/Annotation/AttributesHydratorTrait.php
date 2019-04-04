@@ -55,7 +55,7 @@ trait AttributesHydratorTrait
                 throw new InvalidArgumentException(sprintf('Unknown property "%s" on annotation "%s".', $key, self::class));
             }
 
-            (new \ReflectionProperty($this, $key))->isPublic() ? $this->$key = $value : $this->attributes += [Inflector::tableize($key) => $value];
+            (new \ReflectionProperty($this, $key))->isPublic() ? $this->{$key} = $value : $this->attributes += [Inflector::tableize($key) => $value];
         }
     }
 }

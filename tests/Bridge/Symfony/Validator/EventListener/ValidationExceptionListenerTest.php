@@ -56,8 +56,7 @@ class ValidationExceptionListenerTest extends TestCase
                 return
                     'application/ld+json; charset=utf-8' === $response->headers->get('Content-Type')
                     && 'nosniff' === $response->headers->get('X-Content-Type-Options')
-                    && 'deny' === $response->headers->get('X-Frame-Options')
-                ;
+                    && 'deny' === $response->headers->get('X-Frame-Options');
             })
         ))->shouldBeCalled();
 

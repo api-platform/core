@@ -93,7 +93,7 @@ final class AnnotationResourceMetadataFactory implements ResourceMetadataFactory
 
         $resourceMetadata = $parentResourceMetadata;
         foreach (['shortName', 'description', 'iri', 'itemOperations', 'collectionOperations', 'subresourceOperations', 'graphql', 'attributes'] as $property) {
-            $resourceMetadata = $this->createWith($resourceMetadata, $property, $annotation->$property);
+            $resourceMetadata = $this->createWith($resourceMetadata, $property, $annotation->{$property});
         }
 
         return $resourceMetadata;
@@ -107,12 +107,12 @@ final class AnnotationResourceMetadataFactory implements ResourceMetadataFactory
         $upperProperty = ucfirst($property);
         $getter = "get$upperProperty";
 
-        if (null !== $resourceMetadata->$getter()) {
+        if (null !== $resourceMetadata->{$getter}()) {
             return $resourceMetadata;
         }
 
         $wither = "with$upperProperty";
 
-        return $resourceMetadata->$wither($value);
+        return $resourceMetadata->{$wither}($value);
     }
 }

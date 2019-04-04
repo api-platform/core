@@ -127,6 +127,11 @@
             <tag name="serializer.normalizer" priority="-925" />
         </service>
 
+        <service id="api_platform.serializer.normalizer.no_op_scalar" class="ApiPlatform\Core\Serializer\NoOpScalarNormalizer" public="false">
+            <!-- Run before our non-cacheable normalizers -->
+            <tag name="serializer.normalizer" priority="-900" />
+        </service>
+
         <!-- Resources Operations path resolver -->
 
         <service id="api_platform.operation_path_resolver" alias="api_platform.operation_path_resolver.router" public="false" />
@@ -306,6 +311,19 @@
 
         <service id="api_platform.cache.subresource_operation_factory" parent="cache.system" public="false">
             <tag name="cache.pool" />
+        </service>
+
+        <service id="api_platform.cache_warmer.cache_pool_clearer" class="ApiPlatform\Core\Bridge\Symfony\Bundle\CacheWarmer\CachePoolClearerCacheWarmer" public="false">
+            <argument type="service" id="cache.system_clearer" />
+            <argument type="collection">
+                <argument>api_platform.cache.metadata.property</argument>
+                <argument>api_platform.cache.metadata.resource</argument>
+                <argument>api_platform.cache.route_name_resolver</argument>
+                <argument>api_platform.cache.identifiers_extractor</argument>
+                <argument>api_platform.cache.subresource_operation_factory</argument>
+                <argument>api_platform.elasticsearch.cache.metadata.document</argument>
+            </argument>
+            <tag name="kernel.cache_warmer" priority="64" />
         </service>
     </services>
 

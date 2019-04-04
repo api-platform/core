@@ -150,6 +150,8 @@ trait SearchFilterTrait
 
     /**
      * When the field should be an integer, check that the given value is a valid one.
+     *
+     * @param mixed|null $type
      */
     protected function hasValidValues(array $values, $type = null): bool
     {
