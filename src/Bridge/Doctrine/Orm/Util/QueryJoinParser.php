@@ -24,6 +24,10 @@ use Doctrine\ORM\QueryBuilder;
  *
  * @author Teoh Han Hui <teohhanhui@gmail.com>
  * @author Vincent Chalamon <vincentchalamon@gmail.com>
+ *
+ * @internal
+ *
+ * @deprecated
  */
 final class QueryJoinParser
 {
@@ -33,70 +37,24 @@ final class QueryJoinParser
 
     /**
      * Gets the class metadata from a given join alias.
+     *
+     * @deprecated
      */
     public static function getClassMetadataFromJoinAlias(string $alias, QueryBuilder $queryBuilder, ManagerRegistry $managerRegistry): ClassMetadata
     {
-        $rootEntities = $queryBuilder->getRootEntities();
-        $rootAliases = $queryBuilder->getRootAliases();
+        @trigger_error(sprintf('The use of "%s::getClassMetadataFromJoinAlias()" is deprecated since 2.4 and will be removed in 3.0. Use "%s::getEntityClassByAlias()" instead.', __CLASS__, QueryBuilderHelper::class), E_USER_DEPRECATED);
 
-        $joinParts = $queryBuilder->getDQLPart('join');
+        $entityClass = QueryBuilderHelper::getEntityClassByAlias($alias, $queryBuilder, $managerRegistry);
 
-        $aliasMap = [];
-        $targetAlias = $alias;
-
-        foreach ($joinParts as $rootAlias => $joins) {
-            $aliasMap[$rootAlias] = 'root';
-
-            foreach ($joins as $join) {
-                $alias = $join->getAlias();
-                $relationship = $join->getJoin();
-
-                $pos = strpos($relationship, '.');
-
-                if (false !== $pos) {
-                    $aliasMap[$alias] = [
-                        'parentAlias' => substr($relationship, 0, $pos),
-                        'association' => substr($relationship, $pos + 1),
-                    ];
-                }
-            }
-        }
-
-        $associationStack = [];
-        $rootAlias = null;
-
-        while (null === $rootAlias) {
-            $mapping = $aliasMap[$targetAlias];
-
-            if ('root' === $mapping) {
-                $rootAlias = $targetAlias;
-            } else {
-                $associationStack[] = $mapping['association'];
-                $targetAlias = $mapping['parentAlias'];
-            }
-        }
-
-        $rootEntity = $rootEntities[array_search($rootAlias, $rootAliases, true)];
-
-        $rootMetadata = $managerRegistry
-            ->getManagerForClass($rootEntity)
-            ->getClassMetadata($rootEntity);
-
-        $metadata = $rootMetadata;
-
-        while (null !== ($association = array_pop($associationStack))) {
-            $associationClass = $metadata->getAssociationTargetClass($association);
-
-            $metadata = $managerRegistry
-                ->getManagerForClass($associationClass)
-                ->getClassMetadata($associationClass);
-        }
-
-        return $metadata;
+        return $managerRegistry
+            ->getManagerForClass($entityClass)
+            ->getClassMetadata($entityClass);
     }
 
     /**
      * Gets the relationship from a Join expression.
+     *
+     * @deprecated
      */
     public static function getJoinRelationship(Join $join): string
     {
@@ -107,6 +65,8 @@ final class QueryJoinParser
 
     /**
      * Gets the alias from a Join expression.
+     *
+     * @deprecated
      */
     public static function getJoinAlias(Join $join): string
     {
@@ -119,6 +79,8 @@ final class QueryJoinParser
      * Gets the parts from an OrderBy expression.
      *
      * @return string[]
+     *
+     * @deprecated
      */
     public static function getOrderByParts(OrderBy $orderBy): array
     {

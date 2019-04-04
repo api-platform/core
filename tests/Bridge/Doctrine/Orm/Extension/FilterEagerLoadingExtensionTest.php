@@ -185,8 +185,7 @@ class FilterEagerLoadingExtensionTest extends TestCase
             ->andwhere('t_a3.confirmed = :confirmation')
             ->setParameter('foo', 1)
             ->setParameter('user', 2)
-            ->setParameter('confirmation', true)
-        ;
+            ->setParameter('confirmation', true);
 
         $queryNameGenerator = $this->prophesize(QueryNameGeneratorInterface::class);
         $queryNameGenerator->generateJoinAlias('colors')->shouldBeCalled()->willReturn('colors_2');

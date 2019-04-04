@@ -69,7 +69,7 @@ final class ApiFilter
                 throw new InvalidArgumentException(sprintf('Property "%s" does not exist on the ApiFilter annotation.', $key));
             }
 
-            $this->$key = $value;
+            $this->{$key} = $value;
         }
     }
 }

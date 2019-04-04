@@ -287,3 +287,29 @@ Feature: DTO input and output
       "data": 123
     }
     """
+
+  @!mongodb
+  Scenario: Use messenger with graphql and an input where the handler gives a synchronous result
+    When I send the following GraphQL request:
+    """
+    mutation {
+      createMessengerWithInput(input: {var: "test"}) {
+        messengerWithInput { id, name }
+      }
+    }
+    """
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the JSON should be equal to:
+    """
+    {
+      "data": {
+        "createMessengerWithInput": {
+          "messengerWithInput": {
+              "id": "/messenger_with_inputs/1",
+              "name": "test"
+          }
+        }
+      }
+    }
+    """

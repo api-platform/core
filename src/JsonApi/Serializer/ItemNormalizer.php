@@ -106,9 +106,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
                 $resourceData['attributes'] = $attributesData;
             }
 
-            $document = ['data' => $resourceData];
-
-            return $document;
+            return ['data' => $resourceData];
         }
 
         $attributesData = parent::normalize($object, $format, $context);

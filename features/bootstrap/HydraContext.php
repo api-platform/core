@@ -222,7 +222,7 @@ final class HydraContext implements Context
      *
      * @throws \InvalidArgumentException
      */
-    private function getPropertyInfo(string $propertyName, string $className): \stdClass
+    private function getPropertyInfo(string $propertyName, string $className): stdClass
     {
         foreach ($this->getProperties($className) as $property) {
             if ($property->{'hydra:title'} === $propertyName) {
@@ -238,7 +238,7 @@ final class HydraContext implements Context
      *
      * @throws \InvalidArgumentException
      */
-    private function getOperation(string $method, string $className): \stdClass
+    private function getOperation(string $method, string $className): stdClass
     {
         foreach ($this->getOperations($className) as $operation) {
             if ($operation->{'hydra:method'} === $method) {
@@ -270,7 +270,7 @@ final class HydraContext implements Context
      *
      * @throws \InvalidArgumentException
      */
-    private function getClassInfo(string $className): \stdClass
+    private function getClassInfo(string $className): stdClass
     {
         $json = $this->getLastJsonResponse();
 
@@ -290,7 +290,7 @@ final class HydraContext implements Context
      *
      * @throws \RuntimeException
      */
-    private function getLastJsonResponse(): \stdClass
+    private function getLastJsonResponse(): stdClass
     {
         if (null === $decoded = json_decode($this->restContext->getMink()->getSession()->getDriver()->getContent())) {
             throw new \RuntimeException('JSON response seems to be invalid');

@@ -133,7 +133,7 @@ class ItemMutationResolverFactoryTest extends TestCase
             return $returnedItem;
         });
 
-        $this->dataPersisterProphecy->persist($returnedItem)->shouldBeCalled()->willReturn($returnedItem);
+        $this->dataPersisterProphecy->persist($returnedItem, Argument::type('array'))->shouldBeCalled()->willReturn($returnedItem);
         $this->normalizerProphecy->normalize($returnedItem, Argument::cetera())->shouldBeCalled()->willReturn(['id' => '/related_dummies/3']);
 
         $resolver = ($this->itemMutationResolverFactory)(RelatedDummy::class, null, 'custom_mutation');

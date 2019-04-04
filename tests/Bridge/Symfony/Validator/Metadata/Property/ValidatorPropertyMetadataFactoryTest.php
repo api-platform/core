@@ -31,7 +31,7 @@ class ValidatorPropertyMetadataFactoryTest extends TestCase
 {
     private $validatorClassMetadata;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->validatorClassMetadata = new ClassMetadata(DummyValidatedEntity::class);
         (new AnnotationLoader(new AnnotationReader()))->loadClassMetadata($this->validatorClassMetadata);

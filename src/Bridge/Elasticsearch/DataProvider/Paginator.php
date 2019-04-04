@@ -18,7 +18,7 @@ use ApiPlatform\Core\DataProvider\PaginatorInterface;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
-/*
+/**
  * Paginator for Elasticsearch.
  *
  * @experimental

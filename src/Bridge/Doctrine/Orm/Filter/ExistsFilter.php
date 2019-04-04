@@ -44,6 +44,7 @@ class ExistsFilter extends AbstractContextAwareFilter implements ExistsFilterInt
 
     /**
      * @param RequestStack|null $requestStack No prefix to prevent autowiring of this deprecated property
+     * @param mixed|null        $properties
      */
     public function __construct(ManagerRegistry $managerRegistry, $requestStack = null, LoggerInterface $logger = null, /* string $existsParameterName = self::QUERY_PARAMETER_KEY, array*/ $properties = null)
     {

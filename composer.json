@@ -21,7 +21,7 @@
         "symfony/http-kernel": "^3.4 || ^4.0",
         "symfony/property-access": "^3.4 || ^4.0",
         "symfony/property-info": "^3.4 || ^4.0",
-        "symfony/serializer": "^4.1",
+        "symfony/serializer": "^4.2",
         "symfony/web-link": "^4.1",
         "willdurand/negotiation": "^2.0.3"
     },
@@ -44,7 +44,6 @@
         "jangregor/phpstan-prophecy": "^0.3",
         "justinrainbow/json-schema": "^5.0",
         "nelmio/api-doc-bundle": "^2.13.3",
-        "php-mock/php-mock-phpunit": "^2.0",
         "phpdocumentor/reflection-docblock": "^3.0 || ^4.0",
         "phpdocumentor/type-resolver": "^0.3 || ^0.4",
         "phpspec/prophecy": "^1.8",

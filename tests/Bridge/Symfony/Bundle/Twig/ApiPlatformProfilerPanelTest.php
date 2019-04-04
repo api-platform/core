@@ -38,7 +38,7 @@ class ApiPlatformProfilerPanelTest extends WebTestCase
     private $schemaTool;
     private $env;
 
-    public function setUp()
+    protected function setUp()
     {
         parent::setUp();
         $kernel = self::bootKernel();
@@ -56,7 +56,7 @@ class ApiPlatformProfilerPanelTest extends WebTestCase
         $this->schemaTool->createSchema($classes);
     }
 
-    public function tearDown()
+    protected function tearDown()
     {
         $this->schemaTool->dropSchema($this->manager->getMetadataFactory()->getAllMetadata());
         $this->manager->clear();
