@@ -21,6 +21,7 @@ use ApiPlatform\Exception\OperationNotFoundException;
 use ApiPlatform\Exception\RuntimeException;
 use ApiPlatform\GraphQl\Subscription\MercureSubscriptionIriGeneratorInterface as GraphQlMercureSubscriptionIriGeneratorInterface;
 use ApiPlatform\GraphQl\Subscription\SubscriptionManagerInterface as GraphQlSubscriptionManagerInterface;
+use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Symfony\Messenger\DispatchTrait;
 use ApiPlatform\Util\ResourceClassInfoTrait;
@@ -150,8 +151,9 @@ final class PublishMercureUpdatesListener
             return;
         }
 
+        $operation = $this->resourceMetadataFactory->create($resourceClass)->getOperation();
         try {
-            $options = $this->resourceMetadataFactory->create($resourceClass)->getOperation()->getMercure() ?? false;
+            $options = $operation->getMercure() ?? false;
         } catch (OperationNotFoundException) {
             return;
         }
@@ -208,9 +210,15 @@ final class PublishMercureUpdatesListener
         }
 
         if ('deletedObjects' === $property) {
+            $types = $operation instanceof HttpOperation ? $operation->getTypes() : null;
+            if (null === $types) {
+                $types = [$operation->getShortName()];
+            }
+
             $this->deletedObjects[(object) [
                 'id' => $this->iriConverter->getIriFromResource($object),
                 'iri' => $this->iriConverter->getIriFromResource($object, UrlGeneratorInterface::ABS_URL),
+                'type' => 1 === \count($types) ? $types[0] : $types,
             ]] = $options;
 
             return;
@@ -222,12 +230,12 @@ final class PublishMercureUpdatesListener
     private function publishUpdate(object $object, array $options, string $type): void
     {
         if ($object instanceof \stdClass) {
-            // By convention, if the object has been deleted, we send only its IRI.
+            // By convention, if the object has been deleted, we send only its IRI and its type.
             // This may change in the feature, because it's not JSON Merge Patch compliant,
             // and I'm not a fond of this approach.
             $iri = $options['topics'] ?? $object->iri;
             /** @var string $data */
-            $data = json_encode(['@id' => $object->id], \JSON_THROW_ON_ERROR);
+            $data = json_encode(['@id' => $object->id, '@type' => $object->type], \JSON_THROW_ON_ERROR);
         } else {
             $resourceClass = $this->getObjectClass($object);
             $context = $options['normalization_context'] ?? $this->resourceMetadataFactory->create($resourceClass)->getOperation()->getNormalizationContext() ?? [];
