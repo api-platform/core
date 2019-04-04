@@ -62,3 +62,32 @@ Feature: JSON-LD non-resource handling
       "id": 1
     }
     """
+
+  @!mongodb
+  @createSchema
+  Scenario: Create a resource that contains a stdClass object.
+    When I send a "POST" request to "/plain_object_dummies" with body:
+    """
+    {
+      "content": "{\"fields\":{\"title\":{\"value\":\"\"},\"images\":[{\"id\":0,\"categoryId\":0,\"uri\":\"/api/pictures\",\"resource\":\"{}\",\"description\":\"\",\"alt\":\"\",\"type\":\"picture\",\"text\":\"\",\"src\":\"\"}],\"alternativeAudio\":{},\"caption\":\"\"},\"showCaption\":false,\"alternativeContent\":false,\"alternativeAudioContent\":false,\"blockLayout\":\"default\"}"
+    }
+    """
+    Then the response status code should be 201
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+    And the JSON should be equal to:
+    """
+    {
+      "@context": "/contexts/PlainObjectDummy",
+      "@id": "/plain_object_dummies/1",
+      "@type": "PlainObjectDummy",
+      "data": {
+        "fields": [],
+        "showCaption": false,
+        "alternativeContent": false,
+        "alternativeAudioContent": false,
+        "blockLayout": "default"
+      },
+      "id": 1
+    }
+    """
