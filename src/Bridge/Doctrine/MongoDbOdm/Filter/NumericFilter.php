@@ -33,7 +33,9 @@ use Doctrine\ODM\MongoDB\Types\Type as MongoDbType;
  */
 final class NumericFilter extends AbstractFilter
 {
-    use NumericFilterTrait;
+    use NumericFilterTrait {
+        getDescription as private getDescriptionLegacy;
+    }
 
     /**
      * Type of numeric in Doctrine.
@@ -45,12 +47,20 @@ final class NumericFilter extends AbstractFilter
     ];
 
     /**
+     * @inheritdoc}
+     */
+    public function getDescription(string $resourceClass, array $context = []): array
+    {
+        return $this->getDescriptionLegacy($resourceClass, $context);
+    }
+
+    /**
      * {@inheritdoc}
      */
     protected function filterProperty(string $property, $value, Builder $aggregationBuilder, string $resourceClass, string $operationName = null, array &$context = [])
     {
         if (
-            !$this->isPropertyEnabled($property, $resourceClass) ||
+            !$this->isPropertyEnabled($property, $resourceClass, $context) ||
             !$this->isPropertyMapped($property, $resourceClass) ||
             !$this->isNumericField($property, $resourceClass)
         ) {

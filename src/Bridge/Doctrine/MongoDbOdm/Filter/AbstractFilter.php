@@ -15,6 +15,7 @@ namespace ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Filter;
 
 use ApiPlatform\Core\Bridge\Doctrine\Common\PropertyHelperTrait;
 use ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\PropertyHelperTrait as MongoDbOdmPropertyHelperTrait;
+use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ODM\MongoDB\Aggregation\Builder;
 use Psr\Log\LoggerInterface;
@@ -31,16 +32,17 @@ use Psr\Log\NullLogger;
  */
 abstract class AbstractFilter implements FilterInterface
 {
-    use PropertyHelperTrait;
     use MongoDbOdmPropertyHelperTrait;
+    use PropertyHelperTrait;
 
     protected $managerRegistry;
     protected $logger;
     protected $properties;
 
-    public function __construct(ManagerRegistry $managerRegistry, LoggerInterface $logger = null, array $properties = null)
+    public function __construct(ManagerRegistry $managerRegistry, PropertyMetadataFactoryInterface $propertyMetadataFactory, LoggerInterface $logger = null, array $properties = null)
     {
         $this->managerRegistry = $managerRegistry;
+        $this->propertyMetadataFactory = $propertyMetadataFactory;
         $this->logger = $logger ?? new NullLogger();
         $this->properties = $properties;
     }
@@ -73,18 +75,5 @@ abstract class AbstractFilter implements FilterInterface
     protected function getLogger(): LoggerInterface
     {
         return $this->logger;
-    }
-
-    /**
-     * Determines whether the given property is enabled.
-     */
-    protected function isPropertyEnabled(string $property, string $resourceClass): bool
-    {
-        if (null === $this->properties) {
-            // to ensure sanity, nested properties must still be explicitly enabled
-            return !$this->isPropertyNested($property, $resourceClass);
-        }
-
-        return \array_key_exists($property, $this->properties);
     }
 }

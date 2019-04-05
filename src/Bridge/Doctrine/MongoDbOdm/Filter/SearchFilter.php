@@ -17,6 +17,7 @@ use ApiPlatform\Core\Api\IriConverterInterface;
 use ApiPlatform\Core\Bridge\Doctrine\Common\Filter\SearchFilterInterface;
 use ApiPlatform\Core\Bridge\Doctrine\Common\Filter\SearchFilterTrait;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
+use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Persistence\Mapping\ClassMetadata;
 use Doctrine\ODM\MongoDB\Aggregation\Builder;
@@ -36,13 +37,23 @@ use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
  */
 final class SearchFilter extends AbstractFilter implements SearchFilterInterface
 {
-    use SearchFilterTrait;
+    use SearchFilterTrait {
+        getDescription as private getDescriptionLegacy;
+    }
 
     public const DOCTRINE_INTEGER_TYPE = MongoDbType::INTEGER;
 
-    public function __construct(ManagerRegistry $managerRegistry, IriConverterInterface $iriConverter, PropertyAccessorInterface $propertyAccessor = null, LoggerInterface $logger = null, array $properties = null)
+    /**
+     * @inheritdoc}
+     */
+    public function getDescription(string $resourceClass, array $context = []): array
     {
-        parent::__construct($managerRegistry, $logger, $properties);
+        return $this->getDescriptionLegacy($resourceClass, $context);
+    }
+
+    public function __construct(ManagerRegistry $managerRegistry, PropertyMetadataFactoryInterface $propertyMetadataFactory, IriConverterInterface $iriConverter, PropertyAccessorInterface $propertyAccessor = null, LoggerInterface $logger = null, array $properties = null)
+    {
+        parent::__construct($managerRegistry, $propertyMetadataFactory, $logger, $properties);
 
         $this->iriConverter = $iriConverter;
         $this->propertyAccessor = $propertyAccessor ?: PropertyAccess::createPropertyAccessor();
@@ -65,7 +76,7 @@ final class SearchFilter extends AbstractFilter implements SearchFilterInterface
     {
         if (
             null === $value ||
-            !$this->isPropertyEnabled($property, $resourceClass) ||
+            !$this->isPropertyEnabled($property, $resourceClass, $context) ||
             !$this->isPropertyMapped($property, $resourceClass, true)
         ) {
             return;

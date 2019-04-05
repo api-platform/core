@@ -110,7 +110,7 @@ final class CollectionFiltersNormalizer implements NormalizerInterface, Normaliz
         }
 
         if ($currentFilters) {
-            $data['hydra:search'] = $this->getSearch($resourceClass, $requestParts, $currentFilters);
+            $data['hydra:search'] = $this->getSearch($resourceClass, $requestParts, $currentFilters, $context);
         }
 
         return $data;
@@ -131,12 +131,12 @@ final class CollectionFiltersNormalizer implements NormalizerInterface, Normaliz
      *
      * @param FilterInterface[] $filters
      */
-    private function getSearch(string $resourceClass, array $parts, array $filters): array
+    private function getSearch(string $resourceClass, array $parts, array $filters, array $context): array
     {
         $variables = [];
         $mapping = [];
         foreach ($filters as $filter) {
-            foreach ($filter->getDescription($resourceClass) as $variable => $data) {
+            foreach ($filter->getDescription($resourceClass, $context) as $variable => $data) {
                 $variables[] = $variable;
                 $mapping[] = [
                     '@type' => 'IriTemplateMapping',

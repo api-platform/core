@@ -19,6 +19,7 @@ use ApiPlatform\Core\Exception\PropertyNotFoundException;
 use ApiPlatform\Core\Exception\ResourceClassNotFoundException;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
+use ApiPlatform\Core\Metadata\Property\PropertyMetadataFactoryOptionsTrait;
 use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 
@@ -32,6 +33,7 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 abstract class AbstractFilter implements FilterInterface
 {
     use FieldDatatypeTrait { getNestedFieldPath as protected; }
+    use PropertyMetadataFactoryOptionsTrait;
 
     protected $properties;
     protected $propertyNameCollectionFactory;
@@ -49,24 +51,37 @@ abstract class AbstractFilter implements FilterInterface
     /**
      * Gets all enabled properties for the given resource class.
      */
-    protected function getProperties(string $resourceClass): \Traversable
+    protected function getProperties(string $resourceClass, array $context): \Traversable
     {
         if (null !== $this->properties) {
             return yield from array_keys($this->properties);
         }
 
         try {
-            yield from $this->propertyNameCollectionFactory->create($resourceClass);
+            $propertyNameCollection = $this->propertyNameCollectionFactory->create($resourceClass);
         } catch (ResourceClassNotFoundException $e) {
+            return;
+        }
+
+        foreach ($propertyNameCollection as $property) {
+            try {
+                $propertyMetadata = $this->propertyMetadataFactory->create($resourceClass, $property, $this->getPropertyMetadataFactoryOptions($context));
+            } catch (PropertyNotFoundException $e) {
+                continue;
+            }
+
+            if ($propertyMetadata->isReadable()) {
+                yield $property;
+            }
         }
     }
 
     /**
      * Is the given property enabled?
      */
-    protected function hasProperty(string $resourceClass, string $property): bool
+    protected function hasProperty(string $resourceClass, string $property, array $context): bool
     {
-        return \in_array($property, iterator_to_array($this->getProperties($resourceClass)), true);
+        return \in_array($property, iterator_to_array($this->getProperties($resourceClass, $context)), true);
     }
 
     /**
@@ -78,11 +93,11 @@ abstract class AbstractFilter implements FilterInterface
      *   - the resource class of the decomposed given property
      *   - the property name of the decomposed given property
      */
-    protected function getMetadata(string $resourceClass, string $property): array
+    protected function getMetadata(string $resourceClass, string $property, array $context): array
     {
         $noop = [null, null, null, null];
 
-        if (!$this->hasProperty($resourceClass, $property)) {
+        if (!$this->hasProperty($resourceClass, $property, $context)) {
             return $noop;
         }
 

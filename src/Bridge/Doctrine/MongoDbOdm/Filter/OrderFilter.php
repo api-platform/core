@@ -15,6 +15,7 @@ namespace ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Filter;
 
 use ApiPlatform\Core\Bridge\Doctrine\Common\Filter\OrderFilterInterface;
 use ApiPlatform\Core\Bridge\Doctrine\Common\Filter\OrderFilterTrait;
+use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ODM\MongoDB\Aggregation\Builder;
 use Psr\Log\LoggerInterface;
@@ -37,9 +38,11 @@ use Psr\Log\LoggerInterface;
  */
 final class OrderFilter extends AbstractFilter implements OrderFilterInterface
 {
-    use OrderFilterTrait;
+    use OrderFilterTrait {
+        getDescription as private getDescriptionLegacy;
+    }
 
-    public function __construct(ManagerRegistry $managerRegistry, string $orderParameterName = 'order', LoggerInterface $logger = null, array $properties = null)
+    public function __construct(ManagerRegistry $managerRegistry, PropertyMetadataFactoryInterface $propertyMetadataFactory, string $orderParameterName = 'order', LoggerInterface $logger = null, array $properties = null)
     {
         if (null !== $properties) {
             $properties = array_map(function ($propertyOptions) {
@@ -54,9 +57,17 @@ final class OrderFilter extends AbstractFilter implements OrderFilterInterface
             }, $properties);
         }
 
-        parent::__construct($managerRegistry, $logger, $properties);
+        parent::__construct($managerRegistry, $propertyMetadataFactory, $logger, $properties);
 
         $this->orderParameterName = $orderParameterName;
+    }
+
+    /**
+     * @inheritdoc}
+     */
+    public function getDescription(string $resourceClass, array $context = []): array
+    {
+        return $this->getDescriptionLegacy($resourceClass, $context);
     }
 
     /**
@@ -84,7 +95,7 @@ final class OrderFilter extends AbstractFilter implements OrderFilterInterface
      */
     protected function filterProperty(string $property, $direction, Builder $aggregationBuilder, string $resourceClass, string $operationName = null, array &$context = [])
     {
-        if (!$this->isPropertyEnabled($property, $resourceClass) || !$this->isPropertyMapped($property, $resourceClass)) {
+        if (!$this->isPropertyEnabled($property, $resourceClass, $context) || !$this->isPropertyMapped($property, $resourceClass)) {
             return;
         }
 

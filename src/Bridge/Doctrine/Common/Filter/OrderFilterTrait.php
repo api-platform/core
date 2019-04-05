@@ -18,6 +18,8 @@ use ApiPlatform\Core\Bridge\Doctrine\Common\PropertyHelperTrait;
 /**
  * Trait for ordering the collection by given properties.
  *
+ * @internal
+ *
  * @author Kévin Dunglas <dunglas@gmail.com>
  * @author Théo FIDRY <theo.fidry@gmail.com>
  * @author Alan Poulain <contact@alanpoulain.eu>
@@ -34,8 +36,13 @@ trait OrderFilterTrait
     /**
      * {@inheritdoc}
      */
-    public function getDescription(string $resourceClass): array
+    public function getDescription(string $resourceClass/*, array $context = []*/): array
     {
+        if (\func_num_args() < 2 && __CLASS__ !== \get_class($this) && __CLASS__ !== (new \ReflectionMethod($this, __FUNCTION__))->getDeclaringClass()->getName()) {
+            @trigger_error(sprintf('Method %s() will have a second `$context` argument in version API Platform 3.0. Not defining it is deprecated since API Platform 2.4.', __FUNCTION__), E_USER_DEPRECATED);
+        }
+
+        $context = 1 < \func_num_args() ? (array) func_get_arg(1) : [];
         $description = [];
 
         $properties = $this->getProperties();
@@ -44,7 +51,10 @@ trait OrderFilterTrait
         }
 
         foreach ($properties as $property => $propertyOptions) {
-            if (!$this->isPropertyMapped($property, $resourceClass)) {
+            if (
+                !$this->isPropertyEnabled($property, $resourceClass, $context) ||
+                !$this->isPropertyMapped($property, $resourceClass)
+            ) {
                 continue;
             }
 

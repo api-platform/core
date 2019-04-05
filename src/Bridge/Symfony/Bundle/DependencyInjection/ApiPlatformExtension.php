@@ -22,6 +22,7 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\FilterEagerLoadingExtension;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\QueryCollectionExtensionInterface as DoctrineQueryCollectionExtensionInterface;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\QueryItemExtensionInterface;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\AbstractContextAwareFilter as DoctrineOrmAbstractContextAwareFilter;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\AbstractFilter as DoctrineOrmAbstractFilter;
 use ApiPlatform\Core\Bridge\Elasticsearch\DataProvider\Extension\RequestBodySearchCollectionExtensionInterface;
 use ApiPlatform\Core\DataPersister\DataPersisterInterface;
 use ApiPlatform\Core\DataProvider\CollectionDataProviderInterface;
@@ -480,6 +481,8 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             ->addTag('api_platform.doctrine.orm.query_extension.collection');
         $container->registerForAutoconfiguration(DoctrineOrmAbstractContextAwareFilter::class)
             ->setBindings(['$requestStack' => null]);
+        $container->registerForAutoconfiguration(DoctrineOrmAbstractFilter::class)
+            ->setBindings(['$propertyMetadataFactory' => new Reference('api_platform.metadata.property.metadata_factory')]);
 
         $loader->load('doctrine_orm.xml');
 

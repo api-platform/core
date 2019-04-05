@@ -58,7 +58,7 @@ abstract class AbstractSearchFilter extends AbstractFilter implements ConstantSc
         $searches = [];
 
         foreach ($context['filters'] ?? [] as $property => $values) {
-            [$type, $hasAssociation, $nestedResourceClass, $nestedProperty] = $this->getMetadata($resourceClass, $property);
+            [$type, $hasAssociation, $nestedResourceClass, $nestedProperty] = $this->getMetadata($resourceClass, $property, $context);
 
             if (!$type || !$values = (array) $values) {
                 continue;
@@ -93,12 +93,12 @@ abstract class AbstractSearchFilter extends AbstractFilter implements ConstantSc
     /**
      * {@inheritdoc}
      */
-    public function getDescription(string $resourceClass): array
+    public function getDescription(string $resourceClass, array $context = []): array
     {
         $description = [];
 
-        foreach ($this->getProperties($resourceClass) as $property) {
-            [$type, $hasAssociation] = $this->getMetadata($resourceClass, $property);
+        foreach ($this->getProperties($resourceClass, $context) as $property) {
+            [$type, $hasAssociation] = $this->getMetadata($resourceClass, $property, []);
 
             if (!$type) {
                 continue;

@@ -18,6 +18,8 @@ use ApiPlatform\Core\Bridge\Doctrine\Common\PropertyHelperTrait;
 /**
  * Trait for filtering the collection by date intervals.
  *
+ * @internal
+ *
  * @author Kévin Dunglas <dunglas@gmail.com>
  * @author Théo FIDRY <theo.fidry@gmail.com>
  * @author Alan Poulain <contact@alanpoulain.eu>
@@ -29,8 +31,13 @@ trait DateFilterTrait
     /**
      * {@inheritdoc}
      */
-    public function getDescription(string $resourceClass): array
+    public function getDescription(string $resourceClass/*, array $context = []*/): array
     {
+        if (\func_num_args() < 2 && __CLASS__ !== \get_class($this) && __CLASS__ !== (new \ReflectionMethod($this, __FUNCTION__))->getDeclaringClass()->getName()) {
+            @trigger_error(sprintf('Method %s() will have a second `$context` argument in version API Platform 3.0. Not defining it is deprecated since API Platform 2.4.', __FUNCTION__), E_USER_DEPRECATED);
+        }
+
+        $context = 1 < \func_num_args() ? (array) func_get_arg(1) : [];
         $description = [];
 
         $properties = $this->getProperties();
@@ -39,7 +46,11 @@ trait DateFilterTrait
         }
 
         foreach ($properties as $property => $nullManagement) {
-            if (!$this->isPropertyMapped($property, $resourceClass) || !$this->isDateField($property, $resourceClass)) {
+            if (
+                !$this->isPropertyEnabled($property, $resourceClass, $context) ||
+                !$this->isPropertyMapped($property, $resourceClass) ||
+                !$this->isDateField($property, $resourceClass)
+            ) {
                 continue;
             }
 

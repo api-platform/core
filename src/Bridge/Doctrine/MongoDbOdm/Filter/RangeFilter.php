@@ -27,7 +27,17 @@ use Doctrine\ODM\MongoDB\Aggregation\Builder;
  */
 final class RangeFilter extends AbstractFilter implements RangeFilterInterface
 {
-    use RangeFilterTrait;
+    use RangeFilterTrait {
+        getDescription as private getDescriptionLegacy;
+    }
+
+    /**
+     * @inheritdoc}
+     */
+    public function getDescription(string $resourceClass, array $context = []): array
+    {
+        return $this->getDescriptionLegacy($resourceClass, $context);
+    }
 
     /**
      * {@inheritdoc}
@@ -36,7 +46,7 @@ final class RangeFilter extends AbstractFilter implements RangeFilterInterface
     {
         if (
             !\is_array($values) ||
-            !$this->isPropertyEnabled($property, $resourceClass) ||
+            !$this->isPropertyEnabled($property, $resourceClass, $context) ||
             !$this->isPropertyMapped($property, $resourceClass)
         ) {
             return;

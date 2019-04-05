@@ -34,7 +34,9 @@ use Doctrine\ODM\MongoDB\Types\Type as MongoDbType;
  */
 final class BooleanFilter extends AbstractFilter
 {
-    use BooleanFilterTrait;
+    use BooleanFilterTrait {
+        getDescription as private getDescriptionLegacy;
+    }
 
     public const DOCTRINE_BOOLEAN_TYPES = [
         MongoDbType::BOOL => true,
@@ -42,12 +44,20 @@ final class BooleanFilter extends AbstractFilter
     ];
 
     /**
+     * @inheritdoc}
+     */
+    public function getDescription(string $resourceClass, array $context = []): array
+    {
+        return $this->getDescriptionLegacy($resourceClass, $context);
+    }
+
+    /**
      * {@inheritdoc}
      */
     protected function filterProperty(string $property, $value, Builder $aggregationBuilder, string $resourceClass, string $operationName = null, array &$context = [])
     {
         if (
-            !$this->isPropertyEnabled($property, $resourceClass) ||
+            !$this->isPropertyEnabled($property, $resourceClass, $context) ||
             !$this->isPropertyMapped($property, $resourceClass) ||
             !$this->isBooleanField($property, $resourceClass)
         ) {

@@ -38,9 +38,12 @@ class SearchFilter extends AbstractContextAwareFilter implements SearchFilterInt
 
     public const DOCTRINE_INTEGER_TYPE = DBALType::INTEGER;
 
-    public function __construct(ManagerRegistry $managerRegistry, ?RequestStack $requestStack, IriConverterInterface $iriConverter, PropertyAccessorInterface $propertyAccessor = null, LoggerInterface $logger = null, array $properties = null)
+    /**
+     * {@inheritdoc}
+     */
+    public function __construct(ManagerRegistry $managerRegistry, ?RequestStack $requestStack, IriConverterInterface $iriConverter, PropertyAccessorInterface $propertyAccessor = null, LoggerInterface $logger = null, /*PropertyMetadataFactoryInterface*/ $propertyMetadataFactory = null, /*array*/ $properties = null)
     {
-        parent::__construct($managerRegistry, $requestStack, $logger, $properties);
+        parent::__construct($managerRegistry, $requestStack, $logger, $propertyMetadataFactory, $properties);
 
         $this->iriConverter = $iriConverter;
         $this->propertyAccessor = $propertyAccessor ?: PropertyAccess::createPropertyAccessor();
@@ -59,11 +62,17 @@ class SearchFilter extends AbstractContextAwareFilter implements SearchFilterInt
     /**
      * {@inheritdoc}
      */
-    protected function filterProperty(string $property, $value, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, string $operationName = null)
+    protected function filterProperty(string $property, $value, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, string $operationName = null/*, array $context = []*/)
     {
+        if (\func_num_args() < 7 && __CLASS__ !== \get_class($this) && __CLASS__ !== (new \ReflectionMethod($this, __FUNCTION__))->getDeclaringClass()->getName()) {
+            @trigger_error(sprintf('Method %s() will have a sixth "$context" argument in API Platform 3.0. Not defining it is deprecated since API Platform 2.4.', __FUNCTION__), E_USER_DEPRECATED);
+        }
+
+        $context = 6 < \func_num_args() ? (array) func_get_arg(6) : [];
+
         if (
             null === $value ||
-            !$this->isPropertyEnabled($property, $resourceClass) ||
+            !$this->isPropertyEnabled($property, $resourceClass, $context) ||
             !$this->isPropertyMapped($property, $resourceClass, true)
         ) {
             return;
