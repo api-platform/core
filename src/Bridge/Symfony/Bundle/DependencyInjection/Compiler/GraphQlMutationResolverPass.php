@@ -31,6 +31,10 @@ final class GraphQlMutationResolverPass implements CompilerPassInterface
      */
     public function process(ContainerBuilder $container)
     {
+        if (!$container->getParameter('api_platform.graphql.enabled')) {
+            return;
+        }
+
         $mutations = [];
         foreach ($container->findTaggedServiceIds('api_platform.graphql.mutation_resolver', true) as $serviceId => $tags) {
             foreach ($tags as $tag) {

@@ -31,6 +31,10 @@ final class GraphQlTypePass implements CompilerPassInterface
      */
     public function process(ContainerBuilder $container)
     {
+        if (!$container->getParameter('api_platform.graphql.enabled')) {
+            return;
+        }
+
         $types = [];
         foreach ($container->findTaggedServiceIds('api_platform.graphql.type', true) as $serviceId => $tags) {
             foreach ($tags as $tag) {

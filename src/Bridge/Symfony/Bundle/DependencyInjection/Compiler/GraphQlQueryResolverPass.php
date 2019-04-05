@@ -31,6 +31,10 @@ final class GraphQlQueryResolverPass implements CompilerPassInterface
      */
     public function process(ContainerBuilder $container)
     {
+        if (!$container->getParameter('api_platform.graphql.enabled')) {
+            return;
+        }
+
         $resolvers = [];
         foreach ($container->findTaggedServiceIds('api_platform.graphql.query_resolver', true) as $serviceId => $tags) {
             foreach ($tags as $tag) {
