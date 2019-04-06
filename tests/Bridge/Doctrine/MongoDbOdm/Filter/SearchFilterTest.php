@@ -551,19 +551,6 @@ class SearchFilterTest extends DoctrineMongoDbOdmFilterTestCase
         );
     }
 
-    /**
-     * @group legacy
-     * @expectedDeprecation Not injecting ItemIdentifiersExtractor is deprecated since API Platform 2.5 and can lead to unexpected behaviors, it will not be possible anymore in API Platform 3.0.
-     */
-    public function testNotPassingIdentifiersExtractor()
-    {
-        $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
-        $iriConverter = $iriConverterProphecy->reveal();
-        $propertyAccessor = self::$kernel->getContainer()->get('test.property_accessor');
-
-        return new SearchFilter($this->managerRegistry, $iriConverter, $propertyAccessor, null, null, null);
-    }
-
     protected function buildSearchFilter(ManagerRegistry $managerRegistry, ?array $properties = null)
     {
         $relatedDummyProphecy = $this->prophesize(RelatedDummy::class);
@@ -585,6 +572,6 @@ class SearchFilterTest extends DoctrineMongoDbOdmFilterTestCase
         $identifierExtractorProphecy = $this->prophesize(IdentifiersExtractorInterface::class);
         $identifierExtractorProphecy->getIdentifiersFromResourceClass(Argument::type('string'))->willReturn(['id']);
 
-        return new SearchFilter($managerRegistry, $iriConverter, $propertyAccessor, null, $properties, $identifierExtractorProphecy->reveal());
+        return new SearchFilter($managerRegistry, $iriConverter, $identifierExtractorProphecy->reveal(), $propertyAccessor, null, $properties);
     }
 }

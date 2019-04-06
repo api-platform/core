@@ -15,6 +15,7 @@ namespace ApiPlatform\Core\GraphQl\Serializer;
 
 use ApiPlatform\Core\Api\IdentifiersExtractorInterface;
 use ApiPlatform\Core\Api\IriConverterInterface;
+use ApiPlatform\Core\Util\ClassInfoTrait;
 use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 use Symfony\Component\Serializer\Normalizer\CacheableSupportsMethodInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
@@ -25,6 +26,8 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
  */
 final class ObjectNormalizer implements NormalizerInterface, CacheableSupportsMethodInterface
 {
+    use ClassInfoTrait;
+
     public const FORMAT = 'graphql';
     public const ITEM_RESOURCE_CLASS_KEY = '#itemResourceClass';
     public const ITEM_IDENTIFIERS_KEY = '#itemIdentifiers';
