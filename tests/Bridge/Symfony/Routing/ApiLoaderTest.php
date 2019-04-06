@@ -231,6 +231,10 @@ class ApiLoaderTest extends TestCase
             'api_platform.action.put_item',
             'api_platform.action.delete_item',
             'api_platform.action.get_subresource',
+            'api_platform.action.post_subresource',
+            'api_platform.action.delete_subresource',
+            'api_platform.action.put_subresource',
+            'api_platform.action.patch_subresource',
         ];
         $containerProphecy = $this->prophesize(ContainerInterface::class);
 

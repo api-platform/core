@@ -16,6 +16,7 @@ namespace ApiPlatform\Core\Operation\Factory;
 use ApiPlatform\Core\Bridge\Symfony\Routing\RouteNameGenerator;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
+use ApiPlatform\Core\Metadata\Resource\Factory\OperationResourceMetadataFactory;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Operation\PathSegmentNameGeneratorInterface;
 
@@ -32,13 +33,15 @@ final class SubresourceOperationFactory implements SubresourceOperationFactoryIn
     private $propertyNameCollectionFactory;
     private $propertyMetadataFactory;
     private $pathSegmentNameGenerator;
+    private $formats;
 
-    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, PathSegmentNameGeneratorInterface $pathSegmentNameGenerator)
+    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, PathSegmentNameGeneratorInterface $pathSegmentNameGenerator, array $formats = [])
     {
         $this->resourceMetadataFactory = $resourceMetadataFactory;
         $this->propertyNameCollectionFactory = $propertyNameCollectionFactory;
         $this->propertyMetadataFactory = $propertyMetadataFactory;
         $this->pathSegmentNameGenerator = $pathSegmentNameGenerator;
+        $this->formats = $formats;
     }
 
     /**
@@ -140,8 +143,7 @@ final class SubresourceOperationFactory implements SubresourceOperationFactoryIn
                 // TODO design a dev friendly way to define subresource operations so they can be partially disabled
                 // TODO Maybe merge in them with the default so we don't need to worry in later on population or we will probably need to resolve on the fly
                 $subresourceMetadata = $this->resourceMetadataFactory->create($subresourceClass);
-                $subresourceMetadata = $subresourceMetadata->withCollectionOperations(['get' => ['method' => 'GET']]);
-                $subresourceMetadata = $subresourceMetadata->withItemOperations(['get' => ['method' => 'GET']]);
+                $subresourceMetadata = OperationResourceMetadataFactory::populateOperations($subresourceClass, $subresourceMetadata, $this->formats);
 
                 if (($isLastItem = $propertyMetadata->isIdentifier()) && $allowLastItemWorkaround) {
                     // TODO: next majory: throw an exception and remove $isLastItem and $allowLastItemWorkaround and their impacts
@@ -295,6 +297,9 @@ final class SubresourceOperationFactory implements SubresourceOperationFactoryIn
                          *
                          * related_dummy
                          * - GET    /dummies/{id}/related_dummy         Item
+                         * - PUT    /dummies/{id}/related_dummy         Item
+                         * - DELETE /dummies/{id}/related_dummy         Item
+                         * - PATCH  /dummies/{id}/related_dummy         Item
                          *
                          * Convention 2: /$resource/{id}/$subresources.{_format}
                          * Example 2: /dummy/{id}/related_dummies/{id}.{_format}
@@ -302,6 +307,9 @@ final class SubresourceOperationFactory implements SubresourceOperationFactoryIn
                          *
                          * related_dummies
                          * - GET    /dummies/{id}/related_dummies/{id}   Item
+                         * - PUT    /dummies/{id}/related_dummies/{id}   Item
+                         * - DELETE /dummies/{id}/related_dummies/{id}   Item
+                         * - PATCH  /dummies/{id}/related_dummies/{id}   Item
                          *
                          */
                         'path' => $overriddenPath ?? sprintf(
@@ -361,10 +369,13 @@ final class SubresourceOperationFactory implements SubresourceOperationFactoryIn
                 if (!$isLastItem && (!empty($subresourceCollectionOperations) || !empty($subresourceItemOperations))) {
                     $collectionOperationOverriddenPath =
                         $subresourceCollectionPathByMethod['GET'] ??
+                        $subresourceCollectionPathByMethod['POST'] ??
                         null;
 
                     $itemOperationOverriddenPath =
                         $subresourceItemPathByMethod['GET'] ??
+                        $subresourceItemPathByMethod['PUT'] ??
+                        $subresourceItemPathByMethod['DELETE'] ??
                         null;
 
                     $subresourcePathSegment = $subresourceSegment.($subresource->isCollection() ? '/{'.$identifierName.'}' : '');
