@@ -56,7 +56,7 @@ Feature: Handle properly invalid data submitted to the API
     And the JSON node "@context" should be equal to "/contexts/Error"
     And the JSON node "@type" should be equal to "hydra:Error"
     And the JSON node "hydra:title" should be equal to "An error occurred"
-    And the JSON node "hydra:description" should be equal to 'The type of the "name" attribute must be "string", "null" given.'
+    And the JSON node "hydra:description" should be equal to 'The type of the "name" attribute must be "string", "NULL" given.'
 
   Scenario: Create a resource with wrong value type for relation
     When I add "Content-Type" header equal to "application/ld+json"
