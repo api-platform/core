@@ -14,47 +14,40 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity;
 
 use ApiPlatform\Core\Annotation\ApiResource;
-use ApiPlatform\Core\Tests\Fixtures\NotAResource;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
- * Resource linked to a standard object.
+ * DummyNoGetOperation.
+ *
+ * @author Grégoire Hébert gregoire@les-tilleuls.coop
  *
  * @ORM\Entity
  *
  * @ApiResource(
- *     normalizationContext={
- *         "groups"="contain_non_resource",
- *     },
+ *     collectionOperations={"post"},
+ *     itemOperations={"put"}
  * )
- *
- * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class ContainNonResource
+class DummyNoGetOperation
 {
     /**
-     * @var mixed
+     * @var int The id
      *
      * @ORM\Column(type="integer")
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
-     *
-     * @Groups("contain_non_resource")
      */
-    public $id;
+    private $id;
 
     /**
-     * @var ContainNonResource
+     * @var string
      *
-     * @Groups("contain_non_resource")
+     * @ORM\Column
      */
-    public $nested;
+    public $lorem;
 
-    /**
-     * @var NotAResource
-     *
-     * @Groups("contain_non_resource")
-     */
-    public $notAResource;
+    public function setId($id)
+    {
+        $this->id = $id;
+    }
 }

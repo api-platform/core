@@ -21,6 +21,7 @@ use ApiPlatform\Core\Metadata\Property\Factory\ExtractorPropertyMetadataFactory;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 use ApiPlatform\Core\Metadata\Property\SubresourceMetadata;
+use ApiPlatform\Core\Tests\Fixtures\DummyResourceInterface;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\FileConfigDummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RelatedDummy;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -236,5 +237,19 @@ class ExtractorPropertyMetadataFactoryTest extends FileConfigurationMetadataFact
         $configPath = __DIR__.'/../../../Fixtures/FileConfigurations/parse_exception.yml';
 
         (new ExtractorPropertyMetadataFactory(new YamlExtractor([$configPath])))->create(FileConfigDummy::class, 'foo');
+    }
+
+    public function testItExtractPropertiesFromInterfaceResources()
+    {
+        $configPath = __DIR__.'/../../../Fixtures/FileConfigurations/interface_resource.yml';
+
+        $propertyMetadataFactory = new ExtractorPropertyMetadataFactory(new YamlExtractor([$configPath]));
+        $metadataSomething = $propertyMetadataFactory->create(DummyResourceInterface::class, 'something');
+        $metadataSomethingElse = $propertyMetadataFactory->create(DummyResourceInterface::class, 'somethingElse');
+
+        $this->assertInstanceOf(PropertyMetadata::class, $metadataSomething);
+        $this->assertInstanceOf(PropertyMetadata::class, $metadataSomethingElse);
+        $this->assertTrue($metadataSomething->isIdentifier());
+        $this->assertFalse($metadataSomethingElse->isWritable());
     }
 }

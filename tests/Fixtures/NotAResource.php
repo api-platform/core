@@ -13,6 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Tests\Fixtures;
 
+use Symfony\Component\Serializer\Annotation\Groups;
+
 /**
  * This class is not mapped as an API resource.
  *
@@ -20,7 +22,14 @@ namespace ApiPlatform\Core\Tests\Fixtures;
  */
 class NotAResource
 {
+    /**
+     * @Groups("contain_non_resource")
+     */
     private $foo;
+
+    /**
+     * @Groups("contain_non_resource")
+     */
     private $bar;
 
     public function __construct($foo, $bar)

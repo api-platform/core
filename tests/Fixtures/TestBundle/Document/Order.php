@@ -14,45 +14,42 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Document;
 
 use ApiPlatform\Core\Annotation\ApiResource;
-use ApiPlatform\Core\Tests\Fixtures\NotAResource;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
- * Resource linked to a standard object.
- *
- * @ODM\Document
- *
  * @ApiResource(
- *     normalizationContext={
- *         "groups"="contain_non_resource",
- *     },
+ *     attributes={"normalization_context"={"groups"={"order_read", "customer_read", "address_read"}}},
+ *     forceEager=false
  * )
- *
- * @author Kévin Dunglas <dunglas@gmail.com>
+ * @ODM\Document
  */
-class ContainNonResource
+class Order
 {
     /**
-     * @var mixed
+     * @var int
      *
      * @ODM\Id(strategy="INCREMENT", type="integer")
-     *
-     * @Groups("contain_non_resource")
+     * @Groups({"order_read"})
      */
-    public $id;
+    private $id;
 
     /**
-     * @var ContainNonResource
-     *
-     * @Groups("contain_non_resource")
+     * @ODM\ReferenceOne(targetDocument=Customer::class)
+     * @Groups({"order_read"})
      */
-    public $nested;
+    public $customer;
 
     /**
-     * @var NotAResource
-     *
-     * @Groups("contain_non_resource")
+     * @ODM\ReferenceOne(targetDocument=Customer::class)
+     * @Assert\NotNull
+     * @Groups({"order_read"})
      */
-    public $notAResource;
+    public $recipient;
+
+    public function getId()
+    {
+        return $this->id;
+    }
 }

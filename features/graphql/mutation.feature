@@ -17,6 +17,10 @@ Feature: GraphQL mutation support
             type {
               name
               kind
+              ofType {
+                name
+                kind
+              }
             }
           }
         }
@@ -31,8 +35,9 @@ Feature: GraphQL mutation support
     And the JSON node "data.__type.fields[0].type.name" should match "/^delete[A-z0-9]+Payload$/"
     And the JSON node "data.__type.fields[0].type.kind" should be equal to "OBJECT"
     And the JSON node "data.__type.fields[0].args[0].name" should be equal to "input"
-    And the JSON node "data.__type.fields[0].args[0].type.name" should match "/^delete[A-z0-9]+Input$/"
-    And the JSON node "data.__type.fields[0].args[0].type.kind" should be equal to "INPUT_OBJECT"
+    And the JSON node "data.__type.fields[0].args[0].type.kind" should be equal to "NON_NULL"
+    And the JSON node "data.__type.fields[0].args[0].type.ofType.name" should match "/^delete[A-z0-9]+Input$/"
+    And the JSON node "data.__type.fields[0].args[0].type.ofType.kind" should be equal to "INPUT_OBJECT"
 
   Scenario: Create an item
     When I send the following GraphQL request:

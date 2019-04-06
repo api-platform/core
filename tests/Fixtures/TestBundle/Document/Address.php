@@ -14,45 +14,33 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Document;
 
 use ApiPlatform\Core\Annotation\ApiResource;
-use ApiPlatform\Core\Tests\Fixtures\NotAResource;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
- * Resource linked to a standard object.
- *
- * @ODM\Document
- *
  * @ApiResource(
- *     normalizationContext={
- *         "groups"="contain_non_resource",
- *     },
+ *     attributes={"normalization_context"={"groups"={"address_read"}}}
  * )
- *
- * @author Kévin Dunglas <dunglas@gmail.com>
+ * @ODM\Document
  */
-class ContainNonResource
+class Address
 {
     /**
-     * @var mixed
+     * @var int
      *
      * @ODM\Id(strategy="INCREMENT", type="integer")
-     *
-     * @Groups("contain_non_resource")
+     * @Groups({"address_read"})
      */
-    public $id;
+    private $id;
 
     /**
-     * @var ContainNonResource
-     *
-     * @Groups("contain_non_resource")
+     * @ODM\Field(type="string")
+     * @Groups({"address_read"})
      */
-    public $nested;
+    public $name;
 
-    /**
-     * @var NotAResource
-     *
-     * @Groups("contain_non_resource")
-     */
-    public $notAResource;
+    public function getId()
+    {
+        return $this->id;
+    }
 }

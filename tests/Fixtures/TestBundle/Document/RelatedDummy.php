@@ -75,12 +75,6 @@ class RelatedDummy extends ParentDummy
      */
     public $relatedToDummyFriend;
 
-    public function __construct()
-    {
-        $this->relatedToDummyFriend = new ArrayCollection();
-        $this->embeddedDummy = new EmbeddableDummy();
-    }
-
     /**
      * @var bool A dummy bool
      *
@@ -96,6 +90,12 @@ class RelatedDummy extends ParentDummy
      * @Groups({"friends"})
      */
     public $embeddedDummy;
+
+    public function __construct()
+    {
+        $this->relatedToDummyFriend = new ArrayCollection();
+        $this->embeddedDummy = new EmbeddableDummy();
+    }
 
     public function getId()
     {

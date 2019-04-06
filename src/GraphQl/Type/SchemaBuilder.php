@@ -25,6 +25,7 @@ use ApiPlatform\Core\Util\ClassInfoTrait;
 use Doctrine\Common\Inflector\Inflector;
 use GraphQL\Type\Definition\InputObjectType;
 use GraphQL\Type\Definition\InterfaceType;
+use GraphQL\Type\Definition\NonNull;
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\Type as GraphQLType;
 use GraphQL\Type\Definition\WrappingType;
@@ -113,7 +114,13 @@ final class SchemaBuilder implements SchemaBuilderInterface
                 'fields' => $queryFields,
             ]),
             'typeLoader' => function ($name) {
-                return $this->graphqlTypes[$name];
+                $type = $this->graphqlTypes[$name];
+
+                if ($type instanceof WrappingType) {
+                    return $type->getWrappedType(true);
+                }
+
+                return $type;
             },
         ];
 
@@ -420,7 +427,7 @@ final class SchemaBuilder implements SchemaBuilderInterface
     /**
      * Gets the object type of the given resource.
      *
-     * @return ObjectType|InputObjectType
+     * @return ObjectType|NonNull
      */
     private function getResourceObjectType(?string $resourceClass, ResourceMetadata $resourceMetadata, bool $input, ?string $queryName, ?string $mutationName, bool $wrapped = false, int $depth = 0): GraphQLType
     {
@@ -477,7 +484,7 @@ final class SchemaBuilder implements SchemaBuilderInterface
             'interfaces' => $wrapData ? [] : [$this->getNodeInterface()],
         ];
 
-        return $this->graphqlTypes[$shortName] = $input ? new InputObjectType($configuration) : new ObjectType($configuration);
+        return $this->graphqlTypes[$shortName] = $input ? GraphQLType::nonNull(new InputObjectType($configuration)) : new ObjectType($configuration);
     }
 
     /**
