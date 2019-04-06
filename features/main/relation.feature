@@ -558,6 +558,71 @@ Feature: Relations support
     }
     """
 
+  Scenario: Eager load relations should not be duplicated
+    Given there is a order with same customer and receiver
+    When I add "Content-Type" header equal to "application/ld+json"
+    And I send a "GET" request to "/orders"
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the JSON should be equal to:
+    """
+    {
+        "@context": "/contexts/Order",
+        "@id": "/orders",
+        "@type": "hydra:Collection",
+        "hydra:member": [
+            {
+                "@id": "/orders/1",
+                "@type": "Order",
+                "id": 1,
+                "customer": {
+                    "@id": "/customers/1",
+                    "@type": "Customer",
+                    "id": 1,
+                    "name": "customer_name",
+                    "addresses": [
+                        {
+                            "@id": "/addresses/1",
+                            "@type": "Address",
+                            "id": 1,
+                            "name": "foo"
+                        },
+                        {
+                            "@id": "/addresses/2",
+                            "@type": "Address",
+                            "id": 2,
+                            "name": "bar"
+                        }
+                    ]
+                },
+                "recipient": {
+                    "@id": "/customers/1",
+                    "@type": "Customer",
+                    "id": 1,
+                    "name": "customer_name",
+                    "addresses": [
+                        {
+                            "@id": "/addresses/1",
+                            "@type": "Address",
+                            "id": 1,
+                            "name": "foo"
+                        },
+                        {
+                            "@id": "/addresses/2",
+                            "@type": "Address",
+                            "id": 2,
+                            "name": "bar"
+                        }
+                    ]
+                }
+            }
+        ],
+        "hydra:totalItems": 1
+    }
+    """
+
+
+  @dropSchema
   Scenario: Passing an invalid IRI to a relation
     When I add "Content-Type" header equal to "application/ld+json"
     And I send a "POST" request to "/relation_embedders" with body:
