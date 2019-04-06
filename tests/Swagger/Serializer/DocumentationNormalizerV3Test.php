@@ -1472,27 +1472,53 @@ class DocumentationNormalizerV3Test extends TestCase
             ]),
             'components' => [
                 'schemas' => new \ArrayObject([
-                    'Dummy' => new \ArrayObject([
-                        'type' => 'object',
-                        'description' => 'This is a dummy.',
-                        'externalDocs' => ['url' => 'http://schema.example.com/Dummy'],
-                        'properties' => [
-                            'name' => new \ArrayObject([
-                                'type' => 'string',
-                                'description' => 'This is a name.',
-                            ]),
-                        ],
+                    'application-json' => new \ArrayObject([
+                        'Dummy' => new \ArrayObject([
+                            'type' => 'object',
+                            'description' => 'This is a dummy.',
+                            'externalDocs' => ['url' => 'http://schema.example.com/Dummy'],
+                            'properties' => [
+                                'name' => new \ArrayObject([
+                                    'type' => 'string',
+                                    'description' => 'This is a name.',
+                                ]),
+                            ],
+                        ]),
+                        'Dummy-dummy' => new \ArrayObject([
+                            'type' => 'object',
+                            'description' => 'This is a dummy.',
+                            'externalDocs' => ['url' => 'http://schema.example.com/Dummy'],
+                            'properties' => [
+                                'gerard' => new \ArrayObject([
+                                    'type' => 'string',
+                                    'description' => 'This is a gerard.',
+                                ]),
+                            ],
+                        ]),
                     ]),
-                    'Dummy-dummy' => new \ArrayObject([
-                        'type' => 'object',
-                        'description' => 'This is a dummy.',
-                        'externalDocs' => ['url' => 'http://schema.example.com/Dummy'],
-                        'properties' => [
-                            'gerard' => new \ArrayObject([
-                                'type' => 'string',
-                                'description' => 'This is a gerard.',
-                            ]),
-                        ],
+                    'application-ld+json' => new \ArrayObject([
+                        'Dummy' => new \ArrayObject([
+                            'type' => 'object',
+                            'description' => 'This is a dummy.',
+                            'externalDocs' => ['url' => 'http://schema.example.com/Dummy'],
+                            'properties' => [
+                                'name' => new \ArrayObject([
+                                    'type' => 'string',
+                                    'description' => 'This is a name.',
+                                ]),
+                            ],
+                        ]),
+                        'Dummy-dummy' => new \ArrayObject([
+                            'type' => 'object',
+                            'description' => 'This is a dummy.',
+                            'externalDocs' => ['url' => 'http://schema.example.com/Dummy'],
+                            'properties' => [
+                                'gerard' => new \ArrayObject([
+                                    'type' => 'string',
+                                    'description' => 'This is a gerard.',
+                                ]),
+                            ],
+                        ]),
                     ]),
                 ]),
             ],
@@ -2490,26 +2516,6 @@ class DocumentationNormalizerV3Test extends TestCase
             ]),
             'components' => [
                 'schemas' => new \ArrayObject([
-                    'application-json' => new \ArrayObject([
-                        'Dummy' => new \ArrayObject([
-                            'type' => 'object',
-                            'description' => 'This is a dummy.',
-                            'externalDocs' => ['url' => 'http://schema.example.com/Dummy'],
-                            'properties' => [
-                                'id' => new \ArrayObject([
-                                    'type' => 'integer',
-                                    'description' => 'This is an id.',
-                                    'readOnly' => true,
-                                ]),
-                                'name' => new \ArrayObject([
-                                    'type' => 'string',
-                                    'description' => 'This is a name.',
-                                    'enum' => ['one', 'two'],
-                                    'example' => 'one',
-                                ]),
-                            ],
-                        ]),
-                    ]),
                     'application-ld+json' => new \ArrayObject([
                         'Dummy' => new \ArrayObject([
                             'type' => 'object',
@@ -2887,15 +2893,25 @@ class DocumentationNormalizerV3Test extends TestCase
                             'description' => 'This is a dummy.',
                             'externalDocs' => ['url' => 'http://schema.example.com/Dummy'],
                             'properties' => [
-                                'id' => new \ArrayObject([
-                                    'type' => 'integer',
-                                    'description' => 'This is an id.',
-                                    'readOnly' => true,
-                                ]),
-                                'name' => new \ArrayObject([
-                                    'type' => 'string',
-                                    'description' => 'This is a name.',
-                                ]),
+                                'data' => [
+                                    'type' => 'object',
+                                    'properties' => [
+                                        'attributes' => [
+                                            'type' => 'object',
+                                            'properties' => [
+                                                'id' => new \ArrayObject([
+                                                    'type' => 'integer',
+                                                    'description' => 'This is an id.',
+                                                    'readOnly' => true,
+                                                ]),
+                                                'name' => new \ArrayObject([
+                                                    'type' => 'string',
+                                                    'description' => 'This is a name.',
+                                                ]),
+                                            ]
+                                        ]
+                                    ]
+                                ]
                             ],
                         ]),
                     ]),

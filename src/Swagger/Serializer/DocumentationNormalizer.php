@@ -303,11 +303,9 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
         $successResponse = ['description' => sprintf('%s resource response', $resourceShortName)];
         if ($responseDefinitionKey) {
             if ($v3) {
-                $content = [];
                 foreach ($mimeTypes as $mimeType){
-                    $content[$mimeType] = ['schema' => ['$ref' => sprintf('#/components/schemas/%s/%s', str_replace('/','-',$mimeType), $responseDefinitionKey)]];
+                    $successResponse['content'][$mimeType] = ['schema' => ['$ref' => sprintf('#/components/schemas/%s/%s', str_replace('/','-',$mimeType), $responseDefinitionKey)]];
                 }
-                $successResponse['content'] = $content;
             } else {
                 $successResponse['schema'] = ['$ref' => sprintf('#/definitions/%s', $responseDefinitionKey)];
             }
@@ -417,11 +415,9 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
             ];
 
             if ($v3) {
-                $content = [];
                 foreach ($mimeTypes as $mimeType){
-                    $content[$mimeType] = ['schema' => ['type' => 'array', 'items' => ['$ref' => sprintf('#/components/schemas/%s/%s', $definitionKey)]]];
+                    $okResponse['content'][$mimeType] = ['schema' => ['type' => 'array', 'items' => ['$ref' => sprintf('#/components/schemas/%s/%s', str_replace('/', '-', $mimeType), $definitionKey)]]];
                 }
-                $okResponse['content'] = $content;
             } else {
                 $okResponse['schema'] = ['type' => 'array', 'items' => ['$ref' => sprintf('#/definitions/%s', $definitionKey)]];
             }
@@ -654,7 +650,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
 
         if ($v3) {
             if ($mimeType == 'application/vnd.api+json') {
-                $definitionSchema['properties']['data'] = new \ArrayObject([
+                $definitionSchema['properties']['data'] = [
                     "type"       => "object",
                     "properties" => [
                         "attributes" => [
@@ -662,7 +658,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
                             "properties" => [],
                         ]
                     ]
-                ]);
+                ];
             }
         }
         foreach ($this->propertyNameCollectionFactory->create($resourceClass, $options) as $propertyName) {
