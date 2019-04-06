@@ -14,6 +14,7 @@
             <argument type="service" id="api_platform.router" />
             <argument type="service" id="api_platform.subresource_operation_factory" />
             <argument type="service" id="api_platform.name_converter" on-invalid="ignore" />
+            <argument>%api_platform.url_generation_strategy%</argument>
 
             <tag name="serializer.normalizer" priority="-800" />
         </service>
@@ -33,6 +34,7 @@
             <argument type="service" id="api_platform.router" />
             <argument>%api_platform.validator.serialize_payload_fields%</argument>
             <argument type="service" id="api_platform.name_converter" on-invalid="ignore" />
+            <argument>%api_platform.url_generation_strategy%</argument>
 
             <tag name="serializer.normalizer" priority="-780" />
         </service>
@@ -48,6 +50,8 @@
         <service id="api_platform.hydra.normalizer.error" class="ApiPlatform\Core\Hydra\Serializer\ErrorNormalizer" public="false">
             <argument type="service" id="api_platform.router" />
             <argument>%kernel.debug%</argument>
+            <argument type="collection" />
+            <argument>%api_platform.url_generation_strategy%</argument>
 
             <tag name="serializer.normalizer" priority="-800" />
         </service>

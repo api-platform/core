@@ -37,13 +37,14 @@ final class ContextBuilder implements AnonymousContextBuilderInterface
     private $propertyNameCollectionFactory;
     private $propertyMetadataFactory;
     private $urlGenerator;
+    private $urlGenerationStrategy;
 
     /**
      * @var NameConverterInterface|null
      */
     private $nameConverter;
 
-    public function __construct(ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, ResourceMetadataFactoryInterface $resourceMetadataFactory, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, UrlGeneratorInterface $urlGenerator, NameConverterInterface $nameConverter = null)
+    public function __construct(ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, ResourceMetadataFactoryInterface $resourceMetadataFactory, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, UrlGeneratorInterface $urlGenerator, NameConverterInterface $nameConverter = null, int $urlGenerationStrategy = UrlGeneratorInterface::ABS_PATH)
     {
         $this->resourceNameCollectionFactory = $resourceNameCollectionFactory;
         $this->resourceMetadataFactory = $resourceMetadataFactory;
@@ -51,6 +52,7 @@ final class ContextBuilder implements AnonymousContextBuilderInterface
         $this->propertyMetadataFactory = $propertyMetadataFactory;
         $this->urlGenerator = $urlGenerator;
         $this->nameConverter = $nameConverter;
+        $this->urlGenerationStrategy = $urlGenerationStrategy;
     }
 
     /**
@@ -88,30 +90,30 @@ final class ContextBuilder implements AnonymousContextBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function getResourceContext(string $resourceClass, int $referenceType = UrlGeneratorInterface::ABS_PATH): array
+    public function getResourceContext(string $resourceClass, int $referenceType = UrlGeneratorInterface::DEFAULT): array
     {
         $metadata = $this->resourceMetadataFactory->create($resourceClass);
         if (null === $shortName = $metadata->getShortName()) {
             return [];
         }
 
-        return $this->getResourceContextWithShortname($resourceClass, $referenceType, $shortName);
+        return $this->getResourceContextWithShortname($resourceClass, UrlGeneratorInterface::DEFAULT === $referenceType ? $this->urlGenerationStrategy : $referenceType, $shortName);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getResourceContextUri(string $resourceClass, int $referenceType = UrlGeneratorInterface::ABS_PATH): string
+    public function getResourceContextUri(string $resourceClass, int $referenceType = UrlGeneratorInterface::DEFAULT): string
     {
         $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
 
-        return $this->urlGenerator->generate('api_jsonld_context', ['shortName' => $resourceMetadata->getShortName()], $referenceType);
+        return $this->urlGenerator->generate('api_jsonld_context', ['shortName' => $resourceMetadata->getShortName()], UrlGeneratorInterface::DEFAULT === $referenceType ? $this->urlGenerationStrategy : $referenceType);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getAnonymousResourceContext($object, array $context = [], int $referenceType = UrlGeneratorInterface::ABS_PATH): array
+    public function getAnonymousResourceContext($object, array $context = [], int $referenceType = UrlGeneratorInterface::DEFAULT): array
     {
         $outputClass = $this->getObjectClass($object);
         $shortName = (new \ReflectionClass($outputClass))->getShortName();
@@ -119,7 +121,7 @@ final class ContextBuilder implements AnonymousContextBuilderInterface
         $jsonLdContext = [
             '@context' => $this->getResourceContextWithShortname(
                 $outputClass,
-                $referenceType,
+                UrlGeneratorInterface::DEFAULT === $referenceType ? $this->urlGenerationStrategy : $referenceType,
                 $shortName
             ),
             '@type' => $shortName,

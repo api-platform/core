@@ -167,6 +167,7 @@ class ConfigurationTest extends TestCase
             ],
             'allow_plain_identifiers' => false,
             'resource_class_directories' => [],
+            'url_generation_strategy' => 1,
         ], $config);
     }
 

@@ -27,12 +27,14 @@ final class ConstraintViolationListNormalizer extends AbstractConstraintViolatio
     public const FORMAT = 'jsonld';
 
     private $urlGenerator;
+    private $urlGenerationStrategy;
 
-    public function __construct(UrlGeneratorInterface $urlGenerator, array $serializePayloadFields = null, NameConverterInterface $nameConverter = null)
+    public function __construct(UrlGeneratorInterface $urlGenerator, array $serializePayloadFields = null, NameConverterInterface $nameConverter = null, int $urlGenerationStrategy = UrlGeneratorInterface::ABS_PATH)
     {
         parent::__construct($serializePayloadFields, $nameConverter);
 
         $this->urlGenerator = $urlGenerator;
+        $this->urlGenerationStrategy = $urlGenerationStrategy;
     }
 
     /**
@@ -43,7 +45,7 @@ final class ConstraintViolationListNormalizer extends AbstractConstraintViolatio
         [$messages, $violations] = $this->getMessagesAndViolations($object);
 
         return [
-            '@context' => $this->urlGenerator->generate('api_jsonld_context', ['shortName' => 'ConstraintViolationList']),
+            '@context' => $this->urlGenerator->generate('api_jsonld_context', ['shortName' => 'ConstraintViolationList'], $this->urlGenerationStrategy),
             '@type' => 'ConstraintViolationList',
             'hydra:title' => $context['title'] ?? 'An error occurred',
             'hydra:description' => $messages ? implode("\n", $messages) : (string) $object,

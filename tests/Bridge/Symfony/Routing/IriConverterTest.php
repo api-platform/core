@@ -199,6 +199,18 @@ class IriConverterTest extends TestCase
         $this->assertEquals($converter->getItemIriFromResourceClass(Dummy::class, ['id' => 1]), '/dummies/1');
     }
 
+    public function testGetItemIriFromResourceClassWithValue()
+    {
+        $routeNameResolverProphecy = $this->prophesize(RouteNameResolverInterface::class);
+        $routeNameResolverProphecy->getRouteName(Dummy::class, OperationType::ITEM)->willReturn('api_dummies_get_item');
+
+        $routerProphecy = $this->prophesize(RouterInterface::class);
+        $routerProphecy->generate('api_dummies_get_item', ['id' => 1], UrlGeneratorInterface::ABS_URL)->willReturn('http://example.com/dummies/1');
+
+        $converter = $this->getIriConverter($routerProphecy, $routeNameResolverProphecy);
+        $this->assertSame('http://example.com/dummies/1', $converter->getItemIriFromResourceClass(Dummy::class, ['id' => 1], UrlGeneratorInterface::ABS_URL));
+    }
+
     public function testNotAbleToGenerateGetItemIriFromResourceClass()
     {
         $this->expectException(InvalidArgumentException::class);

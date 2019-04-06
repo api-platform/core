@@ -35,12 +35,14 @@ final class ErrorNormalizer implements NormalizerInterface, CacheableSupportsMet
     private $urlGenerator;
     private $debug;
     private $defaultContext = [self::TITLE => 'An error occurred'];
+    private $urlGenerationStrategy;
 
-    public function __construct(UrlGeneratorInterface $urlGenerator, bool $debug = false, array $defaultContext = [])
+    public function __construct(UrlGeneratorInterface $urlGenerator, bool $debug = false, array $defaultContext = [], int $urlGenerationStrategy = UrlGeneratorInterface::ABS_PATH)
     {
         $this->urlGenerator = $urlGenerator;
         $this->debug = $debug;
         $this->defaultContext = array_merge($this->defaultContext, $defaultContext);
+        $this->urlGenerationStrategy = $urlGenerationStrategy;
     }
 
     /**
@@ -49,7 +51,7 @@ final class ErrorNormalizer implements NormalizerInterface, CacheableSupportsMet
     public function normalize($object, $format = null, array $context = [])
     {
         $data = [
-            '@context' => $this->urlGenerator->generate('api_jsonld_context', ['shortName' => 'Error']),
+            '@context' => $this->urlGenerator->generate('api_jsonld_context', ['shortName' => 'Error'], $this->urlGenerationStrategy),
             '@type' => 'hydra:Error',
             'hydra:title' => $context[self::TITLE] ?? $this->defaultContext[self::TITLE],
             'hydra:description' => $this->getErrorMessage($object, $context, $this->debug),

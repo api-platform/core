@@ -32,6 +32,11 @@ namespace ApiPlatform\Core\Api;
 interface UrlGeneratorInterface
 {
     /**
+     * Allow to generate url using the globally configured strategy.
+     */
+    public const DEFAULT = -1;
+
+    /**
      * Generates an absolute URL, e.g. "http://example.com/dir/file".
      */
     public const ABS_URL = 0;

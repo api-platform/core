@@ -15,6 +15,7 @@
             <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
             <argument type="service" id="api_platform.iri_converter" />
             <argument type="service" id="api_platform.router" />
+            <argument>%api_platform.url_generation_strategy%</argument>
 
             <tag name="serializer.normalizer" priority="-800" />
         </service>

@@ -33,12 +33,14 @@ final class EntrypointNormalizer implements NormalizerInterface, CacheableSuppor
     private $resourceMetadataFactory;
     private $iriConverter;
     private $urlGenerator;
+    private $urlGenerationStrategy;
 
-    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, IriConverterInterface $iriConverter, UrlGeneratorInterface $urlGenerator)
+    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, IriConverterInterface $iriConverter, UrlGeneratorInterface $urlGenerator, int $urlGenerationStrategy = UrlGeneratorInterface::ABS_PATH)
     {
         $this->resourceMetadataFactory = $resourceMetadataFactory;
         $this->iriConverter = $iriConverter;
         $this->urlGenerator = $urlGenerator;
+        $this->urlGenerationStrategy = $urlGenerationStrategy;
     }
 
     /**
@@ -47,8 +49,8 @@ final class EntrypointNormalizer implements NormalizerInterface, CacheableSuppor
     public function normalize($object, $format = null, array $context = [])
     {
         $entrypoint = [
-            '@context' => $this->urlGenerator->generate('api_jsonld_context', ['shortName' => 'Entrypoint']),
-            '@id' => $this->urlGenerator->generate('api_entrypoint'),
+            '@context' => $this->urlGenerator->generate('api_jsonld_context', ['shortName' => 'Entrypoint'], $this->urlGenerationStrategy),
+            '@id' => $this->urlGenerator->generate('api_entrypoint', [], $this->urlGenerationStrategy),
             '@type' => 'Entrypoint',
         ];
 

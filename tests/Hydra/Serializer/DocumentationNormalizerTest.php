@@ -69,9 +69,8 @@ class DocumentationNormalizerTest extends TestCase
         $operationMethodResolverProphecy->getCollectionOperationMethod('dummy', 'post')->shouldBeCalled()->willReturn('POST');
 
         $urlGenerator = $this->prophesize(UrlGeneratorInterface::class);
-        $urlGenerator->generate('api_entrypoint')->willReturn('/')->shouldBeCalled(1);
-        $urlGenerator->generate('api_doc', ['_format' => 'jsonld'])->willReturn('/doc')->shouldBeCalled(1);
-
+        $urlGenerator->generate('api_entrypoint', [], Argument::type('integer'))->willReturn('/')->shouldBeCalled(1);
+        $urlGenerator->generate('api_doc', ['_format' => 'jsonld'], 1)->willReturn('/doc')->shouldBeCalled(1);
         $urlGenerator->generate('api_doc', ['_format' => 'jsonld'], 0)->willReturn('/doc')->shouldBeCalled(1);
 
         $subresourceOperationFactoryProphecy = $this->prophesize(SubresourceOperationFactoryInterface::class);
@@ -384,8 +383,8 @@ class DocumentationNormalizerTest extends TestCase
         $operationMethodResolverProphecy->getCollectionOperationMethod('dummy', 'post')->shouldBeCalled()->willReturn('POST');
 
         $urlGenerator = $this->prophesize(UrlGeneratorInterface::class);
-        $urlGenerator->generate('api_entrypoint')->willReturn('/')->shouldBeCalled(1);
-        $urlGenerator->generate('api_doc', ['_format' => 'jsonld'])->willReturn('/doc')->shouldBeCalled(1);
+        $urlGenerator->generate('api_entrypoint', [], Argument::type('integer'))->willReturn('/')->shouldBeCalled(1);
+        $urlGenerator->generate('api_doc', ['_format' => 'jsonld'], 1)->willReturn('/doc')->shouldBeCalled(1);
         $urlGenerator->generate('api_doc', ['_format' => 'jsonld'], 0)->willReturn('/doc')->shouldBeCalled(1);
 
         $documentationNormalizer = new DocumentationNormalizer(

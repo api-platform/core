@@ -16,6 +16,7 @@ namespace ApiPlatform\Core\Tests\Hydra\Serializer;
 use ApiPlatform\Core\Api\UrlGeneratorInterface;
 use ApiPlatform\Core\Hydra\Serializer\ErrorNormalizer;
 use PHPUnit\Framework\TestCase;
+use Prophecy\Argument;
 use Symfony\Component\Debug\Exception\FlattenException;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -50,7 +51,7 @@ class ErrorNormalizerTest extends TestCase
     public function testErrorServerNormalize(int $status, string $originalMessage, bool $debug)
     {
         $urlGeneratorProphecy = $this->prophesize(UrlGeneratorInterface::class);
-        $urlGeneratorProphecy->generate('api_jsonld_context', ['shortName' => 'Error'])->willReturn('/context/foo')->shouldBeCalled();
+        $urlGeneratorProphecy->generate('api_jsonld_context', ['shortName' => 'Error'], Argument::type('integer'))->willReturn('/context/foo')->shouldBeCalled();
 
         $normalizer = new ErrorNormalizer($urlGeneratorProphecy->reveal(), $debug);
         $exception = FlattenException::create(new \Exception($originalMessage), $status);
@@ -84,7 +85,7 @@ class ErrorNormalizerTest extends TestCase
     public function testNormalize()
     {
         $urlGeneratorProphecy = $this->prophesize(UrlGeneratorInterface::class);
-        $urlGeneratorProphecy->generate('api_jsonld_context', ['shortName' => 'Error'])->willReturn('/context/foo')->shouldBeCalled();
+        $urlGeneratorProphecy->generate('api_jsonld_context', ['shortName' => 'Error'], Argument::type('integer'))->willReturn('/context/foo')->shouldBeCalled();
 
         $normalizer = new ErrorNormalizer($urlGeneratorProphecy->reveal());
 

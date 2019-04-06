@@ -49,8 +49,9 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
     private $urlGenerator;
     private $subresourceOperationFactory;
     private $nameConverter;
+    private $urlGenerationStrategy;
 
-    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, ResourceClassResolverInterface $resourceClassResolver, OperationMethodResolverInterface $operationMethodResolver, UrlGeneratorInterface $urlGenerator, SubresourceOperationFactoryInterface $subresourceOperationFactory = null, NameConverterInterface $nameConverter = null)
+    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, ResourceClassResolverInterface $resourceClassResolver, OperationMethodResolverInterface $operationMethodResolver, UrlGeneratorInterface $urlGenerator, SubresourceOperationFactoryInterface $subresourceOperationFactory = null, NameConverterInterface $nameConverter = null, int $urlGenerationStrategy = UrlGeneratorInterface::ABS_PATH)
     {
         $this->resourceMetadataFactory = $resourceMetadataFactory;
         $this->propertyNameCollectionFactory = $propertyNameCollectionFactory;
@@ -60,6 +61,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
         $this->urlGenerator = $urlGenerator;
         $this->subresourceOperationFactory = $subresourceOperationFactory;
         $this->nameConverter = $nameConverter;
+        $this->urlGenerationStrategy = $urlGenerationStrategy;
     }
 
     /**
@@ -499,7 +501,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
      */
     private function computeDoc(Documentation $object, array $classes): array
     {
-        $doc = ['@context' => $this->getContext(), '@id' => $this->urlGenerator->generate('api_doc', ['_format' => self::FORMAT]), '@type' => 'hydra:ApiDocumentation'];
+        $doc = ['@context' => $this->getContext(), '@id' => $this->urlGenerator->generate('api_doc', ['_format' => self::FORMAT], $this->urlGenerationStrategy), '@type' => 'hydra:ApiDocumentation'];
 
         if ('' !== $object->getTitle()) {
             $doc['hydra:title'] = $object->getTitle();
@@ -509,7 +511,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
             $doc['hydra:description'] = $object->getDescription();
         }
 
-        $doc['hydra:entrypoint'] = $this->urlGenerator->generate('api_entrypoint');
+        $doc['hydra:entrypoint'] = $this->urlGenerator->generate('api_entrypoint', [], $this->urlGenerationStrategy);
         $doc['hydra:supportedClass'] = $classes;
 
         return $doc;

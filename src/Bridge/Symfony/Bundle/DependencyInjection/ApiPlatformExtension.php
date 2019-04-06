@@ -139,6 +139,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $container->setParameter('api_platform.description', $config['description']);
         $container->setParameter('api_platform.version', $config['version']);
         $container->setParameter('api_platform.show_webby', $config['show_webby']);
+        $container->setParameter('api_platform.url_generation_strategy', $config['url_generation_strategy']);
         $container->setParameter('api_platform.exception_to_status', $config['exception_to_status']);
         $container->setParameter('api_platform.formats', $formats);
         $container->setParameter('api_platform.error_formats', $errorFormats);
