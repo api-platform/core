@@ -120,7 +120,6 @@ final class PurgeHttpCacheListener
         } catch (InvalidArgumentException $e) {
             return;
         }
-
     }
 
     private function gatherRelationTags(EntityManagerInterface $em, $entity): void
