@@ -307,15 +307,11 @@ Feature: Table inheritance
            "items": {
              "type": "object",
              "properties": {
-               "@type": {
-                 "type": "string",
-                 "pattern": "^ResourceInterface$"
-               },
-               "@id": {
-                 "type": "string",
-                 "pattern": "^_:"
-               },
                "foo": {
+                 "type": "string",
+                 "required": "true"
+               },
+               "fooz": {
                  "type": "string",
                  "required": "true"
                }
@@ -341,14 +337,6 @@ Feature: Table inheritance
         "context": {
           "type": "string",
           "pattern": "ResourceInterface$"
-        },
-        "@id": {
-          "type": "string",
-          "pattern": "resource_interfaces$"
-        },
-        "@type": {
-          "type": "string",
-          "pattern": "^ResourceInterface$"
         },
         "foo": {
           "type": "string",
