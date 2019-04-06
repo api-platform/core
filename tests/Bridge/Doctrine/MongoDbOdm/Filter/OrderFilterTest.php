@@ -20,6 +20,7 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 
 /**
  * @author Alan Poulain <contact@alanpoulain.eu>
+ * @group mongodb
  */
 class OrderFilterTest extends DoctrineMongoDbOdmFilterTestCase
 {

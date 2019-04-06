@@ -26,6 +26,7 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * @author Alan Poulain <contact@alanpoulain.eu>
+ * @group mongodb
  */
 class OrderExtensionTest extends TestCase
 {

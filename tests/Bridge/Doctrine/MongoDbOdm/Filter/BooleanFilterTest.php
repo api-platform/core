@@ -19,6 +19,7 @@ use ApiPlatform\Core\Tests\Bridge\Doctrine\Common\Filter\BooleanFilterTestTrait;
 
 /**
  * @author Alan Poulain <contact@alanpoulain.eu>
+ * @group mongodb
  */
 class BooleanFilterTest extends DoctrineMongoDbOdmFilterTestCase
 {

@@ -25,6 +25,7 @@ use Psr\Container\ContainerInterface;
 
 /**
  * @author Alan Poulain <contact@alanpoulain.eu>
+ * @group mongodb
  */
 class FilterExtensionTest extends TestCase
 {

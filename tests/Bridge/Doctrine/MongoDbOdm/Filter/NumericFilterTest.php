@@ -19,6 +19,7 @@ use ApiPlatform\Core\Tests\Bridge\Doctrine\Common\Filter\NumericFilterTestTrait;
 
 /**
  * @author Alan Poulain <contact@alanpoulain.eu>
+ * @group mongodb
  */
 class NumericFilterTest extends DoctrineMongoDbOdmFilterTestCase
 {

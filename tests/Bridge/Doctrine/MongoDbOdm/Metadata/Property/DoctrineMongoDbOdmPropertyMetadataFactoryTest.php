@@ -24,6 +24,7 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * @author Alan Poulain <contact@alanpoulain.eu>
+ * @group mongodb
  */
 class DoctrineMongoDbOdmPropertyMetadataFactoryTest extends TestCase
 {

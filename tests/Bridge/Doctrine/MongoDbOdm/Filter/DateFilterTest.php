@@ -20,6 +20,7 @@ use MongoDB\BSON\UTCDateTime;
 
 /**
  * @author Alan Poulain <contact@alanpoulain.eu>
+ * @group mongodb
  */
 class DateFilterTest extends DoctrineMongoDbOdmFilterTestCase
 {

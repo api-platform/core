@@ -29,6 +29,7 @@ use Symfony\Component\PropertyInfo\Type;
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
  * @author Alan Poulain <contact@alanpoulain.eu>
+ * @group mongodb
  */
 class DoctrineExtractorTest extends TestCase
 {

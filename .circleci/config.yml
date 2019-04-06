@@ -87,6 +87,10 @@ reusable-steps:
     run:
       name: Update Composer
       command: sudo composer self-update
+  - &require-doctrine-odm
+    run:
+      name: Require doctrine/mongodb-odm an doctrine/mongodb-odm-bundle
+      command: composer require --no-update doctrine/mongodb-odm:^2.0.0@beta doctrine/mongodb-odm-bundle:^4.0.0@beta
   - &update-project-dependencies
     run:
       name: Update project dependencies
@@ -134,6 +138,7 @@ jobs:
       - *disable-php-memory-limit
       - *install-php-extensions
       - *update-composer
+      - *require-doctrine-odm
       - *update-project-dependencies
       - *save-composer-cache-by-revision
       - *save-composer-cache-by-branch
