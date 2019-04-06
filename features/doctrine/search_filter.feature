@@ -20,7 +20,7 @@ Feature: Search filter on collections
     When I send a "GET" request to "/dummy_cars?colors.prop=red"
     Then the response status code should be 200
     And the JSON should be deep equal to:
-		"""
+    """
     {
       "@context": "/contexts/DummyCar",
       "@id": "/dummy_cars",
