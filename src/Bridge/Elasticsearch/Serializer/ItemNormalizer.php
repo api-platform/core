@@ -14,9 +14,9 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Bridge\Elasticsearch\Serializer;
 
 use ApiPlatform\Core\Bridge\Elasticsearch\Api\IdentifierExtractorInterface;
-use ApiPlatform\Core\Exception\RuntimeException;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\PropertyInfo\PropertyTypeExtractorInterface;
+use Symfony\Component\Serializer\Exception\LogicException;
 use Symfony\Component\Serializer\Mapping\ClassDiscriminatorResolverInterface;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
@@ -67,15 +67,18 @@ final class ItemNormalizer extends ObjectNormalizer
      */
     public function supportsNormalization($data, $format = null): bool
     {
-        return false;
+        // prevent the use of lower priority normalizers (e.g. serializer.normalizer.object) for this format
+        return self::FORMAT === $format;
     }
 
     /**
      * {@inheritdoc}
+     *
+     * @throws LogicException
      */
     public function normalize($object, $format = null, array $context = [])
     {
-        throw new RuntimeException(sprintf('%s is a read-only format.', self::FORMAT));
+        throw new LogicException(sprintf('%s is a write-only format.', self::FORMAT));
     }
 
     /**

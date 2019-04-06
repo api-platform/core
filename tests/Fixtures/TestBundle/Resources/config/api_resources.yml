@@ -7,3 +7,7 @@ resources:
         collectionOperations:
             get:
                 method: 'GET'
+
+        properties:
+            foo:
+                identifier: true

@@ -51,4 +51,9 @@ class ResourceInterfaceImplementation implements ResourceInterface, ResourceBarI
     {
         return $this->bar;
     }
+
+    public function getFooz(): string
+    {
+        return 'fooz';
+    }
 }
