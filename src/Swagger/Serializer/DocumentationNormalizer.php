@@ -303,7 +303,11 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
         $successResponse = ['description' => sprintf('%s resource response', $resourceShortName)];
         if ($responseDefinitionKey) {
             if ($v3) {
-                $successResponse['content'] = array_fill_keys($mimeTypes, ['schema' => ['$ref' => sprintf('#/components/schemas/%s', $responseDefinitionKey)]]);
+                $content = [];
+                foreach ($mimeTypes as $mimeType){
+                    $content[$mimeType] = ['schema' => ['$ref' => sprintf('#/components/schemas/%s/%s', str_replace('/','-',$mimeType), $responseDefinitionKey)]];
+                }
+                $successResponse['content'] = $content;
             } else {
                 $successResponse['schema'] = ['$ref' => sprintf('#/definitions/%s', $responseDefinitionKey)];
             }
@@ -413,7 +417,11 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
             ];
 
             if ($v3) {
-                $okResponse['content'] = array_fill_keys($mimeTypes, ['schema' => ['type' => 'array', 'items' => ['$ref' => sprintf('#/components/schemas/%s', $definitionKey)]]]);
+                $content = [];
+                foreach ($mimeTypes as $mimeType){
+                    $content[$mimeType] = ['schema' => ['type' => 'array', 'items' => ['$ref' => sprintf('#/components/schemas/%s/%s', $definitionKey)]]];
+                }
+                $okResponse['content'] = $content;
             } else {
                 $okResponse['schema'] = ['type' => 'array', 'items' => ['$ref' => sprintf('#/definitions/%s', $definitionKey)]];
             }
