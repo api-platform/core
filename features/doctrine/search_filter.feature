@@ -50,7 +50,7 @@ Feature: Search filter on collections
         },
         "hydra:search": {
         "@type": "hydra:IriTemplate",
-        "hydra:template": "\/dummy_cars{?availableAt[before],availableAt[strictly_before],availableAt[after],availableAt[strictly_after],canSell,foobar[],foobargroups[],foobargroups_override[],colors.prop,name}",
+        "hydra:template": "/dummy_cars{?availableAt[before],availableAt[strictly_before],availableAt[after],availableAt[strictly_after],canSell,foobar[],foobargroups[],foobargroups_override[],colors.prop,name}",
         "hydra:variableRepresentation": "BasicRepresentation",
         "hydra:mapping": [
           {

@@ -105,8 +105,7 @@ class ItemNormalizerTest extends TestCase
             false,
             null,
             [],
-            null,
-            false
+            null
         );
         $normalizer->setSerializer($serializerProphecy->reveal());
 
@@ -144,8 +143,7 @@ class ItemNormalizerTest extends TestCase
             false,
             null,
             [],
-            null,
-            false
+            null
         );
         $normalizer->setSerializer($serializerProphecy->reveal());
 
@@ -184,8 +182,7 @@ class ItemNormalizerTest extends TestCase
             false,
             null,
             [],
-            null,
-            false
+            null
         );
         $normalizer->setSerializer($serializerProphecy->reveal());
 
@@ -222,8 +219,7 @@ class ItemNormalizerTest extends TestCase
             false,
             null,
             [],
-            null,
-            false
+            null
         );
         $normalizer->setSerializer($serializerProphecy->reveal());
         $normalizer->denormalize(['id' => '12', 'name' => 'hello'], Dummy::class, null, $context);
@@ -261,8 +257,7 @@ class ItemNormalizerTest extends TestCase
             false,
             null,
             [],
-            null,
-            true
+            null
         );
         $normalizer->setSerializer($serializerProphecy->reveal());
 
@@ -307,8 +302,7 @@ class ItemNormalizerTest extends TestCase
             false,
             null,
             [$dataTransformer->reveal()],
-            null,
-            false
+            null
         );
         $normalizer->setSerializer($serializerProphecy->reveal());
 

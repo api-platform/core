@@ -324,7 +324,7 @@ class ApiPlatformExtensionTest extends TestCase
         $containerBuilderProphecy->setDefinition('api_platform.graphql.executor', Argument::type(Definition::class))->shouldNotBeCalled();
         $containerBuilderProphecy->setDefinition('api_platform.graphql.schema_builder', Argument::type(Definition::class))->shouldNotBeCalled();
         $containerBuilderProphecy->setDefinition('api_platform.graphql.normalizer.item', Argument::type(Definition::class))->shouldNotBeCalled();
-        $containerBuilderProphecy->setDefinition('api_platform.graphql.normalizer.item.non_resource', Argument::type(Definition::class))->shouldNotBeCalled();
+        $containerBuilderProphecy->setDefinition('api_platform.graphql.normalizer.object', Argument::type(Definition::class))->shouldNotBeCalled();
         $containerBuilderProphecy->setParameter('api_platform.graphql.enabled', true)->shouldNotBeCalled();
         $containerBuilderProphecy->setParameter('api_platform.graphql.enabled', false)->shouldBeCalled();
         $containerBuilderProphecy->setParameter('api_platform.graphql.graphiql.enabled', true)->shouldNotBeCalled();
@@ -842,8 +842,6 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.serializer.context_builder.filter',
             'api_platform.serializer.group_filter',
             'api_platform.serializer.normalizer.item',
-            'api_platform.serializer.normalizer.item.non_resource',
-            'api_platform.serializer.normalizer.no_op_scalar',
             'api_platform.serializer.property_filter',
             'api_platform.serializer_locator',
             'api_platform.subresource_data_provider',
@@ -1019,12 +1017,12 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.graphql.resolver.item',
             'api_platform.graphql.resolver.resource_field',
             'api_platform.graphql.normalizer.item',
-            'api_platform.graphql.normalizer.item.non_resource',
+            'api_platform.graphql.normalizer.object',
             'api_platform.hal.encoder',
             'api_platform.hal.normalizer.collection',
             'api_platform.hal.normalizer.entrypoint',
             'api_platform.hal.normalizer.item',
-            'api_platform.hal.normalizer.item.non_resource',
+            'api_platform.hal.normalizer.object',
             'api_platform.http_cache.listener.response.add_tags',
             'api_platform.http_cache.listener.response.configure',
             'api_platform.http_cache.purger.varnish_client',
@@ -1041,7 +1039,7 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.jsonld.context_builder',
             'api_platform.jsonld.encoder',
             'api_platform.jsonld.normalizer.item',
-            'api_platform.jsonld.normalizer.item.non_resource',
+            'api_platform.jsonld.normalizer.object',
             'api_platform.mercure.listener.response.add_link_header',
             'api_platform.messenger.data_persister',
             'api_platform.messenger.data_transformer',

@@ -24,27 +24,6 @@ final class JsonContext extends BaseJsonContext
         parent::__construct($httpCallResultPool);
     }
 
-    private function sortArrays($obj)
-    {
-        $isObject = is_object($obj);
-
-        foreach ($obj as $key => $value) {
-            if (null === $value || is_scalar($value)) {
-                continue;
-            }
-
-            if (is_array($value)) {
-                sort($value);
-            }
-
-            $value = $this->sortArrays($value);
-
-            $isObject ? $obj->{$key} = $value : $obj[$key] = $value;
-        }
-
-        return $obj;
-    }
-
     /**
      * @Then /^the JSON should be deep equal to:$/
      */
@@ -74,5 +53,26 @@ final class JsonContext extends BaseJsonContext
     {
         $actual = json_decode($this->httpCallResultPool->getResult()->getValue(), true);
         Assert::assertArraySubset(json_decode($content->getRaw(), true), $actual);
+    }
+
+    private function sortArrays($obj)
+    {
+        $isObject = is_object($obj);
+
+        foreach ($obj as $key => $value) {
+            if (null === $value || is_scalar($value)) {
+                continue;
+            }
+
+            if (is_array($value)) {
+                sort($value);
+            }
+
+            $value = $this->sortArrays($value);
+
+            $isObject ? $obj->{$key} = $value : $obj[$key] = $value;
+        }
+
+        return $obj;
     }
 }

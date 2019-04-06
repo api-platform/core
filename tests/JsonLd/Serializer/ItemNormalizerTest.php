@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Hydra\Serializer;
+namespace ApiPlatform\Core\Tests\JsonLd\Serializer;
 
 use ApiPlatform\Core\Api\IriConverterInterface;
 use ApiPlatform\Core\Api\ResourceClassResolverInterface;
@@ -127,8 +127,7 @@ class ItemNormalizerTest extends TestCase
             null,
             null,
             [],
-            [],
-            false
+            []
         );
         $normalizer->setSerializer($serializerProphecy->reveal());
 
