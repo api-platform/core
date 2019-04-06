@@ -605,8 +605,9 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
         if (!isset($definitions[$definitionKey])) {
             if($v3) {
                 $escapedMimeType = str_replace('/', '-', $mimeType);
-                $definitions[$escapedMimeType][$definitionKey] = [];  // Initialize first to prevent infinite loop
-                $definitions[$escapedMimeType][$definitionKey] = $this->getDefinitionSchema($v3, $publicClass ?? $resourceClass, $resourceMetadata, $definitions, $serializerContext, $mimeType);
+                $definitions[$escapedMimeType] = new \ArrayObject([
+                    $definitionKey => $this->getDefinitionSchema($v3, $publicClass ?? $resourceClass, $resourceMetadata, $definitions, $serializerContext, $mimeType) ?? []
+                ]);
             }else {
                 $definitions[$definitionKey] = [];  // Initialize first to prevent infinite loop
                 $definitions[$definitionKey] = $this->getDefinitionSchema($v3, $publicClass ?? $resourceClass, $resourceMetadata, $definitions, $serializerContext);
@@ -642,16 +643,15 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
 
         if ($v3) {
             if ($mimeType == 'application/vnd.api+json') {
-                $definitionSchema['properties']['data'] = [
+                $definitionSchema['properties']['data'] = new \ArrayObject([
                     "type"       => "object",
                     "properties" => [
                         "attributes" => [
                             "type"       => "object",
-                            "properties" => [
-                            ],
+                            "properties" => [],
                         ]
                     ]
-                ];
+                ]);
             }
         }
         foreach ($this->propertyNameCollectionFactory->create($resourceClass, $options) as $propertyName) {
