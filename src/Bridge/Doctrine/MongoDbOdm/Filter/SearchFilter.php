@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Filter;
 
+use ApiPlatform\Core\Api\IdentifiersExtractorInterface;
 use ApiPlatform\Core\Api\IriConverterInterface;
 use ApiPlatform\Core\Bridge\Doctrine\Common\Filter\SearchFilterInterface;
 use ApiPlatform\Core\Bridge\Doctrine\Common\Filter\SearchFilterTrait;
@@ -20,6 +21,7 @@ use ApiPlatform\Core\Exception\InvalidArgumentException;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Persistence\Mapping\ClassMetadata;
 use Doctrine\ODM\MongoDB\Aggregation\Builder;
+use Doctrine\ODM\MongoDB\Mapping\ClassMetadata as MongoDBClassMetadata;
 use Doctrine\ODM\MongoDB\Types\Type as MongoDbType;
 use MongoDB\BSON\Regex;
 use Psr\Log\LoggerInterface;
@@ -40,12 +42,17 @@ final class SearchFilter extends AbstractFilter implements SearchFilterInterface
 
     public const DOCTRINE_INTEGER_TYPE = MongoDbType::INTEGER;
 
-    public function __construct(ManagerRegistry $managerRegistry, IriConverterInterface $iriConverter, PropertyAccessorInterface $propertyAccessor = null, LoggerInterface $logger = null, array $properties = null)
+    public function __construct(ManagerRegistry $managerRegistry, IriConverterInterface $iriConverter, PropertyAccessorInterface $propertyAccessor = null, LoggerInterface $logger = null, array $properties = null, IdentifiersExtractorInterface $identifiersExtractor = null)
     {
         parent::__construct($managerRegistry, $logger, $properties);
 
+        if (null === $identifiersExtractor) {
+            @trigger_error('Not injecting ItemIdentifiersExtractor is deprecated since API Platform 2.5 and can lead to unexpected behaviors, it will not be possible anymore in API Platform 3.0.', E_USER_DEPRECATED);
+        }
+
         $this->iriConverter = $iriConverter;
         $this->propertyAccessor = $propertyAccessor ?: PropertyAccess::createPropertyAccessor();
+        $this->identifiersExtractor = $identifiersExtractor;
     }
 
     protected function getIriConverter(): IriConverterInterface
@@ -77,6 +84,10 @@ final class SearchFilter extends AbstractFilter implements SearchFilterInterface
         if ($this->isPropertyNested($property, $resourceClass)) {
             [$matchField, $field, $associations] = $this->addLookupsForNestedProperty($property, $aggregationBuilder, $resourceClass);
         }
+
+        /**
+         * @var MongoDBClassMetadata
+         */
         $metadata = $this->getNestedMetadata($resourceClass, $associations);
 
         $values = $this->normalizeValues((array) $value, $property);
@@ -124,8 +135,16 @@ final class SearchFilter extends AbstractFilter implements SearchFilterInterface
         }
 
         $values = array_map([$this, 'getIdFromValue'], $values);
+        $associationFieldIdentifier = 'id';
+        $doctrineTypeField = $this->getDoctrineFieldType($property, $resourceClass);
 
-        if (!$this->hasValidValues($values, $this->getDoctrineFieldType($property, $resourceClass))) {
+        if (null !== $this->identifiersExtractor) {
+            $associationResourceClass = $metadata->getAssociationTargetClass($field);
+            $associationFieldIdentifier = $this->identifiersExtractor->getIdentifiersFromResourceClass($associationResourceClass)[0];
+            $doctrineTypeField = $this->getDoctrineFieldType($associationFieldIdentifier, $associationResourceClass);
+        }
+
+        if (!$this->hasValidValues($values, $doctrineTypeField)) {
             $this->logger->notice('Invalid filter ignored', [
                 'exception' => new InvalidArgumentException(sprintf('Values for field "%s" are not valid according to the doctrine type.', $property)),
             ]);

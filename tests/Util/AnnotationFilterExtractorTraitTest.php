@@ -40,7 +40,7 @@ class AnnotationFilterExtractorTraitTest extends KernelTestCase
 
         $this->assertEquals($this->extractor->getFilters($reflectionClass), [
             'annotated_api_platform_core_tests_fixtures_test_bundle_entity_dummy_car_api_platform_core_bridge_doctrine_orm_filter_date_filter' => [
-                ['properties' => ['id' => 'exclude_null', 'colors' => 'exclude_null', 'name' => 'exclude_null', 'canSell' => 'exclude_null', 'availableAt' => 'exclude_null']],
+                ['properties' => ['id' => 'exclude_null', 'colors' => 'exclude_null', 'name' => 'exclude_null', 'canSell' => 'exclude_null', 'availableAt' => 'exclude_null', 'secondColors' => 'exclude_null', 'thirdColors' => 'exclude_null', 'uuid' => 'exclude_null']],
                 DateFilter::class,
             ],
             'annotated_api_platform_core_tests_fixtures_test_bundle_entity_dummy_car_api_platform_core_bridge_doctrine_orm_filter_boolean_filter' => [
@@ -48,7 +48,7 @@ class AnnotationFilterExtractorTraitTest extends KernelTestCase
                 BooleanFilter::class,
             ],
             'annotated_api_platform_core_tests_fixtures_test_bundle_entity_dummy_car_api_platform_core_bridge_doctrine_orm_filter_search_filter' => [
-                ['properties' => ['name' => 'partial', 'colors.prop' => 'ipartial']],
+                ['properties' => ['name' => 'partial', 'colors.prop' => 'ipartial', 'colors' => 'exact', 'secondColors' => 'exact', 'thirdColors' => 'exact', 'uuid' => 'exact']],
                 SearchFilter::class,
             ],
             'annotated_api_platform_core_tests_fixtures_test_bundle_entity_dummy_car_api_platform_core_serializer_filter_property_filter' => [

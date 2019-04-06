@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Tests\Bridge\Doctrine\MongoDbOdm\Filter;
 
+use ApiPlatform\Core\Api\IdentifiersExtractorInterface;
 use ApiPlatform\Core\Api\IriConverterInterface;
 use ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Filter\SearchFilter;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
@@ -344,15 +345,6 @@ class SearchFilterTest extends DoctrineMongoDbOdmFilterTestCase
                                 ],
                             ],
                         ],
-                        [
-                            '$match' => [
-                                'relatedDummy' => [
-                                    '$in' => [
-                                        0,
-                                    ],
-                                ],
-                            ],
-                        ],
                     ],
                     $filterFactory,
                 ],
@@ -469,17 +461,7 @@ class SearchFilterTest extends DoctrineMongoDbOdmFilterTestCase
                     $filterFactory,
                 ],
                 'invalid value for relation' => [
-                    [
-                        [
-                            '$match' => [
-                                'relatedDummy' => [
-                                    '$in' => [
-                                        0,
-                                    ],
-                                ],
-                            ],
-                        ],
-                    ],
+                    [],
                     $filterFactory,
                 ],
                 'IRI value for relation' => [
@@ -569,6 +551,19 @@ class SearchFilterTest extends DoctrineMongoDbOdmFilterTestCase
         );
     }
 
+    /**
+     * @group legacy
+     * @expectedDeprecation Not injecting ItemIdentifiersExtractor is deprecated since API Platform 2.5 and can lead to unexpected behaviors, it will not be possible anymore in API Platform 3.0.
+     */
+    public function testNotPassingIdentifiersExtractor()
+    {
+        $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
+        $iriConverter = $iriConverterProphecy->reveal();
+        $propertyAccessor = self::$kernel->getContainer()->get('test.property_accessor');
+
+        return new SearchFilter($this->managerRegistry, $iriConverter, $propertyAccessor, null, null, null);
+    }
+
     protected function buildSearchFilter(ManagerRegistry $managerRegistry, ?array $properties = null)
     {
         $relatedDummyProphecy = $this->prophesize(RelatedDummy::class);
@@ -587,6 +582,9 @@ class SearchFilterTest extends DoctrineMongoDbOdmFilterTestCase
         $iriConverter = $iriConverterProphecy->reveal();
         $propertyAccessor = self::$kernel->getContainer()->get('test.property_accessor');
 
-        return new SearchFilter($managerRegistry, $iriConverter, $propertyAccessor, null, $properties);
+        $identifierExtractorProphecy = $this->prophesize(IdentifiersExtractorInterface::class);
+        $identifierExtractorProphecy->getIdentifiersFromResourceClass(Argument::type('string'))->willReturn(['id']);
+
+        return new SearchFilter($managerRegistry, $iriConverter, $propertyAccessor, null, $properties, $identifierExtractorProphecy->reveal());
     }
 }
