@@ -67,7 +67,9 @@ final class IdentifiersExtractor implements IdentifiersExtractorInterface
     public function getIdentifiersFromItem($item): array
     {
         $identifiers = [];
-        $resourceClass = $this->getObjectClass($item);
+        $type = $this->getObjectClass($item);
+        $resourceClass = $this->resourceClassResolver->isResourceClass($type) ? $this->resourceClassResolver->getResourceClass($item) : $type;
+
         foreach ($this->propertyNameCollectionFactory->create($resourceClass) as $propertyName) {
             $propertyMetadata = $this->propertyMetadataFactory->create($resourceClass, $propertyName);
             $identifier = $propertyMetadata->isIdentifier();

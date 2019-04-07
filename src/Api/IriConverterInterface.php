@@ -21,6 +21,8 @@ use ApiPlatform\Core\Exception\RuntimeException;
  * Converts item and resources to IRI and vice versa.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
+ *
+ * @deprecated in favor of ResourceIriConverterInterface to be removed in ApiPlatform 3.0
  */
 interface IriConverterInterface
 {
@@ -41,6 +43,10 @@ interface IriConverterInterface
      *
      * @throws InvalidArgumentException
      * @throws RuntimeException
+     *
+     * @return string Class name of resource
+     *
+     * @deprecated in favor of `ResourceIriConverterInterface::getIriFromItemWithResource`
      */
     public function getIriFromItem($item, int $referenceType = UrlGeneratorInterface::ABS_PATH): string;
 

@@ -47,16 +47,25 @@ final class ResourceClassResolver implements ResourceClassResolverInterface
             throw new InvalidArgumentException(sprintf('No resource class found.'));
         }
 
+        $resolvedResourceClass = null;
+        foreach ($this->resourceNameCollectionFactory->create() as $currentResourceClass) {
+            if ($resourceClass === $currentResourceClass) {
+                $resolvedResourceClass = $currentResourceClass;
+            }
+            if (null === $resolvedResourceClass && is_subclass_of($type, $currentResourceClass)) {
+                $resolvedResourceClass = $currentResourceClass;
+            }
+        }
+        if (null !== $resolvedResourceClass) {
+            $resourceClass = $resolvedResourceClass;
+        }
+
         if (
             null === $type
             || ((!$strict || $resourceClass === $type) && $isResourceClass = $this->isResourceClass($type))
+            || null !== $resolvedResourceClass && interface_exists($resourceClass)
         ) {
             return $resourceClass;
-        }
-
-        // The Resource is an interface
-        if ($value instanceof $resourceClass && $type !== $resourceClass && interface_exists($resourceClass)) {
-            throw new InvalidArgumentException(sprintf('The given object\'s resource is the interface "%s", finding a class is not possible.', $resourceClass));
         }
 
         if (
@@ -79,7 +88,7 @@ final class ResourceClassResolver implements ResourceClassResolverInterface
         }
 
         foreach ($this->resourceNameCollectionFactory->create() as $resourceClass) {
-            if ($type === $resourceClass) {
+            if ($type === $resourceClass || is_subclass_of($type, $resourceClass)) {
                 return $this->localIsResourceClassCache[$type] = true;
             }
         }

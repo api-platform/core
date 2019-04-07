@@ -15,8 +15,8 @@ namespace ApiPlatform\Core\Bridge\Symfony\Routing;
 
 use ApiPlatform\Core\Api\IdentifiersExtractor;
 use ApiPlatform\Core\Api\IdentifiersExtractorInterface;
-use ApiPlatform\Core\Api\IriConverterInterface;
 use ApiPlatform\Core\Api\OperationType;
+use ApiPlatform\Core\Api\ResourceIriConverterInterface;
 use ApiPlatform\Core\Api\UrlGeneratorInterface;
 use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
 use ApiPlatform\Core\DataProvider\OperationDataProviderTrait;
@@ -40,7 +40,7 @@ use Symfony\Component\Routing\RouterInterface;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-final class IriConverter implements IriConverterInterface
+final class IriConverter implements ResourceIriConverterInterface
 {
     use ClassInfoTrait;
     use OperationDataProviderTrait;
@@ -112,10 +112,21 @@ final class IriConverter implements IriConverterInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @deprecated use `getIriFromItemWithResource` instead to be removed in ApiPlatform 3.0
      */
     public function getIriFromItem($item, int $referenceType = UrlGeneratorInterface::ABS_PATH): string
     {
         $resourceClass = $this->getObjectClass($item);
+
+        return $this->getIriFromItemWithResource($item, $resourceClass, $referenceType);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getIriFromItemWithResource($item, string $resourceClass, int $referenceType = UrlGeneratorInterface::ABS_PATH): string
+    {
         $routeName = $this->routeNameResolver->getRouteName($resourceClass, OperationType::ITEM);
 
         try {

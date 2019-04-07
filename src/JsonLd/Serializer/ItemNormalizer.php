@@ -72,7 +72,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
         // Use resolved resource class instead of given resource class to support multiple inheritance child types
         $resourceClass = $this->resourceClassResolver->getResourceClass($object, $context['resource_class'] ?? null, true);
         $context = $this->initContext($resourceClass, $context);
-        $iri = $this->iriConverter->getIriFromItem($object);
+        $iri = $this->iriConverter->getIriFromItemWithResource($object, $resourceClass);
         $context['iri'] = $iri;
         $context['api_normalize'] = true;
 
