@@ -731,7 +731,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
                     $definitionSchema['properties']['data']['properties']['attributes']['properties'][$normalizedPropertyName] = $this->getPropertySchema($v3,
                         $propertyMetadata, $definitions, $serializerContext, $mimeType);
                 } else {
-                    $definitionSchema['properties'][$normalizedPropertyName] = $this->getPropertySchema($v3, $propertyMetadata, $definitions, $serializerContext);
+                    $definitionSchema['properties'][$normalizedPropertyName] = $this->getPropertySchema($v3, $propertyMetadata, $definitions, $serializerContext, $mimeType);
                 }
             } else {
                 $definitionSchema['properties'][$normalizedPropertyName] = $this->getPropertySchema($v3, $propertyMetadata, $definitions, $serializerContext);
@@ -819,7 +819,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
                     return [
                         '$ref' => sprintf(
                             '#/components/schemas/%s/%s',
-                            $mimeType,
+                            str_replace('/', '-', $mimeType),
                             $this->getDefinition($v3, $definitions, $resourceMetadata = $this->resourceMetadataFactory->create($className), $className, $resourceMetadata->getAttribute('output')['class'] ?? $className, $serializerContext, $mimeType)
                         ),
                     ];

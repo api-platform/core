@@ -2263,29 +2263,83 @@ class DocumentationNormalizerV3Test extends TestCase
             ]),
             'components' => [
                 'schemas' => new \ArrayObject([
-                    'Question' => new \ArrayObject([
-                        'type' => 'object',
-                        'description' => 'This is a question.',
-                        'externalDocs' => ['url' => 'http://schema.example.com/Question'],
-                        'properties' => [
-                            'answer' => new \ArrayObject([
-                                'type' => 'array',
-                                'description' => 'This is a name.',
-                                'items' => ['$ref' => '#/components/schemas/Answer'],
-                            ]),
-                        ],
+                    'application-json' => new \ArrayObject([
+                        'Question' => new \ArrayObject([
+                            'type' => 'object',
+                            'description' => 'This is a question.',
+                            'externalDocs' => ['url' => 'http://schema.example.com/Question'],
+                            'properties' => [
+                                'answer' => new \ArrayObject([
+                                    'type' => 'array',
+                                    'description' => 'This is a name.',
+                                    'items' => ['$ref' => '#/components/schemas/application-json/Answer'],
+                                ]),
+                            ],
+                        ]),
+                        'Answer' => new \ArrayObject([
+                            'type' => 'object',
+                            'description' => 'This is an answer.',
+                            'externalDocs' => ['url' => 'http://schema.example.com/Answer'],
+                            'properties' => [
+                                'content' => new \ArrayObject([
+                                    'type' => 'array',
+                                    'description' => 'This is a name.',
+                                    'items' => ['$ref' => '#/components/schemas/application-json/Answer'],
+                                ]),
+                            ],
+                        ]),
                     ]),
-                    'Answer' => new \ArrayObject([
-                        'type' => 'object',
-                        'description' => 'This is an answer.',
-                        'externalDocs' => ['url' => 'http://schema.example.com/Answer'],
-                        'properties' => [
-                            'content' => new \ArrayObject([
-                                'type' => 'array',
-                                'description' => 'This is a name.',
-                                'items' => ['$ref' => '#/components/schemas/Answer'],
-                            ]),
-                        ],
+                    'text-xml' => new \ArrayObject([
+                        'Question' => new \ArrayObject([
+                            'type' => 'object',
+                            'description' => 'This is a question.',
+                            'externalDocs' => ['url' => 'http://schema.example.com/Question'],
+                            'properties' => [
+                                'answer' => new \ArrayObject([
+                                    'type' => 'array',
+                                    'description' => 'This is a name.',
+                                    'items' => ['$ref' => '#/components/schemas/text-xml/Answer'],
+                                ]),
+                            ],
+                        ]),
+                        'Answer' => new \ArrayObject([
+                            'type' => 'object',
+                            'description' => 'This is an answer.',
+                            'externalDocs' => ['url' => 'http://schema.example.com/Answer'],
+                            'properties' => [
+                                'content' => new \ArrayObject([
+                                    'type' => 'array',
+                                    'description' => 'This is a name.',
+                                    'items' => ['$ref' => '#/components/schemas/text-xml/Answer'],
+                                ]),
+                            ],
+                        ]),
+                    ]),
+                    'text-csv' => new \ArrayObject([
+                        'Question' => new \ArrayObject([
+                            'type' => 'object',
+                            'description' => 'This is a question.',
+                            'externalDocs' => ['url' => 'http://schema.example.com/Question'],
+                            'properties' => [
+                                'answer' => new \ArrayObject([
+                                    'type' => 'array',
+                                    'description' => 'This is a name.',
+                                    'items' => ['$ref' => '#/components/schemas/text-csv/Answer'],
+                                ]),
+                            ],
+                        ]),
+                        'Answer' => new \ArrayObject([
+                            'type' => 'object',
+                            'description' => 'This is an answer.',
+                            'externalDocs' => ['url' => 'http://schema.example.com/Answer'],
+                            'properties' => [
+                                'content' => new \ArrayObject([
+                                    'type' => 'array',
+                                    'description' => 'This is a name.',
+                                    'items' => ['$ref' => '#/components/schemas/text-csv/Answer'],
+                                ]),
+                            ],
+                        ]),
                     ]),
                 ]),
             ],
