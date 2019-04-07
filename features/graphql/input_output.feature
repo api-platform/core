@@ -1,10 +1,10 @@
 Feature: GraphQL DTO input and output
-  In order to use a hypermedia API
+  In order to use the GraphQL API
   As a client software developer
   I need to be able to use DTOs on my resources as Input or Output objects.
 
   @createSchema
-  Scenario: Retrieve an Output with GraphQl
+  Scenario: Retrieve an Output with GraphQL
     When I add "Content-Type" header equal to "application/ld+json"
     And I send a "POST" request to "/dummy_dto_input_outputs" with body:
     """
@@ -162,8 +162,7 @@ Feature: GraphQL DTO input and output
     }
     """
 
-  @!mongodb
-  Scenario: Use messenger with graphql and an input where the handler gives a synchronous result
+  Scenario: Use messenger with GraphQL and an input where the handler gives a synchronous result
     When I send the following GraphQL request:
     """
     mutation {
