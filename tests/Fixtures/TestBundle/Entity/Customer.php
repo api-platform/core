@@ -14,47 +14,46 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity;
 
 use ApiPlatform\Core\Annotation\ApiResource;
-use ApiPlatform\Core\Tests\Fixtures\NotAResource;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
- * Resource linked to a standard object.
- *
+ * @ApiResource
  * @ORM\Entity
- *
- * @ApiResource(
- *     normalizationContext={
- *         "groups"="contain_non_resource",
- *     },
- * )
- *
- * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class ContainNonResource
+class Customer
 {
     /**
-     * @var mixed
+     * @var int
      *
-     * @ORM\Column(type="integer")
      * @ORM\Id
+     * @ORM\Column(type="integer")
      * @ORM\GeneratedValue(strategy="AUTO")
-     *
-     * @Groups("contain_non_resource")
+     * @Groups({"order_read"})
      */
-    public $id;
+    private $id;
 
     /**
-     * @var ContainNonResource
-     *
-     * @Groups("contain_non_resource")
+     * @ORM\Column(type="string")
+     * @Groups({"order_read"})
      */
-    public $nested;
+    public $name;
 
     /**
-     * @var NotAResource
-     *
-     * @Groups("contain_non_resource")
+     * @ORM\ManyToMany(targetEntity="Address")
+     * @ORM\JoinColumn(nullable=false)
+     * @Groups({"order_read"})
      */
-    public $notAResource;
+    public $addresses;
+
+    public function __construct()
+    {
+        $this->addresses = new ArrayCollection();
+    }
+
+    public function getId()
+    {
+        return $this->id;
+    }
 }

@@ -388,7 +388,7 @@ class AbstractItemNormalizerTest extends TestCase
             (new PropertyMetadata(new Type(Type::BUILTIN_TYPE_STRING), '', true, false))->withInitializable(true)
         );
 
-        $normalizer = new class($propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), $this->prophesize(IriConverterInterface::class)->reveal(), $this->prophesize(ResourceClassResolverInterface::class)->reveal(), null, null, null, null, false, [], [], null, false) extends AbstractItemNormalizer {
+        $normalizer = new class($propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), $this->prophesize(IriConverterInterface::class)->reveal(), $this->prophesize(ResourceClassResolverInterface::class)->reveal(), null, null, null, null, false, [], [], null) extends AbstractItemNormalizer {
         };
 
         /** @var DummyForAdditionalFieldsInput $res */

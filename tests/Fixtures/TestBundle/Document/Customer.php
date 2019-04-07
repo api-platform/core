@@ -14,45 +14,45 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Document;
 
 use ApiPlatform\Core\Annotation\ApiResource;
-use ApiPlatform\Core\Tests\Fixtures\NotAResource;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
- * Resource linked to a standard object.
- *
- * @ODM\Document
- *
  * @ApiResource(
- *     normalizationContext={
- *         "groups"="contain_non_resource",
- *     },
+ *     attributes={"normalization_context"={"groups"={"order_read"}}}
  * )
- *
- * @author Kévin Dunglas <dunglas@gmail.com>
+ * @ODM\Document
  */
-class ContainNonResource
+class Customer
 {
     /**
-     * @var mixed
+     * @var int
      *
      * @ODM\Id(strategy="INCREMENT", type="integer")
-     *
-     * @Groups("contain_non_resource")
+     * @Groups({"order_read"})
      */
-    public $id;
+    private $id;
 
     /**
-     * @var ContainNonResource
-     *
-     * @Groups("contain_non_resource")
+     * @ODM\Field(type="string")
+     * @Groups({"order_read"})
      */
-    public $nested;
+    public $name;
 
     /**
-     * @var NotAResource
-     *
-     * @Groups("contain_non_resource")
+     * @ODM\ReferenceMany(targetDocument=Address::class)
+     * @Groups({"order_read"})
      */
-    public $notAResource;
+    public $addresses;
+
+    public function __construct()
+    {
+        $this->addresses = new ArrayCollection();
+    }
+
+    public function getId()
+    {
+        return $this->id;
+    }
 }

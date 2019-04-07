@@ -307,15 +307,11 @@ Feature: Table inheritance
            "items": {
              "type": "object",
              "properties": {
-               "@type": {
-                 "type": "string",
-                 "pattern": "^ResourceInterface$"
-               },
-               "@id": {
-                 "type": "string",
-                 "pattern": "^_:"
-               },
                "foo": {
+                 "type": "string",
+                 "required": "true"
+               },
+               "fooz": {
                  "type": "string",
                  "required": "true"
                }
@@ -327,3 +323,30 @@ Feature: Table inheritance
        "required": ["hydra:member"]
      }
      """
+
+  Scenario: Get an interface resource item
+    When I send a "GET" request to "/resource_interfaces/some-id"
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+    And the JSON should be valid according to this schema:
+    """
+    {
+      "type": "object",
+      "properties": {
+        "context": {
+          "type": "string",
+          "pattern": "ResourceInterface$"
+        },
+        "foo": {
+          "type": "string",
+          "required": "true"
+        },
+        "fooz": {
+          "type": "string",
+          "required": "true",
+          "pattern": "fooz"
+        }
+      }
+    }
+    """

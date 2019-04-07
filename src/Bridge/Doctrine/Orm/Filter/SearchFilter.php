@@ -49,8 +49,8 @@ class SearchFilter extends AbstractContextAwareFilter implements SearchFilterInt
         }
 
         $this->iriConverter = $iriConverter;
-        $this->propertyAccessor = $propertyAccessor ?: PropertyAccess::createPropertyAccessor();
         $this->identifiersExtractor = $identifiersExtractor;
+        $this->propertyAccessor = $propertyAccessor ?: PropertyAccess::createPropertyAccessor();
     }
 
     protected function getIriConverter(): IriConverterInterface

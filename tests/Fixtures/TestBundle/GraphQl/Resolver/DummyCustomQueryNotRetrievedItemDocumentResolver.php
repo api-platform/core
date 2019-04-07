@@ -33,6 +33,7 @@ class DummyCustomQueryNotRetrievedItemDocumentResolver implements QueryItemResol
     {
         if (null === $item) {
             $item = new DummyCustomQueryDocument();
+            $item->id = 0;
             $item->message = 'Success (not retrieved)!';
 
             return $item;

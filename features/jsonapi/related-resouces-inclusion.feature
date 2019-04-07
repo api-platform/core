@@ -363,11 +363,11 @@ Feature: JSON API Inclusion of Related Resources
                         "dummyDate": null,
                         "dummyBoolean": null,
                         "embeddedDummy": {
+                            "dummyName": null,
                             "dummyBoolean": null,
                             "dummyDate": null,
                             "dummyFloat": null,
                             "dummyPrice": null,
-                            "dummyName": null,
                             "symfony": null
                         },
                         "_id": 1,
@@ -377,8 +377,8 @@ Feature: JSON API Inclusion of Related Resources
                     "relationships": {
                         "thirdLevel": {
                             "data": {
-                                "id": "/third_levels/1",
-                                "type": "ThirdLevel"
+                                "type": "ThirdLevel",
+                                "id": "/third_levels/1"
                             }
                         }
                     }
