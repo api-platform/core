@@ -18,9 +18,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
- * @ApiResource(
- *     attributes={"normalization_context"={"groups"={"address_read"}}}
- * )
+ * @ApiResource
  * @ORM\Entity
  */
 class Address
@@ -31,13 +29,13 @@ class Address
      * @ORM\Id
      * @ORM\Column(type="integer")
      * @ORM\GeneratedValue(strategy="AUTO")
-     * @Groups({"address_read"})
+     * @Groups({"order_read"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string")
-     * @Groups({"address_read"})
+     * @Groups({"order_read"})
      */
     public $name;
 

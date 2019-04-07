@@ -20,7 +20,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * @ApiResource(
- *     attributes={"normalization_context"={"groups"={"customer_read"}}}
+ *     attributes={"normalization_context"={"groups"={"order_read"}}}
  * )
  * @ODM\Document
  */
@@ -30,19 +30,19 @@ class Customer
      * @var int
      *
      * @ODM\Id(strategy="INCREMENT", type="integer")
-     * @Groups({"customer_read"})
+     * @Groups({"order_read"})
      */
     private $id;
 
     /**
      * @ODM\Field(type="string")
-     * @Groups({"customer_read"})
+     * @Groups({"order_read"})
      */
     public $name;
 
     /**
      * @ODM\ReferenceMany(targetDocument=Address::class)
-     * @Groups({"customer_read"})
+     * @Groups({"order_read"})
      */
     public $addresses;
 

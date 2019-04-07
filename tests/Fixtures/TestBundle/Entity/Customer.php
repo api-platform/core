@@ -19,9 +19,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
- * @ApiResource(
- *     attributes={"normalization_context"={"groups"={"customer_read"}}}
- * )
+ * @ApiResource
  * @ORM\Entity
  */
 class Customer
@@ -32,20 +30,20 @@ class Customer
      * @ORM\Id
      * @ORM\Column(type="integer")
      * @ORM\GeneratedValue(strategy="AUTO")
-     * @Groups({"customer_read"})
+     * @Groups({"order_read"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string")
-     * @Groups({"customer_read"})
+     * @Groups({"order_read"})
      */
     public $name;
 
     /**
      * @ORM\ManyToMany(targetEntity="Address")
      * @ORM\JoinColumn(nullable=false)
-     * @Groups({"customer_read"})
+     * @Groups({"order_read"})
      */
     public $addresses;
 

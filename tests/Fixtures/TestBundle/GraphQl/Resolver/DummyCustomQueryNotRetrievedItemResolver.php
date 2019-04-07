@@ -33,6 +33,7 @@ class DummyCustomQueryNotRetrievedItemResolver implements QueryItemResolverInter
     {
         if (null === $item) {
             $item = new DummyCustomQuery();
+            $item->id = 0;
             $item->message = 'Success (not retrieved)!';
 
             return $item;

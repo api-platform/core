@@ -19,7 +19,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * @ApiResource(
- *     attributes={"normalization_context"={"groups"={"address_read"}}}
+ *     attributes={"normalization_context"={"groups"={"order_read"}}}
  * )
  * @ODM\Document
  */
@@ -29,13 +29,13 @@ class Address
      * @var int
      *
      * @ODM\Id(strategy="INCREMENT", type="integer")
-     * @Groups({"address_read"})
+     * @Groups({"order_read"})
      */
     private $id;
 
     /**
      * @ODM\Field(type="string")
-     * @Groups({"address_read"})
+     * @Groups({"order_read"})
      */
     public $name;
 
