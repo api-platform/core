@@ -179,6 +179,7 @@ class IdentifiersExtractorTest extends TestCase
         $resourceClassResolver->isResourceClass(Argument::type('string'))->will(function ($args) {
             return !(Uuid::class === $args[0]);
         });
+        $resourceClassResolver->getResourceClass(Argument::any())->will(function ($args) {return \get_class($args[0]); });
 
         return $resourceClassResolver->reveal();
     }

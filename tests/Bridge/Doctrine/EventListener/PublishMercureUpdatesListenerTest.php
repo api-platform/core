@@ -28,6 +28,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\UnitOfWork;
 use PHPUnit\Framework\TestCase;
+use Prophecy\Argument;
 use Symfony\Component\Mercure\Update;
 use Symfony\Component\Serializer\SerializerInterface;
 
@@ -56,6 +57,7 @@ class PublishMercureUpdatesListenerTest extends TestCase
         $resourceClassResolverProphecy->isResourceClass(NotAResource::class)->willReturn(false);
         $resourceClassResolverProphecy->isResourceClass(DummyCar::class)->willReturn(true);
         $resourceClassResolverProphecy->isResourceClass(DummyFriend::class)->willReturn(true);
+        $resourceClassResolverProphecy->getResourceClass(Argument::type('object'))->will(function ($args) { return \get_class($args[0]); });
 
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
         $iriConverterProphecy->getIriFromItem($toInsert, UrlGeneratorInterface::ABS_URL)->willReturn('http://example.com/dummies/1')->shouldBeCalled();
@@ -136,6 +138,7 @@ class PublishMercureUpdatesListenerTest extends TestCase
 
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
         $resourceClassResolverProphecy->isResourceClass(Dummy::class)->willReturn(true);
+        $resourceClassResolverProphecy->getResourceClass(Argument::type('object'))->will(function ($args) { return \get_class($args[0]); });
 
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
 

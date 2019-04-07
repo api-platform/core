@@ -121,9 +121,11 @@ final class PublishMercureUpdatesListener
     private function storeEntityToPublish($entity, string $property): void
     {
         $resourceClass = $this->getObjectClass($entity);
+
         if (!$this->resourceClassResolver->isResourceClass($resourceClass)) {
             return;
         }
+        $resourceClass = $this->resourceClassResolver->getResourceClass($entity);
 
         $value = $this->resourceMetadataFactory->create($resourceClass)->getAttribute('mercure', false);
         if (false === $value) {

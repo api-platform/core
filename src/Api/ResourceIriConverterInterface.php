@@ -19,7 +19,7 @@ use ApiPlatform\Core\Exception\RuntimeException;
 /**
  * Converts item and resources to IRI and vice versa.
  *
- * @author Kévin Dunglas <dunglas@gmail.com>
+ * @author Maxime Veber <maxime.veber@nekland.fr>
  */
 interface ResourceIriConverterInterface extends IriConverterInterface
 {

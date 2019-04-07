@@ -24,6 +24,7 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyCar;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyTableInheritance;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyTableInheritanceChild;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyTableInheritanceNotApiResourceChild;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -175,13 +176,12 @@ class ResourceClassResolverTest extends TestCase
 
     public function testGetResourceClassWithInterfaceResource()
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage("The given object's resource is the interface \"ApiPlatform\Core\Tests\Fixtures\DummyResourceInterface\", finding a class is not possible.");
         $dummy = new DummyResourceImplementation();
         $resourceNameCollectionFactoryProphecy = $this->prophesize(ResourceNameCollectionFactoryInterface::class);
+        $resourceNameCollectionFactoryProphecy->create()->willReturn(new ResourceNameCollection([DummyResourceInterface::class]))->shouldBeCalled();
 
         $resourceClassResolver = new ResourceClassResolver($resourceNameCollectionFactoryProphecy->reveal());
-        $resourceClassResolver->getResourceClass($dummy, DummyResourceInterface::class, true);
+        $this->assertEquals(DummyResourceInterface::class, $resourceClassResolver->getResourceClass($dummy, DummyResourceInterface::class, true));
     }
 
     public function testGetResourceClassWithoutSecondParameterIsAccurate()
@@ -211,5 +211,27 @@ class ResourceClassResolverTest extends TestCase
 
         $resourceClassResolver = new ResourceClassResolver($resourceNameCollectionFactoryProphecy->reveal());
         $this->assertTrue($resourceClassResolver->isResourceClass(DummyResourceImplementation::class));
+    }
+
+    public function testItResolveParentResourceClassOfChildrenOfResourceClasses()
+    {
+        $dummy = new DummyTableInheritanceNotApiResourceChild();
+        $resourceNameCollectionFactoryProphecy = $this->prophesize(ResourceNameCollectionFactoryInterface::class);
+        $resourceNameCollectionFactoryProphecy->create()->willReturn(new ResourceNameCollection([DummyTableInheritance::class]))->shouldBeCalled();
+
+        $resourceClassResolver = new ResourceClassResolver($resourceNameCollectionFactoryProphecy->reveal());
+        $this->assertTrue($resourceClassResolver->isResourceClass(DummyTableInheritanceNotApiResourceChild::class));
+        $this->assertEquals(DummyTableInheritance::class, $resourceClassResolver->getResourceClass($dummy));
+        $this->assertEquals(DummyTableInheritance::class, $resourceClassResolver->getResourceClass($dummy, DummyTableInheritance::class, true));
+    }
+
+    public function testItResolveChildWhenParentAndChildrenAreResourcesAndIsStrict()
+    {
+        $dummy = new DummyTableInheritanceChild();
+        $resourceNameCollectionFactoryProphecy = $this->prophesize(ResourceNameCollectionFactoryInterface::class);
+        $resourceNameCollectionFactoryProphecy->create()->willReturn(new ResourceNameCollection([DummyTableInheritance::class, DummyTableInheritanceChild::class]))->shouldBeCalled();
+
+        $resourceClassResolver = new ResourceClassResolver($resourceNameCollectionFactoryProphecy->reveal());
+        $this->assertEquals(DummyTableInheritanceChild::class, $resourceClassResolver->getResourceClass($dummy, DummyTableInheritance::class, true));
     }
 }

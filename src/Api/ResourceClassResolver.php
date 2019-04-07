@@ -28,7 +28,6 @@ final class ResourceClassResolver implements ResourceClassResolverInterface
     use ClassInfoTrait;
 
     private $resourceNameCollectionFactory;
-    private $localIsResourceClassCache = [];
 
     public function __construct(ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory)
     {
@@ -56,20 +55,27 @@ final class ResourceClassResolver implements ResourceClassResolverInterface
                 $resolvedResourceClass = $currentResourceClass;
             }
         }
+
         if (null !== $resolvedResourceClass) {
             $resourceClass = $resolvedResourceClass;
         }
 
+        $typeIsStrictResourceClass = $this->isStrictResourceClass($type);
+        if ($strict && $typeIsStrictResourceClass) {
+            return $type;
+        }
+
+        $typeIsResourceClass = $this->isResourceClass($type);
         if (
             null === $type
-            || ((!$strict || $resourceClass === $type) && $isResourceClass = $this->isResourceClass($type))
-            || null !== $resolvedResourceClass && interface_exists($resourceClass)
+            || (((!$strict || $resourceClass === $type)) && $typeIsResourceClass)
+            || null !== $resolvedResourceClass && (interface_exists($resourceClass) || !$typeIsStrictResourceClass)
         ) {
             return $resourceClass;
         }
 
         if (
-            ($isResourceClass ?? $this->isResourceClass($type))
+            $typeIsResourceClass
             || (is_subclass_of($type, $resourceClass) && $this->isResourceClass($resourceClass))
         ) {
             return $type;
@@ -83,16 +89,28 @@ final class ResourceClassResolver implements ResourceClassResolverInterface
      */
     public function isResourceClass(string $type): bool
     {
-        if (isset($this->localIsResourceClassCache[$type])) {
-            return $this->localIsResourceClassCache[$type];
-        }
-
         foreach ($this->resourceNameCollectionFactory->create() as $resourceClass) {
-            if ($type === $resourceClass || is_subclass_of($type, $resourceClass)) {
-                return $this->localIsResourceClassCache[$type] = true;
+            if (is_a($type, $resourceClass, true)) {
+                return true;
             }
         }
 
-        return $this->localIsResourceClassCache[$type] = false;
+        return false;
+    }
+
+    /**
+     * Same of isResourceClass but stricter: it ignores inheritance.
+     *
+     * @param string $type FQCN of an object
+     */
+    private function isStrictResourceClass(string $type): bool
+    {
+        foreach ($this->resourceNameCollectionFactory->create() as $resourceClass) {
+            if ($type === $resourceClass) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

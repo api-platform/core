@@ -20,15 +20,18 @@ Feature: Table inheritance
       "properties": {
         "@type": {
           "type": "string",
-          "pattern": "^DummyTableInheritanceChild$"
+          "pattern": "^DummyTableInheritanceChild$",
+          "required": "true"
         },
         "@context": {
           "type": "string",
-          "pattern": "^/contexts/DummyTableInheritanceChild$"
+          "pattern": "^/contexts/DummyTableInheritanceChild$",
+          "required": "true"
         },
         "@id": {
           "type": "string",
-          "pattern": "^/dummy_table_inheritance_children/1$"
+          "pattern": "^/dummy_table_inheritance_children/1$",
+          "required": "true"
         },
         "name": {
           "type": "string",
@@ -61,7 +64,8 @@ Feature: Table inheritance
             "properties": {
               "@type": {
                 "type": "string",
-                "pattern": "^DummyTableInheritanceChild$"
+                "pattern": "^DummyTableInheritanceChild$",
+                "required": "true"
               },
               "name": {
                 "type": "string",
@@ -80,7 +84,40 @@ Feature: Table inheritance
     }
     """
 
-  @createSchema
+  Scenario: Some children not api resources are created in the app
+    When some dummy table inheritance data but not api resource child are created
+    And I send a "GET" request to "/dummy_table_inheritances"
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+    And the JSON should be valid according to this schema:
+    """
+    {
+      "type": "object",
+      "properties": {
+        "hydra:member": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "@type": {
+                "type": "string",
+                "pattern": "^DummyTableInheritance(Child)?$",
+                "required": "true"
+              },
+              "name": {
+                "type": "string",
+                "required": "true"
+              }
+            }
+          },
+          "minItems": 1
+        }
+      },
+      "required": ["hydra:member"]
+    }
+    """
+
   Scenario: Create a table inherited resource
     When I add "Content-Type" header equal to "application/ld+json"
     And I send a "POST" request to "/dummy_table_inheritance_children" with body:
@@ -97,15 +134,18 @@ Feature: Table inheritance
       "properties": {
         "@type": {
           "type": "string",
-          "pattern": "^DummyTableInheritanceChild$"
+          "pattern": "^DummyTableInheritanceChild$",
+          "required": "true"
         },
         "@context": {
           "type": "string",
-          "pattern": "^/contexts/DummyTableInheritanceChild$"
+          "pattern": "^/contexts/DummyTableInheritanceChild$",
+          "required": "true"
         },
         "@id": {
           "type": "string",
-          "pattern": "^/dummy_table_inheritance_children/1$"
+          "pattern": "^/dummy_table_inheritance_children/3$",
+          "required": "true"
         },
         "name": {
           "type": "string",
@@ -136,15 +176,18 @@ Feature: Table inheritance
       "properties": {
         "@type": {
           "type": "string",
-          "pattern": "^DummyTableInheritanceDifferentChild$"
+          "pattern": "^DummyTableInheritanceDifferentChild$",
+          "required": "true"
         },
         "@context": {
           "type": "string",
-          "pattern": "^/contexts/DummyTableInheritanceDifferentChild$"
+          "pattern": "^/contexts/DummyTableInheritanceDifferentChild$",
+          "required": "true"
         },
         "@id": {
           "type": "string",
-          "pattern": "^/dummy_table_inheritance_different_children/2$"
+          "pattern": "^/dummy_table_inheritance_different_children/4$",
+          "required": "true"
         },
         "name": {
           "type": "string",
@@ -167,7 +210,7 @@ Feature: Table inheritance
     {
       "children": [
         "/dummy_table_inheritance_children/1",
-        "/dummy_table_inheritance_different_children/2"
+        "/dummy_table_inheritance_different_children/4"
       ]
     }
     """
@@ -181,15 +224,18 @@ Feature: Table inheritance
       "properties": {
         "@type": {
           "type": "string",
-          "pattern": "^DummyTableInheritanceRelated$"
+          "pattern": "^DummyTableInheritanceRelated$",
+          "required": "true"
         },
         "@context": {
           "type": "string",
-          "pattern": "^/contexts/DummyTableInheritanceRelated$"
+          "pattern": "^/contexts/DummyTableInheritanceRelated$",
+          "required": "true"
         },
         "@id": {
           "type": "string",
-          "pattern": "^/dummy_table_inheritance_relateds/1$"
+          "pattern": "^/dummy_table_inheritance_relateds/1$",
+          "required": "true"
         },
         "children": {
           "items": {
@@ -199,7 +245,8 @@ Feature: Table inheritance
                 "properties": {
                   "@type": {
                     "type": "string",
-                    "pattern": "^DummyTableInheritanceChild$"
+                    "pattern": "^DummyTableInheritanceChild$",
+                    "required": "true"
                   },
                   "name": {
                     "type": "string",
@@ -215,7 +262,21 @@ Feature: Table inheritance
                 "properties": {
                   "@type": {
                     "type": "string",
-                    "pattern": "^DummyTableInheritanceDifferentChild$"
+                    "pattern": "^DummyTableInheritance$",
+                    "required": "true"
+                  },
+                  "name": {
+                    "type": "string",
+                    "required": "true"
+                  }
+                }
+              },
+              {
+                "properties": {
+                  "@type": {
+                    "type": "string",
+                    "pattern": "^DummyTableInheritanceDifferentChild$",
+                    "required": "true"
                   },
                   "name": {
                     "type": "string",
@@ -255,7 +316,8 @@ Feature: Table inheritance
                 "properties": {
                   "@type": {
                     "type": "string",
-                    "pattern": "^DummyTableInheritanceChild$"
+                    "pattern": "^DummyTableInheritanceChild$",
+                    "required": "true"
                   },
                   "name": {
                     "type": "string",
@@ -271,7 +333,21 @@ Feature: Table inheritance
                 "properties": {
                   "@type": {
                     "type": "string",
-                    "pattern": "^DummyTableInheritanceDifferentChild$"
+                    "pattern": "^DummyTableInheritance$",
+                    "required": "true"
+                  },
+                  "name": {
+                    "type": "string",
+                    "required": "true"
+                  }
+                }
+              },
+              {
+                "properties": {
+                  "@type": {
+                    "type": "string",
+                    "pattern": "^DummyTableInheritanceDifferentChild$",
+                    "required": "true"
                   },
                   "name": {
                     "type": "string",

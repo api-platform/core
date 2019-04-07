@@ -25,7 +25,7 @@ interface ResourceClassResolverInterface
     /**
      * Guesses the associated resource.
      *
-     * @param object $value         Object you're playing with
+     * @param mixed  $value         Object you're playing with
      * @param string $resourceClass Resource class it is supposed to be (could be parent class for instance)
      * @param bool   $strict        value must be type of resource class given or it will return type
      *
