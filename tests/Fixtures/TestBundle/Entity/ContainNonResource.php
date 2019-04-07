@@ -16,12 +16,18 @@ namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity;
 use ApiPlatform\Core\Annotation\ApiResource;
 use ApiPlatform\Core\Tests\Fixtures\NotAResource;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * Resource linked to a standard object.
  *
  * @ORM\Entity
- * @ApiResource
+ *
+ * @ApiResource(
+ *     normalizationContext={
+ *         "groups"="contain_non_resource",
+ *     },
+ * )
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
@@ -33,16 +39,22 @@ class ContainNonResource
      * @ORM\Column(type="integer")
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
+     *
+     * @Groups("contain_non_resource")
      */
     public $id;
 
     /**
-     * @var self
+     * @var ContainNonResource
+     *
+     * @Groups("contain_non_resource")
      */
     public $nested;
 
     /**
      * @var NotAResource
+     *
+     * @Groups("contain_non_resource")
      */
     public $notAResource;
 }

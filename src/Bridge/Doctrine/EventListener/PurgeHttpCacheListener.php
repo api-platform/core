@@ -99,6 +99,10 @@ final class PurgeHttpCacheListener
      */
     public function postFlush(): void
     {
+        if (empty($this->tags)) {
+            return;
+        }
+
         $this->purger->purge($this->tags);
         $this->tags = [];
     }
@@ -107,15 +111,14 @@ final class PurgeHttpCacheListener
     {
         try {
             $resourceClass = $this->resourceClassResolver->getResourceClass($entity);
+            $iri = $this->iriConverter->getIriFromResourceClass($resourceClass);
+            $this->tags[$iri] = $iri;
+            if ($purgeItem) {
+                $iri = $this->iriConverter->getIriFromItem($entity);
+                $this->tags[$iri] = $iri;
+            }
         } catch (InvalidArgumentException $e) {
             return;
-        }
-
-        $iri = $this->iriConverter->getIriFromResourceClass($resourceClass);
-        $this->tags[$iri] = $iri;
-        if ($purgeItem) {
-            $iri = $this->iriConverter->getIriFromItem($entity);
-            $this->tags[$iri] = $iri;
         }
     }
 

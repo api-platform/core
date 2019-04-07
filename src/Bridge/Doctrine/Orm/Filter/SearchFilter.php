@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Bridge\Doctrine\Orm\Filter;
 
+use ApiPlatform\Core\Api\IdentifiersExtractorInterface;
 use ApiPlatform\Core\Api\IriConverterInterface;
 use ApiPlatform\Core\Bridge\Doctrine\Common\Filter\SearchFilterInterface;
 use ApiPlatform\Core\Bridge\Doctrine\Common\Filter\SearchFilterTrait;
@@ -21,6 +22,7 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\DBAL\Types\Type as DBALType;
+use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\QueryBuilder;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -38,11 +40,16 @@ class SearchFilter extends AbstractContextAwareFilter implements SearchFilterInt
 
     public const DOCTRINE_INTEGER_TYPE = DBALType::INTEGER;
 
-    public function __construct(ManagerRegistry $managerRegistry, ?RequestStack $requestStack, IriConverterInterface $iriConverter, PropertyAccessorInterface $propertyAccessor = null, LoggerInterface $logger = null, array $properties = null)
+    public function __construct(ManagerRegistry $managerRegistry, ?RequestStack $requestStack, IriConverterInterface $iriConverter, PropertyAccessorInterface $propertyAccessor = null, LoggerInterface $logger = null, array $properties = null, IdentifiersExtractorInterface $identifiersExtractor = null)
     {
         parent::__construct($managerRegistry, $requestStack, $logger, $properties);
 
+        if (null === $identifiersExtractor) {
+            @trigger_error('Not injecting ItemIdentifiersExtractor is deprecated since API Platform 2.5 and can lead to unexpected behaviors, it will not be possible anymore in API Platform 3.0.', E_USER_DEPRECATED);
+        }
+
         $this->iriConverter = $iriConverter;
+        $this->identifiersExtractor = $identifiersExtractor;
         $this->propertyAccessor = $propertyAccessor ?: PropertyAccess::createPropertyAccessor();
     }
 
@@ -76,6 +83,10 @@ class SearchFilter extends AbstractContextAwareFilter implements SearchFilterInt
         if ($this->isPropertyNested($property, $resourceClass)) {
             [$alias, $field, $associations] = $this->addJoinsForNestedProperty($property, $alias, $queryBuilder, $queryNameGenerator, $resourceClass);
         }
+
+        /**
+         * @var ClassMetadata
+         */
         $metadata = $this->getNestedMetadata($resourceClass, $associations);
 
         $values = $this->normalizeValues((array) $value, $property);
@@ -84,7 +95,6 @@ class SearchFilter extends AbstractContextAwareFilter implements SearchFilterInt
         }
 
         $caseSensitive = true;
-
         if ($metadata->hasField($field)) {
             if ('id' === $field) {
                 $values = array_map([$this, 'getIdFromValue'], $values);
@@ -134,8 +144,16 @@ class SearchFilter extends AbstractContextAwareFilter implements SearchFilterInt
         }
 
         $values = array_map([$this, 'getIdFromValue'], $values);
+        $associationFieldIdentifier = 'id';
+        $doctrineTypeField = $this->getDoctrineFieldType($property, $resourceClass);
 
-        if (!$this->hasValidValues($values, $this->getDoctrineFieldType($property, $resourceClass))) {
+        if (null !== $this->identifiersExtractor) {
+            $associationResourceClass = $metadata->getAssociationTargetClass($field);
+            $associationFieldIdentifier = $this->identifiersExtractor->getIdentifiersFromResourceClass($associationResourceClass)[0];
+            $doctrineTypeField = $this->getDoctrineFieldType($associationFieldIdentifier, $associationResourceClass);
+        }
+
+        if (!$this->hasValidValues($values, $doctrineTypeField)) {
             $this->logger->notice('Invalid filter ignored', [
                 'exception' => new InvalidArgumentException(sprintf('Values for field "%s" are not valid according to the doctrine type.', $field)),
             ]);
@@ -145,10 +163,9 @@ class SearchFilter extends AbstractContextAwareFilter implements SearchFilterInt
 
         $association = $field;
         $valueParameter = $queryNameGenerator->generateParameterName($association);
-
         if ($metadata->isCollectionValuedAssociation($association)) {
             $associationAlias = QueryBuilderHelper::addJoinOnce($queryBuilder, $queryNameGenerator, $alias, $association);
-            $associationField = 'id';
+            $associationField = $associationFieldIdentifier;
         } else {
             $associationAlias = $alias;
             $associationField = $field;

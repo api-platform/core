@@ -119,7 +119,10 @@ final class ItemMutationResolverFactory implements ResolverFactoryInterface
                 return $data;
             }
 
-            $denormalizationContext = null === $item ? ['resource_class' => $resourceClass] : ['resource_class' => $resourceClass, 'object_to_populate' => $item];
+            $denormalizationContext = ['resource_class' => $resourceClass, 'graphql_operation_name' => $operationName];
+            if (null !== $item) {
+                $denormalizationContext['object_to_populate'] = $item;
+            }
             $denormalizationContext += $resourceMetadata->getGraphqlAttribute($operationName, 'denormalization_context', [], true);
             $item = $this->normalizer->denormalize($args['input'], $inputClass ?: $resourceClass, ItemNormalizer::FORMAT, $denormalizationContext);
 
@@ -134,11 +137,6 @@ final class ItemMutationResolverFactory implements ResolverFactoryInterface
             }
 
             if (null !== $item) {
-                $context = ['resource_class' => $resourceClass, 'graphql_operation_name' => $operationName];
-                if (null !== $item) {
-                    $context['object_to_populate'] = $item;
-                }
-
                 $this->validate($item, $info, $resourceMetadata, $operationName);
                 $persistResult = $this->dataPersister->persist($item, $denormalizationContext);
 

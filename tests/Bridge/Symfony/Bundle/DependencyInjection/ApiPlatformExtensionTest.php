@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\Bridge\Symfony\Bundle\DependencyInjection;
 
 use ApiPlatform\Core\Api\FilterInterface;
+use ApiPlatform\Core\Api\IdentifiersExtractorInterface;
 use ApiPlatform\Core\Api\IriConverterInterface;
 use ApiPlatform\Core\Api\OperationAwareFormatsProviderInterface;
 use ApiPlatform\Core\Api\ResourceClassResolverInterface;
@@ -330,7 +331,7 @@ class ApiPlatformExtensionTest extends TestCase
         $containerBuilderProphecy->setDefinition('api_platform.graphql.executor', Argument::type(Definition::class))->shouldNotBeCalled();
         $containerBuilderProphecy->setDefinition('api_platform.graphql.schema_builder', Argument::type(Definition::class))->shouldNotBeCalled();
         $containerBuilderProphecy->setDefinition('api_platform.graphql.normalizer.item', Argument::type(Definition::class))->shouldNotBeCalled();
-        $containerBuilderProphecy->setDefinition('api_platform.graphql.normalizer.item.non_resource', Argument::type(Definition::class))->shouldNotBeCalled();
+        $containerBuilderProphecy->setDefinition('api_platform.graphql.normalizer.object', Argument::type(Definition::class))->shouldNotBeCalled();
         $containerBuilderProphecy->setDefinition('api_platform.graphql.iterable_type', Argument::type(Definition::class))->shouldNotBeCalled();
         $containerBuilderProphecy->setDefinition('api_platform.graphql.type_locator', Argument::type(Definition::class))->shouldNotBeCalled();
         $containerBuilderProphecy->setDefinition('api_platform.graphql.types_factory', Argument::type(Definition::class))->shouldNotBeCalled();
@@ -870,8 +871,6 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.serializer.context_builder.filter',
             'api_platform.serializer.group_filter',
             'api_platform.serializer.normalizer.item',
-            'api_platform.serializer.normalizer.item.non_resource',
-            'api_platform.serializer.normalizer.no_op_scalar',
             'api_platform.serializer.property_filter',
             'api_platform.serializer_locator',
             'api_platform.subresource_data_provider',
@@ -918,6 +917,7 @@ class ApiPlatformExtensionTest extends TestCase
             PropertyFilter::class => 'api_platform.serializer.property_filter',
             GroupFilter::class => 'api_platform.serializer.group_filter',
             OperationAwareFormatsProviderInterface::class => 'api_platform.formats_provider',
+            IdentifiersExtractorInterface::class => 'api_platform.identifiers_extractor.cached',
         ];
 
         foreach ($aliases as $alias => $service) {
@@ -1053,13 +1053,13 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.graphql.query_resolver_locator',
             'api_platform.graphql.mutation_resolver_locator',
             'api_platform.graphql.normalizer.item',
-            'api_platform.graphql.normalizer.item.non_resource',
+            'api_platform.graphql.normalizer.object',
             'api_platform.graphql.command.export_command',
             'api_platform.hal.encoder',
             'api_platform.hal.normalizer.collection',
             'api_platform.hal.normalizer.entrypoint',
             'api_platform.hal.normalizer.item',
-            'api_platform.hal.normalizer.item.non_resource',
+            'api_platform.hal.normalizer.object',
             'api_platform.http_cache.listener.response.add_tags',
             'api_platform.http_cache.listener.response.configure',
             'api_platform.http_cache.purger.varnish_client',
@@ -1076,7 +1076,7 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.jsonld.context_builder',
             'api_platform.jsonld.encoder',
             'api_platform.jsonld.normalizer.item',
-            'api_platform.jsonld.normalizer.item.non_resource',
+            'api_platform.jsonld.normalizer.object',
             'api_platform.mercure.listener.response.add_link_header',
             'api_platform.messenger.data_persister',
             'api_platform.messenger.data_transformer',
@@ -1103,7 +1103,6 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.swagger.normalizer.documentation',
             'api_platform.validator',
         ];
-
         foreach ($definitions as $definition) {
             $containerBuilderProphecy->setDefinition($definition, Argument::type(Definition::class))->shouldBeCalled();
         }
@@ -1134,6 +1133,7 @@ class ApiPlatformExtensionTest extends TestCase
             MongoDbOdmNumericFilter::class => 'api_platform.doctrine_mongodb.odm.numeric_filter',
             MongoDbOdmOrderFilter::class => 'api_platform.doctrine_mongodb.odm.order_filter',
             MongoDbOdmRangeFilter::class => 'api_platform.doctrine_mongodb.odm.range_filter',
+            IdentifiersExtractorInterface::class => 'api_platform.identifiers_extractor.cached',
         ];
 
         foreach ($aliases as $alias => $service) {

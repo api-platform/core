@@ -61,10 +61,9 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer implement
     protected $itemDataProvider;
     protected $allowPlainIdentifiers;
     protected $dataTransformers = [];
-    protected $handleNonResource;
     protected $localCache = [];
 
-    public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, IriConverterInterface $iriConverter, ResourceClassResolverInterface $resourceClassResolver, PropertyAccessorInterface $propertyAccessor = null, NameConverterInterface $nameConverter = null, ClassMetadataFactoryInterface $classMetadataFactory = null, ItemDataProviderInterface $itemDataProvider = null, bool $allowPlainIdentifiers = false, array $defaultContext = [], iterable $dataTransformers = [], ResourceMetadataFactoryInterface $resourceMetadataFactory = null, bool $handleNonResource = false)
+    public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, IriConverterInterface $iriConverter, ResourceClassResolverInterface $resourceClassResolver, PropertyAccessorInterface $propertyAccessor = null, NameConverterInterface $nameConverter = null, ClassMetadataFactoryInterface $classMetadataFactory = null, ItemDataProviderInterface $itemDataProvider = null, bool $allowPlainIdentifiers = false, array $defaultContext = [], iterable $dataTransformers = [], ResourceMetadataFactoryInterface $resourceMetadataFactory = null)
     {
         if (!isset($defaultContext['circular_reference_handler'])) {
             $defaultContext['circular_reference_handler'] = function ($object) {
@@ -86,7 +85,6 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer implement
         $this->allowPlainIdentifiers = $allowPlainIdentifiers;
         $this->dataTransformers = $dataTransformers;
         $this->resourceMetadataFactory = $resourceMetadataFactory;
-        $this->handleNonResource = $handleNonResource;
     }
 
     /**
@@ -98,10 +96,6 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer implement
             return false;
         }
 
-        if ($this->handleNonResource) {
-            return $context['api_normalize'] ?? false;
-        }
-
         return $this->resourceClassResolver->isResourceClass($this->getObjectClass($data));
     }
 
@@ -110,7 +104,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer implement
      */
     public function hasCacheableSupportsMethod(): bool
     {
-        return !$this->handleNonResource;
+        return true;
     }
 
     /**
@@ -120,37 +114,48 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer implement
      */
     public function normalize($object, $format = null, array $context = [])
     {
-        if (!$this->handleNonResource && $object !== $transformed = $this->transformOutput($object, $context)) {
+        if ($object !== $transformed = $this->transformOutput($object, $context)) {
             if (!$this->serializer instanceof NormalizerInterface) {
-                throw new RuntimeException('Cannot normalize the transformed value because the injected serializer is not a normalizer');
+                throw new LogicException('Cannot normalize the transformed value because the injected serializer is not a normalizer');
             }
 
             $context['api_normalize'] = true;
             $context['api_resource'] = $object;
+            unset($context['output']);
 
             return $this->serializer->normalize($transformed, $format, $context);
         }
 
-        if ($this->handleNonResource) {
-            if (!($context['api_normalize'] ?? false)) {
-                throw new LogicException('"api_normalize" must be set to true in context to normalize non-resource');
-            }
-
-            $context = $this->initContext($this->getObjectClass($object), $context);
-
-            return parent::normalize($object, $format, $context);
-        }
-
+        // Use resolved resource class instead of given resource class to support multiple inheritance child types
         $resourceClass = $this->resourceClassResolver->getResourceClass($object, $context['resource_class'] ?? null, true);
         $context = $this->initContext($resourceClass, $context);
+        $iri = $context['iri'] ?? $this->iriConverter->getIriFromItem($object);
+        $context['iri'] = $iri;
         $context['api_normalize'] = true;
 
+        /*
+         * When true, converts the normalized data array of a resource into an
+         * IRI, if the normalized data array is empty.
+         *
+         * This is useful when traversing from a non-resource towards an attribute
+         * which is a resource, as we do not have the benefit of {@see PropertyMetadata::isReadableLink}.
+         *
+         * It must not be propagated to subresources, as {@see PropertyMetadata::isReadableLink}
+         * should take effect.
+         */
+        $emptyResourceAsIri = $context['api_empty_resource_as_iri'] ?? false;
+        unset($context['api_empty_resource_as_iri']);
+
         if (isset($context['resources'])) {
-            $resource = $context['iri'] ?? $this->iriConverter->getIriFromItem($object);
-            $context['resources'][$resource] = $resource;
+            $context['resources'][$iri] = $iri;
         }
 
-        return parent::normalize($object, $format, $context);
+        $data = parent::normalize($object, $format, $context);
+        if ($emptyResourceAsIri && \is_array($data) && 0 === \count($data)) {
+            return $iri;
+        }
+
+        return $data;
     }
 
     /**
@@ -158,10 +163,6 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer implement
      */
     public function supportsDenormalization($data, $type, $format = null, array $context = [])
     {
-        if ($this->handleNonResource) {
-            return $context['api_denormalize'] ?? false;
-        }
-
         return $this->localCache[$type] ?? $this->localCache[$type] = $this->resourceClassResolver->isResourceClass($type);
     }
 
@@ -410,7 +411,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer implement
     /**
      * Denormalizes a relation.
      *
-     * @throws RuntimeException
+     * @throws LogicException
      * @throws UnexpectedValueException
      *
      * @return object|null
@@ -436,7 +437,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer implement
 
             try {
                 if (!$this->serializer instanceof DenormalizerInterface) {
-                    throw new RuntimeException(sprintf('The injected serializer must be an instance of "%s".', DenormalizerInterface::class));
+                    throw new LogicException(sprintf('The injected serializer must be an instance of "%s".', DenormalizerInterface::class));
                 }
 
                 return $this->serializer->denormalize($value, $className, $format, $context);
@@ -520,7 +521,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer implement
      * {@inheritdoc}
      *
      * @throws NoSuchPropertyException
-     * @throws RuntimeException
+     * @throws LogicException
      */
     protected function getAttributeValue($object, $attribute, $format = null, array $context = [])
     {
@@ -561,7 +562,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer implement
         unset($context['resource_class']);
 
         if (!$this->serializer instanceof NormalizerInterface) {
-            throw new RuntimeException(sprintf('The injected serializer must be an instance of "%s".', NormalizerInterface::class));
+            throw new LogicException(sprintf('The injected serializer must be an instance of "%s".', NormalizerInterface::class));
         }
 
         return $this->serializer->normalize($attributeValue, $format, $context);
@@ -585,7 +586,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer implement
     /**
      * Normalizes a relation as an object if is a Link or as an URI.
      *
-     * @throws RuntimeException
+     * @throws LogicException
      *
      * @return string|array
      */
@@ -599,7 +600,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer implement
             }
 
             if (!$this->serializer instanceof NormalizerInterface) {
-                throw new RuntimeException(sprintf('The injected serializer must be an instance of "%s".', NormalizerInterface::class));
+                throw new LogicException(sprintf('The injected serializer must be an instance of "%s".', NormalizerInterface::class));
             }
 
             return $this->serializer->normalize($relatedObject, $format, $context);

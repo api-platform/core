@@ -43,9 +43,9 @@ final class ItemNormalizer extends AbstractItemNormalizer
 
     private $contextBuilder;
 
-    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, IriConverterInterface $iriConverter, ResourceClassResolverInterface $resourceClassResolver, ContextBuilderInterface $contextBuilder, PropertyAccessorInterface $propertyAccessor = null, NameConverterInterface $nameConverter = null, ClassMetadataFactoryInterface $classMetadataFactory = null, array $defaultContext = [], iterable $dataTransformers = [], bool $handleNonResource = false)
+    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, IriConverterInterface $iriConverter, ResourceClassResolverInterface $resourceClassResolver, ContextBuilderInterface $contextBuilder, PropertyAccessorInterface $propertyAccessor = null, NameConverterInterface $nameConverter = null, ClassMetadataFactoryInterface $classMetadataFactory = null, array $defaultContext = [], iterable $dataTransformers = [])
     {
-        parent::__construct($propertyNameCollectionFactory, $propertyMetadataFactory, $iriConverter, $resourceClassResolver, $propertyAccessor, $nameConverter, $classMetadataFactory, null, false, $defaultContext, $dataTransformers, $resourceMetadataFactory, $handleNonResource);
+        parent::__construct($propertyNameCollectionFactory, $propertyMetadataFactory, $iriConverter, $resourceClassResolver, $propertyAccessor, $nameConverter, $classMetadataFactory, null, false, $defaultContext, $dataTransformers, $resourceMetadataFactory);
 
         $this->contextBuilder = $contextBuilder;
     }
@@ -53,7 +53,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
     /**
      * {@inheritdoc}
      */
-    public function supportsNormalization($data, $format = null, array $context = [])
+    public function supportsNormalization($data, $format = null, array $context = []): bool
     {
         return self::FORMAT === $format && parent::supportsNormalization($data, $format, $context);
     }
@@ -65,56 +65,36 @@ final class ItemNormalizer extends AbstractItemNormalizer
      */
     public function normalize($object, $format = null, array $context = [])
     {
-        if (!$this->handleNonResource && null !== $outputClass = $this->getOutputClass($this->getObjectClass($object), $context)) {
+        if (null !== $outputClass = $this->getOutputClass($this->getObjectClass($object), $context)) {
             return parent::normalize($object, $format, $context);
         }
 
-        if ($this->handleNonResource) {
-            if (!($context['api_normalize'] ?? false)) {
-                throw new LogicException('"api_normalize" must be set to true in context to normalize non-resource');
-            }
-
-            if (isset($context['api_resource'])) {
-                $context['output']['iri'] = $this->iriConverter->getIriFromItem($context['api_resource']);
-            }
-
-            $data = $this->createJsonLdContext($this->contextBuilder, $object, $context);
-
-            if (isset($context['api_resource'])) {
-                unset($context['api_resource']);
-            }
-
-            $rawData = parent::normalize($object, $format, $context);
-            if (!\is_array($rawData)) {
-                return $rawData;
-            }
-
-            return $data + $rawData;
-        }
-
-        $resourceClass = $this->resourceClassResolver->getResourceClass($object, $context['resource_class'] ?? null, true);
-        $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
-        $data = $this->addJsonLdContext($this->contextBuilder, $resourceClass, $context);
-
         // Use resolved resource class instead of given resource class to support multiple inheritance child types
-        $context['resource_class'] = $resourceClass;
-        $context['iri'] = $this->iriConverter->getIriFromItem($object);
+        $resourceClass = $this->resourceClassResolver->getResourceClass($object, $context['resource_class'] ?? null, true);
+        $context = $this->initContext($resourceClass, $context);
+        $iri = $this->iriConverter->getIriFromItem($object);
+        $context['iri'] = $iri;
+        $context['api_normalize'] = true;
 
-        $rawData = parent::normalize($object, $format, $context);
-        if (!\is_array($rawData)) {
-            return $rawData;
+        $metadata = $this->addJsonLdContext($this->contextBuilder, $resourceClass, $context);
+
+        $data = parent::normalize($object, $format, $context);
+        if (!\is_array($data)) {
+            return $data;
         }
 
-        $data['@id'] = $context['iri'];
-        $data['@type'] = $resourceMetadata->getIri() ?: $resourceMetadata->getShortName();
+        $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
 
-        return $data + $rawData;
+        $metadata['@id'] = $iri;
+        $metadata['@type'] = $resourceMetadata->getIri() ?: $resourceMetadata->getShortName();
+
+        return $metadata + $data;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function supportsDenormalization($data, $type, $format = null, array $context = [])
+    public function supportsDenormalization($data, $type, $format = null, array $context = []): bool
     {
         return self::FORMAT === $format && parent::supportsDenormalization($data, $type, $format, $context);
     }
@@ -128,7 +108,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
     {
         // Avoid issues with proxies if we populated the object
         if (isset($data['@id']) && !isset($context[self::OBJECT_TO_POPULATE])) {
-            if (isset($context['api_allow_update']) && true !== $context['api_allow_update']) {
+            if (true !== ($context['api_allow_update'] ?? true)) {
                 throw new NotNormalizableValueException('Update is not allowed for this operation.');
             }
 

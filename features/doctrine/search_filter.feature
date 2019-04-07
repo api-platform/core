@@ -22,35 +22,60 @@ Feature: Search filter on collections
     And the JSON should be deep equal to:
     """
     {
-        "@context": "/contexts/DummyCar",
-        "@id": "/dummy_cars",
-        "@type": "hydra:Collection",
-        "hydra:member": [
+      "@context": "/contexts/DummyCar",
+      "@id": "/dummy_cars",
+      "@type": "hydra:Collection",
+      "hydra:member": [
+        {
+          "@id": "/dummy_cars/1",
+          "@type": "DummyCar",
+          "colors": [
             {
-                "@id": "/dummy_cars/1",
-                "@type": "DummyCar",
-                "colors": [
-                    {
-                        "@id": "/dummy_car_colors/1",
-                        "@type": "DummyCarColor",
-                        "prop": "red"
-                    },
-                    {
-                        "@id": "/dummy_car_colors/2",
-                        "@type": "DummyCarColor",
-                        "prop": "blue"
-                    }
-                ]
+              "@id": "/dummy_car_colors/1",
+              "@type": "DummyCarColor",
+              "prop": "red"
+            },
+            {
+              "@id": "/dummy_car_colors/2",
+              "@type": "DummyCarColor",
+              "prop": "blue"
             }
-        ],
-        "hydra:totalItems": 1,
-        "hydra:view": {
-            "@id": "/dummy_cars?colors.prop=red",
-            "@type": "hydra:PartialCollectionView"
-        },
-        "hydra:search": {
+          ],
+          "secondColors": [
+            {
+              "@id": "/dummy_car_colors/1",
+              "@type": "DummyCarColor",
+              "prop": "red"
+            },
+            {
+              "@id": "/dummy_car_colors/2",
+              "@type": "DummyCarColor",
+              "prop": "blue"
+            }
+          ],
+          "thirdColors": [
+            {
+              "@id": "/dummy_car_colors/1",
+              "@type": "DummyCarColor",
+              "prop": "red"
+            },
+            {
+              "@id": "/dummy_car_colors/2",
+              "@type": "DummyCarColor",
+              "prop": "blue"
+            }
+          ],
+          "uuid": []
+        }
+      ],
+      "hydra:totalItems": 1,
+      "hydra:view": {
+        "@id": "/dummy_cars?colors.prop=red",
+        "@type": "hydra:PartialCollectionView"
+      },
+      "hydra:search": {
         "@type": "hydra:IriTemplate",
-        "hydra:template": "\/dummy_cars{?availableAt[before],availableAt[strictly_before],availableAt[after],availableAt[strictly_after],canSell,foobar[],foobargroups[],foobargroups_override[],colors.prop,name}",
+        "hydra:template": "/dummy_cars{?availableAt[before],availableAt[strictly_before],availableAt[after],availableAt[strictly_after],canSell,foobar[],foobargroups[],foobargroups_override[],colors.prop,colors,colors[],secondColors,secondColors[],thirdColors,thirdColors[],uuid,uuid[],name}",
         "hydra:variableRepresentation": "BasicRepresentation",
         "hydra:mapping": [
           {
@@ -85,8 +110,20 @@ Feature: Search filter on collections
           },
           {
             "@type": "IriTemplateMapping",
+            "variable": "colors",
+            "property": "colors",
+            "required": false
+          },
+          {
+            "@type": "IriTemplateMapping",
             "variable": "colors.prop",
             "property": "colors.prop",
+            "required": false
+          },
+          {
+            "@type": "IriTemplateMapping",
+            "variable": "colors[]",
+            "property": "colors",
             "required": false
           },
           {
@@ -111,6 +148,42 @@ Feature: Search filter on collections
             "@type": "IriTemplateMapping",
             "variable": "name",
             "property": "name",
+            "required": false
+          },
+          {
+            "@type": "IriTemplateMapping",
+            "variable": "secondColors",
+            "property": "secondColors",
+            "required": false
+          },
+          {
+            "@type": "IriTemplateMapping",
+            "variable": "secondColors[]",
+            "property": "secondColors",
+            "required": false
+          },
+          {
+            "@type": "IriTemplateMapping",
+            "variable": "thirdColors",
+            "property": "thirdColors",
+            "required": false
+          },
+          {
+            "@type": "IriTemplateMapping",
+            "variable": "thirdColors[]",
+            "property": "thirdColors",
+            "required": false
+          },
+          {
+            "@type": "IriTemplateMapping",
+            "variable": "uuid",
+            "property": "uuid",
+            "required": false
+          },
+          {
+            "@type": "IriTemplateMapping",
+            "variable": "uuid[]",
+            "property": "uuid",
             "required": false
           }
         ]
@@ -389,8 +462,7 @@ Feature: Search filter on collections
         "@id": {"pattern": "^/dummies$"},
         "@type": {"pattern": "^hydra:Collection$"},
         "hydra:member": {
-          "type": "array",
-          "maxItems": 0
+          "type": "array"
         },
         "hydra:view": {
           "type": "object",
@@ -655,3 +727,4 @@ Feature: Search filter on collections
       }
     }
     """
+

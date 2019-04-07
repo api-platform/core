@@ -68,13 +68,13 @@ script:
     fi
   - tests/Fixtures/app/console cache:clear
   - if [[ $APP_ENV = 'postgres' ]]; then
-      vendor/bin/behat --suite=postgres --format=progress;
+      vendor/bin/behat --suite=postgres --format=progress --no-interaction;
     elif [[ $APP_ENV = 'mongodb' ]]; then
-      vendor/bin/behat --suite=mongodb --format=progress;
+      vendor/bin/behat --suite=mongodb --format=progress --no-interaction;
     elif [[ $APP_ENV = 'elasticsearch' ]]; then
-      vendor/bin/behat --suite=elasticsearch --format=progress;
+      vendor/bin/behat --suite=elasticsearch --format=progress --no-interaction;
     else
-      vendor/bin/behat --suite=default --format=progress;
+      vendor/bin/behat --suite=default --format=progress --no-interaction;
     fi
   - tests/Fixtures/app/console api:swagger:export > swagger.json && npx swagger-cli validate swagger.json && rm swagger.json
   - tests/Fixtures/app/console api:swagger:export --yaml > swagger.yaml && npx swagger-cli validate swagger.yaml && rm swagger.yaml
