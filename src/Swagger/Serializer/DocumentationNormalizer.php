@@ -244,7 +244,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
         $responseDefinitionKeys = [];
         $outputMetadata = $resourceMetadata->getTypedOperationAttribute($operationType, $operationName, 'output', ['class' => $resourceClass], true);
         if (null !== $outputClass = $outputMetadata['class'] ?? null) {
-            if($v3) {
+            if ($v3) {
                 foreach ($mimeTypes as $mimeType) {
                     $responseDefinitionKeys[$mimeType] = $this->getDefinition($v3, $definitions, $resourceMetadata, $resourceClass,
                         $outputClass, $serializerContext, $mimeType);
@@ -264,31 +264,28 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
             $pathOperation['summary'] ?? $pathOperation['summary'] = sprintf('Retrieves the collection of %s resources.', $resourceShortName);
 
             $successResponse = ['description' => sprintf('%s collection response', $resourceShortName)];
-
-
-                if ($v3) {
-                    if (!empty($responseDefinitionKeys)) {
-                        foreach ($mimeTypes as $mimeType) {
-                            $successResponse['content'][$mimeType] = [
-                                'schema' => [
-                                    'type' => 'array',
-                                    'items' => [
-                                        '$ref' => sprintf('#/components/schemas/%s/%s',
-                                            str_replace('/', '-', $mimeType), $responseDefinitionKeys[$mimeType])
-                                    ],
+            if ($v3) {
+                if (!empty($responseDefinitionKeys)) {
+                    foreach ($mimeTypes as $mimeType) {
+                        $successResponse['content'][$mimeType] = [
+                            'schema' => [
+                                'type' => 'array',
+                                'items' => [
+                                    '$ref' => sprintf('#/components/schemas/%s/%s',
+                                        str_replace('/', '-', $mimeType), $responseDefinitionKeys[$mimeType]),
                                 ],
-                            ];
-                        }
-                    }
-                } else {
-                    if ($responseDefinitionKey) {
-                        $successResponse['schema'] = [
-                            'type' => 'array',
-                            'items' => ['$ref' => sprintf('#/definitions/%s', $responseDefinitionKey)],
+                            ],
                         ];
                     }
                 }
-
+            } else {
+                if ($responseDefinitionKey) {
+                    $successResponse['schema'] = [
+                        'type' => 'array',
+                        'items' => ['$ref' => sprintf('#/definitions/%s', $responseDefinitionKey)],
+                    ];
+                }
+            }
 
             $pathOperation['responses'] ?? $pathOperation['responses'] = [$successStatus => $successResponse];
             $pathOperation['parameters'] ?? $pathOperation['parameters'] = $this->getFiltersParameters($v3, $resourceClass, $operationName, $resourceMetadata, $definitions, $serializerContext);
@@ -311,13 +308,13 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
         $successResponse = ['description' => sprintf('%s resource response', $resourceShortName)];
 
         if ($v3) {
-            if(!empty($responseDefinitionKeys)) {
+            if (!empty($responseDefinitionKeys)) {
                 foreach ($mimeTypes as $mimeType) {
                     $successResponse['content'][$mimeType] = [
                         'schema' => [
                             '$ref' => sprintf('#/components/schemas/%s/%s', str_replace('/', '-', $mimeType),
-                                $responseDefinitionKeys[$mimeType])
-                        ]
+                                $responseDefinitionKeys[$mimeType]),
+                        ],
                     ];
                 }
             }
@@ -431,7 +428,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
             ];
 
             if ($v3) {
-                foreach ($mimeTypes as $mimeType){
+                foreach ($mimeTypes as $mimeType) {
                     $okResponse['content'][$mimeType] = ['schema' => ['type' => 'array', 'items' => ['$ref' => sprintf('#/components/schemas/%s/%s', str_replace('/', '-', $mimeType), $definitionKey)]]];
                 }
             } else {
@@ -443,7 +440,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
             ];
 
             if ($v3) {
-                foreach ($mimeTypes as $mimeType){
+                foreach ($mimeTypes as $mimeType) {
                     $okResponse['content'][$mimeType] = [
                         'schema' => [
                             '$ref' => sprintf(
@@ -454,7 +451,6 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
                         ],
                     ];
                 }
-
             } else {
                 $okResponse['schema'] = ['$ref' => sprintf('#/definitions/%s', $definitionKey)];
             }
@@ -476,13 +472,13 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
         $responseDefinitionKeys = [];
         $outputMetadata = $resourceMetadata->getTypedOperationAttribute($operationType, $operationName, 'output', ['class' => $resourceClass], true);
         if (null !== $outputClass = $outputMetadata['class'] ?? null) {
-            if($v3){
-                foreach ($mimeTypes as $mimeType){
+            if ($v3) {
+                foreach ($mimeTypes as $mimeType) {
                     $responseDefinitionKeys[$mimeType] = $this->getDefinition($v3, $definitions, $resourceMetadata, $resourceClass,
                         $outputClass,
                         $this->getSerializerContext($operationType, false, $resourceMetadata, $operationName), $mimeType);
                 }
-            }else {
+            } else {
                 $responseDefinitionKey = $this->getDefinition($v3, $definitions, $resourceMetadata, $resourceClass,
                     $outputClass,
                     $this->getSerializerContext($operationType, false, $resourceMetadata, $operationName));
@@ -492,16 +488,16 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
         $successResponse = ['description' => sprintf('%s resource created', $resourceShortName)];
 
         if ($v3) {
-            if(!empty($responseDefinitionKeys)) {
+            if (!empty($responseDefinitionKeys)) {
                 foreach ($mimeTypes as $mimeType) {
                     $successResponse['content'][$mimeType] = [
                         'schema' => [
                             '$ref' => sprintf('#/components/schemas/%s/%s', str_replace('/', '-', $mimeType),
-                                $responseDefinitionKeys[$mimeType])
-                        ]
+                                $responseDefinitionKeys[$mimeType]),
+                        ],
                     ];
                 }
-                if ($links[$key = 'get' . ucfirst($resourceShortName) . ucfirst(OperationType::ITEM)] ?? null) {
+                if ($links[$key = 'get'.ucfirst($resourceShortName).ucfirst(OperationType::ITEM)] ?? null) {
                     $successResponse['links'] = [ucfirst($key) => $links[$key]];
                 }
             }
@@ -522,10 +518,9 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
             return $pathOperation;
         }
 
-
         if ($v3) {
             $content = [];
-            foreach ($mimeTypes as $mimeType){
+            foreach ($mimeTypes as $mimeType) {
                 $requestDefinitionKey = $this->getDefinition($v3, $definitions, $resourceMetadata, $resourceClass, $inputClass, $this->getSerializerContext($operationType, true, $resourceMetadata, $operationName), $mimeType);
                 $content[$mimeType] = ['schema' => ['$ref' => sprintf('#/components/schemas/%s/%s', str_replace('/', '-', $mimeType), $requestDefinitionKey)]];
             }
@@ -585,8 +580,15 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
         $successResponse = ['description' => sprintf('%s resource updated', $resourceShortName)];
 
         if ($v3) {
-            foreach ($mimeTypes as $mimeType) {
-                $successResponse['content'][$mimeType] = ['schema' => ['$ref' => sprintf('#/components/schemas/%s/%s', str_replace('/', '-', $mimeType), $responseDefinitionKeys[$mimeType])]];
+            if (!empty($responseDefinitionKeys)) {
+                foreach ($mimeTypes as $mimeType) {
+                    $successResponse['content'][$mimeType] = [
+                        'schema' => [
+                            '$ref' => sprintf('#/components/schemas/%s/%s', str_replace('/', '-', $mimeType),
+                                $responseDefinitionKeys[$mimeType]),
+                        ],
+                    ];
+                }
             }
         } else {
             if ($responseDefinitionKey) {
@@ -605,10 +607,9 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
             return $pathOperation;
         }
 
-
         if ($v3) {
             $content = [];
-            foreach ($mimeTypes as $mimeType){
+            foreach ($mimeTypes as $mimeType) {
                 $requestDefinitionKey = $this->getDefinition($v3, $definitions, $resourceMetadata, $resourceClass, $inputClass, $this->getSerializerContext($operationType, true, $resourceMetadata, $operationName), $mimeType);
                 $content[$mimeType] = ['schema' => ['$ref' => sprintf('#/components/schemas/%s/%s', str_replace('/', '-', $mimeType), $requestDefinitionKey)]];
             }
@@ -662,16 +663,15 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
             $definitionKey = $this->getDefinitionKey($keyPrefix, (array) ($serializerContext[AbstractNormalizer::GROUPS] ?? []));
         }
 
-        if($v3) {
+        if ($v3) {
             $escapedMimeType = str_replace('/', '-', $mimeType);
             if (!isset($definitions[$escapedMimeType][$definitionKey])) {
-
                 $definitions[$escapedMimeType] = new \ArrayObject([$definitionKey => []]);
 
                 $definitions[$escapedMimeType][$definitionKey] = $this->getDefinitionSchema($v3,
                     $publicClass ?? $resourceClass, $resourceMetadata, $definitions, $serializerContext, $mimeType);
             }
-        }else {
+        } else {
             if (!isset($definitions[$definitionKey])) {
                 $definitions[$definitionKey] = [];  // Initialize first to prevent infinite loop
                 $definitions[$definitionKey] = $this->getDefinitionSchema($v3, $publicClass ?? $resourceClass,
@@ -691,6 +691,8 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
      * Gets a definition Schema Object.
      *
      * @see https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#schemaObject
+     *
+     * @param mixed|null $mimeType
      */
     private function getDefinitionSchema(bool $v3, string $resourceClass, ResourceMetadata $resourceMetadata, \ArrayObject $definitions, array $serializerContext = null, $mimeType = null): \ArrayObject
     {
@@ -707,15 +709,15 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
         $options = isset($serializerContext[AbstractNormalizer::GROUPS]) ? ['serializer_groups' => $serializerContext[AbstractNormalizer::GROUPS]] : [];
 
         if ($v3) {
-            if ($mimeType == 'application/vnd.api+json') {
+            if ('application/vnd.api+json' === $mimeType) {
                 $definitionSchema['properties']['data'] = [
-                    "type"       => "object",
-                    "properties" => [
-                        "attributes" => [
-                            "type"       => "object",
-                            "properties" => [],
-                        ]
-                    ]
+                    'type' => 'object',
+                    'properties' => [
+                        'attributes' => [
+                            'type' => 'object',
+                            'properties' => [],
+                        ],
+                    ],
                 ];
             }
         }
@@ -726,8 +728,8 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
                 $definitionSchema['required'][] = $normalizedPropertyName;
             }
 
-            if($v3) {
-                if ($mimeType == 'application/vnd.api+json') {
+            if ($v3) {
+                if ('application/vnd.api+json' === $mimeType) {
                     $definitionSchema['properties']['data']['properties']['attributes']['properties'][$normalizedPropertyName] = $this->getPropertySchema($v3,
                         $propertyMetadata, $definitions, $serializerContext, $mimeType);
                 } else {
@@ -815,7 +817,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
             }
 
             if (true === $readableLink) {
-                if($v3){
+                if ($v3) {
                     return [
                         '$ref' => sprintf(
                             '#/components/schemas/%s/%s',
