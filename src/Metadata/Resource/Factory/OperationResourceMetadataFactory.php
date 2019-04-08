@@ -123,6 +123,10 @@ final class OperationResourceMetadataFactory implements ResourceMetadataFactoryI
                 $supported ? $operation['method'] = $upperOperationName : $operation['route_name'] = $operationName;
             }
 
+            if (isset($operation['method'])) {
+                $operation['method'] = strtoupper($operation['method']);
+            }
+
             $newOperations[$operationName] = $operation;
         }
 
