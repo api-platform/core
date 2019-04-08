@@ -324,7 +324,7 @@ class DocumentationNormalizerV3Test extends TestCase
             ]),
             'components' => [
                 'schemas' => new \ArrayObject([
-                    "application-ld+json" => new \ArrayObject([
+                    'application-ld+json' => new \ArrayObject([
                         'Dummy' => new \ArrayObject([
                             'type' => 'object',
                             'description' => 'This is a dummy.',
@@ -463,7 +463,7 @@ class DocumentationNormalizerV3Test extends TestCase
                                 ]),
                             ],
                         ]),
-                    ])
+                    ]),
                 ]),
                 'securitySchemes' => [
                     'oauth' => [
@@ -594,7 +594,7 @@ class DocumentationNormalizerV3Test extends TestCase
                                 ]),
                             ],
                         ]),
-                    ])
+                    ]),
                 ]),
                 'securitySchemes' => [
                     'header' => [
@@ -822,7 +822,7 @@ class DocumentationNormalizerV3Test extends TestCase
             ]),
             'components' => [
                 'schemas' => new \ArrayObject([
-                    "application-ld+json" => new \ArrayObject([
+                    'application-ld+json' => new \ArrayObject([
                         'Dummy' => new \ArrayObject([
                             'type' => 'object',
                             'description' => 'This is a dummy.',
@@ -965,7 +965,7 @@ class DocumentationNormalizerV3Test extends TestCase
                                 ]),
                             ],
                         ]),
-                    ])
+                    ]),
                 ]),
             ],
             'servers' => [['url' => '/app_dev.php/']],
@@ -1937,7 +1937,7 @@ class DocumentationNormalizerV3Test extends TestCase
             ]),
             'components' => [
                 'schemas' => new \ArrayObject([
-                    'application-ld+json'  => new \ArrayObject([
+                    'application-ld+json' => new \ArrayObject([
                         'Dummy' => new \ArrayObject([
                             'type' => 'object',
                             'description' => 'This is a dummy.',
@@ -2829,10 +2829,10 @@ class DocumentationNormalizerV3Test extends TestCase
                                                     'type' => 'string',
                                                     'description' => 'This is a name.',
                                                 ]),
-                                            ]
-                                        ]
-                                    ]
-                                ]
+                                            ],
+                                        ],
+                                    ],
+                                ],
                             ],
                         ]),
                     ]),

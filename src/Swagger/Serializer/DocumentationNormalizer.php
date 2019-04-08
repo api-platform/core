@@ -29,6 +29,8 @@ use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Operation\Factory\SubresourceOperationFactoryInterface;
 use ApiPlatform\Core\PathResolver\OperationPathResolverInterface;
+use ApiPlatform\Core\Swagger\Formatter\FormatterFactory;
+use ApiPlatform\Core\Swagger\Formatter\JsonFormatter;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
@@ -708,19 +710,15 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
 
         $options = isset($serializerContext[AbstractNormalizer::GROUPS]) ? ['serializer_groups' => $serializerContext[AbstractNormalizer::GROUPS]] : [];
 
+        $formatterFactory = new FormatterFactory();
         if ($v3) {
-            if ('application/vnd.api+json' === $mimeType) {
-                $definitionSchema['properties']['data'] = [
-                    'type' => 'object',
-                    'properties' => [
-                        'attributes' => [
-                            'type' => 'object',
-                            'properties' => [],
-                        ],
-                    ],
-                ];
-            }
+            $formatter = $formatterFactory->getFormatter($mimeType);
+        } else {
+            $formatter = $formatterFactory->getFormatter('application/json');
         }
+
+        $definitionSchema['properties'] = $formatter->getProperties();
+
         foreach ($this->propertyNameCollectionFactory->create($resourceClass, $options) as $propertyName) {
             $propertyMetadata = $this->propertyMetadataFactory->create($resourceClass, $propertyName);
             $normalizedPropertyName = $this->nameConverter ? $this->nameConverter->normalize($propertyName, $resourceClass, self::FORMAT, $serializerContext ?? []) : $propertyName;
@@ -728,16 +726,8 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
                 $definitionSchema['required'][] = $normalizedPropertyName;
             }
 
-            if ($v3) {
-                if ('application/vnd.api+json' === $mimeType) {
-                    $definitionSchema['properties']['data']['properties']['attributes']['properties'][$normalizedPropertyName] = $this->getPropertySchema($v3,
-                        $propertyMetadata, $definitions, $serializerContext, $mimeType);
-                } else {
-                    $definitionSchema['properties'][$normalizedPropertyName] = $this->getPropertySchema($v3, $propertyMetadata, $definitions, $serializerContext, $mimeType);
-                }
-            } else {
-                $definitionSchema['properties'][$normalizedPropertyName] = $this->getPropertySchema($v3, $propertyMetadata, $definitions, $serializerContext);
-            }
+            $formatter->setProperty($definitionSchema, $normalizedPropertyName, $this->getPropertySchema($v3,
+                        $propertyMetadata, $definitions, $serializerContext, $mimeType));
         }
 
         return $definitionSchema;
