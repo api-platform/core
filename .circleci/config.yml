@@ -13,6 +13,10 @@ reusable-steps:
     run:
       name: Disable Xdebug PHP extension
       command: sudo rm /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
+  - &install-doctrine-mongodb-odm
+    run:
+      name: Install Doctrine MongoDB ODM
+      command: composer require --prefer-dist --no-progress --no-suggest --no-update --ansi doctrine/mongodb-odm:^2.0.0@beta doctrine/mongodb-odm-bundle:^4.0.0@beta
   - &install-php-extensions
     run:
       name: Install PHP extensions
@@ -87,10 +91,6 @@ reusable-steps:
     run:
       name: Update Composer
       command: sudo composer self-update
-  - &install-doctrine-mongodb-odm
-    run:
-      name: Install Doctrine MongoDB ODM
-      command: composer require --prefer-dist --no-progress --no-suggest --no-update --ansi doctrine/mongodb-odm:^2.0.0@beta doctrine/mongodb-odm-bundle:^4.0.0@beta
   - &update-project-dependencies
     run:
       name: Update project dependencies

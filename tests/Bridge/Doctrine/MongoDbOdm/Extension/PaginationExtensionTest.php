@@ -34,8 +34,9 @@ use Doctrine\ODM\MongoDB\UnitOfWork;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @author Alan Poulain <contact@alanpoulain.eu>
  * @group mongodb
+ *
+ * @author Alan Poulain <contact@alanpoulain.eu>
  */
 class PaginationExtensionTest extends TestCase
 {

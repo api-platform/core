@@ -27,8 +27,9 @@ use Doctrine\ODM\MongoDB\Repository\DocumentRepository;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @author Alan Poulain <contact@alanpoulain.eu>
  * @group mongodb
+ *
+ * @author Alan Poulain <contact@alanpoulain.eu>
  */
 class CollectionDataProviderTest extends TestCase
 {
