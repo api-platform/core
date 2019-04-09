@@ -56,7 +56,7 @@ class ConfigurationTest extends TestCase
     /**
      * @group mongodb
      */
-    public function testDefaultConfigWithOdm()
+    public function testDefaultConfigWithMongoDbOdm()
     {
         $this->runDefaultConfigTests(['orm', 'odm']);
     }

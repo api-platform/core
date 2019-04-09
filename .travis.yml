@@ -44,13 +44,13 @@ before_install:
     fi
   - echo "memory_limit=-1" >> ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/travis.ini
   - if [[ $APP_ENV = 'mongodb' ]]; then
-      echo "extension=mongodb.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini;
+      echo "extension=mongodb.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/mongodb.ini;
     fi
   - phpenv config-rm xdebug.ini || echo "xdebug not available"
   - export PATH="$PATH:$HOME/.composer/vendor/bin"
 
 install:
-  - if [[ $APP_ENV = 'mongodb' ]]; then composer require --no-update doctrine/mongodb-odm:^2.0.0@beta doctrine/mongodb-odm-bundle:^4.0.0@beta; fi
+  - if [[ $APP_ENV = 'mongodb' ]]; then composer require --prefer-dist --no-progress --no-suggest --no-update --ansi doctrine/mongodb-odm:^2.0.0@beta doctrine/mongodb-odm-bundle:^4.0.0@beta; fi
   - if [[ $deps = 'low' ]]; then
       composer update --prefer-dist --no-progress --no-suggest --prefer-stable --prefer-lowest --ansi;
     else
