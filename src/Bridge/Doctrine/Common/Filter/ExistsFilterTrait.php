@@ -48,9 +48,9 @@ trait ExistsFilterTrait
             if (!$this->isPropertyMapped($property, $resourceClass, true) || !$this->isNullableField($property, $resourceClass)) {
                 continue;
             }
-
-            $description[sprintf('%s[%s]', $this->existsParameterName, $property)] = [
-                'property' => $property,
+            $propertyName = $this->normalizePropertyName($property);
+            $description[sprintf('%s[%s]', $this->existsParameterName, $propertyName)] = [
+                'property' => $propertyName,
                 'type' => 'bool',
                 'required' => false,
             ];
@@ -67,6 +67,8 @@ trait ExistsFilterTrait
     abstract protected function getProperties(): ?array;
 
     abstract protected function getLogger(): LoggerInterface;
+
+    abstract protected function normalizePropertyName(string $property): string;
 
     private function normalizeValue($value, string $property): ?bool
     {

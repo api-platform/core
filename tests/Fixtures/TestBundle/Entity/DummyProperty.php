@@ -102,6 +102,15 @@ class DummyProperty
     public $groups;
 
     /**
+     * @var string
+     *
+     * @ORM\Column(nullable=true)
+     *
+     * @Groups({"dummy_read"})
+     */
+    public $nameConverted;
+
+    /**
      * @return int
      */
     public function getId()

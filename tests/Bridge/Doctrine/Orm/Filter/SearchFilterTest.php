@@ -22,6 +22,7 @@ use ApiPlatform\Core\Test\DoctrineOrmFilterTestCase;
 use ApiPlatform\Core\Tests\Bridge\Doctrine\Common\Filter\SearchFilterTestTrait;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RelatedDummy;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Serializer\NameConverter\CustomConverter;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Prophecy\Argument;
 use Symfony\Component\HttpFoundation\Request;
@@ -183,15 +184,15 @@ class SearchFilterTest extends DoctrineOrmFilterTestCase
                 'strategy' => 'exact',
                 'is_collection' => true,
             ],
-            'nameConverted' => [
-                'property' => 'nameConverted',
+            'name_converted' => [
+                'property' => 'name_converted',
                 'type' => 'string',
                 'required' => false,
                 'strategy' => 'exact',
                 'is_collection' => false,
             ],
-            'nameConverted[]' => [
-                'property' => 'nameConverted',
+            'name_converted[]' => [
+                'property' => 'name_converted',
                 'type' => 'string',
                 'required' => false,
                 'strategy' => 'exact',
@@ -515,6 +516,6 @@ class SearchFilterTest extends DoctrineOrmFilterTestCase
         $identifierExtractorProphecy = $this->prophesize(IdentifiersExtractorInterface::class);
         $identifierExtractorProphecy->getIdentifiersFromResourceClass(Argument::type('string'))->willReturn(['id']);
 
-        return new SearchFilter($managerRegistry, $requestStack, $iriConverter, $propertyAccessor, null, $properties, $identifierExtractorProphecy->reveal());
+        return new SearchFilter($managerRegistry, $requestStack, $iriConverter, $propertyAccessor, null, $properties, $identifierExtractorProphecy->reveal(), new CustomConverter());
     }
 }

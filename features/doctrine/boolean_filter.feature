@@ -448,3 +448,118 @@ Feature: Boolean filter on collections
     }
     """
     And the JSON node "hydra:totalItems" should be equal to 25
+
+  @createSchema
+  Scenario: Get collection filtered using a name converter
+    Given there are 5 convertedBoolean objects
+    When I send a "GET" request to "/converted_booleans?name_converted=false"
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+    And the JSON should be equal to:
+    """
+    {
+        "@context": "/contexts/ConvertedBoolean",
+        "@id": "/converted_booleans",
+        "@type": "hydra:Collection",
+        "hydra:member": [
+            {
+                "@id": "/converted_booleans/2",
+                "@type": "ConvertedBoolean",
+                "name_converted": false,
+                "id": 2
+            },
+            {
+                "@id": "/converted_booleans/4",
+                "@type": "ConvertedBoolean",
+                "name_converted": false,
+                "id": 4
+            }
+        ],
+        "hydra:totalItems": 2,
+        "hydra:view": {
+            "@id": "/converted_booleans?name_converted=false",
+            "@type": "hydra:PartialCollectionView"
+        },
+        "hydra:search": {
+            "@type": "hydra:IriTemplate",
+            "hydra:template": "/converted_booleans{?name_converted}",
+            "hydra:variableRepresentation": "BasicRepresentation",
+            "hydra:mapping": [
+                {
+                    "@type": "IriTemplateMapping",
+                    "variable": "name_converted",
+                    "property": "name_converted",
+                    "required": false
+                }
+            ]
+        }
+    }
+    """
+    And the JSON should be valid according to this schema:
+    """
+    {
+      "type": "object",
+      "properties": {
+        "@context": {"pattern": "^/contexts/ConvertedBoolean"},
+        "@id": {"pattern": "^/converted_booleans"},
+        "@type": {"pattern": "^hydra:Collection$"},
+        "hydra:member": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "@id": {"pattern": "^/converted_booleans/(2|4)$"},
+              "@type":  {"pattern": "^ConvertedBoolean"},
+              "name_converted": {"type": "boolean"},
+              "id": {"type": "integer", "minimum":2, "maximum": 4}
+            },
+            "required": ["@id", "@type", "name_converted", "id"],
+            "additionalProperties": false
+          },
+          "minItems": 2,
+          "maxItems": 2,
+          "uniqueItems": true
+        },
+        "hydra:totalItems": {"type": "integer", "minimum": 2, "maximum": 2},
+        "hydra:view": {
+          "type": "object",
+          "properties": {
+            "@id": {"pattern": "^/converted_booleans\\?name_converted=false"},
+            "@type": {"pattern": "^hydra:PartialCollectionView$"}
+          },
+          "required": ["@id", "@type"],
+          "additionalProperties": false
+        },
+        "hydra:search": {
+          "type": "object",
+          "properties": {
+            "@type": {"pattern": "^hydra:IriTemplate$"},
+            "hydra:template": {"pattern": "^/converted_booleans\\{\\?name_converted\\}$"},
+            "hydra:variableRepresentation": {"pattern": "^BasicRepresentation$"},
+            "hydra:mapping": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "@type": {"pattern": "^IriTemplateMapping$"},
+                  "variable": {"pattern": "^name_converted$"},
+                  "property": {"pattern": "^name_converted$"},
+                  "required": {"type": "boolean"}
+                },
+                "required": ["@type", "variable", "property", "required"],
+                "additionalProperties": false
+              },
+              "minItems": 1,
+              "maxItems": 1,
+              "uniqueItems": true
+            }
+          },
+          "additionalProperties": false,
+          "required": ["@type", "hydra:template", "hydra:variableRepresentation", "hydra:mapping"]
+        },
+        "additionalProperties": false,
+        "required": ["@context", "@id", "@type", "hydra:member", "hydra:totalItems", "hydra:view", "hydra:search"]
+      }
+    }
+    """

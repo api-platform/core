@@ -54,6 +54,8 @@ trait DateFilterTrait
 
     abstract protected function getProperties(): ?array;
 
+    abstract protected function normalizePropertyName(string $property): string;
+
     /**
      * Determines whether the given property refers to a date field.
      */
@@ -67,9 +69,11 @@ trait DateFilterTrait
      */
     protected function getFilterDescription(string $property, string $period): array
     {
+        $propertyName = $this->normalizePropertyName($property);
+
         return [
-            sprintf('%s[%s]', $property, $period) => [
-                'property' => $property,
+            sprintf('%s[%s]', $propertyName, $period) => [
+                'property' => $propertyName,
                 'type' => \DateTimeInterface::class,
                 'required' => false,
             ],

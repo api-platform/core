@@ -728,3 +728,72 @@ Feature: Search filter on collections
     }
     """
 
+  @createSchema
+  Scenario: Search collection on a property using a name converted
+    Given there are 30 dummy objects
+    When I send a "GET" request to "/dummies?name_converted=Converted 3"
+    Then the response status code should be 200
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+    And the JSON should be valid according to this schema:
+    """
+    {
+      "type": "object",
+      "properties": {
+        "@context": {"pattern": "^/contexts/Dummy$"},
+        "@id": {"pattern": "^/dummies$"},
+        "@type": {"pattern": "^hydra:Collection$"},
+        "hydra:member": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "@id": {
+                "oneOf": [
+                  {"pattern": "^/dummies/3$"},
+                  {"pattern": "^/dummies/30$"}
+                ]
+              },
+              "required": ["@id"]
+            }
+          },
+          "minItems": 2,
+          "maxItems": 2
+        },
+        "hydra:view": {
+          "type": "object",
+          "properties": {
+            "@id": {"pattern": "^/dummies\\?name_converted=Converted%203"},
+            "@type": {"pattern": "^hydra:PartialCollectionView$"}
+          }
+        },
+        "hydra:search": {
+          "type": "object",
+          "properties": {
+            "@type": {"pattern": "^hydra:IriTemplate$"},
+            "hydra:template": {"pattern": "^/dummies\\{\\?.*name_converted.*}$"},
+            "hydra:variableRepresentation": {"pattern": "^BasicRepresentation$"},
+            "hydra:mapping": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "@type": {"pattern": "^IriTemplateMapping$"},
+                  "variable": {"pattern": "^name_converted$"},
+                  "property": {"pattern": "^name_converted$"},
+                  "required": {"type": "boolean"}
+                },
+                "required": ["@type", "variable", "property", "required"],
+                "additionalProperties": false
+              },
+              "additionalItems": true,
+              "uniqueItems": true
+            }
+          },
+          "additionalProperties": false,
+          "required": ["@type", "hydra:template", "hydra:variableRepresentation", "hydra:mapping"]
+        },
+        "additionalProperties": false,
+        "required": ["@context", "@id", "@type", "hydra:member", "hydra:totalItems", "hydra:view", "hydra:search"]
+      }
+    }
+    """

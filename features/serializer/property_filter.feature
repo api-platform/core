@@ -6,7 +6,7 @@ Feature: Filter with serialization attributes on items and collections
   @createSchema
   Scenario: Get a collection of resources by attributes id, foo and bar
     Given there are 10 dummy property objects
-    When I send a "GET" request to "/dummy_properties?properties[]=id&properties[]=foo&properties[]=bar"
+    When I send a "GET" request to "/dummy_properties?properties[]=id&properties[]=foo&properties[]=bar&properties[]=name_converted"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
@@ -20,52 +20,27 @@ Feature: Filter with serialization attributes on items and collections
         "@type": {"pattern": "^hydra:Collection$"},
         "hydra:member": {
           "type": "array",
-          "items": [
-            {
-              "type": "object",
-              "properties": {
-                "@id": {},
-                "@type": {},
-                "id": {},
-                "foo": {},
-                "bar": {}
-              },
-              "additionalProperties": false,
-              "required": ["@id", "@type", "id", "foo", "bar"]
+          "items": {
+            "type": "object",
+            "properties": {
+              "@id": {},
+              "@type": {},
+              "id": {},
+              "foo": {},
+              "bar": {},
+              "name_converted": {}
             },
-            {
-              "type": "object",
-              "properties": {
-                "@id": {},
-                "@type": {},
-                "id": {},
-                "foo": {},
-                "bar": {}
-              },
-              "additionalProperties": false,
-              "required": ["@id", "@type", "id", "foo", "bar"]
-            },
-            {
-              "type": "object",
-              "properties": {
-                "@id": {},
-                "@type": {},
-                "id": {},
-                "foo": {},
-                "bar": {}
-              },
-              "additionalProperties": false,
-              "required": ["@id", "@type", "id", "foo", "bar"]
-            }
-          ],
-          "additionalItems": false,
+            "additionalProperties": false,
+            "required": ["@id", "@type", "id", "foo", "bar", "name_converted"]
+          },
+          "uniqueItems": true,
           "maxItems": 3,
           "minItems": 3
         },
         "hydra:view": {
           "type": "object",
           "properties": {
-            "@id": {"pattern": "^/dummy_properties\\?properties%5B%5D=id&properties%5B%5D=foo&properties%5B%5D=bar&page=1$"},
+            "@id": {"pattern": "^/dummy_properties\\?properties%5B%5D=id&properties%5B%5D=foo&properties%5B%5D=bar&properties%5B%5D=name_converted&page=1$"},
             "@type": {"pattern": "^hydra:PartialCollectionView$"}
           }
         }
@@ -88,72 +63,27 @@ Feature: Filter with serialization attributes on items and collections
         "@type": {"pattern": "^hydra:Collection$"},
         "hydra:member": {
           "type": "array",
-          "items": [
-            {
-              "type": "object",
-              "properties": {
-                "@id": {},
-                "@type": {},
-                "foo": {},
-                "bar": {},
-                "group": {
-                  "type": "object",
-                  "properties": {
-                    "@id": {},
-                    "@type": {},
-                    "baz": {}
-                  },
-                  "additionalProperties": false,
-                  "required": ["@id", "@type", "baz"]
-                }
-              },
-              "additionalProperties": false,
-              "required": ["@id", "@type", "foo", "bar"]
+          "items": {
+            "type": "object",
+            "properties": {
+              "@id": {},
+              "@type": {},
+              "foo": {},
+              "bar": {},
+              "group": {
+                "type": "object",
+                "properties": {
+                  "@id": {},
+                  "@type": {},
+                  "baz": {}
+                },
+                "additionalProperties": false,
+                "required": ["@id", "@type", "baz"]
+              }
             },
-            {
-              "type": "object",
-              "properties": {
-                "@id": {},
-                "@type": {},
-                "foo": {},
-                "bar": {},
-                "group": {
-                  "type": "object",
-                  "properties": {
-                    "@id": {},
-                    "@type": {},
-                    "baz": {}
-                  },
-                  "additionalProperties": false,
-                  "required": ["@id", "@type", "baz"]
-                }
-              },
-              "additionalProperties": false,
-              "required": ["@id", "@type", "foo", "bar"]
-            },
-            {
-              "type": "object",
-              "properties": {
-                "@id": {},
-                "@type": {},
-                "foo": {},
-                "bar": {},
-                "group": {
-                  "type": "object",
-                  "properties": {
-                    "@id": {},
-                    "@type": {},
-                    "baz": {}
-                  },
-                  "additionalProperties": false,
-                  "required": ["@id", "@type", "baz"]
-                }
-              },
-              "additionalProperties": false,
-              "required": ["@id", "@type", "foo", "bar"]
-            }
-          ],
-          "additionalItems": false,
+            "additionalProperties": false,
+            "required": ["@id", "@type", "foo", "bar"]
+          },
           "maxItems": 3,
           "minItems": 3
         },
@@ -169,7 +99,7 @@ Feature: Filter with serialization attributes on items and collections
     """
 
   Scenario: Get a collection of resources by attributes foo, bar
-    When I send a "GET" request to "/dummy_properties?whitelisted_properties[]=foo&whitelisted_properties[]=bar"
+    When I send a "GET" request to "/dummy_properties?whitelisted_properties[]=foo&whitelisted_properties[]=bar&whitelisted_properties[]=name_converted"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
@@ -183,46 +113,24 @@ Feature: Filter with serialization attributes on items and collections
         "@type": {"pattern": "^hydra:Collection$"},
         "hydra:member": {
           "type": "array",
-          "items": [
-            {
-              "type": "object",
-              "properties": {
-                "@id": {},
-                "@type": {},
-                "foo": {}
-              },
-              "additionalProperties": false,
-              "required": ["@id", "@type", "foo"]
+          "items": {
+            "type": "object",
+            "properties": {
+              "@id": {},
+              "@type": {},
+              "foo": {},
+              "name_converted": {}
             },
-            {
-              "type": "object",
-              "properties": {
-                "@id": {},
-                "@type": {},
-                "foo": {}
-              },
-              "additionalProperties": false,
-              "required": ["@id", "@type", "foo"]
-            },
-            {
-              "type": "object",
-              "properties": {
-                "@id": {},
-                "@type": {},
-                "foo": {}
-              },
-              "additionalProperties": false,
-              "required": ["@id", "@type", "foo"]
-            }
-          ],
-          "additionalItems": false,
+            "additionalProperties": false,
+            "required": ["@id", "@type", "foo", "name_converted"]
+          },
           "maxItems": 3,
           "minItems": 3
         },
         "hydra:view": {
           "type": "object",
           "properties": {
-            "@id": {"pattern": "^/dummy_properties\\?whitelisted_properties%5B%5D=foo&whitelisted_properties%5B%5D=bar&page=1$"},
+            "@id": {"pattern": "^/dummy_properties\\?whitelisted_properties%5B%5D=foo&whitelisted_properties%5B%5D=bar&whitelisted_properties%5B%5D=name_converted&page=1$"},
             "@type": {"pattern": "^hydra:PartialCollectionView$"}
           }
         }
@@ -245,69 +153,26 @@ Feature: Filter with serialization attributes on items and collections
         "@type": {"pattern": "^hydra:Collection$"},
         "hydra:member": {
           "type": "array",
-          "items": [
-            {
-              "type": "object",
-              "properties": {
-                "@id": {},
-                "@type": {},
-                "foo": {},
-                "group": {
-                  "type": "object",
-                  "properties": {
-                    "@id": {},
-                    "@type": {},
-                    "baz": {}
-                  },
-                  "additionalProperties": false,
-                  "required": ["@id", "@type", "baz"]
-                }
-              },
-              "additionalProperties": false,
-              "required": ["@id", "@type", "foo"]
+          "items": {
+            "type": "object",
+            "properties": {
+              "@id": {},
+              "@type": {},
+              "foo": {},
+              "group": {
+                "type": "object",
+                "properties": {
+                  "@id": {},
+                  "@type": {},
+                  "baz": {}
+                },
+                "additionalProperties": false,
+                "required": ["@id", "@type", "baz"]
+              }
             },
-            {
-              "type": "object",
-              "properties": {
-                "@id": {},
-                "@type": {},
-                "foo": {},
-                "group": {
-                  "type": "object",
-                  "properties": {
-                    "@id": {},
-                    "@type": {},
-                    "baz": {}
-                  },
-                  "additionalProperties": false,
-                  "required": ["@id", "@type", "baz"]
-                }
-              },
-              "additionalProperties": false,
-              "required": ["@id", "@type", "foo"]
-            },
-            {
-              "type": "object",
-              "properties": {
-                "@id": {},
-                "@type": {},
-                "foo": {},
-                "group": {
-                  "type": "object",
-                  "properties": {
-                    "@id": {},
-                    "@type": {},
-                    "baz": {}
-                  },
-                  "additionalProperties": false,
-                  "required": ["@id", "@type"]
-                }
-              },
-              "additionalProperties": false,
-              "required": ["@id", "@type", "foo"]
-            }
-          ],
-          "additionalItems": false,
+            "additionalProperties": false,
+            "required": ["@id", "@type", "foo"]
+          },
           "maxItems": 3,
           "minItems": 3
         },
@@ -337,36 +202,15 @@ Feature: Filter with serialization attributes on items and collections
         "@type": {"pattern": "^hydra:Collection$"},
         "hydra:member": {
           "type": "array",
-          "items": [
-            {
-              "type": "object",
-              "properties": {
-                "@id": {},
-                "@type": {}
-              },
-              "additionalProperties": false,
-              "required": ["@id", "@type"]
+          "items": {
+            "type": "object",
+            "properties": {
+              "@id": {},
+              "@type": {}
             },
-            {
-              "type": "object",
-              "properties": {
-                "@id": {},
-                "@type": {}
-              },
-              "additionalProperties": false,
-              "required": ["@id", "@type"]
-            },
-            {
-              "type": "object",
-              "properties": {
-                "@id": {},
-                "@type": {}
-              },
-              "additionalProperties": false,
-              "required": ["@id", "@type"]
-            }
-          ],
-          "additionalItems": false,
+            "additionalProperties": false,
+            "required": ["@id", "@type"]
+          },
           "maxItems": 3,
           "minItems": 3
         },
@@ -396,63 +240,24 @@ Feature: Filter with serialization attributes on items and collections
         "@type": {"pattern": "^hydra:Collection$"},
         "hydra:member": {
           "type": "array",
-          "items": [
-            {
-              "type": "object",
-              "properties": {
-                "@id": {},
-                "@type": {},
-                "group": {
-                  "type": "object",
-                  "properties": {
-                    "@id": {},
-                    "@type": {}
-                  },
-                  "additionalProperties": false,
-                  "required": ["@id", "@type"]
-                }
-              },
-              "additionalProperties": false,
-              "required": ["@id", "@type", "group"]
+          "items": {
+            "type": "object",
+            "properties": {
+              "@id": {},
+              "@type": {},
+              "group": {
+                "type": "object",
+                "properties": {
+                  "@id": {},
+                  "@type": {}
+                },
+                "additionalProperties": false,
+                "required": ["@id", "@type"]
+              }
             },
-            {
-              "type": "object",
-              "properties": {
-                "@id": {},
-                "@type": {},
-                "group": {
-                  "type": "object",
-                  "properties": {
-                    "@id": {},
-                    "@type": {}
-                  },
-                  "additionalProperties": false,
-                  "required": ["@id", "@type"]
-                }
-              },
-              "additionalProperties": false,
-              "required": ["@id", "@type", "group"]
-            },
-            {
-              "type": "object",
-              "properties": {
-                "@id": {},
-                "@type": {},
-                "group": {
-                  "type": "object",
-                  "properties": {
-                    "@id": {},
-                    "@type": {}
-                  },
-                  "additionalProperties": false,
-                  "required": ["@id", "@type"]
-                }
-              },
-              "additionalProperties": false,
-              "required": ["@id", "@type", "group"]
-            }
-          ],
-          "additionalItems": false,
+            "additionalProperties": false,
+            "required": ["@id", "@type", "group"]
+          },
           "maxItems": 3,
           "minItems": 3
         },

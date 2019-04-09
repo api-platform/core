@@ -24,6 +24,7 @@ use Doctrine\ORM\QueryBuilder;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 
 /**
  * Filters the collection by whether a property value exists or not.
@@ -41,9 +42,9 @@ class ExistsFilter extends AbstractContextAwareFilter implements ExistsFilterInt
 {
     use ExistsFilterTrait;
 
-    public function __construct(ManagerRegistry $managerRegistry, ?RequestStack $requestStack = null, LoggerInterface $logger = null, array $properties = null, string $existsParameterName = self::QUERY_PARAMETER_KEY)
+    public function __construct(ManagerRegistry $managerRegistry, ?RequestStack $requestStack = null, LoggerInterface $logger = null, array $properties = null, string $existsParameterName = self::QUERY_PARAMETER_KEY, NameConverterInterface $nameConverter = null)
     {
-        parent::__construct($managerRegistry, $requestStack, $logger, $properties);
+        parent::__construct($managerRegistry, $requestStack, $logger, $properties, $nameConverter);
 
         $this->existsParameterName = $existsParameterName;
     }
@@ -61,7 +62,7 @@ class ExistsFilter extends AbstractContextAwareFilter implements ExistsFilterInt
         }
 
         foreach ($context['filters'][$this->existsParameterName] as $property => $value) {
-            $this->filterProperty($property, $value, $queryBuilder, $queryNameGenerator, $resourceClass, $operationName, $context);
+            $this->filterProperty($this->denormalizePropertyName($property), $value, $queryBuilder, $queryNameGenerator, $resourceClass, $operationName, $context);
         }
     }
 

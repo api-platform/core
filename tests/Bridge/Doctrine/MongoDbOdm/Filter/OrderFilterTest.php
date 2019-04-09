@@ -16,6 +16,7 @@ namespace ApiPlatform\Core\Tests\Bridge\Doctrine\MongoDbOdm\Filter;
 use ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Filter\OrderFilter;
 use ApiPlatform\Core\Test\DoctrineMongoDbOdmFilterTestCase;
 use ApiPlatform\Core\Tests\Bridge\Doctrine\Common\Filter\OrderFilterTestTrait;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Serializer\NameConverter\CustomConverter;
 use Doctrine\Common\Persistence\ManagerRegistry;
 
 /**
@@ -82,8 +83,8 @@ class OrderFilterTest extends DoctrineMongoDbOdmFilterTestCase
                 'type' => 'string',
                 'required' => false,
             ],
-            'order[nameConverted]' => [
-                'property' => 'nameConverted',
+            'order[name_converted]' => [
+                'property' => 'name_converted',
                 'type' => 'string',
                 'required' => false,
             ],
@@ -352,6 +353,6 @@ class OrderFilterTest extends DoctrineMongoDbOdmFilterTestCase
 
     protected function buildFilter(?array $properties = null)
     {
-        return new $this->filterClass($this->managerRegistry, 'order', null, $properties);
+        return new $this->filterClass($this->managerRegistry, 'order', null, $properties, new CustomConverter());
     }
 }
