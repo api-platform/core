@@ -1,8 +1,8 @@
 <?php
 
-namespace ApiPlatform\Core\Swagger\Formatter;
+namespace ApiPlatform\Core\Swagger\SchemaFormatter;
 
-interface FormatterInterface
+interface SchemaFormatterInterface
 {
     public function getProperties();
     public function setProperty(\ArrayObject $definitionSchema, $normalizedPropertyName, \ArrayObject $property);

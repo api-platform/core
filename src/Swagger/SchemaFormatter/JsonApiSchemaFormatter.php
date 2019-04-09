@@ -1,8 +1,8 @@
 <?php
 
-namespace ApiPlatform\Core\Swagger\Formatter;
+namespace ApiPlatform\Core\Swagger\SchemaFormatter;
 
-class JsonApiFormatter implements FormatterInterface
+class JsonApiSchemaFormatter implements SchemaFormatterInterface
 {
     public function getProperties()
     {
@@ -12,7 +12,9 @@ class JsonApiFormatter implements FormatterInterface
                 'properties' => [
                     'attributes' => [
                         'type'       => 'object',
-                        'properties' => [],
+                        'properties' => [
+                            'data' => []
+                        ],
                     ],
                 ],
             ],
@@ -21,6 +23,6 @@ class JsonApiFormatter implements FormatterInterface
 
     public function setProperty(\ArrayObject $definitionSchema, $normalizedPropertyName, \ArrayObject $property)
     {
-        $definitionSchema['properties']['data']['properties']['attributes']['properties'][$normalizedPropertyName] = $property;
+        $definitionSchema['properties']['data']['properties']['attributes']['properties']['data'][$normalizedPropertyName] = $property;
     }
 }

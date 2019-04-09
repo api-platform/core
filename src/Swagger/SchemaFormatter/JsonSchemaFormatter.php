@@ -1,8 +1,8 @@
 <?php
 
-namespace ApiPlatform\Core\Swagger\Formatter;
+namespace ApiPlatform\Core\Swagger\SchemaFormatter;
 
-class JsonFormatter implements FormatterInterface
+class JsonSchemaFormatter implements SchemaFormatterInterface
 {
 
     public function getProperties()

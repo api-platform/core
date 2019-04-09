@@ -34,6 +34,9 @@ use ApiPlatform\Core\Operation\UnderscorePathSegmentNameGenerator;
 use ApiPlatform\Core\PathResolver\CustomOperationPathResolver;
 use ApiPlatform\Core\PathResolver\OperationPathResolver;
 use ApiPlatform\Core\PathResolver\OperationPathResolverInterface;
+use ApiPlatform\Core\Swagger\SchemaFormatter\JsonApiSchemaFormatter;
+use ApiPlatform\Core\Swagger\SchemaFormatter\JsonSchemaFormatter;
+use ApiPlatform\Core\Swagger\SchemaFormatter\SchemaFormatterFactory;
 use ApiPlatform\Core\Swagger\Serializer\DocumentationNormalizer;
 use ApiPlatform\Core\Tests\Fixtures\DummyFilter;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Answer;
@@ -85,6 +88,9 @@ class DocumentationNormalizerV3Test extends TestCase
         $operationMethodResolverProphecy->getCollectionOperationMethod(Dummy::class, 'custom2')->shouldBeCalled()->willReturn('POST');
 
         $operationPathResolver = new CustomOperationPathResolver(new OperationPathResolver(new UnderscorePathSegmentNameGenerator()));
+        $schemaFormatterFactory = new SchemaFormatterFactory([
+            'application/json' => new JsonSchemaFormatter(),
+        ]);
 
         $normalizer = new DocumentationNormalizer(
             $resourceMetadataFactoryProphecy->reveal(),
@@ -111,7 +117,8 @@ class DocumentationNormalizerV3Test extends TestCase
             null,
             false,
             'pagination',
-            ['spec_version' => 3]
+            ['spec_version' => 3],
+            $schemaFormatterFactory
         );
 
         $expected = [
@@ -383,6 +390,10 @@ class DocumentationNormalizerV3Test extends TestCase
 
         $operationPathResolver = new CustomOperationPathResolver(new OperationPathResolver(new UnderscorePathSegmentNameGenerator()));
 
+        $schemaFormatterFactory = new SchemaFormatterFactory([
+            'application/json' => new JsonSchemaFormatter(),
+        ]);
+
         $normalizer = new DocumentationNormalizer(
             $resourceMetadataFactoryProphecy->reveal(),
             $propertyNameCollectionFactoryProphecy->reveal(),
@@ -408,7 +419,8 @@ class DocumentationNormalizerV3Test extends TestCase
             null,
             false,
             'pagination',
-            ['spec_version' => 3]
+            ['spec_version' => 3],
+            $schemaFormatterFactory
         );
 
         $expected = [
@@ -517,6 +529,11 @@ class DocumentationNormalizerV3Test extends TestCase
             ],
         ];
 
+        $schemaFormatterFactory = new SchemaFormatterFactory([
+            'application/json' => new JsonSchemaFormatter(),
+
+        ]);
+
         $normalizer = new DocumentationNormalizer(
             $resourceMetadataFactoryProphecy->reveal(),
             $propertyNameCollectionFactoryProphecy->reveal(),
@@ -542,7 +559,8 @@ class DocumentationNormalizerV3Test extends TestCase
             null,
             false,
             'pagination',
-            ['spec_version' => 3]
+            ['spec_version' => 3],
+            $schemaFormatterFactory
         );
 
         $expected = [
@@ -668,6 +686,10 @@ class DocumentationNormalizerV3Test extends TestCase
 
         $operationPathResolver = new CustomOperationPathResolver(new OperationPathResolver(new UnderscorePathSegmentNameGenerator()));
 
+        $schemaFormatterFactory = new SchemaFormatterFactory([
+            'application/json' => new JsonSchemaFormatter(),
+        ]);
+
         $normalizer = new DocumentationNormalizer(
             $resourceMetadataFactoryProphecy->reveal(),
             $propertyNameCollectionFactoryProphecy->reveal(),
@@ -693,7 +715,8 @@ class DocumentationNormalizerV3Test extends TestCase
             null,
             false,
             'pagination',
-            ['spec_version' => 3]
+            ['spec_version' => 3],
+            $schemaFormatterFactory
         );
 
         $expected = [
@@ -887,6 +910,10 @@ class DocumentationNormalizerV3Test extends TestCase
 
         $operationPathResolver = new CustomOperationPathResolver(new OperationPathResolver(new UnderscorePathSegmentNameGenerator()));
 
+        $schemaFormatterFactory = new SchemaFormatterFactory([
+            'application/json' => new JsonSchemaFormatter(),
+        ]);
+
         $normalizer = new DocumentationNormalizer(
             $resourceMetadataFactoryProphecy->reveal(),
             $propertyNameCollectionFactoryProphecy->reveal(),
@@ -912,7 +939,8 @@ class DocumentationNormalizerV3Test extends TestCase
             null,
             false,
             'pagination',
-            ['spec_version' => 3]
+            ['spec_version' => 3],
+            $schemaFormatterFactory
         );
 
         $expected = [
@@ -1019,6 +1047,10 @@ class DocumentationNormalizerV3Test extends TestCase
 
         $operationPathResolver = new CustomOperationPathResolver(new OperationPathResolver(new UnderscorePathSegmentNameGenerator()));
 
+        $schemaFormatterFactory = new SchemaFormatterFactory([
+            'application/json' => new JsonSchemaFormatter(),
+        ]);
+
         $normalizer = new DocumentationNormalizer(
             $resourceMetadataFactoryProphecy->reveal(),
             $propertyNameCollectionFactoryProphecy->reveal(),
@@ -1044,7 +1076,8 @@ class DocumentationNormalizerV3Test extends TestCase
             null,
             false,
             'pagination',
-            ['spec_version' => 3]
+            ['spec_version' => 3],
+            $schemaFormatterFactory
         );
 
         $expected = [
@@ -1250,6 +1283,10 @@ class DocumentationNormalizerV3Test extends TestCase
 
         $operationPathResolver = new CustomOperationPathResolver(new OperationPathResolver(new UnderscorePathSegmentNameGenerator()));
 
+        $schemaFormatterFactory = new SchemaFormatterFactory([
+            'application/json' => new JsonSchemaFormatter(),
+        ]);
+
         $normalizer = new DocumentationNormalizer(
             $resourceMetadataFactoryProphecy->reveal(),
             $propertyNameCollectionFactoryProphecy->reveal(),
@@ -1275,7 +1312,8 @@ class DocumentationNormalizerV3Test extends TestCase
             null,
             false,
             'pagination',
-            ['spec_version' => 3]
+            ['spec_version' => 3],
+            $schemaFormatterFactory
         );
 
         $expected = [
@@ -1785,6 +1823,10 @@ class DocumentationNormalizerV3Test extends TestCase
 
         $operationPathResolver = new CustomOperationPathResolver(new OperationPathResolver(new UnderscorePathSegmentNameGenerator()));
 
+        $schemaFormatterFactory = new SchemaFormatterFactory([
+            'application/json' => new JsonSchemaFormatter(),
+        ]);
+
         $normalizer = new DocumentationNormalizer(
             $resourceMetadataFactoryProphecy->reveal(),
             $propertyNameCollectionFactoryProphecy->reveal(),
@@ -1810,7 +1852,8 @@ class DocumentationNormalizerV3Test extends TestCase
             null,
             false,
             'pagination',
-            ['spec_version' => 3]
+            ['spec_version' => 3],
+            $schemaFormatterFactory
         );
 
         $expected = [
@@ -2012,6 +2055,10 @@ class DocumentationNormalizerV3Test extends TestCase
 
         $operationPathResolver = new CustomOperationPathResolver(new OperationPathResolver(new UnderscorePathSegmentNameGenerator()));
 
+        $schemaFormatterFactory = new SchemaFormatterFactory([
+            'application/json' => new JsonSchemaFormatter(),
+        ]);
+
         $normalizer = new DocumentationNormalizer(
             $resourceMetadataFactoryProphecy->reveal(),
             $propertyNameCollectionFactoryProphecy->reveal(),
@@ -2037,7 +2084,8 @@ class DocumentationNormalizerV3Test extends TestCase
             null,
             false,
             'pagination',
-            ['spec_version' => 3]
+            ['spec_version' => 3],
+            $schemaFormatterFactory
         );
 
         $expected = [
@@ -2169,6 +2217,10 @@ class DocumentationNormalizerV3Test extends TestCase
         $formatProviderProphecy->getFormatsFromOperation(Question::class, 'get', OperationType::ITEM)->willReturn(['json' => ['application/json'], 'csv' => ['text/csv']]);
         $formatProviderProphecy->getFormatsFromOperation(Answer::class, 'get', OperationType::SUBRESOURCE)->willReturn(['xml' => ['text/xml']]);
 
+        $schemaFormatterFactory = new SchemaFormatterFactory([
+            'application/json' => new JsonSchemaFormatter(),
+        ]);
+
         $normalizer = new DocumentationNormalizer(
             $resourceMetadataFactory,
             $propertyNameCollectionFactory,
@@ -2194,7 +2246,8 @@ class DocumentationNormalizerV3Test extends TestCase
             $formatProviderProphecy->reveal(),
             false,
             'pagination',
-            ['spec_version' => 3]
+            ['spec_version' => 3],
+            $schemaFormatterFactory
         );
 
         $expected = [
@@ -2371,6 +2424,10 @@ class DocumentationNormalizerV3Test extends TestCase
 
         $operationPathResolver = new CustomOperationPathResolver(new OperationPathResolver(new UnderscorePathSegmentNameGenerator()));
 
+        $schemaFormatterFactory = new SchemaFormatterFactory([
+            'application/json' => new JsonSchemaFormatter(),
+        ]);
+
         $normalizer = new DocumentationNormalizer(
             $resourceMetadataFactoryProphecy->reveal(),
             $propertyNameCollectionFactoryProphecy->reveal(),
@@ -2396,7 +2453,8 @@ class DocumentationNormalizerV3Test extends TestCase
             null,
             false,
             'pagination',
-            ['spec_version' => 3]
+            ['spec_version' => 3],
+            $schemaFormatterFactory
         );
 
         $expected = [
@@ -2486,6 +2544,10 @@ class DocumentationNormalizerV3Test extends TestCase
 
         $operationPathResolver = new CustomOperationPathResolver(new OperationPathResolver(new UnderscorePathSegmentNameGenerator()));
 
+        $schemaFormatterFactory = new SchemaFormatterFactory([
+            'application/json' => new JsonSchemaFormatter(),
+        ]);
+
         $normalizer = new DocumentationNormalizer(
             $resourceMetadataFactoryProphecy->reveal(),
             $propertyNameCollectionFactoryProphecy->reveal(),
@@ -2511,7 +2573,8 @@ class DocumentationNormalizerV3Test extends TestCase
             null,
             false,
             'pagination',
-            ['spec_version' => 3]
+            ['spec_version' => 3],
+            $schemaFormatterFactory
         );
 
         $expected = [
@@ -2621,6 +2684,11 @@ class DocumentationNormalizerV3Test extends TestCase
         $formatProviderProphecy->getFormatsFromOperation(Dummy::class, 'get', OperationType::ITEM)->willReturn(['jsonapi' => ['application/vnd.api+json']]);
         $formatProviderProphecy->getFormatsFromOperation(Dummy::class, 'put', OperationType::ITEM)->willReturn(['json' => ['application/json'], 'csv' => ['text/csv']]);
 
+        $schemaFormatterFactory = new SchemaFormatterFactory([
+            'application/json' => new JsonSchemaFormatter(),
+            'application/vnd.api+json' => new JsonApiSchemaFormatter()
+        ]);
+
         $normalizer = new DocumentationNormalizer(
             $resourceMetadataFactoryProphecy->reveal(),
             $propertyNameCollectionFactoryProphecy->reveal(),
@@ -2646,7 +2714,8 @@ class DocumentationNormalizerV3Test extends TestCase
             $formatProviderProphecy->reveal(),
             false,
             'pagination',
-            ['spec_version' => 3]
+            ['spec_version' => 3],
+            $schemaFormatterFactory
         );
 
         $expected = [
@@ -2820,15 +2889,17 @@ class DocumentationNormalizerV3Test extends TestCase
                                         'attributes' => [
                                             'type' => 'object',
                                             'properties' => [
-                                                'id' => new \ArrayObject([
-                                                    'type' => 'integer',
-                                                    'description' => 'This is an id.',
-                                                    'readOnly' => true,
-                                                ]),
-                                                'name' => new \ArrayObject([
-                                                    'type' => 'string',
-                                                    'description' => 'This is a name.',
-                                                ]),
+                                                'data' => [
+                                                    'id' => new \ArrayObject([
+                                                        'type' => 'integer',
+                                                        'description' => 'This is an id.',
+                                                        'readOnly' => true,
+                                                    ]),
+                                                    'name' => new \ArrayObject([
+                                                        'type' => 'string',
+                                                        'description' => 'This is a name.',
+                                                    ]),
+                                                ]
                                             ],
                                         ],
                                     ],
