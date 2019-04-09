@@ -19,8 +19,11 @@ use ApiPlatform\Core\Exception\InvalidArgumentException;
 use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
 use Doctrine\Bundle\MongoDBBundle\DoctrineMongoDBBundle;
 use Doctrine\ORM\OptimisticLockException;
+use Doctrine\ORM\Version as DoctrineOrmVersion;
+use Elasticsearch\Client as ElasticsearchClient;
 use FOS\UserBundle\FOSUserBundle;
 use GraphQL\GraphQL;
+use Symfony\Bundle\FullStack;
 use Symfony\Bundle\MercureBundle\MercureBundle;
 use Symfony\Bundle\TwigBundle\TwigBundle;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
@@ -88,82 +91,23 @@ final class Configuration implements ConfigurationInterface
                     ->canBeDisabled()
                     ->addDefaultsIfNotSet()
                     ->children()
-                        ->booleanNode('enabled')->defaultTrue()->info('To enable or disable eager loading')->end()
                         ->booleanNode('fetch_partial')->defaultFalse()->info('Fetch only partial data according to serialization groups. If enabled, Doctrine ORM entities will not work as expected if any of the other fields are used.')->end()
                         ->integerNode('max_joins')->defaultValue(30)->info('Max number of joined relations before EagerLoading throws a RuntimeException')->end()
                         ->booleanNode('force_eager')->defaultTrue()->info('Force join on every relation. If disabled, it will only join relations having the EAGER fetch mode.')->end()
                     ->end()
                 ->end()
-                ->arrayNode('doctrine')
-                    ->{class_exists(DoctrineBundle::class) ? 'canBeDisabled' : 'canBeEnabled'}()
-                ->end()
-                ->arrayNode('doctrine_mongodb_odm')
-                    ->{class_exists(DoctrineMongoDBBundle::class) ? 'canBeDisabled' : 'canBeEnabled'}()
-                ->end()
                 ->booleanNode('enable_fos_user')->defaultValue(class_exists(FOSUserBundle::class))->info('Enable the FOSUserBundle integration.')->end()
                 ->booleanNode('enable_nelmio_api_doc')
-                    ->defaultValue(false)
+                    ->defaultFalse()
                     ->setDeprecated('Enabling the NelmioApiDocBundle integration has been deprecated in 2.2 and will be removed in 3.0. NelmioApiDocBundle 3 has native support for API Platform.')
                     ->info('Enable the NelmioApiDocBundle integration.')
                 ->end()
-                ->booleanNode('enable_swagger')->defaultValue(true)->info('Enable the Swagger documentation and export.')->end()
+                ->booleanNode('enable_swagger')->defaultTrue()->info('Enable the Swagger documentation and export.')->end()
                 ->booleanNode('enable_swagger_ui')->defaultValue(class_exists(TwigBundle::class))->info('Enable Swagger UI')->end()
                 ->booleanNode('enable_re_doc')->defaultValue(class_exists(TwigBundle::class))->info('Enable ReDoc')->end()
                 ->booleanNode('enable_entrypoint')->defaultTrue()->info('Enable the entrypoint')->end()
                 ->booleanNode('enable_docs')->defaultTrue()->info('Enable the docs')->end()
                 ->booleanNode('enable_profiler')->defaultTrue()->info('Enable the data collector and the WebProfilerBundle integration.')->end()
-
-                ->arrayNode('oauth')
-                    ->canBeEnabled()
-                    ->addDefaultsIfNotSet()
-                    ->children()
-                        ->booleanNode('enabled')->defaultFalse()->info('To enable or disable oauth')->end()
-                        ->scalarNode('clientId')->defaultValue('')->info('The oauth client id.')->end()
-                        ->scalarNode('clientSecret')->defaultValue('')->info('The oauth client secret.')->end()
-                        ->scalarNode('type')->defaultValue('oauth2')->info('The oauth client secret.')->end()
-                        ->scalarNode('flow')->defaultValue('application')->info('The oauth flow grant type.')->end()
-                        ->scalarNode('tokenUrl')->defaultValue('/oauth/v2/token')->info('The oauth token url.')->end()
-                        ->scalarNode('authorizationUrl')->defaultValue('/oauth/v2/auth')->info('The oauth authentication url.')->end()
-                        ->arrayNode('scopes')
-                            ->prototype('scalar')->end()
-                        ->end()
-                    ->end()
-                ->end()
-
-                ->arrayNode('graphql')
-                    ->canBeEnabled()
-                    ->addDefaultsIfNotSet()
-                    ->children()
-                        ->booleanNode('enabled')->defaultValue(class_exists(GraphQL::class))->info('To enable or disable GraphQL.')->end()
-                        ->arrayNode('graphiql')
-                            ->canBeEnabled()
-                            ->addDefaultsIfNotSet()
-                            ->children()
-                                ->booleanNode('enabled')->defaultValue(class_exists(GraphQL::class) && class_exists(TwigBundle::class))->info('To enable or disable GraphiQL.')->end()
-                            ->end()
-                        ->end()
-                    ->end()
-                ->end()
-
-                ->arrayNode('swagger')
-                    ->addDefaultsIfNotSet()
-                    ->children()
-                             ->arrayNode('api_keys')
-                                 ->prototype('array')
-                                    ->children()
-                                    ->scalarNode('name')
-                                        ->info('The name of the header or query parameter containing the api key.')
-                                    ->end()
-                                    ->enumNode('type')
-                                        ->info('Whether the api key should be a query parameter or a header.')
-                                        ->values(['query', 'header'])
-                                    ->end()
-                                ->end()
-                             ->end()
-                        ->end()
-                    ->end()
-                ->end()
-
                 ->arrayNode('collection')
                     ->addDefaultsIfNotSet()
                     ->children()
@@ -188,7 +132,6 @@ final class Configuration implements ConfigurationInterface
                         ->end()
                     ->end()
                 ->end()
-
                 ->arrayNode('mapping')
                     ->addDefaultsIfNotSet()
                     ->children()
@@ -197,11 +140,123 @@ final class Configuration implements ConfigurationInterface
                         ->end()
                     ->end()
                 ->end()
-
                 ->arrayNode('resource_class_directories')
                     ->prototype('scalar')->end()
                 ->end()
+            ->end();
 
+        $this->addDoctrineOrmSection($rootNode);
+        $this->addDoctrineMongoDbOdmSection($rootNode);
+        $this->addOAuthSection($rootNode);
+        $this->addGraphQlSection($rootNode);
+        $this->addSwaggerSection($rootNode);
+        $this->addHttpCacheSection($rootNode);
+        $this->addMercureSection($rootNode);
+        $this->addMessengerSection($rootNode);
+        $this->addElasticsearchSection($rootNode);
+
+        $this->addExceptionToStatusSection($rootNode);
+
+        $this->addFormatSection($rootNode, 'formats', [
+            'jsonld' => ['mime_types' => ['application/ld+json']],
+            'json' => ['mime_types' => ['application/json']], // Swagger support
+            'html' => ['mime_types' => ['text/html']], // Swagger UI support
+        ]);
+        $this->addFormatSection($rootNode, 'error_formats', [
+            'jsonproblem' => ['mime_types' => ['application/problem+json']],
+            'jsonld' => ['mime_types' => ['application/ld+json']],
+        ]);
+
+        return $treeBuilder;
+    }
+
+    private function addDoctrineOrmSection(ArrayNodeDefinition $rootNode): void
+    {
+        $rootNode
+            ->children()
+                ->arrayNode('doctrine')
+                    ->{class_exists(DoctrineBundle::class) && class_exists(DoctrineOrmVersion::class) ? 'canBeDisabled' : 'canBeEnabled'}()
+                ->end()
+            ->end();
+    }
+
+    private function addDoctrineMongoDbOdmSection(ArrayNodeDefinition $rootNode): void
+    {
+        $rootNode
+            ->children()
+                ->arrayNode('doctrine_mongodb_odm')
+                    ->{class_exists(DoctrineMongoDBBundle::class) ? 'canBeDisabled' : 'canBeEnabled'}()
+                ->end()
+            ->end();
+    }
+
+    private function addOAuthSection(ArrayNodeDefinition $rootNode): void
+    {
+        $rootNode
+            ->children()
+                ->arrayNode('oauth')
+                    ->canBeEnabled()
+                    ->addDefaultsIfNotSet()
+                    ->children()
+                        ->scalarNode('clientId')->defaultValue('')->info('The oauth client id.')->end()
+                        ->scalarNode('clientSecret')->defaultValue('')->info('The oauth client secret.')->end()
+                        ->scalarNode('type')->defaultValue('oauth2')->info('The oauth client secret.')->end()
+                        ->scalarNode('flow')->defaultValue('application')->info('The oauth flow grant type.')->end()
+                        ->scalarNode('tokenUrl')->defaultValue('/oauth/v2/token')->info('The oauth token url.')->end()
+                        ->scalarNode('authorizationUrl')->defaultValue('/oauth/v2/auth')->info('The oauth authentication url.')->end()
+                        ->arrayNode('scopes')
+                            ->prototype('scalar')->end()
+                        ->end()
+                    ->end()
+                ->end()
+            ->end();
+    }
+
+    private function addGraphQlSection(ArrayNodeDefinition $rootNode): void
+    {
+        $rootNode
+            ->children()
+                ->arrayNode('graphql')
+                    ->{class_exists(GraphQL::class) ? 'canBeDisabled' : 'canBeEnabled'}()
+                    ->addDefaultsIfNotSet()
+                    ->children()
+                        ->arrayNode('graphiql')
+                            ->{class_exists(GraphQL::class) && class_exists(TwigBundle::class) ? 'canBeDisabled' : 'canBeEnabled'}()
+                        ->end()
+                    ->end()
+                ->end()
+            ->end();
+    }
+
+    private function addSwaggerSection(ArrayNodeDefinition $rootNode): void
+    {
+        $rootNode
+            ->children()
+                ->arrayNode('swagger')
+                    ->addDefaultsIfNotSet()
+                    ->children()
+                             ->arrayNode('api_keys')
+                                 ->prototype('array')
+                                    ->children()
+                                    ->scalarNode('name')
+                                        ->info('The name of the header or query parameter containing the api key.')
+                                    ->end()
+                                    ->enumNode('type')
+                                        ->info('Whether the api key should be a query parameter or a header.')
+                                        ->values(['query', 'header'])
+                                    ->end()
+                                ->end()
+                             ->end()
+                        ->end()
+                    ->end()
+                ->end()
+            ->end();
+    }
+
+    private function addHttpCacheSection(ArrayNodeDefinition $rootNode): void
+    {
+        $rootNode
+            ->children()
                 ->arrayNode('http_cache')
                     ->addDefaultsIfNotSet()
                     ->children()
@@ -235,25 +290,56 @@ final class Configuration implements ConfigurationInterface
                         ->end()
                     ->end()
                 ->end()
+            ->end();
+    }
 
+    private function addMercureSection(ArrayNodeDefinition $rootNode): void
+    {
+        $rootNode
+            ->children()
                 ->arrayNode('mercure')
                     ->{class_exists(MercureBundle::class) ? 'canBeDisabled' : 'canBeEnabled'}()
                     ->children()
                         ->scalarNode('hub_url')
                             ->defaultNull()
-                            ->info('The URL send in the Link HTTP header. If not set, will default to the URL for the Symfony\'s bundle default hub.')
+                            ->info('The URL sent in the Link HTTP header. If not set, will default to the URL for MercureBundle\'s default hub.')
                         ->end()
                     ->end()
                 ->end()
+            ->end();
+    }
 
+    private function addMessengerSection(ArrayNodeDefinition $rootNode): void
+    {
+        $rootNode
+            ->children()
                 ->arrayNode('messenger')
-                    ->{interface_exists(MessageBusInterface::class) ? 'canBeDisabled' : 'canBeEnabled'}()
+                    ->{!class_exists(FullStack::class) && interface_exists(MessageBusInterface::class) ? 'canBeDisabled' : 'canBeEnabled'}()
                 ->end()
+            ->end();
+    }
 
+    private function addElasticsearchSection(ArrayNodeDefinition $rootNode): void
+    {
+        $rootNode
+            ->children()
                 ->arrayNode('elasticsearch')
                     ->canBeEnabled()
                     ->addDefaultsIfNotSet()
                     ->children()
+                        ->booleanNode('enabled')
+                            ->defaultFalse()
+                            ->validate()
+                                ->ifTrue()
+                                ->then(static function (bool $v): bool {
+                                    if (!class_exists(ElasticsearchClient::class)) {
+                                        throw new InvalidConfigurationException('The elasticsearch/elasticsearch package is required for Elasticsearch support.');
+                                    }
+
+                                    return $v;
+                                })
+                            ->end()
+                        ->end()
                         ->arrayNode('hosts')
                             ->beforeNormalization()->castToArray()->end()
                             ->defaultValue([])
@@ -271,27 +357,10 @@ final class Configuration implements ConfigurationInterface
                         ->end()
                     ->end()
                 ->end()
-
             ->end();
-
-        $this->addExceptionToStatusSection($rootNode);
-
-        $this->addFormatSection($rootNode, 'formats', [
-            'jsonld' => ['mime_types' => ['application/ld+json']],
-            'json' => ['mime_types' => ['application/json']], // Swagger support
-            'html' => ['mime_types' => ['text/html']], // Swagger UI support
-        ]);
-        $this->addFormatSection($rootNode, 'error_formats', [
-            'jsonproblem' => ['mime_types' => ['application/problem+json']],
-            'jsonld' => ['mime_types' => ['application/ld+json']],
-        ]);
-
-        return $treeBuilder;
     }
 
     /**
-     * Adds an exception to status section.
-     *
      * @throws InvalidConfigurationException
      */
     private function addExceptionToStatusSection(ArrayNodeDefinition $rootNode): void
@@ -343,9 +412,6 @@ final class Configuration implements ConfigurationInterface
             ->end();
     }
 
-    /**
-     * Adds a format section.
-     */
     private function addFormatSection(ArrayNodeDefinition $rootNode, string $key, array $defaultValue): void
     {
         $rootNode
