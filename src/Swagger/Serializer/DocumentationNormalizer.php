@@ -381,7 +381,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
 
         $subResourceMetadata = $this->resourceMetadataFactory->create($subresourceOperation['resource_class']);
         $serializerContext = $this->getSerializerContext(OperationType::SUBRESOURCE, false, $subResourceMetadata, $operationName);
-        $responseDefinitionKey = $this->getDefinition($v3, $definitions, $subResourceMetadata, $subresourceOperation['resource_class'], null, $serializerContext);
+
         $pathOperation = new \ArrayObject([]);
         $pathOperation['tags'] = $subresourceOperation['shortNames'];
         $pathOperation['operationId'] = $operationId;
@@ -396,7 +396,19 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
             $pathOperation['produces'] = $responseMimeTypes ?? $mimeTypes;
         }
 
-        $pathOperation['responses'] = $this->getSubresourceResponse($v3, $responseMimeTypes ?? $mimeTypes, $subresourceOperation['collection'], $subresourceOperation['shortNames'][0], $responseDefinitionKey);
+        $responseDefinitionKeys = [];
+        $responseDefinitionKey = '';
+        if($v3){
+            foreach ($responseMimeTypes ?? $mimeTypes as $mimeType) {
+                $responseDefinitionKeys[$mimeType] = $this->getDefinition($v3, $definitions, $subResourceMetadata,
+                    $subresourceOperation['resource_class'], null, $serializerContext, $mimeType);
+            }
+        } else {
+            $responseDefinitionKey = $this->getDefinition($v3, $definitions, $subResourceMetadata,
+                $subresourceOperation['resource_class'], null, $serializerContext);
+        }
+
+        $pathOperation['responses'] = $this->getSubresourceResponse($v3, $responseMimeTypes ?? $mimeTypes, $subresourceOperation['collection'], $subresourceOperation['shortNames'][0], $responseDefinitionKey, $responseDefinitionKeys);
         // Avoid duplicates parameters when there is a filter on a subresource identifier
         $parametersMemory = [];
         $pathOperation['parameters'] = [];
@@ -423,7 +435,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
         return new \ArrayObject(['get' => $pathOperation]);
     }
 
-    private function getSubresourceResponse(bool $v3, $mimeTypes, bool $collection, string $shortName, string $definitionKey): array
+    private function getSubresourceResponse(bool $v3, $mimeTypes, bool $collection, string $shortName, string $definitionKey, array $definitionKeys = []): array
     {
         if ($collection) {
             $okResponse = [
@@ -432,7 +444,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
 
             if ($v3) {
                 foreach ($mimeTypes as $mimeType) {
-                    $okResponse['content'][$mimeType] = ['schema' => ['type' => 'array', 'items' => ['$ref' => sprintf('#/components/schemas/%s/%s', str_replace('/', '-', $mimeType), $definitionKey)]]];
+                    $okResponse['content'][$mimeType] = ['schema' => ['type' => 'array', 'items' => ['$ref' => sprintf('#/components/schemas/%s/%s', str_replace('/', '-', $mimeType), $definitionKeys[$mimeType])]]];
                 }
             } else {
                 $okResponse['schema'] = ['type' => 'array', 'items' => ['$ref' => sprintf('#/definitions/%s', $definitionKey)]];
@@ -449,7 +461,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
                             '$ref' => sprintf(
                                 '#/components/schemas/%s/%s',
                                 str_replace('/', '-', $mimeType),
-                                $definitionKey
+                                $definitionKeys[$mimeType]
                             ),
                         ],
                     ];

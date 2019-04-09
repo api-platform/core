@@ -2219,6 +2219,7 @@ class DocumentationNormalizerV3Test extends TestCase
 
         $schemaFormatterFactory = new SchemaFormatterFactory([
             'application/json' => new JsonSchemaFormatter(),
+            'text/xml' => new JsonSchemaFormatter(), //@todo: use correct formatter
         ]);
 
         $normalizer = new DocumentationNormalizer(
