@@ -90,30 +90,30 @@ final class ContextBuilder implements AnonymousContextBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function getResourceContext(string $resourceClass, int $referenceType = UrlGeneratorInterface::DEFAULT): array
+    public function getResourceContext(string $resourceClass, int $referenceType = UrlGeneratorInterface::DEFAULT_STRATEGY): array
     {
         $metadata = $this->resourceMetadataFactory->create($resourceClass);
         if (null === $shortName = $metadata->getShortName()) {
             return [];
         }
 
-        return $this->getResourceContextWithShortname($resourceClass, UrlGeneratorInterface::DEFAULT === $referenceType ? $this->urlGenerationStrategy : $referenceType, $shortName);
+        return $this->getResourceContextWithShortname($resourceClass, UrlGeneratorInterface::DEFAULT_STRATEGY === $referenceType ? $this->urlGenerationStrategy : $referenceType, $shortName);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getResourceContextUri(string $resourceClass, int $referenceType = UrlGeneratorInterface::DEFAULT): string
+    public function getResourceContextUri(string $resourceClass, int $referenceType = UrlGeneratorInterface::DEFAULT_STRATEGY): string
     {
         $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
 
-        return $this->urlGenerator->generate('api_jsonld_context', ['shortName' => $resourceMetadata->getShortName()], UrlGeneratorInterface::DEFAULT === $referenceType ? $this->urlGenerationStrategy : $referenceType);
+        return $this->urlGenerator->generate('api_jsonld_context', ['shortName' => $resourceMetadata->getShortName()], UrlGeneratorInterface::DEFAULT_STRATEGY === $referenceType ? $this->urlGenerationStrategy : $referenceType);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getAnonymousResourceContext($object, array $context = [], int $referenceType = UrlGeneratorInterface::DEFAULT): array
+    public function getAnonymousResourceContext($object, array $context = [], int $referenceType = UrlGeneratorInterface::DEFAULT_STRATEGY): array
     {
         $outputClass = $this->getObjectClass($object);
         $shortName = (new \ReflectionClass($outputClass))->getShortName();
@@ -121,7 +121,7 @@ final class ContextBuilder implements AnonymousContextBuilderInterface
         $jsonLdContext = [
             '@context' => $this->getResourceContextWithShortname(
                 $outputClass,
-                UrlGeneratorInterface::DEFAULT === $referenceType ? $this->urlGenerationStrategy : $referenceType,
+                UrlGeneratorInterface::DEFAULT_STRATEGY === $referenceType ? $this->urlGenerationStrategy : $referenceType,
                 $shortName
             ),
             '@type' => $shortName,

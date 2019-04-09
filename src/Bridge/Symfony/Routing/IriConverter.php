@@ -115,7 +115,7 @@ final class IriConverter implements IriConverterInterface
     /**
      * {@inheritdoc}
      */
-    public function getIriFromItem($item, int $referenceType = UrlGeneratorInterface::DEFAULT): string
+    public function getIriFromItem($item, int $referenceType = UrlGeneratorInterface::DEFAULT_STRATEGY): string
     {
         $resourceClass = $this->getObjectClass($item);
 
@@ -128,16 +128,16 @@ final class IriConverter implements IriConverterInterface
             ), $e->getCode(), $e);
         }
 
-        return $this->getItemIriFromResourceClass($resourceClass, $identifiers, UrlGeneratorInterface::DEFAULT === $referenceType ? $this->urlGenerationStrategy : $referenceType);
+        return $this->getItemIriFromResourceClass($resourceClass, $identifiers, UrlGeneratorInterface::DEFAULT_STRATEGY === $referenceType ? $this->urlGenerationStrategy : $referenceType);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getIriFromResourceClass(string $resourceClass, int $referenceType = UrlGeneratorInterface::DEFAULT): string
+    public function getIriFromResourceClass(string $resourceClass, int $referenceType = UrlGeneratorInterface::DEFAULT_STRATEGY): string
     {
         try {
-            return $this->router->generate($this->routeNameResolver->getRouteName($resourceClass, OperationType::COLLECTION), [], UrlGeneratorInterface::DEFAULT === $referenceType ? $this->urlGenerationStrategy : $referenceType);
+            return $this->router->generate($this->routeNameResolver->getRouteName($resourceClass, OperationType::COLLECTION), [], UrlGeneratorInterface::DEFAULT_STRATEGY === $referenceType ? $this->urlGenerationStrategy : $referenceType);
         } catch (RoutingExceptionInterface $e) {
             throw new InvalidArgumentException(sprintf('Unable to generate an IRI for "%s".', $resourceClass), $e->getCode(), $e);
         }
@@ -146,14 +146,14 @@ final class IriConverter implements IriConverterInterface
     /**
      * {@inheritdoc}
      */
-    public function getItemIriFromResourceClass(string $resourceClass, array $identifiers, int $referenceType = UrlGeneratorInterface::DEFAULT): string
+    public function getItemIriFromResourceClass(string $resourceClass, array $identifiers, int $referenceType = UrlGeneratorInterface::DEFAULT_STRATEGY): string
     {
         $routeName = $this->routeNameResolver->getRouteName($resourceClass, OperationType::ITEM);
 
         try {
             $identifiers = $this->generateIdentifiersUrl($identifiers, $resourceClass);
 
-            return $this->router->generate($routeName, ['id' => implode(';', $identifiers)], UrlGeneratorInterface::DEFAULT === $referenceType ? $this->urlGenerationStrategy : $referenceType);
+            return $this->router->generate($routeName, ['id' => implode(';', $identifiers)], UrlGeneratorInterface::DEFAULT_STRATEGY === $referenceType ? $this->urlGenerationStrategy : $referenceType);
         } catch (RoutingExceptionInterface $e) {
             throw new InvalidArgumentException(sprintf(
                 'Unable to generate an IRI for "%s".',
@@ -165,10 +165,10 @@ final class IriConverter implements IriConverterInterface
     /**
      * {@inheritdoc}
      */
-    public function getSubresourceIriFromResourceClass(string $resourceClass, array $context, int $referenceType = UrlGeneratorInterface::DEFAULT): string
+    public function getSubresourceIriFromResourceClass(string $resourceClass, array $context, int $referenceType = UrlGeneratorInterface::DEFAULT_STRATEGY): string
     {
         try {
-            return $this->router->generate($this->routeNameResolver->getRouteName($resourceClass, OperationType::SUBRESOURCE, $context), $context['subresource_identifiers'], UrlGeneratorInterface::DEFAULT === $referenceType ? $this->urlGenerationStrategy : $referenceType);
+            return $this->router->generate($this->routeNameResolver->getRouteName($resourceClass, OperationType::SUBRESOURCE, $context), $context['subresource_identifiers'], UrlGeneratorInterface::DEFAULT_STRATEGY === $referenceType ? $this->urlGenerationStrategy : $referenceType);
         } catch (RoutingExceptionInterface $e) {
             throw new InvalidArgumentException(sprintf('Unable to generate an IRI for "%s".', $resourceClass), $e->getCode(), $e);
         }

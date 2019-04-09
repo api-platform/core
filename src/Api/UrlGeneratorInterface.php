@@ -34,7 +34,7 @@ interface UrlGeneratorInterface
     /**
      * Allow to generate url using the globally configured strategy.
      */
-    public const DEFAULT = -1;
+    public const DEFAULT_STRATEGY = -1;
 
     /**
      * Generates an absolute URL, e.g. "http://example.com/dir/file".
