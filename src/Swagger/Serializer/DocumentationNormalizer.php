@@ -398,7 +398,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
 
         $responseDefinitionKeys = [];
         $responseDefinitionKey = '';
-        if($v3){
+        if ($v3) {
             foreach ($responseMimeTypes ?? $mimeTypes as $mimeType) {
                 $responseDefinitionKeys[$mimeType] = $this->getDefinition($v3, $definitions, $subResourceMetadata,
                     $subresourceOperation['resource_class'], null, $serializerContext, $mimeType);
@@ -727,7 +727,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
         if ($v3) {
             try {
                 $schemaFormatter = $this->schemaFormatterFactory->getFormatter($mimeType);
-            }catch (\Exception $e){
+            } catch (\Exception $e){
                 $schemaFormatter = $this->schemaFormatterFactory->getFormatter('application/json');
             }
 
@@ -741,7 +741,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
                 $definitionSchema['required'][] = $normalizedPropertyName;
             }
 
-            if ($v3 && $schemaFormatter !== null) {
+            if ($v3 && null !== $schemaFormatter) {
                 $schemaFormatter->setProperty($definitionSchema, $normalizedPropertyName, $this->getPropertySchema($v3, $propertyMetadata, $definitions, $serializerContext, $mimeType));
             } else {
                 $definitionSchema['properties'][$normalizedPropertyName] = $this->getPropertySchema($v3, $propertyMetadata, $definitions, $serializerContext);

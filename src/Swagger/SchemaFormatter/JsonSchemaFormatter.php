@@ -14,7 +14,8 @@ class JsonSchemaFormatter implements SchemaFormatterInterface
         return [];
     }
 
-    public function setProperty(\ArrayObject $definitionSchema, $normalizedPropertyName, \ArrayObject $property){
+    public function setProperty(\ArrayObject $definitionSchema, $normalizedPropertyName, \ArrayObject $property)
+    {
         $definitionSchema['properties'][$normalizedPropertyName] = $property;
     }
 

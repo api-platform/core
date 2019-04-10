@@ -531,7 +531,6 @@ class DocumentationNormalizerV3Test extends TestCase
 
         $schemaFormatterFactory = new SchemaFormatterFactory([
             'application/json' => new JsonSchemaFormatter(),
-
         ]);
 
         $normalizer = new DocumentationNormalizer(
@@ -2687,7 +2686,7 @@ class DocumentationNormalizerV3Test extends TestCase
 
         $schemaFormatterFactory = new SchemaFormatterFactory([
             'application/json' => new JsonSchemaFormatter(),
-            'application/vnd.api+json' => new JsonApiSchemaFormatter()
+            'application/vnd.api+json' => new JsonApiSchemaFormatter(),
         ]);
 
         $normalizer = new DocumentationNormalizer(
@@ -2900,7 +2899,7 @@ class DocumentationNormalizerV3Test extends TestCase
                                                         'type' => 'string',
                                                         'description' => 'This is a name.',
                                                     ]),
-                                                ]
+                                                ],
                                             ],
                                         ],
                                     ],

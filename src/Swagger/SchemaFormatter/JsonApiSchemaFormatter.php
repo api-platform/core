@@ -13,12 +13,12 @@ class JsonApiSchemaFormatter implements SchemaFormatterInterface
     {
         return [
             'data' => [
-                'type'       => 'object',
+                'type' => 'object',
                 'properties' => [
                     'attributes' => [
-                        'type'       => 'object',
+                        'type' => 'object',
                         'properties' => [
-                            'data' => []
+                            'data' => [],
                         ],
                     ],
                 ],

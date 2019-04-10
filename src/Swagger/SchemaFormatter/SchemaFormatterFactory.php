@@ -7,7 +7,7 @@ class SchemaFormatterFactory
     /** @var SchemaFormatterInterface[] */
     private $formatters;
 
-    public function __construct(/* iterable */  $formatters)
+    public function __construct(/* iterable */ $formatters)
     {
         $this->formatters = $formatters;
     }
