@@ -2002,7 +2002,7 @@ class DocumentationNormalizerV3Test extends TestCase
                                 ]),
                                 'relatedDummy' => new \ArrayObject([
                                     'description' => 'This is a related dummy \o/.',
-                                    '$ref' => '#/components/schemas/'.$relatedDummyRef,
+                                    '$ref' => '#/components/schemas/application-ld+json/'.$relatedDummyRef,
                                 ]),
                             ],
                         ]),
@@ -2343,18 +2343,6 @@ class DocumentationNormalizerV3Test extends TestCase
                         ]),
                     ]),
                     'text-xml' => new \ArrayObject([
-                        'Question' => new \ArrayObject([
-                            'type' => 'object',
-                            'description' => 'This is a question.',
-                            'externalDocs' => ['url' => 'http://schema.example.com/Question'],
-                            'properties' => [
-                                'answer' => new \ArrayObject([
-                                    'type' => 'array',
-                                    'description' => 'This is a name.',
-                                    'items' => ['$ref' => '#/components/schemas/text-xml/Answer'],
-                                ]),
-                            ],
-                        ]),
                         'Answer' => new \ArrayObject([
                             'type' => 'object',
                             'description' => 'This is an answer.',
