@@ -4,6 +4,11 @@ namespace ApiPlatform\Core\Swagger\SchemaFormatter;
 
 class JsonApiSchemaFormatter implements SchemaFormatterInterface
 {
+    public function supports(string $mimeType)
+    {
+        return 'application/vdn.api+json' === $mimeType;
+    }
+
     public function getProperties()
     {
         return [

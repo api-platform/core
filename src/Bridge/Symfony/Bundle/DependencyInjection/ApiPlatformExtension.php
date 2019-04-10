@@ -33,6 +33,7 @@ use ApiPlatform\Core\GraphQl\Resolver\MutationResolverInterface;
 use ApiPlatform\Core\GraphQl\Resolver\QueryCollectionResolverInterface;
 use ApiPlatform\Core\GraphQl\Resolver\QueryItemResolverInterface;
 use ApiPlatform\Core\GraphQl\Type\Definition\TypeInterface as GraphQlTypeInterface;
+use ApiPlatform\Core\Swagger\SchemaFormatter\SchemaFormatterInterface;
 use Doctrine\Common\Annotations\Annotation;
 use Doctrine\ORM\Version;
 use Elasticsearch\Client;
@@ -142,6 +143,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $this->registerMetadataConfiguration($container, $config, $loader);
         $this->registerOAuthConfiguration($container, $config);
         $this->registerApiKeysConfiguration($container, $config);
+        $this->registerSchemaFormatterConfiguration($container, $loader);
         $this->registerSwaggerConfiguration($container, $config, $loader);
         $this->registerJsonLdConfiguration($container, $formats, $loader, $config['enable_docs']);
         $this->registerGraphqlConfiguration($container, $config, $loader);
@@ -637,5 +639,12 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
     {
         $container->registerForAutoconfiguration(DataTransformerInterface::class)
             ->addTag('api_platform.data_transformer');
+    }
+
+    private function registerSchemaFormatterConfiguration(ContainerBuilder $container, XmlFileLoader $loader)
+    {
+        $loader->load('schema_formatter.xml');
+        $container->registerForAutoconfiguration(SchemaFormatterInterface::class)
+            ->addTag('api_platform.schema_formatter');
     }
 }

@@ -1,0 +1,19 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <services>
+        <service id="api_platform.schema_formatter.json" class="ApiPlatform\Core\Swagger\SchemaFormatter\JsonSchemaFormatter" >
+            <tag name="api_platform.schema_formatter" />
+        </service>
+        <service id="api_platform.schema_formatter.api+json" class="ApiPlatform\Core\Swagger\SchemaFormatter\JsonApiSchemaFormatter" >
+            <tag name="api_platform.schema_formatter" />
+        </service>
+
+        <service id="api_platform.schema_formatter.factory" class="ApiPlatform\Core\Swagger\SchemaFormatter\SchemaFormatterFactory">
+            <argument type="tagged" tag="api_platform.schema_formatter" on-invalid="ignore" />
+        </service>
+    </services>
+</container>

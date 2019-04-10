@@ -31,7 +31,10 @@
             <argument type="service" id="api_platform.formats_provider" on-invalid="ignore" />
             <argument>%api_platform.collection.pagination.client_enabled%</argument>
             <argument>%api_platform.collection.pagination.enabled_parameter_name%</argument>
+            <argument type="collection" />
+            <argument type="service" id="api_platform.schema_formatter.factory" />
             <tag name="serializer.normalizer" priority="-790" />
+
         </service>
 
         <service id="api_platform.swagger.normalizer.api_gateway" class="ApiPlatform\Core\Swagger\Serializer\ApiGatewayNormalizer" public="false" decorates="api_platform.swagger.normalizer.documentation" decoration-priority="-1">
