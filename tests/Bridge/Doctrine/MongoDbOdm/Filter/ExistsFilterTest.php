@@ -113,10 +113,10 @@ class ExistsFilterTest extends DoctrineMongoDbOdmFilterTestCase
     public function provideApplyTestData(): array
     {
         $existsFilterFactory = function (ManagerRegistry $managerRegistry, array $properties = null): ExistsFilter {
-            return new ExistsFilter($managerRegistry, null, 'exists', $properties);
+            return new ExistsFilter($managerRegistry, null, $properties, 'exists');
         };
         $customExistsFilterFactory = function (ManagerRegistry $managerRegistry, array $properties = null): ExistsFilter {
-            return new ExistsFilter($managerRegistry, null, 'customExists', $properties);
+            return new ExistsFilter($managerRegistry, null, $properties, 'customExists');
         };
 
         return array_merge_recursive(
@@ -451,7 +451,7 @@ class ExistsFilterTest extends DoctrineMongoDbOdmFilterTestCase
                 ],
             ],
             function (ManagerRegistry $managerRegistry, array $properties = null): ExistsFilter {
-                return new ExistsFilter($managerRegistry, null, 'exists', $properties);
+                return new ExistsFilter($managerRegistry, null, $properties, 'exists');
             },
         ];
 
@@ -460,6 +460,6 @@ class ExistsFilterTest extends DoctrineMongoDbOdmFilterTestCase
 
     protected function buildFilter(?array $properties = null)
     {
-        return new $this->filterClass($this->managerRegistry, null, 'exists', $properties);
+        return new $this->filterClass($this->managerRegistry, null, $properties, 'exists');
     }
 }
