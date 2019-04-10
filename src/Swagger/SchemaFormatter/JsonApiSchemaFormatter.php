@@ -6,7 +6,7 @@ class JsonApiSchemaFormatter implements SchemaFormatterInterface
 {
     public function supports(string $mimeType)
     {
-        return 'application/vdn.api+json' === $mimeType;
+        return 'application/vnd.api+json' === $mimeType;
     }
 
     public function getProperties()
