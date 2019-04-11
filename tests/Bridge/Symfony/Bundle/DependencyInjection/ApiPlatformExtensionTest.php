@@ -765,6 +765,9 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.http_cache.public' => null,
             'api_platform.enable_entrypoint' => true,
             'api_platform.enable_docs' => true,
+            'api_platform.open_api.contact' => [],
+            'api_platform.open_api.license' => [],
+            'api_platform.open_api.termsOfService' => '',
         ];
 
         $pagination = [

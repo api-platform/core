@@ -272,8 +272,26 @@ final class Configuration implements ConfigurationInterface
                         ->end()
                     ->end()
                 ->end()
-
-            ->end();
+                ->arrayNode('open_api')
+                    ->canBeEnabled()
+                    ->addDefaultsIfNotSet()
+                    ->children()
+                        ->arrayNode('contact')
+                            ->children()
+                                ->scalarNode('name')->defaultValue('API Platform contact')->info('Name of the maintainer of the API')->end()
+                                ->scalarNode('url')->defaultValue('https://api-platform.com')->info('URL of the maintainer of the API')->end()
+                                ->scalarNode('email')->defaultValue('spam@api-platform.com')->info('Email of the maintainer of the API')->end()
+                            ->end()
+                        ->end()
+                        ->arrayNode('license')
+                            ->children()
+                                ->scalarNode('name')->defaultValue('Apache 2.0')->info('API\'s license')->end()
+                                ->scalarNode('url')->defaultValue('https://apache.org/licenses/LICENSE-2.0.html')->info('API\'s license URL')->end()
+                            ->end()
+                        ->end()
+                        ->scalarNode('termsOfService')->defaultValue('')->info('The Terms of Service of the API.')->end()
+                    ->end()
+                ->end();
 
         $this->addExceptionToStatusSection($rootNode);
 

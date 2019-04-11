@@ -60,6 +60,32 @@ use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
  */
 class DocumentationNormalizerV2Test extends TestCase
 {
+    private const TITLE = 'Test API';
+    private const DESCRIPTION = 'This is a test API.';
+    private const VERSION = '1.2.3';
+
+    private $defaultDocumentation;
+    private $blankDocumentation;
+
+    public function setUp()
+    {
+        $info = [
+            'title' => self::TITLE,
+            'description' => self::DESCRIPTION,
+            'version' => self::VERSION,
+        ];
+
+        $infoBlank = [
+            'title' => '',
+            'description' => '',
+            'version' => '0.0.0',
+        ];
+
+        $formats = ['jsonld' => ['application/ld+json']];
+        $this->defaultDocumentation = new Documentation(new ResourceNameCollection([Dummy::class]), $info, $formats);
+        $this->blankDocumentation = new Documentation(new ResourceNameCollection([Dummy::class]), $infoBlank, $formats);
+    }
+
     /**
      * @group legacy
      * @expectedDeprecation Passing an instance of ApiPlatform\Core\Api\UrlGeneratorInterface to ApiPlatform\Core\Swagger\Serializer\DocumentationNormalizer::__construct() is deprecated since version 2.1 and will be removed in 3.0.
@@ -81,8 +107,6 @@ class DocumentationNormalizerV2Test extends TestCase
 
     public function testNormalize()
     {
-        $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), 'Test API', 'This is a test API.', '1.2.3', ['jsonld' => ['application/ld+json']]);
-
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyNameCollectionFactoryProphecy->create(Dummy::class, [])->shouldBeCalled()->willReturn(new PropertyNameCollection(['id', 'name', 'description']));
 
@@ -120,9 +144,9 @@ class DocumentationNormalizerV2Test extends TestCase
             'swagger' => '2.0',
             'basePath' => '/app_dev.php/',
             'info' => [
-                'title' => 'Test API',
-                'description' => 'This is a test API.',
-                'version' => '1.2.3',
+                'title' => self::TITLE,
+                'description' => self::DESCRIPTION,
+                'version' => self::VERSION,
             ],
             'paths' => new \ArrayObject([
                 '/dummies' => [
@@ -314,13 +338,11 @@ class DocumentationNormalizerV2Test extends TestCase
             ]),
         ];
 
-        $this->assertEquals($expected, $normalizer->normalize($documentation, DocumentationNormalizer::FORMAT, ['base_url' => '/app_dev.php/']));
+        $this->assertEquals($expected, $normalizer->normalize($this->defaultDocumentation, DocumentationNormalizer::FORMAT, ['base_url' => '/app_dev.php/']));
     }
 
     public function testNormalizeWithNameConverter()
     {
-        $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), 'Dummy API', 'This is a dummy API', '1.2.3', ['jsonld' => ['application/ld+json']]);
-
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyNameCollectionFactoryProphecy->create(Dummy::class, [])->shouldBeCalled()->willReturn(new PropertyNameCollection(['name', 'nameConverted']));
 
@@ -371,9 +393,9 @@ class DocumentationNormalizerV2Test extends TestCase
             'swagger' => '2.0',
             'basePath' => '/',
             'info' => [
-                'title' => 'Dummy API',
-                'description' => 'This is a dummy API',
-                'version' => '1.2.3',
+                'title' => self::TITLE,
+                'description' => self::DESCRIPTION,
+                'version' => self::VERSION,
             ],
             'paths' => new \ArrayObject([
                 '/dummies/{id}' => [
@@ -429,13 +451,11 @@ class DocumentationNormalizerV2Test extends TestCase
             'security' => [['oauth' => []]],
         ];
 
-        $this->assertEquals($expected, $normalizer->normalize($documentation));
+        $this->assertEquals($expected, $normalizer->normalize($this->defaultDocumentation));
     }
 
     public function testNormalizeWithApiKeysEnabled()
     {
-        $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), 'Test API', 'This is a test API.', '1.2.3', ['jsonld' => ['application/ld+json']]);
-
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyNameCollectionFactoryProphecy->create(Dummy::class, [])->shouldBeCalled()->willReturn(new PropertyNameCollection(['name']));
 
@@ -489,9 +509,9 @@ class DocumentationNormalizerV2Test extends TestCase
             'swagger' => '2.0',
             'basePath' => '/app_dev.php/',
             'info' => [
-                'title' => 'Test API',
-                'description' => 'This is a test API.',
-                'version' => '1.2.3',
+                'title' => self::TITLE,
+                'description' => self::DESCRIPTION,
+                'version' => self::VERSION,
             ],
             'paths' => new \ArrayObject([
                 '/dummies/{id}' => [
@@ -550,16 +570,11 @@ class DocumentationNormalizerV2Test extends TestCase
             ],
         ];
 
-        $this->assertEquals($expected, $normalizer->normalize($documentation, DocumentationNormalizer::FORMAT, ['base_url' => '/app_dev.php/']));
+        $this->assertEquals($expected, $normalizer->normalize($this->defaultDocumentation, DocumentationNormalizer::FORMAT, ['base_url' => '/app_dev.php/']));
     }
 
     public function testNormalizeWithOnlyNormalizationGroups()
     {
-        $title = 'Test API';
-        $description = 'This is a test API.';
-        $formats = ['jsonld' => ['application/ld+json']];
-        $version = '1.2.3';
-        $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), $title, $description, $version, $formats);
         $groups = ['dummy', 'foo', 'bar'];
 
         $ref = 'Dummy-'.implode('_', $groups);
@@ -613,9 +628,9 @@ class DocumentationNormalizerV2Test extends TestCase
             'swagger' => '2.0',
             'basePath' => '/',
             'info' => [
-                'title' => 'Test API',
-                'description' => 'This is a test API.',
-                'version' => '1.2.3',
+                'title' => self::TITLE,
+                'description' => self::DESCRIPTION,
+                'version' => self::VERSION,
             ],
             'paths' => new \ArrayObject([
                 '/dummies' => [
@@ -744,12 +759,11 @@ class DocumentationNormalizerV2Test extends TestCase
             ]),
         ];
 
-        $this->assertEquals($expected, $normalizer->normalize($documentation));
+        $this->assertEquals($expected, $normalizer->normalize($this->defaultDocumentation));
     }
 
     public function testNormalizeWithSwaggerDefinitionName()
     {
-        $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), 'Test API', 'This is a test API.', '1.2.3', ['jsonld' => ['application/ld+json']]);
 
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyNameCollectionFactoryProphecy->create(Dummy::class, [])->shouldBeCalled()->willReturn(new PropertyNameCollection(['id']));
@@ -793,9 +807,9 @@ class DocumentationNormalizerV2Test extends TestCase
             'swagger' => '2.0',
             'basePath' => '/app_dev.php/',
             'info' => [
-                'title' => 'Test API',
-                'description' => 'This is a test API.',
-                'version' => '1.2.3',
+                'title' => self::TITLE,
+                'description' => self::DESCRIPTION,
+                'version' => self::VERSION,
             ],
             'paths' => new \ArrayObject([
                 '/dummies/{id}' => [
@@ -838,17 +852,11 @@ class DocumentationNormalizerV2Test extends TestCase
             ]),
         ];
 
-        $this->assertEquals($expected, $normalizer->normalize($documentation, DocumentationNormalizer::FORMAT, ['base_url' => '/app_dev.php/']));
+        $this->assertEquals($expected, $normalizer->normalize($this->defaultDocumentation, DocumentationNormalizer::FORMAT, ['base_url' => '/app_dev.php/']));
     }
 
     public function testNormalizeWithOnlyDenormalizationGroups()
     {
-        $title = 'Test API';
-        $description = 'This is a test API.';
-        $formats = ['jsonld' => ['application/ld+json']];
-        $version = '1.2.3';
-        $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), $title, $description, $version, $formats);
-
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyNameCollectionFactoryProphecy->create(Dummy::class, ['serializer_groups' => 'dummy'])->shouldBeCalled(1)->willReturn(new PropertyNameCollection(['gerard']));
         $propertyNameCollectionFactoryProphecy->create(Dummy::class, [])->shouldBeCalled()->willReturn(new PropertyNameCollection(['name']));
@@ -898,9 +906,9 @@ class DocumentationNormalizerV2Test extends TestCase
             'swagger' => '2.0',
             'basePath' => '/',
             'info' => [
-                'title' => 'Test API',
-                'description' => 'This is a test API.',
-                'version' => '1.2.3',
+                'title' => self::TITLE,
+                'description' => self::DESCRIPTION,
+                'version' => self::VERSION,
             ],
             'paths' => new \ArrayObject([
                 '/dummies' => [
@@ -1029,17 +1037,11 @@ class DocumentationNormalizerV2Test extends TestCase
             ]),
         ];
 
-        $this->assertEquals($expected, $normalizer->normalize($documentation));
+        $this->assertEquals($expected, $normalizer->normalize($this->defaultDocumentation));
     }
 
     public function testNormalizeWithNormalizationAndDenormalizationGroups()
     {
-        $title = 'Test API';
-        $description = 'This is a test API.';
-        $formats = ['jsonld' => ['application/ld+json']];
-        $version = '1.2.3';
-        $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), $title, $description, $version, $formats);
-
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyNameCollectionFactoryProphecy->create(Dummy::class, ['serializer_groups' => 'dummy'])->shouldBeCalled(1)->willReturn(new PropertyNameCollection(['gerard']));
         $propertyNameCollectionFactoryProphecy->create(Dummy::class, [])->shouldBeCalled()->willReturn(new PropertyNameCollection(['name']));
@@ -1092,9 +1094,9 @@ class DocumentationNormalizerV2Test extends TestCase
             'swagger' => '2.0',
             'basePath' => '/',
             'info' => [
-                'title' => 'Test API',
-                'description' => 'This is a test API.',
-                'version' => '1.2.3',
+                'title' => self::TITLE,
+                'description' => self::DESCRIPTION,
+                'version' => self::VERSION,
             ],
             'paths' => new \ArrayObject([
                 '/dummies' => [
@@ -1223,7 +1225,7 @@ class DocumentationNormalizerV2Test extends TestCase
             ]),
         ];
 
-        $this->assertEquals($expected, $normalizer->normalize($documentation));
+        $this->assertEquals($expected, $normalizer->normalize($this->defaultDocumentation));
     }
 
     public function testFilters()
@@ -1326,19 +1328,15 @@ class DocumentationNormalizerV2Test extends TestCase
             $operationMethodResolverProphecy->reveal(),
             $operationPathResolver
         );
-
-        $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), 'Test API', 'This is a test API.', '1.2.3', ['jsonld' => ['application/ld+json']]);
-
-        $this->assertTrue($normalizer->supportsNormalization($documentation, 'json'));
-        $this->assertFalse($normalizer->supportsNormalization($documentation));
+        
+        $this->assertTrue($normalizer->supportsNormalization($this->defaultDocumentation, 'json'));
+        $this->assertFalse($normalizer->supportsNormalization($this->defaultDocumentation));
         $this->assertFalse($normalizer->supportsNormalization(new Dummy(), 'json'));
         $this->assertTrue($normalizer->hasCacheableSupportsMethod());
     }
 
     public function testNoOperations()
     {
-        $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), '', '', '0.0.0', ['jsonld' => ['application/ld+json']]);
-
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyNameCollectionFactoryProphecy->create(Dummy::class, [])->shouldNotBeCalled();
 
@@ -1383,13 +1381,11 @@ class DocumentationNormalizerV2Test extends TestCase
             'paths' => new \ArrayObject([]),
         ];
 
-        $this->assertEquals($expected, $normalizer->normalize($documentation));
+        $this->assertEquals($expected, $normalizer->normalize($this->blankDocumentation ));
     }
 
     public function testWithCustomMethod()
     {
-        $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), '', '', '0.0.0', ['jsonld' => ['application/ld+json']]);
-
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
 
         $dummyMetadata = new ResourceMetadata(
@@ -1439,16 +1435,11 @@ class DocumentationNormalizerV2Test extends TestCase
             ]),
         ];
 
-        $this->assertEquals($expected, $normalizer->normalize($documentation));
+        $this->assertEquals($expected, $normalizer->normalize($this->blankDocumentation ));
     }
 
     public function testNormalizeWithNestedNormalizationGroups()
     {
-        $title = 'Test API';
-        $description = 'This is a test API.';
-        $formats = ['jsonld' => ['application/ld+json']];
-        $version = '1.2.3';
-        $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), $title, $description, $version, $formats);
         $groups = ['dummy', 'foo', 'bar'];
         $ref = 'Dummy-'.implode('_', $groups);
         $relatedDummyRef = 'RelatedDummy-'.implode('_', $groups);
@@ -1518,9 +1509,9 @@ class DocumentationNormalizerV2Test extends TestCase
             'swagger' => '2.0',
             'basePath' => '/',
             'info' => [
-                'title' => 'Test API',
-                'description' => 'This is a test API.',
-                'version' => '1.2.3',
+                'title' => self::TITLE,
+                'description' => self::DESCRIPTION,
+                'version' => self::VERSION,
             ],
             'paths' => new \ArrayObject([
                 '/dummies' => [
@@ -1664,13 +1655,11 @@ class DocumentationNormalizerV2Test extends TestCase
             ]),
         ];
 
-        $this->assertEquals($expected, $normalizer->normalize($documentation));
+        $this->assertEquals($expected, $normalizer->normalize($this->defaultDocumentation));
     }
 
     private function normalizeWithFilters($filterLocator)
     {
-        $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), '', '', '0.0.0', ['jsonld' => ['application/ld+json']]);
-
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyNameCollectionFactoryProphecy->create(Dummy::class, [])->shouldBeCalled()->willReturn(new PropertyNameCollection(['name']));
 
@@ -1779,12 +1768,18 @@ class DocumentationNormalizerV2Test extends TestCase
             ]),
         ];
 
-        $this->assertEquals($expected, $normalizer->normalize($documentation));
+        $this->assertEquals($expected, $normalizer->normalize($this->blankDocumentation));
     }
 
     public function testNormalizeWithSubResource()
     {
-        $documentation = new Documentation(new ResourceNameCollection([Question::class]), 'Test API', 'This is a test API.', '1.2.3', ['jsonld' => ['application/ld+json']]);
+        $info = [
+            'title' => self::TITLE,
+            'description' => self::DESCRIPTION,
+            'version' => self::VERSION,
+        ];
+
+        $documentation = new Documentation(new ResourceNameCollection([Question::class]), $info, ['jsonld' => ['application/ld+json']]);
 
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyNameCollectionFactoryProphecy->create(Question::class, Argument::any())->shouldBeCalled()->willReturn(new PropertyNameCollection(['answer']));
@@ -1856,9 +1851,9 @@ class DocumentationNormalizerV2Test extends TestCase
             'swagger' => '2.0',
             'basePath' => '/',
             'info' => [
-                'title' => 'Test API',
-                'description' => 'This is a test API.',
-                'version' => '1.2.3',
+                'title' => self::TITLE,
+                'description' => self::DESCRIPTION,
+                'version' => self::VERSION,
             ],
             'paths' => new \ArrayObject([
                 '/api/questions/{id}' => [
@@ -1941,8 +1936,6 @@ class DocumentationNormalizerV2Test extends TestCase
 
     public function testNormalizeWithPropertySwaggerContext()
     {
-        $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), 'Test API', 'This is a test API.', '1.2.3', ['jsonld' => ['application/ld+json']]);
-
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyNameCollectionFactoryProphecy->create(Dummy::class, [])->shouldBeCalled()->willReturn(new PropertyNameCollection(['id', 'name']));
 
@@ -1974,9 +1967,9 @@ class DocumentationNormalizerV2Test extends TestCase
             'swagger' => '2.0',
             'basePath' => '/app_dev.php/',
             'info' => [
-                'title' => 'Test API',
-                'description' => 'This is a test API.',
-                'version' => '1.2.3',
+                'title' => self::TITLE,
+                'description' => self::DESCRIPTION,
+                'version' => self::VERSION,
             ],
             'paths' => new \ArrayObject([
                 '/dummies/{id}' => [
@@ -2025,13 +2018,11 @@ class DocumentationNormalizerV2Test extends TestCase
             ]),
         ];
 
-        $this->assertEquals($expected, $normalizer->normalize($documentation, DocumentationNormalizer::FORMAT, ['base_url' => '/app_dev.php/']));
+        $this->assertEquals($expected, $normalizer->normalize($this->defaultDocumentation, DocumentationNormalizer::FORMAT, ['base_url' => '/app_dev.php/']));
     }
 
     public function testNormalizeWithPaginationClientEnabled()
     {
-        $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), 'Test API', 'This is a test API.', '1.2.3', ['jsonld' => ['application/ld+json']]);
-
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyNameCollectionFactoryProphecy->create(Dummy::class, [])->shouldBeCalled()->willReturn(new PropertyNameCollection(['id', 'name']));
 
@@ -2063,9 +2054,9 @@ class DocumentationNormalizerV2Test extends TestCase
             'swagger' => '2.0',
             'basePath' => '/app_dev.php/',
             'info' => [
-                'title' => 'Test API',
-                'description' => 'This is a test API.',
-                'version' => '1.2.3',
+                'title' => self::TITLE,
+                'description' => self::DESCRIPTION,
+                'version' => self::VERSION,
             ],
             'paths' => new \ArrayObject([
                 '/dummies' => [
@@ -2124,13 +2115,11 @@ class DocumentationNormalizerV2Test extends TestCase
             ]),
         ];
 
-        $this->assertEquals($expected, $normalizer->normalize($documentation, DocumentationNormalizer::FORMAT, ['base_url' => '/app_dev.php/']));
+        $this->assertEquals($expected, $normalizer->normalize($this->defaultDocumentation, DocumentationNormalizer::FORMAT, ['base_url' => '/app_dev.php/']));
     }
 
     public function testNormalizeWithCustomFormatsDefinedAtOperationLevel()
     {
-        $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), 'Test API', 'This is a test API.', '1.2.3', ['jsonld' => ['application/ld+json']]);
-
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyNameCollectionFactoryProphecy->create(Dummy::class, [])->shouldBeCalled()->willReturn(new PropertyNameCollection(['id', 'name']));
 
@@ -2187,9 +2176,9 @@ class DocumentationNormalizerV2Test extends TestCase
             'swagger' => '2.0',
             'basePath' => '/',
             'info' => [
-                'title' => 'Test API',
-                'description' => 'This is a test API.',
-                'version' => '1.2.3',
+                'title' => self::TITLE,
+                'description' => self::DESCRIPTION,
+                'version' => self::VERSION,
             ],
             'paths' => new \ArrayObject([
                 '/dummies' => [
@@ -2306,15 +2295,12 @@ class DocumentationNormalizerV2Test extends TestCase
             ]),
         ];
 
-        $this->assertEquals($expected, $normalizer->normalize($documentation, DocumentationNormalizer::FORMAT, ['base_url' => '/']));
+        $this->assertEquals($expected, $normalizer->normalize($this->defaultDocumentation, DocumentationNormalizer::FORMAT, ['base_url' => '/']));
     }
 
     public function testNormalizeWithInputAndOutputClass()
     {
-        $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), 'Test API', 'This is a test API.', '1.2.3', ['jsonld' => ['application/ld+json']]);
-
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
-        //$propertyNameCollectionFactoryProphecy->create(Dummy::class, [])->shouldBeCalled()->willReturn(new PropertyNameCollection(['id', 'name', 'description']));
         $propertyNameCollectionFactoryProphecy->create(InputDto::class, [])->shouldBeCalled()->willReturn(new PropertyNameCollection(['foo', 'bar']));
         $propertyNameCollectionFactoryProphecy->create(OutputDto::class, [])->shouldBeCalled()->willReturn(new PropertyNameCollection(['baz', 'bat']));
 
@@ -2323,9 +2309,6 @@ class DocumentationNormalizerV2Test extends TestCase
         $resourceMetadataFactoryProphecy->create(Dummy::class)->shouldBeCalled()->willReturn($dummyMetadata);
 
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
-        //$propertyMetadataFactoryProphecy->create(Dummy::class, 'id')->shouldBeCalled()->willReturn(new PropertyMetadata(new Type(Type::BUILTIN_TYPE_INT), 'This is an id.', true, false));
-        //$propertyMetadataFactoryProphecy->create(Dummy::class, 'name')->shouldBeCalled()->willReturn(new PropertyMetadata(new Type(Type::BUILTIN_TYPE_STRING), 'This is a name.', true, true, true, true, false, false, null, null, []));
-        //$propertyMetadataFactoryProphecy->create(Dummy::class, 'description')->shouldBeCalled()->willReturn(new PropertyMetadata(new Type(Type::BUILTIN_TYPE_STRING), 'This is an initializable but not writable property.', true, false, true, true, false, false, null, null, [], null, true));
         // InputDto
         $propertyMetadataFactoryProphecy->create(InputDto::class, 'foo')->shouldBeCalled()->willReturn(new PropertyMetadata(new Type(Type::BUILTIN_TYPE_STRING), 'foo', true, false));
         $propertyMetadataFactoryProphecy->create(InputDto::class, 'bar')->shouldBeCalled()->willReturn(new PropertyMetadata(new Type(Type::BUILTIN_TYPE_INT), 'bar', true, true, true, true, false, false, null, null, []));
@@ -2357,9 +2340,9 @@ class DocumentationNormalizerV2Test extends TestCase
             'swagger' => '2.0',
             'basePath' => '/app_dev.php/',
             'info' => [
-                'title' => 'Test API',
-                'version' => '1.2.3',
-                'description' => 'This is a test API.',
+                'title' => self::TITLE,
+                'description' => self::DESCRIPTION,
+                'version' => self::VERSION,
             ],
             'paths' => new \ArrayObject([
                 '/dummies' => [
@@ -2526,6 +2509,128 @@ class DocumentationNormalizerV2Test extends TestCase
             ]),
         ];
 
+        $this->assertEquals($expected, $normalizer->normalize($this->defaultDocumentation, DocumentationNormalizer::FORMAT, ['base_url' => '/app_dev.php/']));
+    }
+
+    public function testNormalizeWithSwaggerDefinitionInfoComplete()
+    {
+        $info = [
+            'title' => self::TITLE,
+            'description' => self::DESCRIPTION,
+            'version' => self::VERSION,
+            'contact' => [
+                'name' => 'API Platform',
+                'url' => 'https://www.api-platform.com',
+                'email' => 'contact@api-platform.com',
+            ],
+            'license' => [
+                'name' => 'Apache 2.0',
+                'url' => 'https://www.apache.org/licenses/LICENSE-2.0.html',
+            ],
+            'termsOfService' => 'http://example.com/terms/',
+        ];
+
+        $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), $info, ['jsonld' => ['application/ld+json']]);
+
+        $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
+        $propertyNameCollectionFactoryProphecy->create(Dummy::class, [])->shouldBeCalled()->willReturn(new PropertyNameCollection(['id']));
+
+        $dummyMetadata = new ResourceMetadata(
+            'Dummy',
+            'This is a dummy.',
+            'http://schema.example.com/Dummy',
+            [
+                'get' => [
+                    'method' => 'GET',
+                    'normalization_context' => [
+                        DocumentationNormalizer::SWAGGER_DEFINITION_NAME => 'Read',
+                    ],
+                ],
+            ]
+        );
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
+        $resourceMetadataFactoryProphecy->create(Dummy::class)->shouldBeCalled()->willReturn($dummyMetadata);
+
+        $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
+        $propertyMetadataFactoryProphecy->create(Dummy::class, 'id')->shouldBeCalled()->willReturn(new PropertyMetadata(new Type(Type::BUILTIN_TYPE_INT), 'This is an id.', true, false));
+        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
+        $resourceClassResolverProphecy->isResourceClass(Dummy::class)->willReturn(true);
+
+        $operationMethodResolverProphecy = $this->prophesize(OperationMethodResolverInterface::class);
+        $operationMethodResolverProphecy->getItemOperationMethod(Dummy::class, 'get')->shouldBeCalled()->willReturn('GET');
+
+        $operationPathResolver = new CustomOperationPathResolver(new OperationPathResolver(new UnderscorePathSegmentNameGenerator()));
+
+        $normalizer = new DocumentationNormalizer(
+            $resourceMetadataFactoryProphecy->reveal(),
+            $propertyNameCollectionFactoryProphecy->reveal(),
+            $propertyMetadataFactoryProphecy->reveal(),
+            $resourceClassResolverProphecy->reveal(),
+            $operationMethodResolverProphecy->reveal(),
+            $operationPathResolver
+        );
+
+        $expected = [
+            'swagger' => '2.0',
+            'basePath' => '/app_dev.php/',
+            'info' => [
+                'title' => self::TITLE,
+                'description' => self::DESCRIPTION,
+                'version' => self::VERSION,
+                'contact' => [
+                    'name' => 'API Platform',
+                    'url' => 'https://www.api-platform.com',
+                    'email' => 'contact@api-platform.com',
+                ],
+                'license' => [
+                    'name' => 'Apache 2.0',
+                    'url' => 'https://www.apache.org/licenses/LICENSE-2.0.html',
+                ],
+                'termsOfService' => 'http://example.com/terms/',
+            ],
+            'paths' => new \ArrayObject([
+                '/dummies/{id}' => [
+                    'get' => new \ArrayObject([
+                        'tags' => ['Dummy'],
+                        'operationId' => 'getDummyItem',
+                        'produces' => ['application/ld+json'],
+                        'summary' => 'Retrieves a Dummy resource.',
+                        'parameters' => [
+                            [
+                                'name' => 'id',
+                                'in' => 'path',
+                                'type' => 'string',
+                                'required' => true,
+                            ],
+                        ],
+                        'responses' => [
+                            200 => [
+                                'description' => 'Dummy resource response',
+                                'schema' => ['$ref' => '#/definitions/Dummy-Read'],
+                            ],
+                            404 => ['description' => 'Resource not found'],
+                        ],
+                    ]),
+                ],
+            ]),
+            'definitions' => new \ArrayObject([
+                'Dummy-Read' => new \ArrayObject([
+                    'type' => 'object',
+                    'description' => 'This is a dummy.',
+                    'externalDocs' => ['url' => 'http://schema.example.com/Dummy'],
+                    'properties' => [
+                        'id' => new \ArrayObject([
+                            'type' => 'integer',
+                            'description' => 'This is an id.',
+                            'readOnly' => true,
+                        ]),
+                    ],
+                ]),
+            ]),
+        ];
+
         $this->assertEquals($expected, $normalizer->normalize($documentation, DocumentationNormalizer::FORMAT, ['base_url' => '/app_dev.php/']));
     }
+
+
 }

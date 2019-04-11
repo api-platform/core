@@ -46,6 +46,9 @@
             <argument>%api_platform.description%</argument>
             <argument>%api_platform.version%</argument>
             <argument>%api_platform.formats%</argument>
+            <argument>%api_platform.open_api.contact%</argument>
+            <argument>%api_platform.open_api.license%</argument>
+            <argument>%api_platform.open_api.termsOfService%</argument>
             <tag name="console.command" />
         </service>
 

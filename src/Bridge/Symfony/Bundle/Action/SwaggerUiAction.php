@@ -105,7 +105,12 @@ final class SwaggerUiAction
             $this->formats = $this->formatsProvider->getFormatsFromAttributes(RequestAttributesExtractor::extractAttributes($request));
         }
 
-        $documentation = new Documentation($this->resourceNameCollectionFactory->create(), $this->title, $this->description, $this->version, $this->formats);
+        $info = [
+            'title' => $this->title,
+            'description' => $this->description,
+            'version' => $this->version,
+        ];
+        $documentation = new Documentation($this->resourceNameCollectionFactory->create(), $info, $this->formats);
 
         return new Response($this->twig->render('@ApiPlatform/SwaggerUi/index.html.twig', $this->getContext($request, $documentation)));
     }

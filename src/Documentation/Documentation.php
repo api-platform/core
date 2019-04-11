@@ -23,17 +23,13 @@ use ApiPlatform\Core\Metadata\Resource\ResourceNameCollection;
 final class Documentation
 {
     private $resourceNameCollection;
-    private $title;
-    private $description;
-    private $version;
+    private $info;
     private $mimeTypes = [];
 
-    public function __construct(ResourceNameCollection $resourceNameCollection, string $title = '', string $description = '', string $version = '', array $formats = [])
+    public function __construct(ResourceNameCollection $resourceNameCollection, array $info = [], array $formats = [])
     {
         $this->resourceNameCollection = $resourceNameCollection;
-        $this->title = $title;
-        $this->description = $description;
-        $this->version = $version;
+        $this->info = $info;
         foreach ($formats as $mimeTypes) {
             foreach ($mimeTypes as $mimeType) {
                 $this->mimeTypes[] = $mimeType;
@@ -48,17 +44,32 @@ final class Documentation
 
     public function getVersion(): string
     {
-        return $this->version;
+        return $this->info['version'] ?? '';
     }
 
     public function getDescription(): string
     {
-        return $this->description;
+        return $this->info['description'] ?? '';
     }
 
     public function getTitle(): string
     {
-        return $this->title;
+         return $this->info['title'] ?? '';
+    }
+
+    public function getContact(): array
+    {
+        return $this->info['contact'] ?? [];
+    }
+
+    public function getLicense(): array
+    {
+        return $this->info['license'] ?? [];
+    }
+
+    public function getTermsOfService(): string
+    {
+        return $this->info['termsOfService'] ?? '';
     }
 
     public function getResourceNameCollection(): ResourceNameCollection

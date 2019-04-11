@@ -201,6 +201,9 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $container->setParameter('api_platform.http_cache.shared_max_age', $config['http_cache']['shared_max_age']);
         $container->setParameter('api_platform.http_cache.vary', $config['http_cache']['vary']);
         $container->setParameter('api_platform.http_cache.public', $config['http_cache']['public']);
+        $container->setParameter('api_platform.openapi_info.contact', $config['openapi_info']['contact'] ?? []);
+        $container->setParameter('api_platform.openapi_info.license', $config['openapi_info']['license'] ?? []);
+        $container->setParameter('api_platform.openapi_info.terms_of_service', $config['openapi_info']['terms_of_service'] ?? '');
 
         $container->setAlias('api_platform.operation_path_resolver.default', $config['default_operation_path_resolver']);
         $container->setAlias('api_platform.path_segment_name_generator', $config['path_segment_name_generator']);

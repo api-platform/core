@@ -167,6 +167,9 @@ class ConfigurationTest extends TestCase
             ],
             'allow_plain_identifiers' => false,
             'resource_class_directories' => [],
+            'open_api' => [
+                'termsOfService' => '',
+            ]
         ], $config);
     }
 

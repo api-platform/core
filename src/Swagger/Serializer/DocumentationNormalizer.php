@@ -731,6 +731,18 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
             $docs['info']['description'] = $description;
         }
 
+        if (\count($documentation->getContact())) {
+            $docs['info']['contact'] = $documentation->getContact();
+        }
+
+        if (\count($documentation->getLicense())) {
+            $docs['info']['license'] = $documentation->getLicense();
+        }
+
+        if (!empty($documentation->getTermsOfService())) {
+            $docs['info']['termsOfService'] = $documentation->getTermsOfService();
+        }
+
         $securityDefinitions = [];
         $security = [];
 
