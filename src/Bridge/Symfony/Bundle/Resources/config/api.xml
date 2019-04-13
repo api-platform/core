@@ -104,7 +104,7 @@
             <argument>false</argument>
 
             <!-- Run after serializer.normalizer.data_uri but before serializer.normalizer.object -->
-            <tag name="serializer.normalizer" priority="-923" />
+            <tag name="serializer.normalizer" priority="-900" />
         </service>
 
         <!-- Resources Operations path resolver -->
