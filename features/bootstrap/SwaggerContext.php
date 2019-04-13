@@ -176,9 +176,20 @@ final class SwaggerContext implements Context
     private function getClassInfo(string $className, int $specVersion = 2): stdClass
     {
         $nodes = 2 === $specVersion ? $this->getLastJsonResponse()->{'definitions'} : $this->getLastJsonResponse()->{'components'}->{'schemas'};
-        foreach ($nodes as $classTitle => $classData) {
-            if ($classTitle === $className) {
-                return $classData;
+
+        if($specVersion === 3){
+            foreach ($nodes as $mimeTypes) {
+                foreach ($mimeTypes as $classTitle => $classData) {
+                    if ($classTitle === $className) {
+                        return $classData;
+                    }
+                }
+            }
+        } else {
+            foreach ($nodes as $classTitle => $classData) {
+                if ($classTitle === $className) {
+                    return $classData;
+                }
             }
         }
 
