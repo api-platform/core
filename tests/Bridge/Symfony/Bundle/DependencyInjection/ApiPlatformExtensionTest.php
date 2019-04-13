@@ -113,10 +113,6 @@ class ApiPlatformExtensionTest extends TestCase
             'jsonld' => ['mime_types' => ['application/ld+json']],
             'jsonhal' => ['mime_types' => ['application/hal+json']],
         ],
-        'schema_formatters' => [
-            'application/json' => 'api_platform.schema_formatter.json',
-            'application/vdn.json+json' => 'api_platform.schema_formatter.api+json',
-        ],
         'http_cache' => ['invalidation' => [
             'enabled' => true,
             'varnish_urls' => ['test'],

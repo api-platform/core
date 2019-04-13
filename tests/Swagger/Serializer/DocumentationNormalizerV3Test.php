@@ -1762,7 +1762,7 @@ class DocumentationNormalizerV3Test extends TestCase
     {
         $title = 'Test API';
         $description = 'This is a test API.';
-        $formats = ['jsonld' => ['application/ld+json']];
+        $formats = ['jsonld' => ['application/ld+json', 'application/vnd.api+json']];
         $version = '1.2.3';
         $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), $title, $description, $version, $formats);
         $groups = ['dummy', 'foo', 'bar'];
@@ -1824,6 +1824,7 @@ class DocumentationNormalizerV3Test extends TestCase
 
         $schemaFormatterFactory = new SchemaFormatterFactory([
             'application/json' => new JsonSchemaFormatter(),
+            'application/vnd.api+json' => new JsonApiSchemaFormatter(),
         ]);
 
         $normalizer = new DocumentationNormalizer(
@@ -1889,6 +1890,12 @@ class DocumentationNormalizerV3Test extends TestCase
                                             'items' => ['$ref' => '#/components/schemas/application-ld+json/Dummy'],
                                         ],
                                     ],
+                                    'application/vnd.api+json' => [
+                                        'schema' => [
+                                            'type' => 'array',
+                                            'items' => ['$ref' => '#/components/schemas/application-vnd.api+json/Dummy'],
+                                        ],
+                                    ],
                                 ],
                             ],
                         ],
@@ -1901,6 +1908,9 @@ class DocumentationNormalizerV3Test extends TestCase
                                 'application/ld+json' => [
                                     'schema' => ['$ref' => '#/components/schemas/application-ld+json/Dummy'],
                                 ],
+                                'application/vnd.api+json' => [
+                                    'schema' => ['$ref' => '#/components/schemas/application-vnd.api+json/Dummy'],
+                                ],
                             ],
                             'description' => 'The new Dummy resource',
                         ],
@@ -1911,6 +1921,9 @@ class DocumentationNormalizerV3Test extends TestCase
                                 'content' => [
                                     'application/ld+json' => [
                                         'schema' => ['$ref' => '#/components/schemas/application-ld+json/Dummy'],
+                                    ],
+                                    'application/vnd.api+json' => [
+                                        'schema' => ['$ref' => '#/components/schemas/application-vnd.api+json/Dummy'],
                                     ],
                                 ],
                             ],
@@ -1937,6 +1950,9 @@ class DocumentationNormalizerV3Test extends TestCase
                                     'application/ld+json' => [
                                         'schema' => ['$ref' => '#/components/schemas/application-ld+json/Dummy'],
                                     ],
+                                    'application/vnd.api+json' => [
+                                        'schema' => ['$ref' => '#/components/schemas/application-vnd.api+json/Dummy'],
+                                    ],
                                 ],
                             ],
                             '404' => ['description' => 'Resource not found'],
@@ -1949,6 +1965,9 @@ class DocumentationNormalizerV3Test extends TestCase
                             'content' => [
                                 'application/ld+json' => [
                                     'schema' => ['$ref' => '#/components/schemas/application-ld+json/Dummy'],
+                                ],
+                                'application/vnd.api+json' => [
+                                    'schema' => ['$ref' => '#/components/schemas/application-vnd.api+json/Dummy'],
                                 ],
                             ],
                             'description' => 'The updated Dummy resource',
@@ -1968,6 +1987,9 @@ class DocumentationNormalizerV3Test extends TestCase
                                 'content' => [
                                     'application/ld+json' => [
                                         'schema' => ['$ref' => '#/components/schemas/application-ld+json/'.$ref],
+                                    ],
+                                    'application/vnd.api+json' => [
+                                        'schema' => ['$ref' => '#/components/schemas/application-vnd.api+json/'.$ref],
                                     ],
                                 ],
                             ],
@@ -2018,9 +2040,146 @@ class DocumentationNormalizerV3Test extends TestCase
                             ],
                         ]),
                     ]),
+                    'application-vnd.api+json' => new \ArrayObject([
+                        'Dummy' => new \ArrayObject([
+                            'type' => 'object',
+                            'description' => 'This is a dummy.',
+                            'externalDocs' => ['url' => 'http://schema.example.com/Dummy'],
+                            'properties' => [
+                                "data" => [
+                                    'type' => 'object',
+                                    'properties' => [
+                                        'type' => [
+                                            'type' => 'string'
+                                        ],
+                                        'id' => [
+                                            'type' => 'integer'
+                                        ],
+                                        'attributes' => [
+                                            'type' => 'object',
+                                            'properties' => [
+                                                'name' => new \ArrayObject([
+                                                    'type' => 'string',
+                                                    'description' => 'This is a name.',
+                                                ]),
+                                            ]
+                                        ]
+                                    ]
+                                ]
+                            ],
+                        ]),
+                        $ref => new \ArrayObject([
+                            'type' => 'object',
+                            'description' => 'This is a dummy.',
+                            'externalDocs' => ['url' => 'http://schema.example.com/Dummy'],
+                            'properties' => [
+                                'data' => [
+                                    'type' => 'object',
+                                    'properties' => [
+                                        'type' => [
+                                            'type' => 'string'
+                                        ],
+                                        'id' => [
+                                            'type' => 'integer'
+                                        ],
+                                        'attributes' => [
+                                            'type' => 'object',
+                                            'properties' => [
+                                                'name' => new \ArrayObject([
+                                                    'type' => 'string',
+                                                    'description' => 'This is a name.',
+                                                ]),
+                                            ]
+                                        ],
+                                        'relationships' => [
+                                            'type' => 'object',
+                                            'properties' => [
+                                                'relatedDummy' => [
+                                                    'type' => 'object',
+                                                    'properties' => [
+                                                        'links' => [
+                                                            'type' => 'object',
+                                                            'properties' => [
+                                                                'self' => [
+                                                                    'type' => 'string',
+                                                                ],
+                                                                'related' => [
+                                                                    'type' => 'string',
+                                                                ]
+                                                            ]
+                                                        ],
+                                                        'data' => [
+                                                            'type' => 'object',
+                                                            'properties' => [
+                                                                'type' => [
+                                                                    'type' => 'string',
+                                                                ],
+                                                                'id' => [
+                                                                    'type' => 'string',
+                                                                ]
+                                                            ]
+                                                        ]
+                                                    ]
+                                                ],
+                                            ]
+                                        ]
+                                    ]
+                                ]
+                            ],
+                        ]),
+                        $relatedDummyRef => new \ArrayObject([
+                            'type' => 'object',
+                            'description' => 'This is a related dummy.',
+                            'externalDocs' => ['url' => 'http://schema.example.com/RelatedDummy'],
+                            'properties' => [
+                                'data' => [
+                                    'type' => 'object',
+                                    'properties' => [
+                                        'type' => [
+                                            'type' => 'string'
+                                        ],
+                                        'id' => [
+                                            'type' => 'integer'
+                                        ],
+                                        'attributes' => [
+                                            'type' => 'object',
+                                            'properties' => [
+                                                'name' => new \ArrayObject([
+                                                    'type' => 'string',
+                                                    'description' => 'This is a name.',
+                                                ]),
+                                            ]
+                                        ]
+                                    ]
+                                ]
+                            ],
+                        ]),
+                    ]),
                 ]),
             ],
         ];
+
+
+        '"relationships": {
+      "author": {
+        "links": {
+          "self": "http://example.com/articles/1/relationships/author",
+          "related": "http://example.com/articles/1/author"
+        },
+        "data": { "type": "people", "id": "9" }
+      },
+      "comments": {
+        "links": {
+          "self": "http://example.com/articles/1/relationships/comments",
+          "related": "http://example.com/articles/1/comments"
+        },
+        "data": [
+          { "type": "comments", "id": "5" },
+          { "type": "comments", "id": "12" }
+        ]
+      }
+    }';
+
 
         $this->assertEquals($expected, $normalizer->normalize($documentation));
     }
@@ -2874,20 +3033,26 @@ class DocumentationNormalizerV3Test extends TestCase
                                 'data' => [
                                     'type' => 'object',
                                     'properties' => [
+                                        'type' => [
+                                            'type' => 'string',
+                                        ],
+                                        "id" => new \ArrayObject([
+                                            'type' => 'integer',
+                                            'readOnly' => true,
+                                            'description' => 'This is an id.',
+                                        ]),
                                         'attributes' => [
                                             'type' => 'object',
                                             'properties' => [
-                                                'data' => [
-                                                    'id' => new \ArrayObject([
-                                                        'type' => 'integer',
-                                                        'description' => 'This is an id.',
-                                                        'readOnly' => true,
-                                                    ]),
-                                                    'name' => new \ArrayObject([
-                                                        'type' => 'string',
-                                                        'description' => 'This is a name.',
-                                                    ]),
-                                                ],
+                                                '_id' => new \ArrayObject([
+                                                    'type' => 'integer',
+                                                    'description' => 'This is an id.',
+                                                    'readOnly' => true,
+                                                ]),
+                                                'name' => new \ArrayObject([
+                                                    'type' => 'string',
+                                                    'description' => 'This is a name.',
+                                                ]),
                                             ],
                                         ],
                                     ],

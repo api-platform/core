@@ -681,7 +681,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
         if ($v3) {
             $escapedMimeType = str_replace('/', '-', $mimeType);
             if (!isset($definitions[$escapedMimeType][$definitionKey])) {
-                if(isset($definitions[$escapedMimeType])) {
+                if (isset($definitions[$escapedMimeType])) {
                     $definitions[$escapedMimeType][$definitionKey] = [];
                 } else {
                     $definitions[$escapedMimeType] = new \ArrayObject([$definitionKey => []]);
@@ -731,7 +731,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
         if ($v3) {
             try {
                 $schemaFormatter = $this->schemaFormatterFactory->getFormatter($mimeType);
-            } catch (\Exception $e){
+            } catch (\Exception $e) {
                 $schemaFormatter = $this->schemaFormatterFactory->getFormatter('application/json');
             }
 
@@ -746,7 +746,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
             }
 
             if ($v3 && null !== $schemaFormatter) {
-                $schemaFormatter->setProperty($definitionSchema, $normalizedPropertyName, $this->getPropertySchema($v3, $propertyMetadata, $definitions, $serializerContext, $mimeType));
+                $schemaFormatter->setProperty($definitionSchema, $normalizedPropertyName, $this->getPropertySchema($v3, $propertyMetadata, $definitions, $serializerContext, $mimeType), $propertyMetadata);
             } else {
                 $definitionSchema['properties'][$normalizedPropertyName] = $this->getPropertySchema($v3, $propertyMetadata, $definitions, $serializerContext);
             }
