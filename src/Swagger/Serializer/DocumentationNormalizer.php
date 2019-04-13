@@ -735,7 +735,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
                 $schemaFormatter = $this->schemaFormatterFactory->getFormatter('application/json');
             }
 
-            $definitionSchema['properties'] = $schemaFormatter->getProperties();
+            $definitionSchema['properties'] = $schemaFormatter->buildBaseSchemaFormat();
         }
 
         foreach ($this->propertyNameCollectionFactory->create($resourceClass, $options) as $propertyName) {

@@ -17,12 +17,12 @@ use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 
 class JsonApiSchemaFormatter implements SchemaFormatterInterface
 {
-    public function supports(string $mimeType)
+    public function supports(string $mimeType): bool
     {
         return 'application/vnd.api+json' === $mimeType;
     }
 
-    public function getProperties()
+    public function buildBaseSchemaFormat(): array
     {
         return [
             'data' => [
@@ -48,13 +48,16 @@ class JsonApiSchemaFormatter implements SchemaFormatterInterface
         $normalizedPropertyName,
         \ArrayObject $property,
         PropertyMetadata $propertyMetadata
-    ) {
+    ): void {
         if ($normalizedPropertyName === 'id') {
             $definitionSchema['properties']['data']['properties'][$normalizedPropertyName] = $property;
             $normalizedPropertyName = '_id';
         }
 
-        if ($propertyMetadata->getType()->getBuiltinType() === 'object') {
+        if (null !== $propertyMetadata->getType()
+            && $propertyMetadata->getType()->getBuiltinType() === 'object'
+            && isset($property['$ref'])
+        ) {
             $data = [
                 'type'       => 'object',
                 'properties' => [
@@ -66,8 +69,8 @@ class JsonApiSchemaFormatter implements SchemaFormatterInterface
                     ],
                 ],
             ];
-            dump($property);
-            if (true) {
+
+            if (false) {
                 $data = [
                     'type'       => 'object',
                     'properties' => [

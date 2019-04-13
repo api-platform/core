@@ -13,6 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Swagger\SchemaFormatter;
 
+use ApiPlatform\Core\Exception\FormatterNotFoundException;
+
 class SchemaFormatterFactory
 {
     /** @var SchemaFormatterInterface[] */
@@ -23,7 +25,12 @@ class SchemaFormatterFactory
         $this->formatters = $formatters;
     }
 
-    public function getFormatter($mimeType)
+    /**
+     * @param string $mimeType
+     *
+     * @return SchemaFormatterInterface
+     */
+    public function getFormatter(string $mimeType)
     {
         foreach ($this->formatters as $formatter) {
             if ($formatter->supports($mimeType)) {
@@ -31,6 +38,6 @@ class SchemaFormatterFactory
             }
         }
 
-        throw new \Exception('Formatter for mimetype "' . $mimeType . '" not supported');
+        throw new FormatterNotFoundException(sprintf('Formatter for mimetype "%s" not supported', $mimeType));
     }
 }

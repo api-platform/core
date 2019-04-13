@@ -17,12 +17,12 @@ use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 
 class JsonSchemaFormatter implements SchemaFormatterInterface
 {
-    public function supports(string $mimeType)
+    public function supports(string $mimeType): bool
     {
         return 'application/json' === $mimeType;
     }
 
-    public function getProperties()
+    public function buildBaseSchemaFormat(): array
     {
         return [];
     }
@@ -32,7 +32,7 @@ class JsonSchemaFormatter implements SchemaFormatterInterface
         $normalizedPropertyName,
         \ArrayObject $property,
         PropertyMetadata $propertyMetadata
-    ) {
+    ): void {
         $definitionSchema['properties'][$normalizedPropertyName] = $property;
     }
 }

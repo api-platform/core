@@ -2159,28 +2159,6 @@ class DocumentationNormalizerV3Test extends TestCase
             ],
         ];
 
-
-        '"relationships": {
-      "author": {
-        "links": {
-          "self": "http://example.com/articles/1/relationships/author",
-          "related": "http://example.com/articles/1/author"
-        },
-        "data": { "type": "people", "id": "9" }
-      },
-      "comments": {
-        "links": {
-          "self": "http://example.com/articles/1/relationships/comments",
-          "related": "http://example.com/articles/1/comments"
-        },
-        "data": [
-          { "type": "comments", "id": "5" },
-          { "type": "comments", "id": "12" }
-        ]
-      }
-    }';
-
-
         $this->assertEquals($expected, $normalizer->normalize($documentation));
     }
 
