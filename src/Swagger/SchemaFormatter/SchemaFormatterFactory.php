@@ -30,7 +30,7 @@ class SchemaFormatterFactory
      *
      * @return SchemaFormatterInterface
      */
-    public function getFormatter(string $mimeType)
+    public function getFormatter($mimeType)
     {
         foreach ($this->formatters as $formatter) {
             if ($formatter->supports($mimeType)) {

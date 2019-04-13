@@ -143,7 +143,6 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $this->registerMetadataConfiguration($container, $config, $loader);
         $this->registerOAuthConfiguration($container, $config);
         $this->registerApiKeysConfiguration($container, $config);
-        $this->registerSchemaFormatterConfiguration($container, $loader);
         $this->registerSwaggerConfiguration($container, $config, $loader);
         $this->registerJsonLdConfiguration($container, $formats, $loader, $config['enable_docs']);
         $this->registerGraphqlConfiguration($container, $config, $loader);
@@ -358,6 +357,10 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         }
 
         $container->setParameter('api_platform.enable_swagger', $config['enable_swagger']);
+
+        $loader->load('schema_formatter.xml');
+        $container->registerForAutoconfiguration(SchemaFormatterInterface::class)
+            ->addTag('api_platform.schema_formatter');
     }
 
     /**
@@ -639,12 +642,5 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
     {
         $container->registerForAutoconfiguration(DataTransformerInterface::class)
             ->addTag('api_platform.data_transformer');
-    }
-
-    private function registerSchemaFormatterConfiguration(ContainerBuilder $container, XmlFileLoader $loader)
-    {
-        $loader->load('schema_formatter.xml');
-        $container->registerForAutoconfiguration(SchemaFormatterInterface::class)
-            ->addTag('api_platform.schema_formatter');
     }
 }
