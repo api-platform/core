@@ -111,9 +111,9 @@ class SerializeListenerTest extends TestCase
         $request->setRequestFormat('xml');
 
         $eventProphecy = $this->prophesize(GetResponseForControllerResultEvent::class);
-        $eventProphecy->getControllerResult()->willReturn(new \stdClass())->shouldBeCalled();
-        $eventProphecy->getRequest()->willReturn($request)->shouldBeCalled();
-        $eventProphecy->setControllerResult('')->shouldBeCalled();
+        $eventProphecy->getControllerResult()->willReturn(new \stdClass());
+        $eventProphecy->getRequest()->willReturn($request);
+        $eventProphecy->setControllerResult(null)->shouldBeCalled();
 
         $serializerContextBuilderProphecy = $this->prophesize(SerializerContextBuilderInterface::class);
         $serializerContextBuilderProphecy->createFromRequest(Argument::type(Request::class), true, Argument::type('array'))->willReturn($expectedContext)->shouldBeCalled();

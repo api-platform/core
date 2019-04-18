@@ -134,6 +134,12 @@ services:
         arguments: ['@doctrine']
         tags: ['api_platform.filter']
 
+    ApiPlatform\Core\Tests\Fixtures\TestBundle\Controller\DummyDtoNoInput\CreateItemAction:
+        tags: ['controller.service_arguments']
+
+    ApiPlatform\Core\Tests\Fixtures\TestBundle\Controller\DummyDtoNoInput\DoubleBatAction:
+        tags: ['controller.service_arguments']
+
     app.config_dummy_resource.action:
         class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\Action\ConfigCustom'
         arguments: ['@api_platform.item_data_provider']
@@ -223,6 +229,12 @@ services:
 
     app.data_transformer.output_dto:
         class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\DataTransformer\OutputDtoDataTransformer'
+        public: false
+        tags:
+            -  { name: 'api_platform.data_transformer' }
+
+    app.data_transformer.dummy_dto_no_input_to_output_dto:
+        class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\DataTransformer\DummyDtoNoInputToOutputDtoDataTransformer'
         public: false
         tags:
             -  { name: 'api_platform.data_transformer' }
