@@ -390,13 +390,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
 
         $pathOperation['summary'] ?? $pathOperation['summary'] = sprintf('Retrieves a %s resource.', $resourceShortName);
 
-        $parameter = [
-            'name' => 'id',
-            'in' => 'path',
-            'required' => true,
-        ];
-        $v3 ? $parameter['schema'] = ['type' => 'string'] : $parameter['type'] = 'string';
-        $pathOperation['parameters'] ?? $pathOperation['parameters'] = [$parameter];
+        $pathOperation = $this->addItemOperationParameters($v3, $pathOperation);
 
         $successResponse = ['description' => sprintf('%s resource response', $resourceShortName)];
         if ($responseDefinitionKey) {
@@ -423,6 +417,11 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
         }
 
         $pathOperation['summary'] ?? $pathOperation['summary'] = sprintf('Creates a %s resource.', $resourceShortName);
+
+        $userDefinedParameters = $pathOperation['parameters'] ?? null;
+        if (OperationType::ITEM === $operationType) {
+            $pathOperation = $this->addItemOperationParameters($v3, $pathOperation);
+        }
 
         $responseDefinitionKey = false;
         $outputMetadata = $resourceMetadata->getTypedOperationAttribute($operationType, $operationName, 'output', ['class' => $resourceClass], true);
@@ -460,12 +459,12 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
                 'description' => sprintf('The new %s resource', $resourceShortName),
             ];
         } else {
-            $pathOperation['parameters'] ?? $pathOperation['parameters'] = [[
+            $userDefinedParameters ?? $pathOperation['parameters'][] = [
                 'name' => lcfirst($resourceShortName),
                 'in' => 'body',
                 'description' => sprintf('The new %s resource', $resourceShortName),
                 'schema' => ['$ref' => sprintf('#/definitions/%s', $requestDefinitionKey)],
-            ]];
+            ];
         }
 
         return $pathOperation;
@@ -480,13 +479,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
 
         $pathOperation['summary'] ?? $pathOperation['summary'] = sprintf('Replaces the %s resource.', $resourceShortName);
 
-        $parameter = [
-            'name' => 'id',
-            'in' => 'path',
-            'required' => true,
-        ];
-        $v3 ? $parameter['schema'] = ['type' => 'string'] : $parameter['type'] = 'string';
-        $pathOperation['parameters'] ?? $pathOperation['parameters'] = [$parameter];
+        $pathOperation = $this->addItemOperationParameters($v3, $pathOperation);
 
         $responseDefinitionKey = false;
         $outputMetadata = $resourceMetadata->getTypedOperationAttribute($operationType, $operationName, 'output', ['class' => $resourceClass], true);
@@ -540,13 +533,17 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
             '404' => ['description' => 'Resource not found'],
         ];
 
+        return $this->addItemOperationParameters($v3, $pathOperation);
+    }
+
+    private function addItemOperationParameters(bool $v3, \ArrayObject $pathOperation): \ArrayObject
+    {
         $parameter = [
             'name' => 'id',
             'in' => 'path',
             'required' => true,
         ];
         $v3 ? $parameter['schema'] = ['type' => 'string'] : $parameter['type'] = 'string';
-
         $pathOperation['parameters'] ?? $pathOperation['parameters'] = [$parameter];
 
         return $pathOperation;
