@@ -74,11 +74,11 @@ final class WriteListener
                 if (null !== $this->resourceMetadataFactory) {
                     $resourceMetadata = $this->resourceMetadataFactory->create($attributes['resource_class']);
                     $outputMetadata = $resourceMetadata->getOperationAttribute($attributes, 'output', ['class' => $attributes['resource_class']], true);
-                    $hasOutput = \array_key_exists('class', $outputMetadata) && null !== $outputMetadata['class'] && $controllerResult instanceof $outputMetadata['class'];
+                    $hasOutput = \array_key_exists('class', $outputMetadata) && null !== $outputMetadata['class'] && $event->getControllerResult() instanceof $outputMetadata['class'];
                 }
 
                 if ($hasOutput) {
-                    $request->attributes->set('_api_write_item_iri', $this->iriConverter->getIriFromItem($controllerResult));
+                    $request->attributes->set('_api_write_item_iri', $this->iriConverter->getIriFromItem($event->getControllerResult()));
                 }
             break;
             case 'DELETE':
