@@ -92,7 +92,7 @@ Feature: JSON-LD DTO input and output
       "ipsum": "1"
     }
     """
-    Then the response status code should be 201
+    Then the response status code should be 204
     And the response should be empty
 
   @createSchema
@@ -187,15 +187,50 @@ Feature: JSON-LD DTO input and output
 
   @createSchema
   Scenario: Create a resource with no input
-    When I send a "POST" request to "/dummy_dto_no_inputs" with body:
+    When I send a "POST" request to "/dummy_dto_no_inputs"
+    Then the response status code should be 201
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+    And the JSON should be equal to:
     """
     {
-      "foo": "test",
-      "bar": 1
+      "@context": {
+        "@vocab": "http://example.com/docs.jsonld#",
+        "hydra": "http://www.w3.org/ns/hydra/core#",
+        "id": "OutputDto/id",
+        "baz": "OutputDto/baz",
+        "bat": "OutputDto/bat"
+      },
+      "@type": "DummyDtoNoInput",
+      "@id": "/dummy_dto_no_inputs/1",
+      "id": 1,
+      "baz": 1,
+      "bat": "test"
     }
     """
-    Then the response status code should be 201
-    And the response should be empty
+
+  Scenario: Update a resource with no input
+    When I send a "POST" request to "/dummy_dto_no_inputs/1/double_bat"
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+    And the JSON should be equal to:
+    """
+    {
+      "@context": {
+        "@vocab": "http://example.com/docs.jsonld#",
+        "hydra": "http://www.w3.org/ns/hydra/core#",
+        "id": "OutputDto/id",
+        "baz": "OutputDto/baz",
+        "bat": "OutputDto/bat"
+      },
+      "@type": "DummyDtoNoInput",
+      "@id": "/dummy_dto_no_inputs/1",
+      "id": 1,
+      "baz": 1,
+      "bat": "testtest"
+    }
+    """
 
   @!mongodb
   Scenario: Use messenger with an input where the handler gives a synchronous result
