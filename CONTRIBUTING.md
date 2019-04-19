@@ -2,7 +2,7 @@
 
 First of all, thank you for contributing, you're awesome!
 
-To have your code integrated in the API Platform project, there is some rules to follow, but don't panic, it's easy!
+To have your code integrated in the API Platform project, there are some rules to follow, but don't panic, it's easy!
 
 ## Reporting Bugs
 
@@ -10,20 +10,20 @@ If you happen to find a bug, we kindly request you to report it. However, before
 
 * Check the [project documentation available online](https://api-platform.com/docs/)
 
-Then, if it appears that it's a real bug, you may report it using Github by following these 3 points:
+Then, if it appears that it's a real bug, you may report it using GitHub by following these 3 points:
 
 * Check if the bug is not already reported!
 * A clear title to resume the issue
 * A description of the workflow needed to reproduce the bug
 
-> _NOTE:_ Don’t hesitate giving as much information as you can (OS, PHP version extensions...)
+> _NOTE:_ Don't hesitate giving as much information as you can (OS, PHP version extensions...)
 
-### Security issues
+### Security Issues
 
 If you find a security issue, send a mail to Kévin Dunglas <dunglas@gmail.com>. **Please do not report security problems
 publicly**. We will disclose details of the issue and credit you after having released a new version including a fix.
 
-## Pull requests
+## Pull Requests
 
 ### Writing a Pull Request
 
@@ -33,14 +33,14 @@ See [the dedicated documentation entry](https://api-platform.com/docs/extra/rele
 ### Matching Coding Standards
 
 The API Platform project follows [Symfony coding standards](https://symfony.com/doc/current/contributing/code/standards.html).
-But don't worry, you can fix CS issues automatically using the [PHP CS Fixer](http://cs.sensiolabs.org/) tool
+But don't worry, you can fix CS issues automatically using the [PHP CS Fixer](http://cs.sensiolabs.org/) tool:
 
-```bash
+```shell
 php-cs-fixer.phar fix
 ```
 
-And then, add fixed file to your commit before push.
-Be sure to add only **your modified files**. If another files are fixed by cs tools, just revert it before commit.
+And then, add the fixed file to your commit before pushing.
+Be sure to add only **your modified files**. If any other file is fixed by cs tools, just revert it before committing.
 
 ### Sending a Pull Request
 
@@ -52,7 +52,7 @@ When you send a PR, just make sure that:
 * You make the PR on the same branch you based your changes on. If you see commits
 that you did not make in your PR, you're doing it wrong.
 * Also don't forget to add a comment when you update a PR with a ping to [the maintainers](https://github.com/orgs/api-platform/people), so he/she will get a notification.
-* Squash your commits into one commit. (see the next chapter)
+* Squash your commits into one commit (see the next chapter).
 
 All Pull Requests must include [this header](.github/PULL_REQUEST_TEMPLATE.md).
 
@@ -62,23 +62,23 @@ On `api-platform/core` there are two kinds of tests: unit (`phpunit`) and integr
 
 Both `phpunit` and `behat` are development dependencies and should be available in the `vendor` directory.
 
-#### Phpunit and Coverage Generation
+#### PHPUnit and Coverage Generation
 
 To launch unit tests:
 
-```
+```shell
 vendor/bin/phpunit --stop-on-failure -vvv
 ```
 
 If you want coverage, you will need the `phpdbg` package and run:
 
-```
+```shell
 phpdbg -qrr vendor/bin/phpunit --coverage-html coverage -vvv --stop-on-failure
 ```
 
 Sometimes there might be an error with too many open files when generating coverage. To fix this, you can increase the `ulimit`, for example:
 
-```
+```shell
 ulimit -n 4000
 ```
 
@@ -88,15 +88,21 @@ Coverage will be available in `coverage/index.html`.
 
 The command to launch Behat tests is:
 
-```
+```shell
 ./vendor/bin/behat --suite=default --stop-on-failure -vvv
+```
+
+If you want to launch Behat tests for MongoDB, the command is:
+
+```shell
+APP_ENV=mongodb ./vendor/bin/behat --suite=mongodb --stop-on-failure -vvv
 ```
 
 ## Squash your Commits
 
-If you have 3 commits. So start with:
+If you have 3 commits, start with:
 
-```bash
+```shell
 git rebase -i HEAD~3
 ```
 
@@ -106,18 +112,18 @@ Replace all `pick` prefixes by `fixup` (or `f`) **except the first commit** of t
 
 Save and quit the editor.
 
-After that, all your commits where squashed into the first one and the commit message of the first commit.
+After that, all your commits will be squashed into the first one and the commit message will be the first one.
 
-If you would like to rename your commit message type:
+If you would like to rename your commit message, type:
 
-```bash
+```shell
 git commit --amend
 ```
 
 Now force push to update your PR:
 
-```bash
-git push --force
+```shell
+git push --force-with-lease
 ```
 
 # License and Copyright Attribution

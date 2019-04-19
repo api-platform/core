@@ -95,6 +95,7 @@ class WriteListenerTest extends TestCase
 
     /**
      * @see https://github.com/api-platform/core/issues/1799
+     * @see https://github.com/api-platform/core/issues/2692
      */
     public function testOnKernelViewWithControllerResultAndPersistWithImmutableResource()
     {
@@ -102,18 +103,17 @@ class WriteListenerTest extends TestCase
         $dummy->setName('Dummyrino');
 
         $dummy2 = new Dummy();
+        $dummy2->setId(2);
         $dummy2->setName('Dummyferoce');
 
         $dataPersisterProphecy = $this->prophesize(DataPersisterInterface::class);
-        $dataPersisterProphecy->supports($dummy, Argument::type('array'))->willReturn(true)->shouldBeCalled();
+        $dataPersisterProphecy->supports($dummy, Argument::type('array'))->willReturn(true);
+        $dataPersisterProphecy->persist($dummy, Argument::type('array'))->willReturn($dummy2);
 
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
-        $iriConverterProphecy->getIriFromItem($dummy)->willReturn('/dummy/1')->shouldBeCalled();
+        $iriConverterProphecy->getIriFromItem($dummy2)->willReturn('/dummy/2');
 
-        $dataPersisterProphecy
-            ->persist($dummy, Argument::type('array'))
-            ->willReturn($dummy2) // Persist is not mutating $dummy, but return a brand new technically unrelated object instead
-            ->shouldBeCalled();
+        $writeListener = new WriteListener($dataPersisterProphecy->reveal(), $iriConverterProphecy->reveal());
 
         $request = new Request([], [], ['_api_resource_class' => Dummy::class]);
 
@@ -128,10 +128,10 @@ class WriteListenerTest extends TestCase
             $request->setMethod($httpMethod);
             $request->attributes->set(sprintf('_api_%s_operation_name', 'POST' === $httpMethod ? 'collection' : 'item'), strtolower($httpMethod));
 
-            (new WriteListener($dataPersisterProphecy->reveal(), $iriConverterProphecy->reveal()))->onKernelView($event);
+            $writeListener->onKernelView($event);
 
             $this->assertSame($dummy2, $event->getControllerResult());
-            $this->assertEquals('/dummy/1', $request->attributes->get('_api_write_item_iri'));
+            $this->assertEquals('/dummy/2', $request->attributes->get('_api_write_item_iri'));
         }
     }
 
