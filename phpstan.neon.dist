@@ -67,6 +67,9 @@ parameters:
 		-
 			message: '#Method ApiPlatform\\Core\\Bridge\\Doctrine\\Orm\\Util\\QueryBuilderHelper::mapJoinAliases() should return array<string, array<string>\|string> but returns array<int|string, mixed>\.#'
 			path: %currentWorkingDirectory%/src/Bridge/Doctrine/Orm/Util/QueryBuilderHelper.php
+		-
+			message: "#Call to function method_exists\\(\\) with 'Symfony\\\\\\\\Component.+' and 'addRemovedBindingIds?' will always evaluate to false\\.#"
+			path: %currentWorkingDirectory%/tests/Bridge/Symfony/Bundle/DependencyInjection/ApiPlatformExtensionTest.php
 		- "#Call to method PHPUnit\\\\Framework\\\\Assert::assertSame\\(\\) with array\\('(collection_context|item_context|subresource_context)'\\) and array<Symfony\\\\Component\\\\VarDumper\\\\Cloner\\\\Data>\\|bool\\|float\\|int\\|string\\|null will always evaluate to false\\.#"
 		# https://github.com/doctrine/doctrine2/pull/7298/files
 		- '#Strict comparison using === between null and int will always evaluate to false\.#'
