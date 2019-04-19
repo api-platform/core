@@ -86,7 +86,7 @@
         <service id="api_platform.doctrine_mongodb.odm.exists_filter" class="ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Filter\ExistsFilter" public="false" abstract="true">
             <argument type="service" id="doctrine_mongodb" />
             <argument type="service" id="logger" on-invalid="ignore" />
-            <argument>%api_platform.collection.exists_parameter_name%</argument>
+            <argument key="$existsParameterName">%api_platform.collection.exists_parameter_name%</argument>
         </service>
         <service id="ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Filter\ExistsFilter" alias="api_platform.doctrine_mongodb.odm.exists_filter" />
 
