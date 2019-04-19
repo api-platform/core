@@ -3,8 +3,8 @@
     "id": "116b83f8-6c32-48d8-8e28-c5c247532d3f",
     "gender": "male",
     "age": 31,
-    "first_name": "Kilian",
-    "last_name": "Jornet",
+    "firstName": "Kilian",
+    "lastName": "Jornet",
     "tweets": [
       {
         "id": "f36a0026-0635-4865-86a6-5adb21d94d64",
@@ -27,8 +27,8 @@
     "id": "8a8c5855-83fb-48a8-8fc9-f5c59151b2cd",
     "gender": "male",
     "age": 32,
-    "first_name": "Francois",
-    "last_name": "D'Haene",
+    "firstName": "Francois",
+    "lastName": "D'Haene",
     "tweets": [
       {
         "id": "5bc245d7-df50-4e2d-b26b-823e73372183",
@@ -46,8 +46,8 @@
     "id": "f18eb7ab-6985-4e05-afd4-13a638c929d4",
     "gender": "male",
     "age": 30,
-    "first_name": "Xavier",
-    "last_name": "Thevenard",
+    "firstName": "Xavier",
+    "lastName": "Thevenard",
     "tweets": [
       {
         "id": "86c41446-31d6-48a4-96e7-73e84ea283d3",
@@ -60,8 +60,8 @@
     "id": "c81d5151-0d28-4b06-baeb-150bd2b2bbf8",
     "gender": "male",
     "age": 35,
-    "first_name": "Anton",
-    "last_name": "Krupicka",
+    "firstName": "Anton",
+    "lastName": "Krupicka",
     "tweets": [
       {
         "id": "ce73f15a-8c96-46fe-8999-392460feb61b",
@@ -79,8 +79,8 @@
     "id": "15fce6f1-18fd-4ef6-acab-7e6a3333ec7f",
     "gender": "male",
     "age": 28,
-    "first_name": "Jim",
-    "last_name": "Walmsley",
+    "firstName": "Jim",
+    "lastName": "Walmsley",
     "tweets": [
       {
         "id": "0cfe3d33-6116-416b-8c50-3b8319331998",
@@ -93,8 +93,8 @@
     "id": "fbf60054-004f-4d21-a178-cb364d1ef875",
     "gender": "male",
     "age": 30,
-    "first_name": "Zach",
-    "last_name": "Miller",
+    "firstName": "Zach",
+    "lastName": "Miller",
     "tweets": [
       {
         "id": "1c9e0545-1b37-4a9a-83e0-30400d0b354e",
@@ -117,8 +117,8 @@
     "id": "fa7d4578-6692-47ec-9346-a8ab25ca613c",
     "gender": "female",
     "age": 42,
-    "first_name": "Caroline",
-    "last_name": "Chaverot",
+    "firstName": "Caroline",
+    "lastName": "Chaverot",
     "tweets": [
       {
         "id": "6d82a76c-8ba2-4e78-9ab3-6a456e4470c3",
@@ -136,8 +136,8 @@
     "id": "89d4ae3d-73bc-4382-b01c-adf038f893c2",
     "gender": "female",
     "age": 42,
-    "first_name": "Nuria",
-    "last_name": "Picas",
+    "firstName": "Nuria",
+    "lastName": "Picas",
     "tweets": [
       {
         "id": "dcaef1db-225d-442b-960e-5de6984a44be",
@@ -155,8 +155,8 @@
     "id": "cf875c95-41ab-48df-af66-38c74db18f72",
     "gender": "female",
     "age": 32,
-    "first_name": "Emelie",
-    "last_name": "Forsberg",
+    "firstName": "Emelie",
+    "lastName": "Forsberg",
     "tweets": [
       {
         "id": "6947ce52-c85d-4786-a587-3966a936842b",
@@ -174,8 +174,8 @@
     "id": "6a457188-d1ba-45e3-8509-81e5c66a5297",
     "gender": "female",
     "age": 37,
-    "first_name": "Anna",
-    "last_name": "Frost",
+    "firstName": "Anna",
+    "lastName": "Frost",
     "tweets": [
       {
         "id": "9de3308c-6f82-4a57-a33c-4e3cd5d5a3f6",
@@ -193,16 +193,16 @@
     "id": "df315796-aee2-437c-bb16-9f9de538e5ee",
     "gender": "female",
     "age": 34,
-    "first_name": "Rory",
-    "last_name": "Bosio",
+    "firstName": "Rory",
+    "lastName": "Bosio",
     "tweets": []
   },
   {
     "id": "ff0e82ee-e8c9-40ec-82f3-122ef148d533",
     "gender": "female",
     "age": 29,
-    "first_name": "Ruth",
-    "last_name": "Croft",
+    "firstName": "Ruth",
+    "lastName": "Croft",
     "tweets": [
       {
         "id": "3a1d02fa-2347-41ff-80ef-ed9b9c0efea9",
