@@ -126,11 +126,12 @@ class AddHeadersListenerTest extends TestCase
         $factory = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $factory->create(Dummy::class)->willReturn(new ResourceMetadata())->shouldBeCalled();
 
-        $listener = new AddHeadersListener(true, 100, 200, [], true, $factory->reveal());
+        $listener = new AddHeadersListener(true, 100, 200, ['Accept', 'Accept-Encoding'], true, $factory->reveal());
         $listener->onKernelResponse($event->reveal());
 
         $this->assertSame('"etag"', $response->getEtag());
         $this->assertSame('max-age=300, public, s-maxage=400', $response->headers->get('Cache-Control'));
+        $this->assertSame(['Accept', 'Cookie', 'Accept-Encoding'], $response->getVary());
     }
 
     public function testSetHeadersFromResourceMetadata()
@@ -142,7 +143,7 @@ class AddHeadersListenerTest extends TestCase
         $event->getRequest()->willReturn($request)->shouldBeCalled();
         $event->getResponse()->willReturn($response)->shouldBeCalled();
 
-        $metadata = new ResourceMetadata(null, null, null, null, null, ['cache_headers' => ['max_age' => 123, 'shared_max_age' => 456]]);
+        $metadata = new ResourceMetadata(null, null, null, null, null, ['cache_headers' => ['max_age' => 123, 'shared_max_age' => 456, 'vary' => ['Meta-1', 'Meta-2']]]);
         $factory = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $factory->create(Dummy::class)->willReturn($metadata)->shouldBeCalled();
 
@@ -150,5 +151,6 @@ class AddHeadersListenerTest extends TestCase
         $listener->onKernelResponse($event->reveal());
 
         $this->assertSame('max-age=123, public, s-maxage=456', $response->headers->get('Cache-Control'));
+        $this->assertSame(['Accept', 'Cookie', 'Meta-1', 'Meta-2'], $response->getVary());
     }
 }

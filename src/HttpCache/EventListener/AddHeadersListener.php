@@ -70,8 +70,9 @@ final class AddHeadersListener
             $response->setMaxAge($maxAge);
         }
 
-        if (null !== $this->vary) {
-            $response->setVary(array_diff($this->vary, $response->getVary()), false);
+        $defaultVary = $resourceCacheHeaders['vary'] ?? $this->vary;
+        if (null !== $defaultVary) {
+            $response->setVary(array_diff($defaultVary, $response->getVary()), false);
         }
 
         if (null !== ($sharedMaxAge = $resourceCacheHeaders['shared_max_age'] ?? $this->sharedMaxAge) && !$response->headers->hasCacheControlDirective('s-maxage')) {
