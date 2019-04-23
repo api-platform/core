@@ -142,12 +142,12 @@ abstract class AbstractFilter implements FilterInterface
         return $request->query->all();
     }
 
-    protected function denormalizePropertyName(string $property): string
+    protected function denormalizePropertyName($property)
     {
         return null !== $this->nameConverter ? $this->nameConverter->denormalize($property) : $property;
     }
 
-    protected function normalizePropertyName(string $property): string
+    protected function normalizePropertyName($property)
     {
         return null !== $this->nameConverter ? $this->nameConverter->normalize($property) : $property;
     }

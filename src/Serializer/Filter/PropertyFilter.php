@@ -157,18 +157,13 @@ final class PropertyFilter implements FilterInterface
 
         $result = [];
         foreach ($properties as $key => $value) {
-            if (is_numeric($key)) {
-                $result[] = $this->denormalizePropertyName($value);
-                continue;
-            }
-
-            $result[$this->denormalizePropertyName($key)] = \is_array($value) ? $this->denormalizeProperties($value) : $value;
+            $result[$this->denormalizePropertyName($key)] = \is_array($value) ? $this->denormalizeProperties($value) : $this->denormalizePropertyName($value);
         }
 
         return $result;
     }
 
-    private function denormalizePropertyName(string $property): string
+    private function denormalizePropertyName($property)
     {
         return null !== $this->nameConverter ? $this->nameConverter->denormalize($property) : $property;
     }

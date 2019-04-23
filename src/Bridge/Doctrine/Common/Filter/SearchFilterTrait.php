@@ -112,7 +112,7 @@ trait SearchFilterTrait
 
     abstract protected function getPropertyAccessor(): PropertyAccessorInterface;
 
-    abstract protected function normalizePropertyName(string $property): string;
+    abstract protected function normalizePropertyName($property);
 
     /**
      * Gets the ID from an IRI or a raw ID.
