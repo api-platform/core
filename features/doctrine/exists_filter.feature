@@ -70,46 +70,6 @@ Feature: Exists filter on collections
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
-    And the JSON should be equal to:
-    """
-    {
-        "@context": "/contexts/ConvertedString",
-        "@id": "/converted_strings",
-        "@type": "hydra:Collection",
-        "hydra:member": [
-            {
-                "@id": "/converted_strings/1",
-                "@type": "ConvertedString",
-                "name_converted": "name#1",
-                "id": 1
-            },
-            {
-                "@id": "/converted_strings/3",
-                "@type": "ConvertedString",
-                "name_converted": "name#3",
-                "id": 3
-            }
-        ],
-        "hydra:totalItems": 2,
-        "hydra:view": {
-            "@id": "/converted_strings?exists%5Bname_converted%5D=true",
-            "@type": "hydra:PartialCollectionView"
-        },
-        "hydra:search": {
-            "@type": "hydra:IriTemplate",
-            "hydra:template": "/converted_strings{?exists[name_converted]}",
-            "hydra:variableRepresentation": "BasicRepresentation",
-            "hydra:mapping": [
-                {
-                    "@type": "IriTemplateMapping",
-                    "variable": "exists[name_converted]",
-                    "property": "name_converted",
-                    "required": false
-                }
-            ]
-        }
-    }
-    """
     And the JSON should be valid according to this schema:
     """
     {

@@ -1116,64 +1116,6 @@ Feature: Date filter on collections
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
-    And the JSON should be equal to:
-    """
-    {
-        "@context": "/contexts/ConvertedDate",
-        "@id": "/converted_dates",
-        "@type": "hydra:Collection",
-        "hydra:member": [
-            {
-                "@id": "/converted_dates/29",
-                "@type": "ConvertedDate",
-                "name_converted": "2015-04-29T00:00:00+00:00",
-                "id": 29
-            },
-            {
-                "@id": "/converted_dates/30",
-                "@type": "ConvertedDate",
-                "name_converted": "2015-04-30T00:00:00+00:00",
-                "id": 30
-            }
-        ],
-        "hydra:totalItems": 2,
-        "hydra:view": {
-            "@id": "/converted_dates?name_converted%5Bstrictly_after%5D=2015-04-28",
-            "@type": "hydra:PartialCollectionView"
-        },
-        "hydra:search": {
-            "@type": "hydra:IriTemplate",
-            "hydra:template": "/converted_dates{?name_converted[before],name_converted[strictly_before],name_converted[after],name_converted[strictly_after]}",
-            "hydra:variableRepresentation": "BasicRepresentation",
-            "hydra:mapping": [
-                {
-                    "@type": "IriTemplateMapping",
-                    "variable": "name_converted[before]",
-                    "property": "name_converted",
-                    "required": false
-                },
-                {
-                    "@type": "IriTemplateMapping",
-                    "variable": "name_converted[strictly_before]",
-                    "property": "name_converted",
-                    "required": false
-                },
-                {
-                    "@type": "IriTemplateMapping",
-                    "variable": "name_converted[after]",
-                    "property": "name_converted",
-                    "required": false
-                },
-                {
-                    "@type": "IriTemplateMapping",
-                    "variable": "name_converted[strictly_after]",
-                    "property": "name_converted",
-                    "required": false
-                }
-            ]
-        }
-    }
-    """
     And the JSON should be valid according to this schema:
     """
     {

@@ -456,46 +456,6 @@ Feature: Boolean filter on collections
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
-    And the JSON should be equal to:
-    """
-    {
-        "@context": "/contexts/ConvertedBoolean",
-        "@id": "/converted_booleans",
-        "@type": "hydra:Collection",
-        "hydra:member": [
-            {
-                "@id": "/converted_booleans/2",
-                "@type": "ConvertedBoolean",
-                "name_converted": false,
-                "id": 2
-            },
-            {
-                "@id": "/converted_booleans/4",
-                "@type": "ConvertedBoolean",
-                "name_converted": false,
-                "id": 4
-            }
-        ],
-        "hydra:totalItems": 2,
-        "hydra:view": {
-            "@id": "/converted_booleans?name_converted=false",
-            "@type": "hydra:PartialCollectionView"
-        },
-        "hydra:search": {
-            "@type": "hydra:IriTemplate",
-            "hydra:template": "/converted_booleans{?name_converted}",
-            "hydra:variableRepresentation": "BasicRepresentation",
-            "hydra:mapping": [
-                {
-                    "@type": "IriTemplateMapping",
-                    "variable": "name_converted",
-                    "property": "name_converted",
-                    "required": false
-                }
-            ]
-        }
-    }
-    """
     And the JSON should be valid according to this schema:
     """
     {
