@@ -11,10 +11,10 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\MessengerHandler;
+namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\MessengerHandler\Document;
 
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\MessengerWithInput;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Dto\MessengerInput;
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\MessengerWithInput;
 use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
 
 class MessengerWithInputHandler implements MessageHandlerInterface

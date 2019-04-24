@@ -39,7 +39,7 @@ final class ExistsFilter extends AbstractFilter implements ExistsFilterInterface
 {
     use ExistsFilterTrait;
 
-    public function __construct(ManagerRegistry $managerRegistry, LoggerInterface $logger = null, string $existsParameterName = self::QUERY_PARAMETER_KEY, array $properties = null)
+    public function __construct(ManagerRegistry $managerRegistry, LoggerInterface $logger = null, array $properties = null, string $existsParameterName = self::QUERY_PARAMETER_KEY)
     {
         parent::__construct($managerRegistry, $logger, $properties);
 

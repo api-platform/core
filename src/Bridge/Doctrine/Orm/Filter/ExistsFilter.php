@@ -17,7 +17,6 @@ use ApiPlatform\Core\Bridge\Doctrine\Common\Filter\ExistsFilterInterface;
 use ApiPlatform\Core\Bridge\Doctrine\Common\Filter\ExistsFilterTrait;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryBuilderHelper;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGeneratorInterface;
-use ApiPlatform\Core\Exception\InvalidArgumentException;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\Query\Expr\Join;
@@ -42,35 +41,8 @@ class ExistsFilter extends AbstractContextAwareFilter implements ExistsFilterInt
 {
     use ExistsFilterTrait;
 
-    /**
-     * @param RequestStack|null $requestStack No prefix to prevent autowiring of this deprecated property
-     * @param mixed|null        $properties
-     */
-    public function __construct(ManagerRegistry $managerRegistry, $requestStack = null, LoggerInterface $logger = null, /* string $existsParameterName = self::QUERY_PARAMETER_KEY, array*/ $properties = null)
+    public function __construct(ManagerRegistry $managerRegistry, ?RequestStack $requestStack = null, LoggerInterface $logger = null, array $properties = null, string $existsParameterName = self::QUERY_PARAMETER_KEY)
     {
-        $existsParameterName = self::QUERY_PARAMETER_KEY;
-
-        if (($funcNumArgs = \func_num_args()) > 3) {
-            $fourthArgument = func_get_arg(3);
-            if (4 <= $funcNumArgs && (null === $fourthArgument || \is_array($fourthArgument))) {
-                @trigger_error(sprintf('Passing the "$properties" argument as 4th argument of "%s" is deprecated since API Platform 2.5 and will not be possible anymore in API Platform 3. Pass the new "$existsParameterName" argument as 4th argument and the old "$properties" argument as 5th argument instead.', __CLASS__), E_USER_DEPRECATED);
-                $properties = $fourthArgument;
-            } elseif (\is_string($fourthArgument)) {
-                $existsParameterName = $fourthArgument;
-            } else {
-                throw new InvalidArgumentException(sprintf('The "$existsParameterName" argument of "%s" is expected to be a string.', __CLASS__));
-            }
-        }
-
-        if ($funcNumArgs > 4) {
-            $fifthArgument = func_get_arg(4);
-            if (null === $fifthArgument || \is_array($fifthArgument)) {
-                $properties = $fifthArgument;
-            } else {
-                throw new InvalidArgumentException(sprintf('The "$properties" argument of "%s" is expected to be an array or null.', __CLASS__));
-            }
-        }
-
         parent::__construct($managerRegistry, $requestStack, $logger, $properties);
 
         $this->existsParameterName = $existsParameterName;

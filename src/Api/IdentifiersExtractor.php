@@ -42,7 +42,7 @@ final class IdentifiersExtractor implements IdentifiersExtractorInterface
         $this->resourceClassResolver = $resourceClassResolver;
 
         if (null === $this->resourceClassResolver) {
-            @trigger_error(sprintf('Not injecting %s in the CachedIdentifiersExtractor might introduce cache issues with object identifiers.', ResourceClassResolverInterface::class), E_USER_DEPRECATED);
+            @trigger_error(sprintf('Not injecting %s in the IdentifiersExtractor might introduce cache issues with object identifiers.', ResourceClassResolverInterface::class), E_USER_DEPRECATED);
         }
     }
 

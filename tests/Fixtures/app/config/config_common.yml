@@ -134,6 +134,12 @@ services:
         arguments: ['@doctrine']
         tags: ['api_platform.filter']
 
+    ApiPlatform\Core\Tests\Fixtures\TestBundle\Controller\DummyDtoNoInput\CreateItemAction:
+        tags: ['controller.service_arguments']
+
+    ApiPlatform\Core\Tests\Fixtures\TestBundle\Controller\DummyDtoNoInput\DoubleBatAction:
+        tags: ['controller.service_arguments']
+
     app.config_dummy_resource.action:
         class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\Action\ConfigCustom'
         arguments: ['@api_platform.item_data_provider']
@@ -227,6 +233,12 @@ services:
         tags:
             -  { name: 'api_platform.data_transformer' }
 
+    app.data_transformer.dummy_dto_no_input_to_output_dto:
+        class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\DataTransformer\DummyDtoNoInputToOutputDtoDataTransformer'
+        public: false
+        tags:
+            -  { name: 'api_platform.data_transformer' }
+
     app.data_transformer.recover_password_input:
         class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\DataTransformer\RecoverPasswordInputDataTransformer'
         public: false
@@ -238,12 +250,6 @@ services:
         public: false
         tags:
             -  { name: 'api_platform.data_transformer' }
-
-    app.messenger_handler.messenger_with_inputs:
-        class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\MessengerHandler\MessengerWithInputHandler'
-        public: false
-        tags:
-            -  { name: 'messenger.message_handler' }
 
     app.messenger_handler.messenger_with_response:
         class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\MessengerHandler\MessengerWithResponseHandler'

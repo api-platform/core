@@ -95,10 +95,10 @@ class ExistsFilterTest extends DoctrineOrmFilterTestCase
     public function provideApplyTestData(): array
     {
         $existsFilterFactory = function (ManagerRegistry $managerRegistry, array $properties = null, RequestStack $requestStack = null): ExistsFilter {
-            return new ExistsFilter($managerRegistry, $requestStack, null, 'exists', $properties);
+            return new ExistsFilter($managerRegistry, $requestStack, null, $properties, 'exists');
         };
         $customExistsFilterFactory = function (ManagerRegistry $managerRegistry, array $properties = null, RequestStack $requestStack = null): ExistsFilter {
-            return new ExistsFilter($managerRegistry, $requestStack, null, 'customExists', $properties);
+            return new ExistsFilter($managerRegistry, $requestStack, null, $properties, 'customExists');
         };
 
         return array_merge_recursive(
@@ -245,7 +245,7 @@ class ExistsFilterTest extends DoctrineOrmFilterTestCase
             sprintf('SELECT o FROM %s o WHERE o.description IS NOT NULL', Dummy::class),
             null,
             function (ManagerRegistry $managerRegistry, array $properties = null, RequestStack $requestStack = null): ExistsFilter {
-                return new ExistsFilter($managerRegistry, $requestStack, null, 'exists', $properties);
+                return new ExistsFilter($managerRegistry, $requestStack, null, $properties, 'exists');
             },
         ];
 
@@ -273,7 +273,7 @@ class ExistsFilterTest extends DoctrineOrmFilterTestCase
             sprintf('SELECT o FROM %s o WHERE o.description IS NOT NULL', Dummy::class),
             null,
             function (ManagerRegistry $managerRegistry, array $properties = null, RequestStack $requestStack = null): ExistsFilter {
-                return new ExistsFilter($managerRegistry, $requestStack, null, 'exists', $properties);
+                return new ExistsFilter($managerRegistry, $requestStack, null, $properties, 'exists');
             },
         ];
 
@@ -282,6 +282,6 @@ class ExistsFilterTest extends DoctrineOrmFilterTestCase
 
     protected function buildFilter(?array $properties = null)
     {
-        return new $this->filterClass($this->managerRegistry, null, null, 'exists', $properties);
+        return new $this->filterClass($this->managerRegistry, null, null, $properties, 'exists');
     }
 }
