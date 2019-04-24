@@ -1,18 +1,29 @@
 <?php
 
+/*
+ * This file is part of the API Platform project.
+ *
+ * (c) Kévin Dunglas <dunglas@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+declare(strict_types=1);
+
 namespace ApiPlatform\Core\Tests\Swagger\SchemaFormatter;
 
 use ApiPlatform\Core\Exception\FormatterNotFoundException;
 use ApiPlatform\Core\Swagger\SchemaFormatter\JsonApiSchemaFormatter;
 use ApiPlatform\Core\Swagger\SchemaFormatter\JsonSchemaFormatter;
-use ApiPlatform\Core\Swagger\SchemaFormatter\SchemaFormatterFactory;
+use ApiPlatform\Core\Swagger\SchemaFormatter\SchemaFormatterProvider;
 use PHPUnit\Framework\TestCase;
 
-class SchemaFormatterFactoryTest extends TestCase
+class SchemaFormatterProviderTest extends TestCase
 {
     public function testGetFormatter()
     {
-        $schemaFormatterFactory = new SchemaFormatterFactory([
+        $schemaFormatterFactory = new SchemaFormatterProvider([
             new JsonApiSchemaFormatter(),
             new JsonSchemaFormatter(),
         ]);
@@ -22,7 +33,7 @@ class SchemaFormatterFactoryTest extends TestCase
 
     public function testGetFormatterException()
     {
-        $schemaFormatterFactory = new SchemaFormatterFactory([
+        $schemaFormatterFactory = new SchemaFormatterProvider([
             new JsonApiSchemaFormatter(),
             new JsonSchemaFormatter(),
         ]);
@@ -33,7 +44,7 @@ class SchemaFormatterFactoryTest extends TestCase
 
     public function testGetFormatterExceptionNoFormatters()
     {
-        $schemaFormatterFactory = new SchemaFormatterFactory([]);
+        $schemaFormatterFactory = new SchemaFormatterProvider([]);
 
         $this->expectException(FormatterNotFoundException::class);
         $schemaFormatterFactory->getFormatter('application/json-test');

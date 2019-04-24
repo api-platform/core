@@ -17,9 +17,9 @@ use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 
 interface SchemaFormatterInterface
 {
-    public function supports(string $mimeType): bool ;
+    public function supports(string $mimeType): bool;
 
-    public function buildBaseSchemaFormat(): array ;
+    public function buildBaseSchemaFormat(): array;
 
     public function setProperty(\ArrayObject $definitionSchema, $normalizedPropertyName, \ArrayObject $property, PropertyMetadata $propertyMetadata): void;
 }

@@ -177,7 +177,7 @@ final class SwaggerContext implements Context
     {
         $nodes = 2 === $specVersion ? $this->getLastJsonResponse()->{'definitions'} : $this->getLastJsonResponse()->{'components'}->{'schemas'};
 
-        if($specVersion === 3){
+        if (3 === $specVersion) {
             foreach ($nodes as $mimeTypes) {
                 foreach ($mimeTypes as $classTitle => $classData) {
                     if ($classTitle === $className) {

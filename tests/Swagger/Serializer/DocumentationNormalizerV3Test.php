@@ -36,7 +36,7 @@ use ApiPlatform\Core\PathResolver\OperationPathResolver;
 use ApiPlatform\Core\PathResolver\OperationPathResolverInterface;
 use ApiPlatform\Core\Swagger\SchemaFormatter\JsonApiSchemaFormatter;
 use ApiPlatform\Core\Swagger\SchemaFormatter\JsonSchemaFormatter;
-use ApiPlatform\Core\Swagger\SchemaFormatter\SchemaFormatterFactory;
+use ApiPlatform\Core\Swagger\SchemaFormatter\SchemaFormatterProvider;
 use ApiPlatform\Core\Swagger\Serializer\DocumentationNormalizer;
 use ApiPlatform\Core\Tests\Fixtures\DummyFilter;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Answer;
@@ -88,7 +88,7 @@ class DocumentationNormalizerV3Test extends TestCase
         $operationMethodResolverProphecy->getCollectionOperationMethod(Dummy::class, 'custom2')->shouldBeCalled()->willReturn('POST');
 
         $operationPathResolver = new CustomOperationPathResolver(new OperationPathResolver(new UnderscorePathSegmentNameGenerator()));
-        $schemaFormatterFactory = new SchemaFormatterFactory([
+        $schemaFormatterFactory = new SchemaFormatterProvider([
             'application/json' => new JsonSchemaFormatter(),
         ]);
 
@@ -390,7 +390,7 @@ class DocumentationNormalizerV3Test extends TestCase
 
         $operationPathResolver = new CustomOperationPathResolver(new OperationPathResolver(new UnderscorePathSegmentNameGenerator()));
 
-        $schemaFormatterFactory = new SchemaFormatterFactory([
+        $schemaFormatterFactory = new SchemaFormatterProvider([
             'application/json' => new JsonSchemaFormatter(),
         ]);
 
@@ -529,7 +529,7 @@ class DocumentationNormalizerV3Test extends TestCase
             ],
         ];
 
-        $schemaFormatterFactory = new SchemaFormatterFactory([
+        $schemaFormatterFactory = new SchemaFormatterProvider([
             'application/json' => new JsonSchemaFormatter(),
         ]);
 
@@ -685,7 +685,7 @@ class DocumentationNormalizerV3Test extends TestCase
 
         $operationPathResolver = new CustomOperationPathResolver(new OperationPathResolver(new UnderscorePathSegmentNameGenerator()));
 
-        $schemaFormatterFactory = new SchemaFormatterFactory([
+        $schemaFormatterFactory = new SchemaFormatterProvider([
             'application/json' => new JsonSchemaFormatter(),
         ]);
 
@@ -909,7 +909,7 @@ class DocumentationNormalizerV3Test extends TestCase
 
         $operationPathResolver = new CustomOperationPathResolver(new OperationPathResolver(new UnderscorePathSegmentNameGenerator()));
 
-        $schemaFormatterFactory = new SchemaFormatterFactory([
+        $schemaFormatterFactory = new SchemaFormatterProvider([
             'application/json' => new JsonSchemaFormatter(),
         ]);
 
@@ -1046,7 +1046,7 @@ class DocumentationNormalizerV3Test extends TestCase
 
         $operationPathResolver = new CustomOperationPathResolver(new OperationPathResolver(new UnderscorePathSegmentNameGenerator()));
 
-        $schemaFormatterFactory = new SchemaFormatterFactory([
+        $schemaFormatterFactory = new SchemaFormatterProvider([
             'application/json' => new JsonSchemaFormatter(),
         ]);
 
@@ -1282,7 +1282,7 @@ class DocumentationNormalizerV3Test extends TestCase
 
         $operationPathResolver = new CustomOperationPathResolver(new OperationPathResolver(new UnderscorePathSegmentNameGenerator()));
 
-        $schemaFormatterFactory = new SchemaFormatterFactory([
+        $schemaFormatterFactory = new SchemaFormatterProvider([
             'application/json' => new JsonSchemaFormatter(),
         ]);
 
@@ -1822,7 +1822,7 @@ class DocumentationNormalizerV3Test extends TestCase
 
         $operationPathResolver = new CustomOperationPathResolver(new OperationPathResolver(new UnderscorePathSegmentNameGenerator()));
 
-        $schemaFormatterFactory = new SchemaFormatterFactory([
+        $schemaFormatterFactory = new SchemaFormatterProvider([
             'application/json' => new JsonSchemaFormatter(),
             'application/vnd.api+json' => new JsonApiSchemaFormatter(),
         ]);
@@ -2046,14 +2046,14 @@ class DocumentationNormalizerV3Test extends TestCase
                             'description' => 'This is a dummy.',
                             'externalDocs' => ['url' => 'http://schema.example.com/Dummy'],
                             'properties' => [
-                                "data" => [
+                                'data' => [
                                     'type' => 'object',
                                     'properties' => [
                                         'type' => [
-                                            'type' => 'string'
+                                            'type' => 'string',
                                         ],
                                         'id' => [
-                                            'type' => 'integer'
+                                            'type' => 'integer',
                                         ],
                                         'attributes' => [
                                             'type' => 'object',
@@ -2062,10 +2062,10 @@ class DocumentationNormalizerV3Test extends TestCase
                                                     'type' => 'string',
                                                     'description' => 'This is a name.',
                                                 ]),
-                                            ]
-                                        ]
-                                    ]
-                                ]
+                                            ],
+                                        ],
+                                    ],
+                                ],
                             ],
                         ]),
                         $ref => new \ArrayObject([
@@ -2077,10 +2077,10 @@ class DocumentationNormalizerV3Test extends TestCase
                                     'type' => 'object',
                                     'properties' => [
                                         'type' => [
-                                            'type' => 'string'
+                                            'type' => 'string',
                                         ],
                                         'id' => [
-                                            'type' => 'integer'
+                                            'type' => 'integer',
                                         ],
                                         'attributes' => [
                                             'type' => 'object',
@@ -2089,7 +2089,7 @@ class DocumentationNormalizerV3Test extends TestCase
                                                     'type' => 'string',
                                                     'description' => 'This is a name.',
                                                 ]),
-                                            ]
+                                            ],
                                         ],
                                         'relationships' => [
                                             'type' => 'object',
@@ -2105,8 +2105,8 @@ class DocumentationNormalizerV3Test extends TestCase
                                                                 ],
                                                                 'related' => [
                                                                     'type' => 'string',
-                                                                ]
-                                                            ]
+                                                                ],
+                                                            ],
                                                         ],
                                                         'data' => [
                                                             'type' => 'object',
@@ -2116,15 +2116,15 @@ class DocumentationNormalizerV3Test extends TestCase
                                                                 ],
                                                                 'id' => [
                                                                     'type' => 'string',
-                                                                ]
-                                                            ]
-                                                        ]
-                                                    ]
+                                                                ],
+                                                            ],
+                                                        ],
+                                                    ],
                                                 ],
-                                            ]
-                                        ]
-                                    ]
-                                ]
+                                            ],
+                                        ],
+                                    ],
+                                ],
                             ],
                         ]),
                         $relatedDummyRef => new \ArrayObject([
@@ -2136,10 +2136,10 @@ class DocumentationNormalizerV3Test extends TestCase
                                     'type' => 'object',
                                     'properties' => [
                                         'type' => [
-                                            'type' => 'string'
+                                            'type' => 'string',
                                         ],
                                         'id' => [
-                                            'type' => 'integer'
+                                            'type' => 'integer',
                                         ],
                                         'attributes' => [
                                             'type' => 'object',
@@ -2148,10 +2148,10 @@ class DocumentationNormalizerV3Test extends TestCase
                                                     'type' => 'string',
                                                     'description' => 'This is a name.',
                                                 ]),
-                                            ]
-                                        ]
-                                    ]
-                                ]
+                                            ],
+                                        ],
+                                    ],
+                                ],
                             ],
                         ]),
                     ]),
@@ -2191,7 +2191,7 @@ class DocumentationNormalizerV3Test extends TestCase
 
         $operationPathResolver = new CustomOperationPathResolver(new OperationPathResolver(new UnderscorePathSegmentNameGenerator()));
 
-        $schemaFormatterFactory = new SchemaFormatterFactory([
+        $schemaFormatterFactory = new SchemaFormatterProvider([
             'application/json' => new JsonSchemaFormatter(),
         ]);
 
@@ -2353,7 +2353,7 @@ class DocumentationNormalizerV3Test extends TestCase
         $formatProviderProphecy->getFormatsFromOperation(Question::class, 'get', OperationType::ITEM)->willReturn(['json' => ['application/json'], 'csv' => ['text/csv']]);
         $formatProviderProphecy->getFormatsFromOperation(Answer::class, 'get', OperationType::SUBRESOURCE)->willReturn(['xml' => ['text/xml']]);
 
-        $schemaFormatterFactory = new SchemaFormatterFactory([
+        $schemaFormatterFactory = new SchemaFormatterProvider([
             'application/json' => new JsonSchemaFormatter(),
             'text/xml' => new JsonSchemaFormatter(), //@todo: use correct formatter
         ]);
@@ -2549,7 +2549,7 @@ class DocumentationNormalizerV3Test extends TestCase
 
         $operationPathResolver = new CustomOperationPathResolver(new OperationPathResolver(new UnderscorePathSegmentNameGenerator()));
 
-        $schemaFormatterFactory = new SchemaFormatterFactory([
+        $schemaFormatterFactory = new SchemaFormatterProvider([
             'application/json' => new JsonSchemaFormatter(),
         ]);
 
@@ -2669,7 +2669,7 @@ class DocumentationNormalizerV3Test extends TestCase
 
         $operationPathResolver = new CustomOperationPathResolver(new OperationPathResolver(new UnderscorePathSegmentNameGenerator()));
 
-        $schemaFormatterFactory = new SchemaFormatterFactory([
+        $schemaFormatterFactory = new SchemaFormatterProvider([
             'application/json' => new JsonSchemaFormatter(),
         ]);
 
@@ -2809,7 +2809,7 @@ class DocumentationNormalizerV3Test extends TestCase
         $formatProviderProphecy->getFormatsFromOperation(Dummy::class, 'get', OperationType::ITEM)->willReturn(['jsonapi' => ['application/vnd.api+json']]);
         $formatProviderProphecy->getFormatsFromOperation(Dummy::class, 'put', OperationType::ITEM)->willReturn(['json' => ['application/json'], 'csv' => ['text/csv']]);
 
-        $schemaFormatterFactory = new SchemaFormatterFactory([
+        $schemaFormatterFactory = new SchemaFormatterProvider([
             'application/json' => new JsonSchemaFormatter(),
             'application/vnd.api+json' => new JsonApiSchemaFormatter(),
         ]);
@@ -3014,7 +3014,7 @@ class DocumentationNormalizerV3Test extends TestCase
                                         'type' => [
                                             'type' => 'string',
                                         ],
-                                        "id" => new \ArrayObject([
+                                        'id' => new \ArrayObject([
                                             'type' => 'integer',
                                             'readOnly' => true,
                                             'description' => 'This is an id.',

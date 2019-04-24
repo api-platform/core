@@ -15,7 +15,7 @@ namespace ApiPlatform\Core\Swagger\SchemaFormatter;
 
 use ApiPlatform\Core\Exception\FormatterNotFoundException;
 
-class SchemaFormatterFactory
+class SchemaFormatterProvider
 {
     /** @var SchemaFormatterInterface[] */
     private $formatters;

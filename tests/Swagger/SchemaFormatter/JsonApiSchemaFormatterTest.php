@@ -1,5 +1,17 @@
 <?php
 
+/*
+ * This file is part of the API Platform project.
+ *
+ * (c) Kévin Dunglas <dunglas@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+declare(strict_types=1);
+
+
 namespace ApiPlatform\Core\Tests\Swagger\SchemaFormatter;
 
 use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
@@ -26,16 +38,16 @@ class JsonApiSchemaFormatterTest extends TestCase
         $this->assertEquals(
             [
                 'data' => [
-                    'type'       => 'object',
+                    'type' => 'object',
                     'properties' => [
-                        'type'       => [
+                        'type' => [
                             'type' => 'string',
                         ],
-                        'id'         => [
+                        'id' => [
                             'type' => 'integer',
                         ],
                         'attributes' => [
-                            'type'       => 'object',
+                            'type' => 'object',
                             'properties' => [],
                         ],
                     ],
@@ -62,16 +74,16 @@ class JsonApiSchemaFormatterTest extends TestCase
             new \ArrayObject([
                 'properties' => [
                     'data' => [
-                        'type'       => 'object',
+                        'type' => 'object',
                         'properties' => [
-                            'type'       => [
+                            'type' => [
                                 'type' => 'string',
                             ],
-                            'id'         => [
+                            'id' => [
                                 'type' => 'integer',
                             ],
                             'attributes' => [
-                                'type'       => 'object',
+                                'type' => 'object',
                                 'properties' => [
                                     'test' => new \ArrayObject([
                                         'test' => 'foo',

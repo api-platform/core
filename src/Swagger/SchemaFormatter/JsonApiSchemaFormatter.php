@@ -26,16 +26,16 @@ class JsonApiSchemaFormatter implements SchemaFormatterInterface
     {
         return [
             'data' => [
-                'type'       => 'object',
+                'type' => 'object',
                 'properties' => [
-                    'type'       => [
+                    'type' => [
                         'type' => 'string',
                     ],
-                    'id'         => [
+                    'id' => [
                         'type' => 'integer',
                     ],
                     'attributes' => [
-                        'type'       => 'object',
+                        'type' => 'object',
                         'properties' => [],
                     ],
                 ],
@@ -49,46 +49,46 @@ class JsonApiSchemaFormatter implements SchemaFormatterInterface
         \ArrayObject $property,
         PropertyMetadata $propertyMetadata
     ): void {
-        if ($normalizedPropertyName === 'id') {
+        if ('id' === $normalizedPropertyName) {
             $definitionSchema['properties']['data']['properties'][$normalizedPropertyName] = $property;
             $normalizedPropertyName = '_id';
         }
 
         if (null !== $propertyMetadata->getType()
-            && $propertyMetadata->getType()->getBuiltinType() === 'object'
+            && 'object' === $propertyMetadata->getType()->getBuiltinType()
             && isset($property['$ref'])
         ) {
             $data = [
-                'type'       => 'object',
+                'type' => 'object',
                 'properties' => [
                     'type' => [
                         'type' => 'string',
                     ],
-                    'id'   => [
+                    'id' => [
                         'type' => 'string',
                     ],
                 ],
             ];
-
-            if (false) {
-                $data = [
-                    'type'       => 'object',
-                    'properties' => [
-                        $data,
-                    ],
-                ];
-            }
+// @todo: Fix one to many statement.
+//            if (false) {
+//                $data = [
+//                    'type' => 'object',
+//                    'properties' => [
+//                        $data,
+//                    ],
+//                ];
+//            }
 
             $definitionSchema['properties']['data']['properties']['relationships'] = [
-                'type'       => 'object',
+                'type' => 'object',
                 'properties' => [
                     $normalizedPropertyName => [
-                        'type'       => 'object',
+                        'type' => 'object',
                         'properties' => [
                             'links' => [
-                                'type'       => 'object',
+                                'type' => 'object',
                                 'properties' => [
-                                    'self'    => [
+                                    'self' => [
                                         'type' => 'string',
                                     ],
                                     'related' => [
@@ -96,7 +96,7 @@ class JsonApiSchemaFormatter implements SchemaFormatterInterface
                                     ],
                                 ],
                             ],
-                            'data'  => $data,
+                            'data' => $data,
                         ],
                     ],
                 ],
