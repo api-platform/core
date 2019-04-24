@@ -69,7 +69,7 @@ class JsonApiSchemaFormatter implements SchemaFormatterInterface
                     ],
                 ],
             ];
-// @todo: Fix one to many statement.
+            // @todo: Fix one to many statement.
 //            if (false) {
 //                $data = [
 //                    'type' => 'object',
@@ -101,7 +101,6 @@ class JsonApiSchemaFormatter implements SchemaFormatterInterface
                     ],
                 ],
             ];
-
         } else {
             $definitionSchema['properties']['data']['properties']['attributes']['properties'][$normalizedPropertyName] = $property;
         }

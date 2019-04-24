@@ -11,7 +11,6 @@
 
 declare(strict_types=1);
 
-
 namespace ApiPlatform\Core\Tests\Swagger\SchemaFormatter;
 
 use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
