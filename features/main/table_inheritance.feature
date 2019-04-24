@@ -350,3 +350,155 @@ Feature: Table inheritance
       }
     }
     """
+
+  @createSchema
+  Scenario: Create a table inherited resource
+    When I add "Content-Type" header equal to "application/ld+json"
+    And I send a "POST" request to "/dummy_table_inheritance_children" with body:
+    """
+    {"name": "foo", "nickname": "bar"}
+    """
+    Then the response status code should be 201
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+    And the JSON should be valid according to this schema:
+    """
+    {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string",
+          "pattern": "^DummyTableInheritanceChild$"
+        },
+        "@context": {
+          "type": "string",
+          "pattern": "^/contexts/DummyTableInheritanceChild$"
+        },
+        "@id": {
+          "type": "string",
+          "pattern": "^/dummy_table_inheritance_children/1$"
+        },
+        "name": {
+          "type": "string",
+          "pattern": "^foo$",
+          "required": "true"
+        },
+        "nickname": {
+          "type": "string",
+          "pattern": "^bar$",
+          "required": "true"
+        }
+      }
+    }
+    """
+
+  @createSchema
+  @dropSchema
+  Scenario: Generate iri from parent resource
+    Given there are 3 sites with internal owner
+    When I add "Content-Type" header equal to "application/ld+json"
+    And I send a "GET" request to "/sites"
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+    And the JSON should be valid according to this schema:
+    """
+    {
+      "type": "object",
+      "properties": {
+        "hydra:member": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "@type": {
+                "type": "string",
+                "pattern": "^Site$",
+                "required": "true"
+              },
+              "@id": {
+                "type": "string",
+                "pattern": "^/sites/\\d+$",
+                "required": "true"
+              },
+              "id": {
+                "type": "integer",
+                "required": "true"
+              },
+              "title": {
+                "type": "string",
+                "required": "true"
+              },
+              "description": {
+                "type": "string",
+                "required": "true"
+              },
+              "owner": {
+                "type": "string",
+                "pattern": "^/people/\\d+$",
+                "required": "true"
+              }
+            }
+          },
+          "minItems": 3,
+          "maxItems": 3,
+          "required": "true"
+        }
+      }
+    }
+    """
+
+  @createSchema
+  Scenario: Generate iri from current resource even if parent class is a resource
+    Given there are 3 sites with external owner
+    When I add "Content-Type" header equal to "application/ld+json"
+    And I send a "GET" request to "/sites"
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+    And the JSON should be valid according to this schema:
+    """
+    {
+      "type": "object",
+      "properties": {
+        "hydra:member": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "@type": {
+                "type": "string",
+                "pattern": "^Site$",
+                "required": "true"
+              },
+              "@id": {
+                "type": "string",
+                "pattern": "^/sites/\\d+$",
+                "required": "true"
+              },
+              "id": {
+                "type": "integer",
+                "required": "true"
+              },
+              "title": {
+                "type": "string",
+                "required": "true"
+              },
+              "description": {
+                "type": "string",
+                "required": "true"
+              },
+              "owner": {
+                "type": "string",
+                "pattern": "^/external_users/\\d+$",
+                "required": "true"
+              }
+            }
+          },
+          "minItems": 3,
+          "maxItems": 3,
+          "required": "true"
+        }
+      }
+    }
+    """

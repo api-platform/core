@@ -16,6 +16,8 @@ namespace ApiPlatform\Core\Tests\Bridge\Symfony\Routing;
 use ApiPlatform\Core\Api\OperationType;
 use ApiPlatform\Core\Bridge\Symfony\Routing\RouteNameResolver;
 use ApiPlatform\Core\Bridge\Symfony\Routing\RouteNameResolverInterface;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\User;
+use FOS\UserBundle\Model\User as BaseUser;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
@@ -23,6 +25,7 @@ use Symfony\Component\Routing\RouterInterface;
 
 /**
  * @author Teoh Han Hui <teohhanhui@gmail.com>
+ * @author Vincent Chalamon <vincentchalamon@gmail.com>
  */
 class RouteNameResolverTest extends TestCase
 {
@@ -38,11 +41,11 @@ class RouteNameResolverTest extends TestCase
     public function testGetRouteNameForItemRouteWithNoMatchingRoute()
     {
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('No item route associated with the type "AppBundle\\Entity\\User".');
+        $this->expectExceptionMessage('No item route associated with the type "ApiPlatform\\Core\\Tests\\Fixtures\\TestBundle\\Entity\\User".');
 
         $routeCollection = new RouteCollection();
         $routeCollection->add('some_collection_route', new Route('/some/collection/path', [
-            '_api_resource_class' => 'AppBundle\Entity\User',
+            '_api_resource_class' => User::class,
             '_api_collection_operation_name' => 'some_collection_op',
         ]));
 
@@ -50,7 +53,7 @@ class RouteNameResolverTest extends TestCase
         $routerProphecy->getRouteCollection()->willReturn($routeCollection);
 
         $routeNameResolver = new RouteNameResolver($routerProphecy->reveal());
-        $routeNameResolver->getRouteName('AppBundle\Entity\User', OperationType::ITEM);
+        $routeNameResolver->getRouteName(User::class, OperationType::ITEM);
     }
 
     /**
@@ -61,11 +64,11 @@ class RouteNameResolverTest extends TestCase
     {
         $routeCollection = new RouteCollection();
         $routeCollection->add('some_collection_route', new Route('/some/collection/path', [
-            '_api_resource_class' => 'AppBundle\Entity\User',
+            '_api_resource_class' => User::class,
             '_api_collection_operation_name' => 'some_collection_op',
         ]));
         $routeCollection->add('some_item_route', new Route('/some/item/path/{id}', [
-            '_api_resource_class' => 'AppBundle\Entity\User',
+            '_api_resource_class' => User::class,
             '_api_item_operation_name' => 'some_item_op',
         ]));
 
@@ -73,7 +76,7 @@ class RouteNameResolverTest extends TestCase
         $routerProphecy->getRouteCollection()->willReturn($routeCollection);
 
         $routeNameResolver = new RouteNameResolver($routerProphecy->reveal());
-        $actual = $routeNameResolver->getRouteName('AppBundle\Entity\User', false);
+        $actual = $routeNameResolver->getRouteName(User::class, false);
 
         $this->assertSame('some_item_route', $actual);
     }
@@ -82,11 +85,11 @@ class RouteNameResolverTest extends TestCase
     {
         $routeCollection = new RouteCollection();
         $routeCollection->add('some_collection_route', new Route('/some/collection/path', [
-            '_api_resource_class' => 'AppBundle\Entity\User',
+            '_api_resource_class' => User::class,
             '_api_collection_operation_name' => 'some_collection_op',
         ]));
         $routeCollection->add('some_item_route', new Route('/some/item/path/{id}', [
-            '_api_resource_class' => 'AppBundle\Entity\User',
+            '_api_resource_class' => User::class,
             '_api_item_operation_name' => 'some_item_op',
         ]));
 
@@ -94,7 +97,28 @@ class RouteNameResolverTest extends TestCase
         $routerProphecy->getRouteCollection()->willReturn($routeCollection);
 
         $routeNameResolver = new RouteNameResolver($routerProphecy->reveal());
-        $actual = $routeNameResolver->getRouteName('AppBundle\Entity\User', OperationType::ITEM);
+        $actual = $routeNameResolver->getRouteName(User::class, OperationType::ITEM);
+
+        $this->assertSame('some_item_route', $actual);
+    }
+
+    public function testGetRouteNameForItemRouteFromAbstract()
+    {
+        $routeCollection = new RouteCollection();
+        $routeCollection->add('some_collection_route', new Route('/some/collection/path', [
+            '_api_resource_class' => BaseUser::class,
+            '_api_collection_operation_name' => 'some_collection_op',
+        ]));
+        $routeCollection->add('some_item_route', new Route('/some/item/path/{id}', [
+            '_api_resource_class' => BaseUser::class,
+            '_api_item_operation_name' => 'some_item_op',
+        ]));
+
+        $routerProphecy = $this->prophesize(RouterInterface::class);
+        $routerProphecy->getRouteCollection()->willReturn($routeCollection);
+
+        $routeNameResolver = new RouteNameResolver($routerProphecy->reveal());
+        $actual = $routeNameResolver->getRouteName(User::class, OperationType::ITEM);
 
         $this->assertSame('some_item_route', $actual);
     }
@@ -102,11 +126,11 @@ class RouteNameResolverTest extends TestCase
     public function testGetRouteNameForCollectionRouteWithNoMatchingRoute()
     {
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('No collection route associated with the type "AppBundle\\Entity\\User".');
+        $this->expectExceptionMessage('No collection route associated with the type "ApiPlatform\\Core\\Tests\\Fixtures\\TestBundle\\Entity\\User".');
 
         $routeCollection = new RouteCollection();
         $routeCollection->add('some_item_route', new Route('/some/item/path/{id}', [
-            '_api_resource_class' => 'AppBundle\Entity\User',
+            '_api_resource_class' => User::class,
             '_api_item_operation_name' => 'some_item_op',
         ]));
 
@@ -114,7 +138,7 @@ class RouteNameResolverTest extends TestCase
         $routerProphecy->getRouteCollection()->willReturn($routeCollection);
 
         $routeNameResolver = new RouteNameResolver($routerProphecy->reveal());
-        $routeNameResolver->getRouteName('AppBundle\Entity\User', OperationType::COLLECTION);
+        $routeNameResolver->getRouteName(User::class, OperationType::COLLECTION);
     }
 
     /**
@@ -125,11 +149,11 @@ class RouteNameResolverTest extends TestCase
     {
         $routeCollection = new RouteCollection();
         $routeCollection->add('some_item_route', new Route('/some/item/path/{id}', [
-            '_api_resource_class' => 'AppBundle\Entity\User',
+            '_api_resource_class' => User::class,
             '_api_item_operation_name' => 'some_item_op',
         ]));
         $routeCollection->add('some_collection_route', new Route('/some/collection/path', [
-            '_api_resource_class' => 'AppBundle\Entity\User',
+            '_api_resource_class' => User::class,
             '_api_collection_operation_name' => 'some_collection_op',
         ]));
 
@@ -137,7 +161,7 @@ class RouteNameResolverTest extends TestCase
         $routerProphecy->getRouteCollection()->willReturn($routeCollection);
 
         $routeNameResolver = new RouteNameResolver($routerProphecy->reveal());
-        $actual = $routeNameResolver->getRouteName('AppBundle\Entity\User', true);
+        $actual = $routeNameResolver->getRouteName(User::class, true);
 
         $this->assertSame('some_collection_route', $actual);
     }
@@ -146,11 +170,11 @@ class RouteNameResolverTest extends TestCase
     {
         $routeCollection = new RouteCollection();
         $routeCollection->add('some_item_route', new Route('/some/item/path/{id}', [
-            '_api_resource_class' => 'AppBundle\Entity\User',
+            '_api_resource_class' => User::class,
             '_api_item_operation_name' => 'some_item_op',
         ]));
         $routeCollection->add('some_collection_route', new Route('/some/collection/path', [
-            '_api_resource_class' => 'AppBundle\Entity\User',
+            '_api_resource_class' => User::class,
             '_api_collection_operation_name' => 'some_collection_op',
         ]));
 
@@ -158,7 +182,7 @@ class RouteNameResolverTest extends TestCase
         $routerProphecy->getRouteCollection()->willReturn($routeCollection);
 
         $routeNameResolver = new RouteNameResolver($routerProphecy->reveal());
-        $actual = $routeNameResolver->getRouteName('AppBundle\Entity\User', OperationType::COLLECTION);
+        $actual = $routeNameResolver->getRouteName(User::class, OperationType::COLLECTION);
 
         $this->assertSame('some_collection_route', $actual);
     }
@@ -167,17 +191,17 @@ class RouteNameResolverTest extends TestCase
     {
         $routeCollection = new RouteCollection();
         $routeCollection->add('a_some_subresource_route', new Route('/a/some/item/path/{id}', [
-            '_api_resource_class' => 'AppBundle\Entity\User',
+            '_api_resource_class' => User::class,
             '_api_subresource_operation_name' => 'some_other_item_op',
             '_api_subresource_context' => ['identifiers' => [[1, 'bar']]],
         ]));
         $routeCollection->add('b_some_subresource_route', new Route('/b/some/item/path/{id}', [
-            '_api_resource_class' => 'AppBundle\Entity\User',
+            '_api_resource_class' => User::class,
             '_api_subresource_operation_name' => 'some_item_op',
             '_api_subresource_context' => ['identifiers' => [[1, 'foo']]],
         ]));
         $routeCollection->add('some_collection_route', new Route('/some/collection/path', [
-            '_api_resource_class' => 'AppBundle\Entity\User',
+            '_api_resource_class' => User::class,
             '_api_collection_operation_name' => 'some_collection_op',
         ]));
 
@@ -185,7 +209,7 @@ class RouteNameResolverTest extends TestCase
         $routerProphecy->getRouteCollection()->willReturn($routeCollection);
 
         $routeNameResolver = new RouteNameResolver($routerProphecy->reveal());
-        $actual = $routeNameResolver->getRouteName('AppBundle\Entity\User', OperationType::SUBRESOURCE, ['subresource_resources' => ['foo' => 1]]);
+        $actual = $routeNameResolver->getRouteName(User::class, OperationType::SUBRESOURCE, ['subresource_resources' => ['foo' => 1]]);
 
         $this->assertSame('b_some_subresource_route', $actual);
     }

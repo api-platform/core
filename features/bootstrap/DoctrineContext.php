@@ -76,11 +76,13 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyProduct;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyProperty;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\EmbeddableDummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\EmbeddedDummy;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\ExternalUser;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\FileConfigDummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Foo;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\FooDummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\FourthLevel;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Greeting;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\InternalUser;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\MaxDepthDummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Node;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Order;
@@ -95,6 +97,7 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RelatedOwningDummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RelatedToDummyFriend;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RelationEmbedder;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\SecuredDummy;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Site;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\ThirdLevel;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\User;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\UuidIdentifierDummy;
@@ -160,6 +163,52 @@ final class DoctrineContext implements Context
             $dummy->setDescription($descriptions[($i - 1) % 2]);
 
             $this->manager->persist($dummy);
+        }
+
+        $this->manager->flush();
+    }
+
+    /**
+     * @Given there are :nb sites with internal owner
+     */
+    public function thereAreSitesWithInternalOwner(int $nb)
+    {
+        for ($i = 1; $i <= $nb; ++$i) {
+            $internalUser = new InternalUser();
+            $internalUser->setFirstname('Internal');
+            $internalUser->setLastname('User');
+            $internalUser->setEmail('john.doe@example.com');
+            $internalUser->setInternalId('INT');
+
+            $site = new Site();
+            $site->setTitle('title');
+            $site->setDescription('description');
+            $site->setOwner($internalUser);
+
+            $this->manager->persist($site);
+        }
+
+        $this->manager->flush();
+    }
+
+    /**
+     * @Given there are :nb sites with external owner
+     */
+    public function thereAreSitesWithExternalOwner(int $nb)
+    {
+        for ($i = 1; $i <= $nb; ++$i) {
+            $externalUser = new ExternalUser();
+            $externalUser->setFirstname('External');
+            $externalUser->setLastname('User');
+            $externalUser->setEmail('john.doe@example.com');
+            $externalUser->setExternalId('EXT');
+
+            $site = new Site();
+            $site->setTitle('title');
+            $site->setDescription('description');
+            $site->setOwner($externalUser);
+
+            $this->manager->persist($site);
         }
 
         $this->manager->flush();

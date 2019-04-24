@@ -45,12 +45,28 @@ final class RouteNameResolver implements RouteNameResolverInterface
 
         $operationType = OperationTypeDeprecationHelper::getOperationType($operationType);
 
+        // Try with strict class name
         foreach ($this->router->getRouteCollection()->all() as $routeName => $route) {
             $currentResourceClass = $route->getDefault('_api_resource_class');
             $operation = $route->getDefault(sprintf('_api_%s_operation_name', $operationType));
             $methods = $route->getMethods();
 
             if ($resourceClass === $currentResourceClass && null !== $operation && (empty($methods) || \in_array('GET', $methods, true))) {
+                if (OperationType::SUBRESOURCE === $operationType && false === $this->isSameSubresource($context, $route->getDefault('_api_subresource_context'))) {
+                    continue;
+                }
+
+                return $routeName;
+            }
+        }
+
+        // Maybe the parent class is a resource
+        foreach ($this->router->getRouteCollection()->all() as $routeName => $route) {
+            $currentResourceClass = $route->getDefault('_api_resource_class');
+            $operation = $route->getDefault(sprintf('_api_%s_operation_name', $operationType));
+            $methods = $route->getMethods();
+
+            if (null !== $currentResourceClass && is_a($resourceClass, $currentResourceClass, true) && null !== $operation && (empty($methods) || \in_array('GET', $methods, true))) {
                 if (OperationType::SUBRESOURCE === $operationType && false === $this->isSameSubresource($context, $route->getDefault('_api_subresource_context'))) {
                     continue;
                 }
