@@ -548,7 +548,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
                 'in' => 'body',
                 'description' => sprintf('The new %s resource', $resourceShortName),
                 'schema' => ['$ref' => sprintf('#/definitions/%s', $requestDefinitionKey)],
-            ];
+            ]];
         }
 
         return $pathOperation;
