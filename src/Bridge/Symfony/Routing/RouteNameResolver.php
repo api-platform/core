@@ -66,7 +66,7 @@ final class RouteNameResolver implements RouteNameResolverInterface
             $operation = $route->getDefault(sprintf('_api_%s_operation_name', $operationType));
             $methods = $route->getMethods();
 
-            if (null !== $currentResourceClass && is_a($resourceClass, $currentResourceClass, true) && null !== $operation && (empty($methods) || \in_array('GET', $methods, true))) {
+            if (null !== $operation && (empty($methods) || \in_array('GET', $methods, true)) && null !== $currentResourceClass && is_a($resourceClass, $currentResourceClass, true)) {
                 if (OperationType::SUBRESOURCE === $operationType && false === $this->isSameSubresource($context, $route->getDefault('_api_subresource_context'))) {
                     continue;
                 }

@@ -187,6 +187,27 @@ class RouteNameResolverTest extends TestCase
         $this->assertSame('some_collection_route', $actual);
     }
 
+    public function testGetRouteNameForCollectionRouteFromAbstract()
+    {
+        $routeCollection = new RouteCollection();
+        $routeCollection->add('some_item_route', new Route('/some/item/path/{id}', [
+            '_api_resource_class' => BaseUser::class,
+            '_api_item_operation_name' => 'some_item_op',
+        ]));
+        $routeCollection->add('some_collection_route', new Route('/some/collection/path', [
+            '_api_resource_class' => BaseUser::class,
+            '_api_collection_operation_name' => 'some_collection_op',
+        ]));
+
+        $routerProphecy = $this->prophesize(RouterInterface::class);
+        $routerProphecy->getRouteCollection()->willReturn($routeCollection);
+
+        $routeNameResolver = new RouteNameResolver($routerProphecy->reveal());
+        $actual = $routeNameResolver->getRouteName(User::class, OperationType::COLLECTION);
+
+        $this->assertSame('some_collection_route', $actual);
+    }
+
     public function testGetRouteNameForSubresourceRoute()
     {
         $routeCollection = new RouteCollection();
@@ -202,6 +223,33 @@ class RouteNameResolverTest extends TestCase
         ]));
         $routeCollection->add('some_collection_route', new Route('/some/collection/path', [
             '_api_resource_class' => User::class,
+            '_api_collection_operation_name' => 'some_collection_op',
+        ]));
+
+        $routerProphecy = $this->prophesize(RouterInterface::class);
+        $routerProphecy->getRouteCollection()->willReturn($routeCollection);
+
+        $routeNameResolver = new RouteNameResolver($routerProphecy->reveal());
+        $actual = $routeNameResolver->getRouteName(User::class, OperationType::SUBRESOURCE, ['subresource_resources' => ['foo' => 1]]);
+
+        $this->assertSame('b_some_subresource_route', $actual);
+    }
+
+    public function testGetRouteNameForSubresourceRouteFromAbstract()
+    {
+        $routeCollection = new RouteCollection();
+        $routeCollection->add('a_some_subresource_route', new Route('/a/some/item/path/{id}', [
+            '_api_resource_class' => BaseUser::class,
+            '_api_subresource_operation_name' => 'some_other_item_op',
+            '_api_subresource_context' => ['identifiers' => [[1, 'bar']]],
+        ]));
+        $routeCollection->add('b_some_subresource_route', new Route('/b/some/item/path/{id}', [
+            '_api_resource_class' => BaseUser::class,
+            '_api_subresource_operation_name' => 'some_item_op',
+            '_api_subresource_context' => ['identifiers' => [[1, 'foo']]],
+        ]));
+        $routeCollection->add('some_collection_route', new Route('/some/collection/path', [
+            '_api_resource_class' => BaseUser::class,
             '_api_collection_operation_name' => 'some_collection_op',
         ]));
 

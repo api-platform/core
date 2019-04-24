@@ -21,10 +21,10 @@ use Doctrine\ORM\Mapping as ORM;
  * @ORM\InheritanceType("JOINED")
  * @ApiResource(
  *     collectionOperations={
- *         "get"={"path"="/people"}
+ *         "get"={"path"="/custom_users"}
  *     },
  *     itemOperations={
- *         "get"={"path"="/people/{id}"}
+ *         "get"={"path"="/custom_users/{id}"}
  *     }
  * )
  */
