@@ -672,7 +672,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
         }
 
         if ($v3) {
-            $definitionKey = str_replace('/', '-', $mimeType).'-'.$definitionKey ;
+            $definitionKey = str_replace('/', '-', $mimeType).'-'.$definitionKey;
             if (!isset($definitions[$definitionKey])) {
                 $definitions[$definitionKey] = [];
                 $definitions[$definitionKey] = $this->getDefinitionSchema($v3,
