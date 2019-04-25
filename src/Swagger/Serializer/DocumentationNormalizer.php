@@ -676,14 +676,17 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
 
         if ($v3) {
             $escapedMimeType = str_replace('/', '-', $mimeType);
-            if (!isset($definitions[$escapedMimeType][$definitionKey])) {
-                if (isset($definitions[$escapedMimeType])) {
-                    $definitions[$escapedMimeType][$definitionKey] = [];
+            if (!isset($definitions[$escapedMimeType]['properties'][$definitionKey])) {
+                if (isset($definitions[$escapedMimeType]['properties'])) {
+                    $definitions[$escapedMimeType]['properties'][$definitionKey] = [];
                 } else {
-                    $definitions[$escapedMimeType] = new \ArrayObject([$definitionKey => []]);
+                    $definitions[$escapedMimeType] = new \ArrayObject([
+                        'type' => 'object',
+                        'properties' => new \ArrayObject([$definitionKey => []])
+                    ]);
                 }
 
-                $definitions[$escapedMimeType][$definitionKey] = $this->getDefinitionSchema($v3,
+                $definitions[$escapedMimeType]['properties'][$definitionKey] = $this->getDefinitionSchema($v3,
                     $publicClass ?? $resourceClass, $resourceMetadata, $definitions, $serializerContext, $mimeType);
             }
         } else {
