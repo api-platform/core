@@ -32,7 +32,7 @@
             <argument>%api_platform.collection.pagination.client_enabled%</argument>
             <argument>%api_platform.collection.pagination.enabled_parameter_name%</argument>
             <argument type="collection" />
-            <argument type="service" id="api_platform.schema_formatter.factory" />
+            <argument type="service" id="api_platform.schema_formatter.provider" />
             <tag name="serializer.normalizer" priority="-790" />
 
         </service>

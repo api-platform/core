@@ -12,7 +12,7 @@
             <tag name="api_platform.schema_formatter" />
         </service>
 
-        <service id="api_platform.schema_formatter.factory" class="ApiPlatform\Core\Swagger\SchemaFormatter\SchemaFormatterProvider">
+        <service id="api_platform.schema_formatter.provider" class="ApiPlatform\Core\Swagger\SchemaFormatter\SchemaFormatterProvider">
             <argument type="tagged" tag="api_platform.schema_formatter" on-invalid="ignore" />
         </service>
     </services>
