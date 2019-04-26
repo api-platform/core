@@ -1561,4 +1561,44 @@ final class DoctrineContext implements Context
         $this->manager->flush();
         $this->manager->clear();
     }
+
+    /**
+     * @Given there are :nb sites with internal owner
+     */
+    public function thereAreSitesWithInternalOwner(int $nb)
+    {
+        for ($i = 1; $i <= $nb; ++$i) {
+            $internalUser = new \ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\InternalUser();
+            $internalUser->setFirstname('Internal');
+            $internalUser->setLastname('User');
+            $internalUser->setEmail('john.doe@example.com');
+            $internalUser->setInternalId('INT');
+            $site = new \ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Site();
+            $site->setTitle('title');
+            $site->setDescription('description');
+            $site->setOwner($internalUser);
+            $this->manager->persist($site);
+        }
+        $this->manager->flush();
+    }
+
+    /**
+     * @Given there are :nb sites with external owner
+     */
+    public function thereAreSitesWithExternalOwner(int $nb)
+    {
+        for ($i = 1; $i <= $nb; ++$i) {
+            $externalUser = new \ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\ExternalUser();
+            $externalUser->setFirstname('External');
+            $externalUser->setLastname('User');
+            $externalUser->setEmail('john.doe@example.com');
+            $externalUser->setExternalId('EXT');
+            $site = new \ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Site();
+            $site->setTitle('title');
+            $site->setDescription('description');
+            $site->setOwner($externalUser);
+            $this->manager->persist($site);
+        }
+        $this->manager->flush();
+    }
 }

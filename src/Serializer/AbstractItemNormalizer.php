@@ -129,7 +129,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer implement
         // Use resolved resource class instead of given resource class to support multiple inheritance child types
         $resourceClass = $this->resourceClassResolver->getResourceClass($object, $context['resource_class'] ?? null, true);
         $context = $this->initContext($resourceClass, $context);
-        $iri = $context['iri'] ?? $this->iriConverter->getIriFromItem($object);
+        $iri = $context['iri'] ?? $this->iriConverter->getIriFromItemWithResource($object, $resourceClass);
         $context['iri'] = $iri;
         $context['api_normalize'] = true;
 
@@ -546,7 +546,8 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer implement
             $type->isCollection() &&
             ($collectionValueType = $type->getCollectionValueType()) &&
             ($className = $collectionValueType->getClassName()) &&
-            $this->resourceClassResolver->isResourceClass($className)
+            $this->resourceClassResolver->isResourceClass($className) &&
+            ($className = $this->resourceClassResolver->getResourceClass($attributeValue, $className, true))
         ) {
             return $this->normalizeCollectionOfRelations($propertyMetadata, $attributeValue, $className, $format, $this->createChildContext($context, $attribute));
         }
@@ -554,7 +555,8 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer implement
         if (
             $type &&
             ($className = $type->getClassName()) &&
-            $this->resourceClassResolver->isResourceClass($className)
+            $this->resourceClassResolver->isResourceClass($className) &&
+            ($className = $this->resourceClassResolver->getResourceClass($attributeValue, $className, true))
         ) {
             return $this->normalizeRelation($propertyMetadata, $attributeValue, $className, $format, $this->createChildContext($context, $attribute));
         }
@@ -606,7 +608,8 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer implement
             return $this->serializer->normalize($relatedObject, $format, $context);
         }
 
-        $iri = $this->iriConverter->getIriFromItem($relatedObject);
+        $iri = $this->iriConverter->getIriFromItemWithResource($relatedObject, $resourceClass);
+
         if (isset($context['resources'])) {
             $context['resources'][$iri] = $iri;
         }
