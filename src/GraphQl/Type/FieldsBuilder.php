@@ -29,6 +29,7 @@ use GraphQL\Type\Definition\WrappingType;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\Config\Definition\Exception\InvalidTypeException;
 use Symfony\Component\PropertyInfo\Type;
+use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 
 /**
  * Builds the GraphQL fields.
@@ -50,8 +51,10 @@ final class FieldsBuilder implements FieldsBuilderInterface
     private $itemMutationResolverFactory;
     private $filterLocator;
     private $pagination;
+    private $nameConverter;
+    private $nestingSeparator;
 
-    public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, ResourceMetadataFactoryInterface $resourceMetadataFactory, TypesContainerInterface $typesContainer, TypeBuilderInterface $typeBuilder, TypeConverterInterface $typeConverter, ResolverFactoryInterface $itemResolverFactory, ResolverFactoryInterface $collectionResolverFactory, ResolverFactoryInterface $itemMutationResolverFactory, ContainerInterface $filterLocator, Pagination $pagination)
+    public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, ResourceMetadataFactoryInterface $resourceMetadataFactory, TypesContainerInterface $typesContainer, TypeBuilderInterface $typeBuilder, TypeConverterInterface $typeConverter, ResolverFactoryInterface $itemResolverFactory, ResolverFactoryInterface $collectionResolverFactory, ResolverFactoryInterface $itemMutationResolverFactory, ContainerInterface $filterLocator, Pagination $pagination, ?NameConverterInterface $nameConverter, string $nestingSeparator)
     {
         $this->propertyNameCollectionFactory = $propertyNameCollectionFactory;
         $this->propertyMetadataFactory = $propertyMetadataFactory;
@@ -64,6 +67,8 @@ final class FieldsBuilder implements FieldsBuilderInterface
         $this->itemMutationResolverFactory = $itemMutationResolverFactory;
         $this->filterLocator = $filterLocator;
         $this->pagination = $pagination;
+        $this->nameConverter = $nameConverter;
+        $this->nestingSeparator = $nestingSeparator;
     }
 
     /**
@@ -190,7 +195,7 @@ final class FieldsBuilder implements FieldsBuilderInterface
                 }
 
                 if ($fieldConfiguration = $this->getResourceFieldConfiguration($property, $propertyMetadata->getDescription(), $propertyMetadata->getAttribute('deprecation_reason', ''), $propertyType, $resourceClass, $input, $queryName, $mutationName, $depth)) {
-                    $fields['id' === $property ? '_id' : $property] = $fieldConfiguration;
+                    $fields['id' === $property ? '_id' : $this->normalizePropertyName($property)] = $fieldConfiguration;
                 }
             }
         }
@@ -315,6 +320,9 @@ final class FieldsBuilder implements FieldsBuilderInterface
                     $key = substr($key, 0, -2).'_list';
                 }
 
+                /** @var string $key */
+                $key = str_replace('.', $this->nestingSeparator, $key);
+
                 parse_str($key, $parsed);
                 if (\array_key_exists($key, $parsed) && \is_array($parsed[$key])) {
                     $parsed = [$key => ''];
@@ -356,7 +364,7 @@ final class FieldsBuilder implements FieldsBuilderInterface
         foreach ($args as $key => $value) {
             if (strpos($key, '.')) {
                 // Declare relations/nested fields in a GraphQL compatible syntax.
-                $args[str_replace('.', '_', $key)] = $value;
+                $args[str_replace('.', $this->nestingSeparator, $key)] = $value;
                 unset($args[$key]);
             }
         }
@@ -416,5 +424,10 @@ final class FieldsBuilder implements FieldsBuilderInterface
         return !$graphqlType instanceof NullableType || $type->isNullable() || (null !== $mutationName && 'update' === $mutationName)
             ? $graphqlType
             : GraphQLType::nonNull($graphqlType);
+    }
+
+    private function normalizePropertyName(string $property): string
+    {
+        return null !== $this->nameConverter ? $this->nameConverter->normalize($property) : $property;
     }
 }

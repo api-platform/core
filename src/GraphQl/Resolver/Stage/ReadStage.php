@@ -40,14 +40,16 @@ final class ReadStage implements ReadStageInterface
     private $collectionDataProvider;
     private $subresourceDataProvider;
     private $serializerContextBuilder;
+    private $nestingSeparator;
 
-    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, IriConverterInterface $iriConverter, ContextAwareCollectionDataProviderInterface $collectionDataProvider, SubresourceDataProviderInterface $subresourceDataProvider, SerializerContextBuilderInterface $serializerContextBuilder)
+    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, IriConverterInterface $iriConverter, ContextAwareCollectionDataProviderInterface $collectionDataProvider, SubresourceDataProviderInterface $subresourceDataProvider, SerializerContextBuilderInterface $serializerContextBuilder, string $nestingSeparator)
     {
         $this->resourceMetadataFactory = $resourceMetadataFactory;
         $this->iriConverter = $iriConverter;
         $this->collectionDataProvider = $collectionDataProvider;
         $this->subresourceDataProvider = $subresourceDataProvider;
         $this->serializerContextBuilder = $serializerContextBuilder;
+        $this->nestingSeparator = $nestingSeparator;
     }
 
     /**
@@ -144,9 +146,9 @@ final class ReadStage implements ReadStageInterface
                 $filters[$name] = $this->getNormalizedFilters($value);
             }
 
-            if (\is_string($name) && strpos($name, '_')) {
+            if (\is_string($name) && strpos($name, $this->nestingSeparator)) {
                 // Gives a chance to relations/nested fields.
-                $filters[str_replace('_', '.', $name)] = $value;
+                $filters[str_replace($this->nestingSeparator, '.', $name)] = $value;
             }
         }
 

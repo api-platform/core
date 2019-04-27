@@ -636,3 +636,23 @@ Feature: GraphQL collection support
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/json"
     And the JSON node "data.compositeRelation.value" should be equal to "somefoobardummy"
+
+  @createSchema
+  Scenario: Retrieve a collection using name converter
+    Given there are 4 dummy objects
+    When I send the following GraphQL request:
+    """
+    {
+      dummies {
+        edges {
+          node {
+            name_converted
+          }
+        }
+      }
+    }
+    """
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/json"
+    And the JSON node "data.dummies.edges[1].node.name_converted" should be equal to "Converted 2"

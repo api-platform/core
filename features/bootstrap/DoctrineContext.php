@@ -420,6 +420,7 @@ final class DoctrineContext implements Context
             $dummy = $this->buildDummy();
             $dummy->setName('Dummy #'.$i);
             $dummy->setAlias('Alias #'.($nb - $i));
+            $dummy->nameConverted = "Converted $i";
             $dummy->setRelatedDummy($relatedDummy);
 
             $this->manager->persist($relatedDummy);

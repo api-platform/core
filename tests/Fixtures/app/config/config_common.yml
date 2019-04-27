@@ -56,7 +56,9 @@ api_platform:
         jsonproblem:                   ['application/problem+json']
         jsonld:                        ['application/ld+json']
         jsonapi:                       ['application/vnd.api+json']
-    graphql:                           true
+    graphql:
+        enabled: true
+        nesting_separator: __
     name_converter:                    'app.name_converter'
     enable_fos_user:                   true
     collection:

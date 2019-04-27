@@ -3,6 +3,7 @@
 ## 2.5.0 beta 2
 
 * GraphQL: Add support for multipart request so user can create custom file upload mutations (#3041)
+* GraphQL: Add support for name converter (#2765)
 
 ## 2.5.0 beta 1
 
