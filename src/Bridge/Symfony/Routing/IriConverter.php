@@ -30,6 +30,7 @@ use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Core\Util\AttributesExtractor;
 use ApiPlatform\Core\Util\ClassInfoTrait;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\Routing\Exception\ExceptionInterface as RoutingExceptionInterface;
@@ -48,8 +49,9 @@ final class IriConverter implements IriConverterInterface
     private $routeNameResolver;
     private $router;
     private $identifiersExtractor;
+    private $request;
 
-    public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, ItemDataProviderInterface $itemDataProvider, RouteNameResolverInterface $routeNameResolver, RouterInterface $router, PropertyAccessorInterface $propertyAccessor = null, IdentifiersExtractorInterface $identifiersExtractor = null, SubresourceDataProviderInterface $subresourceDataProvider = null, IdentifierConverterInterface $identifierConverter = null)
+    public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, ItemDataProviderInterface $itemDataProvider, RouteNameResolverInterface $routeNameResolver, RouterInterface $router, PropertyAccessorInterface $propertyAccessor = null, IdentifiersExtractorInterface $identifiersExtractor = null, SubresourceDataProviderInterface $subresourceDataProvider = null, IdentifierConverterInterface $identifierConverter = null, RequestStack $requestStack)
     {
         $this->itemDataProvider = $itemDataProvider;
         $this->routeNameResolver = $routeNameResolver;
@@ -57,6 +59,7 @@ final class IriConverter implements IriConverterInterface
         $this->identifiersExtractor = $identifiersExtractor;
         $this->subresourceDataProvider = $subresourceDataProvider;
         $this->identifierConverter = $identifierConverter;
+        $this->request = $requestStack->getMasterRequest();
 
         if (null === $identifiersExtractor) {
             @trigger_error(sprintf('Not injecting "%s" is deprecated since API Platform 2.1 and will not be possible anymore in API Platform 3', IdentifiersExtractorInterface::class), E_USER_DEPRECATED);
@@ -120,8 +123,20 @@ final class IriConverter implements IriConverterInterface
 
         try {
             $identifiers = $this->generateIdentifiersUrl($this->identifiersExtractor->getIdentifiersFromItem($item), $resourceClass);
+            $currentRouteParams = $this->request->attributes->get('_route_params');
+            $pathVariables = $route = $this->router->getRouteCollection()->get($routeName)->compile()->getPathVariables();
+            if ($resourceClass === $this->request->attributes->get('_api_resource_class')) {
+                $params = in_array('id', $pathVariables) ? ['id' => implode(';', $identifiers)] : [];
+                foreach ($currentRouteParams as $paramName => $paramVal) {
+                    if (in_array($paramName, $pathVariables) && !array_key_exists($paramName, $params)) {
+                        $params[$paramName] = $paramVal;
+                    }
+                }
+            } else {
+                $params = ['id' => implode(';', $identifiers)];
+            }
 
-            return $this->router->generate($routeName, ['id' => implode(';', $identifiers)], $referenceType);
+            return $this->router->generate($routeName, $params, $referenceType);
         } catch (RuntimeException $e) {
             throw new InvalidArgumentException(sprintf(
                 'Unable to generate an IRI for the item of type "%s"',
