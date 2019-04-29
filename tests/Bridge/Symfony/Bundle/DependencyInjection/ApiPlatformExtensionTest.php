@@ -536,7 +536,7 @@ class ApiPlatformExtensionTest extends TestCase
     /**
      * @group mongodb
      */
-    public function testDisableDoctrineWithOdm()
+    public function testDisableDoctrineWithMongoDbOdm()
     {
         $this->runDisableDoctrineTests();
     }
