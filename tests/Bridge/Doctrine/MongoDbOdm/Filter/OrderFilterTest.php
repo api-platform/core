@@ -19,6 +19,8 @@ use ApiPlatform\Core\Tests\Bridge\Doctrine\Common\Filter\OrderFilterTestTrait;
 use Doctrine\Common\Persistence\ManagerRegistry;
 
 /**
+ * @group mongodb
+ *
  * @author Alan Poulain <contact@alanpoulain.eu>
  */
 class OrderFilterTest extends DoctrineMongoDbOdmFilterTestCase

@@ -27,6 +27,8 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\PropertyInfo\Type;
 
 /**
+ * @group mongodb
+ *
  * @author Kévin Dunglas <dunglas@gmail.com>
  * @author Alan Poulain <contact@alanpoulain.eu>
  */
