@@ -9,6 +9,7 @@ parameters:
 	paths:
 		- src
 		- tests
+		- tests/Fixtures/app/console
 	symfony:
 		container_xml_path: %rootDir%/../../../tests/Fixtures/app/var/cache/test/appAppKernelTestDebugContainer.xml
 		constant_hassers: false

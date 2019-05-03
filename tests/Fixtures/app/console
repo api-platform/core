@@ -11,8 +11,8 @@ require_once __DIR__.'/bootstrap.php';
 require_once __DIR__.'/AppKernel.php';
 
 $input = new ArgvInput();
-$env = $input->getParameterOption(array('--env', '-e'), $_SERVER['APP_ENV'] ?? 'test');
-$debug = $_SERVER['APP_DEBUG'] ?? 0 && !$input->hasParameterOption(array('--no-debug', '')) && $env !== 'prod';
+$env = $input->getParameterOption(['--env', '-e'], $_SERVER['APP_ENV'] ?? 'test', true);
+$debug = ($_SERVER['APP_DEBUG'] ?? false) && !$input->hasParameterOption('--no-debug', true) && 'prod' !== $env;
 
 if ($debug) {
     Debug::enable();
