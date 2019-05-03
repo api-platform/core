@@ -44,16 +44,16 @@ final class CoverageContext implements Context
     /**
      * @AfterSuite
      */
-    public static function tearDown()
+    public static function teardown()
     {
         $feature = getenv('FEATURE') ?: 'behat';
-        (new PHP())->process(self::$coverage, __DIR__."/../../build/cov/coverage-$feature.cov");
+        (new PHP())->process(self::$coverage, __DIR__."/../../build/coverage/coverage-$feature.cov");
     }
 
     /**
      * @BeforeScenario
      */
-    public function startCoverage(BeforeScenarioScope $scope)
+    public function before(BeforeScenarioScope $scope)
     {
         self::$coverage->start("{$scope->getFeature()->getTitle()}::{$scope->getScenario()->getTitle()}");
     }
@@ -61,7 +61,7 @@ final class CoverageContext implements Context
     /**
      * @AfterScenario
      */
-    public function stopCoverage()
+    public function after()
     {
         self::$coverage->stop();
     }

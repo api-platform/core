@@ -95,6 +95,8 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Serializer\Exception\ExceptionInterface;
 
 /**
+ * @group resource-hog
+ *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
 class ApiPlatformExtensionTest extends TestCase

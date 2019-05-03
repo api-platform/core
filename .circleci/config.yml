@@ -1,280 +1,532 @@
-version: 2
+version: 2.1
 
-reusable-steps:
-  - &clear-test-app-cache
-    run:
-      name: Clear test app cache
-      command: tests/Fixtures/app/console cache:clear
-  - &disable-php-memory-limit
-    run:
-      name: Disable PHP memory limit
-      command: echo 'memory_limit=-1' | sudo tee -a /usr/local/etc/php/php.ini
-  - &disable-xdebug-php-extension
-    run:
-      name: Disable Xdebug PHP extension
-      command: sudo rm /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
-  - &install-doctrine-mongodb-odm
-    run:
-      name: Install Doctrine MongoDB ODM
-      command: composer require --prefer-dist --no-progress --no-suggest --no-update --ansi doctrine/mongodb-odm:^2.0.0@beta doctrine/mongodb-odm-bundle:^4.0.0@beta
-  - &install-php-extensions
-    run:
-      name: Install PHP extensions
-      command: |
-        sudo pecl install mongodb
-        echo 'extension=mongodb.so' | sudo tee /usr/local/etc/php/conf.d/mongodb.ini
-  - &restore-composer-cache
-    restore_cache:
-      keys:
-        - composer-cache-{{ .Revision }}
-        - composer-cache-{{ .Branch }}
-        - composer-cache
-  - &restore-npm-cache
-    restore_cache:
-      keys:
-        - npm-cache-{{ .Revision }}
-        - npm-cache-{{ .Branch }}
-        - npm-cache
-  - &restore-php-cs-fixer-cache
-    restore_cache:
-      keys:
-        - php-cs-fixer-cache-{{ .Revision }}
-        - php-cs-fixer-cache-{{ .Branch }}
-        - php-cs-fixer-cache
-  - &restore-phpstan-cache
-    restore_cache:
-      keys:
-        - phpstan-cache-{{ .Revision }}
-        - phpstan-cache-{{ .Branch }}
-        - phpstan-cache
-  - &save-composer-cache-by-branch
-    save_cache:
-      paths:
-        - ~/.composer/cache
-      key: composer-cache-{{ .Branch }}-{{ .BuildNum }}
-  - &save-composer-cache-by-revision
-    save_cache:
-      paths:
-        - ~/.composer/cache
-      key: composer-cache-{{ .Revision }}-{{ .BuildNum }}
-  - &save-npm-cache-by-branch
-    save_cache:
-      paths:
-        - ~/.npm
-      key: npm-cache-{{ .Branch }}-{{ .BuildNum }}
-  - &save-npm-cache-by-revision
-    save_cache:
-      paths:
-        - ~/.npm
-      key: npm-cache-{{ .Revision }}-{{ .BuildNum }}
-  - &save-php-cs-fixer-cache-by-branch
-    save_cache:
-      paths:
-        - .php_cs.cache
-      key: php-cs-fixer-cache-{{ .Branch }}-{{ .BuildNum }}
-  - &save-php-cs-fixer-cache-by-revision
-    save_cache:
-      paths:
-        - .php_cs.cache
-      key: php-cs-fixer-cache-{{ .Revision }}-{{ .BuildNum }}
-  - &save-phpstan-cache-by-branch
-    save_cache:
-      paths:
-        - /tmp/phpstan/cache
-      key: phpstan-cache-{{ .Branch }}-{{ .BuildNum }}
-  - &save-phpstan-cache-by-revision
-    save_cache:
-      paths:
-        - /tmp/phpstan/cache
-      key: phpstan-cache-{{ .Revision }}-{{ .BuildNum }}
-  - &update-composer
-    run:
-      name: Update Composer
-      command: sudo composer self-update
-  - &update-project-dependencies
-    run:
-      name: Update project dependencies
-      command: composer update --prefer-dist --no-progress --no-suggest --ansi
+orbs:
+  # codecov: codecov/codecov@1
+  # https://github.com/codecov/codecov-circleci-orb/pull/17
+  codecov:
+    commands:
+      upload:
+        parameters:
+          conf:
+            description: Used to specify the location of the .codecov.yml config file
+            type: string
+            default: ".codecov.yml"
+          file:
+            description: Path to the code coverage data file to upload.
+            type: string
+            default: ""
+          flags:
+            description: Flag the upload to group coverage metrics (e.g. unittests | integration | ui,chrome)
+            type: string
+            default: ""
+          token:
+            description: Set the private repository token (defaults to environment variable $CODECOV_TOKEN)
+            type: string
+            default: ${CODECOV_TOKEN}
+          upload_name:
+            description: Custom defined name of the upload. Visible in Codecov UI
+            type: string
+            default: ${CIRCLE_BUILD_NUM}
+        steps:
+          - when:
+              condition: << parameters.file >>
+              steps:
+                - run:
+                    name: Upload Coverage Results
+                    command: |
+                      curl -s https://codecov.io/bash | bash -s -- \
+                        -f "<< parameters.file >>" \
+                        -t "<< parameters.token >>" \
+                        -n "<< parameters.upload_name >>" \
+                        -y "<< parameters.conf >>" \
+                        -F "<< parameters.flags >>" \
+                        -Z || echo 'Codecov upload failed'
+          - unless:
+              condition: << parameters.file >>
+              steps:
+                - run:
+                    name: Upload Coverage Results
+                    command: |
+                      curl -s https://codecov.io/bash | bash -s -- \
+                        -t "<< parameters.token >>" \
+                        -n "<< parameters.upload_name >>" \
+                        -y "<< parameters.conf >>" \
+                        -F "<< parameters.flags >>" \
+                        -Z || echo 'Codecov upload failed'
+  coveralls:
+    commands:
+      upload:
+        parameters:
+          file:
+            description: Path to the code coverage data file to upload.
+            type: string
+            default: ""
+        steps:
+          - run:
+              name: Upload Coverage Results
+              command: |
+                npx @cedx/coveralls@^8.6 "<< parameters.file >>" || echo 'Coveralls upload failed'
+
+commands:
+  clear-test-app-cache:
+    steps:
+      - run:
+          name: Clear test app cache
+          command: tests/Fixtures/app/console cache:clear
+  disable-php-memory-limit:
+    steps:
+      - run:
+          name: Disable PHP memory limit
+          command: echo 'memory_limit=-1' | sudo tee -a /usr/local/etc/php/php.ini
+  disable-xdebug-php-extension:
+    steps:
+      - run:
+          name: Disable Xdebug PHP extension
+          command: sudo rm /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
+  install-doctrine-mongodb-odm:
+    steps:
+      - run:
+          name: Install Doctrine MongoDB ODM
+          command: |
+            composer require --prefer-dist --no-progress --no-suggest --no-update --ansi \
+              doctrine/mongodb-odm:^2.0@beta \
+              doctrine/mongodb-odm-bundle:^4.0@beta \
+  install-mongodb-php-extension:
+    steps:
+      - run:
+          name: Install mongodb PHP extension
+          command: |
+            sudo pecl install mongodb
+            sudo docker-php-ext-enable mongodb
+  merge-code-coverage-reports:
+    parameters:
+      dir:
+        description: Path to the directory containing the code coverage reports to merge.
+        type: string
+      out:
+        description: Path to output the merged code coverage report.
+        type: string
+    steps:
+      - run:
+          name: Download phpcov
+          command: |
+            if [ ! -e phpcov.phar ]; then
+              wget https://phar.phpunit.de/phpcov.phar
+            fi
+      - run:
+          name: Merge code coverage reports
+          command: |
+            mkdir -p "$(dirname -- "<< parameters.out >>")"
+            phpdbg -qrr phpcov.phar merge --clover "<< parameters.out >>" "<< parameters.dir >>"
+  merge-test-reports:
+    parameters:
+      dir:
+        description: Path to the directory containing the test reports to merge.
+        type: string
+      out:
+        description: Path to output the merged test report.
+        type: string
+    steps:
+      - run:
+          name: Merge test reports
+          command: |
+            tmpout=$(mktemp)
+            npx junit-merge@^2.0 --dir "<< parameters.dir >>" --recursive --out "$tmpout"
+            rm -r "<< parameters.dir >>"
+            mkdir -p "$(dirname -- "<< parameters.out >>")"
+            mv "$tmpout" "<< parameters.out >>"
+  restore-composer-cache:
+    steps:
+      - restore_cache:
+          keys:
+            - composer-cache-{{ .Revision }}
+            - composer-cache-{{ .Branch }}
+            - composer-cache
+  restore-npm-cache:
+    steps:
+      - restore_cache:
+          keys:
+            - npm-cache-{{ .Revision }}
+            - npm-cache-{{ .Branch }}
+            - npm-cache
+  restore-php-cs-fixer-cache:
+    steps:
+      - restore_cache:
+          keys:
+            - php-cs-fixer-cache-{{ .Revision }}
+            - php-cs-fixer-cache-{{ .Branch }}
+            - php-cs-fixer-cache
+  restore-phpstan-cache:
+    steps:
+      - restore_cache:
+          keys:
+            - phpstan-cache-{{ .Revision }}
+            - phpstan-cache-{{ .Branch }}
+            - phpstan-cache
+  save-composer-cache:
+    steps:
+      - save_cache:
+          paths:
+            - ~/.composer/cache
+          key: composer-cache-{{ .Branch }}-{{ .BuildNum }}
+      - save_cache:
+          paths:
+            - ~/.composer/cache
+          key: composer-cache-{{ .Revision }}-{{ .BuildNum }}
+  save-npm-cache:
+    steps:
+      - save_cache:
+          paths:
+            - ~/.npm
+          key: npm-cache-{{ .Branch }}-{{ .BuildNum }}
+      - save_cache:
+          paths:
+            - ~/.npm
+          key: npm-cache-{{ .Revision }}-{{ .BuildNum }}
+  save-php-cs-fixer-cache:
+    steps:
+      - save_cache:
+          paths:
+            - .php_cs.cache
+          key: php-cs-fixer-cache-{{ .Branch }}-{{ .BuildNum }}
+      - save_cache:
+          paths:
+            - .php_cs.cache
+          key: php-cs-fixer-cache-{{ .Revision }}-{{ .BuildNum }}
+  save-phpstan-cache:
+    steps:
+      - save_cache:
+          paths:
+            - /tmp/phpstan/cache
+          key: phpstan-cache-{{ .Branch }}-{{ .BuildNum }}
+      - save_cache:
+          paths:
+            - /tmp/phpstan/cache
+          key: phpstan-cache-{{ .Revision }}-{{ .BuildNum }}
+  update-composer:
+    steps:
+      - run:
+          name: Update Composer
+          command: sudo composer self-update
+  update-project-dependencies:
+    steps:
+      - run:
+          name: Update project dependencies
+          command: composer update --prefer-dist --no-progress --no-suggest --ansi
+  wait-for-elasticsearch:
+    steps:
+      - wait-for-service:
+          label: Elasticsearch
+          port: '9200'
+  wait-for-mongodb:
+    steps:
+      - wait-for-service:
+          label: MongoDB
+          port: '27017'
+  wait-for-service:
+    parameters:
+      label:
+        description: Label for the service.
+        type: string
+        default: service
+      port:
+        description: Target port to connect to.
+        type: string
+      timeout:
+        description: Maximum number of seconds to wait.
+        type: integer
+        default: 30
+    steps:
+      - run:
+          name: Wait for << parameters.label >>
+          command: |
+            timeout=<< parameters.timeout >>
+            elapsed=0
+            echo "Waiting for << parameters.label >> to be ready..."
+            until nc -z localhost "<< parameters.port >>" > /dev/null 2>&1; do
+              if _=$((elapsed > timeout)); then
+                echo 'Timed out waiting for << parameters.label >>' >&2
+                exit 1
+              fi
+              sleep 1
+              elapsed=$((elapsed + 1))
+            done
+
+executors:
+  php:
+    docker:
+      - image: circleci/php:7.3-node
+  php-and-elasticsearch:
+    docker:
+      - image: circleci/php:7.3-node
+      # https://github.com/elastic/elasticsearch-docker/issues/84
+      - image: docker.elastic.co/elasticsearch/elasticsearch:6.7.2
+  php-and-mongodb:
+    docker:
+      - image: circleci/php:7.3-node
+      - image: circleci/mongo:4
 
 jobs:
   php-cs-fixer:
-    docker:
-      - image: circleci/php:7.2-node-browsers
+    executor: php
     environment:
       PHP_CS_FIXER_FUTURE_MODE: 1
     working_directory: ~/api-platform/core
     steps:
       - checkout
-      - *restore-composer-cache
-      - *restore-php-cs-fixer-cache
-      - *disable-xdebug-php-extension
-      - *disable-php-memory-limit
-      - *update-composer
+      - restore-composer-cache
+      - restore-php-cs-fixer-cache
+      - disable-xdebug-php-extension
+      - disable-php-memory-limit
+      - update-composer
       - run:
           name: Install PHP-CS-Fixer
-          command: composer global require friendsofphp/php-cs-fixer:^2.14
-      - *save-composer-cache-by-revision
-      - *save-composer-cache-by-branch
+          command: |
+            composer global require --prefer-dist --no-progress --no-suggest --ansi \
+              friendsofphp/php-cs-fixer:^2.14
+      - save-composer-cache
       - run:
           name: Run PHP-CS-Fixer
-          command: |-
+          command: |
             export PATH="$PATH:$HOME/.composer/vendor/bin"
             php-cs-fixer fix --dry-run --diff --ansi
-      - *save-php-cs-fixer-cache-by-revision
-      - *save-php-cs-fixer-cache-by-branch
+      - save-php-cs-fixer-cache
 
   phpstan:
-    docker:
-      - image: circleci/php:7.2-node-browsers
+    executor: php
     environment:
       # https://github.com/phpstan/phpstan-symfony/issues/37
       APP_DEBUG: 1
     working_directory: ~/api-platform/core
     steps:
       - checkout
-      - *restore-composer-cache
-      - *restore-phpstan-cache
-      - *disable-xdebug-php-extension
-      - *disable-php-memory-limit
-      - *install-php-extensions
-      - *update-composer
-      - *install-doctrine-mongodb-odm
-      - *update-project-dependencies
-      - *save-composer-cache-by-revision
-      - *save-composer-cache-by-branch
-      - *clear-test-app-cache
+      - restore-composer-cache
+      - restore-phpstan-cache
+      - disable-xdebug-php-extension
+      - disable-php-memory-limit
+      - install-mongodb-php-extension
+      - update-composer
+      - install-doctrine-mongodb-odm
+      - update-project-dependencies
+      - save-composer-cache
+      - clear-test-app-cache
       - run:
           name: Run PHPStan
           command: vendor/bin/phpstan analyse --ansi
-      - *save-phpstan-cache-by-revision
-      - *save-phpstan-cache-by-branch
+      - save-phpstan-cache
 
   phpunit-coverage:
-    docker:
-      - image: circleci/php:7.2-node-browsers
-    environment:
-      SYMFONY_DEPRECATIONS_HELPER: weak_vendors
+    executor: php
     parallelism: 2
     working_directory: ~/api-platform/core
     steps:
       - checkout
-      - *restore-composer-cache
-      - *restore-npm-cache
-      - *disable-xdebug-php-extension
-      - *disable-php-memory-limit
-      - *install-php-extensions
-      - *update-composer
-      - *update-project-dependencies
-      - *save-composer-cache-by-revision
-      - *save-composer-cache-by-branch
-      - *clear-test-app-cache
+      - restore-composer-cache
+      - restore-npm-cache
+      - disable-xdebug-php-extension
+      - disable-php-memory-limit
+      - update-composer
+      - update-project-dependencies
+      - save-composer-cache
+      - clear-test-app-cache
       - run:
           name: Run PHPUnit tests
-          command: |-
-            mkdir -p build/logs/parallel build/logs/tmp build/cov
-            split_tests=$(find tests -name '*Test.php' -not -path 'tests/Bridge/Symfony/Bundle/DependencyInjection/ApiPlatformExtensionTest.php' | circleci tests split --split-by=timings)
-            export PARALLEL='-j10% --joblog build/logs/parallel/jobs.log --rpl {_}\ s/\\//_/g;'
-            phpunit_cmd='phpdbg -qrr vendor/bin/phpunit --coverage-php build/cov/coverage-{_}.cov --log-junit build/logs/tmp/{_}.xml --colors=always {}'
+          command: |
+            mkdir -p build/logs/phpunit build/coverage
+            split_tests=$(find tests -name '*Test.php' | circleci tests split --split-by=timings)
+            export PARALLEL='-j10% --joblog build/logs/parallel.log --rpl {_}\ s/\\//_/g;'
+            phpunit_cmd='phpdbg -qrr vendor/bin/phpunit --coverage-php build/coverage/coverage-{_}.cov --log-junit build/logs/phpunit/{_}.xml --exclude-group mongodb,resource-hog --colors=always {}'
             echo "$split_tests" | parallel "$phpunit_cmd" || echo "$split_tests" | parallel --retry-failed "$phpunit_cmd"
-      - run:
-          name: Merge PHPUnit test reports
-          command: |-
-            mkdir -p build/logs/phpunit
-            npx junit-merge --out build/logs/phpunit/junit.xml --dir build/logs/tmp
-            rm -r build/logs/tmp
+      - merge-test-reports:
+          dir: build/logs/phpunit
+          out: build/logs/phpunit/junit.xml
       - store_test_results:
           path: build/logs
       - store_artifacts:
           path: build/logs/phpunit/junit.xml
           destination: build/logs/phpunit/junit.xml
       - store_artifacts:
-          path: build/logs/parallel/jobs.log
-          destination: build/logs/parallel/jobs.log
-      - persist_to_workspace:
-          root: build
-          paths:
-            - cov
-      - *save-npm-cache-by-revision
-      - *save-npm-cache-by-branch
+          path: build/logs/parallel.log
+          destination: build/logs/parallel.log
+      - merge-code-coverage-reports:
+          dir: build/coverage
+          out: build/logs/clover.xml
+      - store_artifacts:
+          path: build/logs/clover.xml
+          destination: build/logs/clover.xml
+      - codecov/upload:
+          file: build/logs/clover.xml
+          flags: phpunit
+      - coveralls/upload:
+          file: build/logs/clover.xml
+      - save-npm-cache
 
   behat-coverage:
-    docker:
-      - image: circleci/php:7.2-node-browsers
+    executor: php
     parallelism: 2
     working_directory: ~/api-platform/core
     steps:
       - checkout
-      - *restore-composer-cache
-      - *restore-npm-cache
-      - *disable-xdebug-php-extension
-      - *disable-php-memory-limit
-      - *install-php-extensions
-      - *update-composer
-      - *update-project-dependencies
-      - *save-composer-cache-by-revision
-      - *save-composer-cache-by-branch
-      - *clear-test-app-cache
+      - restore-composer-cache
+      - restore-npm-cache
+      - disable-xdebug-php-extension
+      - disable-php-memory-limit
+      - update-composer
+      - update-project-dependencies
+      - save-composer-cache
+      - clear-test-app-cache
       - run:
           name: Run Behat tests
-          command: |-
-            mkdir -p build/logs/tmp build/cov
+          command: |
+            mkdir -p build/logs/behat build/coverage
             for f in $(find features -name '*.feature' -not -path 'features/main/exposed_state.feature' -not -path 'features/elasticsearch/*' -not -path 'features/mongodb/*' | circleci tests split --split-by=timings); do
-              _f=${f//\//_}
-              FEATURE="${_f}" phpdbg -qrr vendor/bin/behat --profile=coverage --suite=default --format=progress --out=std --format=junit --out=build/logs/tmp/"${_f}" --no-interaction "$f"
+              _f=$(echo "$f" | tr / _)
+              FEATURE="${_f}" phpdbg -qrr vendor/bin/behat --format=progress --out=std --format=junit --out=build/logs/behat/"${_f}" --profile=default-coverage --no-interaction "$f"
             done
-      - run:
-          name: Merge Behat test reports
-          command: |-
-            mkdir -p build/logs/behat
-            npx junit-merge --out build/logs/behat/junit.xml --dir build/logs/tmp --recursive
-            rm -r build/logs/tmp
+      - merge-test-reports:
+          dir: build/logs/behat
+          out: build/logs/behat/junit.xml
       - store_test_results:
           path: build/logs
       - store_artifacts:
           path: build/logs/behat/junit.xml
           destination: build/logs/behat/junit.xml
-      - persist_to_workspace:
-          root: build
-          paths:
-            - cov
-      - *save-npm-cache-by-revision
-      - *save-npm-cache-by-branch
-
-  merge-and-upload-coverage:
-    docker:
-      - image: circleci/php:7.2-node-browsers
-    working_directory: ~/api-platform/core
-    steps:
-      - checkout
-      - *restore-npm-cache
-      - *disable-xdebug-php-extension
-      - *disable-php-memory-limit
-      - run:
-          name: Download phpcov
-          command: wget https://phar.phpunit.de/phpcov.phar
-      - attach_workspace:
-          at: build
-      - run:
-          name: Merge code coverage reports
-          command: |-
-            mkdir -p build/logs
-            phpdbg -qrr phpcov.phar merge --clover build/logs/clover.xml build/cov
+      - merge-code-coverage-reports:
+          dir: build/coverage
+          out: build/logs/clover.xml
       - store_artifacts:
           path: build/logs/clover.xml
           destination: build/logs/clover.xml
+      - codecov/upload:
+          file: build/logs/clover.xml
+          flags: behat
+      - coveralls/upload:
+          file: build/logs/clover.xml
+      - save-npm-cache
+
+  phpunit-mongodb-coverage:
+    executor: php-and-mongodb
+    environment:
+      APP_ENV: mongodb
+    working_directory: ~/api-platform/core
+    steps:
+      - checkout
+      - restore-composer-cache
+      - restore-npm-cache
+      - disable-xdebug-php-extension
+      - disable-php-memory-limit
+      - install-mongodb-php-extension
+      - update-composer
+      - install-doctrine-mongodb-odm
+      - update-project-dependencies
+      - save-composer-cache
+      - clear-test-app-cache
+      - wait-for-mongodb
       - run:
-          name: Upload code coverage report to Coveralls
-          command: |-
-            if [ ! -z "$COVERALLS_REPO_TOKEN" ]; then
-              npx @cedx/coveralls build/logs/clover.xml
-            else
-              echo 'Skipped'
-            fi
+          name: Run PHPUnit tests
+          command: |
+            mkdir -p build/logs/phpunit
+            phpdbg -qrr vendor/bin/phpunit --coverage-clover build/logs/clover.xml --log-junit build/logs/phpunit/junit.xml --exclude-group resource-hog --colors=always --configuration phpunit_mongodb.xml
+      - store_test_results:
+          path: build/logs
+      - store_artifacts:
+          path: build/logs/phpunit/junit.xml
+          destination: build/logs/phpunit/junit.xml
+      - store_artifacts:
+          path: build/logs/clover.xml
+          destination: build/logs/clover.xml
+      - codecov/upload:
+          file: build/logs/clover.xml
+          flags: phpunit_mongodb
+      - coveralls/upload:
+          file: build/logs/clover.xml
+      - save-npm-cache
+
+  behat-mongodb-coverage:
+    executor: php-and-mongodb
+    environment:
+      APP_ENV: mongodb
+    working_directory: ~/api-platform/core
+    steps:
+      - checkout
+      - restore-composer-cache
+      - restore-npm-cache
+      - disable-xdebug-php-extension
+      - disable-php-memory-limit
+      - install-mongodb-php-extension
+      - update-composer
+      - install-doctrine-mongodb-odm
+      - update-project-dependencies
+      - save-composer-cache
+      - clear-test-app-cache
+      - wait-for-mongodb
       - run:
-          name: Upload code coverage report to Codecov
-          command: npx codecov --file=build/logs/clover.xml --disable=gcov
-      - *save-npm-cache-by-revision
-      - *save-npm-cache-by-branch
+          name: Run Behat tests
+          command: |
+            mkdir -p build/logs/behat
+            phpdbg -qrr vendor/bin/behat --format=progress --out=std --format=junit --out=build/logs/behat --profile=mongodb-coverage --no-interaction
+      - merge-test-reports:
+          dir: build/logs/behat
+          out: build/logs/behat/junit.xml
+      - store_test_results:
+          path: build/logs
+      - store_artifacts:
+          path: build/logs/behat/junit.xml
+          destination: build/logs/behat/junit.xml
+      - merge-code-coverage-reports:
+          dir: build/coverage
+          out: build/logs/clover.xml
+      - store_artifacts:
+          path: build/logs/clover.xml
+          destination: build/logs/clover.xml
+      - codecov/upload:
+          file: build/logs/clover.xml
+          flags: behat_mongodb
+      - coveralls/upload:
+          file: build/logs/clover.xml
+      - save-npm-cache
+
+  behat-elasticsearch-coverage:
+    executor: php-and-elasticsearch
+    environment:
+      APP_ENV: elasticsearch
+    working_directory: ~/api-platform/core
+    steps:
+      - checkout
+      - restore-composer-cache
+      - restore-npm-cache
+      - disable-xdebug-php-extension
+      - disable-php-memory-limit
+      - update-composer
+      - update-project-dependencies
+      - save-composer-cache
+      - clear-test-app-cache
+      - wait-for-elasticsearch
+      - run:
+          name: Run Behat tests
+          command: |
+            mkdir -p build/logs/behat
+            phpdbg -qrr vendor/bin/behat --format=progress --out=std --format=junit --out=build/logs/behat --profile=elasticsearch-coverage --no-interaction
+      - merge-test-reports:
+          dir: build/logs/behat
+          out: build/logs/behat/junit.xml
+      - store_test_results:
+          path: build/logs
+      - store_artifacts:
+          path: build/logs/behat/junit.xml
+          destination: build/logs/behat/junit.xml
+      - merge-code-coverage-reports:
+          dir: build/coverage
+          out: build/logs/clover.xml
+      - store_artifacts:
+          path: build/logs/clover.xml
+          destination: build/logs/clover.xml
+      - codecov/upload:
+          file: build/logs/clover.xml
+          flags: behat_elasticsearch
+      - coveralls/upload:
+          file: build/logs/clover.xml
+      - save-npm-cache
 
 workflows:
   version: 2
@@ -286,7 +538,6 @@ workflows:
     jobs:
       - phpunit-coverage
       - behat-coverage
-      - merge-and-upload-coverage:
-          requires:
-            - phpunit-coverage
-            - behat-coverage
+      - phpunit-mongodb-coverage
+      - behat-mongodb-coverage
+      - behat-elasticsearch-coverage
