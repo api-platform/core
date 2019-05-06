@@ -37,18 +37,17 @@ class ValidateListenerTest extends TestCase
     public function testNotAnApiPlatformRequest()
     {
         $validatorProphecy = $this->prophesize(ValidatorInterface::class);
-        $validatorProphecy->validate()->shouldNotBeCalled();
+        $validatorProphecy->validate(Argument::cetera())->shouldNotBeCalled();
         $validator = $validatorProphecy->reveal();
 
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $resourceMetadataFactoryProphecy->create()->shouldNotBeCalled();
         $resourceMetadataFactory = $resourceMetadataFactoryProphecy->reveal();
 
         $request = new Request();
         $request->setMethod('POST');
 
         $event = $this->prophesize(GetResponseForControllerResultEvent::class);
-        $event->getRequest()->willReturn($request)->shouldBeCalled();
+        $event->getRequest()->willReturn($request);
 
         $listener = new ValidateListener($validator, $resourceMetadataFactory);
         $listener->onKernelView($event->reveal());

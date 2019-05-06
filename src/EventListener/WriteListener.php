@@ -16,7 +16,9 @@ namespace ApiPlatform\Core\EventListener;
 use ApiPlatform\Core\Api\IriConverterInterface;
 use ApiPlatform\Core\DataPersister\DataPersisterInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
+use ApiPlatform\Core\Metadata\Resource\ToggleableOperationAttributeTrait;
 use ApiPlatform\Core\Util\RequestAttributesExtractor;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
 
 /**
@@ -27,6 +29,10 @@ use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
  */
 final class WriteListener
 {
+    use ToggleableOperationAttributeTrait;
+
+    public const OPERATION_ATTRIBUTE_KEY = 'write';
+
     private $dataPersister;
     private $iriConverter;
     private $resourceMetadataFactory;
@@ -43,12 +49,19 @@ final class WriteListener
      */
     public function onKernelView(GetResponseForControllerResultEvent $event): void
     {
+        $controllerResult = $event->getControllerResult();
         $request = $event->getRequest();
-        if ($request->isMethodSafe(false) || !($attributes = RequestAttributesExtractor::extractAttributes($request)) || !$attributes['persist']) {
+
+        if (
+            $controllerResult instanceof Response
+            || $request->isMethodSafe(false)
+            || !($attributes = RequestAttributesExtractor::extractAttributes($request))
+            || !$attributes['persist']
+            || $this->isOperationAttributeDisabled($attributes, self::OPERATION_ATTRIBUTE_KEY)
+        ) {
             return;
         }
 
-        $controllerResult = $event->getControllerResult();
         if (!$this->dataPersister->supports($controllerResult, $attributes)) {
             return;
         }

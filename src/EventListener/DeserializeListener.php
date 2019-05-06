@@ -16,6 +16,8 @@ namespace ApiPlatform\Core\EventListener;
 use ApiPlatform\Core\Api\FormatMatcher;
 use ApiPlatform\Core\Api\FormatsProviderInterface;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
+use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
+use ApiPlatform\Core\Metadata\Resource\ToggleableOperationAttributeTrait;
 use ApiPlatform\Core\Serializer\SerializerContextBuilderInterface;
 use ApiPlatform\Core\Util\RequestAttributesExtractor;
 use Symfony\Component\HttpFoundation\Request;
@@ -31,6 +33,10 @@ use Symfony\Component\Serializer\SerializerInterface;
  */
 final class DeserializeListener
 {
+    use ToggleableOperationAttributeTrait;
+
+    public const OPERATION_ATTRIBUTE_KEY = 'deserialize';
+
     private $serializer;
     private $serializerContextBuilder;
     private $formats = [];
@@ -40,7 +46,7 @@ final class DeserializeListener
     /**
      * @throws InvalidArgumentException
      */
-    public function __construct(SerializerInterface $serializer, SerializerContextBuilderInterface $serializerContextBuilder, /* FormatsProviderInterface */$formatsProvider)
+    public function __construct(SerializerInterface $serializer, SerializerContextBuilderInterface $serializerContextBuilder, /* FormatsProviderInterface */$formatsProvider, ResourceMetadataFactoryInterface $resourceMetadataFactory = null)
     {
         $this->serializer = $serializer;
         $this->serializerContextBuilder = $serializerContextBuilder;
@@ -54,6 +60,7 @@ final class DeserializeListener
 
             $this->formatsProvider = $formatsProvider;
         }
+        $this->resourceMetadataFactory = $resourceMetadataFactory;
     }
 
     /**
@@ -69,18 +76,12 @@ final class DeserializeListener
             || $request->isMethodSafe(false)
             || !($attributes = RequestAttributesExtractor::extractAttributes($request))
             || !$attributes['receive']
-            || (
-                    '' === ($requestContent = $request->getContent())
-                    && ('POST' === $method || 'PUT' === $method)
-               )
+            || $this->isOperationAttributeDisabled($attributes, self::OPERATION_ATTRIBUTE_KEY)
         ) {
             return;
         }
 
         $context = $this->serializerContextBuilder->createFromRequest($request, false, $attributes);
-        if (isset($context['input']) && \array_key_exists('class', $context['input']) && null === $context['input']['class']) {
-            return;
-        }
 
         // BC check to be removed in 3.0
         if (null !== $this->formatsProvider) {
@@ -96,9 +97,7 @@ final class DeserializeListener
 
         $request->attributes->set(
             'data',
-            $this->serializer->deserialize(
-                $requestContent, $context['resource_class'], $format, $context
-            )
+            $this->serializer->deserialize($request->getContent(), $context['resource_class'], $format, $context)
         );
     }
 

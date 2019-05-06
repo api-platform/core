@@ -15,8 +15,10 @@ namespace ApiPlatform\Core\Validator\EventListener;
 
 use ApiPlatform\Core\Bridge\Symfony\Validator\Exception\ValidationException;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
+use ApiPlatform\Core\Metadata\Resource\ToggleableOperationAttributeTrait;
 use ApiPlatform\Core\Util\RequestAttributesExtractor;
 use ApiPlatform\Core\Validator\ValidatorInterface;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
 
 /**
@@ -26,6 +28,10 @@ use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
  */
 final class ValidateListener
 {
+    use ToggleableOperationAttributeTrait;
+
+    public const OPERATION_ATTRIBUTE_KEY = 'validate';
+
     private $validator;
     private $resourceMetadataFactory;
 
@@ -42,23 +48,23 @@ final class ValidateListener
      */
     public function onKernelView(GetResponseForControllerResultEvent $event): void
     {
+        $controllerResult = $event->getControllerResult();
         $request = $event->getRequest();
+
         if (
-            $request->isMethodSafe(false)
+            $controllerResult instanceof Response
+            || $request->isMethodSafe(false)
             || $request->isMethod('DELETE')
             || !($attributes = RequestAttributesExtractor::extractAttributes($request))
             || !$attributes['receive']
+            || $this->isOperationAttributeDisabled($attributes, self::OPERATION_ATTRIBUTE_KEY)
         ) {
             return;
         }
 
         $resourceMetadata = $this->resourceMetadataFactory->create($attributes['resource_class']);
-        $inputMetadata = $resourceMetadata->getOperationAttribute($attributes, 'input', [], true);
-        if (\array_key_exists('class', $inputMetadata) && null === $inputMetadata['class']) {
-            return;
-        }
 
         $validationGroups = $resourceMetadata->getOperationAttribute($attributes, 'validation_groups', null, true);
-        $this->validator->validate($event->getControllerResult(), ['groups' => $validationGroups]);
+        $this->validator->validate($controllerResult, ['groups' => $validationGroups]);
     }
 }

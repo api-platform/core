@@ -32,7 +32,7 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Messenger\MessageBusInterface;
-use Symfony\Component\Serializer\Exception\ExceptionInterface;
+use Symfony\Component\Serializer\Exception\ExceptionInterface as SerializerExceptionInterface;
 
 /**
  * The configuration of the bundle.
@@ -369,7 +369,7 @@ final class Configuration implements ConfigurationInterface
             ->children()
                 ->arrayNode('exception_to_status')
                     ->defaultValue([
-                        ExceptionInterface::class => Response::HTTP_BAD_REQUEST,
+                        SerializerExceptionInterface::class => Response::HTTP_BAD_REQUEST,
                         InvalidArgumentException::class => Response::HTTP_BAD_REQUEST,
                         FilterValidationException::class => Response::HTTP_BAD_REQUEST,
                         OptimisticLockException::class => Response::HTTP_CONFLICT,
