@@ -56,6 +56,7 @@
             <argument type="service" id="api_platform.property_accessor" />
             <argument type="service" id="logger" on-invalid="ignore" />
             <argument key="$identifiersExtractor" type="service" id="api_platform.identifiers_extractor.cached" on-invalid="ignore" />
+            <argument key="$nameConverter" type="service" id="api_platform.name_converter" on-invalid="ignore" />
         </service>
         <service id="ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter" alias="api_platform.doctrine.orm.search_filter" />
 
@@ -64,6 +65,7 @@
             <argument>null</argument>
             <argument>%api_platform.collection.order_parameter_name%</argument>
             <argument type="service" id="logger" on-invalid="ignore" />
+            <argument key="$nameConverter" type="service" id="api_platform.name_converter" on-invalid="ignore" />
         </service>
         <service id="ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\OrderFilter" alias="api_platform.doctrine.orm.order_filter" />
 
@@ -71,6 +73,7 @@
             <argument type="service" id="doctrine" />
             <argument>null</argument>
             <argument type="service" id="logger" on-invalid="ignore" />
+            <argument key="$nameConverter" type="service" id="api_platform.name_converter" on-invalid="ignore" />
         </service>
         <service id="ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\RangeFilter" alias="api_platform.doctrine.orm.range_filter" />
 
@@ -78,6 +81,7 @@
             <argument type="service" id="doctrine" />
             <argument>null</argument>
             <argument type="service" id="logger" on-invalid="ignore" />
+            <argument key="$nameConverter" type="service" id="api_platform.name_converter" on-invalid="ignore" />
         </service>
         <service id="ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\DateFilter" alias="api_platform.doctrine.orm.date_filter" />
 
@@ -85,6 +89,7 @@
             <argument type="service" id="doctrine" />
             <argument>null</argument>
             <argument type="service" id="logger" on-invalid="ignore" />
+            <argument key="$nameConverter" type="service" id="api_platform.name_converter" on-invalid="ignore" />
         </service>
         <service id="ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\BooleanFilter" alias="api_platform.doctrine.orm.boolean_filter" />
 
@@ -92,6 +97,7 @@
             <argument type="service" id="doctrine" />
             <argument>null</argument>
             <argument type="service" id="logger" on-invalid="ignore" />
+            <argument key="$nameConverter" type="service" id="api_platform.name_converter" on-invalid="ignore" />
         </service>
         <service id="ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\NumericFilter" alias="api_platform.doctrine.orm.numeric_filter" />
 
@@ -100,6 +106,7 @@
             <argument>null</argument>
             <argument type="service" id="logger" on-invalid="ignore" />
             <argument key="$existsParameterName">%api_platform.collection.exists_parameter_name%</argument>
+            <argument key="$nameConverter" type="service" id="api_platform.name_converter" on-invalid="ignore" />
         </service>
         <service id="ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\ExistsFilter" alias="api_platform.doctrine.orm.exists_filter" />
 

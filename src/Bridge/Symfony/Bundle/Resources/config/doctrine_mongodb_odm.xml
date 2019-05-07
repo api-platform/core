@@ -67,6 +67,7 @@
             <argument type="service" id="api_platform.identifiers_extractor.cached" />
             <argument type="service" id="api_platform.property_accessor" />
             <argument type="service" id="logger" on-invalid="ignore" />
+            <argument key="$nameConverter" type="service" id="api_platform.name_converter" on-invalid="ignore"/>
         </service>
 
         <service id="ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Filter\SearchFilter" alias="api_platform.doctrine_mongodb.odm.search_filter" />
@@ -74,12 +75,14 @@
         <service id="api_platform.doctrine_mongodb.odm.boolean_filter" class="ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Filter\BooleanFilter" public="false" abstract="true">
             <argument type="service" id="doctrine_mongodb" />
             <argument type="service" id="logger" on-invalid="ignore" />
+            <argument key="$nameConverter" type="service" id="api_platform.name_converter" on-invalid="ignore"/>
         </service>
         <service id="ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Filter\BooleanFilter" alias="api_platform.doctrine_mongodb.odm.boolean_filter" />
 
         <service id="api_platform.doctrine_mongodb.odm.date_filter" class="ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Filter\DateFilter" public="false" abstract="true">
             <argument type="service" id="doctrine_mongodb" />
             <argument type="service" id="logger" on-invalid="ignore" />
+            <argument key="$nameConverter" type="service" id="api_platform.name_converter" on-invalid="ignore"/>
         </service>
         <service id="ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Filter\DateFilter" alias="api_platform.doctrine_mongodb.odm.date_filter" />
 
@@ -87,12 +90,14 @@
             <argument type="service" id="doctrine_mongodb" />
             <argument type="service" id="logger" on-invalid="ignore" />
             <argument key="$existsParameterName">%api_platform.collection.exists_parameter_name%</argument>
+            <argument key="$nameConverter" type="service" id="api_platform.name_converter" on-invalid="ignore"/>
         </service>
         <service id="ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Filter\ExistsFilter" alias="api_platform.doctrine_mongodb.odm.exists_filter" />
 
         <service id="api_platform.doctrine_mongodb.odm.numeric_filter" class="ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Filter\NumericFilter" public="false" abstract="true">
             <argument type="service" id="doctrine_mongodb" />
             <argument type="service" id="logger" on-invalid="ignore" />
+            <argument key="$nameConverter" type="service" id="api_platform.name_converter" on-invalid="ignore"/>
         </service>
         <service id="ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Filter\NumericFilter" alias="api_platform.doctrine_mongodb.odm.numeric_filter" />
 
@@ -100,12 +105,14 @@
             <argument type="service" id="doctrine_mongodb" />
             <argument>%api_platform.collection.order_parameter_name%</argument>
             <argument type="service" id="logger" on-invalid="ignore" />
+            <argument key="$nameConverter" type="service" id="api_platform.name_converter" on-invalid="ignore"/>
         </service>
         <service id="ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Filter\OrderFilter" alias="api_platform.doctrine_mongodb.odm.order_filter" />
 
         <service id="api_platform.doctrine_mongodb.odm.range_filter" class="ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Filter\RangeFilter" public="false" abstract="true">
             <argument type="service" id="doctrine_mongodb" />
             <argument type="service" id="logger" on-invalid="ignore" />
+            <argument key="$nameConverter" type="service" id="api_platform.name_converter" on-invalid="ignore"/>
         </service>
         <service id="ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Filter\RangeFilter" alias="api_platform.doctrine_mongodb.odm.range_filter" />
 

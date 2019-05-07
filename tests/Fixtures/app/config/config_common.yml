@@ -151,7 +151,7 @@ services:
 
     app.entity.filter.dummy_property.whitelist_property:
         parent:    'api_platform.serializer.property_filter'
-        arguments: [ 'whitelisted_properties', false, [foo] ]
+        arguments: [ 'whitelisted_properties', false, [foo, nameConverted] ]
         tags:      [ { name: 'api_platform.filter', id: 'dummy_property.whitelist_property' } ]
 
     app.entity.filter.dummy_property.whitelist_nested_property:

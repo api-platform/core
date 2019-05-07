@@ -18,6 +18,7 @@ use ApiPlatform\Core\Bridge\Doctrine\Common\Filter\OrderFilterTrait;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ODM\MongoDB\Aggregation\Builder;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 
 /**
  * Order the collection by given properties.
@@ -39,7 +40,7 @@ final class OrderFilter extends AbstractFilter implements OrderFilterInterface
 {
     use OrderFilterTrait;
 
-    public function __construct(ManagerRegistry $managerRegistry, string $orderParameterName = 'order', LoggerInterface $logger = null, array $properties = null)
+    public function __construct(ManagerRegistry $managerRegistry, string $orderParameterName = 'order', LoggerInterface $logger = null, array $properties = null, NameConverterInterface $nameConverter = null)
     {
         if (null !== $properties) {
             $properties = array_map(function ($propertyOptions) {
@@ -54,7 +55,7 @@ final class OrderFilter extends AbstractFilter implements OrderFilterInterface
             }, $properties);
         }
 
-        parent::__construct($managerRegistry, $logger, $properties);
+        parent::__construct($managerRegistry, $logger, $properties, $nameConverter);
 
         $this->orderParameterName = $orderParameterName;
     }
@@ -75,7 +76,7 @@ final class OrderFilter extends AbstractFilter implements OrderFilterInterface
         }
 
         foreach ($context['filters'][$this->orderParameterName] as $property => $value) {
-            $this->filterProperty($property, $value, $aggregationBuilder, $resourceClass, $operationName, $context);
+            $this->filterProperty($this->denormalizePropertyName($property), $value, $aggregationBuilder, $resourceClass, $operationName, $context);
         }
     }
 

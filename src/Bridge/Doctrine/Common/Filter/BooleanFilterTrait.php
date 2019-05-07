@@ -50,9 +50,9 @@ trait BooleanFilterTrait
             if (!$this->isPropertyMapped($property, $resourceClass) || !$this->isBooleanField($property, $resourceClass)) {
                 continue;
             }
-
-            $description[$property] = [
-                'property' => $property,
+            $propertyName = $this->normalizePropertyName($property);
+            $description[$propertyName] = [
+                'property' => $propertyName,
                 'type' => 'bool',
                 'required' => false,
             ];
@@ -64,6 +64,8 @@ trait BooleanFilterTrait
     abstract protected function getProperties(): ?array;
 
     abstract protected function getLogger(): LoggerInterface;
+
+    abstract protected function normalizePropertyName($property);
 
     /**
      * Determines whether the given property refers to a boolean field.

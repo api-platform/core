@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Serializer\Filter;
 
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 
 /**
@@ -26,12 +27,14 @@ final class PropertyFilter implements FilterInterface
     private $overrideDefaultProperties;
     private $parameterName;
     private $whitelist;
+    private $nameConverter;
 
-    public function __construct(string $parameterName = 'properties', bool $overrideDefaultProperties = false, array $whitelist = null)
+    public function __construct(string $parameterName = 'properties', bool $overrideDefaultProperties = false, array $whitelist = null, NameConverterInterface $nameConverter = null)
     {
         $this->overrideDefaultProperties = $overrideDefaultProperties;
         $this->parameterName = $parameterName;
         $this->whitelist = null === $whitelist ? null : $this->formatWhitelist($whitelist);
+        $this->nameConverter = $nameConverter;
     }
 
     /**
@@ -50,6 +53,8 @@ final class PropertyFilter implements FilterInterface
         if (!\is_array($properties)) {
             return;
         }
+
+        $properties = $this->denormalizeProperties($properties);
 
         if (null !== $this->whitelist) {
             $properties = $this->getProperties($properties, $this->whitelist);
@@ -129,18 +134,37 @@ final class PropertyFilter implements FilterInterface
 
         foreach ($properties as $key => $value) {
             if (is_numeric($key)) {
-                if (\in_array($value, $whitelist, true)) {
-                    $result[] = $value;
+                if (\in_array($propertyName = $this->denormalizePropertyName($value), $whitelist, true)) {
+                    $result[] = $propertyName;
                 }
 
                 continue;
             }
 
             if (\is_array($value) && isset($whitelist[$key]) && $recursiveResult = $this->getProperties($value, $whitelist[$key])) {
-                $result[$key] = $recursiveResult;
+                $result[$this->denormalizePropertyName($key)] = $recursiveResult;
             }
         }
 
         return $result;
+    }
+
+    private function denormalizeProperties(array $properties): array
+    {
+        if (null === $this->nameConverter || !$properties) {
+            return $properties;
+        }
+
+        $result = [];
+        foreach ($properties as $key => $value) {
+            $result[$this->denormalizePropertyName($key)] = \is_array($value) ? $this->denormalizeProperties($value) : $this->denormalizePropertyName($value);
+        }
+
+        return $result;
+    }
+
+    private function denormalizePropertyName($property)
+    {
+        return null !== $this->nameConverter ? $this->nameConverter->denormalize($property) : $property;
     }
 }

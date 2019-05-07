@@ -47,9 +47,9 @@ trait OrderFilterTrait
             if (!$this->isPropertyMapped($property, $resourceClass)) {
                 continue;
             }
-
-            $description[sprintf('%s[%s]', $this->orderParameterName, $property)] = [
-                'property' => $property,
+            $propertyName = $this->normalizePropertyName($property);
+            $description[sprintf('%s[%s]', $this->orderParameterName, $propertyName)] = [
+                'property' => $propertyName,
                 'type' => 'string',
                 'required' => false,
             ];
@@ -59,6 +59,8 @@ trait OrderFilterTrait
     }
 
     abstract protected function getProperties(): ?array;
+
+    abstract protected function normalizePropertyName($property);
 
     private function normalizeValue($value, string $property): ?string
     {

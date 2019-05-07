@@ -17,6 +17,7 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\ExistsFilter;
 use ApiPlatform\Core\Test\DoctrineOrmFilterTestCase;
 use ApiPlatform\Core\Tests\Bridge\Doctrine\Common\Filter\ExistsFilterTestTrait;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Serializer\NameConverter\CustomConverter;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Symfony\Component\HttpFoundation\RequestStack;
 
@@ -79,8 +80,8 @@ class ExistsFilterTest extends DoctrineOrmFilterTestCase
                 'type' => 'bool',
                 'required' => false,
             ],
-            'exists[nameConverted]' => [
-                'property' => 'nameConverted',
+            'exists[name_converted]' => [
+                'property' => 'name_converted',
                 'type' => 'bool',
                 'required' => false,
             ],
@@ -273,7 +274,7 @@ class ExistsFilterTest extends DoctrineOrmFilterTestCase
             sprintf('SELECT o FROM %s o WHERE o.description IS NOT NULL', Dummy::class),
             null,
             function (ManagerRegistry $managerRegistry, array $properties = null, RequestStack $requestStack = null): ExistsFilter {
-                return new ExistsFilter($managerRegistry, $requestStack, null, $properties, 'exists');
+                return new ExistsFilter($managerRegistry, $requestStack, null, $properties, 'exists', new CustomConverter());
             },
         ];
 
@@ -282,6 +283,6 @@ class ExistsFilterTest extends DoctrineOrmFilterTestCase
 
     protected function buildFilter(?array $properties = null)
     {
-        return new $this->filterClass($this->managerRegistry, null, null, $properties, 'exists');
+        return new $this->filterClass($this->managerRegistry, null, null, $properties, 'exists', new CustomConverter());
     }
 }

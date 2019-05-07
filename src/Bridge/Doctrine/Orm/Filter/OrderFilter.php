@@ -22,6 +22,7 @@ use Doctrine\ORM\QueryBuilder;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 
 /**
  * Order the collection by given properties.
@@ -40,7 +41,7 @@ class OrderFilter extends AbstractContextAwareFilter implements OrderFilterInter
 {
     use OrderFilterTrait;
 
-    public function __construct(ManagerRegistry $managerRegistry, ?RequestStack $requestStack = null, string $orderParameterName = 'order', LoggerInterface $logger = null, array $properties = null)
+    public function __construct(ManagerRegistry $managerRegistry, ?RequestStack $requestStack = null, string $orderParameterName = 'order', LoggerInterface $logger = null, array $properties = null, NameConverterInterface $nameConverter = null)
     {
         if (null !== $properties) {
             $properties = array_map(function ($propertyOptions) {
@@ -55,7 +56,7 @@ class OrderFilter extends AbstractContextAwareFilter implements OrderFilterInter
             }, $properties);
         }
 
-        parent::__construct($managerRegistry, $requestStack, $logger, $properties);
+        parent::__construct($managerRegistry, $requestStack, $logger, $properties, $nameConverter);
 
         $this->orderParameterName = $orderParameterName;
     }
@@ -76,7 +77,7 @@ class OrderFilter extends AbstractContextAwareFilter implements OrderFilterInter
         }
 
         foreach ($context['filters'][$this->orderParameterName] as $property => $value) {
-            $this->filterProperty($property, $value, $queryBuilder, $queryNameGenerator, $resourceClass, $operationName, $context);
+            $this->filterProperty($this->denormalizePropertyName($property), $value, $queryBuilder, $queryNameGenerator, $resourceClass, $operationName, $context);
         }
     }
 

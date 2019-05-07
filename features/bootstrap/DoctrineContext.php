@@ -17,6 +17,10 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\CompositeItem as Composi
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\CompositeLabel as CompositeLabelDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\CompositePrimitiveItem as CompositePrimitiveItemDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\CompositeRelation as CompositeRelationDocument;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\ConvertedBoolean as ConvertedBoolDocument;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\ConvertedDate as ConvertedDateDocument;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\ConvertedInteger as ConvertedIntegerDocument;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\ConvertedString as ConvertedStringDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\Customer as CustomerDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\Dummy as DummyDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\DummyAggregateOffer as DummyAggregateOfferDocument;
@@ -62,6 +66,10 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\CompositeLabel;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\CompositePrimitiveItem;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\CompositeRelation;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Container;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\ConvertedBoolean;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\ConvertedDate;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\ConvertedInteger;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\ConvertedString;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Customer;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyAggregateOffer;
@@ -164,6 +172,7 @@ final class DoctrineContext implements Context
             $dummy->setAlias('Alias #'.($nb - $i));
             $dummy->setDummy('SomeDummyTest'.$i);
             $dummy->setDescription($descriptions[($i - 1) % 2]);
+            $dummy->nameConverted = 'Converted '.$i;
 
             $this->manager->persist($dummy);
         }
@@ -257,6 +266,7 @@ final class DoctrineContext implements Context
             foreach (['foo', 'bar', 'baz'] as $property) {
                 $dummyProperty->{$property} = $dummyGroup->{$property} = ucfirst($property).' #'.$i;
             }
+            $dummyProperty->nameConverted = "NameConverted #$i";
 
             $dummyProperty->group = $dummyGroup;
 
@@ -652,6 +662,66 @@ final class DoctrineContext implements Context
             }
 
             $this->manager->persist($dummy);
+        }
+
+        $this->manager->flush();
+    }
+
+    /**
+     * @Given there are :nb convertedDate objects
+     */
+    public function thereAreconvertedDateObjectsWith(int $nb)
+    {
+        for ($i = 1; $i <= $nb; ++$i) {
+            $convertedDate = $this->buildConvertedDate();
+            $convertedDate->nameConverted = new \DateTime(sprintf('2015-04-%d', $i), new \DateTimeZone('UTC'));
+
+            $this->manager->persist($convertedDate);
+        }
+
+        $this->manager->flush();
+    }
+
+    /**
+     * @Given there are :nb convertedString objects
+     */
+    public function thereAreconvertedStringObjectsWith(int $nb)
+    {
+        for ($i = 1; $i <= $nb; ++$i) {
+            $convertedString = $this->buildConvertedString();
+            $convertedString->nameConverted = ($i % 2) ? "name#$i" : null;
+
+            $this->manager->persist($convertedString);
+        }
+
+        $this->manager->flush();
+    }
+
+    /**
+     * @Given there are :nb convertedBoolean objects
+     */
+    public function thereAreconvertedBooleanObjectsWith(int $nb)
+    {
+        for ($i = 1; $i <= $nb; ++$i) {
+            $convertedBoolean = $this->buildConvertedBoolean();
+            $convertedBoolean->nameConverted = (bool) ($i % 2);
+
+            $this->manager->persist($convertedBoolean);
+        }
+
+        $this->manager->flush();
+    }
+
+    /**
+     * @Given there are :nb convertedInteger objects
+     */
+    public function thereAreconvertedIntegerObjectsWith(int $nb)
+    {
+        for ($i = 1; $i <= $nb; ++$i) {
+            $convertedInteger = $this->buildConvertedInteger();
+            $convertedInteger->nameConverted = $i;
+
+            $this->manager->persist($convertedInteger);
         }
 
         $this->manager->flush();
@@ -1264,6 +1334,35 @@ final class DoctrineContext implements Context
         $this->manager->clear();
     }
 
+    /**
+     * @Given there is a order with same customer and receiver
+     */
+    public function testEagerLoadingNotDuplicateRelation()
+    {
+        $customer = $this->isOrm() ? new Customer() : new CustomerDocument();
+        $customer->name = 'customer_name';
+
+        $address1 = $this->isOrm() ? new Address() : new AddressDocument();
+        $address1->name = 'foo';
+        $address2 = $this->isOrm() ? new Address() : new AddressDocument();
+        $address2->name = 'bar';
+
+        $order = $this->isOrm() ? new Order() : new OrderDocument();
+        $order->recipient = $customer;
+        $order->customer = $customer;
+
+        $customer->addresses->add($address1);
+        $customer->addresses->add($address2);
+
+        $this->manager->persist($address1);
+        $this->manager->persist($address2);
+        $this->manager->persist($customer);
+        $this->manager->persist($order);
+
+        $this->manager->flush();
+        $this->manager->clear();
+    }
+
     private function isOrm(): bool
     {
         return null !== $this->schemaTool;
@@ -1579,31 +1678,34 @@ final class DoctrineContext implements Context
     }
 
     /**
-     * @Given there is a order with same customer and receiver
+     * @return ConvertedDate|ConvertedDateDocument
      */
-    public function testEagerLoadingNotDuplicateRelation()
+    private function buildConvertedDate()
     {
-        $customer = $this->isOrm() ? new Customer() : new CustomerDocument();
-        $customer->name = 'customer_name';
+        return $this->isOrm() ? new ConvertedDate() : new ConvertedDateDocument();
+    }
 
-        $address1 = $this->isOrm() ? new Address() : new AddressDocument();
-        $address1->name = 'foo';
-        $address2 = $this->isOrm() ? new Address() : new AddressDocument();
-        $address2->name = 'bar';
+    /**
+     * @return ConvertedBoolean|ConvertedBoolDocument
+     */
+    private function buildConvertedBoolean()
+    {
+        return $this->isOrm() ? new ConvertedBoolean() : new ConvertedBoolDocument();
+    }
 
-        $order = $this->isOrm() ? new Order() : new OrderDocument();
-        $order->recipient = $customer;
-        $order->customer = $customer;
+    /**
+     * @return ConvertedInteger|ConvertedIntegerDocument
+     */
+    private function buildConvertedInteger()
+    {
+        return $this->isOrm() ? new ConvertedInteger() : new ConvertedIntegerDocument();
+    }
 
-        $customer->addresses->add($address1);
-        $customer->addresses->add($address2);
-
-        $this->manager->persist($address1);
-        $this->manager->persist($address2);
-        $this->manager->persist($customer);
-        $this->manager->persist($order);
-
-        $this->manager->flush();
-        $this->manager->clear();
+    /**
+     * @return ConvertedString|ConvertedStringDocument
+     */
+    private function buildConvertedString()
+    {
+        return $this->isOrm() ? new ConvertedString() : new ConvertedStringDocument();
     }
 }

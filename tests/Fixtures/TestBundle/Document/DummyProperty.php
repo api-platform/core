@@ -100,6 +100,15 @@ class DummyProperty
     public $groups;
 
     /**
+     * @var string
+     *
+     * @ODM\Field(nullable=true)
+     *
+     * @Groups({"dummy_read", "dummy_write"})
+     */
+    public $nameConverted;
+
+    /**
      * @return int
      */
     public function getId()

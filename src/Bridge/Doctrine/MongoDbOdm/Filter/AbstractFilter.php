@@ -19,6 +19,7 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ODM\MongoDB\Aggregation\Builder;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
+use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 
 /**
  * {@inheritdoc}
@@ -37,12 +38,14 @@ abstract class AbstractFilter implements FilterInterface
     protected $managerRegistry;
     protected $logger;
     protected $properties;
+    protected $nameConverter;
 
-    public function __construct(ManagerRegistry $managerRegistry, LoggerInterface $logger = null, array $properties = null)
+    public function __construct(ManagerRegistry $managerRegistry, LoggerInterface $logger = null, array $properties = null, NameConverterInterface $nameConverter = null)
     {
         $this->managerRegistry = $managerRegistry;
         $this->logger = $logger ?? new NullLogger();
         $this->properties = $properties;
+        $this->nameConverter = $nameConverter;
     }
 
     /**
@@ -51,7 +54,7 @@ abstract class AbstractFilter implements FilterInterface
     public function apply(Builder $aggregationBuilder, string $resourceClass, string $operationName = null, array &$context = [])
     {
         foreach ($context['filters'] as $property => $value) {
-            $this->filterProperty($property, $value, $aggregationBuilder, $resourceClass, $operationName, $context);
+            $this->filterProperty($this->denormalizePropertyName($property), $value, $aggregationBuilder, $resourceClass, $operationName, $context);
         }
     }
 
@@ -86,5 +89,15 @@ abstract class AbstractFilter implements FilterInterface
         }
 
         return \array_key_exists($property, $this->properties);
+    }
+
+    protected function denormalizePropertyName($property)
+    {
+        return null !== $this->nameConverter ? $this->nameConverter->denormalize($property) : $property;
+    }
+
+    protected function normalizePropertyName($property)
+    {
+        return null !== $this->nameConverter ? $this->nameConverter->normalize($property) : $property;
     }
 }

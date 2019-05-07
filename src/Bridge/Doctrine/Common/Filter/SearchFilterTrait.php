@@ -59,18 +59,19 @@ trait SearchFilterTrait
                 $metadata = $this->getClassMetadata($resourceClass);
             }
 
+            $propertyName = $this->normalizePropertyName($property);
             if ($metadata->hasField($field)) {
                 $typeOfField = $this->getType($metadata->getTypeOfField($field));
                 $strategy = $this->getProperties()[$property] ?? self::STRATEGY_EXACT;
-                $filterParameterNames = [$property];
+                $filterParameterNames = [$propertyName];
 
                 if (self::STRATEGY_EXACT === $strategy) {
-                    $filterParameterNames[] = $property.'[]';
+                    $filterParameterNames[] = $propertyName.'[]';
                 }
 
                 foreach ($filterParameterNames as $filterParameterName) {
                     $description[$filterParameterName] = [
-                        'property' => $property,
+                        'property' => $propertyName,
                         'type' => $typeOfField,
                         'required' => false,
                         'strategy' => $strategy,
@@ -79,13 +80,13 @@ trait SearchFilterTrait
                 }
             } elseif ($metadata->hasAssociation($field)) {
                 $filterParameterNames = [
-                    $property,
-                    $property.'[]',
+                    $propertyName,
+                    $propertyName.'[]',
                 ];
 
                 foreach ($filterParameterNames as $filterParameterName) {
                     $description[$filterParameterName] = [
-                        'property' => $property,
+                        'property' => $propertyName,
                         'type' => 'string',
                         'required' => false,
                         'strategy' => self::STRATEGY_EXACT,
@@ -110,6 +111,8 @@ trait SearchFilterTrait
     abstract protected function getIriConverter(): IriConverterInterface;
 
     abstract protected function getPropertyAccessor(): PropertyAccessorInterface;
+
+    abstract protected function normalizePropertyName($property);
 
     /**
      * Gets the ID from an IRI or a raw ID.
