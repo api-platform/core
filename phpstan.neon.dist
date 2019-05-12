@@ -84,6 +84,7 @@ parameters:
 		- '#Method ApiPlatform\\Core\\Bridge\\Doctrine\\Orm\\Filter\\AbstractFilter::apply\(\) invoked with 5 parameters, 3-4 required\.#'
 		- '#Method ApiPlatform\\Core\\Bridge\\Doctrine\\Orm\\Filter\\AbstractFilter::filterProperty\(\) invoked with 7 parameters, 5-6 required\.#'
 		- '#Method ApiPlatform\\Core\\Bridge\\Doctrine\\Orm\\Filter\\FilterInterface::apply\(\) invoked with 5 parameters, 3-4 required\.#'
+		- '#Method ApiPlatform\\Core\\Bridge\\Doctrine\\Orm\\Filter\\ExistsFilter::filterProperty\(\) invoked with 7 parameters, 5-6 required\.#'
 		- '#Method ApiPlatform\\Core\\Bridge\\Doctrine\\Orm\\Filter\\OrderFilter::filterProperty\(\) invoked with 7 parameters, 5-6 required\.#'
 		- '#Method ApiPlatform\\Core\\DataProvider\\CollectionDataProviderInterface::getCollection\(\) invoked with 3 parameters, 1-2 required\.#'
 		- '#Method Symfony\\Component\\Serializer\\NameConverter\\NameConverterInterface::normalize\(\) invoked with 3 parameters, 1 required\.#'
