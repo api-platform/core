@@ -302,12 +302,17 @@ class ApiPlatformExtensionTest extends TestCase
         $containerBuilderProphecy->setDefinition('api_platform.graphql.resolver.factory.item', Argument::type(Definition::class))->shouldNotBeCalled();
         $containerBuilderProphecy->setDefinition('api_platform.graphql.resolver.resource_field', Argument::type(Definition::class))->shouldNotBeCalled();
         $containerBuilderProphecy->setDefinition('api_platform.graphql.executor', Argument::type(Definition::class))->shouldNotBeCalled();
+        $containerBuilderProphecy->setDefinition('api_platform.graphql.type_builder', Argument::type(Definition::class))->shouldNotBeCalled();
+        $containerBuilderProphecy->setDefinition('api_platform.graphql.fields_builder', Argument::type(Definition::class))->shouldNotBeCalled();
+        $containerBuilderProphecy->setDefinition('api_platform.graphql.fields_builder_locator', Argument::type(Definition::class))->shouldNotBeCalled();
         $containerBuilderProphecy->setDefinition('api_platform.graphql.schema_builder', Argument::type(Definition::class))->shouldNotBeCalled();
         $containerBuilderProphecy->setDefinition('api_platform.graphql.normalizer.item', Argument::type(Definition::class))->shouldNotBeCalled();
         $containerBuilderProphecy->setDefinition('api_platform.graphql.normalizer.object', Argument::type(Definition::class))->shouldNotBeCalled();
         $containerBuilderProphecy->setDefinition('api_platform.graphql.iterable_type', Argument::type(Definition::class))->shouldNotBeCalled();
         $containerBuilderProphecy->setDefinition('api_platform.graphql.type_locator', Argument::type(Definition::class))->shouldNotBeCalled();
+        $containerBuilderProphecy->setDefinition('api_platform.graphql.types_container', Argument::type(Definition::class))->shouldNotBeCalled();
         $containerBuilderProphecy->setDefinition('api_platform.graphql.types_factory', Argument::type(Definition::class))->shouldNotBeCalled();
+        $containerBuilderProphecy->setDefinition('api_platform.graphql.type_converter', Argument::type(Definition::class))->shouldNotBeCalled();
         $containerBuilderProphecy->setDefinition('api_platform.graphql.query_resolver_locator', Argument::type(Definition::class))->shouldNotBeCalled();
         $containerBuilderProphecy->setDefinition('api_platform.graphql.mutation_resolver_locator', Argument::type(Definition::class))->shouldNotBeCalled();
         $containerBuilderProphecy->setDefinition('api_platform.graphql.command.export_command', Argument::type(Definition::class))->shouldNotBeCalled();
@@ -1030,6 +1035,9 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.doctrine_mongodb.odm.subresource_data_provider',
             'api_platform.graphql.action.entrypoint',
             'api_platform.graphql.executor',
+            'api_platform.graphql.type_builder',
+            'api_platform.graphql.fields_builder',
+            'api_platform.graphql.fields_builder_locator',
             'api_platform.graphql.schema_builder',
             'api_platform.graphql.resolver.factory.item',
             'api_platform.graphql.resolver.factory.collection',
@@ -1037,7 +1045,9 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.graphql.resolver.resource_field',
             'api_platform.graphql.iterable_type',
             'api_platform.graphql.type_locator',
+            'api_platform.graphql.types_container',
             'api_platform.graphql.types_factory',
+            'api_platform.graphql.type_converter',
             'api_platform.graphql.query_resolver_locator',
             'api_platform.graphql.mutation_resolver_locator',
             'api_platform.graphql.normalizer.item',

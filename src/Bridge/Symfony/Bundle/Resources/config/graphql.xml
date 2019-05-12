@@ -60,22 +60,50 @@
             <tag name="container.service_locator" />
         </service>
 
+        <service id="api_platform.graphql.types_container" class="ApiPlatform\Core\GraphQl\Type\TypesContainer" />
+
         <service id="api_platform.graphql.types_factory" class="ApiPlatform\Core\GraphQl\Type\TypesFactory">
             <argument type="service" id="api_platform.graphql.type_locator" />
         </service>
 
-        <service id="api_platform.graphql.schema_builder" class="ApiPlatform\Core\GraphQl\Type\SchemaBuilder" public="false">
+        <service id="api_platform.graphql.type_converter" class="ApiPlatform\Core\GraphQl\Type\TypeConverter">
+            <argument type="service" id="api_platform.graphql.type_builder" />
+            <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
+        </service>
+
+        <service id="api_platform.graphql.type_builder" class="ApiPlatform\Core\GraphQl\Type\TypeBuilder" public="false">
+            <argument type="service" id="api_platform.graphql.types_container" />
+            <argument type="service" id="api_platform.graphql.resolver.resource_field" />
+            <argument type="service" id="api_platform.graphql.fields_builder_locator" />
+        </service>
+
+        <service id="api_platform.graphql.fields_builder" class="ApiPlatform\Core\GraphQl\Type\FieldsBuilder" public="false">
             <argument type="service" id="api_platform.metadata.property.name_collection_factory" />
             <argument type="service" id="api_platform.metadata.property.metadata_factory" />
-            <argument type="service" id="api_platform.metadata.resource.name_collection_factory" />
             <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
+            <argument type="service" id="api_platform.graphql.types_container" />
+            <argument type="service" id="api_platform.graphql.type_builder" />
+            <argument type="service" id="api_platform.graphql.type_converter" />
             <argument type="service" id="api_platform.graphql.resolver.factory.item" />
             <argument type="service" id="api_platform.graphql.resolver.factory.collection" />
             <argument type="service" id="api_platform.graphql.resolver.factory.item_mutation" />
-            <argument type="service" id="api_platform.graphql.resolver.resource_field" />
-            <argument type="service" id="api_platform.graphql.types_factory" />
             <argument type="service" id="api_platform.filter_locator" />
             <argument>%api_platform.collection.pagination.enabled%</argument>
+        </service>
+
+        <service id="api_platform.graphql.fields_builder_locator" class="Symfony\Component\DependencyInjection\ServiceLocator" public="false">
+            <argument type="collection">
+                <argument type="service" id="api_platform.graphql.fields_builder" />
+            </argument>
+            <tag name="container.service_locator"/>
+        </service>
+
+        <service id="api_platform.graphql.schema_builder" class="ApiPlatform\Core\GraphQl\Type\SchemaBuilder" public="false">
+            <argument type="service" id="api_platform.metadata.resource.name_collection_factory" />
+            <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
+            <argument type="service" id="api_platform.graphql.types_factory" />
+            <argument type="service" id="api_platform.graphql.types_container" />
+            <argument type="service" id="api_platform.graphql.fields_builder" />
         </service>
 
         <!-- Action -->
