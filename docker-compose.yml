@@ -1,0 +1,15 @@
+version: '3'
+
+services:
+    php:
+        build:
+            context: ./docker
+        ports:
+            - "27017:27017"
+        environment:
+            XDEBUG_CONFIG: remote_host=REPLACE_WITH_YOUR_BRIDGE_IP
+            PHP_IDE_CONFIG: "serverName=docker"
+        volumes:
+            - .:/srv/php:rw,cached
+            - /opt:/opt
+        working_dir: /srv/php
