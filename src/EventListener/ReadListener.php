@@ -107,5 +107,6 @@ final class ReadListener
         }
 
         $request->attributes->set('data', $data);
+        $request->attributes->set('previous_data', \is_object($data) ? clone $data : $data);
     }
 }
