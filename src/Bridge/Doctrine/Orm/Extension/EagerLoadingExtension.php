@@ -167,10 +167,11 @@ final class EagerLoadingExtension implements ContextAwareQueryCollectionExtensio
                 continue;
             }
 
+            // prepare the child context
+            $childNormalizationContext = $normalizationContext;
             if (isset($normalizationContext[AbstractNormalizer::ATTRIBUTES])) {
                 if ($inAttributes = isset($normalizationContext[AbstractNormalizer::ATTRIBUTES][$association])) {
-                    // prepare the child context
-                    $normalizationContext[AbstractNormalizer::ATTRIBUTES] = $normalizationContext[AbstractNormalizer::ATTRIBUTES][$association];
+                    $childNormalizationContext[AbstractNormalizer::ATTRIBUTES] = $normalizationContext[AbstractNormalizer::ATTRIBUTES][$association];
                 }
             } else {
                 $inAttributes = null;
@@ -236,7 +237,7 @@ final class EagerLoadingExtension implements ContextAwareQueryCollectionExtensio
                 }
             }
 
-            $this->joinRelations($queryBuilder, $queryNameGenerator, $mapping['targetEntity'], $forceEager, $fetchPartial, $associationAlias, $options, $normalizationContext, $isLeftJoin, $joinCount, $currentDepth);
+            $this->joinRelations($queryBuilder, $queryNameGenerator, $mapping['targetEntity'], $forceEager, $fetchPartial, $associationAlias, $options, $childNormalizationContext, $isLeftJoin, $joinCount, $currentDepth);
         }
     }
 
