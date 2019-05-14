@@ -39,7 +39,7 @@ final class QueryBuilderHelper
             return $join->getAlias();
         }
 
-        $associationAlias = $newAlias ?: $queryNameGenerator->generateJoinAlias($association);
+        $associationAlias = $newAlias ?? $queryNameGenerator->generateJoinAlias($association);
         $query = "$alias.$association";
 
         if (Join::LEFT_JOIN === $joinType || QueryChecker::hasLeftJoin($queryBuilder)) {
