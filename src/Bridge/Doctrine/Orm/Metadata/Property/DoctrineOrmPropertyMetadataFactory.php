@@ -17,6 +17,7 @@ use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
+use Symfony\Component\PropertyInfo\Type;
 
 /**
  * Use Doctrine metadata to populate the identifier property.
@@ -73,6 +74,30 @@ final class DoctrineOrmPropertyMetadataFactory implements PropertyMetadataFactor
                 $propertyMetadata = $propertyMetadata->withWritable($writable);
 
                 break;
+            }
+        }
+
+        foreach ($doctrineClassMetadata->getAssociationMappings() as $associationMapping) {
+            if ($associationMapping['fieldName'] === $property) {
+                $isNullable = true;
+                foreach ($associationMapping['joinColumns'] as $joinColumn) {
+                    if (!$joinColumn['nullable']) {
+                        $isNullable = false;
+                        break;
+                    }
+                }
+
+                $type = $propertyMetadata->getType();
+                $newType = new Type(
+                    $type->getBuiltinType(),
+                    $isNullable,
+                    $type->getClassName(),
+                    $type->isCollection(),
+                    $type->getCollectionKeyType(),
+                    $type->getCollectionValueType()
+                );
+
+                $propertyMetadata = $propertyMetadata->withType($newType);
             }
         }
 
