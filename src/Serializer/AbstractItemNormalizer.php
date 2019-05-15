@@ -451,11 +451,6 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer implement
         if (!\is_array($value)) {
             // repeat the code so that IRIs keep working with the json format
             if (true === $this->allowPlainIdentifiers && $this->itemDataProvider) {
-                $type = $propertyMetadata->getType();
-                if ($type && $type->isNullable() && null === $value) {
-                    return null;
-                }
-                
                 $item = $this->itemDataProvider->getItem($className, $value, null, $context + ['fetch_data' => true]);
                 if (null === $item) {
                     throw new ItemNotFoundException(sprintf('Item not found for "%s".', $value));
