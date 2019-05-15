@@ -82,10 +82,10 @@ final class DoctrineOrmPropertyMetadataFactory implements PropertyMetadataFactor
                 if (!isset($associationMapping['joinColumns'])) {
                     continue;
                 }
-                
+
                 $isNullable = true;
                 foreach ($associationMapping['joinColumns'] as $joinColumn) {
-                    if (!$joinColumn['nullable']) {
+                    if (!isset($joinColumn['nullable']) || !$joinColumn['nullable']) {
                         $isNullable = false;
                         break;
                     }
