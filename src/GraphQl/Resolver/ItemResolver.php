@@ -72,6 +72,7 @@ final class ItemResolver
         $this->canAccess($this->resourceAccessChecker, $resourceMetadata, $resourceClass, $info, $item, 'query');
 
         $normalizationContext = $resourceMetadata->getGraphqlAttribute('query', 'normalization_context', [], true);
+        $normalizationContext['resource_class'] = $resourceClass;
 
         return $this->normalizer->normalize($item, ItemNormalizer::FORMAT, $normalizationContext + $baseNormalizationContext);
     }

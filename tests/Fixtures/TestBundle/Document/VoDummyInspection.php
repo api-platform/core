@@ -19,7 +19,10 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
- * @ApiResource
+ * @ApiResource(attributes={
+ *     "normalization_context"={"groups"={"inspection_read"}},
+ *     "denormalization_context"={"groups"={"inspection_write"}}
+ * })
  * @ODM\Document
  */
 class VoDummyInspection
@@ -30,7 +33,7 @@ class VoDummyInspection
      * @var bool
      *
      * @ODM\Field(type="boolean")
-     * @Groups({"write"})
+     * @Groups({"car_read", "car_write", "inspection_read", "inspection_write"})
      */
     private $accepted;
 
@@ -38,7 +41,7 @@ class VoDummyInspection
      * @var VoDummyCar
      *
      * @ODM\ReferenceOne(targetDocument=VoDummyCar::class, inversedBy="inspections")
-     * @Groups({"write"})
+     * @Groups({"inspection_read", "inspection_write"})
      */
     private $car;
 
@@ -46,7 +49,7 @@ class VoDummyInspection
      * @var DateTime
      *
      * @ODM\Field(type="date")
-     * @Groups({"write"})
+     * @Groups({"car_read", "car_write", "inspection_read", "inspection_write"})
      */
     private $performed;
 

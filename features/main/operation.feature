@@ -4,7 +4,6 @@ Feature: Operation support
   I need to be able to add custom operations and remove built-in ones
 
   @createSchema
-  @dropSchema
   Scenario: Can not write readonly property
     When I add "Content-Type" header equal to "application/ld+json"
     And I send a "POST" request to "/readable_only_properties" with body:

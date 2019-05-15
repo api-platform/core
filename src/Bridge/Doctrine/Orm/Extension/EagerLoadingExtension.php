@@ -81,6 +81,8 @@ final class EagerLoadingExtension implements ContextAwareQueryCollectionExtensio
     }
 
     /**
+     * {@inheritdoc}
+     *
      * The context may contain serialization groups which helps defining joined entities that are readable.
      */
     public function applyToItem(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, array $identifiers, string $operationName = null, array $context = [])
@@ -111,6 +113,10 @@ final class EagerLoadingExtension implements ContextAwareQueryCollectionExtensio
             return;
         }
 
+        if (!empty($context[AbstractNormalizer::GROUPS])) {
+            $options['serializer_groups'] = $context[AbstractNormalizer::GROUPS];
+        }
+
         $this->joinRelations($queryBuilder, $queryNameGenerator, $resourceClass, $forceEager, $fetchPartial, $queryBuilder->getRootAliases()[0], $options, $context);
     }
 
@@ -133,10 +139,6 @@ final class EagerLoadingExtension implements ContextAwareQueryCollectionExtensio
         $entityManager = $queryBuilder->getEntityManager();
         $classMetadata = $entityManager->getClassMetadata($resourceClass);
         $attributesMetadata = $this->classMetadataFactory ? $this->classMetadataFactory->getMetadataFor($resourceClass)->getAttributesMetadata() : null;
-
-        if (!empty($normalizationContext[AbstractNormalizer::GROUPS])) {
-            $options['serializer_groups'] = $normalizationContext[AbstractNormalizer::GROUPS];
-        }
 
         foreach ($classMetadata->associationMappings as $association => $mapping) {
             //Don't join if max depth is enabled and the current depth limit is reached

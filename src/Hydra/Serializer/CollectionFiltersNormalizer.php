@@ -17,7 +17,6 @@ use ApiPlatform\Core\Api\FilterCollection;
 use ApiPlatform\Core\Api\FilterInterface;
 use ApiPlatform\Core\Api\FilterLocatorTrait;
 use ApiPlatform\Core\Api\ResourceClassResolverInterface;
-use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\Serializer\Normalizer\CacheableSupportsMethodInterface;
@@ -71,19 +70,12 @@ final class CollectionFiltersNormalizer implements NormalizerInterface, Normaliz
     public function normalize($object, $format = null, array $context = [])
     {
         $data = $this->collectionNormalizer->normalize($object, $format, $context);
-        if (isset($context['api_sub_level'])) {
+
+        if (!isset($context['resource_class']) || isset($context['api_sub_level'])) {
             return $data;
         }
 
-        try {
-            $resourceClass = $this->resourceClassResolver->getResourceClass($object, $context['resource_class'] ?? null, true);
-        } catch (InvalidArgumentException $e) {
-            if (!isset($context['resource_class'])) {
-                return $data;
-            }
-
-            throw $e;
-        }
+        $resourceClass = $this->resourceClassResolver->getResourceClass($object, $context['resource_class']);
         $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
 
         $operationName = $context['collection_operation_name'] ?? null;

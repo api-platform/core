@@ -77,10 +77,12 @@ final class CollectionResolverFactory implements ResolverFactoryInterface
             }
 
             $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
-            $dataProviderContext = $resourceMetadata->getGraphqlAttribute($operationName ?? 'query', 'normalization_context', [], true);
-            $dataProviderContext['attributes'] = $this->fieldsToAttributes($info);
+            $normalizationContext = $resourceMetadata->getGraphqlAttribute($operationName ?? 'query', 'normalization_context', [], true);
+            $normalizationContext['attributes'] = $this->fieldsToAttributes($info);
+            $dataProviderContext = $normalizationContext;
             $dataProviderContext['filters'] = $this->getNormalizedFilters($args);
             $dataProviderContext['graphql'] = true;
+            $normalizationContext['resource_class'] = $resourceClass;
 
             if (isset($rootClass, $source[$rootProperty = $info->fieldName], $source[ItemNormalizer::ITEM_KEY])) {
                 $rootResolvedFields = $this->identifiersExtractor->getIdentifiersFromItem(unserialize($source[ItemNormalizer::ITEM_KEY]));
@@ -95,7 +97,7 @@ final class CollectionResolverFactory implements ResolverFactoryInterface
             if (!$this->paginationEnabled) {
                 $data = [];
                 foreach ($collection as $index => $object) {
-                    $data[$index] = $this->normalizer->normalize($object, ItemNormalizer::FORMAT, $dataProviderContext);
+                    $data[$index] = $this->normalizer->normalize($object, ItemNormalizer::FORMAT, $normalizationContext);
                 }
 
                 return $data;
@@ -120,7 +122,7 @@ final class CollectionResolverFactory implements ResolverFactoryInterface
 
             foreach ($collection as $index => $object) {
                 $data['edges'][$index] = [
-                    'node' => $this->normalizer->normalize($object, ItemNormalizer::FORMAT, $dataProviderContext),
+                    'node' => $this->normalizer->normalize($object, ItemNormalizer::FORMAT, $normalizationContext),
                     'cursor' => base64_encode((string) ($index + $offset)),
                 ];
             }
