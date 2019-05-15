@@ -79,6 +79,10 @@ final class DoctrineOrmPropertyMetadataFactory implements PropertyMetadataFactor
 
         foreach ($doctrineClassMetadata->getAssociationMappings() as $associationMapping) {
             if ($associationMapping['fieldName'] === $property) {
+                if (!isset($associationMapping['joinColumns'])) {
+                    continue;
+                }
+                
                 $isNullable = true;
                 foreach ($associationMapping['joinColumns'] as $joinColumn) {
                     if (!$joinColumn['nullable']) {
