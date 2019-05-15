@@ -164,11 +164,13 @@
                         </thead>
 
                         <tbody>
-                            {% for key, value in collector.resourceMetadata.attributes if key != 'filters' %}
-                                <tr>
-                                    <th scope="row">{{ key }}</th>
-                                    <td>{{- profiler_dump(value, 2) -}}</td>
-                                </tr>
+                            {% for key, value in collector.resourceMetadata.attributes %}
+                                {% if key != 'filters' %}
+                                    <tr>
+                                        <th scope="row">{{ key }}</th>
+                                        <td>{{- profiler_dump(value, 2) -}}</td>
+                                    </tr>
+                                {% endif %}
                             {% endfor %}
                         </tbody>
                     </table>
