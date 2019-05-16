@@ -19,6 +19,23 @@ default:
         - 'Behatch\Context\RestContext'
       filters:
         tags: '~@postgres&&~@mongodb&&~@elasticsearch'
+  extensions:
+    'Behat\Symfony2Extension':
+      kernel:
+        env: 'test'
+        debug: 'true'
+        path: 'tests/Fixtures/app/AppKernel.php'
+        bootstrap: 'tests/Fixtures/app/bootstrap.php'
+    'Behat\MinkExtension':
+      base_url: 'http://example.com/'
+      sessions:
+        default:
+          symfony2: ~
+    'Behatch\Extension': ~
+
+postgres:
+  suites:
+    default: false
     postgres:
       contexts:
         - 'DoctrineContext':
@@ -38,6 +55,10 @@ default:
         - 'Behatch\Context\RestContext'
       filters:
         tags: '~@sqlite&&~@mongodb&&~@elasticsearch'
+
+mongodb:
+  suites:
+    default: false
     mongodb:
       contexts:
         - 'DoctrineContext':
@@ -57,6 +78,10 @@ default:
         - 'Behatch\Context\RestContext'
       filters:
         tags: '~@sqlite&&~@elasticsearch&&~@!mongodb'
+
+elasticsearch:
+  suites:
+    default: false
     elasticsearch:
       paths:
         - '%paths.base%/features/elasticsearch'
@@ -71,21 +96,8 @@ default:
         - 'Behat\MinkExtension\Context\MinkContext'
       filters:
         tags: '@elasticsearch'
-  extensions:
-    'Behat\Symfony2Extension':
-      kernel:
-        env: 'test'
-        debug: 'true'
-        path: 'tests/Fixtures/app/AppKernel.php'
-        bootstrap: 'tests/Fixtures/app/bootstrap.php'
-    'Behat\MinkExtension':
-      base_url: 'http://example.com/'
-      sessions:
-        default:
-          symfony2: ~
-    'Behatch\Extension': ~
 
-coverage:
+default-coverage:
   suites:
     default:
       contexts:
@@ -107,3 +119,46 @@ coverage:
         - 'Behatch\Context\RestContext'
       filters:
         tags: '~@postgres&&~@mongodb&&~@elasticsearch'
+
+mongodb-coverage:
+  suites:
+    default: false
+    mongodb:
+      contexts:
+        - 'DoctrineContext':
+            doctrine: '@doctrine_mongodb'
+        - 'HttpHeaderContext'
+        - 'GraphqlContext'
+        - 'JsonContext'
+        - 'HydraContext'
+        - 'SwaggerContext'
+        - 'HttpCacheContext'
+        - 'JsonApiContext':
+            doctrine: '@doctrine_mongodb'
+            jsonApiSchemaFile: '%paths.base%/tests/Fixtures/JsonSchema/jsonapi.json'
+        - 'JsonHalContext':
+            schemaFile: '%paths.base%/tests/Fixtures/JsonHal/jsonhal.json'
+        - 'CoverageContext'
+        - 'Behat\MinkExtension\Context\MinkContext'
+        - 'Behatch\Context\RestContext'
+      filters:
+        tags: '~@sqlite&&~@elasticsearch&&~@!mongodb'
+
+elasticsearch-coverage:
+  suites:
+    default: false
+    elasticsearch:
+      paths:
+        - '%paths.base%/features/elasticsearch'
+      contexts:
+        - 'ElasticsearchContext':
+            client: '@test.api_platform.elasticsearch.client'
+            elasticsearchMappingsPath: '%paths.base%/tests/Fixtures/Elasticsearch/Mappings/'
+            elasticsearchFixturesPath: '%paths.base%/tests/Fixtures/Elasticsearch/Fixtures/'
+        - 'HttpHeaderContext'
+        - 'JsonContext'
+        - 'CoverageContext'
+        - 'Behatch\Context\RestContext'
+        - 'Behat\MinkExtension\Context\MinkContext'
+      filters:
+        tags: '@elasticsearch'
