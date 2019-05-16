@@ -350,6 +350,8 @@ class DocumentationNormalizerV3Test extends TestCase
         ];
 
         $this->assertEquals($expected, $normalizer->normalize($documentation, DocumentationNormalizer::FORMAT, ['base_url' => '/app_dev.php/']));
+        $this->assertArrayNotHasKey('servers', (array) $normalizer->normalize($documentation, DocumentationNormalizer::FORMAT, ['base_url' => '/']));
+        $this->assertArrayNotHasKey('servers', (array) $normalizer->normalize($documentation, DocumentationNormalizer::FORMAT, ['base_url' => '']));
     }
 
     public function testNormalizeWithNameConverter()
