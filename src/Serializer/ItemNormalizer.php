@@ -30,8 +30,6 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 /**
  * Generic item normalizer.
  *
- * @final
- *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
 class ItemNormalizer extends AbstractItemNormalizer
