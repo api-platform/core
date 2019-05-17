@@ -44,6 +44,7 @@ class DummyTableInheritanceRelated
      * @var ArrayCollection Related children
      *
      * @ORM\OneToMany(targetEntity="DummyTableInheritance", mappedBy="parent")
+     * @ORM\OrderBy({"id"="ASC"})
      *
      * @Groups({"default"})
      */
