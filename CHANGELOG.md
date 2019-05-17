@@ -23,6 +23,7 @@
 * Replace the `data` request attribute by the return of the data persister
 * Fix error message in identifiers extractor
 * Improve the bundle's default configuration when using `symfony/symfony` is required
+* Fix the use of `MetadataAwareNameConverter` when available (configuring `name_converter: serializer.name_converter.metadata_aware` will now result in a circular reference error)
 
 ## 2.4.2
 
