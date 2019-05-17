@@ -91,7 +91,7 @@ final class WriteListener
                 }
 
                 if ($hasOutput) {
-                    $request->attributes->set('_api_write_item_iri', $this->iriConverter->getIriFromItem($controllerResult));
+                    $request->attributes->set('_api_write_item_iri', $this->iriConverter->getIriFromResourceClass($attributes['resource_class']));
                 }
             break;
             case 'DELETE':
