@@ -143,7 +143,7 @@ class AddHeadersListenerTest extends TestCase
         $event->getRequest()->willReturn($request)->shouldBeCalled();
         $event->getResponse()->willReturn($response)->shouldBeCalled();
 
-        $metadata = new ResourceMetadata(null, null, null, null, null, ['cache_headers' => ['max_age' => 123, 'shared_max_age' => 456, 'vary' => ['Meta-1', 'Meta-2']]]);
+        $metadata = new ResourceMetadata(null, null, null, null, null, ['cache_headers' => ['max_age' => 123, 'shared_max_age' => 456, 'vary' => ['Vary-1', 'Vary-2']]]);
         $factory = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $factory->create(Dummy::class)->willReturn($metadata)->shouldBeCalled();
 
@@ -151,6 +151,6 @@ class AddHeadersListenerTest extends TestCase
         $listener->onKernelResponse($event->reveal());
 
         $this->assertSame('max-age=123, public, s-maxage=456', $response->headers->get('Cache-Control'));
-        $this->assertSame(['Accept', 'Cookie', 'Meta-1', 'Meta-2'], $response->getVary());
+        $this->assertSame(['Vary-1', 'Vary-2'], $response->getVary());
     }
 }
