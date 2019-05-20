@@ -84,13 +84,22 @@ final class WriteListener
                 }
 
                 $hasOutput = true;
+                $getIriFromItem = false;
+                $getIriFromResourceClass = false;
                 if (null !== $this->resourceMetadataFactory) {
                     $resourceMetadata = $this->resourceMetadataFactory->create($attributes['resource_class']);
                     $outputMetadata = $resourceMetadata->getOperationAttribute($attributes, 'output', ['class' => $attributes['resource_class']], true);
                     $hasOutput = \array_key_exists('class', $outputMetadata) && null !== $outputMetadata['class'] && $controllerResult instanceof $outputMetadata['class'];
+                    if ($outputMetadata['class'] === $attributes['resource_class']) {
+                        $getIriFromItem = true;
+                    } else {
+                        $getIriFromResourceClass = true;
+                    }
                 }
 
-                if ($hasOutput) {
+                if ($hasOutput && $getIriFromItem) {
+                    $request->attributes->set('_api_write_item_iri', $this->iriConverter->getIriFromItem($controllerResult));
+                } elseif ($hasOutput && $getIriFromResourceClass) {
                     $request->attributes->set('_api_write_item_iri', $this->iriConverter->getIriFromResourceClass($attributes['resource_class']));
                 }
             break;
