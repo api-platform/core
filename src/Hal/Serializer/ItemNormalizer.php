@@ -38,9 +38,9 @@ final class ItemNormalizer extends AbstractItemNormalizer
     /**
      * {@inheritdoc}
      */
-    public function supportsNormalization($data, $format = null, array $context = []): bool
+    public function supportsNormalization($data, $format = null): bool
     {
-        return self::FORMAT === $format && parent::supportsNormalization($data, $format, $context);
+        return self::FORMAT === $format && parent::supportsNormalization($data, $format);
     }
 
     /**
@@ -85,7 +85,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
     /**
      * {@inheritdoc}
      */
-    public function supportsDenormalization($data, $type, $format = null, array $context = []): bool
+    public function supportsDenormalization($data, $type, $format = null): bool
     {
         // prevent the use of lower priority normalizers (e.g. serializer.normalizer.object) for this format
         return self::FORMAT === $format;
