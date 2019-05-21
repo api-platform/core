@@ -70,7 +70,9 @@ final class AddHeadersListener
             $response->setMaxAge($maxAge);
         }
 
-        if (null !== $this->vary) {
+        if (isset($resourceCacheHeaders['vary'])) {
+            $response->setVary($resourceCacheHeaders['vary']);
+        } elseif (null !== $this->vary) {
             $response->setVary(array_diff($this->vary, $response->getVary()), false);
         }
 
