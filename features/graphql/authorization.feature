@@ -40,7 +40,7 @@ Feature: Authorization checking
     And the header "Content-Type" should be equal to "application/json"
     And the JSON node "errors[0].message" should be equal to "Access Denied."
 
-  Scenario: An anonymous user tries to create a resource he is not allowed to
+  Scenario: An anonymous user tries to create a resource they is not allowed to
     When I send the following GraphQL request:
     """
     mutation {
@@ -96,7 +96,7 @@ Feature: Authorization checking
     And the header "Content-Type" should be equal to "application/json"
     And the JSON node "data.createSecuredDummy.securedDummy.owner" should be equal to "dunglas"
 
-  Scenario: A user cannot retrieve an item he doesn't own
+  Scenario: A user cannot retrieve an item they doesn't own
     When I add "Authorization" header equal to "Basic ZHVuZ2xhczprZXZpbg=="
     And I send the following GraphQL request:
     """
@@ -112,7 +112,7 @@ Feature: Authorization checking
     And the header "Content-Type" should be equal to "application/json"
     And the JSON node "errors[0].message" should be equal to "Access Denied."
 
-  Scenario: A user can retrieve an item he owns
+  Scenario: A user can retrieve an item they owns
     When I add "Authorization" header equal to "Basic ZHVuZ2xhczprZXZpbg=="
     And I send the following GraphQL request:
     """
@@ -128,7 +128,7 @@ Feature: Authorization checking
     And the header "Content-Type" should be equal to "application/json"
     And the JSON node "data.securedDummy.owner" should be equal to the string "dunglas"
 
-  Scenario: A user can't assign him an item he doesn't own
+  Scenario: A user can't assign to themself an item they doesn't own
     When I add "Authorization" header equal to "Basic YWRtaW46a2l0dGVu"
     And I send the following GraphQL request:
     """
@@ -147,7 +147,7 @@ Feature: Authorization checking
     And the header "Content-Type" should be equal to "application/json"
     And the JSON node "errors[0].message" should be equal to "Access Denied."
 
-  Scenario: A user can update an item he owns and transfer it
+  Scenario: A user can update an item they owns and transfer it
     When I add "Authorization" header equal to "Basic ZHVuZ2xhczprZXZpbg=="
     And I send the following GraphQL request:
     """
