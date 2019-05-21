@@ -18,6 +18,36 @@
 * Metadata: Fix identifier support when using an interface as resource class
 * Metadata: the HTTP method is now always uppercased
 * Allow to disable listeners per operation (fix handling of empty request content)
+
+    Previously, empty request content was allowed for any `POST` and `PUT` operations. This was an unsafe assumption which caused [other problems](https://github.com/api-platform/core/issues/2731).
+
+    If you wish to allow empty request content, please add `"deserialize"=false` to the operation's attributes. For example:
+
+    ```php
+    <?php
+    // api/src/Entity/Book.php
+
+    use ApiPlatform\Core\Annotation\ApiResource;
+    use App\Controller\PublishBookAction;
+
+    /**
+     * @ApiResource(
+     *     itemOperations={
+     *         "put_publish"={
+     *             "method"="PUT",
+     *             "path"="/books/{id}/publish",
+     *             "controller"=PublishBookAction::class,
+     *             "deserialize"=false,
+     *         },
+     *     },
+     * )
+     */
+    class Book
+    {
+    ```
+
+    You may also need to add `"validate"=false` if the controller result is `null` (possibly because you don't need to persist the resource).
+
 * Return the `204` HTTP status code when the output class is set to `null`
 * Be more resilient when normalizing non-resource objects
 * Replace the `data` request attribute by the return of the data persister
