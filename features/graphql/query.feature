@@ -331,16 +331,22 @@ Feature: GraphQL query support
     }
     """
 
-  Scenario: Custom collection query
+  Scenario: Custom item query with custom arguments
+    Given there are 2 dummyCustomQuery objects
     When I send the following GraphQL request:
     """
     {
-      testCollectionDummyCustomQueries {
-        edges {
-          node {
-            message
-          }
-        }
+      testItemCustomArgumentsDummyCustomQuery(
+        id: "/dummy_custom_queries/1",
+        customArgumentBool: true,
+        customArgumentInt: 3,
+        customArgumentString: "A string",
+        customArgumentFloat: 2.6,
+        customArgumentIntArray: [4],
+        customArgumentCustomType: "2019-05-24T00:00:00+00:00"
+      ) {
+        message
+        customArgs
       }
     }
     """
@@ -351,15 +357,17 @@ Feature: GraphQL query support
     """
     {
       "data": {
-        "testCollectionDummyCustomQueries": {
-          "edges": [
-            {
-              "node": {"message": "Success!"}
-            },
-            {
-              "node": {"message": "Success!"}
-            }
-          ]
+        "testItemCustomArgumentsDummyCustomQuery": {
+          "message": "Success!",
+          "customArgs": {
+            "id": "/dummy_custom_queries/1",
+            "customArgumentBool": true,
+            "customArgumentInt": 3,
+            "customArgumentString": "A string",
+            "customArgumentFloat": 2.6,
+            "customArgumentIntArray": [4],
+            "customArgumentCustomType": "2019-05-24T00:00:00+00:00"
+          }
         }
       }
     }

@@ -13,13 +13,21 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\GraphQl\Type;
 
+use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\Exception\ResourceClassNotFoundException;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
+use GraphQL\Error\SyntaxError;
+use GraphQL\Language\AST\ListTypeNode;
+use GraphQL\Language\AST\NamedTypeNode;
+use GraphQL\Language\AST\NonNullTypeNode;
+use GraphQL\Language\AST\TypeNode;
+use GraphQL\Language\Parser;
+use GraphQL\Type\Definition\NullableType;
 use GraphQL\Type\Definition\Type as GraphQLType;
 use Symfony\Component\PropertyInfo\Type;
 
 /**
- * Convert a built-in type to its GraphQL equivalent.
+ * Converts a type to its GraphQL equivalent.
  *
  * @experimental
  *
@@ -27,13 +35,15 @@ use Symfony\Component\PropertyInfo\Type;
  */
 final class TypeConverter implements TypeConverterInterface
 {
-    private $resourceMetadataFactory;
     private $typeBuilder;
+    private $typesContainer;
+    private $resourceMetadataFactory;
 
-    public function __construct(TypeBuilderInterface $typeBuilder, ResourceMetadataFactoryInterface $resourceMetadataFactory)
+    public function __construct(TypeBuilderInterface $typeBuilder, TypesContainerInterface $typesContainer, ResourceMetadataFactoryInterface $resourceMetadataFactory)
     {
-        $this->resourceMetadataFactory = $resourceMetadataFactory;
         $this->typeBuilder = $typeBuilder;
+        $this->typesContainer = $typesContainer;
+        $this->resourceMetadataFactory = $resourceMetadataFactory;
     }
 
     /**
@@ -68,6 +78,24 @@ final class TypeConverter implements TypeConverterInterface
         }
     }
 
+    /**
+     * {@inheritdoc}
+     */
+    public function resolveType(string $type): ?GraphQLType
+    {
+        try {
+            $astTypeNode = Parser::parseType($type);
+        } catch (SyntaxError $e) {
+            throw new InvalidArgumentException(sprintf('"%s" is not a valid GraphQL type.', $type), 0, $e);
+        }
+
+        if ($graphQlType = $this->resolveAstTypeNode($astTypeNode, $type)) {
+            return $graphQlType;
+        }
+
+        throw new InvalidArgumentException(sprintf('The type "%s" was not resolved.', $type));
+    }
+
     private function getResourceType(Type $type, bool $input, ?string $queryName, ?string $mutationName, int $depth): ?GraphQLType
     {
         $resourceClass = $this->typeBuilder->isCollection($type) && ($collectionValueType = $type->getCollectionValueType()) ? $collectionValueType->getClassName() : $type->getClassName();
@@ -86,5 +114,52 @@ final class TypeConverter implements TypeConverterInterface
         }
 
         return $this->typeBuilder->getResourceObjectType($resourceClass, $resourceMetadata, $input, $queryName, $mutationName, false, $depth);
+    }
+
+    private function resolveAstTypeNode(TypeNode $astTypeNode, string $fromType): ?GraphQLType
+    {
+        if ($astTypeNode instanceof NonNullTypeNode) {
+            /** @var NullableType|null $nullableAstTypeNode */
+            $nullableAstTypeNode = $this->resolveNullableAstTypeNode($astTypeNode->type, $fromType);
+
+            return $nullableAstTypeNode ? GraphQLType::nonNull($nullableAstTypeNode) : null;
+        }
+
+        return $this->resolveNullableAstTypeNode($astTypeNode, $fromType);
+    }
+
+    private function resolveNullableAstTypeNode(TypeNode $astTypeNode, string $fromType): ?GraphQLType
+    {
+        if ($astTypeNode instanceof ListTypeNode) {
+            /** @var TypeNode $astTypeNodeElement */
+            $astTypeNodeElement = $astTypeNode->type;
+
+            return GraphQLType::listOf($this->resolveAstTypeNode($astTypeNodeElement, $fromType));
+        }
+
+        if (!$astTypeNode instanceof NamedTypeNode) {
+            return null;
+        }
+
+        $typeName = $astTypeNode->name->value;
+
+        switch ($typeName) {
+            case GraphQLType::STRING:
+                return GraphQLType::string();
+            case GraphQLType::INT:
+                return GraphQLType::int();
+            case GraphQLType::BOOLEAN:
+                return GraphQLType::boolean();
+            case GraphQLType::FLOAT:
+                return GraphQLType::float();
+            case GraphQLType::ID:
+                return GraphQLType::id();
+            default:
+                if ($this->typesContainer->has($typeName)) {
+                    return $this->typesContainer->get($typeName);
+                }
+
+                return null;
+        }
     }
 }

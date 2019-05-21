@@ -16,10 +16,11 @@ namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\GraphQl\Type;
 use ApiPlatform\Core\GraphQl\Type\TypeConverterInterface;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\Dummy as DummyDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
+use GraphQL\Type\Definition\Type as GraphQLType;
 use Symfony\Component\PropertyInfo\Type;
 
 /**
- * Convert a built-in type to its GraphQL equivalent.
+ * Converts a built-in type to its GraphQL equivalent.
  *
  * @author Alan Poulain <contact@alanpoulain.eu>
  */
@@ -46,5 +47,13 @@ final class TypeConverter implements TypeConverterInterface
         }
 
         return $this->defaultTypeConverter->convertType($type, $input, $queryName, $mutationName, $resourceClass, $property, $depth);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function resolveType(string $type): ?GraphQLType
+    {
+        return $this->defaultTypeConverter->resolveType($type);
     }
 }
