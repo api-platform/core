@@ -92,7 +92,10 @@ final class CollectionResolverFactory implements ResolverFactoryInterface
                 $collection = $this->collectionDataProvider->getCollection($resourceClass, null, $dataProviderContext);
             }
 
-            $this->canAccess($this->resourceAccessChecker, $resourceMetadata, $resourceClass, $info, $collection, $operationName ?? 'query');
+            $this->canAccess($this->resourceAccessChecker, $resourceMetadata, $resourceClass, $info, [
+                'object' => $collection,
+                'previous_object' => \is_object($collection) ? clone $collection : $collection,
+            ], $operationName ?? 'query');
 
             if (!$this->paginationEnabled) {
                 $data = [];

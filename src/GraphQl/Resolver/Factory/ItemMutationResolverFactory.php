@@ -93,43 +93,56 @@ final class ItemMutationResolverFactory implements ResolverFactoryInterface
                     throw Error::createLocatedError(sprintf('Item "%s" did not match expected type "%s".', $args['input']['id'], $resourceMetadata->getShortName()), $info->fieldNodes, $info->path);
                 }
             }
-
-            $this->canAccess($this->resourceAccessChecker, $resourceMetadata, $resourceClass, $info, $item, $operationName);
+            $previousItem = \is_object($item) ? clone $item : $item;
 
             $inputMetadata = $resourceMetadata->getGraphqlAttribute($operationName, 'input', null, true);
             $inputClass = null;
             if (\is_array($inputMetadata) && \array_key_exists('class', $inputMetadata)) {
                 if (null === $inputMetadata['class']) {
+                    $this->canAccess($this->resourceAccessChecker, $resourceMetadata, $resourceClass, $info, [
+                        'object' => $item,
+                        'previous_object' => $previousItem,
+                    ], $operationName);
+
                     return $data;
                 }
 
                 $inputClass = $inputMetadata['class'];
             }
 
-            switch ($operationName) {
-                case 'create':
-                case 'update':
-                    $context = ['resource_class' => $resourceClass, 'graphql_operation_name' => $operationName];
-                    if (null !== $item) {
-                        $context['object_to_populate'] = $item;
-                    }
-                    $context += $resourceMetadata->getGraphqlAttribute($operationName, 'denormalization_context', [], true);
-                    $item = $this->normalizer->denormalize($args['input'], $inputClass ?: $resourceClass, ItemNormalizer::FORMAT, $context);
-                    $this->validate($item, $info, $resourceMetadata, $operationName);
-                    $persistResult = $this->dataPersister->persist($item, $context);
+            if ('create' === $operationName || 'update' === $operationName) {
+                $context = ['resource_class' => $resourceClass, 'graphql_operation_name' => $operationName];
+                if (null !== $item) {
+                    $context['object_to_populate'] = $item;
+                }
 
-                    if (null === $persistResult) {
-                        @trigger_error(sprintf('Returning void from %s::persist() is deprecated since API Platform 2.3 and will not be supported in API Platform 3, an object should always be returned.', DataPersisterInterface::class), E_USER_DEPRECATED);
-                    }
+                $context += $resourceMetadata->getGraphqlAttribute($operationName, 'denormalization_context', [], true);
+                $item = $this->normalizer->denormalize($args['input'], $inputClass ?: $resourceClass, ItemNormalizer::FORMAT, $context);
+                $this->canAccess($this->resourceAccessChecker, $resourceMetadata, $resourceClass, $info, [
+                    'object' => $item,
+                    'previous_object' => $previousItem,
+                ], $operationName);
+                $this->validate($item, $info, $resourceMetadata, $operationName);
+                $persistResult = $this->dataPersister->persist($item, $context);
 
-                    return [$wrapFieldName => $this->normalizer->normalize($persistResult ?? $item, ItemNormalizer::FORMAT, $normalizationContext)] + $data;
-                case 'delete':
-                    if ($item) {
-                        $this->dataPersister->remove($item);
-                        $data[$wrapFieldName]['id'] = $args['input']['id'];
-                    } else {
-                        $data[$wrapFieldName]['id'] = null;
-                    }
+                if (null === $persistResult) {
+                    @trigger_error(sprintf('Returning void from %s::persist() is deprecated since API Platform 2.3 and will not be supported in API Platform 3, an object should always be returned.', DataPersisterInterface::class), E_USER_DEPRECATED);
+                }
+
+                return [$wrapFieldName => $this->normalizer->normalize($persistResult ?? $item, ItemNormalizer::FORMAT, $normalizationContext)] + $data;
+            }
+
+            $this->canAccess($this->resourceAccessChecker, $resourceMetadata, $resourceClass, $info, [
+                'object' => $item,
+                'previous_object' => $previousItem,
+            ], $operationName);
+
+            if ('delete' === $operationName) {
+                $data[$wrapFieldName]['id'] = null;
+                if ($item) {
+                    $this->dataPersister->remove($item);
+                    $data[$wrapFieldName]['id'] = $args['input']['id'];
+                }
             }
 
             return $data;
