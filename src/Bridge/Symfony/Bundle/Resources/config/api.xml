@@ -61,6 +61,7 @@
             <argument type="service" id="api_platform.identifiers_extractor.cached" />
             <argument type="service" id="api_platform.subresource_data_provider" on-invalid="ignore" />
             <argument type="service" id="api_platform.identifier.converter" on-invalid="ignore" />
+            <argument type="service" id="api_platform.resource_class_resolver" />
         </service>
         <service id="ApiPlatform\Core\Api\IriConverterInterface" alias="api_platform.iri_converter" />
 

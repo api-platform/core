@@ -29,7 +29,7 @@ abstract class VoDummyVehicle
      * @var string
      *
      * @ODM\Field
-     * @Groups({"write"})
+     * @Groups({"car_read", "car_write"})
      */
     private $make;
 
@@ -37,7 +37,7 @@ abstract class VoDummyVehicle
      * @var VoDummyInsuranceCompany
      *
      * @ODM\ReferenceOne(targetDocument=VoDummyInsuranceCompany::class, cascade={"persist"})
-     * @Groups({"write"})
+     * @Groups({"car_read", "car_write"})
      */
     private $insuranceCompany;
 
@@ -45,7 +45,7 @@ abstract class VoDummyVehicle
      * @var VoDummyDriver[]|Collection
      *
      * @ODM\ReferenceMany(targetDocument=VoDummyDriver::class, cascade={"persist"})
-     * @Groups({"write"})
+     * @Groups({"car_read", "car_write"})
      */
     private $drivers;
 

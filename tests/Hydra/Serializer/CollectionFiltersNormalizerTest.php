@@ -196,13 +196,16 @@ class CollectionFiltersNormalizerTest extends TestCase
         $dummy = new Dummy();
 
         $decoratedProphecy = $this->prophesize(NormalizerInterface::class);
-        $decoratedProphecy->normalize($dummy, null, ['collection_operation_name' => 'get'])->willReturn(['name' => 'foo'])->shouldBeCalled();
+        $decoratedProphecy->normalize($dummy, CollectionNormalizer::FORMAT, [
+            'collection_operation_name' => 'get',
+            'resource_class' => Dummy::class,
+        ])->willReturn(['name' => 'foo']);
 
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadata('foo', '', null, [], ['get' => []]));
 
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
-        $resourceClassResolverProphecy->getResourceClass($dummy, null, true)->willReturn(Dummy::class)->shouldBeCalled();
+        $resourceClassResolverProphecy->getResourceClass($dummy, Dummy::class)->willReturn(Dummy::class);
 
         $normalizer = new CollectionFiltersNormalizer(
             $decoratedProphecy->reveal(),
@@ -211,7 +214,10 @@ class CollectionFiltersNormalizerTest extends TestCase
             $this->prophesize(ContainerInterface::class)->reveal()
         );
 
-        $this->assertEquals(['name' => 'foo'], $normalizer->normalize($dummy, null, ['collection_operation_name' => 'get']));
+        $this->assertEquals(['name' => 'foo'], $normalizer->normalize($dummy, CollectionNormalizer::FORMAT, [
+            'collection_operation_name' => 'get',
+            'resource_class' => Dummy::class,
+        ]));
     }
 
     public function testDoNothingIfNoRequestUri()
@@ -219,13 +225,15 @@ class CollectionFiltersNormalizerTest extends TestCase
         $dummy = new Dummy();
 
         $decoratedProphecy = $this->prophesize(NormalizerInterface::class);
-        $decoratedProphecy->normalize($dummy, null, [])->willReturn(['name' => 'foo'])->shouldBeCalled();
+        $decoratedProphecy->normalize($dummy, CollectionNormalizer::FORMAT, [
+            'resource_class' => Dummy::class,
+        ])->willReturn(['name' => 'foo']);
 
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadata('foo', '', null, [], [], ['filters' => ['foo']]));
 
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
-        $resourceClassResolverProphecy->getResourceClass($dummy, null, true)->willReturn(Dummy::class)->shouldBeCalled();
+        $resourceClassResolverProphecy->getResourceClass($dummy, Dummy::class)->willReturn(Dummy::class);
 
         $normalizer = new CollectionFiltersNormalizer(
             $decoratedProphecy->reveal(),
@@ -234,7 +242,9 @@ class CollectionFiltersNormalizerTest extends TestCase
             $this->prophesize(ContainerInterface::class)->reveal()
         );
 
-        $this->assertEquals(['name' => 'foo'], $normalizer->normalize($dummy));
+        $this->assertEquals(['name' => 'foo'], $normalizer->normalize($dummy, CollectionNormalizer::FORMAT, [
+            'resource_class' => Dummy::class,
+        ]));
     }
 
     public function testNormalize()
@@ -282,13 +292,16 @@ class CollectionFiltersNormalizerTest extends TestCase
         $dummy = new Dummy();
 
         $decoratedProphecy = $this->prophesize(NormalizerInterface::class);
-        $decoratedProphecy->normalize($dummy, null, ['request_uri' => '/foo?bar=baz'])->willReturn(['name' => 'foo'])->shouldBeCalled();
+        $decoratedProphecy->normalize($dummy, CollectionNormalizer::FORMAT, [
+            'request_uri' => '/foo?bar=baz',
+            'resource_class' => Dummy::class,
+        ])->willReturn(['name' => 'foo']);
 
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadata('foo', '', null, [], [], ['filters' => ['foo']]));
 
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
-        $resourceClassResolverProphecy->getResourceClass($dummy, null, true)->willReturn(Dummy::class)->shouldBeCalled();
+        $resourceClassResolverProphecy->getResourceClass($dummy, Dummy::class)->willReturn(Dummy::class);
 
         $normalizer = new CollectionFiltersNormalizer(
             $decoratedProphecy->reveal(),
@@ -312,6 +325,9 @@ class CollectionFiltersNormalizerTest extends TestCase
                     ],
                 ],
             ],
-        ], $normalizer->normalize($dummy, null, ['request_uri' => '/foo?bar=baz']));
+        ], $normalizer->normalize($dummy, CollectionNormalizer::FORMAT, [
+            'request_uri' => '/foo?bar=baz',
+            'resource_class' => Dummy::class,
+        ]));
     }
 }
