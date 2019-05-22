@@ -20,6 +20,8 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Serializer\NameConverter\CustomCo
 use Doctrine\Common\Persistence\ManagerRegistry;
 
 /**
+ * @group mongodb
+ *
  * @author Alan Poulain <contact@alanpoulain.eu>
  */
 class OrderFilterTest extends DoctrineMongoDbOdmFilterTestCase

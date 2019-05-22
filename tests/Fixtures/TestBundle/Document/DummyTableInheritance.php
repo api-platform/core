@@ -21,7 +21,12 @@ use Symfony\Component\Serializer\Annotation\Groups;
  * @ODM\Document
  * @ODM\InheritanceType("SINGLE_COLLECTION")
  * @ODM\DiscriminatorField(value="discr")
- * @ODM\DiscriminatorMap({"dummyTableInheritance"=DummyTableInheritance::class, "dummyTableInheritanceChild"=DummyTableInheritanceChild::class, "dummyTableInheritanceDifferentChild"=DummyTableInheritanceDifferentChild::class})
+ * @ODM\DiscriminatorMap({
+ *     "dummyTableInheritance"=DummyTableInheritance::class,
+ *     "dummyTableInheritanceChild"=DummyTableInheritanceChild::class,
+ *     "dummyTableInheritanceDifferentChild"=DummyTableInheritanceDifferentChild::class,
+ *     "dummyTableInheritanceNotApiResourceChild"=DummyTableInheritanceNotApiResourceChild::class
+ * })
  * @ApiResource
  */
 class DummyTableInheritance

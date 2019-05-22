@@ -211,6 +211,47 @@ SQL;
         $this->assertEquals($this->toDQLString($expected), $qb->getDQL());
     }
 
+    public function testApplyCollectionCorrectlyReplacesJoinCondition()
+    {
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
+        $resourceMetadataFactoryProphecy->create(DummyCar::class)->willReturn(new ResourceMetadata(DummyCar::class));
+
+        $resourceNameCollectionFactoryProphecy = $this->prophesize(ResourceNameCollectionFactoryInterface::class);
+        $resourceNameCollectionFactoryProphecy->create()->willReturn(new ResourceNameCollection([DummyTravel::class]));
+
+        $em = $this->prophesize(EntityManager::class);
+        $em->getExpressionBuilder()->shouldBeCalled()->willReturn(new Expr());
+        $em->getClassMetadata(DummyCar::class)->shouldBeCalled()->willReturn(new ClassMetadataInfo(DummyCar::class));
+
+        $qb = new QueryBuilder($em->reveal());
+
+        $qb->select('o')
+            ->from(DummyCar::class, 'o')
+            ->leftJoin('o.colors', 'colors', 'ON', 'o.id = colors.car AND colors.id IN (1,2,3)')
+            ->where('o.colors = :foo')
+            ->setParameter('foo', 1);
+
+        $queryNameGenerator = $this->prophesize(QueryNameGeneratorInterface::class);
+        $queryNameGenerator->generateJoinAlias('colors')->shouldBeCalled()->willReturn('colors_2');
+        $queryNameGenerator->generateJoinAlias('o')->shouldBeCalled()->willReturn('o_2');
+
+        $filterEagerLoadingExtension = new FilterEagerLoadingExtension($resourceMetadataFactoryProphecy->reveal(), true, new ResourceClassResolver($resourceNameCollectionFactoryProphecy->reveal()));
+        $filterEagerLoadingExtension->applyToCollection($qb, $queryNameGenerator->reveal(), DummyCar::class, 'get');
+
+        $expected = <<<'SQL'
+SELECT o
+FROM ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyCar o
+LEFT JOIN o.colors colors ON o.id = colors.car AND colors.id IN (1,2,3)
+WHERE o IN(
+  SELECT o_2 FROM ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyCar o_2
+  LEFT JOIN o_2.colors colors_2 ON o_2.id = colors_2.car AND colors_2.id IN (1,2,3)
+  WHERE o_2.colors = :foo
+)
+SQL;
+
+        $this->assertEquals($this->toDQLString($expected), $qb->getDQL());
+    }
+
     /**
      * https://github.com/api-platform/core/issues/1021.
      */

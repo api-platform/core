@@ -81,6 +81,7 @@ final class ItemResolverFactory implements ResolverFactoryInterface
             $this->canAccess($this->resourceAccessChecker, $resourceMetadata, $resourceClass, $info, $item, $operationName ?? 'query');
 
             $normalizationContext = $resourceMetadata->getGraphqlAttribute($operationName ?? 'query', 'normalization_context', [], true);
+            $normalizationContext['resource_class'] = $resourceClass;
 
             return $this->normalizer->normalize($item, ItemNormalizer::FORMAT, $normalizationContext + $baseNormalizationContext);
         };

@@ -73,7 +73,7 @@ Feature: Handle properly invalid data submitted to the API
     And the JSON node "@context" should be equal to "/contexts/Error"
     And the JSON node "@type" should be equal to "hydra:Error"
     And the JSON node "hydra:title" should be equal to "An error occurred"
-    And the JSON node "hydra:description" should be equal to 'Expected IRI or nested document for attribute "relatedDummy", "string" given.'
+    And the JSON node "hydra:description" should be equal to 'Invalid IRI "1".'
     And the JSON node "trace" should exist
 
   Scenario: Ignore invalid dates

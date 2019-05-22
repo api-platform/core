@@ -20,6 +20,9 @@ use Doctrine\ODM\MongoDB\Iterator\Iterator;
 use Doctrine\ODM\MongoDB\UnitOfWork;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @group mongodb
+ */
 class PaginatorTest extends TestCase
 {
     /**

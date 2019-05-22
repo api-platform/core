@@ -15,31 +15,27 @@ namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity;
 
 use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
- * @ApiResource
  * @ORM\Entity
+ * @ApiResource
  */
-class VoDummyInsuranceCompany
+class ExternalUser extends AbstractUser
 {
-    use VoDummyIdAwareTrait;
-
     /**
-     * @var string
-     *
      * @ORM\Column
-     * @Groups({"car_read", "car_write"})
      */
-    private $name;
+    private $externalId;
 
-    public function __construct(string $name)
+    public function getExternalId(): ?string
     {
-        $this->name = $name;
+        return $this->externalId;
     }
 
-    public function getName()
+    public function setExternalId(string $externalId): self
     {
-        return $this->name;
+        $this->externalId = $externalId;
+
+        return $this;
     }
 }

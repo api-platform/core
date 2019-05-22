@@ -45,29 +45,35 @@ class CachedIdentifiersExtractorTest extends TestCase
      */
     public function testFirstPass($item, $expected)
     {
-        $key = 'iri_identifiers'.md5(Dummy::class);
+        $cacheItemKey = 'iri_identifiers'.md5(Dummy::class);
 
-        $cacheItem = $this->prophesize(CacheItemInterface::class);
-        $cacheItem->isHit()->shouldBeCalled()->willReturn(false);
-        $cacheItem->set(['id'])->shouldBeCalled();
+        $cacheItemProphecy = $this->prophesize(CacheItemInterface::class);
+        $cacheItemProphecy->isHit()->willReturn(false);
+        $cacheItemProphecy->set(['id'])->shouldBeCalled();
 
-        $cacheItemPool = $this->prophesize(CacheItemPoolInterface::class);
-        $cacheItemPool->getItem($key)->shouldBeCalled()->willReturn($cacheItem);
-        $cacheItemPool->save($cacheItem)->shouldBeCalled();
+        $cacheItemPoolProphecy = $this->prophesize(CacheItemPoolInterface::class);
+        $cacheItemPoolProphecy->getItem($cacheItemKey)->willReturn($cacheItemProphecy);
+        $cacheItemPoolProphecy->save($cacheItemProphecy)->shouldBeCalled();
 
-        $decoration = $this->prophesize(IdentifiersExtractorInterface::class);
-        $decoration->getIdentifiersFromItem($item)->shouldBeCalled()->willReturn($expected);
+        $decoratedProphecy = $this->prophesize(IdentifiersExtractorInterface::class);
+        $decoratedProphecy->getIdentifiersFromItem($item)->willReturn($expected);
 
-        $identifiersExtractor = new CachedIdentifiersExtractor($cacheItemPool->reveal(), $decoration->reveal(), null, $this->getResourceClassResolver());
+        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
+        $resourceClassResolverProphecy->getResourceClass($item)->willReturn(Dummy::class);
+        $resourceClassResolverProphecy->isResourceClass(Dummy::class)->willReturn(true);
+        $resourceClassResolverProphecy->isResourceClass(Uuid::class)->willReturn(false);
+
+        $identifiersExtractor = new CachedIdentifiersExtractor($cacheItemPoolProphecy->reveal(), $decoratedProphecy->reveal(), null, $resourceClassResolverProphecy->reveal());
 
         $this->assertSame($expected, $identifiersExtractor->getIdentifiersFromItem($item));
         $this->assertSame($expected, $identifiersExtractor->getIdentifiersFromItem($item), 'Trigger the local cache');
 
-        $decoration->getIdentifiersFromResourceClass(Dummy::class)->shouldBeCalled()->willReturn(['id']);
+        $expected = ['id'];
 
-        $expectedResult = ['id'];
-        $this->assertSame($expectedResult, $identifiersExtractor->getIdentifiersFromResourceClass(Dummy::class));
-        $this->assertSame($expectedResult, $identifiersExtractor->getIdentifiersFromResourceClass(Dummy::class), 'Trigger the local cache');
+        $decoratedProphecy->getIdentifiersFromResourceClass(Dummy::class)->willReturn($expected);
+
+        $this->assertSame($expected, $identifiersExtractor->getIdentifiersFromResourceClass(Dummy::class));
+        $this->assertSame($expected, $identifiersExtractor->getIdentifiersFromResourceClass(Dummy::class), 'Trigger the local cache');
     }
 
     /**
@@ -75,22 +81,34 @@ class CachedIdentifiersExtractorTest extends TestCase
      */
     public function testSecondPass($item, $expected)
     {
-        $key = 'iri_identifiers'.md5(Dummy::class);
+        $cacheItemKey = 'iri_identifiers'.md5(Dummy::class);
 
-        $cacheItem = $this->prophesize(CacheItemInterface::class);
-        $cacheItem->isHit()->shouldBeCalled()->willReturn(true);
-        $cacheItem->get()->shouldBeCalled()->willReturn(['id']);
+        $cacheItemProphecy = $this->prophesize(CacheItemInterface::class);
+        $cacheItemProphecy->isHit()->willReturn(true);
+        $cacheItemProphecy->get()->willReturn(['id']);
 
-        $cacheItemPool = $this->prophesize(CacheItemPoolInterface::class);
-        $cacheItemPool->getItem($key)->shouldBeCalled()->willReturn($cacheItem);
+        $cacheItemPoolProphecy = $this->prophesize(CacheItemPoolInterface::class);
+        $cacheItemPoolProphecy->getItem($cacheItemKey)->willReturn($cacheItemProphecy);
 
-        $decoration = $this->prophesize(IdentifiersExtractorInterface::class);
-        $decoration->getIdentifiersFromItem($item)->shouldNotBeCalled();
+        $decoratedProphecy = $this->prophesize(IdentifiersExtractorInterface::class);
+        $decoratedProphecy->getIdentifiersFromItem($item)->shouldNotBeCalled();
 
-        $identifiersExtractor = new CachedIdentifiersExtractor($cacheItemPool->reveal(), $decoration->reveal(), null, $this->getResourceClassResolver());
+        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
+        $resourceClassResolverProphecy->getResourceClass($item)->willReturn(Dummy::class);
+        $resourceClassResolverProphecy->isResourceClass(Dummy::class)->willReturn(true);
+        $resourceClassResolverProphecy->isResourceClass(Uuid::class)->willReturn(false);
+
+        $identifiersExtractor = new CachedIdentifiersExtractor($cacheItemPoolProphecy->reveal(), $decoratedProphecy->reveal(), null, $resourceClassResolverProphecy->reveal());
 
         $this->assertSame($expected, $identifiersExtractor->getIdentifiersFromItem($item));
         $this->assertSame($expected, $identifiersExtractor->getIdentifiersFromItem($item), 'Trigger the local cache');
+
+        $expected = ['id'];
+
+        $decoratedProphecy->getIdentifiersFromResourceClass(Dummy::class)->willReturn($expected);
+
+        $this->assertSame($expected, $identifiersExtractor->getIdentifiersFromResourceClass(Dummy::class));
+        $this->assertSame($expected, $identifiersExtractor->getIdentifiersFromResourceClass(Dummy::class), 'Trigger the local cache');
     }
 
     public function identifiersRelatedProvider()
@@ -128,24 +146,31 @@ class CachedIdentifiersExtractorTest extends TestCase
      */
     public function testFirstPassWithRelated($item, $expected)
     {
-        $key = 'iri_identifiers'.md5(Dummy::class);
-        $keyRelated = 'iri_identifiers'.md5(RelatedDummy::class);
+        $cacheItemKey = 'iri_identifiers'.md5(Dummy::class);
+        $relatedCacheItemKey = 'iri_identifiers'.md5(RelatedDummy::class);
 
-        $cacheItem = $this->prophesize(CacheItemInterface::class);
-        $cacheItem->isHit()->shouldBeCalled()->willReturn(true);
-        $cacheItem->get()->shouldBeCalled()->willReturn(['id', 'relatedDummy']);
+        $cacheItemProphecy = $this->prophesize(CacheItemInterface::class);
+        $cacheItemProphecy->isHit()->willReturn(true);
+        $cacheItemProphecy->get()->willReturn(['id', 'relatedDummy']);
 
-        $cacheItemRelated = $this->prophesize(CacheItemInterface::class);
-        $cacheItemRelated->isHit()->shouldBeCalled()->willReturn(false);
+        $relatedCacheItemProphecy = $this->prophesize(CacheItemInterface::class);
+        $relatedCacheItemProphecy->isHit()->willReturn(false);
 
-        $cacheItemPool = $this->prophesize(CacheItemPoolInterface::class);
-        $cacheItemPool->getItem($key)->shouldBeCalled()->willReturn($cacheItem);
-        $cacheItemPool->getItem($keyRelated)->shouldBeCalled()->willReturn($cacheItemRelated);
+        $cacheItemPoolProphecy = $this->prophesize(CacheItemPoolInterface::class);
+        $cacheItemPoolProphecy->getItem($cacheItemKey)->willReturn($cacheItemProphecy);
+        $cacheItemPoolProphecy->getItem($relatedCacheItemKey)->willReturn($relatedCacheItemProphecy);
 
-        $decoration = $this->prophesize(IdentifiersExtractorInterface::class);
-        $decoration->getIdentifiersFromItem($item)->shouldBeCalled()->willReturn($expected);
+        $decoratedProphecy = $this->prophesize(IdentifiersExtractorInterface::class);
+        $decoratedProphecy->getIdentifiersFromItem($item)->willReturn($expected);
 
-        $identifiersExtractor = new CachedIdentifiersExtractor($cacheItemPool->reveal(), $decoration->reveal(), null, $this->getResourceClassResolver());
+        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
+        $resourceClassResolverProphecy->getResourceClass($item)->willReturn(Dummy::class);
+        $resourceClassResolverProphecy->getResourceClass(Argument::type(RelatedDummy::class))->willReturn(RelatedDummy::class);
+        $resourceClassResolverProphecy->isResourceClass(Dummy::class)->willReturn(true);
+        $resourceClassResolverProphecy->isResourceClass(RelatedDummy::class)->willReturn(true);
+        $resourceClassResolverProphecy->isResourceClass(Uuid::class)->willReturn(false);
+
+        $identifiersExtractor = new CachedIdentifiersExtractor($cacheItemPoolProphecy->reveal(), $decoratedProphecy->reveal(), null, $resourceClassResolverProphecy->reveal());
 
         $this->assertSame($expected, $identifiersExtractor->getIdentifiersFromItem($item));
         $this->assertSame($expected, $identifiersExtractor->getIdentifiersFromItem($item), 'Trigger the local cache');
@@ -156,25 +181,32 @@ class CachedIdentifiersExtractorTest extends TestCase
      */
     public function testSecondPassWithRelated($item, $expected)
     {
-        $key = 'iri_identifiers'.md5(Dummy::class);
-        $keyRelated = 'iri_identifiers'.md5(RelatedDummy::class);
+        $cacheItemKey = 'iri_identifiers'.md5(Dummy::class);
+        $relatedCacheItemKey = 'iri_identifiers'.md5(RelatedDummy::class);
 
-        $cacheItem = $this->prophesize(CacheItemInterface::class);
-        $cacheItem->isHit()->shouldBeCalled()->willReturn(true);
-        $cacheItem->get()->shouldBeCalled()->willReturn(['id', 'relatedDummy']);
+        $cacheItemProphecy = $this->prophesize(CacheItemInterface::class);
+        $cacheItemProphecy->isHit()->willReturn(true);
+        $cacheItemProphecy->get()->willReturn(['id', 'relatedDummy']);
 
-        $cacheItemRelated = $this->prophesize(CacheItemInterface::class);
-        $cacheItemRelated->isHit()->shouldBeCalled()->willReturn(true);
-        $cacheItemRelated->get()->shouldBeCalled()->willReturn(['id']);
+        $relatedCacheItemProphecy = $this->prophesize(CacheItemInterface::class);
+        $relatedCacheItemProphecy->isHit()->willReturn(true);
+        $relatedCacheItemProphecy->get()->willReturn(['id']);
 
-        $cacheItemPool = $this->prophesize(CacheItemPoolInterface::class);
-        $cacheItemPool->getItem($key)->shouldBeCalled()->willReturn($cacheItem);
-        $cacheItemPool->getItem($keyRelated)->shouldBeCalled()->willReturn($cacheItemRelated);
+        $cacheItemPoolProphecy = $this->prophesize(CacheItemPoolInterface::class);
+        $cacheItemPoolProphecy->getItem($cacheItemKey)->willReturn($cacheItemProphecy);
+        $cacheItemPoolProphecy->getItem($relatedCacheItemKey)->willReturn($relatedCacheItemProphecy);
 
-        $decoration = $this->prophesize(IdentifiersExtractorInterface::class);
-        $decoration->getIdentifiersFromItem($item)->shouldNotBeCalled();
+        $decoratedProphecy = $this->prophesize(IdentifiersExtractorInterface::class);
+        $decoratedProphecy->getIdentifiersFromItem($item)->shouldNotBeCalled();
 
-        $identifiersExtractor = new CachedIdentifiersExtractor($cacheItemPool->reveal(), $decoration->reveal(), null, $this->getResourceClassResolver());
+        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
+        $resourceClassResolverProphecy->getResourceClass($item)->willReturn(Dummy::class);
+        $resourceClassResolverProphecy->getResourceClass(Argument::type(RelatedDummy::class))->willReturn(RelatedDummy::class);
+        $resourceClassResolverProphecy->isResourceClass(Dummy::class)->willReturn(true);
+        $resourceClassResolverProphecy->isResourceClass(RelatedDummy::class)->willReturn(true);
+        $resourceClassResolverProphecy->isResourceClass(Uuid::class)->willReturn(false);
+
+        $identifiersExtractor = new CachedIdentifiersExtractor($cacheItemPoolProphecy->reveal(), $decoratedProphecy->reveal(), null, $resourceClassResolverProphecy->reveal());
 
         $this->assertSame($expected, $identifiersExtractor->getIdentifiersFromItem($item));
         $this->assertSame($expected, $identifiersExtractor->getIdentifiersFromItem($item), 'Trigger the local cache');
@@ -190,15 +222,5 @@ class CachedIdentifiersExtractorTest extends TestCase
         $decoration = $this->prophesize(IdentifiersExtractorInterface::class);
 
         new CachedIdentifiersExtractor($cacheItemPool->reveal(), $decoration->reveal(), null);
-    }
-
-    private function getResourceClassResolver()
-    {
-        $resourceClassResolver = $this->prophesize(ResourceClassResolverInterface::class);
-        $resourceClassResolver->isResourceClass(Argument::type('string'))->will(function ($args) {
-            return !(Uuid::class === $args[0]);
-        });
-
-        return $resourceClassResolver->reveal();
     }
 }

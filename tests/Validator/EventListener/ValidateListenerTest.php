@@ -20,7 +20,9 @@ use ApiPlatform\Core\Validator\EventListener\ValidateListener;
 use ApiPlatform\Core\Validator\Exception\ValidationException;
 use ApiPlatform\Core\Validator\ValidatorInterface;
 use PHPUnit\Framework\TestCase;
+use Prophecy\Argument;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 
@@ -35,21 +37,19 @@ class ValidateListenerTest extends TestCase
     public function testNotAnApiPlatformRequest()
     {
         $validatorProphecy = $this->prophesize(ValidatorInterface::class);
-        $validatorProphecy->validate()->shouldNotBeCalled();
-        $validator = $validatorProphecy->reveal();
+        $validatorProphecy->validate(Argument::cetera())->shouldNotBeCalled();
 
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $resourceMetadataFactoryProphecy->create()->shouldNotBeCalled();
-        $resourceMetadataFactory = $resourceMetadataFactoryProphecy->reveal();
 
         $request = new Request();
         $request->setMethod('POST');
 
-        $event = $this->prophesize(GetResponseForControllerResultEvent::class);
-        $event->getRequest()->willReturn($request)->shouldBeCalled();
+        $eventProphecy = $this->prophesize(GetResponseForControllerResultEvent::class);
+        $eventProphecy->getControllerResult()->willReturn([]);
+        $eventProphecy->getRequest()->willReturn($request);
 
-        $listener = new ValidateListener($validator, $resourceMetadataFactory);
-        $listener->onKernelView($event->reveal());
+        $listener = new ValidateListener($validatorProphecy->reveal(), $resourceMetadataFactoryProphecy->reveal());
+        $listener->onKernelView($eventProphecy->reveal());
     }
 
     public function testValidatorIsCalled()
@@ -67,19 +67,73 @@ class ValidateListenerTest extends TestCase
         $validationViewListener->onKernelView($event);
     }
 
-    public function testDoNotCallWhenReceiveFlagIsFalse()
+    public function testDoNotValidateWhenControllerResultIsResponse()
     {
-        $data = new DummyEntity();
-        $expectedValidationGroups = ['a', 'b', 'c'];
-
         $validatorProphecy = $this->prophesize(ValidatorInterface::class);
-        $validatorProphecy->validate($data, ['groups' => $expectedValidationGroups])->shouldNotBeCalled();
-        $validator = $validatorProphecy->reveal();
+        $validatorProphecy->validate(Argument::cetera())->shouldNotBeCalled();
 
-        [$resourceMetadataFactory, $event] = $this->createEventObject($expectedValidationGroups, $data, false);
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
 
-        $validationViewListener = new ValidateListener($validator, $resourceMetadataFactory);
-        $validationViewListener->onKernelView($event);
+        $dummy = new DummyEntity();
+
+        $request = new Request([], [], ['data' => $dummy, '_api_resource_class' => DummyEntity::class, '_api_collection_operation_name' => 'post', '_api_receive' => false]);
+        $request->setMethod('POST');
+
+        $response = new Response();
+
+        $eventProphecy = $this->prophesize(GetResponseForControllerResultEvent::class);
+        $eventProphecy->getControllerResult()->willReturn($response);
+        $eventProphecy->getRequest()->willReturn($request);
+
+        $validationViewListener = new ValidateListener($validatorProphecy->reveal(), $resourceMetadataFactoryProphecy->reveal());
+        $validationViewListener->onKernelView($eventProphecy->reveal());
+    }
+
+    public function testDoNotValidateWhenReceiveFlagIsFalse()
+    {
+        $validatorProphecy = $this->prophesize(ValidatorInterface::class);
+        $validatorProphecy->validate(Argument::cetera())->shouldNotBeCalled();
+
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
+
+        $dummy = new DummyEntity();
+
+        $request = new Request([], [], ['data' => $dummy, '_api_resource_class' => DummyEntity::class, '_api_collection_operation_name' => 'post', '_api_receive' => false]);
+        $request->setMethod('POST');
+
+        $eventProphecy = $this->prophesize(GetResponseForControllerResultEvent::class);
+        $eventProphecy->getControllerResult()->willReturn($dummy);
+        $eventProphecy->getRequest()->willReturn($request);
+
+        $validationViewListener = new ValidateListener($validatorProphecy->reveal(), $resourceMetadataFactoryProphecy->reveal());
+        $validationViewListener->onKernelView($eventProphecy->reveal());
+    }
+
+    public function testDoNotValidateWhenDisabledInOperationAttribute()
+    {
+        $validatorProphecy = $this->prophesize(ValidatorInterface::class);
+        $validatorProphecy->validate(Argument::cetera())->shouldNotBeCalled();
+
+        $resourceMetadata = new ResourceMetadata('DummyEntity', null, null, [], [
+            'post' => [
+                'validate' => false,
+            ],
+        ]);
+
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
+        $resourceMetadataFactoryProphecy->create(DummyEntity::class)->willReturn($resourceMetadata);
+
+        $dummy = new DummyEntity();
+
+        $request = new Request([], [], ['data' => $dummy, '_api_resource_class' => DummyEntity::class, '_api_collection_operation_name' => 'post']);
+        $request->setMethod('POST');
+
+        $eventProphecy = $this->prophesize(GetResponseForControllerResultEvent::class);
+        $eventProphecy->getControllerResult()->willReturn($dummy);
+        $eventProphecy->getRequest()->willReturn($request);
+
+        $validationViewListener = new ValidateListener($validatorProphecy->reveal(), $resourceMetadataFactoryProphecy->reveal());
+        $validationViewListener->onKernelView($eventProphecy->reveal());
     }
 
     public function testThrowsValidationExceptionWithViolationsFound()

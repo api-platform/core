@@ -32,15 +32,20 @@ Feature: Table inheritance
         },
         "name": {
           "type": "string",
-          "pattern": "^foo$",
-          "required": "true"
+          "pattern": "^foo$"
         },
         "nickname": {
           "type": "string",
-          "pattern": "^bar$",
-          "required": "true"
+          "pattern": "^bar$"
         }
-      }
+      },
+      "required": [
+        "@type",
+        "@context",
+        "@id",
+        "name",
+        "nickname"
+      ]
     }
     """
 
@@ -56,31 +61,114 @@ Feature: Table inheritance
       "properties": {
         "hydra:member": {
           "type": "array",
-          "items": {
-            "type": "object",
-            "properties": {
-              "@type": {
-                "type": "string",
-                "pattern": "^DummyTableInheritanceChild$"
+          "items": [
+            {
+              "type": "object",
+              "properties": {
+                "@type": {
+                  "type": "string",
+                  "pattern": "^DummyTableInheritanceChild$"
+                },
+                "@id": {
+                  "type": "string",
+                  "pattern": "^/dummy_table_inheritance_children/1$"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "nickname": {
+                  "type": "string"
+                }
               },
-              "name": {
-                "type": "string",
-                "required": "true"
-              },
-              "nickname": {
-                "type": "string",
-                "required": "true"
-              }
+              "required": [
+                "@type",
+                "@id",
+                "name",
+                "nickname"
+              ]
             }
-          },
-          "minItems": 1
+          ],
+          "additionalItems": false
         }
       },
-      "required": ["hydra:member"]
+      "required": [
+        "hydra:member"
+      ]
     }
     """
 
-  @createSchema
+  Scenario: Some children not api resources are created in the app
+    When some dummy table inheritance data but not api resource child are created
+    And I send a "GET" request to "/dummy_table_inheritances"
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+    And the JSON should be valid according to this schema:
+    """
+    {
+      "type": "object",
+      "properties": {
+        "hydra:member": {
+          "type": "array",
+          "items": [
+            {
+              "type": "object",
+              "properties": {
+                "@type": {
+                  "type": "string",
+                  "pattern": "^DummyTableInheritanceChild$"
+                },
+                "@id": {
+                  "type": "string",
+                  "pattern": "^/dummy_table_inheritance_children/1$"
+                },
+                "name": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "@type",
+                "@id",
+                "name"
+              ]
+            },
+            {
+              "type": "object",
+              "properties": {
+                "@type": {
+                  "type": "string",
+                  "pattern": "^DummyTableInheritance$"
+                },
+                "@id": {
+                  "type": "string",
+                  "pattern": "^/dummy_table_inheritances/2$"
+                },
+                "name": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "@type",
+                "@id",
+                "name"
+              ]
+            }
+          ],
+          "additionalItems": false
+        },
+        "hydra:totalItems": {
+          "type": "integer",
+          "minimum": 2,
+          "maximum": 2
+        }
+      },
+      "required": [
+        "hydra:member",
+        "hydra:totalItems"
+      ]
+    }
+    """
+
   Scenario: Create a table inherited resource
     When I add "Content-Type" header equal to "application/ld+json"
     And I send a "POST" request to "/dummy_table_inheritance_children" with body:
@@ -105,19 +193,24 @@ Feature: Table inheritance
         },
         "@id": {
           "type": "string",
-          "pattern": "^/dummy_table_inheritance_children/1$"
+          "pattern": "^/dummy_table_inheritance_children/3$"
         },
         "name": {
           "type": "string",
-          "pattern": "^foo$",
-          "required": "true"
+          "pattern": "^foo$"
         },
         "nickname": {
           "type": "string",
-          "pattern": "^bar$",
-          "required": "true"
+          "pattern": "^bar$"
         }
-      }
+      },
+      "required": [
+        "@type",
+        "@context",
+        "@id",
+        "name",
+        "nickname"
+      ]
     }
     """
 
@@ -144,19 +237,24 @@ Feature: Table inheritance
         },
         "@id": {
           "type": "string",
-          "pattern": "^/dummy_table_inheritance_different_children/2$"
+          "pattern": "^/dummy_table_inheritance_different_children/4$"
         },
         "name": {
           "type": "string",
-          "pattern": "^foo$",
-          "required": "true"
+          "pattern": "^foo$"
         },
         "email": {
           "type": "string",
-          "pattern": "^bar\\@localhost$",
-          "required": "true"
+          "pattern": "^bar\\@localhost$"
         }
-      }
+      },
+      "required": [
+        "@type",
+        "@context",
+        "@id",
+        "name",
+        "email"
+      ]
     }
     """
 
@@ -167,7 +265,7 @@ Feature: Table inheritance
     {
       "children": [
         "/dummy_table_inheritance_children/1",
-        "/dummy_table_inheritance_different_children/2"
+        "/dummy_table_inheritance_different_children/4"
       ]
     }
     """
@@ -192,47 +290,58 @@ Feature: Table inheritance
           "pattern": "^/dummy_table_inheritance_relateds/1$"
         },
         "children": {
-          "items": {
-            "type": "object",
-            "anyOf": [
-              {
-                "properties": {
-                  "@type": {
-                    "type": "string",
-                    "pattern": "^DummyTableInheritanceChild$"
-                  },
-                  "name": {
-                    "type": "string",
-                    "required": "true"
-                  },
-                  "nickname": {
-                    "type": "string",
-                    "required": "true"
-                  }
+          "type": "array",
+          "items": [
+            {
+              "type": "object",
+              "properties": {
+                "@type": {
+                  "type": "string",
+                  "pattern": "^DummyTableInheritanceChild$"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "nickname": {
+                  "type": "string"
                 }
               },
-              {
-                "properties": {
-                  "@type": {
-                    "type": "string",
-                    "pattern": "^DummyTableInheritanceDifferentChild$"
-                  },
-                  "name": {
-                    "type": "string",
-                    "required": "true"
-                  },
-                  "email": {
-                    "type": "string",
-                    "required": "true"
-                  }
+              "required": [
+                "@type",
+                "name",
+                "nickname"
+              ]
+            },
+            {
+              "type": "object",
+              "properties": {
+                "@type": {
+                  "type": "string",
+                  "pattern": "^DummyTableInheritanceDifferentChild$"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "email": {
+                  "type": "string"
                 }
-              }
-            ]
-          },
-          "minItems": 2,
-          "maxItems": 2
+              },
+              "required": [
+                "@type",
+                "name",
+                "email"
+              ]
+            }
+          ],
+          "additionalItems": false
         }
-      }
+      },
+      "required": [
+        "@type",
+        "@context",
+        "@id",
+        "children"
+      ]
     }
     """
 
@@ -248,81 +357,170 @@ Feature: Table inheritance
       "properties": {
         "hydra:member": {
           "type": "array",
-          "items": {
-            "type": "object",
-            "anyOf": [
-              {
-                "properties": {
-                  "@type": {
-                    "type": "string",
-                    "pattern": "^DummyTableInheritanceChild$"
-                  },
-                  "name": {
-                    "type": "string",
-                    "required": "true"
-                  },
-                  "nickname": {
-                    "type": "string",
-                    "required": "true"
-                  }
+          "items": [
+            {
+              "type": "object",
+              "properties": {
+                "@type": {
+                  "type": "string",
+                  "pattern": "^DummyTableInheritanceChild$"
+                },
+                "@id": {
+                  "type": "string",
+                  "pattern": "^/dummy_table_inheritance_children/1$"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "nickname": {
+                  "type": "string"
                 }
               },
-              {
-                "properties": {
-                  "@type": {
-                    "type": "string",
-                    "pattern": "^DummyTableInheritanceDifferentChild$"
-                  },
-                  "name": {
-                    "type": "string",
-                    "required": "true"
-                  },
-                  "email": {
-                    "type": "string",
-                    "required": "true"
-                  }
+              "required": [
+                "@type",
+                "@id",
+                "name",
+                "nickname"
+              ]
+            },
+            {
+              "type": "object",
+              "properties": {
+                "@type": {
+                  "type": "string",
+                  "pattern": "^DummyTableInheritance$"
+                },
+                "@id": {
+                  "type": "string",
+                  "pattern": "^/dummy_table_inheritances/2$"
+                },
+                "name": {
+                  "type": "string"
                 }
-              }
-            ]
-          },
-          "minItems": 2
+              },
+              "required": [
+                "@type",
+                "@id",
+                "name"
+              ]
+            },
+            {
+              "type": "object",
+              "properties": {
+                "@type": {
+                  "type": "string",
+                  "pattern": "^DummyTableInheritanceChild$"
+                },
+                "@id": {
+                  "type": "string",
+                  "pattern": "^/dummy_table_inheritance_children/3$"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "nickname": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "@type",
+                "@id",
+                "name",
+                "nickname"
+              ]
+            }
+          ],
+          "additionalItems": false
+        },
+        "hydra:totalItems": {
+          "type": "integer",
+          "minimum": 4,
+          "maximum": 4
         }
       },
-      "required": ["hydra:member"]
+      "required": [
+        "hydra:member",
+        "hydra:totalItems"
+      ]
     }
     """
 
    Scenario: Get the parent interface collection
-     When I send a "GET" request to "/resource_interfaces"
-     Then the response status code should be 200
-     And the response should be in JSON
-     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
-     And the JSON should be valid according to this schema:
-     """
-     {
-       "type": "object",
-       "properties": {
-         "hydra:member": {
-           "type": "array",
-           "items": {
-             "type": "object",
-             "properties": {
-               "foo": {
-                 "type": "string",
-                 "required": "true"
-               },
-               "fooz": {
-                 "type": "string",
-                 "required": "true"
-               }
-             }
-           },
-           "minItems": 1
-         }
-       },
-       "required": ["hydra:member"]
-     }
-     """
+    When I send a "GET" request to "/resource_interfaces"
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+    And the JSON should be valid according to this schema:
+    """
+    {
+      "type": "object",
+      "properties": {
+        "hydra:member": {
+          "type": "array",
+          "items": [
+            {
+              "type": "object",
+              "properties": {
+                "@type": {
+                  "type": "string",
+                  "pattern": "^ResourceInterface$"
+                },
+                "@id": {
+                  "type": "string",
+                  "pattern": "^/resource_interfaces/item1"
+                },
+                "foo": {
+                  "type": "string",
+                  "pattern": "^item1$"
+                },
+                "fooz": {
+                  "type": "string",
+                  "pattern": "^fooz$"
+                }
+              },
+              "required": [
+                "@type",
+                "@id",
+                "foo",
+                "fooz"
+              ]
+            },
+            {
+              "type": "object",
+              "properties": {
+                "@type": {
+                  "type": "string",
+                  "pattern": "^ResourceInterface$"
+                },
+                "@id": {
+                  "type": "string",
+                  "pattern": "^/resource_interfaces/item2"
+                },
+                "foo": {
+                  "type": "string",
+                  "pattern": "^item2$"
+                },
+                "fooz": {
+                  "type": "string",
+                  "pattern": "^fooz$"
+                }
+              },
+              "required": [
+                "@type",
+                "@id",
+                "foo",
+                "fooz"
+              ]
+            }
+          ],
+          "additionalItems": false
+        }
+      },
+      "required": [
+        "hydra:member"
+      ]
+    }
+    """
 
   Scenario: Get an interface resource item
     When I send a "GET" request to "/resource_interfaces/some-id"
@@ -334,19 +532,267 @@ Feature: Table inheritance
     {
       "type": "object",
       "properties": {
-        "context": {
+        "@context": {
           "type": "string",
-          "pattern": "ResourceInterface$"
+          "pattern": "^/contexts/ResourceInterface$"
+        },
+        "@id": {
+          "type": "string",
+          "pattern": "^/resource_interfaces/single%2520item$"
+        },
+        "@type": {
+          "type": "string",
+          "pattern": "^ResourceInterface$"
         },
         "foo": {
           "type": "string",
-          "required": "true"
+          "pattern": "^single item$"
         },
         "fooz": {
           "type": "string",
-          "required": "true",
           "pattern": "fooz"
         }
-      }
+      },
+      "required": [
+        "@context",
+        "@id",
+        "@type",
+        "foo",
+        "fooz"
+      ],
+      "additionalProperties": false
+    }
+    """
+
+  @!mongodb
+  Scenario: Generate iri from parent resource
+    Given there are 3 sites with internal owner
+    When I add "Content-Type" header equal to "application/ld+json"
+    And I send a "GET" request to "/sites"
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+    And the JSON should be valid according to this schema:
+    """
+    {
+      "type": "object",
+      "properties": {
+        "hydra:member": {
+          "type": "array",
+          "items": [
+            {
+              "type": "object",
+              "properties": {
+                "@type": {
+                  "type": "string",
+                  "pattern": "^Site$"
+                },
+                "@id": {
+                  "type": "string",
+                  "pattern": "^/sites/1$"
+                },
+                "title": {
+                  "type": "string"
+                },
+                "description": {
+                  "type": "string"
+                },
+                "owner": {
+                  "type": "string",
+                  "pattern": "^/custom_users/1$"
+                }
+              },
+              "required": [
+                "@type",
+                "@id",
+                "title",
+                "description",
+                "owner"
+              ]
+            },
+            {
+              "type": "object",
+              "properties": {
+                "@type": {
+                  "type": "string",
+                  "pattern": "^Site$"
+                },
+                "@id": {
+                  "type": "string",
+                  "pattern": "^/sites/2$"
+                },
+                "title": {
+                  "type": "string"
+                },
+                "description": {
+                  "type": "string"
+                },
+                "owner": {
+                  "type": "string",
+                  "pattern": "^/custom_users/2$"
+                }
+              },
+              "required": [
+                "@type",
+                "@id",
+                "title",
+                "description",
+                "owner"
+              ]
+            },
+            {
+              "type": "object",
+              "properties": {
+                "@type": {
+                  "type": "string",
+                  "pattern": "^Site$"
+                },
+                "@id": {
+                  "type": "string",
+                  "pattern": "^/sites/3$"
+                },
+                "title": {
+                  "type": "string"
+                },
+                "description": {
+                  "type": "string"
+                },
+                "owner": {
+                  "type": "string",
+                  "pattern": "^/custom_users/3$"
+                }
+              },
+              "required": [
+                "@type",
+                "@id",
+                "title",
+                "description",
+                "owner"
+              ]
+            }
+          ],
+          "additionalItems": false
+        }
+      },
+      "required": [
+        "hydra:member"
+      ]
+    }
+    """
+
+  @!mongodb
+  @createSchema
+  Scenario: Generate iri from current resource even if parent class is a resource
+    Given there are 3 sites with external owner
+    When I add "Content-Type" header equal to "application/ld+json"
+    And I send a "GET" request to "/sites"
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+    And the JSON should be valid according to this schema:
+    """
+    {
+      "type": "object",
+      "properties": {
+        "hydra:member": {
+          "type": "array",
+          "items": [
+            {
+              "type": "object",
+              "properties": {
+                "@type": {
+                  "type": "string",
+                  "pattern": "^Site$"
+                },
+                "@id": {
+                  "type": "string",
+                  "pattern": "^/sites/1$"
+                },
+                "title": {
+                  "type": "string"
+                },
+                "description": {
+                  "type": "string"
+                },
+                "owner": {
+                  "type": "string",
+                  "pattern": "^/external_users/1$"
+                }
+              },
+              "required": [
+                "@type",
+                "@id",
+                "title",
+                "description",
+                "owner"
+              ]
+            },
+            {
+              "type": "object",
+              "properties": {
+                "@type": {
+                  "type": "string",
+                  "pattern": "^Site$"
+                },
+                "@id": {
+                  "type": "string",
+                  "pattern": "^/sites/2$"
+                },
+                "title": {
+                  "type": "string"
+                },
+                "description": {
+                  "type": "string"
+                },
+                "owner": {
+                  "type": "string",
+                  "pattern": "^/external_users/2$"
+                }
+              },
+              "required": [
+                "@type",
+                "@id",
+                "title",
+                "description",
+                "owner"
+              ]
+            },
+            {
+              "type": "object",
+              "properties": {
+                "@type": {
+                  "type": "string",
+                  "pattern": "^Site$"
+                },
+                "@id": {
+                  "type": "string",
+                  "pattern": "^/sites/3$"
+                },
+                "title": {
+                  "type": "string"
+                },
+                "description": {
+                  "type": "string"
+                },
+                "owner": {
+                  "type": "string",
+                  "pattern": "^/external_users/3$"
+                }
+              },
+              "required": [
+                "@type",
+                "@id",
+                "title",
+                "description",
+                "owner"
+              ]
+            }
+          ],
+          "additionalItems": false
+        }
+      },
+      "required": [
+        "hydra:member"
+      ]
     }
     """

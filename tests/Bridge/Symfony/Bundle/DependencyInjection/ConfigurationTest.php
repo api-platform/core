@@ -50,8 +50,33 @@ class ConfigurationTest extends TestCase
 
     public function testDefaultConfig()
     {
+        $this->runDefaultConfigTests();
+    }
+
+    /**
+     * @group mongodb
+     */
+    public function testDefaultConfigWithMongoDbOdm()
+    {
+        $this->runDefaultConfigTests(['orm', 'odm']);
+    }
+
+    private function runDefaultConfigTests(array $doctrineIntegrationsToLoad = ['orm'])
+    {
         $treeBuilder = $this->configuration->getConfigTreeBuilder();
-        $config = $this->processor->processConfiguration($this->configuration, ['api_platform' => ['title' => 'title', 'description' => 'description', 'version' => '1.0.0']]);
+        $config = $this->processor->processConfiguration($this->configuration, [
+            'api_platform' => [
+                'title' => 'title',
+                'description' => 'description',
+                'version' => '1.0.0',
+                'doctrine' => [
+                    'enabled' => \in_array('orm', $doctrineIntegrationsToLoad, true),
+                ],
+                'doctrine_mongodb_odm' => [
+                    'enabled' => \in_array('odm', $doctrineIntegrationsToLoad, true),
+                ],
+            ],
+        ]);
 
         $this->assertInstanceOf(ConfigurationInterface::class, $this->configuration);
         $this->assertInstanceOf(TreeBuilder::class, $treeBuilder);
@@ -153,10 +178,10 @@ class ConfigurationTest extends TestCase
                 'public' => null,
             ],
             'doctrine' => [
-                'enabled' => true,
+                'enabled' => \in_array('orm', $doctrineIntegrationsToLoad, true),
             ],
             'doctrine_mongodb_odm' => [
-                'enabled' => true,
+                'enabled' => \in_array('odm', $doctrineIntegrationsToLoad, true),
             ],
             'messenger' => [
                 'enabled' => true,

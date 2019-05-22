@@ -16,7 +16,7 @@ namespace ApiPlatform\Core\Api;
 use ApiPlatform\Core\Exception\RuntimeException;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
-use ApiPlatform\Core\Util\ClassInfoTrait;
+use ApiPlatform\Core\Util\ResourceClassInfoTrait;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
@@ -27,12 +27,11 @@ use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
  */
 final class IdentifiersExtractor implements IdentifiersExtractorInterface
 {
-    use ClassInfoTrait;
+    use ResourceClassInfoTrait;
 
     private $propertyNameCollectionFactory;
     private $propertyMetadataFactory;
     private $propertyAccessor;
-    private $resourceClassResolver;
 
     public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, PropertyAccessorInterface $propertyAccessor = null, ResourceClassResolverInterface $resourceClassResolver = null)
     {
@@ -67,7 +66,8 @@ final class IdentifiersExtractor implements IdentifiersExtractorInterface
     public function getIdentifiersFromItem($item): array
     {
         $identifiers = [];
-        $resourceClass = $this->getObjectClass($item);
+        $resourceClass = $this->getResourceClass($item, true);
+
         foreach ($this->propertyNameCollectionFactory->create($resourceClass) as $propertyName) {
             $propertyMetadata = $this->propertyMetadataFactory->create($resourceClass, $propertyName);
             $identifier = $propertyMetadata->isIdentifier();
@@ -81,9 +81,7 @@ final class IdentifiersExtractor implements IdentifiersExtractorInterface
                 continue;
             }
 
-            $relatedResourceClass = $this->getObjectClass($identifier);
-
-            if (null !== $this->resourceClassResolver && !$this->resourceClassResolver->isResourceClass($relatedResourceClass)) {
+            if (null === $relatedResourceClass = $this->getResourceClass($identifier)) {
                 continue;
             }
 

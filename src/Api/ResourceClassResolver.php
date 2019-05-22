@@ -40,33 +40,45 @@ final class ResourceClassResolver implements ResourceClassResolverInterface
      */
     public function getResourceClass($value, string $resourceClass = null, bool $strict = false): string
     {
-        $type = \is_object($value) && !$value instanceof \Traversable ? $this->getObjectClass($value) : $resourceClass;
-        $resourceClass = $resourceClass ?? $type;
-
-        if (null === $resourceClass) {
-            throw new InvalidArgumentException(sprintf('No resource class found.'));
+        if ($strict && null === $resourceClass) {
+            throw new InvalidArgumentException('Strict checking is only possible when resource class is specified.');
         }
 
-        if (
-            null === $type
-            || ((!$strict || $resourceClass === $type) && $isResourceClass = $this->isResourceClass($type))
-        ) {
+        $actualClass = \is_object($value) && !$value instanceof \Traversable ? $this->getObjectClass($value) : null;
+
+        if (null === $actualClass && null === $resourceClass) {
+            throw new InvalidArgumentException('Resource type could not be determined. Resource class must be specified.');
+        }
+
+        if (null !== $resourceClass && !$this->isResourceClass($resourceClass)) {
+            throw new InvalidArgumentException(sprintf('Specified class "%s" is not a resource class.', $resourceClass));
+        }
+
+        if (null === $actualClass) {
             return $resourceClass;
         }
 
-        // The Resource is an interface
-        if ($value instanceof $resourceClass && $type !== $resourceClass && interface_exists($resourceClass)) {
-            throw new InvalidArgumentException(sprintf('The given object\'s resource is the interface "%s", finding a class is not possible.', $resourceClass));
+        if ($strict && !is_a($actualClass, $resourceClass, true)) {
+            throw new InvalidArgumentException(sprintf('Object of type "%s" does not match "%s" resource class.', $actualClass, $resourceClass));
         }
 
-        if (
-            ($isResourceClass ?? $this->isResourceClass($type))
-            || (is_subclass_of($type, $resourceClass) && $this->isResourceClass($resourceClass))
-        ) {
-            return $type;
+        $mostSpecificResourceClass = null;
+
+        foreach ($this->resourceNameCollectionFactory->create() as $resourceClassName) {
+            if (!is_a($actualClass, $resourceClassName, true)) {
+                continue;
+            }
+
+            if (null === $mostSpecificResourceClass || is_subclass_of($resourceClassName, $mostSpecificResourceClass, true)) {
+                $mostSpecificResourceClass = $resourceClassName;
+            }
         }
 
-        throw new InvalidArgumentException(sprintf('No resource class found for object of type "%s".', $type));
+        if (null === $mostSpecificResourceClass) {
+            throw new InvalidArgumentException(sprintf('No resource class found for object of type "%s".', $actualClass));
+        }
+
+        return $mostSpecificResourceClass;
     }
 
     /**
@@ -79,7 +91,7 @@ final class ResourceClassResolver implements ResourceClassResolverInterface
         }
 
         foreach ($this->resourceNameCollectionFactory->create() as $resourceClass) {
-            if ($type === $resourceClass) {
+            if (is_a($type, $resourceClass, true)) {
                 return $this->localIsResourceClassCache[$type] = true;
             }
         }

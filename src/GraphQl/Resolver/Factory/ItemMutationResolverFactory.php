@@ -81,12 +81,14 @@ final class ItemMutationResolverFactory implements ResolverFactoryInterface
 
             $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
             $wrapFieldName = lcfirst($resourceMetadata->getShortName());
-            $normalizationContext = $resourceMetadata->getGraphqlAttribute($operationName ?? '', 'normalization_context', [], true);
-            $normalizationContext['attributes'] = $this->fieldsToAttributes($info)[$wrapFieldName] ?? [];
+            $baseNormalizationContext = $resourceMetadata->getGraphqlAttribute($operationName ?? '', 'normalization_context', [], true);
+            $baseNormalizationContext['attributes'] = $this->fieldsToAttributes($info)[$wrapFieldName] ?? [];
+            $normalizationContext = $baseNormalizationContext;
+            $normalizationContext['resource_class'] = $resourceClass;
 
             if (isset($args['input']['id'])) {
                 try {
-                    $item = $this->iriConverter->getItemFromIri($args['input']['id'], $normalizationContext);
+                    $item = $this->iriConverter->getItemFromIri($args['input']['id'], $baseNormalizationContext);
                 } catch (ItemNotFoundException $e) {
                     throw Error::createLocatedError(sprintf('Item "%s" not found.', $args['input']['id']), $info->fieldNodes, $info->path);
                 }

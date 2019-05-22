@@ -36,6 +36,8 @@ use Doctrine\ODM\MongoDB\Types\Type as MongoDbType;
 use PHPUnit\Framework\TestCase;
 
 /**
+ * @group mongodb
+ *
  * @author Alan Poulain <contact@alanpoulain.eu>
  */
 class ItemDataProviderTest extends TestCase
