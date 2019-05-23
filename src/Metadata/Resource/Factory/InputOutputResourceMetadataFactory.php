@@ -66,12 +66,20 @@ final class InputOutputResourceMetadataFactory implements ResourceMetadataFactor
             $operation['output'] = isset($operation['output']) ? $this->transformInputOutput($operation['output']) : $resourceAttributes['output'];
 
             if (
-                !isset($operation['status'])
-                && isset($operation['output'])
+                isset($operation['input'])
+                && \array_key_exists('class', $operation['input'])
+                && null === $operation['input']['class']
+            ) {
+                $operation['deserialize'] ?? $operation['deserialize'] = false;
+                $operation['validate'] ?? $operation['validate'] = false;
+            }
+
+            if (
+                isset($operation['output'])
                 && \array_key_exists('class', $operation['output'])
                 && null === $operation['output']['class']
             ) {
-                $operation['status'] = 204;
+                $operation['status'] ?? $operation['status'] = 204;
             }
         }
 

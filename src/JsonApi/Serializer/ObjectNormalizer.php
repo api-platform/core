@@ -75,7 +75,7 @@ final class ObjectNormalizer implements NormalizerInterface, CacheableSupportsMe
         }
 
         if (isset($originalResource)) {
-            $resourceClass = $this->resourceClassResolver->getResourceClass($originalResource, $context['resource_class'] ?? null, true);
+            $resourceClass = $this->resourceClassResolver->getResourceClass($originalResource);
             $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
 
             $resourceData = [

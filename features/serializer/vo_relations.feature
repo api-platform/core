@@ -26,28 +26,28 @@ Feature: Value object as ApiResource
     Then the response status code should be 201
     And the JSON should be equal to:
     """
-     {
-         "@context": "/contexts/VoDummyCar",
-         "@id": "/vo_dummy_cars/1",
-         "@type": "VoDummyCar",
-         "mileage": 1500,
-         "bodyType": "suv",
-         "inspections": [],
-         "make": "CustomCar",
-         "insuranceCompany": {
-             "@id": "/vo_dummy_insurance_companies/1",
-             "@type": "VoDummyInsuranceCompany",
-             "name": "Safe Drive Company"
-         },
-         "drivers": [
-             {
-                 "@id": "/vo_dummy_drivers/1",
-                 "@type": "VoDummyDriver",
-                 "firstName": "John",
-                 "lastName": "Doe"
-             }
-         ]
-     }
+    {
+        "@context": "/contexts/VoDummyCar",
+        "@id": "/vo_dummy_cars/1",
+        "@type": "VoDummyCar",
+        "mileage": 1500,
+        "bodyType": "suv",
+        "inspections": [],
+        "make": "CustomCar",
+        "insuranceCompany": {
+            "@id": "/vo_dummy_insurance_companies/1",
+            "@type": "VoDummyInsuranceCompany",
+            "name": "Safe Drive Company"
+        },
+        "drivers": [
+            {
+                "@id": "/vo_dummy_drivers/1",
+                "@type": "VoDummyDriver",
+                "firstName": "John",
+                "lastName": "Doe"
+            }
+        ]
+    }
     """
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
 
@@ -98,8 +98,7 @@ Feature: Value object as ApiResource
         "@type": "VoDummyInspection",
         "accepted": true,
         "car": "/vo_dummy_cars/1",
-        "performed": "2018-08-24T00:00:00+00:00",
-        "id": 1
+        "performed": "2018-08-24T00:00:00+00:00"
     }
     """
 
@@ -117,27 +116,36 @@ Feature: Value object as ApiResource
     }
     """
     Then the response status code should be 400
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
     And the JSON should be valid according to this schema:
     """
     {
       "type": "object",
       "properties": {
         "@context": {
-          "enum": ["/contexts/Error"]
+          "type": "string",
+          "pattern": "^/contexts/Error$"
         },
-        "type": {
-          "enum": ["hydra:Error"]
+        "@type": {
+          "type": "string",
+          "pattern": "^hydra:Error$"
         },
         "hydra:title": {
-          "enum": ["An error occurred"]
+          "type": "string",
+          "pattern": "^An error occurred$"
         },
         "hydra:description": {
           "pattern": "^Cannot create an instance of ApiPlatform\\\\Core\\\\Tests\\\\Fixtures\\\\TestBundle\\\\(Document|Entity)\\\\VoDummyCar from serialized data because its constructor requires parameter \"drivers\" to be present.$"
         }
-      }
+      },
+      "required": [
+        "@context",
+        "@type",
+        "hydra:title",
+        "hydra:description"
+      ]
     }
     """
-    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
 
   @createSchema
   Scenario: Create Value object without default param

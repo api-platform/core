@@ -37,6 +37,7 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\DummyGroup as DummyGroup
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\DummyOffer as DummyOfferDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\DummyProduct as DummyProductDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\DummyProperty as DummyPropertyDocument;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\DummyTableInheritanceNotApiResourceChild as DummyTableInheritanceNotApiResourceChildDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\EmbeddableDummy as EmbeddableDummyDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\EmbeddedDummy as EmbeddedDummyDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\FileConfigDummy as FileConfigDummyDocument;
@@ -87,6 +88,7 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyImmutableDate;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyOffer;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyProduct;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyProperty;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyTableInheritanceNotApiResourceChild;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\EmbeddableDummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\EmbeddedDummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\FileConfigDummy;
@@ -192,6 +194,17 @@ final class DoctrineContext implements Context
             $this->manager->persist($dummy);
         }
 
+        $this->manager->flush();
+    }
+
+    /**
+     * @When some dummy table inheritance data but not api resource child are created
+     */
+    public function someDummyTableInheritanceDataButNotApiResourceChildAreCreated()
+    {
+        $dummy = $this->buildDummyTableInheritanceNotApiResourceChild();
+        $dummy->setName('Foobarbaz inheritance');
+        $this->manager->persist($dummy);
         $this->manager->flush();
     }
 
@@ -1422,6 +1435,14 @@ final class DoctrineContext implements Context
     }
 
     /**
+     * @return DummyTableInheritanceNotApiResourceChild|DummyTableInheritanceNotApiResourceChildDocument
+     */
+    private function buildDummyTableInheritanceNotApiResourceChild()
+    {
+        return $this->isOrm() ? new DummyTableInheritanceNotApiResourceChild() : new DummyTableInheritanceNotApiResourceChildDocument();
+    }
+
+    /**
      * @return DummyAggregateOffer|DummyAggregateOfferDocument
      */
     private function buildDummyAggregateOffer()
@@ -1707,5 +1728,45 @@ final class DoctrineContext implements Context
     private function buildConvertedString()
     {
         return $this->isOrm() ? new ConvertedString() : new ConvertedStringDocument();
+    }
+
+    /**
+     * @Given there are :nb sites with internal owner
+     */
+    public function thereAreSitesWithInternalOwner(int $nb)
+    {
+        for ($i = 1; $i <= $nb; ++$i) {
+            $internalUser = new \ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\InternalUser();
+            $internalUser->setFirstname('Internal');
+            $internalUser->setLastname('User');
+            $internalUser->setEmail('john.doe@example.com');
+            $internalUser->setInternalId('INT');
+            $site = new \ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Site();
+            $site->setTitle('title');
+            $site->setDescription('description');
+            $site->setOwner($internalUser);
+            $this->manager->persist($site);
+        }
+        $this->manager->flush();
+    }
+
+    /**
+     * @Given there are :nb sites with external owner
+     */
+    public function thereAreSitesWithExternalOwner(int $nb)
+    {
+        for ($i = 1; $i <= $nb; ++$i) {
+            $externalUser = new \ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\ExternalUser();
+            $externalUser->setFirstname('External');
+            $externalUser->setLastname('User');
+            $externalUser->setEmail('john.doe@example.com');
+            $externalUser->setExternalId('EXT');
+            $site = new \ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Site();
+            $site->setTitle('title');
+            $site->setDescription('description');
+            $site->setOwner($externalUser);
+            $this->manager->persist($site);
+        }
+        $this->manager->flush();
     }
 }

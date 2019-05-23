@@ -3,7 +3,6 @@ imports:
     - { resource: config_test.yml }
 
 api_platform:
-    name_converter: ~
     mapping:
         paths: ['%kernel.project_dir%/../Elasticsearch/Model']
     elasticsearch:

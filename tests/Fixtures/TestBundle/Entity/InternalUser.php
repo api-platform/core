@@ -13,33 +13,27 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity;
 
-use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
- * @ApiResource
  * @ORM\Entity
  */
-class VoDummyInsuranceCompany
+class InternalUser extends AbstractUser
 {
-    use VoDummyIdAwareTrait;
-
     /**
-     * @var string
-     *
      * @ORM\Column
-     * @Groups({"car_read", "car_write"})
      */
-    private $name;
+    private $internalId;
 
-    public function __construct(string $name)
+    public function getInternalId(): ?string
     {
-        $this->name = $name;
+        return $this->internalId;
     }
 
-    public function getName()
+    public function setInternalId(string $internalId): self
     {
-        return $this->name;
+        $this->internalId = $internalId;
+
+        return $this;
     }
 }

@@ -5,78 +5,222 @@ cache:
     - $HOME/.composer/cache
     - $HOME/.npm
 
+.steps:
+  - &add-composer-bin-dir-to-path |
+      export PATH="$PATH:$HOME/.composer/vendor/bin"
+  - &clear-test-app-cache |
+      tests/Fixtures/app/console cache:clear
+  - &disable-php-memory-limit |
+      echo "memory_limit=-1" >> ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/travis.ini
+  - &disable-xdebug-php-extension |
+      phpenv config-rm xdebug.ini || echo "xdebug not available"
+  - &install-doctrine-mongodb-odm |
+      composer require --prefer-dist --no-progress --no-suggest --no-update --ansi \
+        doctrine/mongodb-odm:^2.0@beta \
+        doctrine/mongodb-odm-bundle:^4.0@beta \
+  - &install-mongodb-php-extension |
+      echo "extension=mongodb.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/mongodb.ini
+  - &run-behat-tests |
+      vendor/bin/behat --format=progress --no-interaction
+  - &run-phpunit-tests |
+      vendor/bin/phpunit
+  - &update-project-dependencies |
+      composer update --prefer-dist --no-progress --no-suggest --ansi
+  - &validate-openapi-v2-json |
+      tests/Fixtures/app/console api:swagger:export > swagger.json && npx swagger-cli validate swagger.json && rm swagger.json
+  - &validate-openapi-v2-yaml |
+      tests/Fixtures/app/console api:swagger:export --yaml > swagger.yaml && npx swagger-cli validate swagger.yaml && rm swagger.yaml
+  - &validate-openapi-v3-json |
+      tests/Fixtures/app/console api:openapi:export --spec-version 3 > swagger.json && npx swagger-cli validate swagger.json && rm swagger.json
+  - &validate-openapi-v3-yaml |
+      tests/Fixtures/app/console api:openapi:export --spec-version 3 --yaml > swagger.yaml && npx swagger-cli validate swagger.yaml && rm swagger.yaml
+
 jobs:
   include:
     - php: '7.1'
-      env: NO_UNIT_TESTS=true
       before_install:
-        - composer remove --dev ext-mongodb doctrine/mongodb-odm doctrine/mongodb-odm-bundle
-        - sed -i '33,39d' tests/Fixtures/app/config/config_common.yml
+        - *disable-php-memory-limit
+        - *disable-xdebug-php-extension
+        - *add-composer-bin-dir-to-path
+      install:
+        - *update-project-dependencies
+      before_script:
+        - *clear-test-app-cache
+      script:
+        - *run-phpunit-tests
+        - *clear-test-app-cache
+        - *run-behat-tests
+        - *validate-openapi-v2-json
+        - *validate-openapi-v2-yaml
+        - *validate-openapi-v3-json
+        - *validate-openapi-v3-yaml
+
     - php: '7.2'
+      before_install:
+        - *disable-php-memory-limit
+        - *disable-xdebug-php-extension
+        - *add-composer-bin-dir-to-path
+      install:
+        - *update-project-dependencies
+      before_script:
+        - *clear-test-app-cache
+      script:
+        - *run-phpunit-tests
+        - *clear-test-app-cache
+        - *run-behat-tests
+        - *validate-openapi-v2-json
+        - *validate-openapi-v2-yaml
+        - *validate-openapi-v3-json
+        - *validate-openapi-v3-yaml
+
     - php: '7.3'
+      before_install:
+        - *disable-php-memory-limit
+        - *disable-xdebug-php-extension
+        - *add-composer-bin-dir-to-path
+      install:
+        - *update-project-dependencies
+      before_script:
+        - *clear-test-app-cache
+      script:
+        - *run-phpunit-tests
+        - *clear-test-app-cache
+        - *run-behat-tests
+        - *validate-openapi-v2-json
+        - *validate-openapi-v2-yaml
+        - *validate-openapi-v3-json
+        - *validate-openapi-v3-yaml
+
     - php: '7.3'
       env: deps=low
+      before_install:
+        - *disable-php-memory-limit
+        - *disable-xdebug-php-extension
+        - *add-composer-bin-dir-to-path
+      install:
+        - composer update --prefer-dist --no-progress --no-suggest --prefer-stable --prefer-lowest --ansi
+      before_script:
+        - *clear-test-app-cache
+      script:
+        - *run-phpunit-tests
+        - *clear-test-app-cache
+        - *run-behat-tests
+        - *validate-openapi-v2-json
+        - *validate-openapi-v2-yaml
+        - *validate-openapi-v3-json
+        - *validate-openapi-v3-yaml
+
     - php: '7.3'
-      env: SYMFONY_DEPRECATIONS_HELPER=0
-    - php: '7.3'
+      env: APP_ENV=postgres
       services:
         - postgresql
+      before_install:
+        - *disable-php-memory-limit
+        - *disable-xdebug-php-extension
+        - *add-composer-bin-dir-to-path
+      install:
+        - *update-project-dependencies
       before_script:
-        - psql -c 'create database api_platform_test;' -U postgres
-      env: APP_ENV=postgres
+        - *clear-test-app-cache
+        - psql --command 'CREATE DATABASE api_platform_test;' --username postgres
+      script:
+        - *run-phpunit-tests
+        - *clear-test-app-cache
+        - vendor/bin/behat --format=progress --profile=postgres --no-interaction
+        - *validate-openapi-v2-json
+        - *validate-openapi-v2-yaml
+        - *validate-openapi-v3-json
+        - *validate-openapi-v3-yaml
+
     - php: '7.3'
+      env: APP_ENV=mysql
       services:
         - mysql
+      before_install:
+        - *disable-php-memory-limit
+        - *disable-xdebug-php-extension
+        - *add-composer-bin-dir-to-path
+      install:
+        - *update-project-dependencies
       before_script:
-        - mysql -e 'CREATE DATABASE api_platform_test;'
-      env: APP_ENV=mysql
+        - *clear-test-app-cache
+        - mysql --execute 'CREATE DATABASE api_platform_test;'
+      script:
+        - *run-phpunit-tests
+        - *clear-test-app-cache
+        - *run-behat-tests
+        - *validate-openapi-v2-json
+        - *validate-openapi-v2-yaml
+        - *validate-openapi-v3-json
+        - *validate-openapi-v3-yaml
+
     - php: '7.3'
+      env: APP_ENV=mongodb
       services:
         - mongodb
-      env: APP_ENV=mongodb
+      before_install:
+        - *disable-php-memory-limit
+        - *install-mongodb-php-extension
+        - *disable-xdebug-php-extension
+        - *add-composer-bin-dir-to-path
+      install:
+        - *install-doctrine-mongodb-odm
+        - *update-project-dependencies
+      before_script:
+        - *clear-test-app-cache
+      script:
+        - vendor/bin/phpunit --configuration phpunit_mongodb.xml
+        - *clear-test-app-cache
+        - vendor/bin/behat --format=progress --profile=mongodb --no-interaction
+        - *validate-openapi-v2-json
+        - *validate-openapi-v2-yaml
+        - *validate-openapi-v3-json
+        - *validate-openapi-v3-yaml
+
     - php: '7.3'
-      services:
-        - elasticsearch
       env: APP_ENV=elasticsearch
+      before_install:
+        - sudo apt-get purge --auto-remove elasticsearch
+        - wget -qO - https://artifacts.elastic.co/GPG-KEY-elasticsearch | sudo apt-key add -
+        - echo 'deb https://artifacts.elastic.co/packages/6.x/apt stable main' | sudo tee -a /etc/apt/sources.list.d/elastic-6.x.list
+        - sudo apt-get update
+        - sudo apt-get install elasticsearch
+        - sudo service elasticsearch start
+        - *disable-php-memory-limit
+        - *disable-xdebug-php-extension
+        - *add-composer-bin-dir-to-path
+      install:
+        - *update-project-dependencies
+      before_script:
+        - *clear-test-app-cache
+      script:
+        - *run-phpunit-tests
+        - *clear-test-app-cache
+        - vendor/bin/behat --format=progress --profile=elasticsearch --no-interaction
+        - *validate-openapi-v2-json
+        - *validate-openapi-v2-yaml
+        - *validate-openapi-v3-json
+        - *validate-openapi-v3-yaml
+
+    - php: '7.3'
+      env: SYMFONY_DEPRECATIONS_HELPER=0
+      before_install:
+        - *disable-php-memory-limit
+        - *disable-xdebug-php-extension
+        - *add-composer-bin-dir-to-path
+      install:
+        - *update-project-dependencies
+      before_script:
+        - *clear-test-app-cache
+      script:
+        - *run-phpunit-tests
+        - *clear-test-app-cache
+        - *run-behat-tests
+        - *validate-openapi-v2-json
+        - *validate-openapi-v2-yaml
+        - *validate-openapi-v3-json
+        - *validate-openapi-v3-yaml
+
   allow_failures:
     - env: SYMFONY_DEPRECATIONS_HELPER=0
   fast_finish: true
-
-before_install:
-  - if [[ $APP_ENV = 'elasticsearch' ]]; then
-      curl -O https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-6.5.0.deb && sudo dpkg -i --force-confnew elasticsearch-6.5.0.deb && sudo service elasticsearch restart;
-    fi
-  - phpenv config-rm xdebug.ini || echo "xdebug not available"
-  - echo "memory_limit=-1" >> ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/travis.ini
-  - echo "extension=mongodb.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
-  - export PATH="$PATH:$HOME/.composer/vendor/bin"
-
-install:
-  - if [[ $deps = 'low' ]]; then
-      composer update --prefer-dist --no-progress --no-suggest --prefer-stable --prefer-lowest --ansi;
-    else
-      composer update --prefer-dist --no-progress --no-suggest --ansi;
-    fi
-
-script:
-  - tests/Fixtures/app/console cache:clear
-  - if [[ $NO_UNIT_TESTS != true ]]; then
-      vendor/bin/phpunit;
-    fi
-  - if [[ $APP_ENV = 'mongodb' ]]; then
-      vendor/bin/phpunit -c phpunit.mongo.xml;
-    fi
-  - tests/Fixtures/app/console cache:clear
-  - if [[ $APP_ENV = 'postgres' ]]; then
-      vendor/bin/behat --suite=postgres --format=progress --no-interaction;
-    elif [[ $APP_ENV = 'mongodb' ]]; then
-      vendor/bin/behat --suite=mongodb --format=progress --no-interaction;
-    elif [[ $APP_ENV = 'elasticsearch' ]]; then
-      vendor/bin/behat --suite=elasticsearch --format=progress --no-interaction;
-    else
-      vendor/bin/behat --suite=default --format=progress --no-interaction;
-    fi
-  - tests/Fixtures/app/console api:swagger:export > swagger.json && npx swagger-cli validate swagger.json && rm swagger.json
-  - tests/Fixtures/app/console api:swagger:export --yaml > swagger.yaml && npx swagger-cli validate swagger.yaml && rm swagger.yaml
-  - tests/Fixtures/app/console api:openapi:export --spec-version 3 > swagger.json && npx swagger-cli validate swagger.json && rm swagger.json
-  - tests/Fixtures/app/console api:openapi:export --spec-version 3 --yaml > swagger.yaml && npx swagger-cli validate swagger.yaml && rm swagger.yaml

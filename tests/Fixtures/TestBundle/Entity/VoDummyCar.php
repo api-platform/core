@@ -21,8 +21,8 @@ use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * @ApiResource(attributes={
- *     "normalization_context"={"groups"={"read", "write"}},
- *     "denormalization_context"={"groups"={"write"}}
+ *     "normalization_context"={"groups"={"car_read"}},
+ *     "denormalization_context"={"groups"={"car_write"}}
  * })
  * @ORM\Entity
  */
@@ -32,7 +32,7 @@ class VoDummyCar extends VoDummyVehicle
      * @var int
      *
      * @ORM\Column(type="integer")
-     * @Groups({"write"})
+     * @Groups({"car_read", "car_write"})
      */
     private $mileage;
 
@@ -40,7 +40,7 @@ class VoDummyCar extends VoDummyVehicle
      * @var string
      *
      * @ORM\Column
-     * @Groups({"write"})
+     * @Groups({"car_read", "car_write"})
      */
     private $bodyType;
 
@@ -48,7 +48,7 @@ class VoDummyCar extends VoDummyVehicle
      * @var VoDummyInspection[]|Collection
      *
      * @ORM\OneToMany(targetEntity="VoDummyInspection", mappedBy="car", cascade={"persist"})
-     * @Groups({"write"})
+     * @Groups({"car_read", "car_write"})
      */
     private $inspections;
 

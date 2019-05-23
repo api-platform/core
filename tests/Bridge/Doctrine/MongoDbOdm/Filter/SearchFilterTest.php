@@ -26,6 +26,8 @@ use MongoDB\BSON\Regex;
 use Prophecy\Argument;
 
 /**
+ * @group mongodb
+ *
  * @author Alan Poulain <contact@alanpoulain.eu>
  */
 class SearchFilterTest extends DoctrineMongoDbOdmFilterTestCase

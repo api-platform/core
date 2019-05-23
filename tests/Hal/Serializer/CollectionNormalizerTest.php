@@ -113,31 +113,34 @@ class CollectionNormalizerTest extends TestCase
     private function normalizePaginator($partial = false)
     {
         $paginatorProphecy = $this->prophesize($partial ? PartialPaginatorInterface::class : PaginatorInterface::class);
-        $paginatorProphecy->getCurrentPage()->willReturn(3)->shouldBeCalled();
-        $paginatorProphecy->getItemsPerPage()->willReturn(12)->shouldBeCalled();
-        $paginatorProphecy->rewind()->shouldBeCalled();
-        $paginatorProphecy->valid()->willReturn(true, false)->shouldBeCalled();
-        $paginatorProphecy->current()->willReturn('foo')->shouldBeCalled();
-        $paginatorProphecy->next()->willReturn()->shouldBeCalled();
+        $paginatorProphecy->getCurrentPage()->willReturn(3);
+        $paginatorProphecy->getItemsPerPage()->willReturn(12);
+        $paginatorProphecy->rewind()->will(function () {});
+        $paginatorProphecy->valid()->willReturn(true, false);
+        $paginatorProphecy->current()->willReturn('foo');
+        $paginatorProphecy->next()->will(function () {});
 
         if (!$partial) {
-            $paginatorProphecy->getLastPage()->willReturn(7)->shouldBeCalled();
-            $paginatorProphecy->getTotalItems()->willReturn(1312)->shouldBeCalled();
+            $paginatorProphecy->getLastPage()->willReturn(7);
+            $paginatorProphecy->getTotalItems()->willReturn(1312);
         } else {
-            $paginatorProphecy->count()->willReturn(12)->shouldBeCalled();
+            $paginatorProphecy->count()->willReturn(12);
         }
 
-        $paginator = $paginatorProphecy->reveal();
-
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
-        $resourceClassResolverProphecy->getResourceClass($paginator, null, true)->willReturn('Foo')->shouldBeCalled();
+        $resourceClassResolverProphecy->getResourceClass($paginatorProphecy, 'Foo')->willReturn('Foo');
 
         $itemNormalizer = $this->prophesize(NormalizerInterface::class);
-        $itemNormalizer->normalize('foo', null, ['api_sub_level' => true, 'resource_class' => 'Foo'])->willReturn(['_links' => ['self' => '/me'], 'name' => 'Kévin']);
+        $itemNormalizer->normalize('foo', CollectionNormalizer::FORMAT, [
+            'api_sub_level' => true,
+            'resource_class' => 'Foo',
+        ])->willReturn(['_links' => ['self' => '/me'], 'name' => 'Kévin']);
 
         $normalizer = new CollectionNormalizer($resourceClassResolverProphecy->reveal(), 'page');
         $normalizer->setNormalizer($itemNormalizer->reveal());
 
-        return $normalizer->normalize($paginator);
+        return $normalizer->normalize($paginatorProphecy->reveal(), CollectionNormalizer::FORMAT, [
+            'resource_class' => 'Foo',
+        ]);
     }
 }

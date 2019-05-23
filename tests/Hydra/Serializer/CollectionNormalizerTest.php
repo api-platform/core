@@ -80,7 +80,7 @@ class CollectionNormalizerTest extends TestCase
         $contextBuilderProphecy->getResourceContextUri(Foo::class)->willReturn('/contexts/Foo');
 
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
-        $resourceClassResolverProphecy->getResourceClass($data, Foo::class, true)->willReturn(Foo::class);
+        $resourceClassResolverProphecy->getResourceClass($data, Foo::class)->willReturn(Foo::class);
 
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
         $iriConverterProphecy->getIriFromResourceClass(Foo::class)->willReturn('/foos');
@@ -294,21 +294,19 @@ class CollectionNormalizerTest extends TestCase
         $paginatorProphecy = $this->prophesize($partial ? PartialPaginatorInterface::class : PaginatorInterface::class);
 
         if (!$partial) {
-            $paginatorProphecy->getTotalItems()->willReturn(1312)->shouldBeCalled();
+            $paginatorProphecy->getTotalItems()->willReturn(1312);
         }
 
-        $paginatorProphecy->rewind()->shouldBeCalled();
-        $paginatorProphecy->valid()->willReturn(true, false)->shouldBeCalled();
-        $paginatorProphecy->current()->willReturn('foo')->shouldBeCalled();
-        $paginatorProphecy->next()->willReturn()->shouldBeCalled();
-
-        $paginator = $paginatorProphecy->reveal();
+        $paginatorProphecy->rewind()->will(function () {});
+        $paginatorProphecy->valid()->willReturn(true, false);
+        $paginatorProphecy->current()->willReturn('foo');
+        $paginatorProphecy->next()->will(function () {});
 
         $serializer = $this->prophesize(SerializerInterface::class);
         $serializer->willImplement(NormalizerInterface::class);
 
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
-        $resourceClassResolverProphecy->getResourceClass($paginator, null, true)->willReturn('Foo')->shouldBeCalled();
+        $resourceClassResolverProphecy->getResourceClass($paginatorProphecy, 'Foo')->willReturn('Foo');
 
         $iriConvert = $this->prophesize(IriConverterInterface::class);
         $iriConvert->getIriFromResourceClass('Foo')->willReturn('/foo/1');
@@ -317,11 +315,17 @@ class CollectionNormalizerTest extends TestCase
         $contextBuilder->getResourceContextUri('Foo')->willReturn('/contexts/Foo');
 
         $itemNormalizer = $this->prophesize(AbstractItemNormalizer::class);
-        $itemNormalizer->normalize('foo', null, ['jsonld_has_context' => true, 'api_sub_level' => true, 'resource_class' => 'Foo'])->willReturn(['name' => 'Kévin', 'friend' => 'Smail']);
+        $itemNormalizer->normalize('foo', CollectionNormalizer::FORMAT, [
+            'jsonld_has_context' => true,
+            'api_sub_level' => true,
+            'resource_class' => 'Foo',
+        ])->willReturn(['name' => 'Kévin', 'friend' => 'Smail']);
 
         $normalizer = new CollectionNormalizer($contextBuilder->reveal(), $resourceClassResolverProphecy->reveal(), $iriConvert->reveal());
         $normalizer->setNormalizer($itemNormalizer->reveal());
 
-        return $normalizer->normalize($paginator);
+        return $normalizer->normalize($paginatorProphecy->reveal(), CollectionNormalizer::FORMAT, [
+            'resource_class' => 'Foo',
+        ]);
     }
 }

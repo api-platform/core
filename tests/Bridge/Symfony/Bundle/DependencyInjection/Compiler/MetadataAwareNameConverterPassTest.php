@@ -15,6 +15,8 @@ namespace ApiPlatform\Core\Tests\Bridge\Symfony\Bundle\DependencyInjection\Compi
 
 use ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\Compiler\MetadataAwareNameConverterPass;
 use PHPUnit\Framework\TestCase;
+use Prophecy\Argument;
+use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
@@ -30,18 +32,17 @@ class MetadataAwareNameConverterPassTest extends TestCase
         $this->assertInstanceOf(CompilerPassInterface::class, new MetadataAwareNameConverterPass());
     }
 
-    public function testProcess()
+    public function testProcessFirstArgumentConfigured()
     {
         $pass = new MetadataAwareNameConverterPass();
 
-        $arguments = [new Reference('serializer.mapping.class_metadata_factory'), new Reference('app.name_converter')];
-
         $definition = $this->prophesize(Definition::class);
-        $definition->getArguments()->willReturn($arguments)->shouldBeCalled();
-        $definition->getArgument(1)->willReturn($arguments[1])->shouldBeCalled();
+        $definition->getArguments()->willReturn([0, 1])->shouldBeCalled();
+        $definition->getArgument(1)->willReturn(new Reference('app.name_converter'))->shouldBeCalled();
 
         $containerBuilderProphecy = $this->prophesize(ContainerBuilder::class);
-        $containerBuilderProphecy->hasAlias('api_platform.name_converter')->willReturn(false)->shouldBeCalled();
+        $containerBuilderProphecy->hasAlias('api_platform.name_converter')->shouldBeCalled()->willReturn(true);
+        $containerBuilderProphecy->getAlias('api_platform.name_converter')->shouldBeCalled()->willReturn(Argument::any());
         $containerBuilderProphecy->hasDefinition('serializer.name_converter.metadata_aware')->willReturn(true)->shouldBeCalled();
         $containerBuilderProphecy->getDefinition('serializer.name_converter.metadata_aware')->willReturn($definition)->shouldBeCalled();
         $containerBuilderProphecy->setAlias('api_platform.name_converter', 'serializer.name_converter.metadata_aware')->shouldBeCalled();
@@ -53,11 +54,19 @@ class MetadataAwareNameConverterPassTest extends TestCase
     {
         $pass = new MetadataAwareNameConverterPass();
 
+        $reference = new Reference('app.name_converter');
+
+        $definition = $this->prophesize(Definition::class);
+        $definition->getArguments()->willReturn([0, 1])->shouldBeCalled();
+        $definition->getArgument(1)->willReturn(null)->shouldBeCalled();
+        $definition->setArgument(1, $reference)->shouldBeCalled();
+
         $containerBuilderProphecy = $this->prophesize(ContainerBuilder::class);
         $containerBuilderProphecy->hasAlias('api_platform.name_converter')->willReturn(true)->shouldBeCalled();
-        $containerBuilderProphecy->hasDefinition('serializer.name_converter.metadata_aware')->shouldNotBeCalled();
-        $containerBuilderProphecy->getDefinition('serializer.name_converter.metadata_aware')->shouldNotBeCalled();
-        $containerBuilderProphecy->setAlias('api_platform.name_converter', 'serializer.name_converter.metadata_aware')->shouldNotBeCalled();
+        $containerBuilderProphecy->getAlias('api_platform.name_converter')->shouldBeCalled()->willReturn(new Alias('app.name_converter'));
+        $containerBuilderProphecy->hasDefinition('serializer.name_converter.metadata_aware')->shouldBeCalled()->willReturn(true);
+        $containerBuilderProphecy->getDefinition('serializer.name_converter.metadata_aware')->shouldBeCalled()->willReturn($definition);
+        $containerBuilderProphecy->setAlias('api_platform.name_converter', 'serializer.name_converter.metadata_aware')->shouldBeCalled();
 
         $pass->process($containerBuilderProphecy->reveal());
     }
@@ -67,28 +76,26 @@ class MetadataAwareNameConverterPassTest extends TestCase
         $pass = new MetadataAwareNameConverterPass();
 
         $containerBuilderProphecy = $this->prophesize(ContainerBuilder::class);
-        $containerBuilderProphecy->hasAlias('api_platform.name_converter')->willReturn(false)->shouldBeCalled();
         $containerBuilderProphecy->hasDefinition('serializer.name_converter.metadata_aware')->willReturn(false)->shouldBeCalled();
         $containerBuilderProphecy->setAlias('api_platform.name_converter', 'serializer.name_converter.metadata_aware')->shouldNotBeCalled();
 
         $pass->process($containerBuilderProphecy->reveal());
     }
 
-    public function testProcessWithMetadataAwareDefinitionSecondArgumentNull()
+    public function testProcessOnlyOneArg()
     {
         $pass = new MetadataAwareNameConverterPass();
 
-        $arguments = [new Reference('serializer.mapping.class_metadata_factory'), null];
-
         $definition = $this->prophesize(Definition::class);
-        $definition->getArguments()->willReturn($arguments)->shouldBeCalled();
-        $definition->getArgument(1)->willReturn($arguments[1])->shouldBeCalled();
+        $definition->getArguments()->willReturn([0])->shouldBeCalled();
+        $definition->addArgument(new Reference('app.name_converter'))->shouldBeCalled();
 
         $containerBuilderProphecy = $this->prophesize(ContainerBuilder::class);
-        $containerBuilderProphecy->hasAlias('api_platform.name_converter')->willReturn(false)->shouldBeCalled();
         $containerBuilderProphecy->hasDefinition('serializer.name_converter.metadata_aware')->willReturn(true)->shouldBeCalled();
-        $containerBuilderProphecy->getDefinition('serializer.name_converter.metadata_aware')->willReturn($definition)->shouldBeCalled();
-        $containerBuilderProphecy->setAlias('api_platform.name_converter', 'serializer.name_converter.metadata_aware')->shouldNotBeCalled();
+        $containerBuilderProphecy->hasAlias('api_platform.name_converter')->shouldBeCalled()->willReturn(true);
+        $containerBuilderProphecy->getAlias('api_platform.name_converter')->shouldBeCalled()->willReturn(new Alias('app.name_converter'));
+        $containerBuilderProphecy->setAlias('api_platform.name_converter', 'serializer.name_converter.metadata_aware')->shouldBeCalled();
+        $containerBuilderProphecy->getDefinition('serializer.name_converter.metadata_aware')->shouldBeCalled()->willReturn($definition);
 
         $pass->process($containerBuilderProphecy->reveal());
     }

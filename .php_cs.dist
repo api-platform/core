@@ -13,7 +13,10 @@ HEADER;
 
 $finder = PhpCsFixer\Finder::create()
     ->in(__DIR__)
-    ->exclude('tests/Fixtures/app/var');
+    ->exclude('tests/Fixtures/app/var')
+    ->append([
+        'tests/Fixtures/app/console',
+    ]);
 
 return PhpCsFixer\Config::create()
     ->setRiskyAllowed(true)

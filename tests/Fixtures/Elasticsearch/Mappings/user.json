@@ -11,10 +11,10 @@
         "age": {
           "type": "integer"
         },
-        "first_name": {
+        "firstName": {
           "type": "text"
         },
-        "last_name": {
+        "lastName": {
           "type": "text"
         },
         "tweets": {

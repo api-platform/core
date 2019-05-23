@@ -19,7 +19,10 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
- * @ApiResource
+ * @ApiResource(attributes={
+ *     "normalization_context"={"groups"={"inspection_read"}},
+ *     "denormalization_context"={"groups"={"inspection_write"}}
+ * })
  * @ORM\Entity
  */
 class VoDummyInspection
@@ -30,7 +33,7 @@ class VoDummyInspection
      * @var bool
      *
      * @ORM\Column(type="boolean")
-     * @Groups({"write"})
+     * @Groups({"car_read", "car_write", "inspection_read", "inspection_write"})
      */
     private $accepted;
 
@@ -38,7 +41,7 @@ class VoDummyInspection
      * @var VoDummyCar
      *
      * @ORM\ManyToOne(targetEntity="VoDummyCar", inversedBy="inspections")
-     * @Groups({"write"})
+     * @Groups({"inspection_read", "inspection_write"})
      */
     private $car;
 
@@ -46,7 +49,7 @@ class VoDummyInspection
      * @var DateTime
      *
      * @ORM\Column(type="datetime")
-     * @Groups({"write"})
+     * @Groups({"car_read", "car_write", "inspection_read", "inspection_write"})
      */
     private $performed;
 
