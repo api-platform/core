@@ -32,6 +32,7 @@ use ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Filter\NumericFilter as MongoDbO
 use ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Filter\OrderFilter as MongoDbOdmOrderFilter;
 use ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Filter\RangeFilter as MongoDbOdmRangeFilter;
 use ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Filter\SearchFilter as MongoDbOdmSearchFilter;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Cache\QueryExpander;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\EagerLoadingExtension;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\FilterEagerLoadingExtension;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\FilterExtension;
@@ -487,6 +488,7 @@ class ApiPlatformExtensionTest extends TestCase
         $containerBuilderProphecy->setDefinition('api_platform.doctrine.listener.http_cache.purge', Argument::type(Definition::class))->shouldNotBeCalled();
         $containerBuilderProphecy->setDefinition('api_platform.doctrine.orm.boolean_filter', Argument::type(Definition::class))->shouldNotBeCalled();
         $containerBuilderProphecy->setDefinition('api_platform.doctrine.orm.collection_data_provider', Argument::type(Definition::class))->shouldNotBeCalled();
+        $containerBuilderProphecy->setDefinition('api_platform.doctrine.orm.cache.query_expander', Argument::type(Definition::class))->shouldNotBeCalled();
         $containerBuilderProphecy->setDefinition('api_platform.doctrine.orm.data_persister', Argument::type(Definition::class))->shouldNotBeCalled();
         $containerBuilderProphecy->setDefinition('api_platform.doctrine.orm.date_filter', Argument::type(Definition::class))->shouldNotBeCalled();
         $containerBuilderProphecy->setDefinition('api_platform.doctrine.orm.default.collection_data_provider', Argument::type(Definition::class))->shouldNotBeCalled();
@@ -518,6 +520,7 @@ class ApiPlatformExtensionTest extends TestCase
         $containerBuilderProphecy->setAlias(BooleanFilter::class, 'api_platform.doctrine.orm.boolean_filter')->shouldNotBeCalled();
         $containerBuilderProphecy->setAlias(NumericFilter::class, 'api_platform.doctrine.orm.numeric_filter')->shouldNotBeCalled();
         $containerBuilderProphecy->setAlias(ExistsFilter::class, 'api_platform.doctrine.orm.exists_filter')->shouldNotBeCalled();
+        $containerBuilderProphecy->setAlias(QueryExpander::class, 'api_platform.doctrine.orm.cache.query_expander')->shouldNotBeCalled();
         $containerBuilder = $containerBuilderProphecy->reveal();
 
         $this->extension->load(array_merge_recursive(self::DEFAULT_CONFIG, ['api_platform' => ['doctrine' => ['enabled' => false]]]), $containerBuilder);
@@ -995,6 +998,7 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.doctrine.listener.mercure.publish',
             'api_platform.doctrine.metadata_factory',
             'api_platform.doctrine.orm.boolean_filter',
+            'api_platform.doctrine.orm.cache.query_expander',
             'api_platform.doctrine.orm.collection_data_provider',
             'api_platform.doctrine.orm.data_persister',
             'api_platform.doctrine.orm.date_filter',
@@ -1135,6 +1139,7 @@ class ApiPlatformExtensionTest extends TestCase
             MongoDbOdmOrderFilter::class => 'api_platform.doctrine_mongodb.odm.order_filter',
             MongoDbOdmRangeFilter::class => 'api_platform.doctrine_mongodb.odm.range_filter',
             IdentifiersExtractorInterface::class => 'api_platform.identifiers_extractor.cached',
+            QueryExpander::class => 'api_platform.doctrine.orm.cache.query_expander',
         ];
 
         foreach ($aliases as $alias => $service) {
