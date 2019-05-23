@@ -26,7 +26,10 @@ use ApiPlatform\Core\Exception\InvalidArgumentException;
  *     @Attribute("accessControl", type="string"),
  *     @Attribute("accessControlMessage", type="string"),
  *     @Attribute("attributes", type="array"),
+ *     @Attribute("cacheable", type="bool"),
  *     @Attribute("cacheHeaders", type="array"),
+ *     @Attribute("cacheHint", type="array"),
+ *     @Attribute("cacheMode", type="int"),
  *     @Attribute("collectionOperations", type="array"),
  *     @Attribute("denormalizationContext", type="array"),
  *     @Attribute("deprecationReason", type="string"),
@@ -61,6 +64,7 @@ use ApiPlatform\Core\Exception\InvalidArgumentException;
  *     @Attribute("subresourceOperations", type="array"),
  *     @Attribute("sunset", type="string"),
  *     @Attribute("swaggerContext", type="array"),
+ *     @Attribute("useResultCache", type="array"),
  *     @Attribute("validationGroups", type="mixed")
  * )
  */
@@ -120,9 +124,30 @@ final class ApiResource
     /**
      * @see https://github.com/Haehnchen/idea-php-annotation-plugin/issues/112
      *
+     * @var bool
+     */
+    private $cacheable;
+
+    /**
+     * @see https://github.com/Haehnchen/idea-php-annotation-plugin/issues/112
+     *
+     * @var bool
+     */
+    private $cacheHint;
+
+    /**
+     * @see https://github.com/Haehnchen/idea-php-annotation-plugin/issues/112
+     *
      * @var array
      */
     private $cacheHeaders;
+
+    /**
+     * @see https://github.com/Haehnchen/idea-php-annotation-plugin/issues/112
+     *
+     * @var int
+     */
+    private $cacheMode;
 
     /**
      * @see https://github.com/Haehnchen/idea-php-annotation-plugin/issues/112
@@ -319,6 +344,13 @@ final class ApiResource
      * @var array
      */
     private $paginationViaCursor;
+
+    /**
+     * @see https://github.com/Haehnchen/idea-php-annotation-plugin/issues/112
+     *
+     * @var array
+     */
+    private $useResultCache;
 
     /**
      * @throws InvalidArgumentException

@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\Bridge\Doctrine\Orm\Extension;
 
 use ApiPlatform\Core\Bridge\Doctrine\Orm\AbstractPaginator;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Cache\QueryExpander;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\ContextAwareQueryResultCollectionExtensionInterface;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\PaginationExtension;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGenerator;
@@ -52,6 +53,7 @@ class PaginationExtensionTest extends TestCase
     {
         $paginationExtension = new PaginationExtension(
             $this->prophesize(ManagerRegistry::class)->reveal(),
+            $this->prophesize(QueryExpander::class)->reveal(),
             new RequestStack(),
             $this->prophesize(ResourceMetadataFactoryInterface::class)->reveal(),
             true,
@@ -75,6 +77,7 @@ class PaginationExtensionTest extends TestCase
 
         new PaginationExtension(
             $this->prophesize(ManagerRegistry::class)->reveal(),
+            $this->prophesize(QueryExpander::class)->reveal(),
             new RequestStack(),
             $this->prophesize(ResourceMetadataFactoryInterface::class)->reveal(),
             'bad argument'
@@ -85,6 +88,7 @@ class PaginationExtensionTest extends TestCase
     {
         $paginationExtension = new PaginationExtension(
             $this->prophesize(ManagerRegistry::class)->reveal(),
+            $this->prophesize(QueryExpander::class)->reveal(),
             $this->prophesize(ResourceMetadataFactoryInterface::class)->reveal(),
             new Pagination($this->prophesize(ResourceMetadataFactoryInterface::class)->reveal())
         );
@@ -99,6 +103,7 @@ class PaginationExtensionTest extends TestCase
 
         new PaginationExtension(
             $this->prophesize(ManagerRegistry::class)->reveal(),
+            $this->prophesize(QueryExpander::class)->reveal(),
             new \stdClass(),
             new Pagination($this->prophesize(ResourceMetadataFactoryInterface::class)->reveal())
         );
@@ -111,6 +116,7 @@ class PaginationExtensionTest extends TestCase
 
         new PaginationExtension(
             $this->prophesize(ManagerRegistry::class)->reveal(),
+            $this->prophesize(QueryExpander::class)->reveal(),
             $this->prophesize(ResourceMetadataFactoryInterface::class)->reveal(),
             new \stdClass()
         );
@@ -138,6 +144,7 @@ class PaginationExtensionTest extends TestCase
 
         $extension = new PaginationExtension(
             $this->prophesize(ManagerRegistry::class)->reveal(),
+            $this->prophesize(QueryExpander::class)->reveal(),
             $resourceMetadataFactory,
             $pagination
         );
@@ -171,6 +178,7 @@ class PaginationExtensionTest extends TestCase
 
         $extension = new PaginationExtension(
             $this->prophesize(ManagerRegistry::class)->reveal(),
+            $this->prophesize(QueryExpander::class)->reveal(),
             $requestStack,
             $resourceMetadataFactory,
             true,
@@ -205,6 +213,7 @@ class PaginationExtensionTest extends TestCase
 
         $extension = new PaginationExtension(
             $this->prophesize(ManagerRegistry::class)->reveal(),
+            $this->prophesize(QueryExpander::class)->reveal(),
             $resourceMetadataFactory,
             $pagination
         );
@@ -238,6 +247,7 @@ class PaginationExtensionTest extends TestCase
 
         $extension = new PaginationExtension(
             $this->prophesize(ManagerRegistry::class)->reveal(),
+            $this->prophesize(QueryExpander::class)->reveal(),
             $requestStack,
             $resourceMetadataFactory,
             true,
@@ -275,6 +285,7 @@ class PaginationExtensionTest extends TestCase
 
         $extension = new PaginationExtension(
             $this->prophesize(ManagerRegistry::class)->reveal(),
+            $this->prophesize(QueryExpander::class)->reveal(),
             $resourceMetadataFactory,
             $pagination
         );
@@ -311,6 +322,7 @@ class PaginationExtensionTest extends TestCase
 
         $extension = new PaginationExtension(
             $this->prophesize(ManagerRegistry::class)->reveal(),
+            $this->prophesize(QueryExpander::class)->reveal(),
             $requestStack,
             $resourceMetadataFactory,
             true,
@@ -348,6 +360,7 @@ class PaginationExtensionTest extends TestCase
 
         $extension = new PaginationExtension(
             $this->prophesize(ManagerRegistry::class)->reveal(),
+            $this->prophesize(QueryExpander::class)->reveal(),
             $resourceMetadataFactory,
             $pagination
         );
@@ -384,6 +397,7 @@ class PaginationExtensionTest extends TestCase
 
         $extension = new PaginationExtension(
             $this->prophesize(ManagerRegistry::class)->reveal(),
+            $this->prophesize(QueryExpander::class)->reveal(),
             $requestStack,
             $resourceMetadataFactory,
             true,
@@ -418,6 +432,7 @@ class PaginationExtensionTest extends TestCase
 
         $extension = new PaginationExtension(
             $this->prophesize(ManagerRegistry::class)->reveal(),
+            $this->prophesize(QueryExpander::class)->reveal(),
             $resourceMetadataFactory,
             $pagination
         );
@@ -451,6 +466,7 @@ class PaginationExtensionTest extends TestCase
 
         $extension = new PaginationExtension(
             $this->prophesize(ManagerRegistry::class)->reveal(),
+            $this->prophesize(QueryExpander::class)->reveal(),
             $requestStack,
             $resourceMetadataFactory,
             true,
@@ -485,6 +501,7 @@ class PaginationExtensionTest extends TestCase
 
         $extension = new PaginationExtension(
             $this->prophesize(ManagerRegistry::class)->reveal(),
+            $this->prophesize(QueryExpander::class)->reveal(),
             $resourceMetadataFactory,
             $pagination
         );
@@ -521,6 +538,7 @@ class PaginationExtensionTest extends TestCase
 
         $extension = new PaginationExtension(
             $this->prophesize(ManagerRegistry::class)->reveal(),
+            $this->prophesize(QueryExpander::class)->reveal(),
             $requestStack,
             $resourceMetadataFactory,
             true,
@@ -546,6 +564,7 @@ class PaginationExtensionTest extends TestCase
 
         $extension = new PaginationExtension(
             $this->prophesize(ManagerRegistry::class)->reveal(),
+            $this->prophesize(QueryExpander::class)->reveal(),
             $resourceMetadataFactory,
             $pagination
         );
@@ -566,6 +585,7 @@ class PaginationExtensionTest extends TestCase
 
         $extension = new PaginationExtension(
             $this->prophesize(ManagerRegistry::class)->reveal(),
+            $this->prophesize(QueryExpander::class)->reveal(),
             new RequestStack(),
             $this->prophesize(ResourceMetadataFactoryInterface::class)->reveal()
         );
@@ -593,6 +613,7 @@ class PaginationExtensionTest extends TestCase
 
         $extension = new PaginationExtension(
             $this->prophesize(ManagerRegistry::class)->reveal(),
+            $this->prophesize(QueryExpander::class)->reveal(),
             $requestStack,
             $resourceMetadataFactory
         );
@@ -616,6 +637,7 @@ class PaginationExtensionTest extends TestCase
 
         $extension = new PaginationExtension(
             $this->prophesize(ManagerRegistry::class)->reveal(),
+            $this->prophesize(QueryExpander::class)->reveal(),
             $resourceMetadataFactory,
             $pagination
         );
@@ -644,6 +666,7 @@ class PaginationExtensionTest extends TestCase
 
         $extension = new PaginationExtension(
             $this->prophesize(ManagerRegistry::class)->reveal(),
+            $this->prophesize(QueryExpander::class)->reveal(),
             $requestStack,
             $resourceMetadataFactory,
             false
@@ -675,6 +698,7 @@ class PaginationExtensionTest extends TestCase
 
         $extension = new PaginationExtension(
             $this->prophesize(ManagerRegistry::class)->reveal(),
+            $this->prophesize(QueryExpander::class)->reveal(),
             $resourceMetadataFactory,
             $pagination
         );
@@ -708,6 +732,7 @@ class PaginationExtensionTest extends TestCase
 
         $extension = new PaginationExtension(
             $this->prophesize(ManagerRegistry::class)->reveal(),
+            $this->prophesize(QueryExpander::class)->reveal(),
             $requestStack,
             $resourceMetadataFactory,
             true,
@@ -732,6 +757,7 @@ class PaginationExtensionTest extends TestCase
 
         $extension = new PaginationExtension(
             $this->prophesize(ManagerRegistry::class)->reveal(),
+            $this->prophesize(QueryExpander::class)->reveal(),
             $resourceMetadataFactory,
             $pagination
         );
@@ -754,6 +780,7 @@ class PaginationExtensionTest extends TestCase
 
         $extension = new PaginationExtension(
             $this->prophesize(ManagerRegistry::class)->reveal(),
+            $this->prophesize(QueryExpander::class)->reveal(),
             $requestStack,
             $resourceMetadataFactory
         );
@@ -769,6 +796,7 @@ class PaginationExtensionTest extends TestCase
     {
         $extension = new PaginationExtension(
             $this->prophesize(ManagerRegistry::class)->reveal(),
+            $this->prophesize(QueryExpander::class)->reveal(),
             new RequestStack(),
             $this->prophesize(ResourceMetadataFactoryInterface::class)->reveal()
         );
@@ -791,6 +819,7 @@ class PaginationExtensionTest extends TestCase
 
         $extension = new PaginationExtension(
             $this->prophesize(ManagerRegistry::class)->reveal(),
+            $this->prophesize(QueryExpander::class)->reveal(),
             $requestStack,
             $resourceMetadataFactory
         );
@@ -810,6 +839,7 @@ class PaginationExtensionTest extends TestCase
 
         $extension = new PaginationExtension(
             $this->prophesize(ManagerRegistry::class)->reveal(),
+            $this->prophesize(QueryExpander::class)->reveal(),
             $resourceMetadataFactory,
             $pagination
         );
@@ -833,6 +863,7 @@ class PaginationExtensionTest extends TestCase
 
         $extension = new PaginationExtension(
             $this->prophesize(ManagerRegistry::class)->reveal(),
+            $this->prophesize(QueryExpander::class)->reveal(),
             $requestStack,
             $resourceMetadataFactory,
             false,
@@ -853,6 +884,7 @@ class PaginationExtensionTest extends TestCase
 
         $extension = new PaginationExtension(
             $this->prophesize(ManagerRegistry::class)->reveal(),
+            $this->prophesize(QueryExpander::class)->reveal(),
             $resourceMetadataFactory,
             $pagination
         );
@@ -876,6 +908,7 @@ class PaginationExtensionTest extends TestCase
 
         $extension = new PaginationExtension(
             $this->prophesize(ManagerRegistry::class)->reveal(),
+            $this->prophesize(QueryExpander::class)->reveal(),
             $requestStack,
             $resourceMetadataFactory,
             false
@@ -908,6 +941,7 @@ class PaginationExtensionTest extends TestCase
 
         $paginationExtension = new PaginationExtension(
             $managerRegistryProphecy->reveal(),
+            $this->prophesize(QueryExpander::class)->reveal(),
             $resourceMetadataFactoryProphecy->reveal(),
             new Pagination($resourceMetadataFactoryProphecy->reveal())
         );
@@ -943,6 +977,7 @@ class PaginationExtensionTest extends TestCase
 
         $paginationExtension = new PaginationExtension(
             $managerRegistryProphecy->reveal(),
+            $this->prophesize(QueryExpander::class)->reveal(),
             $resourceMetadataFactoryProphecy->reveal(),
             new Pagination($resourceMetadataFactoryProphecy->reveal())
         );
@@ -988,6 +1023,7 @@ class PaginationExtensionTest extends TestCase
 
         $paginationExtension = new PaginationExtension(
             $managerRegistryProphecy->reveal(),
+            $this->prophesize(QueryExpander::class)->reveal(),
             $requestStack,
             $resourceMetadataFactoryProphecy->reveal()
         );
@@ -1023,6 +1059,7 @@ class PaginationExtensionTest extends TestCase
 
         $paginationExtension = new PaginationExtension(
             $managerRegistryProphecy->reveal(),
+            $this->prophesize(QueryExpander::class)->reveal(),
             $resourceMetadataFactoryProphecy->reveal(),
             new Pagination($resourceMetadataFactoryProphecy->reveal())
         );
@@ -1072,6 +1109,7 @@ class PaginationExtensionTest extends TestCase
 
         $paginationExtension = new PaginationExtension(
             $managerRegistryProphecy->reveal(),
+            $this->prophesize(QueryExpander::class)->reveal(),
             $requestStack,
             $resourceMetadataFactoryProphecy->reveal()
         );
@@ -1113,6 +1151,7 @@ class PaginationExtensionTest extends TestCase
 
         $paginationExtension = new PaginationExtension(
             $managerRegistryProphecy->reveal(),
+            $this->prophesize(QueryExpander::class)->reveal(),
             $resourceMetadataFactoryProphecy->reveal(),
             new Pagination($resourceMetadataFactoryProphecy->reveal())
         );
@@ -1162,6 +1201,7 @@ class PaginationExtensionTest extends TestCase
 
         $paginationExtension = new PaginationExtension(
             $managerRegistryProphecy->reveal(),
+            $this->prophesize(QueryExpander::class)->reveal(),
             $requestStack,
             $resourceMetadataFactoryProphecy->reveal()
         );
@@ -1203,6 +1243,7 @@ class PaginationExtensionTest extends TestCase
 
         $paginationExtension = new PaginationExtension(
             $managerRegistryProphecy->reveal(),
+            $this->prophesize(QueryExpander::class)->reveal(),
             $resourceMetadataFactoryProphecy->reveal(),
             new Pagination($resourceMetadataFactoryProphecy->reveal())
         );
@@ -1246,6 +1287,7 @@ class PaginationExtensionTest extends TestCase
 
         $paginationExtension = new PaginationExtension(
             $managerRegistryProphecy->reveal(),
+            $this->prophesize(QueryExpander::class)->reveal(),
             $requestStack,
             $resourceMetadataFactoryProphecy->reveal()
         );
@@ -1280,6 +1322,7 @@ class PaginationExtensionTest extends TestCase
 
         $paginationExtension = new PaginationExtension(
             $managerRegistryProphecy->reveal(),
+            $this->prophesize(QueryExpander::class)->reveal(),
             $resourceMetadataFactoryProphecy->reveal(),
             new Pagination($resourceMetadataFactoryProphecy->reveal())
         );
@@ -1322,6 +1365,7 @@ class PaginationExtensionTest extends TestCase
 
         $paginationExtension = new PaginationExtension(
             $managerRegistryProphecy->reveal(),
+            $this->prophesize(QueryExpander::class)->reveal(),
             $requestStack,
             $resourceMetadataFactoryProphecy->reveal()
         );
