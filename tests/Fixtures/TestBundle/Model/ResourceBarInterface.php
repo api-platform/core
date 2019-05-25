@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\OtherResources;
+namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Model;
 
 interface ResourceBarInterface
 {
