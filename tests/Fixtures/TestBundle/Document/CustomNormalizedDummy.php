@@ -36,7 +36,7 @@ class CustomNormalizedDummy
      * @var int The id
      *
      * @ODM\Id(strategy="INCREMENT", type="integer")
-     * @Groups({"input", "output", "related_input"})
+     * @Groups({"input", "output"})
      */
     private $id;
 
@@ -46,7 +46,7 @@ class CustomNormalizedDummy
      * @ODM\Field
      * @Assert\NotBlank
      * @ApiProperty(iri="http://schema.org/name")
-     * @Groups({"input", "output", "related_input"})
+     * @Groups({"input", "output"})
      */
     private $name;
 
@@ -55,7 +55,7 @@ class CustomNormalizedDummy
      *
      * @ODM\Field(nullable=true)
      * @ApiProperty(iri="https://schema.org/alternateName")
-     * @Groups({"input", "output", "related_input"})
+     * @Groups({"input", "output"})
      */
     private $alias;
 
