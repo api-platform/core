@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Bridge\Doctrine\Orm;
+namespace ApiPlatform\Core\Tests\Bridge\Doctrine\Orm\Cache;
 
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Cache\QueryExpander;
 use ApiPlatform\Core\Exception\RuntimeException;
@@ -205,7 +205,7 @@ class QueryExpanderTest extends TestCase
     }
 
     public function testResultCacheAttrTooMuchArgs()
-    {   
+    {
         $resultCacheArgs = [true, 3600, 'id', 'one_too_much'];
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessageRegExp('/^Attribute [a-z_]* should at least contain one item for use. Other options are lifetime and and result cache id$/');
