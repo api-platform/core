@@ -57,10 +57,12 @@ class QueryExpander
     /**
      * @throws ResourceClassNotFoundException
      */
-    private function getDoctrineCacheConfig(string $resourceClass): ?array {
+    private function getDoctrineCacheConfig(string $resourceClass): ?array
+    {
         $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
         $config = $resourceMetadata->getAttribute(self::DOCTRINE_CACHE_CONFIG_ATTR, null);
-        return is_array($config) ? $config : null;
+
+        return \is_array($config) ? $config : null;
     }
 
     private function processCacheable(array $cacheConfig, AbstractQuery $query)
