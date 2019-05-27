@@ -56,9 +56,10 @@ final class PaginationExtension implements ContextAwareQueryResultCollectionExte
 
     /**
      * @param ResourceMetadataFactoryInterface|RequestStack $resourceMetadataFactory
-     * @param Pagination|ResourceMetadataFactoryInterface $pagination
+     * @param Pagination|ResourceMetadataFactoryInterface   $pagination
+     * @param mixed|null                                    $queryExpander
      */
-    public function __construct(ManagerRegistry $managerRegistry, /* ResourceMetadataFactoryInterface */ $resourceMetadataFactory, /* Pagination */ $pagination,  /* ?QueryExpander */ $queryExpander = null)
+    public function __construct(ManagerRegistry $managerRegistry, /* ResourceMetadataFactoryInterface */ $resourceMetadataFactory, /* Pagination */ $pagination, /* ?QueryExpander */ $queryExpander = null)
     {
         if ($resourceMetadataFactory instanceof RequestStack && $pagination instanceof ResourceMetadataFactoryInterface) {
             @trigger_error(sprintf('Passing an instance of "%s" as second argument of "%s" is deprecated since API Platform 2.4 and will not be possible anymore in API Platform 3. Pass an instance of "%s" instead.', RequestStack::class, self::class, ResourceMetadataFactoryInterface::class), E_USER_DEPRECATED);
@@ -246,7 +247,7 @@ final class PaginationExtension implements ContextAwareQueryResultCollectionExte
     private function getResourceClassFromQueryBuilder(QueryBuilder $queryBuilder): ?string
     {
         $fromPart = $queryBuilder->getDQLPart('from');
-        if (1 === count($fromPart)) {
+        if (1 === \count($fromPart)) {
             return $fromPart[0]->getFrom();
         }
     }
