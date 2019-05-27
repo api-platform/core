@@ -69,7 +69,7 @@ final class PaginationExtension implements ContextAwareQueryResultCollectionExte
             $resourceMetadataFactory = $pagination;
             $pagination = null;
 
-            $args = \array_slice(\func_get_args(), 4);
+            $args = \array_slice(\func_get_args(), 3);
             $legacyPaginationArgs = [
                 ['arg_name' => 'enabled', 'type' => 'bool', 'default' => true],
                 ['arg_name' => 'clientEnabled', 'type' => 'bool', 'default' => false],
