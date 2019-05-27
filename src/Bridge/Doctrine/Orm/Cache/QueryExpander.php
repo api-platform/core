@@ -16,7 +16,6 @@ namespace ApiPlatform\Core\Bridge\Doctrine\Orm\Cache;
 use ApiPlatform\Core\Exception\ResourceClassNotFoundException;
 use ApiPlatform\Core\Exception\RuntimeException;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
-use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use Doctrine\ORM\AbstractQuery;
 
 /**
@@ -28,6 +27,7 @@ use Doctrine\ORM\AbstractQuery;
  */
 class QueryExpander
 {
+    public const DOCTRINE_CACHE_CONFIG_ATTR = 'doctrine_cache';
     public const CACHEABLE_ATTR = 'cacheable';
     public const CACHE_HINT_ATTR = 'cache_hint';
     public const CACHE_MODE_ATTR = 'cache_mode';
@@ -45,16 +45,27 @@ class QueryExpander
      */
     public function expand(string $resourceClass, AbstractQuery $query)
     {
-        $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
-        $this->processCacheable($resourceMetadata, $query);
-        $this->processCacheHint($resourceMetadata, $query);
-        $this->processCacheMode($resourceMetadata, $query);
-        $this->processResultCache($resourceMetadata, $query);
+        $cacheConfig = $this->getDoctrineCacheConfig($resourceClass);
+        if (null !== $cacheConfig) {
+            $this->processCacheable($cacheConfig, $query);
+            $this->processCacheHint($cacheConfig, $query);
+            $this->processCacheMode($cacheConfig, $query);
+            $this->processResultCache($cacheConfig, $query);
+        }
     }
 
-    private function processCacheable(ResourceMetadata $resourceMetadata, AbstractQuery $query)
+    /**
+     * @throws ResourceClassNotFoundException
+     */
+    private function getDoctrineCacheConfig(string $resourceClass): ?array {
+        $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
+        $config = $resourceMetadata->getAttribute(self::DOCTRINE_CACHE_CONFIG_ATTR, null);
+        return is_array($config) ? $config : null;
+    }
+
+    private function processCacheable(array $cacheConfig, AbstractQuery $query)
     {
-        if (false !== $resourceMetadata->getAttribute(self::CACHEABLE_ATTR, false)) {
+        if (false !== ($cacheConfig[self::CACHEABLE_ATTR] ?? false)) {
             $query->setCacheable(true);
         }
     }
@@ -62,9 +73,9 @@ class QueryExpander
     /**
      * @throws RuntimeException
      */
-    private function processCacheHint(ResourceMetadata $resourceMetadata, AbstractQuery $query)
+    private function processCacheHint(array $cacheConfig, AbstractQuery $query)
     {
-        if (null !== $cacheHint = $resourceMetadata->getAttribute(self::CACHE_HINT_ATTR, null)) {
+        if (null !== $cacheHint = $cacheConfig[self::CACHE_HINT_ATTR] ?? null) {
             if (!\is_array($cacheHint)) {
                 throw new RuntimeException(sprintf('Attribute value %s should be an array', self::CACHE_HINT_ATTR));
             }
@@ -74,9 +85,9 @@ class QueryExpander
         }
     }
 
-    private function processCacheMode(ResourceMetadata $resourceMetadata, AbstractQuery $query)
+    private function processCacheMode(array $cacheConfig, AbstractQuery $query)
     {
-        if (null !== $cacheMode = $resourceMetadata->getAttribute(self::CACHE_MODE_ATTR, null)) {
+        if (null !== $cacheMode = $cacheConfig[self::CACHE_MODE_ATTR] ?? null) {
             $query->setCacheMode($cacheMode);
         }
     }
@@ -84,9 +95,9 @@ class QueryExpander
     /**
      * @throws RuntimeException
      */
-    private function processResultCache(ResourceMetadata $resourceMetadata, AbstractQuery $query)
+    private function processResultCache(array $cacheConfig, AbstractQuery $query)
     {
-        if (null !== $useResultCache = $resourceMetadata->getAttribute(self::USE_RESULT_CACHE_ATTR, null)) {
+        if (null !== $useResultCache = $cacheConfig[self::USE_RESULT_CACHE_ATTR] ?? null) {
             if (!\is_array($useResultCache)) {
                 throw new RuntimeException(sprintf('Attribute value %s should be an array', self::USE_RESULT_CACHE_ATTR));
             }

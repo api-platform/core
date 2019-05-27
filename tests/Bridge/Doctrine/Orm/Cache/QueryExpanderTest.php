@@ -28,10 +28,25 @@ use PHPUnit\Framework\TestCase;
  */
 class QueryExpanderTest extends TestCase
 {
+    public function testNoCacheConfig() {
+        $resourceMetadata = new ResourceMetadata('Dummy');
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
+        $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn($resourceMetadata)->shouldBeCalled();
+        $query = $this->prophesize(AbstractQuery::class);
+        $query->setCacheable()->shouldNotBeCalled();
+        $query->setHint()->shouldNotBeCalled();
+        $query->setCacheMode()->shouldNotBeCalled();
+        $query->useResultCache()->shouldNotBeCalled();
+
+        $queryExpander = new QueryExpander($resourceMetadataFactoryProphecy->reveal());
+
+        $queryExpander->expand(Dummy::class, $query->reveal());
+    }
+
     public function testSetCacheable()
     {
         $resourceMetadata = new ResourceMetadata('Dummy', null, null, null, null, [
-            QueryExpander::CACHEABLE_ATTR => true,
+            QueryExpander::DOCTRINE_CACHE_CONFIG_ATTR => [ QueryExpander::CACHEABLE_ATTR => true ],
         ]);
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn($resourceMetadata)->shouldBeCalled();
@@ -45,7 +60,9 @@ class QueryExpanderTest extends TestCase
 
     public function testNoCacheableAttr()
     {
-        $resourceMetadata = new ResourceMetadata('Dummy');
+        $resourceMetadata = new ResourceMetadata('Dummy', null, null, null, null, [
+            QueryExpander::DOCTRINE_CACHE_CONFIG_ATTR => [],
+        ]);
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn($resourceMetadata)->shouldBeCalled();
         $query = $this->prophesize(AbstractQuery::class);
@@ -59,10 +76,10 @@ class QueryExpanderTest extends TestCase
     public function testSetCacheHint()
     {
         $resourceMetadata = new ResourceMetadata('Dummy', null, null, null, null, [
-            QueryExpander::CACHE_HINT_ATTR => [
+            QueryExpander::DOCTRINE_CACHE_CONFIG_ATTR => [ QueryExpander::CACHE_HINT_ATTR => [
                 Query::HINT_CACHE_EVICT => true,
                 Query::HINT_REFRESH => false,
-            ],
+            ]],
         ]);
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn($resourceMetadata)->shouldBeCalled();
@@ -77,7 +94,9 @@ class QueryExpanderTest extends TestCase
 
     public function testNoCacheHint()
     {
-        $resourceMetadata = new ResourceMetadata('Dummy');
+        $resourceMetadata = new ResourceMetadata('Dummy', null, null, null, null, [
+            QueryExpander::DOCTRINE_CACHE_CONFIG_ATTR => [],
+        ]);
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn($resourceMetadata)->shouldBeCalled();
         $query = $this->prophesize(AbstractQuery::class);
@@ -91,7 +110,7 @@ class QueryExpanderTest extends TestCase
     public function testSetCacheMode()
     {
         $resourceMetadata = new ResourceMetadata('Dummy', null, null, null, null, [
-            QueryExpander::CACHE_MODE_ATTR => Cache::MODE_REFRESH,
+            QueryExpander::DOCTRINE_CACHE_CONFIG_ATTR => [ QueryExpander::CACHE_MODE_ATTR => Cache::MODE_REFRESH ],
         ]);
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn($resourceMetadata)->shouldBeCalled();
@@ -105,7 +124,9 @@ class QueryExpanderTest extends TestCase
 
     public function testNoCacheModeAttr()
     {
-        $resourceMetadata = new ResourceMetadata('Dummy');
+        $resourceMetadata = new ResourceMetadata('Dummy', null, null, null, null, [
+            QueryExpander::DOCTRINE_CACHE_CONFIG_ATTR => [],
+        ]);
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn($resourceMetadata)->shouldBeCalled();
         $query = $this->prophesize(AbstractQuery::class);
@@ -120,7 +141,7 @@ class QueryExpanderTest extends TestCase
     {
         $resultCacheArgs = [true, 3600, 'id'];
         $resourceMetadata = new ResourceMetadata('Dummy', null, null, null, null, [
-            QueryExpander::USE_RESULT_CACHE_ATTR => $resultCacheArgs,
+            QueryExpander::DOCTRINE_CACHE_CONFIG_ATTR => [ QueryExpander::USE_RESULT_CACHE_ATTR => $resultCacheArgs ],
         ]);
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn($resourceMetadata)->shouldBeCalled();
@@ -134,7 +155,9 @@ class QueryExpanderTest extends TestCase
 
     public function testNoResultCacheAttr()
     {
-        $resourceMetadata = new ResourceMetadata();
+        $resourceMetadata = new ResourceMetadata('Dummy', null, null, null, null, [
+            QueryExpander::DOCTRINE_CACHE_CONFIG_ATTR => [],
+        ]);
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn($resourceMetadata)->shouldBeCalled();
         $query = $this->prophesize(AbstractQuery::class);
@@ -150,7 +173,7 @@ class QueryExpanderTest extends TestCase
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessageRegExp('/^Attribute value [a-z_]* should be an array$/');
         $resourceMetadata = new ResourceMetadata('Dummy', null, null, null, null, [
-            QueryExpander::USE_RESULT_CACHE_ATTR => 'not an array',
+            QueryExpander::DOCTRINE_CACHE_CONFIG_ATTR => [ QueryExpander::USE_RESULT_CACHE_ATTR => 'not an array' ],
         ]);
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn($resourceMetadata)->shouldBeCalled();
@@ -168,7 +191,7 @@ class QueryExpanderTest extends TestCase
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessageRegExp('/^Attribute [a-z_]* should at least contain one item for use. Other options are lifetime and and result cache id$/');
         $resourceMetadata = new ResourceMetadata('Dummy', null, null, null, null, [
-            QueryExpander::USE_RESULT_CACHE_ATTR => $resultCacheArgs,
+            QueryExpander::DOCTRINE_CACHE_CONFIG_ATTR => [ QueryExpander::USE_RESULT_CACHE_ATTR => $resultCacheArgs ],
         ]);
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn($resourceMetadata)->shouldBeCalled();
@@ -186,7 +209,7 @@ class QueryExpanderTest extends TestCase
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessageRegExp('/^Attribute [a-z_]* should at least contain one item for use. Other options are lifetime and and result cache id$/');
         $resourceMetadata = new ResourceMetadata('Dummy', null, null, null, null, [
-            QueryExpander::USE_RESULT_CACHE_ATTR => $resultCacheArgs,
+            QueryExpander::DOCTRINE_CACHE_CONFIG_ATTR => [ QueryExpander::USE_RESULT_CACHE_ATTR => $resultCacheArgs ],
         ]);
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn($resourceMetadata)->shouldBeCalled();
