@@ -18,6 +18,7 @@ use ApiPlatform\Core\Test\DoctrineMongoDbOdmSetup;
 use ApiPlatform\Core\Tests\Bridge\Doctrine\MongoDbOdm\PropertyInfo\Fixtures\DoctrineDummy;
 use ApiPlatform\Core\Tests\Bridge\Doctrine\MongoDbOdm\PropertyInfo\Fixtures\DoctrineEmbeddable;
 use ApiPlatform\Core\Tests\Bridge\Doctrine\MongoDbOdm\PropertyInfo\Fixtures\DoctrineFooType;
+use ApiPlatform\Core\Tests\Bridge\Doctrine\MongoDbOdm\PropertyInfo\Fixtures\DoctrineGeneratedValue;
 use ApiPlatform\Core\Tests\Bridge\Doctrine\MongoDbOdm\PropertyInfo\Fixtures\DoctrineRelation;
 use ApiPlatform\Core\Tests\Bridge\Doctrine\MongoDbOdm\PropertyInfo\Fixtures\DoctrineWithEmbedded;
 use Doctrine\Common\Collections\Collection;
@@ -191,6 +192,15 @@ class DoctrineExtractorTest extends TestCase
     public function testGetTypesCatchException(): void
     {
         $this->assertNull($this->createExtractor()->getTypes('Not\Exist', 'baz'));
+    }
+
+    public function testGeneratedValueNotWritable()
+    {
+        $extractor = $this->createExtractor();
+        $this->assertFalse($extractor->isWritable(DoctrineGeneratedValue::class, 'id'));
+        $this->assertNull($extractor->isReadable(DoctrineGeneratedValue::class, 'id'));
+        $this->assertNull($extractor->isWritable(DoctrineGeneratedValue::class, 'foo'));
+        $this->assertNull($extractor->isReadable(DoctrineGeneratedValue::class, 'foo'));
     }
 
     private function createExtractor(): DoctrineExtractor
