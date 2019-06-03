@@ -68,7 +68,15 @@ final class Paginator implements \IteratorAggregate, PaginatorInterface
      */
     public function getTotalItems(): float
     {
-        return isset($this->documents['hits']['total']) ? (float) $this->documents['hits']['total'] : 0.;
+        // for elastic search version > 7.0.0
+        if (isset($this->documents['hits']['total']['value'])) {
+            return (float) $this->documents['hits']['total']['value'];
+        }
+        // for elastic search old versions
+        if (isset($this->documents['hits']['total'])) {
+            return (float) $this->documents['hits']['total'];
+        }
+        return 0.;
     }
 
     /**
