@@ -350,6 +350,8 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
                 return 'xmls:decimal';
             case Type::BUILTIN_TYPE_BOOL:
                 return 'xmls:boolean';
+            case Type::BUILTIN_TYPE_ARRAY:
+                return 'xmls:array';
             case Type::BUILTIN_TYPE_OBJECT:
                 if (null === $className = $type->getClassName()) {
                     return null;
