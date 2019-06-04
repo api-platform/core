@@ -70,7 +70,7 @@
         "symfony/framework-bundle": "^4.2",
         "symfony/mercure-bundle": "*",
         "symfony/messenger": "^4.2",
-        "symfony/phpunit-bridge": "^3.4.5 || ^4.0.5",
+        "symfony/phpunit-bridge": "^4.3",
         "symfony/routing": "^3.4 || ^4.0",
         "symfony/security-bundle": "^3.4 || ^4.0",
         "symfony/security-core": "^3.4 || ^4.0",
@@ -82,7 +82,8 @@
     },
     "conflict": {
         "doctrine/common": "<2.7",
-        "doctrine/mongodb-odm": "<2.0"
+        "doctrine/mongodb-odm": "<2.0",
+        "symfony/messenger": ">=4.3"
     },
     "suggest": {
         "doctrine/mongodb-odm-bundle": "To support MongoDB. Only versions 4.0 and later are supported.",
