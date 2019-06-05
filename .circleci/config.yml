@@ -530,12 +530,10 @@ jobs:
 
 workflows:
   version: 2
-  lint:
+  lint-and-coverage:
     jobs:
       - php-cs-fixer
       - phpstan
-  test-with-coverage:
-    jobs:
       - phpunit-coverage
       - behat-coverage
       - phpunit-mongodb-coverage
