@@ -1,58 +1,7 @@
 version: 2.1
 
 orbs:
-  # codecov: codecov/codecov@1
-  # https://github.com/codecov/codecov-circleci-orb/pull/17
-  codecov:
-    commands:
-      upload:
-        parameters:
-          conf:
-            description: Used to specify the location of the .codecov.yml config file
-            type: string
-            default: ".codecov.yml"
-          file:
-            description: Path to the code coverage data file to upload.
-            type: string
-            default: ""
-          flags:
-            description: Flag the upload to group coverage metrics (e.g. unittests | integration | ui,chrome)
-            type: string
-            default: ""
-          token:
-            description: Set the private repository token (defaults to environment variable $CODECOV_TOKEN)
-            type: string
-            default: ${CODECOV_TOKEN}
-          upload_name:
-            description: Custom defined name of the upload. Visible in Codecov UI
-            type: string
-            default: ${CIRCLE_BUILD_NUM}
-        steps:
-          - when:
-              condition: << parameters.file >>
-              steps:
-                - run:
-                    name: Upload Coverage Results
-                    command: |
-                      curl -s https://codecov.io/bash | bash -s -- \
-                        -f "<< parameters.file >>" \
-                        -t "<< parameters.token >>" \
-                        -n "<< parameters.upload_name >>" \
-                        -y "<< parameters.conf >>" \
-                        -F "<< parameters.flags >>" \
-                        -Z || echo 'Codecov upload failed'
-          - unless:
-              condition: << parameters.file >>
-              steps:
-                - run:
-                    name: Upload Coverage Results
-                    command: |
-                      curl -s https://codecov.io/bash | bash -s -- \
-                        -t "<< parameters.token >>" \
-                        -n "<< parameters.upload_name >>" \
-                        -y "<< parameters.conf >>" \
-                        -F "<< parameters.flags >>" \
-                        -Z || echo 'Codecov upload failed'
+  codecov: codecov/codecov@1
   coveralls:
     commands:
       upload:
