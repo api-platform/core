@@ -559,7 +559,7 @@ Feature: Relations support
     """
 
   Scenario: Eager load relations should not be duplicated
-    Given there is a order with same customer and receiver
+    Given there is an order with same customer and recipient
     When I add "Content-Type" header equal to "application/ld+json"
     And I send a "GET" request to "/orders"
     Then the response status code should be 200

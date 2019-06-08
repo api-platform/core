@@ -23,8 +23,8 @@ use ApiPlatform\Core\Metadata\Property\PropertyNameCollection;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Doctrine\Generator\Uuid;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RelatedDummy;
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\OtherResources\ResourceInterface;
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\OtherResources\ResourceInterfaceImplementation;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Model\ResourceInterface;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Model\ResourceInterfaceImplementation;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 

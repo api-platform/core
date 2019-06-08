@@ -44,6 +44,7 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\Order as OrderDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\Person as PersonDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\PersonToPet as PersonToPetDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\Pet as PetDocument;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\Product as ProductDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\Question as QuestionDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\RelatedDummy as RelatedDummyDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\RelatedOwnedDummy as RelatedOwnedDummyDocument;
@@ -51,6 +52,7 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\RelatedOwningDummy as Re
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\RelatedToDummyFriend as RelatedToDummyFriendDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\RelationEmbedder as RelationEmbedderDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\SecuredDummy as SecuredDummyDocument;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\Taxon as TaxonDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\ThirdLevel as ThirdLevelDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\User as UserDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Address;
@@ -78,17 +80,20 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyProperty;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyTableInheritanceNotApiResourceChild;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\EmbeddableDummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\EmbeddedDummy;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\ExternalUser;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\FileConfigDummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Foo;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\FooDummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\FourthLevel;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Greeting;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\InternalUser;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\MaxDepthDummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Node;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Order;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Person;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\PersonToPet;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Pet;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Product;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Question;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RamseyUuidDummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RelatedDummy;
@@ -97,10 +102,13 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RelatedOwningDummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RelatedToDummyFriend;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RelationEmbedder;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\SecuredDummy;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Site;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Taxon;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\ThirdLevel;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\User;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\UuidIdentifierDummy;
 use Behat\Behat\Context\Context;
+use Behat\Gherkin\Node\PyStringNode;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Doctrine\ORM\EntityManagerInterface;
@@ -1227,6 +1235,108 @@ final class DoctrineContext implements Context
         $this->manager->clear();
     }
 
+    /**
+     * @Given there is an order with same customer and recipient
+     */
+    public function thereIsAnOrderWithSameCustomerAndRecipient()
+    {
+        $customer = $this->isOrm() ? new Customer() : new CustomerDocument();
+        $customer->name = 'customer_name';
+
+        $address1 = $this->isOrm() ? new Address() : new AddressDocument();
+        $address1->name = 'foo';
+        $address2 = $this->isOrm() ? new Address() : new AddressDocument();
+        $address2->name = 'bar';
+
+        $order = $this->isOrm() ? new Order() : new OrderDocument();
+        $order->recipient = $customer;
+        $order->customer = $customer;
+
+        $customer->addresses->add($address1);
+        $customer->addresses->add($address2);
+
+        $this->manager->persist($address1);
+        $this->manager->persist($address2);
+        $this->manager->persist($customer);
+        $this->manager->persist($order);
+
+        $this->manager->flush();
+        $this->manager->clear();
+    }
+
+    /**
+     * @Given there are :nb sites with internal owner
+     */
+    public function thereAreSitesWithInternalOwner(int $nb)
+    {
+        for ($i = 1; $i <= $nb; ++$i) {
+            $internalUser = new InternalUser();
+            $internalUser->setFirstname('Internal');
+            $internalUser->setLastname('User');
+            $internalUser->setEmail('john.doe@example.com');
+            $internalUser->setInternalId('INT');
+            $site = new Site();
+            $site->setTitle('title');
+            $site->setDescription('description');
+            $site->setOwner($internalUser);
+            $this->manager->persist($site);
+        }
+        $this->manager->flush();
+    }
+
+    /**
+     * @Given there are :nb sites with external owner
+     */
+    public function thereAreSitesWithExternalOwner(int $nb)
+    {
+        for ($i = 1; $i <= $nb; ++$i) {
+            $externalUser = new ExternalUser();
+            $externalUser->setFirstname('External');
+            $externalUser->setLastname('User');
+            $externalUser->setEmail('john.doe@example.com');
+            $externalUser->setExternalId('EXT');
+            $site = new Site();
+            $site->setTitle('title');
+            $site->setDescription('description');
+            $site->setOwner($externalUser);
+            $this->manager->persist($site);
+        }
+        $this->manager->flush();
+    }
+
+    /**
+     * @Given there is the following taxon:
+     */
+    public function thereIsTheFollowingTaxon(PyStringNode $dataNode): void
+    {
+        $data = json_decode((string) $dataNode, true);
+
+        $taxon = $this->isOrm() ? new Taxon() : new TaxonDocument();
+        $taxon->setCode($data['code']);
+        $this->manager->persist($taxon);
+
+        $this->manager->flush();
+    }
+
+    /**
+     * @Given there is the following product:
+     */
+    public function thereIsTheFollowingProduct(PyStringNode $dataNode): void
+    {
+        $data = json_decode((string) $dataNode, true);
+
+        $product = $this->isOrm() ? new Product() : new ProductDocument();
+        $product->setCode($data['code']);
+        if (isset($data['mainTaxon'])) {
+            $mainTaxonId = (int) str_replace('/taxons/', '', $data['mainTaxon']);
+            $mainTaxon = $this->manager->getRepository($this->isOrm() ? Taxon::class : TaxonDocument::class)->find($mainTaxonId);
+            $product->setMainTaxon($mainTaxon);
+        }
+        $this->manager->persist($product);
+
+        $this->manager->flush();
+    }
+
     private function isOrm(): bool
     {
         return null !== $this->schemaTool;
@@ -1531,74 +1641,5 @@ final class DoctrineContext implements Context
     private function buildThirdLevel()
     {
         return $this->isOrm() ? new ThirdLevel() : new ThirdLevelDocument();
-    }
-
-    /**
-     * @Given there is a order with same customer and receiver
-     */
-    public function testEagerLoadingNotDuplicateRelation()
-    {
-        $customer = $this->isOrm() ? new Customer() : new CustomerDocument();
-        $customer->name = 'customer_name';
-
-        $address1 = $this->isOrm() ? new Address() : new AddressDocument();
-        $address1->name = 'foo';
-        $address2 = $this->isOrm() ? new Address() : new AddressDocument();
-        $address2->name = 'bar';
-
-        $order = $this->isOrm() ? new Order() : new OrderDocument();
-        $order->recipient = $customer;
-        $order->customer = $customer;
-
-        $customer->addresses->add($address1);
-        $customer->addresses->add($address2);
-
-        $this->manager->persist($address1);
-        $this->manager->persist($address2);
-        $this->manager->persist($customer);
-        $this->manager->persist($order);
-
-        $this->manager->flush();
-        $this->manager->clear();
-    }
-
-    /**
-     * @Given there are :nb sites with internal owner
-     */
-    public function thereAreSitesWithInternalOwner(int $nb)
-    {
-        for ($i = 1; $i <= $nb; ++$i) {
-            $internalUser = new \ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\InternalUser();
-            $internalUser->setFirstname('Internal');
-            $internalUser->setLastname('User');
-            $internalUser->setEmail('john.doe@example.com');
-            $internalUser->setInternalId('INT');
-            $site = new \ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Site();
-            $site->setTitle('title');
-            $site->setDescription('description');
-            $site->setOwner($internalUser);
-            $this->manager->persist($site);
-        }
-        $this->manager->flush();
-    }
-
-    /**
-     * @Given there are :nb sites with external owner
-     */
-    public function thereAreSitesWithExternalOwner(int $nb)
-    {
-        for ($i = 1; $i <= $nb; ++$i) {
-            $externalUser = new \ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\ExternalUser();
-            $externalUser->setFirstname('External');
-            $externalUser->setLastname('User');
-            $externalUser->setEmail('john.doe@example.com');
-            $externalUser->setExternalId('EXT');
-            $site = new \ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Site();
-            $site->setTitle('title');
-            $site->setDescription('description');
-            $site->setOwner($externalUser);
-            $this->manager->persist($site);
-        }
-        $this->manager->flush();
     }
 }
