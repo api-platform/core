@@ -38,7 +38,7 @@ class CustomNormalizedDummy
      * @ORM\Column(type="integer")
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
-     * @Groups({"input", "output", "related_input"})
+     * @Groups({"input", "output"})
      */
     private $id;
 
@@ -48,7 +48,7 @@ class CustomNormalizedDummy
      * @ORM\Column
      * @Assert\NotBlank
      * @ApiProperty(iri="http://schema.org/name")
-     * @Groups({"input", "output", "related_input"})
+     * @Groups({"input", "output"})
      */
     private $name;
 
@@ -57,7 +57,7 @@ class CustomNormalizedDummy
      *
      * @ORM\Column(nullable=true)
      * @ApiProperty(iri="https://schema.org/alternateName")
-     * @Groups({"input", "output", "related_input"})
+     * @Groups({"input", "output"})
      */
     private $alias;
 
