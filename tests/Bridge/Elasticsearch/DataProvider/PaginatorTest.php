@@ -76,6 +76,9 @@ class PaginatorTest extends TestCase
         ],
     ];
 
+    protected $offset = 4;
+    protected $limit = 4;
+
     /**
      * @var PaginatorInterface
      */
@@ -109,6 +112,22 @@ class PaginatorTest extends TestCase
     public function testGetTotalItems()
     {
         self::assertSame(8., $this->paginator->getTotalItems());
+    }
+
+    public function testGetTotalItemsForElasticSearch7()
+    {
+        // the total in elastichsearch >= 7 is object and not integer.
+        // change documents to be like elasticsearch7
+        $documents = self::DOCUMENTS;
+        $documents['hits']['total'] = [
+            'value' => 8,
+            'relation' => 'eq'
+        ];
+        // I need to create another paginator with documents total changed
+        $denormalizerProphecy = $this->createDenormalizerProphecy($documents);
+        $paginator = $this->createPaginator($this->limit, $this->offset, $documents, $denormalizerProphecy);
+
+        self::assertSame(8., $paginator->getTotalItems());
     }
 
     public function testGetCurrentPage()
@@ -149,20 +168,31 @@ class PaginatorTest extends TestCase
 
     protected function setUp()
     {
-        $this->paginator = $this->getPaginator(4, 4);
+        $this->paginator = $this->getPaginator($this->limit, $this->offset);
     }
 
     protected function getPaginator(int $limit, int $offset)
     {
+        $denormalizerProphecy = $this->createDenormalizerProphecy(static::DOCUMENTS);
+        return $this->createPaginator($limit, $offset, self::DOCUMENTS, $denormalizerProphecy);
+    }
+
+    protected function createDenormalizerProphecy($documents)
+    {
         $denormalizerProphecy = $this->prophesize(DenormalizerInterface::class);
 
-        foreach (static::DOCUMENTS['hits']['hits'] as $document) {
+        foreach ($documents['hits']['hits'] as $document) {
             $denormalizerProphecy
                 ->denormalize($document, Foo::class, ItemNormalizer::FORMAT, [AbstractNormalizer::ALLOW_EXTRA_ATTRIBUTES => true])
                 ->willReturn($this->denormalizeFoo($document['_source']));
         }
+        return $denormalizerProphecy;
+    }
 
-        return new Paginator($denormalizerProphecy->reveal(), self::DOCUMENTS, Foo::class, $limit, $offset);
+    protected function createPaginator(int $limit, int $offset, $documents, $denormalizerProphecy)
+    {
+        $paginator = new Paginator($denormalizerProphecy->reveal(), $documents, Foo::class, $limit, $offset);
+        return $paginator;
     }
 
     protected function denormalizeFoo(array $fooDocument): Foo
