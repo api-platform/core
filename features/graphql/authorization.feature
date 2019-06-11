@@ -40,7 +40,7 @@ Feature: Authorization checking
     And the header "Content-Type" should be equal to "application/json"
     And the JSON node "errors[0].message" should be equal to "Access Denied."
 
-  Scenario: An anonymous user tries to create a resource they is not allowed to
+  Scenario: An anonymous user tries to create a resource they are not allowed to
     When I send the following GraphQL request:
     """
     mutation {
