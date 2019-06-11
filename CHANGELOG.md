@@ -1,5 +1,13 @@
 # Changelog
 
+## 2.4.4
+
+* Store the original data in the `previous_data` request attribute, and allow to access it in security expressions using the `previous_object` variable (useful for PUT and PATCH requests)
+* Fix resource inheritance handling
+* Fix BC break in `AbstractItemNormalizer` introduced in 2.4
+* Fix serialization when using interface as resource
+* Basic compatibility with Symfony 4.3
+
 ## 2.4.3
 
 * Doctrine: allow autowiring of filter classes
