@@ -15,7 +15,9 @@ doctrine_mongodb:
 api_platform:
     doctrine: false
     mapping:
-        paths: ['%kernel.project_dir%/config/api_platform_mongodb_odm']
+        paths:
+            - '%kernel.project_dir%/../TestBundle/Model'
+            - '%kernel.project_dir%/config/api_platform_mongodb_odm'
 
 fos_user:
     db_driver:       'mongodb'
@@ -67,7 +69,21 @@ services:
         arguments: [ { 'name': 'ipartial', 'description': 'ipartial' } ]
         tags:      [ { name: 'api_platform.filter', id: 'related_to_dummy_friend.mongodb.name' } ]
 
-    dummy_dto_no_input.data_provider:
+    app.data_provider.product.item:
+        class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\DataProvider\ProductDocumentItemDataProvider'
+        public: false
+        arguments: ['@doctrine_mongodb']
+        tags:
+            -  { name: 'api_platform.item_data_provider' }
+
+    app.data_provider.taxon.item:
+        class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\DataProvider\TaxonDocumentItemDataProvider'
+        public: false
+        arguments: ['@doctrine_mongodb']
+        tags:
+            -  { name: 'api_platform.item_data_provider' }
+
+    app.dummy_dto_no_input.data_provider:
         class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\DataProvider\DummyDtoNoInputCollectionDataProvider'
         public: false
         arguments: ['@doctrine_mongodb']

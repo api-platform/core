@@ -30,6 +30,13 @@ doctrine:
         auto_generate_proxy_classes:   '%kernel.debug%'
         auto_mapping:                  true
 
+doctrine_mongodb:
+    connections:
+        default: ~
+    document_managers:
+        default:
+            auto_mapping: true
+
 twig:
     strict_variables: '%kernel.debug%'
 
@@ -258,6 +265,12 @@ services:
 
     app.graphql.query_resolver.dummy_custom_collection:
         class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\GraphQl\Resolver\DummyCustomQueryCollectionResolver'
+        public: false
+        tags:
+            - { name: 'api_platform.graphql.query_resolver' }
+
+    app.graphql.query_resolver.dummy_custom_not_retrieved_item:
+        class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\GraphQl\Resolver\DummyCustomQueryNotRetrievedItemResolver'
         public: false
         tags:
             - { name: 'api_platform.graphql.query_resolver' }

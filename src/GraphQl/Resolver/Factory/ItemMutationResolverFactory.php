@@ -71,7 +71,7 @@ final class ItemMutationResolverFactory implements ResolverFactoryInterface
 
     public function __invoke(string $resourceClass = null, string $rootClass = null, string $operationName = null): callable
     {
-        return function ($source, $args, $context, ResolveInfo $info) use ($resourceClass, $operationName) {
+        return function ($source, $args, $c, ResolveInfo $info) use ($resourceClass, $operationName) {
             if (null === $resourceClass) {
                 return null;
             }
@@ -97,13 +97,17 @@ final class ItemMutationResolverFactory implements ResolverFactoryInterface
                     throw Error::createLocatedError(sprintf('Item "%s" did not match expected type "%s".', $args['input']['id'], $resourceMetadata->getShortName()), $info->fieldNodes, $info->path);
                 }
             }
-
-            $this->canAccess($this->resourceAccessChecker, $resourceMetadata, $resourceClass, $info, $item, $operationName);
+            $previousItem = \is_object($item) ? clone $item : $item;
 
             $inputMetadata = $resourceMetadata->getGraphqlAttribute($operationName, 'input', null, true);
             $inputClass = null;
             if (\is_array($inputMetadata) && \array_key_exists('class', $inputMetadata)) {
                 if (null === $inputMetadata['class']) {
+                    $this->canAccess($this->resourceAccessChecker, $resourceMetadata, $resourceClass, $info, [
+                        'object' => $item,
+                        'previous_object' => $previousItem,
+                    ], $operationName);
+
                     return $data;
                 }
 
@@ -111,22 +115,27 @@ final class ItemMutationResolverFactory implements ResolverFactoryInterface
             }
 
             if ('delete' === $operationName) {
+                $this->canAccess($this->resourceAccessChecker, $resourceMetadata, $resourceClass, $info, [
+                    'object' => $item,
+                    'previous_object' => $previousItem,
+                ], $operationName);
+
+                $data[$wrapFieldName]['id'] = null;
                 if ($item) {
                     $this->dataPersister->remove($item);
                     $data[$wrapFieldName]['id'] = $args['input']['id'];
-                } else {
-                    $data[$wrapFieldName]['id'] = null;
                 }
 
                 return $data;
             }
 
-            $denormalizationContext = ['resource_class' => $resourceClass, 'graphql_operation_name' => $operationName];
+            $context = ['resource_class' => $resourceClass, 'graphql_operation_name' => $operationName];
             if (null !== $item) {
-                $denormalizationContext['object_to_populate'] = $item;
+                $context['object_to_populate'] = $item;
             }
-            $denormalizationContext += $resourceMetadata->getGraphqlAttribute($operationName, 'denormalization_context', [], true);
-            $item = $this->normalizer->denormalize($args['input'], $inputClass ?: $resourceClass, ItemNormalizer::FORMAT, $denormalizationContext);
+
+            $context += $resourceMetadata->getGraphqlAttribute($operationName, 'denormalization_context', [], true);
+            $item = $this->normalizer->denormalize($args['input'], $inputClass ?: $resourceClass, ItemNormalizer::FORMAT, $context);
 
             $mutationResolverId = $resourceMetadata->getGraphqlAttribute($operationName, 'mutation');
             if (null !== $mutationResolverId) {
@@ -138,9 +147,14 @@ final class ItemMutationResolverFactory implements ResolverFactoryInterface
                 }
             }
 
+            $this->canAccess($this->resourceAccessChecker, $resourceMetadata, $resourceClass, $info, [
+                'object' => $item,
+                'previous_object' => $previousItem,
+            ], $operationName);
+
             if (null !== $item) {
                 $this->validate($item, $info, $resourceMetadata, $operationName);
-                $persistResult = $this->dataPersister->persist($item, $denormalizationContext);
+                $persistResult = $this->dataPersister->persist($item, $context);
 
                 if (null === $persistResult) {
                     @trigger_error(sprintf('Returning void from %s::persist() is deprecated since API Platform 2.3 and will not be supported in API Platform 3, an object should always be returned.', DataPersisterInterface::class), E_USER_DEPRECATED);
