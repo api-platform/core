@@ -68,17 +68,31 @@ final class ResourceAccessChecker implements ResourceAccessCheckerInterface
      */
     private function getVariables(TokenInterface $token): array
     {
-        $roles = $this->roleHierarchy ? $this->roleHierarchy->getReachableRoles($token->getRoles()) : $token->getRoles();
-
         return [
             'token' => $token,
             'user' => $token->getUser(),
-            'roles' => array_map(function (Role $role) {
-                return $role->getRole();
-            }, $roles),
+            'roles' => $this->getEffectiveRoles($token),
             'trust_resolver' => $this->authenticationTrustResolver,
             // needed for the is_granted expression function
             'auth_checker' => $this->authorizationChecker,
         ];
+    }
+
+    /**
+     * @return string[]
+     */
+    private function getEffectiveRoles(TokenInterface $token): array
+    {
+        if (null === $this->roleHierarchy) {
+            return method_exists($token, 'getRoleNames') ? $token->getRoleNames() : array_map('strval', $token->getRoles());
+        }
+
+        if (method_exists($this->roleHierarchy, 'getReachableRoleNames')) {
+            return $this->roleHierarchy->getReachableRoleNames($token->getRoleNames());
+        }
+
+        return array_map(function (Role $role): string {
+            return $role->getRole();
+        }, $this->roleHierarchy->getReachableRoles($token->getRoles()));
     }
 }

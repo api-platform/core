@@ -1,5 +1,5 @@
 resources:
-    ApiPlatform\Core\Tests\Fixtures\TestBundle\OtherResources\ResourceInterface:
+    ApiPlatform\Core\Tests\Fixtures\TestBundle\Model\ResourceInterface:
         itemOperations:
             get:
                 method: 'GET'

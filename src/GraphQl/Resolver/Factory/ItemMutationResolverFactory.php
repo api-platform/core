@@ -97,13 +97,17 @@ final class ItemMutationResolverFactory implements ResolverFactoryInterface
                     throw Error::createLocatedError(sprintf('Item "%s" did not match expected type "%s".', $args['input']['id'], $resourceMetadata->getShortName()), $info->fieldNodes, $info->path);
                 }
             }
-
-            $this->canAccess($this->resourceAccessChecker, $resourceMetadata, $resourceClass, $info, $item, $operationName);
+            $previousItem = \is_object($item) ? clone $item : $item;
 
             $inputMetadata = $resourceMetadata->getGraphqlAttribute($operationName, 'input', null, true);
             $inputClass = null;
             if (\is_array($inputMetadata) && \array_key_exists('class', $inputMetadata)) {
                 if (null === $inputMetadata['class']) {
+                    $this->canAccess($this->resourceAccessChecker, $resourceMetadata, $resourceClass, $info, [
+                        'object' => $item,
+                        'previous_object' => $previousItem,
+                    ], $operationName);
+
                     return $data;
                 }
 
@@ -111,11 +115,15 @@ final class ItemMutationResolverFactory implements ResolverFactoryInterface
             }
 
             if ('delete' === $operationName) {
+                $this->canAccess($this->resourceAccessChecker, $resourceMetadata, $resourceClass, $info, [
+                    'object' => $item,
+                    'previous_object' => $previousItem,
+                ], $operationName);
+
+                $data[$wrapFieldName]['id'] = null;
                 if ($item) {
                     $this->dataPersister->remove($item);
                     $data[$wrapFieldName]['id'] = $args['input']['id'];
-                } else {
-                    $data[$wrapFieldName]['id'] = null;
                 }
 
                 return $data;
@@ -137,6 +145,11 @@ final class ItemMutationResolverFactory implements ResolverFactoryInterface
                     throw Error::createLocatedError(sprintf('Custom mutation resolver "%s" has to return an item of class %s but returned an item of class %s.', $mutationResolverId, $resourceMetadata->getShortName(), (new \ReflectionClass($itemClass))->getShortName()), $info->fieldNodes, $info->path);
                 }
             }
+
+            $this->canAccess($this->resourceAccessChecker, $resourceMetadata, $resourceClass, $info, [
+                'object' => $item,
+                'previous_object' => $previousItem,
+            ], $operationName);
 
             if (null !== $item) {
                 $this->validate($item, $info, $resourceMetadata, $operationName);
