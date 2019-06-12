@@ -50,32 +50,33 @@ final class ResourceClassResolver implements ResourceClassResolverInterface
             throw new InvalidArgumentException('Resource type could not be determined. Resource class must be specified.');
         }
 
+        if (null !== $actualClass && !$this->isResourceClass($actualClass)) {
+            throw new InvalidArgumentException(sprintf('No resource class found for object of type "%s".', $actualClass));
+        }
+
         if (null !== $resourceClass && !$this->isResourceClass($resourceClass)) {
             throw new InvalidArgumentException(sprintf('Specified class "%s" is not a resource class.', $resourceClass));
         }
 
-        if (null === $actualClass) {
-            return $resourceClass;
-        }
-
-        if ($strict && !is_a($actualClass, $resourceClass, true)) {
+        if ($strict && null !== $actualClass && !is_a($actualClass, $resourceClass, true)) {
             throw new InvalidArgumentException(sprintf('Object of type "%s" does not match "%s" resource class.', $actualClass, $resourceClass));
         }
 
+        $targetClass = $actualClass ?? $resourceClass;
         $mostSpecificResourceClass = null;
 
         foreach ($this->resourceNameCollectionFactory->create() as $resourceClassName) {
-            if (!is_a($actualClass, $resourceClassName, true)) {
+            if (!is_a($targetClass, $resourceClassName, true)) {
                 continue;
             }
 
-            if (null === $mostSpecificResourceClass || is_subclass_of($resourceClassName, $mostSpecificResourceClass, true)) {
+            if (null === $mostSpecificResourceClass || is_subclass_of($resourceClassName, $mostSpecificResourceClass)) {
                 $mostSpecificResourceClass = $resourceClassName;
             }
         }
 
         if (null === $mostSpecificResourceClass) {
-            throw new InvalidArgumentException(sprintf('No resource class found for object of type "%s".', $actualClass));
+            throw new \LogicException('Unexpected execution flow.');
         }
 
         return $mostSpecificResourceClass;

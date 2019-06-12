@@ -78,7 +78,10 @@ final class ItemResolverFactory implements ResolverFactoryInterface
                 $resourceClass = $this->getResourceClass($item, $resourceClass, $info, sprintf('Custom query resolver "%s"', $queryResolverId).' has to return an item of class %s but returned an item of class %s.');
             }
 
-            $this->canAccess($this->resourceAccessChecker, $resourceMetadata, $resourceClass, $info, $item, $operationName ?? 'query');
+            $this->canAccess($this->resourceAccessChecker, $resourceMetadata, $resourceClass, $info, [
+                'object' => $item,
+                'previous_object' => \is_object($item) ? clone $item : $item,
+            ], $operationName ?? 'query');
 
             $normalizationContext = $resourceMetadata->getGraphqlAttribute($operationName ?? 'query', 'normalization_context', [], true);
             $normalizationContext['resource_class'] = $resourceClass;
