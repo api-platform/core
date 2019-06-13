@@ -28,18 +28,16 @@ use GraphQL\Type\Definition\ResolveInfo;
 trait ResourceAccessCheckerTrait
 {
     /**
-     * @param mixed|null $object
-     *
      * @throws Error
      */
-    public function canAccess(?ResourceAccessCheckerInterface $resourceAccessChecker, ResourceMetadata $resourceMetadata, string $resourceClass, ResolveInfo $info, $object = null, string $operationName = null): void
+    public function canAccess(?ResourceAccessCheckerInterface $resourceAccessChecker, ResourceMetadata $resourceMetadata, string $resourceClass, ResolveInfo $info, $extraVariables = [], string $operationName = null): void
     {
         if (null === $resourceAccessChecker) {
             return;
         }
 
         $isGranted = $resourceMetadata->getGraphqlAttribute($operationName ?? '', 'access_control', null, true);
-        if (null === $isGranted || $resourceAccessChecker->isGranted($resourceClass, $isGranted, ['object' => $object])) {
+        if (null === $isGranted || $resourceAccessChecker->isGranted($resourceClass, $isGranted, $extraVariables)) {
             return;
         }
 

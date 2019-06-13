@@ -23,10 +23,12 @@ use Prophecy\Argument;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolverInterface;
+use Symfony\Component\Security\Core\Authentication\Token\AbstractToken;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
+use Symfony\Component\Security\Core\Role\RoleHierarchy;
 use Symfony\Component\Security\Core\Role\RoleHierarchyInterface;
 
 /**
@@ -269,14 +271,14 @@ class DenyAccessListenerTest extends TestCase
         $authenticationTrustResolverProphecy = $this->prophesize(AuthenticationTrustResolverInterface::class);
 
         $roleHierarchyInterfaceProphecy = $this->prophesize(RoleHierarchyInterface::class);
-        $roleHierarchyInterfaceProphecy->getReachableRoles(Argument::type('array'))->willReturn([]);
+        $roleHierarchyInterfaceProphecy->{method_exists(RoleHierarchy::class, 'getReachableRoleNames') ? 'getReachableRoleNames' : 'getReachableRoles'}(Argument::type('array'))->willReturn([]);
 
-        $tokenProphecy = $this->prophesize(TokenInterface::class);
+        $tokenProphecy = $this->prophesize(AbstractToken::class);
         $tokenProphecy->getUser()->willReturn('anon.');
-        $tokenProphecy->getRoles()->willReturn([]);
+        $tokenProphecy->{method_exists(AbstractToken::class, 'getRoleNames') ? 'getRoleNames' : 'getRoles'}()->willReturn([]);
 
         $tokenStorageProphecy = $this->prophesize(TokenStorageInterface::class);
-        $tokenStorageProphecy->getToken()->willReturn($tokenProphecy->reveal())->shouldBeCalled();
+        $tokenStorageProphecy->getToken()->willReturn($tokenProphecy)->shouldBeCalled();
 
         $authorizationCheckerInterface = $this->prophesize(AuthorizationCheckerInterface::class);
 

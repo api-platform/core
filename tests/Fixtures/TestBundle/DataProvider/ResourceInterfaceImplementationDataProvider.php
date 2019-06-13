@@ -16,8 +16,8 @@ namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\DataProvider;
 use ApiPlatform\Core\DataProvider\CollectionDataProviderInterface;
 use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
 use ApiPlatform\Core\DataProvider\RestrictedDataProviderInterface;
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\OtherResources\ResourceInterface;
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\OtherResources\ResourceInterfaceImplementation;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Model\ResourceInterface;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Model\ResourceInterfaceImplementation;
 
 class ResourceInterfaceImplementationDataProvider implements ItemDataProviderInterface, CollectionDataProviderInterface, RestrictedDataProviderInterface
 {

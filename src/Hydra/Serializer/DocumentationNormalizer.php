@@ -459,7 +459,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
     {
         $propertyData = [
             '@id' => $propertyMetadata->getIri() ?? "#$shortName/$propertyName",
-            '@type' => $propertyMetadata->isReadableLink() ? 'rdf:Property' : 'hydra:Link',
+            '@type' => false === $propertyMetadata->isReadableLink() ? 'hydra:Link' : 'rdf:Property',
             'rdfs:label' => $propertyName,
             'domain' => $prefixedShortName,
         ];
