@@ -97,7 +97,7 @@ class AppKernel extends Kernel
 
         $loader->load(__DIR__."/config/config_{$this->getEnvironment()}.yml");
 
-        $alg = class_exists(SodiumPasswordEncoder::class) ? 'auto' : 'bcrypt';
+        $alg = class_exists(SodiumPasswordEncoder::class) && SodiumPasswordEncoder::isSupported() ? 'auto' : 'bcrypt';
         $securityConfig = [
             'encoders' => [
                 User::class => $alg,
