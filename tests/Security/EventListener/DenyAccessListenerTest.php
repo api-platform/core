@@ -29,6 +29,7 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Security\Core\Role\RoleHierarchy;
+use Symfony\Component\Security\Core\Role\RoleHierarchyInterface;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
@@ -269,8 +270,8 @@ class DenyAccessListenerTest extends TestCase
     {
         $authenticationTrustResolverProphecy = $this->prophesize(AuthenticationTrustResolverInterface::class);
 
-        $roleHierarchyInterfaceProphecy = $this->prophesize(RoleHierarchy::class);
-        $roleHierarchyInterfaceProphecy->getReachableRoles(Argument::type('array'))->willReturn([]);
+		$roleHierarchyInterfaceProphecy = $this->prophesize(RoleHierarchyInterface::class);
+        $roleHierarchyInterfaceProphecy->{method_exists(RoleHierarchy::class, 'getReachableRoleNames') ? 'getReachableRoleNames' : 'getReachableRoles'}(Argument::type('array'))->willReturn([]);
 
         $tokenProphecy = $this->prophesize(AbstractToken::class);
         $tokenProphecy->getUser()->willReturn('anon.');
