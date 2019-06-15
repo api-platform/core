@@ -14,13 +14,14 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Bridge\Doctrine\Orm;
 
 use ApiPlatform\Core\DataProvider\PaginatorInterface;
+use Doctrine\ORM\Query;
 
 /**
  * Decorates the Doctrine ORM paginator.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-final class Paginator extends AbstractPaginator implements PaginatorInterface
+final class Paginator extends AbstractPaginator implements PaginatorInterface, QueryAwareInterface
 {
     /**
      * @var int
@@ -45,5 +46,13 @@ final class Paginator extends AbstractPaginator implements PaginatorInterface
     public function getTotalItems(): float
     {
         return (float) ($this->totalItems ?? $this->totalItems = \count($this->paginator));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getQuery(): Query
+    {
+        return $this->paginator->getQuery();
     }
 }
