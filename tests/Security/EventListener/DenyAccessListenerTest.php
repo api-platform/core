@@ -270,7 +270,7 @@ class DenyAccessListenerTest extends TestCase
     {
         $authenticationTrustResolverProphecy = $this->prophesize(AuthenticationTrustResolverInterface::class);
 
-		$roleHierarchyInterfaceProphecy = $this->prophesize(RoleHierarchyInterface::class);
+        $roleHierarchyInterfaceProphecy = $this->prophesize(RoleHierarchyInterface::class);
         $roleHierarchyInterfaceProphecy->{method_exists(RoleHierarchy::class, 'getReachableRoleNames') ? 'getReachableRoleNames' : 'getReachableRoles'}(Argument::type('array'))->willReturn([]);
 
         $tokenProphecy = $this->prophesize(AbstractToken::class);
