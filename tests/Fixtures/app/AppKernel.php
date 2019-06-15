@@ -137,6 +137,19 @@ class AppKernel extends Kernel
 
         $c->loadFromExtension('security', $securityConfig);
 
+        if (class_exists(DoctrineMongoDBBundle::class)) {
+            $c->loadFromExtension('doctrine_mongodb', [
+                'connections' => [
+                    'default' => null,
+                ],
+                'document_managers' => [
+                    'default' => [
+                        'auto_mapping' => true,
+                    ],
+                ],
+            ]);
+        }
+
         if ($_SERVER['LEGACY'] ?? true) {
             $c->loadFromExtension('nelmio_api_doc', [
                 'sandbox' => [

@@ -44,7 +44,6 @@ jobs:
           composer remove --dev --no-progress --no-update --ansi \
             doctrine/mongodb-odm \
             doctrine/mongodb-odm-bundle \
-        - sed -i '33,39d' tests/Fixtures/app/config/config_common.yml
         - *update-project-dependencies
       before_script:
         - *clear-test-app-cache
