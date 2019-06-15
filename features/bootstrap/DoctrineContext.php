@@ -113,6 +113,7 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Tools\SchemaTool;
+use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 
 /**
  * Defines application features from the specific context.
@@ -124,6 +125,7 @@ final class DoctrineContext implements Context
      */
     private $manager;
     private $doctrine;
+    private $passwordEncoder;
     private $schemaTool;
     private $schemaManager;
     private $classes;
@@ -135,9 +137,10 @@ final class DoctrineContext implements Context
      * You can also pass arbitrary arguments to the
      * context constructor through behat.yml.
      */
-    public function __construct(ManagerRegistry $doctrine)
+    public function __construct(ManagerRegistry $doctrine, UserPasswordEncoderInterface $passwordEncoder)
     {
         $this->doctrine = $doctrine;
+        $this->passwordEncoder = $passwordEncoder;
         $this->manager = $doctrine->getManager();
         $this->schemaTool = $this->manager instanceof EntityManagerInterface ? new SchemaTool($this->manager) : null;
         $this->schemaManager = $this->manager instanceof DocumentManager ? $this->manager->getSchemaManager() : null;
@@ -946,8 +949,7 @@ final class DoctrineContext implements Context
     public function thePasswordForUserShouldBeHashed(string $password, string $user)
     {
         $user = $this->doctrine->getRepository($this->isOrm() ? User::class : UserDocument::class)->find($user);
-
-        if (!password_verify($password, $user->getPassword())) {
+        if (!$this->passwordEncoder->isPasswordValid($user, $password)) {
             throw new \Exception('User password mismatch');
         }
     }
