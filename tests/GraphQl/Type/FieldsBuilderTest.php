@@ -123,6 +123,7 @@ class FieldsBuilderTest extends TestCase
     public function testGetQueryFields(string $resourceClass, ResourceMetadata $resourceMetadata, string $queryName, $itemConfiguration, $collectionConfiguration, GraphQLType $graphqlType, bool $isTypeCollection, ?callable $itemResolve, ?callable $collectionResolve, array $expectedQueryFields): void
     {
         $this->typeConverterProphecy->convertType(Argument::type(Type::class), false, $queryName, null, $resourceClass, null, 0)->willReturn($graphqlType);
+        $this->typeConverterProphecy->resolveType(Argument::type('string'))->willReturn(GraphQLType::string());
         $this->typeBuilderProphecy->isCollection(Argument::type(Type::class))->willReturn($isTypeCollection);
         $this->typeBuilderProphecy->getResourcePaginatedCollectionType($graphqlType)->willReturn($graphqlType);
         $this->itemResolverFactoryProphecy->__invoke($resourceClass, $resourceClass, $queryName)->willReturn($itemResolve);
@@ -177,7 +178,7 @@ class FieldsBuilderTest extends TestCase
                     ],
                 ],
             ],
-            'override args and add fields' => [
+            'empty overridden args and add fields' => [
                 'resourceClass', new ResourceMetadata('ShortName'), 'query', ['args' => [], 'name' => 'customActionName'], false, GraphQLType::string(), false, null, null,
                 [
                     'shortName' => [
@@ -187,6 +188,22 @@ class FieldsBuilderTest extends TestCase
                         'resolve' => null,
                         'deprecationReason' => '',
                         'name' => 'customActionName',
+                    ],
+                ],
+            ],
+            'override args with custom ones' => [
+                'resourceClass', new ResourceMetadata('ShortName'), 'query', ['args' => ['customArg' => ['type' => 'a type']]], false, GraphQLType::string(), false, null, null,
+                [
+                    'shortName' => [
+                        'type' => GraphQLType::string(),
+                        'description' => null,
+                        'args' => [
+                            'customArg' => [
+                                'type' => GraphQLType::string(),
+                            ],
+                        ],
+                        'resolve' => null,
+                        'deprecationReason' => '',
                     ],
                 ],
             ],
@@ -246,6 +263,37 @@ class FieldsBuilderTest extends TestCase
                             'boolField_list' => GraphQLType::listOf($graphqlType),
                             'parent_child' => new InputObjectType(['name' => 'ShortNameFilter_parent__child', 'fields' => ['related_nested' => $graphqlType]]),
                             'dateField' => new InputObjectType(['name' => 'ShortNameFilter_dateField', 'fields' => ['before' => $graphqlType]]),
+                        ],
+                        'resolve' => $collectionResolve,
+                        'deprecationReason' => '',
+                    ],
+                ],
+            ],
+            'collection empty overridden args and add fields' => [
+                'resourceClass', new ResourceMetadata('ShortName'), 'action', false, ['args' => [], 'name' => 'customActionName'], $graphqlType = GraphQLType::listOf(new ObjectType(['name' => 'collection'])), true, null, $collectionResolve = function () {
+                },
+                [
+                    'actionShortNames' => [
+                        'type' => $graphqlType,
+                        'description' => null,
+                        'args' => [],
+                        'resolve' => $collectionResolve,
+                        'deprecationReason' => '',
+                        'name' => 'customActionName',
+                    ],
+                ],
+            ],
+            'collection override args with custom ones' => [
+                'resourceClass', new ResourceMetadata('ShortName'), 'action', false, ['args' => ['customArg' => ['type' => 'a type']]], $graphqlType = GraphQLType::listOf(new ObjectType(['name' => 'collection'])), true, null, $collectionResolve = function () {
+                },
+                [
+                    'actionShortNames' => [
+                        'type' => $graphqlType,
+                        'description' => null,
+                        'args' => [
+                            'customArg' => [
+                                'type' => GraphQLType::string(),
+                            ],
                         ],
                         'resolve' => $collectionResolve,
                         'deprecationReason' => '',
@@ -515,6 +563,31 @@ class FieldsBuilderTest extends TestCase
                     ],
                 ],
             ],
+        ];
+    }
+
+    /**
+     * @dataProvider resolveResourceArgsProvider
+     */
+    public function testResolveResourceArgs(array $args, array $expectedResolvedArgs, ?string $expectedExceptionMessage = null): void
+    {
+        if (null !== $expectedExceptionMessage) {
+            $this->expectExceptionMessage($expectedExceptionMessage);
+        }
+
+        $this->typeConverterProphecy->resolveType(Argument::type('string'))->willReturn(GraphQLType::string());
+
+        $args = $this->fieldsBuilder->resolveResourceArgs($args, 'operation', 'shortName');
+
+        $this->assertSame($expectedResolvedArgs, $args);
+    }
+
+    public function resolveResourceArgsProvider(): array
+    {
+        return [
+            [[], []],
+            [['customArg' => []], [], 'The argument "customArg" of the custom operation "operation" in shortName needs a "type" option.'],
+            [['customArg' => ['type' => 'a type']], ['customArg' => ['type' => GraphQLType::string()]]],
         ];
     }
 }

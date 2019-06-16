@@ -31,6 +31,10 @@ use Symfony\Component\Serializer\Annotation\Groups;
  *         "mutation"="app.graphql.mutation_resolver.dummy_custom_not_persisted",
  *         "normalization_context"={"groups"={"result"}},
  *         "denormalization_context"={"groups"={"sum"}}
+ *     },
+ *     "testCustomArguments"={
+ *         "mutation"="app.graphql.mutation_resolver.dummy_custom",
+ *         "args"={"operandC"={"type"="Int!"}}
  *     }
  * })
  *
@@ -50,7 +54,7 @@ class DummyCustomMutation
     /**
      * @var int
      *
-     * @ORM\Column(type="integer")
+     * @ORM\Column(type="integer", nullable=true)
      */
     private $operandA;
 

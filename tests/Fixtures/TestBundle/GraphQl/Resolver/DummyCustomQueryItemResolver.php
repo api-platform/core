@@ -32,6 +32,7 @@ class DummyCustomQueryItemResolver implements QueryItemResolverInterface
     public function __invoke($item, array $context)
     {
         $item->message = 'Success!';
+        $item->customArgs = $context['args'];
 
         return $item;
     }

@@ -109,23 +109,50 @@ class TypeBuilderTest extends TestCase
     public function testGetResourceObjectTypeInput(): void
     {
         $resourceMetadata = new ResourceMetadata('shortName', 'description');
-        $this->typesContainerProphecy->has('shortNameInput')->shouldBeCalled()->willReturn(false);
-        $this->typesContainerProphecy->set('shortNameInput', Argument::type(NonNull::class))->shouldBeCalled();
+        $this->typesContainerProphecy->has('customShortNameInput')->shouldBeCalled()->willReturn(false);
+        $this->typesContainerProphecy->set('customShortNameInput', Argument::type(NonNull::class))->shouldBeCalled();
         $this->typesContainerProphecy->has('Node')->shouldBeCalled()->willReturn(false);
         $this->typesContainerProphecy->set('Node', Argument::type(InterfaceType::class))->shouldBeCalled();
 
         /** @var NonNull $resourceObjectType */
-        $resourceObjectType = $this->typeBuilder->getResourceObjectType('resourceClass', $resourceMetadata, true, null, null);
+        $resourceObjectType = $this->typeBuilder->getResourceObjectType('resourceClass', $resourceMetadata, true, null, 'custom');
         /** @var InputObjectType $wrappedType */
         $wrappedType = $resourceObjectType->getWrappedType();
         $this->assertInstanceOf(InputObjectType::class, $wrappedType);
-        $this->assertSame('shortNameInput', $wrappedType->name);
+        $this->assertSame('customShortNameInput', $wrappedType->name);
         $this->assertSame('description', $wrappedType->description);
         $this->assertArrayHasKey('interfaces', $wrappedType->config);
         $this->assertArrayHasKey('fields', $wrappedType->config);
 
         $fieldsBuilderProphecy = $this->prophesize(FieldsBuilderInterface::class);
-        $fieldsBuilderProphecy->getResourceObjectTypeFields('resourceClass', $resourceMetadata, true, null, null, 0, null)->shouldBeCalled();
+        $fieldsBuilderProphecy->getResourceObjectTypeFields('resourceClass', $resourceMetadata, true, null, 'custom', 0, null)->shouldBeCalled();
+        $this->fieldsBuilderLocatorProphecy->get('api_platform.graphql.fields_builder')->shouldBeCalled()->willReturn($fieldsBuilderProphecy->reveal());
+        $wrappedType->config['fields']();
+    }
+
+    public function testGetResourceObjectTypeCustomMutationInputArgs(): void
+    {
+        $resourceMetadata = (new ResourceMetadata('shortName', 'description'))
+            ->withGraphql(['custom' => ['args' => []]]);
+        $this->typesContainerProphecy->has('customShortNameInput')->shouldBeCalled()->willReturn(false);
+        $this->typesContainerProphecy->set('customShortNameInput', Argument::type(NonNull::class))->shouldBeCalled();
+        $this->typesContainerProphecy->has('Node')->shouldBeCalled()->willReturn(false);
+        $this->typesContainerProphecy->set('Node', Argument::type(InterfaceType::class))->shouldBeCalled();
+
+        /** @var NonNull $resourceObjectType */
+        $resourceObjectType = $this->typeBuilder->getResourceObjectType('resourceClass', $resourceMetadata, true, null, 'custom');
+        /** @var InputObjectType $wrappedType */
+        $wrappedType = $resourceObjectType->getWrappedType();
+        $this->assertInstanceOf(InputObjectType::class, $wrappedType);
+        $this->assertSame('customShortNameInput', $wrappedType->name);
+        $this->assertSame('description', $wrappedType->description);
+        $this->assertArrayHasKey('interfaces', $wrappedType->config);
+        $this->assertArrayHasKey('fields', $wrappedType->config);
+
+        $fieldsBuilderProphecy = $this->prophesize(FieldsBuilderInterface::class);
+        $fieldsBuilderProphecy->getResourceObjectTypeFields('resourceClass', $resourceMetadata, true, null, 'custom', 0, null)
+            ->shouldBeCalled()->willReturn(['clientMutationId' => GraphQLType::string()]);
+        $fieldsBuilderProphecy->resolveResourceArgs([], 'custom', 'shortName')->shouldBeCalled();
         $this->fieldsBuilderLocatorProphecy->get('api_platform.graphql.fields_builder')->shouldBeCalled()->willReturn($fieldsBuilderProphecy->reveal());
         $wrappedType->config['fields']();
     }

@@ -68,6 +68,7 @@
 
         <service id="api_platform.graphql.type_converter" class="ApiPlatform\Core\GraphQl\Type\TypeConverter">
             <argument type="service" id="api_platform.graphql.type_builder" />
+            <argument type="service" id="api_platform.graphql.types_container" />
             <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
         </service>
 
