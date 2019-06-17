@@ -53,6 +53,7 @@
             <argument type="service" id="doctrine" />
             <argument>null</argument>
             <argument type="service" id="api_platform.iri_converter" />
+            <argument type="service" id="api_platform.identifier.converter" />
             <argument type="service" id="api_platform.property_accessor" />
             <argument type="service" id="logger" on-invalid="ignore" />
         </service>

@@ -30,6 +30,7 @@ trait SearchFilterTrait
     use PropertyHelperTrait;
 
     protected $iriConverter;
+    protected $identifierConverter;
     protected $propertyAccessor;
 
     /**
@@ -112,8 +113,10 @@ trait SearchFilterTrait
 
     /**
      * Gets the ID from an IRI or a raw ID.
+     *
+     * @param mixed|null $resourceClass
      */
-    protected function getIdFromValue(string $value)
+    protected function getIdFromValue(string $value, $resourceClass = null)
     {
         try {
             if (null !== $item = $this->getIriConverter()->getItemFromIri($value, ['fetch_data' => false])) {
@@ -121,6 +124,13 @@ trait SearchFilterTrait
             }
         } catch (InvalidArgumentException $e) {
             // Do nothing, return the raw value
+        }
+
+        if (!empty($resourceClass)) {
+            if (null !== $item = $this->getIdentifierConverter()->convert($value, $resourceClass)) {
+                //faraz test this with single id
+                return $this->getPropertyAccessor()->getValue($item, '[id]');
+            }
         }
 
         return $value;
