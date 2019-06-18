@@ -677,7 +677,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
 
             unset($context['resource_class']);
 
-            return $this->serializer->denormalize($value, $className, $format, $context);
+            return $this->serializer->denormalize($value, $className.'[]', $format, $context);
         }
 
         if (null !== $className = $type->getClassName()) {
