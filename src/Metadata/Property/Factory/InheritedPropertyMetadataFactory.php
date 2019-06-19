@@ -39,6 +39,10 @@ final class InheritedPropertyMetadataFactory implements PropertyMetadataFactoryI
     {
         $propertyMetadata = $this->decorated ? $this->decorated->create($resourceClass, $property, $options) : new PropertyMetadata();
 
+        if (property_exists($resourceClass, $property)) {
+            return $propertyMetadata;
+        }
+        
         foreach ($this->resourceNameCollectionFactory->create() as $knownResourceClass) {
             if ($resourceClass === $knownResourceClass) {
                 continue;
