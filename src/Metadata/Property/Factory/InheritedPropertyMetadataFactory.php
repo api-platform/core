@@ -44,7 +44,7 @@ final class InheritedPropertyMetadataFactory implements PropertyMetadataFactoryI
                 continue;
             }
 
-            if (is_subclass_of($knownResourceClass, $resourceClass)) {
+            if (is_subclass_of($resourceClass, $knownResourceClass)) {
                 $propertyMetadata = $this->create($knownResourceClass, $property, $options);
 
                 return $propertyMetadata->withChildInherited($knownResourceClass);
