@@ -127,10 +127,8 @@ services:
         arguments: ['@doctrine']
         tags: ['api_platform.filter']
 
-    ApiPlatform\Core\Tests\Fixtures\TestBundle\Controller\DummyDtoNoInput\CreateItemAction:
-        tags: ['controller.service_arguments']
-
-    ApiPlatform\Core\Tests\Fixtures\TestBundle\Controller\DummyDtoNoInput\DoubleBatAction:
+    ApiPlatform\Core\Tests\Fixtures\TestBundle\Controller\:
+        resource: '../../TestBundle/Controller'
         tags: ['controller.service_arguments']
 
     app.config_dummy_resource.action:

@@ -125,7 +125,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             return $this->serializer->normalize($transformed, $format, $context);
         }
 
-        $resourceClass = $this->resourceClassResolver->getResourceClass($object, $context['resource_class'] ?? null, isset($context['resource_class']));
+        $resourceClass = $this->resourceClassResolver->getResourceClass($object, $context['resource_class'] ?? null);
         $context = $this->initContext($resourceClass, $context);
         $iri = $context['iri'] ?? $this->iriConverter->getIriFromItem($object);
         $context['iri'] = $iri;
@@ -542,7 +542,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             ($className = $type->getClassName()) &&
             $this->resourceClassResolver->isResourceClass($className)
         ) {
-            $resourceClass = $this->resourceClassResolver->getResourceClass($attributeValue, $className, true);
+            $resourceClass = $this->resourceClassResolver->getResourceClass($attributeValue, $className);
             $childContext = $this->createChildContext($context, $attribute);
             $childContext['resource_class'] = $resourceClass;
 

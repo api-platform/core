@@ -126,9 +126,9 @@ class ItemNormalizerTest extends TestCase
         $iriConverterProphecy->getIriFromItem($relatedDummy)->willReturn('/related-dummies/2');
 
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
-        $resourceClassResolverProphecy->getResourceClass($dummy, null, false)->willReturn(Dummy::class);
-        $resourceClassResolverProphecy->getResourceClass($dummy, Dummy::class, true)->willReturn(Dummy::class);
-        $resourceClassResolverProphecy->getResourceClass($relatedDummy, RelatedDummy::class, true)->willReturn(RelatedDummy::class);
+        $resourceClassResolverProphecy->getResourceClass($dummy, null)->willReturn(Dummy::class);
+        $resourceClassResolverProphecy->getResourceClass($dummy, Dummy::class)->willReturn(Dummy::class);
+        $resourceClassResolverProphecy->getResourceClass($relatedDummy, RelatedDummy::class)->willReturn(RelatedDummy::class);
         $resourceClassResolverProphecy->isResourceClass(RelatedDummy::class)->willReturn(true);
 
         $serializerProphecy = $this->prophesize(SerializerInterface::class);
@@ -193,9 +193,9 @@ class ItemNormalizerTest extends TestCase
         $iriConverterProphecy->getIriFromItem($relatedDummy)->willReturn('/related-dummies/2');
 
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
-        $resourceClassResolverProphecy->getResourceClass($dummy, null, false)->willReturn(Dummy::class);
-        $resourceClassResolverProphecy->getResourceClass($dummy, Dummy::class, true)->willReturn(Dummy::class);
-        $resourceClassResolverProphecy->getResourceClass($relatedDummy, RelatedDummy::class, true)->willReturn(RelatedDummy::class);
+        $resourceClassResolverProphecy->getResourceClass($dummy, null)->willReturn(Dummy::class);
+        $resourceClassResolverProphecy->getResourceClass($dummy, Dummy::class)->willReturn(Dummy::class);
+        $resourceClassResolverProphecy->getResourceClass($relatedDummy, RelatedDummy::class)->willReturn(RelatedDummy::class);
         $resourceClassResolverProphecy->isResourceClass(RelatedDummy::class)->willReturn(true);
 
         $serializerProphecy = $this->prophesize(SerializerInterface::class);
@@ -279,11 +279,11 @@ class ItemNormalizerTest extends TestCase
         $iriConverterProphecy->getIriFromItem($level3)->willReturn('/max_depth_dummies/3');
 
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
-        $resourceClassResolverProphecy->getResourceClass($level1, null, false)->willReturn(MaxDepthDummy::class);
-        $resourceClassResolverProphecy->getResourceClass($level1, MaxDepthDummy::class, true)->willReturn(MaxDepthDummy::class);
-        $resourceClassResolverProphecy->getResourceClass($level2, MaxDepthDummy::class, true)->willReturn(MaxDepthDummy::class);
-        $resourceClassResolverProphecy->getResourceClass($level3, MaxDepthDummy::class, true)->willReturn(MaxDepthDummy::class);
-        $resourceClassResolverProphecy->getResourceClass(null, MaxDepthDummy::class, true)->willReturn(MaxDepthDummy::class);
+        $resourceClassResolverProphecy->getResourceClass($level1, null)->willReturn(MaxDepthDummy::class);
+        $resourceClassResolverProphecy->getResourceClass($level1, MaxDepthDummy::class)->willReturn(MaxDepthDummy::class);
+        $resourceClassResolverProphecy->getResourceClass($level2, MaxDepthDummy::class)->willReturn(MaxDepthDummy::class);
+        $resourceClassResolverProphecy->getResourceClass($level3, MaxDepthDummy::class)->willReturn(MaxDepthDummy::class);
+        $resourceClassResolverProphecy->getResourceClass(null, MaxDepthDummy::class)->willReturn(MaxDepthDummy::class);
         $resourceClassResolverProphecy->isResourceClass(MaxDepthDummy::class)->willReturn(true);
 
         $normalizer = new ItemNormalizer(

@@ -74,7 +74,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
             $context['cache_key'] = $this->getJsonApiCacheKey($format, $context);
         }
 
-        $resourceClass = $this->resourceClassResolver->getResourceClass($object, $context['resource_class'] ?? null, isset($context['resource_class']));
+        $resourceClass = $this->resourceClassResolver->getResourceClass($object, $context['resource_class'] ?? null);
         $context = $this->initContext($resourceClass, $context);
         $iri = $this->iriConverter->getIriFromItem($object);
         $context['iri'] = $iri;
