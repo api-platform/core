@@ -114,8 +114,8 @@ class ItemNormalizerTest extends TestCase
         $iriConverterProphecy->getIriFromItem($dummy)->willReturn('/dummies/10');
 
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
-        $resourceClassResolverProphecy->getResourceClass($dummy, null, false)->willReturn(Dummy::class);
-        $resourceClassResolverProphecy->getResourceClass($dummy, Dummy::class, true)->willReturn(Dummy::class);
+        $resourceClassResolverProphecy->getResourceClass($dummy, null)->willReturn(Dummy::class);
+        $resourceClassResolverProphecy->getResourceClass($dummy, Dummy::class)->willReturn(Dummy::class);
 
         $propertyAccessorProphecy = $this->prophesize(PropertyAccessorInterface::class);
         $propertyAccessorProphecy->getValue($dummy, 'id')->willReturn(10);
@@ -170,8 +170,8 @@ class ItemNormalizerTest extends TestCase
         $iriConverterProphecy->getIriFromItem($circularReferenceEntity)->willReturn('/circular_references/1');
 
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
-        $resourceClassResolverProphecy->getResourceClass($circularReferenceEntity, null, false)->willReturn(CircularReference::class);
-        $resourceClassResolverProphecy->getResourceClass($circularReferenceEntity, CircularReference::class, true)->willReturn(CircularReference::class);
+        $resourceClassResolverProphecy->getResourceClass($circularReferenceEntity, null)->willReturn(CircularReference::class);
+        $resourceClassResolverProphecy->getResourceClass($circularReferenceEntity, CircularReference::class)->willReturn(CircularReference::class);
 
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create(CircularReference::class)->willReturn(new ResourceMetadata('CircularReference'));
@@ -226,8 +226,8 @@ class ItemNormalizerTest extends TestCase
         $iriConverterProphecy->getIriFromItem($dummy)->willReturn('/dummies/1');
 
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
-        $resourceClassResolverProphecy->getResourceClass($dummy, null, false)->willReturn(Dummy::class);
-        $resourceClassResolverProphecy->getResourceClass($dummy, Dummy::class, true)->willReturn(Dummy::class);
+        $resourceClassResolverProphecy->getResourceClass($dummy, null)->willReturn(Dummy::class);
+        $resourceClassResolverProphecy->getResourceClass($dummy, Dummy::class)->willReturn(Dummy::class);
 
         $propertyAccessorProphecy = $this->prophesize(PropertyAccessorInterface::class);
         $propertyAccessorProphecy->getValue($dummy, 'bar')->willThrow(new NoSuchPropertyException());
