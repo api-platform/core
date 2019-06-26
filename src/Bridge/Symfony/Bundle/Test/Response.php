@@ -128,10 +128,6 @@ final class Response implements ResponseInterface
     /**
      * {@inheritdoc}
      */
-
-    /**
-     * {@inheritdoc}
-     */
     public function toArray(bool $throw = true): array
     {
         if ('' === $content = $this->getContent($throw)) {
