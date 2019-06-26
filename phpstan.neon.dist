@@ -32,13 +32,6 @@ parameters:
 			path: %currentWorkingDirectory%/src/GraphQl/Resolver/FieldsToAttributesTrait.php
 		- '#Access to an undefined property Prophecy\\Prophecy\\ObjectProphecy<(\\?[a-zA-Z0-9_]+)+>::\$[a-zA-Z0-9_]+#'
 		- '#Call to an undefined method Doctrine\\Common\\Persistence\\ObjectManager::getConnection\(\)#'
-		# https://github.com/symfony/symfony/pull/31903
-		-
-			message: '#Access to an undefined property object::\$headers\.#'
-			path: %currentWorkingDirectory%/tests/Bridge/Symfony/Bundle/Twig/ApiPlatformProfilerPanelTest.php
-		-
-			message: '#Call to an undefined method object::getStatusCode\(\)\.#'
-			path: %currentWorkingDirectory%/tests/Bridge/Symfony/Bundle/Twig/ApiPlatformProfilerPanelTest.php
 		- '#Parameter \#1 \$function of function call_user_func expects callable\(\): mixed, .+ given\.#'
 		- '#Parameter \#1 \$exception of static method Symfony\\Component\\Debug\\Exception\\FlattenException::create\(\) expects Exception, Symfony\\Component\\Serializer\\Exception\\ExceptionInterface given\.#'
 		- '#Parameter \#1 \$classes of class ApiPlatform\\Core\\Metadata\\Resource\\ResourceNameCollection constructor expects array<string>, array<int, int\|string> given\.#'
