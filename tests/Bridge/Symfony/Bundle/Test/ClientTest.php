@@ -69,7 +69,7 @@ class ClientTest extends ApiTestCase
     }
 
     /**
-     * @dataProvider basicProvider
+     * @dataProvider authBasicProvider
      */
     public function testAuthBasic($basic): void
     {
@@ -79,7 +79,7 @@ class ClientTest extends ApiTestCase
         $this->assertSame(200, $response->getStatusCode());
     }
 
-    public function basicProvider(): iterable
+    public function authBasicProvider(): iterable
     {
         yield ['dunglas:kevin'];
         yield [['dunglas', 'kevin']];
