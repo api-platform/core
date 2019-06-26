@@ -47,10 +47,7 @@ class ClientTest extends ApiTestCase
 
         $this->assertSame('/contexts/Entrypoint', $response->toArray()['@context']);
         $this->assertInstanceOf(Profile::class, $client->getProfile());
-
         $this->assertInstanceOf(Response::class, $response);
-        $response->getKernelResponse();
-        $response->getBrowserKitResponse();
     }
 
     public function testCustomHeader(): void
