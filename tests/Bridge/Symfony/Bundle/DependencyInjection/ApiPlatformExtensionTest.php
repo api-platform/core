@@ -1057,6 +1057,7 @@ class ApiPlatformExtensionTest extends TestCase
         foreach ($parameters as $key => $value) {
             $containerBuilderProphecy->setParameter($key, $value)->shouldBeCalled();
         }
+        $containerBuilderProphecy->hasParameter('test.client.parameters')->wilLReturn(true);
 
         foreach (['yaml', 'xml'] as $format) {
             $definitionProphecy = $this->prophesize(Definition::class);
@@ -1158,6 +1159,7 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.swagger.normalizer.api_gateway',
             'api_platform.swagger.normalizer.documentation',
             'api_platform.validator',
+            'test.api_platform.client',
         ];
 
         if (\in_array('odm', $doctrineIntegrationsToLoad, true)) {

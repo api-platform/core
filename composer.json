@@ -72,6 +72,7 @@
         "symfony/finder": "^3.4 || ^4.0",
         "symfony/form": "^3.4 || ^4.0",
         "symfony/framework-bundle": "^4.3",
+        "symfony/http-client": "^4.3",
         "symfony/mercure-bundle": "*",
         "symfony/messenger": "^4.3",
         "symfony/phpunit-bridge": "^4.3.1",
