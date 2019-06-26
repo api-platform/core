@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Security;
 
-use ApiPlatform\Core\Util\ClassInfoTrait;
 use Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolverInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
@@ -28,8 +27,6 @@ use Symfony\Component\Security\Core\Role\RoleHierarchyInterface;
  */
 final class ResourceAccessChecker implements ResourceAccessCheckerInterface
 {
-    use ClassInfoTrait;
-
     private $expressionLanguage;
     private $authenticationTrustResolver;
     private $roleHierarchy;
