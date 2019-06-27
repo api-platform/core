@@ -15,11 +15,16 @@ namespace ApiPlatform\Core\Tests\Bridge\Symfony\Bundle\Test;
 
 use ApiPlatform\Core\Bridge\Symfony\Bundle\Test\ApiTestCase;
 use PHPUnit\Framework\ExpectationFailedException;
+use PHPUnit\Runner\Version;
 
 class ApiTestCaseTest extends ApiTestCase
 {
     public function testAssertJsonContains(): void
     {
+        if (version_compare(Version::id(), '8.0.0', '<')) {
+            $this->markTestSkipped('Requires PHPUnit 8');
+        }
+
         self::createClient()->request('GET', '/');
         $this->assertJsonContains(['@context' => '/contexts/Entrypoint']);
     }
@@ -61,12 +66,20 @@ JSON;
 
     public function testAssertArraySubsetPassesStrictConfig(): void
     {
+        if (version_compare(Version::id(), '8.0.0', '<')) {
+            $this->markTestSkipped('Requires PHPUnit 8');
+        }
+
         $this->expectException(ExpectationFailedException::class);
         $this->assertArraySubset(['bar' => 0], ['bar' => '0'], true);
     }
 
     public function testAssertArraySubsetDoesNothingForValidScenario(): void
     {
+        if (version_compare(Version::id(), '8.0.0', '<')) {
+            $this->markTestSkipped('Requires PHPUnit 8');
+        }
+
         $this->assertArraySubset([1, 2], [1, 2, 3]);
     }
 }

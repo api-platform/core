@@ -20,6 +20,7 @@ use Countable;
 use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\SelfDescribing;
 use PHPUnit\Framework\TestCase;
+use PHPUnit\Runner\Version;
 use ReflectionClass;
 use SebastianBergmann\RecursionContext\InvalidArgumentException;
 use Traversable;
@@ -33,8 +34,15 @@ use function sprintf;
  *
  * @see https://github.com/sebastianbergmann/phpunit/issues/3494
  */
-final class ArraySubsetTest extends TestCase
+class ArraySubsetTest extends TestCase
 {
+    protected function setUp(): void
+    {
+        if (version_compare(Version::id(), '8.0.0', '<')) {
+            $this->markTestSkipped('Requires PHPUnit 8');
+        }
+    }
+
     /**
      * @return mixed[]
      */
