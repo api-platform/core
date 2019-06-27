@@ -39,7 +39,7 @@ final class ApiGatewayNormalizerTest extends TestCase
      */
     private $normalizer;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->documentationNormalizerProphecy = $this->prophesize(NormalizerInterface::class);
         $this->documentationNormalizerProphecy->willImplement(CacheableSupportsMethodInterface::class);

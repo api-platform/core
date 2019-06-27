@@ -45,7 +45,7 @@ abstract class DoctrineMongoDbOdmFilterTestCase extends KernelTestCase
      */
     protected $filterClass;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         self::bootKernel();
 

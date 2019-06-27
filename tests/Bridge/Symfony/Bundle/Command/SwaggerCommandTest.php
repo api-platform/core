@@ -30,7 +30,7 @@ class SwaggerCommandTest extends KernelTestCase
      */
     private $tester;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         self::bootKernel();
 
@@ -70,7 +70,7 @@ class SwaggerCommandTest extends KernelTestCase
       operationId: getDummyCarCollection
 YAML;
 
-        $this->assertContains($expected, $result, 'nested object should be present.');
+        $this->assertStringContainsString($expected, $result, 'nested object should be present.');
 
         $expected = <<<YAML
   '/dummy_cars/{id}':
@@ -79,8 +79,8 @@ YAML;
       operationId: getDummyCarItem
 YAML;
 
-        $this->assertContains($expected, $result, 'arrays should be correctly formatted.');
-        $this->assertContains('openapi: 3.0.2', $result);
+        $this->assertStringContainsString($expected, $result, 'arrays should be correctly formatted.');
+        $this->assertStringContainsString('openapi: 3.0.2', $result);
 
         $expected = <<<YAML
 info:
@@ -90,7 +90,7 @@ info:
     This is a test API.
     Made with love
 YAML;
-        $this->assertContains($expected, $result, 'multiline formatting must be preserved (using literal style).');
+        $this->assertStringContainsString($expected, $result, 'multiline formatting must be preserved (using literal style).');
     }
 
     public function testExecuteOpenApiVersion2WithYaml()
@@ -99,7 +99,7 @@ YAML;
 
         $result = $this->tester->getDisplay();
         $this->assertYaml($result);
-        $this->assertContains("swagger: '2.0'", $result);
+        $this->assertStringContainsString("swagger: '2.0'", $result);
     }
 
     public function testExecuteWithBadArguments()

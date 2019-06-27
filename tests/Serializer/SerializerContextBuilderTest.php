@@ -31,7 +31,7 @@ class SerializerContextBuilderTest extends TestCase
      */
     private $builder;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $resourceMetadata = new ResourceMetadata(
             null,

@@ -30,7 +30,7 @@ class XmlSchemaTest extends TestCase
             XmlUtils::loadFile($fixtures.'invalid.xml', $schema);
             $this->fail();
         } catch (\InvalidArgumentException $e) {
-            $this->assertContains('ERROR 1845', $e->getMessage());
+            $this->assertStringContainsString('ERROR 1845', $e->getMessage());
         }
 
         $this->assertInstanceOf(\DOMDocument::class, XmlUtils::loadFile($fixtures.'valid.xml', $schema));

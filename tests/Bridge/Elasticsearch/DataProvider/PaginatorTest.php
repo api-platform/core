@@ -147,7 +147,7 @@ class PaginatorTest extends TestCase
         );
     }
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->paginator = $this->getPaginator(4, 4);
     }
