@@ -32,6 +32,11 @@ use Symfony\Contracts\HttpClient\ResponseStreamInterface;
 final class Client implements HttpClientInterface
 {
     /**
+     * @var Response
+     */
+    private $response;
+
+    /**
      * @see HttpClientInterface::OPTIONS_DEFAULTS
      */
     public const OPTIONS_DEFAULT = [
@@ -100,7 +105,7 @@ final class Client implements HttpClientInterface
         ];
         $this->kernelBrowser->request($method, $resolvedUrl, [], [], $server, $options['body'] ?? null);
 
-        return new Response($this->kernelBrowser->getResponse(), $this->kernelBrowser->getInternalResponse(), $info);
+        return $this->response = new Response($this->kernelBrowser->getResponse(), $this->kernelBrowser->getInternalResponse(), $info);
     }
 
     /**
@@ -112,7 +117,19 @@ final class Client implements HttpClientInterface
     }
 
     /**
+     * Gets the latest response.
+     *
+     * @internal
+     */
+    public function getResponse(): ?Response
+    {
+        return $this->response;
+    }
+
+    /**
      * Gets the underlying test client.
+     *
+     * @internal
      */
     public function getKernelBrowser(): KernelBrowser
     {

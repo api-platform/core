@@ -40,7 +40,7 @@ class ContextBuilderTest extends TestCase
     private $propertyMetadataFactoryProphecy;
     private $urlGeneratorProphecy;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->entityClass = '\Dummy\DummyEntity';
         $this->resourceNameCollectionFactoryProphecy = $this->prophesize(ResourceNameCollectionFactoryInterface::class);

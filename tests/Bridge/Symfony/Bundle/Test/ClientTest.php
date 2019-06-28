@@ -17,6 +17,7 @@ use ApiPlatform\Core\Bridge\Symfony\Bundle\Test\ApiTestCase;
 use ApiPlatform\Core\Bridge\Symfony\Bundle\Test\Response;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Tools\SchemaTool;
+use PHPUnit\Runner\Version;
 use Symfony\Component\HttpKernel\Profiler\Profile;
 
 class ClientTest extends ApiTestCase
@@ -62,7 +63,8 @@ class ClientTest extends ApiTestCase
             'body' => '{"name": "Kevin"}',
         ]);
         $this->assertSame('application/xml; charset=utf-8', $response->getHeaders()['content-type'][0]);
-        $this->assertContains('<name>Kevin</name>', $response->getContent());
+        $this->assertResponseHeaderSame('content-type', 'application/xml; charset=utf-8');
+        $this->assertStringContainsString('<name>Kevin</name>', $response->getContent());
     }
 
     /**
@@ -74,12 +76,54 @@ class ClientTest extends ApiTestCase
         $client->enableReboot();
         $response = $client->request('GET', '/secured_dummies', ['auth_basic' => $basic]);
         $this->assertSame(200, $response->getStatusCode());
+        $this->assertResponseIsSuccessful();
     }
 
     public function authBasicProvider(): iterable
     {
         yield ['dunglas:kevin'];
         yield [['dunglas', 'kevin']];
+    }
+
+    public function testComplexScenario(): void
+    {
+        if (version_compare(Version::id(), '8.0.0', '<')) {
+            $this->markTestSkipped('Requires PHPUnit 8');
+        }
+
+        self::createClient()->request('GET', '/secured_dummies', ['auth_basic' => ['dunglas', 'kevin']]);
+        $this->assertResponseIsSuccessful();
+        $this->assertResponseHeaderSame('content-type', 'application/ld+json; charset=utf-8');
+
+        $this->assertJsonEquals([
+            '@context' => '/contexts/SecuredDummy',
+            '@id' => '/secured_dummies',
+            '@type' => 'hydra:Collection',
+            'hydra:member' => [],
+            'hydra:totalItems' => 0,
+        ]);
+
+        $this->assertJsonContains(
+            [
+                '@context' => '/contexts/SecuredDummy',
+                '@id' => '/secured_dummies',
+            ]
+        );
+
+        $this->assertMatchesJsonSchema(<<<JSON
+{
+  "type": "object",
+  "properties": {
+    "@context": {"pattern": "^/contexts/SecuredDummy$"},
+    "@id": {"pattern": "^/secured_dummies$"},
+    "@type": {"pattern": "^hydra:Collection"},
+    "hydra:member": {}
+  },
+  "additionalProperties": true,
+  "required": ["@context", "@id", "@type", "hydra:member"]
+}
+JSON
+        );
     }
 
     public function testStream(): void

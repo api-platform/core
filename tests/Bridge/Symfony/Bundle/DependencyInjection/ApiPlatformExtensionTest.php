@@ -144,13 +144,13 @@ class ApiPlatformExtensionTest extends TestCase
     private $extension;
     private $childDefinitionProphecy;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->extension = new ApiPlatformExtension();
         $this->childDefinitionProphecy = $this->prophesize(ChildDefinition::class);
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         $this->extension = null;
     }

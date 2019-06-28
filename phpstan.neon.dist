@@ -16,6 +16,9 @@ parameters:
 		- %rootDir%/../../../tests/Fixtures/app/var/cache
 		# The Symfony Configuration API isn't good enough to be analysed
 		- %rootDir%/../../../src/Bridge/Symfony/Bundle/DependencyInjection/Configuration.php
+		# Imported code (temporary)
+		- %rootDir%/../../../src/Bridge/Symfony/Bundle/Test/BrowserKitAssertionsTrait.php
+		- %rootDir%/../../../tests/Bridge/Symfony/Bundle/Test/WebTestCaseTest.php
 	ignoreErrors:
 		# Real problems, hard to fix
 		- '#Parameter \#2 \$dqlPart of method Doctrine\\ORM\\QueryBuilder::add\(\) expects array\|object, string given\.#'

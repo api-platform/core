@@ -47,7 +47,7 @@ class RequestDataCollectorTest extends TestCase
     private $metadataFactory;
     private $filterLocator;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->response = $this->createMock(Response::class);
         $this->attributes = $this->prophesize(ParameterBag::class);
