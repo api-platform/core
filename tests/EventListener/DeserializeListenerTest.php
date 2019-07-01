@@ -284,25 +284,9 @@ class DeserializeListenerTest extends TestCase
         $listener->onKernelRequest($eventProphecy->reveal());
     }
 
-    public function testBadFormatsProviderParameterThrowsException()
-    {
-        $this->expectException(\ApiPlatform\Core\Exception\InvalidArgumentException::class);
-        $this->expectExceptionMessage('The "$formatsProvider" argument is expected to be an implementation of the "ApiPlatform\\Core\\Api\\FormatsProviderInterface" interface.');
-
-        $serializerProphecy = $this->prophesize(SerializerInterface::class);
-
-        $serializerContextBuilderProphecy = $this->prophesize(SerializerContextBuilderInterface::class);
-
-        new DeserializeListener(
-            $serializerProphecy->reveal(),
-            $serializerContextBuilderProphecy->reveal(),
-            'foo'
-        );
-    }
-
     /**
      * @group legacy
-     * @expectedDeprecation Using an array as formats provider is deprecated since API Platform 2.3 and will not be possible anymore in API Platform 3
+     * @expectedDeprecation Passing an array or an instance of "ApiPlatform\Core\Api\FormatsProviderInterface" as 3rd parameter of the constructor of "ApiPlatform\Core\EventListener\DeserializeListener" is deprecated since API Platform 2.5, pass an instance of "ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface" instead
      */
     public function testLegacyFormatsParameter()
     {

@@ -36,16 +36,22 @@ final class OperationResourceMetadataFactory implements ResourceMetadataFactoryI
     public const SUPPORTED_ITEM_OPERATION_METHODS = [
         'GET' => true,
         'PUT' => true,
+        // PATCH is automatically supported if at least one patch format has been configured
         'DELETE' => true,
     ];
 
     private $decorated;
-    private $formats;
+    private $patchFormats;
 
-    public function __construct(ResourceMetadataFactoryInterface $decorated, array $formats = [])
+    public function __construct(ResourceMetadataFactoryInterface $decorated, array $formats = [], array $patchFormats = [])
     {
         $this->decorated = $decorated;
-        $this->formats = $formats;
+        $this->patchFormats = $patchFormats;
+
+        // Backward Compatibility layer
+        if (isset($formats['jsonapi']) && !isset($patchFormats['jsonapi'])) {
+            $this->patchFormats['jsonapi'] = ['application/vnd.api+json'];
+        }
     }
 
     /**
@@ -72,7 +78,7 @@ final class OperationResourceMetadataFactory implements ResourceMetadataFactoryI
             if (!$isAbstract) {
                 $methods[] = 'PUT';
 
-                if (isset($this->formats['jsonapi'])) {
+                if ($this->patchFormats) {
                     $methods[] = 'PATCH';
                 }
             }
@@ -116,7 +122,7 @@ final class OperationResourceMetadataFactory implements ResourceMetadataFactoryI
             if ($collection) {
                 $supported = isset(self::SUPPORTED_COLLECTION_OPERATION_METHODS[$upperOperationName]);
             } else {
-                $supported = isset(self::SUPPORTED_ITEM_OPERATION_METHODS[$upperOperationName]) || (isset($this->formats['jsonapi']) && 'PATCH' === $upperOperationName);
+                $supported = isset(self::SUPPORTED_ITEM_OPERATION_METHODS[$upperOperationName]) || ($this->patchFormats && 'PATCH' === $upperOperationName);
             }
 
             if (!isset($operation['method']) && !isset($operation['route_name'])) {
@@ -125,6 +131,10 @@ final class OperationResourceMetadataFactory implements ResourceMetadataFactoryI
 
             if (isset($operation['method'])) {
                 $operation['method'] = strtoupper($operation['method']);
+
+                if ('PATCH' === $operation['method'] && ($operation['formats'] ?? true)) {
+                    $operation['formats'] = $this->patchFormats;
+                }
             }
 
             $newOperations[$operationName] = $operation;

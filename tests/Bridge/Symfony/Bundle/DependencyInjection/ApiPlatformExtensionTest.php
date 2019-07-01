@@ -765,6 +765,7 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.description' => 'description',
             'api_platform.error_formats' => ['jsonproblem' => ['application/problem+json'], 'jsonld' => ['application/ld+json']],
             'api_platform.formats' => ['jsonld' => ['application/ld+json'], 'jsonhal' => ['application/hal+json']],
+            'api_platform.patch_formats' => [],
             'api_platform.exception_to_status' => [
                 ExceptionInterface::class => Response::HTTP_BAD_REQUEST,
                 InvalidArgumentException::class => Response::HTTP_BAD_REQUEST,
@@ -865,6 +866,7 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.metadata.property.name_collection_factory.xml',
             'api_platform.metadata.resource.metadata_factory.cached',
             'api_platform.metadata.resource.metadata_factory.operation',
+            'api_platform.metadata.resource.metadata_factory.formats',
             'api_platform.metadata.resource.metadata_factory.input_output',
             'api_platform.metadata.resource.metadata_factory.short_name',
             'api_platform.metadata.resource.metadata_factory.xml',

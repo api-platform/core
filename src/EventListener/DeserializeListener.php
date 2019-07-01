@@ -39,28 +39,29 @@ final class DeserializeListener
 
     private $serializer;
     private $serializerContextBuilder;
-    private $formats = [];
+    private $formats;
     private $formatsProvider;
-    private $formatMatcher;
 
     /**
+     * @param ResourceMetadataFactoryInterface $resourceMetadataFactory
+     *
      * @throws InvalidArgumentException
      */
-    public function __construct(SerializerInterface $serializer, SerializerContextBuilderInterface $serializerContextBuilder, /* FormatsProviderInterface */$formatsProvider, ResourceMetadataFactoryInterface $resourceMetadataFactory = null)
+    public function __construct(SerializerInterface $serializer, SerializerContextBuilderInterface $serializerContextBuilder, $resourceMetadataFactory, ResourceMetadataFactoryInterface $legacyResourceMetadataFactory = null)
     {
         $this->serializer = $serializer;
         $this->serializerContextBuilder = $serializerContextBuilder;
-        if (\is_array($formatsProvider)) {
-            @trigger_error('Using an array as formats provider is deprecated since API Platform 2.3 and will not be possible anymore in API Platform 3', E_USER_DEPRECATED);
-            $this->formats = $formatsProvider;
-        } else {
-            if (!$formatsProvider instanceof FormatsProviderInterface) {
-                throw new InvalidArgumentException(sprintf('The "$formatsProvider" argument is expected to be an implementation of the "%s" interface.', FormatsProviderInterface::class));
-            }
+        $this->resourceMetadataFactory = $resourceMetadataFactory instanceof ResourceMetadataFactoryInterface ? $resourceMetadataFactory : $legacyResourceMetadataFactory;
 
-            $this->formatsProvider = $formatsProvider;
+        if (!$resourceMetadataFactory instanceof ResourceMetadataFactoryInterface) {
+            @trigger_error(sprintf('Passing an array or an instance of "%s" as 3rd parameter of the constructor of "%s" is deprecated since API Platform 2.5, pass an instance of "%s" instead', FormatsProviderInterface::class, __CLASS__, ResourceMetadataFactoryInterface::class), E_USER_DEPRECATED);
         }
-        $this->resourceMetadataFactory = $resourceMetadataFactory;
+
+        if (\is_array($resourceMetadataFactory)) {
+            $this->formats = $resourceMetadataFactory;
+        } elseif ($resourceMetadataFactory instanceof FormatsProviderInterface) {
+            $this->formatsProvider = $resourceMetadataFactory;
+        }
     }
 
     /**
@@ -86,12 +87,18 @@ final class DeserializeListener
         $context = $this->serializerContextBuilder->createFromRequest($request, false, $attributes);
 
         // BC check to be removed in 3.0
-        if (null !== $this->formatsProvider) {
-            $this->formats = $this->formatsProvider->getFormatsFromAttributes($attributes);
+        if ($this->resourceMetadataFactory) {
+            $formats = $this
+                ->resourceMetadataFactory
+                ->create($attributes['resource_class'])
+                ->getOperationAttribute($attributes, 'formats', [], true);
+        } elseif ($this->formatsProvider instanceof FormatsProviderInterface) {
+            $formats = $this->formatsProvider->getFormatsFromAttributes($attributes);
+        } elseif (null !== $this->formats) {
+            $formats = $this->formats;
         }
-        $this->formatMatcher = new FormatMatcher($this->formats);
-        $format = $this->getFormat($request);
 
+        $format = $this->getFormat($request, $formats);
         $data = $request->attributes->get('data');
         if (null !== $data) {
             $context[AbstractNormalizer::OBJECT_TO_POPULATE] = $data;
@@ -108,7 +115,7 @@ final class DeserializeListener
      *
      * @throws UnsupportedMediaTypeHttpException
      */
-    private function getFormat(Request $request): string
+    private function getFormat(Request $request, array $formats): string
     {
         /**
          * @var string|null
@@ -118,10 +125,11 @@ final class DeserializeListener
             throw new UnsupportedMediaTypeHttpException('The "Content-Type" header must exist.');
         }
 
-        $format = $this->formatMatcher->getFormat($contentType);
-        if (null === $format || !isset($this->formats[$format])) {
+        $formatMatcher = new FormatMatcher($formats);
+        $format = $formatMatcher->getFormat($contentType);
+        if (null === $format) {
             $supportedMimeTypes = [];
-            foreach ($this->formats as $mimeTypes) {
+            foreach ($formats as $mimeTypes) {
                 foreach ($mimeTypes as $mimeType) {
                     $supportedMimeTypes[] = $mimeType;
                 }

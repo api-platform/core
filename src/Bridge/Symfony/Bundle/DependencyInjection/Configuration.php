@@ -163,6 +163,7 @@ final class Configuration implements ConfigurationInterface
             'json' => ['mime_types' => ['application/json']], // Swagger support
             'html' => ['mime_types' => ['text/html']], // Swagger UI support
         ]);
+        $this->addFormatSection($rootNode, 'patch_formats', []);
         $this->addFormatSection($rootNode, 'error_formats', [
             'jsonproblem' => ['mime_types' => ['application/problem+json']],
             'jsonld' => ['mime_types' => ['application/ld+json']],
