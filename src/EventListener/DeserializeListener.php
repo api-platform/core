@@ -15,7 +15,6 @@ namespace ApiPlatform\Core\EventListener;
 
 use ApiPlatform\Core\Api\FormatMatcher;
 use ApiPlatform\Core\Api\FormatsProviderInterface;
-use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ToggleableOperationAttributeTrait;
 use ApiPlatform\Core\Serializer\SerializerContextBuilderInterface;
@@ -44,8 +43,6 @@ final class DeserializeListener
 
     /**
      * @param ResourceMetadataFactoryInterface $resourceMetadataFactory
-     *
-     * @throws InvalidArgumentException
      */
     public function __construct(SerializerInterface $serializer, SerializerContextBuilderInterface $serializerContextBuilder, $resourceMetadataFactory, ResourceMetadataFactoryInterface $legacyResourceMetadataFactory = null)
     {
