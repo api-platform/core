@@ -23,20 +23,20 @@ use Symfony\Component\Validator\Constraints as Assert;
  * @author Kévin Dunglas <dunglas@gmail.com>
  *
  * @ApiResource(
- *     attributes={"access_control"="has_role('ROLE_USER')"},
+ *     attributes={"access_control"="is_granted('ROLE_USER')"},
  *     collectionOperations={
  *         "get",
- *         "post"={"access_control"="has_role('ROLE_ADMIN')"}
+ *         "post"={"access_control"="is_granted('ROLE_ADMIN')"}
  *     },
  *     itemOperations={
- *         "get"={"access_control"="has_role('ROLE_USER') and object.getOwner() == user"},
- *         "put"={"access_control"="has_role('ROLE_USER') and previous_object.getOwner() ==  user"},
+ *         "get"={"access_control"="is_granted('ROLE_USER') and object.getOwner() == user"},
+ *         "put"={"access_control"="is_granted('ROLE_USER') and previous_object.getOwner() ==  user"},
  *     },
  *     graphql={
- *         "query"={"access_control"="has_role('ROLE_USER') and object.getOwner() == user"},
+ *         "query"={"access_control"="is_granted('ROLE_USER') and object.getOwner() == user"},
  *         "delete"={},
- *         "update"={"access_control"="has_role('ROLE_USER') and previous_object.getOwner() ==  user"},
- *         "create"={"access_control"="has_role('ROLE_ADMIN')", "access_control_message"="Only admins can create a secured dummy."}
+ *         "update"={"access_control"="is_granted('ROLE_USER') and previous_object.getOwner() ==  user"},
+ *         "create"={"access_control"="is_granted('ROLE_ADMIN')", "access_control_message"="Only admins can create a secured dummy."}
  *     }
  * )
  * @ORM\Entity
