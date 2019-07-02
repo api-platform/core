@@ -14,9 +14,9 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\Swagger\SchemaFormatter;
 
 use ApiPlatform\Core\Exception\FormatterNotFoundException;
-use ApiPlatform\Core\Swagger\SchemaFormatter\JsonApiSchemaFormatter;
-use ApiPlatform\Core\Swagger\SchemaFormatter\DefaultSchemaFormatter;
 use ApiPlatform\Core\Swagger\SchemaFormatter\ChainSchemaFormatter;
+use ApiPlatform\Core\Swagger\SchemaFormatter\DefaultSchemaFormatter;
+use ApiPlatform\Core\Swagger\SchemaFormatter\JsonApiSchemaFormatter;
 use PHPUnit\Framework\TestCase;
 
 class SchemaFormatterProviderTest extends TestCase

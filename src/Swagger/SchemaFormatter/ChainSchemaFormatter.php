@@ -21,6 +21,7 @@ final class ChainSchemaFormatter
 
     /**
      * SchemaFormatterProvider constructor.
+     *
      * @param SchemaFormatterInterface[] $formatters
      */
     public function __construct(/* iterable */ $formatters)

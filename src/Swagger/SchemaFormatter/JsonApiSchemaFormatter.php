@@ -26,16 +26,16 @@ final class JsonApiSchemaFormatter implements SchemaFormatterInterface
     {
         return [
             'data' => [
-                'type'       => 'object',
+                'type' => 'object',
                 'properties' => [
-                    'type'       => [
+                    'type' => [
                         'type' => 'string',
                     ],
-                    'id'         => [
+                    'id' => [
                         'type' => 'integer',
                     ],
                     'attributes' => [
-                        'type'       => 'object',
+                        'type' => 'object',
                         'properties' => [],
                     ],
                 ],
@@ -55,12 +55,12 @@ final class JsonApiSchemaFormatter implements SchemaFormatterInterface
             && isset($property['$ref'])
         ) {
             $data = [
-                'type'       => 'object',
+                'type' => 'object',
                 'properties' => [
                     'type' => [
                         'type' => 'string',
                     ],
-                    'id'   => [
+                    'id' => [
                         'type' => 'string',
                     ],
                 ],
@@ -76,15 +76,15 @@ final class JsonApiSchemaFormatter implements SchemaFormatterInterface
 //            }
 
             $definitionSchema['properties']['data']['properties']['relationships'] = [
-                'type'       => 'object',
+                'type' => 'object',
                 'properties' => [
                     $normalizedPropertyName => [
-                        'type'       => 'object',
+                        'type' => 'object',
                         'properties' => [
                             'links' => [
-                                'type'       => 'object',
+                                'type' => 'object',
                                 'properties' => [
-                                    'self'    => [
+                                    'self' => [
                                         'type' => 'string',
                                     ],
                                     'related' => [
@@ -92,7 +92,7 @@ final class JsonApiSchemaFormatter implements SchemaFormatterInterface
                                     ],
                                 ],
                             ],
-                            'data'  => $data,
+                            'data' => $data,
                         ],
                     ],
                 ],
