@@ -84,6 +84,9 @@ parameters:
 			message: '#Binary operation "\+" between (float\|int\|)?string and 0 results in an error\.#'
 			path: %currentWorkingDirectory%/src/Bridge/Doctrine/Common/Filter/RangeFilterTrait.php
 		- '#Parameter \#1 \$objectValue of method GraphQL\\Type\\Definition\\InterfaceType::resolveType\(\) expects object, array(<string, string>)? given.#'
+		-
+			message: '#Parameter \#1 $callback of function array_map expects (callable)|null, array<int, mixed> given\.#'
+			path: %currentWorkingDirectory%/src/Bridge/Doctrine/*/Filter/AbstractFilter.php
 
 		# Expected, due to deprecations
 		- '#Method ApiPlatform\\Core\\Bridge\\Doctrine\\Orm\\Extension\\QueryResult(Item|Collection)ExtensionInterface::getResult\(\) invoked with 4 parameters, 1 required\.#'
