@@ -311,7 +311,6 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $container->setParameter('api_platform.enable_swagger', $config['enable_swagger']);
         $container->setParameter('api_platform.swagger.api_keys', $config['swagger']['api_keys']);
 
-        $loader->load('schema_formatter.xml');
         $container->registerForAutoconfiguration(SchemaFormatterInterface::class)
             ->addTag('api_platform.schema_formatter');
     }

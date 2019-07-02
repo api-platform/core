@@ -15,36 +15,36 @@ namespace ApiPlatform\Core\Tests\Swagger\SchemaFormatter;
 
 use ApiPlatform\Core\Exception\FormatterNotFoundException;
 use ApiPlatform\Core\Swagger\SchemaFormatter\JsonApiSchemaFormatter;
-use ApiPlatform\Core\Swagger\SchemaFormatter\JsonSchemaFormatter;
-use ApiPlatform\Core\Swagger\SchemaFormatter\SchemaFormatterProvider;
+use ApiPlatform\Core\Swagger\SchemaFormatter\DefaultSchemaFormatter;
+use ApiPlatform\Core\Swagger\SchemaFormatter\ChainSchemaFormatter;
 use PHPUnit\Framework\TestCase;
 
 class SchemaFormatterProviderTest extends TestCase
 {
     public function testGetFormatter()
     {
-        $schemaFormatterFactory = new SchemaFormatterProvider([
+        $schemaFormatterFactory = new ChainSchemaFormatter([
             new JsonApiSchemaFormatter(),
-            new JsonSchemaFormatter(),
+            new DefaultSchemaFormatter(),
         ]);
         $formatter = $schemaFormatterFactory->getFormatter('application/json');
-        $this->assertInstanceOf(JsonSchemaFormatter::class, $formatter);
+        $this->assertInstanceOf(DefaultSchemaFormatter::class, $formatter);
     }
 
-    public function testGetFormatterException()
+    public function testGetFormatterDefault()
     {
-        $schemaFormatterFactory = new SchemaFormatterProvider([
+        $schemaFormatterFactory = new ChainSchemaFormatter([
             new JsonApiSchemaFormatter(),
-            new JsonSchemaFormatter(),
+            new DefaultSchemaFormatter(),
         ]);
 
-        $this->expectException(FormatterNotFoundException::class);
-        $schemaFormatterFactory->getFormatter('application/json-test');
+        $formatter = $schemaFormatterFactory->getFormatter('application/json-test');
+        $this->assertInstanceOf(DefaultSchemaFormatter::class, $formatter);
     }
 
     public function testGetFormatterExceptionNoFormatters()
     {
-        $schemaFormatterFactory = new SchemaFormatterProvider([]);
+        $schemaFormatterFactory = new ChainSchemaFormatter([]);
 
         $this->expectException(FormatterNotFoundException::class);
         $schemaFormatterFactory->getFormatter('application/json-test');

@@ -15,7 +15,7 @@ namespace ApiPlatform\Core\Swagger\SchemaFormatter;
 
 use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 
-class JsonApiSchemaFormatter implements SchemaFormatterInterface
+final class JsonApiSchemaFormatter implements SchemaFormatterInterface
 {
     public function supports(string $mimeType): bool
     {
@@ -26,16 +26,16 @@ class JsonApiSchemaFormatter implements SchemaFormatterInterface
     {
         return [
             'data' => [
-                'type' => 'object',
+                'type'       => 'object',
                 'properties' => [
-                    'type' => [
+                    'type'       => [
                         'type' => 'string',
                     ],
-                    'id' => [
+                    'id'         => [
                         'type' => 'integer',
                     ],
                     'attributes' => [
-                        'type' => 'object',
+                        'type'       => 'object',
                         'properties' => [],
                     ],
                 ],
@@ -43,12 +43,8 @@ class JsonApiSchemaFormatter implements SchemaFormatterInterface
         ];
     }
 
-    public function setProperty(
-        \ArrayObject $definitionSchema,
-        $normalizedPropertyName,
-        \ArrayObject $property,
-        PropertyMetadata $propertyMetadata
-    ): void {
+    public function setProperty(\ArrayObject $definitionSchema, $normalizedPropertyName, \ArrayObject $property, PropertyMetadata $propertyMetadata): void
+    {
         if ('id' === $normalizedPropertyName) {
             $definitionSchema['properties']['data']['properties'][$normalizedPropertyName] = $property;
             $normalizedPropertyName = '_id';
@@ -59,12 +55,12 @@ class JsonApiSchemaFormatter implements SchemaFormatterInterface
             && isset($property['$ref'])
         ) {
             $data = [
-                'type' => 'object',
+                'type'       => 'object',
                 'properties' => [
                     'type' => [
                         'type' => 'string',
                     ],
-                    'id' => [
+                    'id'   => [
                         'type' => 'string',
                     ],
                 ],
@@ -80,15 +76,15 @@ class JsonApiSchemaFormatter implements SchemaFormatterInterface
 //            }
 
             $definitionSchema['properties']['data']['properties']['relationships'] = [
-                'type' => 'object',
+                'type'       => 'object',
                 'properties' => [
                     $normalizedPropertyName => [
-                        'type' => 'object',
+                        'type'       => 'object',
                         'properties' => [
                             'links' => [
-                                'type' => 'object',
+                                'type'       => 'object',
                                 'properties' => [
-                                    'self' => [
+                                    'self'    => [
                                         'type' => 'string',
                                     ],
                                     'related' => [
@@ -96,13 +92,15 @@ class JsonApiSchemaFormatter implements SchemaFormatterInterface
                                     ],
                                 ],
                             ],
-                            'data' => $data,
+                            'data'  => $data,
                         ],
                     ],
                 ],
             ];
-        } else {
-            $definitionSchema['properties']['data']['properties']['attributes']['properties'][$normalizedPropertyName] = $property;
+
+            return;
         }
+
+        $definitionSchema['properties']['data']['properties']['attributes']['properties'][$normalizedPropertyName] = $property;
     }
 }

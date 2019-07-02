@@ -14,32 +14,32 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\Swagger\SchemaFormatter;
 
 use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
-use ApiPlatform\Core\Swagger\SchemaFormatter\JsonSchemaFormatter;
+use ApiPlatform\Core\Swagger\SchemaFormatter\DefaultSchemaFormatter;
 use PHPUnit\Framework\TestCase;
 
-class JsonSchemaFormatterTest extends TestCase
+class DefaultSchemaFormatterTest extends TestCase
 {
     public function testSupports()
     {
-        $schemaFormatter = new JsonSchemaFormatter();
+        $schemaFormatter = new DefaultSchemaFormatter();
         $this->assertTrue($schemaFormatter->supports('application/json'));
     }
 
     public function testSupportsNotSupported()
     {
-        $schemaFormatter = new JsonSchemaFormatter();
-        $this->assertFalse($schemaFormatter->supports('application/jso'));
+        $schemaFormatter = new DefaultSchemaFormatter();
+        $this->assertTrue($schemaFormatter->supports('application/jso'));
     }
 
     public function testBuildBaseSchemaFormat()
     {
-        $schemaFormatter = new JsonSchemaFormatter();
+        $schemaFormatter = new DefaultSchemaFormatter();
         $this->assertEquals([], $schemaFormatter->buildBaseSchemaFormat());
     }
 
     public function testSetProperty()
     {
-        $schemaFormatter = new JsonSchemaFormatter();
+        $schemaFormatter = new DefaultSchemaFormatter();
         $definitionSchema = new \ArrayObject([]);
         $normalizedPropertyName = 'test';
         $property = new \ArrayObject([

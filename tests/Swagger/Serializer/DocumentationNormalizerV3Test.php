@@ -35,8 +35,8 @@ use ApiPlatform\Core\PathResolver\CustomOperationPathResolver;
 use ApiPlatform\Core\PathResolver\OperationPathResolver;
 use ApiPlatform\Core\PathResolver\OperationPathResolverInterface;
 use ApiPlatform\Core\Swagger\SchemaFormatter\JsonApiSchemaFormatter;
-use ApiPlatform\Core\Swagger\SchemaFormatter\JsonSchemaFormatter;
-use ApiPlatform\Core\Swagger\SchemaFormatter\SchemaFormatterProvider;
+use ApiPlatform\Core\Swagger\SchemaFormatter\DefaultSchemaFormatter;
+use ApiPlatform\Core\Swagger\SchemaFormatter\ChainSchemaFormatter;
 use ApiPlatform\Core\Swagger\Serializer\DocumentationNormalizer;
 use ApiPlatform\Core\Tests\Fixtures\DummyFilter;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Answer;
@@ -88,8 +88,8 @@ class DocumentationNormalizerV3Test extends TestCase
         $operationMethodResolverProphecy->getCollectionOperationMethod(Dummy::class, 'custom2')->shouldBeCalled()->willReturn('POST');
 
         $operationPathResolver = new CustomOperationPathResolver(new OperationPathResolver(new UnderscorePathSegmentNameGenerator()));
-        $schemaFormatterFactory = new SchemaFormatterProvider([
-            'application/json' => new JsonSchemaFormatter(),
+        $schemaFormatterFactory = new ChainSchemaFormatter([
+            'application/json' => new DefaultSchemaFormatter(),
         ]);
 
         $normalizer = new DocumentationNormalizer(
@@ -388,8 +388,8 @@ class DocumentationNormalizerV3Test extends TestCase
 
         $operationPathResolver = new CustomOperationPathResolver(new OperationPathResolver(new UnderscorePathSegmentNameGenerator()));
 
-        $schemaFormatterFactory = new SchemaFormatterProvider([
-            'application/json' => new JsonSchemaFormatter(),
+        $schemaFormatterFactory = new ChainSchemaFormatter([
+            'application/json' => new DefaultSchemaFormatter(),
         ]);
 
         $normalizer = new DocumentationNormalizer(
@@ -525,8 +525,8 @@ class DocumentationNormalizerV3Test extends TestCase
             ],
         ];
 
-        $schemaFormatterFactory = new SchemaFormatterProvider([
-            'application/json' => new JsonSchemaFormatter(),
+        $schemaFormatterFactory = new ChainSchemaFormatter([
+            'application/json' => new DefaultSchemaFormatter(),
         ]);
 
         $normalizer = new DocumentationNormalizer(
@@ -679,8 +679,8 @@ class DocumentationNormalizerV3Test extends TestCase
 
         $operationPathResolver = new CustomOperationPathResolver(new OperationPathResolver(new UnderscorePathSegmentNameGenerator()));
 
-        $schemaFormatterFactory = new SchemaFormatterProvider([
-            'application/json' => new JsonSchemaFormatter(),
+        $schemaFormatterFactory = new ChainSchemaFormatter([
+            'application/json' => new DefaultSchemaFormatter(),
         ]);
 
         $normalizer = new DocumentationNormalizer(
@@ -901,8 +901,8 @@ class DocumentationNormalizerV3Test extends TestCase
 
         $operationPathResolver = new CustomOperationPathResolver(new OperationPathResolver(new UnderscorePathSegmentNameGenerator()));
 
-        $schemaFormatterFactory = new SchemaFormatterProvider([
-            'application/json' => new JsonSchemaFormatter(),
+        $schemaFormatterFactory = new ChainSchemaFormatter([
+            'application/json' => new DefaultSchemaFormatter(),
         ]);
 
         $normalizer = new DocumentationNormalizer(
@@ -1036,8 +1036,8 @@ class DocumentationNormalizerV3Test extends TestCase
 
         $operationPathResolver = new CustomOperationPathResolver(new OperationPathResolver(new UnderscorePathSegmentNameGenerator()));
 
-        $schemaFormatterFactory = new SchemaFormatterProvider([
-            'application/json' => new JsonSchemaFormatter(),
+        $schemaFormatterFactory = new ChainSchemaFormatter([
+            'application/json' => new DefaultSchemaFormatter(),
         ]);
 
         $normalizer = new DocumentationNormalizer(
@@ -1270,8 +1270,8 @@ class DocumentationNormalizerV3Test extends TestCase
 
         $operationPathResolver = new CustomOperationPathResolver(new OperationPathResolver(new UnderscorePathSegmentNameGenerator()));
 
-        $schemaFormatterFactory = new SchemaFormatterProvider([
-            'application/json' => new JsonSchemaFormatter(),
+        $schemaFormatterFactory = new ChainSchemaFormatter([
+            'application/json' => new DefaultSchemaFormatter(),
         ]);
 
         $normalizer = new DocumentationNormalizer(
@@ -1808,8 +1808,8 @@ class DocumentationNormalizerV3Test extends TestCase
 
         $operationPathResolver = new CustomOperationPathResolver(new OperationPathResolver(new UnderscorePathSegmentNameGenerator()));
 
-        $schemaFormatterFactory = new SchemaFormatterProvider([
-            'application/json' => new JsonSchemaFormatter(),
+        $schemaFormatterFactory = new ChainSchemaFormatter([
+            'application/json' => new DefaultSchemaFormatter(),
             'application/vnd.api+json' => new JsonApiSchemaFormatter(),
         ]);
 
@@ -2173,8 +2173,8 @@ class DocumentationNormalizerV3Test extends TestCase
 
         $operationPathResolver = new CustomOperationPathResolver(new OperationPathResolver(new UnderscorePathSegmentNameGenerator()));
 
-        $schemaFormatterFactory = new SchemaFormatterProvider([
-            'application/json' => new JsonSchemaFormatter(),
+        $schemaFormatterFactory = new ChainSchemaFormatter([
+            'application/json' => new DefaultSchemaFormatter(),
         ]);
 
         $normalizer = new DocumentationNormalizer(
@@ -2333,9 +2333,9 @@ class DocumentationNormalizerV3Test extends TestCase
         $formatProviderProphecy->getFormatsFromOperation(Question::class, 'get', OperationType::ITEM)->willReturn(['json' => ['application/json'], 'csv' => ['text/csv']]);
         $formatProviderProphecy->getFormatsFromOperation(Answer::class, 'get', OperationType::SUBRESOURCE)->willReturn(['xml' => ['text/xml']]);
 
-        $schemaFormatterFactory = new SchemaFormatterProvider([
-            'application/json' => new JsonSchemaFormatter(),
-            'text/xml' => new JsonSchemaFormatter(), //@todo: use correct formatter
+        $schemaFormatterFactory = new ChainSchemaFormatter([
+            'application/json' => new DefaultSchemaFormatter(),
+            'text/xml' => new DefaultSchemaFormatter(), //@todo: use correct formatter
         ]);
 
         $normalizer = new DocumentationNormalizer(
@@ -2523,8 +2523,8 @@ class DocumentationNormalizerV3Test extends TestCase
 
         $operationPathResolver = new CustomOperationPathResolver(new OperationPathResolver(new UnderscorePathSegmentNameGenerator()));
 
-        $schemaFormatterFactory = new SchemaFormatterProvider([
-            'application/json' => new JsonSchemaFormatter(),
+        $schemaFormatterFactory = new ChainSchemaFormatter([
+            'application/json' => new DefaultSchemaFormatter(),
         ]);
 
         $normalizer = new DocumentationNormalizer(
@@ -2641,8 +2641,8 @@ class DocumentationNormalizerV3Test extends TestCase
 
         $operationPathResolver = new CustomOperationPathResolver(new OperationPathResolver(new UnderscorePathSegmentNameGenerator()));
 
-        $schemaFormatterFactory = new SchemaFormatterProvider([
-            'application/json' => new JsonSchemaFormatter(),
+        $schemaFormatterFactory = new ChainSchemaFormatter([
+            'application/json' => new DefaultSchemaFormatter(),
         ]);
 
         $normalizer = new DocumentationNormalizer(
@@ -2779,8 +2779,8 @@ class DocumentationNormalizerV3Test extends TestCase
         $formatProviderProphecy->getFormatsFromOperation(Dummy::class, 'get', OperationType::ITEM)->willReturn(['jsonapi' => ['application/vnd.api+json']]);
         $formatProviderProphecy->getFormatsFromOperation(Dummy::class, 'put', OperationType::ITEM)->willReturn(['json' => ['application/json'], 'csv' => ['text/csv']]);
 
-        $schemaFormatterFactory = new SchemaFormatterProvider([
-            'application/json' => new JsonSchemaFormatter(),
+        $schemaFormatterFactory = new ChainSchemaFormatter([
+            'application/json' => new DefaultSchemaFormatter(),
             'application/vnd.api+json' => new JsonApiSchemaFormatter(),
         ]);
 

@@ -13,6 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Exception;
 
-class FormatterNotFoundException extends InvalidArgumentException
+final class FormatterNotFoundException extends InvalidArgumentException
 {
 }

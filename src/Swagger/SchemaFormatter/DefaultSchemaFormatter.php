@@ -15,11 +15,11 @@ namespace ApiPlatform\Core\Swagger\SchemaFormatter;
 
 use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 
-class JsonSchemaFormatter implements SchemaFormatterInterface
+class DefaultSchemaFormatter implements SchemaFormatterInterface
 {
     public function supports(string $mimeType): bool
     {
-        return 'application/json' === $mimeType;
+        return true;
     }
 
     public function buildBaseSchemaFormat(): array
