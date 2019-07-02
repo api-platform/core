@@ -204,7 +204,7 @@ Feature: GraphQL mutation support
     When I send the following GraphQL request:
     """
     mutation {
-      updateDummy(input: {id: "/dummies/1", description: "Modified description.", dummyDate: "2018-06-05", clientMutationId: "myId"}) {
+      updateDummy(input: {id: "/dummies/1", description: "Modified description.", dummyDate: "2018-06-05T00:00:00+00:00", clientMutationId: "myId"}) {
         dummy {
           id
           name
@@ -228,7 +228,7 @@ Feature: GraphQL mutation support
     And the JSON node "data.updateDummy.dummy.id" should be equal to "/dummies/1"
     And the JSON node "data.updateDummy.dummy.name" should be equal to "Dummy #1"
     And the JSON node "data.updateDummy.dummy.description" should be equal to "Modified description."
-    And the JSON node "data.updateDummy.dummy.dummyDate" should be equal to "2018-06-05T00:00:00+00:00"
+    And the JSON node "data.updateDummy.dummy.dummyDate" should be equal to "2018-06-05"
     And the JSON node "data.updateDummy.dummy.relatedDummies.edges[0].node.name" should be equal to "RelatedDummy11"
     And the JSON node "data.updateDummy.clientMutationId" should be equal to "myId"
 
@@ -324,7 +324,7 @@ Feature: GraphQL mutation support
     When I send the following GraphQL request:
     """
     mutation {
-      createDummy(input: {_id: 12, name: "", foo: [], clientMutationId: "myId"}) {
+      createDummy(input: {name: "", foo: [], clientMutationId: "myId"}) {
         clientMutationId
       }
     }
@@ -475,3 +475,21 @@ Feature: GraphQL mutation support
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/json"
     And the JSON node "data.sumNotPersistedDummyCustomMutation.dummyCustomMutation" should be null
+
+  Scenario: Execute a custom mutation with custom arguments
+    When I send the following GraphQL request:
+    """
+    mutation {
+      testCustomArgumentsDummyCustomMutation(input: {operandC: 18, clientMutationId: "myId"}) {
+        dummyCustomMutation {
+          result
+        }
+        clientMutationId
+      }
+    }
+    """
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/json"
+    And the JSON node "data.testCustomArgumentsDummyCustomMutation.dummyCustomMutation.result" should be equal to "18"
+    And the JSON node "data.testCustomArgumentsDummyCustomMutation.clientMutationId" should be equal to "myId"

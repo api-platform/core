@@ -61,6 +61,7 @@
             <argument type="service" id="api_platform.identifiers_extractor.cached" />
             <argument type="service" id="api_platform.subresource_data_provider" on-invalid="ignore" />
             <argument type="service" id="api_platform.identifier.converter" on-invalid="ignore" />
+            <argument type="service" id="api_platform.resource_class_resolver" />
         </service>
         <service id="ApiPlatform\Core\Api\IriConverterInterface" alias="api_platform.iri_converter" />
 
@@ -83,7 +84,12 @@
             <argument type="service" id="api_platform.serializer.context_builder.filter.inner" />
         </service>
 
-        <service id="api_platform.serializer.property_filter" class="ApiPlatform\Core\Serializer\Filter\PropertyFilter" public="false" abstract="true" />
+        <service id="api_platform.serializer.property_filter" class="ApiPlatform\Core\Serializer\Filter\PropertyFilter" public="false" abstract="true">
+            <argument key="$parameterName">properties</argument>
+            <argument key="$overrideDefaultProperties">false</argument>
+            <argument key="$whitelist">null</argument>
+            <argument key="$nameConverter" type="service" id="api_platform.name_converter" on-invalid="ignore" />
+        </service>
         <service id="ApiPlatform\Core\Serializer\Filter\PropertyFilter" alias="api_platform.serializer.property_filter" />
 
         <service id="api_platform.serializer.group_filter" class="ApiPlatform\Core\Serializer\Filter\GroupFilter" public="false" abstract="true" />
@@ -155,6 +161,7 @@
             <argument type="service" id="api_platform.subresource_data_provider" />
             <argument type="service" id="api_platform.serializer.context_builder" />
             <argument type="service" id="api_platform.identifier.converter" />
+            <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
 
             <tag name="kernel.event_listener" event="kernel.request" method="onKernelRequest" priority="4" />
         </service>
@@ -162,7 +169,7 @@
         <service id="api_platform.listener.view.write" class="ApiPlatform\Core\EventListener\WriteListener">
             <argument type="service" id="api_platform.data_persister" />
             <argument type="service" id="api_platform.iri_converter" on-invalid="null" />
-            <argument type="service" id="api_platform.metadata.resource.metadata_factory" on-invalid="null" />
+            <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
 
             <tag name="kernel.event_listener" event="kernel.view" method="onKernelView" priority="32" />
         </service>
@@ -171,6 +178,7 @@
             <argument type="service" id="api_platform.serializer" />
             <argument type="service" id="api_platform.serializer.context_builder" />
             <argument type="service" id="api_platform.formats_provider" />
+            <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
 
             <tag name="kernel.event_listener" event="kernel.request" method="onKernelRequest" priority="2" />
         </service>
@@ -178,6 +186,7 @@
         <service id="api_platform.listener.view.serialize" class="ApiPlatform\Core\EventListener\SerializeListener">
             <argument type="service" id="api_platform.serializer" />
             <argument type="service" id="api_platform.serializer.context_builder" />
+            <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
 
             <tag name="kernel.event_listener" event="kernel.view" method="onKernelView" priority="16" />
         </service>

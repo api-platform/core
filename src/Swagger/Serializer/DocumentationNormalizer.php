@@ -724,6 +724,10 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
 
         foreach ($this->propertyNameCollectionFactory->create($resourceClass, $options) as $propertyName) {
             $propertyMetadata = $this->propertyMetadataFactory->create($resourceClass, $propertyName);
+            if (!$propertyMetadata->isReadable() && !$propertyMetadata->isWritable()) {
+                continue;
+            }
+
             $normalizedPropertyName = $this->nameConverter ? $this->nameConverter->normalize($propertyName, $resourceClass, self::FORMAT, $serializerContext ?? []) : $propertyName;
             if ($propertyMetadata->isRequired()) {
                 $definitionSchema['required'][] = $normalizedPropertyName;
@@ -840,7 +844,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
 
         if ($v3) {
             $docs = ['openapi' => self::OPENAPI_VERSION];
-            if ('/' !== $baseUrl) {
+            if ('/' !== $baseUrl && '' !== $baseUrl) {
                 $docs['servers'] = [['url' => $baseUrl]];
             }
         } else {

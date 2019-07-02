@@ -21,6 +21,8 @@ use ApiPlatform\Core\DataProvider\PartialPaginatorInterface;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
+use ApiPlatform\Core\Test\DoctrineMongoDbOdmSetup;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\Dummy;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ODM\MongoDB\Aggregation\Builder;
 use Doctrine\ODM\MongoDB\Aggregation\Stage\Count;
@@ -30,18 +32,21 @@ use Doctrine\ODM\MongoDB\Aggregation\Stage\Skip;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Doctrine\ODM\MongoDB\Iterator\Iterator;
 use Doctrine\ODM\MongoDB\Repository\DocumentRepository;
-use Doctrine\ODM\MongoDB\UnitOfWork;
 use PHPUnit\Framework\TestCase;
 
 /**
+ * @group mongodb
+ *
  * @author Alan Poulain <contact@alanpoulain.eu>
  */
 class PaginationExtensionTest extends TestCase
 {
     private $managerRegistryProphecy;
 
-    protected function setUp()
+    protected function setUp(): void
     {
+        parent::setUp();
+
         $this->managerRegistryProphecy = $this->prophesize(ManagerRegistry::class);
     }
 
@@ -365,25 +370,16 @@ class PaginationExtensionTest extends TestCase
 
     public function testGetResult()
     {
-        $result = $this->getPaginationExtensionResult();
-
-        $this->assertInstanceOf(PartialPaginatorInterface::class, $result);
-        $this->assertInstanceOf(PaginatorInterface::class, $result);
-    }
-
-    private function getPaginationExtensionResult()
-    {
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataFactory = $resourceMetadataFactoryProphecy->reveal();
 
         $pagination = new Pagination($resourceMetadataFactory);
 
-        $unitOfWorkProphecy = $this->prophesize(UnitOfWork::class);
+        $fixturesPath = \dirname((string) (new \ReflectionClass(Dummy::class))->getFileName());
+        $config = DoctrineMongoDbOdmSetup::createAnnotationMetadataConfiguration([$fixturesPath], true);
+        $documentManager = DocumentManager::create(null, $config);
 
-        $documentManagerProphecy = $this->prophesize(DocumentManager::class);
-        $documentManagerProphecy->getUnitOfWork()->willReturn($unitOfWorkProphecy->reveal());
-
-        $this->managerRegistryProphecy->getManagerForClass('Foo')->willReturn($documentManagerProphecy->reveal());
+        $this->managerRegistryProphecy->getManagerForClass(Dummy::class)->willReturn($documentManager);
 
         $iteratorProphecy = $this->prophesize(Iterator::class);
         $iteratorProphecy->toArray()->willReturn([
@@ -417,7 +413,10 @@ class PaginationExtensionTest extends TestCase
             $pagination
         );
 
-        return $paginationExtension->getResult($aggregationBuilderProphecy->reveal(), 'Foo');
+        $result = $paginationExtension->getResult($aggregationBuilderProphecy->reveal(), Dummy::class);
+
+        $this->assertInstanceOf(PartialPaginatorInterface::class, $result);
+        $this->assertInstanceOf(PaginatorInterface::class, $result);
     }
 
     private function mockAggregationBuilder($expectedOffset, $expectedLimit)

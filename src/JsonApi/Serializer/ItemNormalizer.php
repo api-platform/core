@@ -30,7 +30,6 @@ use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
 use Symfony\Component\Serializer\Exception\RuntimeException;
 use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
-use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 /**
@@ -57,9 +56,9 @@ final class ItemNormalizer extends AbstractItemNormalizer
     /**
      * {@inheritdoc}
      */
-    public function supportsNormalization($data, $format = null, array $context = []): bool
+    public function supportsNormalization($data, $format = null): bool
     {
-        return self::FORMAT === $format && parent::supportsNormalization($data, $format, $context);
+        return self::FORMAT === $format && parent::supportsNormalization($data, $format);
     }
 
     /**
@@ -67,7 +66,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
      */
     public function normalize($object, $format = null, array $context = [])
     {
-        if (null !== $outputClass = $this->getOutputClass($this->getObjectClass($object), $context)) {
+        if (null !== $this->getOutputClass($this->getObjectClass($object), $context)) {
             return parent::normalize($object, $format, $context);
         }
 
@@ -75,8 +74,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
             $context['cache_key'] = $this->getJsonApiCacheKey($format, $context);
         }
 
-        // Use resolved resource class instead of given resource class to support multiple inheritance child types
-        $resourceClass = $this->resourceClassResolver->getResourceClass($object, $context['resource_class'] ?? null, true);
+        $resourceClass = $this->resourceClassResolver->getResourceClass($object, $context['resource_class'] ?? null);
         $context = $this->initContext($resourceClass, $context);
         $iri = $this->iriConverter->getIriFromItem($object);
         $context['iri'] = $iri;
@@ -120,9 +118,9 @@ final class ItemNormalizer extends AbstractItemNormalizer
     /**
      * {@inheritdoc}
      */
-    public function supportsDenormalization($data, $type, $format = null, array $context = []): bool
+    public function supportsDenormalization($data, $type, $format = null): bool
     {
-        return self::FORMAT === $format && parent::supportsDenormalization($data, $type, $format, $context);
+        return self::FORMAT === $format && parent::supportsDenormalization($data, $type, $format);
     }
 
     /**
@@ -179,22 +177,11 @@ final class ItemNormalizer extends AbstractItemNormalizer
      *
      * @see http://jsonapi.org/format/#document-resource-object-linkage
      *
-     * @throws LogicException
      * @throws RuntimeException
      * @throws NotNormalizableValueException
      */
     protected function denormalizeRelation(string $attributeName, PropertyMetadata $propertyMetadata, string $className, $value, ?string $format, array $context)
     {
-        // Give a chance to other normalizers (e.g.: DateTimeNormalizer)
-        if (!$this->resourceClassResolver->isResourceClass($className)) {
-            $context['resource_class'] = $className;
-
-            if ($this->serializer instanceof DenormalizerInterface) {
-                return $this->serializer->denormalize($value, $className, $format, $context);
-            }
-            throw new LogicException(sprintf('The injected serializer must be an instance of "%s".', DenormalizerInterface::class));
-        }
-
         if (!\is_array($value) || !isset($value['id'], $value['type'])) {
             throw new NotNormalizableValueException('Only resource linkage supported currently, see: http://jsonapi.org/format/#document-resource-object-linkage.');
         }
@@ -219,8 +206,6 @@ final class ItemNormalizer extends AbstractItemNormalizer
             if (isset($context['operation_type'], $context['subresource_resources'][$resourceClass]) && OperationType::SUBRESOURCE === $context['operation_type']) {
                 $iri = $this->iriConverter->getItemIriFromResourceClass($resourceClass, $context['subresource_resources'][$resourceClass]);
             } else {
-                unset($context['resource_class']);
-
                 if ($this->serializer instanceof NormalizerInterface) {
                     return $this->serializer->normalize($relatedObject, $format, $context);
                 }

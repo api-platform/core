@@ -19,7 +19,7 @@ use ApiPlatform\Core\Api\UrlGeneratorInterface;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\Exception\RuntimeException;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
-use ApiPlatform\Core\Util\ClassInfoTrait;
+use ApiPlatform\Core\Util\ResourceClassInfoTrait;
 use Doctrine\ORM\Event\OnFlushEventArgs;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\Mercure\Update;
@@ -35,9 +35,8 @@ use Symfony\Component\Serializer\SerializerInterface;
  */
 final class PublishMercureUpdatesListener
 {
-    use ClassInfoTrait;
+    use ResourceClassInfoTrait;
 
-    private $resourceClassResolver;
     private $iriConverter;
     private $resourceMetadataFactory;
     private $serializer;
@@ -120,8 +119,7 @@ final class PublishMercureUpdatesListener
      */
     private function storeEntityToPublish($entity, string $property): void
     {
-        $resourceClass = $this->getObjectClass($entity);
-        if (!$this->resourceClassResolver->isResourceClass($resourceClass)) {
+        if (null === $resourceClass = $this->getResourceClass($entity)) {
             return;
         }
 

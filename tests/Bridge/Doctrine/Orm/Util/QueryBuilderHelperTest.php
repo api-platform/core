@@ -22,6 +22,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\QueryBuilder;
 use PHPUnit\Framework\TestCase;
+use Prophecy\Argument;
 
 class QueryBuilderHelperTest extends TestCase
 {
@@ -51,6 +52,33 @@ class QueryBuilderHelperTest extends TestCase
 
         $this->assertSame($expectedAlias,
             $queryBuilder->getDQLPart('join')[$originAliasForJoinOnce ?? 'f'][0]->getAlias());
+    }
+
+    /**
+     * @dataProvider provideAddJoinOnce
+     */
+    public function testAddJoinOnceWithSpecifiedNewAlias()
+    {
+        $queryBuilder = new QueryBuilder($this->prophesize(EntityManagerInterface::class)->reveal());
+        $queryBuilder->from('foo', 'f');
+
+        $queryNameGenerator = $this->prophesize(QueryNameGeneratorInterface::class);
+        $queryNameGenerator->generateJoinAlias(Argument::any())->shouldNotbeCalled();
+
+        QueryBuilderHelper::addJoinOnce(
+            $queryBuilder,
+            $queryNameGenerator->reveal(),
+            'f',
+            'bar',
+            null,
+            null,
+            null,
+            null,
+            'f_8'
+        );
+
+        $this->assertSame('f_8',
+            $queryBuilder->getDQLPart('join')['f'][0]->getAlias());
     }
 
     public function testGetEntityClassByAliasWithJoinByAssociation(): void

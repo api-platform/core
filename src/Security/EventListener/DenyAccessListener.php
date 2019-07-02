@@ -50,8 +50,6 @@ final class DenyAccessListener
     }
 
     /**
-     * Sets the applicable format to the HttpFoundation Request.
-     *
      * @throws AccessDeniedException
      */
     public function onKernelRequest(GetResponseEvent $event): void
@@ -71,6 +69,7 @@ final class DenyAccessListener
 
         $extraVariables = $request->attributes->all();
         $extraVariables['object'] = $request->attributes->get('data');
+        $extraVariables['previous_object'] = $request->attributes->get('previous_data');
         $extraVariables['request'] = $request;
 
         if (!$this->resourceAccessChecker->isGranted($attributes['resource_class'], $isGranted, $extraVariables)) {

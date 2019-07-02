@@ -24,7 +24,8 @@ Feature: JSON API Inclusion of Related Resources
                 "_id": 1,
                 "foo": "Foo #1",
                 "bar": "Bar #1",
-                "baz": "Baz #1"
+                "baz": "Baz #1",
+                "name_converted": "NameConverted #1"
             },
             "relationships": {
                 "group": {
@@ -65,7 +66,8 @@ Feature: JSON API Inclusion of Related Resources
                 "_id": 1,
                 "foo": "Foo #1",
                 "bar": "Bar #1",
-                "baz": "Baz #1"
+                "baz": "Baz #1",
+                "name_converted": "NameConverted #1"
             },
             "relationships": {
                 "group": {
@@ -166,7 +168,8 @@ Feature: JSON API Inclusion of Related Resources
                 "_id": 1,
                 "foo": "Foo #1",
                 "bar": "Bar #1",
-                "baz": "Baz #1"
+                "baz": "Baz #1",
+                "name_converted": null
             },
             "relationships": {
                 "group": {
@@ -245,7 +248,8 @@ Feature: JSON API Inclusion of Related Resources
                 "_id": 1,
                 "foo": "Foo #1",
                 "bar": "Bar #1",
-                "baz": "Baz #1"
+                "baz": "Baz #1",
+                "name_converted": null
             },
             "relationships": {
                 "group": {
@@ -413,7 +417,8 @@ Feature: JSON API Inclusion of Related Resources
                     "_id": 1,
                     "foo": "Foo #1",
                     "bar": "Bar #1",
-                    "baz": "Baz #1"
+                    "baz": "Baz #1",
+                    "name_converted": "NameConverted #1"
                 },
                 "relationships": {
                     "group": {
@@ -431,7 +436,8 @@ Feature: JSON API Inclusion of Related Resources
                     "_id": 2,
                     "foo": "Foo #2",
                     "bar": "Bar #2",
-                    "baz": "Baz #2"
+                    "baz": "Baz #2",
+                    "name_converted": "NameConverted #2"
                 },
                 "relationships": {
                     "group": {
@@ -449,7 +455,8 @@ Feature: JSON API Inclusion of Related Resources
                     "_id": 3,
                     "foo": "Foo #3",
                     "bar": "Bar #3",
-                    "baz": "Baz #3"
+                    "baz": "Baz #3",
+                    "name_converted": "NameConverted #3"
                 },
                 "relationships": {
                     "group": {
@@ -522,7 +529,8 @@ Feature: JSON API Inclusion of Related Resources
                     "_id": 1,
                     "foo": "Foo #1",
                     "bar": "Bar #1",
-                    "baz": "Baz #1"
+                    "baz": "Baz #1",
+                    "name_converted": null
                 },
                 "relationships": {
                     "group": {
@@ -540,7 +548,8 @@ Feature: JSON API Inclusion of Related Resources
                     "_id": 2,
                     "foo": "Foo #2",
                     "bar": "Bar #2",
-                    "baz": "Baz #2"
+                    "baz": "Baz #2",
+                    "name_converted": null
                 },
                 "relationships": {
                     "group": {
@@ -558,7 +567,8 @@ Feature: JSON API Inclusion of Related Resources
                     "_id": 3,
                     "foo": "Foo #3",
                     "bar": "Bar #3",
-                    "baz": "Baz #3"
+                    "baz": "Baz #3",
+                    "name_converted": null
                 },
                 "relationships": {
                     "group": {
@@ -610,7 +620,8 @@ Feature: JSON API Inclusion of Related Resources
                 "_id": 1,
                 "foo": "Foo #1",
                 "bar": "Bar #1",
-                "baz": "Baz #1"
+                "baz": "Baz #1",
+                "name_converted": null
             },
             "relationships": {
                 "groups": {
@@ -627,7 +638,8 @@ Feature: JSON API Inclusion of Related Resources
                 "_id": 2,
                 "foo": "Foo #2",
                 "bar": "Bar #2",
-                "baz": "Baz #2"
+                "baz": "Baz #2",
+                "name_converted": null
             },
             "relationships": {
                 "groups": {

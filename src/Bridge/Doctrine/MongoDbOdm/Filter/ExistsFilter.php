@@ -19,6 +19,7 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ODM\MongoDB\Aggregation\Builder;
 use Doctrine\ODM\MongoDB\Mapping\ClassMetadata;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 
 /**
  * Filters the collection by whether a property value exists or not.
@@ -39,9 +40,9 @@ final class ExistsFilter extends AbstractFilter implements ExistsFilterInterface
 {
     use ExistsFilterTrait;
 
-    public function __construct(ManagerRegistry $managerRegistry, LoggerInterface $logger = null, array $properties = null, string $existsParameterName = self::QUERY_PARAMETER_KEY)
+    public function __construct(ManagerRegistry $managerRegistry, LoggerInterface $logger = null, array $properties = null, string $existsParameterName = self::QUERY_PARAMETER_KEY, NameConverterInterface $nameConverter = null)
     {
-        parent::__construct($managerRegistry, $logger, $properties);
+        parent::__construct($managerRegistry, $logger, $properties, $nameConverter);
 
         $this->existsParameterName = $existsParameterName;
     }
@@ -59,7 +60,7 @@ final class ExistsFilter extends AbstractFilter implements ExistsFilterInterface
         }
 
         foreach ($context['filters'][$this->existsParameterName] as $property => $value) {
-            $this->filterProperty($property, $value, $aggregationBuilder, $resourceClass, $operationName, $context);
+            $this->filterProperty($this->denormalizePropertyName($property), $value, $aggregationBuilder, $resourceClass, $operationName, $context);
         }
     }
 

@@ -58,14 +58,18 @@ trait RangeFilterTrait
 
     abstract protected function getLogger(): LoggerInterface;
 
+    abstract protected function normalizePropertyName($property);
+
     /**
      * Gets filter description.
      */
     protected function getFilterDescription(string $fieldName, string $operator): array
     {
+        $propertyName = $this->normalizePropertyName($fieldName);
+
         return [
-            sprintf('%s[%s]', $fieldName, $operator) => [
-                'property' => $fieldName,
+            sprintf('%s[%s]', $propertyName, $operator) => [
+                'property' => $propertyName,
                 'type' => 'string',
                 'required' => false,
             ],

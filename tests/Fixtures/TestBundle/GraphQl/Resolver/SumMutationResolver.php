@@ -31,6 +31,12 @@ class SumMutationResolver implements MutationResolverInterface
      */
     public function __invoke($item, array $context)
     {
+        if (null !== $operandC = $context['args']['input']['operandC'] ?? null) {
+            $item->setResult((int) $operandC);
+
+            return $item;
+        }
+
         $item->setResult($item->getOperandA() + $item->getOperandB());
 
         return $item;

@@ -1,14 +1,12 @@
 includes:
 	- vendor/jangregor/phpstan-prophecy/src/extension.neon
-	- vendor/phpstan/phpstan-doctrine/extension.neon
-	- vendor/phpstan/phpstan-phpunit/extension.neon
-	- vendor/phpstan/phpstan-symfony/extension.neon
 
 parameters:
 	level: 6
 	paths:
 		- src
 		- tests
+		- tests/Fixtures/app/console
 	symfony:
 		container_xml_path: %rootDir%/../../../tests/Fixtures/app/var/cache/test/appAppKernelTestDebugContainer.xml
 		constant_hassers: false
@@ -18,6 +16,9 @@ parameters:
 		- %rootDir%/../../../tests/Fixtures/app/var/cache
 		# The Symfony Configuration API isn't good enough to be analysed
 		- %rootDir%/../../../src/Bridge/Symfony/Bundle/DependencyInjection/Configuration.php
+		# Imported code (temporary)
+		- %rootDir%/../../../src/Bridge/Symfony/Bundle/Test/BrowserKitAssertionsTrait.php
+		- %rootDir%/../../../tests/Bridge/Symfony/Bundle/Test/WebTestCaseTest.php
 	ignoreErrors:
 		# Real problems, hard to fix
 		- '#Parameter \#2 \$dqlPart of method Doctrine\\ORM\\QueryBuilder::add\(\) expects array\|object, string given\.#'
@@ -68,23 +69,29 @@ parameters:
 			message: '#Method ApiPlatform\\Core\\Bridge\\Doctrine\\Orm\\Util\\QueryBuilderHelper::mapJoinAliases() should return array<string, array<string>\|string> but returns array<int|string, mixed>\.#'
 			path: %currentWorkingDirectory%/src/Bridge/Doctrine/Orm/Util/QueryBuilderHelper.php
 		-
-			message: "#Call to function method_exists\\(\\) with 'Symfony\\\\\\\\Component.+' and 'addRemovedBindingIds?' will always evaluate to false\\.#"
+			message: "#Call to function method_exists\\(\\) with 'Symfony\\\\\\\\Component.+' and '(removeBindings|addRemovedBindingIds)' will always evaluate to false\\.#"
 			path: %currentWorkingDirectory%/tests/Bridge/Symfony/Bundle/DependencyInjection/ApiPlatformExtensionTest.php
+		-
+			message: "#Call to function method_exists\\(\\) with 'Symfony\\\\\\\\Component.+' and 'getReachableRoleNam.+' will always evaluate to false\\.#"
+			path: %currentWorkingDirectory%/tests/Security/EventListener/DenyAccessListenerTest.php
+		-
+			message: "#Call to function method_exists\\(\\) with 'Symfony\\\\\\\\Component.+' and 'getRoleNames' will always evaluate to false\\.#"
+			path: %currentWorkingDirectory%/tests/Security/EventListener/DenyAccessListenerTest.php
 		- "#Call to method PHPUnit\\\\Framework\\\\Assert::assertSame\\(\\) with array\\('(collection_context|item_context|subresource_context)'\\) and array<Symfony\\\\Component\\\\VarDumper\\\\Cloner\\\\Data>\\|bool\\|float\\|int\\|string\\|null will always evaluate to false\\.#"
 		# https://github.com/doctrine/doctrine2/pull/7298/files
 		- '#Strict comparison using === between null and int will always evaluate to false\.#'
 		-
 			message: '#Binary operation "\+" between (float\|int\|)?string and 0 results in an error\.#'
 			path: %currentWorkingDirectory%/src/Bridge/Doctrine/Common/Filter/RangeFilterTrait.php
+		- '#Parameter \#1 \$objectValue of method GraphQL\\Type\\Definition\\InterfaceType::resolveType\(\) expects object, array(<string, string>)? given.#'
 
 		# Expected, due to deprecations
-		- '#Method ApiPlatform\\Core\\Bridge\\Doctrine\\Orm\\Filter\\ExistsFilter::filterProperty\(\) invoked with 7 parameters, 5-6 required\.#'
 		- '#Method ApiPlatform\\Core\\Bridge\\Doctrine\\Orm\\Extension\\QueryResult(Item|Collection)ExtensionInterface::getResult\(\) invoked with 4 parameters, 1 required\.#'
 		- '#Method ApiPlatform\\Core\\Bridge\\Doctrine\\Orm\\Extension\\QueryResult(Item|Collection)ExtensionInterface::supportsResult\(\) invoked with 3 parameters, 1-2 required\.#'
 		- '#Method ApiPlatform\\Core\\Bridge\\Doctrine\\Orm\\Filter\\AbstractFilter::apply\(\) invoked with 5 parameters, 3-4 required\.#'
 		- '#Method ApiPlatform\\Core\\Bridge\\Doctrine\\Orm\\Filter\\AbstractFilter::filterProperty\(\) invoked with 7 parameters, 5-6 required\.#'
 		- '#Method ApiPlatform\\Core\\Bridge\\Doctrine\\Orm\\Filter\\FilterInterface::apply\(\) invoked with 5 parameters, 3-4 required\.#'
-		- '#Method ApiPlatform\\Core\\Bridge\\Doctrine\\Orm\\Filter\\OrderFilter::filterProperty\(\) invoked with 7 parameters, 5-6 required\.#'
+		- '#Method ApiPlatform\\Core\\Bridge\\Doctrine\\Orm\\Filter\\(Exists|Order)Filter::filterProperty\(\) invoked with 7 parameters, 5-6 required\.#'
 		- '#Method ApiPlatform\\Core\\DataProvider\\CollectionDataProviderInterface::getCollection\(\) invoked with 3 parameters, 1-2 required\.#'
 		- '#Method Symfony\\Component\\Serializer\\NameConverter\\NameConverterInterface::normalize\(\) invoked with 3 parameters, 1 required\.#'
 		- '#Method Symfony\\Component\\Serializer\\NameConverter\\NameConverterInterface::normalize\(\) invoked with 4 parameters, 1 required\.#'

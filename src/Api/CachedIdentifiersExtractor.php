@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Api;
 
-use ApiPlatform\Core\Util\ClassInfoTrait;
+use ApiPlatform\Core\Util\ResourceClassInfoTrait;
 use Psr\Cache\CacheException;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\PropertyAccess\PropertyAccess;
@@ -26,14 +26,13 @@ use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
  */
 final class CachedIdentifiersExtractor implements IdentifiersExtractorInterface
 {
-    use ClassInfoTrait;
+    use ResourceClassInfoTrait;
 
     public const CACHE_KEY_PREFIX = 'iri_identifiers';
 
     private $cacheItemPool;
     private $propertyAccessor;
     private $decorated;
-    private $resourceClassResolver;
     private $localCache = [];
     private $localResourceCache = [];
 
@@ -82,9 +81,7 @@ final class CachedIdentifiersExtractor implements IdentifiersExtractorInterface
                 continue;
             }
 
-            $relatedResourceClass = $this->getObjectClass($identifiers[$propertyName]);
-
-            if (null !== $this->resourceClassResolver && !$this->resourceClassResolver->isResourceClass($relatedResourceClass)) {
+            if (null === $relatedResourceClass = $this->getResourceClass($identifiers[$propertyName])) {
                 continue;
             }
 

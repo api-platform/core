@@ -63,7 +63,7 @@ Feature: Collections filtering
     }
     """
     Then the JSON node "data.dummies.edges" should have 1 element
-    And the JSON node "data.dummies.edges[0].node.dummyDate" should be equal to "2015-04-02T00:00:00+00:00"
+    And the JSON node "data.dummies.edges[0].node.dummyDate" should be equal to "2015-04-02"
 
   @createSchema
   Scenario: Retrieve a collection filtered using the search filter

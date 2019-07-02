@@ -76,14 +76,17 @@ final class ObjectNormalizer implements NormalizerInterface, CacheableSupportsMe
             throw new UnexpectedValueException('Expected data to be an array');
         }
 
-        // when using an output class, get the IRI from the resource
-        if (isset($originalResource) && isset($data['id'])) {
+        if (!isset($originalResource)) {
+            return $data;
+        }
+
+        if (isset($data['id'])) {
             $data['_id'] = $data['id'];
             $data['id'] = $this->iriConverter->getIriFromItem($originalResource);
         }
 
-        $data[self::ITEM_RESOURCE_CLASS_KEY] = $this->getObjectClass($object);
-        $data[self::ITEM_IDENTIFIERS_KEY] = $this->identifiersExtractor->getIdentifiersFromItem($object);
+        $data[self::ITEM_RESOURCE_CLASS_KEY] = $this->getObjectClass($originalResource);
+        $data[self::ITEM_IDENTIFIERS_KEY] = $this->identifiersExtractor->getIdentifiersFromItem($originalResource);
 
         return $data;
     }

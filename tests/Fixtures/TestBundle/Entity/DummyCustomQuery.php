@@ -29,8 +29,27 @@ use Doctrine\ORM\Mapping as ORM;
  *         "item_query"="app.graphql.query_resolver.dummy_custom_not_retrieved_item",
  *         "args"={}
  *     },
+ *     "testItemCustomArguments"={
+ *         "item_query"="app.graphql.query_resolver.dummy_custom_item",
+ *         "args"={
+ *             "id"={"type"="ID"},
+ *             "customArgumentNullableBool"={"type"="Boolean"},
+ *             "customArgumentBool"={"type"="Boolean!"},
+ *             "customArgumentInt"={"type"="Int!"},
+ *             "customArgumentString"={"type"="String!"},
+ *             "customArgumentFloat"={"type"="Float!"},
+ *             "customArgumentIntArray"={"type"="[Int!]!"},
+ *             "customArgumentCustomType"={"type"="DateTime!"}
+ *         }
+ *     },
  *     "testCollection"={
  *         "collection_query"="app.graphql.query_resolver.dummy_custom_collection"
+ *     },
+ *     "testCollectionCustomArguments"={
+ *         "collection_query"="app.graphql.query_resolver.dummy_custom_collection",
+ *         "args"={
+ *             "customArgumentString"={"type"="String!"}
+ *         }
  *     }
  * })
  * @ORM\Entity
@@ -50,4 +69,9 @@ class DummyCustomQuery
      * @var string
      */
     public $message;
+
+    /**
+     * @var array
+     */
+    public $customArgs = [];
 }

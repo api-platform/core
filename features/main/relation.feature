@@ -491,7 +491,7 @@ Feature: Relations support
     Given there are people having pets
     When I add "Content-Type" header equal to "application/ld+json"
     And I send a "GET" request to "/people"
-    And the response status code should be 200
+    Then the response status code should be 200
     And the response should be in JSON
     And the JSON should be equal to:
     """
@@ -559,7 +559,7 @@ Feature: Relations support
     """
 
   Scenario: Eager load relations should not be duplicated
-    Given there is a order with same customer and receiver
+    Given there is an order with same customer and recipient
     When I add "Content-Type" header equal to "application/ld+json"
     And I send a "GET" request to "/orders"
     Then the response status code should be 200
@@ -621,8 +621,6 @@ Feature: Relations support
     }
     """
 
-
-  @dropSchema
   Scenario: Passing an invalid IRI to a relation
     When I add "Content-Type" header equal to "application/ld+json"
     And I send a "POST" request to "/relation_embedders" with body:
@@ -634,7 +632,7 @@ Feature: Relations support
     Then the response status code should be 400
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
-    And the JSON node "hydra:description" should contain "Invalid value provided (invalid IRI?)."
+    And the JSON node "hydra:description" should contain 'Invalid IRI "certainly not an iri and not a plain identifier".'
 
   Scenario: Passing an invalid type to a relation
     When I add "Content-Type" header equal to "application/ld+json"
@@ -647,4 +645,32 @@ Feature: Relations support
     Then the response status code should be 400
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
-    And the JSON node "hydra:description" should contain "Invalid value provided (invalid IRI?)."
+    And the JSON should be valid according to this schema:
+    """
+    {
+      "type": "object",
+      "properties": {
+        "@context": {
+          "type": "string",
+          "pattern": "^/contexts/Error$"
+        },
+        "@type": {
+          "type": "string",
+          "pattern": "^hydra:Error$"
+        },
+        "hydra:title": {
+          "type": "string",
+          "pattern": "^An error occurred$"
+        },
+        "hydra:description": {
+          "pattern": "^Expected IRI or document for resource \"ApiPlatform\\\\Core\\\\Tests\\\\Fixtures\\\\TestBundle\\\\(Document|Entity)\\\\RelatedDummy\", \"integer\" given.$"
+        }
+      },
+      "required": [
+        "@context",
+        "@type",
+        "hydra:title",
+        "hydra:description"
+      ]
+    }
+    """

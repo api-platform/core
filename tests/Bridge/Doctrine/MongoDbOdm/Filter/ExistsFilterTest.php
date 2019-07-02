@@ -19,6 +19,8 @@ use ApiPlatform\Core\Tests\Bridge\Doctrine\Common\Filter\ExistsFilterTestTrait;
 use Doctrine\Common\Persistence\ManagerRegistry;
 
 /**
+ * @group mongodb
+ *
  * @author Alan Poulain <contact@alanpoulain.eu>
  */
 class ExistsFilterTest extends DoctrineMongoDbOdmFilterTestCase

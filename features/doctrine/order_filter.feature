@@ -882,3 +882,107 @@ Feature: Order filter on collections
       }
     }
     """
+
+  @createSchema
+  Scenario: Get collection filtered using a name converter
+    Given there are 3 convertedInteger objects
+    When I send a "GET" request to "/converted_integers?order[name_converted]=desc"
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+    And the JSON should be valid according to this schema:
+    """
+    {
+      "type": "object",
+      "properties": {
+        "@context": {"pattern": "^/contexts/ConvertedInteger$"},
+        "@id": {"pattern": "^/converted_integers$"},
+        "@type": {"pattern": "^hydra:Collection$"},
+        "hydra:member": {
+          "type": "array",
+          "items": [
+            {
+              "type": "object",
+              "properties": {
+                "@id": {"pattern": "^/converted_integers/3$"},
+                "@type":  {"pattern": "^ConvertedInteger$"},
+                "name_converted": {"type": "integer"},
+                "id": {"type": "integer", "minimum":3, "maximum": 3}
+              },
+              "required": ["@id", "@type", "name_converted", "id"],
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "@id": {"pattern": "^/converted_integers/2$"},
+                "@type":  {"pattern": "^ConvertedInteger$"},
+                "name_converted": {"type": "integer"},
+                "id": {"type": "integer", "minimum":2, "maximum": 2}
+              },
+              "required": ["@id", "@type", "name_converted", "id"],
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "@id": {"pattern": "^/converted_integers/1$"},
+                "@type":  {"pattern": "^ConvertedInteger$"},
+                "name_converted": {"type": "integer"},
+                "id": {"type": "integer", "minimum":1, "maximum": 1}
+              },
+              "required": ["@id", "@type", "name_converted", "id"],
+              "additionalProperties": false
+            }
+          ],
+          "minItems": 3,
+          "maxItems": 3,
+          "uniqueItems": true
+        },
+        "hydra:totalItems": {"type": "integer", "minimum": 3, "maximum": 3},
+        "hydra:view": {
+          "type": "object",
+          "properties": {
+            "@id": {"pattern": "^/converted_integers\\?order%5Bname_converted%5D=desc$"},
+            "@type": {"pattern": "^hydra:PartialCollectionView$"}
+          },
+          "required": ["@id", "@type"],
+          "additionalProperties": false
+        },
+        "hydra:search": {
+          "type": "object",
+          "properties": {
+            "@type": {"pattern": "^hydra:IriTemplate$"},
+            "hydra:template": {"pattern": "^/converted_integers\\{\\?.*order\\[name_converted\\].*\\}$"},
+            "hydra:variableRepresentation": {"pattern": "^BasicRepresentation$"},
+            "hydra:mapping": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "@type": {"pattern": "^IriTemplateMapping$"},
+                  "variable": {
+                    "oneOf": [
+                      {"pattern": "^order\\[name_converted\\]$"},
+                      {"pattern": "^name_converted(\\[(between|gt|gte|lt|lte)?\\])?$"}
+                    ]
+                  },
+                  "property": {"pattern": "^name_converted$"},
+                  "required": {"type": "boolean"}
+                },
+                "required": ["@type", "variable", "property", "required"],
+                "additionalProperties": false
+              },
+              "minItems": 8,
+              "maxItems": 8,
+              "uniqueItems": true
+            }
+          },
+          "additionalProperties": false,
+          "required": ["@type", "hydra:template", "hydra:variableRepresentation", "hydra:mapping"]
+        },
+        "additionalProperties": false,
+        "required": ["@context", "@id", "@type", "hydra:member", "hydra:totalItems", "hydra:view", "hydra:search"]
+      }
+    }
+    """

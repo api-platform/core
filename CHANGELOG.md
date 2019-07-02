@@ -4,6 +4,74 @@
 
 * GraphQL: Add support for custom types
 
+## 2.4.5
+
+* Fix denormalization of a constructor argument which is a collection of non-resources
+* Allow custom operations to return a different class than the expected resource class
+
+## 2.4.4
+
+* Store the original data in the `previous_data` request attribute, and allow to access it in security expressions using the `previous_object` variable (useful for PUT and PATCH requests)
+* Fix resource inheritance handling
+* Fix BC break in `AbstractItemNormalizer` introduced in 2.4
+* Fix serialization when using interface as resource
+* Basic compatibility with Symfony 4.3
+
+## 2.4.3
+
+* Doctrine: allow autowiring of filter classes
+* Doctrine: don't use `fetchJoinCollection` on `Paginator` when not needed
+* Doctrine: fix a BC break in `OrderFilter`
+* GraphQL: input objects aren't nullable anymore (compliance with the Relay spec)
+* Cache: Remove some useless purges
+* Mercure: publish to Mercure using the default response format
+* Mercure: use the Serializer context
+* OpenAPI: fix documentation of the `PropertyFilter`
+* OpenAPI: fix generation of the `servers` block (also fixes the compatibility with Postman)
+* OpenAPI: skip not readable and not writable properties from the spec
+* OpenAPI: add the `id` path parameter for POST item operation
+* Serializer: add support for Symfony Serializer's `@SerializedName` metadata
+* Metadata: `ApiResource`'s `attributes` property now defaults to `null`, as expected
+* Metadata: Fix identifier support when using an interface as resource class
+* Metadata: the HTTP method is now always uppercased
+* Allow to disable listeners per operation (fix handling of empty request content)
+
+    Previously, empty request content was allowed for any `POST` and `PUT` operations. This was an unsafe assumption which caused [other problems](https://github.com/api-platform/core/issues/2731).
+
+    If you wish to allow empty request content, please add `"deserialize"=false` to the operation's attributes. For example:
+
+    ```php
+    <?php
+    // api/src/Entity/Book.php
+
+    use ApiPlatform\Core\Annotation\ApiResource;
+    use App\Controller\PublishBookAction;
+
+    /**
+     * @ApiResource(
+     *     itemOperations={
+     *         "put_publish"={
+     *             "method"="PUT",
+     *             "path"="/books/{id}/publish",
+     *             "controller"=PublishBookAction::class,
+     *             "deserialize"=false,
+     *         },
+     *     },
+     * )
+     */
+    class Book
+    {
+    ```
+
+    You may also need to add `"validate"=false` if the controller result is `null` (possibly because you don't need to persist the resource).
+
+* Return the `204` HTTP status code when the output class is set to `null`
+* Be more resilient when normalizing non-resource objects
+* Replace the `data` request attribute by the return of the data persister
+* Fix error message in identifiers extractor
+* Improve the bundle's default configuration when using `symfony/symfony` is required
+* Fix the use of `MetadataAwareNameConverter` when available (configuring `name_converter: serializer.name_converter.metadata_aware` will now result in a circular reference error)
+
 ## 2.4.2
 
 * Fix a dependency injection injection problem in `FilterEagerLoadingExtension`

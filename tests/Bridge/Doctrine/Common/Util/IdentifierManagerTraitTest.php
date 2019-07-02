@@ -70,6 +70,7 @@ class IdentifierManagerTraitTest extends TestCase
 
     /**
      * @group legacy
+     * @group mongodb
      */
     public function testSingleDocumentIdentifier()
     {

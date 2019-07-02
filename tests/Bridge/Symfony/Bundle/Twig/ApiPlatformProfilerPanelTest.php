@@ -38,7 +38,7 @@ class ApiPlatformProfilerPanelTest extends WebTestCase
     private $schemaTool;
     private $env;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
         $kernel = self::bootKernel();
@@ -56,7 +56,7 @@ class ApiPlatformProfilerPanelTest extends WebTestCase
         $this->schemaTool->createSchema($classes);
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         $this->schemaTool->dropSchema($this->manager->getMetadataFactory()->getAllMetadata());
         $this->manager->clear();
@@ -78,7 +78,7 @@ class ApiPlatformProfilerPanelTest extends WebTestCase
         $block = $crawler->filter('div[class*=sf-toolbar-block-api_platform]');
 
         // Check extra info content
-        $this->assertContains('sf-toolbar-status-default', $block->attr('class'), 'The toolbar block should have the default color.');
+        $this->assertStringContainsString('sf-toolbar-status-default', $block->attr('class'), 'The toolbar block should have the default color.');
         $this->assertSame('Not an API Platform resource', $block->filter('.sf-toolbar-info-piece span')->html());
     }
 
@@ -96,8 +96,8 @@ class ApiPlatformProfilerPanelTest extends WebTestCase
         $block = $crawler->filter('div[class*=sf-toolbar-block-api_platform]');
 
         // Check extra info content
-        $this->assertContains('sf-toolbar-status-default', $block->attr('class'), 'The toolbar block should have the default color.');
-        $this->assertSame('test_mongodb' === $this->env ? DocumentDummy::class : Dummy::class, $block->filter('.sf-toolbar-info-piece span')->html());
+        $this->assertStringContainsString('sf-toolbar-status-default', $block->attr('class'), 'The toolbar block should have the default color.');
+        $this->assertSame('mongodb' === $this->env ? DocumentDummy::class : Dummy::class, $block->filter('.sf-toolbar-info-piece span')->html());
     }
 
     public function testProfilerGeneralLayoutNotResourceClass()
@@ -136,7 +136,7 @@ class ApiPlatformProfilerPanelTest extends WebTestCase
 
         $metrics = $crawler->filter('.metrics');
         $this->assertCount(1, $metrics->filter('.metric'), 'The should be one metric displayed (resource class).');
-        $this->assertSame('test_mongodb' === $this->env ? DocumentDummy::class : Dummy::class, $metrics->filter('span.value')->html());
+        $this->assertSame('mongodb' === $this->env ? DocumentDummy::class : Dummy::class, $metrics->filter('span.value')->html());
 
         $this->assertCount(3, $crawler->filter('.sf-tabs .tab'), 'Tabs must be presents on the panel.');
 
@@ -177,13 +177,13 @@ class ApiPlatformProfilerPanelTest extends WebTestCase
         // Data provider tab
         $tabContent = $crawler->filter('.tab:nth-of-type(2) .tab-content');
         $this->assertSame('TRUE', $tabContent->filter('table tbody .status-success')->html());
-        $this->assertContains('test_mongodb' === $this->env ? OdmCollectionDataProvider::class : CollectionDataProvider::class, $tabContent->filter('table tbody')->html());
+        $this->assertStringContainsString('mongodb' === $this->env ? OdmCollectionDataProvider::class : CollectionDataProvider::class, $tabContent->filter('table tbody')->html());
 
-        $this->assertContains('No calls to item data provider have been recorded.', $tabContent->html());
-        $this->assertContains('No calls to subresource data provider have been recorded.', $tabContent->html());
+        $this->assertStringContainsString('No calls to item data provider have been recorded.', $tabContent->html());
+        $this->assertStringContainsString('No calls to subresource data provider have been recorded.', $tabContent->html());
 
         // Data persiters tab
-        $this->assertContains('No calls to data persister have been recorded.', $crawler->filter('.tab:nth-of-type(3) .tab-content .empty')->html());
+        $this->assertStringContainsString('No calls to data persister have been recorded.', $crawler->filter('.tab:nth-of-type(3) .tab-content .empty')->html());
     }
 
     public function testPostCollectionProfiler()
@@ -202,14 +202,14 @@ class ApiPlatformProfilerPanelTest extends WebTestCase
 
         // Data provider tab
         $tabContent = $crawler->filter('.tab:nth-of-type(2) .tab-content');
-        $this->assertContains('No calls to collection data provider have been recorded.', $tabContent->html());
-        $this->assertContains('No calls to item data provider have been recorded.', $tabContent->html());
-        $this->assertContains('No calls to subresource data provider have been recorded.', $tabContent->html());
+        $this->assertStringContainsString('No calls to collection data provider have been recorded.', $tabContent->html());
+        $this->assertStringContainsString('No calls to item data provider have been recorded.', $tabContent->html());
+        $this->assertStringContainsString('No calls to subresource data provider have been recorded.', $tabContent->html());
 
         // Data persiters tab
         $tabContent = $crawler->filter('.tab:nth-of-type(3) .tab-content');
         $this->assertSame('TRUE', $tabContent->filter('table tbody .status-success')->html());
-        $this->assertContains(DataPersister::class, $tabContent->filter('table tbody')->html());
+        $this->assertStringContainsString(DataPersister::class, $tabContent->filter('table tbody')->html());
     }
 
     /**
@@ -241,12 +241,12 @@ class ApiPlatformProfilerPanelTest extends WebTestCase
         $this->assertSame(ContainNonResourceItemDataProvider::class, $tabContent->filter('table tbody tr:first-of-type td:nth-of-type(3)')->html());
 
         $this->assertSame('TRUE', $tabContent->filter('table tbody .status-success')->html());
-        $this->assertContains('test_mongodb' === $this->env ? OdmItemDataProvider::class : ItemDataProvider::class, $tabContent->filter('table tbody')->html());
+        $this->assertStringContainsString('mongodb' === $this->env ? OdmItemDataProvider::class : ItemDataProvider::class, $tabContent->filter('table tbody')->html());
 
-        $this->assertContains('No calls to collection data provider have been recorded.', $tabContent->html());
-        $this->assertContains('No calls to subresource data provider have been recorded.', $tabContent->html());
+        $this->assertStringContainsString('No calls to collection data provider have been recorded.', $tabContent->html());
+        $this->assertStringContainsString('No calls to subresource data provider have been recorded.', $tabContent->html());
 
         // Data persiters tab
-        $this->assertContains('No calls to data persister have been recorded.', $crawler->filter('.tab:nth-of-type(3) .tab-content .empty')->html());
+        $this->assertStringContainsString('No calls to data persister have been recorded.', $crawler->filter('.tab:nth-of-type(3) .tab-content .empty')->html());
     }
 }

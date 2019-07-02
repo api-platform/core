@@ -8,8 +8,6 @@ framework:
     session:
         storage_id:                    'session.storage.mock_file'
     form:                              ~ # For FOSUser
-    templating:
-        engines:                       ['twig'] # For Swagger UI
     profiler:
         enabled:                        true
         collect:                        false
@@ -29,13 +27,6 @@ doctrine:
     orm:
         auto_generate_proxy_classes:   '%kernel.debug%'
         auto_mapping:                  true
-
-doctrine_mongodb:
-    connections:
-        default:                       ~
-    document_managers:
-        default:
-            auto_mapping:              true
 
 twig:
     strict_variables: '%kernel.debug%'
@@ -134,10 +125,8 @@ services:
         arguments: ['@doctrine']
         tags: ['api_platform.filter']
 
-    ApiPlatform\Core\Tests\Fixtures\TestBundle\Controller\DummyDtoNoInput\CreateItemAction:
-        tags: ['controller.service_arguments']
-
-    ApiPlatform\Core\Tests\Fixtures\TestBundle\Controller\DummyDtoNoInput\DoubleBatAction:
+    ApiPlatform\Core\Tests\Fixtures\TestBundle\Controller\:
+        resource: '../../TestBundle/Controller'
         tags: ['controller.service_arguments']
 
     app.config_dummy_resource.action:
@@ -151,7 +140,7 @@ services:
 
     app.entity.filter.dummy_property.whitelist_property:
         parent:    'api_platform.serializer.property_filter'
-        arguments: [ 'whitelisted_properties', false, [foo] ]
+        arguments: [ 'whitelisted_properties', false, [foo, nameConverted] ]
         tags:      [ { name: 'api_platform.filter', id: 'dummy_property.whitelist_property' } ]
 
     app.entity.filter.dummy_property.whitelist_nested_property:
@@ -280,3 +269,15 @@ services:
         public: false
         tags:
             - { name: 'api_platform.graphql.mutation_resolver' }
+
+    app.graphql.date_time_type:
+        class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\GraphQl\Type\Definition\DateTimeType'
+        public: false
+        tags:
+            - { name: 'api_platform.graphql.type' }
+
+    app.graphql.type_converter:
+        class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\GraphQl\Type\TypeConverter'
+        decorates: 'api_platform.graphql.type_converter'
+        arguments: ['@app.graphql.type_converter.inner']
+        public: false

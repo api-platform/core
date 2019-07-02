@@ -53,9 +53,9 @@ final class ItemNormalizer extends AbstractItemNormalizer
     /**
      * {@inheritdoc}
      */
-    public function supportsNormalization($data, $format = null, array $context = []): bool
+    public function supportsNormalization($data, $format = null): bool
     {
-        return self::FORMAT === $format && parent::supportsNormalization($data, $format, $context);
+        return self::FORMAT === $format && parent::supportsNormalization($data, $format);
     }
 
     /**
@@ -65,12 +65,11 @@ final class ItemNormalizer extends AbstractItemNormalizer
      */
     public function normalize($object, $format = null, array $context = [])
     {
-        if (null !== $outputClass = $this->getOutputClass($this->getObjectClass($object), $context)) {
+        if (null !== $this->getOutputClass($this->getObjectClass($object), $context)) {
             return parent::normalize($object, $format, $context);
         }
 
-        // Use resolved resource class instead of given resource class to support multiple inheritance child types
-        $resourceClass = $this->resourceClassResolver->getResourceClass($object, $context['resource_class'] ?? null, true);
+        $resourceClass = $this->resourceClassResolver->getResourceClass($object, $context['resource_class'] ?? null);
         $context = $this->initContext($resourceClass, $context);
         $iri = $this->iriConverter->getIriFromItem($object);
         $context['iri'] = $iri;
@@ -94,9 +93,9 @@ final class ItemNormalizer extends AbstractItemNormalizer
     /**
      * {@inheritdoc}
      */
-    public function supportsDenormalization($data, $type, $format = null, array $context = []): bool
+    public function supportsDenormalization($data, $type, $format = null): bool
     {
-        return self::FORMAT === $format && parent::supportsDenormalization($data, $type, $format, $context);
+        return self::FORMAT === $format && parent::supportsDenormalization($data, $type, $format);
     }
 
     /**

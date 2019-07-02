@@ -82,8 +82,8 @@ class ItemNormalizerTest extends TestCase
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
 
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
-        $resourceClassResolverProphecy->isResourceClass(Dummy::class)->willReturn(true)->shouldBeCalled();
-        $resourceClassResolverProphecy->isResourceClass(\stdClass::class)->willReturn(false)->shouldBeCalled();
+        $resourceClassResolverProphecy->isResourceClass(Dummy::class)->willReturn(true);
+        $resourceClassResolverProphecy->isResourceClass(\stdClass::class)->willReturn(false);
 
         $nameConverter = $this->prophesize(NameConverterInterface::class);
 
@@ -111,32 +111,33 @@ class ItemNormalizerTest extends TestCase
 
         $propertyNameCollection = new PropertyNameCollection(['name', 'relatedDummy']);
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
-        $propertyNameCollectionFactoryProphecy->create(Dummy::class, [])->willReturn($propertyNameCollection)->shouldBeCalled();
+        $propertyNameCollectionFactoryProphecy->create(Dummy::class, [])->willReturn($propertyNameCollection);
 
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
         $propertyMetadataFactoryProphecy->create(Dummy::class, 'name', [])->willReturn(
             new PropertyMetadata(new Type(Type::BUILTIN_TYPE_STRING), '', true)
-        )->shouldBeCalled();
+        );
         $propertyMetadataFactoryProphecy->create(Dummy::class, 'relatedDummy', [])->willReturn(
             new PropertyMetadata(new Type(Type::BUILTIN_TYPE_OBJECT, false, RelatedDummy::class), '', true, false, false)
-        )->shouldBeCalled();
+        );
 
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
-        $iriConverterProphecy->getIriFromItem($dummy)->willReturn('/dummies/1')->shouldBeCalled();
-        $iriConverterProphecy->getIriFromItem($relatedDummy)->willReturn('/related-dummies/2')->shouldBeCalled();
+        $iriConverterProphecy->getIriFromItem($dummy)->willReturn('/dummies/1');
+        $iriConverterProphecy->getIriFromItem($relatedDummy)->willReturn('/related-dummies/2');
 
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
-        $resourceClassResolverProphecy->getResourceClass($dummy, null, true)->willReturn(Dummy::class)->shouldBeCalled();
-        $resourceClassResolverProphecy->getResourceClass($dummy, Dummy::class, true)->willReturn(Dummy::class)->shouldBeCalled();
-        $resourceClassResolverProphecy->isResourceClass(RelatedDummy::class)->willReturn(true)->shouldBeCalled();
+        $resourceClassResolverProphecy->getResourceClass($dummy, null)->willReturn(Dummy::class);
+        $resourceClassResolverProphecy->getResourceClass($dummy, Dummy::class)->willReturn(Dummy::class);
+        $resourceClassResolverProphecy->getResourceClass($relatedDummy, RelatedDummy::class)->willReturn(RelatedDummy::class);
+        $resourceClassResolverProphecy->isResourceClass(RelatedDummy::class)->willReturn(true);
 
         $serializerProphecy = $this->prophesize(SerializerInterface::class);
         $serializerProphecy->willImplement(NormalizerInterface::class);
-        $serializerProphecy->normalize('hello', null, Argument::type('array'))->willReturn('hello')->shouldBeCalled();
+        $serializerProphecy->normalize('hello', null, Argument::type('array'))->willReturn('hello');
 
         $nameConverter = $this->prophesize(NameConverterInterface::class);
-        $nameConverter->normalize('name', Argument::any(), Argument::any(), Argument::any())->shouldBeCalled()->willReturn('name');
-        $nameConverter->normalize('relatedDummy', Argument::any(), Argument::any(), Argument::any())->shouldBeCalled()->willReturn('related_dummy');
+        $nameConverter->normalize('name', Argument::any(), Argument::any(), Argument::any())->willReturn('name');
+        $nameConverter->normalize('relatedDummy', Argument::any(), Argument::any(), Argument::any())->willReturn('related_dummy');
 
         $normalizer = new ItemNormalizer(
             $propertyNameCollectionFactoryProphecy->reveal(),
@@ -177,32 +178,33 @@ class ItemNormalizerTest extends TestCase
 
         $propertyNameCollection = new PropertyNameCollection(['name', 'relatedDummy']);
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
-        $propertyNameCollectionFactoryProphecy->create(Dummy::class, [])->willReturn($propertyNameCollection)->shouldBeCalled();
+        $propertyNameCollectionFactoryProphecy->create(Dummy::class, [])->willReturn($propertyNameCollection);
 
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
         $propertyMetadataFactoryProphecy->create(Dummy::class, 'name', [])->willReturn(
             new PropertyMetadata(new Type(Type::BUILTIN_TYPE_STRING), '', true)
-        )->shouldBeCalled();
+        );
         $propertyMetadataFactoryProphecy->create(Dummy::class, 'relatedDummy', [])->willReturn(
             new PropertyMetadata(new Type(Type::BUILTIN_TYPE_OBJECT, false, RelatedDummy::class), '', true, false, false)
-        )->shouldBeCalled();
+        );
 
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
-        $iriConverterProphecy->getIriFromItem($dummy)->willReturn('/dummies/1')->shouldBeCalled();
-        $iriConverterProphecy->getIriFromItem($relatedDummy)->willReturn('/related-dummies/2')->shouldBeCalled();
+        $iriConverterProphecy->getIriFromItem($dummy)->willReturn('/dummies/1');
+        $iriConverterProphecy->getIriFromItem($relatedDummy)->willReturn('/related-dummies/2');
 
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
-        $resourceClassResolverProphecy->getResourceClass($dummy, null, true)->willReturn(Dummy::class)->shouldBeCalled();
-        $resourceClassResolverProphecy->getResourceClass($dummy, Dummy::class, true)->willReturn(Dummy::class)->shouldBeCalled();
-        $resourceClassResolverProphecy->isResourceClass(RelatedDummy::class)->willReturn(true)->shouldBeCalled();
+        $resourceClassResolverProphecy->getResourceClass($dummy, null)->willReturn(Dummy::class);
+        $resourceClassResolverProphecy->getResourceClass($dummy, Dummy::class)->willReturn(Dummy::class);
+        $resourceClassResolverProphecy->getResourceClass($relatedDummy, RelatedDummy::class)->willReturn(RelatedDummy::class);
+        $resourceClassResolverProphecy->isResourceClass(RelatedDummy::class)->willReturn(true);
 
         $serializerProphecy = $this->prophesize(SerializerInterface::class);
         $serializerProphecy->willImplement(NormalizerInterface::class);
-        $serializerProphecy->normalize('hello', null, Argument::type('array'))->willReturn('hello')->shouldBeCalled();
+        $serializerProphecy->normalize('hello', null, Argument::type('array'))->willReturn('hello');
 
         $nameConverter = $this->prophesize(NameConverterInterface::class);
-        $nameConverter->normalize('name', Argument::any(), Argument::any(), Argument::any())->shouldBeCalled()->willReturn('name');
-        $nameConverter->normalize('relatedDummy', Argument::any(), Argument::any(), Argument::any())->shouldBeCalled()->willReturn('related_dummy');
+        $nameConverter->normalize('name', Argument::any(), Argument::any(), Argument::any())->willReturn('name');
+        $nameConverter->normalize('relatedDummy', Argument::any(), Argument::any(), Argument::any())->willReturn('related_dummy');
 
         $normalizer = new ItemNormalizer(
             $propertyNameCollectionFactoryProphecy->reveal(),
@@ -258,30 +260,31 @@ class ItemNormalizerTest extends TestCase
 
         $propertyNameCollection = new PropertyNameCollection(['id', 'name', 'child']);
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
-        $propertyNameCollectionFactoryProphecy->create(MaxDepthDummy::class, [])->willReturn($propertyNameCollection)->shouldBeCalled();
+        $propertyNameCollectionFactoryProphecy->create(MaxDepthDummy::class, [])->willReturn($propertyNameCollection);
 
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
         $propertyMetadataFactoryProphecy->create(MaxDepthDummy::class, 'id', [])->willReturn(
             new PropertyMetadata(new Type(Type::BUILTIN_TYPE_INT), '', true)
-        )->shouldBeCalled();
+        );
         $propertyMetadataFactoryProphecy->create(MaxDepthDummy::class, 'name', [])->willReturn(
             new PropertyMetadata(new Type(Type::BUILTIN_TYPE_STRING), '', true)
-        )->shouldBeCalled();
+        );
         $propertyMetadataFactoryProphecy->create(MaxDepthDummy::class, 'child', [])->willReturn(
             new PropertyMetadata(new Type(Type::BUILTIN_TYPE_OBJECT, false, MaxDepthDummy::class), '', true, false, true)
-        )->shouldBeCalled();
+        );
 
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
-        $iriConverterProphecy->getIriFromItem($level1)->willReturn('/max_depth_dummies/1')->shouldBeCalled();
-        $iriConverterProphecy->getIriFromItem($level2)->willReturn('/max_depth_dummies/2')->shouldBeCalled();
-        $iriConverterProphecy->getIriFromItem($level3)->willReturn('/max_depth_dummies/3')->shouldBeCalled();
+        $iriConverterProphecy->getIriFromItem($level1)->willReturn('/max_depth_dummies/1');
+        $iriConverterProphecy->getIriFromItem($level2)->willReturn('/max_depth_dummies/2');
+        $iriConverterProphecy->getIriFromItem($level3)->willReturn('/max_depth_dummies/3');
 
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
-        $resourceClassResolverProphecy->getResourceClass($level1, null, true)->willReturn(MaxDepthDummy::class)->shouldBeCalled();
-        $resourceClassResolverProphecy->getResourceClass($level1, MaxDepthDummy::class, true)->willReturn(MaxDepthDummy::class)->shouldBeCalled();
-        $resourceClassResolverProphecy->getResourceClass($level2, MaxDepthDummy::class, true)->willReturn(MaxDepthDummy::class)->shouldBeCalled();
-        $resourceClassResolverProphecy->getResourceClass($level3, MaxDepthDummy::class, true)->willReturn(MaxDepthDummy::class)->shouldBeCalled();
-        $resourceClassResolverProphecy->isResourceClass(MaxDepthDummy::class)->willReturn(true)->shouldBeCalled();
+        $resourceClassResolverProphecy->getResourceClass($level1, null)->willReturn(MaxDepthDummy::class);
+        $resourceClassResolverProphecy->getResourceClass($level1, MaxDepthDummy::class)->willReturn(MaxDepthDummy::class);
+        $resourceClassResolverProphecy->getResourceClass($level2, MaxDepthDummy::class)->willReturn(MaxDepthDummy::class);
+        $resourceClassResolverProphecy->getResourceClass($level3, MaxDepthDummy::class)->willReturn(MaxDepthDummy::class);
+        $resourceClassResolverProphecy->getResourceClass(null, MaxDepthDummy::class)->willReturn(MaxDepthDummy::class);
+        $resourceClassResolverProphecy->isResourceClass(MaxDepthDummy::class)->willReturn(true);
 
         $normalizer = new ItemNormalizer(
             $propertyNameCollectionFactoryProphecy->reveal(),

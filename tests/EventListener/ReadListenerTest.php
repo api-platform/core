@@ -20,6 +20,9 @@ use ApiPlatform\Core\EventListener\ReadListener;
 use ApiPlatform\Core\Exception\InvalidIdentifierException;
 use ApiPlatform\Core\Exception\RuntimeException;
 use ApiPlatform\Core\Identifier\IdentifierConverterInterface;
+use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
+use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Symfony\Component\HttpFoundation\Request;
@@ -72,26 +75,58 @@ class ReadListenerTest extends TestCase
         $listener->onKernelRequest($event->reveal());
     }
 
-    public function testDoNotCallWhenReceiveFlagIsFalse()
+    public function testDoNotReadWhenReceiveFlagIsFalse()
     {
-        $identifierConverter = $this->prophesize(IdentifierConverterInterface::class);
-
         $collectionDataProvider = $this->prophesize(CollectionDataProviderInterface::class);
-        $collectionDataProvider->getCollection()->shouldNotBeCalled();
+        $collectionDataProvider->getCollection(Argument::cetera())->shouldNotBeCalled();
 
         $itemDataProvider = $this->prophesize(ItemDataProviderInterface::class);
-        $itemDataProvider->getItem()->shouldNotBeCalled();
+        $itemDataProvider->getItem(Argument::cetera())->shouldNotBeCalled();
 
         $subresourceDataProvider = $this->prophesize(SubresourceDataProviderInterface::class);
-        $subresourceDataProvider->getSubresource()->shouldNotBeCalled();
+        $subresourceDataProvider->getSubresource(Argument::cetera())->shouldNotBeCalled();
 
-        $request = new Request([], [], ['data' => new \stdClass(), '_api_resource_class' => 'Foo', '_api_collection_operation_name' => 'post', '_api_receive' => false]);
+        $identifierConverter = $this->prophesize(IdentifierConverterInterface::class);
+
+        $request = new Request([], [], ['id' => 1, 'data' => new Dummy(), '_api_resource_class' => Dummy::class, '_api_item_operation_name' => 'put', '_api_receive' => false]);
         $request->setMethod('PUT');
 
         $event = $this->prophesize(GetResponseEvent::class);
-        $event->getRequest()->willReturn($request)->shouldBeCalled();
+        $event->getRequest()->willReturn($request);
 
         $listener = new ReadListener($collectionDataProvider->reveal(), $itemDataProvider->reveal(), $subresourceDataProvider->reveal(), null, $identifierConverter->reveal());
+        $listener->onKernelRequest($event->reveal());
+    }
+
+    public function testDoNotReadWhenDisabledInOperationAttribute()
+    {
+        $collectionDataProvider = $this->prophesize(CollectionDataProviderInterface::class);
+        $collectionDataProvider->getCollection(Argument::cetera())->shouldNotBeCalled();
+
+        $itemDataProvider = $this->prophesize(ItemDataProviderInterface::class);
+        $itemDataProvider->getItem(Argument::cetera())->shouldNotBeCalled();
+
+        $subresourceDataProvider = $this->prophesize(SubresourceDataProviderInterface::class);
+        $subresourceDataProvider->getSubresource(Argument::cetera())->shouldNotBeCalled();
+
+        $identifierConverter = $this->prophesize(IdentifierConverterInterface::class);
+
+        $resourceMetadata = new ResourceMetadata('Dummy', null, null, [
+            'put' => [
+                'read' => false,
+            ],
+        ]);
+
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
+        $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn($resourceMetadata);
+
+        $request = new Request([], [], ['id' => 1, 'data' => new Dummy(), '_api_resource_class' => Dummy::class, '_api_item_operation_name' => 'put']);
+        $request->setMethod('PUT');
+
+        $event = $this->prophesize(GetResponseEvent::class);
+        $event->getRequest()->willReturn($request);
+
+        $listener = new ReadListener($collectionDataProvider->reveal(), $itemDataProvider->reveal(), $subresourceDataProvider->reveal(), null, $identifierConverter->reveal(), $resourceMetadataFactoryProphecy->reveal());
         $listener->onKernelRequest($event->reveal());
     }
 
@@ -112,13 +147,13 @@ class ReadListenerTest extends TestCase
         $request->setMethod('POST');
 
         $event = $this->prophesize(GetResponseEvent::class);
-        $event->getRequest()->willReturn($request)->shouldBeCalled();
+        $event->getRequest()->willReturn($request);
 
         $listener = new ReadListener($collectionDataProvider->reveal(), $itemDataProvider->reveal(), $subresourceDataProvider->reveal(), null, $identifierConverter->reveal());
         $listener->onKernelRequest($event->reveal());
 
-        $this->assertTrue($request->attributes->has('data'));
-        $this->assertNull($request->attributes->get('data'));
+        $this->assertFalse($request->attributes->has('data'));
+        $this->assertFalse($request->attributes->has('previous_data'));
     }
 
     public function testRetrieveCollectionGet()
@@ -144,6 +179,7 @@ class ReadListenerTest extends TestCase
         $listener->onKernelRequest($event->reveal());
 
         $this->assertSame([], $request->attributes->get('data'));
+        $this->assertFalse($request->attributes->has('previous_data'));
     }
 
     public function testRetrieveItem()
@@ -171,6 +207,7 @@ class ReadListenerTest extends TestCase
         $listener->onKernelRequest($event->reveal());
 
         $this->assertSame($data, $request->attributes->get('data'));
+        $this->assertEquals($data, $request->attributes->get('previous_data'));
     }
 
     public function testRetrieveItemNoIdentifier()
@@ -223,6 +260,7 @@ class ReadListenerTest extends TestCase
         $listener->onKernelRequest($event->reveal());
 
         $this->assertSame($data, $request->attributes->get('data'));
+        $this->assertSame($data, $request->attributes->get('previous_data'));
     }
 
     public function testRetrieveSubresourceNoDataProvider()

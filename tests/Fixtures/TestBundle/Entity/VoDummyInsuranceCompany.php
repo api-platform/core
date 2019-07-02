@@ -29,7 +29,7 @@ class VoDummyInsuranceCompany
      * @var string
      *
      * @ORM\Column
-     * @Groups({"write"})
+     * @Groups({"car_read", "car_write"})
      */
     private $name;
 
