@@ -10,7 +10,12 @@ Feature: Resource with constructor deserializable
     """
     {
       "foo": "hello",
-      "bar": "world"
+      "bar": "world",
+      "items": [
+        {
+          "foo": "bar"
+        }
+      ]
     }
     """
     Then the response status code should be 201
@@ -25,7 +30,11 @@ Feature: Resource with constructor deserializable
       "id": 1,
       "foo": "hello",
       "bar": "world",
+      "items": [
+        {
+          "foo": "bar"
+        }
+      ],
       "baz": null
     }
     """
-

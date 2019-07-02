@@ -95,7 +95,15 @@ final class TypeBuilder implements TypeBuilderInterface
                     ];
                 }
 
-                return $this->fieldsBuilderLocator->get('api_platform.graphql.fields_builder')->getResourceObjectTypeFields($resourceClass, $resourceMetadata, $input, $queryName, $mutationName, $depth, $ioMetadata);
+                $fieldsBuilder = $this->fieldsBuilderLocator->get('api_platform.graphql.fields_builder');
+
+                $fields = $fieldsBuilder->getResourceObjectTypeFields($resourceClass, $resourceMetadata, $input, $queryName, $mutationName, $depth, $ioMetadata);
+
+                if ($input && null !== $mutationName && null !== $mutationArgs = $resourceMetadata->getGraphql()[$mutationName]['args'] ?? null) {
+                    return $fieldsBuilder->resolveResourceArgs($mutationArgs, $mutationName, $resourceMetadata->getShortName()) + ['clientMutationId' => $fields['clientMutationId']];
+                }
+
+                return $fields;
             },
             'interfaces' => $wrapData ? [] : [$this->getNodeInterface()],
         ];

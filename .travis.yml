@@ -44,7 +44,6 @@ jobs:
           composer remove --dev --no-progress --no-update --ansi \
             doctrine/mongodb-odm \
             doctrine/mongodb-odm-bundle \
-        - sed -i '33,39d' tests/Fixtures/app/config/config_common.yml
         - *update-project-dependencies
       before_script:
         - *clear-test-app-cache
@@ -210,7 +209,7 @@ jobs:
         - *validate-openapi-v3-yaml
 
     - php: '7.3'
-      env: SYMFONY_DEPRECATIONS_HELPER=0
+      env: SYMFONY_DEPRECATIONS_HELPER=max[total]=0
       before_install:
         - *install-mongodb-php-extension
         - *disable-xdebug-php-extension
@@ -230,5 +229,5 @@ jobs:
         - *validate-openapi-v3-yaml
 
   allow_failures:
-    - env: SYMFONY_DEPRECATIONS_HELPER=0
+    - env: SYMFONY_DEPRECATIONS_HELPER=max[total]=0
   fast_finish: true

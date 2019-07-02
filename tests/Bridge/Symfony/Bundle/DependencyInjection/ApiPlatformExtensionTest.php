@@ -144,13 +144,13 @@ class ApiPlatformExtensionTest extends TestCase
     private $extension;
     private $childDefinitionProphecy;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->extension = new ApiPlatformExtension();
         $this->childDefinitionProphecy = $this->prophesize(ChildDefinition::class);
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         $this->extension = null;
     }
@@ -518,7 +518,7 @@ class ApiPlatformExtensionTest extends TestCase
     public function testDisabledMessenger()
     {
         $containerBuilderProphecy = $this->getBaseContainerBuilderProphecy();
-        $containerBuilderProphecy->setAlias('api_platform.message_bus', 'message_bus')->shouldNotBeCalled();
+        $containerBuilderProphecy->setAlias('api_platform.message_bus', 'messenger.default_bus')->shouldNotBeCalled();
         $containerBuilderProphecy->setDefinition('api_platform.messenger.data_persister', Argument::type(Definition::class))->shouldNotBeCalled();
         $containerBuilderProphecy->setDefinition('api_platform.messenger.data_transformer', Argument::type(Definition::class))->shouldNotBeCalled();
         $containerBuilder = $containerBuilderProphecy->reveal();
@@ -1057,6 +1057,7 @@ class ApiPlatformExtensionTest extends TestCase
         foreach ($parameters as $key => $value) {
             $containerBuilderProphecy->setParameter($key, $value)->shouldBeCalled();
         }
+        $containerBuilderProphecy->hasParameter('test.client.parameters')->wilLReturn(true);
 
         foreach (['yaml', 'xml'] as $format) {
             $definitionProphecy = $this->prophesize(Definition::class);
@@ -1158,6 +1159,7 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.swagger.normalizer.api_gateway',
             'api_platform.swagger.normalizer.documentation',
             'api_platform.validator',
+            'test.api_platform.client',
         ];
 
         if (\in_array('odm', $doctrineIntegrationsToLoad, true)) {
@@ -1194,7 +1196,7 @@ class ApiPlatformExtensionTest extends TestCase
 
         $aliases = [
             'api_platform.http_cache.purger' => 'api_platform.http_cache.purger.varnish',
-            'api_platform.message_bus' => 'message_bus',
+            'api_platform.message_bus' => 'messenger.default_bus',
             EagerLoadingExtension::class => 'api_platform.doctrine.orm.query_extension.eager_loading',
             FilterExtension::class => 'api_platform.doctrine.orm.query_extension.filter',
             FilterEagerLoadingExtension::class => 'api_platform.doctrine.orm.query_extension.filter_eager_loading',

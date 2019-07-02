@@ -230,7 +230,7 @@ final class HydraContext implements Context
             }
         }
 
-        throw new \InvalidArgumentException(sprintf('Property "%s" of class "%s" does\'nt exist', $propertyName, $className));
+        throw new \InvalidArgumentException(sprintf('Property "%s" of class "%s" doesn\'t exist', $propertyName, $className));
     }
 
     /**

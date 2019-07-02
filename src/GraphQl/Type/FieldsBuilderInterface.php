@@ -46,4 +46,9 @@ interface FieldsBuilderInterface
      * Gets the fields of the type of the given resource.
      */
     public function getResourceObjectTypeFields(?string $resourceClass, ResourceMetadata $resourceMetadata, bool $input, ?string $queryName, ?string $mutationName, int $depth, ?array $ioMetadata): array;
+
+    /**
+     * Resolve the args of a resource by resolving its types.
+     */
+    public function resolveResourceArgs(array $args, string $operationName, string $shortName): array;
 }

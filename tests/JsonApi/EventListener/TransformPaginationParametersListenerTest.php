@@ -25,7 +25,7 @@ class TransformPaginationParametersListenerTest extends TestCase
 {
     private $listener;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->listener = new TransformPaginationParametersListener();
     }

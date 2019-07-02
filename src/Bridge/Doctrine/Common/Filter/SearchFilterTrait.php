@@ -120,9 +120,9 @@ trait SearchFilterTrait
     protected function getIdFromValue(string $value)
     {
         try {
-            if (null !== $item = $this->getIriConverter()->getItemFromIri($value, ['fetch_data' => false])) {
-                return $this->getPropertyAccessor()->getValue($item, 'id');
-            }
+            $item = $this->getIriConverter()->getItemFromIri($value, ['fetch_data' => false]);
+
+            return $this->getPropertyAccessor()->getValue($item, 'id');
         } catch (InvalidArgumentException $e) {
             // Do nothing, return the raw value
         }

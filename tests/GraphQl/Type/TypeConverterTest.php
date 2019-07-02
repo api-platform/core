@@ -16,8 +16,10 @@ namespace ApiPlatform\Core\Tests\GraphQl\Type;
 use ApiPlatform\Core\Exception\ResourceClassNotFoundException;
 use ApiPlatform\Core\GraphQl\Type\TypeBuilderInterface;
 use ApiPlatform\Core\GraphQl\Type\TypeConverter;
+use ApiPlatform\Core\GraphQl\Type\TypesContainerInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\GraphQl\Type\Definition\DateTimeType;
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\Type as GraphQLType;
 use PHPUnit\Framework\TestCase;
@@ -33,6 +35,9 @@ class TypeConverterTest extends TestCase
     private $typeBuilderProphecy;
 
     /** @var ObjectProphecy */
+    private $typesContainerProphecy;
+
+    /** @var ObjectProphecy */
     private $resourceMetadataFactoryProphecy;
 
     /** @var TypeConverter */
@@ -44,8 +49,9 @@ class TypeConverterTest extends TestCase
     protected function setUp(): void
     {
         $this->typeBuilderProphecy = $this->prophesize(TypeBuilderInterface::class);
+        $this->typesContainerProphecy = $this->prophesize(TypesContainerInterface::class);
         $this->resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $this->typeConverter = new TypeConverter($this->typeBuilderProphecy->reveal(), $this->resourceMetadataFactoryProphecy->reveal());
+        $this->typeConverter = new TypeConverter($this->typeBuilderProphecy->reveal(), $this->typesContainerProphecy->reveal(), $this->resourceMetadataFactoryProphecy->reveal());
     }
 
     /**
@@ -113,5 +119,55 @@ class TypeConverterTest extends TestCase
 
         $graphqlType = $this->typeConverter->convertType($type, false, null, null, 'resourceClass', null, 0);
         $this->assertEquals($expectedGraphqlType, $graphqlType);
+    }
+
+    /**
+     * @dataProvider resolveTypeProvider
+     *
+     * @param string|GraphQLType $expectedGraphqlType
+     */
+    public function testResolveType(string $type, $expectedGraphqlType): void
+    {
+        $this->typesContainerProphecy->has('DateTime')->willReturn(true);
+        $this->typesContainerProphecy->get('DateTime')->willReturn(new DateTimeType());
+
+        $this->assertEquals($expectedGraphqlType, $this->typeConverter->resolveType($type));
+    }
+
+    public function resolveTypeProvider(): array
+    {
+        return [
+            ['String', GraphQLType::string()],
+            ['String!', GraphQLType::nonNull(GraphQLType::string())],
+            ['Boolean', GraphQLType::boolean()],
+            ['[Boolean]', GraphQLType::listOf(GraphQLType::boolean())],
+            ['Int!', GraphQLType::nonNull(GraphQLType::int())],
+            ['[Int!]', GraphQLType::listOf(GraphQLType::nonNull(GraphQLType::int()))],
+            ['Float', GraphQLType::float()],
+            ['[Float]!', GraphQLType::nonNull(GraphQLType::listOf(GraphQLType::float()))],
+            ['DateTime', new DateTimeType()],
+            ['[DateTime!]!', GraphQLType::nonNull(GraphQLType::listOf(GraphQLType::nonNull(new DateTimeType())))],
+        ];
+    }
+
+    /**
+     * @dataProvider resolveTypeInvalidProvider
+     */
+    public function testResolveTypeInvalid(string $type, string $expectedExceptionMessage): void
+    {
+        $this->typesContainerProphecy->has('UnknownType')->willReturn(false);
+
+        $this->expectExceptionMessage($expectedExceptionMessage);
+
+        $this->typeConverter->resolveType($type);
+    }
+
+    public function resolveTypeInvalidProvider(): array
+    {
+        return [
+            ['float?', '"float?" is not a valid GraphQL type.'],
+            ['UnknownType', 'The type "UnknownType" was not resolved.'],
+            ['UnknownType!', 'The type "UnknownType!" was not resolved.'],
+        ];
     }
 }

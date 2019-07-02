@@ -24,7 +24,7 @@ class ReservedAttributeNameConverterTest extends TestCase
 {
     private $reservedAttributeNameConverter;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->reservedAttributeNameConverter = new ReservedAttributeNameConverter(new CustomConverter());
     }

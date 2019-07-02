@@ -33,6 +33,7 @@ class DummyCustomQueryCollectionResolver implements QueryCollectionResolverInter
     {
         foreach ($collection as $dummy) {
             $dummy->message = 'Success!';
+            $dummy->customArgs = $context['args'];
         }
 
         return $collection;

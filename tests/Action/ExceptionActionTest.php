@@ -46,13 +46,12 @@ class ExceptionActionTest extends TestCase
         $request = new Request();
         $request->setFormat('jsonproblem', 'application/problem+json');
 
-        $expected = new Response('', Response::HTTP_BAD_REQUEST, [
-            'Content-Type' => 'application/problem+json; charset=utf-8',
-            'X-Content-Type-Options' => 'nosniff',
-            'X-Frame-Options' => 'deny',
-        ]);
-
-        $this->assertEquals($expected, $exceptionAction($flattenException, $request));
+        $response = $exceptionAction($flattenException, $request);
+        $this->assertSame('', $response->getContent());
+        $this->assertSame(Response::HTTP_BAD_REQUEST, $response->getStatusCode());
+        $this->assertTrue($response->headers->contains('Content-Type', 'application/problem+json; charset=utf-8'));
+        $this->assertTrue($response->headers->contains('X-Content-Type-Options', 'nosniff'));
+        $this->assertTrue($response->headers->contains('X-Frame-Options', 'deny'));
     }
 
     public function testActionWithUncatchableException()

@@ -4,6 +4,11 @@
 
 * GraphQL: Add support for custom types
 
+## 2.4.5
+
+* Fix denormalization of a constructor argument which is a collection of non-resources
+* Allow custom operations to return a different class than the expected resource class
+
 ## 2.4.4
 
 * Store the original data in the `previous_data` request attribute, and allow to access it in security expressions using the `previous_object` variable (useful for PUT and PATCH requests)

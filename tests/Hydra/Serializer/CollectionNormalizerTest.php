@@ -136,7 +136,7 @@ class CollectionNormalizerTest extends TestCase
         $contextBuilderProphecy = $this->prophesize(ContextBuilderInterface::class);
 
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
-        $resourceClassResolverProphecy->getResourceClass($data, null, true)->willThrow(InvalidArgumentException::class);
+        $resourceClassResolverProphecy->getResourceClass($data, null)->willThrow(InvalidArgumentException::class);
 
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
 

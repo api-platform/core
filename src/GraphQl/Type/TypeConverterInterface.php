@@ -17,7 +17,7 @@ use GraphQL\Type\Definition\Type as GraphQLType;
 use Symfony\Component\PropertyInfo\Type;
 
 /**
- * Convert a built-in type to its GraphQL equivalent.
+ * Converts a type to its GraphQL equivalent.
  *
  * @experimental
  *
@@ -26,7 +26,15 @@ use Symfony\Component\PropertyInfo\Type;
 interface TypeConverterInterface
 {
     /**
+     * Converts a built-in type to its GraphQL equivalent.
+     * A string can be returned for a custom registered type.
+     *
      * @return string|GraphQLType|null
      */
     public function convertType(Type $type, bool $input, ?string $queryName, ?string $mutationName, string $resourceClass, ?string $property, int $depth);
+
+    /**
+     * Resolves a type written with the GraphQL type system to its object representation.
+     */
+    public function resolveType(string $type): ?GraphQLType;
 }

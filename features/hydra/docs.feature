@@ -56,8 +56,6 @@ Feature: Documentation support
     And the value of the node "hydra:title" of the Hydra class "Dummy" is "Dummy"
     And the value of the node "hydra:description" of the Hydra class "Dummy" is "Dummy."
     # Properties
-    And "id" property is readable for Hydra class "Dummy"
-    And "id" property is writable for Hydra class "Dummy"
     And "name" property is readable for Hydra class "Dummy"
     And "name" property is writable for Hydra class "Dummy"
     And "name" property is required for Hydra class "Dummy"

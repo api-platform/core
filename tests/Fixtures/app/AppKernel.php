@@ -29,6 +29,7 @@ use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\Routing\RouteCollectionBuilder;
+use Symfony\Component\Security\Core\Encoder\SodiumPasswordEncoder;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
@@ -96,10 +97,11 @@ class AppKernel extends Kernel
 
         $loader->load(__DIR__."/config/config_{$this->getEnvironment()}.yml");
 
+        $alg = class_exists(SodiumPasswordEncoder::class) && SodiumPasswordEncoder::isSupported() ? 'auto' : 'bcrypt';
         $securityConfig = [
             'encoders' => [
-                User::class => 'bcrypt',
-                UserDocument::class => 'bcrypt',
+                User::class => $alg,
+                UserDocument::class => $alg,
                 // Don't use plaintext in production!
                 UserInterface::class => 'plaintext',
             ],
@@ -136,6 +138,19 @@ class AppKernel extends Kernel
         ];
 
         $c->loadFromExtension('security', $securityConfig);
+
+        if (class_exists(DoctrineMongoDBBundle::class)) {
+            $c->loadFromExtension('doctrine_mongodb', [
+                'connections' => [
+                    'default' => null,
+                ],
+                'document_managers' => [
+                    'default' => [
+                        'auto_mapping' => true,
+                    ],
+                ],
+            ]);
+        }
 
         if ($_SERVER['LEGACY'] ?? true) {
             $c->loadFromExtension('nelmio_api_doc', [
