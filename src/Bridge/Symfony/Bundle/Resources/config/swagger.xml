@@ -52,14 +52,14 @@
             <tag name="console.command" />
         </service>
 
-        <service id="api_platform.schema_formatter.json" class="DefaultSchemaFormatter" >
-            <tag name="api_platform.schema_formatter" priority="-100" />
+        <service id="api_platform.schema_formatter.json" class="ApiPlatform\Core\Swagger\SchemaFormatter\DefaultSchemaFormatter" >
+            <tag name="api_platform.schema_formatter" priority="-1000" />
         </service>
         <service id="api_platform.schema_formatter.api+json" class="ApiPlatform\Core\Swagger\SchemaFormatter\JsonApiSchemaFormatter" >
             <tag name="api_platform.schema_formatter" priority="-100" />
         </service>
 
-        <service id="api_platform.schema_formatter.provider" class="ChainSchemaFormatter">
+        <service id="api_platform.schema_formatter.provider" class="ApiPlatform\Core\Swagger\SchemaFormatter\ChainSchemaFormatter">
             <argument type="tagged" tag="api_platform.schema_formatter" on-invalid="ignore" />
         </service>
 

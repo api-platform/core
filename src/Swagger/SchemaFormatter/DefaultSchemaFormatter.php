@@ -27,12 +27,8 @@ class DefaultSchemaFormatter implements SchemaFormatterInterface
         return [];
     }
 
-    public function setProperty(
-        \ArrayObject $definitionSchema,
-        $normalizedPropertyName,
-        \ArrayObject $property,
-        PropertyMetadata $propertyMetadata
-    ): void {
+    public function setProperty(\ArrayObject $definitionSchema, $normalizedPropertyName, \ArrayObject $property, PropertyMetadata $propertyMetadata): void
+    {
         $definitionSchema['properties'][$normalizedPropertyName] = $property;
     }
 }

@@ -1811,8 +1811,8 @@ class DocumentationNormalizerV3Test extends TestCase
         $operationPathResolver = new CustomOperationPathResolver(new OperationPathResolver(new UnderscorePathSegmentNameGenerator()));
 
         $schemaFormatterFactory = new ChainSchemaFormatter([
-            'application/json' => new DefaultSchemaFormatter(),
             'application/vnd.api+json' => new JsonApiSchemaFormatter(),
+            'application/json' => new DefaultSchemaFormatter(),
         ]);
 
         $normalizer = new DocumentationNormalizer(
@@ -2782,8 +2782,8 @@ class DocumentationNormalizerV3Test extends TestCase
         $formatProviderProphecy->getFormatsFromOperation(Dummy::class, 'put', OperationType::ITEM)->willReturn(['json' => ['application/json'], 'csv' => ['text/csv']]);
 
         $schemaFormatterFactory = new ChainSchemaFormatter([
-            'application/json' => new DefaultSchemaFormatter(),
             'application/vnd.api+json' => new JsonApiSchemaFormatter(),
+            'application/json' => new DefaultSchemaFormatter(),
         ]);
 
         $normalizer = new DocumentationNormalizer(
@@ -3052,7 +3052,7 @@ class DocumentationNormalizerV3Test extends TestCase
                                 'type' => 'string',
                                 'description' => 'This is a name.',
                             ]),
-                        ],
+                        ]
                     ]),
                 ]),
             ],
