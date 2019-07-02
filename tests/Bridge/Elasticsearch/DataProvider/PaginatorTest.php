@@ -76,8 +76,8 @@ class PaginatorTest extends TestCase
         ],
     ];
 
-    protected $offset = 4;
-    protected $limit = 4;
+    protected const OFFSET = 4;
+    protected const LIMIT = 4;
 
     /**
      * @var PaginatorInterface
@@ -125,7 +125,7 @@ class PaginatorTest extends TestCase
         ];
         // I need to create another paginator with documents total changed
         $denormalizerProphecy = $this->createDenormalizerProphecy($documents);
-        $paginator = $this->createPaginator($this->limit, $this->offset, $documents, $denormalizerProphecy);
+        $paginator = new Paginator($denormalizerProphecy->reveal(), $documents, Foo::class, self::LIMIT, self::OFFSET);
 
         self::assertSame(8., $paginator->getTotalItems());
     }
@@ -168,13 +168,13 @@ class PaginatorTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->paginator = $this->getPaginator($this->limit, $this->offset);
+        $this->paginator = $this->getPaginator(4, 4);
     }
 
-    protected function getPaginator(int $limit, int $offset)
+    protected function getPaginator($limit, $offset)
     {
         $denormalizerProphecy = $this->createDenormalizerProphecy(static::DOCUMENTS);
-        return $this->createPaginator($limit, $offset, self::DOCUMENTS, $denormalizerProphecy);
+        return new Paginator($denormalizerProphecy->reveal(), self::DOCUMENTS, Foo::class, $limit, $offset);
     }
 
     protected function createDenormalizerProphecy($documents)
@@ -187,12 +187,6 @@ class PaginatorTest extends TestCase
                 ->willReturn($this->denormalizeFoo($document['_source']));
         }
         return $denormalizerProphecy;
-    }
-
-    protected function createPaginator(int $limit, int $offset, $documents, $denormalizerProphecy)
-    {
-        $paginator = new Paginator($denormalizerProphecy->reveal(), $documents, Foo::class, $limit, $offset);
-        return $paginator;
     }
 
     protected function denormalizeFoo(array $fooDocument): Foo
