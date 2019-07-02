@@ -94,7 +94,7 @@ final class DeserializeListener
                 ->getOperationAttribute($attributes, 'formats', [], true);
         } elseif ($this->formatsProvider instanceof FormatsProviderInterface) {
             $formats = $this->formatsProvider->getFormatsFromAttributes($attributes);
-        } elseif (null !== $this->formats) {
+        } else {
             $formats = $this->formats;
         }
 
