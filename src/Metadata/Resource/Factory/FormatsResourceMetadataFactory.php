@@ -23,6 +23,8 @@ use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
  */
 final class FormatsResourceMetadataFactory implements ResourceMetadataFactoryInterface
 {
+    use FormatsNormalizerTrait;
+
     private $decorated;
     private $formats;
 
@@ -43,10 +45,9 @@ final class FormatsResourceMetadataFactory implements ResourceMetadataFactoryInt
     public function create(string $resourceClass): ResourceMetadata
     {
         $resourceMetadata = $this->decorated->create($resourceClass);
-        if (null === $resourceMetadata->getAttribute('formats')) {
-            $resourceMetadata = $resourceMetadata->withAttributes(['formats' => $this->formats] + $resourceMetadata->getAttributes());
-        }
+        $currentFormats = $resourceMetadata->getAttribute('formats');
+        $normalizedFormats = null === $currentFormats ? $this->formats : $this->normalizeFormats($currentFormats, $this->formats);
 
-        return $resourceMetadata;
+        return $resourceMetadata->withAttributes(['formats' => $normalizedFormats] + $resourceMetadata->getAttributes());
     }
 }

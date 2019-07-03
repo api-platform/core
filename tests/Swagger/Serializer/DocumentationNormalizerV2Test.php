@@ -64,7 +64,7 @@ class DocumentationNormalizerV2Test extends TestCase
      * @group legacy
      * @expectedDeprecation Passing an instance of ApiPlatform\Core\Api\UrlGeneratorInterface to ApiPlatform\Core\Swagger\Serializer\DocumentationNormalizer::__construct() is deprecated since version 2.1 and will be removed in 3.0.
      */
-    public function testLegacyConstruct()
+    public function testLegacyConstruct(): void
     {
         $normalizer = new DocumentationNormalizer(
             $this->prophesize(ResourceMetadataFactoryInterface::class)->reveal(),
@@ -86,7 +86,25 @@ class DocumentationNormalizerV2Test extends TestCase
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyNameCollectionFactoryProphecy->create(Dummy::class, [])->shouldBeCalled()->willReturn(new PropertyNameCollection(['id', 'name', 'description']));
 
-        $dummyMetadata = new ResourceMetadata('Dummy', 'This is a dummy.', 'http://schema.example.com/Dummy', ['get' => ['method' => 'GET', 'status' => '202'], 'put' => ['method' => 'PUT', 'status' => '202']], ['get' => ['method' => 'GET', 'status' => '202'], 'post' => ['method' => 'POST', 'status' => '202'], 'custom' => ['method' => 'GET', 'path' => '/foo', 'status' => '202'], 'custom2' => ['method' => 'POST', 'path' => '/foo']], ['pagination_client_items_per_page' => true]);
+        $dummyMetadata = new ResourceMetadata(
+            'Dummy',
+            'This is a dummy.',
+            'http://schema.example.com/Dummy',
+            [
+                'get' => ['method' => 'GET', 'status' => '202'],
+                'put' => ['method' => 'PUT', 'status' => '202'],
+            ],
+            [
+                'get' => ['method' => 'GET', 'status' => '202'],
+                'post' => ['method' => 'POST', 'status' => '202'],
+                'custom' => ['method' => 'GET', 'path' => '/foo', 'status' => '202'],
+                'custom2' => ['method' => 'POST', 'path' => '/foo'],
+            ],
+            [
+                'formats' => ['jsonld' => ['application/ld+json']],
+                'pagination_client_items_per_page' => true,
+            ]
+        );
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create(Dummy::class)->shouldBeCalled()->willReturn($dummyMetadata);
 
@@ -317,14 +335,14 @@ class DocumentationNormalizerV2Test extends TestCase
         $this->assertEquals($expected, $normalizer->normalize($documentation, DocumentationNormalizer::FORMAT, ['base_url' => '/app_dev.php/']));
     }
 
-    public function testNormalizeWithNameConverter()
+    public function testNormalizeWithNameConverter(): void
     {
         $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), 'Dummy API', 'This is a dummy API', '1.2.3', ['jsonld' => ['application/ld+json']]);
 
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyNameCollectionFactoryProphecy->create(Dummy::class, [])->shouldBeCalled()->willReturn(new PropertyNameCollection(['name', 'nameConverted']));
 
-        $dummyMetadata = new ResourceMetadata('Dummy', 'This is a dummy.', null, ['get' => ['method' => 'GET']], [], []);
+        $dummyMetadata = new ResourceMetadata('Dummy', 'This is a dummy.', null, ['get' => ['method' => 'GET']], [], ['formats' => ['jsonld' => ['application/ld+json']]]);
 
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create(Dummy::class)->shouldBeCalled()->willReturn($dummyMetadata);
@@ -432,14 +450,14 @@ class DocumentationNormalizerV2Test extends TestCase
         $this->assertEquals($expected, $normalizer->normalize($documentation));
     }
 
-    public function testNormalizeWithApiKeysEnabled()
+    public function testNormalizeWithApiKeysEnabled(): void
     {
         $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), 'Test API', 'This is a test API.', '1.2.3', ['jsonld' => ['application/ld+json']]);
 
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyNameCollectionFactoryProphecy->create(Dummy::class, [])->shouldBeCalled()->willReturn(new PropertyNameCollection(['name']));
 
-        $dummyMetadata = new ResourceMetadata('Dummy', 'This is a dummy.', null, ['get' => ['method' => 'GET']], [], []);
+        $dummyMetadata = new ResourceMetadata('Dummy', 'This is a dummy.', null, ['get' => ['method' => 'GET']], [], ['formats' => ['jsonld' => ['application/ld+json']]]);
 
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create(Dummy::class)->shouldBeCalled()->willReturn($dummyMetadata);
@@ -553,7 +571,7 @@ class DocumentationNormalizerV2Test extends TestCase
         $this->assertEquals($expected, $normalizer->normalize($documentation, DocumentationNormalizer::FORMAT, ['base_url' => '/app_dev.php/']));
     }
 
-    public function testNormalizeWithOnlyNormalizationGroups()
+    public function testNormalizeWithOnlyNormalizationGroups(): void
     {
         $title = 'Test API';
         $description = 'This is a test API.';
@@ -580,7 +598,7 @@ class DocumentationNormalizerV2Test extends TestCase
                 'get' => ['method' => 'GET'],
                 'post' => ['method' => 'POST'],
             ],
-            []
+            ['formats' => ['jsonld' => ['application/ld+json']]]
         );
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create(Dummy::class)->shouldBeCalled()->willReturn($dummyMetadata);
@@ -747,7 +765,7 @@ class DocumentationNormalizerV2Test extends TestCase
         $this->assertEquals($expected, $normalizer->normalize($documentation));
     }
 
-    public function testNormalizeWithSwaggerDefinitionName()
+    public function testNormalizeWithSwaggerDefinitionName(): void
     {
         $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), 'Test API', 'This is a test API.', '1.2.3', ['jsonld' => ['application/ld+json']]);
 
@@ -765,7 +783,9 @@ class DocumentationNormalizerV2Test extends TestCase
                         DocumentationNormalizer::SWAGGER_DEFINITION_NAME => 'Read',
                     ],
                 ],
-            ]
+            ],
+            [],
+            ['formats' => ['jsonld' => ['application/ld+json']]]
         );
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create(Dummy::class)->shouldBeCalled()->willReturn($dummyMetadata);
@@ -841,7 +861,7 @@ class DocumentationNormalizerV2Test extends TestCase
         $this->assertEquals($expected, $normalizer->normalize($documentation, DocumentationNormalizer::FORMAT, ['base_url' => '/app_dev.php/']));
     }
 
-    public function testNormalizeWithOnlyDenormalizationGroups()
+    public function testNormalizeWithOnlyDenormalizationGroups(): void
     {
         $title = 'Test API';
         $description = 'This is a test API.';
@@ -865,7 +885,7 @@ class DocumentationNormalizerV2Test extends TestCase
                 'get' => ['method' => 'GET'],
                 'post' => ['method' => 'POST'],
             ],
-            []
+            ['formats' => ['jsonld' => ['application/ld+json']]]
         );
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create(Dummy::class)->shouldBeCalled()->willReturn($dummyMetadata);
@@ -1032,7 +1052,7 @@ class DocumentationNormalizerV2Test extends TestCase
         $this->assertEquals($expected, $normalizer->normalize($documentation));
     }
 
-    public function testNormalizeWithNormalizationAndDenormalizationGroups()
+    public function testNormalizeWithNormalizationAndDenormalizationGroups(): void
     {
         $title = 'Test API';
         $description = 'This is a test API.';
@@ -1059,7 +1079,7 @@ class DocumentationNormalizerV2Test extends TestCase
                 'get' => ['method' => 'GET'],
                 'post' => ['method' => 'POST'],
             ],
-            []
+            ['formats' => ['jsonld' => ['application/ld+json']]]
         );
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create(Dummy::class)->shouldBeCalled()->willReturn($dummyMetadata);
@@ -1226,14 +1246,30 @@ class DocumentationNormalizerV2Test extends TestCase
         $this->assertEquals($expected, $normalizer->normalize($documentation));
     }
 
-    public function testNormalizeSkipsNotReadableAndNotWritableProperties()
+    public function testNormalizeSkipsNotReadableAndNotWritableProperties(): void
     {
         $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), 'Test API', 'This is a test API.', '1.2.3', ['jsonld' => ['application/ld+json']]);
 
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyNameCollectionFactoryProphecy->create(Dummy::class, [])->shouldBeCalled()->willReturn(new PropertyNameCollection(['id', 'dummy', 'name']));
 
-        $dummyMetadata = new ResourceMetadata('Dummy', 'This is a dummy.', 'http://schema.example.com/Dummy', ['get' => ['method' => 'GET', 'status' => '202'], 'put' => ['method' => 'PUT', 'status' => '202']], ['get' => ['method' => 'GET', 'status' => '202'], 'post' => ['method' => 'POST', 'status' => '202']], ['pagination_client_items_per_page' => true]);
+        $dummyMetadata = new ResourceMetadata(
+            'Dummy',
+            'This is a dummy.',
+            'http://schema.example.com/Dummy',
+            [
+                'get' => ['method' => 'GET', 'status' => '202'],
+                'put' => ['method' => 'PUT', 'status' => '202'],
+            ],
+            [
+                'get' => ['method' => 'GET', 'status' => '202'],
+                'post' => ['method' => 'POST', 'status' => '202'],
+            ],
+            [
+                'pagination_client_items_per_page' => true,
+                'formats' => ['jsonld' => ['application/ld+json']],
+            ]
+        );
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create(Dummy::class)->shouldBeCalled()->willReturn($dummyMetadata);
 
@@ -1402,7 +1438,7 @@ class DocumentationNormalizerV2Test extends TestCase
         $this->assertEquals($expected, $normalizer->normalize($documentation, DocumentationNormalizer::FORMAT, ['base_url' => '/app_dev.php/']));
     }
 
-    public function testFilters()
+    public function testFilters(): void
     {
         $filterLocatorProphecy = $this->prophesize(ContainerInterface::class);
         $filters = [
@@ -1442,7 +1478,7 @@ class DocumentationNormalizerV2Test extends TestCase
      * @group legacy
      * @expectedDeprecation The ApiPlatform\Core\Api\FilterCollection class is deprecated since version 2.1 and will be removed in 3.0. Provide an implementation of Psr\Container\ContainerInterface instead.
      */
-    public function testFiltersWithDeprecatedFilterCollection()
+    public function testFiltersWithDeprecatedFilterCollection(): void
     {
         $this->normalizeWithFilters(new FilterCollection([
             'f1' => new DummyFilter(['name' => [
@@ -1468,7 +1504,7 @@ class DocumentationNormalizerV2Test extends TestCase
         ]));
     }
 
-    public function testConstructWithInvalidFilterLocator()
+    public function testConstructWithInvalidFilterLocator(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('The "$filterLocator" argument is expected to be an implementation of the "Psr\\Container\\ContainerInterface" interface or null.');
@@ -1485,7 +1521,7 @@ class DocumentationNormalizerV2Test extends TestCase
         );
     }
 
-    public function testSupports()
+    public function testSupports(): void
     {
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
@@ -1511,7 +1547,7 @@ class DocumentationNormalizerV2Test extends TestCase
         $this->assertTrue($normalizer->hasCacheableSupportsMethod());
     }
 
-    public function testNoOperations()
+    public function testNoOperations(): void
     {
         $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), '', '', '0.0.0', ['jsonld' => ['application/ld+json']]);
 
@@ -1562,7 +1598,7 @@ class DocumentationNormalizerV2Test extends TestCase
         $this->assertEquals($expected, $normalizer->normalize($documentation));
     }
 
-    public function testWithCustomMethod()
+    public function testWithCustomMethod(): void
     {
         $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), '', '', '0.0.0', ['jsonld' => ['application/ld+json']]);
 
@@ -1618,7 +1654,7 @@ class DocumentationNormalizerV2Test extends TestCase
         $this->assertEquals($expected, $normalizer->normalize($documentation));
     }
 
-    public function testNormalizeWithNestedNormalizationGroups()
+    public function testNormalizeWithNestedNormalizationGroups(): void
     {
         $title = 'Test API';
         $description = 'This is a test API.';
@@ -1646,7 +1682,7 @@ class DocumentationNormalizerV2Test extends TestCase
                 'get' => ['method' => 'GET'],
                 'post' => ['method' => 'POST'],
             ],
-            []
+            ['formats' => ['jsonld' => ['application/ld+json']]]
         );
 
         $relatedDummyMetadata = new ResourceMetadata(
@@ -1657,7 +1693,7 @@ class DocumentationNormalizerV2Test extends TestCase
                 'get' => ['method' => 'GET'],
             ],
             [],
-            []
+            ['formats' => ['jsonld' => ['application/ld+json']]]
         );
 
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
@@ -1843,7 +1879,7 @@ class DocumentationNormalizerV2Test extends TestCase
         $this->assertEquals($expected, $normalizer->normalize($documentation));
     }
 
-    private function normalizeWithFilters($filterLocator)
+    private function normalizeWithFilters($filterLocator): void
     {
         $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), '', '', '0.0.0', ['jsonld' => ['application/ld+json']]);
 
@@ -1958,7 +1994,7 @@ class DocumentationNormalizerV2Test extends TestCase
         $this->assertEquals($expected, $normalizer->normalize($documentation));
     }
 
-    public function testNormalizeWithSubResource()
+    public function testNormalizeWithSubResource(): void
     {
         $documentation = new Documentation(new ResourceNameCollection([Question::class]), 'Test API', 'This is a test API.', '1.2.3', ['jsonld' => ['application/ld+json']]);
 
@@ -2115,14 +2151,21 @@ class DocumentationNormalizerV2Test extends TestCase
         $this->assertEquals($expected, $normalizer->normalize($documentation));
     }
 
-    public function testNormalizeWithPropertySwaggerContext()
+    public function testNormalizeWithPropertySwaggerContext(): void
     {
         $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), 'Test API', 'This is a test API.', '1.2.3', ['jsonld' => ['application/ld+json']]);
 
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyNameCollectionFactoryProphecy->create(Dummy::class, [])->shouldBeCalled()->willReturn(new PropertyNameCollection(['id', 'name']));
 
-        $dummyMetadata = new ResourceMetadata('Dummy', 'This is a dummy.', 'http://schema.example.com/Dummy', ['get' => ['method' => 'GET']]);
+        $dummyMetadata = new ResourceMetadata(
+            'Dummy',
+            'This is a dummy.',
+            'http://schema.example.com/Dummy',
+            ['get' => ['method' => 'GET']],
+            [],
+            ['formats' => ['jsonld' => ['application/ld+json']]]
+            );
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create(Dummy::class)->shouldBeCalled()->willReturn($dummyMetadata);
 
@@ -2204,14 +2247,21 @@ class DocumentationNormalizerV2Test extends TestCase
         $this->assertEquals($expected, $normalizer->normalize($documentation, DocumentationNormalizer::FORMAT, ['base_url' => '/app_dev.php/']));
     }
 
-    public function testNormalizeWithPaginationClientEnabled()
+    public function testNormalizeWithPaginationClientEnabled(): void
     {
         $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), 'Test API', 'This is a test API.', '1.2.3', ['jsonld' => ['application/ld+json']]);
 
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyNameCollectionFactoryProphecy->create(Dummy::class, [])->shouldBeCalled()->willReturn(new PropertyNameCollection(['id', 'name']));
 
-        $dummyMetadata = new ResourceMetadata('Dummy', 'This is a dummy.', 'http://schema.example.com/Dummy', [], ['get' => ['method' => 'GET', 'pagination_client_enabled' => true]]);
+        $dummyMetadata = new ResourceMetadata(
+            'Dummy',
+            'This is a dummy.',
+            'http://schema.example.com/Dummy',
+            [],
+            ['get' => ['method' => 'GET', 'pagination_client_enabled' => true]],
+            ['formats' => ['jsonld' => ['application/ld+json']]]
+        );
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create(Dummy::class)->shouldBeCalled()->willReturn($dummyMetadata);
 
@@ -2303,7 +2353,7 @@ class DocumentationNormalizerV2Test extends TestCase
         $this->assertEquals($expected, $normalizer->normalize($documentation, DocumentationNormalizer::FORMAT, ['base_url' => '/app_dev.php/']));
     }
 
-    public function testNormalizeWithCustomFormatsDefinedAtOperationLevel()
+    public function testNormalizeWithCustomFormatsDefinedAtOperationLevel(): void
     {
         $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), 'Test API', 'This is a test API.', '1.2.3', ['jsonld' => ['application/ld+json']]);
 
@@ -2485,7 +2535,7 @@ class DocumentationNormalizerV2Test extends TestCase
         $this->assertEquals($expected, $normalizer->normalize($documentation, DocumentationNormalizer::FORMAT, ['base_url' => '/']));
     }
 
-    public function testNormalizeWithInputAndOutputClass()
+    public function testNormalizeWithInputAndOutputClass(): void
     {
         $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), 'Test API', 'This is a test API.', '1.2.3', ['jsonld' => ['application/ld+json']]);
 
@@ -2494,7 +2544,18 @@ class DocumentationNormalizerV2Test extends TestCase
         $propertyNameCollectionFactoryProphecy->create(InputDto::class, [])->shouldBeCalled()->willReturn(new PropertyNameCollection(['foo', 'bar']));
         $propertyNameCollectionFactoryProphecy->create(OutputDto::class, [])->shouldBeCalled()->willReturn(new PropertyNameCollection(['baz', 'bat']));
 
-        $dummyMetadata = new ResourceMetadata('Dummy', 'This is a dummy.', 'http://schema.example.com/Dummy', ['get' => [], 'put' => []], ['get' => [], 'post' => []], ['input' => ['class' => InputDto::class], 'output' => ['class' => OutputDto::class]]);
+        $dummyMetadata = new ResourceMetadata(
+            'Dummy',
+            'This is a dummy.',
+            'http://schema.example.com/Dummy',
+            ['get' => [], 'put' => []],
+            ['get' => [], 'post' => []],
+            [
+                'input' => ['class' => InputDto::class],
+                'output' => ['class' => OutputDto::class],
+                'formats' => ['jsonld' => ['application/ld+json']],
+            ]
+        );
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create(Dummy::class)->shouldBeCalled()->willReturn($dummyMetadata);
 

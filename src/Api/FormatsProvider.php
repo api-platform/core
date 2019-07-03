@@ -21,7 +21,7 @@ use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
  *
  * @author Anthony GRASSIOT <antograssiot@free.fr>
  *
- *  @deprecated since API Platform 2.5, use the "formats" attribute instead
+ * @deprecated since API Platform 2.5, use the "formats" attribute instead
  */
 final class FormatsProvider implements FormatsProviderInterface, OperationAwareFormatsProviderInterface
 {

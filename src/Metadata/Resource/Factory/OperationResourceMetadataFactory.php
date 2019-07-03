@@ -22,6 +22,8 @@ use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
  */
 final class OperationResourceMetadataFactory implements ResourceMetadataFactoryInterface
 {
+    use FormatsNormalizerTrait;
+
     /**
      * @internal
      */
@@ -41,11 +43,13 @@ final class OperationResourceMetadataFactory implements ResourceMetadataFactoryI
     ];
 
     private $decorated;
+    private $formats;
     private $patchFormats;
 
     public function __construct(ResourceMetadataFactoryInterface $decorated, array $formats = [], array $patchFormats = [])
     {
         $this->decorated = $decorated;
+        $this->formats = $formats;
         $this->patchFormats = $patchFormats;
 
         // Backward Compatibility layer
@@ -129,12 +133,18 @@ final class OperationResourceMetadataFactory implements ResourceMetadataFactoryI
                 $supported ? $operation['method'] = $upperOperationName : $operation['route_name'] = $operationName;
             }
 
+            $normalizeFormats = true;
             if (isset($operation['method'])) {
                 $operation['method'] = strtoupper($operation['method']);
 
-                if ('PATCH' === $operation['method'] && ($operation['formats'] ?? true)) {
+                if ('PATCH' === $operation['method'] && !isset($operation['formats'])) {
                     $operation['formats'] = $this->patchFormats;
+                    $normalizeFormats = false;
                 }
+            }
+
+            if ($normalizeFormats && isset($operation['formats'])) {
+                $operation['formats'] = $this->normalizeFormats($operation['formats'], ('PATCH' === $operation['method'] ?? '') ? $this->patchFormats : $this->formats);
             }
 
             $newOperations[$operationName] = $operation;

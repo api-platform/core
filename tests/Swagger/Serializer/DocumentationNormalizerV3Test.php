@@ -65,7 +65,21 @@ class DocumentationNormalizerV3Test extends TestCase
         $propertyNameCollectionFactoryProphecy->create(Dummy::class, [])->shouldBeCalled()->willReturn(new PropertyNameCollection(['id', 'name', 'description']));
         $propertyNameCollectionFactoryProphecy->create(Dummy::class)->shouldBeCalled()->willReturn(new PropertyNameCollection(['id', 'name', 'description']));
 
-        $dummyMetadata = new ResourceMetadata('Dummy', 'This is a dummy.', 'http://schema.example.com/Dummy', ['get' => ['method' => 'GET'], 'put' => ['method' => 'PUT']], ['get' => ['method' => 'GET'], 'post' => ['method' => 'POST'], 'custom' => ['method' => 'GET', 'path' => '/foo'], 'custom2' => ['method' => 'POST', 'path' => '/foo']], ['pagination_client_items_per_page' => true]);
+        $dummyMetadata = new ResourceMetadata(
+            'Dummy',
+            'This is a dummy.',
+            'http://schema.example.com/Dummy',
+            [
+                'get' => ['method' => 'GET'],
+                'put' => ['method' => 'PUT'],
+            ],
+            [
+                'get' => ['method' => 'GET'],
+                'post' => ['method' => 'POST'],
+                'custom' => ['method' => 'GET', 'path' => '/foo'],
+                'custom2' => ['method' => 'POST', 'path' => '/foo'],
+            ],
+            ['pagination_client_items_per_page' => true, 'formats' => ['jsonld' => ['application/ld+json']]]);
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create(Dummy::class)->shouldBeCalled()->willReturn($dummyMetadata);
 
@@ -362,7 +376,14 @@ class DocumentationNormalizerV3Test extends TestCase
         $propertyNameCollectionFactoryProphecy->create(Dummy::class, [])->shouldBeCalled()->willReturn(new PropertyNameCollection(['name', 'nameConverted']));
         $propertyNameCollectionFactoryProphecy->create(Dummy::class)->shouldBeCalled()->willReturn(new PropertyNameCollection(['name', 'nameConverted']));
 
-        $dummyMetadata = new ResourceMetadata('Dummy', 'This is a dummy.', null, ['get' => ['method' => 'GET']], [], []);
+        $dummyMetadata = new ResourceMetadata(
+            'Dummy',
+            'This is a dummy.',
+            null,
+            ['get' => ['method' => 'GET']],
+            [],
+            ['formats' => ['jsonld' => ['application/ld+json']]]
+        );
 
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create(Dummy::class)->shouldBeCalled()->willReturn($dummyMetadata);
@@ -488,7 +509,14 @@ class DocumentationNormalizerV3Test extends TestCase
         $propertyNameCollectionFactoryProphecy->create(Dummy::class, [])->shouldBeCalled()->willReturn(new PropertyNameCollection(['name']));
         $propertyNameCollectionFactoryProphecy->create(Dummy::class)->shouldBeCalled()->willReturn(new PropertyNameCollection(['name']));
 
-        $dummyMetadata = new ResourceMetadata('Dummy', 'This is a dummy.', null, ['get' => ['method' => 'GET']], [], []);
+        $dummyMetadata = new ResourceMetadata(
+            'Dummy',
+            'This is a dummy.',
+            null,
+            ['get' => ['method' => 'GET']],
+            [],
+            ['formats' => ['jsonld' => ['application/ld+json']]]
+        );
 
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create(Dummy::class)->shouldBeCalled()->willReturn($dummyMetadata);
@@ -644,7 +672,7 @@ class DocumentationNormalizerV3Test extends TestCase
                 'get' => ['method' => 'GET'],
                 'post' => ['method' => 'POST'],
             ],
-            []
+            ['formats' => ['jsonld' => ['application/ld+json']]]
         );
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create(Dummy::class)->shouldBeCalled()->willReturn($dummyMetadata);
@@ -866,7 +894,9 @@ class DocumentationNormalizerV3Test extends TestCase
                         DocumentationNormalizer::SWAGGER_DEFINITION_NAME => 'Read',
                     ],
                 ],
-            ]
+            ],
+            [],
+            ['formats' => ['jsonld' => ['application/ld+json']]]
         );
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create(Dummy::class)->shouldBeCalled()->willReturn($dummyMetadata);
@@ -991,7 +1021,7 @@ class DocumentationNormalizerV3Test extends TestCase
                 'get' => ['method' => 'GET'],
                 'post' => ['method' => 'POST'],
             ],
-            []
+            ['formats' => ['jsonld' => ['application/ld+json']]]
         );
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create(Dummy::class)->shouldBeCalled()->willReturn($dummyMetadata);
@@ -1220,7 +1250,7 @@ class DocumentationNormalizerV3Test extends TestCase
                 'get' => ['method' => 'GET'],
                 'post' => ['method' => 'POST'],
             ],
-            []
+            ['formats' => ['jsonld' => ['application/ld+json']]]
         );
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create(Dummy::class)->shouldBeCalled()->willReturn($dummyMetadata);
@@ -1579,7 +1609,7 @@ class DocumentationNormalizerV3Test extends TestCase
             null,
             [],
             [],
-            []
+            ['formats' => ['jsonld' => ['application/ld+json']]]
         );
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create(Dummy::class)->shouldBeCalled()->willReturn($dummyMetadata);
@@ -1647,7 +1677,7 @@ class DocumentationNormalizerV3Test extends TestCase
             null,
             [],
             ['get' => ['method' => 'FOO']],
-            []
+            ['formats' => ['jsonld' => ['application/ld+json']]]
         );
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create(Dummy::class)->shouldBeCalled()->willReturn($dummyMetadata);
@@ -1738,7 +1768,7 @@ class DocumentationNormalizerV3Test extends TestCase
                 'get' => ['method' => 'GET'],
                 'post' => ['method' => 'POST'],
             ],
-            []
+            ['formats' => ['jsonld' => ['application/ld+json']]]
         );
 
         $relatedDummyMetadata = new ResourceMetadata(
@@ -1749,7 +1779,7 @@ class DocumentationNormalizerV3Test extends TestCase
                 'get' => ['method' => 'GET'],
             ],
             [],
-            []
+            ['formats' => ['jsonld' => ['application/ld+json']]]
         );
 
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
@@ -1982,7 +2012,7 @@ class DocumentationNormalizerV3Test extends TestCase
             null,
             [],
             ['get' => ['method' => 'GET', 'filters' => ['f1', 'f2', 'f3', 'f4']]],
-            []
+            ['formats' => ['jsonld' => ['application/ld+json']]]
         );
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create(Dummy::class)->shouldBeCalled()->willReturn($dummyMetadata);
@@ -2116,8 +2146,22 @@ class DocumentationNormalizerV3Test extends TestCase
         $propertyNameCollectionFactoryProphecy->create(Question::class, Argument::any())->shouldBeCalled()->willReturn(new PropertyNameCollection(['answer']));
         $propertyNameCollectionFactoryProphecy->create(Answer::class, Argument::any())->shouldBeCalled()->willReturn(new PropertyNameCollection(['content']));
 
-        $questionMetadata = new ResourceMetadata('Question', 'This is a question.', 'http://schema.example.com/Question', ['get' => ['method' => 'GET']]);
-        $answerMetadata = new ResourceMetadata('Answer', 'This is an answer.', 'http://schema.example.com/Answer', [], ['get' => ['method' => 'GET']]);
+        $questionMetadata = new ResourceMetadata(
+            'Question',
+            'This is a question.',
+            'http://schema.example.com/Question',
+            ['get' => ['method' => 'GET']],
+            [],
+            ['formats' => ['jsonld' => ['application/ld+json']]]
+        );
+        $answerMetadata = new ResourceMetadata(
+            'Answer',
+            'This is an answer.',
+            'http://schema.example.com/Answer',
+            [],
+            ['get' => ['method' => 'GET']],
+            ['formats' => ['jsonld' => ['application/ld+json']]]
+        );
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create(Question::class)->shouldBeCalled()->willReturn($questionMetadata);
         $resourceMetadataFactoryProphecy->create(Answer::class)->shouldBeCalled()->willReturn($answerMetadata);
@@ -2286,7 +2330,14 @@ class DocumentationNormalizerV3Test extends TestCase
         $propertyNameCollectionFactoryProphecy->create(Dummy::class, [])->shouldBeCalled()->willReturn(new PropertyNameCollection(['id', 'name']));
         $propertyNameCollectionFactoryProphecy->create(Dummy::class)->shouldBeCalled()->willReturn(new PropertyNameCollection(['id', 'name']));
 
-        $dummyMetadata = new ResourceMetadata('Dummy', 'This is a dummy.', 'http://schema.example.com/Dummy', ['get' => ['method' => 'GET']]);
+        $dummyMetadata = new ResourceMetadata(
+            'Dummy',
+            'This is a dummy.',
+            'http://schema.example.com/Dummy',
+            ['get' => ['method' => 'GET']],
+            [],
+            ['formats' => ['jsonld' => ['application/ld+json']]]
+        );
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create(Dummy::class)->shouldBeCalled()->willReturn($dummyMetadata);
 
@@ -2399,7 +2450,14 @@ class DocumentationNormalizerV3Test extends TestCase
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyNameCollectionFactoryProphecy->create(Dummy::class, [])->shouldBeCalled()->willReturn(new PropertyNameCollection(['id', 'name']));
 
-        $dummyMetadata = new ResourceMetadata('Dummy', 'This is a dummy.', 'http://schema.example.com/Dummy', [], ['get' => ['method' => 'GET', 'pagination_client_enabled' => true]]);
+        $dummyMetadata = new ResourceMetadata(
+            'Dummy',
+            'This is a dummy.',
+            'http://schema.example.com/Dummy',
+            [],
+            ['get' => ['method' => 'GET', 'pagination_client_enabled' => true]],
+            ['formats' => ['jsonld' => ['application/ld+json']]]
+        );
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create(Dummy::class)->shouldBeCalled()->willReturn($dummyMetadata);
 
@@ -2523,7 +2581,14 @@ class DocumentationNormalizerV3Test extends TestCase
         $propertyNameCollectionFactoryProphecy->create(Dummy::class, [])->shouldBeCalled()->willReturn(new PropertyNameCollection(['id', 'name']));
         $propertyNameCollectionFactoryProphecy->create(Dummy::class)->shouldBeCalled()->willReturn(new PropertyNameCollection(['id', 'name']));
 
-        $dummyMetadata = new ResourceMetadata('Dummy', 'This is a dummy.', 'http://schema.example.com/Dummy', ['get' => ['method' => 'GET'], 'put' => ['method' => 'PUT']], ['get' => ['method' => 'GET'], 'post' => ['method' => 'POST']]);
+        $dummyMetadata = new ResourceMetadata(
+            'Dummy',
+            'This is a dummy.',
+            'http://schema.example.com/Dummy',
+            ['get' => ['method' => 'GET'], 'put' => ['method' => 'PUT']],
+            ['get' => ['method' => 'GET'], 'post' => ['method' => 'POST']],
+            ['formats' => ['jsonld' => ['application/ld+json']]]
+        );
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create(Dummy::class)->shouldBeCalled()->willReturn($dummyMetadata);
 
