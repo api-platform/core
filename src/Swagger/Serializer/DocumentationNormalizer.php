@@ -687,7 +687,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
             }
         }
 
-        if($urlencode) {
+        if ($urlencode) {
             return urlencode($definitionKey);
         }
 

@@ -3052,7 +3052,7 @@ class DocumentationNormalizerV3Test extends TestCase
                                 'type' => 'string',
                                 'description' => 'This is a name.',
                             ]),
-                        ]
+                        ],
                     ]),
                 ]),
             ],

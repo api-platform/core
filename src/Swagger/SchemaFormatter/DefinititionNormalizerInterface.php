@@ -31,6 +31,4 @@ interface DefinititionNormalizerInterface
      * Sets the property in the correct fields for this mime type.
      */
     public function setProperty(\ArrayObject $definitionSchema, $normalizedPropertyName, \ArrayObject $property, PropertyMetadata $propertyMetadata): void;
-
-
 }
