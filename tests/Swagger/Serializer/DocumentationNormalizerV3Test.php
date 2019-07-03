@@ -35,8 +35,8 @@ use ApiPlatform\Core\PathResolver\CustomOperationPathResolver;
 use ApiPlatform\Core\PathResolver\OperationPathResolver;
 use ApiPlatform\Core\PathResolver\OperationPathResolverInterface;
 use ApiPlatform\Core\Swagger\SchemaFormatter\ChainSchemaFormatter;
-use ApiPlatform\Core\Swagger\SchemaFormatter\DefaultSchemaFormatter;
-use ApiPlatform\Core\Swagger\SchemaFormatter\JsonApiSchemaFormatter;
+use ApiPlatform\Core\Swagger\SchemaFormatter\DefaultDefinititionNormalizer;
+use ApiPlatform\Core\Swagger\SchemaFormatter\JsonApiDefinititionNormalizer;
 use ApiPlatform\Core\Swagger\Serializer\DocumentationNormalizer;
 use ApiPlatform\Core\Tests\Fixtures\DummyFilter;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Answer;
@@ -89,7 +89,7 @@ class DocumentationNormalizerV3Test extends TestCase
 
         $operationPathResolver = new CustomOperationPathResolver(new OperationPathResolver(new UnderscorePathSegmentNameGenerator()));
         $schemaFormatterFactory = new ChainSchemaFormatter([
-            'application/json' => new DefaultSchemaFormatter(),
+            'application/json' => new DefaultDefinititionNormalizer(),
         ]);
 
         $normalizer = new DocumentationNormalizer(
@@ -161,7 +161,7 @@ class DocumentationNormalizerV3Test extends TestCase
                                     'application/ld+json' => [
                                         'schema' => [
                                             'type' => 'array',
-                                            'items' => ['$ref' => '#/components/schemas/application-ld+json-Dummy'],
+                                            'items' => ['$ref' => '#/components/schemas/application-ld%2Bjson-Dummy'],
                                         ],
                                     ],
                                 ],
@@ -174,7 +174,7 @@ class DocumentationNormalizerV3Test extends TestCase
                         'requestBody' => [
                             'content' => [
                                 'application/ld+json' => [
-                                    'schema' => ['$ref' => '#/components/schemas/application-ld+json-Dummy'],
+                                    'schema' => ['$ref' => '#/components/schemas/application-ld%2Bjson-Dummy'],
                                 ],
                             ],
                             'description' => 'The new Dummy resource',
@@ -185,7 +185,7 @@ class DocumentationNormalizerV3Test extends TestCase
                                 'description' => 'Dummy resource created',
                                 'content' => [
                                     'application/ld+json' => [
-                                        'schema' => ['$ref' => '#/components/schemas/application-ld+json-Dummy'],
+                                        'schema' => ['$ref' => '#/components/schemas/application-ld%2Bjson-Dummy'],
                                     ],
                                 ],
                                 'links' => [
@@ -219,7 +219,7 @@ class DocumentationNormalizerV3Test extends TestCase
                                 'description' => 'Dummy resource response',
                                 'content' => [
                                     'application/ld+json' => [
-                                        'schema' => ['$ref' => '#/components/schemas/application-ld+json-Dummy'],
+                                        'schema' => ['$ref' => '#/components/schemas/application-ld%2Bjson-Dummy'],
                                     ],
                                 ],
                             ],
@@ -232,7 +232,7 @@ class DocumentationNormalizerV3Test extends TestCase
                         'requestBody' => [
                             'content' => [
                                 'application/ld+json' => [
-                                    'schema' => ['$ref' => '#/components/schemas/application-ld+json-Dummy'],
+                                    'schema' => ['$ref' => '#/components/schemas/application-ld%2Bjson-Dummy'],
                                 ],
                             ],
                             'description' => 'The updated Dummy resource',
@@ -251,7 +251,7 @@ class DocumentationNormalizerV3Test extends TestCase
                                 'description' => 'Dummy resource updated',
                                 'content' => [
                                     'application/ld+json' => [
-                                        'schema' => ['$ref' => '#/components/schemas/application-ld+json-Dummy'],
+                                        'schema' => ['$ref' => '#/components/schemas/application-ld%2Bjson-Dummy'],
                                     ],
                                 ],
                             ],
@@ -288,7 +288,7 @@ class DocumentationNormalizerV3Test extends TestCase
                                     'application/ld+json' => [
                                         'schema' => [
                                             'type' => 'array',
-                                            'items' => ['$ref' => '#/components/schemas/application-ld+json-Dummy'],
+                                            'items' => ['$ref' => '#/components/schemas/application-ld%2Bjson-Dummy'],
                                         ],
                                     ],
                                 ],
@@ -302,7 +302,7 @@ class DocumentationNormalizerV3Test extends TestCase
                         'requestBody' => [
                             'content' => [
                                 'application/ld+json' => [
-                                    'schema' => ['$ref' => '#/components/schemas/application-ld+json-Dummy'],
+                                    'schema' => ['$ref' => '#/components/schemas/application-ld%2Bjson-Dummy'],
                                 ],
                             ],
                             'description' => 'The new Dummy resource',
@@ -312,7 +312,7 @@ class DocumentationNormalizerV3Test extends TestCase
                                 'description' => 'Dummy resource created',
                                 'content' => [
                                     'application/ld+json' => [
-                                        'schema' => ['$ref' => '#/components/schemas/application-ld+json-Dummy'],
+                                        'schema' => ['$ref' => '#/components/schemas/application-ld%2Bjson-Dummy'],
                                     ],
                                 ],
                                 'links' => [
@@ -391,7 +391,7 @@ class DocumentationNormalizerV3Test extends TestCase
         $operationPathResolver = new CustomOperationPathResolver(new OperationPathResolver(new UnderscorePathSegmentNameGenerator()));
 
         $schemaFormatterFactory = new ChainSchemaFormatter([
-            'application/json' => new DefaultSchemaFormatter(),
+            'application/json' => new DefaultDefinititionNormalizer(),
         ]);
 
         $normalizer = new DocumentationNormalizer(
@@ -449,7 +449,7 @@ class DocumentationNormalizerV3Test extends TestCase
                                 'description' => 'Dummy resource response',
                                 'content' => [
                                     'application/ld+json' => [
-                                        'schema' => ['$ref' => '#/components/schemas/application-ld+json-Dummy'],
+                                        'schema' => ['$ref' => '#/components/schemas/application-ld%2Bjson-Dummy'],
                                     ],
                                 ],
                             ],
@@ -528,7 +528,7 @@ class DocumentationNormalizerV3Test extends TestCase
         ];
 
         $schemaFormatterFactory = new ChainSchemaFormatter([
-            'application/json' => new DefaultSchemaFormatter(),
+            'application/json' => new DefaultDefinititionNormalizer(),
         ]);
 
         $normalizer = new DocumentationNormalizer(
@@ -587,7 +587,7 @@ class DocumentationNormalizerV3Test extends TestCase
                                 'description' => 'Dummy resource response',
                                 'content' => [
                                     'application/ld+json' => [
-                                        'schema' => ['$ref' => '#/components/schemas/application-ld+json-Dummy'],
+                                        'schema' => ['$ref' => '#/components/schemas/application-ld%2Bjson-Dummy'],
                                     ],
                                 ],
                             ],
@@ -682,7 +682,7 @@ class DocumentationNormalizerV3Test extends TestCase
         $operationPathResolver = new CustomOperationPathResolver(new OperationPathResolver(new UnderscorePathSegmentNameGenerator()));
 
         $schemaFormatterFactory = new ChainSchemaFormatter([
-            'application/json' => new DefaultSchemaFormatter(),
+            'application/json' => new DefaultDefinititionNormalizer(),
         ]);
 
         $normalizer = new DocumentationNormalizer(
@@ -745,7 +745,7 @@ class DocumentationNormalizerV3Test extends TestCase
                                     'application/ld+json' => [
                                         'schema' => [
                                             'type' => 'array',
-                                            'items' => ['$ref' => '#/components/schemas/application-ld+json-Dummy'],
+                                            'items' => ['$ref' => '#/components/schemas/application-ld%2Bjson-Dummy'],
                                         ],
                                     ],
                                 ],
@@ -759,7 +759,7 @@ class DocumentationNormalizerV3Test extends TestCase
                         'requestBody' => [
                             'content' => [
                                 'application/ld+json' => [
-                                    'schema' => ['$ref' => '#/components/schemas/application-ld+json-Dummy'],
+                                    'schema' => ['$ref' => '#/components/schemas/application-ld%2Bjson-Dummy'],
                                 ],
                             ],
                             'description' => 'The new Dummy resource',
@@ -769,7 +769,7 @@ class DocumentationNormalizerV3Test extends TestCase
                                 'description' => 'Dummy resource created',
                                 'content' => [
                                     'application/ld+json' => [
-                                        'schema' => ['$ref' => '#/components/schemas/application-ld+json-Dummy'],
+                                        'schema' => ['$ref' => '#/components/schemas/application-ld%2Bjson-Dummy'],
                                     ],
                                 ],
                             ],
@@ -796,7 +796,7 @@ class DocumentationNormalizerV3Test extends TestCase
                                 'description' => 'Dummy resource response',
                                 'content' => [
                                     'application/ld+json' => [
-                                        'schema' => ['$ref' => '#/components/schemas/application-ld+json-Dummy'],
+                                        'schema' => ['$ref' => '#/components/schemas/application-ld%2Bjson-Dummy'],
                                     ],
                                 ],
                             ],
@@ -809,7 +809,7 @@ class DocumentationNormalizerV3Test extends TestCase
                         'requestBody' => [
                             'content' => [
                                 'application/ld+json' => [
-                                    'schema' => ['$ref' => '#/components/schemas/application-ld+json-Dummy'],
+                                    'schema' => ['$ref' => '#/components/schemas/application-ld%2Bjson-Dummy'],
                                 ],
                             ],
                             'description' => 'The updated Dummy resource',
@@ -828,7 +828,7 @@ class DocumentationNormalizerV3Test extends TestCase
                                 'description' => 'Dummy resource updated',
                                 'content' => [
                                     'application/ld+json' => [
-                                        'schema' => ['$ref' => '#/components/schemas/application-ld+json-'.$ref],
+                                        'schema' => ['$ref' => '#/components/schemas/application-ld%2Bjson-'.$ref],
                                     ],
                                 ],
                             ],
@@ -904,7 +904,7 @@ class DocumentationNormalizerV3Test extends TestCase
         $operationPathResolver = new CustomOperationPathResolver(new OperationPathResolver(new UnderscorePathSegmentNameGenerator()));
 
         $schemaFormatterFactory = new ChainSchemaFormatter([
-            'application/json' => new DefaultSchemaFormatter(),
+            'application/json' => new DefaultDefinititionNormalizer(),
         ]);
 
         $normalizer = new DocumentationNormalizer(
@@ -962,7 +962,7 @@ class DocumentationNormalizerV3Test extends TestCase
                                 'description' => 'Dummy resource response',
                                 'content' => [
                                     'application/ld+json' => [
-                                        'schema' => ['$ref' => '#/components/schemas/application-ld+json-Dummy-Read'],
+                                        'schema' => ['$ref' => '#/components/schemas/application-ld%2Bjson-Dummy-Read'],
                                     ],
                                 ],
                             ],
@@ -1039,7 +1039,7 @@ class DocumentationNormalizerV3Test extends TestCase
         $operationPathResolver = new CustomOperationPathResolver(new OperationPathResolver(new UnderscorePathSegmentNameGenerator()));
 
         $schemaFormatterFactory = new ChainSchemaFormatter([
-            'application/json' => new DefaultSchemaFormatter(),
+            'application/json' => new DefaultDefinititionNormalizer(),
         ]);
 
         $normalizer = new DocumentationNormalizer(
@@ -1102,7 +1102,7 @@ class DocumentationNormalizerV3Test extends TestCase
                                     'application/ld+json' => [
                                         'schema' => [
                                             'type' => 'array',
-                                            'items' => ['$ref' => '#/components/schemas/application-ld+json-Dummy'],
+                                            'items' => ['$ref' => '#/components/schemas/application-ld%2Bjson-Dummy'],
                                         ],
                                     ],
                                 ],
@@ -1115,7 +1115,7 @@ class DocumentationNormalizerV3Test extends TestCase
                         'requestBody' => [
                             'content' => [
                                 'application/ld+json' => [
-                                    'schema' => ['$ref' => '#/components/schemas/application-ld+json-Dummy'],
+                                    'schema' => ['$ref' => '#/components/schemas/application-ld%2Bjson-Dummy'],
                                 ],
                             ],
                             'description' => 'The new Dummy resource',
@@ -1126,7 +1126,7 @@ class DocumentationNormalizerV3Test extends TestCase
                                 'description' => 'Dummy resource created',
                                 'content' => [
                                     'application/ld+json' => [
-                                        'schema' => ['$ref' => '#/components/schemas/application-ld+json-Dummy'],
+                                        'schema' => ['$ref' => '#/components/schemas/application-ld%2Bjson-Dummy'],
                                     ],
                                 ],
                             ],
@@ -1151,7 +1151,7 @@ class DocumentationNormalizerV3Test extends TestCase
                                 'description' => 'Dummy resource response',
                                 'content' => [
                                     'application/ld+json' => [
-                                        'schema' => ['$ref' => '#/components/schemas/application-ld+json-Dummy'],
+                                        'schema' => ['$ref' => '#/components/schemas/application-ld%2Bjson-Dummy'],
                                     ],
                                 ],
                             ],
@@ -1164,7 +1164,7 @@ class DocumentationNormalizerV3Test extends TestCase
                         'requestBody' => [
                             'content' => [
                                 'application/ld+json' => [
-                                    'schema' => ['$ref' => '#/components/schemas/application-ld+json-Dummy-dummy'],
+                                    'schema' => ['$ref' => '#/components/schemas/application-ld%2Bjson-Dummy-dummy'],
                                 ],
                             ],
                             'description' => 'The updated Dummy resource',
@@ -1183,7 +1183,7 @@ class DocumentationNormalizerV3Test extends TestCase
                                 'description' => 'Dummy resource updated',
                                 'content' => [
                                     'application/ld+json' => [
-                                        'schema' => ['$ref' => '#/components/schemas/application-ld+json-Dummy'],
+                                        'schema' => ['$ref' => '#/components/schemas/application-ld%2Bjson-Dummy'],
                                     ],
                                 ],
                             ],
@@ -1273,7 +1273,7 @@ class DocumentationNormalizerV3Test extends TestCase
         $operationPathResolver = new CustomOperationPathResolver(new OperationPathResolver(new UnderscorePathSegmentNameGenerator()));
 
         $schemaFormatterFactory = new ChainSchemaFormatter([
-            'application/json' => new DefaultSchemaFormatter(),
+            'application/json' => new DefaultDefinititionNormalizer(),
         ]);
 
         $normalizer = new DocumentationNormalizer(
@@ -1336,7 +1336,7 @@ class DocumentationNormalizerV3Test extends TestCase
                                     'application/ld+json' => [
                                         'schema' => [
                                             'type' => 'array',
-                                            'items' => ['$ref' => '#/components/schemas/application-ld+json-Dummy'],
+                                            'items' => ['$ref' => '#/components/schemas/application-ld%2Bjson-Dummy'],
                                         ],
                                     ],
                                 ],
@@ -1349,7 +1349,7 @@ class DocumentationNormalizerV3Test extends TestCase
                         'requestBody' => [
                             'content' => [
                                 'application/ld+json' => [
-                                    'schema' => ['$ref' => '#/components/schemas/application-ld+json-Dummy'],
+                                    'schema' => ['$ref' => '#/components/schemas/application-ld%2Bjson-Dummy'],
                                 ],
                             ],
                             'description' => 'The new Dummy resource',
@@ -1360,7 +1360,7 @@ class DocumentationNormalizerV3Test extends TestCase
                                 'description' => 'Dummy resource created',
                                 'content' => [
                                     'application/ld+json' => [
-                                        'schema' => ['$ref' => '#/components/schemas/application-ld+json-Dummy'],
+                                        'schema' => ['$ref' => '#/components/schemas/application-ld%2Bjson-Dummy'],
                                     ],
                                 ],
                             ],
@@ -1385,7 +1385,7 @@ class DocumentationNormalizerV3Test extends TestCase
                                 'description' => 'Dummy resource response',
                                 'content' => [
                                     'application/ld+json' => [
-                                        'schema' => ['$ref' => '#/components/schemas/application-ld+json-Dummy'],
+                                        'schema' => ['$ref' => '#/components/schemas/application-ld%2Bjson-Dummy'],
                                     ],
                                 ],
                             ],
@@ -1398,7 +1398,7 @@ class DocumentationNormalizerV3Test extends TestCase
                         'requestBody' => [
                             'content' => [
                                 'application/ld+json' => [
-                                    'schema' => ['$ref' => '#/components/schemas/application-ld+json-Dummy-dummy'],
+                                    'schema' => ['$ref' => '#/components/schemas/application-ld%2Bjson-Dummy-dummy'],
                                 ],
                             ],
                             'description' => 'The updated Dummy resource',
@@ -1417,7 +1417,7 @@ class DocumentationNormalizerV3Test extends TestCase
                                 'description' => 'Dummy resource updated',
                                 'content' => [
                                     'application/ld+json' => [
-                                        'schema' => ['$ref' => '#/components/schemas/application-ld+json-Dummy-dummy'],
+                                        'schema' => ['$ref' => '#/components/schemas/application-ld%2Bjson-Dummy-dummy'],
                                     ],
                                 ],
                             ],
@@ -1811,8 +1811,8 @@ class DocumentationNormalizerV3Test extends TestCase
         $operationPathResolver = new CustomOperationPathResolver(new OperationPathResolver(new UnderscorePathSegmentNameGenerator()));
 
         $schemaFormatterFactory = new ChainSchemaFormatter([
-            'application/vnd.api+json' => new JsonApiSchemaFormatter(),
-            'application/json' => new DefaultSchemaFormatter(),
+            'application/vnd.api+json' => new JsonApiDefinititionNormalizer(),
+            'application/json' => new DefaultDefinititionNormalizer(),
         ]);
 
         $normalizer = new DocumentationNormalizer(
@@ -1875,13 +1875,13 @@ class DocumentationNormalizerV3Test extends TestCase
                                     'application/ld+json' => [
                                         'schema' => [
                                             'type' => 'array',
-                                            'items' => ['$ref' => '#/components/schemas/application-ld+json-Dummy'],
+                                            'items' => ['$ref' => '#/components/schemas/application-ld%2Bjson-Dummy'],
                                         ],
                                     ],
                                     'application/vnd.api+json' => [
                                         'schema' => [
                                             'type' => 'array',
-                                            'items' => ['$ref' => '#/components/schemas/application-vnd.api+json-Dummy'],
+                                            'items' => ['$ref' => '#/components/schemas/application-vnd.api%2Bjson-Dummy'],
                                         ],
                                     ],
                                 ],
@@ -1894,10 +1894,10 @@ class DocumentationNormalizerV3Test extends TestCase
                         'requestBody' => [
                             'content' => [
                                 'application/ld+json' => [
-                                    'schema' => ['$ref' => '#/components/schemas/application-ld+json-Dummy'],
+                                    'schema' => ['$ref' => '#/components/schemas/application-ld%2Bjson-Dummy'],
                                 ],
                                 'application/vnd.api+json' => [
-                                    'schema' => ['$ref' => '#/components/schemas/application-vnd.api+json-Dummy'],
+                                    'schema' => ['$ref' => '#/components/schemas/application-vnd.api%2Bjson-Dummy'],
                                 ],
                             ],
                             'description' => 'The new Dummy resource',
@@ -1908,10 +1908,10 @@ class DocumentationNormalizerV3Test extends TestCase
                                 'description' => 'Dummy resource created',
                                 'content' => [
                                     'application/ld+json' => [
-                                        'schema' => ['$ref' => '#/components/schemas/application-ld+json-Dummy'],
+                                        'schema' => ['$ref' => '#/components/schemas/application-ld%2Bjson-Dummy'],
                                     ],
                                     'application/vnd.api+json' => [
-                                        'schema' => ['$ref' => '#/components/schemas/application-vnd.api+json-Dummy'],
+                                        'schema' => ['$ref' => '#/components/schemas/application-vnd.api%2Bjson-Dummy'],
                                     ],
                                 ],
                             ],
@@ -1936,10 +1936,10 @@ class DocumentationNormalizerV3Test extends TestCase
                                 'description' => 'Dummy resource response',
                                 'content' => [
                                     'application/ld+json' => [
-                                        'schema' => ['$ref' => '#/components/schemas/application-ld+json-Dummy'],
+                                        'schema' => ['$ref' => '#/components/schemas/application-ld%2Bjson-Dummy'],
                                     ],
                                     'application/vnd.api+json' => [
-                                        'schema' => ['$ref' => '#/components/schemas/application-vnd.api+json-Dummy'],
+                                        'schema' => ['$ref' => '#/components/schemas/application-vnd.api%2Bjson-Dummy'],
                                     ],
                                 ],
                             ],
@@ -1952,10 +1952,10 @@ class DocumentationNormalizerV3Test extends TestCase
                         'requestBody' => [
                             'content' => [
                                 'application/ld+json' => [
-                                    'schema' => ['$ref' => '#/components/schemas/application-ld+json-Dummy'],
+                                    'schema' => ['$ref' => '#/components/schemas/application-ld%2Bjson-Dummy'],
                                 ],
                                 'application/vnd.api+json' => [
-                                    'schema' => ['$ref' => '#/components/schemas/application-vnd.api+json-Dummy'],
+                                    'schema' => ['$ref' => '#/components/schemas/application-vnd.api%2Bjson-Dummy'],
                                 ],
                             ],
                             'description' => 'The updated Dummy resource',
@@ -1974,10 +1974,10 @@ class DocumentationNormalizerV3Test extends TestCase
                                 'description' => 'Dummy resource updated',
                                 'content' => [
                                     'application/ld+json' => [
-                                        'schema' => ['$ref' => '#/components/schemas/application-ld+json-'.$ref],
+                                        'schema' => ['$ref' => '#/components/schemas/application-ld%2Bjson-'.$ref],
                                     ],
                                     'application/vnd.api+json' => [
-                                        'schema' => ['$ref' => '#/components/schemas/application-vnd.api+json-'.$ref],
+                                        'schema' => ['$ref' => '#/components/schemas/application-vnd.api%2Bjson-'.$ref],
                                     ],
                                 ],
                             ],
@@ -2011,7 +2011,7 @@ class DocumentationNormalizerV3Test extends TestCase
                             ]),
                             'relatedDummy' => new \ArrayObject([
                                 'description' => 'This is a related dummy \o/.',
-                                '$ref' => '#/components/schemas/application-ld+json-'.$relatedDummyRef,
+                                '$ref' => '#/components/schemas/application-ld%2Bjson-'.$relatedDummyRef,
                             ]),
                         ],
                     ]),
@@ -2176,7 +2176,7 @@ class DocumentationNormalizerV3Test extends TestCase
         $operationPathResolver = new CustomOperationPathResolver(new OperationPathResolver(new UnderscorePathSegmentNameGenerator()));
 
         $schemaFormatterFactory = new ChainSchemaFormatter([
-            'application/json' => new DefaultSchemaFormatter(),
+            'application/json' => new DefaultDefinititionNormalizer(),
         ]);
 
         $normalizer = new DocumentationNormalizer(
@@ -2227,7 +2227,7 @@ class DocumentationNormalizerV3Test extends TestCase
                                     'application/ld+json' => [
                                         'schema' => [
                                             'type' => 'array',
-                                            'items' => ['$ref' => '#/components/schemas/application-ld+json-Dummy'],
+                                            'items' => ['$ref' => '#/components/schemas/application-ld%2Bjson-Dummy'],
                                         ],
                                     ],
                                 ],
@@ -2336,8 +2336,8 @@ class DocumentationNormalizerV3Test extends TestCase
         $formatProviderProphecy->getFormatsFromOperation(Answer::class, 'get', OperationType::SUBRESOURCE)->willReturn(['xml' => ['text/xml']]);
 
         $schemaFormatterFactory = new ChainSchemaFormatter([
-            'application/json' => new DefaultSchemaFormatter(),
-            'text/xml' => new DefaultSchemaFormatter(), //@todo: use correct formatter
+            'application/json' => new DefaultDefinititionNormalizer(),
+            'text/xml' => new DefaultDefinititionNormalizer(), //@todo: use correct formatter
         ]);
 
         $normalizer = new DocumentationNormalizer(
@@ -2526,7 +2526,7 @@ class DocumentationNormalizerV3Test extends TestCase
         $operationPathResolver = new CustomOperationPathResolver(new OperationPathResolver(new UnderscorePathSegmentNameGenerator()));
 
         $schemaFormatterFactory = new ChainSchemaFormatter([
-            'application/json' => new DefaultSchemaFormatter(),
+            'application/json' => new DefaultDefinititionNormalizer(),
         ]);
 
         $normalizer = new DocumentationNormalizer(
@@ -2585,7 +2585,7 @@ class DocumentationNormalizerV3Test extends TestCase
                                 'description' => 'Dummy resource response',
                                 'content' => [
                                     'application/ld+json' => [
-                                        'schema' => ['$ref' => '#/components/schemas/application-ld+json-Dummy'],
+                                        'schema' => ['$ref' => '#/components/schemas/application-ld%2Bjson-Dummy'],
                                     ],
                                 ],
                             ],
@@ -2644,7 +2644,7 @@ class DocumentationNormalizerV3Test extends TestCase
         $operationPathResolver = new CustomOperationPathResolver(new OperationPathResolver(new UnderscorePathSegmentNameGenerator()));
 
         $schemaFormatterFactory = new ChainSchemaFormatter([
-            'application/json' => new DefaultSchemaFormatter(),
+            'application/json' => new DefaultDefinititionNormalizer(),
         ]);
 
         $normalizer = new DocumentationNormalizer(
@@ -2713,7 +2713,7 @@ class DocumentationNormalizerV3Test extends TestCase
                                     'application/ld+json' => [
                                         'schema' => [
                                             'type' => 'array',
-                                            'items' => ['$ref' => '#/components/schemas/application-ld+json-Dummy'],
+                                            'items' => ['$ref' => '#/components/schemas/application-ld%2Bjson-Dummy'],
                                         ],
                                     ],
                                 ],
@@ -2782,8 +2782,8 @@ class DocumentationNormalizerV3Test extends TestCase
         $formatProviderProphecy->getFormatsFromOperation(Dummy::class, 'put', OperationType::ITEM)->willReturn(['json' => ['application/json'], 'csv' => ['text/csv']]);
 
         $schemaFormatterFactory = new ChainSchemaFormatter([
-            'application/vnd.api+json' => new JsonApiSchemaFormatter(),
-            'application/json' => new DefaultSchemaFormatter(),
+            'application/vnd.api+json' => new JsonApiDefinititionNormalizer(),
+            'application/json' => new DefaultDefinititionNormalizer(),
         ]);
 
         $normalizer = new DocumentationNormalizer(
@@ -2906,7 +2906,7 @@ class DocumentationNormalizerV3Test extends TestCase
                                 'description' => 'Dummy resource response',
                                 'content' => [
                                     'application/vnd.api+json' => [
-                                        'schema' => ['$ref' => '#/components/schemas/application-vnd.api+json-Dummy'],
+                                        'schema' => ['$ref' => '#/components/schemas/application-vnd.api%2Bjson-Dummy'],
                                     ],
                                 ],
                             ],

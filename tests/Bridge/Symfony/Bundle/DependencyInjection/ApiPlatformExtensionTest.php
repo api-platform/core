@@ -73,7 +73,7 @@ use ApiPlatform\Core\Security\ResourceAccessCheckerInterface;
 use ApiPlatform\Core\Serializer\Filter\GroupFilter;
 use ApiPlatform\Core\Serializer\Filter\PropertyFilter;
 use ApiPlatform\Core\Serializer\SerializerContextBuilderInterface;
-use ApiPlatform\Core\Swagger\SchemaFormatter\SchemaFormatterInterface;
+use ApiPlatform\Core\Swagger\SchemaFormatter\DefinititionNormalizerInterface;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\TestBundle;
 use ApiPlatform\Core\Validator\ValidatorInterface;
 use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
@@ -1033,7 +1033,7 @@ class ApiPlatformExtensionTest extends TestCase
             ->willReturn($this->childDefinitionProphecy)->shouldBeCalledTimes(1);
         $this->childDefinitionProphecy->addTag('api_platform.data_transformer')->shouldBeCalledTimes(1);
 
-        $containerBuilderProphecy->registerForAutoconfiguration(SchemaFormatterInterface::class)
+        $containerBuilderProphecy->registerForAutoconfiguration(DefinititionNormalizerInterface::class)
             ->willReturn($this->childDefinitionProphecy)->shouldBeCalledTimes(1);
         $this->childDefinitionProphecy->addTag('api_platform.schema_formatter')->shouldBeCalledTimes(1);
 

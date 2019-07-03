@@ -15,21 +15,21 @@ namespace ApiPlatform\Core\Swagger\SchemaFormatter;
 
 use ApiPlatform\Core\Exception\FormatterNotFoundException;
 
-final class ChainSchemaFormatter
+final class ChainSchemaFormatter implements SchemaFormatterInterface
 {
     private $formatters;
 
     /**
      * SchemaFormatterProvider constructor.
      *
-     * @param SchemaFormatterInterface[] $formatters
+     * @param DefinititionNormalizerInterface[] $formatters
      */
     public function __construct(/* iterable */ $formatters)
     {
         $this->formatters = $formatters;
     }
 
-    public function getFormatter(string $mimeType): SchemaFormatterInterface
+    public function getFormatter(string $mimeType): DefinititionNormalizerInterface
     {
         foreach ($this->formatters as $formatter) {
             if ($formatter->supports($mimeType)) {

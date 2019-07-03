@@ -52,10 +52,10 @@
             <tag name="console.command" />
         </service>
 
-        <service id="api_platform.schema_formatter.json" class="ApiPlatform\Core\Swagger\SchemaFormatter\DefaultSchemaFormatter" >
+        <service id="api_platform.schema_formatter.json" class="DefaultDefinititionNormalizer" >
             <tag name="api_platform.schema_formatter" priority="-1000" />
         </service>
-        <service id="api_platform.schema_formatter.api+json" class="ApiPlatform\Core\Swagger\SchemaFormatter\JsonApiSchemaFormatter" >
+        <service id="api_platform.schema_formatter.api+json" class="JsonApiDefinititionNormalizer" >
             <tag name="api_platform.schema_formatter" priority="-100" />
         </service>
 

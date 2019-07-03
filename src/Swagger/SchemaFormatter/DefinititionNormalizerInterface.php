@@ -15,7 +15,7 @@ namespace ApiPlatform\Core\Swagger\SchemaFormatter;
 
 use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 
-interface SchemaFormatterInterface
+interface DefinititionNormalizerInterface
 {
     /**
      * Returns if the mimetype is supported by this formatter.
@@ -31,4 +31,6 @@ interface SchemaFormatterInterface
      * Sets the property in the correct fields for this mime type.
      */
     public function setProperty(\ArrayObject $definitionSchema, $normalizedPropertyName, \ArrayObject $property, PropertyMetadata $propertyMetadata): void;
+
+
 }
