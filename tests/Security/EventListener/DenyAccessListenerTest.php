@@ -78,13 +78,13 @@ class DenyAccessListenerTest extends TestCase
         $eventProphecy->getRequest()->willReturn($request)->shouldBeCalled();
         $event = $eventProphecy->reveal();
 
-        $resourceMetadata = new ResourceMetadata(null, null, null, null, null, ['access_control' => 'has_role("ROLE_ADMIN")']);
+        $resourceMetadata = new ResourceMetadata(null, null, null, null, null, ['access_control' => 'is_granted("ROLE_ADMIN")']);
 
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create('Foo')->willReturn($resourceMetadata)->shouldBeCalled();
 
         $resourceAccessCheckerProphecy = $this->prophesize(ResourceAccessCheckerInterface::class);
-        $resourceAccessCheckerProphecy->isGranted('Foo', 'has_role("ROLE_ADMIN")', Argument::type('array'))->willReturn(true)->shouldBeCalled();
+        $resourceAccessCheckerProphecy->isGranted('Foo', 'is_granted("ROLE_ADMIN")', Argument::type('array'))->willReturn(true)->shouldBeCalled();
 
         $listener = $this->getListener($resourceMetadataFactoryProphecy->reveal(), $resourceAccessCheckerProphecy->reveal());
         $listener->onKernelRequest($event);
@@ -100,13 +100,13 @@ class DenyAccessListenerTest extends TestCase
         $eventProphecy->getRequest()->willReturn($request)->shouldBeCalled();
         $event = $eventProphecy->reveal();
 
-        $resourceMetadata = new ResourceMetadata(null, null, null, null, null, ['access_control' => 'has_role("ROLE_ADMIN")']);
+        $resourceMetadata = new ResourceMetadata(null, null, null, null, null, ['access_control' => 'is_granted("ROLE_ADMIN")']);
 
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create('Foo')->willReturn($resourceMetadata)->shouldBeCalled();
 
         $resourceAccessCheckerProphecy = $this->prophesize(ResourceAccessCheckerInterface::class);
-        $resourceAccessCheckerProphecy->isGranted('Foo', 'has_role("ROLE_ADMIN")', Argument::type('array'))->willReturn(false)->shouldBeCalled();
+        $resourceAccessCheckerProphecy->isGranted('Foo', 'is_granted("ROLE_ADMIN")', Argument::type('array'))->willReturn(false)->shouldBeCalled();
 
         $listener = $this->getListener($resourceMetadataFactoryProphecy->reveal(), $resourceAccessCheckerProphecy->reveal());
         $listener->onKernelRequest($event);
@@ -123,13 +123,13 @@ class DenyAccessListenerTest extends TestCase
         $eventProphecy->getRequest()->willReturn($request)->shouldBeCalled();
         $event = $eventProphecy->reveal();
 
-        $resourceMetadata = new ResourceMetadata(null, null, null, null, null, ['access_control' => 'has_role("ROLE_ADMIN")', 'access_control_message' => 'You are not admin.']);
+        $resourceMetadata = new ResourceMetadata(null, null, null, null, null, ['access_control' => 'is_granted("ROLE_ADMIN")', 'access_control_message' => 'You are not admin.']);
 
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create('Foo')->willReturn($resourceMetadata)->shouldBeCalled();
 
         $resourceAccessCheckerProphecy = $this->prophesize(ResourceAccessCheckerInterface::class);
-        $resourceAccessCheckerProphecy->isGranted('Foo', 'has_role("ROLE_ADMIN")', Argument::type('array'))->willReturn(false)->shouldBeCalled();
+        $resourceAccessCheckerProphecy->isGranted('Foo', 'is_granted("ROLE_ADMIN")', Argument::type('array'))->willReturn(false)->shouldBeCalled();
 
         $listener = $this->getListener($resourceMetadataFactoryProphecy->reveal(), $resourceAccessCheckerProphecy->reveal());
         $listener->onKernelRequest($event);
@@ -147,13 +147,13 @@ class DenyAccessListenerTest extends TestCase
         $eventProphecy->getRequest()->willReturn($request)->shouldBeCalled();
         $event = $eventProphecy->reveal();
 
-        $resourceMetadata = new ResourceMetadata(null, null, null, null, null, ['access_control' => 'has_role("ROLE_ADMIN")']);
+        $resourceMetadata = new ResourceMetadata(null, null, null, null, null, ['access_control' => 'is_granted("ROLE_ADMIN")']);
 
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create('Foo')->willReturn($resourceMetadata)->shouldBeCalled();
 
         $expressionLanguageProphecy = $this->prophesize(ExpressionLanguage::class);
-        $expressionLanguageProphecy->evaluate('has_role("ROLE_ADMIN")', Argument::type('array'))->willReturn(true)->shouldBeCalled();
+        $expressionLanguageProphecy->evaluate('is_granted("ROLE_ADMIN")', Argument::type('array'))->willReturn(true)->shouldBeCalled();
 
         $listener = $this->getLegacyListener($resourceMetadataFactoryProphecy->reveal(), $expressionLanguageProphecy->reveal());
         $listener->onKernelRequest($event);
@@ -172,13 +172,13 @@ class DenyAccessListenerTest extends TestCase
         $eventProphecy->getRequest()->willReturn($request)->shouldBeCalled();
         $event = $eventProphecy->reveal();
 
-        $resourceMetadata = new ResourceMetadata(null, null, null, null, null, ['access_control' => 'has_role("ROLE_ADMIN")']);
+        $resourceMetadata = new ResourceMetadata(null, null, null, null, null, ['access_control' => 'is_granted("ROLE_ADMIN")']);
 
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create('Foo')->willReturn($resourceMetadata)->shouldBeCalled();
 
         $expressionLanguageProphecy = $this->prophesize(ExpressionLanguage::class);
-        $expressionLanguageProphecy->evaluate('has_role("ROLE_ADMIN")', Argument::type('array'))->willReturn(false)->shouldBeCalled();
+        $expressionLanguageProphecy->evaluate('is_granted("ROLE_ADMIN")', Argument::type('array'))->willReturn(false)->shouldBeCalled();
 
         $listener = $this->getLegacyListener($resourceMetadataFactoryProphecy->reveal(), $expressionLanguageProphecy->reveal());
         $listener->onKernelRequest($event);
@@ -197,7 +197,7 @@ class DenyAccessListenerTest extends TestCase
         $eventProphecy->getRequest()->willReturn($request)->shouldBeCalled();
         $event = $eventProphecy->reveal();
 
-        $resourceMetadata = new ResourceMetadata(null, null, null, null, null, ['access_control' => 'has_role("ROLE_ADMIN")']);
+        $resourceMetadata = new ResourceMetadata(null, null, null, null, null, ['access_control' => 'is_granted("ROLE_ADMIN")']);
 
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create('Foo')->willReturn($resourceMetadata)->shouldBeCalled();
@@ -219,7 +219,7 @@ class DenyAccessListenerTest extends TestCase
         $eventProphecy->getRequest()->willReturn($request)->shouldBeCalled();
         $event = $eventProphecy->reveal();
 
-        $resourceMetadata = new ResourceMetadata(null, null, null, null, null, ['access_control' => 'has_role("ROLE_ADMIN")']);
+        $resourceMetadata = new ResourceMetadata(null, null, null, null, null, ['access_control' => 'is_granted("ROLE_ADMIN")']);
 
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create('Foo')->willReturn($resourceMetadata)->shouldBeCalled();
@@ -245,7 +245,7 @@ class DenyAccessListenerTest extends TestCase
         $eventProphecy->getRequest()->willReturn($request)->shouldBeCalled();
         $event = $eventProphecy->reveal();
 
-        $resourceMetadata = new ResourceMetadata(null, null, null, null, null, ['access_control' => 'has_role("ROLE_ADMIN")']);
+        $resourceMetadata = new ResourceMetadata(null, null, null, null, null, ['access_control' => 'is_granted("ROLE_ADMIN")']);
 
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create('Foo')->willReturn($resourceMetadata)->shouldBeCalled();
