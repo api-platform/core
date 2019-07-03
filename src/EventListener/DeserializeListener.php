@@ -22,7 +22,6 @@ use ApiPlatform\Core\Serializer\SerializerContextBuilderInterface;
 use ApiPlatform\Core\Util\RequestAttributesExtractor;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
-use Symfony\Component\HttpKernel\Exception\NotAcceptableHttpException;
 use Symfony\Component\HttpKernel\Exception\UnsupportedMediaTypeHttpException;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\SerializerInterface;
@@ -66,6 +65,8 @@ final class DeserializeListener
 
     /**
      * Deserializes the data sent in the requested format.
+     *
+     * @throws UnsupportedMediaTypeHttpException
      */
     public function onKernelRequest(GetResponseEvent $event): void
     {
@@ -105,7 +106,7 @@ final class DeserializeListener
     /**
      * Extracts the format from the Content-Type header and check that it is supported.
      *
-     * @throws NotAcceptableHttpException
+     * @throws UnsupportedMediaTypeHttpException
      */
     private function getFormat(Request $request): string
     {
