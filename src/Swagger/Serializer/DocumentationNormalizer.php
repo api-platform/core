@@ -491,7 +491,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
             } else {
                 $responseDefinitionKey = $this->getDefinition($v3, $definitions, $resourceMetadata, $resourceClass,
                     $outputClass,
-                    $this->getSerializerContext($operationType, false, $resourceMetadata, $operationName),);
+                    $this->getSerializerContext($operationType, false, $resourceMetadata, $operationName));
             }
         }
 
