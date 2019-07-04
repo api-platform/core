@@ -33,7 +33,7 @@ final class CompositeIdentifierParser
     {
         $matches = [];
         $identifiers = [];
-        $num = preg_match_all('/(\w+)=(?<=\w=)(.+?)(?=;\w+=)|(\w+)=([^;]+);?$/', $identifier, $matches, PREG_SET_ORDER);
+        $num = preg_match_all('/(\w+)=(?<=\w=)(.*?)(?=;\w+=)|(\w+)=([^;]*);?$/', $identifier, $matches, PREG_SET_ORDER);
 
         foreach ($matches as $i => $match) {
             if ($i === $num - 1) {
