@@ -93,7 +93,7 @@ abstract class AbstractFilter implements FilterInterface
 
     protected function denormalizePropertyName($property)
     {
-        if (null === $this->nameConverter) {
+        if (!$this->nameConverter instanceof NameConverterInterface) {
             return $property;
         }
 
@@ -102,7 +102,7 @@ abstract class AbstractFilter implements FilterInterface
 
     protected function normalizePropertyName($property)
     {
-        if (null === $this->nameConverter) {
+        if (!$this->nameConverter instanceof NameConverterInterface) {
             return $property;
         }
 
