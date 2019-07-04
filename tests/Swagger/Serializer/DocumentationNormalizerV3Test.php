@@ -57,9 +57,9 @@ use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
  */
 class DocumentationNormalizerV3Test extends TestCase
 {
-    public function testNormalize()
+    public function testNormalize(): void
     {
-        $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), 'Test API', 'This is a test API.', '1.2.3', ['jsonld' => ['application/ld+json']]);
+        $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), 'Test API', 'This is a test API.', '1.2.3');
 
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyNameCollectionFactoryProphecy->create(Dummy::class, [])->shouldBeCalled()->willReturn(new PropertyNameCollection(['id', 'name', 'description']));
@@ -370,7 +370,7 @@ class DocumentationNormalizerV3Test extends TestCase
 
     public function testNormalizeWithNameConverter()
     {
-        $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), 'Dummy API', 'This is a dummy API', '1.2.3', ['jsonld' => ['application/ld+json']]);
+        $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), 'Dummy API', 'This is a dummy API', '1.2.3');
 
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyNameCollectionFactoryProphecy->create(Dummy::class, [])->shouldBeCalled()->willReturn(new PropertyNameCollection(['name', 'nameConverted']));
@@ -503,7 +503,7 @@ class DocumentationNormalizerV3Test extends TestCase
 
     public function testNormalizeWithApiKeysEnabled()
     {
-        $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), 'Test API', 'This is a test API.', '1.2.3', ['jsonld' => ['application/ld+json']]);
+        $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), 'Test API', 'This is a test API.', '1.2.3');
 
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyNameCollectionFactoryProphecy->create(Dummy::class, [])->shouldBeCalled()->willReturn(new PropertyNameCollection(['name']));
@@ -648,9 +648,8 @@ class DocumentationNormalizerV3Test extends TestCase
     {
         $title = 'Test API';
         $description = 'This is a test API.';
-        $formats = ['jsonld' => ['application/ld+json']];
         $version = '1.2.3';
-        $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), $title, $description, $version, $formats);
+        $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), $title, $description, $version);
         $groups = ['dummy', 'foo', 'bar'];
 
         $ref = 'Dummy-'.implode('_', $groups);
@@ -877,7 +876,7 @@ class DocumentationNormalizerV3Test extends TestCase
 
     public function testNormalizeWithOpenApiDefinitionName()
     {
-        $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), 'Test API', 'This is a test API.', '1.2.3', ['jsonld' => ['application/ld+json']]);
+        $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), 'Test API', 'This is a test API.', '1.2.3');
 
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyNameCollectionFactoryProphecy->create(Dummy::class, [])->shouldBeCalled()->willReturn(new PropertyNameCollection(['id']));
@@ -1000,9 +999,8 @@ class DocumentationNormalizerV3Test extends TestCase
     {
         $title = 'Test API';
         $description = 'This is a test API.';
-        $formats = ['jsonld' => ['application/ld+json']];
         $version = '1.2.3';
-        $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), $title, $description, $version, $formats);
+        $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), $title, $description, $version);
 
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyNameCollectionFactoryProphecy->create(Dummy::class, ['serializer_groups' => 'dummy'])->shouldBeCalled(1)->willReturn(new PropertyNameCollection(['gerard']));
@@ -1226,9 +1224,8 @@ class DocumentationNormalizerV3Test extends TestCase
     {
         $title = 'Test API';
         $description = 'This is a test API.';
-        $formats = ['jsonld' => ['application/ld+json']];
         $version = '1.2.3';
-        $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), $title, $description, $version, $formats);
+        $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), $title, $description, $version);
 
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyNameCollectionFactoryProphecy->create(Dummy::class, ['serializer_groups' => 'dummy'])->shouldBeCalled(1)->willReturn(new PropertyNameCollection(['gerard']));
@@ -1588,7 +1585,7 @@ class DocumentationNormalizerV3Test extends TestCase
             ['spec_version' => 3]
         );
 
-        $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), 'Test API', 'This is a test API.', '1.2.3', ['jsonld' => ['application/ld+json']]);
+        $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), 'Test API', 'This is a test API.', '1.2.3');
 
         $this->assertTrue($normalizer->supportsNormalization($documentation, 'json'));
         $this->assertFalse($normalizer->supportsNormalization($documentation));
@@ -1598,7 +1595,7 @@ class DocumentationNormalizerV3Test extends TestCase
 
     public function testNoOperations()
     {
-        $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), '', '', '0.0.0', ['jsonld' => ['application/ld+json']]);
+        $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), '', '', '0.0.0');
 
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyNameCollectionFactoryProphecy->create(Dummy::class, [])->shouldNotBeCalled();
@@ -1667,7 +1664,7 @@ class DocumentationNormalizerV3Test extends TestCase
 
     public function testWithCustomMethod()
     {
-        $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), '', '', '0.0.0', ['jsonld' => ['application/ld+json']]);
+        $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), '', '', '0.0.0');
 
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
 
@@ -1743,9 +1740,8 @@ class DocumentationNormalizerV3Test extends TestCase
     {
         $title = 'Test API';
         $description = 'This is a test API.';
-        $formats = ['jsonld' => ['application/ld+json']];
         $version = '1.2.3';
-        $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), $title, $description, $version, $formats);
+        $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), $title, $description, $version);
         $groups = ['dummy', 'foo', 'bar'];
         $ref = 'Dummy-'.implode('_', $groups);
         $relatedDummyRef = 'RelatedDummy-'.implode('_', $groups);
@@ -2001,7 +1997,7 @@ class DocumentationNormalizerV3Test extends TestCase
 
     private function normalizeWithFilters($filterLocator)
     {
-        $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), '', '', '0.0.0', ['jsonld' => ['application/ld+json']]);
+        $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), '', '', '0.0.0');
 
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyNameCollectionFactoryProphecy->create(Dummy::class, [])->shouldBeCalled()->willReturn(new PropertyNameCollection(['name']));
@@ -2138,9 +2134,23 @@ class DocumentationNormalizerV3Test extends TestCase
         $this->assertEquals($expected, $normalizer->normalize($documentation));
     }
 
-    public function testNormalizeWithSubResource()
+    public function testNormalizeWithSubResource(): void
     {
-        $documentation = new Documentation(new ResourceNameCollection([Question::class]), 'Test API', 'This is a test API.', '1.2.3', ['jsonld' => ['application/ld+json']]);
+        $this->doTestNormalizeWithSubResource();
+    }
+
+    public function testLegacytNormalizeWithSubResource(): void
+    {
+        $formatProviderProphecy = $this->prophesize(OperationAwareFormatsProviderInterface::class);
+        $formatProviderProphecy->getFormatsFromOperation(Question::class, 'get', OperationType::ITEM)->willReturn(['json' => ['application/json'], 'csv' => ['text/csv']]);
+        $formatProviderProphecy->getFormatsFromOperation(Answer::class, 'get', OperationType::SUBRESOURCE)->willReturn(['xml' => ['text/xml']]);
+
+        $this->doTestNormalizeWithSubResource($formatProviderProphecy->reveal());
+    }
+
+    private function doTestNormalizeWithSubResource(OperationAwareFormatsProviderInterface $formatProvider = null): void
+    {
+        $documentation = new Documentation(new ResourceNameCollection([Question::class]), 'Test API', 'This is a test API.', '1.2.3');
 
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyNameCollectionFactoryProphecy->create(Question::class, Argument::any())->shouldBeCalled()->willReturn(new PropertyNameCollection(['answer']));
@@ -2150,17 +2160,17 @@ class DocumentationNormalizerV3Test extends TestCase
             'Question',
             'This is a question.',
             'http://schema.example.com/Question',
-            ['get' => ['method' => 'GET']],
+            ['get' => ['method' => 'GET', 'formats' => ['json' => ['application/json'], 'csv' => ['text/csv']]]],
             [],
-            ['formats' => ['jsonld' => ['application/ld+json']]]
+            [],
+            ['get' => ['formats' => ['xml' => ['text/xml']]]]
         );
         $answerMetadata = new ResourceMetadata(
             'Answer',
             'This is an answer.',
             'http://schema.example.com/Answer',
             [],
-            ['get' => ['method' => 'GET']],
-            ['formats' => ['jsonld' => ['application/ld+json']]]
+            ['get' => ['method' => 'GET', 'formats' => ['json' => ['application/json'], 'csv' => ['text/csv']]]]
         );
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create(Question::class)->shouldBeCalled()->willReturn($questionMetadata);
@@ -2193,10 +2203,6 @@ class DocumentationNormalizerV3Test extends TestCase
 
         $subresourceOperationFactory = new SubresourceOperationFactory($resourceMetadataFactory, $propertyNameCollectionFactory, $propertyMetadataFactory, new UnderscorePathSegmentNameGenerator());
 
-        $formatProviderProphecy = $this->prophesize(OperationAwareFormatsProviderInterface::class);
-        $formatProviderProphecy->getFormatsFromOperation(Question::class, 'get', OperationType::ITEM)->willReturn(['json' => ['application/json'], 'csv' => ['text/csv']]);
-        $formatProviderProphecy->getFormatsFromOperation(Answer::class, 'get', OperationType::SUBRESOURCE)->willReturn(['xml' => ['text/xml']]);
-
         $normalizer = new DocumentationNormalizer(
             $resourceMetadataFactory,
             $propertyNameCollectionFactory,
@@ -2219,7 +2225,7 @@ class DocumentationNormalizerV3Test extends TestCase
             'page',
             false,
             'itemsPerPage',
-            $formatProviderProphecy->reveal(),
+            $formatProvider,
             false,
             'pagination',
             ['spec_version' => 3]
@@ -2324,7 +2330,7 @@ class DocumentationNormalizerV3Test extends TestCase
 
     public function testNormalizeWithPropertyOpenApiContext()
     {
-        $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), 'Test API', 'This is a test API.', '1.2.3', ['jsonld' => ['application/ld+json']]);
+        $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), 'Test API', 'This is a test API.', '1.2.3');
 
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyNameCollectionFactoryProphecy->create(Dummy::class, [])->shouldBeCalled()->willReturn(new PropertyNameCollection(['id', 'name']));
@@ -2445,7 +2451,7 @@ class DocumentationNormalizerV3Test extends TestCase
 
     public function testNormalizeWithPaginationClientEnabled()
     {
-        $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), 'Test API', 'This is a test API.', '1.2.3', ['jsonld' => ['application/ld+json']]);
+        $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), 'Test API', 'This is a test API.', '1.2.3');
 
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyNameCollectionFactoryProphecy->create(Dummy::class, [])->shouldBeCalled()->willReturn(new PropertyNameCollection(['id', 'name']));
@@ -2573,9 +2579,25 @@ class DocumentationNormalizerV3Test extends TestCase
         $this->assertEquals($expected, $normalizer->normalize($documentation, DocumentationNormalizer::FORMAT, ['base_url' => '/app_dev.php/']));
     }
 
-    public function testNormalizeWithCustomFormatsDefinedAtOperationLevel()
+    public function testNormalizeWithCustomFormatsDefinedAtOperationLevel(): void
     {
-        $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), 'Test API', 'This is a test API.', '1.2.3', ['jsonld' => ['application/ld+json']]);
+        $this->doNormalizeWithCustomFormatsDefinedAtOperationLevel();
+    }
+
+    public function testLegacyNormalizeWithCustomFormatsDefinedAtOperationLevel(): void
+    {
+        $formatProviderProphecy = $this->prophesize(OperationAwareFormatsProviderInterface::class);
+        $formatProviderProphecy->getFormatsFromOperation(Dummy::class, 'get', OperationType::ITEM)->willReturn(['jsonapi' => ['application/vnd.api+json']]);
+        $formatProviderProphecy->getFormatsFromOperation(Dummy::class, 'put', OperationType::ITEM)->willReturn(['json' => ['application/json'], 'csv' => ['text/csv']]);
+        $formatProviderProphecy->getFormatsFromOperation(Dummy::class, 'get', OperationType::COLLECTION)->willReturn(['xml' => ['application/xml', 'text/xml']]);
+        $formatProviderProphecy->getFormatsFromOperation(Dummy::class, 'post', OperationType::COLLECTION)->willReturn(['xml' => ['text/xml'], 'csv' => ['text/csv']]);
+
+        $this->doNormalizeWithCustomFormatsDefinedAtOperationLevel($formatProviderProphecy->reveal());
+    }
+
+    private function doNormalizeWithCustomFormatsDefinedAtOperationLevel(OperationAwareFormatsProviderInterface $formatsProvider = null): void
+    {
+        $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), 'Test API', 'This is a test API.', '1.2.3');
 
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyNameCollectionFactoryProphecy->create(Dummy::class, [])->shouldBeCalled()->willReturn(new PropertyNameCollection(['id', 'name']));
@@ -2585,9 +2607,13 @@ class DocumentationNormalizerV3Test extends TestCase
             'Dummy',
             'This is a dummy.',
             'http://schema.example.com/Dummy',
-            ['get' => ['method' => 'GET'], 'put' => ['method' => 'PUT']],
-            ['get' => ['method' => 'GET'], 'post' => ['method' => 'POST']],
-            ['formats' => ['jsonld' => ['application/ld+json']]]
+            [
+                'get' => ['method' => 'GET', 'formats' => ['jsonapi' => ['application/vnd.api+json']]],
+                'put' => ['method' => 'PUT', 'formats' => ['json' => ['application/json'], 'csv' => ['text/csv']]], ],
+            [
+                'get' => ['method' => 'GET', 'formats' => ['xml' => ['application/xml', 'text/xml']]],
+                'post' => ['method' => 'POST', 'formats' => ['xml' => ['text/xml'], 'csv' => ['text/csv']]],
+            ]
         );
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create(Dummy::class)->shouldBeCalled()->willReturn($dummyMetadata);
@@ -2606,12 +2632,6 @@ class DocumentationNormalizerV3Test extends TestCase
 
         $operationPathResolver = new OperationPathResolver(new UnderscorePathSegmentNameGenerator());
 
-        $formatProviderProphecy = $this->prophesize(OperationAwareFormatsProviderInterface::class);
-        $formatProviderProphecy->getFormatsFromOperation(Dummy::class, 'get', OperationType::COLLECTION)->willReturn(['xml' => ['application/xml', 'text/xml']]);
-        $formatProviderProphecy->getFormatsFromOperation(Dummy::class, 'post', OperationType::COLLECTION)->willReturn(['xml' => ['text/xml'], 'csv' => ['text/csv']]);
-        $formatProviderProphecy->getFormatsFromOperation(Dummy::class, 'get', OperationType::ITEM)->willReturn(['jsonapi' => ['application/vnd.api+json']]);
-        $formatProviderProphecy->getFormatsFromOperation(Dummy::class, 'put', OperationType::ITEM)->willReturn(['json' => ['application/json'], 'csv' => ['text/csv']]);
-
         $normalizer = new DocumentationNormalizer(
             $resourceMetadataFactoryProphecy->reveal(),
             $propertyNameCollectionFactoryProphecy->reveal(),
@@ -2628,13 +2648,12 @@ class DocumentationNormalizerV3Test extends TestCase
             '',
             [],
             [],
-
             null,
             false,
             'page',
             false,
             'itemsPerPage',
-            $formatProviderProphecy->reveal(),
+            $formatsProvider,
             false,
             'pagination',
             ['spec_version' => 3]

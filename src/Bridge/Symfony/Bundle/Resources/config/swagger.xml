@@ -45,7 +45,6 @@
             <argument>%api_platform.title%</argument>
             <argument>%api_platform.description%</argument>
             <argument>%api_platform.version%</argument>
-            <argument>%api_platform.formats%</argument>
             <tag name="console.command" />
         </service>
 
