@@ -92,6 +92,10 @@ final class OperationResourceMetadataFactory implements ResourceMetadataFactoryI
             $resourceMetadata = $this->normalize(false, $resourceMetadata, $itemOperations);
         }
 
+        /*if (null !== $subresourceOperations = $resourceMetadata->getSubresourceOperations()) {
+            $resourceMetadata = $this->normalize(false, $resourceMetadata, $subresourceOperations);
+        }*/
+
         $graphql = $resourceMetadata->getGraphql();
         if (null === $graphql) {
             $resourceMetadata = $resourceMetadata->withGraphql(['query' => [], 'delete' => [], 'update' => [], 'create' => []]);
@@ -144,7 +148,7 @@ final class OperationResourceMetadataFactory implements ResourceMetadataFactoryI
             }
 
             if ($normalizeFormats && isset($operation['formats'])) {
-                $operation['formats'] = $this->normalizeFormats($operation['formats'], ('PATCH' === $operation['method'] ?? '') ? $this->patchFormats : $this->formats);
+                $operation['formats'] = $this->normalizeFormats($operation['formats'], ('PATCH' === ($operation['method'] ?? '')) ? $this->patchFormats : $this->formats);
             }
 
             $newOperations[$operationName] = $operation;

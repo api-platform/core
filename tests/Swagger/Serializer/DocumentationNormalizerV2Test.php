@@ -79,7 +79,26 @@ class DocumentationNormalizerV2Test extends TestCase
         $this->assertInstanceOf(DocumentationNormalizer::class, $normalizer);
     }
 
-    public function testNormalize()
+    public function testNormalize(): void
+    {
+        $this->doTestNormalize();
+    }
+
+    public function testLegacyNormalize(): void
+    {
+        $operationMethodResolverProphecy = $this->prophesize(OperationMethodResolverInterface::class);
+        $operationMethodResolverProphecy->getItemOperationMethod(Dummy::class, 'get')->shouldBeCalled()->willReturn('GET');
+        $operationMethodResolverProphecy->getItemOperationMethod(Dummy::class, 'put')->shouldBeCalled()->willReturn('PUT');
+        $operationMethodResolverProphecy->getCollectionOperationMethod(Dummy::class, 'get')->shouldBeCalled()->willReturn('GET');
+        $operationMethodResolverProphecy->getCollectionOperationMethod(Dummy::class, 'post')->shouldBeCalled()->willReturn('POST');
+        $operationMethodResolverProphecy->getCollectionOperationMethod(Dummy::class, 'custom')->shouldBeCalled()->willReturn('GET');
+        $operationMethodResolverProphecy->getCollectionOperationMethod(Dummy::class, 'custom2')->shouldBeCalled()->willReturn('POST');
+
+        $this->doTestNormalize($operationMethodResolverProphecy->reveal());
+    }
+
+
+    private function doTestNormalize(OperationMethodResolverInterface $operationMethodResolver = null): void
     {
         $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), 'Test API', 'This is a test API.', '1.2.3');
 
@@ -115,14 +134,6 @@ class DocumentationNormalizerV2Test extends TestCase
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
         $resourceClassResolverProphecy->isResourceClass(Dummy::class)->willReturn(true);
 
-        $operationMethodResolverProphecy = $this->prophesize(OperationMethodResolverInterface::class);
-        $operationMethodResolverProphecy->getItemOperationMethod(Dummy::class, 'get')->shouldBeCalled()->willReturn('GET');
-        $operationMethodResolverProphecy->getItemOperationMethod(Dummy::class, 'put')->shouldBeCalled()->willReturn('PUT');
-        $operationMethodResolverProphecy->getCollectionOperationMethod(Dummy::class, 'get')->shouldBeCalled()->willReturn('GET');
-        $operationMethodResolverProphecy->getCollectionOperationMethod(Dummy::class, 'post')->shouldBeCalled()->willReturn('POST');
-        $operationMethodResolverProphecy->getCollectionOperationMethod(Dummy::class, 'custom')->shouldBeCalled()->willReturn('GET');
-        $operationMethodResolverProphecy->getCollectionOperationMethod(Dummy::class, 'custom2')->shouldBeCalled()->willReturn('POST');
-
         $operationPathResolver = new CustomOperationPathResolver(new OperationPathResolver(new UnderscorePathSegmentNameGenerator()));
 
         $normalizer = new DocumentationNormalizer(
@@ -130,7 +141,7 @@ class DocumentationNormalizerV2Test extends TestCase
             $propertyNameCollectionFactoryProphecy->reveal(),
             $propertyMetadataFactoryProphecy->reveal(),
             $resourceClassResolverProphecy->reveal(),
-            $operationMethodResolverProphecy->reveal(),
+            $operationMethodResolver,
             $operationPathResolver
         );
 
@@ -354,9 +365,6 @@ class DocumentationNormalizerV2Test extends TestCase
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
         $resourceClassResolverProphecy->isResourceClass(Dummy::class)->willReturn(true);
 
-        $operationMethodResolverProphecy = $this->prophesize(OperationMethodResolverInterface::class);
-        $operationMethodResolverProphecy->getItemOperationMethod(Dummy::class, 'get')->shouldBeCalled()->willReturn('GET');
-
         $nameConverterProphecy = $this->prophesize(
             interface_exists(AdvancedNameConverterInterface::class)
                 ? AdvancedNameConverterInterface::class
@@ -372,7 +380,7 @@ class DocumentationNormalizerV2Test extends TestCase
             $propertyNameCollectionFactoryProphecy->reveal(),
             $propertyMetadataFactoryProphecy->reveal(),
             $resourceClassResolverProphecy->reveal(),
-            $operationMethodResolverProphecy->reveal(),
+            null,
             $operationPathResolver,
             null,
             null,
@@ -468,9 +476,6 @@ class DocumentationNormalizerV2Test extends TestCase
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
         $resourceClassResolverProphecy->isResourceClass(Dummy::class)->willReturn(true);
 
-        $operationMethodResolverProphecy = $this->prophesize(OperationMethodResolverInterface::class);
-        $operationMethodResolverProphecy->getItemOperationMethod(Dummy::class, 'get')->shouldBeCalled()->willReturn('GET');
-
         $operationPathResolver = new CustomOperationPathResolver(new OperationPathResolver(new UnderscorePathSegmentNameGenerator()));
 
         $apiKeysConfiguration = [
@@ -489,7 +494,7 @@ class DocumentationNormalizerV2Test extends TestCase
             $propertyNameCollectionFactoryProphecy->reveal(),
             $propertyMetadataFactoryProphecy->reveal(),
             $resourceClassResolverProphecy->reveal(),
-            $operationMethodResolverProphecy->reveal(),
+            null,
             $operationPathResolver,
             null,
             null,
@@ -609,12 +614,6 @@ class DocumentationNormalizerV2Test extends TestCase
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
         $resourceClassResolverProphecy->isResourceClass(Dummy::class)->willReturn(true);
 
-        $operationMethodResolverProphecy = $this->prophesize(OperationMethodResolverInterface::class);
-        $operationMethodResolverProphecy->getItemOperationMethod(Dummy::class, 'get')->shouldBeCalled()->willReturn('GET');
-        $operationMethodResolverProphecy->getItemOperationMethod(Dummy::class, 'put')->shouldBeCalled()->willReturn('PUT');
-        $operationMethodResolverProphecy->getCollectionOperationMethod(Dummy::class, 'get')->shouldBeCalled()->willReturn('GET');
-        $operationMethodResolverProphecy->getCollectionOperationMethod(Dummy::class, 'post')->shouldBeCalled()->willReturn('POST');
-
         $operationPathResolver = new CustomOperationPathResolver(new OperationPathResolver(new UnderscorePathSegmentNameGenerator()));
 
         $normalizer = new DocumentationNormalizer(
@@ -622,7 +621,7 @@ class DocumentationNormalizerV2Test extends TestCase
             $propertyNameCollectionFactoryProphecy->reveal(),
             $propertyMetadataFactoryProphecy->reveal(),
             $resourceClassResolverProphecy->reveal(),
-            $operationMethodResolverProphecy->reveal(),
+            null,
             $operationPathResolver
         );
 
@@ -794,9 +793,6 @@ class DocumentationNormalizerV2Test extends TestCase
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
         $resourceClassResolverProphecy->isResourceClass(Dummy::class)->willReturn(true);
 
-        $operationMethodResolverProphecy = $this->prophesize(OperationMethodResolverInterface::class);
-        $operationMethodResolverProphecy->getItemOperationMethod(Dummy::class, 'get')->shouldBeCalled()->willReturn('GET');
-
         $operationPathResolver = new CustomOperationPathResolver(new OperationPathResolver(new UnderscorePathSegmentNameGenerator()));
 
         $normalizer = new DocumentationNormalizer(
@@ -804,7 +800,7 @@ class DocumentationNormalizerV2Test extends TestCase
             $propertyNameCollectionFactoryProphecy->reveal(),
             $propertyMetadataFactoryProphecy->reveal(),
             $resourceClassResolverProphecy->reveal(),
-            $operationMethodResolverProphecy->reveal(),
+            null,
             $operationPathResolver
         );
 
@@ -895,12 +891,6 @@ class DocumentationNormalizerV2Test extends TestCase
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
         $resourceClassResolverProphecy->isResourceClass(Dummy::class)->willReturn(true);
 
-        $operationMethodResolverProphecy = $this->prophesize(OperationMethodResolverInterface::class);
-        $operationMethodResolverProphecy->getItemOperationMethod(Dummy::class, 'get')->shouldBeCalled()->willReturn('GET');
-        $operationMethodResolverProphecy->getItemOperationMethod(Dummy::class, 'put')->shouldBeCalled()->willReturn('PUT');
-        $operationMethodResolverProphecy->getCollectionOperationMethod(Dummy::class, 'get')->shouldBeCalled()->willReturn('GET');
-        $operationMethodResolverProphecy->getCollectionOperationMethod(Dummy::class, 'post')->shouldBeCalled()->willReturn('POST');
-
         $operationPathResolver = new CustomOperationPathResolver(new OperationPathResolver(new UnderscorePathSegmentNameGenerator()));
 
         $normalizer = new DocumentationNormalizer(
@@ -908,7 +898,7 @@ class DocumentationNormalizerV2Test extends TestCase
             $propertyNameCollectionFactoryProphecy->reveal(),
             $propertyMetadataFactoryProphecy->reveal(),
             $resourceClassResolverProphecy->reveal(),
-            $operationMethodResolverProphecy->reveal(),
+            null,
             $operationPathResolver
         );
 
@@ -1088,12 +1078,6 @@ class DocumentationNormalizerV2Test extends TestCase
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
         $resourceClassResolverProphecy->isResourceClass(Dummy::class)->willReturn(true);
 
-        $operationMethodResolverProphecy = $this->prophesize(OperationMethodResolverInterface::class);
-        $operationMethodResolverProphecy->getItemOperationMethod(Dummy::class, 'get')->shouldBeCalled()->willReturn('GET');
-        $operationMethodResolverProphecy->getItemOperationMethod(Dummy::class, 'put')->shouldBeCalled()->willReturn('PUT');
-        $operationMethodResolverProphecy->getCollectionOperationMethod(Dummy::class, 'get')->shouldBeCalled()->willReturn('GET');
-        $operationMethodResolverProphecy->getCollectionOperationMethod(Dummy::class, 'post')->shouldBeCalled()->willReturn('POST');
-
         $operationPathResolver = new CustomOperationPathResolver(new OperationPathResolver(new UnderscorePathSegmentNameGenerator()));
 
         $normalizer = new DocumentationNormalizer(
@@ -1101,7 +1085,7 @@ class DocumentationNormalizerV2Test extends TestCase
             $propertyNameCollectionFactoryProphecy->reveal(),
             $propertyMetadataFactoryProphecy->reveal(),
             $resourceClassResolverProphecy->reveal(),
-            $operationMethodResolverProphecy->reveal(),
+            null,
             $operationPathResolver
         );
 
@@ -1277,12 +1261,6 @@ class DocumentationNormalizerV2Test extends TestCase
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
         $resourceClassResolverProphecy->isResourceClass(Dummy::class)->willReturn(true);
 
-        $operationMethodResolverProphecy = $this->prophesize(OperationMethodResolverInterface::class);
-        $operationMethodResolverProphecy->getItemOperationMethod(Dummy::class, 'get')->shouldBeCalled()->willReturn('GET');
-        $operationMethodResolverProphecy->getItemOperationMethod(Dummy::class, 'put')->shouldBeCalled()->willReturn('PUT');
-        $operationMethodResolverProphecy->getCollectionOperationMethod(Dummy::class, 'get')->shouldBeCalled()->willReturn('GET');
-        $operationMethodResolverProphecy->getCollectionOperationMethod(Dummy::class, 'post')->shouldBeCalled()->willReturn('POST');
-
         $operationPathResolver = new CustomOperationPathResolver(new OperationPathResolver(new UnderscorePathSegmentNameGenerator()));
 
         $normalizer = new DocumentationNormalizer(
@@ -1290,7 +1268,7 @@ class DocumentationNormalizerV2Test extends TestCase
             $propertyNameCollectionFactoryProphecy->reveal(),
             $propertyMetadataFactoryProphecy->reveal(),
             $resourceClassResolverProphecy->reveal(),
-            $operationMethodResolverProphecy->reveal(),
+            null,
             $operationPathResolver
         );
 
@@ -1511,7 +1489,7 @@ class DocumentationNormalizerV2Test extends TestCase
             $this->prophesize(PropertyNameCollectionFactoryInterface::class)->reveal(),
             $this->prophesize(PropertyMetadataFactoryInterface::class)->reveal(),
             $this->prophesize(ResourceClassResolverInterface::class)->reveal(),
-            $this->prophesize(OperationMethodResolverInterface::class)->reveal(),
+            null,
             $this->prophesize(OperationPathResolverInterface::class)->reveal(),
             null,
             new \ArrayObject()
@@ -1524,7 +1502,6 @@ class DocumentationNormalizerV2Test extends TestCase
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
-        $operationMethodResolverProphecy = $this->prophesize(OperationMethodResolverInterface::class);
         $operationPathResolver = new CustomOperationPathResolver(new OperationPathResolver(new UnderscorePathSegmentNameGenerator()));
 
         $normalizer = new DocumentationNormalizer(
@@ -1532,7 +1509,7 @@ class DocumentationNormalizerV2Test extends TestCase
             $propertyNameCollectionFactoryProphecy->reveal(),
             $propertyMetadataFactoryProphecy->reveal(),
             $resourceClassResolverProphecy->reveal(),
-            $operationMethodResolverProphecy->reveal(),
+            null,
             $operationPathResolver
         );
 
@@ -1568,9 +1545,6 @@ class DocumentationNormalizerV2Test extends TestCase
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
         $resourceClassResolverProphecy->isResourceClass(Dummy::class)->willReturn(true);
 
-        $operationMethodResolverProphecy = $this->prophesize(OperationMethodResolverInterface::class);
-        $operationMethodResolverProphecy->getCollectionOperationMethod(Dummy::class, 'get')->shouldNotBeCalled();
-
         $operationPathResolver = new CustomOperationPathResolver(new OperationPathResolver(new UnderscorePathSegmentNameGenerator()));
 
         $normalizer = new DocumentationNormalizer(
@@ -1578,7 +1552,7 @@ class DocumentationNormalizerV2Test extends TestCase
             $propertyNameCollectionFactoryProphecy->reveal(),
             $propertyMetadataFactoryProphecy->reveal(),
             $resourceClassResolverProphecy->reveal(),
-            $operationMethodResolverProphecy->reveal(),
+            null,
             $operationPathResolver
         );
 
@@ -1617,9 +1591,6 @@ class DocumentationNormalizerV2Test extends TestCase
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
         $resourceClassResolverProphecy->isResourceClass(Dummy::class)->willReturn(true);
 
-        $operationMethodResolverProphecy = $this->prophesize(OperationMethodResolverInterface::class);
-        $operationMethodResolverProphecy->getCollectionOperationMethod(Dummy::class, 'get')->shouldBeCalled()->willReturn('FOO');
-
         $operationPathResolver = new CustomOperationPathResolver(new OperationPathResolver(new UnderscorePathSegmentNameGenerator()));
 
         $normalizer = new DocumentationNormalizer(
@@ -1627,7 +1598,7 @@ class DocumentationNormalizerV2Test extends TestCase
             $propertyNameCollectionFactoryProphecy->reveal(),
             $propertyMetadataFactoryProphecy->reveal(),
             $resourceClassResolverProphecy->reveal(),
-            $operationMethodResolverProphecy->reveal(),
+            null,
             $operationPathResolver
         );
 
@@ -1705,12 +1676,6 @@ class DocumentationNormalizerV2Test extends TestCase
         $resourceClassResolverProphecy->isResourceClass(Dummy::class)->willReturn(true);
         $resourceClassResolverProphecy->isResourceClass(RelatedDummy::class)->willReturn(true);
 
-        $operationMethodResolverProphecy = $this->prophesize(OperationMethodResolverInterface::class);
-        $operationMethodResolverProphecy->getItemOperationMethod(Dummy::class, 'get')->shouldBeCalled()->willReturn('GET');
-        $operationMethodResolverProphecy->getItemOperationMethod(Dummy::class, 'put')->shouldBeCalled()->willReturn('PUT');
-        $operationMethodResolverProphecy->getCollectionOperationMethod(Dummy::class, 'get')->shouldBeCalled()->willReturn('GET');
-        $operationMethodResolverProphecy->getCollectionOperationMethod(Dummy::class, 'post')->shouldBeCalled()->willReturn('POST');
-
         $operationPathResolver = new CustomOperationPathResolver(new OperationPathResolver(new UnderscorePathSegmentNameGenerator()));
 
         $normalizer = new DocumentationNormalizer(
@@ -1718,7 +1683,7 @@ class DocumentationNormalizerV2Test extends TestCase
             $propertyNameCollectionFactoryProphecy->reveal(),
             $propertyMetadataFactoryProphecy->reveal(),
             $resourceClassResolverProphecy->reveal(),
-            $operationMethodResolverProphecy->reveal(),
+            null,
             $operationPathResolver
         );
 
@@ -1899,9 +1864,6 @@ class DocumentationNormalizerV2Test extends TestCase
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
         $resourceClassResolverProphecy->isResourceClass(Dummy::class)->willReturn(true);
 
-        $operationMethodResolverProphecy = $this->prophesize(OperationMethodResolverInterface::class);
-        $operationMethodResolverProphecy->getCollectionOperationMethod(Dummy::class, 'get')->shouldBeCalled()->willReturn('GET');
-
         $operationPathResolver = new CustomOperationPathResolver(new OperationPathResolver(new UnderscorePathSegmentNameGenerator()));
 
         $normalizer = new DocumentationNormalizer(
@@ -1909,7 +1871,7 @@ class DocumentationNormalizerV2Test extends TestCase
             $propertyNameCollectionFactoryProphecy->reveal(),
             $propertyMetadataFactoryProphecy->reveal(),
             $resourceClassResolverProphecy->reveal(),
-            $operationMethodResolverProphecy->reveal(),
+            null,
             $operationPathResolver,
             null,
             $filterLocator
@@ -2041,9 +2003,6 @@ class DocumentationNormalizerV2Test extends TestCase
         $resourceClassResolverProphecy->isResourceClass(Question::class)->willReturn(true);
         $resourceClassResolverProphecy->isResourceClass(Answer::class)->willReturn(true);
 
-        $operationMethodResolverProphecy = $this->prophesize(OperationMethodResolverInterface::class);
-        $operationMethodResolverProphecy->getItemOperationMethod(Question::class, 'get')->shouldBeCalled()->willReturn('GET');
-
         $routeCollection = new RouteCollection();
         $routeCollection->add('api_questions_answer_get_subresource', new Route('/api/questions/{id}/answer.{_format}'));
         $routeCollection->add('api_questions_get_item', new Route('/api/questions/{id}.{_format}'));
@@ -2064,7 +2023,7 @@ class DocumentationNormalizerV2Test extends TestCase
             $propertyNameCollectionFactory,
             $propertyMetadataFactory,
             $resourceClassResolverProphecy->reveal(),
-            $operationMethodResolverProphecy->reveal(),
+            null,
             $operationPathResolver,
             null,
             null,
@@ -2195,9 +2154,6 @@ class DocumentationNormalizerV2Test extends TestCase
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
         $resourceClassResolverProphecy->isResourceClass(Dummy::class)->willReturn(true);
 
-        $operationMethodResolverProphecy = $this->prophesize(OperationMethodResolverInterface::class);
-        $operationMethodResolverProphecy->getItemOperationMethod(Dummy::class, 'get')->shouldBeCalled()->willReturn('GET');
-
         $operationPathResolver = new CustomOperationPathResolver(new OperationPathResolver(new UnderscorePathSegmentNameGenerator()));
 
         $normalizer = new DocumentationNormalizer(
@@ -2205,7 +2161,7 @@ class DocumentationNormalizerV2Test extends TestCase
             $propertyNameCollectionFactoryProphecy->reveal(),
             $propertyMetadataFactoryProphecy->reveal(),
             $resourceClassResolverProphecy->reveal(),
-            $operationMethodResolverProphecy->reveal(),
+            null,
             $operationPathResolver
         );
 
@@ -2291,9 +2247,6 @@ class DocumentationNormalizerV2Test extends TestCase
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
         $resourceClassResolverProphecy->isResourceClass(Dummy::class)->willReturn(true);
 
-        $operationMethodResolverProphecy = $this->prophesize(OperationMethodResolverInterface::class);
-        $operationMethodResolverProphecy->getCollectionOperationMethod(Dummy::class, 'get')->shouldBeCalled()->willReturn('GET');
-
         $operationPathResolver = new CustomOperationPathResolver(new OperationPathResolver(new UnderscorePathSegmentNameGenerator()));
 
         $normalizer = new DocumentationNormalizer(
@@ -2301,7 +2254,7 @@ class DocumentationNormalizerV2Test extends TestCase
             $propertyNameCollectionFactoryProphecy->reveal(),
             $propertyMetadataFactoryProphecy->reveal(),
             $resourceClassResolverProphecy->reveal(),
-            $operationMethodResolverProphecy->reveal(),
+            null,
             $operationPathResolver
         );
 
@@ -2416,12 +2369,6 @@ class DocumentationNormalizerV2Test extends TestCase
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
         $resourceClassResolverProphecy->isResourceClass(Dummy::class)->willReturn(true);
 
-        $operationMethodResolverProphecy = $this->prophesize(OperationMethodResolverInterface::class);
-        $operationMethodResolverProphecy->getItemOperationMethod(Dummy::class, 'get')->shouldBeCalled()->willReturn('GET');
-        $operationMethodResolverProphecy->getItemOperationMethod(Dummy::class, 'put')->shouldBeCalled()->willReturn('PUT');
-        $operationMethodResolverProphecy->getCollectionOperationMethod(Dummy::class, 'get')->shouldBeCalled()->willReturn('GET');
-        $operationMethodResolverProphecy->getCollectionOperationMethod(Dummy::class, 'post')->shouldBeCalled()->willReturn('POST');
-
         $operationPathResolver = new OperationPathResolver(new UnderscorePathSegmentNameGenerator());
 
         $normalizer = new DocumentationNormalizer(
@@ -2429,7 +2376,7 @@ class DocumentationNormalizerV2Test extends TestCase
             $propertyNameCollectionFactoryProphecy->reveal(),
             $propertyMetadataFactoryProphecy->reveal(),
             $resourceClassResolverProphecy->reveal(),
-            $operationMethodResolverProphecy->reveal(),
+            null,
             $operationPathResolver,
             null,
             null,
@@ -2592,8 +2539,14 @@ class DocumentationNormalizerV2Test extends TestCase
             'Dummy',
             'This is a dummy.',
             'http://schema.example.com/Dummy',
-            ['get' => [], 'put' => []],
-            ['get' => [], 'post' => []],
+            [
+                'get' => ['method' => 'GET'],
+                'put' => ['method' => 'PUT'],
+            ],
+            [
+                'get' => ['method' => 'GET'],
+                'post' => ['method' => 'POST'],
+            ],
             [
                 'input' => ['class' => InputDto::class],
                 'output' => ['class' => OutputDto::class],
@@ -2617,12 +2570,6 @@ class DocumentationNormalizerV2Test extends TestCase
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
         $resourceClassResolverProphecy->isResourceClass(Dummy::class)->willReturn(true);
 
-        $operationMethodResolverProphecy = $this->prophesize(OperationMethodResolverInterface::class);
-        $operationMethodResolverProphecy->getItemOperationMethod(Dummy::class, 'get')->shouldBeCalled()->willReturn('GET');
-        $operationMethodResolverProphecy->getItemOperationMethod(Dummy::class, 'put')->shouldBeCalled()->willReturn('PUT');
-        $operationMethodResolverProphecy->getCollectionOperationMethod(Dummy::class, 'get')->shouldBeCalled()->willReturn('GET');
-        $operationMethodResolverProphecy->getCollectionOperationMethod(Dummy::class, 'post')->shouldBeCalled()->willReturn('POST');
-
         $operationPathResolver = new CustomOperationPathResolver(new OperationPathResolver(new UnderscorePathSegmentNameGenerator()));
 
         $normalizer = new DocumentationNormalizer(
@@ -2630,7 +2577,7 @@ class DocumentationNormalizerV2Test extends TestCase
             $propertyNameCollectionFactoryProphecy->reveal(),
             $propertyMetadataFactoryProphecy->reveal(),
             $resourceClassResolverProphecy->reveal(),
-            $operationMethodResolverProphecy->reveal(),
+            null,
             $operationPathResolver
         );
 
