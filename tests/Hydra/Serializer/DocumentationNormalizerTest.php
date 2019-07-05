@@ -380,15 +380,15 @@ class DocumentationNormalizerTest extends TestCase
             '#dummy',
             [
                 'get' => ['method' => 'GET'],
-                'put' => ['method' => 'PUT', 'input' => ['class' => null]]
+                'put' => ['method' => 'PUT', 'input' => ['class' => null]],
             ],
             [
                 'get' => ['method' => 'GET'],
-                'post' => ['method' => 'POST', 'output' => ['class' => null]]
+                'post' => ['method' => 'POST', 'output' => ['class' => null]],
             ],
             [
                 'input' => ['class' => 'inputClass'],
-                'output' => ['class' => 'outputClass']
+                'output' => ['class' => 'outputClass'],
             ]);
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create('dummy')->shouldBeCalled()->willReturn($dummyMetadata);

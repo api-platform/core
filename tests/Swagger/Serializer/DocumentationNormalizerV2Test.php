@@ -97,7 +97,6 @@ class DocumentationNormalizerV2Test extends TestCase
         $this->doTestNormalize($operationMethodResolverProphecy->reveal());
     }
 
-
     private function doTestNormalize(OperationMethodResolverInterface $operationMethodResolver = null): void
     {
         $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), 'Test API', 'This is a test API.', '1.2.3');

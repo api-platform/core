@@ -88,17 +88,17 @@ final class AddFormatListener
         }
 
         $this->addRequestFormats($request, $formats);
-
         $this->formatMatcher = new FormatMatcher($formats);
-        $flattenedMimeTypes = $this->flattenMimeTypes($formats);
 
         // Empty strings must be converted to null because the Symfony router doesn't support parameter typing before 3.2 (_format)
         if (null === $routeFormat = $request->attributes->get('_format') ?: null) {
+            $flattenedMimeTypes = $this->flattenMimeTypes($formats);
             $mimeTypes = array_keys($flattenedMimeTypes);
         } elseif (!isset($formats[$routeFormat])) {
             throw new NotFoundHttpException(sprintf('Format "%s" is not supported', $routeFormat));
         } else {
             $mimeTypes = Request::getMimeTypes($routeFormat);
+            $flattenedMimeTypes = $this->flattenMimeTypes([$routeFormat => $mimeTypes]);
         }
 
         // First, try to guess the format from the Accept header
