@@ -10,7 +10,7 @@
     <php>
         <ini name="error_reporting" value="-1" />
         <ini name="memory_limit" value="-1" />
-        <env name="SYMFONY_DEPRECATIONS_HELPER" value="max[self]=0" />
+        <env name="SYMFONY_DEPRECATIONS_HELPER" value="max[direct]=0&amp;max[self]=0" />
         <server name="KERNEL_DIR" value="tests/Fixtures/app/" />
         <server name="KERNEL_CLASS" value="AppKernel" />
         <server name="APP_ENV" value="test" />
