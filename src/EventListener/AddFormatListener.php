@@ -37,7 +37,7 @@ final class AddFormatListener
     private $formatMatcher;
 
     /**
-     * @param ResourceMetadataFactoryInterface $resourceMetadataFactory
+     * @param ResourceMetadataFactoryInterface|FormatsProviderInterface|array $resourceMetadataFactory
      */
     public function __construct(Negotiator $negotiator, $resourceMetadataFactory, array $formats = [])
     {

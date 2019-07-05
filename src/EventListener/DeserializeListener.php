@@ -42,7 +42,7 @@ final class DeserializeListener
     private $formatsProvider;
 
     /**
-     * @param ResourceMetadataFactoryInterface $resourceMetadataFactory
+     * @param ResourceMetadataFactoryInterface|FormatsProviderInterface|array $resourceMetadataFactory
      */
     public function __construct(SerializerInterface $serializer, SerializerContextBuilderInterface $serializerContextBuilder, $resourceMetadataFactory, ResourceMetadataFactoryInterface $legacyResourceMetadataFactory = null)
     {
