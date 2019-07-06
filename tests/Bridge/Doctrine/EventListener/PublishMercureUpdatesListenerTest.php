@@ -68,6 +68,8 @@ class PublishMercureUpdatesListenerTest extends TestCase
         $iriConverterProphecy->getIriFromItem($toDelete)->willReturn('/dummies/3')->shouldBeCalled();
         $iriConverterProphecy->getIriFromItem($toDeleteExpressionLanguage)->willReturn('/dummy_friends/4')->shouldBeCalled();
         $iriConverterProphecy->getIriFromItem($toDeleteExpressionLanguage, UrlGeneratorInterface::ABS_URL)->willReturn('http://example.com/dummy_friends/4')->shouldBeCalled();
+        $iriConverterProphecy->getIriFromResourceClass(Dummy::class, UrlGeneratorInterface::ABS_URL)->willReturn('http://example.com/dummies')->shouldBeCalled();
+        $iriConverterProphecy->getIriFromResourceClass(DummyFriend::class, UrlGeneratorInterface::ABS_URL)->willReturn('http://example.com/dummy_friends')->shouldBeCalled();
 
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadata(null, null, null, null, null, ['mercure' => true, 'normalization_context' => ['groups' => ['foo', 'bar']]]));
@@ -111,7 +113,7 @@ class PublishMercureUpdatesListenerTest extends TestCase
         $listener->onFlush($eventArgs);
         $listener->postFlush();
 
-        $this->assertSame(['http://example.com/dummies/1', 'http://example.com/dummies/2', 'http://example.com/dummies/3', 'http://example.com/dummy_friends/4'], $topics);
+        $this->assertSame(['http://example.com/dummies/1', 'http://example.com/dummies', 'http://example.com/dummies/2', 'http://example.com/dummies', 'http://example.com/dummies/3', 'http://example.com/dummies', 'http://example.com/dummy_friends/4', 'http://example.com/dummy_friends'], $topics);
         $this->assertSame([[], [], [], ['foo', 'bar']], $targets);
     }
 
