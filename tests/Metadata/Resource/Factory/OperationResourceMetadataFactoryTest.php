@@ -46,8 +46,8 @@ class OperationResourceMetadataFactoryTest extends TestCase
             [new ResourceMetadata(null, null, null, ['get'], [], null, [], []), new ResourceMetadata(null, null, null, ['get' => ['method' => 'GET']], [], null, [], [])],
             [new ResourceMetadata(null, null, null, ['put'], [], null, [], []), new ResourceMetadata(null, null, null, ['put' => ['method' => 'PUT']], [], null, [], [])],
             [new ResourceMetadata(null, null, null, ['delete'], [], null, [], []), new ResourceMetadata(null, null, null, ['delete' => ['method' => 'DELETE']], [], null, [], [])],
-            [new ResourceMetadata(null, null, null, ['patch'], [], null, [], []), new ResourceMetadata(null, null, null, ['patch' => ['route_name' => 'patch']], [], null, [], [])],
-            [new ResourceMetadata(null, null, null, ['patch'], [], null, [], []), new ResourceMetadata(null, null, null, ['patch' => ['method' => 'PATCH', 'formats' => ['jsonapi' => ['application/vnd.api+json']]]], [], null, [], []), $jsonapi],
+            [new ResourceMetadata(null, null, null, ['patch' => ['method' => 'PATCH', 'route_name' => 'patch']], [], null, [], []), new ResourceMetadata(null, null, null, ['patch' => ['method' => 'PATCH', 'route_name' => 'patch', 'formats' => []]], [], null, [], [])],
+            [new ResourceMetadata(null, null, null, ['patch' => ['method' => 'PATCH', 'route_name' => 'patch']], [], null, [], []), new ResourceMetadata(null, null, null, ['patch' => ['method' => 'PATCH', 'route_name' => 'patch', 'formats' => ['jsonapi' => ['application/vnd.api+json']]]], [], null, [], []), $jsonapi],
             [new ResourceMetadata(null, null, null, ['untouched' => ['method' => 'GET']], [], null, [], []), new ResourceMetadata(null, null, null, ['untouched' => ['method' => 'GET']], [], null, [], []), $jsonapi],
             [new ResourceMetadata(null, null, null, ['untouched_custom' => ['route_name' => 'custom_route']], [], null, [], []), new ResourceMetadata(null, null, null, ['untouched_custom' => ['route_name' => 'custom_route']], [], null, [], []), $jsonapi],
 
@@ -55,7 +55,7 @@ class OperationResourceMetadataFactoryTest extends TestCase
             [new ResourceMetadata(null, null, null, [], null, null, [], []), new ResourceMetadata(null, null, null, [], ['get' => ['method' => 'GET'], 'post' => ['method' => 'POST']], null, [], [])],
             [new ResourceMetadata(null, null, null, [], ['get'], null, [], []), new ResourceMetadata(null, null, null, [], ['get' => ['method' => 'GET']], null, [], [])],
             [new ResourceMetadata(null, null, null, [], ['post'], null, [], []), new ResourceMetadata(null, null, null, [], ['post' => ['method' => 'POST']], null, [], [])],
-            [new ResourceMetadata(null, null, null, [], ['options'], null, [], []), new ResourceMetadata(null, null, null, [], ['options' => ['route_name' => 'options']], null, [], [])],
+            [new ResourceMetadata(null, null, null, [], ['options' => ['method' => 'OPTIONS', 'route_name' => 'options']], null, [], []), new ResourceMetadata(null, null, null, [], ['options' => ['route_name' => 'options', 'method' => 'OPTIONS']], null, [], [])],
             [new ResourceMetadata(null, null, null, [], ['untouched' => ['method' => 'GET']], null, [], []), new ResourceMetadata(null, null, null, [], ['untouched' => ['method' => 'GET']], null, [], [])],
             [new ResourceMetadata(null, null, null, [], ['untouched_custom' => ['route_name' => 'custom_route']], null, [], []), new ResourceMetadata(null, null, null, [], ['untouched_custom' => ['route_name' => 'custom_route']], null, [], [])],
         ];
