@@ -72,7 +72,7 @@ final class OperationResourceMetadataFactory implements ResourceMetadataFactoryI
                 $isAbstract ? ['GET'] : ['GET', 'POST']
             ));
         } else {
-            $resourceMetadata = $this->normalize(true, $resourceMetadata, $collectionOperations);
+            $resourceMetadata = $this->normalize(true, $resourceClass, $resourceMetadata, $collectionOperations);
         }
 
         $itemOperations = $resourceMetadata->getItemOperations();
@@ -89,12 +89,8 @@ final class OperationResourceMetadataFactory implements ResourceMetadataFactoryI
 
             $resourceMetadata = $resourceMetadata->withItemOperations($this->createOperations($methods));
         } else {
-            $resourceMetadata = $this->normalize(false, $resourceMetadata, $itemOperations);
+            $resourceMetadata = $this->normalize(false, $resourceClass, $resourceMetadata, $itemOperations);
         }
-
-        /*if (null !== $subresourceOperations = $resourceMetadata->getSubresourceOperations()) {
-            $resourceMetadata = $this->normalize(false, $resourceMetadata, $subresourceOperations);
-        }*/
 
         $graphql = $resourceMetadata->getGraphql();
         if (null === $graphql) {
@@ -116,7 +112,7 @@ final class OperationResourceMetadataFactory implements ResourceMetadataFactoryI
         return $operations;
     }
 
-    private function normalize(bool $collection, ResourceMetadata $resourceMetadata, array $operations): ResourceMetadata
+    private function normalize(bool $collection, string $resourceClass, ResourceMetadata $resourceMetadata, array $operations): ResourceMetadata
     {
         $newOperations = [];
         foreach ($operations as $operationName => $operation) {
@@ -134,7 +130,12 @@ final class OperationResourceMetadataFactory implements ResourceMetadataFactoryI
             }
 
             if (!isset($operation['method']) && !isset($operation['route_name'])) {
-                $supported ? $operation['method'] = $upperOperationName : $operation['route_name'] = $operationName;
+                if ($supported) {
+                    $operation['method'] = $upperOperationName;
+                } else {
+                    @trigger_error(sprintf('The "route_name" attribute will not be set automatically again in API Platform 3.0, set it for the %s operation "%s" of the class "%s".', $collection ? 'collection' : 'item', $operationName, $resourceClass), E_USER_DEPRECATED);
+                    $operation['route_name'] = $operationName;
+                }
             }
 
             $normalizeFormats = true;
