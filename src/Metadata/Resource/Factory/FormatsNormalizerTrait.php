@@ -49,4 +49,11 @@ trait FormatsNormalizerTrait
 
         return $normalizedFormats;
     }
+
+    private function normalizeInputOutput(array $inOut, array $defaultFormats): array
+    {
+        $inOut['formats'] = isset($inOut['formats']) ? $this->normalizeFormats($inOut['formats'], $this->formats) : $defaultFormats;
+
+        return $inOut;
+    }
 }

@@ -138,19 +138,26 @@ final class OperationResourceMetadataFactory implements ResourceMetadataFactoryI
                 }
             }
 
-            $normalizeFormats = true;
             if (isset($operation['method'])) {
                 $operation['method'] = strtoupper($operation['method']);
 
-                if ('PATCH' === $operation['method'] && !isset($operation['formats'])) {
-                    $operation['formats'] = $this->patchFormats;
-                    $normalizeFormats = false;
+                if ('PATCH' === $operation['method'] && !isset($operation['formats']) && !isset($operation['input']['formats'])) {
+                    $operation['input']['formats'] = $this->patchFormats;
                 }
             }
 
-            if ($normalizeFormats && isset($operation['formats'])) {
-                $operation['formats'] = $this->normalizeFormats($operation['formats'], ('PATCH' === ($operation['method'] ?? '')) ? $this->patchFormats : $this->formats);
+            // Formats hierarchy:
+            // * resource formats
+            //   * resource input/output formats
+            //     * operation formats
+            //       * operation input/output formats
+
+            if (isset($operation['formats'])) {
+                $operation['formats'] = $this->normalizeFormats($operation['formats'], $this->formats);
             }
+
+            $operation['input'] = $this->normalizeInputOutput($resourceMetadata->getAttribute('input', []), $operation['formats'] ?? $resourceMetadata->getAttribute('input')['formats'] ?? []);
+            $operation['output'] = $this->normalizeInputOutput($resourceMetadata->getAttribute('output', []), $operation['formats'] ?? $resourceMetadata->getAttribute('output')['formats'] ?? []);
 
             $newOperations[$operationName] = $operation;
         }

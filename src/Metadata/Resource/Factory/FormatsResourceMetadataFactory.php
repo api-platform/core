@@ -48,6 +48,10 @@ final class FormatsResourceMetadataFactory implements ResourceMetadataFactoryInt
         $currentFormats = $resourceMetadata->getAttribute('formats');
         $normalizedFormats = null === $currentFormats ? $this->formats : $this->normalizeFormats($currentFormats, $this->formats);
 
-        return $resourceMetadata->withAttributes(['formats' => $normalizedFormats] + $resourceMetadata->getAttributes());
+        return $resourceMetadata->withAttributes([
+            'formats' => $normalizedFormats,
+            'input' => $this->normalizeInputOutput($resourceMetadata->getAttribute('input', []), $normalizedFormats),
+            'output' => $this->normalizeInputOutput($resourceMetadata->getAttribute('output', []), $normalizedFormats),
+        ] + $resourceMetadata->getAttributes());
     }
 }
