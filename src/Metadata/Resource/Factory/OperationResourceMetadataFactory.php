@@ -156,8 +156,11 @@ final class OperationResourceMetadataFactory implements ResourceMetadataFactoryI
                 $operation['formats'] = $this->normalizeFormats($operation['formats'], $this->formats);
             }
 
-            $operation['input'] = $this->normalizeInputOutput($resourceMetadata->getAttribute('input', []), $operation['formats'] ?? $resourceMetadata->getAttribute('input')['formats'] ?? []);
-            $operation['output'] = $this->normalizeInputOutput($resourceMetadata->getAttribute('output', []), $operation['formats'] ?? $resourceMetadata->getAttribute('output')['formats'] ?? []);
+            $resourceInputFormats = $resourceMetadata->getAttribute('input', [])['formats'] ?? $resourceMetadata->getAttribute('formats') ?? $this->formats;
+            $resourceOutputFormats = $resourceMetadata->getAttribute('output', [])['formats'] ?? $resourceMetadata->getAttribute('formats') ?? $this->formats;
+
+            $operation['input'] = $this->normalizeInputOutput($resourceMetadata->getAttribute('input', []), $operation['formats'] ?? $resourceMetadata->getAttribute('input', [])['formats'] ?? $resourceInputFormats);
+            $operation['output'] = $this->normalizeInputOutput($resourceMetadata->getAttribute('output', []), $operation['formats'] ?? $resourceMetadata->getAttribute('output', [])['formats'] ?? $resourceOutputFormats);
 
             $newOperations[$operationName] = $operation;
         }

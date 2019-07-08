@@ -77,10 +77,14 @@ final class AddFormatListener
 
         // BC check to be removed in 3.0
         if ($this->resourceMetadataFactory) {
-            $formats = $attributes ? $this
-                ->resourceMetadataFactory
-                ->create($attributes['resource_class'])
-                ->getOperationAttribute($attributes, 'formats', [], true) : $this->formats;
+            if ($attributes) {
+                $formats = $this
+                    ->resourceMetadataFactory
+                    ->create($attributes['resource_class'])
+                    ->getOperationAttribute($attributes, 'output', [], true)['formats'] ?? $this->formats;
+            } else {
+                $formats = $this->formats;
+            }
         } elseif ($this->formatsProvider instanceof FormatsProviderInterface) {
             $formats = $this->formatsProvider->getFormatsFromAttributes($attributes);
         } else {

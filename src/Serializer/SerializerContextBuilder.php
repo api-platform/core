@@ -94,7 +94,7 @@ final class SerializerContextBuilder implements SerializerContextBuilderInterfac
         if (
             isset($this->patchFormats['json'])
             && !isset($context['skip_null_values'])
-            && in_array('application/merge-patch+json', $this->patchFormats['json'], true)
+            && \in_array('application/merge-patch+json', $this->patchFormats['json'], true)
         ) {
             $context['skip_null_values'] = true;
         }
