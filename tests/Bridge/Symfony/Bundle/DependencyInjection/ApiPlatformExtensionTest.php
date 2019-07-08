@@ -73,6 +73,7 @@ use ApiPlatform\Core\Security\ResourceAccessCheckerInterface;
 use ApiPlatform\Core\Serializer\Filter\GroupFilter;
 use ApiPlatform\Core\Serializer\Filter\PropertyFilter;
 use ApiPlatform\Core\Serializer\SerializerContextBuilderInterface;
+use ApiPlatform\Core\Swagger\SchemaFormatter\DefinititionNormalizerInterface;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\TestBundle;
 use ApiPlatform\Core\Validator\ValidatorInterface;
 use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
@@ -1032,6 +1033,10 @@ class ApiPlatformExtensionTest extends TestCase
             ->willReturn($this->childDefinitionProphecy)->shouldBeCalledTimes(1);
         $this->childDefinitionProphecy->addTag('api_platform.data_transformer')->shouldBeCalledTimes(1);
 
+        $containerBuilderProphecy->registerForAutoconfiguration(DefinititionNormalizerInterface::class)
+            ->willReturn($this->childDefinitionProphecy)->shouldBeCalledTimes(1);
+        $this->childDefinitionProphecy->addTag('api_platform.schema_formatter')->shouldBeCalledTimes(1);
+
         $containerBuilderProphecy->addResource(Argument::type(DirectoryResource::class))->shouldBeCalled();
 
         $parameters = [
@@ -1160,6 +1165,9 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.swagger.normalizer.documentation',
             'api_platform.validator',
             'test.api_platform.client',
+            'api_platform.schema_formatter.json',
+            'api_platform.schema_formatter.api+json',
+            'api_platform.schema_formatter.provider',
         ];
 
         if (\in_array('odm', $doctrineIntegrationsToLoad, true)) {

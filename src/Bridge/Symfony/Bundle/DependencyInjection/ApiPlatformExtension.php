@@ -32,6 +32,7 @@ use ApiPlatform\Core\GraphQl\Resolver\MutationResolverInterface;
 use ApiPlatform\Core\GraphQl\Resolver\QueryCollectionResolverInterface;
 use ApiPlatform\Core\GraphQl\Resolver\QueryItemResolverInterface;
 use ApiPlatform\Core\GraphQl\Type\Definition\TypeInterface as GraphQlTypeInterface;
+use ApiPlatform\Core\Swagger\SchemaFormatter\DefinititionNormalizerInterface;
 use Doctrine\Common\Annotations\Annotation;
 use phpDocumentor\Reflection\DocBlockFactoryInterface;
 use Ramsey\Uuid\Uuid;
@@ -314,6 +315,9 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
 
         $container->setParameter('api_platform.enable_swagger', $config['enable_swagger']);
         $container->setParameter('api_platform.swagger.api_keys', $config['swagger']['api_keys']);
+
+        $container->registerForAutoconfiguration(DefinititionNormalizerInterface::class)
+            ->addTag('api_platform.schema_formatter');
     }
 
     private function registerJsonApiConfiguration(array $formats, XmlFileLoader $loader): void
