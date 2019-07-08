@@ -28,10 +28,12 @@ use Symfony\Component\HttpFoundation\Request;
 final class SerializerContextBuilder implements SerializerContextBuilderInterface
 {
     private $resourceMetadataFactory;
+    private $patchFormats;
 
-    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory)
+    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, array $patchFormats = [])
     {
         $this->resourceMetadataFactory = $resourceMetadataFactory;
+        $this->patchFormats = $patchFormats;
     }
 
     /**
@@ -88,6 +90,14 @@ final class SerializerContextBuilder implements SerializerContextBuilderInterfac
         }
 
         unset($context[DocumentationNormalizer::SWAGGER_DEFINITION_NAME]);
+
+        if (
+            isset($this->patchFormats['json'])
+            && !isset($context['skip_null_values'])
+            && in_array('application/merge-patch+json', $this->patchFormats['json'], true)
+        ) {
+            $context['skip_null_values'] = true;
+        }
 
         return $context;
     }
