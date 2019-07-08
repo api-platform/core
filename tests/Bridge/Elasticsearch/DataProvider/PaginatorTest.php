@@ -117,15 +117,13 @@ class PaginatorTest extends TestCase
     public function testGetTotalItemsForElasticSearch7()
     {
         // the total in elastichsearch >= 7 is object and not integer.
-        // change documents to be like elasticsearch7
         $documents = self::DOCUMENTS;
         $documents['hits']['total'] = [
             'value' => 8,
-            'relation' => 'eq'
+            'relation' => 'eq',
         ];
-        // I need to create another paginator with documents total changed
-        $denormalizerProphecy = $this->createDenormalizerProphecy($documents);
-        $paginator = new Paginator($denormalizerProphecy->reveal(), $documents, Foo::class, self::LIMIT, self::OFFSET);
+
+        $paginator = $this->getPaginator(static::LIMIT, static::OFFSET, $documents);
 
         self::assertSame(8., $paginator->getTotalItems());
     }
@@ -168,16 +166,10 @@ class PaginatorTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->paginator = $this->getPaginator(4, 4);
+        $this->paginator = $this->getPaginator();
     }
 
-    protected function getPaginator($limit, $offset)
-    {
-        $denormalizerProphecy = $this->createDenormalizerProphecy(static::DOCUMENTS);
-        return new Paginator($denormalizerProphecy->reveal(), self::DOCUMENTS, Foo::class, $limit, $offset);
-    }
-
-    protected function createDenormalizerProphecy($documents)
+    protected function getPaginator(int $limit = self::OFFSET, int $offset = self::OFFSET, array $documents = self::DOCUMENTS)
     {
         $denormalizerProphecy = $this->prophesize(DenormalizerInterface::class);
 
@@ -186,7 +178,8 @@ class PaginatorTest extends TestCase
                 ->denormalize($document, Foo::class, ItemNormalizer::FORMAT, [AbstractNormalizer::ALLOW_EXTRA_ATTRIBUTES => true])
                 ->willReturn($this->denormalizeFoo($document['_source']));
         }
-        return $denormalizerProphecy;
+
+        return new Paginator($denormalizerProphecy->reveal(), $documents, Foo::class, $limit, $offset);
     }
 
     protected function denormalizeFoo(array $fooDocument): Foo
