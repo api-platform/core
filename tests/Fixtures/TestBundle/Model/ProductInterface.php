@@ -31,13 +31,13 @@ use Symfony\Component\Validator\Constraints as Assert;
  */
 interface ProductInterface
 {
-    /**
-     * @ApiProperty(identifier=true)
-     */
     public function getId();
 
     /**
+     * @ApiProperty(identifier=true)
+     *
      * @Groups({"product_read"})
+     *
      * @Assert\NotBlank
      */
     public function getCode(): ?string;

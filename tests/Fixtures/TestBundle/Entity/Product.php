@@ -34,7 +34,7 @@ class Product implements ProductInterface
     /**
      * @var string|null
      *
-     * @ORM\Column(type="string")
+     * @ORM\Column(type="string", unique=true)
      */
     private $code;
 

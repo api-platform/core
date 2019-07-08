@@ -1330,8 +1330,10 @@ final class DoctrineContext implements Context
         $product = $this->isOrm() ? new Product() : new ProductDocument();
         $product->setCode($data['code']);
         if (isset($data['mainTaxon'])) {
-            $mainTaxonId = (int) str_replace('/taxons/', '', $data['mainTaxon']);
-            $mainTaxon = $this->manager->getRepository($this->isOrm() ? Taxon::class : TaxonDocument::class)->find($mainTaxonId);
+            $mainTaxonCode = str_replace('/taxons/', '', $data['mainTaxon']);
+            $mainTaxon = $this->manager->getRepository($this->isOrm() ? Taxon::class : TaxonDocument::class)->findOneBy([
+                'code' => $mainTaxonCode,
+            ]);
             $product->setMainTaxon($mainTaxon);
         }
         $this->manager->persist($product);

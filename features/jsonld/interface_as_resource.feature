@@ -15,7 +15,7 @@ Feature: JSON-LD using interface as resource
       "code": "WONDERFUL_TAXON"
     }
     """
-    When I send a "GET" request to "/taxons/1"
+    When I send a "GET" request to "/taxons/WONDERFUL_TAXON"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
@@ -23,7 +23,7 @@ Feature: JSON-LD using interface as resource
     """
     {
       "@context": "/contexts/Taxon",
-      "@id": "/taxons/1",
+      "@id": "/taxons/WONDERFUL_TAXON",
       "@type": "Taxon",
       "code": "WONDERFUL_TAXON"
     }
@@ -34,10 +34,10 @@ Feature: JSON-LD using interface as resource
     """
     {
       "code": "GREAT_PRODUCT",
-      "mainTaxon": "/taxons/1"
+      "mainTaxon": "/taxons/WONDERFUL_TAXON"
     }
     """
-    When I send a "GET" request to "/products/1"
+    When I send a "GET" request to "/products/GREAT_PRODUCT"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
@@ -45,11 +45,11 @@ Feature: JSON-LD using interface as resource
     """
     {
       "@context": "/contexts/Product",
-      "@id": "/products/1",
+      "@id": "/products/GREAT_PRODUCT",
       "@type": "Product",
       "code": "GREAT_PRODUCT",
       "mainTaxon": {
-        "@id": "/taxons/1",
+        "@id": "/taxons/WONDERFUL_TAXON",
         "@type": "Taxon",
         "code": "WONDERFUL_TAXON"
       }
