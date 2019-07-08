@@ -29,8 +29,8 @@
             <argument type="tagged" tag="api_platform.data_transformer" on-invalid="ignore" />
             <argument>false</argument>
 
-            <!-- Run after serializer.normalizer.data_uri but before serializer.normalizer.object -->
-            <tag name="serializer.normalizer" priority="-922" />
+            <!-- Run before serializer.normalizer.json_serializable -->
+            <tag name="serializer.normalizer" priority="-890" />
         </service>
 
         <service id="api_platform.jsonld.normalizer.object" class="ApiPlatform\Core\JsonLd\Serializer\ObjectNormalizer" public="false">
@@ -38,8 +38,8 @@
             <argument type="service" id="api_platform.iri_converter" />
             <argument type="service" id="api_platform.jsonld.context_builder" />
 
-            <!-- Run after serializer.normalizer.data_uri but before serializer.normalizer.object -->
-            <tag name="serializer.normalizer" priority="-924" />
+            <!-- Run after serializer.denormalizer.array but before serializer.normalizer.object -->
+            <tag name="serializer.normalizer" priority="-995" />
         </service>
 
         <service id="api_platform.jsonld.encoder" class="ApiPlatform\Core\Serializer\JsonEncoder" public="false">

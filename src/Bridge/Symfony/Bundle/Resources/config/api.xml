@@ -110,8 +110,8 @@
             <argument type="service" id="api_platform.metadata.resource.metadata_factory" on-invalid="ignore" />
             <argument>false</argument>
 
-            <!-- Run after serializer.normalizer.data_uri but before serializer.normalizer.object -->
-            <tag name="serializer.normalizer" priority="-923" />
+            <!-- Run before serializer.normalizer.json_serializable -->
+            <tag name="serializer.normalizer" priority="-895" />
         </service>
 
         <!-- Resources Operations path resolver -->

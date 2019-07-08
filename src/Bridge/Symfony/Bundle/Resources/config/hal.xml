@@ -23,7 +23,8 @@
             <argument type="service" id="api_platform.resource_class_resolver" />
             <argument>%api_platform.collection.pagination.page_parameter_name%</argument>
 
-            <tag name="serializer.normalizer" priority="-790" />
+            <!-- Run after api_platform.hal.normalizer.object but before serializer.normalizer.object and serializer.denormalizer.array -->
+            <tag name="serializer.normalizer" priority="-985" />
         </service>
 
         <service id="api_platform.hal.normalizer.item" class="ApiPlatform\Core\Hal\Serializer\ItemNormalizer" public="false">
@@ -41,16 +42,16 @@
             <argument type="service" id="api_platform.metadata.resource.metadata_factory" on-invalid="ignore" />
             <argument>false</argument>
 
-            <!-- Run after serializer.normalizer.data_uri but before serializer.normalizer.object -->
-            <tag name="serializer.normalizer" priority="-922" />
+            <!-- Run before serializer.normalizer.json_serializable -->
+            <tag name="serializer.normalizer" priority="-890" />
         </service>
 
         <service id="api_platform.hal.normalizer.object" class="ApiPlatform\Core\Hal\Serializer\ObjectNormalizer" public="false">
             <argument type="service" id="serializer.normalizer.object" />
             <argument type="service" id="api_platform.iri_converter" />
 
-            <!-- Run after serializer.normalizer.data_uri but before serializer.normalizer.object -->
-            <tag name="serializer.normalizer" priority="-924" />
+            <!-- Run after serializer.denormalizer.array but before serializer.normalizer.object -->
+            <tag name="serializer.normalizer" priority="-995" />
         </service>
     </services>
 
