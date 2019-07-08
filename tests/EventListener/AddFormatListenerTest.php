@@ -49,7 +49,13 @@ class AddFormatListenerTest extends TestCase
     public function testSupportedRequestFormat(): void
     {
         $resourceMetadataFactory = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $resourceMetadataFactory->create('Foo')->willReturn(new ResourceMetadata(null, null, null, null, null, ['formats' => ['xml' => ['text/xml']]]));
+        $resourceMetadataFactory->create('Foo')->willReturn(new ResourceMetadata(
+            null,
+            null,
+            null,
+            null,
+            ['get' => ['output' => ['formats' => ['xml' => ['text/xml']]]]]
+        ));
 
         $this->doTestSupportedRequestFormat($resourceMetadataFactory->reveal());
     }
@@ -109,7 +115,13 @@ class AddFormatListenerTest extends TestCase
         $event = $eventProphecy->reveal();
 
         $resourceMetadataFactory = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $resourceMetadataFactory->create('Foo')->willReturn(new ResourceMetadata(null, null, null, null, null, ['formats' => ['json' => ['application/json']]]));
+        $resourceMetadataFactory->create('Foo')->willReturn(new ResourceMetadata(
+            null,
+            null,
+            null,
+            null,
+            ['get' => ['output' => ['formats' => ['json' => ['application/json']]]]]
+        ));
 
         $listener = new AddFormatListener(new Negotiator(), $resourceMetadataFactory->reveal());
         $listener->onKernelRequest($event);
@@ -127,7 +139,16 @@ class AddFormatListenerTest extends TestCase
         $event = $eventProphecy->reveal();
 
         $resourceMetadataFactory = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $resourceMetadataFactory->create('Foo')->willReturn(new ResourceMetadata(null, null, null, null, null, ['formats' => ['binary' => ['application/octet-stream'], 'json' => ['application/json']]]));
+        $resourceMetadataFactory->create('Foo')->willReturn(new ResourceMetadata(
+            null,
+            null,
+            null,
+            null,
+            ['get' => ['output' => ['formats' => [
+                'binary' => ['application/octet-stream'],
+                'json' => ['application/json'], ],
+            ]]]
+        ));
 
         $listener = new AddFormatListener(new Negotiator(), $resourceMetadataFactory->reveal());
         $listener->onKernelRequest($event);
@@ -145,7 +166,13 @@ class AddFormatListenerTest extends TestCase
         $event = $eventProphecy->reveal();
 
         $resourceMetadataFactory = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $resourceMetadataFactory->create('Foo')->willReturn(new ResourceMetadata(null, null, null, null, null, ['formats' => ['jsonld' => ['application/ld+json', 'application/json']]]));
+        $resourceMetadataFactory->create('Foo')->willReturn(new ResourceMetadata(
+            null,
+            null,
+            null,
+            null,
+            ['get' => ['output' => ['formats' => ['jsonld' => ['application/ld+json', 'application/json']]]]]
+        ));
 
         $listener = new AddFormatListener(new Negotiator(), $resourceMetadataFactory->reveal());
         $listener->onKernelRequest($event);
@@ -163,7 +190,13 @@ class AddFormatListenerTest extends TestCase
         $event = $eventProphecy->reveal();
 
         $resourceMetadataFactory = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $resourceMetadataFactory->create('Foo')->willReturn(new ResourceMetadata(null, null, null, null, null, ['formats' => ['binary' => ['application/octet-stream'], 'json' => ['application/json']]]));
+        $resourceMetadataFactory->create('Foo')->willReturn(new ResourceMetadata(
+            null,
+            null,
+            null,
+            null,
+            ['get' => ['output' => ['formats' => ['binary' => ['application/octet-stream'], 'json' => ['application/json']]]]]
+        ));
 
         $listener = new AddFormatListener(new Negotiator(), $resourceMetadataFactory->reveal());
         $listener->onKernelRequest($event);
@@ -185,7 +218,13 @@ class AddFormatListenerTest extends TestCase
         $event = $eventProphecy->reveal();
 
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadata(null, null, null, null, null, ['formats' => ['binary' => ['application/octet-stream'], 'json' => ['application/json']]]));
+        $resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadata(
+            null,
+            null,
+            null,
+            null,
+            ['get' => ['output' => ['formats' => ['binary' => ['application/octet-stream'], 'json' => ['application/json']]]]]
+        ));
 
         $listener = new AddFormatListener(new Negotiator(), $resourceMetadataFactoryProphecy->reveal());
         $listener->onKernelRequest($event);
@@ -204,7 +243,13 @@ class AddFormatListenerTest extends TestCase
         $event = $eventProphecy->reveal();
 
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadata(null, null, null, null, null, ['formats' => ['json' => ['application/json']]]));
+        $resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadata(
+            null,
+            null,
+            null,
+            null,
+            ['get' => ['output' => ['formats' => ['json' => ['application/json']]]]]
+        ));
 
         $listener = new AddFormatListener(new Negotiator(), $resourceMetadataFactoryProphecy->reveal());
         $listener->onKernelRequest($event);
@@ -223,7 +268,13 @@ class AddFormatListenerTest extends TestCase
         $event = $eventProphecy->reveal();
 
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadata(null, null, null, null, null, ['formats' => ['json' => ['application/json']]]));
+        $resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadata(
+            null,
+            null,
+            null,
+            null,
+            ['get' => ['output' => ['formats' => ['json' => ['application/json']]]]]
+        ));
 
         $listener = new AddFormatListener(new Negotiator(), $resourceMetadataFactoryProphecy->reveal());
         $listener->onKernelRequest($event);
@@ -240,7 +291,13 @@ class AddFormatListenerTest extends TestCase
         $event = $eventProphecy->reveal();
 
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadata(null, null, null, null, null, ['formats' => ['xml' => ['application/xml'], 'json' => ['application/json']]]));
+        $resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadata(
+            null,
+            null,
+            null,
+            [],
+            ['get' => ['output' => ['formats' => ['xml' => ['application/xml'], 'json' => ['application/json']]]]]
+        ));
 
         $listener = new AddFormatListener(new Negotiator(), $resourceMetadataFactoryProphecy->reveal());
         $listener->onKernelRequest($event);
@@ -260,7 +317,14 @@ class AddFormatListenerTest extends TestCase
         $event = $eventProphecy->reveal();
 
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadata(null, null, null, null, null, ['formats' => ['json' => ['application/json']]]));
+        $resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadata(
+            null,
+            null,
+            null,
+            null,
+            null,
+            ['formats' => ['json' => ['application/json']]]
+        ));
 
         $listener = new AddFormatListener(new Negotiator(), $resourceMetadataFactoryProphecy->reveal());
         $listener->onKernelRequest($event);
@@ -276,7 +340,13 @@ class AddFormatListenerTest extends TestCase
         $event = $eventProphecy->reveal();
 
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadata(null, null, null, null, null, ['formats' => ['csv' => ['text/csv']]]));
+        $resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadata(
+            null,
+            null,
+            null,
+            null,
+            ['get' => ['output' => ['formats' => ['csv' => ['text/csv']]]]]
+        ));
 
         $listener = new AddFormatListener(new Negotiator(), $resourceMetadataFactoryProphecy->reveal());
         $listener->onKernelRequest($event);

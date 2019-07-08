@@ -68,12 +68,9 @@ final class OperationResourceMetadataFactory implements ResourceMetadataFactoryI
 
         $collectionOperations = $resourceMetadata->getCollectionOperations();
         if (null === $collectionOperations) {
-            $resourceMetadata = $resourceMetadata->withCollectionOperations($this->createOperations(
-                $isAbstract ? ['GET'] : ['GET', 'POST']
-            ));
-        } else {
-            $resourceMetadata = $this->normalize(true, $resourceClass, $resourceMetadata, $collectionOperations);
+            $collectionOperations = $this->createOperations($isAbstract ? ['GET'] : ['GET', 'POST']);
         }
+        $resourceMetadata = $this->normalize(true, $resourceClass, $resourceMetadata, $collectionOperations);
 
         $itemOperations = $resourceMetadata->getItemOperations();
         if (null === $itemOperations) {
@@ -87,10 +84,9 @@ final class OperationResourceMetadataFactory implements ResourceMetadataFactoryI
                 }
             }
 
-            $resourceMetadata = $resourceMetadata->withItemOperations($this->createOperations($methods));
-        } else {
-            $resourceMetadata = $this->normalize(false, $resourceClass, $resourceMetadata, $itemOperations);
+            $itemOperations = $this->createOperations($methods);
         }
+        $resourceMetadata = $this->normalize(false, $resourceClass, $resourceMetadata, $itemOperations);
 
         $graphql = $resourceMetadata->getGraphql();
         if (null === $graphql) {
