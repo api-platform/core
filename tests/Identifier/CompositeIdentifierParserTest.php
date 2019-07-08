@@ -37,6 +37,8 @@ class CompositeIdentifierParserTest extends TestCase
             'a=test;b=bar;foo;c=123' => ['a' => 'test', 'b' => 'bar;foo', 'c' => '123'],
             'a=test;b=bar ;foo;c=123;459;barz=123asgfjasdg4;' => ['a' => 'test', 'b' => 'bar ;foo', 'c' => '123;459', 'barz' => '123asgfjasdg4'],
             'foo=test=bar;;bar=bazzz;' => ['foo' => 'test=bar;', 'bar' => 'bazzz'],
+            'foo=test=bar;bar=;test=foo' => ['foo' => 'test=bar', 'bar' => '', 'test' => 'foo'],
+            'foo=test=bar;bar=' => ['foo' => 'test=bar', 'bar' => ''],
         ]]];
     }
 }
