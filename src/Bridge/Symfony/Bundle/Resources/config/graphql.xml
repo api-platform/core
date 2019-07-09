@@ -135,8 +135,8 @@
             <argument type="tagged" tag="api_platform.data_transformer" on-invalid="ignore" />
             <argument type="service" id="api_platform.metadata.resource.metadata_factory" on-invalid="ignore" />
 
-            <!-- Run after serializer.normalizer.data_uri but before serializer.normalizer.object -->
-            <tag name="serializer.normalizer" priority="-922" />
+            <!-- Run before serializer.normalizer.json_serializable -->
+            <tag name="serializer.normalizer" priority="-890" />
         </service>
 
         <service id="api_platform.graphql.normalizer.object" class="ApiPlatform\Core\GraphQl\Serializer\ObjectNormalizer" public="false">
@@ -144,8 +144,8 @@
             <argument type="service" id="api_platform.iri_converter" />
             <argument type="service" id="api_platform.identifiers_extractor.cached" />
 
-            <!-- Run after serializer.normalizer.data_uri but before serializer.normalizer.object -->
-            <tag name="serializer.normalizer" priority="-924" />
+            <!-- Run after serializer.denormalizer.array but before serializer.normalizer.object -->
+            <tag name="serializer.normalizer" priority="-995" />
         </service>
 
         <!-- Command -->

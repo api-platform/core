@@ -27,8 +27,8 @@
             <argument type="service" id="api_platform.resource_class_resolver" />
             <argument>%api_platform.collection.pagination.page_parameter_name%</argument>
 
-
-            <tag name="serializer.normalizer" priority="-790" />
+            <!-- Run after api_platform.jsonapi.normalizer.object but before serializer.normalizer.object and serializer.denormalizer.array -->
+            <tag name="serializer.normalizer" priority="-985" />
         </service>
 
         <service id="api_platform.jsonapi.normalizer.item" class="ApiPlatform\Core\JsonApi\Serializer\ItemNormalizer" public="false">
@@ -43,8 +43,8 @@
             <argument type="tagged" tag="api_platform.data_transformer" on-invalid="ignore" />
             <argument>false</argument>
 
-            <!-- Run after serializer.normalizer.data_uri but before serializer.normalizer.object -->
-            <tag name="serializer.normalizer" priority="-922" />
+            <!-- Run before serializer.normalizer.json_serializable -->
+            <tag name="serializer.normalizer" priority="-890" />
         </service>
 
         <service id="api_platform.jsonapi.normalizer.object" class="ApiPlatform\Core\JsonApi\Serializer\ObjectNormalizer" public="false">
@@ -53,8 +53,8 @@
             <argument type="service" id="api_platform.resource_class_resolver" />
             <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
 
-            <!-- Run after serializer.normalizer.data_uri but before serializer.normalizer.object -->
-            <tag name="serializer.normalizer" priority="-924" />
+            <!-- Run after serializer.denormalizer.array but before serializer.normalizer.object -->
+            <tag name="serializer.normalizer" priority="-995" />
         </service>
 
         <service id="api_platform.jsonapi.normalizer.constraint_violation_list" class="ApiPlatform\Core\JsonApi\Serializer\ConstraintViolationListNormalizer" public="false">
