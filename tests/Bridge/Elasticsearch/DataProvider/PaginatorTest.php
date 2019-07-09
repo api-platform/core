@@ -23,7 +23,7 @@ use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
 class PaginatorTest extends TestCase
 {
-    protected const DOCUMENTS = [
+    private const DOCUMENTS = [
         'hits' => [
             'total' => 8,
             'max_score' => 1,
@@ -76,13 +76,13 @@ class PaginatorTest extends TestCase
         ],
     ];
 
-    protected const OFFSET = 4;
-    protected const LIMIT = 4;
+    private const OFFSET = 4;
+    private const LIMIT = 4;
 
     /**
      * @var PaginatorInterface
      */
-    protected $paginator;
+    private $paginator;
 
     public function testConstruct()
     {
@@ -169,7 +169,7 @@ class PaginatorTest extends TestCase
         $this->paginator = $this->getPaginator();
     }
 
-    protected function getPaginator(int $limit = self::OFFSET, int $offset = self::OFFSET, array $documents = self::DOCUMENTS)
+    private function getPaginator(int $limit = self::OFFSET, int $offset = self::OFFSET, array $documents = self::DOCUMENTS)
     {
         $denormalizerProphecy = $this->prophesize(DenormalizerInterface::class);
 
@@ -182,7 +182,7 @@ class PaginatorTest extends TestCase
         return new Paginator($denormalizerProphecy->reveal(), $documents, Foo::class, $limit, $offset);
     }
 
-    protected function denormalizeFoo(array $fooDocument): Foo
+    private function denormalizeFoo(array $fooDocument): Foo
     {
         $foo = new Foo();
         $foo->setName($fooDocument['name']);
