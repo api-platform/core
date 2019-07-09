@@ -52,7 +52,7 @@ final class FormatsResourceMetadataFactory implements ResourceMetadataFactoryInt
     {
         $resourceMetadata = $this->decorated->create($resourceClass);
         $rawResourceFormats = $resourceMetadata->getAttribute('formats');
-        $resourceFormats = null === $rawResourceFormats ? $this->formats : $this->normalizeFormats($rawResourceFormats, $this->formats);
+        $resourceFormats = null === $rawResourceFormats ? $this->formats : $this->normalizeFormats($rawResourceFormats);
 
         $rawResourceInputFormats = $resourceMetadata->getAttribute('input_formats');
         $rawResourceOutputFormats = $resourceMetadata->getAttribute('output_formats');
@@ -84,11 +84,11 @@ final class FormatsResourceMetadataFactory implements ResourceMetadataFactoryInt
             }
 
             if (isset($operation['formats'])) {
-                $operation['formats'] = $this->normalizeFormats($operation['formats'], $this->formats);
+                $operation['formats'] = $this->normalizeFormats($operation['formats']);
             }
 
-            $operation['input_formats'] = isset($operation['input_formats']) ? $this->normalizeFormats($operation['input_formats'], $this->formats) : $operation['formats'] ?? $resourceInputFormats;
-            $operation['output_formats'] = isset($operation['output_formats']) ? $this->normalizeFormats($operation['output_formats'], $this->formats) : $operation['formats'] ?? $resourceOutputFormats;
+            $operation['input_formats'] = isset($operation['input_formats']) ? $this->normalizeFormats($operation['input_formats']) : $operation['formats'] ?? $resourceInputFormats;
+            $operation['output_formats'] = isset($operation['output_formats']) ? $this->normalizeFormats($operation['output_formats']) : $operation['formats'] ?? $resourceOutputFormats;
 
             $newOperations[$operationName] = $operation;
         }
@@ -99,7 +99,7 @@ final class FormatsResourceMetadataFactory implements ResourceMetadataFactoryInt
     /**
      * @throws InvalidArgumentException
      */
-    private function normalizeFormats(array $currentFormats, array $configuredFormats): array
+    private function normalizeFormats(array $currentFormats): array
     {
         $normalizedFormats = [];
         foreach ($currentFormats as $format => $value) {
@@ -110,8 +110,8 @@ final class FormatsResourceMetadataFactory implements ResourceMetadataFactoryInt
             if (!\is_string($value)) {
                 throw new InvalidArgumentException(sprintf("The 'formats' attributes value must be a string when trying to include an already configured format, %s given.", \gettype($value)));
             }
-            if (\array_key_exists($value, $configuredFormats)) {
-                $normalizedFormats[$value] = $configuredFormats[$value];
+            if (\array_key_exists($value, $this->formats)) {
+                $normalizedFormats[$value] = $this->formats[$value];
                 continue;
             }
 

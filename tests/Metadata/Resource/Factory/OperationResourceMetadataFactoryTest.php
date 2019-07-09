@@ -27,7 +27,7 @@ class OperationResourceMetadataFactoryTest extends TestCase
     /**
      * @dataProvider getMetadata
      */
-    public function testCreateOperation(ResourceMetadata $before, ResourceMetadata $after, array $formats = [])
+    public function testCreateOperation(ResourceMetadata $before, ResourceMetadata $after, array $formats = []): void
     {
         $decoratedProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $decoratedProphecy->create(Dummy::class)->shouldBeCalled()->willReturn($before);
@@ -41,34 +41,29 @@ class OperationResourceMetadataFactoryTest extends TestCase
 
         // Item operations
         yield [new ResourceMetadata(null, null, null, null, [], null, [], []), new ResourceMetadata(null, null, null, $this->getOperations(['get', 'put', 'delete']), [], null, [], [])];
-        yield [new ResourceMetadata(null, null, null, null, [], null, [], []), new ResourceMetadata(null, null, null, $this->getOperations(['get', 'put', 'patch', 'delete'], $jsonapi), [], null, [], []), $jsonapi];
+        yield [new ResourceMetadata(null, null, null, null, [], null, [], []), new ResourceMetadata(null, null, null, $this->getOperations(['get', 'put', 'patch', 'delete']), [], null, [], []), $jsonapi];
         yield [new ResourceMetadata(null, null, null, ['get'], [], null, [], []), new ResourceMetadata(null, null, null, $this->getOperations(['get']), [], null, [], [])];
         yield [new ResourceMetadata(null, null, null, ['put'], [], null, [], []), new ResourceMetadata(null, null, null, $this->getOperations(['put']), [], null, [], [])];
         yield [new ResourceMetadata(null, null, null, ['delete'], [], null, [], []), new ResourceMetadata(null, null, null, $this->getOperations(['delete']), [], null, [], [])];
-        yield [new ResourceMetadata(null, null, null, ['patch' => ['method' => 'PATCH', 'route_name' => 'patch']], [], null, [], []), new ResourceMetadata(null, null, null, ['patch' => ['method' => 'PATCH', 'route_name' => 'patch', 'input' => ['formats' => []], 'output' => ['formats' => []]]], [], null, [], [])];
-        yield [new ResourceMetadata(null, null, null, ['patch' => ['method' => 'PATCH', 'route_name' => 'patch']], [], null, [], []), new ResourceMetadata(null, null, null, ['patch' => ['method' => 'PATCH', 'route_name' => 'patch', 'input' => ['formats' => $jsonapi], 'output' => ['formats' => $jsonapi]]], [], null, [], []), $jsonapi];
-        yield [new ResourceMetadata(null, null, null, ['untouched' => ['method' => 'GET']], [], null, [], []), new ResourceMetadata(null, null, null, ['untouched' => ['method' => 'GET', 'input' => ['formats' => $jsonapi], 'output' => ['formats' => $jsonapi]]], [], null, [], []), $jsonapi];
-        yield [new ResourceMetadata(null, null, null, ['untouched_custom' => ['route_name' => 'custom_route']], [], null, [], []), new ResourceMetadata(null, null, null, ['untouched_custom' => ['route_name' => 'custom_route', 'input' => ['formats' => $jsonapi], 'output' => ['formats' => $jsonapi]]], [], null, [], []), $jsonapi];
+        yield [new ResourceMetadata(null, null, null, ['patch' => ['method' => 'PATCH', 'route_name' => 'patch']], [], null, [], []), new ResourceMetadata(null, null, null, ['patch' => ['method' => 'PATCH', 'route_name' => 'patch']], [], null, [], [])];
+        yield [new ResourceMetadata(null, null, null, ['patch' => ['method' => 'PATCH', 'route_name' => 'patch']], [], null, [], []), new ResourceMetadata(null, null, null, ['patch' => ['method' => 'PATCH', 'route_name' => 'patch']], [], null, [], []), $jsonapi];
+        yield [new ResourceMetadata(null, null, null, ['untouched' => ['method' => 'GET']], [], null, [], []), new ResourceMetadata(null, null, null, ['untouched' => ['method' => 'GET']], [], null, [], []), $jsonapi];
+        yield [new ResourceMetadata(null, null, null, ['untouched_custom' => ['route_name' => 'custom_route']], [], null, [], []), new ResourceMetadata(null, null, null, ['untouched_custom' => ['route_name' => 'custom_route']], [], null, [], []), $jsonapi];
 
         // Collection operations
         yield [new ResourceMetadata(null, null, null, [], null, null, [], []), new ResourceMetadata(null, null, null, [], $this->getOperations(['get', 'post']), null, [], [])];
         yield [new ResourceMetadata(null, null, null, [], ['get'], null, [], []), new ResourceMetadata(null, null, null, [], $this->getOperations(['get']), null, [], [])];
         yield [new ResourceMetadata(null, null, null, [], ['post'], null, [], []), new ResourceMetadata(null, null, null, [], $this->getOperations(['post']), null, [], [])];
-        yield [new ResourceMetadata(null, null, null, [], ['options' => ['method' => 'OPTIONS', 'route_name' => 'options']], null, [], []), new ResourceMetadata(null, null, null, [], ['options' => ['route_name' => 'options', 'method' => 'OPTIONS', 'input' => ['formats' => []], 'output' => ['formats' => []]]], null, [], [])];
-        yield [new ResourceMetadata(null, null, null, [], ['untouched' => ['method' => 'GET']], null, [], []), new ResourceMetadata(null, null, null, [], ['untouched' => ['method' => 'GET', 'input' => ['formats' => []], 'output' => ['formats' => []]]], null, [], [])];
-        yield [new ResourceMetadata(null, null, null, [], ['untouched_custom' => ['route_name' => 'custom_route']], null, [], []), new ResourceMetadata(null, null, null, [], ['untouched_custom' => ['route_name' => 'custom_route', 'input' => ['formats' => []], 'output' => ['formats' => []]]], null, [], [])];
+        yield [new ResourceMetadata(null, null, null, [], ['options' => ['method' => 'OPTIONS', 'route_name' => 'options']], null, [], []), new ResourceMetadata(null, null, null, [], ['options' => ['route_name' => 'options', 'method' => 'OPTIONS']], null, [], [])];
+        yield [new ResourceMetadata(null, null, null, [], ['untouched' => ['method' => 'GET']], null, [], []), new ResourceMetadata(null, null, null, [], ['untouched' => ['method' => 'GET']], null, [], [])];
+        yield [new ResourceMetadata(null, null, null, [], ['untouched_custom' => ['route_name' => 'custom_route']], null, [], []), new ResourceMetadata(null, null, null, [], ['untouched_custom' => ['route_name' => 'custom_route']], null, [], [])];
     }
 
-    private function getOperations(array $names, array $formats = []): array
+    private function getOperations(array $names): array
     {
-        $baseOperation = [
-            'input' => ['formats' => $formats],
-            'output' => ['formats' => $formats],
-        ];
-
         $operations = [];
         foreach ($names as $name) {
-            $operations[$name] = ['method' => strtoupper($name)] + $baseOperation;
+            $operations[$name] = ['method' => strtoupper($name)];
         }
 
         return $operations;

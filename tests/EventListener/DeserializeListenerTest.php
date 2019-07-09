@@ -132,8 +132,8 @@ class DeserializeListenerTest extends TestCase
             null,
             null,
             null,
-            ['put' => ['input' => ['formats' => self::FORMATS]]],
-            ['post' => ['input' => ['formats' => self::FORMATS]]]
+            ['put' => ['input_formats' => self::FORMATS]],
+            ['post' => ['input_formats' => self::FORMATS]]
         ));
 
         $this->doTestDeserialize($method, $populateObject, $resourceMetadataFactoryProphecy->reveal());
@@ -185,7 +185,7 @@ class DeserializeListenerTest extends TestCase
             null,
             null,
             null,
-            ['post' => ['input' => ['formats' => self::FORMATS]]]
+            ['post' => ['input_formats' => self::FORMATS]]
         ));
 
         $this->doTestDeserializeResourceClassSupportedFormat($method, $populateObject, $resourceMetadataFactoryProphecy->reveal());
@@ -247,7 +247,7 @@ class DeserializeListenerTest extends TestCase
             null,
             null,
             null,
-            ['post' => ['input' => ['formats' => ['jsonld' => ['application/ld+json'], 'xml' => ['text/xml']]]]]
+            ['post' => ['input_formats' => ['jsonld' => ['application/ld+json'], 'xml' => ['text/xml']]]]
         ));
 
         $this->doTestContentNegotiation($resourceMetadataFactoryProphecy->reveal());
@@ -312,7 +312,7 @@ class DeserializeListenerTest extends TestCase
             null,
             null,
             null,
-            ['post' => ['input' => ['formats' => ['jsonld' => ['application/ld+json'], 'xml' => ['text/xml']]]]]
+            ['post' => ['input_formats' => ['jsonld' => ['application/ld+json'], 'xml' => ['text/xml']]]]
         ));
 
         $listener = new DeserializeListener(

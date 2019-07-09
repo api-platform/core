@@ -54,7 +54,7 @@ class AddFormatListenerTest extends TestCase
             null,
             null,
             null,
-            ['get' => ['output' => ['formats' => ['xml' => ['text/xml']]]]]
+            ['get' => ['output_formats' => ['xml' => ['text/xml']]]]
         ));
 
         $this->doTestSupportedRequestFormat($resourceMetadataFactory->reveal());
@@ -120,7 +120,7 @@ class AddFormatListenerTest extends TestCase
             null,
             null,
             null,
-            ['get' => ['output' => ['formats' => ['json' => ['application/json']]]]]
+            ['get' => ['output_formats' => ['json' => ['application/json']]]]
         ));
 
         $listener = new AddFormatListener(new Negotiator(), $resourceMetadataFactory->reveal());
@@ -144,10 +144,10 @@ class AddFormatListenerTest extends TestCase
             null,
             null,
             null,
-            ['get' => ['output' => ['formats' => [
+            ['get' => ['output_formats' => [
                 'binary' => ['application/octet-stream'],
                 'json' => ['application/json'], ],
-            ]]]
+            ]]
         ));
 
         $listener = new AddFormatListener(new Negotiator(), $resourceMetadataFactory->reveal());
@@ -171,7 +171,7 @@ class AddFormatListenerTest extends TestCase
             null,
             null,
             null,
-            ['get' => ['output' => ['formats' => ['jsonld' => ['application/ld+json', 'application/json']]]]]
+            ['get' => ['output_formats' => ['jsonld' => ['application/ld+json', 'application/json']]]]
         ));
 
         $listener = new AddFormatListener(new Negotiator(), $resourceMetadataFactory->reveal());
@@ -195,7 +195,7 @@ class AddFormatListenerTest extends TestCase
             null,
             null,
             null,
-            ['get' => ['output' => ['formats' => ['binary' => ['application/octet-stream'], 'json' => ['application/json']]]]]
+            ['get' => ['output_formats' => ['binary' => ['application/octet-stream'], 'json' => ['application/json']]]]
         ));
 
         $listener = new AddFormatListener(new Negotiator(), $resourceMetadataFactory->reveal());
@@ -223,7 +223,7 @@ class AddFormatListenerTest extends TestCase
             null,
             null,
             null,
-            ['get' => ['output' => ['formats' => ['binary' => ['application/octet-stream'], 'json' => ['application/json']]]]]
+            ['get' => ['output_formats' => ['binary' => ['application/octet-stream'], 'json' => ['application/json']]]]
         ));
 
         $listener = new AddFormatListener(new Negotiator(), $resourceMetadataFactoryProphecy->reveal());
@@ -248,7 +248,7 @@ class AddFormatListenerTest extends TestCase
             null,
             null,
             null,
-            ['get' => ['output' => ['formats' => ['json' => ['application/json']]]]]
+            ['get' => ['output_formats' => ['json' => ['application/json']]]]
         ));
 
         $listener = new AddFormatListener(new Negotiator(), $resourceMetadataFactoryProphecy->reveal());
@@ -273,7 +273,7 @@ class AddFormatListenerTest extends TestCase
             null,
             null,
             null,
-            ['get' => ['output' => ['formats' => ['json' => ['application/json']]]]]
+            ['get' => ['output_formats' => ['json' => ['application/json']]]]
         ));
 
         $listener = new AddFormatListener(new Negotiator(), $resourceMetadataFactoryProphecy->reveal());
@@ -296,7 +296,7 @@ class AddFormatListenerTest extends TestCase
             null,
             null,
             [],
-            ['get' => ['output' => ['formats' => ['xml' => ['application/xml'], 'json' => ['application/json']]]]]
+            ['get' => ['output_formats' => ['xml' => ['application/xml'], 'json' => ['application/json']]]]
         ));
 
         $listener = new AddFormatListener(new Negotiator(), $resourceMetadataFactoryProphecy->reveal());
@@ -345,7 +345,7 @@ class AddFormatListenerTest extends TestCase
             null,
             null,
             null,
-            ['get' => ['output' => ['formats' => ['csv' => ['text/csv']]]]]
+            ['get' => ['output_formats' => ['csv' => ['text/csv']]]]
         ));
 
         $listener = new AddFormatListener(new Negotiator(), $resourceMetadataFactoryProphecy->reveal());

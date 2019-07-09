@@ -57,6 +57,11 @@ use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
  */
 class DocumentationNormalizerV3Test extends TestCase
 {
+    private const OPERATION_FORMATS = [
+        'input_formats' => ['jsonld' => ['application/ld+json']],
+        'output_formats' => ['jsonld' => ['application/ld+json']],
+    ];
+
     public function testNormalize(): void
     {
         $this->doTestNormalize();
@@ -88,16 +93,17 @@ class DocumentationNormalizerV3Test extends TestCase
             'This is a dummy.',
             'http://schema.example.com/Dummy',
             [
-                'get' => ['method' => 'GET'],
-                'put' => ['method' => 'PUT'],
+                'get' => ['method' => 'GET'] + self::OPERATION_FORMATS,
+                'put' => ['method' => 'PUT'] + self::OPERATION_FORMATS,
             ],
             [
-                'get' => ['method' => 'GET'],
-                'post' => ['method' => 'POST'],
-                'custom' => ['method' => 'GET', 'path' => '/foo'],
-                'custom2' => ['method' => 'POST', 'path' => '/foo'],
+                'get' => ['method' => 'GET'] + self::OPERATION_FORMATS,
+                'post' => ['method' => 'POST'] + self::OPERATION_FORMATS,
+                'custom' => ['method' => 'GET', 'path' => '/foo'] + self::OPERATION_FORMATS,
+                'custom2' => ['method' => 'POST', 'path' => '/foo'] + self::OPERATION_FORMATS,
             ],
-            ['pagination_client_items_per_page' => true, 'formats' => ['jsonld' => ['application/ld+json']]]);
+            ['pagination_client_items_per_page' => true]
+        );
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create(Dummy::class)->shouldBeCalled()->willReturn($dummyMetadata);
 
@@ -132,7 +138,7 @@ class DocumentationNormalizerV3Test extends TestCase
             'page',
             false,
             'itemsPerPage',
-            null,
+            [],
             false,
             'pagination',
             ['spec_version' => 3]
@@ -390,9 +396,7 @@ class DocumentationNormalizerV3Test extends TestCase
             'Dummy',
             'This is a dummy.',
             null,
-            ['get' => ['method' => 'GET']],
-            [],
-            ['formats' => ['jsonld' => ['application/ld+json']]]
+            ['get' => ['method' => 'GET'] + self::OPERATION_FORMATS]
         );
 
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
@@ -433,7 +437,7 @@ class DocumentationNormalizerV3Test extends TestCase
             'page',
             false,
             'itemsPerPage',
-            null,
+            [],
             false,
             'pagination',
             ['spec_version' => 3]
@@ -520,9 +524,7 @@ class DocumentationNormalizerV3Test extends TestCase
             'Dummy',
             'This is a dummy.',
             null,
-            ['get' => ['method' => 'GET']],
-            [],
-            ['formats' => ['jsonld' => ['application/ld+json']]]
+            ['get' => ['method' => 'GET'] + self::OPERATION_FORMATS]
         );
 
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
@@ -569,7 +571,7 @@ class DocumentationNormalizerV3Test extends TestCase
             'page',
             false,
             'itemsPerPage',
-            null,
+            [],
             false,
             'pagination',
             ['spec_version' => 3]
@@ -668,14 +670,13 @@ class DocumentationNormalizerV3Test extends TestCase
             'This is a dummy.',
             'http://schema.example.com/Dummy',
             [
-                'get' => ['method' => 'GET'],
-                'put' => ['method' => 'PUT', 'normalization_context' => [AbstractNormalizer::GROUPS => $groups]],
+                'get' => ['method' => 'GET'] + self::OPERATION_FORMATS,
+                'put' => ['method' => 'PUT', 'normalization_context' => [AbstractNormalizer::GROUPS => $groups]] + self::OPERATION_FORMATS,
             ],
             [
-                'get' => ['method' => 'GET'],
-                'post' => ['method' => 'POST'],
-            ],
-            ['formats' => ['jsonld' => ['application/ld+json']]]
+                'get' => ['method' => 'GET'] + self::OPERATION_FORMATS,
+                'post' => ['method' => 'POST'] + self::OPERATION_FORMATS,
+            ]
         );
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create(Dummy::class)->shouldBeCalled()->willReturn($dummyMetadata);
@@ -711,7 +712,7 @@ class DocumentationNormalizerV3Test extends TestCase
             'page',
             false,
             'itemsPerPage',
-            null,
+            [],
             false,
             'pagination',
             ['spec_version' => 3]
@@ -890,10 +891,8 @@ class DocumentationNormalizerV3Test extends TestCase
                     'normalization_context' => [
                         DocumentationNormalizer::SWAGGER_DEFINITION_NAME => 'Read',
                     ],
-                ],
-            ],
-            [],
-            ['formats' => ['jsonld' => ['application/ld+json']]]
+                ] + self::OPERATION_FORMATS,
+            ]
         );
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create(Dummy::class)->shouldBeCalled()->willReturn($dummyMetadata);
@@ -927,7 +926,7 @@ class DocumentationNormalizerV3Test extends TestCase
             'page',
             false,
             'itemsPerPage',
-            null,
+            [],
             false,
             'pagination',
             ['spec_version' => 3]
@@ -1007,14 +1006,13 @@ class DocumentationNormalizerV3Test extends TestCase
             'This is a dummy.',
             'http://schema.example.com/Dummy',
             [
-                'get' => ['method' => 'GET'],
-                'put' => ['method' => 'PUT', 'denormalization_context' => [AbstractNormalizer::GROUPS => 'dummy']],
+                'get' => ['method' => 'GET'] + self::OPERATION_FORMATS,
+                'put' => ['method' => 'PUT', 'denormalization_context' => [AbstractNormalizer::GROUPS => 'dummy']] + self::OPERATION_FORMATS,
             ],
             [
-                'get' => ['method' => 'GET'],
-                'post' => ['method' => 'POST'],
-            ],
-            ['formats' => ['jsonld' => ['application/ld+json']]]
+                'get' => ['method' => 'GET'] + self::OPERATION_FORMATS,
+                'post' => ['method' => 'POST'] + self::OPERATION_FORMATS,
+            ]
         );
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create(Dummy::class)->shouldBeCalled()->willReturn($dummyMetadata);
@@ -1050,7 +1048,7 @@ class DocumentationNormalizerV3Test extends TestCase
             'page',
             false,
             'itemsPerPage',
-            null,
+            [],
             false,
             'pagination',
             ['spec_version' => 3]
@@ -1226,17 +1224,16 @@ class DocumentationNormalizerV3Test extends TestCase
             'This is a dummy.',
             'http://schema.example.com/Dummy',
             [
-                'get' => ['method' => 'GET'],
+                'get' => ['method' => 'GET'] + self::OPERATION_FORMATS,
                 'put' => [
                     'method' => 'PUT',
                     'normalization_context' => [AbstractNormalizer::GROUPS => 'dummy'], 'denormalization_context' => [AbstractNormalizer::GROUPS => 'dummy'],
-                ],
+                ] + self::OPERATION_FORMATS,
             ],
             [
-                'get' => ['method' => 'GET'],
-                'post' => ['method' => 'POST'],
-            ],
-            ['formats' => ['jsonld' => ['application/ld+json']]]
+                'get' => ['method' => 'GET'] + self::OPERATION_FORMATS,
+                'post' => ['method' => 'POST'] + self::OPERATION_FORMATS,
+            ]
         );
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create(Dummy::class)->shouldBeCalled()->willReturn($dummyMetadata);
@@ -1272,7 +1269,7 @@ class DocumentationNormalizerV3Test extends TestCase
             'page',
             false,
             'itemsPerPage',
-            null,
+            [],
             false,
             'pagination',
             ['spec_version' => 3]
@@ -1524,7 +1521,7 @@ class DocumentationNormalizerV3Test extends TestCase
             'page',
             false,
             'itemsPerPage',
-            null,
+            [],
             false,
             'pagination',
             ['spec_version' => 3]
@@ -1561,7 +1558,7 @@ class DocumentationNormalizerV3Test extends TestCase
             'page',
             false,
             'itemsPerPage',
-            null,
+            [],
             false,
             'pagination',
             ['spec_version' => 3]
@@ -1623,7 +1620,7 @@ class DocumentationNormalizerV3Test extends TestCase
             'page',
             false,
             'itemsPerPage',
-            null,
+            [],
             false,
             'pagination',
             ['spec_version' => 3]
@@ -1652,8 +1649,7 @@ class DocumentationNormalizerV3Test extends TestCase
             'This is a dummy.',
             null,
             [],
-            ['get' => ['method' => 'FOO']],
-            ['formats' => ['jsonld' => ['application/ld+json']]]
+            ['get' => ['method' => 'FOO'] + self::OPERATION_FORMATS]
         );
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create(Dummy::class)->shouldBeCalled()->willReturn($dummyMetadata);
@@ -1687,7 +1683,7 @@ class DocumentationNormalizerV3Test extends TestCase
             'page',
             false,
             'itemsPerPage',
-            null,
+            [],
             false,
             'pagination',
             ['spec_version' => 3]
@@ -1733,14 +1729,13 @@ class DocumentationNormalizerV3Test extends TestCase
             'This is a dummy.',
             'http://schema.example.com/Dummy',
             [
-                'get' => ['method' => 'GET'],
-                'put' => ['method' => 'PUT', 'normalization_context' => [AbstractNormalizer::GROUPS => $groups]],
+                'get' => ['method' => 'GET'] + self::OPERATION_FORMATS,
+                'put' => ['method' => 'PUT', 'normalization_context' => [AbstractNormalizer::GROUPS => $groups]] + self::OPERATION_FORMATS,
             ],
             [
-                'get' => ['method' => 'GET'],
-                'post' => ['method' => 'POST'],
-            ],
-            ['formats' => ['jsonld' => ['application/ld+json']]]
+                'get' => ['method' => 'GET'] + self::OPERATION_FORMATS,
+                'post' => ['method' => 'POST'] + self::OPERATION_FORMATS,
+            ]
         );
 
         $relatedDummyMetadata = new ResourceMetadata(
@@ -1748,10 +1743,8 @@ class DocumentationNormalizerV3Test extends TestCase
             'This is a related dummy.',
             'http://schema.example.com/RelatedDummy',
             [
-                'get' => ['method' => 'GET'],
-            ],
-            [],
-            ['formats' => ['jsonld' => ['application/ld+json']]]
+                'get' => ['method' => 'GET'] + self::OPERATION_FORMATS,
+            ]
         );
 
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
@@ -1791,7 +1784,7 @@ class DocumentationNormalizerV3Test extends TestCase
             'page',
             false,
             'itemsPerPage',
-            null,
+            [],
             false,
             'pagination',
             ['spec_version' => 3]
@@ -1965,7 +1958,7 @@ class DocumentationNormalizerV3Test extends TestCase
         $this->assertEquals($expected, $normalizer->normalize($documentation));
     }
 
-    private function normalizeWithFilters($filterLocator)
+    private function normalizeWithFilters($filterLocator): void
     {
         $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), '', '', '0.0.0');
 
@@ -1977,8 +1970,7 @@ class DocumentationNormalizerV3Test extends TestCase
             'This is a dummy.',
             null,
             [],
-            ['get' => ['method' => 'GET', 'filters' => ['f1', 'f2', 'f3', 'f4']]],
-            ['formats' => ['jsonld' => ['application/ld+json']]]
+            ['get' => ['method' => 'GET', 'filters' => ['f1', 'f2', 'f3', 'f4']] + self::OPERATION_FORMATS]
         );
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create(Dummy::class)->shouldBeCalled()->willReturn($dummyMetadata);
@@ -2013,7 +2005,7 @@ class DocumentationNormalizerV3Test extends TestCase
             'page',
             false,
             'itemsPerPage',
-            null,
+            [],
             false,
             'pagination',
             ['spec_version' => 3]
@@ -2127,17 +2119,16 @@ class DocumentationNormalizerV3Test extends TestCase
             'Question',
             'This is a question.',
             'http://schema.example.com/Question',
-            ['get' => ['method' => 'GET', 'formats' => ['json' => ['application/json'], 'csv' => ['text/csv']]]],
-            [],
-            [],
-            ['get' => ['formats' => ['xml' => ['text/xml']]]]
+            ['get' => ['method' => 'GET', 'input_formats' => ['json' => ['application/json'], 'csv' => ['text/csv']], 'output_formats' => ['json' => ['application/json'], 'csv' => ['text/csv']]]]
         );
         $answerMetadata = new ResourceMetadata(
             'Answer',
             'This is an answer.',
             'http://schema.example.com/Answer',
             [],
-            ['get' => ['method' => 'GET', 'formats' => ['json' => ['application/json'], 'csv' => ['text/csv']]]]
+            ['get' => ['method' => 'GET']] + self::OPERATION_FORMATS,
+            [],
+            ['get' => ['method' => 'GET', 'input_formats' => ['xml' => ['text/xml']], 'output_formats' => ['xml' => ['text/xml']]]]
         );
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create(Question::class)->shouldBeCalled()->willReturn($questionMetadata);
@@ -2189,7 +2180,7 @@ class DocumentationNormalizerV3Test extends TestCase
             'page',
             false,
             'itemsPerPage',
-            $formatProvider,
+            $formatProvider ?? [],
             false,
             'pagination',
             ['spec_version' => 3]
@@ -2304,9 +2295,7 @@ class DocumentationNormalizerV3Test extends TestCase
             'Dummy',
             'This is a dummy.',
             'http://schema.example.com/Dummy',
-            ['get' => ['method' => 'GET']],
-            [],
-            ['formats' => ['jsonld' => ['application/ld+json']]]
+            ['get' => ['method' => 'GET'] + self::OPERATION_FORMATS]
         );
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create(Dummy::class)->shouldBeCalled()->willReturn($dummyMetadata);
@@ -2341,7 +2330,7 @@ class DocumentationNormalizerV3Test extends TestCase
             'page',
             false,
             'itemsPerPage',
-            null,
+            [],
             false,
             'pagination',
             ['spec_version' => 3]
@@ -2422,8 +2411,7 @@ class DocumentationNormalizerV3Test extends TestCase
             'This is a dummy.',
             'http://schema.example.com/Dummy',
             [],
-            ['get' => ['method' => 'GET', 'pagination_client_enabled' => true]],
-            ['formats' => ['jsonld' => ['application/ld+json']]]
+            ['get' => ['method' => 'GET', 'pagination_client_enabled' => true] + self::OPERATION_FORMATS]
         );
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create(Dummy::class)->shouldBeCalled()->willReturn($dummyMetadata);
@@ -2458,7 +2446,7 @@ class DocumentationNormalizerV3Test extends TestCase
             'page',
             false,
             'itemsPerPage',
-            null,
+            [],
             false,
             'pagination',
             ['spec_version' => 3]
@@ -2566,11 +2554,11 @@ class DocumentationNormalizerV3Test extends TestCase
             'This is a dummy.',
             'http://schema.example.com/Dummy',
             [
-                'get' => ['method' => 'GET', 'formats' => ['jsonapi' => ['application/vnd.api+json']]],
-                'put' => ['method' => 'PUT', 'formats' => ['json' => ['application/json'], 'csv' => ['text/csv']]], ],
+                'get' => ['method' => 'GET', 'output_formats' => ['jsonapi' => ['application/vnd.api+json']]],
+                'put' => ['method' => 'PUT', 'output_formats' => ['json' => ['application/json'], 'csv' => ['text/csv']]], ],
             [
-                'get' => ['method' => 'GET', 'formats' => ['xml' => ['application/xml', 'text/xml']]],
-                'post' => ['method' => 'POST', 'formats' => ['xml' => ['text/xml'], 'csv' => ['text/csv']]],
+                'get' => ['method' => 'GET', 'output_formats' => ['xml' => ['application/xml', 'text/xml']]],
+                'post' => ['method' => 'POST', 'output_formats' => ['xml' => ['text/xml'], 'csv' => ['text/csv']]],
             ]
         );
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
@@ -2605,7 +2593,7 @@ class DocumentationNormalizerV3Test extends TestCase
             'page',
             false,
             'itemsPerPage',
-            $formatsProvider,
+            $formatsProvider ?? [],
             false,
             'pagination',
             ['spec_version' => 3]
