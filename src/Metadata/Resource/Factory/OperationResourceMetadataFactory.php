@@ -22,8 +22,6 @@ use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
  */
 final class OperationResourceMetadataFactory implements ResourceMetadataFactoryInterface
 {
-    use FormatsNormalizerTrait;
-
     /**
      * @internal
      */
@@ -43,19 +41,12 @@ final class OperationResourceMetadataFactory implements ResourceMetadataFactoryI
     ];
 
     private $decorated;
-    private $formats;
     private $patchFormats;
 
-    public function __construct(ResourceMetadataFactoryInterface $decorated, array $formats = [], array $patchFormats = [])
+    public function __construct(ResourceMetadataFactoryInterface $decorated, array $patchFormats = [])
     {
         $this->decorated = $decorated;
-        $this->formats = $formats;
         $this->patchFormats = $patchFormats;
-
-        // Backward Compatibility layer
-        if (isset($formats['jsonapi']) && !isset($patchFormats['jsonapi'])) {
-            $this->patchFormats['jsonapi'] = ['application/vnd.api+json'];
-        }
     }
 
     /**
@@ -68,9 +59,10 @@ final class OperationResourceMetadataFactory implements ResourceMetadataFactoryI
 
         $collectionOperations = $resourceMetadata->getCollectionOperations();
         if (null === $collectionOperations) {
-            $collectionOperations = $this->createOperations($isAbstract ? ['GET'] : ['GET', 'POST']);
+            $resourceMetadata = $resourceMetadata->withCollectionOperations($this->createOperations($isAbstract ? ['GET'] : ['GET', 'POST']));
+        } else {
+            $resourceMetadata = $this->normalize(true, $resourceClass, $resourceMetadata, $collectionOperations);
         }
-        $resourceMetadata = $this->normalize(true, $resourceClass, $resourceMetadata, $collectionOperations);
 
         $itemOperations = $resourceMetadata->getItemOperations();
         if (null === $itemOperations) {
@@ -84,9 +76,10 @@ final class OperationResourceMetadataFactory implements ResourceMetadataFactoryI
                 }
             }
 
-            $itemOperations = $this->createOperations($methods);
+            $resourceMetadata = $resourceMetadata->withItemOperations($this->createOperations($methods));
+        } else {
+            $resourceMetadata = $this->normalize(false, $resourceClass, $resourceMetadata, $itemOperations);
         }
-        $resourceMetadata = $this->normalize(false, $resourceClass, $resourceMetadata, $itemOperations);
 
         $graphql = $resourceMetadata->getGraphql();
         if (null === $graphql) {
@@ -136,27 +129,7 @@ final class OperationResourceMetadataFactory implements ResourceMetadataFactoryI
 
             if (isset($operation['method'])) {
                 $operation['method'] = strtoupper($operation['method']);
-
-                if ('PATCH' === $operation['method'] && !isset($operation['formats']) && !isset($operation['input']['formats'])) {
-                    $operation['input']['formats'] = $this->patchFormats;
-                }
             }
-
-            // Formats hierarchy:
-            // * resource formats
-            //   * resource input/output formats
-            //     * operation formats
-            //       * operation input/output formats
-
-            if (isset($operation['formats'])) {
-                $operation['formats'] = $this->normalizeFormats($operation['formats'], $this->formats);
-            }
-
-            $resourceInputFormats = $resourceMetadata->getAttribute('input', [])['formats'] ?? $resourceMetadata->getAttribute('formats') ?? $this->formats;
-            $resourceOutputFormats = $resourceMetadata->getAttribute('output', [])['formats'] ?? $resourceMetadata->getAttribute('formats') ?? $this->formats;
-
-            $operation['input'] = $this->normalizeInputOutput($resourceMetadata->getAttribute('input', []), $operation['formats'] ?? $resourceMetadata->getAttribute('input', [])['formats'] ?? $resourceInputFormats);
-            $operation['output'] = $this->normalizeInputOutput($resourceMetadata->getAttribute('output', []), $operation['formats'] ?? $resourceMetadata->getAttribute('output', [])['formats'] ?? $resourceOutputFormats);
 
             $newOperations[$operationName] = $operation;
         }

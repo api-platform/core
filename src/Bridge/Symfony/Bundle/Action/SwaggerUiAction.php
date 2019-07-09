@@ -97,7 +97,7 @@ final class SwaggerUiAction
             $formats = $attributes ? $this
                 ->resourceMetadataFactory
                 ->create($attributes['resource_class'])
-                ->getOperationAttribute($attributes, 'formats', [], true) : $this->formats;
+                ->getOperationAttribute($attributes, 'output_formats', [], true) : $this->formats;
         } else {
             $formats = $this->formatsProvider->getFormatsFromAttributes($attributes);
         }

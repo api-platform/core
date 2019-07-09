@@ -88,7 +88,7 @@ final class DeserializeListener
             $formats = $this
                 ->resourceMetadataFactory
                 ->create($attributes['resource_class'])
-                ->getOperationAttribute($attributes, 'input', [], true)['formats'] ?? [];
+                ->getOperationAttribute($attributes, 'input_formats', [], true);
         } elseif ($this->formatsProvider instanceof FormatsProviderInterface) {
             $formats = $this->formatsProvider->getFormatsFromAttributes($attributes);
         } else {

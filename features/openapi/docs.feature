@@ -6,6 +6,7 @@ Feature: Documentation support
   @createSchema
   Scenario: Retrieve the OpenAPI documentation
     Given I send a "GET" request to "/docs.json?spec_version=3"
+    #And print last JSON response
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/json; charset=utf-8"

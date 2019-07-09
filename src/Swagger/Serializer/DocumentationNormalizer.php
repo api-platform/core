@@ -16,7 +16,6 @@ namespace ApiPlatform\Core\Swagger\Serializer;
 use ApiPlatform\Core\Api\FilterCollection;
 use ApiPlatform\Core\Api\FilterLocatorTrait;
 use ApiPlatform\Core\Api\FormatsProviderInterface;
-use ApiPlatform\Core\Api\OperationAwareFormatsProviderInterface;
 use ApiPlatform\Core\Api\OperationMethodResolverInterface;
 use ApiPlatform\Core\Api\OperationType;
 use ApiPlatform\Core\Api\ResourceClassResolverInterface;
@@ -82,6 +81,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
     private $itemsPerPageParameterName;
     private $paginationClientEnabled;
     private $paginationClientEnabledParameterName;
+    private $formats;
     private $formatsProvider;
     private $defaultContext = [
         self::BASE_URL => '/',
@@ -91,17 +91,23 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
 
     /**
      * @param ContainerInterface|FilterCollection|null $filterLocator The new filter locator or the deprecated filter collection
+     * @param mixed|null                               $formats
      */
-    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, ResourceClassResolverInterface $resourceClassResolver, OperationMethodResolverInterface $operationMethodResolver = null, OperationPathResolverInterface $operationPathResolver, UrlGeneratorInterface $urlGenerator = null, $filterLocator = null, NameConverterInterface $nameConverter = null, bool $oauthEnabled = false, string $oauthType = '', string $oauthFlow = '', string $oauthTokenUrl = '', string $oauthAuthorizationUrl = '', array $oauthScopes = [], array $apiKeys = [], SubresourceOperationFactoryInterface $subresourceOperationFactory = null, bool $paginationEnabled = true, string $paginationPageParameterName = 'page', bool $clientItemsPerPage = false, string $itemsPerPageParameterName = 'itemsPerPage', OperationAwareFormatsProviderInterface $formatsProvider = null, bool $paginationClientEnabled = false, string $paginationClientEnabledParameterName = 'pagination', array $defaultContext = [])
+    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, ResourceClassResolverInterface $resourceClassResolver, OperationMethodResolverInterface $operationMethodResolver = null, OperationPathResolverInterface $operationPathResolver, UrlGeneratorInterface $urlGenerator = null, $filterLocator = null, NameConverterInterface $nameConverter = null, bool $oauthEnabled = false, string $oauthType = '', string $oauthFlow = '', string $oauthTokenUrl = '', string $oauthAuthorizationUrl = '', array $oauthScopes = [], array $apiKeys = [], SubresourceOperationFactoryInterface $subresourceOperationFactory = null, bool $paginationEnabled = true, string $paginationPageParameterName = 'page', bool $clientItemsPerPage = false, string $itemsPerPageParameterName = 'itemsPerPage', $formats = null, bool $paginationClientEnabled = false, string $paginationClientEnabledParameterName = 'pagination', array $defaultContext = [])
     {
         if ($urlGenerator) {
             @trigger_error(sprintf('Passing an instance of %s to %s() is deprecated since version 2.1 and will be removed in 3.0.', UrlGeneratorInterface::class, __METHOD__), E_USER_DEPRECATED);
         }
-        if ($formatsProvider) {
-            @trigger_error(sprintf('Passing an instance of %s to %s() is deprecated since version 2.5 and will be removed in 3.0.', FormatsProviderInterface::class, __METHOD__), E_USER_DEPRECATED);
-        }
         if ($operationMethodResolver) {
             @trigger_error(sprintf('Passing an instance of %s to %s() is deprecated since version 2.5 and will be removed in 3.0.', OperationMethodResolverInterface::class, __METHOD__), E_USER_DEPRECATED);
+        }
+
+        if ($formats instanceof FormatsProviderInterface) {
+            @trigger_error(sprintf('Passing an instance of %s to %s() is deprecated since version 2.5 and will be removed in 3.0, pass an array instead.', FormatsProviderInterface::class, __METHOD__), E_USER_DEPRECATED);
+
+            $this->formatsProvider = $formats;
+        } else {
+            $this->formats = $formats;
         }
 
         $this->setFilterLocator($filterLocator, true);
@@ -123,10 +129,8 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
         $this->paginationEnabled = $paginationEnabled;
         $this->paginationPageParameterName = $paginationPageParameterName;
         $this->apiKeys = $apiKeys;
-        $this->subresourceOperationFactory = $subresourceOperationFactory;
         $this->clientItemsPerPage = $clientItemsPerPage;
         $this->itemsPerPageParameterName = $itemsPerPageParameterName;
-        $this->formatsProvider = $formatsProvider;
         $this->paginationClientEnabled = $paginationClientEnabled;
         $this->paginationClientEnabledParameterName = $paginationClientEnabledParameterName;
 
@@ -225,7 +229,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
         }
 
         if (null === $this->formatsProvider) {
-            $responseFormats = $resourceMetadata->getTypedOperationAttribute($operationType, $operationName, 'formats', [], true);
+            $responseFormats = $resourceMetadata->getTypedOperationAttribute($operationType, $operationName, 'output_formats', [], true);
         } else {
             $responseFormats = $this->formatsProvider->getFormatsFromOperation($resourceClass, $operationName, $operationType);
         }
@@ -367,7 +371,12 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
         $pathOperation['summary'] = sprintf('Retrieves %s%s resource%s.', $subresourceOperation['collection'] ? 'the collection of ' : 'a ', $subresourceOperation['shortNames'][0], $subresourceOperation['collection'] ? 's' : '');
 
         if (null === $this->formatsProvider) {
-            $responseFormats = $resourceMetadata->getSubresourceOperationAttribute($operationName, 'formats', [], true);
+            // TODO: Subresource operation metadata aren't available by default, for now we have to fallback on default formats.
+            // TODO: A better approach would be to always populate the subresource operation array.
+            $responseFormats = $this
+                ->resourceMetadataFactory
+                ->create($subresourceOperation['resource_class'])
+                ->getTypedOperationAttribute(OperationType::SUBRESOURCE, $operationName, 'output_formats', $this->formats, true);
         } else {
             $responseFormats = $this->formatsProvider->getFormatsFromOperation($subresourceOperation['resource_class'], $operationName, OperationType::SUBRESOURCE);
         }

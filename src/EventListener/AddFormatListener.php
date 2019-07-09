@@ -78,10 +78,12 @@ final class AddFormatListener
         // BC check to be removed in 3.0
         if ($this->resourceMetadataFactory) {
             if ($attributes) {
+                // TODO: Subresource operation metadata aren't available by default, for now we have to fallback on default formats.
+                // TODO: A better approach would be to always populate the subresource operation array.
                 $formats = $this
                     ->resourceMetadataFactory
                     ->create($attributes['resource_class'])
-                    ->getOperationAttribute($attributes, 'output', [], true)['formats'] ?? $this->formats;
+                    ->getOperationAttribute($attributes, 'output_formats', $this->formats, true);
             } else {
                 $formats = $this->formats;
             }

@@ -100,7 +100,7 @@ final class InputOutputResourceMetadataFactory implements ResourceMetadataFactor
             $attribute = ['class' => $attribute];
         }
 
-        if (!isset($attribute['name'])) {
+        if (!isset($attribute['name']) && isset($attribute['class'])) {
             $attribute['name'] = (new \ReflectionClass($attribute['class']))->getShortName();
         }
 

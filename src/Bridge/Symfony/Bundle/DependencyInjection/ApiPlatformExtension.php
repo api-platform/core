@@ -90,6 +90,11 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $patchFormats = $this->getFormats($config['patch_formats']);
         $errorFormats = $this->getFormats($config['error_formats']);
 
+        // Backward Compatibility layer
+        if (isset($formats['jsonapi']) && !isset($patchFormats['jsonapi'])) {
+            $patchFormats['jsonapi'] = ['application/vnd.api+json'];
+        }
+
         $this->registerCommonConfiguration($container, $config, $loader, $formats, $patchFormats, $errorFormats);
         $this->registerMetadataConfiguration($container, $config, $loader);
         $this->registerOAuthConfiguration($container, $config);
