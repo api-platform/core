@@ -162,8 +162,9 @@
 
         <service id="api_platform.listener.view.write" class="ApiPlatform\Core\EventListener\WriteListener">
             <argument type="service" id="api_platform.data_persister" />
-            <argument type="service" id="api_platform.iri_converter" on-invalid="null" />
+            <argument type="service" id="api_platform.iri_converter" />
             <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
+            <argument type="service" id="api_platform.resource_class_resolver" />
 
             <tag name="kernel.event_listener" event="kernel.view" method="onKernelView" priority="32" />
         </service>
