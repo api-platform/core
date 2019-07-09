@@ -29,6 +29,7 @@ use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\Routing\RouteCollectionBuilder;
+use Symfony\Component\Security\Core\Encoder\SodiumPasswordEncoder;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
@@ -96,10 +97,11 @@ class AppKernel extends Kernel
 
         $loader->load(__DIR__."/config/config_{$this->getEnvironment()}.yml");
 
+        $alg = class_exists(SodiumPasswordEncoder::class) && SodiumPasswordEncoder::isSupported() ? 'auto' : 'bcrypt';
         $securityConfig = [
             'encoders' => [
-                User::class => 'bcrypt',
-                UserDocument::class => 'bcrypt',
+                User::class => $alg,
+                UserDocument::class => $alg,
                 // Don't use plaintext in production!
                 UserInterface::class => 'plaintext',
             ],
@@ -128,6 +130,7 @@ class AppKernel extends Kernel
                     'provider' => 'chain_provider',
                     'http_basic' => null,
                     'anonymous' => null,
+                    'logout_on_user_change' => true,
                 ],
             ],
             'access_control' => [

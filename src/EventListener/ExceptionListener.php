@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\EventListener;
 
 use ApiPlatform\Core\Util\RequestAttributesExtractor;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
 use Symfony\Component\HttpKernel\EventListener\ExceptionListener as BaseExceptionListener;
 
@@ -23,8 +24,15 @@ use Symfony\Component\HttpKernel\EventListener\ExceptionListener as BaseExceptio
  * @author Samuel ROZE <samuel.roze@gmail.com>
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-final class ExceptionListener extends BaseExceptionListener
+final class ExceptionListener
 {
+    private $exceptionListener;
+
+    public function __construct($controller, LoggerInterface $logger = null, $debug = false, string $charset = null, $fileLinkFormat = null)
+    {
+        $this->exceptionListener = new BaseExceptionListener($controller, $logger, $debug, $charset, $fileLinkFormat);
+    }
+
     public function onKernelException(GetResponseForExceptionEvent $event): void
     {
         $request = $event->getRequest();
@@ -36,6 +44,6 @@ final class ExceptionListener extends BaseExceptionListener
             return;
         }
 
-        parent::onKernelException($event);
+        $this->exceptionListener->onKernelException($event);
     }
 }
