@@ -97,10 +97,14 @@ final class FormatsResourceMetadataFactory implements ResourceMetadataFactoryInt
     }
 
     /**
+     * @param array|string $currentFormats
+     *
      * @throws InvalidArgumentException
      */
-    private function normalizeFormats(array $currentFormats): array
+    private function normalizeFormats($currentFormats): array
     {
+        $currentFormats = (array) $currentFormats;
+
         $normalizedFormats = [];
         foreach ($currentFormats as $format => $value) {
             if (!is_numeric($format)) {
