@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\JsonApi\Serializer;
 
+use ApiPlatform\Core\Exception\ErrorCodeSerializableInterface;
 use ApiPlatform\Core\Problem\Serializer\ErrorNormalizerTrait;
 use Symfony\Component\Debug\Exception\FlattenException as LegacyFlattenException;
 use Symfony\Component\ErrorHandler\Exception\FlattenException;
@@ -42,12 +43,16 @@ final class ErrorNormalizer implements NormalizerInterface, CacheableSupportsMet
         $this->defaultContext = array_merge($this->defaultContext, $defaultContext);
     }
 
-    public function normalize($object, $format = null, array $context = [])
+    public function normalize($object, string $format = null, array $context = [])
     {
         $data = [
             'title' => $context[self::TITLE] ?? $this->defaultContext[self::TITLE],
             'description' => $this->getErrorMessage($object, $context, $this->debug),
         ];
+
+        if (null !== $errorCode = $this->getErrorCode($object)) {
+            $data['code'] = $errorCode;
+        }
 
         if ($this->debug && null !== $trace = $object->getTrace()) {
             $data['trace'] = $trace;
