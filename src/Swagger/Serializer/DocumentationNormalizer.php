@@ -230,22 +230,24 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
         }
 
         if (null === $this->formatsProvider) {
+            $requestFormats = $resourceMetadata->getTypedOperationAttribute($operationType, $operationName, 'input_formats', [], true);
             $responseFormats = $resourceMetadata->getTypedOperationAttribute($operationType, $operationName, 'output_formats', [], true);
         } else {
-            $responseFormats = $this->formatsProvider->getFormatsFromOperation($resourceClass, $operationName, $operationType);
+            $requestFormats = $responseFormats = $this->formatsProvider->getFormatsFromOperation($resourceClass, $operationName, $operationType);
         }
 
-        $mimeTypes = $this->extractMimeTypes($responseFormats);
+        $requestMimeTypes = $this->extractMimeTypes($requestFormats);
+        $responseMimeTypes = $this->extractMimeTypes($responseFormats);
         switch ($method) {
             case 'GET':
-                return $this->updateGetOperation($v3, $pathOperation, $mimeTypes, $operationType, $resourceMetadata, $resourceClass, $resourceShortName, $operationName, $definitions);
+                return $this->updateGetOperation($v3, $pathOperation, $responseMimeTypes, $operationType, $resourceMetadata, $resourceClass, $resourceShortName, $operationName, $definitions);
             case 'POST':
-                return $this->updatePostOperation($v3, $pathOperation, $mimeTypes, $operationType, $resourceMetadata, $resourceClass, $resourceShortName, $operationName, $definitions, $links);
+                return $this->updatePostOperation($v3, $pathOperation, $requestMimeTypes, $responseMimeTypes, $operationType, $resourceMetadata, $resourceClass, $resourceShortName, $operationName, $definitions, $links);
             case 'PATCH':
                 $pathOperation['summary'] ?? $pathOperation['summary'] = sprintf('Updates the %s resource.', $resourceShortName);
             // no break
             case 'PUT':
-                return $this->updatePutOperation($v3, $pathOperation, $mimeTypes, $operationType, $resourceMetadata, $resourceClass, $resourceShortName, $operationName, $definitions);
+                return $this->updatePutOperation($v3, $pathOperation, $requestMimeTypes, $responseMimeTypes, $operationType, $resourceMetadata, $resourceClass, $resourceShortName, $operationName, $definitions);
             case 'DELETE':
                 return $this->updateDeleteOperation($v3, $pathOperation, $resourceShortName, $operationType, $operationName, $resourceMetadata);
         }
@@ -442,11 +444,11 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
         return ['200' => $okResponse, '404' => ['description' => 'Resource not found']];
     }
 
-    private function updatePostOperation(bool $v3, \ArrayObject $pathOperation, array $mimeTypes, string $operationType, ResourceMetadata $resourceMetadata, string $resourceClass, string $resourceShortName, string $operationName, \ArrayObject $definitions, \ArrayObject $links): \ArrayObject
+    private function updatePostOperation(bool $v3, \ArrayObject $pathOperation, array $requestMimeTypes, array $responseMimeTypes, string $operationType, ResourceMetadata $resourceMetadata, string $resourceClass, string $resourceShortName, string $operationName, \ArrayObject $definitions, \ArrayObject $links): \ArrayObject
     {
         if (!$v3) {
-            $pathOperation['consumes'] ?? $pathOperation['consumes'] = $mimeTypes;
-            $pathOperation['produces'] ?? $pathOperation['produces'] = $mimeTypes;
+            $pathOperation['consumes'] ?? $pathOperation['consumes'] = $requestMimeTypes;
+            $pathOperation['produces'] ?? $pathOperation['produces'] = $responseMimeTypes;
         }
 
         $pathOperation['summary'] ?? $pathOperation['summary'] = sprintf('Creates a %s resource.', $resourceShortName);
@@ -465,7 +467,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
         $successResponse = ['description' => sprintf('%s resource created', $resourceShortName)];
         if ($responseDefinitionKey) {
             if ($v3) {
-                $successResponse['content'] = array_fill_keys($mimeTypes, ['schema' => ['$ref' => sprintf('#/components/schemas/%s', $responseDefinitionKey)]]);
+                $successResponse['content'] = array_fill_keys($responseMimeTypes, ['schema' => ['$ref' => sprintf('#/components/schemas/%s', $responseDefinitionKey)]]);
                 if ($links[$key = 'get'.ucfirst($resourceShortName).ucfirst(OperationType::ITEM)] ?? null) {
                     $successResponse['links'] = [ucfirst($key) => $links[$key]];
                 }
@@ -488,7 +490,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
         $requestDefinitionKey = $this->getDefinition($v3, $definitions, $resourceMetadata, $resourceClass, $inputClass, $this->getSerializerContext($operationType, true, $resourceMetadata, $operationName));
         if ($v3) {
             $pathOperation['requestBody'] ?? $pathOperation['requestBody'] = [
-                'content' => array_fill_keys($mimeTypes, ['schema' => ['$ref' => sprintf('#/components/schemas/%s', $requestDefinitionKey)]]),
+                'content' => array_fill_keys($requestMimeTypes, ['schema' => ['$ref' => sprintf('#/components/schemas/%s', $requestDefinitionKey)]]),
                 'description' => sprintf('The new %s resource', $resourceShortName),
             ];
         } else {
@@ -503,11 +505,11 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
         return $pathOperation;
     }
 
-    private function updatePutOperation(bool $v3, \ArrayObject $pathOperation, array $mimeTypes, string $operationType, ResourceMetadata $resourceMetadata, string $resourceClass, string $resourceShortName, string $operationName, \ArrayObject $definitions): \ArrayObject
+    private function updatePutOperation(bool $v3, \ArrayObject $pathOperation, array $requestMimeTypes, array $responseMimeTypes, string $operationType, ResourceMetadata $resourceMetadata, string $resourceClass, string $resourceShortName, string $operationName, \ArrayObject $definitions): \ArrayObject
     {
         if (!$v3) {
-            $pathOperation['consumes'] ?? $pathOperation['consumes'] = $mimeTypes;
-            $pathOperation['produces'] ?? $pathOperation['produces'] = $mimeTypes;
+            $pathOperation['consumes'] ?? $pathOperation['consumes'] = $requestMimeTypes;
+            $pathOperation['produces'] ?? $pathOperation['produces'] = $responseMimeTypes;
         }
 
         $pathOperation['summary'] ?? $pathOperation['summary'] = sprintf('Replaces the %s resource.', $resourceShortName);
@@ -523,7 +525,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
         $successResponse = ['description' => sprintf('%s resource updated', $resourceShortName)];
         if ($responseDefinitionKey) {
             if ($v3) {
-                $successResponse['content'] = array_fill_keys($mimeTypes, ['schema' => ['$ref' => sprintf('#/components/schemas/%s', $responseDefinitionKey)]]);
+                $successResponse['content'] = array_fill_keys($responseMimeTypes, ['schema' => ['$ref' => sprintf('#/components/schemas/%s', $responseDefinitionKey)]]);
             } else {
                 $successResponse['schema'] = ['$ref' => sprintf('#/definitions/%s', $responseDefinitionKey)];
             }
@@ -543,7 +545,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
         $requestDefinitionKey = $this->getDefinition($v3, $definitions, $resourceMetadata, $resourceClass, $inputClass, $this->getSerializerContext($operationType, true, $resourceMetadata, $operationName));
         if ($v3) {
             $pathOperation['requestBody'] ?? $pathOperation['requestBody'] = [
-                'content' => array_fill_keys($mimeTypes, ['schema' => ['$ref' => sprintf('#/components/schemas/%s', $requestDefinitionKey)]]),
+                'content' => array_fill_keys($requestMimeTypes, ['schema' => ['$ref' => sprintf('#/components/schemas/%s', $requestDefinitionKey)]]),
                 'description' => sprintf('The updated %s resource', $resourceShortName),
             ];
         } else {
