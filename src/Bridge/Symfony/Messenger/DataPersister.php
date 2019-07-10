@@ -88,6 +88,9 @@ final class DataPersister implements ContextAwareDataPersisterInterface
      */
     public function remove($data, array $context = [])
     {
-        $this->messageBus->dispatch(new Envelope($data, new RemoveStamp()));
+        $this->messageBus->dispatch(
+            (new Envelope($data))
+                ->with(new RemoveStamp())
+        );
     }
 }

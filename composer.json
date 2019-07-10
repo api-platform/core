@@ -44,7 +44,7 @@
         "guzzlehttp/guzzle": "^6.0",
         "jangregor/phpstan-prophecy": "^0.3",
         "justinrainbow/json-schema": "^5.0",
-        "nelmio/api-doc-bundle": "^2.13.3",
+        "nelmio/api-doc-bundle": "^2.13.4",
         "phpdocumentor/reflection-docblock": "^3.0 || ^4.0",
         "phpdocumentor/type-resolver": "^0.3 || ^0.4",
         "phpspec/prophecy": "^1.8",
@@ -74,7 +74,7 @@
         "symfony/framework-bundle": "^4.2",
         "symfony/mercure-bundle": "*",
         "symfony/messenger": "^4.2",
-        "symfony/phpunit-bridge": "^4.3",
+        "symfony/phpunit-bridge": "^4.3.1",
         "symfony/routing": "^3.4 || ^4.0",
         "symfony/security-bundle": "^3.4 || ^4.0",
         "symfony/security-core": "^3.4 || ^4.0",
@@ -86,8 +86,7 @@
     },
     "conflict": {
         "doctrine/common": "<2.7",
-        "doctrine/mongodb-odm": "<2.0",
-        "symfony/messenger": ">=4.3"
+        "doctrine/mongodb-odm": "<2.0"
     },
     "suggest": {
         "doctrine/mongodb-odm-bundle": "To support MongoDB. Only versions 4.0 and later are supported.",

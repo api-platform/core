@@ -32,13 +32,6 @@ parameters:
 			path: %currentWorkingDirectory%/src/GraphQl/Resolver/FieldsToAttributesTrait.php
 		- '#Access to an undefined property Prophecy\\Prophecy\\ObjectProphecy<(\\?[a-zA-Z0-9_]+)+>::\$[a-zA-Z0-9_]+#'
 		- '#Call to an undefined method Doctrine\\Common\\Persistence\\ObjectManager::getConnection\(\)#'
-		# https://github.com/symfony/symfony/pull/31903
-		-
-			message: '#Access to an undefined property object::\$headers\.#'
-			path: %currentWorkingDirectory%/tests/Bridge/Symfony/Bundle/Twig/ApiPlatformProfilerPanelTest.php
-		-
-			message: '#Call to an undefined method object::getStatusCode\(\)\.#'
-			path: %currentWorkingDirectory%/tests/Bridge/Symfony/Bundle/Twig/ApiPlatformProfilerPanelTest.php
 		- '#Parameter \#1 \$function of function call_user_func expects callable\(\): mixed, .+ given\.#'
 		- '#Parameter \#1 \$exception of static method Symfony\\Component\\Debug\\Exception\\FlattenException::create\(\) expects Exception, Symfony\\Component\\Serializer\\Exception\\ExceptionInterface given\.#'
 		- '#Parameter \#1 \$classes of class ApiPlatform\\Core\\Metadata\\Resource\\ResourceNameCollection constructor expects array<string>, array<int, int\|string> given\.#'
@@ -75,8 +68,9 @@ parameters:
 		-
 			message: '#Method ApiPlatform\\Core\\Bridge\\Doctrine\\Orm\\Util\\QueryBuilderHelper::mapJoinAliases() should return array<string, array<string>\|string> but returns array<int|string, mixed>\.#'
 			path: %currentWorkingDirectory%/src/Bridge/Doctrine/Orm/Util/QueryBuilderHelper.php
+		# https://github.com/phpstan/phpstan/issues/1482
 		-
-			message: "#Call to function method_exists\\(\\) with 'Symfony\\\\\\\\Component.+' and '(removeBindings|addRemovedBindingIds)' will always evaluate to false\\.#"
+			message: "#Call to function method_exists\\(\\) with 'Symfony\\\\\\\\Component.+' and 'removeBindings' will always evaluate to false\\.#"
 			path: %currentWorkingDirectory%/tests/Bridge/Symfony/Bundle/DependencyInjection/ApiPlatformExtensionTest.php
 		-
 			message: "#Call to function method_exists\\(\\) with 'Symfony\\\\\\\\Component.+' and 'getReachableRoleNam.+' will always evaluate to false\\.#"
@@ -85,7 +79,7 @@ parameters:
 			message: "#Call to function method_exists\\(\\) with 'Symfony\\\\\\\\Component.+' and 'getRoleNames' will always evaluate to false\\.#"
 			path: %currentWorkingDirectory%/tests/Security/EventListener/DenyAccessListenerTest.php
 		- "#Call to method PHPUnit\\\\Framework\\\\Assert::assertSame\\(\\) with array\\('(collection_context|item_context|subresource_context)'\\) and array<Symfony\\\\Component\\\\VarDumper\\\\Cloner\\\\Data>\\|bool\\|float\\|int\\|string\\|null will always evaluate to false\\.#"
-		# https://github.com/doctrine/doctrine2/pull/7298/files
+		# https://github.com/doctrine/doctrine2/pull/7298
 		- '#Strict comparison using === between null and int will always evaluate to false\.#'
 		-
 			message: '#Binary operation "\+" between (float\|int\|)?string and 0 results in an error\.#'
