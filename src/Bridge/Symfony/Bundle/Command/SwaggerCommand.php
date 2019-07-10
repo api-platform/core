@@ -40,7 +40,7 @@ final class SwaggerCommand extends Command
     private $apiVersion;
     private $apiFormats;
 
-    public function __construct(NormalizerInterface $normalizer, ResourceNameCollectionFactoryInterface $resourceNameCollection, string $apiTitle, string $apiDescription, string $apiVersion, array $apiFormats)
+    public function __construct(NormalizerInterface $normalizer, ResourceNameCollectionFactoryInterface $resourceNameCollection, string $apiTitle, string $apiDescription, string $apiVersion, array $apiFormats = null)
     {
         $this->normalizer = $normalizer;
         $this->resourceNameCollectionFactory = $resourceNameCollection;
@@ -48,6 +48,10 @@ final class SwaggerCommand extends Command
         $this->apiDescription = $apiDescription;
         $this->apiVersion = $apiVersion;
         $this->apiFormats = $apiFormats;
+
+        if (null !== $apiFormats) {
+            @trigger_error(sprintf('Passing a 6th parameter to the constructor of "%s" is deprecated since API Platform 2.5', __CLASS__), E_USER_DEPRECATED);
+        }
 
         parent::__construct();
     }

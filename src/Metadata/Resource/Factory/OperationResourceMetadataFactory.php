@@ -36,16 +36,17 @@ final class OperationResourceMetadataFactory implements ResourceMetadataFactoryI
     public const SUPPORTED_ITEM_OPERATION_METHODS = [
         'GET' => true,
         'PUT' => true,
+        // PATCH is automatically supported if at least one patch format has been configured
         'DELETE' => true,
     ];
 
     private $decorated;
-    private $formats;
+    private $patchFormats;
 
-    public function __construct(ResourceMetadataFactoryInterface $decorated, array $formats = [])
+    public function __construct(ResourceMetadataFactoryInterface $decorated, array $patchFormats = [])
     {
         $this->decorated = $decorated;
-        $this->formats = $formats;
+        $this->patchFormats = $patchFormats;
     }
 
     /**
@@ -58,11 +59,9 @@ final class OperationResourceMetadataFactory implements ResourceMetadataFactoryI
 
         $collectionOperations = $resourceMetadata->getCollectionOperations();
         if (null === $collectionOperations) {
-            $resourceMetadata = $resourceMetadata->withCollectionOperations($this->createOperations(
-                $isAbstract ? ['GET'] : ['GET', 'POST']
-            ));
+            $resourceMetadata = $resourceMetadata->withCollectionOperations($this->createOperations($isAbstract ? ['GET'] : ['GET', 'POST']));
         } else {
-            $resourceMetadata = $this->normalize(true, $resourceMetadata, $collectionOperations);
+            $resourceMetadata = $this->normalize(true, $resourceClass, $resourceMetadata, $collectionOperations);
         }
 
         $itemOperations = $resourceMetadata->getItemOperations();
@@ -72,14 +71,14 @@ final class OperationResourceMetadataFactory implements ResourceMetadataFactoryI
             if (!$isAbstract) {
                 $methods[] = 'PUT';
 
-                if (isset($this->formats['jsonapi'])) {
+                if ($this->patchFormats) {
                     $methods[] = 'PATCH';
                 }
             }
 
             $resourceMetadata = $resourceMetadata->withItemOperations($this->createOperations($methods));
         } else {
-            $resourceMetadata = $this->normalize(false, $resourceMetadata, $itemOperations);
+            $resourceMetadata = $this->normalize(false, $resourceClass, $resourceMetadata, $itemOperations);
         }
 
         $graphql = $resourceMetadata->getGraphql();
@@ -102,7 +101,7 @@ final class OperationResourceMetadataFactory implements ResourceMetadataFactoryI
         return $operations;
     }
 
-    private function normalize(bool $collection, ResourceMetadata $resourceMetadata, array $operations): ResourceMetadata
+    private function normalize(bool $collection, string $resourceClass, ResourceMetadata $resourceMetadata, array $operations): ResourceMetadata
     {
         $newOperations = [];
         foreach ($operations as $operationName => $operation) {
@@ -116,11 +115,16 @@ final class OperationResourceMetadataFactory implements ResourceMetadataFactoryI
             if ($collection) {
                 $supported = isset(self::SUPPORTED_COLLECTION_OPERATION_METHODS[$upperOperationName]);
             } else {
-                $supported = isset(self::SUPPORTED_ITEM_OPERATION_METHODS[$upperOperationName]) || (isset($this->formats['jsonapi']) && 'PATCH' === $upperOperationName);
+                $supported = isset(self::SUPPORTED_ITEM_OPERATION_METHODS[$upperOperationName]) || ($this->patchFormats && 'PATCH' === $upperOperationName);
             }
 
             if (!isset($operation['method']) && !isset($operation['route_name'])) {
-                $supported ? $operation['method'] = $upperOperationName : $operation['route_name'] = $operationName;
+                if ($supported) {
+                    $operation['method'] = $upperOperationName;
+                } else {
+                    @trigger_error(sprintf('The "route_name" attribute will not be set automatically again in API Platform 3.0, set it for the %s operation "%s" of the class "%s".', $collection ? 'collection' : 'item', $operationName, $resourceClass), E_USER_DEPRECATED);
+                    $operation['route_name'] = $operationName;
+                }
             }
 
             if (isset($operation['method'])) {

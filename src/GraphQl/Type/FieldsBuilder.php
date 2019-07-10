@@ -137,7 +137,7 @@ final class FieldsBuilder implements FieldsBuilderInterface
         $idField = ['type' => GraphQLType::nonNull(GraphQLType::id())];
         $clientMutationId = GraphQLType::string();
 
-        if (null !== $ioMetadata && null === $ioMetadata['class']) {
+        if (null !== $ioMetadata && \array_key_exists('class', $ioMetadata) && null === $ioMetadata['class']) {
             if ($input) {
                 return ['clientMutationId' => $clientMutationId];
             }

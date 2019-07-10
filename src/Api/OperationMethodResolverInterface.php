@@ -19,6 +19,8 @@ use ApiPlatform\Core\Exception\RuntimeException;
  * Resolves the uppercased HTTP method associated with an operation.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
+ *
+ * @deprecated since API Platform 2.5, use the "method" attribute instead
  */
 interface OperationMethodResolverInterface
 {

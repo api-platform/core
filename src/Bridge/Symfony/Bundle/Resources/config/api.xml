@@ -18,6 +18,7 @@
         <service id="api_platform.operation_method_resolver" class="ApiPlatform\Core\Bridge\Symfony\Routing\OperationMethodResolver" public="false">
             <argument type="service" id="api_platform.router" />
             <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
+            <deprecated>The "%service_id%" service is deprecated since API Platform 2.5.</deprecated>
         </service>
 
         <service id="api_platform.route_name_resolver" class="ApiPlatform\Core\Bridge\Symfony\Routing\RouteNameResolver" public="false">
@@ -68,13 +69,18 @@
         <service id="api_platform.formats_provider" class="ApiPlatform\Core\Api\FormatsProvider">
             <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
             <argument>%api_platform.formats%</argument>
+            <deprecated>The "%service_id%" service is deprecated since API Platform 2.5.</deprecated>
         </service>
-        <service id="ApiPlatform\Core\Api\OperationAwareFormatsProviderInterface" alias="api_platform.formats_provider" />
+
+        <service id="ApiPlatform\Core\Api\OperationAwareFormatsProviderInterface" alias="api_platform.formats_provider">
+            <deprecated>The "%alias_id%" alias is deprecated since API Platform 2.5.</deprecated>
+        </service>
 
         <!-- Serializer -->
 
         <service id="api_platform.serializer.context_builder" class="ApiPlatform\Core\Serializer\SerializerContextBuilder" public="false">
             <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
+            <argument>%api_platform.patch_formats%</argument>
         </service>
         <service id="ApiPlatform\Core\Serializer\SerializerContextBuilderInterface" alias="api_platform.serializer.context_builder" />
 
@@ -150,7 +156,8 @@
         <!-- kernel.request priority must be < 8 to be executed after the Firewall -->
         <service id="api_platform.listener.request.add_format" class="ApiPlatform\Core\EventListener\AddFormatListener">
             <argument type="service" id="api_platform.negotiator" />
-            <argument type="service" id="api_platform.formats_provider" />
+            <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
+            <argument>%api_platform.formats%</argument>
 
             <tag name="kernel.event_listener" event="kernel.request" method="onKernelRequest" priority="7" />
         </service>
@@ -177,7 +184,6 @@
         <service id="api_platform.listener.request.deserialize" class="ApiPlatform\Core\EventListener\DeserializeListener">
             <argument type="service" id="api_platform.serializer" />
             <argument type="service" id="api_platform.serializer.context_builder" />
-            <argument type="service" id="api_platform.formats_provider" />
             <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
 
             <tag name="kernel.event_listener" event="kernel.request" method="onKernelRequest" priority="2" />
@@ -231,7 +237,6 @@
             <argument>%api_platform.title%</argument>
             <argument>%api_platform.description%</argument>
             <argument>%api_platform.version%</argument>
-            <argument type="service" id="api_platform.formats_provider" />
         </service>
 
         <service id="api_platform.action.exception" class="ApiPlatform\Core\Action\ExceptionAction" public="true">

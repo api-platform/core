@@ -25,6 +25,8 @@ use Symfony\Component\Routing\RouterInterface;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  * @author Teoh Han Hui <teohhanhui@gmail.com>
+ *
+ * @deprecated since API Platform 2.5, use the "method" attribute instead
  */
 final class OperationMethodResolver implements OperationMethodResolverInterface
 {
@@ -33,6 +35,8 @@ final class OperationMethodResolver implements OperationMethodResolverInterface
 
     public function __construct(RouterInterface $router, ResourceMetadataFactoryInterface $resourceMetadataFactory)
     {
+        @trigger_error(sprintf('The "%s" class is deprecated since API Platform 2.5, use the "method" attribute instead.', __CLASS__), E_USER_DEPRECATED);
+
         $this->router = $router;
         $this->resourceMetadataFactory = $resourceMetadataFactory;
     }

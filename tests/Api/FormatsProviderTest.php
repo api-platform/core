@@ -21,6 +21,8 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * @author Anthony GRASSIOT <antograssiot@free.fr>
+ *
+ * @group legacy
  */
 class FormatsProviderTest extends TestCase
 {

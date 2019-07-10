@@ -32,7 +32,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
  *         "get",
  *         "put"={},
  *         "delete",
- *         "custom_get"={"route_name"="relation_embedded.custom_get"},
+ *         "custom_get"={"route_name"="relation_embedded.custom_get", "method"="GET"},
  *         "custom1"={"path"="/api/custom-call/{id}", "method"="GET"},
  *         "custom2"={"path"="/api/custom-call/{id}", "method"="PUT"},
  *     }
