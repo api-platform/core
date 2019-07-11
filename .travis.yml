@@ -209,7 +209,7 @@ jobs:
         - *validate-openapi-v3-yaml
 
     - php: '7.3'
-      env: SYMFONY_DEPRECATIONS_HELPER=0
+      env: SYMFONY_DEPRECATIONS_HELPER=max[total]=5 # 5 deprecation notices from FOSUserBundle
       before_install:
         - *install-mongodb-php-extension
         - *disable-xdebug-php-extension
@@ -229,5 +229,5 @@ jobs:
         - *validate-openapi-v3-yaml
 
   allow_failures:
-    - env: SYMFONY_DEPRECATIONS_HELPER=0
+    - env: SYMFONY_DEPRECATIONS_HELPER=max[total]=5 # 5 deprecation notices from FOSUserBundle
   fast_finish: true

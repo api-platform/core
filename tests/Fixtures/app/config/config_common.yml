@@ -8,8 +8,6 @@ framework:
     session:
         storage_id:                    'session.storage.mock_file'
     form:                              ~ # For FOSUser
-    templating:
-        engines:                       ['twig'] # For Swagger UI
     profiler:
         enabled:                        true
         collect:                        false

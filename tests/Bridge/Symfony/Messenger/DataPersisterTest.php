@@ -80,7 +80,7 @@ class DataPersisterTest extends TestCase
         $dummy = new Dummy();
 
         $messageBus = $this->prophesize(MessageBusInterface::class);
-        $messageBus->dispatch($dummy)->willReturn(new Envelope($dummy, new HandledStamp($dummy, 'DummyHandler::__invoke')))->shouldBeCalled();
+        $messageBus->dispatch($dummy)->willReturn((new Envelope($dummy))->with(new HandledStamp($dummy, 'DummyHandler::__invoke')))->shouldBeCalled();
 
         $dataPersister = new DataPersister($this->prophesize(ResourceMetadataFactoryInterface::class)->reveal(), $messageBus->reveal());
         $this->assertSame($dummy, $dataPersister->persist($dummy));
