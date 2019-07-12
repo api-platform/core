@@ -24,6 +24,8 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
+ * @internal
+ *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
 abstract class DoctrineOrmFilterTestCase extends KernelTestCase
@@ -53,7 +55,7 @@ abstract class DoctrineOrmFilterTestCase extends KernelTestCase
      */
     protected $filterClass;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         self::bootKernel();
 
