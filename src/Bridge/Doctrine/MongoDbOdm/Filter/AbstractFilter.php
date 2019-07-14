@@ -93,11 +93,19 @@ abstract class AbstractFilter implements FilterInterface
 
     protected function denormalizePropertyName($property)
     {
-        return null !== $this->nameConverter ? $this->nameConverter->denormalize($property) : $property;
+        if (!$this->nameConverter instanceof NameConverterInterface) {
+            return $property;
+        }
+
+        return implode('.', array_map([$this->nameConverter, 'denormalize'], explode('.', $property)));
     }
 
     protected function normalizePropertyName($property)
     {
-        return null !== $this->nameConverter ? $this->nameConverter->normalize($property) : $property;
+        if (!$this->nameConverter instanceof NameConverterInterface) {
+            return $property;
+        }
+
+        return implode('.', array_map([$this->nameConverter, 'normalize'], explode('.', $property)));
     }
 }

@@ -20,6 +20,8 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\CompositeRelation as Com
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\ConvertedBoolean as ConvertedBoolDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\ConvertedDate as ConvertedDateDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\ConvertedInteger as ConvertedIntegerDocument;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\ConvertedOwner as ConvertedOwnerDocument;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\ConvertedRelated as ConvertedRelatedDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\ConvertedString as ConvertedStringDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\Customer as CustomerDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\Dummy as DummyDocument;
@@ -72,6 +74,8 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Container;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\ConvertedBoolean;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\ConvertedDate;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\ConvertedInteger;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\ConvertedOwner;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\ConvertedRelated;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\ConvertedString;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Customer;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
@@ -1459,6 +1463,25 @@ final class DoctrineContext implements Context
         $this->manager->flush();
     }
 
+    /**
+     * @Given there are :nb convertedOwner objects with convertedRelated
+     */
+    public function thereAreConvertedOwnerObjects(int $nb)
+    {
+        for ($i = 1; $i <= $nb; ++$i) {
+            $related = $this->buildConvertedRelated();
+            $related->nameConverted = 'Converted '.$i;
+
+            $owner = $this->buildConvertedOwner();
+            $owner->nameConverted = $related;
+
+            $this->manager->persist($related);
+            $this->manager->persist($owner);
+        }
+
+        $this->manager->flush();
+    }
+
     private function isOrm(): bool
     {
         return null !== $this->schemaTool;
@@ -1811,5 +1834,21 @@ final class DoctrineContext implements Context
     private function buildConvertedString()
     {
         return $this->isOrm() ? new ConvertedString() : new ConvertedStringDocument();
+    }
+
+    /**
+     * @return ConvertedOwner|ConvertedOwnerDocument
+     */
+    private function buildConvertedOwner()
+    {
+        return $this->isOrm() ? new ConvertedOwner() : new ConvertedOwnerDocument();
+    }
+
+    /**
+     * @return ConvertedRelated|ConvertedRelatedDocument
+     */
+    private function buildConvertedRelated()
+    {
+        return $this->isOrm() ? new ConvertedRelated() : new ConvertedRelatedDocument();
     }
 }

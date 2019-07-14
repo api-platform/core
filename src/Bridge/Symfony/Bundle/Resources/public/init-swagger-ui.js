@@ -1,6 +1,6 @@
 'use strict';
 
-window.onload = () => {
+window.onload = function() {
     manageWebbyDisplay();
 
     new MutationObserver(function (mutations, self) {
