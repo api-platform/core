@@ -14,26 +14,26 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\Swagger\SchemaFormatter;
 
 use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
-use ApiPlatform\Core\Swagger\SchemaFormatter\JsonApiDefinititionNormalizer;
+use ApiPlatform\Core\Swagger\SchemaFormatter\JsonApiDefinitionNormalizer;
 use PHPUnit\Framework\TestCase;
 
 class JsonApiSchemaFormatterTest extends TestCase
 {
     public function testSupports()
     {
-        $schemaFormatter = new JsonApiDefinititionNormalizer();
+        $schemaFormatter = new JsonApiDefinitionNormalizer();
         $this->assertTrue($schemaFormatter->supports('application/vnd.api+json'));
     }
 
     public function testSupportsNotSupported()
     {
-        $schemaFormatter = new JsonApiDefinititionNormalizer();
+        $schemaFormatter = new JsonApiDefinitionNormalizer();
         $this->assertFalse($schemaFormatter->supports('application/jso'));
     }
 
     public function testBuildBaseSchemaFormat()
     {
-        $schemaFormatter = new JsonApiDefinititionNormalizer();
+        $schemaFormatter = new JsonApiDefinitionNormalizer();
         $this->assertEquals(
             [
                 'data' => [
@@ -58,7 +58,7 @@ class JsonApiSchemaFormatterTest extends TestCase
 
     public function testSetProperty()
     {
-        $schemaFormatter = new JsonApiDefinititionNormalizer();
+        $schemaFormatter = new JsonApiDefinitionNormalizer();
         $definitionSchema = new \ArrayObject([]);
         $normalizedPropertyName = 'test';
         $property = new \ArrayObject([

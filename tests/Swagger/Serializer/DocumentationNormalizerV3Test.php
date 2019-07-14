@@ -35,8 +35,9 @@ use ApiPlatform\Core\PathResolver\CustomOperationPathResolver;
 use ApiPlatform\Core\PathResolver\OperationPathResolver;
 use ApiPlatform\Core\PathResolver\OperationPathResolverInterface;
 use ApiPlatform\Core\Swagger\SchemaFormatter\ChainSchemaFormatter;
-use ApiPlatform\Core\Swagger\SchemaFormatter\DefaultDefinititionNormalizer;
-use ApiPlatform\Core\Swagger\SchemaFormatter\JsonApiDefinititionNormalizer;
+use ApiPlatform\Core\Swagger\SchemaFormatter\DefaultDefinitionNormalizer;
+use ApiPlatform\Core\Swagger\SchemaFormatter\HydraDefinitionNormalizer;
+use ApiPlatform\Core\Swagger\SchemaFormatter\JsonApiDefinitionNormalizer;
 use ApiPlatform\Core\Swagger\Serializer\DocumentationNormalizer;
 use ApiPlatform\Core\Tests\Fixtures\DummyFilter;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Answer;
@@ -89,7 +90,7 @@ class DocumentationNormalizerV3Test extends TestCase
 
         $operationPathResolver = new CustomOperationPathResolver(new OperationPathResolver(new UnderscorePathSegmentNameGenerator()));
         $schemaFormatterFactory = new ChainSchemaFormatter([
-            'application/json' => new DefaultDefinititionNormalizer(),
+            'application/json' => new DefaultDefinitionNormalizer(),
         ]);
 
         $normalizer = new DocumentationNormalizer(
@@ -391,7 +392,7 @@ class DocumentationNormalizerV3Test extends TestCase
         $operationPathResolver = new CustomOperationPathResolver(new OperationPathResolver(new UnderscorePathSegmentNameGenerator()));
 
         $schemaFormatterFactory = new ChainSchemaFormatter([
-            'application/json' => new DefaultDefinititionNormalizer(),
+            'application/json' => new DefaultDefinitionNormalizer(),
         ]);
 
         $normalizer = new DocumentationNormalizer(
@@ -528,7 +529,7 @@ class DocumentationNormalizerV3Test extends TestCase
         ];
 
         $schemaFormatterFactory = new ChainSchemaFormatter([
-            'application/json' => new DefaultDefinititionNormalizer(),
+            'application/json' => new DefaultDefinitionNormalizer(),
         ]);
 
         $normalizer = new DocumentationNormalizer(
@@ -682,7 +683,7 @@ class DocumentationNormalizerV3Test extends TestCase
         $operationPathResolver = new CustomOperationPathResolver(new OperationPathResolver(new UnderscorePathSegmentNameGenerator()));
 
         $schemaFormatterFactory = new ChainSchemaFormatter([
-            'application/json' => new DefaultDefinititionNormalizer(),
+            'application/json' => new DefaultDefinitionNormalizer(),
         ]);
 
         $normalizer = new DocumentationNormalizer(
@@ -904,7 +905,7 @@ class DocumentationNormalizerV3Test extends TestCase
         $operationPathResolver = new CustomOperationPathResolver(new OperationPathResolver(new UnderscorePathSegmentNameGenerator()));
 
         $schemaFormatterFactory = new ChainSchemaFormatter([
-            'application/json' => new DefaultDefinititionNormalizer(),
+            'application/json' => new DefaultDefinitionNormalizer(),
         ]);
 
         $normalizer = new DocumentationNormalizer(
@@ -1039,7 +1040,7 @@ class DocumentationNormalizerV3Test extends TestCase
         $operationPathResolver = new CustomOperationPathResolver(new OperationPathResolver(new UnderscorePathSegmentNameGenerator()));
 
         $schemaFormatterFactory = new ChainSchemaFormatter([
-            'application/json' => new DefaultDefinititionNormalizer(),
+            'application/json' => new DefaultDefinitionNormalizer(),
         ]);
 
         $normalizer = new DocumentationNormalizer(
@@ -1273,7 +1274,7 @@ class DocumentationNormalizerV3Test extends TestCase
         $operationPathResolver = new CustomOperationPathResolver(new OperationPathResolver(new UnderscorePathSegmentNameGenerator()));
 
         $schemaFormatterFactory = new ChainSchemaFormatter([
-            'application/json' => new DefaultDefinititionNormalizer(),
+            'application/json' => new DefaultDefinitionNormalizer(),
         ]);
 
         $normalizer = new DocumentationNormalizer(
@@ -1811,8 +1812,9 @@ class DocumentationNormalizerV3Test extends TestCase
         $operationPathResolver = new CustomOperationPathResolver(new OperationPathResolver(new UnderscorePathSegmentNameGenerator()));
 
         $schemaFormatterFactory = new ChainSchemaFormatter([
-            'application/vnd.api+json' => new JsonApiDefinititionNormalizer(),
-            'application/json' => new DefaultDefinititionNormalizer(),
+            'application/ld+json' => new HydraDefinitionNormalizer(),
+            'application/vnd.api+json' => new JsonApiDefinitionNormalizer(),
+            'application/json' => new DefaultDefinitionNormalizer(),
         ]);
 
         $normalizer = new DocumentationNormalizer(
@@ -1994,10 +1996,21 @@ class DocumentationNormalizerV3Test extends TestCase
                         'description' => 'This is a dummy.',
                         'externalDocs' => ['url' => 'http://schema.example.com/Dummy'],
                         'properties' => [
-                            'name' => new \ArrayObject([
-                                'type' => 'string',
-                                'description' => 'This is a name.',
-                            ]),
+                            'hydra:member' => [
+                                'type' => 'object',
+                                'properties' => [
+                                    '@type' => [
+                                        'type' => 'string',
+                                    ],
+                                    '@id' => [
+                                        'type' => 'integer',
+                                    ],
+                                    'name' => new \ArrayObject([
+                                        'type' => 'string',
+                                        'description' => 'This is a name.',
+                                    ]),
+                                ],
+                            ],
                         ],
                     ]),
                     'application-ld+json-'.$ref => new \ArrayObject([
@@ -2005,14 +2018,25 @@ class DocumentationNormalizerV3Test extends TestCase
                         'description' => 'This is a dummy.',
                         'externalDocs' => ['url' => 'http://schema.example.com/Dummy'],
                         'properties' => [
-                            'name' => new \ArrayObject([
-                                'type' => 'string',
-                                'description' => 'This is a name.',
-                            ]),
-                            'relatedDummy' => new \ArrayObject([
-                                'description' => 'This is a related dummy \o/.',
-                                '$ref' => '#/components/schemas/application-ld%2Bjson-'.$relatedDummyRef,
-                            ]),
+                            'hydra:member' => [
+                                'type' => 'object',
+                                'properties' => [
+                                    '@type' => [
+                                        'type' => 'string',
+                                    ],
+                                    '@id' => [
+                                        'type' => 'integer',
+                                    ],
+                                    'name' => new \ArrayObject([
+                                        'type' => 'string',
+                                        'description' => 'This is a name.',
+                                    ]),
+                                    'relatedDummy' => new \ArrayObject([
+                                        'description' => 'This is a related dummy \o/.',
+                                        '$ref' => '#/components/schemas/application-ld%2Bjson-'.$relatedDummyRef,
+                                    ]),
+                                ],
+                            ],
                         ],
                     ]),
                     'application-ld+json-'.$relatedDummyRef => new \ArrayObject([
@@ -2020,10 +2044,21 @@ class DocumentationNormalizerV3Test extends TestCase
                         'description' => 'This is a related dummy.',
                         'externalDocs' => ['url' => 'http://schema.example.com/RelatedDummy'],
                         'properties' => [
-                            'name' => new \ArrayObject([
-                                'type' => 'string',
-                                'description' => 'This is a name.',
-                            ]),
+                            'hydra:member' => [
+                                'type' => 'object',
+                                'properties' => [
+                                    '@id' => [
+                                        'type' => 'integer',
+                                    ],
+                                    '@type' => [
+                                        'type' => 'string',
+                                    ],
+                                    'name' => new \ArrayObject([
+                                        'type' => 'string',
+                                        'description' => 'This is a name.',
+                                    ]),
+                                ],
+                            ],
                         ],
                     ]),
                     'application-vnd.api+json-Dummy' => new \ArrayObject([
@@ -2176,7 +2211,7 @@ class DocumentationNormalizerV3Test extends TestCase
         $operationPathResolver = new CustomOperationPathResolver(new OperationPathResolver(new UnderscorePathSegmentNameGenerator()));
 
         $schemaFormatterFactory = new ChainSchemaFormatter([
-            'application/json' => new DefaultDefinititionNormalizer(),
+            'application/json' => new DefaultDefinitionNormalizer(),
         ]);
 
         $normalizer = new DocumentationNormalizer(
@@ -2336,8 +2371,8 @@ class DocumentationNormalizerV3Test extends TestCase
         $formatProviderProphecy->getFormatsFromOperation(Answer::class, 'get', OperationType::SUBRESOURCE)->willReturn(['xml' => ['text/xml']]);
 
         $schemaFormatterFactory = new ChainSchemaFormatter([
-            'application/json' => new DefaultDefinititionNormalizer(),
-            'text/xml' => new DefaultDefinititionNormalizer(), //@todo: use correct formatter
+            'application/json' => new DefaultDefinitionNormalizer(),
+            'text/xml' => new DefaultDefinitionNormalizer(), //@todo: use correct formatter
         ]);
 
         $normalizer = new DocumentationNormalizer(
@@ -2526,7 +2561,7 @@ class DocumentationNormalizerV3Test extends TestCase
         $operationPathResolver = new CustomOperationPathResolver(new OperationPathResolver(new UnderscorePathSegmentNameGenerator()));
 
         $schemaFormatterFactory = new ChainSchemaFormatter([
-            'application/json' => new DefaultDefinititionNormalizer(),
+            'application/json' => new DefaultDefinitionNormalizer(),
         ]);
 
         $normalizer = new DocumentationNormalizer(
@@ -2644,7 +2679,7 @@ class DocumentationNormalizerV3Test extends TestCase
         $operationPathResolver = new CustomOperationPathResolver(new OperationPathResolver(new UnderscorePathSegmentNameGenerator()));
 
         $schemaFormatterFactory = new ChainSchemaFormatter([
-            'application/json' => new DefaultDefinititionNormalizer(),
+            'application/json' => new DefaultDefinitionNormalizer(),
         ]);
 
         $normalizer = new DocumentationNormalizer(
@@ -2782,8 +2817,9 @@ class DocumentationNormalizerV3Test extends TestCase
         $formatProviderProphecy->getFormatsFromOperation(Dummy::class, 'put', OperationType::ITEM)->willReturn(['json' => ['application/json'], 'csv' => ['text/csv']]);
 
         $schemaFormatterFactory = new ChainSchemaFormatter([
-            'application/vnd.api+json' => new JsonApiDefinititionNormalizer(),
-            'application/json' => new DefaultDefinititionNormalizer(),
+            'application/ld+json' => new HydraDefinitionNormalizer(),
+            'application/vnd.api+json' => new JsonApiDefinitionNormalizer(),
+            'application/json' => new DefaultDefinitionNormalizer(),
         ]);
 
         $normalizer = new DocumentationNormalizer(

@@ -15,31 +15,34 @@ namespace ApiPlatform\Core\Tests\Swagger\SchemaFormatter;
 
 use ApiPlatform\Core\Exception\FormatterNotFoundException;
 use ApiPlatform\Core\Swagger\SchemaFormatter\ChainSchemaFormatter;
-use ApiPlatform\Core\Swagger\SchemaFormatter\DefaultDefinititionNormalizer;
-use ApiPlatform\Core\Swagger\SchemaFormatter\JsonApiDefinititionNormalizer;
+use ApiPlatform\Core\Swagger\SchemaFormatter\DefaultDefinitionNormalizer;
+use ApiPlatform\Core\Swagger\SchemaFormatter\HydraDefinitionNormalizer;
+use ApiPlatform\Core\Swagger\SchemaFormatter\JsonApiDefinitionNormalizer;
 use PHPUnit\Framework\TestCase;
 
-class SchemaFormatterProviderTest extends TestCase
+class ChainSchemaFormatterTest extends TestCase
 {
     public function testGetFormatter()
     {
         $schemaFormatterFactory = new ChainSchemaFormatter([
-            new JsonApiDefinititionNormalizer(),
-            new DefaultDefinititionNormalizer(),
+            new HydraDefinitionNormalizer(),
+            new JsonApiDefinitionNormalizer(),
+            new DefaultDefinitionNormalizer(),
         ]);
         $formatter = $schemaFormatterFactory->getFormatter('application/json');
-        $this->assertInstanceOf(DefaultDefinititionNormalizer::class, $formatter);
+        $this->assertInstanceOf(DefaultDefinitionNormalizer::class, $formatter);
     }
 
     public function testGetFormatterDefault()
     {
         $schemaFormatterFactory = new ChainSchemaFormatter([
-            new JsonApiDefinititionNormalizer(),
-            new DefaultDefinititionNormalizer(),
+            new HydraDefinitionNormalizer(),
+            new JsonApiDefinitionNormalizer(),
+            new DefaultDefinitionNormalizer(),
         ]);
 
         $formatter = $schemaFormatterFactory->getFormatter('application/json-test');
-        $this->assertInstanceOf(DefaultDefinititionNormalizer::class, $formatter);
+        $this->assertInstanceOf(DefaultDefinitionNormalizer::class, $formatter);
     }
 
     public function testGetFormatterExceptionNoFormatters()

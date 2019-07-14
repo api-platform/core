@@ -15,7 +15,7 @@ namespace ApiPlatform\Core\Swagger\SchemaFormatter;
 
 use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 
-class DefaultDefinititionNormalizer implements DefinititionNormalizerInterface
+class DefaultDefinitionNormalizer implements DefinititionNormalizerInterface
 {
     public function supports(string $mimeType): bool
     {

@@ -15,7 +15,7 @@ namespace ApiPlatform\Core\Swagger\SchemaFormatter;
 
 use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 
-final class JsonApiDefinititionNormalizer implements DefinititionNormalizerInterface
+final class JsonApiDefinitionNormalizer implements DefinititionNormalizerInterface
 {
     public function supports(string $mimeType): bool
     {
