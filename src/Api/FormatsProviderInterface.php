@@ -17,6 +17,8 @@ namespace ApiPlatform\Core\Api;
  * Extracts formats for a given operation according to the retrieved Metadata.
  *
  * @author Anthony GRASSIOT <antograssiot@free.fr>
+ *
+ * @deprecated since API Platform 2.5, use the "formats" attribute instead
  */
 interface FormatsProviderInterface
 {

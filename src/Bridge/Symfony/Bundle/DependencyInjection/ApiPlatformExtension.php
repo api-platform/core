@@ -88,9 +88,15 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $config = $this->processConfiguration($configuration, $configs);
 
         $formats = $this->getFormats($config['formats']);
+        $patchFormats = $this->getFormats($config['patch_formats']);
         $errorFormats = $this->getFormats($config['error_formats']);
 
-        $this->registerCommonConfiguration($container, $config, $loader, $formats, $errorFormats);
+        // Backward Compatibility layer
+        if (isset($formats['jsonapi']) && !isset($patchFormats['jsonapi'])) {
+            $patchFormats['jsonapi'] = ['application/vnd.api+json'];
+        }
+
+        $this->registerCommonConfiguration($container, $config, $loader, $formats, $patchFormats, $errorFormats);
         $this->registerMetadataConfiguration($container, $config, $loader);
         $this->registerOAuthConfiguration($container, $config);
         $this->registerSwaggerConfiguration($container, $config, $loader);
@@ -128,7 +134,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         }
     }
 
-    private function registerCommonConfiguration(ContainerBuilder $container, array $config, XmlFileLoader $loader, array $formats, array $errorFormats): void
+    private function registerCommonConfiguration(ContainerBuilder $container, array $config, XmlFileLoader $loader, array $formats, array $patchFormats, array $errorFormats): void
     {
         $loader->load('api.xml');
         $loader->load('data_persister.xml');
@@ -147,6 +153,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $container->setParameter('api_platform.show_webby', $config['show_webby']);
         $container->setParameter('api_platform.exception_to_status', $config['exception_to_status']);
         $container->setParameter('api_platform.formats', $formats);
+        $container->setParameter('api_platform.patch_formats', $patchFormats);
         $container->setParameter('api_platform.error_formats', $errorFormats);
         $container->setParameter('api_platform.allow_plain_identifiers', $config['allow_plain_identifiers']);
         $container->setParameter('api_platform.eager_loading.enabled', $this->isConfigEnabled($container, $config['eager_loading']));

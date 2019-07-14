@@ -50,8 +50,12 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
     private $subresourceOperationFactory;
     private $nameConverter;
 
-    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, ResourceClassResolverInterface $resourceClassResolver, OperationMethodResolverInterface $operationMethodResolver, UrlGeneratorInterface $urlGenerator, SubresourceOperationFactoryInterface $subresourceOperationFactory = null, NameConverterInterface $nameConverter = null)
+    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, ResourceClassResolverInterface $resourceClassResolver, OperationMethodResolverInterface $operationMethodResolver = null, UrlGeneratorInterface $urlGenerator, SubresourceOperationFactoryInterface $subresourceOperationFactory = null, NameConverterInterface $nameConverter = null)
     {
+        if ($operationMethodResolver) {
+            @trigger_error(sprintf('Passing an instance of %s to %s() is deprecated since version 2.5 and will be removed in 3.0.', OperationMethodResolverInterface::class, __METHOD__), E_USER_DEPRECATED);
+        }
+
         $this->resourceMetadataFactory = $resourceMetadataFactory;
         $this->propertyNameCollectionFactory = $propertyNameCollectionFactory;
         $this->propertyMetadataFactory = $propertyMetadataFactory;
@@ -245,12 +249,16 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
      */
     private function getHydraOperation(string $resourceClass, ResourceMetadata $resourceMetadata, string $operationName, array $operation, string $prefixedShortName, string $operationType, SubresourceMetadata $subresourceMetadata = null): array
     {
-        if (OperationType::COLLECTION === $operationType) {
-            $method = $this->operationMethodResolver->getCollectionOperationMethod($resourceClass, $operationName);
-        } elseif (OperationType::ITEM === $operationType) {
-            $method = $this->operationMethodResolver->getItemOperationMethod($resourceClass, $operationName);
+        if ($this->operationMethodResolver) {
+            if (OperationType::COLLECTION === $operationType) {
+                $method = $this->operationMethodResolver->getCollectionOperationMethod($resourceClass, $operationName);
+            } elseif (OperationType::ITEM === $operationType) {
+                $method = $this->operationMethodResolver->getItemOperationMethod($resourceClass, $operationName);
+            } else {
+                $method = 'GET';
+            }
         } else {
-            $method = 'GET';
+            $method = $resourceMetadata->getTypedOperationAttribute($operationType, $operationName, 'method', 'GET');
         }
 
         $hydraOperation = $operation['hydra_context'] ?? [];

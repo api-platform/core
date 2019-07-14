@@ -21,14 +21,14 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
  * @ApiResource(itemOperations={
  *     "get",
  *     "get_custom"={"method"="GET", "path"="custom_action_collection_dummies/{id}"},
- *     "custom_normalization"={"route_name"="custom_normalization"},
- *     "short_custom_normalization",
+ *     "custom_normalization"={"method"="GET", "route_name"="custom_normalization"},
+ *     "short_custom_normalization"={"method"="GET", "route_name"="short_custom_normalization"},
  * },
  * collectionOperations={
  *     "get",
  *     "get_custom"={"method"="GET", "path"="custom_action_collection_dummies"},
- *     "custom_denormalization"={"route_name"="custom_denormalization"},
- *     "short_custom_denormalization",
+ *     "custom_denormalization"={"method"="GET", "route_name"="custom_denormalization"},
+ *     "short_custom_denormalization"={"method"="GET", "route_name"="short_custom_denormalization"},
  * })
  *
  * @author Kévin Dunglas <dunglas@gmail.com>

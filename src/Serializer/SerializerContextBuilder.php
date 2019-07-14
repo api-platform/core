@@ -28,10 +28,12 @@ use Symfony\Component\HttpFoundation\Request;
 final class SerializerContextBuilder implements SerializerContextBuilderInterface
 {
     private $resourceMetadataFactory;
+    private $patchFormats;
 
-    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory)
+    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, array $patchFormats = [])
     {
         $this->resourceMetadataFactory = $resourceMetadataFactory;
+        $this->patchFormats = $patchFormats;
     }
 
     /**
@@ -65,8 +67,8 @@ final class SerializerContextBuilder implements SerializerContextBuilderInterfac
         }
 
         $context['resource_class'] = $attributes['resource_class'];
-        $context['input'] = $resourceMetadata->getTypedOperationAttribute($operationType, $attributes[$operationKey], 'input', $resourceMetadata->getAttribute('input'));
-        $context['output'] = $resourceMetadata->getTypedOperationAttribute($operationType, $attributes[$operationKey], 'output', $resourceMetadata->getAttribute('output'));
+        $context['input'] = $resourceMetadata->getTypedOperationAttribute($operationType, $attributes[$operationKey], 'input', null, true);
+        $context['output'] = $resourceMetadata->getTypedOperationAttribute($operationType, $attributes[$operationKey], 'output', null, true);
         $context['request_uri'] = $request->getRequestUri();
         $context['uri'] = $request->getUri();
 
@@ -88,6 +90,14 @@ final class SerializerContextBuilder implements SerializerContextBuilderInterfac
         }
 
         unset($context[DocumentationNormalizer::SWAGGER_DEFINITION_NAME]);
+
+        if (
+            isset($this->patchFormats['json'])
+            && !isset($context['skip_null_values'])
+            && \in_array('application/merge-patch+json', $this->patchFormats['json'], true)
+        ) {
+            $context['skip_null_values'] = true;
+        }
 
         return $context;
     }

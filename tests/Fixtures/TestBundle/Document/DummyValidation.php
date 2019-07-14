@@ -23,8 +23,8 @@ use Symfony\Component\Validator\Constraints as Assert;
  *     collectionOperations={
  *         "get"={"method"="GET"},
  *         "post"={"path"="dummy_validation.{_format}", "method"="POST"},
- *         "post_validation_groups"={"route_name"="post_validation_groups", "validation_groups"={"a"}},
- *         "post_validation_sequence"={"route_name"="post_validation_sequence", "validation_groups"="app.dummy_validation.group_generator"}
+ *         "post_validation_groups"={"route_name"="post_validation_groups", "validation_groups"={"a"}, "method"="GET"},
+ *         "post_validation_sequence"={"route_name"="post_validation_sequence", "validation_groups"="app.dummy_validation.group_generator", "method"="GET"}
  *     }
  * )
  */

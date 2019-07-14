@@ -10,7 +10,7 @@
             <argument type="service" id="api_platform.metadata.property.name_collection_factory" />
             <argument type="service" id="api_platform.metadata.property.metadata_factory" />
             <argument type="service" id="api_platform.resource_class_resolver" />
-            <argument type="service" id="api_platform.operation_method_resolver" />
+            <argument>null</argument>
             <argument type="service" id="api_platform.router" />
             <argument type="service" id="api_platform.subresource_operation_factory" />
             <argument type="service" id="api_platform.name_converter" on-invalid="ignore" />
@@ -57,7 +57,8 @@
             <argument type="service" id="api_platform.resource_class_resolver" />
             <argument type="service" id="api_platform.iri_converter" />
 
-            <tag name="serializer.normalizer" priority="-790" />
+            <!-- Run after api_platform.jsonld.normalizer.object but before serializer.normalizer.object and serializer.denormalizer.array -->
+            <tag name="serializer.normalizer" priority="-985" />
         </service>
 
         <service id="api_platform.hydra.normalizer.partial_collection_view" class="ApiPlatform\Core\Hydra\Serializer\PartialCollectionViewNormalizer" decorates="api_platform.hydra.normalizer.collection" public="false">
