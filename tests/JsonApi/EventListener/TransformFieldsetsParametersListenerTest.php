@@ -25,7 +25,7 @@ class TransformFieldsetsParametersListenerTest extends TestCase
 {
     private $listener;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadata('dummy'));

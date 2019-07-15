@@ -92,7 +92,7 @@ use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\DependencyInjection\ParameterBag\EnvPlaceholderParameterBag;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Messenger\Exception\UnrecoverableMessageHandlingException;
+use Symfony\Component\Messenger\Exception\HandlerFailedException;
 use Symfony\Component\Serializer\Exception\ExceptionInterface;
 
 /**
@@ -138,13 +138,13 @@ class ApiPlatformExtensionTest extends TestCase
     private $extension;
     private $childDefinitionProphecy;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->extension = new ApiPlatformExtension();
         $this->childDefinitionProphecy = $this->prophesize(ChildDefinition::class);
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         $this->extension = null;
     }
@@ -494,7 +494,7 @@ class ApiPlatformExtensionTest extends TestCase
     {
         $containerBuilderProphecy = $this->getBaseContainerBuilderProphecy();
         $containerBuilderProphecy->setAlias('api_platform.message_bus', 'messenger.default_bus')->shouldNotBeCalled();
-        if (!class_exists(UnrecoverableMessageHandlingException::class)) {
+        if (!class_exists(HandlerFailedException::class)) {
             $containerBuilderProphecy->setAlias('api_platform.message_bus', 'message_bus')->shouldNotBeCalled();
         }
         $containerBuilderProphecy->setDefinition('api_platform.messenger.data_persister', Argument::type(Definition::class))->shouldNotBeCalled();
@@ -1175,7 +1175,7 @@ class ApiPlatformExtensionTest extends TestCase
             $containerBuilderProphecy->setAlias($alias, $service)->shouldBeCalled();
         }
 
-        if (!class_exists(UnrecoverableMessageHandlingException::class)) {
+        if (!class_exists(HandlerFailedException::class)) {
             $containerBuilderProphecy->setAlias('api_platform.message_bus', 'message_bus')->shouldBeCalled();
         }
 
