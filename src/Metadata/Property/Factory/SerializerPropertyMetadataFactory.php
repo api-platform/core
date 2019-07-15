@@ -17,6 +17,7 @@ use ApiPlatform\Core\Api\ResourceClassResolverInterface;
 use ApiPlatform\Core\Exception\ResourceClassNotFoundException;
 use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
+use ApiPlatform\Core\Util\ResourceClassInfoTrait;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface as SerializerClassMetadataFactoryInterface;
 
 /**
@@ -27,10 +28,10 @@ use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface a
  */
 final class SerializerPropertyMetadataFactory implements PropertyMetadataFactoryInterface
 {
-    private $resourceMetadataFactory;
+    use ResourceClassInfoTrait;
+
     private $serializerClassMetadataFactory;
     private $decorated;
-    private $resourceClassResolver;
 
     public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, SerializerClassMetadataFactoryInterface $serializerClassMetadataFactory, PropertyMetadataFactoryInterface $decorated, ResourceClassResolverInterface $resourceClassResolver = null)
     {
@@ -211,20 +212,5 @@ final class SerializerPropertyMetadataFactory implements PropertyMetadataFactory
         }
 
         return array_unique($groups);
-    }
-
-    private function isResourceClass(string $class): bool
-    {
-        if (null !== $this->resourceClassResolver) {
-            return $this->resourceClassResolver->isResourceClass($class);
-        }
-
-        try {
-            $this->resourceMetadataFactory->create($class);
-
-            return true;
-        } catch (ResourceClassNotFoundException $e) {
-            return false;
-        }
     }
 }

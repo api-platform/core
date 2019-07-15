@@ -82,6 +82,11 @@ parameters:
     container.dumper.inline_class_loader: true
 
 services:
+    ApiPlatform\Core\Tests\Fixtures\TestBundle\MessageHandler\:
+        resource: '../../TestBundle/MessageHandler'
+        autowire: true
+        autoconfigure: true
+
     contain_non_resource.item_data_provider:
         class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\DataProvider\ContainNonResourceItemDataProvider'
         public: false
