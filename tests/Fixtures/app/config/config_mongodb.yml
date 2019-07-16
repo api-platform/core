@@ -69,19 +69,21 @@ services:
         arguments: [ { 'name': 'ipartial', 'description': 'ipartial' } ]
         tags:      [ { name: 'api_platform.filter', id: 'related_to_dummy_friend.mongodb.name' } ]
 
-    app.data_provider.product.item:
-        class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\DataProvider\ProductDocumentItemDataProvider'
+    ApiPlatform\Core\Tests\Fixtures\TestBundle\DataProvider\ProductItemDataProvider:
         public: false
-        arguments: ['@doctrine_mongodb']
+        arguments:
+            $managerRegistry: '@doctrine_mongodb'
+            $orm: false
         tags:
-            -  { name: 'api_platform.item_data_provider' }
+            -   name: 'api_platform.item_data_provider'
 
-    app.data_provider.taxon.item:
-        class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\DataProvider\TaxonDocumentItemDataProvider'
+    ApiPlatform\Core\Tests\Fixtures\TestBundle\DataProvider\TaxonItemDataProvider:
         public: false
-        arguments: ['@doctrine_mongodb']
+        arguments:
+            $managerRegistry: '@doctrine_mongodb'
+            $orm: false
         tags:
-            -  { name: 'api_platform.item_data_provider' }
+            -   name: 'api_platform.item_data_provider'
 
     app.dummy_dto_no_input.data_provider:
         class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\DataProvider\DummyDtoNoInputCollectionDataProvider'

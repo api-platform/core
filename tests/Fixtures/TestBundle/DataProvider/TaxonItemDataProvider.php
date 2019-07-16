@@ -15,6 +15,7 @@ namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\DataProvider;
 
 use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
 use ApiPlatform\Core\DataProvider\RestrictedDataProviderInterface;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\Taxon as TaxonDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Taxon;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Model\TaxonInterface;
 use Doctrine\Common\Persistence\ManagerRegistry;
@@ -22,10 +23,12 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 class TaxonItemDataProvider implements ItemDataProviderInterface, RestrictedDataProviderInterface
 {
     private $managerRegistry;
+    private $orm;
 
-    public function __construct(ManagerRegistry $managerRegistry)
+    public function __construct(ManagerRegistry $managerRegistry, bool $orm = true)
     {
         $this->managerRegistry = $managerRegistry;
+        $this->orm = $orm;
     }
 
     /**
@@ -41,6 +44,8 @@ class TaxonItemDataProvider implements ItemDataProviderInterface, RestrictedData
      */
     public function getItem(string $resourceClass, $id, string $operationName = null, array $context = [])
     {
-        return $this->managerRegistry->getRepository(Taxon::class)->find($id);
+        return $this->managerRegistry->getRepository($this->orm ? Taxon::class : TaxonDocument::class)->findOneBy([
+            'code' => $id,
+        ]);
     }
 }

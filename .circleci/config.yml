@@ -39,6 +39,13 @@ commands:
           command: |
             sudo pecl install mongodb-1.5.4
             sudo docker-php-ext-enable mongodb
+  install-pcov-php-extension:
+    steps:
+      - run:
+          name: Install pcov PHP extension
+          command: |
+            sudo pecl install pcov-1.0.6
+            sudo docker-php-ext-enable pcov
   merge-code-coverage-reports:
     parameters:
       dir:
@@ -51,14 +58,16 @@ commands:
       - run:
           name: Download phpcov
           command: |
-            if [ ! -e phpcov.phar ]; then
+            if ! command -v phpcov; then
               wget https://phar.phpunit.de/phpcov.phar
+              chmod +x phpcov.phar
+              sudo mv phpcov.phar /usr/local/bin/phpcov
             fi
       - run:
           name: Merge code coverage reports
           command: |
             mkdir -p "$(dirname -- "<< parameters.out >>")"
-            phpdbg -qrr phpcov.phar merge --clover "<< parameters.out >>" "<< parameters.dir >>"
+            phpcov merge --clover "<< parameters.out >>" "<< parameters.dir >>"
   merge-test-reports:
     parameters:
       dir:
@@ -263,6 +272,7 @@ jobs:
     steps:
       - checkout
       - install-mongodb-php-extension
+      - install-pcov-php-extension
       - disable-xdebug-php-extension
       - disable-php-memory-limit
       - update-composer
@@ -276,7 +286,7 @@ jobs:
             mkdir -p build/logs/phpunit build/coverage
             split_tests=$(find tests -name '*Test.php' | circleci tests split --split-by=timings)
             export PARALLEL='-j10% --joblog build/logs/parallel.log --rpl {_}\ s/\\//_/g;'
-            phpunit_cmd='phpdbg -qrr vendor/bin/phpunit --coverage-php build/coverage/coverage-{_}.cov --log-junit build/logs/phpunit/{_}.xml --exclude-group mongodb,resource-hog --colors=always {}'
+            phpunit_cmd='vendor/bin/phpunit --coverage-php build/coverage/coverage-{_}.cov --log-junit build/logs/phpunit/{_}.xml --exclude-group mongodb,resource-hog --colors=always {}'
             echo "$split_tests" | parallel "$phpunit_cmd" || echo "$split_tests" | parallel --retry-failed "$phpunit_cmd"
       - restore-npm-cache
       - merge-test-reports:
@@ -310,6 +320,7 @@ jobs:
     steps:
       - checkout
       - install-mongodb-php-extension
+      - install-pcov-php-extension
       - disable-xdebug-php-extension
       - disable-php-memory-limit
       - update-composer
@@ -323,7 +334,7 @@ jobs:
             mkdir -p build/logs/behat build/coverage
             for f in $(find features -name '*.feature' -not -path 'features/main/exposed_state.feature' -not -path 'features/elasticsearch/*' -not -path 'features/mongodb/*' | circleci tests split --split-by=timings); do
               _f=$(echo "$f" | tr / _)
-              FEATURE="${_f}" phpdbg -qrr vendor/bin/behat --format=progress --out=std --format=junit --out=build/logs/behat/"${_f}" --profile=default-coverage --no-interaction "$f"
+              FEATURE="${_f}" vendor/bin/behat --format=progress --out=std --format=junit --out=build/logs/behat/"${_f}" --profile=default-coverage --no-interaction "$f"
             done
       - restore-npm-cache
       - merge-test-reports:
@@ -355,6 +366,7 @@ jobs:
     steps:
       - checkout
       - install-mongodb-php-extension
+      - install-pcov-php-extension
       - disable-xdebug-php-extension
       - disable-php-memory-limit
       - update-composer
@@ -367,7 +379,7 @@ jobs:
           name: Run PHPUnit tests
           command: |
             mkdir -p build/logs/phpunit
-            phpdbg -qrr vendor/bin/phpunit --coverage-clover build/logs/clover.xml --log-junit build/logs/phpunit/junit.xml --exclude-group resource-hog --colors=always --configuration phpunit_mongodb.xml
+            vendor/bin/phpunit --coverage-clover build/logs/clover.xml --log-junit build/logs/phpunit/junit.xml --exclude-group resource-hog --colors=always --configuration phpunit_mongodb.xml
       - store_test_results:
           path: build/logs
       - store_artifacts:
@@ -392,6 +404,7 @@ jobs:
     steps:
       - checkout
       - install-mongodb-php-extension
+      - install-pcov-php-extension
       - disable-xdebug-php-extension
       - disable-php-memory-limit
       - update-composer
@@ -404,7 +417,7 @@ jobs:
           name: Run Behat tests
           command: |
             mkdir -p build/logs/behat
-            phpdbg -qrr vendor/bin/behat --format=progress --out=std --format=junit --out=build/logs/behat --profile=mongodb-coverage --no-interaction
+            vendor/bin/behat --format=progress --out=std --format=junit --out=build/logs/behat --profile=mongodb-coverage --no-interaction
       - restore-npm-cache
       - merge-test-reports:
           dir: build/logs/behat
@@ -435,6 +448,7 @@ jobs:
     steps:
       - checkout
       - install-mongodb-php-extension
+      - install-pcov-php-extension
       - disable-xdebug-php-extension
       - disable-php-memory-limit
       - update-composer
@@ -447,7 +461,7 @@ jobs:
           name: Run Behat tests
           command: |
             mkdir -p build/logs/behat
-            phpdbg -qrr vendor/bin/behat --format=progress --out=std --format=junit --out=build/logs/behat --profile=elasticsearch-coverage --no-interaction
+            vendor/bin/behat --format=progress --out=std --format=junit --out=build/logs/behat --profile=elasticsearch-coverage --no-interaction
       - restore-npm-cache
       - merge-test-reports:
           dir: build/logs/behat

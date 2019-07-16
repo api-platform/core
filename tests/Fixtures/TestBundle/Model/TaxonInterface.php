@@ -31,13 +31,13 @@ use Symfony\Component\Validator\Constraints as Assert;
  */
 interface TaxonInterface
 {
-    /**
-     * @ApiProperty(identifier=true)
-     */
     public function getId();
 
     /**
+     * @ApiProperty(identifier=true)
+     *
      * @Groups({"product_read", "taxon_read"})
+     *
      * @Assert\NotBlank
      */
     public function getCode(): ?string;

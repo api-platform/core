@@ -945,15 +945,11 @@ class ApiPlatformExtensionTest extends TestCase
         $containerBuilderProphecy->getParameter('kernel.project_dir')->willReturn(__DIR__);
         $containerBuilderProphecy->getParameter('kernel.debug')->willReturn(false);
 
-        $containerBuilderProphecy->getDefinition('api_platform.http_cache.purger.varnish')->willReturn(new Definition());
-
         // irrelevant, but to prevent errors
-        // https://github.com/symfony/symfony/pull/29944
+        $definitionDummy = $this->prophesize(Definition::class);
+        $containerBuilderProphecy->getDefinition('api_platform.http_cache.purger.varnish')->willReturn($definitionDummy);
         if (method_exists(ContainerBuilder::class, 'removeBindings')) {
             $containerBuilderProphecy->removeBindings(Argument::type('string'))->will(function () {});
-        } elseif (method_exists(ContainerBuilder::class, 'addRemovedBindingIds')) {
-            // remove this once https://github.com/symfony/symfony/pull/31173 is released
-            $containerBuilderProphecy->addRemovedBindingIds(Argument::type('string'))->will(function () {});
         }
 
         return $containerBuilderProphecy;
@@ -1236,9 +1232,10 @@ class ApiPlatformExtensionTest extends TestCase
         $containerBuilderProphecy->hasParameter('api_platform.metadata_cache')->willReturn(false);
 
         // irrelevant, but to prevent errors
+        $definitionDummy = $this->prophesize(Definition::class);
         $containerBuilderProphecy->removeDefinition('api_platform.cache_warmer.cache_pool_clearer')->will(function () {});
-
-        $containerBuilderProphecy->getDefinition('api_platform.mercure.listener.response.add_link_header')->willReturn(new Definition());
+        $containerBuilderProphecy->getDefinition('api_platform.mercure.listener.response.add_link_header')->willReturn($definitionDummy);
+        $containerBuilderProphecy->getDefinition('api_platform.doctrine.listener.mercure.publish')->willReturn($definitionDummy);
 
         return $containerBuilderProphecy;
     }

@@ -22,6 +22,8 @@ use Doctrine\ODM\MongoDB\Mapping\Driver\XmlDriver;
 /**
  * Convenience class for setting up Doctrine from different installations and configurations.
  *
+ * @internal
+ *
  * @author Benjamin Eberlei <kontakt@beberlei.de>
  * @author Alan Poulain <contact@alanpoulain.eu>
  */
