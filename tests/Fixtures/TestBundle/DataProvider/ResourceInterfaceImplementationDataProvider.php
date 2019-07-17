@@ -29,7 +29,7 @@ class ResourceInterfaceImplementationDataProvider implements ItemDataProviderInt
     public function getItem(string $resourceClass, $id, string $operationName = null, array $context = [])
     {
         if ('some-id' === $id) {
-            return (new ResourceInterfaceImplementation())->setFoo('single item');
+            return (new ResourceInterfaceImplementation())->setFoo('single item')->setBar('single bar');
         }
 
         return null;
