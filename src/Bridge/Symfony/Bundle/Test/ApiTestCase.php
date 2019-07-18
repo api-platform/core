@@ -37,11 +37,12 @@ abstract class ApiTestCase extends KernelTestCase
     /**
      * Creates a Client.
      *
-     * @param array $options An array of options to pass to the createKernel method
+     * @param array $kernelOptions  Options to pass to the createKernel method
+     * @param array $defaultOptions Default options for the requests
      */
-    protected static function createClient(array $options = []): Client
+    protected static function createClient(array $kernelOptions = [], array $defaultOptions = []): Client
     {
-        $kernel = static::bootKernel($options);
+        $kernel = static::bootKernel($kernelOptions);
 
         try {
             /**
@@ -54,6 +55,8 @@ abstract class ApiTestCase extends KernelTestCase
             }
             throw new \LogicException('You cannot create the client used in functional tests if the BrowserKit component is not available. Try running "composer require symfony/browser-kit".');
         }
+
+        $client->setDefaultOptions($defaultOptions);
 
         self::getHttpClient($client);
         self::getClient($client->getKernelBrowser());

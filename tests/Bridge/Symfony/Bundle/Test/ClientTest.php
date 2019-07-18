@@ -67,6 +67,25 @@ class ClientTest extends ApiTestCase
         $this->assertStringContainsString('<name>Kevin</name>', $response->getContent());
     }
 
+    public function testDefaultHeaders(): void
+    {
+        $client = self::createClient([], [
+            'headers' => [
+                'content-type' => 'application/json',
+                'accept' => 'text/xml',
+            ],
+        ]);
+        $client->disableReboot();
+
+        $response = $client->request('POST', '/dummies', [
+            'body' => '{"name": "Kevin"}',
+        ]);
+
+        $this->assertSame('application/xml; charset=utf-8', $response->getHeaders()['content-type'][0]);
+        $this->assertResponseHeaderSame('content-type', 'application/xml; charset=utf-8');
+        $this->assertStringContainsString('<name>Kevin</name>', $response->getContent());
+    }
+
     /**
      * @dataProvider authBasicProvider
      */

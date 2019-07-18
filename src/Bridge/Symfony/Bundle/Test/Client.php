@@ -31,15 +31,12 @@ use Symfony\Contracts\HttpClient\ResponseStreamInterface;
  */
 final class Client implements HttpClientInterface
 {
-    /**
-     * @var Response
-     */
-    private $response;
+    use HttpClientTrait;
 
     /**
      * @see HttpClientInterface::OPTIONS_DEFAULTS
      */
-    public const OPTIONS_DEFAULT = [
+    public const API_OPTIONS_DEFAULTS = [
         'auth_basic' => null,
         'auth_bearer' => null,
         'query' => [],
@@ -49,27 +46,48 @@ final class Client implements HttpClientInterface
         'base_uri' => 'http://example.com',
     ];
 
-    use HttpClientTrait;
-
     private $kernelBrowser;
 
-    public function __construct(KernelBrowser $kernelBrowser)
+    private $defaultOptions = self::API_OPTIONS_DEFAULTS;
+
+    /**
+     * @var Response
+     */
+    private $response;
+
+    /**
+     * @param array $defaultOptions Default options for the requests
+     *
+     * @see HttpClientInterface::OPTIONS_DEFAULTS for available options
+     */
+    public function __construct(KernelBrowser $kernelBrowser, array $defaultOptions = [])
     {
         $this->kernelBrowser = $kernelBrowser;
         $kernelBrowser->followRedirects(false);
+        if ($defaultOptions) {
+            $this->setDefaultOptions($defaultOptions);
+        }
+    }
+
+    /**
+     * Sets the default options for the requests.
+     *
+     * @see HttpClientInterface::OPTIONS_DEFAULTS for available options
+     */
+    public function setDefaultOptions(array $defaultOptions): void
+    {
+        [, $this->defaultOptions] = self::prepareRequest(null, null, $defaultOptions, self::API_OPTIONS_DEFAULTS);
     }
 
     /**
      * {@inheritdoc}
-     *
-     * @see Client::OPTIONS_DEFAULTS for available options
      *
      * @return Response
      */
     public function request(string $method, string $url, array $options = []): ResponseInterface
     {
         $basic = $options['auth_basic'] ?? null;
-        [$url, $options] = self::prepareRequest($method, $url, $options, self::OPTIONS_DEFAULT);
+        [$url, $options] = self::prepareRequest($method, $url, $options, $this->defaultOptions);
         $resolvedUrl = implode('', $url);
 
         $server = [];
