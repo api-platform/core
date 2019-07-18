@@ -14,17 +14,12 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\Bridge\Symfony\Bundle\Test\Constraint;
 
 use ApiPlatform\Core\Bridge\Symfony\Bundle\Test\Constraint\ArraySubset;
-use ArrayAccessible;
-use ArrayObject;
-use Countable;
+use ApiPlatform\Core\Tests\Fixtures\ArrayAccessible;
 use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\SelfDescribing;
 use PHPUnit\Framework\TestCase;
 use PHPUnit\Runner\Version;
-use ReflectionClass;
 use SebastianBergmann\RecursionContext\InvalidArgumentException;
-use Traversable;
-use function sprintf;
 
 /**
  * Imported from dms/phpunit-arraysubset-asserts, because the original constraint has been deprecated.
@@ -64,12 +59,12 @@ class ArraySubsetTest extends TestCase
             'loose array subset and ArrayObject other' => [
                 'expected' => true,
                 'subset' => ['bar' => 0],
-                'other' => new ArrayObject(['foo' => '', 'bar' => '0']),
+                'other' => new \ArrayObject(['foo' => '', 'bar' => '0']),
                 'strict' => false,
             ],
             'strict ArrayObject subset and array other' => [
                 'expected' => true,
-                'subset' => new ArrayObject(['bar' => 0]),
+                'subset' => new \ArrayObject(['bar' => 0]),
                 'other' => ['foo' => '', 'bar' => 0],
                 'strict' => true,
             ],
@@ -77,9 +72,9 @@ class ArraySubsetTest extends TestCase
     }
 
     /**
-     * @param array|Traversable|mixed[] $subset
-     * @param array|Traversable|mixed[] $other
-     * @param bool                      $strict
+     * @param array|\Traversable|mixed[] $subset
+     * @param array|\Traversable|mixed[] $other
+     * @param bool                       $strict
      *
      * @throws ExpectationFailedException
      * @throws InvalidArgumentException
@@ -118,20 +113,20 @@ class ArraySubsetTest extends TestCase
 
     public function testIsCountable(): void
     {
-        $reflection = new ReflectionClass(ArraySubset::class);
+        $reflection = new \ReflectionClass(ArraySubset::class);
 
         $this->assertTrue(
-            $reflection->implementsInterface(Countable::class),
+            $reflection->implementsInterface(\Countable::class),
             sprintf(
                 'Failed to assert that ArraySubset implements "%s".',
-                Countable::class
+                \Countable::class
             )
         );
     }
 
     public function testIsSelfDescribing(): void
     {
-        $reflection = new ReflectionClass(ArraySubset::class);
+        $reflection = new \ReflectionClass(ArraySubset::class);
 
         $this->assertTrue(
             $reflection->implementsInterface(SelfDescribing::class),
