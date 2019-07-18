@@ -113,10 +113,7 @@
     "autoload-dev": {
         "psr-4": {
             "ApiPlatform\\Core\\Tests\\": "tests/"
-        },
-        "classmap": [
-            "vendor/phpunit/phpunit/tests/"
-        ]
+        }
     },
     "extra": {
         "branch-alias": {
