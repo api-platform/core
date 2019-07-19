@@ -29,6 +29,37 @@ class ApiTestCaseTest extends ApiTestCase
         $this->assertJsonContains(['@context' => '/contexts/Entrypoint']);
     }
 
+    public function testAssertJsonContainsWithJsonObjectString(): void
+    {
+        if (version_compare(Version::id(), '8.0.0', '<')) {
+            $this->markTestSkipped('Requires PHPUnit 8');
+        }
+
+        self::createClient()->request('GET', '/');
+        $this->assertJsonContains(<<<JSON
+{
+    "@context": "/contexts/Entrypoint"
+}
+JSON
+        );
+    }
+
+    public function testAssertJsonContainsWithJsonScalarString(): void
+    {
+        if (version_compare(Version::id(), '8.0.0', '<')) {
+            $this->markTestSkipped('Requires PHPUnit 8');
+        }
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('$subset must be array or string (JSON array or JSON object)');
+
+        self::createClient()->request('GET', '/');
+        $this->assertJsonContains(<<<JSON
+"/contexts/Entrypoint"
+JSON
+        );
+    }
+
     public function testAssertJsonEquals(): void
     {
         self::createClient()->request('GET', '/contexts/Address');
@@ -39,6 +70,33 @@ class ApiTestCaseTest extends ApiTestCase
                 'name' => 'Address/name',
             ],
         ]);
+    }
+
+    public function testAssertJsonEqualsWithJsonObjectString(): void
+    {
+        self::createClient()->request('GET', '/contexts/Address');
+        $this->assertJsonEquals(<<<JSON
+{
+    "@context": {
+        "@vocab": "http://example.com/docs.jsonld#",
+        "hydra": "http://www.w3.org/ns/hydra/core#",
+        "name": "Address/name"
+    }
+}
+JSON
+        );
+    }
+
+    public function testAssertJsonEqualsWithJsonScalarString(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('$json must be array or string (JSON array or JSON object)');
+
+        self::createClient()->request('GET', '/contexts/Address');
+        $this->assertJsonEquals(<<<JSON
+"Address/name"
+JSON
+        );
     }
 
     public function testAssertMatchesJsonSchema(): void

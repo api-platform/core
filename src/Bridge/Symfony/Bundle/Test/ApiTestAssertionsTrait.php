@@ -29,7 +29,10 @@ trait ApiTestAssertionsTrait
 
     /**
      * Asserts that the retrieved JSON contains has the specified subset.
+     *
      * This method delegates to self::assertArraySubset().
+     *
+     * @param array|string $subset
      *
      * @throws \Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface
      * @throws \Symfony\Contracts\HttpClient\Exception\DecodingExceptionInterface
@@ -37,17 +40,34 @@ trait ApiTestAssertionsTrait
      * @throws \Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface
      * @throws \Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface
      */
-    public static function assertJsonContains(array $subset, bool $checkForObjectIdentity = true, string $message = ''): void
+    public static function assertJsonContains($subset, bool $checkForObjectIdentity = true, string $message = ''): void
     {
+        if (\is_string($subset)) {
+            $subset = json_decode($subset, true);
+        }
+        if (!\is_array($subset)) {
+            throw new \InvalidArgumentException('$subset must be array or string (JSON array or JSON object)');
+        }
+
         static::assertArraySubset($subset, self::getHttpResponse()->toArray(false), $checkForObjectIdentity, $message);
     }
 
     /**
-     * Asserts that the retrieved JSON is equal to the following array.
+     * Asserts that the retrieved JSON is equal to $json.
+     *
      * Both values are canonicalized before the comparision.
+     *
+     * @param array|string $json
      */
-    public static function assertJsonEquals(array $json, string $message = ''): void
+    public static function assertJsonEquals($json, string $message = ''): void
     {
+        if (\is_string($json)) {
+            $json = json_decode($json, true);
+        }
+        if (!\is_array($json)) {
+            throw new \InvalidArgumentException('$json must be array or string (JSON array or JSON object)');
+        }
+
         static::assertEqualsCanonicalizing($json, self::getHttpResponse()->toArray(false), $message);
     }
 
