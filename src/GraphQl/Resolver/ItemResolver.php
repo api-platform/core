@@ -71,7 +71,7 @@ final class ItemResolver
         $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
         $this->canAccess($this->resourceAccessChecker, $resourceMetadata, $resourceClass, $info, [
             'object' => $item,
-            'previous_object' => \is_object($item) ? clone $item : $item,
+            'previous_object' => clone $item,
         ], 'query');
 
         $normalizationContext = $resourceMetadata->getGraphqlAttribute('query', 'normalization_context', [], true);

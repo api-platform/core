@@ -16,6 +16,7 @@ namespace ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\PropertyInfo;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Persistence\Mapping\MappingException;
 use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\ODM\MongoDB\Mapping\ClassMetadata as MongoDbClassMetadata;
 use Doctrine\ODM\MongoDB\Types\Type as MongoDbType;
 use Symfony\Component\PropertyInfo\PropertyListExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyTypeExtractorInterface;
@@ -63,17 +64,11 @@ final class DoctrineExtractor implements PropertyListExtractorInterface, Propert
             return null;
         }
 
-        $reflectionMetadata = new \ReflectionClass($metadata);
-
         if ($metadata->hasAssociation($property)) {
             $class = $metadata->getAssociationTargetClass($property);
 
             if ($metadata->isSingleValuedAssociation($property)) {
-                if ($reflectionMetadata->hasMethod('isNullable')) {
-                    $nullable = $metadata->isNullable($property);
-                } else {
-                    $nullable = false;
-                }
+                $nullable = $metadata instanceof MongoDbClassMetadata && $metadata->isNullable($property);
 
                 return [new Type(Type::BUILTIN_TYPE_OBJECT, $nullable, $class)];
             }
@@ -94,7 +89,7 @@ final class DoctrineExtractor implements PropertyListExtractorInterface, Propert
 
         if ($metadata->hasField($property)) {
             $typeOfField = $metadata->getTypeOfField($property);
-            $nullable = $reflectionMetadata->hasMethod('isNullable') && $metadata->isNullable($property);
+            $nullable = $metadata instanceof MongoDbClassMetadata && $metadata->isNullable($property);
 
             switch ($typeOfField) {
                 case MongoDbType::DATE:

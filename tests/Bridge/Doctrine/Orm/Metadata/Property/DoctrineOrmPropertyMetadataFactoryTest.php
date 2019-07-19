@@ -42,23 +42,6 @@ class DoctrineOrmPropertyMetadataFactoryTest extends TestCase
         $this->assertEquals($doctrineOrmPropertyMetadataFactory->create(Dummy::class, 'id'), $propertyMetadata);
     }
 
-    public function testCreateNoClassMetadata()
-    {
-        $propertyMetadata = new PropertyMetadata();
-        $propertyMetadataFactory = $this->prophesize(PropertyMetadataFactoryInterface::class);
-        $propertyMetadataFactory->create(Dummy::class, 'id', [])->shouldBeCalled()->willReturn($propertyMetadata);
-
-        $objectManager = $this->prophesize(ObjectManager::class);
-        $objectManager->getClassMetadata(Dummy::class)->shouldBeCalled()->willReturn(null);
-
-        $managerRegistry = $this->prophesize(ManagerRegistry::class);
-        $managerRegistry->getManagerForClass(Dummy::class)->shouldBeCalled()->willReturn($objectManager->reveal());
-
-        $doctrineOrmPropertyMetadataFactory = new DoctrineOrmPropertyMetadataFactory($managerRegistry->reveal(), $propertyMetadataFactory->reveal());
-
-        $this->assertEquals($doctrineOrmPropertyMetadataFactory->create(Dummy::class, 'id'), $propertyMetadata);
-    }
-
     public function testCreateIsIdentifier()
     {
         $propertyMetadata = new PropertyMetadata();

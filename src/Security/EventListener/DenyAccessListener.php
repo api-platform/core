@@ -33,6 +33,9 @@ use Symfony\Component\Security\Core\Role\RoleHierarchyInterface;
 final class DenyAccessListener
 {
     private $resourceMetadataFactory;
+    /**
+     * @var ResourceAccessCheckerInterface
+     */
     private $resourceAccessChecker;
 
     public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, /*ResourceAccessCheckerInterface*/ $resourceAccessCheckerOrExpressionLanguage = null, AuthenticationTrustResolverInterface $authenticationTrustResolver = null, RoleHierarchyInterface $roleHierarchy = null, TokenStorageInterface $tokenStorage = null, AuthorizationCheckerInterface $authorizationChecker = null)
