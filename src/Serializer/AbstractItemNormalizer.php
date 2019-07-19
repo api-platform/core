@@ -533,6 +533,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             $resourceClass = $this->resourceClassResolver->getResourceClass($attributeValue, $className);
             $childContext = $this->createChildContext($context, $attribute, $format);
             $childContext['resource_class'] = $resourceClass;
+            unset($childContext['iri']);
 
             return $this->normalizeCollectionOfRelations($propertyMetadata, $attributeValue, $resourceClass, $format, $childContext);
         }
@@ -545,6 +546,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             $resourceClass = $this->resourceClassResolver->getResourceClass($attributeValue, $className);
             $childContext = $this->createChildContext($context, $attribute, $format);
             $childContext['resource_class'] = $resourceClass;
+            unset($childContext['iri']);
 
             return $this->normalizeRelation($propertyMetadata, $attributeValue, $resourceClass, $format, $childContext);
         }
