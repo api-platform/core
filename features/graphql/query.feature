@@ -307,6 +307,27 @@ Feature: GraphQL query support
     }
     """
 
+  Scenario: Custom item query with read and serialize set to false
+    When I send the following GraphQL request:
+    """
+    {
+      testNoReadAndSerializeItemDummyCustomQuery(id: "/not_used") {
+        message
+      }
+    }
+    """
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/json"
+    And the JSON should be equal to:
+    """
+    {
+      "data": {
+        "testNoReadAndSerializeItemDummyCustomQuery": null
+      }
+    }
+    """
+
   Scenario: Custom item query
     Given there are 2 dummyCustomQuery objects
     When I send the following GraphQL request:

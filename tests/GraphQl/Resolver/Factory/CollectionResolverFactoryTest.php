@@ -189,6 +189,81 @@ class CollectionResolverFactoryTest extends TestCase
         );
     }
 
+    public function testCreateCollectionNoRead(): void
+    {
+        $factory = $this->createCollectionResolverFactory([
+            'Object1',
+            'Object2',
+        ], [], [], false, null, ['query' => ['read' => false]]);
+
+        $resolver = $factory(RelatedDummy::class, Dummy::class);
+
+        $resolveInfo = new ResolveInfo('relatedDummies', [], new ObjectType(['name' => '']), new ObjectType(['name' => '']), [], new Schema([]), [], null, null, []);
+
+        $this->assertEquals(
+            [],
+            $resolver(null, [], null, $resolveInfo)
+        );
+    }
+
+    public function testCreateSubresourceCollectionNoRead(): void
+    {
+        $identifiers = ['id' => 1];
+        $factory = $this->createCollectionResolverFactory([
+            'Object1',
+            'Object2',
+        ], ['Subobject1', 'Subobject2'], $identifiers, false, null, ['query' => ['read' => false]]);
+
+        $resolver = $factory(RelatedDummy::class, Dummy::class, 'query');
+
+        $resolveInfo = new ResolveInfo('relatedDummies', [], new ObjectType(['name' => '']), new ObjectType(['name' => '']), [], new Schema([]), [], null, null, []);
+
+        $source = [
+            'relatedDummies' => [],
+            ItemNormalizer::ITEM_IDENTIFIERS_KEY => $identifiers,
+        ];
+
+        $this->assertEquals([], $resolver($source, [], null, $resolveInfo));
+    }
+
+    public function testCreateCollectionNoSerialize(): void
+    {
+        $factory = $this->createCollectionResolverFactory([
+            'Object1',
+            'Object2',
+        ], [], [], false, null, ['custom_query' => ['collection_query' => 'query_resolver_id', 'serialize' => false]]);
+
+        $resolver = $factory(RelatedDummy::class, Dummy::class, 'custom_query');
+
+        $resolveInfo = new ResolveInfo('relatedDummies', [], new ObjectType(['name' => '']), new ObjectType(['name' => '']), [], new Schema([]), [], null, null, []);
+
+        $this->assertEquals(
+            [],
+            $resolver(null, [], null, $resolveInfo)
+        );
+    }
+
+    public function testCreateCollectionNoSerializeNoPagination(): void
+    {
+        $factory = $this->createCollectionResolverFactory([
+            'Object1',
+            'Object2',
+        ], [], [], true, null, ['custom_query' => ['collection_query' => 'query_resolver_id', 'serialize' => false]]);
+
+        $resolver = $factory(RelatedDummy::class, Dummy::class, 'custom_query');
+
+        $resolveInfo = new ResolveInfo('relatedDummies', [], new ObjectType(['name' => '']), new ObjectType(['name' => '']), [], new Schema([]), [], null, null, []);
+
+        $this->assertEquals(
+            [
+                'totalCount' => 0.0,
+                'edges' => [],
+                'pageInfo' => ['startCursor' => null, 'endCursor' => null, 'hasNextPage' => false, 'hasPreviousPage' => false],
+            ],
+            $resolver(null, [], null, $resolveInfo)
+        );
+    }
+
     /**
      * @param array|\Iterator $collection
      */

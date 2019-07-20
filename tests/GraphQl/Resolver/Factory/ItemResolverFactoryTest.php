@@ -131,6 +131,33 @@ class ItemResolverFactoryTest extends TestCase
         $this->assertEquals('normalizedItem', ($this->itemResolverFactory)(null, null, 'custom_query')(null, ['id' => '/related_dummies/3'], null, $resolveInfo));
     }
 
+    public function testCreateItemResolverNoRead(): void
+    {
+        $this->iriConverterProphecy->getItemFromIri(Argument::cetera())->shouldNotBeCalled();
+        $this->normalizerProphecy->normalize(null, Argument::cetera())->willReturn('nullItem');
+
+        $resolveInfo = new ResolveInfo('name', [], new ObjectType(['name' => '']), new ObjectType(['name' => '']), [], new Schema([]), [], null, null, []);
+
+        $this->resourceMetadataFactoryProphecy->create(RelatedDummy::class)->willReturn(new ResourceMetadata('RelatedDummy', null, null, null, null, null, null, ['query' => ['read' => false]]));
+
+        $this->assertEquals('nullItem', ($this->itemResolverFactory)(RelatedDummy::class)(null, ['id' => '/related_dummies/3'], null, $resolveInfo));
+    }
+
+    public function testCreateItemResolverNoSerialize(): void
+    {
+        $item = new RelatedDummy();
+        $returnedItem = new RelatedDummy();
+        $returnedItem->setName('returned');
+        $this->iriConverterProphecy->getItemFromIri('/related_dummies/3', ['attributes' => []])->willReturn($item);
+        $this->normalizerProphecy->normalize(Argument::cetera())->shouldNotBeCalled();
+
+        $resolveInfo = new ResolveInfo('name', [], new ObjectType(['name' => '']), new ObjectType(['name' => '']), [], new Schema([]), [], null, null, []);
+
+        $this->resourceMetadataFactoryProphecy->create(RelatedDummy::class)->willReturn(new ResourceMetadata('RelatedDummy', null, null, null, null, null, null, ['query' => ['serialize' => false]]));
+
+        $this->assertNull(($this->itemResolverFactory)()(null, ['id' => '/related_dummies/3'], null, $resolveInfo));
+    }
+
     /**
      * @dataProvider subresourceProvider
      */

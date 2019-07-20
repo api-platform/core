@@ -64,11 +64,17 @@ final class ItemResolverFactory implements ResolverFactoryInterface
                 return $source[$info->fieldName];
             }
 
-            $baseNormalizationContext = ['attributes' => $this->fieldsToAttributes($info)];
-            $item = $this->getItem($args, $baseNormalizationContext);
+            $item = null;
             $resourceClass = $this->getResourceClass($item, $resourceClass, $info);
+            $resourceMetadata = $resourceClass ? $this->resourceMetadataFactory->create($resourceClass) : null;
+            $baseNormalizationContext = ['attributes' => $this->fieldsToAttributes($info)];
 
-            $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
+            if (!$resourceMetadata || $resourceMetadata->getGraphqlAttribute($operationName ?? 'query', 'read', true, true)) {
+                $item = $this->getItem($args, $baseNormalizationContext);
+
+                $resourceClass = $this->getResourceClass($item, $resourceClass, $info);
+                $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
+            }
 
             $queryResolverId = $resourceMetadata->getGraphqlAttribute($operationName ?? 'query', 'item_query');
             if (null !== $queryResolverId) {
@@ -86,7 +92,11 @@ final class ItemResolverFactory implements ResolverFactoryInterface
             $normalizationContext = $resourceMetadata->getGraphqlAttribute($operationName ?? 'query', 'normalization_context', [], true);
             $normalizationContext['resource_class'] = $resourceClass;
 
-            return $this->normalizer->normalize($item, ItemNormalizer::FORMAT, $normalizationContext + $baseNormalizationContext);
+            if ($resourceMetadata->getGraphqlAttribute($operationName ?? 'query', 'serialize', true, true)) {
+                return $this->normalizer->normalize($item, ItemNormalizer::FORMAT, $normalizationContext + $baseNormalizationContext);
+            }
+
+            return null;
         };
     }
 

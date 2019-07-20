@@ -459,7 +459,7 @@ Feature: GraphQL mutation support
     And the header "Content-Type" should be equal to "application/json"
     And the JSON node "data.sumDummyCustomMutation.dummyCustomMutation.result" should be equal to "8"
 
-  Scenario: Execute a not persisted custom mutation
+  Scenario: Execute a not persisted custom mutation (resolver returns null)
     When I send the following GraphQL request:
     """
     mutation {
@@ -475,6 +475,40 @@ Feature: GraphQL mutation support
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/json"
     And the JSON node "data.sumNotPersistedDummyCustomMutation.dummyCustomMutation" should be null
+
+  Scenario: Execute a not persisted custom mutation (write set to false) with custom result
+    When I send the following GraphQL request:
+    """
+    mutation {
+      sumNoWriteCustomResultDummyCustomMutation(input: {id: "/dummy_custom_mutations/1", operandB: 5}) {
+        dummyCustomMutation {
+          id
+          result
+        }
+      }
+    }
+    """
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/json"
+    And the JSON node "data.sumNoWriteCustomResultDummyCustomMutation.dummyCustomMutation.result" should be equal to "1234"
+
+  Scenario: Execute a custom mutation with read, deserialize, validate and serialize set to false
+    When I send the following GraphQL request:
+    """
+    mutation {
+      sumOnlyPersistDummyCustomMutation(input: {id: "/dummy_custom_mutations/1", operandB: 5}) {
+        dummyCustomMutation {
+          id
+          result
+        }
+      }
+    }
+    """
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/json"
+    And the JSON node "data.sumOnlyPersistDummyCustomMutation.dummyCustomMutation" should be null
 
   Scenario: Execute a custom mutation with custom arguments
     When I send the following GraphQL request:
