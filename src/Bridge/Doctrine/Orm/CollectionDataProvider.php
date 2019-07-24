@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Bridge\Doctrine\Orm;
 
-use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\ContextAwareQueryCollectionExtensionInterface;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\QueryCollectionExtensionInterface;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\QueryResultCollectionExtensionInterface;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGenerator;
@@ -36,9 +35,9 @@ class CollectionDataProvider implements ContextAwareCollectionDataProviderInterf
     private $collectionExtensions;
 
     /**
-     * @param QueryCollectionExtensionInterface[]|ContextAwareQueryCollectionExtensionInterface[] $collectionExtensions
+     * @param QueryCollectionExtensionInterface[] $collectionExtensions
      */
-    public function __construct(ManagerRegistry $managerRegistry, /* iterable */ $collectionExtensions = [])
+    public function __construct(ManagerRegistry $managerRegistry, iterable $collectionExtensions = [])
     {
         $this->managerRegistry = $managerRegistry;
         $this->collectionExtensions = $collectionExtensions;

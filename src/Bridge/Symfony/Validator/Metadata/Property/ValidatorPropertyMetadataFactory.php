@@ -32,6 +32,7 @@ use Symfony\Component\Validator\Constraints\NotNull;
 use Symfony\Component\Validator\Constraints\Time;
 use Symfony\Component\Validator\Constraints\Url;
 use Symfony\Component\Validator\Constraints\Uuid;
+use Symfony\Component\Validator\Mapping\ClassMetadataInterface as ValidatorClassMetadataInterface;
 use Symfony\Component\Validator\Mapping\Factory\MetadataFactoryInterface as ValidatorMetadataFactoryInterface;
 use Symfony\Component\Validator\Mapping\PropertyMetadataInterface as ValidatorPropertyMetadataInterface;
 
@@ -88,9 +89,17 @@ final class ValidatorPropertyMetadataFactory implements PropertyMetadataFactoryI
         }
 
         $validatorClassMetadata = $this->validatorMetadataFactory->getMetadataFor($resourceClass);
+        if (!$validatorClassMetadata instanceof ValidatorClassMetadataInterface) {
+            throw new \UnexpectedValueException(sprintf('Validator class metadata expected to be of type "%s".', ValidatorClassMetadataInterface::class));
+        }
+
         foreach ($validatorClassMetadata->getPropertyMetadata($name) as $validatorPropertyMetadata) {
             if (null === $required && isset($options['validation_groups'])) {
                 $required = $this->isRequiredByGroups($validatorPropertyMetadata, $options);
+            }
+
+            if (!method_exists($validatorClassMetadata, 'getDefaultGroup')) {
+                throw new \UnexpectedValueException(sprintf('Validator class metadata expected to have method "%s".', 'getDefaultGroup'));
             }
 
             foreach ($validatorPropertyMetadata->findConstraints($validatorClassMetadata->getDefaultGroup()) as $constraint) {

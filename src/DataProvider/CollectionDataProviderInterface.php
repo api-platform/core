@@ -27,7 +27,7 @@ interface CollectionDataProviderInterface
      *
      * @throws ResourceClassNotSupportedException
      *
-     * @return array|\Traversable
+     * @return iterable
      */
     public function getCollection(string $resourceClass, string $operationName = null);
 }

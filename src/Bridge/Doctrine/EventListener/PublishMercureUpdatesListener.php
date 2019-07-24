@@ -48,6 +48,9 @@ final class PublishMercureUpdatesListener
     private $deletedEntities;
     private $formats;
 
+    /**
+     * @param array<string, string[]|string> $formats
+     */
     public function __construct(ResourceClassResolverInterface $resourceClassResolver, IriConverterInterface $iriConverter, ResourceMetadataFactoryInterface $resourceMetadataFactory, SerializerInterface $serializer, array $formats, MessageBusInterface $messageBus = null, callable $publisher = null, ExpressionLanguage $expressionLanguage = null)
     {
         if (null === $messageBus && null === $publisher) {
@@ -166,6 +169,7 @@ final class PublishMercureUpdatesListener
             // This may change in the feature, because it's not JSON Merge Patch compliant,
             // and I'm not a fond of this approach
             $iri = $entity->iri;
+            /** @var string $data */
             $data = json_encode(['@id' => $entity->id]);
         } else {
             $resourceClass = $this->getObjectClass($entity);

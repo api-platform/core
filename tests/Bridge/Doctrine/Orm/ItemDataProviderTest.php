@@ -234,7 +234,8 @@ class ItemDataProviderTest extends TestCase
             'id',
         ]);
 
-        (new ItemDataProvider($managerRegistryProphecy->reveal(), $propertyNameCollectionFactory, $propertyMetadataFactory, [$extensionProphecy->reveal()]))->getItem(Dummy::class, 'foo', null, [IdentifierConverterInterface::HAS_IDENTIFIER_CONVERTER => true]);
+        $itemDataProvider = new ItemDataProvider($managerRegistryProphecy->reveal(), $propertyNameCollectionFactory, $propertyMetadataFactory, [$extensionProphecy->reveal()]);
+        $itemDataProvider->getItem(Dummy::class, ['id' => 1234], null, [IdentifierConverterInterface::HAS_IDENTIFIER_CONVERTER => true]);
     }
 
     /**

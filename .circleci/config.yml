@@ -224,7 +224,6 @@ jobs:
     working_directory: ~/api-platform/core
     steps:
       - checkout
-      - install-mongodb-php-extension
       - disable-xdebug-php-extension
       - disable-php-memory-limit
       - update-composer

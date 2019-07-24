@@ -52,7 +52,7 @@ final class AnnotationSubresourceMetadataFactory implements PropertyMetadataFact
         if ($reflectionClass->hasProperty($property)) {
             $annotation = $this->reader->getPropertyAnnotation($reflectionClass->getProperty($property), ApiSubresource::class);
 
-            if (null !== $annotation) {
+            if ($annotation instanceof ApiSubresource) {
                 return $this->updateMetadata($annotation, $propertyMetadata, $resourceClass, $property);
             }
         }
@@ -70,7 +70,7 @@ final class AnnotationSubresourceMetadataFactory implements PropertyMetadataFact
 
             $annotation = $this->reader->getMethodAnnotation($reflectionMethod, ApiSubresource::class);
 
-            if (null !== $annotation) {
+            if ($annotation instanceof ApiSubresource) {
                 return $this->updateMetadata($annotation, $propertyMetadata, $resourceClass, $property);
             }
         }

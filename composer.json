@@ -49,7 +49,7 @@
         "phpdocumentor/type-resolver": "^0.3 || ^0.4",
         "phpspec/prophecy": "^1.8",
         "phpstan/extension-installer": "^1.0",
-        "phpstan/phpstan": "^0.11",
+        "phpstan/phpstan": "^0.11.10",
         "phpstan/phpstan-doctrine": "^0.11",
         "phpstan/phpstan-phpunit": "^0.11",
         "phpstan/phpstan-symfony": "^0.11",

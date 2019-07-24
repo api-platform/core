@@ -194,8 +194,10 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
             }
         }
 
+        /** @var string[] $classes */
+        $classes = array_keys($classes);
         $properties = [];
-        foreach ($classes as $class => $v) {
+        foreach ($classes as $class) {
             foreach ($this->propertyNameCollectionFactory->create($class, $this->getPropertyNameCollectionFactoryContext($resourceMetadata)) as $propertyName) {
                 $propertyMetadata = $this->propertyMetadataFactory->create($class, $propertyName);
                 if (true === $propertyMetadata->isIdentifier() && false === $propertyMetadata->isWritable()) {

@@ -53,7 +53,7 @@ final class ObjectNormalizer implements NormalizerInterface, CacheableSupportsMe
      */
     public function hasCacheableSupportsMethod(): bool
     {
-        return $this->decorated->hasCacheableSupportsMethod();
+        return $this->decorated instanceof CacheableSupportsMethodInterface && $this->decorated->hasCacheableSupportsMethod();
     }
 
     /**

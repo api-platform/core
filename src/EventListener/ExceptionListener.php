@@ -29,9 +29,9 @@ final class ExceptionListener
 {
     private $exceptionListener;
 
-    public function __construct($controller, LoggerInterface $logger = null, $debug = false, string $charset = null, $fileLinkFormat = null)
+    public function __construct($controller, LoggerInterface $logger = null, $debug = false)
     {
-        $this->exceptionListener = new BaseExceptionListener($controller, $logger, $debug, $charset, $fileLinkFormat);
+        $this->exceptionListener = new BaseExceptionListener($controller, $logger, $debug);
     }
 
     public function onKernelException(GetResponseForExceptionEvent $event): void
