@@ -50,7 +50,7 @@ indent_size = 2
 [.gitmodules]
 indent_style = tab
 
-[.php_cs]
+[.php_cs{,.dist}]
 indent_style = space
 indent_size = 4
 

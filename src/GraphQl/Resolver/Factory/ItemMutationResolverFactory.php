@@ -49,6 +49,9 @@ final class ItemMutationResolverFactory implements ResolverFactoryInterface
     private $iriConverter;
     private $dataPersister;
     private $mutationResolverLocator;
+    /**
+     * @var NormalizerInterface&DenormalizerInterface
+     */
     private $normalizer;
     private $resourceMetadataFactory;
     private $resourceAccessChecker;
@@ -57,7 +60,7 @@ final class ItemMutationResolverFactory implements ResolverFactoryInterface
     public function __construct(IriConverterInterface $iriConverter, DataPersisterInterface $dataPersister, ContainerInterface $mutationResolverLocator, NormalizerInterface $normalizer, ResourceMetadataFactoryInterface $resourceMetadataFactory, ResourceAccessCheckerInterface $resourceAccessChecker = null, ValidatorInterface $validator = null)
     {
         if (!$normalizer instanceof DenormalizerInterface) {
-            throw new InvalidArgumentException(sprintf('The normalizer must implements the "%s" interface', DenormalizerInterface::class));
+            throw new InvalidArgumentException(sprintf('The normalizer must implement the "%s" interface', DenormalizerInterface::class));
         }
 
         $this->iriConverter = $iriConverter;
@@ -153,10 +156,10 @@ final class ItemMutationResolverFactory implements ResolverFactoryInterface
 
             if (null !== $item) {
                 $this->validate($item, $info, $resourceMetadata, $operationName);
-                $persistResult = $this->dataPersister->persist($item, $denormalizationContext);
 
-                if (null === $persistResult) {
-                    @trigger_error(sprintf('Returning void from %s::persist() is deprecated since API Platform 2.3 and will not be supported in API Platform 3, an object should always be returned.', DataPersisterInterface::class), E_USER_DEPRECATED);
+                $persistResult = $this->dataPersister->persist($item, $denormalizationContext);
+                if (!\is_object($persistResult)) {
+                    @trigger_error(sprintf('Not returning an object from %s::persist() is deprecated since API Platform 2.3 and will not be supported in API Platform 3.', DataPersisterInterface::class), E_USER_DEPRECATED);
                 }
             }
 

@@ -20,8 +20,14 @@ namespace ApiPlatform\Core\Api;
  */
 final class FormatMatcher
 {
+    /**
+     * @var array<string, string[]>
+     */
     private $formats;
 
+    /**
+     * @param array<string, string[]|string> $formats
+     */
     public function __construct(array $formats)
     {
         $normalizedFormats = [];

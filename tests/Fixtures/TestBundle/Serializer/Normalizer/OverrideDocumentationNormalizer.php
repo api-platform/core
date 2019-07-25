@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Serializer\Normalizer;
 
+use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 /**
@@ -30,6 +31,10 @@ final class OverrideDocumentationNormalizer implements NormalizerInterface
     public function normalize($object, $format = null, array $context = [])
     {
         $data = $this->documentationNormalizer->normalize($object, $format, $context);
+        if (!\is_array($data)) {
+            throw new UnexpectedValueException('Expected data to be an array');
+        }
+
         if (isset($data['definitions'])) {
             $data['definitions']['RamseyUuidDummy']['properties']['id']['description'] = 'The dummy id';
         } else {

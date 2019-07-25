@@ -25,11 +25,11 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyCustomQuery;
 class DummyCustomQueryCollectionResolver implements QueryCollectionResolverInterface
 {
     /**
-     * @param DummyCustomQuery[]|DummyCustomQueryDocument[] $collection
+     * @param iterable<DummyCustomQuery|DummyCustomQueryDocument> $collection
      *
-     * @return DummyCustomQuery[]|DummyCustomQueryDocument[]
+     * @return iterable<DummyCustomQuery|DummyCustomQueryDocument>
      */
-    public function __invoke($collection, array $context)
+    public function __invoke(iterable $collection, array $context): iterable
     {
         foreach ($collection as $dummy) {
             $dummy->message = 'Success!';

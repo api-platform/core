@@ -19,6 +19,7 @@ use ApiPlatform\Core\Api\FilterLocatorTrait;
 use ApiPlatform\Core\Api\ResourceClassResolverInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use Psr\Container\ContainerInterface;
+use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 use Symfony\Component\Serializer\Normalizer\CacheableSupportsMethodInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerAwareInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
@@ -70,6 +71,9 @@ final class CollectionFiltersNormalizer implements NormalizerInterface, Normaliz
     public function normalize($object, $format = null, array $context = [])
     {
         $data = $this->collectionNormalizer->normalize($object, $format, $context);
+        if (!\is_array($data)) {
+            throw new UnexpectedValueException('Expected data to be an array');
+        }
 
         if (!isset($context['resource_class']) || isset($context['api_sub_level'])) {
             return $data;

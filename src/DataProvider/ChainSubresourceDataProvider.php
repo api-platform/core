@@ -22,13 +22,17 @@ use ApiPlatform\Core\Exception\ResourceClassNotSupportedException;
  */
 final class ChainSubresourceDataProvider implements SubresourceDataProviderInterface
 {
-    /** @internal */
+    /**
+     * @var iterable<SubresourceDataProviderInterface>
+     *
+     * @internal
+     */
     public $dataProviders;
 
     /**
      * @param SubresourceDataProviderInterface[] $dataProviders
      */
-    public function __construct(/* iterable */ $dataProviders)
+    public function __construct(iterable $dataProviders)
     {
         $this->dataProviders = $dataProviders;
     }
