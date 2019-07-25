@@ -19,6 +19,7 @@ use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Util\IriHelper;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
+use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 use Symfony\Component\Serializer\Normalizer\CacheableSupportsMethodInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerAwareInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
@@ -52,6 +53,10 @@ final class PartialCollectionViewNormalizer implements NormalizerInterface, Norm
     public function normalize($object, $format = null, array $context = [])
     {
         $data = $this->collectionNormalizer->normalize($object, $format, $context);
+        if (!\is_array($data)) {
+            throw new UnexpectedValueException('Expected data to be an array');
+        }
+
         if (isset($context['api_sub_level'])) {
             return $data;
         }

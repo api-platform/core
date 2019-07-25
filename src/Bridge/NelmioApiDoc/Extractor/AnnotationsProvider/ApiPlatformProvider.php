@@ -64,7 +64,12 @@ final class ApiPlatformProvider implements AnnotationsProviderInterface
     public function getAnnotations(): array
     {
         $resourceNameCollection = $this->resourceNameCollectionFactory->create();
+
         $hydraDoc = $this->documentationNormalizer->normalize(new Documentation($resourceNameCollection));
+        if (!\is_array($hydraDoc)) {
+            throw new \UnexpectedValueException('Expected data to be an array');
+        }
+
         if (empty($hydraDoc)) {
             return [];
         }

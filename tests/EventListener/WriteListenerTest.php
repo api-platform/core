@@ -65,7 +65,7 @@ class WriteListenerTest extends TestCase
 
     /**
      * @group legacy
-     * @expectedDeprecation Returning void from ApiPlatform\Core\DataPersister\DataPersisterInterface::persist() is deprecated since API Platform 2.3 and will not be supported in API Platform 3, an object should always be returned.
+     * @expectedDeprecation Not returning an object from ApiPlatform\Core\DataPersister\DataPersisterInterface::persist() is deprecated since API Platform 2.3 and will not be supported in API Platform 3.
      */
     public function testOnKernelViewWithControllerResultAndPersistReturningVoid()
     {

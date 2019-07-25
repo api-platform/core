@@ -21,6 +21,7 @@ use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use Doctrine\Common\Inflector\Inflector;
 use GraphQL\Type\Definition\InputObjectType;
+use GraphQL\Type\Definition\NullableType;
 use GraphQL\Type\Definition\Type as GraphQLType;
 use GraphQL\Type\Definition\WrappingType;
 use Psr\Container\ContainerInterface;
@@ -386,6 +387,8 @@ final class FieldsBuilder implements FieldsBuilderInterface
             return $this->paginationEnabled && !$input ? $this->typeBuilder->getResourcePaginatedCollectionType($graphqlType) : GraphQLType::listOf($graphqlType);
         }
 
-        return $type->isNullable() || (null !== $mutationName && 'update' === $mutationName) ? $graphqlType : GraphQLType::nonNull($graphqlType);
+        return !$graphqlType instanceof NullableType || $type->isNullable() || (null !== $mutationName && 'update' === $mutationName)
+            ? $graphqlType
+            : GraphQLType::nonNull($graphqlType);
     }
 }

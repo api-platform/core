@@ -27,7 +27,7 @@ interface QueryResultCollectionExtensionInterface extends QueryCollectionExtensi
     public function supportsResult(string $resourceClass, string $operationName = null): bool;
 
     /**
-     * @return array|\Traversable
+     * @return iterable
      */
     public function getResult(QueryBuilder $queryBuilder);
 }

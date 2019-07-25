@@ -17,6 +17,7 @@ use ApiPlatform\Core\GraphQl\Serializer\ItemNormalizer;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use GraphQL\Type\Definition\InputObjectType;
 use GraphQL\Type\Definition\InterfaceType;
+use GraphQL\Type\Definition\NonNull;
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\Type as GraphQLType;
 use Psr\Container\ContainerInterface;
@@ -65,7 +66,16 @@ final class TypeBuilder implements TypeBuilderInterface
         }
 
         if ($this->typesContainer->has($shortName)) {
-            return $this->typesContainer->get($shortName);
+            $resourceObjectType = $this->typesContainer->get($shortName);
+            if (!($resourceObjectType instanceof ObjectType || $resourceObjectType instanceof NonNull)) {
+                throw new \UnexpectedValueException(sprintf(
+                    'Expected GraphQL type "%s" to be %s.',
+                    $shortName,
+                    implode('|', [ObjectType::class, NonNull::class])
+                ));
+            }
+
+            return $resourceObjectType;
         }
 
         $ioMetadata = $resourceMetadata->getGraphqlAttribute($mutationName ?? 'query', $input ? 'input' : 'output', null, true);
@@ -120,7 +130,12 @@ final class TypeBuilder implements TypeBuilderInterface
     public function getNodeInterface(): InterfaceType
     {
         if ($this->typesContainer->has('Node')) {
-            return $this->typesContainer->get('Node');
+            $nodeInterface = $this->typesContainer->get('Node');
+            if (!$nodeInterface instanceof InterfaceType) {
+                throw new \UnexpectedValueException(sprintf('Expected GraphQL type "Node" to be %s.', InterfaceType::class));
+            }
+
+            return $nodeInterface;
         }
 
         $nodeInterface = new InterfaceType([

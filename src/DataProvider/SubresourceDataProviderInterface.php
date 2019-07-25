@@ -32,7 +32,7 @@ interface SubresourceDataProviderInterface
      *
      * @throws ResourceClassNotSupportedException
      *
-     * @return array|object|null
+     * @return iterable|object|null
      */
     public function getSubresource(string $resourceClass, array $identifiers, array $context, string $operationName = null);
 }

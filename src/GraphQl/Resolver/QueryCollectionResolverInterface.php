@@ -23,9 +23,9 @@ namespace ApiPlatform\Core\GraphQl\Resolver;
 interface QueryCollectionResolverInterface
 {
     /**
-     * @param object[] $collection
+     * @param iterable<object> $collection
      *
-     * @return object[]
+     * @return iterable<object>
      */
-    public function __invoke($collection, array $context);
+    public function __invoke(iterable $collection, array $context): iterable;
 }
