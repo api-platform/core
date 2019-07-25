@@ -29,6 +29,11 @@ use Doctrine\ORM\Mapping as ORM;
  *         "item_query"="app.graphql.query_resolver.dummy_custom_not_retrieved_item",
  *         "args"={}
  *     },
+ *     "testNoReadAndSerializeItem"={
+ *         "item_query"="app.graphql.query_resolver.dummy_custom_item_no_read_and_serialize",
+ *         "read"=false,
+ *         "serialize"=false
+ *     },
  *     "testItemCustomArguments"={
  *         "item_query"="app.graphql.query_resolver.dummy_custom_item",
  *         "args"={
@@ -44,6 +49,11 @@ use Doctrine\ORM\Mapping as ORM;
  *     },
  *     "testCollection"={
  *         "collection_query"="app.graphql.query_resolver.dummy_custom_collection"
+ *     },
+ *     "testCollectionNoReadAndSerialize"={
+ *         "collection_query"="app.graphql.query_resolver.dummy_custom_collection_no_read_and_serialize",
+ *         "read"=false,
+ *         "serialize"=false
  *     },
  *     "testCollectionCustomArguments"={
  *         "collection_query"="app.graphql.query_resolver.dummy_custom_collection",

@@ -518,6 +518,35 @@ Feature: GraphQL collection support
     """
 
   @createSchema
+  Scenario: Custom collection query with read and serialize set to false
+    Given there are 2 dummyCustomQuery objects
+    When I send the following GraphQL request:
+    """
+    {
+      testCollectionNoReadAndSerializeDummyCustomQueries {
+        edges {
+          node {
+            message
+          }
+        }
+      }
+    }
+    """
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/json"
+    And the JSON should be equal to:
+    """
+    {
+      "data": {
+        "testCollectionNoReadAndSerializeDummyCustomQueries": {
+          "edges": []
+        }
+      }
+    }
+    """
+
+  @createSchema
   Scenario: Custom collection query with custom arguments
     Given there are 2 dummyCustomQuery objects
     When I send the following GraphQL request:

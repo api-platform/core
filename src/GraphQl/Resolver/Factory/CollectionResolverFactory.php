@@ -85,15 +85,19 @@ final class CollectionResolverFactory implements ResolverFactoryInterface
             $dataProviderContext['graphql'] = true;
             $normalizationContext['resource_class'] = $resourceClass;
 
-            if (isset($rootClass, $source[$rootProperty = $info->fieldName], $source[ItemNormalizer::ITEM_IDENTIFIERS_KEY])) {
-                $rootResolvedFields = $source[ItemNormalizer::ITEM_IDENTIFIERS_KEY];
-                $subresourceCollection = $this->getSubresource($rootClass, $rootResolvedFields, array_keys($rootResolvedFields), $rootProperty, $resourceClass, true, $dataProviderContext);
-                if (!is_iterable($subresourceCollection)) {
-                    throw new \UnexpectedValueException('Expected subresource collection to be iterable');
+            $collection = [];
+
+            if ($resourceMetadata->getGraphqlAttribute($operationName ?? 'query', 'read', true, true)) {
+                if (isset($rootClass, $source[$rootProperty = $info->fieldName], $source[ItemNormalizer::ITEM_IDENTIFIERS_KEY])) {
+                    $rootResolvedFields = $source[ItemNormalizer::ITEM_IDENTIFIERS_KEY];
+                    $subresourceCollection = $this->getSubresource($rootClass, $rootResolvedFields, array_keys($rootResolvedFields), $rootProperty, $resourceClass, true, $dataProviderContext);
+                    if (!is_iterable($subresourceCollection)) {
+                        throw new \UnexpectedValueException('Expected subresource collection to be iterable');
+                    }
+                    $collection = $subresourceCollection ?? [];
+                } else {
+                    $collection = $this->collectionDataProvider->getCollection($resourceClass, null, $dataProviderContext);
                 }
-                $collection = $subresourceCollection ?? [];
-            } else {
-                $collection = $this->collectionDataProvider->getCollection($resourceClass, null, $dataProviderContext);
             }
 
             $queryResolverId = $resourceMetadata->getGraphqlAttribute($operationName ?? 'query', 'collection_query');
@@ -109,6 +113,10 @@ final class CollectionResolverFactory implements ResolverFactoryInterface
             ], $operationName ?? 'query');
 
             if (!$this->paginationEnabled) {
+                if (!$resourceMetadata->getGraphqlAttribute($operationName ?? 'query', 'serialize', true, true)) {
+                    return [];
+                }
+
                 $data = [];
                 foreach ($collection as $index => $object) {
                     $data[$index] = $this->normalizer->normalize($object, ItemNormalizer::FORMAT, $normalizationContext);
@@ -144,6 +152,11 @@ final class CollectionResolverFactory implements ResolverFactoryInterface
             $offset = 0 > $offset ? 0 : $offset;
 
             $data = ['totalCount' => 0., 'edges' => [], 'pageInfo' => ['startCursor' => null, 'endCursor' => null, 'hasNextPage' => false, 'hasPreviousPage' => false]];
+
+            if (!$resourceMetadata->getGraphqlAttribute($operationName ?? 'query', 'serialize', true, true)) {
+                return $data;
+            }
+
             if ($collection instanceof PaginatorInterface && ($totalItems = $collection->getTotalItems()) > 0) {
                 $data['totalCount'] = $totalItems;
                 $data['pageInfo']['startCursor'] = base64_encode((string) $offset);
