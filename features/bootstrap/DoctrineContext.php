@@ -78,6 +78,8 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\ConvertedOwner;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\ConvertedRelated;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\ConvertedString;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Customer;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DisableItemOperation;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\DisableItemOperation as DisableItemOperationDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyAggregateOffer;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyCar;
@@ -1484,6 +1486,17 @@ final class DoctrineContext implements Context
         $this->manager->flush();
     }
 
+    /**
+     * @Given there is 1 DisableItemOperation
+     */
+    public function thereIsOneDisableItemOperation()
+    {
+        $item = $this->buildDisableItemOperation();
+        $item->name = 'Test';
+        $this->manager->persist($item);
+        $this->manager->flush();
+    }
+
     private function isOrm(): bool
     {
         return null !== $this->schemaTool;
@@ -1852,5 +1865,13 @@ final class DoctrineContext implements Context
     private function buildConvertedRelated()
     {
         return $this->isOrm() ? new ConvertedRelated() : new ConvertedRelatedDocument();
+    }
+
+    /**
+     * @return DisableItemOperation|DisableItemOperationDocument
+     */
+    private function buildDisableItemOperation()
+    {
+        return $this->isOrm() ? new DisableItemOperation() : new DisableItemOperationDocument();
     }
 }

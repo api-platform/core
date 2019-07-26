@@ -15,6 +15,7 @@ namespace ApiPlatform\Core\JsonLd\Serializer;
 
 use ApiPlatform\Core\Api\IriConverterInterface;
 use ApiPlatform\Core\Api\ResourceClassResolverInterface;
+use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\JsonLd\ContextBuilderInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
@@ -71,7 +72,13 @@ final class ItemNormalizer extends AbstractItemNormalizer
 
         $resourceClass = $this->resourceClassResolver->getResourceClass($object, $context['resource_class'] ?? null);
         $context = $this->initContext($resourceClass, $context);
-        $iri = $this->iriConverter->getIriFromItem($object);
+
+        try {
+            $iri = $this->iriConverter->getIriFromItem($object);
+        } catch (InvalidArgumentException $e) {
+            $iri = '_:'.(\function_exists('spl_object_id') ? spl_object_id($object) : spl_object_hash($object));
+        }
+
         $context['iri'] = $iri;
         $context['api_normalize'] = true;
 

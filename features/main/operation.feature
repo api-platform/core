@@ -55,3 +55,9 @@ Feature: Operation support
         }
     }
     """
+
+  @createSchema
+  Scenario: Get a resource that doesn't have a defined item operation
+    Given there is 1 DisableItemOperation
+    When I send a "GET" request to "/disable_item_operations"
+    Then the response status code should be 200
