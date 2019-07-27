@@ -52,10 +52,11 @@ final class ApiLoader extends Loader
     private $resourceClassDirectories;
     private $subresourceOperationFactory;
     private $graphqlEnabled;
+    private $graphiQlEnabled;
     private $entrypointEnabled;
     private $docsEnabled;
 
-    public function __construct(KernelInterface $kernel, ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, ResourceMetadataFactoryInterface $resourceMetadataFactory, OperationPathResolverInterface $operationPathResolver, ContainerInterface $container, array $formats, array $resourceClassDirectories = [], SubresourceOperationFactoryInterface $subresourceOperationFactory = null, bool $graphqlEnabled = false, bool $entrypointEnabled = true, bool $docsEnabled = true)
+    public function __construct(KernelInterface $kernel, ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, ResourceMetadataFactoryInterface $resourceMetadataFactory, OperationPathResolverInterface $operationPathResolver, ContainerInterface $container, array $formats, array $resourceClassDirectories = [], SubresourceOperationFactoryInterface $subresourceOperationFactory = null, bool $graphqlEnabled = false, bool $entrypointEnabled = true, bool $docsEnabled = true, bool $graphiQlEnabled = false)
     {
         /** @var string[]|string $paths */
         $paths = $kernel->locateResource('@ApiPlatformBundle/Resources/config/routing');
@@ -68,6 +69,7 @@ final class ApiLoader extends Loader
         $this->resourceClassDirectories = $resourceClassDirectories;
         $this->subresourceOperationFactory = $subresourceOperationFactory;
         $this->graphqlEnabled = $graphqlEnabled;
+        $this->graphiQlEnabled = $graphiQlEnabled;
         $this->entrypointEnabled = $entrypointEnabled;
         $this->docsEnabled = $docsEnabled;
     }
@@ -166,9 +168,15 @@ final class ApiLoader extends Loader
         }
 
         if ($this->graphqlEnabled) {
-            $graphqlCollection = $this->fileLoader->load('graphql.xml');
+            $graphqlCollection = $this->fileLoader->load('graphql/graphql.xml');
             $graphqlCollection->addDefaults(['_graphql' => true]);
             $routeCollection->addCollection($graphqlCollection);
+        }
+
+        if ($this->graphiQlEnabled) {
+            $graphiQlCollection = $this->fileLoader->load('graphql/graphiql.xml');
+            $graphiQlCollection->addDefaults(['_graphql' => true]);
+            $routeCollection->addCollection($graphiQlCollection);
         }
 
         if (isset($this->formats['jsonld'])) {

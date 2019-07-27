@@ -54,8 +54,9 @@ final class SwaggerUiAction
     private $swaggerUiEnabled;
     private $reDocEnabled;
     private $graphqlEnabled;
+    private $graphiQlEnabled;
 
-    public function __construct(ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, ResourceMetadataFactoryInterface $resourceMetadataFactory, NormalizerInterface $normalizer, TwigEnvironment $twig, UrlGeneratorInterface $urlGenerator, string $title = '', string $description = '', string $version = '', $formats = [], $oauthEnabled = false, $oauthClientId = '', $oauthClientSecret = '', $oauthType = '', $oauthFlow = '', $oauthTokenUrl = '', $oauthAuthorizationUrl = '', $oauthScopes = [], bool $showWebby = true, bool $swaggerUiEnabled = false, bool $reDocEnabled = false, bool $graphqlEnabled = false)
+    public function __construct(ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, ResourceMetadataFactoryInterface $resourceMetadataFactory, NormalizerInterface $normalizer, TwigEnvironment $twig, UrlGeneratorInterface $urlGenerator, string $title = '', string $description = '', string $version = '', $formats = [], $oauthEnabled = false, $oauthClientId = '', $oauthClientSecret = '', $oauthType = '', $oauthFlow = '', $oauthTokenUrl = '', $oauthAuthorizationUrl = '', $oauthScopes = [], bool $showWebby = true, bool $swaggerUiEnabled = false, bool $reDocEnabled = false, bool $graphqlEnabled = false, bool $graphiQlEnabled = false)
     {
         $this->resourceNameCollectionFactory = $resourceNameCollectionFactory;
         $this->resourceMetadataFactory = $resourceMetadataFactory;
@@ -77,6 +78,7 @@ final class SwaggerUiAction
         $this->swaggerUiEnabled = $swaggerUiEnabled;
         $this->reDocEnabled = $reDocEnabled;
         $this->graphqlEnabled = $graphqlEnabled;
+        $this->graphiQlEnabled = $graphiQlEnabled;
 
         if (\is_array($formats)) {
             $this->formats = $formats;
@@ -119,6 +121,7 @@ final class SwaggerUiAction
             'swaggerUiEnabled' => $this->swaggerUiEnabled,
             'reDocEnabled' => $this->reDocEnabled,
             'graphqlEnabled' => $this->graphqlEnabled,
+            'graphiQlEnabled' => $this->graphiQlEnabled,
         ];
 
         $swaggerContext = ['spec_version' => $request->query->getInt('spec_version', 2)];

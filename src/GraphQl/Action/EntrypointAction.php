@@ -21,7 +21,6 @@ use GraphQL\Executor\ExecutionResult;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Twig\Environment as TwigEnvironment;
 
 /**
  * GraphQL API entrypoint.
@@ -32,25 +31,27 @@ final class EntrypointAction
 {
     private $schemaBuilder;
     private $executor;
-    private $twig;
+    private $graphiQlAction;
     private $debug;
-    private $title;
     private $graphiqlEnabled;
+    private $defaultIde;
 
-    public function __construct(SchemaBuilderInterface $schemaBuilder, ExecutorInterface $executor, TwigEnvironment $twig, bool $debug = false, bool $graphiqlEnabled = false, string $title = '')
+    public function __construct(SchemaBuilderInterface $schemaBuilder, ExecutorInterface $executor, GraphiQlAction $graphiQlAction, bool $debug = false, bool $graphiqlEnabled = false, $defaultIde = false)
     {
         $this->schemaBuilder = $schemaBuilder;
         $this->executor = $executor;
-        $this->twig = $twig;
+        $this->graphiQlAction = $graphiQlAction;
         $this->debug = $debug ? Debug::INCLUDE_DEBUG_MESSAGE | Debug::INCLUDE_TRACE : false;
         $this->graphiqlEnabled = $graphiqlEnabled;
-        $this->title = $title;
+        $this->defaultIde = $defaultIde;
     }
 
     public function __invoke(Request $request): Response
     {
-        if ($this->graphiqlEnabled && $request->isMethod('GET') && 'html' === $request->getRequestFormat()) {
-            return new Response($this->twig->render('@ApiPlatform/Graphiql/index.html.twig', ['title' => $this->title]));
+        if ($request->isMethod('GET') && 'html' === $request->getRequestFormat()) {
+            if ('graphiql' === $this->defaultIde && $this->graphiqlEnabled) {
+                return ($this->graphiQlAction)($request);
+            }
         }
 
         [$query, $operation, $variables] = $this->parseRequest($request);
