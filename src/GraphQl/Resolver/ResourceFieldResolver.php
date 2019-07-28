@@ -36,7 +36,7 @@ final class ResourceFieldResolver
         $this->iriConverter = $iriConverter;
     }
 
-    public function __invoke($source, $args, $context, ResolveInfo $info)
+    public function __invoke(?array $source, array $args, $context, ResolveInfo $info)
     {
         $property = null;
         if ('id' === $info->fieldName && !isset($source['_id']) && isset($source[ItemNormalizer::ITEM_RESOURCE_CLASS_KEY], $source[ItemNormalizer::ITEM_IDENTIFIERS_KEY])) {

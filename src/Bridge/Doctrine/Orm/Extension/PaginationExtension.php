@@ -285,7 +285,7 @@ final class PaginationExtension implements ContextAwareQueryResultCollectionExte
 
     private function addCountToContext(QueryBuilder $queryBuilder, array $context): array
     {
-        if (!($context['graphql'] ?? false)) {
+        if (!($context['graphql_operation_name'] ?? false)) {
             return $context;
         }
 

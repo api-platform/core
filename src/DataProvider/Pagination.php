@@ -70,7 +70,7 @@ final class Pagination
      */
     public function getOffset(string $resourceClass = null, string $operationName = null, array $context = []): int
     {
-        $graphql = $context['graphql'] ?? false;
+        $graphql = (bool) ($context['graphql_operation_name'] ?? false);
 
         $limit = $this->getLimit($resourceClass, $operationName, $context);
 
@@ -96,7 +96,7 @@ final class Pagination
      */
     public function getLimit(string $resourceClass = null, string $operationName = null, array $context = []): int
     {
-        $graphql = $context['graphql'] ?? false;
+        $graphql = (bool) ($context['graphql_operation_name'] ?? false);
 
         $limit = $this->options['items_per_page'];
         $clientLimit = $this->options['client_items_per_page'];

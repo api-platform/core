@@ -110,7 +110,7 @@ final class PaginationExtension implements AggregationResultCollectionExtensionI
 
     private function addCountToContext(Builder $aggregationBuilder, array $context): array
     {
-        if (!($context['graphql'] ?? false)) {
+        if (!($context['graphql_operation_name'] ?? false)) {
             return $context;
         }
 

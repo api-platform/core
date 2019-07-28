@@ -488,7 +488,7 @@ class PaginationExtensionTest extends TestCase
             $resourceMetadataFactory,
             $pagination
         );
-        $extension->applyToCollection($queryBuilder, new QueryNameGenerator(), 'Foo', 'op', ['filters' => ['pagination' => true, 'first' => 5, 'after' => 'OQ=='], 'graphql' => true]);
+        $extension->applyToCollection($queryBuilder, new QueryNameGenerator(), 'Foo', 'op', ['filters' => ['pagination' => true, 'first' => 5, 'after' => 'OQ=='], 'graphql_operation_name' => 'query']);
     }
 
     /**
