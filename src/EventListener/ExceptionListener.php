@@ -45,17 +45,18 @@ final class ExceptionListener
             return;
         }
 
-        // unwrap the exception thrown in handler for Symfony Messenger >= 4.3
         $exception = $event->getException();
-        if ($exception instanceof HandlerFailedException) {
-            /** @var \Throwable $previousException */
-            $previousException = $exception->getPrevious();
-            if (!$previousException instanceof \Exception) {
-                throw $previousException;
-            }
 
-            $event->setException($previousException);
+        // unwrap the exception thrown in handler for Symfony Messenger >= 4.3
+        while ($exception instanceof HandlerFailedException) {
+            /** @var \Throwable $exception */
+            $exception = $exception->getPrevious();
+            if (!$exception instanceof \Exception) {
+                throw $exception;
+            }
         }
+
+        $event->setException($exception);
 
         $this->exceptionListener->onKernelException($event);
     }
