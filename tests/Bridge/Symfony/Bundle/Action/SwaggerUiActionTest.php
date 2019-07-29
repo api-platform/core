@@ -77,6 +77,7 @@ class SwaggerUiActionTest extends TestCase
             'reDocEnabled' => false,
             'graphqlEnabled' => false,
             'graphiQlEnabled' => false,
+            'graphQlPlaygroundEnabled' => false,
             'swagger_data' => [
                 'url' => '/url',
                 'spec' => self::SPEC,
@@ -109,6 +110,7 @@ class SwaggerUiActionTest extends TestCase
             'reDocEnabled' => false,
             'graphqlEnabled' => false,
             'graphiQlEnabled' => false,
+            'graphQlPlaygroundEnabled' => false,
             'swagger_data' => [
                 'url' => '/url',
                 'spec' => self::SPEC,
@@ -162,6 +164,7 @@ class SwaggerUiActionTest extends TestCase
             'reDocEnabled' => false,
             'graphqlEnabled' => false,
             'graphiQlEnabled' => false,
+            'graphQlPlaygroundEnabled' => false,
             'swagger_data' => [
                 'url' => '/url',
                 'spec' => self::SPEC,
