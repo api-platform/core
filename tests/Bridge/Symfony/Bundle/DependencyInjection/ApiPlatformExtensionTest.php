@@ -335,6 +335,7 @@ class ApiPlatformExtensionTest extends TestCase
     {
         $containerBuilderProphecy = $this->getBaseContainerBuilderProphecy();
         $containerBuilderProphecy->setDefinition('api_platform.graphql.action.entrypoint', Argument::type(Definition::class))->shouldNotBeCalled();
+        $containerBuilderProphecy->setDefinition('api_platform.graphql.action.graphiql', Argument::type(Definition::class))->shouldNotBeCalled();
         $containerBuilderProphecy->setDefinition('api_platform.graphql.resolver.factory.collection', Argument::type(Definition::class))->shouldNotBeCalled();
         $containerBuilderProphecy->setDefinition('api_platform.graphql.resolver.factory.item_mutation', Argument::type(Definition::class))->shouldNotBeCalled();
         $containerBuilderProphecy->setDefinition('api_platform.graphql.resolver.factory.item', Argument::type(Definition::class))->shouldNotBeCalled();
@@ -356,8 +357,10 @@ class ApiPlatformExtensionTest extends TestCase
         $containerBuilderProphecy->setDefinition('api_platform.graphql.command.export_command', Argument::type(Definition::class))->shouldNotBeCalled();
         $containerBuilderProphecy->setParameter('api_platform.graphql.enabled', true)->shouldNotBeCalled();
         $containerBuilderProphecy->setParameter('api_platform.graphql.enabled', false)->shouldBeCalled();
+        $containerBuilderProphecy->setParameter('api_platform.graphql.default_ide', 'graphiql')->shouldNotBeCalled();
+        $containerBuilderProphecy->setParameter('api_platform.graphql.default_ide', Argument::any())->shouldNotBeCalled();
         $containerBuilderProphecy->setParameter('api_platform.graphql.graphiql.enabled', true)->shouldNotBeCalled();
-        $containerBuilderProphecy->setParameter('api_platform.graphql.graphiql.enabled', false)->shouldNotBeCalled();
+        $containerBuilderProphecy->setParameter('api_platform.graphql.graphiql.enabled', false)->shouldBeCalled();
         $containerBuilderProphecy->registerForAutoconfiguration(GraphQlTypeInterface::class)->shouldNotBeCalled();
         $this->childDefinitionProphecy->addTag('api_platform.graphql.type')->shouldNotBeCalled();
         $containerBuilderProphecy->registerForAutoconfiguration(QueryItemResolverInterface::class)->shouldNotBeCalled();
@@ -1046,6 +1049,7 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.enable_swagger_ui' => true,
             'api_platform.enable_re_doc' => true,
             'api_platform.graphql.enabled' => true,
+            'api_platform.graphql.default_ide' => 'graphiql',
             'api_platform.graphql.graphiql.enabled' => true,
             'api_platform.resource_class_directories' => Argument::type('array'),
             'api_platform.validator.serialize_payload_fields' => [],
@@ -1088,6 +1092,7 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.doctrine.orm.search_filter',
             'api_platform.doctrine.orm.subresource_data_provider',
             'api_platform.graphql.action.entrypoint',
+            'api_platform.graphql.action.graphiql',
             'api_platform.graphql.executor',
             'api_platform.graphql.type_builder',
             'api_platform.graphql.fields_builder',

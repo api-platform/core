@@ -32,6 +32,7 @@
             <argument>%api_platform.enable_swagger_ui%</argument>
             <argument>%api_platform.enable_re_doc%</argument>
             <argument>%api_platform.graphql.enabled%</argument>
+            <argument>%api_platform.graphql.graphiql.enabled%</argument>
         </service>
 
     </services>

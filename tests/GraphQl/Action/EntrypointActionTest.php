@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\GraphQl\Action;
 
 use ApiPlatform\Core\GraphQl\Action\EntrypointAction;
+use ApiPlatform\Core\GraphQl\Action\GraphiQlAction;
 use ApiPlatform\Core\GraphQl\ExecutorInterface;
 use ApiPlatform\Core\GraphQl\Type\SchemaBuilderInterface;
 use GraphQL\Executor\ExecutionResult;
@@ -23,6 +24,7 @@ use Prophecy\Argument;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\RouterInterface;
 use Twig\Environment as TwigEnvironment;
 
 /**
@@ -38,6 +40,15 @@ class EntrypointActionTest extends TestCase
         $expected->headers->remove('Date');
         $actual->headers->remove('Date');
         $this->assertEquals($expected, $actual);
+    }
+
+    public function testGetHtmlAction(): void
+    {
+        $request = new Request();
+        $request->setRequestFormat('html');
+        $mockedEntrypoint = $this->getEntrypointAction();
+
+        $this->assertInstanceOf(Response::class, $mockedEntrypoint($request));
     }
 
     public function testGetAction()
@@ -112,7 +123,10 @@ class EntrypointActionTest extends TestCase
         $executorProphecy->executeQuery(Argument::is($schema->reveal()), 'graphqlQuery', null, null, ['graphqlVariable'], 'graphqlOperationName')->willReturn($executionResultProphecy->reveal());
 
         $twigProphecy = $this->prophesize(TwigEnvironment::class);
+        $routerProphecy = $this->prophesize(RouterInterface::class);
 
-        return new EntrypointAction($schemaBuilderProphecy->reveal(), $executorProphecy->reveal(), $twigProphecy->reveal(), true, true, '');
+        $graphiQlAction = new GraphiQlAction($twigProphecy->reveal(), $routerProphecy->reveal(), true);
+
+        return new EntrypointAction($schemaBuilderProphecy->reveal(), $executorProphecy->reveal(), $graphiQlAction, true, true, 'graphiql');
     }
 }

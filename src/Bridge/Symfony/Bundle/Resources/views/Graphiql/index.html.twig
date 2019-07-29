@@ -6,6 +6,9 @@
 
     <link rel="stylesheet" href="{{ asset('bundles/apiplatform/graphiql/graphiql.css') }}">
     <link rel="stylesheet" href="{{ asset('bundles/apiplatform/graphiql-style.css') }}">
+
+    {# json_encode(65) is for JSON_UNESCAPED_SLASHES|JSON_HEX_TAG to avoid JS XSS #}
+    <script id="graphiql-data" type="application/json">{{ graphiql_data|json_encode(65)|raw }}</script>
 </head>
 
 <body>

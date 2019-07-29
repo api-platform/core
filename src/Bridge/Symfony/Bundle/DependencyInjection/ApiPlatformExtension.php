@@ -369,12 +369,13 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $enabled = $this->isConfigEnabled($container, $config['graphql']);
 
         $container->setParameter('api_platform.graphql.enabled', $enabled);
+        $container->setParameter('api_platform.graphql.graphiql.enabled', $enabled && $this->isConfigEnabled($container, $config['graphql']['graphiql']));
 
         if (!$enabled) {
             return;
         }
 
-        $container->setParameter('api_platform.graphql.graphiql.enabled', $this->isConfigEnabled($container, $config['graphql']['graphiql']));
+        $container->setParameter('api_platform.graphql.default_ide', $config['graphql']['default_ide']);
 
         $loader->load('graphql.xml');
 

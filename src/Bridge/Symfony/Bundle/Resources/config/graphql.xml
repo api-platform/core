@@ -112,8 +112,15 @@
         <service id="api_platform.graphql.action.entrypoint" class="ApiPlatform\Core\GraphQl\Action\EntrypointAction" public="true">
             <argument type="service" id="api_platform.graphql.schema_builder" />
             <argument type="service" id="api_platform.graphql.executor" />
-            <argument type="service" id="twig" />
+            <argument type="service" id="api_platform.graphql.action.graphiql" />
             <argument>%kernel.debug%</argument>
+            <argument>%api_platform.graphql.graphiql.enabled%</argument>
+            <argument>%api_platform.graphql.default_ide%</argument>
+        </service>
+
+        <service id="api_platform.graphql.action.graphiql" class="ApiPlatform\Core\GraphQl\Action\GraphiQlAction" public="true">
+            <argument type="service" id="twig" />
+            <argument type="service" id="api_platform.router" />
             <argument>%api_platform.graphql.graphiql.enabled%</argument>
             <argument>%api_platform.title%</argument>
         </service>

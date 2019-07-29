@@ -117,6 +117,7 @@ class ConfigurationTest extends TestCase
             'enable_profiler' => true,
             'graphql' => [
                 'enabled' => true,
+                'default_ide' => 'graphiql',
                 'graphiql' => [
                     'enabled' => true,
                 ],
