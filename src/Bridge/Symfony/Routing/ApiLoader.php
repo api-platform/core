@@ -53,10 +53,11 @@ final class ApiLoader extends Loader
     private $subresourceOperationFactory;
     private $graphqlEnabled;
     private $graphiQlEnabled;
+    private $graphQlPlaygroundEnabled;
     private $entrypointEnabled;
     private $docsEnabled;
 
-    public function __construct(KernelInterface $kernel, ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, ResourceMetadataFactoryInterface $resourceMetadataFactory, OperationPathResolverInterface $operationPathResolver, ContainerInterface $container, array $formats, array $resourceClassDirectories = [], SubresourceOperationFactoryInterface $subresourceOperationFactory = null, bool $graphqlEnabled = false, bool $entrypointEnabled = true, bool $docsEnabled = true, bool $graphiQlEnabled = false)
+    public function __construct(KernelInterface $kernel, ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, ResourceMetadataFactoryInterface $resourceMetadataFactory, OperationPathResolverInterface $operationPathResolver, ContainerInterface $container, array $formats, array $resourceClassDirectories = [], SubresourceOperationFactoryInterface $subresourceOperationFactory = null, bool $graphqlEnabled = false, bool $entrypointEnabled = true, bool $docsEnabled = true, bool $graphiQlEnabled = false, bool $graphQlPlaygroundEnabled = false)
     {
         /** @var string[]|string $paths */
         $paths = $kernel->locateResource('@ApiPlatformBundle/Resources/config/routing');
@@ -70,6 +71,7 @@ final class ApiLoader extends Loader
         $this->subresourceOperationFactory = $subresourceOperationFactory;
         $this->graphqlEnabled = $graphqlEnabled;
         $this->graphiQlEnabled = $graphiQlEnabled;
+        $this->graphQlPlaygroundEnabled = $graphQlPlaygroundEnabled;
         $this->entrypointEnabled = $entrypointEnabled;
         $this->docsEnabled = $docsEnabled;
     }
@@ -177,6 +179,12 @@ final class ApiLoader extends Loader
             $graphiQlCollection = $this->fileLoader->load('graphql/graphiql.xml');
             $graphiQlCollection->addDefaults(['_graphql' => true]);
             $routeCollection->addCollection($graphiQlCollection);
+        }
+
+        if ($this->graphQlPlaygroundEnabled) {
+            $graphQlPlaygroundCollection = $this->fileLoader->load('graphql/graphql_playground.xml');
+            $graphQlPlaygroundCollection->addDefaults(['_graphql' => true]);
+            $routeCollection->addCollection($graphQlPlaygroundCollection);
         }
 
         if (isset($this->formats['jsonld'])) {

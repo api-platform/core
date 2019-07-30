@@ -32,17 +32,21 @@ final class EntrypointAction
     private $schemaBuilder;
     private $executor;
     private $graphiQlAction;
+    private $graphQlPlaygroundAction;
     private $debug;
     private $graphiqlEnabled;
+    private $graphQlPlaygroundEnabled;
     private $defaultIde;
 
-    public function __construct(SchemaBuilderInterface $schemaBuilder, ExecutorInterface $executor, GraphiQlAction $graphiQlAction, bool $debug = false, bool $graphiqlEnabled = false, $defaultIde = false)
+    public function __construct(SchemaBuilderInterface $schemaBuilder, ExecutorInterface $executor, GraphiQlAction $graphiQlAction, GraphQlPlaygroundAction $graphQlPlaygroundAction, bool $debug = false, bool $graphiqlEnabled = false, bool $graphQlPlaygroundEnabled = false, $defaultIde = false)
     {
         $this->schemaBuilder = $schemaBuilder;
         $this->executor = $executor;
         $this->graphiQlAction = $graphiQlAction;
+        $this->graphQlPlaygroundAction = $graphQlPlaygroundAction;
         $this->debug = $debug ? Debug::INCLUDE_DEBUG_MESSAGE | Debug::INCLUDE_TRACE : false;
         $this->graphiqlEnabled = $graphiqlEnabled;
+        $this->graphQlPlaygroundEnabled = $graphQlPlaygroundEnabled;
         $this->defaultIde = $defaultIde;
     }
 
@@ -51,6 +55,10 @@ final class EntrypointAction
         if ($request->isMethod('GET') && 'html' === $request->getRequestFormat()) {
             if ('graphiql' === $this->defaultIde && $this->graphiqlEnabled) {
                 return ($this->graphiQlAction)($request);
+            }
+
+            if ('graphql-playground' === $this->defaultIde && $this->graphQlPlaygroundEnabled) {
+                return ($this->graphQlPlaygroundAction)($request);
             }
         }
 

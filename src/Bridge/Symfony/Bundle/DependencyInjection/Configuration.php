@@ -226,6 +226,9 @@ final class Configuration implements ConfigurationInterface
                         ->arrayNode('graphiql')
                             ->{class_exists(GraphQL::class) && class_exists(TwigBundle::class) ? 'canBeDisabled' : 'canBeEnabled'}()
                         ->end()
+                        ->arrayNode('graphql_playground')
+                            ->{class_exists(GraphQL::class) && class_exists(TwigBundle::class) ? 'canBeDisabled' : 'canBeEnabled'}()
+                        ->end()
                     ->end()
                 ->end()
             ->end();

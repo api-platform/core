@@ -19,13 +19,8 @@
 }
 
 .graphiql-container {
-  display: -webkit-box;
-  display: -ms-flexbox;
   display: flex;
-  -webkit-box-orient: horizontal;
-  -webkit-box-direction: normal;
-      -ms-flex-direction: row;
-          flex-direction: row;
+  flex-direction: row;
   height: 100%;
   margin: 0;
   overflow: hidden;
@@ -33,16 +28,9 @@
 }
 
 .graphiql-container .editorWrap {
-  display: -webkit-box;
-  display: -ms-flexbox;
   display: flex;
-  -webkit-box-orient: vertical;
-  -webkit-box-direction: normal;
-      -ms-flex-direction: column;
-          flex-direction: column;
-  -webkit-box-flex: 1;
-      -ms-flex: 1;
-          flex: 1;
+  flex-direction: column;
+  flex: 1;
   overflow-x: hidden;
 }
 
@@ -56,33 +44,18 @@
 }
 
 .graphiql-container .topBarWrap {
-  display: -webkit-box;
-  display: -ms-flexbox;
   display: flex;
-  -webkit-box-orient: horizontal;
-  -webkit-box-direction: normal;
-      -ms-flex-direction: row;
-          flex-direction: row;
+  flex-direction: row;
 }
 
 .graphiql-container .topBar {
-  -webkit-box-align: center;
-      -ms-flex-align: center;
-          align-items: center;
-  background: -webkit-gradient(linear, left top, left bottom, from(#f7f7f7), to(#e2e2e2));
+  align-items: center;
   background: linear-gradient(#f7f7f7, #e2e2e2);
   border-bottom: 1px solid #d0d0d0;
   cursor: default;
-  display: -webkit-box;
-  display: -ms-flexbox;
   display: flex;
-  -webkit-box-orient: horizontal;
-  -webkit-box-direction: normal;
-      -ms-flex-direction: row;
-          flex-direction: row;
-  -webkit-box-flex: 1;
-      -ms-flex: 1;
-          flex: 1;
+  flex-direction: row;
+  flex: 1;
   height: 34px;
   overflow-y: visible;
   padding: 7px 14px 6px;
@@ -94,14 +67,11 @@
 
 .graphiql-container .toolbar {
   overflow-x: visible;
-  display: -webkit-box;
-  display: -ms-flexbox;
   display: flex;
 }
 
 .graphiql-container .docExplorerShow,
 .graphiql-container .historyShow {
-  background: -webkit-gradient(linear, left top, left bottom, from(#f7f7f7), to(#e2e2e2));
   background: linear-gradient(#f7f7f7, #e2e2e2);
   border-radius: 0;
   border-bottom: 1px solid #d0d0d0;
@@ -132,57 +102,35 @@
   height: 9px;
   margin: 0 3px -1px 0;
   position: relative;
-  -webkit-transform: rotate(-45deg);
-          transform: rotate(-45deg);
+  -ms-transform: rotate(-45deg);
+      transform: rotate(-45deg);
   width: 9px;
 }
 
 .graphiql-container .editorBar {
-  display: -webkit-box;
-  display: -ms-flexbox;
   display: flex;
-  -webkit-box-orient: horizontal;
-  -webkit-box-direction: normal;
-      -ms-flex-direction: row;
-          flex-direction: row;
-  -webkit-box-flex: 1;
-      -ms-flex: 1;
-          flex: 1;
+  flex-direction: row;
+  flex: 1;
 }
 
 .graphiql-container .queryWrap {
-  display: -webkit-box;
-  display: -ms-flexbox;
   display: flex;
-  -webkit-box-orient: vertical;
-  -webkit-box-direction: normal;
-      -ms-flex-direction: column;
-          flex-direction: column;
-  -webkit-box-flex: 1;
-      -ms-flex: 1;
-          flex: 1;
+  flex-direction: column;
+  flex: 1;
 }
 
 .graphiql-container .resultWrap {
   border-left: solid 1px #e0e0e0;
-  display: -webkit-box;
-  display: -ms-flexbox;
   display: flex;
-  -webkit-box-orient: vertical;
-  -webkit-box-direction: normal;
-      -ms-flex-direction: column;
-          flex-direction: column;
-  -webkit-box-flex: 1;
-      -ms-flex: 1;
-          flex: 1;
+  flex-direction: column;
+  flex: 1;
   position: relative;
 }
 
 .graphiql-container .docExplorerWrap,
 .graphiql-container .historyPaneWrap {
   background: white;
-  -webkit-box-shadow: 0 0 8px rgba(0, 0, 0, 0.15);
-          box-shadow: 0 0 8px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.15);
   position: relative;
   z-index: 3;
 }
@@ -210,21 +158,14 @@
 }
 
 .graphiql-container div .query-editor {
-  -webkit-box-flex: 1;
-      -ms-flex: 1;
-          flex: 1;
+  flex: 1;
   position: relative;
 }
 
 .graphiql-container .variable-editor {
-  display: -webkit-box;
-  display: -ms-flexbox;
   display: flex;
-  -webkit-box-orient: vertical;
-  -webkit-box-direction: normal;
-      -ms-flex-direction: column;
-          flex-direction: column;
-  height: 29px;
+  flex-direction: column;
+  height: 30px;
   position: relative;
 }
 
@@ -246,17 +187,13 @@
 }
 
 .graphiql-container .codemirrorWrap {
-  -webkit-box-flex: 1;
-      -ms-flex: 1;
-          flex: 1;
+  flex: 1;
   height: 100%;
   position: relative;
 }
 
 .graphiql-container .result-window {
-  -webkit-box-flex: 1;
-      -ms-flex: 1;
-          flex: 1;
+  flex: 1;
   height: 100%;
   position: relative;
 }
@@ -298,14 +235,9 @@
 
 .graphiql-container .toolbar-button {
   background: #fdfdfd;
-  background: -webkit-gradient(linear, left top, left bottom, from(#f9f9f9), to(#ececec));
   background: linear-gradient(#f9f9f9, #ececec);
   border-radius: 3px;
-  -webkit-box-shadow:
-    inset 0 0 0 1px rgba(0,0,0,0.20),
-    0 1px 0 rgba(255,255,255, 0.7),
-    inset 0 1px #fff;
-          box-shadow:
+  box-shadow:
     inset 0 0 0 1px rgba(0,0,0,0.20),
     0 1px 0 rgba(255,255,255, 0.7),
     inset 0 1px #fff;
@@ -321,14 +253,8 @@
 }
 
 .graphiql-container .toolbar-button:active {
-  background: -webkit-gradient(linear, left top, left bottom, from(#ececec), to(#d5d5d5));
   background: linear-gradient(#ececec, #d5d5d5);
-  -webkit-box-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.7),
-    inset 0 0 0 1px rgba(0,0,0,0.10),
-    inset 0 1px 1px 1px rgba(0, 0, 0, 0.12),
-    inset 0 0 5px rgba(0, 0, 0, 0.1);
-          box-shadow:
+  box-shadow:
     0 1px 0 rgba(255, 255, 255, 0.7),
     inset 0 0 0 1px rgba(0,0,0,0.10),
     inset 0 1px 1px 1px rgba(0, 0, 0, 0.12),
@@ -336,7 +262,6 @@
 }
 
 .graphiql-container .toolbar-button.error {
-  background: -webkit-gradient(linear, left top, left bottom, from(#fdf3f3), to(#e6d6d7));
   background: linear-gradient(#fdf3f3, #e6d6d7);
   color: #b00;
 }
@@ -368,12 +293,10 @@
 }
 
 .graphiql-container .execute-button {
-  background: -webkit-gradient(linear, left top, left bottom, from(#fdfdfd), to(#d2d3d6));
   background: linear-gradient(#fdfdfd, #d2d3d6);
   border-radius: 17px;
   border: 1px solid rgba(0,0,0,0.25);
-  -webkit-box-shadow: 0 1px 0 #fff;
-          box-shadow: 0 1px 0 #fff;
+  box-shadow: 0 1px 0 #fff;
   cursor: pointer;
   fill: #444;
   height: 34px;
@@ -387,13 +310,8 @@
 }
 
 .graphiql-container .execute-button:active {
-  background: -webkit-gradient(linear, left top, left bottom, from(#e6e6e6), to(#c3c3c3));
   background: linear-gradient(#e6e6e6, #c3c3c3);
-  -webkit-box-shadow:
-    0 1px 0 #fff,
-    inset 0 0 2px rgba(0, 0, 0, 0.2),
-    inset 0 0 6px rgba(0, 0, 0, 0.1);
-          box-shadow:
+  box-shadow:
     0 1px 0 #fff,
     inset 0 0 2px rgba(0, 0, 0, 0.2),
     inset 0 0 6px rgba(0, 0, 0, 0.1);
@@ -412,10 +330,7 @@
 .graphiql-container .toolbar-menu-items,
 .graphiql-container .toolbar-select-options {
   background: #fff;
-  -webkit-box-shadow:
-    0 0 0 1px rgba(0,0,0,0.1),
-    0 2px 4px rgba(0,0,0,0.25);
-          box-shadow:
+  box-shadow:
     0 0 0 1px rgba(0,0,0,0.1),
     0 2px 4px rgba(0,0,0,0.25);
   margin: 0;
@@ -520,8 +435,6 @@
 .CodeMirror-hint-information .content {
   box-orient: vertical;
   color: #141823;
-  display: -webkit-box;
-  display: -ms-flexbox;
   display: flex;
   font-family: system, -apple-system, 'San Francisco', '.SFNSDisplay-Regular', 'Segoe UI', Segoe, 'Segoe WP', 'Helvetica Neue', helvetica, 'Lucida Grande', arial, sans-serif;
   font-size: 13px;
@@ -548,26 +461,12 @@
 }
 
 .autoInsertedLeaf.cm-property {
-  -webkit-animation-duration: 6s;
-          animation-duration: 6s;
-  -webkit-animation-name: insertionFade;
-          animation-name: insertionFade;
+  animation-duration: 6s;
+  animation-name: insertionFade;
   border-bottom: 2px solid rgba(255, 255, 255, 0);
   border-radius: 2px;
   margin: -2px -4px -1px;
   padding: 2px 4px 1px;
-}
-
-@-webkit-keyframes insertionFade {
-  from, to {
-    background: rgba(255, 255, 255, 0);
-    border-color: rgba(255, 255, 255, 0);
-  }
-
-  15%, 85% {
-    background: #fbffc9;
-    border-color: #f0f3c0;
-  }
 }
 
 @keyframes insertionFade {
@@ -587,27 +486,12 @@ div.CodeMirror-lint-tooltip {
   border-radius: 2px;
   border: 0;
   color: #141823;
-  -webkit-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.45);
-          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.45);
-  font-family:
-    system,
-    -apple-system,
-    'San Francisco',
-    '.SFNSDisplay-Regular',
-    'Segoe UI',
-    Segoe,
-    'Segoe WP',
-    'Helvetica Neue',
-    helvetica,
-    'Lucida Grande',
-    arial,
-    sans-serif;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.45);
   font-size: 13px;
   line-height: 16px;
   max-width: 430px;
   opacity: 0;
   padding: 8px 10px;
-  -webkit-transition: opacity 0.15s;
   transition: opacity 0.15s;
   white-space: pre-wrap;
 }
@@ -625,12 +509,8 @@ div.CodeMirror-lint-tooltip > * + * {
 .graphiql-container .CodeMirror-foldmarker {
   border-radius: 4px;
   background: #08f;
-  background: -webkit-gradient(linear, left top, left bottom, from(#43A8FF), to(#0F83E8));
   background: linear-gradient(#43A8FF, #0F83E8);
-  -webkit-box-shadow:
-    0 1px 1px rgba(0, 0, 0, 0.2),
-    inset 0 0 0 1px rgba(0, 0, 0, 0.1);
-          box-shadow:
+  box-shadow:
     0 1px 1px rgba(0, 0, 0, 0.2),
     inset 0 0 0 1px rgba(0, 0, 0, 0.1);
   color: white;
@@ -780,15 +660,9 @@ div.CodeMirror-lint-tooltip > * + * {
 }
 
 .cm-animate-fat-cursor {
-  -webkit-animation: blink 1.06s steps(1) infinite;
-          animation: blink 1.06s steps(1) infinite;
+  animation: blink 1.06s steps(1) infinite;
   border: 0;
   width: auto;
-}
-@-webkit-keyframes blink {
-  0% { background: #7e7; }
-  50% { background: none; }
-  100% { background: #7e7; }
 }
 @keyframes blink {
   0% { background: #7e7; }
@@ -953,8 +827,7 @@ div.CodeMirror span.CodeMirror-nonmatchingbracket {color: #f22;}
   color: inherit;
   font-family: inherit;
   font-size: inherit;
-  -webkit-font-variant-ligatures: none;
-          font-variant-ligatures: none;
+  font-variant-ligatures: none;
   line-height: inherit;
   margin: 0;
   overflow: visible;
@@ -993,8 +866,7 @@ div.CodeMirror span.CodeMirror-nonmatchingbracket {color: #f22;}
 .CodeMirror-gutter,
 .CodeMirror-gutters,
 .CodeMirror-linenumber {
-  -webkit-box-sizing: content-box;
-          box-sizing: content-box;
+  box-sizing: content-box;
 }
 
 .CodeMirror-measure {
@@ -1024,7 +896,6 @@ div.CodeMirror-dragcursors {
 .CodeMirror-selected { background: #d9d9d9; }
 .CodeMirror-focused .CodeMirror-selected { background: #d7d4f0; }
 .CodeMirror-crosshair { cursor: crosshair; }
-.CodeMirror-line::-moz-selection, .CodeMirror-line > span::-moz-selection, .CodeMirror-line > span > span::-moz-selection { background: #d7d4f0; }
 .CodeMirror-line::selection, .CodeMirror-line > span::selection, .CodeMirror-line > span > span::selection { background: #d7d4f0; }
 .CodeMirror-line::-moz-selection, .CodeMirror-line > span::-moz-selection, .CodeMirror-line > span > span::-moz-selection { background: #d7d4f0; }
 
@@ -1091,8 +962,6 @@ span.CodeMirror-selectedtext { background: none; }
 .graphiql-container .doc-explorer-title-bar,
 .graphiql-container .history-title-bar {
   cursor: default;
-  display: -webkit-box;
-  display: -ms-flexbox;
   display: flex;
   height: 34px;
   line-height: 14px;
@@ -1106,18 +975,16 @@ span.CodeMirror-selectedtext { background: none; }
 
 .graphiql-container .doc-explorer-title,
 .graphiql-container .history-title {
-  -webkit-box-flex: 1;
-      -ms-flex: 1;
-          flex: 1;
+  flex: 1;
   font-weight: bold;
   overflow-x: hidden;
   padding: 10px 0 10px 10px;
   text-align: center;
   text-overflow: ellipsis;
-  -webkit-user-select: initial;
-     -moz-user-select: initial;
-      -ms-user-select: initial;
-          user-select: initial;
+  -webkit-user-select: text;
+     -moz-user-select: text;
+      -ms-user-select: text;
+          user-select: text;
   white-space: nowrap;
 }
 
@@ -1143,8 +1010,8 @@ span.CodeMirror-selectedtext { background: none; }
   height: 9px;
   margin: 0 3px -1px 0;
   position: relative;
-  -webkit-transform: rotate(-45deg);
-          transform: rotate(-45deg);
+  -ms-transform: rotate(-45deg);
+      transform: rotate(-45deg);
   width: 9px;
 }
 
@@ -1265,8 +1132,7 @@ span.CodeMirror-selectedtext { background: none; }
 
 .graphiql-container .doc-deprecation {
   background: #fffae8;
-  -webkit-box-shadow: inset 0 0 1px #bfb063;
-          box-shadow: inset 0 0 1px #bfb063;
+  box-shadow: inset 0 0 1px #bfb063;
   color: #867F70;
   line-height: 16px;
   margin: 8px -8px;
@@ -1309,8 +1175,7 @@ span.CodeMirror-selectedtext { background: none; }
   text-align: center;
   padding: 8px 12px 10px;
   width: 100%;
-  -webkit-box-sizing: border-box;
-          box-sizing: border-box;
+  box-sizing: border-box;
   background: #fbfcfc;
   color: #555;
   cursor: pointer;
@@ -1331,8 +1196,8 @@ span.CodeMirror-selectedtext { background: none; }
   font-size: 24px;
   position: absolute;
   top: -2px;
-  -webkit-transform: rotate(-45deg);
-          transform: rotate(-45deg);
+  -ms-transform: rotate(-45deg);
+      transform: rotate(-45deg);
   -webkit-user-select: none;
      -moz-user-select: none;
       -ms-user-select: none;
@@ -1361,8 +1226,7 @@ span.CodeMirror-selectedtext { background: none; }
 
 .graphiql-container .search-box > input {
   border: none;
-  -webkit-box-sizing: border-box;
-          box-sizing: border-box;
+  box-sizing: border-box;
   font-size: 14px;
   outline: none;
   padding: 6px 24px 8px 20px;
@@ -1379,8 +1243,8 @@ span.CodeMirror-selectedtext { background: none; }
   text-align: center;
   text-transform: uppercase;
   top: 50%;
-  -webkit-transform: translate(0, -50%);
-          transform: translate(0, -50%);
+  -ms-transform: translate(0, -50%);
+      transform: translate(0, -50%);
 }
 .CodeMirror-foldmarker {
   color: blue;
@@ -1402,12 +1266,15 @@ span.CodeMirror-selectedtext { background: none; }
 .CodeMirror-foldgutter-folded:after {
   content: "\25B8";
 }
-.graphiql-container .history-contents {
+.graphiql-container .history-contents,
+.graphiql-container .history-contents input {
   font-family: 'Consolas', 'Inconsolata', 'Droid Sans Mono', 'Monaco', monospace;
   padding: 0;
 }
 
 .graphiql-container .history-contents p {
+  align-items: center;
+  display: flex;
   font-size: 12px;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -1417,16 +1284,29 @@ span.CodeMirror-selectedtext { background: none; }
   border-bottom: 1px solid #e0e0e0;
 }
 
+.graphiql-container .history-contents p.editable {
+  padding-bottom: 6px;
+  padding-top: 7px;
+}
+
+.graphiql-container .history-contents input {
+  flex-grow: 1;
+  font-size: 12px;
+}
+
 .graphiql-container .history-contents p:hover {
   cursor: pointer;
 }
-.CodeMirror-info {
+
+.graphiql-container .history-contents p span.history-label {
+  flex-grow: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}.CodeMirror-info {
   background: white;
   border-radius: 2px;
-  -webkit-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.45);
-          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.45);
-  -webkit-box-sizing: border-box;
-          box-sizing: border-box;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.45);
+  box-sizing: border-box;
   color: #555;
   font-family:
     system,
@@ -1449,7 +1329,6 @@ span.CodeMirror-selectedtext { background: none; }
   overflow: hidden;
   padding: 8px 8px;
   position: fixed;
-  -webkit-transition: opacity 0.15s;
   transition: opacity 0.15s;
   z-index: 50;
 }
@@ -1476,8 +1355,7 @@ span.CodeMirror-selectedtext { background: none; }
 
 .CodeMirror-info .info-deprecation {
   background: #fffae8;
-  -webkit-box-shadow: inset 0 1px 1px -1px #bfb063;
-          box-shadow: inset 0 1px 1px -1px #bfb063;
+  box-shadow: inset 0 1px 1px -1px #bfb063;
   color: #867F70;
   line-height: 16px;
   margin: -8px;
@@ -1555,7 +1433,6 @@ span.CodeMirror-selectedtext { background: none; }
   overflow: hidden;
   padding: 2px 5px;
   position: fixed;
-  -webkit-transition: opacity .4s;
   transition: opacity .4s;
   white-space: pre-wrap;
   z-index: 100;
@@ -1612,15 +1489,14 @@ span.CodeMirror-selectedtext { background: none; }
   left: 50%;
   position: absolute;
   top: 50%;
-  -webkit-transform: translate(-50%, -50%);
-          transform: translate(-50%, -50%);
+  -ms-transform: translate(-50%, -50%);
+      transform: translate(-50%, -50%);
   width: 36px;
   z-index: 10;
 }
 
 .graphiql-container .spinner {
-  -webkit-animation: rotation .6s infinite linear;
-          animation: rotation .6s infinite linear;
+  animation: rotation .6s infinite linear;
   border-bottom: 6px solid rgba(150, 150, 150, .15);
   border-left: 6px solid rgba(150, 150, 150, .15);
   border-radius: 100%;
@@ -1633,19 +1509,13 @@ span.CodeMirror-selectedtext { background: none; }
   width: 24px;
 }
 
-@-webkit-keyframes rotation {
-  from { -webkit-transform: rotate(0deg); transform: rotate(0deg); }
-  to { -webkit-transform: rotate(359deg); transform: rotate(359deg); }
-}
-
 @keyframes rotation {
-  from { -webkit-transform: rotate(0deg); transform: rotate(0deg); }
-  to { -webkit-transform: rotate(359deg); transform: rotate(359deg); }
+  from { transform: rotate(0deg); }
+  to { transform: rotate(359deg); }
 }
 .CodeMirror-hints {
   background: white;
-  -webkit-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.45);
-          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.45);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.45);
   font-family: 'Consolas', 'Inconsolata', 'Droid Sans Mono', 'Monaco', monospace;
   font-size: 13px;
   list-style: none;
@@ -1692,8 +1562,7 @@ li.CodeMirror-hint-active {
 
 .CodeMirror-hint-deprecation {
   background: #fffae8;
-  -webkit-box-shadow: inset 0 1px 1px -1px #bfb063;
-          box-shadow: inset 0 1px 1px -1px #bfb063;
+  box-shadow: inset 0 1px 1px -1px #bfb063;
   color: #867F70;
   font-family:
     system,
