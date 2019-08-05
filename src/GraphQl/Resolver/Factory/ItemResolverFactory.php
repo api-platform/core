@@ -13,19 +13,15 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\GraphQl\Resolver\Factory;
 
-use ApiPlatform\Core\Api\IriConverterInterface;
-use ApiPlatform\Core\Exception\ItemNotFoundException;
-use ApiPlatform\Core\GraphQl\Resolver\FieldsToAttributesTrait;
 use ApiPlatform\Core\GraphQl\Resolver\QueryItemResolverInterface;
-use ApiPlatform\Core\GraphQl\Resolver\ResourceAccessCheckerTrait;
-use ApiPlatform\Core\GraphQl\Serializer\ItemNormalizer;
+use ApiPlatform\Core\GraphQl\Resolver\Stage\DenyAccessStageInterface;
+use ApiPlatform\Core\GraphQl\Resolver\Stage\ReadStageInterface;
+use ApiPlatform\Core\GraphQl\Resolver\Stage\SerializeStageInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
-use ApiPlatform\Core\Security\ResourceAccessCheckerInterface;
 use ApiPlatform\Core\Util\ClassInfoTrait;
 use GraphQL\Error\Error;
 use GraphQL\Type\Definition\ResolveInfo;
 use Psr\Container\ContainerInterface;
-use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 /**
  * Creates a function retrieving an item to resolve a GraphQL query.
@@ -38,45 +34,42 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 final class ItemResolverFactory implements ResolverFactoryInterface
 {
     use ClassInfoTrait;
-    use FieldsToAttributesTrait;
-    use ResourceAccessCheckerTrait;
 
-    private $iriConverter;
+    private $readStage;
+    private $denyAccessStage;
+    private $serializeStage;
     private $queryResolverLocator;
-    private $resourceAccessChecker;
-    private $normalizer;
     private $resourceMetadataFactory;
 
-    public function __construct(IriConverterInterface $iriConverter, ContainerInterface $queryResolverLocator, NormalizerInterface $normalizer, ResourceMetadataFactoryInterface $resourceMetadataFactory, ResourceAccessCheckerInterface $resourceAccessChecker = null)
+    public function __construct(ReadStageInterface $readStage, DenyAccessStageInterface $denyAccessStage, SerializeStageInterface $serializeStage, ContainerInterface $queryResolverLocator, ResourceMetadataFactoryInterface $resourceMetadataFactory)
     {
-        $this->iriConverter = $iriConverter;
+        $this->readStage = $readStage;
+        $this->denyAccessStage = $denyAccessStage;
+        $this->serializeStage = $serializeStage;
         $this->queryResolverLocator = $queryResolverLocator;
-        $this->normalizer = $normalizer;
         $this->resourceMetadataFactory = $resourceMetadataFactory;
-        $this->resourceAccessChecker = $resourceAccessChecker;
     }
 
     public function __invoke(?string $resourceClass = null, ?string $rootClass = null, ?string $operationName = null): callable
     {
-        return function ($source, $args, $context, ResolveInfo $info) use ($resourceClass, $operationName) {
+        return function (?array $source, array $args, $context, ResolveInfo $info) use ($resourceClass, $rootClass, $operationName) {
             // Data already fetched and normalized (field or nested resource)
             if (isset($source[$info->fieldName])) {
                 return $source[$info->fieldName];
             }
 
-            $item = null;
-            $resourceClass = $this->getResourceClass($item, $resourceClass, $info);
-            $resourceMetadata = $resourceClass ? $this->resourceMetadataFactory->create($resourceClass) : null;
-            $baseNormalizationContext = ['attributes' => $this->fieldsToAttributes($info)];
+            $operationName = $operationName ?? 'query';
+            $resolverContext = ['source' => $source, 'args' => $args, 'info' => $info, 'is_collection' => false, 'is_mutation' => false];
 
-            if (!$resourceMetadata || $resourceMetadata->getGraphqlAttribute($operationName ?? 'query', 'read', true, true)) {
-                $item = $this->getItem($args, $baseNormalizationContext);
-
-                $resourceClass = $this->getResourceClass($item, $resourceClass, $info);
-                $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
+            $item = $this->readStage->apply($resourceClass, $rootClass, $operationName, $resolverContext);
+            if (null !== $item && !\is_object($item)) {
+                throw new \LogicException('Item from read stage should be a nullable object.');
             }
 
-            $queryResolverId = $resourceMetadata->getGraphqlAttribute($operationName ?? 'query', 'item_query');
+            $resourceClass = $this->getResourceClass($item, $resourceClass, $info);
+            $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
+
+            $queryResolverId = $resourceMetadata->getGraphqlAttribute($operationName, 'item_query');
             if (null !== $queryResolverId) {
                 /** @var QueryItemResolverInterface $queryResolver */
                 $queryResolver = $this->queryResolverLocator->get($queryResolverId);
@@ -84,38 +77,15 @@ final class ItemResolverFactory implements ResolverFactoryInterface
                 $resourceClass = $this->getResourceClass($item, $resourceClass, $info, sprintf('Custom query resolver "%s"', $queryResolverId).' has to return an item of class %s but returned an item of class %s.');
             }
 
-            $this->canAccess($this->resourceAccessChecker, $resourceMetadata, $resourceClass, $info, [
-                'object' => $item,
-                'previous_object' => \is_object($item) ? clone $item : $item,
-            ], $operationName ?? 'query');
+            $this->denyAccessStage->apply($resourceClass, $operationName, $resolverContext + [
+                'extra_variables' => [
+                    'object' => $item,
+                    'previous_object' => \is_object($item) ? clone $item : $item,
+                ],
+            ]);
 
-            $normalizationContext = $resourceMetadata->getGraphqlAttribute($operationName ?? 'query', 'normalization_context', [], true);
-            $normalizationContext['resource_class'] = $resourceClass;
-
-            if ($resourceMetadata->getGraphqlAttribute($operationName ?? 'query', 'serialize', true, true)) {
-                return $this->normalizer->normalize($item, ItemNormalizer::FORMAT, $normalizationContext + $baseNormalizationContext);
-            }
-
-            return null;
+            return $this->serializeStage->apply($item, $resourceClass, $operationName, $resolverContext);
         };
-    }
-
-    /**
-     * @return object|null
-     */
-    private function getItem($args, array $baseNormalizationContext)
-    {
-        if (!isset($args['id'])) {
-            return null;
-        }
-
-        try {
-            $item = $this->iriConverter->getItemFromIri($args['id'], $baseNormalizationContext);
-        } catch (ItemNotFoundException $e) {
-            return null;
-        }
-
-        return $item;
     }
 
     /**
@@ -123,9 +93,13 @@ final class ItemResolverFactory implements ResolverFactoryInterface
      *
      * @throws Error
      */
-    private function getResourceClass($item, ?string $resourceClass, ResolveInfo $info, string $errorMessage = 'Resolver only handles items of class %s but retrieved item is of class %s.'): ?string
+    private function getResourceClass($item, ?string $resourceClass, ResolveInfo $info, string $errorMessage = 'Resolver only handles items of class %s but retrieved item is of class %s.'): string
     {
         if (null === $item) {
+            if (null === $resourceClass) {
+                throw Error::createLocatedError('Resource class cannot be determined.', $info->fieldNodes, $info->path);
+            }
+
             return $resourceClass;
         }
 

@@ -207,7 +207,7 @@ class PaginationExtensionTest extends TestCase
 
         $aggregationBuilderProphecy = $this->mockAggregationBuilder(10, 5);
 
-        $context = ['filters' => ['pagination' => true, 'first' => 5, 'after' => 'OQ=='], 'graphql' => true];
+        $context = ['filters' => ['pagination' => true, 'first' => 5, 'after' => 'OQ=='], 'graphql_operation_name' => 'query'];
 
         $extension = new PaginationExtension(
             $this->managerRegistryProphecy->reveal(),
@@ -240,7 +240,7 @@ class PaginationExtensionTest extends TestCase
         $countProphecy->execute()->shouldBeCalled()->willReturn($iteratorProphecy->reveal());
         $aggregationBuilderProphecy->count('count')->shouldBeCalled()->willReturn($countProphecy->reveal());
 
-        $context = ['filters' => ['pagination' => true, 'last' => 5], 'graphql' => true];
+        $context = ['filters' => ['pagination' => true, 'last' => 5], 'graphql_operation_name' => 'query'];
 
         $extension = new PaginationExtension(
             $this->managerRegistryProphecy->reveal(),

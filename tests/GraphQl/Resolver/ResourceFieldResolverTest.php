@@ -53,7 +53,6 @@ class ResourceFieldResolverTest extends TestCase
 
         $resolver = new ResourceFieldResolver($iriConverterProphecy->reveal());
         $this->assertEquals('bar', $resolver(['foo' => 'bar'], [], [], $resolveInfo));
-        $this->assertEquals('bar', $resolver((object) ['foo' => 'bar'], [], [], $resolveInfo));
     }
 
     public function testNonResource()

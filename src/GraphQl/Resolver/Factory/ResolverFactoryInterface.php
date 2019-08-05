@@ -22,5 +22,5 @@ namespace ApiPlatform\Core\GraphQl\Resolver\Factory;
  */
 interface ResolverFactoryInterface
 {
-    public function __invoke(string $resourceClass = null, string $rootClass = null, string $operationName = null): callable;
+    public function __invoke(?string $resourceClass = null, ?string $rootClass = null, ?string $operationName = null): callable;
 }
