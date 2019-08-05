@@ -15,9 +15,10 @@ namespace ApiPlatform\Core\Tests\Bridge\Doctrine\MongoDbOdm;
 
 use ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Paginator;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
+use ApiPlatform\Core\Test\DoctrineMongoDbOdmSetup;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\Dummy;
+use Doctrine\ODM\MongoDB\DocumentManager;
 use Doctrine\ODM\MongoDB\Iterator\Iterator;
-use Doctrine\ODM\MongoDB\UnitOfWork;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -129,9 +130,11 @@ class PaginatorTest extends TestCase
             ],
         ]);
 
-        $unitOfWork = $this->prophesize(UnitOfWork::class);
+        $fixturesPath = \dirname((string) (new \ReflectionClass(Dummy::class))->getFileName());
+        $config = DoctrineMongoDbOdmSetup::createAnnotationMetadataConfiguration([$fixturesPath], true);
+        $documentManager = DocumentManager::create(null, $config);
 
-        return new Paginator($iterator->reveal(), $unitOfWork->reveal(), Dummy::class, $pipeline);
+        return new Paginator($iterator->reveal(), $documentManager->getUnitOfWork(), Dummy::class, $pipeline);
     }
 
     private function getPaginatorWithMissingStage($facet = false, $results = false, $count = false, $maxResults = false)
@@ -157,9 +160,12 @@ class PaginatorTest extends TestCase
         }
 
         $iterator = $this->prophesize(Iterator::class);
-        $unitOfWork = $this->prophesize(UnitOfWork::class);
 
-        return new Paginator($iterator->reveal(), $unitOfWork->reveal(), Dummy::class, $pipeline);
+        $fixturesPath = \dirname((string) (new \ReflectionClass(Dummy::class))->getFileName());
+        $config = DoctrineMongoDbOdmSetup::createAnnotationMetadataConfiguration([$fixturesPath], true);
+        $documentManager = DocumentManager::create(null, $config);
+
+        return new Paginator($iterator->reveal(), $documentManager->getUnitOfWork(), Dummy::class, $pipeline);
     }
 
     private function getPaginatorWithNoCount($firstResult = 1, $maxResults = 15)
@@ -184,9 +190,12 @@ class PaginatorTest extends TestCase
                 'results' => [],
             ],
         ]);
-        $unitOfWork = $this->prophesize(UnitOfWork::class);
 
-        return new Paginator($iterator->reveal(), $unitOfWork->reveal(), Dummy::class, $pipeline);
+        $fixturesPath = \dirname((string) (new \ReflectionClass(Dummy::class))->getFileName());
+        $config = DoctrineMongoDbOdmSetup::createAnnotationMetadataConfiguration([$fixturesPath], true);
+        $documentManager = DocumentManager::create(null, $config);
+
+        return new Paginator($iterator->reveal(), $documentManager->getUnitOfWork(), Dummy::class, $pipeline);
     }
 
     public function initializeProvider()

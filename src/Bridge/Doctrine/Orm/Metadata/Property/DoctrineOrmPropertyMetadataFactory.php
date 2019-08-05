@@ -49,11 +49,7 @@ final class DoctrineOrmPropertyMetadataFactory implements PropertyMetadataFactor
         if (!$manager) {
             return $propertyMetadata;
         }
-
         $doctrineClassMetadata = $manager->getClassMetadata($resourceClass);
-        if (!$doctrineClassMetadata) {
-            return $propertyMetadata;
-        }
 
         $identifiers = $doctrineClassMetadata->getIdentifier();
         foreach ($identifiers as $identifier) {

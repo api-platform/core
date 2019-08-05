@@ -14,10 +14,12 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\EventListener;
 
 use ApiPlatform\Core\Api\IriConverterInterface;
+use ApiPlatform\Core\Api\ResourceClassResolverInterface;
 use ApiPlatform\Core\DataPersister\DataPersisterInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ToggleableOperationAttributeTrait;
 use ApiPlatform\Core\Util\RequestAttributesExtractor;
+use ApiPlatform\Core\Util\ResourceClassInfoTrait;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
 
@@ -29,19 +31,20 @@ use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
  */
 final class WriteListener
 {
+    use ResourceClassInfoTrait;
     use ToggleableOperationAttributeTrait;
 
     public const OPERATION_ATTRIBUTE_KEY = 'write';
 
     private $dataPersister;
     private $iriConverter;
-    private $resourceMetadataFactory;
 
-    public function __construct(DataPersisterInterface $dataPersister, IriConverterInterface $iriConverter = null, ResourceMetadataFactoryInterface $resourceMetadataFactory = null)
+    public function __construct(DataPersisterInterface $dataPersister, IriConverterInterface $iriConverter = null, ResourceMetadataFactoryInterface $resourceMetadataFactory = null, ResourceClassResolverInterface $resourceClassResolver = null)
     {
         $this->dataPersister = $dataPersister;
         $this->iriConverter = $iriConverter;
         $this->resourceMetadataFactory = $resourceMetadataFactory;
+        $this->resourceClassResolver = $resourceClassResolver;
     }
 
     /**
@@ -72,28 +75,36 @@ final class WriteListener
             case 'POST':
                 $persistResult = $this->dataPersister->persist($controllerResult, $attributes);
 
-                if (null === $persistResult) {
-                    @trigger_error(sprintf('Returning void from %s::persist() is deprecated since API Platform 2.3 and will not be supported in API Platform 3, an object should always be returned.', DataPersisterInterface::class), E_USER_DEPRECATED);
+                if (!\is_object($persistResult)) {
+                    @trigger_error(sprintf('Not returning an object from %s::persist() is deprecated since API Platform 2.3 and will not be supported in API Platform 3.', DataPersisterInterface::class), E_USER_DEPRECATED);
                 } else {
                     $controllerResult = $persistResult;
                     $event->setControllerResult($controllerResult);
                 }
 
-                if (null === $this->iriConverter) {
-                    return;
+                if ($controllerResult instanceof Response) {
+                    break;
                 }
 
                 $hasOutput = true;
-                if (null !== $this->resourceMetadataFactory) {
+                if ($this->resourceMetadataFactory instanceof ResourceMetadataFactoryInterface) {
                     $resourceMetadata = $this->resourceMetadataFactory->create($attributes['resource_class']);
-                    $outputMetadata = $resourceMetadata->getOperationAttribute($attributes, 'output', ['class' => $attributes['resource_class']], true);
-                    $hasOutput = \array_key_exists('class', $outputMetadata) && null !== $outputMetadata['class'] && $controllerResult instanceof $outputMetadata['class'];
+                    $outputMetadata = $resourceMetadata->getOperationAttribute($attributes, 'output', [
+                        'class' => $attributes['resource_class'],
+                    ], true);
+
+                    $hasOutput = \array_key_exists('class', $outputMetadata) && null !== $outputMetadata['class'];
                 }
 
-                if ($hasOutput) {
+                if (!$hasOutput) {
+                    break;
+                }
+
+                if ($this->iriConverter instanceof IriConverterInterface && $this->isResourceClass($this->getObjectClass($controllerResult))) {
                     $request->attributes->set('_api_write_item_iri', $this->iriConverter->getIriFromItem($controllerResult));
                 }
-            break;
+
+                break;
             case 'DELETE':
                 $this->dataPersister->remove($controllerResult);
                 $event->setControllerResult(null);

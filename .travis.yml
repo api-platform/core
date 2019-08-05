@@ -14,10 +14,6 @@ cache:
       echo "memory_limit=-1" >> ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/travis.ini
   - &disable-xdebug-php-extension |
       phpenv config-rm xdebug.ini || echo "xdebug not available"
-  - &install-doctrine-mongodb-odm |
-      composer require --prefer-dist --no-progress --no-suggest --no-update --ansi \
-        doctrine/mongodb-odm:^2.0@beta \
-        doctrine/mongodb-odm-bundle:^4.0@beta \
   - &install-mongodb-php-extension |
       echo "extension=mongodb.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/mongodb.ini
   - &run-behat-tests |
@@ -39,10 +35,15 @@ jobs:
   include:
     - php: '7.1'
       before_install:
-        - *disable-php-memory-limit
+        - *install-mongodb-php-extension
         - *disable-xdebug-php-extension
+        - *disable-php-memory-limit
         - *add-composer-bin-dir-to-path
       install:
+        - |
+          composer remove --dev --no-progress --no-update --ansi \
+            doctrine/mongodb-odm \
+            doctrine/mongodb-odm-bundle \
         - *update-project-dependencies
       before_script:
         - *clear-test-app-cache
@@ -57,8 +58,9 @@ jobs:
 
     - php: '7.2'
       before_install:
-        - *disable-php-memory-limit
+        - *install-mongodb-php-extension
         - *disable-xdebug-php-extension
+        - *disable-php-memory-limit
         - *add-composer-bin-dir-to-path
       install:
         - *update-project-dependencies
@@ -75,8 +77,9 @@ jobs:
 
     - php: '7.3'
       before_install:
-        - *disable-php-memory-limit
+        - *install-mongodb-php-extension
         - *disable-xdebug-php-extension
+        - *disable-php-memory-limit
         - *add-composer-bin-dir-to-path
       install:
         - *update-project-dependencies
@@ -94,8 +97,9 @@ jobs:
     - php: '7.3'
       env: deps=low
       before_install:
-        - *disable-php-memory-limit
+        - *install-mongodb-php-extension
         - *disable-xdebug-php-extension
+        - *disable-php-memory-limit
         - *add-composer-bin-dir-to-path
       install:
         - composer update --prefer-dist --no-progress --no-suggest --prefer-stable --prefer-lowest --ansi
@@ -115,8 +119,9 @@ jobs:
       services:
         - postgresql
       before_install:
-        - *disable-php-memory-limit
+        - *install-mongodb-php-extension
         - *disable-xdebug-php-extension
+        - *disable-php-memory-limit
         - *add-composer-bin-dir-to-path
       install:
         - *update-project-dependencies
@@ -137,8 +142,9 @@ jobs:
       services:
         - mysql
       before_install:
-        - *disable-php-memory-limit
+        - *install-mongodb-php-extension
         - *disable-xdebug-php-extension
+        - *disable-php-memory-limit
         - *add-composer-bin-dir-to-path
       install:
         - *update-project-dependencies
@@ -159,12 +165,11 @@ jobs:
       services:
         - mongodb
       before_install:
-        - *disable-php-memory-limit
         - *install-mongodb-php-extension
         - *disable-xdebug-php-extension
+        - *disable-php-memory-limit
         - *add-composer-bin-dir-to-path
       install:
-        - *install-doctrine-mongodb-odm
         - *update-project-dependencies
       before_script:
         - *clear-test-app-cache
@@ -186,8 +191,9 @@ jobs:
         - sudo apt-get update
         - sudo apt-get install elasticsearch
         - sudo service elasticsearch start
-        - *disable-php-memory-limit
+        - *install-mongodb-php-extension
         - *disable-xdebug-php-extension
+        - *disable-php-memory-limit
         - *add-composer-bin-dir-to-path
       install:
         - *update-project-dependencies
@@ -203,10 +209,11 @@ jobs:
         - *validate-openapi-v3-yaml
 
     - php: '7.3'
-      env: SYMFONY_DEPRECATIONS_HELPER=0
+      env: SYMFONY_DEPRECATIONS_HELPER=max[total]=5 # 5 deprecation notices from FOSUserBundle
       before_install:
-        - *disable-php-memory-limit
+        - *install-mongodb-php-extension
         - *disable-xdebug-php-extension
+        - *disable-php-memory-limit
         - *add-composer-bin-dir-to-path
       install:
         - *update-project-dependencies
@@ -222,5 +229,5 @@ jobs:
         - *validate-openapi-v3-yaml
 
   allow_failures:
-    - env: SYMFONY_DEPRECATIONS_HELPER=0
+    - env: SYMFONY_DEPRECATIONS_HELPER=max[total]=5 # 5 deprecation notices from FOSUserBundle
   fast_finish: true

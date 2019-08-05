@@ -20,13 +20,17 @@ namespace ApiPlatform\Core\DataPersister;
  */
 final class ChainDataPersister implements ContextAwareDataPersisterInterface
 {
-    /** @internal */
+    /**
+     * @var iterable<DataPersisterInterface>
+     *
+     * @internal
+     */
     public $persisters;
 
     /**
      * @param DataPersisterInterface[] $persisters
      */
-    public function __construct(/* iterable */ $persisters)
+    public function __construct(iterable $persisters)
     {
         $this->persisters = $persisters;
     }

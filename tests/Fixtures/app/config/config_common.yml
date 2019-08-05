@@ -8,8 +8,6 @@ framework:
     session:
         storage_id:                    'session.storage.mock_file'
     form:                              ~ # For FOSUser
-    templating:
-        engines:                       ['twig'] # For Swagger UI
     profiler:
         enabled:                        true
         collect:                        false
@@ -84,6 +82,11 @@ parameters:
     container.dumper.inline_class_loader: true
 
 services:
+    ApiPlatform\Core\Tests\Fixtures\TestBundle\MessageHandler\:
+        resource: '../../TestBundle/MessageHandler'
+        autowire: true
+        autoconfigure: true
+
     contain_non_resource.item_data_provider:
         class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\DataProvider\ContainNonResourceItemDataProvider'
         public: false
@@ -127,10 +130,8 @@ services:
         arguments: ['@doctrine']
         tags: ['api_platform.filter']
 
-    ApiPlatform\Core\Tests\Fixtures\TestBundle\Controller\DummyDtoNoInput\CreateItemAction:
-        tags: ['controller.service_arguments']
-
-    ApiPlatform\Core\Tests\Fixtures\TestBundle\Controller\DummyDtoNoInput\DoubleBatAction:
+    ApiPlatform\Core\Tests\Fixtures\TestBundle\Controller\:
+        resource: '../../TestBundle/Controller'
         tags: ['controller.service_arguments']
 
     app.config_dummy_resource.action:

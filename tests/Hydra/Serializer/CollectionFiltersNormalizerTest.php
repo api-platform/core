@@ -80,7 +80,7 @@ class CollectionFiltersNormalizerTest extends TestCase
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
 
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
-        $resourceClassResolverProphecy->getResourceClass($data, null, true)->willThrow(InvalidArgumentException::class);
+        $resourceClassResolverProphecy->getResourceClass($data, null)->willThrow(InvalidArgumentException::class);
 
         $filterLocatorProphecy = $this->prophesize(ContainerInterface::class);
 
@@ -175,7 +175,7 @@ class CollectionFiltersNormalizerTest extends TestCase
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
 
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
-        $resourceClassResolverProphecy->getResourceClass($data, null, true)->willThrow(InvalidArgumentException::class);
+        $resourceClassResolverProphecy->getResourceClass($data, null)->willThrow(InvalidArgumentException::class);
 
         $filterLocatorProphecy = $this->prophesize(ContainerInterface::class);
 

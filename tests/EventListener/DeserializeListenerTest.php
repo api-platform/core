@@ -23,7 +23,7 @@ use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
-use Symfony\Component\HttpKernel\Exception\NotAcceptableHttpException;
+use Symfony\Component\HttpKernel\Exception\UnsupportedMediaTypeHttpException;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\SerializerInterface;
 
@@ -227,7 +227,7 @@ class DeserializeListenerTest extends TestCase
 
     public function testNotSupportedContentType()
     {
-        $this->expectException(NotAcceptableHttpException::class);
+        $this->expectException(UnsupportedMediaTypeHttpException::class);
         $this->expectExceptionMessage('The content-type "application/rdf+xml" is not supported. Supported MIME types are "application/ld+json", "text/xml".');
 
         $eventProphecy = $this->prophesize(GetResponseEvent::class);
@@ -257,7 +257,7 @@ class DeserializeListenerTest extends TestCase
 
     public function testNoContentType()
     {
-        $this->expectException(NotAcceptableHttpException::class);
+        $this->expectException(UnsupportedMediaTypeHttpException::class);
         $this->expectExceptionMessage('The "Content-Type" header must exist.');
 
         $eventProphecy = $this->prophesize(GetResponseEvent::class);

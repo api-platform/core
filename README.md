@@ -9,9 +9,10 @@ It natively supports popular open formats including [JSON for Linked Data (JSON-
 Build a working and fully-featured CRUD API in minutes. Leverage the awesome features of the tool to develop complex and
 high performance API-first projects. Extend or override everything you want.
 
-[![Build Status](https://travis-ci.org/api-platform/core.svg?branch=master)](https://travis-ci.org/api-platform/core)
-[![Build status](https://ci.appveyor.com/api/projects/status/grwuyprts3wdqx5l?svg=true)](https://ci.appveyor.com/project/dunglas/dunglasapibundle)
-[![Coverage Status](https://coveralls.io/repos/github/api-platform/core/badge.svg)](https://coveralls.io/github/api-platform/core)
+[![Travis CI](https://travis-ci.org/api-platform/core.svg?branch=master)](https://travis-ci.org/api-platform/core)
+[![CircleCI](https://circleci.com/gh/api-platform/core/tree/master.svg?style=shield)](https://circleci.com/gh/api-platform/core/tree/master)
+[![AppVeyor](https://ci.appveyor.com/api/projects/status/grwuyprts3wdqx5l/branch/master?svg=true)](https://ci.appveyor.com/project/dunglas/dunglasapibundle/branch/master)
+[![Codecov](https://codecov.io/gh/api-platform/core/branch/master/graph/badge.svg)](https://codecov.io/gh/api-platform/core/branch/master)
 [![SymfonyInsight](https://insight.symfony.com/projects/92d78899-946c-4282-89a3-ac92344f9a93/mini.svg)](https://insight.symfony.com/projects/92d78899-946c-4282-89a3-ac92344f9a93)
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/api-platform/core/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/api-platform/core/?branch=master)
 

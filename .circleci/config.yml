@@ -1,58 +1,7 @@
 version: 2.1
 
 orbs:
-  # codecov: codecov/codecov@1
-  # https://github.com/codecov/codecov-circleci-orb/pull/17
-  codecov:
-    commands:
-      upload:
-        parameters:
-          conf:
-            description: Used to specify the location of the .codecov.yml config file
-            type: string
-            default: ".codecov.yml"
-          file:
-            description: Path to the code coverage data file to upload.
-            type: string
-            default: ""
-          flags:
-            description: Flag the upload to group coverage metrics (e.g. unittests | integration | ui,chrome)
-            type: string
-            default: ""
-          token:
-            description: Set the private repository token (defaults to environment variable $CODECOV_TOKEN)
-            type: string
-            default: ${CODECOV_TOKEN}
-          upload_name:
-            description: Custom defined name of the upload. Visible in Codecov UI
-            type: string
-            default: ${CIRCLE_BUILD_NUM}
-        steps:
-          - when:
-              condition: << parameters.file >>
-              steps:
-                - run:
-                    name: Upload Coverage Results
-                    command: |
-                      curl -s https://codecov.io/bash | bash -s -- \
-                        -f "<< parameters.file >>" \
-                        -t "<< parameters.token >>" \
-                        -n "<< parameters.upload_name >>" \
-                        -y "<< parameters.conf >>" \
-                        -F "<< parameters.flags >>" \
-                        -Z || echo 'Codecov upload failed'
-          - unless:
-              condition: << parameters.file >>
-              steps:
-                - run:
-                    name: Upload Coverage Results
-                    command: |
-                      curl -s https://codecov.io/bash | bash -s -- \
-                        -t "<< parameters.token >>" \
-                        -n "<< parameters.upload_name >>" \
-                        -y "<< parameters.conf >>" \
-                        -F "<< parameters.flags >>" \
-                        -Z || echo 'Codecov upload failed'
+  codecov: codecov/codecov@1
   coveralls:
     commands:
       upload:
@@ -83,21 +32,20 @@ commands:
       - run:
           name: Disable Xdebug PHP extension
           command: sudo rm /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
-  install-doctrine-mongodb-odm:
-    steps:
-      - run:
-          name: Install Doctrine MongoDB ODM
-          command: |
-            composer require --prefer-dist --no-progress --no-suggest --no-update --ansi \
-              doctrine/mongodb-odm:^2.0@beta \
-              doctrine/mongodb-odm-bundle:^4.0@beta \
   install-mongodb-php-extension:
     steps:
       - run:
           name: Install mongodb PHP extension
           command: |
-            sudo pecl install mongodb
+            sudo pecl install mongodb-1.5.4
             sudo docker-php-ext-enable mongodb
+  install-pcov-php-extension:
+    steps:
+      - run:
+          name: Install pcov PHP extension
+          command: |
+            sudo pecl install pcov-1.0.6
+            sudo docker-php-ext-enable pcov
   merge-code-coverage-reports:
     parameters:
       dir:
@@ -110,14 +58,16 @@ commands:
       - run:
           name: Download phpcov
           command: |
-            if [ ! -e phpcov.phar ]; then
+            if ! command -v phpcov; then
               wget https://phar.phpunit.de/phpcov.phar
+              chmod +x phpcov.phar
+              sudo mv phpcov.phar /usr/local/bin/phpcov
             fi
       - run:
           name: Merge code coverage reports
           command: |
             mkdir -p "$(dirname -- "<< parameters.out >>")"
-            phpdbg -qrr phpcov.phar merge --clover "<< parameters.out >>" "<< parameters.dir >>"
+            phpcov merge --clover "<< parameters.out >>" "<< parameters.dir >>"
   merge-test-reports:
     parameters:
       dir:
@@ -274,17 +224,17 @@ jobs:
     working_directory: ~/api-platform/core
     steps:
       - checkout
-      - restore-composer-cache
-      - restore-php-cs-fixer-cache
       - disable-xdebug-php-extension
       - disable-php-memory-limit
       - update-composer
+      - restore-composer-cache
       - run:
           name: Install PHP-CS-Fixer
           command: |
             composer global require --prefer-dist --no-progress --no-suggest --ansi \
               friendsofphp/php-cs-fixer:^2.14
       - save-composer-cache
+      - restore-php-cs-fixer-cache
       - run:
           name: Run PHP-CS-Fixer
           command: |
@@ -300,16 +250,15 @@ jobs:
     working_directory: ~/api-platform/core
     steps:
       - checkout
-      - restore-composer-cache
-      - restore-phpstan-cache
+      - install-mongodb-php-extension
       - disable-xdebug-php-extension
       - disable-php-memory-limit
-      - install-mongodb-php-extension
       - update-composer
-      - install-doctrine-mongodb-odm
+      - restore-composer-cache
       - update-project-dependencies
       - save-composer-cache
       - clear-test-app-cache
+      - restore-phpstan-cache
       - run:
           name: Run PHPStan
           command: vendor/bin/phpstan analyse --ansi
@@ -321,11 +270,12 @@ jobs:
     working_directory: ~/api-platform/core
     steps:
       - checkout
-      - restore-composer-cache
-      - restore-npm-cache
+      - install-mongodb-php-extension
+      - install-pcov-php-extension
       - disable-xdebug-php-extension
       - disable-php-memory-limit
       - update-composer
+      - restore-composer-cache
       - update-project-dependencies
       - save-composer-cache
       - clear-test-app-cache
@@ -335,8 +285,9 @@ jobs:
             mkdir -p build/logs/phpunit build/coverage
             split_tests=$(find tests -name '*Test.php' | circleci tests split --split-by=timings)
             export PARALLEL='-j10% --joblog build/logs/parallel.log --rpl {_}\ s/\\//_/g;'
-            phpunit_cmd='phpdbg -qrr vendor/bin/phpunit --coverage-php build/coverage/coverage-{_}.cov --log-junit build/logs/phpunit/{_}.xml --exclude-group mongodb,resource-hog --colors=always {}'
+            phpunit_cmd='vendor/bin/phpunit --coverage-php build/coverage/coverage-{_}.cov --log-junit build/logs/phpunit/{_}.xml --exclude-group mongodb,resource-hog --colors=always {}'
             echo "$split_tests" | parallel "$phpunit_cmd" || echo "$split_tests" | parallel --retry-failed "$phpunit_cmd"
+      - restore-npm-cache
       - merge-test-reports:
           dir: build/logs/phpunit
           out: build/logs/phpunit/junit.xml
@@ -367,11 +318,12 @@ jobs:
     working_directory: ~/api-platform/core
     steps:
       - checkout
-      - restore-composer-cache
-      - restore-npm-cache
+      - install-mongodb-php-extension
+      - install-pcov-php-extension
       - disable-xdebug-php-extension
       - disable-php-memory-limit
       - update-composer
+      - restore-composer-cache
       - update-project-dependencies
       - save-composer-cache
       - clear-test-app-cache
@@ -381,8 +333,9 @@ jobs:
             mkdir -p build/logs/behat build/coverage
             for f in $(find features -name '*.feature' -not -path 'features/main/exposed_state.feature' -not -path 'features/elasticsearch/*' -not -path 'features/mongodb/*' | circleci tests split --split-by=timings); do
               _f=$(echo "$f" | tr / _)
-              FEATURE="${_f}" phpdbg -qrr vendor/bin/behat --format=progress --out=std --format=junit --out=build/logs/behat/"${_f}" --profile=default-coverage --no-interaction "$f"
+              FEATURE="${_f}" vendor/bin/behat --format=progress --out=std --format=junit --out=build/logs/behat/"${_f}" --profile=default-coverage --no-interaction "$f"
             done
+      - restore-npm-cache
       - merge-test-reports:
           dir: build/logs/behat
           out: build/logs/behat/junit.xml
@@ -411,13 +364,12 @@ jobs:
     working_directory: ~/api-platform/core
     steps:
       - checkout
-      - restore-composer-cache
-      - restore-npm-cache
+      - install-mongodb-php-extension
+      - install-pcov-php-extension
       - disable-xdebug-php-extension
       - disable-php-memory-limit
-      - install-mongodb-php-extension
       - update-composer
-      - install-doctrine-mongodb-odm
+      - restore-composer-cache
       - update-project-dependencies
       - save-composer-cache
       - clear-test-app-cache
@@ -426,7 +378,7 @@ jobs:
           name: Run PHPUnit tests
           command: |
             mkdir -p build/logs/phpunit
-            phpdbg -qrr vendor/bin/phpunit --coverage-clover build/logs/clover.xml --log-junit build/logs/phpunit/junit.xml --exclude-group resource-hog --colors=always --configuration phpunit_mongodb.xml
+            vendor/bin/phpunit --coverage-clover build/logs/clover.xml --log-junit build/logs/phpunit/junit.xml --exclude-group resource-hog --colors=always --configuration phpunit_mongodb.xml
       - store_test_results:
           path: build/logs
       - store_artifacts:
@@ -435,6 +387,7 @@ jobs:
       - store_artifacts:
           path: build/logs/clover.xml
           destination: build/logs/clover.xml
+      - restore-npm-cache
       - codecov/upload:
           file: build/logs/clover.xml
           flags: phpunit_mongodb
@@ -449,13 +402,12 @@ jobs:
     working_directory: ~/api-platform/core
     steps:
       - checkout
-      - restore-composer-cache
-      - restore-npm-cache
+      - install-mongodb-php-extension
+      - install-pcov-php-extension
       - disable-xdebug-php-extension
       - disable-php-memory-limit
-      - install-mongodb-php-extension
       - update-composer
-      - install-doctrine-mongodb-odm
+      - restore-composer-cache
       - update-project-dependencies
       - save-composer-cache
       - clear-test-app-cache
@@ -464,7 +416,8 @@ jobs:
           name: Run Behat tests
           command: |
             mkdir -p build/logs/behat
-            phpdbg -qrr vendor/bin/behat --format=progress --out=std --format=junit --out=build/logs/behat --profile=mongodb-coverage --no-interaction
+            vendor/bin/behat --format=progress --out=std --format=junit --out=build/logs/behat --profile=mongodb-coverage --no-interaction
+      - restore-npm-cache
       - merge-test-reports:
           dir: build/logs/behat
           out: build/logs/behat/junit.xml
@@ -493,11 +446,12 @@ jobs:
     working_directory: ~/api-platform/core
     steps:
       - checkout
-      - restore-composer-cache
-      - restore-npm-cache
+      - install-mongodb-php-extension
+      - install-pcov-php-extension
       - disable-xdebug-php-extension
       - disable-php-memory-limit
       - update-composer
+      - restore-composer-cache
       - update-project-dependencies
       - save-composer-cache
       - clear-test-app-cache
@@ -506,7 +460,8 @@ jobs:
           name: Run Behat tests
           command: |
             mkdir -p build/logs/behat
-            phpdbg -qrr vendor/bin/behat --format=progress --out=std --format=junit --out=build/logs/behat --profile=elasticsearch-coverage --no-interaction
+            vendor/bin/behat --format=progress --out=std --format=junit --out=build/logs/behat --profile=elasticsearch-coverage --no-interaction
+      - restore-npm-cache
       - merge-test-reports:
           dir: build/logs/behat
           out: build/logs/behat/junit.xml
@@ -530,12 +485,10 @@ jobs:
 
 workflows:
   version: 2
-  lint:
+  lint-and-coverage:
     jobs:
       - php-cs-fixer
       - phpstan
-  test-with-coverage:
-    jobs:
       - phpunit-coverage
       - behat-coverage
       - phpunit-mongodb-coverage

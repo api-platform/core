@@ -14,6 +14,8 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity;
 
 use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Dto\PasswordResetRequest;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Dto\PasswordResetRequestResult;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Dto\RecoverPasswordInput;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Dto\RecoverPasswordOutput;
 use Doctrine\ORM\Mapping as ORM;
@@ -30,6 +32,23 @@ use Symfony\Component\Serializer\Annotation\Groups;
  *     attributes={
  *         "normalization_context"={"groups"={"user", "user-read"}},
  *         "denormalization_context"={"groups"={"user", "user-write"}}
+ *     },
+ *     collectionOperations={
+ *         "post",
+ *         "get",
+ *         "post_password_reset_request"={
+ *             "method"="POST",
+ *             "path"="/users/password_reset_request",
+ *             "messenger"="input",
+ *             "input"=PasswordResetRequest::class,
+ *             "output"=PasswordResetRequestResult::class,
+ *             "normalization_context"={
+ *                 "groups"={"user_password_reset_request"},
+ *             },
+ *             "denormalization_context"={
+ *                 "groups"={"user_password_reset_request"},
+ *             },
+ *         },
  *     },
  *     itemOperations={"get", "put", "delete",
  *         "recover_password"={

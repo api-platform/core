@@ -36,6 +36,7 @@ use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Resource\DirectoryResource;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
@@ -43,6 +44,8 @@ use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
+use Symfony\Component\Messenger\Exception\HandlerFailedException;
+use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\Yaml\Yaml;
 
@@ -521,6 +524,11 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
 
         if ($this->isConfigEnabled($container, $config['doctrine'])) {
             $loader->load('doctrine_orm_mercure_publisher.xml');
+
+            // BC for Symfony Messenger 4.2
+            if (interface_exists(MessageBusInterface::class) && !class_exists(HandlerFailedException::class)) {
+                $container->getDefinition('api_platform.doctrine.listener.mercure.publish')->replaceArgument(5, new Reference('message_bus', ContainerInterface::IGNORE_ON_INVALID_REFERENCE));
+            }
         }
     }
 
@@ -531,6 +539,11 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         }
 
         $loader->load('messenger.xml');
+
+        // BC for Symfony Messenger 4.2
+        if (interface_exists(MessageBusInterface::class) && !class_exists(HandlerFailedException::class)) {
+            $container->setAlias('api_platform.message_bus', 'message_bus');
+        }
     }
 
     private function registerElasticsearchConfiguration(ContainerBuilder $container, array $config, XmlFileLoader $loader): void

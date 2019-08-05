@@ -154,8 +154,8 @@ class AbstractItemNormalizerTest extends TestCase
         $propertyAccessorProphecy->getValue($dummy, 'relatedDummies')->willReturn($relatedDummies);
 
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
-        $resourceClassResolverProphecy->getResourceClass($dummy, null, false)->willReturn(Dummy::class);
-        $resourceClassResolverProphecy->getResourceClass($relatedDummy, RelatedDummy::class, true)->willReturn(RelatedDummy::class);
+        $resourceClassResolverProphecy->getResourceClass($dummy, null)->willReturn(Dummy::class);
+        $resourceClassResolverProphecy->getResourceClass($relatedDummy, RelatedDummy::class)->willReturn(RelatedDummy::class);
         $resourceClassResolverProphecy->getResourceClass($relatedDummies, RelatedDummy::class)->willReturn(RelatedDummy::class);
         $resourceClassResolverProphecy->isResourceClass(RelatedDummy::class)->willReturn(RelatedDummy::class);
 
@@ -224,14 +224,19 @@ class AbstractItemNormalizerTest extends TestCase
         $propertyAccessorProphecy->getValue($dummy, 'relatedDummies')->willReturn($relatedDummies);
 
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
-        $resourceClassResolverProphecy->getResourceClass($dummy, null, false)->willReturn(Dummy::class);
-        $resourceClassResolverProphecy->getResourceClass($relatedDummy, RelatedDummy::class, true)->willReturn(RelatedDummy::class);
+        $resourceClassResolverProphecy->getResourceClass($dummy, null)->willReturn(Dummy::class);
+        $resourceClassResolverProphecy->getResourceClass($relatedDummy, RelatedDummy::class)->willReturn(RelatedDummy::class);
         $resourceClassResolverProphecy->getResourceClass($relatedDummies, RelatedDummy::class)->willReturn(RelatedDummy::class);
         $resourceClassResolverProphecy->isResourceClass(RelatedDummy::class)->willReturn(RelatedDummy::class);
 
         $serializerProphecy = $this->prophesize(SerializerInterface::class);
         $serializerProphecy->willImplement(NormalizerInterface::class);
-        $serializerProphecy->normalize($relatedDummy, null, Argument::type('array'))->willReturn(['foo' => 'hello']);
+        $relatedDummyChildContext = Argument::allOf(
+            Argument::type('array'),
+            Argument::withEntry('resource_class', RelatedDummy::class),
+            Argument::not(Argument::withKey('iri'))
+        );
+        $serializerProphecy->normalize($relatedDummy, null, $relatedDummyChildContext)->willReturn(['foo' => 'hello']);
         $serializerProphecy->normalize(['foo' => 'hello'], null, Argument::type('array'))->willReturn(['foo' => 'hello']);
         $serializerProphecy->normalize([['foo' => 'hello']], null, Argument::type('array'))->willReturn([['foo' => 'hello']]);
 
@@ -826,7 +831,7 @@ class AbstractItemNormalizerTest extends TestCase
         $propertyAccessorProphecy->getValue($dummy, 'nickname')->willThrow(new NoSuchPropertyException())->shouldBeCalled();
 
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
-        $resourceClassResolverProphecy->getResourceClass($dummy, DummyTableInheritance::class, true)->willReturn(DummyTableInheritance::class)->shouldBeCalled();
+        $resourceClassResolverProphecy->getResourceClass($dummy, DummyTableInheritance::class)->willReturn(DummyTableInheritance::class)->shouldBeCalled();
 
         $serializerProphecy = $this->prophesize(SerializerInterface::class);
         $serializerProphecy->willImplement(NormalizerInterface::class);

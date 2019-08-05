@@ -14,6 +14,8 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Util;
 
 use ApiPlatform\Core\Api\ResourceClassResolverInterface;
+use ApiPlatform\Core\Exception\ResourceClassNotFoundException;
+use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 
 /**
  * Retrieves information about a resource class.
@@ -28,6 +30,11 @@ trait ResourceClassInfoTrait
      * @var ResourceClassResolverInterface|null
      */
     private $resourceClassResolver;
+
+    /**
+     * @var ResourceMetadataFactoryInterface|null
+     */
+    private $resourceMetadataFactory;
 
     /**
      * Gets the resource class of the given object.
@@ -50,5 +57,25 @@ trait ResourceClassInfoTrait
         }
 
         return $this->resourceClassResolver->getResourceClass($object);
+    }
+
+    private function isResourceClass(string $class): bool
+    {
+        if ($this->resourceClassResolver instanceof ResourceClassResolverInterface) {
+            return $this->resourceClassResolver->isResourceClass($class);
+        }
+
+        if (!$this->resourceMetadataFactory instanceof ResourceMetadataFactoryInterface) {
+            // assume that it's a resource class
+            return true;
+        }
+
+        try {
+            $this->resourceMetadataFactory->create($class);
+        } catch (ResourceClassNotFoundException $e) {
+            return false;
+        }
+
+        return true;
     }
 }

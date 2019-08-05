@@ -87,7 +87,7 @@ class ItemNormalizerTest extends TestCase
         $iriConverterProphecy->getIriFromItem($dummy)->willReturn('/dummies/1');
 
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
-        $resourceClassResolverProphecy->getResourceClass($dummy, null, false)->willReturn(Dummy::class);
+        $resourceClassResolverProphecy->getResourceClass($dummy, null)->willReturn(Dummy::class);
 
         $serializerProphecy = $this->prophesize(SerializerInterface::class);
         $serializerProphecy->willImplement(NormalizerInterface::class);
@@ -283,7 +283,7 @@ class ItemNormalizerTest extends TestCase
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
 
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
-        $resourceClassResolverProphecy->getResourceClass($output, null, true)->willThrow(InvalidArgumentException::class);
+        $resourceClassResolverProphecy->getResourceClass($output, null)->willThrow(InvalidArgumentException::class);
 
         $serializerProphecy = $this->prophesize(SerializerInterface::class);
         $serializerProphecy->willImplement(NormalizerInterface::class);

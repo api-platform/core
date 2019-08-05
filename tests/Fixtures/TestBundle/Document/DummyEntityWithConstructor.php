@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Document;
 
 use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Core\Tests\Fixtures\DummyObjectWithoutConstructor;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
@@ -62,10 +63,19 @@ class DummyEntityWithConstructor
      */
     private $baz;
 
-    public function __construct(string $foo, string $bar)
+    /**
+     * @var DummyObjectWithoutConstructor[]
+     */
+    private $items;
+
+    /**
+     * @param DummyObjectWithoutConstructor[] $items
+     */
+    public function __construct(string $foo, string $bar, array $items)
     {
         $this->foo = $foo;
         $this->bar = $bar;
+        $this->items = $items;
     }
 
     public function getId(): int
@@ -81,6 +91,14 @@ class DummyEntityWithConstructor
     public function getBar(): string
     {
         return $this->bar;
+    }
+
+    /**
+     * @return DummyObjectWithoutConstructor[]
+     */
+    public function getItems(): array
+    {
+        return $this->items;
     }
 
     /**

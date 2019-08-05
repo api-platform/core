@@ -4,6 +4,7 @@ default:
       contexts:
         - 'DoctrineContext':
             doctrine: '@doctrine'
+            passwordEncoder: '@security.password_encoder'
         - 'HttpHeaderContext'
         - 'GraphqlContext'
         - 'JsonContext'
@@ -40,6 +41,7 @@ postgres:
       contexts:
         - 'DoctrineContext':
             doctrine: '@doctrine'
+            passwordEncoder: '@security.password_encoder'
         - 'HttpHeaderContext'
         - 'GraphqlContext'
         - 'JsonContext'
@@ -63,6 +65,7 @@ mongodb:
       contexts:
         - 'DoctrineContext':
             doctrine: '@doctrine_mongodb'
+            passwordEncoder: '@security.password_encoder'
         - 'HttpHeaderContext'
         - 'GraphqlContext'
         - 'JsonContext'
@@ -103,6 +106,7 @@ default-coverage:
       contexts:
         - 'DoctrineContext':
             doctrine: '@doctrine'
+            passwordEncoder: '@security.password_encoder'
         - 'HttpHeaderContext'
         - 'GraphqlContext'
         - 'JsonContext'
@@ -127,6 +131,7 @@ mongodb-coverage:
       contexts:
         - 'DoctrineContext':
             doctrine: '@doctrine_mongodb'
+            passwordEncoder: '@security.password_encoder'
         - 'HttpHeaderContext'
         - 'GraphqlContext'
         - 'JsonContext'

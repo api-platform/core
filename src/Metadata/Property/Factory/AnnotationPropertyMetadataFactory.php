@@ -58,7 +58,7 @@ final class AnnotationPropertyMetadataFactory implements PropertyMetadataFactory
         if ($reflectionClass->hasProperty($property)) {
             $annotation = $this->reader->getPropertyAnnotation($reflectionClass->getProperty($property), ApiProperty::class);
 
-            if (null !== $annotation) {
+            if ($annotation instanceof ApiProperty) {
                 return $this->createMetadata($annotation, $parentPropertyMetadata);
             }
         }
@@ -75,7 +75,8 @@ final class AnnotationPropertyMetadataFactory implements PropertyMetadataFactory
             }
 
             $annotation = $this->reader->getMethodAnnotation($reflectionMethod, ApiProperty::class);
-            if (null !== $annotation) {
+
+            if ($annotation instanceof ApiProperty) {
                 return $this->createMetadata($annotation, $parentPropertyMetadata);
             }
         }

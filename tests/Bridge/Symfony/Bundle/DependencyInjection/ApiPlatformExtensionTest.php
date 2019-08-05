@@ -92,6 +92,7 @@ use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\DependencyInjection\ParameterBag\EnvPlaceholderParameterBag;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Messenger\Exception\HandlerFailedException;
 use Symfony\Component\Serializer\Exception\ExceptionInterface;
 
 /**
@@ -137,13 +138,13 @@ class ApiPlatformExtensionTest extends TestCase
     private $extension;
     private $childDefinitionProphecy;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->extension = new ApiPlatformExtension();
         $this->childDefinitionProphecy = $this->prophesize(ChildDefinition::class);
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         $this->extension = null;
     }
@@ -492,7 +493,10 @@ class ApiPlatformExtensionTest extends TestCase
     public function testDisabledMessenger()
     {
         $containerBuilderProphecy = $this->getBaseContainerBuilderProphecy();
-        $containerBuilderProphecy->setAlias('api_platform.message_bus', 'message_bus')->shouldNotBeCalled();
+        $containerBuilderProphecy->setAlias('api_platform.message_bus', 'messenger.default_bus')->shouldNotBeCalled();
+        if (!class_exists(HandlerFailedException::class)) {
+            $containerBuilderProphecy->setAlias('api_platform.message_bus', 'message_bus')->shouldNotBeCalled();
+        }
         $containerBuilderProphecy->setDefinition('api_platform.messenger.data_persister', Argument::type(Definition::class))->shouldNotBeCalled();
         $containerBuilderProphecy->setDefinition('api_platform.messenger.data_transformer', Argument::type(Definition::class))->shouldNotBeCalled();
         $containerBuilder = $containerBuilderProphecy->reveal();
@@ -914,15 +918,11 @@ class ApiPlatformExtensionTest extends TestCase
         $containerBuilderProphecy->getParameter('kernel.project_dir')->willReturn(__DIR__);
         $containerBuilderProphecy->getParameter('kernel.debug')->willReturn(false);
 
-        $containerBuilderProphecy->getDefinition('api_platform.http_cache.purger.varnish')->willReturn(new Definition());
-
         // irrelevant, but to prevent errors
-        // https://github.com/symfony/symfony/pull/29944
+        $definitionDummy = $this->prophesize(Definition::class);
+        $containerBuilderProphecy->getDefinition('api_platform.http_cache.purger.varnish')->willReturn($definitionDummy);
         if (method_exists(ContainerBuilder::class, 'removeBindings')) {
             $containerBuilderProphecy->removeBindings(Argument::type('string'))->will(function () {});
-        } elseif (method_exists(ContainerBuilder::class, 'addRemovedBindingIds')) {
-            // remove this once https://github.com/symfony/symfony/pull/31173 is released
-            $containerBuilderProphecy->addRemovedBindingIds(Argument::type('string'))->will(function () {});
         }
 
         return $containerBuilderProphecy;
@@ -1140,7 +1140,7 @@ class ApiPlatformExtensionTest extends TestCase
 
         $aliases = [
             'api_platform.http_cache.purger' => 'api_platform.http_cache.purger.varnish',
-            'api_platform.message_bus' => 'message_bus',
+            'api_platform.message_bus' => 'messenger.default_bus',
             EagerLoadingExtension::class => 'api_platform.doctrine.orm.query_extension.eager_loading',
             FilterExtension::class => 'api_platform.doctrine.orm.query_extension.filter',
             FilterEagerLoadingExtension::class => 'api_platform.doctrine.orm.query_extension.filter_eager_loading',
@@ -1175,12 +1175,17 @@ class ApiPlatformExtensionTest extends TestCase
             $containerBuilderProphecy->setAlias($alias, $service)->shouldBeCalled();
         }
 
+        if (!class_exists(HandlerFailedException::class)) {
+            $containerBuilderProphecy->setAlias('api_platform.message_bus', 'message_bus')->shouldBeCalled();
+        }
+
         $containerBuilderProphecy->hasParameter('api_platform.metadata_cache')->willReturn(false);
 
         // irrelevant, but to prevent errors
+        $definitionDummy = $this->prophesize(Definition::class);
         $containerBuilderProphecy->removeDefinition('api_platform.cache_warmer.cache_pool_clearer')->will(function () {});
-
-        $containerBuilderProphecy->getDefinition('api_platform.mercure.listener.response.add_link_header')->willReturn(new Definition());
+        $containerBuilderProphecy->getDefinition('api_platform.mercure.listener.response.add_link_header')->willReturn($definitionDummy);
+        $containerBuilderProphecy->getDefinition('api_platform.doctrine.listener.mercure.publish')->willReturn($definitionDummy);
 
         return $containerBuilderProphecy;
     }

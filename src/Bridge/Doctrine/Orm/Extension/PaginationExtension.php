@@ -38,6 +38,9 @@ final class PaginationExtension implements ContextAwareQueryResultCollectionExte
 {
     private $managerRegistry;
     private $requestStack;
+    /**
+     * @var ResourceMetadataFactoryInterface
+     */
     private $resourceMetadataFactory;
     private $enabled;
     private $clientEnabled;
@@ -50,6 +53,9 @@ final class PaginationExtension implements ContextAwareQueryResultCollectionExte
     private $partial;
     private $clientPartial;
     private $partialParameterName;
+    /**
+     * @var Pagination|null
+     */
     private $pagination;
 
     /**

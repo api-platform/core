@@ -86,13 +86,19 @@ final class CollectionResolverFactory implements ResolverFactoryInterface
 
             if (isset($rootClass, $source[$rootProperty = $info->fieldName], $source[ItemNormalizer::ITEM_KEY])) {
                 $rootResolvedFields = $this->identifiersExtractor->getIdentifiersFromItem(unserialize($source[ItemNormalizer::ITEM_KEY]));
-                $subresource = $this->getSubresource($rootClass, $rootResolvedFields, array_keys($rootResolvedFields), $rootProperty, $resourceClass, true, $dataProviderContext);
-                $collection = $subresource ?? [];
+                $subresourceCollection = $this->getSubresource($rootClass, $rootResolvedFields, array_keys($rootResolvedFields), $rootProperty, $resourceClass, true, $dataProviderContext);
+                if (!is_iterable($subresourceCollection)) {
+                    throw new \UnexpectedValueException('Expected subresource collection to be iterable');
+                }
+                $collection = $subresourceCollection ?? [];
             } else {
                 $collection = $this->collectionDataProvider->getCollection($resourceClass, null, $dataProviderContext);
             }
 
-            $this->canAccess($this->resourceAccessChecker, $resourceMetadata, $resourceClass, $info, $collection, $operationName ?? 'query');
+            $this->canAccess($this->resourceAccessChecker, $resourceMetadata, $resourceClass, $info, [
+                'object' => $collection,
+                'previous_object' => \is_object($collection) ? clone $collection : $collection,
+            ], $operationName ?? 'query');
 
             if (!$this->paginationEnabled) {
                 $data = [];
@@ -134,7 +140,7 @@ final class CollectionResolverFactory implements ResolverFactoryInterface
     /**
      * @throws ResourceClassNotSupportedException
      *
-     * @return object|null
+     * @return iterable|object|null
      */
     private function getSubresource(string $rootClass, array $rootResolvedFields, array $rootIdentifiers, string $rootProperty, string $subresourceClass, bool $isCollection, array $normalizationContext)
     {

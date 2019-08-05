@@ -21,6 +21,8 @@ use Doctrine\ODM\MongoDB\Repository\DocumentRepository;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
 /**
+ * @internal
+ *
  * @author Alan Poulain <contact@alanpoulain.eu>
  */
 abstract class DoctrineMongoDbOdmFilterTestCase extends KernelTestCase
@@ -45,7 +47,7 @@ abstract class DoctrineMongoDbOdmFilterTestCase extends KernelTestCase
      */
     protected $filterClass;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         self::bootKernel();
 

@@ -17,8 +17,7 @@ use ApiPlatform\Core\DataTransformer\DataTransformerInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 
 /**
- * Transforms an input that implements the InputMessage interface
- * to itself. This gives the ability to send the Input to a
+ * Transforms an Input to itself. This gives the ability to send the Input to a
  * message handler and process it asynchronously.
  *
  * @author Antoine Bluchet <soyuka@gmail.com>

@@ -27,7 +27,7 @@ class ApiResourceTest extends TestCase
     public function testConstruct()
     {
         $resource = new ApiResource([
-            'accessControl' => 'has_role("ROLE_FOO")',
+            'accessControl' => 'is_granted("ROLE_FOO")',
             'accessControlMessage' => 'You are not foo.',
             'attributes' => ['foo' => 'bar', 'validation_groups' => ['baz', 'qux'], 'cache_headers' => ['max_age' => 0, 'shared_max_age' => 0]],
             'collectionOperations' => ['bar' => ['foo']],
@@ -71,7 +71,7 @@ class ApiResourceTest extends TestCase
         $this->assertSame([], $resource->subresourceOperations);
         $this->assertSame(['query' => ['normalization_context' => ['groups' => ['foo', 'bar']]]], $resource->graphql);
         $this->assertEquals([
-            'access_control' => 'has_role("ROLE_FOO")',
+            'access_control' => 'is_granted("ROLE_FOO")',
             'access_control_message' => 'You are not foo.',
             'denormalization_context' => ['groups' => ['foo']],
             'fetch_partial' => true,
@@ -118,7 +118,7 @@ class ApiResourceTest extends TestCase
         $this->assertEquals([
             'foo' => 'bar',
             'route_prefix' => '/whatever',
-            'access_control' => "has_role('ROLE_FOO')",
+            'access_control' => "is_granted('ROLE_FOO')",
             'access_control_message' => 'You are not foo.',
             'cache_headers' => ['max_age' => 0, 'shared_max_age' => 0],
         ], $resource->attributes);
