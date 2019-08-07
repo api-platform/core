@@ -690,6 +690,10 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
                 $type = \in_array($data['type'], Type::$builtinTypes, true) ? $this->jsonSchemaTypeFactory->getType(new Type($data['type'], false, null, $data['is_collection'] ?? false)) : ['type' => 'string'];
                 $v3 ? $parameter['schema'] = $type : $parameter += $type;
 
+                if ($v3 && isset($data['schema'])) {
+                    $parameter['schema'] = $data['schema'];
+                }
+
                 if ('array' === ($type['type'] ?? '')) {
                     $deepObject = \in_array($data['type'], [Type::BUILTIN_TYPE_ARRAY, Type::BUILTIN_TYPE_OBJECT], true);
 
