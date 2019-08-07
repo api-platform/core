@@ -163,6 +163,11 @@ commands:
       - run:
           name: Update project dependencies
           command: composer update --prefer-dist --no-progress --no-suggest --ansi
+  update-project-dependencies-high:
+    steps:
+      - run:
+          name: Update project dependencies (high deps)
+          command: composer config minimum-stability dev && composer require symfony/error-renderer:^4.4 --no-update && composer update --prefer-dist --no-progress --no-suggest --ansi
   wait-for-elasticsearch:
     steps:
       - wait-for-service:
@@ -255,7 +260,7 @@ jobs:
       - disable-php-memory-limit
       - update-composer
       - restore-composer-cache
-      - update-project-dependencies
+      - update-project-dependencies-high
       - save-composer-cache
       - clear-test-app-cache
       - restore-phpstan-cache

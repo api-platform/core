@@ -14,7 +14,8 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Action;
 
 use ApiPlatform\Core\Util\ErrorFormatGuesser;
-use Symfony\Component\Debug\Exception\FlattenException;
+use Symfony\Component\Debug\Exception\FlattenException as LegacyFlattenException;
+use Symfony\Component\ErrorRenderer\Exception\FlattenException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Serializer\SerializerInterface;
@@ -59,8 +60,12 @@ final class ExceptionAction
     /**
      * Converts a an exception to a JSON response.
      */
-    public function __invoke(FlattenException $exception, Request $request): Response
+    public function __invoke(/* FlattenException */$exception, Request $request): Response
     {
+        if (!$exception instanceof FlattenException && !$exception instanceof LegacyFlattenException) {
+            throw new \TypeError(sprintf('Argument 1 passed to %s() must be an instance of %s or %s.', __METHOD__, FlattenException::class, LegacyFlattenException::class));
+        }
+
         $exceptionClass = $exception->getClass();
         $statusCode = $exception->getStatusCode();
 

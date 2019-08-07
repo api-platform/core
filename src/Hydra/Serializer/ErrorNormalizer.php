@@ -15,12 +15,13 @@ namespace ApiPlatform\Core\Hydra\Serializer;
 
 use ApiPlatform\Core\Api\UrlGeneratorInterface;
 use ApiPlatform\Core\Problem\Serializer\ErrorNormalizerTrait;
-use Symfony\Component\Debug\Exception\FlattenException;
+use Symfony\Component\Debug\Exception\FlattenException as LegacyFlattenException;
+use Symfony\Component\ErrorRenderer\Exception\FlattenException;
 use Symfony\Component\Serializer\Normalizer\CacheableSupportsMethodInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 /**
- * Converts {@see \Exception} or {@see \Symfony\Component\Debug\Exception\FlattenException} to a Hydra error representation.
+ * Converts {@see \Exception} or {@see \Symfony\Component\ErrorRenderer\Exception\FlattenException} to a Hydra error representation.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  * @author Samuel ROZE <samuel.roze@gmail.com>
@@ -67,7 +68,7 @@ final class ErrorNormalizer implements NormalizerInterface, CacheableSupportsMet
      */
     public function supportsNormalization($data, $format = null)
     {
-        return self::FORMAT === $format && ($data instanceof \Exception || $data instanceof FlattenException);
+        return self::FORMAT === $format && ($data instanceof \Exception || $data instanceof FlattenException || $data instanceof LegacyFlattenException);
     }
 
     /**
