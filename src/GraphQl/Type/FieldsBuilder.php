@@ -232,6 +232,8 @@ final class FieldsBuilder implements FieldsBuilderInterface
 
             $args = [];
             if (!$input && null === $mutationName && !$isStandardGraphqlType && $this->typeBuilder->isCollection($type)) {
+                $propertyResourceMetadata = $this->resourceMetadataFactory->create($className);
+
                 if ($this->paginationEnabled) {
                     $args = [
                         'first' => [
@@ -253,15 +255,15 @@ final class FieldsBuilder implements FieldsBuilderInterface
                     ];
                 }
 
-                foreach ($resourceMetadata->getGraphqlAttribute($queryName ?? 'query', 'filters', [], true) as $filterId) {
+                foreach ($propertyResourceMetadata->getGraphqlAttribute($queryName ?? 'query', 'filters', [], true) as $filterId) {
                     if (null === $this->filterLocator || !$this->filterLocator->has($filterId)) {
                         continue;
                     }
 
-                    foreach ($this->filterLocator->get($filterId)->getDescription($resourceClass) as $key => $value) {
+                    foreach ($this->filterLocator->get($filterId)->getDescription($className) as $key => $value) {
                         $nullable = isset($value['required']) ? !$value['required'] : true;
                         $filterType = \in_array($value['type'], Type::$builtinTypes, true) ? new Type($value['type'], $nullable) : new Type('object', $nullable, $value['type']);
-                        $graphqlFilterType = $this->convertType($filterType, false, $queryName, $mutationName, $resourceClass, $property, $depth);
+                        $graphqlFilterType = $this->convertType($filterType, false, $queryName, $mutationName, $className, $property, $depth);
 
                         if ('[]' === substr($key, -2)) {
                             $graphqlFilterType = GraphQLType::listOf($graphqlFilterType);
