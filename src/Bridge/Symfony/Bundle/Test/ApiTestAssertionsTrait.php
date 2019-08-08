@@ -88,7 +88,7 @@ trait ApiTestAssertionsTrait
      * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
      * @throws \Exception
      */
-    public static function assertArraySubset($subset, $array, bool $checkForObjectIdentity = false, string $message = ''): void
+    public static function assertArraySubset($subset, $array, $checkForObjectIdentity = false, $message = '')
     {
         $constraint = new ArraySubset($subset, $checkForObjectIdentity);
         static::assertThat($array, $constraint, $message);
