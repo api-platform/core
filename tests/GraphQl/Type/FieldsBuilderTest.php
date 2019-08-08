@@ -122,10 +122,11 @@ class FieldsBuilderTest extends TestCase
      */
     public function testGetQueryFields(string $resourceClass, ResourceMetadata $resourceMetadata, string $queryName, $itemConfiguration, $collectionConfiguration, GraphQLType $graphqlType, bool $isTypeCollection, ?callable $itemResolve, ?callable $collectionResolve, array $expectedQueryFields): void
     {
-        $this->typeConverterProphecy->convertType(Argument::type(Type::class), false, $queryName, null, $resourceClass, null, 0)->willReturn($graphqlType);
+        $this->typeConverterProphecy->convertType(Argument::type(Type::class), false, $queryName, null, $resourceClass, $resourceClass, null, 0)->willReturn($graphqlType);
         $this->typeConverterProphecy->resolveType(Argument::type('string'))->willReturn(GraphQLType::string());
         $this->typeBuilderProphecy->isCollection(Argument::type(Type::class))->willReturn($isTypeCollection);
         $this->typeBuilderProphecy->getResourcePaginatedCollectionType($graphqlType)->willReturn($graphqlType);
+        $this->resourceMetadataFactoryProphecy->create($resourceClass)->willReturn($resourceMetadata);
         $this->itemResolverFactoryProphecy->__invoke($resourceClass, $resourceClass, $queryName)->willReturn($itemResolve);
         $this->collectionResolverFactoryProphecy->__invoke($resourceClass, $resourceClass, $queryName)->willReturn($collectionResolve);
         $this->filterLocatorProphecy->has('my_filter')->willReturn(true);
@@ -308,10 +309,11 @@ class FieldsBuilderTest extends TestCase
      */
     public function testGetMutationFields(string $resourceClass, ResourceMetadata $resourceMetadata, string $mutationName, GraphQLType $graphqlType, bool $isTypeCollection, ?callable $mutationResolve, ?callable $collectionResolve, array $expectedMutationFields): void
     {
-        $this->typeConverterProphecy->convertType(Argument::type(Type::class), false, null, $mutationName, $resourceClass, null, 0)->willReturn($graphqlType);
-        $this->typeConverterProphecy->convertType(Argument::type(Type::class), true, null, $mutationName, $resourceClass, null, 0)->willReturn($graphqlType);
+        $this->typeConverterProphecy->convertType(Argument::type(Type::class), false, null, $mutationName, $resourceClass, $resourceClass, null, 0)->willReturn($graphqlType);
+        $this->typeConverterProphecy->convertType(Argument::type(Type::class), true, null, $mutationName, $resourceClass, $resourceClass, null, 0)->willReturn($graphqlType);
         $this->typeBuilderProphecy->isCollection(Argument::type(Type::class))->willReturn($isTypeCollection);
         $this->typeBuilderProphecy->getResourcePaginatedCollectionType($graphqlType)->willReturn($graphqlType);
+        $this->resourceMetadataFactoryProphecy->create($resourceClass)->willReturn(new ResourceMetadata());
         $this->collectionResolverFactoryProphecy->__invoke($resourceClass, $resourceClass, null)->willReturn($collectionResolve);
         $this->itemMutationResolverFactoryProphecy->__invoke($resourceClass, null, $mutationName)->willReturn($mutationResolve);
 
@@ -375,10 +377,10 @@ class FieldsBuilderTest extends TestCase
         foreach ($properties as $propertyName => $propertyMetadata) {
             $this->propertyMetadataFactoryProphecy->create($resourceClass, $propertyName, ['graphql_operation_name' => $queryName ?? $mutationName])->willReturn($propertyMetadata);
             $this->propertyMetadataFactoryProphecy->create($resourceClass, $propertyName, ['graphql_operation_name' => $queryName ?? $mutationName])->willReturn($propertyMetadata);
-            $this->typeConverterProphecy->convertType(new Type(Type::BUILTIN_TYPE_NULL), Argument::type('bool'), $queryName, null, $resourceClass, $propertyName, 1)->willReturn(null);
-            $this->typeConverterProphecy->convertType(new Type(Type::BUILTIN_TYPE_CALLABLE), Argument::type('bool'), $queryName, null, $resourceClass, $propertyName, 1)->willReturn('NotRegisteredType');
-            $this->typeConverterProphecy->convertType(Argument::type(Type::class), Argument::type('bool'), $queryName, null, $resourceClass, $propertyName, 1)->willReturn(GraphQLType::string());
-            $this->typeConverterProphecy->convertType(Argument::type(Type::class), Argument::type('bool'), null, $mutationName, $resourceClass, $propertyName, 1)->willReturn(GraphQLType::string());
+            $this->typeConverterProphecy->convertType(new Type(Type::BUILTIN_TYPE_NULL), Argument::type('bool'), $queryName, null, '', $resourceClass, $propertyName, 1)->willReturn(null);
+            $this->typeConverterProphecy->convertType(new Type(Type::BUILTIN_TYPE_CALLABLE), Argument::type('bool'), $queryName, null, '', $resourceClass, $propertyName, 1)->willReturn('NotRegisteredType');
+            $this->typeConverterProphecy->convertType(Argument::type(Type::class), Argument::type('bool'), $queryName, null, '', $resourceClass, $propertyName, 1)->willReturn(GraphQLType::string());
+            $this->typeConverterProphecy->convertType(Argument::type(Type::class), Argument::type('bool'), null, $mutationName, '', $resourceClass, $propertyName, 1)->willReturn(GraphQLType::string());
             $this->typeConverterProphecy->convertType(Argument::type(Type::class), true, null, $mutationName, 'subresourceClass', $propertyName, 1)->willReturn(GraphQLType::string());
         }
         $this->typesContainerProphecy->has('NotRegisteredType')->willReturn(false);

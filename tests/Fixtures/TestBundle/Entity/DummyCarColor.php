@@ -13,7 +13,9 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity;
 
+use ApiPlatform\Core\Annotation\ApiFilter;
 use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation as Serializer;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -46,6 +48,7 @@ class DummyCarColor
      * @var string
      *
      * @ORM\Column(nullable=false)
+     * @ApiFilter(SearchFilter::class)
      * @Assert\NotBlank
      *
      * @Serializer\Groups({"colors"})
