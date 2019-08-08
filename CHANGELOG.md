@@ -2,7 +2,15 @@
 
 ## 2.5.0 beta 1
 
+* GraphQL: Add support for custom queries and mutations
 * GraphQL: Add support for custom types
+* GraphQL: Better pagination support (backwards pagination)
+* GraphQL: Add the concept of *stages* in the workflow of the resolvers and add the possibility to disable them with operation attributes
+* GraphQL: Add GraphQL Playground besides GraphiQL and add the possibility to change the default IDE (or to disable it) for the GraphQL endpoint
+* GraphQL: Add a command to print the schema in SDL
+* GraphQL: Improve serialization performance by avoiding calls to the `serialize` PHP function
+* GraphQL: Allow to use a search and an exist filter on the same resource
+* GraphQL: Refactor the architecture of the whole system to allow the decoration of useful services (`TypeConverter` to manage custom types, `SerializerContextBuilder` to modify the (de)serialization context dynamically, etc.)
 
 ## 2.4.5
 
