@@ -16,6 +16,7 @@ namespace ApiPlatform\Core\Bridge\Doctrine\EventListener;
 use ApiPlatform\Core\Api\IriConverterInterface;
 use ApiPlatform\Core\Api\ResourceClassResolverInterface;
 use ApiPlatform\Core\Api\UrlGeneratorInterface;
+use ApiPlatform\Core\Bridge\Symfony\Messenger\DispatchTrait;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\Exception\RuntimeException;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
@@ -35,12 +36,12 @@ use Symfony\Component\Serializer\SerializerInterface;
  */
 final class PublishMercureUpdatesListener
 {
+    use DispatchTrait;
     use ResourceClassInfoTrait;
 
     private $iriConverter;
     private $resourceMetadataFactory;
     private $serializer;
-    private $messageBus;
     private $publisher;
     private $expressionLanguage;
     private $createdEntities;
@@ -180,6 +181,6 @@ final class PublishMercureUpdatesListener
         }
 
         $update = new Update($iri, $data, $targets);
-        $this->messageBus ? $this->messageBus->dispatch($update) : ($this->publisher)($update);
+        $this->messageBus ? $this->dispatch($update) : ($this->publisher)($update);
     }
 }

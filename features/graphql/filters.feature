@@ -107,8 +107,8 @@ Feature: Collections filtering
       }
     }
     """
-    Then the JSON node "data.dummies.edges[0].node.relatedDummies.edges" should have 0 element
-    And the JSON node "data.dummies.edges[1].node.relatedDummies.edges" should have 0 element
+    Then the JSON node "data.dummies.edges[0].node.relatedDummies.edges" should have 0 elements
+    And the JSON node "data.dummies.edges[1].node.relatedDummies.edges" should have 0 elements
     And the JSON node "data.dummies.edges[2].node.relatedDummies.edges" should have 1 element
     And the JSON node "data.dummies.edges[2].node.relatedDummies.edges[0].node.name" should be equal to "RelatedDummy13"
 
