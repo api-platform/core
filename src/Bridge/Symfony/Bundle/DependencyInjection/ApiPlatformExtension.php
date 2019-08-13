@@ -311,6 +311,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             return;
         }
 
+        $loader->load('json_schema.xml');
         $loader->load('swagger.xml');
 
         if ($config['enable_swagger_ui'] || $config['enable_re_doc']) {
