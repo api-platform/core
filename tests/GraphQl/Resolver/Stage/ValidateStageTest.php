@@ -58,7 +58,7 @@ class ValidateStageTest extends TestCase
 
         $this->validatorProphecy->validate(Argument::cetera())->shouldNotBeCalled();
 
-        $this->validateStage->apply(new \stdClass(), $resourceClass, $operationName, []);
+        ($this->validateStage)(new \stdClass(), $resourceClass, $operationName, []);
     }
 
     public function testApply(): void
@@ -74,7 +74,7 @@ class ValidateStageTest extends TestCase
         $object = new \stdClass();
         $this->validatorProphecy->validate($object, ['groups' => $validationGroups])->shouldBeCalled();
 
-        $this->validateStage->apply($object, $resourceClass, $operationName, []);
+        ($this->validateStage)($object, $resourceClass, $operationName, []);
     }
 
     public function testApplyNotValidated(): void
@@ -94,6 +94,6 @@ class ValidateStageTest extends TestCase
 
         $this->expectException(Error::class);
 
-        $this->validateStage->apply($object, $resourceClass, $operationName, $context);
+        ($this->validateStage)($object, $resourceClass, $operationName, $context);
     }
 }

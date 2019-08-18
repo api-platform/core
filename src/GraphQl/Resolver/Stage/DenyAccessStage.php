@@ -39,7 +39,7 @@ final class DenyAccessStage implements DenyAccessStageInterface
     /**
      * {@inheritdoc}
      */
-    public function apply(string $resourceClass, string $operationName, array $context): void
+    public function __invoke(string $resourceClass, string $operationName, array $context): void
     {
         $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
 

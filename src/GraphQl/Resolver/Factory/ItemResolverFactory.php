@@ -61,7 +61,7 @@ final class ItemResolverFactory implements ResolverFactoryInterface
             $operationName = $operationName ?? 'query';
             $resolverContext = ['source' => $source, 'args' => $args, 'info' => $info, 'is_collection' => false, 'is_mutation' => false];
 
-            $item = $this->readStage->apply($resourceClass, $rootClass, $operationName, $resolverContext);
+            $item = ($this->readStage)($resourceClass, $rootClass, $operationName, $resolverContext);
             if (null !== $item && !\is_object($item)) {
                 throw new \LogicException('Item from read stage should be a nullable object.');
             }
@@ -77,14 +77,14 @@ final class ItemResolverFactory implements ResolverFactoryInterface
                 $resourceClass = $this->getResourceClass($item, $resourceClass, $info, sprintf('Custom query resolver "%s"', $queryResolverId).' has to return an item of class %s but returned an item of class %s.');
             }
 
-            $this->denyAccessStage->apply($resourceClass, $operationName, $resolverContext + [
+            ($this->denyAccessStage)($resourceClass, $operationName, $resolverContext + [
                 'extra_variables' => [
                     'object' => $item,
                     'previous_object' => \is_object($item) ? clone $item : $item,
                 ],
             ]);
 
-            return $this->serializeStage->apply($item, $resourceClass, $operationName, $resolverContext);
+            return ($this->serializeStage)($item, $resourceClass, $operationName, $resolverContext);
         };
     }
 

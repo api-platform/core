@@ -46,7 +46,7 @@ final class SerializeStage implements SerializeStageInterface
     /**
      * {@inheritdoc}
      */
-    public function apply($itemOrCollection, string $resourceClass, string $operationName, array $context): ?array
+    public function __invoke($itemOrCollection, string $resourceClass, string $operationName, array $context): ?array
     {
         $isCollection = $context['is_collection'];
         $isMutation = $context['is_mutation'];

@@ -42,7 +42,7 @@ final class DeserializeStage implements DeserializeStageInterface
     /**
      * {@inheritdoc}
      */
-    public function apply($objectToPopulate, string $resourceClass, string $operationName, array $context)
+    public function __invoke($objectToPopulate, string $resourceClass, string $operationName, array $context)
     {
         $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
         if (!$resourceMetadata->getGraphqlAttribute($operationName, 'deserialize', true, true)) {

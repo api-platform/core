@@ -25,5 +25,5 @@ interface ReadStageInterface
     /**
      * @return object|iterable|null
      */
-    public function apply(?string $resourceClass, ?string $rootClass, string $operationName, array $context);
+    public function __invoke(?string $resourceClass, ?string $rootClass, string $operationName, array $context);
 }

@@ -53,7 +53,7 @@ class WriteStageTest extends TestCase
         $resourceClass = 'myResource';
         $this->resourceMetadataFactoryProphecy->create($resourceClass)->willReturn(new ResourceMetadata());
 
-        $result = $this->writeStage->apply(null, $resourceClass, 'query', []);
+        $result = ($this->writeStage)(null, $resourceClass, 'query', []);
 
         $this->assertNull($result);
     }
@@ -68,7 +68,7 @@ class WriteStageTest extends TestCase
         $this->resourceMetadataFactoryProphecy->create($resourceClass)->willReturn($resourceMetadata);
 
         $data = new \stdClass();
-        $result = $this->writeStage->apply($data, $resourceClass, $operationName, []);
+        $result = ($this->writeStage)($data, $resourceClass, $operationName, []);
 
         $this->assertSame($data, $result);
     }
@@ -87,7 +87,7 @@ class WriteStageTest extends TestCase
         $this->dataPersisterProphecy->remove($data, $denormalizationContext)->shouldBeCalled();
         $this->dataPersisterProphecy->persist(Argument::cetera())->shouldNotBeCalled();
 
-        $result = $this->writeStage->apply($data, $resourceClass, $operationName, $context);
+        $result = ($this->writeStage)($data, $resourceClass, $operationName, $context);
 
         $this->assertNull($result);
     }
@@ -107,7 +107,7 @@ class WriteStageTest extends TestCase
         $this->dataPersisterProphecy->remove(Argument::cetera())->shouldNotBeCalled();
         $this->dataPersisterProphecy->persist($data, $denormalizationContext)->shouldBeCalled()->willReturn($persistedData);
 
-        $result = $this->writeStage->apply($data, $resourceClass, $operationName, $context);
+        $result = ($this->writeStage)($data, $resourceClass, $operationName, $context);
 
         $this->assertSame($persistedData, $result);
     }
@@ -130,7 +130,7 @@ class WriteStageTest extends TestCase
         $this->dataPersisterProphecy->remove(Argument::cetera())->shouldNotBeCalled();
         $this->dataPersisterProphecy->persist($data, $denormalizationContext)->shouldBeCalled();
 
-        $result = $this->writeStage->apply($data, $resourceClass, $operationName, $context);
+        $result = ($this->writeStage)($data, $resourceClass, $operationName, $context);
 
         $this->assertNull($result);
     }

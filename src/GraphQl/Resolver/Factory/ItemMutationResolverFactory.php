@@ -67,7 +67,7 @@ final class ItemMutationResolverFactory implements ResolverFactoryInterface
 
             $resolverContext = ['source' => $source, 'args' => $args, 'info' => $info, 'is_collection' => false, 'is_mutation' => true];
 
-            $item = $this->readStage->apply($resourceClass, $rootClass, $operationName, $resolverContext);
+            $item = ($this->readStage)($resourceClass, $rootClass, $operationName, $resolverContext);
             if (null !== $item && !\is_object($item)) {
                 throw new \LogicException('Item from read stage should be a nullable object.');
             }
@@ -75,19 +75,19 @@ final class ItemMutationResolverFactory implements ResolverFactoryInterface
             $previousItem = \is_object($item) ? clone $item : $item;
 
             if ('delete' === $operationName) {
-                $this->denyAccessStage->apply($resourceClass, $operationName, $resolverContext + [
+                ($this->denyAccessStage)($resourceClass, $operationName, $resolverContext + [
                     'extra_variables' => [
                         'object' => $item,
                         'previous_object' => $previousItem,
                     ],
                 ]);
 
-                $item = $this->writeStage->apply($item, $resourceClass, $operationName, $resolverContext);
+                $item = ($this->writeStage)($item, $resourceClass, $operationName, $resolverContext);
 
-                return $this->serializeStage->apply($item, $resourceClass, $operationName, $resolverContext);
+                return ($this->serializeStage)($item, $resourceClass, $operationName, $resolverContext);
             }
 
-            $item = $this->deserializeStage->apply($item, $resourceClass, $operationName, $resolverContext);
+            $item = ($this->deserializeStage)($item, $resourceClass, $operationName, $resolverContext);
 
             $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
 
@@ -101,7 +101,7 @@ final class ItemMutationResolverFactory implements ResolverFactoryInterface
                 }
             }
 
-            $this->denyAccessStage->apply($resourceClass, $operationName, $resolverContext + [
+            ($this->denyAccessStage)($resourceClass, $operationName, $resolverContext + [
                 'extra_variables' => [
                     'object' => $item,
                     'previous_object' => $previousItem,
@@ -109,12 +109,12 @@ final class ItemMutationResolverFactory implements ResolverFactoryInterface
             ]);
 
             if (null !== $item) {
-                $this->validateStage->apply($item, $resourceClass, $operationName, $resolverContext);
+                ($this->validateStage)($item, $resourceClass, $operationName, $resolverContext);
 
-                $persistResult = $this->writeStage->apply($item, $resourceClass, $operationName, $resolverContext);
+                $persistResult = ($this->writeStage)($item, $resourceClass, $operationName, $resolverContext);
             }
 
-            return $this->serializeStage->apply($persistResult ?? $item, $resourceClass, $operationName, $resolverContext);
+            return ($this->serializeStage)($persistResult ?? $item, $resourceClass, $operationName, $resolverContext);
         };
     }
 }

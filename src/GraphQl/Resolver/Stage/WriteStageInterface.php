@@ -27,5 +27,5 @@ interface WriteStageInterface
      *
      * @return object|null
      */
-    public function apply($data, string $resourceClass, string $operationName, array $context);
+    public function __invoke($data, string $resourceClass, string $operationName, array $context);
 }

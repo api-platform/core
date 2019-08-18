@@ -73,7 +73,7 @@ class ReadStageTest extends TestCase
         ]);
         $this->resourceMetadataFactoryProphecy->create($resourceClass)->willReturn($resourceMetadata);
 
-        $result = $this->readStage->apply($resourceClass, null, $operationName, $context);
+        $result = ($this->readStage)($resourceClass, null, $operationName, $context);
 
         $this->assertSame($expectedResult, $result);
     }
@@ -114,7 +114,7 @@ class ReadStageTest extends TestCase
             $this->iriConverterProphecy->getItemFromIri($identifier, $normalizationContext)->willReturn($item);
         }
 
-        $result = $this->readStage->apply($resourceClass, null, $operationName, $context);
+        $result = ($this->readStage)($resourceClass, null, $operationName, $context);
 
         $this->assertSame($expectedResult, $result);
     }
@@ -162,7 +162,7 @@ class ReadStageTest extends TestCase
             $this->expectExceptionMessage($expectedExceptionMessage);
         }
 
-        $result = $this->readStage->apply($resourceClass, null, $operationName, $context);
+        $result = ($this->readStage)($resourceClass, null, $operationName, $context);
 
         $this->assertSame($expectedResult, $result);
     }
@@ -205,7 +205,7 @@ class ReadStageTest extends TestCase
 
         $this->collectionDataProviderProphecy->getCollection($resourceClass, null, $normalizationContext + ['filters' => $expectedFilters])->willReturn($expectedResult);
 
-        $result = $this->readStage->apply($resourceClass, $rootClass, $operationName, $context);
+        $result = ($this->readStage)($resourceClass, $rootClass, $operationName, $context);
 
         $this->assertSame($expectedResult, $result);
     }
