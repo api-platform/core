@@ -308,6 +308,10 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
     private function registerSwaggerConfiguration(ContainerBuilder $container, array $config, XmlFileLoader $loader): void
     {
         if (!$config['enable_swagger']) {
+            @trigger_error('The "api_platform.enable_swagger" parameter is deprecated since version 2.5 and will have no effect in 3.0. Please use "api_platform.swagger.versions" instead.', E_USER_DEPRECATED);
+        }
+
+        if (empty($config['swagger']['versions'])) {
             return;
         }
 
@@ -321,6 +325,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         }
 
         $container->setParameter('api_platform.enable_swagger', $config['enable_swagger']);
+        $container->setParameter('api_platform.swagger.versions', $config['swagger']['versions']);
         $container->setParameter('api_platform.swagger.api_keys', $config['swagger']['api_keys']);
     }
 
