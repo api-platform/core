@@ -72,6 +72,7 @@ final class FilterEagerLoadingExtension implements ContextAwareQueryCollectionEx
         $queryBuilderClone = clone $queryBuilder;
         $queryBuilderClone->resetDQLPart('where');
         $changedWhereClause = false;
+        $in = null;
 
         if (!$classMetadata->isIdentifierComposite) {
             $replacementAlias = $queryNameGenerator->generateJoinAlias($originAlias);
@@ -98,6 +99,10 @@ final class FilterEagerLoadingExtension implements ContextAwareQueryCollectionEx
             return;
         }
 
+        if (\count($in->getDQLPart('orderBy')) === \count($queryBuilder->getDQLPart('orderBy'))) {
+            $queryBuilder->resetDQLPart('orderBy');
+        }
+
         $queryBuilder->resetDQLPart('where');
         $queryBuilder->add('where', $queryBuilderClone->getDQLPart('where'));
     }
@@ -114,6 +119,7 @@ final class FilterEagerLoadingExtension implements ContextAwareQueryCollectionEx
 
         $joinParts = $queryBuilder->getDQLPart('join');
         $wherePart = $queryBuilder->getDQLPart('where');
+        $orderByPart = $queryBuilder->getDQLPart('orderBy');
 
         //reset parts
         $queryBuilderClone->resetDQLPart('join');
@@ -157,6 +163,15 @@ final class FilterEagerLoadingExtension implements ContextAwareQueryCollectionEx
         }
 
         $queryBuilderClone->add('where', str_replace($aliases, $replacements, (string) $wherePart));
+
+        foreach ($orderByPart as $order) {
+            $oldOrderBy = (string) $order;
+            $newOrderBy = str_replace($aliases, $replacements, $oldOrderBy);
+
+            if ($newOrderBy !== $oldOrderBy) {
+                $queryBuilderClone->add('orderBy', str_replace($aliases, $replacements, (string) $order), true);
+            }
+        }
 
         return $queryBuilderClone;
     }

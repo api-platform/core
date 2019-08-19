@@ -143,6 +143,16 @@
         </service>
         <service id="ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\FilterExtension" alias="api_platform.doctrine.orm.query_extension.filter" />
 
+
+        <service id="api_platform.doctrine.orm.query_extension.order" class="ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\OrderExtension" public="false">
+            <argument>%api_platform.collection.order%</argument>
+            <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
+
+            <tag name="api_platform.doctrine.orm.query_extension.collection" priority="-17" />
+        </service>
+        <service id="ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\OrderExtension" alias="api_platform.doctrine.orm.query_extension.order" />
+
+
         <!-- This needs to be executed right after the filter extension -->
 
         <service id="api_platform.doctrine.orm.query_extension.filter_eager_loading" class="ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\FilterEagerLoadingExtension" public="false">
@@ -150,7 +160,7 @@
             <argument>%api_platform.eager_loading.force_eager%</argument>
             <argument type="service" id="api_platform.resource_class_resolver" />
 
-            <tag name="api_platform.doctrine.orm.query_extension.collection" priority="-17" />
+            <tag name="api_platform.doctrine.orm.query_extension.collection" priority="-18" />
         </service>
         <service id="ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\FilterEagerLoadingExtension" alias="api_platform.doctrine.orm.query_extension.filter_eager_loading" />
 
@@ -162,14 +172,6 @@
             <tag name="api_platform.doctrine.orm.query_extension.collection" priority="-64" />
         </service>
         <service id="ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\PaginationExtension" alias="api_platform.doctrine.orm.query_extension.pagination" />
-
-        <service id="api_platform.doctrine.orm.query_extension.order" class="ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\OrderExtension" public="false">
-            <argument>%api_platform.collection.order%</argument>
-            <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
-
-            <tag name="api_platform.doctrine.orm.query_extension.collection" priority="-32" />
-        </service>
-        <service id="ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\OrderExtension" alias="api_platform.doctrine.orm.query_extension.order" />
     </services>
 
 </container>

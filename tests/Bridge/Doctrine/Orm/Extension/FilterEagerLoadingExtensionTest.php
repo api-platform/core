@@ -327,9 +327,9 @@ IN(
   SELECT o_2 FROM ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyCar o_2
   LEFT JOIN o_2.colors colors_2
   WHERE o_2.colors = :foo
+  ORDER BY o_2.colors ASC
 )
 GROUP BY o.colors HAVING counter > 3
-ORDER BY o.colors ASC
 SQL;
 
         $this->assertEquals($this->toDQLString($expected), $qb->getDQL());
