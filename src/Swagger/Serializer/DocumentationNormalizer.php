@@ -283,32 +283,36 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
         return $pathOperation;
     }
 
-    private function addSchemas(bool $v3, array $message, Schema $jsonSchema, \ArrayObject $definitions, string $resourceClass, string $operationType, string $operationName, array $mimeTypes, bool $output = true, bool $forceCollection = false)
+    /**
+     * @return array the update message as first value, and if the schema is defined as second
+     */
+    private function addSchemas(bool $v3, array $message, \ArrayObject $definitions, string $resourceClass, string $operationType, string $operationName, array $mimeTypes, bool $output = true, bool $forceCollection = false)
     {
-        if (!$jsonSchema->isDefined()) {
-            return $message;
-        }
-
         if (!$v3) {
+            $jsonSchema = $this->getJsonSchema($v3, $definitions, $resourceClass, $output, $operationType, $operationName, 'json', null, $forceCollection);
+            if (!$jsonSchema->isDefined()) {
+                return [$message, false];
+            }
+
             $message['schema'] = $jsonSchema->getArrayCopy(false);
 
-            return $message;
+            return [$message, true];
         }
 
         foreach ($mimeTypes as $mimeType => $format) {
-            if ('json' !== $format) {
-                $jsonSchema = $this->getJsonSchema($v3, $definitions, $resourceClass, $output, $operationType, $operationName, $format, null, $forceCollection);
+            $jsonSchema = $this->getJsonSchema($v3, $definitions, $resourceClass, $output, $operationType, $operationName, $format, null, $forceCollection);
+            if (!$jsonSchema->isDefined()) {
+                return [$message, false];
             }
 
             $message['content'][$mimeType] = ['schema' => $jsonSchema->getArrayCopy(false)];
         }
 
-        return $message;
+        return [$message, true];
     }
 
     private function updateGetOperation(bool $v3, \ArrayObject $pathOperation, array $mimeTypes, string $operationType, ResourceMetadata $resourceMetadata, string $resourceClass, string $resourceShortName, string $operationName, \ArrayObject $definitions): \ArrayObject
     {
-        $jsonSchema = $this->getJsonSchema($v3, $definitions, $resourceClass, true, $operationType, $operationName);
         $successStatus = (string) $resourceMetadata->getTypedOperationAttribute($operationType, $operationName, 'status', '200');
 
         if (!$v3) {
@@ -319,7 +323,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
             $pathOperation['summary'] ?? $pathOperation['summary'] = sprintf('Retrieves the collection of %s resources.', $resourceShortName);
 
             $successResponse = ['description' => sprintf('%s collection response', $resourceShortName)];
-            $successResponse = $this->addSchemas($v3, $successResponse, $jsonSchema, $definitions, $resourceClass, $operationType, $operationName, $mimeTypes);
+            [$successResponse] = $this->addSchemas($v3, $successResponse, $definitions, $resourceClass, $operationType, $operationName, $mimeTypes);
 
             $pathOperation['responses'] ?? $pathOperation['responses'] = [$successStatus => $successResponse];
             $pathOperation['parameters'] ?? $pathOperation['parameters'] = $this->getFiltersParameters($v3, $resourceClass, $operationName, $resourceMetadata);
@@ -334,7 +338,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
         $pathOperation = $this->addItemOperationParameters($v3, $pathOperation);
 
         $successResponse = ['description' => sprintf('%s resource response', $resourceShortName)];
-        $successResponse = $this->addSchemas($v3, $successResponse, $jsonSchema, $definitions, $resourceClass, $operationType, $operationName, $mimeTypes);
+        [$successResponse] = $this->addSchemas($v3, $successResponse, $definitions, $resourceClass, $operationType, $operationName, $mimeTypes);
 
         $pathOperation['responses'] ?? $pathOperation['responses'] = [
             $successStatus => $successResponse,
@@ -390,7 +394,6 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
         $collection = $subresourceOperation['collection'] ?? false;
 
         $subResourceMetadata = $this->resourceMetadataFactory->create($subresourceOperation['resource_class']);
-        $jsonSchema = $this->getJsonSchema($v3, $definitions, $subresourceOperation['resource_class'], true, OperationType::SUBRESOURCE, $operationName, 'json', null, $collection);
 
         $pathOperation = new \ArrayObject([]);
         $pathOperation['tags'] = $subresourceOperation['shortNames'];
@@ -417,7 +420,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
         $successResponse = [
             'description' => sprintf('%s %s response', $subresourceOperation['shortNames'][0], $collection ? 'collection' : 'resource'),
         ];
-        $successResponse = $this->addSchemas($v3, $successResponse, $jsonSchema, $definitions, $subresourceOperation['resource_class'], OperationType::SUBRESOURCE, $operationName, $mimeTypes, true, $collection);
+        [$successResponse] = $this->addSchemas($v3, $successResponse, $definitions, $subresourceOperation['resource_class'], OperationType::SUBRESOURCE, $operationName, $mimeTypes, true, $collection);
 
         $pathOperation['responses'] = ['200' => $successResponse, '404' => ['description' => 'Resource not found']];
 
@@ -456,20 +459,15 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
 
         $pathOperation['summary'] ?? $pathOperation['summary'] = sprintf('Creates a %s resource.', $resourceShortName);
 
-        $userDefinedParameters = $pathOperation['parameters'] ?? null;
         if (OperationType::ITEM === $operationType) {
             $pathOperation = $this->addItemOperationParameters($v3, $pathOperation);
         }
 
-        $jsonSchema = $this->getJsonSchema($v3, $definitions, $resourceClass, true, $operationType, $operationName);
-
         $successResponse = ['description' => sprintf('%s resource created', $resourceShortName)];
-        if ($jsonSchema->isDefined()) {
-            $successResponse = $this->addSchemas($v3, $successResponse, $jsonSchema, $definitions, $resourceClass, $operationType, $operationName, $responseMimeTypes);
+        [$successResponse, $defined] = $this->addSchemas($v3, $successResponse, $definitions, $resourceClass, $operationType, $operationName, $responseMimeTypes);
 
-            if ($v3 && ($links[$key = 'get'.ucfirst($resourceShortName).ucfirst(OperationType::ITEM)] ?? null)) {
-                $successResponse['links'] = [ucfirst($key) => $links[$key]];
-            }
+        if ($defined && $v3 && ($links[$key = 'get'.ucfirst($resourceShortName).ucfirst(OperationType::ITEM)] ?? null)) {
+            $successResponse['links'] = [ucfirst($key) => $links[$key]];
         }
 
         $pathOperation['responses'] ?? $pathOperation['responses'] = [
@@ -478,28 +476,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
             '404' => ['description' => 'Resource not found'],
         ];
 
-        $jsonSchema = $this->getJsonSchema($v3, $definitions, $resourceClass, false, $operationType, $operationName);
-        if (!$jsonSchema->isDefined()) {
-            return $pathOperation;
-        }
-
-        if ($v3) {
-            if (!isset($pathOperation['requestBody'])) {
-                $pathOperation['requestBody'] = $this->addSchemas($v3, [], $jsonSchema, $definitions, $resourceClass, $operationType, $operationName, $requestMimeTypes, false);
-                $pathOperation['requestBody']['description'] = sprintf('The new %s resource', $resourceShortName);
-            }
-
-            return $pathOperation;
-        }
-
-        $userDefinedParameters ?? $pathOperation['parameters'][] = [
-            'name' => lcfirst($resourceShortName),
-            'in' => 'body',
-            'description' => sprintf('The new %s resource', $resourceShortName),
-            'schema' => $jsonSchema->getArrayCopy(false),
-        ];
-
-        return $pathOperation;
+        return $this->addRequestBody($v3, $pathOperation, $definitions, $resourceClass, $resourceShortName, $operationType, $operationName, $requestMimeTypes);
     }
 
     private function updatePutOperation(bool $v3, \ArrayObject $pathOperation, array $requestMimeTypes, array $responseMimeTypes, string $operationType, ResourceMetadata $resourceMetadata, string $resourceClass, string $resourceShortName, string $operationName, \ArrayObject $definitions): \ArrayObject
@@ -513,12 +490,8 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
 
         $pathOperation = $this->addItemOperationParameters($v3, $pathOperation);
 
-        $jsonSchema = $this->getJsonSchema($v3, $definitions, $resourceClass, true, $operationType, $operationName);
-
         $successResponse = ['description' => sprintf('%s resource updated', $resourceShortName)];
-        if ($jsonSchema->isDefined()) {
-            $successResponse = $this->addSchemas($v3, $successResponse, $jsonSchema, $definitions, $resourceClass, $operationType, $operationName, $responseMimeTypes);
-        }
+        [$successResponse] = $this->addSchemas($v3, $successResponse, $definitions, $resourceClass, $operationType, $operationName, $responseMimeTypes);
 
         $pathOperation['responses'] ?? $pathOperation['responses'] = [
             (string) $resourceMetadata->getTypedOperationAttribute($operationType, $operationName, 'status', '200') => $successResponse,
@@ -526,16 +499,23 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
             '404' => ['description' => 'Resource not found'],
         ];
 
-        $jsonSchema = $this->getJsonSchema($v3, $definitions, $resourceClass, false, $operationType, $operationName);
-        if (!$jsonSchema->isDefined()) {
+        return $this->addRequestBody($v3, $pathOperation, $definitions, $resourceClass, $resourceShortName, $operationType, $operationName, $requestMimeTypes, true);
+    }
+
+    private function addRequestBody(bool $v3, \ArrayObject $pathOperation, \ArrayObject $definitions, string $resourceClass, string $resourceShortName, string $operationType, string $operationName, array $requestMimeTypes, bool $put = false)
+    {
+        if (isset($pathOperation['requestBody'])) {
             return $pathOperation;
         }
 
+        [$message, $defined] = $this->addSchemas($v3, [], $definitions, $resourceClass, $operationType, $operationName, $requestMimeTypes, false);
+        if (!$defined) {
+            return $pathOperation;
+        }
+
+        $description = sprintf('The %s %s resource', $put ? 'updated' : 'new', $resourceShortName);
         if ($v3) {
-            if (!isset($pathOperation['requestBody'])) {
-                $pathOperation['requestBody'] = $this->addSchemas($v3, [], $jsonSchema, $definitions, $resourceClass, $operationType, $operationName, $requestMimeTypes, false);
-                $pathOperation['requestBody']['description'] = sprintf('The updated %s resource', $resourceShortName);
-            }
+            $pathOperation['requestBody'] = $message + ['description' => $description];
 
             return $pathOperation;
         }
@@ -543,9 +523,8 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
         $pathOperation['parameters'][] = [
             'name' => lcfirst($resourceShortName),
             'in' => 'body',
-            'description' => sprintf('The updated %s resource', $resourceShortName),
-            'schema' => $jsonSchema->getArrayCopy(false),
-        ];
+            'description' => $description,
+        ] + $message;
 
         return $pathOperation;
     }

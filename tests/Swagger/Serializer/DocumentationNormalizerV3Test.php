@@ -418,8 +418,8 @@ class DocumentationNormalizerV3Test extends TestCase
         $propertyMetadataFactoryProphecy->create(Dummy::class, 'nameConverted')->shouldBeCalled()->willReturn(new PropertyMetadata(new Type(Type::BUILTIN_TYPE_STRING), 'This is a converted name.', true, true, null, null, false));
 
         $nameConverterProphecy = $this->prophesize(NameConverterInterface::class);
-        $nameConverterProphecy->normalize('name', Dummy::class, DocumentationNormalizer::FORMAT, [])->willReturn('name')->shouldBeCalled();
-        $nameConverterProphecy->normalize('nameConverted', Dummy::class, DocumentationNormalizer::FORMAT, [])->willReturn('name_converted')->shouldBeCalled();
+        $nameConverterProphecy->normalize('name', Dummy::class, 'jsonld', [])->willReturn('name')->shouldBeCalled();
+        $nameConverterProphecy->normalize('nameConverted', Dummy::class, 'jsonld', [])->willReturn('name_converted')->shouldBeCalled();
 
         $operationPathResolver = new CustomOperationPathResolver(new OperationPathResolver(new UnderscorePathSegmentNameGenerator()));
 
