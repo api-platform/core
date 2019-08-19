@@ -53,7 +53,7 @@ final class ReadStage implements ReadStageInterface
     /**
      * {@inheritdoc}
      */
-    public function apply(?string $resourceClass, ?string $rootClass, string $operationName, array $context)
+    public function __invoke(?string $resourceClass, ?string $rootClass, string $operationName, array $context)
     {
         $resourceMetadata = $resourceClass ? $this->resourceMetadataFactory->create($resourceClass) : null;
         if ($resourceMetadata && !$resourceMetadata->getGraphqlAttribute($operationName, 'read', true, true)) {

@@ -53,7 +53,7 @@ class DenyAccessStageTest extends TestCase
 
         $this->resourceAccessCheckerProphecy->isGranted(Argument::cetera())->shouldNotBeCalled();
 
-        $this->denyAccessStage->apply($resourceClass, 'query', []);
+        ($this->denyAccessStage)($resourceClass, 'query', []);
     }
 
     public function testGranted(): void
@@ -69,7 +69,7 @@ class DenyAccessStageTest extends TestCase
 
         $this->resourceAccessCheckerProphecy->isGranted($resourceClass, $isGranted, $extraVariables)->shouldBeCalled()->willReturn(true);
 
-        $this->denyAccessStage->apply($resourceClass, 'query', ['extra_variables' => $extraVariables]);
+        ($this->denyAccessStage)($resourceClass, 'query', ['extra_variables' => $extraVariables]);
     }
 
     public function testNotGranted(): void
@@ -90,7 +90,7 @@ class DenyAccessStageTest extends TestCase
         $this->expectException(Error::class);
         $this->expectExceptionMessage('Access Denied.');
 
-        $this->denyAccessStage->apply($resourceClass, 'query', [
+        ($this->denyAccessStage)($resourceClass, 'query', [
             'info' => $info,
             'extra_variables' => $extraVariables,
         ]);

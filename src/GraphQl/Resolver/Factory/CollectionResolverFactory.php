@@ -66,7 +66,7 @@ final class CollectionResolverFactory implements ResolverFactoryInterface
             $operationName = $operationName ?? 'query';
             $resolverContext = ['source' => $source, 'args' => $args, 'info' => $info, 'is_collection' => true, 'is_mutation' => false];
 
-            $collection = $this->readStage->apply($resourceClass, $rootClass, $operationName, $resolverContext);
+            $collection = ($this->readStage)($resourceClass, $rootClass, $operationName, $resolverContext);
             if (!is_iterable($collection)) {
                 throw new \LogicException('Collection from read stage should be iterable.');
             }
@@ -80,14 +80,14 @@ final class CollectionResolverFactory implements ResolverFactoryInterface
                 $collection = $queryResolver($collection, $resolverContext);
             }
 
-            $this->denyAccessStage->apply($resourceClass, $operationName, $resolverContext + [
+            ($this->denyAccessStage)($resourceClass, $operationName, $resolverContext + [
                 'extra_variables' => [
                     'object' => $collection,
                     'previous_object' => \is_object($collection) ? clone $collection : $collection,
                 ],
             ]);
 
-            return $this->serializeStage->apply($collection, $resourceClass, $operationName, $resolverContext);
+            return ($this->serializeStage)($collection, $resourceClass, $operationName, $resolverContext);
         };
     }
 }

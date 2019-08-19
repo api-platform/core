@@ -27,5 +27,5 @@ interface DenyAccessStageInterface
     /**
      * @throws Error
      */
-    public function apply(string $resourceClass, string $operationName, array $context): void;
+    public function __invoke(string $resourceClass, string $operationName, array $context): void;
 }

@@ -80,11 +80,11 @@ class CollectionResolverFactoryTest extends TestCase
         $this->requestStackProphecy->getCurrentRequest()->willReturn($request);
 
         $readStageCollection = [new \stdClass()];
-        $this->readStageProphecy->apply($resourceClass, $rootClass, $operationName, $resolverContext)->shouldBeCalled()->willReturn($readStageCollection);
+        $this->readStageProphecy->__invoke($resourceClass, $rootClass, $operationName, $resolverContext)->shouldBeCalled()->willReturn($readStageCollection);
 
         $this->resourceMetadataFactoryProphecy->create($resourceClass)->willReturn(new ResourceMetadata());
 
-        $this->denyAccessStageProphecy->apply($resourceClass, $operationName, $resolverContext + [
+        $this->denyAccessStageProphecy->__invoke($resourceClass, $operationName, $resolverContext + [
             'extra_variables' => [
                 'object' => $readStageCollection,
                 'previous_object' => $readStageCollection,
@@ -92,7 +92,7 @@ class CollectionResolverFactoryTest extends TestCase
         ])->shouldBeCalled();
 
         $serializeStageData = ['serialized'];
-        $this->serializeStageProphecy->apply($readStageCollection, $resourceClass, $operationName, $resolverContext)->shouldBeCalled()->willReturn($serializeStageData);
+        $this->serializeStageProphecy->__invoke($readStageCollection, $resourceClass, $operationName, $resolverContext)->shouldBeCalled()->willReturn($serializeStageData);
 
         $this->assertSame($serializeStageData, ($this->collectionResolverFactory)($resourceClass, $rootClass, $operationName)($source, $args, null, $info));
     }
@@ -132,7 +132,7 @@ class CollectionResolverFactoryTest extends TestCase
         $resolverContext = ['source' => $source, 'args' => $args, 'info' => $info, 'is_collection' => true, 'is_mutation' => false];
 
         $readStageCollection = new \stdClass();
-        $this->readStageProphecy->apply($resourceClass, $rootClass, $operationName, $resolverContext)->shouldBeCalled()->willReturn($readStageCollection);
+        $this->readStageProphecy->__invoke($resourceClass, $rootClass, $operationName, $resolverContext)->shouldBeCalled()->willReturn($readStageCollection);
 
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Collection from read stage should be iterable.');
@@ -151,7 +151,7 @@ class CollectionResolverFactoryTest extends TestCase
         $resolverContext = ['source' => $source, 'args' => $args, 'info' => $info, 'is_collection' => true, 'is_mutation' => false];
 
         $readStageCollection = [new \stdClass()];
-        $this->readStageProphecy->apply($resourceClass, $rootClass, $operationName, $resolverContext)->shouldBeCalled()->willReturn($readStageCollection);
+        $this->readStageProphecy->__invoke($resourceClass, $rootClass, $operationName, $resolverContext)->shouldBeCalled()->willReturn($readStageCollection);
 
         $this->resourceMetadataFactoryProphecy->create($resourceClass)->willReturn(
             (new ResourceMetadata())->withGraphql([$operationName => ['collection_query' => 'query_resolver_id']])
@@ -163,7 +163,7 @@ class CollectionResolverFactoryTest extends TestCase
             return $customCollection;
         });
 
-        $this->denyAccessStageProphecy->apply($resourceClass, $operationName, $resolverContext + [
+        $this->denyAccessStageProphecy->__invoke($resourceClass, $operationName, $resolverContext + [
             'extra_variables' => [
                 'object' => $customCollection,
                 'previous_object' => $customCollection,
@@ -171,7 +171,7 @@ class CollectionResolverFactoryTest extends TestCase
         ])->shouldBeCalled();
 
         $serializeStageData = ['serialized'];
-        $this->serializeStageProphecy->apply($customCollection, $resourceClass, $operationName, $resolverContext)->shouldBeCalled()->willReturn($serializeStageData);
+        $this->serializeStageProphecy->__invoke($customCollection, $resourceClass, $operationName, $resolverContext)->shouldBeCalled()->willReturn($serializeStageData);
 
         $this->assertSame($serializeStageData, ($this->collectionResolverFactory)($resourceClass, $rootClass, $operationName)($source, $args, null, $info));
     }
