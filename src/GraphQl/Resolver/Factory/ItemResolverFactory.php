@@ -19,6 +19,7 @@ use ApiPlatform\Core\GraphQl\Resolver\Stage\ReadStageInterface;
 use ApiPlatform\Core\GraphQl\Resolver\Stage\SerializeStageInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Util\ClassInfoTrait;
+use ApiPlatform\Core\Util\CloneTrait;
 use GraphQL\Error\Error;
 use GraphQL\Type\Definition\ResolveInfo;
 use Psr\Container\ContainerInterface;
@@ -33,6 +34,7 @@ use Psr\Container\ContainerInterface;
  */
 final class ItemResolverFactory implements ResolverFactoryInterface
 {
+    use CloneTrait;
     use ClassInfoTrait;
 
     private $readStage;
@@ -80,7 +82,7 @@ final class ItemResolverFactory implements ResolverFactoryInterface
             ($this->denyAccessStage)($resourceClass, $operationName, $resolverContext + [
                 'extra_variables' => [
                     'object' => $item,
-                    'previous_object' => \is_object($item) ? clone $item : $item,
+                    'previous_object' => $this->clone($item),
                 ],
             ]);
 
