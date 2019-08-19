@@ -129,7 +129,7 @@ final class SwaggerUiAction
             'graphQlPlaygroundEnabled' => $this->graphQlPlaygroundEnabled,
         ];
 
-        $swaggerContext = ['spec_version' => $request->query->getInt('spec_version', (int)($this->swaggerVersions[0] ?? 2))];
+        $swaggerContext = ['spec_version' => $request->query->getInt('spec_version', (int) ($this->swaggerVersions[0] ?? 2))];
         if ('' !== $baseUrl = $request->getBaseUrl()) {
             $swaggerContext['base_url'] = $baseUrl;
         }

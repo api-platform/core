@@ -60,7 +60,7 @@ final class Configuration implements ConfigurationInterface
                 ->ifTrue(static function ($v) {
                     return isset($v['enable_swagger']) && false === $v['enable_swagger'];
                 })
-                ->then(static function ($v){
+                ->then(static function ($v) {
                     $v['swagger']['versions'] = [];
 
                     return $v;
@@ -262,7 +262,7 @@ final class Configuration implements ConfigurationInterface
                             ->defaultValue($defaultVersions)
                             ->beforeNormalization()->castToArray()->end()
                             ->validate()
-                                ->ifTrue(function($v) use ($defaultVersions) {
+                                ->ifTrue(function ($v) use ($defaultVersions) {
                                     return $v !== array_intersect($v, $defaultVersions);
                                 })
                                 ->thenInvalid(sprintf('Only the versions %s are supported. Got %s.', implode(' and ', $defaultVersions), '%s'))

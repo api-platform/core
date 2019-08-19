@@ -318,6 +318,7 @@ class ConfigurationTest extends TestCase
 
     /**
      * Test config for disabled swagger versions.
+     *
      * @group legacy
      * @expectedDeprecation The use of `enable_swagger` has been deprecated in 2.5 and will be removed in 3.0. use `api_platform.swagger.versions` instead.
      */
