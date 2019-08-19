@@ -18,6 +18,7 @@ use ApiPlatform\Core\GraphQl\Resolver\Stage\DenyAccessStageInterface;
 use ApiPlatform\Core\GraphQl\Resolver\Stage\ReadStageInterface;
 use ApiPlatform\Core\GraphQl\Resolver\Stage\SerializeStageInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
+use ApiPlatform\Core\Util\CloneTrait;
 use GraphQL\Type\Definition\ResolveInfo;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -32,6 +33,8 @@ use Symfony\Component\HttpFoundation\RequestStack;
  */
 final class CollectionResolverFactory implements ResolverFactoryInterface
 {
+    use CloneTrait;
+
     private $readStage;
     private $denyAccessStage;
     private $serializeStage;
@@ -83,7 +86,7 @@ final class CollectionResolverFactory implements ResolverFactoryInterface
             ($this->denyAccessStage)($resourceClass, $operationName, $resolverContext + [
                 'extra_variables' => [
                     'object' => $collection,
-                    'previous_object' => \is_object($collection) ? clone $collection : $collection,
+                    'previous_object' => $this->clone($collection),
                 ],
             ]);
 

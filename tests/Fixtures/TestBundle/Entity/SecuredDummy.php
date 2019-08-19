@@ -26,6 +26,11 @@ use Symfony\Component\Validator\Constraints as Assert;
  *     attributes={"access_control"="is_granted('ROLE_USER')"},
  *     collectionOperations={
  *         "get",
+ *         "get_from_data_provider_generator"={
+ *             "method"="GET",
+ *             "path"="custom_data_provider_generator",
+ *             "access_control"="is_granted('ROLE_USER')"
+ *         },
  *         "post"={"access_control"="is_granted('ROLE_ADMIN')"}
  *     },
  *     itemOperations={

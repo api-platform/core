@@ -22,6 +22,7 @@ use ApiPlatform\Core\GraphQl\Resolver\Stage\ValidateStageInterface;
 use ApiPlatform\Core\GraphQl\Resolver\Stage\WriteStageInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Util\ClassInfoTrait;
+use ApiPlatform\Core\Util\CloneTrait;
 use GraphQL\Error\Error;
 use GraphQL\Type\Definition\ResolveInfo;
 use Psr\Container\ContainerInterface;
@@ -36,6 +37,7 @@ use Psr\Container\ContainerInterface;
 final class ItemMutationResolverFactory implements ResolverFactoryInterface
 {
     use ClassInfoTrait;
+    use CloneTrait;
 
     private $readStage;
     private $denyAccessStage;
@@ -71,8 +73,7 @@ final class ItemMutationResolverFactory implements ResolverFactoryInterface
             if (null !== $item && !\is_object($item)) {
                 throw new \LogicException('Item from read stage should be a nullable object.');
             }
-
-            $previousItem = \is_object($item) ? clone $item : $item;
+            $previousItem = $this->clone($item);
 
             if ('delete' === $operationName) {
                 ($this->denyAccessStage)($resourceClass, $operationName, $resolverContext + [
