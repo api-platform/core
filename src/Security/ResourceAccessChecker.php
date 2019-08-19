@@ -46,13 +46,13 @@ final class ResourceAccessChecker implements ResourceAccessCheckerInterface
     public function isGranted(string $resourceClass, string $expression, array $extraVariables = []): bool
     {
         if (null === $this->tokenStorage || null === $this->authenticationTrustResolver) {
-            throw new \LogicException('The "symfony/security" library must be installed to use the "access_control" attribute.');
+            throw new \LogicException('The "symfony/security" library must be installed to use the "security" attribute.');
         }
         if (null === $token = $this->tokenStorage->getToken()) {
-            throw new \LogicException('The current token must be set to use the "access_control" attribute (is the URL behind a firewall?).');
+            throw new \LogicException('The current token must be set to use the "security" attribute (is the URL behind a firewall?).');
         }
         if (null === $this->expressionLanguage) {
-            throw new \LogicException('The "symfony/expression-language" library must be installed to use the "access_control".');
+            throw new \LogicException('The "symfony/expression-language" library must be installed to use the "security".');
         }
 
         return (bool) $this->expressionLanguage->evaluate($expression, array_merge($extraVariables, $this->getVariables($token)));

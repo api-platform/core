@@ -14,8 +14,9 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\GraphQl\Resolver\Factory;
 
 use ApiPlatform\Core\GraphQl\Resolver\Factory\ItemResolverFactory;
-use ApiPlatform\Core\GraphQl\Resolver\Stage\DenyAccessStageInterface;
 use ApiPlatform\Core\GraphQl\Resolver\Stage\ReadStageInterface;
+use ApiPlatform\Core\GraphQl\Resolver\Stage\SecurityPostDenormalizeStageInterface;
+use ApiPlatform\Core\GraphQl\Resolver\Stage\SecurityStageInterface;
 use ApiPlatform\Core\GraphQl\Resolver\Stage\SerializeStageInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
@@ -33,7 +34,8 @@ class ItemResolverFactoryTest extends TestCase
 {
     private $itemResolverFactory;
     private $readStageProphecy;
-    private $denyAccessStageProphecy;
+    private $securityStageProphecy;
+    private $securityPostDenormalizeStageProphecy;
     private $serializeStageProphecy;
     private $queryResolverLocatorProphecy;
     private $resourceMetadataFactoryProphecy;
@@ -44,14 +46,16 @@ class ItemResolverFactoryTest extends TestCase
     protected function setUp(): void
     {
         $this->readStageProphecy = $this->prophesize(ReadStageInterface::class);
-        $this->denyAccessStageProphecy = $this->prophesize(DenyAccessStageInterface::class);
+        $this->securityStageProphecy = $this->prophesize(SecurityStageInterface::class);
+        $this->securityPostDenormalizeStageProphecy = $this->prophesize(SecurityPostDenormalizeStageInterface::class);
         $this->serializeStageProphecy = $this->prophesize(SerializeStageInterface::class);
         $this->queryResolverLocatorProphecy = $this->prophesize(ContainerInterface::class);
         $this->resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
 
         $this->itemResolverFactory = new ItemResolverFactory(
             $this->readStageProphecy->reveal(),
-            $this->denyAccessStageProphecy->reveal(),
+            $this->securityStageProphecy->reveal(),
+            $this->securityPostDenormalizeStageProphecy->reveal(),
             $this->serializeStageProphecy->reveal(),
             $this->queryResolverLocatorProphecy->reveal(),
             $this->resourceMetadataFactoryProphecy->reveal()
@@ -76,7 +80,12 @@ class ItemResolverFactoryTest extends TestCase
 
         $this->resourceMetadataFactoryProphecy->create($determinedResourceClass)->willReturn(new ResourceMetadata());
 
-        $this->denyAccessStageProphecy->__invoke($determinedResourceClass, $operationName, $resolverContext + [
+        $this->securityStageProphecy->__invoke($determinedResourceClass, $operationName, $resolverContext + [
+            'extra_variables' => [
+                'object' => $readStageItem,
+            ],
+        ])->shouldBeCalled();
+        $this->securityPostDenormalizeStageProphecy->__invoke($determinedResourceClass, $operationName, $resolverContext + [
             'extra_variables' => [
                 'object' => $readStageItem,
                 'previous_object' => $readStageItem,
@@ -187,7 +196,12 @@ class ItemResolverFactoryTest extends TestCase
             return $customItem;
         });
 
-        $this->denyAccessStageProphecy->__invoke($resourceClass, $operationName, $resolverContext + [
+        $this->securityStageProphecy->__invoke($resourceClass, $operationName, $resolverContext + [
+            'extra_variables' => [
+                'object' => $customItem,
+            ],
+        ])->shouldBeCalled();
+        $this->securityPostDenormalizeStageProphecy->__invoke($resourceClass, $operationName, $resolverContext + [
             'extra_variables' => [
                 'object' => $customItem,
                 'previous_object' => $customItem,

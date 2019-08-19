@@ -14,9 +14,10 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\GraphQl\Resolver\Factory;
 
 use ApiPlatform\Core\GraphQl\Resolver\Factory\ItemMutationResolverFactory;
-use ApiPlatform\Core\GraphQl\Resolver\Stage\DenyAccessStageInterface;
 use ApiPlatform\Core\GraphQl\Resolver\Stage\DeserializeStageInterface;
 use ApiPlatform\Core\GraphQl\Resolver\Stage\ReadStageInterface;
+use ApiPlatform\Core\GraphQl\Resolver\Stage\SecurityPostDenormalizeStageInterface;
+use ApiPlatform\Core\GraphQl\Resolver\Stage\SecurityStageInterface;
 use ApiPlatform\Core\GraphQl\Resolver\Stage\SerializeStageInterface;
 use ApiPlatform\Core\GraphQl\Resolver\Stage\ValidateStageInterface;
 use ApiPlatform\Core\GraphQl\Resolver\Stage\WriteStageInterface;
@@ -36,7 +37,8 @@ class ItemMutationResolverFactoryTest extends TestCase
 {
     private $itemMutationResolverFactory;
     private $readStageProphecy;
-    private $denyAccessStageProphecy;
+    private $securityStageProphecy;
+    private $securityPostDenormalizeStageProphecy;
     private $serializeStageProphecy;
     private $deserializeStageProphecy;
     private $writeStageProphecy;
@@ -50,7 +52,8 @@ class ItemMutationResolverFactoryTest extends TestCase
     protected function setUp(): void
     {
         $this->readStageProphecy = $this->prophesize(ReadStageInterface::class);
-        $this->denyAccessStageProphecy = $this->prophesize(DenyAccessStageInterface::class);
+        $this->securityStageProphecy = $this->prophesize(SecurityStageInterface::class);
+        $this->securityPostDenormalizeStageProphecy = $this->prophesize(SecurityPostDenormalizeStageInterface::class);
         $this->serializeStageProphecy = $this->prophesize(SerializeStageInterface::class);
         $this->deserializeStageProphecy = $this->prophesize(DeserializeStageInterface::class);
         $this->writeStageProphecy = $this->prophesize(WriteStageInterface::class);
@@ -60,7 +63,8 @@ class ItemMutationResolverFactoryTest extends TestCase
 
         $this->itemMutationResolverFactory = new ItemMutationResolverFactory(
             $this->readStageProphecy->reveal(),
-            $this->denyAccessStageProphecy->reveal(),
+            $this->securityStageProphecy->reveal(),
+            $this->securityPostDenormalizeStageProphecy->reveal(),
             $this->serializeStageProphecy->reveal(),
             $this->deserializeStageProphecy->reveal(),
             $this->writeStageProphecy->reveal(),
@@ -90,7 +94,12 @@ class ItemMutationResolverFactoryTest extends TestCase
 
         $this->resourceMetadataFactoryProphecy->create($resourceClass)->willReturn(new ResourceMetadata());
 
-        $this->denyAccessStageProphecy->__invoke($resourceClass, $operationName, $resolverContext + [
+        $this->securityStageProphecy->__invoke($resourceClass, $operationName, $resolverContext + [
+            'extra_variables' => [
+                'object' => $readStageItem,
+            ],
+        ])->shouldBeCalled();
+        $this->securityPostDenormalizeStageProphecy->__invoke($resourceClass, $operationName, $resolverContext + [
             'extra_variables' => [
                 'object' => $deserializeStageItem,
                 'previous_object' => $readStageItem,
@@ -171,7 +180,12 @@ class ItemMutationResolverFactoryTest extends TestCase
 
         $this->resourceMetadataFactoryProphecy->create($resourceClass)->willReturn(new ResourceMetadata());
 
-        $this->denyAccessStageProphecy->__invoke($resourceClass, $operationName, $resolverContext + [
+        $this->securityStageProphecy->__invoke($resourceClass, $operationName, $resolverContext + [
+            'extra_variables' => [
+                'object' => $readStageItem,
+            ],
+        ])->shouldBeCalled();
+        $this->securityPostDenormalizeStageProphecy->__invoke($resourceClass, $operationName, $resolverContext + [
             'extra_variables' => [
                 'object' => $deserializeStageItem,
                 'previous_object' => $readStageItem,
@@ -204,7 +218,12 @@ class ItemMutationResolverFactoryTest extends TestCase
 
         $this->deserializeStageProphecy->__invoke(Argument::cetera())->shouldNotBeCalled();
 
-        $this->denyAccessStageProphecy->__invoke($resourceClass, $operationName, $resolverContext + [
+        $this->securityStageProphecy->__invoke($resourceClass, $operationName, $resolverContext + [
+            'extra_variables' => [
+                'object' => $readStageItem,
+            ],
+        ])->shouldBeCalled();
+        $this->securityPostDenormalizeStageProphecy->__invoke($resourceClass, $operationName, $resolverContext + [
             'extra_variables' => [
                 'object' => $readStageItem,
                 'previous_object' => $readStageItem,
@@ -251,7 +270,12 @@ class ItemMutationResolverFactoryTest extends TestCase
             return $customItem;
         });
 
-        $this->denyAccessStageProphecy->__invoke($resourceClass, $operationName, $resolverContext + [
+        $this->securityStageProphecy->__invoke($resourceClass, $operationName, $resolverContext + [
+            'extra_variables' => [
+                'object' => $readStageItem,
+            ],
+        ])->shouldBeCalled();
+        $this->securityPostDenormalizeStageProphecy->__invoke($resourceClass, $operationName, $resolverContext + [
             'extra_variables' => [
                 'object' => $customItem,
                 'previous_object' => $readStageItem,
