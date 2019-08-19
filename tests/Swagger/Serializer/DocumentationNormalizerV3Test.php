@@ -165,6 +165,7 @@ class DocumentationNormalizerV3Test extends TestCase
                                 'required' => false,
                                 'schema' => [
                                     'type' => 'integer',
+                                    'default' => 1,
                                 ],
                                 'description' => 'The collection page number',
                             ],
@@ -174,6 +175,8 @@ class DocumentationNormalizerV3Test extends TestCase
                                 'required' => false,
                                 'schema' => [
                                     'type' => 'integer',
+                                    'default' => 30,
+                                    'minimum' => 0,
                                 ],
                                 'description' => 'The number of items per page',
                             ],
@@ -294,14 +297,21 @@ class DocumentationNormalizerV3Test extends TestCase
                                 'name' => 'page',
                                 'in' => 'query',
                                 'required' => false,
-                                'schema' => ['type' => 'integer'],
+                                'schema' => [
+                                    'type' => 'integer',
+                                    'default' => 1,
+                                ],
                                 'description' => 'The collection page number',
                             ],
                             [
                                 'name' => 'itemsPerPage',
                                 'in' => 'query',
                                 'required' => false,
-                                'schema' => ['type' => 'integer'],
+                                'schema' => [
+                                    'type' => 'integer',
+                                    'default' => 30,
+                                    'minimum' => 0,
+                                ],
                                 'description' => 'The number of items per page',
                             ],
                         ],
@@ -772,7 +782,10 @@ class DocumentationNormalizerV3Test extends TestCase
                                 'name' => 'page',
                                 'in' => 'query',
                                 'required' => false,
-                                'schema' => ['type' => 'integer'],
+                                'schema' => [
+                                    'type' => 'integer',
+                                    'default' => 1,
+                                ],
                                 'description' => 'The collection page number',
                             ],
                         ],
@@ -1103,7 +1116,10 @@ class DocumentationNormalizerV3Test extends TestCase
                                 'name' => 'page',
                                 'in' => 'query',
                                 'required' => false,
-                                'schema' => ['type' => 'integer'],
+                                'schema' => [
+                                    'type' => 'integer',
+                                    'default' => 1,
+                                ],
                                 'description' => 'The collection page number',
                             ],
                         ],
@@ -1321,7 +1337,10 @@ class DocumentationNormalizerV3Test extends TestCase
                                 'name' => 'page',
                                 'in' => 'query',
                                 'required' => false,
-                                'schema' => ['type' => 'integer'],
+                                'schema' => [
+                                    'type' => 'integer',
+                                    'default' => 1,
+                                ],
                                 'description' => 'The collection page number',
                             ],
                         ],
@@ -1825,7 +1844,10 @@ class DocumentationNormalizerV3Test extends TestCase
                                 'name' => 'page',
                                 'in' => 'query',
                                 'required' => false,
-                                'schema' => ['type' => 'integer'],
+                                'schema' => [
+                                    'type' => 'integer',
+                                    'default' => 1,
+                                ],
                                 'description' => 'The collection page number',
                             ],
                         ],
@@ -2079,7 +2101,10 @@ class DocumentationNormalizerV3Test extends TestCase
                                 'name' => 'page',
                                 'in' => 'query',
                                 'required' => false,
-                                'schema' => ['type' => 'integer'],
+                                'schema' => [
+                                    'type' => 'integer',
+                                    'default' => 1,
+                                ],
                                 'description' => 'The collection page number',
                             ],
                         ],
@@ -2476,7 +2501,10 @@ class DocumentationNormalizerV3Test extends TestCase
                                 'name' => 'page',
                                 'in' => 'query',
                                 'required' => false,
-                                'schema' => ['type' => 'integer'],
+                                'schema' => [
+                                    'type' => 'integer',
+                                    'default' => 1,
+                                ],
                                 'description' => 'The collection page number',
                             ],
                             [
@@ -2485,6 +2513,139 @@ class DocumentationNormalizerV3Test extends TestCase
                                 'required' => false,
                                 'schema' => ['type' => 'boolean'],
                                 'description' => 'Enable or disable pagination',
+                            ],
+                        ],
+                        'responses' => [
+                            '200' => [
+                                'description' => 'Dummy collection response',
+                                'content' => [
+                                    'application/ld+json' => [
+                                        'schema' => [
+                                            'type' => 'array',
+                                            'items' => ['$ref' => '#/components/schemas/Dummy'],
+                                        ],
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ]),
+                ],
+            ]),
+            'components' => [
+                'schemas' => new \ArrayObject([
+                    'Dummy' => new \ArrayObject([
+                        'type' => 'object',
+                        'description' => 'This is a dummy.',
+                        'externalDocs' => ['url' => 'http://schema.example.com/Dummy'],
+                        'properties' => [
+                            'id' => new \ArrayObject([
+                                'type' => 'integer',
+                                'description' => 'This is an id.',
+                                'readOnly' => true,
+                            ]),
+                            'name' => new \ArrayObject([
+                                'type' => 'string',
+                                'description' => 'This is a name.',
+                                'enum' => ['one', 'two'],
+                                'example' => 'one',
+                            ]),
+                        ],
+                    ]),
+                ]),
+            ],
+        ];
+
+        $this->assertEquals($expected, $normalizer->normalize($documentation, DocumentationNormalizer::FORMAT, ['base_url' => '/app_dev.php/']));
+    }
+
+    public function testNormalizeWithPaginationCustomDefaultAndMaxItemsPerPage(): void
+    {
+        $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), 'Test API', 'This is a test API.', '1.2.3');
+
+        $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
+        $propertyNameCollectionFactoryProphecy->create(Dummy::class, [])->shouldBeCalled()->willReturn(new PropertyNameCollection(['id', 'name']));
+
+        $dummyMetadata = new ResourceMetadata(
+            'Dummy',
+            'This is a dummy.',
+            'http://schema.example.com/Dummy',
+            [],
+            ['get' => ['method' => 'GET'] + self::OPERATION_FORMATS],
+            ['pagination_client_items_per_page' => true, 'pagination_items_per_page' => 20, 'maximum_items_per_page' => 80]
+        );
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
+        $resourceMetadataFactoryProphecy->create(Dummy::class)->shouldBeCalled()->willReturn($dummyMetadata);
+
+        $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
+        $propertyMetadataFactoryProphecy->create(Dummy::class, 'id')->shouldBeCalled()->willReturn(new PropertyMetadata(new Type(Type::BUILTIN_TYPE_INT), 'This is an id.', true, false));
+        $propertyMetadataFactoryProphecy->create(Dummy::class, 'name')->shouldBeCalled()->willReturn(new PropertyMetadata(new Type(Type::BUILTIN_TYPE_STRING), 'This is a name.', true, true, true, true, false, false, null, null, ['openapi_context' => ['type' => 'string', 'enum' => ['one', 'two'], 'example' => 'one']]));
+
+        $operationPathResolver = new CustomOperationPathResolver(new OperationPathResolver(new UnderscorePathSegmentNameGenerator()));
+
+        $normalizer = new DocumentationNormalizer(
+            $resourceMetadataFactoryProphecy->reveal(),
+            $propertyNameCollectionFactoryProphecy->reveal(),
+            $propertyMetadataFactoryProphecy->reveal(),
+            null,
+            null,
+            $operationPathResolver,
+            null,
+            null,
+            null,
+            false,
+            '',
+            '',
+            '',
+            '',
+            [],
+            [],
+            null,
+            true,
+            'page',
+            false,
+            'itemsPerPage',
+            [],
+            false,
+            'pagination',
+            ['spec_version' => 3]
+        );
+
+        $expected = [
+            'openapi' => '3.0.2',
+            'servers' => [['url' => '/app_dev.php/']],
+            'info' => [
+                'title' => 'Test API',
+                'description' => 'This is a test API.',
+                'version' => '1.2.3',
+            ],
+            'paths' => new \ArrayObject([
+                '/dummies' => [
+                    'get' => new \ArrayObject([
+                        'tags' => ['Dummy'],
+                        'operationId' => 'getDummyCollection',
+                        'summary' => 'Retrieves the collection of Dummy resources.',
+                        'parameters' => [
+                            [
+                                'name' => 'page',
+                                'in' => 'query',
+                                'required' => false,
+                                'schema' => [
+                                    'type' => 'integer',
+                                    'default' => 1,
+                                ],
+                                'description' => 'The collection page number',
+                            ],
+                            [
+                                'name' => 'itemsPerPage',
+                                'in' => 'query',
+                                'required' => false,
+                                'schema' => [
+                                    'type' => 'integer',
+                                    'default' => 20,
+                                    'minimum' => 0,
+                                    'maximum' => 80,
+                                ],
+                                'description' => 'The number of items per page',
                             ],
                         ],
                         'responses' => [
