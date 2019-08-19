@@ -66,6 +66,8 @@ use ApiPlatform\Core\GraphQl\Resolver\QueryCollectionResolverInterface;
 use ApiPlatform\Core\GraphQl\Resolver\QueryItemResolverInterface;
 use ApiPlatform\Core\GraphQl\Serializer\SerializerContextBuilderInterface as GraphQlSerializerContextBuilderInterface;
 use ApiPlatform\Core\GraphQl\Type\Definition\TypeInterface as GraphQlTypeInterface;
+use ApiPlatform\Core\JsonSchema\SchemaFactoryInterface;
+use ApiPlatform\Core\JsonSchema\TypeFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
@@ -1150,6 +1152,7 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.hydra.normalizer.entrypoint',
             'api_platform.hydra.normalizer.error',
             'api_platform.hydra.normalizer.partial_collection_view',
+            'api_platform.hydra.json_schema.schema_factory',
             'api_platform.jsonld.action.context',
             'api_platform.jsonld.context_builder',
             'api_platform.jsonld.encoder',
@@ -1182,6 +1185,8 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.swagger.listener.ui',
             'api_platform.swagger.normalizer.api_gateway',
             'api_platform.swagger.normalizer.documentation',
+            'api_platform.json_schema.type_factory',
+            'api_platform.json_schema.schema_factory',
             'api_platform.validator',
             'test.api_platform.client',
         ];
@@ -1235,6 +1240,8 @@ class ApiPlatformExtensionTest extends TestCase
             NumericFilter::class => 'api_platform.doctrine.orm.numeric_filter',
             ExistsFilter::class => 'api_platform.doctrine.orm.exists_filter',
             GraphQlSerializerContextBuilderInterface::class => 'api_platform.graphql.serializer.context_builder',
+            TypeFactoryInterface::class => 'api_platform.json_schema.type_factory',
+            SchemaFactoryInterface::class => 'api_platform.json_schema.schema_factory',
         ];
 
         if (\in_array('odm', $doctrineIntegrationsToLoad, true)) {
