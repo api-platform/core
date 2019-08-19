@@ -56,6 +56,16 @@ final class Configuration implements ConfigurationInterface
         }
 
         $rootNode
+            ->beforeNormalization()
+                ->ifTrue(static function ($v) {
+                    return isset($v['enable_swagger']) && false === $v['enable_swagger'];
+                })
+                ->then(static function ($v){
+                    $v['swagger']['versions'] = [];
+
+                    return $v;
+                })
+            ->end()
             ->children()
                 ->scalarNode('title')
                     ->info('The title of the API.')
@@ -102,7 +112,11 @@ final class Configuration implements ConfigurationInterface
                     ->setDeprecated('Enabling the NelmioApiDocBundle integration has been deprecated in 2.2 and will be removed in 3.0. NelmioApiDocBundle 3 has native support for API Platform.')
                     ->info('Enable the NelmioApiDocBundle integration.')
                 ->end()
-                ->booleanNode('enable_swagger')->defaultTrue()->info('Enable the Swagger documentation and export.')->end()
+                ->booleanNode('enable_swagger')
+                    ->defaultTrue()
+                    ->setDeprecated('The use of `enable_swagger` has been deprecated in 2.5 and will be removed in 3.0. use `api_platform.swagger.versions` instead.')
+                    ->info('Enable the Swagger documentation and export.')
+                ->end()
                 ->booleanNode('enable_swagger_ui')->defaultValue(class_exists(TwigBundle::class))->info('Enable Swagger UI')->end()
                 ->booleanNode('enable_re_doc')->defaultValue(class_exists(TwigBundle::class))->info('Enable ReDoc')->end()
                 ->booleanNode('enable_entrypoint')->defaultTrue()->info('Enable the entrypoint')->end()
@@ -236,14 +250,28 @@ final class Configuration implements ConfigurationInterface
 
     private function addSwaggerSection(ArrayNodeDefinition $rootNode): void
     {
+        $defaultVersions = ['2.0.0', '3.0.2'];
+
         $rootNode
             ->children()
                 ->arrayNode('swagger')
                     ->addDefaultsIfNotSet()
                     ->children()
-                             ->arrayNode('api_keys')
-                                 ->prototype('array')
-                                    ->children()
+                        ->arrayNode('versions')
+                            ->info('The active versions of OpenAPI to be exported or used in the swagger_ui')
+                            ->defaultValue($defaultVersions)
+                            ->beforeNormalization()->castToArray()->end()
+                            ->validate()
+                                ->ifTrue(function($v) use ($defaultVersions) {
+                                    return $v !== array_intersect($v, $defaultVersions);
+                                })
+                                ->thenInvalid(sprintf('Only the versions %s are supported. Got %s.', implode(' and ', $defaultVersions), '%s'))
+                            ->end()
+                            ->prototype('scalar')->end()
+                        ->end()
+                        ->arrayNode('api_keys')
+                            ->prototype('array')
+                                ->children()
                                     ->scalarNode('name')
                                         ->info('The name of the header or query parameter containing the api key.')
                                     ->end()
@@ -252,7 +280,7 @@ final class Configuration implements ConfigurationInterface
                                         ->values(['query', 'header'])
                                     ->end()
                                 ->end()
-                             ->end()
+                            ->end()
                         ->end()
                     ->end()
                 ->end()
