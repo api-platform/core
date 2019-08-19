@@ -199,7 +199,6 @@ class ApiPlatformExtensionTest extends TestCase
     public function testLoadDefaultConfig()
     {
         $containerBuilderProphecy = $this->getBaseContainerBuilderProphecy();
-        $containerBuilderProphecy->setParameter('api_platform.enable_swagger', '1')->shouldBeCalled();
         $containerBuilderProphecy->hasParameter('kernel.debug')->willReturn(true);
         $containerBuilderProphecy->getParameter('kernel.debug')->willReturn(false);
         $containerBuilder = $containerBuilderProphecy->reveal();
@@ -213,7 +212,6 @@ class ApiPlatformExtensionTest extends TestCase
     public function testLoadDefaultConfigWithOdm()
     {
         $containerBuilderProphecy = $this->getBaseContainerBuilderProphecy(['odm']);
-        $containerBuilderProphecy->setParameter('api_platform.enable_swagger', '1')->shouldBeCalled();
         $containerBuilderProphecy->hasParameter('kernel.debug')->willReturn(true);
         $containerBuilderProphecy->getParameter('kernel.debug')->willReturn(false);
         $containerBuilder = $containerBuilderProphecy->reveal();
@@ -232,7 +230,6 @@ class ApiPlatformExtensionTest extends TestCase
         $containerBuilderProphecy->hasParameter('kernel.debug')->willReturn(true);
         $containerBuilderProphecy->getParameter('kernel.debug')->willReturn(false);
         $containerBuilderProphecy->setAlias('api_platform.name_converter', $nameConverterId)->shouldBeCalled();
-        $containerBuilderProphecy->setParameter('api_platform.enable_swagger', '1')->shouldBeCalled();
 
         $containerBuilder = $containerBuilderProphecy->reveal();
 
@@ -252,7 +249,6 @@ class ApiPlatformExtensionTest extends TestCase
             'FOSUserBundle' => FOSUserBundle::class,
         ])->shouldBeCalled();
         $containerBuilderProphecy->setDefinition('api_platform.fos_user.event_listener', Argument::type(Definition::class))->shouldBeCalled();
-        $containerBuilderProphecy->setParameter('api_platform.enable_swagger', '1')->shouldBeCalled();
 
         $containerBuilder = $containerBuilderProphecy->reveal();
 
@@ -323,7 +319,6 @@ class ApiPlatformExtensionTest extends TestCase
         ])->shouldBeCalled();
         $containerBuilderProphecy->setDefinition('api_platform.nelmio_api_doc.annotations_provider', Argument::type(Definition::class))->shouldBeCalled();
         $containerBuilderProphecy->setDefinition('api_platform.nelmio_api_doc.parser', Argument::type(Definition::class))->shouldBeCalled();
-        $containerBuilderProphecy->setParameter('api_platform.enable_swagger', '1')->shouldBeCalled();
 
         $containerBuilder = $containerBuilderProphecy->reveal();
 
@@ -1058,9 +1053,8 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.oauth.tokenUrl' => '/oauth/v2/token',
             'api_platform.oauth.authorizationUrl' => '/oauth/v2/auth',
             'api_platform.oauth.scopes' => [],
-            'api_platform.swagger.versions' => ['2.0.0', '3.0.2'],
+            'api_platform.swagger.versions' => ['2', '3'],
             'api_platform.swagger.api_keys' => [],
-            'api_platform.enable_swagger' => true,
             'api_platform.enable_swagger_ui' => true,
             'api_platform.enable_re_doc' => true,
             'api_platform.graphql.enabled' => true,

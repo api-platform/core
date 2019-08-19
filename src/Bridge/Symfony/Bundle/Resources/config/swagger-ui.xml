@@ -34,6 +34,7 @@
             <argument>%api_platform.graphql.enabled%</argument>
             <argument>%api_platform.graphql.graphiql.enabled%</argument>
             <argument>%api_platform.graphql.graphql_playground.enabled%</argument>
+            <argument>%api_platform.swagger.versions%</argument>
         </service>
 
     </services>

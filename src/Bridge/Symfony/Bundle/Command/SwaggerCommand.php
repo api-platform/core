@@ -39,8 +39,9 @@ final class SwaggerCommand extends Command
     private $apiDescription;
     private $apiVersion;
     private $apiFormats;
+    private $swaggerVersions;
 
-    public function __construct(NormalizerInterface $normalizer, ResourceNameCollectionFactoryInterface $resourceNameCollection, string $apiTitle, string $apiDescription, string $apiVersion, array $apiFormats = null)
+    public function __construct(NormalizerInterface $normalizer, ResourceNameCollectionFactoryInterface $resourceNameCollection, string $apiTitle, string $apiDescription, string $apiVersion, array $apiFormats = null, array $swaggerVersions = [])
     {
         $this->normalizer = $normalizer;
         $this->resourceNameCollectionFactory = $resourceNameCollection;
@@ -48,6 +49,7 @@ final class SwaggerCommand extends Command
         $this->apiDescription = $apiDescription;
         $this->apiVersion = $apiVersion;
         $this->apiFormats = $apiFormats;
+        $this->swaggerVersions = $swaggerVersions;
 
         if (null !== $apiFormats) {
             @trigger_error(sprintf('Passing a 6th parameter to the constructor of "%s" is deprecated since API Platform 2.5', __CLASS__), E_USER_DEPRECATED);
@@ -66,7 +68,7 @@ final class SwaggerCommand extends Command
             ->setAliases(['api:swagger:export'])
             ->setDescription('Dump the OpenAPI documentation')
             ->addOption('yaml', 'y', InputOption::VALUE_NONE, 'Dump the documentation in YAML')
-            ->addOption('spec-version', null, InputOption::VALUE_OPTIONAL, 'OpenAPI version to use ("2" or "3")', '2')
+            ->addOption('spec-version', null, InputOption::VALUE_OPTIONAL, sprintf('OpenAPI version to use (%s)', implode(' or ', $this->swaggerVersions)), $this->swaggerVersions[0] ?? '2')
             ->addOption('output', 'o', InputOption::VALUE_OPTIONAL, 'Write output to file')
             ->addOption('api-gateway', null, InputOption::VALUE_NONE, 'API Gateway compatibility');
     }
@@ -78,10 +80,10 @@ final class SwaggerCommand extends Command
     {
         $io = new SymfonyStyle($input, $output);
         /** @var string $version */
-        $version = $input->getOption('spec-version');
+        $version = $input->getOption('spec-version')[0];
 
-        if (!\in_array($version, ['2', '3'], true)) {
-            throw new InvalidOptionException(sprintf('This tool only supports version 2 and 3 of the OpenAPI specification ("%s" given).', $version));
+        if (!\in_array($version, $this->swaggerVersions, true)) {
+            throw new InvalidOptionException(sprintf('This tool only supports version %s of the OpenAPI specification ("%s" given).', implode(', ', $this->swaggerVersions), $version));
         }
 
         $documentation = new Documentation($this->resourceNameCollectionFactory->create(), $this->apiTitle, $this->apiDescription, $this->apiVersion, $this->apiFormats);

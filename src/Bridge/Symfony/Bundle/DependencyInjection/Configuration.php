@@ -250,7 +250,7 @@ final class Configuration implements ConfigurationInterface
 
     private function addSwaggerSection(ArrayNodeDefinition $rootNode): void
     {
-        $defaultVersions = ['2.0.0', '3.0.2'];
+        $defaultVersions = ['2', '3'];
 
         $rootNode
             ->children()
@@ -258,7 +258,7 @@ final class Configuration implements ConfigurationInterface
                     ->addDefaultsIfNotSet()
                     ->children()
                         ->arrayNode('versions')
-                            ->info('The active versions of OpenAPI to be exported or used in the swagger_ui')
+                            ->info('The active versions of OpenAPI to be exported or used in the swagger_ui. The first value is the default.')
                             ->defaultValue($defaultVersions)
                             ->beforeNormalization()->castToArray()->end()
                             ->validate()

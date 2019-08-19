@@ -141,7 +141,7 @@ class ConfigurationTest extends TestCase
                 'scopes' => [],
             ],
             'swagger' => [
-                'versions' => ['2.0.0', '3.0.2'],
+                'versions' => ['2', '3'],
                 'api_keys' => [],
             ],
             'eager_loading' => [
@@ -327,7 +327,7 @@ class ConfigurationTest extends TestCase
             'api_platform' => [
                 'enable_swagger' => false,
                 'swagger' => [
-                    'versions' => ['3.0.2'],
+                    'versions' => ['3'],
                 ],
             ],
         ]);
@@ -344,24 +344,24 @@ class ConfigurationTest extends TestCase
         $config = $this->processor->processConfiguration($this->configuration, [
             'api_platform' => [
                 'swagger' => [
-                    'versions' => ['3.0.2'],
+                    'versions' => ['3'],
                 ],
             ],
         ]);
 
         $this->assertTrue(isset($config['swagger']['versions']));
-        $this->assertSame(['3.0.2'], $config['swagger']['versions']);
+        $this->assertSame(['3'], $config['swagger']['versions']);
 
         $config = $this->processor->processConfiguration($this->configuration, [
             'api_platform' => [
                 'swagger' => [
-                    'versions' => '2.0.0',
+                    'versions' => '2',
                 ],
             ],
         ]);
 
         $this->assertTrue(isset($config['swagger']['versions']));
-        $this->assertSame(['2.0.0'], $config['swagger']['versions']);
+        $this->assertSame(['2'], $config['swagger']['versions']);
 
         $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessageRegExp('/Only the versions .+ are supported. Got .+./');
@@ -369,7 +369,7 @@ class ConfigurationTest extends TestCase
         $this->processor->processConfiguration($this->configuration, [
             'api_platform' => [
                 'swagger' => [
-                    'versions' => ['1.0.0'],
+                    'versions' => ['1'],
                 ],
             ],
         ]);

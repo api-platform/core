@@ -32,14 +32,15 @@ final class DocumentationAction
     private $version;
     private $formats;
     private $formatsProvider;
-    private $resourceMetadataFactory;
+    private $swaggerVersions;
 
-    public function __construct(ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, string $title = '', string $description = '', string $version = '', $formatsProvider = null)
+    public function __construct(ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, string $title = '', string $description = '', string $version = '', $formatsProvider = null, array $swaggerVersions = [])
     {
         $this->resourceNameCollectionFactory = $resourceNameCollectionFactory;
         $this->title = $title;
         $this->description = $description;
         $this->version = $version;
+        $this->swaggerVersions = $swaggerVersions;
 
         if (null === $formatsProvider) {
             return;
@@ -57,7 +58,7 @@ final class DocumentationAction
     public function __invoke(Request $request = null): Documentation
     {
         if (null !== $request) {
-            $context = ['base_url' => $request->getBaseUrl(), 'spec_version' => $request->query->getInt('spec_version', 2)];
+            $context = ['base_url' => $request->getBaseUrl(), 'spec_version' => $request->query->getInt('spec_version', (int)($this->swaggerVersions[0] ?? 2))];
             if ($request->query->getBoolean('api_gateway')) {
                 $context['api_gateway'] = true;
             }
