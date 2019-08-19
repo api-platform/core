@@ -24,6 +24,7 @@ use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Security\ResourceAccessCheckerInterface;
 use ApiPlatform\Core\Util\ClassInfoTrait;
+use ApiPlatform\Core\Util\CloneTrait;
 use ApiPlatform\Core\Validator\Exception\ValidationException;
 use ApiPlatform\Core\Validator\ValidatorInterface;
 use GraphQL\Error\Error;
@@ -41,6 +42,7 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 final class ItemMutationResolverFactory implements ResolverFactoryInterface
 {
     use ClassInfoTrait;
+    use CloneTrait;
     use FieldsToAttributesTrait;
     use ResourceAccessCheckerTrait;
 
@@ -96,7 +98,7 @@ final class ItemMutationResolverFactory implements ResolverFactoryInterface
                     throw Error::createLocatedError(sprintf('Item "%s" did not match expected type "%s".', $args['input']['id'], $resourceMetadata->getShortName()), $info->fieldNodes, $info->path);
                 }
             }
-            $previousItem = \is_object($item) ? clone $item : $item;
+            $previousItem = $this->clone($item);
 
             $inputMetadata = $resourceMetadata->getGraphqlAttribute($operationName, 'input', null, true);
             $inputClass = null;
