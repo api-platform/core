@@ -22,6 +22,12 @@
             <argument type="service" id="api_platform.name_converter" on-invalid="ignore" />
         </service>
         <service id="ApiPlatform\Core\JsonSchema\SchemaFactoryInterface" alias="api_platform.json_schema.schema_factory" />
+
+        <service id="api_platform.json_schema.json_schema_generate_command" class="ApiPlatform\Core\JsonSchema\Command\JsonSchemaGenerateCommand">
+            <argument type="service" id="api_platform.json_schema.schema_factory"/>
+            <argument>%api_platform.formats%</argument>
+            <tag name="console.command" />
+        </service>
     </services>
 
 </container>
