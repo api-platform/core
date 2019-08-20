@@ -14,9 +14,10 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\GraphQl\Resolver\Factory;
 
 use ApiPlatform\Core\GraphQl\Resolver\MutationResolverInterface;
-use ApiPlatform\Core\GraphQl\Resolver\Stage\DenyAccessStageInterface;
 use ApiPlatform\Core\GraphQl\Resolver\Stage\DeserializeStageInterface;
 use ApiPlatform\Core\GraphQl\Resolver\Stage\ReadStageInterface;
+use ApiPlatform\Core\GraphQl\Resolver\Stage\SecurityPostDenormalizeStageInterface;
+use ApiPlatform\Core\GraphQl\Resolver\Stage\SecurityStageInterface;
 use ApiPlatform\Core\GraphQl\Resolver\Stage\SerializeStageInterface;
 use ApiPlatform\Core\GraphQl\Resolver\Stage\ValidateStageInterface;
 use ApiPlatform\Core\GraphQl\Resolver\Stage\WriteStageInterface;
@@ -33,6 +34,7 @@ use Psr\Container\ContainerInterface;
  * @experimental
  *
  * @author Alan Poulain <contact@alanpoulain.eu>
+ * @author Vincent Chalamon <vincentchalamon@gmail.com>
  */
 final class ItemMutationResolverFactory implements ResolverFactoryInterface
 {
@@ -40,7 +42,8 @@ final class ItemMutationResolverFactory implements ResolverFactoryInterface
     use CloneTrait;
 
     private $readStage;
-    private $denyAccessStage;
+    private $securityStage;
+    private $securityPostDenormalizeStage;
     private $serializeStage;
     private $deserializeStage;
     private $writeStage;
@@ -48,10 +51,11 @@ final class ItemMutationResolverFactory implements ResolverFactoryInterface
     private $mutationResolverLocator;
     private $resourceMetadataFactory;
 
-    public function __construct(ReadStageInterface $readStage, DenyAccessStageInterface $denyAccessStage, SerializeStageInterface $serializeStage, DeserializeStageInterface $deserializeStage, WriteStageInterface $writeStage, ValidateStageInterface $validateStage, ContainerInterface $mutationResolverLocator, ResourceMetadataFactoryInterface $resourceMetadataFactory)
+    public function __construct(ReadStageInterface $readStage, SecurityStageInterface $securityStage, SecurityPostDenormalizeStageInterface $securityPostDenormalizeStage, SerializeStageInterface $serializeStage, DeserializeStageInterface $deserializeStage, WriteStageInterface $writeStage, ValidateStageInterface $validateStage, ContainerInterface $mutationResolverLocator, ResourceMetadataFactoryInterface $resourceMetadataFactory)
     {
         $this->readStage = $readStage;
-        $this->denyAccessStage = $denyAccessStage;
+        $this->securityStage = $securityStage;
+        $this->securityPostDenormalizeStage = $securityPostDenormalizeStage;
         $this->serializeStage = $serializeStage;
         $this->deserializeStage = $deserializeStage;
         $this->writeStage = $writeStage;
@@ -73,16 +77,20 @@ final class ItemMutationResolverFactory implements ResolverFactoryInterface
             if (null !== $item && !\is_object($item)) {
                 throw new \LogicException('Item from read stage should be a nullable object.');
             }
+            ($this->securityStage)($resourceClass, $operationName, $resolverContext + [
+                'extra_variables' => [
+                    'object' => $item,
+                ],
+            ]);
             $previousItem = $this->clone($item);
 
             if ('delete' === $operationName) {
-                ($this->denyAccessStage)($resourceClass, $operationName, $resolverContext + [
+                ($this->securityPostDenormalizeStage)($resourceClass, $operationName, $resolverContext + [
                     'extra_variables' => [
                         'object' => $item,
                         'previous_object' => $previousItem,
                     ],
                 ]);
-
                 $item = ($this->writeStage)($item, $resourceClass, $operationName, $resolverContext);
 
                 return ($this->serializeStage)($item, $resourceClass, $operationName, $resolverContext);
@@ -102,7 +110,7 @@ final class ItemMutationResolverFactory implements ResolverFactoryInterface
                 }
             }
 
-            ($this->denyAccessStage)($resourceClass, $operationName, $resolverContext + [
+            ($this->securityPostDenormalizeStage)($resourceClass, $operationName, $resolverContext + [
                 'extra_variables' => [
                     'object' => $item,
                     'previous_object' => $previousItem,

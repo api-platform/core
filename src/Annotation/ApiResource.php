@@ -25,6 +25,10 @@ use ApiPlatform\Core\Exception\InvalidArgumentException;
  * @Attributes(
  *     @Attribute("accessControl", type="string"),
  *     @Attribute("accessControlMessage", type="string"),
+ *     @Attribute("security", type="string"),
+ *     @Attribute("securityMessage", type="string"),
+ *     @Attribute("securityPostDenormalize", type="string"),
+ *     @Attribute("securityPostDenormalizeMessage", type="string"),
  *     @Attribute("attributes", type="array"),
  *     @Attribute("cacheHeaders", type="array"),
  *     @Attribute("collectionOperations", type="array"),
@@ -108,14 +112,28 @@ final class ApiResource
      *
      * @var string
      */
-    private $accessControl;
+    private $security;
 
     /**
      * @see https://github.com/Haehnchen/idea-php-annotation-plugin/issues/112
      *
      * @var string
      */
-    private $accessControlMessage;
+    private $securityMessage;
+
+    /**
+     * @see https://github.com/Haehnchen/idea-php-annotation-plugin/issues/112
+     *
+     * @var string
+     */
+    private $securityPostDenormalize;
+
+    /**
+     * @see https://github.com/Haehnchen/idea-php-annotation-plugin/issues/112
+     *
+     * @var string
+     */
+    private $securityPostDenormalizeMessage;
 
     /**
      * @see https://github.com/Haehnchen/idea-php-annotation-plugin/issues/112

@@ -19,13 +19,13 @@ use GraphQL\Error\Error;
 use GraphQL\Type\Definition\ResolveInfo;
 
 /**
- * Deny access stage of GraphQL resolvers.
+ * Security post denormalize stage of GraphQL resolvers.
  *
  * @experimental
  *
- * @author Alan Poulain <contact@alanpoulain.eu>
+ * @author Vincent Chalamon <vincentchalamon@gmail.com>
  */
-final class DenyAccessStage implements DenyAccessStageInterface
+final class SecurityPostDenormalizeStage implements SecurityPostDenormalizeStageInterface
 {
     private $resourceMetadataFactory;
     private $resourceAccessChecker;
@@ -43,13 +43,21 @@ final class DenyAccessStage implements DenyAccessStageInterface
     {
         $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
 
-        $isGranted = $resourceMetadata->getGraphqlAttribute($operationName, 'access_control', null, true);
+        $isGranted = $resourceMetadata->getGraphqlAttribute($operationName, 'security_post_denormalize', null, true);
+        if (null === $isGranted) {
+            // Backward compatibility
+            $isGranted = $resourceMetadata->getGraphqlAttribute($operationName, 'access_control', null, true);
+            if (null !== $isGranted) {
+                @trigger_error('Attribute "access_control" is deprecated since API Platform 2.5, prefer using "security" attribute instead', E_USER_DEPRECATED);
+            }
+        }
+
         if (null === $isGranted || $this->resourceAccessChecker->isGranted($resourceClass, (string) $isGranted, $context['extra_variables'])) {
             return;
         }
 
         /** @var ResolveInfo $info */
         $info = $context['info'];
-        throw Error::createLocatedError($resourceMetadata->getGraphqlAttribute($operationName, 'access_control_message', 'Access Denied.'), $info->fieldNodes, $info->path);
+        throw Error::createLocatedError($resourceMetadata->getGraphqlAttribute($operationName, 'security_post_denormalize_message', 'Access Denied.'), $info->fieldNodes, $info->path);
     }
 }

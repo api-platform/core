@@ -27,8 +27,10 @@ class ApiResourceTest extends TestCase
     public function testConstruct()
     {
         $resource = new ApiResource([
-            'accessControl' => 'is_granted("ROLE_FOO")',
-            'accessControlMessage' => 'You are not foo.',
+            'security' => 'is_granted("ROLE_FOO")',
+            'securityMessage' => 'You are not foo.',
+            'securityPostDenormalize' => 'is_granted("ROLE_BAR")',
+            'securityPostDenormalizeMessage' => 'You are not bar.',
             'attributes' => ['foo' => 'bar', 'validation_groups' => ['baz', 'qux'], 'cache_headers' => ['max_age' => 0, 'shared_max_age' => 0, 'vary' => ['Custom-Vary-1', 'Custom-Vary-2']]],
             'collectionOperations' => ['bar' => ['foo']],
             'denormalizationContext' => ['groups' => ['foo']],
@@ -71,8 +73,10 @@ class ApiResourceTest extends TestCase
         $this->assertSame([], $resource->subresourceOperations);
         $this->assertSame(['query' => ['normalization_context' => ['groups' => ['foo', 'bar']]]], $resource->graphql);
         $this->assertEquals([
-            'access_control' => 'is_granted("ROLE_FOO")',
-            'access_control_message' => 'You are not foo.',
+            'security' => 'is_granted("ROLE_FOO")',
+            'security_message' => 'You are not foo.',
+            'security_post_denormalize' => 'is_granted("ROLE_BAR")',
+            'security_post_denormalize_message' => 'You are not bar.',
             'denormalization_context' => ['groups' => ['foo']],
             'fetch_partial' => true,
             'foo' => 'bar',
@@ -118,8 +122,10 @@ class ApiResourceTest extends TestCase
         $this->assertEquals([
             'foo' => 'bar',
             'route_prefix' => '/whatever',
-            'access_control' => "is_granted('ROLE_FOO')",
-            'access_control_message' => 'You are not foo.',
+            'security' => "is_granted('ROLE_FOO')",
+            'security_message' => 'You are not foo.',
+            'security_post_denormalize' => "is_granted('ROLE_BAR')",
+            'security_post_denormalize_message' => 'You are not bar.',
             'cache_headers' => ['max_age' => 0, 'shared_max_age' => 0, 'vary' => ['Custom-Vary-1', 'Custom-Vary-2']],
         ], $resource->attributes);
     }

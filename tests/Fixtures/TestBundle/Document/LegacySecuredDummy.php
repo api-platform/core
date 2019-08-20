@@ -11,56 +11,49 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity;
+namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Document;
 
 use ApiPlatform\Core\Annotation\ApiResource;
-use Doctrine\ORM\Mapping as ORM;
+use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
- * Secured resource.
+ * Secured resource with legacy access_control attribute.
  *
- * @author Kévin Dunglas <dunglas@gmail.com>
+ * @author Vincent Chalamon <vincentchalamon@gmail.com>
  *
  * @ApiResource(
- *     attributes={"security"="is_granted('ROLE_USER')"},
+ *     attributes={"access_control"="is_granted('ROLE_USER')"},
  *     collectionOperations={
  *         "get",
- *         "get_from_data_provider_generator"={
- *             "method"="GET",
- *             "path"="custom_data_provider_generator",
- *             "security"="is_granted('ROLE_USER')"
- *         },
- *         "post"={"security"="is_granted('ROLE_ADMIN')"}
+ *         "post"={"access_control"="is_granted('ROLE_ADMIN')"}
  *     },
  *     itemOperations={
- *         "get"={"security"="is_granted('ROLE_USER') and object.getOwner() == user"},
- *         "put"={"security_post_denormalize"="is_granted('ROLE_USER') and previous_object.getOwner() == user"},
+ *         "get"={"access_control"="is_granted('ROLE_USER') and object.getOwner() == user"},
+ *         "put"={"access_control"="is_granted('ROLE_USER') and previous_object.getOwner() == user"},
  *     },
  *     graphql={
- *         "query"={"security"="is_granted('ROLE_USER') and object.getOwner() == user"},
+ *         "query"={"access_control"="is_granted('ROLE_USER') and object.getOwner() == user"},
  *         "delete"={},
- *         "update"={"security_post_denormalize"="is_granted('ROLE_USER') and previous_object.getOwner() == user"},
- *         "create"={"security"="is_granted('ROLE_ADMIN')", "security_message"="Only admins can create a secured dummy."}
+ *         "update"={"access_control"="is_granted('ROLE_USER') and previous_object.getOwner() ==  user"},
+ *         "create"={"access_control"="is_granted('ROLE_ADMIN')", "access_control_message"="Only admins can create a secured dummy."}
  *     }
  * )
- * @ORM\Entity
+ * @ODM\Document
  */
-class SecuredDummy
+class LegacySecuredDummy
 {
     /**
      * @var int
      *
-     * @ORM\Column(type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
+     * @ODM\Id(strategy="INCREMENT", type="integer")
      */
     private $id;
 
     /**
      * @var string The title
      *
-     * @ORM\Column
+     * @ODM\Field
      * @Assert\NotBlank
      */
     private $title;
@@ -68,14 +61,14 @@ class SecuredDummy
     /**
      * @var string The description
      *
-     * @ORM\Column
+     * @ODM\Field
      */
     private $description = '';
 
     /**
      * @var string The owner
      *
-     * @ORM\Column
+     * @ODM\Field
      * @Assert\NotBlank
      */
     private $owner;

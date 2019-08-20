@@ -11,7 +11,8 @@
 
         <service id="api_platform.graphql.resolver.factory.item" class="ApiPlatform\Core\GraphQl\Resolver\Factory\ItemResolverFactory" public="false">
             <argument type="service" id="api_platform.graphql.resolver.stage.read" />
-            <argument type="service" id="api_platform.graphql.resolver.stage.deny_access" />
+            <argument type="service" id="api_platform.graphql.resolver.stage.security" />
+            <argument type="service" id="api_platform.graphql.resolver.stage.security_post_denormalize" />
             <argument type="service" id="api_platform.graphql.resolver.stage.serialize" />
             <argument type="service" id="api_platform.graphql.query_resolver_locator" />
             <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
@@ -19,7 +20,8 @@
 
         <service id="api_platform.graphql.resolver.factory.collection" class="ApiPlatform\Core\GraphQl\Resolver\Factory\CollectionResolverFactory" public="false">
             <argument type="service" id="api_platform.graphql.resolver.stage.read" />
-            <argument type="service" id="api_platform.graphql.resolver.stage.deny_access" />
+            <argument type="service" id="api_platform.graphql.resolver.stage.security" />
+            <argument type="service" id="api_platform.graphql.resolver.stage.security_post_denormalize" />
             <argument type="service" id="api_platform.graphql.resolver.stage.serialize" />
             <argument type="service" id="api_platform.graphql.query_resolver_locator" />
             <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
@@ -28,7 +30,8 @@
 
         <service id="api_platform.graphql.resolver.factory.item_mutation" class="ApiPlatform\Core\GraphQl\Resolver\Factory\ItemMutationResolverFactory" public="false">
             <argument type="service" id="api_platform.graphql.resolver.stage.read" />
-            <argument type="service" id="api_platform.graphql.resolver.stage.deny_access" />
+            <argument type="service" id="api_platform.graphql.resolver.stage.security" />
+            <argument type="service" id="api_platform.graphql.resolver.stage.security_post_denormalize" />
             <argument type="service" id="api_platform.graphql.resolver.stage.serialize" />
             <argument type="service" id="api_platform.graphql.resolver.stage.deserialize" />
             <argument type="service" id="api_platform.graphql.resolver.stage.write" />
@@ -47,7 +50,12 @@
             <argument type="service" id="api_platform.graphql.serializer.context_builder" />
         </service>
 
-        <service id="api_platform.graphql.resolver.stage.deny_access" class="ApiPlatform\Core\GraphQl\Resolver\Stage\DenyAccessStage" public="false">
+        <service id="api_platform.graphql.resolver.stage.security" class="ApiPlatform\Core\GraphQl\Resolver\Stage\SecurityStage" public="false">
+            <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
+            <argument type="service" id="api_platform.security.resource_access_checker" />
+        </service>
+
+        <service id="api_platform.graphql.resolver.stage.security_post_denormalize" class="ApiPlatform\Core\GraphQl\Resolver\Stage\SecurityPostDenormalizeStage" public="false">
             <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
             <argument type="service" id="api_platform.security.resource_access_checker" />
         </service>

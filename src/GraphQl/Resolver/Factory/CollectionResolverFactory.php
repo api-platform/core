@@ -14,8 +14,9 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\GraphQl\Resolver\Factory;
 
 use ApiPlatform\Core\GraphQl\Resolver\QueryCollectionResolverInterface;
-use ApiPlatform\Core\GraphQl\Resolver\Stage\DenyAccessStageInterface;
 use ApiPlatform\Core\GraphQl\Resolver\Stage\ReadStageInterface;
+use ApiPlatform\Core\GraphQl\Resolver\Stage\SecurityPostDenormalizeStageInterface;
+use ApiPlatform\Core\GraphQl\Resolver\Stage\SecurityStageInterface;
 use ApiPlatform\Core\GraphQl\Resolver\Stage\SerializeStageInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Util\CloneTrait;
@@ -30,22 +31,25 @@ use Symfony\Component\HttpFoundation\RequestStack;
  *
  * @author Alan Poulain <contact@alanpoulain.eu>
  * @author Kévin Dunglas <dunglas@gmail.com>
+ * @author Vincent Chalamon <vincentchalamon@gmail.com>
  */
 final class CollectionResolverFactory implements ResolverFactoryInterface
 {
     use CloneTrait;
 
     private $readStage;
-    private $denyAccessStage;
+    private $securityStage;
+    private $securityPostDenormalizeStage;
     private $serializeStage;
     private $queryResolverLocator;
     private $requestStack;
     private $resourceMetadataFactory;
 
-    public function __construct(ReadStageInterface $readStage, DenyAccessStageInterface $denyAccessStage, SerializeStageInterface $serializeStage, ContainerInterface $queryResolverLocator, ResourceMetadataFactoryInterface $resourceMetadataFactory, RequestStack $requestStack = null)
+    public function __construct(ReadStageInterface $readStage, SecurityStageInterface $securityStage, SecurityPostDenormalizeStageInterface $securityPostDenormalizeStage, SerializeStageInterface $serializeStage, ContainerInterface $queryResolverLocator, ResourceMetadataFactoryInterface $resourceMetadataFactory, RequestStack $requestStack = null)
     {
         $this->readStage = $readStage;
-        $this->denyAccessStage = $denyAccessStage;
+        $this->securityStage = $securityStage;
+        $this->securityPostDenormalizeStage = $securityPostDenormalizeStage;
         $this->serializeStage = $serializeStage;
         $this->queryResolverLocator = $queryResolverLocator;
         $this->requestStack = $requestStack;
@@ -83,7 +87,12 @@ final class CollectionResolverFactory implements ResolverFactoryInterface
                 $collection = $queryResolver($collection, $resolverContext);
             }
 
-            ($this->denyAccessStage)($resourceClass, $operationName, $resolverContext + [
+            ($this->securityStage)($resourceClass, $operationName, $resolverContext + [
+                'extra_variables' => [
+                    'object' => $collection,
+                ],
+            ]);
+            ($this->securityPostDenormalizeStage)($resourceClass, $operationName, $resolverContext + [
                 'extra_variables' => [
                     'object' => $collection,
                     'previous_object' => $this->clone($collection),

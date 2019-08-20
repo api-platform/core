@@ -14,8 +14,9 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\GraphQl\Resolver\Factory;
 
 use ApiPlatform\Core\GraphQl\Resolver\QueryItemResolverInterface;
-use ApiPlatform\Core\GraphQl\Resolver\Stage\DenyAccessStageInterface;
 use ApiPlatform\Core\GraphQl\Resolver\Stage\ReadStageInterface;
+use ApiPlatform\Core\GraphQl\Resolver\Stage\SecurityPostDenormalizeStageInterface;
+use ApiPlatform\Core\GraphQl\Resolver\Stage\SecurityStageInterface;
 use ApiPlatform\Core\GraphQl\Resolver\Stage\SerializeStageInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Util\ClassInfoTrait;
@@ -31,6 +32,7 @@ use Psr\Container\ContainerInterface;
  *
  * @author Alan Poulain <contact@alanpoulain.eu>
  * @author Kévin Dunglas <dunglas@gmail.com>
+ * @author Vincent Chalamon <vincentchalamon@gmail.com>
  */
 final class ItemResolverFactory implements ResolverFactoryInterface
 {
@@ -38,15 +40,17 @@ final class ItemResolverFactory implements ResolverFactoryInterface
     use ClassInfoTrait;
 
     private $readStage;
-    private $denyAccessStage;
+    private $securityStage;
+    private $securityPostDenormalizeStage;
     private $serializeStage;
     private $queryResolverLocator;
     private $resourceMetadataFactory;
 
-    public function __construct(ReadStageInterface $readStage, DenyAccessStageInterface $denyAccessStage, SerializeStageInterface $serializeStage, ContainerInterface $queryResolverLocator, ResourceMetadataFactoryInterface $resourceMetadataFactory)
+    public function __construct(ReadStageInterface $readStage, SecurityStageInterface $securityStage, SecurityPostDenormalizeStageInterface $securityPostDenormalizeStage, SerializeStageInterface $serializeStage, ContainerInterface $queryResolverLocator, ResourceMetadataFactoryInterface $resourceMetadataFactory)
     {
         $this->readStage = $readStage;
-        $this->denyAccessStage = $denyAccessStage;
+        $this->securityStage = $securityStage;
+        $this->securityPostDenormalizeStage = $securityPostDenormalizeStage;
         $this->serializeStage = $serializeStage;
         $this->queryResolverLocator = $queryResolverLocator;
         $this->resourceMetadataFactory = $resourceMetadataFactory;
@@ -79,7 +83,12 @@ final class ItemResolverFactory implements ResolverFactoryInterface
                 $resourceClass = $this->getResourceClass($item, $resourceClass, $info, sprintf('Custom query resolver "%s"', $queryResolverId).' has to return an item of class %s but returned an item of class %s.');
             }
 
-            ($this->denyAccessStage)($resourceClass, $operationName, $resolverContext + [
+            ($this->securityStage)($resourceClass, $operationName, $resolverContext + [
+                'extra_variables' => [
+                    'object' => $item,
+                ],
+            ]);
+            ($this->securityPostDenormalizeStage)($resourceClass, $operationName, $resolverContext + [
                 'extra_variables' => [
                     'object' => $item,
                     'previous_object' => $this->clone($item),
