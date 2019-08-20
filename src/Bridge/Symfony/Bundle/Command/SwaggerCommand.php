@@ -79,8 +79,13 @@ final class SwaggerCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $io = new SymfonyStyle($input, $output);
+
+        /** @var string $spec_version */
+        $spec_version = $input->getOption('spec-version');
+
         /** @var string $version */
-        $version =  explode('.', $input->getOption('spec-version'))[0];
+        $version = explode('.', $spec_version)[0];
+
         if (!\in_array($version, $this->swaggerVersions, true)) {
             throw new InvalidOptionException(sprintf('This tool only supports version %s of the OpenAPI specification ("%s" given).', implode(', ', $this->swaggerVersions), $version));
         }
