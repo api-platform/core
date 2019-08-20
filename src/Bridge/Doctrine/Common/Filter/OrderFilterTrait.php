@@ -52,6 +52,13 @@ trait OrderFilterTrait
                 'property' => $propertyName,
                 'type' => 'string',
                 'required' => false,
+                'schema' => [
+                    'type' => 'string',
+                    'enum' => [
+                        strtolower(OrderFilterInterface::DIRECTION_ASC),
+                        strtolower(OrderFilterInterface::DIRECTION_DESC),
+                    ],
+                ],
             ];
         }
 

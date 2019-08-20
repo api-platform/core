@@ -28,11 +28,25 @@ trait OrderFilterTestTrait
                 'property' => 'id',
                 'type' => 'string',
                 'required' => false,
+                'schema' => [
+                    'type' => 'string',
+                    'enum' => [
+                        'asc',
+                        'desc',
+                    ],
+                ],
             ],
             'order[name]' => [
                 'property' => 'name',
                 'type' => 'string',
                 'required' => false,
+                'schema' => [
+                    'type' => 'string',
+                    'enum' => [
+                        'asc',
+                        'desc',
+                    ],
+                ],
             ],
         ], $filter->getDescription($this->resourceClass));
     }
