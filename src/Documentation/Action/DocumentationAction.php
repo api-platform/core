@@ -35,8 +35,8 @@ final class DocumentationAction
     private $swaggerVersions;
 
     /**
-     * @param int[]      $swaggerVersions
-     * @param mixed|null $formatsProvider
+     * @param int[]                                $swaggerVersions
+     * @param mixed|array|FormatsProviderInterface $formatsProvider
      */
     public function __construct(ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, string $title = '', string $description = '', string $version = '', $formatsProvider = null, array $swaggerVersions = [2, 3])
     {
