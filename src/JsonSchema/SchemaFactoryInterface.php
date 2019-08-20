@@ -27,5 +27,5 @@ interface SchemaFactoryInterface
     /**
      * @throws ResourceClassNotFoundException
      */
-    public function buildSchema(string $resourceClass, string $format = 'json', bool $output = true, ?string $operationType = null, ?string $operationName = null, ?Schema $schema = null, ?array $serializerContext = null, bool $forceCollection = false): Schema;
+    public function buildSchema(string $resourceClass, string $format = 'json', string $type = Schema::TYPE_OUTPUT, ?string $operationType = null, ?string $operationName = null, ?Schema $schema = null, ?array $serializerContext = null, bool $forceCollection = false): Schema;
 }

@@ -25,16 +25,19 @@ use PHPUnit\Framework\Constraint\Constraint;
  */
 final class MatchesJsonSchema extends Constraint
 {
+    /**
+     * @var object|array
+     */
     private $schema;
     private $checkMode;
 
     /**
-     * @param array|string $schema
+     * @param object|array|string $schema
      */
     public function __construct($schema, ?int $checkMode = null)
     {
+        $this->schema = \is_string($schema) ? json_decode($schema) : $schema;
         $this->checkMode = $checkMode;
-        $this->schema = \is_array($schema) ? (object) $schema : json_decode($schema);
     }
 
     /**
@@ -46,15 +49,15 @@ final class MatchesJsonSchema extends Constraint
     }
 
     /**
-     * @param array $other
+     * {@inheritdoc}
      */
     protected function matches($other): bool
     {
         if (!class_exists(Validator::class)) {
-            throw new \RuntimeException('The "justinrainbow/json-schema" library must be installed to use "assertMatchesJsonSchema()". Try running "composer require --dev justinrainbow/json-schema".');
+            throw new \LogicException('The "justinrainbow/json-schema" library must be installed to use "assertMatchesJsonSchema()". Try running "composer require --dev justinrainbow/json-schema".');
         }
 
-        $other = (object) $other;
+        $other = $this->normalizeJson($other);
 
         $validator = new Validator();
         $validator->validate($other, $this->schema, $this->checkMode);
@@ -63,14 +66,14 @@ final class MatchesJsonSchema extends Constraint
     }
 
     /**
-     * @param object $other
+     * {@inheritdoc}
      */
     protected function additionalFailureDescription($other): string
     {
-        $other = (object) $other;
+        $other = $this->normalizeJson($other);
 
         $validator = new Validator();
-        $validator->check($other, $this->schema);
+        $validator->validate($other, $this->schema, $this->checkMode);
 
         $errors = [];
         foreach ($validator->getErrors() as $error) {
@@ -79,5 +82,33 @@ final class MatchesJsonSchema extends Constraint
         }
 
         return implode("\n", $errors);
+    }
+
+    /**
+     * Normalizes a JSON document.
+     *
+     * Specifically, we should ensure that:
+     * 1. a JSON object is represented as a PHP object, not as an associative array.
+     */
+    private function normalizeJson($document)
+    {
+        if (is_scalar($document) || \is_object($document)) {
+            return $document;
+        }
+
+        if (!\is_array($document)) {
+            throw new \InvalidArgumentException('Document must be scalar, array or object.');
+        }
+
+        $document = json_encode($document);
+        if (!\is_string($document)) {
+            throw new \UnexpectedValueException('JSON encode failed.');
+        }
+        $document = json_decode($document);
+        if (!\is_array($document) && !\is_object($document)) {
+            throw new \UnexpectedValueException('JSON decode failed.');
+        }
+
+        return $document;
     }
 }

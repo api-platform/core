@@ -55,6 +55,9 @@ parameters:
 			message: '#Parameter \#1 \$docblock of method phpDocumentor\\Reflection\\DocBlockFactoryInterface::create\(\) expects string, ReflectionClass given\.#'
 			path: %currentWorkingDirectory%/src/Metadata/Resource/Factory/PhpDocResourceMetadataFactory.php
 		-
+			message: '#Parameter \#1 \$objectValue of method GraphQL\\Type\\Definition\\InterfaceType::resolveType\(\) expects object, array(<string, string>)? given.#'
+			path: %currentWorkingDirectory%/tests/GraphQl/Type/TypeBuilderTest.php
+		-
 			message: '#Property ApiPlatform\\Core\\Test\\DoctrineMongoDbOdmFilterTestCase::\$repository \(Doctrine\\ODM\\MongoDB\\Repository\\DocumentRepository\) does not accept Doctrine\\ORM\\EntityRepository<ApiPlatform\\Core\\Tests\\Fixtures\\TestBundle\\Document\\Dummy>\.#'
 			path: %currentWorkingDirectory%/src/Test/DoctrineMongoDbOdmFilterTestCase.php
 		- '#Method ApiPlatform\\Core\\(Serializer\\Abstract|JsonApi\\Serializer\\)ItemNormalizer::normalizeRelation\(\) should return array\|string but returns array\|bool\|float\|int\|string\.#'
@@ -78,7 +81,10 @@ parameters:
 		-
 			message: '#Binary operation "\+" between (float\|int\|)?string and 0 results in an error\.#'
 			path: %currentWorkingDirectory%/src/Bridge/Doctrine/Common/Filter/RangeFilterTrait.php
-		- '#Parameter \#1 \$objectValue of method GraphQL\\Type\\Definition\\InterfaceType::resolveType\(\) expects object, array(<string, string>)? given.#'
+		# https://github.com/phpstan/phpstan-symfony/issues/27
+		-
+			message: '#Service "api_platform\.json_schema\.schema_factory" is private\.#'
+			path: %currentWorkingDirectory%/src/Bridge/Symfony/Bundle/Test/ApiTestAssertionsTrait.php
 
 		# Expected, due to optional interfaces
 		- '#Method ApiPlatform\\Core\\Bridge\\Doctrine\\Orm\\Extension\\QueryCollectionExtensionInterface::applyToCollection\(\) invoked with 5 parameters, 3-4 required\.#'

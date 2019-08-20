@@ -13,9 +13,13 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Bridge\Symfony\Bundle\Test;
 
+use ApiPlatform\Core\Api\OperationType;
 use ApiPlatform\Core\Bridge\Symfony\Bundle\Test\Constraint\ArraySubset;
 use ApiPlatform\Core\Bridge\Symfony\Bundle\Test\Constraint\MatchesJsonSchema;
+use ApiPlatform\Core\JsonSchema\Schema;
+use ApiPlatform\Core\JsonSchema\SchemaFactoryInterface;
 use PHPUnit\Framework\ExpectationFailedException;
+use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
 /**
@@ -28,9 +32,9 @@ trait ApiTestAssertionsTrait
     use BrowserKitAssertionsTrait;
 
     /**
-     * Asserts that the retrieved JSON contains has the specified subset.
+     * Asserts that the retrieved JSON contains the specified subset.
      *
-     * This method delegates to self::assertArraySubset().
+     * This method delegates to static::assertArraySubset().
      *
      * @param array|string $subset
      *
@@ -91,16 +95,32 @@ trait ApiTestAssertionsTrait
     public static function assertArraySubset($subset, $array, bool $checkForObjectIdentity = false, string $message = ''): void
     {
         $constraint = new ArraySubset($subset, $checkForObjectIdentity);
+
         static::assertThat($array, $constraint, $message);
     }
 
     /**
-     * @param array|string $jsonSchema
+     * @param object|array|string $jsonSchema
      */
     public static function assertMatchesJsonSchema($jsonSchema, ?int $checkMode = null, string $message = ''): void
     {
         $constraint = new MatchesJsonSchema($jsonSchema, $checkMode);
+
         static::assertThat(self::getHttpResponse()->toArray(false), $constraint, $message);
+    }
+
+    public static function assertMatchesResourceCollectionJsonSchema(string $resourceClass, ?string $operationName = null, string $format = 'jsonld'): void
+    {
+        $schema = self::getSchemaFactory()->buildSchema($resourceClass, $format, Schema::TYPE_OUTPUT, OperationType::COLLECTION, $operationName);
+
+        static::assertMatchesJsonSchema($schema);
+    }
+
+    public static function assertMatchesResourceItemJsonSchema(string $resourceClass, ?string $operationName = null, string $format = 'jsonld'): void
+    {
+        $schema = self::getSchemaFactory()->buildSchema($resourceClass, $format, Schema::TYPE_OUTPUT, OperationType::ITEM, $operationName);
+
+        static::assertMatchesJsonSchema($schema);
     }
 
     private static function getHttpClient(Client $newClient = null): ?Client
@@ -125,5 +145,17 @@ trait ApiTestAssertionsTrait
         }
 
         return $response;
+    }
+
+    private static function getSchemaFactory(): SchemaFactoryInterface
+    {
+        try {
+            /** @var SchemaFactoryInterface $schemaFactory */
+            $schemaFactory = static::$container->get('api_platform.json_schema.schema_factory');
+        } catch (ServiceNotFoundException $e) {
+            throw new \LogicException('You cannot use the resource JSON Schema assertions if the "api_platform.swagger.versions" config is null or empty.');
+        }
+
+        return $schemaFactory;
     }
 }
