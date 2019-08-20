@@ -83,10 +83,10 @@ final class SwaggerCommand extends Command
     {
         $io = new SymfonyStyle($input, $output);
 
-        /** @var int $version */
+        /** @var string $version */
         $version = $input->getOption('spec-version');
 
-        if (!\in_array($version, $this->swaggerVersions, true)) {
+        if (!\in_array((int) $version, $this->swaggerVersions, true)) {
             throw new InvalidOptionException(sprintf('This tool only supports versions %s of the OpenAPI specification ("%s" given).', implode(', ', $this->swaggerVersions), $version));
         }
 
