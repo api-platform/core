@@ -20,7 +20,6 @@ use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Swagger\Serializer\DocumentationNormalizer;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
@@ -76,7 +75,7 @@ final class SchemaFactory implements SchemaFactoryInterface
 
         $method = (null !== $operationType && null !== $operationName) ? $resourceMetadata->getTypedOperationAttribute($operationType, $operationName, 'method') : 'GET';
 
-        if (!$output && !in_array($method, [Request::METHOD_POST, Request::METHOD_PATCH, Request::METHOD_PUT], true)) {
+        if (!$output && !\in_array($method, ['POST', 'PATCH', 'PUT'], true)) {
             return $schema;
         }
 

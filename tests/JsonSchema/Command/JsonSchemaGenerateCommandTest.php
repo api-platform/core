@@ -1,9 +1,19 @@
 <?php
 
+/*
+ * This file is part of the API Platform project.
+ *
+ * (c) Kévin Dunglas <dunglas@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 declare(strict_types=1);
 
 namespace ApiPlatform\Core\Tests\JsonSchema\Command;
 
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\Dummy as DocumentDummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
@@ -19,48 +29,51 @@ class JsonSchemaGenerateCommandTest extends KernelTestCase
      */
     private $tester;
 
+    private $entityClass;
+
     protected function setUp(): void
     {
-        self::bootKernel();
+        $kernel = self::bootKernel();
 
         $application = new Application(static::$kernel);
         $application->setCatchExceptions(true);
         $application->setAutoExit(false);
 
+        $this->entityClass = 'mongodb' === $kernel->getEnvironment() ? DocumentDummy::class : Dummy::class;
         $this->tester = new ApplicationTester($application);
     }
 
     public function testExecuteWithoutOption()
     {
-        $this->tester->run(['command' => 'api:json-schema:generate', 'resource' => Dummy::class]);
+        $this->tester->run(['command' => 'api:json-schema:generate', 'resource' => $this->entityClass]);
 
         $this->assertJson($this->tester->getDisplay());
     }
 
     public function testExecuteWithItemOperationGet()
     {
-        $this->tester->run(['command' => 'api:json-schema:generate', 'resource' => Dummy::class, '--itemOperation' => 'get']);
+        $this->tester->run(['command' => 'api:json-schema:generate', 'resource' => $this->entityClass, '--itemOperation' => 'get', '--type' => 'output']);
 
         $this->assertJson($this->tester->getDisplay());
     }
 
     public function testExecuteWithCollectionOperationGet()
     {
-        $this->tester->run(['command' => 'api:json-schema:generate', 'resource' => Dummy::class, '--collectionOperation' => 'get']);
+        $this->tester->run(['command' => 'api:json-schema:generate', 'resource' => $this->entityClass, '--collectionOperation' => 'get', '--type' => 'output']);
 
         $this->assertJson($this->tester->getDisplay());
     }
 
     public function testExecuteWithTooManyOptions()
     {
-        $this->tester->run(['command' => 'api:json-schema:generate', 'resource' => Dummy::class, '--collectionOperation' => 'get', '--itemOperation' => 'get']);
+        $this->tester->run(['command' => 'api:json-schema:generate', 'resource' => $this->entityClass, '--collectionOperation' => 'get', '--itemOperation' => 'get', '--type' => 'output']);
 
-        $this->assertStringContainsString('You can only use one of "--itemOperation" and "--collectionOperation" options at the same time.', $this->tester->getDisplay());
+        $this->assertStringStartsWith('[ERROR] You can only use one of "--itemOperation" and "--collectionOperation"', trim(str_replace(["\r", "\n"], '', $this->tester->getDisplay())));
     }
 
     public function testExecuteWithJsonldFormatOption()
     {
-        $this->tester->run(['command' => 'api:json-schema:generate', 'resource' => Dummy::class, '--format' => 'jsonld']);
+        $this->tester->run(['command' => 'api:json-schema:generate', 'resource' => $this->entityClass, '--collectionOperation' => 'post', '--format' => 'jsonld']);
         $result = $this->tester->getDisplay();
 
         $this->assertStringContainsString('@id', $result);
