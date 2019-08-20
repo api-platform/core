@@ -31,9 +31,9 @@ interface DataTransformerInterface
     public function transform($object, string $to, array $context = []);
 
     /**
-     * Checks whether the transformation is supported for a given object and context.
+     * Checks whether the transformation is supported for a given data and context.
      *
-     * @param object $object
+     * @param object|array $data object on normalize / array on denormalize
      */
-    public function supportsTransformation($object, string $to, array $context = []): bool;
+    public function supportsTransformation($data, string $to, array $context = []): bool;
 }
