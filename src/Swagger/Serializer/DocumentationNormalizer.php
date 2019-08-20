@@ -706,11 +706,18 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
                     'required' => $data['required'],
                 ];
 
+                if (isset($data['description'])) {
+                    $parameter['description'] = $data['description'];
+                }
+
                 $type = \in_array($data['type'], Type::$builtinTypes, true) ? $this->jsonSchemaTypeFactory->getType(new Type($data['type'], false, null, $data['is_collection'] ?? false)) : ['type' => 'string'];
                 $v3 ? $parameter['schema'] = $type : $parameter += $type;
 
                 if ($v3 && isset($data['schema'])) {
                     $parameter['schema'] = $data['schema'];
+                }
+                if (!$v3 && isset($data['schema']['items'])) {
+                    $parameter['items'] = $data['schema']['items'];
                 }
 
                 if ('array' === ($type['type'] ?? '')) {
@@ -724,6 +731,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
                     }
                 }
 
+                /** @deprecated schema key should be used instead */
                 $key = $v3 ? 'openapi' : 'swagger';
                 if (isset($data[$key])) {
                     $parameter = $data[$key] + $parameter;
