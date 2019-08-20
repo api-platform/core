@@ -357,7 +357,10 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
                 'required' => false,
                 'description' => 'The collection page number',
             ];
-            $v3 ? $paginationParameter['schema'] = ['type' => 'integer'] : $paginationParameter['type'] = 'integer';
+            $v3 ? $paginationParameter['schema'] = [
+                'type' => 'integer',
+                'default' => 1,
+            ] : $paginationParameter['type'] = 'integer';
             $pathOperation['parameters'][] = $paginationParameter;
 
             if ($resourceMetadata->getCollectionOperationAttribute($operationName, 'pagination_client_items_per_page', $this->clientItemsPerPage, true)) {
@@ -367,7 +370,19 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
                     'required' => false,
                     'description' => 'The number of items per page',
                 ];
-                $v3 ? $itemPerPageParameter['schema'] = ['type' => 'integer'] : $itemPerPageParameter['type'] = 'integer';
+                if ($v3) {
+                    $itemPerPageParameter['schema'] = [
+                        'type' => 'integer',
+                        'default' => $resourceMetadata->getCollectionOperationAttribute($operationName, 'pagination_items_per_page', 30, true),
+                        'minimum' => 0,
+                    ];
+
+                    if ($maximumItemPerPage = $resourceMetadata->getCollectionOperationAttribute($operationName, 'maximum_items_per_page', false, true)) {
+                        $itemPerPageParameter['schema']['maximum'] = $maximumItemPerPage;
+                    }
+                } else {
+                    $itemPerPageParameter['type'] = 'integer';
+                }
 
                 $pathOperation['parameters'][] = $itemPerPageParameter;
             }
