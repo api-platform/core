@@ -43,7 +43,7 @@ class SwaggerCommandTest extends KernelTestCase
 
     public function testExecuteWithAliasVersion3()
     {
-        $this->tester->run(['command' => 'api:swagger:export', '--spec-version' => '3']);
+        $this->tester->run(['command' => 'api:swagger:export', '--spec-version' => 3]);
 
         $this->assertJson($this->tester->getDisplay());
     }
@@ -57,7 +57,7 @@ class SwaggerCommandTest extends KernelTestCase
 
     public function testExecuteWithYamlVersion3()
     {
-        $this->tester->run(['command' => 'api:swagger:export', '--yaml' => true, '--spec-version' => '3']);
+        $this->tester->run(['command' => 'api:swagger:export', '--yaml' => true, '--spec-version' => 3]);
 
         $result = $this->tester->getDisplay();
         $this->assertYaml($result);
@@ -105,7 +105,7 @@ YAML;
     public function testExecuteWithBadArguments()
     {
         $this->expectException(InvalidOptionException::class);
-        $this->expectExceptionMessage('This tool only supports version 2 and 3 of the OpenAPI specification ("foo" given).');
+        $this->expectExceptionMessage('This tool only supports versions 2, 3 of the OpenAPI specification ("foo" given).');
         $this->tester->run(['command' => 'api:openapi:export', '--spec-version' => 'foo', '--yaml' => true]);
     }
 

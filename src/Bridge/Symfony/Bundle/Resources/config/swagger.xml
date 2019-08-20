@@ -31,6 +31,7 @@
             <argument>%api_platform.formats%</argument>
             <argument>%api_platform.collection.pagination.client_enabled%</argument>
             <argument>%api_platform.collection.pagination.enabled_parameter_name%</argument>
+            <argument>%api_platform.swagger.versions%</argument>
             <tag name="serializer.normalizer" priority="-790" />
         </service>
 
@@ -45,6 +46,8 @@
             <argument>%api_platform.title%</argument>
             <argument>%api_platform.description%</argument>
             <argument>%api_platform.version%</argument>
+            <argument>null</argument>
+            <argument>%api_platform.swagger.versions%</argument>
             <tag name="console.command" />
         </service>
 

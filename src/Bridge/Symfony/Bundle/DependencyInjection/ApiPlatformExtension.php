@@ -307,7 +307,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
      */
     private function registerSwaggerConfiguration(ContainerBuilder $container, array $config, XmlFileLoader $loader): void
     {
-        if (!$config['enable_swagger']) {
+        if (empty($config['swagger']['versions'])) {
             return;
         }
 
@@ -320,7 +320,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             $container->setParameter('api_platform.enable_re_doc', $config['enable_re_doc']);
         }
 
-        $container->setParameter('api_platform.enable_swagger', $config['enable_swagger']);
+        $container->setParameter('api_platform.swagger.versions', $config['swagger']['versions']);
         $container->setParameter('api_platform.swagger.api_keys', $config['swagger']['api_keys']);
     }
 
