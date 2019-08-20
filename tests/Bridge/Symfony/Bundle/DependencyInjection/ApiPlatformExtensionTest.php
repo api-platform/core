@@ -1053,7 +1053,7 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.oauth.tokenUrl' => '/oauth/v2/token',
             'api_platform.oauth.authorizationUrl' => '/oauth/v2/auth',
             'api_platform.oauth.scopes' => [],
-            'api_platform.swagger.versions' => ['2', '3'],
+            'api_platform.swagger.versions' => [2, 3],
             'api_platform.swagger.api_keys' => [],
             'api_platform.enable_swagger_ui' => true,
             'api_platform.enable_re_doc' => true,

@@ -41,6 +41,9 @@ final class SwaggerCommand extends Command
     private $apiFormats;
     private $swaggerVersions;
 
+    /**
+     * @param int[] $swaggerVersions
+     */
     public function __construct(NormalizerInterface $normalizer, ResourceNameCollectionFactoryInterface $resourceNameCollection, string $apiTitle, string $apiDescription, string $apiVersion, array $apiFormats = null, array $swaggerVersions = [2, 3])
     {
         $this->normalizer = $normalizer;
@@ -80,14 +83,11 @@ final class SwaggerCommand extends Command
     {
         $io = new SymfonyStyle($input, $output);
 
-        /** @var string $spec_version */
-        $spec_version = $input->getOption('spec-version');
-
-        /** @var string $version */
-        $version = explode('.', $spec_version)[0];
+        /** @var int $version */
+        $version = $input->getOption('spec-version');
 
         if (!\in_array($version, $this->swaggerVersions, true)) {
-            throw new InvalidOptionException(sprintf('This tool only supports version %s of the OpenAPI specification ("%s" given).', implode(', ', $this->swaggerVersions), $version));
+            throw new InvalidOptionException(sprintf('This tool only supports versions %s of the OpenAPI specification ("%s" given).', implode(', ', $this->swaggerVersions), $version));
         }
 
         $documentation = new Documentation($this->resourceNameCollectionFactory->create(), $this->apiTitle, $this->apiDescription, $this->apiVersion, $this->apiFormats);

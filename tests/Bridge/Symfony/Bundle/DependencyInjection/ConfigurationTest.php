@@ -141,7 +141,7 @@ class ConfigurationTest extends TestCase
                 'scopes' => [],
             ],
             'swagger' => [
-                'versions' => ['2', '3'],
+                'versions' => [2, 3],
                 'api_keys' => [],
             ],
             'eager_loading' => [
@@ -312,15 +312,12 @@ class ConfigurationTest extends TestCase
             ],
         ]);
 
-        $this->assertTrue(isset($config['swagger']['api_keys']));
+        $this->assertArrayHasKey('api_keys', $config['swagger']);
         $this->assertSame($exampleConfig, $config['swagger']['api_keys'][0]);
     }
 
     /**
      * Test config for disabled swagger versions.
-     *
-     * @group legacy
-     * @expectedDeprecation The use of `enable_swagger` has been deprecated in 2.5 and will be removed in 3.0. use `api_platform.swagger.versions` instead.
      */
     public function testDisabledSwaggerVersionConfig()
     {
@@ -328,13 +325,13 @@ class ConfigurationTest extends TestCase
             'api_platform' => [
                 'enable_swagger' => false,
                 'swagger' => [
-                    'versions' => ['3'],
+                    'versions' => [3],
                 ],
             ],
         ]);
 
-        $this->assertTrue(isset($config['swagger']['versions']));
-        $this->assertSame([], $config['swagger']['versions']);
+        $this->assertArrayHasKey('versions', $config['swagger']);
+        $this->assertEmpty($config['swagger']['versions']);
     }
 
     /**
@@ -345,24 +342,24 @@ class ConfigurationTest extends TestCase
         $config = $this->processor->processConfiguration($this->configuration, [
             'api_platform' => [
                 'swagger' => [
-                    'versions' => ['3'],
+                    'versions' => [3],
                 ],
             ],
         ]);
 
-        $this->assertTrue(isset($config['swagger']['versions']));
-        $this->assertSame(['3'], $config['swagger']['versions']);
+        $this->assertArrayHasKey('versions', $config['swagger']);
+        $this->assertSame([3], $config['swagger']['versions']);
 
         $config = $this->processor->processConfiguration($this->configuration, [
             'api_platform' => [
                 'swagger' => [
-                    'versions' => '2',
+                    'versions' => 2,
                 ],
             ],
         ]);
 
-        $this->assertTrue(isset($config['swagger']['versions']));
-        $this->assertSame(['2'], $config['swagger']['versions']);
+        $this->assertArrayHasKey('versions', $config['swagger']);
+        $this->assertSame([2], $config['swagger']['versions']);
 
         $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessageRegExp('/Only the versions .+ are supported. Got .+./');
@@ -370,7 +367,7 @@ class ConfigurationTest extends TestCase
         $this->processor->processConfiguration($this->configuration, [
             'api_platform' => [
                 'swagger' => [
-                    'versions' => ['1'],
+                    'versions' => [1],
                 ],
             ],
         ]);

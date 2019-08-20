@@ -58,7 +58,7 @@ final class Configuration implements ConfigurationInterface
         $rootNode
             ->beforeNormalization()
                 ->ifTrue(static function ($v) {
-                    return isset($v['enable_swagger']) && false === $v['enable_swagger'];
+                    return false === ($v['enable_swagger'] ?? null);
                 })
                 ->then(static function ($v) {
                     $v['swagger']['versions'] = [];
@@ -112,11 +112,7 @@ final class Configuration implements ConfigurationInterface
                     ->setDeprecated('Enabling the NelmioApiDocBundle integration has been deprecated in 2.2 and will be removed in 3.0. NelmioApiDocBundle 3 has native support for API Platform.')
                     ->info('Enable the NelmioApiDocBundle integration.')
                 ->end()
-                ->booleanNode('enable_swagger')
-                    ->defaultTrue()
-                    ->setDeprecated('The use of `enable_swagger` has been deprecated in 2.5 and will be removed in 3.0. use `api_platform.swagger.versions` instead.')
-                    ->info('Enable the Swagger documentation and export.')
-                ->end()
+                ->booleanNode('enable_swagger')->defaultTrue()->info('Enable the Swagger documentation and export.')->end()
                 ->booleanNode('enable_swagger_ui')->defaultValue(class_exists(TwigBundle::class))->info('Enable Swagger UI')->end()
                 ->booleanNode('enable_re_doc')->defaultValue(class_exists(TwigBundle::class))->info('Enable ReDoc')->end()
                 ->booleanNode('enable_entrypoint')->defaultTrue()->info('Enable the entrypoint')->end()
@@ -250,7 +246,7 @@ final class Configuration implements ConfigurationInterface
 
     private function addSwaggerSection(ArrayNodeDefinition $rootNode): void
     {
-        $defaultVersions = ['2', '3'];
+        $defaultVersions = [2, 3];
 
         $rootNode
             ->children()
@@ -260,7 +256,19 @@ final class Configuration implements ConfigurationInterface
                         ->arrayNode('versions')
                             ->info('The active versions of OpenAPI to be exported or used in the swagger_ui. The first value is the default.')
                             ->defaultValue($defaultVersions)
-                            ->beforeNormalization()->castToArray()->end()
+                            ->beforeNormalization()
+                                ->always(static function ($v) {
+                                    if (!\is_array($v)) {
+                                        $v = [$v];
+                                    }
+
+                                    foreach ($v as &$version) {
+                                        $version = (int) $version;
+                                    }
+
+                                    return $v;
+                                })
+                            ->end()
                             ->validate()
                                 ->ifTrue(function ($v) use ($defaultVersions) {
                                     return $v !== array_intersect($v, $defaultVersions);
