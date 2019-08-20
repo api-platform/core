@@ -241,7 +241,7 @@
             <argument>%api_platform.description%</argument>
             <argument>%api_platform.version%</argument>
             <argument>null</argument>
-            <argument type="expression">container.hasParameter('api_platform.swagger.versions') ? parameter('api_platform.swagger.versions') : null</argument>
+            <argument on-invalid="null">%api_platform.swagger.versions%</argument>
         </service>
 
         <service id="api_platform.action.exception" class="ApiPlatform\Core\Action\ExceptionAction" public="true">

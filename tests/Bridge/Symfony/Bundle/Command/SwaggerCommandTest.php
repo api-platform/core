@@ -105,7 +105,7 @@ YAML;
     public function testExecuteWithBadArguments()
     {
         $this->expectException(InvalidOptionException::class);
-        $this->expectExceptionMessage('This tool only supports version 2 and 3 of the OpenAPI specification ("foo" given).');
+        $this->expectExceptionMessage('This tool only supports version 2, 3 of the OpenAPI specification ("foo" given).');
         $this->tester->run(['command' => 'api:openapi:export', '--spec-version' => 'foo', '--yaml' => true]);
     }
 
