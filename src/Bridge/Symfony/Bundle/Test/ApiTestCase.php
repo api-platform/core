@@ -15,7 +15,9 @@ namespace ApiPlatform\Core\Bridge\Symfony\Bundle\Test;
 
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
+use Symfony\Component\HttpClient\HttpClient;
 
 /**
  * Base class for functional API tests.
@@ -42,6 +44,10 @@ abstract class ApiTestCase extends KernelTestCase
      */
     protected static function createClient(array $kernelOptions = [], array $defaultOptions = []): Client
     {
+        if (!class_exists(HttpClient::class)) {
+            throw new RuntimeException('Run "composer require --dev symfony/http-client" to use the test client"');
+        }
+
         $kernel = static::bootKernel($kernelOptions);
 
         try {

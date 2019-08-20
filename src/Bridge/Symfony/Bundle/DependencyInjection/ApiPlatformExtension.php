@@ -41,12 +41,10 @@ use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Resource\DirectoryResource;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\Finder\Finder;
-use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\Yaml\Yaml;
@@ -130,10 +128,6 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             ->addTag('api_platform.filter');
 
         if ($container->hasParameter('test.client.parameters') && class_exists(AbstractBrowser::class)) {
-            if (!class_exists(HttpClient::class)) {
-                throw new RuntimeException('Run "composer require --dev symfony/http-client" to use the test client"');
-            }
-
             $loader->load('test.xml');
         }
     }
