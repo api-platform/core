@@ -57,7 +57,7 @@ final class ExceptionAction
     }
 
     /**
-     * Converts a an exception to a JSON response.
+     * Converts an exception to a JSON response.
      */
     public function __invoke(FlattenException $exception, Request $request): Response
     {
