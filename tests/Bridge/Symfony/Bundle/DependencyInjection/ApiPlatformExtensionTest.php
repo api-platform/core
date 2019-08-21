@@ -1184,6 +1184,7 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.swagger.normalizer.documentation',
             'api_platform.json_schema.type_factory',
             'api_platform.json_schema.schema_factory',
+            'api_platform.json_schema.json_schema_generate_command',
             'api_platform.validator',
             'test.api_platform.client',
         ];

@@ -72,6 +72,13 @@ final class SchemaFactory implements SchemaFactoryInterface
 
         $version = $schema->getVersion();
         $definitionName = $this->buildDefinitionName($resourceClass, $format, $output, $operationType, $operationName, $serializerContext);
+
+        $method = (null !== $operationType && null !== $operationName) ? $resourceMetadata->getTypedOperationAttribute($operationType, $operationName, 'method') : 'GET';
+
+        if (!$output && !\in_array($method, ['POST', 'PATCH', 'PUT'], true)) {
+            return $schema;
+        }
+
         if (!isset($schema['$ref']) && !isset($schema['type'])) {
             $ref = Schema::VERSION_OPENAPI === $version ? '#/components/schemas/'.$definitionName : '#/definitions/'.$definitionName;
 
