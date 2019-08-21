@@ -20,7 +20,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Serializer\SerializerInterface;
 
 /**
- * Renders a normalized exception for a given {@see \Symfony\Component\Debug\Exception\FlattenException}.
+ * Renders a normalized exception for a given {@see FlattenException}.
  *
  * Usage:
  *
@@ -58,8 +58,10 @@ final class ExceptionAction
 
     /**
      * Converts an exception to a JSON response.
+     *
+     * @param FlattenException $exception
      */
-    public function __invoke(FlattenException $exception, Request $request): Response
+    public function __invoke($exception, Request $request): Response
     {
         $exceptionClass = $exception->getClass();
         $statusCode = $exception->getStatusCode();
