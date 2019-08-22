@@ -16,16 +16,17 @@ namespace ApiPlatform\Core\GraphQl\Resolver\Stage;
 use GraphQL\Error\Error;
 
 /**
- * Deny access stage of GraphQL resolvers.
+ * Security stage of GraphQL resolvers.
  *
  * @experimental
  *
  * @author Alan Poulain <contact@alanpoulain.eu>
+ * @author Vincent Chalamon <vincentchalamon@gmail.com>
  */
-interface DenyAccessStageInterface
+interface SecurityStageInterface
 {
     /**
      * @throws Error
      */
-    public function apply(string $resourceClass, string $operationName, array $context): void;
+    public function __invoke(string $resourceClass, string $operationName, array $context): void;
 }

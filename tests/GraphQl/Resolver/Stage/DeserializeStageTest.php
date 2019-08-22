@@ -62,7 +62,7 @@ class DeserializeStageTest extends TestCase
         ]);
         $this->resourceMetadataFactoryProphecy->create($resourceClass)->willReturn($resourceMetadata);
 
-        $result = $this->deserializeStage->apply($objectToPopulate, $resourceClass, $operationName, []);
+        $result = ($this->deserializeStage)($objectToPopulate, $resourceClass, $operationName, []);
 
         $this->assertSame($objectToPopulate, $result);
     }
@@ -84,7 +84,7 @@ class DeserializeStageTest extends TestCase
         $denormalizedData = new \stdClass();
         $this->denormalizerProphecy->denormalize($context['args']['input'], $resourceClass, ItemNormalizer::FORMAT, $denormalizationContext)->shouldBeCalled()->willReturn($denormalizedData);
 
-        $result = $this->deserializeStage->apply($objectToPopulate, $resourceClass, $operationName, $context);
+        $result = ($this->deserializeStage)($objectToPopulate, $resourceClass, $operationName, $context);
 
         $this->assertSame($denormalizedData, $result);
     }

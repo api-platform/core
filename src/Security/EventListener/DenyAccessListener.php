@@ -18,6 +18,7 @@ use ApiPlatform\Core\Security\ExpressionLanguage;
 use ApiPlatform\Core\Security\ResourceAccessChecker;
 use ApiPlatform\Core\Security\ResourceAccessCheckerInterface;
 use ApiPlatform\Core\Util\RequestAttributesExtractor;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolverInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
@@ -52,31 +53,55 @@ final class DenyAccessListener
         @trigger_error(sprintf('Passing an instance of "%s" or null as second argument of "%s" is deprecated since API Platform 2.2 and will not be possible anymore in API Platform 3. Pass an instance of "%s" and no extra argument instead.', ExpressionLanguage::class, self::class, ResourceAccessCheckerInterface::class), E_USER_DEPRECATED);
     }
 
+    public function onKernelRequest(GetResponseEvent $event): void
+    {
+        @trigger_error(sprintf('Method "%1$s::onKernelRequest" is deprecated since API Platform 2.4 and will not be available anymore in API Platform 3. Prefer calling "%1$s::onSecurity" instead.', self::class), E_USER_DEPRECATED);
+        $this->onSecurityPostDenormalize($event);
+    }
+
+    public function onSecurity(GetResponseEvent $event): void
+    {
+        $this->checkSecurity($event->getRequest(), 'security', false);
+    }
+
+    public function onSecurityPostDenormalize(GetResponseEvent $event): void
+    {
+        $request = $event->getRequest();
+        $this->checkSecurity($request, 'security_post_denormalize', true, [
+            'previous_object' => $request->attributes->get('previous_data'),
+        ]);
+    }
+
     /**
      * @throws AccessDeniedException
      */
-    public function onKernelRequest(GetResponseEvent $event): void
+    private function checkSecurity(Request $request, string $attribute, bool $backwardCompatibility, array $extraVariables = []): void
     {
-        $request = $event->getRequest();
         if (!$attributes = RequestAttributesExtractor::extractAttributes($request)) {
             return;
         }
 
         $resourceMetadata = $this->resourceMetadataFactory->create($attributes['resource_class']);
 
-        $isGranted = $resourceMetadata->getOperationAttribute($attributes, 'access_control', null, true);
+        $isGranted = $resourceMetadata->getOperationAttribute($attributes, $attribute, null, true);
+        if ($backwardCompatibility && null === $isGranted) {
+            // Backward compatibility
+            $isGranted = $resourceMetadata->getOperationAttribute($attributes, 'access_control', null, true);
+            if (null !== $isGranted) {
+                @trigger_error('Using "access_control" attribute is deprecated since API Platform 2.4 and will not be possible anymore in API Platform 3. Use "security" attribute instead.', E_USER_DEPRECATED);
+            }
+        }
 
         if (null === $isGranted) {
             return;
         }
 
-        $extraVariables = $request->attributes->all();
+        $extraVariables += $request->attributes->all();
         $extraVariables['object'] = $request->attributes->get('data');
-        $extraVariables['previous_object'] = $request->attributes->get('previous_data');
         $extraVariables['request'] = $request;
 
         if (!$this->resourceAccessChecker->isGranted($attributes['resource_class'], $isGranted, $extraVariables)) {
-            throw new AccessDeniedException($resourceMetadata->getOperationAttribute($attributes, 'access_control_message', 'Access Denied.', true));
+            throw new AccessDeniedException($resourceMetadata->getOperationAttribute($attributes, $attribute.'_message', 'Access Denied.', true));
         }
     }
 }

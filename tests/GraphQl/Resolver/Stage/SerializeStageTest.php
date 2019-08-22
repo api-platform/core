@@ -56,7 +56,7 @@ class SerializeStageTest extends TestCase
         ]);
         $this->resourceMetadataFactoryProphecy->create($resourceClass)->willReturn($resourceMetadata);
 
-        $result = $this->createSerializeStage($paginationEnabled)->apply(null, $resourceClass, $operationName, $context);
+        $result = ($this->createSerializeStage($paginationEnabled))(null, $resourceClass, $operationName, $context);
 
         $this->assertSame($expectedResult, $result);
     }
@@ -86,7 +86,7 @@ class SerializeStageTest extends TestCase
 
         $this->normalizerProphecy->normalize(Argument::type('stdClass'), ItemNormalizer::FORMAT, $normalizationContext)->willReturn(['normalized_item']);
 
-        $result = $this->createSerializeStage($paginationEnabled)->apply($itemOrCollection, $resourceClass, $operationName, $context);
+        $result = ($this->createSerializeStage($paginationEnabled))($itemOrCollection, $resourceClass, $operationName, $context);
 
         $this->assertSame($expectedResult, $result);
     }
@@ -131,7 +131,7 @@ class SerializeStageTest extends TestCase
             $this->expectExceptionMessage($expectedExceptionMessage);
         }
 
-        $result = $this->createSerializeStage(true)->apply($collection, $resourceClass, $operationName, $context);
+        $result = ($this->createSerializeStage(true))($collection, $resourceClass, $operationName, $context);
 
         $this->assertSame($expectedResult, $result);
     }
@@ -165,7 +165,7 @@ class SerializeStageTest extends TestCase
         $this->expectException(Error::class);
         $this->expectExceptionMessage('Expected serialized data to be a nullable array.');
 
-        $this->createSerializeStage(false)->apply(new \stdClass(), $resourceClass, $operationName, $context);
+        ($this->createSerializeStage(false))(new \stdClass(), $resourceClass, $operationName, $context);
     }
 
     private function createSerializeStage(bool $paginationEnabled): SerializeStage

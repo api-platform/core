@@ -41,7 +41,7 @@ final class WriteStage implements WriteStageInterface
     /**
      * {@inheritdoc}
      */
-    public function apply($data, string $resourceClass, string $operationName, array $context)
+    public function __invoke($data, string $resourceClass, string $operationName, array $context)
     {
         $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
         if (null === $data || !$resourceMetadata->getGraphqlAttribute($operationName, 'write', true, true)) {

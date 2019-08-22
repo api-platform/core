@@ -75,7 +75,7 @@
         "symfony/http-client": "^4.3",
         "symfony/mercure-bundle": "*",
         "symfony/messenger": "^4.3",
-        "symfony/phpunit-bridge": "^4.3.1",
+        "symfony/phpunit-bridge": "^4.3@dev",
         "symfony/routing": "^3.4 || ^4.0",
         "symfony/security-bundle": "^3.4 || ^4.0",
         "symfony/security-core": "^4.3",

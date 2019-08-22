@@ -66,6 +66,8 @@ use ApiPlatform\Core\GraphQl\Resolver\QueryCollectionResolverInterface;
 use ApiPlatform\Core\GraphQl\Resolver\QueryItemResolverInterface;
 use ApiPlatform\Core\GraphQl\Serializer\SerializerContextBuilderInterface as GraphQlSerializerContextBuilderInterface;
 use ApiPlatform\Core\GraphQl\Type\Definition\TypeInterface as GraphQlTypeInterface;
+use ApiPlatform\Core\JsonSchema\SchemaFactoryInterface;
+use ApiPlatform\Core\JsonSchema\TypeFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
@@ -197,7 +199,6 @@ class ApiPlatformExtensionTest extends TestCase
     public function testLoadDefaultConfig()
     {
         $containerBuilderProphecy = $this->getBaseContainerBuilderProphecy();
-        $containerBuilderProphecy->setParameter('api_platform.enable_swagger', '1')->shouldBeCalled();
         $containerBuilderProphecy->hasParameter('kernel.debug')->willReturn(true);
         $containerBuilderProphecy->getParameter('kernel.debug')->willReturn(false);
         $containerBuilder = $containerBuilderProphecy->reveal();
@@ -211,7 +212,6 @@ class ApiPlatformExtensionTest extends TestCase
     public function testLoadDefaultConfigWithOdm()
     {
         $containerBuilderProphecy = $this->getBaseContainerBuilderProphecy(['odm']);
-        $containerBuilderProphecy->setParameter('api_platform.enable_swagger', '1')->shouldBeCalled();
         $containerBuilderProphecy->hasParameter('kernel.debug')->willReturn(true);
         $containerBuilderProphecy->getParameter('kernel.debug')->willReturn(false);
         $containerBuilder = $containerBuilderProphecy->reveal();
@@ -230,7 +230,6 @@ class ApiPlatformExtensionTest extends TestCase
         $containerBuilderProphecy->hasParameter('kernel.debug')->willReturn(true);
         $containerBuilderProphecy->getParameter('kernel.debug')->willReturn(false);
         $containerBuilderProphecy->setAlias('api_platform.name_converter', $nameConverterId)->shouldBeCalled();
-        $containerBuilderProphecy->setParameter('api_platform.enable_swagger', '1')->shouldBeCalled();
 
         $containerBuilder = $containerBuilderProphecy->reveal();
 
@@ -250,7 +249,6 @@ class ApiPlatformExtensionTest extends TestCase
             'FOSUserBundle' => FOSUserBundle::class,
         ])->shouldBeCalled();
         $containerBuilderProphecy->setDefinition('api_platform.fos_user.event_listener', Argument::type(Definition::class))->shouldBeCalled();
-        $containerBuilderProphecy->setParameter('api_platform.enable_swagger', '1')->shouldBeCalled();
 
         $containerBuilder = $containerBuilderProphecy->reveal();
 
@@ -321,7 +319,6 @@ class ApiPlatformExtensionTest extends TestCase
         ])->shouldBeCalled();
         $containerBuilderProphecy->setDefinition('api_platform.nelmio_api_doc.annotations_provider', Argument::type(Definition::class))->shouldBeCalled();
         $containerBuilderProphecy->setDefinition('api_platform.nelmio_api_doc.parser', Argument::type(Definition::class))->shouldBeCalled();
-        $containerBuilderProphecy->setParameter('api_platform.enable_swagger', '1')->shouldBeCalled();
 
         $containerBuilder = $containerBuilderProphecy->reveal();
 
@@ -342,7 +339,8 @@ class ApiPlatformExtensionTest extends TestCase
         $containerBuilderProphecy->setDefinition('api_platform.graphql.resolver.factory.item_mutation', Argument::type(Definition::class))->shouldNotBeCalled();
         $containerBuilderProphecy->setDefinition('api_platform.graphql.resolver.factory.item', Argument::type(Definition::class))->shouldNotBeCalled();
         $containerBuilderProphecy->setDefinition('api_platform.graphql.resolver.stage.read', Argument::type(Definition::class))->shouldNotBeCalled();
-        $containerBuilderProphecy->setDefinition('api_platform.graphql.resolver.stage.deny_access', Argument::type(Definition::class))->shouldNotBeCalled();
+        $containerBuilderProphecy->setDefinition('api_platform.graphql.resolver.stage.security', Argument::type(Definition::class))->shouldNotBeCalled();
+        $containerBuilderProphecy->setDefinition('api_platform.graphql.resolver.stage.security_post_denormalize', Argument::type(Definition::class))->shouldNotBeCalled();
         $containerBuilderProphecy->setDefinition('api_platform.graphql.resolver.stage.serialize', Argument::type(Definition::class))->shouldNotBeCalled();
         $containerBuilderProphecy->setDefinition('api_platform.graphql.resolver.stage.deserialize', Argument::type(Definition::class))->shouldNotBeCalled();
         $containerBuilderProphecy->setDefinition('api_platform.graphql.resolver.stage.write', Argument::type(Definition::class))->shouldNotBeCalled();
@@ -1056,8 +1054,8 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.oauth.tokenUrl' => '/oauth/v2/token',
             'api_platform.oauth.authorizationUrl' => '/oauth/v2/auth',
             'api_platform.oauth.scopes' => [],
+            'api_platform.swagger.versions' => [2, 3],
             'api_platform.swagger.api_keys' => [],
-            'api_platform.enable_swagger' => true,
             'api_platform.enable_swagger_ui' => true,
             'api_platform.enable_re_doc' => true,
             'api_platform.graphql.enabled' => true,
@@ -1116,7 +1114,8 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.graphql.resolver.factory.collection',
             'api_platform.graphql.resolver.factory.item_mutation',
             'api_platform.graphql.resolver.stage.read',
-            'api_platform.graphql.resolver.stage.deny_access',
+            'api_platform.graphql.resolver.stage.security',
+            'api_platform.graphql.resolver.stage.security_post_denormalize',
             'api_platform.graphql.resolver.stage.serialize',
             'api_platform.graphql.resolver.stage.deserialize',
             'api_platform.graphql.resolver.stage.write',
@@ -1150,6 +1149,7 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.hydra.normalizer.entrypoint',
             'api_platform.hydra.normalizer.error',
             'api_platform.hydra.normalizer.partial_collection_view',
+            'api_platform.hydra.json_schema.schema_factory',
             'api_platform.jsonld.action.context',
             'api_platform.jsonld.context_builder',
             'api_platform.jsonld.encoder',
@@ -1182,6 +1182,9 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.swagger.listener.ui',
             'api_platform.swagger.normalizer.api_gateway',
             'api_platform.swagger.normalizer.documentation',
+            'api_platform.json_schema.type_factory',
+            'api_platform.json_schema.schema_factory',
+            'api_platform.json_schema.json_schema_generate_command',
             'api_platform.validator',
             'test.api_platform.client',
         ];
@@ -1235,6 +1238,8 @@ class ApiPlatformExtensionTest extends TestCase
             NumericFilter::class => 'api_platform.doctrine.orm.numeric_filter',
             ExistsFilter::class => 'api_platform.doctrine.orm.exists_filter',
             GraphQlSerializerContextBuilderInterface::class => 'api_platform.graphql.serializer.context_builder',
+            TypeFactoryInterface::class => 'api_platform.json_schema.type_factory',
+            SchemaFactoryInterface::class => 'api_platform.json_schema.schema_factory',
         ];
 
         if (\in_array('odm', $doctrineIntegrationsToLoad, true)) {

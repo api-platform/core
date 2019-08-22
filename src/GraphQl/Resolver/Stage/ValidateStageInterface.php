@@ -29,5 +29,5 @@ interface ValidateStageInterface
      *
      * @throws Error
      */
-    public function apply($object, string $resourceClass, string $operationName, array $context): void;
+    public function __invoke($object, string $resourceClass, string $operationName, array $context): void;
 }

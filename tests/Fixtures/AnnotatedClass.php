@@ -25,8 +25,10 @@ use ApiPlatform\Core\Annotation\ApiResource;
  *     graphql={"query"={"normalization_context"={"groups"={"foo", "bar"}}}},
  *     attributes={"foo"="bar", "route_prefix"="/whatever", "cache_headers"={"max_age"=0, "shared_max_age"=0, "vary"={"Custom-Vary-1", "Custom-Vary-2"}}},
  *     routePrefix="/foo",
- *     accessControl="is_granted('ROLE_FOO')",
- *     accessControlMessage="You are not foo."
+ *     security="is_granted('ROLE_FOO')",
+ *     securityMessage="You are not foo.",
+ *     securityPostDenormalize="is_granted('ROLE_BAR')",
+ *     securityPostDenormalizeMessage="You are not bar."
  * )
  *
  * @author Marcus Speight <marcus@pmconnect.co.uk>

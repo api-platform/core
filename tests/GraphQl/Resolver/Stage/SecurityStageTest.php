@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Tests\GraphQl\Resolver\Stage;
 
-use ApiPlatform\Core\GraphQl\Resolver\Stage\DenyAccessStage;
+use ApiPlatform\Core\GraphQl\Resolver\Stage\SecurityStage;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Security\ResourceAccessCheckerInterface;
@@ -24,11 +24,12 @@ use Prophecy\Argument;
 
 /**
  * @author Alan Poulain <contact@alanpoulain.eu>
+ * @author Vincent Chalamon <vincentchalamon@gmail.com>
  */
-class DenyAccessStageTest extends TestCase
+class SecurityStageTest extends TestCase
 {
-    /** @var DenyAccessStage */
-    private $denyAccessStage;
+    /** @var SecurityStage */
+    private $securityStage;
     private $resourceMetadataFactoryProphecy;
     private $resourceAccessCheckerProphecy;
 
@@ -40,20 +41,20 @@ class DenyAccessStageTest extends TestCase
         $this->resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $this->resourceAccessCheckerProphecy = $this->prophesize(ResourceAccessCheckerInterface::class);
 
-        $this->denyAccessStage = new DenyAccessStage(
+        $this->securityStage = new SecurityStage(
             $this->resourceMetadataFactoryProphecy->reveal(),
             $this->resourceAccessCheckerProphecy->reveal()
         );
     }
 
-    public function testNoAccessControl(): void
+    public function testNoSecurity(): void
     {
         $resourceClass = 'myResource';
         $this->resourceMetadataFactoryProphecy->create($resourceClass)->willReturn(new ResourceMetadata());
 
         $this->resourceAccessCheckerProphecy->isGranted(Argument::cetera())->shouldNotBeCalled();
 
-        $this->denyAccessStage->apply($resourceClass, 'query', []);
+        ($this->securityStage)($resourceClass, 'query', []);
     }
 
     public function testGranted(): void
@@ -63,13 +64,13 @@ class DenyAccessStageTest extends TestCase
         $isGranted = 'not_granted';
         $extraVariables = ['extra' => false];
         $resourceMetadata = (new ResourceMetadata())->withGraphql([
-            $operationName => ['access_control' => $isGranted],
+            $operationName => ['security' => $isGranted],
         ]);
         $this->resourceMetadataFactoryProphecy->create($resourceClass)->willReturn($resourceMetadata);
 
         $this->resourceAccessCheckerProphecy->isGranted($resourceClass, $isGranted, $extraVariables)->shouldBeCalled()->willReturn(true);
 
-        $this->denyAccessStage->apply($resourceClass, 'query', ['extra_variables' => $extraVariables]);
+        ($this->securityStage)($resourceClass, 'query', ['extra_variables' => $extraVariables]);
     }
 
     public function testNotGranted(): void
@@ -79,7 +80,7 @@ class DenyAccessStageTest extends TestCase
         $isGranted = 'not_granted';
         $extraVariables = ['extra' => false];
         $resourceMetadata = (new ResourceMetadata())->withGraphql([
-            $operationName => ['access_control' => $isGranted],
+            $operationName => ['security' => $isGranted],
         ]);
         $this->resourceMetadataFactoryProphecy->create($resourceClass)->willReturn($resourceMetadata);
 
@@ -90,7 +91,7 @@ class DenyAccessStageTest extends TestCase
         $this->expectException(Error::class);
         $this->expectExceptionMessage('Access Denied.');
 
-        $this->denyAccessStage->apply($resourceClass, 'query', [
+        ($this->securityStage)($resourceClass, 'query', [
             'info' => $info,
             'extra_variables' => $extraVariables,
         ]);

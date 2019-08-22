@@ -40,7 +40,7 @@ final class ValidateStage implements ValidateStageInterface
     /**
      * {@inheritdoc}
      */
-    public function apply($object, string $resourceClass, string $operationName, array $context): void
+    public function __invoke($object, string $resourceClass, string $operationName, array $context): void
     {
         $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
         if (!$resourceMetadata->getGraphqlAttribute($operationName, 'validate', true, true)) {

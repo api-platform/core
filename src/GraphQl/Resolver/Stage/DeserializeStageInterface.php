@@ -27,5 +27,5 @@ interface DeserializeStageInterface
      *
      * @return object|null
      */
-    public function apply($objectToPopulate, string $resourceClass, string $operationName, array $context);
+    public function __invoke($objectToPopulate, string $resourceClass, string $operationName, array $context);
 }

@@ -52,9 +52,6 @@ parameters:
 		- '#Parameter \#(2|3) \$(resourceMetadataFactory|pagination) of class ApiPlatform\\Core\\Bridge\\Doctrine\\Orm\\Extension\\PaginationExtension constructor expects (ApiPlatform\\Core\\Metadata\\Resource\\Factory\\ResourceMetadataFactoryInterface\|Symfony\\Component\\HttpFoundation\\RequestStack|ApiPlatform\\Core\\DataProvider\\Pagination\|ApiPlatform\\Core\\Metadata\\Resource\\Factory\\ResourceMetadataFactoryInterface), stdClass given\.#'
 		- '#Parameter \#[0-9] \$filterLocator of class ApiPlatform\\Core\\Bridge\\Doctrine\\Orm\\Extension\\FilterExtension constructor expects ApiPlatform\\Core\\Api\\FilterCollection|Psr\\Container\\ContainerInterface(\|null)?, ArrayObject given\.#'
 		-
-			message: '#Parameter \#9 \$nameConverter of class ApiPlatform\\Core\\Swagger\\Serializer\\DocumentationNormalizer constructor expects Symfony\\Component\\Serializer\\NameConverter\\NameConverterInterface\|null, object given\.#'
-			path: %currentWorkingDirectory%/tests/Swagger/Serializer/DocumentationNormalizer*Test.php
-		-
 			message: '#Parameter \#1 \$resource of method ApiPlatform\\Core\\Metadata\\Extractor\\XmlExtractor::getAttributes\(\) expects SimpleXMLElement, object given\.#'
 			path: %currentWorkingDirectory%/src/Metadata/Extractor/XmlExtractor.php
 		-

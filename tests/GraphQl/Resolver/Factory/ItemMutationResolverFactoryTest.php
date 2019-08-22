@@ -14,9 +14,10 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\GraphQl\Resolver\Factory;
 
 use ApiPlatform\Core\GraphQl\Resolver\Factory\ItemMutationResolverFactory;
-use ApiPlatform\Core\GraphQl\Resolver\Stage\DenyAccessStageInterface;
 use ApiPlatform\Core\GraphQl\Resolver\Stage\DeserializeStageInterface;
 use ApiPlatform\Core\GraphQl\Resolver\Stage\ReadStageInterface;
+use ApiPlatform\Core\GraphQl\Resolver\Stage\SecurityPostDenormalizeStageInterface;
+use ApiPlatform\Core\GraphQl\Resolver\Stage\SecurityStageInterface;
 use ApiPlatform\Core\GraphQl\Resolver\Stage\SerializeStageInterface;
 use ApiPlatform\Core\GraphQl\Resolver\Stage\ValidateStageInterface;
 use ApiPlatform\Core\GraphQl\Resolver\Stage\WriteStageInterface;
@@ -36,7 +37,8 @@ class ItemMutationResolverFactoryTest extends TestCase
 {
     private $itemMutationResolverFactory;
     private $readStageProphecy;
-    private $denyAccessStageProphecy;
+    private $securityStageProphecy;
+    private $securityPostDenormalizeStageProphecy;
     private $serializeStageProphecy;
     private $deserializeStageProphecy;
     private $writeStageProphecy;
@@ -50,7 +52,8 @@ class ItemMutationResolverFactoryTest extends TestCase
     protected function setUp(): void
     {
         $this->readStageProphecy = $this->prophesize(ReadStageInterface::class);
-        $this->denyAccessStageProphecy = $this->prophesize(DenyAccessStageInterface::class);
+        $this->securityStageProphecy = $this->prophesize(SecurityStageInterface::class);
+        $this->securityPostDenormalizeStageProphecy = $this->prophesize(SecurityPostDenormalizeStageInterface::class);
         $this->serializeStageProphecy = $this->prophesize(SerializeStageInterface::class);
         $this->deserializeStageProphecy = $this->prophesize(DeserializeStageInterface::class);
         $this->writeStageProphecy = $this->prophesize(WriteStageInterface::class);
@@ -60,7 +63,8 @@ class ItemMutationResolverFactoryTest extends TestCase
 
         $this->itemMutationResolverFactory = new ItemMutationResolverFactory(
             $this->readStageProphecy->reveal(),
-            $this->denyAccessStageProphecy->reveal(),
+            $this->securityStageProphecy->reveal(),
+            $this->securityPostDenormalizeStageProphecy->reveal(),
             $this->serializeStageProphecy->reveal(),
             $this->deserializeStageProphecy->reveal(),
             $this->writeStageProphecy->reveal(),
@@ -82,29 +86,34 @@ class ItemMutationResolverFactoryTest extends TestCase
 
         $readStageItem = new \stdClass();
         $readStageItem->field = 'read';
-        $this->readStageProphecy->apply($resourceClass, $rootClass, $operationName, $resolverContext)->shouldBeCalled()->willReturn($readStageItem);
+        $this->readStageProphecy->__invoke($resourceClass, $rootClass, $operationName, $resolverContext)->shouldBeCalled()->willReturn($readStageItem);
 
         $deserializeStageItem = new \stdClass();
         $deserializeStageItem->field = 'deserialize';
-        $this->deserializeStageProphecy->apply($readStageItem, $resourceClass, $operationName, $resolverContext)->shouldBeCalled()->willReturn($deserializeStageItem);
+        $this->deserializeStageProphecy->__invoke($readStageItem, $resourceClass, $operationName, $resolverContext)->shouldBeCalled()->willReturn($deserializeStageItem);
 
         $this->resourceMetadataFactoryProphecy->create($resourceClass)->willReturn(new ResourceMetadata());
 
-        $this->denyAccessStageProphecy->apply($resourceClass, $operationName, $resolverContext + [
+        $this->securityStageProphecy->__invoke($resourceClass, $operationName, $resolverContext + [
+            'extra_variables' => [
+                'object' => $readStageItem,
+            ],
+        ])->shouldBeCalled();
+        $this->securityPostDenormalizeStageProphecy->__invoke($resourceClass, $operationName, $resolverContext + [
             'extra_variables' => [
                 'object' => $deserializeStageItem,
                 'previous_object' => $readStageItem,
             ],
         ])->shouldBeCalled();
 
-        $this->validateStageProphecy->apply($deserializeStageItem, $resourceClass, $operationName, $resolverContext)->shouldBeCalled();
+        $this->validateStageProphecy->__invoke($deserializeStageItem, $resourceClass, $operationName, $resolverContext)->shouldBeCalled();
 
         $writeStageItem = new \stdClass();
         $writeStageItem->field = 'write';
-        $this->writeStageProphecy->apply($deserializeStageItem, $resourceClass, $operationName, $resolverContext)->shouldBeCalled()->willReturn($writeStageItem);
+        $this->writeStageProphecy->__invoke($deserializeStageItem, $resourceClass, $operationName, $resolverContext)->shouldBeCalled()->willReturn($writeStageItem);
 
         $serializeStageData = ['serialized'];
-        $this->serializeStageProphecy->apply($writeStageItem, $resourceClass, $operationName, $resolverContext)->shouldBeCalled()->willReturn($serializeStageData);
+        $this->serializeStageProphecy->__invoke($writeStageItem, $resourceClass, $operationName, $resolverContext)->shouldBeCalled()->willReturn($serializeStageData);
 
         $this->assertSame($serializeStageData, ($this->itemMutationResolverFactory)($resourceClass, $rootClass, $operationName)($source, $args, null, $info));
     }
@@ -144,7 +153,7 @@ class ItemMutationResolverFactoryTest extends TestCase
         $resolverContext = ['source' => $source, 'args' => $args, 'info' => $info, 'is_collection' => false, 'is_mutation' => true];
 
         $readStageItem = [];
-        $this->readStageProphecy->apply($resourceClass, $rootClass, $operationName, $resolverContext)->shouldBeCalled()->willReturn($readStageItem);
+        $this->readStageProphecy->__invoke($resourceClass, $rootClass, $operationName, $resolverContext)->shouldBeCalled()->willReturn($readStageItem);
 
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Item from read stage should be a nullable object.');
@@ -164,26 +173,31 @@ class ItemMutationResolverFactoryTest extends TestCase
 
         $readStageItem = new \stdClass();
         $readStageItem->field = 'read';
-        $this->readStageProphecy->apply($resourceClass, $rootClass, $operationName, $resolverContext)->shouldBeCalled()->willReturn($readStageItem);
+        $this->readStageProphecy->__invoke($resourceClass, $rootClass, $operationName, $resolverContext)->shouldBeCalled()->willReturn($readStageItem);
 
         $deserializeStageItem = null;
-        $this->deserializeStageProphecy->apply($readStageItem, $resourceClass, $operationName, $resolverContext)->shouldBeCalled()->willReturn($deserializeStageItem);
+        $this->deserializeStageProphecy->__invoke($readStageItem, $resourceClass, $operationName, $resolverContext)->shouldBeCalled()->willReturn($deserializeStageItem);
 
         $this->resourceMetadataFactoryProphecy->create($resourceClass)->willReturn(new ResourceMetadata());
 
-        $this->denyAccessStageProphecy->apply($resourceClass, $operationName, $resolverContext + [
+        $this->securityStageProphecy->__invoke($resourceClass, $operationName, $resolverContext + [
+            'extra_variables' => [
+                'object' => $readStageItem,
+            ],
+        ])->shouldBeCalled();
+        $this->securityPostDenormalizeStageProphecy->__invoke($resourceClass, $operationName, $resolverContext + [
             'extra_variables' => [
                 'object' => $deserializeStageItem,
                 'previous_object' => $readStageItem,
             ],
         ])->shouldBeCalled();
 
-        $this->validateStageProphecy->apply(Argument::cetera())->shouldNotBeCalled();
+        $this->validateStageProphecy->__invoke(Argument::cetera())->shouldNotBeCalled();
 
-        $this->writeStageProphecy->apply(Argument::cetera())->shouldNotBeCalled();
+        $this->writeStageProphecy->__invoke(Argument::cetera())->shouldNotBeCalled();
 
         $serializeStageData = null;
-        $this->serializeStageProphecy->apply($deserializeStageItem, $resourceClass, $operationName, $resolverContext)->shouldBeCalled()->willReturn($serializeStageData);
+        $this->serializeStageProphecy->__invoke($deserializeStageItem, $resourceClass, $operationName, $resolverContext)->shouldBeCalled()->willReturn($serializeStageData);
 
         $this->assertNull(($this->itemMutationResolverFactory)($resourceClass, $rootClass, $operationName)($source, $args, null, $info));
     }
@@ -200,25 +214,30 @@ class ItemMutationResolverFactoryTest extends TestCase
 
         $readStageItem = new \stdClass();
         $readStageItem->field = 'read';
-        $this->readStageProphecy->apply($resourceClass, $rootClass, $operationName, $resolverContext)->shouldBeCalled()->willReturn($readStageItem);
+        $this->readStageProphecy->__invoke($resourceClass, $rootClass, $operationName, $resolverContext)->shouldBeCalled()->willReturn($readStageItem);
 
-        $this->deserializeStageProphecy->apply(Argument::cetera())->shouldNotBeCalled();
+        $this->deserializeStageProphecy->__invoke(Argument::cetera())->shouldNotBeCalled();
 
-        $this->denyAccessStageProphecy->apply($resourceClass, $operationName, $resolverContext + [
+        $this->securityStageProphecy->__invoke($resourceClass, $operationName, $resolverContext + [
+            'extra_variables' => [
+                'object' => $readStageItem,
+            ],
+        ])->shouldBeCalled();
+        $this->securityPostDenormalizeStageProphecy->__invoke($resourceClass, $operationName, $resolverContext + [
             'extra_variables' => [
                 'object' => $readStageItem,
                 'previous_object' => $readStageItem,
             ],
         ])->shouldBeCalled();
 
-        $this->validateStageProphecy->apply(Argument::cetera())->shouldNotBeCalled();
+        $this->validateStageProphecy->__invoke(Argument::cetera())->shouldNotBeCalled();
 
         $writeStageItem = new \stdClass();
         $writeStageItem->field = 'write';
-        $this->writeStageProphecy->apply($readStageItem, $resourceClass, $operationName, $resolverContext)->shouldBeCalled()->willReturn($writeStageItem);
+        $this->writeStageProphecy->__invoke($readStageItem, $resourceClass, $operationName, $resolverContext)->shouldBeCalled()->willReturn($writeStageItem);
 
         $serializeStageData = ['serialized'];
-        $this->serializeStageProphecy->apply($writeStageItem, $resourceClass, $operationName, $resolverContext)->shouldBeCalled()->willReturn($serializeStageData);
+        $this->serializeStageProphecy->__invoke($writeStageItem, $resourceClass, $operationName, $resolverContext)->shouldBeCalled()->willReturn($serializeStageData);
 
         $this->assertSame($serializeStageData, ($this->itemMutationResolverFactory)($resourceClass, $rootClass, $operationName)($source, $args, null, $info));
     }
@@ -235,11 +254,11 @@ class ItemMutationResolverFactoryTest extends TestCase
 
         $readStageItem = new \stdClass();
         $readStageItem->field = 'read';
-        $this->readStageProphecy->apply($resourceClass, $rootClass, $operationName, $resolverContext)->shouldBeCalled()->willReturn($readStageItem);
+        $this->readStageProphecy->__invoke($resourceClass, $rootClass, $operationName, $resolverContext)->shouldBeCalled()->willReturn($readStageItem);
 
         $deserializeStageItem = new \stdClass();
         $deserializeStageItem->field = 'deserialize';
-        $this->deserializeStageProphecy->apply($readStageItem, $resourceClass, $operationName, $resolverContext)->shouldBeCalled()->willReturn($deserializeStageItem);
+        $this->deserializeStageProphecy->__invoke($readStageItem, $resourceClass, $operationName, $resolverContext)->shouldBeCalled()->willReturn($deserializeStageItem);
 
         $this->resourceMetadataFactoryProphecy->create($resourceClass)->willReturn(
             (new ResourceMetadata())->withGraphql([$operationName => ['mutation' => 'query_resolver_id']])
@@ -251,21 +270,26 @@ class ItemMutationResolverFactoryTest extends TestCase
             return $customItem;
         });
 
-        $this->denyAccessStageProphecy->apply($resourceClass, $operationName, $resolverContext + [
+        $this->securityStageProphecy->__invoke($resourceClass, $operationName, $resolverContext + [
+            'extra_variables' => [
+                'object' => $readStageItem,
+            ],
+        ])->shouldBeCalled();
+        $this->securityPostDenormalizeStageProphecy->__invoke($resourceClass, $operationName, $resolverContext + [
             'extra_variables' => [
                 'object' => $customItem,
                 'previous_object' => $readStageItem,
             ],
         ])->shouldBeCalled();
 
-        $this->validateStageProphecy->apply($customItem, $resourceClass, $operationName, $resolverContext)->shouldBeCalled();
+        $this->validateStageProphecy->__invoke($customItem, $resourceClass, $operationName, $resolverContext)->shouldBeCalled();
 
         $writeStageItem = new \stdClass();
         $writeStageItem->field = 'write';
-        $this->writeStageProphecy->apply($customItem, $resourceClass, $operationName, $resolverContext)->shouldBeCalled()->willReturn($writeStageItem);
+        $this->writeStageProphecy->__invoke($customItem, $resourceClass, $operationName, $resolverContext)->shouldBeCalled()->willReturn($writeStageItem);
 
         $serializeStageData = ['serialized'];
-        $this->serializeStageProphecy->apply($writeStageItem, $resourceClass, $operationName, $resolverContext)->shouldBeCalled()->willReturn($serializeStageData);
+        $this->serializeStageProphecy->__invoke($writeStageItem, $resourceClass, $operationName, $resolverContext)->shouldBeCalled()->willReturn($serializeStageData);
 
         $this->assertSame($serializeStageData, ($this->itemMutationResolverFactory)($resourceClass, $rootClass, $operationName)($source, $args, null, $info));
     }
@@ -282,11 +306,11 @@ class ItemMutationResolverFactoryTest extends TestCase
 
         $readStageItem = new \stdClass();
         $readStageItem->field = 'read';
-        $this->readStageProphecy->apply($resourceClass, $rootClass, $operationName, $resolverContext)->shouldBeCalled()->willReturn($readStageItem);
+        $this->readStageProphecy->__invoke($resourceClass, $rootClass, $operationName, $resolverContext)->shouldBeCalled()->willReturn($readStageItem);
 
         $deserializeStageItem = new \stdClass();
         $deserializeStageItem->field = 'deserialize';
-        $this->deserializeStageProphecy->apply($readStageItem, $resourceClass, $operationName, $resolverContext)->shouldBeCalled()->willReturn($deserializeStageItem);
+        $this->deserializeStageProphecy->__invoke($readStageItem, $resourceClass, $operationName, $resolverContext)->shouldBeCalled()->willReturn($deserializeStageItem);
 
         $this->resourceMetadataFactoryProphecy->create($resourceClass)->willReturn(
             (new ResourceMetadata('shortName'))->withGraphql([$operationName => ['mutation' => 'query_resolver_id']])
