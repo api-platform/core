@@ -23,7 +23,7 @@ Feature: GraphQL query support
     {
       node(id: "/dummies/1") {
         id
-        ... on Dummy {
+        ... on DummyItem{
           name
         }
       }
@@ -31,6 +31,7 @@ Feature: GraphQL query support
     """
     Then the response status code should be 200
     And the response should be in JSON
+    And print last JSON response
     And the header "Content-Type" should be equal to "application/json"
     And the JSON node "data.node.id" should be equal to "/dummies/1"
     And the JSON node "data.node.name" should be equal to "Dummy #1"

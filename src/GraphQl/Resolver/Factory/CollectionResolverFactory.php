@@ -63,7 +63,7 @@ final class CollectionResolverFactory implements ResolverFactoryInterface
                 );
             }
 
-            $operationName = $operationName ?? 'query';
+            $operationName = $operationName ?? 'collection_query';
             $resolverContext = ['source' => $source, 'args' => $args, 'info' => $info, 'is_collection' => true, 'is_mutation' => false];
 
             $collection = $this->readStage->apply($resourceClass, $rootClass, $operationName, $resolverContext);

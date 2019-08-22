@@ -53,6 +53,13 @@ final class TypeBuilder implements TypeBuilderInterface
         if (null !== $mutationName) {
             $shortName = $mutationName.ucfirst($shortName);
         }
+        if ('item_query' === $queryName) {
+            $shortName .= 'Item';
+        }
+        if ('collection_query' === $queryName) {
+            $shortName .= 'Collection';
+        }
+
         if ($input) {
             $shortName .= 'Input';
         } elseif (null !== $mutationName) {

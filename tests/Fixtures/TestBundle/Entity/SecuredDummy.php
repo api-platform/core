@@ -33,7 +33,8 @@ use Symfony\Component\Validator\Constraints as Assert;
  *         "put"={"access_control"="is_granted('ROLE_USER') and previous_object.getOwner() ==  user"},
  *     },
  *     graphql={
- *         "query"={"access_control"="is_granted('ROLE_USER') and object.getOwner() == user"},
+ *         "item_query"={"access_control"="is_granted('ROLE_USER') and object.getOwner() == user"},
+ *         "collection_query"={"access_control"="is_granted('ROLE_ADMIN')"},
  *         "delete"={},
  *         "update"={"access_control"="is_granted('ROLE_USER') and previous_object.getOwner() ==  user"},
  *         "create"={"access_control"="is_granted('ROLE_ADMIN')", "access_control_message"="Only admins can create a secured dummy."}
