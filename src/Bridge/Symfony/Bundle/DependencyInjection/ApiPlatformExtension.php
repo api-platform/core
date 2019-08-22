@@ -495,7 +495,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         }
 
         $container->getDefinition('api_platform.http_cache.purger.varnish')->setArguments([$definitions,
-            $config['http_cache']['invalidation']['max_header_length']]);
+            $config['http_cache']['invalidation']['max_header_length'], ]);
         $container->setAlias('api_platform.http_cache.purger', 'api_platform.http_cache.purger.varnish');
     }
 
