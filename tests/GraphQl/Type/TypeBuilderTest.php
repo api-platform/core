@@ -262,11 +262,11 @@ class TypeBuilderTest extends TestCase
 
         $this->assertNull($nodeInterface->resolveType([], [], $this->prophesize(ResolveInfo::class)->reveal()));
 
-        $this->typesContainerProphecy->has('Dummy')->shouldBeCalled()->willReturn(false);
+        $this->typesContainerProphecy->has('DummyItem')->shouldBeCalled()->willReturn(false);
         $this->assertNull($nodeInterface->resolveType([ItemNormalizer::ITEM_RESOURCE_CLASS_KEY => Dummy::class], [], $this->prophesize(ResolveInfo::class)->reveal()));
 
-        $this->typesContainerProphecy->has('Dummy')->shouldBeCalled()->willReturn(true);
-        $this->typesContainerProphecy->get('Dummy')->shouldBeCalled()->willReturn(GraphQLType::string());
+        $this->typesContainerProphecy->has('DummyItem')->shouldBeCalled()->willReturn(true);
+        $this->typesContainerProphecy->get('DummyItem')->shouldBeCalled()->willReturn(GraphQLType::string());
         /** @var GraphQLType $resolvedType */
         $resolvedType = $nodeInterface->resolveType([ItemNormalizer::ITEM_RESOURCE_CLASS_KEY => Dummy::class], [], $this->prophesize(ResolveInfo::class)->reveal());
         $this->assertSame(GraphQLType::string(), $resolvedType);

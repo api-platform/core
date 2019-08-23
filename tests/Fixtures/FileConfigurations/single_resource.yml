@@ -14,7 +14,10 @@
         my_collection_subresource:
             path: 'the/subresource/path'
     graphql:
-        query:
+        item_query:
+            normalization_context:
+                groups: ['graphql']
+        collection_query:
             normalization_context:
                 groups: ['graphql']
     attributes:

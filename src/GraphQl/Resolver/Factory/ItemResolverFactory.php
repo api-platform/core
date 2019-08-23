@@ -64,7 +64,7 @@ final class ItemResolverFactory implements ResolverFactoryInterface
                 return $source[$info->fieldName];
             }
 
-            $operationName = $operationName ?? 'query';
+            $operationName = $operationName ?? 'item_query';
             $resolverContext = ['source' => $source, 'args' => $args, 'info' => $info, 'is_collection' => false, 'is_mutation' => false];
 
             $item = ($this->readStage)($resourceClass, $rootClass, $operationName, $resolverContext);

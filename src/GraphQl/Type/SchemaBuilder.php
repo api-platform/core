@@ -60,7 +60,7 @@ final class SchemaBuilder implements SchemaBuilderInterface
             /** @var array<string, mixed> $graphqlConfiguration */
             $graphqlConfiguration = $resourceMetadata->getGraphql() ?? [];
             foreach ($graphqlConfiguration as $operationName => $value) {
-                if ('query' === $operationName) {
+                if ('item_query' === $operationName || 'collection_query' === $operationName) {
                     $queryFields += $this->fieldsBuilder->getQueryFields($resourceClass, $resourceMetadata, $operationName, [], []);
 
                     continue;

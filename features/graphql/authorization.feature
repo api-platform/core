@@ -165,3 +165,44 @@ Feature: Authorization checking
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/json"
     And the JSON node "data.updateSecuredDummy.securedDummy.owner" should be equal to the string "vincent"
+
+  Scenario: An admin can retrieve collection resource
+    When I add "Authorization" header equal to "Basic YWRtaW46a2l0dGVu"
+    When I send the following GraphQL request:
+    """
+    {
+      securedDummies {
+        edges {
+          node {
+            title
+            description
+          }
+        }
+      }
+    }
+    """
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/json"
+    And the JSON node "data.securedDummies" should not be null
+
+  Scenario: A regular user can't retrieve collection resource
+    When I add "Authorization" header equal to "Basic ZHVuZ2xhczprZXZpbg=="
+    When I send the following GraphQL request:
+    """
+    {
+      securedDummies {
+        edges {
+          node {
+            title
+            description
+          }
+        }
+      }
+    }
+    """
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/json"
+    And the JSON node "data.securedDummies" should be null
+    And the JSON node "errors[0].message" should be equal to "Access Denied."

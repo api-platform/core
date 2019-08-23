@@ -61,6 +61,11 @@ final class TypeBuilder implements TypeBuilderInterface
             }
             $shortName .= 'Payload';
         }
+        if ('item_query' === $queryName) {
+            $shortName .= 'Item';
+        } elseif ('collection_query' === $queryName) {
+            $shortName .= 'Collection';
+        }
         if ($wrapped && null !== $mutationName) {
             $shortName .= 'Data';
         }
@@ -153,6 +158,7 @@ final class TypeBuilder implements TypeBuilderInterface
                 }
 
                 $shortName = (new \ReflectionClass($value[ItemNormalizer::ITEM_RESOURCE_CLASS_KEY]))->getShortName();
+                $shortName .= 'Item';
 
                 return $this->typesContainer->has($shortName) ? $this->typesContainer->get($shortName) : null;
             },
