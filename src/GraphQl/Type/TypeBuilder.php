@@ -63,7 +63,8 @@ final class TypeBuilder implements TypeBuilderInterface
         }
         if ('item_query' === $queryName) {
             $shortName .= 'Item';
-        } elseif ('collection_query' === $queryName) {
+        }
+        if ('collection_query' === $queryName) {
             $shortName .= 'Collection';
         }
         if ($wrapped && null !== $mutationName) {
@@ -157,8 +158,7 @@ final class TypeBuilder implements TypeBuilderInterface
                     return null;
                 }
 
-                $shortName = (new \ReflectionClass($value[ItemNormalizer::ITEM_RESOURCE_CLASS_KEY]))->getShortName();
-                $shortName .= 'Item';
+                $shortName = (new \ReflectionClass($value[ItemNormalizer::ITEM_RESOURCE_CLASS_KEY]))->getShortName().'Item';
 
                 return $this->typesContainer->has($shortName) ? $this->typesContainer->get($shortName) : null;
             },

@@ -168,7 +168,7 @@ Feature: Authorization checking
 
   Scenario: An admin can retrieve collection resource
     When I add "Authorization" header equal to "Basic YWRtaW46a2l0dGVu"
-    When I send the following GraphQL request:
+    And I send the following GraphQL request:
     """
     {
       securedDummies {
@@ -188,7 +188,7 @@ Feature: Authorization checking
 
   Scenario: A regular user can't retrieve collection resource
     When I add "Authorization" header equal to "Basic ZHVuZ2xhczprZXZpbg=="
-    When I send the following GraphQL request:
+    And I send the following GraphQL request:
     """
     {
       securedDummies {
