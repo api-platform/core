@@ -83,7 +83,7 @@ final class OperationResourceMetadataFactory implements ResourceMetadataFactoryI
 
         $graphql = $resourceMetadata->getGraphql();
         if (null === $graphql) {
-            $resourceMetadata = $resourceMetadata->withGraphql(['query' => [], 'delete' => [], 'update' => [], 'create' => []]);
+            $resourceMetadata = $resourceMetadata->withGraphql(['item_query' => [], 'collection_query' => [], 'delete' => [], 'update' => [], 'create' => []]);
         } else {
             $resourceMetadata = $this->normalizeGraphQl($resourceMetadata, $graphql);
         }

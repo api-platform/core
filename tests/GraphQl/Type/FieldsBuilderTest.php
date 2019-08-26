@@ -180,7 +180,7 @@ class FieldsBuilderTest extends TestCase
                 ],
             ],
             'empty overridden args and add fields' => [
-                'resourceClass', new ResourceMetadata('ShortName'), 'query', ['args' => [], 'name' => 'customActionName'], false, GraphQLType::string(), false, null, null,
+                'resourceClass', new ResourceMetadata('ShortName'), 'item_query', ['args' => [], 'name' => 'customActionName'], false, GraphQLType::string(), false, null, null,
                 [
                     'shortName' => [
                         'type' => GraphQLType::string(),
@@ -193,7 +193,7 @@ class FieldsBuilderTest extends TestCase
                 ],
             ],
             'override args with custom ones' => [
-                'resourceClass', new ResourceMetadata('ShortName'), 'query', ['args' => ['customArg' => ['type' => 'a type']]], false, GraphQLType::string(), false, null, null,
+                'resourceClass', new ResourceMetadata('ShortName'), 'item_query', ['args' => ['customArg' => ['type' => 'a type']]], false, GraphQLType::string(), false, null, null,
                 [
                     'shortName' => [
                         'type' => GraphQLType::string(),

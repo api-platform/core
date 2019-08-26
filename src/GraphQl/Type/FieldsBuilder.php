@@ -86,7 +86,7 @@ final class FieldsBuilder implements FieldsBuilderInterface
     {
         $queryFields = [];
         $shortName = $resourceMetadata->getShortName();
-        $fieldName = lcfirst('query' === $queryName ? $shortName : $queryName.$shortName);
+        $fieldName = lcfirst('item_query' === $queryName || 'collection_query' === $queryName ? $shortName : $queryName.$shortName);
 
         $deprecationReason = $resourceMetadata->getGraphqlAttribute($queryName, 'deprecation_reason', '', true);
 
@@ -167,7 +167,7 @@ final class FieldsBuilder implements FieldsBuilderInterface
 
         if (null !== $resourceClass) {
             foreach ($this->propertyNameCollectionFactory->create($resourceClass) as $property) {
-                $propertyMetadata = $this->propertyMetadataFactory->create($resourceClass, $property, ['graphql_operation_name' => $mutationName ?? $queryName ?? 'query']);
+                $propertyMetadata = $this->propertyMetadataFactory->create($resourceClass, $property, ['graphql_operation_name' => $mutationName ?? $queryName ?? 'item_query']);
                 if (
                     null === ($propertyType = $propertyMetadata->getType())
                     || (!$input && false === $propertyMetadata->isReadable())

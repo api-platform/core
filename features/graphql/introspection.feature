@@ -21,7 +21,7 @@ Feature: GraphQL introspection support
     When I send the following GraphQL request:
     """
     {
-      type1: __type(name: "DummyProduct") {
+      type1: __type(name: "DummyProductItem") {
         description,
         fields {
           name
@@ -35,7 +35,7 @@ Feature: GraphQL introspection support
           }
         }
       }
-      type2: __type(name: "DummyAggregateOfferConnection") {
+      type2: __type(name: "DummyAggregateOfferItemConnection") {
         description,
         fields {
           name
@@ -49,7 +49,7 @@ Feature: GraphQL introspection support
           }
         }
       }
-      type3: __type(name: "DummyAggregateOfferEdge") {
+      type3: __type(name: "DummyAggregateOfferItemEdge") {
         description,
         fields {
           name
@@ -69,12 +69,12 @@ Feature: GraphQL introspection support
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/json"
     And the JSON node "data.type1.description" should be equal to "Dummy Product."
-    And the JSON node "data.type1.fields[1].type.name" should be equal to "DummyAggregateOfferConnection"
+    And the JSON node "data.type1.fields[1].type.name" should be equal to "DummyAggregateOfferItemConnection"
     And the JSON node "data.type2.fields[0].name" should be equal to "edges"
-    And the JSON node "data.type2.fields[0].type.ofType.name" should be equal to "DummyAggregateOfferEdge"
+    And the JSON node "data.type2.fields[0].type.ofType.name" should be equal to "DummyAggregateOfferItemEdge"
     And the JSON node "data.type3.fields[0].name" should be equal to "node"
     And the JSON node "data.type3.fields[1].name" should be equal to "cursor"
-    And the JSON node "data.type3.fields[0].type.name" should be equal to "DummyAggregateOffer"
+    And the JSON node "data.type3.fields[0].type.name" should be equal to "DummyAggregateOfferItem"
 
   Scenario: Introspect deprecated queries
     When I send the following GraphQL request:
@@ -121,7 +121,7 @@ Feature: GraphQL introspection support
     When I send the following GraphQL request:
     """
     {
-      __type(name: "DeprecatedResource") {
+      __type(name: "DeprecatedResourceItem") {
         fields(includeDeprecated: true) {
           name
           isDeprecated
@@ -224,7 +224,7 @@ Feature: GraphQL introspection support
     When I send the following GraphQL request:
     """
     {
-      __type(name: "Dummy") {
+      __type(name: "DummyItem") {
         description,
         fields {
           name
@@ -250,7 +250,7 @@ Feature: GraphQL introspection support
     When I send the following GraphQL request:
     """
     {
-      typeQuery: __type(name: "DummyGroup") {
+      typeQuery: __type(name: "DummyGroupItem") {
         description,
         fields {
           name
@@ -405,4 +405,4 @@ Feature: GraphQL introspection support
     And the header "Content-Type" should be equal to "application/json"
     And the JSON node "data.dummyItem.name" should be equal to "Dummy #3"
     And the JSON node "data.dummyItem.relatedDummy.name" should be equal to "RelatedDummy #3"
-    And the JSON node "data.dummyItem.relatedDummy.__typename" should be equal to "RelatedDummy"
+    And the JSON node "data.dummyItem.relatedDummy.__typename" should be equal to "RelatedDummyItem"
