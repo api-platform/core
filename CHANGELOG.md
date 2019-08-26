@@ -12,6 +12,9 @@
 * GraphQL: Allow to use a search and an exist filter on the same resource
 * GraphQL: Refactor the architecture of the whole system to allow the decoration of useful services (`TypeConverter` to manage custom types, `SerializerContextBuilder` to modify the (de)serialization context dynamically, etc.)
 
+**BC Break** 
+* GraphQL: Separate item_query and collection_query operations so user can use different security and serialization groups for them
+
 ## 2.4.6
 
 * GraphQL: Use correct resource configuration for filter arguments of nested collection
