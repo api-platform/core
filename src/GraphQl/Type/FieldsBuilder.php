@@ -90,14 +90,14 @@ final class FieldsBuilder implements FieldsBuilderInterface
 
         $deprecationReason = $resourceMetadata->getGraphqlAttribute($queryName, 'deprecation_reason', '', true);
 
-        if ('collection_query' !== $queryName && false !== $itemConfiguration && $fieldConfiguration = $this->getResourceFieldConfiguration(null, null, $deprecationReason, new Type(Type::BUILTIN_TYPE_OBJECT, true, $resourceClass), $resourceClass, false, $queryName, null)) {
+        if (false !== $itemConfiguration && $fieldConfiguration = $this->getResourceFieldConfiguration(null, null, $deprecationReason, new Type(Type::BUILTIN_TYPE_OBJECT, true, $resourceClass), $resourceClass, false, $queryName, null)) {
             $args = $this->resolveResourceArgs($itemConfiguration['args'] ?? [], $queryName, $shortName);
             $itemConfiguration['args'] = $args ?: $itemConfiguration['args'] ?? ['id' => ['type' => GraphQLType::nonNull(GraphQLType::id())]];
 
             $queryFields[$fieldName] = array_merge($fieldConfiguration, $itemConfiguration);
         }
 
-        if ('item_query' !== $queryName && false !== $collectionConfiguration && $fieldConfiguration = $this->getResourceFieldConfiguration(null, null, $deprecationReason, new Type(Type::BUILTIN_TYPE_OBJECT, false, null, true, null, new Type(Type::BUILTIN_TYPE_OBJECT, false, $resourceClass)), $resourceClass, false, $queryName, null)) {
+        if (false !== $collectionConfiguration && $fieldConfiguration = $this->getResourceFieldConfiguration(null, null, $deprecationReason, new Type(Type::BUILTIN_TYPE_OBJECT, false, null, true, null, new Type(Type::BUILTIN_TYPE_OBJECT, false, $resourceClass)), $resourceClass, false, $queryName, null)) {
             $args = $this->resolveResourceArgs($collectionConfiguration['args'] ?? [], $queryName, $shortName);
             $collectionConfiguration['args'] = $args ?: $collectionConfiguration['args'] ?? $fieldConfiguration['args'];
 

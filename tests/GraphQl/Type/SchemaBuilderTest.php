@@ -76,8 +76,8 @@ class SchemaBuilderTest extends TestCase
         $typeFoo->name = 'Foo';
         $this->typesContainerProphecy->get('Foo')->willReturn(GraphQLType::listOf($typeFoo));
         $this->fieldsBuilderProphecy->getNodeQueryFields()->shouldBeCalled()->willReturn(['node_fields']);
-        $this->fieldsBuilderProphecy->getQueryFields($resourceClass, $resourceMetadata, 'item_query', [], [])->willReturn(['query' => ['query_fields']]);
-        $this->fieldsBuilderProphecy->getQueryFields($resourceClass, $resourceMetadata, 'collection_query', [], [])->willReturn(['query' => ['query_fields']]);
+        $this->fieldsBuilderProphecy->getQueryFields($resourceClass, $resourceMetadata, 'item_query', [], false)->willReturn(['query' => ['query_fields']]);
+        $this->fieldsBuilderProphecy->getQueryFields($resourceClass, $resourceMetadata, 'collection_query', false, [])->willReturn(['query' => ['query_fields']]);
         $this->fieldsBuilderProphecy->getQueryFields($resourceClass, $resourceMetadata, 'custom_item_query', ['item_query' => 'item_query_resolver'], false)->willReturn(['custom_item_query' => ['custom_item_query_fields']]);
         $this->fieldsBuilderProphecy->getQueryFields($resourceClass, $resourceMetadata, 'custom_collection_query', false, ['collection_query' => 'collection_query_resolver'])->willReturn(['custom_collection_query' => ['custom_collection_query_fields']]);
         $this->fieldsBuilderProphecy->getMutationFields($resourceClass, $resourceMetadata, 'mutation')->willReturn(['mutation' => ['mutation_fields']]);
