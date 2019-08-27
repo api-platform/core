@@ -58,7 +58,7 @@ final class ApiFilter
         }
 
         if (!is_a($options['value'], FilterInterface::class, true)) {
-            throw new InvalidArgumentException(sprintf('The filter class "%s" does not implement "%s".', $options['value'], FilterInterface::class));
+            throw new InvalidArgumentException(sprintf('The filter class "%s" does not implement "%s". Did you forget a use statement ?', $options['value'], FilterInterface::class));
         }
 
         $this->filterClass = $options['value'];
