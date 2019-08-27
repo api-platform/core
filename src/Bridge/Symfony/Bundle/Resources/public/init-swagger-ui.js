@@ -40,11 +40,15 @@ window.onload = function() {
         tryOutObserver.observe(document, {childList: true, subtree: true});
     }).observe(document, {childList: true, subtree: true});
 
-    const data = JSON.parse(document.getElementById('swagger-data').innerText);
+    let dataElement = document.getElementById('swagger-data');
+
+    const data = JSON.parse(dataElement.innerText);
+    const oauthRedirectUrl = dataElement.dataset.oauthRedirectUrl;
     const ui = SwaggerUIBundle({
         spec: data.spec,
         dom_id: '#swagger-ui',
         validatorUrl: null,
+        oauth2RedirectUrl: oauthRedirectUrl,
         presets: [
             SwaggerUIBundle.presets.apis,
             SwaggerUIStandalonePreset,

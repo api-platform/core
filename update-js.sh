@@ -10,6 +10,7 @@ mkdir -p $dest
 cp node_modules/swagger-ui-dist/swagger-ui-bundle.js $dest
 cp node_modules/swagger-ui-dist/swagger-ui-standalone-preset.js $dest
 cp node_modules/swagger-ui-dist/swagger-ui.css $dest
+cp node_modules/swagger-ui-dist/oauth2-redirect.html $dest
 
 dest=src/Bridge/Symfony/Bundle/Resources/public/react/
 if [ -d $dest ]; then
