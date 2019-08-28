@@ -605,11 +605,13 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
 
     /**
      * Finds the first supported data transformer if any.
+     *
+     * @param object|array $data object on normalize / array on denormalize
      */
-    protected function getDataTransformer($object, string $to, array $context = []): ?DataTransformerInterface
+    protected function getDataTransformer($data, string $to, array $context = []): ?DataTransformerInterface
     {
         foreach ($this->dataTransformers as $dataTransformer) {
-            if ($dataTransformer->supportsTransformation($object, $to, $context)) {
+            if ($dataTransformer->supportsTransformation($data, $to, $context)) {
                 return $dataTransformer;
             }
         }
