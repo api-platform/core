@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.4.7
+
+* Fix passing context to data persisters' `remove` method
+* Doctrine: ensure that `EntityManagerInterface` is used in data providers
+
 ## 2.4.6
 
 * GraphQL: Use correct resource configuration for filter arguments of nested collection
