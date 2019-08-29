@@ -13,9 +13,10 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Bridge\Symfony\Bundle\Test;
 
-use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+use Symfony\Component\BrowserKit\AbstractBrowser;
 use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
+use Symfony\Component\HttpClient\HttpClientTrait;
 
 /**
  * Base class for functional API tests.
@@ -54,10 +55,11 @@ abstract class ApiTestCase extends KernelTestCase
              */
             $client = $kernel->getContainer()->get('test.api_platform.client');
         } catch (ServiceNotFoundException $e) {
-            if (class_exists(KernelBrowser::class) && trait_exists('Symfony\Component\HttpClient\HttpClientTrait')) {
-                throw new \LogicException('You cannot create the client used in functional tests if the "framework.test" config is not set to true.');
+            if (!class_exists(AbstractBrowser::class) || !trait_exists(HttpClientTrait::class)) {
+                throw new \LogicException('You cannot create the client used in functional tests if the BrowserKit and HttpClient components are not available. Try running "composer require --dev symfony/browser-kit symfony/http-client".');
             }
-            throw new \LogicException('You cannot create the client used in functional tests if the BrowserKit and HttpClient components are not available. Try running "composer require --dev symfony/browser-kit symfony/http-client".');
+
+            throw new \LogicException('You cannot create the client used in functional tests if the "framework.test" config is not set to true.');
         }
 
         $client->setDefaultOptions($defaultOptions);
