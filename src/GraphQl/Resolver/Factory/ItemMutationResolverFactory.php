@@ -123,6 +123,9 @@ final class ItemMutationResolverFactory implements ResolverFactoryInterface
 
                 $context += $resourceMetadata->getGraphqlAttribute($operationName, 'denormalization_context', [], true);
                 $item = $this->normalizer->denormalize($args['input'], $inputClass ?: $resourceClass, ItemNormalizer::FORMAT, $context);
+                if (!\is_object($item)) {
+                    throw new \UnexpectedValueException('Expected item to be an object.');
+                }
                 $this->canAccess($this->resourceAccessChecker, $resourceMetadata, $resourceClass, $info, [
                     'object' => $item,
                     'previous_object' => $previousItem,
