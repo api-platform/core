@@ -22,6 +22,7 @@ use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInte
 use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Serializer\AbstractItemNormalizer;
+use ApiPlatform\Core\Serializer\CacheKeyTrait;
 use ApiPlatform\Core\Serializer\ContextTrait;
 use ApiPlatform\Core\Util\ClassInfoTrait;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
@@ -41,6 +42,7 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
  */
 final class ItemNormalizer extends AbstractItemNormalizer
 {
+    use CacheKeyTrait;
     use ClassInfoTrait;
     use ContextTrait;
 
@@ -71,7 +73,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
         }
 
         if (!isset($context['cache_key'])) {
-            $context['cache_key'] = $this->getJsonApiCacheKey($format, $context);
+            $context['cache_key'] = $this->getCacheKey($format, $context);
         }
 
         $resourceClass = $this->resourceClassResolver->getResourceClass($object, $context['resource_class'] ?? null);
@@ -397,20 +399,5 @@ final class ItemNormalizer extends AbstractItemNormalizer
         }
 
         return $included;
-    }
-
-    /**
-     * Gets the cache key to use.
-     *
-     * @return bool|string
-     */
-    private function getJsonApiCacheKey(?string $format, array $context)
-    {
-        try {
-            return md5($format.serialize($context));
-        } catch (\Exception $exception) {
-            // The context cannot be serialized, skip the cache
-            return false;
-        }
     }
 }

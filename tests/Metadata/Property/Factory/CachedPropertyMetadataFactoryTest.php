@@ -74,8 +74,8 @@ class CachedPropertyMetadataFactoryTest extends TestCase
         $decoratedPropertyMetadataFactory = $this->prophesize(PropertyMetadataFactoryInterface::class);
         $decoratedPropertyMetadataFactory->create(Dummy::class, 'dummy', [])->willReturn(new PropertyMetadata(null, 'A dummy', true, true, null, null, false, false))->shouldBeCalled();
 
-        $cacheException = $this->prophesize(CacheException::class);
-        $cacheException->willExtend(\Exception::class);
+        $cacheException = $this->prophesize(\Exception::class);
+        $cacheException->willImplement(CacheException::class);
 
         $cacheItemPool = $this->prophesize(CacheItemPoolInterface::class);
         $cacheItemPool->getItem($this->generateCacheKey())->willThrow($cacheException->reveal())->shouldBeCalled();

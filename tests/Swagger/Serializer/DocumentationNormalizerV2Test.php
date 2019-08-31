@@ -565,7 +565,7 @@ class DocumentationNormalizerV2Test extends TestCase
         $ref = 'Dummy-'.implode('_', $groups);
 
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
-        $propertyNameCollectionFactoryProphecy->create(Dummy::class, ['serializer_groups' => $groups])->shouldBeCalled(1)->willReturn(new PropertyNameCollection(['gerard']));
+        $propertyNameCollectionFactoryProphecy->create(Dummy::class, ['serializer_groups' => $groups])->shouldBeCalledTimes(1)->willReturn(new PropertyNameCollection(['gerard']));
         $propertyNameCollectionFactoryProphecy->create(Dummy::class, [])->shouldBeCalled()->willReturn(new PropertyNameCollection(['name']));
 
         $dummyMetadata = new ResourceMetadata(
@@ -850,7 +850,7 @@ class DocumentationNormalizerV2Test extends TestCase
         $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), $title, $description, $version, $formats);
 
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
-        $propertyNameCollectionFactoryProphecy->create(Dummy::class, ['serializer_groups' => 'dummy'])->shouldBeCalled(1)->willReturn(new PropertyNameCollection(['gerard']));
+        $propertyNameCollectionFactoryProphecy->create(Dummy::class, ['serializer_groups' => 'dummy'])->shouldBeCalledTimes(1)->willReturn(new PropertyNameCollection(['gerard']));
         $propertyNameCollectionFactoryProphecy->create(Dummy::class, [])->shouldBeCalled()->willReturn(new PropertyNameCollection(['name']));
 
         $dummyMetadata = new ResourceMetadata(
@@ -1041,7 +1041,7 @@ class DocumentationNormalizerV2Test extends TestCase
         $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), $title, $description, $version, $formats);
 
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
-        $propertyNameCollectionFactoryProphecy->create(Dummy::class, ['serializer_groups' => 'dummy'])->shouldBeCalled(1)->willReturn(new PropertyNameCollection(['gerard']));
+        $propertyNameCollectionFactoryProphecy->create(Dummy::class, ['serializer_groups' => 'dummy'])->shouldBeCalledTimes(1)->willReturn(new PropertyNameCollection(['gerard']));
         $propertyNameCollectionFactoryProphecy->create(Dummy::class, [])->shouldBeCalled()->willReturn(new PropertyNameCollection(['name']));
 
         $dummyMetadata = new ResourceMetadata(
@@ -1630,9 +1630,9 @@ class DocumentationNormalizerV2Test extends TestCase
         $relatedDummyRef = 'RelatedDummy-'.implode('_', $groups);
 
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
-        $propertyNameCollectionFactoryProphecy->create(Dummy::class, ['serializer_groups' => $groups])->shouldBeCalled(1)->willReturn(new PropertyNameCollection(['name', 'relatedDummy']));
+        $propertyNameCollectionFactoryProphecy->create(Dummy::class, ['serializer_groups' => $groups])->shouldBeCalledTimes(1)->willReturn(new PropertyNameCollection(['name', 'relatedDummy']));
         $propertyNameCollectionFactoryProphecy->create(Dummy::class, [])->shouldBeCalled()->willReturn(new PropertyNameCollection(['name']));
-        $propertyNameCollectionFactoryProphecy->create(RelatedDummy::class, ['serializer_groups' => $groups])->shouldBeCalled(1)->willReturn(new PropertyNameCollection(['name']));
+        $propertyNameCollectionFactoryProphecy->create(RelatedDummy::class, ['serializer_groups' => $groups])->shouldBeCalledTimes(1)->willReturn(new PropertyNameCollection(['name']));
 
         $dummyMetadata = new ResourceMetadata(
             'Dummy',

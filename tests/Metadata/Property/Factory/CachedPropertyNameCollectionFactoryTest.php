@@ -74,8 +74,8 @@ class CachedPropertyNameCollectionFactoryTest extends TestCase
         $decoratedPropertyNameCollectionFactory = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $decoratedPropertyNameCollectionFactory->create(Dummy::class, [])->willReturn(new PropertyNameCollection(['id', 'name', 'description', 'dummy']))->shouldBeCalled();
 
-        $cacheException = $this->prophesize(CacheException::class);
-        $cacheException->willExtend(\Exception::class);
+        $cacheException = $this->prophesize(\Exception::class);
+        $cacheException->willImplement(CacheException::class);
 
         $cacheItemPool = $this->prophesize(CacheItemPoolInterface::class);
         $cacheItemPool->getItem($this->generateCacheKey())->willThrow($cacheException->reveal())->shouldBeCalled();

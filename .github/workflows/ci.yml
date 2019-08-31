@@ -1,0 +1,98 @@
+name: CI
+
+on:
+  push:
+    # branches:
+    #   - master
+    #   - '[0-9]*.[0-9]*'
+    #   - '[0-9]*.x'
+    # tags:
+    #   - 'v[0-9]*.[0-9]*'
+  pull_request:
+
+jobs:
+  phpunit:
+    name: PHPUnit (PHP ${{ matrix.php }})
+    runs-on: ubuntu-latest
+    container:
+      image: php:${{ matrix.php }}
+    strategy:
+      # https://github.community/t5/GitHub-Actions/GitHub-Actions-Matrix-options-dont-work-as-documented/m-p/29558
+      matrix:
+        php:
+          - '7.1'
+          - '7.2'
+          - '7.3'
+          - '7.4-rc'
+      fail-fast: false
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v1
+      - name: Install system packages
+        run: |
+          apt-get update
+          apt-get install -y --no-install-recommends \
+            unzip
+      - name: Install mongodb PHP extension
+        if: matrix.php != '7.1'
+        run: |
+          pecl install mongodb-1.5.5
+          docker-php-ext-enable mongodb
+      - name: Disable PHP memory limit
+        run: echo 'memory_limit=-1' >> /usr/local/etc/php/php.ini
+      - name: Install Composer
+        run: curl -sS -o - https://raw.githubusercontent.com/composer/getcomposer.org/ba13e3fc70f1c66250d1ea7ea4911d593aa1dba5/web/installer | php -- --install-dir=/usr/local/bin --filename=composer --quiet
+      - name: Remove Doctrine MongoDB ODM
+        if: matrix.php == '7.1'
+        run: |
+          composer remove --dev --no-progress --no-update --ansi \
+            doctrine/mongodb-odm \
+            doctrine/mongodb-odm-bundle
+      - name: Update project dependencies
+        run: composer update --no-progress --no-suggest --ansi
+      - name: Clear test app cache
+        run: tests/Fixtures/app/console cache:clear --ansi
+      - name: Run PHPUnit tests
+        run: vendor/bin/phpunit --colors=always
+
+  phpunit-lowest-deps:
+    name: PHPUnit (PHP ${{ matrix.php }}) (lowest dependencies)
+    runs-on: ubuntu-latest
+    container:
+      image: php:${{ matrix.php }}
+    strategy:
+      # https://github.community/t5/GitHub-Actions/GitHub-Actions-Matrix-options-dont-work-as-documented/m-p/29558
+      matrix:
+        php:
+          - '7.3'
+          - '7.4-rc'
+      fail-fast: false
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v1
+      - name: Install system packages
+        run: |
+          apt-get update
+          apt-get install -y --no-install-recommends \
+            unzip
+      - name: Install mongodb PHP extension
+        if: matrix.php != '7.1'
+        run: |
+          pecl install mongodb-1.5.5
+          docker-php-ext-enable mongodb
+      - name: Disable PHP memory limit
+        run: echo 'memory_limit=-1' >> /usr/local/etc/php/php.ini
+      - name: Install Composer
+        run: curl -sS -o - https://raw.githubusercontent.com/composer/getcomposer.org/ba13e3fc70f1c66250d1ea7ea4911d593aa1dba5/web/installer | php -- --install-dir=/usr/local/bin --filename=composer --quiet
+      - name: Remove Doctrine MongoDB ODM
+        if: matrix.php == '7.1'
+        run: |
+          composer remove --dev --no-progress --no-update --ansi \
+            doctrine/mongodb-odm \
+            doctrine/mongodb-odm-bundle
+      - name: Update project dependencies
+        run: composer update --no-progress --no-suggest --prefer-stable --prefer-lowest --ansi
+      - name: Clear test app cache
+        run: tests/Fixtures/app/console cache:clear --ansi
+      - name: Run PHPUnit tests
+        run: vendor/bin/phpunit --colors=always

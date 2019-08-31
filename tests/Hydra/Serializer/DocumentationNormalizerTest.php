@@ -69,10 +69,10 @@ class DocumentationNormalizerTest extends TestCase
         $operationMethodResolverProphecy->getCollectionOperationMethod('dummy', 'post')->shouldBeCalled()->willReturn('POST');
 
         $urlGenerator = $this->prophesize(UrlGeneratorInterface::class);
-        $urlGenerator->generate('api_entrypoint')->willReturn('/')->shouldBeCalled(1);
-        $urlGenerator->generate('api_doc', ['_format' => 'jsonld'])->willReturn('/doc')->shouldBeCalled(1);
+        $urlGenerator->generate('api_entrypoint')->willReturn('/')->shouldBeCalledTimes(1);
+        $urlGenerator->generate('api_doc', ['_format' => 'jsonld'])->willReturn('/doc')->shouldBeCalledTimes(1);
 
-        $urlGenerator->generate('api_doc', ['_format' => 'jsonld'], 0)->willReturn('/doc')->shouldBeCalled(1);
+        $urlGenerator->generate('api_doc', ['_format' => 'jsonld'], 0)->willReturn('/doc')->shouldBeCalledTimes(1);
 
         $subresourceOperationFactoryProphecy = $this->prophesize(SubresourceOperationFactoryInterface::class);
         $subresourceOperationFactoryProphecy->create('dummy')->shouldBeCalled()->willReturn([
@@ -384,9 +384,9 @@ class DocumentationNormalizerTest extends TestCase
         $operationMethodResolverProphecy->getCollectionOperationMethod('dummy', 'post')->shouldBeCalled()->willReturn('POST');
 
         $urlGenerator = $this->prophesize(UrlGeneratorInterface::class);
-        $urlGenerator->generate('api_entrypoint')->willReturn('/')->shouldBeCalled(1);
-        $urlGenerator->generate('api_doc', ['_format' => 'jsonld'])->willReturn('/doc')->shouldBeCalled(1);
-        $urlGenerator->generate('api_doc', ['_format' => 'jsonld'], 0)->willReturn('/doc')->shouldBeCalled(1);
+        $urlGenerator->generate('api_entrypoint')->willReturn('/')->shouldBeCalledTimes(1);
+        $urlGenerator->generate('api_doc', ['_format' => 'jsonld'])->willReturn('/doc')->shouldBeCalledTimes(1);
+        $urlGenerator->generate('api_doc', ['_format' => 'jsonld'], 0)->willReturn('/doc')->shouldBeCalledTimes(1);
 
         $documentationNormalizer = new DocumentationNormalizer(
             $resourceMetadataFactoryProphecy->reveal(),
