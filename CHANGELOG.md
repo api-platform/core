@@ -2,6 +2,7 @@
 
 ## 2.5.0 beta 1
 
+* GraphQL: **BC Break** Separate `item_query` and `collection_query` operations so user can use different security and serialization groups for them
 * GraphQL: Add support for custom queries and mutations
 * GraphQL: Add support for custom types
 * GraphQL: Better pagination support (backwards pagination)
@@ -12,8 +13,10 @@
 * GraphQL: Allow to use a search and an exist filter on the same resource
 * GraphQL: Refactor the architecture of the whole system to allow the decoration of useful services (`TypeConverter` to manage custom types, `SerializerContextBuilder` to modify the (de)serialization context dynamically, etc.)
 
-**BC Break** 
-* GraphQL: Separate item_query and collection_query operations so user can use different security and serialization groups for them
+## 2.4.7
+
+* Fix passing context to data persisters' `remove` method
+* Doctrine: ensure that `EntityManagerInterface` is used in data providers
 
 ## 2.4.6
 
