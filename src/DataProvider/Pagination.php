@@ -53,9 +53,9 @@ final class Pagination
     public function getPage(array $context = []): int
     {
         $page = (int) $this->getParameterFromContext(
-            $context,
-            $this->options['page_parameter_name'],
-            $this->options['page_default']
+          $context,
+          $this->options['page_parameter_name'],
+          $this->options['page_default']
         );
 
         if (1 > $page) {
@@ -116,7 +116,7 @@ final class Pagination
         }
 
         if ($graphql && null !== ($before = $this->getParameterFromContext($context, 'before'))
-            && (false === ($before = base64_decode($before, true)) ? 0 : (int) $before - $limit) < 0) {
+          && (false === ($before = base64_decode($before, true)) ? 0 : (int) $before - $limit) < 0) {
             $limit = (int) $before;
         }
 
@@ -189,9 +189,14 @@ final class Pagination
 
         if (null !== $resourceClass) {
             $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
-            $enabled = $resourceMetadata->getCollectionOperationAttribute($operationName, $partial ? 'pagination_partial' : 'pagination_enabled', $enabled, true);
+            if (isset($context['graphql_operation_name']) && null !== $operationName) {
+                $enabled = $resourceMetadata->getGraphqlAttribute($operationName, 'pagination_enabled', $enabled, true);
+                $clientEnabled = false;
+            } else {
+                $enabled = $resourceMetadata->getCollectionOperationAttribute($operationName, $partial ? 'pagination_partial' : 'pagination_enabled', $enabled, true);
 
-            $clientEnabled = $resourceMetadata->getCollectionOperationAttribute($operationName, $partial ? 'pagination_client_partial' : 'pagination_client_enabled', $clientEnabled, true);
+                $clientEnabled = $resourceMetadata->getCollectionOperationAttribute($operationName, $partial ? 'pagination_client_partial' : 'pagination_client_enabled', $clientEnabled, true);
+            }
         }
 
         if ($clientEnabled) {

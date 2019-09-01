@@ -100,7 +100,7 @@ final class ReadStage implements ReadStageInterface
             return $subresourceCollection;
         }
 
-        return $this->collectionDataProvider->getCollection($resourceClass, null, $normalizationContext);
+        return $this->collectionDataProvider->getCollection($resourceClass, $operationName, $normalizationContext);
     }
 
     private function getIdentifier(array $context): ?string

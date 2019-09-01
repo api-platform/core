@@ -203,7 +203,7 @@ class ReadStageTest extends TestCase
 
         $this->subresourceDataProviderProphecy->getSubresource($resourceClass, ['id' => 3], $normalizationContext + ['filters' => $expectedFilters, 'property' => $fieldName, 'identifiers' => [['id', $resourceClass]], 'collection' => true])->willReturn(['subresource']);
 
-        $this->collectionDataProviderProphecy->getCollection($resourceClass, null, $normalizationContext + ['filters' => $expectedFilters])->willReturn($expectedResult);
+        $this->collectionDataProviderProphecy->getCollection($resourceClass, $operationName, $normalizationContext + ['filters' => $expectedFilters])->willReturn($expectedResult);
 
         $result = ($this->readStage)($resourceClass, $rootClass, $operationName, $context);
 

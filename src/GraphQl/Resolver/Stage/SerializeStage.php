@@ -84,7 +84,7 @@ final class SerializeStage implements SerializeStageInterface
         }
 
         if ($isCollection && is_iterable($itemOrCollection)) {
-            if (!$this->paginationEnabled) {
+            if (!$resourceMetadata->getGraphqlAttribute($operationName, 'pagination_enabled', $this->paginationEnabled, true)) {
                 $data = [];
                 foreach ($itemOrCollection as $index => $object) {
                     $data[$index] = $this->normalizer->normalize($object, ItemNormalizer::FORMAT, $normalizationContext);

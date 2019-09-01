@@ -235,7 +235,7 @@ final class FieldsBuilder implements FieldsBuilderInterface
 
             $args = [];
             if (!$input && null === $mutationName && !$isStandardGraphqlType && $this->typeBuilder->isCollection($type)) {
-                if ($this->paginationEnabled) {
+                if (null !== $resourceMetadata && null !== $queryName ? $resourceMetadata->getGraphqlAttribute($queryName, 'pagination_enabled', $this->paginationEnabled, true) : $this->paginationEnabled) {
                     $args = [
                         'first' => [
                             'type' => GraphQLType::int(),
@@ -397,7 +397,15 @@ final class FieldsBuilder implements FieldsBuilderInterface
         }
 
         if ($this->typeBuilder->isCollection($type)) {
-            return $this->paginationEnabled && !$input ? $this->typeBuilder->getResourcePaginatedCollectionType($graphqlType) : GraphQLType::listOf($graphqlType);
+            $resourceMetadata = null;
+            if (!empty($resourceClass)) {
+                try {
+                    $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
+                } catch (ResourceClassNotFoundException $e) {
+                }
+            }
+
+            return (null !== $resourceMetadata && null !== $queryName ? $resourceMetadata->getGraphqlAttribute($queryName, 'pagination_enabled', $this->paginationEnabled, true) : $this->paginationEnabled) && !$input ? $this->typeBuilder->getResourcePaginatedCollectionType($graphqlType) : GraphQLType::listOf($graphqlType);
         }
 
         return !$graphqlType instanceof NullableType || $type->isNullable() || (null !== $mutationName && 'update' === $mutationName)
