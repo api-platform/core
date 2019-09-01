@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\GraphQl\Type;
 
+use ApiPlatform\Core\DataProvider\Pagination;
 use ApiPlatform\Core\Exception\ResourceClassNotFoundException;
 use ApiPlatform\Core\GraphQl\Resolver\Factory\ResolverFactoryInterface;
 use ApiPlatform\Core\GraphQl\Type\Definition\TypeInterface;
@@ -48,9 +49,9 @@ final class FieldsBuilder implements FieldsBuilderInterface
     private $collectionResolverFactory;
     private $itemMutationResolverFactory;
     private $filterLocator;
-    private $paginationEnabled;
+    private $pagination;
 
-    public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, ResourceMetadataFactoryInterface $resourceMetadataFactory, TypesContainerInterface $typesContainer, TypeBuilderInterface $typeBuilder, TypeConverterInterface $typeConverter, ResolverFactoryInterface $itemResolverFactory, ResolverFactoryInterface $collectionResolverFactory, ResolverFactoryInterface $itemMutationResolverFactory, ContainerInterface $filterLocator, bool $paginationEnabled)
+    public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, ResourceMetadataFactoryInterface $resourceMetadataFactory, TypesContainerInterface $typesContainer, TypeBuilderInterface $typeBuilder, TypeConverterInterface $typeConverter, ResolverFactoryInterface $itemResolverFactory, ResolverFactoryInterface $collectionResolverFactory, ResolverFactoryInterface $itemMutationResolverFactory, ContainerInterface $filterLocator, Pagination $pagination)
     {
         $this->propertyNameCollectionFactory = $propertyNameCollectionFactory;
         $this->propertyMetadataFactory = $propertyMetadataFactory;
@@ -62,7 +63,7 @@ final class FieldsBuilder implements FieldsBuilderInterface
         $this->collectionResolverFactory = $collectionResolverFactory;
         $this->itemMutationResolverFactory = $itemMutationResolverFactory;
         $this->filterLocator = $filterLocator;
-        $this->paginationEnabled = $paginationEnabled;
+        $this->pagination = $pagination;
     }
 
     /**
@@ -247,7 +248,7 @@ final class FieldsBuilder implements FieldsBuilderInterface
 
             $args = [];
             if (!$input && null === $mutationName && !$isStandardGraphqlType && $this->typeBuilder->isCollection($type)) {
-                if ($this->paginationEnabled) {
+                if ($this->pagination->isGraphQlEnabled($resourceClass, $queryName)) {
                     $args = [
                         'first' => [
                             'type' => GraphQLType::int(),
@@ -409,7 +410,7 @@ final class FieldsBuilder implements FieldsBuilderInterface
         }
 
         if ($this->typeBuilder->isCollection($type)) {
-            return $this->paginationEnabled && !$input ? $this->typeBuilder->getResourcePaginatedCollectionType($graphqlType) : GraphQLType::listOf($graphqlType);
+            return $this->pagination->isGraphQlEnabled($resourceClass, $queryName ?? $mutationName) && !$input ? $this->typeBuilder->getResourcePaginatedCollectionType($graphqlType) : GraphQLType::listOf($graphqlType);
         }
 
         return !$graphqlType instanceof NullableType || $type->isNullable() || (null !== $mutationName && 'update' === $mutationName)

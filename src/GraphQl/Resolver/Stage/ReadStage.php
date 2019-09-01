@@ -92,7 +92,7 @@ final class ReadStage implements ReadStageInterface
         $source = $context['source'];
         if (isset($source[$rootProperty = $info->fieldName], $source[ItemNormalizer::ITEM_IDENTIFIERS_KEY])) {
             $rootResolvedFields = $source[ItemNormalizer::ITEM_IDENTIFIERS_KEY];
-            $subresourceCollection = $this->getSubresource($rootClass, $rootResolvedFields, $rootProperty, $resourceClass, $normalizationContext);
+            $subresourceCollection = $this->getSubresource($rootClass, $rootResolvedFields, $rootProperty, $resourceClass, $normalizationContext, $operationName);
             if (!is_iterable($subresourceCollection)) {
                 throw new \UnexpectedValueException('Expected subresource collection to be iterable');
             }
@@ -100,7 +100,7 @@ final class ReadStage implements ReadStageInterface
             return $subresourceCollection;
         }
 
-        return $this->collectionDataProvider->getCollection($resourceClass, null, $normalizationContext);
+        return $this->collectionDataProvider->getCollection($resourceClass, $operationName, $normalizationContext);
     }
 
     private function getIdentifier(array $context): ?string
@@ -156,7 +156,7 @@ final class ReadStage implements ReadStageInterface
     /**
      * @return iterable|object|null
      */
-    private function getSubresource(string $rootClass, array $rootResolvedFields, string $rootProperty, string $subresourceClass, array $normalizationContext)
+    private function getSubresource(string $rootClass, array $rootResolvedFields, string $rootProperty, string $subresourceClass, array $normalizationContext, string $operationName)
     {
         $resolvedIdentifiers = [];
         $rootIdentifiers = array_keys($rootResolvedFields);
@@ -168,6 +168,6 @@ final class ReadStage implements ReadStageInterface
             'property' => $rootProperty,
             'identifiers' => $resolvedIdentifiers,
             'collection' => true,
-        ]);
+        ], $operationName);
     }
 }
