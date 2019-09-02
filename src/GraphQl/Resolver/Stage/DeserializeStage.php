@@ -54,6 +54,12 @@ final class DeserializeStage implements DeserializeStageInterface
             $denormalizationContext[AbstractNormalizer::OBJECT_TO_POPULATE] = $objectToPopulate;
         }
 
-        return $this->denormalizer->denormalize($context['args']['input'], $resourceClass, ItemNormalizer::FORMAT, $denormalizationContext);
+        $item = $this->denormalizer->denormalize($context['args']['input'], $resourceClass, ItemNormalizer::FORMAT, $denormalizationContext);
+
+        if (!\is_object($item)) {
+            throw new \UnexpectedValueException('Expected item to be an object.');
+        }
+
+        return $item;
     }
 }

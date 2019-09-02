@@ -63,7 +63,7 @@ final class AddHeadersListener
         }
 
         if ($this->etag && !$response->getEtag()) {
-            $response->setEtag(md5($response->getContent()));
+            $response->setEtag(md5((string) $response->getContent()));
         }
 
         if (null !== ($maxAge = $resourceCacheHeaders['max_age'] ?? $this->maxAge) && !$response->headers->hasCacheControlDirective('max-age')) {
