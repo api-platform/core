@@ -123,14 +123,14 @@
 * Use Symfony's MetadataAwareNameConverter when available
 * Change the extension's priorities (`<0`) for improved compatibility with Symfony's autoconfiguration feature. If you have custom extensions we recommend to use positive priorities.
 
-| Service name                                               | Priority | Class                                              |
-|------------------------------------------------------------|------|---------------------------------------------------------|
-| api_platform.doctrine.orm.query_extension.eager_loading (collection) | -8 | ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\EagerLoadingExtension |
-| api_platform.doctrine.orm.query_extension.eager_loading (item) | -8 | ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\EagerLoadingExtension |
-| api_platform.doctrine.orm.query_extension.filter | -16 | ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\FilterExtension |
-| api_platform.doctrine.orm.query_extension.filter_eager_loading | -17 | ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\FilterEagerLoadingExtension |
-| api_platform.doctrine.orm.query_extension.order | -32 | ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\OrderExtension |
-| api_platform.doctrine.orm.query_extension.pagination | -64 | ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\PaginationExtension |
+| Service name                                               | Old priority | New priority | Class                                              |
+|------------------------------------------------------------|------|------|---------------------------------------------------------|
+| api_platform.doctrine.orm.query_extension.eager_loading (collection) |  | -8 | ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\EagerLoadingExtension |
+| api_platform.doctrine.orm.query_extension.eager_loading (item) | |  -8 | ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\EagerLoadingExtension |
+| api_platform.doctrine.orm.query_extension.filter | 32 | -16 | ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\FilterExtension |
+| api_platform.doctrine.orm.query_extension.filter_eager_loading | |  -17 | ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\FilterEagerLoadingExtension |
+| api_platform.doctrine.orm.query_extension.order | 16 | -32 | ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\OrderExtension |
+| api_platform.doctrine.orm.query_extension.pagination | 8 | -64 | ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\PaginationExtension |
 
 * Fix JSON-LD contexts when using output classes
 * GraphQl: Fix pagination (the `endCursor` behavior was wrong)
@@ -145,33 +145,33 @@
 * Respect `_api_respond` request attribute in the SerializeListener
 * Change the normalizer's priorities (`< 0`). If you have custom normalizer we recommend to use positive priorities.
 
-| Service name                                               | Priority | Class                                              |
-|------------------------------------------------------------|------|---------------------------------------------------------|
-| api_platform.hydra.normalizer.constraint_violation_list   | -780 | ApiPlatform\Core\Hydra\Serializer\ConstraintViolationListNormalizer
-| api_platform.jsonapi.normalizer.constraint_violation_list | -780 | ApiPlatform\Core\JsonApi\Serializer\ConstraintViolationListNormalizer
-| api_platform.problem.normalizer.constraint_violation_list | -780 | ApiPlatform\Core\Problem\Serializer\ConstraintViolationListNormalizer
-| api_platform.swagger.normalizer.api_gateway               | -780 | ApiPlatform\Core\Swagger\Serializer\ApiGatewayNormalizer
-| api_platform.hal.normalizer.collection                    | -790 | ApiPlatform\Core\Hal\Serializer\CollectionNormalizer
-| api_platform.hydra.normalizer.collection_filters          | -790 | ApiPlatform\Core\Hydra\Serializer\CollectionFiltersNormalizer
-| api_platform.jsonapi.normalizer.collection                | -790 | ApiPlatform\Core\JsonApi\Serializer\CollectionNormalizer
-| api_platform.jsonapi.normalizer.error                     | -790 | ApiPlatform\Core\JsonApi\Serializer\ErrorNormalizer
-| api_platform.hal.normalizer.entrypoint                    | -800 | ApiPlatform\Core\Hal\Serializer\EntrypointNormalizer
-| api_platform.hydra.normalizer.documentation               | -800 | ApiPlatform\Core\Hydra\Serializer\DocumentationNormalizer
-| api_platform.hydra.normalizer.entrypoint                  | -800 | ApiPlatform\Core\Hydra\Serializer\EntrypointNormalizer
-| api_platform.hydra.normalizer.error                       | -800 | ApiPlatform\Core\Hydra\Serializer\ErrorNormalizer
-| api_platform.jsonapi.normalizer.entrypoint                | -800 | ApiPlatform\Core\JsonApi\Serializer\EntrypointNormalizer
-| api_platform.problem.normalizer.error                     | -810 | ApiPlatform\Core\Problem\Serializer\ErrorNormalizer
-| serializer.normalizer.json_serializable                   | -900 | Symfony\Component\Serializer\Normalizer\JsonSerializableNormalizer
-| serializer.normalizer.datetime                            | -910 | Symfony\Component\Serializer\Normalizer\DateTimeNormalizer
-| serializer.normalizer.constraint_violation_list           | -915 | Symfony\Component\Serializer\Normalizer\ConstraintViolationListNormalizer
-| serializer.normalizer.dateinterval                        | -915 | Symfony\Component\Serializer\Normalizer\DateIntervalNormalizer
-| serializer.normalizer.data_uri                            | -920 | Symfony\Component\Serializer\Normalizer\DataUriNormalizer
-| api_platform.graphql.normalizer.item                      | -922 | ApiPlatform\Core\GraphQl\Serializer\ItemNormalizer
-| api_platform.hal.normalizer.item                          | -922 | ApiPlatform\Core\Hal\Serializer\ItemNormalizer
-| api_platform.jsonapi.normalizer.item                      | -922 | ApiPlatform\Core\JsonApi\Serializer\ItemNormalizer
-| api_platform.jsonld.normalizer.item                       | -922 | ApiPlatform\Core\JsonLd\Serializer\ItemNormalizer
-| api_platform.serializer.normalizer.item                   | -923 | ApiPlatform\Core\Serializer\ItemNormalizer
-| serializer.normalizer.object                              | -1000 | Symfony\Component\Serializer\Normalizer\ObjectNormalizer
+| Service name                                               | Old priority | New priority | Class                                              |
+|------------------------------------------------------------|------|------|---------------------------------------------------------|
+| api_platform.hydra.normalizer.constraint_violation_list   | 64 | -780 | ApiPlatform\Core\Hydra\Serializer\ConstraintViolationListNormalizer
+| api_platform.jsonapi.normalizer.constraint_violation_list |  | -780 | ApiPlatform\Core\JsonApi\Serializer\ConstraintViolationListNormalizer
+| api_platform.problem.normalizer.constraint_violation_list | |  -780 | ApiPlatform\Core\Problem\Serializer\ConstraintViolationListNormalizer
+| api_platform.swagger.normalizer.api_gateway               | 17 | -780 | ApiPlatform\Core\Swagger\Serializer\ApiGatewayNormalizer
+| api_platform.hal.normalizer.collection                    |  | -790 | ApiPlatform\Core\Hal\Serializer\CollectionNormalizer
+| api_platform.hydra.normalizer.collection_filters          | 0 | -790 | ApiPlatform\Core\Hydra\Serializer\CollectionFiltersNormalizer
+| api_platform.jsonapi.normalizer.collection                |  | -790 | ApiPlatform\Core\JsonApi\Serializer\CollectionNormalizer
+| api_platform.jsonapi.normalizer.error                     |  | -790 | ApiPlatform\Core\JsonApi\Serializer\ErrorNormalizer
+| api_platform.hal.normalizer.entrypoint                    |  | -800 | ApiPlatform\Core\Hal\Serializer\EntrypointNormalizer
+| api_platform.hydra.normalizer.documentation               | 32 | -800 | ApiPlatform\Core\Hydra\Serializer\DocumentationNormalizer
+| api_platform.hydra.normalizer.entrypoint                  | 32 | -800 | ApiPlatform\Core\Hydra\Serializer\EntrypointNormalizer
+| api_platform.hydra.normalizer.error                       | 32 | -800 | ApiPlatform\Core\Hydra\Serializer\ErrorNormalizer
+| api_platform.jsonapi.normalizer.entrypoint                |  | -800 | ApiPlatform\Core\JsonApi\Serializer\EntrypointNormalizer
+| api_platform.problem.normalizer.error                     |  | -810 | ApiPlatform\Core\Problem\Serializer\ErrorNormalizer
+| serializer.normalizer.json_serializable                   | -900 | -900 | Symfony\Component\Serializer\Normalizer\JsonSerializableNormalizer
+| serializer.normalizer.datetime                            | -910 | -910 | Symfony\Component\Serializer\Normalizer\DateTimeNormalizer
+| serializer.normalizer.constraint_violation_list           |  | -915 | Symfony\Component\Serializer\Normalizer\ConstraintViolationListNormalizer
+| serializer.normalizer.dateinterval                        | -915 | -915 | Symfony\Component\Serializer\Normalizer\DateIntervalNormalizer
+| serializer.normalizer.data_uri                            | -920 | -920 | Symfony\Component\Serializer\Normalizer\DataUriNormalizer
+| api_platform.graphql.normalizer.item                      | 8 | -922 | ApiPlatform\Core\GraphQl\Serializer\ItemNormalizer
+| api_platform.hal.normalizer.item                          |  | -922 | ApiPlatform\Core\Hal\Serializer\ItemNormalizer
+| api_platform.jsonapi.normalizer.item                      |  | -922 | ApiPlatform\Core\JsonApi\Serializer\ItemNormalizer
+| api_platform.jsonld.normalizer.item                       | 8 | -922 | ApiPlatform\Core\JsonLd\Serializer\ItemNormalizer
+| api_platform.serializer.normalizer.item                   | 0 | -923 | ApiPlatform\Core\Serializer\ItemNormalizer
+| serializer.normalizer.object                              | -1000 | -1000 | Symfony\Component\Serializer\Normalizer\ObjectNormalizer
 
 * Allow custom stylesheets to be appended or replaced in the swagger UI
 * Load messenger only if available
