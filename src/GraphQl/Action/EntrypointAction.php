@@ -21,6 +21,7 @@ use GraphQL\Executor\ExecutionResult;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\PropertyAccess\PropertyAccess;
 
 /**
  * GraphQL API entrypoint.
@@ -139,18 +140,14 @@ final class EntrypointAction
         if (!$mapValues) {
             return $variables;
         }
+        $propertyAccessor = PropertyAccess::createPropertyAccessor();
         foreach ($mapValues as $key => $value) {
             if ($request->files->has($key)) {
                 foreach ($mapValues[$key] as $mapValue) {
                     $path = explode('.', $mapValue);
                     if ('variables' === $path[0]) {
                         unset($path[0]);
-                        $temp = &$variables;
-                        foreach ($path as $pathValue) {
-                            $temp = &$temp[$pathValue];
-                        }
-                        $temp = $request->files->get($key);
-                        unset($temp);
+                        $propertyAccessor->setValue($variables,"[".join("][",$path)."]",$request->files->get($key));
                     }
                 }
             }
