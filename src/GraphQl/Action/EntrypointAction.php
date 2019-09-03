@@ -102,7 +102,7 @@ final class EntrypointAction
                 [$query, $operation, $variables] = $this->parseInput($query, $variables, $operation, $request->request->get('operations'));
 
                 if ($request->request->has('map')) {
-                    $variables = $this->applyMappingToVariables($request, $variables);
+                    $variables = $this->applyMapToVariables($request, $variables);
                 }
             }
         }
@@ -114,9 +114,10 @@ final class EntrypointAction
         return [$query, $operation, $variables];
     }
 
-    private function parseInput($query, $variables, $operation, string $jsonContent): array
+    private function parseInput(?string $query, ?array $variables, ?string $operation, string $jsonContent): array
     {
         $input = json_decode($jsonContent, true);
+
         if (isset($input['query'])) {
             $query = $input['query'];
         }
@@ -132,7 +133,7 @@ final class EntrypointAction
         return [$query, $operation, $variables];
     }
 
-    private function applyMappingToVariables(Request $request, array $variables): array
+    private function applyMapToVariables(Request $request, array $variables): array
     {
         $mapValues = json_decode($request->request->get('map'), true);
         if (!$mapValues) {

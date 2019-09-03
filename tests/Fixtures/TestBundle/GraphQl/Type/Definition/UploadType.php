@@ -20,7 +20,7 @@ use GraphQL\Type\Definition\ScalarType;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 /**
- * Represents a Upload type.
+ * Represents an Upload type.
  *
  * @author Mahmood Bazdar <mahmood@bazdar.me>
  */
