@@ -423,16 +423,16 @@ Feature: GraphQL mutation support
     And the JSON node "data.testCustomArgumentsDummyCustomMutation.clientMutationId" should be equal to "myId"
 
   Scenario: Uploading a file with custom mutation
-    When I have the following files for GraphQL request:
+    Given I have the following files for a GraphQL request:
       | name | file      |
-      | file | @test.gif |
-    And I have the following GraphQL mapping:
+      | file | test.gif |
+    And I have the following GraphQL form multipart map:
     """
     {
       "file":["variables.file"]
     }
     """
-    And I send the following form multipart GraphQL operations:
+    When I send the following GraphQL form multipart operations:
     """
       {
         "query":"mutation($file:Upload!){\n uploadMediaObject(input:{file:$file}){\n mediaObject{\n id\n contentUrl\n }\n }\n }",
@@ -446,12 +446,12 @@ Feature: GraphQL mutation support
     And the JSON node "data.uploadMediaObject.mediaObject.contentUrl" should be equal to "test.gif"
 
   Scenario: Uploading multiple files with custom mutation
-    When I have the following files for GraphQL request:
+    Given I have the following files for a GraphQL request:
       | name | file      |
-      | 0    | @test.gif |
-      | 1    | @test.gif |
-      | 2    | @test.gif |
-    And I have the following GraphQL mapping:
+      | 0    | test.gif |
+      | 1    | test.gif |
+      | 2    | test.gif |
+    And I have the following GraphQL form multipart map:
     """
     {
       "0": ["variables.files.0"],
@@ -459,7 +459,7 @@ Feature: GraphQL mutation support
       "2": ["variables.files.2"]
     }
     """
-    And I send the following form multipart GraphQL operations:
+    When I send the following GraphQL form multipart operations:
     """
       {
         "query":"mutation($files:[Upload!]!){\n uploadMultipleMediaObject(input:{files:$files}){\n mediaObject{\n id\n contentUrl\n }\n }\n }",

@@ -24,9 +24,9 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\MediaObject;
 class UploadMediaObjectResolver implements MutationResolverInterface
 {
     /**
-     * @param \ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\MediaObject|null $item
+     * @param MediaObject|null $item
      *
-     * @return \ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\MediaObject|null The mutated item
+     * @return MediaObject|null The mutated item
      */
     public function __invoke($item, array $context): MediaObject
     {
