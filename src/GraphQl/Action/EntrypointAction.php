@@ -94,21 +94,17 @@ final class EntrypointAction
         }
 
         if ('json' === $request->getContentType()) {
-            $input = json_decode($request->getContent(), true);
+            return $this->parseInput($query, $variables, $operation, $request->getContent());
+        }
 
-            if (isset($input['query'])) {
-                $query = $input['query'];
+        if (false !== mb_stripos($request->headers->get('CONTENT_TYPE'), 'multipart/form-data')) {
+            if ($request->request->has('operations')) {
+                [$query, $operation, $variables] = $this->parseInput($query, $variables, $operation, $request->request->get('operations'));
+
+                if ($request->request->has('map')) {
+                    $variables = $this->applyMappingToVariables($request, $variables);
+                }
             }
-
-            if (isset($input['variables'])) {
-                $variables = \is_array($input['variables']) ? $input['variables'] : json_decode($input['variables'], true);
-            }
-
-            if (isset($input['operation'])) {
-                $operation = $input['operation'];
-            }
-
-            return [$query, $operation, $variables];
         }
 
         if ('application/graphql' === $request->headers->get('CONTENT_TYPE')) {
@@ -116,5 +112,49 @@ final class EntrypointAction
         }
 
         return [$query, $operation, $variables];
+    }
+
+    private function parseInput($query, $variables, $operation, string $jsonContent): array
+    {
+        $input = json_decode($jsonContent, true);
+        if (isset($input['query'])) {
+            $query = $input['query'];
+        }
+
+        if (isset($input['variables'])) {
+            $variables = \is_array($input['variables']) ? $input['variables'] : json_decode($input['variables'], true);
+        }
+
+        if (isset($input['operation'])) {
+            $operation = $input['operation'];
+        }
+
+        return [$query, $operation, $variables];
+    }
+
+    private function applyMappingToVariables(Request $request, array $variables): array
+    {
+        $mapValues = json_decode($request->request->get('map'), true);
+        if (!$mapValues) {
+            return $variables;
+        }
+        foreach ($mapValues as $key => $value) {
+            if ($request->files->has($key)) {
+                foreach ($mapValues[$key] as $mapValue) {
+                    $path = explode('.', $mapValue);
+                    if ('variables' === $path[0]) {
+                        unset($path[0]);
+                        $temp = &$variables;
+                        foreach ($path as $pathValue) {
+                            $temp = &$temp[$pathValue];
+                        }
+                        $temp = $request->files->get($key);
+                        unset($temp);
+                    }
+                }
+            }
+        }
+
+        return $variables;
     }
 }

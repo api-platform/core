@@ -22,6 +22,7 @@ use GraphQL\Executor\ExecutionResult;
 use GraphQL\Type\Schema;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -77,6 +78,38 @@ class EntrypointActionTest extends TestCase
         $request->setMethod('POST');
         $request->headers->set('Content-Type', 'application/json');
         $mockedEntrypoint = $this->getEntrypointAction();
+
+        $this->assertEqualsWithoutDateHeader(new JsonResponse(['GraphQL']), $mockedEntrypoint($request));
+    }
+
+    public function testFormMultipartAction()
+    {
+        $file = new UploadedFile(
+            __DIR__.'/Fixtures/test.gif',
+            'original.gif',
+            null,
+            UPLOAD_ERR_OK
+        );
+        $request = new Request([], ['operations' => '{"query": "graphqlQuery", "variables": {"file":null}, "operation": "graphqlOperationName"}', 'map' => '{"0":["variables.file"]}'], [], [], ['0' => $file]);
+        $request->setMethod('POST');
+        $request->headers->set('Content-Type', 'multipart/form-data');
+
+        $schema = $this->prophesize(Schema::class);
+        $schemaBuilderProphecy = $this->prophesize(SchemaBuilderInterface::class);
+        $schemaBuilderProphecy->getSchema()->willReturn($schema->reveal());
+
+        $executionResultProphecy = $this->prophesize(ExecutionResult::class);
+        $executionResultProphecy->toArray(3)->willReturn(['GraphQL']);
+        $executorProphecy = $this->prophesize(ExecutorInterface::class);
+        $executorProphecy->executeQuery(Argument::is($schema->reveal()), 'graphqlQuery', null, null, ['file' => $file], 'graphqlOperationName')->willReturn($executionResultProphecy->reveal());
+
+        $twigProphecy = $this->prophesize(TwigEnvironment::class);
+        $routerProphecy = $this->prophesize(RouterInterface::class);
+
+        $graphiQlAction = new GraphiQlAction($twigProphecy->reveal(), $routerProphecy->reveal(), true);
+        $graphQlPlaygroundAction = new GraphQlPlaygroundAction($twigProphecy->reveal(), $routerProphecy->reveal(), true);
+
+        $mockedEntrypoint = new EntrypointAction($schemaBuilderProphecy->reveal(), $executorProphecy->reveal(), $graphiQlAction, $graphQlPlaygroundAction, true, true, true, 'graphiql');
 
         $this->assertEqualsWithoutDateHeader(new JsonResponse(['GraphQL']), $mockedEntrypoint($request));
     }

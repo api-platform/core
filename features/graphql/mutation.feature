@@ -1,4 +1,5 @@
 Feature: GraphQL mutation support
+
   @createSchema
   Scenario: Introspect types
     When I send the following GraphQL request:
@@ -420,3 +421,57 @@ Feature: GraphQL mutation support
     And the header "Content-Type" should be equal to "application/json"
     And the JSON node "data.testCustomArgumentsDummyCustomMutation.dummyCustomMutation.result" should be equal to "18"
     And the JSON node "data.testCustomArgumentsDummyCustomMutation.clientMutationId" should be equal to "myId"
+
+  Scenario: Uploading a file with custom mutation
+    When I have the following files for GraphQL request:
+      | name | file      |
+      | file | @test.gif |
+    And I have the following GraphQL mapping:
+    """
+    {
+      "file":["variables.file"]
+    }
+    """
+    And I send the following form multipart GraphQL operations:
+    """
+      {
+        "query":"mutation($file:Upload!){\n uploadMediaObject(input:{file:$file}){\n mediaObject{\n id\n contentUrl\n }\n }\n }",
+        "variables":{
+          "file": null
+        }
+      }
+    """
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the JSON node "data.uploadMediaObject.mediaObject.contentUrl" should be equal to "test.gif"
+
+  Scenario: Uploading multiple files with custom mutation
+    When I have the following files for GraphQL request:
+      | name | file      |
+      | 0    | @test.gif |
+      | 1    | @test.gif |
+      | 2    | @test.gif |
+    And I have the following GraphQL mapping:
+    """
+    {
+      "0": ["variables.files.0"],
+      "1": ["variables.files.1"],
+      "2": ["variables.files.2"]
+    }
+    """
+    And I send the following form multipart GraphQL operations:
+    """
+      {
+        "query":"mutation($files:[Upload!]!){\n uploadMultipleMediaObject(input:{files:$files}){\n mediaObject{\n id\n contentUrl\n }\n }\n }",
+        "variables":{
+          "files": [
+            null,
+            null,
+            null
+          ]
+        }
+      }
+    """
+    Then the response status code should be 200
+    And the JSON node "data.uploadMultipleMediaObject.mediaObject.contentUrl" should be equal to "test.gif"
+

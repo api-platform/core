@@ -15,6 +15,7 @@ use Behat\Behat\Context\Context;
 use Behat\Behat\Context\Environment\InitializedContextEnvironment;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use Behat\Gherkin\Node\PyStringNode;
+use Behat\Gherkin\Node\TableNode;
 use Behatch\Context\RestContext;
 use Behatch\HttpCall\Request;
 use GraphQL\Type\Introspection;
@@ -95,6 +96,48 @@ final class GraphqlContext implements Context
     {
         $this->graphqlRequest['operation'] = $operation;
         $this->sendGraphqlRequest();
+    }
+
+    /**
+     * @When I have the following files for GraphQL request:
+     */
+    public function iHaveTheFollowingFilesForGraphqlRequest(TableNode $table)
+    {
+        $files = [];
+
+        foreach ($table->getHash() as $row) {
+            if (!isset($row['name']) || !isset($row['file'])) {
+                throw new \Exception("You must provide a 'name' and 'file' column in your table node.");
+            }
+
+            if (is_string($row['file']) && '@' == substr($row['file'], 0, 1)) {
+                $files[$row['name']] = rtrim($this->restContext->getMinkParameter('files_path'), DIRECTORY_SEPARATOR).DIRECTORY_SEPARATOR.substr($row['file'], 1);
+            }
+        }
+
+        $this->graphqlRequest['files'] = $files;
+    }
+
+    /**
+     * @When I have the following GraphQL mapping:
+     */
+    public function iHaveTheFollowingGraphqlMapping(PyStringNode $string)
+    {
+        $this->graphqlRequest['map'] = $string->getRaw();
+    }
+
+    /**
+     * @When I send the following form multipart GraphQL operations:
+     */
+    public function iSendTheFollowingFormMultipartGraphqlOperations(PyStringNode $string)
+    {
+        $params = [];
+        $params['operations'] = $string->getRaw();
+        $params['map'] = $this->graphqlRequest['map'];
+
+        $this->request->setHttpHeader('Content-type', 'multipart/form-data');
+        $this->request->setHttpHeader('Accept', null);
+        $this->request->send('POST', '/graphql', $params, $this->graphqlRequest['files']);
     }
 
     /**

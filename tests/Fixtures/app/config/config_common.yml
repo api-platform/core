@@ -297,8 +297,25 @@ services:
         tags:
             - { name: 'api_platform.graphql.mutation_resolver' }
 
+    app.graphql.mutation_resolver.upload_media_object:
+        class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\GraphQl\Resolver\UploadMediaObjectResolver'
+        public: false
+        tags:
+            - { name: 'api_platform.graphql.mutation_resolver' }
+    app.graphql.mutation_resolver.upload_multiple_media_object:
+            class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\GraphQl\Resolver\UploadMultipleMediaObjectResolver'
+            public: false
+            tags:
+                - { name: 'api_platform.graphql.mutation_resolver' }
+
     app.graphql.date_time_type:
         class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\GraphQl\Type\Definition\DateTimeType'
+        public: false
+        tags:
+            - { name: 'api_platform.graphql.type' }
+
+    app.graphql.upload_type:
+        class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\GraphQl\Type\Definition\UploadType'
         public: false
         tags:
             - { name: 'api_platform.graphql.type' }
