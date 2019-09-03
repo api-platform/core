@@ -147,7 +147,7 @@ final class EntrypointAction
                     $path = explode('.', $mapValue);
                     if ('variables' === $path[0]) {
                         unset($path[0]);
-                        $propertyAccessor->setValue($variables,"[".join("][",$path)."]",$request->files->get($key));
+                        $propertyAccessor->setValue($variables, '['.implode('][', $path).']', $request->files->get($key));
                     }
                 }
             }
