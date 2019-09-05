@@ -23,6 +23,7 @@ use ApiPlatform\Core\GraphQl\Resolver\ResourceAccessCheckerTrait;
 use ApiPlatform\Core\GraphQl\Serializer\ItemNormalizer;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Security\ResourceAccessCheckerInterface;
+use ApiPlatform\Core\Util\CloneTrait;
 use GraphQL\Error\Error;
 use GraphQL\Type\Definition\ResolveInfo;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -38,6 +39,7 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
  */
 final class CollectionResolverFactory implements ResolverFactoryInterface
 {
+    use CloneTrait;
     use FieldsToAttributesTrait;
     use ResourceAccessCheckerTrait;
 
@@ -97,7 +99,7 @@ final class CollectionResolverFactory implements ResolverFactoryInterface
 
             $this->canAccess($this->resourceAccessChecker, $resourceMetadata, $resourceClass, $info, [
                 'object' => $collection,
-                'previous_object' => \is_object($collection) ? clone $collection : $collection,
+                'previous_object' => $this->clone($collection),
             ], $operationName ?? 'query');
 
             if (!$this->paginationEnabled) {

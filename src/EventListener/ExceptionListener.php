@@ -17,7 +17,6 @@ use ApiPlatform\Core\Util\RequestAttributesExtractor;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
 use Symfony\Component\HttpKernel\EventListener\ExceptionListener as BaseExceptionListener;
-use Symfony\Component\Messenger\Exception\HandlerFailedException;
 
 /**
  * Handles requests errors.
@@ -44,19 +43,6 @@ final class ExceptionListener
         ) {
             return;
         }
-
-        $exception = $event->getException();
-
-        // unwrap the exception thrown in handler for Symfony Messenger >= 4.3
-        while ($exception instanceof HandlerFailedException) {
-            /** @var \Throwable $exception */
-            $exception = $exception->getPrevious();
-            if (!$exception instanceof \Exception) {
-                throw $exception;
-            }
-        }
-
-        $event->setException($exception);
 
         $this->exceptionListener->onKernelException($event);
     }

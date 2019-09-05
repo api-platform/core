@@ -275,6 +275,7 @@ class SchemaBuilderTest extends TestCase
             );
             $resourceMetadataFactoryProphecy->create($resourceClassName)->willReturn($resourceMetadata);
             $resourceMetadataFactoryProphecy->create('unknownResource')->willThrow(new ResourceClassNotFoundException());
+            $resourceMetadataFactoryProphecy->create('DateTime')->willThrow(new ResourceClassNotFoundException());
 
             $propertyNames = [];
             foreach (Type::$builtinTypes as $builtinType) {

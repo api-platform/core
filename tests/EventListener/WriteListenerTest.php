@@ -172,7 +172,7 @@ class WriteListenerTest extends TestCase
 
         $dataPersisterProphecy = $this->prophesize(DataPersisterInterface::class);
         $dataPersisterProphecy->supports($dummy, Argument::type('array'))->willReturn(true)->shouldBeCalled();
-        $dataPersisterProphecy->remove($dummy)->shouldBeCalled();
+        $dataPersisterProphecy->remove($dummy, Argument::type('array'))->shouldBeCalled();
 
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
         $iriConverterProphecy->getIriFromItem($dummy)->shouldNotBeCalled();

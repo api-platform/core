@@ -73,6 +73,11 @@ services:
         arguments: [ { 'name': 'ipartial', 'description': 'ipartial' } ]
         tags:      [ { name: 'api_platform.filter', id: 'related_to_dummy_friend.name' } ]
 
+    ApiPlatform\Core\Tests\Fixtures\TestBundle\DataProvider\GeneratorDataProvider:
+        public: false
+        tags:
+            -   name: 'api_platform.item_data_provider'
+
     ApiPlatform\Core\Tests\Fixtures\TestBundle\DataProvider\ProductItemDataProvider:
         public: false
         arguments:
