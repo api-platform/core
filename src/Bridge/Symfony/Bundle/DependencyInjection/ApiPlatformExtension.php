@@ -378,6 +378,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         }
 
         $container->setParameter('api_platform.graphql.default_ide', $config['graphql']['default_ide']);
+        $container->setParameter('api_platform.graphql.collection.pagination', $config['graphql']['collection']['pagination']);
 
         $loader->load('graphql.xml');
 

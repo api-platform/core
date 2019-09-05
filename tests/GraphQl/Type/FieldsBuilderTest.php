@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\GraphQl\Type;
 
 use ApiPlatform\Core\Api\FilterInterface;
+use ApiPlatform\Core\DataProvider\Pagination;
 use ApiPlatform\Core\GraphQl\Resolver\Factory\ResolverFactoryInterface;
 use ApiPlatform\Core\GraphQl\Type\FieldsBuilder;
 use ApiPlatform\Core\GraphQl\Type\TypeBuilderInterface;
@@ -90,7 +91,7 @@ class FieldsBuilderTest extends TestCase
         $this->collectionResolverFactoryProphecy = $this->prophesize(ResolverFactoryInterface::class);
         $this->itemMutationResolverFactoryProphecy = $this->prophesize(ResolverFactoryInterface::class);
         $this->filterLocatorProphecy = $this->prophesize(ContainerInterface::class);
-        $this->fieldsBuilder = new FieldsBuilder($this->propertyNameCollectionFactoryProphecy->reveal(), $this->propertyMetadataFactoryProphecy->reveal(), $this->resourceMetadataFactoryProphecy->reveal(), $this->typesContainerProphecy->reveal(), $this->typeBuilderProphecy->reveal(), $this->typeConverterProphecy->reveal(), $this->itemResolverFactoryProphecy->reveal(), $this->collectionResolverFactoryProphecy->reveal(), $this->itemMutationResolverFactoryProphecy->reveal(), $this->filterLocatorProphecy->reveal(), true);
+        $this->fieldsBuilder = new FieldsBuilder($this->propertyNameCollectionFactoryProphecy->reveal(), $this->propertyMetadataFactoryProphecy->reveal(), $this->resourceMetadataFactoryProphecy->reveal(), $this->typesContainerProphecy->reveal(), $this->typeBuilderProphecy->reveal(), $this->typeConverterProphecy->reveal(), $this->itemResolverFactoryProphecy->reveal(), $this->collectionResolverFactoryProphecy->reveal(), $this->itemMutationResolverFactoryProphecy->reveal(), $this->filterLocatorProphecy->reveal(), new Pagination($this->resourceMetadataFactoryProphecy->reveal()));
     }
 
     public function testGetNodeQueryFields(): void

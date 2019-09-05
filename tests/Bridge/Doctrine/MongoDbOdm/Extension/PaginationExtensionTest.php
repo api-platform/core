@@ -290,6 +290,28 @@ class PaginationExtensionTest extends TestCase
         $extension->applyToCollection($aggregationBuilderProphecy->reveal(), 'Foo', 'op', $context);
     }
 
+    public function testApplyToCollectionGraphQlPaginationDisabled()
+    {
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
+        $resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadata(null, null, null, [], []));
+        $resourceMetadataFactory = $resourceMetadataFactoryProphecy->reveal();
+
+        $pagination = new Pagination($resourceMetadataFactory, [], [
+            'enabled' => false,
+        ]);
+
+        $aggregationBuilderProphecy = $this->prophesize(Builder::class);
+        $aggregationBuilderProphecy->facet()->shouldNotBeCalled();
+
+        $context = ['graphql_operation_name' => 'op'];
+
+        $extension = new PaginationExtension(
+            $this->managerRegistryProphecy->reveal(),
+            $pagination
+        );
+        $extension->applyToCollection($aggregationBuilderProphecy->reveal(), 'Foo', 'op', $context);
+    }
+
     public function testApplyToCollectionWithMaximumItemsPerPage()
     {
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
@@ -366,6 +388,23 @@ class PaginationExtensionTest extends TestCase
             $pagination
         );
         $this->assertFalse($extension->supportsResult('Foo', 'op', ['filters' => ['enabled' => false]]));
+    }
+
+    public function testSupportsResultGraphQlPaginationDisabled()
+    {
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
+        $resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadata(null, null, null, [], []));
+        $resourceMetadataFactory = $resourceMetadataFactoryProphecy->reveal();
+
+        $pagination = new Pagination($resourceMetadataFactory, [], [
+            'enabled' => false,
+        ]);
+
+        $extension = new PaginationExtension(
+            $this->managerRegistryProphecy->reveal(),
+            $pagination
+        );
+        $this->assertFalse($extension->supportsResult('Foo', 'op', ['filters' => ['enabled' => false], 'graphql_operation_name' => 'op']));
     }
 
     public function testGetResult()

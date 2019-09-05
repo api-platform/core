@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\GraphQl\Resolver\Stage;
 
 use ApiPlatform\Core\DataProvider\ArrayPaginator;
+use ApiPlatform\Core\DataProvider\Pagination;
 use ApiPlatform\Core\GraphQl\Resolver\Stage\SerializeStage;
 use ApiPlatform\Core\GraphQl\Serializer\ItemNormalizer;
 use ApiPlatform\Core\GraphQl\Serializer\SerializerContextBuilderInterface;
@@ -170,11 +171,13 @@ class SerializeStageTest extends TestCase
 
     private function createSerializeStage(bool $paginationEnabled): SerializeStage
     {
+        $pagination = new Pagination($this->resourceMetadataFactoryProphecy->reveal(), [], ['enabled' => $paginationEnabled]);
+
         return new SerializeStage(
             $this->resourceMetadataFactoryProphecy->reveal(),
             $this->normalizerProphecy->reveal(),
             $this->serializerContextBuilderProphecy->reveal(),
-            $paginationEnabled
+            $pagination
         );
     }
 }

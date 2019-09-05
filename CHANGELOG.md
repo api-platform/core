@@ -6,6 +6,7 @@
 * GraphQL: Add support for custom queries and mutations
 * GraphQL: Add support for custom types
 * GraphQL: Better pagination support (backwards pagination)
+* GraphQL: Support the pagination per resource
 * GraphQL: Add the concept of *stages* in the workflow of the resolvers and add the possibility to disable them with operation attributes
 * GraphQL: Add GraphQL Playground besides GraphiQL and add the possibility to change the default IDE (or to disable it) for the GraphQL endpoint
 * GraphQL: Add a command to print the schema in SDL
