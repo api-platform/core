@@ -2,7 +2,7 @@
 
 ## 2.5.0 beta 1
 
-* GraphQL: **BC Break** Separate `item_query` and `collection_query` operations so user can use different security and serialization groups for them
+* GraphQL: **BC Break** Separate `query` resource operation attribute into `item_query` and `collection_query` operations so user can use different security and serialization groups for them
 * GraphQL: Add support for custom queries and mutations
 * GraphQL: Add support for custom types
 * GraphQL: Better pagination support (backwards pagination)

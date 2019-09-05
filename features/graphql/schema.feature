@@ -5,7 +5,7 @@ Feature: GraphQL schema-related features
     When I run the command "api:graphql:export"
     Then the command output should contain:
     """
-   ###Dummy Friend.###
+    ###Dummy Friend.###
     type DummyFriend implements Node {
       id: ID!
 

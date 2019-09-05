@@ -82,29 +82,41 @@ final class FieldsBuilder implements FieldsBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function getQueryFields(string $resourceClass, ResourceMetadata $resourceMetadata, string $queryName, $itemConfiguration, $collectionConfiguration): array
+    public function getItemQueryFields(string $resourceClass, ResourceMetadata $resourceMetadata, string $queryName, array $configuration): array
     {
-        $queryFields = [];
         $shortName = $resourceMetadata->getShortName();
-        $fieldName = lcfirst('item_query' === $queryName || 'collection_query' === $queryName ? $shortName : $queryName.$shortName);
+        $fieldName = lcfirst('item_query' === $queryName ? $shortName : $queryName.$shortName);
 
-        $deprecationReason = $resourceMetadata->getGraphqlAttribute($queryName, 'deprecation_reason', '', true);
+        $deprecationReason = (string) $resourceMetadata->getGraphqlAttribute($queryName, 'deprecation_reason', '', true);
 
-        if (false !== $itemConfiguration && $fieldConfiguration = $this->getResourceFieldConfiguration(null, null, $deprecationReason, new Type(Type::BUILTIN_TYPE_OBJECT, true, $resourceClass), $resourceClass, false, $queryName, null)) {
-            $args = $this->resolveResourceArgs($itemConfiguration['args'] ?? [], $queryName, $shortName);
-            $itemConfiguration['args'] = $args ?: $itemConfiguration['args'] ?? ['id' => ['type' => GraphQLType::nonNull(GraphQLType::id())]];
+        if ($fieldConfiguration = $this->getResourceFieldConfiguration(null, null, $deprecationReason, new Type(Type::BUILTIN_TYPE_OBJECT, true, $resourceClass), $resourceClass, false, $queryName, null)) {
+            $args = $this->resolveResourceArgs($configuration['args'] ?? [], $queryName, $shortName);
+            $configuration['args'] = $args ?: $configuration['args'] ?? ['id' => ['type' => GraphQLType::nonNull(GraphQLType::id())]];
 
-            $queryFields[$fieldName] = array_merge($fieldConfiguration, $itemConfiguration);
+            return [$fieldName => array_merge($fieldConfiguration, $configuration)];
         }
 
-        if (false !== $collectionConfiguration && $fieldConfiguration = $this->getResourceFieldConfiguration(null, null, $deprecationReason, new Type(Type::BUILTIN_TYPE_OBJECT, false, null, true, null, new Type(Type::BUILTIN_TYPE_OBJECT, false, $resourceClass)), $resourceClass, false, $queryName, null)) {
-            $args = $this->resolveResourceArgs($collectionConfiguration['args'] ?? [], $queryName, $shortName);
-            $collectionConfiguration['args'] = $args ?: $collectionConfiguration['args'] ?? $fieldConfiguration['args'];
+        return [];
+    }
 
-            $queryFields[Inflector::pluralize($fieldName)] = array_merge($fieldConfiguration, $collectionConfiguration);
+    /**
+     * {@inheritdoc}
+     */
+    public function getCollectionQueryFields(string $resourceClass, ResourceMetadata $resourceMetadata, string $queryName, array $configuration): array
+    {
+        $shortName = $resourceMetadata->getShortName();
+        $fieldName = lcfirst('collection_query' === $queryName ? $shortName : $queryName.$shortName);
+
+        $deprecationReason = (string) $resourceMetadata->getGraphqlAttribute($queryName, 'deprecation_reason', '', true);
+
+        if ($fieldConfiguration = $this->getResourceFieldConfiguration(null, null, $deprecationReason, new Type(Type::BUILTIN_TYPE_OBJECT, false, null, true, null, new Type(Type::BUILTIN_TYPE_OBJECT, false, $resourceClass)), $resourceClass, false, $queryName, null)) {
+            $args = $this->resolveResourceArgs($configuration['args'] ?? [], $queryName, $shortName);
+            $configuration['args'] = $args ?: $configuration['args'] ?? $fieldConfiguration['args'];
+
+            return [Inflector::pluralize($fieldName) => array_merge($fieldConfiguration, $configuration)];
         }
 
-        return $queryFields;
+        return [];
     }
 
     /**
