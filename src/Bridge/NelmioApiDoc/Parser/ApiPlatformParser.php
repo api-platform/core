@@ -235,7 +235,7 @@ final class ApiPlatformParser implements ParserInterface
         if ('object' === $builtinType) {
             $className = $type->getClassName();
 
-            if (is_subclass_of($className, \DateTimeInterface::class)) {
+            if (is_a($className, \DateTimeInterface::class, true)) {
                 $data['dataType'] = DataTypes::DATETIME;
                 $data['format'] = sprintf('{DateTime %s}', \DateTime::RFC3339);
 
