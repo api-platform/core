@@ -55,7 +55,7 @@ class DeserializeStageTest extends TestCase
      */
     public function testApplyDisabled($objectToPopulate): void
     {
-        $operationName = 'query';
+        $operationName = 'item_query';
         $resourceClass = 'myResource';
         $resourceMetadata = (new ResourceMetadata())->withGraphql([
             $operationName => ['deserialize' => false],
@@ -74,7 +74,7 @@ class DeserializeStageTest extends TestCase
      */
     public function testApply($objectToPopulate, array $denormalizationContext): void
     {
-        $operationName = 'query';
+        $operationName = 'item_query';
         $resourceClass = 'myResource';
         $context = ['args' => ['input' => 'myInput']];
         $this->resourceMetadataFactoryProphecy->create($resourceClass)->willReturn(new ResourceMetadata());

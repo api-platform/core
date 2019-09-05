@@ -66,7 +66,7 @@ class ReadStageTest extends TestCase
      */
     public function testApplyDisabled(array $context, $expectedResult): void
     {
-        $operationName = 'query';
+        $operationName = 'item_query';
         $resourceClass = 'myResource';
         $resourceMetadata = (new ResourceMetadata())->withGraphql([
             $operationName => ['read' => false],
@@ -94,7 +94,7 @@ class ReadStageTest extends TestCase
      */
     public function testApplyItem(?string $identifier, $item, bool $throwNotFound, $expectedResult): void
     {
-        $operationName = 'query';
+        $operationName = 'item_query';
         $resourceClass = 'myResource';
         $info = $this->prophesize(ResolveInfo::class)->reveal();
         $context = [
@@ -184,7 +184,7 @@ class ReadStageTest extends TestCase
      */
     public function testApplyCollection(array $args, ?string $rootClass, ?array $source, array $expectedFilters, iterable $expectedResult): void
     {
-        $operationName = 'query';
+        $operationName = 'collection_query';
         $resourceClass = 'myResource';
         $info = $this->prophesize(ResolveInfo::class)->reveal();
         $fieldName = 'subresource';

@@ -78,7 +78,7 @@ class SerializerContextBuilderTest extends TestCase
         return [
             'nominal' => [
                 $resourceClass = 'myResource',
-                $operationName = 'query',
+                $operationName = 'item_query',
                 ['_id' => 3, 'field' => 'foo'],
                 [
                     'groups' => ['normalization_group'],
@@ -95,7 +95,7 @@ class SerializerContextBuilderTest extends TestCase
             ],
             'nominal collection' => [
                 $resourceClass = 'myResource',
-                $operationName = 'query',
+                $operationName = 'collection_query',
                 ['edges' => ['node' => ['nodeField' => 'baz']]],
                 [
                     'groups' => ['normalization_group'],
@@ -111,7 +111,7 @@ class SerializerContextBuilderTest extends TestCase
             ],
             'no resource class' => [
                 $resourceClass = null,
-                $operationName = 'query',
+                $operationName = 'item_query',
                 ['related' => ['_id' => 9]],
                 [
                     'resource_class' => $resourceClass,
@@ -177,7 +177,7 @@ class SerializerContextBuilderTest extends TestCase
         return [
             'nominal' => [
                 $resourceClass = 'myResource',
-                $operationName = 'query',
+                $operationName = 'item_query',
                 [
                     'groups' => ['denormalization_group'],
                     'resource_class' => $resourceClass,
@@ -188,7 +188,7 @@ class SerializerContextBuilderTest extends TestCase
             ],
             'no resource class' => [
                 $resourceClass = null,
-                $operationName = 'query',
+                $operationName = 'item_query',
                 [
                     'resource_class' => $resourceClass,
                     'graphql_operation_name' => $operationName,
