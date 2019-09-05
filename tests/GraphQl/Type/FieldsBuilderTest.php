@@ -424,7 +424,7 @@ class FieldsBuilderTest extends TestCase
                     'propertyBool' => new PropertyMetadata(new Type(Type::BUILTIN_TYPE_BOOL), null, true, false),
                     'propertyNotReadable' => new PropertyMetadata(new Type(Type::BUILTIN_TYPE_BOOL), null, false, false),
                 ],
-                false, 'query', null, null,
+                false, 'item_query', null, null,
                 [
                     'id' => [
                         'type' => GraphQLType::nonNull(GraphQLType::id()),
@@ -443,7 +443,7 @@ class FieldsBuilderTest extends TestCase
                     'property' => new PropertyMetadata(),
                     'propertyBool' => new PropertyMetadata(new Type(Type::BUILTIN_TYPE_BOOL), null, false, false),
                 ],
-                true, 'query', null, null,
+                true, 'item_query', null, null,
                 [
                     'id' => [
                         'type' => GraphQLType::nonNull(GraphQLType::id()),
@@ -580,7 +580,7 @@ class FieldsBuilderTest extends TestCase
                     'propertyInvalidType' => new PropertyMetadata(new Type(Type::BUILTIN_TYPE_NULL), null, true, false),
                     'propertyNotRegisteredType' => new PropertyMetadata(new Type(Type::BUILTIN_TYPE_CALLABLE), null, true, false),
                 ],
-                false, 'query', null, null,
+                false, 'item_query', null, null,
                 [
                     'id' => [
                         'type' => GraphQLType::nonNull(GraphQLType::id()),
