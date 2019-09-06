@@ -47,6 +47,10 @@ trim_trailing_whitespace = false
 indent_style = space
 indent_size = 2
 
+[.github/workflows/*.yml]
+indent_style = space
+indent_size = 2
+
 [.gitmodules]
 indent_style = tab
 
