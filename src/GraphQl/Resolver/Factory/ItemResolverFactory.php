@@ -79,7 +79,7 @@ final class ItemResolverFactory implements ResolverFactoryInterface
             if (null !== $queryResolverId) {
                 /** @var QueryItemResolverInterface $queryResolver */
                 $queryResolver = $this->queryResolverLocator->get($queryResolverId);
-                $item = $queryResolver($item, ['source' => $source, 'args' => $args, 'info' => $info]);
+                $item = $queryResolver($item, $resolverContext);
                 $resourceClass = $this->getResourceClass($item, $resourceClass, $info, sprintf('Custom query resolver "%s"', $queryResolverId).' has to return an item of class %s but returned an item of class %s.');
             }
 

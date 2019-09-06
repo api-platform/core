@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\GraphQl\Type;
 
+use ApiPlatform\Core\DataProvider\Pagination;
 use ApiPlatform\Core\Exception\ResourceClassNotFoundException;
 use ApiPlatform\Core\GraphQl\Resolver\Factory\ResolverFactoryInterface;
 use ApiPlatform\Core\GraphQl\Type\Definition\TypeInterface;
@@ -48,9 +49,9 @@ final class FieldsBuilder implements FieldsBuilderInterface
     private $collectionResolverFactory;
     private $itemMutationResolverFactory;
     private $filterLocator;
-    private $paginationEnabled;
+    private $pagination;
 
-    public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, ResourceMetadataFactoryInterface $resourceMetadataFactory, TypesContainerInterface $typesContainer, TypeBuilderInterface $typeBuilder, TypeConverterInterface $typeConverter, ResolverFactoryInterface $itemResolverFactory, ResolverFactoryInterface $collectionResolverFactory, ResolverFactoryInterface $itemMutationResolverFactory, ContainerInterface $filterLocator, bool $paginationEnabled)
+    public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, ResourceMetadataFactoryInterface $resourceMetadataFactory, TypesContainerInterface $typesContainer, TypeBuilderInterface $typeBuilder, TypeConverterInterface $typeConverter, ResolverFactoryInterface $itemResolverFactory, ResolverFactoryInterface $collectionResolverFactory, ResolverFactoryInterface $itemMutationResolverFactory, ContainerInterface $filterLocator, Pagination $pagination)
     {
         $this->propertyNameCollectionFactory = $propertyNameCollectionFactory;
         $this->propertyMetadataFactory = $propertyMetadataFactory;
@@ -62,7 +63,7 @@ final class FieldsBuilder implements FieldsBuilderInterface
         $this->collectionResolverFactory = $collectionResolverFactory;
         $this->itemMutationResolverFactory = $itemMutationResolverFactory;
         $this->filterLocator = $filterLocator;
-        $this->paginationEnabled = $paginationEnabled;
+        $this->pagination = $pagination;
     }
 
     /**
@@ -82,29 +83,41 @@ final class FieldsBuilder implements FieldsBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function getQueryFields(string $resourceClass, ResourceMetadata $resourceMetadata, string $queryName, $itemConfiguration, $collectionConfiguration): array
+    public function getItemQueryFields(string $resourceClass, ResourceMetadata $resourceMetadata, string $queryName, array $configuration): array
     {
-        $queryFields = [];
         $shortName = $resourceMetadata->getShortName();
-        $fieldName = lcfirst('item_query' === $queryName || 'collection_query' === $queryName ? $shortName : $queryName.$shortName);
+        $fieldName = lcfirst('item_query' === $queryName ? $shortName : $queryName.$shortName);
 
-        $deprecationReason = $resourceMetadata->getGraphqlAttribute($queryName, 'deprecation_reason', '', true);
+        $deprecationReason = (string) $resourceMetadata->getGraphqlAttribute($queryName, 'deprecation_reason', '', true);
 
-        if (false !== $itemConfiguration && $fieldConfiguration = $this->getResourceFieldConfiguration(null, null, $deprecationReason, new Type(Type::BUILTIN_TYPE_OBJECT, true, $resourceClass), $resourceClass, false, $queryName, null)) {
-            $args = $this->resolveResourceArgs($itemConfiguration['args'] ?? [], $queryName, $shortName);
-            $itemConfiguration['args'] = $args ?: $itemConfiguration['args'] ?? ['id' => ['type' => GraphQLType::nonNull(GraphQLType::id())]];
+        if ($fieldConfiguration = $this->getResourceFieldConfiguration(null, null, $deprecationReason, new Type(Type::BUILTIN_TYPE_OBJECT, true, $resourceClass), $resourceClass, false, $queryName, null)) {
+            $args = $this->resolveResourceArgs($configuration['args'] ?? [], $queryName, $shortName);
+            $configuration['args'] = $args ?: $configuration['args'] ?? ['id' => ['type' => GraphQLType::nonNull(GraphQLType::id())]];
 
-            $queryFields[$fieldName] = array_merge($fieldConfiguration, $itemConfiguration);
+            return [$fieldName => array_merge($fieldConfiguration, $configuration)];
         }
 
-        if (false !== $collectionConfiguration && $fieldConfiguration = $this->getResourceFieldConfiguration(null, null, $deprecationReason, new Type(Type::BUILTIN_TYPE_OBJECT, false, null, true, null, new Type(Type::BUILTIN_TYPE_OBJECT, false, $resourceClass)), $resourceClass, false, $queryName, null)) {
-            $args = $this->resolveResourceArgs($collectionConfiguration['args'] ?? [], $queryName, $shortName);
-            $collectionConfiguration['args'] = $args ?: $collectionConfiguration['args'] ?? $fieldConfiguration['args'];
+        return [];
+    }
 
-            $queryFields[Inflector::pluralize($fieldName)] = array_merge($fieldConfiguration, $collectionConfiguration);
+    /**
+     * {@inheritdoc}
+     */
+    public function getCollectionQueryFields(string $resourceClass, ResourceMetadata $resourceMetadata, string $queryName, array $configuration): array
+    {
+        $shortName = $resourceMetadata->getShortName();
+        $fieldName = lcfirst('collection_query' === $queryName ? $shortName : $queryName.$shortName);
+
+        $deprecationReason = (string) $resourceMetadata->getGraphqlAttribute($queryName, 'deprecation_reason', '', true);
+
+        if ($fieldConfiguration = $this->getResourceFieldConfiguration(null, null, $deprecationReason, new Type(Type::BUILTIN_TYPE_OBJECT, false, null, true, null, new Type(Type::BUILTIN_TYPE_OBJECT, false, $resourceClass)), $resourceClass, false, $queryName, null)) {
+            $args = $this->resolveResourceArgs($configuration['args'] ?? [], $queryName, $shortName);
+            $configuration['args'] = $args ?: $configuration['args'] ?? $fieldConfiguration['args'];
+
+            return [Inflector::pluralize($fieldName) => array_merge($fieldConfiguration, $configuration)];
         }
 
-        return $queryFields;
+        return [];
     }
 
     /**
@@ -167,7 +180,7 @@ final class FieldsBuilder implements FieldsBuilderInterface
 
         if (null !== $resourceClass) {
             foreach ($this->propertyNameCollectionFactory->create($resourceClass) as $property) {
-                $propertyMetadata = $this->propertyMetadataFactory->create($resourceClass, $property, ['graphql_operation_name' => $mutationName ?? $queryName ?? 'item_query']);
+                $propertyMetadata = $this->propertyMetadataFactory->create($resourceClass, $property, ['graphql_operation_name' => $mutationName ?? $queryName]);
                 if (
                     null === ($propertyType = $propertyMetadata->getType())
                     || (!$input && false === $propertyMetadata->isReadable())
@@ -235,7 +248,7 @@ final class FieldsBuilder implements FieldsBuilderInterface
 
             $args = [];
             if (!$input && null === $mutationName && !$isStandardGraphqlType && $this->typeBuilder->isCollection($type)) {
-                if ($this->paginationEnabled) {
+                if ($this->pagination->isGraphQlEnabled($resourceClass, $queryName)) {
                     $args = [
                         'first' => [
                             'type' => GraphQLType::int(),
@@ -287,7 +300,7 @@ final class FieldsBuilder implements FieldsBuilderInterface
             return $args;
         }
 
-        foreach ($resourceMetadata->getGraphqlAttribute($queryName ?? 'query', 'filters', [], true) as $filterId) {
+        foreach ($resourceMetadata->getGraphqlAttribute($queryName, 'filters', [], true) as $filterId) {
             if (null === $this->filterLocator || !$this->filterLocator->has($filterId)) {
                 continue;
             }
@@ -397,7 +410,7 @@ final class FieldsBuilder implements FieldsBuilderInterface
         }
 
         if ($this->typeBuilder->isCollection($type)) {
-            return $this->paginationEnabled && !$input ? $this->typeBuilder->getResourcePaginatedCollectionType($graphqlType) : GraphQLType::listOf($graphqlType);
+            return $this->pagination->isGraphQlEnabled($resourceClass, $queryName ?? $mutationName) && !$input ? $this->typeBuilder->getResourcePaginatedCollectionType($graphqlType) : GraphQLType::listOf($graphqlType);
         }
 
         return !$graphqlType instanceof NullableType || $type->isNullable() || (null !== $mutationName && 'update' === $mutationName)

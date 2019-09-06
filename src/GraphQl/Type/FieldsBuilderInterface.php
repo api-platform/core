@@ -30,12 +30,14 @@ interface FieldsBuilderInterface
     public function getNodeQueryFields(): array;
 
     /**
-     * Gets the query fields of the schema.
-     *
-     * @param array|false $itemConfiguration       false if not configured
-     * @param array|false $collectionConfiguration false if not configured
+     * Gets the item query fields of the schema.
      */
-    public function getQueryFields(string $resourceClass, ResourceMetadata $resourceMetadata, string $queryName, $itemConfiguration, $collectionConfiguration): array;
+    public function getItemQueryFields(string $resourceClass, ResourceMetadata $resourceMetadata, string $queryName, array $configuration): array;
+
+    /**
+     * Gets the collection query fields of the schema.
+     */
+    public function getCollectionQueryFields(string $resourceClass, ResourceMetadata $resourceMetadata, string $queryName, array $configuration): array;
 
     /**
      * Gets the mutation fields of the schema.

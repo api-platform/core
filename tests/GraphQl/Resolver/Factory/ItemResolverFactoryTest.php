@@ -70,7 +70,7 @@ class ItemResolverFactoryTest extends TestCase
     public function testResolve(?string $resourceClass, string $determinedResourceClass, $readStageItem): void
     {
         $rootClass = 'rootClass';
-        $operationName = 'query';
+        $operationName = 'item_query';
         $source = ['source'];
         $args = ['args'];
         $info = $this->prophesize(ResolveInfo::class)->reveal();
@@ -120,7 +120,7 @@ class ItemResolverFactoryTest extends TestCase
     {
         $resourceClass = 'stdClass';
         $rootClass = 'rootClass';
-        $operationName = 'query';
+        $operationName = 'item_query';
         $source = ['source'];
         $args = ['args'];
         $info = $this->prophesize(ResolveInfo::class)->reveal();
@@ -139,7 +139,7 @@ class ItemResolverFactoryTest extends TestCase
     {
         $resourceClass = null;
         $rootClass = 'rootClass';
-        $operationName = 'query';
+        $operationName = 'item_query';
         $source = ['source'];
         $args = ['args'];
         $info = $this->prophesize(ResolveInfo::class)->reveal();
@@ -158,7 +158,7 @@ class ItemResolverFactoryTest extends TestCase
     {
         $resourceClass = Dummy::class;
         $rootClass = 'rootClass';
-        $operationName = 'query';
+        $operationName = 'item_query';
         $source = ['source'];
         $args = ['args'];
         $info = $this->prophesize(ResolveInfo::class)->reveal();

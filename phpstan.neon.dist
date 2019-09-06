@@ -24,7 +24,7 @@ parameters:
 		# Real problems, hard to fix
 		- '#Parameter \#2 \$dqlPart of method Doctrine\\ORM\\QueryBuilder::add\(\) expects array\|object, string given\.#'
 		-
-			message: '#Return type \(int\) of method ApiPlatform\\Core\\Identifier\\Normalizer\\IntegerDenormalizer::denormalize\(\) should be compatible with return type \(object\) of method Symfony\\Component\\Serializer\\Normalizer\\DenormalizerInterface::denormalize\(\)#'
+			message: '#Return type \(int\) of method ApiPlatform\\Core\\Identifier\\Normalizer\\IntegerDenormalizer::denormalize\(\) should be compatible with return type \(array\|object\) of method Symfony\\Component\\Serializer\\Normalizer\\DenormalizerInterface::denormalize\(\)#'
 			path: %currentWorkingDirectory%/src/Identifier/Normalizer/IntegerDenormalizer.php
 
 		# False positives

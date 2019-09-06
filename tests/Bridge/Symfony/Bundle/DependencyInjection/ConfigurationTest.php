@@ -124,6 +124,11 @@ class ConfigurationTest extends TestCase
                 'graphiql' => [
                     'enabled' => true,
                 ],
+                'collection' => [
+                    'pagination' => [
+                        'enabled' => true,
+                    ],
+                ],
             ],
             'elasticsearch' => [
                 'enabled' => false,

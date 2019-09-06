@@ -101,6 +101,11 @@ final class ItemDataProvider implements ItemDataProviderInterface, RestrictedDat
             return null;
         }
 
-        return $this->denormalizer->denormalize($document, $resourceClass, ItemNormalizer::FORMAT, [AbstractNormalizer::ALLOW_EXTRA_ATTRIBUTES => true]);
+        $item = $this->denormalizer->denormalize($document, $resourceClass, ItemNormalizer::FORMAT, [AbstractNormalizer::ALLOW_EXTRA_ATTRIBUTES => true]);
+        if (!\is_object($item) && null !== $item) {
+            throw new \UnexpectedValueException('Expected item to be an object or null.');
+        }
+
+        return $item;
     }
 }

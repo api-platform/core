@@ -49,7 +49,7 @@ class ValidateStageTest extends TestCase
 
     public function testApplyDisabled(): void
     {
-        $operationName = 'query';
+        $operationName = 'item_query';
         $resourceClass = 'myResource';
         $resourceMetadata = (new ResourceMetadata())->withGraphql([
             $operationName => ['validate' => false],
@@ -63,7 +63,7 @@ class ValidateStageTest extends TestCase
 
     public function testApply(): void
     {
-        $operationName = 'query';
+        $operationName = 'item_query';
         $resourceClass = 'myResource';
         $validationGroups = ['group'];
         $resourceMetadata = (new ResourceMetadata())->withGraphql([
@@ -79,7 +79,7 @@ class ValidateStageTest extends TestCase
 
     public function testApplyNotValidated(): void
     {
-        $operationName = 'query';
+        $operationName = 'item_query';
         $resourceClass = 'myResource';
         $validationGroups = ['group'];
         $resourceMetadata = (new ResourceMetadata())->withGraphql([

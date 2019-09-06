@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\DataProvider;
 
 use ApiPlatform\Core\Exception\InvalidArgumentException;
+use ApiPlatform\Core\Exception\ResourceClassNotFoundException;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 
 /**
@@ -24,9 +25,10 @@ use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 final class Pagination
 {
     private $options;
+    private $graphQlOptions;
     private $resourceMetadataFactory;
 
-    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, array $options = [])
+    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, array $options = [], array $graphQlOptions = [])
     {
         $this->resourceMetadataFactory = $resourceMetadataFactory;
         $this->options = array_merge([
@@ -43,6 +45,9 @@ final class Pagination
             'client_partial' => false,
             'partial_parameter_name' => 'partial',
         ], $options);
+        $this->graphQlOptions = array_merge([
+            'enabled' => true,
+        ], $graphQlOptions);
     }
 
     /**
@@ -172,6 +177,14 @@ final class Pagination
     }
 
     /**
+     * Is the pagination enabled for GraphQL?
+     */
+    public function isGraphQlEnabled(?string $resourceClass = null, ?string $operationName = null, array $context = []): bool
+    {
+        return $this->getGraphQlEnabled($resourceClass, $operationName);
+    }
+
+    /**
      * Is the partial pagination enabled?
      */
     public function isPartialEnabled(string $resourceClass = null, string $operationName = null, array $context = []): bool
@@ -196,6 +209,23 @@ final class Pagination
 
         if ($clientEnabled) {
             return filter_var($this->getParameterFromContext($context, $this->options[$partial ? 'partial_parameter_name' : 'enabled_parameter_name'], $enabled), FILTER_VALIDATE_BOOLEAN);
+        }
+
+        return (bool) $enabled;
+    }
+
+    private function getGraphQlEnabled(?string $resourceClass, ?string $operationName): bool
+    {
+        $enabled = $this->graphQlOptions['enabled'];
+
+        if (null !== $resourceClass) {
+            try {
+                $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
+            } catch (ResourceClassNotFoundException $e) {
+                return $enabled;
+            }
+
+            return (bool) $resourceMetadata->getGraphqlAttribute($operationName, 'pagination_enabled', $enabled, true);
         }
 
         return $enabled;

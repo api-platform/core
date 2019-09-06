@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\GraphQl\Resolver\Stage;
 
+use ApiPlatform\Core\DataProvider\Pagination;
 use ApiPlatform\Core\DataProvider\PaginatorInterface;
 use ApiPlatform\Core\GraphQl\Serializer\ItemNormalizer;
 use ApiPlatform\Core\GraphQl\Serializer\SerializerContextBuilderInterface;
@@ -33,14 +34,14 @@ final class SerializeStage implements SerializeStageInterface
     private $resourceMetadataFactory;
     private $normalizer;
     private $serializerContextBuilder;
-    private $paginationEnabled;
+    private $pagination;
 
-    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, NormalizerInterface $normalizer, SerializerContextBuilderInterface $serializerContextBuilder, bool $paginationEnabled)
+    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, NormalizerInterface $normalizer, SerializerContextBuilderInterface $serializerContextBuilder, Pagination $pagination)
     {
         $this->resourceMetadataFactory = $resourceMetadataFactory;
         $this->normalizer = $normalizer;
         $this->serializerContextBuilder = $serializerContextBuilder;
-        $this->paginationEnabled = $paginationEnabled;
+        $this->pagination = $pagination;
     }
 
     /**
@@ -54,7 +55,7 @@ final class SerializeStage implements SerializeStageInterface
         $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
         if (!$resourceMetadata->getGraphqlAttribute($operationName, 'serialize', true, true)) {
             if ($isCollection) {
-                if ($this->paginationEnabled) {
+                if ($this->pagination->isGraphQlEnabled($resourceClass, $operationName, $context)) {
                     return $this->getDefaultPaginatedData();
                 }
 
@@ -84,7 +85,7 @@ final class SerializeStage implements SerializeStageInterface
         }
 
         if ($isCollection && is_iterable($itemOrCollection)) {
-            if (!$this->paginationEnabled) {
+            if (!$this->pagination->isGraphQlEnabled($resourceClass, $operationName, $context)) {
                 $data = [];
                 foreach ($itemOrCollection as $index => $object) {
                     $data[$index] = $this->normalizer->normalize($object, ItemNormalizer::FORMAT, $normalizationContext);

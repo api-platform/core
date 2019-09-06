@@ -183,6 +183,9 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
                 throw new LogicException('Cannot denormalize the input because the injected serializer is not a denormalizer');
             }
             $denormalizedInput = $this->serializer->denormalize($data, $inputClass, $format, $context);
+            if (!\is_object($denormalizedInput)) {
+                throw new \UnexpectedValueException('Expected denormalized input to be an object.');
+            }
 
             return $dataTransformer->transform($denormalizedInput, $resourceClass, $dataTransformerContext);
         }
@@ -437,7 +440,12 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             }
 
             try {
-                return $this->serializer->denormalize($value, $className, $format, $context);
+                $item = $this->serializer->denormalize($value, $className, $format, $context);
+                if (!\is_object($item) && null !== $item) {
+                    throw new \UnexpectedValueException('Expected item to be an object or null.');
+                }
+
+                return $item;
             } catch (InvalidValueException $e) {
                 if (!$supportsPlainIdentifiers) {
                     throw $e;

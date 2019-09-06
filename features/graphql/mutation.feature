@@ -61,7 +61,7 @@ Feature: GraphQL mutation support
     And the header "Content-Type" should be equal to "application/json"
     And the JSON node "data.createFoo.foo.id" should be equal to "/foos/1"
     And the JSON node "data.createFoo.foo._id" should be equal to 1
-    And the JSON node "data.createFoo.foo.__typename" should be equal to "Foo"
+    And the JSON node "data.createFoo.foo.__typename" should be equal to "FooItem"
     And the JSON node "data.createFoo.foo.name" should be equal to "A new one"
     And the JSON node "data.createFoo.foo.bar" should be equal to "new"
     And the JSON node "data.createFoo.clientMutationId" should be equal to "myId"
@@ -112,7 +112,7 @@ Feature: GraphQL mutation support
     And the JSON node "data.createDummy.dummy.name" should be equal to "A dummy"
     And the JSON node "data.createDummy.dummy.foo" should have 0 elements
     And the JSON node "data.createDummy.dummy.relatedDummy.name" should be equal to "RelatedDummy #1"
-    And the JSON node "data.createDummy.dummy.relatedDummy.__typename" should be equal to "RelatedDummy"
+    And the JSON node "data.createDummy.dummy.relatedDummy.__typename" should be equal to "RelatedDummyItem"
     And the JSON node "data.createDummy.clientMutationId" should be equal to "myId"
 
   Scenario: Create an item with an iterable field

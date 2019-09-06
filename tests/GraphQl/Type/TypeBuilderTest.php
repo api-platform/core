@@ -64,21 +64,21 @@ class TypeBuilderTest extends TestCase
     public function testGetResourceObjectType(): void
     {
         $resourceMetadata = new ResourceMetadata('shortName', 'description');
-        $this->typesContainerProphecy->has('shortName')->shouldBeCalled()->willReturn(false);
-        $this->typesContainerProphecy->set('shortName', Argument::type(ObjectType::class))->shouldBeCalled();
+        $this->typesContainerProphecy->has('shortNameItem')->shouldBeCalled()->willReturn(false);
+        $this->typesContainerProphecy->set('shortNameItem', Argument::type(ObjectType::class))->shouldBeCalled();
         $this->typesContainerProphecy->has('Node')->shouldBeCalled()->willReturn(false);
         $this->typesContainerProphecy->set('Node', Argument::type(InterfaceType::class))->shouldBeCalled();
 
         /** @var ObjectType $resourceObjectType */
-        $resourceObjectType = $this->typeBuilder->getResourceObjectType('resourceClass', $resourceMetadata, false, null, null);
-        $this->assertSame('shortName', $resourceObjectType->name);
+        $resourceObjectType = $this->typeBuilder->getResourceObjectType('resourceClass', $resourceMetadata, false, 'item_query', null);
+        $this->assertSame('shortNameItem', $resourceObjectType->name);
         $this->assertSame('description', $resourceObjectType->description);
         $this->assertSame($this->defaultFieldResolver, $resourceObjectType->resolveFieldFn);
         $this->assertArrayHasKey('interfaces', $resourceObjectType->config);
         $this->assertArrayHasKey('fields', $resourceObjectType->config);
 
         $fieldsBuilderProphecy = $this->prophesize(FieldsBuilderInterface::class);
-        $fieldsBuilderProphecy->getResourceObjectTypeFields('resourceClass', $resourceMetadata, false, null, null, 0, null)->shouldBeCalled();
+        $fieldsBuilderProphecy->getResourceObjectTypeFields('resourceClass', $resourceMetadata, false, 'item_query', null, 0, null)->shouldBeCalled();
         $this->fieldsBuilderLocatorProphecy->get('api_platform.graphql.fields_builder')->shouldBeCalled()->willReturn($fieldsBuilderProphecy->reveal());
         $resourceObjectType->config['fields']();
     }
@@ -86,22 +86,22 @@ class TypeBuilderTest extends TestCase
     public function testGetResourceObjectTypeOutputClass(): void
     {
         $resourceMetadata = (new ResourceMetadata('shortName', 'description'))
-            ->withGraphql(['query' => ['output' => ['class' => 'outputClass']]]);
-        $this->typesContainerProphecy->has('shortName')->shouldBeCalled()->willReturn(false);
-        $this->typesContainerProphecy->set('shortName', Argument::type(ObjectType::class))->shouldBeCalled();
+            ->withGraphql(['item_query' => ['output' => ['class' => 'outputClass']]]);
+        $this->typesContainerProphecy->has('shortNameItem')->shouldBeCalled()->willReturn(false);
+        $this->typesContainerProphecy->set('shortNameItem', Argument::type(ObjectType::class))->shouldBeCalled();
         $this->typesContainerProphecy->has('Node')->shouldBeCalled()->willReturn(false);
         $this->typesContainerProphecy->set('Node', Argument::type(InterfaceType::class))->shouldBeCalled();
 
         /** @var ObjectType $resourceObjectType */
-        $resourceObjectType = $this->typeBuilder->getResourceObjectType('resourceClass', $resourceMetadata, false, null, null);
-        $this->assertSame('shortName', $resourceObjectType->name);
+        $resourceObjectType = $this->typeBuilder->getResourceObjectType('resourceClass', $resourceMetadata, false, 'item_query', null);
+        $this->assertSame('shortNameItem', $resourceObjectType->name);
         $this->assertSame('description', $resourceObjectType->description);
         $this->assertSame($this->defaultFieldResolver, $resourceObjectType->resolveFieldFn);
         $this->assertArrayHasKey('interfaces', $resourceObjectType->config);
         $this->assertArrayHasKey('fields', $resourceObjectType->config);
 
         $fieldsBuilderProphecy = $this->prophesize(FieldsBuilderInterface::class);
-        $fieldsBuilderProphecy->getResourceObjectTypeFields('outputClass', $resourceMetadata, false, null, null, 0, ['class' => 'outputClass'])->shouldBeCalled();
+        $fieldsBuilderProphecy->getResourceObjectTypeFields('outputClass', $resourceMetadata, false, 'item_query', null, 0, ['class' => 'outputClass'])->shouldBeCalled();
         $this->fieldsBuilderLocatorProphecy->get('api_platform.graphql.fields_builder')->shouldBeCalled()->willReturn($fieldsBuilderProphecy->reveal());
         $resourceObjectType->config['fields']();
     }
@@ -175,8 +175,8 @@ class TypeBuilderTest extends TestCase
         $this->assertArrayHasKey('fields', $resourceObjectType->config);
 
         // Recursive call (not using wrapped type)
-        $this->typesContainerProphecy->has('shortName')->shouldBeCalled()->willReturn(false);
-        $this->typesContainerProphecy->set('shortName', Argument::type(ObjectType::class))->shouldBeCalled();
+        $this->typesContainerProphecy->has('shortNameItem')->shouldBeCalled()->willReturn(false);
+        $this->typesContainerProphecy->set('shortNameItem', Argument::type(ObjectType::class))->shouldBeCalled();
 
         $fieldsType = $resourceObjectType->config['fields']();
         $this->assertArrayHasKey('shortName', $fieldsType);
@@ -188,7 +188,7 @@ class TypeBuilderTest extends TestCase
     {
         $resourceMetadata = (new ResourceMetadata('shortName', 'description'))
             ->withGraphql([
-                'query' => ['normalization_context' => ['groups' => ['query']]],
+                'item_query' => ['normalization_context' => ['groups' => ['item_query']]],
                 'create' => ['normalization_context' => ['groups' => ['create']]],
             ]);
         $this->typesContainerProphecy->has('createShortNamePayload')->shouldBeCalled()->willReturn(false);
