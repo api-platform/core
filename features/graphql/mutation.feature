@@ -60,7 +60,7 @@ Feature: GraphQL mutation support
     And the header "Content-Type" should be equal to "application/json"
     And the JSON node "data.createFoo.foo.id" should be equal to "/foos/1"
     And the JSON node "data.createFoo.foo._id" should be equal to 1
-    And the JSON node "data.createFoo.foo.__typename" should be equal to "Foo"
+    And the JSON node "data.createFoo.foo.__typename" should be equal to "FooItem"
     And the JSON node "data.createFoo.foo.name" should be equal to "A new one"
     And the JSON node "data.createFoo.foo.bar" should be equal to "new"
     And the JSON node "data.createFoo.clientMutationId" should be equal to "myId"
@@ -111,7 +111,7 @@ Feature: GraphQL mutation support
     And the JSON node "data.createDummy.dummy.name" should be equal to "A dummy"
     And the JSON node "data.createDummy.dummy.foo" should have 0 elements
     And the JSON node "data.createDummy.dummy.relatedDummy.name" should be equal to "RelatedDummy #1"
-    And the JSON node "data.createDummy.dummy.relatedDummy.__typename" should be equal to "RelatedDummy"
+    And the JSON node "data.createDummy.dummy.relatedDummy.__typename" should be equal to "RelatedDummyItem"
     And the JSON node "data.createDummy.clientMutationId" should be equal to "myId"
 
   Scenario: Create an item with an iterable field
@@ -333,113 +333,6 @@ Feature: GraphQL mutation support
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/json"
     And the JSON node "errors[0].message" should be equal to "name: This value should not be blank."
-
-  Scenario: Create an item using custom inputClass & disabled outputClass
-    Given there are 2 dummyDtoNoOutput objects
-    When I send the following GraphQL request:
-    """
-    mutation {
-      createDummyDtoNoOutput(input: {foo: "A new one", bar: 3, clientMutationId: "myId"}) {
-        dummyDtoNoOutput {
-          id
-        }
-        clientMutationId
-      }
-    }
-    """
-    Then the response status code should be 200
-    And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/json"
-    And the JSON should be equal to:
-    """
-    {
-      "errors": [
-        {
-          "message": "Cannot query field \"id\" on type \"DummyDtoNoOutput\".",
-          "extensions": {
-            "category": "graphql"
-          },
-          "locations": [
-            {
-              "line": 4,
-              "column": 7
-            }
-          ]
-        }
-      ]
-    }
-    """
-
-  Scenario: Cannot create an item with input fields using disabled inputClass
-    When I send the following GraphQL request:
-    """
-    mutation {
-      createDummyDtoNoInput(input: {lorem: "A new one", ipsum: 3, clientMutationId: "myId"}) {
-        clientMutationId
-      }
-    }
-    """
-    Then the response status code should be 200
-    And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/json"
-    And the JSON should be equal to:
-    """
-    {
-      "errors": [
-        {
-          "message": "Field \"lorem\" is not defined by type createDummyDtoNoInputInput.",
-          "extensions": {
-            "category": "graphql"
-          },
-          "locations": [
-            {
-              "line": 2,
-              "column": 33
-            }
-          ]
-        },
-        {
-          "message": "Field \"ipsum\" is not defined by type createDummyDtoNoInputInput.",
-          "extensions": {
-            "category": "graphql"
-          },
-          "locations": [
-            {
-              "line": 2,
-              "column": 53
-            }
-          ]
-        }
-      ]
-    }
-    """
-
-  Scenario: Create an item with empty input fields using disabled inputClass (no persist done)
-    When I send the following GraphQL request:
-    """
-    mutation {
-      createDummyDtoNoInput(input: {clientMutationId: "myId"}) {
-        dummyDtoNoInput {
-          id
-        }
-        clientMutationId
-      }
-    }
-    """
-    Then the response status code should be 200
-    And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/json"
-    And the JSON should be equal to:
-    """
-    {
-      "data": {
-        "createDummyDtoNoInput": {
-          "dummyDtoNoInput": null,
-          "clientMutationId": "myId"
-        }
-      }
-    }
-    """
 
   Scenario: Execute a custom mutation
     Given there are 1 dummyCustomMutation objects

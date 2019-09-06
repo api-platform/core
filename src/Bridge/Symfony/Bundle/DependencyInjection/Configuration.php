@@ -56,6 +56,16 @@ final class Configuration implements ConfigurationInterface
         }
 
         $rootNode
+            ->beforeNormalization()
+                ->ifTrue(static function ($v) {
+                    return false === ($v['enable_swagger'] ?? null);
+                })
+                ->then(static function ($v) {
+                    $v['swagger']['versions'] = [];
+
+                    return $v;
+                })
+            ->end()
             ->children()
                 ->scalarNode('title')
                     ->info('The title of the API.')
@@ -229,6 +239,14 @@ final class Configuration implements ConfigurationInterface
                         ->arrayNode('graphql_playground')
                             ->{class_exists(GraphQL::class) && class_exists(TwigBundle::class) ? 'canBeDisabled' : 'canBeEnabled'}()
                         ->end()
+                        ->arrayNode('collection')
+                            ->addDefaultsIfNotSet()
+                            ->children()
+                                ->arrayNode('pagination')
+                                    ->canBeDisabled()
+                                ->end()
+                            ->end()
+                        ->end()
                     ->end()
                 ->end()
             ->end();
@@ -236,14 +254,40 @@ final class Configuration implements ConfigurationInterface
 
     private function addSwaggerSection(ArrayNodeDefinition $rootNode): void
     {
+        $defaultVersions = [2, 3];
+
         $rootNode
             ->children()
                 ->arrayNode('swagger')
                     ->addDefaultsIfNotSet()
                     ->children()
-                             ->arrayNode('api_keys')
-                                 ->prototype('array')
-                                    ->children()
+                        ->arrayNode('versions')
+                            ->info('The active versions of OpenAPI to be exported or used in the swagger_ui. The first value is the default.')
+                            ->defaultValue($defaultVersions)
+                            ->beforeNormalization()
+                                ->always(static function ($v) {
+                                    if (!\is_array($v)) {
+                                        $v = [$v];
+                                    }
+
+                                    foreach ($v as &$version) {
+                                        $version = (int) $version;
+                                    }
+
+                                    return $v;
+                                })
+                            ->end()
+                            ->validate()
+                                ->ifTrue(function ($v) use ($defaultVersions) {
+                                    return $v !== array_intersect($v, $defaultVersions);
+                                })
+                                ->thenInvalid(sprintf('Only the versions %s are supported. Got %s.', implode(' and ', $defaultVersions), '%s'))
+                            ->end()
+                            ->prototype('scalar')->end()
+                        ->end()
+                        ->arrayNode('api_keys')
+                            ->prototype('array')
+                                ->children()
                                     ->scalarNode('name')
                                         ->info('The name of the header or query parameter containing the api key.')
                                     ->end()
@@ -252,7 +296,7 @@ final class Configuration implements ConfigurationInterface
                                         ->values(['query', 'header'])
                                     ->end()
                                 ->end()
-                             ->end()
+                            ->end()
                         ->end()
                     ->end()
                 ->end()

@@ -36,17 +36,17 @@ final class TypeConverter implements TypeConverterInterface
     /**
      * {@inheritdoc}
      */
-    public function convertType(Type $type, bool $input, ?string $queryName, ?string $mutationName, string $resourceClass, ?string $property, int $depth)
+    public function convertType(Type $type, bool $input, ?string $queryName, ?string $mutationName, string $resourceClass, string $rootResource, ?string $property, int $depth)
     {
         if ('dummyDate' === $property
-            && \in_array($resourceClass, [Dummy::class, DummyDocument::class], true)
+            && \in_array($rootResource, [Dummy::class, DummyDocument::class], true)
             && Type::BUILTIN_TYPE_OBJECT === $type->getBuiltinType()
             && is_a($type->getClassName(), \DateTimeInterface::class, true)
         ) {
             return 'DateTime';
         }
 
-        return $this->defaultTypeConverter->convertType($type, $input, $queryName, $mutationName, $resourceClass, $property, $depth);
+        return $this->defaultTypeConverter->convertType($type, $input, $queryName, $mutationName, $resourceClass, $rootResource, $property, $depth);
     }
 
     /**

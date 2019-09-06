@@ -61,6 +61,12 @@ final class TypeBuilder implements TypeBuilderInterface
             }
             $shortName .= 'Payload';
         }
+        if ('item_query' === $queryName) {
+            $shortName .= 'Item';
+        }
+        if ('collection_query' === $queryName) {
+            $shortName .= 'Collection';
+        }
         if ($wrapped && null !== $mutationName) {
             $shortName .= 'Data';
         }
@@ -78,7 +84,7 @@ final class TypeBuilder implements TypeBuilderInterface
             return $resourceObjectType;
         }
 
-        $ioMetadata = $resourceMetadata->getGraphqlAttribute($mutationName ?? 'query', $input ? 'input' : 'output', null, true);
+        $ioMetadata = $resourceMetadata->getGraphqlAttribute($mutationName ?? $queryName, $input ? 'input' : 'output', null, true);
         if (null !== $ioMetadata && \array_key_exists('class', $ioMetadata) && null !== $ioMetadata['class']) {
             $resourceClass = $ioMetadata['class'];
         }
@@ -91,7 +97,7 @@ final class TypeBuilder implements TypeBuilderInterface
             'resolveField' => $this->defaultFieldResolver,
             'fields' => function () use ($resourceClass, $resourceMetadata, $input, $mutationName, $queryName, $wrapData, $depth, $ioMetadata) {
                 if ($wrapData) {
-                    $queryNormalizationContext = $resourceMetadata->getGraphqlAttribute($queryName ?? 'query', 'normalization_context', [], true);
+                    $queryNormalizationContext = $resourceMetadata->getGraphqlAttribute($queryName ?? '', 'normalization_context', [], true);
                     $mutationNormalizationContext = $resourceMetadata->getGraphqlAttribute($mutationName ?? '', 'normalization_context', [], true);
                     // Use a new type for the wrapped object only if there is a specific normalization context for the mutation.
                     // If not, use the query type in order to ensure the client cache could be used.
@@ -100,7 +106,7 @@ final class TypeBuilder implements TypeBuilderInterface
                     return [
                         lcfirst($resourceMetadata->getShortName()) => $useWrappedType ?
                             $this->getResourceObjectType($resourceClass, $resourceMetadata, $input, $queryName, $mutationName, true, $depth) :
-                            $this->getResourceObjectType($resourceClass, $resourceMetadata, $input, $queryName, null, true, $depth),
+                            $this->getResourceObjectType($resourceClass, $resourceMetadata, $input, $queryName ?? 'item_query', null, true, $depth),
                         'clientMutationId' => GraphQLType::string(),
                     ];
                 }
@@ -152,7 +158,7 @@ final class TypeBuilder implements TypeBuilderInterface
                     return null;
                 }
 
-                $shortName = (new \ReflectionClass($value[ItemNormalizer::ITEM_RESOURCE_CLASS_KEY]))->getShortName();
+                $shortName = (new \ReflectionClass($value[ItemNormalizer::ITEM_RESOURCE_CLASS_KEY]))->getShortName().'Item';
 
                 return $this->typesContainer->has($shortName) ? $this->typesContainer->get($shortName) : null;
             },

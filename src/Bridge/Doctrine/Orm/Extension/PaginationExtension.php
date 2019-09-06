@@ -134,6 +134,10 @@ final class PaginationExtension implements ContextAwareQueryResultCollectionExte
      */
     public function supportsResult(string $resourceClass, string $operationName = null, array $context = []): bool
     {
+        if ($context['graphql_operation_name'] ?? false) {
+            return $this->pagination->isGraphQlEnabled($resourceClass, $operationName, $context);
+        }
+
         if (null === $this->requestStack) {
             return $this->pagination->isEnabled($resourceClass, $operationName, $context);
         }
@@ -190,6 +194,10 @@ final class PaginationExtension implements ContextAwareQueryResultCollectionExte
 
         if (null === $request) {
             if (!$this->pagination->isEnabled($resourceClass, $operationName, $context)) {
+                return null;
+            }
+
+            if (($context['graphql_operation_name'] ?? false) && !$this->pagination->isGraphQlEnabled($resourceClass, $operationName, $context)) {
                 return null;
             }
 
@@ -285,7 +293,7 @@ final class PaginationExtension implements ContextAwareQueryResultCollectionExte
 
     private function addCountToContext(QueryBuilder $queryBuilder, array $context): array
     {
-        if (!($context['graphql'] ?? false)) {
+        if (!($context['graphql_operation_name'] ?? false)) {
             return $context;
         }
 

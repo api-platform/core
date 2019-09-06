@@ -23,6 +23,7 @@ use ApiPlatform\Core\Identifier\IdentifierConverterInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ToggleableOperationAttributeTrait;
 use ApiPlatform\Core\Serializer\SerializerContextBuilderInterface;
+use ApiPlatform\Core\Util\CloneTrait;
 use ApiPlatform\Core\Util\RequestAttributesExtractor;
 use ApiPlatform\Core\Util\RequestParser;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
@@ -35,6 +36,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  */
 final class ReadListener
 {
+    use CloneTrait;
     use OperationDataProviderTrait;
     use ToggleableOperationAttributeTrait;
 
@@ -115,6 +117,6 @@ final class ReadListener
         }
 
         $request->attributes->set('data', $data);
-        $request->attributes->set('previous_data', \is_object($data) ? clone $data : $data);
+        $request->attributes->set('previous_data', $this->clone($data));
     }
 }

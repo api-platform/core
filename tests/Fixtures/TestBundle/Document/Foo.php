@@ -21,9 +21,17 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
  *
  * @author Vincent Chalamon <vincentchalamon@gmail.com>
  *
- * @ApiResource(attributes={
- *     "order"={"bar", "name"="DESC"}
- * })
+ * @ApiResource(
+ *     attributes={
+ *         "order"={"bar", "name"="DESC"}
+ *     },
+ *     graphql={
+ *         "item_query",
+ *         "collection_query"={"pagination_enabled"=false},
+ *         "create",
+ *         "delete"
+ *     }
+ * )
  * @ODM\Document
  */
 class Foo

@@ -32,9 +32,9 @@ use Symfony\Component\Messenger\Stamp\HandledStamp;
 final class DataPersister implements ContextAwareDataPersisterInterface
 {
     use ClassInfoTrait;
+    use DispatchTrait;
 
     private $resourceMetadataFactory;
-    private $messageBus;
 
     public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, MessageBusInterface $messageBus)
     {
@@ -75,7 +75,7 @@ final class DataPersister implements ContextAwareDataPersisterInterface
      */
     public function persist($data, array $context = [])
     {
-        $envelope = $this->messageBus->dispatch($data);
+        $envelope = $this->dispatch($data);
 
         $handledStamp = $envelope->last(HandledStamp::class);
         if (!$handledStamp instanceof HandledStamp) {
@@ -90,7 +90,7 @@ final class DataPersister implements ContextAwareDataPersisterInterface
      */
     public function remove($data, array $context = [])
     {
-        $this->messageBus->dispatch(
+        $this->dispatch(
             (new Envelope($data))
                 ->with(new RemoveStamp())
         );

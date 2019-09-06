@@ -128,7 +128,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $container->registerForAutoconfiguration(FilterInterface::class)
             ->addTag('api_platform.filter');
 
-        if ($container->hasParameter('test.client.parameters') && class_exists(AbstractBrowser::class)) {
+        if ($container->hasParameter('test.client.parameters') && class_exists(AbstractBrowser::class) && trait_exists('Symfony\Component\HttpClient\HttpClientTrait')) {
             $loader->load('test.xml');
         }
     }
@@ -307,10 +307,11 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
      */
     private function registerSwaggerConfiguration(ContainerBuilder $container, array $config, XmlFileLoader $loader): void
     {
-        if (!$config['enable_swagger']) {
+        if (empty($config['swagger']['versions'])) {
             return;
         }
 
+        $loader->load('json_schema.xml');
         $loader->load('swagger.xml');
 
         if ($config['enable_swagger_ui'] || $config['enable_re_doc']) {
@@ -319,7 +320,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             $container->setParameter('api_platform.enable_re_doc', $config['enable_re_doc']);
         }
 
-        $container->setParameter('api_platform.enable_swagger', $config['enable_swagger']);
+        $container->setParameter('api_platform.swagger.versions', $config['swagger']['versions']);
         $container->setParameter('api_platform.swagger.api_keys', $config['swagger']['api_keys']);
     }
 
@@ -377,6 +378,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         }
 
         $container->setParameter('api_platform.graphql.default_ide', $config['graphql']['default_ide']);
+        $container->setParameter('api_platform.graphql.collection.pagination', $config['graphql']['collection']['pagination']);
 
         $loader->load('graphql.xml');
 

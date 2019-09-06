@@ -17,10 +17,13 @@ use ApiPlatform\Core\Api\FilterCollection;
 use ApiPlatform\Core\Api\OperationAwareFormatsProviderInterface;
 use ApiPlatform\Core\Api\OperationMethodResolverInterface;
 use ApiPlatform\Core\Api\OperationType;
-use ApiPlatform\Core\Api\ResourceClassResolverInterface;
 use ApiPlatform\Core\Bridge\Symfony\Routing\RouterOperationPathResolver;
 use ApiPlatform\Core\Documentation\Documentation;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
+use ApiPlatform\Core\JsonSchema\SchemaFactory;
+use ApiPlatform\Core\JsonSchema\SchemaFactoryInterface;
+use ApiPlatform\Core\JsonSchema\TypeFactory;
+use ApiPlatform\Core\JsonSchema\TypeFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
@@ -111,8 +114,6 @@ class DocumentationNormalizerV3Test extends TestCase
         $propertyMetadataFactoryProphecy->create(Dummy::class, 'id')->shouldBeCalled()->willReturn(new PropertyMetadata(new Type(Type::BUILTIN_TYPE_INT), 'This is an id.', true, false, null, null, null, true));
         $propertyMetadataFactoryProphecy->create(Dummy::class, 'name')->shouldBeCalled()->willReturn(new PropertyMetadata(new Type(Type::BUILTIN_TYPE_STRING), 'This is a name.', true, true, true, true, false, false, null, null, []));
         $propertyMetadataFactoryProphecy->create(Dummy::class, 'description')->shouldBeCalled()->willReturn(new PropertyMetadata(new Type(Type::BUILTIN_TYPE_STRING), 'This is an initializable but not writable property.', true, false, true, true, false, false, null, null, [], null, true));
-        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
-        $resourceClassResolverProphecy->isResourceClass(Dummy::class)->willReturn(true);
 
         $operationPathResolver = new CustomOperationPathResolver(new OperationPathResolver(new UnderscorePathSegmentNameGenerator()));
 
@@ -120,7 +121,7 @@ class DocumentationNormalizerV3Test extends TestCase
             $resourceMetadataFactoryProphecy->reveal(),
             $propertyNameCollectionFactoryProphecy->reveal(),
             $propertyMetadataFactoryProphecy->reveal(),
-            $resourceClassResolverProphecy->reveal(),
+            null,
             $operationMethodResolver,
             $operationPathResolver,
             null,
@@ -164,6 +165,7 @@ class DocumentationNormalizerV3Test extends TestCase
                                 'required' => false,
                                 'schema' => [
                                     'type' => 'integer',
+                                    'default' => 1,
                                 ],
                                 'description' => 'The collection page number',
                             ],
@@ -173,6 +175,8 @@ class DocumentationNormalizerV3Test extends TestCase
                                 'required' => false,
                                 'schema' => [
                                     'type' => 'integer',
+                                    'default' => 30,
+                                    'minimum' => 0,
                                 ],
                                 'description' => 'The number of items per page',
                             ],
@@ -293,14 +297,21 @@ class DocumentationNormalizerV3Test extends TestCase
                                 'name' => 'page',
                                 'in' => 'query',
                                 'required' => false,
-                                'schema' => ['type' => 'integer'],
+                                'schema' => [
+                                    'type' => 'integer',
+                                    'default' => 1,
+                                ],
                                 'description' => 'The collection page number',
                             ],
                             [
                                 'name' => 'itemsPerPage',
                                 'in' => 'query',
                                 'required' => false,
-                                'schema' => ['type' => 'integer'],
+                                'schema' => [
+                                    'type' => 'integer',
+                                    'default' => 30,
+                                    'minimum' => 0,
+                                ],
                                 'description' => 'The number of items per page',
                             ],
                         ],
@@ -386,6 +397,16 @@ class DocumentationNormalizerV3Test extends TestCase
 
     public function testNormalizeWithNameConverter(): void
     {
+        $this->doTestNormalizeWithNameConverter();
+    }
+
+    public function testLegacyNormalizeWithNameConverter(): void
+    {
+        $this->doTestNormalizeWithNameConverter(true);
+    }
+
+    private function doTestNormalizeWithNameConverter(bool $legacy = false): void
+    {
         $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), 'Dummy API', 'This is a dummy API', '1.2.3');
 
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
@@ -406,25 +427,54 @@ class DocumentationNormalizerV3Test extends TestCase
         $propertyMetadataFactoryProphecy->create(Dummy::class, 'name')->shouldBeCalled()->willReturn(new PropertyMetadata(new Type(Type::BUILTIN_TYPE_STRING), 'This is a name.', true, true, null, null, false));
         $propertyMetadataFactoryProphecy->create(Dummy::class, 'nameConverted')->shouldBeCalled()->willReturn(new PropertyMetadata(new Type(Type::BUILTIN_TYPE_STRING), 'This is a converted name.', true, true, null, null, false));
 
-        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
-        $resourceClassResolverProphecy->isResourceClass(Dummy::class)->willReturn(true);
-
         $nameConverterProphecy = $this->prophesize(NameConverterInterface::class);
-        $nameConverterProphecy->normalize('name', Dummy::class, DocumentationNormalizer::FORMAT, [])->willReturn('name')->shouldBeCalled();
-        $nameConverterProphecy->normalize('nameConverted', Dummy::class, DocumentationNormalizer::FORMAT, [])->willReturn('name_converted')->shouldBeCalled();
+        $nameConverterProphecy->normalize('name', Dummy::class, 'jsonld', [])->willReturn('name')->shouldBeCalled();
+        $nameConverterProphecy->normalize('nameConverted', Dummy::class, 'jsonld', [])->willReturn('name_converted')->shouldBeCalled();
 
         $operationPathResolver = new CustomOperationPathResolver(new OperationPathResolver(new UnderscorePathSegmentNameGenerator()));
 
+        /**
+         * @var ResourceMetadataFactoryInterface
+         */
+        $resourceMetadataFactory = $resourceMetadataFactoryProphecy->reveal();
+        /**
+         * @var PropertyNameCollectionFactoryInterface
+         */
+        $propertyNameCollectionFactory = $propertyNameCollectionFactoryProphecy->reveal();
+        /**
+         * @var PropertyMetadataFactoryInterface
+         */
+        $propertyMetadataFactory = $propertyMetadataFactoryProphecy->reveal();
+        /**
+         * @var NameConverterInterface
+         */
+        $nameConverter = $nameConverterProphecy->reveal();
+
+        /**
+         * @var TypeFactoryInterface|null
+         */
+        $typeFactory = null;
+        /**
+         * @var SchemaFactoryInterface|null
+         */
+        $schemaFactory = null;
+
+        if (!$legacy) {
+            $typeFactory = new TypeFactory();
+            $schemaFactory = new SchemaFactory($typeFactory, $resourceMetadataFactory, $propertyNameCollectionFactory, $propertyMetadataFactory, $nameConverter);
+            $typeFactory->setSchemaFactory($schemaFactory);
+        }
+
         $normalizer = new DocumentationNormalizer(
-            $resourceMetadataFactoryProphecy->reveal(),
-            $propertyNameCollectionFactoryProphecy->reveal(),
-            $propertyMetadataFactoryProphecy->reveal(),
-            $resourceClassResolverProphecy->reveal(),
-            null,
+            $resourceMetadataFactory,
+            $propertyNameCollectionFactory,
+            $propertyMetadataFactory,
+            $schemaFactory,
+            $typeFactory,
             $operationPathResolver,
             null,
             null,
-            $nameConverterProphecy->reveal(),
+            $legacy ? $nameConverter : null,
             true,
             'oauth2',
             'application',
@@ -533,9 +583,6 @@ class DocumentationNormalizerV3Test extends TestCase
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
         $propertyMetadataFactoryProphecy->create(Dummy::class, 'name')->shouldBeCalled()->willReturn(new PropertyMetadata(new Type(Type::BUILTIN_TYPE_STRING), 'This is a name.', true, true, null, null, false));
 
-        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
-        $resourceClassResolverProphecy->isResourceClass(Dummy::class)->willReturn(true);
-
         $operationPathResolver = new CustomOperationPathResolver(new OperationPathResolver(new UnderscorePathSegmentNameGenerator()));
 
         $apiKeysConfiguration = [
@@ -553,7 +600,7 @@ class DocumentationNormalizerV3Test extends TestCase
             $resourceMetadataFactoryProphecy->reveal(),
             $propertyNameCollectionFactoryProphecy->reveal(),
             $propertyMetadataFactoryProphecy->reveal(),
-            $resourceClassResolverProphecy->reveal(),
+            null,
             null,
             $operationPathResolver,
             null,
@@ -685,16 +732,13 @@ class DocumentationNormalizerV3Test extends TestCase
         $propertyMetadataFactoryProphecy->create(Dummy::class, 'name')->shouldBeCalled()->willReturn(new PropertyMetadata(new Type(Type::BUILTIN_TYPE_STRING), 'This is a name.', true, true, true, true, false, false, null, null, []));
         $propertyMetadataFactoryProphecy->create(Dummy::class, 'gerard')->shouldBeCalled()->willReturn(new PropertyMetadata(new Type(Type::BUILTIN_TYPE_STRING), 'This is a gerard.', true, true, true, true, false, false, null, null, []));
 
-        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
-        $resourceClassResolverProphecy->isResourceClass(Dummy::class)->willReturn(true);
-
         $operationPathResolver = new CustomOperationPathResolver(new OperationPathResolver(new UnderscorePathSegmentNameGenerator()));
 
         $normalizer = new DocumentationNormalizer(
             $resourceMetadataFactoryProphecy->reveal(),
             $propertyNameCollectionFactoryProphecy->reveal(),
             $propertyMetadataFactoryProphecy->reveal(),
-            $resourceClassResolverProphecy->reveal(),
+            null,
             null,
             $operationPathResolver,
             null,
@@ -738,7 +782,10 @@ class DocumentationNormalizerV3Test extends TestCase
                                 'name' => 'page',
                                 'in' => 'query',
                                 'required' => false,
-                                'schema' => ['type' => 'integer'],
+                                'schema' => [
+                                    'type' => 'integer',
+                                    'default' => 1,
+                                ],
                                 'description' => 'The collection page number',
                             ],
                         ],
@@ -899,8 +946,6 @@ class DocumentationNormalizerV3Test extends TestCase
 
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
         $propertyMetadataFactoryProphecy->create(Dummy::class, 'id')->shouldBeCalled()->willReturn(new PropertyMetadata(new Type(Type::BUILTIN_TYPE_INT), 'This is an id.', true, false));
-        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
-        $resourceClassResolverProphecy->isResourceClass(Dummy::class)->willReturn(true);
 
         $operationPathResolver = new CustomOperationPathResolver(new OperationPathResolver(new UnderscorePathSegmentNameGenerator()));
 
@@ -908,7 +953,7 @@ class DocumentationNormalizerV3Test extends TestCase
             $resourceMetadataFactoryProphecy->reveal(),
             $propertyNameCollectionFactoryProphecy->reveal(),
             $propertyMetadataFactoryProphecy->reveal(),
-            $resourceClassResolverProphecy->reveal(),
+            null,
             null,
             $operationPathResolver,
             null,
@@ -1021,16 +1066,13 @@ class DocumentationNormalizerV3Test extends TestCase
         $propertyMetadataFactoryProphecy->create(Dummy::class, 'name')->shouldBeCalled()->willReturn(new PropertyMetadata(new Type(Type::BUILTIN_TYPE_STRING), 'This is a name.', true, true, true, true, false, false, null, null, []));
         $propertyMetadataFactoryProphecy->create(Dummy::class, 'gerard')->shouldBeCalled()->willReturn(new PropertyMetadata(new Type(Type::BUILTIN_TYPE_STRING), 'This is a gerard.', true, true, true, true, false, false, null, null, []));
 
-        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
-        $resourceClassResolverProphecy->isResourceClass(Dummy::class)->willReturn(true);
-
         $operationPathResolver = new CustomOperationPathResolver(new OperationPathResolver(new UnderscorePathSegmentNameGenerator()));
 
         $normalizer = new DocumentationNormalizer(
             $resourceMetadataFactoryProphecy->reveal(),
             $propertyNameCollectionFactoryProphecy->reveal(),
             $propertyMetadataFactoryProphecy->reveal(),
-            $resourceClassResolverProphecy->reveal(),
+            null,
             null,
             $operationPathResolver,
             null,
@@ -1074,7 +1116,10 @@ class DocumentationNormalizerV3Test extends TestCase
                                 'name' => 'page',
                                 'in' => 'query',
                                 'required' => false,
-                                'schema' => ['type' => 'integer'],
+                                'schema' => [
+                                    'type' => 'integer',
+                                    'default' => 1,
+                                ],
                                 'description' => 'The collection page number',
                             ],
                         ],
@@ -1242,16 +1287,13 @@ class DocumentationNormalizerV3Test extends TestCase
         $propertyMetadataFactoryProphecy->create(Dummy::class, 'name')->shouldBeCalled()->willReturn(new PropertyMetadata(new Type(Type::BUILTIN_TYPE_STRING), 'This is a name.', true, true, true, true, false, false, null, null, []));
         $propertyMetadataFactoryProphecy->create(Dummy::class, 'gerard')->shouldBeCalled()->willReturn(new PropertyMetadata(new Type(Type::BUILTIN_TYPE_STRING), 'This is a gerard.', true, true, true, true, false, false, null, null, []));
 
-        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
-        $resourceClassResolverProphecy->isResourceClass(Dummy::class)->willReturn(true);
-
         $operationPathResolver = new CustomOperationPathResolver(new OperationPathResolver(new UnderscorePathSegmentNameGenerator()));
 
         $normalizer = new DocumentationNormalizer(
             $resourceMetadataFactoryProphecy->reveal(),
             $propertyNameCollectionFactoryProphecy->reveal(),
             $propertyMetadataFactoryProphecy->reveal(),
-            $resourceClassResolverProphecy->reveal(),
+            null,
             null,
             $operationPathResolver,
             null,
@@ -1295,7 +1337,10 @@ class DocumentationNormalizerV3Test extends TestCase
                                 'name' => 'page',
                                 'in' => 'query',
                                 'required' => false,
-                                'schema' => ['type' => 'integer'],
+                                'schema' => [
+                                    'type' => 'integer',
+                                    'default' => 1,
+                                ],
                                 'description' => 'The collection page number',
                             ],
                         ],
@@ -1452,6 +1497,15 @@ class DocumentationNormalizerV3Test extends TestCase
                 'required' => true,
                 'strategy' => 'exact',
             ]]),
+            'f4' => new DummyFilter(['order[name]' => [
+                'property' => 'name',
+                'type' => 'string',
+                'required' => false,
+                'schema' => [
+                    'type' => 'string',
+                    'enum' => ['asc', 'desc'],
+                ],
+            ]]),
         ];
 
         foreach ($filters as $filterId => $filter) {
@@ -1459,7 +1513,7 @@ class DocumentationNormalizerV3Test extends TestCase
             $filterLocatorProphecy->get($filterId)->willReturn($filter)->shouldBeCalled();
         }
 
-        $filterLocatorProphecy->has('f4')->willReturn(false)->shouldBeCalled();
+        $filterLocatorProphecy->has('f5')->willReturn(false)->shouldBeCalled();
 
         $this->normalizeWithFilters($filterLocatorProphecy->reveal());
     }
@@ -1491,6 +1545,15 @@ class DocumentationNormalizerV3Test extends TestCase
                 'required' => true,
                 'strategy' => 'exact',
             ]]),
+            'f4' => new DummyFilter(['order[name]' => [
+                'property' => 'name',
+                'type' => 'string',
+                'required' => false,
+                'schema' => [
+                    'type' => 'string',
+                    'enum' => ['asc', 'desc'],
+                ],
+            ]]),
         ]));
     }
 
@@ -1503,7 +1566,7 @@ class DocumentationNormalizerV3Test extends TestCase
             $this->prophesize(ResourceMetadataFactoryInterface::class)->reveal(),
             $this->prophesize(PropertyNameCollectionFactoryInterface::class)->reveal(),
             $this->prophesize(PropertyMetadataFactoryInterface::class)->reveal(),
-            $this->prophesize(ResourceClassResolverInterface::class)->reveal(),
+            null,
             null,
             $this->prophesize(OperationPathResolverInterface::class)->reveal(),
             null,
@@ -1533,14 +1596,13 @@ class DocumentationNormalizerV3Test extends TestCase
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
-        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
         $operationPathResolver = new CustomOperationPathResolver(new OperationPathResolver(new UnderscorePathSegmentNameGenerator()));
 
         $normalizer = new DocumentationNormalizer(
             $resourceMetadataFactoryProphecy->reveal(),
             $propertyNameCollectionFactoryProphecy->reveal(),
             $propertyMetadataFactoryProphecy->reveal(),
-            $resourceClassResolverProphecy->reveal(),
+            null,
             null,
             $operationPathResolver,
             null,
@@ -1593,16 +1655,13 @@ class DocumentationNormalizerV3Test extends TestCase
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
         $propertyMetadataFactoryProphecy->create(Dummy::class, 'name')->shouldNotBeCalled();
 
-        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
-        $resourceClassResolverProphecy->isResourceClass(Dummy::class)->willReturn(true);
-
         $operationPathResolver = new CustomOperationPathResolver(new OperationPathResolver(new UnderscorePathSegmentNameGenerator()));
 
         $normalizer = new DocumentationNormalizer(
             $resourceMetadataFactoryProphecy->reveal(),
             $propertyNameCollectionFactoryProphecy->reveal(),
             $propertyMetadataFactoryProphecy->reveal(),
-            $resourceClassResolverProphecy->reveal(),
+            null,
             null,
             $operationPathResolver,
             null,
@@ -1656,16 +1715,13 @@ class DocumentationNormalizerV3Test extends TestCase
 
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
 
-        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
-        $resourceClassResolverProphecy->isResourceClass(Dummy::class)->willReturn(true);
-
         $operationPathResolver = new CustomOperationPathResolver(new OperationPathResolver(new UnderscorePathSegmentNameGenerator()));
 
         $normalizer = new DocumentationNormalizer(
             $resourceMetadataFactoryProphecy->reveal(),
             $propertyNameCollectionFactoryProphecy->reveal(),
             $propertyMetadataFactoryProphecy->reveal(),
-            $resourceClassResolverProphecy->reveal(),
+            null,
             null,
             $operationPathResolver,
             null,
@@ -1756,17 +1812,13 @@ class DocumentationNormalizerV3Test extends TestCase
         $propertyMetadataFactoryProphecy->create(Dummy::class, 'relatedDummy')->shouldBeCalled()->willReturn(new PropertyMetadata(new Type(Type::BUILTIN_TYPE_OBJECT, true, RelatedDummy::class), 'This is a related dummy \o/.', true, true, true, true, false, false, null, null, []));
         $propertyMetadataFactoryProphecy->create(RelatedDummy::class, 'name')->shouldBeCalled()->willReturn(new PropertyMetadata(new Type(Type::BUILTIN_TYPE_STRING), 'This is a name.', true, true, true, true, false, false, null, null, []));
 
-        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
-        $resourceClassResolverProphecy->isResourceClass(Dummy::class)->willReturn(true);
-        $resourceClassResolverProphecy->isResourceClass(RelatedDummy::class)->willReturn(true);
-
         $operationPathResolver = new CustomOperationPathResolver(new OperationPathResolver(new UnderscorePathSegmentNameGenerator()));
 
         $normalizer = new DocumentationNormalizer(
             $resourceMetadataFactoryProphecy->reveal(),
             $propertyNameCollectionFactoryProphecy->reveal(),
             $propertyMetadataFactoryProphecy->reveal(),
-            $resourceClassResolverProphecy->reveal(),
+            null,
             null,
             $operationPathResolver,
             null,
@@ -1810,7 +1862,10 @@ class DocumentationNormalizerV3Test extends TestCase
                                 'name' => 'page',
                                 'in' => 'query',
                                 'required' => false,
-                                'schema' => ['type' => 'integer'],
+                                'schema' => [
+                                    'type' => 'integer',
+                                    'default' => 1,
+                                ],
                                 'description' => 'The collection page number',
                             ],
                         ],
@@ -1970,7 +2025,7 @@ class DocumentationNormalizerV3Test extends TestCase
             'This is a dummy.',
             null,
             [],
-            ['get' => ['method' => 'GET', 'filters' => ['f1', 'f2', 'f3', 'f4']] + self::OPERATION_FORMATS]
+            ['get' => ['method' => 'GET', 'filters' => ['f1', 'f2', 'f3', 'f4', 'f5']] + self::OPERATION_FORMATS]
         );
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create(Dummy::class)->shouldBeCalled()->willReturn($dummyMetadata);
@@ -1978,16 +2033,13 @@ class DocumentationNormalizerV3Test extends TestCase
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
         $propertyMetadataFactoryProphecy->create(Dummy::class, 'name')->shouldBeCalled()->willReturn(new PropertyMetadata(new Type(Type::BUILTIN_TYPE_STRING), 'This is a name.', true, true, true, true, false, false, null, null, []));
 
-        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
-        $resourceClassResolverProphecy->isResourceClass(Dummy::class)->willReturn(true);
-
         $operationPathResolver = new CustomOperationPathResolver(new OperationPathResolver(new UnderscorePathSegmentNameGenerator()));
 
         $normalizer = new DocumentationNormalizer(
             $resourceMetadataFactoryProphecy->reveal(),
             $propertyNameCollectionFactoryProphecy->reveal(),
             $propertyMetadataFactoryProphecy->reveal(),
-            $resourceClassResolverProphecy->reveal(),
+            null,
             null,
             $operationPathResolver,
             null,
@@ -2064,10 +2116,22 @@ class DocumentationNormalizerV3Test extends TestCase
                                 'explode' => true,
                             ],
                             [
+                                'name' => 'order[name]',
+                                'in' => 'query',
+                                'required' => false,
+                                'schema' => [
+                                    'type' => 'string',
+                                    'enum' => ['asc', 'desc'],
+                                ],
+                            ],
+                            [
                                 'name' => 'page',
                                 'in' => 'query',
                                 'required' => false,
-                                'schema' => ['type' => 'integer'],
+                                'schema' => [
+                                    'type' => 'integer',
+                                    'default' => 1,
+                                ],
                                 'description' => 'The collection page number',
                             ],
                         ],
@@ -2139,9 +2203,6 @@ class DocumentationNormalizerV3Test extends TestCase
         $propertyMetadataFactoryProphecy->create(Question::class, 'answer')->shouldBeCalled()->willReturn(new PropertyMetadata(new Type(Type::BUILTIN_TYPE_OBJECT, false, Question::class, true, null, new Type(Type::BUILTIN_TYPE_OBJECT, false, Answer::class)), 'This is a name.', true, true, true, true, false, false, null, null, [], $subresourceMetadata));
 
         $propertyMetadataFactoryProphecy->create(Answer::class, 'content')->shouldBeCalled()->willReturn(new PropertyMetadata(new Type(Type::BUILTIN_TYPE_OBJECT, false, Question::class, true, null, new Type(Type::BUILTIN_TYPE_OBJECT, false, Answer::class)), 'This is a name.', true, true, true, true, false, false, null, null, []));
-        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
-        $resourceClassResolverProphecy->isResourceClass(Question::class)->willReturn(true);
-        $resourceClassResolverProphecy->isResourceClass(Answer::class)->willReturn(true);
 
         $routeCollection = new RouteCollection();
         $routeCollection->add('api_questions_answer_get_subresource', new Route('/api/questions/{id}/answer.{_format}'));
@@ -2162,7 +2223,7 @@ class DocumentationNormalizerV3Test extends TestCase
             $resourceMetadataFactory,
             $propertyNameCollectionFactory,
             $propertyMetadataFactory,
-            $resourceClassResolverProphecy->reveal(),
+            null,
             null,
             $operationPathResolver,
             null,
@@ -2303,8 +2364,6 @@ class DocumentationNormalizerV3Test extends TestCase
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
         $propertyMetadataFactoryProphecy->create(Dummy::class, 'id')->shouldBeCalled()->willReturn(new PropertyMetadata(new Type(Type::BUILTIN_TYPE_INT), 'This is an id.', true, false));
         $propertyMetadataFactoryProphecy->create(Dummy::class, 'name')->shouldBeCalled()->willReturn(new PropertyMetadata(new Type(Type::BUILTIN_TYPE_STRING), 'This is a name.', true, true, true, true, false, false, null, null, ['openapi_context' => ['type' => 'string', 'enum' => ['one', 'two'], 'example' => 'one']]));
-        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
-        $resourceClassResolverProphecy->isResourceClass(Dummy::class)->willReturn(true);
 
         $operationPathResolver = new CustomOperationPathResolver(new OperationPathResolver(new UnderscorePathSegmentNameGenerator()));
 
@@ -2312,7 +2371,7 @@ class DocumentationNormalizerV3Test extends TestCase
             $resourceMetadataFactoryProphecy->reveal(),
             $propertyNameCollectionFactoryProphecy->reveal(),
             $propertyMetadataFactoryProphecy->reveal(),
-            $resourceClassResolverProphecy->reveal(),
+            null,
             null,
             $operationPathResolver,
             null,
@@ -2419,8 +2478,6 @@ class DocumentationNormalizerV3Test extends TestCase
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
         $propertyMetadataFactoryProphecy->create(Dummy::class, 'id')->shouldBeCalled()->willReturn(new PropertyMetadata(new Type(Type::BUILTIN_TYPE_INT), 'This is an id.', true, false));
         $propertyMetadataFactoryProphecy->create(Dummy::class, 'name')->shouldBeCalled()->willReturn(new PropertyMetadata(new Type(Type::BUILTIN_TYPE_STRING), 'This is a name.', true, true, true, true, false, false, null, null, ['openapi_context' => ['type' => 'string', 'enum' => ['one', 'two'], 'example' => 'one']]));
-        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
-        $resourceClassResolverProphecy->isResourceClass(Dummy::class)->willReturn(true);
 
         $operationPathResolver = new CustomOperationPathResolver(new OperationPathResolver(new UnderscorePathSegmentNameGenerator()));
 
@@ -2428,7 +2485,7 @@ class DocumentationNormalizerV3Test extends TestCase
             $resourceMetadataFactoryProphecy->reveal(),
             $propertyNameCollectionFactoryProphecy->reveal(),
             $propertyMetadataFactoryProphecy->reveal(),
-            $resourceClassResolverProphecy->reveal(),
+            null,
             null,
             $operationPathResolver,
             null,
@@ -2471,7 +2528,10 @@ class DocumentationNormalizerV3Test extends TestCase
                                 'name' => 'page',
                                 'in' => 'query',
                                 'required' => false,
-                                'schema' => ['type' => 'integer'],
+                                'schema' => [
+                                    'type' => 'integer',
+                                    'default' => 1,
+                                ],
                                 'description' => 'The collection page number',
                             ],
                             [
@@ -2480,6 +2540,139 @@ class DocumentationNormalizerV3Test extends TestCase
                                 'required' => false,
                                 'schema' => ['type' => 'boolean'],
                                 'description' => 'Enable or disable pagination',
+                            ],
+                        ],
+                        'responses' => [
+                            '200' => [
+                                'description' => 'Dummy collection response',
+                                'content' => [
+                                    'application/ld+json' => [
+                                        'schema' => [
+                                            'type' => 'array',
+                                            'items' => ['$ref' => '#/components/schemas/Dummy'],
+                                        ],
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ]),
+                ],
+            ]),
+            'components' => [
+                'schemas' => new \ArrayObject([
+                    'Dummy' => new \ArrayObject([
+                        'type' => 'object',
+                        'description' => 'This is a dummy.',
+                        'externalDocs' => ['url' => 'http://schema.example.com/Dummy'],
+                        'properties' => [
+                            'id' => new \ArrayObject([
+                                'type' => 'integer',
+                                'description' => 'This is an id.',
+                                'readOnly' => true,
+                            ]),
+                            'name' => new \ArrayObject([
+                                'type' => 'string',
+                                'description' => 'This is a name.',
+                                'enum' => ['one', 'two'],
+                                'example' => 'one',
+                            ]),
+                        ],
+                    ]),
+                ]),
+            ],
+        ];
+
+        $this->assertEquals($expected, $normalizer->normalize($documentation, DocumentationNormalizer::FORMAT, ['base_url' => '/app_dev.php/']));
+    }
+
+    public function testNormalizeWithPaginationCustomDefaultAndMaxItemsPerPage(): void
+    {
+        $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), 'Test API', 'This is a test API.', '1.2.3');
+
+        $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
+        $propertyNameCollectionFactoryProphecy->create(Dummy::class, [])->shouldBeCalled()->willReturn(new PropertyNameCollection(['id', 'name']));
+
+        $dummyMetadata = new ResourceMetadata(
+            'Dummy',
+            'This is a dummy.',
+            'http://schema.example.com/Dummy',
+            [],
+            ['get' => ['method' => 'GET'] + self::OPERATION_FORMATS],
+            ['pagination_client_items_per_page' => true, 'pagination_items_per_page' => 20, 'maximum_items_per_page' => 80]
+        );
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
+        $resourceMetadataFactoryProphecy->create(Dummy::class)->shouldBeCalled()->willReturn($dummyMetadata);
+
+        $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
+        $propertyMetadataFactoryProphecy->create(Dummy::class, 'id')->shouldBeCalled()->willReturn(new PropertyMetadata(new Type(Type::BUILTIN_TYPE_INT), 'This is an id.', true, false));
+        $propertyMetadataFactoryProphecy->create(Dummy::class, 'name')->shouldBeCalled()->willReturn(new PropertyMetadata(new Type(Type::BUILTIN_TYPE_STRING), 'This is a name.', true, true, true, true, false, false, null, null, ['openapi_context' => ['type' => 'string', 'enum' => ['one', 'two'], 'example' => 'one']]));
+
+        $operationPathResolver = new CustomOperationPathResolver(new OperationPathResolver(new UnderscorePathSegmentNameGenerator()));
+
+        $normalizer = new DocumentationNormalizer(
+            $resourceMetadataFactoryProphecy->reveal(),
+            $propertyNameCollectionFactoryProphecy->reveal(),
+            $propertyMetadataFactoryProphecy->reveal(),
+            null,
+            null,
+            $operationPathResolver,
+            null,
+            null,
+            null,
+            false,
+            '',
+            '',
+            '',
+            '',
+            [],
+            [],
+            null,
+            true,
+            'page',
+            false,
+            'itemsPerPage',
+            [],
+            false,
+            'pagination',
+            ['spec_version' => 3]
+        );
+
+        $expected = [
+            'openapi' => '3.0.2',
+            'servers' => [['url' => '/app_dev.php/']],
+            'info' => [
+                'title' => 'Test API',
+                'description' => 'This is a test API.',
+                'version' => '1.2.3',
+            ],
+            'paths' => new \ArrayObject([
+                '/dummies' => [
+                    'get' => new \ArrayObject([
+                        'tags' => ['Dummy'],
+                        'operationId' => 'getDummyCollection',
+                        'summary' => 'Retrieves the collection of Dummy resources.',
+                        'parameters' => [
+                            [
+                                'name' => 'page',
+                                'in' => 'query',
+                                'required' => false,
+                                'schema' => [
+                                    'type' => 'integer',
+                                    'default' => 1,
+                                ],
+                                'description' => 'The collection page number',
+                            ],
+                            [
+                                'name' => 'itemsPerPage',
+                                'in' => 'query',
+                                'required' => false,
+                                'schema' => [
+                                    'type' => 'integer',
+                                    'default' => 20,
+                                    'minimum' => 0,
+                                    'maximum' => 80,
+                                ],
+                                'description' => 'The number of items per page',
                             ],
                         ],
                         'responses' => [
@@ -2567,8 +2760,6 @@ class DocumentationNormalizerV3Test extends TestCase
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
         $propertyMetadataFactoryProphecy->create(Dummy::class, 'id')->shouldBeCalled()->willReturn(new PropertyMetadata(new Type(Type::BUILTIN_TYPE_INT), 'This is an id.', true, false, null, null, null, true));
         $propertyMetadataFactoryProphecy->create(Dummy::class, 'name')->shouldBeCalled()->willReturn(new PropertyMetadata(new Type(Type::BUILTIN_TYPE_STRING), 'This is a name.', true, true, true, true, false, false, null, null, []));
-        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
-        $resourceClassResolverProphecy->isResourceClass(Dummy::class)->willReturn(true);
 
         $operationPathResolver = new OperationPathResolver(new UnderscorePathSegmentNameGenerator());
 
@@ -2576,7 +2767,7 @@ class DocumentationNormalizerV3Test extends TestCase
             $resourceMetadataFactoryProphecy->reveal(),
             $propertyNameCollectionFactoryProphecy->reveal(),
             $propertyMetadataFactoryProphecy->reveal(),
-            $resourceClassResolverProphecy->reveal(),
+            null,
             null,
             $operationPathResolver,
             null,

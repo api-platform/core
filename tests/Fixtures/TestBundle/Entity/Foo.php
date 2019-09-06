@@ -21,9 +21,17 @@ use Doctrine\ORM\Mapping as ORM;
  *
  * @author Vincent Chalamon <vincentchalamon@gmail.com>
  *
- * @ApiResource(attributes={
- *     "order"={"bar", "name"="DESC"}
- * })
+ * @ApiResource(
+ *     attributes={
+ *         "order"={"bar", "name"="DESC"}
+ *     },
+ *     graphql={
+ *         "item_query",
+ *         "collection_query"={"pagination_enabled"=false},
+ *         "create",
+ *         "delete"
+ *     }
+ * )
  * @ORM\Entity
  */
 class Foo

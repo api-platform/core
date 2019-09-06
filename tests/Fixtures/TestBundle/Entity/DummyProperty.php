@@ -35,7 +35,8 @@ use Symfony\Component\Serializer\Annotation\Groups;
  *         }
  *     },
  *     graphql={
- *         "query",
+ *         "item_query",
+ *         "collection_query",
  *         "update",
  *         "delete",
  *         "create"={

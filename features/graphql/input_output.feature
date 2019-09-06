@@ -55,6 +55,37 @@ Feature: GraphQL DTO input and output
     }
     """
 
+  Scenario: Create an item with custom input and output
+    When I send the following GraphQL request:
+    """
+    mutation {
+      createDummyDtoInputOutput(input: {foo: "A foo", bar: 4, clientMutationId: "myId"}) {
+        dummyDtoInputOutput {
+          baz,
+          bat
+        }
+        clientMutationId
+      }
+    }
+    """
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/json"
+    And the JSON should be equal to:
+    """
+    {
+      "data": {
+        "createDummyDtoInputOutput": {
+          "dummyDtoInputOutput": {
+            "baz": 4,
+            "bat": "A foo"
+          },
+          "clientMutationId": "myId"
+        }
+      }
+    }
+    """
+
   Scenario: Create an item using custom inputClass & disabled outputClass
     Given there are 2 dummyDtoNoOutput objects
     When I send the following GraphQL request:
@@ -76,7 +107,7 @@ Feature: GraphQL DTO input and output
     {
       "errors": [
         {
-          "message": "Cannot query field \"id\" on type \"DummyDtoNoOutput\".",
+          "message": "Cannot query field \"id\" on type \"DummyDtoNoOutputItem\".",
           "extensions": {
             "category": "graphql"
           },
@@ -132,33 +163,6 @@ Feature: GraphQL DTO input and output
           ]
         }
       ]
-    }
-    """
-
-  Scenario: Create an item with empty input fields using disabled inputClass (no persist done)
-    When I send the following GraphQL request:
-    """
-    mutation {
-      createDummyDtoNoInput(input: {clientMutationId: "myId"}) {
-        dummyDtoNoInput {
-          id
-        }
-        clientMutationId
-      }
-    }
-    """
-    Then the response status code should be 200
-    And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/json"
-    And the JSON should be equal to:
-    """
-    {
-      "data": {
-        "createDummyDtoNoInput": {
-          "dummyDtoNoInput": null,
-          "clientMutationId": "myId"
-        }
-      }
     }
     """
 

@@ -17,7 +17,6 @@ use ApiPlatform\Core\Util\RequestAttributesExtractor;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
 use Symfony\Component\HttpKernel\EventListener\ExceptionListener as BaseExceptionListener;
-use Symfony\Component\Messenger\Exception\HandlerFailedException;
 
 /**
  * Handles requests errors.
@@ -43,18 +42,6 @@ final class ExceptionListener
             !((RequestAttributesExtractor::extractAttributes($request)['respond'] ?? $request->attributes->getBoolean('_api_respond', false)) || $request->attributes->getBoolean('_graphql', false))
         ) {
             return;
-        }
-
-        // unwrap the exception thrown in handler for Symfony Messenger >= 4.3
-        $exception = $event->getException();
-        if ($exception instanceof HandlerFailedException) {
-            /** @var \Throwable $previousException */
-            $previousException = $exception->getPrevious();
-            if (!$previousException instanceof \Exception) {
-                throw $previousException;
-            }
-
-            $event->setException($previousException);
         }
 
         $this->exceptionListener->onKernelException($event);

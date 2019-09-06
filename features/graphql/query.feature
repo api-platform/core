@@ -23,7 +23,7 @@ Feature: GraphQL query support
     {
       node(id: "/dummies/1") {
         id
-        ... on Dummy {
+        ... on DummyItem {
           name
         }
       }

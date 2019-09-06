@@ -20,7 +20,7 @@ use ApiPlatform\Core\DataProvider\ContextAwareCollectionDataProviderInterface;
 use ApiPlatform\Core\DataProvider\RestrictedDataProviderInterface;
 use ApiPlatform\Core\Exception\RuntimeException;
 use Doctrine\Common\Persistence\ManagerRegistry;
-use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\ORM\EntityManagerInterface;
 
 /**
  * Collection data provider for the Doctrine ORM.
@@ -45,7 +45,7 @@ class CollectionDataProvider implements ContextAwareCollectionDataProviderInterf
 
     public function supports(string $resourceClass, string $operationName = null, array $context = []): bool
     {
-        return null !== $this->managerRegistry->getManagerForClass($resourceClass);
+        return $this->managerRegistry->getManagerForClass($resourceClass) instanceof EntityManagerInterface;
     }
 
     /**
@@ -55,7 +55,7 @@ class CollectionDataProvider implements ContextAwareCollectionDataProviderInterf
      */
     public function getCollection(string $resourceClass, string $operationName = null, array $context = [])
     {
-        /** @var ObjectManager $manager */
+        /** @var EntityManagerInterface $manager */
         $manager = $this->managerRegistry->getManagerForClass($resourceClass);
 
         $repository = $manager->getRepository($resourceClass);

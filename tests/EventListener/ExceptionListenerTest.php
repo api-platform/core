@@ -35,9 +35,9 @@ class ExceptionListenerTest extends TestCase
         $kernel->handle(Argument::type(Request::class), HttpKernelInterface::SUB_REQUEST, false)->willReturn(new Response())->shouldBeCalled();
 
         $eventProphecy = $this->prophesize(GetResponseForExceptionEvent::class);
-        $eventProphecy->getRequest()->willReturn($request)->shouldBeCalled();
-        $eventProphecy->getException()->willReturn(new \Exception())->shouldBeCalled();
-        $eventProphecy->getKernel()->willReturn($kernel)->shouldBeCalled();
+        $eventProphecy->getRequest()->willReturn($request);
+        $eventProphecy->getException()->willReturn(new \Exception());
+        $eventProphecy->getKernel()->willReturn($kernel);
         $eventProphecy->setResponse(Argument::type(Response::class))->shouldBeCalled();
 
         $listener = new ExceptionListener('foo:bar');
@@ -55,7 +55,8 @@ class ExceptionListenerTest extends TestCase
     public function testDoNothingWhenNotAnApiCall()
     {
         $eventProphecy = $this->prophesize(GetResponseForExceptionEvent::class);
-        $eventProphecy->getRequest()->willReturn(new Request())->shouldBeCalled();
+        $eventProphecy->getRequest()->willReturn(new Request());
+        $eventProphecy->setResponse(Argument::type(Response::class))->shouldNotBeCalled();
 
         $listener = new ExceptionListener('foo:bar');
         $listener->onKernelException($eventProphecy->reveal());
@@ -67,7 +68,8 @@ class ExceptionListenerTest extends TestCase
         $request->setRequestFormat('html');
 
         $eventProphecy = $this->prophesize(GetResponseForExceptionEvent::class);
-        $eventProphecy->getRequest()->willReturn($request)->shouldBeCalled();
+        $eventProphecy->getRequest()->willReturn($request);
+        $eventProphecy->setResponse(Argument::type(Response::class))->shouldNotBeCalled();
 
         $listener = new ExceptionListener('foo:bar');
         $listener->onKernelException($eventProphecy->reveal());

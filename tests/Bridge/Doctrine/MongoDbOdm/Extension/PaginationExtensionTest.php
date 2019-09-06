@@ -207,7 +207,7 @@ class PaginationExtensionTest extends TestCase
 
         $aggregationBuilderProphecy = $this->mockAggregationBuilder(10, 5);
 
-        $context = ['filters' => ['pagination' => true, 'first' => 5, 'after' => 'OQ=='], 'graphql' => true];
+        $context = ['filters' => ['pagination' => true, 'first' => 5, 'after' => 'OQ=='], 'graphql_operation_name' => 'query'];
 
         $extension = new PaginationExtension(
             $this->managerRegistryProphecy->reveal(),
@@ -240,7 +240,7 @@ class PaginationExtensionTest extends TestCase
         $countProphecy->execute()->shouldBeCalled()->willReturn($iteratorProphecy->reveal());
         $aggregationBuilderProphecy->count('count')->shouldBeCalled()->willReturn($countProphecy->reveal());
 
-        $context = ['filters' => ['pagination' => true, 'last' => 5], 'graphql' => true];
+        $context = ['filters' => ['pagination' => true, 'last' => 5], 'graphql_operation_name' => 'query'];
 
         $extension = new PaginationExtension(
             $this->managerRegistryProphecy->reveal(),
@@ -282,6 +282,28 @@ class PaginationExtensionTest extends TestCase
         $aggregationBuilderProphecy->facet()->shouldNotBeCalled();
 
         $context = [];
+
+        $extension = new PaginationExtension(
+            $this->managerRegistryProphecy->reveal(),
+            $pagination
+        );
+        $extension->applyToCollection($aggregationBuilderProphecy->reveal(), 'Foo', 'op', $context);
+    }
+
+    public function testApplyToCollectionGraphQlPaginationDisabled()
+    {
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
+        $resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadata(null, null, null, [], []));
+        $resourceMetadataFactory = $resourceMetadataFactoryProphecy->reveal();
+
+        $pagination = new Pagination($resourceMetadataFactory, [], [
+            'enabled' => false,
+        ]);
+
+        $aggregationBuilderProphecy = $this->prophesize(Builder::class);
+        $aggregationBuilderProphecy->facet()->shouldNotBeCalled();
+
+        $context = ['graphql_operation_name' => 'op'];
 
         $extension = new PaginationExtension(
             $this->managerRegistryProphecy->reveal(),
@@ -366,6 +388,23 @@ class PaginationExtensionTest extends TestCase
             $pagination
         );
         $this->assertFalse($extension->supportsResult('Foo', 'op', ['filters' => ['enabled' => false]]));
+    }
+
+    public function testSupportsResultGraphQlPaginationDisabled()
+    {
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
+        $resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadata(null, null, null, [], []));
+        $resourceMetadataFactory = $resourceMetadataFactoryProphecy->reveal();
+
+        $pagination = new Pagination($resourceMetadataFactory, [], [
+            'enabled' => false,
+        ]);
+
+        $extension = new PaginationExtension(
+            $this->managerRegistryProphecy->reveal(),
+            $pagination
+        );
+        $this->assertFalse($extension->supportsResult('Foo', 'op', ['filters' => ['enabled' => false], 'graphql_operation_name' => 'op']));
     }
 
     public function testGetResult()

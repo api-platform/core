@@ -10,32 +10,78 @@
         <!-- Resolvers -->
 
         <service id="api_platform.graphql.resolver.factory.item" class="ApiPlatform\Core\GraphQl\Resolver\Factory\ItemResolverFactory" public="false">
-            <argument type="service" id="api_platform.iri_converter" />
+            <argument type="service" id="api_platform.graphql.resolver.stage.read" />
+            <argument type="service" id="api_platform.graphql.resolver.stage.security" />
+            <argument type="service" id="api_platform.graphql.resolver.stage.security_post_denormalize" />
+            <argument type="service" id="api_platform.graphql.resolver.stage.serialize" />
             <argument type="service" id="api_platform.graphql.query_resolver_locator" />
-            <argument type="service" id="serializer" />
             <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
-            <argument type="service" id="api_platform.security.resource_access_checker" on-invalid="ignore" />
         </service>
 
         <service id="api_platform.graphql.resolver.factory.collection" class="ApiPlatform\Core\GraphQl\Resolver\Factory\CollectionResolverFactory" public="false">
-            <argument type="service" id="api_platform.collection_data_provider" />
-            <argument type="service" id="api_platform.subresource_data_provider" />
+            <argument type="service" id="api_platform.graphql.resolver.stage.read" />
+            <argument type="service" id="api_platform.graphql.resolver.stage.security" />
+            <argument type="service" id="api_platform.graphql.resolver.stage.security_post_denormalize" />
+            <argument type="service" id="api_platform.graphql.resolver.stage.serialize" />
             <argument type="service" id="api_platform.graphql.query_resolver_locator" />
-            <argument type="service" id="serializer" />
             <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
-            <argument type="service" id="api_platform.security.resource_access_checker" on-invalid="null" />
             <argument type="service" id="request_stack" />
-            <argument>%api_platform.collection.pagination.enabled%</argument>
         </service>
 
         <service id="api_platform.graphql.resolver.factory.item_mutation" class="ApiPlatform\Core\GraphQl\Resolver\Factory\ItemMutationResolverFactory" public="false">
-            <argument type="service" id="api_platform.iri_converter" />
-            <argument type="service" id="api_platform.data_persister" />
+            <argument type="service" id="api_platform.graphql.resolver.stage.read" />
+            <argument type="service" id="api_platform.graphql.resolver.stage.security" />
+            <argument type="service" id="api_platform.graphql.resolver.stage.security_post_denormalize" />
+            <argument type="service" id="api_platform.graphql.resolver.stage.serialize" />
+            <argument type="service" id="api_platform.graphql.resolver.stage.deserialize" />
+            <argument type="service" id="api_platform.graphql.resolver.stage.write" />
+            <argument type="service" id="api_platform.graphql.resolver.stage.validate" />
             <argument type="service" id="api_platform.graphql.mutation_resolver_locator" />
-            <argument type="service" id="serializer" />
             <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
-            <argument type="service" id="api_platform.security.resource_access_checker" on-invalid="null" />
-            <argument type="service" id="api_platform.validator" on-invalid="null" />
+        </service>
+
+        <!-- Resolver Stages -->
+
+        <service id="api_platform.graphql.resolver.stage.read" class="ApiPlatform\Core\GraphQl\Resolver\Stage\ReadStage" public="false">
+            <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
+            <argument type="service" id="api_platform.iri_converter" />
+            <argument type="service" id="api_platform.collection_data_provider" />
+            <argument type="service" id="api_platform.subresource_data_provider" />
+            <argument type="service" id="api_platform.graphql.serializer.context_builder" />
+        </service>
+
+        <service id="api_platform.graphql.resolver.stage.security" class="ApiPlatform\Core\GraphQl\Resolver\Stage\SecurityStage" public="false">
+            <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
+            <argument type="service" id="api_platform.security.resource_access_checker" />
+        </service>
+
+        <service id="api_platform.graphql.resolver.stage.security_post_denormalize" class="ApiPlatform\Core\GraphQl\Resolver\Stage\SecurityPostDenormalizeStage" public="false">
+            <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
+            <argument type="service" id="api_platform.security.resource_access_checker" />
+        </service>
+
+        <service id="api_platform.graphql.resolver.stage.serialize" class="ApiPlatform\Core\GraphQl\Resolver\Stage\SerializeStage" public="false">
+            <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
+            <argument type="service" id="serializer" />
+            <argument type="service" id="api_platform.graphql.serializer.context_builder" />
+            <argument type="service" id="api_platform.pagination" />
+        </service>
+
+        <service id="api_platform.graphql.resolver.stage.deserialize" class="ApiPlatform\Core\GraphQl\Resolver\Stage\DeserializeStage" public="false">
+            <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
+            <argument type="service" id="serializer" />
+            <argument type="service" id="api_platform.graphql.serializer.context_builder" />
+        </service>
+
+        <service id="api_platform.graphql.resolver.stage.write" class="ApiPlatform\Core\GraphQl\Resolver\Stage\WriteStage" public="false">
+            <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
+            <argument type="service" id="api_platform.data_persister" />
+            <argument type="service" id="api_platform.graphql.serializer.context_builder" />
+        </service>
+
+        <service id="api_platform.graphql.resolver.stage.validate" class="ApiPlatform\Core\GraphQl\Resolver\Stage\ValidateStage" public="false">
+            <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
+            <argument type="service" id="api_platform.validator" />
         </service>
 
         <service id="api_platform.graphql.resolver.resource_field" class="ApiPlatform\Core\GraphQl\Resolver\ResourceFieldResolver" public="false">
@@ -89,7 +135,7 @@
             <argument type="service" id="api_platform.graphql.resolver.factory.collection" />
             <argument type="service" id="api_platform.graphql.resolver.factory.item_mutation" />
             <argument type="service" id="api_platform.filter_locator" />
-            <argument>%api_platform.collection.pagination.enabled%</argument>
+            <argument type="service" id="api_platform.pagination" />
         </service>
 
         <service id="api_platform.graphql.fields_builder_locator" class="Symfony\Component\DependencyInjection\ServiceLocator" public="false">
@@ -163,6 +209,11 @@
             <!-- Run after serializer.denormalizer.array but before serializer.normalizer.object -->
             <tag name="serializer.normalizer" priority="-995" />
         </service>
+
+        <service id="api_platform.graphql.serializer.context_builder" class="ApiPlatform\Core\GraphQl\Serializer\SerializerContextBuilder" public="false">
+            <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
+        </service>
+        <service id="ApiPlatform\Core\GraphQl\Serializer\SerializerContextBuilderInterface" alias="api_platform.graphql.serializer.context_builder" />
 
         <!-- Command -->
 

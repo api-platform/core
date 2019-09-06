@@ -82,6 +82,16 @@ parameters:
     container.dumper.inline_class_loader: true
 
 services:
+    test.client:
+        class: ApiPlatform\Core\Tests\Fixtures\TestBundle\BrowserKit\Client
+        shared: false
+        public: true
+        arguments:
+            - '@kernel'
+            - '%test.client.parameters%'
+            - '@test.client.history'
+            - '@test.client.cookiejar'
+
     ApiPlatform\Core\Tests\Fixtures\TestBundle\MessageHandler\:
         resource: '../../TestBundle/MessageHandler'
         autowire: true

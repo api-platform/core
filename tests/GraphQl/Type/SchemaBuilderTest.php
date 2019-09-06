@@ -76,9 +76,10 @@ class SchemaBuilderTest extends TestCase
         $typeFoo->name = 'Foo';
         $this->typesContainerProphecy->get('Foo')->willReturn(GraphQLType::listOf($typeFoo));
         $this->fieldsBuilderProphecy->getNodeQueryFields()->shouldBeCalled()->willReturn(['node_fields']);
-        $this->fieldsBuilderProphecy->getQueryFields($resourceClass, $resourceMetadata, 'query', [], [])->willReturn(['query' => ['query_fields']]);
-        $this->fieldsBuilderProphecy->getQueryFields($resourceClass, $resourceMetadata, 'custom_item_query', ['item_query' => 'item_query_resolver'], false)->willReturn(['custom_item_query' => ['custom_item_query_fields']]);
-        $this->fieldsBuilderProphecy->getQueryFields($resourceClass, $resourceMetadata, 'custom_collection_query', false, ['collection_query' => 'collection_query_resolver'])->willReturn(['custom_collection_query' => ['custom_collection_query_fields']]);
+        $this->fieldsBuilderProphecy->getItemQueryFields($resourceClass, $resourceMetadata, 'item_query', [])->willReturn(['query' => ['query_fields']]);
+        $this->fieldsBuilderProphecy->getCollectionQueryFields($resourceClass, $resourceMetadata, 'collection_query', [])->willReturn(['query' => ['query_fields']]);
+        $this->fieldsBuilderProphecy->getItemQueryFields($resourceClass, $resourceMetadata, 'custom_item_query', ['item_query' => 'item_query_resolver'])->willReturn(['custom_item_query' => ['custom_item_query_fields']]);
+        $this->fieldsBuilderProphecy->getCollectionQueryFields($resourceClass, $resourceMetadata, 'custom_collection_query', ['collection_query' => 'collection_query_resolver'])->willReturn(['custom_collection_query' => ['custom_collection_query_fields']]);
         $this->fieldsBuilderProphecy->getMutationFields($resourceClass, $resourceMetadata, 'mutation')->willReturn(['mutation' => ['mutation_fields']]);
 
         $this->resourceNameCollectionFactoryProphecy->create()->willReturn(new ResourceNameCollection([$resourceClass]));
@@ -102,7 +103,16 @@ class SchemaBuilderTest extends TestCase
                     ],
                 ]), null,
             ],
-            'query' => ['resourceClass', (new ResourceMetadata())->withGraphql(['query' => []]),
+            'item query' => ['resourceClass', (new ResourceMetadata())->withGraphql(['item_query' => []]),
+                new ObjectType([
+                    'name' => 'Query',
+                    'fields' => [
+                        'node' => ['node_fields'],
+                        'query' => ['query_fields'],
+                    ],
+                ]), null,
+            ],
+            'collection query' => ['resourceClass', (new ResourceMetadata())->withGraphql(['collection_query' => []]),
                 new ObjectType([
                     'name' => 'Query',
                     'fields' => [

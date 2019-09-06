@@ -107,10 +107,32 @@ Feature: Collections filtering
       }
     }
     """
-    And the JSON node "data.dummies.edges[0].node.relatedDummies.edges" should have 0 elements
+    Then the JSON node "data.dummies.edges[0].node.relatedDummies.edges" should have 0 elements
     And the JSON node "data.dummies.edges[1].node.relatedDummies.edges" should have 0 elements
     And the JSON node "data.dummies.edges[2].node.relatedDummies.edges" should have 1 element
     And the JSON node "data.dummies.edges[2].node.relatedDummies.edges[0].node.name" should be equal to "RelatedDummy13"
+
+  @createSchema
+  Scenario: Use a filter of a nested collection
+    Given there is a DummyCar entity with related colors
+    When I send the following GraphQL request:
+    """
+    {
+      dummyCar(id: "/dummy_cars/1") {
+        id
+        colors(prop: "blue") {
+          edges {
+            node {
+              id
+              prop
+            }
+          }
+        }
+      }
+    }
+    """
+    Then the JSON node "data.dummyCar.colors.edges" should have 1 element
+    And the JSON node "data.dummyCar.colors.edges[0].node.prop" should be equal to "blue"
 
   @createSchema
   Scenario: Retrieve a collection filtered using the related search filter

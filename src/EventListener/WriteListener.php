@@ -106,7 +106,7 @@ final class WriteListener
 
                 break;
             case 'DELETE':
-                $this->dataPersister->remove($controllerResult);
+                $this->dataPersister->remove($controllerResult, $attributes);
                 $event->setControllerResult(null);
                 break;
         }
