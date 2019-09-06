@@ -204,8 +204,7 @@ executors:
   php-and-elasticsearch:
     docker:
       - image: circleci/php:7.3-node
-      # https://github.com/elastic/elasticsearch-docker/issues/84
-      - image: docker.elastic.co/elasticsearch/elasticsearch:6.7.2
+      - image: docker.elastic.co/elasticsearch/elasticsearch:6.8.3 # https://github.com/elastic/elasticsearch/issues/43627
   php-and-mongodb:
     docker:
       - image: circleci/php:7.3-node
@@ -215,7 +214,7 @@ jobs:
   php-cs-fixer:
     executor: php
     environment:
-      PHP_CS_FIXER_FUTURE_MODE: 1
+      PHP_CS_FIXER_FUTURE_MODE: '1'
     working_directory: ~/api-platform/core
     steps:
       - checkout
@@ -239,8 +238,7 @@ jobs:
   phpstan:
     executor: php
     environment:
-      # https://github.com/phpstan/phpstan-symfony/issues/37
-      APP_DEBUG: 1
+      APP_DEBUG: '1' # https://github.com/phpstan/phpstan-symfony/issues/37
     working_directory: ~/api-platform/core
     steps:
       - checkout

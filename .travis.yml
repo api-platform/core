@@ -6,8 +6,6 @@ cache:
     - $HOME/.npm
 
 .steps:
-  - &add-composer-bin-dir-to-path |
-      export PATH="$PATH:$HOME/.composer/vendor/bin"
   - &clear-test-app-cache |
       tests/Fixtures/app/console cache:clear
   - &disable-php-memory-limit |
@@ -33,13 +31,11 @@ cache:
 
 jobs:
   include:
-    - name: '(PHP 7.1)'
+    - name: 'Behat (PHP 7.1)'
       php: '7.1'
       before_install:
-        - *enable-mongodb-php-extension
         - *disable-xdebug-php-extension
         - *disable-php-memory-limit
-        - *add-composer-bin-dir-to-path
       install:
         - |
           composer remove --dev --no-progress --no-update --ansi \
@@ -49,69 +45,94 @@ jobs:
       before_script:
         - *clear-test-app-cache
       script:
-        - *run-phpunit-tests
-        - *clear-test-app-cache
         - *run-behat-tests
         - *validate-openapi-v2-json
         - *validate-openapi-v2-yaml
         - *validate-openapi-v3-json
         - *validate-openapi-v3-yaml
 
-    - name: '(PHP 7.2)'
+    - name: 'Behat (PHP 7.2)'
       php: '7.2'
       before_install:
         - *enable-mongodb-php-extension
         - *disable-xdebug-php-extension
         - *disable-php-memory-limit
-        - *add-composer-bin-dir-to-path
       install:
         - *update-project-dependencies
       before_script:
         - *clear-test-app-cache
       script:
-        - *run-phpunit-tests
-        - *clear-test-app-cache
         - *run-behat-tests
         - *validate-openapi-v2-json
         - *validate-openapi-v2-yaml
         - *validate-openapi-v3-json
         - *validate-openapi-v3-yaml
 
-    - name: '(PHP 7.3)'
+    - name: 'Behat (PHP 7.3)'
       php: '7.3'
       before_install:
         - *enable-mongodb-php-extension
         - *disable-xdebug-php-extension
         - *disable-php-memory-limit
-        - *add-composer-bin-dir-to-path
       install:
         - *update-project-dependencies
       before_script:
         - *clear-test-app-cache
       script:
-        - *run-phpunit-tests
-        - *clear-test-app-cache
         - *run-behat-tests
         - *validate-openapi-v2-json
         - *validate-openapi-v2-yaml
         - *validate-openapi-v3-json
         - *validate-openapi-v3-yaml
 
-    - name: '(PHP 7.3) (lowest dependencies)'
+    - name: 'Behat (PHP 7.4-rc)'
+      php: '7.4snapshot'
+      env: LEGACY=0
+      before_install:
+        - *enable-mongodb-php-extension
+        - *disable-xdebug-php-extension
+        - *disable-php-memory-limit
+      install:
+        - *update-project-dependencies
+      before_script:
+        - *clear-test-app-cache
+      script:
+        - vendor/bin/behat --format=progress --profile=default-no-legacy --no-interaction --colors
+        - *validate-openapi-v2-json
+        - *validate-openapi-v2-yaml
+        - *validate-openapi-v3-json
+        - *validate-openapi-v3-yaml
+
+    - name: 'Behat (PHP 7.3) (lowest dependencies)'
       php: '7.3'
       before_install:
         - *enable-mongodb-php-extension
         - *disable-xdebug-php-extension
         - *disable-php-memory-limit
-        - *add-composer-bin-dir-to-path
       install:
         - composer update --no-progress --no-suggest --prefer-stable --prefer-lowest --ansi
       before_script:
         - *clear-test-app-cache
       script:
-        - *run-phpunit-tests
-        - *clear-test-app-cache
         - *run-behat-tests
+        - *validate-openapi-v2-json
+        - *validate-openapi-v2-yaml
+        - *validate-openapi-v3-json
+        - *validate-openapi-v3-yaml
+
+    - name: 'Behat (PHP 7.4-rc) (lowest dependencies)'
+      php: '7.4snapshot'
+      env: LEGACY=0
+      before_install:
+        - *enable-mongodb-php-extension
+        - *disable-xdebug-php-extension
+        - *disable-php-memory-limit
+      install:
+        - composer update --no-progress --no-suggest --prefer-stable --prefer-lowest --ansi
+      before_script:
+        - *clear-test-app-cache
+      script:
+        - vendor/bin/behat --format=progress --profile=default-no-legacy --no-interaction --colors
         - *validate-openapi-v2-json
         - *validate-openapi-v2-yaml
         - *validate-openapi-v3-json
@@ -125,7 +146,6 @@ jobs:
         - *enable-mongodb-php-extension
         - *disable-xdebug-php-extension
         - *disable-php-memory-limit
-        - *add-composer-bin-dir-to-path
       install:
         - *update-project-dependencies
       before_script:
@@ -148,7 +168,6 @@ jobs:
         - *enable-mongodb-php-extension
         - *disable-xdebug-php-extension
         - *disable-php-memory-limit
-        - *add-composer-bin-dir-to-path
       install:
         - *update-project-dependencies
       before_script:
@@ -171,7 +190,6 @@ jobs:
         - *enable-mongodb-php-extension
         - *disable-xdebug-php-extension
         - *disable-php-memory-limit
-        - *add-composer-bin-dir-to-path
       install:
         - *update-project-dependencies
       before_script:
@@ -197,7 +215,6 @@ jobs:
         - *enable-mongodb-php-extension
         - *disable-xdebug-php-extension
         - *disable-php-memory-limit
-        - *add-composer-bin-dir-to-path
       install:
         - *update-project-dependencies
       before_script:
@@ -211,26 +228,4 @@ jobs:
         - *validate-openapi-v3-json
         - *validate-openapi-v3-yaml
 
-    - php: '7.3'
-      env: SYMFONY_DEPRECATIONS_HELPER=max[total]=5 # 5 deprecation notices from FOSUserBundle
-      before_install:
-        - *enable-mongodb-php-extension
-        - *disable-xdebug-php-extension
-        - *disable-php-memory-limit
-        - *add-composer-bin-dir-to-path
-      install:
-        - *update-project-dependencies
-      before_script:
-        - *clear-test-app-cache
-      script:
-        - *run-phpunit-tests
-        - *clear-test-app-cache
-        - *run-behat-tests
-        - *validate-openapi-v2-json
-        - *validate-openapi-v2-yaml
-        - *validate-openapi-v3-json
-        - *validate-openapi-v3-yaml
-
-  allow_failures:
-    - env: SYMFONY_DEPRECATIONS_HELPER=max[total]=5 # 5 deprecation notices from FOSUserBundle
   fast_finish: true

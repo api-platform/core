@@ -34,6 +34,12 @@ default:
           symfony2: ~
     'Behatch\Extension': ~
 
+default-no-legacy:
+  suites:
+    default:
+      filters:
+        tags: '~@postgres&&~@mongodb&&~@elasticsearch&&~@legacy'
+
 postgres:
   suites:
     default: false
