@@ -30,6 +30,7 @@ final class UploadType extends ScalarType implements TypeInterface
      * @var string
      */
     public $name = 'Upload';
+
     /**
      * @var string
      */

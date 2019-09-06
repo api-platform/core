@@ -21,7 +21,7 @@ use GraphQL\Executor\ExecutionResult;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\PropertyAccess\PropertyAccess;
+use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 /**
  * GraphQL API entrypoint.
@@ -38,8 +38,9 @@ final class EntrypointAction
     private $graphiqlEnabled;
     private $graphQlPlaygroundEnabled;
     private $defaultIde;
+    private $propertyAccessor;
 
-    public function __construct(SchemaBuilderInterface $schemaBuilder, ExecutorInterface $executor, GraphiQlAction $graphiQlAction, GraphQlPlaygroundAction $graphQlPlaygroundAction, bool $debug = false, bool $graphiqlEnabled = false, bool $graphQlPlaygroundEnabled = false, $defaultIde = false)
+    public function __construct(SchemaBuilderInterface $schemaBuilder, ExecutorInterface $executor, GraphiQlAction $graphiQlAction, GraphQlPlaygroundAction $graphQlPlaygroundAction, PropertyAccessorInterface $propertyAccessor, bool $debug = false, bool $graphiqlEnabled = false, bool $graphQlPlaygroundEnabled = false, $defaultIde = false)
     {
         $this->schemaBuilder = $schemaBuilder;
         $this->executor = $executor;
@@ -49,6 +50,7 @@ final class EntrypointAction
         $this->graphiqlEnabled = $graphiqlEnabled;
         $this->graphQlPlaygroundEnabled = $graphQlPlaygroundEnabled;
         $this->defaultIde = $defaultIde;
+        $this->propertyAccessor = $propertyAccessor;
     }
 
     public function __invoke(Request $request): Response
@@ -105,6 +107,8 @@ final class EntrypointAction
                 if ($request->request->has('map')) {
                     $variables = $this->applyMapToVariables($request, $variables);
                 }
+
+                return [$query, $operation, $variables];
             }
         }
 
@@ -140,14 +144,13 @@ final class EntrypointAction
         if (!$mapValues) {
             return $variables;
         }
-        $propertyAccessor = PropertyAccess::createPropertyAccessor();
         foreach ($mapValues as $key => $value) {
             if ($request->files->has($key)) {
                 foreach ($mapValues[$key] as $mapValue) {
                     $path = explode('.', $mapValue);
                     if ('variables' === $path[0]) {
                         unset($path[0]);
-                        $propertyAccessor->setValue($variables, '['.implode('][', $path).']', $request->files->get($key));
+                        $this->propertyAccessor->setValue($variables, '['.implode('][', $path).']', $request->files->get($key));
                     }
                 }
             }

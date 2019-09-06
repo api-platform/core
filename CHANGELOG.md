@@ -13,7 +13,7 @@
 * GraphQL: Improve serialization performance by avoiding calls to the `serialize` PHP function
 * GraphQL: Allow to use a search and an exist filter on the same resource
 * GraphQL: Refactor the architecture of the whole system to allow the decoration of useful services (`TypeConverter` to manage custom types, `SerializerContextBuilder` to modify the (de)serialization context dynamically, etc.)
-* GraphQL: Add support for form multipart request so user can create custom file upload mutations
+* GraphQL: Add support for multipart form request so user can create custom file upload mutations
 
 ## 2.4.7
 

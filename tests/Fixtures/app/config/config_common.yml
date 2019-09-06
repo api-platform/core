@@ -302,6 +302,7 @@ services:
         public: false
         tags:
             - { name: 'api_platform.graphql.mutation_resolver' }
+
     app.graphql.mutation_resolver.upload_multiple_media_object:
             class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\GraphQl\Resolver\UploadMultipleMediaObjectResolver'
             public: false

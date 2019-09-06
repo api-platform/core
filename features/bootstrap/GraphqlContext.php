@@ -110,33 +110,30 @@ final class GraphqlContext implements Context
                 throw new \Exception("You must provide a 'name' and 'file' column in your table node.");
             }
 
-            if (is_string($row['file'])) {
-                $files[$row['name']] = $this->restContext->getMinkParameter('files_path').DIRECTORY_SEPARATOR.$row['file'];
-            }
+            $files[$row['name']] = $this->restContext->getMinkParameter('files_path').DIRECTORY_SEPARATOR.$row['file'];
         }
 
         $this->graphqlRequest['files'] = $files;
     }
 
     /**
-     * @Given I have the following GraphQL form multipart map:
+     * @Given I have the following GraphQL multipart form map:
      */
-    public function iHaveTheFollowingGraphqlFormMultipartMap(PyStringNode $string)
+    public function iHaveTheFollowingGraphqlMultipartFormMap(PyStringNode $string)
     {
         $this->graphqlRequest['map'] = $string->getRaw();
     }
 
     /**
-     * @When I send the following GraphQL form multipart operations:
+     * @When I send the following GraphQL multipart form operations:
      */
-    public function iSendTheFollowingGraphqlFormMultipartOperations(PyStringNode $string)
+    public function iSendTheFollowingGraphqlMultipartFormOperations(PyStringNode $string)
     {
         $params = [];
         $params['operations'] = $string->getRaw();
         $params['map'] = $this->graphqlRequest['map'];
 
         $this->request->setHttpHeader('Content-type', 'multipart/form-data');
-        $this->request->setHttpHeader('Accept', null);
         $this->request->send('POST', '/graphql', $params, $this->graphqlRequest['files']);
     }
 

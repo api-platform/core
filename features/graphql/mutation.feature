@@ -424,18 +424,18 @@ Feature: GraphQL mutation support
 
   Scenario: Uploading a file with custom mutation
     Given I have the following files for a GraphQL request:
-      | name | file      |
+      | name | file     |
       | file | test.gif |
-    And I have the following GraphQL form multipart map:
+    And I have the following GraphQL multipart form map:
     """
     {
       "file":["variables.file"]
     }
     """
-    When I send the following GraphQL form multipart operations:
+    When I send the following GraphQL multipart form operations:
     """
       {
-        "query":"mutation($file:Upload!){\n uploadMediaObject(input:{file:$file}){\n mediaObject{\n id\n contentUrl\n }\n }\n }",
+        "query":"mutation($file:Upload!){ uploadMediaObject(input:{file:$file}){ mediaObject{ id contentUrl } } }",
         "variables":{
           "file": null
         }
@@ -447,11 +447,11 @@ Feature: GraphQL mutation support
 
   Scenario: Uploading multiple files with custom mutation
     Given I have the following files for a GraphQL request:
-      | name | file      |
+      | name | file     |
       | 0    | test.gif |
       | 1    | test.gif |
       | 2    | test.gif |
-    And I have the following GraphQL form multipart map:
+    And I have the following GraphQL multipart form map:
     """
     {
       "0": ["variables.files.0"],
@@ -459,10 +459,10 @@ Feature: GraphQL mutation support
       "2": ["variables.files.2"]
     }
     """
-    When I send the following GraphQL form multipart operations:
+    When I send the following GraphQl multipart form operations:
     """
       {
-        "query":"mutation($files:[Upload!]!){\n uploadMultipleMediaObject(input:{files:$files}){\n mediaObject{\n id\n contentUrl\n }\n }\n }",
+        "query":"mutation($files:[Upload!]!){ uploadMultipleMediaObject(input:{files:$files}){ mediaObject{ id contentUrl } } }",
         "variables":{
           "files": [
             null,
