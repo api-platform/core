@@ -25,12 +25,11 @@ class UploadMultipleMediaObjectResolver implements MutationResolverInterface
 {
     /**
      * @param MediaObject|null $item
-     *
-     * @return MediaObject|null The mutated item
      */
     public function __invoke($item, array $context): MediaObject
     {
         $result = [];
+        $mediaObject = null;
         //doing some process on uploaded files
         /** @var \Symfony\Component\HttpFoundation\File\UploadedFile $file */
         foreach ($context['args']['input']['files'] as $key => $file) {

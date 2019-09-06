@@ -422,6 +422,7 @@ Feature: GraphQL mutation support
     And the JSON node "data.testCustomArgumentsDummyCustomMutation.dummyCustomMutation.result" should be equal to "18"
     And the JSON node "data.testCustomArgumentsDummyCustomMutation.clientMutationId" should be equal to "myId"
 
+  @!mongodb
   Scenario: Uploading a file with custom mutation
     Given I have the following files for a GraphQL request:
       | name | file     |
@@ -445,6 +446,7 @@ Feature: GraphQL mutation support
     And the response should be in JSON
     And the JSON node "data.uploadMediaObject.mediaObject.contentUrl" should be equal to "test.gif"
 
+  @!mongodb
   Scenario: Uploading multiple files with custom mutation
     Given I have the following files for a GraphQL request:
       | name | file     |

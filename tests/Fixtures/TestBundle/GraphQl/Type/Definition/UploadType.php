@@ -17,6 +17,7 @@ use ApiPlatform\Core\GraphQl\Type\Definition\TypeInterface;
 use GraphQL\Error\Error;
 use GraphQL\Error\InvariantViolation;
 use GraphQL\Type\Definition\ScalarType;
+use GraphQL\Utils\Utils;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 /**
@@ -69,7 +70,7 @@ final class UploadType extends ScalarType implements TypeInterface
      */
     public function parseLiteral($valueNode, array $variables = null)
     {
-        throw new Error('`Upload` cannot be hardcoded in query, be sure to conform to GraphQL multipart request specification. Instead got: '.$valueNode->kind, $valueNode);
+        throw new Error('`Upload` cannot be hardcoded in query, be sure to conform to GraphQL multipart request specification.', $valueNode);
     }
 
     public function getName(): string

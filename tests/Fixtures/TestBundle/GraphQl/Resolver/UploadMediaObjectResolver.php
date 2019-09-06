@@ -25,8 +25,6 @@ class UploadMediaObjectResolver implements MutationResolverInterface
 {
     /**
      * @param MediaObject|null $item
-     *
-     * @return MediaObject|null The mutated item
      */
     public function __invoke($item, array $context): MediaObject
     {
