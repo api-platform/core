@@ -173,6 +173,13 @@ class EntrypointActionTest extends TestCase
                 ['file' => null],
                 new JsonResponse(['GraphQL']),
             ],
+            'upload when variable param does not exist' => [
+                '{"query": "graphqlQuery", "variables": {"file":null}, "operation": "graphqlOperationName"}',
+                '{"file":["variables.wrong"]}',
+                ['file' => $file],
+                ['file' => null],
+                new Response('{"errors":[{"message":"GraphQL variables are not valid JSON or multipart form map does not match the variables","extensions":{"category":"graphql"}}]}'),
+            ],
         ];
     }
 
@@ -204,7 +211,7 @@ class EntrypointActionTest extends TestCase
         $mockedEntrypoint = $this->getEntrypointAction();
 
         $this->assertEquals(400, $mockedEntrypoint($request)->getStatusCode());
-        $this->assertEquals('{"errors":[{"message":"GraphQL variables are not valid JSON","extensions":{"category":"graphql"}}]}', $mockedEntrypoint($request)->getContent());
+        $this->assertEquals('{"errors":[{"message":"GraphQL variables are not valid JSON or multipart form map does not match the variables","extensions":{"category":"graphql"}}]}', $mockedEntrypoint($request)->getContent());
     }
 
     private function getEntrypointAction(): EntrypointAction

@@ -72,7 +72,7 @@ final class EntrypointAction
         }
 
         if (null === $variables) {
-            return new JsonResponse(new ExecutionResult(null, [new Error('GraphQL variables are not valid JSON')]), Response::HTTP_BAD_REQUEST);
+            return new JsonResponse(new ExecutionResult(null, [new Error('GraphQL variables are not valid JSON or multipart form map does not match the variables')]), Response::HTTP_BAD_REQUEST);
         }
 
         try {
@@ -138,7 +138,7 @@ final class EntrypointAction
         return [$query, $operation, $variables];
     }
 
-    private function applyMapToVariables(Request $request, array $variables): array
+    private function applyMapToVariables(Request $request, array $variables): ?array
     {
         $mapValues = json_decode($request->request->get('map'), true);
         if (!$mapValues) {
@@ -150,7 +150,18 @@ final class EntrypointAction
                     $path = explode('.', $mapValue);
                     if ('variables' === $path[0]) {
                         unset($path[0]);
-                        $this->propertyAccessor->setValue($variables, '['.implode('][', $path).']', $request->files->get($key));
+
+                        $mapPathExistsInVariables = array_reduce($path, function (array $arr, $idx) {
+                            return (
+                            \array_key_exists($idx, $arr)
+                          ) ? $arr[$idx] : false;
+                        }, $variables);
+
+                        if (false !== $mapPathExistsInVariables) {
+                            $this->propertyAccessor->setValue($variables, '['.implode('][', $path).']', $request->files->get($key));
+                        } else {
+                            return null;
+                        }
                     }
                 }
             }
