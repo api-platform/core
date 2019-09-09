@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\JsonSchema;
 
+use ApiPlatform\Core\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
 use Symfony\Component\PropertyInfo\Type;
 
 /**
@@ -28,6 +29,19 @@ final class TypeFactory implements TypeFactoryInterface
      * @var SchemaFactoryInterface|null
      */
     private $schemaFactory;
+
+    /**
+     * @var array
+     */
+    private $resourceClasses;
+
+    /**
+     * TypeFactory constructor.
+     */
+    public function __construct(ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory = null)
+    {
+        $this->resourceClasses = $resourceNameCollectionFactory ? iterator_to_array($resourceNameCollectionFactory->create()) : [];
+    }
 
     /**
      * Injects the JSON Schema factory to use.
@@ -92,6 +106,12 @@ final class TypeFactory implements TypeFactoryInterface
             return ['$ref' => $subSchema['$ref']];
         }
 
-        return ['type' => 'string'];
+        $classType = ['type' => 'string'];
+
+        if (\in_array($className, $this->resourceClasses, true)) {
+            $classType['format'] = 'iri-reference';
+        }
+
+        return $classType;
     }
 }

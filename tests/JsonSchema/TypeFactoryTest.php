@@ -16,6 +16,8 @@ namespace ApiPlatform\Core\Tests\JsonSchema;
 use ApiPlatform\Core\JsonSchema\Schema;
 use ApiPlatform\Core\JsonSchema\SchemaFactoryInterface;
 use ApiPlatform\Core\JsonSchema\TypeFactory;
+use ApiPlatform\Core\Metadata\Extractor\ExtractorInterface;
+use ApiPlatform\Core\Metadata\Resource\Factory\ExtractorResourceNameCollectionFactory;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
@@ -28,7 +30,16 @@ class TypeFactoryTest extends TestCase
      */
     public function testGetType(array $schema, Type $type): void
     {
-        $typeFactory = new TypeFactory();
+        $typeFactory = new TypeFactory(new ExtractorResourceNameCollectionFactory(
+            new class() implements ExtractorInterface {
+                public function getResources(): array
+                {
+                    return [
+                        Dummy::class => [],
+                    ];
+                }
+            }
+        ));
         $this->assertSame($schema, $typeFactory->getType($type));
     }
 
@@ -39,7 +50,7 @@ class TypeFactoryTest extends TestCase
         yield [['type' => 'boolean'], new Type(Type::BUILTIN_TYPE_BOOL)];
         yield [['type' => 'string'], new Type(Type::BUILTIN_TYPE_OBJECT)];
         yield [['type' => 'string', 'format' => 'date-time'], new Type(Type::BUILTIN_TYPE_OBJECT, false, \DateTimeImmutable::class)];
-        yield [['type' => 'string'], new Type(Type::BUILTIN_TYPE_OBJECT, false, Dummy::class)];
+        yield [['type' => 'string', 'format' => 'iri-reference'], new Type(Type::BUILTIN_TYPE_OBJECT, false, Dummy::class)];
         yield [['type' => 'array', 'items' => ['type' => 'string']], new Type(Type::BUILTIN_TYPE_STRING, false, null, true)];
     }
 

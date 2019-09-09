@@ -8,6 +8,7 @@
         <defaults public="false" />
 
         <service id="api_platform.json_schema.type_factory" class="ApiPlatform\Core\JsonSchema\TypeFactory">
+            <argument type="service" id="api_platform.metadata.resource.name_collection_factory"></argument>
             <call method="setSchemaFactory">
                 <argument type="service" id="api_platform.json_schema.schema_factory"/>
             </call>
