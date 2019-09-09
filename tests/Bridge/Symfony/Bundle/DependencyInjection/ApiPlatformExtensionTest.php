@@ -366,8 +366,7 @@ class ApiPlatformExtensionTest extends TestCase
         $containerBuilderProphecy->setParameter('api_platform.graphql.enabled', false)->shouldBeCalled();
         $containerBuilderProphecy->setParameter('api_platform.graphql.default_ide', 'graphiql')->shouldNotBeCalled();
         $containerBuilderProphecy->setParameter('api_platform.graphql.default_ide', Argument::any())->shouldNotBeCalled();
-        $containerBuilderProphecy->setParameter('api_platform.graphql.collection.pagination', ['enabled' => true])->shouldNotBeCalled();
-        $containerBuilderProphecy->setParameter('api_platform.graphql.collection.pagination', Argument::any())->shouldNotBeCalled();
+        $containerBuilderProphecy->setParameter('api_platform.graphql.collection.pagination', ['enabled' => true])->shouldBeCalled();
         $containerBuilderProphecy->setParameter('api_platform.graphql.graphiql.enabled', true)->shouldNotBeCalled();
         $containerBuilderProphecy->setParameter('api_platform.graphql.graphiql.enabled', false)->shouldBeCalled();
         $containerBuilderProphecy->setParameter('api_platform.graphql.graphql_playground.enabled', true)->shouldNotBeCalled();
