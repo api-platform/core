@@ -31,16 +31,18 @@ final class TypeFactory implements TypeFactoryInterface
     private $schemaFactory;
 
     /**
+     * @var ResourceNameCollectionFactoryInterface|null
+     */
+    private $resourceNameCollectionFactory;
+
+    /**
      * @var array
      */
     private $resourceClasses;
 
-    /**
-     * TypeFactory constructor.
-     */
     public function __construct(ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory = null)
     {
-        $this->resourceClasses = $resourceNameCollectionFactory ? iterator_to_array($resourceNameCollectionFactory->create()) : [];
+        $this->resourceNameCollectionFactory = $resourceNameCollectionFactory;
     }
 
     /**
@@ -108,10 +110,22 @@ final class TypeFactory implements TypeFactoryInterface
 
         $classType = ['type' => 'string'];
 
-        if (\in_array($className, $this->resourceClasses, true)) {
+        if (\in_array($className, $this->getDeclaredResources(), true)) {
             $classType['format'] = 'iri-reference';
         }
 
         return $classType;
+    }
+
+    /**
+     * Returns classes declared as resources.
+     */
+    private function getDeclaredResources(): array
+    {
+        if (null === $this->resourceClasses) {
+            $this->resourceClasses = $this->resourceNameCollectionFactory ? iterator_to_array($this->resourceNameCollectionFactory->create()) : [];
+        }
+
+        return $this->resourceClasses;
     }
 }

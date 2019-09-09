@@ -16,8 +16,8 @@ namespace ApiPlatform\Core\Tests\JsonSchema;
 use ApiPlatform\Core\JsonSchema\Schema;
 use ApiPlatform\Core\JsonSchema\SchemaFactoryInterface;
 use ApiPlatform\Core\JsonSchema\TypeFactory;
-use ApiPlatform\Core\Metadata\Extractor\ExtractorInterface;
-use ApiPlatform\Core\Metadata\Resource\Factory\ExtractorResourceNameCollectionFactory;
+use ApiPlatform\Core\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
+use ApiPlatform\Core\Metadata\Resource\ResourceNameCollection;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
@@ -30,16 +30,10 @@ class TypeFactoryTest extends TestCase
      */
     public function testGetType(array $schema, Type $type): void
     {
-        $typeFactory = new TypeFactory(new ExtractorResourceNameCollectionFactory(
-            new class() implements ExtractorInterface {
-                public function getResources(): array
-                {
-                    return [
-                        Dummy::class => [],
-                    ];
-                }
-            }
-        ));
+        $resourceNameCollectionFactory = $this->prophesize(ResourceNameCollectionFactoryInterface::class);
+        $resourceNameCollectionFactory->create()->willReturn(new ResourceNameCollection([Dummy::class]));
+        $typeFactory = new TypeFactory($resourceNameCollectionFactory->reveal());
+
         $this->assertSame($schema, $typeFactory->getType($type));
     }
 
