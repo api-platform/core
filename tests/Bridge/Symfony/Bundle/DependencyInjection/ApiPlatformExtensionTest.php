@@ -63,6 +63,7 @@ use ApiPlatform\Core\DataProvider\SubresourceDataProviderInterface;
 use ApiPlatform\Core\DataTransformer\DataTransformerInterface;
 use ApiPlatform\Core\Exception\FilterValidationException;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
+use ApiPlatform\Core\GraphQl\Exception\ExceptionFormatterInterface;
 use ApiPlatform\Core\GraphQl\Resolver\MutationResolverInterface;
 use ApiPlatform\Core\GraphQl\Resolver\QueryCollectionResolverInterface;
 use ApiPlatform\Core\GraphQl\Resolver\QueryItemResolverInterface;
@@ -367,6 +368,10 @@ class ApiPlatformExtensionTest extends TestCase
         $containerBuilderProphecy->setDefinition('api_platform.graphql.type_converter', Argument::type(Definition::class))->shouldNotBeCalled();
         $containerBuilderProphecy->setDefinition('api_platform.graphql.query_resolver_locator', Argument::type(Definition::class))->shouldNotBeCalled();
         $containerBuilderProphecy->setDefinition('api_platform.graphql.mutation_resolver_locator', Argument::type(Definition::class))->shouldNotBeCalled();
+        $containerBuilderProphecy->setDefinition('api_platform.graphql.validation_exception_formatter', Argument::type(Definition::class))->shouldNotBeCalled();
+        $containerBuilderProphecy->setDefinition('api_platform.graphql.exception_formatter_callback', Argument::type(Definition::class))->shouldNotBeCalled();
+        $containerBuilderProphecy->setDefinition('api_platform.graphql.exception_formatter_locator', Argument::type(Definition::class))->shouldNotBeCalled();
+        $containerBuilderProphecy->setDefinition('api_platform.graphql.exception_formatter_factory', Argument::type(Definition::class))->shouldNotBeCalled();
         $containerBuilderProphecy->setDefinition('api_platform.graphql.command.export_command', Argument::type(Definition::class))->shouldNotBeCalled();
         $containerBuilderProphecy->setParameter('api_platform.graphql.enabled', true)->shouldNotBeCalled();
         $containerBuilderProphecy->setParameter('api_platform.graphql.enabled', false)->shouldBeCalled();
@@ -386,6 +391,8 @@ class ApiPlatformExtensionTest extends TestCase
         $this->childDefinitionProphecy->addTag('api_platform.graphql.query_resolver')->shouldNotBeCalled();
         $containerBuilderProphecy->registerForAutoconfiguration(MutationResolverInterface::class)->shouldNotBeCalled();
         $this->childDefinitionProphecy->addTag('api_platform.graphql.mutation_resolver')->shouldNotBeCalled();
+        $containerBuilderProphecy->registerForAutoconfiguration(ExceptionFormatterInterface::class)->shouldNotBeCalled();
+        $this->childDefinitionProphecy->addTag('api_platform.graphql.exception_formatter')->shouldNotBeCalled();
         $containerBuilderProphecy->setAlias(GraphQlSerializerContextBuilderInterface::class, 'api_platform.graphql.serializer.context_builder')->shouldNotBeCalled();
 
         $containerBuilder = $containerBuilderProphecy->reveal();
@@ -1057,6 +1064,10 @@ class ApiPlatformExtensionTest extends TestCase
             ->willReturn($this->childDefinitionProphecy)->shouldBeCalledTimes(1);
         $this->childDefinitionProphecy->addTag('api_platform.graphql.type')->shouldBeCalledTimes(1);
 
+        $containerBuilderProphecy->registerForAutoconfiguration(ExceptionFormatterInterface::class)
+            ->willReturn($this->childDefinitionProphecy)->shouldBeCalledTimes(1);
+        $this->childDefinitionProphecy->addTag('api_platform.graphql.exception_formatter')->shouldBeCalledTimes(1);
+
         $containerBuilderProphecy->registerForAutoconfiguration(QueryItemResolverInterface::class)
             ->willReturn($this->childDefinitionProphecy)->shouldBeCalledTimes(1);
         $containerBuilderProphecy->registerForAutoconfiguration(QueryCollectionResolverInterface::class)
@@ -1183,6 +1194,10 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.graphql.resolver.stage.write',
             'api_platform.graphql.resolver.stage.validate',
             'api_platform.graphql.resolver.resource_field',
+            'api_platform.graphql.exception_formatter_callback',
+            'api_platform.graphql.validation_exception_formatter',
+            'api_platform.graphql.exception_formatter_locator',
+            'api_platform.graphql.exception_formatter_factory',
             'api_platform.graphql.iterable_type',
             'api_platform.graphql.upload_type',
             'api_platform.graphql.type_locator',

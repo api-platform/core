@@ -16,6 +16,7 @@ namespace ApiPlatform\Core\Tests\GraphQl\Action;
 use ApiPlatform\Core\GraphQl\Action\EntrypointAction;
 use ApiPlatform\Core\GraphQl\Action\GraphiQlAction;
 use ApiPlatform\Core\GraphQl\Action\GraphQlPlaygroundAction;
+use ApiPlatform\Core\GraphQl\Exception\ExceptionFormatterCallbackInterface;
 use ApiPlatform\Core\GraphQl\ExecutorInterface;
 use ApiPlatform\Core\GraphQl\Type\SchemaBuilderInterface;
 use GraphQL\Executor\ExecutionResult;
@@ -228,8 +229,11 @@ class EntrypointActionTest extends TestCase
         $schemaBuilderProphecy = $this->prophesize(SchemaBuilderInterface::class);
         $schemaBuilderProphecy->getSchema()->willReturn($schema->reveal());
 
+        $exceptionFormatterCallback = $this->prophesize(ExceptionFormatterCallbackInterface::class)->reveal();
+
         $executionResultProphecy = $this->prophesize(ExecutionResult::class);
         $executionResultProphecy->toArray(false)->willReturn(['GraphQL']);
+        $executionResultProphecy->setErrorFormatter($exceptionFormatterCallback)->willReturn($executionResultProphecy);
         $executorProphecy = $this->prophesize(ExecutorInterface::class);
         $executorProphecy->executeQuery(Argument::is($schema->reveal()), 'graphqlQuery', null, null, $variables, 'graphqlOperationName')->willReturn($executionResultProphecy->reveal());
 
@@ -239,6 +243,6 @@ class EntrypointActionTest extends TestCase
         $graphiQlAction = new GraphiQlAction($twigProphecy->reveal(), $routerProphecy->reveal(), true);
         $graphQlPlaygroundAction = new GraphQlPlaygroundAction($twigProphecy->reveal(), $routerProphecy->reveal(), true);
 
-        return new EntrypointAction($schemaBuilderProphecy->reveal(), $executorProphecy->reveal(), $graphiQlAction, $graphQlPlaygroundAction, false, true, true, 'graphiql');
+        return new EntrypointAction($schemaBuilderProphecy->reveal(), $executorProphecy->reveal(), $graphiQlAction, $graphQlPlaygroundAction, $exceptionFormatterCallback, false, true, true, 'graphiql');
     }
 }

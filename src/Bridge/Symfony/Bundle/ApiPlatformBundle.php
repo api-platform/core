@@ -17,6 +17,7 @@ use ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\Compiler\Annotati
 use ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\Compiler\DataProviderPass;
 use ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\Compiler\ElasticsearchClientPass;
 use ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\Compiler\FilterPass;
+use ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\Compiler\GraphQlExceptionFormatterPass;
 use ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\Compiler\GraphQlMutationResolverPass;
 use ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\Compiler\GraphQlQueryResolverPass;
 use ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\Compiler\GraphQlTypePass;
@@ -48,6 +49,7 @@ final class ApiPlatformBundle extends Bundle
         $container->addCompilerPass(new GraphQlTypePass());
         $container->addCompilerPass(new GraphQlQueryResolverPass());
         $container->addCompilerPass(new GraphQlMutationResolverPass());
+        $container->addCompilerPass(new GraphQlExceptionFormatterPass());
         $container->addCompilerPass(new MetadataAwareNameConverterPass());
     }
 }

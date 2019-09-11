@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\GraphQl\Action;
 
+use ApiPlatform\Core\GraphQl\Exception\ExceptionFormatterCallbackInterface;
 use ApiPlatform\Core\GraphQl\ExecutorInterface;
 use ApiPlatform\Core\GraphQl\Type\SchemaBuilderInterface;
 use GraphQL\Error\Debug;
@@ -39,8 +40,9 @@ final class EntrypointAction
     private $graphiqlEnabled;
     private $graphQlPlaygroundEnabled;
     private $defaultIde;
+    private $exceptionFormatterCallback;
 
-    public function __construct(SchemaBuilderInterface $schemaBuilder, ExecutorInterface $executor, GraphiQlAction $graphiQlAction, GraphQlPlaygroundAction $graphQlPlaygroundAction, bool $debug = false, bool $graphiqlEnabled = false, bool $graphQlPlaygroundEnabled = false, $defaultIde = false)
+    public function __construct(SchemaBuilderInterface $schemaBuilder, ExecutorInterface $executor, GraphiQlAction $graphiQlAction, GraphQlPlaygroundAction $graphQlPlaygroundAction, ExceptionFormatterCallbackInterface $exceptionFormatterCallback, bool $debug = false, bool $graphiqlEnabled = false, bool $graphQlPlaygroundEnabled = false, $defaultIde = false)
     {
         $this->schemaBuilder = $schemaBuilder;
         $this->executor = $executor;
@@ -50,6 +52,7 @@ final class EntrypointAction
         $this->graphiqlEnabled = $graphiqlEnabled;
         $this->graphQlPlaygroundEnabled = $graphQlPlaygroundEnabled;
         $this->defaultIde = $defaultIde;
+        $this->exceptionFormatterCallback = $exceptionFormatterCallback;
     }
 
     public function __invoke(Request $request): Response
@@ -70,7 +73,8 @@ final class EntrypointAction
                 throw new BadRequestHttpException('GraphQL query is not valid.');
             }
 
-            $executionResult = $this->executor->executeQuery($this->schemaBuilder->getSchema(), $query, null, null, $variables, $operation);
+            $executionResult = $this->executor->executeQuery($this->schemaBuilder->getSchema(), $query, null, null, $variables, $operation)
+              ->setErrorFormatter($this->exceptionFormatterCallback);
         } catch (BadRequestHttpException $e) {
             $exception = new UserError($e->getMessage(), 0, $e);
 

@@ -159,7 +159,22 @@
             <argument type="service" id="api_platform.graphql.types_container" />
             <argument type="service" id="api_platform.graphql.fields_builder" />
         </service>
+        <!-- Exception formatter -->
+        <service id="api_platform.graphql.exception_formatter_callback" class="ApiPlatform\Core\GraphQl\Exception\ExceptionFormatterCallback">
+            <argument type="service" id="api_platform.graphql.exception_formatter_factory" />
+        </service>
 
+        <service id="api_platform.graphql.validation_exception_formatter" class="ApiPlatform\Core\GraphQl\Exception\Formatter\ValidationExceptionFormatter">
+            <tag name="api_platform.graphql.exception_formatter" />
+        </service>
+
+        <service id="api_platform.graphql.exception_formatter_locator" class="Symfony\Component\DependencyInjection\ServiceLocator">
+            <tag name="container.service_locator" />
+        </service>
+
+        <service id="api_platform.graphql.exception_formatter_factory" class="ApiPlatform\Core\GraphQl\Exception\ExceptionFormatterFactory">
+            <argument type="service" id="api_platform.graphql.exception_formatter_locator" />
+        </service>
         <!-- Action -->
 
         <service id="api_platform.graphql.action.entrypoint" class="ApiPlatform\Core\GraphQl\Action\EntrypointAction" public="true">
@@ -167,6 +182,7 @@
             <argument type="service" id="api_platform.graphql.executor" />
             <argument type="service" id="api_platform.graphql.action.graphiql" />
             <argument type="service" id="api_platform.graphql.action.graphql_playground" />
+            <argument type="service" id="api_platform.graphql.exception_formatter_callback" />
             <argument>%kernel.debug%</argument>
             <argument>%api_platform.graphql.graphiql.enabled%</argument>
             <argument>%api_platform.graphql.graphql_playground.enabled%</argument>
