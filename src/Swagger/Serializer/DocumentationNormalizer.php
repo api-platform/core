@@ -368,7 +368,26 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
                         'required' => false,
                         'description' => 'The number of items per page',
                     ];
-                    $v3 ? $itemPerPageParameter['schema'] = ['type' => 'integer'] : $itemPerPageParameter['type'] = 'integer';
+
+                    if ($v3) {
+                        $itemPerPageParameter['schema'] = [
+                            'type' => 'integer',
+                            'default' => $resourceMetadata->getCollectionOperationAttribute($operationName, 'pagination_items_per_page', 30, true),
+                            'minimum' => 0,
+                        ];
+
+                        $maxItemsPerPage = $resourceMetadata->getCollectionOperationAttribute($operationName, 'maximum_items_per_page', null, true);
+                        if (null !== $maxItemsPerPage) {
+                            @trigger_error('The "maximum_items_per_page" option has been deprecated since API Platform 2.5 in favor of "pagination_maximum_items_per_page" and will be removed in API Platform 3.', E_USER_DEPRECATED);
+                        }
+                        $maxItemsPerPage = $resourceMetadata->getCollectionOperationAttribute($operationName, 'pagination_maximum_items_per_page', $maxItemsPerPage, true);
+
+                        if (null !== $maxItemsPerPage) {
+                            $itemPerPageParameter['schema']['maximum'] = $maxItemsPerPage;
+                        }
+                    } else {
+                        $itemPerPageParameter['type'] = 'integer';
+                    }
 
                     $pathOperation['parameters'][] = $itemPerPageParameter;
                 }

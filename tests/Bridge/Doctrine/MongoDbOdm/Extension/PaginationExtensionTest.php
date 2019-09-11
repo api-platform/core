@@ -266,7 +266,7 @@ class PaginationExtensionTest extends TestCase
         $attributes = [
             'pagination_enabled' => true,
             'pagination_client_enabled' => true,
-            'maximum_items_per_page' => 80,
+            'pagination_maximum_items_per_page' => 80,
         ];
         $resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadata(null, null, null, [], [], $attributes));
         $resourceMetadataFactory = $resourceMetadataFactoryProphecy->reveal();
@@ -274,7 +274,7 @@ class PaginationExtensionTest extends TestCase
         $pagination = new Pagination($resourceMetadataFactory, [
             'client_enabled' => true,
             'client_items_per_page' => true,
-            'maximum_items_per_page' => 50,
+            'pagination_maximum_items_per_page' => 50,
         ]);
 
         $aggregationBuilder = $this->mockAggregationBuilder(0, 80);
