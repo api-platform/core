@@ -127,11 +127,15 @@ final class Pagination
 
         if ($clientLimit) {
             $limit = (int) $this->getParameterFromContext($context, $this->options['items_per_page_parameter_name'], $limit);
-            $maxItemsPerPage = $this->options['maximum_items_per_page'];
+            $maxItemsPerPage = null;
 
             if (null !== $resourceClass) {
                 $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
-                $maxItemsPerPage = $resourceMetadata->getCollectionOperationAttribute($operationName, 'maximum_items_per_page', $maxItemsPerPage, true);
+                $maxItemsPerPage = $resourceMetadata->getCollectionOperationAttribute($operationName, 'maximum_items_per_page', null, true);
+                if (null !== $maxItemsPerPage) {
+                    @trigger_error('The "maximum_items_per_page" option has been deprecated since API Platform 2.5 in favor of "pagination_maximum_items_per_page" and will be removed in API Platform 3.', E_USER_DEPRECATED);
+                }
+                $maxItemsPerPage = $resourceMetadata->getCollectionOperationAttribute($operationName, 'pagination_maximum_items_per_page', $maxItemsPerPage ?? $this->options['maximum_items_per_page'], true);
             }
 
             if (null !== $maxItemsPerPage && $limit > $maxItemsPerPage) {
