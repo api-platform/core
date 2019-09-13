@@ -251,7 +251,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
         $pathOperation = new \ArrayObject($operation[$v3 ? 'openapi_context' : 'swagger_context'] ?? []);
         $resourceShortName = $resourceMetadata->getShortName();
         $pathOperation['tags'] ?? $pathOperation['tags'] = [$resourceShortName];
-        $pathOperation['operationId'] ?? $pathOperation['operationId'] = lcfirst($operationName).ucfirst($resourceShortName).ucfirst($operationType);
+        $pathOperation['operationId'] ?? $pathOperation['operationId'] = strtolower($operationName).ucfirst($resourceShortName).ucfirst($operationType);
         if ($v3 && 'GET' === $method && OperationType::ITEM === $operationType && $link = $this->getLinkObject($resourceClass, $pathOperation['operationId'], $this->getPath($resourceShortName, $operationName, $operation, $operationType))) {
             $links[$pathOperation['operationId']] = $link;
         }
