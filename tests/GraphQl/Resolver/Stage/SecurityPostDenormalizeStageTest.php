@@ -54,12 +54,12 @@ class SecurityPostDenormalizeStageTest extends TestCase
 
         $this->resourceAccessCheckerProphecy->isGranted(Argument::cetera())->shouldNotBeCalled();
 
-        ($this->securityPostDenormalizeStage)($resourceClass, 'query', []);
+        ($this->securityPostDenormalizeStage)($resourceClass, 'item_query', []);
     }
 
     public function testGranted(): void
     {
-        $operationName = 'query';
+        $operationName = 'item_query';
         $resourceClass = 'myResource';
         $isGranted = 'not_granted';
         $extraVariables = ['extra' => false];
@@ -70,7 +70,7 @@ class SecurityPostDenormalizeStageTest extends TestCase
 
         $this->resourceAccessCheckerProphecy->isGranted($resourceClass, $isGranted, $extraVariables)->shouldBeCalled()->willReturn(true);
 
-        ($this->securityPostDenormalizeStage)($resourceClass, 'query', ['extra_variables' => $extraVariables]);
+        ($this->securityPostDenormalizeStage)($resourceClass, 'item_query', ['extra_variables' => $extraVariables]);
     }
 
     /**
@@ -78,7 +78,7 @@ class SecurityPostDenormalizeStageTest extends TestCase
      */
     public function testGrantedLegacy(): void
     {
-        $operationName = 'query';
+        $operationName = 'item_query';
         $resourceClass = 'myResource';
         $isGranted = 'not_granted';
         $extraVariables = ['extra' => false];
@@ -89,12 +89,12 @@ class SecurityPostDenormalizeStageTest extends TestCase
 
         $this->resourceAccessCheckerProphecy->isGranted($resourceClass, $isGranted, $extraVariables)->shouldBeCalled()->willReturn(true);
 
-        ($this->securityPostDenormalizeStage)($resourceClass, 'query', ['extra_variables' => $extraVariables]);
+        ($this->securityPostDenormalizeStage)($resourceClass, 'item_query', ['extra_variables' => $extraVariables]);
     }
 
     public function testNotGranted(): void
     {
-        $operationName = 'query';
+        $operationName = 'item_query';
         $resourceClass = 'myResource';
         $isGranted = 'not_granted';
         $extraVariables = ['extra' => false];
@@ -110,7 +110,7 @@ class SecurityPostDenormalizeStageTest extends TestCase
         $this->expectException(Error::class);
         $this->expectExceptionMessage('Access Denied.');
 
-        ($this->securityPostDenormalizeStage)($resourceClass, 'query', [
+        ($this->securityPostDenormalizeStage)($resourceClass, 'item_query', [
             'info' => $info,
             'extra_variables' => $extraVariables,
         ]);

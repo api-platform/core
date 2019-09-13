@@ -5,17 +5,6 @@ Feature: GraphQL schema-related features
     When I run the command "api:graphql:export"
     Then the command output should contain:
     """
-   ###Dummy Friend.###
-    type DummyFriend implements Node {
-      id: ID!
-
-      ###The id###
-      _id: Int!
-
-      ###The dummy name###
-      name: String!
-    }
-
     ###Dummy Friend.###
     type DummyFriendCollection implements Node {
       id: ID!
@@ -65,17 +54,6 @@ Feature: GraphQL schema-related features
       | --comment-descriptions | true |
     Then the command output should contain:
     """
-    # Dummy Friend.
-    type DummyFriend implements Node {
-      id: ID!
-
-      # The id
-      _id: Int!
-
-      # The dummy name
-      name: String!
-    }
-
     # Dummy Friend.
     type DummyFriendCollection implements Node {
       id: ID!

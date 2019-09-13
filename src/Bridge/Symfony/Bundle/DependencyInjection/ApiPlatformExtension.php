@@ -46,6 +46,7 @@ use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\Finder\Finder;
+use Symfony\Component\HttpClient\HttpClientTrait;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\Yaml\Yaml;
@@ -128,8 +129,12 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $container->registerForAutoconfiguration(FilterInterface::class)
             ->addTag('api_platform.filter');
 
-        if ($container->hasParameter('test.client.parameters') && class_exists(AbstractBrowser::class) && trait_exists('Symfony\Component\HttpClient\HttpClientTrait')) {
+        if ($container->hasParameter('test.client.parameters')) {
             $loader->load('test.xml');
+
+            if (!class_exists(AbstractBrowser::class) || !trait_exists(HttpClientTrait::class)) {
+                $container->removeDefinition('test.api_platform.client');
+            }
         }
     }
 
@@ -372,6 +377,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $container->setParameter('api_platform.graphql.enabled', $enabled);
         $container->setParameter('api_platform.graphql.graphiql.enabled', $enabled && $this->isConfigEnabled($container, $config['graphql']['graphiql']));
         $container->setParameter('api_platform.graphql.graphql_playground.enabled', $enabled && $this->isConfigEnabled($container, $config['graphql']['graphql_playground']));
+        $container->setParameter('api_platform.graphql.collection.pagination', $config['graphql']['collection']['pagination']);
 
         if (!$enabled) {
             return;

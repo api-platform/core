@@ -55,7 +55,7 @@ final class Response implements ResponseInterface
             }
         }
 
-        $this->content = $httpFoundationResponse->getContent();
+        $this->content = (string) $httpFoundationResponse->getContent();
         $this->info = [
             'http_code' => $httpFoundationResponse->getStatusCode(),
             'error' => null,

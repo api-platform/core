@@ -366,6 +366,7 @@ class ApiPlatformExtensionTest extends TestCase
         $containerBuilderProphecy->setParameter('api_platform.graphql.enabled', false)->shouldBeCalled();
         $containerBuilderProphecy->setParameter('api_platform.graphql.default_ide', 'graphiql')->shouldNotBeCalled();
         $containerBuilderProphecy->setParameter('api_platform.graphql.default_ide', Argument::any())->shouldNotBeCalled();
+        $containerBuilderProphecy->setParameter('api_platform.graphql.collection.pagination', ['enabled' => true])->shouldBeCalled();
         $containerBuilderProphecy->setParameter('api_platform.graphql.graphiql.enabled', true)->shouldNotBeCalled();
         $containerBuilderProphecy->setParameter('api_platform.graphql.graphiql.enabled', false)->shouldBeCalled();
         $containerBuilderProphecy->setParameter('api_platform.graphql.graphql_playground.enabled', true)->shouldNotBeCalled();
@@ -1060,6 +1061,7 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.enable_re_doc' => true,
             'api_platform.graphql.enabled' => true,
             'api_platform.graphql.default_ide' => 'graphiql',
+            'api_platform.graphql.collection.pagination' => ['enabled' => true],
             'api_platform.graphql.graphiql.enabled' => true,
             'api_platform.graphql.graphql_playground.enabled' => true,
             'api_platform.resource_class_directories' => Argument::type('array'),

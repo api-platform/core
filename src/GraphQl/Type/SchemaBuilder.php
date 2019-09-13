@@ -61,25 +61,25 @@ final class SchemaBuilder implements SchemaBuilderInterface
             $graphqlConfiguration = $resourceMetadata->getGraphql() ?? [];
             foreach ($graphqlConfiguration as $operationName => $value) {
                 if ('item_query' === $operationName) {
-                    $queryFields += $this->fieldsBuilder->getQueryFields($resourceClass, $resourceMetadata, $operationName, [], false);
+                    $queryFields += $this->fieldsBuilder->getItemQueryFields($resourceClass, $resourceMetadata, $operationName, []);
 
                     continue;
                 }
 
                 if ('collection_query' === $operationName) {
-                    $queryFields += $this->fieldsBuilder->getQueryFields($resourceClass, $resourceMetadata, $operationName, false, []);
+                    $queryFields += $this->fieldsBuilder->getCollectionQueryFields($resourceClass, $resourceMetadata, $operationName, []);
 
                     continue;
                 }
 
                 if ($resourceMetadata->getGraphqlAttribute($operationName, 'item_query')) {
-                    $queryFields += $this->fieldsBuilder->getQueryFields($resourceClass, $resourceMetadata, $operationName, $value, false);
+                    $queryFields += $this->fieldsBuilder->getItemQueryFields($resourceClass, $resourceMetadata, $operationName, $value);
 
                     continue;
                 }
 
                 if ($resourceMetadata->getGraphqlAttribute($operationName, 'collection_query')) {
-                    $queryFields += $this->fieldsBuilder->getQueryFields($resourceClass, $resourceMetadata, $operationName, false, $value);
+                    $queryFields += $this->fieldsBuilder->getCollectionQueryFields($resourceClass, $resourceMetadata, $operationName, $value);
 
                     continue;
                 }

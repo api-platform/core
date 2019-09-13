@@ -482,6 +482,26 @@ Feature: GraphQL collection support
     And the header "Content-Type" should be equal to "application/json"
     And the JSON node "data.dummies.edges" should have 0 element
 
+  @createSchema
+  Scenario: Retrieve a collection with pagination disabled
+    Given there are 4 foo objects with fake names
+    When I send the following GraphQL request:
+    """
+    {
+      foos {
+        id
+        name
+        bar
+      }
+    }
+    """
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/json"
+    And the JSON node "data.foos[3].id" should be equal to "/foos/4"
+    And the JSON node "data.foos[3].name" should be equal to "Separativeness"
+    And the JSON node "data.foos[3].bar" should be equal to "Sit"
+
   Scenario: Custom collection query
     Given there are 2 dummyCustomQuery objects
     When I send the following GraphQL request:

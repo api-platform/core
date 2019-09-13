@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\GraphQl\Resolver\Stage;
 
 use ApiPlatform\Core\DataProvider\ArrayPaginator;
+use ApiPlatform\Core\DataProvider\Pagination;
 use ApiPlatform\Core\GraphQl\Resolver\Stage\SerializeStage;
 use ApiPlatform\Core\GraphQl\Serializer\ItemNormalizer;
 use ApiPlatform\Core\GraphQl\Serializer\SerializerContextBuilderInterface;
@@ -49,7 +50,7 @@ class SerializeStageTest extends TestCase
      */
     public function testApplyDisabled(array $context, bool $paginationEnabled, ?array $expectedResult): void
     {
-        $operationName = 'query';
+        $operationName = 'item_query';
         $resourceClass = 'myResource';
         $resourceMetadata = (new ResourceMetadata())->withGraphql([
             $operationName => ['serialize' => false],
@@ -99,8 +100,8 @@ class SerializeStageTest extends TestCase
         ];
 
         return [
-            'item' => [new \stdClass(), 'query', $defaultContext + ['is_collection' => false, 'is_mutation' => false], false, ['normalized_item']],
-            'collection without pagination' => [[new \stdClass(), new \stdClass()], 'query', $defaultContext + ['is_collection' => true, 'is_mutation' => false], false, [['normalized_item'], ['normalized_item']]],
+            'item' => [new \stdClass(), 'item_query', $defaultContext + ['is_collection' => false, 'is_mutation' => false], false, ['normalized_item']],
+            'collection without pagination' => [[new \stdClass(), new \stdClass()], 'collection_query', $defaultContext + ['is_collection' => true, 'is_mutation' => false], false, [['normalized_item'], ['normalized_item']]],
             'mutation' => [new \stdClass(), 'create', array_merge($defaultContext, ['args' => ['input' => ['clientMutationId' => 'clientMutationId']], 'is_collection' => false, 'is_mutation' => true]), false, ['shortName' => ['normalized_item'], 'clientMutationId' => 'clientMutationId']],
             'delete mutation' => [new \stdClass(), 'delete', array_merge($defaultContext, ['args' => ['input' => ['id' => 4]], 'is_collection' => false, 'is_mutation' => true]), false, ['shortName' => ['id' => 4], 'clientMutationId' => null]],
         ];
@@ -111,7 +112,7 @@ class SerializeStageTest extends TestCase
      */
     public function testApplyCollectionWithPagination(iterable $collection, array $args, ?array $expectedResult, ?string $expectedExceptionClass = null, ?string $expectedExceptionMessage = null): void
     {
-        $operationName = 'query';
+        $operationName = 'collection_query';
         $resourceClass = 'myResource';
         $context = [
             'is_collection' => true,
@@ -152,7 +153,7 @@ class SerializeStageTest extends TestCase
 
     public function testApplyBadNormalizedData(): void
     {
-        $operationName = 'query';
+        $operationName = 'item_query';
         $resourceClass = 'myResource';
         $context = ['is_collection' => false, 'is_mutation' => false, 'args' => [], 'info' => $this->prophesize(ResolveInfo::class)->reveal()];
         $this->resourceMetadataFactoryProphecy->create($resourceClass)->willReturn(new ResourceMetadata());
@@ -170,11 +171,13 @@ class SerializeStageTest extends TestCase
 
     private function createSerializeStage(bool $paginationEnabled): SerializeStage
     {
+        $pagination = new Pagination($this->resourceMetadataFactoryProphecy->reveal(), [], ['enabled' => $paginationEnabled]);
+
         return new SerializeStage(
             $this->resourceMetadataFactoryProphecy->reveal(),
             $this->normalizerProphecy->reveal(),
             $this->serializerContextBuilderProphecy->reveal(),
-            $paginationEnabled
+            $pagination
         );
     }
 }
