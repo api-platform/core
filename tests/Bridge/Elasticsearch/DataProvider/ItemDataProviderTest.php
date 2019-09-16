@@ -78,6 +78,8 @@ class ItemDataProviderTest extends TestCase
         );
 
         self::assertTrue($itemDataProvider->supports(Foo::class));
+        self::assertFalse($itemDataProvider->supports(Foo::class, 'put'));
+        self::assertFalse($itemDataProvider->supports(Foo::class, 'delete'));
         self::assertFalse($itemDataProvider->supports(Dummy::class));
         self::assertFalse($itemDataProvider->supports(CompositeRelation::class));
         self::assertFalse($itemDataProvider->supports(DummyCar::class));

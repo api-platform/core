@@ -56,6 +56,10 @@ final class ItemDataProvider implements ItemDataProviderInterface, RestrictedDat
      */
     public function supports(string $resourceClass, ?string $operationName = null, array $context = []): bool
     {
+        if (in_array($operationName, ['put', 'delete'])) {
+            return false;
+        }
+
         try {
             $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
             if (false === $resourceMetadata->getItemOperationAttribute($operationName, 'elasticsearch', true, true)) {
