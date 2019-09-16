@@ -56,7 +56,7 @@ final class ItemDataProvider implements ItemDataProviderInterface, RestrictedDat
      */
     public function supports(string $resourceClass, ?string $operationName = null, array $context = []): bool
     {
-        if (in_array($operationName, ['put', 'delete'])) {
+        if (\in_array($operationName, ['put', 'delete'], true)) {
             return false;
         }
 
