@@ -579,9 +579,9 @@ class ApiPlatformExtensionTest extends TestCase
     {
         $containerBuilderProphecy = $this->getBaseContainerBuilderProphecy();
         $containerBuilderProphecy->registerForAutoconfiguration(AggregationItemExtensionInterface::class)->shouldNotBeCalled();
-        $this->childDefinitionProphecy->addTag('api_platform.doctrine.mongodb.aggregation_extension.item')->shouldNotBeCalled();
+        $this->childDefinitionProphecy->addTag('api_platform.doctrine_mongodb.odm.aggregation_extension.item')->shouldNotBeCalled();
         $containerBuilderProphecy->registerForAutoconfiguration(AggregationCollectionExtensionInterface::class)->shouldNotBeCalled();
-        $this->childDefinitionProphecy->addTag('api_platform.doctrine.mongodb.aggregation_extension.collection')->shouldNotBeCalled();
+        $this->childDefinitionProphecy->addTag('api_platform.doctrine_mongodb.odm.aggregation_extension.collection')->shouldNotBeCalled();
         $containerBuilderProphecy->registerForAutoconfiguration(DoctrineMongoDbOdmAbstractFilter::class)->shouldNotBeCalled();
         $this->childDefinitionProphecy->setBindings(Argument::allOf(Argument::withEntry('$managerRegistry', Argument::type(Reference::class))))->shouldNotBeCalled();
         $containerBuilderProphecy->setDefinition('api_platform.doctrine_mongodb.odm.aggregation_extension.filter', Argument::type(Definition::class))->shouldNotBeCalled();
@@ -976,11 +976,11 @@ class ApiPlatformExtensionTest extends TestCase
         if (\in_array('odm', $doctrineIntegrationsToLoad, true)) {
             $containerBuilderProphecy->registerForAutoconfiguration(AggregationItemExtensionInterface::class)
                 ->willReturn($this->childDefinitionProphecy)->shouldBeCalledTimes(1);
-            $this->childDefinitionProphecy->addTag('api_platform.doctrine.mongodb.aggregation_extension.item')->shouldBeCalledTimes(1);
+            $this->childDefinitionProphecy->addTag('api_platform.doctrine_mongodb.odm.aggregation_extension.item')->shouldBeCalledTimes(1);
 
             $containerBuilderProphecy->registerForAutoconfiguration(AggregationCollectionExtensionInterface::class)
                 ->willReturn($this->childDefinitionProphecy)->shouldBeCalledTimes(1);
-            $this->childDefinitionProphecy->addTag('api_platform.doctrine.mongodb.aggregation_extension.collection')->shouldBeCalledTimes(1);
+            $this->childDefinitionProphecy->addTag('api_platform.doctrine_mongodb.odm.aggregation_extension.collection')->shouldBeCalledTimes(1);
 
             $containerBuilderProphecy->registerForAutoconfiguration(DoctrineMongoDbOdmAbstractFilter::class)
                 ->willReturn($this->childDefinitionProphecy)->shouldBeCalledTimes(1);
