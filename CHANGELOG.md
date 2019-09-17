@@ -39,6 +39,10 @@ Please read #2825 if you have issues with the behavior of Readable/Writable Link
 ## 2.4.7
 
 * Fix passing context to data persisters' `remove` method
+* Ensure OpenAPI normalizers properly expose the date format
+* Add source maps for Swagger UI
+* Improve error message when filter class is not imported
+* Add missing autowiring alias for `Pagination`
 * Doctrine: ensure that `EntityManagerInterface` is used in data providers
 
 ## 2.4.6
