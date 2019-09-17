@@ -437,9 +437,9 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         }
 
         $container->registerForAutoconfiguration(AggregationItemExtensionInterface::class)
-            ->addTag('api_platform.doctrine.mongodb.aggregation_extension.item');
+            ->addTag('api_platform.doctrine_mongodb.odm.aggregation_extension.item');
         $container->registerForAutoconfiguration(AggregationCollectionExtensionInterface::class)
-            ->addTag('api_platform.doctrine.mongodb.aggregation_extension.collection');
+            ->addTag('api_platform.doctrine_mongodb.odm.aggregation_extension.collection');
         $container->registerForAutoconfiguration(DoctrineMongoDbOdmAbstractFilter::class)
             ->setBindings(['$managerRegistry' => new Reference('doctrine_mongodb')]);
 
