@@ -74,7 +74,7 @@ final class TypeFactory implements TypeFactoryInterface
             return ['type' => 'string'];
         }
 
-        if (is_subclass_of($className, \DateTimeInterface::class)) {
+        if (is_a($className, \DateTimeInterface::class, true)) {
             return ['type' => 'string', 'format' => 'date-time'];
         }
 

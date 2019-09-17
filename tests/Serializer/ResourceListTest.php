@@ -32,11 +32,4 @@ class ResourceListTest extends TestCase
     {
         $this->assertInstanceOf(\ArrayObject::class, $this->resourceList);
     }
-
-    public function testSerialize()
-    {
-        $this->resourceList['foo'] = 'bar';
-
-        $this->assertEquals('N;', serialize($this->resourceList));
-    }
 }
