@@ -2,17 +2,39 @@
 
 ## 2.5.0 beta 1
 
-* GraphQL: **BC Break** Separate `query` resource operation attribute into `item_query` and `collection_query` operations so user can use different security and serialization groups for them
-* GraphQL: Add support for custom queries and mutations
+* Add an HTTP client dedicated to functional API testing (#2608)
+* Add PATCH support (#2895)
+* Add a command to generate json schemas `api:json-schema:generate` (#2996)
+* Add infrastructure to generate a JSON Schema from a Resource `ApiPlatform\Core\JsonSchema\SchemaFactoryInterface` (#2983)
+* Replaces `access_control` by `security` and adds a `security_post_denormalize` attribute (#2992)
+* Add basic infrastructure for cursor-based pagination (#2532)
+* Change ExistsFilter syntax to `exists[property]`, old syntax still supported see #2243, fixes it's behavior on GraphQL (also related #2640).
+* Pagination with subresources (#2698)
+* Improve search filter id's managment (#1844)
+* Add support of name converter in filters (#2751, #2897), filter signature in abstract methods has changed see b42dfd198b1644904fd6a684ab2cedaf530254e3
+* Ability to change the Vary header via `cacheHeaders` attributes of a resource (#2758)
+* Ability to use the Query object in a paginator (#2493)
+* Compatibility with Symfony 4.3 (#2784)
+* Better handling of JsonSerializable classes (#2921)
+* Elasticsearch: Add pagination (#2919)
+* Add default, min, max specification in pagination parameter API docs (#3002)
+* Add a swagger version configuration option `swagger.versions` and deprecates the `enable_swagger` configuration option (#2998)
+* Order filter now documents `asc`/`desc` as enum (#2971)
+* GraphQL: **BC Break** Separate `query` resource operation attribute into `item_query` and `collection_query` operations so user can use different security and serialization groups for them (#2944, #3015)
+* GraphQL: Add support for custom queries and mutations (#2447)
 * GraphQL: Add support for custom types
-* GraphQL: Better pagination support (backwards pagination)
+* GraphQL: Better pagination support (backwards pagination) (#2142)
 * GraphQL: Support the pagination per resource
-* GraphQL: Add the concept of *stages* in the workflow of the resolvers and add the possibility to disable them with operation attributes
+* GraphQL: Add the concept of *stages* in the workflow of the resolvers and add the possibility to disable them with operation attributes (#2959)
 * GraphQL: Add GraphQL Playground besides GraphiQL and add the possibility to change the default IDE (or to disable it) for the GraphQL endpoint
-* GraphQL: Add a command to print the schema in SDL
+* GraphQL: Add a command to print the schema in SDL `api:graphql:export > schema.graphql` (#2600)
 * GraphQL: Improve serialization performance by avoiding calls to the `serialize` PHP function
 * GraphQL: Allow to use a search and an exist filter on the same resource
 * GraphQL: Refactor the architecture of the whole system to allow the decoration of useful services (`TypeConverter` to manage custom types, `SerializerContextBuilder` to modify the (de)serialization context dynamically, etc.)
+
+Notes:
+
+Please read #2825 if you have issues with the behavior of Readable/Writable Link
 
 ## 2.4.7
 
