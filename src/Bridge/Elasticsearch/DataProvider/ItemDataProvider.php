@@ -63,7 +63,7 @@ final class ItemDataProvider implements ItemDataProviderInterface, RestrictedDat
             }
 
             $method = $resourceMetadata->getItemOperationAttribute($operationName, 'method');
-            if (\in_array($method, ['PUT', 'PATCH', 'DELETE'])) {
+            if (\in_array($method, ['PUT', 'PATCH', 'DELETE'], true)) {
                 return false;
             }
         } catch (ResourceClassNotFoundException $e) {
