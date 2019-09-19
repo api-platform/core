@@ -56,13 +56,14 @@ final class ItemDataProvider implements ItemDataProviderInterface, RestrictedDat
      */
     public function supports(string $resourceClass, ?string $operationName = null, array $context = []): bool
     {
-        if (\in_array($operationName, ['put', 'delete'], true)) {
-            return false;
-        }
-
         try {
             $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
             if (false === $resourceMetadata->getItemOperationAttribute($operationName, 'elasticsearch', true, true)) {
+                return false;
+            }
+
+            $method = $resourceMetadata->getItemOperationAttribute($operationName, 'method');
+            if (\in_array($method, ['PUT', 'PATCH', 'DELETE'])) {
                 return false;
             }
         } catch (ResourceClassNotFoundException $e) {
