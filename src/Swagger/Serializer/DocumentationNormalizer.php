@@ -288,10 +288,10 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
     /**
      * @return array the update message as first value, and if the schema is defined as second
      */
-    private function addSchemas(bool $v3, array $message, \ArrayObject $definitions, string $resourceClass, string $operationType, string $operationName, array $mimeTypes, bool $output = true, bool $forceCollection = false): array
+    private function addSchemas(bool $v3, array $message, \ArrayObject $definitions, string $resourceClass, string $operationType, string $operationName, array $mimeTypes, string $type = Schema::TYPE_OUTPUT, bool $forceCollection = false): array
     {
         if (!$v3) {
-            $jsonSchema = $this->getJsonSchema($v3, $definitions, $resourceClass, $output, $operationType, $operationName, 'json', null, $forceCollection);
+            $jsonSchema = $this->getJsonSchema($v3, $definitions, $resourceClass, $type, $operationType, $operationName, 'json', null, $forceCollection);
             if (!$jsonSchema->isDefined()) {
                 return [$message, false];
             }
@@ -302,7 +302,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
         }
 
         foreach ($mimeTypes as $mimeType => $format) {
-            $jsonSchema = $this->getJsonSchema($v3, $definitions, $resourceClass, $output, $operationType, $operationName, $format, null, $forceCollection);
+            $jsonSchema = $this->getJsonSchema($v3, $definitions, $resourceClass, $type, $operationType, $operationName, $format, null, $forceCollection);
             if (!$jsonSchema->isDefined()) {
                 return [$message, false];
             }
@@ -437,7 +437,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
         $successResponse = [
             'description' => sprintf('%s %s response', $subresourceOperation['shortNames'][0], $collection ? 'collection' : 'resource'),
         ];
-        [$successResponse] = $this->addSchemas($v3, $successResponse, $definitions, $subresourceOperation['resource_class'], OperationType::SUBRESOURCE, $operationName, $mimeTypes, true, $collection);
+        [$successResponse] = $this->addSchemas($v3, $successResponse, $definitions, $subresourceOperation['resource_class'], OperationType::SUBRESOURCE, $operationName, $mimeTypes, Schema::TYPE_OUTPUT, $collection);
 
         $pathOperation['responses'] = ['200' => $successResponse, '404' => ['description' => 'Resource not found']];
 
@@ -525,7 +525,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
             return $pathOperation;
         }
 
-        [$message, $defined] = $this->addSchemas($v3, [], $definitions, $resourceClass, $operationType, $operationName, $requestMimeTypes, false);
+        [$message, $defined] = $this->addSchemas($v3, [], $definitions, $resourceClass, $operationType, $operationName, $requestMimeTypes, Schema::TYPE_INPUT);
         if (!$defined) {
             return $pathOperation;
         }
@@ -570,12 +570,12 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
         return $pathOperation;
     }
 
-    private function getJsonSchema(bool $v3, \ArrayObject $definitions, string $resourceClass, bool $output, ?string $operationType, ?string $operationName, string $format = 'json', ?array $serializerContext = null, bool $forceCollection = false): Schema
+    private function getJsonSchema(bool $v3, \ArrayObject $definitions, string $resourceClass, string $type, ?string $operationType, ?string $operationName, string $format = 'json', ?array $serializerContext = null, bool $forceCollection = false): Schema
     {
         $schema = new Schema($v3 ? Schema::VERSION_OPENAPI : Schema::VERSION_SWAGGER);
         $schema->setDefinitions($definitions);
 
-        $this->jsonSchemaFactory->buildSchema($resourceClass, $format, $output, $operationType, $operationName, $schema, $serializerContext, $forceCollection);
+        $this->jsonSchemaFactory->buildSchema($resourceClass, $format, $type, $operationType, $operationName, $schema, $serializerContext, $forceCollection);
 
         return $schema;
     }

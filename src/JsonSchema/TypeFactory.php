@@ -82,12 +82,9 @@ final class TypeFactory implements TypeFactoryInterface
             $version = $schema->getVersion();
 
             $subSchema = new Schema($version);
-            /*
-             * @var Schema $schema Prevents a false positive in PHPStan
-             */
             $subSchema->setDefinitions($schema->getDefinitions()); // Populate definitions of the main schema
 
-            $this->schemaFactory->buildSchema($className, $format, true, null, null, $subSchema, $serializerContext);
+            $this->schemaFactory->buildSchema($className, $format, Schema::TYPE_OUTPUT, null, null, $subSchema, $serializerContext);
 
             return ['$ref' => $subSchema['$ref']];
         }

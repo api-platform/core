@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\JsonSchema\Command;
 
 use ApiPlatform\Core\Api\OperationType;
+use ApiPlatform\Core\JsonSchema\Schema;
 use ApiPlatform\Core\JsonSchema\SchemaFactoryInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Exception\InvalidOptionException;
@@ -53,7 +54,7 @@ final class JsonSchemaGenerateCommand extends Command
             ->addOption('itemOperation', null, InputOption::VALUE_REQUIRED, 'The item operation')
             ->addOption('collectionOperation', null, InputOption::VALUE_REQUIRED, 'The collection operation')
             ->addOption('format', null, InputOption::VALUE_REQUIRED, 'The response format', (string) $this->formats[0])
-            ->addOption('type', null, InputOption::VALUE_REQUIRED, 'The type of schema to generate (input or output)', 'input');
+            ->addOption('type', null, InputOption::VALUE_REQUIRED, sprintf('The type of schema to generate (%s or %s)', Schema::TYPE_INPUT, Schema::TYPE_OUTPUT), Schema::TYPE_INPUT);
     }
 
     /**
@@ -71,11 +72,11 @@ final class JsonSchemaGenerateCommand extends Command
         $collectionOperation = $input->getOption('collectionOperation');
         /** @var string $format */
         $format = $input->getOption('format');
-        /** @var string $outputType */
-        $outputType = $input->getOption('type');
+        /** @var string $type */
+        $type = $input->getOption('type');
 
-        if (!\in_array($outputType, ['input', 'output'], true)) {
-            $io->error('You can only use "input" or "output" for the "type" option');
+        if (!\in_array($type, [Schema::TYPE_INPUT, Schema::TYPE_OUTPUT], true)) {
+            $io->error(sprintf('You can only use "%s" or "%s" for the "type" option', Schema::TYPE_INPUT, Schema::TYPE_OUTPUT));
 
             return 1;
         }
@@ -100,10 +101,10 @@ final class JsonSchemaGenerateCommand extends Command
             $operationName = $itemOperation ?? $collectionOperation;
         }
 
-        $schema = $this->schemaFactory->buildSchema($resource, $format, 'output' === $outputType, $operationType, $operationName);
+        $schema = $this->schemaFactory->buildSchema($resource, $format, $type, $operationType, $operationName);
 
         if (null !== $operationType && null !== $operationName && !$schema->isDefined()) {
-            $io->error(sprintf('There is no %ss defined for the operation "%s" of the resource "%s".', $outputType, $operationName, $resource));
+            $io->error(sprintf('There is no %s defined for the operation "%s" of the resource "%s".', $type, $operationName, $resource));
 
             return 1;
         }

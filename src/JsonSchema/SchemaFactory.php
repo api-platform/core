@@ -62,20 +62,20 @@ final class SchemaFactory implements SchemaFactoryInterface
     /**
      * {@inheritdoc}
      */
-    public function buildSchema(string $resourceClass, string $format = 'json', bool $output = true, ?string $operationType = null, ?string $operationName = null, ?Schema $schema = null, ?array $serializerContext = null, bool $forceCollection = false): Schema
+    public function buildSchema(string $resourceClass, string $format = 'json', string $type = Schema::TYPE_OUTPUT, ?string $operationType = null, ?string $operationName = null, ?Schema $schema = null, ?array $serializerContext = null, bool $forceCollection = false): Schema
     {
         $schema = $schema ?? new Schema();
-        if (null === $metadata = $this->getMetadata($resourceClass, $output, $operationType, $operationName, $serializerContext)) {
+        if (null === $metadata = $this->getMetadata($resourceClass, $type, $operationType, $operationName, $serializerContext)) {
             return $schema;
         }
         [$resourceMetadata, $serializerContext, $inputOrOutputClass] = $metadata;
 
         $version = $schema->getVersion();
-        $definitionName = $this->buildDefinitionName($resourceClass, $format, $output, $operationType, $operationName, $serializerContext);
+        $definitionName = $this->buildDefinitionName($resourceClass, $format, $type, $operationType, $operationName, $serializerContext);
 
         $method = (null !== $operationType && null !== $operationName) ? $resourceMetadata->getTypedOperationAttribute($operationType, $operationName, 'method') : 'GET';
 
-        if (!$output && !\in_array($method, ['POST', 'PATCH', 'PUT'], true)) {
+        if (Schema::TYPE_OUTPUT !== $type && !\in_array($method, ['POST', 'PATCH', 'PUT'], true)) {
             return $schema;
         }
 
@@ -196,9 +196,9 @@ final class SchemaFactory implements SchemaFactoryInterface
         $schema->getDefinitions()[$definitionName]['properties'][$normalizedPropertyName] = $propertySchema;
     }
 
-    private function buildDefinitionName(string $resourceClass, string $format = 'json', bool $output = true, ?string $operationType = null, ?string $operationName = null, ?array $serializerContext = null): string
+    private function buildDefinitionName(string $resourceClass, string $format = 'json', string $type = Schema::TYPE_OUTPUT, ?string $operationType = null, ?string $operationName = null, ?array $serializerContext = null): string
     {
-        [$resourceMetadata, $serializerContext, $inputOrOutputClass] = $this->getMetadata($resourceClass, $output, $operationType, $operationName, $serializerContext);
+        [$resourceMetadata, $serializerContext, $inputOrOutputClass] = $this->getMetadata($resourceClass, $type, $operationType, $operationName, $serializerContext);
 
         $prefix = $resourceMetadata->getShortName();
         if (null !== $inputOrOutputClass && $resourceClass !== $inputOrOutputClass) {
@@ -220,10 +220,10 @@ final class SchemaFactory implements SchemaFactoryInterface
         return $name;
     }
 
-    private function getMetadata(string $resourceClass, bool $output, ?string $operationType, ?string $operationName, ?array $serializerContext): ?array
+    private function getMetadata(string $resourceClass, string $type = Schema::TYPE_OUTPUT, ?string $operationType, ?string $operationName, ?array $serializerContext): ?array
     {
         $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
-        $attribute = $output ? 'output' : 'input';
+        $attribute = Schema::TYPE_OUTPUT === $type ? 'output' : 'input';
         if (null === $operationType || null === $operationName) {
             $inputOrOutput = $resourceMetadata->getAttribute($attribute, ['class' => $resourceClass]);
         } else {
@@ -237,14 +237,14 @@ final class SchemaFactory implements SchemaFactoryInterface
 
         return [
             $resourceMetadata,
-            $serializerContext ?? $this->getSerializerContext($resourceMetadata, $output, $operationType, $operationName),
+            $serializerContext ?? $this->getSerializerContext($resourceMetadata, $type, $operationType, $operationName),
             $inputOrOutput['class'],
         ];
     }
 
-    private function getSerializerContext(ResourceMetadata $resourceMetadata, bool $output, ?string $operationType, ?string $operationName): array
+    private function getSerializerContext(ResourceMetadata $resourceMetadata, string $type = Schema::TYPE_OUTPUT, ?string $operationType, ?string $operationName): array
     {
-        $attribute = $output ? 'normalization_context' : 'denormalization_context';
+        $attribute = Schema::TYPE_OUTPUT === $type ? 'normalization_context' : 'denormalization_context';
 
         if (null === $operationType || null === $operationName) {
             return $resourceMetadata->getAttribute($attribute, []);
