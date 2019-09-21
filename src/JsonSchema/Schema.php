@@ -27,9 +27,11 @@ namespace ApiPlatform\Core\JsonSchema;
  */
 final class Schema extends \ArrayObject
 {
+    public const TYPE_INPUT = 'input';
+    public const TYPE_OUTPUT = 'output';
     public const VERSION_JSON_SCHEMA = 'json-schema';
-    public const VERSION_SWAGGER = 'swagger';
     public const VERSION_OPENAPI = 'openapi';
+    public const VERSION_SWAGGER = 'swagger';
 
     private $version;
 
@@ -49,6 +51,8 @@ final class Schema extends \ArrayObject
     }
 
     /**
+     * {@inheritdoc}
+     *
      * @param bool $includeDefinitions if set to false, definitions will not be included in the resulting array
      */
     public function getArrayCopy(bool $includeDefinitions = true): array

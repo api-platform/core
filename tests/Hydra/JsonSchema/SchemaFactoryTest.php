@@ -15,6 +15,7 @@ namespace ApiPlatform\Core\Tests\Hydra\JsonSchema;
 
 use ApiPlatform\Core\Api\OperationType;
 use ApiPlatform\Core\Hydra\JsonSchema\SchemaFactory;
+use ApiPlatform\Core\JsonSchema\Schema;
 use ApiPlatform\Core\JsonSchema\SchemaFactory as BaseSchemaFactory;
 use ApiPlatform\Core\JsonSchema\TypeFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
@@ -77,7 +78,7 @@ class SchemaFactoryTest extends TestCase
 
     public function testSchemaTypeBuildSchema(): void
     {
-        $resultSchema = $this->schemaFactory->buildSchema(Dummy::class, 'jsonld', true, OperationType::COLLECTION);
+        $resultSchema = $this->schemaFactory->buildSchema(Dummy::class, 'jsonld', Schema::TYPE_OUTPUT, OperationType::COLLECTION);
 
         $this->assertNull($resultSchema->getRootDefinitionKey());
         $this->assertArrayHasKey('properties', $resultSchema);
@@ -86,7 +87,7 @@ class SchemaFactoryTest extends TestCase
         $this->assertArrayHasKey('hydra:view', $resultSchema['properties']);
         $this->assertArrayHasKey('hydra:search', $resultSchema['properties']);
 
-        $resultSchema = $this->schemaFactory->buildSchema(Dummy::class, 'jsonld', true, null, null, null, null, true);
+        $resultSchema = $this->schemaFactory->buildSchema(Dummy::class, 'jsonld', Schema::TYPE_OUTPUT, null, null, null, null, true);
 
         $this->assertNull($resultSchema->getRootDefinitionKey());
         $this->assertArrayHasKey('properties', $resultSchema);
