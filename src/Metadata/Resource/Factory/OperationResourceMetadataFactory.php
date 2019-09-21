@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Metadata\Resource\Factory;
 
+use ApiPlatform\Core\Action\NotFoundAction;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 
 /**
@@ -81,6 +82,13 @@ final class OperationResourceMetadataFactory implements ResourceMetadataFactoryI
             $resourceMetadata = $this->normalize(false, $resourceClass, $resourceMetadata, $itemOperations);
         }
 
+        if ($this->needsDefaultGetOperation($resourceMetadata)) {
+            $resourceMetadata = $resourceMetadata->withItemOperations(array_merge(
+                $resourceMetadata->getItemOperations(),
+                ['get' => ['method' => 'GET', 'read' => false, 'output' => ['class' => false], 'controller' => NotFoundAction::class]])
+            );
+        }
+
         $graphql = $resourceMetadata->getGraphql();
         if (null === $graphql) {
             $resourceMetadata = $resourceMetadata->withGraphql(['item_query' => [], 'collection_query' => [], 'delete' => [], 'update' => [], 'create' => []]);
@@ -147,5 +155,18 @@ final class OperationResourceMetadataFactory implements ResourceMetadataFactoryI
         }
 
         return $resourceMetadata->withGraphql($operations);
+    }
+
+    private function needsDefaultGetOperation(ResourceMetadata $resourceMetadata): bool
+    {
+        $itemOperations = $resourceMetadata->getItemOperations();
+
+        foreach ($itemOperations as $itemOperation) {
+            if ('GET' === ($itemOperation['method'] ?? false)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }
