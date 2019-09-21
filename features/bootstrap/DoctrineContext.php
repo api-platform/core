@@ -31,6 +31,7 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\DummyCarColor as DummyCa
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\DummyCustomMutation as DummyCustomMutationDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\DummyCustomQuery as DummyCustomQueryDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\DummyDate as DummyDateDocument;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\DummyDifferentGraphQlSerializationGroup as DummyDifferentGraphQlSerializationGroupDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\DummyDtoCustom as DummyDtoCustomDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\DummyDtoNoInput as DummyDtoNoInputDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\DummyDtoNoOutput as DummyDtoNoOutputDocument;
@@ -85,6 +86,7 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyCarColor;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyCustomMutation;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyCustomQuery;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyDate;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyDifferentGraphQlSerializationGroup;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyDtoCustom;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyDtoNoInput;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyDtoNoOutput;
@@ -1225,6 +1227,21 @@ final class DoctrineContext implements Context
     }
 
     /**
+     * @Given there are :nb dummy with different GraphQL serialization groups objects
+     */
+    public function thereAreDummyWithDifferentGraphQLSerializationGroupsObjects(int $nb)
+    {
+        for ($i = 1; $i <= $nb; ++$i) {
+            $dummyDifferentSerializationGroup = $this->buildDummyDifferentSerializationGroup();
+            $dummyDifferentSerializationGroup->setName('Name #'.$i);
+            $dummyDifferentSerializationGroup->setTitle('Title #'.$i);
+            $this->manager->persist($dummyDifferentSerializationGroup);
+        }
+
+        $this->manager->flush();
+    }
+
+    /**
      * @Given there is a ramsey identified resource with uuid :uuid
      */
     public function thereIsARamseyIdentifiedResource(string $uuid)
@@ -1581,6 +1598,14 @@ final class DoctrineContext implements Context
     private function buildDummyDate()
     {
         return $this->isOrm() ? new DummyDate() : new DummyDateDocument();
+    }
+
+    /**
+     * @return DummyDifferentGraphQlSerializationGroup|DummyDifferentGraphQlSerializationGroupDocument
+     */
+    private function buildDummyDifferentSerializationGroup()
+    {
+        return $this->isOrm() ? new DummyDifferentGraphQlSerializationGroup() : new DummyDifferentGraphQlSerializationGroupDocument();
     }
 
     /**

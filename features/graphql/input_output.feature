@@ -107,7 +107,7 @@ Feature: GraphQL DTO input and output
     {
       "errors": [
         {
-          "message": "Cannot query field \"id\" on type \"DummyDtoNoOutputItem\".",
+          "message": "Cannot query field \"id\" on type \"DummyDtoNoOutput\".",
           "extensions": {
             "category": "graphql"
           },
