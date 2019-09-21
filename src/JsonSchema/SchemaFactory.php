@@ -230,7 +230,7 @@ final class SchemaFactory implements SchemaFactoryInterface
             $inputOrOutput = $resourceMetadata->getTypedOperationAttribute($operationType, $operationName, $attribute, ['class' => $resourceClass], true);
         }
 
-        if (null === ($inputOrOutput['class'] ?? null)) {
+        if (false === ($inputOrOutput['class'] ?? false)) {
             // input or output disabled
             return null;
         }
