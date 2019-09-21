@@ -8,6 +8,7 @@ Feature: GraphQL query support
       dummy(id: "/dummies/1") {
         id
         name
+        name_converted
       }
     }
     """
@@ -16,6 +17,7 @@ Feature: GraphQL query support
     And the header "Content-Type" should be equal to "application/json"
     And the JSON node "data.dummy.id" should be equal to "/dummies/1"
     And the JSON node "data.dummy.name" should be equal to "Dummy #1"
+    And the JSON node "data.dummy.name_converted" should be equal to "Converted 1"
 
   Scenario: Retrieve a Relay Node
     When I send the following GraphQL request:

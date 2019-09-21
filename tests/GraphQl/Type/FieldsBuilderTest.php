@@ -27,6 +27,7 @@ use ApiPlatform\Core\Metadata\Property\PropertyNameCollection;
 use ApiPlatform\Core\Metadata\Property\SubresourceMetadata;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Serializer\NameConverter\CustomConverter;
 use GraphQL\Type\Definition\InputObjectType;
 use GraphQL\Type\Definition\InterfaceType;
 use GraphQL\Type\Definition\NonNull;
@@ -91,7 +92,7 @@ class FieldsBuilderTest extends TestCase
         $this->collectionResolverFactoryProphecy = $this->prophesize(ResolverFactoryInterface::class);
         $this->itemMutationResolverFactoryProphecy = $this->prophesize(ResolverFactoryInterface::class);
         $this->filterLocatorProphecy = $this->prophesize(ContainerInterface::class);
-        $this->fieldsBuilder = new FieldsBuilder($this->propertyNameCollectionFactoryProphecy->reveal(), $this->propertyMetadataFactoryProphecy->reveal(), $this->resourceMetadataFactoryProphecy->reveal(), $this->typesContainerProphecy->reveal(), $this->typeBuilderProphecy->reveal(), $this->typeConverterProphecy->reveal(), $this->itemResolverFactoryProphecy->reveal(), $this->collectionResolverFactoryProphecy->reveal(), $this->itemMutationResolverFactoryProphecy->reveal(), $this->filterLocatorProphecy->reveal(), new Pagination($this->resourceMetadataFactoryProphecy->reveal()));
+        $this->fieldsBuilder = new FieldsBuilder($this->propertyNameCollectionFactoryProphecy->reveal(), $this->propertyMetadataFactoryProphecy->reveal(), $this->resourceMetadataFactoryProphecy->reveal(), $this->typesContainerProphecy->reveal(), $this->typeBuilderProphecy->reveal(), $this->typeConverterProphecy->reveal(), $this->itemResolverFactoryProphecy->reveal(), $this->collectionResolverFactoryProphecy->reveal(), $this->itemMutationResolverFactoryProphecy->reveal(), $this->filterLocatorProphecy->reveal(), new Pagination($this->resourceMetadataFactoryProphecy->reveal()), new CustomConverter(), '__');
     }
 
     public function testGetNodeQueryFields(): void
@@ -285,7 +286,7 @@ class FieldsBuilderTest extends TestCase
                             ],
                             'boolField' => $graphqlType,
                             'boolField_list' => GraphQLType::listOf($graphqlType),
-                            'parent_child' => new InputObjectType(['name' => 'ShortNameFilter_parent__child', 'fields' => ['related_nested' => $graphqlType]]),
+                            'parent__child' => new InputObjectType(['name' => 'ShortNameFilter_parent__child', 'fields' => ['related__nested' => $graphqlType]]),
                             'dateField' => new InputObjectType(['name' => 'ShortNameFilter_dateField', 'fields' => ['before' => $graphqlType]]),
                         ],
                         'resolve' => $resolver,
@@ -424,6 +425,7 @@ class FieldsBuilderTest extends TestCase
                     'property' => new PropertyMetadata(),
                     'propertyBool' => new PropertyMetadata(new Type(Type::BUILTIN_TYPE_BOOL), null, true, false),
                     'propertyNotReadable' => new PropertyMetadata(new Type(Type::BUILTIN_TYPE_BOOL), null, false, false),
+                    'nameConverted' => new PropertyMetadata(new Type(Type::BUILTIN_TYPE_STRING), null, true, false),
                 ],
                 false, 'item_query', null, null,
                 [
@@ -431,6 +433,13 @@ class FieldsBuilderTest extends TestCase
                         'type' => GraphQLType::nonNull(GraphQLType::id()),
                     ],
                     'propertyBool' => [
+                        'type' => GraphQLType::nonNull(GraphQLType::string()),
+                        'description' => null,
+                        'args' => [],
+                        'resolve' => null,
+                        'deprecationReason' => '',
+                    ],
+                    'name_converted' => [
                         'type' => GraphQLType::nonNull(GraphQLType::string()),
                         'description' => null,
                         'args' => [],

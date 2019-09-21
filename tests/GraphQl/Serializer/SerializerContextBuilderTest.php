@@ -16,6 +16,7 @@ namespace ApiPlatform\Core\Tests\GraphQl\Serializer;
 use ApiPlatform\Core\GraphQl\Serializer\SerializerContextBuilder;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Serializer\NameConverter\CustomConverter;
 use GraphQL\Type\Definition\ResolveInfo;
 use PHPUnit\Framework\TestCase;
 
@@ -36,7 +37,8 @@ class SerializerContextBuilderTest extends TestCase
         $this->resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
 
         $this->serializerContextBuilder = new SerializerContextBuilder(
-            $this->resourceMetadataFactoryProphecy->reveal()
+            $this->resourceMetadataFactoryProphecy->reveal(),
+            new CustomConverter()
         );
     }
 
@@ -85,8 +87,8 @@ class SerializerContextBuilderTest extends TestCase
                     'resource_class' => $resourceClass,
                     'graphql_operation_name' => $operationName,
                     'attributes' => [
-                        'field' => 'foo',
                         'id' => 3,
+                        'field' => 'foo',
                     ],
                     'input' => ['class' => 'inputClass'],
                     'output' => ['class' => 'outputClass'],
@@ -131,8 +133,8 @@ class SerializerContextBuilderTest extends TestCase
                     'resource_class' => $resourceClass,
                     'graphql_operation_name' => $operationName,
                     'attributes' => [
-                        'related' => ['field' => 'bar'],
                         'id' => 7,
+                        'related' => ['field' => 'bar'],
                     ],
                     'input' => ['class' => 'inputClass'],
                     'output' => ['class' => 'outputClass'],

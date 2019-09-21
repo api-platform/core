@@ -91,7 +91,7 @@ Feature: GraphQL mutation support
     When I send the following GraphQL request:
     """
     mutation {
-      createDummy(input: {name: "A dummy", foo: [], relatedDummy: "/related_dummies/1", clientMutationId: "myId"}) {
+      createDummy(input: {name: "A dummy", foo: [], relatedDummy: "/related_dummies/1", name_converted: "Converted" clientMutationId: "myId"}) {
         dummy {
           id
           name
@@ -100,6 +100,7 @@ Feature: GraphQL mutation support
             name
             __typename
           }
+          name_converted
         }
         clientMutationId
       }
@@ -113,6 +114,7 @@ Feature: GraphQL mutation support
     And the JSON node "data.createDummy.dummy.foo" should have 0 elements
     And the JSON node "data.createDummy.dummy.relatedDummy.name" should be equal to "RelatedDummy #1"
     And the JSON node "data.createDummy.dummy.relatedDummy.__typename" should be equal to "RelatedDummyItem"
+    And the JSON node "data.createDummy.dummy.name_converted" should be equal to "Converted"
     And the JSON node "data.createDummy.clientMutationId" should be equal to "myId"
 
   Scenario: Create an item with an iterable field

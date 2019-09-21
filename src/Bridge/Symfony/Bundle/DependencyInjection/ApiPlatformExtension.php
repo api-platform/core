@@ -384,6 +384,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         }
 
         $container->setParameter('api_platform.graphql.default_ide', $config['graphql']['default_ide']);
+        $container->setParameter('api_platform.graphql.nesting_separator', $config['graphql']['nesting_separator']);
 
         $loader->load('graphql.xml');
 

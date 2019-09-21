@@ -55,7 +55,8 @@ class ReadStageTest extends TestCase
             $this->iriConverterProphecy->reveal(),
             $this->collectionDataProviderProphecy->reveal(),
             $this->subresourceDataProviderProphecy->reveal(),
-            $this->serializerContextBuilderProphecy->reveal()
+            $this->serializerContextBuilderProphecy->reveal(),
+            '_'
         );
     }
 
