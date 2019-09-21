@@ -356,6 +356,7 @@ class ApiPlatformExtensionTest extends TestCase
         $containerBuilderProphecy->setDefinition('api_platform.graphql.normalizer.object', Argument::type(Definition::class))->shouldNotBeCalled();
         $containerBuilderProphecy->setDefinition('api_platform.graphql.serializer.context_builder', Argument::type(Definition::class))->shouldNotBeCalled();
         $containerBuilderProphecy->setDefinition('api_platform.graphql.iterable_type', Argument::type(Definition::class))->shouldNotBeCalled();
+        $containerBuilderProphecy->setDefinition('api_platform.graphql.upload_type', Argument::type(Definition::class))->shouldNotBeCalled();
         $containerBuilderProphecy->setDefinition('api_platform.graphql.type_locator', Argument::type(Definition::class))->shouldNotBeCalled();
         $containerBuilderProphecy->setDefinition('api_platform.graphql.types_container', Argument::type(Definition::class))->shouldNotBeCalled();
         $containerBuilderProphecy->setDefinition('api_platform.graphql.types_factory', Argument::type(Definition::class))->shouldNotBeCalled();
@@ -1126,6 +1127,7 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.graphql.resolver.stage.validate',
             'api_platform.graphql.resolver.resource_field',
             'api_platform.graphql.iterable_type',
+            'api_platform.graphql.upload_type',
             'api_platform.graphql.type_locator',
             'api_platform.graphql.types_container',
             'api_platform.graphql.types_factory',

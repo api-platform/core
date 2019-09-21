@@ -15,6 +15,7 @@ use Behat\Behat\Context\Context;
 use Behat\Behat\Context\Environment\InitializedContextEnvironment;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use Behat\Gherkin\Node\PyStringNode;
+use Behat\Gherkin\Node\TableNode;
 use Behatch\Context\RestContext;
 use Behatch\HttpCall\Request;
 use GraphQL\Type\Introspection;
@@ -95,6 +96,45 @@ final class GraphqlContext implements Context
     {
         $this->graphqlRequest['operation'] = $operation;
         $this->sendGraphqlRequest();
+    }
+
+    /**
+     * @Given I have the following file(s) for a GraphQL request:
+     */
+    public function iHaveTheFollowingFilesForAGraphqlRequest(TableNode $table)
+    {
+        $files = [];
+
+        foreach ($table->getHash() as $row) {
+            if (!isset($row['name'], $row['file'])) {
+                throw new \InvalidArgumentException('You must provide a "name" and "file" column in your table node.');
+            }
+
+            $files[$row['name']] = $this->restContext->getMinkParameter('files_path').DIRECTORY_SEPARATOR.$row['file'];
+        }
+
+        $this->graphqlRequest['files'] = $files;
+    }
+
+    /**
+     * @Given I have the following GraphQL multipart request map:
+     */
+    public function iHaveTheFollowingGraphqlMultipartRequestMap(PyStringNode $string)
+    {
+        $this->graphqlRequest['map'] = $string->getRaw();
+    }
+
+    /**
+     * @When I send the following GraphQL multipart request operations:
+     */
+    public function iSendTheFollowingGraphqlMultipartRequestOperations(PyStringNode $string)
+    {
+        $params = [];
+        $params['operations'] = $string->getRaw();
+        $params['map'] = $this->graphqlRequest['map'];
+
+        $this->request->setHttpHeader('Content-type', 'multipart/form-data');
+        $this->request->send('POST', '/graphql', $params, $this->graphqlRequest['files']);
     }
 
     /**

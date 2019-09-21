@@ -6,7 +6,7 @@ Feature: GraphQL introspection support
     Then the response status code should be 400
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/json"
-    And the JSON node "errors[0].message" should be equal to "GraphQL query is not valid"
+    And the JSON node "errors[0].message" should be equal to "GraphQL query is not valid."
 
   Scenario: Introspect the GraphQL schema
     When I send the query to introspect the schema
