@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Hal\Serializer;
 
 use ApiPlatform\Core\Serializer\AbstractItemNormalizer;
+use ApiPlatform\Core\Serializer\CacheKeyTrait;
 use ApiPlatform\Core\Serializer\ContextTrait;
 use ApiPlatform\Core\Util\ClassInfoTrait;
 use Symfony\Component\Serializer\Exception\LogicException;
@@ -27,8 +28,9 @@ use Symfony\Component\Serializer\Mapping\AttributeMetadataInterface;
  */
 final class ItemNormalizer extends AbstractItemNormalizer
 {
-    use ContextTrait;
+    use CacheKeyTrait;
     use ClassInfoTrait;
+    use ContextTrait;
 
     public const FORMAT = 'jsonhal';
 
@@ -53,7 +55,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
         }
 
         if (!isset($context['cache_key'])) {
-            $context['cache_key'] = $this->getHalCacheKey($format, $context);
+            $context['cache_key'] = $this->getCacheKey($format, $context);
         }
 
         $resourceClass = $this->resourceClassResolver->getResourceClass($object, $context['resource_class'] ?? null);
@@ -231,21 +233,6 @@ final class ItemNormalizer extends AbstractItemNormalizer
         }
 
         return \is_string($rel) ? $rel : $rel['_links']['self']['href'];
-    }
-
-    /**
-     * Gets the cache key to use.
-     *
-     * @return bool|string
-     */
-    private function getHalCacheKey(?string $format, array $context)
-    {
-        try {
-            return md5($format.serialize($context));
-        } catch (\Exception $exception) {
-            // The context cannot be serialized, skip the cache
-            return false;
-        }
     }
 
     /**

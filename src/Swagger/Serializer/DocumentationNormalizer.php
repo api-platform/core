@@ -288,7 +288,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
     /**
      * @return array the update message as first value, and if the schema is defined as second
      */
-    private function addSchemas(bool $v3, array $message, \ArrayObject $definitions, string $resourceClass, string $operationType, string $operationName, array $mimeTypes, bool $output = true, bool $forceCollection = false)
+    private function addSchemas(bool $v3, array $message, \ArrayObject $definitions, string $resourceClass, string $operationType, string $operationName, array $mimeTypes, bool $output = true, bool $forceCollection = false): array
     {
         if (!$v3) {
             $jsonSchema = $this->getJsonSchema($v3, $definitions, $resourceClass, $output, $operationType, $operationName, 'json', null, $forceCollection);

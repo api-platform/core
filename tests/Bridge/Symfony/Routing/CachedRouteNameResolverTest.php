@@ -159,8 +159,8 @@ class CachedRouteNameResolverTest extends TestCase
 
     public function testGetRouteNameWithCacheItemThrowsCacheException()
     {
-        $cacheException = $this->prophesize(CacheException::class);
-        $cacheException->willExtend(\Exception::class);
+        $cacheException = $this->prophesize(\Exception::class);
+        $cacheException->willImplement(CacheException::class);
 
         $cacheItemPool = $this->prophesize(CacheItemPoolInterface::class);
         $cacheItemPool->getItem(Argument::type('string'))->shouldBeCalledTimes(1)->willThrow($cacheException->reveal());

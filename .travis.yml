@@ -14,14 +14,14 @@ cache:
       echo "memory_limit=-1" >> ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/travis.ini
   - &disable-xdebug-php-extension |
       phpenv config-rm xdebug.ini || echo "xdebug not available"
-  - &install-mongodb-php-extension |
+  - &enable-mongodb-php-extension |
       echo "extension=mongodb.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/mongodb.ini
   - &run-behat-tests |
-      vendor/bin/behat --format=progress --no-interaction
+      vendor/bin/behat --format=progress --no-interaction --colors
   - &run-phpunit-tests |
-      vendor/bin/phpunit
+      vendor/bin/phpunit --colors=always
   - &update-project-dependencies |
-      composer update --prefer-dist --no-progress --no-suggest --ansi
+      composer update --no-progress --no-suggest --ansi
   - &validate-openapi-v2-json |
       tests/Fixtures/app/console api:swagger:export > swagger.json && npx swagger-cli validate swagger.json && rm swagger.json
   - &validate-openapi-v2-yaml |
@@ -33,9 +33,10 @@ cache:
 
 jobs:
   include:
-    - php: '7.1'
+    - name: '(PHP 7.1)'
+      php: '7.1'
       before_install:
-        - *install-mongodb-php-extension
+        - *enable-mongodb-php-extension
         - *disable-xdebug-php-extension
         - *disable-php-memory-limit
         - *add-composer-bin-dir-to-path
@@ -56,9 +57,10 @@ jobs:
         - *validate-openapi-v3-json
         - *validate-openapi-v3-yaml
 
-    - php: '7.2'
+    - name: '(PHP 7.2)'
+      php: '7.2'
       before_install:
-        - *install-mongodb-php-extension
+        - *enable-mongodb-php-extension
         - *disable-xdebug-php-extension
         - *disable-php-memory-limit
         - *add-composer-bin-dir-to-path
@@ -75,9 +77,10 @@ jobs:
         - *validate-openapi-v3-json
         - *validate-openapi-v3-yaml
 
-    - php: '7.3'
+    - name: '(PHP 7.3)'
+      php: '7.3'
       before_install:
-        - *install-mongodb-php-extension
+        - *enable-mongodb-php-extension
         - *disable-xdebug-php-extension
         - *disable-php-memory-limit
         - *add-composer-bin-dir-to-path
@@ -94,15 +97,15 @@ jobs:
         - *validate-openapi-v3-json
         - *validate-openapi-v3-yaml
 
-    - php: '7.3'
-      env: deps=low
+    - name: '(PHP 7.3) (lowest dependencies)'
+      php: '7.3'
       before_install:
-        - *install-mongodb-php-extension
+        - *enable-mongodb-php-extension
         - *disable-xdebug-php-extension
         - *disable-php-memory-limit
         - *add-composer-bin-dir-to-path
       install:
-        - composer update --prefer-dist --no-progress --no-suggest --prefer-stable --prefer-lowest --ansi
+        - composer update --no-progress --no-suggest --prefer-stable --prefer-lowest --ansi
       before_script:
         - *clear-test-app-cache
       script:
@@ -119,7 +122,7 @@ jobs:
       services:
         - postgresql
       before_install:
-        - *install-mongodb-php-extension
+        - *enable-mongodb-php-extension
         - *disable-xdebug-php-extension
         - *disable-php-memory-limit
         - *add-composer-bin-dir-to-path
@@ -142,7 +145,7 @@ jobs:
       services:
         - mysql
       before_install:
-        - *install-mongodb-php-extension
+        - *enable-mongodb-php-extension
         - *disable-xdebug-php-extension
         - *disable-php-memory-limit
         - *add-composer-bin-dir-to-path
@@ -165,7 +168,7 @@ jobs:
       services:
         - mongodb
       before_install:
-        - *install-mongodb-php-extension
+        - *enable-mongodb-php-extension
         - *disable-xdebug-php-extension
         - *disable-php-memory-limit
         - *add-composer-bin-dir-to-path
@@ -191,7 +194,7 @@ jobs:
         - sudo apt-get update
         - sudo apt-get install elasticsearch
         - sudo service elasticsearch start
-        - *install-mongodb-php-extension
+        - *enable-mongodb-php-extension
         - *disable-xdebug-php-extension
         - *disable-php-memory-limit
         - *add-composer-bin-dir-to-path
@@ -211,7 +214,7 @@ jobs:
     - php: '7.3'
       env: SYMFONY_DEPRECATIONS_HELPER=max[total]=5 # 5 deprecation notices from FOSUserBundle
       before_install:
-        - *install-mongodb-php-extension
+        - *enable-mongodb-php-extension
         - *disable-xdebug-php-extension
         - *disable-php-memory-limit
         - *add-composer-bin-dir-to-path

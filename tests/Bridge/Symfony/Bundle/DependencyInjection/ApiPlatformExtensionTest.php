@@ -57,6 +57,7 @@ use ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\ApiPlatformExtens
 use ApiPlatform\Core\DataPersister\DataPersisterInterface;
 use ApiPlatform\Core\DataProvider\CollectionDataProviderInterface;
 use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
+use ApiPlatform\Core\DataProvider\Pagination;
 use ApiPlatform\Core\DataProvider\SubresourceDataProviderInterface;
 use ApiPlatform\Core\DataTransformer\DataTransformerInterface;
 use ApiPlatform\Core\Exception\FilterValidationException;
@@ -935,6 +936,7 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.property_accessor' => 'property_accessor',
             'api_platform.property_info' => 'property_info',
             'api_platform.serializer' => 'serializer',
+            Pagination::class => 'api_platform.pagination',
             IriConverterInterface::class => 'api_platform.iri_converter',
             UrlGeneratorInterface::class => 'api_platform.router',
             SerializerContextBuilderInterface::class => 'api_platform.serializer.context_builder',

@@ -32,6 +32,7 @@
             <argument>%api_platform.collection.pagination%</argument>
             <argument>%api_platform.graphql.collection.pagination%</argument>
         </service>
+        <service id="ApiPlatform\Core\DataProvider\Pagination" alias="api_platform.pagination" />
     </services>
 
 </container>

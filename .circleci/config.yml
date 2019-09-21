@@ -21,7 +21,7 @@ commands:
     steps:
       - run:
           name: Clear test app cache
-          command: tests/Fixtures/app/console cache:clear
+          command: tests/Fixtures/app/console cache:clear --ansi
   disable-php-memory-limit:
     steps:
       - run:
@@ -37,7 +37,7 @@ commands:
       - run:
           name: Install mongodb PHP extension
           command: |
-            sudo pecl install mongodb-1.5.4
+            sudo pecl install mongodb-1.5.5
             sudo docker-php-ext-enable mongodb
   install-pcov-php-extension:
     steps:
@@ -153,16 +153,11 @@ commands:
           paths:
             - /tmp/phpstan/cache
           key: phpstan-cache-{{ .Revision }}-{{ .BuildNum }}
-  update-composer:
-    steps:
-      - run:
-          name: Update Composer
-          command: sudo composer self-update
   update-project-dependencies:
     steps:
       - run:
           name: Update project dependencies
-          command: composer update --prefer-dist --no-progress --no-suggest --ansi
+          command: composer update --no-progress --no-suggest --ansi
   wait-for-elasticsearch:
     steps:
       - wait-for-service:
@@ -226,7 +221,6 @@ jobs:
       - checkout
       - disable-xdebug-php-extension
       - disable-php-memory-limit
-      - update-composer
       - restore-composer-cache
       - run:
           name: Install PHP-CS-Fixer
@@ -253,7 +247,6 @@ jobs:
       - install-mongodb-php-extension
       - disable-xdebug-php-extension
       - disable-php-memory-limit
-      - update-composer
       - restore-composer-cache
       - update-project-dependencies
       - save-composer-cache
@@ -274,7 +267,6 @@ jobs:
       - install-pcov-php-extension
       - disable-xdebug-php-extension
       - disable-php-memory-limit
-      - update-composer
       - restore-composer-cache
       - update-project-dependencies
       - save-composer-cache
@@ -322,7 +314,6 @@ jobs:
       - install-pcov-php-extension
       - disable-xdebug-php-extension
       - disable-php-memory-limit
-      - update-composer
       - restore-composer-cache
       - update-project-dependencies
       - save-composer-cache
@@ -333,7 +324,7 @@ jobs:
             mkdir -p build/logs/behat build/coverage
             for f in $(find features -name '*.feature' -not -path 'features/main/exposed_state.feature' -not -path 'features/elasticsearch/*' -not -path 'features/mongodb/*' | circleci tests split --split-by=timings); do
               _f=$(echo "$f" | tr / _)
-              FEATURE="${_f}" vendor/bin/behat --format=progress --out=std --format=junit --out=build/logs/behat/"${_f}" --profile=default-coverage --no-interaction "$f"
+              FEATURE="${_f}" vendor/bin/behat --format=progress --out=std --format=junit --out=build/logs/behat/"${_f}" --profile=default-coverage --no-interaction --colors "$f"
             done
       - restore-npm-cache
       - merge-test-reports:
@@ -368,7 +359,6 @@ jobs:
       - install-pcov-php-extension
       - disable-xdebug-php-extension
       - disable-php-memory-limit
-      - update-composer
       - restore-composer-cache
       - update-project-dependencies
       - save-composer-cache
@@ -406,7 +396,6 @@ jobs:
       - install-pcov-php-extension
       - disable-xdebug-php-extension
       - disable-php-memory-limit
-      - update-composer
       - restore-composer-cache
       - update-project-dependencies
       - save-composer-cache
@@ -416,7 +405,7 @@ jobs:
           name: Run Behat tests
           command: |
             mkdir -p build/logs/behat
-            vendor/bin/behat --format=progress --out=std --format=junit --out=build/logs/behat --profile=mongodb-coverage --no-interaction
+            vendor/bin/behat --format=progress --out=std --format=junit --out=build/logs/behat --profile=mongodb-coverage --no-interaction --colors
       - restore-npm-cache
       - merge-test-reports:
           dir: build/logs/behat
@@ -450,7 +439,6 @@ jobs:
       - install-pcov-php-extension
       - disable-xdebug-php-extension
       - disable-php-memory-limit
-      - update-composer
       - restore-composer-cache
       - update-project-dependencies
       - save-composer-cache
@@ -460,7 +448,7 @@ jobs:
           name: Run Behat tests
           command: |
             mkdir -p build/logs/behat
-            vendor/bin/behat --format=progress --out=std --format=junit --out=build/logs/behat --profile=elasticsearch-coverage --no-interaction
+            vendor/bin/behat --format=progress --out=std --format=junit --out=build/logs/behat --profile=elasticsearch-coverage --no-interaction --colors
       - restore-npm-cache
       - merge-test-reports:
           dir: build/logs/behat
@@ -485,10 +473,12 @@ jobs:
 
 workflows:
   version: 2
-  lint-and-coverage:
+  lint:
     jobs:
       - php-cs-fixer
       - phpstan
+  coverage:
+    jobs:
       - phpunit-coverage
       - behat-coverage
       - phpunit-mongodb-coverage
