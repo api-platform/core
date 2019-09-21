@@ -14,7 +14,8 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\GraphQl\Resolver;
 
 use ApiPlatform\Core\GraphQl\Resolver\MutationResolverInterface;
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\MediaObject;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Model\MediaObject;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 /**
  * Resolver for custom file upload mutation.
@@ -29,10 +30,11 @@ class UploadMediaObjectResolver implements MutationResolverInterface
     public function __invoke($item, array $context): MediaObject
     {
         /**
-         * @var \Symfony\Component\HttpFoundation\File\UploadedFile
+         * @var UploadedFile
          */
         $uploadedFile = $context['args']['input']['file'];
-        // doing some process for uploading the file
+
+        // Some process to save the file.
 
         $uploadedMediaObject = new MediaObject();
         $uploadedMediaObject->id = 1;

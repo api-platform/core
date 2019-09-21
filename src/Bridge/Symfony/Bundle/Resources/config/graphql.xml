@@ -102,6 +102,10 @@
             <tag name="api_platform.graphql.type" />
         </service>
 
+        <service id="api_platform.graphql.upload_type" class="ApiPlatform\Core\GraphQl\Type\Definition\UploadType">
+            <tag name="api_platform.graphql.type" />
+        </service>
+
         <service id="api_platform.graphql.type_locator" class="Symfony\Component\DependencyInjection\ServiceLocator">
             <tag name="container.service_locator" />
         </service>
@@ -160,7 +164,6 @@
             <argument type="service" id="api_platform.graphql.executor" />
             <argument type="service" id="api_platform.graphql.action.graphiql" />
             <argument type="service" id="api_platform.graphql.action.graphql_playground" />
-            <argument type="service" id="property_accessor" />
             <argument>%kernel.debug%</argument>
             <argument>%api_platform.graphql.graphiql.enabled%</argument>
             <argument>%api_platform.graphql.graphql_playground.enabled%</argument>

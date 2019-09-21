@@ -11,27 +11,25 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity;
+namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Model;
 
 use ApiPlatform\Core\Annotation\ApiProperty;
 use ApiPlatform\Core\Annotation\ApiResource;
-use GraphQL\Type\Definition\Type;
 
 /**
- * Class MediaObject.
- *
- * @ApiResource(iri="http://schema.org/MediaObject",
+ * @ApiResource(
+ *     iri="http://schema.org/MediaObject",
  *     graphql={
  *         "upload"={
  *             "mutation"="app.graphql.mutation_resolver.upload_media_object",
  *             "args"={
- *                 "file"={"type"="Upload!", "description"="File"}
+ *                 "file"={"type"="Upload!", "description"="Upload a file"}
  *             }
  *         },
  *         "uploadMultiple"={
  *             "mutation"="app.graphql.mutation_resolver.upload_multiple_media_object",
  *             "args"={
- *                 "files"={"type"="[Upload!]!", "description"="Files"}
+ *                 "files"={"type"="[Upload!]!", "description"="Upload multiple files"}
  *             }
  *         }
  *     }

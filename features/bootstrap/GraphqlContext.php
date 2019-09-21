@@ -99,15 +99,15 @@ final class GraphqlContext implements Context
     }
 
     /**
-     * @Given I have the following files for a GraphQL request:
+     * @Given I have the following file(s) for a GraphQL request:
      */
     public function iHaveTheFollowingFilesForAGraphqlRequest(TableNode $table)
     {
         $files = [];
 
         foreach ($table->getHash() as $row) {
-            if (!isset($row['name']) || !isset($row['file'])) {
-                throw new \Exception("You must provide a 'name' and 'file' column in your table node.");
+            if (!isset($row['name'], $row['file'])) {
+                throw new \InvalidArgumentException('You must provide a "name" and "file" column in your table node.');
             }
 
             $files[$row['name']] = $this->restContext->getMinkParameter('files_path').DIRECTORY_SEPARATOR.$row['file'];
@@ -117,17 +117,17 @@ final class GraphqlContext implements Context
     }
 
     /**
-     * @Given I have the following GraphQL multipart form map:
+     * @Given I have the following GraphQL multipart request map:
      */
-    public function iHaveTheFollowingGraphqlMultipartFormMap(PyStringNode $string)
+    public function iHaveTheFollowingGraphqlMultipartRequestMap(PyStringNode $string)
     {
         $this->graphqlRequest['map'] = $string->getRaw();
     }
 
     /**
-     * @When I send the following GraphQL multipart form operations:
+     * @When I send the following GraphQL multipart request operations:
      */
-    public function iSendTheFollowingGraphqlMultipartFormOperations(PyStringNode $string)
+    public function iSendTheFollowingGraphqlMultipartRequestOperations(PyStringNode $string)
     {
         $params = [];
         $params['operations'] = $string->getRaw();

@@ -31,14 +31,14 @@ Feature: GraphQL mutation support
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/json"
-    And the JSON node "data.__type.fields[0].name" should contain "delete"
-    And the JSON node "data.__type.fields[0].description" should match '/^Deletes a [A-z0-9]+.$/'
-    And the JSON node "data.__type.fields[0].type.name" should match "/^delete[A-z0-9]+Payload$/"
-    And the JSON node "data.__type.fields[0].type.kind" should be equal to "OBJECT"
-    And the JSON node "data.__type.fields[0].args[0].name" should be equal to "input"
-    And the JSON node "data.__type.fields[0].args[0].type.kind" should be equal to "NON_NULL"
-    And the JSON node "data.__type.fields[0].args[0].type.ofType.name" should match "/^delete[A-z0-9]+Input$/"
-    And the JSON node "data.__type.fields[0].args[0].type.ofType.kind" should be equal to "INPUT_OBJECT"
+    And the JSON node "data.__type.fields[2].name" should contain "delete"
+    And the JSON node "data.__type.fields[2].description" should match '/^Deletes a [A-z0-9]+.$/'
+    And the JSON node "data.__type.fields[2].type.name" should match "/^delete[A-z0-9]+Payload$/"
+    And the JSON node "data.__type.fields[2].type.kind" should be equal to "OBJECT"
+    And the JSON node "data.__type.fields[2].args[0].name" should be equal to "input"
+    And the JSON node "data.__type.fields[2].args[0].type.kind" should be equal to "NON_NULL"
+    And the JSON node "data.__type.fields[2].args[0].type.ofType.name" should match "/^delete[A-z0-9]+Input$/"
+    And the JSON node "data.__type.fields[2].args[0].type.ofType.kind" should be equal to "INPUT_OBJECT"
 
   Scenario: Create an item
     When I send the following GraphQL request:
@@ -422,22 +422,21 @@ Feature: GraphQL mutation support
     And the JSON node "data.testCustomArgumentsDummyCustomMutation.dummyCustomMutation.result" should be equal to "18"
     And the JSON node "data.testCustomArgumentsDummyCustomMutation.clientMutationId" should be equal to "myId"
 
-  @!mongodb
-  Scenario: Uploading a file with custom mutation
-    Given I have the following files for a GraphQL request:
+  Scenario: Uploading a file with a custom mutation
+    Given I have the following file for a GraphQL request:
       | name | file     |
       | file | test.gif |
-    And I have the following GraphQL multipart form map:
+    And I have the following GraphQL multipart request map:
     """
     {
-      "file":["variables.file"]
+      "file": ["variables.file"]
     }
     """
-    When I send the following GraphQL multipart form operations:
+    When I send the following GraphQL multipart request operations:
     """
       {
-        "query":"mutation($file:Upload!){ uploadMediaObject(input:{file:$file}){ mediaObject{ id contentUrl } } }",
-        "variables":{
+        "query": "mutation($file: Upload!) { uploadMediaObject(input: {file: $file}) { mediaObject { id contentUrl } } }",
+        "variables": {
           "file": null
         }
       }
@@ -446,14 +445,13 @@ Feature: GraphQL mutation support
     And the response should be in JSON
     And the JSON node "data.uploadMediaObject.mediaObject.contentUrl" should be equal to "test.gif"
 
-  @!mongodb
-  Scenario: Uploading multiple files with custom mutation
+  Scenario: Uploading multiple files with a custom mutation
     Given I have the following files for a GraphQL request:
       | name | file     |
       | 0    | test.gif |
       | 1    | test.gif |
       | 2    | test.gif |
-    And I have the following GraphQL multipart form map:
+    And I have the following GraphQL multipart request map:
     """
     {
       "0": ["variables.files.0"],
@@ -461,11 +459,11 @@ Feature: GraphQL mutation support
       "2": ["variables.files.2"]
     }
     """
-    When I send the following GraphQl multipart form operations:
+    When I send the following GraphQL multipart request operations:
     """
       {
-        "query":"mutation($files:[Upload!]!){ uploadMultipleMediaObject(input:{files:$files}){ mediaObject{ id contentUrl } } }",
-        "variables":{
+        "query": "mutation($files: [Upload!]!) { uploadMultipleMediaObject(input: {files: $files}) { mediaObject { id contentUrl } } }",
+        "variables": {
           "files": [
             null,
             null,
@@ -476,4 +474,3 @@ Feature: GraphQL mutation support
     """
     Then the response status code should be 200
     And the JSON node "data.uploadMultipleMediaObject.mediaObject.contentUrl" should be equal to "test.gif"
-
