@@ -89,13 +89,13 @@ Coverage will be available in `coverage/index.html`.
 The command to launch Behat tests is:
 
 ```shell
-./vendor/bin/behat --suite=default --stop-on-failure -vvv
+./vendor/bin/behat --profile=default --stop-on-failure -vvv
 ```
 
 If you want to launch Behat tests for MongoDB, the command is:
 
 ```shell
-APP_ENV=mongodb ./vendor/bin/behat --suite=mongodb --stop-on-failure -vvv
+APP_ENV=mongodb ./vendor/bin/behat --profile=mongodb --stop-on-failure -vvv
 ```
 
 ## Squash your Commits

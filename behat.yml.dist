@@ -20,7 +20,7 @@ default:
         - 'Behat\MinkExtension\Context\MinkContext'
         - 'Behatch\Context\RestContext'
       filters:
-        tags: '~@postgres&&~@mongodb&&~@elasticsearch'
+        tags: '~@postgres&&~@mongodb&&~@elasticsearch&&~@absoluteUrl'
   extensions:
     'Behat\Symfony2Extension':
       kernel:
@@ -59,7 +59,7 @@ postgres:
         - 'Behat\MinkExtension\Context\MinkContext'
         - 'Behatch\Context\RestContext'
       filters:
-        tags: '~@sqlite&&~@mongodb&&~@elasticsearch'
+        tags: '~@sqlite&&~@mongodb&&~@elasticsearch&&~@absoluteUrl'
 
 mongodb:
   suites:
@@ -84,7 +84,7 @@ mongodb:
         - 'Behat\MinkExtension\Context\MinkContext'
         - 'Behatch\Context\RestContext'
       filters:
-        tags: '~@sqlite&&~@elasticsearch&&~@!mongodb'
+        tags: '~@sqlite&&~@elasticsearch&&~@!mongodb&&~@absoluteUrl'
 
 elasticsearch:
   suites:
@@ -104,6 +104,22 @@ elasticsearch:
         - 'Behat\MinkExtension\Context\MinkContext'
       filters:
         tags: '@elasticsearch'
+
+absoluteUrl:
+  suites:
+    default: false
+    absoluteUrl:
+      paths:
+        - '%paths.base%/features/absolute_url'
+      contexts:
+        - 'DoctrineContext':
+            doctrine: '@doctrine'
+            passwordEncoder: '@security.password_encoder'
+        - 'JsonContext'
+        - 'Behatch\Context\RestContext'
+        - 'Behat\MinkExtension\Context\MinkContext'
+      filters:
+        tags: '@absoluteUrl'
 
 default-coverage:
   suites:
@@ -128,7 +144,7 @@ default-coverage:
         - 'Behat\MinkExtension\Context\MinkContext'
         - 'Behatch\Context\RestContext'
       filters:
-        tags: '~@postgres&&~@mongodb&&~@elasticsearch'
+        tags: '~@postgres&&~@mongodb&&~@elasticsearch&&~@absoluteUrl'
 
 mongodb-coverage:
   suites:
@@ -154,7 +170,7 @@ mongodb-coverage:
         - 'Behat\MinkExtension\Context\MinkContext'
         - 'Behatch\Context\RestContext'
       filters:
-        tags: '~@sqlite&&~@elasticsearch&&~@!mongodb'
+        tags: '~@sqlite&&~@elasticsearch&&~@!mongodb&&~@absoluteUrl'
 
 elasticsearch-coverage:
   suites:

@@ -212,6 +212,26 @@ jobs:
         - *validate-openapi-v3-yaml
 
     - php: '7.3'
+      env: APP_ENV=absolute_url
+      before_install:
+        - *enable-mongodb-php-extension
+        - *disable-xdebug-php-extension
+        - *disable-php-memory-limit
+        - *add-composer-bin-dir-to-path
+      install:
+        - *update-project-dependencies
+      before_script:
+        - *clear-test-app-cache
+      script:
+        - *run-phpunit-tests
+        - *clear-test-app-cache
+        - vendor/bin/behat --format=progress --profile=absoluteUrl --no-interaction
+        - *validate-openapi-v2-json
+        - *validate-openapi-v2-yaml
+        - *validate-openapi-v3-json
+        - *validate-openapi-v3-yaml
+
+    - php: '7.3'
       env: SYMFONY_DEPRECATIONS_HELPER=max[total]=5 # 5 deprecation notices from FOSUserBundle
       before_install:
         - *enable-mongodb-php-extension

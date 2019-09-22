@@ -145,6 +145,18 @@ class IriConverterTest extends TestCase
         $this->assertEquals($converter->getIriFromResourceClass(Dummy::class), '/dummies');
     }
 
+    public function testGetIriFromResourceClassAbsoluteUrl()
+    {
+        $routeNameResolverProphecy = $this->prophesize(RouteNameResolverInterface::class);
+        $routeNameResolverProphecy->getRouteName(Dummy::class, OperationType::COLLECTION)->willReturn('dummies');
+
+        $routerProphecy = $this->prophesize(RouterInterface::class);
+        $routerProphecy->generate('dummies', [], UrlGeneratorInterface::ABS_URL)->willReturn('http://example.com/dummies');
+
+        $converter = $this->getIriConverter($routerProphecy, $routeNameResolverProphecy, null, null, null, true);
+        $this->assertEquals($converter->getIriFromResourceClass(Dummy::class), 'http://example.com/dummies');
+    }
+
     public function testNotAbleToGenerateGetIriFromResourceClass()
     {
         $this->expectException(InvalidArgumentException::class);
@@ -197,6 +209,18 @@ class IriConverterTest extends TestCase
 
         $converter = $this->getIriConverter($routerProphecy, $routeNameResolverProphecy);
         $this->assertEquals($converter->getItemIriFromResourceClass(Dummy::class, ['id' => 1]), '/dummies/1');
+    }
+
+    public function testGetItemIriFromResourceClassAbsoluteUrl()
+    {
+        $routeNameResolverProphecy = $this->prophesize(RouteNameResolverInterface::class);
+        $routeNameResolverProphecy->getRouteName(Dummy::class, OperationType::ITEM)->willReturn('api_dummies_get_item');
+
+        $routerProphecy = $this->prophesize(RouterInterface::class);
+        $routerProphecy->generate('api_dummies_get_item', ['id' => 1], UrlGeneratorInterface::ABS_URL)->willReturn('http://example.com/dummies/1');
+
+        $converter = $this->getIriConverter($routerProphecy, $routeNameResolverProphecy, null, null, null, true);
+        $this->assertEquals($converter->getItemIriFromResourceClass(Dummy::class, ['id' => 1]), 'http://example.com/dummies/1');
     }
 
     public function testNotAbleToGenerateGetItemIriFromResourceClass()
@@ -339,7 +363,7 @@ class IriConverterTest extends TestCase
         return $resourceClassResolver->reveal();
     }
 
-    private function getIriConverter($routerProphecy = null, $routeNameResolverProphecy = null, $itemDataProviderProphecy = null, $subresourceDataProviderProphecy = null, $identifierConverterProphecy = null)
+    private function getIriConverter($routerProphecy = null, $routeNameResolverProphecy = null, $itemDataProviderProphecy = null, $subresourceDataProviderProphecy = null, $identifierConverterProphecy = null, $absoluteUrl = false)
     {
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
@@ -366,7 +390,9 @@ class IriConverterTest extends TestCase
             null,
             new IdentifiersExtractor($propertyNameCollectionFactory, $propertyMetadataFactory, null, $this->getResourceClassResolver()),
             $subresourceDataProviderProphecy ? $subresourceDataProviderProphecy->reveal() : null,
-            $identifierConverterProphecy ? $identifierConverterProphecy->reveal() : null
+            $identifierConverterProphecy ? $identifierConverterProphecy->reveal() : null,
+            null,
+            $absoluteUrl
         );
     }
 }

@@ -322,7 +322,7 @@ jobs:
           name: Run Behat tests
           command: |
             mkdir -p build/logs/behat build/coverage
-            for f in $(find features -name '*.feature' -not -path 'features/main/exposed_state.feature' -not -path 'features/elasticsearch/*' -not -path 'features/mongodb/*' | circleci tests split --split-by=timings); do
+            for f in $(find features -name '*.feature' -not -path 'features/main/exposed_state.feature' -not -path 'features/elasticsearch/*' -not -path 'features/mongodb/*' -not -path 'features/absolute_url/*' | circleci tests split --split-by=timings); do
               _f=$(echo "$f" | tr / _)
               FEATURE="${_f}" vendor/bin/behat --format=progress --out=std --format=junit --out=build/logs/behat/"${_f}" --profile=default-coverage --no-interaction --colors "$f"
             done
@@ -471,6 +471,48 @@ jobs:
           file: build/logs/clover.xml
       - save-npm-cache
 
+  behat-absolute-url-coverage:
+    executor: php
+    environment:
+      APP_ENV: absolute_url
+    working_directory: ~/api-platform/core
+    steps:
+      - checkout
+      - install-mongodb-php-extension
+      - install-pcov-php-extension
+      - disable-xdebug-php-extension
+      - disable-php-memory-limit
+      - restore-composer-cache
+      - update-project-dependencies
+      - save-composer-cache
+      - clear-test-app-cache
+      - run:
+          name: Run Behat tests
+          command: |
+            mkdir -p build/logs/behat
+            vendor/bin/behat --format=progress --out=std --format=junit --out=build/logs/behat --profile=absoluteUrl --no-interaction --colors
+      - restore-npm-cache
+      - merge-test-reports:
+          dir: build/logs/behat
+          out: build/logs/behat/junit.xml
+      - store_test_results:
+          path: build/logs
+      - store_artifacts:
+          path: build/logs/behat/junit.xml
+          destination: build/logs/behat/junit.xml
+      - merge-code-coverage-reports:
+          dir: build/coverage
+          out: build/logs/clover.xml
+      - store_artifacts:
+          path: build/logs/clover.xml
+          destination: build/logs/clover.xml
+      - codecov/upload:
+          file: build/logs/clover.xml
+          flags: behat_absolute_url
+      - coveralls/upload:
+          file: build/logs/clover.xml
+      - save-npm-cache
+
 workflows:
   version: 2
   lint:
@@ -484,3 +526,4 @@ workflows:
       - phpunit-mongodb-coverage
       - behat-mongodb-coverage
       - behat-elasticsearch-coverage
+      - behat-absolute-url-coverage

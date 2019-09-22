@@ -1,0 +1,5 @@
+imports:
+    - { resource: config_test.yml }
+        
+api_platform:
+    absolute_url: true

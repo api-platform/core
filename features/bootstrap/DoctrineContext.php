@@ -11,6 +11,8 @@
 
 declare(strict_types=1);
 
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\AbsoluteUrlDummy as AbsoluteUrlDummyDocument;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\AbsoluteUrlRelationDummy as AbsoluteUrlRelationDummyDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\Address as AddressDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\Answer as AnswerDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\CompositeItem as CompositeItemDocument;
@@ -64,6 +66,8 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\SoMany as SoManyDocument
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\Taxon as TaxonDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\ThirdLevel as ThirdLevelDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\User as UserDocument;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\AbsoluteUrlDummy;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\AbsoluteUrlRelationDummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Address;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Answer;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\CompositeItem;
@@ -1485,6 +1489,23 @@ final class DoctrineContext implements Context
         $this->manager->flush();
     }
 
+    /**
+     * @Given there are :nb absoluteUrlDummy objects with a related absoluteUrlRelationDummy
+     */
+    public function thereAreAbsoluteUrlDummies(int $nb)
+    {
+        for ($i = 1; $i <= $nb; ++$i) {
+            $absoluteUrlRelationDummy = $this->buildAbsoluteUrlRelationDummy();
+            $absoluteUrlDummy = $this->buildAbsoluteUrlDummy();
+            $absoluteUrlDummy->absoluteUrlRelationDummy = $absoluteUrlRelationDummy;
+
+            $this->manager->persist($absoluteUrlRelationDummy);
+            $this->manager->persist($absoluteUrlDummy);
+        }
+
+        $this->manager->flush();
+    }
+
     private function isOrm(): bool
     {
         return null !== $this->schemaTool;
@@ -1853,5 +1874,21 @@ final class DoctrineContext implements Context
     private function buildConvertedRelated()
     {
         return $this->isOrm() ? new ConvertedRelated() : new ConvertedRelatedDocument();
+    }
+
+    /**
+     * @return AbsoluteUrlDummyDocument|AbsoluteUrlDummy
+     */
+    private function buildAbsoluteUrlDummy()
+    {
+        return $this->isOrm() ? new AbsoluteUrlDummy() : new AbsoluteUrlDummyDocument();
+    }
+
+    /**
+     * @return AbsoluteUrlRelationDummyDocument|AbsoluteUrlRelationDummy
+     */
+    private function buildAbsoluteUrlRelationDummy()
+    {
+        return $this->isOrm() ? new AbsoluteUrlRelationDummy() : new AbsoluteUrlRelationDummyDocument();
     }
 }

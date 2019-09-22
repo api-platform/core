@@ -49,8 +49,9 @@ final class IriConverter implements IriConverterInterface
     private $routeNameResolver;
     private $router;
     private $identifiersExtractor;
+    private $absoluteUrl;
 
-    public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, ItemDataProviderInterface $itemDataProvider, RouteNameResolverInterface $routeNameResolver, RouterInterface $router, PropertyAccessorInterface $propertyAccessor = null, IdentifiersExtractorInterface $identifiersExtractor = null, SubresourceDataProviderInterface $subresourceDataProvider = null, IdentifierConverterInterface $identifierConverter = null, ResourceClassResolverInterface $resourceClassResolver = null)
+    public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, ItemDataProviderInterface $itemDataProvider, RouteNameResolverInterface $routeNameResolver, RouterInterface $router, PropertyAccessorInterface $propertyAccessor = null, IdentifiersExtractorInterface $identifiersExtractor = null, SubresourceDataProviderInterface $subresourceDataProvider = null, IdentifierConverterInterface $identifierConverter = null, ResourceClassResolverInterface $resourceClassResolver = null, bool $absoluteUrl = false)
     {
         $this->itemDataProvider = $itemDataProvider;
         $this->routeNameResolver = $routeNameResolver;
@@ -59,6 +60,7 @@ final class IriConverter implements IriConverterInterface
         $this->subresourceDataProvider = $subresourceDataProvider;
         $this->identifierConverter = $identifierConverter;
         $this->resourceClassResolver = $resourceClassResolver;
+        $this->absoluteUrl = $absoluteUrl;
 
         if (null === $identifiersExtractor) {
             @trigger_error(sprintf('Not injecting "%s" is deprecated since API Platform 2.1 and will not be possible anymore in API Platform 3', IdentifiersExtractorInterface::class), E_USER_DEPRECATED);
@@ -137,7 +139,7 @@ final class IriConverter implements IriConverterInterface
     public function getIriFromResourceClass(string $resourceClass, int $referenceType = UrlGeneratorInterface::ABS_PATH): string
     {
         try {
-            return $this->router->generate($this->routeNameResolver->getRouteName($resourceClass, OperationType::COLLECTION), [], $referenceType);
+            return $this->generate($this->routeNameResolver->getRouteName($resourceClass, OperationType::COLLECTION), [], $referenceType);
         } catch (RoutingExceptionInterface $e) {
             throw new InvalidArgumentException(sprintf('Unable to generate an IRI for "%s".', $resourceClass), $e->getCode(), $e);
         }
@@ -153,7 +155,7 @@ final class IriConverter implements IriConverterInterface
         try {
             $identifiers = $this->generateIdentifiersUrl($identifiers, $resourceClass);
 
-            return $this->router->generate($routeName, ['id' => implode(';', $identifiers)], $referenceType);
+            return $this->generate($routeName, ['id' => implode(';', $identifiers)], $referenceType);
         } catch (RoutingExceptionInterface $e) {
             throw new InvalidArgumentException(sprintf(
                 'Unable to generate an IRI for "%s".',
@@ -168,10 +170,19 @@ final class IriConverter implements IriConverterInterface
     public function getSubresourceIriFromResourceClass(string $resourceClass, array $context, int $referenceType = UrlGeneratorInterface::ABS_PATH): string
     {
         try {
-            return $this->router->generate($this->routeNameResolver->getRouteName($resourceClass, OperationType::SUBRESOURCE, $context), $context['subresource_identifiers'], $referenceType);
+            return $this->generate($this->routeNameResolver->getRouteName($resourceClass, OperationType::SUBRESOURCE, $context), $context['subresource_identifiers'], $referenceType);
         } catch (RoutingExceptionInterface $e) {
             throw new InvalidArgumentException(sprintf('Unable to generate an IRI for "%s".', $resourceClass), $e->getCode(), $e);
         }
+    }
+
+    /**
+     * @param array $parameters
+     * @param int   $referenceType
+     */
+    private function generate(string $name, $parameters = [], $referenceType = UrlGeneratorInterface::ABS_PATH): string
+    {
+        return $this->router->generate($name, $parameters, true === $this->absoluteUrl ? UrlGeneratorInterface::ABS_URL : $referenceType);
     }
 
     /**

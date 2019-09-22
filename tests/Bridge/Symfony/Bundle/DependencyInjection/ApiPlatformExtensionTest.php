@@ -117,6 +117,7 @@ class ApiPlatformExtensionTest extends TestCase
         'title' => 'title',
         'description' => 'description',
         'version' => 'version',
+        'absolute_url' => false,
         'formats' => [
             'jsonld' => ['mime_types' => ['application/ld+json']],
             'jsonhal' => ['mime_types' => ['application/hal+json']],
@@ -793,6 +794,7 @@ class ApiPlatformExtensionTest extends TestCase
             ],
             'api_platform.title' => 'title',
             'api_platform.version' => 'version',
+            'api_platform.absolute_url' => false,
             'api_platform.show_webby' => true,
             'api_platform.allow_plain_identifiers' => false,
             'api_platform.eager_loading.enabled' => Argument::type('bool'),
@@ -1076,6 +1078,7 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.resource_class_directories' => Argument::type('array'),
             'api_platform.validator.serialize_payload_fields' => [],
             'api_platform.elasticsearch.enabled' => false,
+            'api_platform.absolute_url' => false,
         ];
 
         foreach ($parameters as $key => $value) {
