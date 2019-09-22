@@ -553,7 +553,7 @@ final class Configuration implements ConfigurationInterface
         $defaultsNode
             ->ignoreExtraKeys()
             ->beforeNormalization()
-            ->always(function (array $defaults) use ($nameConverter) {
+            ->always(static function (array $defaults) use ($nameConverter) {
                 $normalizedDefaults = [];
                 foreach ($defaults as $option => $value) {
                     $option = $nameConverter->normalize($option);

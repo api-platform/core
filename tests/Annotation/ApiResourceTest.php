@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\Annotation;
 
 use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Core\Api\UrlGeneratorInterface;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\Tests\Fixtures\AnnotatedClass;
 use Doctrine\Common\Annotations\AnnotationReader;
@@ -64,6 +65,7 @@ class ApiResourceTest extends TestCase
             'swaggerContext' => ['description' => 'bar'],
             'validationGroups' => ['foo', 'bar'],
             'sunset' => 'Thu, 11 Oct 2018 00:00:00 +0200',
+            'urlGenerationStrategy' => UrlGeneratorInterface::ABS_PATH,
         ]);
 
         $this->assertSame('shortName', $resource->shortName);
@@ -105,6 +107,7 @@ class ApiResourceTest extends TestCase
             'validation_groups' => ['baz', 'qux'],
             'cache_headers' => ['max_age' => 0, 'shared_max_age' => 0, 'vary' => ['Custom-Vary-1', 'Custom-Vary-2']],
             'sunset' => 'Thu, 11 Oct 2018 00:00:00 +0200',
+            'url_generation_strategy' => 1,
         ], $resource->attributes);
     }
 

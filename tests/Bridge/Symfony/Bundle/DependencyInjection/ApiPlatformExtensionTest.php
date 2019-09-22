@@ -862,6 +862,7 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.defaults' => ['attributes' => []],
             'api_platform.enable_entrypoint' => true,
             'api_platform.enable_docs' => true,
+            'api_platform.url_generation_strategy' => 1,
         ];
 
         $pagination = [

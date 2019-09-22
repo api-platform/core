@@ -11,6 +11,8 @@
 
 declare(strict_types=1);
 
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\AbsoluteUrlDummy as AbsoluteUrlDummyDocument;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\AbsoluteUrlRelationDummy as AbsoluteUrlRelationDummyDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\Address as AddressDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\Answer as AnswerDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\CompositeItem as CompositeItemDocument;
@@ -52,6 +54,8 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\FooDummy as FooDummyDocu
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\FourthLevel as FourthLevelDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\Greeting as GreetingDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\MaxDepthDummy as MaxDepthDummyDocument;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\NetworkPathDummy as NetworkPathDummyDocument;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\NetworkPathRelationDummy as NetworkPathRelationDummyDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\Order as OrderDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\Person as PersonDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\PersonToPet as PersonToPetDocument;
@@ -69,6 +73,8 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\Taxon as TaxonDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\ThirdLevel as ThirdLevelDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\UrlEncodedId as UrlEncodedIdDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\User as UserDocument;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\AbsoluteUrlDummy;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\AbsoluteUrlRelationDummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Address;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Answer;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\CompositeItem;
@@ -113,6 +119,9 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\FourthLevel;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Greeting;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\InternalUser;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\MaxDepthDummy;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\NetworkPathDummy;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\NetworkPathRelationDummy;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Node;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Order;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Person;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\PersonToPet;
@@ -1527,6 +1536,7 @@ final class DoctrineContext implements Context
     }
 
     /**
+<<<<<<< HEAD
      * @Given there are :nb dummy mercure objects
      */
     public function thereAreDummyMercureObjects(int $nb)
@@ -1542,6 +1552,36 @@ final class DoctrineContext implements Context
 
             $this->manager->persist($relatedDummy);
             $this->manager->persist($dummyMercure);
+=======
+     * @Given there are :nb absoluteUrlDummy objects with a related absoluteUrlRelationDummy
+     */
+    public function thereAreAbsoluteUrlDummies(int $nb)
+    {
+        for ($i = 1; $i <= $nb; ++$i) {
+            $absoluteUrlRelationDummy = $this->buildAbsoluteUrlRelationDummy();
+            $absoluteUrlDummy = $this->buildAbsoluteUrlDummy();
+            $absoluteUrlDummy->absoluteUrlRelationDummy = $absoluteUrlRelationDummy;
+
+            $this->manager->persist($absoluteUrlRelationDummy);
+            $this->manager->persist($absoluteUrlDummy);
+        }
+
+        $this->manager->flush();
+    }
+
+    /**
+     * @Given there are :nb networkPathDummy objects with a related networkPathRelationDummy
+     */
+    public function thereArenetworkPathDummies(int $nb)
+    {
+        for ($i = 1; $i <= $nb; ++$i) {
+            $networkPathRelationDummy = $this->buildNetworkPathRelationDummy();
+            $networkPathDummy = $this->buildNetworkPathDummy();
+            $networkPathDummy->networkPathRelationDummy = $networkPathRelationDummy;
+
+            $this->manager->persist($networkPathRelationDummy);
+            $this->manager->persist($networkPathDummy);
+>>>>>>> 880597f6... add ability to return absolute urls instead of relative IRIs
         }
 
         $this->manager->flush();
@@ -1926,10 +1966,42 @@ final class DoctrineContext implements Context
     }
 
     /**
+<<<<<<< HEAD
      * @return DummyMercure|DummyMercureDocument
      */
     private function buildDummyMercure()
     {
         return $this->isOrm() ? new DummyMercure() : new DummyMercureDocument();
+=======
+     * @return AbsoluteUrlDummyDocument|AbsoluteUrlDummy
+     */
+    private function buildAbsoluteUrlDummy()
+    {
+        return $this->isOrm() ? new AbsoluteUrlDummy() : new AbsoluteUrlDummyDocument();
+    }
+
+    /**
+     * @return AbsoluteUrlRelationDummyDocument|AbsoluteUrlRelationDummy
+     */
+    private function buildAbsoluteUrlRelationDummy()
+    {
+        return $this->isOrm() ? new AbsoluteUrlRelationDummy() : new AbsoluteUrlRelationDummyDocument();
+    }
+
+    /**
+     * @return NetworkPathDummyDocument|NetworkPathDummy
+     */
+    private function buildNetworkPathDummy()
+    {
+        return $this->isOrm() ? new NetworkPathDummy() : new NetworkPathDummyDocument();
+    }
+
+    /**
+     * @return NetworkPathRelationDummyDocument|NetworkPathRelationDummy
+     */
+    private function buildNetworkPathRelationDummy()
+    {
+        return $this->isOrm() ? new NetworkPathRelationDummy() : new NetworkPathRelationDummyDocument();
+>>>>>>> 880597f6... add ability to return absolute urls instead of relative IRIs
     }
 }

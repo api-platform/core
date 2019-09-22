@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Util;
 
+use ApiPlatform\Core\Api\UrlGeneratorInterface;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
 
 /**
@@ -56,27 +57,30 @@ final class IriHelper
      *
      * @param float $page
      */
-    public static function createIri(array $parts, array $parameters, string $pageParameterName = null, float $page = null, bool $absoluteUrl = false): string
+    public static function createIri(array $parts, array $parameters, string $pageParameterName = null, float $page = null, $urlGenerationStrategy = UrlGeneratorInterface::ABS_PATH): string
     {
         if (null !== $page && null !== $pageParameterName) {
             $parameters[$pageParameterName] = $page;
+        }
+
+        if (\is_bool($urlGenerationStrategy)) {
+            @trigger_error(sprintf('Passing a bool as 5th parameter to "%s::createIri()" is deprecated since API Platform 2.6. Pass an "%s" constant (int) instead.', __CLASS__, UrlGeneratorInterface::class), E_USER_DEPRECATED);
+            $urlGenerationStrategy = $urlGenerationStrategy ? UrlGeneratorInterface::ABS_URL : UrlGeneratorInterface::ABS_PATH;
         }
 
         $query = http_build_query($parameters, '', '&', PHP_QUERY_RFC3986);
         $parts['query'] = preg_replace('/%5B\d+%5D/', '%5B%5D', $query);
 
         $url = '';
-
-        if ($absoluteUrl && isset($parts['host'])) {
+        if ((UrlGeneratorInterface::ABS_URL === $urlGenerationStrategy || UrlGeneratorInterface::NET_PATH === $urlGenerationStrategy) && isset($parts['host'])) {
             if (isset($parts['scheme'])) {
-                $url .= $parts['scheme'];
+                $scheme = $parts['scheme'];
             } elseif (isset($parts['port']) && 443 === $parts['port']) {
-                $url .= 'https';
+                $scheme = 'https';
             } else {
-                $url .= 'http';
+                $scheme = 'http';
             }
-
-            $url .= '://';
+            $url .= UrlGeneratorInterface::NET_PATH === $urlGenerationStrategy ? '//' : "$scheme://";
 
             if (isset($parts['user'])) {
                 $url .= $parts['user'];
