@@ -81,7 +81,7 @@ abstract class ApiTestCase extends KernelTestCase
                 null === $objectManager = static::$container->get('doctrine')->getManagerForClass($resourceClass)
             ) &&
             (
-                !static::$container->has('doctrine_mongodb.odm.default_document_manager') ||
+                !static::$container->has('doctrine_mongodb') ||
                 null === $objectManager = static::$container->get('doctrine_mongodb.odm.default_document_manager')->getManagerForClass($resourceClass)
             )
         ) {
