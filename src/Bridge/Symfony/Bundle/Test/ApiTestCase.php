@@ -69,4 +69,34 @@ abstract class ApiTestCase extends KernelTestCase
 
         return $client;
     }
+
+    /**
+     * Finds the IRI of a resource item macthing the resource class and the specified criteria.
+     */
+    protected function findIriBy(string $resourceClass, array $criteria): ?string
+    {
+        if (null === static::$container) {
+            throw new \RuntimeException(sprintf('The container is not available. You must call "bootKernel()" or "createClient()" before calling "%s".', __METHOD__));
+        }
+
+        if (
+            (
+                !static::$container->has('doctrine') ||
+                null === $objectManager = static::$container->get('doctrine')->getManagerForClass($resourceClass)
+            ) &&
+            (
+                !static::$container->has('doctrine_mongodb') ||
+                null === $objectManager = static::$container->get('doctrine_mongodb')->getManagerForClass($resourceClass)
+            )
+        ) {
+            throw new \RuntimeException(sprintf('"%s" only supports classes managed by Doctrine ORM or Doctrine MongoDB ODM. Override this method to implement your own retrieval logic if you don\'t use those libraries.', __METHOD__));
+        }
+
+        $item = $objectManager->getRepository($resourceClass)->findOneBy($criteria);
+        if (null === $item) {
+            return null;
+        }
+
+        return static::$container->get('api_platform.iri_converter')->getIriFromItem($item);
+    }
 }

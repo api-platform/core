@@ -16,6 +16,7 @@ namespace ApiPlatform\Core\GraphQl\Serializer;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use GraphQL\Type\Definition\ResolveInfo;
+use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 
 /**
  * Builds the context used by the Symfony Serializer.
@@ -27,10 +28,12 @@ use GraphQL\Type\Definition\ResolveInfo;
 final class SerializerContextBuilder implements SerializerContextBuilderInterface
 {
     private $resourceMetadataFactory;
+    private $nameConverter;
 
-    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory)
+    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, ?NameConverterInterface $nameConverter)
     {
         $this->resourceMetadataFactory = $resourceMetadataFactory;
+        $this->nameConverter = $nameConverter;
     }
 
     public function create(?string $resourceClass, string $operationName, array $resolverContext, bool $normalization): array
@@ -83,15 +86,23 @@ final class SerializerContextBuilder implements SerializerContextBuilderInterfac
 
     private function replaceIdKeys(array $fields): array
     {
+        $denormalizedFields = [];
+
         foreach ($fields as $key => $value) {
             if ('_id' === $key) {
-                $fields['id'] = $fields['_id'];
-                unset($fields['_id']);
-            } elseif (\is_array($fields[$key])) {
-                $fields[$key] = $this->replaceIdKeys($fields[$key]);
+                $denormalizedFields['id'] = $fields['_id'];
+
+                continue;
             }
+
+            $denormalizedFields[$this->denormalizePropertyName((string) $key)] = \is_array($fields[$key]) ? $this->replaceIdKeys($fields[$key]) : $value;
         }
 
-        return $fields;
+        return $denormalizedFields;
+    }
+
+    private function denormalizePropertyName(string $property): string
+    {
+        return null !== $this->nameConverter ? $this->nameConverter->denormalize($property) : $property;
     }
 }

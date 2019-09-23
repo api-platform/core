@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.5.0 beta 2
+
+* GraphQL: Add support for multipart request so user can create custom file upload mutations (#3041)
+* GraphQL: Add support for name converter (#2765)
+
 ## 2.5.0 beta 1
 
 * Add an HTTP client dedicated to functional API testing (#2608)
@@ -22,15 +27,15 @@
 * Order filter now documents `asc`/`desc` as enum (#2971)
 * GraphQL: **BC Break** Separate `query` resource operation attribute into `item_query` and `collection_query` operations so user can use different security and serialization groups for them (#2944, #3015)
 * GraphQL: Add support for custom queries and mutations (#2447)
-* GraphQL: Add support for custom types
+* GraphQL: Add support for custom types (#2492)
 * GraphQL: Better pagination support (backwards pagination) (#2142)
-* GraphQL: Support the pagination per resource
+* GraphQL: Support the pagination per resource (#3035)
 * GraphQL: Add the concept of *stages* in the workflow of the resolvers and add the possibility to disable them with operation attributes (#2959)
-* GraphQL: Add GraphQL Playground besides GraphiQL and add the possibility to change the default IDE (or to disable it) for the GraphQL endpoint
+* GraphQL: Add GraphQL Playground besides GraphiQL and add the possibility to change the default IDE (or to disable it) for the GraphQL endpoint (#2956, #2961)
 * GraphQL: Add a command to print the schema in SDL `api:graphql:export > schema.graphql` (#2600)
-* GraphQL: Improve serialization performance by avoiding calls to the `serialize` PHP function
-* GraphQL: Allow to use a search and an exist filter on the same resource
-* GraphQL: Refactor the architecture of the whole system to allow the decoration of useful services (`TypeConverter` to manage custom types, `SerializerContextBuilder` to modify the (de)serialization context dynamically, etc.)
+* GraphQL: Improve serialization performance by avoiding calls to the `serialize` PHP function (#2576)
+* GraphQL: Allow to use a search and an exist filter on the same resource (#2243)
+* GraphQL: Refactor the architecture of the whole system to allow the decoration of useful services (`TypeConverter` to manage custom types, `SerializerContextBuilder` to modify the (de)serialization context dynamically, etc.) (#2772)
 
 Notes:
 

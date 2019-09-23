@@ -239,6 +239,7 @@ final class Configuration implements ConfigurationInterface
                         ->arrayNode('graphql_playground')
                             ->{class_exists(GraphQL::class) && class_exists(TwigBundle::class) ? 'canBeDisabled' : 'canBeEnabled'}()
                         ->end()
+                        ->scalarNode('nesting_separator')->defaultValue('_')->info('The separator to use to filter nested fields.')->end()
                         ->arrayNode('collection')
                             ->addDefaultsIfNotSet()
                             ->children()

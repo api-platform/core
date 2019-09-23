@@ -50,11 +50,15 @@ api_platform:
         xml:                           ['application/xml', 'text/xml']
         json:                          ['application/json']
         html:                          ['text/html']
+        graphql:                       ['application/graphql']
+        multipart:                     ['multipart/form-data']
     error_formats:
         jsonproblem:                   ['application/problem+json']
         jsonld:                        ['application/ld+json']
         jsonapi:                       ['application/vnd.api+json']
-    graphql:                           true
+    graphql:
+        enabled: true
+        nesting_separator: __
     name_converter:                    'app.name_converter'
     enable_fos_user:                   true
     collection:
@@ -293,6 +297,18 @@ services:
 
     app.graphql.mutation_resolver.dummy_custom_no_write_custom_result:
         class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\GraphQl\Resolver\SumNoWriteCustomResultMutationResolver'
+        public: false
+        tags:
+            - { name: 'api_platform.graphql.mutation_resolver' }
+
+    app.graphql.mutation_resolver.upload_media_object:
+        class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\GraphQl\Resolver\UploadMediaObjectResolver'
+        public: false
+        tags:
+            - { name: 'api_platform.graphql.mutation_resolver' }
+
+    app.graphql.mutation_resolver.upload_multiple_media_object:
+        class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\GraphQl\Resolver\UploadMultipleMediaObjectResolver'
         public: false
         tags:
             - { name: 'api_platform.graphql.mutation_resolver' }

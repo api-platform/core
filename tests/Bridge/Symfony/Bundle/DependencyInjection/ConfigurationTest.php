@@ -124,6 +124,7 @@ class ConfigurationTest extends TestCase
                 'graphiql' => [
                     'enabled' => true,
                 ],
+                'nesting_separator' => '_',
                 'collection' => [
                     'pagination' => [
                         'enabled' => true,
