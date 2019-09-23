@@ -71,7 +71,7 @@ abstract class ApiTestCase extends KernelTestCase
     }
 
     /**
-     * Finds the IRI of the resource of the given class, corresponding to the given criteria.
+     * Finds the IRI of a resource item macthing the resource class and the specified criteria.
      */
     protected function findIriBy(string $resourceClass, array $criteria): ?string
     {
