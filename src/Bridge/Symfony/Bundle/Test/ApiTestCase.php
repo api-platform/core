@@ -92,11 +92,11 @@ abstract class ApiTestCase extends KernelTestCase
             throw new \RuntimeException(sprintf('"%s" only supports classes managed by Doctrine ORM or Doctrine MongoDB ODM. Override this method to implement your own retrieval logic if you don\'t use those libraries.', __METHOD__));
         }
 
-        $resource = $objectManager->getRepository($resourceClass)->findOneBy($criteria);
-        if (null === $resource) {
+        $item = $objectManager->getRepository($resourceClass)->findOneBy($criteria);
+        if (null === $item) {
             return null;
         }
 
-        return static::$container->get('api_platform.iri_converter')->getIriFromitem($resource);
+        return static::$container->get('api_platform.iri_converter')->getIriFromItem($item);
     }
 }
