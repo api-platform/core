@@ -75,7 +75,15 @@ abstract class ApiTestCase extends KernelTestCase
      */
     protected function findIriBy(string $resourceClass, array $criteria): ?string
     {
-        $resource = static::$container->get('doctrine')->getRepository($resourceClass)->findOneBy($criteria);
+        if (static::$container->has('doctrine')) {
+            $objectManager = static::$container->get('doctrine');
+        } elseif (static::$container->has('doctrine_mongodb.odm.default_document_manager')) {
+            $objectManager = static::$container->get('doctrine_mongodb.odm.default_document_manager');
+        } else {
+            throw new \RuntimeException(sprintf('"%s" only supports Doctrine ORM and Doctrine MongoDB ODM. Install one of those libraries or override this method to implement your own retrieval logic.', __METHOD__));
+        }
+
+        $resource = $objectManager->getRepository($resourceClass)->findOneBy($criteria);
         if (null === $resource) {
             return null;
         }
