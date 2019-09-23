@@ -26,9 +26,6 @@ parameters:
 
 		# False positives
 		-
-			message: '#Service "api_platform.iri_converter" is private\.#'
-			path:  %currentWorkingDirectory%/src/Bridge/Symfony/Bundle/Test/ApiTestCase.php
-		-
 			message: '#Variable \$positionPm might not be defined\.#'
 			path: %currentWorkingDirectory%/src/Util/ClassInfoTrait.php
 		-
@@ -88,6 +85,9 @@ parameters:
 		-
 			message: '#Service "api_platform\.json_schema\.schema_factory" is private\.#'
 			path: %currentWorkingDirectory%/src/Bridge/Symfony/Bundle/Test/ApiTestAssertionsTrait.php
+		-
+			message: '#Service "api_platform.iri_converter" is private\.#'
+			path:  %currentWorkingDirectory%/src/Bridge/Symfony/Bundle/Test/ApiTestCase.php
 
 		# Expected, due to optional interfaces
 		- '#Method ApiPlatform\\Core\\Bridge\\Doctrine\\Orm\\Extension\\QueryCollectionExtensionInterface::applyToCollection\(\) invoked with 5 parameters, 3-4 required\.#'
