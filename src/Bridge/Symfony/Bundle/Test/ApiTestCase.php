@@ -75,6 +75,10 @@ abstract class ApiTestCase extends KernelTestCase
      */
     protected function findIriBy(string $resourceClass, array $criteria): ?string
     {
+        if (null === static::$container) {
+            throw new \RuntimeException(sprintf('The container is not available. You must call "bootKernel()" or "createClient()" before calling "%s".', __METHOD__));
+        }
+
         if (
             (
                 !static::$container->has('doctrine') ||

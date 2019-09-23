@@ -26,6 +26,9 @@ parameters:
 
 		# False positives
 		-
+			message: '#Service "api_platform.iri_converter" is private\.#'
+			path:  %currentWorkingDirectory%/src/Bridge/Symfony/Bundle/Test/ApiTestCase.php
+		-
 			message: '#Variable \$positionPm might not be defined\.#'
 			path: %currentWorkingDirectory%/src/Util/ClassInfoTrait.php
 		-
