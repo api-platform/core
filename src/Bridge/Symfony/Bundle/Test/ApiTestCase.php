@@ -69,4 +69,17 @@ abstract class ApiTestCase extends KernelTestCase
 
         return $client;
     }
+
+    /**
+     * Finds the IRI of the resource of the given class, corresponding to the given criteria.
+     */
+    protected function findIriBy(string $resourceClass, array $criteria): ?string
+    {
+        $resource = static::$container->get('doctrine')->getRepository($resourceClass)->findOneBy($criteria);
+        if (null === $resource) {
+            return null;
+        }
+
+        return static::$container->get('api_platform.iri_converter')->getIriFromitem($resource);
+    }
 }
