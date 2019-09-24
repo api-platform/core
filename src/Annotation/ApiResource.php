@@ -45,7 +45,6 @@ use ApiPlatform\Core\Exception\InvalidArgumentException;
  *     @Attribute("input", type="mixed"),
  *     @Attribute("iri", type="string"),
  *     @Attribute("itemOperations", type="array"),
- *     @Attribute("maximumItemsPerPage", type="int"),
  *     @Attribute("mercure", type="mixed"),
  *     @Attribute("messenger", type="mixed"),
  *     @Attribute("normalizationContext", type="array"),
@@ -58,6 +57,8 @@ use ApiPlatform\Core\Exception\InvalidArgumentException;
  *     @Attribute("paginationEnabled", type="bool"),
  *     @Attribute("paginationFetchJoinCollection", type="bool"),
  *     @Attribute("paginationItemsPerPage", type="int"),
+ *     @Attribute("maximumItemsPerPage", type="int"),
+ *     @Attribute("paginationMaximumItemsPerPage", type="int"),
  *     @Attribute("paginationPartial", type="bool"),
  *     @Attribute("paginationViaCursor", type="array"),
  *     @Attribute("routePrefix", type="string"),
@@ -201,13 +202,6 @@ final class ApiResource
     /**
      * @see https://github.com/Haehnchen/idea-php-annotation-plugin/issues/112
      *
-     * @var int
-     */
-    private $maximumItemsPerPage;
-
-    /**
-     * @see https://github.com/Haehnchen/idea-php-annotation-plugin/issues/112
-     *
      * @var mixed
      */
     private $mercure;
@@ -274,6 +268,22 @@ final class ApiResource
      * @var int
      */
     private $paginationItemsPerPage;
+
+    /**
+     * @see https://github.com/Haehnchen/idea-php-annotation-plugin/issues/112
+     *
+     * @var int
+     *
+     * @deprecated - Use $paginationMaximumItemsPerPage instead
+     */
+    private $maximumItemsPerPage;
+
+    /**
+     * @see https://github.com/Haehnchen/idea-php-annotation-plugin/issues/112
+     *
+     * @var int
+     */
+    private $paginationMaximumItemsPerPage;
 
     /**
      * @see https://github.com/Haehnchen/idea-php-annotation-plugin/issues/112
