@@ -98,7 +98,7 @@ final class RespondListener
 
         $patchMimeTypes = [];
         foreach ($resourceMetadata->getItemOperations() as $operation) {
-            if ('PATCH' !== $operation['method'] || !isset($operation['input_formats'])) {
+            if ('PATCH' !== ($operation['method'] ?? '') || !isset($operation['input_formats'])) {
                 continue;
             }
 
