@@ -2,6 +2,11 @@
 
 ## 2.5.0 beta 2
 
+* Allow to not declare GET item operation
+* Add support for the Accept-Patch header
+* Make the the `maximum_items_per_page` attribute consistent with other attributes controlling pagination 
+* Test: Add an helper method to find the IRI of a resource
+* Test: Add assertions for testing response against JSON Schema from API resource
 * GraphQL: Add support for multipart request so user can create custom file upload mutations (#3041)
 * GraphQL: Add support for name converter (#2765)
 
