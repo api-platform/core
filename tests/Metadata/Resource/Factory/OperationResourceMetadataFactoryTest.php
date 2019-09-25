@@ -29,12 +29,12 @@ class OperationResourceMetadataFactoryTest extends TestCase
     /**
      * @dataProvider getMetadata
      */
-    public function testCreateOperation(ResourceMetadata $before, ResourceMetadata $after, array $formats = []): void
+    public function testCreateOperation(ResourceMetadata $before, ResourceMetadata $after, array $formats = [], $disableRest = false ): void
     {
         $decoratedProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $decoratedProphecy->create(Dummy::class)->shouldBeCalled()->willReturn($before);
 
-        $this->assertEquals($after, (new OperationResourceMetadataFactory($decoratedProphecy->reveal(), $formats))->create(Dummy::class));
+        $this->assertEquals($after, (new OperationResourceMetadataFactory($decoratedProphecy->reveal(), $formats, $disableRest))->create(Dummy::class));
     }
 
     public function getMetadata(): iterable
@@ -46,6 +46,7 @@ class OperationResourceMetadataFactoryTest extends TestCase
         yield [new ResourceMetadata(null, null, null, null, [], null, [], []), new ResourceMetadata(null, null, null, $this->getOperations(['get', 'put', 'patch', 'delete']), [], null, [], []), $jsonapi];
         yield [new ResourceMetadata(null, null, null, ['get'], [], null, [], []), new ResourceMetadata(null, null, null, $this->getOperations(['get']), [], null, [], [])];
         yield [new ResourceMetadata(null, null, null, [], [], null, [], []), new ResourceMetadata(null, null, null, $this->getPlaceholderOperation(), [], null, [], [])];
+        yield [new ResourceMetadata(null, null, null, null, null, null, [], []), new ResourceMetadata(null, null, null, $this->getPlaceholderOperation(), [], null, [], []), [], true];
         yield [new ResourceMetadata(null, null, null, ['put'], [], null, [], []), new ResourceMetadata(null, null, null, $this->getOperations(['put']), [], null, [], [])];
         yield [new ResourceMetadata(null, null, null, ['delete'], [], null, [], []), new ResourceMetadata(null, null, null, $this->getOperations(['delete']), [], null, [], [])];
         yield [new ResourceMetadata(null, null, null, ['patch' => ['method' => 'PATCH', 'route_name' => 'patch']], [], null, [], []), new ResourceMetadata(null, null, null, array_merge(['patch' => ['method' => 'PATCH', 'route_name' => 'patch']], $this->getPlaceholderOperation()), [], null, [], [])];

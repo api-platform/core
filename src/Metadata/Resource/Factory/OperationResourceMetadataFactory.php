@@ -43,11 +43,13 @@ final class OperationResourceMetadataFactory implements ResourceMetadataFactoryI
 
     private $decorated;
     private $patchFormats;
+    private $disableRest;
 
-    public function __construct(ResourceMetadataFactoryInterface $decorated, array $patchFormats = [])
+    public function __construct(ResourceMetadataFactoryInterface $decorated, array $patchFormats = [], $disableRest = false)
     {
         $this->decorated = $decorated;
         $this->patchFormats = $patchFormats;
+        $this->disableRest = $disableRest;
     }
 
     /**
@@ -59,6 +61,11 @@ final class OperationResourceMetadataFactory implements ResourceMetadataFactoryI
         $isAbstract = (new \ReflectionClass($resourceClass))->isAbstract();
 
         $collectionOperations = $resourceMetadata->getCollectionOperations();
+        // If rest is disabled we don't want to add the default operations
+        // but we want to have the placeholder get operation
+        if (true === $this->disableRest) {
+            $collectionOperations = [];
+        }
         if (null === $collectionOperations) {
             $resourceMetadata = $resourceMetadata->withCollectionOperations($this->createOperations($isAbstract ? ['GET'] : ['GET', 'POST']));
         } else {
@@ -66,6 +73,12 @@ final class OperationResourceMetadataFactory implements ResourceMetadataFactoryI
         }
 
         $itemOperations = $resourceMetadata->getItemOperations();
+        // If rest is disabled we don't want to add the default operations
+        // but we want to have the placeholder get operation
+        if (true === $this->disableRest) {
+            $itemOperations = [];
+        }
+
         if (null === $itemOperations) {
             $methods = ['GET', 'DELETE'];
 
