@@ -294,7 +294,7 @@ class ApiPlatformExtensionTest extends TestCase
         $builder = new ContainerBuilder();
 
         $loader = new XmlFileLoader($builder, new FileLocator(\dirname(__DIR__).'/../../../../src/Bridge/Symfony/Bundle/Resources/config'));
-        $loader->load('api.xml');
+        $loader->load('rest_event_listener.xml');
         $loader->load('fos_user.xml');
 
         $fosListener = $builder->getDefinition('api_platform.fos_user.event_listener');
@@ -757,6 +757,26 @@ class ApiPlatformExtensionTest extends TestCase
         $this->extension->load(self::DEFAULT_CONFIG, $containerBuilder);
     }
 
+    public function testDisableRest()
+    {
+        $containerBuilderProphecy = $this->getBaseContainerBuilderProphecy();
+        $containerBuilderProphecy->setDefinition('api_platform.listener.request.add_format', Argument::type(Definition::class))->shouldNotBeCalled();
+        $containerBuilderProphecy->setDefinition('api_platform.listener.request.read', Argument::type(Definition::class))->shouldNotBeCalled();
+        $containerBuilderProphecy->setDefinition('api_platform.listener.view.write', Argument::type(Definition::class))->shouldNotBeCalled();
+        $containerBuilderProphecy->setDefinition('api_platform.listener.request.deserialize', Argument::type(Definition::class))->shouldNotBeCalled();
+        $containerBuilderProphecy->setDefinition('api_platform.listener.view.serialize', Argument::type(Definition::class))->shouldNotBeCalled();
+        $containerBuilderProphecy->setDefinition('api_platform.listener.view.respond', Argument::type(Definition::class))->shouldNotBeCalled();
+        $containerBuilderProphecy->setParameter('api_platform.rest.disable_rest', false)->shouldNotBeCalled();
+        $containerBuilderProphecy->setParameter('api_platform.rest.disable_rest', true)->shouldBeCalled();
+
+        $containerBuilder = $containerBuilderProphecy->reveal();
+
+        $config = self::DEFAULT_CONFIG;
+        $config['api_platform']['disable_rest'] = true;
+
+        $this->extension->load($config, $containerBuilder);
+    }
+
     private function getPartialContainerBuilderProphecy()
     {
         $parameterBag = new EnvPlaceholderParameterBag();
@@ -806,6 +826,7 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.http_cache.public' => null,
             'api_platform.enable_entrypoint' => true,
             'api_platform.enable_docs' => true,
+            'api_platform.rest.disable_rest' => false,
         ];
 
         $pagination = [
@@ -1073,6 +1094,7 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.graphql.collection.pagination' => ['enabled' => true],
             'api_platform.graphql.graphiql.enabled' => true,
             'api_platform.graphql.graphql_playground.enabled' => true,
+            'api_platform.rest.disable_rest' => false,
             'api_platform.resource_class_directories' => Argument::type('array'),
             'api_platform.validator.serialize_payload_fields' => [],
             'api_platform.elasticsearch.enabled' => false,

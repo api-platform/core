@@ -97,6 +97,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         }
 
         $this->registerCommonConfiguration($container, $config, $loader, $formats, $patchFormats, $errorFormats);
+        $this->registerRestListenerConfiguration($container, $config, $loader);
         $this->registerMetadataConfiguration($container, $config, $loader);
         $this->registerOAuthConfiguration($container, $config);
         $this->registerSwaggerConfiguration($container, $config, $loader);
@@ -368,6 +369,18 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         }
 
         $loader->load('problem.xml');
+    }
+
+    private function registerRestListenerConfiguration(ContainerBuilder $container, array $config, XmlFileLoader $loader): void
+    {
+        $container->setParameter('api_platform.rest.disable_rest', $config['disable_rest']);
+
+        if ($config['disable_rest']) {
+            return;
+        }
+
+        $loader->load('rest_event_listener.xml');
+
     }
 
     private function registerGraphQlConfiguration(ContainerBuilder $container, array $config, XmlFileLoader $loader): void

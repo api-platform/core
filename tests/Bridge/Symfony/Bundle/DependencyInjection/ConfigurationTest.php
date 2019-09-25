@@ -204,6 +204,7 @@ class ConfigurationTest extends TestCase
             ],
             'allow_plain_identifiers' => false,
             'resource_class_directories' => [],
+            'disable_rest' => false
         ], $config);
     }
 

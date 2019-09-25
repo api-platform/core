@@ -44,6 +44,7 @@
             <argument>%api_platform.enable_docs%</argument>
             <argument>%api_platform.graphql.graphiql.enabled%</argument>
             <argument>%api_platform.graphql.graphql_playground.enabled%</argument>
+            <argument>%api_platform.rest.disable_rest%</argument>
 
             <tag name="routing.loader" />
         </service>
@@ -154,56 +155,6 @@
         <service id="api_platform.path_segment_name_generator.dash" class="ApiPlatform\Core\Operation\DashPathSegmentNameGenerator" public="false" />
 
         <!-- Event listeners -->
-
-        <!-- kernel.request priority must be < 8 to be executed after the Firewall -->
-        <service id="api_platform.listener.request.add_format" class="ApiPlatform\Core\EventListener\AddFormatListener">
-            <argument type="service" id="api_platform.negotiator" />
-            <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
-            <argument>%api_platform.formats%</argument>
-
-            <tag name="kernel.event_listener" event="kernel.request" method="onKernelRequest" priority="7" />
-        </service>
-
-        <service id="api_platform.listener.request.read" class="ApiPlatform\Core\EventListener\ReadListener">
-            <argument type="service" id="api_platform.collection_data_provider" />
-            <argument type="service" id="api_platform.item_data_provider" />
-            <argument type="service" id="api_platform.subresource_data_provider" />
-            <argument type="service" id="api_platform.serializer.context_builder" />
-            <argument type="service" id="api_platform.identifier.converter" />
-            <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
-
-            <tag name="kernel.event_listener" event="kernel.request" method="onKernelRequest" priority="4" />
-        </service>
-
-        <service id="api_platform.listener.view.write" class="ApiPlatform\Core\EventListener\WriteListener">
-            <argument type="service" id="api_platform.data_persister" />
-            <argument type="service" id="api_platform.iri_converter" />
-            <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
-            <argument type="service" id="api_platform.resource_class_resolver" />
-
-            <tag name="kernel.event_listener" event="kernel.view" method="onKernelView" priority="32" />
-        </service>
-
-        <service id="api_platform.listener.request.deserialize" class="ApiPlatform\Core\EventListener\DeserializeListener">
-            <argument type="service" id="api_platform.serializer" />
-            <argument type="service" id="api_platform.serializer.context_builder" />
-            <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
-
-            <tag name="kernel.event_listener" event="kernel.request" method="onKernelRequest" priority="2" />
-        </service>
-
-        <service id="api_platform.listener.view.serialize" class="ApiPlatform\Core\EventListener\SerializeListener">
-            <argument type="service" id="api_platform.serializer" />
-            <argument type="service" id="api_platform.serializer.context_builder" />
-            <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
-
-            <tag name="kernel.event_listener" event="kernel.view" method="onKernelView" priority="16" />
-        </service>
-
-        <service id="api_platform.listener.view.respond" class="ApiPlatform\Core\EventListener\RespondListener">
-            <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
-            <tag name="kernel.event_listener" event="kernel.view" method="onKernelView" priority="8" />
-        </service>
 
         <service id="api_platform.listener.exception.validation" class="ApiPlatform\Core\Bridge\Symfony\Validator\EventListener\ValidationExceptionListener">
             <argument type="service" id="api_platform.serializer" />
