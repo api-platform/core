@@ -78,6 +78,6 @@ class OperationResourceMetadataFactoryTest extends TestCase
 
     private function getPlaceholderOperation(): array
     {
-        return ['get' => ['method' => 'GET', 'read' => false, 'output' => ['class' => false], 'controller' => NotFoundAction::class]];
+        return ['get' => ['method' => 'GET', 'read' => false, 'output' => ['class' => null], 'controller' => NotFoundAction::class]];
     }
 }

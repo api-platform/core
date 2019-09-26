@@ -85,7 +85,7 @@ final class OperationResourceMetadataFactory implements ResourceMetadataFactoryI
         if ($this->needsDefaultGetOperation($resourceMetadata)) {
             $resourceMetadata = $resourceMetadata->withItemOperations(array_merge(
                 $resourceMetadata->getItemOperations(),
-                ['get' => ['method' => 'GET', 'read' => false, 'output' => ['class' => false], 'controller' => NotFoundAction::class]])
+                ['get' => ['method' => 'GET', 'read' => false, 'output' => ['class' => null], 'controller' => NotFoundAction::class]])
             );
         }
 
@@ -162,7 +162,7 @@ final class OperationResourceMetadataFactory implements ResourceMetadataFactoryI
         $itemOperations = $resourceMetadata->getItemOperations();
 
         foreach ($itemOperations as $itemOperation) {
-            if ('GET' === ($itemOperation['method'] ?? false)) {
+            if ('GET' === ($itemOperation['method'] ?? null)) {
                 return false;
             }
         }
