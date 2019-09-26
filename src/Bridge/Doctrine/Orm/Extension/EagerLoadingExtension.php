@@ -114,7 +114,7 @@ final class EagerLoadingExtension implements ContextAwareQueryCollectionExtensio
         }
 
         if (!empty($context[AbstractNormalizer::GROUPS])) {
-            $options['serializer_groups'] = $context[AbstractNormalizer::GROUPS];
+            $options['serializer_groups'] = (array) $context[AbstractNormalizer::GROUPS];
         }
 
         $this->joinRelations($queryBuilder, $queryNameGenerator, $resourceClass, $forceEager, $fetchPartial, $queryBuilder->getRootAliases()[0], $options, $context);
