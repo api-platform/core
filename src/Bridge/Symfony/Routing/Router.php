@@ -72,8 +72,8 @@ final class Router implements RouterInterface, UrlGeneratorInterface
     {
         $baseContext = $this->router->getContext();
         $baseURL = $baseContext->getBaseUrl();
-        if (strpos($pathInfo, $baseURL) === 0) {
-            $pathInfo = substr($pathInfo, strlen($baseURL));
+        if (0 === strpos($pathInfo, $baseURL)) {
+            $pathInfo = substr($pathInfo, \strlen($baseURL));
         }
 
         $request = Request::create($pathInfo, 'GET', [], [], [], ['HTTP_HOST' => $baseContext->getHost()]);
