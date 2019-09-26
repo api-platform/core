@@ -5,6 +5,7 @@
 * Allow to not declare GET item operation
 * Add support for the Accept-Patch header
 * Make the the `maximum_items_per_page` attribute consistent with other attributes controlling pagination 
+* Allow to use a string instead of an array for serializer groups
 * Test: Add an helper method to find the IRI of a resource
 * Test: Add assertions for testing response against JSON Schema from API resource
 * GraphQL: Add support for multipart request so user can create custom file upload mutations (#3041)
