@@ -100,7 +100,7 @@ final class Client implements HttpClientInterface
             }
 
             // BrowserKit doesn't support setting several headers with the same name
-            $server['HTTP_'.strtoupper(strtr($key, '-', '_'))] = $value[0] ?? '';
+            $server['HTTP_'.strtoupper(str_replace('-', '_', $key))] = $value[0] ?? '';
         }
 
         if ($basic) {

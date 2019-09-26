@@ -114,14 +114,14 @@ final class ApiPlatformParser implements ParserInterface
         $attributes = $resourceMetadata->getAttributes();
 
         if (isset($attributes['normalization_context'][AbstractNormalizer::GROUPS])) {
-            $options['serializer_groups'] = $attributes['normalization_context'][AbstractNormalizer::GROUPS];
+            $options['serializer_groups'] = (array) $attributes['normalization_context'][AbstractNormalizer::GROUPS];
         }
 
         if (isset($attributes['denormalization_context'][AbstractNormalizer::GROUPS])) {
             if (isset($options['serializer_groups'])) {
                 $options['serializer_groups'] += $attributes['denormalization_context'][AbstractNormalizer::GROUPS];
             } else {
-                $options['serializer_groups'] = $attributes['denormalization_context'][AbstractNormalizer::GROUPS];
+                $options['serializer_groups'] = (array) $attributes['denormalization_context'][AbstractNormalizer::GROUPS];
             }
         }
 

@@ -480,7 +480,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
 
         if (isset($context[self::GROUPS])) {
             /* @see https://github.com/symfony/symfony/blob/v4.2.6/src/Symfony/Component/PropertyInfo/Extractor/SerializerExtractor.php */
-            $options['serializer_groups'] = $context[self::GROUPS];
+            $options['serializer_groups'] = (array) $context[self::GROUPS];
         }
 
         if (isset($context['collection_operation_name'])) {

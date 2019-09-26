@@ -118,7 +118,7 @@ final class SchemaFactory implements SchemaFactoryInterface
             $definition['externalDocs'] = ['url' => $iri];
         }
 
-        $options = isset($serializerContext[AbstractNormalizer::GROUPS]) ? ['serializer_groups' => $serializerContext[AbstractNormalizer::GROUPS]] : [];
+        $options = isset($serializerContext[AbstractNormalizer::GROUPS]) ? ['serializer_groups' => (array) $serializerContext[AbstractNormalizer::GROUPS]] : [];
         foreach ($this->propertyNameCollectionFactory->create($inputOrOutputClass, $options) as $propertyName) {
             $propertyMetadata = $this->propertyMetadataFactory->create($inputOrOutputClass, $propertyName);
             if (!$propertyMetadata->isReadable() && !$propertyMetadata->isWritable()) {
