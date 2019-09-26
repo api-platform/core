@@ -68,7 +68,7 @@ class JsonSchemaGenerateCommandTest extends KernelTestCase
     {
         $this->tester->run(['command' => 'api:json-schema:generate', 'resource' => $this->entityClass, '--collectionOperation' => 'get', '--itemOperation' => 'get', '--type' => 'output']);
 
-        $this->assertStringStartsWith('[ERROR] You can only use one of "--itemOperation" and "--collectionOperation" options at the same time.', trim(preg_replace('/\s+/', ' ', $this->tester->getDisplay())));
+        $this->assertStringStartsWith('[ERROR] You can only use one of "--itemOperation" and "--collectionOperation"', trim(str_replace(["\r", "\n"], '', $this->tester->getDisplay())));
     }
 
     public function testExecuteWithJsonldFormatOption()
