@@ -55,9 +55,6 @@ abstract class DoctrineOrmFilterTestCase extends KernelTestCase
      */
     protected $filterClass;
 
-    /**
-     * @group legacy
-     */
     protected function setUp(): void
     {
         self::bootKernel();

@@ -41,9 +41,6 @@ class SwaggerCommandTest extends KernelTestCase
         $this->tester = new ApplicationTester($application);
     }
 
-    /**
-     * @group legacy
-     */
     public function testExecuteWithAliasVersion3()
     {
         $this->tester->run(['command' => 'api:swagger:export', '--spec-version' => 3]);

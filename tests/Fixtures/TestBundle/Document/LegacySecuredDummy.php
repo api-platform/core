@@ -23,8 +23,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  * @author Vincent Chalamon <vincentchalamon@gmail.com>
  *
  * @ApiResource(
- *     accessControl="is_granted('ROLE_USER')",
- *     accessControlMessage="Nope!",
+ *     attributes={"access_control"="is_granted('ROLE_USER')"},
  *     collectionOperations={
  *         "get",
  *         "post"={"access_control"="is_granted('ROLE_ADMIN')"}

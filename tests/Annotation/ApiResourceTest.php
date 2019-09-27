@@ -143,4 +143,17 @@ class ApiResourceTest extends TestCase
             'invalidAttribute' => 'exception',
         ]);
     }
+
+    /**
+     * @group legacy
+     * @expectedDeprecation Attribute "accessControl" is deprecated in annotation since API Platform 2.5, prefer using "security" attribute instead
+     * @expectedDeprecation Attribute "accessControlMessage" is deprecated in annotation since API Platform 2.5, prefer using "securityMessage" attribute instead
+     */
+    public function testWithDeprecatedAttributes()
+    {
+        new ApiResource([
+            'accessControl' => "is_granted('ROLE_USER')",
+            'accessControlMessage' => 'Nope!',
+        ]);
+    }
 }
