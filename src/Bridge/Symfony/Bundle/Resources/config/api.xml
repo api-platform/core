@@ -229,8 +229,6 @@
         <service id="api_platform.action.put_item" alias="api_platform.action.placeholder" public="true" />
         <service id="api_platform.action.delete_item" alias="api_platform.action.placeholder" public="true" />
         <service id="api_platform.action.get_subresource" alias="api_platform.action.placeholder" public="true" />
-        <service id="api_platform.action.not_found" class="ApiPlatform\Core\Action\NotFoundAction" public="true" />
-        <service id="ApiPlatform\Core\Action\NotFoundAction" alias="api_platform.action.not_found" public="true" />
 
         <service id="api_platform.action.entrypoint" class="ApiPlatform\Core\Action\EntrypointAction" public="true">
             <argument type="service" id="api_platform.metadata.resource.name_collection_factory" />

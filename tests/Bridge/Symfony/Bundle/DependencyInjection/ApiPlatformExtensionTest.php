@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Tests\Bridge\Symfony\Bundle\DependencyInjection;
 
-use ApiPlatform\Core\Action\NotFoundAction;
 use ApiPlatform\Core\Api\FilterInterface;
 use ApiPlatform\Core\Api\IdentifiersExtractorInterface;
 use ApiPlatform\Core\Api\IriConverterInterface;
@@ -844,7 +843,6 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.action.documentation',
             'api_platform.action.entrypoint',
             'api_platform.action.exception',
-            'api_platform.action.not_found',
             'api_platform.action.placeholder',
             'api_platform.cache.identifiers_extractor',
             'api_platform.cache.metadata.property',
@@ -940,24 +938,23 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.property_accessor' => 'property_accessor',
             'api_platform.property_info' => 'property_info',
             'api_platform.serializer' => 'serializer',
-            CollectionDataProviderInterface::class => 'api_platform.collection_data_provider',
-            DataPersisterInterface::class => 'api_platform.data_persister',
-            GroupFilter::class => 'api_platform.serializer.group_filter',
-            IdentifiersExtractorInterface::class => 'api_platform.identifiers_extractor.cached',
-            IriConverterInterface::class => 'api_platform.iri_converter',
-            ItemDataProviderInterface::class => 'api_platform.item_data_provider',
-            NotFoundAction::class => 'api_platform.action.not_found',
-            OperationAwareFormatsProviderInterface::class => 'api_platform.formats_provider',
             Pagination::class => 'api_platform.pagination',
-            PropertyFilter::class => 'api_platform.serializer.property_filter',
+            IriConverterInterface::class => 'api_platform.iri_converter',
+            UrlGeneratorInterface::class => 'api_platform.router',
+            SerializerContextBuilderInterface::class => 'api_platform.serializer.context_builder',
+            CollectionDataProviderInterface::class => 'api_platform.collection_data_provider',
+            ItemDataProviderInterface::class => 'api_platform.item_data_provider',
+            SubresourceDataProviderInterface::class => 'api_platform.subresource_data_provider',
+            DataPersisterInterface::class => 'api_platform.data_persister',
+            ResourceNameCollectionFactoryInterface::class => 'api_platform.metadata.resource.name_collection_factory',
+            ResourceMetadataFactoryInterface::class => 'api_platform.metadata.resource.metadata_factory',
             PropertyNameCollectionFactoryInterface::class => 'api_platform.metadata.property.name_collection_factory',
             PropertyMetadataFactoryInterface::class => 'api_platform.metadata.property.metadata_factory',
             ResourceClassResolverInterface::class => 'api_platform.resource_class_resolver',
-            ResourceNameCollectionFactoryInterface::class => 'api_platform.metadata.resource.name_collection_factory',
-            ResourceMetadataFactoryInterface::class => 'api_platform.metadata.resource.metadata_factory',
-            SerializerContextBuilderInterface::class => 'api_platform.serializer.context_builder',
-            SubresourceDataProviderInterface::class => 'api_platform.subresource_data_provider',
-            UrlGeneratorInterface::class => 'api_platform.router',
+            PropertyFilter::class => 'api_platform.serializer.property_filter',
+            GroupFilter::class => 'api_platform.serializer.group_filter',
+            OperationAwareFormatsProviderInterface::class => 'api_platform.formats_provider',
+            IdentifiersExtractorInterface::class => 'api_platform.identifiers_extractor.cached',
         ];
 
         foreach ($aliases as $alias => $service) {
