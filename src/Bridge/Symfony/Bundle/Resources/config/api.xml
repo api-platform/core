@@ -67,6 +67,8 @@
             <argument type="service" id="api_platform.resource_class_resolver" />
         </service>
         <service id="ApiPlatform\Core\Api\IriConverterInterface" alias="api_platform.iri_converter" />
+        <service id="ApiPlatform\Core\Api\IriFromItemConverterInterface" alias="api_platform.iri_converter" />
+        <service id="ApiPlatform\Core\Api\ItemFromIriConverterInterface" alias="api_platform.iri_converter" />
 
         <service id="api_platform.formats_provider" class="ApiPlatform\Core\Api\FormatsProvider">
             <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
