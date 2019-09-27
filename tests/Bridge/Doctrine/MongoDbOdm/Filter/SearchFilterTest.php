@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\Bridge\Doctrine\MongoDbOdm\Filter;
 
 use ApiPlatform\Core\Api\IdentifiersExtractorInterface;
-use ApiPlatform\Core\Api\IriConverterInterface;
+use ApiPlatform\Core\Api\ItemFromIriConverterInterface;
 use ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Filter\SearchFilter;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\Test\DoctrineMongoDbOdmFilterTestCase;
@@ -557,9 +557,9 @@ class SearchFilterTest extends DoctrineMongoDbOdmFilterTestCase
     protected function buildSearchFilter(ManagerRegistry $managerRegistry, ?array $properties = null)
     {
         $relatedDummyProphecy = $this->prophesize(RelatedDummy::class);
-        $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
+        $itemFromIriConverterProphecy = $this->prophesize(ItemFromIriConverterInterface::class);
 
-        $iriConverterProphecy->getItemFromIri(Argument::type('string'), ['fetch_data' => false])->will(function ($args) use ($relatedDummyProphecy) {
+        $itemFromIriConverterProphecy->getItemFromIri(Argument::type('string'), ['fetch_data' => false])->will(function ($args) use ($relatedDummyProphecy) {
             if (false !== strpos($args[0], '/related_dummies')) {
                 $relatedDummyProphecy->getId()->shouldBeCalled()->willReturn(1);
 
@@ -569,7 +569,7 @@ class SearchFilterTest extends DoctrineMongoDbOdmFilterTestCase
             throw new InvalidArgumentException();
         });
 
-        $iriConverter = $iriConverterProphecy->reveal();
+        $iriConverter = $itemFromIriConverterProphecy->reveal();
         $propertyAccessor = self::$kernel->getContainer()->get('test.property_accessor');
 
         $identifierExtractorProphecy = $this->prophesize(IdentifiersExtractorInterface::class);

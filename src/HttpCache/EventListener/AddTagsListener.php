@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\HttpCache\EventListener;
 
 use ApiPlatform\Core\Api\IriConverterInterface;
+use ApiPlatform\Core\Api\IriFromItemConverterInterface;
 use ApiPlatform\Core\Util\RequestAttributesExtractor;
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
 
@@ -30,11 +31,11 @@ use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
  */
 final class AddTagsListener
 {
-    private $iriConverter;
+    private $iriFromItemConverter;
 
-    public function __construct(IriConverterInterface $iriConverter)
+    public function __construct(IriFromItemConverterInterface $iriFromItemConverter)
     {
-        $this->iriConverter = $iriConverter;
+        $this->iriFromItemConverter = $iriFromItemConverter;
     }
 
     /**
@@ -56,7 +57,7 @@ final class AddTagsListener
         $resources = $request->attributes->get('_resources');
         if (isset($attributes['collection_operation_name']) || ($attributes['subresource_context']['collection'] ?? false)) {
             // Allows to purge collections
-            $iri = $this->iriConverter->getIriFromResourceClass($attributes['resource_class']);
+            $iri = $this->iriFromItemConverter->getIriFromResourceClass($attributes['resource_class']);
             $resources[$iri] = $iri;
         }
 

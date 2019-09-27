@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\GraphQl\Resolver\Stage;
 
-use ApiPlatform\Core\Api\IriConverterInterface;
+use ApiPlatform\Core\Api\ItemFromIriConverterInterface;
 use ApiPlatform\Core\DataProvider\ContextAwareCollectionDataProviderInterface;
 use ApiPlatform\Core\DataProvider\SubresourceDataProviderInterface;
 use ApiPlatform\Core\Exception\ItemNotFoundException;
@@ -36,16 +36,16 @@ final class ReadStage implements ReadStageInterface
     use ClassInfoTrait;
 
     private $resourceMetadataFactory;
-    private $iriConverter;
+    private $itemFromIriConverter;
     private $collectionDataProvider;
     private $subresourceDataProvider;
     private $serializerContextBuilder;
     private $nestingSeparator;
 
-    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, IriConverterInterface $iriConverter, ContextAwareCollectionDataProviderInterface $collectionDataProvider, SubresourceDataProviderInterface $subresourceDataProvider, SerializerContextBuilderInterface $serializerContextBuilder, string $nestingSeparator)
+    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, ItemFromIriConverterInterface $itemFromIriConverter, ContextAwareCollectionDataProviderInterface $collectionDataProvider, SubresourceDataProviderInterface $subresourceDataProvider, SerializerContextBuilderInterface $serializerContextBuilder, string $nestingSeparator)
     {
         $this->resourceMetadataFactory = $resourceMetadataFactory;
-        $this->iriConverter = $iriConverter;
+        $this->itemFromIriConverter = $itemFromIriConverter;
         $this->collectionDataProvider = $collectionDataProvider;
         $this->subresourceDataProvider = $subresourceDataProvider;
         $this->serializerContextBuilder = $serializerContextBuilder;
@@ -126,7 +126,7 @@ final class ReadStage implements ReadStageInterface
         }
 
         try {
-            $item = $this->iriConverter->getItemFromIri($identifier, $normalizationContext);
+            $item = $this->itemFromIriConverter->getItemFromIri($identifier, $normalizationContext);
         } catch (ItemNotFoundException $e) {
             return null;
         }

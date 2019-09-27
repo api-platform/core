@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Bridge\Doctrine\EventListener;
 
-use ApiPlatform\Core\Api\IriConverterInterface;
+use ApiPlatform\Core\Api\IriFromItemConverterInterface;
 use ApiPlatform\Core\Api\ResourceClassResolverInterface;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\Exception\RuntimeException;
@@ -36,15 +36,15 @@ use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 final class PurgeHttpCacheListener
 {
     private $purger;
-    private $iriConverter;
+    private $iriFromItemConverter;
     private $resourceClassResolver;
     private $propertyAccessor;
     private $tags = [];
 
-    public function __construct(PurgerInterface $purger, IriConverterInterface $iriConverter, ResourceClassResolverInterface $resourceClassResolver, PropertyAccessorInterface $propertyAccessor = null)
+    public function __construct(PurgerInterface $purger, IriFromItemConverterInterface $iriFromItemConverter, ResourceClassResolverInterface $resourceClassResolver, PropertyAccessorInterface $propertyAccessor = null)
     {
         $this->purger = $purger;
-        $this->iriConverter = $iriConverter;
+        $this->iriFromItemConverter = $iriFromItemConverter;
         $this->resourceClassResolver = $resourceClassResolver;
         $this->propertyAccessor = $propertyAccessor ?? PropertyAccess::createPropertyAccessor();
     }
@@ -111,10 +111,10 @@ final class PurgeHttpCacheListener
     {
         try {
             $resourceClass = $this->resourceClassResolver->getResourceClass($entity);
-            $iri = $this->iriConverter->getIriFromResourceClass($resourceClass);
+            $iri = $this->iriFromItemConverter->getIriFromResourceClass($resourceClass);
             $this->tags[$iri] = $iri;
             if ($purgeItem) {
-                $iri = $this->iriConverter->getIriFromItem($entity);
+                $iri = $this->iriFromItemConverter->getIriFromItem($entity);
                 $this->tags[$iri] = $iri;
             }
         } catch (InvalidArgumentException $e) {
@@ -154,7 +154,7 @@ final class PurgeHttpCacheListener
     private function addTagForItem($value): void
     {
         try {
-            $iri = $this->iriConverter->getIriFromItem($value);
+            $iri = $this->iriFromItemConverter->getIriFromItem($value);
             $this->tags[$iri] = $iri;
         } catch (InvalidArgumentException $e) {
         } catch (RuntimeException $e) {
