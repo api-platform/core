@@ -12,7 +12,7 @@ Feature: IRI should contain Absolute URL
     And the JSON should be equal to:
     """
     {
-      "@context": "\/contexts\/AbsoluteUrlDummy",
+      "@context": "http:\/\/example.com\/contexts\/AbsoluteUrlDummy",
       "@id": "http:\/\/example.com\/absolute_url_dummies",
       "@type": "hydra:Collection",
       "hydra:member": [
@@ -41,7 +41,7 @@ Feature: IRI should contain Absolute URL
     And the JSON should be equal to:
     """
     {
-      "@context": "\/contexts\/AbsoluteUrlRelationDummy",
+      "@context": "http:\/\/example.com\/contexts\/AbsoluteUrlRelationDummy",
       "@id": "http:\/\/example.com\/absolute_url_relation_dummies\/2",
       "@type": "AbsoluteUrlRelationDummy",
       "absoluteUrlDummies": [],
@@ -57,7 +57,7 @@ Feature: IRI should contain Absolute URL
     And the JSON should be equal to:
     """
     {
-      "@context": "\/contexts\/AbsoluteUrlDummy",
+      "@context": "http:\/\/example.com\/contexts\/AbsoluteUrlDummy",
       "@id": "http:\/\/example.com\/absolute_url_dummies\/1",
       "@type": "AbsoluteUrlDummy",
       "absoluteUrlRelationDummy": "http:\/\/example.com\/absolute_url_relation_dummies\/1",
@@ -73,7 +73,7 @@ Feature: IRI should contain Absolute URL
     And the JSON should be equal to:
     """
     {
-      "@context": "\/contexts\/AbsoluteUrlDummy",
+      "@context": "http:\/\/example.com\/contexts\/AbsoluteUrlDummy",
       "@id": "http:\/\/example.com\/absolute_url_relation_dummies\/1\/absolute_url_dummies",
       "@type": "hydra:Collection",
       "hydra:member": [

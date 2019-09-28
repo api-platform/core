@@ -101,7 +101,7 @@ final class ContextBuilder implements AnonymousContextBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function getResourceContextUri(string $resourceClass, int $referenceType = UrlGeneratorInterface::ABS_PATH): string
+    public function getResourceContextUri(string $resourceClass, int $referenceType = null): string
     {
         $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
 

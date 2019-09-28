@@ -52,6 +52,7 @@
 
         <service id="api_platform.router" class="ApiPlatform\Core\Bridge\Symfony\Routing\Router" public="false">
             <argument type="service" id="router" />
+            <argument>%api_platform.absolute_url%</argument>
         </service>
 
         <service id="api_platform.iri_converter" class="ApiPlatform\Core\Bridge\Symfony\Routing\IriConverter" public="false">

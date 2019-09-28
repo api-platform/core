@@ -117,7 +117,7 @@ final class IriConverter implements IriConverterInterface
     /**
      * {@inheritdoc}
      */
-    public function getIriFromItem($item, int $referenceType = UrlGeneratorInterface::ABS_PATH): string
+    public function getIriFromItem($item, int $referenceType = null): string
     {
         $resourceClass = $this->getResourceClass($item, true);
 
@@ -136,10 +136,10 @@ final class IriConverter implements IriConverterInterface
     /**
      * {@inheritdoc}
      */
-    public function getIriFromResourceClass(string $resourceClass, int $referenceType = UrlGeneratorInterface::ABS_PATH): string
+    public function getIriFromResourceClass(string $resourceClass, int $referenceType = null): string
     {
         try {
-            return $this->generate($this->routeNameResolver->getRouteName($resourceClass, OperationType::COLLECTION), [], $referenceType);
+            return $this->router->generate($this->routeNameResolver->getRouteName($resourceClass, OperationType::COLLECTION), [], null === $referenceType ? $this->absoluteUrl ? UrlGeneratorInterface::ABS_URL : UrlGeneratorInterface::ABS_PATH : $referenceType);
         } catch (RoutingExceptionInterface $e) {
             throw new InvalidArgumentException(sprintf('Unable to generate an IRI for "%s".', $resourceClass), $e->getCode(), $e);
         }
@@ -148,14 +148,14 @@ final class IriConverter implements IriConverterInterface
     /**
      * {@inheritdoc}
      */
-    public function getItemIriFromResourceClass(string $resourceClass, array $identifiers, int $referenceType = UrlGeneratorInterface::ABS_PATH): string
+    public function getItemIriFromResourceClass(string $resourceClass, array $identifiers, int $referenceType = null): string
     {
         $routeName = $this->routeNameResolver->getRouteName($resourceClass, OperationType::ITEM);
 
         try {
             $identifiers = $this->generateIdentifiersUrl($identifiers, $resourceClass);
 
-            return $this->generate($routeName, ['id' => implode(';', $identifiers)], $referenceType);
+            return $this->router->generate($routeName, ['id' => implode(';', $identifiers)], null === $referenceType ? $this->absoluteUrl ? UrlGeneratorInterface::ABS_URL : UrlGeneratorInterface::ABS_PATH : $referenceType);
         } catch (RoutingExceptionInterface $e) {
             throw new InvalidArgumentException(sprintf(
                 'Unable to generate an IRI for "%s".',
@@ -167,22 +167,13 @@ final class IriConverter implements IriConverterInterface
     /**
      * {@inheritdoc}
      */
-    public function getSubresourceIriFromResourceClass(string $resourceClass, array $context, int $referenceType = UrlGeneratorInterface::ABS_PATH): string
+    public function getSubresourceIriFromResourceClass(string $resourceClass, array $context, int $referenceType = null): string
     {
         try {
-            return $this->generate($this->routeNameResolver->getRouteName($resourceClass, OperationType::SUBRESOURCE, $context), $context['subresource_identifiers'], $referenceType);
+            return $this->router->generate($this->routeNameResolver->getRouteName($resourceClass, OperationType::SUBRESOURCE, $context), $context['subresource_identifiers'], null === $referenceType ? $this->absoluteUrl ? UrlGeneratorInterface::ABS_URL : UrlGeneratorInterface::ABS_PATH : $referenceType);
         } catch (RoutingExceptionInterface $e) {
             throw new InvalidArgumentException(sprintf('Unable to generate an IRI for "%s".', $resourceClass), $e->getCode(), $e);
         }
-    }
-
-    /**
-     * @param array $parameters
-     * @param int   $referenceType
-     */
-    private function generate(string $name, $parameters = [], $referenceType = UrlGeneratorInterface::ABS_PATH): string
-    {
-        return $this->router->generate($name, $parameters, true === $this->absoluteUrl ? UrlGeneratorInterface::ABS_URL : $referenceType);
     }
 
     /**

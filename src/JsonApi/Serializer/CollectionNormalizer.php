@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\JsonApi\Serializer;
 
+use ApiPlatform\Core\Api\ResourceClassResolverInterface;
 use ApiPlatform\Core\Serializer\AbstractCollectionNormalizer;
 use ApiPlatform\Core\Util\IriHelper;
 use Symfony\Component\Serializer\Exception\UnexpectedValueException;
@@ -28,32 +29,40 @@ final class CollectionNormalizer extends AbstractCollectionNormalizer
 {
     public const FORMAT = 'jsonapi';
 
+    private $absoluteUrl;
+
+    public function __construct(ResourceClassResolverInterface $resourceClassResolver, string $pageParameterName, bool $absoluteUrl = false)
+    {
+        $this->absoluteUrl = $absoluteUrl;
+        parent::__construct($resourceClassResolver, $pageParameterName);
+    }
+
     /**
      * {@inheritdoc}
      */
     protected function getPaginationData($object, array $context = []): array
     {
         [$paginator, $paginated, $currentPage, $itemsPerPage, $lastPage, $pageTotalItems, $totalItems] = $this->getPaginationConfig($object, $context);
-        $parsed = IriHelper::parseIri($context['request_uri'] ?? '/', $this->pageParameterName);
+        $parsed = IriHelper::parseIri($context['uri'] ?? '/', $this->pageParameterName);
 
         $data = [
             'links' => [
-                'self' => IriHelper::createIri($parsed['parts'], $parsed['parameters'], $this->pageParameterName, $paginated ? $currentPage : null),
+                'self' => IriHelper::createIri($parsed['parts'], $parsed['parameters'], $this->pageParameterName, $paginated ? $currentPage : null, $this->absoluteUrl),
             ],
         ];
 
         if ($paginated) {
             if (null !== $lastPage) {
-                $data['links']['first'] = IriHelper::createIri($parsed['parts'], $parsed['parameters'], $this->pageParameterName, 1.);
-                $data['links']['last'] = IriHelper::createIri($parsed['parts'], $parsed['parameters'], $this->pageParameterName, $lastPage);
+                $data['links']['first'] = IriHelper::createIri($parsed['parts'], $parsed['parameters'], $this->pageParameterName, 1., $this->absoluteUrl);
+                $data['links']['last'] = IriHelper::createIri($parsed['parts'], $parsed['parameters'], $this->pageParameterName, $lastPage, $this->absoluteUrl);
             }
 
             if (1. !== $currentPage) {
-                $data['links']['prev'] = IriHelper::createIri($parsed['parts'], $parsed['parameters'], $this->pageParameterName, $currentPage - 1.);
+                $data['links']['prev'] = IriHelper::createIri($parsed['parts'], $parsed['parameters'], $this->pageParameterName, $currentPage - 1., $this->absoluteUrl);
             }
 
             if (null !== $lastPage && $currentPage !== $lastPage || null === $lastPage && $pageTotalItems >= $itemsPerPage) {
-                $data['links']['next'] = IriHelper::createIri($parsed['parts'], $parsed['parameters'], $this->pageParameterName, $currentPage + 1.);
+                $data['links']['next'] = IriHelper::createIri($parsed['parts'], $parsed['parameters'], $this->pageParameterName, $currentPage + 1., $this->absoluteUrl);
             }
         }
 

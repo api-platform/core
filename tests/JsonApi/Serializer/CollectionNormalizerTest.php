@@ -59,6 +59,7 @@ class CollectionNormalizerTest extends TestCase
         $itemNormalizer = $this->prophesize(NormalizerInterface::class);
         $itemNormalizer->normalize('foo', CollectionNormalizer::FORMAT, [
             'request_uri' => '/foos?page=3',
+            'uri' => 'http://example.com/foos?page=3',
             'api_sub_level' => true,
             'resource_class' => 'Foo',
         ])->willReturn([
@@ -102,6 +103,7 @@ class CollectionNormalizerTest extends TestCase
 
         $this->assertEquals($expected, $normalizer->normalize($paginator, CollectionNormalizer::FORMAT, [
             'request_uri' => '/foos?page=3',
+            'uri' => 'http://example.com/foos?page=3',
             'resource_class' => 'Foo',
         ]));
     }
@@ -125,6 +127,7 @@ class CollectionNormalizerTest extends TestCase
         $itemNormalizer = $this->prophesize(NormalizerInterface::class);
         $itemNormalizer->normalize('foo', CollectionNormalizer::FORMAT, [
             'request_uri' => '/foos?page=3',
+            'uri' => 'http://example.com/foos?page=3',
             'api_sub_level' => true,
             'resource_class' => 'Foo',
         ])->willReturn([
@@ -165,6 +168,7 @@ class CollectionNormalizerTest extends TestCase
 
         $this->assertEquals($expected, $normalizer->normalize($paginator, CollectionNormalizer::FORMAT, [
             'request_uri' => '/foos?page=3',
+            'uri' => 'http://example.com/foos?page=3',
             'resource_class' => 'Foo',
         ]));
     }
@@ -179,6 +183,7 @@ class CollectionNormalizerTest extends TestCase
         $itemNormalizer = $this->prophesize(NormalizerInterface::class);
         $itemNormalizer->normalize('foo', CollectionNormalizer::FORMAT, [
             'request_uri' => '/foos',
+            'uri' => 'http://example.com/foos',
             'api_sub_level' => true,
             'resource_class' => 'Foo',
         ])->willReturn([
@@ -212,6 +217,7 @@ class CollectionNormalizerTest extends TestCase
 
         $this->assertEquals($expected, $normalizer->normalize($data, CollectionNormalizer::FORMAT, [
             'request_uri' => '/foos',
+            'uri' => 'http://example.com/foos',
             'resource_class' => 'Foo',
         ]));
     }
@@ -226,6 +232,7 @@ class CollectionNormalizerTest extends TestCase
         $itemNormalizer = $this->prophesize(NormalizerInterface::class);
         $itemNormalizer->normalize('foo', CollectionNormalizer::FORMAT, [
             'request_uri' => '/foos',
+            'uri' => 'http://example.com/foos',
             'api_sub_level' => true,
             'resource_class' => 'Foo',
         ])->willReturn([
@@ -279,6 +286,7 @@ class CollectionNormalizerTest extends TestCase
 
         $this->assertEquals($expected, $normalizer->normalize($data, CollectionNormalizer::FORMAT, [
             'request_uri' => '/foos',
+            'uri' => 'http://example.com/foos',
             'resource_class' => 'Foo',
         ]));
     }
@@ -296,6 +304,7 @@ class CollectionNormalizerTest extends TestCase
         $itemNormalizer = $this->prophesize(NormalizerInterface::class);
         $itemNormalizer->normalize('foo', CollectionNormalizer::FORMAT, [
             'request_uri' => '/foos',
+            'uri' => 'http://example.com/foos',
             'api_sub_level' => true,
             'resource_class' => 'Foo',
         ])->willReturn([]);
@@ -305,6 +314,7 @@ class CollectionNormalizerTest extends TestCase
 
         $normalizer->normalize($data, CollectionNormalizer::FORMAT, [
             'request_uri' => '/foos',
+            'uri' => 'http://example.com/foos',
             'resource_class' => 'Foo',
         ]);
     }

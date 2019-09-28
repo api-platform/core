@@ -35,10 +35,12 @@ final class Router implements RouterInterface, UrlGeneratorInterface
     ];
 
     private $router;
+    private $absoluteUrl;
 
-    public function __construct(RouterInterface $router)
+    public function __construct(RouterInterface $router, bool $absoluteUrl = false)
     {
         $this->router = $router;
+        $this->absoluteUrl = $absoluteUrl;
     }
 
     /**
@@ -96,8 +98,15 @@ final class Router implements RouterInterface, UrlGeneratorInterface
     /**
      * {@inheritdoc}
      */
-    public function generate($name, $parameters = [], $referenceType = self::ABS_PATH)
+    public function generate($name, $parameters = [], $referenceType = null)
     {
-        return $this->router->generate($name, $parameters, self::CONST_MAP[$referenceType]);
+        return $this->router->generate(
+            $name,
+            $parameters,
+            null === $referenceType
+                ? $this->absoluteUrl
+                    ? self::CONST_MAP[UrlGeneratorInterface::ABS_URL]
+                    : self::CONST_MAP[UrlGeneratorInterface::ABS_PATH]
+                : self::CONST_MAP[$referenceType]);
     }
 }
