@@ -9,7 +9,7 @@ Feature: GraphQL collection support
         ...dummyFields
       }
     }
-    fragment dummyFields on DummyCollectionConnection {
+    fragment dummyFields on DummyConnection {
       edges {
         node {
           id
@@ -656,3 +656,27 @@ Feature: GraphQL collection support
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/json"
     And the JSON node "data.dummies.edges[1].node.name_converted" should be equal to "Converted 2"
+
+  @createSchema
+  Scenario: Retrieve a collection with different serialization groups for item_query and collection_query
+    Given there are 3 dummy with different GraphQL serialization groups objects
+    When I send the following GraphQL request:
+    """
+    {
+      dummyDifferentGraphQlSerializationGroups {
+        edges {
+          node {
+            name
+          }
+        }
+      }
+    }
+    """
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the JSON node "data.dummyDifferentGraphQlSerializationGroups.edges[0].node.name" should exist
+    And the JSON node "data.dummyDifferentGraphQlSerializationGroups.edges[1].node.name" should exist
+    And the JSON node "data.dummyDifferentGraphQlSerializationGroups.edges[2].node.name" should exist
+    And the JSON node "data.dummyDifferentGraphQlSerializationGroups.edges[0].node.title" should not exist
+    And the JSON node "data.dummyDifferentGraphQlSerializationGroups.edges[1].node.title" should not exist
+    And the JSON node "data.dummyDifferentGraphQlSerializationGroups.edges[2].node.title" should not exist

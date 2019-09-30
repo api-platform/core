@@ -61,11 +61,14 @@ final class TypeBuilder implements TypeBuilderInterface
             }
             $shortName .= 'Payload';
         }
-        if ('item_query' === $queryName) {
-            $shortName .= 'Item';
-        }
-        if ('collection_query' === $queryName) {
-            $shortName .= 'Collection';
+        if (('item_query' === $queryName || 'collection_query' === $queryName)
+            && $resourceMetadata->getGraphqlAttribute('item_query', 'normalization_context', [], true) !== $resourceMetadata->getGraphqlAttribute('collection_query', 'normalization_context', [], true)) {
+            if ('item_query' === $queryName) {
+                $shortName .= 'Item';
+            }
+            if ('collection_query' === $queryName) {
+                $shortName .= 'Collection';
+            }
         }
         if ($wrapped && null !== $mutationName) {
             $shortName .= 'Data';
@@ -158,7 +161,7 @@ final class TypeBuilder implements TypeBuilderInterface
                     return null;
                 }
 
-                $shortName = (new \ReflectionClass($value[ItemNormalizer::ITEM_RESOURCE_CLASS_KEY]))->getShortName().'Item';
+                $shortName = (new \ReflectionClass($value[ItemNormalizer::ITEM_RESOURCE_CLASS_KEY]))->getShortName();
 
                 return $this->typesContainer->has($shortName) ? $this->typesContainer->get($shortName) : null;
             },

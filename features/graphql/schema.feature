@@ -6,7 +6,7 @@ Feature: GraphQL schema-related features
     Then the command output should contain:
     """
     ###Dummy Friend.###
-    type DummyFriendCollection implements Node {
+    type DummyFriend implements Node {
       id: ID!
 
       ###The id###
@@ -16,36 +16,25 @@ Feature: GraphQL schema-related features
       name: String!
     }
 
-    ###Connection for DummyFriendCollection.###
-    type DummyFriendCollectionConnection {
-      edges: [DummyFriendCollectionEdge]
-      pageInfo: DummyFriendCollectionPageInfo!
+    ###Connection for DummyFriend.###
+    type DummyFriendConnection {
+      edges: [DummyFriendEdge]
+      pageInfo: DummyFriendPageInfo!
       totalCount: Int!
     }
 
-    ###Edge of DummyFriendCollection.###
-    type DummyFriendCollectionEdge {
-      node: DummyFriendCollection
+    ###Edge of DummyFriend.###
+    type DummyFriendEdge {
+      node: DummyFriend
       cursor: String!
     }
 
     ###Information about the current page.###
-    type DummyFriendCollectionPageInfo {
+    type DummyFriendPageInfo {
       endCursor: String
       startCursor: String
       hasNextPage: Boolean!
       hasPreviousPage: Boolean!
-    }
-
-    ###Dummy Friend.###
-    type DummyFriendItem implements Node {
-      id: ID!
-
-      ###The id###
-      _id: Int!
-
-      ###The dummy name###
-      name: String!
     }
     """
 
@@ -55,7 +44,7 @@ Feature: GraphQL schema-related features
     Then the command output should contain:
     """
     # Dummy Friend.
-    type DummyFriendCollection implements Node {
+    type DummyFriend implements Node {
       id: ID!
 
       # The id
@@ -65,35 +54,24 @@ Feature: GraphQL schema-related features
       name: String!
     }
 
-    # Connection for DummyFriendCollection.
-    type DummyFriendCollectionConnection {
-      edges: [DummyFriendCollectionEdge]
-      pageInfo: DummyFriendCollectionPageInfo!
+    # Connection for DummyFriend.
+    type DummyFriendConnection {
+      edges: [DummyFriendEdge]
+      pageInfo: DummyFriendPageInfo!
       totalCount: Int!
     }
 
-    # Edge of DummyFriendCollection.
-    type DummyFriendCollectionEdge {
-      node: DummyFriendCollection
+    # Edge of DummyFriend.
+    type DummyFriendEdge {
+      node: DummyFriend
       cursor: String!
     }
 
     # Information about the current page.
-    type DummyFriendCollectionPageInfo {
+    type DummyFriendPageInfo {
       endCursor: String
       startCursor: String
       hasNextPage: Boolean!
       hasPreviousPage: Boolean!
-    }
-
-    # Dummy Friend.
-    type DummyFriendItem implements Node {
-      id: ID!
-
-      # The id
-      _id: Int!
-
-      # The dummy name
-      name: String!
     }
     """
