@@ -1229,13 +1229,13 @@ final class DoctrineContext implements Context
     /**
      * @Given there are :nb dummy with different GraphQL serialization groups objects
      */
-    public function thereAreDummyWithDifferentGraphQLSerializationGroupsObjects(int $nb)
+    public function thereAreDummyWithDifferentGraphQlSerializationGroupsObjects(int $nb)
     {
         for ($i = 1; $i <= $nb; ++$i) {
-            $dummyDifferentSerializationGroup = $this->buildDummyDifferentSerializationGroup();
-            $dummyDifferentSerializationGroup->setName('Name #'.$i);
-            $dummyDifferentSerializationGroup->setTitle('Title #'.$i);
-            $this->manager->persist($dummyDifferentSerializationGroup);
+            $dummyDifferentGraphQlSerializationGroup = $this->buildDummyDifferentGraphQlSerializationGroup();
+            $dummyDifferentGraphQlSerializationGroup->setName('Name #'.$i);
+            $dummyDifferentGraphQlSerializationGroup->setTitle('Title #'.$i);
+            $this->manager->persist($dummyDifferentGraphQlSerializationGroup);
         }
 
         $this->manager->flush();
@@ -1603,7 +1603,7 @@ final class DoctrineContext implements Context
     /**
      * @return DummyDifferentGraphQlSerializationGroup|DummyDifferentGraphQlSerializationGroupDocument
      */
-    private function buildDummyDifferentSerializationGroup()
+    private function buildDummyDifferentGraphQlSerializationGroup()
     {
         return $this->isOrm() ? new DummyDifferentGraphQlSerializationGroup() : new DummyDifferentGraphQlSerializationGroupDocument();
     }

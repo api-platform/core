@@ -107,14 +107,14 @@ class TypeBuilderTest extends TestCase
     }
 
     /**
-     * @dataProvider resourceObjectTypeSerializationGroupsProvider
+     * @dataProvider resourceObjectTypeQuerySerializationGroupsProvider
      */
-    public function testGetResourceObjectTypeQuerySerializationGroups(string $itemSerializationGroup, string $collectionSerilizationGroup, string $shortName, string $queryName)
+    public function testGetResourceObjectTypeQuerySerializationGroups(string $itemSerializationGroup, string $collectionSerializationGroup, string $shortName, string $queryName)
     {
         $resourceMetadata = (new ResourceMetadata('shortName', 'description'))
             ->withGraphql([
                 'item_query' => ['normalization_context' => ['groups' => [$itemSerializationGroup]]],
-                'collection_query' => ['normalization_context' => ['groups' => [$collectionSerilizationGroup]]],
+                'collection_query' => ['normalization_context' => ['groups' => [$collectionSerializationGroup]]],
             ]);
         $this->typesContainerProphecy->has($shortName)->shouldBeCalled()->willReturn(false);
         $this->typesContainerProphecy->set($shortName, Argument::type(ObjectType::class))->shouldBeCalled();
@@ -124,14 +124,9 @@ class TypeBuilderTest extends TestCase
         /** @var ObjectType $resourceObjectType */
         $resourceObjectType = $this->typeBuilder->getResourceObjectType('resourceClass', $resourceMetadata, false, $queryName, null);
         $this->assertSame($shortName, $resourceObjectType->name);
-
-        $fieldsBuilderProphecy = $this->prophesize(FieldsBuilderInterface::class);
-        $fieldsBuilderProphecy->getResourceObjectTypeFields('resourceClass', $resourceMetadata, false, $queryName, null, 0, null)->shouldBeCalled();
-        $this->fieldsBuilderLocatorProphecy->get('api_platform.graphql.fields_builder')->shouldBeCalled()->willReturn($fieldsBuilderProphecy->reveal());
-        $resourceObjectType->config['fields']();
     }
 
-    public function resourceObjectTypeSerializationGroupsProvider(): array
+    public function resourceObjectTypeQuerySerializationGroupsProvider(): array
     {
         return [
             'same serialization groups for item_query and collection_query' => [
@@ -140,13 +135,13 @@ class TypeBuilderTest extends TestCase
                 'shortName',
                 'item_query',
             ],
-            'different serialization groups for item_query and collection_query when calling to item_query' => [
+            'different serialization groups for item_query and collection_query when using item_query' => [
                 'item_group',
                 'collection_group',
                 'shortNameItem',
                 'item_query',
             ],
-            'different serialization groups for item_query and collection_query when calling to collection_query' => [
+            'different serialization groups for item_query and collection_query when using collection_query' => [
                 'item_group',
                 'collection_group',
                 'shortNameCollection',

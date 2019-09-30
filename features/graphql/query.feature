@@ -402,7 +402,7 @@ Feature: GraphQL query support
     When I send the following GraphQL request:
     """
     {
-      dummyDifferentGraphQlSerializationGroup(id:"/dummy_different_graph_ql_serialization_groups/1") {
+      dummyDifferentGraphQlSerializationGroup(id: "/dummy_different_graph_ql_serialization_groups/1") {
         name
         title
       }
