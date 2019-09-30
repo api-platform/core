@@ -8,6 +8,7 @@
 * Doctrine: Better exception to find which resource is linked to an exception (#3965)
 * Doctrine: Allow mixed type value for date filter (notice if invalid) (#3870)
 * Doctrine: Add `nulls_always_first` and `nulls_always_last` to `nulls_comparison` in order filter (#4103)
+* Doctrine: Add a global `order_nulls_comparison` configuration (#3117)
 * MongoDB: `date_immutable` support (#3940)
 * DataProvider: Add `TraversablePaginator` (#3783)
 * JSON:API: Support inclusion of resources from path (#3288)

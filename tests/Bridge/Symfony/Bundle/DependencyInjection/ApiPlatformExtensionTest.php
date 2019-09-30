@@ -883,6 +883,7 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.collection.exists_parameter_name' => 'exists',
             'api_platform.collection.order' => 'ASC',
             'api_platform.collection.order_parameter_name' => 'order',
+            'api_platform.collection.order_nulls_comparison' => null,
             'api_platform.description' => 'description',
             'api_platform.error_formats' => ['jsonproblem' => ['application/problem+json'], 'jsonld' => ['application/ld+json']],
             'api_platform.formats' => null === $configuration ? ['jsonld' => ['application/ld+json'], 'jsonhal' => ['application/hal+json']] : $this->getFormatsFromConfiguration($configuration['api_platform']['formats']) ?? [],
