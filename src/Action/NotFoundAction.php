@@ -16,9 +16,7 @@ namespace ApiPlatform\Core\Action;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
- * Not found action.
- *
- * @author Antoine Bluchet <soyuka@gmail.com>
+ * An action which always returns HTTP 404 Not Found. Useful for disabling an operation.
  */
 final class NotFoundAction
 {

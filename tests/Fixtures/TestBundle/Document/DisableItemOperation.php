@@ -13,15 +13,23 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Document;
 
+use ApiPlatform\Core\Action\NotFoundAction;
 use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 
 /**
- * DisableItemOperation.
- *
- * @author Antoine Bluchet <soyuka@gmail.com>
- *
- * @ApiResource(itemOperations={}, collectionOperations={"get"})
+ * @ApiResource(
+ *     collectionOperations={
+ *         "get",
+ *     },
+ *     itemOperations={
+ *         "get"={
+ *             "controller"=NotFoundAction::class,
+ *             "read"=false,
+ *             "output"=false,
+ *         },
+ *     },
+ * )
  * @ODM\Document
  */
 class DisableItemOperation

@@ -1,5 +1,16 @@
 # Changelog
 
+## 2.5.0
+
+* Fix BC-break when using short-syntax notation for `access_control`
+* Fix BC-break when no item operations are declared
+* GraphQL: Adding serialization group difference condition for `item_query` and `collection_query` types
+* JSON Schema: Fix command
+
+## 2.5.0 beta 3
+
+* GraphQL: Use different types (`MyTypeItem` and `MyTypeCollection`) only if serialization groups are different for `item_query` and `collection_query` (#3083)
+
 ## 2.5.0 beta 2
 
 * Allow to not declare GET item operation

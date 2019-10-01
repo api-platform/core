@@ -56,10 +56,10 @@ Feature: Operation support
     }
     """
 
-  Scenario: Get the collection of a resource that doesn't have a defined item operation
+  Scenario: Get the collection of a resource that have disabled item operation
     When I send a "GET" request to "/disable_item_operations"
     Then the response status code should be 200
 
-  Scenario: Do not get a resource that doesn't have a defined item operation
+  Scenario: Get a 404 response for the disabled item operation
     When I send a "GET" request to "/disable_item_operations/1"
     Then the response status code should be 404

@@ -49,6 +49,17 @@ trait AttributesHydratorTrait
             unset($values['attributes']);
         }
 
+        if (\array_key_exists('accessControl', $values)) {
+            $values['security'] = $values['accessControl'];
+            @trigger_error('Attribute "accessControl" is deprecated in annotation since API Platform 2.5, prefer using "security" attribute instead', E_USER_DEPRECATED);
+            unset($values['accessControl']);
+        }
+        if (\array_key_exists('accessControlMessage', $values)) {
+            $values['securityMessage'] = $values['accessControlMessage'];
+            @trigger_error('Attribute "accessControlMessage" is deprecated in annotation since API Platform 2.5, prefer using "securityMessage" attribute instead', E_USER_DEPRECATED);
+            unset($values['accessControlMessage']);
+        }
+
         foreach ($values as $key => $value) {
             $key = (string) $key;
             if (!property_exists($this, $key)) {

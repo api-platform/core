@@ -13,15 +13,23 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity;
 
+use ApiPlatform\Core\Action\NotFoundAction;
 use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * DisableItemOperation.
- *
- * @author Antoine Bluchet <soyuka@gmail.com>
- *
- * @ApiResource(itemOperations={}, collectionOperations={"get", "post"})
+ * @ApiResource(
+ *     collectionOperations={
+ *         "get",
+ *     },
+ *     itemOperations={
+ *         "get"={
+ *             "controller"=NotFoundAction::class,
+ *             "read"=false,
+ *             "output"=false,
+ *         },
+ *     },
+ * )
  * @ORM\Entity
  */
 class DisableItemOperation

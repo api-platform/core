@@ -73,7 +73,11 @@ final class SchemaFactory implements SchemaFactoryInterface
         $version = $schema->getVersion();
         $definitionName = $this->buildDefinitionName($resourceClass, $format, $type, $operationType, $operationName, $serializerContext);
 
-        $method = (null !== $operationType && null !== $operationName) ? $resourceMetadata->getTypedOperationAttribute($operationType, $operationName, 'method') : 'GET';
+        if (null === $operationType || null === $operationName) {
+            $method = Schema::TYPE_INPUT === $type ? 'POST' : 'GET';
+        } else {
+            $method = $resourceMetadata->getTypedOperationAttribute($operationType, $operationName, 'method');
+        }
 
         if (Schema::TYPE_OUTPUT !== $type && !\in_array($method, ['POST', 'PATCH', 'PUT'], true)) {
             return $schema;
@@ -230,7 +234,7 @@ final class SchemaFactory implements SchemaFactoryInterface
             $inputOrOutput = $resourceMetadata->getTypedOperationAttribute($operationType, $operationName, $attribute, ['class' => $resourceClass], true);
         }
 
-        if (false === ($inputOrOutput['class'] ?? false)) {
+        if (null === ($inputOrOutput['class'] ?? null)) {
             // input or output disabled
             return null;
         }
