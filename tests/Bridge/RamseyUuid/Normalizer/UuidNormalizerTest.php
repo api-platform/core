@@ -16,6 +16,7 @@ namespace ApiPlatform\Core\Tests\Bridge\RamseyUuid\Normalizer;
 use ApiPlatform\Core\Bridge\RamseyUuid\Identifier\Normalizer\UuidNormalizer;
 use PHPUnit\Framework\TestCase;
 use Ramsey\Uuid\Uuid;
+use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
 
 class UuidNormalizerTest extends TestCase
 {
@@ -36,7 +37,7 @@ class UuidNormalizerTest extends TestCase
 
     public function testFailDenormalizeUuid()
     {
-        $this->expectException(\ApiPlatform\Core\Exception\InvalidIdentifierException::class);
+        $this->expectException(NotNormalizableValueException::class);
 
         $uuid = 'notanuuid';
         $normalizer = new UuidNormalizer();
