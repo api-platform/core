@@ -17,6 +17,8 @@ use ApiPlatform\Core\Action\NotFoundAction;
 use ApiPlatform\Core\Api\FilterInterface;
 use ApiPlatform\Core\Api\IdentifiersExtractorInterface;
 use ApiPlatform\Core\Api\IriConverterInterface;
+use ApiPlatform\Core\Api\IriFromItemConverterInterface;
+use ApiPlatform\Core\Api\ItemFromIriConverterInterface;
 use ApiPlatform\Core\Api\OperationAwareFormatsProviderInterface;
 use ApiPlatform\Core\Api\ResourceClassResolverInterface;
 use ApiPlatform\Core\Api\UrlGeneratorInterface;
@@ -989,6 +991,8 @@ class ApiPlatformExtensionTest extends TestCase
             GroupFilter::class => 'api_platform.serializer.group_filter',
             IdentifiersExtractorInterface::class => 'api_platform.identifiers_extractor.cached',
             IriConverterInterface::class => 'api_platform.iri_converter',
+            IriFromItemConverterInterface::class => 'api_platform.iri_converter',
+            ItemFromIriConverterInterface::class => 'api_platform.iri_converter',
             ItemDataProviderInterface::class => 'api_platform.item_data_provider',
             NotFoundAction::class => 'api_platform.action.not_found',
             OperationAwareFormatsProviderInterface::class => 'api_platform.formats_provider',
