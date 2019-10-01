@@ -557,7 +557,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
     private function isBodyParameterAlreadyExists(array $parameters): bool
     {
         foreach ($parameters as $parameter) {
-            if (array_key_exists('in', $parameter) && $parameter['in'] === 'body') {
+            if (\array_key_exists('in', $parameter) && 'body' === $parameter['in']) {
                 return true;
             }
         }

@@ -828,18 +828,18 @@ class DocumentationNormalizerV2Test extends TestCase
             [
                 'get' => ['method' => 'GET'] + self::OPERATION_FORMATS,
                 'post' => [
-                        'method' => 'POST',
-                        'swagger_context' => [
-                            'parameters' => [
-                                [
-                                    'name' => 'dummy',
-                                    'in' => 'body',
-                                    'description' => 'The new custom Dummy resource',
-                                    'schema' => ['$ref' => '#/definitions/Dummy'],
-                                ]
-                            ]
-                        ]
-                    ] + self::OPERATION_FORMATS,
+                    'method' => 'POST',
+                    'swagger_context' => [
+                        'parameters' => [
+                            [
+                                'name' => 'dummy',
+                                'in' => 'body',
+                                'description' => 'The new custom Dummy resource',
+                                'schema' => ['$ref' => '#/definitions/Dummy'],
+                            ],
+                        ],
+                    ],
+                ] + self::OPERATION_FORMATS,
             ]
         );
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
