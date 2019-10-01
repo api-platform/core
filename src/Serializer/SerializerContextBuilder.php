@@ -94,7 +94,7 @@ final class SerializerContextBuilder implements SerializerContextBuilderInterfac
         }
 
         foreach ($resourceMetadata->getItemOperations() as $operation) {
-            if ('PATCH' === $operation['method'] && \in_array('application/merge-patch+json', $operation['input_formats']['json'] ?? [], true)) {
+            if (\in_array('application/merge-patch+json', $operation['input_formats']['json'] ?? [], true) && 'PATCH' === $operation['method']) {
                 $context['skip_null_values'] = true;
 
                 break;
