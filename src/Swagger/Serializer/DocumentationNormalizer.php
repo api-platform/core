@@ -543,13 +543,26 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
             return $pathOperation;
         }
 
-        $pathOperation['parameters'][] = [
-            'name' => lcfirst($resourceShortName),
-            'in' => 'body',
-            'description' => $description,
-        ] + $message;
+        if (!$this->isBodyParameterAlreadyExists($pathOperation['parameters'] ?? [])) {
+            $pathOperation['parameters'][] = [
+                'name' => lcfirst($resourceShortName),
+                'in' => 'body',
+                'description' => $description,
+            ] + $message;
+        }
 
         return $pathOperation;
+    }
+
+    private function isBodyParameterAlreadyExists(array $parameters): bool
+    {
+        foreach ($parameters as $parameter) {
+            if (array_key_exists('in', $parameter) && $parameter['in'] === 'body') {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private function updateDeleteOperation(bool $v3, \ArrayObject $pathOperation, string $resourceShortName, string $operationType, string $operationName, ResourceMetadata $resourceMetadata): \ArrayObject
