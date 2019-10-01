@@ -101,7 +101,7 @@ final class SerializeListener
 
         $linkProvider = $request->attributes->get('_links', new GenericLinkProvider());
         foreach ($resourcesToPush as $resourceToPush) {
-            $linkProvider = $linkProvider->withLink(new Link('preload', $resourceToPush));
+            $linkProvider = $linkProvider->withLink((new Link('preload', $resourceToPush))->withAttribute('as', 'fetch'));
         }
         $request->attributes->set('_links', $linkProvider);
     }
