@@ -13,15 +13,15 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Tests\Metadata\Resource\Factory;
 
-use ApiPlatform\Core\Metadata\Resource\Factory\DefaultConfigurationResourceMetadataFactory;
+use ApiPlatform\Core\Metadata\Resource\Factory\DefaultsResourceMetadataFactory;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use PHPUnit\Framework\TestCase;
 
-class DefaultConfigurationResourceMetadataFactoryTest extends TestCase
+class DefaultsResourceMetadataFactoryTest extends TestCase
 {
-    public function testCreate()
+    public function testCreate(): void
     {
         $decoratedProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $decoratedProphecy->create(Dummy::class)->shouldBeCalled()->willReturn(new ResourceMetadata(
@@ -44,7 +44,7 @@ class DefaultConfigurationResourceMetadataFactoryTest extends TestCase
             ],
         ];
 
-        $factory = new DefaultConfigurationResourceMetadataFactory($decoratedProphecy->reveal(), $defaults);
+        $factory = new DefaultsResourceMetadataFactory($decoratedProphecy->reveal(), $defaults);
 
         $resourceMetadata = $factory->create(Dummy::class);
         $this->assertEquals('foo', $resourceMetadata->getShortName());

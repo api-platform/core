@@ -20,16 +20,16 @@ use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
  *
  * @author Beno!t POLASZEK <bpolaszek@gmail.com>
  */
-final class DefaultConfigurationResourceMetadataFactory implements ResourceMetadataFactoryInterface
+final class DefaultsResourceMetadataFactory implements ResourceMetadataFactoryInterface
 {
     private $decorated;
 
-    private $options;
+    private $defaults;
 
-    public function __construct(ResourceMetadataFactoryInterface $decorated, array $options)
+    public function __construct(ResourceMetadataFactoryInterface $decorated, array $defaults)
     {
         $this->decorated = $decorated;
-        $this->options = $options;
+        $this->defaults = $defaults;
     }
 
     /**
@@ -39,13 +39,13 @@ final class DefaultConfigurationResourceMetadataFactory implements ResourceMetad
     {
         $resourceMetadata = $this->decorated->create($resourceClass);
         $attributes = $resourceMetadata->getAttributes();
+        $attributesConfig = $this->defaults['attributes'] ?? [];
 
-        $baseConfig = array_filter($this->options, function (string $key) {
-            return 'attributes' !== $key;
-        }, \ARRAY_FILTER_USE_KEY);
-        $attributesConfig = $this->options['attributes'] ?? [];
+        foreach ($this->defaults as $key => $value) {
+            if ('attributes' === $key) {
+                continue;
+            }
 
-        foreach ($baseConfig as $key => $value) {
             if (method_exists($resourceMetadata, 'get'.$key) && null === $resourceMetadata->{'get'.$key}() && method_exists($resourceMetadata, 'with'.$key)) {
                 $resourceMetadata = $resourceMetadata->{'with'.$key}($value);
             }

@@ -33,7 +33,7 @@
             <argument>%api_platform.patch_formats%</argument>
         </service>
 
-        <service id="api_platform.metadata.resource.metadata_factory.defaults" class="ApiPlatform\Core\Metadata\Resource\Factory\DefaultConfigurationResourceMetadataFactory" decorates="api_platform.metadata.resource.metadata_factory" decoration-priority="-9" public="false">
+        <service id="api_platform.metadata.resource.metadata_factory.defaults" class="ApiPlatform\Core\Metadata\Resource\Factory\DefaultsResourceMetadataFactory" decorates="api_platform.metadata.resource.metadata_factory" decoration-priority="-9" public="false">
             <argument type="service" id="api_platform.metadata.resource.metadata_factory.defaults.inner" />
             <argument>%api_platform.defaults%</argument>
         </service>
