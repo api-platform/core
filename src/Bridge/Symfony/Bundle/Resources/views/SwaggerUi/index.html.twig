@@ -10,9 +10,9 @@
         <link rel="stylesheet" href="{{ asset('bundles/apiplatform/style.css') }}">
     {% endblock %}
 
-    {% set oauthData = {'oauth': swagger_data.oauth|merge({'redirectUrl' : absolute_url(asset('bundles/apiplatform/swagger-ui/oauth2-redirect.html')) })} %}
+    {% set oauth_data = {'oauth': swagger_data.oauth|merge({'redirectUrl' : absolute_url(asset('bundles/apiplatform/swagger-ui/oauth2-redirect.html')) })} %}
     {# json_encode(65) is for JSON_UNESCAPED_SLASHES|JSON_HEX_TAG to avoid JS XSS #}
-    <script id="swagger-data" type="application/json">{{ swagger_data|merge(oauthData)|json_encode(65)|raw }}</script>
+    <script id="swagger-data" type="application/json">{{ swagger_data|merge(oauth_data)|json_encode(65)|raw }}</script>
 </head>
 
 <body>
