@@ -204,6 +204,9 @@ class ConfigurationTest extends TestCase
             ],
             'allow_plain_identifiers' => false,
             'resource_class_directories' => [],
+            'defaults' => [
+                'attributes' => [],
+            ],
         ], $config);
     }
 
@@ -401,5 +404,22 @@ class ConfigurationTest extends TestCase
         ]);
 
         $this->assertTrue($config['elasticsearch']['enabled']);
+    }
+
+    public function testDefaultsConfig()
+    {
+        $config = $this->processor->processConfiguration($this->configuration, [
+            'api_platform' => [
+                'defaults' => [
+                    'description' => 'foo',
+                    'attributes' => [
+                        'mercure' => true,
+                    ],
+                ],
+            ],
+        ]);
+
+        $this->assertEquals('foo', $config['defaults']['description']);
+        $this->assertTrue($config['defaults']['attributes']['mercure']);
     }
 }

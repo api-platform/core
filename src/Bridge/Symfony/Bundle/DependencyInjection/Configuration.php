@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection;
 
+use ApiPlatform\Core\Annotation\ApiResource;
 use ApiPlatform\Core\Bridge\Elasticsearch\Metadata\Document\DocumentMetadata;
 use ApiPlatform\Core\Exception\FilterValidationException;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
@@ -178,6 +179,8 @@ final class Configuration implements ConfigurationInterface
             'jsonproblem' => ['mime_types' => ['application/problem+json']],
             'jsonld' => ['mime_types' => ['application/ld+json']],
         ]);
+
+        $this->addDefaultsSection($rootNode);
 
         return $treeBuilder;
     }
@@ -493,5 +496,22 @@ final class Configuration implements ConfigurationInterface
                     ->end()
                 ->end()
             ->end();
+    }
+
+    private function addDefaultsSection(ArrayNodeDefinition $rootNode): void
+    {
+        $defaultsNode = $rootNode->children()->arrayNode('defaults')->addDefaultsIfNotSet();
+        $attributesNode = $defaultsNode->children()->arrayNode('attributes')->addDefaultsIfNotSet();
+        $properties = (new \ReflectionClass(ApiResource::class))->getProperties();
+
+        foreach ($properties as $property) {
+            $optionName = $property->getName();
+            if ('attributes' === $optionName) { // "attributes" is a sub-level and not a config option
+                continue;
+            }
+
+            $node = $property->isPublic() ? $defaultsNode : $attributesNode;
+            $node->children()->variableNode($optionName);
+        }
     }
 }
