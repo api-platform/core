@@ -105,7 +105,7 @@ final class TypeConverter implements TypeConverterInterface
 
         try {
             $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
-            if ([] === ($resourceMetadata->getGraphql() ?? [])) {
+            if (0 === $depth && [] === ($resourceMetadata->getGraphql() ?? [])) {
                 return null;
             }
         } catch (ResourceClassNotFoundException $e) {
