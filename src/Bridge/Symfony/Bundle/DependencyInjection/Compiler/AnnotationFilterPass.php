@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\Compiler;
 
+use ApiPlatform\Core\Annotation\ApiFilter;
 use ApiPlatform\Core\Util\AnnotationFilterExtractorTrait;
 use ApiPlatform\Core\Util\ReflectionClassRecursiveIterator;
 use Doctrine\Common\Annotations\Reader;
@@ -23,7 +24,7 @@ use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 
 /**
- * Injects filters.
+ * Registers filter services from {@see ApiFilter} annotations.
  *
  * @internal
  *
@@ -43,7 +44,7 @@ final class AnnotationFilterPass implements CompilerPassInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
         $resourceClassDirectories = $container->getParameter('api_platform.resource_class_directories');
 
@@ -55,28 +56,41 @@ final class AnnotationFilterPass implements CompilerPassInterface
     /**
      * @throws InvalidArgumentException
      */
-    private function createFilterDefinitions(\ReflectionClass $reflectionClass, ContainerBuilder $container): void
+    private function createFilterDefinitions(\ReflectionClass $resourceReflectionClass, ContainerBuilder $container): void
     {
-        $reader = $this->reader ?? $this->reader = $container->get('annotation_reader');
+        $this->reader ?? $this->reader = $container->get('annotation_reader');
 
-        foreach ($this->readFilterAnnotations($reflectionClass, $reader) as $id => [$arguments, $filterClass]) {
+        foreach ($this->readFilterAnnotations($resourceReflectionClass, $this->reader) as $id => [$arguments, $filterClass]) {
             if ($container->has($id)) {
                 continue;
             }
 
-            if ($container->has($filterClass) && ($definition = $container->findDefinition($filterClass))->isAbstract()) {
-                $definition = new ChildDefinition($definition->getClass());
-            } elseif ($reflectionClass = $container->getReflectionClass($filterClass, false)) {
-                $definition = new Definition($reflectionClass->getName());
-                $definition->setAutoconfigured(true);
-            } else {
+            if (null === $filterReflectionClass = $container->getReflectionClass($filterClass, false)) {
                 throw new InvalidArgumentException(sprintf('Class "%s" used for service "%s" cannot be found.', $filterClass, $id));
+            }
+
+            if ($container->has($filterClass) && ($parentDefinition = $container->findDefinition($filterClass))->isAbstract()) {
+                $definition = new ChildDefinition($parentDefinition->getClass());
+            } else {
+                $definition = new Definition($filterReflectionClass->getName());
+                $definition->setAutoconfigured(true);
             }
 
             $definition->addTag(self::TAG_FILTER_NAME);
             $definition->setAutowired(true);
 
+            $parameterNames = [];
+            if (null !== $constructorReflectionMethod = $filterReflectionClass->getConstructor()) {
+                foreach ($constructorReflectionMethod->getParameters() as $reflectionParameter) {
+                    $parameterNames[$reflectionParameter->name] = true;
+                }
+            }
+
             foreach ($arguments as $key => $value) {
+                if (!isset($parameterNames[$key])) {
+                    throw new InvalidArgumentException(sprintf('Class "%s" does not have argument "$%s".', $filterClass, $key));
+                }
+
                 $definition->setArgument("$$key", $value);
             }
 
