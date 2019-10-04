@@ -83,7 +83,7 @@ abstract class AbstractSearchFilter extends AbstractFilter implements ConstantSc
             return $clauseBody;
         }
 
-        return array_merge($clauseBody, [
+        return array_merge_recursive($clauseBody, [
             'bool' => [
                 'must' => $searches,
             ],
