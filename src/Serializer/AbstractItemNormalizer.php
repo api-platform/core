@@ -472,14 +472,13 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
     }
 
     /**
-     * Gets a valid context for property name collection / property metadata factories.
+     * Gets the options for the property name collection / property metadata factories.
      */
     protected function getFactoryOptions(array $context): array
     {
         $options = [];
 
         if (isset($context[self::GROUPS])) {
-            /* @see https://github.com/symfony/symfony/blob/v4.2.6/src/Symfony/Component/PropertyInfo/Extractor/SerializerExtractor.php */
             $options['serializer_groups'] = $context[self::GROUPS];
         }
 
