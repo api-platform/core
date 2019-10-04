@@ -215,9 +215,14 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             // snake_case is the reference for all attribute keys
             $snakeCased = strtolower(preg_replace('/[A-Z]/', '_\\0', $key));
 
-            if (($reflProperty = $reflClass->getProperty($camelCased)) && $reflProperty->isPublic()) {
-                $normalizedDefaults[$snakeCased] = $value;
-            } else {
+            try {
+                $reflProperty = $reflClass->getProperty($camelCased);
+                if ($reflProperty->isPublic()) {
+                    $normalizedDefaults[$snakeCased] = $value;
+                } else {
+                    $normalizedDefaults['attributes'][$snakeCased] = $value;
+                }
+            } catch (\ReflectionException $e) {
                 $normalizedDefaults['attributes'][$snakeCased] = $value;
             }
         }

@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection;
 
+use ApiPlatform\Core\Annotation\ApiResource;
 use ApiPlatform\Core\Bridge\Elasticsearch\Metadata\Document\DocumentMetadata;
 use ApiPlatform\Core\Exception\FilterValidationException;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
@@ -154,8 +155,6 @@ final class Configuration implements ConfigurationInterface
                 ->arrayNode('resource_class_directories')
                     ->prototype('scalar')->end()
                 ->end()
-                ->variableNode('defaults')
-                ->end()
             ->end();
 
         $this->addDoctrineOrmSection($rootNode);
@@ -180,6 +179,8 @@ final class Configuration implements ConfigurationInterface
             'jsonproblem' => ['mime_types' => ['application/problem+json']],
             'jsonld' => ['mime_types' => ['application/ld+json']],
         ]);
+
+        $this->addDefaultsSection($rootNode);
 
         return $treeBuilder;
     }
@@ -495,5 +496,26 @@ final class Configuration implements ConfigurationInterface
                     ->end()
                 ->end()
             ->end();
+    }
+
+    private function addDefaultsSection(ArrayNodeDefinition $rootNode): void
+    {
+        $defaultsNode = $rootNode->children()->arrayNode('defaults')->ignoreExtraKeys();
+        $properties = (new \ReflectionClass(ApiResource::class))->getProperties();
+        $ignoredOptions = [
+            'shortName',
+            'attributes',
+            'subresourceOperations',
+        ];
+
+        foreach ($properties as $property) {
+            $optionName = $property->getName();
+            if (\in_array($optionName, $ignoredOptions, true)) { // "attributes" is a sub-level and not a config option
+                continue;
+            }
+            $snakeCased = strtolower(preg_replace('/[A-Z]/', '_\\0', $optionName));
+
+            $defaultsNode->children()->variableNode($snakeCased);
+        }
     }
 }
