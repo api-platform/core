@@ -124,7 +124,7 @@ final class SchemaFactory implements SchemaFactoryInterface
 
         $options = isset($serializerContext[AbstractNormalizer::GROUPS]) ? ['serializer_groups' => (array) $serializerContext[AbstractNormalizer::GROUPS]] : [];
         foreach ($this->propertyNameCollectionFactory->create($inputOrOutputClass, $options) as $propertyName) {
-            $propertyMetadata = $this->propertyMetadataFactory->create($inputOrOutputClass, $propertyName);
+            $propertyMetadata = $this->propertyMetadataFactory->create($inputOrOutputClass, $propertyName, $options);
             if (!$propertyMetadata->isReadable() && !$propertyMetadata->isWritable()) {
                 continue;
             }
