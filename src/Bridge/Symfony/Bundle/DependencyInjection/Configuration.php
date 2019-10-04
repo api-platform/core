@@ -154,6 +154,8 @@ final class Configuration implements ConfigurationInterface
                 ->arrayNode('resource_class_directories')
                     ->prototype('scalar')->end()
                 ->end()
+                ->variableNode('defaults')
+                ->end()
             ->end();
 
         $this->addDoctrineOrmSection($rootNode);

@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection;
 
+use ApiPlatform\Core\Annotation\ApiResource;
 use ApiPlatform\Core\Api\FilterInterface;
 use ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Extension\AggregationCollectionExtensionInterface;
 use ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Extension\AggregationItemExtensionInterface;
@@ -191,6 +192,37 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         if ($config['name_converter']) {
             $container->setAlias('api_platform.name_converter', $config['name_converter']);
         }
+        $container->setParameter('api_platform.defaults', $this->normalizeDefaults($config['defaults'] ?? []));
+    }
+
+    private function normalizeDefaults(array $defaults): array
+    {
+        $normalizedDefaults = ['attributes' => []];
+        $reflClass = new \ReflectionClass(ApiResource::class);
+
+        foreach ($defaults as $key => $value) {
+            // camelCase allows us comparing to @ApiResource properties
+            $camelCased = lcfirst(
+                preg_replace_callback(
+                    '/(^|_|\.)+(.)/',
+                    static function ($match) {
+                        return ('.' === $match[1] ? '_' : '').strtoupper($match[2]);
+                    },
+                    $key
+                )
+            );
+
+            // snake_case is the reference for all attribute keys
+            $snakeCased = strtolower(preg_replace('/[A-Z]/', '_\\0', $key));
+
+            if (($reflProperty = $reflClass->getProperty($camelCased)) && $reflProperty->isPublic()) {
+                $normalizedDefaults[$snakeCased] = $value;
+            } else {
+                $normalizedDefaults['attributes'][$snakeCased] = $value;
+            }
+        }
+
+        return $normalizedDefaults;
     }
 
     private function registerMetadataConfiguration(ContainerBuilder $container, array $config, XmlFileLoader $loader): void
