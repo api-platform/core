@@ -543,7 +543,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
             return $pathOperation;
         }
 
-        if (!$this->isBodyParameterAlreadyExists($pathOperation['parameters'] ?? [])) {
+        if (!$this->hasBodyParameter($pathOperation['parameters'] ?? [])) {
             $pathOperation['parameters'][] = [
                 'name' => lcfirst($resourceShortName),
                 'in' => 'body',
