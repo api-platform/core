@@ -472,7 +472,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
     }
 
     /**
-     * Gets a valid context for property name collection / property metadata factories.
+     * Gets the options for the property name collection / property metadata factories.
      */
     protected function getFactoryOptions(array $context): array
     {

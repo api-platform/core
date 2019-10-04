@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Document;
 
+use ApiPlatform\Core\Annotation\ApiProperty;
 use ApiPlatform\Core\Annotation\ApiResource;
 use ApiPlatform\Core\Annotation\ApiSubresource;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -32,9 +33,10 @@ use Symfony\Component\Validator\Constraints as Assert;
 class RelatedDummy extends ParentDummy
 {
     /**
+     * @ApiProperty(writable=false)
      * @ApiSubresource
      * @ODM\Id(strategy="INCREMENT", type="integer")
-     * @Groups({"friends"})
+     * @Groups({"chicago", "friends"})
      */
     private $id;
 
