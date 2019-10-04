@@ -115,4 +115,28 @@ class SecurityPostDenormalizeStageTest extends TestCase
             'extra_variables' => $extraVariables,
         ]);
     }
+
+    public function testNoSecurityBundleInstalled(): void
+    {
+        $operationName = 'item_query';
+        $resourceClass = 'myResource';
+        $isGranted = 'not_granted';
+        $extraVariables = ['extra' => false];
+        $resourceMetadata = (new ResourceMetadata())->withGraphql(
+            [
+                $operationName => ['security_post_denormalize' => $isGranted],
+            ]
+        );
+        $this->resourceMetadataFactoryProphecy->create($resourceClass)->willReturn($resourceMetadata);
+
+        $this->securityPostDenormalizeStage = new SecurityPostDenormalizeStage($this->resourceMetadataFactoryProphecy->reveal(), null);
+
+        $info = $this->prophesize(ResolveInfo::class)->reveal();
+        $this->expectException(\LogicException::class);
+
+        ($this->securityPostDenormalizeStage)($resourceClass,'item_query', [
+            'info' => $info,
+            'extra_variables' => $extraVariables,
+        ]);
+    }
 }

@@ -96,4 +96,24 @@ class SecurityStageTest extends TestCase
             'extra_variables' => $extraVariables,
         ]);
     }
+
+    public function testNoSecurityBundleInstalled(): void
+    {
+        $this->securityStage = new SecurityStage($this->resourceMetadataFactoryProphecy->reveal(), null);
+
+        $operationName = 'item_query';
+        $resourceClass = 'myResource';
+        $isGranted = 'not_granted';
+        $extraVariables = ['extra' => false];
+        $resourceMetadata = (new ResourceMetadata())->withGraphql([
+            $operationName => ['security' => $isGranted],
+        ]);
+        $this->resourceMetadataFactoryProphecy->create($resourceClass)->willReturn($resourceMetadata);
+
+        $this->expectException(\LogicException::class);
+
+        ($this->securityStage)($resourceClass, 'item_query', [
+            'extra_variables' => $extraVariables
+        ]);
+    }
 }

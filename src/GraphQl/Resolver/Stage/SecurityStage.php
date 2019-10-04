@@ -30,7 +30,7 @@ final class SecurityStage implements SecurityStageInterface
     private $resourceMetadataFactory;
     private $resourceAccessChecker;
 
-    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, ResourceAccessCheckerInterface $resourceAccessChecker)
+    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, ?ResourceAccessCheckerInterface $resourceAccessChecker)
     {
         $this->resourceMetadataFactory = $resourceMetadataFactory;
         $this->resourceAccessChecker = $resourceAccessChecker;
@@ -44,6 +44,11 @@ final class SecurityStage implements SecurityStageInterface
         $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
 
         $isGranted = $resourceMetadata->getGraphqlAttribute($operationName, 'security', null, true);
+
+        if (null !== $isGranted && null === $this->resourceAccessChecker) {
+            throw new \LogicException('Cannot check security expression when SecurityBundle is not installed. Try running "composer require symfony/security-bundle".');
+        }
+
         if (null === $isGranted || $this->resourceAccessChecker->isGranted($resourceClass, (string) $isGranted, $context['extra_variables'])) {
             return;
         }
