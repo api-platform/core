@@ -48,7 +48,7 @@ final class DefaultPropertyMetadataFactory implements PropertyMetadataFactoryInt
 
         $defaultProperties = $reflectionClass->getDefaultProperties();
 
-        if (!array_key_exists($property, $defaultProperties) || null === ($defaultProperty = $defaultProperties[$property])) {
+        if (!\array_key_exists($property, $defaultProperties) || null === ($defaultProperty = $defaultProperties[$property])) {
             return $propertyMetadata;
         }
 
