@@ -176,6 +176,18 @@ final class SchemaFactory implements SchemaFactoryInterface
             $propertySchema['externalDocs'] = ['url' => $iri];
         }
 
+        if (!isset($propertySchema['default']) && null !== $default = $propertyMetadata->getDefault()) {
+            $propertySchema['default'] = $default;
+        }
+
+        if (!isset($propertySchema['example']) && null !== $example = $propertyMetadata->getExample()) {
+            $propertySchema['example'] = $example;
+        }
+
+        if (!isset($propertySchema['example']) && isset($propertySchema['default'])) {
+            $propertySchema['example'] = $propertySchema['default'];
+        }
+
         $valueSchema = [];
         if (null !== $type = $propertyMetadata->getType()) {
             $isCollection = $type->isCollection();
