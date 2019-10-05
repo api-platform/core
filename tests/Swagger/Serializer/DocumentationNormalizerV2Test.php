@@ -2966,6 +2966,7 @@ class DocumentationNormalizerV2Test extends TestCase
 
         $result = $normalizer->normalize($documentation, DocumentationNormalizer::FORMAT);
 
+        $this->assertIsArray($result);
         $this->assertEquals($expectedDefault, $result['definitions']['DummyPropertyWithDefaultValue']['properties']['foo']['default']);
         $this->assertEquals($expectedExample, $result['definitions']['DummyPropertyWithDefaultValue']['properties']['foo']['example']);
     }
