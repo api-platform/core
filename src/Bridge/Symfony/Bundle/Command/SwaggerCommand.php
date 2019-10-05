@@ -100,5 +100,7 @@ final class SwaggerCommand extends Command
         } else {
             $output->writeln($content);
         }
+
+        return 0;
     }
 }
