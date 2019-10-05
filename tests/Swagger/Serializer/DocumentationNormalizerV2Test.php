@@ -2952,11 +2952,6 @@ class DocumentationNormalizerV2Test extends TestCase
 
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
         $propertyMetadataFactoryProphecy->create(DummyPropertyWithDefaultValue::class, 'foo')->shouldBeCalled()->willReturn($propertyMetadata);
-        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
-        $resourceClassResolverProphecy->isResourceClass(DummyPropertyWithDefaultValue::class)->willReturn(true);
-
-        $operationMethodResolverProphecy = $this->prophesize(OperationMethodResolverInterface::class);
-        $operationMethodResolverProphecy->getItemOperationMethod(DummyPropertyWithDefaultValue::class, 'get')->shouldBeCalled()->willReturn('GET');
 
         $operationPathResolver = new CustomOperationPathResolver(new OperationPathResolver(new UnderscorePathSegmentNameGenerator()));
 
@@ -2964,8 +2959,8 @@ class DocumentationNormalizerV2Test extends TestCase
             $resourceMetadataFactoryProphecy->reveal(),
             $propertyNameCollectionFactoryProphecy->reveal(),
             $propertyMetadataFactoryProphecy->reveal(),
-            $resourceClassResolverProphecy->reveal(),
-            $operationMethodResolverProphecy->reveal(),
+            null,
+            null,
             $operationPathResolver
         );
 
