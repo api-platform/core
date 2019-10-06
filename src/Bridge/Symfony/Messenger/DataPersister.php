@@ -77,7 +77,7 @@ final class DataPersister implements ContextAwareDataPersisterInterface
     {
         $envelope = $this->dispatch(
             (new Envelope($data))
-                ->with(new ContextStamp())
+                ->with(new ContextStamp($context))
         );
 
         $handledStamp = $envelope->last(HandledStamp::class);

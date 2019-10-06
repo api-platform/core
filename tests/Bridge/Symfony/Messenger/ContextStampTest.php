@@ -3,7 +3,7 @@
 /*
  * This file is part of the API Platform project.
  *
- * (c) Sergii Pavlenko <sergii.pavlenko.v@gmail.com>
+ * (c) Kévin Dunglas <dunglas@gmail.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -25,5 +25,11 @@ class ContextStampTest extends TestCase
     public function testConstruct()
     {
         $this->assertInstanceOf(StampInterface::class, new ContextStamp());
+    }
+
+    public function testGetContext()
+    {
+        $context_stamp = new ContextStamp();
+        $this->assertIsArray($context_stamp->getContext());
     }
 }
