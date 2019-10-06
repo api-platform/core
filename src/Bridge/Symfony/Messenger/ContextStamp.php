@@ -24,12 +24,9 @@ use Symfony\Component\Messenger\Stamp\StampInterface;
  */
 final class ContextStamp implements StampInterface
 {
-    /**
-     * @var array
-     */
     private $context;
 
-    public function __construct($context = [])
+    public function __construct(array $context = [])
     {
         $this->context = $context;
     }

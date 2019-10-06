@@ -29,7 +29,7 @@ class ContextStampTest extends TestCase
 
     public function testGetContext()
     {
-        $context_stamp = new ContextStamp();
-        $this->assertIsArray($context_stamp->getContext());
+        $contextStamp = new ContextStamp();
+        $this->assertIsArray($contextStamp->getContext());
     }
 }
