@@ -170,7 +170,7 @@ final class Response implements ResponseInterface
     }
 
     /**
-     * Returns the internal BrowserKit reponse.
+     * Returns the internal BrowserKit response.
      */
     public function getBrowserKitResponse(): BrowserKitResponse
     {
