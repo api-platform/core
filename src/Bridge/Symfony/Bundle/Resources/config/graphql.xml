@@ -53,12 +53,12 @@
 
         <service id="api_platform.graphql.resolver.stage.security" class="ApiPlatform\Core\GraphQl\Resolver\Stage\SecurityStage" public="false">
             <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
-            <argument type="service" id="api_platform.security.resource_access_checker" />
+            <argument type="service" id="api_platform.security.resource_access_checker" on-invalid="ignore" />
         </service>
 
         <service id="api_platform.graphql.resolver.stage.security_post_denormalize" class="ApiPlatform\Core\GraphQl\Resolver\Stage\SecurityPostDenormalizeStage" public="false">
             <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
-            <argument type="service" id="api_platform.security.resource_access_checker" />
+            <argument type="service" id="api_platform.security.resource_access_checker" on-invalid="ignore" />
         </service>
 
         <service id="api_platform.graphql.resolver.stage.serialize" class="ApiPlatform\Core\GraphQl\Resolver\Stage\SerializeStage" public="false">

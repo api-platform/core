@@ -30,7 +30,7 @@ final class SecurityPostDenormalizeStage implements SecurityPostDenormalizeStage
     private $resourceMetadataFactory;
     private $resourceAccessChecker;
 
-    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, ResourceAccessCheckerInterface $resourceAccessChecker)
+    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, ?ResourceAccessCheckerInterface $resourceAccessChecker)
     {
         $this->resourceMetadataFactory = $resourceMetadataFactory;
         $this->resourceAccessChecker = $resourceAccessChecker;
@@ -44,12 +44,17 @@ final class SecurityPostDenormalizeStage implements SecurityPostDenormalizeStage
         $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
 
         $isGranted = $resourceMetadata->getGraphqlAttribute($operationName, 'security_post_denormalize', null, true);
+
         if (null === $isGranted) {
             // Backward compatibility
             $isGranted = $resourceMetadata->getGraphqlAttribute($operationName, 'access_control', null, true);
             if (null !== $isGranted) {
                 @trigger_error('Attribute "access_control" is deprecated since API Platform 2.5, prefer using "security" attribute instead', E_USER_DEPRECATED);
             }
+        }
+
+        if (null !== $isGranted && null === $this->resourceAccessChecker) {
+            throw new \LogicException('Cannot check security expression when SecurityBundle is not installed. Try running "composer require symfony/security-bundle".');
         }
 
         if (null === $isGranted || $this->resourceAccessChecker->isGranted($resourceClass, (string) $isGranted, $context['extra_variables'])) {
