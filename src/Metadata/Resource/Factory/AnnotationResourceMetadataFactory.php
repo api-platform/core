@@ -27,9 +27,6 @@ final class AnnotationResourceMetadataFactory implements ResourceMetadataFactory
 {
     private $reader;
     private $decorated;
-    /**
-     * @var array
-     */
     private $defaults;
 
     public function __construct(Reader $reader, ResourceMetadataFactoryInterface $decorated = null, array $defaults = [])

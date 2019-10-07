@@ -34,6 +34,7 @@ use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Serializer\Exception\ExceptionInterface as SerializerExceptionInterface;
+use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
 
 /**
  * The configuration of the bundle.
@@ -500,20 +501,21 @@ final class Configuration implements ConfigurationInterface
 
     private function addDefaultsSection(ArrayNodeDefinition $rootNode): void
     {
+        $nameConverter = new CamelCaseToSnakeCaseNameConverter();
         $defaultsNode = $rootNode->children()->arrayNode('defaults')->ignoreExtraKeys();
         $properties = (new \ReflectionClass(ApiResource::class))->getProperties();
         $ignoredOptions = [
-            'shortName',
-            'attributes',
-            'subresourceOperations',
+            'shortName', // It doesn't make sense for multiple resources to share the same name.
+            'subresourceOperations', // Same here.
+            'attributes', // The "attributes" option is a sub-level and not a config option.
         ];
 
         foreach ($properties as $property) {
-            $optionName = $property->getName();
-            if (\in_array($optionName, $ignoredOptions, true)) { // "attributes" is a sub-level and not a config option
+            $option = $property->getName();
+            if (\in_array($option, $ignoredOptions, true)) {
                 continue;
             }
-            $snakeCased = strtolower(preg_replace('/[A-Z]/', '_\\0', $optionName));
+            $snakeCased = $nameConverter->normalize($option);
 
             $defaultsNode->children()->variableNode($snakeCased);
         }

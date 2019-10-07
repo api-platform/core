@@ -49,6 +49,7 @@ use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpClient\HttpClientTrait;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
+use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\Yaml\Yaml;
 
@@ -198,26 +199,18 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
     private function normalizeDefaults(array $defaults): array
     {
         $normalizedDefaults = ['attributes' => []];
-        $reflClass = new \ReflectionClass(ApiResource::class);
+        $reflectionClass = new \ReflectionClass(ApiResource::class);
+        $nameConverter = new CamelCaseToSnakeCaseNameConverter();
 
-        foreach ($defaults as $key => $value) {
+        foreach ($defaults as $option => $value) {
             // camelCase allows us comparing to @ApiResource properties
-            $camelCased = lcfirst(
-                preg_replace_callback(
-                    '/(^|_|\.)+(.)/',
-                    static function ($match) {
-                        return ('.' === $match[1] ? '_' : '').strtoupper($match[2]);
-                    },
-                    $key
-                )
-            );
-
             // snake_case is the reference for all attribute keys
-            $snakeCased = strtolower(preg_replace('/[A-Z]/', '_\\0', $key));
+            $camelCased = $nameConverter->denormalize($option);
+            $snakeCased = $nameConverter->normalize($option);
 
             try {
-                $reflProperty = $reflClass->getProperty($camelCased);
-                if ($reflProperty->isPublic()) {
+                $reflectionProperty = $reflectionClass->getProperty($camelCased);
+                if ($reflectionProperty->isPublic()) {
                     $normalizedDefaults[$snakeCased] = $value;
                 } else {
                     $normalizedDefaults['attributes'][$snakeCased] = $value;
