@@ -104,7 +104,6 @@ class SecurityStageTest extends TestCase
         $operationName = 'item_query';
         $resourceClass = 'myResource';
         $isGranted = 'not_granted';
-        $extraVariables = ['extra' => false];
         $resourceMetadata = (new ResourceMetadata())->withGraphql([
             $operationName => ['security' => $isGranted],
         ]);
@@ -112,8 +111,19 @@ class SecurityStageTest extends TestCase
 
         $this->expectException(\LogicException::class);
 
-        ($this->securityStage)($resourceClass, 'item_query', [
-            'extra_variables' => $extraVariables
-        ]);
+        ($this->securityStage)($resourceClass, 'item_query', []);
+    }
+
+    public function testNoSecurityBundleInstalledNoExpression(): void
+    {
+        $this->securityStage = new SecurityStage($this->resourceMetadataFactoryProphecy->reveal(), null);
+
+        $resourceClass = 'myResource';
+        $resourceMetadata = new ResourceMetadata();
+        $this->resourceMetadataFactoryProphecy->create($resourceClass)->willReturn($resourceMetadata);
+
+        $this->resourceAccessCheckerProphecy->isGranted(Argument::any())->shouldNotBeCalled();
+
+        ($this->securityStage)($resourceClass, 'item_query', []);
     }
 }
