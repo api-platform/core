@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.6.0
+
+* MongoDB: Possibility to add execute options (aggregate command fields) for a resource, like `allowDiskUse` (#3144)
+
 ## 2.5.0
 
 * Fix BC-break when using short-syntax notation for `access_control`

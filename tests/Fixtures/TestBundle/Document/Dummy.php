@@ -27,6 +27,11 @@ use Symfony\Component\Validator\Constraints as Assert;
  * @author Alexandre Delplace <alexandre.delplacemille@gmail.com>
  *
  * @ApiResource(attributes={
+ *     "doctrine_mongodb"={
+ *         "execute_options"={
+ *             "allowDiskUse"=true
+ *         }
+ *     },
  *     "filters"={
  *         "my_dummy.mongodb.boolean",
  *         "my_dummy.mongodb.date",
