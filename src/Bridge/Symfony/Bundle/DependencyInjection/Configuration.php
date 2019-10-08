@@ -544,21 +544,23 @@ final class Configuration implements ConfigurationInterface
     private function addDefaultsSection(ArrayNodeDefinition $rootNode): void
     {
         $nameConverter = new CamelCaseToSnakeCaseNameConverter();
-        $defaultsNode = $rootNode->children()->arrayNode('defaults')->ignoreExtraKeys();
-        $properties = (new \ReflectionClass(ApiResource::class))->getProperties();
-        $ignoredOptions = [
-            'shortName', // It doesn't make sense for multiple resources to share the same name.
-            'subresourceOperations', // Same here.
-            'attributes', // The "attributes" option is a sub-level and not a config option.
-        ];
+        $defaultsNode = $rootNode->children()->arrayNode('defaults');
 
-        foreach ($properties as $property) {
-            $option = $property->getName();
-            if (\in_array($option, $ignoredOptions, true)) {
-                continue;
-            }
-            $snakeCased = $nameConverter->normalize($option);
+        $defaultsNode
+            ->ignoreExtraKeys()
+            ->beforeNormalization()
+            ->always(function (array $defaults) use ($nameConverter) {
+                $normalizedDefaults = [];
+                foreach ($defaults as $option => $value) {
+                    $option = $nameConverter->normalize($option);
+                    $normalizedDefaults[$option] = $value;
+                }
 
+                return $normalizedDefaults;
+            });
+
+        foreach (ApiResource::CONFIGURABLE_DEFAULTS as $attribute) {
+            $snakeCased = $nameConverter->normalize($attribute);
             $defaultsNode->children()->variableNode($snakeCased);
         }
     }

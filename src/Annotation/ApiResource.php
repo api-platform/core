@@ -74,6 +74,55 @@ final class ApiResource
     use AttributesHydratorTrait;
 
     /**
+     * @internal
+     *
+     * @see \ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\Configuration::addDefaultsSection
+     */
+    public const CONFIGURABLE_DEFAULTS = [
+        'accessControl',
+        'accessControlMessage',
+        'security',
+        'securityMessage',
+        'securityPostDenormalize',
+        'securityPostDenormalizeMessage',
+        'cacheHeaders',
+        'collectionOperations',
+        'denormalizationContext',
+        'deprecationReason',
+        'description',
+        'elasticsearch',
+        'fetchPartial',
+        'forceEager',
+        'formats',
+        'filters',
+        'graphql',
+        'hydraContext',
+        'input',
+        'iri',
+        'itemOperations',
+        'mercure',
+        'messenger',
+        'normalizationContext',
+        'openapiContext',
+        'order',
+        'output',
+        'paginationClientEnabled',
+        'paginationClientItemsPerPage',
+        'paginationClientPartial',
+        'paginationEnabled',
+        'paginationFetchJoinCollection',
+        'paginationItemsPerPage',
+        'maximumItemsPerPage',
+        'paginationMaximumItemsPerPage',
+        'paginationPartial',
+        'paginationViaCursor',
+        'routePrefix',
+        'sunset',
+        'swaggerContext',
+        'validationGroups',
+    ];
+
+    /**
      * @var string
      */
     public $shortName;

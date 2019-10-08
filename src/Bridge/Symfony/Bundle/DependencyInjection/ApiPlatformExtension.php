@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection;
 
-use ApiPlatform\Core\Annotation\ApiResource;
 use ApiPlatform\Core\Api\FilterInterface;
 use ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Extension\AggregationCollectionExtensionInterface;
 use ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Extension\AggregationItemExtensionInterface;
@@ -49,7 +48,6 @@ use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpClient\HttpClientTrait;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
-use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\Yaml\Yaml;
 
@@ -199,24 +197,19 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
     private function normalizeDefaults(array $defaults): array
     {
         $normalizedDefaults = ['attributes' => []];
-        $reflectionClass = new \ReflectionClass(ApiResource::class);
-        $nameConverter = new CamelCaseToSnakeCaseNameConverter();
+        $rootLevelOptions = [
+            'description',
+            'iri',
+            'item_operations',
+            'collection_operations',
+            'graphql',
+        ];
 
         foreach ($defaults as $option => $value) {
-            // camelCase allows us comparing to @ApiResource properties
-            // snake_case is the reference for all attribute keys
-            $camelCased = $nameConverter->denormalize($option);
-            $snakeCased = $nameConverter->normalize($option);
-
-            try {
-                $reflectionProperty = $reflectionClass->getProperty($camelCased);
-                if ($reflectionProperty->isPublic()) {
-                    $normalizedDefaults[$snakeCased] = $value;
-                } else {
-                    $normalizedDefaults['attributes'][$snakeCased] = $value;
-                }
-            } catch (\ReflectionException $e) {
-                $normalizedDefaults['attributes'][$snakeCased] = $value;
+            if (\in_array($option, $rootLevelOptions, true)) {
+                $normalizedDefaults[$option] = $value;
+            } else {
+                $normalizedDefaults['attributes'][$option] = $value;
             }
         }
 
