@@ -32,7 +32,7 @@
 * Add basic infrastructure for cursor-based pagination (#2532)
 * Change ExistsFilter syntax to `exists[property]`, old syntax still supported see #2243, fixes it's behavior on GraphQL (also related #2640).
 * Pagination with subresources (#2698)
-* Improve search filter id's managment (#1844)
+* Improve search filter id's management (#1844)
 * Add support of name converter in filters (#2751, #2897), filter signature in abstract methods has changed see b42dfd198b1644904fd6a684ab2cedaf530254e3
 * Ability to change the Vary header via `cacheHeaders` attributes of a resource (#2758)
 * Ability to use the Query object in a paginator (#2493)
@@ -149,7 +149,7 @@ Please read #2825 if you have issues with the behavior of Readable/Writable Link
 
 ## 2.4.2
 
-* Fix a dependency injection injection problem in `FilterEagerLoadingExtension`
+* Fix a dependency injection problem in `FilterEagerLoadingExtension`
 * Improve performance by adding a `NoOpScalarNormalizer` handling scalar values
 
 ## 2.4.1
