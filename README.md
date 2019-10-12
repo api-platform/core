@@ -15,6 +15,7 @@ high performance API-first projects. Extend or override everything you want.
 [![Codecov](https://codecov.io/gh/api-platform/core/branch/master/graph/badge.svg)](https://codecov.io/gh/api-platform/core/branch/master)
 [![SymfonyInsight](https://insight.symfony.com/projects/92d78899-946c-4282-89a3-ac92344f9a93/mini.svg)](https://insight.symfony.com/projects/92d78899-946c-4282-89a3-ac92344f9a93)
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/api-platform/core/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/api-platform/core/?branch=master)
+[![GNU license](https://img.shields.io/github/license/api-platform/core)](https://github.com/api-platform/core/blob/master/LICENSE)
 
 ## Documentation
 
