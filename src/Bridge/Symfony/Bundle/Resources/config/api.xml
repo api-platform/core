@@ -118,7 +118,7 @@
             <argument>false</argument>
 
             <!-- Run before serializer.normalizer.json_serializable -->
-            <tag name="serializer.normalizer" priority="-895" />
+            <tag name="serializer.normalizer" priority="-922" />
         </service>
 
         <!-- Resources Operations path resolver -->
