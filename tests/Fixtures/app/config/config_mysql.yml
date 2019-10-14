@@ -1,13 +1,15 @@
 imports:
-    - { resource: parameters_mysql.yml }
     - { resource: config_test.yml }
+
+parameters:
+    env(DATABASE_URL): mysql://root:@localhost/api_platform_test
+    env(MYSQL_VERSION): '5.7'
 
 doctrine:
     dbal:
-        driver:   'pdo_mysql'
-        dbname:   '%dbname%'
-        user:     '%user%'
-        password: '%password%'
-        host:     '%host%'
+        driver: pdo_mysql
+        url: '%env(resolve:DATABASE_URL)%'
+        path: ~
+        server_version: '%env(MYSQL_VERSION)%'
         types:
-            uuid:  Ramsey\Uuid\Doctrine\UuidType
+            uuid: Ramsey\Uuid\Doctrine\UuidType

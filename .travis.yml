@@ -12,6 +12,8 @@ cache:
 .steps:
   - &clear-test-app-cache |
       tests/Fixtures/app/console cache:clear
+  - &create-test-database |
+      tests/Fixtures/app/console doctrine:database:create
   - &disable-php-memory-limit |
       echo "memory_limit=-1" >> ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/travis.ini
   - &disable-xdebug-php-extension |
@@ -151,8 +153,13 @@ jobs:
         - *validate-openapi-v3-json
         - *validate-openapi-v3-yaml
 
-    - php: '7.3'
-      env: APP_ENV=postgres
+    - name: 'Behat (PHP 7.3) (PostgreSQL)'
+      php: '7.3'
+      env: >-
+        APP_ENV=postgres
+        DATABASE_URL=postgres://postgres:@localhost/api_platform_test
+      addons:
+        postgresql: '10'
       services:
         - postgresql
       before_install:
@@ -164,18 +171,19 @@ jobs:
         - *update-project-dependencies
       before_script:
         - *clear-test-app-cache
-        - psql --command 'CREATE DATABASE api_platform_test;' --username postgres
+        - *create-test-database
       script:
-        - *run-phpunit-tests
-        - *clear-test-app-cache
         - vendor/bin/behat --format=progress --profile=postgres --no-interaction
         - *validate-openapi-v2-json
         - *validate-openapi-v2-yaml
         - *validate-openapi-v3-json
         - *validate-openapi-v3-yaml
 
-    - php: '7.3'
-      env: APP_ENV=mysql
+    - name: 'Behat (PHP 7.3) (MySQL)'
+      php: '7.3'
+      env: >-
+        APP_ENV=mysql
+        DATABASE_URL=mysql://travis:@localhost/api_platform_test
       services:
         - mysql
       before_install:
@@ -187,10 +195,8 @@ jobs:
         - *update-project-dependencies
       before_script:
         - *clear-test-app-cache
-        - mysql --execute 'CREATE DATABASE api_platform_test;'
+        - *create-test-database
       script:
-        - *run-phpunit-tests
-        - *clear-test-app-cache
         - *run-behat-tests
         - *validate-openapi-v2-json
         - *validate-openapi-v2-yaml

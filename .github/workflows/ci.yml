@@ -101,6 +101,134 @@ jobs:
       - name: Run PHPUnit tests
         run: vendor/bin/phpunit --colors=always
 
+  phpunit-postgresql:
+    name: PHPUnit (PHP ${{ matrix.php }}) (PostgreSQL)
+    runs-on: ubuntu-latest
+    container:
+      image: php:${{ matrix.php }}-alpine
+    services:
+      postgres:
+        image: postgres:10-alpine
+        env:
+          POSTGRES_DB: api_platform_test
+          POSTGRES_PASSWORD: hk7dFAByeQVVxpLtmZ6GVUzP
+          POSTGRES_USER: api-platform
+        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+    strategy:
+      matrix:
+        php:
+          - '7.3'
+      fail-fast: false
+    env:
+      APP_ENV: postgres
+      DATABASE_URL: postgres://api-platform:hk7dFAByeQVVxpLtmZ6GVUzP@postgres/api_platform_test
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v1
+      - name: Install system packages
+        run: |
+          apk add \
+            unzip \
+      - name: Install PHP extensions
+        run: |
+          apk add \
+            $PHPIZE_DEPS \
+            postgresql-dev \
+          ;
+          docker-php-ext-install -j$(nproc) \
+            pdo_pgsql \
+          ;
+      - name: Install mongodb PHP extension
+        if: matrix.php != '7.1'
+        run: |
+          apk add $PHPIZE_DEPS
+          pecl install mongodb-1.5.5
+          docker-php-ext-enable mongodb
+      - name: Disable PHP memory limit
+        run: echo 'memory_limit=-1' >> /usr/local/etc/php/php.ini
+      - name: Install Composer
+        run: wget -qO - https://raw.githubusercontent.com/composer/getcomposer.org/fb22b78362d31c0d2bf516d1f8cdfd2745caa431/web/installer | php -- --install-dir=/usr/local/bin --filename=composer --quiet
+      - name: Install Symfony Flex
+        run: |
+          composer global require --prefer-dist --no-progress --no-suggest --ansi \
+            symfony/flex
+      - name: Remove Doctrine MongoDB ODM
+        if: matrix.php == '7.1'
+        run: |
+          composer remove --dev --no-progress --no-update --ansi \
+            doctrine/mongodb-odm \
+            doctrine/mongodb-odm-bundle \
+      - name: Update project dependencies
+        run: composer update --no-progress --no-suggest --ansi
+      - name: Clear test app cache
+        run: tests/Fixtures/app/console cache:clear --ansi
+      - name: Run PHPUnit tests
+        run: vendor/bin/phpunit --colors=always
+
+  phpunit-mysql:
+    name: PHPUnit (PHP ${{ matrix.php }}) (MySQL)
+    runs-on: ubuntu-latest
+    container:
+      image: php:${{ matrix.php }}-alpine
+    services:
+      mysql:
+        image: mysql:5.7
+        env:
+          MYSQL_DATABASE: api_platform_test
+          MYSQL_PASSWORD: LUhGR5tJ7WA2gbGumknCYBcB
+          MYSQL_RANDOM_ROOT_PASSWORD: 'yes'
+          MYSQL_USER: api-platform
+        options: --health-cmd "mysqladmin ping" --health-interval 10s --health-timeout 5s --health-retries 5
+    strategy:
+      matrix:
+        php:
+          - '7.3'
+      fail-fast: false
+    env:
+      APP_ENV: mysql
+      DATABASE_URL: mysql://api-platform:LUhGR5tJ7WA2gbGumknCYBcB@mysql/api_platform_test
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v1
+      - name: Install system packages
+        run: |
+          apk add \
+            unzip \
+      - name: Install PHP extensions
+        run: |
+          apk add \
+            $PHPIZE_DEPS \
+          ;
+          docker-php-ext-install -j$(nproc) \
+            pdo_mysql \
+          ;
+      - name: Install mongodb PHP extension
+        if: matrix.php != '7.1'
+        run: |
+          apk add $PHPIZE_DEPS
+          pecl install mongodb-1.5.5
+          docker-php-ext-enable mongodb
+      - name: Disable PHP memory limit
+        run: echo 'memory_limit=-1' >> /usr/local/etc/php/php.ini
+      - name: Install Composer
+        run: wget -qO - https://raw.githubusercontent.com/composer/getcomposer.org/fb22b78362d31c0d2bf516d1f8cdfd2745caa431/web/installer | php -- --install-dir=/usr/local/bin --filename=composer --quiet
+      - name: Install Symfony Flex
+        run: |
+          composer global require --prefer-dist --no-progress --no-suggest --ansi \
+            symfony/flex
+      - name: Remove Doctrine MongoDB ODM
+        if: matrix.php == '7.1'
+        run: |
+          composer remove --dev --no-progress --no-update --ansi \
+            doctrine/mongodb-odm \
+            doctrine/mongodb-odm-bundle \
+      - name: Update project dependencies
+        run: composer update --no-progress --no-suggest --ansi
+      - name: Clear test app cache
+        run: tests/Fixtures/app/console cache:clear --ansi
+      - name: Run PHPUnit tests
+        run: vendor/bin/phpunit --colors=always
+
   phpunit-no-deprecations:
     name: PHPUnit (PHP ${{ matrix.php }}) (no deprecations)
     runs-on: ubuntu-latest
