@@ -191,6 +191,29 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         if ($config['name_converter']) {
             $container->setAlias('api_platform.name_converter', $config['name_converter']);
         }
+        $container->setParameter('api_platform.defaults', $this->normalizeDefaults($config['defaults'] ?? []));
+    }
+
+    private function normalizeDefaults(array $defaults): array
+    {
+        $normalizedDefaults = ['attributes' => []];
+        $rootLevelOptions = [
+            'description',
+            'iri',
+            'item_operations',
+            'collection_operations',
+            'graphql',
+        ];
+
+        foreach ($defaults as $option => $value) {
+            if (\in_array($option, $rootLevelOptions, true)) {
+                $normalizedDefaults[$option] = $value;
+            } else {
+                $normalizedDefaults['attributes'][$option] = $value;
+            }
+        }
+
+        return $normalizedDefaults;
     }
 
     private function registerMetadataConfiguration(ContainerBuilder $container, array $config, XmlFileLoader $loader): void
