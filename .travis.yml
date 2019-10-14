@@ -1,8 +1,12 @@
 language: php
 
+env:
+  global:
+    - SYMFONY_REQUIRE='^3.4 || ^4.0'
+
 cache:
   directories:
-    - $HOME/.composer/cache
+    - $HOME/.composer/cache/files
     - $HOME/.npm
 
 .steps:
@@ -14,6 +18,9 @@ cache:
       phpenv config-rm xdebug.ini || echo "xdebug not available"
   - &enable-mongodb-php-extension |
       echo "extension=mongodb.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/mongodb.ini
+  - &install-symfony-flex |
+      composer global require --prefer-dist --no-progress --no-suggest --ansi \
+        symfony/flex
   - &run-behat-tests |
       vendor/bin/behat --format=progress --no-interaction --colors
   - &run-phpunit-tests |
@@ -36,6 +43,7 @@ jobs:
       before_install:
         - *disable-xdebug-php-extension
         - *disable-php-memory-limit
+        - *install-symfony-flex
       install:
         - |
           composer remove --dev --no-progress --no-update --ansi \
@@ -57,6 +65,7 @@ jobs:
         - *enable-mongodb-php-extension
         - *disable-xdebug-php-extension
         - *disable-php-memory-limit
+        - *install-symfony-flex
       install:
         - *update-project-dependencies
       before_script:
@@ -74,6 +83,7 @@ jobs:
         - *enable-mongodb-php-extension
         - *disable-xdebug-php-extension
         - *disable-php-memory-limit
+        - *install-symfony-flex
       install:
         - *update-project-dependencies
       before_script:
@@ -92,6 +102,7 @@ jobs:
         - *enable-mongodb-php-extension
         - *disable-xdebug-php-extension
         - *disable-php-memory-limit
+        - *install-symfony-flex
       install:
         - *update-project-dependencies
       before_script:
@@ -109,6 +120,7 @@ jobs:
         - *enable-mongodb-php-extension
         - *disable-xdebug-php-extension
         - *disable-php-memory-limit
+        - *install-symfony-flex
       install:
         - composer update --no-progress --no-suggest --prefer-stable --prefer-lowest --ansi
       before_script:
@@ -127,6 +139,7 @@ jobs:
         - *enable-mongodb-php-extension
         - *disable-xdebug-php-extension
         - *disable-php-memory-limit
+        - *install-symfony-flex
       install:
         - composer update --no-progress --no-suggest --prefer-stable --prefer-lowest --ansi
       before_script:
@@ -146,6 +159,7 @@ jobs:
         - *enable-mongodb-php-extension
         - *disable-xdebug-php-extension
         - *disable-php-memory-limit
+        - *install-symfony-flex
       install:
         - *update-project-dependencies
       before_script:
@@ -168,6 +182,7 @@ jobs:
         - *enable-mongodb-php-extension
         - *disable-xdebug-php-extension
         - *disable-php-memory-limit
+        - *install-symfony-flex
       install:
         - *update-project-dependencies
       before_script:
@@ -190,6 +205,7 @@ jobs:
         - *enable-mongodb-php-extension
         - *disable-xdebug-php-extension
         - *disable-php-memory-limit
+        - *install-symfony-flex
       install:
         - *update-project-dependencies
       before_script:
@@ -215,6 +231,7 @@ jobs:
         - *enable-mongodb-php-extension
         - *disable-xdebug-php-extension
         - *disable-php-memory-limit
+        - *install-symfony-flex
       install:
         - *update-project-dependencies
       before_script:

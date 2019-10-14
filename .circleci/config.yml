@@ -46,6 +46,13 @@ commands:
           command: |
             sudo pecl install pcov-1.0.6
             sudo docker-php-ext-enable pcov
+  install-symfony-flex:
+    steps:
+      - run:
+          name: Install Symfony Flex
+          command: |
+            composer global require --prefer-dist --no-progress --no-suggest --ansi \
+              symfony/flex
   merge-code-coverage-reports:
     parameters:
       dir:
@@ -117,11 +124,11 @@ commands:
     steps:
       - save_cache:
           paths:
-            - ~/.composer/cache
+            - ~/.composer/cache/files
           key: composer-cache-{{ .Branch }}-{{ .BuildNum }}
       - save_cache:
           paths:
-            - ~/.composer/cache
+            - ~/.composer/cache/files
           key: composer-cache-{{ .Revision }}-{{ .BuildNum }}
   save-npm-cache:
     steps:
@@ -201,13 +208,19 @@ executors:
   php:
     docker:
       - image: circleci/php:7.3-node
+        environment:
+          SYMFONY_REQUIRE: ^3.4 || ^4.0
   php-and-elasticsearch:
     docker:
       - image: circleci/php:7.3-node
+        environment:
+          SYMFONY_REQUIRE: ^3.4 || ^4.0
       - image: docker.elastic.co/elasticsearch/elasticsearch:6.8.3 # https://github.com/elastic/elasticsearch/issues/43627
   php-and-mongodb:
     docker:
       - image: circleci/php:7.3-node
+        environment:
+          SYMFONY_REQUIRE: ^3.4 || ^4.0
       - image: circleci/mongo:4
 
 jobs:
@@ -221,6 +234,7 @@ jobs:
       - disable-xdebug-php-extension
       - disable-php-memory-limit
       - restore-composer-cache
+      - install-symfony-flex
       - run:
           name: Install PHP-CS-Fixer
           command: |
@@ -246,6 +260,7 @@ jobs:
       - disable-xdebug-php-extension
       - disable-php-memory-limit
       - restore-composer-cache
+      - install-symfony-flex
       - update-project-dependencies
       - save-composer-cache
       - clear-test-app-cache
@@ -266,6 +281,7 @@ jobs:
       - disable-xdebug-php-extension
       - disable-php-memory-limit
       - restore-composer-cache
+      - install-symfony-flex
       - update-project-dependencies
       - save-composer-cache
       - clear-test-app-cache
@@ -313,6 +329,7 @@ jobs:
       - disable-xdebug-php-extension
       - disable-php-memory-limit
       - restore-composer-cache
+      - install-symfony-flex
       - update-project-dependencies
       - save-composer-cache
       - clear-test-app-cache
@@ -358,6 +375,7 @@ jobs:
       - disable-xdebug-php-extension
       - disable-php-memory-limit
       - restore-composer-cache
+      - install-symfony-flex
       - update-project-dependencies
       - save-composer-cache
       - clear-test-app-cache
@@ -395,6 +413,7 @@ jobs:
       - disable-xdebug-php-extension
       - disable-php-memory-limit
       - restore-composer-cache
+      - install-symfony-flex
       - update-project-dependencies
       - save-composer-cache
       - clear-test-app-cache
@@ -438,6 +457,7 @@ jobs:
       - disable-xdebug-php-extension
       - disable-php-memory-limit
       - restore-composer-cache
+      - install-symfony-flex
       - update-project-dependencies
       - save-composer-cache
       - clear-test-app-cache
