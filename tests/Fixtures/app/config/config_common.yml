@@ -321,8 +321,3 @@ services:
         decorates: 'api_platform.graphql.type_converter'
         arguments: ['@app.graphql.type_converter.inner']
         public: false
-
-    app.graphql.validation_exception_formatter:
-        class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\GraphQl\ExceptionFormatter\ValidationExceptionFormatter'
-        tags:
-            - { name: 'api_platform.graphql.exception_formatter' }

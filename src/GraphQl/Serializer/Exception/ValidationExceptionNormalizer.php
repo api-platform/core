@@ -11,35 +11,36 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\GraphQl\ExceptionFormatter;
+namespace ApiPlatform\Core\GraphQl\Serializer\Exception;
 
 use ApiPlatform\Core\Bridge\Symfony\Validator\Exception\ValidationException;
-use ApiPlatform\Core\GraphQl\Exception\ExceptionFormatterInterface;
 use GraphQL\Error\Error;
 use GraphQL\Error\FormattedError;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Validator\ConstraintViolation;
 
 /**
- * Formats Validation exception.
+ * Normalize validation exceptions.
+ *
+ * @experimental
  *
  * @author Mahmood Bazdar <mahmood@bazdar.me>
+ * @author Alan Poulain <contact@alanpoulain.eu>
  */
-class ValidationExceptionFormatter implements ExceptionFormatterInterface
+final class ValidationExceptionNormalizer implements NormalizerInterface
 {
     /**
      * {@inheritdoc}
      */
-    public function format(Error $error): array
+    public function normalize($object, $format = null, array $context = []): array
     {
-        /**
-         * @var ValidationException
-         */
-        $validationException = $error->getPrevious();
-        $error = FormattedError::createFromException($error);
-        $error['message'] = 'Validation Exception';
+        /** @var ValidationException */
+        $validationException = $object->getPrevious();
+        $error = FormattedError::createFromException($object);
+        $error['message'] = $validationException->getMessage();
         $error['status'] = Response::HTTP_BAD_REQUEST;
-        $error['extensions']['category'] = Error::CATEGORY_GRAPHQL;
+        $error['extensions']['category'] = 'user';
         $error['violations'] = [];
 
         /** @var ConstraintViolation $violation */
@@ -56,16 +57,8 @@ class ValidationExceptionFormatter implements ExceptionFormatterInterface
     /**
      * {@inheritdoc}
      */
-    public function supports(\Throwable $exception): bool
+    public function supportsNormalization($data, $format = null): bool
     {
-        return $exception instanceof ValidationException;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getPriority(): int
-    {
-        return 1;
+        return $data instanceof Error && $data->getPrevious() instanceof ValidationException;
     }
 }

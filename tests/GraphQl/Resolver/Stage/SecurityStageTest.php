@@ -17,10 +17,10 @@ use ApiPlatform\Core\GraphQl\Resolver\Stage\SecurityStage;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Security\ResourceAccessCheckerInterface;
-use GraphQL\Error\Error;
 use GraphQL\Type\Definition\ResolveInfo;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 /**
  * @author Alan Poulain <contact@alanpoulain.eu>
@@ -88,7 +88,7 @@ class SecurityStageTest extends TestCase
 
         $info = $this->prophesize(ResolveInfo::class)->reveal();
 
-        $this->expectException(Error::class);
+        $this->expectException(AccessDeniedHttpException::class);
         $this->expectExceptionMessage('Access Denied.');
 
         ($this->securityStage)($resourceClass, 'item_query', [

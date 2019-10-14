@@ -675,11 +675,10 @@ Feature: GraphQL mutation support
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/json"
     And the JSON node "errors[0].status" should be equal to "400"
-    And the JSON node "errors[0].message" should be equal to "Validation Exception"
+    And the JSON node "errors[0].message" should be equal to "name: This value should not be blank."
     And the JSON node "errors[0].violations" should exist
     And the JSON node "errors[0].violations[0].path" should be equal to "name"
     And the JSON node "errors[0].violations[0].message" should be equal to "This value should not be blank."
-
 
   Scenario: Execute a custom mutation
     Given there are 1 dummyCustomMutation objects

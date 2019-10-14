@@ -3,6 +3,7 @@
 ## 2.6.x-dev
 
 * MongoDB: Possibility to add execute options (aggregate command fields) for a resource, like `allowDiskUse` (#3144)
+* GraphQL: Allow to format GraphQL errors based on exceptions (#3063)
 
 ## 2.5.1
 
@@ -43,7 +44,6 @@
 * Test: Add assertions for testing response against JSON Schema from API resource
 * GraphQL: Add support for multipart request so user can create custom file upload mutations (#3041)
 * GraphQL: Add support for name converter (#2765)
-* GraphQL: Allow to format GraphQL errors based on exceptions.
 
 ## 2.5.0 beta 1
 

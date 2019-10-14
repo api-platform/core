@@ -24,7 +24,6 @@ use ApiPlatform\Core\GraphQl\Resolver\Stage\WriteStageInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Util\ClassInfoTrait;
 use ApiPlatform\Core\Util\CloneTrait;
-use GraphQL\Error\Error;
 use GraphQL\Type\Definition\ResolveInfo;
 use Psr\Container\ContainerInterface;
 
@@ -106,7 +105,7 @@ final class ItemMutationResolverFactory implements ResolverFactoryInterface
                 $mutationResolver = $this->mutationResolverLocator->get($mutationResolverId);
                 $item = $mutationResolver($item, $resolverContext);
                 if (null !== $item && $resourceClass !== $itemClass = $this->getObjectClass($item)) {
-                    throw Error::createLocatedError(sprintf('Custom mutation resolver "%s" has to return an item of class %s but returned an item of class %s.', $mutationResolverId, $resourceMetadata->getShortName(), (new \ReflectionClass($itemClass))->getShortName()), $info->fieldNodes, $info->path);
+                    throw new \LogicException(sprintf('Custom mutation resolver "%s" has to return an item of class %s but returned an item of class %s.', $mutationResolverId, $resourceMetadata->getShortName(), (new \ReflectionClass($itemClass))->getShortName()));
                 }
             }
 

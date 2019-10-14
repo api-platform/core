@@ -24,7 +24,6 @@ use ApiPlatform\Core\GraphQl\Resolver\Stage\WriteStageInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
-use GraphQL\Error\Error;
 use GraphQL\Type\Definition\ResolveInfo;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
@@ -321,7 +320,7 @@ class ItemMutationResolverFactoryTest extends TestCase
             return $customItem;
         });
 
-        $this->expectException(Error::class);
+        $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Custom mutation resolver "query_resolver_id" has to return an item of class shortName but returned an item of class Dummy.');
 
         ($this->itemMutationResolverFactory)($resourceClass, $rootClass, $operationName)($source, $args, null, $info);
