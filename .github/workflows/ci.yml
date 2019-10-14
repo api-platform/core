@@ -75,7 +75,6 @@ jobs:
           apk add \
             unzip \
       - name: Install mongodb PHP extension
-        if: matrix.php != '7.1'
         run: |
           apk add $PHPIZE_DEPS
           pecl install mongodb-1.5.5
@@ -88,12 +87,6 @@ jobs:
         run: |
           composer global require --prefer-dist --no-progress --no-suggest --ansi \
             symfony/flex
-      - name: Remove Doctrine MongoDB ODM
-        if: matrix.php == '7.1'
-        run: |
-          composer remove --dev --no-progress --no-update --ansi \
-            doctrine/mongodb-odm \
-            doctrine/mongodb-odm-bundle \
       - name: Update project dependencies
         run: composer update --no-progress --no-suggest --prefer-stable --prefer-lowest --ansi
       - name: Clear test app cache
@@ -139,7 +132,6 @@ jobs:
             pdo_pgsql \
           ;
       - name: Install mongodb PHP extension
-        if: matrix.php != '7.1'
         run: |
           apk add $PHPIZE_DEPS
           pecl install mongodb-1.5.5
@@ -152,12 +144,6 @@ jobs:
         run: |
           composer global require --prefer-dist --no-progress --no-suggest --ansi \
             symfony/flex
-      - name: Remove Doctrine MongoDB ODM
-        if: matrix.php == '7.1'
-        run: |
-          composer remove --dev --no-progress --no-update --ansi \
-            doctrine/mongodb-odm \
-            doctrine/mongodb-odm-bundle \
       - name: Update project dependencies
         run: composer update --no-progress --no-suggest --ansi
       - name: Clear test app cache
@@ -203,7 +189,6 @@ jobs:
             pdo_mysql \
           ;
       - name: Install mongodb PHP extension
-        if: matrix.php != '7.1'
         run: |
           apk add $PHPIZE_DEPS
           pecl install mongodb-1.5.5
@@ -216,12 +201,104 @@ jobs:
         run: |
           composer global require --prefer-dist --no-progress --no-suggest --ansi \
             symfony/flex
-      - name: Remove Doctrine MongoDB ODM
-        if: matrix.php == '7.1'
+      - name: Update project dependencies
+        run: composer update --no-progress --no-suggest --ansi
+      - name: Clear test app cache
+        run: tests/Fixtures/app/console cache:clear --ansi
+      - name: Run PHPUnit tests
+        run: vendor/bin/phpunit --colors=always
+
+  phpunit-mongodb:
+    name: PHPUnit (PHP ${{ matrix.php }}) (MongoDB)
+    runs-on: ubuntu-latest
+    container:
+      image: php:${{ matrix.php }}-alpine
+    services:
+      mongo:
+        image: mongo:4
+        options: >-
+          --health-cmd "mongo --quiet --eval 'quit(db.runCommand({ ping: 1 }).ok ? 0 : 2)'"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    strategy:
+      matrix:
+        php:
+          - '7.3'
+      fail-fast: false
+    env:
+      APP_ENV: mongodb
+      MONGODB_URL: mongodb://mongo:27017
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v1
+      - name: Install system packages
         run: |
-          composer remove --dev --no-progress --no-update --ansi \
-            doctrine/mongodb-odm \
-            doctrine/mongodb-odm-bundle \
+          apk add \
+            unzip \
+      - name: Install mongodb PHP extension
+        run: |
+          apk add $PHPIZE_DEPS
+          pecl install mongodb-1.5.5
+          docker-php-ext-enable mongodb
+      - name: Disable PHP memory limit
+        run: echo 'memory_limit=-1' >> /usr/local/etc/php/php.ini
+      - name: Install Composer
+        run: wget -qO - https://raw.githubusercontent.com/composer/getcomposer.org/fb22b78362d31c0d2bf516d1f8cdfd2745caa431/web/installer | php -- --install-dir=/usr/local/bin --filename=composer --quiet
+      - name: Install Symfony Flex
+        run: |
+          composer global require --prefer-dist --no-progress --no-suggest --ansi \
+            symfony/flex
+      - name: Update project dependencies
+        run: composer update --no-progress --no-suggest --ansi
+      - name: Clear test app cache
+        run: tests/Fixtures/app/console cache:clear --ansi
+      - name: Run PHPUnit tests
+        run: vendor/bin/phpunit --colors=always --configuration phpunit_mongodb.xml
+
+  phpunit-elasticsearch:
+    name: PHPUnit (PHP ${{ matrix.php }}) (Elasticsearch)
+    runs-on: ubuntu-latest
+    container:
+      image: php:${{ matrix.php }}-alpine
+    services:
+      elasticsearch:
+        image: docker.elastic.co/elasticsearch/elasticsearch:6.8.3 # https://github.com/elastic/elasticsearch/issues/43627
+        env:
+          discovery.type: single-node
+        options: >-
+          --health-cmd "curl -fsSL http://127.0.0.1:9200/_cluster/health | grep -q '\"status\":[[:space:]]*\"green\"'"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    strategy:
+      matrix:
+        php:
+          - '7.3'
+      fail-fast: false
+    env:
+      APP_ENV: elasticsearch
+      ELASTICSEARCH_URL: http://elasticsearch:9200
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v1
+      - name: Install system packages
+        run: |
+          apk add \
+            unzip \
+      - name: Install mongodb PHP extension
+        run: |
+          apk add $PHPIZE_DEPS
+          pecl install mongodb-1.5.5
+          docker-php-ext-enable mongodb
+      - name: Disable PHP memory limit
+        run: echo 'memory_limit=-1' >> /usr/local/etc/php/php.ini
+      - name: Install Composer
+        run: wget -qO - https://raw.githubusercontent.com/composer/getcomposer.org/fb22b78362d31c0d2bf516d1f8cdfd2745caa431/web/installer | php -- --install-dir=/usr/local/bin --filename=composer --quiet
+      - name: Install Symfony Flex
+        run: |
+          composer global require --prefer-dist --no-progress --no-suggest --ansi \
+            symfony/flex
       - name: Update project dependencies
         run: composer update --no-progress --no-suggest --ansi
       - name: Clear test app cache
@@ -249,7 +326,6 @@ jobs:
           apk add \
             unzip \
       - name: Install mongodb PHP extension
-        if: matrix.php != '7.1'
         run: |
           apk add $PHPIZE_DEPS
           pecl install mongodb-1.5.5
@@ -262,12 +338,6 @@ jobs:
         run: |
           composer global require --prefer-dist --no-progress --no-suggest --ansi \
             symfony/flex
-      - name: Remove Doctrine MongoDB ODM
-        if: matrix.php == '7.1'
-        run: |
-          composer remove --dev --no-progress --no-update --ansi \
-            doctrine/mongodb-odm \
-            doctrine/mongodb-odm-bundle \
       - name: Update project dependencies
         run: composer update --no-progress --no-suggest --ansi
       - name: Clear test app cache

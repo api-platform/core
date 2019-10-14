@@ -203,7 +203,8 @@ jobs:
         - *validate-openapi-v3-json
         - *validate-openapi-v3-yaml
 
-    - php: '7.3'
+    - name: 'Behat (PHP 7.3) (MongoDB)'
+      php: '7.3'
       env: APP_ENV=mongodb
       services:
         - mongodb
@@ -217,15 +218,14 @@ jobs:
       before_script:
         - *clear-test-app-cache
       script:
-        - vendor/bin/phpunit --configuration phpunit_mongodb.xml
-        - *clear-test-app-cache
         - vendor/bin/behat --format=progress --profile=mongodb --no-interaction
         - *validate-openapi-v2-json
         - *validate-openapi-v2-yaml
         - *validate-openapi-v3-json
         - *validate-openapi-v3-yaml
 
-    - php: '7.3'
+    - name: 'Behat (PHP 7.3) (Elasticsearch)'
+      php: '7.3'
       env: APP_ENV=elasticsearch
       before_install:
         - sudo apt-get purge --auto-remove elasticsearch
@@ -233,7 +233,7 @@ jobs:
         - echo 'deb https://artifacts.elastic.co/packages/6.x/apt stable main' | sudo tee -a /etc/apt/sources.list.d/elastic-6.x.list
         - sudo apt-get update
         - sudo apt-get install elasticsearch
-        - sudo service elasticsearch start
+        - sudo systemctl start elasticsearch
         - *enable-mongodb-php-extension
         - *disable-xdebug-php-extension
         - *disable-php-memory-limit
@@ -243,8 +243,6 @@ jobs:
       before_script:
         - *clear-test-app-cache
       script:
-        - *run-phpunit-tests
-        - *clear-test-app-cache
         - vendor/bin/behat --format=progress --profile=elasticsearch --no-interaction
         - *validate-openapi-v2-json
         - *validate-openapi-v2-yaml
