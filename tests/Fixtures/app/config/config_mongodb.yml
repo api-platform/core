@@ -1,13 +1,16 @@
 imports:
-    - { resource: parameters_mongodb.yml }
     - { resource: config_common.yml }
+
+parameters:
+    env(MONGODB_DB): api_platform_test
+    env(MONGODB_URL): mongodb://localhost:27017
 
 doctrine_mongodb:
     connections:
         default:
-            server: '%server%'
+            server: '%env(resolve:MONGODB_URL)%'
             options: {}
-    default_database: '%dbname%'
+    default_database: '%env(resolve:MONGODB_DB)%'
     document_managers:
         default:
             auto_mapping: true
