@@ -1,3 +1,0 @@
-parameters:
-    server: mongodb://localhost:27017
-    dbname: 'api_platform_test'
