@@ -196,6 +196,21 @@ final class Pagination
         return $this->getEnabled($context, $resourceClass, $operationName, true);
     }
 
+    public function getItemsPerPageOptions(): array
+    {
+        return array_intersect_key($this->options, array_flip([
+            'client_items_per_page',
+            'items_per_page_parameter_name',
+        ]));
+    }
+
+    public function getGraphQlPaginationType(string $resourceClass, string $operationName): string
+    {
+        $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
+
+        return (string) $resourceMetadata->getGraphqlAttribute($operationName, 'paginationType', 'cursor', true);
+    }
+
     /**
      * Is the classic or partial pagination enabled?
      */

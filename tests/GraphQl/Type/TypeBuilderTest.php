@@ -13,10 +13,12 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Tests\GraphQl\Type;
 
+use ApiPlatform\Core\DataProvider\Pagination;
 use ApiPlatform\Core\GraphQl\Serializer\ItemNormalizer;
 use ApiPlatform\Core\GraphQl\Type\FieldsBuilderInterface;
 use ApiPlatform\Core\GraphQl\Type\TypeBuilder;
 use ApiPlatform\Core\GraphQl\Type\TypesContainerInterface;
+use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use GraphQL\Type\Definition\InputObjectType;
@@ -46,6 +48,9 @@ class TypeBuilderTest extends TestCase
     /** @var ObjectProphecy */
     private $fieldsBuilderLocatorProphecy;
 
+    /** @var ObjectProphecy */
+    private $resourceMetadataFactoryProphecy;
+
     /** @var TypeBuilder */
     private $typeBuilder;
 
@@ -58,7 +63,13 @@ class TypeBuilderTest extends TestCase
         $this->defaultFieldResolver = function () {
         };
         $this->fieldsBuilderLocatorProphecy = $this->prophesize(ContainerInterface::class);
-        $this->typeBuilder = new TypeBuilder($this->typesContainerProphecy->reveal(), $this->defaultFieldResolver, $this->fieldsBuilderLocatorProphecy->reveal());
+        $this->resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
+        $this->typeBuilder = new TypeBuilder(
+            $this->typesContainerProphecy->reveal(),
+            $this->defaultFieldResolver,
+            $this->fieldsBuilderLocatorProphecy->reveal(),
+            new Pagination($this->resourceMetadataFactoryProphecy->reveal())
+        );
     }
 
     public function testGetResourceObjectType(): void
@@ -316,15 +327,24 @@ class TypeBuilderTest extends TestCase
         $this->assertSame(GraphQLType::string(), $resolvedType);
     }
 
-    public function testGetResourcePaginatedCollectionType(): void
+    public function testCursorBasedGetResourcePaginatedCollectionType(): void
     {
         $this->typesContainerProphecy->has('StringConnection')->shouldBeCalled()->willReturn(false);
         $this->typesContainerProphecy->set('StringConnection', Argument::type(ObjectType::class))->shouldBeCalled();
         $this->typesContainerProphecy->set('StringEdge', Argument::type(ObjectType::class))->shouldBeCalled();
         $this->typesContainerProphecy->set('StringPageInfo', Argument::type(ObjectType::class))->shouldBeCalled();
 
+        $this->resourceMetadataFactoryProphecy->create('StringResourceClass')->shouldBeCalled()->willReturn(new ResourceMetadata(
+            null,
+            null,
+            null,
+            null,
+            null,
+            ['paginationType' => 'cursor']
+        ));
+
         /** @var ObjectType $resourcePaginatedCollectionType */
-        $resourcePaginatedCollectionType = $this->typeBuilder->getResourcePaginatedCollectionType(GraphQLType::string());
+        $resourcePaginatedCollectionType = $this->typeBuilder->getResourcePaginatedCollectionType(GraphQLType::string(), 'StringResourceClass', 'operationName');
         $this->assertSame('StringConnection', $resourcePaginatedCollectionType->name);
         $this->assertSame('Connection for String.', $resourcePaginatedCollectionType->description);
 
@@ -368,6 +388,48 @@ class TypeBuilderTest extends TestCase
         $totalCountType = $resourcePaginatedCollectionTypeFields['totalCount']->getType();
         $this->assertInstanceOf(NonNull::class, $totalCountType);
         $this->assertSame(GraphQLType::int(), $totalCountType->getWrappedType());
+    }
+
+    public function testPageBasedGetResourcePaginatedCollectionType(): void
+    {
+        $this->typesContainerProphecy->has('StringConnection')->shouldBeCalled()->willReturn(false);
+        $this->typesContainerProphecy->set('StringConnection', Argument::type(ObjectType::class))->shouldBeCalled();
+        $this->typesContainerProphecy->set('StringPaginationInfo', Argument::type(ObjectType::class))->shouldBeCalled();
+
+        $this->resourceMetadataFactoryProphecy->create('StringResourceClass')->shouldBeCalled()->willReturn(new ResourceMetadata(
+            null,
+            null,
+            null,
+            null,
+            null,
+            ['paginationType' => 'page']
+        ));
+
+        /** @var ObjectType $resourcePaginatedCollectionType */
+        $resourcePaginatedCollectionType = $this->typeBuilder->getResourcePaginatedCollectionType(GraphQLType::string(), 'StringResourceClass', 'operationName');
+        $this->assertSame('StringConnection', $resourcePaginatedCollectionType->name);
+        $this->assertSame('Connection for String.', $resourcePaginatedCollectionType->description);
+
+        $resourcePaginatedCollectionTypeFields = $resourcePaginatedCollectionType->getFields();
+        $this->assertArrayHasKey('collection', $resourcePaginatedCollectionTypeFields);
+        $this->assertArrayHasKey('paginationInfo', $resourcePaginatedCollectionTypeFields);
+
+        /** @var NonNull $paginationInfoType */
+        $paginationInfoType = $resourcePaginatedCollectionTypeFields['paginationInfo']->getType();
+        /** @var ObjectType $wrappedType */
+        $wrappedType = $paginationInfoType->getWrappedType();
+        $this->assertSame('StringPaginationInfo', $wrappedType->name);
+        $this->assertSame('Information about the pagination.', $wrappedType->description);
+        $paginationInfoObjectTypeFields = $wrappedType->getFields();
+        $this->assertArrayHasKey('itemsPerPage', $paginationInfoObjectTypeFields);
+        $this->assertArrayHasKey('lastPage', $paginationInfoObjectTypeFields);
+        $this->assertArrayHasKey('totalCount', $paginationInfoObjectTypeFields);
+        $this->assertInstanceOf(NonNull::class, $paginationInfoObjectTypeFields['itemsPerPage']->getType());
+        $this->assertSame(GraphQLType::int(), $paginationInfoObjectTypeFields['itemsPerPage']->getType()->getWrappedType());
+        $this->assertInstanceOf(NonNull::class, $paginationInfoObjectTypeFields['lastPage']->getType());
+        $this->assertSame(GraphQLType::int(), $paginationInfoObjectTypeFields['lastPage']->getType()->getWrappedType());
+        $this->assertInstanceOf(NonNull::class, $paginationInfoObjectTypeFields['totalCount']->getType());
+        $this->assertSame(GraphQLType::int(), $paginationInfoObjectTypeFields['totalCount']->getType()->getWrappedType());
     }
 
     /**

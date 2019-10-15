@@ -254,24 +254,7 @@ final class FieldsBuilder implements FieldsBuilderInterface
             $args = [];
             if (!$input && null === $mutationName && !$isStandardGraphqlType && $this->typeBuilder->isCollection($type)) {
                 if ($this->pagination->isGraphQlEnabled($resourceClass, $queryName)) {
-                    $args = [
-                        'first' => [
-                            'type' => GraphQLType::int(),
-                            'description' => 'Returns the first n elements from the list.',
-                        ],
-                        'last' => [
-                            'type' => GraphQLType::int(),
-                            'description' => 'Returns the last n elements from the list.',
-                        ],
-                        'before' => [
-                            'type' => GraphQLType::string(),
-                            'description' => 'Returns the elements in the list that come before the specified cursor.',
-                        ],
-                        'after' => [
-                            'type' => GraphQLType::string(),
-                            'description' => 'Returns the elements in the list that come after the specified cursor.',
-                        ],
-                    ];
+                    $args = $this->getGraphQlPaginationArgs($resourceClass, $queryName);
                 }
 
                 $args = $this->getFilterArgs($args, $resourceClass, $resourceMetadata, $rootResource, $property, $queryName, $mutationName, $depth);
@@ -297,6 +280,49 @@ final class FieldsBuilder implements FieldsBuilderInterface
         }
 
         return null;
+    }
+
+    private function getGraphQlPaginationArgs(string $resourceClass, string $queryName): array
+    {
+        $paginationType = $this->pagination->getGraphQlPaginationType($resourceClass, $queryName);
+
+        if ('cursor' === $paginationType) {
+            return [
+                'first' => [
+                    'type' => GraphQLType::int(),
+                    'description' => 'Returns the first n elements from the list.',
+                ],
+                'last' => [
+                    'type' => GraphQLType::int(),
+                    'description' => 'Returns the last n elements from the list.',
+                ],
+                'before' => [
+                    'type' => GraphQLType::string(),
+                    'description' => 'Returns the elements in the list that come before the specified cursor.',
+                ],
+                'after' => [
+                    'type' => GraphQLType::string(),
+                    'description' => 'Returns the elements in the list that come after the specified cursor.',
+                ],
+            ];
+        }
+
+        $args = [
+            'page' => [
+                'type' => GraphQLType::int(),
+                'description' => 'Returns the current page.',
+            ],
+        ];
+
+        $itemsPerPageOptions = $this->pagination->getItemsPerPageOptions();
+        if ($itemsPerPageOptions['client_items_per_page']) {
+            $args[$itemsPerPageOptions['items_per_page_parameter_name']] = [
+                'type' => GraphQLType::int(),
+                'description' => 'Returns the number of items per page.',
+            ];
+        }
+
+        return $args;
     }
 
     private function getFilterArgs(array $args, ?string $resourceClass, ?ResourceMetadata $resourceMetadata, string $rootResource, ?string $property, ?string $queryName, ?string $mutationName, int $depth): array
@@ -418,7 +444,9 @@ final class FieldsBuilder implements FieldsBuilderInterface
         }
 
         if ($this->typeBuilder->isCollection($type)) {
-            return $this->pagination->isGraphQlEnabled($resourceClass, $queryName ?? $mutationName) && !$input ? $this->typeBuilder->getResourcePaginatedCollectionType($graphqlType) : GraphQLType::listOf($graphqlType);
+            $operationName = $queryName ?? $mutationName;
+
+            return $this->pagination->isGraphQlEnabled($resourceClass, $operationName) && !$input ? $this->typeBuilder->getResourcePaginatedCollectionType($graphqlType, $resourceClass, $operationName) : GraphQLType::listOf($graphqlType);
         }
 
         return !$graphqlType instanceof NullableType || $type->isNullable() || (null !== $mutationName && 'update' === $mutationName)
