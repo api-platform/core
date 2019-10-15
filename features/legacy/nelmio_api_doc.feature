@@ -1,3 +1,4 @@
+@legacy
 Feature: NelmioApiDoc integration
   In order to use NelmioApiDocBundle
   As an API software developer
