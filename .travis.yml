@@ -1,21 +1,28 @@
 language: php
 
+env:
+  global:
+    - SYMFONY_REQUIRE='^3.4 || ^4.0'
+
 cache:
   directories:
-    - $HOME/.composer/cache
+    - $HOME/.composer/cache/files
     - $HOME/.npm
 
 .steps:
-  - &add-composer-bin-dir-to-path |
-      export PATH="$PATH:$HOME/.composer/vendor/bin"
   - &clear-test-app-cache |
       tests/Fixtures/app/console cache:clear
+  - &create-test-database |
+      tests/Fixtures/app/console doctrine:database:create
   - &disable-php-memory-limit |
       echo "memory_limit=-1" >> ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/travis.ini
   - &disable-xdebug-php-extension |
       phpenv config-rm xdebug.ini || echo "xdebug not available"
   - &enable-mongodb-php-extension |
       echo "extension=mongodb.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/mongodb.ini
+  - &install-symfony-flex |
+      composer global require --prefer-dist --no-progress --no-suggest --ansi \
+        symfony/flex
   - &run-behat-tests |
       vendor/bin/behat --format=progress --no-interaction --colors
   - &run-phpunit-tests |
@@ -33,13 +40,12 @@ cache:
 
 jobs:
   include:
-    - name: '(PHP 7.1)'
+    - name: 'Behat (PHP 7.1)'
       php: '7.1'
       before_install:
-        - *enable-mongodb-php-extension
         - *disable-xdebug-php-extension
         - *disable-php-memory-limit
-        - *add-composer-bin-dir-to-path
+        - *install-symfony-flex
       install:
         - |
           composer remove --dev --no-progress --no-update --ansi \
@@ -49,121 +55,156 @@ jobs:
       before_script:
         - *clear-test-app-cache
       script:
-        - *run-phpunit-tests
-        - *clear-test-app-cache
         - *run-behat-tests
         - *validate-openapi-v2-json
         - *validate-openapi-v2-yaml
         - *validate-openapi-v3-json
         - *validate-openapi-v3-yaml
 
-    - name: '(PHP 7.2)'
+    - name: 'Behat (PHP 7.2)'
       php: '7.2'
       before_install:
         - *enable-mongodb-php-extension
         - *disable-xdebug-php-extension
         - *disable-php-memory-limit
-        - *add-composer-bin-dir-to-path
+        - *install-symfony-flex
       install:
         - *update-project-dependencies
       before_script:
         - *clear-test-app-cache
       script:
-        - *run-phpunit-tests
-        - *clear-test-app-cache
         - *run-behat-tests
         - *validate-openapi-v2-json
         - *validate-openapi-v2-yaml
         - *validate-openapi-v3-json
         - *validate-openapi-v3-yaml
 
-    - name: '(PHP 7.3)'
+    - name: 'Behat (PHP 7.3)'
       php: '7.3'
       before_install:
         - *enable-mongodb-php-extension
         - *disable-xdebug-php-extension
         - *disable-php-memory-limit
-        - *add-composer-bin-dir-to-path
+        - *install-symfony-flex
       install:
         - *update-project-dependencies
       before_script:
         - *clear-test-app-cache
       script:
-        - *run-phpunit-tests
-        - *clear-test-app-cache
         - *run-behat-tests
         - *validate-openapi-v2-json
         - *validate-openapi-v2-yaml
         - *validate-openapi-v3-json
         - *validate-openapi-v3-yaml
 
-    - name: '(PHP 7.3) (lowest dependencies)'
+    - name: 'Behat (PHP 7.4-rc)'
+      php: '7.4snapshot'
+      env: LEGACY=0
+      before_install:
+        - *enable-mongodb-php-extension
+        - *disable-xdebug-php-extension
+        - *disable-php-memory-limit
+        - *install-symfony-flex
+      install:
+        - *update-project-dependencies
+      before_script:
+        - *clear-test-app-cache
+      script:
+        - vendor/bin/behat --format=progress --profile=default-no-legacy --no-interaction --colors
+        - *validate-openapi-v2-json
+        - *validate-openapi-v2-yaml
+        - *validate-openapi-v3-json
+        - *validate-openapi-v3-yaml
+
+    - name: 'Behat (PHP 7.3) (lowest dependencies)'
       php: '7.3'
       before_install:
         - *enable-mongodb-php-extension
         - *disable-xdebug-php-extension
         - *disable-php-memory-limit
-        - *add-composer-bin-dir-to-path
+        - *install-symfony-flex
       install:
         - composer update --no-progress --no-suggest --prefer-stable --prefer-lowest --ansi
       before_script:
         - *clear-test-app-cache
       script:
-        - *run-phpunit-tests
-        - *clear-test-app-cache
         - *run-behat-tests
         - *validate-openapi-v2-json
         - *validate-openapi-v2-yaml
         - *validate-openapi-v3-json
         - *validate-openapi-v3-yaml
 
-    - php: '7.3'
-      env: APP_ENV=postgres
+    - name: 'Behat (PHP 7.4-rc) (lowest dependencies)'
+      php: '7.4snapshot'
+      env: LEGACY=0
+      before_install:
+        - *enable-mongodb-php-extension
+        - *disable-xdebug-php-extension
+        - *disable-php-memory-limit
+        - *install-symfony-flex
+      install:
+        - composer update --no-progress --no-suggest --prefer-stable --prefer-lowest --ansi
+      before_script:
+        - *clear-test-app-cache
+      script:
+        - vendor/bin/behat --format=progress --profile=default-no-legacy --no-interaction --colors
+        - *validate-openapi-v2-json
+        - *validate-openapi-v2-yaml
+        - *validate-openapi-v3-json
+        - *validate-openapi-v3-yaml
+
+    - name: 'Behat (PHP 7.3) (PostgreSQL)'
+      php: '7.3'
+      env: >-
+        APP_ENV=postgres
+        DATABASE_URL=postgres://postgres:@localhost/api_platform_test
+      addons:
+        postgresql: '10'
       services:
         - postgresql
       before_install:
         - *enable-mongodb-php-extension
         - *disable-xdebug-php-extension
         - *disable-php-memory-limit
-        - *add-composer-bin-dir-to-path
+        - *install-symfony-flex
       install:
         - *update-project-dependencies
       before_script:
         - *clear-test-app-cache
-        - psql --command 'CREATE DATABASE api_platform_test;' --username postgres
+        - *create-test-database
       script:
-        - *run-phpunit-tests
-        - *clear-test-app-cache
         - vendor/bin/behat --format=progress --profile=postgres --no-interaction
         - *validate-openapi-v2-json
         - *validate-openapi-v2-yaml
         - *validate-openapi-v3-json
         - *validate-openapi-v3-yaml
 
-    - php: '7.3'
-      env: APP_ENV=mysql
+    - name: 'Behat (PHP 7.3) (MySQL)'
+      php: '7.3'
+      env: >-
+        APP_ENV=mysql
+        DATABASE_URL=mysql://travis:@localhost/api_platform_test
       services:
         - mysql
       before_install:
         - *enable-mongodb-php-extension
         - *disable-xdebug-php-extension
         - *disable-php-memory-limit
-        - *add-composer-bin-dir-to-path
+        - *install-symfony-flex
       install:
         - *update-project-dependencies
       before_script:
         - *clear-test-app-cache
-        - mysql --execute 'CREATE DATABASE api_platform_test;'
+        - *create-test-database
       script:
-        - *run-phpunit-tests
-        - *clear-test-app-cache
         - *run-behat-tests
         - *validate-openapi-v2-json
         - *validate-openapi-v2-yaml
         - *validate-openapi-v3-json
         - *validate-openapi-v3-yaml
 
-    - php: '7.3'
+    - name: 'Behat (PHP 7.3) (MongoDB)'
+      php: '7.3'
       env: APP_ENV=mongodb
       services:
         - mongodb
@@ -171,21 +212,20 @@ jobs:
         - *enable-mongodb-php-extension
         - *disable-xdebug-php-extension
         - *disable-php-memory-limit
-        - *add-composer-bin-dir-to-path
+        - *install-symfony-flex
       install:
         - *update-project-dependencies
       before_script:
         - *clear-test-app-cache
       script:
-        - vendor/bin/phpunit --configuration phpunit_mongodb.xml
-        - *clear-test-app-cache
         - vendor/bin/behat --format=progress --profile=mongodb --no-interaction
         - *validate-openapi-v2-json
         - *validate-openapi-v2-yaml
         - *validate-openapi-v3-json
         - *validate-openapi-v3-yaml
 
-    - php: '7.3'
+    - name: 'Behat (PHP 7.3) (Elasticsearch)'
+      php: '7.3'
       env: APP_ENV=elasticsearch
       before_install:
         - sudo apt-get purge --auto-remove elasticsearch
@@ -193,44 +233,20 @@ jobs:
         - echo 'deb https://artifacts.elastic.co/packages/6.x/apt stable main' | sudo tee -a /etc/apt/sources.list.d/elastic-6.x.list
         - sudo apt-get update
         - sudo apt-get install elasticsearch
-        - sudo service elasticsearch start
+        - sudo systemctl start elasticsearch
         - *enable-mongodb-php-extension
         - *disable-xdebug-php-extension
         - *disable-php-memory-limit
-        - *add-composer-bin-dir-to-path
+        - *install-symfony-flex
       install:
         - *update-project-dependencies
       before_script:
         - *clear-test-app-cache
       script:
-        - *run-phpunit-tests
-        - *clear-test-app-cache
         - vendor/bin/behat --format=progress --profile=elasticsearch --no-interaction
         - *validate-openapi-v2-json
         - *validate-openapi-v2-yaml
         - *validate-openapi-v3-json
         - *validate-openapi-v3-yaml
 
-    - php: '7.3'
-      env: SYMFONY_DEPRECATIONS_HELPER=max[total]=5 # 5 deprecation notices from FOSUserBundle
-      before_install:
-        - *enable-mongodb-php-extension
-        - *disable-xdebug-php-extension
-        - *disable-php-memory-limit
-        - *add-composer-bin-dir-to-path
-      install:
-        - *update-project-dependencies
-      before_script:
-        - *clear-test-app-cache
-      script:
-        - *run-phpunit-tests
-        - *clear-test-app-cache
-        - *run-behat-tests
-        - *validate-openapi-v2-json
-        - *validate-openapi-v2-yaml
-        - *validate-openapi-v3-json
-        - *validate-openapi-v3-yaml
-
-  allow_failures:
-    - env: SYMFONY_DEPRECATIONS_HELPER=max[total]=5 # 5 deprecation notices from FOSUserBundle
   fast_finish: true
