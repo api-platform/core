@@ -137,10 +137,10 @@ class AppKernel extends Kernel
             ],
         ];
 
-        $c->loadFromExtension('security', $securityConfig);
+        $c->prependExtensionConfig('security', $securityConfig);
 
         if (class_exists(DoctrineMongoDBBundle::class)) {
-            $c->loadFromExtension('doctrine_mongodb', [
+            $c->prependExtensionConfig('doctrine_mongodb', [
                 'connections' => [
                     'default' => null,
                 ],
@@ -153,7 +153,7 @@ class AppKernel extends Kernel
         }
 
         if ($_SERVER['LEGACY'] ?? true) {
-            $c->loadFromExtension('nelmio_api_doc', [
+            $c->prependExtensionConfig('nelmio_api_doc', [
                 'sandbox' => [
                     'accept_type' => 'application/json',
                     'body_format' => [
@@ -165,7 +165,7 @@ class AppKernel extends Kernel
                     ],
                 ],
             ]);
-            $c->loadFromExtension('api_platform', ['enable_nelmio_api_doc' => true]);
+            $c->prependExtensionConfig('api_platform', ['enable_nelmio_api_doc' => true]);
         }
     }
 }
