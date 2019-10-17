@@ -61,6 +61,11 @@ final class ItemDataProvider implements ItemDataProviderInterface, RestrictedDat
             if (false === $resourceMetadata->getItemOperationAttribute($operationName, 'elasticsearch', true, true)) {
                 return false;
             }
+
+            $method = $resourceMetadata->getItemOperationAttribute($operationName, 'method');
+            if (\in_array($method, ['PUT', 'PATCH', 'DELETE'], true)) {
+                return false;
+            }
         } catch (ResourceClassNotFoundException $e) {
             return false;
         }

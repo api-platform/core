@@ -37,6 +37,13 @@ use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
 class ItemDataProviderTest extends TestCase
 {
+    private const DEFAULT_ITEM_OPERATIONS = [
+        'get' => ['method' => 'GET'],
+        'put' => ['method' => 'PUT'],
+        'patch' => ['method' => 'PATCH'],
+        'delete' => ['method' => 'DELETE'],
+    ];
+
     public function testConstruct()
     {
         self::assertInstanceOf(
@@ -63,7 +70,7 @@ class ItemDataProviderTest extends TestCase
         $identifierExtractorProphecy->getIdentifierFromResourceClass(CompositeRelation::class)->willThrow(new NonUniqueIdentifierException())->shouldBeCalled();
 
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $resourceMetadataFactoryProphecy->create(Foo::class)->shouldBeCalled()->willReturn(new ResourceMetadata());
+        $resourceMetadataFactoryProphecy->create(Foo::class)->shouldBeCalled()->willReturn((new ResourceMetadata())->withItemOperations(self::DEFAULT_ITEM_OPERATIONS));
         $resourceMetadataFactoryProphecy->create(Dummy::class)->shouldBeCalled()->willReturn(new ResourceMetadata());
         $resourceMetadataFactoryProphecy->create(CompositeRelation::class)->shouldBeCalled()->willReturn(new ResourceMetadata());
         $resourceMetadataFactoryProphecy->create(DummyCar::class)->shouldBeCalled()->willReturn((new ResourceMetadata())->withAttributes(['elasticsearch' => false]));
@@ -78,6 +85,10 @@ class ItemDataProviderTest extends TestCase
         );
 
         self::assertTrue($itemDataProvider->supports(Foo::class));
+        self::assertTrue($itemDataProvider->supports(Foo::class, 'get'));
+        self::assertFalse($itemDataProvider->supports(Foo::class, 'put'));
+        self::assertFalse($itemDataProvider->supports(Foo::class, 'patch'));
+        self::assertFalse($itemDataProvider->supports(Foo::class, 'delete'));
         self::assertFalse($itemDataProvider->supports(Dummy::class));
         self::assertFalse($itemDataProvider->supports(CompositeRelation::class));
         self::assertFalse($itemDataProvider->supports(DummyCar::class));
