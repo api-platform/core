@@ -9,6 +9,7 @@ default:
         - 'HttpHeaderContext'
         - 'GraphqlContext'
         - 'JsonContext'
+        - 'XmlContext'
         - 'HydraContext'
         - 'SwaggerContext'
         - 'HttpCacheContext'
