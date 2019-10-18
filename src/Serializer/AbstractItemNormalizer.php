@@ -701,6 +701,29 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             return $this->serializer->denormalize($value, $className, $format, $context);
         }
 
+        if (is_string($value) && 'string' !== $type->getBuiltinType()) {
+
+            if ('bool' === $type->getBuiltinType()) {
+                if (in_array($value, ['true', 'True', 'T', 't', "1"], true)) {
+                    $value = true;
+                }
+                if (in_array($value, ['false', 'False', 'F', 'f', "0"], true)) {
+                    $value = false;
+                }
+            }
+
+            if (is_numeric($value)) {
+
+                if ('int' === $type->getBuiltinType()) {
+                    $value = intval($value);
+                }
+
+                if ('float' === $type->getBuiltinType()) {
+                    $value = floatval($value);
+                }
+            }
+        }
+
         if ($context[static::DISABLE_TYPE_ENFORCEMENT] ?? false) {
             return $value;
         }

@@ -58,7 +58,6 @@ Feature: XML Input and Output
     And the response should be in XML
     And the header "Content-Type" should be equal to "application/xml; charset=utf-8"
 
-
   @createSchema
   Scenario: Posting an XML resource with an float value
     When I send a "POST" request to "/resource_with_floats" with body:
