@@ -59,6 +59,9 @@ final class ApiGatewayNormalizer implements NormalizerInterface, CacheableSuppor
             $data['basePath'] = '/';
         }
 
+        unset($data['security']);
+        unset($data['securityDefinitions']);
+
         foreach ($data['paths'] as $path => $operations) {
             foreach ($operations as $operation => $options) {
                 if (isset($options['parameters'])) {
@@ -67,7 +70,7 @@ final class ApiGatewayNormalizer implements NormalizerInterface, CacheableSuppor
                             unset($data['paths'][$path][$operation]['parameters'][$key]);
                         }
                         if (isset($parameter['schema']['$ref']) && !preg_match('/^#\/definitions\/[A-z]+$/', $parameter['schema']['$ref'])) {
-                            $data['paths'][$path][$operation]['parameters'][$key]['schema']['$ref'] = str_replace(['-', '_'], '', $parameter['schema']['$ref']);
+                            $data['paths'][$path][$operation]['parameters'][$key]['schema']['$ref'] = str_replace(['-', ':', '_'], '', $parameter['schema']['$ref']);
                         }
                     }
                     $data['paths'][$path][$operation]['parameters'] = array_values($data['paths'][$path][$operation]['parameters']);
@@ -75,10 +78,10 @@ final class ApiGatewayNormalizer implements NormalizerInterface, CacheableSuppor
                 if (isset($options['responses'])) {
                     foreach ($options['responses'] as $statusCode => $response) {
                         if (isset($response['schema']['items']['$ref']) && !preg_match('/^#\/definitions\/[A-z]+$/', $response['schema']['items']['$ref'])) {
-                            $data['paths'][$path][$operation]['responses'][$statusCode]['schema']['items']['$ref'] = str_replace(['-', '_'], '', $response['schema']['items']['$ref']);
+                            $data['paths'][$path][$operation]['responses'][$statusCode]['schema']['items']['$ref'] = str_replace(['-', ':', '_'], '', $response['schema']['items']['$ref']);
                         }
                         if (isset($response['schema']['$ref']) && !preg_match('/^#\/definitions\/[A-z]+$/', $response['schema']['$ref'])) {
-                            $data['paths'][$path][$operation]['responses'][$statusCode]['schema']['$ref'] = str_replace(['-', '_'], '', $response['schema']['$ref']);
+                            $data['paths'][$path][$operation]['responses'][$statusCode]['schema']['$ref'] = str_replace(['-', ':', '_'], '', $response['schema']['$ref']);
                         }
                     }
                 }
@@ -94,10 +97,10 @@ final class ApiGatewayNormalizer implements NormalizerInterface, CacheableSuppor
                     unset($data['definitions'][$definition]['properties'][$property]['readOnly']);
                 }
                 if (isset($propertyOptions['$ref']) && !preg_match('/^#\/definitions\/[A-z]+$/', $propertyOptions['$ref'])) {
-                    $data['definitions'][$definition]['properties'][$property]['$ref'] = str_replace(['-', '_'], '', $propertyOptions['$ref']);
+                    $data['definitions'][$definition]['properties'][$property]['$ref'] = str_replace(['-', ':', '_'], '', $propertyOptions['$ref']);
                 }
                 if (isset($propertyOptions['items']['$ref']) && !preg_match('/^#\/definitions\/[A-z]+$/', $propertyOptions['items']['$ref'])) {
-                    $data['definitions'][$definition]['properties'][$property]['items']['$ref'] = str_replace(['-', '_'], '', $propertyOptions['items']['$ref']);
+                    $data['definitions'][$definition]['properties'][$property]['items']['$ref'] = str_replace(['-', ':', '_'], '', $propertyOptions['items']['$ref']);
                 }
             }
         }
@@ -105,7 +108,7 @@ final class ApiGatewayNormalizer implements NormalizerInterface, CacheableSuppor
         // $data['definitions'] is an instance of \ArrayObject
         foreach (array_keys($data['definitions']->getArrayCopy()) as $definition) {
             if (!preg_match('/^[A-z]+$/', (string) $definition)) {
-                $data['definitions'][str_replace(['-', '_'], '', (string) $definition)] = $data['definitions'][$definition];
+                $data['definitions'][str_replace(['-', ':', '_'], '', (string) $definition)] = $data['definitions'][$definition];
                 unset($data['definitions'][$definition]);
             }
         }
