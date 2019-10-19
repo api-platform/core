@@ -25,8 +25,6 @@ cache:
         symfony/flex
   - &run-behat-tests |
       vendor/bin/behat --format=progress --no-interaction --colors
-  - &run-phpunit-tests |
-      vendor/bin/phpunit --colors=always
   - &update-project-dependencies |
       composer update --no-progress --no-suggest --ansi
   - &validate-openapi-v2-json |
@@ -187,6 +185,15 @@ jobs:
       services:
         - mysql
       before_install:
+        - sudo systemctl stop mysql
+        - sudo mv /var/lib/mysql /var/ramfs/mysql
+        - sudo ln -s /var/ramfs/mysql /var/lib/mysql
+        - |
+          {
+            echo '[mysqld]';
+            echo 'innodb_flush_log_at_trx_commit=0';
+          } | sudo tee /etc/mysql/conf.d/performance.cnf
+        - sudo systemctl start mysql
         - *enable-mongodb-php-extension
         - *disable-xdebug-php-extension
         - *disable-php-memory-limit
