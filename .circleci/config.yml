@@ -30,7 +30,7 @@ commands:
   disable-xdebug-php-extension:
     steps:
       - run:
-          name: Disable Xdebug PHP extension
+          name: Disable xdebug PHP extension
           command: sudo rm /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
   install-mongodb-php-extension:
     steps:
@@ -95,6 +95,7 @@ commands:
   restore-composer-cache:
     steps:
       - restore_cache:
+          name: Restore Composer cache
           keys:
             - composer-cache-{{ .Revision }}
             - composer-cache-{{ .Branch }}
@@ -102,6 +103,7 @@ commands:
   restore-npm-cache:
     steps:
       - restore_cache:
+          name: Restore npm cache
           keys:
             - npm-cache-{{ .Revision }}
             - npm-cache-{{ .Branch }}
@@ -109,6 +111,7 @@ commands:
   restore-php-cs-fixer-cache:
     steps:
       - restore_cache:
+          name: Restore PHP-CS-Fixer cache
           keys:
             - php-cs-fixer-cache-{{ .Revision }}
             - php-cs-fixer-cache-{{ .Branch }}
@@ -116,6 +119,7 @@ commands:
   restore-phpstan-cache:
     steps:
       - restore_cache:
+          name: Restore PHPStan cache
           keys:
             - phpstan-cache-{{ .Revision }}
             - phpstan-cache-{{ .Branch }}
@@ -123,40 +127,48 @@ commands:
   save-composer-cache:
     steps:
       - save_cache:
+          name: Save Composer cache
           paths:
             - ~/.composer/cache/files
           key: composer-cache-{{ .Branch }}-{{ .BuildNum }}
       - save_cache:
+          name: Save Composer cache
           paths:
             - ~/.composer/cache/files
           key: composer-cache-{{ .Revision }}-{{ .BuildNum }}
   save-npm-cache:
     steps:
       - save_cache:
+          name: Save npm cache
           paths:
             - ~/.npm
           key: npm-cache-{{ .Branch }}-{{ .BuildNum }}
       - save_cache:
+          name: Save npm cache
           paths:
             - ~/.npm
           key: npm-cache-{{ .Revision }}-{{ .BuildNum }}
   save-php-cs-fixer-cache:
     steps:
       - save_cache:
+          name: Save PHP-CS-Fixer cache
           paths:
             - .php_cs.cache
           key: php-cs-fixer-cache-{{ .Branch }}-{{ .BuildNum }}
       - save_cache:
+          name: Save PHP-CS-Fixer cache
           paths:
             - .php_cs.cache
           key: php-cs-fixer-cache-{{ .Revision }}-{{ .BuildNum }}
   save-phpstan-cache:
     steps:
       - save_cache:
+          name: Save PHPStan cache
           paths:
             - /tmp/phpstan/cache
           key: phpstan-cache-{{ .Branch }}-{{ .BuildNum }}
       - save_cache:
+          name: Save PHPStan cache
           paths:
             - /tmp/phpstan/cache
           key: phpstan-cache-{{ .Revision }}-{{ .BuildNum }}
@@ -225,6 +237,7 @@ executors:
 
 jobs:
   php-cs-fixer:
+    description: PHP-CS-Fixer
     executor: php
     environment:
       PHP_CS_FIXER_FUTURE_MODE: '1'
@@ -250,6 +263,7 @@ jobs:
       - save-php-cs-fixer-cache
 
   phpstan:
+    description: PHPStan
     executor: php
     environment:
       APP_DEBUG: '1' # https://github.com/phpstan/phpstan-symfony/issues/37
@@ -271,6 +285,7 @@ jobs:
       - save-phpstan-cache
 
   phpunit-coverage:
+    description: PHPUnit (code coverage)
     executor: php
     parallelism: 2
     working_directory: ~/api-platform/core
@@ -319,6 +334,7 @@ jobs:
       - save-npm-cache
 
   behat-coverage:
+    description: Behat (code coverage)
     executor: php
     parallelism: 2
     working_directory: ~/api-platform/core
@@ -364,6 +380,7 @@ jobs:
       - save-npm-cache
 
   phpunit-mongodb-coverage:
+    description: PHPUnit (MongoDB) (code coverage)
     executor: php-and-mongodb
     environment:
       APP_ENV: mongodb
@@ -402,6 +419,7 @@ jobs:
       - save-npm-cache
 
   behat-mongodb-coverage:
+    description: Behat (MongoDB) (code coverage)
     executor: php-and-mongodb
     environment:
       APP_ENV: mongodb
@@ -446,6 +464,7 @@ jobs:
       - save-npm-cache
 
   behat-elasticsearch-coverage:
+    description: Behat (Elasticsearch) (code coverage)
     executor: php-and-elasticsearch
     environment:
       APP_ENV: elasticsearch
