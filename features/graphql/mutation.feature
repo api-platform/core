@@ -31,14 +31,353 @@ Feature: GraphQL mutation support
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/json"
-    And the JSON node "data.__type.fields[2].name" should contain "delete"
-    And the JSON node "data.__type.fields[2].description" should match '/^Deletes a [A-z0-9]+.$/'
-    And the JSON node "data.__type.fields[2].type.name" should match "/^delete[A-z0-9]+Payload$/"
-    And the JSON node "data.__type.fields[2].type.kind" should be equal to "OBJECT"
-    And the JSON node "data.__type.fields[2].args[0].name" should be equal to "input"
-    And the JSON node "data.__type.fields[2].args[0].type.kind" should be equal to "NON_NULL"
-    And the JSON node "data.__type.fields[2].args[0].type.ofType.name" should match "/^delete[A-z0-9]+Input$/"
-    And the JSON node "data.__type.fields[2].args[0].type.ofType.kind" should be equal to "INPUT_OBJECT"
+    And the JSON should be valid according to this schema:
+    """
+    {
+      "type": "object",
+      "required": [
+        "data"
+      ],
+      "properties": {
+        "data": {
+          "type": "object",
+          "required": [
+            "__type"
+          ],
+          "properties": {
+            "__type": {
+              "type": "object",
+              "required": [
+                "fields"
+              ],
+              "properties": {
+                "fields": {
+                  "type": "array",
+                  "minItems": 1,
+                  "items": {
+                    "oneOf": [
+                      {
+                        "type": "object",
+                        "required": [
+                          "name",
+                          "description",
+                          "type",
+                          "args"
+                        ],
+                        "properties": {
+                          "name": {
+                            "pattern": "^create[A-z0-9]+$"
+                          },
+                          "description": {
+                            "pattern": "^Creates a [A-z0-9]+.$"
+                          },
+                          "type": {
+                            "type": "object",
+                            "required": [
+                              "name",
+                              "kind"
+                            ],
+                            "properties": {
+                              "name": {
+                                "pattern": "^create[A-z0-9]+Payload$"
+                              },
+                              "kind": {
+                                "enum": ["OBJECT"]
+                              }
+                            }
+                          },
+                          "args": {
+                            "type": "array",
+                            "minItems": 1,
+                            "maxItems": 1,
+                            "items": [
+                              {
+                                "type": "object",
+                                "required": [
+                                  "name",
+                                  "type"
+                                ],
+                                "properties": {
+                                  "name": {
+                                    "enum": ["input"]
+                                  },
+                                  "type": {
+                                    "type": "object",
+                                    "required": [
+                                      "kind",
+                                      "ofType"
+                                    ],
+                                    "properties": {
+                                      "kind": {
+                                        "enum": ["NON_NULL"]
+                                      },
+                                      "ofType": {
+                                        "type": "object",
+                                        "required": [
+                                          "name",
+                                          "kind"
+                                        ],
+                                        "properties": {
+                                          "name": {
+                                            "pattern": "^create[A-z0-9]+Input$"
+                                          },
+                                          "kind": {
+                                            "enum": ["INPUT_OBJECT"]
+                                          }
+                                        }
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            ]
+                          }
+                        }
+                      },
+                      {
+                        "type": "object",
+                        "required": [
+                          "name",
+                          "description",
+                          "type",
+                          "args"
+                        ],
+                        "properties": {
+                          "name": {
+                            "pattern": "^update[A-z0-9]+$"
+                          },
+                          "description": {
+                            "pattern": "^Updates a [A-z0-9]+.$"
+                          },
+                          "type": {
+                            "type": "object",
+                            "required": [
+                              "name",
+                              "kind"
+                            ],
+                            "properties": {
+                              "name": {
+                                "pattern": "^update[A-z0-9]+Payload$"
+                              },
+                              "kind": {
+                                "enum": ["OBJECT"]
+                              }
+                            }
+                          },
+                          "args": {
+                            "type": "array",
+                            "minItems": 1,
+                            "maxItems": 1,
+                            "items": [
+                              {
+                                "type": "object",
+                                "required": [
+                                  "name",
+                                  "type"
+                                ],
+                                "properties": {
+                                  "name": {
+                                    "enum": ["input"]
+                                  },
+                                  "type": {
+                                    "type": "object",
+                                    "required": [
+                                      "kind",
+                                      "ofType"
+                                    ],
+                                    "properties": {
+                                      "kind": {
+                                        "enum": ["NON_NULL"]
+                                      },
+                                      "ofType": {
+                                        "type": "object",
+                                        "required": [
+                                          "name",
+                                          "kind"
+                                        ],
+                                        "properties": {
+                                          "name": {
+                                            "pattern": "^update[A-z0-9]+Input$"
+                                          },
+                                          "kind": {
+                                            "enum": ["INPUT_OBJECT"]
+                                          }
+                                        }
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            ]
+                          }
+                        }
+                      },
+                      {
+                        "type": "object",
+                        "required": [
+                          "name",
+                          "description",
+                          "type",
+                          "args"
+                        ],
+                        "properties": {
+                          "name": {
+                            "pattern": "^delete[A-z0-9]+$"
+                          },
+                          "description": {
+                            "pattern": "^Deletes a [A-z0-9]+.$"
+                          },
+                          "type": {
+                            "type": "object",
+                            "required": [
+                              "name",
+                              "kind"
+                            ],
+                            "properties": {
+                              "name": {
+                                "pattern": "^delete[A-z0-9]+Payload$"
+                              },
+                              "kind": {
+                                "enum": ["OBJECT"]
+                              }
+                            }
+                          },
+                          "args": {
+                            "type": "array",
+                            "minItems": 1,
+                            "maxItems": 1,
+                            "items": [
+                              {
+                                "type": "object",
+                                "required": [
+                                  "name",
+                                  "type"
+                                ],
+                                "properties": {
+                                  "name": {
+                                    "enum": ["input"]
+                                  },
+                                  "type": {
+                                    "type": "object",
+                                    "required": [
+                                      "kind",
+                                      "ofType"
+                                    ],
+                                    "properties": {
+                                      "kind": {
+                                        "enum": ["NON_NULL"]
+                                      },
+                                      "ofType": {
+                                        "type": "object",
+                                        "required": [
+                                          "name",
+                                          "kind"
+                                        ],
+                                        "properties": {
+                                          "name": {
+                                            "pattern": "^delete[A-z0-9]+Input$"
+                                          },
+                                          "kind": {
+                                            "enum": ["INPUT_OBJECT"]
+                                          }
+                                        }
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            ]
+                          }
+                        }
+                      },
+                      {
+                        "type": "object",
+                        "required": [
+                          "name",
+                          "description",
+                          "type",
+                          "args"
+                        ],
+                        "properties": {
+                          "name": {
+                            "pattern": "^(?!create|update|delete)[A-z0-9]+$"
+                          },
+                          "description": {
+                            "pattern": "^(?!Create|Update|Delete)[A-z0-9]+s a [A-z0-9]+.$"
+                          },
+                          "type": {
+                            "type": "object",
+                            "required": [
+                              "name",
+                              "kind"
+                            ],
+                            "properties": {
+                              "name": {
+                                "pattern": "^(?!create|update|delete)[A-z0-9]+Payload$"
+                              },
+                              "kind": {
+                                "enum": ["OBJECT"]
+                              }
+                            }
+                          },
+                          "args": {
+                            "type": "array",
+                            "minItems": 1,
+                            "maxItems": 1,
+                            "items": [
+                              {
+                                "type": "object",
+                                "required": [
+                                  "name",
+                                  "type"
+                                ],
+                                "properties": {
+                                  "name": {
+                                    "enum": ["input"]
+                                  },
+                                  "type": {
+                                    "type": "object",
+                                    "required": [
+                                      "kind",
+                                      "ofType"
+                                    ],
+                                    "properties": {
+                                      "kind": {
+                                        "enum": ["NON_NULL"]
+                                      },
+                                      "ofType": {
+                                        "type": "object",
+                                        "required": [
+                                          "name",
+                                          "kind"
+                                        ],
+                                        "properties": {
+                                          "name": {
+                                            "pattern": "^(?!create|update|delete)[A-z0-9]+Input$"
+                                          },
+                                          "kind": {
+                                            "enum": ["INPUT_OBJECT"]
+                                          }
+                                        }
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    """
 
   Scenario: Create an item
     When I send the following GraphQL request:
