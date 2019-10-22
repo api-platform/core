@@ -29,12 +29,12 @@ final class TransformFilteringParametersListener
         $request = $event->getRequest();
         if (
             'jsonapi' !== $request->getRequestFormat() ||
-            null === ($filters = $request->query->get('filter')) ||
-            !\is_array($filters)
+            null === ($filterParameter = $request->query->get('filter')) ||
+            !\is_array($filterParameter)
         ) {
             return;
         }
-
-        $request->attributes->set('_api_filters', $filters);
+        $filters = $request->attributes->get('_api_filters', []);
+        $request->attributes->set('_api_filters', array_merge($filterParameter, $filters));
     }
 }
