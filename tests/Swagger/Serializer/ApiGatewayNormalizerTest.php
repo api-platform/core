@@ -13,220 +13,533 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Tests\Swagger\Serializer;
 
+use ApiPlatform\Core\Documentation\Documentation;
+use ApiPlatform\Core\Metadata\Resource\ResourceNameCollection;
 use ApiPlatform\Core\Swagger\Serializer\ApiGatewayNormalizer;
+use ApiPlatform\Core\Swagger\Serializer\DocumentationNormalizer;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use PHPUnit\Framework\TestCase;
-use Prophecy\Prophecy\ObjectProphecy;
 use Symfony\Component\Serializer\Normalizer\CacheableSupportsMethodInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
-/**
- * @author Vincent Chalamon <vincent@les-tilleuls.coop>
- */
 final class ApiGatewayNormalizerTest extends TestCase
 {
-    /**
-     * @var ObjectProphecy
-     */
-    private $documentationNormalizerProphecy;
-
-    /**
-     * @var ObjectProphecy
-     */
-    private $objectProphecy;
-
-    /**
-     * @var ApiGatewayNormalizer
-     */
-    private $normalizer;
-
-    protected function setUp(): void
+    public function testSupportsNormalization(): void
     {
-        $this->documentationNormalizerProphecy = $this->prophesize(NormalizerInterface::class);
-        $this->documentationNormalizerProphecy->willImplement(CacheableSupportsMethodInterface::class);
-        $this->documentationNormalizerProphecy->hasCacheableSupportsMethod()->willReturn(true);
-        $this->objectProphecy = $this->prophesize(\stdClass::class);
-        $this->normalizer = new ApiGatewayNormalizer($this->documentationNormalizerProphecy->reveal());
+        $documentationNormalizerProphecy = $this->prophesize(NormalizerInterface::class);
+        $documentationNormalizerProphecy->willImplement(CacheableSupportsMethodInterface::class);
+        $documentationNormalizerProphecy->supportsNormalization(DocumentationNormalizer::FORMAT, Documentation::class)->willReturn(true);
+        $documentationNormalizerProphecy->hasCacheableSupportsMethod()->willReturn(true);
+
+        $normalizer = new ApiGatewayNormalizer($documentationNormalizerProphecy->reveal());
+
+        $this->assertTrue($normalizer->supportsNormalization(DocumentationNormalizer::FORMAT, Documentation::class));
+        $this->assertTrue($normalizer->hasCacheableSupportsMethod());
     }
 
-    public function testSupportsNormalization()
+    public function testNormalize(): void
     {
-        $this->documentationNormalizerProphecy->supportsNormalization('foo', 'bar')->willReturn(true)->shouldBeCalledTimes(1);
-        $this->assertTrue($this->normalizer->supportsNormalization('foo', 'bar'));
-        $this->assertTrue($this->normalizer->hasCacheableSupportsMethod());
-    }
+        $documentation = new Documentation(new ResourceNameCollection([
+            Dummy::class,
+        ]));
 
-    public function testNormalizeWithoutApiGateway()
-    {
-        $this->documentationNormalizerProphecy->normalize($this->objectProphecy, 'jsonld', [])
-            ->willReturn(['basePath' => '/api'])
-            ->shouldBeCalledTimes(1);
-        $this->assertEquals(['basePath' => '/api'], $this->normalizer->normalize($this->objectProphecy->reveal(), 'jsonld'));
-    }
-
-    public function testNormalizeWithApiGateway()
-    {
-        $this->documentationNormalizerProphecy->normalize($this->objectProphecy, 'jsonld', ['api_gateway' => true])
-            ->willReturn([
-                'basePath' => '',
-                'paths' => [
-                    '/foo' => [
-                        'get' => [
-                            'responses' => [
-                                '200' => [
-                                    'schema' => [
-                                        'items' => [
-                                            '$ref' => '#/definitions/Foo-foo_read',
-                                        ],
-                                    ],
-                                ],
-                            ],
-                            'parameters' => [
-                                [
-                                    'name' => 'bar',
-                                ],
-                                [
-                                    'name' => 'bar[]',
+        $swaggerDocument = [
+            'paths' => new \ArrayObject([
+                '/dummies' => [
+                    'post' => new \ArrayObject([
+                        'parameters' => [
+                            [
+                                'name' => 'dummy',
+                                'in' => 'body',
+                                'schema' => [
+                                    '$ref' => '#/definitions/Dummy',
                                 ],
                             ],
                         ],
-                        'post' => [
-                            'parameters' => [
-                                [
-                                    'name' => 'foo',
-                                    'schema' => [
-                                        '$ref' => '#/definitions/Foo-foo_write',
-                                    ],
+                        'responses' => [
+                            201 => [
+                                'schema' => [
+                                    '$ref' => '#/definitions/Dummy-list_details',
                                 ],
                             ],
-                            'responses' => [
-                                '201' => [
-                                    'schema' => [
-                                        'items' => [
-                                            '$ref' => '#/definitions/Foo-foo_read',
-                                        ],
+                        ],
+                    ]),
+                    'get' => new \ArrayObject([
+                        'parameters' => [
+                            [
+                                'name' => 'relatedDummy',
+                                'in' => 'query',
+                                'required' => false,
+                                'type' => 'string',
+                            ],
+                            [
+                                'name' => 'relatedDummy[]',
+                                'in' => 'query',
+                                'required' => false,
+                                'type' => 'string',
+                            ],
+                        ],
+                        'responses' => [
+                            200 => [
+                                'schema' => [
+                                    'type' => 'array',
+                                    'items' => [
+                                        '$ref' => '#/definitions/Dummy-list',
                                     ],
                                 ],
                             ],
                         ],
-                    ],
+                    ]),
                 ],
-                'definitions' => new \ArrayObject([
-                    'Foo-foo_write' => [
-                        'properties' => [
-                            'bar' => [
-                                '$ref' => '#/definitions/Bar-bar_read',
-                            ],
-                        ],
-                    ],
-                    'Foo-foo_read' => [
-                        'properties' => [
-                            'id' => [
-                                'readOnly' => true,
-                                'type' => 'integer',
-                            ],
-                            'bar' => [
-                                '$ref' => '#/definitions/Bar-bar_write',
-                            ],
-                        ],
-                    ],
-                    'Bar-bar_write' => [
-                        'properties' => [
-                            'foo' => [
+                '/dummies/{id}' => [
+                    'get' => new \ArrayObject([
+                        'parameters' => [
+                            [
+                                'name' => 'id',
+                                'in' => 'path',
+                                'required' => true,
                                 'type' => 'string',
                             ],
                         ],
-                    ],
-                    'Bar-bar_read' => [
-                        'properties' => [
-                            'id' => [
-                                'readOnly' => true,
-                                'type' => 'integer',
+                        'responses' => [
+                            200 => [
+                                'schema' => [
+                                    '$ref' => '#/definitions/Dummy-list_details',
+                                ],
                             ],
-                            'foo' => [
-                                'type' => 'string',
+                        ],
+                    ]),
+                ],
+                '/dummies/{id}/what' => [
+                    'post' => new \ArrayObject([
+                        'parameters' => [
+                            [
+                                'name' => 'dummy',
+                                'in' => 'body',
+                                'schema' => [
+                                    '$ref' => '#/definitions/Dummy:InputDto',
+                                ],
                             ],
+                        ],
+                        'responses' => [
+                            200 => [
+                                'schema' => [
+                                    '$ref' => '#/definitions/Dummy:OutputDto',
+                                ],
+                            ],
+                        ],
+                    ]),
+                ],
+            ]),
+            'definitions' => new \ArrayObject([
+                'Dummy' => new \ArrayObject([
+                    'properties' => [
+                        'id' => [
+                            'readOnly' => true,
+                            'type' => 'integer',
+                        ],
+                        'description' => [
+                            'type' => 'string',
                         ],
                     ],
                 ]),
-            ])
-            ->shouldBeCalledTimes(1);
-        $this->assertEquals([
-            'basePath' => '/',
-            'paths' => [
-                '/foo' => [
-                    'get' => [
-                        'responses' => [
-                            '200' => [
+                'Dummy-list' => new \ArrayObject([
+                    'properties' => [
+                        'id' => [
+                            'readOnly' => true,
+                            'type' => 'integer',
+                        ],
+                        'description' => [
+                            'type' => 'string',
+                        ],
+                    ],
+                ]),
+                'Dummy-list_details' => new \ArrayObject([
+                    'properties' => [
+                        'id' => [
+                            'readOnly' => true,
+                            'type' => 'integer',
+                        ],
+                        'description' => [
+                            'type' => 'string',
+                        ],
+                        'relatedDummy' => new \ArrayObject([
+                            '$ref' => '#/definitions/RelatedDummy-list_details',
+                        ]),
+                    ],
+                ]),
+                'Dummy:OutputDto' => new \ArrayObject([
+                    'type' => 'object',
+                    'properties' => [
+                        'baz' => new \ArrayObject([
+                            'readOnly' => true,
+                            'type' => 'string',
+                        ]),
+                        'bat' => new \ArrayObject([
+                            'type' => 'integer',
+                        ]),
+                    ],
+                ]),
+                'Dummy:InputDto' => new \ArrayObject([
+                    'type' => 'object',
+                    'properties' => [
+                        'foo' => new \ArrayObject([
+                            'type' => 'string',
+                        ]),
+                        'bar' => new \ArrayObject([
+                            'type' => 'integer',
+                        ]),
+                    ],
+                ]),
+                'RelatedDummy-list_details' => new \ArrayObject([
+                    'type' => 'object',
+                    'properties' => [
+                        'name' => new \ArrayObject([
+                            'type' => 'string',
+                        ]),
+                    ],
+                ]),
+            ]),
+        ];
+
+        $modifiedSwaggerDocument = [
+            'paths' => new \ArrayObject([
+                '/dummies' => [
+                    'post' => new \ArrayObject([
+                        'parameters' => [
+                            [
+                                'name' => 'dummy',
+                                'in' => 'body',
                                 'schema' => [
+                                    '$ref' => '#/definitions/Dummy',
+                                ],
+                            ],
+                        ],
+                        'responses' => [
+                            201 => [
+                                'schema' => [
+                                    '$ref' => '#/definitions/Dummylistdetails',
+                                ],
+                            ],
+                        ],
+                    ]),
+                    'get' => new \ArrayObject([
+                        'parameters' => [
+                            [
+                                'name' => 'relatedDummy',
+                                'in' => 'query',
+                                'required' => false,
+                                'type' => 'string',
+                            ],
+                        ],
+                        'responses' => [
+                            200 => [
+                                'schema' => [
+                                    'type' => 'array',
                                     'items' => [
-                                        '$ref' => '#/definitions/Foofooread',
+                                        '$ref' => '#/definitions/Dummylist',
                                     ],
                                 ],
                             ],
                         ],
+                    ]),
+                ],
+                '/dummies/{id}' => [
+                    'get' => new \ArrayObject([
                         'parameters' => [
                             [
-                                'name' => 'bar',
+                                'name' => 'id',
+                                'in' => 'path',
+                                'required' => true,
+                                'type' => 'string',
                             ],
                         ],
-                    ],
-                    'post' => [
+                        'responses' => [
+                            200 => [
+                                'schema' => [
+                                    '$ref' => '#/definitions/Dummylistdetails',
+                                ],
+                            ],
+                        ],
+                    ]),
+                ],
+                '/dummies/{id}/what' => [
+                    'post' => new \ArrayObject([
                         'parameters' => [
                             [
-                                'name' => 'foo',
+                                'name' => 'dummy',
+                                'in' => 'body',
                                 'schema' => [
-                                    '$ref' => '#/definitions/Foofoowrite',
+                                    '$ref' => '#/definitions/DummyInputDto',
                                 ],
                             ],
                         ],
                         'responses' => [
-                            '201' => [
+                            200 => [
                                 'schema' => [
-                                    'items' => [
-                                        '$ref' => '#/definitions/Foofooread',
-                                    ],
+                                    '$ref' => '#/definitions/DummyOutputDto',
                                 ],
                             ],
                         ],
-                    ],
-                ],
-            ],
-            'definitions' => new \ArrayObject([
-                'Foofoowrite' => [
-                    'properties' => [
-                        'bar' => [
-                            '$ref' => '#/definitions/Barbarread',
-                        ],
-                    ],
-                ],
-                'Foofooread' => [
-                    'properties' => [
-                        'id' => [
-                            'type' => 'integer',
-                        ],
-                        'bar' => [
-                            '$ref' => '#/definitions/Barbarwrite',
-                        ],
-                    ],
-                ],
-                'Barbarwrite' => [
-                    'properties' => [
-                        'foo' => [
-                            'type' => 'string',
-                        ],
-                    ],
-                ],
-                'Barbarread' => [
-                    'properties' => [
-                        'id' => [
-                            'type' => 'integer',
-                        ],
-                        'foo' => [
-                            'type' => 'string',
-                        ],
-                    ],
+                    ]),
                 ],
             ]),
-        ], $this->normalizer->normalize($this->objectProphecy->reveal(), 'jsonld', ['api_gateway' => true]));
+            'definitions' => new \ArrayObject([
+                'Dummy' => new \ArrayObject([
+                    'properties' => [
+                        'id' => [
+                            'type' => 'integer',
+                        ],
+                        'description' => [
+                            'type' => 'string',
+                        ],
+                    ],
+                ]),
+                'Dummylist' => new \ArrayObject([
+                    'properties' => [
+                        'id' => [
+                            'type' => 'integer',
+                        ],
+                        'description' => [
+                            'type' => 'string',
+                        ],
+                    ],
+                ]),
+                'Dummylistdetails' => new \ArrayObject([
+                    'properties' => [
+                        'id' => [
+                            'type' => 'integer',
+                        ],
+                        'description' => [
+                            'type' => 'string',
+                        ],
+                        'relatedDummy' => new \ArrayObject([
+                            '$ref' => '#/definitions/RelatedDummylistdetails',
+                        ]),
+                    ],
+                ]),
+                'DummyOutputDto' => new \ArrayObject([
+                    'type' => 'object',
+                    'properties' => [
+                        'baz' => new \ArrayObject([
+                            'type' => 'string',
+                        ]),
+                        'bat' => new \ArrayObject([
+                            'type' => 'integer',
+                        ]),
+                    ],
+                ]),
+                'DummyInputDto' => new \ArrayObject([
+                    'type' => 'object',
+                    'properties' => [
+                        'foo' => new \ArrayObject([
+                            'type' => 'string',
+                        ]),
+                        'bar' => new \ArrayObject([
+                            'type' => 'integer',
+                        ]),
+                    ],
+                ]),
+                'RelatedDummylistdetails' => new \ArrayObject([
+                    'type' => 'object',
+                    'properties' => [
+                        'name' => new \ArrayObject([
+                            'type' => 'string',
+                        ]),
+                    ],
+                ]),
+            ]),
+            'basePath' => '/',
+        ];
+
+        $documentationNormalizerProphecy = $this->prophesize(NormalizerInterface::class);
+        $documentationNormalizerProphecy->normalize($documentation, DocumentationNormalizer::FORMAT, [
+            'spec_version' => 2,
+            ApiGatewayNormalizer::API_GATEWAY => true,
+        ])->willReturn($swaggerDocument);
+
+        $normalizer = new ApiGatewayNormalizer($documentationNormalizerProphecy->reveal());
+
+        $this->assertEquals($modifiedSwaggerDocument, $normalizer->normalize($documentation, DocumentationNormalizer::FORMAT, [
+            'spec_version' => 2,
+            ApiGatewayNormalizer::API_GATEWAY => true,
+        ]));
+    }
+
+    public function testNormalizeNotInApiGatewayContext(): void
+    {
+        $documentation = new Documentation(new ResourceNameCollection([
+            Dummy::class,
+        ]));
+
+        $swaggerDocument = [
+            'paths' => new \ArrayObject([
+                '/dummies' => [
+                    'post' => new \ArrayObject([
+                        'parameters' => [
+                            [
+                                'name' => 'dummy',
+                                'in' => 'body',
+                                'schema' => [
+                                    '$ref' => '#/definitions/Dummy',
+                                ],
+                            ],
+                        ],
+                        'responses' => [
+                            201 => [
+                                'schema' => [
+                                    '$ref' => '#/definitions/Dummy-list_details',
+                                ],
+                            ],
+                        ],
+                    ]),
+                    'get' => new \ArrayObject([
+                        'parameters' => [
+                            [
+                                'name' => 'relatedDummy',
+                                'in' => 'query',
+                                'required' => false,
+                                'type' => 'string',
+                            ],
+                            [
+                                'name' => 'relatedDummy[]',
+                                'in' => 'query',
+                                'required' => false,
+                                'type' => 'string',
+                            ],
+                        ],
+                        'responses' => [
+                            200 => [
+                                'schema' => [
+                                    'type' => 'array',
+                                    'items' => [
+                                        '$ref' => '#/definitions/Dummy-list',
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ]),
+                ],
+                '/dummies/{id}' => [
+                    'get' => new \ArrayObject([
+                        'parameters' => [
+                            [
+                                'name' => 'id',
+                                'in' => 'path',
+                                'required' => true,
+                                'type' => 'string',
+                            ],
+                        ],
+                        'responses' => [
+                            200 => [
+                                'schema' => [
+                                    '$ref' => '#/definitions/Dummy-list_details',
+                                ],
+                            ],
+                        ],
+                    ]),
+                ],
+                '/dummies/{id}/what' => [
+                    'post' => new \ArrayObject([
+                        'parameters' => [
+                            [
+                                'name' => 'dummy',
+                                'in' => 'body',
+                                'schema' => [
+                                    '$ref' => '#/definitions/Dummy:InputDto',
+                                ],
+                            ],
+                        ],
+                        'responses' => [
+                            200 => [
+                                'schema' => [
+                                    '$ref' => '#/definitions/Dummy:OutputDto',
+                                ],
+                            ],
+                        ],
+                    ]),
+                ],
+            ]),
+            'definitions' => new \ArrayObject([
+                'Dummy' => new \ArrayObject([
+                    'properties' => [
+                        'id' => [
+                            'readOnly' => true,
+                            'type' => 'integer',
+                        ],
+                        'description' => [
+                            'type' => 'string',
+                        ],
+                    ],
+                ]),
+                'Dummy-list' => new \ArrayObject([
+                    'properties' => [
+                        'id' => [
+                            'readOnly' => true,
+                            'type' => 'integer',
+                        ],
+                        'description' => [
+                            'type' => 'string',
+                        ],
+                    ],
+                ]),
+                'Dummy-list_details' => new \ArrayObject([
+                    'properties' => [
+                        'id' => [
+                            'readOnly' => true,
+                            'type' => 'integer',
+                        ],
+                        'description' => [
+                            'type' => 'string',
+                        ],
+                        'relatedDummy' => new \ArrayObject([
+                            '$ref' => '#/definitions/RelatedDummy-list_details',
+                        ]),
+                    ],
+                ]),
+                'Dummy:OutputDto' => new \ArrayObject([
+                    'type' => 'object',
+                    'properties' => [
+                        'baz' => new \ArrayObject([
+                            'readOnly' => true,
+                            'type' => 'string',
+                        ]),
+                        'bat' => new \ArrayObject([
+                            'type' => 'integer',
+                        ]),
+                    ],
+                ]),
+                'Dummy:InputDto' => new \ArrayObject([
+                    'type' => 'object',
+                    'properties' => [
+                        'foo' => new \ArrayObject([
+                            'type' => 'string',
+                        ]),
+                        'bar' => new \ArrayObject([
+                            'type' => 'integer',
+                        ]),
+                    ],
+                ]),
+                'RelatedDummy-list_details' => new \ArrayObject([
+                    'type' => 'object',
+                    'properties' => [
+                        'name' => new \ArrayObject([
+                            'type' => 'string',
+                        ]),
+                    ],
+                ]),
+            ]),
+        ];
+
+        $documentationNormalizerProphecy = $this->prophesize(NormalizerInterface::class);
+        $documentationNormalizerProphecy->normalize($documentation, DocumentationNormalizer::FORMAT, [
+            'spec_version' => 2,
+        ])->willReturn($swaggerDocument);
+
+        $normalizer = new ApiGatewayNormalizer($documentationNormalizerProphecy->reveal());
+
+        $this->assertEquals($swaggerDocument, $normalizer->normalize($documentation, DocumentationNormalizer::FORMAT, [
+            'spec_version' => 2,
+        ]));
     }
 }
