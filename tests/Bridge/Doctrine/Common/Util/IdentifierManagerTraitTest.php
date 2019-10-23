@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\Bridge\Doctrine\Common\Util;
 
 use ApiPlatform\Core\Bridge\Doctrine\Common\Util\IdentifierManagerTrait;
+use ApiPlatform\Core\Exception\InvalidIdentifierException;
 use ApiPlatform\Core\Exception\PropertyNotFoundException;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
@@ -31,6 +32,7 @@ use Doctrine\ODM\MongoDB\Mapping\ClassMetadata as MongoDbOdmClassMetadata;
 use Doctrine\ODM\MongoDB\Types\Type as MongoDbType;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\TestCase;
+use Ramsey\Uuid\Doctrine\UuidType;
 
 class IdentifierManagerTraitTest extends TestCase
 {
@@ -203,5 +205,29 @@ class IdentifierManagerTraitTest extends TestCase
         $managerProphecy->getClassMetadata($resourceClass)->willReturn($classMetadataProphecy->reveal());
 
         return $managerProphecy->reveal();
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testInvalidIdentifierConversion()
+    {
+        DBALType::addType('uuid', UuidType::class);
+
+        $this->expectException(InvalidIdentifierException::class);
+        $this->expectExceptionMessage('Invalid value "ida" provided for an identifier.');
+
+        [$propertyNameCollectionFactory, $propertyMetadataFactory] = $this->getMetadataFactories(Dummy::class, [
+            'ida',
+        ]);
+        $objectManager = $this->getEntityManager(Dummy::class, [
+            'ida' => [
+                'type' => 'uuid',
+            ],
+        ]);
+
+        $identifierManager = $this->getIdentifierManagerTraitImpl($propertyNameCollectionFactory, $propertyMetadataFactory);
+
+        $identifierManager->normalizeIdentifiers('notanuuid', $objectManager, Dummy::class);
     }
 }
