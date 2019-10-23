@@ -335,6 +335,8 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
      */
     private function registerSwaggerConfiguration(ContainerBuilder $container, array $config, XmlFileLoader $loader): void
     {
+        $container->setParameter('api_platform.swagger.versions', $config['swagger']['versions']);
+
         if (empty($config['swagger']['versions'])) {
             return;
         }
@@ -348,7 +350,6 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             $container->setParameter('api_platform.enable_re_doc', $config['enable_re_doc']);
         }
 
-        $container->setParameter('api_platform.swagger.versions', $config['swagger']['versions']);
         $container->setParameter('api_platform.swagger.api_keys', $config['swagger']['api_keys']);
     }
 
@@ -369,6 +370,10 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
 
         $loader->load('jsonld.xml');
         $loader->load('hydra.xml');
+
+        if (!$container->has('api_platform.json_schema.schema_factory')) {
+            $container->removeDefinition('api_platform.hydra.json_schema.schema_factory');
+        }
 
         if (!$docEnabled) {
             $container->removeDefinition('api_platform.hydra.listener.response.add_link_header');

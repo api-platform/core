@@ -23,24 +23,20 @@ cache:
   - &install-symfony-flex |
       composer global require --prefer-dist --no-progress --no-suggest --ansi \
         symfony/flex
-  - &run-behat-tests |
-      vendor/bin/behat --format=progress --no-interaction --colors
-  - &run-phpunit-tests |
-      vendor/bin/phpunit --colors=always
   - &update-project-dependencies |
       composer update --no-progress --no-suggest --ansi
   - &validate-openapi-v2-json |
-      tests/Fixtures/app/console api:swagger:export > swagger.json && npx swagger-cli validate swagger.json && rm swagger.json
+      npx swagger-cli validate <(tests/Fixtures/app/console api:swagger:export)
   - &validate-openapi-v2-yaml |
-      tests/Fixtures/app/console api:swagger:export --yaml > swagger.yaml && npx swagger-cli validate swagger.yaml && rm swagger.yaml
+      npx swagger-cli validate <(tests/Fixtures/app/console api:swagger:export --yaml)
   - &validate-openapi-v3-json |
-      tests/Fixtures/app/console api:openapi:export --spec-version 3 > swagger.json && npx swagger-cli validate swagger.json && rm swagger.json
+      npx swagger-cli validate <(tests/Fixtures/app/console api:openapi:export --spec-version 3)
   - &validate-openapi-v3-yaml |
-      tests/Fixtures/app/console api:openapi:export --spec-version 3 --yaml > swagger.yaml && npx swagger-cli validate swagger.yaml && rm swagger.yaml
+      npx swagger-cli validate <(tests/Fixtures/app/console api:openapi:export --spec-version 3 --yaml)
 
 jobs:
   include:
-    - name: 'Behat (PHP 7.1)'
+    - name: '(PHP 7.1)'
       php: '7.1'
       before_install:
         - *disable-xdebug-php-extension
@@ -55,13 +51,12 @@ jobs:
       before_script:
         - *clear-test-app-cache
       script:
-        - *run-behat-tests
         - *validate-openapi-v2-json
         - *validate-openapi-v2-yaml
         - *validate-openapi-v3-json
         - *validate-openapi-v3-yaml
 
-    - name: 'Behat (PHP 7.2)'
+    - name: '(PHP 7.2)'
       php: '7.2'
       before_install:
         - *enable-mongodb-php-extension
@@ -73,13 +68,12 @@ jobs:
       before_script:
         - *clear-test-app-cache
       script:
-        - *run-behat-tests
         - *validate-openapi-v2-json
         - *validate-openapi-v2-yaml
         - *validate-openapi-v3-json
         - *validate-openapi-v3-yaml
 
-    - name: 'Behat (PHP 7.3)'
+    - name: '(PHP 7.3)'
       php: '7.3'
       before_install:
         - *enable-mongodb-php-extension
@@ -91,13 +85,12 @@ jobs:
       before_script:
         - *clear-test-app-cache
       script:
-        - *run-behat-tests
         - *validate-openapi-v2-json
         - *validate-openapi-v2-yaml
         - *validate-openapi-v3-json
         - *validate-openapi-v3-yaml
 
-    - name: 'Behat (PHP 7.4-rc)'
+    - name: '(PHP 7.4-rc)'
       php: '7.4snapshot'
       env: LEGACY=0
       before_install:
@@ -110,13 +103,12 @@ jobs:
       before_script:
         - *clear-test-app-cache
       script:
-        - vendor/bin/behat --format=progress --profile=default-no-legacy --no-interaction --colors
         - *validate-openapi-v2-json
         - *validate-openapi-v2-yaml
         - *validate-openapi-v3-json
         - *validate-openapi-v3-yaml
 
-    - name: 'Behat (PHP 7.3) (lowest dependencies)'
+    - name: '(PHP 7.3) (lowest dependencies)'
       php: '7.3'
       before_install:
         - *enable-mongodb-php-extension
@@ -128,13 +120,12 @@ jobs:
       before_script:
         - *clear-test-app-cache
       script:
-        - *run-behat-tests
         - *validate-openapi-v2-json
         - *validate-openapi-v2-yaml
         - *validate-openapi-v3-json
         - *validate-openapi-v3-yaml
 
-    - name: 'Behat (PHP 7.4-rc) (lowest dependencies)'
+    - name: '(PHP 7.4-rc) (lowest dependencies)'
       php: '7.4snapshot'
       env: LEGACY=0
       before_install:
@@ -147,13 +138,12 @@ jobs:
       before_script:
         - *clear-test-app-cache
       script:
-        - vendor/bin/behat --format=progress --profile=default-no-legacy --no-interaction --colors
         - *validate-openapi-v2-json
         - *validate-openapi-v2-yaml
         - *validate-openapi-v3-json
         - *validate-openapi-v3-yaml
 
-    - name: 'Behat (PHP 7.3) (PostgreSQL)'
+    - name: '(PHP 7.3) (PostgreSQL)'
       php: '7.3'
       env: >-
         APP_ENV=postgres
@@ -173,13 +163,12 @@ jobs:
         - *clear-test-app-cache
         - *create-test-database
       script:
-        - vendor/bin/behat --format=progress --profile=postgres --no-interaction
         - *validate-openapi-v2-json
         - *validate-openapi-v2-yaml
         - *validate-openapi-v3-json
         - *validate-openapi-v3-yaml
 
-    - name: 'Behat (PHP 7.3) (MySQL)'
+    - name: '(PHP 7.3) (MySQL)'
       php: '7.3'
       env: >-
         APP_ENV=mysql
@@ -187,6 +176,15 @@ jobs:
       services:
         - mysql
       before_install:
+        - sudo systemctl stop mysql
+        - sudo mv /var/lib/mysql /var/ramfs/mysql
+        - sudo ln -s /var/ramfs/mysql /var/lib/mysql
+        - |
+          {
+            echo '[mysqld]';
+            echo 'innodb_flush_log_at_trx_commit=0';
+          } | sudo tee /etc/mysql/conf.d/performance.cnf
+        - sudo systemctl start mysql
         - *enable-mongodb-php-extension
         - *disable-xdebug-php-extension
         - *disable-php-memory-limit
@@ -197,13 +195,12 @@ jobs:
         - *clear-test-app-cache
         - *create-test-database
       script:
-        - *run-behat-tests
         - *validate-openapi-v2-json
         - *validate-openapi-v2-yaml
         - *validate-openapi-v3-json
         - *validate-openapi-v3-yaml
 
-    - name: 'Behat (PHP 7.3) (MongoDB)'
+    - name: '(PHP 7.3) (MongoDB)'
       php: '7.3'
       env: APP_ENV=mongodb
       services:
@@ -218,13 +215,12 @@ jobs:
       before_script:
         - *clear-test-app-cache
       script:
-        - vendor/bin/behat --format=progress --profile=mongodb --no-interaction
         - *validate-openapi-v2-json
         - *validate-openapi-v2-yaml
         - *validate-openapi-v3-json
         - *validate-openapi-v3-yaml
 
-    - name: 'Behat (PHP 7.3) (Elasticsearch)'
+    - name: '(PHP 7.3) (Elasticsearch)'
       php: '7.3'
       env: APP_ENV=elasticsearch
       before_install:
@@ -243,7 +239,6 @@ jobs:
       before_script:
         - *clear-test-app-cache
       script:
-        - vendor/bin/behat --format=progress --profile=elasticsearch --no-interaction
         - *validate-openapi-v2-json
         - *validate-openapi-v2-yaml
         - *validate-openapi-v3-json

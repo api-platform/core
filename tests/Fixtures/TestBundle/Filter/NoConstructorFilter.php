@@ -11,12 +11,21 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Doctrine\Orm\Filter;
+namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Filter;
 
-class AnotherDummyFilter
+use ApiPlatform\Core\Api\FilterInterface;
+
+final class NoConstructorFilter implements FilterInterface
 {
+    /**
+     * {@inheritdoc}
+     */
     public function getDescription(string $resourceClass): array
     {
-        return [];
+        return [
+            'property' => 'foo',
+            'type' => '',
+            'required' => false,
+        ];
     }
 }
