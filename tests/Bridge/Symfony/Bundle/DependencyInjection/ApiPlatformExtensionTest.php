@@ -761,7 +761,46 @@ class ApiPlatformExtensionTest extends TestCase
         $this->extension->load(self::DEFAULT_CONFIG, $containerBuilder);
     }
 
-    private function getPartialContainerBuilderProphecy()
+    public function testDisabledSwaggerAndHydra()
+    {
+        $config = self::DEFAULT_CONFIG;
+        $config['api_platform']['enable_swagger'] = false;
+        $config['api_platform']['enable_swagger_ui'] = false;
+        $config['api_platform']['formats'] = [
+            'jsonhal' => ['mime_types' => ['application/hal+json']],
+        ];
+
+        $containerBuilderProphecy = $this->getBaseContainerBuilderProphecy(['orm'], $config);
+        $containerBuilderProphecy->setDefinition('api_platform.swagger.action.ui', Argument::type(Definition::class))->shouldNotBeCalled();
+        $containerBuilderProphecy->setDefinition('api_platform.swagger.listener.ui', Argument::type(Definition::class))->shouldNotBeCalled();
+        $containerBuilderProphecy->setParameter('api_platform.enable_swagger_ui', true)->shouldNotBeCalled();
+        $containerBuilderProphecy->setParameter('api_platform.enable_swagger_ui', true)->shouldNotBeCalled();
+        $containerBuilderProphecy->setParameter('api_platform.enable_swagger_ui', false)->shouldNotBeCalled();
+        $containerBuilderProphecy->setParameter('api_platform.enable_re_doc', true)->shouldNotBeCalled();
+        $containerBuilderProphecy->setParameter('api_platform.enable_re_doc', false)->shouldNotBeCalled();
+        $containerBuilder = $containerBuilderProphecy->reveal();
+        $this->extension->load($config, $containerBuilder);
+    }
+
+    public function testDisabledSwagger()
+    {
+        $config = self::DEFAULT_CONFIG;
+        $config['api_platform']['enable_swagger'] = false;
+        $config['api_platform']['enable_swagger_ui'] = false;
+
+        $containerBuilderProphecy = $this->getBaseContainerBuilderProphecy(['orm'], $config);
+        $containerBuilderProphecy->setDefinition('api_platform.swagger.action.ui', Argument::type(Definition::class))->shouldNotBeCalled();
+        $containerBuilderProphecy->setDefinition('api_platform.swagger.listener.ui', Argument::type(Definition::class))->shouldNotBeCalled();
+        $containerBuilderProphecy->setParameter('api_platform.enable_swagger_ui', true)->shouldNotBeCalled();
+        $containerBuilderProphecy->setParameter('api_platform.enable_swagger_ui', true)->shouldNotBeCalled();
+        $containerBuilderProphecy->setParameter('api_platform.enable_swagger_ui', false)->shouldNotBeCalled();
+        $containerBuilderProphecy->setParameter('api_platform.enable_re_doc', true)->shouldNotBeCalled();
+        $containerBuilderProphecy->setParameter('api_platform.enable_re_doc', false)->shouldNotBeCalled();
+        $containerBuilder = $containerBuilderProphecy->reveal();
+        $this->extension->load($config, $containerBuilder);
+    }
+
+    private function getPartialContainerBuilderProphecy($configuration = null)
     {
         $parameterBag = new EnvPlaceholderParameterBag();
 
@@ -787,7 +826,7 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.collection.order_parameter_name' => 'order',
             'api_platform.description' => 'description',
             'api_platform.error_formats' => ['jsonproblem' => ['application/problem+json'], 'jsonld' => ['application/ld+json']],
-            'api_platform.formats' => ['jsonld' => ['application/ld+json'], 'jsonhal' => ['application/hal+json']],
+            'api_platform.formats' => null === $configuration ? ['jsonld' => ['application/ld+json'], 'jsonhal' => ['application/hal+json']] : $this->getFormatsFromConfiguration($configuration['api_platform']['formats']) ?? [],
             'api_platform.patch_formats' => [],
             'api_platform.exception_to_status' => [
                 ExceptionInterface::class => Response::HTTP_BAD_REQUEST,
@@ -982,9 +1021,12 @@ class ApiPlatformExtensionTest extends TestCase
         return $containerBuilderProphecy;
     }
 
-    private function getBaseContainerBuilderProphecy(array $doctrineIntegrationsToLoad = ['orm'])
+    private function getBaseContainerBuilderProphecy(array $doctrineIntegrationsToLoad = ['orm'], $configuration = null)
     {
-        $containerBuilderProphecy = $this->getPartialContainerBuilderProphecy();
+        $hasSwagger = null === $configuration || true === $configuration['api_platform']['enable_swagger'] ?? false;
+        $hasHydra = null === $configuration || isset($configuration['api_platform']['formats']['jsonld']);
+
+        $containerBuilderProphecy = $this->getPartialContainerBuilderProphecy($configuration);
 
         $containerBuilderProphecy->hasParameter('kernel.debug')->willReturn(true);
         $containerBuilderProphecy->getParameter('kernel.debug')->willReturn(false);
@@ -1068,8 +1110,6 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.oauth.tokenUrl' => '/oauth/v2/token',
             'api_platform.oauth.authorizationUrl' => '/oauth/v2/auth',
             'api_platform.oauth.scopes' => [],
-            'api_platform.swagger.versions' => [2, 3],
-            'api_platform.swagger.api_keys' => [],
             'api_platform.enable_swagger_ui' => true,
             'api_platform.enable_re_doc' => true,
             'api_platform.graphql.enabled' => true,
@@ -1083,6 +1123,13 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.elasticsearch.enabled' => false,
             'api_platform.defaults' => ['attributes' => []],
         ];
+
+        if ($hasSwagger) {
+            $parameters['api_platform.swagger.versions'] = [2, 3];
+            $parameters['api_platform.swagger.api_keys'] = [];
+        } else {
+            $parameters['api_platform.swagger.versions'] = [];
+        }
 
         foreach ($parameters as $key => $value) {
             $containerBuilderProphecy->setParameter($key, $value)->shouldBeCalled();
@@ -1159,20 +1206,6 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.http_cache.listener.response.configure',
             'api_platform.http_cache.purger.varnish_client',
             'api_platform.http_cache.purger.varnish',
-            'api_platform.hydra.listener.response.add_link_header',
-            'api_platform.hydra.normalizer.collection',
-            'api_platform.hydra.normalizer.collection_filters',
-            'api_platform.hydra.normalizer.constraint_violation_list',
-            'api_platform.hydra.normalizer.documentation',
-            'api_platform.hydra.normalizer.entrypoint',
-            'api_platform.hydra.normalizer.error',
-            'api_platform.hydra.normalizer.partial_collection_view',
-            'api_platform.hydra.json_schema.schema_factory',
-            'api_platform.jsonld.action.context',
-            'api_platform.jsonld.context_builder',
-            'api_platform.jsonld.encoder',
-            'api_platform.jsonld.normalizer.item',
-            'api_platform.jsonld.normalizer.object',
             'api_platform.listener.view.validate',
             'api_platform.listener.view.validate_query_parameters',
             'api_platform.mercure.listener.response.add_link_header',
@@ -1196,13 +1229,7 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.problem.normalizer.constraint_violation_list',
             'api_platform.problem.normalizer.error',
             'api_platform.swagger.action.ui',
-            'api_platform.swagger.command.swagger_command',
             'api_platform.swagger.listener.ui',
-            'api_platform.swagger.normalizer.api_gateway',
-            'api_platform.swagger.normalizer.documentation',
-            'api_platform.json_schema.type_factory',
-            'api_platform.json_schema.schema_factory',
-            'api_platform.json_schema.json_schema_generate_command',
             'api_platform.validator',
             'test.api_platform.client',
         ];
@@ -1235,6 +1262,41 @@ class ApiPlatformExtensionTest extends TestCase
             $definitions[] = 'api_platform.doctrine.metadata_factory';
         }
 
+        // Only when swagger is enabled
+        if ($hasSwagger) {
+            $definitions[] = 'api_platform.swagger.command.swagger_command';
+            $definitions[] = 'api_platform.swagger.normalizer.api_gateway';
+            $definitions[] = 'api_platform.swagger.normalizer.documentation';
+            $definitions[] = 'api_platform.json_schema.type_factory';
+            $definitions[] = 'api_platform.json_schema.schema_factory';
+            $definitions[] = 'api_platform.json_schema.json_schema_generate_command';
+        }
+
+        // has jsonld
+        if ($hasHydra) {
+            $containerBuilderProphecy->has('api_platform.json_schema.schema_factory')->shouldBeCalled()->willReturn($hasSwagger);
+
+            if (!$hasSwagger) {
+                $containerBuilderProphecy->has('api_platform.json_schema.schema_factory')->shouldBeCalled()->willReturn(false);
+                $containerBuilderProphecy->removeDefinition('api_platform.hydra.json_schema.schema_factory')->shouldBeCalled();
+            }
+
+            $definitions[] = 'api_platform.hydra.json_schema.schema_factory';
+            $definitions[] = 'api_platform.hydra.listener.response.add_link_header';
+            $definitions[] = 'api_platform.hydra.normalizer.collection';
+            $definitions[] = 'api_platform.hydra.normalizer.collection_filters';
+            $definitions[] = 'api_platform.hydra.normalizer.constraint_violation_list';
+            $definitions[] = 'api_platform.hydra.normalizer.documentation';
+            $definitions[] = 'api_platform.hydra.normalizer.entrypoint';
+            $definitions[] = 'api_platform.hydra.normalizer.error';
+            $definitions[] = 'api_platform.hydra.normalizer.partial_collection_view';
+            $definitions[] = 'api_platform.jsonld.action.context';
+            $definitions[] = 'api_platform.jsonld.context_builder';
+            $definitions[] = 'api_platform.jsonld.encoder';
+            $definitions[] = 'api_platform.jsonld.normalizer.item';
+            $definitions[] = 'api_platform.jsonld.normalizer.object';
+        }
+
         foreach ($definitions as $definition) {
             $containerBuilderProphecy->setDefinition($definition, Argument::type(Definition::class))->shouldBeCalled();
         }
@@ -1256,8 +1318,6 @@ class ApiPlatformExtensionTest extends TestCase
             NumericFilter::class => 'api_platform.doctrine.orm.numeric_filter',
             ExistsFilter::class => 'api_platform.doctrine.orm.exists_filter',
             GraphQlSerializerContextBuilderInterface::class => 'api_platform.graphql.serializer.context_builder',
-            TypeFactoryInterface::class => 'api_platform.json_schema.type_factory',
-            SchemaFactoryInterface::class => 'api_platform.json_schema.schema_factory',
         ];
 
         if (\in_array('odm', $doctrineIntegrationsToLoad, true)) {
@@ -1275,6 +1335,14 @@ class ApiPlatformExtensionTest extends TestCase
             ];
         }
 
+        // Only when swagger is enabled
+        if ($hasSwagger) {
+            $aliases += [
+                TypeFactoryInterface::class => 'api_platform.json_schema.type_factory',
+                SchemaFactoryInterface::class => 'api_platform.json_schema.schema_factory',
+            ];
+        }
+
         foreach ($aliases as $alias => $service) {
             $containerBuilderProphecy->setAlias($alias, $service)->shouldBeCalled();
         }
@@ -1288,5 +1356,22 @@ class ApiPlatformExtensionTest extends TestCase
         $containerBuilderProphecy->getDefinition('api_platform.doctrine.listener.mercure.publish')->willReturn($definitionDummy);
 
         return $containerBuilderProphecy;
+    }
+
+    private function getFormatsFromConfiguration(array $formatsConfiguration)
+    {
+        $formats = [];
+
+        foreach ($formatsConfiguration as $format => $mimeTypes) {
+            if (!isset($formats[$format])) {
+                $formats[$format] = [];
+            }
+
+            foreach ($mimeTypes['mime_types'] as $mimeType) {
+                $formats[$format][] = $mimeType;
+            }
+        }
+
+        return $formats;
     }
 }
