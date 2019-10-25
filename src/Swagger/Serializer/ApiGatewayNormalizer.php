@@ -31,7 +31,9 @@ final class ApiGatewayNormalizer implements NormalizerInterface, CacheableSuppor
     public const API_GATEWAY = 'api_gateway';
 
     private $documentationNormalizer;
-    private $defaultContext = [self::API_GATEWAY => false];
+    private $defaultContext = [
+        self::API_GATEWAY => false,
+    ];
 
     public function __construct(NormalizerInterface $documentationNormalizer, $defaultContext = [])
     {
@@ -66,19 +68,19 @@ final class ApiGatewayNormalizer implements NormalizerInterface, CacheableSuppor
                         if (!preg_match('/^[a-zA-Z0-9._$-]+$/', $parameter['name'])) {
                             unset($data['paths'][$path][$operation]['parameters'][$key]);
                         }
-                        if (isset($parameter['schema']['$ref']) && !preg_match('/^#\/definitions\/[A-z]+$/', $parameter['schema']['$ref'])) {
-                            $data['paths'][$path][$operation]['parameters'][$key]['schema']['$ref'] = str_replace(['-', '_'], '', $parameter['schema']['$ref']);
+                        if (isset($parameter['schema']['$ref']) && $this->isLocalRef($parameter['schema']['$ref'])) {
+                            $data['paths'][$path][$operation]['parameters'][$key]['schema']['$ref'] = $this->normalizeRef($parameter['schema']['$ref']);
                         }
                     }
                     $data['paths'][$path][$operation]['parameters'] = array_values($data['paths'][$path][$operation]['parameters']);
                 }
                 if (isset($options['responses'])) {
                     foreach ($options['responses'] as $statusCode => $response) {
-                        if (isset($response['schema']['items']['$ref']) && !preg_match('/^#\/definitions\/[A-z]+$/', $response['schema']['items']['$ref'])) {
-                            $data['paths'][$path][$operation]['responses'][$statusCode]['schema']['items']['$ref'] = str_replace(['-', '_'], '', $response['schema']['items']['$ref']);
+                        if (isset($response['schema']['items']['$ref']) && $this->isLocalRef($response['schema']['items']['$ref'])) {
+                            $data['paths'][$path][$operation]['responses'][$statusCode]['schema']['items']['$ref'] = $this->normalizeRef($response['schema']['items']['$ref']);
                         }
-                        if (isset($response['schema']['$ref']) && !preg_match('/^#\/definitions\/[A-z]+$/', $response['schema']['$ref'])) {
-                            $data['paths'][$path][$operation]['responses'][$statusCode]['schema']['$ref'] = str_replace(['-', '_'], '', $response['schema']['$ref']);
+                        if (isset($response['schema']['$ref']) && $this->isLocalRef($response['schema']['$ref'])) {
+                            $data['paths'][$path][$operation]['responses'][$statusCode]['schema']['$ref'] = $this->normalizeRef($response['schema']['$ref']);
                         }
                     }
                 }
@@ -93,19 +95,19 @@ final class ApiGatewayNormalizer implements NormalizerInterface, CacheableSuppor
                 if (isset($propertyOptions['readOnly'])) {
                     unset($data['definitions'][$definition]['properties'][$property]['readOnly']);
                 }
-                if (isset($propertyOptions['$ref']) && !preg_match('/^#\/definitions\/[A-z]+$/', $propertyOptions['$ref'])) {
-                    $data['definitions'][$definition]['properties'][$property]['$ref'] = str_replace(['-', '_'], '', $propertyOptions['$ref']);
+                if (isset($propertyOptions['$ref']) && $this->isLocalRef($propertyOptions['$ref'])) {
+                    $data['definitions'][$definition]['properties'][$property]['$ref'] = $this->normalizeRef($propertyOptions['$ref']);
                 }
-                if (isset($propertyOptions['items']['$ref']) && !preg_match('/^#\/definitions\/[A-z]+$/', $propertyOptions['items']['$ref'])) {
-                    $data['definitions'][$definition]['properties'][$property]['items']['$ref'] = str_replace(['-', '_'], '', $propertyOptions['items']['$ref']);
+                if (isset($propertyOptions['items']['$ref']) && $this->isLocalRef($propertyOptions['items']['$ref'])) {
+                    $data['definitions'][$definition]['properties'][$property]['items']['$ref'] = $this->normalizeRef($propertyOptions['items']['$ref']);
                 }
             }
         }
 
         // $data['definitions'] is an instance of \ArrayObject
         foreach (array_keys($data['definitions']->getArrayCopy()) as $definition) {
-            if (!preg_match('/^[A-z]+$/', (string) $definition)) {
-                $data['definitions'][str_replace(['-', '_'], '', (string) $definition)] = $data['definitions'][$definition];
+            if (!preg_match('/^[0-9A-Za-z]+$/', (string) $definition)) {
+                $data['definitions'][preg_replace('/[^0-9A-Za-z]/', '', (string) $definition)] = $data['definitions'][$definition];
                 unset($data['definitions'][$definition]);
             }
         }
@@ -127,5 +129,21 @@ final class ApiGatewayNormalizer implements NormalizerInterface, CacheableSuppor
     public function hasCacheableSupportsMethod(): bool
     {
         return $this->documentationNormalizer instanceof CacheableSupportsMethodInterface && $this->documentationNormalizer->hasCacheableSupportsMethod();
+    }
+
+    private function isLocalRef(string $ref): bool
+    {
+        return '#/' === substr($ref, 0, 2);
+    }
+
+    private function normalizeRef(string $ref): string
+    {
+        $refParts = explode('/', $ref);
+
+        $schemaName = array_pop($refParts);
+        $schemaName = preg_replace('/[^0-9A-Za-z]/', '', $schemaName);
+        $refParts[] = $schemaName;
+
+        return implode('/', $refParts);
     }
 }
