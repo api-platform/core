@@ -20,7 +20,7 @@ default:
         - 'Behat\MinkExtension\Context\MinkContext'
         - 'Behatch\Context\RestContext'
       filters:
-        tags: '~@postgres&&~@mongodb&&~@elasticsearch'
+        tags: '~@postgres&&~@mongodb&&~@elasticsearch&&~@legacy'
   extensions:
     'Behat\Symfony2Extension':
       kernel:
@@ -35,12 +35,6 @@ default:
         default:
           symfony2: ~
     'Behatch\Extension': ~
-
-default-no-legacy:
-  suites:
-    default:
-      filters:
-        tags: '~@postgres&&~@mongodb&&~@elasticsearch&&~@legacy'
 
 postgres:
   suites:
@@ -64,14 +58,6 @@ postgres:
             schemaFile: '%paths.base%/tests/Fixtures/JsonHal/jsonhal.json'
         - 'Behat\MinkExtension\Context\MinkContext'
         - 'Behatch\Context\RestContext'
-      filters:
-        tags: '~@sqlite&&~@mongodb&&~@elasticsearch'
-
-postgres-no-legacy:
-  suites:
-    default: false
-    postgres:
-      <<: *postgres-suite
       filters:
         tags: '~@sqlite&&~@mongodb&&~@elasticsearch&&~@legacy'
 
@@ -98,14 +84,6 @@ mongodb:
         - 'Behat\MinkExtension\Context\MinkContext'
         - 'Behatch\Context\RestContext'
       filters:
-        tags: '~@sqlite&&~@elasticsearch&&~@!mongodb'
-
-mongodb-no-legacy:
-  suites:
-    default: false
-    mongodb:
-      <<: *mongodb-suite
-      filters:
         tags: '~@sqlite&&~@elasticsearch&&~@!mongodb&&~@legacy'
 
 elasticsearch:
@@ -125,19 +103,11 @@ elasticsearch:
         - 'Behatch\Context\RestContext'
         - 'Behat\MinkExtension\Context\MinkContext'
       filters:
-        tags: '@elasticsearch'
-
-elasticsearch-no-legacy:
-  suites:
-    default: false
-    elasticsearch:
-      <<: *elasticsearch-suite
-      filters:
         tags: '@elasticsearch&&~@legacy'
 
 default-coverage:
   suites:
-    default:
+    default: &default-coverage-suite
       contexts:
         - 'CommandContext'
         - 'DoctrineContext':
@@ -161,7 +131,7 @@ default-coverage:
 mongodb-coverage:
   suites:
     default: false
-    mongodb:
+    mongodb: &mongodb-coverage-suite
       <<: *mongodb-suite
       contexts:
         - 'CommandContext'
@@ -186,7 +156,7 @@ mongodb-coverage:
 elasticsearch-coverage:
   suites:
     default: false
-    elasticsearch:
+    elasticsearch: &elasticsearch-coverage-suite
       <<: *elasticsearch-suite
       contexts:
         - 'CommandContext'
@@ -199,3 +169,56 @@ elasticsearch-coverage:
         - 'CoverageContext'
         - 'Behatch\Context\RestContext'
         - 'Behat\MinkExtension\Context\MinkContext'
+
+default-legacy:
+  suites:
+    default:
+      filters:
+        tags: '~@postgres&&~@mongodb&&~@elasticsearch'
+
+postgres-legacy:
+  suites:
+    default: false
+    postgres:
+      <<: *postgres-suite
+      filters:
+        tags: '~@sqlite&&~@mongodb&&~@elasticsearch'
+
+mongodb-legacy:
+  suites:
+    default: false
+    mongodb:
+      <<: *mongodb-suite
+      filters:
+        tags: '~@sqlite&&~@elasticsearch&&~@!mongodb'
+
+elasticsearch-legacy:
+  suites:
+    default: false
+    elasticsearch:
+      <<: *elasticsearch-suite
+      filters:
+        tags: '@elasticsearch'
+
+default-legacy-coverage:
+  suites:
+    default:
+      <<: *default-coverage-suite
+      filters:
+        tags: '~@postgres&&~@mongodb&&~@elasticsearch'
+
+mongodb-legacy-coverage:
+  suites:
+    default: false
+    mongodb:
+      <<: *mongodb-coverage-suite
+      filters:
+        tags: '~@sqlite&&~@elasticsearch&&~@!mongodb'
+
+elasticsearch-legacy-coverage:
+  suites:
+    default: false
+    elasticsearch:
+      <<: *elasticsearch-coverage-suite
+      filters:
+        tags: '@elasticsearch'

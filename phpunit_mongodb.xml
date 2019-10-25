@@ -27,9 +27,10 @@
         <whitelist processUncoveredFilesFromWhitelist="true">
             <directory>.</directory>
             <exclude>
-                <directory>tests</directory>
                 <directory>features</directory>
+                <directory>tests</directory>
                 <directory>vendor</directory>
+                <file>src/Bridge/Symfony/Bundle/DependencyInjection/ApiPlatformExtension.php</file>
             </exclude>
         </whitelist>
     </filter>

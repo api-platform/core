@@ -7,7 +7,9 @@ on:
 env:
   COMPOSER_ALLOW_SUPERUSER: '1' # https://getcomposer.org/doc/03-cli.md#composer-allow-superuser
   COMPOSER_INSTALLER_COMMIT: fb22b78362d31c0d2bf516d1f8cdfd2745caa431
+  COVERAGE: '0'
   EXT_MONGODB_VERSION: '1.5.5'
+  EXT_PCOV_VERSION: '1.0.6'
   LEGACY: '0'
   SYMFONY_REQUIRE: ^3.4 || ^4.0
 
@@ -26,7 +28,11 @@ jobs:
           - '7.2'
           - '7.3'
           - '7.4-rc'
+        include:
+          - php: '7.3'
+            coverage: true
       fail-fast: false
+    timeout-minutes: 20
     steps:
       - name: Checkout
         uses: actions/checkout@v1
@@ -40,6 +46,12 @@ jobs:
           apk add $PHPIZE_DEPS
           pecl install mongodb-$EXT_MONGODB_VERSION
           docker-php-ext-enable mongodb
+      - name: Install pcov PHP extension
+        if: matrix.coverage
+        run: |
+          apk add $PHPIZE_DEPS
+          pecl install pcov-$EXT_PCOV_VERSION
+          docker-php-ext-enable pcov
       - name: Disable PHP memory limit
         run: echo 'memory_limit=-1' >> /usr/local/etc/php/php.ini
       - name: Install Composer
@@ -64,8 +76,38 @@ jobs:
           mkdir -p /tmp/api-platform/core/var
           ln -s /tmp/api-platform/core/var tests/Fixtures/app/var
           tests/Fixtures/app/console cache:clear --ansi
+      - name: Enable code coverage
+        if: matrix.coverage
+        run: echo '::set-env name=COVERAGE::1'
       - name: Run PHPUnit tests
-        run: vendor/bin/phpunit --colors=always
+        run: |
+          mkdir -p build/logs/phpunit
+          if [ "$COVERAGE" = '1' ]; then
+            vendor/bin/phpunit --coverage-clover build/logs/phpunit/clover.xml --log-junit build/logs/phpunit/junit.xml --colors=always
+          else
+            vendor/bin/phpunit --log-junit build/logs/phpunit/junit.xml --colors=always
+          fi
+      - name: Upload test artifacts
+        if: always()
+        uses: actions/upload-artifact@v1
+        with:
+          name: phpunit-logs-php${{ matrix.php }}
+          path: build/logs/phpunit
+      - name: Upload coverage results to Codecov
+        if: matrix.coverage
+        uses: codecov/codecov-action@v1.0.3
+        with:
+          name: phpunit-php${{ matrix.php }}
+          flags: phpunit
+          token: ${{ secrets.CODECOV_TOKEN }}
+      - name: Upload coverage results to Coveralls
+        if: matrix.coverage
+        env:
+          COVERALLS_REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          composer global require --prefer-dist --no-progress --no-suggest --ansi cedx/coveralls
+          export PATH="$PATH:$HOME/.composer/vendor/bin"
+          coveralls build/logs/phpunit/clover.xml
 
   behat:
     name: Behat (PHP ${{ matrix.php }})
@@ -81,7 +123,11 @@ jobs:
           - '7.2'
           - '7.3'
           - '7.4-rc'
+        include:
+          - php: '7.3'
+            coverage: true
       fail-fast: false
+    timeout-minutes: 20
     steps:
       - name: Checkout
         uses: actions/checkout@v1
@@ -95,6 +141,12 @@ jobs:
           apk add $PHPIZE_DEPS
           pecl install mongodb-$EXT_MONGODB_VERSION
           docker-php-ext-enable mongodb
+      - name: Install pcov PHP extension
+        if: matrix.coverage
+        run: |
+          apk add $PHPIZE_DEPS
+          pecl install pcov-$EXT_PCOV_VERSION
+          docker-php-ext-enable pcov
       - name: Disable PHP memory limit
         run: echo 'memory_limit=-1' >> /usr/local/etc/php/php.ini
       - name: Install Composer
@@ -121,14 +173,45 @@ jobs:
         run: |
           mkdir -p /tmp/api-platform/core/var
           ln -s /tmp/api-platform/core/var tests/Fixtures/app/var
-          tests/Fixtures/app/console cache:clear --ansi
+          tests/Fixtures/app/console cache:clear --
+      - name: Enable code coverage
+        if: matrix.coverage
+        run: echo '::set-env name=COVERAGE::1'
       - name: Run Behat tests
         run: |
-          if [ "$LEGACY" = '1' ]; then
-            vendor/bin/behat --format=progress --no-interaction --colors
+          mkdir -p build/logs/behat
+          if [ "$COVERAGE" = '1' ]; then
+            vendor/bin/behat --format=progress --out=std --format=junit --out=build/logs/behat/junit --profile="$(if [ "$LEGACY" = '1' ]; then echo 'default-legacy-coverage'; else echo 'default-coverage'; fi)" --no-interaction --colors
           else
-            vendor/bin/behat --format=progress --profile=default-no-legacy --no-interaction --colors
+            vendor/bin/behat --format=progress --out=std --format=junit --out=build/logs/behat/junit --profile="$(if [ "$LEGACY" = '1' ]; then echo 'default-legacy'; else echo 'default'; fi)" --no-interaction --colors
           fi
+      - name: Merge code coverage reports
+        if: matrix.coverage
+        run: |
+          wget -qO /usr/local/bin/phpcov https://phar.phpunit.de/phpcov.phar
+          chmod +x /usr/local/bin/phpcov
+          phpcov merge --clover build/logs/behat/clover.xml build/coverage
+      - name: Upload test artifacts
+        if: always()
+        uses: actions/upload-artifact@v1
+        with:
+          name: behat-logs-php${{ matrix.php }}
+          path: build/logs/behat
+      - name: Upload coverage results to Codecov
+        if: matrix.coverage
+        uses: codecov/codecov-action@v1.0.3
+        with:
+          name: behat-php${{ matrix.php }}
+          flags: behat
+          token: ${{ secrets.CODECOV_TOKEN }}
+      - name: Upload coverage results to Coveralls
+        if: matrix.coverage
+        env:
+          COVERALLS_REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          composer global require --prefer-dist --no-progress --no-suggest --ansi cedx/coveralls
+          export PATH="$PATH:$HOME/.composer/vendor/bin"
+          coveralls build/logs/behat/clover.xml
 
   phpunit-lowest-deps:
     name: PHPUnit (PHP ${{ matrix.php }}) (lowest dependencies)
@@ -143,6 +226,7 @@ jobs:
           - '7.3'
           - '7.4-rc'
       fail-fast: false
+    timeout-minutes: 20
     steps:
       - name: Checkout
         uses: actions/checkout@v1
@@ -174,7 +258,15 @@ jobs:
           ln -s /tmp/api-platform/core/var tests/Fixtures/app/var
           tests/Fixtures/app/console cache:clear --ansi
       - name: Run PHPUnit tests
-        run: vendor/bin/phpunit --colors=always
+        run: |
+          mkdir -p build/logs/phpunit
+          vendor/bin/phpunit --log-junit build/logs/phpunit/junit.xml --colors=always
+      - name: Upload test artifacts
+        if: always()
+        uses: actions/upload-artifact@v1
+        with:
+          name: phpunit-logs-php${{ matrix.php }}-lowest-deps
+          path: build/logs/phpunit
 
   behat-lowest-deps:
     name: Behat (PHP ${{ matrix.php }}) (lowest dependencies)
@@ -189,6 +281,7 @@ jobs:
           - '7.3'
           - '7.4-rc'
       fail-fast: false
+    timeout-minutes: 20
     steps:
       - name: Checkout
         uses: actions/checkout@v1
@@ -224,11 +317,14 @@ jobs:
           tests/Fixtures/app/console cache:clear --ansi
       - name: Run Behat tests
         run: |
-          if [ "$LEGACY" = '1' ]; then
-            vendor/bin/behat --format=progress --no-interaction --colors
-          else
-            vendor/bin/behat --format=progress --profile=default-no-legacy --no-interaction --colors
-          fi
+          mkdir -p build/logs/behat
+          vendor/bin/behat --format=progress --out=std --format=junit --out=build/logs/behat/junit --profile="$(if [ "$LEGACY" = '1' ]; then echo 'default-legacy'; else echo 'default'; fi)" --no-interaction --colors
+      - name: Upload test artifacts
+        if: always()
+        uses: actions/upload-artifact@v1
+        with:
+          name: behat-logs-php${{ matrix.php }}-lowest-deps
+          path: build/logs/behat
 
   phpunit-postgresql:
     name: PHPUnit (PHP ${{ matrix.php }}) (PostgreSQL)
@@ -255,6 +351,7 @@ jobs:
         php:
           - '7.3'
       fail-fast: false
+    timeout-minutes: 20
     env:
       APP_ENV: postgres
       DATABASE_URL: postgres://api-platform:hk7dFAByeQVVxpLtmZ6GVUzP@postgres/api_platform_test
@@ -298,7 +395,15 @@ jobs:
           ln -s /tmp/api-platform/core/var tests/Fixtures/app/var
           tests/Fixtures/app/console cache:clear --ansi
       - name: Run PHPUnit tests
-        run: vendor/bin/phpunit --colors=always
+        run: |
+          mkdir -p build/logs/phpunit
+          vendor/bin/phpunit --log-junit build/logs/phpunit/junit.xml --colors=always
+      - name: Upload test artifacts
+        if: always()
+        uses: actions/upload-artifact@v1
+        with:
+          name: phpunit-logs-php${{ matrix.php }}-postgresql
+          path: build/logs/phpunit
 
   behat-postgresql:
     name: Behat (PHP ${{ matrix.php }}) (PostgreSQL)
@@ -325,6 +430,7 @@ jobs:
         php:
           - '7.3'
       fail-fast: false
+    timeout-minutes: 20
     env:
       APP_ENV: postgres
       DATABASE_URL: postgres://api-platform:hk7dFAByeQVVxpLtmZ6GVUzP@postgres/api_platform_test
@@ -372,11 +478,14 @@ jobs:
           tests/Fixtures/app/console cache:clear --ansi
       - name: Run Behat tests
         run: |
-          if [ "$LEGACY" = '1' ]; then
-            vendor/bin/behat --format=progress --profile=postgres --no-interaction --colors
-          else
-            vendor/bin/behat --format=progress --profile=postgres-no-legacy --no-interaction --colors
-          fi
+          mkdir -p build/logs/behat
+          vendor/bin/behat --format=progress --out=std --format=junit --out=build/logs/behat/junit --profile="$(if [ "$LEGACY" = '1' ]; then echo 'postgres-legacy'; else echo 'postgres'; fi)" --no-interaction --colors
+      - name: Upload test artifacts
+        if: always()
+        uses: actions/upload-artifact@v1
+        with:
+          name: behat-logs-php${{ matrix.php }}-postgresql
+          path: build/logs/behat
 
   phpunit-mysql:
     name: PHPUnit (PHP ${{ matrix.php }}) (MySQL)
@@ -404,6 +513,7 @@ jobs:
         php:
           - '7.3'
       fail-fast: false
+    timeout-minutes: 20
     env:
       APP_ENV: mysql
       DATABASE_URL: mysql://api-platform:LUhGR5tJ7WA2gbGumknCYBcB@mysql/api_platform_test
@@ -446,7 +556,15 @@ jobs:
           ln -s /tmp/api-platform/core/var tests/Fixtures/app/var
           tests/Fixtures/app/console cache:clear --ansi
       - name: Run PHPUnit tests
-        run: vendor/bin/phpunit --colors=always
+        run: |
+          mkdir -p build/logs/phpunit
+          vendor/bin/phpunit --log-junit build/logs/phpunit/junit.xml --colors=always
+      - name: Upload test artifacts
+        if: always()
+        uses: actions/upload-artifact@v1
+        with:
+          name: phpunit-logs-php${{ matrix.php }}-mysql
+          path: build/logs/phpunit
 
   behat-mysql:
     name: Behat (PHP ${{ matrix.php }}) (MySQL)
@@ -474,6 +592,7 @@ jobs:
         php:
           - '7.3'
       fail-fast: false
+    timeout-minutes: 20
     env:
       APP_ENV: mysql
       DATABASE_URL: mysql://api-platform:LUhGR5tJ7WA2gbGumknCYBcB@mysql/api_platform_test
@@ -520,11 +639,14 @@ jobs:
           tests/Fixtures/app/console cache:clear --ansi
       - name: Run Behat tests
         run: |
-          if [ "$LEGACY" = '1' ]; then
-            vendor/bin/behat --format=progress --no-interaction --colors
-          else
-            vendor/bin/behat --format=progress --profile=default-no-legacy --no-interaction --colors
-          fi
+          mkdir -p build/logs/behat
+          vendor/bin/behat --format=progress --out=std --format=junit --out=build/logs/behat/junit --profile="$(if [ "$LEGACY" = '1' ]; then echo 'default-legacy'; else echo 'default'; fi)" --no-interaction --colors
+      - name: Upload test artifacts
+        if: always()
+        uses: actions/upload-artifact@v1
+        with:
+          name: behat-logs-php${{ matrix.php }}-mysql
+          path: build/logs/behat
 
   phpunit-mongodb:
     name: PHPUnit (PHP ${{ matrix.php }}) (MongoDB)
@@ -537,6 +659,7 @@ jobs:
       mongo:
         image: mongo:4
         options: >-
+          --mount type=tmpfs,destination=/data/db
           --health-cmd "mongo --quiet --eval 'quit(db.runCommand({ ping: 1 }).ok ? 0 : 2)'"
           --health-interval 10s
           --health-timeout 5s
@@ -545,7 +668,11 @@ jobs:
       matrix:
         php:
           - '7.3'
+        include:
+          - php: '7.3'
+            coverage: true
       fail-fast: false
+    timeout-minutes: 20
     env:
       APP_ENV: mongodb
       MONGODB_URL: mongodb://mongo:27017
@@ -561,6 +688,12 @@ jobs:
           apk add $PHPIZE_DEPS
           pecl install mongodb-$EXT_MONGODB_VERSION
           docker-php-ext-enable mongodb
+      - name: Install pcov PHP extension
+        if: matrix.coverage
+        run: |
+          apk add $PHPIZE_DEPS
+          pecl install pcov-$EXT_PCOV_VERSION
+          docker-php-ext-enable pcov
       - name: Disable PHP memory limit
         run: echo 'memory_limit=-1' >> /usr/local/etc/php/php.ini
       - name: Install Composer
@@ -579,8 +712,38 @@ jobs:
           mkdir -p /tmp/api-platform/core/var
           ln -s /tmp/api-platform/core/var tests/Fixtures/app/var
           tests/Fixtures/app/console cache:clear --ansi
+      - name: Enable code coverage
+        if: matrix.coverage
+        run: echo '::set-env name=COVERAGE::1'
       - name: Run PHPUnit tests
-        run: vendor/bin/phpunit --colors=always --configuration phpunit_mongodb.xml
+        run: |
+          mkdir -p build/logs/phpunit
+          if [ "$COVERAGE" = '1' ]; then
+            vendor/bin/phpunit --coverage-clover build/logs/phpunit/clover.xml --log-junit build/logs/phpunit/junit.xml --colors=always --configuration phpunit_mongodb.xml
+          else
+            vendor/bin/phpunit --log-junit build/logs/phpunit/junit.xml --colors=always --configuration phpunit_mongodb.xml
+          fi
+      - name: Upload test artifacts
+        if: always()
+        uses: actions/upload-artifact@v1
+        with:
+          name: phpunit-logs-php${{ matrix.php }}-mongodb
+          path: build/logs/phpunit
+      - name: Upload coverage results to Codecov
+        if: matrix.coverage
+        uses: codecov/codecov-action@v1.0.3
+        with:
+          name: phpunit-php${{ matrix.php }}-mongodb
+          flags: phpunit_mongodb
+          token: ${{ secrets.CODECOV_TOKEN }}
+      - name: Upload coverage results to Coveralls
+        if: matrix.coverage
+        env:
+          COVERALLS_REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          composer global require --prefer-dist --no-progress --no-suggest --ansi cedx/coveralls
+          export PATH="$PATH:$HOME/.composer/vendor/bin"
+          coveralls build/logs/phpunit/clover.xml
 
   behat-mongodb:
     name: Behat (PHP ${{ matrix.php }}) (MongoDB)
@@ -593,6 +756,7 @@ jobs:
       mongo:
         image: mongo:4
         options: >-
+          --mount type=tmpfs,destination=/data/db
           --health-cmd "mongo --quiet --eval 'quit(db.runCommand({ ping: 1 }).ok ? 0 : 2)'"
           --health-interval 10s
           --health-timeout 5s
@@ -601,7 +765,11 @@ jobs:
       matrix:
         php:
           - '7.3'
+        include:
+          - php: '7.3'
+            coverage: true
       fail-fast: false
+    timeout-minutes: 20
     env:
       APP_ENV: mongodb
       MONGODB_URL: mongodb://mongo:27017
@@ -617,6 +785,12 @@ jobs:
           apk add $PHPIZE_DEPS
           pecl install mongodb-$EXT_MONGODB_VERSION
           docker-php-ext-enable mongodb
+      - name: Install pcov PHP extension
+        if: matrix.coverage
+        run: |
+          apk add $PHPIZE_DEPS
+          pecl install pcov-$EXT_PCOV_VERSION
+          docker-php-ext-enable pcov
       - name: Disable PHP memory limit
         run: echo 'memory_limit=-1' >> /usr/local/etc/php/php.ini
       - name: Install Composer
@@ -638,13 +812,44 @@ jobs:
           mkdir -p /tmp/api-platform/core/var
           ln -s /tmp/api-platform/core/var tests/Fixtures/app/var
           tests/Fixtures/app/console cache:clear --ansi
+      - name: Enable code coverage
+        if: matrix.coverage
+        run: echo '::set-env name=COVERAGE::1'
       - name: Run Behat tests
         run: |
-          if [ "$LEGACY" = '1' ]; then
-            vendor/bin/behat --format=progress --profile=mongodb --no-interaction --colors
+          mkdir -p build/logs/behat
+          if [ "$COVERAGE" = '1' ]; then
+            vendor/bin/behat --format=progress --out=std --format=junit --out=build/logs/behat/junit --profile="$(if [ "$LEGACY" = '1' ]; then echo 'mongodb-legacy-coverage'; else echo 'mongodb-coverage'; fi)" --no-interaction --colors
           else
-            vendor/bin/behat --format=progress --profile=mongodb-no-legacy --no-interaction --colors
+            vendor/bin/behat --format=progress --out=std --format=junit --out=build/logs/behat/junit --profile="$(if [ "$LEGACY" = '1' ]; then echo 'mongodb-legacy'; else echo 'mongodb'; fi)" --no-interaction --colors
           fi
+      - name: Merge code coverage reports
+        if: matrix.coverage
+        run: |
+          wget -qO /usr/local/bin/phpcov https://phar.phpunit.de/phpcov.phar
+          chmod +x /usr/local/bin/phpcov
+          phpcov merge --clover build/logs/behat/clover.xml build/coverage
+      - name: Upload test artifacts
+        if: always()
+        uses: actions/upload-artifact@v1
+        with:
+          name: behat-logs-php${{ matrix.php }}-mongodb
+          path: build/logs/behat
+      - name: Upload coverage results to Codecov
+        if: matrix.coverage
+        uses: codecov/codecov-action@v1.0.3
+        with:
+          name: behat-php${{ matrix.php }}-mongodb
+          flags: behat_mongodb
+          token: ${{ secrets.CODECOV_TOKEN }}
+      - name: Upload coverage results to Coveralls
+        if: matrix.coverage
+        env:
+          COVERALLS_REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          composer global require --prefer-dist --no-progress --no-suggest --ansi cedx/coveralls
+          export PATH="$PATH:$HOME/.composer/vendor/bin"
+          coveralls build/logs/behat/clover.xml
 
   phpunit-elasticsearch:
     name: PHPUnit (PHP ${{ matrix.php }}) (Elasticsearch)
@@ -659,6 +864,7 @@ jobs:
         env:
           discovery.type: single-node
         options: >-
+          --mount type=tmpfs,destination=/usr/share/elasticsearch/data
           --health-cmd "curl -fsSL http://127.0.0.1:9200/_cluster/health | grep -q '\"status\":[[:space:]]*\"green\"'"
           --health-interval 10s
           --health-timeout 5s
@@ -667,7 +873,11 @@ jobs:
       matrix:
         php:
           - '7.3'
+        include:
+          - php: '7.3'
+            coverage: true
       fail-fast: false
+    timeout-minutes: 20
     env:
       APP_ENV: elasticsearch
       ELASTICSEARCH_URL: http://elasticsearch:9200
@@ -683,6 +893,12 @@ jobs:
           apk add $PHPIZE_DEPS
           pecl install mongodb-$EXT_MONGODB_VERSION
           docker-php-ext-enable mongodb
+      - name: Install pcov PHP extension
+        if: matrix.coverage
+        run: |
+          apk add $PHPIZE_DEPS
+          pecl install pcov-$EXT_PCOV_VERSION
+          docker-php-ext-enable pcov
       - name: Disable PHP memory limit
         run: echo 'memory_limit=-1' >> /usr/local/etc/php/php.ini
       - name: Install Composer
@@ -701,8 +917,38 @@ jobs:
           mkdir -p /tmp/api-platform/core/var
           ln -s /tmp/api-platform/core/var tests/Fixtures/app/var
           tests/Fixtures/app/console cache:clear --ansi
+      - name: Enable code coverage
+        if: matrix.coverage
+        run: echo '::set-env name=COVERAGE::1'
       - name: Run PHPUnit tests
-        run: vendor/bin/phpunit --colors=always
+        run: |
+          mkdir -p build/logs/phpunit
+          if [ "$COVERAGE" = '1' ]; then
+            vendor/bin/phpunit --coverage-clover build/logs/phpunit/clover.xml --log-junit build/logs/phpunit/junit.xml --colors=always
+          else
+            vendor/bin/phpunit --log-junit build/logs/phpunit/junit.xml --colors=always
+          fi
+      - name: Upload test artifacts
+        if: always()
+        uses: actions/upload-artifact@v1
+        with:
+          name: phpunit-logs-php${{ matrix.php }}-elasticsearch
+          path: build/logs/phpunit
+      - name: Upload coverage results to Codecov
+        if: matrix.coverage
+        uses: codecov/codecov-action@v1.0.3
+        with:
+          name: phpunit-php${{ matrix.php }}-elasticsearch
+          flags: phpunit_elasticsearch
+          token: ${{ secrets.CODECOV_TOKEN }}
+      - name: Upload coverage results to Coveralls
+        if: matrix.coverage
+        env:
+          COVERALLS_REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          composer global require --prefer-dist --no-progress --no-suggest --ansi cedx/coveralls
+          export PATH="$PATH:$HOME/.composer/vendor/bin"
+          coveralls build/logs/phpunit/clover.xml
 
   behat-elasticsearch:
     name: Behat (PHP ${{ matrix.php }}) (Elasticsearch)
@@ -717,6 +963,7 @@ jobs:
         env:
           discovery.type: single-node
         options: >-
+          --mount type=tmpfs,destination=/usr/share/elasticsearch/data
           --health-cmd "curl -fsSL http://127.0.0.1:9200/_cluster/health | grep -q '\"status\":[[:space:]]*\"green\"'"
           --health-interval 10s
           --health-timeout 5s
@@ -725,7 +972,11 @@ jobs:
       matrix:
         php:
           - '7.3'
+        include:
+          - php: '7.3'
+            coverage: true
       fail-fast: false
+    timeout-minutes: 20
     env:
       APP_ENV: elasticsearch
       ELASTICSEARCH_URL: http://elasticsearch:9200
@@ -741,6 +992,12 @@ jobs:
           apk add $PHPIZE_DEPS
           pecl install mongodb-$EXT_MONGODB_VERSION
           docker-php-ext-enable mongodb
+      - name: Install pcov PHP extension
+        if: matrix.coverage
+        run: |
+          apk add $PHPIZE_DEPS
+          pecl install pcov-$EXT_PCOV_VERSION
+          docker-php-ext-enable pcov
       - name: Disable PHP memory limit
         run: echo 'memory_limit=-1' >> /usr/local/etc/php/php.ini
       - name: Install Composer
@@ -761,14 +1018,45 @@ jobs:
         run: |
           mkdir -p /tmp/api-platform/core/var
           ln -s /tmp/api-platform/core/var tests/Fixtures/app/var
-          tests/Fixtures/app/console cache:clear --ansi
+          tests/Fixtures/app/console cache:clear --
+      - name: Enable code coverage
+        if: matrix.coverage
+        run: echo '::set-env name=COVERAGE::1'
       - name: Run Behat tests
         run: |
-          if [ "$LEGACY" = '1' ]; then
-            vendor/bin/behat --format=progress --profile=elasticsearch --no-interaction --colors
+          mkdir -p build/logs/behat
+          if [ "$COVERAGE" = '1' ]; then
+            vendor/bin/behat --format=progress --out=std --format=junit --out=build/logs/behat/junit --profile="$(if [ "$LEGACY" = '1' ]; then echo 'elasticsearch-legacy-coverage'; else echo 'elasticsearch-coverage'; fi)" --no-interaction --colors
           else
-            vendor/bin/behat --format=progress --profile=elasticsearch-no-legacy --no-interaction --colors
+            vendor/bin/behat --format=progress --out=std --format=junit --out=build/logs/behat/junit --profile="$(if [ "$LEGACY" = '1' ]; then echo 'elasticsearch-legacy'; else echo 'elasticsearch'; fi)" --no-interaction --colors
           fi
+      - name: Merge code coverage reports
+        if: matrix.coverage
+        run: |
+          wget -qO /usr/local/bin/phpcov https://phar.phpunit.de/phpcov.phar
+          chmod +x /usr/local/bin/phpcov
+          phpcov merge --clover build/logs/behat/clover.xml build/coverage
+      - name: Upload test artifacts
+        if: always()
+        uses: actions/upload-artifact@v1
+        with:
+          name: behat-logs-php${{ matrix.php }}-elasticsearch
+          path: build/logs/behat
+      - name: Upload coverage results to Codecov
+        if: matrix.coverage
+        uses: codecov/codecov-action@v1.0.3
+        with:
+          name: behat-php${{ matrix.php }}-elasticsearch
+          flags: behat_elasticsearch
+          token: ${{ secrets.CODECOV_TOKEN }}
+      - name: Upload coverage results to Coveralls
+        if: matrix.coverage
+        env:
+          COVERALLS_REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          composer global require --prefer-dist --no-progress --no-suggest --ansi cedx/coveralls
+          export PATH="$PATH:$HOME/.composer/vendor/bin"
+          coveralls build/logs/behat/clover.xml
 
   phpunit-no-deprecations:
     name: PHPUnit (PHP ${{ matrix.php }}) (no deprecations)
@@ -782,6 +1070,7 @@ jobs:
         php:
           - '7.3'
       fail-fast: false
+    timeout-minutes: 20
     env:
       SYMFONY_DEPRECATIONS_HELPER: max[total]=5 # 5 deprecation notices from FOSUserBundle
     steps:
@@ -815,5 +1104,13 @@ jobs:
           ln -s /tmp/api-platform/core/var tests/Fixtures/app/var
           tests/Fixtures/app/console cache:clear --ansi
       - name: Run PHPUnit tests
-        run: vendor/bin/phpunit --colors=always
+        run: |
+          mkdir -p build/logs/phpunit
+          vendor/bin/phpunit --log-junit build/logs/phpunit/junit.xml --colors=always
         continue-on-error: true
+      - name: Upload test artifacts
+        if: always()
+        uses: actions/upload-artifact@v1
+        with:
+          name: phpunit-logs-php${{ matrix.php }}-no-deprecations
+          path: build/logs/phpunit
