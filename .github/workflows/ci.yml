@@ -22,7 +22,6 @@ jobs:
     strategy:
       matrix:
         php:
-          - '7.1'
           - '7.2'
           - '7.3'
           - '7.4-rc'
@@ -35,7 +34,6 @@ jobs:
           apk add \
             unzip \
       - name: Install mongodb PHP extension
-        if: (!startsWith(matrix.php, '7.1'))
         run: |
           apk add $PHPIZE_DEPS
           pecl install mongodb-$EXT_MONGODB_VERSION
@@ -48,12 +46,6 @@ jobs:
         run: |
           composer global require --prefer-dist --no-progress --no-suggest --ansi \
             symfony/flex
-      - name: Remove Doctrine MongoDB ODM
-        if: startsWith(matrix.php, '7.1')
-        run: |
-          composer remove --dev --no-progress --no-update --ansi \
-            doctrine/mongodb-odm \
-            doctrine/mongodb-odm-bundle \
       - name: Update project dependencies
         run: |
           mkdir -p /tmp/api-platform/core/vendor
@@ -77,7 +69,6 @@ jobs:
     strategy:
       matrix:
         php:
-          - '7.1'
           - '7.2'
           - '7.3'
           - '7.4-rc'
@@ -90,7 +81,6 @@ jobs:
           apk add \
             unzip \
       - name: Install mongodb PHP extension
-        if: (!startsWith(matrix.php, '7.1'))
         run: |
           apk add $PHPIZE_DEPS
           pecl install mongodb-$EXT_MONGODB_VERSION
@@ -103,19 +93,13 @@ jobs:
         run: |
           composer global require --prefer-dist --no-progress --no-suggest --ansi \
             symfony/flex
-      - name: Remove Doctrine MongoDB ODM
-        if: startsWith(matrix.php, '7.1')
-        run: |
-          composer remove --dev --no-progress --no-update --ansi \
-            doctrine/mongodb-odm \
-            doctrine/mongodb-odm-bundle \
       - name: Update project dependencies
         run: |
           mkdir -p /tmp/api-platform/core/vendor
           ln -s /tmp/api-platform/core/vendor vendor
           composer update --no-progress --no-suggest --ansi
       - name: Enable legacy integrations
-        if: startsWith(matrix.php, '7.1') || startsWith(matrix.php, '7.2') || startsWith(matrix.php, '7.3')
+        if: startsWith(matrix.php, '7.2') || startsWith(matrix.php, '7.3')
         run: echo '::set-env name=LEGACY::1'
       - name: Clear test app cache
         run: |

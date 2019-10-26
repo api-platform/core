@@ -36,26 +36,6 @@ cache:
 
 jobs:
   include:
-    - name: '(PHP 7.1)'
-      php: '7.1'
-      before_install:
-        - *disable-xdebug-php-extension
-        - *disable-php-memory-limit
-        - *install-symfony-flex
-      install:
-        - |
-          composer remove --dev --no-progress --no-update --ansi \
-            doctrine/mongodb-odm \
-            doctrine/mongodb-odm-bundle \
-        - *update-project-dependencies
-      before_script:
-        - *clear-test-app-cache
-      script:
-        - *validate-openapi-v2-json
-        - *validate-openapi-v2-yaml
-        - *validate-openapi-v3-json
-        - *validate-openapi-v3-yaml
-
     - name: '(PHP 7.2)'
       php: '7.2'
       before_install:
