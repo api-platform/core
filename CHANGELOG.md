@@ -420,7 +420,7 @@ Please read #2825 if you have issues with the behavior of Readable/Writable Link
 * Persist data in Doctrine DataPersister only if needed
 * Fix identifiers handling in GraphQL mutations
 * Fix client-side ID creation or update when using GraphQL mutations
-* Fix an error that was occuring when the Expression Language component wasn't installed
+* Fix an error that was occurring when the Expression Language component wasn't installed
 * Update the `ChainSubresourceDataProvider` class to take into account `RestrictedDataProviderInterface`
 
 ## 2.2.4
