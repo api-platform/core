@@ -46,7 +46,7 @@ class HttpExceptionNormalizerTest extends TestCase
 
         $normalizedError = $this->httpExceptionNormalizer->normalize($error);
         $this->assertSame($expectedExceptionMessage, $normalizedError['message']);
-        $this->assertSame($expectedStatus, $normalizedError['status']);
+        $this->assertSame($expectedStatus, $normalizedError['extensions']['status']);
         $this->assertSame($expectedCategory, $normalizedError['extensions']['category']);
     }
 

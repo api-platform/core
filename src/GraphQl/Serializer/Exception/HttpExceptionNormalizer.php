@@ -36,7 +36,7 @@ final class HttpExceptionNormalizer implements NormalizerInterface
         $httpException = $object->getPrevious();
         $error = FormattedError::createFromException($object);
         $error['message'] = $httpException->getMessage();
-        $error['status'] = $statusCode = $httpException->getStatusCode();
+        $error['extensions']['status'] = $statusCode = $httpException->getStatusCode();
         $error['extensions']['category'] = $statusCode < 500 ? 'user' : Error::CATEGORY_INTERNAL;
 
         return $error;

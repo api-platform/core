@@ -39,13 +39,13 @@ final class ValidationExceptionNormalizer implements NormalizerInterface
         $validationException = $object->getPrevious();
         $error = FormattedError::createFromException($object);
         $error['message'] = $validationException->getMessage();
-        $error['status'] = Response::HTTP_BAD_REQUEST;
+        $error['extensions']['status'] = Response::HTTP_BAD_REQUEST;
         $error['extensions']['category'] = 'user';
-        $error['violations'] = [];
+        $error['extensions']['violations'] = [];
 
         /** @var ConstraintViolation $violation */
         foreach ($validationException->getConstraintViolationList() as $violation) {
-            $error['violations'][] = [
+            $error['extensions']['violations'][] = [
                 'path' => $violation->getPropertyPath(),
                 'message' => $violation->getMessage(),
             ];

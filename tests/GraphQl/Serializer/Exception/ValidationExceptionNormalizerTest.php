@@ -48,9 +48,9 @@ class ValidationExceptionNormalizerTest extends TestCase
 
         $normalizedError = $this->validationExceptionNormalizer->normalize($error);
         $this->assertSame($exceptionMessage, $normalizedError['message']);
-        $this->assertSame(400, $normalizedError['status']);
+        $this->assertSame(400, $normalizedError['extensions']['status']);
         $this->assertSame('user', $normalizedError['extensions']['category']);
-        $this->assertArrayHasKey('violations', $normalizedError);
+        $this->assertArrayHasKey('violations', $normalizedError['extensions']);
         $this->assertSame([
             [
                 'path' => 'field 1',
@@ -60,7 +60,7 @@ class ValidationExceptionNormalizerTest extends TestCase
                 'path' => 'field 2',
                 'message' => 'message 2',
             ],
-        ], $normalizedError['violations']);
+        ], $normalizedError['extensions']['violations']);
     }
 
     public function testSupportsNormalization(): void
