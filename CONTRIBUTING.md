@@ -28,7 +28,7 @@ See [the dedicated documentation entry](https://api-platform.com/docs/extra/rele
 ### Matching Coding Standards
 
 The API Platform project follows [Symfony coding standards](https://symfony.com/doc/current/contributing/code/standards.html).
-But don't worry, you can fix CS issues automatically using the [PHP CS Fixer](http://cs.sensiolabs.org/) tool:
+But don't worry, you can fix CS issues automatically using the [PHP CS Fixer](https://cs.sensiolabs.org/) tool:
 
 ```shell
 php-cs-fixer.phar fix
