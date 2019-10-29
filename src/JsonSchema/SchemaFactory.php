@@ -206,7 +206,9 @@ final class SchemaFactory implements SchemaFactoryInterface
 
         $prefix = $resourceMetadata->getShortName();
         if (null !== $inputOrOutputClass && $resourceClass !== $inputOrOutputClass) {
-            $prefix .= ':'.md5($inputOrOutputClass);
+            $parts = explode('\\', $inputOrOutputClass);
+            $shortName = end($parts);
+            $prefix .= ':'.$shortName;
         }
 
         if (isset($this->distinctFormats[$format])) {
