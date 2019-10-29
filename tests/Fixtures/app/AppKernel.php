@@ -84,7 +84,7 @@ class AppKernel extends Kernel
 
     protected function configureRoutes(RouteCollectionBuilder $routes)
     {
-        $routes->import("config/routing_{$this->getEnvironment()}.yml");
+        $routes->import(__DIR__."/config/routing_{$this->getEnvironment()}.yml");
 
         if ($_SERVER['LEGACY'] ?? true) {
             $routes->import('@NelmioApiDocBundle/Resources/config/routing.yml', '/nelmioapidoc');

@@ -53,7 +53,7 @@ final class ValidateListener
 
         if (
             $controllerResult instanceof Response
-            || $request->isMethodSafe(false)
+            || $request->isMethodSafe()
             || $request->isMethod('DELETE')
             || !($attributes = RequestAttributesExtractor::extractAttributes($request))
             || !$attributes['receive']

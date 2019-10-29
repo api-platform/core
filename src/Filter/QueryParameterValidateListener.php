@@ -42,7 +42,7 @@ final class QueryParameterValidateListener
     {
         $request = $event->getRequest();
         if (
-            !$request->isMethodSafe(false)
+            !$request->isMethodSafe()
             || !($attributes = RequestAttributesExtractor::extractAttributes($request))
             || !isset($attributes['collection_operation_name'])
             || 'get' !== ($operationName = $attributes['collection_operation_name'])
