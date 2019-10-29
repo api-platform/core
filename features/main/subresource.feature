@@ -24,7 +24,7 @@ Feature: Subresource support
     }
     """
 
-  Scenario: Get a non existant subresource
+  Scenario: Get a non existent subresource
     Given there is an answer "42" to the question "What's the answer to the Ultimate Question of Life, the Universe and Everything?"
     When I send a "GET" request to "/questions/999999/answer"
     Then the response status code should be 404
