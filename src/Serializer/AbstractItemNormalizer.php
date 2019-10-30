@@ -535,6 +535,10 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             ($className = $type->getClassName()) &&
             $this->resourceClassResolver->isResourceClass($className)
         ) {
+            if (null === $attributeValue) {
+                return null;
+            }
+
             $resourceClass = $this->resourceClassResolver->getResourceClass($attributeValue, $className);
             $childContext = $this->createChildContext($context, $attribute, $format);
             $childContext['resource_class'] = $resourceClass;
@@ -556,11 +560,17 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
      * Normalizes a collection of relations (to-many).
      *
      * @param iterable $attributeValue
+     *
+     * @throws UnexpectedValueException
      */
     protected function normalizeCollectionOfRelations(PropertyMetadata $propertyMetadata, $attributeValue, string $resourceClass, ?string $format, array $context): array
     {
         $value = [];
         foreach ($attributeValue as $index => $obj) {
+            if (null === $obj) {
+                throw new UnexpectedValueException('Unexpected null value in to-many relation.');
+            }
+
             $value[$index] = $this->normalizeRelation($propertyMetadata, $obj, $resourceClass, $format, $context);
         }
 
@@ -568,20 +578,28 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
     }
 
     /**
-     * Normalizes a relation as an object if is a Link or as an URI.
+     * Normalizes a relation.
+     *
+     * @param object $relatedObject
      *
      * @throws LogicException
+     * @throws UnexpectedValueException
      *
-     * @return string|array
+     * @return string|array|\ArrayObject IRI or normalized object data
      */
     protected function normalizeRelation(PropertyMetadata $propertyMetadata, $relatedObject, string $resourceClass, ?string $format, array $context)
     {
-        if (null === $relatedObject || !empty($context['attributes']) || $propertyMetadata->isReadableLink()) {
+        if (!empty($context['attributes']) || $propertyMetadata->isReadableLink()) {
             if (!$this->serializer instanceof NormalizerInterface) {
                 throw new LogicException(sprintf('The injected serializer must be an instance of "%s".', NormalizerInterface::class));
             }
 
-            return $this->serializer->normalize($relatedObject, $format, $context);
+            $normalizedRelatedObject = $this->serializer->normalize($relatedObject, $format, $context);
+            if (!\is_string($normalizedRelatedObject) && !\is_array($normalizedRelatedObject) && !$normalizedRelatedObject instanceof \ArrayObject) {
+                throw new UnexpectedValueException('Expected normalized relation to be an IRI, array or \ArrayObject');
+            }
+
+            return $normalizedRelatedObject;
         }
 
         $iri = $this->iriConverter->getIriFromItem($relatedObject);
