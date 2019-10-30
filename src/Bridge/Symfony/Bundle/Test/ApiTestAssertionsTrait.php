@@ -59,7 +59,7 @@ trait ApiTestAssertionsTrait
     /**
      * Asserts that the retrieved JSON is equal to $json.
      *
-     * Both values are canonicalized before the comparision.
+     * Both values are canonicalized before the comparison.
      *
      * @param array|string $json
      */
