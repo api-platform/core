@@ -26,6 +26,9 @@ parameters:
 
 		# False positives
 		-
+			message: '#Variable \$iri might not be defined\.#'
+			path: %currentWorkingDirectory%/src/JsonApi/Serializer/ItemNormalizer.php
+		-
 			message: '#Variable \$positionPm might not be defined\.#'
 			path: %currentWorkingDirectory%/src/Util/ClassInfoTrait.php
 		-
@@ -60,7 +63,6 @@ parameters:
 		-
 			message: '#Property ApiPlatform\\Core\\Test\\DoctrineMongoDbOdmFilterTestCase::\$repository \(Doctrine\\ODM\\MongoDB\\Repository\\DocumentRepository\) does not accept Doctrine\\ORM\\EntityRepository<ApiPlatform\\Core\\Tests\\Fixtures\\TestBundle\\Document\\Dummy>\.#'
 			path: %currentWorkingDirectory%/src/Test/DoctrineMongoDbOdmFilterTestCase.php
-		- '#Method ApiPlatform\\Core\\(Serializer\\Abstract|JsonApi\\Serializer\\)ItemNormalizer::normalizeRelation\(\) should return array\|string but returns array\|bool\|float\|int\|string\|null\.#'
 		- '#Method ApiPlatform\\Core\\Util\\RequestParser::parseRequestParams\(\) should return array but returns array\|false\.#'
 		-
 			message: '#Method ApiPlatform\\Core\\Bridge\\Doctrine\\Orm\\Util\\QueryBuilderHelper::mapJoinAliases() should return array<string, array<string>\|string> but returns array<int|string, mixed>\.#'
@@ -116,3 +118,8 @@ parameters:
 			path: %currentWorkingDirectory%/src/Action/ExceptionAction.php
 		- '#Call to method get(Class|Headers|StatusCode)\(\) on an unknown class Symfony\\Component\\ErrorHandler\\Exception\\FlattenException\.#'
 		- '#Class Symfony\\Component\\ErrorHandler\\Exception\\FlattenException not found\.#'
+		-
+			message: '#Instanceof between bool\|float\|int|null and ArrayObject will always evaluate to false\.#'
+			paths:
+				- %currentWorkingDirectory%/src/JsonApi/Serializer/ItemNormalizer.php
+				- %currentWorkingDirectory%/src/Serializer/AbstractItemNormalizer.php
