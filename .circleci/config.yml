@@ -1,21 +1,5 @@
 version: 2.1
 
-orbs:
-  codecov: codecov/codecov@1
-  coveralls:
-    commands:
-      upload:
-        parameters:
-          file:
-            description: Path to the code coverage data file to upload.
-            type: string
-            default: ""
-        steps:
-          - run:
-              name: Upload Coverage Results
-              command: |
-                npx @cedx/coveralls@^8.6 "<< parameters.file >>" || echo 'Coveralls upload failed'
-
 commands:
   clear-test-app-cache:
     steps:
@@ -39,13 +23,6 @@ commands:
           command: |
             sudo pecl install mongodb-1.5.5
             sudo docker-php-ext-enable mongodb
-  install-pcov-php-extension:
-    steps:
-      - run:
-          name: Install pcov PHP extension
-          command: |
-            sudo pecl install pcov-1.0.6
-            sudo docker-php-ext-enable pcov
   install-symfony-flex:
     steps:
       - run:
@@ -53,45 +30,6 @@ commands:
           command: |
             composer global require --prefer-dist --no-progress --no-suggest --ansi \
               symfony/flex
-  merge-code-coverage-reports:
-    parameters:
-      dir:
-        description: Path to the directory containing the code coverage reports to merge.
-        type: string
-      out:
-        description: Path to output the merged code coverage report.
-        type: string
-    steps:
-      - run:
-          name: Download phpcov
-          command: |
-            if ! command -v phpcov; then
-              wget https://phar.phpunit.de/phpcov.phar
-              chmod +x phpcov.phar
-              sudo mv phpcov.phar /usr/local/bin/phpcov
-            fi
-      - run:
-          name: Merge code coverage reports
-          command: |
-            mkdir -p "$(dirname -- "<< parameters.out >>")"
-            phpcov merge --clover "<< parameters.out >>" "<< parameters.dir >>"
-  merge-test-reports:
-    parameters:
-      dir:
-        description: Path to the directory containing the test reports to merge.
-        type: string
-      out:
-        description: Path to output the merged test report.
-        type: string
-    steps:
-      - run:
-          name: Merge test reports
-          command: |
-            tmpout=$(mktemp)
-            npx junit-merge@^2.0 --dir "<< parameters.dir >>" --recursive --out "$tmpout"
-            rm -r "<< parameters.dir >>"
-            mkdir -p "$(dirname -- "<< parameters.out >>")"
-            mv "$tmpout" "<< parameters.out >>"
   restore-composer-cache:
     steps:
       - restore_cache:
@@ -100,14 +38,6 @@ commands:
             - composer-cache-{{ .Revision }}
             - composer-cache-{{ .Branch }}
             - composer-cache
-  restore-npm-cache:
-    steps:
-      - restore_cache:
-          name: Restore npm cache
-          keys:
-            - npm-cache-{{ .Revision }}
-            - npm-cache-{{ .Branch }}
-            - npm-cache
   restore-php-cs-fixer-cache:
     steps:
       - restore_cache:
@@ -136,18 +66,6 @@ commands:
           paths:
             - ~/.composer/cache/files
           key: composer-cache-{{ .Revision }}-{{ .BuildNum }}
-  save-npm-cache:
-    steps:
-      - save_cache:
-          name: Save npm cache
-          paths:
-            - ~/.npm
-          key: npm-cache-{{ .Branch }}-{{ .BuildNum }}
-      - save_cache:
-          name: Save npm cache
-          paths:
-            - ~/.npm
-          key: npm-cache-{{ .Revision }}-{{ .BuildNum }}
   save-php-cs-fixer-cache:
     steps:
       - save_cache:
@@ -177,44 +95,6 @@ commands:
       - run:
           name: Update project dependencies
           command: composer update --no-progress --no-suggest --ansi
-  wait-for-elasticsearch:
-    steps:
-      - wait-for-service:
-          label: Elasticsearch
-          port: '9200'
-  wait-for-mongodb:
-    steps:
-      - wait-for-service:
-          label: MongoDB
-          port: '27017'
-  wait-for-service:
-    parameters:
-      label:
-        description: Label for the service.
-        type: string
-        default: service
-      port:
-        description: Target port to connect to.
-        type: string
-      timeout:
-        description: Maximum number of seconds to wait.
-        type: integer
-        default: 30
-    steps:
-      - run:
-          name: Wait for << parameters.label >>
-          command: |
-            timeout=<< parameters.timeout >>
-            elapsed=0
-            echo "Waiting for << parameters.label >> to be ready..."
-            until nc -z localhost "<< parameters.port >>" > /dev/null 2>&1; do
-              if _=$((elapsed > timeout)); then
-                echo 'Timed out waiting for << parameters.label >>' >&2
-                exit 1
-              fi
-              sleep 1
-              elapsed=$((elapsed + 1))
-            done
 
 executors:
   php:
@@ -222,18 +102,6 @@ executors:
       - image: circleci/php:7.3-node
         environment:
           SYMFONY_REQUIRE: ^3.4 || ^4.0
-  php-and-elasticsearch:
-    docker:
-      - image: circleci/php:7.3-node
-        environment:
-          SYMFONY_REQUIRE: ^3.4 || ^4.0
-      - image: docker.elastic.co/elasticsearch/elasticsearch:6.8.3 # https://github.com/elastic/elasticsearch/issues/43627
-  php-and-mongodb:
-    docker:
-      - image: circleci/php:7.3-node
-        environment:
-          SYMFONY_REQUIRE: ^3.4 || ^4.0
-      - image: circleci/mongo:4
 
 jobs:
   php-cs-fixer:
@@ -284,240 +152,9 @@ jobs:
           command: vendor/bin/phpstan analyse --ansi
       - save-phpstan-cache
 
-  phpunit-coverage:
-    description: PHPUnit (code coverage)
-    executor: php
-    parallelism: 2
-    working_directory: ~/api-platform/core
-    steps:
-      - checkout
-      - install-mongodb-php-extension
-      - install-pcov-php-extension
-      - disable-xdebug-php-extension
-      - disable-php-memory-limit
-      - restore-composer-cache
-      - install-symfony-flex
-      - update-project-dependencies
-      - save-composer-cache
-      - clear-test-app-cache
-      - run:
-          name: Run PHPUnit tests
-          command: |
-            mkdir -p build/logs/phpunit build/coverage
-            split_tests=$(find tests -name '*Test.php' | circleci tests split --split-by=timings)
-            export PARALLEL='-j10% --joblog build/logs/parallel.log --rpl {_}\ s/\\//_/g;'
-            phpunit_cmd='vendor/bin/phpunit --coverage-php build/coverage/coverage-{_}.cov --log-junit build/logs/phpunit/{_}.xml --exclude-group mongodb,resource-hog --colors=always {}'
-            echo "$split_tests" | parallel "$phpunit_cmd" || echo "$split_tests" | parallel --retry-failed "$phpunit_cmd"
-      - restore-npm-cache
-      - merge-test-reports:
-          dir: build/logs/phpunit
-          out: build/logs/phpunit/junit.xml
-      - store_test_results:
-          path: build/logs
-      - store_artifacts:
-          path: build/logs/phpunit/junit.xml
-          destination: build/logs/phpunit/junit.xml
-      - store_artifacts:
-          path: build/logs/parallel.log
-          destination: build/logs/parallel.log
-      - merge-code-coverage-reports:
-          dir: build/coverage
-          out: build/logs/clover.xml
-      - store_artifacts:
-          path: build/logs/clover.xml
-          destination: build/logs/clover.xml
-      - codecov/upload:
-          file: build/logs/clover.xml
-          flags: phpunit
-      - coveralls/upload:
-          file: build/logs/clover.xml
-      - save-npm-cache
-
-  behat-coverage:
-    description: Behat (code coverage)
-    executor: php
-    parallelism: 2
-    working_directory: ~/api-platform/core
-    steps:
-      - checkout
-      - install-mongodb-php-extension
-      - install-pcov-php-extension
-      - disable-xdebug-php-extension
-      - disable-php-memory-limit
-      - restore-composer-cache
-      - install-symfony-flex
-      - update-project-dependencies
-      - save-composer-cache
-      - clear-test-app-cache
-      - run:
-          name: Run Behat tests
-          command: |
-            mkdir -p build/logs/behat build/coverage
-            for f in $(find features -name '*.feature' -not -path 'features/main/exposed_state.feature' -not -path 'features/elasticsearch/*' -not -path 'features/mongodb/*' | circleci tests split --split-by=timings); do
-              _f=$(echo "$f" | tr / _)
-              FEATURE="${_f}" vendor/bin/behat --format=progress --out=std --format=junit --out=build/logs/behat/"${_f}" --profile=default-coverage --no-interaction --colors "$f"
-            done
-      - restore-npm-cache
-      - merge-test-reports:
-          dir: build/logs/behat
-          out: build/logs/behat/junit.xml
-      - store_test_results:
-          path: build/logs
-      - store_artifacts:
-          path: build/logs/behat/junit.xml
-          destination: build/logs/behat/junit.xml
-      - merge-code-coverage-reports:
-          dir: build/coverage
-          out: build/logs/clover.xml
-      - store_artifacts:
-          path: build/logs/clover.xml
-          destination: build/logs/clover.xml
-      - codecov/upload:
-          file: build/logs/clover.xml
-          flags: behat
-      - coveralls/upload:
-          file: build/logs/clover.xml
-      - save-npm-cache
-
-  phpunit-mongodb-coverage:
-    description: PHPUnit (MongoDB) (code coverage)
-    executor: php-and-mongodb
-    environment:
-      APP_ENV: mongodb
-    working_directory: ~/api-platform/core
-    steps:
-      - checkout
-      - install-mongodb-php-extension
-      - install-pcov-php-extension
-      - disable-xdebug-php-extension
-      - disable-php-memory-limit
-      - restore-composer-cache
-      - install-symfony-flex
-      - update-project-dependencies
-      - save-composer-cache
-      - clear-test-app-cache
-      - wait-for-mongodb
-      - run:
-          name: Run PHPUnit tests
-          command: |
-            mkdir -p build/logs/phpunit
-            vendor/bin/phpunit --coverage-clover build/logs/clover.xml --log-junit build/logs/phpunit/junit.xml --exclude-group resource-hog --colors=always --configuration phpunit_mongodb.xml
-      - store_test_results:
-          path: build/logs
-      - store_artifacts:
-          path: build/logs/phpunit/junit.xml
-          destination: build/logs/phpunit/junit.xml
-      - store_artifacts:
-          path: build/logs/clover.xml
-          destination: build/logs/clover.xml
-      - restore-npm-cache
-      - codecov/upload:
-          file: build/logs/clover.xml
-          flags: phpunit_mongodb
-      - coveralls/upload:
-          file: build/logs/clover.xml
-      - save-npm-cache
-
-  behat-mongodb-coverage:
-    description: Behat (MongoDB) (code coverage)
-    executor: php-and-mongodb
-    environment:
-      APP_ENV: mongodb
-    working_directory: ~/api-platform/core
-    steps:
-      - checkout
-      - install-mongodb-php-extension
-      - install-pcov-php-extension
-      - disable-xdebug-php-extension
-      - disable-php-memory-limit
-      - restore-composer-cache
-      - install-symfony-flex
-      - update-project-dependencies
-      - save-composer-cache
-      - clear-test-app-cache
-      - wait-for-mongodb
-      - run:
-          name: Run Behat tests
-          command: |
-            mkdir -p build/logs/behat
-            vendor/bin/behat --format=progress --out=std --format=junit --out=build/logs/behat --profile=mongodb-coverage --no-interaction --colors
-      - restore-npm-cache
-      - merge-test-reports:
-          dir: build/logs/behat
-          out: build/logs/behat/junit.xml
-      - store_test_results:
-          path: build/logs
-      - store_artifacts:
-          path: build/logs/behat/junit.xml
-          destination: build/logs/behat/junit.xml
-      - merge-code-coverage-reports:
-          dir: build/coverage
-          out: build/logs/clover.xml
-      - store_artifacts:
-          path: build/logs/clover.xml
-          destination: build/logs/clover.xml
-      - codecov/upload:
-          file: build/logs/clover.xml
-          flags: behat_mongodb
-      - coveralls/upload:
-          file: build/logs/clover.xml
-      - save-npm-cache
-
-  behat-elasticsearch-coverage:
-    description: Behat (Elasticsearch) (code coverage)
-    executor: php-and-elasticsearch
-    environment:
-      APP_ENV: elasticsearch
-    working_directory: ~/api-platform/core
-    steps:
-      - checkout
-      - install-mongodb-php-extension
-      - install-pcov-php-extension
-      - disable-xdebug-php-extension
-      - disable-php-memory-limit
-      - restore-composer-cache
-      - install-symfony-flex
-      - update-project-dependencies
-      - save-composer-cache
-      - clear-test-app-cache
-      - wait-for-elasticsearch
-      - run:
-          name: Run Behat tests
-          command: |
-            mkdir -p build/logs/behat
-            vendor/bin/behat --format=progress --out=std --format=junit --out=build/logs/behat --profile=elasticsearch-coverage --no-interaction --colors
-      - restore-npm-cache
-      - merge-test-reports:
-          dir: build/logs/behat
-          out: build/logs/behat/junit.xml
-      - store_test_results:
-          path: build/logs
-      - store_artifacts:
-          path: build/logs/behat/junit.xml
-          destination: build/logs/behat/junit.xml
-      - merge-code-coverage-reports:
-          dir: build/coverage
-          out: build/logs/clover.xml
-      - store_artifacts:
-          path: build/logs/clover.xml
-          destination: build/logs/clover.xml
-      - codecov/upload:
-          file: build/logs/clover.xml
-          flags: behat_elasticsearch
-      - coveralls/upload:
-          file: build/logs/clover.xml
-      - save-npm-cache
-
 workflows:
   version: 2
   lint:
     jobs:
       - php-cs-fixer
       - phpstan
-  coverage:
-    jobs:
-      - phpunit-coverage
-      - behat-coverage
-      - phpunit-mongodb-coverage
-      - behat-mongodb-coverage
-      - behat-elasticsearch-coverage
