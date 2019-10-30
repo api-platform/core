@@ -41,7 +41,7 @@
             <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
             <argument type="collection" />
             <argument type="tagged" tag="api_platform.data_transformer" on-invalid="ignore" />
-            <argument>false</argument>
+            <argument type="service" id="api_platform.security.resource_access_checker" />
 
             <!-- Run before serializer.normalizer.json_serializable -->
             <tag name="serializer.normalizer" priority="-890" />

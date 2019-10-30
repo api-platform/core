@@ -24,6 +24,7 @@ use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
+use ApiPlatform\Core\Security\ResourceAccessCheckerInterface;
 use ApiPlatform\Core\Util\ClassInfoTrait;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Symfony\Component\PropertyAccess\PropertyAccess;
@@ -55,13 +56,14 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
     protected $propertyMetadataFactory;
     protected $iriConverter;
     protected $resourceClassResolver;
+    protected $resourceAccessChecker;
     protected $propertyAccessor;
     protected $itemDataProvider;
     protected $allowPlainIdentifiers;
     protected $dataTransformers = [];
     protected $localCache = [];
 
-    public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, IriConverterInterface $iriConverter, ResourceClassResolverInterface $resourceClassResolver, PropertyAccessorInterface $propertyAccessor = null, NameConverterInterface $nameConverter = null, ClassMetadataFactoryInterface $classMetadataFactory = null, ItemDataProviderInterface $itemDataProvider = null, bool $allowPlainIdentifiers = false, array $defaultContext = [], iterable $dataTransformers = [], ResourceMetadataFactoryInterface $resourceMetadataFactory = null)
+    public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, IriConverterInterface $iriConverter, ResourceClassResolverInterface $resourceClassResolver, PropertyAccessorInterface $propertyAccessor = null, NameConverterInterface $nameConverter = null, ClassMetadataFactoryInterface $classMetadataFactory = null, ItemDataProviderInterface $itemDataProvider = null, bool $allowPlainIdentifiers = false, array $defaultContext = [], iterable $dataTransformers = [], ResourceMetadataFactoryInterface $resourceMetadataFactory = null, ResourceAccessCheckerInterface $resourceAccessChecker = null)
     {
         if (!isset($defaultContext['circular_reference_handler'])) {
             $defaultContext['circular_reference_handler'] = function ($object) {
@@ -83,6 +85,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
         $this->allowPlainIdentifiers = $allowPlainIdentifiers;
         $this->dataTransformers = $dataTransformers;
         $this->resourceMetadataFactory = $resourceMetadataFactory;
+        $this->resourceAccessChecker = $resourceAccessChecker;
     }
 
     /**
@@ -347,6 +350,25 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
         }
 
         return $allowedAttributes;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function isAllowedAttribute($classOrObject, $attribute, $format = null, array $context = [])
+    {
+        if (!parent::isAllowedAttribute($classOrObject, $attribute, $format, $context)) {
+            return false;
+        }
+
+        $options = $this->getFactoryOptions($context);
+        $propertyMetadata = $this->propertyMetadataFactory->create($context['resource_class'], $attribute, $options);
+        $security = $propertyMetadata->getAttribute('security');
+        if ($this->resourceAccessChecker && $security) {
+            return $this->resourceAccessChecker->isGranted($attribute, $security);
+        }
+
+        return true;
     }
 
     /**
