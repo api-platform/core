@@ -59,7 +59,8 @@ Feature: Authorization checking
     {
         "title": "Special Title",
         "description": "Description",
-        "owner": "dunglas"
+        "owner": "dunglas",
+        "adminOnlyProperty": "secret"
     }
     """
     Then the response status code should be 201
@@ -100,3 +101,18 @@ Feature: Authorization checking
     }
     """
     Then the response status code should be 200
+
+  Scenario: An admin retrieves a resource with an admin only viewable property
+    When I add "Accept" header equal to "application/ld+json"
+    And I add "Content-Type" header equal to "application/ld+json"
+    And I add "Authorization" header equal to "Basic YWRtaW46a2l0dGVu"
+    And I send a "GET" request to "/secured_dummies"
+    Then the response status code should be 200
+    And the response should contain "adminOnlyProperty"
+
+  Scenario: A user retrieves a resource with an admin only viewable property
+    When I add "Accept" header equal to "application/ld+json"
+    And I add "Authorization" header equal to "Basic ZHVuZ2xhczprZXZpbg=="
+    And I send a "GET" request to "/secured_dummies"
+    Then the response status code should be 200
+    And the response should not contain "adminOnlyProperty"

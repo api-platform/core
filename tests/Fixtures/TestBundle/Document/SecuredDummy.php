@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Document;
 
+use ApiPlatform\Core\Annotation\ApiProperty;
 use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -26,7 +27,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  * @ApiResource(
  *     attributes={"security"="is_granted('ROLE_USER')"},
  *     collectionOperations={
- *         "get",
+ *         "get"={"security"="is_granted('ROLE_USER') or is_granted('ROLE_ADMIN')"},
  *         "get_from_data_provider_generator"={
  *             "method"="GET",
  *             "path"="custom_data_provider_generator",
@@ -73,6 +74,14 @@ class SecuredDummy
     private $description = '';
 
     /**
+     * @var string The dummy secret property, only readable/writable by specific users
+     *
+     * @ODM\Field
+     * @ApiProperty(security="is_granted('ROLE_ADMIN')")
+     */
+    private $adminOnlyProperty = '';
+
+    /**
      * @var string The owner
      *
      * @ODM\Field
@@ -103,6 +112,16 @@ class SecuredDummy
     public function setDescription(string $description)
     {
         $this->description = $description;
+    }
+
+    public function getAdminOnlyProperty(): ?string
+    {
+        return $this->adminOnlyProperty;
+    }
+
+    public function setAdminOnlyProperty(?string $adminOnlyProperty)
+    {
+        $this->adminOnlyProperty = $adminOnlyProperty;
     }
 
     public function getOwner(): string

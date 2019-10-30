@@ -91,7 +91,7 @@ Feature: Authorization checking
     When I send the following GraphQL request:
     """
     mutation {
-      createSecuredDummy(input: {owner: "me", title: "Hi", description: "Desc", clientMutationId: "auth"}) {
+      createSecuredDummy(input: {owner: "me", title: "Hi", description: "Desc", adminOnlyProperty: "secret", clientMutationId: "auth"}) {
         securedDummy {
           title
           owner
@@ -112,7 +112,7 @@ Feature: Authorization checking
     And I send the following GraphQL request:
     """
     mutation {
-      createSecuredDummy(input: {owner: "someone", title: "Hi", description: "Desc"}) {
+      createSecuredDummy(input: {owner: "someone", title: "Hi", description: "Desc", adminOnlyProperty: "secret"}) {
         securedDummy {
           id
           title
@@ -131,7 +131,7 @@ Feature: Authorization checking
     And I send the following GraphQL request:
     """
     mutation {
-      createSecuredDummy(input: {owner: "dunglas", title: "Hi", description: "Desc"}) {
+      createSecuredDummy(input: {owner: "dunglas", title: "Hi", description: "Desc", adminOnlyProperty: "secret"}) {
         securedDummy {
           id
           title
