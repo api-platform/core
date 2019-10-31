@@ -27,6 +27,7 @@ use Symfony\Bundle\TwigBundle\TwigBundle;
 use Symfony\Bundle\WebProfilerBundle\WebProfilerBundle;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\ErrorRenderer\ErrorRenderer;
 use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\Routing\RouteCollectionBuilder;
 use Symfony\Component\Security\Core\Encoder\SodiumPasswordEncoder;
@@ -151,6 +152,12 @@ class AppKernel extends Kernel
                 ],
             ]);
         }
+
+        $twigConfig = ['strict_variables' => '%kernel.debug%'];
+        if (class_exists(ErrorRenderer::class)) {
+            $twigConfig['exception_controller'] = null;
+        }
+        $c->prependExtensionConfig('twig', $twigConfig);
 
         if ($_SERVER['LEGACY'] ?? true) {
             $c->prependExtensionConfig('nelmio_api_doc', [

@@ -25,6 +25,7 @@ parameters:
 			path: %currentWorkingDirectory%/src/Identifier/Normalizer/IntegerDenormalizer.php
 
 		# False positives
+		- '#Class Symfony\\Component\\ErrorRenderer\\ErrorRenderer not found\.#'
 		-
 			message: '#Variable \$positionPm might not be defined\.#'
 			path: %currentWorkingDirectory%/src/Util/ClassInfoTrait.php
