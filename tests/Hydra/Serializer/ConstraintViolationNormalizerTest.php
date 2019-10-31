@@ -40,18 +40,15 @@ class ConstraintViolationNormalizerTest extends TestCase
         $this->assertTrue($normalizer->hasCacheableSupportsMethod());
     }
 
-    public function testNormalize()
+    public function testNormalizeLegacy()
     {
         $urlGeneratorProphecy = $this->prophesize(UrlGeneratorInterface::class);
         $nameConverterProphecy = $this->prophesize(NameConverterInterface::class);
-
         $urlGeneratorProphecy->generate('api_jsonld_context', ['shortName' => 'ConstraintViolationList'])->willReturn('/context/foo')->shouldBeCalled();
         $nameConverterProphecy->normalize(Argument::type('string'), null, Argument::type('string'))->will(function ($args) {
             return '_'.$args[0];
         });
-
         $normalizer = new ConstraintViolationListNormalizer($urlGeneratorProphecy->reveal(), ['severity', 'anotherField1'], $nameConverterProphecy->reveal());
-
         // Note : we use NotNull constraint and not Constraint class because Constraint is abstract
         $constraint = new NotNull();
         $constraint->payload = ['severity' => 'warning', 'anotherField2' => 'aValue'];
@@ -59,7 +56,6 @@ class ConstraintViolationNormalizerTest extends TestCase
             new ConstraintViolation('a', 'b', [], 'c', 'd', 'e', null, null, $constraint),
             new ConstraintViolation('1', '2', [], '3', '4', '5'),
         ]);
-
         $expected = [
             '@context' => '/context/foo',
             '@type' => 'ConstraintViolationList',
@@ -77,6 +73,48 @@ _4: 1',
                 [
                     'propertyPath' => '_4',
                     'message' => '1',
+                ],
+            ],
+        ];
+        $this->assertEquals($expected, $normalizer->normalize($list));
+    }
+
+    public function testNormalize()
+    {
+        $urlGeneratorProphecy = $this->prophesize(UrlGeneratorInterface::class);
+        $nameConverterProphecy = $this->prophesize(NameConverterInterface::class);
+        $urlGeneratorProphecy->generate('api_jsonld_context', ['shortName' => 'ConstraintViolationList'])->willReturn('/context/foo');
+        $nameConverterProphecy->normalize(Argument::type('string'), null, null, [])->will(function ($args) {
+            return '_'.$args[0];
+        });
+        $normalizer = new ConstraintViolationListNormalizer($urlGeneratorProphecy->reveal(), ['severity', 'anotherField1'], $nameConverterProphecy->reveal(), true);
+        // Note : we use NotNull constraint and not Constraint class because Constraint is abstract
+        $constraint = new NotNull();
+        $constraint->payload = ['severity' => 'warning', 'anotherField2' => 'aValue'];
+        $list = new ConstraintViolationList([
+            new ConstraintViolation('a', 'b', [], 'c', 'd', 'e', null, 'abcde1234', $constraint),
+            new ConstraintViolation('1', '2', [], '3', '4', '5'),
+        ]);
+        $expected = [
+            '@context' => '/context/foo',
+            '@type' => 'ConstraintViolationList',
+            'hydra:title' => 'An error occurred',
+            'hydra:description' => '_d: a
+_4: 1',
+            'violations' => [
+                [
+                    'propertyPath' => '_d',
+                    'title' => 'a',
+                    'parameters' => [],
+                    'type' => 'urn:uuid:abcde1234',
+                    'payload' => [
+                        'severity' => 'warning',
+                    ],
+                ],
+                [
+                    'propertyPath' => '_4',
+                    'title' => '1',
+                    'parameters' => [],
                 ],
             ],
         ];

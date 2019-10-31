@@ -33,6 +33,7 @@
             <argument type="service" id="api_platform.router" />
             <argument>%api_platform.validator.serialize_payload_fields%</argument>
             <argument type="service" id="api_platform.name_converter" on-invalid="ignore" />
+            <argument>%api_platform.enable_symfony_violation_normalizer%</argument>
 
             <tag name="serializer.normalizer" priority="-780" />
         </service>

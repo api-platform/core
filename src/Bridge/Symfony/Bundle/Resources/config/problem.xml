@@ -15,6 +15,8 @@
         <service id="api_platform.problem.normalizer.constraint_violation_list" class="ApiPlatform\Core\Problem\Serializer\ConstraintViolationListNormalizer" public="false">
             <argument>%api_platform.validator.serialize_payload_fields%</argument>
             <argument type="service" id="api_platform.name_converter" on-invalid="ignore" />
+            <argument type="collection"></argument>
+            <argument>%api_platform.enable_symfony_violation_normalizer%</argument>
 
             <tag name="serializer.normalizer" priority="-780" />
         </service>

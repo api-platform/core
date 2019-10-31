@@ -850,6 +850,7 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.defaults' => ['attributes' => []],
             'api_platform.enable_entrypoint' => true,
             'api_platform.enable_docs' => true,
+            'api_platform.enable_symfony_violation_normalizer' => false,
         ];
 
         $pagination = [
@@ -1122,6 +1123,7 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.validator.serialize_payload_fields' => [],
             'api_platform.elasticsearch.enabled' => false,
             'api_platform.defaults' => ['attributes' => []],
+            'api_platform.enable_symfony_violation_normalizer' => false,
         ];
 
         if ($hasSwagger) {

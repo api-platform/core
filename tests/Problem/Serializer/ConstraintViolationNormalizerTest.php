@@ -37,7 +37,7 @@ class ConstraintViolationNormalizerTest extends TestCase
         $this->assertTrue($normalizer->hasCacheableSupportsMethod());
     }
 
-    public function testNormalize()
+    public function testNormalizeLegacy()
     {
         $nameConverterProphecy = $this->prophesize(NameConverterInterface::class);
         $normalizer = new ConstraintViolationListNormalizer(['severity', 'anotherField1'], $nameConverterProphecy->reveal());
@@ -70,6 +70,48 @@ _4: 1',
                 [
                     'propertyPath' => '_4',
                     'message' => '1',
+                ],
+            ],
+        ];
+        $this->assertEquals($expected, $normalizer->normalize($list));
+    }
+
+    public function testNormalize()
+    {
+        $nameConverterProphecy = $this->prophesize(NameConverterInterface::class);
+        $normalizer = new ConstraintViolationListNormalizer(['severity', 'anotherField1'], $nameConverterProphecy->reveal(), [], true);
+
+        $nameConverterProphecy->normalize(Argument::type('string'), null, null, [])->will(function ($args) {
+            return '_'.$args[0];
+        });
+
+        // Note : we use NotNull constraint and not Constraint class because Constraint is abstract
+        $constraint = new NotNull();
+        $constraint->payload = ['severity' => 'warning', 'anotherField2' => 'aValue'];
+        $list = new ConstraintViolationList([
+            new ConstraintViolation('a', 'b', [], 'c', 'd', 'e', null, 'abcde1234', $constraint),
+            new ConstraintViolation('1', '2', [], '3', '4', '5'),
+        ]);
+
+        $expected = [
+            'type' => 'https://tools.ietf.org/html/rfc2616#section-10',
+            'title' => 'An error occurred',
+            'detail' => '_d: a
+_4: 1',
+            'violations' => [
+                [
+                    'propertyPath' => '_d',
+                    'title' => 'a',
+                    'parameters' => [],
+                    'type' => 'urn:uuid:abcde1234',
+                    'payload' => [
+                        'severity' => 'warning',
+                    ],
+                ],
+                [
+                    'propertyPath' => '_4',
+                    'title' => '1',
+                    'parameters' => [],
                 ],
             ],
         ];

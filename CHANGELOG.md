@@ -2,6 +2,7 @@
 
 ## 2.6.0
 
+* Add parameter `api_platform.enable_symfony_violation_normalizer` in order to deprecate non-usage of Symfony Serializer's `Symfony\Component\Serializer\Normalizer\ConstraintViolationListNormalizer` Normalizer.
 * MongoDB: Possibility to add execute options (aggregate command fields) for a resource, like `allowDiskUse` (#3144)
 
 ## 2.5.0

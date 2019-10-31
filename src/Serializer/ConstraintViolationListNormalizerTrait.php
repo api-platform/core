@@ -13,9 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Serializer;
 
-use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
-use Symfony\Component\Serializer\Normalizer\CacheableSupportsMethodInterface;
-use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
 
 /**
@@ -25,27 +22,8 @@ use Symfony\Component\Validator\ConstraintViolationListInterface;
  *
  * @internal
  */
-abstract class AbstractConstraintViolationListNormalizer implements NormalizerInterface, CacheableSupportsMethodInterface
+trait ConstraintViolationListNormalizerTrait
 {
-    public const FORMAT = null; // Must be overrode
-
-    private $serializePayloadFields;
-    private $nameConverter;
-
-    public function __construct(array $serializePayloadFields = null, NameConverterInterface $nameConverter = null)
-    {
-        $this->nameConverter = $nameConverter;
-        $this->serializePayloadFields = $serializePayloadFields;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function supportsNormalization($data, $format = null): bool
-    {
-        return static::FORMAT === $format && $data instanceof ConstraintViolationListInterface;
-    }
-
     /**
      * {@inheritdoc}
      */
@@ -56,6 +34,8 @@ abstract class AbstractConstraintViolationListNormalizer implements NormalizerIn
 
     protected function getMessagesAndViolations(ConstraintViolationListInterface $constraintViolationList): array
     {
+        @trigger_error('Using Api-platform\'s ConstraintViolationList Normalizer is deprecated since 2.6 and will not be possible in 3.0. Please set "api_platform.enable_symfony_violation_normalizer" parameter to "true".', E_USER_DEPRECATED);
+
         $violations = $messages = [];
 
         foreach ($constraintViolationList as $violation) {
@@ -77,5 +57,17 @@ abstract class AbstractConstraintViolationListNormalizer implements NormalizerIn
         }
 
         return [$messages, $violations];
+    }
+
+    protected function addPayloadToViolations(ConstraintViolationListInterface $object, array &$violations): void
+    {
+        foreach ($object as $key => $violation) {
+            $constraint = $violation->getConstraint();
+            if ($this->serializePayloadFields && $constraint && $constraint->payload) {
+                // If some fields are whitelisted, only them are added
+                $payloadFields = null === $this->serializePayloadFields ? $constraint->payload : array_intersect_key($constraint->payload, array_flip($this->serializePayloadFields));
+                $payloadFields && $violations[$key]['payload'] = $payloadFields;
+            }
+        }
     }
 }
