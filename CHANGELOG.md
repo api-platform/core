@@ -3,6 +3,7 @@
 ## 2.6.0
 
 * MongoDB: Possibility to add execute options (aggregate command fields) for a resource, like `allowDiskUse` (#3144)
+* Split IriConverterInterface in two interfaces (#1664)
 
 ## 2.5.0
 
