@@ -2780,7 +2780,7 @@ class DocumentationNormalizerV2Test extends TestCase
                                 'schema' => [
                                     'type' => 'array',
                                     'items' => [
-                                        '$ref' => '#/definitions/Dummy:300dcd476cef011532fb0ca7683395d7',
+                                        '$ref' => '#/definitions/Dummy:OutputDto',
                                     ],
                                 ],
                             ],
@@ -2805,7 +2805,7 @@ class DocumentationNormalizerV2Test extends TestCase
                             201 => [
                                 'description' => 'Dummy resource created',
                                 'schema' => [
-                                    '$ref' => '#/definitions/Dummy:300dcd476cef011532fb0ca7683395d7',
+                                    '$ref' => '#/definitions/Dummy:OutputDto',
                                 ],
                             ],
                             400 => [
@@ -2821,7 +2821,7 @@ class DocumentationNormalizerV2Test extends TestCase
                                 'in' => 'body',
                                 'description' => 'The new Dummy resource',
                                 'schema' => [
-                                    '$ref' => '#/definitions/Dummy:b4f76c1a44965bd401aa23bb37618acc',
+                                    '$ref' => '#/definitions/Dummy:InputDto',
                                 ],
                             ],
                         ],
@@ -2845,7 +2845,7 @@ class DocumentationNormalizerV2Test extends TestCase
                             200 => [
                                 'description' => 'Dummy resource response',
                                 'schema' => [
-                                    '$ref' => '#/definitions/Dummy:300dcd476cef011532fb0ca7683395d7',
+                                    '$ref' => '#/definitions/Dummy:OutputDto',
                                 ],
                             ],
                             404 => [
@@ -2871,7 +2871,7 @@ class DocumentationNormalizerV2Test extends TestCase
                                 'in' => 'body',
                                 'description' => 'The updated Dummy resource',
                                 'schema' => [
-                                    '$ref' => '#/definitions/Dummy:b4f76c1a44965bd401aa23bb37618acc',
+                                    '$ref' => '#/definitions/Dummy:InputDto',
                                 ],
                             ],
                         ],
@@ -2879,7 +2879,7 @@ class DocumentationNormalizerV2Test extends TestCase
                             200 => [
                                 'description' => 'Dummy resource updated',
                                 'schema' => [
-                                    '$ref' => '#/definitions/Dummy:300dcd476cef011532fb0ca7683395d7',
+                                    '$ref' => '#/definitions/Dummy:OutputDto',
                                 ],
                             ],
                             400 => [
@@ -2893,7 +2893,7 @@ class DocumentationNormalizerV2Test extends TestCase
                 ],
             ]),
             'definitions' => new \ArrayObject([
-                'Dummy:300dcd476cef011532fb0ca7683395d7' => new \ArrayObject([
+                'Dummy:OutputDto' => new \ArrayObject([
                     'type' => 'object',
                     'description' => 'This is a dummy.',
                     'externalDocs' => [
@@ -2911,7 +2911,7 @@ class DocumentationNormalizerV2Test extends TestCase
                         ]),
                     ],
                 ]),
-                'Dummy:b4f76c1a44965bd401aa23bb37618acc' => new \ArrayObject([
+                'Dummy:InputDto' => new \ArrayObject([
                     'type' => 'object',
                     'description' => 'This is a dummy.',
                     'externalDocs' => [
