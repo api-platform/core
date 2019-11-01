@@ -16,7 +16,7 @@ namespace ApiPlatform\Core\Bridge\Doctrine\EventListener;
 use ApiPlatform\Core\EventListener\WriteListener as BaseWriteListener;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Persistence\ObjectManager;
-use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
+use Symfony\Component\HttpKernel\Event\ViewEvent;
 
 /**
  * Bridges Doctrine and the API system.
@@ -39,7 +39,7 @@ final class WriteListener
     /**
      * Persists, updates or delete data return by the controller if applicable.
      */
-    public function onKernelView(GetResponseForControllerResultEvent $event): void
+    public function onKernelView(ViewEvent $event): void
     {
         $request = $event->getRequest();
         if ($request->isMethodSafe()) {

@@ -14,27 +14,14 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Action;
 
 use ApiPlatform\Core\Util\ErrorFormatGuesser;
-use Symfony\Component\Debug\Exception\FlattenException;
+use Symfony\Component\Debug\Exception\FlattenException as LegacyFlattenException;
+use Symfony\Component\ErrorRenderer\Exception\FlattenException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Serializer\SerializerInterface;
 
 /**
- * Renders a normalized exception for a given {@see FlattenException}.
- *
- * Usage:
- *
- *     $exceptionAction = new ExceptionAction(
- *         new Serializer(),
- *         [
- *             'jsonproblem' => ['application/problem+json'],
- *             'jsonld' => ['application/ld+json'],
- *         ],
- *         [
- *             ExceptionInterface::class => Response::HTTP_BAD_REQUEST,
- *             InvalidArgumentException::class => Response::HTTP_BAD_REQUEST,
- *         ]
- *     );
+ * Renders a normalized exception for a given {@see FlattenException} or {@see LegacyFlattenException}.
  *
  * @author Baptiste Meyer <baptiste.meyer@gmail.com>
  * @author Kévin Dunglas <dunglas@gmail.com>
@@ -46,7 +33,7 @@ final class ExceptionAction
     private $exceptionToStatus;
 
     /**
-     * @param array $errorFormats      A list of enabled formats, the first one will be the default
+     * @param array $errorFormats      A list of enabled error formats
      * @param array $exceptionToStatus A list of exceptions mapped to their HTTP status code
      */
     public function __construct(SerializerInterface $serializer, array $errorFormats, array $exceptionToStatus = [])
@@ -59,7 +46,7 @@ final class ExceptionAction
     /**
      * Converts an exception to a JSON response.
      *
-     * @param FlattenException $exception
+     * @param FlattenException|LegacyFlattenException $exception
      */
     public function __invoke($exception, Request $request): Response
     {

@@ -16,7 +16,7 @@ namespace ApiPlatform\Core\Bridge\FosUser;
 use ApiPlatform\Core\Util\RequestAttributesExtractor;
 use FOS\UserBundle\Model\UserInterface;
 use FOS\UserBundle\Model\UserManagerInterface;
-use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
+use Symfony\Component\HttpKernel\Event\ViewEvent;
 
 /**
  * Bridges between FOSUserBundle and API Platform Core.
@@ -36,7 +36,7 @@ final class EventListener
     /**
      * Persists, updates or delete data return by the controller if applicable.
      */
-    public function onKernelView(GetResponseForControllerResultEvent $event): void
+    public function onKernelView(ViewEvent $event): void
     {
         $request = $event->getRequest();
         if (!RequestAttributesExtractor::extractAttributes($request)) {
