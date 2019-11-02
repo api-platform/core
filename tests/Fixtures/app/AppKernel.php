@@ -131,6 +131,7 @@ class AppKernel extends Kernel
                     'provider' => 'chain_provider',
                     'http_basic' => null,
                     'anonymous' => null,
+                    'stateless' => true,
                 ],
             ],
             'access_control' => [
