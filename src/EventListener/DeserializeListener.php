@@ -132,11 +132,7 @@ final class DeserializeListener
                 }
             }
 
-            throw new UnsupportedMediaTypeHttpException(sprintf(
-                'The content-type "%s" is not supported. Supported MIME types are "%s".',
-                $contentType,
-                implode('", "', $supportedMimeTypes)
-            ));
+            throw new UnsupportedMediaTypeHttpException(sprintf('The content-type "%s" is not supported. Supported MIME types are "%s".', $contentType, implode('", "', $supportedMimeTypes)));
         }
 
         return $format;

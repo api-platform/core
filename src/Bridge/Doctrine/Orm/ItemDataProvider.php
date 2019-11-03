@@ -74,10 +74,7 @@ class ItemDataProvider implements DenormalizedIdentifiersAwareItemDataProviderIn
             $id = $this->normalizeIdentifiers($id, $manager, $resourceClass);
         }
         if (!\is_array($id)) {
-            throw new \InvalidArgumentException(sprintf(
-                '$id must be array when "%s" key is set to true in the $context',
-                IdentifierConverterInterface::HAS_IDENTIFIER_CONVERTER
-            ));
+            throw new \InvalidArgumentException(sprintf('$id must be array when "%s" key is set to true in the $context', IdentifierConverterInterface::HAS_IDENTIFIER_CONVERTER));
         }
         $identifiers = $id;
 

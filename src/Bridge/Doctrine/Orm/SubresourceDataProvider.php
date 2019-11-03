@@ -142,9 +142,7 @@ final class SubresourceDataProvider implements SubresourceDataProviderInterface
         $classMetadata = $manager->getClassMetadata($identifierResourceClass);
 
         if (!$classMetadata instanceof ClassMetadataInfo) {
-            throw new RuntimeException(
-                "The class metadata for $identifierResourceClass must be an instance of ClassMetadataInfo."
-            );
+            throw new RuntimeException("The class metadata for $identifierResourceClass must be an instance of ClassMetadataInfo.");
         }
 
         $qb = $manager->createQueryBuilder();

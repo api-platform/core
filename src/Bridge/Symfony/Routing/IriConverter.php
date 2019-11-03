@@ -122,10 +122,7 @@ final class IriConverter implements IriConverterInterface
         try {
             $identifiers = $this->identifiersExtractor->getIdentifiersFromItem($item);
         } catch (RuntimeException $e) {
-            throw new InvalidArgumentException(sprintf(
-                'Unable to generate an IRI for the item of type "%s"',
-                $resourceClass
-            ), $e->getCode(), $e);
+            throw new InvalidArgumentException(sprintf('Unable to generate an IRI for the item of type "%s"', $resourceClass), $e->getCode(), $e);
         }
 
         return $this->getItemIriFromResourceClass($resourceClass, $identifiers, $referenceType);
@@ -155,10 +152,7 @@ final class IriConverter implements IriConverterInterface
 
             return $this->router->generate($routeName, ['id' => implode(';', $identifiers)], $referenceType);
         } catch (RoutingExceptionInterface $e) {
-            throw new InvalidArgumentException(sprintf(
-                'Unable to generate an IRI for "%s".',
-                $resourceClass
-            ), $e->getCode(), $e);
+            throw new InvalidArgumentException(sprintf('Unable to generate an IRI for "%s".', $resourceClass), $e->getCode(), $e);
         }
     }
 
@@ -184,10 +178,7 @@ final class IriConverter implements IriConverterInterface
     private function generateIdentifiersUrl(array $identifiers, string $resourceClass): array
     {
         if (0 === \count($identifiers)) {
-            throw new InvalidArgumentException(sprintf(
-                'No identifiers defined for resource of type "%s"',
-                $resourceClass
-            ));
+            throw new InvalidArgumentException(sprintf('No identifiers defined for resource of type "%s"', $resourceClass));
         }
 
         if (1 === \count($identifiers)) {
