@@ -51,7 +51,7 @@ final class InheritedPropertyNameCollectionFactory implements PropertyNameCollec
                 continue;
             }
 
-            if (is_subclass_of($knownResourceClass, $resourceClass)) {
+            if (is_subclass_of($resourceClass, $knownResourceClass)) {
                 foreach ($this->create($knownResourceClass) as $propertyName) {
                     $propertyNames[$propertyName] = $propertyName;
                 }
