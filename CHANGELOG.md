@@ -2,6 +2,7 @@
 
 ## 2.6.0
 
+* Display the API Platform's version in the debug-bar
 * MongoDB: Possibility to add execute options (aggregate command fields) for a resource, like `allowDiskUse` (#3144)
 * MongoDB: Mercure support (#3290)
 * GraphQL: Subscription support with Mercure (#3321)

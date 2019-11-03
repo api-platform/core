@@ -23,6 +23,7 @@ use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
 use ApiPlatform\Core\DataProvider\SubresourceDataProviderInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Util\RequestAttributesExtractor;
+use PackageVersions\Versions;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -156,6 +157,18 @@ final class RequestDataCollector extends DataCollector
     public function getDataPersisters(): array
     {
         return $this->data['dataPersisters'] ?? ['responses' => []];
+    }
+
+    public function getVersion(): ?string
+    {
+        if (!class_exists(Versions::class)) {
+            return null;
+        }
+
+        $version = Versions::getVersion('api-platform/core');
+        preg_match('/^v(.*?)@/', $version, $output);
+
+        return $output[1] ?? strtok($version, '@');
     }
 
     /**
