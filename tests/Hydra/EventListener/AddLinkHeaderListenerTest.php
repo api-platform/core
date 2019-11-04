@@ -19,7 +19,7 @@ use Fig\Link\GenericLinkProvider;
 use Fig\Link\Link;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
+use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\WebLink\HttpHeaderSerializer;
 
 /**
@@ -35,7 +35,7 @@ class AddLinkHeaderListenerTest extends TestCase
         $urlGenerator = $this->prophesize(UrlGeneratorInterface::class);
         $urlGenerator->generate('api_doc', ['_format' => 'jsonld'], UrlGeneratorInterface::ABS_URL)->willReturn('http://example.com/docs')->shouldBeCalled();
 
-        $event = $this->prophesize(FilterResponseEvent::class);
+        $event = $this->prophesize(ResponseEvent::class);
         $event->getRequest()->willReturn($request)->shouldBeCalled();
 
         $listener = new AddLinkHeaderListener($urlGenerator->reveal());

@@ -19,7 +19,7 @@ use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
+use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Validator\ConstraintViolationList;
 
@@ -30,7 +30,7 @@ class ValidationExceptionListenerTest extends TestCase
 {
     public function testNotValidationException()
     {
-        $eventProphecy = $this->prophesize(GetResponseForExceptionEvent::class);
+        $eventProphecy = $this->prophesize(ExceptionEvent::class);
         $eventProphecy->getException()->willReturn(new \Exception())->shouldBeCalled();
         $eventProphecy->setResponse()->shouldNotBeCalled();
 
@@ -45,7 +45,7 @@ class ValidationExceptionListenerTest extends TestCase
         $exceptionJson = '{"foo": "bar"}';
         $list = new ConstraintViolationList([]);
 
-        $eventProphecy = $this->prophesize(GetResponseForExceptionEvent::class);
+        $eventProphecy = $this->prophesize(ExceptionEvent::class);
         $eventProphecy->getException()->willReturn(new ValidationException($list))->shouldBeCalled();
         $eventProphecy->getRequest()->willReturn(new Request())->shouldBeCalled();
         $eventProphecy->setResponse(Argument::allOf(

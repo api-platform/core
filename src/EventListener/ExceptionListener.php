@@ -15,7 +15,7 @@ namespace ApiPlatform\Core\EventListener;
 
 use ApiPlatform\Core\Util\RequestAttributesExtractor;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
+use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\HttpKernel\EventListener\ExceptionListener as BaseExceptionListener;
 
 /**
@@ -33,7 +33,7 @@ final class ExceptionListener
         $this->exceptionListener = new BaseExceptionListener($controller, $logger, $debug);
     }
 
-    public function onKernelException(GetResponseForExceptionEvent $event): void
+    public function onKernelException(ExceptionEvent $event): void
     {
         $request = $event->getRequest();
         // Normalize exceptions only for routes managed by API Platform

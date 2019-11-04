@@ -16,7 +16,7 @@ namespace ApiPlatform\Core\Mercure\EventListener;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use Fig\Link\GenericLinkProvider;
 use Fig\Link\Link;
-use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
+use Symfony\Component\HttpKernel\Event\ResponseEvent;
 
 /**
  * Adds the HTTP Link header pointing to the Mercure hub for resources having their updates dispatched.
@@ -37,7 +37,7 @@ final class AddLinkHeaderListener
     /**
      * Sends the Mercure header on each response.
      */
-    public function onKernelResponse(FilterResponseEvent $event): void
+    public function onKernelResponse(ResponseEvent $event): void
     {
         $link = new Link('mercure', $this->hub);
 

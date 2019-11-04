@@ -27,6 +27,7 @@ use Symfony\Bundle\TwigBundle\TwigBundle;
 use Symfony\Bundle\WebProfilerBundle\WebProfilerBundle;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\ErrorRenderer\ErrorRenderer;
 use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\Routing\RouteCollectionBuilder;
 use Symfony\Component\Security\Core\Encoder\SodiumPasswordEncoder;
@@ -84,7 +85,7 @@ class AppKernel extends Kernel
 
     protected function configureRoutes(RouteCollectionBuilder $routes)
     {
-        $routes->import("config/routing_{$this->getEnvironment()}.yml");
+        $routes->import(__DIR__."/config/routing_{$this->getEnvironment()}.yml");
 
         if ($_SERVER['LEGACY'] ?? true) {
             $routes->import('@NelmioApiDocBundle/Resources/config/routing.yml', '/nelmioapidoc');
@@ -130,6 +131,7 @@ class AppKernel extends Kernel
                     'provider' => 'chain_provider',
                     'http_basic' => null,
                     'anonymous' => null,
+                    'stateless' => true,
                 ],
             ],
             'access_control' => [
@@ -151,6 +153,12 @@ class AppKernel extends Kernel
                 ],
             ]);
         }
+
+        $twigConfig = ['strict_variables' => '%kernel.debug%'];
+        if (class_exists(ErrorRenderer::class)) {
+            $twigConfig['exception_controller'] = null;
+        }
+        $c->prependExtensionConfig('twig', $twigConfig);
 
         if ($_SERVER['LEGACY'] ?? true) {
             $c->prependExtensionConfig('nelmio_api_doc', [

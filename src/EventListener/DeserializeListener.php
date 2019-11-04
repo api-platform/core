@@ -20,7 +20,7 @@ use ApiPlatform\Core\Metadata\Resource\ToggleableOperationAttributeTrait;
 use ApiPlatform\Core\Serializer\SerializerContextBuilderInterface;
 use ApiPlatform\Core\Util\RequestAttributesExtractor;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\Exception\UnsupportedMediaTypeHttpException;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\SerializerInterface;
@@ -66,14 +66,14 @@ final class DeserializeListener
      *
      * @throws UnsupportedMediaTypeHttpException
      */
-    public function onKernelRequest(GetResponseEvent $event): void
+    public function onKernelRequest(RequestEvent $event): void
     {
         $request = $event->getRequest();
         $method = $request->getMethod();
 
         if (
             'DELETE' === $method
-            || $request->isMethodSafe(false)
+            || $request->isMethodSafe()
             || !($attributes = RequestAttributesExtractor::extractAttributes($request))
             || !$attributes['receive']
             || $this->isOperationAttributeDisabled($attributes, self::OPERATION_ATTRIBUTE_KEY)
@@ -132,11 +132,7 @@ final class DeserializeListener
                 }
             }
 
-            throw new UnsupportedMediaTypeHttpException(sprintf(
-                'The content-type "%s" is not supported. Supported MIME types are "%s".',
-                $contentType,
-                implode('", "', $supportedMimeTypes)
-            ));
+            throw new UnsupportedMediaTypeHttpException(sprintf('The content-type "%s" is not supported. Supported MIME types are "%s".', $contentType, implode('", "', $supportedMimeTypes)));
         }
 
         return $format;

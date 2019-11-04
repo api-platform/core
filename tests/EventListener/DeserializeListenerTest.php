@@ -22,7 +22,7 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\Exception\UnsupportedMediaTypeHttpException;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\SerializerInterface;
@@ -36,7 +36,7 @@ class DeserializeListenerTest extends TestCase
 
     public function testDoNotCallWhenRequestMethodIsSafe(): void
     {
-        $eventProphecy = $this->prophesize(GetResponseEvent::class);
+        $eventProphecy = $this->prophesize(RequestEvent::class);
 
         $request = new Request([], [], ['data' => new \stdClass()]);
         $request->setMethod('GET');
@@ -57,7 +57,7 @@ class DeserializeListenerTest extends TestCase
 
     public function testDoNotCallWhenRequestNotManaged(): void
     {
-        $eventProphecy = $this->prophesize(GetResponseEvent::class);
+        $eventProphecy = $this->prophesize(RequestEvent::class);
 
         $request = new Request([], [], ['data' => new \stdClass()], [], [], [], '{}');
         $request->setMethod('POST');
@@ -89,7 +89,7 @@ class DeserializeListenerTest extends TestCase
         $request = new Request([], [], ['data' => new Dummy(), '_api_resource_class' => Dummy::class, '_api_collection_operation_name' => 'post', '_api_receive' => false]);
         $request->setMethod('POST');
 
-        $eventProphecy = $this->prophesize(GetResponseEvent::class);
+        $eventProphecy = $this->prophesize(RequestEvent::class);
         $eventProphecy->getRequest()->willReturn($request);
 
         $listener = new DeserializeListener($serializerProphecy->reveal(), $serializerContextBuilderProphecy->reveal(), $resourceMetadataFactoryProphecy->reveal());
@@ -115,7 +115,7 @@ class DeserializeListenerTest extends TestCase
         $request = new Request([], [], ['data' => new Dummy(), '_api_resource_class' => Dummy::class, '_api_collection_operation_name' => 'post']);
         $request->setMethod('POST');
 
-        $eventProphecy = $this->prophesize(GetResponseEvent::class);
+        $eventProphecy = $this->prophesize(RequestEvent::class);
         $eventProphecy->getRequest()->willReturn($request);
 
         $listener = new DeserializeListener($serializerProphecy->reveal(), $serializerContextBuilderProphecy->reveal(), $resourceMetadataFactoryProphecy->reveal());
@@ -153,7 +153,7 @@ class DeserializeListenerTest extends TestCase
     private function doTestDeserialize(string $method, bool $populateObject, $resourceMetadataFactory): void
     {
         $result = $populateObject ? new \stdClass() : null;
-        $eventProphecy = $this->prophesize(GetResponseEvent::class);
+        $eventProphecy = $this->prophesize(RequestEvent::class);
 
         $request = new Request([], [], ['data' => $result, '_api_resource_class' => 'Foo', '_api_collection_operation_name' => 'post'], [], [], [], '{}');
         $request->setMethod($method);
@@ -211,7 +211,7 @@ class DeserializeListenerTest extends TestCase
     private function doTestDeserializeResourceClassSupportedFormat(string $method, bool $populateObject, $resourceMetadataFactory): void
     {
         $result = $populateObject ? new \stdClass() : null;
-        $eventProphecy = $this->prophesize(GetResponseEvent::class);
+        $eventProphecy = $this->prophesize(RequestEvent::class);
 
         $request = new Request([], [], ['data' => $result, '_api_resource_class' => 'Foo', '_api_collection_operation_name' => 'post'], [], [], [], '{}');
         $request->setMethod($method);
@@ -263,7 +263,7 @@ class DeserializeListenerTest extends TestCase
 
     private function doTestContentNegotiation($resourceMetadataFactory): void
     {
-        $eventProphecy = $this->prophesize(GetResponseEvent::class);
+        $eventProphecy = $this->prophesize(RequestEvent::class);
 
         $request = new Request([], [], ['_api_resource_class' => 'Foo', '_api_collection_operation_name' => 'post'], [], [], [], '{}');
         $request->setMethod('POST');
@@ -292,7 +292,7 @@ class DeserializeListenerTest extends TestCase
         $this->expectException(UnsupportedMediaTypeHttpException::class);
         $this->expectExceptionMessage('The content-type "application/rdf+xml" is not supported. Supported MIME types are "application/ld+json", "text/xml".');
 
-        $eventProphecy = $this->prophesize(GetResponseEvent::class);
+        $eventProphecy = $this->prophesize(RequestEvent::class);
 
         $request = new Request([], [], ['_api_resource_class' => 'Foo', '_api_collection_operation_name' => 'post'], [], [], [], '{}');
         $request->setMethod('POST');
@@ -328,7 +328,7 @@ class DeserializeListenerTest extends TestCase
         $this->expectException(UnsupportedMediaTypeHttpException::class);
         $this->expectExceptionMessage('The "Content-Type" header must exist.');
 
-        $eventProphecy = $this->prophesize(GetResponseEvent::class);
+        $eventProphecy = $this->prophesize(RequestEvent::class);
 
         $request = new Request([], [], ['_api_resource_class' => 'Foo', '_api_collection_operation_name' => 'post'], [], [], [], '{}');
         $request->setMethod('POST');

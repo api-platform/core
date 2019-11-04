@@ -16,7 +16,7 @@ namespace ApiPlatform\Core\Tests\JsonApi\EventListener;
 use ApiPlatform\Core\JsonApi\EventListener\TransformFilteringParametersListener;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\HttpKernel\Event\RequestEvent;
 
 /**
  * @author Baptiste Meyer <baptiste.meyer@gmail.com>
@@ -37,7 +37,7 @@ class TransformFilteringParametersListenerTest extends TestCase
 
         $request = $expectedRequest->duplicate();
 
-        $eventProphecy = $this->prophesize(GetResponseEvent::class);
+        $eventProphecy = $this->prophesize(RequestEvent::class);
         $eventProphecy->getRequest()->willReturn($request)->shouldBeCalled();
 
         $this->listener->onKernelRequest($eventProphecy->reveal());
@@ -47,7 +47,7 @@ class TransformFilteringParametersListenerTest extends TestCase
 
     public function testOnKernelRequestWithInvalidFilter()
     {
-        $eventProphecy = $this->prophesize(GetResponseEvent::class);
+        $eventProphecy = $this->prophesize(RequestEvent::class);
 
         $expectedRequest = new Request();
         $expectedRequest->setRequestFormat('jsonapi');
@@ -72,7 +72,7 @@ class TransformFilteringParametersListenerTest extends TestCase
         $request = new Request(['filter' => ['foo' => 'bar', 'baz' => 'qux']]);
         $request->setRequestFormat('jsonapi');
 
-        $eventProphecy = $this->prophesize(GetResponseEvent::class);
+        $eventProphecy = $this->prophesize(RequestEvent::class);
         $eventProphecy->getRequest()->willReturn($request)->shouldBeCalled();
 
         $this->listener->onKernelRequest($eventProphecy->reveal());
