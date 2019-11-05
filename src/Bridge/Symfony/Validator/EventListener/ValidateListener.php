@@ -52,7 +52,7 @@ final class ValidateListener
     {
         $request = $event->getRequest();
         if (
-            $request->isMethodSafe(false)
+            $request->isMethodSafe()
             || $request->isMethod('DELETE')
             || !($attributes = RequestAttributesExtractor::extractAttributes($request))
             || !$attributes['receive']

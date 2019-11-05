@@ -73,7 +73,7 @@ final class DeserializeListener
 
         if (
             'DELETE' === $method
-            || $request->isMethodSafe(false)
+            || $request->isMethodSafe()
             || !($attributes = RequestAttributesExtractor::extractAttributes($request))
             || !$attributes['receive']
             || $this->isOperationAttributeDisabled($attributes, self::OPERATION_ATTRIBUTE_KEY)

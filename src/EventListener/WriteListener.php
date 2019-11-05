@@ -57,7 +57,7 @@ final class WriteListener
 
         if (
             $controllerResult instanceof Response
-            || $request->isMethodSafe(false)
+            || $request->isMethodSafe()
             || !($attributes = RequestAttributesExtractor::extractAttributes($request))
             || !$attributes['persist']
             || $this->isOperationAttributeDisabled($attributes, self::OPERATION_ATTRIBUTE_KEY)
