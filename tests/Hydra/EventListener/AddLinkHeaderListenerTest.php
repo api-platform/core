@@ -15,12 +15,12 @@ namespace ApiPlatform\Core\Tests\Hydra\EventListener;
 
 use ApiPlatform\Core\Api\UrlGeneratorInterface;
 use ApiPlatform\Core\Hydra\EventListener\AddLinkHeaderListener;
-use Fig\Link\GenericLinkProvider;
-use Fig\Link\Link;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
+use Symfony\Component\WebLink\GenericLinkProvider;
 use Symfony\Component\WebLink\HttpHeaderSerializer;
+use Symfony\Component\WebLink\Link;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
