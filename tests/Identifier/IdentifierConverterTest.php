@@ -33,7 +33,7 @@ class IdentifierConverterTest extends TestCase
         $class = 'Dummy';
 
         $integerPropertyMetadata = (new PropertyMetadata())->withIdentifier(true)->withType(new Type(Type::BUILTIN_TYPE_INT));
-        $identifierPropertyMetadata = (new PropertyMetadata())->withIdentifier(true);
+        $identifierPropertyMetadata = (new PropertyMetadata())->withIdentifier(true)->withType(new Type(Type::BUILTIN_TYPE_INT));
         $dateIdentifierPropertyMetadata = (new PropertyMetadata())->withIdentifier(true)->withType(new Type(Type::BUILTIN_TYPE_OBJECT, false, \DateTime::class));
 
         $propertyMetadataFactory = $this->prophesize(PropertyMetadataFactoryInterface::class);
