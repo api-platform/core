@@ -495,6 +495,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
      * {@inheritdoc}
      *
      * @throws NoSuchPropertyException
+     * @throws UnexpectedValueException
      * @throws LogicException
      */
     protected function getAttributeValue($object, $attribute, $format = null, array $context = [])
@@ -512,16 +513,23 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             $attributeValue = null;
         }
 
+        if (null === $attributeValue || is_scalar($attributeValue)) {
+            return $attributeValue;
+        }
+
         $type = $propertyMetadata->getType();
 
         if (
-            is_iterable($attributeValue) &&
             $type &&
             $type->isCollection() &&
             ($collectionValueType = $type->getCollectionValueType()) &&
             ($className = $collectionValueType->getClassName()) &&
             $this->resourceClassResolver->isResourceClass($className)
         ) {
+            if (!is_iterable($attributeValue)) {
+                throw new UnexpectedValueException('Unexpected non-iterable value for to-many relation.');
+            }
+
             $resourceClass = $this->resourceClassResolver->getResourceClass($attributeValue, $className);
             $childContext = $this->createChildContext($context, $attribute, $format);
             $childContext['resource_class'] = $resourceClass;
@@ -535,8 +543,8 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             ($className = $type->getClassName()) &&
             $this->resourceClassResolver->isResourceClass($className)
         ) {
-            if (null === $attributeValue) {
-                return null;
+            if (!\is_object($attributeValue)) {
+                throw new UnexpectedValueException('Unexpected non-object value for to-one relation.');
             }
 
             $resourceClass = $this->resourceClassResolver->getResourceClass($attributeValue, $className);
@@ -567,8 +575,8 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
     {
         $value = [];
         foreach ($attributeValue as $index => $obj) {
-            if (null === $obj) {
-                throw new UnexpectedValueException('Unexpected null value in to-many relation.');
+            if (!\is_object($obj)) {
+                throw new UnexpectedValueException('Unexpected non-object element in to-many relation.');
             }
 
             $value[$index] = $this->normalizeRelation($propertyMetadata, $obj, $resourceClass, $format, $context);
