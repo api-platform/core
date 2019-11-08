@@ -24,7 +24,7 @@ cache:
       composer global require --prefer-dist --no-progress --no-suggest --ansi \
         symfony/flex
   - &update-project-dependencies |
-      composer update --no-progress --no-suggest --ansi
+      composer update --no-progress --no-suggest --ansi --prefer-stable
   - &validate-openapi-v2-json |
       npx swagger-cli validate <(tests/Fixtures/app/console api:swagger:export)
   - &validate-openapi-v2-yaml |

@@ -94,7 +94,7 @@ commands:
     steps:
       - run:
           name: Update project dependencies
-          command: composer update --no-progress --no-suggest --ansi
+          command: composer update --no-progress --no-suggest --ansi --prefer-stable
 
 executors:
   php:
