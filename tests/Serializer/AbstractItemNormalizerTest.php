@@ -805,7 +805,10 @@ class AbstractItemNormalizerTest extends TestCase
         $propertyAccessorProphecy->setValue($actual, 'name', null)->shouldHaveBeenCalled();
     }
 
-    public function testChildInheritedProperty()
+    /**
+     * @group legacy
+     */
+    public function testChildInheritedProperty(): void
     {
         $dummy = new DummyTableInheritance();
         $dummy->setName('foo');
