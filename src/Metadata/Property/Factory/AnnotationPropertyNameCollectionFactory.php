@@ -48,7 +48,7 @@ final class AnnotationPropertyNameCollectionFactory implements PropertyNameColle
             try {
                 $propertyNameCollection = $this->decorated->create($resourceClass, $options);
             } catch (ResourceClassNotFoundException $resourceClassNotFoundException) {
-                // Ignore not found exceptions from parent
+                // Ignore not found exceptions from decorated factory
             }
         }
 
@@ -87,7 +87,7 @@ final class AnnotationPropertyNameCollectionFactory implements PropertyNameColle
             }
         }
 
-        // Inherited from parent
+        // add property names from decorated factory
         if (null !== $propertyNameCollection) {
             foreach ($propertyNameCollection as $propertyName) {
                 $propertyNames[$propertyName] = $propertyName;

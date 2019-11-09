@@ -31,6 +31,9 @@ final class PropertyMetadata
     private $required;
     private $iri;
     private $identifier;
+    /**
+     * @deprecated since 2.6, to be removed in 3.0
+     */
     private $childInherited;
     private $attributes;
     private $subresource;
@@ -47,6 +50,9 @@ final class PropertyMetadata
         $this->required = $required;
         $this->identifier = $identifier;
         $this->iri = $iri;
+        if (null !== $childInherited) {
+            @trigger_error(sprintf('Providing a non-null value for the 10th argument ($childInherited) of the "%s" constructor is deprecated since 2.6 and will not be supported in 3.0.', __CLASS__), E_USER_DEPRECATED);
+        }
         $this->childInherited = $childInherited;
         $this->attributes = $attributes;
         $this->subresource = $subresource;
@@ -258,7 +264,7 @@ final class PropertyMetadata
     }
 
     /**
-     * Gets child inherited.
+     * @deprecated since 2.6, to be removed in 3.0
      */
     public function getChildInherited(): ?string
     {
@@ -266,7 +272,7 @@ final class PropertyMetadata
     }
 
     /**
-     * Is the property inherited from a child class?
+     * @deprecated since 2.6, to be removed in 3.0
      */
     public function hasChildInherited(): bool
     {
@@ -274,22 +280,22 @@ final class PropertyMetadata
     }
 
     /**
-     * Is the property inherited from a child class?
-     *
-     * @deprecated since version 2.4, to be removed in 3.0.
+     * @deprecated since 2.4, to be removed in 3.0
      */
     public function isChildInherited(): ?string
     {
-        @trigger_error(sprintf('The use of "%1$s::isChildInherited()" is deprecated since 2.4 and will be removed in 3.0. Use "%1$s::getChildInherited()" or "%1$s::hasChildInherited()" directly instead.', __CLASS__), E_USER_DEPRECATED);
+        @trigger_error(sprintf('"%s::%s" is deprecated since 2.4 and will be removed in 3.0.', __CLASS__, __METHOD__), E_USER_DEPRECATED);
 
         return $this->getChildInherited();
     }
 
     /**
-     * Returns a new instance with the given child inherited class.
+     * @deprecated since 2.6, to be removed in 3.0
      */
     public function withChildInherited(string $childInherited): self
     {
+        @trigger_error(sprintf('"%s::%s" is deprecated since 2.6 and will be removed in 3.0.', __CLASS__, __METHOD__), E_USER_DEPRECATED);
+
         $metadata = clone $this;
         $metadata->childInherited = $childInherited;
 
