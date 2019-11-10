@@ -47,9 +47,16 @@ Feature: Exists filter on collections
         "@context": {"pattern": "^/contexts/Dummy$"},
         "@id": {"pattern": "^/dummies$"},
         "@type": {"pattern": "^hydra:Collection$"},
-        "hydra:totalItems": {"type":"number", "minimum": 3},
+        "hydra:totalItems": {"type":"number", "minimum": 15, "minimum": 15},
         "hydra:member": {
           "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "@id": {"pattern": "^/dummies/(1|2|3)$"}
+            },
+            "required": ["@id"]
+          },
           "minItems": 3
         },
         "hydra:view": {

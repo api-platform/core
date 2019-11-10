@@ -28,7 +28,7 @@ Feature: JSON API error handling
         {
           "detail": "This value should not be blank.",
           "source": {
-            "pointer": "data\/attributes\/name"
+            "pointer": "data/attributes/name"
           }
         }
       ]
@@ -59,13 +59,13 @@ Feature: JSON API error handling
         {
           "detail": "This value should not be null.",
           "source": {
-            "pointer": "data\/relationships\/dummyFriend"
+            "pointer": "data/relationships/dummyFriend"
           }
         },
         {
           "detail": "This value should not be null.",
           "source": {
-            "pointer": "data\/relationships\/relatedDummy"
+            "pointer": "data/relationships/relatedDummy"
           }
         }
       ]
