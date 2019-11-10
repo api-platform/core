@@ -24,17 +24,17 @@ Feature: Max depth handling
     {
       "_links": {
         "self": {
-          "href": "\/max_depth_eager_dummies\/1"
+          "href": "/max_depth_eager_dummies/1"
         },
         "child": {
-          "href": "\/max_depth_eager_dummies\/2"
+          "href": "/max_depth_eager_dummies/2"
         }
       },
       "_embedded": {
         "child": {
           "_links": {
             "self": {
-              "href": "\/max_depth_eager_dummies\/2"
+              "href": "/max_depth_eager_dummies/2"
             }
           },
           "id": 2,
@@ -69,17 +69,17 @@ Feature: Max depth handling
     {
       "_links": {
         "self": {
-          "href": "\/max_depth_eager_dummies\/1"
+          "href": "/max_depth_eager_dummies/1"
         },
         "child": {
-          "href": "\/max_depth_eager_dummies\/2"
+          "href": "/max_depth_eager_dummies/2"
         }
       },
       "_embedded": {
         "child": {
           "_links": {
             "self": {
-              "href": "\/max_depth_eager_dummies\/2"
+              "href": "/max_depth_eager_dummies/2"
             }
           },
           "id": 2,
@@ -115,17 +115,17 @@ Feature: Max depth handling
     {
       "_links": {
         "self": {
-          "href": "\/max_depth_dummies\/1"
+          "href": "/max_depth_dummies/1"
         },
         "child": {
-          "href": "\/max_depth_dummies\/2"
+          "href": "/max_depth_dummies/2"
         }
       },
       "_embedded": {
         "child": {
           "_links": {
             "self": {
-              "href": "\/max_depth_dummies\/2"
+              "href": "/max_depth_dummies/2"
             }
           },
           "id": 2,

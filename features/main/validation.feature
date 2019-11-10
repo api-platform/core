@@ -29,7 +29,7 @@ Feature: Using validations groups
     And the JSON should be equal to:
     """
     {
-      "@context": "\/contexts\/ConstraintViolationList",
+      "@context": "/contexts/ConstraintViolationList",
       "@type": "ConstraintViolationList",
       "hydra:title": "An error occurred",
       "hydra:description": "name: This value should not be null.",
@@ -57,7 +57,7 @@ Feature: Using validations groups
     And the JSON should be equal to:
     """
     {
-      "@context": "\/contexts\/ConstraintViolationList",
+      "@context": "/contexts/ConstraintViolationList",
       "@type": "ConstraintViolationList",
       "hydra:title": "An error occurred",
       "hydra:description": "title: This value should not be null.",

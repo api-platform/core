@@ -731,8 +731,8 @@ Feature: Filter with serialization groups on items and collections
     And the JSON should be equal to:
     """
     {
-      "@context": "\/contexts\/DummyGroup",
-      "@id": "\/dummy_groups\/11",
+      "@context": "/contexts/DummyGroup",
+      "@id": "/dummy_groups/11",
       "@type": "DummyGroup",
       "id": 11,
       "foo": "Foo",
@@ -758,8 +758,8 @@ Feature: Filter with serialization groups on items and collections
     And the JSON should be equal to:
     """
     {
-      "@context": "\/contexts\/DummyGroup",
-      "@id": "\/dummy_groups\/12",
+      "@context": "/contexts/DummyGroup",
+      "@id": "/dummy_groups/12",
       "@type": "DummyGroup",
       "foo": "Foo"
     }
@@ -782,8 +782,8 @@ Feature: Filter with serialization groups on items and collections
     And the JSON should be equal to:
     """
     {
-      "@context": "\/contexts\/DummyGroup",
-      "@id": "\/dummy_groups\/13",
+      "@context": "/contexts/DummyGroup",
+      "@id": "/dummy_groups/13",
       "@type": "DummyGroup",
       "id": 13,
       "foo": "Foo",
@@ -810,8 +810,8 @@ Feature: Filter with serialization groups on items and collections
     And the JSON should be equal to:
     """
     {
-      "@context": "\/contexts\/DummyGroup",
-      "@id": "\/dummy_groups\/14",
+      "@context": "/contexts/DummyGroup",
+      "@id": "/dummy_groups/14",
       "@type": "DummyGroup",
       "foo": "Foo",
       "baz": "Baz",
@@ -836,8 +836,8 @@ Feature: Filter with serialization groups on items and collections
     And the JSON should be equal to:
     """
     {
-      "@context": "\/contexts\/DummyGroup",
-      "@id": "\/dummy_groups\/15",
+      "@context": "/contexts/DummyGroup",
+      "@id": "/dummy_groups/15",
       "@type": "DummyGroup",
       "id": 15,
       "foo": "Foo",
@@ -864,8 +864,8 @@ Feature: Filter with serialization groups on items and collections
     And the JSON should be equal to:
     """
     {
-      "@context": "\/contexts\/DummyGroup",
-      "@id": "\/dummy_groups\/16",
+      "@context": "/contexts/DummyGroup",
+      "@id": "/dummy_groups/16",
       "@type": "DummyGroup",
       "id": 16,
       "foo": "Foo",
@@ -892,8 +892,8 @@ Feature: Filter with serialization groups on items and collections
     And the JSON should be equal to:
     """
     {
-      "@context": "\/contexts\/DummyGroup",
-      "@id": "\/dummy_groups\/17",
+      "@context": "/contexts/DummyGroup",
+      "@id": "/dummy_groups/17",
       "@type": "DummyGroup",
       "id": 17,
       "foo": "Foo",
@@ -919,8 +919,8 @@ Feature: Filter with serialization groups on items and collections
     And the JSON should be equal to:
     """
     {
-      "@context": "\/contexts\/DummyGroup",
-      "@id": "\/dummy_groups\/18",
+      "@context": "/contexts/DummyGroup",
+      "@id": "/dummy_groups/18",
       "@type": "DummyGroup"
     }
     """
@@ -942,8 +942,8 @@ Feature: Filter with serialization groups on items and collections
     And the JSON should be equal to:
     """
     {
-      "@context": "\/contexts\/DummyGroup",
-      "@id": "\/dummy_groups\/19",
+      "@context": "/contexts/DummyGroup",
+      "@id": "/dummy_groups/19",
       "@type": "DummyGroup",
       "id": 19,
       "foo": "Foo",
@@ -969,8 +969,8 @@ Feature: Filter with serialization groups on items and collections
     And the JSON should be equal to:
     """
     {
-      "@context": "\/contexts\/DummyGroup",
-      "@id": "\/dummy_groups\/20",
+      "@context": "/contexts/DummyGroup",
+      "@id": "/dummy_groups/20",
       "@type": "DummyGroup",
       "baz": "Baz"
     }
