@@ -282,7 +282,9 @@ class ItemNormalizerTest extends TestCase
         $resourceClassResolverProphecy->getResourceClass($level1, null)->willReturn(MaxDepthDummy::class);
         $resourceClassResolverProphecy->getResourceClass($level1, MaxDepthDummy::class)->willReturn(MaxDepthDummy::class);
         $resourceClassResolverProphecy->getResourceClass($level2, MaxDepthDummy::class)->willReturn(MaxDepthDummy::class);
+        $resourceClassResolverProphecy->getResourceClass($level2, null)->willReturn(MaxDepthDummy::class);
         $resourceClassResolverProphecy->getResourceClass($level3, MaxDepthDummy::class)->willReturn(MaxDepthDummy::class);
+        $resourceClassResolverProphecy->getResourceClass($level3, null)->willReturn(MaxDepthDummy::class);
         $resourceClassResolverProphecy->getResourceClass(null, MaxDepthDummy::class)->willReturn(MaxDepthDummy::class);
         $resourceClassResolverProphecy->isResourceClass(MaxDepthDummy::class)->willReturn(true);
 
