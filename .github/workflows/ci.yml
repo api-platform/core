@@ -70,7 +70,7 @@ jobs:
         run: |
           mkdir -p /tmp/api-platform/core/vendor
           ln -s /tmp/api-platform/core/vendor vendor
-          composer update --no-progress --no-suggest --ansi --prefer-stable
+          composer update --no-progress --no-suggest --ansi
       - name: Clear test app cache
         run: |
           mkdir -p /tmp/api-platform/core/var
@@ -165,7 +165,7 @@ jobs:
         run: |
           mkdir -p /tmp/api-platform/core/vendor
           ln -s /tmp/api-platform/core/vendor vendor
-          composer update --no-progress --no-suggest --ansi --prefer-stable
+          composer update --no-progress --no-suggest --ansi
       - name: Enable legacy integrations
         if: startsWith(matrix.php, '7.1') || startsWith(matrix.php, '7.2') || startsWith(matrix.php, '7.3')
         run: echo '::set-env name=LEGACY::1'
@@ -388,7 +388,7 @@ jobs:
         run: |
           mkdir -p /tmp/api-platform/core/vendor
           ln -s /tmp/api-platform/core/vendor vendor
-          composer update --no-progress --no-suggest --ansi --prefer-stable
+          composer update --no-progress --no-suggest --ansi
       - name: Clear test app cache
         run: |
           mkdir -p /tmp/api-platform/core/var
@@ -467,7 +467,7 @@ jobs:
         run: |
           mkdir -p /tmp/api-platform/core/vendor
           ln -s /tmp/api-platform/core/vendor vendor
-          composer update --no-progress --no-suggest --ansi --prefer-stable
+          composer update --no-progress --no-suggest --ansi
       - name: Enable legacy integrations
         if: startsWith(matrix.php, '7.3')
         run: echo '::set-env name=LEGACY::1'
@@ -549,7 +549,7 @@ jobs:
         run: |
           mkdir -p /tmp/api-platform/core/vendor
           ln -s /tmp/api-platform/core/vendor vendor
-          composer update --no-progress --no-suggest --ansi --prefer-stable
+          composer update --no-progress --no-suggest --ansi
       - name: Clear test app cache
         run: |
           mkdir -p /tmp/api-platform/core/var
@@ -628,7 +628,7 @@ jobs:
         run: |
           mkdir -p /tmp/api-platform/core/vendor
           ln -s /tmp/api-platform/core/vendor vendor
-          composer update --no-progress --no-suggest --ansi --prefer-stable
+          composer update --no-progress --no-suggest --ansi
       - name: Enable legacy integrations
         if: startsWith(matrix.php, '7.3')
         run: echo '::set-env name=LEGACY::1'
@@ -706,7 +706,7 @@ jobs:
         run: |
           mkdir -p /tmp/api-platform/core/vendor
           ln -s /tmp/api-platform/core/vendor vendor
-          composer update --no-progress --no-suggest --ansi --prefer-stable
+          composer update --no-progress --no-suggest --ansi
       - name: Clear test app cache
         run: |
           mkdir -p /tmp/api-platform/core/var
@@ -803,7 +803,7 @@ jobs:
         run: |
           mkdir -p /tmp/api-platform/core/vendor
           ln -s /tmp/api-platform/core/vendor vendor
-          composer update --no-progress --no-suggest --ansi --prefer-stable
+          composer update --no-progress --no-suggest --ansi
       - name: Enable legacy integrations
         if: startsWith(matrix.php, '7.3')
         run: echo '::set-env name=LEGACY::1'
@@ -911,7 +911,7 @@ jobs:
         run: |
           mkdir -p /tmp/api-platform/core/vendor
           ln -s /tmp/api-platform/core/vendor vendor
-          composer update --no-progress --no-suggest --ansi --prefer-stable
+          composer update --no-progress --no-suggest --ansi
       - name: Clear test app cache
         run: |
           mkdir -p /tmp/api-platform/core/var
@@ -1010,7 +1010,7 @@ jobs:
         run: |
           mkdir -p /tmp/api-platform/core/vendor
           ln -s /tmp/api-platform/core/vendor vendor
-          composer update --no-progress --no-suggest --ansi --prefer-stable
+          composer update --no-progress --no-suggest --ansi
       - name: Enable legacy integrations
         if: startsWith(matrix.php, '7.3')
         run: echo '::set-env name=LEGACY::1'
@@ -1097,7 +1097,7 @@ jobs:
         run: |
           mkdir -p /tmp/api-platform/core/vendor
           ln -s /tmp/api-platform/core/vendor vendor
-          composer update --no-progress --no-suggest --ansi --prefer-stable
+          composer update --no-progress --no-suggest --ansi
       - name: Clear test app cache
         run: |
           mkdir -p /tmp/api-platform/core/var
@@ -1158,7 +1158,7 @@ jobs:
         run: |
           mkdir -p /tmp/api-platform/core/vendor
           ln -s /tmp/api-platform/core/vendor vendor
-          composer update --no-progress --no-suggest --ansi --prefer-stable
+          composer update --no-progress --no-suggest --ansi
       - name: Flag held back Symfony packages
         env:
           symfony_version: ${{ matrix.symfony }}
@@ -1233,7 +1233,7 @@ jobs:
         run: |
           mkdir -p /tmp/api-platform/core/vendor
           ln -s /tmp/api-platform/core/vendor vendor
-          composer update --no-progress --no-suggest --ansi --prefer-stable
+          composer update --no-progress --no-suggest --ansi
       - name: Flag held back Symfony packages
         env:
           symfony_version: ${{ matrix.symfony }}

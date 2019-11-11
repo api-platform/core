@@ -12,7 +12,6 @@
             "homepage": "https://dunglas.fr"
         }
     ],
-    "minimum-stability": "dev",
     "require": {
         "php": ">=7.1",
         "doctrine/inflector": "^1.0",
