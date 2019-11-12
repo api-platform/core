@@ -116,6 +116,7 @@ parameters:
 		-
 			message: '#Parameter \$exception of method ApiPlatform\\Core\\Action\\ExceptionAction::__invoke\(\) has invalid typehint type Symfony\\Component\\ErrorHandler\\Exception\\FlattenException\.#'
 			path: %currentWorkingDirectory%/src/Action/ExceptionAction.php
+
 		- '#Call to method get(Class|Headers|StatusCode)\(\) on an unknown class Symfony\\Component\\ErrorHandler\\Exception\\FlattenException\.#'
 		- '#Class Symfony\\Component\\ErrorHandler\\Exception\\FlattenException not found\.#'
 		-
@@ -123,3 +124,4 @@ parameters:
 			paths:
 				- %currentWorkingDirectory%/src/JsonApi/Serializer/ItemNormalizer.php
 				- %currentWorkingDirectory%/src/Serializer/AbstractItemNormalizer.php
+		- '#Symfony\\Component\\HttpKernel\\EventListener\\ErrorListener#'
