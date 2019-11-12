@@ -368,8 +368,8 @@ Feature: Filter with serialization attributes on items and collections
     And the JSON should be equal to:
     """
     {
-      "@context": "\/contexts\/DummyProperty",
-      "@id": "\/dummy_properties\/11",
+      "@context": "/contexts/DummyProperty",
+      "@id": "/dummy_properties/11",
       "@type": "DummyProperty",
       "foo": "Foo",
       "bar": "Bar"
@@ -396,13 +396,13 @@ Feature: Filter with serialization attributes on items and collections
     And the JSON should be equal to:
     """
     {
-      "@context": "\/contexts\/DummyProperty",
-      "@id": "\/dummy_properties\/12",
+      "@context": "/contexts/DummyProperty",
+      "@id": "/dummy_properties/12",
       "@type": "DummyProperty",
       "foo": "Foo",
       "bar": "Bar",
       "group": {
-        "@id": "\/dummy_groups\/11",
+        "@id": "/dummy_groups/11",
         "@type": "DummyGroup",
         "foo": "Foo",
         "baz": null

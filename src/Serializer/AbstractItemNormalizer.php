@@ -281,13 +281,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
                 } elseif ($constructorParameter->isDefaultValueAvailable()) {
                     $params[] = $constructorParameter->getDefaultValue();
                 } else {
-                    throw new MissingConstructorArgumentsException(
-                        sprintf(
-                            'Cannot create an instance of %s from serialized data because its constructor requires parameter "%s" to be present.',
-                            $class,
-                            $constructorParameter->name
-                        )
-                    );
+                    throw new MissingConstructorArgumentsException(sprintf('Cannot create an instance of %s from serialized data because its constructor requires parameter "%s" to be present.', $class, $constructorParameter->name));
                 }
             }
 
@@ -368,9 +362,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
         }
 
         if (!$isValid) {
-            throw new InvalidArgumentException(sprintf(
-                'The type of the "%s" attribute must be "%s", "%s" given.', $attribute, $builtinType, \gettype($value)
-            ));
+            throw new InvalidArgumentException(sprintf('The type of the "%s" attribute must be "%s", "%s" given.', $attribute, $builtinType, \gettype($value)));
         }
     }
 
@@ -382,9 +374,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
     protected function denormalizeCollection(string $attribute, PropertyMetadata $propertyMetadata, Type $type, string $className, $value, ?string $format, array $context): array
     {
         if (!\is_array($value)) {
-            throw new InvalidArgumentException(sprintf(
-                'The type of the "%s" attribute must be "array", "%s" given.', $attribute, \gettype($value)
-            ));
+            throw new InvalidArgumentException(sprintf('The type of the "%s" attribute must be "array", "%s" given.', $attribute, \gettype($value)));
         }
 
         $collectionKeyType = $type->getCollectionKeyType();
@@ -393,10 +383,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
         $values = [];
         foreach ($value as $index => $obj) {
             if (null !== $collectionKeyBuiltinType && !\call_user_func('is_'.$collectionKeyBuiltinType, $index)) {
-                throw new InvalidArgumentException(sprintf(
-                        'The type of the key "%s" must be "%s", "%s" given.',
-                        $index, $collectionKeyBuiltinType, \gettype($index))
-                );
+                throw new InvalidArgumentException(sprintf('The type of the key "%s" must be "%s", "%s" given.', $index, $collectionKeyBuiltinType, \gettype($index)));
             }
 
             $values[$index] = $this->denormalizeRelation($attribute, $propertyMetadata, $className, $obj, $format, $this->createChildContext($context, $attribute, $format));
@@ -455,9 +442,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
 
         if (!\is_array($value)) {
             if (!$supportsPlainIdentifiers) {
-                throw new UnexpectedValueException(sprintf(
-                    'Expected IRI or nested document for attribute "%s", "%s" given.', $attributeName, \gettype($value)
-                ));
+                throw new UnexpectedValueException(sprintf('Expected IRI or nested document for attribute "%s", "%s" given.', $attributeName, \gettype($value)));
             }
 
             $item = $this->itemDataProvider->getItem($className, $value, null, $context + ['fetch_data' => true]);

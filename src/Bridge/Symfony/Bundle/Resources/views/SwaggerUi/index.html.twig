@@ -83,7 +83,7 @@
     {% if (reDocEnabled and not swaggerUiEnabled) or (reDocEnabled and 're_doc' == active_ui) %}
         <script src="{{ asset('bundles/apiplatform/redoc/redoc.standalone.js') }}"></script>
         <script src="{{ asset('bundles/apiplatform/init-redoc-ui.js') }}"></script>
-    {% elseif (swaggerUiEnabled) %}
+    {% else %}
         <script src="{{ asset('bundles/apiplatform/swagger-ui/swagger-ui-bundle.js') }}"></script>
         <script src="{{ asset('bundles/apiplatform/swagger-ui/swagger-ui-standalone-preset.js') }}"></script>
         <script src="{{ asset('bundles/apiplatform/init-swagger-ui.js') }}"></script>

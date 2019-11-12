@@ -1,8 +1,26 @@
 # Changelog
 
-## 2.6.0
+## 2.6.x-dev
 
 * MongoDB: Possibility to add execute options (aggregate command fields) for a resource, like `allowDiskUse` (#3144)
+
+## 2.5.1
+
+* Compatibility with Symfony 5
+* Fix a notice in `SerializerContextBuilder`
+* Fix dashed path segment generation
+* Fix support for custom filters without constructor in the `@ApiFilter` annotation
+* Fix a bug that was preventing to disable Swagger/OpenAPI
+* Return a `404` HTTP status code instead of `500` whe the identifier is invalid (e.g.: invalid UUID)
+* Add links to the documentation in `@ApiResource` annotation's attributes to improve DX
+* JSON:API: fix pagination being ignored when using the `filter` query parameter
+* Elasticsearch: Allow multiple queries to be set
+* OpenAPI: Do not append `body` parameter if it already exists
+* OpenAPI: Fix removal of illegal characters in schema name for Amazon API Gateway
+* Swagger UI: Add missing `oauth2-redirect` configuration
+* Swagger UI: Allow changing the location of Swagger UI
+* GraphQL: Fix an error that was occurring when `SecurityBundle` was not installed
+* HTTP/2 Server Push: Push relations as `fetch`
 
 ## 2.5.0
 

@@ -23,7 +23,7 @@ use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
+use Symfony\Component\HttpKernel\Event\ViewEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 /**
@@ -44,7 +44,7 @@ class ValidateListenerTest extends TestCase
         $request = new Request();
         $request->setMethod('POST');
 
-        $eventProphecy = $this->prophesize(GetResponseForControllerResultEvent::class);
+        $eventProphecy = $this->prophesize(ViewEvent::class);
         $eventProphecy->getControllerResult()->willReturn([]);
         $eventProphecy->getRequest()->willReturn($request);
 
@@ -81,7 +81,7 @@ class ValidateListenerTest extends TestCase
 
         $response = new Response();
 
-        $eventProphecy = $this->prophesize(GetResponseForControllerResultEvent::class);
+        $eventProphecy = $this->prophesize(ViewEvent::class);
         $eventProphecy->getControllerResult()->willReturn($response);
         $eventProphecy->getRequest()->willReturn($request);
 
@@ -101,7 +101,7 @@ class ValidateListenerTest extends TestCase
         $request = new Request([], [], ['data' => $dummy, '_api_resource_class' => DummyEntity::class, '_api_collection_operation_name' => 'post', '_api_receive' => false]);
         $request->setMethod('POST');
 
-        $eventProphecy = $this->prophesize(GetResponseForControllerResultEvent::class);
+        $eventProphecy = $this->prophesize(ViewEvent::class);
         $eventProphecy->getControllerResult()->willReturn($dummy);
         $eventProphecy->getRequest()->willReturn($request);
 
@@ -128,7 +128,7 @@ class ValidateListenerTest extends TestCase
         $request = new Request([], [], ['data' => $dummy, '_api_resource_class' => DummyEntity::class, '_api_collection_operation_name' => 'post']);
         $request->setMethod('POST');
 
-        $eventProphecy = $this->prophesize(GetResponseForControllerResultEvent::class);
+        $eventProphecy = $this->prophesize(ViewEvent::class);
         $eventProphecy->getControllerResult()->willReturn($dummy);
         $eventProphecy->getRequest()->willReturn($request);
 
@@ -175,7 +175,7 @@ class ValidateListenerTest extends TestCase
         ]);
 
         $request->setMethod('POST');
-        $event = new GetResponseForControllerResultEvent($kernel, $request, HttpKernelInterface::MASTER_REQUEST, $data);
+        $event = new ViewEvent($kernel, $request, HttpKernelInterface::MASTER_REQUEST, $data);
 
         return [$resourceMetadataFactory, $event];
     }

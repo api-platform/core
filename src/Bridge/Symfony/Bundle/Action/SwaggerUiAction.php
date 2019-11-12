@@ -153,7 +153,7 @@ final class SwaggerUiAction
             'scopes' => $this->oauthScopes,
         ];
 
-        if ($request->isMethodSafe(false) && null !== $resourceClass = $request->attributes->get('_api_resource_class')) {
+        if ($request->isMethodSafe() && null !== $resourceClass = $request->attributes->get('_api_resource_class')) {
             $swaggerData['id'] = $request->attributes->get('id');
             $swaggerData['queryParameters'] = $request->query->all();
 

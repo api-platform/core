@@ -190,6 +190,7 @@ final class ApiResource
     private $deprecationReason;
 
     /**
+     * @see https://api-platform.com/docs/core/elasticsearch/
      * @see https://github.com/Haehnchen/idea-php-annotation-plugin/issues/112
      *
      * @var bool
@@ -406,6 +407,7 @@ final class ApiResource
     private $securityPostDenormalize;
 
     /**
+     * @see https://api-platform.com/docs/core/security/#configuring-the-access-control-error-message
      * @see https://github.com/Haehnchen/idea-php-annotation-plugin/issues/112
      *
      * @var string
