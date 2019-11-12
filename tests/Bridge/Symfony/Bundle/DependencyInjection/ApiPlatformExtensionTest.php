@@ -521,13 +521,11 @@ class ApiPlatformExtensionTest extends TestCase
     public function testDisabledSwaggerUIAndRedoc()
     {
         $containerBuilderProphecy = $this->getBaseContainerBuilderProphecy();
-        $containerBuilderProphecy->setDefinition('api_platform.swagger.action.ui', Argument::type(Definition::class))->shouldNotBeCalled();
-        $containerBuilderProphecy->setDefinition('api_platform.swagger.listener.ui', Argument::type(Definition::class))->shouldNotBeCalled();
+        $containerBuilderProphecy->removeDefinition('api_platform.swagger.listener.ui')->shouldBeCalledTimes(1);
         $containerBuilderProphecy->setParameter('api_platform.enable_swagger_ui', true)->shouldNotBeCalled();
-        $containerBuilderProphecy->setParameter('api_platform.enable_swagger_ui', true)->shouldNotBeCalled();
-        $containerBuilderProphecy->setParameter('api_platform.enable_swagger_ui', false)->shouldNotBeCalled();
+        $containerBuilderProphecy->setParameter('api_platform.enable_swagger_ui', false)->shouldBeCalledTimes(1);
         $containerBuilderProphecy->setParameter('api_platform.enable_re_doc', true)->shouldNotBeCalled();
-        $containerBuilderProphecy->setParameter('api_platform.enable_re_doc', false)->shouldNotBeCalled();
+        $containerBuilderProphecy->setParameter('api_platform.enable_re_doc', false)->shouldBeCalledTimes(1);
         $containerBuilder = $containerBuilderProphecy->reveal();
 
         $config = self::DEFAULT_CONFIG;

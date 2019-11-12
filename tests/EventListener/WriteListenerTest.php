@@ -24,7 +24,7 @@ use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
+use Symfony\Component\HttpKernel\Event\ViewEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 /**
@@ -46,7 +46,7 @@ class WriteListenerTest extends TestCase
 
         $request = new Request([], [], ['_api_resource_class' => Dummy::class]);
 
-        $event = new GetResponseForControllerResultEvent(
+        $event = new ViewEvent(
             $this->prophesize(HttpKernelInterface::class)->reveal(),
             $request,
             HttpKernelInterface::MASTER_REQUEST,
@@ -78,7 +78,7 @@ class WriteListenerTest extends TestCase
 
         $request = new Request([], [], ['_api_resource_class' => Dummy::class]);
 
-        $event = new GetResponseForControllerResultEvent(
+        $event = new ViewEvent(
             $this->prophesize(HttpKernelInterface::class)->reveal(),
             $request,
             HttpKernelInterface::MASTER_REQUEST,
@@ -119,7 +119,7 @@ class WriteListenerTest extends TestCase
         $request = new Request([], [], ['_api_resource_class' => Dummy::class]);
 
         foreach (['PATCH', 'PUT', 'POST'] as $httpMethod) {
-            $event = new GetResponseForControllerResultEvent(
+            $event = new ViewEvent(
                 $this->prophesize(HttpKernelInterface::class)->reveal(),
                 $request,
                 HttpKernelInterface::MASTER_REQUEST,
@@ -155,7 +155,7 @@ class WriteListenerTest extends TestCase
         $request = new Request([], [], ['_api_resource_class' => Dummy::class, '_api_collection_operation_name' => 'post']);
         $request->setMethod('POST');
 
-        $event = new GetResponseForControllerResultEvent(
+        $event = new ViewEvent(
             $this->prophesize(HttpKernelInterface::class)->reveal(),
             $request,
             HttpKernelInterface::MASTER_REQUEST,
@@ -180,7 +180,7 @@ class WriteListenerTest extends TestCase
         $request = new Request([], [], ['_api_resource_class' => Dummy::class, '_api_item_operation_name' => 'delete']);
         $request->setMethod('DELETE');
 
-        $event = new GetResponseForControllerResultEvent(
+        $event = new ViewEvent(
             $this->prophesize(HttpKernelInterface::class)->reveal(),
             $request,
             HttpKernelInterface::MASTER_REQUEST,
@@ -206,7 +206,7 @@ class WriteListenerTest extends TestCase
         $request = new Request([], [], ['_api_resource_class' => Dummy::class, '_api_item_operation_name' => 'head']);
         $request->setMethod('HEAD');
 
-        $event = new GetResponseForControllerResultEvent(
+        $event = new ViewEvent(
             $this->prophesize(HttpKernelInterface::class)->reveal(),
             $request,
             HttpKernelInterface::MASTER_REQUEST,
@@ -229,7 +229,7 @@ class WriteListenerTest extends TestCase
 
         $response = new Response();
 
-        $event = new GetResponseForControllerResultEvent(
+        $event = new ViewEvent(
             $this->prophesize(HttpKernelInterface::class)->reveal(),
             $request,
             HttpKernelInterface::MASTER_REQUEST,
@@ -255,7 +255,7 @@ class WriteListenerTest extends TestCase
         $request = new Request([], [], ['data' => new Dummy(), '_api_resource_class' => Dummy::class, '_api_collection_operation_name' => 'post', '_api_persist' => false]);
         $request->setMethod('POST');
 
-        $event = new GetResponseForControllerResultEvent(
+        $event = new ViewEvent(
             $this->prophesize(HttpKernelInterface::class)->reveal(),
             $request,
             HttpKernelInterface::MASTER_REQUEST,
@@ -290,7 +290,7 @@ class WriteListenerTest extends TestCase
         $request = new Request([], [], ['data' => new Dummy(), '_api_resource_class' => Dummy::class, '_api_collection_operation_name' => 'post']);
         $request->setMethod('POST');
 
-        $event = new GetResponseForControllerResultEvent(
+        $event = new ViewEvent(
             $this->prophesize(HttpKernelInterface::class)->reveal(),
             $request,
             HttpKernelInterface::MASTER_REQUEST,
@@ -317,7 +317,7 @@ class WriteListenerTest extends TestCase
         $request = new Request();
         $request->setMethod('POST');
 
-        $event = new GetResponseForControllerResultEvent(
+        $event = new ViewEvent(
             $this->prophesize(HttpKernelInterface::class)->reveal(),
             $request,
             HttpKernelInterface::MASTER_REQUEST,
@@ -341,7 +341,7 @@ class WriteListenerTest extends TestCase
         $request = new Request([], [], ['_api_resource_class' => ConcreteDummy::class, '_api_item_operation_name' => 'put', '_api_persist' => true]);
         $request->setMethod('PUT');
 
-        $event = new GetResponseForControllerResultEvent(
+        $event = new ViewEvent(
             $this->prophesize(HttpKernelInterface::class)->reveal(),
             $request,
             HttpKernelInterface::MASTER_REQUEST,
@@ -367,7 +367,7 @@ class WriteListenerTest extends TestCase
         $request = new Request([], [], ['_api_resource_class' => 'Dummy', '_api_collection_operation_name' => 'post']);
         $request->setMethod('POST');
 
-        $event = new GetResponseForControllerResultEvent(
+        $event = new ViewEvent(
             $this->prophesize(HttpKernelInterface::class)->reveal(),
             $request,
             HttpKernelInterface::MASTER_REQUEST,

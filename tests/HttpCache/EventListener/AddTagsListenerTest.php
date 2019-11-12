@@ -19,7 +19,7 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
+use Symfony\Component\HttpKernel\Event\ResponseEvent;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
@@ -37,7 +37,7 @@ class AddTagsListenerTest extends TestCase
         $response->setPublic();
         $response->setEtag('foo');
 
-        $event = $this->prophesize(FilterResponseEvent::class);
+        $event = $this->prophesize(ResponseEvent::class);
         $event->getRequest()->willReturn($request)->shouldBeCalled();
         $event->getResponse()->willReturn($response)->shouldBeCalled();
 
@@ -55,7 +55,7 @@ class AddTagsListenerTest extends TestCase
 
         $response = new Response();
 
-        $event = $this->prophesize(FilterResponseEvent::class);
+        $event = $this->prophesize(ResponseEvent::class);
         $event->getRequest()->willReturn($request)->shouldBeCalled();
         $event->getResponse()->willReturn($response)->shouldBeCalled();
 
@@ -75,7 +75,7 @@ class AddTagsListenerTest extends TestCase
         $response->setPublic();
         $response->setEtag('foo');
 
-        $event = $this->prophesize(FilterResponseEvent::class);
+        $event = $this->prophesize(ResponseEvent::class);
         $event->getRequest()->willReturn($request)->shouldBeCalled();
         $event->getResponse()->willReturn($response)->shouldBeCalled();
 
@@ -95,7 +95,7 @@ class AddTagsListenerTest extends TestCase
         $response->setPublic();
         $response->setEtag('foo');
 
-        $event = $this->prophesize(FilterResponseEvent::class);
+        $event = $this->prophesize(ResponseEvent::class);
         $event->getRequest()->willReturn($request)->shouldBeCalled();
         $event->getResponse()->willReturn($response)->shouldBeCalled();
 
@@ -115,7 +115,7 @@ class AddTagsListenerTest extends TestCase
         $response->setPublic();
         $response->setEtag('foo');
 
-        $event = $this->prophesize(FilterResponseEvent::class);
+        $event = $this->prophesize(ResponseEvent::class);
         $event->getRequest()->willReturn($request)->shouldBeCalled();
         $event->getResponse()->willReturn($response)->shouldBeCalled();
 
@@ -136,7 +136,7 @@ class AddTagsListenerTest extends TestCase
         $response->setPublic();
         $response->setEtag('foo');
 
-        $event = $this->prophesize(FilterResponseEvent::class);
+        $event = $this->prophesize(ResponseEvent::class);
         $event->getRequest()->willReturn($request)->shouldBeCalled();
         $event->getResponse()->willReturn($response)->shouldBeCalled();
 
@@ -157,7 +157,7 @@ class AddTagsListenerTest extends TestCase
         $response->setPublic();
         $response->setEtag('foo');
 
-        $event = $this->prophesize(FilterResponseEvent::class);
+        $event = $this->prophesize(ResponseEvent::class);
         $event->getRequest()->willReturn($request)->shouldBeCalled();
         $event->getResponse()->willReturn($response)->shouldBeCalled();
 
@@ -178,7 +178,7 @@ class AddTagsListenerTest extends TestCase
         $response->setPublic();
         $response->setEtag('foo');
 
-        $event = $this->prophesize(FilterResponseEvent::class);
+        $event = $this->prophesize(ResponseEvent::class);
         $event->getRequest()->willReturn($request)->shouldBeCalled();
         $event->getResponse()->willReturn($response)->shouldBeCalled();
 

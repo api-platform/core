@@ -106,3 +106,14 @@ parameters:
 		- '#Method ApiPlatform\\Core\\Bridge\\Doctrine\\Orm\\Filter\\(Abstract|Exists|Order)Filter::filterProperty\(\) invoked with 7 parameters, 5-6 required\.#'
 		- '#Method ApiPlatform\\Core\\Bridge\\Doctrine\\Orm\\Filter\\(AbstractFilter|FilterInterface)::apply\(\) invoked with 5 parameters, 3-4 required\.#'
 		- '#Method ApiPlatform\\Core\\PathResolver\\OperationPathResolverInterface::resolveOperationPath\(\) invoked with 4 parameters, 3 required\.#'
+
+		# Expected, due to forward compatibility
+		-
+			message: '#Class Symfony\\Component\\ErrorRenderer\\ErrorRenderer not found\.#'
+			path: %currentWorkingDirectory%/tests/Fixtures/app/AppKernel.php
+		-
+			message: '#Parameter \$exception of method ApiPlatform\\Core\\Action\\ExceptionAction::__invoke\(\) has invalid typehint type Symfony\\Component\\ErrorRenderer\\Exception\\FlattenException\.#'
+			path: %currentWorkingDirectory%/src/Action/ExceptionAction.php
+		-
+			message: '#Call to method get(Class|Headers|StatusCode)\(\) on an unknown class Symfony\\Component\\ErrorRenderer\\Exception\\FlattenException\.#'
+			path: %currentWorkingDirectory%/src/Action/ExceptionAction.php

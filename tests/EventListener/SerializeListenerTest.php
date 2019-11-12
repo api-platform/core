@@ -23,7 +23,7 @@ use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
+use Symfony\Component\HttpKernel\Event\ViewEvent;
 use Symfony\Component\Serializer\Encoder\EncoderInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 
@@ -39,7 +39,7 @@ class SerializeListenerTest extends TestCase
 
         $request = new Request();
 
-        $eventProphecy = $this->prophesize(GetResponseForControllerResultEvent::class);
+        $eventProphecy = $this->prophesize(ViewEvent::class);
         $eventProphecy->getControllerResult()->willReturn(new Response());
         $eventProphecy->getRequest()->willReturn($request);
 
@@ -62,7 +62,7 @@ class SerializeListenerTest extends TestCase
         $request = new Request([], [], ['data' => $dummy, '_api_resource_class' => Dummy::class, '_api_collection_operation_name' => 'post', '_api_respond' => false]);
         $request->setMethod('POST');
 
-        $eventProphecy = $this->prophesize(GetResponseForControllerResultEvent::class);
+        $eventProphecy = $this->prophesize(ViewEvent::class);
         $eventProphecy->getControllerResult()->willReturn($dummy);
         $eventProphecy->getRequest()->willReturn($request);
         $eventProphecy->setControllerResult(Argument::any())->shouldNotBeCalled();
@@ -92,7 +92,7 @@ class SerializeListenerTest extends TestCase
         $request = new Request([], [], ['data' => $dummy, '_api_resource_class' => Dummy::class, '_api_collection_operation_name' => 'post']);
         $request->setMethod('POST');
 
-        $eventProphecy = $this->prophesize(GetResponseForControllerResultEvent::class);
+        $eventProphecy = $this->prophesize(ViewEvent::class);
         $eventProphecy->getControllerResult()->willReturn($dummy);
         $eventProphecy->getRequest()->willReturn($request);
         $eventProphecy->setControllerResult(Argument::any())->shouldNotBeCalled();
@@ -125,7 +125,7 @@ class SerializeListenerTest extends TestCase
         $request = new Request([], [], ['_api_resource_class' => 'Foo', '_api_collection_operation_name' => 'get']);
         $request->setRequestFormat('xml');
 
-        $eventProphecy = $this->prophesize(GetResponseForControllerResultEvent::class);
+        $eventProphecy = $this->prophesize(ViewEvent::class);
         $eventProphecy->getControllerResult()->willReturn(new \stdClass())->shouldBeCalled();
         $eventProphecy->getRequest()->willReturn($request)->shouldBeCalled();
         $eventProphecy->setControllerResult('bar')->shouldBeCalled();
@@ -145,7 +145,7 @@ class SerializeListenerTest extends TestCase
         $request = new Request([], [], ['_api_resource_class' => 'Foo', '_api_collection_operation_name' => 'get', '_api_output_class' => false]);
         $request->setRequestFormat('xml');
 
-        $eventProphecy = $this->prophesize(GetResponseForControllerResultEvent::class);
+        $eventProphecy = $this->prophesize(ViewEvent::class);
         $eventProphecy->getControllerResult()->willReturn(new \stdClass());
         $eventProphecy->getRequest()->willReturn($request);
         $eventProphecy->setControllerResult(null)->shouldBeCalled();
@@ -180,7 +180,7 @@ class SerializeListenerTest extends TestCase
         $request = new Request([], [], ['_api_resource_class' => 'Foo', '_api_item_operation_name' => 'get']);
         $request->setRequestFormat('xml');
 
-        $eventProphecy = $this->prophesize(GetResponseForControllerResultEvent::class);
+        $eventProphecy = $this->prophesize(ViewEvent::class);
         $eventProphecy->getControllerResult()->willReturn(new \stdClass())->shouldBeCalled();
         $eventProphecy->getRequest()->willReturn($request)->shouldBeCalled();
         $eventProphecy->setControllerResult('bar')->shouldBeCalled();
@@ -202,7 +202,7 @@ class SerializeListenerTest extends TestCase
         $request = new Request([], [], ['_api_respond' => true]);
         $request->setRequestFormat('xml');
 
-        $eventProphecy = $this->prophesize(GetResponseForControllerResultEvent::class);
+        $eventProphecy = $this->prophesize(ViewEvent::class);
         $eventProphecy->getControllerResult()->willReturn([])->shouldBeCalled();
         $eventProphecy->getRequest()->willReturn($request)->shouldBeCalled();
         $eventProphecy->setControllerResult('bar')->shouldBeCalled();

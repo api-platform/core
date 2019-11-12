@@ -19,7 +19,7 @@ use FOS\UserBundle\Model\UserInterface;
 use FOS\UserBundle\Model\UserManagerInterface;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
+use Symfony\Component\HttpKernel\Event\ViewEvent;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
@@ -36,7 +36,7 @@ class EventListenerTest extends TestCase
         $manager = $this->prophesize(UserManagerInterface::class);
         $manager->deleteUser($user)->shouldBeCalled();
 
-        $event = $this->prophesize(GetResponseForControllerResultEvent::class);
+        $event = $this->prophesize(ViewEvent::class);
         $event->getControllerResult()->willReturn($user)->shouldBeCalled();
         $event->getRequest()->willReturn($request)->shouldBeCalled();
         $event->setControllerResult(null)->shouldBeCalled();
@@ -55,7 +55,7 @@ class EventListenerTest extends TestCase
         $manager = $this->prophesize(UserManagerInterface::class);
         $manager->updateUser($user)->shouldBeCalled();
 
-        $event = $this->prophesize(GetResponseForControllerResultEvent::class);
+        $event = $this->prophesize(ViewEvent::class);
         $event->getControllerResult()->willReturn($user)->shouldBeCalled();
         $event->getRequest()->willReturn($request)->shouldBeCalled();
         $event->setControllerResult()->shouldNotBeCalled();
@@ -72,7 +72,7 @@ class EventListenerTest extends TestCase
         $manager->deleteUser()->shouldNotBeCalled();
         $manager->updateUser()->shouldNotBeCalled();
 
-        $event = $this->prophesize(GetResponseForControllerResultEvent::class);
+        $event = $this->prophesize(ViewEvent::class);
         $event->getRequest()->willReturn($request)->shouldBeCalled();
 
         $listener = new EventListener($manager->reveal());
@@ -88,7 +88,7 @@ class EventListenerTest extends TestCase
         $manager->deleteUser()->shouldNotBeCalled();
         $manager->updateUser()->shouldNotBeCalled();
 
-        $event = $this->prophesize(GetResponseForControllerResultEvent::class);
+        $event = $this->prophesize(ViewEvent::class);
         $event->getRequest()->willReturn($request)->shouldBeCalled();
         $event->getControllerResult()->willReturn(new \stdClass());
 
@@ -104,7 +104,7 @@ class EventListenerTest extends TestCase
         $manager->deleteUser()->shouldNotBeCalled();
         $manager->updateUser()->shouldNotBeCalled();
 
-        $event = $this->prophesize(GetResponseForControllerResultEvent::class);
+        $event = $this->prophesize(ViewEvent::class);
         $event->getRequest()->willReturn($request)->shouldBeCalled();
         $event->getControllerResult()->willReturn(new User());
 

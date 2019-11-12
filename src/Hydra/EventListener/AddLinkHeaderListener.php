@@ -17,7 +17,7 @@ use ApiPlatform\Core\Api\UrlGeneratorInterface;
 use ApiPlatform\Core\JsonLd\ContextBuilder;
 use Fig\Link\GenericLinkProvider;
 use Fig\Link\Link;
-use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
+use Symfony\Component\HttpKernel\Event\ResponseEvent;
 
 /**
  * Adds the HTTP Link header pointing to the Hydra documentation.
@@ -36,7 +36,7 @@ final class AddLinkHeaderListener
     /**
      * Sends the Hydra header on each response.
      */
-    public function onKernelResponse(FilterResponseEvent $event): void
+    public function onKernelResponse(ResponseEvent $event): void
     {
         $apiDocUrl = $this->urlGenerator->generate('api_doc', ['_format' => 'jsonld'], UrlGeneratorInterface::ABS_URL);
         $link = new Link(ContextBuilder::HYDRA_NS.'apiDocumentation', $apiDocUrl);

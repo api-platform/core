@@ -21,7 +21,7 @@ use ApiPlatform\Core\Metadata\Resource\ToggleableOperationAttributeTrait;
 use ApiPlatform\Core\Util\RequestAttributesExtractor;
 use ApiPlatform\Core\Util\ResourceClassInfoTrait;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
+use Symfony\Component\HttpKernel\Event\ViewEvent;
 
 /**
  * Bridges persistence and the API system.
@@ -50,14 +50,14 @@ final class WriteListener
     /**
      * Persists, updates or delete data return by the controller if applicable.
      */
-    public function onKernelView(GetResponseForControllerResultEvent $event): void
+    public function onKernelView(ViewEvent $event): void
     {
         $controllerResult = $event->getControllerResult();
         $request = $event->getRequest();
 
         if (
             $controllerResult instanceof Response
-            || $request->isMethodSafe(false)
+            || $request->isMethodSafe()
             || !($attributes = RequestAttributesExtractor::extractAttributes($request))
             || !$attributes['persist']
             || $this->isOperationAttributeDisabled($attributes, self::OPERATION_ATTRIBUTE_KEY)

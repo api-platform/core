@@ -19,7 +19,7 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Persistence\ObjectManager;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
+use Symfony\Component\HttpKernel\Event\ViewEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 /**
@@ -46,7 +46,7 @@ class WriteListenerTest extends TestCase
         $request = new Request();
         $request->setMethod('POST');
         $request->attributes->set('_api_resource_class', 'Dummy');
-        $event = new GetResponseForControllerResultEvent($httpKernelProphecy->reveal(), $request, HttpKernelInterface::MASTER_REQUEST, $dummy);
+        $event = new ViewEvent($httpKernelProphecy->reveal(), $request, HttpKernelInterface::MASTER_REQUEST, $dummy);
 
         $writeListener->onKernelView($event);
     }
@@ -69,7 +69,7 @@ class WriteListenerTest extends TestCase
         $request = new Request();
         $request->setMethod('DELETE');
         $request->attributes->set('_api_resource_class', 'Dummy');
-        $eventProphecy = $this->prophesize(GetResponseForControllerResultEvent::class);
+        $eventProphecy = $this->prophesize(ViewEvent::class);
         $eventProphecy->setControllerResult(null)->shouldBeCalled();
         $eventProphecy->getRequest()->willReturn($request);
         $eventProphecy->getControllerResult()->willReturn($dummy);
@@ -95,7 +95,7 @@ class WriteListenerTest extends TestCase
         $request = new Request();
         $request->setMethod('HEAD');
         $request->attributes->set('_api_resource_class', 'Dummy');
-        $event = new GetResponseForControllerResultEvent($httpKernelProphecy->reveal(), $request, HttpKernelInterface::MASTER_REQUEST, $dummy);
+        $event = new ViewEvent($httpKernelProphecy->reveal(), $request, HttpKernelInterface::MASTER_REQUEST, $dummy);
 
         $writeListener->onKernelView($event);
     }
@@ -117,7 +117,7 @@ class WriteListenerTest extends TestCase
         $httpKernelProphecy = $this->prophesize(HttpKernelInterface::class);
         $request = new Request();
         $request->setMethod('POST');
-        $event = new GetResponseForControllerResultEvent($httpKernelProphecy->reveal(), $request, HttpKernelInterface::MASTER_REQUEST, $dummy);
+        $event = new ViewEvent($httpKernelProphecy->reveal(), $request, HttpKernelInterface::MASTER_REQUEST, $dummy);
 
         $writeListener->onKernelView($event);
     }
@@ -139,7 +139,7 @@ class WriteListenerTest extends TestCase
         $request = new Request();
         $request->setMethod('DELETE');
         $request->attributes->set('_api_resource_class', 'Dummy');
-        $event = new GetResponseForControllerResultEvent($httpKernelProphecy->reveal(), $request, HttpKernelInterface::MASTER_REQUEST, $dummy);
+        $event = new ViewEvent($httpKernelProphecy->reveal(), $request, HttpKernelInterface::MASTER_REQUEST, $dummy);
 
         $writeListener->onKernelView($event);
     }
