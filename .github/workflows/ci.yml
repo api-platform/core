@@ -40,14 +40,25 @@ jobs:
         run: |
           apk add \
             unzip \
+      - name: Get PHP extension directory
+        id: php-extension-directory
+        run: |
+          directory=$(php -r "echo ini_get('extension_dir');")
+          echo "::set-output name=directory::$directory"
+      - name: Cache PHP extensions
+        id: cache-php-extensions
+        uses: actions/cache@v1
+        with:
+          path: steps.php-extension-directory.outputs.directory
+          key: php-extensions-php${{ matrix.php }}-mongo-$EXT_MONGODB_VERSION-pcov-$EXT_PCOV_VERSION
       - name: Install mongodb PHP extension
-        if: (!startsWith(matrix.php, '7.1'))
+        if: (!startsWith(matrix.php, '7.1')) && steps.cache-php-extensions.outputs.cache-hit != 'true'
         run: |
           apk add $PHPIZE_DEPS
           pecl install mongodb-$EXT_MONGODB_VERSION
           docker-php-ext-enable mongodb
       - name: Install pcov PHP extension
-        if: matrix.coverage
+        if: matrix.coverage && steps.cache-php-extensions.outputs.cache-hit != 'true'
         run: |
           apk add $PHPIZE_DEPS
           pecl install pcov-$EXT_PCOV_VERSION
