@@ -1,5 +1,8 @@
 version: 2.1
 
+.constants:
+  - &ext-mongodb-version '1.6.0'
+
 commands:
   clear-test-app-cache:
     steps:
@@ -18,11 +21,34 @@ commands:
           command: sudo rm /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
   install-mongodb-php-extension:
     steps:
+      - install-php-extension-from-pecl:
+          extension_name: mongodb
+          extension_version: *ext-mongodb-version
+  install-php-extension-from-pecl:
+    parameters:
+      extension_name:
+        description: Name of the PHP extension.
+        type: string
+      extension_version:
+        description: Version of the PHP extension.
+        type: string
+    steps:
       - run:
-          name: Install mongodb PHP extension
+          name: Install << parameters.extension_name >> PHP extension
+          environment:
+            BUILD_DIR: /var/tmp/build/ext-<< parameters.extension_name >>-<< parameters.extension_version >>
+            SRC_DIR: /usr/src/php/ext/<< parameters.extension_name >>
           command: |
-            sudo pecl install mongodb-1.5.5
-            sudo docker-php-ext-enable mongodb
+            sudo mkdir -p "$SRC_DIR" "$BUILD_DIR"
+            sudo chown -R "$(id -u):$(id -g)" "$SRC_DIR" "$BUILD_DIR"
+            cd "$SRC_DIR"
+            curl -fsSL "https://pecl.php.net/get/<< parameters.extension_name >>-<< parameters.extension_version >>.tgz" | tar -zx --strip-components 1
+            phpize
+            cd "$BUILD_DIR"
+            "$SRC_DIR"/configure --config-cache
+            make -j"$(nproc)"
+            sudo make -j"$(nproc)" install
+            sudo docker-php-ext-enable << parameters.extension_name >>
   install-symfony-flex:
     steps:
       - run:
@@ -35,61 +61,114 @@ commands:
       - restore_cache:
           name: Restore Composer cache
           keys:
-            - composer-cache-{{ .Revision }}
-            - composer-cache-{{ .Branch }}
-            - composer-cache
+            - composer-{{ .Revision }}
+            - composer-{{ .Branch }}
+            - composer-
+  restore-mongodb-php-extension-build-cache:
+    parameters:
+      php_version:
+        description: PHP version (major.minor).
+        type: string
+    steps:
+      - restore-php-extension-build-cache:
+          extension_name: mongodb
+          extension_version: *ext-mongodb-version
+          php_version: << parameters.php_version >>
   restore-php-cs-fixer-cache:
     steps:
       - restore_cache:
           name: Restore PHP-CS-Fixer cache
           keys:
-            - php-cs-fixer-cache-{{ .Revision }}
-            - php-cs-fixer-cache-{{ .Branch }}
-            - php-cs-fixer-cache
+            - php-cs-fixer-{{ .Revision }}
+            - php-cs-fixer-{{ .Branch }}
+            - php-cs-fixer-
+  restore-php-extension-build-cache:
+    parameters:
+      extension_name:
+        description: Name of the PHP extension.
+        type: string
+      extension_version:
+        description: Version of the PHP extension.
+        type: string
+      php_version:
+        description: PHP version (major.minor).
+        type: string
+    steps:
+      - restore_cache:
+          name: Restore << parameters.extension_name >> PHP extension build cache
+          keys:
+            - ext-<< parameters.extension_name >>-<< parameters.extension_version >>-php<< parameters.php_version >>-
   restore-phpstan-cache:
     steps:
       - restore_cache:
           name: Restore PHPStan cache
           keys:
-            - phpstan-cache-{{ .Revision }}
-            - phpstan-cache-{{ .Branch }}
-            - phpstan-cache
+            - phpstan-{{ .Revision }}
+            - phpstan-{{ .Branch }}
+            - phpstan-
   save-composer-cache:
     steps:
       - save_cache:
           name: Save Composer cache
           paths:
             - ~/.composer/cache
-          key: composer-cache-{{ .Branch }}-{{ .BuildNum }}
+          key: composer-{{ .Branch }}-{{ .BuildNum }}
       - save_cache:
           name: Save Composer cache
           paths:
             - ~/.composer/cache
-          key: composer-cache-{{ .Revision }}-{{ .BuildNum }}
+          key: composer-{{ .Revision }}-{{ .BuildNum }}
+  save-mongodb-php-extension-build-cache:
+    parameters:
+      php_version:
+        description: PHP version (major.minor).
+        type: string
+    steps:
+      - save-php-extension-build-cache:
+          extension_name: mongodb
+          extension_version: *ext-mongodb-version
+          php_version: << parameters.php_version >>
   save-php-cs-fixer-cache:
     steps:
       - save_cache:
           name: Save PHP-CS-Fixer cache
           paths:
             - .php_cs.cache
-          key: php-cs-fixer-cache-{{ .Branch }}-{{ .BuildNum }}
+          key: php-cs-fixer-{{ .Branch }}-{{ .BuildNum }}
       - save_cache:
           name: Save PHP-CS-Fixer cache
           paths:
             - .php_cs.cache
-          key: php-cs-fixer-cache-{{ .Revision }}-{{ .BuildNum }}
+          key: php-cs-fixer-{{ .Revision }}-{{ .BuildNum }}
+  save-php-extension-build-cache:
+    parameters:
+      extension_name:
+        description: Name of the PHP extension.
+        type: string
+      extension_version:
+        description: Version of the PHP extension.
+        type: string
+      php_version:
+        description: PHP version (major.minor).
+        type: string
+    steps:
+      - save_cache:
+          name: Save << parameters.extension_name >> PHP extension build cache
+          paths:
+            - /var/tmp/build/ext-<< parameters.extension_name >>-<< parameters.extension_version >>
+          key: ext-<< parameters.extension_name >>-<< parameters.extension_version >>-php<< parameters.php_version >>-{{ .BuildNum }}
   save-phpstan-cache:
     steps:
       - save_cache:
           name: Save PHPStan cache
           paths:
             - /tmp/phpstan/cache
-          key: phpstan-cache-{{ .Branch }}-{{ .BuildNum }}
+          key: phpstan-{{ .Branch }}-{{ .BuildNum }}
       - save_cache:
           name: Save PHPStan cache
           paths:
             - /tmp/phpstan/cache
-          key: phpstan-cache-{{ .Revision }}-{{ .BuildNum }}
+          key: phpstan-{{ .Revision }}-{{ .BuildNum }}
   update-project-dependencies:
     steps:
       - run:
@@ -98,15 +177,25 @@ commands:
 
 executors:
   php:
+    parameters:
+      php_version:
+        description: PHP version (major.minor).
+        type: string
     docker:
-      - image: circleci/php:7.3-node
+      - image: circleci/php:<< parameters.php_version >>-node
         environment:
-          SYMFONY_REQUIRE: ^3.4 || ^4.0
+          SYMFONY_REQUIRE: ^3.4 || ^4.0 || ^5.0
 
 jobs:
   php-cs-fixer:
     description: PHP-CS-Fixer
-    executor: php
+    parameters:
+      php_version:
+        description: PHP version (major.minor).
+        type: string
+    executor:
+      name: php
+      php_version: << parameters.php_version >>
     environment:
       PHP_CS_FIXER_FUTURE_MODE: '1'
     working_directory: ~/api-platform/core
@@ -132,13 +221,23 @@ jobs:
 
   phpstan:
     description: PHPStan
-    executor: php
+    parameters:
+      php_version:
+        description: PHP version (major.minor).
+        type: string
+    executor:
+      name: php
+      php_version: << parameters.php_version >>
     environment:
       APP_DEBUG: '1' # https://github.com/phpstan/phpstan-symfony/issues/37
     working_directory: ~/api-platform/core
     steps:
       - checkout
+      - restore-mongodb-php-extension-build-cache:
+          php_version: << parameters.php_version >>
       - install-mongodb-php-extension
+      - save-mongodb-php-extension-build-cache:
+          php_version: << parameters.php_version >>
       - disable-xdebug-php-extension
       - disable-php-memory-limit
       - restore-composer-cache
@@ -156,5 +255,7 @@ workflows:
   version: 2
   lint:
     jobs:
-      - php-cs-fixer
-      - phpstan
+      - php-cs-fixer:
+          php_version: '7.3'
+      - phpstan:
+          php_version: '7.3'
