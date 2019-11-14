@@ -7,6 +7,12 @@ Feature: Documentation support
     Given I send a "GET" request to "/"
     Then the header "Link" should be equal to '<http://example.com/docs.jsonld>; rel="http://www.w3.org/ns/hydra/core#apiDocumentation"'
 
+  Scenario: Checks that the Link pointing to the Hydra documentation is set on OPTIONS requests
+    Given I add "Access-Control-Request-Method" header equal to "OPTIONS"
+    And I add "Origin" header equal to "http://client.com"
+    When I send a "OPTIONS" request to "/"
+    Then the header "Link" should be equal to '<http://example.com/docs.jsonld>; rel="http://www.w3.org/ns/hydra/core#apiDocumentation"'
+
   Scenario: Retrieve the API vocabulary
     Given I send a "GET" request to "/docs.jsonld"
     Then the response status code should be 200

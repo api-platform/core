@@ -27,6 +27,12 @@
             <tag name="kernel.event_listener" event="kernel.response" method="onKernelResponse" />
         </service>
 
+        <service id="api_platform.hydra.listener.response.router" class="ApiPlatform\Core\Bridge\Symfony\Bundle\EventListener\RouterListener">
+            <argument type="service" id="router.request_context" />
+
+            <tag name="kernel.event_listener" event="kernel.response" method="onKernelResponse" priority="250" />
+        </service>
+
         <!-- Serializer -->
 
         <service id="api_platform.hydra.normalizer.constraint_violation_list" class="ApiPlatform\Core\Hydra\Serializer\ConstraintViolationListNormalizer" public="false">

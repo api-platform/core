@@ -47,6 +47,7 @@
         "jangregor/phpstan-prophecy": "^0.4.2",
         "justinrainbow/json-schema": "^5.2.1",
         "nelmio/api-doc-bundle": "^2.13.4",
+        "nelmio/cors-bundle": "^1.5 || ^2.0",
         "phpdocumentor/reflection-docblock": "^3.0 || ^4.0",
         "phpdocumentor/type-resolver": "^0.3 || ^0.4",
         "phpspec/prophecy": "^1.8",

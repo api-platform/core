@@ -19,6 +19,7 @@ use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
 use Doctrine\Bundle\MongoDBBundle\DoctrineMongoDBBundle;
 use FOS\UserBundle\FOSUserBundle;
 use Nelmio\ApiDocBundle\NelmioApiDocBundle;
+use Nelmio\CorsBundle\NelmioCorsBundle;
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
 use Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait;
 use Symfony\Bundle\MercureBundle\MercureBundle;
@@ -61,6 +62,7 @@ class AppKernel extends Kernel
             new SecurityBundle(),
             new FOSUserBundle(),
             new WebProfilerBundle(),
+            new NelmioCorsBundle(),
         ];
 
         if (class_exists(DoctrineMongoDBBundle::class)) {
