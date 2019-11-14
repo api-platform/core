@@ -56,6 +56,14 @@ jobs:
         run: echo 'memory_limit=-1' >> /usr/local/etc/php/php.ini
       - name: Install Composer
         run: wget -qO - https://raw.githubusercontent.com/composer/getcomposer.org/$COMPOSER_INSTALLER_COMMIT/web/installer | php -- --install-dir=/usr/local/bin --filename=composer --quiet
+      - name: Cache Composer packages
+        uses: actions/cache@v1
+        with:
+          path: ~/.composer/cache
+          key: composer-php${{ matrix.php }}-${{ github.sha }}
+          restore-keys: |
+            composer-php${{ matrix.php }}-
+            composer-
       - name: Install Symfony Flex
         run: |
           composer global require --prefer-dist --no-progress --no-suggest --ansi \
@@ -151,6 +159,14 @@ jobs:
         run: echo 'memory_limit=-1' >> /usr/local/etc/php/php.ini
       - name: Install Composer
         run: wget -qO - https://raw.githubusercontent.com/composer/getcomposer.org/$COMPOSER_INSTALLER_COMMIT/web/installer | php -- --install-dir=/usr/local/bin --filename=composer --quiet
+      - name: Cache Composer packages
+        uses: actions/cache@v1
+        with:
+          path: ~/.composer/cache
+          key: composer-php${{ matrix.php }}-${{ github.sha }}
+          restore-keys: |
+            composer-php${{ matrix.php }}-
+            composer-
       - name: Install Symfony Flex
         run: |
           composer global require --prefer-dist --no-progress --no-suggest --ansi \
@@ -243,6 +259,15 @@ jobs:
         run: echo 'memory_limit=-1' >> /usr/local/etc/php/php.ini
       - name: Install Composer
         run: wget -qO - https://raw.githubusercontent.com/composer/getcomposer.org/$COMPOSER_INSTALLER_COMMIT/web/installer | php -- --install-dir=/usr/local/bin --filename=composer --quiet
+      - name: Cache Composer packages
+        uses: actions/cache@v1
+        with:
+          path: ~/.composer/cache
+          key: composer-php${{ matrix.php }}-lowest-deps-${{ github.sha }}
+          restore-keys: |
+            composer-php${{ matrix.php }}-lowest-deps-
+            composer-php${{ matrix.php }}-
+            composer-
       - name: Install Symfony Flex
         run: |
           composer global require --prefer-dist --no-progress --no-suggest --ansi \
@@ -298,6 +323,15 @@ jobs:
         run: echo 'memory_limit=-1' >> /usr/local/etc/php/php.ini
       - name: Install Composer
         run: wget -qO - https://raw.githubusercontent.com/composer/getcomposer.org/$COMPOSER_INSTALLER_COMMIT/web/installer | php -- --install-dir=/usr/local/bin --filename=composer --quiet
+      - name: Cache Composer packages
+        uses: actions/cache@v1
+        with:
+          path: ~/.composer/cache
+          key: composer-php${{ matrix.php }}-lowest-deps-${{ github.sha }}
+          restore-keys: |
+            composer-php${{ matrix.php }}-lowest-deps-
+            composer-php${{ matrix.php }}-
+            composer-
       - name: Install Symfony Flex
         run: |
           composer global require --prefer-dist --no-progress --no-suggest --ansi \
@@ -380,6 +414,14 @@ jobs:
         run: echo 'memory_limit=-1' >> /usr/local/etc/php/php.ini
       - name: Install Composer
         run: wget -qO - https://raw.githubusercontent.com/composer/getcomposer.org/$COMPOSER_INSTALLER_COMMIT/web/installer | php -- --install-dir=/usr/local/bin --filename=composer --quiet
+      - name: Cache Composer packages
+        uses: actions/cache@v1
+        with:
+          path: ~/.composer/cache
+          key: composer-php${{ matrix.php }}-${{ github.sha }}
+          restore-keys: |
+            composer-php${{ matrix.php }}-
+            composer-
       - name: Install Symfony Flex
         run: |
           composer global require --prefer-dist --no-progress --no-suggest --ansi \
@@ -459,6 +501,14 @@ jobs:
         run: echo 'memory_limit=-1' >> /usr/local/etc/php/php.ini
       - name: Install Composer
         run: wget -qO - https://raw.githubusercontent.com/composer/getcomposer.org/$COMPOSER_INSTALLER_COMMIT/web/installer | php -- --install-dir=/usr/local/bin --filename=composer --quiet
+      - name: Cache Composer packages
+        uses: actions/cache@v1
+        with:
+          path: ~/.composer/cache
+          key: composer-php${{ matrix.php }}-${{ github.sha }}
+          restore-keys: |
+            composer-php${{ matrix.php }}-
+            composer-
       - name: Install Symfony Flex
         run: |
           composer global require --prefer-dist --no-progress --no-suggest --ansi \
@@ -541,6 +591,14 @@ jobs:
         run: echo 'memory_limit=-1' >> /usr/local/etc/php/php.ini
       - name: Install Composer
         run: wget -qO - https://raw.githubusercontent.com/composer/getcomposer.org/$COMPOSER_INSTALLER_COMMIT/web/installer | php -- --install-dir=/usr/local/bin --filename=composer --quiet
+      - name: Cache Composer packages
+        uses: actions/cache@v1
+        with:
+          path: ~/.composer/cache
+          key: composer-php${{ matrix.php }}-${{ github.sha }}
+          restore-keys: |
+            composer-php${{ matrix.php }}-
+            composer-
       - name: Install Symfony Flex
         run: |
           composer global require --prefer-dist --no-progress --no-suggest --ansi \
@@ -620,6 +678,14 @@ jobs:
         run: echo 'memory_limit=-1' >> /usr/local/etc/php/php.ini
       - name: Install Composer
         run: wget -qO - https://raw.githubusercontent.com/composer/getcomposer.org/$COMPOSER_INSTALLER_COMMIT/web/installer | php -- --install-dir=/usr/local/bin --filename=composer --quiet
+      - name: Cache Composer packages
+        uses: actions/cache@v1
+        with:
+          path: ~/.composer/cache
+          key: composer-php${{ matrix.php }}-${{ github.sha }}
+          restore-keys: |
+            composer-php${{ matrix.php }}-
+            composer-
       - name: Install Symfony Flex
         run: |
           composer global require --prefer-dist --no-progress --no-suggest --ansi \
@@ -698,6 +764,14 @@ jobs:
         run: echo 'memory_limit=-1' >> /usr/local/etc/php/php.ini
       - name: Install Composer
         run: wget -qO - https://raw.githubusercontent.com/composer/getcomposer.org/$COMPOSER_INSTALLER_COMMIT/web/installer | php -- --install-dir=/usr/local/bin --filename=composer --quiet
+      - name: Cache Composer packages
+        uses: actions/cache@v1
+        with:
+          path: ~/.composer/cache
+          key: composer-php${{ matrix.php }}-${{ github.sha }}
+          restore-keys: |
+            composer-php${{ matrix.php }}-
+            composer-
       - name: Install Symfony Flex
         run: |
           composer global require --prefer-dist --no-progress --no-suggest --ansi \
@@ -795,6 +869,14 @@ jobs:
         run: echo 'memory_limit=-1' >> /usr/local/etc/php/php.ini
       - name: Install Composer
         run: wget -qO - https://raw.githubusercontent.com/composer/getcomposer.org/$COMPOSER_INSTALLER_COMMIT/web/installer | php -- --install-dir=/usr/local/bin --filename=composer --quiet
+      - name: Cache Composer packages
+        uses: actions/cache@v1
+        with:
+          path: ~/.composer/cache
+          key: composer-php${{ matrix.php }}-${{ github.sha }}
+          restore-keys: |
+            composer-php${{ matrix.php }}-
+            composer-
       - name: Install Symfony Flex
         run: |
           composer global require --prefer-dist --no-progress --no-suggest --ansi \
@@ -903,6 +985,14 @@ jobs:
         run: echo 'memory_limit=-1' >> /usr/local/etc/php/php.ini
       - name: Install Composer
         run: wget -qO - https://raw.githubusercontent.com/composer/getcomposer.org/$COMPOSER_INSTALLER_COMMIT/web/installer | php -- --install-dir=/usr/local/bin --filename=composer --quiet
+      - name: Cache Composer packages
+        uses: actions/cache@v1
+        with:
+          path: ~/.composer/cache
+          key: composer-php${{ matrix.php }}-${{ github.sha }}
+          restore-keys: |
+            composer-php${{ matrix.php }}-
+            composer-
       - name: Install Symfony Flex
         run: |
           composer global require --prefer-dist --no-progress --no-suggest --ansi \
@@ -1002,6 +1092,14 @@ jobs:
         run: echo 'memory_limit=-1' >> /usr/local/etc/php/php.ini
       - name: Install Composer
         run: wget -qO - https://raw.githubusercontent.com/composer/getcomposer.org/$COMPOSER_INSTALLER_COMMIT/web/installer | php -- --install-dir=/usr/local/bin --filename=composer --quiet
+      - name: Cache Composer packages
+        uses: actions/cache@v1
+        with:
+          path: ~/.composer/cache
+          key: composer-php${{ matrix.php }}-${{ github.sha }}
+          restore-keys: |
+            composer-php${{ matrix.php }}-
+            composer-
       - name: Install Symfony Flex
         run: |
           composer global require --prefer-dist --no-progress --no-suggest --ansi \
@@ -1089,6 +1187,14 @@ jobs:
         run: echo 'memory_limit=-1' >> /usr/local/etc/php/php.ini
       - name: Install Composer
         run: wget -qO - https://raw.githubusercontent.com/composer/getcomposer.org/$COMPOSER_INSTALLER_COMMIT/web/installer | php -- --install-dir=/usr/local/bin --filename=composer --quiet
+      - name: Cache Composer packages
+        uses: actions/cache@v1
+        with:
+          path: ~/.composer/cache
+          key: composer-php${{ matrix.php }}-${{ github.sha }}
+          restore-keys: |
+            composer-php${{ matrix.php }}-
+            composer-
       - name: Install Symfony Flex
         run: |
           composer global require --prefer-dist --no-progress --no-suggest --ansi \
@@ -1147,6 +1253,15 @@ jobs:
         run: echo 'memory_limit=-1' >> /usr/local/etc/php/php.ini
       - name: Install Composer
         run: wget -qO - https://raw.githubusercontent.com/composer/getcomposer.org/$COMPOSER_INSTALLER_COMMIT/web/installer | php -- --install-dir=/usr/local/bin --filename=composer --quiet
+      - name: Cache Composer packages
+        uses: actions/cache@v1
+        with:
+          path: ~/.composer/cache
+          key: composer-php${{ matrix.php }}-symfony${{ matrix.symfony }}-${{ github.sha }}
+          restore-keys: |
+            composer-php${{ matrix.php }}-symfony${{ matrix.symfony }}-
+            composer-php${{ matrix.php }}-
+            composer-
       - name: Install Symfony Flex
         run: |
           composer global require --prefer-dist --no-progress --no-suggest --ansi \
@@ -1222,6 +1337,15 @@ jobs:
         run: echo 'memory_limit=-1' >> /usr/local/etc/php/php.ini
       - name: Install Composer
         run: wget -qO - https://raw.githubusercontent.com/composer/getcomposer.org/$COMPOSER_INSTALLER_COMMIT/web/installer | php -- --install-dir=/usr/local/bin --filename=composer --quiet
+      - name: Cache Composer packages
+        uses: actions/cache@v1
+        with:
+          path: ~/.composer/cache
+          key: composer-php${{ matrix.php }}-symfony${{ matrix.symfony }}-${{ github.sha }}
+          restore-keys: |
+            composer-php${{ matrix.php }}-symfony${{ matrix.symfony }}-
+            composer-php${{ matrix.php }}-
+            composer-
       - name: Install Symfony Flex
         run: |
           composer global require --prefer-dist --no-progress --no-suggest --ansi \

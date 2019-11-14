@@ -59,12 +59,12 @@ commands:
       - save_cache:
           name: Save Composer cache
           paths:
-            - ~/.composer/cache/files
+            - ~/.composer/cache
           key: composer-cache-{{ .Branch }}-{{ .BuildNum }}
       - save_cache:
           name: Save Composer cache
           paths:
-            - ~/.composer/cache/files
+            - ~/.composer/cache
           key: composer-cache-{{ .Revision }}-{{ .BuildNum }}
   save-php-cs-fixer-cache:
     steps:
