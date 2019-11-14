@@ -109,11 +109,10 @@ parameters:
 
 		# Expected, due to forward compatibility
 		-
-			message: '#Class Symfony\\Component\\ErrorRenderer\\ErrorRenderer not found\.#'
+			message: '#Class Symfony\\Component\\ErrorHandler\\ErrorRenderer\\ErrorRendererInterface not found\.#'
 			path: %currentWorkingDirectory%/tests/Fixtures/app/AppKernel.php
 		-
-			message: '#Parameter \$exception of method ApiPlatform\\Core\\Action\\ExceptionAction::__invoke\(\) has invalid typehint type Symfony\\Component\\ErrorRenderer\\Exception\\FlattenException\.#'
+			message: '#Parameter \$exception of method ApiPlatform\\Core\\Action\\ExceptionAction::__invoke\(\) has invalid typehint type Symfony\\Component\\ErrorHandler\\Exception\\FlattenException\.#'
 			path: %currentWorkingDirectory%/src/Action/ExceptionAction.php
-		-
-			message: '#Call to method get(Class|Headers|StatusCode)\(\) on an unknown class Symfony\\Component\\ErrorRenderer\\Exception\\FlattenException\.#'
-			path: %currentWorkingDirectory%/src/Action/ExceptionAction.php
+		- '#Call to method get(Class|Headers|StatusCode)\(\) on an unknown class Symfony\\Component\\ErrorHandler\\Exception\\FlattenException\.#'
+		- '#Class Symfony\\Component\\ErrorHandler\\Exception\\FlattenException not found\.#'
