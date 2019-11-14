@@ -128,6 +128,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $this->registerDataTransformerConfiguration($container);
         $this->registerSecurityConfiguration($container, $loader);
         $this->registerMakerConfiguration($container, $config, $loader);
+        $this->registerArgumentResolverConfiguration($container, $loader);
 
         $container->registerForAutoconfiguration(DataPersisterInterface::class)
             ->addTag('api_platform.data_persister');
@@ -751,6 +752,11 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         }
 
         $loader->load('maker.xml');
+    }
+
+    private function registerArgumentResolverConfiguration(ContainerBuilder $container, XmlFileLoader $loader): void
+    {
+        $loader->load('argument_resolver.xml');
     }
 
     private function buildDeprecationArgs(string $version, string $message): array

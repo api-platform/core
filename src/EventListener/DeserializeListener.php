@@ -16,7 +16,6 @@ namespace ApiPlatform\Core\EventListener;
 use ApiPlatform\Core\Api\FormatMatcher;
 use ApiPlatform\Core\Api\FormatsProviderInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
-use ApiPlatform\Core\Metadata\Resource\ToggleableOperationAttributeTrait;
 use ApiPlatform\Core\Serializer\SerializerContextBuilderInterface;
 use ApiPlatform\Core\Util\RequestAttributesExtractor;
 use Symfony\Component\HttpFoundation\Request;
@@ -32,7 +31,7 @@ use Symfony\Component\Serializer\SerializerInterface;
  */
 final class DeserializeListener
 {
-    use ToggleableOperationAttributeTrait;
+    use ToggleableDeserializationTrait;
 
     public const OPERATION_ATTRIBUTE_KEY = 'deserialize';
 
@@ -69,15 +68,9 @@ final class DeserializeListener
     public function onKernelRequest(RequestEvent $event): void
     {
         $request = $event->getRequest();
-        $method = $request->getMethod();
+        $attributes = RequestAttributesExtractor::extractAttributes($request);
 
-        if (
-            'DELETE' === $method
-            || $request->isMethodSafe()
-            || !($attributes = RequestAttributesExtractor::extractAttributes($request))
-            || !$attributes['receive']
-            || $this->isOperationAttributeDisabled($attributes, self::OPERATION_ATTRIBUTE_KEY)
-        ) {
+        if (!$this->isRequestToDeserialize($request, $attributes)) {
             return;
         }
 

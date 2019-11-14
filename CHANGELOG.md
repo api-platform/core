@@ -25,6 +25,7 @@
 * DataProvider: Add `TraversablePaginator` (#3783)
 * JSON:API: Support inclusion of resources from path (#3288)
 * Swagger UI: Add `swagger_ui_extra_configuration` to Swagger / OpenAPI configuration (#3731)
+* Allow controller argument with a name different from `$data` thanks to an argument resolver (#3263)
 * GraphQL: Support `ApiProperty` security (#4143)
 * GraphQL: **BC** Fix security on association collection properties. The collection resource `item_query` security is no longer used. `ApiProperty` security can now be used to secure collection (or any other) properties. (#4143)
 * Deprecate `allow_plain_identifiers` option (#4167)
