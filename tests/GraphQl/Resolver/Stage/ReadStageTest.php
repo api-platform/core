@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Tests\GraphQl\Resolver\Stage;
 
-use ApiPlatform\Core\Api\IriConverterInterface;
+use ApiPlatform\Core\Api\ItemFromIriConverterInterface;
 use ApiPlatform\Core\DataProvider\ContextAwareCollectionDataProviderInterface;
 use ApiPlatform\Core\DataProvider\SubresourceDataProviderInterface;
 use ApiPlatform\Core\Exception\ItemNotFoundException;
@@ -34,7 +34,7 @@ class ReadStageTest extends TestCase
     /** @var ReadStage */
     private $readStage;
     private $resourceMetadataFactoryProphecy;
-    private $iriConverterProphecy;
+    private $itemFromIriConverterProphecy;
     private $collectionDataProviderProphecy;
     private $subresourceDataProviderProphecy;
     private $serializerContextBuilderProphecy;
@@ -45,14 +45,14 @@ class ReadStageTest extends TestCase
     protected function setUp(): void
     {
         $this->resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $this->iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
+        $this->itemFromIriConverterProphecy = $this->prophesize(ItemFromIriConverterInterface::class);
         $this->collectionDataProviderProphecy = $this->prophesize(ContextAwareCollectionDataProviderInterface::class);
         $this->subresourceDataProviderProphecy = $this->prophesize(SubresourceDataProviderInterface::class);
         $this->serializerContextBuilderProphecy = $this->prophesize(SerializerContextBuilderInterface::class);
 
         $this->readStage = new ReadStage(
             $this->resourceMetadataFactoryProphecy->reveal(),
-            $this->iriConverterProphecy->reveal(),
+            $this->itemFromIriConverterProphecy->reveal(),
             $this->collectionDataProviderProphecy->reveal(),
             $this->subresourceDataProviderProphecy->reveal(),
             $this->serializerContextBuilderProphecy->reveal(),
@@ -110,9 +110,9 @@ class ReadStageTest extends TestCase
         $this->serializerContextBuilderProphecy->create($resourceClass, $operationName, $context, true)->shouldBeCalled()->willReturn($normalizationContext);
 
         if ($throwNotFound) {
-            $this->iriConverterProphecy->getItemFromIri($identifier, $normalizationContext)->willThrow(new ItemNotFoundException());
+            $this->itemFromIriConverterProphecy->getItemFromIri($identifier, $normalizationContext)->willThrow(new ItemNotFoundException());
         } else {
-            $this->iriConverterProphecy->getItemFromIri($identifier, $normalizationContext)->willReturn($item);
+            $this->itemFromIriConverterProphecy->getItemFromIri($identifier, $normalizationContext)->willReturn($item);
         }
 
         $result = ($this->readStage)($resourceClass, null, $operationName, $context);
@@ -153,9 +153,9 @@ class ReadStageTest extends TestCase
         $this->serializerContextBuilderProphecy->create($resourceClass, $operationName, $context, true)->shouldBeCalled()->willReturn($normalizationContext);
 
         if ($throwNotFound) {
-            $this->iriConverterProphecy->getItemFromIri($identifier, $normalizationContext)->willThrow(new ItemNotFoundException());
+            $this->itemFromIriConverterProphecy->getItemFromIri($identifier, $normalizationContext)->willThrow(new ItemNotFoundException());
         } else {
-            $this->iriConverterProphecy->getItemFromIri($identifier, $normalizationContext)->willReturn($item);
+            $this->itemFromIriConverterProphecy->getItemFromIri($identifier, $normalizationContext)->willReturn($item);
         }
 
         if ($expectedExceptionClass) {

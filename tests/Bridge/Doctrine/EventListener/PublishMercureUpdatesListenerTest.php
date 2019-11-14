@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Tests\Bridge\Doctrine\EventListener;
 
-use ApiPlatform\Core\Api\IriConverterInterface;
+use ApiPlatform\Core\Api\IriFromItemConverterInterface;
 use ApiPlatform\Core\Api\ResourceClassResolverInterface;
 use ApiPlatform\Core\Api\UrlGeneratorInterface;
 use ApiPlatform\Core\Bridge\Doctrine\EventListener\PublishMercureUpdatesListener;
@@ -61,13 +61,13 @@ class PublishMercureUpdatesListenerTest extends TestCase
         $resourceClassResolverProphecy->isResourceClass(DummyCar::class)->willReturn(true);
         $resourceClassResolverProphecy->isResourceClass(DummyFriend::class)->willReturn(true);
 
-        $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
-        $iriConverterProphecy->getIriFromItem($toInsert, UrlGeneratorInterface::ABS_URL)->willReturn('http://example.com/dummies/1')->shouldBeCalled();
-        $iriConverterProphecy->getIriFromItem($toUpdate, UrlGeneratorInterface::ABS_URL)->willReturn('http://example.com/dummies/2')->shouldBeCalled();
-        $iriConverterProphecy->getIriFromItem($toDelete, UrlGeneratorInterface::ABS_URL)->willReturn('http://example.com/dummies/3')->shouldBeCalled();
-        $iriConverterProphecy->getIriFromItem($toDelete)->willReturn('/dummies/3')->shouldBeCalled();
-        $iriConverterProphecy->getIriFromItem($toDeleteExpressionLanguage)->willReturn('/dummy_friends/4')->shouldBeCalled();
-        $iriConverterProphecy->getIriFromItem($toDeleteExpressionLanguage, UrlGeneratorInterface::ABS_URL)->willReturn('http://example.com/dummy_friends/4')->shouldBeCalled();
+        $iriFromItemConverterProphecy = $this->prophesize(IriFromItemConverterInterface::class);
+        $iriFromItemConverterProphecy->getIriFromItem($toInsert, UrlGeneratorInterface::ABS_URL)->willReturn('http://example.com/dummies/1')->shouldBeCalled();
+        $iriFromItemConverterProphecy->getIriFromItem($toUpdate, UrlGeneratorInterface::ABS_URL)->willReturn('http://example.com/dummies/2')->shouldBeCalled();
+        $iriFromItemConverterProphecy->getIriFromItem($toDelete, UrlGeneratorInterface::ABS_URL)->willReturn('http://example.com/dummies/3')->shouldBeCalled();
+        $iriFromItemConverterProphecy->getIriFromItem($toDelete)->willReturn('/dummies/3')->shouldBeCalled();
+        $iriFromItemConverterProphecy->getIriFromItem($toDeleteExpressionLanguage)->willReturn('/dummy_friends/4')->shouldBeCalled();
+        $iriFromItemConverterProphecy->getIriFromItem($toDeleteExpressionLanguage, UrlGeneratorInterface::ABS_URL)->willReturn('http://example.com/dummy_friends/4')->shouldBeCalled();
 
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadata(null, null, null, null, null, ['mercure' => true, 'normalization_context' => ['groups' => ['foo', 'bar']]]));
@@ -91,7 +91,7 @@ class PublishMercureUpdatesListenerTest extends TestCase
 
         $listener = new PublishMercureUpdatesListener(
             $resourceClassResolverProphecy->reveal(),
-            $iriConverterProphecy->reveal(),
+            $iriFromItemConverterProphecy->reveal(),
             $resourceMetadataFactoryProphecy->reveal(),
             $serializerProphecy->reveal(),
             $formats,
@@ -122,7 +122,7 @@ class PublishMercureUpdatesListenerTest extends TestCase
 
         new PublishMercureUpdatesListener(
             $this->prophesize(ResourceClassResolverInterface::class)->reveal(),
-            $this->prophesize(IriConverterInterface::class)->reveal(),
+            $this->prophesize(IriFromItemConverterInterface::class)->reveal(),
             $this->prophesize(ResourceMetadataFactoryInterface::class)->reveal(),
             $this->prophesize(SerializerInterface::class)->reveal(),
             ['jsonld' => ['application/ld+json'], 'jsonhal' => ['application/hal+json']],
@@ -142,7 +142,7 @@ class PublishMercureUpdatesListenerTest extends TestCase
         $resourceClassResolverProphecy->getResourceClass(Argument::type(Dummy::class))->willReturn(Dummy::class);
         $resourceClassResolverProphecy->isResourceClass(Dummy::class)->willReturn(true);
 
-        $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
+        $iriFromItemConverterProphecy = $this->prophesize(IriFromItemConverterInterface::class);
 
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadata(null, null, null, null, null, ['mercure' => 1]));
@@ -151,7 +151,7 @@ class PublishMercureUpdatesListenerTest extends TestCase
 
         $listener = new PublishMercureUpdatesListener(
             $resourceClassResolverProphecy->reveal(),
-            $iriConverterProphecy->reveal(),
+            $iriFromItemConverterProphecy->reveal(),
             $resourceMetadataFactoryProphecy->reveal(),
             $serializerProphecy->reveal(),
             ['jsonld' => ['application/ld+json'], 'jsonhal' => ['application/hal+json']],

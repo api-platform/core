@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\GraphQl\Resolver;
 
-use ApiPlatform\Core\Api\IriConverterInterface;
+use ApiPlatform\Core\Api\IriFromItemConverterInterface;
 use ApiPlatform\Core\GraphQl\Serializer\ItemNormalizer;
 use ApiPlatform\Core\Util\ClassInfoTrait;
 use GraphQL\Type\Definition\ResolveInfo;
@@ -29,18 +29,18 @@ final class ResourceFieldResolver
 {
     use ClassInfoTrait;
 
-    private $iriConverter;
+    private $iriFromItemConverter;
 
-    public function __construct(IriConverterInterface $iriConverter)
+    public function __construct(IriFromItemConverterInterface $iriFromItemConverter)
     {
-        $this->iriConverter = $iriConverter;
+        $this->iriFromItemConverter = $iriFromItemConverter;
     }
 
     public function __invoke(?array $source, array $args, $context, ResolveInfo $info)
     {
         $property = null;
         if ('id' === $info->fieldName && !isset($source['_id']) && isset($source[ItemNormalizer::ITEM_RESOURCE_CLASS_KEY], $source[ItemNormalizer::ITEM_IDENTIFIERS_KEY])) {
-            return $this->iriConverter->getItemIriFromResourceClass($source[ItemNormalizer::ITEM_RESOURCE_CLASS_KEY], $source[ItemNormalizer::ITEM_IDENTIFIERS_KEY]);
+            return $this->iriFromItemConverter->getItemIriFromResourceClass($source[ItemNormalizer::ITEM_RESOURCE_CLASS_KEY], $source[ItemNormalizer::ITEM_IDENTIFIERS_KEY]);
         }
 
         if ('_id' === $info->fieldName && !isset($source['_id']) && isset($source['id'])) {

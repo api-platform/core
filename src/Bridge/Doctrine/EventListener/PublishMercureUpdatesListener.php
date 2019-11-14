@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Bridge\Doctrine\EventListener;
 
-use ApiPlatform\Core\Api\IriConverterInterface;
+use ApiPlatform\Core\Api\IriFromItemConverterInterface;
 use ApiPlatform\Core\Api\ResourceClassResolverInterface;
 use ApiPlatform\Core\Api\UrlGeneratorInterface;
 use ApiPlatform\Core\Bridge\Symfony\Messenger\DispatchTrait;
@@ -39,7 +39,7 @@ final class PublishMercureUpdatesListener
     use DispatchTrait;
     use ResourceClassInfoTrait;
 
-    private $iriConverter;
+    private $iriFromItemConverter;
     private $resourceMetadataFactory;
     private $serializer;
     private $publisher;
@@ -52,14 +52,14 @@ final class PublishMercureUpdatesListener
     /**
      * @param array<string, string[]|string> $formats
      */
-    public function __construct(ResourceClassResolverInterface $resourceClassResolver, IriConverterInterface $iriConverter, ResourceMetadataFactoryInterface $resourceMetadataFactory, SerializerInterface $serializer, array $formats, MessageBusInterface $messageBus = null, callable $publisher = null, ExpressionLanguage $expressionLanguage = null)
+    public function __construct(ResourceClassResolverInterface $resourceClassResolver, IriFromItemConverterInterface $iriFromItemConverter, ResourceMetadataFactoryInterface $resourceMetadataFactory, SerializerInterface $serializer, array $formats, MessageBusInterface $messageBus = null, callable $publisher = null, ExpressionLanguage $expressionLanguage = null)
     {
         if (null === $messageBus && null === $publisher) {
             throw new InvalidArgumentException('A message bus or a publisher must be provided.');
         }
 
         $this->resourceClassResolver = $resourceClassResolver;
-        $this->iriConverter = $iriConverter;
+        $this->iriFromItemConverter = $iriFromItemConverter;
         $this->resourceMetadataFactory = $resourceMetadataFactory;
         $this->serializer = $serializer;
         $this->formats = $formats;
@@ -150,8 +150,8 @@ final class PublishMercureUpdatesListener
 
         if ('deletedEntities' === $property) {
             $this->deletedEntities[(object) [
-                'id' => $this->iriConverter->getIriFromItem($entity),
-                'iri' => $this->iriConverter->getIriFromItem($entity, UrlGeneratorInterface::ABS_URL),
+                'id' => $this->iriFromItemConverter->getIriFromItem($entity),
+                'iri' => $this->iriFromItemConverter->getIriFromItem($entity, UrlGeneratorInterface::ABS_URL),
             ]] = $value;
 
             return;
@@ -176,7 +176,7 @@ final class PublishMercureUpdatesListener
             $resourceClass = $this->getObjectClass($entity);
             $context = $this->resourceMetadataFactory->create($resourceClass)->getAttribute('normalization_context', []);
 
-            $iri = $this->iriConverter->getIriFromItem($entity, UrlGeneratorInterface::ABS_URL);
+            $iri = $this->iriFromItemConverter->getIriFromItem($entity, UrlGeneratorInterface::ABS_URL);
             $data = $this->serializer->serialize($entity, key($this->formats), $context);
         }
 
