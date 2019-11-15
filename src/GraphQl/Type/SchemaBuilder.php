@@ -74,7 +74,6 @@ final class SchemaBuilder implements SchemaBuilderInterface
 
                 if ($resourceMetadata->getGraphqlAttribute($operationName, 'item_query')) {
                     $queryFields += $this->fieldsBuilder->getItemQueryFields($resourceClass, $resourceMetadata, $operationName, $value);
-
                     continue;
                 }
 
