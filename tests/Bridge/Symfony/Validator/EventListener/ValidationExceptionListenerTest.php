@@ -31,10 +31,10 @@ class ValidationExceptionListenerTest extends TestCase
     public function testNotValidationException()
     {
         $eventProphecy = $this->prophesize(ExceptionEvent::class);
-        if (method_exists(ExceptionEvent::class, 'getException')) {
-            $eventProphecy->getException()->willReturn(new \Exception())->shouldBeCalled();
-        } else {
+        if (method_exists(ExceptionEvent::class, 'getThrowable')) {
             $eventProphecy->getThrowable()->willReturn(new \Exception())->shouldBeCalled();
+        } else {
+            $eventProphecy->getException()->willReturn(new \Exception())->shouldBeCalled();
         }
         $eventProphecy->setResponse()->shouldNotBeCalled();
 
@@ -50,10 +50,10 @@ class ValidationExceptionListenerTest extends TestCase
         $list = new ConstraintViolationList([]);
 
         $eventProphecy = $this->prophesize(ExceptionEvent::class);
-        if (method_exists(ExceptionEvent::class, 'getException')) {
-            $eventProphecy->getException()->willReturn(new ValidationException($list))->shouldBeCalled();
-        } else {
+        if (method_exists(ExceptionEvent::class, 'getThrowable')) {
             $eventProphecy->getThrowable()->willReturn(new ValidationException($list))->shouldBeCalled();
+        } else {
+            $eventProphecy->getException()->willReturn(new ValidationException($list))->shouldBeCalled();
         }
         $eventProphecy->getRequest()->willReturn(new Request())->shouldBeCalled();
         $eventProphecy->setResponse(Argument::allOf(

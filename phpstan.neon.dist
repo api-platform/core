@@ -125,8 +125,10 @@ parameters:
 			path: %currentWorkingDirectory%/src/Action/ExceptionAction.php
 		- '#Call to method get(Class|Headers|StatusCode)\(\) on an unknown class Symfony\\Component\\ErrorHandler\\Exception\\FlattenException\.#'
 		-
-			message: "#Call to function method_exists\\(\\) with 'Symfony\\\\\\\\Component.+' and 'getException' will always evaluate to false\\.#"
-			path: %currentWorkingDirectory%/tests/Bridge/Symfony/Validator/EventListener/ValidationExceptionListenerTest.php
+			message: "#Call to function method_exists\\(\\) with 'Symfony\\\\\\\\Component.+' and 'getThrowable' will always evaluate to false\\.#"
+			paths:
+				- %currentWorkingDirectory%/tests/Bridge/Symfony/Validator/EventListener/ValidationExceptionListenerTest.php
+				- %currentWorkingDirectory%/tests/EventListener/ExceptionListenerTest.php
 		-
 			message: '#Instanceof between bool\|float\|int|null and ArrayObject will always evaluate to false\.#'
 			paths:
