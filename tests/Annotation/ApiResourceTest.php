@@ -31,7 +31,7 @@ class ApiResourceTest extends TestCase
             'securityMessage' => 'You are not foo.',
             'securityPostDenormalize' => 'is_granted("ROLE_BAR")',
             'securityPostDenormalizeMessage' => 'You are not bar.',
-            'attributes' => ['foo' => 'bar', 'validation_groups' => ['baz', 'qux'], 'cache_headers' => ['max_age' => 0, 'shared_max_age' => 0, 'vary' => ['Custom-Vary-1', 'Custom-Vary-2']]],
+            'attributes' => ['foo' => 'bar', 'validation_groups' => ['baz', 'qux'], 'cache_headers' => ['max_age' => 0, 'shared_max_age' => 0, 'tags' => true, 'vary' => ['Custom-Vary-1', 'Custom-Vary-2']]],
             'collectionOperations' => ['bar' => ['foo']],
             'denormalizationContext' => ['groups' => ['foo']],
             'description' => 'description',
