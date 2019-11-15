@@ -80,4 +80,20 @@ class AddLinkHeaderListenerTest extends TestCase
             [new Request([], [], ['_api_resource_class' => Dummy::class])],
         ];
     }
+
+    public function testSkipWhenPreflightRequest(): void
+    {
+        $request = new Request();
+        $request->setMethod('OPTIONS');
+        $request->headers->set('Access-Control-Request-Method', 'POST');
+
+        $event = $this->prophesize(ResponseEvent::class);
+        $event->getRequest()->willReturn($request)->shouldBeCalled();
+
+        $resourceMetadataFactory = $this->prophesize(ResourceMetadataFactoryInterface::class);
+        $listener = new AddLinkHeaderListener($resourceMetadataFactory->reveal(), 'http://example.com/.well-known/mercure');
+        $listener->onKernelResponse($event->reveal());
+
+        $this->assertFalse($request->attributes->has('_links'));
+    }
 }
