@@ -103,7 +103,7 @@ class AddTagsListenerTest extends TestCase
         $response->setPublic();
         $response->setEtag('foo');
 
-        $event = $this->prophesize(FilterResponseEvent::class);
+        $event = $this->prophesize(ResponseEvent::class);
         $event->getRequest()->willReturn($request)->shouldBeCalled();
         $event->getResponse()->willReturn($response)->shouldBeCalled();
 
