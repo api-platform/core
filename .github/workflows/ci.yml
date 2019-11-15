@@ -8,7 +8,7 @@ env:
   COMPOSER_ALLOW_SUPERUSER: '1' # https://getcomposer.org/doc/03-cli.md#composer-allow-superuser
   COMPOSER_INSTALLER_COMMIT: fb22b78362d31c0d2bf516d1f8cdfd2745caa431
   COVERAGE: '0'
-  EXT_MONGODB_VERSION: '1.5.5'
+  EXT_MONGODB_VERSION: '1.6.0'
   EXT_PCOV_VERSION: '1.0.6'
   LEGACY: '0'
   SYMFONY_REQUIRE: ^3.4 || ^4.0 || ^5.0
@@ -21,6 +21,7 @@ jobs:
       image: php:${{ matrix.php }}-alpine
       options: >-
         --tmpfs /tmp:exec
+        --tmpfs /var/tmp:exec
     strategy:
       matrix:
         php:
@@ -40,17 +41,47 @@ jobs:
         run: |
           apk add \
             unzip \
+      - name: Cache mongodb PHP extension build
+        if: (!startsWith(matrix.php, '7.1'))
+        uses: actions/cache@v1
+        with:
+          path: /var/tmp/build/ext-mongodb-${{ env.EXT_MONGODB_VERSION }}
+          key: ext-mongodb-${{ env.EXT_MONGODB_VERSION }}-php${{ matrix.php }}-${{ github.sha }}
+          restore-keys: |
+            ext-mongodb-${{ env.EXT_MONGODB_VERSION }}-php${{ matrix.php }}-
       - name: Install mongodb PHP extension
         if: (!startsWith(matrix.php, '7.1'))
+        env:
+          BUILD_DIR: /var/tmp/build/ext-mongodb-${{ env.EXT_MONGODB_VERSION }}
+          SRC_DIR: /usr/src/php/ext/mongodb
         run: |
-          apk add $PHPIZE_DEPS
-          pecl install mongodb-$EXT_MONGODB_VERSION
+          apk add \
+            $PHPIZE_DEPS
+          mkdir -p "$SRC_DIR" "$BUILD_DIR"
+          cd "$SRC_DIR"
+          curl -fsSL "https://pecl.php.net/get/mongodb-$EXT_MONGODB_VERSION.tgz" | tar -zx --strip-components 1
+          phpize
+          cd "$BUILD_DIR"
+          "$SRC_DIR"/configure --config-cache
+          make -j"$(nproc)"
+          make -j"$(nproc)" install
           docker-php-ext-enable mongodb
       - name: Install pcov PHP extension
         if: matrix.coverage
+        env:
+          BUILD_DIR: /var/tmp/build/ext-pcov-${{ env.EXT_PCOV_VERSION }}
+          SRC_DIR: /usr/src/php/ext/pcov
         run: |
-          apk add $PHPIZE_DEPS
-          pecl install pcov-$EXT_PCOV_VERSION
+          apk add \
+            $PHPIZE_DEPS
+          mkdir -p "$SRC_DIR" "$BUILD_DIR"
+          cd "$SRC_DIR"
+          curl -fsSL "https://pecl.php.net/get/pcov-$EXT_PCOV_VERSION.tgz" | tar -zx --strip-components 1
+          phpize
+          cd "$BUILD_DIR"
+          "$SRC_DIR"/configure --config-cache
+          make -j"$(nproc)"
+          make -j"$(nproc)" install
           docker-php-ext-enable pcov
       - name: Disable PHP memory limit
         run: echo 'memory_limit=-1' >> /usr/local/etc/php/php.ini
@@ -124,6 +155,7 @@ jobs:
       image: php:${{ matrix.php }}-alpine
       options: >-
         --tmpfs /tmp:exec
+        --tmpfs /var/tmp:exec
     strategy:
       matrix:
         php:
@@ -143,17 +175,47 @@ jobs:
         run: |
           apk add \
             unzip \
+      - name: Cache mongodb PHP extension build
+        if: (!startsWith(matrix.php, '7.1'))
+        uses: actions/cache@v1
+        with:
+          path: /var/tmp/build/ext-mongodb-${{ env.EXT_MONGODB_VERSION }}
+          key: ext-mongodb-${{ env.EXT_MONGODB_VERSION }}-php${{ matrix.php }}-${{ github.sha }}
+          restore-keys: |
+            ext-mongodb-${{ env.EXT_MONGODB_VERSION }}-php${{ matrix.php }}-
       - name: Install mongodb PHP extension
         if: (!startsWith(matrix.php, '7.1'))
+        env:
+          BUILD_DIR: /var/tmp/build/ext-mongodb-${{ env.EXT_MONGODB_VERSION }}
+          SRC_DIR: /usr/src/php/ext/mongodb
         run: |
-          apk add $PHPIZE_DEPS
-          pecl install mongodb-$EXT_MONGODB_VERSION
+          apk add \
+            $PHPIZE_DEPS
+          mkdir -p "$SRC_DIR" "$BUILD_DIR"
+          cd "$SRC_DIR"
+          curl -fsSL "https://pecl.php.net/get/mongodb-$EXT_MONGODB_VERSION.tgz" | tar -zx --strip-components 1
+          phpize
+          cd "$BUILD_DIR"
+          "$SRC_DIR"/configure --config-cache
+          make -j"$(nproc)"
+          make -j"$(nproc)" install
           docker-php-ext-enable mongodb
       - name: Install pcov PHP extension
         if: matrix.coverage
+        env:
+          BUILD_DIR: /var/tmp/build/ext-pcov-${{ env.EXT_PCOV_VERSION }}
+          SRC_DIR: /usr/src/php/ext/pcov
         run: |
-          apk add $PHPIZE_DEPS
-          pecl install pcov-$EXT_PCOV_VERSION
+          apk add \
+            $PHPIZE_DEPS
+          mkdir -p "$SRC_DIR" "$BUILD_DIR"
+          cd "$SRC_DIR"
+          curl -fsSL "https://pecl.php.net/get/pcov-$EXT_PCOV_VERSION.tgz" | tar -zx --strip-components 1
+          phpize
+          cd "$BUILD_DIR"
+          "$SRC_DIR"/configure --config-cache
+          make -j"$(nproc)"
+          make -j"$(nproc)" install
           docker-php-ext-enable pcov
       - name: Disable PHP memory limit
         run: echo 'memory_limit=-1' >> /usr/local/etc/php/php.ini
@@ -236,6 +298,7 @@ jobs:
       image: php:${{ matrix.php }}-alpine
       options: >-
         --tmpfs /tmp:exec
+        --tmpfs /var/tmp:exec
     strategy:
       matrix:
         php:
@@ -250,10 +313,28 @@ jobs:
         run: |
           apk add \
             unzip \
+      - name: Cache mongodb PHP extension build
+        uses: actions/cache@v1
+        with:
+          path: /var/tmp/build/ext-mongodb-${{ env.EXT_MONGODB_VERSION }}
+          key: ext-mongodb-${{ env.EXT_MONGODB_VERSION }}-php${{ matrix.php }}-${{ github.sha }}
+          restore-keys: |
+            ext-mongodb-${{ env.EXT_MONGODB_VERSION }}-php${{ matrix.php }}-
       - name: Install mongodb PHP extension
+        env:
+          BUILD_DIR: /var/tmp/build/ext-mongodb-${{ env.EXT_MONGODB_VERSION }}
+          SRC_DIR: /usr/src/php/ext/mongodb
         run: |
-          apk add $PHPIZE_DEPS
-          pecl install mongodb-$EXT_MONGODB_VERSION
+          apk add \
+            $PHPIZE_DEPS
+          mkdir -p "$SRC_DIR" "$BUILD_DIR"
+          cd "$SRC_DIR"
+          curl -fsSL "https://pecl.php.net/get/mongodb-$EXT_MONGODB_VERSION.tgz" | tar -zx --strip-components 1
+          phpize
+          cd "$BUILD_DIR"
+          "$SRC_DIR"/configure --config-cache
+          make -j"$(nproc)"
+          make -j"$(nproc)" install
           docker-php-ext-enable mongodb
       - name: Disable PHP memory limit
         run: echo 'memory_limit=-1' >> /usr/local/etc/php/php.ini
@@ -300,6 +381,7 @@ jobs:
       image: php:${{ matrix.php }}-alpine
       options: >-
         --tmpfs /tmp:exec
+        --tmpfs /var/tmp:exec
     strategy:
       matrix:
         php:
@@ -314,10 +396,28 @@ jobs:
         run: |
           apk add \
             unzip \
+      - name: Cache mongodb PHP extension build
+        uses: actions/cache@v1
+        with:
+          path: /var/tmp/build/ext-mongodb-${{ env.EXT_MONGODB_VERSION }}
+          key: ext-mongodb-${{ env.EXT_MONGODB_VERSION }}-php${{ matrix.php }}-${{ github.sha }}
+          restore-keys: |
+            ext-mongodb-${{ env.EXT_MONGODB_VERSION }}-php${{ matrix.php }}-
       - name: Install mongodb PHP extension
+        env:
+          BUILD_DIR: /var/tmp/build/ext-mongodb-${{ env.EXT_MONGODB_VERSION }}
+          SRC_DIR: /usr/src/php/ext/mongodb
         run: |
-          apk add $PHPIZE_DEPS
-          pecl install mongodb-$EXT_MONGODB_VERSION
+          apk add \
+            $PHPIZE_DEPS
+          mkdir -p "$SRC_DIR" "$BUILD_DIR"
+          cd "$SRC_DIR"
+          curl -fsSL "https://pecl.php.net/get/mongodb-$EXT_MONGODB_VERSION.tgz" | tar -zx --strip-components 1
+          phpize
+          cd "$BUILD_DIR"
+          "$SRC_DIR"/configure --config-cache
+          make -j"$(nproc)"
+          make -j"$(nproc)" install
           docker-php-ext-enable mongodb
       - name: Disable PHP memory limit
         run: echo 'memory_limit=-1' >> /usr/local/etc/php/php.ini
@@ -367,6 +467,7 @@ jobs:
       image: php:${{ matrix.php }}-alpine
       options: >-
         --tmpfs /tmp:exec
+        --tmpfs /var/tmp:exec
     services:
       postgres:
         image: postgres:10-alpine
@@ -405,10 +506,28 @@ jobs:
           docker-php-ext-install -j$(nproc) \
             pdo_pgsql \
           ;
+      - name: Cache mongodb PHP extension build
+        uses: actions/cache@v1
+        with:
+          path: /var/tmp/build/ext-mongodb-${{ env.EXT_MONGODB_VERSION }}
+          key: ext-mongodb-${{ env.EXT_MONGODB_VERSION }}-php${{ matrix.php }}-${{ github.sha }}
+          restore-keys: |
+            ext-mongodb-${{ env.EXT_MONGODB_VERSION }}-php${{ matrix.php }}-
       - name: Install mongodb PHP extension
+        env:
+          BUILD_DIR: /var/tmp/build/ext-mongodb-${{ env.EXT_MONGODB_VERSION }}
+          SRC_DIR: /usr/src/php/ext/mongodb
         run: |
-          apk add $PHPIZE_DEPS
-          pecl install mongodb-$EXT_MONGODB_VERSION
+          apk add \
+            $PHPIZE_DEPS
+          mkdir -p "$SRC_DIR" "$BUILD_DIR"
+          cd "$SRC_DIR"
+          curl -fsSL "https://pecl.php.net/get/mongodb-$EXT_MONGODB_VERSION.tgz" | tar -zx --strip-components 1
+          phpize
+          cd "$BUILD_DIR"
+          "$SRC_DIR"/configure --config-cache
+          make -j"$(nproc)"
+          make -j"$(nproc)" install
           docker-php-ext-enable mongodb
       - name: Disable PHP memory limit
         run: echo 'memory_limit=-1' >> /usr/local/etc/php/php.ini
@@ -454,6 +573,7 @@ jobs:
       image: php:${{ matrix.php }}-alpine
       options: >-
         --tmpfs /tmp:exec
+        --tmpfs /var/tmp:exec
     services:
       postgres:
         image: postgres:10-alpine
@@ -492,10 +612,28 @@ jobs:
           docker-php-ext-install -j$(nproc) \
             pdo_pgsql \
           ;
+      - name: Cache mongodb PHP extension build
+        uses: actions/cache@v1
+        with:
+          path: /var/tmp/build/ext-mongodb-${{ env.EXT_MONGODB_VERSION }}
+          key: ext-mongodb-${{ env.EXT_MONGODB_VERSION }}-php${{ matrix.php }}-${{ github.sha }}
+          restore-keys: |
+            ext-mongodb-${{ env.EXT_MONGODB_VERSION }}-php${{ matrix.php }}-
       - name: Install mongodb PHP extension
+        env:
+          BUILD_DIR: /var/tmp/build/ext-mongodb-${{ env.EXT_MONGODB_VERSION }}
+          SRC_DIR: /usr/src/php/ext/mongodb
         run: |
-          apk add $PHPIZE_DEPS
-          pecl install mongodb-$EXT_MONGODB_VERSION
+          apk add \
+            $PHPIZE_DEPS
+          mkdir -p "$SRC_DIR" "$BUILD_DIR"
+          cd "$SRC_DIR"
+          curl -fsSL "https://pecl.php.net/get/mongodb-$EXT_MONGODB_VERSION.tgz" | tar -zx --strip-components 1
+          phpize
+          cd "$BUILD_DIR"
+          "$SRC_DIR"/configure --config-cache
+          make -j"$(nproc)"
+          make -j"$(nproc)" install
           docker-php-ext-enable mongodb
       - name: Disable PHP memory limit
         run: echo 'memory_limit=-1' >> /usr/local/etc/php/php.ini
@@ -544,6 +682,7 @@ jobs:
       image: php:${{ matrix.php }}-alpine
       options: >-
         --tmpfs /tmp:exec
+        --tmpfs /var/tmp:exec
     services:
       mysql:
         image: mysql:5.7
@@ -582,10 +721,28 @@ jobs:
           docker-php-ext-install -j$(nproc) \
             pdo_mysql \
           ;
+      - name: Cache mongodb PHP extension build
+        uses: actions/cache@v1
+        with:
+          path: /var/tmp/build/ext-mongodb-${{ env.EXT_MONGODB_VERSION }}
+          key: ext-mongodb-${{ env.EXT_MONGODB_VERSION }}-php${{ matrix.php }}-${{ github.sha }}
+          restore-keys: |
+            ext-mongodb-${{ env.EXT_MONGODB_VERSION }}-php${{ matrix.php }}-
       - name: Install mongodb PHP extension
+        env:
+          BUILD_DIR: /var/tmp/build/ext-mongodb-${{ env.EXT_MONGODB_VERSION }}
+          SRC_DIR: /usr/src/php/ext/mongodb
         run: |
-          apk add $PHPIZE_DEPS
-          pecl install mongodb-$EXT_MONGODB_VERSION
+          apk add \
+            $PHPIZE_DEPS
+          mkdir -p "$SRC_DIR" "$BUILD_DIR"
+          cd "$SRC_DIR"
+          curl -fsSL "https://pecl.php.net/get/mongodb-$EXT_MONGODB_VERSION.tgz" | tar -zx --strip-components 1
+          phpize
+          cd "$BUILD_DIR"
+          "$SRC_DIR"/configure --config-cache
+          make -j"$(nproc)"
+          make -j"$(nproc)" install
           docker-php-ext-enable mongodb
       - name: Disable PHP memory limit
         run: echo 'memory_limit=-1' >> /usr/local/etc/php/php.ini
@@ -631,6 +788,7 @@ jobs:
       image: php:${{ matrix.php }}-alpine
       options: >-
         --tmpfs /tmp:exec
+        --tmpfs /var/tmp:exec
     services:
       mysql:
         image: mysql:5.7
@@ -669,10 +827,28 @@ jobs:
           docker-php-ext-install -j$(nproc) \
             pdo_mysql \
           ;
+      - name: Cache mongodb PHP extension build
+        uses: actions/cache@v1
+        with:
+          path: /var/tmp/build/ext-mongodb-${{ env.EXT_MONGODB_VERSION }}
+          key: ext-mongodb-${{ env.EXT_MONGODB_VERSION }}-php${{ matrix.php }}-${{ github.sha }}
+          restore-keys: |
+            ext-mongodb-${{ env.EXT_MONGODB_VERSION }}-php${{ matrix.php }}-
       - name: Install mongodb PHP extension
+        env:
+          BUILD_DIR: /var/tmp/build/ext-mongodb-${{ env.EXT_MONGODB_VERSION }}
+          SRC_DIR: /usr/src/php/ext/mongodb
         run: |
-          apk add $PHPIZE_DEPS
-          pecl install mongodb-$EXT_MONGODB_VERSION
+          apk add \
+            $PHPIZE_DEPS
+          mkdir -p "$SRC_DIR" "$BUILD_DIR"
+          cd "$SRC_DIR"
+          curl -fsSL "https://pecl.php.net/get/mongodb-$EXT_MONGODB_VERSION.tgz" | tar -zx --strip-components 1
+          phpize
+          cd "$BUILD_DIR"
+          "$SRC_DIR"/configure --config-cache
+          make -j"$(nproc)"
+          make -j"$(nproc)" install
           docker-php-ext-enable mongodb
       - name: Disable PHP memory limit
         run: echo 'memory_limit=-1' >> /usr/local/etc/php/php.ini
@@ -721,6 +897,7 @@ jobs:
       image: php:${{ matrix.php }}-alpine
       options: >-
         --tmpfs /tmp:exec
+        --tmpfs /var/tmp:exec
     services:
       mongo:
         image: mongo:4
@@ -749,16 +926,45 @@ jobs:
         run: |
           apk add \
             unzip \
+      - name: Cache mongodb PHP extension build
+        uses: actions/cache@v1
+        with:
+          path: /var/tmp/build/ext-mongodb-${{ env.EXT_MONGODB_VERSION }}
+          key: ext-mongodb-${{ env.EXT_MONGODB_VERSION }}-php${{ matrix.php }}-${{ github.sha }}
+          restore-keys: |
+            ext-mongodb-${{ env.EXT_MONGODB_VERSION }}-php${{ matrix.php }}-
       - name: Install mongodb PHP extension
+        env:
+          BUILD_DIR: /var/tmp/build/ext-mongodb-${{ env.EXT_MONGODB_VERSION }}
+          SRC_DIR: /usr/src/php/ext/mongodb
         run: |
-          apk add $PHPIZE_DEPS
-          pecl install mongodb-$EXT_MONGODB_VERSION
+          apk add \
+            $PHPIZE_DEPS
+          mkdir -p "$SRC_DIR" "$BUILD_DIR"
+          cd "$SRC_DIR"
+          curl -fsSL "https://pecl.php.net/get/mongodb-$EXT_MONGODB_VERSION.tgz" | tar -zx --strip-components 1
+          phpize
+          cd "$BUILD_DIR"
+          "$SRC_DIR"/configure --config-cache
+          make -j"$(nproc)"
+          make -j"$(nproc)" install
           docker-php-ext-enable mongodb
       - name: Install pcov PHP extension
         if: matrix.coverage
+        env:
+          BUILD_DIR: /var/tmp/build/ext-pcov-${{ env.EXT_PCOV_VERSION }}
+          SRC_DIR: /usr/src/php/ext/pcov
         run: |
-          apk add $PHPIZE_DEPS
-          pecl install pcov-$EXT_PCOV_VERSION
+          apk add \
+            $PHPIZE_DEPS
+          mkdir -p "$SRC_DIR" "$BUILD_DIR"
+          cd "$SRC_DIR"
+          curl -fsSL "https://pecl.php.net/get/pcov-$EXT_PCOV_VERSION.tgz" | tar -zx --strip-components 1
+          phpize
+          cd "$BUILD_DIR"
+          "$SRC_DIR"/configure --config-cache
+          make -j"$(nproc)"
+          make -j"$(nproc)" install
           docker-php-ext-enable pcov
       - name: Disable PHP memory limit
         run: echo 'memory_limit=-1' >> /usr/local/etc/php/php.ini
@@ -826,6 +1032,7 @@ jobs:
       image: php:${{ matrix.php }}-alpine
       options: >-
         --tmpfs /tmp:exec
+        --tmpfs /var/tmp:exec
     services:
       mongo:
         image: mongo:4
@@ -854,16 +1061,45 @@ jobs:
         run: |
           apk add \
             unzip \
+      - name: Cache mongodb PHP extension build
+        uses: actions/cache@v1
+        with:
+          path: /var/tmp/build/ext-mongodb-${{ env.EXT_MONGODB_VERSION }}
+          key: ext-mongodb-${{ env.EXT_MONGODB_VERSION }}-php${{ matrix.php }}-${{ github.sha }}
+          restore-keys: |
+            ext-mongodb-${{ env.EXT_MONGODB_VERSION }}-php${{ matrix.php }}-
       - name: Install mongodb PHP extension
+        env:
+          BUILD_DIR: /var/tmp/build/ext-mongodb-${{ env.EXT_MONGODB_VERSION }}
+          SRC_DIR: /usr/src/php/ext/mongodb
         run: |
-          apk add $PHPIZE_DEPS
-          pecl install mongodb-$EXT_MONGODB_VERSION
+          apk add \
+            $PHPIZE_DEPS
+          mkdir -p "$SRC_DIR" "$BUILD_DIR"
+          cd "$SRC_DIR"
+          curl -fsSL "https://pecl.php.net/get/mongodb-$EXT_MONGODB_VERSION.tgz" | tar -zx --strip-components 1
+          phpize
+          cd "$BUILD_DIR"
+          "$SRC_DIR"/configure --config-cache
+          make -j"$(nproc)"
+          make -j"$(nproc)" install
           docker-php-ext-enable mongodb
       - name: Install pcov PHP extension
         if: matrix.coverage
+        env:
+          BUILD_DIR: /var/tmp/build/ext-pcov-${{ env.EXT_PCOV_VERSION }}
+          SRC_DIR: /usr/src/php/ext/pcov
         run: |
-          apk add $PHPIZE_DEPS
-          pecl install pcov-$EXT_PCOV_VERSION
+          apk add \
+            $PHPIZE_DEPS
+          mkdir -p "$SRC_DIR" "$BUILD_DIR"
+          cd "$SRC_DIR"
+          curl -fsSL "https://pecl.php.net/get/pcov-$EXT_PCOV_VERSION.tgz" | tar -zx --strip-components 1
+          phpize
+          cd "$BUILD_DIR"
+          "$SRC_DIR"/configure --config-cache
+          make -j"$(nproc)"
+          make -j"$(nproc)" install
           docker-php-ext-enable pcov
       - name: Disable PHP memory limit
         run: echo 'memory_limit=-1' >> /usr/local/etc/php/php.ini
@@ -940,6 +1176,7 @@ jobs:
       image: php:${{ matrix.php }}-alpine
       options: >-
         --tmpfs /tmp:exec
+        --tmpfs /var/tmp:exec
     services:
       elasticsearch:
         image: docker.elastic.co/elasticsearch/elasticsearch:6.8.3 # https://github.com/elastic/elasticsearch/issues/43627
@@ -970,16 +1207,45 @@ jobs:
         run: |
           apk add \
             unzip \
+      - name: Cache mongodb PHP extension build
+        uses: actions/cache@v1
+        with:
+          path: /var/tmp/build/ext-mongodb-${{ env.EXT_MONGODB_VERSION }}
+          key: ext-mongodb-${{ env.EXT_MONGODB_VERSION }}-php${{ matrix.php }}-${{ github.sha }}
+          restore-keys: |
+            ext-mongodb-${{ env.EXT_MONGODB_VERSION }}-php${{ matrix.php }}-
       - name: Install mongodb PHP extension
+        env:
+          BUILD_DIR: /var/tmp/build/ext-mongodb-${{ env.EXT_MONGODB_VERSION }}
+          SRC_DIR: /usr/src/php/ext/mongodb
         run: |
-          apk add $PHPIZE_DEPS
-          pecl install mongodb-$EXT_MONGODB_VERSION
+          apk add \
+            $PHPIZE_DEPS
+          mkdir -p "$SRC_DIR" "$BUILD_DIR"
+          cd "$SRC_DIR"
+          curl -fsSL "https://pecl.php.net/get/mongodb-$EXT_MONGODB_VERSION.tgz" | tar -zx --strip-components 1
+          phpize
+          cd "$BUILD_DIR"
+          "$SRC_DIR"/configure --config-cache
+          make -j"$(nproc)"
+          make -j"$(nproc)" install
           docker-php-ext-enable mongodb
       - name: Install pcov PHP extension
         if: matrix.coverage
+        env:
+          BUILD_DIR: /var/tmp/build/ext-pcov-${{ env.EXT_PCOV_VERSION }}
+          SRC_DIR: /usr/src/php/ext/pcov
         run: |
-          apk add $PHPIZE_DEPS
-          pecl install pcov-$EXT_PCOV_VERSION
+          apk add \
+            $PHPIZE_DEPS
+          mkdir -p "$SRC_DIR" "$BUILD_DIR"
+          cd "$SRC_DIR"
+          curl -fsSL "https://pecl.php.net/get/pcov-$EXT_PCOV_VERSION.tgz" | tar -zx --strip-components 1
+          phpize
+          cd "$BUILD_DIR"
+          "$SRC_DIR"/configure --config-cache
+          make -j"$(nproc)"
+          make -j"$(nproc)" install
           docker-php-ext-enable pcov
       - name: Disable PHP memory limit
         run: echo 'memory_limit=-1' >> /usr/local/etc/php/php.ini
@@ -1047,6 +1313,7 @@ jobs:
       image: php:${{ matrix.php }}-alpine
       options: >-
         --tmpfs /tmp:exec
+        --tmpfs /var/tmp:exec
     services:
       elasticsearch:
         image: docker.elastic.co/elasticsearch/elasticsearch:6.8.3 # https://github.com/elastic/elasticsearch/issues/43627
@@ -1077,16 +1344,45 @@ jobs:
         run: |
           apk add \
             unzip \
+      - name: Cache mongodb PHP extension build
+        uses: actions/cache@v1
+        with:
+          path: /var/tmp/build/ext-mongodb-${{ env.EXT_MONGODB_VERSION }}
+          key: ext-mongodb-${{ env.EXT_MONGODB_VERSION }}-php${{ matrix.php }}-${{ github.sha }}
+          restore-keys: |
+            ext-mongodb-${{ env.EXT_MONGODB_VERSION }}-php${{ matrix.php }}-
       - name: Install mongodb PHP extension
+        env:
+          BUILD_DIR: /var/tmp/build/ext-mongodb-${{ env.EXT_MONGODB_VERSION }}
+          SRC_DIR: /usr/src/php/ext/mongodb
         run: |
-          apk add $PHPIZE_DEPS
-          pecl install mongodb-$EXT_MONGODB_VERSION
+          apk add \
+            $PHPIZE_DEPS
+          mkdir -p "$SRC_DIR" "$BUILD_DIR"
+          cd "$SRC_DIR"
+          curl -fsSL "https://pecl.php.net/get/mongodb-$EXT_MONGODB_VERSION.tgz" | tar -zx --strip-components 1
+          phpize
+          cd "$BUILD_DIR"
+          "$SRC_DIR"/configure --config-cache
+          make -j"$(nproc)"
+          make -j"$(nproc)" install
           docker-php-ext-enable mongodb
       - name: Install pcov PHP extension
         if: matrix.coverage
+        env:
+          BUILD_DIR: /var/tmp/build/ext-pcov-${{ env.EXT_PCOV_VERSION }}
+          SRC_DIR: /usr/src/php/ext/pcov
         run: |
-          apk add $PHPIZE_DEPS
-          pecl install pcov-$EXT_PCOV_VERSION
+          apk add \
+            $PHPIZE_DEPS
+          mkdir -p "$SRC_DIR" "$BUILD_DIR"
+          cd "$SRC_DIR"
+          curl -fsSL "https://pecl.php.net/get/pcov-$EXT_PCOV_VERSION.tgz" | tar -zx --strip-components 1
+          phpize
+          cd "$BUILD_DIR"
+          "$SRC_DIR"/configure --config-cache
+          make -j"$(nproc)"
+          make -j"$(nproc)" install
           docker-php-ext-enable pcov
       - name: Disable PHP memory limit
         run: echo 'memory_limit=-1' >> /usr/local/etc/php/php.ini
@@ -1163,6 +1459,7 @@ jobs:
       image: php:${{ matrix.php }}-alpine
       options: >-
         --tmpfs /tmp:exec
+        --tmpfs /var/tmp:exec
     strategy:
       matrix:
         php:
@@ -1178,10 +1475,28 @@ jobs:
         run: |
           apk add \
             unzip \
+      - name: Cache mongodb PHP extension build
+        uses: actions/cache@v1
+        with:
+          path: /var/tmp/build/ext-mongodb-${{ env.EXT_MONGODB_VERSION }}
+          key: ext-mongodb-${{ env.EXT_MONGODB_VERSION }}-php${{ matrix.php }}-${{ github.sha }}
+          restore-keys: |
+            ext-mongodb-${{ env.EXT_MONGODB_VERSION }}-php${{ matrix.php }}-
       - name: Install mongodb PHP extension
+        env:
+          BUILD_DIR: /var/tmp/build/ext-mongodb-${{ env.EXT_MONGODB_VERSION }}
+          SRC_DIR: /usr/src/php/ext/mongodb
         run: |
-          apk add $PHPIZE_DEPS
-          pecl install mongodb-$EXT_MONGODB_VERSION
+          apk add \
+            $PHPIZE_DEPS
+          mkdir -p "$SRC_DIR" "$BUILD_DIR"
+          cd "$SRC_DIR"
+          curl -fsSL "https://pecl.php.net/get/mongodb-$EXT_MONGODB_VERSION.tgz" | tar -zx --strip-components 1
+          phpize
+          cd "$BUILD_DIR"
+          "$SRC_DIR"/configure --config-cache
+          make -j"$(nproc)"
+          make -j"$(nproc)" install
           docker-php-ext-enable mongodb
       - name: Disable PHP memory limit
         run: echo 'memory_limit=-1' >> /usr/local/etc/php/php.ini
@@ -1227,6 +1542,7 @@ jobs:
       image: php:${{ matrix.php }}-alpine
       options: >-
         --tmpfs /tmp:exec
+        --tmpfs /var/tmp:exec
     strategy:
       matrix:
         php:
@@ -1244,10 +1560,28 @@ jobs:
             jq \
             moreutils \
             unzip \
+      - name: Cache mongodb PHP extension build
+        uses: actions/cache@v1
+        with:
+          path: /var/tmp/build/ext-mongodb-${{ env.EXT_MONGODB_VERSION }}
+          key: ext-mongodb-${{ env.EXT_MONGODB_VERSION }}-php${{ matrix.php }}-${{ github.sha }}
+          restore-keys: |
+            ext-mongodb-${{ env.EXT_MONGODB_VERSION }}-php${{ matrix.php }}-
       - name: Install mongodb PHP extension
+        env:
+          BUILD_DIR: /var/tmp/build/ext-mongodb-${{ env.EXT_MONGODB_VERSION }}
+          SRC_DIR: /usr/src/php/ext/mongodb
         run: |
-          apk add $PHPIZE_DEPS
-          pecl install mongodb-$EXT_MONGODB_VERSION
+          apk add \
+            $PHPIZE_DEPS
+          mkdir -p "$SRC_DIR" "$BUILD_DIR"
+          cd "$SRC_DIR"
+          curl -fsSL "https://pecl.php.net/get/mongodb-$EXT_MONGODB_VERSION.tgz" | tar -zx --strip-components 1
+          phpize
+          cd "$BUILD_DIR"
+          "$SRC_DIR"/configure --config-cache
+          make -j"$(nproc)"
+          make -j"$(nproc)" install
           docker-php-ext-enable mongodb
       - name: Disable PHP memory limit
         run: echo 'memory_limit=-1' >> /usr/local/etc/php/php.ini
@@ -1311,6 +1645,7 @@ jobs:
       image: php:${{ matrix.php }}-alpine
       options: >-
         --tmpfs /tmp:exec
+        --tmpfs /var/tmp:exec
     strategy:
       matrix:
         php:
@@ -1328,10 +1663,28 @@ jobs:
             jq \
             moreutils \
             unzip \
+      - name: Cache mongodb PHP extension build
+        uses: actions/cache@v1
+        with:
+          path: /var/tmp/build/ext-mongodb-${{ env.EXT_MONGODB_VERSION }}
+          key: ext-mongodb-${{ env.EXT_MONGODB_VERSION }}-php${{ matrix.php }}-${{ github.sha }}
+          restore-keys: |
+            ext-mongodb-${{ env.EXT_MONGODB_VERSION }}-php${{ matrix.php }}-
       - name: Install mongodb PHP extension
+        env:
+          BUILD_DIR: /var/tmp/build/ext-mongodb-${{ env.EXT_MONGODB_VERSION }}
+          SRC_DIR: /usr/src/php/ext/mongodb
         run: |
-          apk add $PHPIZE_DEPS
-          pecl install mongodb-$EXT_MONGODB_VERSION
+          apk add \
+            $PHPIZE_DEPS
+          mkdir -p "$SRC_DIR" "$BUILD_DIR"
+          cd "$SRC_DIR"
+          curl -fsSL "https://pecl.php.net/get/mongodb-$EXT_MONGODB_VERSION.tgz" | tar -zx --strip-components 1
+          phpize
+          cd "$BUILD_DIR"
+          "$SRC_DIR"/configure --config-cache
+          make -j"$(nproc)"
+          make -j"$(nproc)" install
           docker-php-ext-enable mongodb
       - name: Disable PHP memory limit
         run: echo 'memory_limit=-1' >> /usr/local/etc/php/php.ini
