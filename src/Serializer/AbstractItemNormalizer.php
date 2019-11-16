@@ -495,6 +495,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
      * {@inheritdoc}
      *
      * @throws NoSuchPropertyException
+     * @throws UnexpectedValueException
      * @throws LogicException
      */
     protected function getAttributeValue($object, $attribute, $format = null, array $context = [])
@@ -515,13 +516,16 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
         $type = $propertyMetadata->getType();
 
         if (
-            is_iterable($attributeValue) &&
             $type &&
             $type->isCollection() &&
             ($collectionValueType = $type->getCollectionValueType()) &&
             ($className = $collectionValueType->getClassName()) &&
             $this->resourceClassResolver->isResourceClass($className)
         ) {
+            if (!is_iterable($attributeValue)) {
+                throw new UnexpectedValueException('Unexpected non-iterable value for to-many relation.');
+            }
+
             $resourceClass = $this->resourceClassResolver->getResourceClass($attributeValue, $className);
             $childContext = $this->createChildContext($context, $attribute, $format);
             $childContext['resource_class'] = $resourceClass;
@@ -535,6 +539,10 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             ($className = $type->getClassName()) &&
             $this->resourceClassResolver->isResourceClass($className)
         ) {
+            if (!\is_object($attributeValue) && null !== $attributeValue) {
+                throw new UnexpectedValueException('Unexpected non-object value for to-one relation.');
+            }
+
             $resourceClass = $this->resourceClassResolver->getResourceClass($attributeValue, $className);
             $childContext = $this->createChildContext($context, $attribute, $format);
             $childContext['resource_class'] = $resourceClass;
@@ -556,11 +564,17 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
      * Normalizes a collection of relations (to-many).
      *
      * @param iterable $attributeValue
+     *
+     * @throws UnexpectedValueException
      */
     protected function normalizeCollectionOfRelations(PropertyMetadata $propertyMetadata, $attributeValue, string $resourceClass, ?string $format, array $context): array
     {
         $value = [];
         foreach ($attributeValue as $index => $obj) {
+            if (!\is_object($obj) && null !== $obj) {
+                throw new UnexpectedValueException('Unexpected non-object element in to-many relation.');
+            }
+
             $value[$index] = $this->normalizeRelation($propertyMetadata, $obj, $resourceClass, $format, $context);
         }
 
@@ -568,11 +582,14 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
     }
 
     /**
-     * Normalizes a relation as an object if is a Link or as an URI.
+     * Normalizes a relation.
+     *
+     * @param object|null $relatedObject
      *
      * @throws LogicException
+     * @throws UnexpectedValueException
      *
-     * @return string|array
+     * @return string|array|\ArrayObject|null IRI or normalized object data
      */
     protected function normalizeRelation(PropertyMetadata $propertyMetadata, $relatedObject, string $resourceClass, ?string $format, array $context)
     {
@@ -581,7 +598,12 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
                 throw new LogicException(sprintf('The injected serializer must be an instance of "%s".', NormalizerInterface::class));
             }
 
-            return $this->serializer->normalize($relatedObject, $format, $context);
+            $normalizedRelatedObject = $this->serializer->normalize($relatedObject, $format, $context);
+            if (!\is_string($normalizedRelatedObject) && !\is_array($normalizedRelatedObject) && !$normalizedRelatedObject instanceof \ArrayObject && null !== $normalizedRelatedObject) {
+                throw new UnexpectedValueException('Expected normalized relation to be an IRI, array, \ArrayObject or null');
+            }
+
+            return $normalizedRelatedObject;
         }
 
         $iri = $this->iriConverter->getIriFromItem($relatedObject);
