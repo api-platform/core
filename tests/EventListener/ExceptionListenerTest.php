@@ -36,7 +36,11 @@ class ExceptionListenerTest extends TestCase
 
         $eventProphecy = $this->prophesize(ExceptionEvent::class);
         $eventProphecy->getRequest()->willReturn($request);
-        $eventProphecy->getException()->willReturn(new \Exception());
+        if (method_exists(ExceptionEvent::class, 'getThrowable')) {
+            $eventProphecy->getThrowable()->willReturn(new \Exception());
+        } else {
+            $eventProphecy->getException()->willReturn(new \Exception());
+        }
         $eventProphecy->getKernel()->willReturn($kernel);
         $eventProphecy->setResponse(Argument::type(Response::class))->shouldBeCalled();
 

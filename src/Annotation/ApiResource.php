@@ -370,7 +370,7 @@ final class ApiResource
      * @see https://api-platform.com/docs/core/performance/#partial-pagination
      * @see https://github.com/Haehnchen/idea-php-annotation-plugin/issues/112
      *
-     * @var int
+     * @var bool
      */
     private $paginationPartial;
 

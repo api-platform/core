@@ -66,7 +66,7 @@
         "symfony/config": "^3.4 || ^4.0 || ^5.0",
         "symfony/console": "^3.4 || ^4.0 || ^5.0",
         "symfony/css-selector": "^3.4 || ^4.0 || ^5.0",
-        "symfony/debug": "^3.4 || ^4.0 || ^5.0",
+        "symfony/debug": "^3.4 || ^4.0",
         "symfony/dependency-injection": "^3.4 || ^4.0 || ^5.0",
         "symfony/doctrine-bridge": "^3.4 || ^4.0 || ^5.0",
         "symfony/dom-crawler": "^3.4 || ^4.0 || ^5.0",

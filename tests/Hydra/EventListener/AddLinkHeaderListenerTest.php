@@ -50,4 +50,20 @@ class AddLinkHeaderListenerTest extends TestCase
             ['<https://demo.mercure.rocks/hub>; rel="mercure",<http://example.com/docs>; rel="http://www.w3.org/ns/hydra/core#apiDocumentation"', new Request([], [], ['_links' => new GenericLinkProvider([new Link('mercure', 'https://demo.mercure.rocks/hub')])])],
         ];
     }
+
+    public function testSkipWhenPreflightRequest(): void
+    {
+        $request = new Request();
+        $request->setMethod('OPTIONS');
+        $request->headers->set('Access-Control-Request-Method', 'POST');
+
+        $event = $this->prophesize(ResponseEvent::class);
+        $event->getRequest()->willReturn($request)->shouldBeCalled();
+
+        $urlGenerator = $this->prophesize(UrlGeneratorInterface::class);
+        $listener = new AddLinkHeaderListener($urlGenerator->reveal());
+        $listener->onKernelResponse($event->reveal());
+
+        $this->assertFalse($request->attributes->has('_links'));
+    }
 }

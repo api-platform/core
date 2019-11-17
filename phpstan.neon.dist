@@ -26,6 +26,9 @@ parameters:
 
 		# False positives
 		-
+			message: '#Variable \$iri might not be defined\.#'
+			path: %currentWorkingDirectory%/src/JsonApi/Serializer/ItemNormalizer.php
+		-
 			message: '#Variable \$positionPm might not be defined\.#'
 			path: %currentWorkingDirectory%/src/Util/ClassInfoTrait.php
 		-
@@ -60,7 +63,6 @@ parameters:
 		-
 			message: '#Property ApiPlatform\\Core\\Test\\DoctrineMongoDbOdmFilterTestCase::\$repository \(Doctrine\\ODM\\MongoDB\\Repository\\DocumentRepository\) does not accept Doctrine\\ORM\\EntityRepository<ApiPlatform\\Core\\Tests\\Fixtures\\TestBundle\\Document\\Dummy>\.#'
 			path: %currentWorkingDirectory%/src/Test/DoctrineMongoDbOdmFilterTestCase.php
-		- '#Method ApiPlatform\\Core\\(Serializer\\Abstract|JsonApi\\Serializer\\)ItemNormalizer::normalizeRelation\(\) should return array\|string but returns array\|bool\|float\|int\|string\.#'
 		- '#Method ApiPlatform\\Core\\Util\\RequestParser::parseRequestParams\(\) should return array but returns array\|false\.#'
 		-
 			message: '#Method ApiPlatform\\Core\\Bridge\\Doctrine\\Orm\\Util\\QueryBuilderHelper::mapJoinAliases() should return array<string, array<string>\|string> but returns array<int|string, mixed>\.#'
@@ -87,7 +89,7 @@ parameters:
 			path: %currentWorkingDirectory%/src/Bridge/Symfony/Bundle/Test/ApiTestAssertionsTrait.php
 		-
 			message: '#Service "api_platform.iri_converter" is private\.#'
-			path:  %currentWorkingDirectory%/src/Bridge/Symfony/Bundle/Test/ApiTestCase.php
+			path: %currentWorkingDirectory%/src/Bridge/Symfony/Bundle/Test/ApiTestCase.php
 
 		# Expected, due to optional interfaces
 		- '#Method ApiPlatform\\Core\\Bridge\\Doctrine\\Orm\\Extension\\QueryCollectionExtensionInterface::applyToCollection\(\) invoked with 5 parameters, 3-4 required\.#'
@@ -109,11 +111,26 @@ parameters:
 
 		# Expected, due to forward compatibility
 		-
-			message: '#Class Symfony\\Component\\ErrorRenderer\\ErrorRenderer not found\.#'
+			message: '#Class Symfony\\Component\\ErrorHandler\\ErrorRenderer\\ErrorRendererInterface not found\.#'
 			path: %currentWorkingDirectory%/tests/Fixtures/app/AppKernel.php
+		- '#Class Symfony\\Component\\ErrorHandler\\Exception\\FlattenException not found\.#'
 		-
-			message: '#Parameter \$exception of method ApiPlatform\\Core\\Action\\ExceptionAction::__invoke\(\) has invalid typehint type Symfony\\Component\\ErrorRenderer\\Exception\\FlattenException\.#'
-			path: %currentWorkingDirectory%/src/Action/ExceptionAction.php
+			message: '#Class Symfony\\Component\\HttpKernel\\EventListener\\ErrorListener not found\.#'
+			path: %currentWorkingDirectory%/src/EventListener/ExceptionListener.php
 		-
-			message: '#Call to method get(Class|Headers|StatusCode)\(\) on an unknown class Symfony\\Component\\ErrorRenderer\\Exception\\FlattenException\.#'
+			message: '#Instantiated class Symfony\\Component\\HttpKernel\\EventListener\\ErrorListener not found\.#'
+			path: %currentWorkingDirectory%/src/EventListener/ExceptionListener.php
+		-
+			message: '#Parameter \$exception of method ApiPlatform\\Core\\Action\\ExceptionAction::__invoke\(\) has invalid typehint type Symfony\\Component\\ErrorHandler\\Exception\\FlattenException\.#'
 			path: %currentWorkingDirectory%/src/Action/ExceptionAction.php
+		- '#Call to method get(Class|Headers|StatusCode)\(\) on an unknown class Symfony\\Component\\ErrorHandler\\Exception\\FlattenException\.#'
+		-
+			message: "#Call to function method_exists\\(\\) with 'Symfony\\\\\\\\Component.+' and 'getThrowable' will always evaluate to false\\.#"
+			paths:
+				- %currentWorkingDirectory%/tests/Bridge/Symfony/Validator/EventListener/ValidationExceptionListenerTest.php
+				- %currentWorkingDirectory%/tests/EventListener/ExceptionListenerTest.php
+		-
+			message: '#Instanceof between bool\|float\|int|null and ArrayObject will always evaluate to false\.#'
+			paths:
+				- %currentWorkingDirectory%/src/JsonApi/Serializer/ItemNormalizer.php
+				- %currentWorkingDirectory%/src/Serializer/AbstractItemNormalizer.php
