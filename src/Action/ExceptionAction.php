@@ -15,7 +15,7 @@ namespace ApiPlatform\Core\Action;
 
 use ApiPlatform\Core\Util\ErrorFormatGuesser;
 use Symfony\Component\Debug\Exception\FlattenException as LegacyFlattenException;
-use Symfony\Component\ErrorRenderer\Exception\FlattenException;
+use Symfony\Component\ErrorHandler\Exception\FlattenException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Serializer\SerializerInterface;

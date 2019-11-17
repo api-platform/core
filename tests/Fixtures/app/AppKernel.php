@@ -27,10 +27,10 @@ use Symfony\Bundle\TwigBundle\TwigBundle;
 use Symfony\Bundle\WebProfilerBundle\WebProfilerBundle;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\ErrorRenderer\ErrorRenderer;
+use Symfony\Component\ErrorHandler\ErrorRenderer\ErrorRendererInterface;
 use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\Routing\RouteCollectionBuilder;
-use Symfony\Component\Security\Core\Encoder\SodiumPasswordEncoder;
+use Symfony\Component\Security\Core\Encoder\NativePasswordEncoder;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
@@ -98,7 +98,7 @@ class AppKernel extends Kernel
 
         $loader->load(__DIR__."/config/config_{$this->getEnvironment()}.yml");
 
-        $alg = class_exists(SodiumPasswordEncoder::class) && SodiumPasswordEncoder::isSupported() ? 'auto' : 'bcrypt';
+        $alg = class_exists(NativePasswordEncoder::class) ? 'auto' : 'bcrypt';
         $securityConfig = [
             'encoders' => [
                 User::class => $alg,
@@ -155,7 +155,7 @@ class AppKernel extends Kernel
         }
 
         $twigConfig = ['strict_variables' => '%kernel.debug%'];
-        if (class_exists(ErrorRenderer::class)) {
+        if (interface_exists(ErrorRendererInterface::class)) {
             $twigConfig['exception_controller'] = null;
         }
         $c->prependExtensionConfig('twig', $twigConfig);

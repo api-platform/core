@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\JsonApi\Serializer;
 
 use ApiPlatform\Core\Api\IriConverterInterface;
-use ApiPlatform\Core\Api\OperationType;
 use ApiPlatform\Core\Api\ResourceClassResolverInterface;
 use ApiPlatform\Core\Exception\ItemNotFoundException;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
@@ -199,34 +198,29 @@ final class ItemNormalizer extends AbstractItemNormalizer
      * {@inheritdoc}
      *
      * @see http://jsonapi.org/format/#document-resource-object-linkage
-     *
-     * @throws LogicException
      */
     protected function normalizeRelation(PropertyMetadata $propertyMetadata, $relatedObject, string $resourceClass, ?string $format, array $context)
     {
-        if (null === $relatedObject) {
-            if (isset($context['operation_type'], $context['subresource_resources'][$resourceClass]) && OperationType::SUBRESOURCE === $context['operation_type']) {
-                $iri = $this->iriConverter->getItemIriFromResourceClass($resourceClass, $context['subresource_resources'][$resourceClass]);
-            } else {
-                if ($this->serializer instanceof NormalizerInterface) {
-                    return $this->serializer->normalize($relatedObject, $format, $context);
-                }
-                throw new LogicException(sprintf('The injected serializer must be an instance of "%s".', NormalizerInterface::class));
-            }
-        } else {
+        if (null !== $relatedObject) {
             $iri = $this->iriConverter->getIriFromItem($relatedObject);
             $context['iri'] = $iri;
 
             if (isset($context['resources'])) {
                 $context['resources'][$iri] = $iri;
             }
-            if (isset($context['api_included'])) {
-                if (!$this->serializer instanceof NormalizerInterface) {
-                    throw new LogicException(sprintf('The injected serializer must be an instance of "%s".', NormalizerInterface::class));
-                }
+        }
 
-                return $this->serializer->normalize($relatedObject, $format, $context);
+        if (null === $relatedObject || isset($context['api_included'])) {
+            if (!$this->serializer instanceof NormalizerInterface) {
+                throw new LogicException(sprintf('The injected serializer must be an instance of "%s".', NormalizerInterface::class));
             }
+
+            $normalizedRelatedObject = $this->serializer->normalize($relatedObject, $format, $context);
+            if (!\is_string($normalizedRelatedObject) && !\is_array($normalizedRelatedObject) && !$normalizedRelatedObject instanceof \ArrayObject && null !== $normalizedRelatedObject) {
+                throw new UnexpectedValueException('Expected normalized relation to be an IRI, array, \ArrayObject or null');
+            }
+
+            return $normalizedRelatedObject;
         }
 
         return [
