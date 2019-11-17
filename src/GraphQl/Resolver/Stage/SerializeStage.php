@@ -18,8 +18,6 @@ use ApiPlatform\Core\DataProvider\PaginatorInterface;
 use ApiPlatform\Core\GraphQl\Serializer\ItemNormalizer;
 use ApiPlatform\Core\GraphQl\Serializer\SerializerContextBuilderInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
-use GraphQL\Error\Error;
-use GraphQL\Type\Definition\ResolveInfo;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 /**
@@ -72,8 +70,6 @@ final class SerializeStage implements SerializeStageInterface
         $normalizationContext = $this->serializerContextBuilder->create($resourceClass, $operationName, $context, true);
 
         $args = $context['args'];
-        /** @var ResolveInfo $info */
-        $info = $context['info'];
 
         $data = null;
         if (!$isCollection) {
@@ -96,7 +92,7 @@ final class SerializeStage implements SerializeStageInterface
         }
 
         if (null !== $data && !\is_array($data)) {
-            throw Error::createLocatedError('Expected serialized data to be a nullable array.', $info->fieldNodes, $info->path);
+            throw new \UnexpectedValueException('Expected serialized data to be a nullable array.');
         }
 
         if ($isMutation) {
@@ -109,16 +105,15 @@ final class SerializeStage implements SerializeStageInterface
     }
 
     /**
-     * @throws Error
+     * @throws \LogicException
+     * @throws \UnexpectedValueException
      */
     private function serializePaginatedCollection(iterable $collection, array $normalizationContext, array $context): array
     {
         $args = $context['args'];
-        /** @var ResolveInfo $info */
-        $info = $context['info'];
 
         if (!($collection instanceof PaginatorInterface)) {
-            throw Error::createLocatedError(sprintf('Collection returned by the collection data provider must implement %s', PaginatorInterface::class), $info->fieldNodes, $info->path);
+            throw new \LogicException(sprintf('Collection returned by the collection data provider must implement %s.', PaginatorInterface::class));
         }
 
         $offset = 0;
@@ -127,14 +122,14 @@ final class SerializeStage implements SerializeStageInterface
         if (isset($args['after'])) {
             $after = base64_decode($args['after'], true);
             if (false === $after) {
-                throw Error::createLocatedError(sprintf('Cursor %s is invalid', $args['after']), $info->fieldNodes, $info->path);
+                throw new \UnexpectedValueException(sprintf('Cursor %s is invalid.', $args['after']));
             }
             $offset = 1 + (int) $after;
         }
         if (isset($args['before'])) {
             $before = base64_decode($args['before'], true);
             if (false === $before) {
-                throw Error::createLocatedError(sprintf('Cursor %s is invalid', $args['before']), $info->fieldNodes, $info->path);
+                throw new \UnexpectedValueException(sprintf('Cursor %s is invalid.', $args['before']));
             }
             $offset = (int) $before - $nbPageItems;
         }

@@ -167,6 +167,7 @@
             <argument type="service" id="api_platform.graphql.executor" />
             <argument type="service" id="api_platform.graphql.action.graphiql" />
             <argument type="service" id="api_platform.graphql.action.graphql_playground" />
+            <argument type="service" id="serializer" />
             <argument>%kernel.debug%</argument>
             <argument>%api_platform.graphql.graphiql.enabled%</argument>
             <argument>%api_platform.graphql.graphql_playground.enabled%</argument>
@@ -215,6 +216,22 @@
 
             <!-- Run after serializer.denormalizer.array but before serializer.normalizer.object -->
             <tag name="serializer.normalizer" priority="-995" />
+        </service>
+
+        <service id="api_platform.graphql.normalizer.error" class="ApiPlatform\Core\GraphQl\Serializer\Exception\ErrorNormalizer">
+            <tag name="serializer.normalizer" priority="-790" />
+        </service>
+
+        <service id="api_platform.graphql.normalizer.validation_exception" class="ApiPlatform\Core\GraphQl\Serializer\Exception\ValidationExceptionNormalizer">
+            <tag name="serializer.normalizer" priority="-780" />
+        </service>
+
+        <service id="api_platform.graphql.normalizer.http_exception" class="ApiPlatform\Core\GraphQl\Serializer\Exception\HttpExceptionNormalizer">
+            <tag name="serializer.normalizer" priority="-780" />
+        </service>
+
+        <service id="api_platform.graphql.normalizer.runtime_exception" class="ApiPlatform\Core\GraphQl\Serializer\Exception\RuntimeExceptionNormalizer">
+            <tag name="serializer.normalizer" priority="-780" />
         </service>
 
         <service id="api_platform.graphql.serializer.context_builder" class="ApiPlatform\Core\GraphQl\Serializer\SerializerContextBuilder" public="false">

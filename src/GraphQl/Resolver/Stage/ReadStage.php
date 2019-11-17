@@ -21,8 +21,8 @@ use ApiPlatform\Core\GraphQl\Serializer\ItemNormalizer;
 use ApiPlatform\Core\GraphQl\Serializer\SerializerContextBuilderInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Util\ClassInfoTrait;
-use GraphQL\Error\Error;
 use GraphQL\Type\Definition\ResolveInfo;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
  * Read stage of GraphQL resolvers.
@@ -63,9 +63,6 @@ final class ReadStage implements ReadStageInterface
         }
 
         $args = $context['args'];
-        /** @var ResolveInfo $info */
-        $info = $context['info'];
-
         $normalizationContext = $this->serializerContextBuilder->create($resourceClass, $operationName, $context, true);
 
         if (!$context['is_collection']) {
@@ -74,11 +71,11 @@ final class ReadStage implements ReadStageInterface
 
             if ($identifier && $context['is_mutation']) {
                 if (null === $item) {
-                    throw Error::createLocatedError(sprintf('Item "%s" not found.', $args['input']['id']), $info->fieldNodes, $info->path);
+                    throw new NotFoundHttpException(sprintf('Item "%s" not found.', $args['input']['id']));
                 }
 
                 if ($resourceClass !== $this->getObjectClass($item)) {
-                    throw Error::createLocatedError(sprintf('Item "%s" did not match expected type "%s".', $args['input']['id'], $resourceMetadata->getShortName()), $info->fieldNodes, $info->path);
+                    throw new \UnexpectedValueException(sprintf('Item "%s" did not match expected type "%s".', $args['input']['id'], $resourceMetadata->getShortName()));
                 }
             }
 
@@ -92,11 +89,13 @@ final class ReadStage implements ReadStageInterface
         $normalizationContext['filters'] = $this->getNormalizedFilters($args);
 
         $source = $context['source'];
+        /** @var ResolveInfo $info */
+        $info = $context['info'];
         if (isset($source[$rootProperty = $info->fieldName], $source[ItemNormalizer::ITEM_IDENTIFIERS_KEY])) {
             $rootResolvedFields = $source[ItemNormalizer::ITEM_IDENTIFIERS_KEY];
             $subresourceCollection = $this->getSubresource($rootClass, $rootResolvedFields, $rootProperty, $resourceClass, $normalizationContext, $operationName);
             if (!is_iterable($subresourceCollection)) {
-                throw new \UnexpectedValueException('Expected subresource collection to be iterable');
+                throw new \UnexpectedValueException('Expected subresource collection to be iterable.');
             }
 
             return $subresourceCollection;

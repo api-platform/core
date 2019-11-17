@@ -3,6 +3,7 @@
 ## 2.6.x-dev
 
 * MongoDB: Possibility to add execute options (aggregate command fields) for a resource, like `allowDiskUse` (#3144)
+* GraphQL: Allow to format GraphQL errors based on exceptions (#3063)
 
 ## 2.5.1
 

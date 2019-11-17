@@ -22,9 +22,9 @@ use ApiPlatform\Core\GraphQl\Serializer\ItemNormalizer;
 use ApiPlatform\Core\GraphQl\Serializer\SerializerContextBuilderInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
-use GraphQL\Error\Error;
 use GraphQL\Type\Definition\ResolveInfo;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
  * @author Alan Poulain <contact@alanpoulain.eu>
@@ -175,8 +175,8 @@ class ReadStageTest extends TestCase
         return [
             'no identifier' => ['myResource', null, $item, false, null],
             'identifier' => ['stdClass', 'identifier', $item, false, $item],
-            'identifier bad item' => ['myResource', 'identifier', $item, false, $item, Error::class, 'Item "identifier" did not match expected type "shortName".'],
-            'identifier not found' => ['myResource', 'identifier_not_found', $item, true, null, Error::class, 'Item "identifier_not_found" not found.'],
+            'identifier bad item' => ['myResource', 'identifier', $item, false, $item, \UnexpectedValueException::class, 'Item "identifier" did not match expected type "shortName".'],
+            'identifier not found' => ['myResource', 'identifier_not_found', $item, true, null, NotFoundHttpException::class, 'Item "identifier_not_found" not found.'],
         ];
     }
 

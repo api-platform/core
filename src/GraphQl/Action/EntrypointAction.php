@@ -17,15 +17,17 @@ use ApiPlatform\Core\GraphQl\ExecutorInterface;
 use ApiPlatform\Core\GraphQl\Type\SchemaBuilderInterface;
 use GraphQL\Error\Debug;
 use GraphQL\Error\Error;
-use GraphQL\Error\UserError;
 use GraphQL\Executor\ExecutionResult;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 /**
  * GraphQL API entrypoint.
+ *
+ * @experimental
  *
  * @author Alan Poulain <contact@alanpoulain.eu>
  */
@@ -35,17 +37,19 @@ final class EntrypointAction
     private $executor;
     private $graphiQlAction;
     private $graphQlPlaygroundAction;
+    private $normalizer;
     private $debug;
     private $graphiqlEnabled;
     private $graphQlPlaygroundEnabled;
     private $defaultIde;
 
-    public function __construct(SchemaBuilderInterface $schemaBuilder, ExecutorInterface $executor, GraphiQlAction $graphiQlAction, GraphQlPlaygroundAction $graphQlPlaygroundAction, bool $debug = false, bool $graphiqlEnabled = false, bool $graphQlPlaygroundEnabled = false, $defaultIde = false)
+    public function __construct(SchemaBuilderInterface $schemaBuilder, ExecutorInterface $executor, GraphiQlAction $graphiQlAction, GraphQlPlaygroundAction $graphQlPlaygroundAction, NormalizerInterface $normalizer, bool $debug = false, bool $graphiqlEnabled = false, bool $graphQlPlaygroundEnabled = false, $defaultIde = false)
     {
         $this->schemaBuilder = $schemaBuilder;
         $this->executor = $executor;
         $this->graphiQlAction = $graphiQlAction;
         $this->graphQlPlaygroundAction = $graphQlPlaygroundAction;
+        $this->normalizer = $normalizer;
         $this->debug = $debug ? Debug::INCLUDE_DEBUG_MESSAGE | Debug::INCLUDE_TRACE : false;
         $this->graphiqlEnabled = $graphiqlEnabled;
         $this->graphQlPlaygroundEnabled = $graphQlPlaygroundEnabled;
@@ -54,29 +58,28 @@ final class EntrypointAction
 
     public function __invoke(Request $request): Response
     {
-        if ($request->isMethod('GET') && 'html' === $request->getRequestFormat()) {
-            if ('graphiql' === $this->defaultIde && $this->graphiqlEnabled) {
-                return ($this->graphiQlAction)($request);
-            }
-
-            if ('graphql-playground' === $this->defaultIde && $this->graphQlPlaygroundEnabled) {
-                return ($this->graphQlPlaygroundAction)($request);
-            }
-        }
-
         try {
+            if ($request->isMethod('GET') && 'html' === $request->getRequestFormat()) {
+                if ('graphiql' === $this->defaultIde && $this->graphiqlEnabled) {
+                    return ($this->graphiQlAction)($request);
+                }
+
+                if ('graphql-playground' === $this->defaultIde && $this->graphQlPlaygroundEnabled) {
+                    return ($this->graphQlPlaygroundAction)($request);
+                }
+            }
+
             [$query, $operation, $variables] = $this->parseRequest($request);
             if (null === $query) {
                 throw new BadRequestHttpException('GraphQL query is not valid.');
             }
 
-            $executionResult = $this->executor->executeQuery($this->schemaBuilder->getSchema(), $query, null, null, $variables, $operation);
-        } catch (BadRequestHttpException $e) {
-            $exception = new UserError($e->getMessage(), 0, $e);
-
-            return $this->buildExceptionResponse($exception, Response::HTTP_BAD_REQUEST);
-        } catch (\Exception $e) {
-            return $this->buildExceptionResponse($e, Response::HTTP_OK);
+            $executionResult = $this->executor
+                ->executeQuery($this->schemaBuilder->getSchema(), $query, null, null, $variables, $operation)
+                ->setErrorFormatter([$this->normalizer, 'normalize']);
+        } catch (\Exception $exception) {
+            $executionResult = (new ExecutionResult(null, [new Error($exception->getMessage(), null, null, null, null, $exception)]))
+                ->setErrorFormatter([$this->normalizer, 'normalize']);
         }
 
         return new JsonResponse($executionResult->toArray($this->debug));
@@ -206,12 +209,5 @@ final class EntrypointAction
         }
 
         return $variables;
-    }
-
-    private function buildExceptionResponse(\Exception $e, int $statusCode): JsonResponse
-    {
-        $executionResult = new ExecutionResult(null, [new Error($e->getMessage(), null, null, null, null, $e)]);
-
-        return new JsonResponse($executionResult->toArray($this->debug), $statusCode);
     }
 }

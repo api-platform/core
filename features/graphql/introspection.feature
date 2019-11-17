@@ -3,9 +3,11 @@ Feature: GraphQL introspection support
   @createSchema
   Scenario: Execute an empty GraphQL query
     When I send a "GET" request to "/graphql"
-    Then the response status code should be 400
+    Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/json"
+    And the JSON node "errors[0].extensions.status" should be equal to 400
+    And the JSON node "errors[0].extensions.category" should be equal to user
     And the JSON node "errors[0].message" should be equal to "GraphQL query is not valid."
 
   Scenario: Introspect the GraphQL schema

@@ -15,8 +15,7 @@ namespace ApiPlatform\Core\GraphQl\Resolver\Stage;
 
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Security\ResourceAccessCheckerInterface;
-use GraphQL\Error\Error;
-use GraphQL\Type\Definition\ResolveInfo;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 /**
  * Security post denormalize stage of GraphQL resolvers.
@@ -61,8 +60,6 @@ final class SecurityPostDenormalizeStage implements SecurityPostDenormalizeStage
             return;
         }
 
-        /** @var ResolveInfo $info */
-        $info = $context['info'];
-        throw Error::createLocatedError($resourceMetadata->getGraphqlAttribute($operationName, 'security_post_denormalize_message', 'Access Denied.'), $info->fieldNodes, $info->path);
+        throw new AccessDeniedHttpException($resourceMetadata->getGraphqlAttribute($operationName, 'security_post_denormalize_message', 'Access Denied.'));
     }
 }
