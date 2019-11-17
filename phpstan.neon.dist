@@ -89,7 +89,7 @@ parameters:
 			path: %currentWorkingDirectory%/src/Bridge/Symfony/Bundle/Test/ApiTestAssertionsTrait.php
 		-
 			message: '#Service "api_platform.iri_converter" is private\.#'
-			path:  %currentWorkingDirectory%/src/Bridge/Symfony/Bundle/Test/ApiTestCase.php
+			path: %currentWorkingDirectory%/src/Bridge/Symfony/Bundle/Test/ApiTestCase.php
 
 		# Expected, due to optional interfaces
 		- '#Method ApiPlatform\\Core\\Bridge\\Doctrine\\Orm\\Extension\\QueryCollectionExtensionInterface::applyToCollection\(\) invoked with 5 parameters, 3-4 required\.#'
@@ -113,11 +113,22 @@ parameters:
 		-
 			message: '#Class Symfony\\Component\\ErrorHandler\\ErrorRenderer\\ErrorRendererInterface not found\.#'
 			path: %currentWorkingDirectory%/tests/Fixtures/app/AppKernel.php
+		- '#Class Symfony\\Component\\ErrorHandler\\Exception\\FlattenException not found\.#'
+		-
+			message: '#Class Symfony\\Component\\HttpKernel\\EventListener\\ErrorListener not found\.#'
+			path: %currentWorkingDirectory%/src/EventListener/ExceptionListener.php
+		-
+			message: '#Instantiated class Symfony\\Component\\HttpKernel\\EventListener\\ErrorListener not found\.#'
+			path: %currentWorkingDirectory%/src/EventListener/ExceptionListener.php
 		-
 			message: '#Parameter \$exception of method ApiPlatform\\Core\\Action\\ExceptionAction::__invoke\(\) has invalid typehint type Symfony\\Component\\ErrorHandler\\Exception\\FlattenException\.#'
 			path: %currentWorkingDirectory%/src/Action/ExceptionAction.php
 		- '#Call to method get(Class|Headers|StatusCode)\(\) on an unknown class Symfony\\Component\\ErrorHandler\\Exception\\FlattenException\.#'
-		- '#Class Symfony\\Component\\ErrorHandler\\Exception\\FlattenException not found\.#'
+		-
+			message: "#Call to function method_exists\\(\\) with 'Symfony\\\\\\\\Component.+' and 'getThrowable' will always evaluate to false\\.#"
+			paths:
+				- %currentWorkingDirectory%/tests/Bridge/Symfony/Validator/EventListener/ValidationExceptionListenerTest.php
+				- %currentWorkingDirectory%/tests/EventListener/ExceptionListenerTest.php
 		-
 			message: '#Instanceof between bool\|float\|int|null and ArrayObject will always evaluate to false\.#'
 			paths:
