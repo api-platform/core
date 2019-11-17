@@ -1,8 +1,15 @@
 # Changelog
 
+## 2.5.2
+
+* Compatibility with Symfony 5 RC
+* Compatibility with NelmioCorsBundle 2
+* Fix the type of `ApiResource::$paginationPartial`
+* Ensure correct return type from `AbstractItemNormalizer::normalizeRelation`
+
 ## 2.5.1
 
-* Compatibility with Symfony 5
+* Compatibility with Symfony 5 beta
 * Fix a notice in `SerializerContextBuilder`
 * Fix dashed path segment generation
 * Fix support for custom filters without constructor in the `@ApiFilter` annotation
