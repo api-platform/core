@@ -368,8 +368,8 @@ class CollectionNormalizerTest extends TestCase
             '@id' => '/foos',
             '@type' => 'hydra:Collection',
             'hydra:member' => [
-                '/foos/1',
-                '/foos/3',
+                ['@id' => '/foos/1'],
+                ['@id' => '/foos/3'],
             ],
             'hydra:totalItems' => 2,
         ], $actual);

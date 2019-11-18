@@ -90,7 +90,7 @@ final class CollectionNormalizer implements NormalizerInterface, NormalizerAware
         $data['hydra:member'] = [];
         $iriOnly = $context[self::IRI_ONLY] ?? $this->defaultContext[self::IRI_ONLY];
         foreach ($object as $obj) {
-            $data['hydra:member'][] = $iriOnly ? $this->iriConverter->getIriFromItem($obj) : $this->normalizer->normalize($obj, $format, $context);
+            $data['hydra:member'][] = $iriOnly ? ['@id' => $this->iriConverter->getIriFromItem($obj)] : $this->normalizer->normalize($obj, $format, $context);
         }
 
         $paginated = null;
