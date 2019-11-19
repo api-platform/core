@@ -307,16 +307,17 @@ final class FieldsBuilder implements FieldsBuilderInterface
             ];
         }
 
+        $paginationOptions = $this->pagination->getOptions();
+
         $args = [
-            'page' => [
+            $paginationOptions['page_parameter_name'] => [
                 'type' => GraphQLType::int(),
                 'description' => 'Returns the current page.',
             ],
         ];
 
-        $itemsPerPageOptions = $this->pagination->getItemsPerPageOptions();
-        if ($itemsPerPageOptions['client_items_per_page']) {
-            $args[$itemsPerPageOptions['items_per_page_parameter_name']] = [
+        if ($paginationOptions['client_items_per_page']) {
+            $args[$paginationOptions['items_per_page_parameter_name']] = [
                 'type' => GraphQLType::int(),
                 'description' => 'Returns the number of items per page.',
             ];

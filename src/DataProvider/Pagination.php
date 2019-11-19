@@ -196,12 +196,9 @@ final class Pagination
         return $this->getEnabled($context, $resourceClass, $operationName, true);
     }
 
-    public function getItemsPerPageOptions(): array
+    public function getOptions(): array
     {
-        return array_intersect_key($this->options, array_flip([
-            'client_items_per_page',
-            'items_per_page_parameter_name',
-        ]));
+        return $this->options;
     }
 
     public function getGraphQlPaginationType(string $resourceClass, string $operationName): string
