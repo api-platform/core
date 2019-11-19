@@ -78,8 +78,6 @@ parameters:
 			message: "#Call to function method_exists\\(\\) with 'Symfony\\\\\\\\Component.+' and 'getRoleNames' will always evaluate to false\\.#"
 			path: %currentWorkingDirectory%/tests/Security/EventListener/DenyAccessListenerTest.php
 		- "#Call to method PHPUnit\\\\Framework\\\\Assert::assertSame\\(\\) with array\\('(collection_context|item_context|subresource_context)'\\) and array<Symfony\\\\Component\\\\VarDumper\\\\Cloner\\\\Data>\\|bool\\|float\\|int\\|string\\|null will always evaluate to false\\.#"
-		# https://github.com/doctrine/doctrine2/pull/7298
-		- '#Strict comparison using === between null and int will always evaluate to false\.#'
 		-
 			message: '#Binary operation "\+" between (float\|int\|)?string and 0 results in an error\.#'
 			path: %currentWorkingDirectory%/src/Bridge/Doctrine/Common/Filter/RangeFilterTrait.php

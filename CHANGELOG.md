@@ -5,9 +5,16 @@
 * MongoDB: Possibility to add execute options (aggregate command fields) for a resource, like `allowDiskUse` (#3144)
 * GraphQL: Allow to format GraphQL errors based on exceptions (#3063)
 
+## 2.5.2
+
+* Compatibility with Symfony 5 RC
+* Compatibility with NelmioCorsBundle 2
+* Fix the type of `ApiResource::$paginationPartial`
+* Ensure correct return type from `AbstractItemNormalizer::normalizeRelation`
+
 ## 2.5.1
 
-* Compatibility with Symfony 5
+* Compatibility with Symfony 5 beta
 * Fix a notice in `SerializerContextBuilder`
 * Fix dashed path segment generation
 * Fix support for custom filters without constructor in the `@ApiFilter` annotation
@@ -38,7 +45,7 @@
 
 * Allow to not declare GET item operation
 * Add support for the Accept-Patch header
-* Make the the `maximum_items_per_page` attribute consistent with other attributes controlling pagination 
+* Make the the `maximum_items_per_page` attribute consistent with other attributes controlling pagination
 * Allow to use a string instead of an array for serializer groups
 * Test: Add an helper method to find the IRI of a resource
 * Test: Add assertions for testing response against JSON Schema from API resource
