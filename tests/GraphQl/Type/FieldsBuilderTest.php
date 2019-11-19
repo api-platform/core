@@ -206,7 +206,7 @@ class FieldsBuilderTest extends TestCase
         $this->typeConverterProphecy->convertType(Argument::type(Type::class), false, $queryName, null, $resourceClass, $resourceClass, null, 0)->willReturn($graphqlType);
         $this->typeConverterProphecy->resolveType(Argument::type('string'))->willReturn(GraphQLType::string());
         $this->typeBuilderProphecy->isCollection(Argument::type(Type::class))->willReturn(true);
-        $this->typeBuilderProphecy->getResourcePaginatedCollectionType($graphqlType)->willReturn($graphqlType);
+        $this->typeBuilderProphecy->getResourcePaginatedCollectionType($graphqlType, $resourceClass, $queryName)->willReturn($graphqlType);
         $this->resourceMetadataFactoryProphecy->create($resourceClass)->willReturn($resourceMetadata);
         $this->collectionResolverFactoryProphecy->__invoke($resourceClass, $resourceClass, $queryName)->willReturn($resolver);
         $this->filterLocatorProphecy->has('my_filter')->willReturn(true);
@@ -325,6 +325,27 @@ class FieldsBuilderTest extends TestCase
                     ],
                 ],
             ],
+            'collection with page-based pagination enabled' => ['resourceClass', (new ResourceMetadata('ShortName', null, null, null, null, ['paginationType' => 'page']))->withGraphql(['action' => ['filters' => ['my_filter']]]), 'action', [], $graphqlType = GraphQLType::listOf(new ObjectType(['name' => 'collection'])), $resolver = function () {
+            },
+                [
+                    'actionShortNames' => [
+                        'type' => $graphqlType,
+                        'description' => null,
+                        'args' => [
+                            'page' => [
+                                'type' => GraphQLType::int(),
+                                'description' => 'Returns the current page.',
+                            ],
+                            'boolField' => $graphqlType,
+                            'boolField_list' => GraphQLType::listOf($graphqlType),
+                            'parent__child' => new InputObjectType(['name' => 'ShortNameFilter_parent__child', 'fields' => ['related__nested' => $graphqlType]]),
+                            'dateField' => new InputObjectType(['name' => 'ShortNameFilter_dateField', 'fields' => ['before' => $graphqlType]]),
+                        ],
+                        'resolve' => $resolver,
+                        'deprecationReason' => '',
+                    ],
+                ],
+            ],
         ];
     }
 
@@ -336,7 +357,7 @@ class FieldsBuilderTest extends TestCase
         $this->typeConverterProphecy->convertType(Argument::type(Type::class), false, null, $mutationName, $resourceClass, $resourceClass, null, 0)->willReturn($graphqlType);
         $this->typeConverterProphecy->convertType(Argument::type(Type::class), true, null, $mutationName, $resourceClass, $resourceClass, null, 0)->willReturn($graphqlType);
         $this->typeBuilderProphecy->isCollection(Argument::type(Type::class))->willReturn($isTypeCollection);
-        $this->typeBuilderProphecy->getResourcePaginatedCollectionType($graphqlType)->willReturn($graphqlType);
+        $this->typeBuilderProphecy->getResourcePaginatedCollectionType($graphqlType, $resourceClass, $mutationName)->willReturn($graphqlType);
         $this->resourceMetadataFactoryProphecy->create($resourceClass)->willReturn(new ResourceMetadata());
         $this->collectionResolverFactoryProphecy->__invoke($resourceClass, $resourceClass, null)->willReturn($collectionResolver);
         $this->itemMutationResolverFactoryProphecy->__invoke($resourceClass, null, $mutationName)->willReturn($mutationResolver);

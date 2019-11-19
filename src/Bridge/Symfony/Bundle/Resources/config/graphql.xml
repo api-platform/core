@@ -127,6 +127,7 @@
             <argument type="service" id="api_platform.graphql.types_container" />
             <argument type="service" id="api_platform.graphql.resolver.resource_field" />
             <argument type="service" id="api_platform.graphql.fields_builder_locator" />
+            <argument type="service" id="api_platform.pagination" />
         </service>
 
         <service id="api_platform.graphql.fields_builder" class="ApiPlatform\Core\GraphQl\Type\FieldsBuilder" public="false">

@@ -54,7 +54,9 @@ final class SerializeStage implements SerializeStageInterface
         if (!$resourceMetadata->getGraphqlAttribute($operationName, 'serialize', true, true)) {
             if ($isCollection) {
                 if ($this->pagination->isGraphQlEnabled($resourceClass, $operationName, $context)) {
-                    return $this->getDefaultPaginatedData();
+                    return 'cursor' === $this->pagination->getGraphQlPaginationType($resourceClass, $operationName) ?
+                        $this->getDefaultCursorBasedPaginatedData() :
+                        $this->getDefaultPageBasedPaginatedData();
                 }
 
                 return [];
@@ -87,7 +89,9 @@ final class SerializeStage implements SerializeStageInterface
                     $data[$index] = $this->normalizer->normalize($object, ItemNormalizer::FORMAT, $normalizationContext);
                 }
             } else {
-                $data = $this->serializePaginatedCollection($itemOrCollection, $normalizationContext, $context);
+                $data = 'cursor' === $this->pagination->getGraphQlPaginationType($resourceClass, $operationName) ?
+                    $this->serializeCursorBasedPaginatedCollection($itemOrCollection, $normalizationContext, $context) :
+                    $this->serializePageBasedPaginatedCollection($itemOrCollection, $normalizationContext);
             }
         }
 
@@ -108,7 +112,7 @@ final class SerializeStage implements SerializeStageInterface
      * @throws \LogicException
      * @throws \UnexpectedValueException
      */
-    private function serializePaginatedCollection(iterable $collection, array $normalizationContext, array $context): array
+    private function serializeCursorBasedPaginatedCollection(iterable $collection, array $normalizationContext, array $context): array
     {
         $args = $context['args'];
 
@@ -138,7 +142,7 @@ final class SerializeStage implements SerializeStageInterface
         }
         $offset = 0 > $offset ? 0 : $offset;
 
-        $data = $this->getDefaultPaginatedData();
+        $data = $this->getDefaultCursorBasedPaginatedData();
 
         if (($totalItems = $collection->getTotalItems()) > 0) {
             $data['totalCount'] = $totalItems;
@@ -161,9 +165,35 @@ final class SerializeStage implements SerializeStageInterface
         return $data;
     }
 
-    private function getDefaultPaginatedData(): array
+    /**
+     * @throws \LogicException
+     */
+    private function serializePageBasedPaginatedCollection(iterable $collection, array $normalizationContext): array
+    {
+        if (!($collection instanceof PaginatorInterface)) {
+            throw new \LogicException(sprintf('Collection returned by the collection data provider must implement %s.', PaginatorInterface::class));
+        }
+
+        $data = $this->getDefaultPageBasedPaginatedData();
+        $data['paginationInfo']['totalCount'] = $collection->getTotalItems();
+        $data['paginationInfo']['lastPage'] = $collection->getLastPage();
+        $data['paginationInfo']['itemsPerPage'] = $collection->getItemsPerPage();
+
+        foreach ($collection as $object) {
+            $data['collection'][] = $this->normalizer->normalize($object, ItemNormalizer::FORMAT, $normalizationContext);
+        }
+
+        return $data;
+    }
+
+    private function getDefaultCursorBasedPaginatedData(): array
     {
         return ['totalCount' => 0., 'edges' => [], 'pageInfo' => ['startCursor' => null, 'endCursor' => null, 'hasNextPage' => false, 'hasPreviousPage' => false]];
+    }
+
+    private function getDefaultPageBasedPaginatedData(): array
+    {
+        return ['collection' => [], 'paginationInfo' => ['itemsPerPage' => 0., 'totalCount' => 0., 'lastPage' => 0.]];
     }
 
     private function getDefaultMutationData(array $context): array
