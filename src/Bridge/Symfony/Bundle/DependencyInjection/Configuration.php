@@ -366,7 +366,6 @@ final class Configuration implements ConfigurationInterface
                         ->end()
                         ->booleanNode('public')->defaultNull()->info('To make all responses public by default.')->end()
                         ->arrayNode('invalidation')
-                            ->setDeprecated('The use of the `http_cache.invalidation` has been deprecated in 2.6 and will be removed in 3.0. Use `defaults.cache_headers.invalidation` instead.')
                             ->info('Enable the tags-based cache invalidation system.')
                             ->canBeEnabled()
                             ->children()
