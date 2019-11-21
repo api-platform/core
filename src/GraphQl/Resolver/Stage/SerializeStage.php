@@ -150,7 +150,8 @@ final class SerializeStage implements SerializeStageInterface
             $data['pageInfo']['startCursor'] = base64_encode((string) $offset);
             $end = $offset + $nbPageItems - 1;
             $data['pageInfo']['endCursor'] = base64_encode((string) ($end >= 0 ? $end : 0));
-            $data['pageInfo']['hasNextPage'] = (float) $offset + $collection->getItemsPerPage() * $collection->getCurrentPage() < $totalItems;
+            $itemsPerPage = $collection->getItemsPerPage();
+            $data['pageInfo']['hasNextPage'] = (float) ($itemsPerPage > 0 ? $offset % $itemsPerPage : $offset) + $itemsPerPage * $collection->getCurrentPage() < $totalItems;
             $data['pageInfo']['hasPreviousPage'] = $offset > 0;
         }
 
