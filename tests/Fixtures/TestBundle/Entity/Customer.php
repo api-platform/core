@@ -45,7 +45,7 @@ class Customer
      * @ORM\JoinColumn(nullable=false)
      * @Groups({"order_read"})
      */
-    public $addresses;
+    private $addresses;
 
     public function __construct()
     {
@@ -55,5 +55,13 @@ class Customer
     public function getId()
     {
         return $this->id;
+    }
+
+    public function getAddresses() {
+        return $this->addresses;
+    }
+
+    public function getAddress() {
+        return $this->addresses->first();
     }
 }
