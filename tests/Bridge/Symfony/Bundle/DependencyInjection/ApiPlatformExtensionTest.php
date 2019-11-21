@@ -1227,6 +1227,8 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.metadata.resource.metadata_factory.php_doc',
             'api_platform.metadata.resource.metadata_factory.short_name',
             'api_platform.metadata.resource.metadata_factory.yaml',
+            'api_platform.metadata.resource.name_collection_factory.directory',
+            'api_platform.metadata.resource.metadata_factory.directory',
             'api_platform.metadata.resource.name_collection_factory.annotation',
             'api_platform.metadata.resource.name_collection_factory.yaml',
             'api_platform.metadata.subresource.metadata_factory.annotation',
