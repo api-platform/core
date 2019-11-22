@@ -48,8 +48,7 @@ final class SerializerPropertyMetadataFactory implements PropertyMetadataFactory
     {
         $propertyMetadata = $this->decorated->create($resourceClass, $property, $options);
 
-        // in case of a property inherited (in a child class), we need it's properties
-        // to be mapped against serialization groups instead of the parent ones.
+        // BC to be removed in 3.0
         if (null !== ($childResourceClass = $propertyMetadata->getChildInherited())) {
             $resourceClass = $childResourceClass;
         }
