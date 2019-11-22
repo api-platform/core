@@ -17,7 +17,7 @@ use ApiPlatform\Core\Util\RequestAttributesExtractor;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\HttpKernel\EventListener\ErrorListener;
-use Symfony\Component\HttpKernel\EventListener\ExceptionListener as BaseExceptionListener;
+use Symfony\Component\HttpKernel\EventListener\ExceptionListener as LegacyExceptionListener;
 
 /**
  * Handles requests errors.
@@ -29,12 +29,12 @@ final class ExceptionListener
 {
     private $exceptionListener;
 
-    public function __construct($controller, LoggerInterface $logger = null, $debug = false)
+    public function __construct($controller, LoggerInterface $logger = null, $debug = false, ErrorListener $errorListener = null)
     {
-        if (class_exists(ErrorListener::class)) {
+        if (null !== $errorListener) {
             $this->exceptionListener = new ErrorListener($controller, $logger, $debug);
         } else {
-            $this->exceptionListener = new BaseExceptionListener($controller, $logger, $debug);
+            $this->exceptionListener = new LegacyExceptionListener($controller, $logger, $debug);
         }
     }
 
