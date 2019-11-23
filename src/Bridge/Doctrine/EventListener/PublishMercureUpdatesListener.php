@@ -19,12 +19,15 @@ use ApiPlatform\Core\Api\UrlGeneratorInterface;
 use ApiPlatform\Core\Bridge\Symfony\Messenger\DispatchTrait;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\Exception\RuntimeException;
+use ApiPlatform\Core\GraphQl\Subscription\MercureSubscriptionIriGeneratorInterface as GraphQlMercureSubscriptionIriGeneratorInterface;
+use ApiPlatform\Core\GraphQl\Subscription\SubscriptionManagerInterface as GraphQlSubscriptionManagerInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Util\ResourceClassInfoTrait;
 use Doctrine\Common\EventArgs;
 use Doctrine\ODM\MongoDB\Event\OnFlushEventArgs as MongoDbOdmOnFlushEventArgs;
 use Doctrine\ORM\Event\OnFlushEventArgs as OrmOnFlushEventArgs;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Mercure\Update;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Serializer\SerializerInterface;
@@ -49,11 +52,13 @@ final class PublishMercureUpdatesListener
     private $updatedObjects;
     private $deletedObjects;
     private $formats;
+    private $graphQlSubscriptionManager;
+    private $graphQlMercureSubscriptionIriGenerator;
 
     /**
      * @param array<string, string[]|string> $formats
      */
-    public function __construct(ResourceClassResolverInterface $resourceClassResolver, IriConverterInterface $iriConverter, ResourceMetadataFactoryInterface $resourceMetadataFactory, SerializerInterface $serializer, array $formats, MessageBusInterface $messageBus = null, callable $publisher = null, ExpressionLanguage $expressionLanguage = null)
+    public function __construct(ResourceClassResolverInterface $resourceClassResolver, IriConverterInterface $iriConverter, ResourceMetadataFactoryInterface $resourceMetadataFactory, SerializerInterface $serializer, array $formats, MessageBusInterface $messageBus = null, callable $publisher = null, ?GraphQlSubscriptionManagerInterface $graphQlSubscriptionManager = null, ?GraphQlMercureSubscriptionIriGeneratorInterface $graphQlMercureSubscriptionIriGenerator = null, ExpressionLanguage $expressionLanguage = null)
     {
         if (null === $messageBus && null === $publisher) {
             throw new InvalidArgumentException('A message bus or a publisher must be provided.');
@@ -67,6 +72,8 @@ final class PublishMercureUpdatesListener
         $this->messageBus = $messageBus;
         $this->publisher = $publisher;
         $this->expressionLanguage = $expressionLanguage ?? class_exists(ExpressionLanguage::class) ? new ExpressionLanguage() : null;
+        $this->graphQlSubscriptionManager = $graphQlSubscriptionManager;
+        $this->graphQlMercureSubscriptionIriGenerator = $graphQlMercureSubscriptionIriGenerator;
         $this->reset();
     }
 
@@ -106,15 +113,15 @@ final class PublishMercureUpdatesListener
     {
         try {
             foreach ($this->createdObjects as $object) {
-                $this->publishUpdate($object, $this->createdObjects[$object]);
+                $this->publishUpdate($object, $this->createdObjects[$object], 'create');
             }
 
             foreach ($this->updatedObjects as $object) {
-                $this->publishUpdate($object, $this->updatedObjects[$object]);
+                $this->publishUpdate($object, $this->updatedObjects[$object], 'update');
             }
 
             foreach ($this->deletedObjects as $object) {
-                $this->publishUpdate($object, $this->deletedObjects[$object]);
+                $this->publishUpdate($object, $this->deletedObjects[$object], 'delete');
             }
         } finally {
             $this->reset();
@@ -173,7 +180,7 @@ final class PublishMercureUpdatesListener
     /**
      * @param object $object
      */
-    private function publishUpdate($object, array $targets): void
+    private function publishUpdate($object, array $targets, string $type): void
     {
         if ($object instanceof \stdClass) {
             // By convention, if the object has been deleted, we send only its IRI.
@@ -190,7 +197,35 @@ final class PublishMercureUpdatesListener
             $data = $this->serializer->serialize($object, key($this->formats), $context);
         }
 
-        $update = new Update($iri, $data, $targets);
-        $this->messageBus ? $this->dispatch($update) : ($this->publisher)($update);
+        $updates = array_merge([new Update($iri, $data, $targets)], $this->getGraphQlSubscriptionUpdates($object, $targets, $type));
+
+        foreach ($updates as $update) {
+            $this->messageBus ? $this->dispatch($update) : ($this->publisher)($update);
+        }
+    }
+
+    /**
+     * @param object $object
+     *
+     * @return Update[]
+     */
+    private function getGraphQlSubscriptionUpdates($object, array $targets, string $type): array
+    {
+        if ('update' !== $type || !$this->graphQlSubscriptionManager || !$this->graphQlMercureSubscriptionIriGenerator) {
+            return [];
+        }
+
+        $payloads = $this->graphQlSubscriptionManager->getPushPayloads($object);
+
+        $updates = [];
+        foreach ($payloads as [$subscriptionId, $data]) {
+            $updates[] = new Update(
+                $this->graphQlMercureSubscriptionIriGenerator->generateTopicIri($subscriptionId),
+                (string) (new JsonResponse($data))->getContent(),
+                $targets
+            );
+        }
+
+        return $updates;
     }
 }

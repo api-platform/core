@@ -49,16 +49,19 @@ final class TypeBuilder implements TypeBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function getResourceObjectType(?string $resourceClass, ResourceMetadata $resourceMetadata, bool $input, ?string $queryName, ?string $mutationName, bool $wrapped = false, int $depth = 0): GraphQLType
+    public function getResourceObjectType(?string $resourceClass, ResourceMetadata $resourceMetadata, bool $input, ?string $queryName, ?string $mutationName, ?string $subscriptionName, bool $wrapped = false, int $depth = 0): GraphQLType
     {
         $shortName = $resourceMetadata->getShortName();
 
         if (null !== $mutationName) {
             $shortName = $mutationName.ucfirst($shortName);
         }
+        if (null !== $subscriptionName) {
+            $shortName = $subscriptionName.ucfirst($shortName).'Subscription';
+        }
         if ($input) {
             $shortName .= 'Input';
-        } elseif (null !== $mutationName) {
+        } elseif (null !== $mutationName || null !== $subscriptionName) {
             if ($depth > 0) {
                 $shortName .= 'Nested';
             }
@@ -73,7 +76,7 @@ final class TypeBuilder implements TypeBuilderInterface
                 $shortName .= 'Collection';
             }
         }
-        if ($wrapped && null !== $mutationName) {
+        if ($wrapped && (null !== $mutationName || null !== $subscriptionName)) {
             $shortName .= 'Data';
         }
 
@@ -86,36 +89,46 @@ final class TypeBuilder implements TypeBuilderInterface
             return $resourceObjectType;
         }
 
-        $ioMetadata = $resourceMetadata->getGraphqlAttribute($mutationName ?? $queryName, $input ? 'input' : 'output', null, true);
+        $ioMetadata = $resourceMetadata->getGraphqlAttribute($subscriptionName ?? $mutationName ?? $queryName, $input ? 'input' : 'output', null, true);
         if (null !== $ioMetadata && \array_key_exists('class', $ioMetadata) && null !== $ioMetadata['class']) {
             $resourceClass = $ioMetadata['class'];
         }
 
-        $wrapData = !$wrapped && null !== $mutationName && !$input && $depth < 1;
+        $wrapData = !$wrapped && (null !== $mutationName || null !== $subscriptionName) && !$input && $depth < 1;
 
         $configuration = [
             'name' => $shortName,
             'description' => $resourceMetadata->getDescription(),
             'resolveField' => $this->defaultFieldResolver,
-            'fields' => function () use ($resourceClass, $resourceMetadata, $input, $mutationName, $queryName, $wrapData, $depth, $ioMetadata) {
+            'fields' => function () use ($resourceClass, $resourceMetadata, $input, $queryName, $mutationName, $subscriptionName, $wrapData, $depth, $ioMetadata) {
                 if ($wrapData) {
                     $queryNormalizationContext = $resourceMetadata->getGraphqlAttribute($queryName ?? '', 'normalization_context', [], true);
-                    $mutationNormalizationContext = $resourceMetadata->getGraphqlAttribute($mutationName ?? '', 'normalization_context', [], true);
-                    // Use a new type for the wrapped object only if there is a specific normalization context for the mutation.
+                    $mutationNormalizationContext = $resourceMetadata->getGraphqlAttribute($mutationName ?? $subscriptionName ?? '', 'normalization_context', [], true);
+                    // Use a new type for the wrapped object only if there is a specific normalization context for the mutation or the subscription.
                     // If not, use the query type in order to ensure the client cache could be used.
                     $useWrappedType = $queryNormalizationContext !== $mutationNormalizationContext;
 
-                    return [
+                    $fields = [
                         lcfirst($resourceMetadata->getShortName()) => $useWrappedType ?
-                            $this->getResourceObjectType($resourceClass, $resourceMetadata, $input, $queryName, $mutationName, true, $depth) :
-                            $this->getResourceObjectType($resourceClass, $resourceMetadata, $input, $queryName ?? 'item_query', null, true, $depth),
-                        'clientMutationId' => GraphQLType::string(),
+                            $this->getResourceObjectType($resourceClass, $resourceMetadata, $input, $queryName, $mutationName, $subscriptionName, true, $depth) :
+                            $this->getResourceObjectType($resourceClass, $resourceMetadata, $input, $queryName ?? 'item_query', null, null, true, $depth),
                     ];
+
+                    if (null !== $subscriptionName) {
+                        $fields['clientSubscriptionId'] = GraphQLType::string();
+                        if ($resourceMetadata->getAttribute('mercure', false)) {
+                            $fields['mercureUrl'] = GraphQLType::string();
+                        }
+
+                        return $fields;
+                    }
+
+                    return $fields + ['clientMutationId' => GraphQLType::string()];
                 }
 
                 $fieldsBuilder = $this->fieldsBuilderLocator->get('api_platform.graphql.fields_builder');
 
-                $fields = $fieldsBuilder->getResourceObjectTypeFields($resourceClass, $resourceMetadata, $input, $queryName, $mutationName, $depth, $ioMetadata);
+                $fields = $fieldsBuilder->getResourceObjectTypeFields($resourceClass, $resourceMetadata, $input, $queryName, $mutationName, $subscriptionName, $depth, $ioMetadata);
 
                 if ($input && null !== $mutationName && null !== $mutationArgs = $resourceMetadata->getGraphql()[$mutationName]['args'] ?? null) {
                     return $fieldsBuilder->resolveResourceArgs($mutationArgs, $mutationName, $resourceMetadata->getShortName()) + ['clientMutationId' => $fields['clientMutationId']];

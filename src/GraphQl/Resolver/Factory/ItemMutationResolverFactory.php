@@ -70,7 +70,7 @@ final class ItemMutationResolverFactory implements ResolverFactoryInterface
                 return null;
             }
 
-            $resolverContext = ['source' => $source, 'args' => $args, 'info' => $info, 'is_collection' => false, 'is_mutation' => true];
+            $resolverContext = ['source' => $source, 'args' => $args, 'info' => $info, 'is_collection' => false, 'is_mutation' => true, 'is_subscription' => false];
 
             $item = ($this->readStage)($resourceClass, $rootClass, $operationName, $resolverContext);
             if (null !== $item && !\is_object($item)) {

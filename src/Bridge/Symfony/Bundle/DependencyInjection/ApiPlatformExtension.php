@@ -590,6 +590,11 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         if ($this->isConfigEnabled($container, $config['doctrine_mongodb_odm'])) {
             $loader->load('doctrine_mongodb_odm_mercure_publisher.xml');
         }
+
+        if ($this->isConfigEnabled($container, $config['graphql'])) {
+            $loader->load('graphql_mercure.xml');
+            $container->getDefinition('api_platform.graphql.subscription.mercure_iri_generator')->addArgument($config['mercure']['hub_url'] ?? '%mercure.default_hub%');
+        }
     }
 
     private function registerMessengerConfiguration(ContainerBuilder $container, array $config, XmlFileLoader $loader): void

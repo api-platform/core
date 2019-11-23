@@ -37,6 +37,7 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\DummyDtoNoInput as Dummy
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\DummyDtoNoOutput as DummyDtoNoOutputDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\DummyFriend as DummyFriendDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\DummyGroup as DummyGroupDocument;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\DummyMercure as DummyMercureDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\DummyOffer as DummyOfferDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\DummyProduct as DummyProductDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\DummyProperty as DummyPropertyDocument;
@@ -93,6 +94,7 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyDtoNoOutput;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyFriend;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyGroup;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyImmutableDate;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyMercure;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyOffer;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyProduct;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyProperty;
@@ -1502,6 +1504,27 @@ final class DoctrineContext implements Context
         $this->manager->flush();
     }
 
+    /**
+     * @Given there are :nb dummy mercure objects
+     */
+    public function thereAreDummyMercureObjects(int $nb)
+    {
+        for ($i = 1; $i <= $nb; ++$i) {
+            $relatedDummy = $this->buildRelatedDummy();
+            $relatedDummy->setName('RelatedDummy #'.$i);
+
+            $dummyMercure = $this->buildDummyMercure();
+            $dummyMercure->name = "Dummy Mercure #$i";
+            $dummyMercure->description = 'Description';
+            $dummyMercure->relatedDummy = $relatedDummy;
+
+            $this->manager->persist($relatedDummy);
+            $this->manager->persist($dummyMercure);
+        }
+
+        $this->manager->flush();
+    }
+
     private function isOrm(): bool
     {
         return null !== $this->schemaTool;
@@ -1878,5 +1901,13 @@ final class DoctrineContext implements Context
     private function buildConvertedRelated()
     {
         return $this->isOrm() ? new ConvertedRelated() : new ConvertedRelatedDocument();
+    }
+
+    /**
+     * @return DummyMercure|DummyMercureDocument
+     */
+    private function buildDummyMercure()
+    {
+        return $this->isOrm() ? new DummyMercure() : new DummyMercureDocument();
     }
 }
