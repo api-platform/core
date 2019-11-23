@@ -31,11 +31,7 @@ final class ExceptionListener
 
     public function __construct($controller, LoggerInterface $logger = null, $debug = false, ErrorListener $errorListener = null)
     {
-        if (null !== $errorListener) {
-            $this->exceptionListener = new ErrorListener($controller, $logger, $debug);
-        } else {
-            $this->exceptionListener = new LegacyExceptionListener($controller, $logger, $debug);
-        }
+        $this->exceptionListener = $errorListener ? new ErrorListener($controller, $logger, $debug) : new LegacyExceptionListener($controller, $logger, $debug);
     }
 
     public function onKernelException(ExceptionEvent $event): void
