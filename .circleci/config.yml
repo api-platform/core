@@ -183,8 +183,6 @@ executors:
         type: string
     docker:
       - image: circleci/php:<< parameters.php_version >>-node
-        environment:
-          SYMFONY_REQUIRE: ^3.4 || ^4.0 || ^5.0
 
 jobs:
   php-cs-fixer:

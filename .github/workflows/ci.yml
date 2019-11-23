@@ -11,7 +11,6 @@ env:
   EXT_MONGODB_VERSION: '1.6.0'
   EXT_PCOV_VERSION: '1.0.6'
   LEGACY: '0'
-  SYMFONY_REQUIRE: ^3.4 || ^4.0 || ^5.0
 
 jobs:
   phpunit:
