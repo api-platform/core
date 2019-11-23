@@ -108,7 +108,7 @@ class DocumentationNormalizerV2Test extends TestCase
 
     private function doTestNormalize(OperationMethodResolverInterface $operationMethodResolver = null): void
     {
-        $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), 'Test API', 'This is a test API.', '1.2.3');
+        $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), ['title' => 'Test API', 'description' => 'This is a test API.', 'version' => '1.2.3']);
 
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyNameCollectionFactoryProphecy->create(Dummy::class, [])->shouldBeCalled()->willReturn(new PropertyNameCollection(['id', 'name', 'description', 'dummyDate']));
@@ -366,7 +366,7 @@ class DocumentationNormalizerV2Test extends TestCase
 
     private function doTestNormalizeWithNameConverter(bool $legacy = false): void
     {
-        $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), 'Dummy API', 'This is a dummy API', '1.2.3');
+        $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), ['title' => 'Dummy API', 'description' => 'This is a dummy API', 'version' => '1.2.3']);
 
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyNameCollectionFactoryProphecy->create(Dummy::class, [])->shouldBeCalled()->willReturn(new PropertyNameCollection(['name', 'nameConverted']));
@@ -507,7 +507,7 @@ class DocumentationNormalizerV2Test extends TestCase
 
     public function testNormalizeWithApiKeysEnabled(): void
     {
-        $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), 'Test API', 'This is a test API.', '1.2.3');
+        $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), ['title' => 'Test API', 'description' => 'This is a test API.', 'version' => '1.2.3']);
 
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyNameCollectionFactoryProphecy->create(Dummy::class, [])->shouldBeCalled()->willReturn(new PropertyNameCollection(['name']));
@@ -625,7 +625,7 @@ class DocumentationNormalizerV2Test extends TestCase
         $title = 'Test API';
         $description = 'This is a test API.';
         $version = '1.2.3';
-        $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), $title, $description, $version);
+        $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), ['title' => $title, 'description' => $description, 'version' => $version]);
         $groups = ['dummy', 'foo', 'bar'];
 
         $ref = 'Dummy-'.implode('_', $groups);
@@ -808,7 +808,7 @@ class DocumentationNormalizerV2Test extends TestCase
         $title = 'Test API';
         $description = 'This is a test API.';
         $version = '1.2.3';
-        $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), $title, $description, $version);
+        $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), ['title' => $title, 'description' => $description, 'version' => $version]);
         $groups = ['dummy', 'foo', 'bar'];
 
         $ref = 'Dummy-'.implode('_', $groups);
@@ -1000,7 +1000,7 @@ class DocumentationNormalizerV2Test extends TestCase
 
     public function testNormalizeWithSwaggerDefinitionName(): void
     {
-        $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), 'Test API', 'This is a test API.', '1.2.3');
+        $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), ['title' => 'Test API', 'description' => 'This is a test API.', 'version' => '1.2.3']);
 
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyNameCollectionFactoryProphecy->create(Dummy::class, [])->shouldBeCalled()->willReturn(new PropertyNameCollection(['id']));
@@ -1092,7 +1092,7 @@ class DocumentationNormalizerV2Test extends TestCase
         $title = 'Test API';
         $description = 'This is a test API.';
         $version = '1.2.3';
-        $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), $title, $description, $version);
+        $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), ['title' => $title, 'description' => $description, 'version' => $version]);
 
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyNameCollectionFactoryProphecy->create(Dummy::class, ['serializer_groups' => ['dummy']])->shouldBeCalledTimes(1)->willReturn(new PropertyNameCollection(['gerard']));
@@ -1272,7 +1272,7 @@ class DocumentationNormalizerV2Test extends TestCase
         $title = 'Test API';
         $description = 'This is a test API.';
         $version = '1.2.3';
-        $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), $title, $description, $version);
+        $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), ['title' => $title, 'description' => $description, 'version' => $version]);
 
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyNameCollectionFactoryProphecy->create(Dummy::class, ['serializer_groups' => ['dummy']])->shouldBeCalledTimes(1)->willReturn(new PropertyNameCollection(['gerard']));
@@ -1452,7 +1452,7 @@ class DocumentationNormalizerV2Test extends TestCase
 
     public function testNormalizeSkipsNotReadableAndNotWritableProperties(): void
     {
-        $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), 'Test API', 'This is a test API.', '1.2.3');
+        $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), ['title' => 'Test API', 'description' => 'This is a test API.', 'version' => '1.2.3']);
 
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyNameCollectionFactoryProphecy->create(Dummy::class, [])->shouldBeCalled()->willReturn(new PropertyNameCollection(['id', 'dummy', 'name']));
@@ -1730,7 +1730,7 @@ class DocumentationNormalizerV2Test extends TestCase
             $operationPathResolver
         );
 
-        $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), 'Test API', 'This is a test API.', '1.2.3');
+        $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), ['title' => 'Test API', 'description' => 'This is a test API.', 'version' => '1.2.3']);
 
         $this->assertTrue($normalizer->supportsNormalization($documentation, 'json'));
         $this->assertFalse($normalizer->supportsNormalization($documentation));
@@ -1740,7 +1740,7 @@ class DocumentationNormalizerV2Test extends TestCase
 
     public function testNoOperations(): void
     {
-        $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), '', '', '0.0.0');
+        $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), ['title' => '', 'description' => '', 'version' => '0.0.0']);
 
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyNameCollectionFactoryProphecy->create(Dummy::class, [])->shouldNotBeCalled();
@@ -1781,7 +1781,7 @@ class DocumentationNormalizerV2Test extends TestCase
 
     public function testWithCustomMethod(): void
     {
-        $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), '', '', '0.0.0');
+        $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), ['title' => '', 'description' => '', 'version' => '0.0.0']);
 
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
 
@@ -1833,7 +1833,7 @@ class DocumentationNormalizerV2Test extends TestCase
         $title = 'Test API';
         $description = 'This is a test API.';
         $version = '1.2.3';
-        $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), $title, $description, $version);
+        $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), ['title' => $title, 'description' => $description, 'version' => $version]);
         $groups = ['dummy', 'foo', 'bar'];
         $ref = 'Dummy-'.implode('_', $groups);
         $relatedDummyRef = 'RelatedDummy-'.implode('_', $groups);
@@ -2041,7 +2041,7 @@ class DocumentationNormalizerV2Test extends TestCase
 
     private function normalizeWithFilters($filterLocator): void
     {
-        $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), '', '', '0.0.0');
+        $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), ['title' => '', 'description' => '', 'version' => '0.0.0']);
 
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyNameCollectionFactoryProphecy->create(Dummy::class, [])->shouldBeCalled()->willReturn(new PropertyNameCollection(['name']));
@@ -2163,7 +2163,7 @@ class DocumentationNormalizerV2Test extends TestCase
 
     private function doTestNormalizeWithSubResource(OperationAwareFormatsProviderInterface $formatsProvider = null): void
     {
-        $documentation = new Documentation(new ResourceNameCollection([Question::class]), 'Test API', 'This is a test API.', '1.2.3');
+        $documentation = new Documentation(new ResourceNameCollection([Question::class]), ['title' => 'Test API', 'description' => 'This is a test API.', 'version' => '1.2.3']);
 
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyNameCollectionFactoryProphecy->create(Question::class, Argument::any())->shouldBeCalled()->willReturn(new PropertyNameCollection(['answer']));
@@ -2323,7 +2323,7 @@ class DocumentationNormalizerV2Test extends TestCase
 
     public function testNormalizeWithPropertySwaggerContext(): void
     {
-        $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), 'Test API', 'This is a test API.', '1.2.3');
+        $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), ['title' => 'Test API', 'description' => 'This is a test API.', 'version' => '1.2.3']);
 
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyNameCollectionFactoryProphecy->create(Dummy::class, [])->shouldBeCalled()->willReturn(new PropertyNameCollection(['id', 'name']));
@@ -2412,7 +2412,7 @@ class DocumentationNormalizerV2Test extends TestCase
 
     public function testNormalizeWithPaginationClientEnabled(): void
     {
-        $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), 'Test API', 'This is a test API.', '1.2.3');
+        $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), ['title' => 'Test API', 'description' => 'This is a test API.', 'version' => '1.2.3']);
 
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyNameCollectionFactoryProphecy->create(Dummy::class, [])->shouldBeCalled()->willReturn(new PropertyNameCollection(['id', 'name']));
@@ -2528,7 +2528,7 @@ class DocumentationNormalizerV2Test extends TestCase
 
     private function doTestNormalizeWithCustomFormatsDefinedAtOperationLevel(OperationAwareFormatsProviderInterface $formatProvider = null): void
     {
-        $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), 'Test API', 'This is a test API.', '1.2.3');
+        $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), ['title' => 'Test API', 'description' => 'This is a test API.', 'version' => '1.2.3']);
 
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyNameCollectionFactoryProphecy->create(Dummy::class, [])->shouldBeCalled()->willReturn(new PropertyNameCollection(['id', 'name']));
@@ -2710,7 +2710,7 @@ class DocumentationNormalizerV2Test extends TestCase
 
     private function doTestNormalizeWithInputAndOutputClass(): void
     {
-        $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), 'Test API', 'This is a test API.', '1.2.3');
+        $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), ['title' => 'Test API', 'description' => 'This is a test API.', 'version' => '1.2.3']);
 
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         //$propertyNameCollectionFactoryProphecy->create(Dummy::class, [])->shouldBeCalled()->willReturn(new PropertyNameCollection(['id', 'name', 'description']));
@@ -2932,6 +2932,410 @@ class DocumentationNormalizerV2Test extends TestCase
             ]),
         ];
 
+        $this->assertEquals($expected, $normalizer->normalize($documentation, DocumentationNormalizer::FORMAT, ['base_url' => '/app_dev.php/']));
+    }
+
+    public function testNormalizeWithSwaggerDefinitionInfoWithContact()
+    {
+        $info = [
+            'title' => 'Test API',
+            'description' => 'This is a test API.',
+            'version' => '1.2.3',
+            'contact' => [
+                'name' => 'API Platform',
+                'url' => 'https://www.api-platform.com',
+                'email' => 'contact@api-platform.com',
+            ],
+        ];
+        $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), $info);
+        $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
+        $propertyNameCollectionFactoryProphecy->create(Dummy::class, [])->shouldBeCalled()->willReturn(new PropertyNameCollection(['id']));
+        $dummyMetadata = new ResourceMetadata(
+            'Dummy',
+            'This is a dummy.',
+            'http://schema.example.com/Dummy',
+            [
+                'get' => [
+                    'method' => 'GET',
+                    'normalization_context' => [
+                        DocumentationNormalizer::SWAGGER_DEFINITION_NAME => 'Read',
+                    ],
+                ],
+            ]
+        );
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
+        $resourceMetadataFactoryProphecy->create(Dummy::class)->shouldBeCalled()->willReturn($dummyMetadata);
+        $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
+        $propertyMetadataFactoryProphecy->create(Dummy::class, 'id')->shouldBeCalled()->willReturn(new PropertyMetadata(new Type(Type::BUILTIN_TYPE_INT), 'This is an id.', true, false));
+        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
+        $resourceClassResolverProphecy->isResourceClass(Dummy::class)->willReturn(true);
+        $operationMethodResolverProphecy = $this->prophesize(OperationMethodResolverInterface::class);
+        $operationMethodResolverProphecy->getItemOperationMethod(Dummy::class, 'get')->shouldBeCalled()->willReturn('GET');
+        $operationPathResolver = new CustomOperationPathResolver(new OperationPathResolver(new UnderscorePathSegmentNameGenerator()));
+        $normalizer = new DocumentationNormalizer(
+            $resourceMetadataFactoryProphecy->reveal(),
+            $propertyNameCollectionFactoryProphecy->reveal(),
+            $propertyMetadataFactoryProphecy->reveal(),
+            $resourceClassResolverProphecy->reveal(),
+            $operationMethodResolverProphecy->reveal(),
+            $operationPathResolver
+        );
+        $expected = [
+            'swagger' => '2.0',
+            'basePath' => '/app_dev.php/',
+            'info' => [
+                'title' => 'Test API',
+                'description' => 'This is a test API.',
+                'version' => '1.2.3',
+                'contact' => [
+                    'name' => 'API Platform',
+                    'url' => 'https://www.api-platform.com',
+                    'email' => 'contact@api-platform.com',
+                ],
+            ],
+            'paths' => new \ArrayObject([
+                '/dummies/{id}' => [
+                    'get' => new \ArrayObject([
+                        'tags' => ['Dummy'],
+                        'operationId' => 'getDummyItem',
+                        'summary' => 'Retrieves a Dummy resource.',
+                        'parameters' => [
+                            [
+                                'name' => 'id',
+                                'in' => 'path',
+                                'type' => 'string',
+                                'required' => true,
+                            ],
+                        ],
+                        'responses' => [
+                            200 => [
+                                'description' => 'Dummy resource response',
+                                'schema' => ['$ref' => '#/definitions/Dummy-Read'],
+                            ],
+                            404 => ['description' => 'Resource not found'],
+                        ],
+                        'produces' => [],
+                    ]),
+                ],
+            ]),
+            'definitions' => new \ArrayObject([
+                'Dummy-Read' => new \ArrayObject([
+                    'type' => 'object',
+                    'description' => 'This is a dummy.',
+                    'externalDocs' => ['url' => 'http://schema.example.com/Dummy'],
+                    'properties' => [
+                        'id' => new \ArrayObject([
+                            'type' => 'integer',
+                            'description' => 'This is an id.',
+                            'readOnly' => true,
+                        ]),
+                    ],
+                ]),
+            ]),
+        ];
+        $this->assertEquals($expected, $normalizer->normalize($documentation, DocumentationNormalizer::FORMAT, ['base_url' => '/app_dev.php/']));
+    }
+
+    public function testNormalizeWithSwaggerDefinitionInfoWithLicense()
+    {
+        $info = [
+            'title' => 'Test API',
+            'description' => 'This is a test API.',
+            'version' => '1.2.3',
+            'license' => [
+                'name' => 'Apache 2.0',
+                'url' => 'https://www.apache.org/licenses/LICENSE-2.0.html',
+            ],
+        ];
+        $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), $info);
+        $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
+        $propertyNameCollectionFactoryProphecy->create(Dummy::class, [])->shouldBeCalled()->willReturn(new PropertyNameCollection(['id']));
+        $dummyMetadata = new ResourceMetadata(
+            'Dummy',
+            'This is a dummy.',
+            'http://schema.example.com/Dummy',
+            [
+                'get' => [
+                    'method' => 'GET',
+                    'normalization_context' => [
+                        DocumentationNormalizer::SWAGGER_DEFINITION_NAME => 'Read',
+                    ],
+                ],
+            ]
+        );
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
+        $resourceMetadataFactoryProphecy->create(Dummy::class)->shouldBeCalled()->willReturn($dummyMetadata);
+        $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
+        $propertyMetadataFactoryProphecy->create(Dummy::class, 'id')->shouldBeCalled()->willReturn(new PropertyMetadata(new Type(Type::BUILTIN_TYPE_INT), 'This is an id.', true, false));
+        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
+        $resourceClassResolverProphecy->isResourceClass(Dummy::class)->willReturn(true);
+        $operationMethodResolverProphecy = $this->prophesize(OperationMethodResolverInterface::class);
+        $operationMethodResolverProphecy->getItemOperationMethod(Dummy::class, 'get')->shouldBeCalled()->willReturn('GET');
+        $operationPathResolver = new CustomOperationPathResolver(new OperationPathResolver(new UnderscorePathSegmentNameGenerator()));
+        $normalizer = new DocumentationNormalizer(
+            $resourceMetadataFactoryProphecy->reveal(),
+            $propertyNameCollectionFactoryProphecy->reveal(),
+            $propertyMetadataFactoryProphecy->reveal(),
+            $resourceClassResolverProphecy->reveal(),
+            $operationMethodResolverProphecy->reveal(),
+            $operationPathResolver
+        );
+        $expected = [
+            'swagger' => '2.0',
+            'basePath' => '/app_dev.php/',
+            'info' => [
+                'title' => 'Test API',
+                'description' => 'This is a test API.',
+                'version' => '1.2.3',
+                'license' => [
+                    'name' => 'Apache 2.0',
+                    'url' => 'https://www.apache.org/licenses/LICENSE-2.0.html',
+                ],
+            ],
+            'paths' => new \ArrayObject([
+                '/dummies/{id}' => [
+                    'get' => new \ArrayObject([
+                        'tags' => ['Dummy'],
+                        'operationId' => 'getDummyItem',
+                        'summary' => 'Retrieves a Dummy resource.',
+                        'parameters' => [
+                            [
+                                'name' => 'id',
+                                'in' => 'path',
+                                'type' => 'string',
+                                'required' => true,
+                            ],
+                        ],
+                        'responses' => [
+                            200 => [
+                                'description' => 'Dummy resource response',
+                                'schema' => ['$ref' => '#/definitions/Dummy-Read'],
+                            ],
+                            404 => ['description' => 'Resource not found'],
+                        ],
+                        'produces' => [],
+                    ]),
+                ],
+            ]),
+            'definitions' => new \ArrayObject([
+                'Dummy-Read' => new \ArrayObject([
+                    'type' => 'object',
+                    'description' => 'This is a dummy.',
+                    'externalDocs' => ['url' => 'http://schema.example.com/Dummy'],
+                    'properties' => [
+                        'id' => new \ArrayObject([
+                            'type' => 'integer',
+                            'description' => 'This is an id.',
+                            'readOnly' => true,
+                        ]),
+                    ],
+                ]),
+            ]),
+        ];
+        $this->assertEquals($expected, $normalizer->normalize($documentation, DocumentationNormalizer::FORMAT, ['base_url' => '/app_dev.php/']));
+    }
+
+    public function testNormalizeWithSwaggerDefinitionInfoWithTermsOfService()
+    {
+        $info = [
+            'title' => 'Test API',
+            'description' => 'This is a test API.',
+            'version' => '1.2.3',
+            'termsOfService' => 'http://example.com/terms/',
+        ];
+        $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), $info);
+        $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
+        $propertyNameCollectionFactoryProphecy->create(Dummy::class, [])->shouldBeCalled()->willReturn(new PropertyNameCollection(['id']));
+        $dummyMetadata = new ResourceMetadata(
+            'Dummy',
+            'This is a dummy.',
+            'http://schema.example.com/Dummy',
+            [
+                'get' => [
+                    'method' => 'GET',
+                    'normalization_context' => [
+                        DocumentationNormalizer::SWAGGER_DEFINITION_NAME => 'Read',
+                    ],
+                ],
+            ]
+        );
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
+        $resourceMetadataFactoryProphecy->create(Dummy::class)->shouldBeCalled()->willReturn($dummyMetadata);
+        $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
+        $propertyMetadataFactoryProphecy->create(Dummy::class, 'id')->shouldBeCalled()->willReturn(new PropertyMetadata(new Type(Type::BUILTIN_TYPE_INT), 'This is an id.', true, false));
+        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
+        $resourceClassResolverProphecy->isResourceClass(Dummy::class)->willReturn(true);
+        $operationMethodResolverProphecy = $this->prophesize(OperationMethodResolverInterface::class);
+        $operationMethodResolverProphecy->getItemOperationMethod(Dummy::class, 'get')->shouldBeCalled()->willReturn('GET');
+        $operationPathResolver = new CustomOperationPathResolver(new OperationPathResolver(new UnderscorePathSegmentNameGenerator()));
+        $normalizer = new DocumentationNormalizer(
+            $resourceMetadataFactoryProphecy->reveal(),
+            $propertyNameCollectionFactoryProphecy->reveal(),
+            $propertyMetadataFactoryProphecy->reveal(),
+            $resourceClassResolverProphecy->reveal(),
+            $operationMethodResolverProphecy->reveal(),
+            $operationPathResolver
+        );
+        $expected = [
+            'swagger' => '2.0',
+            'basePath' => '/app_dev.php/',
+            'info' => [
+                'title' => 'Test API',
+                'description' => 'This is a test API.',
+                'version' => '1.2.3',
+                'termsOfService' => 'http://example.com/terms/',
+            ],
+            'paths' => new \ArrayObject([
+                '/dummies/{id}' => [
+                    'get' => new \ArrayObject([
+                        'tags' => ['Dummy'],
+                        'operationId' => 'getDummyItem',
+                        'summary' => 'Retrieves a Dummy resource.',
+                        'parameters' => [
+                            [
+                                'name' => 'id',
+                                'in' => 'path',
+                                'type' => 'string',
+                                'required' => true,
+                            ],
+                        ],
+                        'responses' => [
+                            200 => [
+                                'description' => 'Dummy resource response',
+                                'schema' => ['$ref' => '#/definitions/Dummy-Read'],
+                            ],
+                            404 => ['description' => 'Resource not found'],
+                        ],
+                        'produces' => [],
+                    ]),
+                ],
+            ]),
+            'definitions' => new \ArrayObject([
+                'Dummy-Read' => new \ArrayObject([
+                    'type' => 'object',
+                    'description' => 'This is a dummy.',
+                    'externalDocs' => ['url' => 'http://schema.example.com/Dummy'],
+                    'properties' => [
+                        'id' => new \ArrayObject([
+                            'type' => 'integer',
+                            'description' => 'This is an id.',
+                            'readOnly' => true,
+                        ]),
+                    ],
+                ]),
+            ]),
+        ];
+        $this->assertEquals($expected, $normalizer->normalize($documentation, DocumentationNormalizer::FORMAT, ['base_url' => '/app_dev.php/']));
+    }
+
+    public function testNormalizeWithSwaggerDefinitionInfoComplete()
+    {
+        $info = [
+            'title' => 'Test API',
+            'description' => 'This is a test API.',
+            'version' => '1.2.3',
+            'contact' => [
+                'name' => 'API Platform',
+                'url' => 'https://www.api-platform.com',
+                'email' => 'contact@api-platform.com',
+            ],
+            'license' => [
+                'name' => 'Apache 2.0',
+                'url' => 'https://www.apache.org/licenses/LICENSE-2.0.html',
+            ],
+            'termsOfService' => 'http://example.com/terms/',
+        ];
+        $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), $info);
+        $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
+        $propertyNameCollectionFactoryProphecy->create(Dummy::class, [])->shouldBeCalled()->willReturn(new PropertyNameCollection(['id']));
+        $dummyMetadata = new ResourceMetadata(
+            'Dummy',
+            'This is a dummy.',
+            'http://schema.example.com/Dummy',
+            [
+                'get' => [
+                    'method' => 'GET',
+                    'normalization_context' => [
+                        DocumentationNormalizer::SWAGGER_DEFINITION_NAME => 'Read',
+                    ],
+                ],
+            ]
+        );
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
+        $resourceMetadataFactoryProphecy->create(Dummy::class)->shouldBeCalled()->willReturn($dummyMetadata);
+        $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
+        $propertyMetadataFactoryProphecy->create(Dummy::class, 'id')->shouldBeCalled()->willReturn(new PropertyMetadata(new Type(Type::BUILTIN_TYPE_INT), 'This is an id.', true, false));
+        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
+        $resourceClassResolverProphecy->isResourceClass(Dummy::class)->willReturn(true);
+        $operationMethodResolverProphecy = $this->prophesize(OperationMethodResolverInterface::class);
+        $operationMethodResolverProphecy->getItemOperationMethod(Dummy::class, 'get')->shouldBeCalled()->willReturn('GET');
+        $operationPathResolver = new CustomOperationPathResolver(new OperationPathResolver(new UnderscorePathSegmentNameGenerator()));
+        $normalizer = new DocumentationNormalizer(
+            $resourceMetadataFactoryProphecy->reveal(),
+            $propertyNameCollectionFactoryProphecy->reveal(),
+            $propertyMetadataFactoryProphecy->reveal(),
+            $resourceClassResolverProphecy->reveal(),
+            $operationMethodResolverProphecy->reveal(),
+            $operationPathResolver
+        );
+        $expected = [
+            'swagger' => '2.0',
+            'basePath' => '/app_dev.php/',
+            'info' => [
+                'title' => 'Test API',
+                'description' => 'This is a test API.',
+                'version' => '1.2.3',
+                'contact' => [
+                    'name' => 'API Platform',
+                    'url' => 'https://www.api-platform.com',
+                    'email' => 'contact@api-platform.com',
+                ],
+                'license' => [
+                    'name' => 'Apache 2.0',
+                    'url' => 'https://www.apache.org/licenses/LICENSE-2.0.html',
+                ],
+                'termsOfService' => 'http://example.com/terms/',
+            ],
+            'paths' => new \ArrayObject([
+                '/dummies/{id}' => [
+                    'get' => new \ArrayObject([
+                        'tags' => ['Dummy'],
+                        'operationId' => 'getDummyItem',
+                        'produces' => [],
+                        'summary' => 'Retrieves a Dummy resource.',
+                        'parameters' => [
+                            [
+                                'name' => 'id',
+                                'in' => 'path',
+                                'type' => 'string',
+                                'required' => true,
+                            ],
+                        ],
+                        'responses' => [
+                            200 => [
+                                'description' => 'Dummy resource response',
+                                'schema' => ['$ref' => '#/definitions/Dummy-Read'],
+                            ],
+                            404 => ['description' => 'Resource not found'],
+                        ],
+                    ]),
+                ],
+            ]),
+            'definitions' => new \ArrayObject([
+                'Dummy-Read' => new \ArrayObject([
+                    'type' => 'object',
+                    'description' => 'This is a dummy.',
+                    'externalDocs' => ['url' => 'http://schema.example.com/Dummy'],
+                    'properties' => [
+                        'id' => new \ArrayObject([
+                            'type' => 'integer',
+                            'description' => 'This is an id.',
+                            'readOnly' => true,
+                        ]),
+                    ],
+                ]),
+            ]),
+        ];
         $this->assertEquals($expected, $normalizer->normalize($documentation, DocumentationNormalizer::FORMAT, ['base_url' => '/app_dev.php/']));
     }
 }

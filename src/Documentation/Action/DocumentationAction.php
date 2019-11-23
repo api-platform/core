@@ -75,6 +75,12 @@ final class DocumentationAction
             $this->formats = $this->formatsProvider->getFormatsFromAttributes($attributes ?? []);
         }
 
-        return new Documentation($this->resourceNameCollectionFactory->create(), $this->title, $this->description, $this->version, $this->formats);
+        $info = [
+            'title' => $this->title,
+            'description' => $this->description,
+            'version' => $this->version,
+        ];
+
+        return new Documentation($this->resourceNameCollectionFactory->create(), $info, $this->formats);
     }
 }

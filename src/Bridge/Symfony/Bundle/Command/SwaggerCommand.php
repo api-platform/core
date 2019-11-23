@@ -35,22 +35,23 @@ final class SwaggerCommand extends Command
 {
     private $normalizer;
     private $resourceNameCollectionFactory;
-    private $apiTitle;
-    private $apiDescription;
-    private $apiVersion;
+    private $apiInfo = [];
     private $apiFormats;
     private $swaggerVersions;
 
     /**
      * @param int[] $swaggerVersions
      */
-    public function __construct(NormalizerInterface $normalizer, ResourceNameCollectionFactoryInterface $resourceNameCollection, string $apiTitle, string $apiDescription, string $apiVersion, array $apiFormats = null, array $swaggerVersions = [2, 3])
+    public function __construct(NormalizerInterface $normalizer, ResourceNameCollectionFactoryInterface $resourceNameCollection, string $apiTitle, string $apiDescription, string $apiVersion, array $apiContact, array $apiLicense, string $apiTermsOfService, array $apiFormats, array $swaggerVersions = [2, 3])
     {
         $this->normalizer = $normalizer;
         $this->resourceNameCollectionFactory = $resourceNameCollection;
-        $this->apiTitle = $apiTitle;
-        $this->apiDescription = $apiDescription;
-        $this->apiVersion = $apiVersion;
+        $this->apiInfo['title'] = $apiTitle;
+        $this->apiInfo['description'] = $apiDescription;
+        $this->apiInfo['version'] = $apiVersion;
+        $this->apiInfo['contact'] = $apiContact;
+        $this->apiInfo['license'] = $apiLicense;
+        $this->apiInfo['termsOfService'] = $apiTermsOfService;
         $this->apiFormats = $apiFormats;
         $this->swaggerVersions = $swaggerVersions;
 
@@ -89,8 +90,7 @@ final class SwaggerCommand extends Command
         if (!\in_array((int) $version, $this->swaggerVersions, true)) {
             throw new InvalidOptionException(sprintf('This tool only supports versions %s of the OpenAPI specification ("%s" given).', implode(', ', $this->swaggerVersions), $version));
         }
-
-        $documentation = new Documentation($this->resourceNameCollectionFactory->create(), $this->apiTitle, $this->apiDescription, $this->apiVersion, $this->apiFormats);
+        $documentation = new Documentation($this->resourceNameCollectionFactory->create(), $this->apiInfo, $this->apiFormats);
         $data = $this->normalizer->normalize($documentation, DocumentationNormalizer::FORMAT, ['spec_version' => (int) $version, ApiGatewayNormalizer::API_GATEWAY => $input->getOption('api-gateway')]);
         $content = $input->getOption('yaml') ? Yaml::dump($data, 10, 2, Yaml::DUMP_OBJECT_AS_MAP | Yaml::DUMP_EMPTY_ARRAY_AS_SEQUENCE | Yaml::DUMP_MULTI_LINE_LITERAL_BLOCK) : (json_encode($data, JSON_PRETTY_PRINT) ?: '');
 

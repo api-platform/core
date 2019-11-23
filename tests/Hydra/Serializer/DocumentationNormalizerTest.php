@@ -58,7 +58,7 @@ class DocumentationNormalizerTest extends TestCase
         $title = 'Test Api';
         $desc = 'test ApiGerard';
         $version = '0.0.0';
-        $documentation = new Documentation(new ResourceNameCollection(['dummy' => 'dummy']), $title, $desc, $version);
+        $documentation = new Documentation(new ResourceNameCollection(['dummy' => 'dummy']), ['title' => $title, 'description' => $desc, 'version' => $version]);
 
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyNameCollectionFactoryProphecy->create('dummy', [])->shouldBeCalled()->willReturn(new PropertyNameCollection(['name', 'description', 'nameConverted', 'relatedDummy']));
@@ -368,7 +368,7 @@ class DocumentationNormalizerTest extends TestCase
         $title = 'Test Api';
         $desc = 'test ApiGerard';
         $version = '0.0.0';
-        $documentation = new Documentation(new ResourceNameCollection(['dummy' => 'dummy']), $title, $desc, $version);
+        $documentation = new Documentation(new ResourceNameCollection(['dummy' => 'dummy']), ['title' => $title, 'description' => $desc, 'version' => $version]);
 
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyNameCollectionFactoryProphecy->create('inputClass', [])->shouldBeCalled()->willReturn(new PropertyNameCollection(['a', 'b']));

@@ -46,7 +46,7 @@ class DocumentationActionTest extends TestCase
         $attributesProphecy->set('_api_normalization_context', ['foo' => 'bar', 'base_url' => '/api', 'api_gateway' => true, 'spec_version' => 2])->shouldBeCalledTimes(1);
 
         $documentation = new DocumentationAction($resourceNameCollectionFactoryProphecy->reveal(), 'My happy hippie api', 'lots of chocolate', '1.0.0');
-        $this->assertEquals(new Documentation(new ResourceNameCollection(['dummies']), 'My happy hippie api', 'lots of chocolate', '1.0.0'), $documentation($requestProphecy->reveal()));
+        $this->assertEquals(new Documentation(new ResourceNameCollection(['dummies']), ['title' => 'My happy hippie api', 'description' => 'lots of chocolate', 'version' => '1.0.0']), $documentation($requestProphecy->reveal()));
     }
 
     public function testLegacyDocumentationAction(): void
@@ -68,7 +68,7 @@ class DocumentationActionTest extends TestCase
         $formatsProviderProphecy->getFormatsFromAttributes(Argument::type('array'))->willReturn(['formats' => ['jsonld' => 'application/ld+json']])->shouldBeCalled();
 
         $documentation = new DocumentationAction($resourceNameCollectionFactoryProphecy->reveal(), 'My happy hippie api', 'lots of chocolate', '1.0.0', $formatsProviderProphecy->reveal());
-        $this->assertEquals(new Documentation(new ResourceNameCollection(['dummies']), 'My happy hippie api', 'lots of chocolate', '1.0.0', ['formats' => ['jsonld' => 'application/ld+json']]), $documentation($requestProphecy->reveal()));
+        $this->assertEquals(new Documentation(new ResourceNameCollection(['dummies']), ['title' => 'My happy hippie api', 'description' => 'lots of chocolate', 'version' => '1.0.0'], ['formats' => ['jsonld' => 'application/ld+json']]), $documentation($requestProphecy->reveal()));
     }
 
     /**

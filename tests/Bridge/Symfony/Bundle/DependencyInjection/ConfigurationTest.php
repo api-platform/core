@@ -84,6 +84,7 @@ class ConfigurationTest extends TestCase
             'title' => 'title',
             'description' => 'description',
             'version' => '1.0.0',
+            'termsOfService' => '',
             'show_webby' => true,
             'formats' => [
                 'jsonld' => ['mime_types' => ['application/ld+json']],

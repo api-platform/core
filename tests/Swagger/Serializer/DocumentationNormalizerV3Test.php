@@ -85,7 +85,7 @@ class DocumentationNormalizerV3Test extends TestCase
 
     private function doTestNormalize(OperationMethodResolverInterface $operationMethodResolver = null): void
     {
-        $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), 'Test API', 'This is a test API.', '1.2.3');
+        $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), ['title' => 'Test API', 'description' => 'This is a test API.', 'version' => '1.2.3']);
 
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyNameCollectionFactoryProphecy->create(Dummy::class, [])->shouldBeCalled()->willReturn(new PropertyNameCollection(['id', 'name', 'description', 'dummyDate']));
@@ -413,7 +413,7 @@ class DocumentationNormalizerV3Test extends TestCase
 
     private function doTestNormalizeWithNameConverter(bool $legacy = false): void
     {
-        $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), 'Dummy API', 'This is a dummy API', '1.2.3');
+        $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), ['title' => 'Dummy API', 'description' => 'This is a dummy API', 'version' => '1.2.3']);
 
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyNameCollectionFactoryProphecy->create(Dummy::class, [])->shouldBeCalled()->willReturn(new PropertyNameCollection(['name', 'nameConverted']));
@@ -570,7 +570,7 @@ class DocumentationNormalizerV3Test extends TestCase
 
     public function testNormalizeWithApiKeysEnabled(): void
     {
-        $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), 'Test API', 'This is a test API.', '1.2.3');
+        $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), ['title' => 'Test API', 'description' => 'This is a test API.', 'version' => '1.2.3']);
 
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyNameCollectionFactoryProphecy->create(Dummy::class, [])->shouldBeCalled()->willReturn(new PropertyNameCollection(['name']));
@@ -708,7 +708,7 @@ class DocumentationNormalizerV3Test extends TestCase
         $title = 'Test API';
         $description = 'This is a test API.';
         $version = '1.2.3';
-        $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), $title, $description, $version);
+        $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), ['title' => $title, 'description' => $description, 'version' => $version]);
         $groups = ['dummy', 'foo', 'bar'];
 
         $ref = 'Dummy-'.implode('_', $groups);
@@ -928,7 +928,7 @@ class DocumentationNormalizerV3Test extends TestCase
 
     public function testNormalizeWithOpenApiDefinitionName(): void
     {
-        $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), 'Test API', 'This is a test API.', '1.2.3');
+        $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), ['title' => 'Test API', 'description' => 'This is a test API.', 'version' => '1.2.3']);
 
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyNameCollectionFactoryProphecy->create(Dummy::class, [])->shouldBeCalled()->willReturn(new PropertyNameCollection(['id']));
@@ -1045,7 +1045,7 @@ class DocumentationNormalizerV3Test extends TestCase
         $title = 'Test API';
         $description = 'This is a test API.';
         $version = '1.2.3';
-        $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), $title, $description, $version);
+        $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), ['title' => $title, 'description' => $description, 'version' => $version]);
 
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyNameCollectionFactoryProphecy->create(Dummy::class, ['serializer_groups' => ['dummy']])->shouldBeCalledTimes(1)->willReturn(new PropertyNameCollection(['gerard']));
@@ -1263,7 +1263,7 @@ class DocumentationNormalizerV3Test extends TestCase
         $title = 'Test API';
         $description = 'This is a test API.';
         $version = '1.2.3';
-        $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), $title, $description, $version);
+        $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), ['title' => $title, 'description' => $description, 'version' => $version]);
 
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyNameCollectionFactoryProphecy->create(Dummy::class, ['serializer_groups' => ['dummy']])->shouldBeCalledTimes(1)->willReturn(new PropertyNameCollection(['gerard']));
@@ -1632,7 +1632,7 @@ class DocumentationNormalizerV3Test extends TestCase
             ['spec_version' => 3]
         );
 
-        $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), 'Test API', 'This is a test API.', '1.2.3');
+        $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), ['title' => 'Test API', 'description' => 'This is a test API.', 'version' => '1.2.3']);
 
         $this->assertTrue($normalizer->supportsNormalization($documentation, 'json'));
         $this->assertFalse($normalizer->supportsNormalization($documentation));
@@ -1642,7 +1642,7 @@ class DocumentationNormalizerV3Test extends TestCase
 
     public function testNoOperations(): void
     {
-        $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), '', '', '0.0.0');
+        $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), ['title' => '', 'description' => '', 'version' => '0.0.0']);
 
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyNameCollectionFactoryProphecy->create(Dummy::class, [])->shouldNotBeCalled();
@@ -1705,7 +1705,7 @@ class DocumentationNormalizerV3Test extends TestCase
 
     public function testWithCustomMethod(): void
     {
-        $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), '', '', '0.0.0');
+        $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), ['title' => '', 'description' => '', 'version' => '0.0.0']);
 
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
 
@@ -1775,7 +1775,7 @@ class DocumentationNormalizerV3Test extends TestCase
         $title = 'Test API';
         $description = 'This is a test API.';
         $version = '1.2.3';
-        $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), $title, $description, $version);
+        $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), ['title' => $title, 'description' => $description, 'version' => $version]);
         $groups = ['dummy', 'foo', 'bar'];
         $ref = 'Dummy-'.implode('_', $groups);
         $relatedDummyRef = 'RelatedDummy-'.implode('_', $groups);
@@ -2021,7 +2021,7 @@ class DocumentationNormalizerV3Test extends TestCase
 
     private function normalizeWithFilters($filterLocator): void
     {
-        $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), '', '', '0.0.0');
+        $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), ['title' => '', 'description' => '', 'version' => '0.0.0']);
 
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyNameCollectionFactoryProphecy->create(Dummy::class, [])->shouldBeCalled()->willReturn(new PropertyNameCollection(['name']));
@@ -2179,7 +2179,7 @@ class DocumentationNormalizerV3Test extends TestCase
 
     private function doTestNormalizeWithSubResource(OperationAwareFormatsProviderInterface $formatProvider = null): void
     {
-        $documentation = new Documentation(new ResourceNameCollection([Question::class]), 'Test API', 'This is a test API.', '1.2.3');
+        $documentation = new Documentation(new ResourceNameCollection([Question::class]), ['title' => 'Test API', 'description' => 'This is a test API.', 'version' => '1.2.3']);
 
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyNameCollectionFactoryProphecy->create(Question::class, Argument::any())->shouldBeCalled()->willReturn(new PropertyNameCollection(['answer']));
@@ -2352,7 +2352,7 @@ class DocumentationNormalizerV3Test extends TestCase
 
     public function testNormalizeWithPropertyOpenApiContext(): void
     {
-        $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), 'Test API', 'This is a test API.', '1.2.3');
+        $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), ['title' => 'Test API', 'description' => 'This is a test API.', 'version' => '1.2.3']);
 
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyNameCollectionFactoryProphecy->create(Dummy::class, [])->shouldBeCalled()->willReturn(new PropertyNameCollection(['id', 'name']));
@@ -2466,7 +2466,7 @@ class DocumentationNormalizerV3Test extends TestCase
 
     public function testNormalizeWithPaginationClientEnabled(): void
     {
-        $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), 'Test API', 'This is a test API.', '1.2.3');
+        $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), ['title' => 'Test API', 'description' => 'This is a test API.', 'version' => '1.2.3']);
 
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyNameCollectionFactoryProphecy->create(Dummy::class, [])->shouldBeCalled()->willReturn(new PropertyNameCollection(['id', 'name']));
@@ -2593,7 +2593,7 @@ class DocumentationNormalizerV3Test extends TestCase
 
     public function testNormalizeWithPaginationCustomDefaultAndMaxItemsPerPage(): void
     {
-        $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), 'Test API', 'This is a test API.', '1.2.3');
+        $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), ['title' => 'Test API', 'description' => 'This is a test API.', 'version' => '1.2.3']);
 
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyNameCollectionFactoryProphecy->create(Dummy::class, [])->shouldBeCalled()->willReturn(new PropertyNameCollection(['id', 'name']));
@@ -2730,7 +2730,7 @@ class DocumentationNormalizerV3Test extends TestCase
      */
     public function testLegacyNormalizeWithPaginationCustomDefaultAndMaxItemsPerPage(): void
     {
-        $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), 'Test API', 'This is a test API.', '1.2.3');
+        $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), ['title' => 'Test API', 'description' => 'This is a test API.', 'version' => '1.2.3']);
 
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyNameCollectionFactoryProphecy->create(Dummy::class, [])->shouldBeCalled()->willReturn(new PropertyNameCollection(['id', 'name']));
@@ -2879,7 +2879,7 @@ class DocumentationNormalizerV3Test extends TestCase
 
     private function doNormalizeWithCustomFormatsDefinedAtOperationLevel(OperationAwareFormatsProviderInterface $formatsProvider = null): void
     {
-        $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), 'Test API', 'This is a test API.', '1.2.3');
+        $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), ['title' => 'Test API', 'description' => 'This is a test API.', 'version' => '1.2.3']);
 
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyNameCollectionFactoryProphecy->create(Dummy::class, [])->shouldBeCalled()->willReturn(new PropertyNameCollection(['id', 'name']));
