@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.5.3
+
+* Compatibility with Symfony 5
+* GraphQL: Fix `hasNextPage` when `offset > itemsPerPage`
+
 ## 2.5.2
 
 * Compatibility with Symfony 5 RC
