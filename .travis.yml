@@ -1,9 +1,5 @@
 language: php
 
-env:
-  global:
-    - SYMFONY_REQUIRE='^3.4 || ^4.0 || ^5.0'
-
 cache:
   directories:
     - $HOME/.composer/cache
