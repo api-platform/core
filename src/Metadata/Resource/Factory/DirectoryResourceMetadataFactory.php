@@ -38,7 +38,16 @@ final class DirectoryResourceMetadataFactory implements ResourceMetadataFactoryI
             } catch (ResourceClassNotFoundException $e) {
             }
         }
-        $resource = [] + $this->defaults;
+        $resource = [];
+        $resource['shortName'] = $this->defaults['shortName'] ?? (new \ReflectionClass($resourceClass))->getShortName();
+        $resource['description'] = $this->defaults['description'] ?? '';
+        $resource['iri'] = $this->defaults['iri'] ?? null;
+        $resource['itemOperations'] = $this->defaults['itemOperations'] ?? [];
+        $resource['collectionOperations'] = $this->defaults['collectionOperations'] ?? [];
+        $resource['subresourceOperations'] = $this->defaults['collectionOperations'] ?? [];
+        $resource['graphql'] = $this->defaults['graphql'] ?? null;
+        $resource['attributes'] = $this->defaults['attributes'] ?? [];
+
         return $this->update($parentResourceMetadata ?: new ResourceMetadata(), $resource);
     }
 
