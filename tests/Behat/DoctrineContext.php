@@ -618,6 +618,53 @@ final class DoctrineContext implements Context
     }
 
     /**
+     * @Given there is a dummy object with :nb relatedDummies and their thirdLevel
+     */
+    public function thereIsADummyObjectWithRelatedDummiesAndTheirThirdLevel(int $nb)
+    {
+        $dummy = $this->buildDummy();
+        $dummy->setName('Dummy with relations');
+
+        for ($i = 1; $i <= $nb; ++$i) {
+            $thirdLevel = $this->buildThirdLevel();
+
+            $relatedDummy = $this->buildRelatedDummy();
+            $relatedDummy->setName('RelatedDummy #'.$i);
+            $relatedDummy->setThirdLevel($thirdLevel);
+
+            $dummy->addRelatedDummy($relatedDummy);
+
+            $this->manager->persist($thirdLevel);
+            $this->manager->persist($relatedDummy);
+        }
+        $this->manager->persist($dummy);
+        $this->manager->flush();
+    }
+
+    /**
+     * @Given there is a dummy object with :nb relatedDummies with same thirdLevel
+     */
+    public function thereIsADummyObjectWithRelatedDummiesWithSameThirdLevel(int $nb)
+    {
+        $dummy = $this->buildDummy();
+        $dummy->setName('Dummy with relations');
+        $thirdLevel = $this->buildThirdLevel();
+
+        for ($i = 1; $i <= $nb; ++$i) {
+            $relatedDummy = $this->buildRelatedDummy();
+            $relatedDummy->setName('RelatedDummy #'.$i);
+            $relatedDummy->setThirdLevel($thirdLevel);
+
+            $dummy->addRelatedDummy($relatedDummy);
+
+            $this->manager->persist($relatedDummy);
+        }
+        $this->manager->persist($thirdLevel);
+        $this->manager->persist($dummy);
+        $this->manager->flush();
+    }
+
+    /**
      * @Given there are :nb dummy objects with embeddedDummy
      */
     public function thereAreDummyObjectsWithEmbeddedDummy(int $nb)

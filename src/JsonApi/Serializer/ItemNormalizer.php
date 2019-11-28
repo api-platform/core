@@ -94,6 +94,19 @@ final class ItemNormalizer extends AbstractItemNormalizer
         $allRelationshipsData = $this->getComponents($object, $format, $context)['relationships'];
         $populatedRelationContext = $context;
         $relationshipsData = $this->getPopulatedRelations($object, $format, $populatedRelationContext, $allRelationshipsData);
+
+        if (!isset($context['api_included_resources'])) {
+            // initialize tracking of already included resources
+            $context['api_included_resources'] = [];
+        }
+
+        // do not include primary resources
+        $context['api_included_resources'] = [
+            $resourceMetadata->getShortName() => [
+                $context['iri'],
+            ],
+        ];
+
         $includedResourcesData = $this->getRelatedResources($object, $format, $context, $allRelationshipsData);
 
         $resourceData = [
@@ -370,12 +383,19 @@ final class ItemNormalizer extends AbstractItemNormalizer
 
         $included = [];
         foreach ($relationships as $relationshipDataArray) {
-            if (!\in_array($relationshipDataArray['name'], $context['api_included'], true)) {
+            $relationshipName = $relationshipDataArray['name'];
+
+            if (!$this->shouldIncludeRelation($relationshipName, $context)) {
                 continue;
             }
 
             $relationshipName = $relationshipDataArray['name'];
             $relationContext = $context;
+            if ($this->isIntermediateResource($relationshipName, $context)) {
+                $relationContext['api_included'] = $this->getNestedResources($relationshipName, $context);
+            } else {
+                $relationContext['api_included'] = [];
+            }
             $attributeValue = $this->getAttributeValue($object, $relationshipName, $format, $relationContext);
 
             if (!$attributeValue) {
@@ -384,18 +404,86 @@ final class ItemNormalizer extends AbstractItemNormalizer
 
             // Many to one relationship
             if ('one' === $relationshipDataArray['cardinality']) {
-                $included[] = $attributeValue['data'];
+                $this->addIncluded($attributeValue['data'], $included, $context);
+                if (isset($attributeValue['included']) && \is_array($attributeValue['included'])) {
+                    foreach ($attributeValue['included'] as $include) {
+                        $this->addIncluded($include, $included, $context);
+                    }
+                }
 
                 continue;
             }
             // Many to many relationship
             foreach ($attributeValue as $attributeValueElement) {
                 if (isset($attributeValueElement['data'])) {
-                    $included[] = $attributeValueElement['data'];
+                    $this->addIncluded($attributeValueElement['data'], $included, $context);
+
+                    if (isset($attributeValueElement['included']) && \is_array($attributeValueElement['included'])) {
+                        foreach ($attributeValueElement['included'] as $include) {
+                            $this->addIncluded($include, $included, $context);
+                        }
+                    }
                 }
             }
         }
 
         return $included;
+    }
+
+    /**
+     * add data to included array if it's not already.
+     *
+     * @param array $data
+     * @param array $included
+     * @param array $context
+     */
+    private function addIncluded($data, &$included, &$context)
+    {
+        if (isset($data['id']) && $data['type']) {
+            if (!isset($context['api_included_resources'][$data['type']])) {
+                $context['api_included_resources'][$data['type']] = [];
+            }
+            if (!\in_array($data['id'], $context['api_included_resources'][$data['type']], true)) {
+                $included[] = $data;
+                // track already included resources
+                $context['api_included_resources'][$data['type']][] = $data['id'];
+            }
+        }
+    }
+
+    /**
+     * figure out if the relationship is in the api_included hash, at least as an intermediate resource.
+     */
+    private function shouldIncludeRelation(string $relationshipName, array $context): bool
+    {
+        $normalizedName = $this->nameConverter ? $this->nameConverter->normalize($relationshipName, $context['resource_class'], self::FORMAT, $context) : $relationshipName;
+
+        return \in_array($normalizedName, $context['api_included'], true) || $this->isIntermediateResource($relationshipName, $context);
+    }
+
+    /**
+     * returns true if the relationship is an intermediate resource.
+     */
+    private function isIntermediateResource(string $relationshipName, array $context): bool
+    {
+        $nested = $this->getNestedResources($relationshipName, $context);
+
+        return \count($nested) > 0;
+    }
+
+    /**
+     * returns the names of the nested resources from an relationship.
+     */
+    private function getNestedResources(string $relationshipName, array $context): array
+    {
+        $normalizedName = $this->nameConverter ? $this->nameConverter->normalize($relationshipName, $context['resource_class'], self::FORMAT, $context) : $relationshipName;
+
+        $filtered = array_filter($context['api_included'], function (string $included) use ($normalizedName) {
+            return 0 === strpos($included, $normalizedName.'.');
+        });
+
+        return array_map(function (string $nested) {
+            return substr($nested, strpos($nested, '.') + 1);
+        }, $filtered);
     }
 }
