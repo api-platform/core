@@ -5,6 +5,7 @@
 * MongoDB: Possibility to add execute options (aggregate command fields) for a resource, like `allowDiskUse` (#3144)
 * GraphQL: Allow to format GraphQL errors based on exceptions (#3063)
 * GraphQL: Add page-based pagination (#3175)
+* OpenAPI: Add PHP default values to the documentation (#2386) 
 
 ## 2.5.2
 
