@@ -176,6 +176,7 @@ class ConfigurationTest extends TestCase
             ],
             'mapping' => [
                 'paths' => [],
+                'auto_mapping' => false,
             ],
             'http_cache' => [
                 'invalidation' => [

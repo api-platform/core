@@ -32,21 +32,13 @@ final class DirectoryResourceMetadataFactory implements ResourceMetadataFactoryI
     public function create(string $resourceClass): ResourceMetadata
     {
         $parentResourceMetadata = null;
-        if (null !== $this->decorated) {
+        if ($this->decorated) {
             try {
                 $parentResourceMetadata = $this->decorated->create($resourceClass);
             } catch (ResourceClassNotFoundException $e) {
             }
         }
-        $resource = [];
-        $resource['shortName'] = $this->defaults['shortName'] ?? (new \ReflectionClass($resourceClass))->getShortName();
-        $resource['description'] = $this->defaults['description'] ?? '';
-        $resource['iri'] = $this->defaults['iri'] ?? null;
-        $resource['itemOperations'] = $this->defaults['itemOperations'] ?? [];
-        $resource['collectionOperations'] = $this->defaults['collectionOperations'] ?? [];
-        $resource['subresourceOperations'] = $this->defaults['collectionOperations'] ?? [];
-        $resource['graphql'] = $this->defaults['graphql'] ?? null;
-        $resource['attributes'] = $this->defaults['attributes'] ?? [];
+        $resource['shortName'] = (new \ReflectionClass($resourceClass))->getShortName();
 
         return $this->update($parentResourceMetadata ?: new ResourceMetadata(), $resource);
     }
@@ -56,16 +48,7 @@ final class DirectoryResourceMetadataFactory implements ResourceMetadataFactoryI
      */
     private function update(ResourceMetadata $resourceMetadata, array $metadata): ResourceMetadata
     {
-        foreach ([
-            'shortName',
-            'description',
-            'iri',
-            'itemOperations',
-            'collectionOperations',
-            'subresourceOperations',
-            'graphql',
-            'attributes',
-        ] as $property) {
+        foreach (['shortName'] as $property) {
             if (null === $metadata[$property] || null !== $resourceMetadata->{'get'.ucfirst($property)}()) {
                 continue;
             }

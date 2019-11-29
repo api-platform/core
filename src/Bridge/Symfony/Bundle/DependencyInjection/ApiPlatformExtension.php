@@ -220,7 +220,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
     {
         $loader->load('metadata/metadata.xml');
         $loader->load('metadata/xml.xml');
-        [$xmlResources, $yamlResources, $dirResources] = $this->getResourcesToWatch($container, $config);
+        [$xmlResources, $yamlResources] = $this->getResourcesToWatch($container, $config);
 
         if (!empty($config['resource_class_directories'])) {
             $container->setParameter('api_platform.resource_class_directories', array_merge(
@@ -243,7 +243,9 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             $loader->load('metadata/php_doc.xml');
         }
 
-        $loader->load('metadata/directory.xml');
+        if (true === $config['mapping']['auto_mapping']) {
+            $loader->load('metadata/directory.xml');
+        }
     }
 
     private function getBundlesResourcesPaths(ContainerBuilder $container, array $config): array

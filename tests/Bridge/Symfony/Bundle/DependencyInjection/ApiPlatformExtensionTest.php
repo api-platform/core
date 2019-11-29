@@ -1026,6 +1026,7 @@ class ApiPlatformExtensionTest extends TestCase
     {
         $hasSwagger = null === $configuration || true === $configuration['api_platform']['enable_swagger'] ?? false;
         $hasHydra = null === $configuration || isset($configuration['api_platform']['formats']['jsonld']);
+        $autoMapping = $configuration['api_platform']['mapping']['auto_mapping'] ?? false;
 
         $containerBuilderProphecy = $this->getPartialContainerBuilderProphecy($configuration);
 
@@ -1227,8 +1228,6 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.metadata.resource.metadata_factory.php_doc',
             'api_platform.metadata.resource.metadata_factory.short_name',
             'api_platform.metadata.resource.metadata_factory.yaml',
-            'api_platform.metadata.resource.name_collection_factory.directory',
-            'api_platform.metadata.resource.metadata_factory.directory',
             'api_platform.metadata.resource.name_collection_factory.annotation',
             'api_platform.metadata.resource.name_collection_factory.yaml',
             'api_platform.metadata.subresource.metadata_factory.annotation',
@@ -1240,6 +1239,12 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.validator',
             'test.api_platform.client',
         ];
+        if (true === $autoMapping) {
+            $definitions = array_merge($definitions, [
+                'api_platform.metadata.resource.name_collection_factory.directory',
+                'api_platform.metadata.resource.metadata_factory.directory',
+            ]);
+        }
 
         if (\in_array('odm', $doctrineIntegrationsToLoad, true)) {
             $definitions = array_merge($definitions, [

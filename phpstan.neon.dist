@@ -5,6 +5,7 @@ parameters:
 		- tests
 		- tests/Fixtures/app/console
 	inferPrivatePropertyTypeFromConstructor: true
+	reportUnmatchedIgnoredErrors: false
 	symfony:
 		container_xml_path: %rootDir%/../../../tests/Fixtures/app/var/cache/test/appAppKernelTestDebugContainer.xml
 		constant_hassers: false
