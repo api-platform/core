@@ -77,6 +77,16 @@ final class ApiProperty
     public $identifier;
 
     /**
+     * @var mixed
+     */
+    public $default;
+
+    /**
+     * @var mixed
+     */
+    public $example;
+
+    /**
      * @see https://github.com/Haehnchen/idea-php-annotation-plugin/issues/112
      *
      * @var string
