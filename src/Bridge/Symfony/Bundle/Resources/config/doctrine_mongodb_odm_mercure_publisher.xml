@@ -8,7 +8,7 @@
 
         <!-- Event listener -->
 
-        <service id="api_platform.doctrine.orm.listener.mercure.publish" class="ApiPlatform\Core\Bridge\Doctrine\Orm\EventListener\PublishMercureUpdatesListener">
+        <service id="api_platform.doctrine_mongodb.odm.listener.mercure.publish" class="ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\EventListener\PublishMercureUpdatesListener">
             <argument type="service" id="api_platform.resource_class_resolver" />
             <argument type="service" id="api_platform.iri_converter" />
             <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
@@ -17,8 +17,8 @@
             <argument type="service" id="messenger.default_bus" on-invalid="ignore" />
             <argument type="service" id="mercure.hub.default.publisher" />
 
-            <tag name="doctrine.event_listener" event="onFlush" />
-            <tag name="doctrine.event_listener" event="postFlush" />
+            <tag name="doctrine_mongodb.odm.event_listener" event="onFlush" />
+            <tag name="doctrine_mongodb.odm.event_listener" event="postFlush" />
         </service>
 
     </services>

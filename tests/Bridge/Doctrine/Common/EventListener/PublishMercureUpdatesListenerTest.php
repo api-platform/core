@@ -11,12 +11,12 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Bridge\Doctrine\EventListener;
+namespace ApiPlatform\Core\Tests\Bridge\Doctrine\Common\EventListener;
 
 use ApiPlatform\Core\Api\IriConverterInterface;
 use ApiPlatform\Core\Api\ResourceClassResolverInterface;
 use ApiPlatform\Core\Api\UrlGeneratorInterface;
-use ApiPlatform\Core\Bridge\Doctrine\EventListener\PublishMercureUpdatesListener;
+use ApiPlatform\Core\Bridge\Doctrine\Common\EventListener\AbstractPublishMercureUpdatesListener;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
@@ -24,20 +24,54 @@ use ApiPlatform\Core\Tests\Fixtures\NotAResource;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyCar;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyFriend;
-use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\Event\OnFlushEventArgs;
-use Doctrine\ORM\UnitOfWork;
+use Doctrine\Common\EventArgs;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
+use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\Mercure\Update;
+use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
+ * @author Alan Poulain <contact@alanpoulain.eu>
  */
 class PublishMercureUpdatesListenerTest extends TestCase
 {
-    public function testPublishUpdate()
+    protected function getPublishMercureUpdatesListener(array $toInserts, array $toUpdates, array $toDeletes, ResourceClassResolverInterface $resourceClassResolver, IriConverterInterface $iriConverter, ResourceMetadataFactoryInterface $resourceMetadataFactory, SerializerInterface $serializer, array $formats, MessageBusInterface $messageBus = null, callable $publisher = null, ExpressionLanguage $expressionLanguage = null): AbstractPublishMercureUpdatesListener
+    {
+        return new class($toInserts, $toUpdates, $toDeletes, $resourceClassResolver, $iriConverter, $resourceMetadataFactory, $serializer, $formats, $messageBus, $publisher, $expressionLanguage) extends AbstractPublishMercureUpdatesListener {
+            private $toInserts;
+            private $toUpdates;
+            private $toDeletes;
+
+            public function __construct(array $toInserts, array $toUpdates, array $toDeletes, ResourceClassResolverInterface $resourceClassResolver, IriConverterInterface $iriConverter, ResourceMetadataFactoryInterface $resourceMetadataFactory, SerializerInterface $serializer, array $formats, MessageBusInterface $messageBus = null, callable $publisher = null, ExpressionLanguage $expressionLanguage = null)
+            {
+                parent::__construct($resourceClassResolver, $iriConverter, $resourceMetadataFactory, $serializer, $formats, $messageBus, $publisher, $expressionLanguage);
+
+                $this->toInserts = $toInserts;
+                $this->toUpdates = $toUpdates;
+                $this->toDeletes = $toDeletes;
+            }
+
+            public function onFlush(EventArgs $eventArgs): void
+            {
+                foreach ($this->toInserts as $document) {
+                    $this->storeObjectToPublish($document, 'createdObjects');
+                }
+
+                foreach ($this->toUpdates as $document) {
+                    $this->storeObjectToPublish($document, 'updatedObjects');
+                }
+
+                foreach ($this->toDeletes as $document) {
+                    $this->storeObjectToPublish($document, 'deletedObjects');
+                }
+            }
+        };
+    }
+
+    public function testPublishUpdate(): void
     {
         $toInsert = new Dummy();
         $toInsert->setId(1);
@@ -89,7 +123,10 @@ class PublishMercureUpdatesListenerTest extends TestCase
             return 'id';
         };
 
-        $listener = new PublishMercureUpdatesListener(
+        $listener = $this->getPublishMercureUpdatesListener(
+            [$toInsert, $toInsertNotResource],
+            [$toUpdate, $toUpdateNoMercureAttribute],
+            [$toDelete, $toDeleteExpressionLanguage],
             $resourceClassResolverProphecy->reveal(),
             $iriConverterProphecy->reveal(),
             $resourceMetadataFactoryProphecy->reveal(),
@@ -99,28 +136,24 @@ class PublishMercureUpdatesListenerTest extends TestCase
             $publisher
         );
 
-        $uowProphecy = $this->prophesize(UnitOfWork::class);
-        $uowProphecy->getScheduledEntityInsertions()->willReturn([$toInsert, $toInsertNotResource])->shouldBeCalled();
-        $uowProphecy->getScheduledEntityUpdates()->willReturn([$toUpdate, $toUpdateNoMercureAttribute])->shouldBeCalled();
-        $uowProphecy->getScheduledEntityDeletions()->willReturn([$toDelete, $toDeleteExpressionLanguage])->shouldBeCalled();
+        $eventArgsProphecy = $this->prophesize(EventArgs::class);
 
-        $emProphecy = $this->prophesize(EntityManagerInterface::class);
-        $emProphecy->getUnitOfWork()->willReturn($uowProphecy->reveal())->shouldBeCalled();
-        $eventArgs = new OnFlushEventArgs($emProphecy->reveal());
-
-        $listener->onFlush($eventArgs);
+        $listener->onFlush($eventArgsProphecy->reveal());
         $listener->postFlush();
 
         $this->assertSame(['http://example.com/dummies/1', 'http://example.com/dummies/2', 'http://example.com/dummies/3', 'http://example.com/dummy_friends/4'], $topics);
         $this->assertSame([[], [], [], ['foo', 'bar']], $targets);
     }
 
-    public function testNoPublisher()
+    public function testNoPublisher(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('A message bus or a publisher must be provided.');
 
-        new PublishMercureUpdatesListener(
+        $this->getPublishMercureUpdatesListener(
+            [],
+            [],
+            [],
             $this->prophesize(ResourceClassResolverInterface::class)->reveal(),
             $this->prophesize(IriConverterInterface::class)->reveal(),
             $this->prophesize(ResourceMetadataFactoryInterface::class)->reveal(),
@@ -131,7 +164,7 @@ class PublishMercureUpdatesListenerTest extends TestCase
         );
     }
 
-    public function testInvalidMercureAttribute()
+    public function testInvalidMercureAttribute(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('The value of the "mercure" attribute of the "ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy" resource class must be a boolean, an array of targets or a valid expression, "integer" given.');
@@ -149,7 +182,10 @@ class PublishMercureUpdatesListenerTest extends TestCase
 
         $serializerProphecy = $this->prophesize(SerializerInterface::class);
 
-        $listener = new PublishMercureUpdatesListener(
+        $listener = $this->getPublishMercureUpdatesListener(
+            [$toInsert],
+            [],
+            [],
             $resourceClassResolverProphecy->reveal(),
             $iriConverterProphecy->reveal(),
             $resourceMetadataFactoryProphecy->reveal(),
@@ -161,14 +197,9 @@ class PublishMercureUpdatesListenerTest extends TestCase
             }
         );
 
-        $uowProphecy = $this->prophesize(UnitOfWork::class);
-        $uowProphecy->getScheduledEntityInsertions()->willReturn([$toInsert])->shouldBeCalled();
+        $eventArgsProphecy = $this->prophesize(EventArgs::class);
 
-        $emProphecy = $this->prophesize(EntityManagerInterface::class);
-        $emProphecy->getUnitOfWork()->willReturn($uowProphecy->reveal())->shouldBeCalled();
-        $eventArgs = new OnFlushEventArgs($emProphecy->reveal());
-
-        $listener->onFlush($eventArgs);
+        $listener->onFlush($eventArgsProphecy->reveal());
         //$listener->postFlush();
     }
 }

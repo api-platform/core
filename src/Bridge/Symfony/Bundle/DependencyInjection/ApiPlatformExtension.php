@@ -587,6 +587,9 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         if ($this->isConfigEnabled($container, $config['doctrine'])) {
             $loader->load('doctrine_orm_mercure_publisher.xml');
         }
+        if ($this->isConfigEnabled($container, $config['doctrine_mongodb_odm'])) {
+            $loader->load('doctrine_mongodb_odm_mercure_publisher.xml');
+        }
     }
 
     private function registerMessengerConfiguration(ContainerBuilder $container, array $config, XmlFileLoader $loader): void
