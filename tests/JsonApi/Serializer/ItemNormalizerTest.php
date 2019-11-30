@@ -256,17 +256,17 @@ class ItemNormalizerTest extends TestCase
         $normalizer->setSerializer($this->prophesize(SerializerInterface::class)->reveal());
 
         $circularReferenceLimit = 2;
-        if (interface_exists(AdvancedNameConverterInterface::class)) {
-            $context = [
-                'circular_reference_limit' => $circularReferenceLimit,
-                'circular_reference_limit_counters' => [spl_object_hash($circularReferenceEntity) => 2],
-                'cache_error' => function () {},
-            ];
-        } else {
+        if (!interface_exists(AdvancedNameConverterInterface::class) && method_exists($normalizer, 'setCircularReferenceLimit')) {
             $normalizer->setCircularReferenceLimit($circularReferenceLimit);
 
             $context = [
                 'circular_reference_limit' => [spl_object_hash($circularReferenceEntity) => 2],
+                'cache_error' => function () {},
+            ];
+        } else {
+            $context = [
+                'circular_reference_limit' => $circularReferenceLimit,
+                'circular_reference_limit_counters' => [spl_object_hash($circularReferenceEntity) => 2],
                 'cache_error' => function () {},
             ];
         }

@@ -5,7 +5,12 @@
 * MongoDB: Possibility to add execute options (aggregate command fields) for a resource, like `allowDiskUse` (#3144)
 * GraphQL: Allow to format GraphQL errors based on exceptions (#3063)
 * GraphQL: Add page-based pagination (#3175)
-* OpenAPI: Add PHP default values to the documentation (#2386) 
+* OpenAPI: Add PHP default values to the documentation (#2386)
+ 
+## 2.5.3
+
+* Compatibility with Symfony 5
+* GraphQL: Fix `hasNextPage` when `offset > itemsPerPage`
 
 ## 2.5.2
 
