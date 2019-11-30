@@ -68,7 +68,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
                 return $this->iriConverter->getIriFromItem($object);
             };
         }
-        if (!interface_exists(AdvancedNameConverterInterface::class)) {
+        if (!interface_exists(AdvancedNameConverterInterface::class) && method_exists($this, 'setCircularReferenceHandler')) {
             $this->setCircularReferenceHandler($defaultContext['circular_reference_handler']);
         }
 

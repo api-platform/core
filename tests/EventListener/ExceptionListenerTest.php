@@ -19,6 +19,7 @@ use Prophecy\Argument;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
+use Symfony\Component\HttpKernel\EventListener\ErrorListener;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 /**
@@ -44,7 +45,7 @@ class ExceptionListenerTest extends TestCase
         $eventProphecy->getKernel()->willReturn($kernel);
         $eventProphecy->setResponse(Argument::type(Response::class))->shouldBeCalled();
 
-        $listener = new ExceptionListener('foo:bar');
+        $listener = new ExceptionListener('foo:bar', null, false, class_exists(ErrorListener::class) ? $this->prophesize(ErrorListener::class)->reveal() : null);
         $listener->onKernelException($eventProphecy->reveal());
     }
 
@@ -62,7 +63,7 @@ class ExceptionListenerTest extends TestCase
         $eventProphecy->getRequest()->willReturn(new Request());
         $eventProphecy->setResponse(Argument::type(Response::class))->shouldNotBeCalled();
 
-        $listener = new ExceptionListener('foo:bar');
+        $listener = new ExceptionListener('foo:bar', null, false, class_exists(ErrorListener::class) ? $this->prophesize(ErrorListener::class)->reveal() : null);
         $listener->onKernelException($eventProphecy->reveal());
     }
 
@@ -75,7 +76,7 @@ class ExceptionListenerTest extends TestCase
         $eventProphecy->getRequest()->willReturn($request);
         $eventProphecy->setResponse(Argument::type(Response::class))->shouldNotBeCalled();
 
-        $listener = new ExceptionListener('foo:bar');
+        $listener = new ExceptionListener('foo:bar', null, false, class_exists(ErrorListener::class) ? $this->prophesize(ErrorListener::class)->reveal() : null);
         $listener->onKernelException($eventProphecy->reveal());
     }
 }
