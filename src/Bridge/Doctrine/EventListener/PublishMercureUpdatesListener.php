@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Bridge\Doctrine\Common\EventListener;
+namespace ApiPlatform\Core\Bridge\Doctrine\EventListener;
 
 use ApiPlatform\Core\Api\IriConverterInterface;
 use ApiPlatform\Core\Api\ResourceClassResolverInterface;
@@ -22,6 +22,8 @@ use ApiPlatform\Core\Exception\RuntimeException;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Util\ResourceClassInfoTrait;
 use Doctrine\Common\EventArgs;
+use Doctrine\ODM\MongoDB\Event\OnFlushEventArgs as MongoDbOdmOnFlushEventArgs;
+use Doctrine\ORM\Event\OnFlushEventArgs as OrmOnFlushEventArgs;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\Mercure\Update;
 use Symfony\Component\Messenger\MessageBusInterface;
@@ -34,7 +36,7 @@ use Symfony\Component\Serializer\SerializerInterface;
  *
  * @experimental
  */
-abstract class AbstractPublishMercureUpdatesListener
+final class PublishMercureUpdatesListener
 {
     use DispatchTrait;
     use ResourceClassInfoTrait;
@@ -71,7 +73,31 @@ abstract class AbstractPublishMercureUpdatesListener
     /**
      * Collects created, updated and deleted objects.
      */
-    abstract public function onFlush(EventArgs $eventArgs): void;
+    public function onFlush(EventArgs $eventArgs): void
+    {
+        if ($eventArgs instanceof OrmOnFlushEventArgs) {
+            $uow = $eventArgs->getEntityManager()->getUnitOfWork();
+        } elseif ($eventArgs instanceof MongoDbOdmOnFlushEventArgs) {
+            $uow = $eventArgs->getDocumentManager()->getUnitOfWork();
+        } else {
+            return;
+        }
+
+        $methodName = $eventArgs instanceof OrmOnFlushEventArgs ? 'getScheduledEntityInsertions' : 'getScheduledDocumentInsertions';
+        foreach ($uow->{$methodName}() as $object) {
+            $this->storeObjectToPublish($object, 'createdObjects');
+        }
+
+        $methodName = $eventArgs instanceof OrmOnFlushEventArgs ? 'getScheduledEntityUpdates' : 'getScheduledDocumentUpdates';
+        foreach ($uow->{$methodName}() as $object) {
+            $this->storeObjectToPublish($object, 'updatedObjects');
+        }
+
+        $methodName = $eventArgs instanceof OrmOnFlushEventArgs ? 'getScheduledEntityDeletions' : 'getScheduledDocumentDeletions';
+        foreach ($uow->{$methodName}() as $object) {
+            $this->storeObjectToPublish($object, 'deletedObjects');
+        }
+    }
 
     /**
      * Publishes updates for changes collected on flush, and resets the store.
@@ -95,10 +121,17 @@ abstract class AbstractPublishMercureUpdatesListener
         }
     }
 
+    private function reset(): void
+    {
+        $this->createdObjects = new \SplObjectStorage();
+        $this->updatedObjects = new \SplObjectStorage();
+        $this->deletedObjects = new \SplObjectStorage();
+    }
+
     /**
      * @param object $object
      */
-    protected function storeObjectToPublish($object, string $property): void
+    private function storeObjectToPublish($object, string $property): void
     {
         if (null === $resourceClass = $this->getResourceClass($object)) {
             return;
@@ -135,13 +168,6 @@ abstract class AbstractPublishMercureUpdatesListener
         }
 
         $this->{$property}[$object] = $value;
-    }
-
-    private function reset(): void
-    {
-        $this->createdObjects = new \SplObjectStorage();
-        $this->updatedObjects = new \SplObjectStorage();
-        $this->deletedObjects = new \SplObjectStorage();
     }
 
     /**
