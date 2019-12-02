@@ -38,23 +38,12 @@ final class DirectoryResourceMetadataFactory implements ResourceMetadataFactoryI
             } catch (ResourceClassNotFoundException $e) {
             }
         }
-        $resource['shortName'] = (new \ReflectionClass($resourceClass))->getShortName();
+        $resourceMetadata = $parentResourceMetadata ?: new ResourceMetadata();
 
-        return $this->update($parentResourceMetadata ?: new ResourceMetadata(), $resource);
-    }
-
-    /**
-     * Creates a new instance of metadata if the property is not already set.
-     */
-    private function update(ResourceMetadata $resourceMetadata, array $metadata): ResourceMetadata
-    {
-        foreach (['shortName'] as $property) {
-            if (null === $metadata[$property] || null !== $resourceMetadata->{'get'.ucfirst($property)}()) {
-                continue;
-            }
-            $resourceMetadata = $resourceMetadata->{'with'.ucfirst($property)}($metadata[$property]);
+        if (null !== $resourceMetadata->getShortname()) {
+            return $resourceMetadata;
         }
 
-        return $resourceMetadata;
+        return $resourceMetadata->withShortname((new \ReflectionClass($resourceClass))->getShortName());
     }
 }

@@ -39,6 +39,9 @@ class DirectoryResourceNameCollectionFactory implements ResourceNameCollectionFa
         }
 
         foreach (ReflectionClassRecursiveIterator::getReflectionClassesFromDirectories($this->paths) as $className => $reflectionClass) {
+            if (interface_exists($className)) {
+                continue;
+            }
             $classes[$className] = true;
         }
 

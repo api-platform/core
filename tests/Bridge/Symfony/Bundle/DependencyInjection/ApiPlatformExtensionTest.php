@@ -784,6 +784,20 @@ class ApiPlatformExtensionTest extends TestCase
         $this->extension->load($config, $containerBuilder);
     }
 
+    public function testEnableAutoMapping()
+    {
+        $config = self::DEFAULT_CONFIG;
+        $config['api_platform']['mapping']['auto_mapping'] = true;
+        $config['api_platform']['enable_swagger'] = true;
+        $config['api_platform']['enable_swagger_ui'] = true;
+        $config['api_platform']['formats'] = [
+            'jsonhal' => ['mime_types' => ['application/hal+json']],
+        ];
+        $containerBuilderProphecy = $this->getBaseContainerBuilderProphecy(['orm'], $config);
+        $containerBuilder = $containerBuilderProphecy->reveal();
+        $this->extension->load($config, $containerBuilder);
+    }
+
     public function testDisabledSwagger()
     {
         $config = self::DEFAULT_CONFIG;
