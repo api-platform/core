@@ -78,7 +78,7 @@ final class TypeFactory implements TypeFactoryInterface
             return ['type' => 'string', 'format' => 'date-time'];
         }
 
-        if (null !== $this->schemaFactory && true === $readableLink && null !== $schema) { // Skip if $baseSchema is null (filters only support basic types)
+        if (null !== $this->schemaFactory && null !== $schema) { // Skip if $baseSchema is null (filters only support basic types)
             $version = $schema->getVersion();
 
             $subSchema = new Schema($version);

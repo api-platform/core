@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\JsonSchema;
 
 use ApiPlatform\Core\Api\OperationType;
+use ApiPlatform\Core\Exception\ResourceClassNotFoundException;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
@@ -240,7 +241,12 @@ final class SchemaFactory implements SchemaFactoryInterface
 
     private function getMetadata(string $resourceClass, string $type = Schema::TYPE_OUTPUT, ?string $operationType, ?string $operationName, ?array $serializerContext): ?array
     {
-        $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
+        try {
+            $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
+        } catch (ResourceClassNotFoundException $e) {
+            $resourceMetadata = new ResourceMetadata((new \ReflectionClass($resourceClass))->getShortName());
+        }
+
         $attribute = Schema::TYPE_OUTPUT === $type ? 'output' : 'input';
         if (null === $operationType || null === $operationName) {
             $inputOrOutput = $resourceMetadata->getAttribute($attribute, ['class' => $resourceClass]);
