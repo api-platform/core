@@ -21,8 +21,8 @@
         "symfony/http-kernel": "^3.4 || ^4.0",
         "symfony/property-access": "^3.4 || ^4.0",
         "symfony/property-info": "^3.4 || ^4.0",
-        "symfony/serializer": "^4.2.6",
-        "symfony/web-link": "^4.1",
+        "symfony/serializer": "^3.4",
+        "symfony/web-link": "^3.4",
         "willdurand/negotiation": "^2.0.3"
     },
     "require-dev": {
