@@ -34,7 +34,7 @@ trait ResourceClassInfoTrait
     /**
      * @var ResourceMetadataFactoryInterface|null
      */
-    private $resourceMetadataFactory;
+    protected $resourceMetadataFactory;
 
     /**
      * Gets the resource class of the given object.

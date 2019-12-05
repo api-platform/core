@@ -20,6 +20,7 @@ use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyDtoInputOutput;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyTableInheritance;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyTableInheritanceChild;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RelatedDummy;
@@ -67,6 +68,7 @@ class SerializerPropertyMetadataFactoryTest extends TestCase
                 ],
             ]);
         $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn($dummyResourceMetadata);
+        $resourceMetadataFactoryProphecy->create(RelatedDummy::class)->willReturn(new ResourceMetadata());
 
         $serializerClassMetadataFactoryProphecy = $this->prophesize(SerializerClassMetadataFactoryInterface::class);
         $dummySerializerClassMetadata = new SerializerClassMetadata(Dummy::class);
@@ -157,5 +159,92 @@ class SerializerPropertyMetadataFactoryTest extends TestCase
         $actual = $serializerPropertyMetadataFactory->create(DummyTableInheritance::class, 'nickname');
 
         $this->assertEquals($actual->getChildInherited(), DummyTableInheritanceChild::class);
+    }
+
+    public function testCreateWithRelatedInputOutputDtos()
+    {
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
+        $dummyResourceMetadata = (new ResourceMetadata())
+            ->withAttributes([
+                'normalization_context' => [
+                    AbstractNormalizer::GROUPS => 'dummy_read',
+                ],
+                'denormalization_context' => [
+                    AbstractNormalizer::GROUPS => 'dummy_write',
+                ],
+            ]);
+        $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn($dummyResourceMetadata);
+        $relatedDummyResourceMetadata = (new ResourceMetadata())
+            ->withAttributes([
+                'input' => [
+                    'class' => DummyDtoInputOutput::class,
+                ],
+                'output' => [
+                    'class' => DummyDtoInputOutput::class,
+                ],
+            ]);
+        $resourceMetadataFactoryProphecy->create(RelatedDummy::class)->willReturn($relatedDummyResourceMetadata);
+
+        $serializerClassMetadataFactoryProphecy = $this->prophesize(SerializerClassMetadataFactoryInterface::class);
+        $dummySerializerClassMetadata = new SerializerClassMetadata(Dummy::class);
+        $fooSerializerAttributeMetadata = new SerializerAttributeMetadata('foo');
+        $fooSerializerAttributeMetadata->addGroup('dummy_read');
+        $fooSerializerAttributeMetadata->addGroup('dummy_write');
+        $dummySerializerClassMetadata->addAttributeMetadata($fooSerializerAttributeMetadata);
+        $relatedDummySerializerAttributeMetadata = new SerializerAttributeMetadata('relatedDummy');
+        $relatedDummySerializerAttributeMetadata->addGroup('dummy_read');
+        $relatedDummySerializerAttributeMetadata->addGroup('dummy_write');
+        $dummySerializerClassMetadata->addAttributeMetadata($relatedDummySerializerAttributeMetadata);
+        $nameConvertedSerializerAttributeMetadata = new SerializerAttributeMetadata('nameConverted');
+        $dummySerializerClassMetadata->addAttributeMetadata($nameConvertedSerializerAttributeMetadata);
+        $serializerClassMetadataFactoryProphecy->getMetadataFor(Dummy::class)->willReturn($dummySerializerClassMetadata);
+        $relatedDummySerializerClassMetadata = new SerializerClassMetadata(DummyDtoInputOutput::class);
+        $idSerializerAttributeMetadata = new SerializerAttributeMetadata('id');
+        $idSerializerAttributeMetadata->addGroup('dummy_read');
+        $idSerializerAttributeMetadata->addGroup('dummy_write');
+        $relatedDummySerializerClassMetadata->addAttributeMetadata($idSerializerAttributeMetadata);
+        $strSerializerAttributeMetadata = new SerializerAttributeMetadata('str');
+        $strSerializerAttributeMetadata->addGroup('dummy_read');
+        $strSerializerAttributeMetadata->addGroup('dummy_write');
+        $relatedDummySerializerClassMetadata->addAttributeMetadata($strSerializerAttributeMetadata);
+        $serializerClassMetadataFactoryProphecy->getMetadataFor(DummyDtoInputOutput::class)->willReturn($relatedDummySerializerClassMetadata);
+
+        $decoratedProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
+        $fooPropertyMetadata = (new PropertyMetadata())
+            ->withType(new Type(Type::BUILTIN_TYPE_ARRAY, true))
+            ->withReadable(false)
+            ->withWritable(true);
+        $decoratedProphecy->create(Dummy::class, 'foo', [])->willReturn($fooPropertyMetadata);
+        $relatedDummyPropertyMetadata = (new PropertyMetadata())
+            ->withType(new Type(Type::BUILTIN_TYPE_OBJECT, true, RelatedDummy::class));
+        $decoratedProphecy->create(Dummy::class, 'relatedDummy', [])->willReturn($relatedDummyPropertyMetadata);
+        $nameConvertedPropertyMetadata = (new PropertyMetadata())
+            ->withType(new Type(Type::BUILTIN_TYPE_STRING, true));
+        $decoratedProphecy->create(Dummy::class, 'nameConverted', [])->willReturn($nameConvertedPropertyMetadata);
+
+        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
+        $resourceClassResolverProphecy->isResourceClass(RelatedDummy::class)->willReturn(true);
+        $resourceClassResolverProphecy->getResourceClass(null, RelatedDummy::class)->willReturn(RelatedDummy::class);
+
+        $serializerPropertyMetadataFactory = new SerializerPropertyMetadataFactory($resourceMetadataFactoryProphecy->reveal(), $serializerClassMetadataFactoryProphecy->reveal(), $decoratedProphecy->reveal(), $resourceClassResolverProphecy->reveal());
+
+        $actual = [];
+        $actual[] = $serializerPropertyMetadataFactory->create(Dummy::class, 'foo');
+        $actual[] = $serializerPropertyMetadataFactory->create(Dummy::class, 'relatedDummy');
+        $actual[] = $serializerPropertyMetadataFactory->create(Dummy::class, 'nameConverted');
+
+        $this->assertInstanceOf(PropertyMetadata::class, $actual[0]);
+        $this->assertFalse($actual[0]->isReadable());
+        $this->assertTrue($actual[0]->isWritable());
+
+        $this->assertInstanceOf(PropertyMetadata::class, $actual[1]);
+        $this->assertTrue($actual[1]->isReadable());
+        $this->assertTrue($actual[1]->isWritable());
+        $this->assertTrue($actual[1]->isReadableLink());
+        $this->assertTrue($actual[1]->isWritableLink());
+
+        $this->assertInstanceOf(PropertyMetadata::class, $actual[2]);
+        $this->assertFalse($actual[2]->isReadable());
+        $this->assertFalse($actual[2]->isWritable());
     }
 }

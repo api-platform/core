@@ -40,7 +40,6 @@ final class PublishMercureUpdatesListener
     use ResourceClassInfoTrait;
 
     private $iriConverter;
-    private $resourceMetadataFactory;
     private $serializer;
     private $publisher;
     private $expressionLanguage;

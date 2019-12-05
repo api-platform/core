@@ -23,7 +23,7 @@ trait ToggleableOperationAttributeTrait
     /**
      * @var ResourceMetadataFactoryInterface|null
      */
-    private $resourceMetadataFactory;
+    protected $resourceMetadataFactory;
 
     private function isOperationAttributeDisabled(array $attributes, string $attribute, bool $default = false, bool $resourceFallback = true): bool
     {

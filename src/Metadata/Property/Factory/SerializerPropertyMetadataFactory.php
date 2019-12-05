@@ -17,6 +17,7 @@ use ApiPlatform\Core\Api\ResourceClassResolverInterface;
 use ApiPlatform\Core\Exception\ResourceClassNotFoundException;
 use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
+use ApiPlatform\Core\Serializer\InputOutputMetadataTrait;
 use ApiPlatform\Core\Util\ResourceClassInfoTrait;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface as SerializerClassMetadataFactoryInterface;
 
@@ -28,6 +29,7 @@ use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface a
  */
 final class SerializerPropertyMetadataFactory implements PropertyMetadataFactoryInterface
 {
+    use InputOutputMetadataTrait;
     use ResourceClassInfoTrait;
 
     private $serializerClassMetadataFactory;
@@ -124,13 +126,15 @@ final class SerializerPropertyMetadataFactory implements PropertyMetadataFactory
             $relatedClass = $this->resourceClassResolver->getResourceClass(null, $relatedClass);
         }
 
-        $relatedGroups = $this->getClassSerializerGroups($relatedClass);
-
         if (null === $propertyMetadata->isReadableLink()) {
+            $relatedGroups = $this->getClassSerializerGroups($this->getOutputClass($relatedClass) ?? $relatedClass);
+
             $propertyMetadata = $propertyMetadata->withReadableLink(null !== $normalizationGroups && !empty(array_intersect($normalizationGroups, $relatedGroups)));
         }
 
         if (null === $propertyMetadata->isWritableLink()) {
+            $relatedGroups = $this->getClassSerializerGroups($this->getInputClass($relatedClass) ?? $relatedClass);
+
             $propertyMetadata = $propertyMetadata->withWritableLink(null !== $denormalizationGroups && !empty(array_intersect($denormalizationGroups, $relatedGroups)));
         }
 
