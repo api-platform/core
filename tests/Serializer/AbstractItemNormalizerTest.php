@@ -1125,4 +1125,90 @@ class AbstractItemNormalizerTest extends TestCase
 
         $propertyAccessorProphecy->setValue($actualDummy, 'name', 'Dummy')->shouldHaveBeenCalled();
     }
+
+    public function testNormalizationWithUnreadableProperty()
+    {
+        $dummy = new Dummy();
+
+        $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
+        $propertyNameCollectionFactoryProphecy->create(Dummy::class, [])->willReturn(
+            new PropertyNameCollection(['unreadableProperty'])
+        )->shouldBeCalled();
+
+        $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
+        $propertyMetadataFactoryProphecy->create(Dummy::class, 'unreadableProperty', [])->willReturn(
+            new PropertyMetadata(new Type(Type::BUILTIN_TYPE_STRING), '', false)
+        )->shouldBeCalled();
+
+        $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
+        $iriConverterProphecy->getIriFromItem($dummy)->willReturn('/dummies/1')->shouldBeCalled();
+
+        $propertyAccessorProphecy = $this->prophesize(PropertyAccessorInterface::class);
+
+        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
+        $resourceClassResolverProphecy->getResourceClass($dummy, Dummy::class)->willReturn(Dummy::class)->shouldBeCalled();
+
+        $normalizer = $this->getMockForAbstractClass(AbstractItemNormalizer::class, [
+            $propertyNameCollectionFactoryProphecy->reveal(),
+            $propertyMetadataFactoryProphecy->reveal(),
+            $iriConverterProphecy->reveal(),
+            $resourceClassResolverProphecy->reveal(),
+            $propertyAccessorProphecy->reveal(),
+            null,
+            null,
+            null,
+            false,
+            [],
+            [],
+            null,
+            false,
+        ]);
+
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('Property "unreadableProperty" of class ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy is not readable.');
+
+        $normalizer->normalize($dummy, null, ['resource_class' => Dummy::class, 'resources' => []]);
+    }
+
+    public function testDenormalizationWithUnreadableProperty()
+    {
+        $data = [
+            'unwritableProperty' => 1,
+        ];
+
+        $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
+        $propertyNameCollectionFactoryProphecy->create(Dummy::class, [])->willReturn(new PropertyNameCollection(['unwritableProperty']));
+
+        $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
+        $propertyMetadataFactoryProphecy->create(Dummy::class, 'unwritableProperty', [])->willReturn(
+            new PropertyMetadata(new Type(Type::BUILTIN_TYPE_STRING), '', true, false)
+        )->shouldBeCalled();
+
+        $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
+        $propertyAccessorProphecy = $this->prophesize(PropertyAccessorInterface::class);
+
+        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
+        $resourceClassResolverProphecy->getResourceClass(null, Dummy::class)->willReturn(Dummy::class);
+
+        $normalizer = $this->getMockForAbstractClass(AbstractItemNormalizer::class, [
+            $propertyNameCollectionFactoryProphecy->reveal(),
+            $propertyMetadataFactoryProphecy->reveal(),
+            $iriConverterProphecy->reveal(),
+            $resourceClassResolverProphecy->reveal(),
+            $propertyAccessorProphecy->reveal(),
+            null,
+            null,
+            null,
+            false,
+            [],
+            [],
+            null,
+            false,
+        ]);
+
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('Property "unwritableProperty" of class ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy is not writable.');
+
+        $normalizer->denormalize($data, Dummy::class, 'jsonld');
+    }
 }

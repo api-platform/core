@@ -325,13 +325,29 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
         foreach ($propertyNames as $propertyName) {
             $propertyMetadata = $this->propertyMetadataFactory->create($context['resource_class'], $propertyName, $options);
 
-            if (
-                $this->isAllowedAttribute($classOrObject, $propertyName, null, $context) &&
-                (
-                    isset($context['api_normalize']) && $propertyMetadata->isReadable() ||
-                    isset($context['api_denormalize']) && ($propertyMetadata->isWritable() || !\is_object($classOrObject) && $propertyMetadata->isInitializable())
-                )
-            ) {
+            if (!$this->isAllowedAttribute($classOrObject, $propertyName, null, $context)) {
+                continue;
+            }
+
+            if (isset($context['api_normalize'])) {
+                if (!$propertyMetadata->isReadable()) {
+                    $class = \is_object($classOrObject) ? get_class($classOrObject) : $classOrObject;
+
+                    throw new \LogicException("Property \"{$propertyName}\" of class {$class} is not readable.");
+                }
+
+                $allowedAttributes[] = $propertyName;
+
+                continue;
+            }
+
+            if (isset($context['api_denormalize'])) {
+                if (!$propertyMetadata->isWritable() && (\is_object($classOrObject) || !$propertyMetadata->isInitializable())) {
+                    $class = \is_object($classOrObject) ? get_class($classOrObject) : $classOrObject;
+
+                    throw new \LogicException("Property \"{$propertyName}\" of class {$class} is not writable.");
+                }
+
                 $allowedAttributes[] = $propertyName;
             }
         }
