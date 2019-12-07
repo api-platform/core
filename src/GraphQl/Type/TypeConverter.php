@@ -61,6 +61,12 @@ final class TypeConverter implements TypeConverterInterface
             case Type::BUILTIN_TYPE_STRING:
                 return GraphQLType::string();
             case Type::BUILTIN_TYPE_ARRAY:
+                if ($type->getCollectionValueType() &&
+                    (null !== $collectionValue = $type->getCollectionValueType()) &&
+                    (Type::BUILTIN_TYPE_OBJECT === $collectionValue->getBuiltinType())
+                ) {
+                    return $this->getResourceType($collectionValue, $input, $queryName, $mutationName, $depth);
+                }
             case Type::BUILTIN_TYPE_ITERABLE:
                 return 'Iterable';
             case Type::BUILTIN_TYPE_OBJECT:
@@ -105,7 +111,7 @@ final class TypeConverter implements TypeConverterInterface
 
         try {
             $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
-            if ([] === ($resourceMetadata->getGraphql() ?? [])) {
+            if (!\array_key_exists($queryName ?? $mutationName, $resourceMetadata->getGraphql() ?? [])) {
                 return null;
             }
         } catch (ResourceClassNotFoundException $e) {

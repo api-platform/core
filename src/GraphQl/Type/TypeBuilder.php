@@ -203,7 +203,14 @@ final class TypeBuilder implements TypeBuilderInterface
      */
     public function isCollection(Type $type): bool
     {
-        return $type->isCollection() && Type::BUILTIN_TYPE_OBJECT === $type->getBuiltinType();
+        return ($type->isCollection() && Type::BUILTIN_TYPE_OBJECT === $type->getBuiltinType()) || $this->isArrayOfObjects($type);
+    }
+
+    private function isArrayOfObjects(Type $type): bool
+    {
+        return Type::BUILTIN_TYPE_ARRAY === $type->getBuiltinType() &&
+            (null !== $collectionValue = $type->getCollectionValueType()) &&
+            Type::BUILTIN_TYPE_OBJECT === $collectionValue->getBuiltinType();
     }
 
     private function buildResourceObjectType(?string $resourceClass, string $shortName, ResourceMetadata $resourceMetadata, bool $input, ?string $queryName, ?string $mutationName, bool $wrapped, int $depth)
@@ -215,7 +222,7 @@ final class TypeBuilder implements TypeBuilderInterface
 
         $wrapData = !$wrapped && null !== $mutationName && !$input && $depth < 1;
         $interfaceTypes = ($interfaces = $resourceMetadata->getImplements())
-            ? $this->getInterfaceTypes($interfaces, $queryName === 'collection_query')
+            ? $this->getInterfaceTypes($interfaces)
             : [];
 
         $configuration = [
@@ -326,7 +333,7 @@ final class TypeBuilder implements TypeBuilderInterface
         return $resourceInterface;
     }
 
-    private function getInterfaceTypes(array $resources, bool $isCollection): array
+    private function getInterfaceTypes(array $resources): array
     {
         $interfaceTypes = [];
         foreach ($resources as $resourceClass) {
