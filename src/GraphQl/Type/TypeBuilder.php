@@ -72,7 +72,7 @@ final class TypeBuilder implements TypeBuilderInterface
             $shortName .= self::INTERFACE_POSTFIX;
         }
 
-        if (('item_query' === $queryName || 'collection_query' === $queryName)
+        if (!$resourceMetadata->isInterface() && ('item_query' === $queryName || 'collection_query' === $queryName)
             && $resourceMetadata->getGraphqlAttribute('item_query', 'normalization_context', [], true) !== $resourceMetadata->getGraphqlAttribute('collection_query', 'normalization_context', [], true)) {
             if ('item_query' === $queryName) {
                 $shortName .= self::ITEM_POSTFIX;
@@ -213,8 +213,8 @@ final class TypeBuilder implements TypeBuilderInterface
         }
 
         $wrapData = !$wrapped && null !== $mutationName && !$input && $depth < 1;
-        $interfaces = ($interface = $resourceMetadata->getImplements())
-            ? $this->getInterfaceTypes($interface)
+        $interfaceTypes = ($interfaces = $resourceMetadata->getImplements())
+            ? $this->getInterfaceTypes($interfaces, $queryName === 'collection_query')
             : [];
 
         $configuration = [
@@ -247,7 +247,7 @@ final class TypeBuilder implements TypeBuilderInterface
 
                 return $fields;
             },
-            'interfaces' => $wrapData ? [] : \array_merge([$this->getNodeInterface()], $interfaces),
+            'interfaces' => $wrapData ? [] : \array_merge([$this->getNodeInterface()], $interfaceTypes),
         ];
 
         return $input ? GraphQLType::nonNull(new InputObjectType($configuration)) : new ObjectType($configuration);
@@ -292,10 +292,13 @@ final class TypeBuilder implements TypeBuilderInterface
                     throw new \UnexpectedValueException('Resource class was not passed. Interface type can not be used.');
                 }
 
-                $shortName = (new \ReflectionClass($value[ItemNormalizer::ITEM_RESOURCE_CLASS_KEY]))->getShortName().'Item';
+                $shortName = (new \ReflectionClass($value[ItemNormalizer::ITEM_RESOURCE_CLASS_KEY]))->getShortName();
 
                 if (!$this->typesContainer->has($shortName)) {
-                    throw new \UnexpectedValueException("Type with name $shortName can not be found");
+                    $shortName .= self::ITEM_POSTFIX;
+                    if (!$this->typesContainer->has($shortName)) {
+                        throw new \UnexpectedValueException("Type with name $shortName can not be found");
+                    }
                 }
 
                 $type = $this->typesContainer->get($shortName);
@@ -322,9 +325,9 @@ final class TypeBuilder implements TypeBuilderInterface
         return $resourceInterface;
     }
 
-    private function getInterfaceTypes(array $resources): array
+    private function getInterfaceTypes(array $resources, bool $isCollection): array
     {
-        $types = [];
+        $interfaceTypes = [];
         foreach ($resources as $resourceClass) {
             try {
                 $reflection = new \ReflectionClass($resourceClass);
@@ -332,13 +335,10 @@ final class TypeBuilder implements TypeBuilderInterface
                 throw new \UnexpectedValueException("Class $resourceClass can't be found.");
             }
 
-            $itemTypeName = $reflection->getShortName().self::INTERFACE_POSTFIX;
-            $types[] = isset($this->graphqlTypes[$itemTypeName]) ? [$this->graphqlTypes[$itemTypeName]] : [];
-
-            $collectionTypeName = $reflection->getShortName().self::INTERFACE_POSTFIX.self::COLLECTION_POSTFIX;
-            $types[] = isset($this->graphqlTypes[$collectionTypeName]) ? [$this->graphqlTypes[$collectionTypeName]] : [];
+            $typeName = $reflection->getShortName().self::INTERFACE_POSTFIX;
+            $interfaceTypes[] = $this->typesContainer->has($typeName) ? [$this->typesContainer->get($typeName)] : [];
         }
 
-        return \array_merge(...$types);
+        return \array_merge(...$interfaceTypes);
     }
 }
