@@ -203,14 +203,7 @@ final class TypeBuilder implements TypeBuilderInterface
      */
     public function isCollection(Type $type): bool
     {
-        return ($type->isCollection() && Type::BUILTIN_TYPE_OBJECT === $type->getBuiltinType()) || $this->isArrayOfObjects($type);
-    }
-
-    private function isArrayOfObjects(Type $type): bool
-    {
-        return Type::BUILTIN_TYPE_ARRAY === $type->getBuiltinType() &&
-            (null !== $collectionValue = $type->getCollectionValueType()) &&
-            Type::BUILTIN_TYPE_OBJECT === $collectionValue->getBuiltinType();
+        return $type->isCollection() && Type::BUILTIN_TYPE_OBJECT === $type->getBuiltinType();
     }
 
     private function buildResourceObjectType(?string $resourceClass, string $shortName, ResourceMetadata $resourceMetadata, bool $input, ?string $queryName, ?string $mutationName, bool $wrapped, int $depth)
