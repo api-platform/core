@@ -19,7 +19,7 @@ use ApiPlatform\Core\Security\ResourceAccessChecker;
 use ApiPlatform\Core\Security\ResourceAccessCheckerInterface;
 use ApiPlatform\Core\Util\RequestAttributesExtractor;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolverInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
@@ -53,18 +53,18 @@ final class DenyAccessListener
         @trigger_error(sprintf('Passing an instance of "%s" or null as second argument of "%s" is deprecated since API Platform 2.2 and will not be possible anymore in API Platform 3. Pass an instance of "%s" and no extra argument instead.', ExpressionLanguage::class, self::class, ResourceAccessCheckerInterface::class), E_USER_DEPRECATED);
     }
 
-    public function onKernelRequest(GetResponseEvent $event): void
+    public function onKernelRequest(RequestEvent $event): void
     {
         @trigger_error(sprintf('Method "%1$s::onKernelRequest" is deprecated since API Platform 2.4 and will not be available anymore in API Platform 3. Prefer calling "%1$s::onSecurity" instead.', self::class), E_USER_DEPRECATED);
         $this->onSecurityPostDenormalize($event);
     }
 
-    public function onSecurity(GetResponseEvent $event): void
+    public function onSecurity(RequestEvent $event): void
     {
         $this->checkSecurity($event->getRequest(), 'security', false);
     }
 
-    public function onSecurityPostDenormalize(GetResponseEvent $event): void
+    public function onSecurityPostDenormalize(RequestEvent $event): void
     {
         $request = $event->getRequest();
         $this->checkSecurity($request, 'security_post_denormalize', true, [

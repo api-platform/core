@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\DataProvider;
 
 use ApiPlatform\Core\Exception\InvalidArgumentException;
+use ApiPlatform\Core\Exception\ResourceClassNotFoundException;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 
 /**
@@ -24,9 +25,10 @@ use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 final class Pagination
 {
     private $options;
+    private $graphQlOptions;
     private $resourceMetadataFactory;
 
-    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, array $options = [])
+    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, array $options = [], array $graphQlOptions = [])
     {
         $this->resourceMetadataFactory = $resourceMetadataFactory;
         $this->options = array_merge([
@@ -43,6 +45,9 @@ final class Pagination
             'client_partial' => false,
             'partial_parameter_name' => 'partial',
         ], $options);
+        $this->graphQlOptions = array_merge([
+            'enabled' => true,
+        ], $graphQlOptions);
     }
 
     /**
@@ -122,11 +127,15 @@ final class Pagination
 
         if ($clientLimit) {
             $limit = (int) $this->getParameterFromContext($context, $this->options['items_per_page_parameter_name'], $limit);
-            $maxItemsPerPage = $this->options['maximum_items_per_page'];
+            $maxItemsPerPage = null;
 
             if (null !== $resourceClass) {
                 $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
-                $maxItemsPerPage = $resourceMetadata->getCollectionOperationAttribute($operationName, 'maximum_items_per_page', $maxItemsPerPage, true);
+                $maxItemsPerPage = $resourceMetadata->getCollectionOperationAttribute($operationName, 'maximum_items_per_page', null, true);
+                if (null !== $maxItemsPerPage) {
+                    @trigger_error('The "maximum_items_per_page" option has been deprecated since API Platform 2.5 in favor of "pagination_maximum_items_per_page" and will be removed in API Platform 3.', E_USER_DEPRECATED);
+                }
+                $maxItemsPerPage = $resourceMetadata->getCollectionOperationAttribute($operationName, 'pagination_maximum_items_per_page', $maxItemsPerPage ?? $this->options['maximum_items_per_page'], true);
             }
 
             if (null !== $maxItemsPerPage && $limit > $maxItemsPerPage) {
@@ -172,11 +181,31 @@ final class Pagination
     }
 
     /**
+     * Is the pagination enabled for GraphQL?
+     */
+    public function isGraphQlEnabled(?string $resourceClass = null, ?string $operationName = null, array $context = []): bool
+    {
+        return $this->getGraphQlEnabled($resourceClass, $operationName);
+    }
+
+    /**
      * Is the partial pagination enabled?
      */
     public function isPartialEnabled(string $resourceClass = null, string $operationName = null, array $context = []): bool
     {
         return $this->getEnabled($context, $resourceClass, $operationName, true);
+    }
+
+    public function getOptions(): array
+    {
+        return $this->options;
+    }
+
+    public function getGraphQlPaginationType(string $resourceClass, string $operationName): string
+    {
+        $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
+
+        return (string) $resourceMetadata->getGraphqlAttribute($operationName, 'paginationType', 'cursor', true);
     }
 
     /**
@@ -196,6 +225,23 @@ final class Pagination
 
         if ($clientEnabled) {
             return filter_var($this->getParameterFromContext($context, $this->options[$partial ? 'partial_parameter_name' : 'enabled_parameter_name'], $enabled), FILTER_VALIDATE_BOOLEAN);
+        }
+
+        return (bool) $enabled;
+    }
+
+    private function getGraphQlEnabled(?string $resourceClass, ?string $operationName): bool
+    {
+        $enabled = $this->graphQlOptions['enabled'];
+
+        if (null !== $resourceClass) {
+            try {
+                $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
+            } catch (ResourceClassNotFoundException $e) {
+                return $enabled;
+            }
+
+            return (bool) $resourceMetadata->getGraphqlAttribute($operationName, 'pagination_enabled', $enabled, true);
         }
 
         return $enabled;

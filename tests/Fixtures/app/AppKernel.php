@@ -27,9 +27,10 @@ use Symfony\Bundle\TwigBundle\TwigBundle;
 use Symfony\Bundle\WebProfilerBundle\WebProfilerBundle;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\ErrorHandler\ErrorRenderer\ErrorRendererInterface;
 use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\Routing\RouteCollectionBuilder;
-use Symfony\Component\Security\Core\Encoder\SodiumPasswordEncoder;
+use Symfony\Component\Security\Core\Encoder\NativePasswordEncoder;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
@@ -84,7 +85,7 @@ class AppKernel extends Kernel
 
     protected function configureRoutes(RouteCollectionBuilder $routes)
     {
-        $routes->import("config/routing_{$this->getEnvironment()}.yml");
+        $routes->import(__DIR__."/config/routing_{$this->getEnvironment()}.yml");
 
         if ($_SERVER['LEGACY'] ?? true) {
             $routes->import('@NelmioApiDocBundle/Resources/config/routing.yml', '/nelmioapidoc');
@@ -97,7 +98,7 @@ class AppKernel extends Kernel
 
         $loader->load(__DIR__."/config/config_{$this->getEnvironment()}.yml");
 
-        $alg = class_exists(SodiumPasswordEncoder::class) && SodiumPasswordEncoder::isSupported() ? 'auto' : 'bcrypt';
+        $alg = class_exists(NativePasswordEncoder::class) ? 'auto' : 'bcrypt';
         $securityConfig = [
             'encoders' => [
                 User::class => $alg,
@@ -130,6 +131,7 @@ class AppKernel extends Kernel
                     'provider' => 'chain_provider',
                     'http_basic' => null,
                     'anonymous' => null,
+                    'stateless' => true,
                 ],
             ],
             'access_control' => [
@@ -137,10 +139,10 @@ class AppKernel extends Kernel
             ],
         ];
 
-        $c->loadFromExtension('security', $securityConfig);
+        $c->prependExtensionConfig('security', $securityConfig);
 
         if (class_exists(DoctrineMongoDBBundle::class)) {
-            $c->loadFromExtension('doctrine_mongodb', [
+            $c->prependExtensionConfig('doctrine_mongodb', [
                 'connections' => [
                     'default' => null,
                 ],
@@ -152,8 +154,14 @@ class AppKernel extends Kernel
             ]);
         }
 
+        $twigConfig = ['strict_variables' => '%kernel.debug%'];
+        if (interface_exists(ErrorRendererInterface::class)) {
+            $twigConfig['exception_controller'] = null;
+        }
+        $c->prependExtensionConfig('twig', $twigConfig);
+
         if ($_SERVER['LEGACY'] ?? true) {
-            $c->loadFromExtension('nelmio_api_doc', [
+            $c->prependExtensionConfig('nelmio_api_doc', [
                 'sandbox' => [
                     'accept_type' => 'application/json',
                     'body_format' => [
@@ -165,7 +173,7 @@ class AppKernel extends Kernel
                     ],
                 ],
             ]);
-            $c->loadFromExtension('api_platform', ['enable_nelmio_api_doc' => true]);
+            $c->prependExtensionConfig('api_platform', ['enable_nelmio_api_doc' => true]);
         }
     }
 }

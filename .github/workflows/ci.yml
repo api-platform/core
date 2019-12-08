@@ -1,0 +1,1744 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+env:
+  COMPOSER_ALLOW_SUPERUSER: '1' # https://getcomposer.org/doc/03-cli.md#composer-allow-superuser
+  COMPOSER_INSTALLER_COMMIT: fb22b78362d31c0d2bf516d1f8cdfd2745caa431
+  COVERAGE: '0'
+  EXT_MONGODB_VERSION: '1.6.0'
+  EXT_PCOV_VERSION: '1.0.6'
+  LEGACY: '0'
+
+jobs:
+  phpunit:
+    name: PHPUnit (PHP ${{ matrix.php }})
+    runs-on: ubuntu-latest
+    container:
+      image: php:${{ matrix.php }}-alpine
+      options: >-
+        --tmpfs /tmp:exec
+        --tmpfs /var/tmp:exec
+    strategy:
+      matrix:
+        php:
+          - '7.1'
+          - '7.2'
+          - '7.3'
+          - '7.4-rc'
+        include:
+          - php: '7.3'
+            coverage: true
+      fail-fast: false
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v1
+      - name: Install system packages
+        run: |
+          apk add \
+            unzip \
+      - name: Cache mongodb PHP extension build
+        if: (!startsWith(matrix.php, '7.1'))
+        uses: actions/cache@v1
+        with:
+          path: /var/tmp/build/ext-mongodb-${{ env.EXT_MONGODB_VERSION }}
+          key: ext-mongodb-${{ env.EXT_MONGODB_VERSION }}-php${{ matrix.php }}-${{ github.sha }}
+          restore-keys: |
+            ext-mongodb-${{ env.EXT_MONGODB_VERSION }}-php${{ matrix.php }}-
+      - name: Install mongodb PHP extension
+        if: (!startsWith(matrix.php, '7.1'))
+        env:
+          BUILD_DIR: /var/tmp/build/ext-mongodb-${{ env.EXT_MONGODB_VERSION }}
+          SRC_DIR: /usr/src/php/ext/mongodb
+        run: |
+          apk add \
+            $PHPIZE_DEPS
+          mkdir -p "$SRC_DIR" "$BUILD_DIR"
+          cd "$SRC_DIR"
+          curl -fsSL "https://pecl.php.net/get/mongodb-$EXT_MONGODB_VERSION.tgz" | tar -zx --strip-components 1
+          phpize
+          cd "$BUILD_DIR"
+          "$SRC_DIR"/configure --config-cache
+          make -j"$(nproc)"
+          make -j"$(nproc)" install
+          docker-php-ext-enable mongodb
+      - name: Install pcov PHP extension
+        if: matrix.coverage
+        env:
+          BUILD_DIR: /var/tmp/build/ext-pcov-${{ env.EXT_PCOV_VERSION }}
+          SRC_DIR: /usr/src/php/ext/pcov
+        run: |
+          apk add \
+            $PHPIZE_DEPS
+          mkdir -p "$SRC_DIR" "$BUILD_DIR"
+          cd "$SRC_DIR"
+          curl -fsSL "https://pecl.php.net/get/pcov-$EXT_PCOV_VERSION.tgz" | tar -zx --strip-components 1
+          phpize
+          cd "$BUILD_DIR"
+          "$SRC_DIR"/configure --config-cache
+          make -j"$(nproc)"
+          make -j"$(nproc)" install
+          docker-php-ext-enable pcov
+      - name: Disable PHP memory limit
+        run: echo 'memory_limit=-1' >> /usr/local/etc/php/php.ini
+      - name: Install Composer
+        run: wget -qO - https://raw.githubusercontent.com/composer/getcomposer.org/$COMPOSER_INSTALLER_COMMIT/web/installer | php -- --install-dir=/usr/local/bin --filename=composer --quiet
+      - name: Cache Composer packages
+        uses: actions/cache@v1
+        with:
+          path: ~/.composer/cache
+          key: composer-php${{ matrix.php }}-${{ github.sha }}
+          restore-keys: |
+            composer-php${{ matrix.php }}-
+            composer-
+      - name: Install Symfony Flex
+        run: |
+          composer global require --prefer-dist --no-progress --no-suggest --ansi \
+            symfony/flex
+      - name: Remove Doctrine MongoDB ODM
+        if: startsWith(matrix.php, '7.1')
+        run: |
+          composer remove --dev --no-progress --no-update --ansi \
+            doctrine/mongodb-odm \
+            doctrine/mongodb-odm-bundle \
+      - name: Update project dependencies
+        run: |
+          mkdir -p /tmp/api-platform/core/vendor
+          ln -s /tmp/api-platform/core/vendor vendor
+          composer update --no-progress --no-suggest --ansi
+      - name: Clear test app cache
+        run: |
+          mkdir -p /tmp/api-platform/core/var
+          ln -s /tmp/api-platform/core/var tests/Fixtures/app/var
+          tests/Fixtures/app/console cache:clear --ansi
+      - name: Enable code coverage
+        if: matrix.coverage
+        run: echo '::set-env name=COVERAGE::1'
+      - name: Run PHPUnit tests
+        run: |
+          mkdir -p build/logs/phpunit
+          if [ "$COVERAGE" = '1' ]; then
+            vendor/bin/phpunit --coverage-clover build/logs/phpunit/clover.xml --log-junit build/logs/phpunit/junit.xml --colors=always
+          else
+            vendor/bin/phpunit --log-junit build/logs/phpunit/junit.xml --colors=always
+          fi
+      - name: Upload test artifacts
+        if: always()
+        uses: actions/upload-artifact@v1
+        with:
+          name: phpunit-logs-php${{ matrix.php }}
+          path: build/logs/phpunit
+      - name: Upload coverage results to Codecov
+        if: matrix.coverage
+        uses: codecov/codecov-action@v1.0.3
+        with:
+          name: phpunit-php${{ matrix.php }}
+          flags: phpunit
+          token: ${{ secrets.CODECOV_TOKEN }}
+      - name: Upload coverage results to Coveralls
+        if: matrix.coverage
+        env:
+          COVERALLS_REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          composer global require --prefer-dist --no-progress --no-suggest --ansi cedx/coveralls
+          export PATH="$PATH:$HOME/.composer/vendor/bin"
+          coveralls build/logs/phpunit/clover.xml
+
+  behat:
+    name: Behat (PHP ${{ matrix.php }})
+    runs-on: ubuntu-latest
+    container:
+      image: php:${{ matrix.php }}-alpine
+      options: >-
+        --tmpfs /tmp:exec
+        --tmpfs /var/tmp:exec
+    strategy:
+      matrix:
+        php:
+          - '7.1'
+          - '7.2'
+          - '7.3'
+          - '7.4-rc'
+        include:
+          - php: '7.3'
+            coverage: true
+      fail-fast: false
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v1
+      - name: Install system packages
+        run: |
+          apk add \
+            unzip \
+      - name: Cache mongodb PHP extension build
+        if: (!startsWith(matrix.php, '7.1'))
+        uses: actions/cache@v1
+        with:
+          path: /var/tmp/build/ext-mongodb-${{ env.EXT_MONGODB_VERSION }}
+          key: ext-mongodb-${{ env.EXT_MONGODB_VERSION }}-php${{ matrix.php }}-${{ github.sha }}
+          restore-keys: |
+            ext-mongodb-${{ env.EXT_MONGODB_VERSION }}-php${{ matrix.php }}-
+      - name: Install mongodb PHP extension
+        if: (!startsWith(matrix.php, '7.1'))
+        env:
+          BUILD_DIR: /var/tmp/build/ext-mongodb-${{ env.EXT_MONGODB_VERSION }}
+          SRC_DIR: /usr/src/php/ext/mongodb
+        run: |
+          apk add \
+            $PHPIZE_DEPS
+          mkdir -p "$SRC_DIR" "$BUILD_DIR"
+          cd "$SRC_DIR"
+          curl -fsSL "https://pecl.php.net/get/mongodb-$EXT_MONGODB_VERSION.tgz" | tar -zx --strip-components 1
+          phpize
+          cd "$BUILD_DIR"
+          "$SRC_DIR"/configure --config-cache
+          make -j"$(nproc)"
+          make -j"$(nproc)" install
+          docker-php-ext-enable mongodb
+      - name: Install pcov PHP extension
+        if: matrix.coverage
+        env:
+          BUILD_DIR: /var/tmp/build/ext-pcov-${{ env.EXT_PCOV_VERSION }}
+          SRC_DIR: /usr/src/php/ext/pcov
+        run: |
+          apk add \
+            $PHPIZE_DEPS
+          mkdir -p "$SRC_DIR" "$BUILD_DIR"
+          cd "$SRC_DIR"
+          curl -fsSL "https://pecl.php.net/get/pcov-$EXT_PCOV_VERSION.tgz" | tar -zx --strip-components 1
+          phpize
+          cd "$BUILD_DIR"
+          "$SRC_DIR"/configure --config-cache
+          make -j"$(nproc)"
+          make -j"$(nproc)" install
+          docker-php-ext-enable pcov
+      - name: Disable PHP memory limit
+        run: echo 'memory_limit=-1' >> /usr/local/etc/php/php.ini
+      - name: Install Composer
+        run: wget -qO - https://raw.githubusercontent.com/composer/getcomposer.org/$COMPOSER_INSTALLER_COMMIT/web/installer | php -- --install-dir=/usr/local/bin --filename=composer --quiet
+      - name: Cache Composer packages
+        uses: actions/cache@v1
+        with:
+          path: ~/.composer/cache
+          key: composer-php${{ matrix.php }}-${{ github.sha }}
+          restore-keys: |
+            composer-php${{ matrix.php }}-
+            composer-
+      - name: Install Symfony Flex
+        run: |
+          composer global require --prefer-dist --no-progress --no-suggest --ansi \
+            symfony/flex
+      - name: Remove Doctrine MongoDB ODM
+        if: startsWith(matrix.php, '7.1')
+        run: |
+          composer remove --dev --no-progress --no-update --ansi \
+            doctrine/mongodb-odm \
+            doctrine/mongodb-odm-bundle \
+      - name: Update project dependencies
+        run: |
+          mkdir -p /tmp/api-platform/core/vendor
+          ln -s /tmp/api-platform/core/vendor vendor
+          composer update --no-progress --no-suggest --ansi
+      - name: Enable legacy integrations
+        if: startsWith(matrix.php, '7.1') || startsWith(matrix.php, '7.2') || startsWith(matrix.php, '7.3')
+        run: echo '::set-env name=LEGACY::1'
+      - name: Clear test app cache
+        run: |
+          mkdir -p /tmp/api-platform/core/var
+          ln -s /tmp/api-platform/core/var tests/Fixtures/app/var
+          tests/Fixtures/app/console cache:clear --ansi
+      - name: Enable code coverage
+        if: matrix.coverage
+        run: echo '::set-env name=COVERAGE::1'
+      - name: Run Behat tests
+        run: |
+          mkdir -p build/logs/behat
+          if [ "$COVERAGE" = '1' ]; then
+            vendor/bin/behat --format=progress --out=std --format=junit --out=build/logs/behat/junit --profile="$(if [ "$LEGACY" = '1' ]; then echo 'default-legacy-coverage'; else echo 'default-coverage'; fi)" --no-interaction --colors
+          else
+            vendor/bin/behat --format=progress --out=std --format=junit --out=build/logs/behat/junit --profile="$(if [ "$LEGACY" = '1' ]; then echo 'default-legacy'; else echo 'default'; fi)" --no-interaction --colors
+          fi
+      - name: Merge code coverage reports
+        if: matrix.coverage
+        run: |
+          wget -qO /usr/local/bin/phpcov https://phar.phpunit.de/phpcov.phar
+          chmod +x /usr/local/bin/phpcov
+          phpcov merge --clover build/logs/behat/clover.xml build/coverage
+      - name: Upload test artifacts
+        if: always()
+        uses: actions/upload-artifact@v1
+        with:
+          name: behat-logs-php${{ matrix.php }}
+          path: build/logs/behat
+      - name: Upload coverage results to Codecov
+        if: matrix.coverage
+        uses: codecov/codecov-action@v1.0.3
+        with:
+          name: behat-php${{ matrix.php }}
+          flags: behat
+          token: ${{ secrets.CODECOV_TOKEN }}
+      - name: Upload coverage results to Coveralls
+        if: matrix.coverage
+        env:
+          COVERALLS_REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          composer global require --prefer-dist --no-progress --no-suggest --ansi cedx/coveralls
+          export PATH="$PATH:$HOME/.composer/vendor/bin"
+          coveralls build/logs/behat/clover.xml
+
+  phpunit-lowest-deps:
+    name: PHPUnit (PHP ${{ matrix.php }}) (lowest dependencies)
+    runs-on: ubuntu-latest
+    container:
+      image: php:${{ matrix.php }}-alpine
+      options: >-
+        --tmpfs /tmp:exec
+        --tmpfs /var/tmp:exec
+    strategy:
+      matrix:
+        php:
+          - '7.3'
+          - '7.4-rc'
+      fail-fast: false
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v1
+      - name: Install system packages
+        run: |
+          apk add \
+            unzip \
+      - name: Cache mongodb PHP extension build
+        uses: actions/cache@v1
+        with:
+          path: /var/tmp/build/ext-mongodb-${{ env.EXT_MONGODB_VERSION }}
+          key: ext-mongodb-${{ env.EXT_MONGODB_VERSION }}-php${{ matrix.php }}-${{ github.sha }}
+          restore-keys: |
+            ext-mongodb-${{ env.EXT_MONGODB_VERSION }}-php${{ matrix.php }}-
+      - name: Install mongodb PHP extension
+        env:
+          BUILD_DIR: /var/tmp/build/ext-mongodb-${{ env.EXT_MONGODB_VERSION }}
+          SRC_DIR: /usr/src/php/ext/mongodb
+        run: |
+          apk add \
+            $PHPIZE_DEPS
+          mkdir -p "$SRC_DIR" "$BUILD_DIR"
+          cd "$SRC_DIR"
+          curl -fsSL "https://pecl.php.net/get/mongodb-$EXT_MONGODB_VERSION.tgz" | tar -zx --strip-components 1
+          phpize
+          cd "$BUILD_DIR"
+          "$SRC_DIR"/configure --config-cache
+          make -j"$(nproc)"
+          make -j"$(nproc)" install
+          docker-php-ext-enable mongodb
+      - name: Disable PHP memory limit
+        run: echo 'memory_limit=-1' >> /usr/local/etc/php/php.ini
+      - name: Install Composer
+        run: wget -qO - https://raw.githubusercontent.com/composer/getcomposer.org/$COMPOSER_INSTALLER_COMMIT/web/installer | php -- --install-dir=/usr/local/bin --filename=composer --quiet
+      - name: Cache Composer packages
+        uses: actions/cache@v1
+        with:
+          path: ~/.composer/cache
+          key: composer-php${{ matrix.php }}-lowest-deps-${{ github.sha }}
+          restore-keys: |
+            composer-php${{ matrix.php }}-lowest-deps-
+            composer-php${{ matrix.php }}-
+            composer-
+      - name: Install Symfony Flex
+        run: |
+          composer global require --prefer-dist --no-progress --no-suggest --ansi \
+            symfony/flex
+      - name: Update project dependencies
+        run: |
+          mkdir -p /tmp/api-platform/core/vendor
+          ln -s /tmp/api-platform/core/vendor vendor
+          composer update --no-progress --no-suggest --prefer-stable --prefer-lowest --ansi
+      - name: Clear test app cache
+        run: |
+          mkdir -p /tmp/api-platform/core/var
+          ln -s /tmp/api-platform/core/var tests/Fixtures/app/var
+          tests/Fixtures/app/console cache:clear --ansi
+      - name: Run PHPUnit tests
+        run: |
+          mkdir -p build/logs/phpunit
+          vendor/bin/phpunit --log-junit build/logs/phpunit/junit.xml --colors=always
+      - name: Upload test artifacts
+        if: always()
+        uses: actions/upload-artifact@v1
+        with:
+          name: phpunit-logs-php${{ matrix.php }}-lowest-deps
+          path: build/logs/phpunit
+
+  behat-lowest-deps:
+    name: Behat (PHP ${{ matrix.php }}) (lowest dependencies)
+    runs-on: ubuntu-latest
+    container:
+      image: php:${{ matrix.php }}-alpine
+      options: >-
+        --tmpfs /tmp:exec
+        --tmpfs /var/tmp:exec
+    strategy:
+      matrix:
+        php:
+          - '7.3'
+          - '7.4-rc'
+      fail-fast: false
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v1
+      - name: Install system packages
+        run: |
+          apk add \
+            unzip \
+      - name: Cache mongodb PHP extension build
+        uses: actions/cache@v1
+        with:
+          path: /var/tmp/build/ext-mongodb-${{ env.EXT_MONGODB_VERSION }}
+          key: ext-mongodb-${{ env.EXT_MONGODB_VERSION }}-php${{ matrix.php }}-${{ github.sha }}
+          restore-keys: |
+            ext-mongodb-${{ env.EXT_MONGODB_VERSION }}-php${{ matrix.php }}-
+      - name: Install mongodb PHP extension
+        env:
+          BUILD_DIR: /var/tmp/build/ext-mongodb-${{ env.EXT_MONGODB_VERSION }}
+          SRC_DIR: /usr/src/php/ext/mongodb
+        run: |
+          apk add \
+            $PHPIZE_DEPS
+          mkdir -p "$SRC_DIR" "$BUILD_DIR"
+          cd "$SRC_DIR"
+          curl -fsSL "https://pecl.php.net/get/mongodb-$EXT_MONGODB_VERSION.tgz" | tar -zx --strip-components 1
+          phpize
+          cd "$BUILD_DIR"
+          "$SRC_DIR"/configure --config-cache
+          make -j"$(nproc)"
+          make -j"$(nproc)" install
+          docker-php-ext-enable mongodb
+      - name: Disable PHP memory limit
+        run: echo 'memory_limit=-1' >> /usr/local/etc/php/php.ini
+      - name: Install Composer
+        run: wget -qO - https://raw.githubusercontent.com/composer/getcomposer.org/$COMPOSER_INSTALLER_COMMIT/web/installer | php -- --install-dir=/usr/local/bin --filename=composer --quiet
+      - name: Cache Composer packages
+        uses: actions/cache@v1
+        with:
+          path: ~/.composer/cache
+          key: composer-php${{ matrix.php }}-lowest-deps-${{ github.sha }}
+          restore-keys: |
+            composer-php${{ matrix.php }}-lowest-deps-
+            composer-php${{ matrix.php }}-
+            composer-
+      - name: Install Symfony Flex
+        run: |
+          composer global require --prefer-dist --no-progress --no-suggest --ansi \
+            symfony/flex
+      - name: Update project dependencies
+        run: |
+          mkdir -p /tmp/api-platform/core/vendor
+          ln -s /tmp/api-platform/core/vendor vendor
+          composer update --no-progress --no-suggest --prefer-stable --prefer-lowest --ansi
+      - name: Enable legacy integrations
+        if: startsWith(matrix.php, '7.3')
+        run: echo '::set-env name=LEGACY::1'
+      - name: Clear test app cache
+        run: |
+          mkdir -p /tmp/api-platform/core/var
+          ln -s /tmp/api-platform/core/var tests/Fixtures/app/var
+          tests/Fixtures/app/console cache:clear --ansi
+      - name: Run Behat tests
+        run: |
+          mkdir -p build/logs/behat
+          vendor/bin/behat --format=progress --out=std --format=junit --out=build/logs/behat/junit --profile="$(if [ "$LEGACY" = '1' ]; then echo 'default-legacy'; else echo 'default'; fi)" --no-interaction --colors
+      - name: Upload test artifacts
+        if: always()
+        uses: actions/upload-artifact@v1
+        with:
+          name: behat-logs-php${{ matrix.php }}-lowest-deps
+          path: build/logs/behat
+
+  phpunit-postgresql:
+    name: PHPUnit (PHP ${{ matrix.php }}) (PostgreSQL)
+    runs-on: ubuntu-latest
+    container:
+      image: php:${{ matrix.php }}-alpine
+      options: >-
+        --tmpfs /tmp:exec
+        --tmpfs /var/tmp:exec
+    services:
+      postgres:
+        image: postgres:10-alpine
+        env:
+          POSTGRES_DB: api_platform_test
+          POSTGRES_PASSWORD: hk7dFAByeQVVxpLtmZ6GVUzP
+          POSTGRES_USER: api-platform
+        options: >-
+          --mount type=tmpfs,destination=/var/lib/postgresql/data
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    strategy:
+      matrix:
+        php:
+          - '7.3'
+      fail-fast: false
+    timeout-minutes: 20
+    env:
+      APP_ENV: postgres
+      DATABASE_URL: postgres://api-platform:hk7dFAByeQVVxpLtmZ6GVUzP@postgres/api_platform_test
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v1
+      - name: Install system packages
+        run: |
+          apk add \
+            unzip \
+      - name: Install PHP extensions
+        run: |
+          apk add \
+            $PHPIZE_DEPS \
+            postgresql-dev \
+          ;
+          docker-php-ext-install -j$(nproc) \
+            pdo_pgsql \
+          ;
+      - name: Cache mongodb PHP extension build
+        uses: actions/cache@v1
+        with:
+          path: /var/tmp/build/ext-mongodb-${{ env.EXT_MONGODB_VERSION }}
+          key: ext-mongodb-${{ env.EXT_MONGODB_VERSION }}-php${{ matrix.php }}-${{ github.sha }}
+          restore-keys: |
+            ext-mongodb-${{ env.EXT_MONGODB_VERSION }}-php${{ matrix.php }}-
+      - name: Install mongodb PHP extension
+        env:
+          BUILD_DIR: /var/tmp/build/ext-mongodb-${{ env.EXT_MONGODB_VERSION }}
+          SRC_DIR: /usr/src/php/ext/mongodb
+        run: |
+          apk add \
+            $PHPIZE_DEPS
+          mkdir -p "$SRC_DIR" "$BUILD_DIR"
+          cd "$SRC_DIR"
+          curl -fsSL "https://pecl.php.net/get/mongodb-$EXT_MONGODB_VERSION.tgz" | tar -zx --strip-components 1
+          phpize
+          cd "$BUILD_DIR"
+          "$SRC_DIR"/configure --config-cache
+          make -j"$(nproc)"
+          make -j"$(nproc)" install
+          docker-php-ext-enable mongodb
+      - name: Disable PHP memory limit
+        run: echo 'memory_limit=-1' >> /usr/local/etc/php/php.ini
+      - name: Install Composer
+        run: wget -qO - https://raw.githubusercontent.com/composer/getcomposer.org/$COMPOSER_INSTALLER_COMMIT/web/installer | php -- --install-dir=/usr/local/bin --filename=composer --quiet
+      - name: Cache Composer packages
+        uses: actions/cache@v1
+        with:
+          path: ~/.composer/cache
+          key: composer-php${{ matrix.php }}-${{ github.sha }}
+          restore-keys: |
+            composer-php${{ matrix.php }}-
+            composer-
+      - name: Install Symfony Flex
+        run: |
+          composer global require --prefer-dist --no-progress --no-suggest --ansi \
+            symfony/flex
+      - name: Update project dependencies
+        run: |
+          mkdir -p /tmp/api-platform/core/vendor
+          ln -s /tmp/api-platform/core/vendor vendor
+          composer update --no-progress --no-suggest --ansi
+      - name: Clear test app cache
+        run: |
+          mkdir -p /tmp/api-platform/core/var
+          ln -s /tmp/api-platform/core/var tests/Fixtures/app/var
+          tests/Fixtures/app/console cache:clear --ansi
+      - name: Run PHPUnit tests
+        run: |
+          mkdir -p build/logs/phpunit
+          vendor/bin/phpunit --log-junit build/logs/phpunit/junit.xml --colors=always
+      - name: Upload test artifacts
+        if: always()
+        uses: actions/upload-artifact@v1
+        with:
+          name: phpunit-logs-php${{ matrix.php }}-postgresql
+          path: build/logs/phpunit
+
+  behat-postgresql:
+    name: Behat (PHP ${{ matrix.php }}) (PostgreSQL)
+    runs-on: ubuntu-latest
+    container:
+      image: php:${{ matrix.php }}-alpine
+      options: >-
+        --tmpfs /tmp:exec
+        --tmpfs /var/tmp:exec
+    services:
+      postgres:
+        image: postgres:10-alpine
+        env:
+          POSTGRES_DB: api_platform_test
+          POSTGRES_PASSWORD: hk7dFAByeQVVxpLtmZ6GVUzP
+          POSTGRES_USER: api-platform
+        options: >-
+          --mount type=tmpfs,destination=/var/lib/postgresql/data
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    strategy:
+      matrix:
+        php:
+          - '7.3'
+      fail-fast: false
+    timeout-minutes: 20
+    env:
+      APP_ENV: postgres
+      DATABASE_URL: postgres://api-platform:hk7dFAByeQVVxpLtmZ6GVUzP@postgres/api_platform_test
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v1
+      - name: Install system packages
+        run: |
+          apk add \
+            unzip \
+      - name: Install PHP extensions
+        run: |
+          apk add \
+            $PHPIZE_DEPS \
+            postgresql-dev \
+          ;
+          docker-php-ext-install -j$(nproc) \
+            pdo_pgsql \
+          ;
+      - name: Cache mongodb PHP extension build
+        uses: actions/cache@v1
+        with:
+          path: /var/tmp/build/ext-mongodb-${{ env.EXT_MONGODB_VERSION }}
+          key: ext-mongodb-${{ env.EXT_MONGODB_VERSION }}-php${{ matrix.php }}-${{ github.sha }}
+          restore-keys: |
+            ext-mongodb-${{ env.EXT_MONGODB_VERSION }}-php${{ matrix.php }}-
+      - name: Install mongodb PHP extension
+        env:
+          BUILD_DIR: /var/tmp/build/ext-mongodb-${{ env.EXT_MONGODB_VERSION }}
+          SRC_DIR: /usr/src/php/ext/mongodb
+        run: |
+          apk add \
+            $PHPIZE_DEPS
+          mkdir -p "$SRC_DIR" "$BUILD_DIR"
+          cd "$SRC_DIR"
+          curl -fsSL "https://pecl.php.net/get/mongodb-$EXT_MONGODB_VERSION.tgz" | tar -zx --strip-components 1
+          phpize
+          cd "$BUILD_DIR"
+          "$SRC_DIR"/configure --config-cache
+          make -j"$(nproc)"
+          make -j"$(nproc)" install
+          docker-php-ext-enable mongodb
+      - name: Disable PHP memory limit
+        run: echo 'memory_limit=-1' >> /usr/local/etc/php/php.ini
+      - name: Install Composer
+        run: wget -qO - https://raw.githubusercontent.com/composer/getcomposer.org/$COMPOSER_INSTALLER_COMMIT/web/installer | php -- --install-dir=/usr/local/bin --filename=composer --quiet
+      - name: Cache Composer packages
+        uses: actions/cache@v1
+        with:
+          path: ~/.composer/cache
+          key: composer-php${{ matrix.php }}-${{ github.sha }}
+          restore-keys: |
+            composer-php${{ matrix.php }}-
+            composer-
+      - name: Install Symfony Flex
+        run: |
+          composer global require --prefer-dist --no-progress --no-suggest --ansi \
+            symfony/flex
+      - name: Update project dependencies
+        run: |
+          mkdir -p /tmp/api-platform/core/vendor
+          ln -s /tmp/api-platform/core/vendor vendor
+          composer update --no-progress --no-suggest --ansi
+      - name: Enable legacy integrations
+        if: startsWith(matrix.php, '7.3')
+        run: echo '::set-env name=LEGACY::1'
+      - name: Clear test app cache
+        run: |
+          mkdir -p /tmp/api-platform/core/var
+          ln -s /tmp/api-platform/core/var tests/Fixtures/app/var
+          tests/Fixtures/app/console cache:clear --ansi
+      - name: Run Behat tests
+        run: |
+          mkdir -p build/logs/behat
+          vendor/bin/behat --format=progress --out=std --format=junit --out=build/logs/behat/junit --profile="$(if [ "$LEGACY" = '1' ]; then echo 'postgres-legacy'; else echo 'postgres'; fi)" --no-interaction --colors
+      - name: Upload test artifacts
+        if: always()
+        uses: actions/upload-artifact@v1
+        with:
+          name: behat-logs-php${{ matrix.php }}-postgresql
+          path: build/logs/behat
+
+  phpunit-mysql:
+    name: PHPUnit (PHP ${{ matrix.php }}) (MySQL)
+    runs-on: ubuntu-latest
+    container:
+      image: php:${{ matrix.php }}-alpine
+      options: >-
+        --tmpfs /tmp:exec
+        --tmpfs /var/tmp:exec
+    services:
+      mysql:
+        image: mysql:5.7
+        env:
+          MYSQL_DATABASE: api_platform_test
+          MYSQL_PASSWORD: LUhGR5tJ7WA2gbGumknCYBcB
+          MYSQL_RANDOM_ROOT_PASSWORD: 'yes'
+          MYSQL_USER: api-platform
+        options: >-
+          --mount type=tmpfs,destination=/var/lib/mysql
+          --health-cmd "mysqladmin ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    strategy:
+      matrix:
+        php:
+          - '7.3'
+      fail-fast: false
+    timeout-minutes: 20
+    env:
+      APP_ENV: mysql
+      DATABASE_URL: mysql://api-platform:LUhGR5tJ7WA2gbGumknCYBcB@mysql/api_platform_test
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v1
+      - name: Install system packages
+        run: |
+          apk add \
+            unzip \
+      - name: Install PHP extensions
+        run: |
+          apk add \
+            $PHPIZE_DEPS \
+          ;
+          docker-php-ext-install -j$(nproc) \
+            pdo_mysql \
+          ;
+      - name: Cache mongodb PHP extension build
+        uses: actions/cache@v1
+        with:
+          path: /var/tmp/build/ext-mongodb-${{ env.EXT_MONGODB_VERSION }}
+          key: ext-mongodb-${{ env.EXT_MONGODB_VERSION }}-php${{ matrix.php }}-${{ github.sha }}
+          restore-keys: |
+            ext-mongodb-${{ env.EXT_MONGODB_VERSION }}-php${{ matrix.php }}-
+      - name: Install mongodb PHP extension
+        env:
+          BUILD_DIR: /var/tmp/build/ext-mongodb-${{ env.EXT_MONGODB_VERSION }}
+          SRC_DIR: /usr/src/php/ext/mongodb
+        run: |
+          apk add \
+            $PHPIZE_DEPS
+          mkdir -p "$SRC_DIR" "$BUILD_DIR"
+          cd "$SRC_DIR"
+          curl -fsSL "https://pecl.php.net/get/mongodb-$EXT_MONGODB_VERSION.tgz" | tar -zx --strip-components 1
+          phpize
+          cd "$BUILD_DIR"
+          "$SRC_DIR"/configure --config-cache
+          make -j"$(nproc)"
+          make -j"$(nproc)" install
+          docker-php-ext-enable mongodb
+      - name: Disable PHP memory limit
+        run: echo 'memory_limit=-1' >> /usr/local/etc/php/php.ini
+      - name: Install Composer
+        run: wget -qO - https://raw.githubusercontent.com/composer/getcomposer.org/$COMPOSER_INSTALLER_COMMIT/web/installer | php -- --install-dir=/usr/local/bin --filename=composer --quiet
+      - name: Cache Composer packages
+        uses: actions/cache@v1
+        with:
+          path: ~/.composer/cache
+          key: composer-php${{ matrix.php }}-${{ github.sha }}
+          restore-keys: |
+            composer-php${{ matrix.php }}-
+            composer-
+      - name: Install Symfony Flex
+        run: |
+          composer global require --prefer-dist --no-progress --no-suggest --ansi \
+            symfony/flex
+      - name: Update project dependencies
+        run: |
+          mkdir -p /tmp/api-platform/core/vendor
+          ln -s /tmp/api-platform/core/vendor vendor
+          composer update --no-progress --no-suggest --ansi
+      - name: Clear test app cache
+        run: |
+          mkdir -p /tmp/api-platform/core/var
+          ln -s /tmp/api-platform/core/var tests/Fixtures/app/var
+          tests/Fixtures/app/console cache:clear --ansi
+      - name: Run PHPUnit tests
+        run: |
+          mkdir -p build/logs/phpunit
+          vendor/bin/phpunit --log-junit build/logs/phpunit/junit.xml --colors=always
+      - name: Upload test artifacts
+        if: always()
+        uses: actions/upload-artifact@v1
+        with:
+          name: phpunit-logs-php${{ matrix.php }}-mysql
+          path: build/logs/phpunit
+
+  behat-mysql:
+    name: Behat (PHP ${{ matrix.php }}) (MySQL)
+    runs-on: ubuntu-latest
+    container:
+      image: php:${{ matrix.php }}-alpine
+      options: >-
+        --tmpfs /tmp:exec
+        --tmpfs /var/tmp:exec
+    services:
+      mysql:
+        image: mysql:5.7
+        env:
+          MYSQL_DATABASE: api_platform_test
+          MYSQL_PASSWORD: LUhGR5tJ7WA2gbGumknCYBcB
+          MYSQL_RANDOM_ROOT_PASSWORD: 'yes'
+          MYSQL_USER: api-platform
+        options: >-
+          --mount type=tmpfs,destination=/var/lib/mysql
+          --health-cmd "mysqladmin ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    strategy:
+      matrix:
+        php:
+          - '7.3'
+      fail-fast: false
+    timeout-minutes: 20
+    env:
+      APP_ENV: mysql
+      DATABASE_URL: mysql://api-platform:LUhGR5tJ7WA2gbGumknCYBcB@mysql/api_platform_test
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v1
+      - name: Install system packages
+        run: |
+          apk add \
+            unzip \
+      - name: Install PHP extensions
+        run: |
+          apk add \
+            $PHPIZE_DEPS \
+          ;
+          docker-php-ext-install -j$(nproc) \
+            pdo_mysql \
+          ;
+      - name: Cache mongodb PHP extension build
+        uses: actions/cache@v1
+        with:
+          path: /var/tmp/build/ext-mongodb-${{ env.EXT_MONGODB_VERSION }}
+          key: ext-mongodb-${{ env.EXT_MONGODB_VERSION }}-php${{ matrix.php }}-${{ github.sha }}
+          restore-keys: |
+            ext-mongodb-${{ env.EXT_MONGODB_VERSION }}-php${{ matrix.php }}-
+      - name: Install mongodb PHP extension
+        env:
+          BUILD_DIR: /var/tmp/build/ext-mongodb-${{ env.EXT_MONGODB_VERSION }}
+          SRC_DIR: /usr/src/php/ext/mongodb
+        run: |
+          apk add \
+            $PHPIZE_DEPS
+          mkdir -p "$SRC_DIR" "$BUILD_DIR"
+          cd "$SRC_DIR"
+          curl -fsSL "https://pecl.php.net/get/mongodb-$EXT_MONGODB_VERSION.tgz" | tar -zx --strip-components 1
+          phpize
+          cd "$BUILD_DIR"
+          "$SRC_DIR"/configure --config-cache
+          make -j"$(nproc)"
+          make -j"$(nproc)" install
+          docker-php-ext-enable mongodb
+      - name: Disable PHP memory limit
+        run: echo 'memory_limit=-1' >> /usr/local/etc/php/php.ini
+      - name: Install Composer
+        run: wget -qO - https://raw.githubusercontent.com/composer/getcomposer.org/$COMPOSER_INSTALLER_COMMIT/web/installer | php -- --install-dir=/usr/local/bin --filename=composer --quiet
+      - name: Cache Composer packages
+        uses: actions/cache@v1
+        with:
+          path: ~/.composer/cache
+          key: composer-php${{ matrix.php }}-${{ github.sha }}
+          restore-keys: |
+            composer-php${{ matrix.php }}-
+            composer-
+      - name: Install Symfony Flex
+        run: |
+          composer global require --prefer-dist --no-progress --no-suggest --ansi \
+            symfony/flex
+      - name: Update project dependencies
+        run: |
+          mkdir -p /tmp/api-platform/core/vendor
+          ln -s /tmp/api-platform/core/vendor vendor
+          composer update --no-progress --no-suggest --ansi
+      - name: Enable legacy integrations
+        if: startsWith(matrix.php, '7.3')
+        run: echo '::set-env name=LEGACY::1'
+      - name: Clear test app cache
+        run: |
+          mkdir -p /tmp/api-platform/core/var
+          ln -s /tmp/api-platform/core/var tests/Fixtures/app/var
+          tests/Fixtures/app/console cache:clear --ansi
+      - name: Run Behat tests
+        run: |
+          mkdir -p build/logs/behat
+          vendor/bin/behat --format=progress --out=std --format=junit --out=build/logs/behat/junit --profile="$(if [ "$LEGACY" = '1' ]; then echo 'default-legacy'; else echo 'default'; fi)" --no-interaction --colors
+      - name: Upload test artifacts
+        if: always()
+        uses: actions/upload-artifact@v1
+        with:
+          name: behat-logs-php${{ matrix.php }}-mysql
+          path: build/logs/behat
+
+  phpunit-mongodb:
+    name: PHPUnit (PHP ${{ matrix.php }}) (MongoDB)
+    runs-on: ubuntu-latest
+    container:
+      image: php:${{ matrix.php }}-alpine
+      options: >-
+        --tmpfs /tmp:exec
+        --tmpfs /var/tmp:exec
+    services:
+      mongo:
+        image: mongo:4
+        options: >-
+          --mount type=tmpfs,destination=/data/db
+          --health-cmd "mongo --quiet --eval 'quit(db.runCommand({ ping: 1 }).ok ? 0 : 2)'"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    strategy:
+      matrix:
+        php:
+          - '7.3'
+        include:
+          - php: '7.3'
+            coverage: true
+      fail-fast: false
+    timeout-minutes: 20
+    env:
+      APP_ENV: mongodb
+      MONGODB_URL: mongodb://mongo:27017
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v1
+      - name: Install system packages
+        run: |
+          apk add \
+            unzip \
+      - name: Cache mongodb PHP extension build
+        uses: actions/cache@v1
+        with:
+          path: /var/tmp/build/ext-mongodb-${{ env.EXT_MONGODB_VERSION }}
+          key: ext-mongodb-${{ env.EXT_MONGODB_VERSION }}-php${{ matrix.php }}-${{ github.sha }}
+          restore-keys: |
+            ext-mongodb-${{ env.EXT_MONGODB_VERSION }}-php${{ matrix.php }}-
+      - name: Install mongodb PHP extension
+        env:
+          BUILD_DIR: /var/tmp/build/ext-mongodb-${{ env.EXT_MONGODB_VERSION }}
+          SRC_DIR: /usr/src/php/ext/mongodb
+        run: |
+          apk add \
+            $PHPIZE_DEPS
+          mkdir -p "$SRC_DIR" "$BUILD_DIR"
+          cd "$SRC_DIR"
+          curl -fsSL "https://pecl.php.net/get/mongodb-$EXT_MONGODB_VERSION.tgz" | tar -zx --strip-components 1
+          phpize
+          cd "$BUILD_DIR"
+          "$SRC_DIR"/configure --config-cache
+          make -j"$(nproc)"
+          make -j"$(nproc)" install
+          docker-php-ext-enable mongodb
+      - name: Install pcov PHP extension
+        if: matrix.coverage
+        env:
+          BUILD_DIR: /var/tmp/build/ext-pcov-${{ env.EXT_PCOV_VERSION }}
+          SRC_DIR: /usr/src/php/ext/pcov
+        run: |
+          apk add \
+            $PHPIZE_DEPS
+          mkdir -p "$SRC_DIR" "$BUILD_DIR"
+          cd "$SRC_DIR"
+          curl -fsSL "https://pecl.php.net/get/pcov-$EXT_PCOV_VERSION.tgz" | tar -zx --strip-components 1
+          phpize
+          cd "$BUILD_DIR"
+          "$SRC_DIR"/configure --config-cache
+          make -j"$(nproc)"
+          make -j"$(nproc)" install
+          docker-php-ext-enable pcov
+      - name: Disable PHP memory limit
+        run: echo 'memory_limit=-1' >> /usr/local/etc/php/php.ini
+      - name: Install Composer
+        run: wget -qO - https://raw.githubusercontent.com/composer/getcomposer.org/$COMPOSER_INSTALLER_COMMIT/web/installer | php -- --install-dir=/usr/local/bin --filename=composer --quiet
+      - name: Cache Composer packages
+        uses: actions/cache@v1
+        with:
+          path: ~/.composer/cache
+          key: composer-php${{ matrix.php }}-${{ github.sha }}
+          restore-keys: |
+            composer-php${{ matrix.php }}-
+            composer-
+      - name: Install Symfony Flex
+        run: |
+          composer global require --prefer-dist --no-progress --no-suggest --ansi \
+            symfony/flex
+      - name: Update project dependencies
+        run: |
+          mkdir -p /tmp/api-platform/core/vendor
+          ln -s /tmp/api-platform/core/vendor vendor
+          composer update --no-progress --no-suggest --ansi
+      - name: Clear test app cache
+        run: |
+          mkdir -p /tmp/api-platform/core/var
+          ln -s /tmp/api-platform/core/var tests/Fixtures/app/var
+          tests/Fixtures/app/console cache:clear --ansi
+      - name: Enable code coverage
+        if: matrix.coverage
+        run: echo '::set-env name=COVERAGE::1'
+      - name: Run PHPUnit tests
+        run: |
+          mkdir -p build/logs/phpunit
+          if [ "$COVERAGE" = '1' ]; then
+            vendor/bin/phpunit --coverage-clover build/logs/phpunit/clover.xml --log-junit build/logs/phpunit/junit.xml --colors=always --configuration phpunit_mongodb.xml
+          else
+            vendor/bin/phpunit --log-junit build/logs/phpunit/junit.xml --colors=always --configuration phpunit_mongodb.xml
+          fi
+      - name: Upload test artifacts
+        if: always()
+        uses: actions/upload-artifact@v1
+        with:
+          name: phpunit-logs-php${{ matrix.php }}-mongodb
+          path: build/logs/phpunit
+      - name: Upload coverage results to Codecov
+        if: matrix.coverage
+        uses: codecov/codecov-action@v1.0.3
+        with:
+          name: phpunit-php${{ matrix.php }}-mongodb
+          flags: phpunit_mongodb
+          token: ${{ secrets.CODECOV_TOKEN }}
+      - name: Upload coverage results to Coveralls
+        if: matrix.coverage
+        env:
+          COVERALLS_REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          composer global require --prefer-dist --no-progress --no-suggest --ansi cedx/coveralls
+          export PATH="$PATH:$HOME/.composer/vendor/bin"
+          coveralls build/logs/phpunit/clover.xml
+
+  behat-mongodb:
+    name: Behat (PHP ${{ matrix.php }}) (MongoDB)
+    runs-on: ubuntu-latest
+    container:
+      image: php:${{ matrix.php }}-alpine
+      options: >-
+        --tmpfs /tmp:exec
+        --tmpfs /var/tmp:exec
+    services:
+      mongo:
+        image: mongo:4
+        options: >-
+          --mount type=tmpfs,destination=/data/db
+          --health-cmd "mongo --quiet --eval 'quit(db.runCommand({ ping: 1 }).ok ? 0 : 2)'"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    strategy:
+      matrix:
+        php:
+          - '7.3'
+        include:
+          - php: '7.3'
+            coverage: true
+      fail-fast: false
+    timeout-minutes: 20
+    env:
+      APP_ENV: mongodb
+      MONGODB_URL: mongodb://mongo:27017
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v1
+      - name: Install system packages
+        run: |
+          apk add \
+            unzip \
+      - name: Cache mongodb PHP extension build
+        uses: actions/cache@v1
+        with:
+          path: /var/tmp/build/ext-mongodb-${{ env.EXT_MONGODB_VERSION }}
+          key: ext-mongodb-${{ env.EXT_MONGODB_VERSION }}-php${{ matrix.php }}-${{ github.sha }}
+          restore-keys: |
+            ext-mongodb-${{ env.EXT_MONGODB_VERSION }}-php${{ matrix.php }}-
+      - name: Install mongodb PHP extension
+        env:
+          BUILD_DIR: /var/tmp/build/ext-mongodb-${{ env.EXT_MONGODB_VERSION }}
+          SRC_DIR: /usr/src/php/ext/mongodb
+        run: |
+          apk add \
+            $PHPIZE_DEPS
+          mkdir -p "$SRC_DIR" "$BUILD_DIR"
+          cd "$SRC_DIR"
+          curl -fsSL "https://pecl.php.net/get/mongodb-$EXT_MONGODB_VERSION.tgz" | tar -zx --strip-components 1
+          phpize
+          cd "$BUILD_DIR"
+          "$SRC_DIR"/configure --config-cache
+          make -j"$(nproc)"
+          make -j"$(nproc)" install
+          docker-php-ext-enable mongodb
+      - name: Install pcov PHP extension
+        if: matrix.coverage
+        env:
+          BUILD_DIR: /var/tmp/build/ext-pcov-${{ env.EXT_PCOV_VERSION }}
+          SRC_DIR: /usr/src/php/ext/pcov
+        run: |
+          apk add \
+            $PHPIZE_DEPS
+          mkdir -p "$SRC_DIR" "$BUILD_DIR"
+          cd "$SRC_DIR"
+          curl -fsSL "https://pecl.php.net/get/pcov-$EXT_PCOV_VERSION.tgz" | tar -zx --strip-components 1
+          phpize
+          cd "$BUILD_DIR"
+          "$SRC_DIR"/configure --config-cache
+          make -j"$(nproc)"
+          make -j"$(nproc)" install
+          docker-php-ext-enable pcov
+      - name: Disable PHP memory limit
+        run: echo 'memory_limit=-1' >> /usr/local/etc/php/php.ini
+      - name: Install Composer
+        run: wget -qO - https://raw.githubusercontent.com/composer/getcomposer.org/$COMPOSER_INSTALLER_COMMIT/web/installer | php -- --install-dir=/usr/local/bin --filename=composer --quiet
+      - name: Cache Composer packages
+        uses: actions/cache@v1
+        with:
+          path: ~/.composer/cache
+          key: composer-php${{ matrix.php }}-${{ github.sha }}
+          restore-keys: |
+            composer-php${{ matrix.php }}-
+            composer-
+      - name: Install Symfony Flex
+        run: |
+          composer global require --prefer-dist --no-progress --no-suggest --ansi \
+            symfony/flex
+      - name: Update project dependencies
+        run: |
+          mkdir -p /tmp/api-platform/core/vendor
+          ln -s /tmp/api-platform/core/vendor vendor
+          composer update --no-progress --no-suggest --ansi
+      - name: Enable legacy integrations
+        if: startsWith(matrix.php, '7.3')
+        run: echo '::set-env name=LEGACY::1'
+      - name: Clear test app cache
+        run: |
+          mkdir -p /tmp/api-platform/core/var
+          ln -s /tmp/api-platform/core/var tests/Fixtures/app/var
+          tests/Fixtures/app/console cache:clear --ansi
+      - name: Enable code coverage
+        if: matrix.coverage
+        run: echo '::set-env name=COVERAGE::1'
+      - name: Run Behat tests
+        run: |
+          mkdir -p build/logs/behat
+          if [ "$COVERAGE" = '1' ]; then
+            vendor/bin/behat --format=progress --out=std --format=junit --out=build/logs/behat/junit --profile="$(if [ "$LEGACY" = '1' ]; then echo 'mongodb-legacy-coverage'; else echo 'mongodb-coverage'; fi)" --no-interaction --colors
+          else
+            vendor/bin/behat --format=progress --out=std --format=junit --out=build/logs/behat/junit --profile="$(if [ "$LEGACY" = '1' ]; then echo 'mongodb-legacy'; else echo 'mongodb'; fi)" --no-interaction --colors
+          fi
+      - name: Merge code coverage reports
+        if: matrix.coverage
+        run: |
+          wget -qO /usr/local/bin/phpcov https://phar.phpunit.de/phpcov.phar
+          chmod +x /usr/local/bin/phpcov
+          phpcov merge --clover build/logs/behat/clover.xml build/coverage
+      - name: Upload test artifacts
+        if: always()
+        uses: actions/upload-artifact@v1
+        with:
+          name: behat-logs-php${{ matrix.php }}-mongodb
+          path: build/logs/behat
+      - name: Upload coverage results to Codecov
+        if: matrix.coverage
+        uses: codecov/codecov-action@v1.0.3
+        with:
+          name: behat-php${{ matrix.php }}-mongodb
+          flags: behat_mongodb
+          token: ${{ secrets.CODECOV_TOKEN }}
+      - name: Upload coverage results to Coveralls
+        if: matrix.coverage
+        env:
+          COVERALLS_REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          composer global require --prefer-dist --no-progress --no-suggest --ansi cedx/coveralls
+          export PATH="$PATH:$HOME/.composer/vendor/bin"
+          coveralls build/logs/behat/clover.xml
+
+  phpunit-elasticsearch:
+    name: PHPUnit (PHP ${{ matrix.php }}) (Elasticsearch)
+    runs-on: ubuntu-latest
+    container:
+      image: php:${{ matrix.php }}-alpine
+      options: >-
+        --tmpfs /tmp:exec
+        --tmpfs /var/tmp:exec
+    services:
+      elasticsearch:
+        image: docker.elastic.co/elasticsearch/elasticsearch:6.8.3 # https://github.com/elastic/elasticsearch/issues/43627
+        env:
+          discovery.type: single-node
+        options: >-
+          --mount type=tmpfs,destination=/usr/share/elasticsearch/data
+          --health-cmd "curl -fsSL http://127.0.0.1:9200/_cluster/health | grep -q '\"status\":[[:space:]]*\"green\"'"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    strategy:
+      matrix:
+        php:
+          - '7.3'
+        include:
+          - php: '7.3'
+            coverage: true
+      fail-fast: false
+    timeout-minutes: 20
+    env:
+      APP_ENV: elasticsearch
+      ELASTICSEARCH_URL: http://elasticsearch:9200
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v1
+      - name: Install system packages
+        run: |
+          apk add \
+            unzip \
+      - name: Cache mongodb PHP extension build
+        uses: actions/cache@v1
+        with:
+          path: /var/tmp/build/ext-mongodb-${{ env.EXT_MONGODB_VERSION }}
+          key: ext-mongodb-${{ env.EXT_MONGODB_VERSION }}-php${{ matrix.php }}-${{ github.sha }}
+          restore-keys: |
+            ext-mongodb-${{ env.EXT_MONGODB_VERSION }}-php${{ matrix.php }}-
+      - name: Install mongodb PHP extension
+        env:
+          BUILD_DIR: /var/tmp/build/ext-mongodb-${{ env.EXT_MONGODB_VERSION }}
+          SRC_DIR: /usr/src/php/ext/mongodb
+        run: |
+          apk add \
+            $PHPIZE_DEPS
+          mkdir -p "$SRC_DIR" "$BUILD_DIR"
+          cd "$SRC_DIR"
+          curl -fsSL "https://pecl.php.net/get/mongodb-$EXT_MONGODB_VERSION.tgz" | tar -zx --strip-components 1
+          phpize
+          cd "$BUILD_DIR"
+          "$SRC_DIR"/configure --config-cache
+          make -j"$(nproc)"
+          make -j"$(nproc)" install
+          docker-php-ext-enable mongodb
+      - name: Install pcov PHP extension
+        if: matrix.coverage
+        env:
+          BUILD_DIR: /var/tmp/build/ext-pcov-${{ env.EXT_PCOV_VERSION }}
+          SRC_DIR: /usr/src/php/ext/pcov
+        run: |
+          apk add \
+            $PHPIZE_DEPS
+          mkdir -p "$SRC_DIR" "$BUILD_DIR"
+          cd "$SRC_DIR"
+          curl -fsSL "https://pecl.php.net/get/pcov-$EXT_PCOV_VERSION.tgz" | tar -zx --strip-components 1
+          phpize
+          cd "$BUILD_DIR"
+          "$SRC_DIR"/configure --config-cache
+          make -j"$(nproc)"
+          make -j"$(nproc)" install
+          docker-php-ext-enable pcov
+      - name: Disable PHP memory limit
+        run: echo 'memory_limit=-1' >> /usr/local/etc/php/php.ini
+      - name: Install Composer
+        run: wget -qO - https://raw.githubusercontent.com/composer/getcomposer.org/$COMPOSER_INSTALLER_COMMIT/web/installer | php -- --install-dir=/usr/local/bin --filename=composer --quiet
+      - name: Cache Composer packages
+        uses: actions/cache@v1
+        with:
+          path: ~/.composer/cache
+          key: composer-php${{ matrix.php }}-${{ github.sha }}
+          restore-keys: |
+            composer-php${{ matrix.php }}-
+            composer-
+      - name: Install Symfony Flex
+        run: |
+          composer global require --prefer-dist --no-progress --no-suggest --ansi \
+            symfony/flex
+      - name: Update project dependencies
+        run: |
+          mkdir -p /tmp/api-platform/core/vendor
+          ln -s /tmp/api-platform/core/vendor vendor
+          composer update --no-progress --no-suggest --ansi
+      - name: Clear test app cache
+        run: |
+          mkdir -p /tmp/api-platform/core/var
+          ln -s /tmp/api-platform/core/var tests/Fixtures/app/var
+          tests/Fixtures/app/console cache:clear --ansi
+      - name: Enable code coverage
+        if: matrix.coverage
+        run: echo '::set-env name=COVERAGE::1'
+      - name: Run PHPUnit tests
+        run: |
+          mkdir -p build/logs/phpunit
+          if [ "$COVERAGE" = '1' ]; then
+            vendor/bin/phpunit --coverage-clover build/logs/phpunit/clover.xml --log-junit build/logs/phpunit/junit.xml --colors=always
+          else
+            vendor/bin/phpunit --log-junit build/logs/phpunit/junit.xml --colors=always
+          fi
+      - name: Upload test artifacts
+        if: always()
+        uses: actions/upload-artifact@v1
+        with:
+          name: phpunit-logs-php${{ matrix.php }}-elasticsearch
+          path: build/logs/phpunit
+      - name: Upload coverage results to Codecov
+        if: matrix.coverage
+        uses: codecov/codecov-action@v1.0.3
+        with:
+          name: phpunit-php${{ matrix.php }}-elasticsearch
+          flags: phpunit_elasticsearch
+          token: ${{ secrets.CODECOV_TOKEN }}
+      - name: Upload coverage results to Coveralls
+        if: matrix.coverage
+        env:
+          COVERALLS_REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          composer global require --prefer-dist --no-progress --no-suggest --ansi cedx/coveralls
+          export PATH="$PATH:$HOME/.composer/vendor/bin"
+          coveralls build/logs/phpunit/clover.xml
+
+  behat-elasticsearch:
+    name: Behat (PHP ${{ matrix.php }}) (Elasticsearch)
+    runs-on: ubuntu-latest
+    container:
+      image: php:${{ matrix.php }}-alpine
+      options: >-
+        --tmpfs /tmp:exec
+        --tmpfs /var/tmp:exec
+    services:
+      elasticsearch:
+        image: docker.elastic.co/elasticsearch/elasticsearch:6.8.3 # https://github.com/elastic/elasticsearch/issues/43627
+        env:
+          discovery.type: single-node
+        options: >-
+          --mount type=tmpfs,destination=/usr/share/elasticsearch/data
+          --health-cmd "curl -fsSL http://127.0.0.1:9200/_cluster/health | grep -q '\"status\":[[:space:]]*\"green\"'"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    strategy:
+      matrix:
+        php:
+          - '7.3'
+        include:
+          - php: '7.3'
+            coverage: true
+      fail-fast: false
+    timeout-minutes: 20
+    env:
+      APP_ENV: elasticsearch
+      ELASTICSEARCH_URL: http://elasticsearch:9200
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v1
+      - name: Install system packages
+        run: |
+          apk add \
+            unzip \
+      - name: Cache mongodb PHP extension build
+        uses: actions/cache@v1
+        with:
+          path: /var/tmp/build/ext-mongodb-${{ env.EXT_MONGODB_VERSION }}
+          key: ext-mongodb-${{ env.EXT_MONGODB_VERSION }}-php${{ matrix.php }}-${{ github.sha }}
+          restore-keys: |
+            ext-mongodb-${{ env.EXT_MONGODB_VERSION }}-php${{ matrix.php }}-
+      - name: Install mongodb PHP extension
+        env:
+          BUILD_DIR: /var/tmp/build/ext-mongodb-${{ env.EXT_MONGODB_VERSION }}
+          SRC_DIR: /usr/src/php/ext/mongodb
+        run: |
+          apk add \
+            $PHPIZE_DEPS
+          mkdir -p "$SRC_DIR" "$BUILD_DIR"
+          cd "$SRC_DIR"
+          curl -fsSL "https://pecl.php.net/get/mongodb-$EXT_MONGODB_VERSION.tgz" | tar -zx --strip-components 1
+          phpize
+          cd "$BUILD_DIR"
+          "$SRC_DIR"/configure --config-cache
+          make -j"$(nproc)"
+          make -j"$(nproc)" install
+          docker-php-ext-enable mongodb
+      - name: Install pcov PHP extension
+        if: matrix.coverage
+        env:
+          BUILD_DIR: /var/tmp/build/ext-pcov-${{ env.EXT_PCOV_VERSION }}
+          SRC_DIR: /usr/src/php/ext/pcov
+        run: |
+          apk add \
+            $PHPIZE_DEPS
+          mkdir -p "$SRC_DIR" "$BUILD_DIR"
+          cd "$SRC_DIR"
+          curl -fsSL "https://pecl.php.net/get/pcov-$EXT_PCOV_VERSION.tgz" | tar -zx --strip-components 1
+          phpize
+          cd "$BUILD_DIR"
+          "$SRC_DIR"/configure --config-cache
+          make -j"$(nproc)"
+          make -j"$(nproc)" install
+          docker-php-ext-enable pcov
+      - name: Disable PHP memory limit
+        run: echo 'memory_limit=-1' >> /usr/local/etc/php/php.ini
+      - name: Install Composer
+        run: wget -qO - https://raw.githubusercontent.com/composer/getcomposer.org/$COMPOSER_INSTALLER_COMMIT/web/installer | php -- --install-dir=/usr/local/bin --filename=composer --quiet
+      - name: Cache Composer packages
+        uses: actions/cache@v1
+        with:
+          path: ~/.composer/cache
+          key: composer-php${{ matrix.php }}-${{ github.sha }}
+          restore-keys: |
+            composer-php${{ matrix.php }}-
+            composer-
+      - name: Install Symfony Flex
+        run: |
+          composer global require --prefer-dist --no-progress --no-suggest --ansi \
+            symfony/flex
+      - name: Update project dependencies
+        run: |
+          mkdir -p /tmp/api-platform/core/vendor
+          ln -s /tmp/api-platform/core/vendor vendor
+          composer update --no-progress --no-suggest --ansi
+      - name: Enable legacy integrations
+        if: startsWith(matrix.php, '7.3')
+        run: echo '::set-env name=LEGACY::1'
+      - name: Clear test app cache
+        run: |
+          mkdir -p /tmp/api-platform/core/var
+          ln -s /tmp/api-platform/core/var tests/Fixtures/app/var
+          tests/Fixtures/app/console cache:clear --ansi
+      - name: Enable code coverage
+        if: matrix.coverage
+        run: echo '::set-env name=COVERAGE::1'
+      - name: Run Behat tests
+        run: |
+          mkdir -p build/logs/behat
+          if [ "$COVERAGE" = '1' ]; then
+            vendor/bin/behat --format=progress --out=std --format=junit --out=build/logs/behat/junit --profile="$(if [ "$LEGACY" = '1' ]; then echo 'elasticsearch-legacy-coverage'; else echo 'elasticsearch-coverage'; fi)" --no-interaction --colors
+          else
+            vendor/bin/behat --format=progress --out=std --format=junit --out=build/logs/behat/junit --profile="$(if [ "$LEGACY" = '1' ]; then echo 'elasticsearch-legacy'; else echo 'elasticsearch'; fi)" --no-interaction --colors
+          fi
+      - name: Merge code coverage reports
+        if: matrix.coverage
+        run: |
+          wget -qO /usr/local/bin/phpcov https://phar.phpunit.de/phpcov.phar
+          chmod +x /usr/local/bin/phpcov
+          phpcov merge --clover build/logs/behat/clover.xml build/coverage
+      - name: Upload test artifacts
+        if: always()
+        uses: actions/upload-artifact@v1
+        with:
+          name: behat-logs-php${{ matrix.php }}-elasticsearch
+          path: build/logs/behat
+      - name: Upload coverage results to Codecov
+        if: matrix.coverage
+        uses: codecov/codecov-action@v1.0.3
+        with:
+          name: behat-php${{ matrix.php }}-elasticsearch
+          flags: behat_elasticsearch
+          token: ${{ secrets.CODECOV_TOKEN }}
+      - name: Upload coverage results to Coveralls
+        if: matrix.coverage
+        env:
+          COVERALLS_REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          composer global require --prefer-dist --no-progress --no-suggest --ansi cedx/coveralls
+          export PATH="$PATH:$HOME/.composer/vendor/bin"
+          coveralls build/logs/behat/clover.xml
+
+  phpunit-no-deprecations:
+    name: PHPUnit (PHP ${{ matrix.php }}) (no deprecations)
+    runs-on: ubuntu-latest
+    container:
+      image: php:${{ matrix.php }}-alpine
+      options: >-
+        --tmpfs /tmp:exec
+        --tmpfs /var/tmp:exec
+    strategy:
+      matrix:
+        php:
+          - '7.3'
+      fail-fast: false
+    timeout-minutes: 20
+    env:
+      SYMFONY_DEPRECATIONS_HELPER: max[total]=5 # 5 deprecation notices from FOSUserBundle
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v1
+      - name: Install system packages
+        run: |
+          apk add \
+            unzip \
+      - name: Cache mongodb PHP extension build
+        uses: actions/cache@v1
+        with:
+          path: /var/tmp/build/ext-mongodb-${{ env.EXT_MONGODB_VERSION }}
+          key: ext-mongodb-${{ env.EXT_MONGODB_VERSION }}-php${{ matrix.php }}-${{ github.sha }}
+          restore-keys: |
+            ext-mongodb-${{ env.EXT_MONGODB_VERSION }}-php${{ matrix.php }}-
+      - name: Install mongodb PHP extension
+        env:
+          BUILD_DIR: /var/tmp/build/ext-mongodb-${{ env.EXT_MONGODB_VERSION }}
+          SRC_DIR: /usr/src/php/ext/mongodb
+        run: |
+          apk add \
+            $PHPIZE_DEPS
+          mkdir -p "$SRC_DIR" "$BUILD_DIR"
+          cd "$SRC_DIR"
+          curl -fsSL "https://pecl.php.net/get/mongodb-$EXT_MONGODB_VERSION.tgz" | tar -zx --strip-components 1
+          phpize
+          cd "$BUILD_DIR"
+          "$SRC_DIR"/configure --config-cache
+          make -j"$(nproc)"
+          make -j"$(nproc)" install
+          docker-php-ext-enable mongodb
+      - name: Disable PHP memory limit
+        run: echo 'memory_limit=-1' >> /usr/local/etc/php/php.ini
+      - name: Install Composer
+        run: wget -qO - https://raw.githubusercontent.com/composer/getcomposer.org/$COMPOSER_INSTALLER_COMMIT/web/installer | php -- --install-dir=/usr/local/bin --filename=composer --quiet
+      - name: Cache Composer packages
+        uses: actions/cache@v1
+        with:
+          path: ~/.composer/cache
+          key: composer-php${{ matrix.php }}-${{ github.sha }}
+          restore-keys: |
+            composer-php${{ matrix.php }}-
+            composer-
+      - name: Install Symfony Flex
+        run: |
+          composer global require --prefer-dist --no-progress --no-suggest --ansi \
+            symfony/flex
+      - name: Update project dependencies
+        run: |
+          mkdir -p /tmp/api-platform/core/vendor
+          ln -s /tmp/api-platform/core/vendor vendor
+          composer update --no-progress --no-suggest --ansi
+      - name: Clear test app cache
+        run: |
+          mkdir -p /tmp/api-platform/core/var
+          ln -s /tmp/api-platform/core/var tests/Fixtures/app/var
+          tests/Fixtures/app/console cache:clear --ansi
+      - name: Run PHPUnit tests
+        run: |
+          mkdir -p build/logs/phpunit
+          vendor/bin/phpunit --log-junit build/logs/phpunit/junit.xml --colors=always
+      - name: Upload test artifacts
+        if: always()
+        uses: actions/upload-artifact@v1
+        with:
+          name: phpunit-logs-php${{ matrix.php }}-no-deprecations
+          path: build/logs/phpunit
+
+  phpunit-symfony-next:
+    name: PHPUnit (PHP ${{ matrix.php }}) (Symfony ${{ matrix.symfony }})
+    runs-on: ubuntu-latest
+    container:
+      image: php:${{ matrix.php }}-alpine
+      options: >-
+        --tmpfs /tmp:exec
+        --tmpfs /var/tmp:exec
+    strategy:
+      matrix:
+        php:
+          - '7.3'
+        symfony:
+          - '4.4'
+      fail-fast: false
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v1
+      - name: Install system packages
+        run: |
+          apk add \
+            jq \
+            moreutils \
+            unzip \
+      - name: Cache mongodb PHP extension build
+        uses: actions/cache@v1
+        with:
+          path: /var/tmp/build/ext-mongodb-${{ env.EXT_MONGODB_VERSION }}
+          key: ext-mongodb-${{ env.EXT_MONGODB_VERSION }}-php${{ matrix.php }}-${{ github.sha }}
+          restore-keys: |
+            ext-mongodb-${{ env.EXT_MONGODB_VERSION }}-php${{ matrix.php }}-
+      - name: Install mongodb PHP extension
+        env:
+          BUILD_DIR: /var/tmp/build/ext-mongodb-${{ env.EXT_MONGODB_VERSION }}
+          SRC_DIR: /usr/src/php/ext/mongodb
+        run: |
+          apk add \
+            $PHPIZE_DEPS
+          mkdir -p "$SRC_DIR" "$BUILD_DIR"
+          cd "$SRC_DIR"
+          curl -fsSL "https://pecl.php.net/get/mongodb-$EXT_MONGODB_VERSION.tgz" | tar -zx --strip-components 1
+          phpize
+          cd "$BUILD_DIR"
+          "$SRC_DIR"/configure --config-cache
+          make -j"$(nproc)"
+          make -j"$(nproc)" install
+          docker-php-ext-enable mongodb
+      - name: Disable PHP memory limit
+        run: echo 'memory_limit=-1' >> /usr/local/etc/php/php.ini
+      - name: Install Composer
+        run: wget -qO - https://raw.githubusercontent.com/composer/getcomposer.org/$COMPOSER_INSTALLER_COMMIT/web/installer | php -- --install-dir=/usr/local/bin --filename=composer --quiet
+      - name: Cache Composer packages
+        uses: actions/cache@v1
+        with:
+          path: ~/.composer/cache
+          key: composer-php${{ matrix.php }}-symfony${{ matrix.symfony }}-${{ github.sha }}
+          restore-keys: |
+            composer-php${{ matrix.php }}-symfony${{ matrix.symfony }}-
+            composer-php${{ matrix.php }}-
+            composer-
+      - name: Install Symfony Flex
+        run: |
+          composer global require --prefer-dist --no-progress --no-suggest --ansi \
+            symfony/flex
+      - name: Allow unstable project dependencies
+        run: |
+          jq '. + {"minimum-stability": "dev"}' composer.json | sponge composer.json
+      - name: Update project dependencies
+        run: |
+          mkdir -p /tmp/api-platform/core/vendor
+          ln -s /tmp/api-platform/core/vendor vendor
+          composer update --no-progress --no-suggest --ansi
+      - name: Flag held back Symfony packages
+        env:
+          symfony_version: ${{ matrix.symfony }}
+        run: |
+          version_pattern=$symfony_version.x-dev
+          if [ "${symfony_version%.4}" != "$symfony_version" ]; then
+            current_major=${symfony_version%.4}
+            next_major=$((current_major + 1))
+            version_pattern=$version_pattern'|'$next_major.0.x-dev'|'dev-master
+          fi
+          version_pattern=$(echo "$version_pattern" | sed -r 's/\./\\./g')
+          symfony_packages=$(composer show symfony/* | tr -s ' ' '\t' | cut -f1-2 | grep -vE 'polyfill|contracts|mercure')
+          ! echo "$symfony_packages" | grep -vE "$version_pattern"
+        continue-on-error: true
+      - name: Clear test app cache
+        run: |
+          mkdir -p /tmp/api-platform/core/var
+          ln -s /tmp/api-platform/core/var tests/Fixtures/app/var
+          tests/Fixtures/app/console cache:clear --ansi
+      - name: Run PHPUnit tests
+        run: |
+          mkdir -p build/logs/phpunit
+          vendor/bin/phpunit --log-junit build/logs/phpunit/junit.xml --colors=always
+      - name: Upload test artifacts
+        if: always()
+        uses: actions/upload-artifact@v1
+        with:
+          name: phpunit-logs-php${{ matrix.php }}-symfony${{ matrix.symfony }}
+          path: build/logs/phpunit
+
+  behat-symfony-next:
+    name: Behat (PHP ${{ matrix.php }}) (Symfony ${{ matrix.symfony }})
+    runs-on: ubuntu-latest
+    container:
+      image: php:${{ matrix.php }}-alpine
+      options: >-
+        --tmpfs /tmp:exec
+        --tmpfs /var/tmp:exec
+    strategy:
+      matrix:
+        php:
+          - '7.3'
+        symfony:
+          - '4.4'
+      fail-fast: false
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v1
+      - name: Install system packages
+        run: |
+          apk add \
+            jq \
+            moreutils \
+            unzip \
+      - name: Cache mongodb PHP extension build
+        uses: actions/cache@v1
+        with:
+          path: /var/tmp/build/ext-mongodb-${{ env.EXT_MONGODB_VERSION }}
+          key: ext-mongodb-${{ env.EXT_MONGODB_VERSION }}-php${{ matrix.php }}-${{ github.sha }}
+          restore-keys: |
+            ext-mongodb-${{ env.EXT_MONGODB_VERSION }}-php${{ matrix.php }}-
+      - name: Install mongodb PHP extension
+        env:
+          BUILD_DIR: /var/tmp/build/ext-mongodb-${{ env.EXT_MONGODB_VERSION }}
+          SRC_DIR: /usr/src/php/ext/mongodb
+        run: |
+          apk add \
+            $PHPIZE_DEPS
+          mkdir -p "$SRC_DIR" "$BUILD_DIR"
+          cd "$SRC_DIR"
+          curl -fsSL "https://pecl.php.net/get/mongodb-$EXT_MONGODB_VERSION.tgz" | tar -zx --strip-components 1
+          phpize
+          cd "$BUILD_DIR"
+          "$SRC_DIR"/configure --config-cache
+          make -j"$(nproc)"
+          make -j"$(nproc)" install
+          docker-php-ext-enable mongodb
+      - name: Disable PHP memory limit
+        run: echo 'memory_limit=-1' >> /usr/local/etc/php/php.ini
+      - name: Install Composer
+        run: wget -qO - https://raw.githubusercontent.com/composer/getcomposer.org/$COMPOSER_INSTALLER_COMMIT/web/installer | php -- --install-dir=/usr/local/bin --filename=composer --quiet
+      - name: Cache Composer packages
+        uses: actions/cache@v1
+        with:
+          path: ~/.composer/cache
+          key: composer-php${{ matrix.php }}-symfony${{ matrix.symfony }}-${{ github.sha }}
+          restore-keys: |
+            composer-php${{ matrix.php }}-symfony${{ matrix.symfony }}-
+            composer-php${{ matrix.php }}-
+            composer-
+      - name: Install Symfony Flex
+        run: |
+          composer global require --prefer-dist --no-progress --no-suggest --ansi \
+            symfony/flex
+      - name: Allow unstable project dependencies
+        run: |
+          jq '. + {"minimum-stability": "dev"}' composer.json | sponge composer.json
+      - name: Update project dependencies
+        run: |
+          mkdir -p /tmp/api-platform/core/vendor
+          ln -s /tmp/api-platform/core/vendor vendor
+          composer update --no-progress --no-suggest --ansi
+      - name: Flag held back Symfony packages
+        env:
+          symfony_version: ${{ matrix.symfony }}
+        run: |
+          version_pattern=$symfony_version.x-dev
+          if [ "${symfony_version%.4}" != "$symfony_version" ]; then
+            current_major=${symfony_version%.4}
+            next_major=$((current_major + 1))
+            version_pattern=$version_pattern'|'$next_major.0.x-dev'|'dev-master
+          fi
+          version_pattern=$(echo "$version_pattern" | sed -r 's/\./\\./g')
+          symfony_packages=$(composer show symfony/* | tr -s ' ' '\t' | cut -f1-2 | grep -vE 'polyfill|contracts|mercure')
+          ! echo "$symfony_packages" | grep -vE "$version_pattern"
+        continue-on-error: true
+      - name: Enable legacy integrations
+        if: startsWith(matrix.php, '7.3')
+        run: echo '::set-env name=LEGACY::1'
+      - name: Clear test app cache
+        run: |
+          mkdir -p /tmp/api-platform/core/var
+          ln -s /tmp/api-platform/core/var tests/Fixtures/app/var
+          tests/Fixtures/app/console cache:clear --ansi
+      - name: Run Behat tests
+        run: |
+          mkdir -p build/logs/behat
+          vendor/bin/behat --format=progress --out=std --format=junit --out=build/logs/behat/junit --profile="$(if [ "$LEGACY" = '1' ]; then echo 'default-legacy'; else echo 'default'; fi)" --no-interaction --colors
+      - name: Upload test artifacts
+        if: always()
+        uses: actions/upload-artifact@v1
+        with:
+          name: behat-logs-php${{ matrix.php }}-symfony${{ matrix.symfony }}
+          path: build/logs/behat

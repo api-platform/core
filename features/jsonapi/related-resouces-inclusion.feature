@@ -38,7 +38,7 @@ Feature: JSON API Inclusion of Related Resources
         },
         "included": [
             {
-                "id": "\/dummy_groups\/1",
+                "id": "/dummy_groups/1",
                 "type": "DummyGroup",
                 "attributes": {
                     "_id": 1,
@@ -107,7 +107,7 @@ Feature: JSON API Inclusion of Related Resources
         },
         "included": [
             {
-                "id": "\/dummy_groups\/1",
+                "id": "/dummy_groups/1",
                 "type": "DummyGroup",
                 "attributes": {
                     "_id": 1,
@@ -140,7 +140,7 @@ Feature: JSON API Inclusion of Related Resources
         },
         "included": [
             {
-                "id": "\/dummy_groups\/1",
+                "id": "/dummy_groups/1",
                 "type": "DummyGroup",
                 "attributes": {
                     "_id": 1,
@@ -402,7 +402,7 @@ Feature: JSON API Inclusion of Related Resources
     """
     {
         "links": {
-            "self": "\/dummy_properties?include=group"
+            "self": "/dummy_properties?include=group"
         },
         "meta": {
             "totalItems": 3,
@@ -470,7 +470,7 @@ Feature: JSON API Inclusion of Related Resources
         ],
         "included": [
             {
-                "id": "\/dummy_groups\/1",
+                "id": "/dummy_groups/1",
                 "type": "DummyGroup",
                 "attributes": {
                     "_id": 1,
@@ -480,7 +480,7 @@ Feature: JSON API Inclusion of Related Resources
                 }
             },
             {
-                "id": "\/dummy_groups\/2",
+                "id": "/dummy_groups/2",
                 "type": "DummyGroup",
                 "attributes": {
                     "_id": 2,
@@ -490,7 +490,7 @@ Feature: JSON API Inclusion of Related Resources
                 }
             },
             {
-                "id": "\/dummy_groups\/3",
+                "id": "/dummy_groups/3",
                 "type": "DummyGroup",
                 "attributes": {
                     "_id": 3,
@@ -514,7 +514,7 @@ Feature: JSON API Inclusion of Related Resources
     """
     {
         "links": {
-            "self": "\/dummy_properties?include=group"
+            "self": "/dummy_properties?include=group"
         },
         "meta": {
             "totalItems": 3,
@@ -582,7 +582,7 @@ Feature: JSON API Inclusion of Related Resources
         ],
         "included": [
             {
-                "id": "\/dummy_groups\/1",
+                "id": "/dummy_groups/1",
                 "type": "DummyGroup",
                 "attributes": {
                     "_id": 1,

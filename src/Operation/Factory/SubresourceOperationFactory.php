@@ -75,7 +75,7 @@ final class SubresourceOperationFactory implements SubresourceOperationFactoryIn
 
             $subresourceClass = $subresource->getResourceClass();
             $subresourceMetadata = $this->resourceMetadataFactory->create($subresourceClass);
-            $isLastItem = $resourceClass === $parentOperation['resource_class'] && $propertyMetadata->isIdentifier();
+            $isLastItem = ($parentOperation['resource_class'] ?? null) === $resourceClass && $propertyMetadata->isIdentifier();
 
             // A subresource that is also an identifier can't be a start point
             if ($isLastItem && (null === $parentOperation || false === $parentOperation['collection'])) {

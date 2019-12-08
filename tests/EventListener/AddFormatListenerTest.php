@@ -21,7 +21,7 @@ use Negotiation\Negotiator;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\Exception\NotAcceptableHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
@@ -34,7 +34,7 @@ class AddFormatListenerTest extends TestCase
     {
         $request = new Request();
 
-        $eventProphecy = $this->prophesize(GetResponseEvent::class);
+        $eventProphecy = $this->prophesize(RequestEvent::class);
         $eventProphecy->getRequest()->willReturn($request);
         $event = $eventProphecy->reveal();
 
@@ -73,7 +73,7 @@ class AddFormatListenerTest extends TestCase
         $request = new Request([], [], ['_api_resource_class' => 'Foo', '_api_collection_operation_name' => 'get']);
         $request->setRequestFormat('xml');
 
-        $eventProphecy = $this->prophesize(GetResponseEvent::class);
+        $eventProphecy = $this->prophesize(RequestEvent::class);
         $eventProphecy->getRequest()->willReturn($request);
         $event = $eventProphecy->reveal();
 
@@ -89,7 +89,7 @@ class AddFormatListenerTest extends TestCase
         $request = new Request([], [], ['_api_respond' => true]);
         $request->setRequestFormat('xml');
 
-        $eventProphecy = $this->prophesize(GetResponseEvent::class);
+        $eventProphecy = $this->prophesize(RequestEvent::class);
         $eventProphecy->getRequest()->willReturn($request);
         $event = $eventProphecy->reveal();
 
@@ -110,7 +110,7 @@ class AddFormatListenerTest extends TestCase
         $request = new Request([], [], ['_api_resource_class' => 'Foo', '_api_collection_operation_name' => 'get']);
         $request->setRequestFormat('xml');
 
-        $eventProphecy = $this->prophesize(GetResponseEvent::class);
+        $eventProphecy = $this->prophesize(RequestEvent::class);
         $eventProphecy->getRequest()->willReturn($request);
         $event = $eventProphecy->reveal();
 
@@ -134,7 +134,7 @@ class AddFormatListenerTest extends TestCase
         $request = new Request([], [], ['_api_resource_class' => 'Foo', '_api_collection_operation_name' => 'get']);
         $request->headers->set('Accept', 'text/html, application/xhtml+xml, application/xml, application/json;q=0.9, */*;q=0.8');
 
-        $eventProphecy = $this->prophesize(GetResponseEvent::class);
+        $eventProphecy = $this->prophesize(RequestEvent::class);
         $eventProphecy->getRequest()->willReturn($request);
         $event = $eventProphecy->reveal();
 
@@ -161,7 +161,7 @@ class AddFormatListenerTest extends TestCase
         $request = new Request([], [], ['_api_resource_class' => 'Foo', '_api_collection_operation_name' => 'get']);
         $request->headers->set('Accept', 'application/json');
 
-        $eventProphecy = $this->prophesize(GetResponseEvent::class);
+        $eventProphecy = $this->prophesize(RequestEvent::class);
         $eventProphecy->getRequest()->willReturn($request);
         $event = $eventProphecy->reveal();
 
@@ -185,7 +185,7 @@ class AddFormatListenerTest extends TestCase
         $request = new Request([], [], ['_api_resource_class' => 'Foo', '_api_collection_operation_name' => 'get']);
         $request->headers->set('Accept', 'text/html, application/xhtml+xml, application/xml;q=0.9, */*;q=0.8');
 
-        $eventProphecy = $this->prophesize(GetResponseEvent::class);
+        $eventProphecy = $this->prophesize(RequestEvent::class);
         $eventProphecy->getRequest()->willReturn($request);
         $event = $eventProphecy->reveal();
 
@@ -213,7 +213,7 @@ class AddFormatListenerTest extends TestCase
         $request = new Request([], [], ['_api_resource_class' => 'Foo', '_api_collection_operation_name' => 'get']);
         $request->headers->set('Accept', 'text/html, application/xhtml+xml, application/xml;q=0.9');
 
-        $eventProphecy = $this->prophesize(GetResponseEvent::class);
+        $eventProphecy = $this->prophesize(RequestEvent::class);
         $eventProphecy->getRequest()->willReturn($request);
         $event = $eventProphecy->reveal();
 
@@ -238,7 +238,7 @@ class AddFormatListenerTest extends TestCase
         $request = new Request([], [], ['_api_resource_class' => 'Foo', '_api_collection_operation_name' => 'get']);
         $request->headers->set('Accept', 'text/xml');
 
-        $eventProphecy = $this->prophesize(GetResponseEvent::class);
+        $eventProphecy = $this->prophesize(RequestEvent::class);
         $eventProphecy->getRequest()->willReturn($request);
         $event = $eventProphecy->reveal();
 
@@ -263,7 +263,7 @@ class AddFormatListenerTest extends TestCase
         $request = new Request([], [], ['_api_resource_class' => 'Foo', '_api_collection_operation_name' => 'get']);
         $request->headers->set('Accept', 'invalid');
 
-        $eventProphecy = $this->prophesize(GetResponseEvent::class);
+        $eventProphecy = $this->prophesize(RequestEvent::class);
         $eventProphecy->getRequest()->willReturn($request);
         $event = $eventProphecy->reveal();
 
@@ -286,7 +286,7 @@ class AddFormatListenerTest extends TestCase
         $request->headers->set('Accept', 'application/json');
         $request->setRequestFormat('xml');
 
-        $eventProphecy = $this->prophesize(GetResponseEvent::class);
+        $eventProphecy = $this->prophesize(RequestEvent::class);
         $eventProphecy->getRequest()->willReturn($request);
         $event = $eventProphecy->reveal();
 
@@ -312,7 +312,7 @@ class AddFormatListenerTest extends TestCase
 
         $request = new Request([], [], ['_api_resource_class' => 'Foo', '_api_collection_operation_name' => 'get', '_format' => 'invalid']);
 
-        $eventProphecy = $this->prophesize(GetResponseEvent::class);
+        $eventProphecy = $this->prophesize(RequestEvent::class);
         $eventProphecy->getRequest()->willReturn($request);
         $event = $eventProphecy->reveal();
 
@@ -335,7 +335,7 @@ class AddFormatListenerTest extends TestCase
         $request = new Request([], [], ['_api_resource_class' => 'Foo', '_api_collection_operation_name' => 'get']);
         $request->setRequestFormat('csv');
 
-        $eventProphecy = $this->prophesize(GetResponseEvent::class);
+        $eventProphecy = $this->prophesize(RequestEvent::class);
         $eventProphecy->getRequest()->willReturn($request)->shouldBeCalled();
         $event = $eventProphecy->reveal();
 

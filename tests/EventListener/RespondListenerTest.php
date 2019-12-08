@@ -21,7 +21,7 @@ use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
+use Symfony\Component\HttpKernel\Event\ViewEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 /**
@@ -33,7 +33,7 @@ class RespondListenerTest extends TestCase
     {
         $request = new Request();
 
-        $eventProphecy = $this->prophesize(GetResponseForControllerResultEvent::class);
+        $eventProphecy = $this->prophesize(ViewEvent::class);
         $eventProphecy->getControllerResult()->willReturn(new Response());
         $eventProphecy->getRequest()->willReturn($request);
         $eventProphecy->setResponse(Argument::any())->shouldNotBeCalled();
@@ -46,7 +46,7 @@ class RespondListenerTest extends TestCase
     {
         $request = new Request([], [], ['_api_respond' => false]);
 
-        $eventProphecy = $this->prophesize(GetResponseForControllerResultEvent::class);
+        $eventProphecy = $this->prophesize(ViewEvent::class);
         $eventProphecy->getControllerResult()->willReturn('foo');
         $eventProphecy->getRequest()->willReturn($request);
         $eventProphecy->setResponse(Argument::any())->shouldNotBeCalled();
@@ -61,7 +61,7 @@ class RespondListenerTest extends TestCase
         $request->setRequestFormat('xml');
 
         $kernelProphecy = $this->prophesize(HttpKernelInterface::class);
-        $event = new GetResponseForControllerResultEvent(
+        $event = new ViewEvent(
             $kernelProphecy->reveal(),
             $request,
             HttpKernelInterface::MASTER_REQUEST,
@@ -88,7 +88,7 @@ class RespondListenerTest extends TestCase
         $request->setMethod('POST');
         $request->setRequestFormat('xml');
 
-        $event = new GetResponseForControllerResultEvent(
+        $event = new ViewEvent(
             $kernelProphecy->reveal(),
             $request,
             HttpKernelInterface::MASTER_REQUEST,
@@ -117,7 +117,7 @@ class RespondListenerTest extends TestCase
         $request->setRequestFormat('xml');
         $request->setMethod('DELETE');
 
-        $event = new GetResponseForControllerResultEvent(
+        $event = new ViewEvent(
             $kernelProphecy->reveal(),
             $request,
             HttpKernelInterface::MASTER_REQUEST,
@@ -142,7 +142,7 @@ class RespondListenerTest extends TestCase
 
         $request = new Request([], [], ['_api_resource_class' => Dummy::class, '_api_item_operation_name' => 'get', '_api_respond' => true]);
 
-        $event = new GetResponseForControllerResultEvent(
+        $event = new ViewEvent(
             $kernelProphecy->reveal(),
             $request,
             HttpKernelInterface::MASTER_REQUEST,
@@ -166,7 +166,7 @@ class RespondListenerTest extends TestCase
 
         $request = new Request([], [], ['_api_resource_class' => Dummy::class, '_api_item_operation_name' => 'get', '_api_respond' => true]);
 
-        $event = new GetResponseForControllerResultEvent(
+        $event = new ViewEvent(
             $kernelProphecy->reveal(),
             $request,
             HttpKernelInterface::MASTER_REQUEST,
@@ -185,7 +185,7 @@ class RespondListenerTest extends TestCase
     {
         $request = new Request([], [], ['_api_resource_class' => Dummy::class, '_api_item_operation_name' => 'get', '_api_respond' => true]);
         $response = new Response();
-        $eventProphecy = $this->prophesize(GetResponseForControllerResultEvent::class);
+        $eventProphecy = $this->prophesize(ViewEvent::class);
         $eventProphecy->getControllerResult()->willReturn($response);
         $eventProphecy->getRequest()->willReturn($request);
         $eventProphecy->setResponse($response)->shouldBeCalled();

@@ -52,7 +52,7 @@ final class IterableType extends ScalarType implements TypeInterface
     public function serialize($value)
     {
         if (!is_iterable($value)) {
-            throw new Error(sprintf('Iterable cannot represent non iterable value: %s', Utils::printSafe($value)));
+            throw new Error(sprintf('`Iterable` cannot represent non iterable value: %s', Utils::printSafe($value)));
         }
 
         return $value;
@@ -64,7 +64,7 @@ final class IterableType extends ScalarType implements TypeInterface
     public function parseValue($value)
     {
         if (!is_iterable($value)) {
-            throw new Error(sprintf('Iterable cannot represent non iterable value: %s', Utils::printSafeJson($value)));
+            throw new Error(sprintf('`Iterable` cannot represent non iterable value: %s', Utils::printSafeJson($value)));
         }
 
         return $value;

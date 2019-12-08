@@ -1,19 +1,108 @@
 # Changelog
 
+## 2.6.x-dev
+
+* MongoDB: Possibility to add execute options (aggregate command fields) for a resource, like `allowDiskUse` (#3144)
+* GraphQL: Allow to format GraphQL errors based on exceptions (#3063)
+* GraphQL: Add page-based pagination (#3175)
+* OpenAPI: Add PHP default values to the documentation (#2386)
+ 
+## 2.5.3
+
+* Compatibility with Symfony 5
+* GraphQL: Fix `hasNextPage` when `offset > itemsPerPage`
+
+## 2.5.2
+
+* Compatibility with Symfony 5 RC
+* Compatibility with NelmioCorsBundle 2
+* Fix the type of `ApiResource::$paginationPartial`
+* Ensure correct return type from `AbstractItemNormalizer::normalizeRelation`
+
+## 2.5.1
+
+* Compatibility with Symfony 5 beta
+* Fix a notice in `SerializerContextBuilder`
+* Fix dashed path segment generation
+* Fix support for custom filters without constructor in the `@ApiFilter` annotation
+* Fix a bug that was preventing to disable Swagger/OpenAPI
+* Return a `404` HTTP status code instead of `500` whe the identifier is invalid (e.g.: invalid UUID)
+* Add links to the documentation in `@ApiResource` annotation's attributes to improve DX
+* JSON:API: fix pagination being ignored when using the `filter` query parameter
+* Elasticsearch: Allow multiple queries to be set
+* OpenAPI: Do not append `body` parameter if it already exists
+* OpenAPI: Fix removal of illegal characters in schema name for Amazon API Gateway
+* Swagger UI: Add missing `oauth2-redirect` configuration
+* Swagger UI: Allow changing the location of Swagger UI
+* GraphQL: Fix an error that was occurring when `SecurityBundle` was not installed
+* HTTP/2 Server Push: Push relations as `fetch`
+
+## 2.5.0
+
+* Fix BC-break when using short-syntax notation for `access_control`
+* Fix BC-break when no item operations are declared
+* GraphQL: Adding serialization group difference condition for `item_query` and `collection_query` types
+* JSON Schema: Fix command
+
+## 2.5.0 beta 3
+
+* GraphQL: Use different types (`MyTypeItem` and `MyTypeCollection`) only if serialization groups are different for `item_query` and `collection_query` (#3083)
+
+## 2.5.0 beta 2
+
+* Allow to not declare GET item operation
+* Add support for the Accept-Patch header
+* Make the the `maximum_items_per_page` attribute consistent with other attributes controlling pagination
+* Allow to use a string instead of an array for serializer groups
+* Test: Add an helper method to find the IRI of a resource
+* Test: Add assertions for testing response against JSON Schema from API resource
+* GraphQL: Add support for multipart request so user can create custom file upload mutations (#3041)
+* GraphQL: Add support for name converter (#2765)
+
 ## 2.5.0 beta 1
 
-* GraphQL: Add support for custom queries and mutations
-* GraphQL: Add support for custom types
-* GraphQL: Better pagination support (backwards pagination)
-* GraphQL: Add the concept of *stages* in the workflow of the resolvers and add the possibility to disable them with operation attributes
-* GraphQL: Add GraphQL Playground besides GraphiQL and add the possibility to change the default IDE (or to disable it) for the GraphQL endpoint
-* GraphQL: Add a command to print the schema in SDL
-* GraphQL: Improve serialization performance by avoiding calls to the `serialize` PHP function
-* GraphQL: Allow to use a search and an exist filter on the same resource
-* GraphQL: Refactor the architecture of the whole system to allow the decoration of useful services (`TypeConverter` to manage custom types, `SerializerContextBuilder` to modify the (de)serialization context dynamically, etc.)
+* Add an HTTP client dedicated to functional API testing (#2608)
+* Add PATCH support (#2895)
+* Add a command to generate json schemas `api:json-schema:generate` (#2996)
+* Add infrastructure to generate a JSON Schema from a Resource `ApiPlatform\Core\JsonSchema\SchemaFactoryInterface` (#2983)
+* Replaces `access_control` by `security` and adds a `security_post_denormalize` attribute (#2992)
+* Add basic infrastructure for cursor-based pagination (#2532)
+* Change ExistsFilter syntax to `exists[property]`, old syntax still supported see #2243, fixes it's behavior on GraphQL (also related #2640).
+* Pagination with subresources (#2698)
+* Improve search filter id's management (#1844)
+* Add support of name converter in filters (#2751, #2897), filter signature in abstract methods has changed see b42dfd198b1644904fd6a684ab2cedaf530254e3
+* Ability to change the Vary header via `cacheHeaders` attributes of a resource (#2758)
+* Ability to use the Query object in a paginator (#2493)
+* Compatibility with Symfony 4.3 (#2784)
+* Better handling of JsonSerializable classes (#2921)
+* Elasticsearch: Add pagination (#2919)
+* Add default, min, max specification in pagination parameter API docs (#3002)
+* Add a swagger version configuration option `swagger.versions` and deprecates the `enable_swagger` configuration option (#2998)
+* Order filter now documents `asc`/`desc` as enum (#2971)
+* GraphQL: **BC Break** Separate `query` resource operation attribute into `item_query` and `collection_query` operations so user can use different security and serialization groups for them (#2944, #3015)
+* GraphQL: Add support for custom queries and mutations (#2447)
+* GraphQL: Add support for custom types (#2492)
+* GraphQL: Better pagination support (backwards pagination) (#2142)
+* GraphQL: Support the pagination per resource (#3035)
+* GraphQL: Add the concept of *stages* in the workflow of the resolvers and add the possibility to disable them with operation attributes (#2959)
+* GraphQL: Add GraphQL Playground besides GraphiQL and add the possibility to change the default IDE (or to disable it) for the GraphQL endpoint (#2956, #2961)
+* GraphQL: Add a command to print the schema in SDL `api:graphql:export > schema.graphql` (#2600)
+* GraphQL: Improve serialization performance by avoiding calls to the `serialize` PHP function (#2576)
+* GraphQL: Allow to use a search and an exist filter on the same resource (#2243)
+* GraphQL: Refactor the architecture of the whole system to allow the decoration of useful services (`TypeConverter` to manage custom types, `SerializerContextBuilder` to modify the (de)serialization context dynamically, etc.) (#2772)
 
-**BC Break** 
-* GraphQL: Separate item_query and collection_query operations so user can use different security and serialization groups for them
+Notes:
+
+Please read #2825 if you have issues with the behavior of Readable/Writable Link
+
+## 2.4.7
+
+* Fix passing context to data persisters' `remove` method
+* Ensure OpenAPI normalizers properly expose the date format
+* Add source maps for Swagger UI
+* Improve error message when filter class is not imported
+* Add missing autowiring alias for `Pagination`
+* Doctrine: ensure that `EntityManagerInterface` is used in data providers
 
 ## 2.4.6
 
@@ -97,7 +186,7 @@
 
 ## 2.4.2
 
-* Fix a dependency injection injection problem in `FilterEagerLoadingExtension`
+* Fix a dependency injection problem in `FilterEagerLoadingExtension`
 * Improve performance by adding a `NoOpScalarNormalizer` handling scalar values
 
 ## 2.4.1
@@ -120,14 +209,14 @@
 * Use Symfony's MetadataAwareNameConverter when available
 * Change the extension's priorities (`<0`) for improved compatibility with Symfony's autoconfiguration feature. If you have custom extensions we recommend to use positive priorities.
 
-| Service name                                               | Priority | Class                                              |
-|------------------------------------------------------------|------|---------------------------------------------------------|
-| api_platform.doctrine.orm.query_extension.eager_loading (collection) | -8 | ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\EagerLoadingExtension |
-| api_platform.doctrine.orm.query_extension.eager_loading (item) | -8 | ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\EagerLoadingExtension |
-| api_platform.doctrine.orm.query_extension.filter | -16 | ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\FilterExtension |
-| api_platform.doctrine.orm.query_extension.filter_eager_loading | -17 | ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\FilterEagerLoadingExtension |
-| api_platform.doctrine.orm.query_extension.order | -32 | ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\OrderExtension |
-| api_platform.doctrine.orm.query_extension.pagination | -64 | ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\PaginationExtension |
+| Service name                                               | Old priority | New priority | Class                                              |
+|------------------------------------------------------------|------|------|---------------------------------------------------------|
+| api_platform.doctrine.orm.query_extension.eager_loading (collection) |  | -8 | ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\EagerLoadingExtension |
+| api_platform.doctrine.orm.query_extension.eager_loading (item) | |  -8 | ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\EagerLoadingExtension |
+| api_platform.doctrine.orm.query_extension.filter | 32 | -16 | ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\FilterExtension |
+| api_platform.doctrine.orm.query_extension.filter_eager_loading | |  -17 | ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\FilterEagerLoadingExtension |
+| api_platform.doctrine.orm.query_extension.order | 16 | -32 | ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\OrderExtension |
+| api_platform.doctrine.orm.query_extension.pagination | 8 | -64 | ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\PaginationExtension |
 
 * Fix JSON-LD contexts when using output classes
 * GraphQl: Fix pagination (the `endCursor` behavior was wrong)
@@ -142,33 +231,33 @@
 * Respect `_api_respond` request attribute in the SerializeListener
 * Change the normalizer's priorities (`< 0`). If you have custom normalizer we recommend to use positive priorities.
 
-| Service name                                               | Priority | Class                                              |
-|------------------------------------------------------------|------|---------------------------------------------------------|
-| api_platform.hydra.normalizer.constraint_violation_list   | -780 | ApiPlatform\Core\Hydra\Serializer\ConstraintViolationListNormalizer
-| api_platform.jsonapi.normalizer.constraint_violation_list | -780 | ApiPlatform\Core\JsonApi\Serializer\ConstraintViolationListNormalizer
-| api_platform.problem.normalizer.constraint_violation_list | -780 | ApiPlatform\Core\Problem\Serializer\ConstraintViolationListNormalizer
-| api_platform.swagger.normalizer.api_gateway               | -780 | ApiPlatform\Core\Swagger\Serializer\ApiGatewayNormalizer
-| api_platform.hal.normalizer.collection                    | -790 | ApiPlatform\Core\Hal\Serializer\CollectionNormalizer
-| api_platform.hydra.normalizer.collection_filters          | -790 | ApiPlatform\Core\Hydra\Serializer\CollectionFiltersNormalizer
-| api_platform.jsonapi.normalizer.collection                | -790 | ApiPlatform\Core\JsonApi\Serializer\CollectionNormalizer
-| api_platform.jsonapi.normalizer.error                     | -790 | ApiPlatform\Core\JsonApi\Serializer\ErrorNormalizer
-| api_platform.hal.normalizer.entrypoint                    | -800 | ApiPlatform\Core\Hal\Serializer\EntrypointNormalizer
-| api_platform.hydra.normalizer.documentation               | -800 | ApiPlatform\Core\Hydra\Serializer\DocumentationNormalizer
-| api_platform.hydra.normalizer.entrypoint                  | -800 | ApiPlatform\Core\Hydra\Serializer\EntrypointNormalizer
-| api_platform.hydra.normalizer.error                       | -800 | ApiPlatform\Core\Hydra\Serializer\ErrorNormalizer
-| api_platform.jsonapi.normalizer.entrypoint                | -800 | ApiPlatform\Core\JsonApi\Serializer\EntrypointNormalizer
-| api_platform.problem.normalizer.error                     | -810 | ApiPlatform\Core\Problem\Serializer\ErrorNormalizer
-| serializer.normalizer.json_serializable                   | -900 | Symfony\Component\Serializer\Normalizer\JsonSerializableNormalizer
-| serializer.normalizer.datetime                            | -910 | Symfony\Component\Serializer\Normalizer\DateTimeNormalizer
-| serializer.normalizer.constraint_violation_list           | -915 | Symfony\Component\Serializer\Normalizer\ConstraintViolationListNormalizer
-| serializer.normalizer.dateinterval                        | -915 | Symfony\Component\Serializer\Normalizer\DateIntervalNormalizer
-| serializer.normalizer.data_uri                            | -920 | Symfony\Component\Serializer\Normalizer\DataUriNormalizer
-| api_platform.graphql.normalizer.item                      | -922 | ApiPlatform\Core\GraphQl\Serializer\ItemNormalizer
-| api_platform.hal.normalizer.item                          | -922 | ApiPlatform\Core\Hal\Serializer\ItemNormalizer
-| api_platform.jsonapi.normalizer.item                      | -922 | ApiPlatform\Core\JsonApi\Serializer\ItemNormalizer
-| api_platform.jsonld.normalizer.item                       | -922 | ApiPlatform\Core\JsonLd\Serializer\ItemNormalizer
-| api_platform.serializer.normalizer.item                   | -923 | ApiPlatform\Core\Serializer\ItemNormalizer
-| serializer.normalizer.object                              | -1000 | Symfony\Component\Serializer\Normalizer\ObjectNormalizer
+| Service name                                               | Old priority | New priority | Class                                              |
+|------------------------------------------------------------|------|------|---------------------------------------------------------|
+| api_platform.hydra.normalizer.constraint_violation_list   | 64 | -780 | ApiPlatform\Core\Hydra\Serializer\ConstraintViolationListNormalizer
+| api_platform.jsonapi.normalizer.constraint_violation_list |  | -780 | ApiPlatform\Core\JsonApi\Serializer\ConstraintViolationListNormalizer
+| api_platform.problem.normalizer.constraint_violation_list | |  -780 | ApiPlatform\Core\Problem\Serializer\ConstraintViolationListNormalizer
+| api_platform.swagger.normalizer.api_gateway               | 17 | -780 | ApiPlatform\Core\Swagger\Serializer\ApiGatewayNormalizer
+| api_platform.hal.normalizer.collection                    |  | -790 | ApiPlatform\Core\Hal\Serializer\CollectionNormalizer
+| api_platform.hydra.normalizer.collection_filters          | 0 | -790 | ApiPlatform\Core\Hydra\Serializer\CollectionFiltersNormalizer
+| api_platform.jsonapi.normalizer.collection                |  | -790 | ApiPlatform\Core\JsonApi\Serializer\CollectionNormalizer
+| api_platform.jsonapi.normalizer.error                     |  | -790 | ApiPlatform\Core\JsonApi\Serializer\ErrorNormalizer
+| api_platform.hal.normalizer.entrypoint                    |  | -800 | ApiPlatform\Core\Hal\Serializer\EntrypointNormalizer
+| api_platform.hydra.normalizer.documentation               | 32 | -800 | ApiPlatform\Core\Hydra\Serializer\DocumentationNormalizer
+| api_platform.hydra.normalizer.entrypoint                  | 32 | -800 | ApiPlatform\Core\Hydra\Serializer\EntrypointNormalizer
+| api_platform.hydra.normalizer.error                       | 32 | -800 | ApiPlatform\Core\Hydra\Serializer\ErrorNormalizer
+| api_platform.jsonapi.normalizer.entrypoint                |  | -800 | ApiPlatform\Core\JsonApi\Serializer\EntrypointNormalizer
+| api_platform.problem.normalizer.error                     |  | -810 | ApiPlatform\Core\Problem\Serializer\ErrorNormalizer
+| serializer.normalizer.json_serializable                   | -900 | -900 | Symfony\Component\Serializer\Normalizer\JsonSerializableNormalizer
+| serializer.normalizer.datetime                            | -910 | -910 | Symfony\Component\Serializer\Normalizer\DateTimeNormalizer
+| serializer.normalizer.constraint_violation_list           |  | -915 | Symfony\Component\Serializer\Normalizer\ConstraintViolationListNormalizer
+| serializer.normalizer.dateinterval                        | -915 | -915 | Symfony\Component\Serializer\Normalizer\DateIntervalNormalizer
+| serializer.normalizer.data_uri                            | -920 | -920 | Symfony\Component\Serializer\Normalizer\DataUriNormalizer
+| api_platform.graphql.normalizer.item                      | 8 | -922 | ApiPlatform\Core\GraphQl\Serializer\ItemNormalizer
+| api_platform.hal.normalizer.item                          |  | -922 | ApiPlatform\Core\Hal\Serializer\ItemNormalizer
+| api_platform.jsonapi.normalizer.item                      |  | -922 | ApiPlatform\Core\JsonApi\Serializer\ItemNormalizer
+| api_platform.jsonld.normalizer.item                       | 8 | -922 | ApiPlatform\Core\JsonLd\Serializer\ItemNormalizer
+| api_platform.serializer.normalizer.item                   | 0 | -923 | ApiPlatform\Core\Serializer\ItemNormalizer
+| serializer.normalizer.object                              | -1000 | -1000 | Symfony\Component\Serializer\Normalizer\ObjectNormalizer
 
 * Allow custom stylesheets to be appended or replaced in the swagger UI
 * Load messenger only if available
@@ -368,7 +457,7 @@
 * Persist data in Doctrine DataPersister only if needed
 * Fix identifiers handling in GraphQL mutations
 * Fix client-side ID creation or update when using GraphQL mutations
-* Fix an error that was occuring when the Expression Language component wasn't installed
+* Fix an error that was occurring when the Expression Language component wasn't installed
 * Update the `ChainSubresourceDataProvider` class to take into account `RestrictedDataProviderInterface`
 
 ## 2.2.4

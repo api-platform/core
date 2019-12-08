@@ -23,7 +23,7 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyTableInheritanceChild
 use PHPUnit\Framework\TestCase;
 
 /**
- * @author Antoine Bluchet <soyuka@gmail.com>
+ * @group legacy
  */
 class InheritedPropertyNameCollectionFactoryTest extends TestCase
 {

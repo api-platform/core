@@ -47,9 +47,9 @@ final class SchemaFactory implements SchemaFactoryInterface
     /**
      * {@inheritdoc}
      */
-    public function buildSchema(string $resourceClass, string $format = 'jsonld', bool $output = true, ?string $operationType = null, ?string $operationName = null, ?Schema $schema = null, ?array $serializerContext = null, bool $forceCollection = false): Schema
+    public function buildSchema(string $resourceClass, string $format = 'jsonld', string $type = Schema::TYPE_OUTPUT, ?string $operationType = null, ?string $operationName = null, ?Schema $schema = null, ?array $serializerContext = null, bool $forceCollection = false): Schema
     {
-        $schema = $this->schemaFactory->buildSchema($resourceClass, $format, $output, $operationType, $operationName, $schema, $serializerContext, $forceCollection);
+        $schema = $this->schemaFactory->buildSchema($resourceClass, $format, $type, $operationType, $operationName, $schema, $serializerContext, $forceCollection);
         if ('jsonld' !== $format) {
             return $schema;
         }
@@ -74,24 +74,29 @@ final class SchemaFactory implements SchemaFactoryInterface
                 ],
                 'hydra:totalItems' => [
                     'type' => 'integer',
-                    'minimum' => 1,
+                    'minimum' => 0,
                 ],
                 'hydra:view' => [
                     'type' => 'object',
                     'properties' => [
-                        '@id' => ['type' => 'string'],
-                        '@type' => ['type' => 'string'],
+                        '@id' => [
+                            'type' => 'string',
+                            'format' => 'iri-reference',
+                        ],
+                        '@type' => [
+                            'type' => 'string',
+                        ],
                         'hydra:first' => [
-                            'type' => 'integer',
-                            'minimum' => 1,
+                            'type' => 'string',
+                            'format' => 'iri-reference',
                         ],
                         'hydra:last' => [
-                            'type' => 'integer',
-                            'minimum' => 1,
+                            'type' => 'string',
+                            'format' => 'iri-reference',
                         ],
                         'hydra:next' => [
-                            'type' => 'integer',
-                            'minimum' => 1,
+                            'type' => 'string',
+                            'format' => 'iri-reference',
                         ],
                     ],
                 ],
@@ -115,6 +120,9 @@ final class SchemaFactory implements SchemaFactoryInterface
                         ],
                     ],
                 ],
+            ];
+            $schema['required'] = [
+                'hydra:member',
             ];
 
             return $schema;

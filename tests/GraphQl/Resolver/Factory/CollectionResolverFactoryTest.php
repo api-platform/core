@@ -70,7 +70,7 @@ class CollectionResolverFactoryTest extends TestCase
     {
         $resourceClass = 'stdClass';
         $rootClass = 'rootClass';
-        $operationName = 'query';
+        $operationName = 'collection_query';
         $source = ['source'];
         $args = ['args'];
         $info = $this->prophesize(ResolveInfo::class)->reveal();
@@ -110,7 +110,7 @@ class CollectionResolverFactoryTest extends TestCase
     {
         $resourceClass = null;
         $rootClass = 'rootClass';
-        $operationName = 'query';
+        $operationName = 'collection_query';
         $source = ['source'];
         $args = ['args'];
         $info = $this->prophesize(ResolveInfo::class)->reveal();
@@ -122,7 +122,7 @@ class CollectionResolverFactoryTest extends TestCase
     {
         $resourceClass = 'stdClass';
         $rootClass = null;
-        $operationName = 'query';
+        $operationName = 'collection_query';
         $source = ['source'];
         $args = ['args'];
         $info = $this->prophesize(ResolveInfo::class)->reveal();
@@ -134,7 +134,7 @@ class CollectionResolverFactoryTest extends TestCase
     {
         $resourceClass = 'stdClass';
         $rootClass = 'rootClass';
-        $operationName = 'query';
+        $operationName = 'collection_query';
         $source = ['source'];
         $args = ['args'];
         $info = $this->prophesize(ResolveInfo::class)->reveal();
@@ -153,7 +153,7 @@ class CollectionResolverFactoryTest extends TestCase
     {
         $resourceClass = 'stdClass';
         $rootClass = 'rootClass';
-        $operationName = 'query';
+        $operationName = 'collection_query';
         $source = ['source'];
         $args = ['args'];
         $info = $this->prophesize(ResolveInfo::class)->reveal();

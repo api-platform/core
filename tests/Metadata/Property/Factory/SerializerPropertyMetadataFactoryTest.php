@@ -30,9 +30,6 @@ use Symfony\Component\Serializer\Mapping\ClassMetadata as SerializerClassMetadat
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface as SerializerClassMetadataFactoryInterface;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 
-/**
- * @author Teoh Han Hui <teohhanhui@gmail.com>
- */
 class SerializerPropertyMetadataFactoryTest extends TestCase
 {
     public function testConstruct()
@@ -137,7 +134,10 @@ class SerializerPropertyMetadataFactoryTest extends TestCase
         ];
     }
 
-    public function testCreateInherited()
+    /**
+     * @group legacy
+     */
+    public function testCreateInherited(): void
     {
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create(DummyTableInheritanceChild::class)->willReturn(new ResourceMetadata());

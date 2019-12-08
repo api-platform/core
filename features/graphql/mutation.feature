@@ -1,4 +1,5 @@
 Feature: GraphQL mutation support
+
   @createSchema
   Scenario: Introspect types
     When I send the following GraphQL request:
@@ -30,14 +31,353 @@ Feature: GraphQL mutation support
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/json"
-    And the JSON node "data.__type.fields[0].name" should contain "delete"
-    And the JSON node "data.__type.fields[0].description" should match '/^Deletes a [A-z0-9]+.$/'
-    And the JSON node "data.__type.fields[0].type.name" should match "/^delete[A-z0-9]+Payload$/"
-    And the JSON node "data.__type.fields[0].type.kind" should be equal to "OBJECT"
-    And the JSON node "data.__type.fields[0].args[0].name" should be equal to "input"
-    And the JSON node "data.__type.fields[0].args[0].type.kind" should be equal to "NON_NULL"
-    And the JSON node "data.__type.fields[0].args[0].type.ofType.name" should match "/^delete[A-z0-9]+Input$/"
-    And the JSON node "data.__type.fields[0].args[0].type.ofType.kind" should be equal to "INPUT_OBJECT"
+    And the JSON should be valid according to this schema:
+    """
+    {
+      "type": "object",
+      "required": [
+        "data"
+      ],
+      "properties": {
+        "data": {
+          "type": "object",
+          "required": [
+            "__type"
+          ],
+          "properties": {
+            "__type": {
+              "type": "object",
+              "required": [
+                "fields"
+              ],
+              "properties": {
+                "fields": {
+                  "type": "array",
+                  "minItems": 1,
+                  "items": {
+                    "oneOf": [
+                      {
+                        "type": "object",
+                        "required": [
+                          "name",
+                          "description",
+                          "type",
+                          "args"
+                        ],
+                        "properties": {
+                          "name": {
+                            "pattern": "^create[A-z0-9]+$"
+                          },
+                          "description": {
+                            "pattern": "^Creates a [A-z0-9]+.$"
+                          },
+                          "type": {
+                            "type": "object",
+                            "required": [
+                              "name",
+                              "kind"
+                            ],
+                            "properties": {
+                              "name": {
+                                "pattern": "^create[A-z0-9]+Payload$"
+                              },
+                              "kind": {
+                                "enum": ["OBJECT"]
+                              }
+                            }
+                          },
+                          "args": {
+                            "type": "array",
+                            "minItems": 1,
+                            "maxItems": 1,
+                            "items": [
+                              {
+                                "type": "object",
+                                "required": [
+                                  "name",
+                                  "type"
+                                ],
+                                "properties": {
+                                  "name": {
+                                    "enum": ["input"]
+                                  },
+                                  "type": {
+                                    "type": "object",
+                                    "required": [
+                                      "kind",
+                                      "ofType"
+                                    ],
+                                    "properties": {
+                                      "kind": {
+                                        "enum": ["NON_NULL"]
+                                      },
+                                      "ofType": {
+                                        "type": "object",
+                                        "required": [
+                                          "name",
+                                          "kind"
+                                        ],
+                                        "properties": {
+                                          "name": {
+                                            "pattern": "^create[A-z0-9]+Input$"
+                                          },
+                                          "kind": {
+                                            "enum": ["INPUT_OBJECT"]
+                                          }
+                                        }
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            ]
+                          }
+                        }
+                      },
+                      {
+                        "type": "object",
+                        "required": [
+                          "name",
+                          "description",
+                          "type",
+                          "args"
+                        ],
+                        "properties": {
+                          "name": {
+                            "pattern": "^update[A-z0-9]+$"
+                          },
+                          "description": {
+                            "pattern": "^Updates a [A-z0-9]+.$"
+                          },
+                          "type": {
+                            "type": "object",
+                            "required": [
+                              "name",
+                              "kind"
+                            ],
+                            "properties": {
+                              "name": {
+                                "pattern": "^update[A-z0-9]+Payload$"
+                              },
+                              "kind": {
+                                "enum": ["OBJECT"]
+                              }
+                            }
+                          },
+                          "args": {
+                            "type": "array",
+                            "minItems": 1,
+                            "maxItems": 1,
+                            "items": [
+                              {
+                                "type": "object",
+                                "required": [
+                                  "name",
+                                  "type"
+                                ],
+                                "properties": {
+                                  "name": {
+                                    "enum": ["input"]
+                                  },
+                                  "type": {
+                                    "type": "object",
+                                    "required": [
+                                      "kind",
+                                      "ofType"
+                                    ],
+                                    "properties": {
+                                      "kind": {
+                                        "enum": ["NON_NULL"]
+                                      },
+                                      "ofType": {
+                                        "type": "object",
+                                        "required": [
+                                          "name",
+                                          "kind"
+                                        ],
+                                        "properties": {
+                                          "name": {
+                                            "pattern": "^update[A-z0-9]+Input$"
+                                          },
+                                          "kind": {
+                                            "enum": ["INPUT_OBJECT"]
+                                          }
+                                        }
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            ]
+                          }
+                        }
+                      },
+                      {
+                        "type": "object",
+                        "required": [
+                          "name",
+                          "description",
+                          "type",
+                          "args"
+                        ],
+                        "properties": {
+                          "name": {
+                            "pattern": "^delete[A-z0-9]+$"
+                          },
+                          "description": {
+                            "pattern": "^Deletes a [A-z0-9]+.$"
+                          },
+                          "type": {
+                            "type": "object",
+                            "required": [
+                              "name",
+                              "kind"
+                            ],
+                            "properties": {
+                              "name": {
+                                "pattern": "^delete[A-z0-9]+Payload$"
+                              },
+                              "kind": {
+                                "enum": ["OBJECT"]
+                              }
+                            }
+                          },
+                          "args": {
+                            "type": "array",
+                            "minItems": 1,
+                            "maxItems": 1,
+                            "items": [
+                              {
+                                "type": "object",
+                                "required": [
+                                  "name",
+                                  "type"
+                                ],
+                                "properties": {
+                                  "name": {
+                                    "enum": ["input"]
+                                  },
+                                  "type": {
+                                    "type": "object",
+                                    "required": [
+                                      "kind",
+                                      "ofType"
+                                    ],
+                                    "properties": {
+                                      "kind": {
+                                        "enum": ["NON_NULL"]
+                                      },
+                                      "ofType": {
+                                        "type": "object",
+                                        "required": [
+                                          "name",
+                                          "kind"
+                                        ],
+                                        "properties": {
+                                          "name": {
+                                            "pattern": "^delete[A-z0-9]+Input$"
+                                          },
+                                          "kind": {
+                                            "enum": ["INPUT_OBJECT"]
+                                          }
+                                        }
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            ]
+                          }
+                        }
+                      },
+                      {
+                        "type": "object",
+                        "required": [
+                          "name",
+                          "description",
+                          "type",
+                          "args"
+                        ],
+                        "properties": {
+                          "name": {
+                            "pattern": "^(?!create|update|delete)[A-z0-9]+$"
+                          },
+                          "description": {
+                            "pattern": "^(?!Create|Update|Delete)[A-z0-9]+s a [A-z0-9]+.$"
+                          },
+                          "type": {
+                            "type": "object",
+                            "required": [
+                              "name",
+                              "kind"
+                            ],
+                            "properties": {
+                              "name": {
+                                "pattern": "^(?!create|update|delete)[A-z0-9]+Payload$"
+                              },
+                              "kind": {
+                                "enum": ["OBJECT"]
+                              }
+                            }
+                          },
+                          "args": {
+                            "type": "array",
+                            "minItems": 1,
+                            "maxItems": 1,
+                            "items": [
+                              {
+                                "type": "object",
+                                "required": [
+                                  "name",
+                                  "type"
+                                ],
+                                "properties": {
+                                  "name": {
+                                    "enum": ["input"]
+                                  },
+                                  "type": {
+                                    "type": "object",
+                                    "required": [
+                                      "kind",
+                                      "ofType"
+                                    ],
+                                    "properties": {
+                                      "kind": {
+                                        "enum": ["NON_NULL"]
+                                      },
+                                      "ofType": {
+                                        "type": "object",
+                                        "required": [
+                                          "name",
+                                          "kind"
+                                        ],
+                                        "properties": {
+                                          "name": {
+                                            "pattern": "^(?!create|update|delete)[A-z0-9]+Input$"
+                                          },
+                                          "kind": {
+                                            "enum": ["INPUT_OBJECT"]
+                                          }
+                                        }
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    """
 
   Scenario: Create an item
     When I send the following GraphQL request:
@@ -90,7 +430,7 @@ Feature: GraphQL mutation support
     When I send the following GraphQL request:
     """
     mutation {
-      createDummy(input: {name: "A dummy", foo: [], relatedDummy: "/related_dummies/1", clientMutationId: "myId"}) {
+      createDummy(input: {name: "A dummy", foo: [], relatedDummy: "/related_dummies/1", name_converted: "Converted" clientMutationId: "myId"}) {
         dummy {
           id
           name
@@ -99,6 +439,7 @@ Feature: GraphQL mutation support
             name
             __typename
           }
+          name_converted
         }
         clientMutationId
       }
@@ -112,6 +453,7 @@ Feature: GraphQL mutation support
     And the JSON node "data.createDummy.dummy.foo" should have 0 elements
     And the JSON node "data.createDummy.dummy.relatedDummy.name" should be equal to "RelatedDummy #1"
     And the JSON node "data.createDummy.dummy.relatedDummy.__typename" should be equal to "RelatedDummy"
+    And the JSON node "data.createDummy.dummy.name_converted" should be equal to "Converted"
     And the JSON node "data.createDummy.clientMutationId" should be equal to "myId"
 
   Scenario: Create an item with an iterable field
@@ -332,7 +674,11 @@ Feature: GraphQL mutation support
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/json"
+    And the JSON node "errors[0].extensions.status" should be equal to "400"
     And the JSON node "errors[0].message" should be equal to "name: This value should not be blank."
+    And the JSON node "errors[0].extensions.violations" should exist
+    And the JSON node "errors[0].extensions.violations[0].path" should be equal to "name"
+    And the JSON node "errors[0].extensions.violations[0].message" should be equal to "This value should not be blank."
 
   Scenario: Execute a custom mutation
     Given there are 1 dummyCustomMutation objects
@@ -420,3 +766,56 @@ Feature: GraphQL mutation support
     And the header "Content-Type" should be equal to "application/json"
     And the JSON node "data.testCustomArgumentsDummyCustomMutation.dummyCustomMutation.result" should be equal to "18"
     And the JSON node "data.testCustomArgumentsDummyCustomMutation.clientMutationId" should be equal to "myId"
+
+  Scenario: Uploading a file with a custom mutation
+    Given I have the following file for a GraphQL request:
+      | name | file     |
+      | file | test.gif |
+    And I have the following GraphQL multipart request map:
+    """
+    {
+      "file": ["variables.file"]
+    }
+    """
+    When I send the following GraphQL multipart request operations:
+    """
+      {
+        "query": "mutation($file: Upload!) { uploadMediaObject(input: {file: $file}) { mediaObject { id contentUrl } } }",
+        "variables": {
+          "file": null
+        }
+      }
+    """
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the JSON node "data.uploadMediaObject.mediaObject.contentUrl" should be equal to "test.gif"
+
+  Scenario: Uploading multiple files with a custom mutation
+    Given I have the following files for a GraphQL request:
+      | name | file     |
+      | 0    | test.gif |
+      | 1    | test.gif |
+      | 2    | test.gif |
+    And I have the following GraphQL multipart request map:
+    """
+    {
+      "0": ["variables.files.0"],
+      "1": ["variables.files.1"],
+      "2": ["variables.files.2"]
+    }
+    """
+    When I send the following GraphQL multipart request operations:
+    """
+      {
+        "query": "mutation($files: [Upload!]!) { uploadMultipleMediaObject(input: {files: $files}) { mediaObject { id contentUrl } } }",
+        "variables": {
+          "files": [
+            null,
+            null,
+            null
+          ]
+        }
+      }
+    """
+    Then the response status code should be 200
+    And the JSON node "data.uploadMultipleMediaObject.mediaObject.contentUrl" should be equal to "test.gif"

@@ -19,6 +19,7 @@ use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Swagger\Serializer\DocumentationNormalizer;
 use ApiPlatform\Core\Util\RequestAttributesExtractor;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Serializer\Encoder\CsvEncoder;
 
 /**
  * {@inheritdoc}
@@ -28,12 +29,10 @@ use Symfony\Component\HttpFoundation\Request;
 final class SerializerContextBuilder implements SerializerContextBuilderInterface
 {
     private $resourceMetadataFactory;
-    private $patchFormats;
 
-    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, array $patchFormats = [])
+    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory)
     {
         $this->resourceMetadataFactory = $resourceMetadataFactory;
-        $this->patchFormats = $patchFormats;
     }
 
     /**
@@ -62,8 +61,14 @@ final class SerializerContextBuilder implements SerializerContextBuilderInterfac
         $context['operation_type'] = $operationType;
         $context[$operationKey] = $attributes[$operationKey];
 
-        if (!$normalization && !isset($context['api_allow_update'])) {
-            $context['api_allow_update'] = \in_array($request->getMethod(), ['PUT', 'PATCH'], true);
+        if (!$normalization) {
+            if (!isset($context['api_allow_update'])) {
+                $context['api_allow_update'] = \in_array($request->getMethod(), ['PUT', 'PATCH'], true);
+            }
+
+            if ('csv' === $request->getContentType()) {
+                $context[CsvEncoder::AS_COLLECTION_KEY] = false;
+            }
         }
 
         $context['resource_class'] = $attributes['resource_class'];
@@ -91,12 +96,16 @@ final class SerializerContextBuilder implements SerializerContextBuilderInterfac
 
         unset($context[DocumentationNormalizer::SWAGGER_DEFINITION_NAME]);
 
-        if (
-            isset($this->patchFormats['json'])
-            && !isset($context['skip_null_values'])
-            && \in_array('application/merge-patch+json', $this->patchFormats['json'], true)
-        ) {
-            $context['skip_null_values'] = true;
+        if (isset($context['skip_null_values'])) {
+            return $context;
+        }
+
+        foreach ($resourceMetadata->getItemOperations() as $operation) {
+            if ('PATCH' === ($operation['method'] ?? '') && \in_array('application/merge-patch+json', $operation['input_formats']['json'] ?? [], true)) {
+                $context['skip_null_values'] = true;
+
+                break;
+            }
         }
 
         return $context;

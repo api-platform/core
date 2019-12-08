@@ -14,12 +14,12 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\GraphQl\Resolver\Stage;
 
 use ApiPlatform\Core\DataProvider\ArrayPaginator;
+use ApiPlatform\Core\DataProvider\Pagination;
 use ApiPlatform\Core\GraphQl\Resolver\Stage\SerializeStage;
 use ApiPlatform\Core\GraphQl\Serializer\ItemNormalizer;
 use ApiPlatform\Core\GraphQl\Serializer\SerializerContextBuilderInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
-use GraphQL\Error\Error;
 use GraphQL\Type\Definition\ResolveInfo;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
@@ -49,7 +49,7 @@ class SerializeStageTest extends TestCase
      */
     public function testApplyDisabled(array $context, bool $paginationEnabled, ?array $expectedResult): void
     {
-        $operationName = 'query';
+        $operationName = 'item_query';
         $resourceClass = 'myResource';
         $resourceMetadata = (new ResourceMetadata())->withGraphql([
             $operationName => ['serialize' => false],
@@ -99,8 +99,8 @@ class SerializeStageTest extends TestCase
         ];
 
         return [
-            'item' => [new \stdClass(), 'query', $defaultContext + ['is_collection' => false, 'is_mutation' => false], false, ['normalized_item']],
-            'collection without pagination' => [[new \stdClass(), new \stdClass()], 'query', $defaultContext + ['is_collection' => true, 'is_mutation' => false], false, [['normalized_item'], ['normalized_item']]],
+            'item' => [new \stdClass(), 'item_query', $defaultContext + ['is_collection' => false, 'is_mutation' => false], false, ['normalized_item']],
+            'collection without pagination' => [[new \stdClass(), new \stdClass()], 'collection_query', $defaultContext + ['is_collection' => true, 'is_mutation' => false], false, [['normalized_item'], ['normalized_item']]],
             'mutation' => [new \stdClass(), 'create', array_merge($defaultContext, ['args' => ['input' => ['clientMutationId' => 'clientMutationId']], 'is_collection' => false, 'is_mutation' => true]), false, ['shortName' => ['normalized_item'], 'clientMutationId' => 'clientMutationId']],
             'delete mutation' => [new \stdClass(), 'delete', array_merge($defaultContext, ['args' => ['input' => ['id' => 4]], 'is_collection' => false, 'is_mutation' => true]), false, ['shortName' => ['id' => 4], 'clientMutationId' => null]],
         ];
@@ -111,7 +111,7 @@ class SerializeStageTest extends TestCase
      */
     public function testApplyCollectionWithPagination(iterable $collection, array $args, ?array $expectedResult, ?string $expectedExceptionClass = null, ?string $expectedExceptionMessage = null): void
     {
-        $operationName = 'query';
+        $operationName = 'collection_query';
         $resourceClass = 'myResource';
         $context = [
             'is_collection' => true,
@@ -139,20 +139,20 @@ class SerializeStageTest extends TestCase
     public function applyCollectionWithPaginationProvider(): array
     {
         return [
-            'not paginator' => [[], [], null, Error::class, 'Collection returned by the collection data provider must implement ApiPlatform\Core\DataProvider\PaginatorInterface'],
+            'not paginator' => [[], [], null, \LogicException::class, 'Collection returned by the collection data provider must implement ApiPlatform\Core\DataProvider\PaginatorInterface'],
             'empty paginator' => [new ArrayPaginator([], 0, 0), [], ['totalCount' => 0., 'edges' => [], 'pageInfo' => ['startCursor' => null, 'endCursor' => null, 'hasNextPage' => false, 'hasPreviousPage' => false]]],
             'paginator' => [new ArrayPaginator([new \stdClass(), new \stdClass(), new \stdClass()], 0, 2), [], ['totalCount' => 3., 'edges' => [['node' => ['normalized_item'], 'cursor' => 'MA=='], ['node' => ['normalized_item'], 'cursor' => 'MQ==']], 'pageInfo' => ['startCursor' => 'MA==', 'endCursor' => 'MQ==', 'hasNextPage' => true, 'hasPreviousPage' => false]]],
             'paginator with after cursor' => [new ArrayPaginator([new \stdClass(), new \stdClass(), new \stdClass()], 1, 2), ['after' => 'MA=='], ['totalCount' => 3., 'edges' => [['node' => ['normalized_item'], 'cursor' => 'MQ=='], ['node' => ['normalized_item'], 'cursor' => 'Mg==']], 'pageInfo' => ['startCursor' => 'MQ==', 'endCursor' => 'Mg==', 'hasNextPage' => false, 'hasPreviousPage' => true]]],
-            'paginator with bad after cursor' => [new ArrayPaginator([], 0, 0), ['after' => '-'], null, Error::class, 'Cursor - is invalid'],
-            'paginator with before cursor' => [new ArrayPaginator([new \stdClass(), new \stdClass(), new \stdClass()], 1, 1), ['before' => 'Mg=='], ['totalCount' => 3., 'edges' => [['node' => ['normalized_item'], 'cursor' => 'MQ==']], 'pageInfo' => ['startCursor' => 'MQ==', 'endCursor' => 'MQ==', 'hasNextPage' => false, 'hasPreviousPage' => true]]],
-            'paginator with bad before cursor' => [new ArrayPaginator([], 0, 0), ['before' => '-'], null, Error::class, 'Cursor - is invalid'],
+            'paginator with bad after cursor' => [new ArrayPaginator([], 0, 0), ['after' => '-'], null, \UnexpectedValueException::class, 'Cursor - is invalid'],
+            'paginator with before cursor' => [new ArrayPaginator([new \stdClass(), new \stdClass(), new \stdClass()], 1, 1), ['before' => 'Mg=='], ['totalCount' => 3., 'edges' => [['node' => ['normalized_item'], 'cursor' => 'MQ==']], 'pageInfo' => ['startCursor' => 'MQ==', 'endCursor' => 'MQ==', 'hasNextPage' => true, 'hasPreviousPage' => true]]],
+            'paginator with bad before cursor' => [new ArrayPaginator([], 0, 0), ['before' => '-'], null, \UnexpectedValueException::class, 'Cursor - is invalid'],
             'paginator with last' => [new ArrayPaginator([new \stdClass(), new \stdClass(), new \stdClass()], 1, 2), ['last' => 2], ['totalCount' => 3., 'edges' => [['node' => ['normalized_item'], 'cursor' => 'MQ=='], ['node' => ['normalized_item'], 'cursor' => 'Mg==']], 'pageInfo' => ['startCursor' => 'MQ==', 'endCursor' => 'Mg==', 'hasNextPage' => false, 'hasPreviousPage' => true]]],
         ];
     }
 
     public function testApplyBadNormalizedData(): void
     {
-        $operationName = 'query';
+        $operationName = 'item_query';
         $resourceClass = 'myResource';
         $context = ['is_collection' => false, 'is_mutation' => false, 'args' => [], 'info' => $this->prophesize(ResolveInfo::class)->reveal()];
         $this->resourceMetadataFactoryProphecy->create($resourceClass)->willReturn(new ResourceMetadata());
@@ -162,7 +162,7 @@ class SerializeStageTest extends TestCase
 
         $this->normalizerProphecy->normalize(Argument::type('stdClass'), ItemNormalizer::FORMAT, $normalizationContext)->willReturn(new \stdClass());
 
-        $this->expectException(Error::class);
+        $this->expectException(\UnexpectedValueException::class);
         $this->expectExceptionMessage('Expected serialized data to be a nullable array.');
 
         ($this->createSerializeStage(false))(new \stdClass(), $resourceClass, $operationName, $context);
@@ -170,11 +170,13 @@ class SerializeStageTest extends TestCase
 
     private function createSerializeStage(bool $paginationEnabled): SerializeStage
     {
+        $pagination = new Pagination($this->resourceMetadataFactoryProphecy->reveal(), [], ['enabled' => $paginationEnabled]);
+
         return new SerializeStage(
             $this->resourceMetadataFactoryProphecy->reveal(),
             $this->normalizerProphecy->reveal(),
             $this->serializerContextBuilderProphecy->reveal(),
-            $paginationEnabled
+            $pagination
         );
     }
 }

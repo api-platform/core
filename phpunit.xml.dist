@@ -2,7 +2,7 @@
 
 <!-- http://phpunit.de/manual/4.1/en/appendixes.configuration.html -->
 <phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:noNamespaceSchemaLocation="http://schema.phpunit.de/4.6/phpunit.xsd"
+         xsi:noNamespaceSchemaLocation="./vendor/phpunit/phpunit/phpunit.xsd"
          backupGlobals="false"
          bootstrap="tests/Fixtures/app/bootstrap.php"
          colors="true"
@@ -27,9 +27,10 @@
         <whitelist processUncoveredFilesFromWhitelist="true">
             <directory>.</directory>
             <exclude>
-                <directory>tests</directory>
                 <directory>features</directory>
+                <directory>tests</directory>
                 <directory>vendor</directory>
+                <file>src/Bridge/Symfony/Bundle/DependencyInjection/ApiPlatformExtension.php</file>
             </exclude>
         </whitelist>
     </filter>

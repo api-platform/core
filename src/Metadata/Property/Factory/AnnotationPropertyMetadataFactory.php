@@ -112,12 +112,16 @@ final class AnnotationPropertyMetadataFactory implements PropertyMetadataFactory
                 $annotation->identifier,
                 $annotation->iri,
                 null,
-                $annotation->attributes
+                $annotation->attributes,
+                null,
+                null,
+                $annotation->default,
+                $annotation->example
             );
         }
 
         $propertyMetadata = $parentPropertyMetadata;
-        foreach ([['get', 'description'], ['is', 'readable'], ['is', 'writable'], ['is', 'readableLink'], ['is', 'writableLink'], ['is', 'required'], ['get', 'iri'], ['is', 'identifier'], ['get', 'attributes']] as $property) {
+        foreach ([['get', 'description'], ['is', 'readable'], ['is', 'writable'], ['is', 'readableLink'], ['is', 'writableLink'], ['is', 'required'], ['get', 'iri'], ['is', 'identifier'], ['get', 'attributes'], ['get', 'default'], ['get', 'example']] as $property) {
             if (null !== $value = $annotation->{$property[1]}) {
                 $propertyMetadata = $this->createWith($propertyMetadata, $property, $value);
             }

@@ -15,9 +15,10 @@ namespace ApiPlatform\Core\Hydra\EventListener;
 
 use ApiPlatform\Core\Api\UrlGeneratorInterface;
 use ApiPlatform\Core\JsonLd\ContextBuilder;
+use ApiPlatform\Core\Util\CorsTrait;
 use Fig\Link\GenericLinkProvider;
 use Fig\Link\Link;
-use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
+use Symfony\Component\HttpKernel\Event\ResponseEvent;
 
 /**
  * Adds the HTTP Link header pointing to the Hydra documentation.
@@ -26,6 +27,8 @@ use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
  */
 final class AddLinkHeaderListener
 {
+    use CorsTrait;
+
     private $urlGenerator;
 
     public function __construct(UrlGeneratorInterface $urlGenerator)
@@ -36,17 +39,22 @@ final class AddLinkHeaderListener
     /**
      * Sends the Hydra header on each response.
      */
-    public function onKernelResponse(FilterResponseEvent $event): void
+    public function onKernelResponse(ResponseEvent $event): void
     {
+        $request = $event->getRequest();
+        // Prevent issues with NelmioCorsBundle
+        if ($this->isPreflightRequest($request)) {
+            return;
+        }
+
         $apiDocUrl = $this->urlGenerator->generate('api_doc', ['_format' => 'jsonld'], UrlGeneratorInterface::ABS_URL);
         $link = new Link(ContextBuilder::HYDRA_NS.'apiDocumentation', $apiDocUrl);
 
-        $attributes = $event->getRequest()->attributes;
-        if (null === $linkProvider = $attributes->get('_links')) {
-            $attributes->set('_links', new GenericLinkProvider([$link]));
+        if (null === $linkProvider = $request->attributes->get('_links')) {
+            $request->attributes->set('_links', new GenericLinkProvider([$link]));
 
             return;
         }
-        $attributes->set('_links', $linkProvider->withLink($link));
+        $request->attributes->set('_links', $linkProvider->withLink($link));
     }
 }

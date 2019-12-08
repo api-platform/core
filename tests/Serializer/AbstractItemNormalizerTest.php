@@ -181,7 +181,7 @@ class AbstractItemNormalizerTest extends TestCase
         ]);
         $normalizer->setSerializer($serializerProphecy->reveal());
 
-        if (!interface_exists(AdvancedNameConverterInterface::class)) {
+        if (!interface_exists(AdvancedNameConverterInterface::class) && method_exists($normalizer, 'setIgnoredAttributes')) {
             $normalizer->setIgnoredAttributes(['alias']);
         }
 
@@ -805,7 +805,10 @@ class AbstractItemNormalizerTest extends TestCase
         $propertyAccessorProphecy->setValue($actual, 'name', null)->shouldHaveBeenCalled();
     }
 
-    public function testChildInheritedProperty()
+    /**
+     * @group legacy
+     */
+    public function testChildInheritedProperty(): void
     {
         $dummy = new DummyTableInheritance();
         $dummy->setName('foo');

@@ -124,7 +124,7 @@ Feature: Content Negotiation support
     Then the response status code should be 406
     And the header "Content-Type" should be equal to "application/problem+json; charset=utf-8"
 
-  Scenario: Post an CSV body allowed on a single resource
+  Scenario: Post CSV body allowed on a single resource
     When I add "Accept" header equal to "application/xml"
     And I add "Content-Type" header equal to "text/csv"
     And I send a "POST" request to "/dummy_custom_formats" with body:

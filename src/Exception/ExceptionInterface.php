@@ -18,6 +18,6 @@ namespace ApiPlatform\Core\Exception;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-interface ExceptionInterface
+interface ExceptionInterface extends \Throwable
 {
 }

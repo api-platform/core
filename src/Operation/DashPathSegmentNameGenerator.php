@@ -27,9 +27,7 @@ final class DashPathSegmentNameGenerator implements PathSegmentNameGeneratorInte
      */
     public function getSegmentName(string $name, bool $collection = true): string
     {
-        $name = $this->dashize($name);
-
-        return $collection ? Inflector::pluralize($name) : $name;
+        return $collection ? $this->dashize(Inflector::pluralize($name)) : $this->dashize($name);
     }
 
     private function dashize(string $string): string

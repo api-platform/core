@@ -89,10 +89,10 @@ final class Client implements HttpClientInterface
         $basic = $options['auth_basic'] ?? null;
         [$url, $options] = self::prepareRequest($method, $url, $options, $this->defaultOptions);
         $resolvedUrl = implode('', $url);
-
         $server = [];
+
         // Convert headers to a $_SERVER-like array
-        foreach ($options['headers'] as $key => $value) {
+        foreach (self::extractHeaders($options) as $key => $value) {
             if ('content-type' === $key) {
                 $server['CONTENT_TYPE'] = $value[0] ?? '';
 
@@ -211,5 +211,29 @@ final class Client implements HttpClientInterface
     public function enableReboot(): void
     {
         $this->kernelBrowser->enableReboot();
+    }
+
+    /**
+     * Extracts headers depending on the symfony/http-client version being used.
+     *
+     * @return array<string, string[]>
+     */
+    private static function extractHeaders(array $options): array
+    {
+        if (!isset($options['normalized_headers'])) {
+            return $options['headers'];
+        }
+
+        $headers = [];
+
+        /** @var string $key */
+        foreach ($options['normalized_headers'] as $key => $values) {
+            foreach ($values as $value) {
+                [, $value] = explode(': ', $value, 2);
+                $headers[$key][] = $value;
+            }
+        }
+
+        return $headers;
     }
 }

@@ -1,13 +1,15 @@
 imports:
-    - { resource: parameters_postgres.yml }
     - { resource: config_test.yml }
+
+parameters:
+    env(DATABASE_URL): postgres://postgres:@localhost/api_platform_test
+    env(POSTGRES_VERSION): '10'
 
 doctrine:
     dbal:
-        driver:   'pdo_pgsql'
-        dbname:   '%dbname%'
-        user:     '%user%'
-        password: '%password%'
-        host:     '%host%'
+        driver: pdo_pgsql
+        url: '%env(resolve:DATABASE_URL)%'
+        path: ~
+        server_version: '%env(POSTGRES_VERSION)%'
         types:
-            uuid:  Ramsey\Uuid\Doctrine\UuidType
+            uuid: Ramsey\Uuid\Doctrine\UuidType

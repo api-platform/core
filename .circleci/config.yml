@@ -1,27 +1,14 @@
 version: 2.1
 
-orbs:
-  codecov: codecov/codecov@1
-  coveralls:
-    commands:
-      upload:
-        parameters:
-          file:
-            description: Path to the code coverage data file to upload.
-            type: string
-            default: ""
-        steps:
-          - run:
-              name: Upload Coverage Results
-              command: |
-                npx @cedx/coveralls@^8.6 "<< parameters.file >>" || echo 'Coveralls upload failed'
+.constants:
+  - &ext-mongodb-version '1.6.0'
 
 commands:
   clear-test-app-cache:
     steps:
       - run:
           name: Clear test app cache
-          command: tests/Fixtures/app/console cache:clear
+          command: tests/Fixtures/app/console cache:clear --ansi
   disable-php-memory-limit:
     steps:
       - run:
@@ -30,204 +17,192 @@ commands:
   disable-xdebug-php-extension:
     steps:
       - run:
-          name: Disable Xdebug PHP extension
+          name: Disable xdebug PHP extension
           command: sudo rm /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
   install-mongodb-php-extension:
     steps:
-      - run:
-          name: Install mongodb PHP extension
-          command: |
-            sudo pecl install mongodb-1.5.4
-            sudo docker-php-ext-enable mongodb
-  install-pcov-php-extension:
-    steps:
-      - run:
-          name: Install pcov PHP extension
-          command: |
-            sudo pecl install pcov-1.0.6
-            sudo docker-php-ext-enable pcov
-  merge-code-coverage-reports:
+      - install-php-extension-from-pecl:
+          extension_name: mongodb
+          extension_version: *ext-mongodb-version
+  install-php-extension-from-pecl:
     parameters:
-      dir:
-        description: Path to the directory containing the code coverage reports to merge.
+      extension_name:
+        description: Name of the PHP extension.
         type: string
-      out:
-        description: Path to output the merged code coverage report.
-        type: string
-    steps:
-      - run:
-          name: Download phpcov
-          command: |
-            if ! command -v phpcov; then
-              wget https://phar.phpunit.de/phpcov.phar
-              chmod +x phpcov.phar
-              sudo mv phpcov.phar /usr/local/bin/phpcov
-            fi
-      - run:
-          name: Merge code coverage reports
-          command: |
-            mkdir -p "$(dirname -- "<< parameters.out >>")"
-            phpcov merge --clover "<< parameters.out >>" "<< parameters.dir >>"
-  merge-test-reports:
-    parameters:
-      dir:
-        description: Path to the directory containing the test reports to merge.
-        type: string
-      out:
-        description: Path to output the merged test report.
+      extension_version:
+        description: Version of the PHP extension.
         type: string
     steps:
       - run:
-          name: Merge test reports
+          name: Install << parameters.extension_name >> PHP extension
+          environment:
+            BUILD_DIR: /var/tmp/build/ext-<< parameters.extension_name >>-<< parameters.extension_version >>
+            SRC_DIR: /usr/src/php/ext/<< parameters.extension_name >>
           command: |
-            tmpout=$(mktemp)
-            npx junit-merge@^2.0 --dir "<< parameters.dir >>" --recursive --out "$tmpout"
-            rm -r "<< parameters.dir >>"
-            mkdir -p "$(dirname -- "<< parameters.out >>")"
-            mv "$tmpout" "<< parameters.out >>"
+            sudo mkdir -p "$SRC_DIR" "$BUILD_DIR"
+            sudo chown -R "$(id -u):$(id -g)" "$SRC_DIR" "$BUILD_DIR"
+            cd "$SRC_DIR"
+            curl -fsSL "https://pecl.php.net/get/<< parameters.extension_name >>-<< parameters.extension_version >>.tgz" | tar -zx --strip-components 1
+            phpize
+            cd "$BUILD_DIR"
+            "$SRC_DIR"/configure --config-cache
+            make -j"$(nproc)"
+            sudo make -j"$(nproc)" install
+            sudo docker-php-ext-enable << parameters.extension_name >>
+  install-symfony-flex:
+    steps:
+      - run:
+          name: Install Symfony Flex
+          command: |
+            composer global require --prefer-dist --no-progress --no-suggest --ansi \
+              symfony/flex
   restore-composer-cache:
     steps:
       - restore_cache:
+          name: Restore Composer cache
           keys:
-            - composer-cache-{{ .Revision }}
-            - composer-cache-{{ .Branch }}
-            - composer-cache
-  restore-npm-cache:
+            - composer-{{ .Revision }}
+            - composer-{{ .Branch }}
+            - composer-
+  restore-mongodb-php-extension-build-cache:
+    parameters:
+      php_version:
+        description: PHP version (major.minor).
+        type: string
     steps:
-      - restore_cache:
-          keys:
-            - npm-cache-{{ .Revision }}
-            - npm-cache-{{ .Branch }}
-            - npm-cache
+      - restore-php-extension-build-cache:
+          extension_name: mongodb
+          extension_version: *ext-mongodb-version
+          php_version: << parameters.php_version >>
   restore-php-cs-fixer-cache:
     steps:
       - restore_cache:
+          name: Restore PHP-CS-Fixer cache
           keys:
-            - php-cs-fixer-cache-{{ .Revision }}
-            - php-cs-fixer-cache-{{ .Branch }}
-            - php-cs-fixer-cache
+            - php-cs-fixer-{{ .Revision }}
+            - php-cs-fixer-{{ .Branch }}
+            - php-cs-fixer-
+  restore-php-extension-build-cache:
+    parameters:
+      extension_name:
+        description: Name of the PHP extension.
+        type: string
+      extension_version:
+        description: Version of the PHP extension.
+        type: string
+      php_version:
+        description: PHP version (major.minor).
+        type: string
+    steps:
+      - restore_cache:
+          name: Restore << parameters.extension_name >> PHP extension build cache
+          keys:
+            - ext-<< parameters.extension_name >>-<< parameters.extension_version >>-php<< parameters.php_version >>-
   restore-phpstan-cache:
     steps:
       - restore_cache:
+          name: Restore PHPStan cache
           keys:
-            - phpstan-cache-{{ .Revision }}
-            - phpstan-cache-{{ .Branch }}
-            - phpstan-cache
+            - phpstan-{{ .Revision }}
+            - phpstan-{{ .Branch }}
+            - phpstan-
   save-composer-cache:
     steps:
       - save_cache:
+          name: Save Composer cache
           paths:
             - ~/.composer/cache
-          key: composer-cache-{{ .Branch }}-{{ .BuildNum }}
+          key: composer-{{ .Branch }}-{{ .BuildNum }}
       - save_cache:
+          name: Save Composer cache
           paths:
             - ~/.composer/cache
-          key: composer-cache-{{ .Revision }}-{{ .BuildNum }}
-  save-npm-cache:
+          key: composer-{{ .Revision }}-{{ .BuildNum }}
+  save-mongodb-php-extension-build-cache:
+    parameters:
+      php_version:
+        description: PHP version (major.minor).
+        type: string
     steps:
-      - save_cache:
-          paths:
-            - ~/.npm
-          key: npm-cache-{{ .Branch }}-{{ .BuildNum }}
-      - save_cache:
-          paths:
-            - ~/.npm
-          key: npm-cache-{{ .Revision }}-{{ .BuildNum }}
+      - save-php-extension-build-cache:
+          extension_name: mongodb
+          extension_version: *ext-mongodb-version
+          php_version: << parameters.php_version >>
   save-php-cs-fixer-cache:
     steps:
       - save_cache:
+          name: Save PHP-CS-Fixer cache
           paths:
             - .php_cs.cache
-          key: php-cs-fixer-cache-{{ .Branch }}-{{ .BuildNum }}
+          key: php-cs-fixer-{{ .Branch }}-{{ .BuildNum }}
       - save_cache:
+          name: Save PHP-CS-Fixer cache
           paths:
             - .php_cs.cache
-          key: php-cs-fixer-cache-{{ .Revision }}-{{ .BuildNum }}
+          key: php-cs-fixer-{{ .Revision }}-{{ .BuildNum }}
+  save-php-extension-build-cache:
+    parameters:
+      extension_name:
+        description: Name of the PHP extension.
+        type: string
+      extension_version:
+        description: Version of the PHP extension.
+        type: string
+      php_version:
+        description: PHP version (major.minor).
+        type: string
+    steps:
+      - save_cache:
+          name: Save << parameters.extension_name >> PHP extension build cache
+          paths:
+            - /var/tmp/build/ext-<< parameters.extension_name >>-<< parameters.extension_version >>
+          key: ext-<< parameters.extension_name >>-<< parameters.extension_version >>-php<< parameters.php_version >>-{{ .BuildNum }}
   save-phpstan-cache:
     steps:
       - save_cache:
+          name: Save PHPStan cache
           paths:
             - /tmp/phpstan/cache
-          key: phpstan-cache-{{ .Branch }}-{{ .BuildNum }}
+          key: phpstan-{{ .Branch }}-{{ .BuildNum }}
       - save_cache:
+          name: Save PHPStan cache
           paths:
             - /tmp/phpstan/cache
-          key: phpstan-cache-{{ .Revision }}-{{ .BuildNum }}
-  update-composer:
-    steps:
-      - run:
-          name: Update Composer
-          command: sudo composer self-update
+          key: phpstan-{{ .Revision }}-{{ .BuildNum }}
   update-project-dependencies:
     steps:
       - run:
           name: Update project dependencies
-          command: composer update --prefer-dist --no-progress --no-suggest --ansi
-  wait-for-elasticsearch:
-    steps:
-      - wait-for-service:
-          label: Elasticsearch
-          port: '9200'
-  wait-for-mongodb:
-    steps:
-      - wait-for-service:
-          label: MongoDB
-          port: '27017'
-  wait-for-service:
-    parameters:
-      label:
-        description: Label for the service.
-        type: string
-        default: service
-      port:
-        description: Target port to connect to.
-        type: string
-      timeout:
-        description: Maximum number of seconds to wait.
-        type: integer
-        default: 30
-    steps:
-      - run:
-          name: Wait for << parameters.label >>
-          command: |
-            timeout=<< parameters.timeout >>
-            elapsed=0
-            echo "Waiting for << parameters.label >> to be ready..."
-            until nc -z localhost "<< parameters.port >>" > /dev/null 2>&1; do
-              if _=$((elapsed > timeout)); then
-                echo 'Timed out waiting for << parameters.label >>' >&2
-                exit 1
-              fi
-              sleep 1
-              elapsed=$((elapsed + 1))
-            done
+          command: composer update --no-progress --no-suggest --ansi
 
 executors:
   php:
+    parameters:
+      php_version:
+        description: PHP version (major.minor).
+        type: string
     docker:
-      - image: circleci/php:7.3-node
-  php-and-elasticsearch:
-    docker:
-      - image: circleci/php:7.3-node
-      # https://github.com/elastic/elasticsearch-docker/issues/84
-      - image: docker.elastic.co/elasticsearch/elasticsearch:6.7.2
-  php-and-mongodb:
-    docker:
-      - image: circleci/php:7.3-node
-      - image: circleci/mongo:4
+      - image: circleci/php:<< parameters.php_version >>-node
 
 jobs:
   php-cs-fixer:
-    executor: php
+    description: PHP-CS-Fixer
+    parameters:
+      php_version:
+        description: PHP version (major.minor).
+        type: string
+    executor:
+      name: php
+      php_version: << parameters.php_version >>
     environment:
-      PHP_CS_FIXER_FUTURE_MODE: 1
+      PHP_CS_FIXER_FUTURE_MODE: '1'
     working_directory: ~/api-platform/core
     steps:
       - checkout
       - disable-xdebug-php-extension
       - disable-php-memory-limit
-      - update-composer
       - restore-composer-cache
+      - install-symfony-flex
       - run:
           name: Install PHP-CS-Fixer
           command: |
@@ -243,18 +218,28 @@ jobs:
       - save-php-cs-fixer-cache
 
   phpstan:
-    executor: php
+    description: PHPStan
+    parameters:
+      php_version:
+        description: PHP version (major.minor).
+        type: string
+    executor:
+      name: php
+      php_version: << parameters.php_version >>
     environment:
-      # https://github.com/phpstan/phpstan-symfony/issues/37
-      APP_DEBUG: 1
+      APP_DEBUG: '1' # https://github.com/phpstan/phpstan-symfony/issues/37
     working_directory: ~/api-platform/core
     steps:
       - checkout
+      - restore-mongodb-php-extension-build-cache:
+          php_version: << parameters.php_version >>
       - install-mongodb-php-extension
+      - save-mongodb-php-extension-build-cache:
+          php_version: << parameters.php_version >>
       - disable-xdebug-php-extension
       - disable-php-memory-limit
-      - update-composer
       - restore-composer-cache
+      - install-symfony-flex
       - update-project-dependencies
       - save-composer-cache
       - clear-test-app-cache
@@ -264,233 +249,11 @@ jobs:
           command: vendor/bin/phpstan analyse --ansi
       - save-phpstan-cache
 
-  phpunit-coverage:
-    executor: php
-    parallelism: 2
-    working_directory: ~/api-platform/core
-    steps:
-      - checkout
-      - install-mongodb-php-extension
-      - install-pcov-php-extension
-      - disable-xdebug-php-extension
-      - disable-php-memory-limit
-      - update-composer
-      - restore-composer-cache
-      - update-project-dependencies
-      - save-composer-cache
-      - clear-test-app-cache
-      - run:
-          name: Run PHPUnit tests
-          command: |
-            mkdir -p build/logs/phpunit build/coverage
-            split_tests=$(find tests -name '*Test.php' | circleci tests split --split-by=timings)
-            export PARALLEL='-j10% --joblog build/logs/parallel.log --rpl {_}\ s/\\//_/g;'
-            phpunit_cmd='vendor/bin/phpunit --coverage-php build/coverage/coverage-{_}.cov --log-junit build/logs/phpunit/{_}.xml --exclude-group mongodb,resource-hog --colors=always {}'
-            echo "$split_tests" | parallel "$phpunit_cmd" || echo "$split_tests" | parallel --retry-failed "$phpunit_cmd"
-      - restore-npm-cache
-      - merge-test-reports:
-          dir: build/logs/phpunit
-          out: build/logs/phpunit/junit.xml
-      - store_test_results:
-          path: build/logs
-      - store_artifacts:
-          path: build/logs/phpunit/junit.xml
-          destination: build/logs/phpunit/junit.xml
-      - store_artifacts:
-          path: build/logs/parallel.log
-          destination: build/logs/parallel.log
-      - merge-code-coverage-reports:
-          dir: build/coverage
-          out: build/logs/clover.xml
-      - store_artifacts:
-          path: build/logs/clover.xml
-          destination: build/logs/clover.xml
-      - codecov/upload:
-          file: build/logs/clover.xml
-          flags: phpunit
-      - coveralls/upload:
-          file: build/logs/clover.xml
-      - save-npm-cache
-
-  behat-coverage:
-    executor: php
-    parallelism: 2
-    working_directory: ~/api-platform/core
-    steps:
-      - checkout
-      - install-mongodb-php-extension
-      - install-pcov-php-extension
-      - disable-xdebug-php-extension
-      - disable-php-memory-limit
-      - update-composer
-      - restore-composer-cache
-      - update-project-dependencies
-      - save-composer-cache
-      - clear-test-app-cache
-      - run:
-          name: Run Behat tests
-          command: |
-            mkdir -p build/logs/behat build/coverage
-            for f in $(find features -name '*.feature' -not -path 'features/main/exposed_state.feature' -not -path 'features/elasticsearch/*' -not -path 'features/mongodb/*' | circleci tests split --split-by=timings); do
-              _f=$(echo "$f" | tr / _)
-              FEATURE="${_f}" vendor/bin/behat --format=progress --out=std --format=junit --out=build/logs/behat/"${_f}" --profile=default-coverage --no-interaction "$f"
-            done
-      - restore-npm-cache
-      - merge-test-reports:
-          dir: build/logs/behat
-          out: build/logs/behat/junit.xml
-      - store_test_results:
-          path: build/logs
-      - store_artifacts:
-          path: build/logs/behat/junit.xml
-          destination: build/logs/behat/junit.xml
-      - merge-code-coverage-reports:
-          dir: build/coverage
-          out: build/logs/clover.xml
-      - store_artifacts:
-          path: build/logs/clover.xml
-          destination: build/logs/clover.xml
-      - codecov/upload:
-          file: build/logs/clover.xml
-          flags: behat
-      - coveralls/upload:
-          file: build/logs/clover.xml
-      - save-npm-cache
-
-  phpunit-mongodb-coverage:
-    executor: php-and-mongodb
-    environment:
-      APP_ENV: mongodb
-    working_directory: ~/api-platform/core
-    steps:
-      - checkout
-      - install-mongodb-php-extension
-      - install-pcov-php-extension
-      - disable-xdebug-php-extension
-      - disable-php-memory-limit
-      - update-composer
-      - restore-composer-cache
-      - update-project-dependencies
-      - save-composer-cache
-      - clear-test-app-cache
-      - wait-for-mongodb
-      - run:
-          name: Run PHPUnit tests
-          command: |
-            mkdir -p build/logs/phpunit
-            vendor/bin/phpunit --coverage-clover build/logs/clover.xml --log-junit build/logs/phpunit/junit.xml --exclude-group resource-hog --colors=always --configuration phpunit_mongodb.xml
-      - store_test_results:
-          path: build/logs
-      - store_artifacts:
-          path: build/logs/phpunit/junit.xml
-          destination: build/logs/phpunit/junit.xml
-      - store_artifacts:
-          path: build/logs/clover.xml
-          destination: build/logs/clover.xml
-      - restore-npm-cache
-      - codecov/upload:
-          file: build/logs/clover.xml
-          flags: phpunit_mongodb
-      - coveralls/upload:
-          file: build/logs/clover.xml
-      - save-npm-cache
-
-  behat-mongodb-coverage:
-    executor: php-and-mongodb
-    environment:
-      APP_ENV: mongodb
-    working_directory: ~/api-platform/core
-    steps:
-      - checkout
-      - install-mongodb-php-extension
-      - install-pcov-php-extension
-      - disable-xdebug-php-extension
-      - disable-php-memory-limit
-      - update-composer
-      - restore-composer-cache
-      - update-project-dependencies
-      - save-composer-cache
-      - clear-test-app-cache
-      - wait-for-mongodb
-      - run:
-          name: Run Behat tests
-          command: |
-            mkdir -p build/logs/behat
-            vendor/bin/behat --format=progress --out=std --format=junit --out=build/logs/behat --profile=mongodb-coverage --no-interaction
-      - restore-npm-cache
-      - merge-test-reports:
-          dir: build/logs/behat
-          out: build/logs/behat/junit.xml
-      - store_test_results:
-          path: build/logs
-      - store_artifacts:
-          path: build/logs/behat/junit.xml
-          destination: build/logs/behat/junit.xml
-      - merge-code-coverage-reports:
-          dir: build/coverage
-          out: build/logs/clover.xml
-      - store_artifacts:
-          path: build/logs/clover.xml
-          destination: build/logs/clover.xml
-      - codecov/upload:
-          file: build/logs/clover.xml
-          flags: behat_mongodb
-      - coveralls/upload:
-          file: build/logs/clover.xml
-      - save-npm-cache
-
-  behat-elasticsearch-coverage:
-    executor: php-and-elasticsearch
-    environment:
-      APP_ENV: elasticsearch
-    working_directory: ~/api-platform/core
-    steps:
-      - checkout
-      - install-mongodb-php-extension
-      - install-pcov-php-extension
-      - disable-xdebug-php-extension
-      - disable-php-memory-limit
-      - update-composer
-      - restore-composer-cache
-      - update-project-dependencies
-      - save-composer-cache
-      - clear-test-app-cache
-      - wait-for-elasticsearch
-      - run:
-          name: Run Behat tests
-          command: |
-            mkdir -p build/logs/behat
-            vendor/bin/behat --format=progress --out=std --format=junit --out=build/logs/behat --profile=elasticsearch-coverage --no-interaction
-      - restore-npm-cache
-      - merge-test-reports:
-          dir: build/logs/behat
-          out: build/logs/behat/junit.xml
-      - store_test_results:
-          path: build/logs
-      - store_artifacts:
-          path: build/logs/behat/junit.xml
-          destination: build/logs/behat/junit.xml
-      - merge-code-coverage-reports:
-          dir: build/coverage
-          out: build/logs/clover.xml
-      - store_artifacts:
-          path: build/logs/clover.xml
-          destination: build/logs/clover.xml
-      - codecov/upload:
-          file: build/logs/clover.xml
-          flags: behat_elasticsearch
-      - coveralls/upload:
-          file: build/logs/clover.xml
-      - save-npm-cache
-
 workflows:
   version: 2
-  lint-and-coverage:
+  lint:
     jobs:
-      - php-cs-fixer
-      - phpstan
-      - phpunit-coverage
-      - behat-coverage
-      - phpunit-mongodb-coverage
-      - behat-mongodb-coverage
-      - behat-elasticsearch-coverage
+      - php-cs-fixer:
+          php_version: '7.3'
+      - phpstan:
+          php_version: '7.3'

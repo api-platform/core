@@ -10,8 +10,9 @@
         <link rel="stylesheet" href="{{ asset('bundles/apiplatform/style.css') }}">
     {% endblock %}
 
+    {% set oauth_data = {'oauth': swagger_data.oauth|merge({'redirectUrl' : absolute_url(asset('bundles/apiplatform/swagger-ui/oauth2-redirect.html')) })} %}
     {# json_encode(65) is for JSON_UNESCAPED_SLASHES|JSON_HEX_TAG to avoid JS XSS #}
-    <script id="swagger-data" type="application/json">{{ swagger_data|json_encode(65)|raw }}</script>
+    <script id="swagger-data" type="application/json">{{ swagger_data|merge(oauth_data)|json_encode(65)|raw }}</script>
 </head>
 
 <body>
@@ -82,7 +83,7 @@
     {% if (reDocEnabled and not swaggerUiEnabled) or (reDocEnabled and 're_doc' == active_ui) %}
         <script src="{{ asset('bundles/apiplatform/redoc/redoc.standalone.js') }}"></script>
         <script src="{{ asset('bundles/apiplatform/init-redoc-ui.js') }}"></script>
-    {% elseif (swaggerUiEnabled) %}
+    {% else %}
         <script src="{{ asset('bundles/apiplatform/swagger-ui/swagger-ui-bundle.js') }}"></script>
         <script src="{{ asset('bundles/apiplatform/swagger-ui/swagger-ui-standalone-preset.js') }}"></script>
         <script src="{{ asset('bundles/apiplatform/init-swagger-ui.js') }}"></script>

@@ -14,9 +14,10 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\EventListener;
 
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
+use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Util\RequestAttributesExtractor;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
+use Symfony\Component\HttpKernel\Event\ViewEvent;
 
 /**
  * Builds the response object.
@@ -40,7 +41,7 @@ final class RespondListener
     /**
      * Creates a Response to send to the client according to the requested format.
      */
-    public function onKernelView(GetResponseForControllerResultEvent $event): void
+    public function onKernelView(ViewEvent $event): void
     {
         $controllerResult = $event->getControllerResult();
         $request = $event->getRequest();
@@ -51,7 +52,7 @@ final class RespondListener
 
             return;
         }
-        if ($controllerResult instanceof Response || !($attributes['respond'] ?? $request->attributes->getBoolean('_api_respond', false))) {
+        if ($controllerResult instanceof Response || !($attributes['respond'] ?? $request->attributes->getBoolean('_api_respond'))) {
             return;
         }
 
@@ -78,6 +79,7 @@ final class RespondListener
                 $headers['Sunset'] = (new \DateTimeImmutable($sunset))->format(\DateTime::RFC1123);
             }
 
+            $headers = $this->addAcceptPatchHeader($headers, $attributes, $resourceMetadata);
             $status = $resourceMetadata->getOperationAttribute($attributes, 'status');
         }
 
@@ -86,5 +88,30 @@ final class RespondListener
             $status ?? self::METHOD_TO_CODE[$request->getMethod()] ?? Response::HTTP_OK,
             $headers
         ));
+    }
+
+    private function addAcceptPatchHeader(array $headers, array $attributes, ResourceMetadata $resourceMetadata): array
+    {
+        if (!isset($attributes['item_operation_name'])) {
+            return $headers;
+        }
+
+        $patchMimeTypes = [];
+        foreach ($resourceMetadata->getItemOperations() as $operation) {
+            if ('PATCH' !== ($operation['method'] ?? '') || !isset($operation['input_formats'])) {
+                continue;
+            }
+
+            foreach ($operation['input_formats'] as $mimeTypes) {
+                foreach ($mimeTypes as $mimeType) {
+                    $patchMimeTypes[] = $mimeType;
+                }
+            }
+            $headers['Accept-Patch'] = implode(', ', $patchMimeTypes);
+
+            return $headers;
+        }
+
+        return $headers;
     }
 }

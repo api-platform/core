@@ -25,7 +25,6 @@ use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Persistence\Mapping\ClassMetadata;
-use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\QueryBuilder;
 
@@ -56,7 +55,7 @@ class ItemDataProvider implements DenormalizedIdentifiersAwareItemDataProviderIn
 
     public function supports(string $resourceClass, string $operationName = null, array $context = []): bool
     {
-        return null !== $this->managerRegistry->getManagerForClass($resourceClass);
+        return $this->managerRegistry->getManagerForClass($resourceClass) instanceof EntityManagerInterface;
     }
 
     /**
@@ -68,22 +67,19 @@ class ItemDataProvider implements DenormalizedIdentifiersAwareItemDataProviderIn
      */
     public function getItem(string $resourceClass, $id, string $operationName = null, array $context = [])
     {
-        /** @var ObjectManager $manager */
+        /** @var EntityManagerInterface $manager */
         $manager = $this->managerRegistry->getManagerForClass($resourceClass);
 
         if ((\is_int($id) || \is_string($id)) && !($context[IdentifierConverterInterface::HAS_IDENTIFIER_CONVERTER] ?? false)) {
             $id = $this->normalizeIdentifiers($id, $manager, $resourceClass);
         }
         if (!\is_array($id)) {
-            throw new \InvalidArgumentException(sprintf(
-                '$id must be array when "%s" key is set to true in the $context',
-                IdentifierConverterInterface::HAS_IDENTIFIER_CONVERTER
-            ));
+            throw new \InvalidArgumentException(sprintf('$id must be array when "%s" key is set to true in the $context', IdentifierConverterInterface::HAS_IDENTIFIER_CONVERTER));
         }
         $identifiers = $id;
 
         $fetchData = $context['fetch_data'] ?? true;
-        if (!$fetchData && $manager instanceof EntityManagerInterface) {
+        if (!$fetchData) {
             return $manager->getReference($resourceClass, $identifiers);
         }
 

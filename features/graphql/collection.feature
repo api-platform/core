@@ -9,7 +9,7 @@ Feature: GraphQL collection support
         ...dummyFields
       }
     }
-    fragment dummyFields on DummyCollectionConnection {
+    fragment dummyFields on DummyConnection {
       edges {
         node {
           id
@@ -482,6 +482,26 @@ Feature: GraphQL collection support
     And the header "Content-Type" should be equal to "application/json"
     And the JSON node "data.dummies.edges" should have 0 element
 
+  @createSchema
+  Scenario: Retrieve a collection with pagination disabled
+    Given there are 4 foo objects with fake names
+    When I send the following GraphQL request:
+    """
+    {
+      foos {
+        id
+        name
+        bar
+      }
+    }
+    """
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/json"
+    And the JSON node "data.foos[3].id" should be equal to "/foos/4"
+    And the JSON node "data.foos[3].name" should be equal to "Separativeness"
+    And the JSON node "data.foos[3].bar" should be equal to "Sit"
+
   Scenario: Custom collection query
     Given there are 2 dummyCustomQuery objects
     When I send the following GraphQL request:
@@ -616,3 +636,146 @@ Feature: GraphQL collection support
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/json"
     And the JSON node "data.compositeRelation.value" should be equal to "somefoobardummy"
+
+  @createSchema
+  Scenario: Retrieve a collection using name converter
+    Given there are 4 dummy objects
+    When I send the following GraphQL request:
+    """
+    {
+      dummies {
+        edges {
+          node {
+            name_converted
+          }
+        }
+      }
+    }
+    """
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/json"
+    And the JSON node "data.dummies.edges[1].node.name_converted" should be equal to "Converted 2"
+
+  @createSchema
+  Scenario: Retrieve a collection with different serialization groups for item_query and collection_query
+    Given there are 3 dummy with different GraphQL serialization groups objects
+    When I send the following GraphQL request:
+    """
+    {
+      dummyDifferentGraphQlSerializationGroups {
+        edges {
+          node {
+            name
+          }
+        }
+      }
+    }
+    """
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the JSON node "data.dummyDifferentGraphQlSerializationGroups.edges[0].node.name" should exist
+    And the JSON node "data.dummyDifferentGraphQlSerializationGroups.edges[1].node.name" should exist
+    And the JSON node "data.dummyDifferentGraphQlSerializationGroups.edges[2].node.name" should exist
+    And the JSON node "data.dummyDifferentGraphQlSerializationGroups.edges[0].node.title" should not exist
+    And the JSON node "data.dummyDifferentGraphQlSerializationGroups.edges[1].node.title" should not exist
+    And the JSON node "data.dummyDifferentGraphQlSerializationGroups.edges[2].node.title" should not exist
+
+  @createSchema
+  Scenario: Retrieve a paginated collection using page-based pagination
+    Given there are 5 fooDummy objects with fake names
+    When I send the following GraphQL request:
+    """
+    {
+      fooDummies(page: 1) {
+        collection {
+          id
+        }
+        paginationInfo {
+          itemsPerPage
+          lastPage
+          totalCount
+        }
+      }
+    }
+    """
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the JSON node "data.fooDummies.collection" should have 3 elements
+    And the JSON node "data.fooDummies.collection[0].id" should exist
+    And the JSON node "data.fooDummies.collection[1].id" should exist
+    And the JSON node "data.fooDummies.collection[2].id" should exist
+    And the JSON node "data.fooDummies.paginationInfo.itemsPerPage" should be equal to the number 3
+    And the JSON node "data.fooDummies.paginationInfo.lastPage" should be equal to the number 2
+    And the JSON node "data.fooDummies.paginationInfo.totalCount" should be equal to the number 5
+    When I send the following GraphQL request:
+    """
+    {
+      fooDummies(page: 2) {
+        collection {
+          id
+        }
+      }
+    }
+    """
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the JSON node "data.fooDummies.collection" should have 2 elements
+    When I send the following GraphQL request:
+    """
+    {
+      fooDummies(page: 3) {
+        collection {
+          id
+        }
+      }
+    }
+    """
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the JSON node "data.fooDummies.collection" should have 0 elements
+
+  @createSchema
+  Scenario: Retrieve a paginated collection using page-based pagination and client-defined limit
+    Given there are 5 fooDummy objects with fake names
+    When I send the following GraphQL request:
+    """
+    {
+      fooDummies(page: 1, itemsPerPage: 2) {
+        collection {
+          id
+        }
+      }
+    }
+    """
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the JSON node "data.fooDummies.collection" should have 2 elements
+    And the JSON node "data.fooDummies.collection[0].id" should exist
+    And the JSON node "data.fooDummies.collection[1].id" should exist
+    When I send the following GraphQL request:
+    """
+    {
+      fooDummies(page: 2, itemsPerPage: 2) {
+        collection {
+          id
+        }
+      }
+    }
+    """
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the JSON node "data.fooDummies.collection" should have 2 elements
+    When I send the following GraphQL request:
+    """
+    {
+      fooDummies(page: 3, itemsPerPage: 2) {
+        collection {
+          id
+        }
+      }
+    }
+    """
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the JSON node "data.fooDummies.collection" should have 1 element

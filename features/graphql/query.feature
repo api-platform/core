@@ -8,6 +8,7 @@ Feature: GraphQL query support
       dummy(id: "/dummies/1") {
         id
         name
+        name_converted
       }
     }
     """
@@ -16,6 +17,7 @@ Feature: GraphQL query support
     And the header "Content-Type" should be equal to "application/json"
     And the JSON node "data.dummy.id" should be equal to "/dummies/1"
     And the JSON node "data.dummy.name" should be equal to "Dummy #1"
+    And the JSON node "data.dummy.name_converted" should be equal to "Converted 1"
 
   Scenario: Retrieve a Relay Node
     When I send the following GraphQL request:
@@ -23,7 +25,7 @@ Feature: GraphQL query support
     {
       node(id: "/dummies/1") {
         id
-        ... on DummyItem {
+        ... on Dummy {
           name
         }
       }
@@ -393,3 +395,20 @@ Feature: GraphQL query support
       }
     }
     """
+
+  @createSchema
+  Scenario: Retrieve an item with different serialization groups for item_query and collection_query
+    Given there are 1 dummy with different GraphQL serialization groups objects
+    When I send the following GraphQL request:
+    """
+    {
+      dummyDifferentGraphQlSerializationGroup(id: "/dummy_different_graph_ql_serialization_groups/1") {
+        name
+        title
+      }
+    }
+    """
+    Then the response status code should be 200
+    And the header "Content-Type" should be equal to "application/json"
+    And the JSON node "data.dummyDifferentGraphQlSerializationGroup.name" should be equal to "Name #1"
+    And the JSON node "data.dummyDifferentGraphQlSerializationGroup.title" should be equal to "Title #1"

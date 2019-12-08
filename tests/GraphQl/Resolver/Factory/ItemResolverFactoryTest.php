@@ -21,7 +21,6 @@ use ApiPlatform\Core\GraphQl\Resolver\Stage\SerializeStageInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
-use GraphQL\Error\Error;
 use GraphQL\Type\Definition\ResolveInfo;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
@@ -70,7 +69,7 @@ class ItemResolverFactoryTest extends TestCase
     public function testResolve(?string $resourceClass, string $determinedResourceClass, $readStageItem): void
     {
         $rootClass = 'rootClass';
-        $operationName = 'query';
+        $operationName = 'item_query';
         $source = ['source'];
         $args = ['args'];
         $info = $this->prophesize(ResolveInfo::class)->reveal();
@@ -120,7 +119,7 @@ class ItemResolverFactoryTest extends TestCase
     {
         $resourceClass = 'stdClass';
         $rootClass = 'rootClass';
-        $operationName = 'query';
+        $operationName = 'item_query';
         $source = ['source'];
         $args = ['args'];
         $info = $this->prophesize(ResolveInfo::class)->reveal();
@@ -139,7 +138,7 @@ class ItemResolverFactoryTest extends TestCase
     {
         $resourceClass = null;
         $rootClass = 'rootClass';
-        $operationName = 'query';
+        $operationName = 'item_query';
         $source = ['source'];
         $args = ['args'];
         $info = $this->prophesize(ResolveInfo::class)->reveal();
@@ -148,7 +147,7 @@ class ItemResolverFactoryTest extends TestCase
         $readStageItem = null;
         $this->readStageProphecy->__invoke($resourceClass, $rootClass, $operationName, $resolverContext)->shouldBeCalled()->willReturn($readStageItem);
 
-        $this->expectException(Error::class);
+        $this->expectException(\UnexpectedValueException::class);
         $this->expectExceptionMessage('Resource class cannot be determined.');
 
         ($this->itemResolverFactory)($resourceClass, $rootClass, $operationName)($source, $args, null, $info);
@@ -158,7 +157,7 @@ class ItemResolverFactoryTest extends TestCase
     {
         $resourceClass = Dummy::class;
         $rootClass = 'rootClass';
-        $operationName = 'query';
+        $operationName = 'item_query';
         $source = ['source'];
         $args = ['args'];
         $info = $this->prophesize(ResolveInfo::class)->reveal();
@@ -167,7 +166,7 @@ class ItemResolverFactoryTest extends TestCase
         $readStageItem = new \stdClass();
         $this->readStageProphecy->__invoke($resourceClass, $rootClass, $operationName, $resolverContext)->shouldBeCalled()->willReturn($readStageItem);
 
-        $this->expectException(Error::class);
+        $this->expectException(\UnexpectedValueException::class);
         $this->expectExceptionMessage('Resolver only handles items of class Dummy but retrieved item is of class stdClass.');
 
         ($this->itemResolverFactory)($resourceClass, $rootClass, $operationName)($source, $args, null, $info);
@@ -236,7 +235,7 @@ class ItemResolverFactoryTest extends TestCase
             return $customItem;
         });
 
-        $this->expectException(Error::class);
+        $this->expectException(\UnexpectedValueException::class);
         $this->expectExceptionMessage('Custom query resolver "query_resolver_id" has to return an item of class stdClass but returned an item of class Dummy.');
 
         ($this->itemResolverFactory)($resourceClass, $rootClass, $operationName)($source, $args, null, $info);

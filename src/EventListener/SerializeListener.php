@@ -23,8 +23,9 @@ use Fig\Link\GenericLinkProvider;
 use Fig\Link\Link;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
+use Symfony\Component\HttpKernel\Event\ViewEvent;
 use Symfony\Component\Serializer\Encoder\EncoderInterface;
+use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
 use Symfony\Component\Serializer\SerializerInterface;
 
 /**
@@ -51,7 +52,7 @@ final class SerializeListener
     /**
      * Serializes the data to the requested format.
      */
-    public function onKernelView(GetResponseForControllerResultEvent $event): void
+    public function onKernelView(ViewEvent $event): void
     {
         $controllerResult = $event->getControllerResult();
         $request = $event->getRequest();
@@ -83,9 +84,11 @@ final class SerializeListener
         }
         $resources = new ResourceList();
         $context['resources'] = &$resources;
+        $context[AbstractObjectNormalizer::EXCLUDE_FROM_CACHE_KEY][] = 'resources';
 
         $resourcesToPush = new ResourceList();
         $context['resources_to_push'] = &$resourcesToPush;
+        $context[AbstractObjectNormalizer::EXCLUDE_FROM_CACHE_KEY][] = 'resources_to_push';
 
         $request->attributes->set('_api_normalization_context', $context);
 
@@ -98,7 +101,7 @@ final class SerializeListener
 
         $linkProvider = $request->attributes->get('_links', new GenericLinkProvider());
         foreach ($resourcesToPush as $resourceToPush) {
-            $linkProvider = $linkProvider->withLink(new Link('preload', $resourceToPush));
+            $linkProvider = $linkProvider->withLink((new Link('preload', $resourceToPush))->withAttribute('as', 'fetch'));
         }
         $request->attributes->set('_links', $linkProvider);
     }
@@ -110,7 +113,7 @@ final class SerializeListener
      *
      * @throws RuntimeException
      */
-    private function serializeRawData(GetResponseForControllerResultEvent $event, Request $request, $controllerResult): void
+    private function serializeRawData(ViewEvent $event, Request $request, $controllerResult): void
     {
         if (\is_object($controllerResult)) {
             $event->setControllerResult($this->serializer->serialize($controllerResult, $request->getRequestFormat(), $request->attributes->get('_api_normalization_context', [])));

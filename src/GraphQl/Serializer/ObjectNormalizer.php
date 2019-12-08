@@ -73,7 +73,7 @@ final class ObjectNormalizer implements NormalizerInterface, CacheableSupportsMe
 
         $data = $this->decorated->normalize($object, $format, $context);
         if (!\is_array($data)) {
-            throw new UnexpectedValueException('Expected data to be an array');
+            throw new UnexpectedValueException('Expected data to be an array.');
         }
 
         if (!isset($originalResource)) {

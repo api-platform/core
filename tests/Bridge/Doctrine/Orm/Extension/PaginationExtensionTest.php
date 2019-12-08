@@ -651,13 +651,36 @@ class PaginationExtensionTest extends TestCase
         $extension->applyToCollection($queryBuilder, new QueryNameGenerator(), 'Foo', 'op');
     }
 
+    public function testApplyToCollectionGraphQlPaginationDisabled()
+    {
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
+        $resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadata(null, null, null, [], []));
+        $resourceMetadataFactory = $resourceMetadataFactoryProphecy->reveal();
+
+        $pagination = new Pagination($resourceMetadataFactory, [], [
+            'enabled' => false,
+        ]);
+
+        $queryBuilderProphecy = $this->prophesize(QueryBuilder::class);
+        $queryBuilderProphecy->setFirstResult(Argument::any())->shouldNotBeCalled();
+        $queryBuilderProphecy->setMaxResults(Argument::any())->shouldNotBeCalled();
+        $queryBuilder = $queryBuilderProphecy->reveal();
+
+        $extension = new PaginationExtension(
+            $this->prophesize(ManagerRegistry::class)->reveal(),
+            $resourceMetadataFactory,
+            $pagination
+        );
+        $extension->applyToCollection($queryBuilder, new QueryNameGenerator(), 'Foo', 'op', ['graphql_operation_name' => 'op']);
+    }
+
     public function testApplyToCollectionWithMaximumItemsPerPage()
     {
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $attributes = [
             'pagination_enabled' => true,
             'pagination_client_enabled' => true,
-            'maximum_items_per_page' => 80,
+            'pagination_maximum_items_per_page' => 80,
         ];
         $resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadata(null, null, null, [], [], $attributes));
         $resourceMetadataFactory = $resourceMetadataFactoryProphecy->reveal();
@@ -686,6 +709,7 @@ class PaginationExtensionTest extends TestCase
      * @expectedDeprecation Passing an instance of "Symfony\Component\HttpFoundation\RequestStack" as second argument of "ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\PaginationExtension" is deprecated since API Platform 2.4 and will not be possible anymore in API Platform 3. Pass an instance of "ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface" instead.
      * @expectedDeprecation Passing an instance of "ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface" as third argument of "ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\PaginationExtension" is deprecated since API Platform 2.4 and will not be possible anymore in API Platform 3. Pass an instance of "ApiPlatform\Core\DataProvider\Pagination" instead.
      * @expectedDeprecation Passing "$enabled", "$clientEnabled", "$clientItemsPerPage", "$itemsPerPage", "$pageParameterName", "$enabledParameterName", "$itemsPerPageParameterName", "$maximumItemPerPage", "$partial", "$clientPartial", "$partialParameterName" arguments is deprecated since API Platform 2.4 and will not be possible anymore in API Platform 3. Pass an instance of "ApiPlatform\Core\Bridge\Doctrine\Orm\Paginator" as third argument instead.
+     * @expectedDeprecation The "maximum_items_per_page" option has been deprecated since API Platform 2.5 in favor of "pagination_maximum_items_per_page" and will be removed in API Platform 3.
      */
     public function testLegacyApplyToCollectionWithMaximumItemsPerPage()
     {
@@ -881,6 +905,24 @@ class PaginationExtensionTest extends TestCase
             false
         );
         $this->assertFalse($extension->supportsResult('Foo', 'op'));
+    }
+
+    public function testSupportsResultGraphQlPaginationDisabled()
+    {
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
+        $resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadata(null, null, null, [], []));
+        $resourceMetadataFactory = $resourceMetadataFactoryProphecy->reveal();
+
+        $pagination = new Pagination($resourceMetadataFactory, [], [
+            'enabled' => false,
+        ]);
+
+        $extension = new PaginationExtension(
+            $this->prophesize(ManagerRegistry::class)->reveal(),
+            $resourceMetadataFactory,
+            $pagination
+        );
+        $this->assertFalse($extension->supportsResult('Foo', 'op', ['graphql_operation_name' => 'op']));
     }
 
     public function testGetResult()

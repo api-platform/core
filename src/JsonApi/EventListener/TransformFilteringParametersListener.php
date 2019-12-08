@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\JsonApi\EventListener;
 
-use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\HttpKernel\Event\RequestEvent;
 
 /**
  * @see http://jsonapi.org/format/#fetching-filtering
@@ -24,17 +24,17 @@ use Symfony\Component\HttpKernel\Event\GetResponseEvent;
  */
 final class TransformFilteringParametersListener
 {
-    public function onKernelRequest(GetResponseEvent $event): void
+    public function onKernelRequest(RequestEvent $event): void
     {
         $request = $event->getRequest();
         if (
             'jsonapi' !== $request->getRequestFormat() ||
-            null === ($filters = $request->query->get('filter')) ||
-            !\is_array($filters)
+            null === ($filterParameter = $request->query->get('filter')) ||
+            !\is_array($filterParameter)
         ) {
             return;
         }
-
-        $request->attributes->set('_api_filters', $filters);
+        $filters = $request->attributes->get('_api_filters', []);
+        $request->attributes->set('_api_filters', array_merge($filterParameter, $filters));
     }
 }

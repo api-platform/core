@@ -18,7 +18,8 @@ use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
+use Symfony\Component\HttpKernel\Event\ExceptionEvent;
+use Symfony\Component\HttpKernel\EventListener\ErrorListener;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 /**
@@ -34,13 +35,17 @@ class ExceptionListenerTest extends TestCase
         $kernel = $this->prophesize(HttpKernelInterface::class);
         $kernel->handle(Argument::type(Request::class), HttpKernelInterface::SUB_REQUEST, false)->willReturn(new Response())->shouldBeCalled();
 
-        $eventProphecy = $this->prophesize(GetResponseForExceptionEvent::class);
+        $eventProphecy = $this->prophesize(ExceptionEvent::class);
         $eventProphecy->getRequest()->willReturn($request);
-        $eventProphecy->getException()->willReturn(new \Exception());
+        if (method_exists(ExceptionEvent::class, 'getThrowable')) {
+            $eventProphecy->getThrowable()->willReturn(new \Exception());
+        } else {
+            $eventProphecy->getException()->willReturn(new \Exception());
+        }
         $eventProphecy->getKernel()->willReturn($kernel);
         $eventProphecy->setResponse(Argument::type(Response::class))->shouldBeCalled();
 
-        $listener = new ExceptionListener('foo:bar');
+        $listener = new ExceptionListener('foo:bar', null, false, class_exists(ErrorListener::class) ? $this->prophesize(ErrorListener::class)->reveal() : null);
         $listener->onKernelException($eventProphecy->reveal());
     }
 
@@ -54,11 +59,11 @@ class ExceptionListenerTest extends TestCase
 
     public function testDoNothingWhenNotAnApiCall()
     {
-        $eventProphecy = $this->prophesize(GetResponseForExceptionEvent::class);
+        $eventProphecy = $this->prophesize(ExceptionEvent::class);
         $eventProphecy->getRequest()->willReturn(new Request());
         $eventProphecy->setResponse(Argument::type(Response::class))->shouldNotBeCalled();
 
-        $listener = new ExceptionListener('foo:bar');
+        $listener = new ExceptionListener('foo:bar', null, false, class_exists(ErrorListener::class) ? $this->prophesize(ErrorListener::class)->reveal() : null);
         $listener->onKernelException($eventProphecy->reveal());
     }
 
@@ -67,11 +72,11 @@ class ExceptionListenerTest extends TestCase
         $request = new Request([], [], ['_api_respond' => true]);
         $request->setRequestFormat('html');
 
-        $eventProphecy = $this->prophesize(GetResponseForExceptionEvent::class);
+        $eventProphecy = $this->prophesize(ExceptionEvent::class);
         $eventProphecy->getRequest()->willReturn($request);
         $eventProphecy->setResponse(Argument::type(Response::class))->shouldNotBeCalled();
 
-        $listener = new ExceptionListener('foo:bar');
+        $listener = new ExceptionListener('foo:bar', null, false, class_exists(ErrorListener::class) ? $this->prophesize(ErrorListener::class)->reveal() : null);
         $listener->onKernelException($eventProphecy->reveal());
     }
 }

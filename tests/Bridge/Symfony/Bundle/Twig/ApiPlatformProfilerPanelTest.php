@@ -54,6 +54,8 @@ class ApiPlatformProfilerPanelTest extends WebTestCase
         $this->schemaTool->dropSchema($classes);
         $this->manager->clear();
         $this->schemaTool->createSchema($classes);
+
+        $this->ensureKernelShutdown();
     }
 
     protected function tearDown(): void

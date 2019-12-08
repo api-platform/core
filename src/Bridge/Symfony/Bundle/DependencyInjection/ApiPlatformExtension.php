@@ -46,6 +46,7 @@ use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\Finder\Finder;
+use Symfony\Component\HttpClient\HttpClientTrait;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\Yaml\Yaml;
@@ -128,8 +129,12 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $container->registerForAutoconfiguration(FilterInterface::class)
             ->addTag('api_platform.filter');
 
-        if ($container->hasParameter('test.client.parameters') && class_exists(AbstractBrowser::class) && trait_exists('Symfony\Component\HttpClient\HttpClientTrait')) {
+        if ($container->hasParameter('test.client.parameters')) {
             $loader->load('test.xml');
+
+            if (!class_exists(AbstractBrowser::class) || !trait_exists(HttpClientTrait::class)) {
+                $container->removeDefinition('test.api_platform.client');
+            }
         }
     }
 
@@ -187,6 +192,29 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         if ($config['name_converter']) {
             $container->setAlias('api_platform.name_converter', $config['name_converter']);
         }
+        $container->setParameter('api_platform.defaults', $this->normalizeDefaults($config['defaults'] ?? []));
+    }
+
+    private function normalizeDefaults(array $defaults): array
+    {
+        $normalizedDefaults = ['attributes' => []];
+        $rootLevelOptions = [
+            'description',
+            'iri',
+            'item_operations',
+            'collection_operations',
+            'graphql',
+        ];
+
+        foreach ($defaults as $option => $value) {
+            if (\in_array($option, $rootLevelOptions, true)) {
+                $normalizedDefaults[$option] = $value;
+            } else {
+                $normalizedDefaults['attributes'][$option] = $value;
+            }
+        }
+
+        return $normalizedDefaults;
     }
 
     private function registerMetadataConfiguration(ContainerBuilder $container, array $config, XmlFileLoader $loader): void
@@ -308,20 +336,23 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
      */
     private function registerSwaggerConfiguration(ContainerBuilder $container, array $config, XmlFileLoader $loader): void
     {
+        $container->setParameter('api_platform.swagger.versions', $config['swagger']['versions']);
+
         if (empty($config['swagger']['versions'])) {
             return;
         }
 
         $loader->load('json_schema.xml');
         $loader->load('swagger.xml');
+        $loader->load('swagger-ui.xml');
 
-        if ($config['enable_swagger_ui'] || $config['enable_re_doc']) {
-            $loader->load('swagger-ui.xml');
-            $container->setParameter('api_platform.enable_swagger_ui', $config['enable_swagger_ui']);
-            $container->setParameter('api_platform.enable_re_doc', $config['enable_re_doc']);
+        if (!$config['enable_swagger_ui'] && !$config['enable_re_doc']) {
+            // Remove the listener but keep the controller to allow customizing the path of the UI
+            $container->removeDefinition('api_platform.swagger.listener.ui');
         }
 
-        $container->setParameter('api_platform.swagger.versions', $config['swagger']['versions']);
+        $container->setParameter('api_platform.enable_swagger_ui', $config['enable_swagger_ui']);
+        $container->setParameter('api_platform.enable_re_doc', $config['enable_re_doc']);
         $container->setParameter('api_platform.swagger.api_keys', $config['swagger']['api_keys']);
     }
 
@@ -342,6 +373,10 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
 
         $loader->load('jsonld.xml');
         $loader->load('hydra.xml');
+
+        if (!$container->has('api_platform.json_schema.schema_factory')) {
+            $container->removeDefinition('api_platform.hydra.json_schema.schema_factory');
+        }
 
         if (!$docEnabled) {
             $container->removeDefinition('api_platform.hydra.listener.response.add_link_header');
@@ -373,12 +408,14 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $container->setParameter('api_platform.graphql.enabled', $enabled);
         $container->setParameter('api_platform.graphql.graphiql.enabled', $enabled && $this->isConfigEnabled($container, $config['graphql']['graphiql']));
         $container->setParameter('api_platform.graphql.graphql_playground.enabled', $enabled && $this->isConfigEnabled($container, $config['graphql']['graphql_playground']));
+        $container->setParameter('api_platform.graphql.collection.pagination', $config['graphql']['collection']['pagination']);
 
         if (!$enabled) {
             return;
         }
 
         $container->setParameter('api_platform.graphql.default_ide', $config['graphql']['default_ide']);
+        $container->setParameter('api_platform.graphql.nesting_separator', $config['graphql']['nesting_separator']);
 
         $loader->load('graphql.xml');
 
@@ -463,9 +500,9 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         }
 
         $container->registerForAutoconfiguration(AggregationItemExtensionInterface::class)
-            ->addTag('api_platform.doctrine.mongodb.aggregation_extension.item');
+            ->addTag('api_platform.doctrine_mongodb.odm.aggregation_extension.item');
         $container->registerForAutoconfiguration(AggregationCollectionExtensionInterface::class)
-            ->addTag('api_platform.doctrine.mongodb.aggregation_extension.collection');
+            ->addTag('api_platform.doctrine_mongodb.odm.aggregation_extension.collection');
         $container->registerForAutoconfiguration(DoctrineMongoDbOdmAbstractFilter::class)
             ->setBindings(['$managerRegistry' => new Reference('doctrine_mongodb')]);
 

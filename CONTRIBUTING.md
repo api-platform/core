@@ -18,11 +18,6 @@ Then, if it appears that it's a real bug, you may report it using GitHub by foll
 
 > _NOTE:_ Don't hesitate giving as much information as you can (OS, PHP version extensions...)
 
-### Security Issues
-
-If you find a security issue, send a mail to Kévin Dunglas <dunglas@gmail.com>. **Please do not report security problems
-publicly**. We will disclose details of the issue and credit you after having released a new version including a fix.
-
 ## Pull Requests
 
 ### Writing a Pull Request
@@ -33,7 +28,7 @@ See [the dedicated documentation entry](https://api-platform.com/docs/extra/rele
 ### Matching Coding Standards
 
 The API Platform project follows [Symfony coding standards](https://symfony.com/doc/current/contributing/code/standards.html).
-But don't worry, you can fix CS issues automatically using the [PHP CS Fixer](http://cs.sensiolabs.org/) tool:
+But don't worry, you can fix CS issues automatically using the [PHP CS Fixer](https://cs.sensiolabs.org/) tool:
 
 ```shell
 php-cs-fixer.phar fix

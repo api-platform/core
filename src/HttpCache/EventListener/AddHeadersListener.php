@@ -15,7 +15,7 @@ namespace ApiPlatform\Core\HttpCache\EventListener;
 
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Util\RequestAttributesExtractor;
-use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
+use Symfony\Component\HttpKernel\Event\ResponseEvent;
 
 /**
  * Configures cache HTTP headers for the current response.
@@ -43,7 +43,7 @@ final class AddHeadersListener
         $this->resourceMetadataFactory = $resourceMetadataFactory;
     }
 
-    public function onKernelResponse(FilterResponseEvent $event): void
+    public function onKernelResponse(ResponseEvent $event): void
     {
         $request = $event->getRequest();
         if (!$request->isMethodCacheable() || !RequestAttributesExtractor::extractAttributes($request)) {
@@ -63,7 +63,7 @@ final class AddHeadersListener
         }
 
         if ($this->etag && !$response->getEtag()) {
-            $response->setEtag(md5($response->getContent()));
+            $response->setEtag(md5((string) $response->getContent()));
         }
 
         if (null !== ($maxAge = $resourceCacheHeaders['max_age'] ?? $this->maxAge) && !$response->headers->hasCacheControlDirective('max-age')) {

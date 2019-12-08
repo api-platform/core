@@ -14,9 +14,10 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Mercure\EventListener;
 
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
+use ApiPlatform\Core\Util\CorsTrait;
 use Fig\Link\GenericLinkProvider;
 use Fig\Link\Link;
-use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
+use Symfony\Component\HttpKernel\Event\ResponseEvent;
 
 /**
  * Adds the HTTP Link header pointing to the Mercure hub for resources having their updates dispatched.
@@ -25,6 +26,8 @@ use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
  */
 final class AddLinkHeaderListener
 {
+    use CorsTrait;
+
     private $resourceMetadataFactory;
     private $hub;
 
@@ -37,24 +40,29 @@ final class AddLinkHeaderListener
     /**
      * Sends the Mercure header on each response.
      */
-    public function onKernelResponse(FilterResponseEvent $event): void
+    public function onKernelResponse(ResponseEvent $event): void
     {
+        $request = $event->getRequest();
+        // Prevent issues with NelmioCorsBundle
+        if ($this->isPreflightRequest($request)) {
+            return;
+        }
+
         $link = new Link('mercure', $this->hub);
 
-        $attributes = $event->getRequest()->attributes;
         if (
-            null === ($resourceClass = $attributes->get('_api_resource_class')) ||
+            null === ($resourceClass = $request->attributes->get('_api_resource_class')) ||
             false === $this->resourceMetadataFactory->create($resourceClass)->getAttribute('mercure', false)
         ) {
             return;
         }
 
-        if (null === $linkProvider = $attributes->get('_links')) {
-            $attributes->set('_links', new GenericLinkProvider([$link]));
+        if (null === $linkProvider = $request->attributes->get('_links')) {
+            $request->attributes->set('_links', new GenericLinkProvider([$link]));
 
             return;
         }
 
-        $attributes->set('_links', $linkProvider->withLink($link));
+        $request->attributes->set('_links', $linkProvider->withLink($link));
     }
 }

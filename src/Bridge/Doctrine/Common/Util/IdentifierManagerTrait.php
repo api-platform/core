@@ -13,8 +13,10 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Bridge\Doctrine\Common\Util;
 
+use ApiPlatform\Core\Exception\InvalidIdentifierException;
 use ApiPlatform\Core\Exception\PropertyNotFoundException;
 use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\DBAL\Types\ConversionException;
 use Doctrine\DBAL\Types\Type as DBALType;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Doctrine\ODM\MongoDB\Types\Type as MongoDbType;
@@ -34,6 +36,7 @@ trait IdentifierManagerTrait
      * @param int|string $id
      *
      * @throws PropertyNotFoundException
+     * @throws InvalidIdentifierException
      */
     private function normalizeIdentifiers($id, ObjectManager $manager, string $resourceClass): array
     {
@@ -76,11 +79,15 @@ trait IdentifierManagerTrait
 
             $doctrineTypeName = $doctrineClassMetadata->getTypeOfField($propertyName);
 
-            if ($isOrm && null !== $doctrineTypeName && DBALType::hasType($doctrineTypeName)) {
-                $identifier = DBALType::getType($doctrineTypeName)->convertToPHPValue($identifier, $platform);
-            }
-            if ($isOdm && null !== $doctrineTypeName && MongoDbType::hasType($doctrineTypeName)) {
-                $identifier = MongoDbType::getType($doctrineTypeName)->convertToPHPValue($identifier);
+            try {
+                if ($isOrm && null !== $doctrineTypeName && DBALType::hasType($doctrineTypeName)) {
+                    $identifier = DBALType::getType($doctrineTypeName)->convertToPHPValue($identifier, $platform);
+                }
+                if ($isOdm && null !== $doctrineTypeName && MongoDbType::hasType($doctrineTypeName)) {
+                    $identifier = MongoDbType::getType($doctrineTypeName)->convertToPHPValue($identifier);
+                }
+            } catch (ConversionException $e) {
+                throw new InvalidIdentifierException(sprintf('Invalid value "%s" provided for an identifier.', $propertyName), $e->getCode(), $e);
             }
 
             $identifiers[$propertyName] = $identifier;

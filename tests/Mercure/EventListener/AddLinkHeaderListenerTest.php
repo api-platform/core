@@ -21,7 +21,7 @@ use Fig\Link\GenericLinkProvider;
 use Fig\Link\Link;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
+use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\WebLink\HttpHeaderSerializer;
 
 /**
@@ -39,7 +39,7 @@ class AddLinkHeaderListenerTest extends TestCase
 
         $listener = new AddLinkHeaderListener($resourceMetadataFactoryProphecy->reveal(), 'https://demo.mercure.rocks/hub');
 
-        $eventProphecy = $this->prophesize(FilterResponseEvent::class);
+        $eventProphecy = $this->prophesize(ResponseEvent::class);
         $eventProphecy->getRequest()->willReturn($request)->shouldBeCalled();
 
         $listener->onKernelResponse($eventProphecy->reveal());
@@ -65,7 +65,7 @@ class AddLinkHeaderListenerTest extends TestCase
 
         $listener = new AddLinkHeaderListener($resourceMetadataFactoryProphecy->reveal(), 'https://demo.mercure.rocks/hub');
 
-        $eventProphecy = $this->prophesize(FilterResponseEvent::class);
+        $eventProphecy = $this->prophesize(ResponseEvent::class);
         $eventProphecy->getRequest()->willReturn($request)->shouldBeCalled();
 
         $listener->onKernelResponse($eventProphecy->reveal());
@@ -79,5 +79,21 @@ class AddLinkHeaderListenerTest extends TestCase
             [new Request()],
             [new Request([], [], ['_api_resource_class' => Dummy::class])],
         ];
+    }
+
+    public function testSkipWhenPreflightRequest(): void
+    {
+        $request = new Request();
+        $request->setMethod('OPTIONS');
+        $request->headers->set('Access-Control-Request-Method', 'POST');
+
+        $event = $this->prophesize(ResponseEvent::class);
+        $event->getRequest()->willReturn($request)->shouldBeCalled();
+
+        $resourceMetadataFactory = $this->prophesize(ResourceMetadataFactoryInterface::class);
+        $listener = new AddLinkHeaderListener($resourceMetadataFactory->reveal(), 'http://example.com/.well-known/mercure');
+        $listener->onKernelResponse($event->reveal());
+
+        $this->assertFalse($request->attributes->has('_links'));
     }
 }

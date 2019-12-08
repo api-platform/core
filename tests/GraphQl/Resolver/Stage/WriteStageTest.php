@@ -53,14 +53,14 @@ class WriteStageTest extends TestCase
         $resourceClass = 'myResource';
         $this->resourceMetadataFactoryProphecy->create($resourceClass)->willReturn(new ResourceMetadata());
 
-        $result = ($this->writeStage)(null, $resourceClass, 'query', []);
+        $result = ($this->writeStage)(null, $resourceClass, 'item_query', []);
 
         $this->assertNull($result);
     }
 
     public function testApplyDisabled(): void
     {
-        $operationName = 'query';
+        $operationName = 'item_query';
         $resourceClass = 'myResource';
         $resourceMetadata = (new ResourceMetadata())->withGraphql([
             $operationName => ['write' => false],

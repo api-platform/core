@@ -22,9 +22,9 @@ use ApiPlatform\Core\GraphQl\Serializer\ItemNormalizer;
 use ApiPlatform\Core\GraphQl\Serializer\SerializerContextBuilderInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
-use GraphQL\Error\Error;
 use GraphQL\Type\Definition\ResolveInfo;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
  * @author Alan Poulain <contact@alanpoulain.eu>
@@ -55,7 +55,8 @@ class ReadStageTest extends TestCase
             $this->iriConverterProphecy->reveal(),
             $this->collectionDataProviderProphecy->reveal(),
             $this->subresourceDataProviderProphecy->reveal(),
-            $this->serializerContextBuilderProphecy->reveal()
+            $this->serializerContextBuilderProphecy->reveal(),
+            '_'
         );
     }
 
@@ -66,7 +67,7 @@ class ReadStageTest extends TestCase
      */
     public function testApplyDisabled(array $context, $expectedResult): void
     {
-        $operationName = 'query';
+        $operationName = 'item_query';
         $resourceClass = 'myResource';
         $resourceMetadata = (new ResourceMetadata())->withGraphql([
             $operationName => ['read' => false],
@@ -94,7 +95,7 @@ class ReadStageTest extends TestCase
      */
     public function testApplyItem(?string $identifier, $item, bool $throwNotFound, $expectedResult): void
     {
-        $operationName = 'query';
+        $operationName = 'item_query';
         $resourceClass = 'myResource';
         $info = $this->prophesize(ResolveInfo::class)->reveal();
         $context = [
@@ -174,8 +175,8 @@ class ReadStageTest extends TestCase
         return [
             'no identifier' => ['myResource', null, $item, false, null],
             'identifier' => ['stdClass', 'identifier', $item, false, $item],
-            'identifier bad item' => ['myResource', 'identifier', $item, false, $item, Error::class, 'Item "identifier" did not match expected type "shortName".'],
-            'identifier not found' => ['myResource', 'identifier_not_found', $item, true, null, Error::class, 'Item "identifier_not_found" not found.'],
+            'identifier bad item' => ['myResource', 'identifier', $item, false, $item, \UnexpectedValueException::class, 'Item "identifier" did not match expected type "shortName".'],
+            'identifier not found' => ['myResource', 'identifier_not_found', $item, true, null, NotFoundHttpException::class, 'Item "identifier_not_found" not found.'],
         ];
     }
 
@@ -184,7 +185,7 @@ class ReadStageTest extends TestCase
      */
     public function testApplyCollection(array $args, ?string $rootClass, ?array $source, array $expectedFilters, iterable $expectedResult): void
     {
-        $operationName = 'query';
+        $operationName = 'collection_query';
         $resourceClass = 'myResource';
         $info = $this->prophesize(ResolveInfo::class)->reveal();
         $fieldName = 'subresource';
@@ -201,9 +202,9 @@ class ReadStageTest extends TestCase
         $normalizationContext = ['normalization' => true];
         $this->serializerContextBuilderProphecy->create($resourceClass, $operationName, $context, true)->shouldBeCalled()->willReturn($normalizationContext);
 
-        $this->subresourceDataProviderProphecy->getSubresource($resourceClass, ['id' => 3], $normalizationContext + ['filters' => $expectedFilters, 'property' => $fieldName, 'identifiers' => [['id', $resourceClass]], 'collection' => true])->willReturn(['subresource']);
+        $this->subresourceDataProviderProphecy->getSubresource($resourceClass, ['id' => 3], $normalizationContext + ['filters' => $expectedFilters, 'property' => $fieldName, 'identifiers' => [['id', $resourceClass]], 'collection' => true], $operationName)->willReturn(['subresource']);
 
-        $this->collectionDataProviderProphecy->getCollection($resourceClass, null, $normalizationContext + ['filters' => $expectedFilters])->willReturn($expectedResult);
+        $this->collectionDataProviderProphecy->getCollection($resourceClass, $operationName, $normalizationContext + ['filters' => $expectedFilters])->willReturn($expectedResult);
 
         $result = ($this->readStage)($resourceClass, $rootClass, $operationName, $context);
 

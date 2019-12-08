@@ -14,6 +14,11 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\Bridge\Symfony\Bundle\Test;
 
 use ApiPlatform\Core\Bridge\Symfony\Bundle\Test\ApiTestCase;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\Dummy as DummyDocument;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Model\ResourceInterface;
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Tools\SchemaTool;
 use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Runner\Version;
 
@@ -120,6 +125,18 @@ JSON;
         $this->assertMatchesJsonSchema(json_decode($jsonSchema, true));
     }
 
+    public function testAssertMatchesResourceCollectionJsonSchema(): void
+    {
+        self::createClient()->request('GET', '/resource_interfaces');
+        $this->assertMatchesResourceCollectionJsonSchema(ResourceInterface::class);
+    }
+
+    public function testAssertMatchesResourceItemJsonSchema(): void
+    {
+        self::createClient()->request('GET', '/resource_interfaces/some-id');
+        $this->assertMatchesResourceItemJsonSchema(ResourceInterface::class);
+    }
+
     // Next tests have been imported from dms/phpunit-arraysubset-asserts, because the original constraint has been deprecated.
 
     public function testAssertArraySubsetPassesStrictConfig(): void
@@ -139,5 +156,32 @@ JSON;
         }
 
         $this->assertArraySubset([1, 2], [1, 2, 3]);
+    }
+
+    public function testFindIriBy(): void
+    {
+        self::bootKernel();
+        /**
+         * @var EntityManagerInterface
+         */
+        $manager = self::$container->get('doctrine')->getManager();
+        $classes = $manager->getMetadataFactory()->getAllMetadata();
+        $schemaTool = new SchemaTool($manager);
+
+        $schemaTool->dropSchema($classes);
+        $schemaTool->createSchema($classes);
+
+        self::createClient()->request('POST', '/dummies', [
+            'headers' => [
+                'content-type' => 'application/json',
+                'accept' => 'text/xml',
+            ],
+            'body' => '{"name": "Kevin"}',
+        ]);
+        $this->assertResponseIsSuccessful();
+
+        $resource = 'mongodb' === self::$container->getParameter('kernel.environment') ? DummyDocument::class : Dummy::class;
+        $this->assertRegExp('~^/dummies/\d+~', self::findIriBy($resource, ['name' => 'Kevin']));
+        $this->assertNull(self::findIriBy($resource, ['name' => 'not-exist']));
     }
 }

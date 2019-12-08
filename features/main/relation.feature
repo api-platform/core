@@ -365,66 +365,6 @@ Feature: Relations support
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
 
-  Scenario: Create a new relation (json)
-    When I add "Content-Type" header equal to "application/json"
-    And I send a "POST" request to "/relation_embedders" with body:
-    """
-    {
-      "anotherRelated": {
-        "symfony": "laravel"
-      }
-    }
-    """
-    Then the response status code should be 201
-    And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
-    And the JSON should be equal to:
-    """
-    {
-      "@context": "/contexts/RelationEmbedder",
-      "@id": "/relation_embedders/3",
-      "@type": "RelationEmbedder",
-      "krondstadt": "Krondstadt",
-      "anotherRelated": {
-        "@id": "/related_dummies/4",
-        "@type": "https://schema.org/Product",
-        "symfony": "laravel",
-        "thirdLevel": null
-      },
-      "related": null
-    }
-    """
-
-  Scenario: Update the relation with a new one (json)
-    When I add "Content-Type" header equal to "application/json"
-    And I send a "PUT" request to "/relation_embedders/3" with body:
-    """
-    {
-      "anotherRelated": {
-        "symfony": "laravel2"
-      }
-    }
-    """
-    Then the response status code should be 200
-    And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
-    And the JSON should be equal to:
-    """
-    {
-      "@context": "/contexts/RelationEmbedder",
-      "@id": "/relation_embedders/3",
-      "@type": "RelationEmbedder",
-      "krondstadt": "Krondstadt",
-      "anotherRelated": {
-        "@id": "/related_dummies/5",
-        "@type": "https://schema.org/Product",
-        "symfony": "laravel2",
-        "thirdLevel": null
-      },
-      "related": null
-    }
-    """
-
   Scenario: Update an embedded relation
     When I add "Content-Type" header equal to "application/ld+json"
     And I send a "PUT" request to "/relation_embedders/2" with body:
@@ -453,37 +393,6 @@ Feature: Relations support
         "thirdLevel": null
       },
       "related": null
-    }
-    """
-
-  Scenario: Create a related dummy with a relation (json)
-    When I add "Content-Type" header equal to "application/json"
-    And I send a "POST" request to "/related_dummies" with body:
-    """
-    {"thirdLevel": "1"}
-    """
-    Then the response status code should be 201
-    And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
-    And the JSON should be equal to:
-    """
-    {
-      "@context": "/contexts/RelatedDummy",
-      "@id": "/related_dummies/6",
-      "@type": "https://schema.org/Product",
-      "id": 6,
-      "name": null,
-      "symfony": "symfony",
-      "dummyDate": null,
-      "thirdLevel": {
-        "@id": "/third_levels/1",
-        "@type": "ThirdLevel",
-        "fourthLevel": null
-      },
-      "relatedToDummyFriend": [],
-      "dummyBoolean": null,
-      "embeddedDummy": [],
-      "age": null
     }
     """
 
@@ -516,45 +425,6 @@ Feature: Relations support
         }
       ],
       "hydra:totalItems": 1
-    }
-    """
-
-  Scenario: Passing a (valid) plain identifier on a relation
-    When I add "Content-Type" header equal to "application/json"
-    And I send a "POST" request to "/dummies" with body:
-    """
-    {
-      "relatedDummy": "1",
-      "relatedDummies": ["1"],
-      "name": "Dummy with plain relations"
-    }
-    """
-    Then the response status code should be 201
-    And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
-    And the JSON should be equal to:
-    """
-    {
-      "@context":"/contexts/Dummy",
-      "@id":"/dummies/2",
-      "@type":"Dummy",
-      "description":null,
-      "dummy":null,
-      "dummyBoolean":null,
-      "dummyDate":null,
-      "dummyFloat":null,
-      "dummyPrice":null,
-      "relatedDummy":"/related_dummies/1",
-      "relatedDummies":["/related_dummies/1"],
-      "jsonData":[],
-      "arrayData":[],
-      "name_converted":null,
-      "relatedOwnedDummy": null,
-      "relatedOwningDummy": null,
-      "id":2,
-      "name":"Dummy with plain relations",
-      "alias":null,
-      "foo":null
     }
     """
 

@@ -17,6 +17,7 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Metadata\Property\DoctrineOrmPropertyMe
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyPropertyWithDefaultValue;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Persistence\Mapping\ClassMetadata;
 use Doctrine\Common\Persistence\ObjectManager;
@@ -73,6 +74,7 @@ class DoctrineOrmPropertyMetadataFactoryTest extends TestCase
 
         $classMetadata = $this->prophesize(ClassMetadataInfo::class);
         $classMetadata->getIdentifier()->shouldBeCalled()->willReturn(['id']);
+        $classMetadata->getFieldNames()->shouldBeCalled()->willReturn([]);
 
         $objectManager = $this->prophesize(ObjectManager::class);
         $objectManager->getClassMetadata(Dummy::class)->shouldBeCalled()->willReturn($classMetadata->reveal());
@@ -88,6 +90,31 @@ class DoctrineOrmPropertyMetadataFactoryTest extends TestCase
         $this->assertEquals($doctrinePropertyMetadata->isWritable(), false);
     }
 
+    public function testCreateWithDefaultOption()
+    {
+        $propertyMetadata = new PropertyMetadata();
+
+        $propertyMetadataFactory = $this->prophesize(PropertyMetadataFactoryInterface::class);
+        $propertyMetadataFactory->create(DummyPropertyWithDefaultValue::class, 'dummyDefaultOption', [])->shouldBeCalled()->willReturn($propertyMetadata);
+
+        $classMetadata = new ClassMetadataInfo(DummyPropertyWithDefaultValue::class);
+        $classMetadata->fieldMappings = [
+            'dummyDefaultOption' => ['options' => ['default' => 'default value']],
+        ];
+
+        $objectManager = $this->prophesize(ObjectManager::class);
+        $objectManager->getClassMetadata(DummyPropertyWithDefaultValue::class)->shouldBeCalled()->willReturn($classMetadata);
+
+        $managerRegistry = $this->prophesize(ManagerRegistry::class);
+        $managerRegistry->getManagerForClass(DummyPropertyWithDefaultValue::class)->shouldBeCalled()->willReturn($objectManager->reveal());
+
+        $doctrineOrmPropertyMetadataFactory = new DoctrineOrmPropertyMetadataFactory($managerRegistry->reveal(), $propertyMetadataFactory->reveal());
+
+        $doctrinePropertyMetadata = $doctrineOrmPropertyMetadataFactory->create(DummyPropertyWithDefaultValue::class, 'dummyDefaultOption');
+
+        $this->assertEquals($doctrinePropertyMetadata->getDefault(), 'default value');
+    }
+
     public function testCreateClassMetadataInfo()
     {
         $propertyMetadata = new PropertyMetadata();
@@ -98,6 +125,7 @@ class DoctrineOrmPropertyMetadataFactoryTest extends TestCase
         $classMetadata = $this->prophesize(ClassMetadataInfo::class);
         $classMetadata->getIdentifier()->shouldBeCalled()->willReturn(['id']);
         $classMetadata->isIdentifierNatural()->shouldBeCalled()->willReturn(true);
+        $classMetadata->getFieldNames()->shouldBeCalled()->willReturn([]);
 
         $objectManager = $this->prophesize(ObjectManager::class);
         $objectManager->getClassMetadata(Dummy::class)->shouldBeCalled()->willReturn($classMetadata->reveal());

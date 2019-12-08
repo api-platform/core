@@ -82,7 +82,6 @@
 
         <service id="api_platform.serializer.context_builder" class="ApiPlatform\Core\Serializer\SerializerContextBuilder" public="false">
             <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
-            <argument>%api_platform.patch_formats%</argument>
         </service>
         <service id="ApiPlatform\Core\Serializer\SerializerContextBuilderInterface" alias="api_platform.serializer.context_builder" />
 
@@ -215,6 +214,8 @@
         <service id="api_platform.listener.exception" class="ApiPlatform\Core\EventListener\ExceptionListener">
             <argument>api_platform.action.exception</argument>
             <argument type="service" id="logger" on-invalid="null" />
+            <argument>false</argument>
+            <argument type="service" id="exception_listener" on-invalid="null" />
 
             <tag name="kernel.event_listener" event="kernel.exception" method="onKernelException" priority="-96" />
             <tag name="monolog.logger" channel="request" />
@@ -230,6 +231,8 @@
         <service id="api_platform.action.put_item" alias="api_platform.action.placeholder" public="true" />
         <service id="api_platform.action.delete_item" alias="api_platform.action.placeholder" public="true" />
         <service id="api_platform.action.get_subresource" alias="api_platform.action.placeholder" public="true" />
+        <service id="api_platform.action.not_found" class="ApiPlatform\Core\Action\NotFoundAction" public="true" />
+        <service id="ApiPlatform\Core\Action\NotFoundAction" alias="api_platform.action.not_found" public="true" />
 
         <service id="api_platform.action.entrypoint" class="ApiPlatform\Core\Action\EntrypointAction" public="true">
             <argument type="service" id="api_platform.metadata.resource.name_collection_factory" />

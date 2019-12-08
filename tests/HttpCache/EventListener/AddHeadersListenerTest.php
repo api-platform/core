@@ -20,7 +20,7 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
+use Symfony\Component\HttpKernel\Event\ResponseEvent;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
@@ -34,7 +34,7 @@ class AddHeadersListenerTest extends TestCase
 
         $response = new Response();
 
-        $event = $this->prophesize(FilterResponseEvent::class);
+        $event = $this->prophesize(ResponseEvent::class);
         $event->getRequest()->willReturn($request)->shouldBeCalled();
         $event->getResponse()->willReturn($response)->shouldNotBeCalled();
 
@@ -50,7 +50,7 @@ class AddHeadersListenerTest extends TestCase
 
         $response = new Response('{}', Response::HTTP_BAD_REQUEST);
 
-        $event = $this->prophesize(FilterResponseEvent::class);
+        $event = $this->prophesize(ResponseEvent::class);
         $event->getRequest()->willReturn($request)->shouldBeCalled();
         $event->getResponse()->willReturn($response)->shouldBeCalled();
 
@@ -65,7 +65,7 @@ class AddHeadersListenerTest extends TestCase
         $request = new Request();
         $response = new Response();
 
-        $event = $this->prophesize(FilterResponseEvent::class);
+        $event = $this->prophesize(ResponseEvent::class);
         $event->getRequest()->willReturn($request)->shouldBeCalled();
         $event->getResponse()->willReturn($response)->shouldNotBeCalled();
 
@@ -80,7 +80,7 @@ class AddHeadersListenerTest extends TestCase
         $request = new Request([], [], ['_api_resource_class' => Dummy::class, '_api_item_operation_name' => 'get']);
         $response = new Response();
 
-        $event = $this->prophesize(FilterResponseEvent::class);
+        $event = $this->prophesize(ResponseEvent::class);
         $event->getRequest()->willReturn($request)->shouldBeCalled();
         $event->getResponse()->willReturn($response)->shouldBeCalled();
 
@@ -95,7 +95,7 @@ class AddHeadersListenerTest extends TestCase
         $request = new Request([], [], ['_api_resource_class' => Dummy::class, '_api_item_operation_name' => 'get']);
         $response = new Response('some content', 200, ['Vary' => ['Accept', 'Cookie']]);
 
-        $event = $this->prophesize(FilterResponseEvent::class);
+        $event = $this->prophesize(ResponseEvent::class);
         $event->getRequest()->willReturn($request)->shouldBeCalled();
         $event->getResponse()->willReturn($response)->shouldBeCalled();
 
@@ -119,7 +119,7 @@ class AddHeadersListenerTest extends TestCase
         // This also calls setPublic
         $response->setSharedMaxAge(400);
 
-        $event = $this->prophesize(FilterResponseEvent::class);
+        $event = $this->prophesize(ResponseEvent::class);
         $event->getRequest()->willReturn($request)->shouldBeCalled();
         $event->getResponse()->willReturn($response)->shouldBeCalled();
 
@@ -139,7 +139,7 @@ class AddHeadersListenerTest extends TestCase
         $request = new Request([], [], ['_api_resource_class' => Dummy::class, '_api_item_operation_name' => 'get']);
         $response = new Response('some content', 200, ['Vary' => ['Accept', 'Cookie']]);
 
-        $event = $this->prophesize(FilterResponseEvent::class);
+        $event = $this->prophesize(ResponseEvent::class);
         $event->getRequest()->willReturn($request)->shouldBeCalled();
         $event->getResponse()->willReturn($response)->shouldBeCalled();
 

@@ -114,14 +114,14 @@ final class ApiPlatformParser implements ParserInterface
         $attributes = $resourceMetadata->getAttributes();
 
         if (isset($attributes['normalization_context'][AbstractNormalizer::GROUPS])) {
-            $options['serializer_groups'] = $attributes['normalization_context'][AbstractNormalizer::GROUPS];
+            $options['serializer_groups'] = (array) $attributes['normalization_context'][AbstractNormalizer::GROUPS];
         }
 
         if (isset($attributes['denormalization_context'][AbstractNormalizer::GROUPS])) {
             if (isset($options['serializer_groups'])) {
                 $options['serializer_groups'] += $attributes['denormalization_context'][AbstractNormalizer::GROUPS];
             } else {
-                $options['serializer_groups'] = $attributes['denormalization_context'][AbstractNormalizer::GROUPS];
+                $options['serializer_groups'] = (array) $attributes['denormalization_context'][AbstractNormalizer::GROUPS];
             }
         }
 
@@ -235,7 +235,7 @@ final class ApiPlatformParser implements ParserInterface
         if ('object' === $builtinType) {
             $className = $type->getClassName();
 
-            if (is_subclass_of($className, \DateTimeInterface::class)) {
+            if (is_a($className, \DateTimeInterface::class, true)) {
                 $data['dataType'] = DataTypes::DATETIME;
                 $data['format'] = sprintf('{DateTime %s}', \DateTime::RFC3339);
 

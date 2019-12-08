@@ -13,10 +13,12 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Tests\GraphQl\Type;
 
+use ApiPlatform\Core\DataProvider\Pagination;
 use ApiPlatform\Core\GraphQl\Serializer\ItemNormalizer;
 use ApiPlatform\Core\GraphQl\Type\FieldsBuilderInterface;
 use ApiPlatform\Core\GraphQl\Type\TypeBuilder;
 use ApiPlatform\Core\GraphQl\Type\TypesContainerInterface;
+use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use GraphQL\Type\Definition\InputObjectType;
@@ -46,6 +48,9 @@ class TypeBuilderTest extends TestCase
     /** @var ObjectProphecy */
     private $fieldsBuilderLocatorProphecy;
 
+    /** @var ObjectProphecy */
+    private $resourceMetadataFactoryProphecy;
+
     /** @var TypeBuilder */
     private $typeBuilder;
 
@@ -58,7 +63,13 @@ class TypeBuilderTest extends TestCase
         $this->defaultFieldResolver = function () {
         };
         $this->fieldsBuilderLocatorProphecy = $this->prophesize(ContainerInterface::class);
-        $this->typeBuilder = new TypeBuilder($this->typesContainerProphecy->reveal(), $this->defaultFieldResolver, $this->fieldsBuilderLocatorProphecy->reveal());
+        $this->resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
+        $this->typeBuilder = new TypeBuilder(
+            $this->typesContainerProphecy->reveal(),
+            $this->defaultFieldResolver,
+            $this->fieldsBuilderLocatorProphecy->reveal(),
+            new Pagination($this->resourceMetadataFactoryProphecy->reveal())
+        );
     }
 
     public function testGetResourceObjectType(): void
@@ -70,7 +81,7 @@ class TypeBuilderTest extends TestCase
         $this->typesContainerProphecy->set('Node', Argument::type(InterfaceType::class))->shouldBeCalled();
 
         /** @var ObjectType $resourceObjectType */
-        $resourceObjectType = $this->typeBuilder->getResourceObjectType('resourceClass', $resourceMetadata, false, null, null);
+        $resourceObjectType = $this->typeBuilder->getResourceObjectType('resourceClass', $resourceMetadata, false, 'item_query', null);
         $this->assertSame('shortName', $resourceObjectType->name);
         $this->assertSame('description', $resourceObjectType->description);
         $this->assertSame($this->defaultFieldResolver, $resourceObjectType->resolveFieldFn);
@@ -78,7 +89,7 @@ class TypeBuilderTest extends TestCase
         $this->assertArrayHasKey('fields', $resourceObjectType->config);
 
         $fieldsBuilderProphecy = $this->prophesize(FieldsBuilderInterface::class);
-        $fieldsBuilderProphecy->getResourceObjectTypeFields('resourceClass', $resourceMetadata, false, null, null, 0, null)->shouldBeCalled();
+        $fieldsBuilderProphecy->getResourceObjectTypeFields('resourceClass', $resourceMetadata, false, 'item_query', null, 0, null)->shouldBeCalled();
         $this->fieldsBuilderLocatorProphecy->get('api_platform.graphql.fields_builder')->shouldBeCalled()->willReturn($fieldsBuilderProphecy->reveal());
         $resourceObjectType->config['fields']();
     }
@@ -86,14 +97,14 @@ class TypeBuilderTest extends TestCase
     public function testGetResourceObjectTypeOutputClass(): void
     {
         $resourceMetadata = (new ResourceMetadata('shortName', 'description'))
-            ->withGraphql(['query' => ['output' => ['class' => 'outputClass']]]);
+            ->withGraphql(['item_query' => ['output' => ['class' => 'outputClass']]]);
         $this->typesContainerProphecy->has('shortName')->shouldBeCalled()->willReturn(false);
         $this->typesContainerProphecy->set('shortName', Argument::type(ObjectType::class))->shouldBeCalled();
         $this->typesContainerProphecy->has('Node')->shouldBeCalled()->willReturn(false);
         $this->typesContainerProphecy->set('Node', Argument::type(InterfaceType::class))->shouldBeCalled();
 
         /** @var ObjectType $resourceObjectType */
-        $resourceObjectType = $this->typeBuilder->getResourceObjectType('resourceClass', $resourceMetadata, false, null, null);
+        $resourceObjectType = $this->typeBuilder->getResourceObjectType('resourceClass', $resourceMetadata, false, 'item_query', null);
         $this->assertSame('shortName', $resourceObjectType->name);
         $this->assertSame('description', $resourceObjectType->description);
         $this->assertSame($this->defaultFieldResolver, $resourceObjectType->resolveFieldFn);
@@ -101,9 +112,53 @@ class TypeBuilderTest extends TestCase
         $this->assertArrayHasKey('fields', $resourceObjectType->config);
 
         $fieldsBuilderProphecy = $this->prophesize(FieldsBuilderInterface::class);
-        $fieldsBuilderProphecy->getResourceObjectTypeFields('outputClass', $resourceMetadata, false, null, null, 0, ['class' => 'outputClass'])->shouldBeCalled();
+        $fieldsBuilderProphecy->getResourceObjectTypeFields('outputClass', $resourceMetadata, false, 'item_query', null, 0, ['class' => 'outputClass'])->shouldBeCalled();
         $this->fieldsBuilderLocatorProphecy->get('api_platform.graphql.fields_builder')->shouldBeCalled()->willReturn($fieldsBuilderProphecy->reveal());
         $resourceObjectType->config['fields']();
+    }
+
+    /**
+     * @dataProvider resourceObjectTypeQuerySerializationGroupsProvider
+     */
+    public function testGetResourceObjectTypeQuerySerializationGroups(string $itemSerializationGroup, string $collectionSerializationGroup, string $shortName, string $queryName)
+    {
+        $resourceMetadata = (new ResourceMetadata('shortName', 'description'))
+            ->withGraphql([
+                'item_query' => ['normalization_context' => ['groups' => [$itemSerializationGroup]]],
+                'collection_query' => ['normalization_context' => ['groups' => [$collectionSerializationGroup]]],
+            ]);
+        $this->typesContainerProphecy->has($shortName)->shouldBeCalled()->willReturn(false);
+        $this->typesContainerProphecy->set($shortName, Argument::type(ObjectType::class))->shouldBeCalled();
+        $this->typesContainerProphecy->has('Node')->shouldBeCalled()->willReturn(false);
+        $this->typesContainerProphecy->set('Node', Argument::type(InterfaceType::class))->shouldBeCalled();
+
+        /** @var ObjectType $resourceObjectType */
+        $resourceObjectType = $this->typeBuilder->getResourceObjectType('resourceClass', $resourceMetadata, false, $queryName, null);
+        $this->assertSame($shortName, $resourceObjectType->name);
+    }
+
+    public function resourceObjectTypeQuerySerializationGroupsProvider(): array
+    {
+        return [
+            'same serialization groups for item_query and collection_query' => [
+                'group',
+                'group',
+                'shortName',
+                'item_query',
+            ],
+            'different serialization groups for item_query and collection_query when using item_query' => [
+                'item_group',
+                'collection_group',
+                'shortNameItem',
+                'item_query',
+            ],
+            'different serialization groups for item_query and collection_query when using collection_query' => [
+                'item_group',
+                'collection_group',
+                'shortNameCollection',
+                'collection_query',
+            ],
+        ];
     }
 
     public function testGetResourceObjectTypeInput(): void
@@ -188,7 +243,7 @@ class TypeBuilderTest extends TestCase
     {
         $resourceMetadata = (new ResourceMetadata('shortName', 'description'))
             ->withGraphql([
-                'query' => ['normalization_context' => ['groups' => ['query']]],
+                'item_query' => ['normalization_context' => ['groups' => ['item_query']]],
                 'create' => ['normalization_context' => ['groups' => ['create']]],
             ]);
         $this->typesContainerProphecy->has('createShortNamePayload')->shouldBeCalled()->willReturn(false);
@@ -262,25 +317,34 @@ class TypeBuilderTest extends TestCase
 
         $this->assertNull($nodeInterface->resolveType([], [], $this->prophesize(ResolveInfo::class)->reveal()));
 
-        $this->typesContainerProphecy->has('DummyItem')->shouldBeCalled()->willReturn(false);
+        $this->typesContainerProphecy->has('Dummy')->shouldBeCalled()->willReturn(false);
         $this->assertNull($nodeInterface->resolveType([ItemNormalizer::ITEM_RESOURCE_CLASS_KEY => Dummy::class], [], $this->prophesize(ResolveInfo::class)->reveal()));
 
-        $this->typesContainerProphecy->has('DummyItem')->shouldBeCalled()->willReturn(true);
-        $this->typesContainerProphecy->get('DummyItem')->shouldBeCalled()->willReturn(GraphQLType::string());
+        $this->typesContainerProphecy->has('Dummy')->shouldBeCalled()->willReturn(true);
+        $this->typesContainerProphecy->get('Dummy')->shouldBeCalled()->willReturn(GraphQLType::string());
         /** @var GraphQLType $resolvedType */
         $resolvedType = $nodeInterface->resolveType([ItemNormalizer::ITEM_RESOURCE_CLASS_KEY => Dummy::class], [], $this->prophesize(ResolveInfo::class)->reveal());
         $this->assertSame(GraphQLType::string(), $resolvedType);
     }
 
-    public function testGetResourcePaginatedCollectionType(): void
+    public function testCursorBasedGetResourcePaginatedCollectionType(): void
     {
         $this->typesContainerProphecy->has('StringConnection')->shouldBeCalled()->willReturn(false);
         $this->typesContainerProphecy->set('StringConnection', Argument::type(ObjectType::class))->shouldBeCalled();
         $this->typesContainerProphecy->set('StringEdge', Argument::type(ObjectType::class))->shouldBeCalled();
         $this->typesContainerProphecy->set('StringPageInfo', Argument::type(ObjectType::class))->shouldBeCalled();
 
+        $this->resourceMetadataFactoryProphecy->create('StringResourceClass')->shouldBeCalled()->willReturn(new ResourceMetadata(
+            null,
+            null,
+            null,
+            null,
+            null,
+            ['paginationType' => 'cursor']
+        ));
+
         /** @var ObjectType $resourcePaginatedCollectionType */
-        $resourcePaginatedCollectionType = $this->typeBuilder->getResourcePaginatedCollectionType(GraphQLType::string());
+        $resourcePaginatedCollectionType = $this->typeBuilder->getResourcePaginatedCollectionType(GraphQLType::string(), 'StringResourceClass', 'operationName');
         $this->assertSame('StringConnection', $resourcePaginatedCollectionType->name);
         $this->assertSame('Connection for String.', $resourcePaginatedCollectionType->description);
 
@@ -324,6 +388,48 @@ class TypeBuilderTest extends TestCase
         $totalCountType = $resourcePaginatedCollectionTypeFields['totalCount']->getType();
         $this->assertInstanceOf(NonNull::class, $totalCountType);
         $this->assertSame(GraphQLType::int(), $totalCountType->getWrappedType());
+    }
+
+    public function testPageBasedGetResourcePaginatedCollectionType(): void
+    {
+        $this->typesContainerProphecy->has('StringConnection')->shouldBeCalled()->willReturn(false);
+        $this->typesContainerProphecy->set('StringConnection', Argument::type(ObjectType::class))->shouldBeCalled();
+        $this->typesContainerProphecy->set('StringPaginationInfo', Argument::type(ObjectType::class))->shouldBeCalled();
+
+        $this->resourceMetadataFactoryProphecy->create('StringResourceClass')->shouldBeCalled()->willReturn(new ResourceMetadata(
+            null,
+            null,
+            null,
+            null,
+            null,
+            ['paginationType' => 'page']
+        ));
+
+        /** @var ObjectType $resourcePaginatedCollectionType */
+        $resourcePaginatedCollectionType = $this->typeBuilder->getResourcePaginatedCollectionType(GraphQLType::string(), 'StringResourceClass', 'operationName');
+        $this->assertSame('StringConnection', $resourcePaginatedCollectionType->name);
+        $this->assertSame('Connection for String.', $resourcePaginatedCollectionType->description);
+
+        $resourcePaginatedCollectionTypeFields = $resourcePaginatedCollectionType->getFields();
+        $this->assertArrayHasKey('collection', $resourcePaginatedCollectionTypeFields);
+        $this->assertArrayHasKey('paginationInfo', $resourcePaginatedCollectionTypeFields);
+
+        /** @var NonNull $paginationInfoType */
+        $paginationInfoType = $resourcePaginatedCollectionTypeFields['paginationInfo']->getType();
+        /** @var ObjectType $wrappedType */
+        $wrappedType = $paginationInfoType->getWrappedType();
+        $this->assertSame('StringPaginationInfo', $wrappedType->name);
+        $this->assertSame('Information about the pagination.', $wrappedType->description);
+        $paginationInfoObjectTypeFields = $wrappedType->getFields();
+        $this->assertArrayHasKey('itemsPerPage', $paginationInfoObjectTypeFields);
+        $this->assertArrayHasKey('lastPage', $paginationInfoObjectTypeFields);
+        $this->assertArrayHasKey('totalCount', $paginationInfoObjectTypeFields);
+        $this->assertInstanceOf(NonNull::class, $paginationInfoObjectTypeFields['itemsPerPage']->getType());
+        $this->assertSame(GraphQLType::int(), $paginationInfoObjectTypeFields['itemsPerPage']->getType()->getWrappedType());
+        $this->assertInstanceOf(NonNull::class, $paginationInfoObjectTypeFields['lastPage']->getType());
+        $this->assertSame(GraphQLType::int(), $paginationInfoObjectTypeFields['lastPage']->getType()->getWrappedType());
+        $this->assertInstanceOf(NonNull::class, $paginationInfoObjectTypeFields['totalCount']->getType());
+        $this->assertSame(GraphQLType::int(), $paginationInfoObjectTypeFields['totalCount']->getType()->getWrappedType());
     }
 
     /**

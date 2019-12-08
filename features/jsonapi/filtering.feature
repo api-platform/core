@@ -23,6 +23,14 @@ Feature: JSON API filter handling
     And the JSON should be valid according to the JSON API schema
     And the JSON node "data" should have 0 elements
 
+  Scenario: Apply filters and pagination at the same time
+    When I send a "GET" request to "/dummies?filter[name]=foo&page[page]=2"
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the JSON should be valid according to the JSON API schema
+    Then the JSON node "meta.currentPage" should be a number
+    Then the JSON node "meta.currentPage" should be equal to "2"
+
   Scenario: Apply property filter based on the 'fields'
     Given there are 2 dummy property objects
     When I send a "GET" request to "/dummy_properties?fields[DummyProperty]=id,foo,bar"

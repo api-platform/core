@@ -1,6 +1,3 @@
-includes:
-	- vendor/jangregor/phpstan-prophecy/src/extension.neon
-
 parameters:
 	level: 6
 	paths:
@@ -24,10 +21,13 @@ parameters:
 		# Real problems, hard to fix
 		- '#Parameter \#2 \$dqlPart of method Doctrine\\ORM\\QueryBuilder::add\(\) expects array\|object, string given\.#'
 		-
-			message: '#Return type \(int\) of method ApiPlatform\\Core\\Identifier\\Normalizer\\IntegerDenormalizer::denormalize\(\) should be compatible with return type \(object\) of method Symfony\\Component\\Serializer\\Normalizer\\DenormalizerInterface::denormalize\(\)#'
+			message: '#Return type \(int\) of method ApiPlatform\\Core\\Identifier\\Normalizer\\IntegerDenormalizer::denormalize\(\) should be compatible with return type \(array\|object\) of method Symfony\\Component\\Serializer\\Normalizer\\DenormalizerInterface::denormalize\(\)#'
 			path: %currentWorkingDirectory%/src/Identifier/Normalizer/IntegerDenormalizer.php
 
 		# False positives
+		-
+			message: '#Variable \$iri might not be defined\.#'
+			path: %currentWorkingDirectory%/src/JsonApi/Serializer/ItemNormalizer.php
 		-
 			message: '#Variable \$positionPm might not be defined\.#'
 			path: %currentWorkingDirectory%/src/Util/ClassInfoTrait.php
@@ -58,9 +58,11 @@ parameters:
 			message: '#Parameter \#1 \$docblock of method phpDocumentor\\Reflection\\DocBlockFactoryInterface::create\(\) expects string, ReflectionClass given\.#'
 			path: %currentWorkingDirectory%/src/Metadata/Resource/Factory/PhpDocResourceMetadataFactory.php
 		-
+			message: '#Parameter \#1 \$objectValue of method GraphQL\\Type\\Definition\\InterfaceType::resolveType\(\) expects object, array(<string, string>)? given.#'
+			path: %currentWorkingDirectory%/tests/GraphQl/Type/TypeBuilderTest.php
+		-
 			message: '#Property ApiPlatform\\Core\\Test\\DoctrineMongoDbOdmFilterTestCase::\$repository \(Doctrine\\ODM\\MongoDB\\Repository\\DocumentRepository\) does not accept Doctrine\\ORM\\EntityRepository<ApiPlatform\\Core\\Tests\\Fixtures\\TestBundle\\Document\\Dummy>\.#'
 			path: %currentWorkingDirectory%/src/Test/DoctrineMongoDbOdmFilterTestCase.php
-		- '#Method ApiPlatform\\Core\\(Serializer\\Abstract|JsonApi\\Serializer\\)ItemNormalizer::normalizeRelation\(\) should return array\|string but returns array\|bool\|float\|int\|string\.#'
 		- '#Method ApiPlatform\\Core\\Util\\RequestParser::parseRequestParams\(\) should return array but returns array\|false\.#'
 		-
 			message: '#Method ApiPlatform\\Core\\Bridge\\Doctrine\\Orm\\Util\\QueryBuilderHelper::mapJoinAliases() should return array<string, array<string>\|string> but returns array<int|string, mixed>\.#'
@@ -76,12 +78,16 @@ parameters:
 			message: "#Call to function method_exists\\(\\) with 'Symfony\\\\\\\\Component.+' and 'getRoleNames' will always evaluate to false\\.#"
 			path: %currentWorkingDirectory%/tests/Security/EventListener/DenyAccessListenerTest.php
 		- "#Call to method PHPUnit\\\\Framework\\\\Assert::assertSame\\(\\) with array\\('(collection_context|item_context|subresource_context)'\\) and array<Symfony\\\\Component\\\\VarDumper\\\\Cloner\\\\Data>\\|bool\\|float\\|int\\|string\\|null will always evaluate to false\\.#"
-		# https://github.com/doctrine/doctrine2/pull/7298
-		- '#Strict comparison using === between null and int will always evaluate to false\.#'
 		-
 			message: '#Binary operation "\+" between (float\|int\|)?string and 0 results in an error\.#'
 			path: %currentWorkingDirectory%/src/Bridge/Doctrine/Common/Filter/RangeFilterTrait.php
-		- '#Parameter \#1 \$objectValue of method GraphQL\\Type\\Definition\\InterfaceType::resolveType\(\) expects object, array(<string, string>)? given.#'
+		# https://github.com/phpstan/phpstan-symfony/issues/27
+		-
+			message: '#Service "api_platform\.json_schema\.schema_factory" is private\.#'
+			path: %currentWorkingDirectory%/src/Bridge/Symfony/Bundle/Test/ApiTestAssertionsTrait.php
+		-
+			message: '#Service "api_platform.iri_converter" is private\.#'
+			path: %currentWorkingDirectory%/src/Bridge/Symfony/Bundle/Test/ApiTestCase.php
 
 		# Expected, due to optional interfaces
 		- '#Method ApiPlatform\\Core\\Bridge\\Doctrine\\Orm\\Extension\\QueryCollectionExtensionInterface::applyToCollection\(\) invoked with 5 parameters, 3-4 required\.#'
@@ -100,3 +106,15 @@ parameters:
 		- '#Method ApiPlatform\\Core\\Bridge\\Doctrine\\Orm\\Filter\\(Abstract|Exists|Order)Filter::filterProperty\(\) invoked with 7 parameters, 5-6 required\.#'
 		- '#Method ApiPlatform\\Core\\Bridge\\Doctrine\\Orm\\Filter\\(AbstractFilter|FilterInterface)::apply\(\) invoked with 5 parameters, 3-4 required\.#'
 		- '#Method ApiPlatform\\Core\\PathResolver\\OperationPathResolverInterface::resolveOperationPath\(\) invoked with 4 parameters, 3 required\.#'
+
+		# Expected, due to backward compatibility
+		-
+			message: "#Call to function method_exists\\(\\) with ApiPlatform\\\\Core\\\\JsonApi\\\\Serializer\\\\ItemNormalizer and 'setCircularReferenc…' will always evaluate to false\\.#"
+			path: %currentWorkingDirectory%/tests/JsonApi/Serializer/ItemNormalizerTest.php
+
+		# Expected, due to forward compatibility
+		-
+			message: "#Call to function method_exists\\(\\) with 'Symfony\\\\\\\\Component.+' and 'getThrowable' will always evaluate to false\\.#"
+			paths:
+				- %currentWorkingDirectory%/tests/Bridge/Symfony/Validator/EventListener/ValidationExceptionListenerTest.php
+				- %currentWorkingDirectory%/tests/EventListener/ExceptionListenerTest.php

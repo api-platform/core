@@ -3,10 +3,12 @@ Feature: GraphQL introspection support
   @createSchema
   Scenario: Execute an empty GraphQL query
     When I send a "GET" request to "/graphql"
-    Then the response status code should be 400
+    Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/json"
-    And the JSON node "errors[0].message" should be equal to "GraphQL query is not valid"
+    And the JSON node "errors[0].extensions.status" should be equal to 400
+    And the JSON node "errors[0].extensions.category" should be equal to user
+    And the JSON node "errors[0].message" should be equal to "GraphQL query is not valid."
 
   Scenario: Introspect the GraphQL schema
     When I send the query to introspect the schema
@@ -21,7 +23,7 @@ Feature: GraphQL introspection support
     When I send the following GraphQL request:
     """
     {
-      type1: __type(name: "DummyProductItem") {
+      type1: __type(name: "DummyProduct") {
         description,
         fields {
           name
@@ -35,7 +37,7 @@ Feature: GraphQL introspection support
           }
         }
       }
-      type2: __type(name: "DummyAggregateOfferItemConnection") {
+      type2: __type(name: "DummyAggregateOfferConnection") {
         description,
         fields {
           name
@@ -49,7 +51,7 @@ Feature: GraphQL introspection support
           }
         }
       }
-      type3: __type(name: "DummyAggregateOfferItemEdge") {
+      type3: __type(name: "DummyAggregateOfferEdge") {
         description,
         fields {
           name
@@ -69,12 +71,53 @@ Feature: GraphQL introspection support
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/json"
     And the JSON node "data.type1.description" should be equal to "Dummy Product."
-    And the JSON node "data.type1.fields[1].type.name" should be equal to "DummyAggregateOfferItemConnection"
+    And the JSON node "data.type1.fields[1].type.name" should be equal to "DummyAggregateOfferConnection"
     And the JSON node "data.type2.fields[0].name" should be equal to "edges"
-    And the JSON node "data.type2.fields[0].type.ofType.name" should be equal to "DummyAggregateOfferItemEdge"
+    And the JSON node "data.type2.fields[0].type.ofType.name" should be equal to "DummyAggregateOfferEdge"
     And the JSON node "data.type3.fields[0].name" should be equal to "node"
     And the JSON node "data.type3.fields[1].name" should be equal to "cursor"
-    And the JSON node "data.type3.fields[0].type.name" should be equal to "DummyAggregateOfferItem"
+    And the JSON node "data.type3.fields[0].type.name" should be equal to "DummyAggregateOffer"
+
+  Scenario: Introspect types with different serialization groups for item_query and collection_query
+    When I send the following GraphQL request:
+    """
+    {
+      type1: __type(name: "DummyDifferentGraphQlSerializationGroupCollection") {
+        description,
+        fields {
+          name
+          type {
+            name
+            kind
+            ofType {
+              name
+              kind
+            }
+          }
+        }
+      }
+      type2: __type(name: "DummyDifferentGraphQlSerializationGroupItem") {
+        description,
+        fields {
+          name
+          type {
+            name
+            kind
+            ofType {
+              name
+              kind
+            }
+          }
+        }
+      }
+    }
+    """
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/json"
+    And the JSON node "data.type1.description" should be equal to "Dummy with different serialization groups for item_query and collection_query."
+    And the JSON node "data.type1.fields[3].name" should not exist
+    And the JSON node "data.type2.fields[3].name" should be equal to "title"
 
   Scenario: Introspect deprecated queries
     When I send the following GraphQL request:
@@ -121,7 +164,7 @@ Feature: GraphQL introspection support
     When I send the following GraphQL request:
     """
     {
-      __type(name: "DeprecatedResourceItem") {
+      __type(name: "DeprecatedResource") {
         fields(includeDeprecated: true) {
           name
           isDeprecated
@@ -224,7 +267,7 @@ Feature: GraphQL introspection support
     When I send the following GraphQL request:
     """
     {
-      __type(name: "DummyItem") {
+      __type(name: "Dummy") {
         description,
         fields {
           name
@@ -250,7 +293,7 @@ Feature: GraphQL introspection support
     When I send the following GraphQL request:
     """
     {
-      typeQuery: __type(name: "DummyGroupItem") {
+      typeQuery: __type(name: "DummyGroup") {
         description,
         fields {
           name
@@ -390,7 +433,7 @@ Feature: GraphQL introspection support
     When I send the following GraphQL request:
     """
     {
-      dummyItem: dummy(id: "/dummies/3") {
+      dummy: dummy(id: "/dummies/3") {
         name
         relatedDummy {
           id
@@ -403,6 +446,6 @@ Feature: GraphQL introspection support
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/json"
-    And the JSON node "data.dummyItem.name" should be equal to "Dummy #3"
-    And the JSON node "data.dummyItem.relatedDummy.name" should be equal to "RelatedDummy #3"
-    And the JSON node "data.dummyItem.relatedDummy.__typename" should be equal to "RelatedDummyItem"
+    And the JSON node "data.dummy.name" should be equal to "Dummy #3"
+    And the JSON node "data.dummy.relatedDummy.name" should be equal to "RelatedDummy #3"
+    And the JSON node "data.dummy.relatedDummy.__typename" should be equal to "RelatedDummy"
