@@ -9,6 +9,7 @@
         <!-- Event listener -->
 
         <service id="api_platform.doctrine.listener.mercure.publish" class="ApiPlatform\Core\Bridge\Doctrine\EventListener\PublishMercureUpdatesListener">
+            <argument type="service" id="ApiPlatform\Core\Mercure\EntitiesToPublish" />
             <argument type="service" id="api_platform.resource_class_resolver" />
             <argument type="service" id="api_platform.iri_converter" />
             <argument type="service" id="api_platform.metadata.resource.metadata_factory" />

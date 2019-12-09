@@ -22,10 +22,19 @@ use ApiPlatform\Core\Exception\RuntimeException;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Util\ResourceClassInfoTrait;
 use Doctrine\ORM\Event\OnFlushEventArgs;
+use ApiPlatform\Core\Mercure\EntitiesToPublish;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\Mercure\Update;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Serializer\SerializerInterface;
+
+/**
+ * Publishes resources updates to the Mercure hub.
+ *
+ * @author Kévin Dunglas <dunglas@gmail.com>
+ *
+ * @experimental
+ */
 
 /**
  * Publishes resources updates to the Mercure hub.
@@ -44,15 +53,15 @@ final class PublishMercureUpdatesListener
     private $serializer;
     private $publisher;
     private $expressionLanguage;
-    private $createdEntities;
-    private $updatedEntities;
-    private $deletedEntities;
+
     private $formats;
+
+    private $entitiesToPublish;
 
     /**
      * @param array<string, string[]|string> $formats
      */
-    public function __construct(ResourceClassResolverInterface $resourceClassResolver, IriConverterInterface $iriConverter, ResourceMetadataFactoryInterface $resourceMetadataFactory, SerializerInterface $serializer, array $formats, MessageBusInterface $messageBus = null, callable $publisher = null, ExpressionLanguage $expressionLanguage = null)
+    public function __construct(EntitiesToPublish $entitiesToPublish, ResourceClassResolverInterface $resourceClassResolver, IriConverterInterface $iriConverter, ResourceMetadataFactoryInterface $resourceMetadataFactory, SerializerInterface $serializer, array $formats, MessageBusInterface $messageBus = null, callable $publisher = null, ExpressionLanguage $expressionLanguage = null)
     {
         if (null === $messageBus && null === $publisher) {
             throw new InvalidArgumentException('A message bus or a publisher must be provided.');
@@ -66,7 +75,7 @@ final class PublishMercureUpdatesListener
         $this->messageBus = $messageBus;
         $this->publisher = $publisher;
         $this->expressionLanguage = $expressionLanguage ?? class_exists(ExpressionLanguage::class) ? new ExpressionLanguage() : null;
-        $this->reset();
+        $this->entitiesToPublish = $entitiesToPublish;
     }
 
     /**
@@ -95,27 +104,20 @@ final class PublishMercureUpdatesListener
     public function postFlush(): void
     {
         try {
-            foreach ($this->createdEntities as $entity) {
-                $this->publishUpdate($entity, $this->createdEntities[$entity]);
+            foreach ($this->entitiesToPublish->getCreatedEntities() as $entity) {
+                $this->publishUpdate($entity, $this->entitiesToPublish->getCreatedEntityValue($entity));
             }
 
-            foreach ($this->updatedEntities as $entity) {
-                $this->publishUpdate($entity, $this->updatedEntities[$entity]);
+            foreach ($this->entitiesToPublish->getUpdatedEntities() as $entity) {
+                $this->publishUpdate($entity, $this->entitiesToPublish->getUpdatedEntityValue($entity));
             }
 
-            foreach ($this->deletedEntities as $entity) {
-                $this->publishUpdate($entity, $this->deletedEntities[$entity]);
+            foreach ($this->entitiesToPublish->getDeletedEntities() as $entity) {
+                $this->publishUpdate($entity, $this->entitiesToPublish->getDeletedEntityValue($entity));
             }
         } finally {
-            $this->reset();
+            $this->entitiesToPublish->reset();
         }
-    }
-
-    private function reset(): void
-    {
-        $this->createdEntities = new \SplObjectStorage();
-        $this->updatedEntities = new \SplObjectStorage();
-        $this->deletedEntities = new \SplObjectStorage();
     }
 
     /**
@@ -149,15 +151,18 @@ final class PublishMercureUpdatesListener
         }
 
         if ('deletedEntities' === $property) {
-            $this->deletedEntities[(object) [
+            $entityObject = (object) [
                 'id' => $this->iriConverter->getIriFromItem($entity),
                 'iri' => $this->iriConverter->getIriFromItem($entity, UrlGeneratorInterface::ABS_URL),
-            ]] = $value;
+            ];
+            $this->entitiesToPublish->addDeletedEntites($entityObject, $value);
 
             return;
         }
 
-        $this->{$property}[$entity] = $value;
+        $functionName = sprintf('%s%s', 'add', ucfirst($property));
+        $this->entitiesToPublish->$functionName($entity, $value);
+
     }
 
     /**
