@@ -15,7 +15,6 @@ namespace ApiPlatform\Core\Bridge\Doctrine\Orm\Util;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\Mapping\ClassMetadata;
-use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
 
 /**
@@ -160,22 +159,6 @@ final class QueryChecker
         @trigger_error(sprintf('The use of "%s::hasOrderByOnToManyJoin()" is deprecated since 2.4 and will be removed in 3.0. Use "%1$s::hasOrderByOnFetchJoinedToManyAssociation()" instead.', __CLASS__), E_USER_DEPRECATED);
 
         return self::hasOrderByOnFetchJoinedToManyAssociation($queryBuilder, $managerRegistry);
-    }
-
-    /**
-     * Determines whether the QueryBuilder already has a left join.
-     */
-    public static function hasLeftJoin(QueryBuilder $queryBuilder): bool
-    {
-        foreach ($queryBuilder->getDQLPart('join') as $joins) {
-            foreach ($joins as $join) {
-                if (Join::LEFT_JOIN === $join->getJoinType()) {
-                    return true;
-                }
-            }
-        }
-
-        return false;
     }
 
     /**

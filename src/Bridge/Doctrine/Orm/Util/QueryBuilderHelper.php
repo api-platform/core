@@ -33,7 +33,8 @@ final class QueryBuilderHelper
      */
     public static function addJoinOnce(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $alias, string $association, string $joinType = null, string $conditionType = null, string $condition = null, string $originAlias = null, string $newAlias = null): string
     {
-        $join = self::getExistingJoin($queryBuilder, $alias, $association, $originAlias);
+        $joinType = $joinType ?? Join::INNER_JOIN;
+        $join = self::getExistingJoin($queryBuilder, $alias, $association, $originAlias, $joinType);
 
         if (null !== $join) {
             return $join->getAlias();
@@ -42,7 +43,7 @@ final class QueryBuilderHelper
         $associationAlias = $newAlias ?? $queryNameGenerator->generateJoinAlias($association);
         $query = "$alias.$association";
 
-        if (Join::LEFT_JOIN === $joinType || QueryChecker::hasLeftJoin($queryBuilder)) {
+        if (Join::LEFT_JOIN === $joinType) {
             $queryBuilder->leftJoin($query, $associationAlias, $conditionType, $condition);
         } else {
             $queryBuilder->innerJoin($query, $associationAlias, $conditionType, $condition);
@@ -160,7 +161,7 @@ final class QueryBuilderHelper
     /**
      * Gets the existing join from QueryBuilder DQL parts.
      */
-    private static function getExistingJoin(QueryBuilder $queryBuilder, string $alias, string $association, string $originAlias = null): ?Join
+    private static function getExistingJoin(QueryBuilder $queryBuilder, string $alias, string $association, ?string $originAlias, string $joinType): ?Join
     {
         $parts = $queryBuilder->getDQLPart('join');
         $rootAlias = $originAlias ?? $queryBuilder->getRootAliases()[0];
@@ -171,7 +172,7 @@ final class QueryBuilderHelper
 
         foreach ($parts[$rootAlias] as $join) {
             /** @var Join $join */
-            if (sprintf('%s.%s', $alias, $association) === $join->getJoin()) {
+            if (sprintf('%s.%s', $alias, $association) === $join->getJoin() && $join->getJoinType() === $joinType) {
                 return $join;
             }
         }

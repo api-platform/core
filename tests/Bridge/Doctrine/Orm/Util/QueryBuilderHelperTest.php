@@ -20,6 +20,7 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RelatedDummy;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
@@ -55,8 +56,49 @@ class QueryBuilderHelperTest extends TestCase
     }
 
     /**
-     * @dataProvider provideAddJoinOnce
+     * @dataProvider provideAddJoinOnceWithMixedJoinTypes
      */
+    public function testAddJoinOnceWithMixedJoinTypes(
+        string $originAliasForJoinOnce,
+        string $newAlias,
+        string $joinType,
+        string $expectedAlias,
+        string $expectedJoinType
+    ): void {
+        $queryBuilder = new QueryBuilder($this->prophesize(EntityManagerInterface::class)->reveal());
+        $queryBuilder->from('foo', 'f');
+        $queryBuilder->from('foo', 'f2');
+        $queryBuilder->join('f.bar', 'b');
+        $queryBuilder->join('f2.bar', 'b2');
+        $queryBuilder->leftJoin('f2.bar', 'bl2');
+
+        $queryNameGenerator = $this->prophesize(QueryNameGeneratorInterface::class);
+
+        $alias = QueryBuilderHelper::addJoinOnce(
+            $queryBuilder,
+            $queryNameGenerator->reveal(),
+            $originAliasForJoinOnce,
+            'bar',
+            $joinType,
+            null,
+            null,
+            $originAliasForJoinOnce,
+            $newAlias
+        );
+
+        /** @var Join $join */
+        foreach ($queryBuilder->getDQLPart('join')[$originAliasForJoinOnce] as $join) {
+            if ($join->getAlias() === $alias) {
+                $addedJoinType = $join->getJoinType();
+            }
+        }
+
+        $this->assertEqualsCanonicalizing(
+            [$expectedAlias, $expectedJoinType],
+            [$alias, $addedJoinType ?? null]
+        );
+    }
+
     public function testAddJoinOnceWithSpecifiedNewAlias()
     {
         $queryBuilder = new QueryBuilder($this->prophesize(EntityManagerInterface::class)->reveal());
@@ -137,6 +179,33 @@ class QueryBuilderHelperTest extends TestCase
             [
                 'f2',
                 'b2',
+            ],
+        ];
+    }
+
+    public function provideAddJoinOnceWithMixedJoinTypes(): array
+    {
+        return [
+            'Adding new join for already joined association but with different type' => [
+                'f',
+                'bl',
+                Join::LEFT_JOIN,
+                'bl',
+                Join::LEFT_JOIN,
+            ],
+            'Adding already existing join with type left' => [
+                'f2',
+                'bl8',
+                Join::LEFT_JOIN,
+                'bl2',
+                Join::LEFT_JOIN,
+            ],
+            'Adding already existing join with type inner' => [
+                'f2',
+                'b8',
+                Join::INNER_JOIN,
+                'b2',
+                Join::INNER_JOIN,
             ],
         ];
     }
