@@ -132,7 +132,7 @@ final class ItemResolverFactory implements ResolverFactoryInterface
                 throw Error::createLocatedError(sprintf($errorMessage, (new \ReflectionClass($resourceClass))->getShortName(), (new \ReflectionClass($itemClass))->getShortName()), $info->fieldNodes, $info->path);
             }
 
-            $returnType = $this->typeBuilder->getResourceObjectType($resourceClass, $returnItemMetadata, false, $info->operation->operation, null);
+            $returnType = $this->typeBuilder->getResourceObjectType($resourceClass, $returnItemMetadata, false, null, null);
             if ($returnType->implementsInterface($info->returnType)) {
                 return $resourceClass;
             }
