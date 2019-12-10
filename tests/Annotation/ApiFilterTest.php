@@ -15,7 +15,6 @@ namespace ApiPlatform\Core\Tests\Annotation;
 
 use ApiPlatform\Core\Annotation\ApiFilter;
 use ApiPlatform\Core\Tests\Fixtures\DummyFilter;
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -29,14 +28,6 @@ class ApiFilterTest extends TestCase
         $this->expectExceptionMessage('This annotation needs a value representing the filter class.');
 
         new ApiFilter();
-    }
-
-    public function testInvalidFilter()
-    {
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('The filter class "ApiPlatform\\Core\\Tests\\Fixtures\\TestBundle\\Entity\\Dummy" does not implement "ApiPlatform\\Core\\Api\\FilterInterface". Did you forget a use statement?');
-
-        new ApiFilter(['value' => Dummy::class]);
     }
 
     public function testInvalidProperty()

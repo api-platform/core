@@ -14,6 +14,8 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Util;
 
 use ApiPlatform\Core\Annotation\ApiFilter;
+use ApiPlatform\Core\Api\FilterInterface;
+use ApiPlatform\Core\Exception\InvalidArgumentException;
 use Doctrine\Common\Annotations\Reader;
 use Doctrine\Common\Inflector\Inflector;
 
@@ -135,8 +137,12 @@ trait AnnotationFilterExtractorTrait
      */
     private function generateFilterId(\ReflectionClass $reflectionClass, string $filterClass, string $filterId = null): string
     {
-        $suffix = null !== $filterId ? '_'.$filterId : $filterId;
+        try {
+            $suffix = null !== $filterId ? '_'.$filterId : $filterId;
 
-        return 'annotated_'.Inflector::tableize(str_replace('\\', '', $reflectionClass->getName().(new \ReflectionClass($filterClass))->getName().$suffix));
+            return 'annotated_'.Inflector::tableize(str_replace('\\', '', $reflectionClass->getName().(new \ReflectionClass($filterClass))->getName().$suffix));
+        } catch (\ReflectionException $e) {
+            throw new InvalidArgumentException(sprintf('The filter class "%s" does not implement "%s" in "%s". Did you forget a use statement?', $filterClass, FilterInterface::class, $reflectionClass->getName()));
+        }
     }
 }

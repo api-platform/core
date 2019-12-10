@@ -57,10 +57,6 @@ final class ApiFilter
             throw new InvalidArgumentException('This annotation needs a value representing the filter class.');
         }
 
-        if (!is_a($options['value'], FilterInterface::class, true)) {
-            throw new InvalidArgumentException(sprintf('The filter class "%s" does not implement "%s". Did you forget a use statement?', $options['value'], FilterInterface::class));
-        }
-
         $this->filterClass = $options['value'];
         unset($options['value']);
 

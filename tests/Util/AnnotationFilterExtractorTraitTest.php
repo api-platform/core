@@ -17,9 +17,11 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\BooleanFilter;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\DateFilter;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\OrderFilter;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
+use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\Serializer\Filter\GroupFilter;
 use ApiPlatform\Core\Serializer\Filter\PropertyFilter;
 use ApiPlatform\Core\Tests\Fixtures\DummyEntityFilterAnnotated;
+use ApiPlatform\Core\Tests\Fixtures\DummyEntityInvalidFilter;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyCar;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Util\AnnotationFilterExtractor;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
@@ -81,5 +83,15 @@ class AnnotationFilterExtractorTraitTest extends KernelTestCase
                 OrderFilter::class,
             ],
         ]);
+    }
+
+    public function testThrowsOnInvalidFilter()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('The filter class "SearchFilter" does not implement "ApiPlatform\\Core\\Api\\FilterInterface" in "ApiPlatform\Core\Tests\Fixtures\DummyEntityInvalidFilter". Did you forget a use statement?');
+
+        $reflectionClass = new \ReflectionClass(DummyEntityInvalidFilter::class);
+
+        $this->extractor->getFilters($reflectionClass);
     }
 }
