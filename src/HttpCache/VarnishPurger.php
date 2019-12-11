@@ -42,7 +42,7 @@ final class VarnishPurger implements PurgerInterface
      *
      * This assumes that the tags are separated by one character.
      *
-     * From https://github.com/FriendsOfSymfony/FOSHttpCache/blob/master/src/ProxyClient/HttpProxyClient.php#L137
+     * From https://github.com/FriendsOfSymfony/FOSHttpCache/blob/2.8.0/src/ProxyClient/HttpProxyClient.php#L137
      *
      * @param string[] $escapedTags
      * @param string   $glue        The concatenation string to use
