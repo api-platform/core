@@ -35,7 +35,9 @@ parameters:
 			message: '#Cannot assign offset .+ to bool\.#'
 			path: %currentWorkingDirectory%/src/GraphQl/Serializer/SerializerContextBuilder.php
 		- '#Access to an undefined property Prophecy\\Prophecy\\ObjectProphecy<(\\?[a-zA-Z0-9_]+)+>::\$[a-zA-Z0-9_]+#'
-		- '#Call to an undefined method Doctrine\\Common\\Persistence\\ObjectManager::getConnection\(\)#'
+		-
+			message: '#Call to an undefined method Doctrine\\Persistence\\ObjectManager::getConnection\(\)#'
+			path: %currentWorkingDirectory%/src/Bridge/Doctrine/Common/Util/IdentifierManagerTrait.php
 		# https://github.com/willdurand/Negotiation/issues/89#issuecomment-513283286
 		-
 			message: '#Call to an undefined method Negotiation\\AcceptHeader::getType\(\)\.#'
@@ -61,8 +63,11 @@ parameters:
 			message: '#Parameter \#1 \$objectValue of method GraphQL\\Type\\Definition\\InterfaceType::resolveType\(\) expects object, array(<string, string>)? given.#'
 			path: %currentWorkingDirectory%/tests/GraphQl/Type/TypeBuilderTest.php
 		-
-			message: '#Property ApiPlatform\\Core\\Test\\DoctrineMongoDbOdmFilterTestCase::\$repository \(Doctrine\\ODM\\MongoDB\\Repository\\DocumentRepository\) does not accept Doctrine\\ORM\\EntityRepository<ApiPlatform\\Core\\Tests\\Fixtures\\TestBundle\\Document\\Dummy>\.#'
+			message: '#Property ApiPlatform\\Core\\Test\\DoctrineMongoDbOdmFilterTestCase::\$repository \(Doctrine\\ODM\\MongoDB\\Repository\\DocumentRepository\) does not accept Doctrine\\Persistence\\ObjectRepository\.#'
 			path: %currentWorkingDirectory%/src/Test/DoctrineMongoDbOdmFilterTestCase.php
+		-
+			message: '#Property ApiPlatform\\Core\\Test\\DoctrineOrmFilterTestCase::\$repository \(Doctrine\\ORM\\EntityRepository\) does not accept Doctrine\\Persistence\\ObjectRepository\.#'
+			path: %currentWorkingDirectory%/src/Test/DoctrineOrmFilterTestCase.php
 		- '#Method ApiPlatform\\Core\\Util\\RequestParser::parseRequestParams\(\) should return array but returns array\|false\.#'
 		-
 			message: '#Method ApiPlatform\\Core\\Bridge\\Doctrine\\Orm\\Util\\QueryBuilderHelper::mapJoinAliases() should return array<string, array<string>\|string> but returns array<int|string, mixed>\.#'
