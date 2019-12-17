@@ -164,8 +164,8 @@ final class PaginationExtension implements ContextAwareQueryResultCollectionExte
             $query->setHint(CountWalker::HINT_DISTINCT, false);
         }
 
-        $doctrineOrmPaginator = new DoctrineOrmPaginator($query, $this->shouldDoctrinePaginatorFetchJoinCollection($queryBuilder, $resourceClass, $operationName));
-        $doctrineOrmPaginator->setUseOutputWalkers($this->shouldDoctrinePaginatorUseOutputWalkers($queryBuilder, $resourceClass, $operationName));
+        $doctrineOrmPaginator = new DoctrineOrmPaginator($query, $this->shouldDoctrinePaginatorFetchJoinCollection($queryBuilder, $resourceClass, $operationName, $context));
+        $doctrineOrmPaginator->setUseOutputWalkers($this->shouldDoctrinePaginatorUseOutputWalkers($queryBuilder, $resourceClass, $operationName, $context));
 
         if (null === $this->requestStack) {
             $isPartialEnabled = $this->pagination->isPartialEnabled($resourceClass, $operationName, $context);
@@ -317,12 +317,16 @@ final class PaginationExtension implements ContextAwareQueryResultCollectionExte
     /**
      * Determines the value of the $fetchJoinCollection argument passed to the Doctrine ORM Paginator.
      */
-    private function shouldDoctrinePaginatorFetchJoinCollection(QueryBuilder $queryBuilder, string $resourceClass = null, string $operationName = null): bool
+    private function shouldDoctrinePaginatorFetchJoinCollection(QueryBuilder $queryBuilder, string $resourceClass = null, string $operationName = null, array $context = []): bool
     {
         if (null !== $resourceClass) {
             $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
 
-            if (null !== $fetchJoinCollection = $resourceMetadata->getCollectionOperationAttribute($operationName, 'pagination_fetch_join_collection', null, true)) {
+            if (isset($context['collection_operation_name']) && null !== $fetchJoinCollection = $resourceMetadata->getCollectionOperationAttribute($operationName, 'pagination_fetch_join_collection', null, true)) {
+                return $fetchJoinCollection;
+            }
+
+            if (isset($context['graphql_operation_name']) && null !== $fetchJoinCollection = $resourceMetadata->getGraphqlAttribute($operationName, 'pagination_fetch_join_collection', null, true)) {
                 return $fetchJoinCollection;
             }
         }
@@ -348,12 +352,16 @@ final class PaginationExtension implements ContextAwareQueryResultCollectionExte
     /**
      * Determines whether the Doctrine ORM Paginator should use output walkers.
      */
-    private function shouldDoctrinePaginatorUseOutputWalkers(QueryBuilder $queryBuilder, string $resourceClass = null, string $operationName = null): bool
+    private function shouldDoctrinePaginatorUseOutputWalkers(QueryBuilder $queryBuilder, string $resourceClass = null, string $operationName = null, array $context = []): bool
     {
         if (null !== $resourceClass) {
             $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
 
-            if (null !== $useOutputWalkers = $resourceMetadata->getCollectionOperationAttribute($operationName, 'pagination_use_output_walkers', null, true)) {
+            if (isset($context['collection_operation_name']) && null !== $useOutputWalkers = $resourceMetadata->getCollectionOperationAttribute($operationName, 'pagination_use_output_walkers', null, true)) {
+                return $useOutputWalkers;
+            }
+
+            if (isset($context['graphql_operation_name']) && null !== $useOutputWalkers = $resourceMetadata->getGraphqlAttribute($operationName, 'pagination_use_output_walkers', null, true)) {
                 return $useOutputWalkers;
             }
         }
