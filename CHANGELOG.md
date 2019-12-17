@@ -7,6 +7,7 @@
 * GraphQL: Allow to format GraphQL errors based on exceptions (#3063)
 * GraphQL: Add page-based pagination (#3175)
 * OpenAPI: Add PHP default values to the documentation (#2386)
+* OpenAPI: Add nullable schema components properties
  
 ## 2.5.3
 

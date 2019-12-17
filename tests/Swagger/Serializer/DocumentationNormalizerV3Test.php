@@ -388,6 +388,7 @@ class DocumentationNormalizerV3Test extends TestCase
                                 'type' => 'string',
                                 'description' => 'This is a \DateTimeInterface object.',
                                 'format' => 'date-time',
+                                'nullable' => true,
                             ]),
                         ],
                     ]),
@@ -1998,6 +1999,7 @@ class DocumentationNormalizerV3Test extends TestCase
                             'relatedDummy' => new \ArrayObject([
                                 'description' => 'This is a related dummy \o/.',
                                 '$ref' => '#/components/schemas/'.$relatedDummyRef,
+                                'nullable' => true,
                             ]),
                         ],
                     ]),

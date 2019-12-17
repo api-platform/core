@@ -199,7 +199,8 @@ final class SchemaFactory implements SchemaFactoryInterface
                 $className = $valueType->getClassName();
             }
 
-            $valueSchema = $this->typeFactory->getType(new Type($builtinType, $type->isNullable(), $className, $isCollection), $format, $propertyMetadata->isReadableLink(), $serializerContext, $schema);
+            $valueSchema = !$swagger && $type->isNullable() ? ['nullable' => true] : [];
+            $valueSchema += $this->typeFactory->getType(new Type($builtinType, $type->isNullable(), $className, $isCollection), $format, $propertyMetadata->isReadableLink(), $serializerContext, $schema);
         }
 
         $propertySchema = new \ArrayObject($propertySchema + $valueSchema);
