@@ -86,8 +86,8 @@ jobs:
         - *validate-openapi-v3-json
         - *validate-openapi-v3-yaml
 
-    - name: '(PHP 7.4-rc)'
-      php: '7.4snapshot'
+    - name: '(PHP 7.4)'
+      php: '7.4'
       env: LEGACY=0
       before_install:
         - *enable-mongodb-php-extension
@@ -121,8 +121,8 @@ jobs:
         - *validate-openapi-v3-json
         - *validate-openapi-v3-yaml
 
-    - name: '(PHP 7.4-rc) (lowest dependencies)'
-      php: '7.4snapshot'
+    - name: '(PHP 7.4) (lowest dependencies)'
+      php: '7.4'
       env: LEGACY=0
       before_install:
         - *enable-mongodb-php-extension
