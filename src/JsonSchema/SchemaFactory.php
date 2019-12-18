@@ -238,7 +238,7 @@ final class SchemaFactory implements SchemaFactoryInterface
         if (!$this->isResourceClass($className)) {
             return [
                 null,
-                $serializerContext,
+                $serializerContext ?? [],
                 $className,
             ];
         }
