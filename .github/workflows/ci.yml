@@ -27,7 +27,7 @@ jobs:
           - '7.1'
           - '7.2'
           - '7.3'
-          - '7.4-rc'
+          - '7.4'
         include:
           - php: '7.3'
             coverage: true
@@ -161,7 +161,7 @@ jobs:
           - '7.1'
           - '7.2'
           - '7.3'
-          - '7.4-rc'
+          - '7.4'
         include:
           - php: '7.3'
             coverage: true
@@ -302,7 +302,7 @@ jobs:
       matrix:
         php:
           - '7.3'
-          - '7.4-rc'
+          - '7.4'
       fail-fast: false
     timeout-minutes: 20
     steps:
@@ -385,7 +385,7 @@ jobs:
       matrix:
         php:
           - '7.3'
-          - '7.4-rc'
+          - '7.4'
       fail-fast: false
     timeout-minutes: 20
     steps:
