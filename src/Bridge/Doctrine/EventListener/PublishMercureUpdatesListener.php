@@ -21,7 +21,9 @@ use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\Exception\RuntimeException;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Util\ResourceClassInfoTrait;
-use Doctrine\ORM\Event\OnFlushEventArgs;
+use Doctrine\Common\EventArgs;
+use Doctrine\ODM\MongoDB\Event\OnFlushEventArgs as MongoDbOdmOnFlushEventArgs;
+use Doctrine\ORM\Event\OnFlushEventArgs as OrmOnFlushEventArgs;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\Mercure\Update;
 use Symfony\Component\Messenger\MessageBusInterface;
@@ -40,13 +42,12 @@ final class PublishMercureUpdatesListener
     use ResourceClassInfoTrait;
 
     private $iriConverter;
-    private $resourceMetadataFactory;
     private $serializer;
     private $publisher;
     private $expressionLanguage;
-    private $createdEntities;
-    private $updatedEntities;
-    private $deletedEntities;
+    private $createdObjects;
+    private $updatedObjects;
+    private $deletedObjects;
     private $formats;
 
     /**
@@ -70,22 +71,31 @@ final class PublishMercureUpdatesListener
     }
 
     /**
-     * Collects created, updated and deleted entities.
+     * Collects created, updated and deleted objects.
      */
-    public function onFlush(OnFlushEventArgs $eventArgs): void
+    public function onFlush(EventArgs $eventArgs): void
     {
-        $uow = $eventArgs->getEntityManager()->getUnitOfWork();
-
-        foreach ($uow->getScheduledEntityInsertions() as $entity) {
-            $this->storeEntityToPublish($entity, 'createdEntities');
+        if ($eventArgs instanceof OrmOnFlushEventArgs) {
+            $uow = $eventArgs->getEntityManager()->getUnitOfWork();
+        } elseif ($eventArgs instanceof MongoDbOdmOnFlushEventArgs) {
+            $uow = $eventArgs->getDocumentManager()->getUnitOfWork();
+        } else {
+            return;
         }
 
-        foreach ($uow->getScheduledEntityUpdates() as $entity) {
-            $this->storeEntityToPublish($entity, 'updatedEntities');
+        $methodName = $eventArgs instanceof OrmOnFlushEventArgs ? 'getScheduledEntityInsertions' : 'getScheduledDocumentInsertions';
+        foreach ($uow->{$methodName}() as $object) {
+            $this->storeObjectToPublish($object, 'createdObjects');
         }
 
-        foreach ($uow->getScheduledEntityDeletions() as $entity) {
-            $this->storeEntityToPublish($entity, 'deletedEntities');
+        $methodName = $eventArgs instanceof OrmOnFlushEventArgs ? 'getScheduledEntityUpdates' : 'getScheduledDocumentUpdates';
+        foreach ($uow->{$methodName}() as $object) {
+            $this->storeObjectToPublish($object, 'updatedObjects');
+        }
+
+        $methodName = $eventArgs instanceof OrmOnFlushEventArgs ? 'getScheduledEntityDeletions' : 'getScheduledDocumentDeletions';
+        foreach ($uow->{$methodName}() as $object) {
+            $this->storeObjectToPublish($object, 'deletedObjects');
         }
     }
 
@@ -95,16 +105,16 @@ final class PublishMercureUpdatesListener
     public function postFlush(): void
     {
         try {
-            foreach ($this->createdEntities as $entity) {
-                $this->publishUpdate($entity, $this->createdEntities[$entity]);
+            foreach ($this->createdObjects as $object) {
+                $this->publishUpdate($object, $this->createdObjects[$object]);
             }
 
-            foreach ($this->updatedEntities as $entity) {
-                $this->publishUpdate($entity, $this->updatedEntities[$entity]);
+            foreach ($this->updatedObjects as $object) {
+                $this->publishUpdate($object, $this->updatedObjects[$object]);
             }
 
-            foreach ($this->deletedEntities as $entity) {
-                $this->publishUpdate($entity, $this->deletedEntities[$entity]);
+            foreach ($this->deletedObjects as $object) {
+                $this->publishUpdate($object, $this->deletedObjects[$object]);
             }
         } finally {
             $this->reset();
@@ -113,17 +123,17 @@ final class PublishMercureUpdatesListener
 
     private function reset(): void
     {
-        $this->createdEntities = new \SplObjectStorage();
-        $this->updatedEntities = new \SplObjectStorage();
-        $this->deletedEntities = new \SplObjectStorage();
+        $this->createdObjects = new \SplObjectStorage();
+        $this->updatedObjects = new \SplObjectStorage();
+        $this->deletedObjects = new \SplObjectStorage();
     }
 
     /**
-     * @param object $entity
+     * @param object $object
      */
-    private function storeEntityToPublish($entity, string $property): void
+    private function storeObjectToPublish($object, string $property): void
     {
-        if (null === $resourceClass = $this->getResourceClass($entity)) {
+        if (null === $resourceClass = $this->getResourceClass($object)) {
             return;
         }
 
@@ -137,7 +147,7 @@ final class PublishMercureUpdatesListener
                 throw new RuntimeException('The Expression Language component is not installed. Try running "composer require symfony/expression-language".');
             }
 
-            $value = $this->expressionLanguage->evaluate($value, ['object' => $entity]);
+            $value = $this->expressionLanguage->evaluate($value, ['object' => $object]);
         }
 
         if (true === $value) {
@@ -148,36 +158,36 @@ final class PublishMercureUpdatesListener
             throw new InvalidArgumentException(sprintf('The value of the "mercure" attribute of the "%s" resource class must be a boolean, an array of targets or a valid expression, "%s" given.', $resourceClass, \gettype($value)));
         }
 
-        if ('deletedEntities' === $property) {
-            $this->deletedEntities[(object) [
-                'id' => $this->iriConverter->getIriFromItem($entity),
-                'iri' => $this->iriConverter->getIriFromItem($entity, UrlGeneratorInterface::ABS_URL),
+        if ('deletedObjects' === $property) {
+            $this->deletedObjects[(object) [
+                'id' => $this->iriConverter->getIriFromItem($object),
+                'iri' => $this->iriConverter->getIriFromItem($object, UrlGeneratorInterface::ABS_URL),
             ]] = $value;
 
             return;
         }
 
-        $this->{$property}[$entity] = $value;
+        $this->{$property}[$object] = $value;
     }
 
     /**
-     * @param object $entity
+     * @param object $object
      */
-    private function publishUpdate($entity, array $targets): void
+    private function publishUpdate($object, array $targets): void
     {
-        if ($entity instanceof \stdClass) {
-            // By convention, if the entity has been deleted, we send only its IRI
+        if ($object instanceof \stdClass) {
+            // By convention, if the object has been deleted, we send only its IRI.
             // This may change in the feature, because it's not JSON Merge Patch compliant,
-            // and I'm not a fond of this approach
-            $iri = $entity->iri;
+            // and I'm not a fond of this approach.
+            $iri = $object->iri;
             /** @var string $data */
-            $data = json_encode(['@id' => $entity->id]);
+            $data = json_encode(['@id' => $object->id]);
         } else {
-            $resourceClass = $this->getObjectClass($entity);
+            $resourceClass = $this->getObjectClass($object);
             $context = $this->resourceMetadataFactory->create($resourceClass)->getAttribute('normalization_context', []);
 
-            $iri = $this->iriConverter->getIriFromItem($entity, UrlGeneratorInterface::ABS_URL);
-            $data = $this->serializer->serialize($entity, key($this->formats), $context);
+            $iri = $this->iriConverter->getIriFromItem($object, UrlGeneratorInterface::ABS_URL);
+            $data = $this->serializer->serialize($object, key($this->formats), $context);
         }
 
         $update = new Update($iri, $data, $targets);
