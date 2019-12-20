@@ -1,7 +1,7 @@
 version: 2.1
 
 .constants:
-  - &ext-mongodb-version '1.6.0'
+  - &ext-mongodb-version '1.6.1'
 
 commands:
   clear-test-app-cache:
