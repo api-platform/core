@@ -16,11 +16,16 @@ namespace ApiPlatform\Core\JsonSchema;
 use Symfony\Component\PropertyInfo\Type;
 
 /**
- * Gets the OpenAPI type corresponding to the given PHP type, and recursively adds needed new schema to the current schema if provided.
+ * Factory for creating the JSON Schema document which specifies the data type corresponding to a PHP type.
+ *
+ * @experimental
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
 interface TypeFactoryInterface
 {
+    /**
+     * Gets the JSON Schema document which specifies the data type corresponding to the given PHP type, and recursively adds needed new schema to the current schema if provided.
+     */
     public function getType(Type $type, string $format = 'json', ?bool $readableLink = null, ?array $serializerContext = null, Schema $schema = null): array;
 }

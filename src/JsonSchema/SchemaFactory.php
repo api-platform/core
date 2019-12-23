@@ -14,12 +14,14 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\JsonSchema;
 
 use ApiPlatform\Core\Api\OperationType;
+use ApiPlatform\Core\Api\ResourceClassResolverInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Swagger\Serializer\DocumentationNormalizer;
+use ApiPlatform\Core\Util\ResourceClassInfoTrait;
 use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
@@ -33,20 +35,22 @@ use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
  */
 final class SchemaFactory implements SchemaFactoryInterface
 {
-    private $resourceMetadataFactory;
+    use ResourceClassInfoTrait;
+
+    private $typeFactory;
     private $propertyNameCollectionFactory;
     private $propertyMetadataFactory;
-    private $typeFactory;
     private $nameConverter;
     private $distinctFormats = [];
 
-    public function __construct(TypeFactoryInterface $typeFactory, ResourceMetadataFactoryInterface $resourceMetadataFactory, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, NameConverterInterface $nameConverter = null)
+    public function __construct(TypeFactoryInterface $typeFactory, ResourceMetadataFactoryInterface $resourceMetadataFactory, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, NameConverterInterface $nameConverter = null, ResourceClassResolverInterface $resourceClassResolver = null)
     {
+        $this->typeFactory = $typeFactory;
         $this->resourceMetadataFactory = $resourceMetadataFactory;
         $this->propertyNameCollectionFactory = $propertyNameCollectionFactory;
         $this->propertyMetadataFactory = $propertyMetadataFactory;
         $this->nameConverter = $nameConverter;
-        $this->typeFactory = $typeFactory;
+        $this->resourceClassResolver = $resourceClassResolver;
     }
 
     /**
@@ -62,16 +66,20 @@ final class SchemaFactory implements SchemaFactoryInterface
     /**
      * {@inheritdoc}
      */
-    public function buildSchema(string $resourceClass, string $format = 'json', string $type = Schema::TYPE_OUTPUT, ?string $operationType = null, ?string $operationName = null, ?Schema $schema = null, ?array $serializerContext = null, bool $forceCollection = false): Schema
+    public function buildSchema(string $className, string $format = 'json', string $type = Schema::TYPE_OUTPUT, ?string $operationType = null, ?string $operationName = null, ?Schema $schema = null, ?array $serializerContext = null, bool $forceCollection = false): Schema
     {
         $schema = $schema ?? new Schema();
-        if (null === $metadata = $this->getMetadata($resourceClass, $type, $operationType, $operationName, $serializerContext)) {
+        if (null === $metadata = $this->getMetadata($className, $type, $operationType, $operationName, $serializerContext)) {
             return $schema;
         }
         [$resourceMetadata, $serializerContext, $inputOrOutputClass] = $metadata;
 
+        if (null === $resourceMetadata && (null !== $operationType || null !== $operationName)) {
+            throw new \LogicException('The $operationType and $operationName arguments must be null for non-resource class.');
+        }
+
         $version = $schema->getVersion();
-        $definitionName = $this->buildDefinitionName($resourceClass, $format, $type, $operationType, $operationName, $serializerContext);
+        $definitionName = $this->buildDefinitionName($className, $format, $type, $operationType, $operationName, $serializerContext);
 
         if (null === $operationType || null === $operationName) {
             $method = Schema::TYPE_INPUT === $type ? 'POST' : 'GET';
@@ -103,12 +111,13 @@ final class SchemaFactory implements SchemaFactoryInterface
 
         $definition = new \ArrayObject(['type' => 'object']);
         $definitions[$definitionName] = $definition;
-        if (null !== $description = $resourceMetadata->getDescription()) {
+        if (null !== $resourceMetadata && null !== $description = $resourceMetadata->getDescription()) {
             $definition['description'] = $description;
         }
         // see https://github.com/json-schema-org/json-schema-spec/pull/737
         if (
             Schema::VERSION_SWAGGER !== $version &&
+            null !== $resourceMetadata &&
             (
                 (null !== $operationType && null !== $operationName && null !== $resourceMetadata->getTypedOperationAttribute($operationType, $operationName, 'deprecation_reason', null, true)) ||
                 null !== $resourceMetadata->getAttribute('deprecation_reason', null)
@@ -118,7 +127,7 @@ final class SchemaFactory implements SchemaFactoryInterface
         }
         // externalDocs is an OpenAPI specific extension, but JSON Schema allows additional keys, so we always add it
         // See https://json-schema.org/latest/json-schema-core.html#rfc.section.6.4
-        if (null !== $iri = $resourceMetadata->getIri()) {
+        if (null !== $resourceMetadata && null !== $iri = $resourceMetadata->getIri()) {
             $definition['externalDocs'] = ['url' => $iri];
         }
 
@@ -200,12 +209,12 @@ final class SchemaFactory implements SchemaFactoryInterface
         $schema->getDefinitions()[$definitionName]['properties'][$normalizedPropertyName] = $propertySchema;
     }
 
-    private function buildDefinitionName(string $resourceClass, string $format = 'json', string $type = Schema::TYPE_OUTPUT, ?string $operationType = null, ?string $operationName = null, ?array $serializerContext = null): string
+    private function buildDefinitionName(string $className, string $format = 'json', string $type = Schema::TYPE_OUTPUT, ?string $operationType = null, ?string $operationName = null, ?array $serializerContext = null): string
     {
-        [$resourceMetadata, $serializerContext, $inputOrOutputClass] = $this->getMetadata($resourceClass, $type, $operationType, $operationName, $serializerContext);
+        [$resourceMetadata, $serializerContext, $inputOrOutputClass] = $this->getMetadata($className, $type, $operationType, $operationName, $serializerContext);
 
-        $prefix = $resourceMetadata->getShortName();
-        if (null !== $inputOrOutputClass && $resourceClass !== $inputOrOutputClass) {
+        $prefix = $resourceMetadata ? $resourceMetadata->getShortName() : (new \ReflectionClass($className))->getShortName();
+        if (null !== $inputOrOutputClass && $className !== $inputOrOutputClass) {
             $prefix .= ':'.md5($inputOrOutputClass);
         }
 
@@ -224,14 +233,22 @@ final class SchemaFactory implements SchemaFactoryInterface
         return $name;
     }
 
-    private function getMetadata(string $resourceClass, string $type = Schema::TYPE_OUTPUT, ?string $operationType, ?string $operationName, ?array $serializerContext): ?array
+    private function getMetadata(string $className, string $type = Schema::TYPE_OUTPUT, ?string $operationType, ?string $operationName, ?array $serializerContext): ?array
     {
-        $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
+        if (!$this->isResourceClass($className)) {
+            return [
+                null,
+                $serializerContext ?? [],
+                $className,
+            ];
+        }
+
+        $resourceMetadata = $this->resourceMetadataFactory->create($className);
         $attribute = Schema::TYPE_OUTPUT === $type ? 'output' : 'input';
         if (null === $operationType || null === $operationName) {
-            $inputOrOutput = $resourceMetadata->getAttribute($attribute, ['class' => $resourceClass]);
+            $inputOrOutput = $resourceMetadata->getAttribute($attribute, ['class' => $className]);
         } else {
-            $inputOrOutput = $resourceMetadata->getTypedOperationAttribute($operationType, $operationName, $attribute, ['class' => $resourceClass], true);
+            $inputOrOutput = $resourceMetadata->getTypedOperationAttribute($operationType, $operationName, $attribute, ['class' => $className], true);
         }
 
         if (null === ($inputOrOutput['class'] ?? null)) {

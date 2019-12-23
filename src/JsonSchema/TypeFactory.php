@@ -13,6 +13,9 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\JsonSchema;
 
+use ApiPlatform\Core\Api\ResourceClassResolverInterface;
+use ApiPlatform\Core\Util\ResourceClassInfoTrait;
+use Ramsey\Uuid\UuidInterface;
 use Symfony\Component\PropertyInfo\Type;
 
 /**
@@ -24,21 +27,25 @@ use Symfony\Component\PropertyInfo\Type;
  */
 final class TypeFactory implements TypeFactoryInterface
 {
+    use ResourceClassInfoTrait;
+
     /**
      * @var SchemaFactoryInterface|null
      */
     private $schemaFactory;
 
-    /**
-     * Injects the JSON Schema factory to use.
-     */
+    public function __construct(ResourceClassResolverInterface $resourceClassResolver = null)
+    {
+        $this->resourceClassResolver = $resourceClassResolver;
+    }
+
     public function setSchemaFactory(SchemaFactoryInterface $schemaFactory): void
     {
         $this->schemaFactory = $schemaFactory;
     }
 
     /**
-     * Gets the OpenAPI type corresponding to the given PHP type, and recursively adds needed new schema to the current schema if provided.
+     * {@inheritdoc}
      */
     public function getType(Type $type, string $format = 'json', ?bool $readableLink = null, ?array $serializerContext = null, Schema $schema = null): array
     {
@@ -66,7 +73,7 @@ final class TypeFactory implements TypeFactoryInterface
     }
 
     /**
-     * Gets the OpenAPI type corresponding to the given PHP class, and recursively adds needed new schema to the current schema if provided.
+     * Gets the JSON Schema document which specifies the data type corresponding to the given PHP class, and recursively adds needed new schema to the current schema if provided.
      */
     private function getClassType(?string $className, string $format = 'json', ?bool $readableLink = null, ?array $serializerContext = null, ?Schema $schema = null): array
     {
@@ -75,20 +82,41 @@ final class TypeFactory implements TypeFactoryInterface
         }
 
         if (is_a($className, \DateTimeInterface::class, true)) {
-            return ['type' => 'string', 'format' => 'date-time'];
+            return [
+                'type' => 'string',
+                'format' => 'date-time',
+            ];
+        }
+        if (is_a($className, UuidInterface::class, true)) {
+            return [
+                'type' => 'string',
+                'format' => 'uuid',
+            ];
         }
 
-        if (null !== $this->schemaFactory && true === $readableLink && null !== $schema) { // Skip if $baseSchema is null (filters only support basic types)
-            $version = $schema->getVersion();
-
-            $subSchema = new Schema($version);
-            $subSchema->setDefinitions($schema->getDefinitions()); // Populate definitions of the main schema
-
-            $this->schemaFactory->buildSchema($className, $format, Schema::TYPE_OUTPUT, null, null, $subSchema, $serializerContext);
-
-            return ['$ref' => $subSchema['$ref']];
+        // Skip if $schema is null (filters only support basic types)
+        if (null === $schema) {
+            return ['type' => 'string'];
         }
 
-        return ['type' => 'string'];
+        if ($this->isResourceClass($className) && true !== $readableLink) {
+            return [
+                'type' => 'string',
+                'format' => 'iri-reference',
+            ];
+        }
+
+        $version = $schema->getVersion();
+
+        $subSchema = new Schema($version);
+        $subSchema->setDefinitions($schema->getDefinitions()); // Populate definitions of the main schema
+
+        if (null === $this->schemaFactory) {
+            throw new \LogicException('The schema factory must be injected by calling the "setSchemaFactory" method.');
+        }
+
+        $subSchema = $this->schemaFactory->buildSchema($className, $format, Schema::TYPE_OUTPUT, null, null, $subSchema, $serializerContext);
+
+        return ['$ref' => $subSchema['$ref']];
     }
 }

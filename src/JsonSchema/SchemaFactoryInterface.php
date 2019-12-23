@@ -13,10 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\JsonSchema;
 
-use ApiPlatform\Core\Exception\ResourceClassNotFoundException;
-
 /**
- * Builds a JSON Schema from an API Platform resource definition.
+ * Factory for creating the JSON Schema document corresponding to a PHP class.
  *
  * @experimental
  *
@@ -25,7 +23,7 @@ use ApiPlatform\Core\Exception\ResourceClassNotFoundException;
 interface SchemaFactoryInterface
 {
     /**
-     * @throws ResourceClassNotFoundException
+     * Builds the JSON Schema document corresponding to the given PHP class.
      */
-    public function buildSchema(string $resourceClass, string $format = 'json', string $type = Schema::TYPE_OUTPUT, ?string $operationType = null, ?string $operationName = null, ?Schema $schema = null, ?array $serializerContext = null, bool $forceCollection = false): Schema;
+    public function buildSchema(string $className, string $format = 'json', string $type = Schema::TYPE_OUTPUT, ?string $operationType = null, ?string $operationName = null, ?Schema $schema = null, ?array $serializerContext = null, bool $forceCollection = false): Schema;
 }
