@@ -224,6 +224,6 @@ final class TypeBuilder implements TypeBuilderInterface
      */
     public function isCollection(Type $type): bool
     {
-        return $type->isCollection() && Type::BUILTIN_TYPE_OBJECT === $type->getBuiltinType();
+        return $type->isCollection() && ($collectionValueType = $type->getCollectionValueType()) && null !== $collectionValueType->getClassName();
     }
 }

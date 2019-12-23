@@ -384,7 +384,12 @@ class TypeBuilderTest extends TestCase
             [new Type(Type::BUILTIN_TYPE_BOOL), false],
             [new Type(Type::BUILTIN_TYPE_OBJECT), false],
             [new Type(Type::BUILTIN_TYPE_RESOURCE, false, null, false), false],
-            [new Type(Type::BUILTIN_TYPE_OBJECT, false, null, true), true],
+            [new Type(Type::BUILTIN_TYPE_OBJECT, false, null, true), false],
+            [new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true), false],
+            [new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, null, new Type(Type::BUILTIN_TYPE_OBJECT)), false],
+            [new Type(Type::BUILTIN_TYPE_OBJECT, false, 'className', true), false],
+            [new Type(Type::BUILTIN_TYPE_OBJECT, false, null, true, null, new Type(Type::BUILTIN_TYPE_OBJECT, false, 'className')), true],
+            [new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, null, new Type(Type::BUILTIN_TYPE_OBJECT, false, 'className')), true],
         ];
     }
 }
