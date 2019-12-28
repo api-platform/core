@@ -2,6 +2,7 @@
 
 ## 2.6.x-dev
 
+* Removing the google fonts from SwaggerUI
 * MongoDB: Possibility to add execute options (aggregate command fields) for a resource, like `allowDiskUse` (#3144)
 * MongoDB: Mercure support (#3290)
 * GraphQL: Allow to format GraphQL errors based on exceptions (#3063)
