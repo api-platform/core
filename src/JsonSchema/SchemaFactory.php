@@ -153,6 +153,8 @@ final class SchemaFactory implements SchemaFactoryInterface
     {
         $version = $schema->getVersion();
         $swagger = false;
+        $propertySchema = $propertyMetadata->getSchema() ?? [];
+
         switch ($version) {
             case Schema::VERSION_SWAGGER:
                 $swagger = true;
@@ -165,7 +167,11 @@ final class SchemaFactory implements SchemaFactoryInterface
                 $basePropertySchemaAttribute = 'json_schema_context';
         }
 
-        $propertySchema = $propertyMetadata->getAttributes()[$basePropertySchemaAttribute] ?? [];
+        $propertySchema = array_merge(
+            $propertySchema,
+            $propertyMetadata->getAttributes()[$basePropertySchemaAttribute] ?? []
+        );
+
         if (false === $propertyMetadata->isWritable() && !$propertyMetadata->isInitializable()) {
             $propertySchema['readOnly'] = true;
         }

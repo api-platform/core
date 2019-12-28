@@ -14,6 +14,19 @@
         <service id="api_platform.metadata.property.metadata_factory.validator" class="ApiPlatform\Core\Bridge\Symfony\Validator\Metadata\Property\ValidatorPropertyMetadataFactory" decorates="api_platform.metadata.property.metadata_factory" decoration-priority="20" public="false">
             <argument type="service" id="validator" />
             <argument type="service" id="api_platform.metadata.property.metadata_factory.validator.inner" />
+            <argument type="tagged" tag="api_platform.metadata.property_schema_restriction" />
+        </service>
+
+        <service id="api_platform.metadata.property_schema.length_restriction" class="ApiPlatform\Core\Bridge\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaLengthRestriction" public="false">
+            <tag name="api_platform.metadata.property_schema_restriction"/>
+        </service>
+
+        <service id="api_platform.metadata.property_schema.regex_restriction" class="ApiPlatform\Core\Bridge\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaRegexRestriction" public="false">
+            <tag name="api_platform.metadata.property_schema_restriction"/>
+        </service>
+
+        <service id="api_platform.metadata.property_schema.format_restriction" class="ApiPlatform\Core\Bridge\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaFormat" public="false">
+            <tag name="api_platform.metadata.property_schema_restriction"/>
         </service>
 
         <service id="api_platform.listener.view.validate" class="ApiPlatform\Core\Validator\EventListener\ValidateListener">

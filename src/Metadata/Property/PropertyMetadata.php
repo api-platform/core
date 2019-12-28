@@ -46,8 +46,9 @@ final class PropertyMetadata
      * @var null
      */
     private $example;
+    private $schema;
 
-    public function __construct(Type $type = null, string $description = null, bool $readable = null, bool $writable = null, bool $readableLink = null, bool $writableLink = null, bool $required = null, bool $identifier = null, string $iri = null, $childInherited = null, array $attributes = null, SubresourceMetadata $subresource = null, bool $initializable = null, $default = null, $example = null)
+    public function __construct(Type $type = null, string $description = null, bool $readable = null, bool $writable = null, bool $readableLink = null, bool $writableLink = null, bool $required = null, bool $identifier = null, string $iri = null, $childInherited = null, array $attributes = null, SubresourceMetadata $subresource = null, bool $initializable = null, $default = null, $example = null, array $schema = null)
     {
         $this->type = $type;
         $this->description = $description;
@@ -67,6 +68,7 @@ final class PropertyMetadata
         $this->initializable = $initializable;
         $this->default = $default;
         $this->example = $example;
+        $this->schema = $schema;
     }
 
     /**
@@ -394,6 +396,25 @@ final class PropertyMetadata
     {
         $metadata = clone $this;
         $metadata->example = $example;
+
+        return $metadata;
+    }
+
+    /**
+     * @return array
+     */
+    public function getSchema(): ?array
+    {
+        return $this->schema;
+    }
+
+    /**
+     * Returns a new instance with the given schema.
+     */
+    public function withSchema(array $schema = null): self
+    {
+        $metadata = clone $this;
+        $metadata->schema = $schema;
 
         return $metadata;
     }

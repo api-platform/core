@@ -31,8 +31,38 @@ class DummyValidatedEntity
      * @var string A dummy
      *
      * @Assert\NotBlank
+     * @Assert\Length(max="4", min="10")
+     * @Assert\Regex(pattern="^dummy$")
      */
     public $dummy;
+
+    /**
+     * @var string
+     *
+     * @Assert\Email
+     */
+    public $dummyEmail;
+
+    /**
+     * @var string
+     *
+     * @Assert\Uuid
+     */
+    public $dummyUuid;
+
+    /**
+     * @var string
+     *
+     * @Assert\Ip
+     */
+    public $dummyIpv4;
+
+    /**
+     * @var string
+     *
+     * @Assert\Ip(version="6")
+     */
+    public $dummyIpv6;
 
     /**
      * @var \DateTimeInterface A dummy date
