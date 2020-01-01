@@ -555,10 +555,13 @@ class DocumentationNormalizerV3Test extends TestCase
                     'oauth' => [
                         'type' => 'oauth2',
                         'description' => 'OAuth client_credentials Grant',
-                        'flow' => 'application',
-                        'tokenUrl' => '/oauth/v2/token',
-                        'authorizationUrl' => '/oauth/v2/auth',
-                        'scopes' => ['scope param'],
+                        'flows' => [
+                            'application' => [
+                                'tokenUrl' => '/oauth/v2/token',
+                                'authorizationUrl' => '/oauth/v2/auth',
+                                'scopes' => ['scope param'],
+                            ],
+                        ],
                     ],
                 ],
             ],
