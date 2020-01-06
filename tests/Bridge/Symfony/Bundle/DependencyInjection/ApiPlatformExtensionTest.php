@@ -61,6 +61,7 @@ use ApiPlatform\Core\DataPersister\DataPersisterInterface;
 use ApiPlatform\Core\DataProvider\CollectionDataProviderInterface;
 use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
 use ApiPlatform\Core\DataProvider\Pagination;
+use ApiPlatform\Core\DataProvider\PaginationOptions;
 use ApiPlatform\Core\DataProvider\SubresourceDataProviderInterface;
 use ApiPlatform\Core\DataTransformer\DataTransformerInterface;
 use ApiPlatform\Core\Exception\FilterValidationException;
@@ -77,6 +78,10 @@ use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
+use ApiPlatform\Core\OpenApi\Serializer\Options;
+use ApiPlatform\Core\OpenApi\Serializer\DocumentationNormalizer;
+use ApiPlatform\Core\OpenApi\Factory\OpenApiFactoryInterface;
+use ApiPlatform\Core\OpenApi\Serializer\OpenApiNormalizer;
 use ApiPlatform\Core\Security\ResourceAccessCheckerInterface;
 use ApiPlatform\Core\Serializer\Filter\GroupFilter;
 use ApiPlatform\Core\Serializer\Filter\PropertyFilter;
@@ -960,6 +965,7 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.operation_path_resolver.generator',
             'api_platform.operation_path_resolver.underscore',
             'api_platform.pagination',
+            'api_platform.pagination_options',
             'api_platform.path_segment_name_generator.underscore',
             'api_platform.path_segment_name_generator.dash',
             'api_platform.resource_class_resolver',
@@ -1019,6 +1025,7 @@ class ApiPlatformExtensionTest extends TestCase
             SerializerContextBuilderInterface::class => 'api_platform.serializer.context_builder',
             SubresourceDataProviderInterface::class => 'api_platform.subresource_data_provider',
             UrlGeneratorInterface::class => 'api_platform.router',
+            PaginationOptions::class => 'api_platform.pagination_options',
         ];
 
         foreach ($aliases as $alias => $service) {
@@ -1319,6 +1326,10 @@ class ApiPlatformExtensionTest extends TestCase
             $definitions[] = 'api_platform.json_schema.type_factory';
             $definitions[] = 'api_platform.json_schema.schema_factory';
             $definitions[] = 'api_platform.json_schema.json_schema_generate_command';
+            $definitions[] = 'api_platform.openapi.options';
+            $definitions[] = 'api_platform.openapi.normalizer';
+            $definitions[] = 'api_platform.openapi.factory';
+            $definitions[] = 'api_platform.openapi.command';
         }
 
         // has jsonld
@@ -1390,6 +1401,9 @@ class ApiPlatformExtensionTest extends TestCase
             $aliases += [
                 TypeFactoryInterface::class => 'api_platform.json_schema.type_factory',
                 SchemaFactoryInterface::class => 'api_platform.json_schema.schema_factory',
+                Options::class => 'api_platform.openapi.options',
+                OpenApiNormalizer::class => 'api_platform.openapi.normalizer',
+                OpenApiFactoryInterface::class => 'api_platform.openapi.factory',
             ];
         }
 

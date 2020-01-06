@@ -38,13 +38,14 @@ final class DocumentationAction
      * @param int[]                                $swaggerVersions
      * @param mixed|array|FormatsProviderInterface $formatsProvider
      */
-    public function __construct(ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, string $title = '', string $description = '', string $version = '', $formatsProvider = null, array $swaggerVersions = [2, 3])
+    public function __construct(ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, string $title = '', string $description = '', string $version = '', $formatsProvider = null, array $swaggerVersions = [2, 3], OpenApiFactoryInterface $openApiFactory = null)
     {
         $this->resourceNameCollectionFactory = $resourceNameCollectionFactory;
         $this->title = $title;
         $this->description = $description;
         $this->version = $version;
         $this->swaggerVersions = $swaggerVersions;
+        $this->openApiFactory = $openApiFactory;
 
         if (null === $formatsProvider) {
             return;
@@ -56,13 +57,14 @@ final class DocumentationAction
 
             return;
         }
+
         $this->formatsProvider = $formatsProvider;
     }
 
     public function __invoke(Request $request = null): Documentation
     {
         if (null !== $request) {
-            $context = ['base_url' => $request->getBaseUrl(), 'spec_version' => $request->query->getInt('spec_version', $this->swaggerVersions[0] ?? 2)];
+            $context = ['base_url' => $request->getBaseUrl(), 'spec_version' => $request->query->getInt('spec_version', $this->swaggerVersions[0] ?? 3)];
             if ($request->query->getBoolean('api_gateway')) {
                 $context['api_gateway'] = true;
             }
@@ -73,6 +75,10 @@ final class DocumentationAction
         // BC check to be removed in 3.0
         if (null !== $this->formatsProvider) {
             $this->formats = $this->formatsProvider->getFormatsFromAttributes($attributes ?? []);
+        }
+
+        if (3 === $context['spec_version']) {
+            return $this->openApiFactory->create($context);
         }
 
         return new Documentation($this->resourceNameCollectionFactory->create(), $this->title, $this->description, $this->version, $this->formats);
