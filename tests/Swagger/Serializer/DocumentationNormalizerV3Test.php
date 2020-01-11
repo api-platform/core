@@ -483,7 +483,7 @@ class DocumentationNormalizerV3Test extends TestCase
             $legacy ? $nameConverter : null,
             true,
             'oauth2',
-            'application',
+            'authorizationCode',
             '/oauth/v2/token',
             '/oauth/v2/auth',
             ['scope param'],
@@ -554,9 +554,9 @@ class DocumentationNormalizerV3Test extends TestCase
                 'securitySchemes' => [
                     'oauth' => [
                         'type' => 'oauth2',
-                        'description' => 'OAuth client_credentials Grant',
+                        'description' => 'OAuth 2.0 authorization code Grant',
                         'flows' => [
-                            'application' => [
+                            'authorizationCode' => [
                                 'tokenUrl' => '/oauth/v2/token',
                                 'authorizationUrl' => '/oauth/v2/auth',
                                 'scopes' => ['scope param'],
