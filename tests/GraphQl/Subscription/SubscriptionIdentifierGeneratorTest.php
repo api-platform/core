@@ -31,10 +31,65 @@ class SubscriptionIdentifierGeneratorTest extends TestCase
         $this->subscriptionIdentifierGenerator = new SubscriptionIdentifierGenerator();
     }
 
+    public function testGenerateSubscriptionIdentifier(): void
+    {
+        $this->assertSame('bf861b4e0edd7766ff61da90c60fdceef2618b595a3628901921d4d8eca555d0', $this->subscriptionIdentifierGenerator->generateSubscriptionIdentifier([
+            'dummyMercure' => [
+                'id' => true,
+                'name' => true,
+                'relatedDummy' => [
+                    'name' => true,
+                ],
+            ],
+        ]));
+    }
+
+    public function testGenerateSubscriptionIdentifierFieldsNotIncluded(): void
+    {
+        $subscriptionId = $this->subscriptionIdentifierGenerator->generateSubscriptionIdentifier([
+            'dummyMercure' => [
+                'id' => true,
+                'name' => true,
+                'relatedDummy' => [
+                    'name' => true,
+                ],
+            ],
+        ]);
+
+        $subscriptionId2 = $this->subscriptionIdentifierGenerator->generateSubscriptionIdentifier([
+            'dummyMercure' => [
+                'id' => true,
+                'name' => true,
+                'relatedDummy' => [
+                    'name' => true,
+                ],
+            ],
+            'mercureUrl' => true,
+            'clientSubscriptionId' => true,
+        ]);
+
+        $this->assertSame($subscriptionId, $subscriptionId2);
+    }
+
     public function testDifferentGeneratedSubscriptionIdentifiers(): void
     {
-        $subscriptionId = $this->subscriptionIdentifierGenerator->generateSubscriptionIdentifier();
+        $subscriptionId = $this->subscriptionIdentifierGenerator->generateSubscriptionIdentifier([
+            'dummyMercure' => [
+                'id' => true,
+                'name' => true,
+                'relatedDummy' => [
+                    'name' => true,
+                ],
+            ],
+        ]);
 
-        $this->assertNotSame($subscriptionId, $this->subscriptionIdentifierGenerator->generateSubscriptionIdentifier());
+        $this->assertNotSame($subscriptionId, $this->subscriptionIdentifierGenerator->generateSubscriptionIdentifier([
+            'dummyMercure' => [
+                'id' => true,
+                'relatedDummy' => [
+                    'name' => true,
+                ],
+            ],
+        ]));
     }
 }

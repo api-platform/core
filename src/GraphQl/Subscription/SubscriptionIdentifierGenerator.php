@@ -22,8 +22,10 @@ namespace ApiPlatform\Core\GraphQl\Subscription;
  */
 final class SubscriptionIdentifierGenerator implements SubscriptionIdentifierGeneratorInterface
 {
-    public function generateSubscriptionIdentifier(): string
+    public function generateSubscriptionIdentifier(array $fields): string
     {
-        return bin2hex(random_bytes(16));
+        unset($fields['mercureUrl'], $fields['clientSubscriptionId']);
+
+        return hash('sha256', print_r($fields, true));
     }
 }

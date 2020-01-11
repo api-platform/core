@@ -68,7 +68,7 @@ class SubscriptionManagerTest extends TestCase
         $cacheItemProphecy = $this->prophesize(CacheItemInterface::class);
         $cacheItemProphecy->isHit()->willReturn(false);
         $subscriptionId = 'subscriptionId';
-        $this->subscriptionIdentifierGeneratorProphecy->generateSubscriptionIdentifier()->willReturn($subscriptionId);
+        $this->subscriptionIdentifierGeneratorProphecy->generateSubscriptionIdentifier($fields)->willReturn($subscriptionId);
         $cacheItemProphecy->set([[$subscriptionId, $fields, ['result']]])->shouldBeCalled();
         $this->subscriptionsCacheProphecy->getItem('_foos_34')->shouldBeCalled()->willReturn($cacheItemProphecy->reveal());
         $this->subscriptionsCacheProphecy->save($cacheItemProphecy->reveal())->shouldBeCalled();
@@ -93,7 +93,7 @@ class SubscriptionManagerTest extends TestCase
         ];
         $cacheItemProphecy->get()->willReturn($cachedSubscriptions);
         $subscriptionId = 'subscriptionId';
-        $this->subscriptionIdentifierGeneratorProphecy->generateSubscriptionIdentifier()->willReturn($subscriptionId);
+        $this->subscriptionIdentifierGeneratorProphecy->generateSubscriptionIdentifier($fields)->willReturn($subscriptionId);
         $cacheItemProphecy->set(array_merge($cachedSubscriptions, [[$subscriptionId, $fields, ['result']]]))->shouldBeCalled();
         $this->subscriptionsCacheProphecy->getItem('_foos_34')->shouldBeCalled()->willReturn($cacheItemProphecy->reveal());
         $this->subscriptionsCacheProphecy->save($cacheItemProphecy->reveal())->shouldBeCalled();
@@ -116,7 +116,7 @@ class SubscriptionManagerTest extends TestCase
             ['subscriptionIdFoo', ['fieldsFoo'], ['resultFoo']],
             ['subscriptionIdBar', ['fieldsBar'], ['resultBar']],
         ]);
-        $this->subscriptionIdentifierGeneratorProphecy->generateSubscriptionIdentifier()->shouldNotBeCalled();
+        $this->subscriptionIdentifierGeneratorProphecy->generateSubscriptionIdentifier($fields)->shouldNotBeCalled();
         $this->subscriptionsCacheProphecy->getItem('_foos_34')->shouldBeCalled()->willReturn($cacheItemProphecy->reveal());
 
         $this->assertSame('subscriptionIdBar', $this->subscriptionManager->retrieveSubscriptionId($context, $result));
@@ -153,7 +153,7 @@ class SubscriptionManagerTest extends TestCase
             ], ['resultFoo']],
             ['subscriptionIdBar', ['fieldsBar'], ['resultBar']],
         ]);
-        $this->subscriptionIdentifierGeneratorProphecy->generateSubscriptionIdentifier()->shouldNotBeCalled();
+        $this->subscriptionIdentifierGeneratorProphecy->generateSubscriptionIdentifier($fields)->shouldNotBeCalled();
         $this->subscriptionsCacheProphecy->getItem('_foos_34')->shouldBeCalled()->willReturn($cacheItemProphecy->reveal());
 
         $this->assertSame('subscriptionIdFoo', $this->subscriptionManager->retrieveSubscriptionId($context, $result));

@@ -69,7 +69,7 @@ final class SubscriptionManager implements SubscriptionManagerInterface
             }
         }
 
-        $subscriptionId = $this->subscriptionIdentifierGenerator->generateSubscriptionIdentifier();
+        $subscriptionId = $this->subscriptionIdentifierGenerator->generateSubscriptionIdentifier($fields);
         unset($result['clientSubscriptionId']);
         $subscriptions[] = [$subscriptionId, $fields, $result];
         $subscriptionsCacheItem->set($subscriptions);

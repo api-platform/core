@@ -22,5 +22,5 @@ namespace ApiPlatform\Core\GraphQl\Subscription;
  */
 interface SubscriptionIdentifierGeneratorInterface
 {
-    public function generateSubscriptionIdentifier(): string;
+    public function generateSubscriptionIdentifier(array $fields): string;
 }
