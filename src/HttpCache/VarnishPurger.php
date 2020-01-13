@@ -24,14 +24,14 @@ use GuzzleHttp\ClientInterface;
  */
 final class VarnishPurger implements PurgerInterface
 {
-    private $maxHeaderLength;
     private $clients;
+    private $maxHeaderLength;
 
     /**
      * @param ClientInterface[] $clients
      * @param int               $maxHeaderLength
      */
-    public function __construct(array $clients, $maxHeaderLength = 7500)
+    public function __construct(array $clients, int $maxHeaderLength = 7500)
     {
         $this->clients = $clients;
         $this->maxHeaderLength = $maxHeaderLength;
