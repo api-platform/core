@@ -29,7 +29,6 @@ final class VarnishPurger implements PurgerInterface
 
     /**
      * @param ClientInterface[] $clients
-     * @param int               $maxHeaderLength
      */
     public function __construct(array $clients, int $maxHeaderLength = 7500)
     {
