@@ -23,6 +23,8 @@ use Symfony\Component\Validator\Validator\ValidatorInterface as SymfonyValidator
  * Validates an item using the Symfony validator component.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
+ *
+ * @final
  */
 class Validator implements ValidatorInterface
 {

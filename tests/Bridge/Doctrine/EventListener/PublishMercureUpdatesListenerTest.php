@@ -37,7 +37,7 @@ use Symfony\Component\Serializer\SerializerInterface;
  */
 class PublishMercureUpdatesListenerTest extends TestCase
 {
-    public function testPublishUpdate()
+    public function testPublishUpdate(): void
     {
         $toInsert = new Dummy();
         $toInsert->setId(1);
@@ -115,7 +115,7 @@ class PublishMercureUpdatesListenerTest extends TestCase
         $this->assertSame([[], [], [], ['foo', 'bar']], $targets);
     }
 
-    public function testNoPublisher()
+    public function testNoPublisher(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('A message bus or a publisher must be provided.');
@@ -131,7 +131,7 @@ class PublishMercureUpdatesListenerTest extends TestCase
         );
     }
 
-    public function testInvalidMercureAttribute()
+    public function testInvalidMercureAttribute(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('The value of the "mercure" attribute of the "ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy" resource class must be a boolean, an array of targets or a valid expression, "integer" given.');

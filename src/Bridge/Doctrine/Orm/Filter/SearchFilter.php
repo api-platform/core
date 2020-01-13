@@ -22,7 +22,6 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\DBAL\Types\Type as DBALType;
-use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\QueryBuilder;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -85,17 +84,14 @@ class SearchFilter extends AbstractContextAwareFilter implements SearchFilterInt
             [$alias, $field, $associations] = $this->addJoinsForNestedProperty($property, $alias, $queryBuilder, $queryNameGenerator, $resourceClass);
         }
 
-        /**
-         * @var ClassMetadata
-         */
-        $metadata = $this->getNestedMetadata($resourceClass, $associations);
-
         $values = $this->normalizeValues((array) $value, $property);
         if (null === $values) {
             return;
         }
 
         $caseSensitive = true;
+        $metadata = $this->getNestedMetadata($resourceClass, $associations);
+
         if ($metadata->hasField($field)) {
             if ('id' === $field) {
                 $values = array_map([$this, 'getIdFromValue'], $values);
@@ -234,7 +230,7 @@ class SearchFilter extends AbstractContextAwareFilter implements SearchFilterInt
      */
     protected function createWrapCase(bool $caseSensitive): \Closure
     {
-        return function (string $expr) use ($caseSensitive): string {
+        return static function (string $expr) use ($caseSensitive): string {
             if ($caseSensitive) {
                 return $expr;
             }
