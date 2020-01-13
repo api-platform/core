@@ -9,11 +9,11 @@ install:
   - ps: Set-Service wuauserv -StartupType Manual
   - cinst -y php composer
   - refreshenv
-  - cd c:\tools\php73\ext
+  - cd c:\tools\php74\ext
   - ps: |
       $web = New-Object Net.WebClient
       $web.Headers.Add('user-agent', 'AppVeyor')
-      $web.DownloadFile('https://windows.php.net/downloads/pecl/releases/mongodb/1.5.3/php_mongodb-1.5.3-7.3-nts-vc15-x64.zip', 'c:\tools\php73\ext\php_mongodb.zip')
+      $web.DownloadFile('https://windows.php.net/downloads/pecl/releases/mongodb/1.6.1/php_mongodb-1.6.1-7.4-nts-vc15-x64.zip', 'c:\tools\php74\ext\php_mongodb.zip')
   - 7z x php_mongodb.zip -y >nul
   - cd ..
   - copy php.ini-production php.ini /Y

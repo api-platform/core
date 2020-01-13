@@ -29,6 +29,7 @@ final class ResourceClassResolver implements ResourceClassResolverInterface
 
     private $resourceNameCollectionFactory;
     private $localIsResourceClassCache = [];
+    private $localMostSpecificResourceClassCache = [];
 
     public function __construct(ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory)
     {
@@ -63,6 +64,11 @@ final class ResourceClassResolver implements ResourceClassResolverInterface
         }
 
         $targetClass = $actualClass ?? $resourceClass;
+
+        if (isset($this->localMostSpecificResourceClassCache[$targetClass])) {
+            return $this->localMostSpecificResourceClassCache[$targetClass];
+        }
+
         $mostSpecificResourceClass = null;
 
         foreach ($this->resourceNameCollectionFactory->create() as $resourceClassName) {
@@ -78,6 +84,8 @@ final class ResourceClassResolver implements ResourceClassResolverInterface
         if (null === $mostSpecificResourceClass) {
             throw new \LogicException('Unexpected execution flow.');
         }
+
+        $this->localMostSpecificResourceClassCache[$targetClass] = $mostSpecificResourceClass;
 
         return $mostSpecificResourceClass;
     }

@@ -203,7 +203,11 @@ final class Pagination
 
     public function getGraphQlPaginationType(string $resourceClass, string $operationName): string
     {
-        $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
+        try {
+            $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
+        } catch (ResourceClassNotFoundException $e) {
+            return 'cursor';
+        }
 
         return (string) $resourceMetadata->getGraphqlAttribute($operationName, 'paginationType', 'cursor', true);
     }
