@@ -492,7 +492,7 @@ class DocumentationNormalizerV2Test extends TestCase
             'securityDefinitions' => [
                 'oauth' => [
                     'type' => 'oauth2',
-                    'description' => 'OAuth client_credentials Grant',
+                    'description' => 'OAuth 2.0 application Grant',
                     'flow' => 'application',
                     'tokenUrl' => '/oauth/v2/token',
                     'authorizationUrl' => '/oauth/v2/auth',

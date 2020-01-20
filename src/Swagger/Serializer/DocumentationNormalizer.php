@@ -631,14 +631,28 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
         $security = [];
 
         if ($this->oauthEnabled) {
-            $securityDefinitions['oauth'] = [
-                'type' => $this->oauthType,
-                'description' => 'OAuth client_credentials Grant',
-                'flow' => $this->oauthFlow,
+            $oauthAttributes = [
                 'tokenUrl' => $this->oauthTokenUrl,
                 'authorizationUrl' => $this->oauthAuthorizationUrl,
                 'scopes' => $this->oauthScopes,
             ];
+
+            $securityDefinitions['oauth'] = [
+                'type' => $this->oauthType,
+                'description' => sprintf(
+                    'OAuth 2.0 %s Grant',
+                    strtolower(preg_replace('/[A-Z]/', ' \\0', lcfirst($this->oauthFlow)))
+                ),
+            ];
+
+            if ($v3) {
+                $securityDefinitions['oauth']['flows'] = [
+                    $this->oauthFlow => $oauthAttributes,
+                ];
+            } else {
+                $securityDefinitions['oauth']['flow'] = $this->oauthFlow;
+                $securityDefinitions['oauth'] = array_merge($securityDefinitions['oauth'], $oauthAttributes);
+            }
 
             $security[] = ['oauth' => []];
         }
