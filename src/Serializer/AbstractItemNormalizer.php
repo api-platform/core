@@ -514,9 +514,6 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
         }
 
         $type = $propertyMetadata->getType();
-        if ($type && $type->isNullable() && null === $attributeValue) {
-            return null;
-        }
 
         if (
             $type &&
@@ -526,6 +523,9 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             $this->resourceClassResolver->isResourceClass($className)
         ) {
             if (!is_iterable($attributeValue)) {
+                if ($type->isNullable() && null === $attributeValue) {
+                    return null;
+                }
                 throw new UnexpectedValueException('Unexpected non-iterable value for to-many relation.');
             }
 
