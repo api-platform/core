@@ -514,11 +514,10 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
         }
 
         $type = $propertyMetadata->getType();
-        if ($type->isNullable() && is_null($attributeValue)) {
-            
+        if ($type && $type->isNullable() && null === $attributeValue) {
             return null;
         }
-        
+
         if (
             $type &&
             $type->isCollection() &&
