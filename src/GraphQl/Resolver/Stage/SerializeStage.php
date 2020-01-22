@@ -125,7 +125,7 @@ final class SerializeStage implements SerializeStageInterface
         $totalItems = $collection->getTotalItems();
         $nbPageItems = $collection->count();
         if (isset($args['after'])) {
-            $after = base64_decode($args['after'], true);
+            $after = '' === $args['after'] ? -1 : base64_decode($args['after'], true);
             if (false === $after) {
                 throw Error::createLocatedError(sprintf('Cursor %s is invalid', $args['after']), $info->fieldNodes, $info->path);
             }
