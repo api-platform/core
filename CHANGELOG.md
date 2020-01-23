@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.5.5
+
+* GraphQL: Do not allow empty cursor values on `before` or `after`
+
 ## 2.5.4
 
 * Add a local cache in `ResourceClassResolver::getResourceClass()`
