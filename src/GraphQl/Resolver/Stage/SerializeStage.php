@@ -126,15 +126,17 @@ final class SerializeStage implements SerializeStageInterface
         $nbPageItems = $collection->count();
         if (isset($args['after'])) {
             $after = base64_decode($args['after'], true);
-            if (false === $after) {
-                throw Error::createLocatedError(sprintf('Cursor %s is invalid', $args['after']), $info->fieldNodes, $info->path);
+            if (false === $after || '' === $args['after']) {
+                $msg = '' === $args['after'] ? 'Empty cursor is invalid' : sprintf('Cursor %s is invalid', $args['after']);
+                throw Error::createLocatedError($msg, $info->fieldNodes, $info->path);
             }
             $offset = 1 + (int) $after;
         }
         if (isset($args['before'])) {
             $before = base64_decode($args['before'], true);
-            if (false === $before) {
-                throw Error::createLocatedError(sprintf('Cursor %s is invalid', $args['before']), $info->fieldNodes, $info->path);
+            if (false === $before || '' === $args['before']) {
+                $msg = '' === $args['before'] ? 'Empty cursor is invalid' : sprintf('Cursor %s is invalid', $args['before']);
+                throw Error::createLocatedError($msg, $info->fieldNodes, $info->path);
             }
             $offset = (int) $before - $nbPageItems;
         }
