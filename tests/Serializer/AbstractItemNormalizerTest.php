@@ -1140,7 +1140,7 @@ class AbstractItemNormalizerTest extends TestCase
         $propertyMetadata = new PropertyMetadata(
             new Type(Type::BUILTIN_TYPE_ARRAY, true, DummyTableNonDoctrineInheritance::class, true,
                 new Type(Type::BUILTIN_TYPE_INT),
-                new Type(Type::BUILTIN_TYPE_OBJECT, false, DummyTableNonDoctrineInheritance::class),
+                new Type(Type::BUILTIN_TYPE_OBJECT, false, DummyTableNonDoctrineInheritance::class)
             ),
             '',
             true
@@ -1202,7 +1202,7 @@ class AbstractItemNormalizerTest extends TestCase
         $propertyMetadata = new PropertyMetadata(
             new Type(Type::BUILTIN_TYPE_ARRAY, false, DummyTableNonDoctrineInheritance::class, true,
                 new Type(Type::BUILTIN_TYPE_INT),
-                new Type(Type::BUILTIN_TYPE_OBJECT, false, DummyTableNonDoctrineInheritance::class),
+                new Type(Type::BUILTIN_TYPE_OBJECT, false, DummyTableNonDoctrineInheritance::class)
             ),
             '',
             true
