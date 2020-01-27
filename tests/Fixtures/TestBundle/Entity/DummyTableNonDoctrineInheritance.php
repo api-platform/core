@@ -26,18 +26,17 @@ class DummyTableNonDoctrineInheritance
      *
      * @Groups({"default"})
      */
-    private $id;
+    public $id;
 
     /**
      * @var string The dummy name
      *
      * @Groups({"default"})
      */
-    private $name;
+    public $name;
 
     /**
      * @var DummyTableNonDoctrineInheritanceRelated
-     *
      */
-    private $parent;
+    public $parent;
 }
