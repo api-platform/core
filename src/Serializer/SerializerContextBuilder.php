@@ -16,7 +16,6 @@ namespace ApiPlatform\Core\Serializer;
 use ApiPlatform\Core\Api\OperationType;
 use ApiPlatform\Core\Exception\RuntimeException;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
-use ApiPlatform\Core\Swagger\Serializer\DocumentationNormalizer;
 use ApiPlatform\Core\Util\RequestAttributesExtractor;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Serializer\Encoder\CsvEncoder;
@@ -52,6 +51,9 @@ final class SerializerContextBuilder implements SerializerContextBuilderInterfac
         } elseif (isset($attributes['item_operation_name'])) {
             $operationKey = 'item_operation_name';
             $operationType = OperationType::ITEM;
+        } elseif (isset($attributes['resource_operation_name'])) {
+            $operationKey = 'resource_operation_name';
+            $operationType = OperationType::RESOURCE;
         } else {
             $operationKey = 'subresource_operation_name';
             $operationType = OperationType::SUBRESOURCE;
@@ -94,13 +96,11 @@ final class SerializerContextBuilder implements SerializerContextBuilderInterfac
             $context['subresource_resource_class'] = $attributes['subresource_resource_class'] ?? null;
         }
 
-        unset($context[DocumentationNormalizer::SWAGGER_DEFINITION_NAME]);
-
         if (isset($context['skip_null_values'])) {
             return $context;
         }
 
-        foreach ($resourceMetadata->getItemOperations() as $operation) {
+        foreach ($resourceMetadata->getItemOperations() ?? [] as $operation) {
             if ('PATCH' === ($operation['method'] ?? '') && \in_array('application/merge-patch+json', $operation['input_formats']['json'] ?? [], true)) {
                 $context['skip_null_values'] = true;
 
