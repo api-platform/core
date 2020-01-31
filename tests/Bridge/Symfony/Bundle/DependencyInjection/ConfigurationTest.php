@@ -104,7 +104,7 @@ class ConfigurationTest extends TestCase
             'default_operation_path_resolver' => 'api_platform.operation_path_resolver.underscore',
             'path_segment_name_generator' => 'api_platform.path_segment_name_generator.underscore',
             'validator' => [
-                'serialize_payload_fields' => [],
+                'serialize_payload_fields' => null,
             ],
             'name_converter' => null,
             'enable_fos_user' => true,
