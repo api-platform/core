@@ -65,7 +65,7 @@ class SchemaBuilderTest extends TestCase
     /**
      * @dataProvider schemaProvider
      */
-    public function testGetSchema(string $resourceClass, ResourceMetadata $resourceMetadata, ObjectType $expectedQueryType, ?ObjectType $expectedMutationType): void
+    public function testGetSchema(string $resourceClass, ResourceMetadata $resourceMetadata, ObjectType $expectedQueryType, ?ObjectType $expectedMutationType, ?ObjectType $expectedSubscriptionType): void
     {
         $type = $this->prophesize(GraphQLType::class)->reveal();
         $type->name = 'MyType';
@@ -81,6 +81,8 @@ class SchemaBuilderTest extends TestCase
         $this->fieldsBuilderProphecy->getItemQueryFields($resourceClass, $resourceMetadata, 'custom_item_query', ['item_query' => 'item_query_resolver'])->willReturn(['custom_item_query' => ['custom_item_query_fields']]);
         $this->fieldsBuilderProphecy->getCollectionQueryFields($resourceClass, $resourceMetadata, 'custom_collection_query', ['collection_query' => 'collection_query_resolver'])->willReturn(['custom_collection_query' => ['custom_collection_query_fields']]);
         $this->fieldsBuilderProphecy->getMutationFields($resourceClass, $resourceMetadata, 'mutation')->willReturn(['mutation' => ['mutation_fields']]);
+        $this->fieldsBuilderProphecy->getMutationFields($resourceClass, $resourceMetadata, 'update')->willReturn(['mutation' => ['mutation_fields']]);
+        $this->fieldsBuilderProphecy->getSubscriptionFields($resourceClass, $resourceMetadata, 'update')->willReturn(['subscription' => ['subscription_fields']]);
 
         $this->resourceNameCollectionFactoryProphecy->create()->willReturn(new ResourceNameCollection([$resourceClass]));
         $this->resourceMetadataFactoryProphecy->create($resourceClass)->willReturn($resourceMetadata);
@@ -88,6 +90,7 @@ class SchemaBuilderTest extends TestCase
         $schema = $this->schemaBuilder->getSchema();
         $this->assertEquals($expectedQueryType, $schema->getQueryType());
         $this->assertEquals($expectedMutationType, $schema->getMutationType());
+        $this->assertEquals($expectedSubscriptionType, $schema->getSubscriptionType());
         $this->assertEquals($type, $schema->getType('MyType'));
         $this->assertEquals($typeFoo, $schema->getType('Foo'));
     }
@@ -101,7 +104,7 @@ class SchemaBuilderTest extends TestCase
                     'fields' => [
                         'node' => ['node_fields'],
                     ],
-                ]), null,
+                ]), null, null,
             ],
             'item query' => ['resourceClass', (new ResourceMetadata())->withGraphql(['item_query' => []]),
                 new ObjectType([
@@ -110,7 +113,7 @@ class SchemaBuilderTest extends TestCase
                         'node' => ['node_fields'],
                         'query' => ['query_fields'],
                     ],
-                ]), null,
+                ]), null, null,
             ],
             'collection query' => ['resourceClass', (new ResourceMetadata())->withGraphql(['collection_query' => []]),
                 new ObjectType([
@@ -119,7 +122,7 @@ class SchemaBuilderTest extends TestCase
                         'node' => ['node_fields'],
                         'query' => ['query_fields'],
                     ],
-                ]), null,
+                ]), null, null,
             ],
             'custom item query' => ['resourceClass', (new ResourceMetadata())->withGraphql(['custom_item_query' => ['item_query' => 'item_query_resolver']]),
                 new ObjectType([
@@ -128,7 +131,7 @@ class SchemaBuilderTest extends TestCase
                         'node' => ['node_fields'],
                         'custom_item_query' => ['custom_item_query_fields'],
                     ],
-                ]), null,
+                ]), null, null,
             ],
             'custom collection query' => ['resourceClass', (new ResourceMetadata())->withGraphql(['custom_collection_query' => ['collection_query' => 'collection_query_resolver']]),
                 new ObjectType([
@@ -137,7 +140,7 @@ class SchemaBuilderTest extends TestCase
                         'node' => ['node_fields'],
                         'custom_collection_query' => ['custom_collection_query_fields'],
                     ],
-                ]), null,
+                ]), null, null,
             ],
             'mutation' => ['resourceClass', (new ResourceMetadata())->withGraphql(['mutation' => []]),
                 new ObjectType([
@@ -150,6 +153,27 @@ class SchemaBuilderTest extends TestCase
                     'name' => 'Mutation',
                     'fields' => [
                         'mutation' => ['mutation_fields'],
+                    ],
+                ]),
+                null,
+            ],
+            'subscription' => ['resourceClass', (new ResourceMetadata())->withGraphql(['update' => []]),
+                new ObjectType([
+                    'name' => 'Query',
+                    'fields' => [
+                        'node' => ['node_fields'],
+                    ],
+                ]),
+                new ObjectType([
+                    'name' => 'Mutation',
+                    'fields' => [
+                        'mutation' => ['mutation_fields'],
+                    ],
+                ]),
+                new ObjectType([
+                    'name' => 'Subscription',
+                    'fields' => [
+                        'subscription' => ['subscription_fields'],
                     ],
                 ]),
             ],

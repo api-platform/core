@@ -17,6 +17,7 @@ use ApiPlatform\Core\Api\IriConverterInterface;
 use ApiPlatform\Core\DataProvider\ContextAwareCollectionDataProviderInterface;
 use ApiPlatform\Core\DataProvider\SubresourceDataProviderInterface;
 use ApiPlatform\Core\Exception\ItemNotFoundException;
+use ApiPlatform\Core\GraphQl\Resolver\Util\IdentifierTrait;
 use ApiPlatform\Core\GraphQl\Serializer\ItemNormalizer;
 use ApiPlatform\Core\GraphQl\Serializer\SerializerContextBuilderInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
@@ -34,6 +35,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 final class ReadStage implements ReadStageInterface
 {
     use ClassInfoTrait;
+    use IdentifierTrait;
 
     private $resourceMetadataFactory;
     private $iriConverter;
@@ -66,10 +68,10 @@ final class ReadStage implements ReadStageInterface
         $normalizationContext = $this->serializerContextBuilder->create($resourceClass, $operationName, $context, true);
 
         if (!$context['is_collection']) {
-            $identifier = $this->getIdentifier($context);
+            $identifier = $this->getIdentifierFromContext($context);
             $item = $this->getItem($identifier, $normalizationContext);
 
-            if ($identifier && $context['is_mutation']) {
+            if ($identifier && ($context['is_mutation'] || $context['is_subscription'])) {
                 if (null === $item) {
                     throw new NotFoundHttpException(sprintf('Item "%s" not found.', $args['input']['id']));
                 }
@@ -102,17 +104,6 @@ final class ReadStage implements ReadStageInterface
         }
 
         return $this->collectionDataProvider->getCollection($resourceClass, $operationName, $normalizationContext);
-    }
-
-    private function getIdentifier(array $context): ?string
-    {
-        $args = $context['args'];
-
-        if ($context['is_mutation']) {
-            return $args['input']['id'] ?? null;
-        }
-
-        return $args['id'] ?? null;
     }
 
     /**
