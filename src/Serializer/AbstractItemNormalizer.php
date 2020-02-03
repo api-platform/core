@@ -197,9 +197,18 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             if (!$this->serializer instanceof DenormalizerInterface) {
                 throw new LogicException('Cannot denormalize the input because the injected serializer is not a denormalizer');
             }
+            if ($dataTransformer instanceof PreHydrateInputInterface) {
+                $context[static::OBJECT_TO_POPULATE] = $dataTransformer->createInput($inputClass, $context);
+            }
             $denormalizedInput = $this->serializer->denormalize($data, $inputClass, $format, $context);
             if (!\is_object($denormalizedInput)) {
                 throw new \UnexpectedValueException('Expected denormalized input to be an object.');
+            }
+            if ($dataTransformer instanceof PreHydrateInputInterface) {
+                unset($context[static::OBJECT_TO_POPULATE]);
+            }
+            if (null !== $objectToPopulate) {
+                $context[static::OBJECT_TO_POPULATE] = $objectToPopulate;
             }
 
             return $dataTransformer->transform($denormalizedInput, $resourceClass, $dataTransformerContext);
