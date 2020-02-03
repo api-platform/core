@@ -49,8 +49,6 @@ that you did not make in your PR, you're doing it wrong.
 * Also don't forget to add a comment when you update a PR with a ping to [the maintainers](https://github.com/orgs/api-platform/people), so he/she will get a notification.
 * Squash your commits into one commit (see the next chapter).
 
-All Pull Requests must include [this header](.github/PULL_REQUEST_TEMPLATE.md).
-
 ### Tests
 
 On `api-platform/core` there are two kinds of tests: unit (`phpunit`) and integration tests (`behat`).
