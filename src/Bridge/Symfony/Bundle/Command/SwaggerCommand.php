@@ -92,7 +92,9 @@ final class SwaggerCommand extends Command
 
         $documentation = new Documentation($this->resourceNameCollectionFactory->create(), $this->apiTitle, $this->apiDescription, $this->apiVersion, $this->apiFormats);
         $data = $this->normalizer->normalize($documentation, DocumentationNormalizer::FORMAT, ['spec_version' => (int) $version, ApiGatewayNormalizer::API_GATEWAY => $input->getOption('api-gateway')]);
-        $content = $input->getOption('yaml') ? Yaml::dump($data, 10, 2, Yaml::DUMP_OBJECT_AS_MAP | Yaml::DUMP_EMPTY_ARRAY_AS_SEQUENCE | Yaml::DUMP_MULTI_LINE_LITERAL_BLOCK) : (json_encode($data, JSON_PRETTY_PRINT) ?: '');
+        $content = $input->getOption('yaml')
+            ? Yaml::dump($data, 10, 2, Yaml::DUMP_OBJECT_AS_MAP | Yaml::DUMP_EMPTY_ARRAY_AS_SEQUENCE | Yaml::DUMP_MULTI_LINE_LITERAL_BLOCK)
+            : (json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) ?: '');
 
         if (!empty($filename = $input->getOption('output')) && \is_string($filename)) {
             file_put_contents($filename, $content);

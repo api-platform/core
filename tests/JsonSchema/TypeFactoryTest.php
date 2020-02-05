@@ -19,6 +19,7 @@ use ApiPlatform\Core\JsonSchema\TypeFactory;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
+use Ramsey\Uuid\Uuid;
 use Symfony\Component\PropertyInfo\Type;
 
 class TypeFactoryTest extends TestCase
@@ -39,8 +40,19 @@ class TypeFactoryTest extends TestCase
         yield [['type' => 'boolean'], new Type(Type::BUILTIN_TYPE_BOOL)];
         yield [['type' => 'string'], new Type(Type::BUILTIN_TYPE_OBJECT)];
         yield [['type' => 'string', 'format' => 'date-time'], new Type(Type::BUILTIN_TYPE_OBJECT, false, \DateTimeImmutable::class)];
+        yield [['type' => 'string', 'format' => 'uuid'], new Type(Type::BUILTIN_TYPE_OBJECT, false, Uuid::class)];
         yield [['type' => 'string'], new Type(Type::BUILTIN_TYPE_OBJECT, false, Dummy::class)];
         yield [['type' => 'array', 'items' => ['type' => 'string']], new Type(Type::BUILTIN_TYPE_STRING, false, null, true)];
+    }
+
+    public function testGetTypeWithSchema(): void
+    {
+        $typeFactory = new TypeFactory();
+        $type = new Type(Type::BUILTIN_TYPE_OBJECT, false, Dummy::class);
+        $this->assertSame(
+            ['type' => 'string', 'format' => 'iri-reference'],
+            $typeFactory->getType($type, 'json', null, null, new Schema())
+        );
     }
 
     public function testGetClassType(): void

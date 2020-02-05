@@ -22,7 +22,7 @@ interface DataTransformerInterface
 {
     /**
      * Transforms the given object to something else, usually another object.
-     * This must return the original object if no transformation has been done.
+     * This must return the original object if no transformations have been done.
      *
      * @param object $object
      *
