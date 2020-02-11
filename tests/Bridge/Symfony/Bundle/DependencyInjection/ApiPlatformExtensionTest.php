@@ -529,6 +529,23 @@ class ApiPlatformExtensionTest extends TestCase
         $this->extension->load($config, $containerBuilder);
     }
 
+    public function testEnabledSerializationContextDoc(): void
+    {
+        $config = self::DEFAULT_CONFIG;
+        $config['api_platform']['enable_serialization_context_doc'] = true;
+
+        $containerBuilderProphecy = $this->getBaseContainerBuilderProphecy(['orm'], $config);
+        $definitionProphecy = $this->prophesize(Definition::class);
+        $definitionProphecy->replaceArgument(Argument::cetera())->shouldNotBeCalled();
+        $definition = $definitionProphecy->reveal();
+        $containerBuilderProphecy->getDefinition('api_platform.json_schema.schema_factory')->willReturn($definition);
+        $containerBuilderProphecy->getDefinition('api_platform.swagger.normalizer.documentation')->willReturn($definition);
+        $containerBuilderProphecy->getDefinition('api_platform.hydra.normalizer.documentation')->willReturn($definition);
+        $containerBuilder = $containerBuilderProphecy->reveal();
+
+        $this->extension->load($config, $containerBuilder);
+    }
+
     public function testDisabledSwaggerUIAndRedoc()
     {
         $containerBuilderProphecy = $this->getBaseContainerBuilderProphecy();
@@ -1033,8 +1050,9 @@ class ApiPlatformExtensionTest extends TestCase
 
     private function getBaseContainerBuilderProphecy(array $doctrineIntegrationsToLoad = ['orm'], $configuration = null)
     {
-        $hasSwagger = null === $configuration || true === $configuration['api_platform']['enable_swagger'] ?? false;
+        $hasSwagger = null === $configuration || true === ($configuration['api_platform']['enable_swagger'] ?? true);
         $hasHydra = null === $configuration || isset($configuration['api_platform']['formats']['jsonld']);
+        $useSerializationContext = null !== $configuration && true === ($configuration['api_platform']['enable_serialization_context_doc'] ?? false);
 
         $containerBuilderProphecy = $this->getPartialContainerBuilderProphecy($configuration);
 
@@ -1378,6 +1396,20 @@ class ApiPlatformExtensionTest extends TestCase
 
         foreach ($aliases as $alias => $service) {
             $containerBuilderProphecy->setAlias($alias, $service)->shouldBeCalled();
+        }
+
+        if ($hasSwagger && !$useSerializationContext) {
+            $definitionProphecy = $this->prophesize(Definition::class);
+            $definitionProphecy->replaceArgument(6, null)->shouldBeCalled();
+            $containerBuilderProphecy->getDefinition('api_platform.json_schema.schema_factory')->willReturn($definitionProphecy->reveal());
+            $definitionProphecy = $this->prophesize(Definition::class);
+            $definitionProphecy->replaceArgument(26, null)->shouldBeCalled();
+            $containerBuilderProphecy->getDefinition('api_platform.swagger.normalizer.documentation')->willReturn($definitionProphecy->reveal());
+        }
+        if ($hasHydra && !$useSerializationContext) {
+            $definitionProphecy = $this->prophesize(Definition::class);
+            $definitionProphecy->replaceArgument(8, null)->shouldBeCalled();
+            $containerBuilderProphecy->getDefinition('api_platform.hydra.normalizer.documentation')->willReturn($definitionProphecy->reveal());
         }
 
         $containerBuilderProphecy->hasParameter('api_platform.metadata_cache')->willReturn(false);

@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Serializer;
 
+use ApiPlatform\Core\Api\OperationType;
 use ApiPlatform\Core\Exception\ResourceClassNotFoundException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
@@ -31,19 +32,8 @@ trait PropertyFactoryOptionsTrait
      */
     private function getPropertyFactoryOptions(string $resourceClass, bool $splitDeserialization = false): array
     {
-        try {
-            $request = Request::createFromGlobals();
-            $serializationContext = $this->serializerContextBuilder->createFromRequest($request, true, [
-                'resource_class' => $resourceClass,
-                'resource_operation_name' => 'resource',
-            ]);
-            $deserializationContext = $this->serializerContextBuilder->createFromRequest($request, false, [
-                'resource_class' => $resourceClass,
-                'resource_operation_name' => 'resource',
-            ]);
-        } catch (ResourceClassNotFoundException $exception) {
-            return [];
-        }
+        $serializationContext = $this->getSerializationContext($resourceClass, true);
+        $deserializationContext = $this->getSerializationContext($resourceClass, false);
         $serializationGroups = (array) ($serializationContext[AbstractNormalizer::GROUPS] ?? []);
         $deserializationGroups = (array) ($deserializationContext[AbstractNormalizer::GROUPS] ?? []);
 
@@ -61,5 +51,47 @@ trait PropertyFactoryOptionsTrait
         }
 
         return $options;
+    }
+
+    /**
+     * Get the serialization context using the serializer context builder if available or the resource attributes if not.
+     */
+    private function getSerializationContext(string $resourceClass, bool $normalization, ?string $operationType = null, ?string $operationName = null): array
+    {
+        try {
+            if ($this->serializerContextBuilder) {
+                switch ($operationType) {
+                    case OperationType::ITEM:
+                        $operationKey = 'item_operation_name';
+                        break;
+                    case OperationType::COLLECTION:
+                        $operationKey = 'collection_operation_name';
+                        break;
+                    case OperationType::SUBRESOURCE:
+                        $operationKey = 'subresource_operation_name';
+                        break;
+                    default:
+                        $operationKey = 'resource_operation_name';
+                }
+
+                $request = Request::createFromGlobals();
+
+                return $this->serializerContextBuilder->createFromRequest($request, $normalization, [
+                    'resource_class' => $resourceClass,
+                    $operationKey => $operationName ?? 'resource',
+                ]);
+            }
+
+            $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
+            $attribute = $normalization ? 'normalization_context' : 'denormalization_context';
+
+            if (null === $operationType || null === $operationName) {
+                return $resourceMetadata->getAttribute($attribute, []);
+            }
+
+            return $resourceMetadata->getTypedOperationAttribute($operationType, $operationName, $attribute, [], true);
+        } catch (ResourceClassNotFoundException $exception) {
+            return [];
+        }
     }
 }

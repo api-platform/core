@@ -20,11 +20,9 @@ use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInte
 use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Serializer\PropertyFactoryOptionsTrait;
-use ApiPlatform\Core\Serializer\SerializerContextBuilder;
 use ApiPlatform\Core\Serializer\SerializerContextBuilderInterface;
 use ApiPlatform\Core\Swagger\Serializer\DocumentationNormalizer;
 use ApiPlatform\Core\Util\ResourceClassInfoTrait;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
@@ -48,7 +46,7 @@ final class SchemaFactory implements SchemaFactoryInterface
     private $distinctFormats = [];
     private $serializerContextBuilder;
 
-    public function __construct(TypeFactoryInterface $typeFactory, ResourceMetadataFactoryInterface $resourceMetadataFactory, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, NameConverterInterface $nameConverter = null, ResourceClassResolverInterface $resourceClassResolver = null, SerializerContextBuilderInterface $serializerContextBuilder = null)
+    public function __construct(TypeFactoryInterface $typeFactory, ResourceMetadataFactoryInterface $resourceMetadataFactory, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, NameConverterInterface $nameConverter = null, ResourceClassResolverInterface $resourceClassResolver = null, ?SerializerContextBuilderInterface $serializerContextBuilder = null)
     {
         $this->typeFactory = $typeFactory;
         $this->resourceMetadataFactory = $resourceMetadataFactory;
@@ -56,7 +54,7 @@ final class SchemaFactory implements SchemaFactoryInterface
         $this->propertyMetadataFactory = $propertyMetadataFactory;
         $this->nameConverter = $nameConverter;
         $this->resourceClassResolver = $resourceClassResolver;
-        $this->serializerContextBuilder = $serializerContextBuilder ?? new SerializerContextBuilder($this->resourceMetadataFactory);
+        $this->serializerContextBuilder = $serializerContextBuilder;
     }
 
     /**
@@ -285,30 +283,8 @@ final class SchemaFactory implements SchemaFactoryInterface
 
         return [
             $resourceMetadata,
-            $serializerContext ?? $this->getSerializerContext($className, $type, $operationType, $operationName),
+            $serializerContext ?? $this->getSerializationContext($className, Schema::TYPE_OUTPUT === $type, $operationType, $operationName),
             $inputOrOutput['class'],
         ];
-    }
-
-    private function getSerializerContext(string $className, string $type = Schema::TYPE_OUTPUT, ?string $operationType, ?string $operationName): array
-    {
-        switch ($operationType) {
-            case OperationType::ITEM:
-                $operationKey = 'item_operation_name';
-                break;
-            case OperationType::COLLECTION:
-                $operationKey = 'collection_operation_name';
-                break;
-            case OperationType::SUBRESOURCE:
-                $operationKey = 'subresource_operation_name';
-                break;
-            default:
-                $operationKey = 'resource_operation_name';
-        }
-
-        return $this->serializerContextBuilder->createFromRequest(Request::createFromGlobals(), Schema::TYPE_OUTPUT === $type, [
-            'resource_class' => $className,
-            $operationKey => $operationName ?? 'resource',
-        ]);
     }
 }
