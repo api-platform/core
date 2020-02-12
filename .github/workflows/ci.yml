@@ -1547,7 +1547,7 @@ jobs:
         php:
           - '7.3'
         symfony:
-          - '4.4'
+          - '5.1'
       fail-fast: false
     timeout-minutes: 20
     steps:
@@ -1650,7 +1650,7 @@ jobs:
         php:
           - '7.3'
         symfony:
-          - '4.4'
+          - '5.1'
       fail-fast: false
     timeout-minutes: 20
     steps:
