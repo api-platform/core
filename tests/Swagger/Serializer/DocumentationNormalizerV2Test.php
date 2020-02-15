@@ -348,6 +348,7 @@ class DocumentationNormalizerV2Test extends TestCase
                             'description' => 'This is a \DateTimeInterface object.',
                             'format' => 'date-time',
                         ]),                     ],
+                    'additionalProperties' => false,
                 ]),
             ]),
         ];
@@ -488,6 +489,7 @@ class DocumentationNormalizerV2Test extends TestCase
                             'description' => 'This is a converted name.',
                         ]),
                     ],
+                    'additionalProperties' => false,
                 ]),
             ]),
             'securityDefinitions' => [
@@ -596,6 +598,7 @@ class DocumentationNormalizerV2Test extends TestCase
                             'description' => 'This is a name.',
                         ]),
                     ],
+                    'additionalProperties' => false,
                 ]),
             ]),
             'securityDefinitions' => [
@@ -786,6 +789,7 @@ class DocumentationNormalizerV2Test extends TestCase
                             'description' => 'This is a name.',
                         ]),
                     ],
+                    'additionalProperties' => false,
                 ]),
                 $ref => new \ArrayObject([
                     'type' => 'object',
@@ -797,6 +801,7 @@ class DocumentationNormalizerV2Test extends TestCase
                             'description' => 'This is a gerard.',
                         ]),
                     ],
+                    'additionalProperties' => false,
                 ]),
             ]),
         ];
@@ -981,6 +986,7 @@ class DocumentationNormalizerV2Test extends TestCase
                             'description' => 'This is a name.',
                         ]),
                     ],
+                    'additionalProperties' => false,
                 ]),
                 $ref => new \ArrayObject([
                     'type' => 'object',
@@ -992,6 +998,7 @@ class DocumentationNormalizerV2Test extends TestCase
                             'description' => 'This is a gerard.',
                         ]),
                     ],
+                    'additionalProperties' => false,
                 ]),
             ]),
         ];
@@ -1081,6 +1088,7 @@ class DocumentationNormalizerV2Test extends TestCase
                             'readOnly' => true,
                         ]),
                     ],
+                    'additionalProperties' => false,
                 ]),
             ]),
         ];
@@ -1250,6 +1258,7 @@ class DocumentationNormalizerV2Test extends TestCase
                             'description' => 'This is a name.',
                         ]),
                     ],
+                    'additionalProperties' => false,
                 ]),
                 'Dummy-dummy' => new \ArrayObject([
                     'type' => 'object',
@@ -1261,6 +1270,7 @@ class DocumentationNormalizerV2Test extends TestCase
                             'description' => 'This is a gerard.',
                         ]),
                     ],
+                    'additionalProperties' => false,
                 ]),
             ]),
         ];
@@ -1433,6 +1443,7 @@ class DocumentationNormalizerV2Test extends TestCase
                             'description' => 'This is a name.',
                         ]),
                     ],
+                    'additionalProperties' => false,
                 ]),
                 'Dummy-dummy' => new \ArrayObject([
                     'type' => 'object',
@@ -1444,6 +1455,7 @@ class DocumentationNormalizerV2Test extends TestCase
                             'description' => 'This is a gerard.',
                         ]),
                     ],
+                    'additionalProperties' => false,
                 ]),
             ]),
         ];
@@ -1625,6 +1637,7 @@ class DocumentationNormalizerV2Test extends TestCase
                             'description' => 'This is a name.',
                         ]),
                     ],
+                    'additionalProperties' => false,
                 ]),
             ]),
         ];
@@ -2007,6 +2020,7 @@ class DocumentationNormalizerV2Test extends TestCase
                             'description' => 'This is a name.',
                         ]),
                     ],
+                    'additionalProperties' => false,
                 ]),
                 $ref => new \ArrayObject([
                     'type' => 'object',
@@ -2022,6 +2036,7 @@ class DocumentationNormalizerV2Test extends TestCase
                             '$ref' => '#/definitions/'.$relatedDummyRef,
                         ]),
                     ],
+                    'additionalProperties' => false,
                 ]),
                 $relatedDummyRef => new \ArrayObject([
                     'type' => 'object',
@@ -2033,6 +2048,7 @@ class DocumentationNormalizerV2Test extends TestCase
                             'description' => 'This is a name.',
                         ]),
                     ],
+                    'additionalProperties' => false,
                 ]),
             ]),
         ];
@@ -2141,6 +2157,7 @@ class DocumentationNormalizerV2Test extends TestCase
                             'type' => 'string',
                         ]),
                     ],
+                    'additionalProperties' => false,
                 ]),
             ]),
         ];
@@ -2303,6 +2320,7 @@ class DocumentationNormalizerV2Test extends TestCase
                             'items' => ['$ref' => '#/definitions/Answer'],
                         ]),
                     ],
+                    'additionalProperties' => false,
                 ]),
                 'Answer' => new \ArrayObject([
                     'type' => 'object',
@@ -2315,6 +2333,7 @@ class DocumentationNormalizerV2Test extends TestCase
                             'items' => ['$ref' => '#/definitions/Answer'],
                         ]),
                     ],
+                    'additionalProperties' => false,
                 ]),
             ]),
         ];
@@ -2404,6 +2423,7 @@ class DocumentationNormalizerV2Test extends TestCase
                             'example' => 'one',
                         ]),
                     ],
+                    'additionalProperties' => false,
                 ]),
             ]),
         ];
@@ -2504,6 +2524,7 @@ class DocumentationNormalizerV2Test extends TestCase
                             'example' => 'one',
                         ]),
                     ],
+                    'additionalProperties' => false,
                 ]),
             ]),
         ];
@@ -2697,6 +2718,7 @@ class DocumentationNormalizerV2Test extends TestCase
                             'description' => 'This is a name.',
                         ]),
                     ],
+                    'additionalProperties' => false,
                 ]),
             ]),
         ];
@@ -2911,6 +2933,7 @@ class DocumentationNormalizerV2Test extends TestCase
                             'type' => 'integer',
                         ]),
                     ],
+                    'additionalProperties' => false,
                 ]),
                 'Dummy:InputDto' => new \ArrayObject([
                     'type' => 'object',
@@ -2929,6 +2952,7 @@ class DocumentationNormalizerV2Test extends TestCase
                             'type' => 'integer',
                         ]),
                     ],
+                    'additionalProperties' => false,
                 ]),
             ]),
         ];
