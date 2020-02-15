@@ -110,7 +110,7 @@ final class SchemaFactory implements SchemaFactoryInterface
         }
 
         $definition = new \ArrayObject(['type' => 'object']);
-        $definition["additionalProperties"] = false;
+        $definition['additionalProperties'] = false;
         $definitions[$definitionName] = $definition;
         if (null !== $resourceMetadata && null !== $description = $resourceMetadata->getDescription()) {
             $definition['description'] = $description;

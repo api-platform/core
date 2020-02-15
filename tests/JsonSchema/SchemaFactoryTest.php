@@ -73,6 +73,6 @@ class SchemaFactoryTest extends TestCase
         $this->assertArrayHasKey('bar', $definitions[$rootDefinitionKey]['properties']);
         $this->assertArrayHasKey('type', $definitions[$rootDefinitionKey]['properties']['bar']);
         $this->assertSame('integer', $definitions[$rootDefinitionKey]['properties']['bar']['type']);
-        $this->assertSame(false, $definitions[$rootDefinitionKey]['additionalProperties']);
+        $this->assertFalse($definitions[$rootDefinitionKey]['additionalProperties']);
     }
 }
