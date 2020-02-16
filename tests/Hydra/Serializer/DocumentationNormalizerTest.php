@@ -27,11 +27,10 @@ use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Metadata\Resource\ResourceNameCollection;
 use ApiPlatform\Core\Operation\Factory\SubresourceOperationFactoryInterface;
-use ApiPlatform\Core\Serializer\SerializerContextBuilderInterface;
+use ApiPlatform\Core\Serializer\SerializerContextFactoryInterface;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Serializer\NameConverter\CustomConverter;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\PropertyInfo\Type;
 
 /**
@@ -102,13 +101,11 @@ class DocumentationNormalizerTest extends TestCase
             ],
         ]);
 
-        $serializerContextBuilderProphecy = $this->prophesize(SerializerContextBuilderInterface::class);
-        $serializerContextBuilderProphecy->createFromRequest(Argument::type(Request::class), true, [
-            'resource_class' => 'dummy',
+        $serializerContextFactoryProphecy = $this->prophesize(SerializerContextFactoryInterface::class);
+        $serializerContextFactoryProphecy->create('dummy', 'resource', true, [
             'resource_operation_name' => 'resource',
         ])->willReturn(['groups' => ['serialization_groups']]);
-        $serializerContextBuilderProphecy->createFromRequest(Argument::type(Request::class), false, [
-            'resource_class' => 'dummy',
+        $serializerContextFactoryProphecy->create('dummy', 'resource', false, [
             'resource_operation_name' => 'resource',
         ])->willReturn(['groups' => 'deserialization_groups']);
 
@@ -121,7 +118,7 @@ class DocumentationNormalizerTest extends TestCase
             $urlGenerator->reveal(),
             $subresourceOperationFactoryProphecy->reveal(),
             new CustomConverter(),
-            $serializerContextBuilderProphecy->reveal()
+            $serializerContextFactoryProphecy->reveal()
         );
 
         $expected = [
@@ -421,9 +418,8 @@ class DocumentationNormalizerTest extends TestCase
         $urlGenerator->generate('api_doc', ['_format' => 'jsonld'])->willReturn('/doc')->shouldBeCalledTimes(1);
         $urlGenerator->generate('api_doc', ['_format' => 'jsonld'], 0)->willReturn('/doc')->shouldBeCalledTimes(1);
 
-        $serializerContextBuilderProphecy = $this->prophesize(SerializerContextBuilderInterface::class);
-        $serializerContextBuilderProphecy->createFromRequest(Argument::type(Request::class), Argument::type('bool'), [
-            'resource_class' => 'dummy',
+        $serializerContextFactoryProphecy = $this->prophesize(SerializerContextFactoryInterface::class);
+        $serializerContextFactoryProphecy->create('dummy', 'resource', Argument::type('bool'), [
             'resource_operation_name' => 'resource',
         ])->willReturn([]);
 
@@ -436,7 +432,7 @@ class DocumentationNormalizerTest extends TestCase
             $urlGenerator->reveal(),
             null,
             null,
-            $serializerContextBuilderProphecy->reveal()
+            $serializerContextFactoryProphecy->reveal()
         );
 
         $expected = [

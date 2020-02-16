@@ -68,7 +68,6 @@ use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\GraphQl\Resolver\MutationResolverInterface;
 use ApiPlatform\Core\GraphQl\Resolver\QueryCollectionResolverInterface;
 use ApiPlatform\Core\GraphQl\Resolver\QueryItemResolverInterface;
-use ApiPlatform\Core\GraphQl\Serializer\SerializerContextBuilderInterface as GraphQlSerializerContextBuilderInterface;
 use ApiPlatform\Core\GraphQl\Type\Definition\TypeInterface as GraphQlTypeInterface;
 use ApiPlatform\Core\JsonSchema\SchemaFactoryInterface;
 use ApiPlatform\Core\JsonSchema\TypeFactoryInterface;
@@ -80,6 +79,7 @@ use ApiPlatform\Core\Security\ResourceAccessCheckerInterface;
 use ApiPlatform\Core\Serializer\Filter\GroupFilter;
 use ApiPlatform\Core\Serializer\Filter\PropertyFilter;
 use ApiPlatform\Core\Serializer\SerializerContextBuilderInterface;
+use ApiPlatform\Core\Serializer\SerializerContextFactoryInterface;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\TestBundle;
 use ApiPlatform\Core\Validator\ValidatorInterface;
 use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
@@ -361,7 +361,7 @@ class ApiPlatformExtensionTest extends TestCase
         $containerBuilderProphecy->setDefinition('api_platform.graphql.schema_builder', Argument::type(Definition::class))->shouldNotBeCalled();
         $containerBuilderProphecy->setDefinition('api_platform.graphql.normalizer.item', Argument::type(Definition::class))->shouldNotBeCalled();
         $containerBuilderProphecy->setDefinition('api_platform.graphql.normalizer.object', Argument::type(Definition::class))->shouldNotBeCalled();
-        $containerBuilderProphecy->setDefinition('api_platform.graphql.serializer.context_builder', Argument::type(Definition::class))->shouldNotBeCalled();
+        $containerBuilderProphecy->setDefinition('api_platform.graphql.serializer.context_factory', Argument::type(Definition::class))->shouldNotBeCalled();
         $containerBuilderProphecy->setDefinition('api_platform.graphql.iterable_type', Argument::type(Definition::class))->shouldNotBeCalled();
         $containerBuilderProphecy->setDefinition('api_platform.graphql.upload_type', Argument::type(Definition::class))->shouldNotBeCalled();
         $containerBuilderProphecy->setDefinition('api_platform.graphql.type_locator', Argument::type(Definition::class))->shouldNotBeCalled();
@@ -397,7 +397,6 @@ class ApiPlatformExtensionTest extends TestCase
         $this->childDefinitionProphecy->addTag('api_platform.graphql.query_resolver')->shouldNotBeCalled();
         $containerBuilderProphecy->registerForAutoconfiguration(MutationResolverInterface::class)->shouldNotBeCalled();
         $this->childDefinitionProphecy->addTag('api_platform.graphql.mutation_resolver')->shouldNotBeCalled();
-        $containerBuilderProphecy->setAlias(GraphQlSerializerContextBuilderInterface::class, 'api_platform.graphql.serializer.context_builder')->shouldNotBeCalled();
 
         $containerBuilder = $containerBuilderProphecy->reveal();
 
@@ -979,7 +978,9 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.route_name_resolver.cached',
             'api_platform.router',
             'api_platform.serializer.context_builder',
+            'api_platform.serializer.context_factory',
             'api_platform.serializer.context_builder.filter',
+            'api_platform.serializer.context_factory.filter',
             'api_platform.serializer.group_filter',
             'api_platform.serializer.normalizer.item',
             'api_platform.serializer.property_filter',
@@ -1027,6 +1028,7 @@ class ApiPlatformExtensionTest extends TestCase
             ResourceNameCollectionFactoryInterface::class => 'api_platform.metadata.resource.name_collection_factory',
             ResourceMetadataFactoryInterface::class => 'api_platform.metadata.resource.metadata_factory',
             SerializerContextBuilderInterface::class => 'api_platform.serializer.context_builder',
+            SerializerContextFactoryInterface::class => 'api_platform.serializer.context_factory',
             SubresourceDataProviderInterface::class => 'api_platform.subresource_data_provider',
             UrlGeneratorInterface::class => 'api_platform.router',
         ];
@@ -1236,7 +1238,7 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.graphql.mutation_resolver_locator',
             'api_platform.graphql.normalizer.item',
             'api_platform.graphql.normalizer.object',
-            'api_platform.graphql.serializer.context_builder',
+            'api_platform.graphql.serializer.context_factory',
             'api_platform.graphql.subscription.subscription_manager',
             'api_platform.graphql.subscription.subscription_identifier_generator',
             'api_platform.graphql.cache.subscription',
@@ -1368,7 +1370,6 @@ class ApiPlatformExtensionTest extends TestCase
             NumericFilter::class => 'api_platform.doctrine.orm.numeric_filter',
             ExistsFilter::class => 'api_platform.doctrine.orm.exists_filter',
             'api_platform.doctrine.listener.mercure.publish' => 'api_platform.doctrine.orm.listener.mercure.publish',
-            GraphQlSerializerContextBuilderInterface::class => 'api_platform.graphql.serializer.context_builder',
         ];
 
         if (\in_array('odm', $doctrineIntegrationsToLoad, true)) {

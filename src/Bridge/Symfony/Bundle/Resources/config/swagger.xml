@@ -33,7 +33,7 @@
             <argument>%api_platform.collection.pagination.enabled_parameter_name%</argument>
             <argument type="collection" />
             <argument>%api_platform.swagger.versions%</argument>
-            <argument type="service" id="api_platform.serializer.context_builder" />
+            <argument type="service" id="api_platform.serializer.context_factory" />
             <tag name="serializer.normalizer" priority="-790" />
         </service>
 

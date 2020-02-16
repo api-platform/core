@@ -15,7 +15,6 @@ namespace ApiPlatform\Core\Serializer;
 
 use ApiPlatform\Core\Api\OperationType;
 use ApiPlatform\Core\Exception\ResourceClassNotFoundException;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 
 /**
@@ -23,7 +22,7 @@ use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
  *
  * @internal
  *
- * @author @author Alan Poulain <contact@alanpoulain.eu>
+ * @author Alan Poulain <contact@alanpoulain.eu>
  */
 trait PropertyFactoryOptionsTrait
 {
@@ -59,7 +58,7 @@ trait PropertyFactoryOptionsTrait
     private function getSerializationContext(string $resourceClass, bool $normalization, ?string $operationType = null, ?string $operationName = null): array
     {
         try {
-            if ($this->serializerContextBuilder) {
+            if ($this->serializerContextFactory) {
                 switch ($operationType) {
                     case OperationType::ITEM:
                         $operationKey = 'item_operation_name';
@@ -74,10 +73,7 @@ trait PropertyFactoryOptionsTrait
                         $operationKey = 'resource_operation_name';
                 }
 
-                $request = Request::createFromGlobals();
-
-                return $this->serializerContextBuilder->createFromRequest($request, $normalization, [
-                    'resource_class' => $resourceClass,
+                return $this->serializerContextFactory->create($resourceClass, $operationName ?? 'resource', $normalization, [
                     $operationKey => $operationName ?? 'resource',
                 ]);
             }

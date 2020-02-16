@@ -20,7 +20,7 @@ use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInte
 use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Serializer\PropertyFactoryOptionsTrait;
-use ApiPlatform\Core\Serializer\SerializerContextBuilderInterface;
+use ApiPlatform\Core\Serializer\SerializerContextFactoryInterface;
 use ApiPlatform\Core\Swagger\Serializer\DocumentationNormalizer;
 use ApiPlatform\Core\Util\ResourceClassInfoTrait;
 use Symfony\Component\PropertyInfo\Type;
@@ -44,9 +44,9 @@ final class SchemaFactory implements SchemaFactoryInterface
     private $propertyMetadataFactory;
     private $nameConverter;
     private $distinctFormats = [];
-    private $serializerContextBuilder;
+    private $serializerContextFactory;
 
-    public function __construct(TypeFactoryInterface $typeFactory, ResourceMetadataFactoryInterface $resourceMetadataFactory, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, NameConverterInterface $nameConverter = null, ResourceClassResolverInterface $resourceClassResolver = null, ?SerializerContextBuilderInterface $serializerContextBuilder = null)
+    public function __construct(TypeFactoryInterface $typeFactory, ResourceMetadataFactoryInterface $resourceMetadataFactory, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, NameConverterInterface $nameConverter = null, ResourceClassResolverInterface $resourceClassResolver = null, ?SerializerContextFactoryInterface $serializerContextFactory = null)
     {
         $this->typeFactory = $typeFactory;
         $this->resourceMetadataFactory = $resourceMetadataFactory;
@@ -54,7 +54,7 @@ final class SchemaFactory implements SchemaFactoryInterface
         $this->propertyMetadataFactory = $propertyMetadataFactory;
         $this->nameConverter = $nameConverter;
         $this->resourceClassResolver = $resourceClassResolver;
-        $this->serializerContextBuilder = $serializerContextBuilder;
+        $this->serializerContextFactory = $serializerContextFactory;
     }
 
     /**

@@ -27,7 +27,7 @@ use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Operation\Factory\SubresourceOperationFactoryInterface;
 use ApiPlatform\Core\Serializer\PropertyFactoryOptionsTrait;
-use ApiPlatform\Core\Serializer\SerializerContextBuilderInterface;
+use ApiPlatform\Core\Serializer\SerializerContextFactoryInterface;
 use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 use Symfony\Component\Serializer\Normalizer\CacheableSupportsMethodInterface;
@@ -52,9 +52,9 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
     private $urlGenerator;
     private $subresourceOperationFactory;
     private $nameConverter;
-    private $serializerContextBuilder;
+    private $serializerContextFactory;
 
-    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, ResourceClassResolverInterface $resourceClassResolver, OperationMethodResolverInterface $operationMethodResolver = null, UrlGeneratorInterface $urlGenerator, SubresourceOperationFactoryInterface $subresourceOperationFactory = null, NameConverterInterface $nameConverter = null, ?SerializerContextBuilderInterface $serializerContextBuilder = null)
+    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, ResourceClassResolverInterface $resourceClassResolver, OperationMethodResolverInterface $operationMethodResolver = null, UrlGeneratorInterface $urlGenerator, SubresourceOperationFactoryInterface $subresourceOperationFactory = null, NameConverterInterface $nameConverter = null, ?SerializerContextFactoryInterface $serializerContextFactory = null)
     {
         if ($operationMethodResolver) {
             @trigger_error(sprintf('Passing an instance of %s to %s() is deprecated since version 2.5 and will be removed in 3.0.', OperationMethodResolverInterface::class, __METHOD__), E_USER_DEPRECATED);
@@ -68,7 +68,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
         $this->urlGenerator = $urlGenerator;
         $this->subresourceOperationFactory = $subresourceOperationFactory;
         $this->nameConverter = $nameConverter;
-        $this->serializerContextBuilder = $serializerContextBuilder;
+        $this->serializerContextFactory = $serializerContextFactory;
     }
 
     /**

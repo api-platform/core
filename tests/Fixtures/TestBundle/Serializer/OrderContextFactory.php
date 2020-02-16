@@ -13,28 +13,26 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Serializer;
 
-use ApiPlatform\Core\Serializer\SerializerContextBuilderInterface;
+use ApiPlatform\Core\Serializer\SerializerContextFactoryInterface;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\Order as OrderDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Order;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationCredentialsNotFoundException;
 
-final class OrderContextBuilder implements SerializerContextBuilderInterface
+final class OrderContextFactory implements SerializerContextFactoryInterface
 {
     private $decorated;
     private $authorizationChecker;
 
-    public function __construct(SerializerContextBuilderInterface $decorated, AuthorizationCheckerInterface $authorizationChecker)
+    public function __construct(SerializerContextFactoryInterface $decorated, AuthorizationCheckerInterface $authorizationChecker)
     {
         $this->decorated = $decorated;
         $this->authorizationChecker = $authorizationChecker;
     }
 
-    public function createFromRequest(Request $request, bool $normalization, ?array $extractedAttributes = null): array
+    public function create(string $resourceClass, string $operationName, bool $normalization, array $context): array
     {
-        $context = $this->decorated->createFromRequest($request, $normalization, $extractedAttributes);
-        $resourceClass = $context['resource_class'] ?? null;
+        $context = $this->decorated->create($resourceClass, $operationName, $normalization, $context);
 
         try {
             if (\in_array($resourceClass, [Order::class, OrderDocument::class], true) && isset($context['groups']) && $this->authorizationChecker->isGranted('ROLE_ADMIN')) {
