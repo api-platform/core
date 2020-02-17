@@ -65,6 +65,7 @@ class TraceableChainItemDataCollectorTest extends TestCase
             new class() implements ItemDataProviderInterface {
                 public function getItem(string $resourceClass, $id, string $operationName = null, array $context = [])
                 {
+                    return null;
                 }
             },
             ['some_context'],
@@ -87,11 +88,13 @@ class TraceableChainItemDataCollectorTest extends TestCase
 
                     public function getItem(string $resourceClass, $id, string $operationName = null, array $context = [])
                     {
+                        return null;
                     }
                 },
                 new class() implements RestrictedDataProviderInterface, DenormalizedIdentifiersAwareItemDataProviderInterface {
                     public function getItem(string $resourceClass, /* array */ $id, string $operationName = null, array $context = [])
                     {
+                        return null;
                     }
 
                     public function supports(string $resourceClass, string $operationName = null, array $context = []): bool
@@ -102,6 +105,7 @@ class TraceableChainItemDataCollectorTest extends TestCase
                 new class() implements ItemDataProviderInterface {
                     public function getItem(string $resourceClass, $id, string $operationName = null, array $context = [])
                     {
+                        return null;
                     }
                 },
             ]),
@@ -123,6 +127,7 @@ class TraceableChainItemDataCollectorTest extends TestCase
                 new class() implements ItemDataProviderInterface {
                     public function getItem(string $resourceClass, $id, string $operationName = null, array $context = [])
                     {
+                        return null;
                     }
                 },
             ]),

@@ -64,6 +64,7 @@ class TraceableChainSubresourceDataCollectorTest extends TestCase
             new class() implements SubresourceDataProviderInterface {
                 public function getSubresource(string $resourceClass, array $identifiers, array $context, string $operationName = null)
                 {
+                    return null;
                 }
             },
             ['some_context'],
@@ -81,6 +82,7 @@ class TraceableChainSubresourceDataCollectorTest extends TestCase
                 new class() implements SubresourceDataProviderInterface, RestrictedDataProviderInterface {
                     public function getSubresource(string $resourceClass, array $identifiers, array $context, string $operationName = null)
                     {
+                        return null;
                     }
 
                     public function supports(string $resourceClass, string $operationName = null, array $context = []): bool
@@ -91,6 +93,7 @@ class TraceableChainSubresourceDataCollectorTest extends TestCase
                 new class() implements SubresourceDataProviderInterface, RestrictedDataProviderInterface {
                     public function getSubresource(string $resourceClass, array $identifiers, array $context, string $operationName = null)
                     {
+                        return null;
                     }
 
                     public function supports(string $resourceClass, string $operationName = null, array $context = []): bool
@@ -101,6 +104,7 @@ class TraceableChainSubresourceDataCollectorTest extends TestCase
                 new class() implements SubresourceDataProviderInterface {
                     public function getSubresource(string $resourceClass, array $identifiers, array $context, string $operationName = null)
                     {
+                        return null;
                     }
                 },
             ]),
@@ -122,6 +126,7 @@ class TraceableChainSubresourceDataCollectorTest extends TestCase
                 new class() implements SubresourceDataProviderInterface {
                     public function getSubresource(string $resourceClass, array $identifiers, array $context, string $operationName = null)
                     {
+                        return null;
                     }
                 },
             ]),

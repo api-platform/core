@@ -14,9 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Bridge\Symfony\Bundle\Test\Constraint;
 
 use PHPUnit\Framework\Constraint\Constraint;
-use PHPUnit\Framework\ExpectationFailedException;
 use SebastianBergmann\Comparator\ComparisonFailure;
-use SebastianBergmann\RecursionContext\InvalidArgumentException;
 
 /**
  * Constraint that asserts that the array it is evaluated for has a specified subset.
@@ -43,21 +41,7 @@ final class ArraySubset extends Constraint
     }
 
     /**
-     * Evaluates the constraint for parameter $other.
-     *
-     * If $returnResult is set to false (the default), an exception is thrown
-     * in case of a failure. null is returned otherwise.
-     *
-     * If $returnResult is true, the result of the evaluation is returned as
-     * a boolean value instead: true in case of success, false in case of a
-     * failure.
-     *
-     * @param iterable $other
-     *
-     * @throws ExpectationFailedException
-     * @throws InvalidArgumentException
-     *
-     * @return iterable|bool|null
+     * {@inheritdoc}
      */
     public function evaluate($other, string $description = '', bool $returnResult = false)
     {
@@ -88,9 +72,7 @@ final class ArraySubset extends Constraint
     }
 
     /**
-     * Returns a string representation of the constraint.
-     *
-     * @throws InvalidArgumentException
+     * {@inheritdoc}
      */
     public function toString(): string
     {
@@ -98,14 +80,7 @@ final class ArraySubset extends Constraint
     }
 
     /**
-     * Returns the description of the failure.
-     *
-     * The beginning of failure messages is "Failed asserting that" in most
-     * cases. This method should return the second part of that sentence.
-     *
-     * @param mixed $other evaluated value or object
-     *
-     * @throws InvalidArgumentException
+     * {@inheritdoc}
      */
     protected function failureDescription($other): string
     {
@@ -120,10 +95,7 @@ final class ArraySubset extends Constraint
         if ($other instanceof \ArrayObject) {
             return $other->getArrayCopy();
         }
-        if ($other instanceof \Traversable) {
-            return iterator_to_array($other);
-        }
-        // Keep BC even if we know that array would not be the expected one
-        return (array) $other;
+
+        return iterator_to_array($other);
     }
 }

@@ -64,6 +64,7 @@ class TraceableChainCollectionDataCollectorTest extends TestCase
             new class() implements CollectionDataProviderInterface {
                 public function getCollection(string $resourceClass, string $operationName = null)
                 {
+                    return [];
                 }
             },
             ['some_context'],
@@ -125,6 +126,7 @@ class TraceableChainCollectionDataCollectorTest extends TestCase
                 new class() implements CollectionDataProviderInterface {
                     public function getCollection(string $resourceClass, string $operationName = null)
                     {
+                        return [];
                     }
                 },
             ]),
