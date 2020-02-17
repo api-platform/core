@@ -198,15 +198,41 @@ final class SubresourceDataProvider implements SubresourceDataProviderInterface
                 ->from($identifierResourceClass, $alias);
         }
 
+        $lastIdentifer = 1 === $remainingIdentifiers;
+        $association = $classMetadata->hasAssociation($previousAssociationProperty) ? $classMetadata->getAssociationMapping($previousAssociationProperty) : [];
+        $optimizable = $lastIdentifer && (
+                (isset($association['inversedBy']) && ClassMetadataInfo::ONE_TO_ONE === $association['type'])
+                || (isset($association['mappedBy']) && ClassMetadataInfo::ONE_TO_MANY === $association['type'])
+            );
+
         // Add where clause for identifiers
         foreach ($normalizedIdentifiers as $key => $value) {
             $placeholder = $queryNameGenerator->generateParameterName($key);
-            $qb->andWhere("$alias.$key = :$placeholder");
+            if ($optimizable) {
+                // Add where clause for identifiers, but not via a WHERE ... IN ( ...subquery... ). Instead we use
+                // a direct identifier equality clause, to speed thing up when dealing with large tables.
+                // We may do so as there is no more recursion levels from here.
+
+                if (ClassMetadataInfo::ONE_TO_ONE === $association['type']) {
+                    $joinAlias = $queryNameGenerator->generateJoinAlias($association['inversedBy']);
+
+                    $previousQueryBuilder->innerJoin("$previousAlias.{$association['inversedBy']}", $joinAlias)
+                        ->andWhere("$joinAlias.$key = :$placeholder");
+                } else {
+                    $previousQueryBuilder->andWhere("IDENTITY($previousAlias) = :$placeholder");
+                }
+            } else {
+                $qb->andWhere("$alias.$key = :$placeholder");
+            }
             $topQueryBuilder->setParameter($placeholder, $value, (string) $classMetadata->getTypeOfField($key));
         }
 
         // Recurse queries
         $qb = $this->buildQuery($identifiers, $context, $queryNameGenerator, $qb, $alias, --$remainingIdentifiers, $topQueryBuilder);
+
+        if ($optimizable) {
+            return $previousQueryBuilder;
+        }
 
         return $previousQueryBuilder->andWhere($qb->expr()->in($previousAlias, $qb->getDQL()));
     }
