@@ -87,6 +87,12 @@ final class TypeFactory implements TypeFactoryInterface
                 'format' => 'date-time',
             ];
         }
+        if (is_a($className, \DateInterval::class, true)) {
+            return [
+                'type' => 'string',
+                'format' => 'duration',
+            ];
+        }
         if (is_a($className, UuidInterface::class, true)) {
             return [
                 'type' => 'string',

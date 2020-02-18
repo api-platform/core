@@ -39,6 +39,7 @@ class TypeFactoryTest extends TestCase
         yield [['type' => 'boolean'], new Type(Type::BUILTIN_TYPE_BOOL)];
         yield [['type' => 'string'], new Type(Type::BUILTIN_TYPE_OBJECT)];
         yield [['type' => 'string', 'format' => 'date-time'], new Type(Type::BUILTIN_TYPE_OBJECT, false, \DateTimeImmutable::class)];
+        yield [['type' => 'string', 'format' => 'duration'], new Type(Type::BUILTIN_TYPE_OBJECT, false, \DateInterval::class)];
         yield [['type' => 'string'], new Type(Type::BUILTIN_TYPE_OBJECT, false, Dummy::class)];
         yield [['type' => 'array', 'items' => ['type' => 'string']], new Type(Type::BUILTIN_TYPE_STRING, false, null, true)];
     }
