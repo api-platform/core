@@ -99,15 +99,11 @@ final class TypeFactory implements TypeFactoryInterface
             return ['type' => 'string'];
         }
 
-        if (true !== $readableLink) {
-            if ($this->isResourceClass($className)) {
-                return [
-                    'type' => 'string',
-                    'format' => 'iri-reference',
-                ];
-            }
-
-            return ['type' => 'string'];
+        if ($this->isResourceClass($className) && true !== $readableLink) {
+            return [
+                'type' => 'string',
+                'format' => 'iri-reference',
+            ];
         }
 
         $version = $schema->getVersion();
