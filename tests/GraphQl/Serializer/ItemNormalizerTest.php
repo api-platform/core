@@ -123,6 +123,57 @@ class ItemNormalizerTest extends TestCase
         ]));
     }
 
+    public function testNormalizeNoResolverData(): void
+    {
+        $dummy = new Dummy();
+        $dummy->setName('hello');
+
+        $propertyNameCollection = new PropertyNameCollection(['name']);
+        $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
+        $propertyNameCollectionFactoryProphecy->create(Dummy::class, [])->willReturn($propertyNameCollection);
+
+        $propertyMetadata = new PropertyMetadata(null, null, true);
+        $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
+        $propertyMetadataFactoryProphecy->create(Dummy::class, 'name', [])->willReturn($propertyMetadata);
+
+        $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
+        $iriConverterProphecy->getIriFromItem($dummy)->willReturn('/dummies/1');
+
+        $identifiersExtractorProphecy = $this->prophesize(IdentifiersExtractorInterface::class);
+
+        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
+        $resourceClassResolverProphecy->getResourceClass($dummy, null)->willReturn(Dummy::class);
+
+        $serializerProphecy = $this->prophesize(SerializerInterface::class);
+        $serializerProphecy->willImplement(NormalizerInterface::class);
+        $serializerProphecy->normalize('hello', ItemNormalizer::FORMAT, Argument::type('array'))->willReturn('hello');
+
+        $normalizer = new ItemNormalizer(
+            $propertyNameCollectionFactoryProphecy->reveal(),
+            $propertyMetadataFactoryProphecy->reveal(),
+            $iriConverterProphecy->reveal(),
+            $identifiersExtractorProphecy->reveal(),
+            $resourceClassResolverProphecy->reveal(),
+            null,
+            null,
+            null,
+            null,
+            false,
+            null,
+            [],
+            null
+        );
+        $normalizer->setSerializer($serializerProphecy->reveal());
+
+        $expected = [
+            'name' => 'hello',
+        ];
+        $this->assertEquals($expected, $normalizer->normalize($dummy, ItemNormalizer::FORMAT, [
+            'resources' => [],
+            'no_resolver_data' => true,
+        ]));
+    }
+
     public function testDenormalize()
     {
         $context = ['resource_class' => Dummy::class, 'api_allow_update' => true];

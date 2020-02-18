@@ -15,6 +15,7 @@ namespace ApiPlatform\Core\GraphQl\Resolver\Stage;
 
 use ApiPlatform\Core\DataProvider\Pagination;
 use ApiPlatform\Core\DataProvider\PaginatorInterface;
+use ApiPlatform\Core\GraphQl\Resolver\Util\IdentifierTrait;
 use ApiPlatform\Core\GraphQl\Serializer\ItemNormalizer;
 use ApiPlatform\Core\GraphQl\Serializer\SerializerContextBuilderInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
@@ -29,6 +30,8 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
  */
 final class SerializeStage implements SerializeStageInterface
 {
+    use IdentifierTrait;
+
     private $resourceMetadataFactory;
     private $normalizer;
     private $serializerContextBuilder;
@@ -49,6 +52,7 @@ final class SerializeStage implements SerializeStageInterface
     {
         $isCollection = $context['is_collection'];
         $isMutation = $context['is_mutation'];
+        $isSubscription = $context['is_subscription'];
 
         $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
         if (!$resourceMetadata->getGraphqlAttribute($operationName, 'serialize', true, true)) {
@@ -66,17 +70,19 @@ final class SerializeStage implements SerializeStageInterface
                 return $this->getDefaultMutationData($context);
             }
 
+            if ($isSubscription) {
+                return $this->getDefaultSubscriptionData($context);
+            }
+
             return null;
         }
 
         $normalizationContext = $this->serializerContextBuilder->create($resourceClass, $operationName, $context, true);
 
-        $args = $context['args'];
-
         $data = null;
         if (!$isCollection) {
             if ($isMutation && 'delete' === $operationName) {
-                $data = ['id' => $args['input']['id'] ?? null];
+                $data = ['id' => $this->getIdentifierFromContext($context)];
             } else {
                 $data = $this->normalizer->normalize($itemOrCollection, ItemNormalizer::FORMAT, $normalizationContext);
             }
@@ -99,10 +105,10 @@ final class SerializeStage implements SerializeStageInterface
             throw new \UnexpectedValueException('Expected serialized data to be a nullable array.');
         }
 
-        if ($isMutation) {
+        if ($isMutation || $isSubscription) {
             $wrapFieldName = lcfirst($resourceMetadata->getShortName());
 
-            return [$wrapFieldName => $data] + $this->getDefaultMutationData($context);
+            return [$wrapFieldName => $data] + ($isMutation ? $this->getDefaultMutationData($context) : $this->getDefaultSubscriptionData($context));
         }
 
         return $data;
@@ -200,5 +206,10 @@ final class SerializeStage implements SerializeStageInterface
     private function getDefaultMutationData(array $context): array
     {
         return ['clientMutationId' => $context['args']['input']['clientMutationId'] ?? null];
+    }
+
+    private function getDefaultSubscriptionData(array $context): array
+    {
+        return ['clientSubscriptionId' => $context['args']['input']['clientSubscriptionId'] ?? null];
     }
 }

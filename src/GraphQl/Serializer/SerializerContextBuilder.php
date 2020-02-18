@@ -49,6 +49,10 @@ final class SerializerContextBuilder implements SerializerContextBuilderInterfac
             $context['attributes'] = $this->fieldsToAttributes($resourceMetadata, $resolverContext);
         }
 
+        if (isset($resolverContext['fields'])) {
+            $context['no_resolver_data'] = true;
+        }
+
         if ($resourceMetadata) {
             $context['input'] = $resourceMetadata->getGraphqlAttribute($operationName, 'input', null, true);
             $context['output'] = $resourceMetadata->getGraphqlAttribute($operationName, 'output', null, true);
@@ -65,15 +69,19 @@ final class SerializerContextBuilder implements SerializerContextBuilderInterfac
      */
     private function fieldsToAttributes(?ResourceMetadata $resourceMetadata, array $context): array
     {
-        /** @var ResolveInfo $info */
-        $info = $context['info'];
-        $fields = $info->getFieldSelection(PHP_INT_MAX);
+        if (isset($context['fields'])) {
+            $fields = $context['fields'];
+        } else {
+            /** @var ResolveInfo $info */
+            $info = $context['info'];
+            $fields = $info->getFieldSelection(PHP_INT_MAX);
+        }
 
         $attributes = $this->replaceIdKeys($fields['edges']['node'] ?? $fields);
 
-        if ($context['is_mutation']) {
+        if ($context['is_mutation'] || $context['is_subscription']) {
             if (!$resourceMetadata) {
-                throw new \LogicException('ResourceMetadata should always exist for a mutation.');
+                throw new \LogicException('ResourceMetadata should always exist for a mutation or a subscription.');
             }
 
             $wrapFieldName = lcfirst($resourceMetadata->getShortName());

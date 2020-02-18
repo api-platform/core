@@ -40,6 +40,15 @@
             <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
         </service>
 
+        <service id="api_platform.graphql.resolver.factory.item_subscription" class="ApiPlatform\Core\GraphQl\Resolver\Factory\ItemSubscriptionResolverFactory" public="false">
+            <argument type="service" id="api_platform.graphql.resolver.stage.read" />
+            <argument type="service" id="api_platform.graphql.resolver.stage.security" />
+            <argument type="service" id="api_platform.graphql.resolver.stage.serialize" />
+            <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
+            <argument type="service" id="api_platform.graphql.subscription.subscription_manager" />
+            <argument type="service" id="api_platform.graphql.subscription.mercure_iri_generator" on-invalid="ignore" />
+        </service>
+
         <!-- Resolver Stages -->
 
         <service id="api_platform.graphql.resolver.stage.read" class="ApiPlatform\Core\GraphQl\Resolver\Stage\ReadStage" public="false">
@@ -140,6 +149,7 @@
             <argument type="service" id="api_platform.graphql.resolver.factory.item" />
             <argument type="service" id="api_platform.graphql.resolver.factory.collection" />
             <argument type="service" id="api_platform.graphql.resolver.factory.item_mutation" />
+            <argument type="service" id="api_platform.graphql.resolver.factory.item_subscription" />
             <argument type="service" id="api_platform.filter_locator" />
             <argument type="service" id="api_platform.pagination" />
             <argument type="service" id="api_platform.name_converter" on-invalid="ignore" />
@@ -240,6 +250,21 @@
             <argument type="service" id="api_platform.name_converter" on-invalid="ignore" />
         </service>
         <service id="ApiPlatform\Core\GraphQl\Serializer\SerializerContextBuilderInterface" alias="api_platform.graphql.serializer.context_builder" />
+
+        <!-- Subscription -->
+
+        <service id="api_platform.graphql.subscription.subscription_manager" class="ApiPlatform\Core\GraphQl\Subscription\SubscriptionManager">
+            <argument type="service" id="api_platform.graphql.cache.subscription" />
+            <argument type="service" id="api_platform.graphql.subscription.subscription_identifier_generator" />
+            <argument type="service" id="api_platform.graphql.resolver.stage.serialize" />
+            <argument type="service" id="api_platform.iri_converter" />
+        </service>
+
+        <service id="api_platform.graphql.subscription.subscription_identifier_generator" class="ApiPlatform\Core\GraphQl\Subscription\SubscriptionIdentifierGenerator" />
+
+        <service id="api_platform.graphql.cache.subscription" parent="cache.system" public="false">
+            <tag name="cache.pool" />
+        </service>
 
         <!-- Command -->
 

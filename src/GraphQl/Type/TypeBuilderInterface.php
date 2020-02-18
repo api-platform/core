@@ -34,7 +34,7 @@ interface TypeBuilderInterface
      *
      * @return ObjectType|NonNull the object type, possibly wrapped by NonNull
      */
-    public function getResourceObjectType(?string $resourceClass, ResourceMetadata $resourceMetadata, bool $input, ?string $queryName, ?string $mutationName, bool $wrapped, int $depth): GraphQLType;
+    public function getResourceObjectType(?string $resourceClass, ResourceMetadata $resourceMetadata, bool $input, ?string $queryName, ?string $mutationName, ?string $subscriptionName, bool $wrapped, int $depth): GraphQLType;
 
     /**
      * Get the interface type of a node.

@@ -85,8 +85,10 @@ final class ObjectNormalizer implements NormalizerInterface, CacheableSupportsMe
             $data['id'] = $this->iriConverter->getIriFromItem($originalResource);
         }
 
-        $data[self::ITEM_RESOURCE_CLASS_KEY] = $this->getObjectClass($originalResource);
-        $data[self::ITEM_IDENTIFIERS_KEY] = $this->identifiersExtractor->getIdentifiersFromItem($originalResource);
+        if (!($context['no_resolver_data'] ?? false)) {
+            $data[self::ITEM_RESOURCE_CLASS_KEY] = $this->getObjectClass($originalResource);
+            $data[self::ITEM_IDENTIFIERS_KEY] = $this->identifiersExtractor->getIdentifiersFromItem($originalResource);
+        }
 
         return $data;
     }

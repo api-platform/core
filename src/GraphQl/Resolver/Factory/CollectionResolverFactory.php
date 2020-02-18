@@ -71,7 +71,7 @@ final class CollectionResolverFactory implements ResolverFactoryInterface
             }
 
             $operationName = $operationName ?? 'collection_query';
-            $resolverContext = ['source' => $source, 'args' => $args, 'info' => $info, 'is_collection' => true, 'is_mutation' => false];
+            $resolverContext = ['source' => $source, 'args' => $args, 'info' => $info, 'is_collection' => true, 'is_mutation' => false, 'is_subscription' => false];
 
             $collection = ($this->readStage)($resourceClass, $rootClass, $operationName, $resolverContext);
             if (!is_iterable($collection)) {

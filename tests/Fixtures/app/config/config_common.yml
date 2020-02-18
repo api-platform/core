@@ -235,6 +235,8 @@ services:
 
     mercure.hub.default.publisher:
         class: ApiPlatform\Core\Tests\Fixtures\DummyMercurePublisher
+        public: true
+        tags: ['messenger.message_handler']
 
     app.serializer.normalizer.override_documentation:
         class: ApiPlatform\Core\Tests\Fixtures\TestBundle\Serializer\Normalizer\OverrideDocumentationNormalizer
