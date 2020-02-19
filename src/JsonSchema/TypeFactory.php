@@ -156,10 +156,6 @@ final class TypeFactory implements TypeFactoryInterface
      * @param array<string, mixed> $jsonSchema
      *
      * @return array<string, mixed>
-     *
-     * @psalm-param array{type=: string|list<string>} $jsonSchema
-     *
-     * @psalm-return array{type=: string|list<string>, $ref=: string}
      */
     private function addNullabilityToTypeDefinition(array $jsonSchema, Type $type): array
     {
