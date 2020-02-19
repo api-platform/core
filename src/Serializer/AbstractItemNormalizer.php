@@ -17,6 +17,7 @@ use ApiPlatform\Core\Api\IriConverterInterface;
 use ApiPlatform\Core\Api\ResourceClassResolverInterface;
 use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
 use ApiPlatform\Core\DataTransformer\DataTransformerInterface;
+use ApiPlatform\Core\DataTransformer\PreHydrateInputInterface;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\Exception\InvalidValueException;
 use ApiPlatform\Core\Exception\ItemNotFoundException;
@@ -205,9 +206,6 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
                 throw new \UnexpectedValueException('Expected denormalized input to be an object.');
             }
             if ($dataTransformer instanceof PreHydrateInputInterface) {
-                unset($context[static::OBJECT_TO_POPULATE]);
-            }
-            if (null !== $objectToPopulate) {
                 $context[static::OBJECT_TO_POPULATE] = $objectToPopulate;
             }
 
