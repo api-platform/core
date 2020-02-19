@@ -17,9 +17,6 @@ use ApiPlatform\Core\Api\ResourceClassResolverInterface;
 use ApiPlatform\Core\Util\ResourceClassInfoTrait;
 use Ramsey\Uuid\UuidInterface;
 use Symfony\Component\PropertyInfo\Type;
-use function array_merge;
-use function array_unique;
-use function array_values;
 
 /**
  * {@inheritdoc}
@@ -163,27 +160,11 @@ final class TypeFactory implements TypeFactoryInterface
             return $jsonSchema;
         }
 
-        if (!\array_key_exists('type', $jsonSchema)) {
-            return [
-                'oneOf' => [
-                    ['type' => 'null'],
-                    $jsonSchema,
-                ],
-            ];
-        }
-
-        return array_merge($jsonSchema, ['type' => $this->addNullToTypes((array) $jsonSchema['type'])]);
-    }
-
-    /**
-     * @param string[] $types
-     *
-     * @return string[]
-     *
-     * @psalm-param list<string> $types
-     */
-    private function addNullToTypes(array $types): array
-    {
-        return array_values(array_unique(array_merge($types, ['null'])));
+        return [
+            'oneOf' => [
+                ['type' => 'null'],
+                $jsonSchema,
+            ],
+        ];
     }
 }

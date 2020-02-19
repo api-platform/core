@@ -35,28 +35,36 @@ class TypeFactoryTest extends TestCase
     public function typeProvider(): iterable
     {
         yield [['type' => 'integer'], new Type(Type::BUILTIN_TYPE_INT)];
-        yield [['type' => ['integer', 'null']], new Type(Type::BUILTIN_TYPE_INT, true)];
+        yield [['oneOf' => [['type' => 'null'], ['type' => 'integer']]], new Type(Type::BUILTIN_TYPE_INT, true)];
         yield [['type' => 'number'], new Type(Type::BUILTIN_TYPE_FLOAT)];
-        yield [['type' => ['number', 'null']], new Type(Type::BUILTIN_TYPE_FLOAT, true)];
+        yield [['oneOf' => [['type' => 'null'], ['type' => 'number']]], new Type(Type::BUILTIN_TYPE_FLOAT, true)];
         yield [['type' => 'boolean'], new Type(Type::BUILTIN_TYPE_BOOL)];
-        yield [['type' => ['boolean', 'null']], new Type(Type::BUILTIN_TYPE_BOOL, true)];
+        yield [['oneOf' => [['type' => 'null'], ['type' => 'boolean']]], new Type(Type::BUILTIN_TYPE_BOOL, true)];
         yield [['type' => 'string'], new Type(Type::BUILTIN_TYPE_STRING)];
-        yield [['type' => ['string', 'null']], new Type(Type::BUILTIN_TYPE_STRING, true)];
+        yield [['oneOf' => [['type' => 'null'], ['type' => 'string']]], new Type(Type::BUILTIN_TYPE_STRING, true)];
         yield [['type' => 'object'], new Type(Type::BUILTIN_TYPE_OBJECT)];
-        yield [['type' => ['object', 'null']], new Type(Type::BUILTIN_TYPE_OBJECT, true)];
+        yield [['oneOf' => [['type' => 'null'], ['type' => 'object']]], new Type(Type::BUILTIN_TYPE_OBJECT, true)];
         yield [['type' => 'string', 'format' => 'date-time'], new Type(Type::BUILTIN_TYPE_OBJECT, false, \DateTimeImmutable::class)];
-        yield [['type' => ['string', 'null'], 'format' => 'date-time'], new Type(Type::BUILTIN_TYPE_OBJECT, true, \DateTimeImmutable::class)];
+        yield [['oneOf' => [['type' => 'null'], ['type' => 'string', 'format' => 'date-time']]], new Type(Type::BUILTIN_TYPE_OBJECT, true, \DateTimeImmutable::class)];
         yield [['type' => 'string', 'format' => 'duration'], new Type(Type::BUILTIN_TYPE_OBJECT, false, \DateInterval::class)];
         yield [['type' => 'object'], new Type(Type::BUILTIN_TYPE_OBJECT, false, Dummy::class)];
-        yield [['type' => ['object', 'null']], new Type(Type::BUILTIN_TYPE_OBJECT, true, Dummy::class)];
+        yield [['oneOf' => [['type' => 'null'], ['type' => 'object']]], new Type(Type::BUILTIN_TYPE_OBJECT, true, Dummy::class)];
         yield [['type' => 'array', 'items' => ['type' => 'string']], new Type(Type::BUILTIN_TYPE_STRING, false, null, true)];
         yield 'array can be itself nullable' => [
-            ['type' => ['array', 'null'], 'items' => ['type' => 'string']],
+            ['oneOf' => [['type' => 'null'], ['type' => 'array', 'items' => ['type' => 'string']]]],
             new Type(Type::BUILTIN_TYPE_STRING, true, null, true),
         ];
 
         yield 'array can contain nullable values' => [
-            ['type' => 'array', 'items' => ['type' => ['string', 'null']]],
+            [
+                'type' => 'array',
+                'items' => [
+                    'oneOf' => [
+                        ['type' => 'null'],
+                        ['type' => 'string'],
+                    ],
+                ],
+            ],
             new Type(Type::BUILTIN_TYPE_STRING, false, null, true, null, new Type(Type::BUILTIN_TYPE_STRING, true, null, false)),
         ];
 
@@ -72,7 +80,12 @@ class TypeFactoryTest extends TestCase
         ];
 
         yield 'nullable map with string keys becomes a nullable object' => [
-            ['type' => ['object', 'null'], 'additionalProperties' => ['type' => 'string']],
+            [
+                'oneOf' => [
+                    ['type' => 'null'],
+                    ['type' => 'object', 'additionalProperties' => ['type' => 'string']],
+                ],
+            ],
             new Type(
                 Type::BUILTIN_TYPE_STRING,
                 true,
@@ -96,7 +109,15 @@ class TypeFactoryTest extends TestCase
         ];
 
         yield 'map value type nullability will be considered' => [
-            ['type' => 'object', 'additionalProperties' => ['type' => ['integer', 'null']]],
+            [
+                'type' => 'object',
+                'additionalProperties' => [
+                    'oneOf' => [
+                        ['type' => 'null'],
+                        ['type' => 'integer'],
+                    ],
+                ],
+            ],
             new Type(
                 Type::BUILTIN_TYPE_ARRAY,
                 false,
@@ -108,7 +129,20 @@ class TypeFactoryTest extends TestCase
         ];
 
         yield 'nullable map can contain nullable values' => [
-            ['type' => ['object', 'null'], 'additionalProperties' => ['type' => ['integer', 'null']]],
+            [
+                'oneOf' => [
+                    ['type' => 'null'],
+                    [
+                        'type' => 'object',
+                        'additionalProperties' => [
+                            'oneOf' => [
+                                ['type' => 'null'],
+                                ['type' => 'integer'],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
             new Type(
                 Type::BUILTIN_TYPE_ARRAY,
                 true,

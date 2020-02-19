@@ -343,9 +343,14 @@ class DocumentationNormalizerV2Test extends TestCase
                             'description' => 'This is an initializable but not writable property.',
                         ]),
                         'dummyDate' => new \ArrayObject([
-                            'type' => ['string', 'null'],
+                            'oneOf' => [
+                                ['type' => 'null'],
+                                [
+                                    'type' => 'string',
+                                    'format' => 'date-time',
+                                ],
+                            ],
                             'description' => 'This is a \DateTimeInterface object.',
-                            'format' => 'date-time',
                         ]),
                     ],
                 ]),
