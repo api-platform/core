@@ -17,6 +17,9 @@ use ApiPlatform\Core\Api\ResourceClassResolverInterface;
 use ApiPlatform\Core\Util\ResourceClassInfoTrait;
 use Ramsey\Uuid\UuidInterface;
 use Symfony\Component\PropertyInfo\Type;
+use function array_merge;
+use function array_unique;
+use function array_values;
 
 /**
  * {@inheritdoc}
@@ -50,14 +53,37 @@ final class TypeFactory implements TypeFactoryInterface
     public function getType(Type $type, string $format = 'json', ?bool $readableLink = null, ?array $serializerContext = null, Schema $schema = null): array
     {
         if ($type->isCollection()) {
-            $subType = new Type($type->getBuiltinType(), $type->isNullable(), $type->getClassName(), false);
+            $keyType = $type->getCollectionKeyType();
+            $subType = $type->getCollectionValueType()
+                ?? new Type($type->getBuiltinType(), false, $type->getClassName(), false);
 
-            return [
-                'type' => 'array',
-                'items' => $this->getType($subType, $format, $readableLink, $serializerContext, $schema),
-            ];
+            if (null !== $keyType && Type::BUILTIN_TYPE_STRING === $keyType->getBuiltinType()) {
+                return $this->addNullabilityToTypeDefinition(
+                    [
+                        'type' => 'object',
+                        'additionalProperties' => $this->getType($subType, $format, $readableLink, $serializerContext, $schema),
+                    ],
+                    $type
+                );
+            }
+
+            return $this->addNullabilityToTypeDefinition(
+                [
+                    'type' => 'array',
+                    'items' => $this->getType($subType, $format, $readableLink, $serializerContext, $schema),
+                ],
+                $type
+            );
         }
 
+        return $this->addNullabilityToTypeDefinition(
+            $this->makeBasicType($type, $format, $readableLink, $serializerContext, $schema),
+            $type
+        );
+    }
+
+    private function makeBasicType(Type $type, string $format = 'json', ?bool $readableLink = null, ?array $serializerContext = null, Schema $schema = null): array
+    {
         switch ($type->getBuiltinType()) {
             case Type::BUILTIN_TYPE_INT:
                 return ['type' => 'integer'];
@@ -78,7 +104,7 @@ final class TypeFactory implements TypeFactoryInterface
     private function getClassType(?string $className, string $format = 'json', ?bool $readableLink = null, ?array $serializerContext = null, ?Schema $schema = null): array
     {
         if (null === $className) {
-            return ['type' => 'string'];
+            return ['type' => 'object'];
         }
 
         if (is_a($className, \DateTimeInterface::class, true)) {
@@ -102,7 +128,7 @@ final class TypeFactory implements TypeFactoryInterface
 
         // Skip if $schema is null (filters only support basic types)
         if (null === $schema) {
-            return ['type' => 'string'];
+            return ['type' => 'object'];
         }
 
         if ($this->isResourceClass($className) && true !== $readableLink) {
@@ -124,5 +150,44 @@ final class TypeFactory implements TypeFactoryInterface
         $subSchema = $this->schemaFactory->buildSchema($className, $format, Schema::TYPE_OUTPUT, null, null, $subSchema, $serializerContext);
 
         return ['$ref' => $subSchema['$ref']];
+    }
+
+    /**
+     * @param array<string, mixed> $jsonSchema
+     *
+     * @return array<string, mixed>
+     *
+     * @psalm-param array{type=: string|list<string>} $jsonSchema
+     *
+     * @psalm-return array{type=: string|list<string>, $ref=: string}
+     */
+    private function addNullabilityToTypeDefinition(array $jsonSchema, Type $type): array
+    {
+        if (!$type->isNullable()) {
+            return $jsonSchema;
+        }
+
+        if (!\array_key_exists('type', $jsonSchema)) {
+            return [
+                'oneOf' => [
+                    ['type' => 'null'],
+                    $jsonSchema,
+                ],
+            ];
+        }
+
+        return array_merge($jsonSchema, ['type' => $this->addNullToTypes((array) $jsonSchema['type'])]);
+    }
+
+    /**
+     * @param string[] $types
+     *
+     * @return string[]
+     *
+     * @psalm-param list<string> $types
+     */
+    private function addNullToTypes(array $types): array
+    {
+        return array_values(array_unique(array_merge($types, ['null'])));
     }
 }
