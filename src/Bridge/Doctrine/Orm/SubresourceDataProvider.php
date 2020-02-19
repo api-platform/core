@@ -205,7 +205,7 @@ final class SubresourceDataProvider implements SubresourceDataProviderInterface
             $placeholder = $queryNameGenerator->generateParameterName($key);
             $topQueryBuilder->setParameter($placeholder, $value, (string) $classMetadata->getTypeOfField($key));
 
-            // Optimizaion: add where clause for identifiers, but not via a WHERE ... IN ( ...subquery... ).
+            // Optimization: add where clause for identifiers, but not via a WHERE ... IN ( ...subquery... ).
             // Instead we use a direct identifier equality clause, to speed thing up when dealing with large tables.
             // We may do so if there is no more recursion levels from here, and if relation allows it.
             $association = $classMetadata->hasAssociation($previousAssociationProperty) ? $classMetadata->getAssociationMapping($previousAssociationProperty) : [];
