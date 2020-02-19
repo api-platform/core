@@ -198,11 +198,30 @@ final class SubresourceDataProvider implements SubresourceDataProviderInterface
                 ->from($identifierResourceClass, $alias);
         }
 
+        $isLeaf = 1 === $remainingIdentifiers;
+
         // Add where clause for identifiers
         foreach ($normalizedIdentifiers as $key => $value) {
             $placeholder = $queryNameGenerator->generateParameterName($key);
-            $qb->andWhere("$alias.$key = :$placeholder");
             $topQueryBuilder->setParameter($placeholder, $value, (string) $classMetadata->getTypeOfField($key));
+
+            // Optimization: add where clause for identifiers, but not via a WHERE ... IN ( ...subquery... ).
+            // Instead we use a direct identifier equality clause, to speed things up when dealing with large tables.
+            // We may do so if there is no more recursion levels from here, and if relation allows it.
+            $association = $classMetadata->hasAssociation($previousAssociationProperty) ? $classMetadata->getAssociationMapping($previousAssociationProperty) : [];
+            $oneToOneBidirectional = isset($association['inversedBy']) && ClassMetadataInfo::ONE_TO_ONE === $association['type'];
+            $oneToManyBidirectional = isset($association['mappedBy']) && ClassMetadataInfo::ONE_TO_MANY === $association['type'];
+            if ($isLeaf && $oneToOneBidirectional) {
+                $joinAlias = $queryNameGenerator->generateJoinAlias($association['inversedBy']);
+
+                return $previousQueryBuilder->innerJoin("$previousAlias.{$association['inversedBy']}", $joinAlias)
+                    ->andWhere("$joinAlias.$key = :$placeholder");
+            }
+            if ($isLeaf && $oneToManyBidirectional) {
+                return $previousQueryBuilder->andWhere("IDENTITY($previousAlias) = :$placeholder");
+            }
+
+            $qb->andWhere("$alias.$key = :$placeholder");
         }
 
         // Recurse queries
