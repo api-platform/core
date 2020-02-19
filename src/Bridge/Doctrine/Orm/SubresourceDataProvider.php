@@ -206,7 +206,7 @@ final class SubresourceDataProvider implements SubresourceDataProviderInterface
             $topQueryBuilder->setParameter($placeholder, $value, (string) $classMetadata->getTypeOfField($key));
 
             // Optimization: add where clause for identifiers, but not via a WHERE ... IN ( ...subquery... ).
-            // Instead we use a direct identifier equality clause, to speed thing up when dealing with large tables.
+            // Instead we use a direct identifier equality clause, to speed things up when dealing with large tables.
             // We may do so if there is no more recursion levels from here, and if relation allows it.
             $association = $classMetadata->hasAssociation($previousAssociationProperty) ? $classMetadata->getAssociationMapping($previousAssociationProperty) : [];
             $oneToOneBidirectional = isset($association['inversedBy']) && ClassMetadataInfo::ONE_TO_ONE === $association['type'];
