@@ -38,6 +38,7 @@ use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
 use Symfony\Component\Serializer\NameConverter\AdvancedNameConverterInterface;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
+use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
@@ -191,14 +192,11 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
                 throw new LogicException('Cannot denormalize the input because the injected serializer is not a denormalizer');
             }
             if ($dataTransformer instanceof PreHydrateInputInterface) {
-                $context[static::OBJECT_TO_POPULATE] = $dataTransformer->createInput($inputClass, $context);
+                $context[AbstractNormalizer::OBJECT_TO_POPULATE] = $dataTransformer->createInput($inputClass, $context);
             }
             $denormalizedInput = $this->serializer->denormalize($data, $inputClass, $format, $context);
             if (!\is_object($denormalizedInput)) {
                 throw new \UnexpectedValueException('Expected denormalized input to be an object.');
-            }
-            if ($dataTransformer instanceof PreHydrateInputInterface) {
-                $context[static::OBJECT_TO_POPULATE] = $objectToPopulate;
             }
 
             return $dataTransformer->transform($denormalizedInput, $resourceClass, $dataTransformerContext);
