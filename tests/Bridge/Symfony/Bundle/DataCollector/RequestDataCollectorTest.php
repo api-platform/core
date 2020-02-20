@@ -237,6 +237,7 @@ class RequestDataCollectorTest extends TestCase
             new class() implements CollectionDataProviderInterface {
                 public function getCollection(string $resourceClass, string $operationName = null)
                 {
+                    return [];
                 }
             },
         ]));
@@ -251,6 +252,7 @@ class RequestDataCollectorTest extends TestCase
             new class() implements ItemDataProviderInterface {
                 public function getItem(string $resourceClass, $id, string $operationName = null, array $context = [])
                 {
+                    return null;
                 }
             },
         ]));
@@ -265,6 +267,7 @@ class RequestDataCollectorTest extends TestCase
             new class() implements SubresourceDataProviderInterface {
                 public function getSubresource(string $resourceClass, array $identifiers, array $context, string $operationName = null)
                 {
+                    return null;
                 }
             },
         ]));

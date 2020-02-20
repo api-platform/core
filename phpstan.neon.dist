@@ -1,98 +1,110 @@
 parameters:
-	level: 6
+	level: 5
 	paths:
 		- src
 		- tests
 		- tests/Fixtures/app/console
 	inferPrivatePropertyTypeFromConstructor: true
 	symfony:
-		container_xml_path: %rootDir%/../../../tests/Fixtures/app/var/cache/test/appAppKernelTestDebugContainer.xml
+		container_xml_path: tests/Fixtures/app/var/cache/test/appAppKernelTestDebugContainer.xml
 		constant_hassers: false
 	autoload_files:
-		- %rootDir%/../../../tests/Fixtures/app/AppKernel.php
+		- tests/Fixtures/app/AppKernel.php
 	excludes_analyse:
-		- %rootDir%/../../../tests/Fixtures/app/var/cache
+		- tests/Fixtures/app/var/cache
 		# The Symfony Configuration API isn't good enough to be analysed
-		- %rootDir%/../../../src/Bridge/Symfony/Bundle/DependencyInjection/Configuration.php
+		- src/Bridge/Symfony/Bundle/DependencyInjection/Configuration.php
 		# Imported code (temporary)
-		- %rootDir%/../../../src/Bridge/Symfony/Bundle/Test/BrowserKitAssertionsTrait.php
-		- %rootDir%/../../../tests/Bridge/Symfony/Bundle/Test/WebTestCaseTest.php
+		- src/Bridge/Symfony/Bundle/Test/BrowserKitAssertionsTrait.php
+		- tests/Bridge/Symfony/Bundle/Test/WebTestCaseTest.php
+	earlyTerminatingMethodCalls:
+		PHPUnit\Framework\Constraint\Constraint:
+			- fail
 	ignoreErrors:
 		# Real problems, hard to fix
 		- '#Parameter \#2 \$dqlPart of method Doctrine\\ORM\\QueryBuilder::add\(\) expects array\|object, string given\.#'
 		-
 			message: '#Return type \(int\) of method ApiPlatform\\Core\\Identifier\\Normalizer\\IntegerDenormalizer::denormalize\(\) should be compatible with return type \(array\|object\) of method Symfony\\Component\\Serializer\\Normalizer\\DenormalizerInterface::denormalize\(\)#'
-			path: %currentWorkingDirectory%/src/Identifier/Normalizer/IntegerDenormalizer.php
+			path: src/Identifier/Normalizer/IntegerDenormalizer.php
 
 		# False positives
 		-
 			message: '#Variable \$iri might not be defined\.#'
-			path: %currentWorkingDirectory%/src/JsonApi/Serializer/ItemNormalizer.php
+			path: src/JsonApi/Serializer/ItemNormalizer.php
 		-
 			message: '#Variable \$positionPm might not be defined\.#'
-			path: %currentWorkingDirectory%/src/Util/ClassInfoTrait.php
+			path: src/Util/ClassInfoTrait.php
 		- '#Access to an undefined property Prophecy\\Prophecy\\ObjectProphecy<(\\?[a-zA-Z0-9_]+)+>::\$[a-zA-Z0-9_]+#'
 		-
 			message: '#Call to an undefined method Doctrine\\Persistence\\ObjectManager::getConnection\(\)#'
-			path: %currentWorkingDirectory%/src/Bridge/Doctrine/Common/Util/IdentifierManagerTrait.php
+			path: src/Bridge/Doctrine/Common/Util/IdentifierManagerTrait.php
 		# https://github.com/willdurand/Negotiation/issues/89#issuecomment-513283286
 		-
 			message: '#Call to an undefined method Negotiation\\AcceptHeader::getType\(\)\.#'
-			path: %currentWorkingDirectory%/src/EventListener/AddFormatListener.php
+			path: src/EventListener/AddFormatListener.php
 		# https://github.com/symfony/symfony/issues/31814#issuecomment-498749590
 		-
 			message: '#Call to an undefined method Symfony\\Component\\Security\\Core\\Role\\RoleHierarchyInterface::getReachableRoles\(\)\.#'
-			path: %currentWorkingDirectory%/src/Security/ResourceAccessChecker.php
-		- '#Parameter \#1 \$function of function call_user_func expects callable\(\): mixed, .+ given\.#'
-		- '#Parameter \#1 \$exception of static method Symfony\\Component\\Debug\\Exception\\FlattenException::create\(\) expects Exception, Symfony\\Component\\Serializer\\Exception\\ExceptionInterface given\.#'
-		- '#Parameter \#1 \$classes of class ApiPlatform\\Core\\Metadata\\Resource\\ResourceNameCollection constructor expects array<string>, array<int, int\|string> given\.#'
+			path: src/Security/ResourceAccessChecker.php
 		- '#Parameter \#1 \$vars of class GraphQL\\Language\\AST\\(IntValue|ObjectField|ObjectValue|BooleanValue|ListValue|StringValue)Node constructor expects array<bool\|float\|GraphQL\\Language\\AST\\Location\|GraphQL\\Language\\AST\\NameNode\|GraphQL\\Language\\AST\\NodeList\|GraphQL\\Language\\AST\\SelectionSetNode\|int\|string\|null>, array<string, .+> given\.#'
 		- '#Parameter \#1 \$defaultContext of class Symfony\\Component\\Serializer\\Encoder\\Json(De|En)code constructor expects array, (int|true) given\.#'
 		- '#Parameter \#(2|3) \$(resourceMetadataFactory|pagination) of class ApiPlatform\\Core\\Bridge\\Doctrine\\Orm\\Extension\\PaginationExtension constructor expects (ApiPlatform\\Core\\Metadata\\Resource\\Factory\\ResourceMetadataFactoryInterface\|Symfony\\Component\\HttpFoundation\\RequestStack|ApiPlatform\\Core\\DataProvider\\Pagination\|ApiPlatform\\Core\\Metadata\\Resource\\Factory\\ResourceMetadataFactoryInterface), stdClass given\.#'
-		- '#Parameter \#[0-9] \$filterLocator of class ApiPlatform\\Core\\Bridge\\Doctrine\\Orm\\Extension\\FilterExtension constructor expects ApiPlatform\\Core\\Api\\FilterCollection|Psr\\Container\\ContainerInterface(\|null)?, ArrayObject given\.#'
+		# https://github.com/phpDocumentor/ReflectionDocBlock/pull/209
 		-
-			message: '#Parameter \#1 \$resource of method ApiPlatform\\Core\\Metadata\\Extractor\\XmlExtractor::getAttributes\(\) expects SimpleXMLElement, object given\.#'
-			path: %currentWorkingDirectory%/src/Metadata/Extractor/XmlExtractor.php
+			message: '#Parameter \#1 \$docblock of method phpDocumentor\\Reflection\\DocBlockFactoryInterface::create\(\) expects string, ReflectionClass<mixed> given\.#'
+			path: src/Metadata/Resource/Factory/PhpDocResourceMetadataFactory.php
 		-
-			message: '#Parameter \#1 \$docblock of method phpDocumentor\\Reflection\\DocBlockFactoryInterface::create\(\) expects string, ReflectionClass given\.#'
-			path: %currentWorkingDirectory%/src/Metadata/Resource/Factory/PhpDocResourceMetadataFactory.php
+			message: '#Parameter \#[0-9] \$filterLocator of class .+ constructor expects ApiPlatform\\Core\\Api\\FilterCollection|Psr\\Container\\ContainerInterface, ArrayObject<mixed, mixed> given\.#'
+			paths:
+				- tests/Bridge/Doctrine/Orm/Extension/FilterExtensionTest.php
+				- tests/Bridge/NelmioApiDoc/Extractor/AnnotationsProvider/ApiPlatformProviderTest.php
+				- tests/Hydra/Serializer/CollectionFiltersNormalizerTest.php
+				- tests/Swagger/Serializer/DocumentationNormalizerV2Test.php
+				- tests/Swagger/Serializer/DocumentationNormalizerV3Test.php
 		-
 			message: '#Parameter \#1 \$objectValue of method GraphQL\\Type\\Definition\\InterfaceType::resolveType\(\) expects object, array(<string, string>)? given.#'
-			path: %currentWorkingDirectory%/tests/GraphQl/Type/TypeBuilderTest.php
+			path: tests/GraphQl/Type/TypeBuilderTest.php
+		# https://github.com/phpstan/phpstan-doctrine/issues/115
 		-
-			message: '#Property ApiPlatform\\Core\\Test\\DoctrineMongoDbOdmFilterTestCase::\$repository \(Doctrine\\ODM\\MongoDB\\Repository\\DocumentRepository\) does not accept Doctrine\\Persistence\\ObjectRepository\.#'
-			path: %currentWorkingDirectory%/src/Test/DoctrineMongoDbOdmFilterTestCase.php
+			message: '#Property ApiPlatform\\Core\\Test\\DoctrineMongoDbOdmFilterTestCase::\$repository \(Doctrine\\ODM\\MongoDB\\Repository\\DocumentRepository\) does not accept Doctrine\\ORM\\EntityRepository<ApiPlatform\\Core\\Tests\\Fixtures\\TestBundle\\Document\\Dummy>\.#'
+			path: src/Test/DoctrineMongoDbOdmFilterTestCase.php
 		-
-			message: '#Property ApiPlatform\\Core\\Test\\DoctrineOrmFilterTestCase::\$repository \(Doctrine\\ORM\\EntityRepository\) does not accept Doctrine\\Persistence\\ObjectRepository\.#'
-			path: %currentWorkingDirectory%/src/Test/DoctrineOrmFilterTestCase.php
-		- '#Method ApiPlatform\\Core\\Util\\RequestParser::parseRequestParams\(\) should return array but returns array\|false\.#'
+			message: "#Call to method PHPUnit\\\\Framework\\\\Assert::assertSame\\(\\) with array\\('(collection_context|item_context|subresource_context)'\\) and array<Symfony\\\\Component\\\\VarDumper\\\\Cloner\\\\Data>\\|bool\\|float\\|int\\|string\\|null will always evaluate to false\\.#"
+			path: tests/Bridge/Symfony/Bundle/DataCollector/RequestDataCollectorTest.php
+		# https://github.com/phpstan/phpstan-phpunit/issues/62
 		-
-			message: '#Method ApiPlatform\\Core\\Bridge\\Doctrine\\Orm\\Util\\QueryBuilderHelper::mapJoinAliases() should return array<string, array<string>\|string> but returns array<int|string, mixed>\.#'
-			path: %currentWorkingDirectory%/src/Bridge/Doctrine/Orm/Util/QueryBuilderHelper.php
-		# https://github.com/phpstan/phpstan/issues/1482
+			message: '#Call to method PHPUnit\\Framework\\Assert::assertSame\(\) with 2 and int will always evaluate to false\.#'
+			path: tests/Identifier/Normalizer/IntegerDenormalizerTest.php
 		-
-			message: "#Call to function method_exists\\(\\) with 'Symfony\\\\\\\\Component.+' and 'removeBindings' will always evaluate to false\\.#"
-			path: %currentWorkingDirectory%/tests/Bridge/Symfony/Bundle/DependencyInjection/ApiPlatformExtensionTest.php
-		-
-			message: "#Call to function method_exists\\(\\) with 'Symfony\\\\\\\\Component.+' and 'getReachableRoleNam.+' will always evaluate to false\\.#"
-			path: %currentWorkingDirectory%/tests/Security/EventListener/DenyAccessListenerTest.php
-		-
-			message: "#Call to function method_exists\\(\\) with 'Symfony\\\\\\\\Component.+' and 'getRoleNames' will always evaluate to false\\.#"
-			path: %currentWorkingDirectory%/tests/Security/EventListener/DenyAccessListenerTest.php
-		- "#Call to method PHPUnit\\\\Framework\\\\Assert::assertSame\\(\\) with array\\('(collection_context|item_context|subresource_context)'\\) and array<Symfony\\\\Component\\\\VarDumper\\\\Cloner\\\\Data>\\|bool\\|float\\|int\\|string\\|null will always evaluate to false\\.#"
+			message: '#Call to method PHPUnit\\Framework\\Assert::assertSame\(\) with array\(.+\) and array\(.+\) will always evaluate to false\.#'
+			path: tests/Util/SortTraitTest.php
 		-
 			message: '#Binary operation "\+" between (float\|int\|)?string and 0 results in an error\.#'
-			path: %currentWorkingDirectory%/src/Bridge/Doctrine/Common/Filter/RangeFilterTrait.php
+			path: src/Bridge/Doctrine/Common/Filter/RangeFilterTrait.php
 		# https://github.com/phpstan/phpstan-symfony/issues/27
 		-
 			message: '#Service "api_platform\.json_schema\.schema_factory" is private\.#'
-			path: %currentWorkingDirectory%/src/Bridge/Symfony/Bundle/Test/ApiTestAssertionsTrait.php
+			path: src/Bridge/Symfony/Bundle/Test/ApiTestAssertionsTrait.php
 		-
-			message: '#Service "api_platform.iri_converter" is private\.#'
-			path: %currentWorkingDirectory%/src/Bridge/Symfony/Bundle/Test/ApiTestCase.php
+			message: '#Service "api_platform\.iri_converter" is private\.#'
+			path: src/Bridge/Symfony/Bundle/Test/ApiTestCase.php
+		# https://github.com/phpstan/phpstan-symfony/issues/76
 		-
-			message: "#Call to method PHPUnit\\\\Framework\\\\Assert::assertSame\\(\\) with array\\(.+\\) and array\\(.+\\) will always evaluate to false\\.#"
-			path: %currentWorkingDirectory%/tests/Util/SortTraitTest.php
+			message: '#Service "api_platform\.graphql\.fields_builder" is private\.#'
+			path: src/GraphQl/Type/TypeBuilder.php
+		-
+			message: '#Service "test" is not registered in the container\.#'
+			path: tests/GraphQl/Type/TypesContainerTest.php
+		# https://github.com/phpstan/phpstan/issues/2999
+		-
+			message: '#ArrayObject<string, string> does not accept true\.#'
+			path: src/JsonSchema/SchemaFactory.php
+		-
+			message: '#ArrayObject<string, string> does not accept array<string, mixed>\.#'
+			path: src/JsonSchema/SchemaFactory.php
+		-
+			message: '#Cannot assign new offset to string\.#'
+			path: src/JsonSchema/SchemaFactory.php
 
 		# Expected, due to optional interfaces
 		- '#Method ApiPlatform\\Core\\Bridge\\Doctrine\\Orm\\Extension\\QueryCollectionExtensionInterface::applyToCollection\(\) invoked with 5 parameters, 3-4 required\.#'
@@ -115,11 +127,4 @@ parameters:
 		# Expected, due to backward compatibility
 		-
 			message: "#Call to function method_exists\\(\\) with ApiPlatform\\\\Core\\\\JsonApi\\\\Serializer\\\\ItemNormalizer and 'setCircularReferenc…' will always evaluate to false\\.#"
-			path: %currentWorkingDirectory%/tests/JsonApi/Serializer/ItemNormalizerTest.php
-
-		# Expected, due to forward compatibility
-		-
-			message: "#Call to function method_exists\\(\\) with 'Symfony\\\\\\\\Component.+' and 'getThrowable' will always evaluate to false\\.#"
-			paths:
-				- %currentWorkingDirectory%/tests/Bridge/Symfony/Validator/EventListener/ValidationExceptionListenerTest.php
-				- %currentWorkingDirectory%/tests/EventListener/ExceptionListenerTest.php
+			path: tests/JsonApi/Serializer/ItemNormalizerTest.php
