@@ -154,6 +154,113 @@ class TypeFactoryTest extends TestCase
         ];
     }
 
+    /** @dataProvider openAPIV2typeProvider */
+    public function testGetTypeWithOpenAPIV2Syntax(array $schema, Type $type): void
+    {
+        $typeFactory = new TypeFactory();
+        $this->assertSame($schema, $typeFactory->getType($type, 'json', null, [TypeFactory::CONTEXT_SERIALIZATION_FORMAT_OPENAPI_PRE_V3_0 => null]));
+    }
+
+    public function openAPIV2typeProvider(): iterable
+    {
+        yield [['type' => 'integer'], new Type(Type::BUILTIN_TYPE_INT)];
+        yield [['type' => 'integer'], new Type(Type::BUILTIN_TYPE_INT, true)];
+        yield [['type' => 'number'], new Type(Type::BUILTIN_TYPE_FLOAT)];
+        yield [['type' => 'number'], new Type(Type::BUILTIN_TYPE_FLOAT, true)];
+        yield [['type' => 'boolean'], new Type(Type::BUILTIN_TYPE_BOOL)];
+        yield [['type' => 'boolean'], new Type(Type::BUILTIN_TYPE_BOOL, true)];
+        yield [['type' => 'string'], new Type(Type::BUILTIN_TYPE_STRING)];
+        yield [['type' => 'string'], new Type(Type::BUILTIN_TYPE_STRING, true)];
+        yield [['type' => 'object'], new Type(Type::BUILTIN_TYPE_OBJECT)];
+        yield [['type' => 'object'], new Type(Type::BUILTIN_TYPE_OBJECT, true)];
+        yield [['type' => 'string', 'format' => 'date-time'], new Type(Type::BUILTIN_TYPE_OBJECT, false, \DateTimeImmutable::class)];
+        yield [['type' => 'string', 'format' => 'date-time'], new Type(Type::BUILTIN_TYPE_OBJECT, true, \DateTimeImmutable::class)];
+        yield [['type' => 'string', 'format' => 'duration'], new Type(Type::BUILTIN_TYPE_OBJECT, false, \DateInterval::class)];
+        yield [['type' => 'object'], new Type(Type::BUILTIN_TYPE_OBJECT, false, Dummy::class)];
+        yield [['type' => 'object'], new Type(Type::BUILTIN_TYPE_OBJECT, true, Dummy::class)];
+        yield [['type' => 'array', 'items' => ['type' => 'string']], new Type(Type::BUILTIN_TYPE_STRING, false, null, true)];
+        yield 'array can be itself nullable, but ignored in OpenAPI V2' => [
+            ['type' => 'array', 'items' => ['type' => 'string']],
+            new Type(Type::BUILTIN_TYPE_STRING, true, null, true),
+        ];
+
+        yield 'array can contain nullable values, but ignored in OpenAPI V2' => [
+            [
+                'type' => 'array',
+                'items' => ['type' => 'string'],
+            ],
+            new Type(Type::BUILTIN_TYPE_STRING, false, null, true, null, new Type(Type::BUILTIN_TYPE_STRING, true, null, false)),
+        ];
+
+        yield 'map with string keys becomes an object' => [
+            ['type' => 'object', 'additionalProperties' => ['type' => 'string']],
+            new Type(
+                Type::BUILTIN_TYPE_STRING,
+                false,
+                null,
+                true,
+                new Type(Type::BUILTIN_TYPE_STRING, false, null, false)
+            ),
+        ];
+
+        yield 'nullable map with string keys becomes a nullable object, but ignored in OpenAPI V2' => [
+            [
+                'type' => 'object',
+                'additionalProperties' => ['type' => 'string'],
+            ],
+            new Type(
+                Type::BUILTIN_TYPE_STRING,
+                true,
+                null,
+                true,
+                new Type(Type::BUILTIN_TYPE_STRING, false, null, false),
+                new Type(Type::BUILTIN_TYPE_STRING, false, null, false)
+            ),
+        ];
+
+        yield 'map value type will be considered' => [
+            ['type' => 'object', 'additionalProperties' => ['type' => 'integer']],
+            new Type(
+                Type::BUILTIN_TYPE_ARRAY,
+                false,
+                null,
+                true,
+                new Type(Type::BUILTIN_TYPE_STRING, false, null, false),
+                new Type(Type::BUILTIN_TYPE_INT, false, null, false)
+            ),
+        ];
+
+        yield 'map value type nullability will be considered, but ignored in OpenAPI V2' => [
+            [
+                'type' => 'object',
+                'additionalProperties' => ['type' => 'integer'],
+            ],
+            new Type(
+                Type::BUILTIN_TYPE_ARRAY,
+                false,
+                null,
+                true,
+                new Type(Type::BUILTIN_TYPE_STRING, false, null, false),
+                new Type(Type::BUILTIN_TYPE_INT, true, null, false)
+            ),
+        ];
+
+        yield 'nullable map can contain nullable values, but ignored in OpenAPI V2' => [
+            [
+                'type' => 'object',
+                'additionalProperties' => ['type' => 'integer'],
+            ],
+            new Type(
+                Type::BUILTIN_TYPE_ARRAY,
+                true,
+                null,
+                true,
+                new Type(Type::BUILTIN_TYPE_STRING, false, null, false),
+                new Type(Type::BUILTIN_TYPE_INT, true, null, false)
+            ),
+        ];
+    }
+
     public function testGetClassType(): void
     {
         $schemaFactoryProphecy = $this->prophesize(SchemaFactoryInterface::class);
