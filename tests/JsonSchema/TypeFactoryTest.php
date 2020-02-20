@@ -42,13 +42,13 @@ class TypeFactoryTest extends TestCase
         yield [['nullable' => true, 'type' => 'boolean'], new Type(Type::BUILTIN_TYPE_BOOL, true)];
         yield [['type' => 'string'], new Type(Type::BUILTIN_TYPE_STRING)];
         yield [['nullable' => true, 'type' => 'string'], new Type(Type::BUILTIN_TYPE_STRING, true)];
-        yield [['type' => 'object'], new Type(Type::BUILTIN_TYPE_OBJECT)];
-        yield [['nullable' => true, 'type' => 'object'], new Type(Type::BUILTIN_TYPE_OBJECT, true)];
+        yield [['type' => 'string'], new Type(Type::BUILTIN_TYPE_OBJECT)];
+        yield [['nullable' => true, 'type' => 'string'], new Type(Type::BUILTIN_TYPE_OBJECT, true)];
         yield [['type' => 'string', 'format' => 'date-time'], new Type(Type::BUILTIN_TYPE_OBJECT, false, \DateTimeImmutable::class)];
         yield [['nullable' => true, 'type' => 'string', 'format' => 'date-time'], new Type(Type::BUILTIN_TYPE_OBJECT, true, \DateTimeImmutable::class)];
         yield [['type' => 'string', 'format' => 'duration'], new Type(Type::BUILTIN_TYPE_OBJECT, false, \DateInterval::class)];
-        yield [['type' => 'object'], new Type(Type::BUILTIN_TYPE_OBJECT, false, Dummy::class)];
-        yield [['nullable' => true, 'type' => 'object'], new Type(Type::BUILTIN_TYPE_OBJECT, true, Dummy::class)];
+        yield [['type' => 'string'], new Type(Type::BUILTIN_TYPE_OBJECT, false, Dummy::class)];
+        yield [['nullable' => true, 'type' => 'string'], new Type(Type::BUILTIN_TYPE_OBJECT, true, Dummy::class)];
         yield [['type' => 'array', 'items' => ['type' => 'string']], new Type(Type::BUILTIN_TYPE_STRING, false, null, true)];
         yield 'array can be itself nullable' => [
             ['nullable' => true, 'type' => 'array', 'items' => ['type' => 'string']],
@@ -160,13 +160,13 @@ class TypeFactoryTest extends TestCase
         yield [['type' => 'boolean'], new Type(Type::BUILTIN_TYPE_BOOL, true)];
         yield [['type' => 'string'], new Type(Type::BUILTIN_TYPE_STRING)];
         yield [['type' => 'string'], new Type(Type::BUILTIN_TYPE_STRING, true)];
-        yield [['type' => 'object'], new Type(Type::BUILTIN_TYPE_OBJECT)];
-        yield [['type' => 'object'], new Type(Type::BUILTIN_TYPE_OBJECT, true)];
+        yield [['type' => 'string'], new Type(Type::BUILTIN_TYPE_OBJECT)];
+        yield [['type' => 'string'], new Type(Type::BUILTIN_TYPE_OBJECT, true)];
         yield [['type' => 'string', 'format' => 'date-time'], new Type(Type::BUILTIN_TYPE_OBJECT, false, \DateTimeImmutable::class)];
         yield [['type' => 'string', 'format' => 'date-time'], new Type(Type::BUILTIN_TYPE_OBJECT, true, \DateTimeImmutable::class)];
         yield [['type' => 'string', 'format' => 'duration'], new Type(Type::BUILTIN_TYPE_OBJECT, false, \DateInterval::class)];
-        yield [['type' => 'object'], new Type(Type::BUILTIN_TYPE_OBJECT, false, Dummy::class)];
-        yield [['type' => 'object'], new Type(Type::BUILTIN_TYPE_OBJECT, true, Dummy::class)];
+        yield [['type' => 'string'], new Type(Type::BUILTIN_TYPE_OBJECT, false, Dummy::class)];
+        yield [['type' => 'string'], new Type(Type::BUILTIN_TYPE_OBJECT, true, Dummy::class)];
         yield [['type' => 'array', 'items' => ['type' => 'string']], new Type(Type::BUILTIN_TYPE_STRING, false, null, true)];
         yield 'array can be itself nullable, but ignored in OpenAPI V2' => [
             ['type' => 'array', 'items' => ['type' => 'string']],

@@ -117,7 +117,7 @@ final class TypeFactory implements TypeFactoryInterface
     private function getClassType(?string $className, string $format, ?bool $readableLink, ?array $serializerContext, ?Schema $schema): array
     {
         if (null === $className) {
-            return ['type' => 'object'];
+            return ['type' => 'string'];
         }
 
         if (is_a($className, \DateTimeInterface::class, true)) {
@@ -141,7 +141,7 @@ final class TypeFactory implements TypeFactoryInterface
 
         // Skip if $schema is null (filters only support basic types)
         if (null === $schema) {
-            return ['type' => 'object'];
+            return ['type' => 'string'];
         }
 
         if ($this->isResourceClass($className) && true !== $readableLink) {
