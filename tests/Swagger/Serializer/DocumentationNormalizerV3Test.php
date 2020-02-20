@@ -385,13 +385,9 @@ class DocumentationNormalizerV3Test extends TestCase
                                 'description' => 'This is an initializable but not writable property.',
                             ]),
                             'dummyDate' => new \ArrayObject([
-                                'oneOf' => [
-                                    ['type' => 'null'],
-                                    [
-                                        'type' => 'string',
-                                        'format' => 'date-time',
-                                    ],
-                                ],
+                                'nullable' => true,
+                                'type' => 'string',
+                                'format' => 'date-time',
                                 'description' => 'This is a \DateTimeInterface object.',
                             ]),
                         ],
@@ -2005,8 +2001,8 @@ class DocumentationNormalizerV3Test extends TestCase
                             ]),
                             'relatedDummy' => new \ArrayObject([
                                 'description' => 'This is a related dummy \o/.',
-                                'oneOf' => [
-                                    ['type' => 'null'],
+                                'nullable' => true,
+                                'anyOf' => [
                                     ['$ref' => '#/components/schemas/'.$relatedDummyRef],
                                 ],
                             ]),

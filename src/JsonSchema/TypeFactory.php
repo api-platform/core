@@ -180,11 +180,13 @@ final class TypeFactory implements TypeFactoryInterface
             return $jsonSchema;
         }
 
-        return [
-            'oneOf' => [
-                ['type' => 'null'],
-                $jsonSchema,
-            ],
-        ];
+        if (\array_key_exists('$ref', $jsonSchema)) {
+            return [
+                'nullable' => true,
+                'anyOf' => [$jsonSchema],
+            ];
+        }
+
+        return array_merge($jsonSchema, ['nullable' => true]);
     }
 }
