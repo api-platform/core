@@ -1,6 +1,6 @@
 # Changelog
 
-## 2.5.5
+## 2.5.x-dev
 
 * GraphQL: Do not allow empty cursor values on `before` or `after`
 
