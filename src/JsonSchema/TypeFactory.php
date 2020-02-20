@@ -27,6 +27,8 @@ use Symfony\Component\PropertyInfo\Type;
  */
 final class TypeFactory implements TypeFactoryInterface
 {
+    use ResourceClassInfoTrait;
+
     /**
      * This constant is to be provided as serializer context key to conditionally enable types to be generated in
      * a format that is compatible with OpenAPI specifications **PREVIOUS** to 3.0.
@@ -39,8 +41,6 @@ final class TypeFactory implements TypeFactoryInterface
      *           it in downstream projects!
      */
     public const CONTEXT_SERIALIZATION_FORMAT_OPENAPI_PRE_V3_0 = self::class.'::CONTEXT_SERIALIZATION_FORMAT_OPENAPI_PRE_V3_0';
-
-    use ResourceClassInfoTrait;
 
     /**
      * @var SchemaFactoryInterface|null
