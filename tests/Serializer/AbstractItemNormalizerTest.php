@@ -45,7 +45,7 @@ use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 use Symfony\Component\Serializer\NameConverter\AdvancedNameConverterInterface;
-use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
+use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\SerializerInterface;
@@ -413,7 +413,8 @@ class AbstractItemNormalizerTest extends TestCase
             'resource_class' => null,
         ]);
         $cleanedContextWithObjectToPopulate = array_merge($cleanedContext, [
-            AbstractNormalizer::OBJECT_TO_POPULATE => $preHydratedDummy,
+            AbstractObjectNormalizer::OBJECT_TO_POPULATE => $preHydratedDummy,
+            AbstractObjectNormalizer::DEEP_OBJECT_TO_POPULATE => true,
         ]);
 
         $dummyInputDto = new DummyForAdditionalFieldsInput('Dummy Name');
