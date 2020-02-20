@@ -16,9 +16,9 @@ namespace ApiPlatform\Core\DataTransformer;
 interface PreHydrateInputInterface
 {
     /**
-     * @param string $class
+     * @param string $inputClass
      *
      * @return object
      */
-    public function createInput($class, array $context = []);
+    public function createInput($inputClass, array $context = []);
 }
