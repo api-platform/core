@@ -64,8 +64,7 @@ final class TypeFactory implements TypeFactoryInterface
     {
         if ($type->isCollection()) {
             $keyType = $type->getCollectionKeyType();
-            $subType = $type->getCollectionValueType()
-                ?? new Type($type->getBuiltinType(), false, $type->getClassName(), false);
+            $subType = $type->getCollectionValueType() ?? new Type($type->getBuiltinType(), false, $type->getClassName(), false);
 
             if (null !== $keyType && Type::BUILTIN_TYPE_STRING === $keyType->getBuiltinType()) {
                 return $this->addNullabilityToTypeDefinition(
