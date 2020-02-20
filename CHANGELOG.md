@@ -8,7 +8,11 @@
 * GraphQL: Allow to format GraphQL errors based on exceptions (#3063)
 * GraphQL: Add page-based pagination (#3175)
 * OpenAPI: Add PHP default values to the documentation (#2386)
- 
+
+## 2.5.x-dev
+
+* GraphQL: Do not allow empty cursor values on `before` or `after`
+
 ## 2.5.4
 
 * Add a local cache in `ResourceClassResolver::getResourceClass()`

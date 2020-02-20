@@ -131,15 +131,15 @@ final class SerializeStage implements SerializeStageInterface
         $nbPageItems = $collection->count();
         if (isset($args['after'])) {
             $after = base64_decode($args['after'], true);
-            if (false === $after) {
-                throw new \UnexpectedValueException(sprintf('Cursor %s is invalid.', $args['after']));
+            if (false === $after || '' === $args['after']) {
+                throw new \UnexpectedValueException('' === $args['after'] ? 'Empty cursor is invalid' : sprintf('Cursor %s is invalid', $args['after']));
             }
             $offset = 1 + (int) $after;
         }
         if (isset($args['before'])) {
             $before = base64_decode($args['before'], true);
-            if (false === $before) {
-                throw new \UnexpectedValueException(sprintf('Cursor %s is invalid.', $args['before']));
+            if (false === $before || '' === $args['before']) {
+                throw new \UnexpectedValueException('' === $args['before'] ? 'Empty cursor is invalid' : sprintf('Cursor %s is invalid', $args['before']));
             }
             $offset = (int) $before - $nbPageItems;
         }

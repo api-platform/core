@@ -144,14 +144,14 @@ final class EntrypointAction
      */
     private function parseMultipartRequest(?string $query, ?string $operation, array $variables, array $bodyParameters, array $files): array
     {
-        /** @var string $operations */
-        /** @var string $map */
         if ((null === $operations = $bodyParameters['operations'] ?? null) || (null === $map = $bodyParameters['map'] ?? null)) {
             throw new BadRequestHttpException('GraphQL multipart request does not respect the specification.');
         }
 
+        /** @var string $operations */
         [$query, $operation, $variables] = $this->parseData($query, $operation, $variables, $operations);
 
+        /** @var string $map */
         if (!\is_array($decodedMap = json_decode($map, true))) {
             throw new BadRequestHttpException('GraphQL multipart request map is not valid JSON.');
         }
