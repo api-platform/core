@@ -69,7 +69,7 @@ final class GroupFilter implements FilterInterface, SerializerContextFilterInter
      */
     public function applyToSerializerContext(string $resourceClass, string $operationName, bool $normalization, array $context, array &$serializerContext): void
     {
-        if (\array_key_exists($this->parameterName, $commonAttribute = ($context['request_attributes']['_api_filters'] ?? []))) {
+        if (\array_key_exists($this->parameterName, $commonAttribute = ($context['filters'] ?? []))) {
             $groups = $commonAttribute[$this->parameterName];
         } else {
             $groups = $context['request_query'][$this->parameterName] ?? null;

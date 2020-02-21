@@ -22,10 +22,7 @@ use ApiPlatform\Core\Exception\RuntimeException;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
-use ApiPlatform\Core\Serializer\ContextTrait;
 use ApiPlatform\Core\Serializer\SerializerContextBuilderInterface;
-use ApiPlatform\Core\Serializer\SerializerContextFactoryInterface;
-use ApiPlatform\Core\Util\RequestAttributesExtractor;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\QueryBuilder;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -43,28 +40,25 @@ use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
  */
 final class EagerLoadingExtension implements ContextAwareQueryCollectionExtensionInterface, QueryItemExtensionInterface
 {
-    use ContextTrait;
     use EagerLoadingTrait;
 
     private $propertyNameCollectionFactory;
     private $propertyMetadataFactory;
     private $classMetadataFactory;
     private $maxJoins;
-    private $serializerContextFactory;
+    private $serializerContextBuilder;
     private $requestStack;
 
     /**
-     * @param SerializerContextBuilderInterface|SerializerContextFactoryInterface $serializerContextBuilder
-     *
      * @TODO move $fetchPartial after $forceEager (@soyuka) in 3.0
      */
-    public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, ResourceMetadataFactoryInterface $resourceMetadataFactory, int $maxJoins = 30, bool $forceEager = true, RequestStack $requestStack = null, /* SerializerContextBuilderInterface $serializerContextFactory */$serializerContextBuilder = null, bool $fetchPartial = false, ClassMetadataFactoryInterface $classMetadataFactory = null)
+    public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, ResourceMetadataFactoryInterface $resourceMetadataFactory, int $maxJoins = 30, bool $forceEager = true, RequestStack $requestStack = null, SerializerContextBuilderInterface $serializerContextBuilder = null, bool $fetchPartial = false, ClassMetadataFactoryInterface $classMetadataFactory = null)
     {
         if (null !== $requestStack) {
             @trigger_error(sprintf('Passing an instance of "%s" is deprecated since version 2.2 and will be removed in 3.0. Use the data provider\'s context instead.', RequestStack::class), E_USER_DEPRECATED);
         }
         if (null !== $serializerContextBuilder) {
-            @trigger_error(sprintf('Passing an instance of "%s" or "%s" is deprecated since version 2.2 and will be removed in 3.0. Use the data provider\'s context instead.', SerializerContextBuilderInterface::class, SerializerContextFactoryInterface::class), E_USER_DEPRECATED);
+            @trigger_error(sprintf('Passing an instance of "%s" is deprecated since version 2.2 and will be removed in 3.0. Use the data provider\'s context instead.', SerializerContextBuilderInterface::class), E_USER_DEPRECATED);
         }
 
         $this->propertyNameCollectionFactory = $propertyNameCollectionFactory;
@@ -74,7 +68,7 @@ final class EagerLoadingExtension implements ContextAwareQueryCollectionExtensio
         $this->maxJoins = $maxJoins;
         $this->forceEager = $forceEager;
         $this->fetchPartial = $fetchPartial;
-        $this->serializerContextFactory = $serializerContextBuilder;
+        $this->serializerContextBuilder = $serializerContextBuilder;
         $this->requestStack = $requestStack;
     }
 
@@ -290,15 +284,8 @@ final class EagerLoadingExtension implements ContextAwareQueryCollectionExtensio
      */
     private function getNormalizationContext(string $resourceClass, string $contextType, array $options): array
     {
-        if (null !== $this->requestStack && null !== $this->serializerContextFactory && null !== $request = $this->requestStack->getCurrentRequest()) {
-            if ($this->serializerContextFactory instanceof SerializerContextBuilderInterface) {
-                return $this->serializerContextFactory->createFromRequest($request, 'normalization_context' === $contextType);
-            }
-            $attributes = RequestAttributesExtractor::extractAttributes($request);
-            $operationName = $this->getOperationNameFromContext($attributes);
-            $context = $this->addRequestContext($request, $attributes);
-
-            return $this->serializerContextFactory->create($attributes['resource_class'], $operationName, true, $context);
+        if (null !== $this->requestStack && null !== $this->serializerContextBuilder && null !== $request = $this->requestStack->getCurrentRequest()) {
+            return $this->serializerContextBuilder->createFromRequest($request, 'normalization_context' === $contextType);
         }
 
         $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);

@@ -25,7 +25,6 @@ use ApiPlatform\Core\Metadata\Property\PropertyNameCollection;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Serializer\SerializerContextBuilderInterface;
-use ApiPlatform\Core\Serializer\SerializerContextFactoryInterface;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\AbstractDummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\ConcreteDummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
@@ -614,17 +613,6 @@ class EagerLoadingExtensionTest extends TestCase
         $serializerContextBuilderProphecy->createFromRequest(Argument::type(Request::class), true)->shouldBeCalled()->willReturn([AbstractNormalizer::GROUPS => ['foo']]);
 
         $this->doTestApplyToCollectionWithSerializerContext($serializerContextBuilderProphecy->reveal());
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testLegacyApplyToCollectionWithSerializerContextFactory(): void
-    {
-        $serializerContextFactoryProphecy = $this->prophesize(SerializerContextFactoryInterface::class);
-        $serializerContextFactoryProphecy->create('Foo', 'get', true, Argument::type('array'))->shouldBeCalled()->willReturn([AbstractNormalizer::GROUPS => ['foo']]);
-
-        $this->doTestApplyToCollectionWithSerializerContext($serializerContextFactoryProphecy->reveal());
     }
 
     private function doTestApplyToCollectionWithSerializerContext($serializerContextFactory): void

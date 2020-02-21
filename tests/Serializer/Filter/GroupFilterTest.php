@@ -192,7 +192,7 @@ class GroupFilterTest extends TestCase
 
     public function testApplyWithGroupsInFilterAttribute(): void
     {
-        $context = ['request_attributes' => ['_api_filters' => ['groups' => ['fooz']]], 'request_query' => ['groups' => ['foo', 'bar', 'baz']]];
+        $context = ['filters' => ['groups' => ['fooz']], 'request_query' => ['groups' => ['foo', 'bar', 'baz']]];
         $serializerContext = ['groups' => ['foo', 'qux']];
 
         $groupFilter = new GroupFilter();
