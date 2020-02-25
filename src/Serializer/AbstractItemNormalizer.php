@@ -522,7 +522,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             ($className = $collectionValueType->getClassName()) &&
             $this->resourceClassResolver->isResourceClass($className)
         ) {
-            if (!$type->isNullable() && null === $attributeValue) {
+            if (null === $attributeValue && !$type->isNullable()) {
                 throw new UnexpectedValueException('Unexpected null value for non-nullable to-many relation.');
             }
             if (null !== $attributeValue && !is_iterable($attributeValue)) {
@@ -542,10 +542,10 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             ($className = $type->getClassName()) &&
             $this->resourceClassResolver->isResourceClass($className)
         ) {
-            if (!$type->isNullable() && null === $attributeValue) {
+            if (null === $attributeValue && !$type->isNullable()) {
                 throw new UnexpectedValueException('Unexpected null value for non-nullable to-one relation.');
             }
-            if (!\is_object($attributeValue) && null !== $attributeValue) {
+            if (null !== $attributeValue && !\is_object($attributeValue)) {
                 throw new UnexpectedValueException('Unexpected non-object value for to-one relation.');
             }
 
