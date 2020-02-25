@@ -522,7 +522,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             ($className = $collectionValueType->getClassName()) &&
             $this->resourceClassResolver->isResourceClass($className)
         ) {
-            if ($attributeValue !== null && !is_iterable($attributeValue)) {
+            if (null !== $attributeValue && !is_iterable($attributeValue)) {
                 throw new UnexpectedValueException('Unexpected non-iterable value for to-many relation.');
             }
 
