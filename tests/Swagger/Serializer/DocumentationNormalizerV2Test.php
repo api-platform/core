@@ -344,9 +344,10 @@ class DocumentationNormalizerV2Test extends TestCase
                         ]),
                         'dummyDate' => new \ArrayObject([
                             'type' => 'string',
-                            'description' => 'This is a \DateTimeInterface object.',
                             'format' => 'date-time',
-                        ]),                     ],
+                            'description' => 'This is a \DateTimeInterface object.',
+                        ]),
+                    ],
                 ]),
             ]),
         ];
@@ -380,13 +381,19 @@ class DocumentationNormalizerV2Test extends TestCase
         $propertyMetadataFactoryProphecy->create(Dummy::class, 'name')->shouldBeCalled()->willReturn(new PropertyMetadata(new Type(Type::BUILTIN_TYPE_STRING), 'This is a name.', true, true, null, null, false));
         $propertyMetadataFactoryProphecy->create(Dummy::class, 'nameConverted')->shouldBeCalled()->willReturn(new PropertyMetadata(new Type(Type::BUILTIN_TYPE_STRING), 'This is a converted name.', true, true, null, null, false));
 
-        $nameConverterProphecy = $this->prophesize(
-            interface_exists(AdvancedNameConverterInterface::class)
-                ? AdvancedNameConverterInterface::class
-                : NameConverterInterface::class
-        );
-        $nameConverterProphecy->normalize('name', Dummy::class, DocumentationNormalizer::FORMAT, [])->willReturn('name')->shouldBeCalled();
-        $nameConverterProphecy->normalize('nameConverted', Dummy::class, DocumentationNormalizer::FORMAT, [])->willReturn('name_converted')->shouldBeCalled();
+        if (interface_exists(AdvancedNameConverterInterface::class)) {
+            $nameConverter = $this->createMock(AdvancedNameConverterInterface::class);
+        } else {
+            $nameConverter = $this->createMock(NameConverterInterface::class);
+        }
+
+        $nameConverter->method('normalize')
+            ->with(self::logicalOr('name', 'nameConverted'))
+            ->willReturnCallback(static function (string $nameToNormalize): string {
+                return 'nameConverted' === $nameToNormalize
+                    ? 'name_converted'
+                    : $nameToNormalize;
+            });
 
         $operationPathResolver = new CustomOperationPathResolver(new OperationPathResolver(new UnderscorePathSegmentNameGenerator()));
 
@@ -402,10 +409,6 @@ class DocumentationNormalizerV2Test extends TestCase
          * @var PropertyMetadataFactoryInterface
          */
         $propertyMetadataFactory = $propertyMetadataFactoryProphecy->reveal();
-        /**
-         * @var NameConverterInterface
-         */
-        $nameConverter = $nameConverterProphecy->reveal();
 
         /**
          * @var TypeFactoryInterface|null
