@@ -13,10 +13,10 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Validator;
 
-use ApiPlatform\Core\Bridge\Symfony\Validator\Exception\ValidationException;
+use ApiPlatform\Core\Validator\Exception\ValidationException;
 
 /**
- * Validates an item using the Symfony validator component.
+ * Validates an item.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
