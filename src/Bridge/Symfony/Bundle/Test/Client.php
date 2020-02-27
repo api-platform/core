@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Bridge\Symfony\Bundle\Test;
 
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
+use Symfony\Component\BrowserKit\CookieJar;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpClient\HttpClientTrait;
 use Symfony\Component\HttpKernel\KernelInterface;
@@ -164,6 +165,16 @@ final class Client implements HttpClientInterface
     public function getContainer(): ?ContainerInterface
     {
         return $this->kernelBrowser->getContainer();
+    }
+
+    /**
+     * Returns the CookieJar instance.
+     *
+     * @return CookieJar A CookieJar instance
+     */
+    public function getCookieJar(): CookieJar
+    {
+        return $this->kernelBrowser->getCookieJar();
     }
 
     /**
