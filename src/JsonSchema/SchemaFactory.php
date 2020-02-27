@@ -258,19 +258,19 @@ final class SchemaFactory implements SchemaFactoryInterface
 
         return [
             $resourceMetadata,
-            $this->getSerializerContext($resourceMetadata, $type, $operationType, $operationName, $serializerContext),
+            $serializerContext ?? $this->getSerializerContext($resourceMetadata, $type, $operationType, $operationName),
             $inputOrOutput['class'],
         ];
     }
 
-    private function getSerializerContext(ResourceMetadata $resourceMetadata, string $type = Schema::TYPE_OUTPUT, ?string $operationType, ?string $operationName, ?array $previousSerializerContext): array
+    private function getSerializerContext(ResourceMetadata $resourceMetadata, string $type = Schema::TYPE_OUTPUT, ?string $operationType, ?string $operationName): array
     {
         $attribute = Schema::TYPE_OUTPUT === $type ? 'normalization_context' : 'denormalization_context';
 
         if (null === $operationType || null === $operationName) {
-            return array_merge($resourceMetadata->getAttribute($attribute, []), (array) $previousSerializerContext);
+            return $resourceMetadata->getAttribute($attribute, []);
         }
 
-        return array_merge($resourceMetadata->getTypedOperationAttribute($operationType, $operationName, $attribute, [], true), (array) $previousSerializerContext);
+        return $resourceMetadata->getTypedOperationAttribute($operationType, $operationName, $attribute, [], true);
     }
 }

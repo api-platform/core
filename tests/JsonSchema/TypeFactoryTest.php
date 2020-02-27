@@ -29,7 +29,7 @@ class TypeFactoryTest extends TestCase
     public function testGetType(array $schema, Type $type): void
     {
         $typeFactory = new TypeFactory();
-        $this->assertEquals($schema, $typeFactory->getType($type));
+        $this->assertEquals($schema, $typeFactory->getType($type, 'json', null, null, new Schema()));
     }
 
     public function typeProvider(): iterable
@@ -47,8 +47,8 @@ class TypeFactoryTest extends TestCase
         yield [['type' => 'string', 'format' => 'date-time'], new Type(Type::BUILTIN_TYPE_OBJECT, false, \DateTimeImmutable::class)];
         yield [['nullable' => true, 'type' => 'string', 'format' => 'date-time'], new Type(Type::BUILTIN_TYPE_OBJECT, true, \DateTimeImmutable::class)];
         yield [['type' => 'string', 'format' => 'duration'], new Type(Type::BUILTIN_TYPE_OBJECT, false, \DateInterval::class)];
-        yield [['type' => 'string'], new Type(Type::BUILTIN_TYPE_OBJECT, false, Dummy::class)];
-        yield [['nullable' => true, 'type' => 'string'], new Type(Type::BUILTIN_TYPE_OBJECT, true, Dummy::class)];
+        yield [['type' => 'string', 'format' => 'iri-reference'], new Type(Type::BUILTIN_TYPE_OBJECT, false, Dummy::class)];
+        yield [['nullable' => true, 'type' => 'string', 'format' => 'iri-reference'], new Type(Type::BUILTIN_TYPE_OBJECT, true, Dummy::class)];
         yield [['type' => 'array', 'items' => ['type' => 'string']], new Type(Type::BUILTIN_TYPE_STRING, false, null, true)];
         yield 'array can be itself nullable' => [
             ['nullable' => true, 'type' => 'array', 'items' => ['type' => 'string']],
@@ -147,7 +147,7 @@ class TypeFactoryTest extends TestCase
     public function testGetTypeWithOpenAPIV2Syntax(array $schema, Type $type): void
     {
         $typeFactory = new TypeFactory();
-        $this->assertSame($schema, $typeFactory->getType($type, 'json', null, [TypeFactory::CONTEXT_SERIALIZATION_FORMAT_OPENAPI_PRE_V3_0 => null]));
+        $this->assertSame($schema, $typeFactory->getType($type, 'json', null, null, new Schema(Schema::VERSION_SWAGGER)));
     }
 
     public function openAPIV2typeProvider(): iterable
@@ -165,8 +165,8 @@ class TypeFactoryTest extends TestCase
         yield [['type' => 'string', 'format' => 'date-time'], new Type(Type::BUILTIN_TYPE_OBJECT, false, \DateTimeImmutable::class)];
         yield [['type' => 'string', 'format' => 'date-time'], new Type(Type::BUILTIN_TYPE_OBJECT, true, \DateTimeImmutable::class)];
         yield [['type' => 'string', 'format' => 'duration'], new Type(Type::BUILTIN_TYPE_OBJECT, false, \DateInterval::class)];
-        yield [['type' => 'string'], new Type(Type::BUILTIN_TYPE_OBJECT, false, Dummy::class)];
-        yield [['type' => 'string'], new Type(Type::BUILTIN_TYPE_OBJECT, true, Dummy::class)];
+        yield [['type' => 'string', 'format' => 'iri-reference'], new Type(Type::BUILTIN_TYPE_OBJECT, false, Dummy::class)];
+        yield [['type' => 'string', 'format' => 'iri-reference'], new Type(Type::BUILTIN_TYPE_OBJECT, true, Dummy::class)];
         yield [['type' => 'array', 'items' => ['type' => 'string']], new Type(Type::BUILTIN_TYPE_STRING, false, null, true)];
         yield 'array can be itself nullable, but ignored in OpenAPI V2' => [
             ['type' => 'array', 'items' => ['type' => 'string']],
@@ -284,20 +284,11 @@ class TypeFactoryTest extends TestCase
         $typeFactory = new TypeFactory();
         $typeFactory->setSchemaFactory($schemaFactory);
 
-        self::assertSame(
-            [
-                'nullable' => true,
-                'anyOf' => [
-                    ['$ref' => 'the-ref-name'],
-                ],
+        self::assertSame([
+            'nullable' => true,
+            'anyOf' => [
+                ['$ref' => 'the-ref-name'],
             ],
-            $typeFactory->getType(
-                new Type(Type::BUILTIN_TYPE_OBJECT, true, Dummy::class),
-                'jsonld',
-                true,
-                ['foo' => 'bar'],
-                new Schema()
-            )
-        );
+        ], $typeFactory->getType(new Type(Type::BUILTIN_TYPE_OBJECT, true, Dummy::class), 'jsonld', true, ['foo' => 'bar'], new Schema()));
     }
 }

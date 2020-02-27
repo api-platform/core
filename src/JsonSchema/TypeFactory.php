@@ -30,19 +30,6 @@ final class TypeFactory implements TypeFactoryInterface
     use ResourceClassInfoTrait;
 
     /**
-     * This constant is to be provided as serializer context key to conditionally enable types to be generated in
-     * a format that is compatible with OpenAPI specifications **PREVIOUS** to 3.0.
-     *
-     * Without this flag being set, the generated format will only be compatible with Swagger 3.0 or newer.
-     *
-     * Once support for OpenAPI < 3.0 is gone, this constant **WILL BE REMOVED**
-     *
-     * @internal Once support for OpenAPI < 3.0 is gone, this constant **WILL BE REMOVED** - do not rely on
-     *           it in downstream projects!
-     */
-    public const CONTEXT_SERIALIZATION_FORMAT_OPENAPI_PRE_V3_0 = self::class.'::CONTEXT_SERIALIZATION_FORMAT_OPENAPI_PRE_V3_0';
-
-    /**
      * @var SchemaFactoryInterface|null
      */
     private $schemaFactory;
@@ -67,31 +54,19 @@ final class TypeFactory implements TypeFactoryInterface
             $subType = $type->getCollectionValueType() ?? new Type($type->getBuiltinType(), false, $type->getClassName(), false);
 
             if (null !== $keyType && Type::BUILTIN_TYPE_STRING === $keyType->getBuiltinType()) {
-                return $this->addNullabilityToTypeDefinition(
-                    [
-                        'type' => 'object',
-                        'additionalProperties' => $this->getType($subType, $format, $readableLink, $serializerContext, $schema),
-                    ],
-                    $type,
-                    (array) $serializerContext
-                );
+                return $this->addNullabilityToTypeDefinition([
+                    'type' => 'object',
+                    'additionalProperties' => $this->getType($subType, $format, $readableLink, $serializerContext, $schema),
+                ], $type, $schema);
             }
 
-            return $this->addNullabilityToTypeDefinition(
-                [
-                    'type' => 'array',
-                    'items' => $this->getType($subType, $format, $readableLink, $serializerContext, $schema),
-                ],
-                $type,
-                (array) $serializerContext
-            );
+            return $this->addNullabilityToTypeDefinition([
+                'type' => 'array',
+                'items' => $this->getType($subType, $format, $readableLink, $serializerContext, $schema),
+            ], $type, $schema);
         }
 
-        return $this->addNullabilityToTypeDefinition(
-            $this->makeBasicType($type, $format, $readableLink, $serializerContext, $schema),
-            $type,
-            (array) $serializerContext
-        );
+        return $this->addNullabilityToTypeDefinition($this->makeBasicType($type, $format, $readableLink, $serializerContext, $schema), $type, $schema);
     }
 
     private function makeBasicType(Type $type, string $format = 'json', ?bool $readableLink = null, ?array $serializerContext = null, Schema $schema = null): array
@@ -169,9 +144,9 @@ final class TypeFactory implements TypeFactoryInterface
      *
      * @return array<string, mixed>
      */
-    private function addNullabilityToTypeDefinition(array $jsonSchema, Type $type, array $serializerContext): array
+    private function addNullabilityToTypeDefinition(array $jsonSchema, Type $type, ?Schema $schema): array
     {
-        if (\array_key_exists(self::CONTEXT_SERIALIZATION_FORMAT_OPENAPI_PRE_V3_0, $serializerContext)) {
+        if ($schema && Schema::VERSION_SWAGGER === $schema->getVersion()) {
             return $jsonSchema;
         }
 

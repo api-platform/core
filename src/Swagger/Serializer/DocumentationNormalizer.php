@@ -594,10 +594,6 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
         $schema = new Schema($v3 ? Schema::VERSION_OPENAPI : Schema::VERSION_SWAGGER);
         $schema->setDefinitions($definitions);
 
-        if (!$v3) {
-            $serializerContext = array_merge([TypeFactory::CONTEXT_SERIALIZATION_FORMAT_OPENAPI_PRE_V3_0 => null], (array) $serializerContext);
-        }
-
         $this->jsonSchemaFactory->buildSchema($resourceClass, $format, $type, $operationType, $operationName, $schema, $serializerContext, $forceCollection);
 
         return $schema;
@@ -724,14 +720,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
                     'required' => $data['required'],
                 ];
 
-                $type = \in_array($data['type'], Type::$builtinTypes, true)
-                    ? $this->jsonSchemaTypeFactory->getType(
-                        new Type($data['type'], false, null, $data['is_collection'] ?? false),
-                        'json',
-                        null,
-                        $v3 ? null : [TypeFactory::CONTEXT_SERIALIZATION_FORMAT_OPENAPI_PRE_V3_0 => null]
-                    )
-                    : ['type' => 'string'];
+                $type = \in_array($data['type'], Type::$builtinTypes, true) ? $this->jsonSchemaTypeFactory->getType(new Type($data['type'], false, null, $data['is_collection'] ?? false)) : ['type' => 'string'];
                 $v3 ? $parameter['schema'] = $type : $parameter += $type;
 
                 if ($v3 && isset($data['schema'])) {
