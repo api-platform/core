@@ -45,7 +45,7 @@ class AnnotationResourceMetadataFactoryTest extends TestCase
         $this->assertEquals(['foo' => ['bar' => true]], $metadata->getItemOperations());
         $this->assertEquals(['baz' => ['tab' => false]], $metadata->getCollectionOperations());
         $this->assertEquals(['sub' => ['bus' => false]], $metadata->getSubresourceOperations());
-        $this->assertEquals(['a' => 1, 'route_prefix' => '/foobar'], $metadata->getAttributes());
+        $this->assertEquals(['a' => 1, 'route_prefix' => '/foobar', 'stateless' => false], $metadata->getAttributes());
         $this->assertEquals(['foo' => 'bar'], $metadata->getGraphql());
     }
 
@@ -59,6 +59,7 @@ class AnnotationResourceMetadataFactoryTest extends TestCase
             'attributes' => [
                 'pagination_items_per_page' => 4,
                 'pagination_maximum_items_per_page' => 6,
+                'stateless' => true,
             ],
         ];
 
@@ -81,6 +82,7 @@ class AnnotationResourceMetadataFactoryTest extends TestCase
         $this->assertTrue($metadata->getAttribute('pagination_client_enabled'));
         $this->assertEquals(4, $metadata->getAttribute('pagination_items_per_page'));
         $this->assertEquals(10, $metadata->getAttribute('pagination_maximum_items_per_page'));
+        $this->assertTrue($metadata->getAttribute('stateless'));
     }
 
     public function testCreateWithoutAttributes()
@@ -105,6 +107,7 @@ class AnnotationResourceMetadataFactoryTest extends TestCase
             'subresourceOperations' => ['sub' => ['bus' => false]],
             'attributes' => ['a' => 1, 'route_prefix' => '/foobar'],
             'graphql' => ['foo' => 'bar'],
+            'stateless' => false,
         ];
         $annotationFull = new ApiResource($resourceData);
 

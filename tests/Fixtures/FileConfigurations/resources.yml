@@ -27,6 +27,7 @@ resources:
             hydra_context:
                 '@type': 'hydra:Operation'
                 '@hydra:title': !php/const ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\FileConfigDummy::HYDRA_TITLE
+            stateless: true
         iri: 'someirischema'
         properties:
             'foo':

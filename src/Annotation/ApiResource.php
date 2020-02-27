@@ -63,6 +63,7 @@ use ApiPlatform\Core\Exception\InvalidArgumentException;
  *     @Attribute("securityPostDenormalize", type="string"),
  *     @Attribute("securityPostDenormalizeMessage", type="string"),
  *     @Attribute("shortName", type="string"),
+ *     @Attribute("stateless", type="bool"),
  *     @Attribute("subresourceOperations", type="array"),
  *     @Attribute("sunset", type="string"),
  *     @Attribute("swaggerContext", type="array"),
@@ -118,6 +119,7 @@ final class ApiResource
         'paginationPartial',
         'paginationViaCursor',
         'routePrefix',
+        'stateless',
         'sunset',
         'swaggerContext',
         'urlGenerationStrategy',
@@ -413,6 +415,13 @@ final class ApiResource
      * @var string
      */
     private $securityPostDenormalizeMessage;
+
+    /**
+     * @see https://github.com/Haehnchen/idea-php-annotation-plugin/issues/112
+     *
+     * @var bool
+     */
+    private $stateless;
 
     /**
      * @see https://api-platform.com/docs/core/deprecations/#setting-the-sunset-http-header-to-indicate-when-a-resource-or-an-operation-will-be-removed

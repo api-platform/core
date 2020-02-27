@@ -48,25 +48,29 @@ class OperationResourceMetadataFactoryTest extends TestCase
         yield [new ResourceMetadata(null, null, null, ['get'], [], null, [], []), new ResourceMetadata(null, null, null, $this->getOperations(['get']), [], null, [], [])];
         yield [new ResourceMetadata(null, null, null, ['put'], [], null, [], []), new ResourceMetadata(null, null, null, $this->getOperations(['put']), [], null, [], [])];
         yield [new ResourceMetadata(null, null, null, ['delete'], [], null, [], []), new ResourceMetadata(null, null, null, $this->getOperations(['delete']), [], null, [], [])];
-        yield [new ResourceMetadata(null, null, null, ['patch' => ['method' => 'PATCH', 'route_name' => 'patch']], [], null, [], []), new ResourceMetadata(null, null, null, ['patch' => ['method' => 'PATCH', 'route_name' => 'patch']], [], null, [], [])];
-        yield [new ResourceMetadata(null, null, null, ['patch' => ['method' => 'PATCH', 'route_name' => 'patch']], [], null, [], []), new ResourceMetadata(null, null, null, ['patch' => ['method' => 'PATCH', 'route_name' => 'patch']], [], null, [], []), $jsonapi];
-        yield [new ResourceMetadata(null, null, null, ['untouched' => ['method' => 'GET']], [], null, [], []), new ResourceMetadata(null, null, null, ['untouched' => ['method' => 'GET']], [], null, [], []), $jsonapi];
-        yield [new ResourceMetadata(null, null, null, ['untouched_custom' => ['route_name' => 'custom_route']], [], null, [], []), new ResourceMetadata(null, null, null, ['untouched_custom' => ['route_name' => 'custom_route']], [], null, [], []), $jsonapi];
+        yield [new ResourceMetadata(null, null, null, ['patch' => ['method' => 'PATCH', 'route_name' => 'patch']], [], null, [], []), new ResourceMetadata(null, null, null, ['patch' => ['method' => 'PATCH', 'route_name' => 'patch', 'stateless' => null]], [], null, [], [])];
+        yield [new ResourceMetadata(null, null, null, ['patch' => ['method' => 'PATCH', 'route_name' => 'patch']], [], null, [], []), new ResourceMetadata(null, null, null, ['patch' => ['method' => 'PATCH', 'route_name' => 'patch', 'stateless' => null]], [], null, [], []), $jsonapi];
+        yield [new ResourceMetadata(null, null, null, ['untouched' => ['method' => 'GET']], [], null, [], []), new ResourceMetadata(null, null, null, ['untouched' => ['method' => 'GET', 'stateless' => null]], [], null, [], []), $jsonapi];
+        yield [new ResourceMetadata(null, null, null, ['untouched_custom' => ['route_name' => 'custom_route']], [], null, [], []), new ResourceMetadata(null, null, null, ['untouched_custom' => ['route_name' => 'custom_route', 'stateless' => null]], [], null, [], []), $jsonapi];
+        yield [new ResourceMetadata(null, null, null, ['stateless_operation' => ['method' => 'GET', 'stateless' => true]], [], null, [], []), new ResourceMetadata(null, null, null, ['stateless_operation' => ['method' => 'GET', 'stateless' => true]], [], null, [], []), $jsonapi];
+        yield [new ResourceMetadata(null, null, null, ['statefull_attribute' => ['method' => 'GET']], [], ['stateless' => false], [], []), new ResourceMetadata(null, null, null, ['statefull_attribute' => ['method' => 'GET', 'stateless' => false]], [], ['stateless' => false], [], []), $jsonapi];
 
         // Collection operations
         yield [new ResourceMetadata(null, null, null, [], null, null, [], []), new ResourceMetadata(null, null, null, [], $this->getOperations(['get', 'post']), null, [], [])];
         yield [new ResourceMetadata(null, null, null, [], ['get'], null, [], []), new ResourceMetadata(null, null, null, [], $this->getOperations(['get']), null, [], [])];
         yield [new ResourceMetadata(null, null, null, [], ['post'], null, [], []), new ResourceMetadata(null, null, null, [], $this->getOperations(['post']), null, [], [])];
-        yield [new ResourceMetadata(null, null, null, [], ['options' => ['method' => 'OPTIONS', 'route_name' => 'options']], null, [], []), new ResourceMetadata(null, null, null, [], ['options' => ['route_name' => 'options', 'method' => 'OPTIONS']], null, [], [])];
-        yield [new ResourceMetadata(null, null, null, [], ['untouched' => ['method' => 'GET']], null, [], []), new ResourceMetadata(null, null, null, [], ['untouched' => ['method' => 'GET']], null, [], [])];
-        yield [new ResourceMetadata(null, null, null, [], ['untouched_custom' => ['route_name' => 'custom_route']], null, [], []), new ResourceMetadata(null, null, null, [], ['untouched_custom' => ['route_name' => 'custom_route']], null, [], [])];
+        yield [new ResourceMetadata(null, null, null, [], ['options' => ['method' => 'OPTIONS', 'route_name' => 'options']], null, [], []), new ResourceMetadata(null, null, null, [], ['options' => ['route_name' => 'options', 'method' => 'OPTIONS', 'stateless' => null]], null, [], [])];
+        yield [new ResourceMetadata(null, null, null, [], ['untouched' => ['method' => 'GET']], null, [], []), new ResourceMetadata(null, null, null, [], ['untouched' => ['method' => 'GET', 'stateless' => null]], null, [], [])];
+        yield [new ResourceMetadata(null, null, null, [], ['untouched_custom' => ['route_name' => 'custom_route']], null, [], []), new ResourceMetadata(null, null, null, [], ['untouched_custom' => ['route_name' => 'custom_route', 'stateless' => null]], null, [], [])];
+        yield [new ResourceMetadata(null, null, null, [], ['statefull_operation' => ['method' => 'GET', 'stateless' => false]], null, null, []), new ResourceMetadata(null, null, null, [], ['statefull_operation' => ['method' => 'GET', 'stateless' => false]], null, null, []), $jsonapi];
+        yield [new ResourceMetadata(null, null, null, [], ['stateless_attribute' => ['method' => 'GET']], ['stateless' => true], null, []), new ResourceMetadata(null, null, null, [], ['stateless_attribute' => ['method' => 'GET', 'stateless' => true]], ['stateless' => true], null, []), $jsonapi];
     }
 
     private function getOperations(array $names): array
     {
         $operations = [];
         foreach ($names as $name) {
-            $operations[$name] = ['method' => strtoupper($name)];
+            $operations[$name] = ['method' => strtoupper($name), 'stateless' => null];
         }
 
         return $operations;

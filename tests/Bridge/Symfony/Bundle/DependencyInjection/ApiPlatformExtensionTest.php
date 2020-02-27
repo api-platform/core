@@ -158,6 +158,7 @@ class ApiPlatformExtensionTest extends TestCase
         ],
         'defaults' => [
             'attributes' => [],
+            'stateless' => true,
         ],
     ]];
 
@@ -720,7 +721,7 @@ class ApiPlatformExtensionTest extends TestCase
         $containerBuilderProphecy->registerForAutoconfiguration(RequestBodySearchCollectionExtensionInterface::class)->willReturn($this->childDefinitionProphecy)->shouldBeCalled();
         $containerBuilderProphecy->setParameter('api_platform.elasticsearch.hosts', ['http://elasticsearch:9200'])->shouldBeCalled();
         $containerBuilderProphecy->setParameter('api_platform.elasticsearch.mapping', [])->shouldBeCalled();
-        $containerBuilderProphecy->setParameter('api_platform.defaults', ['attributes' => []])->shouldBeCalled();
+        $containerBuilderProphecy->setParameter('api_platform.defaults', ['attributes' => ['stateless' => true]])->shouldBeCalled();
 
         $config = self::DEFAULT_CONFIG;
         $config['api_platform']['elasticsearch'] = [
@@ -871,7 +872,7 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.http_cache.vary' => ['Accept'],
             'api_platform.http_cache.public' => null,
             'api_platform.http_cache.invalidation.max_header_length' => 7500,
-            'api_platform.defaults' => ['attributes' => []],
+            'api_platform.defaults' => ['attributes' => ['stateless' => true]],
             'api_platform.enable_entrypoint' => true,
             'api_platform.enable_docs' => true,
             'api_platform.url_generation_strategy' => 1,
@@ -1175,7 +1176,7 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.resource_class_directories' => Argument::type('array'),
             'api_platform.validator.serialize_payload_fields' => [],
             'api_platform.elasticsearch.enabled' => false,
-            'api_platform.defaults' => ['attributes' => []],
+            'api_platform.defaults' => ['attributes' => ['stateless' => true]],
         ];
 
         if ($hasSwagger) {
