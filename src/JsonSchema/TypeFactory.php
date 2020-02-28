@@ -50,14 +50,27 @@ final class TypeFactory implements TypeFactoryInterface
     public function getType(Type $type, string $format = 'json', ?bool $readableLink = null, ?array $serializerContext = null, Schema $schema = null): array
     {
         if ($type->isCollection()) {
-            $subType = new Type($type->getBuiltinType(), $type->isNullable(), $type->getClassName(), false);
+            $keyType = $type->getCollectionKeyType();
+            $subType = $type->getCollectionValueType() ?? new Type($type->getBuiltinType(), false, $type->getClassName(), false);
 
-            return [
+            if (null !== $keyType && Type::BUILTIN_TYPE_STRING === $keyType->getBuiltinType()) {
+                return $this->addNullabilityToTypeDefinition([
+                    'type' => 'object',
+                    'additionalProperties' => $this->getType($subType, $format, $readableLink, $serializerContext, $schema),
+                ], $type, $schema);
+            }
+
+            return $this->addNullabilityToTypeDefinition([
                 'type' => 'array',
                 'items' => $this->getType($subType, $format, $readableLink, $serializerContext, $schema),
-            ];
+            ], $type, $schema);
         }
 
+        return $this->addNullabilityToTypeDefinition($this->makeBasicType($type, $format, $readableLink, $serializerContext, $schema), $type, $schema);
+    }
+
+    private function makeBasicType(Type $type, string $format = 'json', ?bool $readableLink = null, ?array $serializerContext = null, Schema $schema = null): array
+    {
         switch ($type->getBuiltinType()) {
             case Type::BUILTIN_TYPE_INT:
                 return ['type' => 'integer'];
@@ -75,7 +88,7 @@ final class TypeFactory implements TypeFactoryInterface
     /**
      * Gets the JSON Schema document which specifies the data type corresponding to the given PHP class, and recursively adds needed new schema to the current schema if provided.
      */
-    private function getClassType(?string $className, string $format = 'json', ?bool $readableLink = null, ?array $serializerContext = null, ?Schema $schema = null): array
+    private function getClassType(?string $className, string $format, ?bool $readableLink, ?array $serializerContext, ?Schema $schema): array
     {
         if (null === $className) {
             return ['type' => 'string'];
@@ -124,5 +137,30 @@ final class TypeFactory implements TypeFactoryInterface
         $subSchema = $this->schemaFactory->buildSchema($className, $format, Schema::TYPE_OUTPUT, null, null, $subSchema, $serializerContext);
 
         return ['$ref' => $subSchema['$ref']];
+    }
+
+    /**
+     * @param array<string, mixed> $jsonSchema
+     *
+     * @return array<string, mixed>
+     */
+    private function addNullabilityToTypeDefinition(array $jsonSchema, Type $type, ?Schema $schema): array
+    {
+        if ($schema && Schema::VERSION_SWAGGER === $schema->getVersion()) {
+            return $jsonSchema;
+        }
+
+        if (!$type->isNullable()) {
+            return $jsonSchema;
+        }
+
+        if (\array_key_exists('$ref', $jsonSchema)) {
+            return [
+                'nullable' => true,
+                'anyOf' => [$jsonSchema],
+            ];
+        }
+
+        return array_merge($jsonSchema, ['nullable' => true]);
     }
 }

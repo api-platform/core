@@ -181,49 +181,9 @@ default-legacy:
       filters:
         tags: '~@postgres&&~@mongodb&&~@elasticsearch'
 
-postgres-legacy:
-  suites:
-    default: false
-    postgres:
-      <<: *postgres-suite
-      filters:
-        tags: '~@sqlite&&~@mongodb&&~@elasticsearch'
-
-mongodb-legacy:
-  suites:
-    default: false
-    mongodb:
-      <<: *mongodb-suite
-      filters:
-        tags: '~@sqlite&&~@elasticsearch&&~@!mongodb'
-
-elasticsearch-legacy:
-  suites:
-    default: false
-    elasticsearch:
-      <<: *elasticsearch-suite
-      filters:
-        tags: '@elasticsearch'
-
 default-legacy-coverage:
   suites:
     default:
       <<: *default-coverage-suite
       filters:
         tags: '~@postgres&&~@mongodb&&~@elasticsearch'
-
-mongodb-legacy-coverage:
-  suites:
-    default: false
-    mongodb:
-      <<: *mongodb-coverage-suite
-      filters:
-        tags: '~@sqlite&&~@elasticsearch&&~@!mongodb'
-
-elasticsearch-legacy-coverage:
-  suites:
-    default: false
-    elasticsearch:
-      <<: *elasticsearch-coverage-suite
-      filters:
-        tags: '@elasticsearch'
