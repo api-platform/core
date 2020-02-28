@@ -14,7 +14,6 @@
         <server name="KERNEL_DIR" value="tests/Fixtures/app/" />
         <server name="KERNEL_CLASS" value="AppKernel" />
         <server name="APP_ENV" value="test" />
-        <server name="LEGACY" value="0" />
     </php>
 
     <testsuites>
