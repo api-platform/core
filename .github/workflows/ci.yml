@@ -47,6 +47,7 @@ jobs:
           key: ext-mongodb-${{ env.EXT_MONGODB_VERSION }}-php${{ matrix.php }}-${{ github.sha }}
           restore-keys: |
             ext-mongodb-${{ env.EXT_MONGODB_VERSION }}-php${{ matrix.php }}-
+        continue-on-error: true
       - name: Install mongodb PHP extension
         if: (!startsWith(matrix.php, '7.1'))
         env:
@@ -93,6 +94,7 @@ jobs:
           restore-keys: |
             composer-php${{ matrix.php }}-
             composer-
+        continue-on-error: true
       - name: Install Symfony Flex
         run: |
           composer global require --prefer-dist --no-progress --no-suggest --ansi \
@@ -130,6 +132,7 @@ jobs:
         with:
           name: phpunit-logs-php${{ matrix.php }}
           path: build/logs/phpunit
+        continue-on-error: true
       - name: Upload coverage results to Codecov
         if: matrix.coverage
         uses: codecov/codecov-action@v1.0.3
@@ -137,6 +140,7 @@ jobs:
           name: phpunit-php${{ matrix.php }}
           flags: phpunit
           token: ${{ secrets.CODECOV_TOKEN }}
+        continue-on-error: true
       - name: Upload coverage results to Coveralls
         if: matrix.coverage
         env:
@@ -145,6 +149,7 @@ jobs:
           composer global require --prefer-dist --no-progress --no-suggest --ansi cedx/coveralls
           export PATH="$PATH:$HOME/.composer/vendor/bin"
           coveralls build/logs/phpunit/clover.xml
+        continue-on-error: true
 
   behat:
     name: Behat (PHP ${{ matrix.php }})
@@ -181,6 +186,7 @@ jobs:
           key: ext-mongodb-${{ env.EXT_MONGODB_VERSION }}-php${{ matrix.php }}-${{ github.sha }}
           restore-keys: |
             ext-mongodb-${{ env.EXT_MONGODB_VERSION }}-php${{ matrix.php }}-
+        continue-on-error: true
       - name: Install mongodb PHP extension
         if: (!startsWith(matrix.php, '7.1'))
         env:
@@ -227,6 +233,7 @@ jobs:
           restore-keys: |
             composer-php${{ matrix.php }}-
             composer-
+        continue-on-error: true
       - name: Install Symfony Flex
         run: |
           composer global require --prefer-dist --no-progress --no-suggest --ansi \
@@ -264,12 +271,14 @@ jobs:
           wget -qO /usr/local/bin/phpcov https://phar.phpunit.de/phpcov.phar
           chmod +x /usr/local/bin/phpcov
           phpcov merge --clover build/logs/behat/clover.xml build/coverage
+        continue-on-error: true
       - name: Upload test artifacts
         if: always()
         uses: actions/upload-artifact@v1
         with:
           name: behat-logs-php${{ matrix.php }}
           path: build/logs/behat
+        continue-on-error: true
       - name: Upload coverage results to Codecov
         if: matrix.coverage
         uses: codecov/codecov-action@v1.0.3
@@ -277,6 +286,7 @@ jobs:
           name: behat-php${{ matrix.php }}
           flags: behat
           token: ${{ secrets.CODECOV_TOKEN }}
+        continue-on-error: true
       - name: Upload coverage results to Coveralls
         if: matrix.coverage
         env:
@@ -285,6 +295,7 @@ jobs:
           composer global require --prefer-dist --no-progress --no-suggest --ansi cedx/coveralls
           export PATH="$PATH:$HOME/.composer/vendor/bin"
           coveralls build/logs/behat/clover.xml
+        continue-on-error: true
 
   phpunit-lowest-deps:
     name: PHPUnit (PHP ${{ matrix.php }}) (lowest dependencies)
@@ -314,6 +325,7 @@ jobs:
           key: ext-mongodb-${{ env.EXT_MONGODB_VERSION }}-php${{ matrix.php }}-${{ github.sha }}
           restore-keys: |
             ext-mongodb-${{ env.EXT_MONGODB_VERSION }}-php${{ matrix.php }}-
+        continue-on-error: true
       - name: Install mongodb PHP extension
         env:
           BUILD_DIR: /var/tmp/build/ext-mongodb-${{ env.EXT_MONGODB_VERSION }}
@@ -343,6 +355,7 @@ jobs:
             composer-php${{ matrix.php }}-lowest-deps-
             composer-php${{ matrix.php }}-
             composer-
+        continue-on-error: true
       - name: Install Symfony Flex
         run: |
           composer global require --prefer-dist --no-progress --no-suggest --ansi \
@@ -367,6 +380,7 @@ jobs:
         with:
           name: phpunit-logs-php${{ matrix.php }}-lowest-deps
           path: build/logs/phpunit
+        continue-on-error: true
 
   behat-lowest-deps:
     name: Behat (PHP ${{ matrix.php }}) (lowest dependencies)
@@ -396,6 +410,7 @@ jobs:
           key: ext-mongodb-${{ env.EXT_MONGODB_VERSION }}-php${{ matrix.php }}-${{ github.sha }}
           restore-keys: |
             ext-mongodb-${{ env.EXT_MONGODB_VERSION }}-php${{ matrix.php }}-
+        continue-on-error: true
       - name: Install mongodb PHP extension
         env:
           BUILD_DIR: /var/tmp/build/ext-mongodb-${{ env.EXT_MONGODB_VERSION }}
@@ -425,6 +440,7 @@ jobs:
             composer-php${{ matrix.php }}-lowest-deps-
             composer-php${{ matrix.php }}-
             composer-
+        continue-on-error: true
       - name: Install Symfony Flex
         run: |
           composer global require --prefer-dist --no-progress --no-suggest --ansi \
@@ -449,6 +465,7 @@ jobs:
         with:
           name: behat-logs-php${{ matrix.php }}-lowest-deps
           path: build/logs/behat
+        continue-on-error: true
 
   behat-legacy:
     name: Behat (PHP ${{ matrix.php }}) (legacy)
@@ -487,6 +504,7 @@ jobs:
           key: ext-mongodb-${{ env.EXT_MONGODB_VERSION }}-php${{ matrix.php }}-${{ github.sha }}
           restore-keys: |
             ext-mongodb-${{ env.EXT_MONGODB_VERSION }}-php${{ matrix.php }}-
+        continue-on-error: true
       - name: Install mongodb PHP extension
         if: (!startsWith(matrix.php, '7.1'))
         env:
@@ -534,6 +552,7 @@ jobs:
             composer-php${{ matrix.php }}-legacy-
             composer-php${{ matrix.php }}-
             composer-
+        continue-on-error: true
       - name: Install Symfony Flex
         run: |
           composer global require --prefer-dist --no-progress --no-suggest --ansi \
@@ -571,12 +590,14 @@ jobs:
           wget -qO /usr/local/bin/phpcov https://phar.phpunit.de/phpcov.phar
           chmod +x /usr/local/bin/phpcov
           phpcov merge --clover build/logs/behat/clover.xml build/coverage
+        continue-on-error: true
       - name: Upload test artifacts
         if: always()
         uses: actions/upload-artifact@v1
         with:
           name: behat-logs-php${{ matrix.php }}-legacy
           path: build/logs/behat
+        continue-on-error: true
       - name: Upload coverage results to Codecov
         if: matrix.coverage
         uses: codecov/codecov-action@v1.0.3
@@ -584,6 +605,7 @@ jobs:
           name: behat-php${{ matrix.php }}-legacy
           flags: behat_legacy
           token: ${{ secrets.CODECOV_TOKEN }}
+        continue-on-error: true
       - name: Upload coverage results to Coveralls
         if: matrix.coverage
         env:
@@ -592,6 +614,7 @@ jobs:
           composer global require --prefer-dist --no-progress --no-suggest --ansi cedx/coveralls
           export PATH="$PATH:$HOME/.composer/vendor/bin"
           coveralls build/logs/behat/clover.xml
+        continue-on-error: true
 
   behat-lowest-deps-legacy:
     name: Behat (PHP ${{ matrix.php }}) (lowest dependencies) (legacy)
@@ -624,6 +647,7 @@ jobs:
           key: ext-mongodb-${{ env.EXT_MONGODB_VERSION }}-php${{ matrix.php }}-${{ github.sha }}
           restore-keys: |
             ext-mongodb-${{ env.EXT_MONGODB_VERSION }}-php${{ matrix.php }}-
+        continue-on-error: true
       - name: Install mongodb PHP extension
         env:
           BUILD_DIR: /var/tmp/build/ext-mongodb-${{ env.EXT_MONGODB_VERSION }}
@@ -654,6 +678,7 @@ jobs:
             composer-php${{ matrix.php }}-lowest-deps-
             composer-php${{ matrix.php }}-
             composer-
+        continue-on-error: true
       - name: Install Symfony Flex
         run: |
           composer global require --prefer-dist --no-progress --no-suggest --ansi \
@@ -678,6 +703,7 @@ jobs:
         with:
           name: behat-logs-php${{ matrix.php }}-lowest-deps-legacy
           path: build/logs/behat
+        continue-on-error: true
 
   phpunit-postgresql:
     name: PHPUnit (PHP ${{ matrix.php }}) (PostgreSQL)
@@ -732,6 +758,7 @@ jobs:
           key: ext-mongodb-${{ env.EXT_MONGODB_VERSION }}-php${{ matrix.php }}-${{ github.sha }}
           restore-keys: |
             ext-mongodb-${{ env.EXT_MONGODB_VERSION }}-php${{ matrix.php }}-
+        continue-on-error: true
       - name: Install mongodb PHP extension
         env:
           BUILD_DIR: /var/tmp/build/ext-mongodb-${{ env.EXT_MONGODB_VERSION }}
@@ -760,6 +787,7 @@ jobs:
           restore-keys: |
             composer-php${{ matrix.php }}-
             composer-
+        continue-on-error: true
       - name: Install Symfony Flex
         run: |
           composer global require --prefer-dist --no-progress --no-suggest --ansi \
@@ -784,6 +812,7 @@ jobs:
         with:
           name: phpunit-logs-php${{ matrix.php }}-postgresql
           path: build/logs/phpunit
+        continue-on-error: true
 
   behat-postgresql:
     name: Behat (PHP ${{ matrix.php }}) (PostgreSQL)
@@ -838,6 +867,7 @@ jobs:
           key: ext-mongodb-${{ env.EXT_MONGODB_VERSION }}-php${{ matrix.php }}-${{ github.sha }}
           restore-keys: |
             ext-mongodb-${{ env.EXT_MONGODB_VERSION }}-php${{ matrix.php }}-
+        continue-on-error: true
       - name: Install mongodb PHP extension
         env:
           BUILD_DIR: /var/tmp/build/ext-mongodb-${{ env.EXT_MONGODB_VERSION }}
@@ -866,6 +896,7 @@ jobs:
           restore-keys: |
             composer-php${{ matrix.php }}-
             composer-
+        continue-on-error: true
       - name: Install Symfony Flex
         run: |
           composer global require --prefer-dist --no-progress --no-suggest --ansi \
@@ -890,6 +921,7 @@ jobs:
         with:
           name: behat-logs-php${{ matrix.php }}-postgresql
           path: build/logs/behat
+        continue-on-error: true
 
   phpunit-mysql:
     name: PHPUnit (PHP ${{ matrix.php }}) (MySQL)
@@ -944,6 +976,7 @@ jobs:
           key: ext-mongodb-${{ env.EXT_MONGODB_VERSION }}-php${{ matrix.php }}-${{ github.sha }}
           restore-keys: |
             ext-mongodb-${{ env.EXT_MONGODB_VERSION }}-php${{ matrix.php }}-
+        continue-on-error: true
       - name: Install mongodb PHP extension
         env:
           BUILD_DIR: /var/tmp/build/ext-mongodb-${{ env.EXT_MONGODB_VERSION }}
@@ -972,6 +1005,7 @@ jobs:
           restore-keys: |
             composer-php${{ matrix.php }}-
             composer-
+        continue-on-error: true
       - name: Install Symfony Flex
         run: |
           composer global require --prefer-dist --no-progress --no-suggest --ansi \
@@ -996,6 +1030,7 @@ jobs:
         with:
           name: phpunit-logs-php${{ matrix.php }}-mysql
           path: build/logs/phpunit
+        continue-on-error: true
 
   behat-mysql:
     name: Behat (PHP ${{ matrix.php }}) (MySQL)
@@ -1050,6 +1085,7 @@ jobs:
           key: ext-mongodb-${{ env.EXT_MONGODB_VERSION }}-php${{ matrix.php }}-${{ github.sha }}
           restore-keys: |
             ext-mongodb-${{ env.EXT_MONGODB_VERSION }}-php${{ matrix.php }}-
+        continue-on-error: true
       - name: Install mongodb PHP extension
         env:
           BUILD_DIR: /var/tmp/build/ext-mongodb-${{ env.EXT_MONGODB_VERSION }}
@@ -1078,6 +1114,7 @@ jobs:
           restore-keys: |
             composer-php${{ matrix.php }}-
             composer-
+        continue-on-error: true
       - name: Install Symfony Flex
         run: |
           composer global require --prefer-dist --no-progress --no-suggest --ansi \
@@ -1102,6 +1139,7 @@ jobs:
         with:
           name: behat-logs-php${{ matrix.php }}-mysql
           path: build/logs/behat
+        continue-on-error: true
 
   phpunit-mongodb:
     name: PHPUnit (PHP ${{ matrix.php }}) (MongoDB)
@@ -1146,6 +1184,7 @@ jobs:
           key: ext-mongodb-${{ env.EXT_MONGODB_VERSION }}-php${{ matrix.php }}-${{ github.sha }}
           restore-keys: |
             ext-mongodb-${{ env.EXT_MONGODB_VERSION }}-php${{ matrix.php }}-
+        continue-on-error: true
       - name: Install mongodb PHP extension
         env:
           BUILD_DIR: /var/tmp/build/ext-mongodb-${{ env.EXT_MONGODB_VERSION }}
@@ -1191,6 +1230,7 @@ jobs:
           restore-keys: |
             composer-php${{ matrix.php }}-
             composer-
+        continue-on-error: true
       - name: Install Symfony Flex
         run: |
           composer global require --prefer-dist --no-progress --no-suggest --ansi \
@@ -1222,6 +1262,7 @@ jobs:
         with:
           name: phpunit-logs-php${{ matrix.php }}-mongodb
           path: build/logs/phpunit
+        continue-on-error: true
       - name: Upload coverage results to Codecov
         if: matrix.coverage
         uses: codecov/codecov-action@v1.0.3
@@ -1229,6 +1270,7 @@ jobs:
           name: phpunit-php${{ matrix.php }}-mongodb
           flags: phpunit_mongodb
           token: ${{ secrets.CODECOV_TOKEN }}
+        continue-on-error: true
       - name: Upload coverage results to Coveralls
         if: matrix.coverage
         env:
@@ -1237,6 +1279,7 @@ jobs:
           composer global require --prefer-dist --no-progress --no-suggest --ansi cedx/coveralls
           export PATH="$PATH:$HOME/.composer/vendor/bin"
           coveralls build/logs/phpunit/clover.xml
+        continue-on-error: true
 
   behat-mongodb:
     name: Behat (PHP ${{ matrix.php }}) (MongoDB)
@@ -1281,6 +1324,7 @@ jobs:
           key: ext-mongodb-${{ env.EXT_MONGODB_VERSION }}-php${{ matrix.php }}-${{ github.sha }}
           restore-keys: |
             ext-mongodb-${{ env.EXT_MONGODB_VERSION }}-php${{ matrix.php }}-
+        continue-on-error: true
       - name: Install mongodb PHP extension
         env:
           BUILD_DIR: /var/tmp/build/ext-mongodb-${{ env.EXT_MONGODB_VERSION }}
@@ -1326,6 +1370,7 @@ jobs:
           restore-keys: |
             composer-php${{ matrix.php }}-
             composer-
+        continue-on-error: true
       - name: Install Symfony Flex
         run: |
           composer global require --prefer-dist --no-progress --no-suggest --ansi \
@@ -1357,12 +1402,14 @@ jobs:
           wget -qO /usr/local/bin/phpcov https://phar.phpunit.de/phpcov.phar
           chmod +x /usr/local/bin/phpcov
           phpcov merge --clover build/logs/behat/clover.xml build/coverage
+        continue-on-error: true
       - name: Upload test artifacts
         if: always()
         uses: actions/upload-artifact@v1
         with:
           name: behat-logs-php${{ matrix.php }}-mongodb
           path: build/logs/behat
+        continue-on-error: true
       - name: Upload coverage results to Codecov
         if: matrix.coverage
         uses: codecov/codecov-action@v1.0.3
@@ -1370,6 +1417,7 @@ jobs:
           name: behat-php${{ matrix.php }}-mongodb
           flags: behat_mongodb
           token: ${{ secrets.CODECOV_TOKEN }}
+        continue-on-error: true
       - name: Upload coverage results to Coveralls
         if: matrix.coverage
         env:
@@ -1378,6 +1426,7 @@ jobs:
           composer global require --prefer-dist --no-progress --no-suggest --ansi cedx/coveralls
           export PATH="$PATH:$HOME/.composer/vendor/bin"
           coveralls build/logs/behat/clover.xml
+        continue-on-error: true
 
   phpunit-elasticsearch:
     name: PHPUnit (PHP ${{ matrix.php }}) (Elasticsearch)
@@ -1424,6 +1473,7 @@ jobs:
           key: ext-mongodb-${{ env.EXT_MONGODB_VERSION }}-php${{ matrix.php }}-${{ github.sha }}
           restore-keys: |
             ext-mongodb-${{ env.EXT_MONGODB_VERSION }}-php${{ matrix.php }}-
+        continue-on-error: true
       - name: Install mongodb PHP extension
         env:
           BUILD_DIR: /var/tmp/build/ext-mongodb-${{ env.EXT_MONGODB_VERSION }}
@@ -1469,6 +1519,7 @@ jobs:
           restore-keys: |
             composer-php${{ matrix.php }}-
             composer-
+        continue-on-error: true
       - name: Install Symfony Flex
         run: |
           composer global require --prefer-dist --no-progress --no-suggest --ansi \
@@ -1500,6 +1551,7 @@ jobs:
         with:
           name: phpunit-logs-php${{ matrix.php }}-elasticsearch
           path: build/logs/phpunit
+        continue-on-error: true
       - name: Upload coverage results to Codecov
         if: matrix.coverage
         uses: codecov/codecov-action@v1.0.3
@@ -1507,6 +1559,7 @@ jobs:
           name: phpunit-php${{ matrix.php }}-elasticsearch
           flags: phpunit_elasticsearch
           token: ${{ secrets.CODECOV_TOKEN }}
+        continue-on-error: true
       - name: Upload coverage results to Coveralls
         if: matrix.coverage
         env:
@@ -1515,6 +1568,7 @@ jobs:
           composer global require --prefer-dist --no-progress --no-suggest --ansi cedx/coveralls
           export PATH="$PATH:$HOME/.composer/vendor/bin"
           coveralls build/logs/phpunit/clover.xml
+        continue-on-error: true
 
   behat-elasticsearch:
     name: Behat (PHP ${{ matrix.php }}) (Elasticsearch)
@@ -1561,6 +1615,7 @@ jobs:
           key: ext-mongodb-${{ env.EXT_MONGODB_VERSION }}-php${{ matrix.php }}-${{ github.sha }}
           restore-keys: |
             ext-mongodb-${{ env.EXT_MONGODB_VERSION }}-php${{ matrix.php }}-
+        continue-on-error: true
       - name: Install mongodb PHP extension
         env:
           BUILD_DIR: /var/tmp/build/ext-mongodb-${{ env.EXT_MONGODB_VERSION }}
@@ -1606,6 +1661,7 @@ jobs:
           restore-keys: |
             composer-php${{ matrix.php }}-
             composer-
+        continue-on-error: true
       - name: Install Symfony Flex
         run: |
           composer global require --prefer-dist --no-progress --no-suggest --ansi \
@@ -1637,12 +1693,14 @@ jobs:
           wget -qO /usr/local/bin/phpcov https://phar.phpunit.de/phpcov.phar
           chmod +x /usr/local/bin/phpcov
           phpcov merge --clover build/logs/behat/clover.xml build/coverage
+        continue-on-error: true
       - name: Upload test artifacts
         if: always()
         uses: actions/upload-artifact@v1
         with:
           name: behat-logs-php${{ matrix.php }}-elasticsearch
           path: build/logs/behat
+        continue-on-error: true
       - name: Upload coverage results to Codecov
         if: matrix.coverage
         uses: codecov/codecov-action@v1.0.3
@@ -1650,6 +1708,7 @@ jobs:
           name: behat-php${{ matrix.php }}-elasticsearch
           flags: behat_elasticsearch
           token: ${{ secrets.CODECOV_TOKEN }}
+        continue-on-error: true
       - name: Upload coverage results to Coveralls
         if: matrix.coverage
         env:
@@ -1658,6 +1717,7 @@ jobs:
           composer global require --prefer-dist --no-progress --no-suggest --ansi cedx/coveralls
           export PATH="$PATH:$HOME/.composer/vendor/bin"
           coveralls build/logs/behat/clover.xml
+        continue-on-error: true
 
   phpunit-no-deprecations:
     name: PHPUnit (PHP ${{ matrix.php }}) (no deprecations)
@@ -1689,6 +1749,7 @@ jobs:
           key: ext-mongodb-${{ env.EXT_MONGODB_VERSION }}-php${{ matrix.php }}-${{ github.sha }}
           restore-keys: |
             ext-mongodb-${{ env.EXT_MONGODB_VERSION }}-php${{ matrix.php }}-
+        continue-on-error: true
       - name: Install mongodb PHP extension
         env:
           BUILD_DIR: /var/tmp/build/ext-mongodb-${{ env.EXT_MONGODB_VERSION }}
@@ -1717,6 +1778,7 @@ jobs:
           restore-keys: |
             composer-php${{ matrix.php }}-
             composer-
+        continue-on-error: true
       - name: Install Symfony Flex
         run: |
           composer global require --prefer-dist --no-progress --no-suggest --ansi \
@@ -1741,6 +1803,7 @@ jobs:
         with:
           name: phpunit-logs-php${{ matrix.php }}-no-deprecations
           path: build/logs/phpunit
+        continue-on-error: true
 
   phpunit-symfony-next:
     name: PHPUnit (PHP ${{ matrix.php }}) (Symfony ${{ matrix.symfony }})
@@ -1774,6 +1837,7 @@ jobs:
           key: ext-mongodb-${{ env.EXT_MONGODB_VERSION }}-php${{ matrix.php }}-${{ github.sha }}
           restore-keys: |
             ext-mongodb-${{ env.EXT_MONGODB_VERSION }}-php${{ matrix.php }}-
+        continue-on-error: true
       - name: Install mongodb PHP extension
         env:
           BUILD_DIR: /var/tmp/build/ext-mongodb-${{ env.EXT_MONGODB_VERSION }}
@@ -1803,6 +1867,7 @@ jobs:
             composer-php${{ matrix.php }}-symfony${{ matrix.symfony }}-
             composer-php${{ matrix.php }}-
             composer-
+        continue-on-error: true
       - name: Install Symfony Flex
         run: |
           composer global require --prefer-dist --no-progress --no-suggest --ansi \
@@ -1844,6 +1909,7 @@ jobs:
         with:
           name: phpunit-logs-php${{ matrix.php }}-symfony${{ matrix.symfony }}
           path: build/logs/phpunit
+        continue-on-error: true
 
   behat-symfony-next:
     name: Behat (PHP ${{ matrix.php }}) (Symfony ${{ matrix.symfony }})
@@ -1877,6 +1943,7 @@ jobs:
           key: ext-mongodb-${{ env.EXT_MONGODB_VERSION }}-php${{ matrix.php }}-${{ github.sha }}
           restore-keys: |
             ext-mongodb-${{ env.EXT_MONGODB_VERSION }}-php${{ matrix.php }}-
+        continue-on-error: true
       - name: Install mongodb PHP extension
         env:
           BUILD_DIR: /var/tmp/build/ext-mongodb-${{ env.EXT_MONGODB_VERSION }}
@@ -1906,6 +1973,7 @@ jobs:
             composer-php${{ matrix.php }}-symfony${{ matrix.symfony }}-
             composer-php${{ matrix.php }}-
             composer-
+        continue-on-error: true
       - name: Install Symfony Flex
         run: |
           composer global require --prefer-dist --no-progress --no-suggest --ansi \
@@ -1947,3 +2015,4 @@ jobs:
         with:
           name: behat-logs-php${{ matrix.php }}-symfony${{ matrix.symfony }}
           path: build/logs/behat
+        continue-on-error: true
