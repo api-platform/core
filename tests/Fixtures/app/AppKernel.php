@@ -71,7 +71,7 @@ class AppKernel extends Kernel
             $bundles[] = new TestBundle();
         }
 
-        if ($_SERVER['LEGACY'] ?? true) {
+        if ($_SERVER['LEGACY'] ?? false) {
             $bundles[] = new NelmioApiDocBundle();
         }
 
@@ -87,7 +87,7 @@ class AppKernel extends Kernel
     {
         $routes->import(__DIR__."/config/routing_{$this->getEnvironment()}.yml");
 
-        if ($_SERVER['LEGACY'] ?? true) {
+        if ($_SERVER['LEGACY'] ?? false) {
             $routes->import('@NelmioApiDocBundle/Resources/config/routing.yml', '/nelmioapidoc');
         }
     }
@@ -160,7 +160,7 @@ class AppKernel extends Kernel
         }
         $c->prependExtensionConfig('twig', $twigConfig);
 
-        if ($_SERVER['LEGACY'] ?? true) {
+        if ($_SERVER['LEGACY'] ?? false) {
             $c->prependExtensionConfig('nelmio_api_doc', [
                 'sandbox' => [
                     'accept_type' => 'application/json',

@@ -88,7 +88,6 @@ jobs:
 
     - name: '(PHP 7.4)'
       php: '7.4'
-      env: LEGACY=0
       before_install:
         - *enable-mongodb-php-extension
         - *disable-xdebug-php-extension
@@ -123,7 +122,6 @@ jobs:
 
     - name: '(PHP 7.4) (lowest dependencies)'
       php: '7.4'
-      env: LEGACY=0
       before_install:
         - *enable-mongodb-php-extension
         - *disable-xdebug-php-extension
