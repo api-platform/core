@@ -169,8 +169,6 @@ final class Client implements HttpClientInterface
 
     /**
      * Returns the CookieJar instance.
-     *
-     * @return CookieJar A CookieJar instance
      */
     public function getCookieJar(): CookieJar
     {
