@@ -1,0 +1,24 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <services>
+        <service id="api_platform.gedmo_doctrine.swagger_from_decorator"
+                 class="ApiPlatform\Core\Bridge\GedmoDoctrine\Swagger\SwaggerFromDecorator"
+                 decorates="api_platform.swagger.normalizer.api_gateway"
+                 autoconfigure="false">
+            <argument type="service" id="api_platform.gedmo_doctrine.swagger_from_decorator.inner"/>
+            <argument>%api_platform.doctrine_gedmo_extensions.from_header_unmatch%</argument>
+        </service>
+
+        <service id="api_platform.gedmo_doctrine.from_listener"
+                 class="ApiPlatform\Core\Bridge\GedmoDoctrine\EventListener\FromListener">
+            <argument type="service" id="gedmo.listener.blameable" />
+
+            <tag name="kernel.event_listener" event="kernel.request" method="onKernelRequest" />
+        </service>
+    </services>
+
+</container>

@@ -36,6 +36,7 @@ use ApiPlatform\Core\GraphQl\Type\Definition\TypeInterface as GraphQlTypeInterfa
 use Doctrine\Common\Annotations\Annotation;
 use phpDocumentor\Reflection\DocBlockFactoryInterface;
 use Ramsey\Uuid\Uuid;
+use Gedmo\Blameable\BlameableListener;
 use Symfony\Component\BrowserKit\AbstractBrowser;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Config\FileLocator;
@@ -185,6 +186,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $container->setParameter('api_platform.http_cache.shared_max_age', $config['http_cache']['shared_max_age']);
         $container->setParameter('api_platform.http_cache.vary', $config['http_cache']['vary']);
         $container->setParameter('api_platform.http_cache.public', $config['http_cache']['public']);
+        $container->setParameter('api_platform.doctrine_gedmo_extensions.from_header_unmatch', $config['doctrine_gedmo_extensions']['from_header_unmatch']);
 
         $container->setAlias('api_platform.operation_path_resolver.default', $config['default_operation_path_resolver']);
         $container->setAlias('api_platform.path_segment_name_generator', $config['path_segment_name_generator']);
@@ -436,6 +438,10 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
 
         if (isset($bundles['FOSUserBundle']) && $config['enable_fos_user']) {
             $loader->load('fos_user.xml');
+        }
+
+        if (class_exists(BlameableListener::class) && $config['doctrine_gedmo_extensions']['from_header_enabled']) {
+            $loader->load('gedmo_blameable.xml');
         }
 
         if (isset($bundles['NelmioApiDocBundle']) && $config['enable_nelmio_api_doc']) {
