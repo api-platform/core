@@ -488,9 +488,7 @@ final class FieldsBuilder implements FieldsBuilderInterface
             return $this->pagination->isGraphQlEnabled($resourceClass, $operationName) && !$input ? $this->typeBuilder->getResourcePaginatedCollectionType($graphqlType, $resourceClass, $operationName) : GraphQLType::listOf($graphqlType);
         }
 
-        return $graphqlType instanceof NullableType || $type->isNullable() || (null !== $mutationName && 'update' === $mutationName)
-            ? $graphqlType
-            : GraphQLType::nonNull($graphqlType);
+        return $graphqlType;
     }
 
     private function normalizePropertyName(string $property): string
