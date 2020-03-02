@@ -56,6 +56,7 @@ use ApiPlatform\Core\Bridge\Elasticsearch\DataProvider\Filter\TermFilter;
 use ApiPlatform\Core\Bridge\Elasticsearch\Metadata\Document\Factory\DocumentMetadataFactoryInterface;
 use ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\ApiPlatformExtension;
 use ApiPlatform\Core\Bridge\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaRestrictionMetadataInterface;
+use ApiPlatform\Core\Bridge\Symfony\Validator\ValidationGroupsGeneratorInterface;
 use ApiPlatform\Core\DataPersister\DataPersisterInterface;
 use ApiPlatform\Core\DataProvider\CollectionDataProviderInterface;
 use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
@@ -1090,6 +1091,10 @@ class ApiPlatformExtensionTest extends TestCase
             ->willReturn($this->childDefinitionProphecy)->shouldBeCalledTimes(1);
         $this->childDefinitionProphecy->setBindings(['$requestStack' => null])->shouldBeCalledTimes(1);
 
+        $containerBuilderProphecy->registerForAutoconfiguration(ValidationGroupsGeneratorInterface::class)
+            ->willReturn($this->childDefinitionProphecy)->shouldBeCalledTimes(1);
+        $this->childDefinitionProphecy->addTag('api_platform.validation_groups_generator')->willReturn($this->childDefinitionProphecy)->shouldBeCalledTimes(1);
+
         $containerBuilderProphecy->registerForAutoconfiguration(PropertySchemaRestrictionMetadataInterface::class)
             ->willReturn($this->childDefinitionProphecy)->shouldBeCalledTimes(1);
         $this->childDefinitionProphecy->addTag('api_platform.metadata.property_schema_restriction')->shouldBeCalledTimes(1);
@@ -1384,6 +1389,7 @@ class ApiPlatformExtensionTest extends TestCase
         $containerBuilderProphecy->getDefinition('api_platform.doctrine.orm.listener.mercure.publish')->willReturn($definitionDummy);
         $containerBuilderProphecy->getDefinition('api_platform.doctrine_mongodb.odm.listener.mercure.publish')->willReturn($definitionDummy);
         $containerBuilderProphecy->getDefinition('api_platform.graphql.subscription.mercure_iri_generator')->willReturn($definitionDummy);
+        $this->childDefinitionProphecy->setPublic(true)->will(function () {});
 
         return $containerBuilderProphecy;
     }

@@ -13,11 +13,15 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Validator;
 
+use ApiPlatform\Core\Bridge\Symfony\Validator\ValidationGroupsGeneratorInterface;
 use Symfony\Component\Validator\Constraints\GroupSequence;
 
-class DummyValidationGroupsGenerator
+final class DummyValidationGroupsGenerator implements ValidationGroupsGeneratorInterface
 {
-    public function __invoke()
+    /**
+     * {@inheritdoc}
+     */
+    public function __invoke($object): GroupSequence
     {
         return new GroupSequence(['b', 'a']);
     }
