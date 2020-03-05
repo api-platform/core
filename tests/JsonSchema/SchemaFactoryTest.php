@@ -13,7 +13,9 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Tests\JsonSchema;
 
+use ApiPlatform\Core\Api\OperationType;
 use ApiPlatform\Core\Api\ResourceClassResolverInterface;
+use ApiPlatform\Core\JsonSchema\Schema;
 use ApiPlatform\Core\JsonSchema\SchemaFactory;
 use ApiPlatform\Core\JsonSchema\TypeFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
@@ -21,7 +23,9 @@ use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInte
 use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 use ApiPlatform\Core\Metadata\Property\PropertyNameCollection;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
+use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Tests\Fixtures\NotAResource;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\OverriddenOperationDummy;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Symfony\Component\PropertyInfo\Type;
@@ -73,5 +77,68 @@ class SchemaFactoryTest extends TestCase
         $this->assertArrayHasKey('bar', $definitions[$rootDefinitionKey]['properties']);
         $this->assertArrayHasKey('type', $definitions[$rootDefinitionKey]['properties']['bar']);
         $this->assertSame('integer', $definitions[$rootDefinitionKey]['properties']['bar']['type']);
+    }
+
+    public function testBuildSchemaForOperationWithOverriddenSerializerGroups(): void
+    {
+        $typeFactoryProphecy = $this->prophesize(TypeFactoryInterface::class);
+        $typeFactoryProphecy->getType(Argument::allOf(
+            Argument::type(Type::class),
+            Argument::which('getBuiltinType', Type::BUILTIN_TYPE_STRING)
+        ), Argument::cetera())->willReturn([
+            'type' => 'string',
+        ]);
+
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
+        $resourceMetadataFactoryProphecy->create(OverriddenOperationDummy::class)->willReturn(new ResourceMetadata((new \ReflectionClass(OverriddenOperationDummy::class))->getShortName(), null, null, [
+            'put' => [
+                'normalization_context' => [
+                    'groups' => 'overridden_operation_dummy_put',
+                ],
+            ],
+        ], [], [
+            'normalization_context' => [
+                'groups' => 'overridden_operation_dummy_read',
+            ],
+        ]));
+
+        $serializerGroup = 'overridden_operation_dummy_put';
+
+        $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
+        $propertyNameCollectionFactoryProphecy->create(OverriddenOperationDummy::class, Argument::allOf(
+            Argument::type('array'),
+            Argument::withEntry('serializer_groups', [$serializerGroup])
+        ))->willReturn(new PropertyNameCollection(['alias', 'description']));
+
+        $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
+        $propertyMetadataFactoryProphecy->create(OverriddenOperationDummy::class, 'alias', Argument::allOf(
+            Argument::type('array'),
+            Argument::withEntry('serializer_groups', [$serializerGroup])
+        ))->willReturn(new PropertyMetadata(new Type(Type::BUILTIN_TYPE_STRING), null, true));
+        $propertyMetadataFactoryProphecy->create(OverriddenOperationDummy::class, 'description', Argument::allOf(
+            Argument::type('array'),
+            Argument::withEntry('serializer_groups', [$serializerGroup])
+        ))->willReturn(new PropertyMetadata(new Type(Type::BUILTIN_TYPE_STRING), null, true));
+
+        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
+        $resourceClassResolverProphecy->isResourceClass(OverriddenOperationDummy::class)->willReturn(true);
+
+        $schemaFactory = new SchemaFactory($typeFactoryProphecy->reveal(), $resourceMetadataFactoryProphecy->reveal(), $propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), null, $resourceClassResolverProphecy->reveal());
+        $resultSchema = $schemaFactory->buildSchema(OverriddenOperationDummy::class, 'json', Schema::TYPE_OUTPUT, OperationType::ITEM, 'put');
+
+        $rootDefinitionKey = $resultSchema->getRootDefinitionKey();
+        $definitions = $resultSchema->getDefinitions();
+
+        $this->assertSame((new \ReflectionClass(OverriddenOperationDummy::class))->getShortName().'-'.$serializerGroup, $rootDefinitionKey);
+        $this->assertArrayHasKey($rootDefinitionKey, $definitions);
+        $this->assertArrayHasKey('type', $definitions[$rootDefinitionKey]);
+        $this->assertSame('object', $definitions[$rootDefinitionKey]['type']);
+        $this->assertArrayHasKey('properties', $definitions[$rootDefinitionKey]);
+        $this->assertArrayHasKey('alias', $definitions[$rootDefinitionKey]['properties']);
+        $this->assertArrayHasKey('type', $definitions[$rootDefinitionKey]['properties']['alias']);
+        $this->assertSame('string', $definitions[$rootDefinitionKey]['properties']['alias']['type']);
+        $this->assertArrayHasKey('description', $definitions[$rootDefinitionKey]['properties']);
+        $this->assertArrayHasKey('type', $definitions[$rootDefinitionKey]['properties']['description']);
+        $this->assertSame('string', $definitions[$rootDefinitionKey]['properties']['description']['type']);
     }
 }
