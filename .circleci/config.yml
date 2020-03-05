@@ -162,12 +162,12 @@ commands:
       - save_cache:
           name: Save PHPStan cache
           paths:
-            - /tmp/phpstan/cache
+            - /tmp/phpstan/resultCache.php
           key: phpstan-{{ .Branch }}-{{ .BuildNum }}
       - save_cache:
           name: Save PHPStan cache
           paths:
-            - /tmp/phpstan/cache
+            - /tmp/phpstan/resultCache.php
           key: phpstan-{{ .Revision }}-{{ .BuildNum }}
   update-project-dependencies:
     steps:
