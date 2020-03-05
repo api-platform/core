@@ -40,9 +40,10 @@ trait ErrorNormalizerTrait
 
     private function getErrorCode($object): ?string
     {
-        $exceptionClass = get_class($object);
         if ($object instanceof FlattenException || $object instanceof LegacyFlattenException) {
             $exceptionClass = $object->getClass();
+        } else {
+            $exceptionClass = get_class($object);
         }
 
         if (is_a($exceptionClass, ErrorCodeSerializableInterface::class, true)) {
