@@ -38,6 +38,7 @@ jobs:
       - name: Install system packages
         run: |
           apk add \
+            bash \
             unzip \
       - name: Cache mongodb PHP extension build
         if: (!startsWith(matrix.php, '7.1'))
@@ -135,11 +136,11 @@ jobs:
         continue-on-error: true
       - name: Upload coverage results to Codecov
         if: matrix.coverage
-        uses: codecov/codecov-action@v1.0.3
+        uses: codecov/codecov-action@v1
         with:
           name: phpunit-php${{ matrix.php }}
           flags: phpunit
-          token: ${{ secrets.CODECOV_TOKEN }}
+          fail_ci_if_error: true
         continue-on-error: true
       - name: Upload coverage results to Coveralls
         if: matrix.coverage
@@ -177,6 +178,7 @@ jobs:
       - name: Install system packages
         run: |
           apk add \
+            bash \
             unzip \
       - name: Cache mongodb PHP extension build
         if: (!startsWith(matrix.php, '7.1'))
@@ -281,11 +283,11 @@ jobs:
         continue-on-error: true
       - name: Upload coverage results to Codecov
         if: matrix.coverage
-        uses: codecov/codecov-action@v1.0.3
+        uses: codecov/codecov-action@v1
         with:
           name: behat-php${{ matrix.php }}
           flags: behat
-          token: ${{ secrets.CODECOV_TOKEN }}
+          fail_ci_if_error: true
         continue-on-error: true
       - name: Upload coverage results to Coveralls
         if: matrix.coverage
@@ -495,6 +497,7 @@ jobs:
       - name: Install system packages
         run: |
           apk add \
+            bash \
             unzip \
       - name: Cache mongodb PHP extension build
         if: (!startsWith(matrix.php, '7.1'))
@@ -600,11 +603,11 @@ jobs:
         continue-on-error: true
       - name: Upload coverage results to Codecov
         if: matrix.coverage
-        uses: codecov/codecov-action@v1.0.3
+        uses: codecov/codecov-action@v1
         with:
           name: behat-php${{ matrix.php }}-legacy
           flags: behat_legacy
-          token: ${{ secrets.CODECOV_TOKEN }}
+          fail_ci_if_error: true
         continue-on-error: true
       - name: Upload coverage results to Coveralls
         if: matrix.coverage
@@ -1176,6 +1179,7 @@ jobs:
       - name: Install system packages
         run: |
           apk add \
+            bash \
             unzip \
       - name: Cache mongodb PHP extension build
         uses: actions/cache@v1
@@ -1265,11 +1269,11 @@ jobs:
         continue-on-error: true
       - name: Upload coverage results to Codecov
         if: matrix.coverage
-        uses: codecov/codecov-action@v1.0.3
+        uses: codecov/codecov-action@v1
         with:
           name: phpunit-php${{ matrix.php }}-mongodb
           flags: phpunit_mongodb
-          token: ${{ secrets.CODECOV_TOKEN }}
+          fail_ci_if_error: true
         continue-on-error: true
       - name: Upload coverage results to Coveralls
         if: matrix.coverage
@@ -1316,6 +1320,7 @@ jobs:
       - name: Install system packages
         run: |
           apk add \
+            bash \
             unzip \
       - name: Cache mongodb PHP extension build
         uses: actions/cache@v1
@@ -1412,11 +1417,11 @@ jobs:
         continue-on-error: true
       - name: Upload coverage results to Codecov
         if: matrix.coverage
-        uses: codecov/codecov-action@v1.0.3
+        uses: codecov/codecov-action@v1
         with:
           name: behat-php${{ matrix.php }}-mongodb
           flags: behat_mongodb
-          token: ${{ secrets.CODECOV_TOKEN }}
+          fail_ci_if_error: true
         continue-on-error: true
       - name: Upload coverage results to Coveralls
         if: matrix.coverage
@@ -1465,6 +1470,7 @@ jobs:
       - name: Install system packages
         run: |
           apk add \
+            bash \
             unzip \
       - name: Cache mongodb PHP extension build
         uses: actions/cache@v1
@@ -1554,11 +1560,11 @@ jobs:
         continue-on-error: true
       - name: Upload coverage results to Codecov
         if: matrix.coverage
-        uses: codecov/codecov-action@v1.0.3
+        uses: codecov/codecov-action@v1
         with:
           name: phpunit-php${{ matrix.php }}-elasticsearch
           flags: phpunit_elasticsearch
-          token: ${{ secrets.CODECOV_TOKEN }}
+          fail_ci_if_error: true
         continue-on-error: true
       - name: Upload coverage results to Coveralls
         if: matrix.coverage
@@ -1607,6 +1613,7 @@ jobs:
       - name: Install system packages
         run: |
           apk add \
+            bash \
             unzip \
       - name: Cache mongodb PHP extension build
         uses: actions/cache@v1
@@ -1703,11 +1710,11 @@ jobs:
         continue-on-error: true
       - name: Upload coverage results to Codecov
         if: matrix.coverage
-        uses: codecov/codecov-action@v1.0.3
+        uses: codecov/codecov-action@v1
         with:
           name: behat-php${{ matrix.php }}-elasticsearch
           flags: behat_elasticsearch
-          token: ${{ secrets.CODECOV_TOKEN }}
+          fail_ci_if_error: true
         continue-on-error: true
       - name: Upload coverage results to Coveralls
         if: matrix.coverage
