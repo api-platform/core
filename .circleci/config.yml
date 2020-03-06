@@ -1,8 +1,5 @@
 version: 2.1
 
-.constants:
-  - &ext-mongodb-version '1.6.1'
-
 commands:
   clear-test-app-cache:
     steps:
@@ -19,11 +16,6 @@ commands:
       - run:
           name: Disable xdebug PHP extension
           command: sudo rm /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
-  install-mongodb-php-extension:
-    steps:
-      - install-php-extension-from-pecl:
-          extension_name: mongodb
-          extension_version: *ext-mongodb-version
   install-php-extension-from-pecl:
     parameters:
       extension_name:
@@ -64,16 +56,6 @@ commands:
             - composer-{{ .Revision }}
             - composer-{{ .Branch }}
             - composer-
-  restore-mongodb-php-extension-build-cache:
-    parameters:
-      php_version:
-        description: PHP version (major.minor).
-        type: string
-    steps:
-      - restore-php-extension-build-cache:
-          extension_name: mongodb
-          extension_version: *ext-mongodb-version
-          php_version: << parameters.php_version >>
   restore-php-cs-fixer-cache:
     steps:
       - restore_cache:
@@ -118,16 +100,6 @@ commands:
           paths:
             - ~/.composer/cache
           key: composer-{{ .Revision }}-{{ .BuildNum }}
-  save-mongodb-php-extension-build-cache:
-    parameters:
-      php_version:
-        description: PHP version (major.minor).
-        type: string
-    steps:
-      - save-php-extension-build-cache:
-          extension_name: mongodb
-          extension_version: *ext-mongodb-version
-          php_version: << parameters.php_version >>
   save-php-cs-fixer-cache:
     steps:
       - save_cache:
@@ -231,11 +203,6 @@ jobs:
     working_directory: ~/api-platform/core
     steps:
       - checkout
-      - restore-mongodb-php-extension-build-cache:
-          php_version: << parameters.php_version >>
-      - install-mongodb-php-extension
-      - save-mongodb-php-extension-build-cache:
-          php_version: << parameters.php_version >>
       - disable-xdebug-php-extension
       - disable-php-memory-limit
       - restore-composer-cache
