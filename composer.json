@@ -86,6 +86,7 @@
         "symfony/validator": "^3.4 || ^4.0 || ^5.0",
         "symfony/web-profiler-bundle": "^4.2 || ^5.0",
         "symfony/yaml": "^3.4 || ^4.0 || ^5.0",
+        "teohhanhui/stubs-mongodb": "@dev",
         "twig/twig": "^1.42.3 || ^2.12",
         "webonyx/graphql-php": ">=0.13.1 <1.0"
     },
@@ -119,6 +120,12 @@
             "ApiPlatform\\Core\\Tests\\": "tests/"
         }
     },
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/teohhanhui/stubs-mongodb"
+        }
+    ],
     "config": {
         "preferred-install": {
             "*": "dist"
