@@ -16,7 +16,7 @@ namespace ApiPlatform\Core\Tests\JsonApi\Serializer;
 use ApiPlatform\Core\JsonApi\Serializer\ErrorNormalizer;
 use ApiPlatform\Core\Tests\Mock\Exception\ErrorCodeSerializable;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\ErrorHandler\Exception\FlattenException;
+use Symfony\Component\Debug\Exception\FlattenException;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
