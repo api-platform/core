@@ -49,6 +49,10 @@ final class ErrorNormalizer implements NormalizerInterface, CacheableSupportsMet
             'description' => $this->getErrorMessage($object, $context, $this->debug),
         ];
 
+        if (null !== $errorCode = $this->getErrorCode($object)) {
+            $data['code'] = $errorCode;
+        }
+
         if ($this->debug && null !== $trace = $object->getTrace()) {
             $data['trace'] = $trace;
         }

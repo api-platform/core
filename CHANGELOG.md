@@ -8,6 +8,7 @@
 * GraphQL: Allow to format GraphQL errors based on exceptions (#3063)
 * GraphQL: Add page-based pagination (#3175)
 * OpenAPI: Add PHP default values to the documentation (#2386)
+* Deprecate using a validation groups generator service not implementing `ApiPlatform\Core\Bridge\Symfony\Validator\ValidationGroupsGeneratorInterface` (#3346)
 
 ## 2.5.x-dev
 
