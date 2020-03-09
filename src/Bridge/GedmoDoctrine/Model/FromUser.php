@@ -16,7 +16,7 @@ namespace ApiPlatform\Core\Bridge\GedmoDoctrine\Model;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
- * A model for holding the email address sent in a "From" header request
+ * A model for holding the email address sent in a "From" header request.
  *
  * @author Ryan Jefferson <ryanhjefferson@gmail.com>
  */

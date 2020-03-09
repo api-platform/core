@@ -16,7 +16,7 @@ namespace ApiPlatform\Core\Bridge\GedmoDoctrine\Swagger;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 /**
- * Class SwaggerFromDecorator
+ * Class SwaggerFromDecorator.
  *
  * @author Ryan Jefferson <ryanhjefferson@gmail.com>
  */
@@ -38,10 +38,10 @@ final class SwaggerFromDecorator implements NormalizerInterface
         $docs = $this->decorated->normalize($object, $format, $context);
 
         $requestHeader = [
-            'name'        => 'From',
+            'name' => 'From',
             'description' => 'Email address for a user who controls the requesting user agent.',
-            'required'    => false,
-            'in'          => 'header'
+            'required' => false,
+            'in' => 'header',
         ];
 
         foreach ($docs['paths'] as $name => &$item) {

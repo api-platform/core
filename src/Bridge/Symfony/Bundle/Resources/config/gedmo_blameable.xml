@@ -16,6 +16,7 @@
         <service id="api_platform.gedmo_doctrine.from_listener"
                  class="ApiPlatform\Core\Bridge\GedmoDoctrine\EventListener\FromListener">
             <argument type="service" id="gedmo.listener.blameable" />
+            <argument>%api_platform.doctrine_gedmo_extensions.from_header_unmatch%</argument>
 
             <tag name="kernel.event_listener" event="kernel.request" method="onKernelRequest" />
         </service>
