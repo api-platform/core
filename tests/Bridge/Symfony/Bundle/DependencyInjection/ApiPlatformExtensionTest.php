@@ -858,6 +858,7 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.http_cache.shared_max_age' => null,
             'api_platform.http_cache.vary' => ['Accept'],
             'api_platform.http_cache.public' => null,
+            'api_platform.http_cache.invalidation.max_header_length' => 7500,
             'api_platform.defaults' => ['attributes' => []],
             'api_platform.enable_entrypoint' => true,
             'api_platform.enable_docs' => true,
