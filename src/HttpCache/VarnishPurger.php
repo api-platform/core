@@ -48,7 +48,7 @@ final class VarnishPurger implements PurgerInterface
      *
      * @return int Number of tags per tag invalidation request
      */
-    private function determineTagsPerHeader($escapedTags, $glue)
+    private function determineTagsPerHeader(array $escapedTags, string $glue): int
     {
         if (mb_strlen(implode($glue, $escapedTags)) < $this->maxHeaderLength) {
             return \count($escapedTags);
