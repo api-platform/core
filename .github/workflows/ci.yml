@@ -298,6 +298,30 @@ jobs:
           export PATH="$PATH:$HOME/.composer/vendor/bin"
           coveralls build/logs/behat/clover.xml
         continue-on-error: true
+      - name: Export OpenAPI documents
+        run: |
+          mkdir -p build/out/openapi
+          tests/Fixtures/app/console api:openapi:export --spec-version=2 -o build/out/openapi/swagger_v2.json
+          tests/Fixtures/app/console api:openapi:export --spec-version=2 --yaml -o build/out/openapi/swagger_v2.yaml
+          tests/Fixtures/app/console api:openapi:export --spec-version=3 -o build/out/openapi/openapi_v3.json
+          tests/Fixtures/app/console api:openapi:export --spec-version=3 --yaml -o build/out/openapi/openapi_v3.yaml
+      - name: Validate OpenAPI documents
+        uses: docker://node:12-alpine
+        with:
+          args: |
+            sh -c -e "
+              npx swagger-cli validate build/out/openapi/swagger_v2.json
+              npx swagger-cli validate build/out/openapi/swagger_v2.yaml
+              npx swagger-cli validate build/out/openapi/openapi_v3.json
+              npx swagger-cli validate build/out/openapi/openapi_v3.yaml
+            "
+      - name: Upload OpenAPI artifacts
+        if: always()
+        uses: actions/upload-artifact@v1
+        with:
+          name: openapi-docs-php${{ matrix.php }}
+          path: build/out/openapi
+        continue-on-error: true
 
   phpunit-lowest-deps:
     name: PHPUnit (PHP ${{ matrix.php }}) (lowest dependencies)
@@ -467,6 +491,30 @@ jobs:
         with:
           name: behat-logs-php${{ matrix.php }}-lowest-deps
           path: build/logs/behat
+        continue-on-error: true
+      - name: Export OpenAPI documents
+        run: |
+          mkdir -p build/out/openapi
+          tests/Fixtures/app/console api:openapi:export --spec-version=2 -o build/out/openapi/swagger_v2.json
+          tests/Fixtures/app/console api:openapi:export --spec-version=2 --yaml -o build/out/openapi/swagger_v2.yaml
+          tests/Fixtures/app/console api:openapi:export --spec-version=3 -o build/out/openapi/openapi_v3.json
+          tests/Fixtures/app/console api:openapi:export --spec-version=3 --yaml -o build/out/openapi/openapi_v3.yaml
+      - name: Validate OpenAPI documents
+        uses: docker://node:12-alpine
+        with:
+          args: |
+            sh -c -e "
+              npx swagger-cli validate build/out/openapi/swagger_v2.json
+              npx swagger-cli validate build/out/openapi/swagger_v2.yaml
+              npx swagger-cli validate build/out/openapi/openapi_v3.json
+              npx swagger-cli validate build/out/openapi/openapi_v3.yaml
+            "
+      - name: Upload OpenAPI artifacts
+        if: always()
+        uses: actions/upload-artifact@v1
+        with:
+          name: openapi-docs-php${{ matrix.php }}-lowest-deps
+          path: build/out/openapi
         continue-on-error: true
 
   behat-legacy:
@@ -925,6 +973,30 @@ jobs:
           name: behat-logs-php${{ matrix.php }}-postgresql
           path: build/logs/behat
         continue-on-error: true
+      - name: Export OpenAPI documents
+        run: |
+          mkdir -p build/out/openapi
+          tests/Fixtures/app/console api:openapi:export --spec-version=2 -o build/out/openapi/swagger_v2.json
+          tests/Fixtures/app/console api:openapi:export --spec-version=2 --yaml -o build/out/openapi/swagger_v2.yaml
+          tests/Fixtures/app/console api:openapi:export --spec-version=3 -o build/out/openapi/openapi_v3.json
+          tests/Fixtures/app/console api:openapi:export --spec-version=3 --yaml -o build/out/openapi/openapi_v3.yaml
+      - name: Validate OpenAPI documents
+        uses: docker://node:12-alpine
+        with:
+          args: |
+            sh -c -e "
+              npx swagger-cli validate build/out/openapi/swagger_v2.json
+              npx swagger-cli validate build/out/openapi/swagger_v2.yaml
+              npx swagger-cli validate build/out/openapi/openapi_v3.json
+              npx swagger-cli validate build/out/openapi/openapi_v3.yaml
+            "
+      - name: Upload OpenAPI artifacts
+        if: always()
+        uses: actions/upload-artifact@v1
+        with:
+          name: openapi-docs-php${{ matrix.php }}-postgresql
+          path: build/out/openapi
+        continue-on-error: true
 
   phpunit-mysql:
     name: PHPUnit (PHP ${{ matrix.php }}) (MySQL)
@@ -1142,6 +1214,30 @@ jobs:
         with:
           name: behat-logs-php${{ matrix.php }}-mysql
           path: build/logs/behat
+        continue-on-error: true
+      - name: Export OpenAPI documents
+        run: |
+          mkdir -p build/out/openapi
+          tests/Fixtures/app/console api:openapi:export --spec-version=2 -o build/out/openapi/swagger_v2.json
+          tests/Fixtures/app/console api:openapi:export --spec-version=2 --yaml -o build/out/openapi/swagger_v2.yaml
+          tests/Fixtures/app/console api:openapi:export --spec-version=3 -o build/out/openapi/openapi_v3.json
+          tests/Fixtures/app/console api:openapi:export --spec-version=3 --yaml -o build/out/openapi/openapi_v3.yaml
+      - name: Validate OpenAPI documents
+        uses: docker://node:12-alpine
+        with:
+          args: |
+            sh -c -e "
+              npx swagger-cli validate build/out/openapi/swagger_v2.json
+              npx swagger-cli validate build/out/openapi/swagger_v2.yaml
+              npx swagger-cli validate build/out/openapi/openapi_v3.json
+              npx swagger-cli validate build/out/openapi/openapi_v3.yaml
+            "
+      - name: Upload OpenAPI artifacts
+        if: always()
+        uses: actions/upload-artifact@v1
+        with:
+          name: openapi-docs-php${{ matrix.php }}-mysql
+          path: build/out/openapi
         continue-on-error: true
 
   phpunit-mongodb:
@@ -1431,6 +1527,30 @@ jobs:
           composer global require --prefer-dist --no-progress --no-suggest --ansi cedx/coveralls
           export PATH="$PATH:$HOME/.composer/vendor/bin"
           coveralls build/logs/behat/clover.xml
+        continue-on-error: true
+      - name: Export OpenAPI documents
+        run: |
+          mkdir -p build/out/openapi
+          tests/Fixtures/app/console api:openapi:export --spec-version=2 -o build/out/openapi/swagger_v2.json
+          tests/Fixtures/app/console api:openapi:export --spec-version=2 --yaml -o build/out/openapi/swagger_v2.yaml
+          tests/Fixtures/app/console api:openapi:export --spec-version=3 -o build/out/openapi/openapi_v3.json
+          tests/Fixtures/app/console api:openapi:export --spec-version=3 --yaml -o build/out/openapi/openapi_v3.yaml
+      - name: Validate OpenAPI documents
+        uses: docker://node:12-alpine
+        with:
+          args: |
+            sh -c -e "
+              npx swagger-cli validate build/out/openapi/swagger_v2.json
+              npx swagger-cli validate build/out/openapi/swagger_v2.yaml
+              npx swagger-cli validate build/out/openapi/openapi_v3.json
+              npx swagger-cli validate build/out/openapi/openapi_v3.yaml
+            "
+      - name: Upload OpenAPI artifacts
+        if: always()
+        uses: actions/upload-artifact@v1
+        with:
+          name: openapi-docs-php${{ matrix.php }}-mongodb
+          path: build/out/openapi
         continue-on-error: true
 
   phpunit-elasticsearch:
@@ -1724,6 +1844,30 @@ jobs:
           composer global require --prefer-dist --no-progress --no-suggest --ansi cedx/coveralls
           export PATH="$PATH:$HOME/.composer/vendor/bin"
           coveralls build/logs/behat/clover.xml
+        continue-on-error: true
+      - name: Export OpenAPI documents
+        run: |
+          mkdir -p build/out/openapi
+          tests/Fixtures/app/console api:openapi:export --spec-version=2 -o build/out/openapi/swagger_v2.json
+          tests/Fixtures/app/console api:openapi:export --spec-version=2 --yaml -o build/out/openapi/swagger_v2.yaml
+          tests/Fixtures/app/console api:openapi:export --spec-version=3 -o build/out/openapi/openapi_v3.json
+          tests/Fixtures/app/console api:openapi:export --spec-version=3 --yaml -o build/out/openapi/openapi_v3.yaml
+      - name: Validate OpenAPI documents
+        uses: docker://node:12-alpine
+        with:
+          args: |
+            sh -c -e "
+              npx swagger-cli validate build/out/openapi/swagger_v2.json
+              npx swagger-cli validate build/out/openapi/swagger_v2.yaml
+              npx swagger-cli validate build/out/openapi/openapi_v3.json
+              npx swagger-cli validate build/out/openapi/openapi_v3.yaml
+            "
+      - name: Upload OpenAPI artifacts
+        if: always()
+        uses: actions/upload-artifact@v1
+        with:
+          name: openapi-docs-php${{ matrix.php }}-elasticsearch
+          path: build/out/openapi
         continue-on-error: true
 
   phpunit-no-deprecations:
