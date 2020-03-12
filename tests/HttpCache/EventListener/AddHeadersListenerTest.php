@@ -102,11 +102,11 @@ class AddHeadersListenerTest extends TestCase
         $factory = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $factory->create(Dummy::class)->willReturn(new ResourceMetadata())->shouldBeCalled();
 
-        $listener = new AddHeadersListener(true, 100, 200, ['Accept', 'Accept-Encoding'], true, $factory->reveal());
+        $listener = new AddHeadersListener(true, 100, 200, ['Accept', 'Accept-Encoding'], true, $factory->reveal(), 15, 30);
         $listener->onKernelResponse($event->reveal());
 
         $this->assertSame('"9893532233caff98cd083a116b013c0b"', $response->getEtag());
-        $this->assertSame('max-age=100, public, s-maxage=200', $response->headers->get('Cache-Control'));
+        $this->assertSame('max-age=100, public, s-maxage=200, stale-if-error=30, stale-while-revalidate=15', $response->headers->get('Cache-Control'));
         $this->assertSame(['Accept', 'Cookie', 'Accept-Encoding'], $response->getVary());
     }
 
@@ -126,11 +126,11 @@ class AddHeadersListenerTest extends TestCase
         $factory = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $factory->create(Dummy::class)->willReturn(new ResourceMetadata())->shouldBeCalled();
 
-        $listener = new AddHeadersListener(true, 100, 200, ['Accept', 'Accept-Encoding'], true, $factory->reveal());
+        $listener = new AddHeadersListener(true, 100, 200, ['Accept', 'Accept-Encoding'], true, $factory->reveal(), 15, 30);
         $listener->onKernelResponse($event->reveal());
 
         $this->assertSame('"etag"', $response->getEtag());
-        $this->assertSame('max-age=300, public, s-maxage=400', $response->headers->get('Cache-Control'));
+        $this->assertSame('max-age=300, public, s-maxage=400, stale-if-error=30, stale-while-revalidate=15', $response->headers->get('Cache-Control'));
         $this->assertSame(['Accept', 'Cookie', 'Accept-Encoding'], $response->getVary());
     }
 
@@ -143,14 +143,14 @@ class AddHeadersListenerTest extends TestCase
         $event->getRequest()->willReturn($request)->shouldBeCalled();
         $event->getResponse()->willReturn($response)->shouldBeCalled();
 
-        $metadata = new ResourceMetadata(null, null, null, null, null, ['cache_headers' => ['max_age' => 123, 'shared_max_age' => 456, 'vary' => ['Vary-1', 'Vary-2']]]);
+        $metadata = new ResourceMetadata(null, null, null, null, null, ['cache_headers' => ['max_age' => 123, 'shared_max_age' => 456, 'stale_while_revalidate' => 928, 'stale_if_error' => 70,  'vary' => ['Vary-1', 'Vary-2']]]);
         $factory = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $factory->create(Dummy::class)->willReturn($metadata)->shouldBeCalled();
 
-        $listener = new AddHeadersListener(true, 100, 200, ['Accept', 'Accept-Encoding'], true, $factory->reveal());
+        $listener = new AddHeadersListener(true, 100, 200, ['Accept', 'Accept-Encoding'], true, $factory->reveal(), 15, 30);
         $listener->onKernelResponse($event->reveal());
 
-        $this->assertSame('max-age=123, public, s-maxage=456', $response->headers->get('Cache-Control'));
+        $this->assertSame('max-age=123, public, s-maxage=456, stale-if-error=70, stale-while-revalidate=928', $response->headers->get('Cache-Control'));
         $this->assertSame(['Vary-1', 'Vary-2'], $response->getVary());
     }
 }
