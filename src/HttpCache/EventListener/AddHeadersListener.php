@@ -32,8 +32,10 @@ final class AddHeadersListener
     private $vary;
     private $public;
     private $resourceMetadataFactory;
+    private $staleWhileRevalidate;
+    private $staleIfError;
 
-    public function __construct(bool $etag = false, int $maxAge = null, int $sharedMaxAge = null, array $vary = null, bool $public = null, ResourceMetadataFactoryInterface $resourceMetadataFactory = null)
+    public function __construct(bool $etag = false, int $maxAge = null, int $sharedMaxAge = null, array $vary = null, bool $public = null, ResourceMetadataFactoryInterface $resourceMetadataFactory = null, int $staleWhileRevalidate = null, int $staleIfError = null)
     {
         $this->etag = $etag;
         $this->maxAge = $maxAge;
@@ -41,6 +43,8 @@ final class AddHeadersListener
         $this->vary = $vary;
         $this->public = $public;
         $this->resourceMetadataFactory = $resourceMetadataFactory;
+        $this->staleWhileRevalidate = $staleWhileRevalidate;
+        $this->staleIfError = $staleIfError;
     }
 
     public function onKernelResponse(ResponseEvent $event): void
@@ -82,6 +86,14 @@ final class AddHeadersListener
 
         if (null !== $this->public && !$response->headers->hasCacheControlDirective('public')) {
             $this->public ? $response->setPublic() : $response->setPrivate();
+        }
+
+        if (null !== ($staleWhileRevalidate = $resourceCacheHeaders['stale_while_revalidate'] ?? $this->staleWhileRevalidate) && !$response->headers->hasCacheControlDirective('stale-while-revalidate')) {
+            $response->headers->addCacheControlDirective('stale-while-revalidate', $staleWhileRevalidate);
+        }
+
+        if (null !== ($staleIfError = $resourceCacheHeaders['stale_if_error'] ?? $this->staleIfError) && !$response->headers->hasCacheControlDirective('stale-if-error')) {
+            $response->headers->addCacheControlDirective('stale-if-error', $staleIfError);
         }
     }
 }
