@@ -36,3 +36,7 @@ Feature: JSON API pagination handling
   Scenario: Get an error when provided page number is not valid
     When I send a "GET" request to "/dummies?page[page]=0"
     Then the response status code should be 400
+    
+  Scenario: Get an error when provided page number is too large
+    When I send a "GET" request to "/dummies?page[page]=9223372036854775807"
+    Then the response status code should be 400
