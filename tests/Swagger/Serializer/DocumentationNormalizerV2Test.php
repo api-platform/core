@@ -2939,14 +2939,14 @@ class DocumentationNormalizerV2Test extends TestCase
         $documentation = new Documentation(new ResourceNameCollection([DummyPropertyWithDefaultValue::class]));
 
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
-        $propertyNameCollectionFactoryProphecy->create(DummyPropertyWithDefaultValue::class, [])->shouldBeCalled()->willReturn(new PropertyNameCollection(['foo']));
+        $propertyNameCollectionFactoryProphecy->create(DummyPropertyWithDefaultValue::class, Argument::any())->shouldBeCalled()->willReturn(new PropertyNameCollection(['foo']));
 
         $dummyMetadata = new ResourceMetadata('DummyPropertyWithDefaultValue', null, null, ['get' => ['method' => 'GET']]);
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create(DummyPropertyWithDefaultValue::class)->shouldBeCalled()->willReturn($dummyMetadata);
 
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
-        $propertyMetadataFactoryProphecy->create(DummyPropertyWithDefaultValue::class, 'foo')->shouldBeCalled()->willReturn($propertyMetadata);
+        $propertyMetadataFactoryProphecy->create(DummyPropertyWithDefaultValue::class, 'foo', Argument::any())->shouldBeCalled()->willReturn($propertyMetadata);
 
         $operationPathResolver = new CustomOperationPathResolver(new OperationPathResolver(new UnderscorePathSegmentNameGenerator()));
 
