@@ -224,7 +224,7 @@ final class FieldsBuilder implements FieldsBuilderInterface
                 }
 
                 if ($fieldConfiguration = $this->getResourceFieldConfiguration($property, $propertyMetadata->getDescription(), $propertyMetadata->getAttribute('deprecation_reason', ''), $propertyType, $resourceClass, $input, $queryName, $mutationName, $subscriptionName, $depth)) {
-                    $fields['id' === $property ? '_id' : $this->normalizePropertyName($property)] = $fieldConfiguration;
+                    $fields['id' === $property ? '_id' : $this->normalizePropertyName($property, $resourceClass)] = $fieldConfiguration;
                 }
             }
         }
@@ -493,8 +493,8 @@ final class FieldsBuilder implements FieldsBuilderInterface
             : GraphQLType::nonNull($graphqlType);
     }
 
-    private function normalizePropertyName(string $property): string
+    private function normalizePropertyName(string $property, string $resourceClass): string
     {
-        return null !== $this->nameConverter ? $this->nameConverter->normalize($property) : $property;
+        return null !== $this->nameConverter ? $this->nameConverter->normalize($property, $resourceClass) : $property;
     }
 }
