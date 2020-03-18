@@ -78,6 +78,7 @@ class RespondListenerTest extends TestCase
         $this->assertEquals('Accept', $response->headers->get('Vary'));
         $this->assertEquals('nosniff', $response->headers->get('X-Content-Type-Options'));
         $this->assertEquals('deny', $response->headers->get('X-Frame-Options'));
+        $this->assertNull($response->headers->get('Location'));
     }
 
     public function testCreate201Response()
@@ -134,6 +135,7 @@ class RespondListenerTest extends TestCase
         $this->assertEquals('Accept', $response->headers->get('Vary'));
         $this->assertEquals('nosniff', $response->headers->get('X-Content-Type-Options'));
         $this->assertEquals('deny', $response->headers->get('X-Frame-Options'));
+        $this->assertNull($response->headers->get('Location'));
     }
 
     public function testSetSunsetHeader()

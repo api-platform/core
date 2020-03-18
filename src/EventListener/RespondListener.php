@@ -83,9 +83,15 @@ final class RespondListener
             $status = $resourceMetadata->getOperationAttribute($attributes, 'status');
         }
 
+        $status = $status ?? self::METHOD_TO_CODE[$request->getMethod()] ?? Response::HTTP_OK;
+
+        if ($request->isMethod('POST') && !\in_array($status, [Response::HTTP_CREATED, Response::HTTP_ACCEPTED], true)) {
+            unset($headers['Location']);
+        }
+
         $event->setResponse(new Response(
             $controllerResult,
-            $status ?? self::METHOD_TO_CODE[$request->getMethod()] ?? Response::HTTP_OK,
+            $status,
             $headers
         ));
     }
