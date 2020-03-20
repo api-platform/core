@@ -182,6 +182,7 @@ class ConfigurationTest extends TestCase
                     'enabled' => false,
                     'varnish_urls' => [],
                     'request_options' => [],
+                    'max_header_length' => 7500,
                 ],
                 'etag' => true,
                 'max_age' => null,
