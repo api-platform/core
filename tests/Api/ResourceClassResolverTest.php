@@ -95,7 +95,6 @@ class ResourceClassResolverTest extends TestCase
 
         $dummy = new \ArrayObject();
 
-
         $resourceClassResolver = new ResourceClassResolver($resourceNameCollectionFactoryProphecy->reveal());
 
         $this->assertEquals(\ArrayObject::class, $resourceClassResolver->getResourceClass($dummy));
