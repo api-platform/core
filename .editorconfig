@@ -43,10 +43,6 @@ indent_style = space
 indent_size = 4
 trim_trailing_whitespace = false
 
-[.circleci/config.yml]
-indent_style = space
-indent_size = 2
-
 [.github/workflows/*.yml]
 indent_style = space
 indent_size = 2
@@ -57,14 +53,6 @@ indent_style = tab
 [.php_cs{,.dist}]
 indent_style = space
 indent_size = 4
-
-[.styleci.yml]
-indent_style = space
-indent_size = 2
-
-[.travis.yml]
-indent_style = space
-indent_size = 2
 
 [appveyor.yml]
 indent_style = space
