@@ -449,6 +449,34 @@ final class DoctrineContext implements Context
     }
 
     /**
+     * @Given there are dummies with similar properties
+     */
+    public function thereAreDummiesWithSimilarProperties()
+    {
+        $dummy1 = $this->buildDummy();
+        $dummy1->setName('foo');
+        $dummy1->setDescription('bar');
+
+        $dummy2 = $this->buildDummy();
+        $dummy2->setName('baz');
+        $dummy2->setDescription('qux');
+
+        $dummy3 = $this->buildDummy();
+        $dummy3->setName('foo');
+        $dummy3->setDescription('qux');
+
+        $dummy4 = $this->buildDummy();
+        $dummy4->setName('baz');
+        $dummy4->setDescription('bar');
+
+        $this->manager->persist($dummy1);
+        $this->manager->persist($dummy2);
+        $this->manager->persist($dummy3);
+        $this->manager->persist($dummy4);
+        $this->manager->flush();
+    }
+
+    /**
      * @Given there are :nb dummyDtoNoInput objects
      */
     public function thereAreDummyDtoNoInputObjects(int $nb)

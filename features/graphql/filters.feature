@@ -223,6 +223,31 @@ Feature: Collections filtering
     And the JSON node "data.dummies.edges[1].node.name" should be equal to "Dummy #1"
 
   @createSchema
+  Scenario: Retrieve a collection ordered correctly given the order of the argument
+    Given there are dummies with similar properties
+    When I send the following GraphQL request:
+    """
+    {
+      dummies(order: {description: "ASC", name: "ASC"}) {
+        edges {
+          node {
+            id
+            name
+            description
+          }
+        }
+      }
+    }
+    """
+    Then the response status code should be 200
+    And the header "Content-Type" should be equal to "application/json"
+    And the JSON node "data.dummies.edges[0].node.name" should be equal to "baz"
+    And the JSON node "data.dummies.edges[0].node.description" should be equal to "bar"
+    And the JSON node "data.dummies.edges[1].node.name" should be equal to "foo"
+    And the JSON node "data.dummies.edges[1].node.description" should be equal to "bar"
+
+
+  @createSchema
   Scenario: Retrieve a collection filtered using the related search filter with two values and exact strategy
     Given there are 3 dummy objects with relatedDummy
     When  I send the following GraphQL request:
