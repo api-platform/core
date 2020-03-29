@@ -131,8 +131,13 @@ final class ReadStage implements ReadStageInterface
 
         foreach ($filters as $name => $value) {
             if (\is_array($value)) {
-                if (strpos($name, '_list')) {
+                if (\is_string($name) && strpos($name, '_list')) {
                     $name = substr($name, 0, \strlen($name) - \strlen('_list'));
+                }
+
+                // If it's just a simple array of string values, for example when using the _list syntax we don't want to decompose the array because it's will return multiple string and not multipe array that we can merge
+                if ($this->isNumericIndexArrayOfArray($value)) {
+                    $value = array_merge(...$value);
                 }
                 $filters[$name] = $this->getNormalizedFilters($value);
             }
@@ -162,5 +167,20 @@ final class ReadStage implements ReadStageInterface
             'identifiers' => $resolvedIdentifiers,
             'collection' => true,
         ], $operationName);
+    }
+
+    private function isNumericIndexArrayOfArray(array $array): bool
+    {
+        if ([] === $array) {
+            return false;
+        }
+
+        if (array_keys($array) !== range(0, \count($array) - 1)) {
+            return false;
+        }
+
+        return $array === array_filter($array, static function ($item) {
+            return \is_array($item);
+        });
     }
 }

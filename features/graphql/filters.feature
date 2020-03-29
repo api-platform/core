@@ -228,7 +228,7 @@ Feature: Collections filtering
     When I send the following GraphQL request:
     """
     {
-      dummies(order: {description: "ASC", name: "ASC"}) {
+      dummies(order: [{description: "ASC"}, {name: "ASC"}]) {
         edges {
           node {
             id

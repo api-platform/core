@@ -451,10 +451,10 @@ final class FieldsBuilder implements FieldsBuilderInterface
 
             unset($value['#name']);
 
-            $filterArgType = new InputObjectType([
+            $filterArgType = GraphQLType::listOf(new InputObjectType([
                 'name' => $name,
                 'fields' => $this->convertFilterArgsToTypes($value),
-            ]);
+            ]));
 
             $this->typesContainer->set($name, $filterArgType);
 
