@@ -8,10 +8,133 @@ env:
   COMPOSER_ALLOW_SUPERUSER: '1' # https://getcomposer.org/doc/03-cli.md#composer-allow-superuser
   COMPOSER_INSTALLER_COMMIT: fb22b78362d31c0d2bf516d1f8cdfd2745caa431
   COVERAGE: '0'
-  EXT_MONGODB_VERSION: '1.6.1'
+  EXT_MONGODB_VERSION: '1.7.3'
   EXT_PCOV_VERSION: '1.0.6'
 
 jobs:
+  php-cs-fixer:
+    name: PHP-CS-Fixer (PHP ${{ matrix.php }})
+    runs-on: ubuntu-latest
+    container:
+      image: php:${{ matrix.php }}-alpine
+      options: >-
+        --tmpfs /tmp:exec
+        --tmpfs /var/tmp:exec
+    strategy:
+      matrix:
+        php:
+          - '7.4'
+      fail-fast: false
+    timeout-minutes: 5
+    env:
+      PHP_CS_FIXER_FUTURE_MODE: '1'
+      PHP_CS_FIXER_VERSION: '^2.14'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v1
+      - name: Install system packages
+        run: |
+          apk add \
+            unzip \
+      - name: Disable PHP memory limit
+        run: echo 'memory_limit=-1' >> /usr/local/etc/php/php.ini
+      - name: Install Composer
+        run: wget -qO - https://raw.githubusercontent.com/composer/getcomposer.org/$COMPOSER_INSTALLER_COMMIT/web/installer | php -- --install-dir=/usr/local/bin --filename=composer --quiet
+      - name: Cache Composer packages
+        uses: actions/cache@v1
+        with:
+          path: ~/.composer/cache
+          key: composer-php${{ matrix.php }}-php-cs-fixer-${{ github.sha }}
+          restore-keys: |
+            composer-php${{ matrix.php }}-php-cs-fixer-
+            composer-php${{ matrix.php }}-
+            composer-
+        continue-on-error: true
+      - name: Install Symfony Flex
+        run: |
+          composer global require --prefer-dist --no-progress --no-suggest --ansi \
+            symfony/flex
+      - name: Install PHP-CS-Fixer
+        run: |
+          composer global require --prefer-dist --no-progress --no-suggest --ansi \
+            friendsofphp/php-cs-fixer:"${PHP_CS_FIXER_VERSION}"
+      - name: Cache PHP-CS-Fixer results
+        uses: actions/cache@v1
+        with:
+          path: /var/cache/php-cs-fixer
+          key: php-cs-fixer-php${{ matrix.php }}-${{ github.sha }}
+          restore-keys: |
+            php-cs-fixer-php${{ matrix.php }}-
+            php-cs-fixer-
+        continue-on-error: true
+      - name: Run PHP-CS-Fixer fix
+        run: |
+          export PATH="$PATH:$HOME/.composer/vendor/bin"
+          mkdir -p /var/cache/php-cs-fixer
+          php-cs-fixer fix --dry-run --diff --cache-file=/var/cache/php-cs-fixer/.php_cs.cache --ansi
+
+  phpstan:
+    name: PHPStan (PHP ${{ matrix.php }})
+    runs-on: ubuntu-latest
+    container:
+      image: php:${{ matrix.php }}-alpine
+      options: >-
+        --tmpfs /tmp:exec
+        --tmpfs /var/tmp:exec
+    strategy:
+      matrix:
+        php:
+          - '7.4'
+      fail-fast: false
+    timeout-minutes: 5
+    env:
+      APP_DEBUG: '1' # https://github.com/phpstan/phpstan-symfony/issues/37
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v1
+      - name: Install system packages
+        run: |
+          apk add \
+            unzip \
+      - name: Disable PHP memory limit
+        run: echo 'memory_limit=-1' >> /usr/local/etc/php/php.ini
+      - name: Install Composer
+        run: wget -qO - https://raw.githubusercontent.com/composer/getcomposer.org/$COMPOSER_INSTALLER_COMMIT/web/installer | php -- --install-dir=/usr/local/bin --filename=composer --quiet
+      - name: Cache Composer packages
+        uses: actions/cache@v1
+        with:
+          path: ~/.composer/cache
+          key: composer-php${{ matrix.php }}-${{ github.sha }}
+          restore-keys: |
+            composer-php${{ matrix.php }}-
+            composer-
+        continue-on-error: true
+      - name: Install Symfony Flex
+        run: |
+          composer global require --prefer-dist --no-progress --no-suggest --ansi \
+            symfony/flex
+      - name: Update project dependencies
+        run: |
+          mkdir -p /tmp/api-platform/core/vendor
+          ln -s /tmp/api-platform/core/vendor vendor
+          composer update --no-progress --no-suggest --ansi
+      - name: Clear test app cache
+        run: |
+          mkdir -p /tmp/api-platform/core/var
+          ln -s /tmp/api-platform/core/var tests/Fixtures/app/var
+          tests/Fixtures/app/console cache:clear --ansi
+      - name: Cache PHPStan results
+        uses: actions/cache@v1
+        with:
+          path: /tmp/phpstan
+          key: phpstan-php${{ matrix.php }}-${{ github.sha }}
+          restore-keys: |
+            phpstan-php${{ matrix.php }}-
+            phpstan-
+        continue-on-error: true
+      - name: Run PHPStan analysis
+        run: vendor/bin/phpstan analyse --ansi
+
   phpunit:
     name: PHPUnit (PHP ${{ matrix.php }})
     runs-on: ubuntu-latest
@@ -38,6 +161,7 @@ jobs:
       - name: Install system packages
         run: |
           apk add \
+            bash \
             unzip \
       - name: Cache mongodb PHP extension build
         if: (!startsWith(matrix.php, '7.1'))
@@ -135,11 +259,11 @@ jobs:
         continue-on-error: true
       - name: Upload coverage results to Codecov
         if: matrix.coverage
-        uses: codecov/codecov-action@v1.0.3
+        uses: codecov/codecov-action@v1
         with:
           name: phpunit-php${{ matrix.php }}
           flags: phpunit
-          token: ${{ secrets.CODECOV_TOKEN }}
+          fail_ci_if_error: true
         continue-on-error: true
       - name: Upload coverage results to Coveralls
         if: matrix.coverage
@@ -177,6 +301,7 @@ jobs:
       - name: Install system packages
         run: |
           apk add \
+            bash \
             unzip \
       - name: Cache mongodb PHP extension build
         if: (!startsWith(matrix.php, '7.1'))
@@ -281,11 +406,11 @@ jobs:
         continue-on-error: true
       - name: Upload coverage results to Codecov
         if: matrix.coverage
-        uses: codecov/codecov-action@v1.0.3
+        uses: codecov/codecov-action@v1
         with:
           name: behat-php${{ matrix.php }}
           flags: behat
-          token: ${{ secrets.CODECOV_TOKEN }}
+          fail_ci_if_error: true
         continue-on-error: true
       - name: Upload coverage results to Coveralls
         if: matrix.coverage
@@ -295,6 +420,30 @@ jobs:
           composer global require --prefer-dist --no-progress --no-suggest --ansi cedx/coveralls
           export PATH="$PATH:$HOME/.composer/vendor/bin"
           coveralls build/logs/behat/clover.xml
+        continue-on-error: true
+      - name: Export OpenAPI documents
+        run: |
+          mkdir -p build/out/openapi
+          tests/Fixtures/app/console api:openapi:export --spec-version=2 -o build/out/openapi/swagger_v2.json
+          tests/Fixtures/app/console api:openapi:export --spec-version=2 --yaml -o build/out/openapi/swagger_v2.yaml
+          tests/Fixtures/app/console api:openapi:export --spec-version=3 -o build/out/openapi/openapi_v3.json
+          tests/Fixtures/app/console api:openapi:export --spec-version=3 --yaml -o build/out/openapi/openapi_v3.yaml
+      - name: Validate OpenAPI documents
+        uses: docker://node:12-alpine
+        with:
+          args: |
+            sh -c -e "
+              npx swagger-cli validate build/out/openapi/swagger_v2.json
+              npx swagger-cli validate build/out/openapi/swagger_v2.yaml
+              npx swagger-cli validate build/out/openapi/openapi_v3.json
+              npx swagger-cli validate build/out/openapi/openapi_v3.yaml
+            "
+      - name: Upload OpenAPI artifacts
+        if: always()
+        uses: actions/upload-artifact@v1
+        with:
+          name: openapi-docs-php${{ matrix.php }}
+          path: build/out/openapi
         continue-on-error: true
 
   phpunit-lowest-deps:
@@ -466,6 +615,30 @@ jobs:
           name: behat-logs-php${{ matrix.php }}-lowest-deps
           path: build/logs/behat
         continue-on-error: true
+      - name: Export OpenAPI documents
+        run: |
+          mkdir -p build/out/openapi
+          tests/Fixtures/app/console api:openapi:export --spec-version=2 -o build/out/openapi/swagger_v2.json
+          tests/Fixtures/app/console api:openapi:export --spec-version=2 --yaml -o build/out/openapi/swagger_v2.yaml
+          tests/Fixtures/app/console api:openapi:export --spec-version=3 -o build/out/openapi/openapi_v3.json
+          tests/Fixtures/app/console api:openapi:export --spec-version=3 --yaml -o build/out/openapi/openapi_v3.yaml
+      - name: Validate OpenAPI documents
+        uses: docker://node:12-alpine
+        with:
+          args: |
+            sh -c -e "
+              npx swagger-cli validate build/out/openapi/swagger_v2.json
+              npx swagger-cli validate build/out/openapi/swagger_v2.yaml
+              npx swagger-cli validate build/out/openapi/openapi_v3.json
+              npx swagger-cli validate build/out/openapi/openapi_v3.yaml
+            "
+      - name: Upload OpenAPI artifacts
+        if: always()
+        uses: actions/upload-artifact@v1
+        with:
+          name: openapi-docs-php${{ matrix.php }}-lowest-deps
+          path: build/out/openapi
+        continue-on-error: true
 
   behat-legacy:
     name: Behat (PHP ${{ matrix.php }}) (legacy)
@@ -495,6 +668,7 @@ jobs:
       - name: Install system packages
         run: |
           apk add \
+            bash \
             unzip \
       - name: Cache mongodb PHP extension build
         if: (!startsWith(matrix.php, '7.1'))
@@ -600,11 +774,11 @@ jobs:
         continue-on-error: true
       - name: Upload coverage results to Codecov
         if: matrix.coverage
-        uses: codecov/codecov-action@v1.0.3
+        uses: codecov/codecov-action@v1
         with:
           name: behat-php${{ matrix.php }}-legacy
           flags: behat_legacy
-          token: ${{ secrets.CODECOV_TOKEN }}
+          fail_ci_if_error: true
         continue-on-error: true
       - name: Upload coverage results to Coveralls
         if: matrix.coverage
@@ -922,6 +1096,30 @@ jobs:
           name: behat-logs-php${{ matrix.php }}-postgresql
           path: build/logs/behat
         continue-on-error: true
+      - name: Export OpenAPI documents
+        run: |
+          mkdir -p build/out/openapi
+          tests/Fixtures/app/console api:openapi:export --spec-version=2 -o build/out/openapi/swagger_v2.json
+          tests/Fixtures/app/console api:openapi:export --spec-version=2 --yaml -o build/out/openapi/swagger_v2.yaml
+          tests/Fixtures/app/console api:openapi:export --spec-version=3 -o build/out/openapi/openapi_v3.json
+          tests/Fixtures/app/console api:openapi:export --spec-version=3 --yaml -o build/out/openapi/openapi_v3.yaml
+      - name: Validate OpenAPI documents
+        uses: docker://node:12-alpine
+        with:
+          args: |
+            sh -c -e "
+              npx swagger-cli validate build/out/openapi/swagger_v2.json
+              npx swagger-cli validate build/out/openapi/swagger_v2.yaml
+              npx swagger-cli validate build/out/openapi/openapi_v3.json
+              npx swagger-cli validate build/out/openapi/openapi_v3.yaml
+            "
+      - name: Upload OpenAPI artifacts
+        if: always()
+        uses: actions/upload-artifact@v1
+        with:
+          name: openapi-docs-php${{ matrix.php }}-postgresql
+          path: build/out/openapi
+        continue-on-error: true
 
   phpunit-mysql:
     name: PHPUnit (PHP ${{ matrix.php }}) (MySQL)
@@ -1140,6 +1338,30 @@ jobs:
           name: behat-logs-php${{ matrix.php }}-mysql
           path: build/logs/behat
         continue-on-error: true
+      - name: Export OpenAPI documents
+        run: |
+          mkdir -p build/out/openapi
+          tests/Fixtures/app/console api:openapi:export --spec-version=2 -o build/out/openapi/swagger_v2.json
+          tests/Fixtures/app/console api:openapi:export --spec-version=2 --yaml -o build/out/openapi/swagger_v2.yaml
+          tests/Fixtures/app/console api:openapi:export --spec-version=3 -o build/out/openapi/openapi_v3.json
+          tests/Fixtures/app/console api:openapi:export --spec-version=3 --yaml -o build/out/openapi/openapi_v3.yaml
+      - name: Validate OpenAPI documents
+        uses: docker://node:12-alpine
+        with:
+          args: |
+            sh -c -e "
+              npx swagger-cli validate build/out/openapi/swagger_v2.json
+              npx swagger-cli validate build/out/openapi/swagger_v2.yaml
+              npx swagger-cli validate build/out/openapi/openapi_v3.json
+              npx swagger-cli validate build/out/openapi/openapi_v3.yaml
+            "
+      - name: Upload OpenAPI artifacts
+        if: always()
+        uses: actions/upload-artifact@v1
+        with:
+          name: openapi-docs-php${{ matrix.php }}-mysql
+          path: build/out/openapi
+        continue-on-error: true
 
   phpunit-mongodb:
     name: PHPUnit (PHP ${{ matrix.php }}) (MongoDB)
@@ -1176,6 +1398,7 @@ jobs:
       - name: Install system packages
         run: |
           apk add \
+            bash \
             unzip \
       - name: Cache mongodb PHP extension build
         uses: actions/cache@v1
@@ -1265,11 +1488,11 @@ jobs:
         continue-on-error: true
       - name: Upload coverage results to Codecov
         if: matrix.coverage
-        uses: codecov/codecov-action@v1.0.3
+        uses: codecov/codecov-action@v1
         with:
           name: phpunit-php${{ matrix.php }}-mongodb
           flags: phpunit_mongodb
-          token: ${{ secrets.CODECOV_TOKEN }}
+          fail_ci_if_error: true
         continue-on-error: true
       - name: Upload coverage results to Coveralls
         if: matrix.coverage
@@ -1316,6 +1539,7 @@ jobs:
       - name: Install system packages
         run: |
           apk add \
+            bash \
             unzip \
       - name: Cache mongodb PHP extension build
         uses: actions/cache@v1
@@ -1412,11 +1636,11 @@ jobs:
         continue-on-error: true
       - name: Upload coverage results to Codecov
         if: matrix.coverage
-        uses: codecov/codecov-action@v1.0.3
+        uses: codecov/codecov-action@v1
         with:
           name: behat-php${{ matrix.php }}-mongodb
           flags: behat_mongodb
-          token: ${{ secrets.CODECOV_TOKEN }}
+          fail_ci_if_error: true
         continue-on-error: true
       - name: Upload coverage results to Coveralls
         if: matrix.coverage
@@ -1426,6 +1650,30 @@ jobs:
           composer global require --prefer-dist --no-progress --no-suggest --ansi cedx/coveralls
           export PATH="$PATH:$HOME/.composer/vendor/bin"
           coveralls build/logs/behat/clover.xml
+        continue-on-error: true
+      - name: Export OpenAPI documents
+        run: |
+          mkdir -p build/out/openapi
+          tests/Fixtures/app/console api:openapi:export --spec-version=2 -o build/out/openapi/swagger_v2.json
+          tests/Fixtures/app/console api:openapi:export --spec-version=2 --yaml -o build/out/openapi/swagger_v2.yaml
+          tests/Fixtures/app/console api:openapi:export --spec-version=3 -o build/out/openapi/openapi_v3.json
+          tests/Fixtures/app/console api:openapi:export --spec-version=3 --yaml -o build/out/openapi/openapi_v3.yaml
+      - name: Validate OpenAPI documents
+        uses: docker://node:12-alpine
+        with:
+          args: |
+            sh -c -e "
+              npx swagger-cli validate build/out/openapi/swagger_v2.json
+              npx swagger-cli validate build/out/openapi/swagger_v2.yaml
+              npx swagger-cli validate build/out/openapi/openapi_v3.json
+              npx swagger-cli validate build/out/openapi/openapi_v3.yaml
+            "
+      - name: Upload OpenAPI artifacts
+        if: always()
+        uses: actions/upload-artifact@v1
+        with:
+          name: openapi-docs-php${{ matrix.php }}-mongodb
+          path: build/out/openapi
         continue-on-error: true
 
   phpunit-elasticsearch:
@@ -1465,6 +1713,7 @@ jobs:
       - name: Install system packages
         run: |
           apk add \
+            bash \
             unzip \
       - name: Cache mongodb PHP extension build
         uses: actions/cache@v1
@@ -1554,11 +1803,11 @@ jobs:
         continue-on-error: true
       - name: Upload coverage results to Codecov
         if: matrix.coverage
-        uses: codecov/codecov-action@v1.0.3
+        uses: codecov/codecov-action@v1
         with:
           name: phpunit-php${{ matrix.php }}-elasticsearch
           flags: phpunit_elasticsearch
-          token: ${{ secrets.CODECOV_TOKEN }}
+          fail_ci_if_error: true
         continue-on-error: true
       - name: Upload coverage results to Coveralls
         if: matrix.coverage
@@ -1607,6 +1856,7 @@ jobs:
       - name: Install system packages
         run: |
           apk add \
+            bash \
             unzip \
       - name: Cache mongodb PHP extension build
         uses: actions/cache@v1
@@ -1703,11 +1953,11 @@ jobs:
         continue-on-error: true
       - name: Upload coverage results to Codecov
         if: matrix.coverage
-        uses: codecov/codecov-action@v1.0.3
+        uses: codecov/codecov-action@v1
         with:
           name: behat-php${{ matrix.php }}-elasticsearch
           flags: behat_elasticsearch
-          token: ${{ secrets.CODECOV_TOKEN }}
+          fail_ci_if_error: true
         continue-on-error: true
       - name: Upload coverage results to Coveralls
         if: matrix.coverage
@@ -1717,6 +1967,30 @@ jobs:
           composer global require --prefer-dist --no-progress --no-suggest --ansi cedx/coveralls
           export PATH="$PATH:$HOME/.composer/vendor/bin"
           coveralls build/logs/behat/clover.xml
+        continue-on-error: true
+      - name: Export OpenAPI documents
+        run: |
+          mkdir -p build/out/openapi
+          tests/Fixtures/app/console api:openapi:export --spec-version=2 -o build/out/openapi/swagger_v2.json
+          tests/Fixtures/app/console api:openapi:export --spec-version=2 --yaml -o build/out/openapi/swagger_v2.yaml
+          tests/Fixtures/app/console api:openapi:export --spec-version=3 -o build/out/openapi/openapi_v3.json
+          tests/Fixtures/app/console api:openapi:export --spec-version=3 --yaml -o build/out/openapi/openapi_v3.yaml
+      - name: Validate OpenAPI documents
+        uses: docker://node:12-alpine
+        with:
+          args: |
+            sh -c -e "
+              npx swagger-cli validate build/out/openapi/swagger_v2.json
+              npx swagger-cli validate build/out/openapi/swagger_v2.yaml
+              npx swagger-cli validate build/out/openapi/openapi_v3.json
+              npx swagger-cli validate build/out/openapi/openapi_v3.yaml
+            "
+      - name: Upload OpenAPI artifacts
+        if: always()
+        uses: actions/upload-artifact@v1
+        with:
+          name: openapi-docs-php${{ matrix.php }}-elasticsearch
+          path: build/out/openapi
         continue-on-error: true
 
   phpunit-no-deprecations:

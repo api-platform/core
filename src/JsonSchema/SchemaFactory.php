@@ -131,9 +131,9 @@ final class SchemaFactory implements SchemaFactoryInterface
             $definition['externalDocs'] = ['url' => $iri];
         }
 
-        $options = isset($serializerContext[AbstractNormalizer::GROUPS]) ? ['serializer_groups' => (array) $serializerContext[AbstractNormalizer::GROUPS]] : [];
+        $options = $this->getFactoryOptions($serializerContext, $operationType, $operationName);
         foreach ($this->propertyNameCollectionFactory->create($inputOrOutputClass, $options) as $propertyName) {
-            $propertyMetadata = $this->propertyMetadataFactory->create($inputOrOutputClass, $propertyName);
+            $propertyMetadata = $this->propertyMetadataFactory->create($inputOrOutputClass, $propertyName, $options);
             if (!$propertyMetadata->isReadable() && !$propertyMetadata->isWritable()) {
                 continue;
             }
@@ -292,5 +292,33 @@ final class SchemaFactory implements SchemaFactoryInterface
         }
 
         return $resourceMetadata->getTypedOperationAttribute($operationType, $operationName, $attribute, [], true);
+    }
+
+    /**
+     * Gets the options for the property name collection / property metadata factories.
+     */
+    private function getFactoryOptions(array $serializerContext, ?string $operationType, ?string $operationName): array
+    {
+        $options = [];
+
+        if (isset($serializerContext[AbstractNormalizer::GROUPS])) {
+            /* @see https://github.com/symfony/symfony/blob/v4.2.6/src/Symfony/Component/PropertyInfo/Extractor/SerializerExtractor.php */
+            $options['serializer_groups'] = (array) $serializerContext[AbstractNormalizer::GROUPS];
+        }
+
+        if (null !== $operationType && null !== $operationName) {
+            switch ($operationType) {
+                case OperationType::COLLECTION:
+                    $options['collection_operation_name'] = $operationName;
+                    break;
+                case OperationType::ITEM:
+                    $options['item_operation_name'] = $operationName;
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        return $options;
     }
 }
