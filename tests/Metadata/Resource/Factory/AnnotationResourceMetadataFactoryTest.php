@@ -62,6 +62,7 @@ class AnnotationResourceMetadataFactoryTest extends TestCase
         $annotation = new ApiResource([
             'itemOperations' => ['get', 'delete'],
             'attributes' => [
+                'pagination_client_enabled' => true,
                 'pagination_maximum_items_per_page' => 10,
             ],
         ]);
@@ -74,6 +75,7 @@ class AnnotationResourceMetadataFactoryTest extends TestCase
         $this->assertEquals('CHANGEME!', $metadata->getDescription());
         $this->assertEquals(['get'], $metadata->getCollectionOperations());
         $this->assertEquals(['get', 'delete'], $metadata->getItemOperations());
+        $this->assertTrue($metadata->getAttribute('pagination_client_enabled'));
         $this->assertEquals(4, $metadata->getAttribute('pagination_items_per_page'));
         $this->assertEquals(10, $metadata->getAttribute('pagination_maximum_items_per_page'));
     }
