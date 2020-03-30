@@ -18,9 +18,9 @@ use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Util\RequestAttributesExtractor;
 use ApiPlatform\Core\Validator\EventListener\ValidateListener as MainValidateListener;
 use Psr\Container\ContainerInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface as SymfonyContainerInterface;
 use Symfony\Component\HttpKernel\Event\ViewEvent;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface as SymfonyContainerInterface;
 
 /**
  * Validates data.

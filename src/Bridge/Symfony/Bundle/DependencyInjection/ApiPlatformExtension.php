@@ -570,7 +570,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         }
 
         $container->setParameter('api_platform.validator.serialize_payload_fields', $config['validator']['serialize_payload_fields']);
-        $container->setParameter('api_platform.validator.default_groups',  $config['validator']['default_groups']);
+        $container->setParameter('api_platform.validator.default_groups', $config['validator']['default_groups']);
     }
 
     private function registerDataCollectorConfiguration(ContainerBuilder $container, array $config, XmlFileLoader $loader): void
