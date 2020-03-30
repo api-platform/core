@@ -1139,6 +1139,7 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.graphql.graphql_playground.enabled' => true,
             'api_platform.resource_class_directories' => Argument::type('array'),
             'api_platform.validator.serialize_payload_fields' => [],
+            'api_platform.validator.default_groups' => [],
             'api_platform.elasticsearch.enabled' => false,
             'api_platform.defaults' => ['attributes' => []],
         ];
