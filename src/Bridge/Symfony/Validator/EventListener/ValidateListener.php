@@ -82,7 +82,7 @@ final class ValidateListener
             $validationGroups = $validationGroups($data);
         }
         
-        if (empty($validationGroups) {
+        if (empty($validationGroups)) {
             $validationGroups = $this->container->getParameter('api_platform.validator.default_groups');
         }
 
