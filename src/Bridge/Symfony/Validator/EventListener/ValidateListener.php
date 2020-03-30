@@ -81,6 +81,10 @@ final class ValidateListener
         } elseif (\is_callable($validationGroups)) {
             $validationGroups = $validationGroups($data);
         }
+        
+        if (empty($validationGroups) {
+            $validationGroups = $this->container->getParameter('api_platform.validator.default_groups');
+        }
 
         $violations = $this->validator->validate($data, null, (array) $validationGroups);
         if (0 !== \count($violations)) {
