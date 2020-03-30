@@ -82,7 +82,7 @@ final class ValidateListener
         } elseif (\is_callable($validationGroups)) {
             $validationGroups = $validationGroups($data);
         }
-        
+
         if ($this->container instanceof SymfonyContainerInterface && empty($validationGroups)) {
             $validationGroups = $this->container->getParameter('api_platform.validator.default_groups');
         }
