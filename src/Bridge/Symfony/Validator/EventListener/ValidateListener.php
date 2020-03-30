@@ -20,6 +20,7 @@ use ApiPlatform\Core\Validator\EventListener\ValidateListener as MainValidateLis
 use Psr\Container\ContainerInterface;
 use Symfony\Component\HttpKernel\Event\ViewEvent;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface as SymfonyContainerInterface;
 
 /**
  * Validates data.
@@ -82,7 +83,7 @@ final class ValidateListener
             $validationGroups = $validationGroups($data);
         }
         
-        if (empty($validationGroups)) {
+        if ($this->container instanceof SymfonyContainerInterface && empty($validationGroups)) {
             $validationGroups = $this->container->getParameter('api_platform.validator.default_groups');
         }
 
