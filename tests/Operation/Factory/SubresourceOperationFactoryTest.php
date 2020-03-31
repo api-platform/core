@@ -72,7 +72,8 @@ class SubresourceOperationFactoryTest extends TestCase
                 ],
                 'route_name' => 'api_dummy_entities_subresource_get_subresource',
                 'path' => '/dummy_entities/{id}/subresource.{_format}',
-                'operation_name' => 'subresource_get_subresource',
+                'operation_name' => 'subresource_get',
+                'parent_resource_class' => 'ApiPlatform\Core\Tests\Fixtures\DummyEntity',
             ] + SubresourceOperationFactory::ROUTE_OPTIONS,
             'api_dummy_entities_subresource_another_subresource_get_subresource' => [
                 'property' => 'anotherSubresource',
@@ -85,7 +86,8 @@ class SubresourceOperationFactoryTest extends TestCase
                 ],
                 'route_name' => 'api_dummy_entities_subresource_another_subresource_get_subresource',
                 'path' => '/dummy_entities/{id}/subresource/another_subresource.{_format}',
-                'operation_name' => 'subresource_another_subresource_get_subresource',
+                'operation_name' => 'subresource_another_subresource_get',
+                'parent_resource_class' => 'ApiPlatform\Core\Tests\Fixtures\DummyEntity',
             ] + SubresourceOperationFactory::ROUTE_OPTIONS,
             'api_dummy_entities_subresource_another_subresource_subcollections_get_subresource' => [
                 'property' => 'subcollection',
@@ -99,7 +101,8 @@ class SubresourceOperationFactoryTest extends TestCase
                 ],
                 'route_name' => 'api_dummy_entities_subresource_another_subresource_subcollections_get_subresource',
                 'path' => '/dummy_entities/{id}/subresource/another_subresource/subcollections.{_format}',
-                'operation_name' => 'subresource_another_subresource_subcollections_get_subresource',
+                'operation_name' => 'subresource_another_subresource_subcollections_get',
+                'parent_resource_class' => 'ApiPlatform\Core\Tests\Fixtures\DummyEntity',
             ] + SubresourceOperationFactory::ROUTE_OPTIONS,
             'api_dummy_entities_subcollections_get_subresource' => [
                 'property' => 'subcollection',
@@ -111,7 +114,8 @@ class SubresourceOperationFactoryTest extends TestCase
                 ],
                 'route_name' => 'api_dummy_entities_subcollections_get_subresource',
                 'path' => '/dummy_entities/{id}/subcollections.{_format}',
-                'operation_name' => 'subcollections_get_subresource',
+                'operation_name' => 'subcollections_get',
+                'parent_resource_class' => 'ApiPlatform\Core\Tests\Fixtures\DummyEntity',
             ] + SubresourceOperationFactory::ROUTE_OPTIONS,
             'api_dummy_entities_subcollections_another_subresource_get_subresource' => [
                 'property' => 'anotherSubresource',
@@ -124,7 +128,8 @@ class SubresourceOperationFactoryTest extends TestCase
                 ],
                 'route_name' => 'api_dummy_entities_subcollections_another_subresource_get_subresource',
                 'path' => '/dummy_entities/{id}/subcollections/{subcollection}/another_subresource.{_format}',
-                'operation_name' => 'subcollections_another_subresource_get_subresource',
+                'operation_name' => 'subcollections_another_subresource_get',
+                'parent_resource_class' => 'ApiPlatform\Core\Tests\Fixtures\DummyEntity',
             ] + SubresourceOperationFactory::ROUTE_OPTIONS,
             'api_dummy_entities_subcollections_another_subresource_subresource_get_subresource' => [
                 'property' => 'subresource',
@@ -138,7 +143,8 @@ class SubresourceOperationFactoryTest extends TestCase
                 ],
                 'route_name' => 'api_dummy_entities_subcollections_another_subresource_subresource_get_subresource',
                 'path' => '/dummy_entities/{id}/subcollections/{subcollection}/another_subresource/subresource.{_format}',
-                'operation_name' => 'subcollections_another_subresource_subresource_get_subresource',
+                'operation_name' => 'subcollections_another_subresource_subresource_get',
+                'parent_resource_class' => 'ApiPlatform\Core\Tests\Fixtures\DummyEntity',
             ] + SubresourceOperationFactory::ROUTE_OPTIONS,
         ], $subresourceOperationFactory->create(DummyEntity::class));
     }
@@ -148,10 +154,10 @@ class SubresourceOperationFactoryTest extends TestCase
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create(RelatedDummyEntity::class)->shouldBeCalled()->willReturn(new ResourceMetadata('relatedDummyEntity'));
         $resourceMetadataFactoryProphecy->create(DummyEntity::class)->shouldBeCalled()->willReturn((new ResourceMetadata('dummyEntity'))->withSubresourceOperations([
-            'subcollections_get_subresource' => [
+            'subcollections_get' => [
                 'path' => '/dummy_entities/{id}/foobars',
             ],
-            'subcollections_another_subresource_get_subresource' => [
+            'subcollections_another_subresource_get' => [
                 'path' => '/dummy_entities/{id}/foobars/{subcollection}/another_foobar.{_format}',
             ],
         ]));
@@ -190,7 +196,8 @@ class SubresourceOperationFactoryTest extends TestCase
                 ],
                 'route_name' => 'api_dummy_entities_subresource_get_subresource',
                 'path' => '/dummy_entities/{id}/subresource.{_format}',
-                'operation_name' => 'subresource_get_subresource',
+                'operation_name' => 'subresource_get',
+                'parent_resource_class' => 'ApiPlatform\Core\Tests\Fixtures\DummyEntity',
             ] + SubresourceOperationFactory::ROUTE_OPTIONS,
             'api_dummy_entities_subresource_another_subresource_get_subresource' => [
                 'property' => 'anotherSubresource',
@@ -203,7 +210,8 @@ class SubresourceOperationFactoryTest extends TestCase
                 ],
                 'route_name' => 'api_dummy_entities_subresource_another_subresource_get_subresource',
                 'path' => '/dummy_entities/{id}/subresource/another_subresource.{_format}',
-                'operation_name' => 'subresource_another_subresource_get_subresource',
+                'operation_name' => 'subresource_another_subresource_get',
+                'parent_resource_class' => 'ApiPlatform\Core\Tests\Fixtures\DummyEntity',
             ] + SubresourceOperationFactory::ROUTE_OPTIONS,
             'api_dummy_entities_subresource_another_subresource_subcollections_get_subresource' => [
                 'property' => 'subcollection',
@@ -217,7 +225,8 @@ class SubresourceOperationFactoryTest extends TestCase
                 ],
                 'route_name' => 'api_dummy_entities_subresource_another_subresource_subcollections_get_subresource',
                 'path' => '/dummy_entities/{id}/subresource/another_subresource/subcollections.{_format}',
-                'operation_name' => 'subresource_another_subresource_subcollections_get_subresource',
+                'operation_name' => 'subresource_another_subresource_subcollections_get',
+                'parent_resource_class' => 'ApiPlatform\Core\Tests\Fixtures\DummyEntity',
             ] + SubresourceOperationFactory::ROUTE_OPTIONS,
             'api_dummy_entities_subcollections_get_subresource' => [
                 'property' => 'subcollection',
@@ -229,7 +238,8 @@ class SubresourceOperationFactoryTest extends TestCase
                 ],
                 'route_name' => 'api_dummy_entities_subcollections_get_subresource',
                 'path' => '/dummy_entities/{id}/foobars',
-                'operation_name' => 'subcollections_get_subresource',
+                'operation_name' => 'subcollections_get',
+                'parent_resource_class' => 'ApiPlatform\Core\Tests\Fixtures\DummyEntity',
             ] + SubresourceOperationFactory::ROUTE_OPTIONS,
             'api_dummy_entities_subcollections_another_subresource_get_subresource' => [
                 'property' => 'anotherSubresource',
@@ -242,7 +252,8 @@ class SubresourceOperationFactoryTest extends TestCase
                 ],
                 'route_name' => 'api_dummy_entities_subcollections_another_subresource_get_subresource',
                 'path' => '/dummy_entities/{id}/foobars/{subcollection}/another_foobar.{_format}',
-                'operation_name' => 'subcollections_another_subresource_get_subresource',
+                'operation_name' => 'subcollections_another_subresource_get',
+                'parent_resource_class' => 'ApiPlatform\Core\Tests\Fixtures\DummyEntity',
             ] + SubresourceOperationFactory::ROUTE_OPTIONS,
             'api_dummy_entities_subcollections_another_subresource_subresource_get_subresource' => [
                 'property' => 'subresource',
@@ -256,7 +267,8 @@ class SubresourceOperationFactoryTest extends TestCase
                 ],
                 'route_name' => 'api_dummy_entities_subcollections_another_subresource_subresource_get_subresource',
                 'path' => '/dummy_entities/{id}/foobars/{subcollection}/another_foobar/subresource.{_format}',
-                'operation_name' => 'subcollections_another_subresource_subresource_get_subresource',
+                'operation_name' => 'subcollections_another_subresource_subresource_get',
+                'parent_resource_class' => 'ApiPlatform\Core\Tests\Fixtures\DummyEntity',
             ] + SubresourceOperationFactory::ROUTE_OPTIONS,
         ], $subresourceOperationFactory->create(DummyEntity::class));
     }
@@ -301,7 +313,8 @@ class SubresourceOperationFactoryTest extends TestCase
                 ],
                 'route_name' => 'api_dummy_entities_subresource_get_subresource',
                 'path' => '/dummy_entities/{id}/subresource.{_format}',
-                'operation_name' => 'subresource_get_subresource',
+                'operation_name' => 'subresource_get',
+                'parent_resource_class' => 'ApiPlatform\Core\Tests\Fixtures\DummyEntity',
             ] + SubresourceOperationFactory::ROUTE_OPTIONS,
         ], $subresourceOperationFactory->create(DummyEntity::class));
     }
@@ -361,7 +374,8 @@ class SubresourceOperationFactoryTest extends TestCase
                 ],
                 'route_name' => 'api_dummy_entities_subresource_get_subresource',
                 'path' => '/dummy_entities/{id}/subresources.{_format}',
-                'operation_name' => 'subresource_get_subresource',
+                'operation_name' => 'subresource_get',
+                'parent_resource_class' => 'ApiPlatform\Core\Tests\Fixtures\DummyEntity',
             ] + SubresourceOperationFactory::ROUTE_OPTIONS,
             'api_dummy_entities_second_subresource_get_subresource' => [
                 'property' => 'secondSubresource',
@@ -373,7 +387,8 @@ class SubresourceOperationFactoryTest extends TestCase
                 ],
                 'route_name' => 'api_dummy_entities_second_subresource_get_subresource',
                 'path' => '/dummy_entities/{id}/second_subresources.{_format}',
-                'operation_name' => 'second_subresource_get_subresource',
+                'operation_name' => 'second_subresource_get',
+                'parent_resource_class' => 'ApiPlatform\Core\Tests\Fixtures\DummyEntity',
             ] + SubresourceOperationFactory::ROUTE_OPTIONS,
             'api_dummy_entities_second_subresource_more_subresource_get_subresource' => [
                 'property' => 'moreSubresource',
@@ -386,7 +401,8 @@ class SubresourceOperationFactoryTest extends TestCase
                 ],
                 'route_name' => 'api_dummy_entities_second_subresource_more_subresource_get_subresource',
                 'path' => '/dummy_entities/{id}/second_subresources/mode_subresources.{_format}',
-                'operation_name' => 'second_subresource_more_subresource_get_subresource',
+                'operation_name' => 'second_subresource_more_subresource_get',
+                'parent_resource_class' => 'ApiPlatform\Core\Tests\Fixtures\DummyEntity',
             ] + SubresourceOperationFactory::ROUTE_OPTIONS,
         ], $subresourceOperationFactory->create(DummyEntity::class));
     }
@@ -445,7 +461,8 @@ class SubresourceOperationFactoryTest extends TestCase
                 ],
                 'route_name' => 'api_dummy_entities_subresource_get_subresource',
                 'path' => '/dummy_entities/{id}/subresources.{_format}',
-                'operation_name' => 'subresource_get_subresource',
+                'operation_name' => 'subresource_get',
+                'parent_resource_class' => 'ApiPlatform\Core\Tests\Fixtures\DummyEntity',
             ] + SubresourceOperationFactory::ROUTE_OPTIONS,
             'api_dummy_entities_second_subresource_get_subresource' => [
                 'property' => 'secondSubresource',
@@ -457,7 +474,8 @@ class SubresourceOperationFactoryTest extends TestCase
                 ],
                 'route_name' => 'api_dummy_entities_second_subresource_get_subresource',
                 'path' => '/dummy_entities/{id}/second_subresources.{_format}',
-                'operation_name' => 'second_subresource_get_subresource',
+                'operation_name' => 'second_subresource_get',
+                'parent_resource_class' => 'ApiPlatform\Core\Tests\Fixtures\DummyEntity',
             ] + SubresourceOperationFactory::ROUTE_OPTIONS,
         ], $subresourceOperationFactory->create(DummyEntity::class));
     }
@@ -500,7 +518,8 @@ class SubresourceOperationFactoryTest extends TestCase
                 ],
                 'route_name' => 'api_dummy_entities_subresource_get_subresource',
                 'path' => '/dummy_entities/{id}/subresources.{_format}',
-                'operation_name' => 'subresource_get_subresource',
+                'operation_name' => 'subresource_get',
+                'parent_resource_class' => 'ApiPlatform\Core\Tests\Fixtures\DummyEntity',
             ] + SubresourceOperationFactory::ROUTE_OPTIONS,
         ], $subresourceOperationFactory->create(DummyEntity::class));
     }
@@ -545,7 +564,8 @@ class SubresourceOperationFactoryTest extends TestCase
                 ],
                 'route_name' => 'api_dummy_entities_subresources_get_subresource',
                 'path' => '/dummy_entities/{id}/subresource.{_format}',
-                'operation_name' => 'subresources_get_subresource',
+                'operation_name' => 'subresources_get',
+                'parent_resource_class' => 'ApiPlatform\Core\Tests\Fixtures\DummyEntity',
             ] + SubresourceOperationFactory::ROUTE_OPTIONS,
             'api_dummy_entities_subresources_item_get_subresource' => [
                 'property' => 'id',
@@ -558,7 +578,8 @@ class SubresourceOperationFactoryTest extends TestCase
                 ],
                 'route_name' => 'api_dummy_entities_subresources_item_get_subresource',
                 'path' => '/dummy_entities/{id}/subresource/{subresource}.{_format}',
-                'operation_name' => 'subresources_item_get_subresource',
+                'operation_name' => 'subresources_item_get',
+                'parent_resource_class' => 'ApiPlatform\Core\Tests\Fixtures\DummyEntity',
             ] + SubresourceOperationFactory::ROUTE_OPTIONS,
         ], $result);
     }
@@ -603,7 +624,8 @@ class SubresourceOperationFactoryTest extends TestCase
                 ],
                 'route_name' => 'api_dummy_entities_subresource_get_subresource',
                 'path' => '/dummy_entities/{id}/subresource.{_format}',
-                'operation_name' => 'subresource_get_subresource',
+                'operation_name' => 'subresource_get',
+                'parent_resource_class' => 'ApiPlatform\Core\Tests\Fixtures\DummyEntity',
             ] + SubresourceOperationFactory::ROUTE_OPTIONS,
         ], $result);
     }
@@ -648,7 +670,8 @@ class SubresourceOperationFactoryTest extends TestCase
                 ],
                 'route_name' => 'api_dummy_entities_subresource_get_subresource',
                 'path' => '/root_resource_prefix/dummy_entities/{id}/subresource.{_format}',
-                'operation_name' => 'subresource_get_subresource',
+                'operation_name' => 'subresource_get',
+                'parent_resource_class' => 'ApiPlatform\Core\Tests\Fixtures\DummyEntity',
             ] + SubresourceOperationFactory::ROUTE_OPTIONS,
         ], $subresourceOperationFactory->create(DummyEntity::class));
     }
