@@ -114,6 +114,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
      */
     public function normalize($object, $format = null, array $context = [])
     {
+
         if (!($isTransformed = isset($context[self::IS_TRANSFORMED_TO_SAME_CLASS_CONTEXT_KEY])) && $outputClass = $this->getOutputClass($this->getObjectClass($object), $context)) {
             if (!$this->serializer instanceof NormalizerInterface) {
                 throw new LogicException('Cannot normalize the output because the injected serializer is not a normalizer');
@@ -645,6 +646,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
      * For a given resource, it returns an output representation if any
      * If not, the resource is returned.
      */
+
     protected function transformOutput($object, array $context = [], string $outputClass = null)
     {
         if (null === $outputClass) {
