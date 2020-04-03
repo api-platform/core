@@ -90,6 +90,7 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyDifferentGraphQlSeria
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyDtoCustom;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyDtoNoInput;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyDtoNoOutput;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyDtoOutputSameClass;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyFriend;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyGroup;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyImmutableDate;
@@ -1375,6 +1376,19 @@ final class DoctrineContext implements Context
             $this->manager->persist($dto);
         }
 
+        $this->manager->flush();
+        $this->manager->clear();
+    }
+
+    /**
+     * @Given there is a DummyDtoOutputSameClass
+     */
+    public function thereIsADummyDtoOutputSameClass()
+    {
+        $dto = new DummyDtoOutputSameClass();
+        $dto->lorem = 'test';
+        $dto->ipsum = '1';
+        $this->manager->persist($dto);
         $this->manager->flush();
         $this->manager->clear();
     }
