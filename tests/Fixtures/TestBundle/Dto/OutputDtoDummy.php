@@ -20,4 +20,5 @@ namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Dto;
  */
 class OutputDtoDummy
 {
+    public $foo = 'foo';
 }
