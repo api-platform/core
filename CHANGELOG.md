@@ -13,6 +13,7 @@
 ## 2.5.x-dev
 
 * GraphQL: Do not allow empty cursor values on `before` or `after`
+* Bug fix: Allow Data Transformers to return the original class if no transformation is made or the transformation was to the original object
 
 ## 2.5.4
 
