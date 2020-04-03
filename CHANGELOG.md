@@ -4,6 +4,7 @@
 
 * GraphQL: Do not allow empty cursor values on `before` or `after`
 * Filter: Improve the RangeFilter query in case the values are equals using the between operator
+* Bug fix: Allow Data Transformers to return the original class if no transformation has been made, or the transformation was to the original object
 
 ## 2.5.4
 
