@@ -136,8 +136,9 @@ final class FieldsBuilder implements FieldsBuilderInterface
         $shortName = $resourceMetadata->getShortName();
         $resourceType = new Type(Type::BUILTIN_TYPE_OBJECT, true, $resourceClass);
         $deprecationReason = $resourceMetadata->getGraphqlAttribute($mutationName, 'deprecation_reason', '', true);
+        $description = $resourceMetadata->getGraphqlAttribute($mutationName, 'description', ucfirst("{$mutationName}s a $shortName."), false);
 
-        if ($fieldConfiguration = $this->getResourceFieldConfiguration(null, ucfirst("{$mutationName}s a $shortName."), $deprecationReason, $resourceType, $resourceClass, false, null, $mutationName, null)) {
+        if ($fieldConfiguration = $this->getResourceFieldConfiguration(null, $description, $deprecationReason, $resourceType, $resourceClass, false, null, $mutationName, null)) {
             $fieldConfiguration['args'] += ['input' => $this->getResourceFieldConfiguration(null, null, $deprecationReason, $resourceType, $resourceClass, true, null, $mutationName, null)];
         }
 
