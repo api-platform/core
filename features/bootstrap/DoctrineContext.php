@@ -35,6 +35,8 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\DummyDifferentGraphQlSer
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\DummyDtoCustom as DummyDtoCustomDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\DummyDtoNoInput as DummyDtoNoInputDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\DummyDtoNoOutput as DummyDtoNoOutputDocument;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\DummyDtoOutputFallbackToSameClass as DummyDtoOutputFallbackToSameClassDocument;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\DummyDtoOutputSameClass as DummyDtoOutputSameClassDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\DummyFriend as DummyFriendDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\DummyGroup as DummyGroupDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\DummyOffer as DummyOfferDocument;
@@ -1386,7 +1388,7 @@ final class DoctrineContext implements Context
      */
     public function thereIsADummyDtoOutputSameClass()
     {
-        $dto = new DummyDtoOutputSameClass();
+        $dto = $this->isOrm() ? new DummyDtoOutputSameClass() : new DummyDtoOutputSameClassDocument();
         $dto->lorem = 'test';
         $dto->ipsum = '1';
         $this->manager->persist($dto);
@@ -1399,7 +1401,7 @@ final class DoctrineContext implements Context
      */
     public function thereIsADummyDtoOutputFallbackToSameClass()
     {
-        $dto = new DummyDtoOutputFallbackToSameClass();
+        $dto = $this->isOrm() ? new DummyDtoOutputFallbackToSameClass() : new DummyDtoOutputFallbackToSameClassDocument();
         $dto->lorem = 'test';
         $dto->ipsum = '1';
         $this->manager->persist($dto);
