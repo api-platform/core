@@ -14,9 +14,10 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Dto;
 
 /**
- * OutputDtoDummy
+ * OutputDtoDummy.
  *
  * @author Daniel West <daniel@silverback.is>
  */
 class OutputDtoDummy
-{}
+{
+}

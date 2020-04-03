@@ -18,7 +18,7 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Dto\OutputDtoDummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyDtoOutputFallbackToSameClass;
 
 /**
- * OutputDtoUnmodifiedDataTransformer
+ * OutputDtoUnmodifiedDataTransformer.
  *
  * @author Daniel West <daniel@silverback.is>
  */
