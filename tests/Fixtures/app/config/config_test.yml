@@ -60,7 +60,7 @@ services:
 
     app.my_dummy_resource.exists_filter:
         parent:    'api_platform.doctrine.orm.exists_filter'
-        arguments: [ { 'alias': ~, 'description': ~, 'relatedDummy.name': ~, 'dummyBoolean': ~, 'relatedDummy': ~ } ]
+        arguments: [ { 'alias': ~, 'description': ~, 'relatedDummy.name': ~, 'dummyBoolean': ~, 'relatedDummy': ~, 'relatedDummies': ~ } ]
         tags:      [ { name: 'api_platform.filter', id: 'my_dummy.exists' } ]
 
     app.related_dummy_resource.search_filter:
