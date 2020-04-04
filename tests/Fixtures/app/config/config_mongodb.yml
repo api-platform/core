@@ -41,7 +41,7 @@ services:
         tags:      [ { name: 'api_platform.filter', id: 'my_dummy.mongodb.date' } ]
     app.my_dummy_resource.mongodb.exists_filter:
         parent:    'api_platform.doctrine_mongodb.odm.exists_filter'
-        arguments: [ { 'alias': ~, 'description': ~, 'relatedDummy.name': ~, 'dummyBoolean': ~, 'relatedDummy': ~ } ]
+        arguments: [ { 'alias': ~, 'description': ~, 'relatedDummy.name': ~, 'dummyBoolean': ~, 'relatedDummy': ~, 'relatedDummies': ~ } ]
         tags:      [ { name: 'api_platform.filter', id: 'my_dummy.mongodb.exists' } ]
     app.my_dummy_resource.mongodb.numeric_filter:
         parent:    'api_platform.doctrine_mongodb.odm.numeric_filter'

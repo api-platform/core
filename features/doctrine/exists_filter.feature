@@ -1,10 +1,10 @@
 Feature: Exists filter on collections
   In order to retrieve large collections of resources
   As a client software developer
-  I need to retrieve collections that exists
+  I need to retrieve collections with properties that exist or not
 
   @createSchema
-  Scenario: Get collection where exists does not exist
+  Scenario: Get collection where a property does not exist
     Given there are 15 dummy objects with dummyBoolean true
     When I send a "GET" request to "/dummies?exists[dummyBoolean]=0"
     Then the response status code should be 200
@@ -34,7 +34,7 @@ Feature: Exists filter on collections
     }
     """
 
-  Scenario: Get collection where exists does exist
+  Scenario: Get collection where a property does exist
     When I send a "GET" request to "/dummies?exists[dummyBoolean]=1"
     Then the response status code should be 200
     And the response should be in JSON
@@ -47,7 +47,7 @@ Feature: Exists filter on collections
         "@context": {"pattern": "^/contexts/Dummy$"},
         "@id": {"pattern": "^/dummies$"},
         "@type": {"pattern": "^hydra:Collection$"},
-        "hydra:totalItems": {"type":"number", "minimum": 15, "minimum": 15},
+        "hydra:totalItems": {"type":"number", "minimum": 15, "maximum": 15},
         "hydra:member": {
           "type": "array",
           "items": {
@@ -63,6 +63,83 @@ Feature: Exists filter on collections
           "type": "object",
           "properties": {
             "@id": {"pattern": "^/dummies\\?exists%5BdummyBoolean%5D=1&page=1$"},
+            "@type": {"pattern": "^hydra:PartialCollectionView$"}
+          }
+        }
+      }
+    }
+    """
+
+  @createSchema
+  Scenario: Use exists filter with a empty relation collection
+    Given there are 3 dummy objects having each 0 relatedDummies
+    And there are 2 dummy objects having each 3 relatedDummies
+    When I send a "GET" request to "/dummies?exists[relatedDummies]=0"
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+    And the JSON should be valid according to this schema:
+    """
+    {
+      "type": "object",
+      "properties": {
+        "@context": {"pattern": "^/contexts/Dummy$"},
+        "@id": {"pattern": "^/dummies$"},
+        "@type": {"pattern": "^hydra:Collection$"},
+        "hydra:totalItems": {"type":"number", "minimum": 3, "maximum": 3},
+        "hydra:member": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "@id": {"pattern": "^/dummies/(1|2|3)$"}
+            },
+            "required": ["@id"]
+          },
+          "minItems": 3,
+          "maxItems": 3
+        },
+        "hydra:view": {
+          "type": "object",
+          "properties": {
+            "@id": {"pattern": "^/dummies\\?exists%5BrelatedDummies%5D=0$"},
+            "@type": {"pattern": "^hydra:PartialCollectionView$"}
+          }
+        }
+      }
+    }
+    """
+
+  Scenario: Use exists filter with a non empty relation collection
+    When I send a "GET" request to "/dummies?exists[relatedDummies]=1"
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+    And the JSON should be valid according to this schema:
+    """
+    {
+      "type": "object",
+      "properties": {
+        "@context": {"pattern": "^/contexts/Dummy$"},
+        "@id": {"pattern": "^/dummies$"},
+        "@type": {"pattern": "^hydra:Collection$"},
+        "hydra:totalItems": {"type":"number", "minimum": 2, "maximum": 2},
+        "hydra:member": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "@id": {"pattern": "^/dummies/(4|5)$"}
+            },
+            "required": ["@id"]
+          },
+          "minItems": 2,
+          "maxItems": 2
+        },
+        "hydra:view": {
+          "type": "object",
+          "properties": {
+            "@id": {"pattern": "^/dummies\\?exists%5BrelatedDummies%5D=1$"},
             "@type": {"pattern": "^hydra:PartialCollectionView$"}
           }
         }
