@@ -116,7 +116,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
             ],
             'hydra:title' => "The collection of $shortName resources",
             'hydra:readable' => true,
-            'hydra:writable' => false,
+            'hydra:writeable' => false,
         ];
 
         if ($resourceMetadata->getCollectionOperationAttribute('GET', 'deprecation_reason', null, true)) {
@@ -416,7 +416,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
                     'hydra:title' => 'propertyPath',
                     'hydra:description' => 'The property path of the violation',
                     'hydra:readable' => true,
-                    'hydra:writable' => false,
+                    'hydra:writeable' => false,
                 ],
                 [
                     '@type' => 'hydra:SupportedProperty',
@@ -430,7 +430,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
                     'hydra:title' => 'message',
                     'hydra:description' => 'The message associated with the violation',
                     'hydra:readable' => true,
-                    'hydra:writable' => false,
+                    'hydra:writeable' => false,
                 ],
             ],
         ];
@@ -454,7 +454,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
                     'hydra:title' => 'violations',
                     'hydra:description' => 'The violations',
                     'hydra:readable' => true,
-                    'hydra:writable' => false,
+                    'hydra:writeable' => false,
                 ],
             ],
         ];
@@ -486,7 +486,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
             'hydra:title' => $propertyName,
             'hydra:required' => $propertyMetadata->isRequired(),
             'hydra:readable' => $propertyMetadata->isReadable(),
-            'hydra:writable' => $propertyMetadata->isWritable() || $propertyMetadata->isInitializable(),
+            'hydra:writeable' => $propertyMetadata->isWritable() || $propertyMetadata->isInitializable(),
         ];
 
         if (null !== $range = $this->getRange($propertyMetadata)) {
