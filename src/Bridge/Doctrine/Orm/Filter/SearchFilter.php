@@ -168,11 +168,11 @@ class SearchFilter extends AbstractContextAwareFilter implements SearchFilterInt
         if (1 === \count($values)) {
             $queryBuilder
                 ->andWhere(sprintf('%s.%s = :%s', $associationAlias, $associationField, $valueParameter))
-                ->setParameter($valueParameter, $values[0]);
+                ->setParameter($valueParameter, $values[0], $doctrineTypeField);
         } else {
             $queryBuilder
                 ->andWhere(sprintf('%s.%s IN (:%s)', $associationAlias, $associationField, $valueParameter))
-                ->setParameter($valueParameter, $values);
+                ->setParameter($valueParameter, $values, $doctrineTypeField);
         }
     }
 
