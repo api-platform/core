@@ -16,20 +16,21 @@ namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\DataTransformer;
 use ApiPlatform\Core\DataTransformer\DataTransformerInterface;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Dto\OutputDtoDummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyDtoOutputFallbackToSameClass;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyDtoOutputSameClass;
 
 /**
  * OutputDtoUnmodifiedDataTransformer.
  *
  * @author Daniel West <daniel@silverback.is>
  */
-final class OutputDtoFallbackSameClassTransformer implements DataTransformerInterface
+final class OutputDtoSameClassTransformer implements DataTransformerInterface
 {
     /**
      * {@inheritdoc}
      */
     public function transform($object, string $to, array $context = [])
     {
-        if (!$object instanceof DummyDtoOutputFallbackToSameClass) {
+        if (!$object instanceof DummyDtoOutputFallbackToSameClass && !$object instanceof DummyDtoOutputSameClass) {
             throw new \InvalidArgumentException();
         }
         $object->ipsum = 'modified';
@@ -42,6 +43,7 @@ final class OutputDtoFallbackSameClassTransformer implements DataTransformerInte
      */
     public function supportsTransformation($data, string $to, array $context = []): bool
     {
-        return $data instanceof DummyDtoOutputFallbackToSameClass && OutputDtoDummy::class === $to;
+        return ($data instanceof DummyDtoOutputFallbackToSameClass && OutputDtoDummy::class === $to) ||
+            ($data instanceof DummyDtoOutputSameClass && DummyDtoOutputSameClass::class === $to);
     }
 }

@@ -97,7 +97,7 @@ Feature: JSON-LD DTO input and output
       "@id": "/dummy_dto_output_same_classes/1",
       "@type": "DummyDtoOutputSameClass",
       "lorem": "test",
-      "ipsum": "1",
+      "ipsum": "modified",
       "id": 1
     }
     """
