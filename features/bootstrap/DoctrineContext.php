@@ -594,7 +594,7 @@ final class DoctrineContext implements Context
         $descriptions = ['Smart dummy.', 'Not so smart dummy.'];
 
         for ($i = 1; $i <= $nb; ++$i) {
-            $date = new DateTime(sprintf('2015-04-%d', $i), new DateTimeZone('UTC'));
+            $date = new \DateTime(sprintf('2015-04-%d', $i), new \DateTimeZone('UTC'));
 
             $dummy = $this->buildDummy();
             $dummy->setName('Dummy #'.$i);
@@ -625,11 +625,11 @@ final class DoctrineContext implements Context
             $bool = false;
         } else {
             $expected = ['true', 'false', '1', '0'];
-            throw new InvalidArgumentException(sprintf('Invalid boolean value for "%s" property, expected one of ( "%s" )', $bool, implode('" | "', $expected)));
+            throw new \InvalidArgumentException(sprintf('Invalid boolean value for "%s" property, expected one of ( "%s" )', $bool, implode('" | "', $expected)));
         }
 
         for ($i = 1; $i <= $nb; ++$i) {
-            $date = new DateTime(sprintf('2015-04-%d', $i), new DateTimeZone('UTC'));
+            $date = new \DateTime(sprintf('2015-04-%d', $i), new \DateTimeZone('UTC'));
 
             $dummy = $this->buildDummy();
             $dummy->setName('Dummy #'.$i);
@@ -654,7 +654,7 @@ final class DoctrineContext implements Context
     public function thereAreDummyObjectsWithDummyDateAndRelatedDummy(int $nb)
     {
         for ($i = 1; $i <= $nb; ++$i) {
-            $date = new DateTime(sprintf('2015-04-%d', $i), new DateTimeZone('UTC'));
+            $date = new \DateTime(sprintf('2015-04-%d', $i), new \DateTimeZone('UTC'));
 
             $relatedDummy = $this->buildRelatedDummy();
             $relatedDummy->setName('RelatedDummy #'.$i);
@@ -682,7 +682,7 @@ final class DoctrineContext implements Context
     public function thereAreDummyObjectsWithDummyDateAndEmbeddedDummy(int $nb)
     {
         for ($i = 1; $i <= $nb; ++$i) {
-            $date = new DateTime(sprintf('2015-04-%d', $i), new DateTimeZone('UTC'));
+            $date = new \DateTime(sprintf('2015-04-%d', $i), new \DateTimeZone('UTC'));
 
             $embeddableDummy = $this->buildEmbeddableDummy();
             $embeddableDummy->setDummyName('Embeddable #'.$i);
@@ -709,7 +709,7 @@ final class DoctrineContext implements Context
     {
         for ($i = 1; $i <= $nb; ++$i) {
             $convertedDate = $this->buildConvertedDate();
-            $convertedDate->nameConverted = new DateTime(sprintf('2015-04-%d', $i), new DateTimeZone('UTC'));
+            $convertedDate->nameConverted = new \DateTime(sprintf('2015-04-%d', $i), new \DateTimeZone('UTC'));
 
             $this->manager->persist($convertedDate);
         }
@@ -795,7 +795,7 @@ final class DoctrineContext implements Context
             $bool = false;
         } else {
             $expected = ['true', 'false', '1', '0'];
-            throw new InvalidArgumentException(sprintf('Invalid boolean value for "%s" property, expected one of ( "%s" )', $bool, implode('" | "', $expected)));
+            throw new \InvalidArgumentException(sprintf('Invalid boolean value for "%s" property, expected one of ( "%s" )', $bool, implode('" | "', $expected)));
         }
         $descriptions = ['Smart dummy.', 'Not so smart dummy.'];
 
@@ -823,7 +823,7 @@ final class DoctrineContext implements Context
             $bool = false;
         } else {
             $expected = ['true', 'false', '1', '0'];
-            throw new InvalidArgumentException(sprintf('Invalid boolean value for "%s" property, expected one of ( "%s" )', $bool, implode('" | "', $expected)));
+            throw new \InvalidArgumentException(sprintf('Invalid boolean value for "%s" property, expected one of ( "%s" )', $bool, implode('" | "', $expected)));
         }
 
         for ($i = 1; $i <= $nb; ++$i) {
@@ -850,7 +850,7 @@ final class DoctrineContext implements Context
             $bool = false;
         } else {
             $expected = ['true', 'false', '1', '0'];
-            throw new InvalidArgumentException(sprintf('Invalid boolean value for "%s" property, expected one of ( "%s" )', $bool, implode('" | "', $expected)));
+            throw new \InvalidArgumentException(sprintf('Invalid boolean value for "%s" property, expected one of ( "%s" )', $bool, implode('" | "', $expected)));
         }
 
         for ($i = 1; $i <= $nb; ++$i) {
@@ -980,7 +980,7 @@ final class DoctrineContext implements Context
         $foo = $this->buildDummyCar();
         $foo->setName('mustli');
         $foo->setCanSell(true);
-        $foo->setAvailableAt(new DateTime());
+        $foo->setAvailableAt(new \DateTime());
         $this->manager->persist($foo);
 
         $bar1 = $this->buildDummyCarColor();
@@ -1146,7 +1146,7 @@ final class DoctrineContext implements Context
     public function thereAreDummyDateObjectsWithDummyDate(int $nb)
     {
         for ($i = 1; $i <= $nb; ++$i) {
-            $date = new DateTime(sprintf('2015-04-%d', $i), new DateTimeZone('UTC'));
+            $date = new \DateTime(sprintf('2015-04-%d', $i), new \DateTimeZone('UTC'));
 
             $dummy = $this->buildDummyDate();
             $dummy->dummyDate = $date;
@@ -1164,7 +1164,7 @@ final class DoctrineContext implements Context
     public function thereAreDummyDateObjectsWithNullableDateIncludeNullAfter(int $nb)
     {
         for ($i = 1; $i <= $nb; ++$i) {
-            $date = new DateTime(sprintf('2015-04-%d', $i), new DateTimeZone('UTC'));
+            $date = new \DateTime(sprintf('2015-04-%d', $i), new \DateTimeZone('UTC'));
 
             $dummy = $this->buildDummyDate();
             $dummy->dummyDate = $date;
@@ -1183,7 +1183,7 @@ final class DoctrineContext implements Context
     public function thereAreDummyDateObjectsWithNullableDateIncludeNullBefore(int $nb)
     {
         for ($i = 1; $i <= $nb; ++$i) {
-            $date = new DateTime(sprintf('2015-04-%d', $i), new DateTimeZone('UTC'));
+            $date = new \DateTime(sprintf('2015-04-%d', $i), new \DateTimeZone('UTC'));
 
             $dummy = $this->buildDummyDate();
             $dummy->dummyDate = $date;
@@ -1202,7 +1202,7 @@ final class DoctrineContext implements Context
     public function thereAreDummyDateObjectsWithNullableDateIncludeNullBeforeAndAfter(int $nb)
     {
         for ($i = 1; $i <= $nb; ++$i) {
-            $date = new DateTime(sprintf('2015-04-%d', $i), new DateTimeZone('UTC'));
+            $date = new \DateTime(sprintf('2015-04-%d', $i), new \DateTimeZone('UTC'));
 
             $dummy = $this->buildDummyDate();
             $dummy->dummyDate = $date;
@@ -1220,7 +1220,7 @@ final class DoctrineContext implements Context
     public function thereAreDummyImmutableDateObjectsWithDummyDate(int $nb)
     {
         for ($i = 1; $i <= $nb; ++$i) {
-            $date = new DateTimeImmutable(sprintf('2015-04-%d', $i), new DateTimeZone('UTC'));
+            $date = new \DateTimeImmutable(sprintf('2015-04-%d', $i), new \DateTimeZone('UTC'));
             $dummy = new DummyImmutableDate();
             $dummy->dummyDate = $date;
 
