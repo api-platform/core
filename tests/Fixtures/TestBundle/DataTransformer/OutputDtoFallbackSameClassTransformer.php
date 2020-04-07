@@ -22,13 +22,18 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyDtoOutputFallbackToSa
  *
  * @author Daniel West <daniel@silverback.is>
  */
-final class OutputDtoUnmodifiedDataTransformer implements DataTransformerInterface
+final class OutputDtoFallbackSameClassTransformer implements DataTransformerInterface
 {
     /**
      * {@inheritdoc}
      */
     public function transform($object, string $to, array $context = [])
     {
+        if (!$object instanceof DummyDtoOutputFallbackToSameClass) {
+            throw new \InvalidArgumentException();
+        }
+        $object->ipsum = 'modified';
+
         return $object;
     }
 

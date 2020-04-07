@@ -67,6 +67,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
     {
         $objectClass = $this->getObjectClass($object);
         $outputClass = $this->getOutputClass($objectClass, $context);
+
         if (null !== $outputClass && !isset($context[self::IS_TRANSFORMED_TO_SAME_CLASS_CONTEXT_KEY])) {
             return parent::normalize($object, $format, $context);
         }

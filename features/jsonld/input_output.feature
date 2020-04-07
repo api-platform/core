@@ -116,7 +116,7 @@ Feature: JSON-LD DTO input and output
       "@id": "/dummy_dto_output_fallback_to_same_classes/1",
       "@type": "DummyDtoOutputFallbackToSameClass",
       "lorem": "test",
-      "ipsum": "1",
+      "ipsum": "modified",
       "id": 1
     }
     """
