@@ -23,9 +23,6 @@ class ElaoEnumType implements TypeFactoryInterface
      */
     private $decorated;
 
-    /**
-     * @param TypeFactoryInterface $decorated
-     */
     public function __construct(TypeFactoryInterface $decorated)
     {
         $this->decorated = $decorated;
