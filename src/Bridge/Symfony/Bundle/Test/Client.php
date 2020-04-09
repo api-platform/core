@@ -44,6 +44,7 @@ final class Client implements HttpClientInterface
         'body' => '',
         'json' => null,
         'base_uri' => 'http://example.com',
+        'extra' => [],
     ];
 
     private $kernelBrowser;
