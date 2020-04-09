@@ -14,6 +14,8 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\DataTransformer;
 
 use ApiPlatform\Core\DataTransformer\DataTransformerInterface;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\DummyDtoOutputFallbackToSameClass as DummyDtoOutputFallbackToSameClassDocument;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\DummyDtoOutputSameClass as DummyDtoOutputSameClassDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Dto\OutputDtoDummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyDtoOutputFallbackToSameClass;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyDtoOutputSameClass;
@@ -30,7 +32,12 @@ final class OutputDtoSameClassTransformer implements DataTransformerInterface
      */
     public function transform($object, string $to, array $context = [])
     {
-        if (!$object instanceof DummyDtoOutputFallbackToSameClass && !$object instanceof DummyDtoOutputSameClass) {
+        if (
+            !$object instanceof DummyDtoOutputFallbackToSameClass &&
+            !$object instanceof DummyDtoOutputFallbackToSameClassDocument &&
+            !$object instanceof DummyDtoOutputSameClass &&
+            !$object instanceof DummyDtoOutputSameClassDocument
+        ) {
             throw new \InvalidArgumentException();
         }
         $object->ipsum = 'modified';
@@ -43,7 +50,7 @@ final class OutputDtoSameClassTransformer implements DataTransformerInterface
      */
     public function supportsTransformation($data, string $to, array $context = []): bool
     {
-        return ($data instanceof DummyDtoOutputFallbackToSameClass && OutputDtoDummy::class === $to) ||
-            ($data instanceof DummyDtoOutputSameClass && DummyDtoOutputSameClass::class === $to);
+        return (($data instanceof DummyDtoOutputFallbackToSameClass || $data instanceof DummyDtoOutputFallbackToSameClassDocument) && OutputDtoDummy::class === $to) ||
+            (($data instanceof DummyDtoOutputSameClass || $data instanceof DummyDtoOutputSameClassDocument) && DummyDtoOutputSameClass::class === $to);
     }
 }
