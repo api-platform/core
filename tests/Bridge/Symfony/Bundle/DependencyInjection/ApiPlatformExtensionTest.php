@@ -1259,6 +1259,7 @@ class ApiPlatformExtensionTest extends TestCase
             $definitions[] = 'api_platform.swagger.command.swagger_command';
             $definitions[] = 'api_platform.swagger.normalizer.api_gateway';
             $definitions[] = 'api_platform.swagger.normalizer.documentation';
+            $definitions[] = 'api_platform.json_schema.type.elao_enum_type';
             $definitions[] = 'api_platform.json_schema.type_factory';
             $definitions[] = 'api_platform.json_schema.schema_factory';
             $definitions[] = 'api_platform.json_schema.json_schema_generate_command';
