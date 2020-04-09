@@ -84,7 +84,7 @@ final class Client implements HttpClientInterface
      *
      * @return Response
      */
-    public function request(string $method, string $url, array $options = []): ResponseInterface
+    public function request(string $method, string $url, array $options = [], array $files = []): ResponseInterface
     {
         $basic = $options['auth_basic'] ?? null;
         [$url, $options] = self::prepareRequest($method, $url, $options, $this->defaultOptions);
@@ -121,7 +121,7 @@ final class Client implements HttpClientInterface
             'url' => $resolvedUrl,
             'primary_port' => 'http:' === $url['scheme'] ? 80 : 443,
         ];
-        $this->kernelBrowser->request($method, $resolvedUrl, [], [], $server, $options['body'] ?? null);
+        $this->kernelBrowser->request($method, $resolvedUrl, [], $files, $server, $options['body'] ?? null);
 
         return $this->response = new Response($this->kernelBrowser->getResponse(), $this->kernelBrowser->getInternalResponse(), $info);
     }
