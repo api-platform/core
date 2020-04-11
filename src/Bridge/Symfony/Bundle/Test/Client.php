@@ -122,8 +122,7 @@ final class Client implements HttpClientInterface
             'url' => $resolvedUrl,
             'primary_port' => 'http:' === $url['scheme'] ? 80 : 443,
         ];
-        $extra = $options['extra'] ?? [];
-        $this->kernelBrowser->request($method, $resolvedUrl, [], $extra['files'] ?? [], $server, $options['body'] ?? null);
+        $this->kernelBrowser->request($method, $resolvedUrl, $options['extra']['parameters'] ?? [], $options['extra']['files'] ?? [], $server, $options['body'] ?? null);
 
         return $this->response = new Response($this->kernelBrowser->getResponse(), $this->kernelBrowser->getInternalResponse(), $info);
     }
