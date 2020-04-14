@@ -105,6 +105,9 @@ parameters:
 		-
 			message: '#Cannot assign new offset to string\.#'
 			path: src/JsonSchema/SchemaFactory.php
+		-
+			message: '#Class Elao\\Enum\\EnumInterface not found\.#'
+			path: src/JsonSchema/Type/ElaoEnumType.php
 
 		# Expected, due to optional interfaces
 		- '#Method ApiPlatform\\Core\\Bridge\\Doctrine\\Orm\\Extension\\QueryCollectionExtensionInterface::applyToCollection\(\) invoked with 5 parameters, 3-4 required\.#'
