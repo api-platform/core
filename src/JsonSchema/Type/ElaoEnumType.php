@@ -1,4 +1,5 @@
 <?php
+
 /*
  * This file is part of the API Platform project.
  *
@@ -14,6 +15,7 @@ namespace ApiPlatform\Core\JsonSchema\Type;
 
 use ApiPlatform\Core\JsonSchema\Schema;
 use ApiPlatform\Core\JsonSchema\TypeFactoryInterface;
+use Elao\Enum\EnumInterface;
 use Symfony\Component\PropertyInfo\Type;
 
 class ElaoEnumType implements TypeFactoryInterface
@@ -33,17 +35,16 @@ class ElaoEnumType implements TypeFactoryInterface
      */
     public function getType(Type $type, string $format = 'json', ?bool $readableLink = null, ?array $serializerContext = null, Schema $schema = null): array
     {
-        if (is_a($enumClass = $type->getClassName(), 'Elao\Enum\EnumInterface', true)) {
-
-            $values = $enumClass::values();
-
-            return [
-                'type' => 'string',
-                'enum' => $values,
-                'example' => reset($values),
-            ];
+        if (!is_a($enumClass = $type->getClassName(), EnumInterface::class, true)) {
+            return $this->decorated->getType($type, $format, $readableLink, $serializerContext, $schema);
         }
 
-        return $this->decorated->getType($type, $format, $readableLink, $serializerContext, $schema);
+        $values = $enumClass::values();
+
+        return [
+            'type' => 'string',
+            'enum' => $values,
+            'example' => reset($values),
+        ];
     }
 }
