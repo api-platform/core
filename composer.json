@@ -41,6 +41,7 @@
         "doctrine/mongodb-odm": "^2.0",
         "doctrine/mongodb-odm-bundle": "^4.0",
         "doctrine/orm": "^2.6.4",
+        "elao/enum": "^1.7",
         "elasticsearch/elasticsearch": "^6.0",
         "friendsofsymfony/user-bundle": "^2.2@dev",
         "guzzlehttp/guzzle": "^6.0",
