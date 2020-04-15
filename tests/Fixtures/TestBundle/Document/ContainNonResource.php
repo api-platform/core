@@ -34,8 +34,6 @@ use Symfony\Component\Serializer\Annotation\Groups;
 class ContainNonResource
 {
     /**
-     * @var mixed
-     *
      * @ODM\Id(strategy="INCREMENT", type="integer")
      *
      * @Groups("contain_non_resource")
