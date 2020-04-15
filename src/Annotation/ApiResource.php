@@ -208,8 +208,6 @@ final class ApiResource
     /**
      * @see https://api-platform.com/docs/core/mercure
      * @see https://github.com/Haehnchen/idea-php-annotation-plugin/issues/112
-     *
-     * @var mixed
      */
     private $mercure;
 
@@ -384,8 +382,6 @@ final class ApiResource
     /**
      * @see https://api-platform.com/docs/core/validation/#using-validation-groups
      * @see https://github.com/Haehnchen/idea-php-annotation-plugin/issues/112
-     *
-     * @var mixed
      */
     private $validationGroups;
 

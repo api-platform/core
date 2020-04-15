@@ -34,8 +34,6 @@ use Symfony\Component\Serializer\Annotation\Groups;
 class ContainNonResource
 {
     /**
-     * @var mixed
-     *
      * @ORM\Column(type="integer")
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
