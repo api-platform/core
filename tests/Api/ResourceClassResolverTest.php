@@ -88,6 +88,18 @@ class ResourceClassResolverTest extends TestCase
         $this->assertEquals(Dummy::class, $resourceClassResolver->getResourceClass($dummies, Dummy::class));
     }
 
+    public function testGetResourceClassWithTraversable()
+    {
+        $resourceNameCollectionFactoryProphecy = $this->prophesize(ResourceNameCollectionFactoryInterface::class);
+        $resourceNameCollectionFactoryProphecy->create()->willReturn(new ResourceNameCollection([\ArrayObject::class]));
+
+        $dummy = new \ArrayObject();
+
+        $resourceClassResolver = new ResourceClassResolver($resourceNameCollectionFactoryProphecy->reveal());
+
+        $this->assertEquals(\ArrayObject::class, $resourceClassResolver->getResourceClass($dummy));
+    }
+
     public function testGetResourceClassWithPaginatorInterfaceAsValue()
     {
         $resourceNameCollectionFactoryProphecy = $this->prophesize(ResourceNameCollectionFactoryInterface::class);
@@ -119,6 +131,7 @@ class ResourceClassResolverTest extends TestCase
         $this->expectExceptionMessage('Resource type could not be determined. Resource class must be specified.');
 
         $resourceNameCollectionFactoryProphecy = $this->prophesize(ResourceNameCollectionFactoryInterface::class);
+        $resourceNameCollectionFactoryProphecy->create()->willReturn(new ResourceNameCollection([]));
 
         $resourceClassResolver = new ResourceClassResolver($resourceNameCollectionFactoryProphecy->reveal());
 
