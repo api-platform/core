@@ -29,6 +29,10 @@ parameters:
 
 		# False positives
 		-
+			message: '#Strict comparison using !== between .+ and .+ will always evaluate to false\.#'
+			paths:
+				- src/Bridge/Doctrine/Common/PropertyHelperTrait.php
+		-
 			message: '#Variable \$iri might not be defined\.#'
 			path: src/JsonApi/Serializer/ItemNormalizer.php
 		-
