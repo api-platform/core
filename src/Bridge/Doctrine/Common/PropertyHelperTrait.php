@@ -52,7 +52,7 @@ trait PropertyHelperTrait
         if (\func_num_args() > 1) {
             $resourceClass = (string) func_get_arg(1);
         } else {
-            if (__CLASS__ !== \get_class($this)) {
+            if (__CLASS__ !== static::class) {
                 $r = new \ReflectionMethod($this, __FUNCTION__);
                 if (__CLASS__ !== $r->getDeclaringClass()->getName()) {
                     @trigger_error(sprintf('Method %s() will have a second `$resourceClass` argument in version API Platform 3.0. Not defining it is deprecated since API Platform 2.1.', __FUNCTION__), E_USER_DEPRECATED);
@@ -91,7 +91,7 @@ trait PropertyHelperTrait
 
         if (\func_num_args() > 1) {
             $resourceClass = func_get_arg(1);
-        } elseif (__CLASS__ !== \get_class($this)) {
+        } elseif (__CLASS__ !== static::class) {
             $r = new \ReflectionMethod($this, __FUNCTION__);
             if (__CLASS__ !== $r->getDeclaringClass()->getName()) {
                 @trigger_error(sprintf('Method %s() will have a second `$resourceClass` argument in version API Platform 3.0. Not defining it is deprecated since API Platform 2.1.', __FUNCTION__), E_USER_DEPRECATED);

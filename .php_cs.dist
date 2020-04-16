@@ -108,16 +108,6 @@ return PhpCsFixer\Config::create()
                 'property',
             ],
         ],
-        'void_return' => false, // BC breaks; to be done in API Platform 3.0,
-        // removed get_class_this see https://github.com/FriendsOfPHP/PHP-CS-Fixer/issues/4921
-        'function_to_constant' => [
-            'functions' => [
-                'get_called_class',
-                'get_class',
-                'php_sapi_name',
-                'phpversion',
-                'pi'
-            ]
-        ]
+        'void_return' => false, // BC breaks; to be done in API Platform 3.0
     ])
     ->setFinder($finder);

@@ -74,7 +74,7 @@ class ExistsFilter extends AbstractContextAwareFilter implements ExistsFilterInt
         if (\func_num_args() > 6) {
             $context = func_get_arg(6);
         } else {
-            if (__CLASS__ !== \get_class($this)) {
+            if (__CLASS__ !== static::class) {
                 $r = new \ReflectionMethod($this, __FUNCTION__);
                 if (__CLASS__ !== $r->getDeclaringClass()->getName()) {
                     @trigger_error(sprintf('Method %s() will have a seventh `$context` argument in version API Platform 3.0. Not defining it is deprecated since API Platform 2.5.', __FUNCTION__), E_USER_DEPRECATED);
