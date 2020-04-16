@@ -18,7 +18,7 @@ use ApiPlatform\Core\JsonSchema\TypeFactoryInterface;
 use Elao\Enum\EnumInterface;
 use Symfony\Component\PropertyInfo\Type;
 
-class ElaoEnumType implements TypeFactoryInterface
+final class ElaoEnumType implements TypeFactoryInterface
 {
     /**
      * @var TypeFactoryInterface
