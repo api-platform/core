@@ -3,6 +3,7 @@
 ## 2.5.x-dev
 
 * GraphQL: Do not allow empty cursor values on `before` or `after`
+* Filter: Improve the RangeFilter query in case the values are equals using the between operator
 
 ## 2.5.4
 
