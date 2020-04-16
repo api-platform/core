@@ -90,9 +90,9 @@ final class Pagination
         if ($graphql && null !== ($last = $this->getParameterFromContext($context, 'last'))) {
             return ($offset = ($context['count'] ?? 0) - $last) < 0 ? 0 : $offset;
         }
-        
+
         $offset = ($this->getPage($context) - 1) * $limit;
-        
+
         if (!\is_int($offset)) {
             throw new InvalidArgumentException('Page parameter is too large.');
         }
