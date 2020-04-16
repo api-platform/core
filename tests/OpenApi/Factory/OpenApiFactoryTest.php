@@ -217,7 +217,7 @@ class OpenApiFactoryTest extends TestCase
             'query' => new Model\SecurityScheme('apiKey', 'Value for the key query parameter.', 'key', 'query'),
         ]);
 
-        $paths = $openApi->getPaths(false);
+        $paths = $openApi->getPaths();
         $dummiesPath = $paths->getPath('/dummies');
         $this->assertNotNull($dummiesPath);
         foreach (['Put', 'Head', 'Trace', 'Delete', 'Options', 'Patch'] as $method) {
@@ -537,10 +537,10 @@ class OpenApiFactoryTest extends TestCase
 
         $openApi = $factory->create(['base_url' => '/app_dev.php/']);
 
-        $pathItem = $openApi->getPaths(false)->getPath('/dummies/{id}');
+        $pathItem = $openApi->getPaths()->getPath('/dummies/{id}');
         $operation = $pathItem->getGet();
 
-        $openApi->getPaths(false)->addPath('/dummies/{id}', $pathItem->withGet(
+        $openApi->getPaths()->addPath('/dummies/{id}', $pathItem->withGet(
             $operation->withParameters(array_merge(
                 $operation->getParameters(),
                 [new Model\Parameter('fields', 'query', 'Fields to remove of the output')]

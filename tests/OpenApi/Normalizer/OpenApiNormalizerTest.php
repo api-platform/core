@@ -119,10 +119,10 @@ class OpenApiNormalizerTest extends TestCase
 
         $openApi = $factory->create(['base_url' => '/app_dev.php/']);
 
-        $pathItem = $openApi->getPaths(false)->getPath('/dummies/{id}');
+        $pathItem = $openApi->getPaths()->getPath('/dummies/{id}');
         $operation = $pathItem->getGet();
 
-        $openApi->getPaths(false)->addPath('/dummies/{id}', $pathItem->withGet(
+        $openApi->getPaths()->addPath('/dummies/{id}', $pathItem->withGet(
             $operation->withParameters(array_merge(
                 $operation->getParameters(),
                 [new Model\Parameter('fields', 'query', 'Fields to remove of the output')]
@@ -150,5 +150,7 @@ class OpenApiNormalizerTest extends TestCase
         $this->assertArrayNotHasKey('extensionProperties', $openApiAsArray);
         // this key is null, should not be in the output
         $this->assertArrayNotHasKey('termsOfService', $openApiAsArray['info']);
+        $this->assertArrayNotHasKey('paths', $openApiAsArray['paths']);
+        $this->assertArrayHasKey('/dummies/{id}', $openApiAsArray['paths']);
     }
 }

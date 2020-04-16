@@ -60,9 +60,9 @@ class OpenApi
         return $this->servers;
     }
 
-    public function getPaths($asArray = true)
+    public function getPaths()
     {
-        return $asArray ? $this->paths->getPaths() : $this->paths;
+        return $this->paths;
     }
 
     public function getComponents(): Components
