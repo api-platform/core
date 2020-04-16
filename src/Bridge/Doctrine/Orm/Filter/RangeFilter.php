@@ -89,6 +89,7 @@ class RangeFilter extends AbstractContextAwareFilter implements RangeFilterInter
                     $queryBuilder
                         ->andWhere(sprintf('%s.%s = :%s', $alias, $field, $valueParameter))
                         ->setParameter($valueParameter, $rangeValue[0]);
+
                     return;
                 }
 

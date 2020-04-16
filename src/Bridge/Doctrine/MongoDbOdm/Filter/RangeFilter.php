@@ -80,6 +80,7 @@ final class RangeFilter extends AbstractFilter implements RangeFilterInterface
 
                 if ($rangeValue[0] === $rangeValue[1]) {
                     $aggregationBuilder->match()->field($matchField)->equals($rangeValue[0]);
+
                     return;
                 }
 
