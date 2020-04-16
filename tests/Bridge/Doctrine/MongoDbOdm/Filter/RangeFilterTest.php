@@ -453,6 +453,15 @@ class RangeFilterTest extends DoctrineMongoDbOdmFilterTestCase
                         ],
                     ],
                 ],
+                'between (same values)' => [
+                    [
+                        [
+                            '$match' => [
+                                'dummyPrice' => 9.99,
+                            ],
+                        ],
+                    ],
+                ],
                 'between (too many operands)' => [
                     [],
                 ],

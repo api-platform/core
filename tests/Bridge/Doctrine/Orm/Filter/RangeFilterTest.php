@@ -343,6 +343,9 @@ class RangeFilterTest extends DoctrineOrmFilterTestCase
                 'between' => [
                     sprintf('SELECT o FROM %s o WHERE o.dummyPrice BETWEEN :dummyPrice_p1_1 AND :dummyPrice_p1_2', Dummy::class),
                 ],
+                'between (same values)' => [
+                    sprintf('SELECT o FROM %s o WHERE o.dummyPrice = :dummyPrice_p1', Dummy::class),
+                ],
                 'between (too many operands)' => [
                     sprintf('SELECT o FROM %s o', Dummy::class),
                 ],

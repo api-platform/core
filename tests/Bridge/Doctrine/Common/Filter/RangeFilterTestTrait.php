@@ -29,6 +29,14 @@ trait RangeFilterTestTrait
                     ],
                 ],
             ],
+            'between (same values)' => [
+                null,
+                [
+                    'dummyPrice' => [
+                        'between' => '9.99..9.99',
+                    ],
+                ],
+            ],
             'between (too many operands)' => [
                 null,
                 [

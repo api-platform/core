@@ -85,6 +85,14 @@ class RangeFilter extends AbstractContextAwareFilter implements RangeFilterInter
                     return;
                 }
 
+                if ($rangeValue[0] === $rangeValue[1]) {
+                    $queryBuilder
+                        ->andWhere(sprintf('%s.%s = :%s', $alias, $field, $valueParameter))
+                        ->setParameter($valueParameter, $rangeValue[0]);
+
+                    return;
+                }
+
                 $queryBuilder
                     ->andWhere(sprintf('%1$s.%2$s BETWEEN :%3$s_1 AND :%3$s_2', $alias, $field, $valueParameter))
                     ->setParameter(sprintf('%s_1', $valueParameter), $rangeValue[0])
