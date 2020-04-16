@@ -80,6 +80,38 @@ class RespondListenerTest extends TestCase
         $this->assertEquals('deny', $response->headers->get('X-Frame-Options'));
     }
 
+    public function testPostCreate200Response()
+    {
+        $kernelProphecy = $this->prophesize(HttpKernelInterface::class);
+
+        $request = new Request([], [], ['_api_respond' => true, '_api_write_item_iri' => '/dummy_entities/1', '_api_item_operation_name' => 'post']);
+        $request->setMethod('POST');
+        $request->setRequestFormat('xml');
+
+        $event = new ViewEvent(
+            $kernelProphecy->reveal(),
+            $request,
+            HttpKernelInterface::MASTER_REQUEST,
+            'foo'
+        );
+
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
+        $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadata(null, null, null, ['post' => ['status' => Response::HTTP_OK]]));
+
+        $listener = new RespondListener($resourceMetadataFactoryProphecy->reveal());
+        $listener->onKernelView($event);
+
+        $response = $event->getResponse();
+        $this->assertEquals('foo', $response->getContent());
+        $this->assertEquals(Response::HTTP_OK, $response->getStatusCode());
+        $this->assertEquals('text/xml; charset=utf-8', $response->headers->get('Content-Type'));
+        $this->assertEquals('Accept', $response->headers->get('Vary'));
+        $this->assertEquals('nosniff', $response->headers->get('X-Content-Type-Options'));
+        $this->assertEquals('deny', $response->headers->get('X-Frame-Options'));
+        $this->assertFalse($response->headers->has('Location'));
+        $this->assertEquals('/dummy_entities/1', $response->headers->get('Content-Location'));
+    }
+
     public function testCreate201Response()
     {
         $kernelProphecy = $this->prophesize(HttpKernelInterface::class);
