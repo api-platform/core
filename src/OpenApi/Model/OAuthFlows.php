@@ -30,22 +30,22 @@ class OAuthFlows
         $this->authorizationCode = $authorizationCode;
     }
 
-    public function getImplicit(): OAuthFlow
+    public function getImplicit(): ?OAuthFlow
     {
         return $this->implicit;
     }
 
-    public function getPassword(): OAuthFlow
+    public function getPassword(): ?OAuthFlow
     {
         return $this->password;
     }
 
-    public function getClientCredentials(): OAuthFlow
+    public function getClientCredentials(): ?OAuthFlow
     {
         return $this->clientCredentials;
     }
 
-    public function getAuthorizationCode(): OAuthFlow
+    public function getAuthorizationCode(): ?OAuthFlow
     {
         return $this->authorizationCode;
     }

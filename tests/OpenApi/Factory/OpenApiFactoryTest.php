@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\OpenApi\Factory;
 
 use ApiPlatform\Core\DataProvider\PaginationOptions;
-use ApiPlatform\Core\Documentation\Documentation;
 use ApiPlatform\Core\JsonSchema\Schema;
 use ApiPlatform\Core\JsonSchema\SchemaFactory;
 use ApiPlatform\Core\JsonSchema\TypeFactory;
@@ -41,7 +40,6 @@ use Prophecy\Argument;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
-use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 class OpenApiFactoryTest extends TestCase
 {
@@ -190,7 +188,7 @@ class OpenApiFactoryTest extends TestCase
                     'type' => 'string',
                     'description' => 'This is a \DateTimeInterface object.',
                     'format' => 'date-time',
-                    'nullable' => true
+                    'nullable' => true,
                 ]),
                 'enum' => new \ArrayObject([
                     'type' => 'string',
@@ -469,88 +467,93 @@ class OpenApiFactoryTest extends TestCase
         ));
     }
 
-    // public function testOverrideDocumentation()
-    // {
-    //     $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), 'Test API', 'This is a test API.', '1.2.3');
-    //     $defaultContext = ['base_url' => '/app_dev.php/'];
-    //     $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
-    //     $propertyNameCollectionFactoryProphecy->create(Dummy::class, Argument::any())->shouldBeCalled()->willReturn(new PropertyNameCollection(['id', 'name', 'description', 'dummyDate']));
-    //
-    //     $dummyMetadata = new ResourceMetadata(
-    //         'Dummy',
-    //         'This is a dummy.',
-    //         'http://schema.example.com/Dummy',
-    //         [
-    //             'get' => ['method' => 'GET'] + self::OPERATION_FORMATS,
-    //             'put' => ['method' => 'PUT'] + self::OPERATION_FORMATS,
-    //             'delete' => ['method' => 'DELETE'] + self::OPERATION_FORMATS,
-    //         ],
-    //         [
-    //             'get' => ['method' => 'GET'] + self::OPERATION_FORMATS,
-    //             'post' => ['method' => 'POST'] + self::OPERATION_FORMATS,
-    //         ],
-    //         []
-    //     );
-    //
-    //     $subresourceOperationFactoryProphecy = $this->prophesize(SubresourceOperationFactoryInterface::class);
-    //     $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
-    //     $resourceMetadataFactoryProphecy->create(Dummy::class)->shouldBeCalled()->willReturn($dummyMetadata);
-    //
-    //     $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
-    //     $propertyMetadataFactoryProphecy->create(Dummy::class, 'id')->shouldBeCalled()->willReturn(new PropertyMetadata(new Type(Type::BUILTIN_TYPE_INT), 'This is an id.', true, false, null, null, null, true, null, null, null, null, null, null, null, ['minLength' => 3, 'maxLength' => 20, 'pattern' => '^dummyPattern$']));
-    //     $propertyMetadataFactoryProphecy->create(Dummy::class, 'name')->shouldBeCalled()->willReturn(new PropertyMetadata(new Type(Type::BUILTIN_TYPE_STRING), 'This is a name.', true, true, true, true, false, false, null, null, [], null, null, null, null));
-    //     $propertyMetadataFactoryProphecy->create(Dummy::class, 'description')->shouldBeCalled()->willReturn(new PropertyMetadata(new Type(Type::BUILTIN_TYPE_STRING), 'This is an initializable but not writable property.', true, false, true, true, false, false, null, null, [], null, true));
-    //     $propertyMetadataFactoryProphecy->create(Dummy::class, 'dummyDate')->shouldBeCalled()->willReturn(new PropertyMetadata(new Type(Type::BUILTIN_TYPE_OBJECT, true, \DateTime::class), 'This is a \DateTimeInterface object.', true, true, true, true, false, false, null, null, []));
-    //
-    //     $operationPathResolver = new CustomOperationPathResolver(new OperationPathResolver(new UnderscorePathSegmentNameGenerator()));
-    //     $filterLocatorProphecy = $this->prophesize(ContainerInterface::class);
-    //     $resourceMetadataFactory = $resourceMetadataFactoryProphecy->reveal();
-    //     $propertyNameCollectionFactory = $propertyNameCollectionFactoryProphecy->reveal();
-    //     $propertyMetadataFactory = $propertyMetadataFactoryProphecy->reveal();
-    //
-    //     $typeFactory = new TypeFactory();
-    //     $schemaFactory = new SchemaFactory($typeFactory, $resourceMetadataFactory, $propertyNameCollectionFactory, $propertyMetadataFactory, new CamelCaseToSnakeCaseNameConverter());
-    //     $typeFactory->setSchemaFactory($schemaFactory);
-    //
-    //     $noopNormalizer = $this->prophesize(NormalizerInterface::class);
-    //     $noopNormalizer->normalize(Argument::any())->will(function ($args) {
-    //         return $args[0];
-    //     });
-    //
-    //     $normalizer = new DocumentationNormalizer(
-    //         $resourceMetadataFactory,
-    //         $propertyNameCollectionFactory,
-    //         $propertyMetadataFactory,
-    //         $schemaFactory,
-    //         $typeFactory,
-    //         $operationPathResolver,
-    //         $filterLocatorProphecy->reveal(),
-    //         $subresourceOperationFactoryProphecy->reveal(),
-    //         [],
-    //         ['spec_version' => 3],
-    //         new AuthorizationOptions(),
-    //         new PaginationOptions(),
-    //         $noopNormalizer->reveal()
-    //     );
-    //
-    //     /**
-    //      * @var OpenApi\OpenApi
-    //      */
-    //     $openApi = $normalizer->normalize($documentation, DocumentationNormalizer::FORMAT, $defaultContext);
-    //     $pathItem = $openApi->getPaths()->getPath('/dummies/{id}');
-    //     $operation = $pathItem->getGet();
-    //
-    //     $openApi->getPaths()->addPath('/dummies/{id}', $pathItem->withGet(
-    //         $operation->withParameters(array_merge(
-    //             $operation->getParameters(),
-    //             [new Model\Parameter('fields', 'query', 'Fields to remove of the output')]
-    //         ))
-    //     ));
-    //
-    //     $openApi = $openApi->withInfo(new Model\Info('New Title', 'v2', 'Description of my custom API'));
-    //     $openApi = $openApi->withXInternalId('Custom X value');
-        // var_dump($openApi);
-    // }
+    public function testOverrideDocumentation()
+    {
+        $resourceNameCollectionFactoryProphecy = $this->prophesize(ResourceNameCollectionFactoryInterface::class);
+        $resourceNameCollectionFactoryProphecy->create()->shouldBeCalled()->willReturn(new ResourceNameCollection([Dummy::class]));
+        $defaultContext = ['base_url' => '/app_dev.php/'];
+        $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
+        $propertyNameCollectionFactoryProphecy->create(Dummy::class, Argument::any())->shouldBeCalled()->willReturn(new PropertyNameCollection(['id', 'name', 'description', 'dummyDate']));
+
+        $dummyMetadata = new ResourceMetadata(
+            'Dummy',
+            'This is a dummy.',
+            'http://schema.example.com/Dummy',
+            [
+                'get' => ['method' => 'GET'] + self::OPERATION_FORMATS,
+                'put' => ['method' => 'PUT'] + self::OPERATION_FORMATS,
+                'delete' => ['method' => 'DELETE'] + self::OPERATION_FORMATS,
+            ],
+            [
+                'get' => ['method' => 'GET'] + self::OPERATION_FORMATS,
+                'post' => ['method' => 'POST'] + self::OPERATION_FORMATS,
+            ],
+            []
+        );
+
+        $subresourceOperationFactoryProphecy = $this->prophesize(SubresourceOperationFactoryInterface::class);
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
+        $resourceMetadataFactoryProphecy->create(Dummy::class)->shouldBeCalled()->willReturn($dummyMetadata);
+
+        $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
+        $propertyMetadataFactoryProphecy->create(Dummy::class, 'id')->shouldBeCalled()->willReturn(new PropertyMetadata(new Type(Type::BUILTIN_TYPE_INT), 'This is an id.', true, false, null, null, null, true, null, null, null, null, null, null, null, ['minLength' => 3, 'maxLength' => 20, 'pattern' => '^dummyPattern$']));
+        $propertyMetadataFactoryProphecy->create(Dummy::class, 'name')->shouldBeCalled()->willReturn(new PropertyMetadata(new Type(Type::BUILTIN_TYPE_STRING), 'This is a name.', true, true, true, true, false, false, null, null, [], null, null, null, null));
+        $propertyMetadataFactoryProphecy->create(Dummy::class, 'description')->shouldBeCalled()->willReturn(new PropertyMetadata(new Type(Type::BUILTIN_TYPE_STRING), 'This is an initializable but not writable property.', true, false, true, true, false, false, null, null, [], null, true));
+        $propertyMetadataFactoryProphecy->create(Dummy::class, 'dummyDate')->shouldBeCalled()->willReturn(new PropertyMetadata(new Type(Type::BUILTIN_TYPE_OBJECT, true, \DateTime::class), 'This is a \DateTimeInterface object.', true, true, true, true, false, false, null, null, []));
+
+        $operationPathResolver = new CustomOperationPathResolver(new OperationPathResolver(new UnderscorePathSegmentNameGenerator()));
+        $filterLocatorProphecy = $this->prophesize(ContainerInterface::class);
+        $resourceMetadataFactory = $resourceMetadataFactoryProphecy->reveal();
+        $propertyNameCollectionFactory = $propertyNameCollectionFactoryProphecy->reveal();
+        $propertyMetadataFactory = $propertyMetadataFactoryProphecy->reveal();
+
+        $typeFactory = new TypeFactory();
+        $schemaFactory = new SchemaFactory($typeFactory, $resourceMetadataFactory, $propertyNameCollectionFactory, $propertyMetadataFactory, new CamelCaseToSnakeCaseNameConverter());
+        $typeFactory->setSchemaFactory($schemaFactory);
+
+        $factory = new OpenApiFactory(
+            $resourceNameCollectionFactoryProphecy->reveal(),
+            $resourceMetadataFactory,
+            $propertyNameCollectionFactory,
+            $propertyMetadataFactory,
+            $schemaFactory,
+            $typeFactory,
+            $operationPathResolver,
+            $filterLocatorProphecy->reveal(),
+            $subresourceOperationFactoryProphecy->reveal(),
+            [],
+            new Options('Test API', 'This is a test API.', '1.2.3', true, 'oauth2', 'authorizationCode', '/oauth/v2/token', '/oauth/v2/auth', '/oauth/v2/refresh', ['scope param'], [
+                'header' => [
+                    'type' => 'header',
+                    'name' => 'Authorization',
+                ],
+                'query' => [
+                    'type' => 'query',
+                    'name' => 'key',
+                ],
+            ]),
+            new PaginationOptions(true, 'page', true, 'itemsPerPage', true, 'pagination')
+        );
+
+        $openApi = $factory->create(['base_url' => '/app_dev.php/']);
+
+        $pathItem = $openApi->getPaths(false)->getPath('/dummies/{id}');
+        $operation = $pathItem->getGet();
+
+        $openApi->getPaths(false)->addPath('/dummies/{id}', $pathItem->withGet(
+            $operation->withParameters(array_merge(
+                $operation->getParameters(),
+                [new Model\Parameter('fields', 'query', 'Fields to remove of the output')]
+            ))
+        ));
+
+        $openApi = $openApi->withInfo((new Model\Info('New Title', 'v2', 'Description of my custom API'))->withExtensionProperty('info-key', 'Info value'));
+        $openApi = $openApi->withExtensionProperty('key', 'Custom x-key value');
+        $openApi = $openApi->withExtensionProperty('x-value', 'Custom x-value value');
+
+        $this->assertEquals($openApi->getInfo()->getExtensionProperties(), ['x-info-key' => 'Info value']);
+        $this->assertEquals($openApi->getExtensionProperties(), ['x-key' => 'Custom x-key value', 'x-value' => 'Custom x-value value']);
+    }
 
     // public function testSubresourceDocumentation() {
         // $documentation = new Documentation(new ResourceNameCollection([Question::class]), 'Test API', 'This is a test API.', '1.2.3');

@@ -24,6 +24,7 @@ final class OpenApiNormalizer implements NormalizerInterface, CacheableSupportsM
 {
     public const FORMAT = 'json';
 
+    private const EXTENSION_PROPERTIES_KEY = 'extensionProperties';
     private $decorated;
 
     public function __construct(NormalizerInterface $decorated)
@@ -36,14 +37,21 @@ final class OpenApiNormalizer implements NormalizerInterface, CacheableSupportsM
      */
     public function normalize($object, $format = null, array $context = [])
     {
-        return $this->unsetEmptyScalar($this->decorated->normalize($object, $format, $context));
+        return $this->recursiveClean($this->decorated->normalize($object, $format, $context));
     }
 
-    private function unsetEmptyScalar($data)
+    private function recursiveClean($data)
     {
         foreach ($data as $key => $value) {
+            if (self::EXTENSION_PROPERTIES_KEY === $key) {
+                foreach ($data[self::EXTENSION_PROPERTIES_KEY] as $extensionPropertyKey => $extensionPropertyValue) {
+                    $data[$extensionPropertyKey] = $extensionPropertyValue;
+                }
+                continue;
+            }
+
             if (\is_array($value)) {
-                $data[$key] = $this->unsetEmptyScalar($value);
+                $data[$key] = $this->recursiveClean($value);
                 // arrays must stay even if empty
                 continue;
             }
@@ -52,6 +60,8 @@ final class OpenApiNormalizer implements NormalizerInterface, CacheableSupportsM
                 unset($data[$key]);
             }
         }
+
+        unset($data[self::EXTENSION_PROPERTIES_KEY]);
 
         return $data;
     }

@@ -15,15 +15,22 @@ namespace ApiPlatform\Core\OpenApi\Model;
 
 trait ExtensionTrait
 {
-    public function __call(string $name, array $arguments)
+    private $extensionProperties = [];
+
+    public function withExtensionProperty(string $key, string $value)
     {
-        if (0 !== strpos($name, 'withX')) {
-            throw new \BadMethodCallException('Specification extensions must start with x!');
+        if (0 !== strpos($key, 'x-')) {
+            $key = 'x-'.$key;
         }
 
         $clone = clone $this;
-        $clone->{str_replace('withX', 'x-', $name)} = $arguments[0];
+        $clone->extensionProperties[$key] = $value;
 
         return $clone;
+    }
+
+    public function getExtensionProperties()
+    {
+        return $this->extensionProperties;
     }
 }

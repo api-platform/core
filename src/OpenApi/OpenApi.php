@@ -60,9 +60,6 @@ class OpenApi
         return $this->servers;
     }
 
-    /**
-     * @param bool $asArray for proper normalization
-     */
     public function getPaths($asArray = true)
     {
         return $asArray ? $this->paths->getPaths() : $this->paths;

@@ -48,12 +48,12 @@ class SecurityScheme
         return $this->description;
     }
 
-    public function getName(): string
+    public function getName(): ?string
     {
         return $this->name;
     }
 
-    public function getIn(): string
+    public function getIn(): ?string
     {
         return $this->in;
     }
@@ -63,17 +63,17 @@ class SecurityScheme
         return $this->scheme;
     }
 
-    public function getBearerFormat(): string
+    public function getBearerFormat(): ?string
     {
         return $this->bearerFormat;
     }
 
-    public function getFlows(): OAuthFlows
+    public function getFlows(): ?OAuthFlows
     {
         return $this->flows;
     }
 
-    public function getOpenIdConnectUrl(): string
+    public function getOpenIdConnectUrl(): ?string
     {
         return $this->openIdConnectUrl;
     }
