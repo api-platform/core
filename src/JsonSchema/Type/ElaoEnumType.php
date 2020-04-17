@@ -44,7 +44,7 @@ final class ElaoEnumType implements TypeFactoryInterface
         return [
             'type' => 'string',
             'enum' => $values,
-            'example' => reset($values),
+            'example' => $values[0],
         ];
     }
 }
