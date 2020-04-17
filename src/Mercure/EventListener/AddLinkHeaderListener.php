@@ -48,14 +48,14 @@ final class AddLinkHeaderListener
             return;
         }
 
-        $link = new Link('mercure', $this->hub);
-
         if (
             null === ($resourceClass = $request->attributes->get('_api_resource_class')) ||
             false === $this->resourceMetadataFactory->create($resourceClass)->getAttribute('mercure', false)
         ) {
             return;
         }
+
+        $link = new Link('hub', $this->hub);
 
         if (null === $linkProvider = $request->attributes->get('_links')) {
             $request->attributes->set('_links', new GenericLinkProvider([$link]));

@@ -50,8 +50,8 @@ class AddLinkHeaderListenerTest extends TestCase
     public function addProvider(): array
     {
         return [
-            ['<https://demo.mercure.rocks/hub>; rel="mercure"', new Request([], [], ['_api_resource_class' => Dummy::class])],
-            ['<http://example.com/docs>; rel="http://www.w3.org/ns/hydra/core#apiDocumentation",<https://demo.mercure.rocks/hub>; rel="mercure"', new Request([], [], ['_api_resource_class' => Dummy::class, '_links' => new GenericLinkProvider([new Link('http://www.w3.org/ns/hydra/core#apiDocumentation', 'http://example.com/docs')])])],
+            ['<https://demo.mercure.rocks/hub>; rel="hub"', new Request([], [], ['_api_resource_class' => Dummy::class])],
+            ['<http://example.com/docs>; rel="http://www.w3.org/ns/hydra/core#apiDocumentation",<https://demo.mercure.rocks/hub>; rel="hub"', new Request([], [], ['_api_resource_class' => Dummy::class, '_links' => new GenericLinkProvider([new Link('http://www.w3.org/ns/hydra/core#apiDocumentation', 'http://example.com/docs')])])],
         ];
     }
 
