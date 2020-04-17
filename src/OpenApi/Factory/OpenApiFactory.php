@@ -367,7 +367,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
             'OAuth 2.0 %s Grant',
             strtolower(preg_replace('/[A-Z]/', ' \\0', lcfirst($this->openApiOptions->getOAuthFlow())))
         );
-        list($implicit, $password, $clientCredentials, $authorizationCode) = [null, null, null, null];
+        $implicit = $password = $clientCredentials = $authorizationCode = null;
 
         switch ($this->openApiOptions->getOAuthFlow()) {
             case 'implicit':
