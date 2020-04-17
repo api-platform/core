@@ -22,7 +22,7 @@ class PaginationOptions
     private $paginationClientEnabled;
     private $paginationClientEnabledParameterName;
 
-    public function __construct($paginationEnabled = true, string $paginationPageParameterName = 'page', bool $clientItemsPerPage = false, string $itemsPerPageParameterName = 'itemsPerPage', bool $paginationClientEnabled = false, string $paginationClientEnabledParameterName = 'pagination')
+    public function __construct(bool $paginationEnabled = true, string $paginationPageParameterName = 'page', bool $clientItemsPerPage = false, string $itemsPerPageParameterName = 'itemsPerPage', bool $paginationClientEnabled = false, string $paginationClientEnabledParameterName = 'pagination')
     {
         $this->paginationEnabled = $paginationEnabled;
         $this->paginationPageParameterName = $paginationPageParameterName;
@@ -32,32 +32,32 @@ class PaginationOptions
         $this->paginationClientEnabledParameterName = $paginationClientEnabledParameterName;
     }
 
-    public function isPaginationEnabled()
+    public function isPaginationEnabled(): bool
     {
         return $this->paginationEnabled;
     }
 
-    public function getPaginationPageParameterName()
+    public function getPaginationPageParameterName(): string
     {
         return $this->paginationPageParameterName;
     }
 
-    public function getClientItemsPerPage()
+    public function getClientItemsPerPage(): bool
     {
         return $this->clientItemsPerPage;
     }
 
-    public function getItemsPerPageParameterName()
+    public function getItemsPerPageParameterName(): string
     {
         return $this->itemsPerPageParameterName;
     }
 
-    public function getPaginationClientEnabled()
+    public function getPaginationClientEnabled(): bool
     {
         return $this->paginationClientEnabled;
     }
 
-    public function getPaginationClientEnabledParameterName()
+    public function getPaginationClientEnabledParameterName(): string
     {
         return $this->paginationClientEnabledParameterName;
     }

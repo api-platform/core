@@ -40,47 +40,47 @@ class Components
         $this->callbacks = $callbacks;
     }
 
-    public function getSchemas()
+    public function getSchemas(): array
     {
         return $this->schemas;
     }
 
-    public function getResponses()
+    public function getResponses(): array
     {
         return $this->responses;
     }
 
-    public function getParameters()
+    public function getParameters(): array
     {
         return $this->parameters;
     }
 
-    public function getExamples()
+    public function getExamples(): array
     {
         return $this->examples;
     }
 
-    public function getRequestBodies()
+    public function getRequestBodies(): array
     {
         return $this->requestBodies;
     }
 
-    public function getHeaders()
+    public function getHeaders(): array
     {
         return $this->headers;
     }
 
-    public function getSecuritySchemes()
+    public function getSecuritySchemes(): array
     {
         return $this->securitySchemes;
     }
 
-    public function getLinks()
+    public function getLinks(): array
     {
         return $this->links;
     }
 
-    public function getCallbacks()
+    public function getCallbacks(): array
     {
         return $this->callbacks;
     }

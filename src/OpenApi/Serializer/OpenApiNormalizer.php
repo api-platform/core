@@ -35,12 +35,12 @@ final class OpenApiNormalizer implements NormalizerInterface, CacheableSupportsM
     /**
      * {@inheritdoc}
      */
-    public function normalize($object, $format = null, array $context = [])
+    public function normalize($object, $format = null, array $context = []): array
     {
         return $this->recursiveClean($this->decorated->normalize($object, $format, $context));
     }
 
-    private function recursiveClean($data)
+    private function recursiveClean($data): array
     {
         foreach ($data as $key => $value) {
             if (self::EXTENSION_PROPERTIES_KEY === $key) {

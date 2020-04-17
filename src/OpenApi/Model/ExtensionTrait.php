@@ -29,7 +29,7 @@ trait ExtensionTrait
         return $clone;
     }
 
-    public function getExtensionProperties()
+    public function getExtensionProperties(): array
     {
         return $this->extensionProperties;
     }

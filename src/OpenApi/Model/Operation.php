@@ -46,7 +46,7 @@ class Operation
         $this->externalDocs = $externalDocs;
     }
 
-    public function addResponse(Response $response, $status = 'default')
+    public function addResponse(Response $response, $status = 'default'): self
     {
         $this->responses[$status] = $response;
 

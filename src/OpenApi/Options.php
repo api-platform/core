@@ -42,57 +42,57 @@ final class Options
         $this->apiKeys = $apiKeys;
     }
 
-    public function getTitle()
+    public function getTitle(): string
     {
         return $this->title;
     }
 
-    public function getDescription()
+    public function getDescription(): string
     {
         return $this->description;
     }
 
-    public function getVersion()
+    public function getVersion(): string
     {
         return $this->version;
     }
 
-    public function getOAuthEnabled()
+    public function getOAuthEnabled(): bool
     {
         return $this->oAuthEnabled;
     }
 
-    public function getOAuthType()
+    public function getOAuthType(): string
     {
         return $this->oAuthType;
     }
 
-    public function getOAuthFlow()
+    public function getOAuthFlow(): string
     {
         return $this->oAuthFlow;
     }
 
-    public function getOAuthTokenUrl()
+    public function getOAuthTokenUrl(): string
     {
         return $this->oAuthTokenUrl;
     }
 
-    public function getOAuthAuthorizationUrl()
+    public function getOAuthAuthorizationUrl(): string
     {
         return $this->oAuthAuthorizationUrl;
     }
 
-    public function getOAuthRefreshUrl()
+    public function getOAuthRefreshUrl(): string
     {
         return $this->oAuthRefreshUrl;
     }
 
-    public function getOAuthScopes()
+    public function getOAuthScopes(): string
     {
         return $this->oAuthScopes;
     }
 
-    public function getApiKeys()
+    public function getApiKeys(): string
     {
         return $this->apiKeys;
     }

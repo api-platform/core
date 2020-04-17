@@ -27,7 +27,7 @@ class Paths
         return $this->paths[$path] ?? null;
     }
 
-    public function getPaths()
+    public function getPaths(): array
     {
         return $this->paths;
     }
