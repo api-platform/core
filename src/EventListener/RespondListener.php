@@ -63,14 +63,6 @@ final class RespondListener
             'X-Frame-Options' => 'deny',
         ];
 
-        if ($request->attributes->has('_api_write_item_iri')) {
-            $headers['Content-Location'] = $request->attributes->get('_api_write_item_iri');
-
-            if ($request->isMethod('POST')) {
-                $headers['Location'] = $request->attributes->get('_api_write_item_iri');
-            }
-        }
-
         $status = null;
         if ($this->resourceMetadataFactory && $attributes) {
             $resourceMetadata = $this->resourceMetadataFactory->create($attributes['resource_class']);
@@ -83,9 +75,19 @@ final class RespondListener
             $status = $resourceMetadata->getOperationAttribute($attributes, 'status');
         }
 
+        $status = $status ?? self::METHOD_TO_CODE[$request->getMethod()] ?? Response::HTTP_OK;
+
+        if ($request->attributes->has('_api_write_item_iri')) {
+            $headers['Content-Location'] = $request->attributes->get('_api_write_item_iri');
+
+            if ((Response::HTTP_CREATED === $status || (300 <= $status && $status < 400)) && $request->isMethod('POST')) {
+                $headers['Location'] = $request->attributes->get('_api_write_item_iri');
+            }
+        }
+
         $event->setResponse(new Response(
             $controllerResult,
-            $status ?? self::METHOD_TO_CODE[$request->getMethod()] ?? Response::HTTP_OK,
+            $status,
             $headers
         ));
     }
