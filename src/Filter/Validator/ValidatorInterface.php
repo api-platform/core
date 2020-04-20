@@ -16,9 +16,9 @@ namespace ApiPlatform\Core\Filter\Validator;
 interface ValidatorInterface
 {
     /**
-     * @var string        the parameter name to validate
-     * @var array<string, mixed> $filterDescription the filter descriptions as returned by `ApiPlatform\Core\Api\FilterInterface::getDescription()`
-     * @var array<string, mixed> $queryParameters the list of query parameter
+     * @param string               $name              the parameter name to validate
+     * @param array<string, mixed> $filterDescription the filter descriptions as returned by `ApiPlatform\Core\Api\FilterInterface::getDescription()`
+     * @param array<string, mixed> $queryParameters   the list of query parameter
      */
     public function validate(string $name, array $filterDescription, array $queryParameters): array;
 }
