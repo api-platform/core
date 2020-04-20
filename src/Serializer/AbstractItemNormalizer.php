@@ -119,7 +119,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
                 throw new LogicException('Cannot normalize the output because the injected serializer is not a normalizer');
             }
 
-            if ($object !== $transformed = $this->transformOutput($object, $outputClass, $context)) {
+            if ($object !== $transformed = $this->transformOutput($object, $context, $outputClass)) {
                 $context['api_normalize'] = true;
                 $context['api_resource'] = $object;
                 unset($context['output'], $context['resource_class']);
@@ -645,8 +645,12 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
      * For a given resource, it returns an output representation if any
      * If not, the resource is returned.
      */
-    protected function transformOutput($object, string $outputClass, array $context = [])
+    protected function transformOutput($object, array $context = [], string $outputClass = null)
     {
+        if (null === $outputClass) {
+            $outputClass = $this->getOutputClass($this->getObjectClass($object), $context);
+        }
+
         if (null !== $outputClass && null !== $dataTransformer = $this->getDataTransformer($object, $outputClass, $context)) {
             return $dataTransformer->transform($object, $outputClass, $context);
         }

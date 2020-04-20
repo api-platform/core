@@ -21,8 +21,6 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyDtoOutputFallbackToSa
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyDtoOutputSameClass;
 
 /**
- * OutputDtoUnmodifiedDataTransformer.
- *
  * @author Daniel West <daniel@silverback.is>
  */
 final class OutputDtoSameClassTransformer implements DataTransformerInterface
