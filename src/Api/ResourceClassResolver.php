@@ -45,7 +45,8 @@ final class ResourceClassResolver implements ResourceClassResolverInterface
             throw new InvalidArgumentException('Strict checking is only possible when resource class is specified.');
         }
 
-        $actualClass = \is_object($value) && !$value instanceof \Traversable ? $this->getObjectClass($value) : null;
+        $objectClass = \is_object($value) ? $this->getObjectClass($value) : null;
+        $actualClass = ($objectClass && (!$value instanceof \Traversable || $this->isResourceClass($objectClass))) ? $this->getObjectClass($value) : null;
 
         if (null === $actualClass && null === $resourceClass) {
             throw new InvalidArgumentException('Resource type could not be determined. Resource class must be specified.');

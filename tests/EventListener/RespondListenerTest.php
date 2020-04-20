@@ -80,6 +80,55 @@ class RespondListenerTest extends TestCase
         $this->assertEquals('deny', $response->headers->get('X-Frame-Options'));
     }
 
+    public function testPost200WithoutLocation()
+    {
+        $kernelProphecy = $this->prophesize(HttpKernelInterface::class);
+
+        $request = new Request([], [], ['_api_resource_class' => Dummy::class, '_api_item_operation_name' => 'get', '_api_respond' => true, '_api_write_item_iri' => '/dummy_entities/1']);
+        $request->setMethod('POST');
+
+        $event = new ViewEvent(
+            $kernelProphecy->reveal(),
+            $request,
+            HttpKernelInterface::MASTER_REQUEST,
+            'bar'
+        );
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
+        $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadata(null, null, null, ['get' => ['status' => Response::HTTP_OK]]));
+
+        $listener = new RespondListener($resourceMetadataFactoryProphecy->reveal());
+        $listener->onKernelView($event);
+
+        $response = $event->getResponse();
+        $this->assertFalse($response->headers->has('Location'));
+        $this->assertSame(Response::HTTP_OK, $event->getResponse()->getStatusCode());
+    }
+
+    public function testPost301WithLocation()
+    {
+        $kernelProphecy = $this->prophesize(HttpKernelInterface::class);
+
+        $request = new Request([], [], ['_api_resource_class' => Dummy::class, '_api_item_operation_name' => 'get', '_api_respond' => true, '_api_write_item_iri' => '/dummy_entities/1']);
+        $request->setMethod('POST');
+
+        $event = new ViewEvent(
+            $kernelProphecy->reveal(),
+            $request,
+            HttpKernelInterface::MASTER_REQUEST,
+            'bar'
+        );
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
+        $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadata(null, null, null, ['get' => ['status' => Response::HTTP_MOVED_PERMANENTLY]]));
+
+        $listener = new RespondListener($resourceMetadataFactoryProphecy->reveal());
+        $listener->onKernelView($event);
+
+        $response = $event->getResponse();
+        $this->assertTrue($response->headers->has('Location'));
+        $this->assertEquals('/dummy_entities/1', $response->headers->get('Location'));
+        $this->assertSame(Response::HTTP_MOVED_PERMANENTLY, $event->getResponse()->getStatusCode());
+    }
+
     public function testCreate201Response()
     {
         $kernelProphecy = $this->prophesize(HttpKernelInterface::class);
@@ -107,6 +156,7 @@ class RespondListenerTest extends TestCase
         $this->assertEquals('deny', $response->headers->get('X-Frame-Options'));
         $this->assertEquals('/dummy_entities/1', $response->headers->get('Location'));
         $this->assertEquals('/dummy_entities/1', $response->headers->get('Content-Location'));
+        $this->assertTrue($response->headers->has('Location'));
     }
 
     public function testCreate204Response()

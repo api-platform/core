@@ -192,7 +192,7 @@ final class HydraContext implements Context
      */
     public function assertPropertyIsWritable(string $propertyName, string $className)
     {
-        if (!$this->getPropertyInfo($propertyName, $className)->{'hydra:writable'}) {
+        if (!$this->getPropertyInfo($propertyName, $className)->{'hydra:writeable'}) {
             throw new ExpectationFailedException(sprintf('Property "%s" of class "%s" is not writable', $propertyName, $className));
         }
     }

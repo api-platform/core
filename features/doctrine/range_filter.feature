@@ -60,6 +60,51 @@ Feature: Range filter on collections
     }
     """
 
+  @createSchema
+  Scenario: Get collection filtered by range (between the same values)
+    Given there are 30 dummy objects with dummyPrice
+    When I send a "GET" request to "/dummies?dummyPrice[between]=12.99..12.99"
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+    And the JSON should be valid according to this schema:
+    """
+    {
+      "type": "object",
+      "properties": {
+        "@context": {"pattern": "^/contexts/Dummy$"},
+        "@id": {"pattern": "^/dummies$"},
+        "@type": {"pattern": "^hydra:Collection$"},
+        "hydra:member": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "@id": {
+                "oneOf": [
+                  {"pattern": "^/dummies/2$"},
+                  {"pattern": "^/dummies/6$"},
+                  {"pattern": "^/dummies/10$"}
+                ]
+              }
+            }
+          },
+          "minItems": 3,
+          "maxItems": 3,
+          "uniqueItems": true
+        },
+        "hydra:totalItems": {"type": "number", "minimum": 8, "maximum": 8},
+        "hydra:view": {
+          "type": "object",
+          "properties": {
+            "@id": {"pattern": "^/dummies\\?dummyPrice%5Bbetween%5D=12.99..12.99"},
+            "@type": {"pattern": "^hydra:PartialCollectionView$"}
+          }
+        }
+      }
+    }
+    """
+
   Scenario: Filter by range (between) with invalid format
     When I send a "GET" request to "/dummies?dummyPrice[between]=9.99..12.99..15.99"
     Then the response status code should be 200
