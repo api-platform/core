@@ -1,15 +1,34 @@
 # Changelog
 
 ## 2.5.x-dev
+* JSON Schema: Missing LD context from Data Transformers #3479
+
+## 2.5.5
 
 * GraphQL: Do not allow empty cursor values on `before` or `after`
 * Filter: Improve the RangeFilter query in case the values are equals using the between operator
-* Bug fix: Allow Data Transformers to return the original class if no transformation has been made, or the transformation was to the original object
+* Pagination: Fix bug with large values, 
+* Doctrine: use the correct type within `setParameter` of the SearchFilter #3331
+* Allow \Traversable resources #3463
+* Hydra: `hydra:writable` => `hydra:writeable` #3481
+* Hydra: Show `hydra:next` only when it's available #3457
+* DX: Improve contributing by adding a stub package for ext-mongodb #3431
+* Swagger: Missing default context argument #3443
+* Swagger: Fix API docs path in swagger ui #3475
+* OpenAPI: Export with unescaped slashes #3368
+* OpenAPI: OAuth flows fix #3333
+* JSON Schema: Fix metadata options #3425
+* JSON Schema: Allow decoration #3417
+* JSON Schema: Add DateInterval type #3351
+* JSON Schema: Correct schema generation for many types #3402
+* Validation: Use our `ValidationException` instead of symfony's #3414
+* Subresources: Improve queries when there's only one level #3396
+* HTTP: Location header is only set on POST with a 201 or between 300 and 400 #3497
 
 ## 2.5.4
 
 * Add a local cache in `ResourceClassResolver::getResourceClass()`
-* JSON Schema: Fix  generation for non-resource class
+* JSON Schema: Fix generation for non-resource class
 * Doctrine: Get class metadata only when it's needed in `SearchFilter`
 * GraphQL: Better detection of collection type
 
