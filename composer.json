@@ -42,7 +42,7 @@
         "doctrine/mongodb-odm-bundle": "^4.0",
         "doctrine/orm": "^2.6.4",
         "elasticsearch/elasticsearch": "^6.0",
-        "friendsofsymfony/user-bundle": "^2.2@dev",
+        "friendsofsymfony/user-bundle": "2.2.x-dev#157b53bd7d6c347148a90e723981a43f9c897bf5",
         "guzzlehttp/guzzle": "^6.0",
         "jangregor/phpstan-prophecy": "^0.6",
         "justinrainbow/json-schema": "^5.2.1",
