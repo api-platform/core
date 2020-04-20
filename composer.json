@@ -97,7 +97,6 @@
     "suggest": {
         "doctrine/mongodb-odm-bundle": "To support MongoDB. Only versions 4.0 and later are supported.",
         "elasticsearch/elasticsearch": "To support Elasticsearch.",
-        "friendsofsymfony/user-bundle": "To use the FOSUserBundle bridge.",
         "guzzlehttp/guzzle": "To use the HTTP cache invalidation system.",
         "phpdocumentor/reflection-docblock": "To support extracting metadata from PHPDoc.",
         "psr/cache-implementation": "To use metadata caching.",
