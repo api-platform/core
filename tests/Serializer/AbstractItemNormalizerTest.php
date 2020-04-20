@@ -245,7 +245,7 @@ class AbstractItemNormalizerTest extends TestCase
         ]);
         $normalizer->setSerializer($serializerProphecy->reveal());
 
-        if (!interface_exists(AdvancedNameConverterInterface::class)) {
+        if (!interface_exists(AdvancedNameConverterInterface::class) && method_exists($normalizer, 'setIgnoredAttributes')) {
             $normalizer->setIgnoredAttributes(['alias']);
         }
 
