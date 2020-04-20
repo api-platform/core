@@ -92,7 +92,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
      */
     public function supportsNormalization($data, $format = null)
     {
-        if (!\is_object($data) || $data instanceof \Traversable) {
+        if (!\is_object($data)) {
             return false;
         }
 

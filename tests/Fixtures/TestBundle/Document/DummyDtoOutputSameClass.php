@@ -29,35 +29,21 @@ class DummyDtoOutputSameClass
     /**
      * @var int The id
      *
-<<<<<<< HEAD
-     * @ORM\Column(type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
-=======
      * @ODM\Id(strategy="INCREMENT", type="integer", nullable=true)
->>>>>>> Add ODM docs for tests
      */
     private $id;
 
     /**
      * @var string
      *
-<<<<<<< HEAD
-     * @ORM\Column
-=======
      * @ODM\Field
->>>>>>> Add ODM docs for tests
      */
     public $lorem;
 
     /**
      * @var string
      *
-<<<<<<< HEAD
-     * @ORM\Column
-=======
      * @ODM\Field
->>>>>>> Add ODM docs for tests
      */
     public $ipsum;
 

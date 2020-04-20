@@ -1081,7 +1081,7 @@ final class DoctrineContext implements Context
     {
         $user = $this->doctrine->getRepository($this->isOrm() ? User::class : UserDocument::class)->find($user);
         if (!$this->passwordEncoder->isPasswordValid($user, $password)) {
-            throw new Exception('User password mismatch');
+            throw new \Exception('User password mismatch');
         }
     }
 
