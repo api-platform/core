@@ -2008,7 +2008,7 @@ jobs:
       fail-fast: false
     timeout-minutes: 20
     env:
-      SYMFONY_DEPRECATIONS_HELPER: max[total]=5 # 5 deprecation notices from FOSUserBundle
+      SYMFONY_DEPRECATIONS_HELPER: max[total]=5
     steps:
       - name: Checkout
         uses: actions/checkout@v1
