@@ -10,15 +10,34 @@
 * OpenAPI: Add PHP default values to the documentation (#2386)
 * Deprecate using a validation groups generator service not implementing `ApiPlatform\Core\Bridge\Symfony\Validator\ValidationGroupsGeneratorInterface` (#3346)
 
-## 2.5.x-dev
+## 2.5.5
 
-* GraphQL: Do not allow empty cursor values on `before` or `after`
-* Filter: Improve the RangeFilter query in case the values are equals using the between operator
+* Filter: Improve the RangeFilter query in case the values are equals using the between operator #3488
+* Pagination: Fix bug with large values #3451
+* Doctrine: use the correct type within `setParameter` of the SearchFilter #3331
+* Allow `\Traversable` resources #3463
+* Hydra: `hydra:writable` => `hydra:writeable` #3481
+* Hydra: Show `hydra:next` only when it's available #3457
+* Swagger UI: Missing default context argument #3443
+* Swagger UI: Fix API docs path in swagger ui #3475
+* OpenAPI: Export with unescaped slashes #3368
+* OpenAPI: OAuth flows fix #3333
+* JSON Schema: Fix metadata options #3425
+* JSON Schema: Allow decoration #3417
+* JSON Schema: Add DateInterval type #3351
+* JSON Schema: Correct schema generation for many types #3402
+* Validation: Use API Platform's `ValidationException` instead of Symfony's #3414
+* Validation: Fix a bug preventing to serialize validator's payload #3375
+* Subresources: Improve queries when there's only one level #3396
+* HTTP: Location header is only set on POST with a 201 or between 300 and 400 #3497
+* GraphQL: Do not allow empty cursor values on `before` or `after` #3360
+* Bump versions of Swagger UI, GraphiQL and GraphQL Playground #3510
+>>>>>>> 2.5
 
 ## 2.5.4
 
 * Add a local cache in `ResourceClassResolver::getResourceClass()`
-* JSON Schema: Fix  generation for non-resource class
+* JSON Schema: Fix generation for non-resource class
 * Doctrine: Get class metadata only when it's needed in `SearchFilter`
 * GraphQL: Better detection of collection type
 

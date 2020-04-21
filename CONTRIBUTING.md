@@ -25,14 +25,29 @@ Then, if it appears that it's a real bug, you may report it using GitHub by foll
 First of all, you must decide on what branch your changes will be based depending of the nature of the change.
 See [the dedicated documentation entry](https://api-platform.com/docs/extra/releases/).
 
+To prepare your patch directly in the `vendor/` of an existing project (convenient to fix a bug):
+
+1. Remove the existing copy of the library: `rm -Rf vendor/api-platform/core`
+2. Reinstall the lib while keeping Git metadata: `composer install --prefer-source`
+3. You can now work directly in `vendor/api-platform/core`, create a new branch: `git checkout -b my_patch`
+4. When your patch is ready, fork the project and add your Git remote: `git remote add <your-name> git@github.com:<your-name>/core.git`
+5. You can now push your code and open your Pull Request: `git push <your-name> my_patch`
+
+Alternatively, you can also work with the test application we provide:
+
+    cd tests/Fixtures/app
+    ./console assets:install --symlink
+    symfony serve
+    
+    # or if you prefer using the PHP built-in web server
+    php -S localhost:8000 -t public/
+
 ### Matching Coding Standards
 
 The API Platform project follows [Symfony coding standards](https://symfony.com/doc/current/contributing/code/standards.html).
 But don't worry, you can fix CS issues automatically using the [PHP CS Fixer](https://cs.sensiolabs.org/) tool:
 
-```shell
-php-cs-fixer.phar fix
-```
+    php-cs-fixer.phar fix
 
 And then, add the fixed file to your commit before pushing.
 Be sure to add only **your modified files**. If any other file is fixed by cs tools, just revert it before committing.
@@ -59,21 +74,15 @@ Both `phpunit` and `behat` are development dependencies and should be available 
 
 To launch unit tests:
 
-```shell
-vendor/bin/phpunit --stop-on-failure -vvv
-```
+    vendor/bin/phpunit --stop-on-failure -vvv
 
-If you want coverage, you will need the `phpdbg` package and run:
+If you want coverage, you will need the `pcov` PHP extension and run:
 
-```shell
-phpdbg -qrr vendor/bin/phpunit --coverage-html coverage -vvv --stop-on-failure
-```
+    vendor/bin/phpunit --coverage-html coverage -vvv --stop-on-failure
 
 Sometimes there might be an error with too many open files when generating coverage. To fix this, you can increase the `ulimit`, for example:
 
-```shell
-ulimit -n 4000
-```
+    ulimit -n 4000
 
 Coverage will be available in `coverage/index.html`.
 
@@ -81,23 +90,17 @@ Coverage will be available in `coverage/index.html`.
 
 The command to launch Behat tests is:
 
-```shell
-./vendor/bin/behat --suite=default --stop-on-failure -vvv
-```
+    ./vendor/bin/behat --suite=default --stop-on-failure -vvv
 
 If you want to launch Behat tests for MongoDB, the command is:
 
-```shell
-APP_ENV=mongodb ./vendor/bin/behat --suite=mongodb --stop-on-failure -vvv
-```
+    APP_ENV=mongodb ./vendor/bin/behat --suite=mongodb --stop-on-failure -vvv
 
 ## Squash your Commits
 
 If you have 3 commits, start with:
 
-```shell
-git rebase -i HEAD~3
-```
+    git rebase -i HEAD~3
 
 An editor will be opened with your 3 commits, all prefixed by `pick`.
 
@@ -109,15 +112,11 @@ After that, all your commits will be squashed into the first one and the commit 
 
 If you would like to rename your commit message, type:
 
-```shell
-git commit --amend
-```
+    git commit --amend
 
 Now force push to update your PR:
 
-```shell
-git push --force-with-lease
-```
+    git push --force-with-lease
 
 # License and Copyright Attribution
 
@@ -127,3 +126,13 @@ and to transfer the copyright on the submitted code to Kévin Dunglas.
 Be sure to you have the right to do that (if you are a professional, ask your company)!
 
 If you include code from another project, please mention it in the Pull Request description and credit the original author.
+
+# Releases
+
+This section is dedicated to maintainers.
+
+1. Update the JavaScript dependencies by running `./update-js.sh` (always check if it works in a browser)
+2. Update the `CHANGELOG.md` file (be sure to include Pull Request numbers when appropriate)
+3. Create a signed tag: `git tag -s vX.Y.Z -m "Version X.Y.Z"`
+4. Create a release using GitHub's UI and copy the changelog 
+5. Create a new release of `api-platform/api-platform`
