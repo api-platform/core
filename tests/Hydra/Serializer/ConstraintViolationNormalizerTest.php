@@ -90,7 +90,7 @@ _4: 1',
     public function payloadFieldsProvider(): iterable
     {
         yield [['severity', 'anotherField1'], ['severity' => 'warning']];
-        yield [[], ['severity' => 'warning', 'anotherField2' => 'aValue']];
-        yield [null, []];
+        yield [null, ['severity' => 'warning', 'anotherField2' => 'aValue']];
+        yield [[], []];
     }
 }
