@@ -21,6 +21,7 @@
 * Subresources: Improve queries when there's only one level #3396
 * HTTP: Location header is only set on POST with a 201 or between 300 and 400 #3497
 * GraphQL: Do not allow empty cursor values on `before` or `after` #3360
+* Bump versions of Swagger UI, GraphiQL and GraphQL Playground #3510
 
 ## 2.5.4
 
