@@ -17,7 +17,7 @@ use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
-class UuidDenormalizer implements DenormalizerInterface
+final class UuidDenormalizer implements DenormalizerInterface
 {
     public function denormalize($data, string $type, string $format = null, array $context = [])
     {
