@@ -40,7 +40,10 @@ class ConstraintViolationNormalizerTest extends TestCase
         $this->assertTrue($normalizer->hasCacheableSupportsMethod());
     }
 
-    public function testNormalize()
+    /**
+     * @dataProvider payloadFieldsProvider
+     */
+    public function testNormalize(?array $fields, array $result)
     {
         $urlGeneratorProphecy = $this->prophesize(UrlGeneratorInterface::class);
         $nameConverterProphecy = $this->prophesize(NameConverterInterface::class);
@@ -50,7 +53,7 @@ class ConstraintViolationNormalizerTest extends TestCase
             return '_'.$args[0];
         });
 
-        $normalizer = new ConstraintViolationListNormalizer($urlGeneratorProphecy->reveal(), ['severity', 'anotherField1'], $nameConverterProphecy->reveal());
+        $normalizer = new ConstraintViolationListNormalizer($urlGeneratorProphecy->reveal(), $fields, $nameConverterProphecy->reveal());
 
         // Note : we use NotNull constraint and not Constraint class because Constraint is abstract
         $constraint = new NotNull();
@@ -70,9 +73,6 @@ _4: 1',
                 [
                     'propertyPath' => '_d',
                     'message' => 'a',
-                    'payload' => [
-                        'severity' => 'warning',
-                    ],
                 ],
                 [
                     'propertyPath' => '_4',
@@ -80,6 +80,17 @@ _4: 1',
                 ],
             ],
         ];
+        if ([] !== $result) {
+            $expected['violations'][0]['payload'] = $result;
+        }
+
         $this->assertEquals($expected, $normalizer->normalize($list));
+    }
+
+    public function payloadFieldsProvider(): iterable
+    {
+        yield [['severity', 'anotherField1'], ['severity' => 'warning']];
+        yield [null, ['severity' => 'warning', 'anotherField2' => 'aValue']];
+        yield [[], []];
     }
 }
