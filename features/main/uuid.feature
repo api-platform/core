@@ -130,3 +130,17 @@ Feature: Using uuid identifier on resource
     Then the response status code should be 404
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+
+  @!mongodb
+  @createSchema
+  Scenario: Create a resource identified by Ramsey\Uuid\Uuid
+    When I add "Content-Type" header equal to "application/ld+json"
+    And I send a "POST" request to "/ramsey_uuid_dummies" with body:
+    """
+    {
+      "id": "41b29566-144b-11e6-a148-3e1d05defe78"
+    }
+    """
+    Then the response status code should be 201
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"

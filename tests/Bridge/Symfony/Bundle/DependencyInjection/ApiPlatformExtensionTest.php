@@ -949,6 +949,7 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.serializer.group_filter',
             'api_platform.serializer.normalizer.item',
             'api_platform.serializer.property_filter',
+            'api_platform.serializer.uuid_denormalizer',
             'api_platform.serializer_locator',
             'api_platform.subresource_data_provider',
             'api_platform.subresource_operation_factory',
