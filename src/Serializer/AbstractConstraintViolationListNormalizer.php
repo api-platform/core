@@ -35,7 +35,7 @@ abstract class AbstractConstraintViolationListNormalizer implements NormalizerIn
     public function __construct(array $serializePayloadFields = null, NameConverterInterface $nameConverter = null)
     {
         $this->nameConverter = $nameConverter;
-        $this->serializePayloadFields = $serializePayloadFields;
+        $this->serializePayloadFields = null === $serializePayloadFields ? null : array_flip($serializePayloadFields);
     }
 
     /**
@@ -66,10 +66,14 @@ abstract class AbstractConstraintViolationListNormalizer implements NormalizerIn
             ];
 
             $constraint = $violation->getConstraint();
-            if ($this->serializePayloadFields && $constraint && $constraint->payload) {
+            if (
+                [] !== $this->serializePayloadFields &&
+                $constraint &&
+                $constraint->payload &&
                 // If some fields are whitelisted, only them are added
-                $payloadFields = null === $this->serializePayloadFields ? $constraint->payload : array_intersect_key($constraint->payload, array_flip($this->serializePayloadFields));
-                $payloadFields && $violationData['payload'] = $payloadFields;
+                $payloadFields = null === $this->serializePayloadFields ? $constraint->payload : array_intersect_key($constraint->payload, $this->serializePayloadFields)
+            ) {
+                $violationData['payload'] = $payloadFields;
             }
 
             $violations[] = $violationData;

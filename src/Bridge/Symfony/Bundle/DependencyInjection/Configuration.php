@@ -94,7 +94,7 @@ final class Configuration implements ConfigurationInterface
                 ->arrayNode('validator')
                     ->addDefaultsIfNotSet()
                     ->children()
-                        ->variableNode('serialize_payload_fields')->defaultValue([])->info('Enable the serialization of payload fields when a validation error is thrown.')->end()
+                        ->variableNode('serialize_payload_fields')->defaultValue([])->info('Set to null to serialize all payload fields when a validation error is thrown, or set the fields you want to include explicitly.')->end()
                     ->end()
                 ->end()
                 ->arrayNode('eager_loading')
