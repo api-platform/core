@@ -9,4 +9,5 @@
 /swagger.json
 /swagger.yaml
 /tests/Fixtures/app/var/
+/tests/Fixtures/app/public/bundles/
 /vendor/
