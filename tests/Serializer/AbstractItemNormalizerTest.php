@@ -25,6 +25,7 @@ use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 use ApiPlatform\Core\Metadata\Property\PropertyNameCollection;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
+use ApiPlatform\Core\Security\ResourceAccessCheckerInterface;
 use ApiPlatform\Core\Serializer\AbstractItemNormalizer;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Dto\InputDto;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
@@ -33,6 +34,7 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyForAdditionalFieldsIn
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyTableInheritance;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyTableInheritanceChild;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RelatedDummy;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\SecuredDummy;
 use Doctrine\Common\Collections\ArrayCollection;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
@@ -110,7 +112,7 @@ class AbstractItemNormalizerTest extends TestCase
             [],
             [],
             null,
-            false,
+            null,
         ]);
 
         $this->assertTrue($normalizer->supportsNormalization($dummy));
@@ -177,7 +179,7 @@ class AbstractItemNormalizerTest extends TestCase
             [],
             [],
             null,
-            false,
+            null,
         ]);
         $normalizer->setSerializer($serializerProphecy->reveal());
 
@@ -193,6 +195,65 @@ class AbstractItemNormalizerTest extends TestCase
         $this->assertEquals($expected, $normalizer->normalize($dummy, null, [
             'resources' => [],
             'ignored_attributes' => ['alias'],
+        ]));
+    }
+
+    public function testNormalizeWithSecuredProperty()
+    {
+        $dummy = new SecuredDummy();
+        $dummy->setTitle('myPublicTitle');
+        $dummy->setAdminOnlyProperty('secret');
+
+        $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
+        $propertyNameCollectionFactoryProphecy->create(SecuredDummy::class, [])->willReturn(new PropertyNameCollection(['title', 'adminOnlyProperty']));
+
+        $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
+        $propertyMetadataFactoryProphecy->create(SecuredDummy::class, 'title', [])->willReturn(new PropertyMetadata(new Type(Type::BUILTIN_TYPE_STRING), '', true));
+        $propertyMetadataFactoryProphecy->create(SecuredDummy::class, 'adminOnlyProperty', [])->willReturn(new PropertyMetadata(new Type(Type::BUILTIN_TYPE_STRING), '', true, null, null, null, null, null, null, null, ['security' => 'is_granted(\'ROLE_ADMIN\')']));
+
+        $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
+        $iriConverterProphecy->getIriFromItem($dummy)->willReturn('/secured_dummies/1');
+
+        $propertyAccessorProphecy = $this->prophesize(PropertyAccessorInterface::class);
+        $propertyAccessorProphecy->getValue($dummy, 'title')->willReturn('myPublicTitle');
+        $propertyAccessorProphecy->getValue($dummy, 'adminOnlyProperty')->willReturn('secret');
+
+        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
+        $resourceClassResolverProphecy->getResourceClass($dummy, null)->willReturn(SecuredDummy::class);
+
+        $resourceAccessChecker = $this->prophesize(ResourceAccessCheckerInterface::class);
+        $resourceAccessChecker->isGranted('adminOnlyProperty', 'is_granted(\'ROLE_ADMIN\')')->willReturn(false);
+
+        $serializerProphecy = $this->prophesize(SerializerInterface::class);
+        $serializerProphecy->willImplement(NormalizerInterface::class);
+        $serializerProphecy->normalize('myPublicTitle', null, Argument::type('array'))->willReturn('myPublicTitle');
+
+        $normalizer = $this->getMockForAbstractClass(AbstractItemNormalizer::class, [
+            $propertyNameCollectionFactoryProphecy->reveal(),
+            $propertyMetadataFactoryProphecy->reveal(),
+            $iriConverterProphecy->reveal(),
+            $resourceClassResolverProphecy->reveal(),
+            $propertyAccessorProphecy->reveal(),
+            null,
+            null,
+            null,
+            false,
+            [],
+            [],
+            null,
+            $resourceAccessChecker->reveal(),
+        ]);
+        $normalizer->setSerializer($serializerProphecy->reveal());
+
+        if (!interface_exists(AdvancedNameConverterInterface::class) && method_exists($normalizer, 'setIgnoredAttributes')) {
+            $normalizer->setIgnoredAttributes(['alias']);
+        }
+
+        $expected = [
+            'title' => 'myPublicTitle',
+        ];
+        $this->assertEquals($expected, $normalizer->normalize($dummy, null, [
+            'resources' => [],
         ]));
     }
 
@@ -253,7 +314,7 @@ class AbstractItemNormalizerTest extends TestCase
             [],
             [],
             null,
-            false,
+            null,
         ]);
         $normalizer->setSerializer($serializerProphecy->reveal());
 
@@ -315,7 +376,7 @@ class AbstractItemNormalizerTest extends TestCase
             [],
             [],
             null,
-            false,
+            null,
         ]);
         $normalizer->setSerializer($serializerProphecy->reveal());
 
@@ -365,7 +426,7 @@ class AbstractItemNormalizerTest extends TestCase
         $serializerProphecy->willImplement(DenormalizerInterface::class);
         $serializerProphecy->denormalize($data, DummyForAdditionalFieldsInput::class, 'json', $cleanedContext)->willReturn($dummyInputDto);
 
-        $normalizer = new class($propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), $iriConverterProphecy->reveal(), $resourceClassResolverProphecy->reveal(), null, null, null, null, false, [], [$inputDataTransformerProphecy->reveal()], null) extends AbstractItemNormalizer {
+        $normalizer = new class($propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), $iriConverterProphecy->reveal(), $resourceClassResolverProphecy->reveal(), null, null, null, null, false, [], [$inputDataTransformerProphecy->reveal()], null, null) extends AbstractItemNormalizer {
         };
         $normalizer->setSerializer($serializerProphecy->reveal());
 
@@ -424,7 +485,7 @@ class AbstractItemNormalizerTest extends TestCase
             [],
             [],
             null,
-            false,
+            null,
         ]);
         $normalizer->setSerializer($serializerProphecy->reveal());
 
@@ -486,7 +547,7 @@ class AbstractItemNormalizerTest extends TestCase
             [],
             [],
             null,
-            false,
+            null,
         ]);
         $normalizer->setSerializer($serializerProphecy->reveal());
 
@@ -544,7 +605,7 @@ class AbstractItemNormalizerTest extends TestCase
             [],
             [],
             null,
-            false,
+            null,
         ]);
         $normalizer->setSerializer($serializerProphecy->reveal());
 
@@ -589,7 +650,7 @@ class AbstractItemNormalizerTest extends TestCase
             [],
             [],
             null,
-            false,
+            null,
         ]);
         $normalizer->setSerializer($serializerProphecy->reveal());
 
@@ -631,7 +692,7 @@ class AbstractItemNormalizerTest extends TestCase
             [],
             [],
             null,
-            false,
+            null,
         ]);
         $normalizer->setSerializer($serializerProphecy->reveal());
 
@@ -677,7 +738,7 @@ class AbstractItemNormalizerTest extends TestCase
             [],
             [],
             null,
-            false,
+            null,
         ]);
         $normalizer->setSerializer($serializerProphecy->reveal());
 
@@ -752,7 +813,7 @@ class AbstractItemNormalizerTest extends TestCase
             [],
             [],
             null,
-            false,
+            null,
         ]);
         $normalizer->setSerializer($serializerProphecy->reveal());
 
@@ -794,7 +855,7 @@ class AbstractItemNormalizerTest extends TestCase
             [],
             [],
             null,
-            false,
+            null,
         ]);
         $normalizer->setSerializer($serializerProphecy->reveal());
 
@@ -854,7 +915,7 @@ class AbstractItemNormalizerTest extends TestCase
             [],
             [],
             null,
-            false,
+            null,
         ]);
         $normalizer->setSerializer($serializerProphecy->reveal());
 
@@ -906,7 +967,7 @@ class AbstractItemNormalizerTest extends TestCase
             [],
             [],
             null,
-            false,
+            null,
         ]);
         $normalizer->setSerializer($serializerProphecy->reveal());
 
@@ -969,7 +1030,7 @@ class AbstractItemNormalizerTest extends TestCase
             [],
             [],
             null,
-            true,
+            null,
         ]);
         $normalizer->setSerializer($serializerProphecy->reveal());
 
@@ -1027,7 +1088,7 @@ class AbstractItemNormalizerTest extends TestCase
             [],
             [],
             null,
-            false,
+            null,
         ]);
         $normalizer->setSerializer($serializerProphecy->reveal());
 
@@ -1114,7 +1175,7 @@ class AbstractItemNormalizerTest extends TestCase
             [],
             [$dataTransformerProphecy->reveal(), $secondDataTransformerProphecy->reveal()],
             $resourceMetadataFactoryProphecy->reveal(),
-            false,
+            null,
         ]);
         $normalizer->setSerializer($serializerProphecy->reveal());
 
