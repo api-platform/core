@@ -29,6 +29,7 @@ use GraphQL\Type\Definition\WrappingType;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\Config\Definition\Exception\InvalidTypeException;
 use Symfony\Component\PropertyInfo\Type;
+use Symfony\Component\Serializer\NameConverter\AdvancedNameConverterInterface;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 
 /**
@@ -497,6 +498,13 @@ final class FieldsBuilder implements FieldsBuilderInterface
 
     private function normalizePropertyName(string $property, string $resourceClass): string
     {
-        return null !== $this->nameConverter ? $this->nameConverter->normalize($property, $resourceClass) : $property;
+        if (null === $this->nameConverter) {
+            return $property;
+        }
+        if ($this->nameConverter instanceof AdvancedNameConverterInterface) {
+            return $this->nameConverter->normalize($property, $resourceClass);
+        }
+
+        return $this->nameConverter->normalize($property);
     }
 }

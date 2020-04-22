@@ -40,7 +40,7 @@ class AnnotationFilterExtractorTraitTest extends KernelTestCase
 
         $this->assertEquals($this->extractor->getFilters($reflectionClass), [
             'annotated_api_platform_core_tests_fixtures_test_bundle_entity_dummy_car_api_platform_core_bridge_doctrine_orm_filter_date_filter' => [
-                ['properties' => ['id' => 'exclude_null', 'colors' => 'exclude_null', 'name' => 'exclude_null', 'canSell' => 'exclude_null', 'availableAt' => 'exclude_null', 'secondColors' => 'exclude_null', 'thirdColors' => 'exclude_null', 'uuid' => 'exclude_null']],
+                ['properties' => ['id' => 'exclude_null', 'colors' => 'exclude_null', 'name' => 'exclude_null', 'canSell' => 'exclude_null', 'availableAt' => 'exclude_null', 'brand' => 'exclude_null', 'secondColors' => 'exclude_null', 'thirdColors' => 'exclude_null', 'uuid' => 'exclude_null']],
                 DateFilter::class,
             ],
             'annotated_api_platform_core_tests_fixtures_test_bundle_entity_dummy_car_api_platform_core_bridge_doctrine_orm_filter_boolean_filter' => [

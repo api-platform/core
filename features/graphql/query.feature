@@ -126,6 +126,18 @@ Feature: GraphQL query support
     And the header "Content-Type" should be equal to "application/json"
     And the JSON node "data.dummyGroup.foo" should be equal to "Foo #1"
 
+  Scenario: Query a serialized name
+    Given there is a DummyCar entity with related colors
+    When I send the following GraphQL request:
+    """
+    {
+      dummyCar(id: "/dummy_cars/1") {
+        carBrand
+      }
+    }
+    """
+    Then the JSON node "data.dummyCar.carBrand" should be equal to "DummyBrand"
+
   Scenario: Fetch only the internal id
     When I send the following GraphQL request:
     """
