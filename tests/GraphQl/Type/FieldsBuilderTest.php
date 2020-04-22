@@ -143,11 +143,11 @@ class FieldsBuilderTest extends TestCase
     {
         return [
             'no resource field configuration' => ['resourceClass', new ResourceMetadata(), 'action', [], null, null, []],
-            'nominal standard type case with deprecation reason' => ['resourceClass', (new ResourceMetadata('ShortName'))->withGraphql(['action' => ['deprecation_reason' => 'not useful']]), 'action', [], GraphQLType::string(), null,
+            'nominal standard type case with deprecation reason and description' => ['resourceClass', (new ResourceMetadata('ShortName'))->withGraphql(['action' => ['deprecation_reason' => 'not useful', 'description' => 'Custom description.']]), 'action', [], GraphQLType::string(), null,
                 [
                     'actionShortName' => [
                         'type' => GraphQLType::string(),
-                        'description' => null,
+                        'description' => 'Custom description.',
                         'args' => [
                             'id' => ['type' => GraphQLType::nonNull(GraphQLType::id())],
                         ],
@@ -236,12 +236,12 @@ class FieldsBuilderTest extends TestCase
     {
         return [
             'no resource field configuration' => ['resourceClass', new ResourceMetadata(), 'action', [], null, null, []],
-            'nominal collection case with deprecation reason' => ['resourceClass', (new ResourceMetadata('ShortName'))->withGraphql(['action' => ['deprecation_reason' => 'not useful']]), 'action', [], $graphqlType = GraphQLType::listOf(new ObjectType(['name' => 'collection'])), $resolver = function () {
+            'nominal collection case with deprecation reason and description' => ['resourceClass', (new ResourceMetadata('ShortName'))->withGraphql(['action' => ['deprecation_reason' => 'not useful', 'description' => 'Custom description.']]), 'action', [], $graphqlType = GraphQLType::listOf(new ObjectType(['name' => 'collection'])), $resolver = function () {
             },
                 [
                     'actionShortNames' => [
                         'type' => $graphqlType,
-                        'description' => null,
+                        'description' => 'Custom description.',
                         'args' => [
                             'first' => [
                                 'type' => GraphQLType::int(),
