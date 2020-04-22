@@ -51,7 +51,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
     use ContextTrait;
     use InputOutputMetadataTrait;
 
-    public const IS_TRANSFORMED_TO_SAME_CLASS_CONTEXT_KEY = 'is_transformed_to_same_class';
+    public const IS_TRANSFORMED_TO_SAME_CLASS = 'is_transformed_to_same_class';
 
     protected $propertyNameCollectionFactory;
     protected $propertyMetadataFactory;
@@ -114,7 +114,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
      */
     public function normalize($object, $format = null, array $context = [])
     {
-        if (!($isTransformed = isset($context[self::IS_TRANSFORMED_TO_SAME_CLASS_CONTEXT_KEY])) && $outputClass = $this->getOutputClass($this->getObjectClass($object), $context)) {
+        if (!($isTransformed = isset($context[self::IS_TRANSFORMED_TO_SAME_CLASS])) && $outputClass = $this->getOutputClass($this->getObjectClass($object), $context)) {
             if (!$this->serializer instanceof NormalizerInterface) {
                 throw new LogicException('Cannot normalize the output because the injected serializer is not a normalizer');
             }
@@ -124,13 +124,13 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
                 $context['api_resource'] = $object;
                 unset($context['output'], $context['resource_class']);
             } else {
-                $context[self::IS_TRANSFORMED_TO_SAME_CLASS_CONTEXT_KEY] = true;
+                $context[self::IS_TRANSFORMED_TO_SAME_CLASS] = true;
             }
 
             return $this->serializer->normalize($transformed, $format, $context);
         }
         if ($isTransformed) {
-            unset($context[self::IS_TRANSFORMED_TO_SAME_CLASS_CONTEXT_KEY]);
+            unset($context[self::IS_TRANSFORMED_TO_SAME_CLASS]);
         }
 
         $resourceClass = $this->resourceClassResolver->getResourceClass($object, $context['resource_class'] ?? null);

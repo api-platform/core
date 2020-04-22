@@ -19,7 +19,7 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * Dummy InputOutput.
  *
- * @author Kévin Dunglas <dunglas@gmail.com>
+ * @author Daniel West <daniel@silverback.is>
  *
  * @ApiResource(attributes={"output"=DummyDtoOutputSameClass::class})
  * @ORM\Entity

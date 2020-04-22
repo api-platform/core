@@ -19,7 +19,7 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 /**
  * Dummy InputOutput.
  *
- * @author Kévin Dunglas <dunglas@gmail.com>
+ * @author Daniel West <daniel@silverback.is>
  *
  * @ApiResource(attributes={"output"=DummyDtoOutputSameClass::class})
  * @ODM\Document
