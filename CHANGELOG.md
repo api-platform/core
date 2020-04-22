@@ -7,6 +7,7 @@
 * GraphQL: Subscription support with Mercure (#3321)
 * GraphQL: Allow to format GraphQL errors based on exceptions (#3063)
 * GraphQL: Add page-based pagination (#3175)
+* GraphQL: Possibility to add a custom description for queries, mutations and subscriptions (#3477, #3514)
 * OpenAPI: Add PHP default values to the documentation (#2386)
 * Deprecate using a validation groups generator service not implementing `ApiPlatform\Core\Bridge\Symfony\Validator\ValidationGroupsGeneratorInterface` (#3346)
 
