@@ -135,9 +135,10 @@ final class FieldsBuilder implements FieldsBuilderInterface
         $mutationFields = [];
         $shortName = $resourceMetadata->getShortName();
         $resourceType = new Type(Type::BUILTIN_TYPE_OBJECT, true, $resourceClass);
+        $description = $resourceMetadata->getGraphqlAttribute($mutationName, 'description', ucfirst("{$mutationName}s a $shortName."), false);
         $deprecationReason = $resourceMetadata->getGraphqlAttribute($mutationName, 'deprecation_reason', '', true);
 
-        if ($fieldConfiguration = $this->getResourceFieldConfiguration(null, ucfirst("{$mutationName}s a $shortName."), $deprecationReason, $resourceType, $resourceClass, false, null, $mutationName, null)) {
+        if ($fieldConfiguration = $this->getResourceFieldConfiguration(null, $description, $deprecationReason, $resourceType, $resourceClass, false, null, $mutationName, null)) {
             $fieldConfiguration['args'] += ['input' => $this->getResourceFieldConfiguration(null, null, $deprecationReason, $resourceType, $resourceClass, true, null, $mutationName, null)];
         }
 
@@ -154,9 +155,10 @@ final class FieldsBuilder implements FieldsBuilderInterface
         $subscriptionFields = [];
         $shortName = $resourceMetadata->getShortName();
         $resourceType = new Type(Type::BUILTIN_TYPE_OBJECT, true, $resourceClass);
+        $description = $resourceMetadata->getGraphqlAttribute($subscriptionName, 'description', "Subscribes to the $subscriptionName event of a $shortName.", false);
         $deprecationReason = $resourceMetadata->getGraphqlAttribute($subscriptionName, 'deprecation_reason', '', true);
 
-        if ($fieldConfiguration = $this->getResourceFieldConfiguration(null, "Subscribes to the $subscriptionName event of a $shortName.", $deprecationReason, $resourceType, $resourceClass, false, null, null, $subscriptionName)) {
+        if ($fieldConfiguration = $this->getResourceFieldConfiguration(null, $description, $deprecationReason, $resourceType, $resourceClass, false, null, null, $subscriptionName)) {
             $fieldConfiguration['args'] += ['input' => $this->getResourceFieldConfiguration(null, null, $deprecationReason, $resourceType, $resourceClass, true, null, null, $subscriptionName)];
         }
 
