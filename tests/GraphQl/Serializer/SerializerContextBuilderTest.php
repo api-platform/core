@@ -19,6 +19,8 @@ use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Serializer\NameConverter\CustomConverter;
 use GraphQL\Type\Definition\ResolveInfo;
 use PHPUnit\Framework\TestCase;
+use Prophecy\Argument;
+use Symfony\Component\Serializer\NameConverter\AdvancedNameConverterInterface;
 
 /**
  * @author Alan Poulain <contact@alanpoulain.eu>
@@ -36,16 +38,18 @@ class SerializerContextBuilderTest extends TestCase
     {
         $this->resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
 
-        $this->serializerContextBuilder = new SerializerContextBuilder(
-            $this->resourceMetadataFactoryProphecy->reveal(),
-            new CustomConverter()
-        );
+        $this->serializerContextBuilder = $this->buildSerializerContextBuilder();
+    }
+
+    private function buildSerializerContextBuilder(?AdvancedNameConverterInterface $advancedNameConverter = null): SerializerContextBuilder
+    {
+        return new SerializerContextBuilder($this->resourceMetadataFactoryProphecy->reveal(), $advancedNameConverter ?? new CustomConverter());
     }
 
     /**
      * @dataProvider createNormalizationContextProvider
      */
-    public function testCreateNormalizationContext(?string $resourceClass, string $operationName, array $fields, bool $isMutation, bool $isSubscription, bool $noInfo, array $expectedContext, ?string $expectedExceptionClass = null, ?string $expectedExceptionMessage = null): void
+    public function testCreateNormalizationContext(?string $resourceClass, string $operationName, array $fields, bool $isMutation, bool $isSubscription, bool $noInfo, array $expectedContext, ?AdvancedNameConverterInterface $advancedNameConverter = null, ?string $expectedExceptionClass = null, ?string $expectedExceptionMessage = null): void
     {
         $resolverContext = [
             'is_mutation' => $isMutation,
@@ -76,13 +80,21 @@ class SerializerContextBuilderTest extends TestCase
             $this->expectExceptionMessage($expectedExceptionMessage);
         }
 
-        $context = $this->serializerContextBuilder->create($resourceClass, $operationName, $resolverContext, true);
+        $serializerContextBuilder = $this->serializerContextBuilder;
+        if ($advancedNameConverter) {
+            $serializerContextBuilder = $this->buildSerializerContextBuilder($advancedNameConverter);
+        }
+
+        $context = $serializerContextBuilder->create($resourceClass, $operationName, $resolverContext, true);
 
         $this->assertSame($expectedContext, $context);
     }
 
     public function createNormalizationContextProvider(): array
     {
+        $advancedNameConverter = $this->prophesize(AdvancedNameConverterInterface::class);
+        $advancedNameConverter->denormalize('field', 'myResource', null, Argument::type('array'))->willReturn('denormalizedField');
+
         return [
             'nominal' => [
                 $resourceClass = 'myResource',
@@ -95,13 +107,33 @@ class SerializerContextBuilderTest extends TestCase
                     'groups' => ['normalization_group'],
                     'resource_class' => $resourceClass,
                     'graphql_operation_name' => $operationName,
+                    'input' => ['class' => 'inputClass'],
+                    'output' => ['class' => 'outputClass'],
                     'attributes' => [
                         'id' => 3,
                         'field' => 'foo',
                     ],
+                ],
+            ],
+            'nominal with advanced name converter' => [
+                $resourceClass = 'myResource',
+                $operationName = 'item_query',
+                ['_id' => 3, 'field' => 'foo'],
+                false,
+                false,
+                false,
+                [
+                    'groups' => ['normalization_group'],
+                    'resource_class' => $resourceClass,
+                    'graphql_operation_name' => $operationName,
                     'input' => ['class' => 'inputClass'],
                     'output' => ['class' => 'outputClass'],
+                    'attributes' => [
+                        'id' => 3,
+                        'denormalizedField' => 'foo',
+                    ],
                 ],
+                $advancedNameConverter->reveal(),
             ],
             'nominal collection' => [
                 $resourceClass = 'myResource',
@@ -114,11 +146,11 @@ class SerializerContextBuilderTest extends TestCase
                     'groups' => ['normalization_group'],
                     'resource_class' => $resourceClass,
                     'graphql_operation_name' => $operationName,
+                    'input' => ['class' => 'inputClass'],
+                    'output' => ['class' => 'outputClass'],
                     'attributes' => [
                         'nodeField' => 'baz',
                     ],
-                    'input' => ['class' => 'inputClass'],
-                    'output' => ['class' => 'outputClass'],
                 ],
             ],
             'no resource class' => [
@@ -147,12 +179,12 @@ class SerializerContextBuilderTest extends TestCase
                     'groups' => ['normalization_group'],
                     'resource_class' => $resourceClass,
                     'graphql_operation_name' => $operationName,
+                    'input' => ['class' => 'inputClass'],
+                    'output' => ['class' => 'outputClass'],
                     'attributes' => [
                         'id' => 7,
                         'related' => ['field' => 'bar'],
                     ],
-                    'input' => ['class' => 'inputClass'],
-                    'output' => ['class' => 'outputClass'],
                 ],
             ],
             'mutation without resource class' => [
@@ -163,6 +195,7 @@ class SerializerContextBuilderTest extends TestCase
                 false,
                 false,
                 [],
+                null,
                 \LogicException::class,
                 'ResourceMetadata should always exist for a mutation or a subscription.',
             ],
@@ -177,13 +210,13 @@ class SerializerContextBuilderTest extends TestCase
                     'groups' => ['normalization_group'],
                     'resource_class' => $resourceClass,
                     'graphql_operation_name' => $operationName,
+                    'no_resolver_data' => true,
+                    'input' => ['class' => 'inputClass'],
+                    'output' => ['class' => 'outputClass'],
                     'attributes' => [
                         'id' => 7,
                         'related' => ['field' => 'bar'],
                     ],
-                    'no_resolver_data' => true,
-                    'input' => ['class' => 'inputClass'],
-                    'output' => ['class' => 'outputClass'],
                 ],
             ],
         ];

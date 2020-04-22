@@ -65,7 +65,8 @@ Feature: Search filter on collections
               "prop": "blue"
             }
           ],
-          "uuid": []
+          "uuid": [],
+          "carBrand": "DummyBrand"
         }
       ],
       "hydra:totalItems": 1,
