@@ -49,6 +49,6 @@ final class OutputDtoSameClassTransformer implements DataTransformerInterface
     public function supportsTransformation($data, string $to, array $context = []): bool
     {
         return (($data instanceof DummyDtoOutputFallbackToSameClass || $data instanceof DummyDtoOutputFallbackToSameClassDocument) && OutputDtoDummy::class === $to) ||
-            (($data instanceof DummyDtoOutputSameClass || $data instanceof DummyDtoOutputSameClassDocument) && DummyDtoOutputSameClass::class === $to);
+            (($data instanceof DummyDtoOutputSameClass || $data instanceof DummyDtoOutputSameClassDocument) && (DummyDtoOutputSameClass::class === $to || DummyDtoOutputSameClassDocument::class === $to));
     }
 }
