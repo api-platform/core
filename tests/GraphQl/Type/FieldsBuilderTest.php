@@ -393,6 +393,26 @@ class FieldsBuilderTest extends TestCase
                     ],
                 ],
             ],
+            'custom description' => ['resourceClass', (new ResourceMetadata('ShortName'))->withGraphql(['action' => ['description' => 'Custom description.']]), 'action', $graphqlType = new ObjectType(['name' => 'mutation']), $inputGraphqlType = new ObjectType(['name' => 'input']), $mutationResolver = function () {
+            },
+                [
+                    'actionShortName' => [
+                        'type' => $graphqlType,
+                        'description' => 'Custom description.',
+                        'args' => [
+                            'input' => [
+                                'type' => $inputGraphqlType,
+                                'description' => null,
+                                'args' => [],
+                                'resolve' => null,
+                                'deprecationReason' => '',
+                            ],
+                        ],
+                        'resolve' => $mutationResolver,
+                        'deprecationReason' => '',
+                    ],
+                ],
+            ],
         ];
     }
 
@@ -435,6 +455,26 @@ class FieldsBuilderTest extends TestCase
                         ],
                         'resolve' => $subscriptionResolver,
                         'deprecationReason' => 'not useful',
+                    ],
+                ],
+            ],
+            'custom description' => ['resourceClass', (new ResourceMetadata('ShortName'))->withAttributes(['mercure' => true])->withGraphql(['action' => ['description' => 'Custom description.']]), 'action', $graphqlType = new ObjectType(['name' => 'subscription']), $inputGraphqlType = new ObjectType(['name' => 'input']), $subscriptionResolver = function () {
+            },
+                [
+                    'actionShortNameSubscribe' => [
+                        'type' => $graphqlType,
+                        'description' => 'Custom description.',
+                        'args' => [
+                            'input' => [
+                                'type' => $inputGraphqlType,
+                                'description' => null,
+                                'args' => [],
+                                'resolve' => null,
+                                'deprecationReason' => '',
+                            ],
+                        ],
+                        'resolve' => $subscriptionResolver,
+                        'deprecationReason' => '',
                     ],
                 ],
             ],
