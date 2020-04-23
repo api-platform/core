@@ -78,7 +78,7 @@ final class SerializerContextBuilder implements SerializerContextBuilderInterfac
             $fields = $info->getFieldSelection(PHP_INT_MAX);
         }
 
-        $attributes = $this->replaceIdKeys($fields['edges']['node'] ?? $fields, $resourceClass, $context);
+        $attributes = $this->replaceIdKeys($fields['edges']['node'] ?? $fields['collection'] ?? $fields, $resourceClass, $context);
 
         if ($resolverContext['is_mutation'] || $resolverContext['is_subscription']) {
             if (!$resourceMetadata) {
