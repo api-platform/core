@@ -690,6 +690,7 @@ Feature: GraphQL collection support
       fooDummies(page: 1) {
         collection {
           id
+          name
         }
         paginationInfo {
           itemsPerPage
@@ -703,8 +704,11 @@ Feature: GraphQL collection support
     And the response should be in JSON
     And the JSON node "data.fooDummies.collection" should have 3 elements
     And the JSON node "data.fooDummies.collection[0].id" should exist
+    And the JSON node "data.fooDummies.collection[0].name" should exist
     And the JSON node "data.fooDummies.collection[1].id" should exist
+    And the JSON node "data.fooDummies.collection[1].name" should exist
     And the JSON node "data.fooDummies.collection[2].id" should exist
+    And the JSON node "data.fooDummies.collection[2].name" should exist
     And the JSON node "data.fooDummies.paginationInfo.itemsPerPage" should be equal to the number 3
     And the JSON node "data.fooDummies.paginationInfo.lastPage" should be equal to the number 2
     And the JSON node "data.fooDummies.paginationInfo.totalCount" should be equal to the number 5
@@ -714,6 +718,7 @@ Feature: GraphQL collection support
       fooDummies(page: 2) {
         collection {
           id
+          name
         }
       }
     }
@@ -727,6 +732,7 @@ Feature: GraphQL collection support
       fooDummies(page: 3) {
         collection {
           id
+          name
         }
       }
     }
@@ -744,6 +750,7 @@ Feature: GraphQL collection support
       fooDummies(page: 1, itemsPerPage: 2) {
         collection {
           id
+          name
         }
       }
     }
@@ -752,13 +759,16 @@ Feature: GraphQL collection support
     And the response should be in JSON
     And the JSON node "data.fooDummies.collection" should have 2 elements
     And the JSON node "data.fooDummies.collection[0].id" should exist
+    And the JSON node "data.fooDummies.collection[0].name" should exist
     And the JSON node "data.fooDummies.collection[1].id" should exist
+    And the JSON node "data.fooDummies.collection[1].name" should exist
     When I send the following GraphQL request:
     """
     {
       fooDummies(page: 2, itemsPerPage: 2) {
         collection {
           id
+          name
         }
       }
     }
@@ -772,6 +782,7 @@ Feature: GraphQL collection support
       fooDummies(page: 3, itemsPerPage: 2) {
         collection {
           id
+          name
         }
       }
     }
