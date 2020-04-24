@@ -34,7 +34,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
  * @author Kévin Dunglas <dunglas@gmail.com>
  * @author Samuel ROZE <samuel.roze@gmail.com>
  */
-final class PaginationExtension implements ContextAwareQueryResultCollectionExtensionInterface
+final class PaginationExtension implements ContextAwareQueryResultCollectionExtensionInterface, ContextAwareQueryCollectionExtensionInterface
 {
     private $managerRegistry;
     private $requestStack;
