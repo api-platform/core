@@ -52,8 +52,8 @@ final class OpenApiNormalizer implements NormalizerInterface, CacheableSupportsM
 
             // Side effect of using getPaths(): Paths which itself contains the array
             if ('paths' === $key) {
-              $value = $data['paths'] = $data['paths']['paths'];
-              unset($data['paths']['paths']);
+                $value = $data['paths'] = $data['paths']['paths'];
+                unset($data['paths']['paths']);
             }
 
             if (\is_array($value)) {

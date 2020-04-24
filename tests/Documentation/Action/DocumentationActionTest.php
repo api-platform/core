@@ -18,6 +18,8 @@ use ApiPlatform\Core\Documentation\Action\DocumentationAction;
 use ApiPlatform\Core\Documentation\Documentation;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceNameCollection;
+use ApiPlatform\Core\OpenApi\Factory\OpenApiFactoryInterface;
+use ApiPlatform\Core\OpenApi\OpenApi;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
@@ -29,7 +31,11 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class DocumentationActionTest extends TestCase
 {
-    public function testyDocumentationAction(): void
+    /**
+     * @group legacy
+     * @expectedDeprecation Not passing an array or an instance of "ApiPlatform\Core\OpenApi\Factory\OpenApiFactoryInterface" as 7th parameter of the constructor of "ApiPlatform\Core\Documentation\Action\DocumentationAction" is deprecated since API Platform 2.6
+     */
+    public function testDocumentationAction(): void
     {
         $requestProphecy = $this->prophesize(Request::class);
         $attributesProphecy = $this->prophesize(ParameterBagInterface::class);
@@ -80,5 +86,49 @@ class DocumentationActionTest extends TestCase
         $resourceNameCollectionFactoryProphecy = $this->prophesize(ResourceNameCollectionFactoryInterface::class);
         $resourceNameCollectionFactoryProphecy->create()->willReturn(new ResourceNameCollection(['dummies']));
         new DocumentationAction($resourceNameCollectionFactoryProphecy->reveal(), '', '', '', ['formats' => ['jsonld' => 'application/ld+json']]);
+    }
+
+    public function testDocumentationActionV2(): void
+    {
+        $openApiFactoryProphecy = $this->prophesize(OpenApiFactoryInterface::class);
+        $requestProphecy = $this->prophesize(Request::class);
+        $attributesProphecy = $this->prophesize(ParameterBagInterface::class);
+        $queryProphecy = $this->prophesize(ParameterBag::class);
+        $resourceNameCollectionFactoryProphecy = $this->prophesize(ResourceNameCollectionFactoryInterface::class);
+        $resourceNameCollectionFactoryProphecy->create()->willReturn(new ResourceNameCollection(['dummies']));
+        $requestProphecy->attributes = $attributesProphecy->reveal();
+        $requestProphecy->query = $queryProphecy->reveal();
+        $requestProphecy->getBaseUrl()->willReturn('/api')->shouldBeCalledTimes(1);
+        $queryProphecy->getBoolean('api_gateway')->willReturn(true)->shouldBeCalledTimes(1);
+        $queryProphecy->getInt('spec_version', 2)->willReturn(2)->shouldBeCalledTimes(1);
+        $attributesProphecy->all()->willReturn(['_api_normalization_context' => ['foo' => 'bar', 'base_url' => '/api', 'api_gateway' => true, 'spec_version' => 2]])->shouldBeCalledTimes(1);
+        $attributesProphecy->get('_api_normalization_context', [])->willReturn(['foo' => 'bar'])->shouldBeCalledTimes(1);
+        $attributesProphecy->set('_api_normalization_context', ['foo' => 'bar', 'base_url' => '/api', 'api_gateway' => true, 'spec_version' => 2])->shouldBeCalledTimes(1);
+
+        $documentation = new DocumentationAction($resourceNameCollectionFactoryProphecy->reveal(), 'My happy hippie api', 'lots of chocolate', '1.0.0', null, [2, 3], $openApiFactoryProphecy->reveal());
+        $this->assertEquals(new Documentation(new ResourceNameCollection(['dummies']), 'My happy hippie api', 'lots of chocolate', '1.0.0'), $documentation($requestProphecy->reveal()));
+    }
+
+    public function testDocumentationActionV3(): void
+    {
+        $openApi = $this->prophesize(OpenApi::class)->reveal();
+        $openApiFactoryProphecy = $this->prophesize(OpenApiFactoryInterface::class);
+        $openApiFactoryProphecy->create(Argument::any())->shouldBeCalled()->willReturn($openApi);
+        $requestProphecy = $this->prophesize(Request::class);
+        $attributesProphecy = $this->prophesize(ParameterBagInterface::class);
+        $queryProphecy = $this->prophesize(ParameterBag::class);
+        $resourceNameCollectionFactoryProphecy = $this->prophesize(ResourceNameCollectionFactoryInterface::class);
+        $resourceNameCollectionFactoryProphecy->create()->willReturn(new ResourceNameCollection(['dummies']));
+        $requestProphecy->attributes = $attributesProphecy->reveal();
+        $requestProphecy->query = $queryProphecy->reveal();
+        $requestProphecy->getBaseUrl()->willReturn('/api')->shouldBeCalledTimes(1);
+        $queryProphecy->getBoolean('api_gateway')->willReturn(true)->shouldBeCalledTimes(1);
+        $queryProphecy->getInt('spec_version', 2)->willReturn(3)->shouldBeCalledTimes(1);
+        $attributesProphecy->all()->willReturn(['_api_normalization_context' => ['foo' => 'bar', 'base_url' => '/api', 'api_gateway' => true, 'spec_version' => 3]])->shouldBeCalledTimes(1);
+        $attributesProphecy->get('_api_normalization_context', [])->willReturn(['foo' => 'bar'])->shouldBeCalledTimes(1);
+        $attributesProphecy->set('_api_normalization_context', ['foo' => 'bar', 'base_url' => '/api', 'api_gateway' => true, 'spec_version' => 3])->shouldBeCalledTimes(1);
+
+        $documentation = new DocumentationAction($resourceNameCollectionFactoryProphecy->reveal(), 'My happy hippie api', 'lots of chocolate', '1.0.0', null, [2, 3], $openApiFactoryProphecy->reveal());
+        $this->assertInstanceOf(OpenApi::class, $documentation($requestProphecy->reveal()));
     }
 }

@@ -58,7 +58,7 @@ class MediaType
         return $clone;
     }
 
-    public function withExample()
+    public function withExample($example): self
     {
         $clone = clone $this;
         $clone->example = $example;

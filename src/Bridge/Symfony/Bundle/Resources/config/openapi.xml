@@ -25,7 +25,7 @@
             <argument>%api_platform.oauth.scopes%</argument>
             <argument>%api_platform.swagger.api_keys%</argument>
         </service>
-        <service id="ApiPlatform\Core\OpenApi\Serializer\Options" alias="api_platform.openapi.options" />
+        <service id="ApiPlatform\Core\OpenApi\Options" alias="api_platform.openapi.options" />
 
         <service id="api_platform.openapi.factory" class="ApiPlatform\Core\OpenApi\Factory\OpenApiFactory" public="false">
             <argument type="service" id="api_platform.metadata.resource.name_collection_factory" />

@@ -87,12 +87,12 @@ final class Options
         return $this->oAuthRefreshUrl;
     }
 
-    public function getOAuthScopes(): string
+    public function getOAuthScopes(): array
     {
         return $this->oAuthScopes;
     }
 
-    public function getApiKeys(): string
+    public function getApiKeys(): array
     {
         return $this->apiKeys;
     }

@@ -84,7 +84,7 @@ class Link
         return $clone;
     }
 
-    public function withDescription(array $description): self
+    public function withDescription(string $description): self
     {
         $clone = clone $this;
         $clone->description = $description;
