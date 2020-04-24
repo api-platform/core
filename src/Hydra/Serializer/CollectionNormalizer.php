@@ -39,16 +39,21 @@ final class CollectionNormalizer implements NormalizerInterface, NormalizerAware
     use NormalizerAwareTrait;
 
     public const FORMAT = 'jsonld';
+    public const IRI_ONLY = 'iri_only';
 
     private $contextBuilder;
     private $resourceClassResolver;
     private $iriConverter;
+    private $defaultContext = [
+        self::IRI_ONLY => false,
+    ];
 
-    public function __construct(ContextBuilderInterface $contextBuilder, ResourceClassResolverInterface $resourceClassResolver, IriConverterInterface $iriConverter)
+    public function __construct(ContextBuilderInterface $contextBuilder, ResourceClassResolverInterface $resourceClassResolver, IriConverterInterface $iriConverter, array $defaultContext = [])
     {
         $this->contextBuilder = $contextBuilder;
         $this->resourceClassResolver = $resourceClassResolver;
         $this->iriConverter = $iriConverter;
+        $this->defaultContext = array_merge($this->defaultContext, $defaultContext);
     }
 
     /**
@@ -82,7 +87,7 @@ final class CollectionNormalizer implements NormalizerInterface, NormalizerAware
 
         $data['@type'] = 'hydra:Collection';
         $data['hydra:member'] = [];
-        $iriOnly = $context['iri_only'] ?? false;
+        $iriOnly = $context[self::IRI_ONLY] ?? $this->defaultContext[self::IRI_ONLY];
         foreach ($object as $obj) {
             $data['hydra:member'][] = $iriOnly ? $this->iriConverter->getIriFromItem($obj) : $this->normalizer->normalize($obj, $format, $context);
         }
