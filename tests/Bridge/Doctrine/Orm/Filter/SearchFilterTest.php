@@ -20,6 +20,7 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGenerator;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\Test\DoctrineOrmFilterTestCase;
 use ApiPlatform\Core\Tests\Bridge\Doctrine\Common\Filter\SearchFilterTestTrait;
+use ApiPlatform\Core\Tests\Fixtures\ExtendingSearchFilter;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RelatedDummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Serializer\NameConverter\CustomConverter;
@@ -363,6 +364,18 @@ class SearchFilterTest extends DoctrineOrmFilterTestCase
 
         $expectedDql = sprintf('SELECT %s FROM %s %1$s WHERE %1$s.name = :name_p1', 'somealias', Dummy::class);
         $this->assertEquals($expectedDql, $queryBuilder->getQuery()->getDQL());
+        $this->assertTrue($queryBuilder->getParameter('name_p1')->typeWasSpecified());
+    }
+
+    /**
+     * @group legacy
+     * @expectedDeprecation The "ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter" class is considered final. It may change without further notice as of its next major version. You should not extend it from "ApiPlatform\Core\Tests\Fixtures\ExtendingSearchFilter".
+     *
+     * @expectedDeprecation Method "ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter::addWhereByStrategy()" will have a 8th `string $fieldType` argument in version 3.0. Not defining it is deprecated since 2.6.
+     */
+    public function testDeprecateAddWhereByStrategyWithoutType()
+    {
+        new ExtendingSearchFilter($this->repository->createQueryBuilder($this->alias));
     }
 
     public function provideApplyTestData(): array

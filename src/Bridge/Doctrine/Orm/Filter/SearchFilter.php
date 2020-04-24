@@ -33,6 +33,7 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
  * Filter the collection by given properties.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
+ * @final
  */
 class SearchFilter extends AbstractContextAwareFilter implements SearchFilterInterface
 {
@@ -113,7 +114,7 @@ class SearchFilter extends AbstractContextAwareFilter implements SearchFilterInt
             }
 
             if (1 === \count($values)) {
-                $this->addWhereByStrategy($strategy, $queryBuilder, $queryNameGenerator, $alias, $field, $doctrineTypeField, $values[0], $caseSensitive);
+                $this->addWhereByStrategy($strategy, $queryBuilder, $queryNameGenerator, $alias, $field, $values[0], $caseSensitive, $doctrineTypeField);
 
                 return;
             }
@@ -181,8 +182,15 @@ class SearchFilter extends AbstractContextAwareFilter implements SearchFilterInt
      *
      * @throws InvalidArgumentException If strategy does not exist
      */
-    protected function addWhereByStrategy(string $strategy, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $alias, string $field, $fieldType, $value, bool $caseSensitive)
+    protected function addWhereByStrategy(string $strategy, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $alias, string $field, $value, bool $caseSensitive/*, string $fieldType = null*/)
     {
+        $fieldType = null;
+        if (8 === \func_num_args()) {
+            $fieldType = func_get_arg(7);
+        } else {
+            @trigger_error(sprintf('Method "%s()" will have a 8th `string $fieldType` argument in version 3.0. Not defining it is deprecated since 2.6.', __METHOD__), E_USER_DEPRECATED);
+        }
+
         $wrapCase = $this->createWrapCase($caseSensitive);
         $valueParameter = $queryNameGenerator->generateParameterName($field);
 
