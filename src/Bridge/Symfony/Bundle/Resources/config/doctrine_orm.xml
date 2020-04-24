@@ -131,7 +131,8 @@
             <argument type="service" id="serializer.mapping.class_metadata_factory" />
 
             <tag name="api_platform.doctrine.orm.query_extension.item" priority="-8" />
-            <tag name="api_platform.doctrine.orm.query_extension.collection" priority="-8" />
+            <!-- After filter_eager_loading -->
+            <tag name="api_platform.doctrine.orm.query_extension.collection" priority="-18" />
         </service>
         <service id="ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\EagerLoadingExtension" alias="api_platform.doctrine.orm.query_extension.eager_loading" />
 

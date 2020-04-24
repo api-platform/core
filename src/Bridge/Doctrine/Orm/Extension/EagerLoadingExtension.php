@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Bridge\Doctrine\Orm\Extension;
 
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\EagerLoadingTrait;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryBuilderHelper;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\Exception\PropertyNotFoundException;
@@ -24,6 +25,7 @@ use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInte
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Serializer\SerializerContextBuilderInterface;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
+use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
@@ -190,16 +192,20 @@ final class EagerLoadingExtension implements ContextAwareQueryCollectionExtensio
                 continue;
             }
 
-            $isNullable = $mapping['joinColumns'][0]['nullable'] ?? true;
-            if (false !== $wasLeftJoin || true === $isNullable) {
-                $method = 'leftJoin';
-            } else {
-                $method = 'innerJoin';
-            }
+            $existingJoin = QueryBuilderHelper::getExistingJoin($queryBuilder, $parentAlias, $association);
 
-            $associationAlias = $queryNameGenerator->generateJoinAlias($association);
-            $queryBuilder->{$method}(sprintf('%s.%s', $parentAlias, $association), $associationAlias);
-            ++$joinCount;
+            if (null !== $existingJoin) {
+                $associationAlias = $existingJoin->getAlias();
+                $isLeftJoin = Join::LEFT_JOIN === $existingJoin->getJoinType();
+            } else {
+                $isNullable = $mapping['joinColumns'][0]['nullable'] ?? true;
+                $isLeftJoin = false !== $wasLeftJoin || true === $isNullable;
+                $method = $isLeftJoin ? 'leftJoin' : 'innerJoin';
+
+                $associationAlias = $queryNameGenerator->generateJoinAlias($association);
+                $queryBuilder->{$method}(sprintf('%s.%s', $parentAlias, $association), $associationAlias);
+                ++$joinCount;
+            }
 
             if (true === $fetchPartial) {
                 try {
@@ -230,7 +236,7 @@ final class EagerLoadingExtension implements ContextAwareQueryCollectionExtensio
                 }
             }
 
-            $this->joinRelations($queryBuilder, $queryNameGenerator, $mapping['targetEntity'], $forceEager, $fetchPartial, $associationAlias, $options, $normalizationContext, 'leftJoin' === $method, $joinCount, $currentDepth);
+            $this->joinRelations($queryBuilder, $queryNameGenerator, $mapping['targetEntity'], $forceEager, $fetchPartial, $associationAlias, $options, $normalizationContext, $isLeftJoin, $joinCount, $currentDepth);
         }
     }
 

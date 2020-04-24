@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Tests\Behat;
 
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Doctrine\Orm\EntityManager;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\AbsoluteUrlDummy as AbsoluteUrlDummyDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\AbsoluteUrlRelationDummy as AbsoluteUrlRelationDummyDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\Address as AddressDocument;
@@ -212,6 +213,25 @@ final class DoctrineContext implements Context
         }
 
         $this->doctrine->getManager()->clear();
+    }
+
+    /**
+     * @Then the DQL should be equal to:
+     */
+    public function theDqlShouldBeEqualTo(PyStringNode $dql)
+    {
+        /** @var EntityManager $manager */
+        $manager = $this->doctrine->getManager();
+
+        $actualDql = $manager::$dql;
+
+        $expectedDql = preg_replace('/\(\R */', '(', (string) $dql);
+        $expectedDql = preg_replace('/\R *\)/', ')', $expectedDql);
+        $expectedDql = preg_replace('/\R */', ' ', $expectedDql);
+
+        if ($expectedDql !== $actualDql) {
+            throw new \RuntimeException("The DQL:\n'$actualDql' is not equal to:\n'$expectedDql'");
+        }
     }
 
     /**
