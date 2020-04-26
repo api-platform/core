@@ -238,7 +238,7 @@ class IriConverterTest extends TestCase
         $subresourceContext = ['identifiers' => [['id', Dummy::class, true]]];
         $routeNameResolverProphecy = $this->prophesize(RouteNameResolverInterface::class);
         $routerProphecy = $this->prophesize(RouterInterface::class);
-        $routerProphecy->match('/users/3/adresses')->willReturn([
+        $routerProphecy->match('/users/3/addresses')->willReturn([
             '_api_resource_class' => Dummy::class,
             '_api_subresource_context' => $subresourceContext,
             '_api_subresource_operation_name' => 'get_subresource',
@@ -247,18 +247,18 @@ class IriConverterTest extends TestCase
         $subresourceDataProviderProphecy = $this->prophesize(SubresourceDataProviderInterface::class);
         $subresourceDataProviderProphecy->getSubresource(Dummy::class, ['id' => 3], $subresourceContext + ['fetch_data' => true], 'get_subresource')->shouldBeCalled()->willReturn($item);
         $converter = $this->getIriConverter($routerProphecy, $routeNameResolverProphecy, null, $subresourceDataProviderProphecy);
-        $this->assertEquals($converter->getItemFromIri('/users/3/adresses', ['fetch_data' => true]), $item);
+        $this->assertEquals($converter->getItemFromIri('/users/3/addresses', ['fetch_data' => true]), $item);
     }
 
     public function testGetItemFromIriWithSubresourceDataProviderNotFound()
     {
         $this->expectException(ItemNotFoundException::class);
-        $this->expectExceptionMessage('Item not found for "/users/3/adresses".');
+        $this->expectExceptionMessage('Item not found for "/users/3/addresses".');
 
         $subresourceContext = ['identifiers' => [['id', Dummy::class, true]]];
         $routeNameResolverProphecy = $this->prophesize(RouteNameResolverInterface::class);
         $routerProphecy = $this->prophesize(RouterInterface::class);
-        $routerProphecy->match('/users/3/adresses')->willReturn([
+        $routerProphecy->match('/users/3/addresses')->willReturn([
             '_api_resource_class' => Dummy::class,
             '_api_subresource_context' => $subresourceContext,
             '_api_subresource_operation_name' => 'get_subresource',
@@ -269,7 +269,7 @@ class IriConverterTest extends TestCase
         $subresourceDataProviderProphecy = $this->prophesize(SubresourceDataProviderInterface::class);
         $subresourceDataProviderProphecy->getSubresource(Dummy::class, ['id' => ['id' => 3]], $subresourceContext + ['fetch_data' => true, IdentifierConverterInterface::HAS_IDENTIFIER_CONVERTER => true], 'get_subresource')->shouldBeCalled()->willReturn(null);
         $converter = $this->getIriConverter($routerProphecy, $routeNameResolverProphecy, null, $subresourceDataProviderProphecy, $identifierConverterProphecy);
-        $converter->getItemFromIri('/users/3/adresses', ['fetch_data' => true]);
+        $converter->getItemFromIri('/users/3/addresses', ['fetch_data' => true]);
     }
 
     public function testGetItemFromIriBadIdentifierException()
