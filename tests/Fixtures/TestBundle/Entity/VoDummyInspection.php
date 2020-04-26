@@ -19,10 +19,13 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
- * @ApiResource(attributes={
- *     "normalization_context"={"groups"={"inspection_read"}},
- *     "denormalization_context"={"groups"={"inspection_write"}}
- * })
+ * @ApiResource(
+ *     attributes={
+ *         "normalization_context"={"groups"={"inspection_read"}},
+ *         "denormalization_context"={"groups"={"inspection_write"}}
+ *     },
+ *     graphql={}
+ * )
  * @ORM\Entity
  */
 class VoDummyInspection
