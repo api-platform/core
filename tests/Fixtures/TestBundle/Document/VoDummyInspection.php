@@ -19,10 +19,13 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
- * @ApiResource(attributes={
- *     "normalization_context"={"groups"={"inspection_read"}},
- *     "denormalization_context"={"groups"={"inspection_write"}}
- * })
+ * @ApiResource(
+ *     attributes={
+ *         "normalization_context"={"groups"={"inspection_read"}},
+ *         "denormalization_context"={"groups"={"inspection_write"}}
+ *     },
+ *     graphql={}
+ * )
  * @ODM\Document
  */
 class VoDummyInspection
