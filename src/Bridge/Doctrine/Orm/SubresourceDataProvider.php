@@ -217,7 +217,7 @@ final class SubresourceDataProvider implements SubresourceDataProviderInterface
                 return $previousQueryBuilder->innerJoin("$previousAlias.{$association['inversedBy']}", $joinAlias)
                     ->andWhere("$joinAlias.$key = :$placeholder");
             }
-            if ($isLeaf && $oneToManyBidirectional) {
+            if ($isLeaf && $oneToManyBidirectional && \in_array($key, $classMetadata->getIdentifier(), true)) {
                 return $previousQueryBuilder->andWhere("IDENTITY($previousAlias) = :$placeholder");
             }
 
