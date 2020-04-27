@@ -15,7 +15,7 @@ namespace ApiPlatform\Core\GraphQl\Serializer\Exception;
 
 use GraphQL\Error\Error;
 use GraphQL\Error\FormattedError;
-use Symfony\Component\HttpKernel\Exception\HttpException;
+use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 /**
@@ -32,7 +32,7 @@ final class HttpExceptionNormalizer implements NormalizerInterface
      */
     public function normalize($object, $format = null, array $context = []): array
     {
-        /** @var HttpException */
+        /** @var HttpExceptionInterface */
         $httpException = $object->getPrevious();
         $error = FormattedError::createFromException($object);
         $error['message'] = $httpException->getMessage();
@@ -47,6 +47,6 @@ final class HttpExceptionNormalizer implements NormalizerInterface
      */
     public function supportsNormalization($data, $format = null): bool
     {
-        return $data instanceof Error && $data->getPrevious() instanceof HttpException;
+        return $data instanceof Error && $data->getPrevious() instanceof HttpExceptionInterface;
     }
 }
