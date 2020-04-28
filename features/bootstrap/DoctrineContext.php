@@ -73,7 +73,6 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\CompositeItem;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\CompositeLabel;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\CompositePrimitiveItem;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\CompositeRelation;
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Container;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\ConvertedBoolean;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\ConvertedDate;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\ConvertedInteger;
@@ -111,7 +110,6 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\FourthLevel;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Greeting;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\InternalUser;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\MaxDepthDummy;
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Node;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Order;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Person;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\PersonToPet;
@@ -1053,25 +1051,6 @@ final class DoctrineContext implements Context
 
         $this->manager->flush();
         $this->manager->clear();
-    }
-
-    /**
-     * @Given there are :nb nodes in a container :uuid
-     */
-    public function thereAreNodesInAContainer(int $nb, string $uuid)
-    {
-        $container = new Container();
-        $container->setId($uuid);
-        $this->manager->persist($container);
-
-        for ($i = 0; $i < $nb; ++$i) {
-            $node = new Node();
-            $node->setContainer($container);
-            $node->setSerial($i);
-            $this->manager->persist($node);
-        }
-
-        $this->manager->flush();
     }
 
     /**
