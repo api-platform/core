@@ -22,7 +22,7 @@ class OAuthFlow
     private $refreshUrl;
     private $scopes;
 
-    public function __construct(string $authorizationUrl = null, string $tokenUrl = null, string $refreshUrl = null, array $scopes = [])
+    public function __construct(string $authorizationUrl = null, string $tokenUrl = null, string $refreshUrl = null, \ArrayObject $scopes = null)
     {
         $this->authorizationUrl = $authorizationUrl;
         $this->tokenUrl = $tokenUrl;
@@ -45,7 +45,7 @@ class OAuthFlow
         return $this->refreshUrl;
     }
 
-    public function getScopes(): array
+    public function getScopes(): \ArrayObject
     {
         return $this->scopes;
     }
@@ -74,7 +74,7 @@ class OAuthFlow
         return $clone;
     }
 
-    public function withScopes(array $scopes): self
+    public function withScopes(\ArrayObject $scopes): self
     {
         $clone = clone $this;
         $clone->scopes = $scopes;

@@ -30,7 +30,7 @@ class Operation
     private $servers;
     private $externalDocs;
 
-    public function __construct(string $operationId = null, array $tags = [], array $responses = [], string $summary = '', string $description = '', $externalDocs = [], array $parameters = [], RequestBody $requestBody = null, $callbacks = [], bool $deprecated = false, $security = [], array $servers = [])
+    public function __construct(string $operationId = null, array $tags = [], array $responses = [], string $summary = '', string $description = '', ExternalDocumentation $externalDocs = null, array $parameters = [], RequestBody $requestBody = null, \ArrayObject $callbacks = null, bool $deprecated = false, array $security = [], array $servers = [])
     {
         $this->tags = $tags;
         $this->summary = $summary;
@@ -78,7 +78,7 @@ class Operation
         return $this->description;
     }
 
-    public function getExternalDocs(): array
+    public function getExternalDocs(): ?ExternalDocumentation
     {
         return $this->externalDocs;
     }
@@ -93,7 +93,7 @@ class Operation
         return $this->requestBody;
     }
 
-    public function getCallbacks(): array
+    public function getCallbacks(): ?\ArrayObject
     {
         return $this->callbacks;
     }
@@ -153,7 +153,7 @@ class Operation
         return $clone;
     }
 
-    public function withExternalDocs(array $externalDocs): self
+    public function withExternalDocs(ExternalDocumentation $externalDocs): self
     {
         $clone = clone $this;
         $clone->externalDocs = $externalDocs;
@@ -177,7 +177,7 @@ class Operation
         return $clone;
     }
 
-    public function withCallbacks(array $callbacks): self
+    public function withCallbacks(\ArrayObject $callbacks): self
     {
         $clone = clone $this;
         $clone->callbacks = $callbacks;

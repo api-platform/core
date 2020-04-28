@@ -25,7 +25,7 @@ class Link
     private $server;
 
     // string $operationRef, ?
-    public function __construct(string $operationId, array $parameters = [], array $requestBody = [], string $description = '', Server $server = null)
+    public function __construct(string $operationId, \ArrayObject $parameters = null, $requestBody = null, string $description = '', Server $server = null)
     {
         // $this->operationRef = $operationRef;
         $this->operationId = $operationId;
@@ -40,12 +40,12 @@ class Link
         return $this->operationId;
     }
 
-    public function getParameters(): array
+    public function getParameters(): \ArrayObject
     {
         return $this->parameters;
     }
 
-    public function getRequestBody(): array
+    public function getRequestBody()
     {
         return $this->requestBody;
     }
@@ -68,7 +68,7 @@ class Link
         return $clone;
     }
 
-    public function withParameters(array $parameters): self
+    public function withParameters(\ArrayObject $parameters): self
     {
         $clone = clone $this;
         $clone->parameters = $parameters;
@@ -76,7 +76,7 @@ class Link
         return $clone;
     }
 
-    public function withRequestBody(array $requestBody): self
+    public function withRequestBody($requestBody): self
     {
         $clone = clone $this;
         $clone->requestBody = $requestBody;

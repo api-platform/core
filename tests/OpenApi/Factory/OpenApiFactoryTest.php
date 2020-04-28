@@ -213,7 +213,7 @@ class OpenApiFactoryTest extends TestCase
         $this->assertEquals($components->getSchemas(), ['Dummy' => $dummySchema->getDefinitions()]);
 
         $this->assertEquals($components->getSecuritySchemes(), [
-            'oauth' => new Model\SecurityScheme('oauth2', 'OAuth 2.0 authorization code Grant', null, null, 'oauth2', null, new Model\OAuthFlows(null, null, null, new Model\OAuthFlow('/oauth/v2/auth', '/oauth/v2/token', '/oauth/v2/refresh', ['scope param']))),
+            'oauth' => new Model\SecurityScheme('oauth2', 'OAuth 2.0 authorization code Grant', null, null, 'oauth2', null, new Model\OAuthFlows(null, null, null, new Model\OAuthFlow('/oauth/v2/auth', '/oauth/v2/token', '/oauth/v2/refresh', new \ArrayObject(['scope param'])))),
             'header' => new Model\SecurityScheme('apiKey', 'Value for the Authorization header parameter.', 'Authorization', 'header', 'bearer'),
             'query' => new Model\SecurityScheme('apiKey', 'Value for the key query parameter.', 'key', 'query', 'bearer'),
         ]);
@@ -229,16 +229,16 @@ class OpenApiFactoryTest extends TestCase
             'getDummyCollection',
             ['Dummy'],
             [
-                '200' => new Model\Response('Dummy collection', [
-                    'application/ld+json' => new Model\MediaType([
+                '200' => new Model\Response('Dummy collection', new \ArrayObject([
+                    'application/ld+json' => new Model\MediaType(new \ArrayObject(new \ArrayObject([
                         'type' => 'array',
                         'items' => ['$ref' => '#/components/schemas/Dummy'],
-                    ]),
-                ]),
+                    ]))),
+                ])),
             ],
             '',
             'Retrieves the collection of Dummy resources.',
-            [],
+            null,
             [
                 new Model\Parameter('page', 'query', 'The collection page number', false, false, true, [
                     'type' => 'integer',
@@ -261,23 +261,23 @@ class OpenApiFactoryTest extends TestCase
             [
                 '201' => new Model\Response(
                     'Dummy resource created',
-                    [
-                        'application/ld+json' => new Model\MediaType(['$ref' => '#/components/schemas/Dummy']),
-                    ],
-                    [],
-                    ['GetDummyItem' => new Model\Link('getDummyItem', ['id' => '$response.body#/id'], [], 'The `id` value returned in the response can be used as the `id` parameter in `GET /dummies/{id}`.')]
+                    new \ArrayObject([
+                        'application/ld+json' => new Model\MediaType(new \ArrayObject(new \ArrayObject(['$ref' => '#/components/schemas/Dummy']))),
+                    ]),
+                    null,
+                    new \ArrayObject(['GetDummyItem' => new Model\Link('getDummyItem', new \ArrayObject(['id' => '$response.body#/id']), [], 'The `id` value returned in the response can be used as the `id` parameter in `GET /dummies/{id}`.')])
                 ),
                 '400' => new Model\Response('Invalid input'),
             ],
             '',
             'Creates a Dummy resource.',
-            [],
+            null,
             [],
             new Model\RequestBody(
                 'The new Dummy resource',
-                [
-                    'application/ld+json' => new Model\MediaType(['$ref' => '#/components/schemas/Dummy']),
-                ],
+                new \ArrayObject([
+                    'application/ld+json' => new Model\MediaType(new \ArrayObject(new \ArrayObject(['$ref' => '#/components/schemas/Dummy']))),
+                ]),
                 true
             )
         ));
@@ -294,15 +294,15 @@ class OpenApiFactoryTest extends TestCase
             [
                 '200' => new Model\Response(
                     'Dummy resource',
-                    [
-                        'application/ld+json' => new Model\MediaType(['$ref' => '#/components/schemas/Dummy']),
-                    ]
+                    new \ArrayObject([
+                        'application/ld+json' => new Model\MediaType(new \ArrayObject(new \ArrayObject(['$ref' => '#/components/schemas/Dummy']))),
+                    ])
                 ),
                 '404' => new Model\Response('Resource not found'),
             ],
             '',
             'Retrieves a Dummy resource.',
-            [],
+            null,
             [new Model\Parameter('id', 'path', 'Resource identifier', true, false, false, ['type' => 'string'])]
         ));
 
@@ -312,24 +312,24 @@ class OpenApiFactoryTest extends TestCase
             [
                 '200' => new Model\Response(
                     'Dummy resource updated',
-                    [
-                        'application/ld+json' => new Model\MediaType(['$ref' => '#/components/schemas/Dummy']),
-                    ],
-                    [],
-                    ['GetDummyItem' => new Model\Link('getDummyItem', ['id' => '$response.body#/id'], [], 'The `id` value returned in the response can be used as the `id` parameter in `GET /dummies/{id}`.')]
+                    new \ArrayObject([
+                        'application/ld+json' => new Model\MediaType(new \ArrayObject(['$ref' => '#/components/schemas/Dummy'])),
+                    ]),
+                    null,
+                    new \ArrayObject(['GetDummyItem' => new Model\Link('getDummyItem', new \ArrayObject(['id' => '$response.body#/id']), [], 'The `id` value returned in the response can be used as the `id` parameter in `GET /dummies/{id}`.')])
                 ),
                 '400' => new Model\Response('Invalid input'),
                 '404' => new Model\Response('Resource not found'),
             ],
             '',
             'Replaces the Dummy resource.',
-            [],
+            null,
             [new Model\Parameter('id', 'path', 'Resource identifier', true, false, false, ['type' => 'string'])],
             new Model\RequestBody(
                 'The updated Dummy resource',
-                [
-                    'application/ld+json' => new Model\MediaType(['$ref' => '#/components/schemas/Dummy']),
-                ],
+                new \ArrayObject([
+                    'application/ld+json' => new Model\MediaType(new \ArrayObject(['$ref' => '#/components/schemas/Dummy'])),
+                ]),
                 true
             )
         ));
@@ -343,7 +343,7 @@ class OpenApiFactoryTest extends TestCase
             ],
             '',
             'Removes the Dummy resource.',
-            [],
+            null,
             [new Model\Parameter('id', 'path', 'Resource identifier', true, false, false, ['type' => 'string'])]
         ));
 
@@ -356,7 +356,7 @@ class OpenApiFactoryTest extends TestCase
             ],
             '',
             'Custom description',
-            [],
+            null,
             [new Model\Parameter('id', 'path', 'Resource identifier', true, false, false, ['type' => 'string'])]
         ));
 
@@ -367,26 +367,26 @@ class OpenApiFactoryTest extends TestCase
             [
                 '200' => new Model\Response(
                     'Dummy resource updated',
-                    [
-                        'application/json' => new Model\MediaType(['$ref' => '#/components/schemas/Dummy']),
-                        'text/csv' => new Model\MediaType(['$ref' => '#/components/schemas/Dummy']),
-                    ],
-                    [],
-                    ['GetDummyItem' => new Model\Link('getDummyItem', ['id' => '$response.body#/id'], [], 'The `id` value returned in the response can be used as the `id` parameter in `GET /dummies/{id}`.')]
+                    new \ArrayObject([
+                        'application/json' => new Model\MediaType(new \ArrayObject(['$ref' => '#/components/schemas/Dummy'])),
+                        'text/csv' => new Model\MediaType(new \ArrayObject(['$ref' => '#/components/schemas/Dummy'])),
+                    ]),
+                    null,
+                    new \ArrayObject(['GetDummyItem' => new Model\Link('getDummyItem', new \ArrayObject(['id' => '$response.body#/id']), [], 'The `id` value returned in the response can be used as the `id` parameter in `GET /dummies/{id}`.')])
                 ),
                 '400' => new Model\Response('Invalid input'),
                 '404' => new Model\Response('Resource not found'),
             ],
             '',
             'Replaces the Dummy resource.',
-            [],
+            null,
             [new Model\Parameter('id', 'path', 'Resource identifier', true, false, false, ['type' => 'string'])],
             new Model\RequestBody(
                 'The updated Dummy resource',
-                [
-                    'application/json' => new Model\MediaType(['$ref' => '#/components/schemas/Dummy']),
-                    'text/csv' => new Model\MediaType(['$ref' => '#/components/schemas/Dummy']),
-                ],
+                new \ArrayObject([
+                    'application/json' => new Model\MediaType(new \ArrayObject(['$ref' => '#/components/schemas/Dummy'])),
+                    'text/csv' => new Model\MediaType(new \ArrayObject(['$ref' => '#/components/schemas/Dummy'])),
+                ]),
                 true
             )
         ));
@@ -396,16 +396,16 @@ class OpenApiFactoryTest extends TestCase
             'filteredDummyCollection',
             ['Dummy'],
             [
-                '200' => new Model\Response('Dummy collection', [
-                    'application/ld+json' => new Model\MediaType([
+                '200' => new Model\Response('Dummy collection', new \ArrayObject([
+                    'application/ld+json' => new Model\MediaType(new \ArrayObject([
                         'type' => 'array',
                         'items' => ['$ref' => '#/components/schemas/Dummy'],
-                    ]),
-                ]),
+                    ])),
+                ])),
             ],
             '',
             'Retrieves the collection of Dummy resources.',
-            [],
+            null,
             [
                 new Model\Parameter('page', 'query', 'The collection page number', false, false, true, [
                     'type' => 'integer',
@@ -440,16 +440,16 @@ class OpenApiFactoryTest extends TestCase
             'paginatedDummyCollection',
             ['Dummy'],
             [
-                '200' => new Model\Response('Dummy collection', [
-                    'application/ld+json' => new Model\MediaType([
+                '200' => new Model\Response('Dummy collection', new \ArrayObject([
+                    'application/ld+json' => new Model\MediaType(new \ArrayObject([
                         'type' => 'array',
                         'items' => ['$ref' => '#/components/schemas/Dummy'],
-                    ]),
-                ]),
+                    ])),
+                ])),
             ],
             '',
             'Retrieves the collection of Dummy resources.',
-            [],
+            null,
             [
                 new Model\Parameter('page', 'query', 'The collection page number', false, false, true, [
                     'type' => 'integer',

@@ -22,7 +22,7 @@ class Response
     private $headers;
     private $links;
 
-    public function __construct(string $description = '', array $content = [], array $headers = [], array $links = [])
+    public function __construct(string $description = '', \ArrayObject $content = null, \ArrayObject $headers = null, \ArrayObject $links = null)
     {
         $this->description = $description;
         $this->content = $content;
@@ -35,17 +35,17 @@ class Response
         return $this->description;
     }
 
-    public function getContent(): array
+    public function getContent(): ?\ArrayObject
     {
         return $this->content;
     }
 
-    public function getHeaders(): array
+    public function getHeaders(): ?\ArrayObject
     {
         return $this->headers;
     }
 
-    public function getLinks(): array
+    public function getLinks(): ?\ArrayObject
     {
         return $this->links;
     }
@@ -58,7 +58,7 @@ class Response
         return $clone;
     }
 
-    public function withContent(array $content): self
+    public function withContent(\ArrayObject $content): self
     {
         $clone = clone $this;
         $clone->content = $content;
@@ -66,7 +66,7 @@ class Response
         return $clone;
     }
 
-    public function withHeaders(array $headers): self
+    public function withHeaders(\ArrayObject $headers): self
     {
         $clone = clone $this;
         $clone->headers = $headers;
@@ -74,7 +74,7 @@ class Response
         return $clone;
     }
 
-    public function withLinks(array $links): self
+    public function withLinks(\ArrayObject $links): self
     {
         $clone = clone $this;
         $clone->links = $links;

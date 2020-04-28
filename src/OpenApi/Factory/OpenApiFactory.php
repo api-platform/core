@@ -25,6 +25,7 @@ use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\OpenApi\Model;
+use ApiPlatform\Core\OpenApi\Model\ExternalDocumentation;
 use ApiPlatform\Core\OpenApi\OpenApi;
 use ApiPlatform\Core\OpenApi\Options;
 use ApiPlatform\Core\Operation\Factory\SubresourceOperationFactoryInterface;
@@ -101,7 +102,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
             $securityRequirements[$key] = [];
         }
 
-        return new OpenApi($info, $servers, $paths, new Model\Components($schemas, [], [], [], [], [], $securitySchemes), $securityRequirements);
+        return new OpenApi($info, $servers, $paths, new Model\Components(new \ArrayObject($schemas), new \ArrayObject(), new \ArrayObject(), new \ArrayObject(), new \ArrayObject(), new \ArrayObject(), new \ArrayObject($securitySchemes)), $securityRequirements);
     }
 
     private function collectPaths(ResourceMetadata $resourceMetadata, string $resourceClass, string $operationType, array $context, Model\Paths $paths, array $links, array $schemas = []): array
@@ -143,18 +144,18 @@ final class OpenApiFactory implements OpenApiFactoryInterface
                     $responses[$successStatus] = new Model\Response(sprintf('%s %s', $resourceShortName, OperationType::COLLECTION === $operationType ? 'collection' : 'resource'), $responseContent);
                     break;
                 case 'POST':
-                    $responseLinks = isset($links[$linkedOperationId]) ? [ucfirst($linkedOperationId) => $links[$linkedOperationId]] : [];
+                    $responseLinks = new \ArrayObject(isset($links[$linkedOperationId]) ? [ucfirst($linkedOperationId) => $links[$linkedOperationId]] : []);
                     $responseContent = $this->buildContent($responseMimeTypes, $operationSchemaOutput);
                     $successStatus = (string) $resourceMetadata->getTypedOperationAttribute($operationType, $operationName, 'status', '201');
-                    $responses[$successStatus] = new Model\Response(sprintf('%s resource created', $resourceShortName), $responseContent, [], $responseLinks);
+                    $responses[$successStatus] = new Model\Response(sprintf('%s resource created', $resourceShortName), $responseContent, null, $responseLinks);
                     $responses['400'] = new Model\Response('Invalid input');
                     break;
                 case 'PATCH':
                 case 'PUT':
-                    $responseLinks = isset($links[$linkedOperationId]) ? [ucfirst($linkedOperationId) => $links[$linkedOperationId]] : [];
+                    $responseLinks = new \ArrayObject(isset($links[$linkedOperationId]) ? [ucfirst($linkedOperationId) => $links[$linkedOperationId]] : []);
                     $successStatus = (string) $resourceMetadata->getTypedOperationAttribute($operationType, $operationName, 'status', '200');
                     $responseContent = $this->buildContent($responseMimeTypes, $operationSchemaOutput);
-                    $responses[$successStatus] = new Model\Response(sprintf('%s resource updated', $resourceShortName), $responseContent, [], $responseLinks);
+                    $responses[$successStatus] = new Model\Response(sprintf('%s resource updated', $resourceShortName), $responseContent, null, $responseLinks);
                     $responses['400'] = new Model\Response('Invalid input');
                     break;
                 case 'DELETE':
@@ -186,10 +187,10 @@ final class OpenApiFactory implements OpenApiFactoryInterface
                 $responses,
                 $operation['openapi_context']['summary'] ?? '',
                 $operation['openapi_context']['description'] ?? $this->getPathDescription($resourceShortName, $method, $operationType),
-                $operation['openapi_context']['externalDocs'] ?? [],
+                isset($operation['openapi_context']['externalDocs']) ? new ExternalDocumentation($operation['openapi_context']['externalDocs']['description'] ?? null, $operation['openapi_context']['externalDocs']['url']) : null,
                 $parameters,
                 $requestBody,
-                $operation['openapi_context']['callbacks'] ?? [],
+                new \ArrayObject($operation['openapi_context']['callbacks'] ?? []),
                 $operation['openapi_context']['deprecated'] ?? (bool) $resourceMetadata->getTypedOperationAttribute($operationType, $operationName, 'deprecation_reason', false, true),
                 $operation['openapi_context']['security'] ?? [],
                 $operation['openapi_context']['servers'] ?? []
@@ -204,12 +205,12 @@ final class OpenApiFactory implements OpenApiFactoryInterface
     /**
      * @TODO: support multiple format schemas
      */
-    private function buildContent(array $responseMimeTypes, $operationSchema)
+    private function buildContent(array $responseMimeTypes, $operationSchema): \ArrayObject
     {
-        $content = [];
+        $content = new \ArrayObject();
 
         foreach ($responseMimeTypes as $mimeType => $format) {
-            $content[$mimeType] = new Model\MediaType($operationSchema->getArrayCopy(false));
+            $content[$mimeType] = new Model\MediaType(new \ArrayObject($operationSchema->getArrayCopy(false)));
         }
 
         return $content;
@@ -299,7 +300,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
 
         return new Model\Link(
             $operationId,
-            $parameters,
+            new \ArrayObject($parameters),
             [],
             1 === \count($parameters) ? sprintf('The `%1$s` value returned in the response can be used as the `%1$s` parameter in `GET %2$s`.', key($parameters), $path) : sprintf('The values returned in the response can be used in `GET %s`.', $path)
         );
@@ -320,7 +321,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
             foreach ($filter->getDescription($resourceClass) as $name => $data) {
                 $schema = $data['schema'] ?? \in_array($data['type'], Type::$builtinTypes, true) ? $this->jsonSchemaTypeFactory->getType(new Type($data['type'], false, null, $data['is_collection'] ?? false)) : ['type' => 'string'];
 
-                $parameters[] = new Model\Parameter($name, 'query', $data['description'] ?? '', $data['required'] ?? false, $data['openapi']['deprecated'] ?? false, $data['openapi']['allowEmptyValue'] ?? true, $schema, 'array' === $schema['type'] && \in_array($data['type'], [Type::BUILTIN_TYPE_ARRAY, Type::BUILTIN_TYPE_OBJECT], true) ? 'deepObject' : 'form', 'array' === $schema['type'], $data['openapi']['allowReserved'] ?? false, $data['openapi']['example'] ?? null, $data['openapi']['examples'] ?? []);
+                $parameters[] = new Model\Parameter($name, 'query', $data['description'] ?? '', $data['required'] ?? false, $data['openapi']['deprecated'] ?? false, $data['openapi']['allowEmptyValue'] ?? true, $schema, 'array' === $schema['type'] && \in_array($data['type'], [Type::BUILTIN_TYPE_ARRAY, Type::BUILTIN_TYPE_OBJECT], true) ? 'deepObject' : 'form', 'array' === $schema['type'], $data['openapi']['allowReserved'] ?? false, $data['openapi']['example'] ?? null, isset($data['openapi']['examples']) ? new \ArrayObject($data['openapi']['examples']) : null);
             }
         }
 
@@ -362,7 +363,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
 
     private function getOauthSecurityScheme()
     {
-        $oauthFlow = new Model\OAuthFlow($this->openApiOptions->getOAuthAuthorizationUrl(), $this->openApiOptions->getOAuthTokenUrl(), $this->openApiOptions->getOAuthRefreshUrl(), $this->openApiOptions->getOAuthScopes());
+        $oauthFlow = new Model\OAuthFlow($this->openApiOptions->getOAuthAuthorizationUrl(), $this->openApiOptions->getOAuthTokenUrl(), $this->openApiOptions->getOAuthRefreshUrl(), new \ArrayObject($this->openApiOptions->getOAuthScopes()));
         $description = sprintf(
             'OAuth 2.0 %s Grant',
             strtolower(preg_replace('/[A-Z]/', ' \\0', lcfirst($this->openApiOptions->getOAuthFlow())))

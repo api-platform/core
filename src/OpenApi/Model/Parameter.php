@@ -31,7 +31,7 @@ class Parameter
     private $examples;
     private $content;
 
-    public function __construct(string $name, string $in, string $description = '', bool $required = false, bool $deprecated = false, bool $allowEmptyValue = false, array $schema = [], string $style = null, bool $explode = false, bool $allowReserved = false, $example = null, $examples = [], array $content = [])
+    public function __construct(string $name, string $in, string $description = '', bool $required = false, bool $deprecated = false, bool $allowEmptyValue = false, array $schema = [], string $style = null, bool $explode = false, bool $allowReserved = false, $example = null, \ArrayObject $examples = null, \ArrayObject $content = null)
     {
         $this->name = $name;
         $this->in = $in;
@@ -82,7 +82,7 @@ class Parameter
         return $this->deprecated;
     }
 
-    public function getAllowEmptyValue(): bool
+    public function canAllowEmptyValue(): bool
     {
         return $this->allowEmptyValue;
     }
@@ -97,12 +97,12 @@ class Parameter
         return $this->style;
     }
 
-    public function getExplode(): bool
+    public function canExplode(): bool
     {
         return $this->explode;
     }
 
-    public function getAllowReserved(): bool
+    public function canAllowReserved(): bool
     {
         return $this->allowReserved;
     }
@@ -112,12 +112,12 @@ class Parameter
         return $this->example;
     }
 
-    public function getExamples(): array
+    public function getExamples(): ?\ArrayObject
     {
         return $this->examples;
     }
 
-    public function getContent(): array
+    public function getContent(): ?\ArrayObject
     {
         return $this->content;
     }
@@ -210,7 +210,7 @@ class Parameter
         return $clone;
     }
 
-    public function withExamples(array $examples): self
+    public function withExamples(\ArrayObject $examples): self
     {
         $clone = clone $this;
         $clone->examples = $examples;
@@ -218,7 +218,7 @@ class Parameter
         return $clone;
     }
 
-    public function withContent(array $content): self
+    public function withContent(\ArrayObject $content): self
     {
         $clone = clone $this;
         $clone->content = $content;

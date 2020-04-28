@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\OpenApi\Serializer;
 
 use ApiPlatform\Core\OpenApi\OpenApi;
+use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
 use Symfony\Component\Serializer\Normalizer\CacheableSupportsMethodInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
@@ -23,8 +24,9 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 final class OpenApiNormalizer implements NormalizerInterface, CacheableSupportsMethodInterface
 {
     public const FORMAT = 'json';
-
+    public const OPEN_API_PRESERVE_EMPTY_OBJECTS = 'open_api_preserve_empty_objects';
     private const EXTENSION_PROPERTIES_KEY = 'extensionProperties';
+
     private $decorated;
 
     public function __construct(NormalizerInterface $decorated)
@@ -37,6 +39,9 @@ final class OpenApiNormalizer implements NormalizerInterface, CacheableSupportsM
      */
     public function normalize($object, $format = null, array $context = []): array
     {
+        $context[AbstractObjectNormalizer::PRESERVE_EMPTY_OBJECTS] = true;
+        $context[AbstractObjectNormalizer::SKIP_NULL_VALUES] = true;
+
         return $this->recursiveClean($this->decorated->normalize($object, $format, $context));
     }
 
@@ -60,10 +65,6 @@ final class OpenApiNormalizer implements NormalizerInterface, CacheableSupportsM
                 $data[$key] = $this->recursiveClean($value);
                 // arrays must stay even if empty
                 continue;
-            }
-
-            if (empty($value)) {
-                unset($data[$key]);
             }
         }
 

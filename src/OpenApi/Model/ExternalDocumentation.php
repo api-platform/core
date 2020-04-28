@@ -13,19 +13,17 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\OpenApi\Model;
 
-class RequestBody
+class ExternalDocumentation
 {
     use ExtensionTrait;
 
     private $description;
-    private $content;
-    private $required;
+    private $url;
 
-    public function __construct(string $description = '', \ArrayObject $content = null, bool $required = false)
+    public function __construct(string $description = '', string $url = '')
     {
         $this->description = $description;
-        $this->content = $content;
-        $this->required = $required;
+        $this->url = $url;
     }
 
     public function getDescription(): string
@@ -33,14 +31,9 @@ class RequestBody
         return $this->description;
     }
 
-    public function getContent(): \ArrayObject
+    public function getUrl(): string
     {
-        return $this->content;
-    }
-
-    public function getRequired(): bool
-    {
-        return $this->required;
+        return $this->url;
     }
 
     public function withDescription(string $description): self
@@ -51,18 +44,10 @@ class RequestBody
         return $clone;
     }
 
-    public function withContent(\ArrayObject $content): self
+    public function withUrl(string $url): self
     {
         $clone = clone $this;
-        $clone->content = $content;
-
-        return $clone;
-    }
-
-    public function withRequired(bool $required): self
-    {
-        $clone = clone $this;
-        $clone->required = $required;
+        $clone->url = $url;
 
         return $clone;
     }

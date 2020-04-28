@@ -27,7 +27,7 @@ class Components
     private $links;
     private $callbacks;
 
-    public function __construct(array $schemas = [], array $responses = [], array $parameters = [], array $examples = [], array $requestBodies = [], array $headers = [], array $securitySchemes = [], array $links = [], array $callbacks = [])
+    public function __construct(\ArrayObject $schemas = null, \ArrayObject $responses = null, \ArrayObject $parameters = null, \ArrayObject $examples = null, \ArrayObject $requestBodies = null, \ArrayObject $headers = null, \ArrayObject $securitySchemes = null, \ArrayObject $links = null, \ArrayObject $callbacks = null)
     {
         $this->schemas = $schemas;
         $this->responses = $responses;
@@ -40,48 +40,120 @@ class Components
         $this->callbacks = $callbacks;
     }
 
-    public function getSchemas(): array
+    public function getSchemas(): ?\ArrayObject
     {
         return $this->schemas;
     }
 
-    public function getResponses(): array
+    public function getResponses(): ?\ArrayObject
     {
         return $this->responses;
     }
 
-    public function getParameters(): array
+    public function getParameters(): ?\ArrayObject
     {
         return $this->parameters;
     }
 
-    public function getExamples(): array
+    public function getExamples(): ?\ArrayObject
     {
         return $this->examples;
     }
 
-    public function getRequestBodies(): array
+    public function getRequestBodies(): ?\ArrayObject
     {
         return $this->requestBodies;
     }
 
-    public function getHeaders(): array
+    public function getHeaders(): ?\ArrayObject
     {
         return $this->headers;
     }
 
-    public function getSecuritySchemes(): array
+    public function getSecuritySchemes(): ?\ArrayObject
     {
         return $this->securitySchemes;
     }
 
-    public function getLinks(): array
+    public function getLinks(): ?\ArrayObject
     {
         return $this->links;
     }
 
-    public function getCallbacks(): array
+    public function getCallbacks(): ?\ArrayObject
     {
         return $this->callbacks;
+    }
+
+    public function withSchemas(\ArrayObject $schemas): self
+    {
+        $clone = clone $this;
+        $clone->schemas = $schemas;
+
+        return $clone;
+    }
+
+    public function withResponses(\ArrayObject $responses): self
+    {
+        $clone = clone $this;
+        $clone->responses = $responses;
+
+        return $clone;
+    }
+
+    public function withParameters(\ArrayObject $parameters): self
+    {
+        $clone = clone $this;
+        $clone->parameters = $parameters;
+
+        return $clone;
+    }
+
+    public function withExamples(\ArrayObject $examples): self
+    {
+        $clone = clone $this;
+        $clone->examples = $examples;
+
+        return $clone;
+    }
+
+    public function withRequestBodies(\ArrayObject $requestBodies): self
+    {
+        $clone = clone $this;
+        $clone->requestBodies = $requestBodies;
+
+        return $clone;
+    }
+
+    public function withHeaders(\ArrayObject $headers): self
+    {
+        $clone = clone $this;
+        $clone->headers = $headers;
+
+        return $clone;
+    }
+
+    public function withSecuritySchemes(\ArrayObject $securitySchemes): self
+    {
+        $clone = clone $this;
+        $clone->securitySchemes = $securitySchemes;
+
+        return $clone;
+    }
+
+    public function withLinks(\ArrayObject $links): self
+    {
+        $clone = clone $this;
+        $clone->links = $links;
+
+        return $clone;
+    }
+
+    public function withCallbacks(\ArrayObject $callbacks): self
+    {
+        $clone = clone $this;
+        $clone->callbacks = $callbacks;
+
+        return $clone;
     }
 }

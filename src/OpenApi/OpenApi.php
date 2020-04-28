@@ -23,7 +23,7 @@ class OpenApi implements DocumentationInterface
 {
     use ExtensionTrait;
 
-    public const VERSION = '3.0.2';
+    public const VERSION = '3.0.3';
 
     private $openapi;
     private $info;

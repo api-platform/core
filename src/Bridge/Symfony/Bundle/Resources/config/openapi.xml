@@ -49,6 +49,10 @@
             <tag name="console.command" />
         </service>
 
+        <service id="api_platform.openapi.normalizer.api_gateway"  class="ApiPlatform\Core\Swagger\Serializer\ApiGatewayNormalizer" public="false" decorates="api_platform.openapi.normalizer" decoration-priority="-1">
+            <argument type="service" id="api_platform.openapi.normalizer.api_gateway.inner" />
+            <tag name="serializer.normalizer" priority="-780" />
+        </service>
     </services>
 
 </container>

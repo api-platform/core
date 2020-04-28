@@ -22,7 +22,7 @@ class MediaType
     private $examples;
     private $encoding;
 
-    public function __construct(array $schema = [], $example = null, array $examples = [], array $encoding = [])
+    public function __construct(\ArrayObject $schema = null, $example = null, \ArrayObject $examples = null, Encoding $encoding = null)
     {
         $this->schema = $schema;
         $this->example = $example;
@@ -30,7 +30,7 @@ class MediaType
         $this->encoding = $encoding;
     }
 
-    public function getSchema(): array
+    public function getSchema(): ?\ArrayObject
     {
         return $this->schema;
     }
@@ -40,17 +40,17 @@ class MediaType
         return $this->example;
     }
 
-    public function getExamples(): array
+    public function getExamples(): ?\ArrayObject
     {
         return $this->examples;
     }
 
-    public function getEncoding(): array
+    public function getEncoding(): ?Encoding
     {
         return $this->encoding;
     }
 
-    public function withSchema(array $schema): self
+    public function withSchema(\ArrayObject $schema): self
     {
         $clone = clone $this;
         $clone->schema = $schema;
@@ -66,7 +66,7 @@ class MediaType
         return $clone;
     }
 
-    public function withExamples(array $examples): self
+    public function withExamples(\ArrayObject $examples): self
     {
         $clone = clone $this;
         $clone->examples = $examples;
@@ -74,7 +74,7 @@ class MediaType
         return $clone;
     }
 
-    public function withEncoding(array $encoding): self
+    public function withEncoding(Encoding $encoding): self
     {
         $clone = clone $this;
         $clone->encoding = $encoding;

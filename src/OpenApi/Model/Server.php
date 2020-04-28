@@ -21,7 +21,7 @@ class Server
     private $description;
     private $variables;
 
-    public function __construct(string $url, string $description = '', array $variables = [])
+    public function __construct(string $url, string $description = '', \ArrayObject $variables = null)
     {
         $this->url = $url;
         $this->description = $description;
@@ -38,7 +38,7 @@ class Server
         return $this->description;
     }
 
-    public function getVariables(): array
+    public function getVariables(): \ArrayObject
     {
         return $this->variables;
     }
@@ -59,7 +59,7 @@ class Server
         return $clone;
     }
 
-    public function withVariables(array $variables): self
+    public function withVariables(\ArrayObject $variables): self
     {
         $clone = clone $this;
         $clone->variables = $variables;
