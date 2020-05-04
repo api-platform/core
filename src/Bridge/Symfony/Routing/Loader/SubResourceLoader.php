@@ -80,7 +80,9 @@ final class SubResourceLoader extends Loader
      */
     public function supports($resource, $type = null)
     {
-        return 'api_subresource' === $type;
+        if (null !== $this->subresourceOperationFactory) {
+            return 'api_subresource' === $type;
+        }
     }
 
 }
