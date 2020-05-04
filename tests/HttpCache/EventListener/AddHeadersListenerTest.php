@@ -147,7 +147,7 @@ class AddHeadersListenerTest extends TestCase
         $factory = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $factory->create(Dummy::class)->willReturn($metadata)->shouldBeCalled();
 
-        $listener = new AddHeadersListener(true, 100, 200, [], true, $factory->reveal());
+        $listener = new AddHeadersListener(true, 100, 200, ['Accept', 'Accept-Encoding'], true, $factory->reveal());
         $listener->onKernelResponse($event->reveal());
 
         $this->assertSame('max-age=123, public, s-maxage=456', $response->headers->get('Cache-Control'));
