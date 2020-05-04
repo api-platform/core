@@ -76,12 +76,14 @@ final class AddHeadersListener
             $response->setVary(array_diff($this->vary, $response->getVary()), false);
         }
 
-        if (null !== ($sharedMaxAge = $resourceCacheHeaders['shared_max_age'] ?? $this->sharedMaxAge) && !$response->headers->hasCacheControlDirective('s-maxage')) {
-            $response->setSharedMaxAge($sharedMaxAge);
+        $public = ($resourceCacheHeaders['public'] ?? $this->public);
+        if (null !== $public && !$response->headers->hasCacheControlDirective('public')) {
+            $public ? $response->setPublic() : $response->setPrivate();
         }
 
-        if (null !== $this->public && !$response->headers->hasCacheControlDirective('public')) {
-            $this->public ? $response->setPublic() : $response->setPrivate();
+        // s-maxage is only relevant is resource is not marked as "private"
+        if ($public && null !== ($sharedMaxAge = $resourceCacheHeaders['shared_max_age'] ?? $this->sharedMaxAge) && !$response->headers->hasCacheControlDirective('s-maxage')) {
+            $response->setSharedMaxAge($sharedMaxAge);
         }
     }
 }
