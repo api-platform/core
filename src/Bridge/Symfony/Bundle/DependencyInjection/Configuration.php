@@ -186,6 +186,7 @@ final class Configuration implements ConfigurationInterface
                 ->end()
             ->end();
 
+        $this->addRoutingLoaderSection($rootNode);
         $this->addDoctrineOrmSection($rootNode);
         $this->addDoctrineMongoDbOdmSection($rootNode);
         $this->addOAuthSection($rootNode);
@@ -212,6 +213,26 @@ final class Configuration implements ConfigurationInterface
         $this->addDefaultsSection($rootNode);
 
         return $treeBuilder;
+    }
+
+    private function addRoutingLoaderSection(ArrayNodeDefinition $rootNode)
+    {
+        $rootNode
+            ->children()
+                ->arrayNode('routing')
+                    ->addDefaultsIfNotSet()
+                    ->children()
+                        ->arrayNode('autoload')
+                        ->addDefaultsIfNotSet()
+                            ->children()
+                                ->booleanNode('externals')->defaultTrue()->end()
+                                ->booleanNode('directories')->defaultTrue()->end()
+                                ->booleanNode('resources')->defaultTrue()->end()
+                            ->end()
+                        ->end()
+                    ->end()
+                ->end()
+            ->end();
     }
 
     private function addDoctrineOrmSection(ArrayNodeDefinition $rootNode): void

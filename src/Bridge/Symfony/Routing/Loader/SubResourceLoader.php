@@ -16,6 +16,7 @@ use Symfony\Component\Routing\RouteCollection;
  * Loads Resources.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
+ * @author Tebaly <admin@freedomsex.net>
  */
 final class SubResourceLoader extends Loader
 {

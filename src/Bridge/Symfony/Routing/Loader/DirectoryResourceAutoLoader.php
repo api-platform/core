@@ -26,11 +26,12 @@ class DirectoryResourceAutoLoader extends Loader
     /**
      * {@inheritdoc}
      */
-    public function load($resourceClass, $type = null): RouteCollection
+    public function load($resource, $type = null): RouteCollection
     {
         $collection = new RouteCollection();
         foreach ($this->resourceClassDirectories as $directory) {
-            $collection->addResource(new DirectoryResource($directory, '/\.php$/'));
+            $subCollection = $this->import($directory, 'api_directory');
+            $collection->addCollection($subCollection);
         }
         return $collection;
     }
