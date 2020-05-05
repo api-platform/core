@@ -17,6 +17,7 @@ use ApiPlatform\Core\Bridge\Symfony\PropertyInfo\Metadata\Property\PropertyInfoP
 use ApiPlatform\Core\Tests\Fixtures\DummyObjectWithoutPublicProperties;
 use ApiPlatform\Core\Tests\Fixtures\DummyObjectWithPublicProperties;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
 
 /**
@@ -26,7 +27,10 @@ class PropertyInfoPropertyNameCollectionFactoryTest extends TestCase
 {
     public function testCreateMethodReturnsEmptyPropertyNameCollection()
     {
-        $factory = new PropertyInfoPropertyNameCollectionFactory(new PropertyInfoExtractor());
+        $factory = new PropertyInfoPropertyNameCollectionFactory(new PropertyInfoExtractor([
+            new ReflectionExtractor(),
+        ]));
+
         $collection = $factory->create(DummyObjectWithoutPublicProperties::class);
 
         self::assertCount(0, $collection->getIterator());
@@ -34,7 +38,10 @@ class PropertyInfoPropertyNameCollectionFactoryTest extends TestCase
 
     public function testCreateMethodReturnsProperPropertyNameCollection()
     {
-        $factory = new PropertyInfoPropertyNameCollectionFactory(new PropertyInfoExtractor());
+        $factory = new PropertyInfoPropertyNameCollectionFactory(new PropertyInfoExtractor([
+            new ReflectionExtractor(),
+        ]));
+
         $collection = $factory->create(DummyObjectWithPublicProperties::class);
 
         self::assertCount(2, $collection->getIterator());
