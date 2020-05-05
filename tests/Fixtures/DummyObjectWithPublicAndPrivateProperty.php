@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Tests\Fixtures;
 
-class DummyObjectWithPublicProperties
+class DummyObjectWithPublicAndPrivateProperty
 {
     public $foo;
-    public $bar;
+    private $bar;
 }

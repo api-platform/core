@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Tests\Fixtures;
 
-class DummyObjectWithoutPublicProperties
+class DummyObjectWithOnlyPrivateProperty
 {
     private $foo;
 }
