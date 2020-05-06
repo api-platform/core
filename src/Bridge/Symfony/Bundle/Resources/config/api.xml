@@ -50,8 +50,12 @@
             <tag name="routing.loader" />
         </service>
 
-        <service id="ApiPlatform\Core\Bridge\Symfony\Routing\Loader\DirectoryLoader" >
-            <argument type="service" id="file_locator"/>
+        <service id="ApiPlatform\Core\Bridge\Symfony\Routing\Loader\BundleLoader">
+            <argument type="service" id="api_platform.metadata.resource.name_collection_factory" />
+            <tag name="routing.loader" />
+        </service>
+
+        <service id="ApiPlatform\Core\Bridge\Symfony\Routing\Loader\DirectoryLoader">
             <tag name="routing.loader" />
         </service>
 

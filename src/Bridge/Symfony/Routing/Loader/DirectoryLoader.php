@@ -17,6 +17,16 @@ class DirectoryLoader extends Loader
     {
         $collection = new RouteCollection();
         $collection->addResource(new DirectoryResource($path, '/\.php$/'));
+        // todo: need test
+        foreach (scandir($path) as $dir) {
+            if ('.' !== $dir[0]) {
+                $directory = $path.'/'.$dir;
+                if (is_dir($directory)) {
+                    $subCollection = $this->import($directory, 'api_directory');
+                }
+                $collection->addCollection($subCollection);
+            }
+        }
         return $collection;
     }
 
