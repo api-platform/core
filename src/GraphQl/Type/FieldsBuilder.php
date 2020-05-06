@@ -380,8 +380,12 @@ final class FieldsBuilder implements FieldsBuilderInterface
 
             foreach ($this->filterLocator->get($filterId)->getDescription($resourceClass) as $key => $value) {
                 $nullable = isset($value['required']) ? !$value['required'] : true;
-                $filterType = \in_array($value['type'], Type::$builtinTypes, true) ? new Type($value['type'], $nullable) : new Type('object', $nullable, $value['type']);
-                $graphqlFilterType = $this->convertType($filterType, false, $queryName, $mutationName, null, $resourceClass, $rootResource, $property, $depth);
+                if ($value['type'] instanceof GraphQLType) {
+                    $graphqlFilterType = $value['type'];
+                } else {
+                    $filterType = \in_array($value['type'], Type::$builtinTypes, true) ? new Type($value['type'], $nullable) : new Type('object', $nullable, $value['type']);
+                    $graphqlFilterType = $this->convertType($filterType, false, $queryName, $mutationName, null, $resourceClass, $rootResource, $property, $depth);
+                }
 
                 if ('[]' === substr($key, -2)) {
                     $graphqlFilterType = GraphQLType::listOf($graphqlFilterType);
