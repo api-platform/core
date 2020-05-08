@@ -182,7 +182,7 @@ final class IriConverter implements IriConverterInterface
         }
 
         if (1 === \count($identifiers)) {
-            return [rawurlencode((string) reset($identifiers))];
+            return [(string) reset($identifiers)];
         }
 
         foreach ($identifiers as $name => $value) {
