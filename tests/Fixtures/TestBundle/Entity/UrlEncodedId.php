@@ -42,7 +42,7 @@ class UrlEncodedId
      * @ORM\Column(type="string")
      * @ORM\Id
      */
-    private $id = 'encode:id';
+    private $id = '%encode:id';
 
     public function getId()
     {

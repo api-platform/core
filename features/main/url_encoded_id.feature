@@ -13,12 +13,14 @@ Feature: Allowing resource identifiers with characters that should be URL encode
     """
     {
         "@context": "/contexts/UrlEncodedId",
-        "@id": "/url_encoded_ids/encode:id",
+        "@id": "/url_encoded_ids/%25encode:id",
         "@type": "UrlEncodedId",
-        "id": "encode:id"
+        "id": "%encode:id"
     }
     """
     Examples:
-      | url                            |
-      | /url_encoded_ids/encode:id     |
-      | /url_encoded_ids/encode%3Aid   |
+      | url                              |
+      | /url_encoded_ids/%encode:id      |
+      | /url_encoded_ids/%25encode%3Aid  |
+      | /url_encoded_ids/%25encode:id    |
+      | /url_encoded_ids/%encode%3Aid    |
