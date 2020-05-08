@@ -127,6 +127,7 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Site;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\SoMany;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Taxon;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\ThirdLevel;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\UrlEncodedId;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\User;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\UuidIdentifierDummy;
 use Behat\Behat\Context\Context;
@@ -1049,6 +1050,17 @@ final class DoctrineContext implements Context
         $this->manager->persist($answer);
         $this->manager->persist($question);
 
+        $this->manager->flush();
+        $this->manager->clear();
+    }
+
+    /**
+     * @Given there is a UrlEncodedId resource
+     */
+    public function thereIsAUrlEncodedIdResource()
+    {
+        $urlEncodedIdResource = new UrlEncodedId();
+        $this->manager->persist($urlEncodedIdResource);
         $this->manager->flush();
         $this->manager->clear();
     }

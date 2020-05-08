@@ -1,0 +1,51 @@
+<?php
+
+/*
+ * This file is part of the API Platform project.
+ *
+ * (c) Kévin Dunglas <dunglas@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+declare(strict_types=1);
+
+namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity;
+
+use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Dto\CustomInputDto;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Dto\CustomOutputDto;
+use Doctrine\ORM\Mapping as ORM;
+
+/**
+ * @author Daniel West <daniel@silverback.is>
+ *
+ * Resource with an ID that will be URL encoded
+ *
+ * @ORM\Entity
+ *
+ * @ApiResource(
+ *     itemOperations={
+ *        "get"={
+ *            "method"="GET",
+ *            "requirements"={"id"=".+"}
+ *        }
+ *     }
+ * )
+ */
+class UrlEncodedId
+{
+    /**
+     * @var int The id
+     *
+     * @ORM\Column(type="string")
+     * @ORM\Id
+     */
+    private $id = 'encode:id';
+
+    public function getId()
+    {
+        return $this->id;
+    }
+}
