@@ -3,7 +3,7 @@
 ## 2.5.x-dev
 
 * JSON Schema: Missing JSON-LD context from Data Transformers #3479
-* Url Encoded IRIs: Fix IRI url encoding
+* Url Encoded IRIs: Fix IRI url encoding #3552
 
 ## 2.5.5
 
