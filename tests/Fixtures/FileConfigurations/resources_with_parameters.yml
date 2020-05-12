@@ -1,5 +1,8 @@
 resources:
-    '%dummy_class%': ~
+    '%dummy_class%':
+        properties:
+            'relatedOwnedDummy':
+                subresource: { resourceClass: '%dummy_related_owned_class%' }
     '%dummy_class%Bis': ~
     '%file_config_dummy_class%':
         shortName: 'thedummyshortname'
