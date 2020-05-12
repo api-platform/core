@@ -23,8 +23,8 @@ class DirectoryLoader extends Loader
                 $directory = $path.'/'.$dir;
                 if (is_dir($directory)) {
                     $subCollection = $this->import($directory, 'api_directory');
+                    $collection->addCollection($subCollection);
                 }
-                $collection->addCollection($subCollection);
             }
         }
         return $collection;
