@@ -12,6 +12,7 @@
 * GraphQL: **BC** `operation` is now `operationName` to follow the standard (#3568)
 * OpenAPI: Add PHP default values to the documentation (#2386)
 * Deprecate using a validation groups generator service not implementing `ApiPlatform\Core\Bridge\Symfony\Validator\ValidationGroupsGeneratorInterface` (#3346)
+* Subresources: subresource resourceClass can now be defined as a container parameter in XML and Yaml definitions
 
 ## 2.5.6
 
