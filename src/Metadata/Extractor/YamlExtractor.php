@@ -100,6 +100,9 @@ final class YamlExtractor extends AbstractExtractor
             if (!\is_array($propertyValues)) {
                 throw new InvalidArgumentException(sprintf('"%s" setting is expected to be null or an array, %s given in "%s".', $propertyName, \gettype($propertyValues), $path));
             }
+            if (isset($propertyValues['subresource']['resourceClass'])) {
+                $propertyValues['subresource']['resourceClass'] = $this->resolve($propertyValues['subresource']['resourceClass']);
+            }
 
             $this->resources[$resourceName]['properties'][$propertyName] = [
                 'description' => $this->phpize($propertyValues, 'description', 'string'),
