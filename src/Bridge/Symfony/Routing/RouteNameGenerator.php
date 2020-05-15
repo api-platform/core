@@ -16,7 +16,8 @@ namespace ApiPlatform\Core\Bridge\Symfony\Routing;
 use ApiPlatform\Core\Api\OperationType;
 use ApiPlatform\Core\Api\OperationTypeDeprecationHelper;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
-use Doctrine\Common\Inflector\Inflector;
+use Doctrine\Inflector\Inflector;
+use Doctrine\Inflector\InflectorFactory;
 
 /**
  * Generates the Symfony route name associated with an operation name and a resource short name.
@@ -64,8 +65,9 @@ final class RouteNameGenerator
      */
     public static function inflector(string $name, bool $pluralize = true): string
     {
-        $name = Inflector::tableize($name);
+        $inflector = InflectorFactory::create()->build();
+        $name = $inflector->tableize($name);
 
-        return $pluralize ? Inflector::pluralize($name) : $name;
+        return $pluralize ? $inflector->pluralize($name) : $name;
     }
 }

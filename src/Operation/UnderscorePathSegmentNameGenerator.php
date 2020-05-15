@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Operation;
 
-use Doctrine\Common\Inflector\Inflector;
+use Doctrine\Inflector\InflectorFactory;
 
 /**
  * Generate a path name with an underscore separator according to a string and whether it's a collection or not.
@@ -27,8 +27,9 @@ final class UnderscorePathSegmentNameGenerator implements PathSegmentNameGenerat
      */
     public function getSegmentName(string $name, bool $collection = true): string
     {
-        $name = Inflector::tableize($name);
+        $inflector = InflectorFactory::create()->build();
+        $name = $inflector->tableize($name);
 
-        return $collection ? Inflector::pluralize($name) : $name;
+        return $collection ? $inflector->pluralize($name) : $name;
     }
 }

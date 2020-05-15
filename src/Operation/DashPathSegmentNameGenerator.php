@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Operation;
 
-use Doctrine\Common\Inflector\Inflector;
+use Doctrine\Inflector\InflectorFactory;
 
 /**
  * Generate a path name with a dash separator according to a string and whether it's a collection or not.
@@ -27,7 +27,9 @@ final class DashPathSegmentNameGenerator implements PathSegmentNameGeneratorInte
      */
     public function getSegmentName(string $name, bool $collection = true): string
     {
-        return $collection ? $this->dashize(Inflector::pluralize($name)) : $this->dashize($name);
+        $inflector = InflectorFactory::create()->build();
+
+        return $collection ? $this->dashize($inflector->pluralize($name)) : $this->dashize($name);
     }
 
     private function dashize(string $string): string

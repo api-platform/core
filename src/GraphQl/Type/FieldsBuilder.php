@@ -21,7 +21,7 @@ use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
-use Doctrine\Common\Inflector\Inflector;
+use Doctrine\Inflector\InflectorFactory;
 use GraphQL\Type\Definition\InputObjectType;
 use GraphQL\Type\Definition\NullableType;
 use GraphQL\Type\Definition\Type as GraphQLType;
@@ -113,6 +113,8 @@ final class FieldsBuilder implements FieldsBuilderInterface
      */
     public function getCollectionQueryFields(string $resourceClass, ResourceMetadata $resourceMetadata, string $queryName, array $configuration): array
     {
+        $inflector = InflectorFactory::create()->build();
+
         $shortName = $resourceMetadata->getShortName();
         $fieldName = lcfirst('collection_query' === $queryName ? $shortName : $queryName.$shortName);
         $description = $resourceMetadata->getGraphqlAttribute($queryName, 'description');
@@ -122,7 +124,7 @@ final class FieldsBuilder implements FieldsBuilderInterface
             $args = $this->resolveResourceArgs($configuration['args'] ?? [], $queryName, $shortName);
             $configuration['args'] = $args ?: $configuration['args'] ?? $fieldConfiguration['args'];
 
-            return [Inflector::pluralize($fieldName) => array_merge($fieldConfiguration, $configuration)];
+            return [$inflector->pluralize($fieldName) => array_merge($fieldConfiguration, $configuration)];
         }
 
         return [];
