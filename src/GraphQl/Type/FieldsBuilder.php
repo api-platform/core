@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\GraphQl\Type;
 
+use ApiPlatform\Core\Bridge\Doctrine\Inflector\Inflector;
 use ApiPlatform\Core\DataProvider\Pagination;
 use ApiPlatform\Core\Exception\ResourceClassNotFoundException;
 use ApiPlatform\Core\GraphQl\Resolver\Factory\ResolverFactoryInterface;
@@ -21,7 +22,6 @@ use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
-use Doctrine\Common\Inflector\Inflector;
 use GraphQL\Type\Definition\InputObjectType;
 use GraphQL\Type\Definition\NullableType;
 use GraphQL\Type\Definition\Type as GraphQLType;

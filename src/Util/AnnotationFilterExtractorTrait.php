@@ -14,8 +14,8 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Util;
 
 use ApiPlatform\Core\Annotation\ApiFilter;
+use ApiPlatform\Core\Bridge\Doctrine\Inflector\Inflector;
 use Doctrine\Common\Annotations\Reader;
-use Doctrine\Common\Inflector\Inflector;
 
 /**
  * Generates a service id for a generic filter.
