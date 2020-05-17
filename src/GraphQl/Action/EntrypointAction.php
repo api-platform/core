@@ -91,7 +91,7 @@ final class EntrypointAction
     private function parseRequest(Request $request): array
     {
         $query = $request->query->get('query');
-        $operation = $request->query->get('operation');
+        $operation = $request->query->get('operationName');
         if ($variables = $request->query->get('variables', [])) {
             $variables = $this->decodeVariables($variables);
         }
@@ -132,8 +132,8 @@ final class EntrypointAction
             $variables = \is_array($data['variables']) ? $data['variables'] : $this->decodeVariables($data['variables']);
         }
 
-        if (isset($data['operation'])) {
-            $operation = $data['operation'];
+        if (isset($data['operationName'])) {
+            $operation = $data['operationName'];
         }
 
         return [$query, $operation, $variables];

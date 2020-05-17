@@ -58,7 +58,7 @@ class EntrypointActionTest extends TestCase
 
     public function testGetAction(): void
     {
-        $request = new Request(['query' => 'graphqlQuery', 'variables' => '["graphqlVariable"]', 'operation' => 'graphqlOperationName']);
+        $request = new Request(['query' => 'graphqlQuery', 'variables' => '["graphqlVariable"]', 'operationName' => 'graphqlOperationName']);
         $request->setRequestFormat('json');
         $mockedEntrypoint = $this->getEntrypointAction();
 
@@ -67,7 +67,7 @@ class EntrypointActionTest extends TestCase
 
     public function testPostRawAction(): void
     {
-        $request = new Request(['variables' => '["graphqlVariable"]', 'operation' => 'graphqlOperationName'], [], [], [], [], [], 'graphqlQuery');
+        $request = new Request(['variables' => '["graphqlVariable"]', 'operationName' => 'graphqlOperationName'], [], [], [], [], [], 'graphqlQuery');
         $request->setFormat('graphql', 'application/graphql');
         $request->setMethod('POST');
         $request->headers->set('Content-Type', 'application/graphql');
@@ -78,7 +78,7 @@ class EntrypointActionTest extends TestCase
 
     public function testPostJsonAction(): void
     {
-        $request = new Request([], [], [], [], [], [], '{"query": "graphqlQuery", "variables": "[\"graphqlVariable\"]", "operation": "graphqlOperationName"}');
+        $request = new Request([], [], [], [], [], [], '{"query": "graphqlQuery", "variables": "[\"graphqlVariable\"]", "operationName": "graphqlOperationName"}');
         $request->setMethod('POST');
         $request->headers->set('Content-Type', 'application/json');
         $mockedEntrypoint = $this->getEntrypointAction();
@@ -119,14 +119,14 @@ class EntrypointActionTest extends TestCase
 
         return [
             'upload a single file' => [
-                '{"query": "graphqlQuery", "variables": {"file": null}, "operation": "graphqlOperationName"}',
+                '{"query": "graphqlQuery", "variables": {"file": null}, "operationName": "graphqlOperationName"}',
                 '{"file": ["variables.file"]}',
                 ['file' => $file],
                 ['file' => $file],
                 new JsonResponse(['GraphQL']),
             ],
             'upload multiple files' => [
-                '{"query": "graphqlQuery", "variables": {"files": [null, null, null]}, "operation": "graphqlOperationName"}',
+                '{"query": "graphqlQuery", "variables": {"files": [null, null, null]}, "operationName": "graphqlOperationName"}',
                 '{"0": ["variables.files.0"], "1": ["variables.files.1"], "2": ["variables.files.2"]}',
                 [
                     '0' => $file,
@@ -150,7 +150,7 @@ class EntrypointActionTest extends TestCase
                 new Response('{"errors":[{"message":"GraphQL multipart request does not respect the specification.","extensions":{"category":"user","status":400}}]}'),
             ],
             'upload without providing map' => [
-                '{"query": "graphqlQuery", "variables": {"file": null}, "operation": "graphqlOperationName"}',
+                '{"query": "graphqlQuery", "variables": {"file": null}, "operationName": "graphqlOperationName"}',
                 null,
                 ['file' => $file],
                 ['file' => null],
@@ -164,28 +164,28 @@ class EntrypointActionTest extends TestCase
                 new Response('{"errors":[{"message":"GraphQL data is not valid JSON.","extensions":{"category":"user","status":400}}]}'),
             ],
             'upload with invalid map JSON' => [
-                '{"query": "graphqlQuery", "variables": {"file": null}, "operation": "graphqlOperationName"}',
+                '{"query": "graphqlQuery", "variables": {"file": null}, "operationName": "graphqlOperationName"}',
                 '{invalid}',
                 ['file' => $file],
                 ['file' => null],
                 new Response('{"errors":[{"message":"GraphQL multipart request map is not valid JSON.","extensions":{"category":"user","status":400}}]}'),
             ],
             'upload with no file' => [
-                '{"query": "graphqlQuery", "variables": {"file": null}, "operation": "graphqlOperationName"}',
+                '{"query": "graphqlQuery", "variables": {"file": null}, "operationName": "graphqlOperationName"}',
                 '{"file": ["file"]}',
                 [],
                 ['file' => null],
                 new Response('{"errors":[{"message":"GraphQL multipart request file has not been sent correctly.","extensions":{"category":"user","status":400}}]}'),
             ],
             'upload with wrong map' => [
-                '{"query": "graphqlQuery", "variables": {"file": null}, "operation": "graphqlOperationName"}',
+                '{"query": "graphqlQuery", "variables": {"file": null}, "operationName": "graphqlOperationName"}',
                 '{"file": ["file"]}',
                 ['file' => $file],
                 ['file' => null],
                 new Response('{"errors":[{"message":"GraphQL multipart request path in map is invalid.","extensions":{"category":"user","status":400}}]}'),
             ],
             'upload when variable path does not exist' => [
-                '{"query": "graphqlQuery", "variables": {"file": null}, "operation": "graphqlOperationName"}',
+                '{"query": "graphqlQuery", "variables": {"file": null}, "operationName": "graphqlOperationName"}',
                 '{"file": ["variables.wrong"]}',
                 ['file' => $file],
                 ['file' => null],
@@ -217,7 +217,7 @@ class EntrypointActionTest extends TestCase
 
     public function testBadVariablesAction(): void
     {
-        $request = new Request(['query' => 'graphqlQuery', 'variables' => 'graphqlVariable', 'operation' => 'graphqlOperationName']);
+        $request = new Request(['query' => 'graphqlQuery', 'variables' => 'graphqlVariable', 'operationName' => 'graphqlOperationName']);
         $request->setRequestFormat('json');
         $mockedEntrypoint = $this->getEntrypointAction();
 

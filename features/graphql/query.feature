@@ -102,13 +102,13 @@ Feature: GraphQL query support
       }
     }
     """
-    And I send the GraphQL request with operation "DummyWithId2"
+    And I send the GraphQL request with operationName "DummyWithId2"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/json"
     And the JSON node "data.dummyItem.id" should be equal to "/dummies/2"
     And the JSON node "data.dummyItem.name" should be equal to "Dummy #2"
-    And I send the GraphQL request with operation "DummyWithId1"
+    And I send the GraphQL request with operationName "DummyWithId1"
     And the JSON node "data.dummyItem.name" should be equal to "Dummy #1"
 
   Scenario: Use serialization groups
