@@ -129,8 +129,8 @@ final class EntrypointAction
             $variables = \is_array($data['variables']) ? $data['variables'] : $this->decodeVariables($data['variables']);
         }
 
-        if (isset($data['operation'])) {
-            $operation = $data['operation'];
+        if (isset($data['operationName'])) {
+            $operation = $data['operationName'];
         }
 
         return [$query, $operation, $variables];
