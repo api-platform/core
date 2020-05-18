@@ -69,13 +69,13 @@ final class EntrypointAction
                 }
             }
 
-            [$query, $operation, $variables] = $this->parseRequest($request);
+            [$query, $operationName, $variables] = $this->parseRequest($request);
             if (null === $query) {
                 throw new BadRequestHttpException('GraphQL query is not valid.');
             }
 
             $executionResult = $this->executor
-                ->executeQuery($this->schemaBuilder->getSchema(), $query, null, null, $variables, $operation)
+                ->executeQuery($this->schemaBuilder->getSchema(), $query, null, null, $variables, $operationName)
                 ->setErrorFormatter([$this->normalizer, 'normalize']);
         } catch (\Exception $exception) {
             $executionResult = (new ExecutionResult(null, [new Error($exception->getMessage(), null, null, null, null, $exception)]))
@@ -91,17 +91,17 @@ final class EntrypointAction
     private function parseRequest(Request $request): array
     {
         $query = $request->query->get('query');
-        $operation = $request->query->get('operation');
+        $operationName = $request->query->get('operationName');
         if ($variables = $request->query->get('variables', [])) {
             $variables = $this->decodeVariables($variables);
         }
 
         if (!$request->isMethod('POST')) {
-            return [$query, $operation, $variables];
+            return [$query, $operationName, $variables];
         }
 
         if ('json' === $request->getContentType()) {
-            return $this->parseData($query, $operation, $variables, $request->getContent());
+            return $this->parseData($query, $operationName, $variables, $request->getContent());
         }
 
         if ('graphql' === $request->getContentType()) {
@@ -109,16 +109,16 @@ final class EntrypointAction
         }
 
         if ('multipart' === $request->getContentType()) {
-            return $this->parseMultipartRequest($query, $operation, $variables, $request->request->all(), $request->files->all());
+            return $this->parseMultipartRequest($query, $operationName, $variables, $request->request->all(), $request->files->all());
         }
 
-        return [$query, $operation, $variables];
+        return [$query, $operationName, $variables];
     }
 
     /**
      * @throws BadRequestHttpException
      */
-    private function parseData(?string $query, ?string $operation, array $variables, string $jsonContent): array
+    private function parseData(?string $query, ?string $operationName, array $variables, string $jsonContent): array
     {
         if (!\is_array($data = json_decode($jsonContent, true))) {
             throw new BadRequestHttpException('GraphQL data is not valid JSON.');
@@ -132,24 +132,23 @@ final class EntrypointAction
             $variables = \is_array($data['variables']) ? $data['variables'] : $this->decodeVariables($data['variables']);
         }
 
-        if (isset($data['operation'])) {
-            $operation = $data['operation'];
+        if (isset($data['operationName'])) {
+            $operationName = $data['operationName'];
         }
 
-        return [$query, $operation, $variables];
+        return [$query, $operationName, $variables];
     }
 
     /**
      * @throws BadRequestHttpException
      */
-    private function parseMultipartRequest(?string $query, ?string $operation, array $variables, array $bodyParameters, array $files): array
+    private function parseMultipartRequest(?string $query, ?string $operationName, array $variables, array $bodyParameters, array $files): array
     {
         if ((null === $operations = $bodyParameters['operations'] ?? null) || (null === $map = $bodyParameters['map'] ?? null)) {
             throw new BadRequestHttpException('GraphQL multipart request does not respect the specification.');
         }
 
-        /** @var string $operations */
-        [$query, $operation, $variables] = $this->parseData($query, $operation, $variables, $operations);
+        [$query, $operationName, $variables] = $this->parseData($query, $operationName, $variables, $operations);
 
         /** @var string $map */
         if (!\is_array($decodedMap = json_decode($map, true))) {
@@ -158,7 +157,7 @@ final class EntrypointAction
 
         $variables = $this->applyMapToVariables($decodedMap, $variables, $files);
 
-        return [$query, $operation, $variables];
+        return [$query, $operationName, $variables];
     }
 
     /**

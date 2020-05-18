@@ -90,11 +90,11 @@ final class GraphqlContext implements Context
     }
 
     /**
-     * @When I send the GraphQL request with operation :operation
+     * @When I send the GraphQL request with operationName :operationName
      */
-    public function ISendTheGraphqlRequestWithOperation(string $operation)
+    public function ISendTheGraphqlRequestWithOperation(string $operationName)
     {
-        $this->graphqlRequest['operation'] = $operation;
+        $this->graphqlRequest['operationName'] = $operationName;
         $this->sendGraphqlRequest();
     }
 
