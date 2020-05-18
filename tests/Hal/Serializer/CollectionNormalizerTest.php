@@ -112,7 +112,11 @@ class CollectionNormalizerTest extends TestCase
 
     private function normalizePaginator($partial = false)
     {
-        $paginatorProphecy = $this->prophesize($partial ? PartialPaginatorInterface::class : PaginatorInterface::class);
+        $paginatorProphecy = $this->prophesize(PaginatorInterface::class);
+        if ($partial) {
+            $paginatorProphecy = $this->prophesize(PartialPaginatorInterface::class);
+        }
+
         $paginatorProphecy->getCurrentPage()->willReturn(3);
         $paginatorProphecy->getItemsPerPage()->willReturn(12);
         $paginatorProphecy->rewind()->will(function () {});
