@@ -44,4 +44,11 @@ class UuidNormalizerTest extends TestCase
         $this->assertTrue($normalizer->supportsDenormalization($uuid, Uuid::class));
         $normalizer->denormalize($uuid, Uuid::class);
     }
+
+    public function testDoNotSupportNotString()
+    {
+        $uuid = Uuid::uuid4();
+        $normalizer = new UuidNormalizer();
+        $this->assertFalse($normalizer->supportsDenormalization($uuid, Uuid::class));
+    }
 }
