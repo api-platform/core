@@ -92,7 +92,8 @@
     },
     "conflict": {
         "doctrine/common": "<2.7",
-        "doctrine/mongodb-odm": "<2.0"
+        "doctrine/mongodb-odm": "<2.0",
+        "doctrine/inflector": "^1.4"
     },
     "suggest": {
         "doctrine/mongodb-odm-bundle": "To support MongoDB. Only versions 4.0 and later are supported.",
