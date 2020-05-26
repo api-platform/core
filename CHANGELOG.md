@@ -1,8 +1,11 @@
 # Changelog
 
-## 2.5.x-dev
+## 2.5.6
 
-* JSON Schema: Missing LD context from Data Transformers #3479
+* JSON Schema: Missing JSON-LD context from Data Transformers #3479
+* GraphQl: Resource with no operation should be available through relations #3532
+* Fix ramsey uuid denormalization #3473
+* Revert #3331 as it breaks backwards compatibility 
 
 ## 2.5.5
 
