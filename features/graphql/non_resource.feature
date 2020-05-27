@@ -1,12 +1,12 @@
 # TODO: FIXME: GraphQL support for non-resources is non-existent
 
-Feature: GraphQL non-resource handling
-  In order to use non-resource types
-  As a developer
-  I should be able to serialize types not mapped to an API resource.
+#Feature: GraphQL non-resource handling
+#  In order to use non-resource types
+#  As a developer
+#  I should be able to serialize types not mapped to an API resource.
 
-  Scenario: Get a resource containing a raw object
-    Then it is not supported
+#  Scenario: Get a resource containing a raw object
+#    Then it is not supported
 #     When I send the following GraphQL request:
 #     """
 #     {
@@ -55,10 +55,10 @@ Feature: GraphQL non-resource handling
 #     }
 #     """
 
-  @!mongodb
-  @createSchema
-  Scenario: Create a resource that has a non-resource relation.
-    Then it is not supported
+#  @!mongodb
+#  @createSchema
+#  Scenario: Create a resource that has a non-resource relation.
+#    Then it is not supported
 #     When I send the following GraphQL request:
 #     """
 #     mutation {

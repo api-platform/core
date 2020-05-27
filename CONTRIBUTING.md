@@ -35,10 +35,12 @@ To prepare your patch directly in the `vendor/` of an existing project (convenie
 
 Alternatively, you can also work with the test application we provide:
 
+    cd core
+    composer update
     cd tests/Fixtures/app
     ./console assets:install --symlink
     symfony serve
-    
+
     # or if you prefer using the PHP built-in web server
     php -S localhost:8000 -t public/
 
@@ -70,6 +72,11 @@ On `api-platform/core` there are two kinds of tests: unit (`phpunit`) and integr
 
 Both `phpunit` and `behat` are development dependencies and should be available in the `vendor` directory.
 
+To prepare core for running tests you'll need to install dependancies:
+
+    cd core
+    composer update
+
 #### PHPUnit and Coverage Generation
 
 To launch unit tests:
@@ -90,11 +97,15 @@ Coverage will be available in `coverage/index.html`.
 
 The command to launch Behat tests is:
 
-    ./vendor/bin/behat --suite=default --stop-on-failure -vvv
+    APP_ENV=test vendor/bin/behat --stop-on-failure
 
-If you want to launch Behat tests for MongoDB, the command is:
+Available environments:
 
-    APP_ENV=mongodb ./vendor/bin/behat --suite=mongodb --stop-on-failure -vvv
+* `APP_ENV=elasticsearch vendor/bin/behat --stop-on-failure`
+* `APP_ENV=mongodb vendor/bin/behat --stop-on-failure`
+* `APP_ENV=mysql vendor/bin/behat --stop-on-failure`
+* `APP_ENV=postgres vendor/bin/behat --stop-on-failure`
+* `APP_ENV=test vendor/bin/behat --stop-on-failure` (SQLite)
 
 ## Squash your Commits
 
@@ -134,5 +145,5 @@ This section is dedicated to maintainers.
 1. Update the JavaScript dependencies by running `./update-js.sh` (always check if it works in a browser)
 2. Update the `CHANGELOG.md` file (be sure to include Pull Request numbers when appropriate)
 3. Create a signed tag: `git tag -s vX.Y.Z -m "Version X.Y.Z"`
-4. Create a release using GitHub's UI and copy the changelog 
+4. Create a release using GitHub's UI and copy the changelog
 5. Create a new release of `api-platform/api-platform`
