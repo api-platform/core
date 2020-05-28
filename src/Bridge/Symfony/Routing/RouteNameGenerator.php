@@ -15,8 +15,8 @@ namespace ApiPlatform\Core\Bridge\Symfony\Routing;
 
 use ApiPlatform\Core\Api\OperationType;
 use ApiPlatform\Core\Api\OperationTypeDeprecationHelper;
-use ApiPlatform\Core\Bridge\Doctrine\Inflector\Inflector;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
+use ApiPlatform\Core\Util\Inflector;
 
 /**
  * Generates the Symfony route name associated with an operation name and a resource short name.
