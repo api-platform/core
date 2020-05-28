@@ -2,33 +2,36 @@
 
 ## 2.5.6
 
-* JSON Schema: Missing JSON-LD context from Data Transformers #3479
-* GraphQl: Resource with no operation should be available through relations #3532
-* Fix ramsey uuid denormalization #3473
-* Revert #3331 as it breaks backwards compatibility 
+* Add support for Mercure 0.10 (#3584)
+* Allow objects without properties (#3544)
+* Fix Ramsey uuid denormalization (#3473)
+* Revert #3331 as it breaks backwards compatibility
+* Handle deprecations from Doctrine Inflector (#3564)
+* JSON Schema: Missing JSON-LD context from Data Transformers (#3479)
+* GraphQL: Resource with no operations should be available through relations (#3532)
 
 ## 2.5.5
 
-* Filter: Improve the RangeFilter query in case the values are equals using the between operator #3488
-* Pagination: Fix bug with large values #3451
-* Doctrine: use the correct type within `setParameter` of the SearchFilter #3331
-* Allow `\Traversable` resources #3463
-* Hydra: `hydra:writable` => `hydra:writeable` #3481
-* Hydra: Show `hydra:next` only when it's available #3457
-* Swagger UI: Missing default context argument #3443
-* Swagger UI: Fix API docs path in swagger ui #3475
-* OpenAPI: Export with unescaped slashes #3368
-* OpenAPI: OAuth flows fix #3333
-* JSON Schema: Fix metadata options #3425
-* JSON Schema: Allow decoration #3417
-* JSON Schema: Add DateInterval type #3351
-* JSON Schema: Correct schema generation for many types #3402
-* Validation: Use API Platform's `ValidationException` instead of Symfony's #3414
-* Validation: Fix a bug preventing to serialize validator's payload #3375
-* Subresources: Improve queries when there's only one level #3396
-* HTTP: Location header is only set on POST with a 201 or between 300 and 400 #3497
-* GraphQL: Do not allow empty cursor values on `before` or `after` #3360
-* Bump versions of Swagger UI, GraphiQL and GraphQL Playground #3510
+* Filter: Improve the RangeFilter query in case the values are equals using the between operator (#3488)
+* Pagination: Fix bug with large values (#3451)
+* Doctrine: use the correct type within `setParameter` of the SearchFilter (#3331)
+* Allow `\Traversable` resources (#3463)
+* Hydra: `hydra:writable` => `hydra:writeable` (#3481)
+* Hydra: Show `hydra:next` only when it's available (#3457)
+* Swagger UI: Missing default context argument (#3443)
+* Swagger UI: Fix API docs path in swagger ui (#3475)
+* OpenAPI: Export with unescaped slashes (#3368)
+* OpenAPI: OAuth flows fix (#3333)
+* JSON Schema: Fix metadata options (#3425)
+* JSON Schema: Allow decoration (#3417)
+* JSON Schema: Add DateInterval type (#3351)
+* JSON Schema: Correct schema generation for many types (#3402)
+* Validation: Use API Platform's `ValidationException` instead of Symfony's (#3414)
+* Validation: Fix a bug preventing to serialize validator's payload (#3375)
+* Subresources: Improve queries when there's only one level (#3396)
+* HTTP: Location header is only set on POST with a 201 or between 300 and 400 (#3497)
+* GraphQL: Do not allow empty cursor values on `before` or `after` (#3360)
+* Bump versions of Swagger UI, GraphiQL and GraphQL Playground (#3510)
 
 ## 2.5.4
 
@@ -54,7 +57,7 @@
 * Compatibility with Symfony 5 beta
 * Fix a notice in `SerializerContextBuilder`
 * Fix dashed path segment generation
-* Fix support for custom filters without constructor in the `@ApiFilter` annotation
+* Fix support for custom filters without constructors in the `@ApiFilter` annotation
 * Fix a bug that was preventing to disable Swagger/OpenAPI
 * Return a `404` HTTP status code instead of `500` whe the identifier is invalid (e.g.: invalid UUID)
 * Add links to the documentation in `@ApiResource` annotation's attributes to improve DX
@@ -82,9 +85,9 @@
 
 * Allow to not declare GET item operation
 * Add support for the Accept-Patch header
-* Make the the `maximum_items_per_page` attribute consistent with other attributes controlling pagination 
+* Make the `maximum_items_per_page` attribute consistent with other attributes controlling pagination 
 * Allow to use a string instead of an array for serializer groups
-* Test: Add an helper method to find the IRI of a resource
+* Test: Add a helper method to find the IRI of a resource
 * Test: Add assertions for testing response against JSON Schema from API resource
 * GraphQL: Add support for multipart request so user can create custom file upload mutations (#3041)
 * GraphQL: Add support for name converter (#2765)
@@ -97,7 +100,7 @@
 * Add infrastructure to generate a JSON Schema from a Resource `ApiPlatform\Core\JsonSchema\SchemaFactoryInterface` (#2983)
 * Replaces `access_control` by `security` and adds a `security_post_denormalize` attribute (#2992)
 * Add basic infrastructure for cursor-based pagination (#2532)
-* Change ExistsFilter syntax to `exists[property]`, old syntax still supported see #2243, fixes it's behavior on GraphQL (also related #2640).
+* Change ExistsFilter syntax to `exists[property]`, old syntax still supported see #2243, fixes its behavior on GraphQL (also related #2640).
 * Pagination with subresources (#2698)
 * Improve search filter id's management (#1844)
 * Add support of name converter in filters (#2751, #2897), filter signature in abstract methods has changed see b42dfd198b1644904fd6a684ab2cedaf530254e3
@@ -141,10 +144,10 @@ Please read #2825 if you have issues with the behavior of Readable/Writable Link
 * Varnish: Prevent cache miss by generating IRI for child related resources
 * Messenger: Unwrap exception thrown in handler for Symfony Messenger 4.3
 * Fix remaining Symfony 4.3 deprecation notices
-* Prevent cloning non clonable objects in `previous_data`
+* Prevent cloning non cloneable objects in `previous_data`
 * Return a 415 HTTP status code instead of a 406 one when a faulty `Content-Type` is sent
 * Fix `WriteListener` trying to generate IRI for non-resources
-* Allow to extract blank values from composite identifier
+* Allow extracting blank values from composite identifier
 
 ## 2.4.5
 
@@ -312,18 +315,18 @@ Please read #2825 if you have issues with the behavior of Readable/Writable Link
 * OpenAPI: support generating documentation using [ReDoc](https://github.com/Rebilly/ReDoc)
 * OpenAPI: basic hypermedia hints using OpenAPI v3 links
 * OpenAPI: expose the pagination controls
-* Allow to use custom classes for input and output (DTO) with the `input_class` and `output_class` attributes
-* Allow to disable the input or the output by setting `input_class` and `output_class` to false
+* Allow using custom classes for input and output (DTO) with the `input_class` and `output_class` attributes
+* Allow disabling the input or the output by setting `input_class` and `output_class` to false
 * Guess and automatically set the appropriate Schema.org IRIs for common validation constraints
-* Allow to set custom cache HTTP headers using the `cache_headers` attribute
-* Allow to set the HTTP status code to send to the client through the `status` attribute
+* Allow setting custom cache HTTP headers using the `cache_headers` attribute
+* Allow setting the HTTP status code to send to the client through the `status` attribute
 * Add support for the `Sunset` HTTP header using the `sunset` attribute
 * Set the `Content-Location` and `Location` headers when appropriate for better RFC7231 conformance
 * Display the matching data provider and data persister in the debug panel
 * GraphQL: improve performance by lazy loading types
 * Add the `api_persist` request attribute to enable or disable the `WriteListener`
-* Allow to set a default context in all normalizers
-* Permit to use a string instead of an array when there is only one serialization group
+* Allow setting a default context in all normalizers
+* Permit using a string instead of an array when there is only one serialization group
 * Add support for setting relations using the constructor of the resource classes
 * Automatically set a [409 Conflict](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/409) HTTP status code when an `OptimisticLockException` is thrown
 * Resolve Dependency Injection Container parameters in the XML and YAML files for the resource class configuration
@@ -348,7 +351,7 @@ Please read #2825 if you have issues with the behavior of Readable/Writable Link
 * OpenAPI/Swagger: add a description for the `properties[]` filter
 * OpenAPI/Swagger: Leverage advanced name converters
 * JSON-LD: Prevent an error in `ItemNormalizer` when `$context['resource_class']` is not defined
-* Allow to pass a the serialization group to use a string instead of as an array of one element
+* Allow to pass the serialization group to use a string instead of as an array of one element
 * Modernize the code base to use PHP 7.1 features when possible
 * Bump minimal dependencies of the used Symfony components
 * Improve the Packagist description
@@ -367,7 +370,7 @@ Please read #2825 if you have issues with the behavior of Readable/Writable Link
 * Throw an `InvalidArgumentException` when trying to get an item from a collection route
 * Improve the debug bar panel visibility
 * Take into account the `route_prefix` attribute in subresources
-* Allow to use multiple values with `NumericFilter`
+* Allow using multiple values with `NumericFilter`
 * Improve exception handling in `ReadListener` by adding the previous exception
 
 ## 2.3.3
@@ -406,7 +409,7 @@ Please read #2825 if you have issues with the behavior of Readable/Writable Link
 * Add support for deprecating resources, operations and fields in GraphQL, Hydra and Swagger
 * Add API Platform panels in the Symfony profiler and in the web debug toolbar
 * Make resource class's constructor parameters writable
-* Add support for interface as a resource
+* Add support for interfaces as resources
 * Add a shortcut syntax to define attributes at the root of `@ApiResource` and `@ApiProperty` annotations
 * Throw an exception if a required filter isn't set
 * Allow to specify the message when access is denied using the `access_control_message` attribute
@@ -481,7 +484,7 @@ Please read #2825 if you have issues with the behavior of Readable/Writable Link
 
 ## 2.2.5
 
-* Fix a various issues preventing the metadata cache to work properly (performance fix)
+* Fix various issues preventing the metadata cache to work properly (performance fix)
 * Fix a cache corruption issue when using subresources
 * Fix non-standard outputs when using the HAL format
 * Persist data in Doctrine DataPersister only if needed
@@ -499,7 +502,7 @@ Please read #2825 if you have issues with the behavior of Readable/Writable Link
 ## 2.2.3
 
 * Fix object state inconsistency after persistence
-* Allow to use multiple `@ApiFilter` annotations on the same class
+* Allow using multiple `@ApiFilter` annotations on the same class
 * Fix a BC break when the serialization context builder depends of the retrieved data
 * Fix a bug regarding collections handling in the GraphQL endpoint
 
@@ -534,8 +537,8 @@ Please read #2825 if you have issues with the behavior of Readable/Writable Link
 * Deprecate the `ApiPlatform\Core\Bridge\Doctrine\EventListener\WriteListener` class in favor of the new `ApiPlatform\Core\EventListener\WriteListener` class.
 * Remove the `api_platform.doctrine.listener.view.write` event listener service.
 * Add a data persistence layer with a new `ApiPlatform\Core\DataPersister\DataPersisterInterface` interface.
-* Add the a new configuration to disable the API entrypoint and the documentation
-* Allow to set maximum items per page at operation/resource level
+* Add a new configuration to disable the API entrypoint and the documentation
+* Allow setting maximum items per page at operation/resource level
 * Add the ability to customize the message when configuring an access control rule trough the `access_control_message` attribute
 * Allow empty operations in XML configs
 
@@ -554,9 +557,9 @@ Please read #2825 if you have issues with the behavior of Readable/Writable Link
 * Add support for the immutable date and time types introduced in Doctrine
 * Fix the Doctrine query generated to retrieve nested subresources
 * Fix several bugs in the automatic eager loading support
-* Fix a bug occurring when passing neither an IRI nor an array in an embedded relation
-* Allow to request `0` items per page in collections
-* Also copy the `Host` from the Symfony Router
+* Fix a bug occurring when passing neither an IRI, nor an array in an embedded relation
+* Allow requesting `0` items per page in collections
+* Copy the `Host` from the Symfony Router
 * `Paginator::getLastPage()` now always returns a `float`
 * Minor performance improvements
 * Minor quality fixes
@@ -566,7 +569,7 @@ Please read #2825 if you have issues with the behavior of Readable/Writable Link
 * Symfony 3.4 and 4.0 compatibility
 * Autowiring strict mode compatibility
 * Fix a bug preventing to create resource classes in the global namespace
-* Fix Doctrine type conversion in filter's WHERE clauses
+* Fix Doctrine type conversion in filters WHERE clauses
 * Fix filters when using eager loading and non-association composite identifier
 * Fix Doctrine type resolution for identifiers (for custom DBALType)
 * Add missing Symfony Routing options to operations configuration
@@ -621,9 +624,9 @@ Please read #2825 if you have issues with the behavior of Readable/Writable Link
 * Add a flag to disable all request listeners
 * Add a default order option in the configuration
 * Allow to disable all operations using the XML configuration format and deprecate the previous format
-* Allow upper cased property names
+* Allow upper-cased property names
 * Improve the overall performance by optimizing `RequestAttributesExtractor`
-* Improve the performance of the filters subsystem by using a PSR-11 service locator and deprecate the `FilterCollection` class
+* Improve the performance of the filter subsystem by using a PSR-11 service locator and deprecate the `FilterCollection` class
 * Add compatibility with Symfony Flex and Symfony 4
 * Allow the Symfony Dependency Injection component to autoconfigure data providers and query extensions
 * Allow to use service for dynamic validation groups
@@ -721,7 +724,7 @@ Please read #2825 if you have issues with the behavior of Readable/Writable Link
 * Fix the support of the Symfony's serializer @MaxDepth annotation
 * Fix property range of relations in the Hydra doc when an IRI is used
 * Fix an error "api:swagger:export" command when decorating the Swagger normalizer
-* Fix an an error in the Swagger documentation generator when a property has several serialization groups
+* Fix an error in the Swagger documentation generator when a property has several serialization groups
 
 ## 2.0.1
 
@@ -759,7 +762,7 @@ Please read #2825 if you have issues with the behavior of Readable/Writable Link
 * Add a range filter
 * Search filter: add a case sensitivity setting
 * Search filter: fix the behavior of the search filter when 0 is provided as value
-* Search filter: allow to use identifiers different than id
+* Search filter: allow using identifiers different from id
 * Exclude tests from classmap
 * Fix some deprecations and tests
 
@@ -805,4 +808,4 @@ Please read #2825 if you have issues with the behavior of Readable/Writable Link
 ## 1.0.0 beta 2
 
 * Preserve indexes when normalizing and denormalizing associative arrays
-* Allow to set default order for property when registering a `Doctrine\Orm\Filter\OrderFilter` instance
+* Allow setting default order for property when registering a `Doctrine\Orm\Filter\OrderFilter` instance
