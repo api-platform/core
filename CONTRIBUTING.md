@@ -97,11 +97,13 @@ Coverage will be available in `coverage/index.html`.
 
 The command to launch Behat tests is:
 
-    ./vendor/bin/behat --suite=default --stop-on-failure -vvv
+    php -d memory_limit=-1 ./vendor/bin/behat --suite=default --stop-on-failure --format=progress
 
 If you want to launch Behat tests for MongoDB, the command is:
 
-    APP_ENV=mongodb ./vendor/bin/behat --suite=mongodb --stop-on-failure -vvv
+    APP_ENV=mongodb php -d memory_limit=-1 ./vendor/bin/behat --suite=mongodb --stop-on-failure --format=progress
+
+To get more details about an error, replace `--format=progress` by `-vvv`.
 
 ## Squash your Commits
 
