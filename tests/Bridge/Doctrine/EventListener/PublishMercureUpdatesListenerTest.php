@@ -88,7 +88,7 @@ class PublishMercureUpdatesListenerTest extends TestCase
         $targets = [];
         $publisher = function (Update $update) use (&$topics, &$targets): string {
             $topics = array_merge($topics, $update->getTopics());
-            $targets[] = $update->getTargets();
+            $targets[] = $update->getTargets(); // @phpstan-ignore-line
 
             return 'id';
         };

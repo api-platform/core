@@ -185,7 +185,6 @@ final class PublishMercureUpdatesListener
 
     /**
      * @param object $entity
-     * @param array
      */
     private function publishUpdate($entity, array $options): void
     {
@@ -207,8 +206,11 @@ final class PublishMercureUpdatesListener
         if (method_exists(Update::class, 'isPrivate')) {
             $update = new Update($iri, $data, $options['private'] ?? false, $options['id'] ?? null, $options['type'] ?? null, $options['retry'] ?? null);
         } else {
-            // Mercure Component < 0.4
-            // @phpstan-ignore-next-line
+            /**
+             * Mercure Component < 0.4.
+             *
+             * @phpstan-ignore-next-line
+             */
             $update = new Update($iri, $data, $options);
         }
         $this->messageBus ? $this->dispatch($update) : ($this->publisher)($update);
