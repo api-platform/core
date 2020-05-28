@@ -428,7 +428,7 @@ Feature: GraphQL introspection support
     And the JSON node "data.typeCreatePayloadData.fields[3].type.name" should be equal to "createDummyGroupNestedPayload"
     And the JSON node "data.typeCreateNestedPayload.fields[0].name" should be equal to "id"
 
-  Scenario: Retrieve an item through a GraphQL query
+  Scenario: Retrieve a type name through a GraphQL query
     Given there are 4 dummy objects with relatedDummy
     When I send the following GraphQL request:
     """
@@ -449,3 +449,28 @@ Feature: GraphQL introspection support
     And the JSON node "data.dummy.name" should be equal to "Dummy #3"
     And the JSON node "data.dummy.relatedDummy.name" should be equal to "RelatedDummy #3"
     And the JSON node "data.dummy.relatedDummy.__typename" should be equal to "RelatedDummy"
+
+  Scenario: Introspect a type available only through relations
+    When I send the following GraphQL request:
+    """
+    {
+      typeNotAvailable: __type(name: "VoDummyInspectionConnection") {
+        description
+      }
+      typeOwner: __type(name: "VoDummyCar") {
+        description,
+        fields {
+          name
+          type {
+            name
+          }
+        }
+      }
+    }
+    """
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/json"
+    And the JSON node "errors[0].debugMessage" should be equal to 'Type with id "VoDummyInspectionConnection" is not present in the types container'
+    And the JSON node "data.typeNotAvailable" should be null
+    And the JSON node "data.typeOwner.fields[3].type.name" should be equal to "VoDummyInspectionConnection"

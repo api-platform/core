@@ -132,11 +132,6 @@ class DoctrineDummy
     private $key;
 
     /**
-     * @Field(type="file")
-     */
-    private $file;
-
-    /**
      * @Field(type="hash")
      */
     private $hash;

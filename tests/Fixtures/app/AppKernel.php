@@ -17,6 +17,8 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\User;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\TestBundle;
 use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
 use Doctrine\Bundle\MongoDBBundle\DoctrineMongoDBBundle;
+use Doctrine\Common\Inflector\Inflector;
+use Doctrine\Inflector\InflectorFactory;
 use FOS\UserBundle\FOSUserBundle;
 use Nelmio\ApiDocBundle\NelmioApiDocBundle;
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
@@ -48,6 +50,12 @@ class AppKernel extends Kernel
 
         // patch for behat/symfony2-extension not supporting %env(APP_ENV)%
         $this->environment = $_SERVER['APP_ENV'] ?? $environment;
+
+        // patch for old versions of Doctrine Inflector, to delete when we'll drop support for v1
+        // see https://github.com/doctrine/inflector/issues/147#issuecomment-628807276
+        if (!class_exists(InflectorFactory::class)) {
+            Inflector::rules('plural', ['/taxon/i' => 'taxa']);
+        }
     }
 
     public function registerBundles(): array

@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Operation;
 
-use Doctrine\Common\Inflector\Inflector;
+use ApiPlatform\Core\Util\Inflector;
 
 /**
  * Generate a path name with an underscore separator according to a string and whether it's a collection or not.

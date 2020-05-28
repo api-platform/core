@@ -255,6 +255,12 @@ services:
         tags:
             -  { name: 'api_platform.data_transformer' }
 
+    app.data_transformer.custom_output_dto_fallback_same_class:
+        class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\DataTransformer\OutputDtoSameClassTransformer'
+        public: false
+        tags:
+            - { name: 'api_platform.data_transformer' }
+
     app.data_transformer.input_dto:
         class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\DataTransformer\InputDtoDataTransformer'
         public: false

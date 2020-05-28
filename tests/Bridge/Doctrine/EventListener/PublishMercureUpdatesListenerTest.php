@@ -39,8 +39,12 @@ use Symfony\Component\Serializer\SerializerInterface;
  */
 class PublishMercureUpdatesListenerTest extends TestCase
 {
-    public function testPublishUpdate(): void
+    public function testLegacyPublishUpdate(): void
     {
+        if (method_exists(Update::class, 'isPrivate')) {
+            $this->markTestSkipped();
+        }
+
         $toInsert = new Dummy();
         $toInsert->setId(1);
         $toInsertNotResource = new NotAResource('foo', 'bar');
@@ -86,7 +90,7 @@ class PublishMercureUpdatesListenerTest extends TestCase
         $targets = [];
         $publisher = function (Update $update) use (&$topics, &$targets): string {
             $topics = array_merge($topics, $update->getTopics());
-            $targets[] = $update->getTargets();
+            $targets[] = $update->getTargets(); // @phpstan-ignore-line
 
             return 'id';
         };
@@ -117,8 +121,97 @@ class PublishMercureUpdatesListenerTest extends TestCase
         $this->assertSame([[], [], [], ['foo', 'bar']], $targets);
     }
 
+    public function testPublishUpdate(): void
+    {
+        if (!method_exists(Update::class, 'isPrivate')) {
+            $this->markTestSkipped();
+        }
+
+        $toInsert = new Dummy();
+        $toInsert->setId(1);
+        $toInsertNotResource = new NotAResource('foo', 'bar');
+
+        $toUpdate = new Dummy();
+        $toUpdate->setId(2);
+        $toUpdateNoMercureAttribute = new DummyCar();
+
+        $toDelete = new Dummy();
+        $toDelete->setId(3);
+        $toDeleteExpressionLanguage = new DummyFriend();
+        $toDeleteExpressionLanguage->setId(4);
+
+        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
+        $resourceClassResolverProphecy->getResourceClass(Argument::type(Dummy::class))->willReturn(Dummy::class);
+        $resourceClassResolverProphecy->getResourceClass(Argument::type(DummyCar::class))->willReturn(DummyCar::class);
+        $resourceClassResolverProphecy->getResourceClass(Argument::type(DummyFriend::class))->willReturn(DummyFriend::class);
+        $resourceClassResolverProphecy->isResourceClass(Dummy::class)->willReturn(true);
+        $resourceClassResolverProphecy->isResourceClass(NotAResource::class)->willReturn(false);
+        $resourceClassResolverProphecy->isResourceClass(DummyCar::class)->willReturn(true);
+        $resourceClassResolverProphecy->isResourceClass(DummyFriend::class)->willReturn(true);
+
+        $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
+        $iriConverterProphecy->getIriFromItem($toInsert, UrlGeneratorInterface::ABS_URL)->willReturn('http://example.com/dummies/1')->shouldBeCalled();
+        $iriConverterProphecy->getIriFromItem($toUpdate, UrlGeneratorInterface::ABS_URL)->willReturn('http://example.com/dummies/2')->shouldBeCalled();
+        $iriConverterProphecy->getIriFromItem($toDelete, UrlGeneratorInterface::ABS_URL)->willReturn('http://example.com/dummies/3')->shouldBeCalled();
+        $iriConverterProphecy->getIriFromItem($toDelete)->willReturn('/dummies/3')->shouldBeCalled();
+        $iriConverterProphecy->getIriFromItem($toDeleteExpressionLanguage)->willReturn('/dummy_friends/4')->shouldBeCalled();
+        $iriConverterProphecy->getIriFromItem($toDeleteExpressionLanguage, UrlGeneratorInterface::ABS_URL)->willReturn('http://example.com/dummy_friends/4')->shouldBeCalled();
+
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
+        $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadata(null, null, null, null, null, ['mercure' => true, 'normalization_context' => ['groups' => ['foo', 'bar']]]));
+        $resourceMetadataFactoryProphecy->create(DummyCar::class)->willReturn(new ResourceMetadata());
+        $resourceMetadataFactoryProphecy->create(DummyFriend::class)->willReturn(new ResourceMetadata(null, null, null, null, null, ['mercure' => ['private' => true, 'retry' => 10]]));
+
+        $serializerProphecy = $this->prophesize(SerializerInterface::class);
+        $serializerProphecy->serialize($toInsert, 'jsonld', ['groups' => ['foo', 'bar']])->willReturn('1');
+        $serializerProphecy->serialize($toUpdate, 'jsonld', ['groups' => ['foo', 'bar']])->willReturn('2');
+
+        $formats = ['jsonld' => ['application/ld+json'], 'jsonhal' => ['application/hal+json']];
+
+        $topics = [];
+        $private = [];
+        $retry = [];
+        $publisher = function (Update $update) use (&$topics, &$private, &$retry): string {
+            $topics = array_merge($topics, $update->getTopics());
+            $private[] = $update->isPrivate();
+            $retry[] = $update->getRetry();
+
+            return 'id';
+        };
+
+        $listener = new PublishMercureUpdatesListener(
+            $resourceClassResolverProphecy->reveal(),
+            $iriConverterProphecy->reveal(),
+            $resourceMetadataFactoryProphecy->reveal(),
+            $serializerProphecy->reveal(),
+            $formats,
+            null,
+            $publisher
+        );
+
+        $uowProphecy = $this->prophesize(UnitOfWork::class);
+        $uowProphecy->getScheduledEntityInsertions()->willReturn([$toInsert, $toInsertNotResource])->shouldBeCalled();
+        $uowProphecy->getScheduledEntityUpdates()->willReturn([$toUpdate, $toUpdateNoMercureAttribute])->shouldBeCalled();
+        $uowProphecy->getScheduledEntityDeletions()->willReturn([$toDelete, $toDeleteExpressionLanguage])->shouldBeCalled();
+
+        $emProphecy = $this->prophesize(EntityManagerInterface::class);
+        $emProphecy->getUnitOfWork()->willReturn($uowProphecy->reveal())->shouldBeCalled();
+        $eventArgs = new OnFlushEventArgs($emProphecy->reveal());
+
+        $listener->onFlush($eventArgs);
+        $listener->postFlush();
+
+        $this->assertSame(['http://example.com/dummies/1', 'http://example.com/dummies/2', 'http://example.com/dummies/3', 'http://example.com/dummy_friends/4'], $topics);
+        $this->assertSame([false, false, false, true], $private);
+        $this->assertSame([null, null, null, 10], $retry);
+    }
+
     public function testPublishGraphQlUpdates(): void
     {
+        if (!method_exists(Update::class, 'isPrivate')) {
+            $this->markTestSkipped();
+        }
+
         $toUpdate = new Dummy();
         $toUpdate->setId(2);
 
@@ -138,11 +231,13 @@ class PublishMercureUpdatesListenerTest extends TestCase
         $formats = ['jsonld' => ['application/ld+json'], 'jsonhal' => ['application/hal+json']];
 
         $topics = [];
-        $targets = [];
+        $private = [];
+        $retry = [];
         $data = [];
-        $publisher = function (Update $update) use (&$topics, &$targets, &$data): string {
+        $publisher = function (Update $update) use (&$topics, &$private, &$retry, &$data): string {
             $topics = array_merge($topics, $update->getTopics());
-            $targets[] = $update->getTargets();
+            $private[] = $update->isPrivate();
+            $retry[] = $update->getRetry();
             $data[] = $update->getData();
 
             return 'id';
@@ -181,7 +276,8 @@ class PublishMercureUpdatesListenerTest extends TestCase
         $listener->postFlush();
 
         $this->assertSame(['http://example.com/dummies/2', 'subscription-topic-iri'], $topics);
-        $this->assertSame([[], []], $targets);
+        $this->assertSame([false, false], $private);
+        $this->assertSame([null, null], $retry);
         $this->assertSame(['2', '["data"]'], $data);
     }
 
@@ -204,7 +300,7 @@ class PublishMercureUpdatesListenerTest extends TestCase
     public function testInvalidMercureAttribute(): void
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('The value of the "mercure" attribute of the "ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy" resource class must be a boolean, an array of targets or a valid expression, "integer" given.');
+        $this->expectExceptionMessage('The value of the "mercure" attribute of the "ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy" resource class must be a boolean, an array of options or an expression returning this array, "integer" given.');
 
         $toInsert = new Dummy();
 

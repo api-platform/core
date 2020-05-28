@@ -41,6 +41,15 @@ use Symfony\Component\Serializer\SerializerInterface;
  */
 final class PublishMercureUpdatesListener
 {
+    private const ALLOWED_KEYS = [
+        'topics' => true,
+        'data' => true,
+        'private' => true,
+        'id' => true,
+        'type' => true,
+        'retry' => true,
+    ];
+
     use DispatchTrait;
     use ResourceClassInfoTrait;
 
@@ -144,60 +153,75 @@ final class PublishMercureUpdatesListener
             return;
         }
 
-        $value = $this->resourceMetadataFactory->create($resourceClass)->getAttribute('mercure', false);
-        if (false === $value) {
+        $options = $this->resourceMetadataFactory->create($resourceClass)->getAttribute('mercure', false);
+        if (false === $options) {
             return;
         }
 
-        if (\is_string($value)) {
+        if (\is_string($options)) {
             if (null === $this->expressionLanguage) {
                 throw new RuntimeException('The Expression Language component is not installed. Try running "composer require symfony/expression-language".');
             }
 
-            $value = $this->expressionLanguage->evaluate($value, ['object' => $object]);
+            $options = $this->expressionLanguage->evaluate($options, ['object' => $object]);
         }
 
-        if (true === $value) {
-            $value = [];
+        if (true === $options) {
+            $options = [];
         }
 
-        if (!\is_array($value)) {
-            throw new InvalidArgumentException(sprintf('The value of the "mercure" attribute of the "%s" resource class must be a boolean, an array of targets or a valid expression, "%s" given.', $resourceClass, \gettype($value)));
+        if (!\is_array($options)) {
+            throw new InvalidArgumentException(sprintf('The value of the "mercure" attribute of the "%s" resource class must be a boolean, an array of options or an expression returning this array, "%s" given.', $resourceClass, \gettype($options)));
+        }
+
+        foreach ($options as $key => $value) {
+            if (0 === $key) {
+                if (method_exists(Update::class, 'isPrivate')) {
+                    throw new \InvalidArgumentException('Targets do not exist anymore since Mercure 0.10. Mark the update as private instead or downgrade the Mercure Component to version 0.3');
+                }
+
+                @trigger_error('Targets do not exist anymore since Mercure 0.10. Mark the update as private instead.', E_USER_DEPRECATED);
+                break;
+            }
+
+            if (!isset(self::ALLOWED_KEYS[$key])) {
+                throw new InvalidArgumentException(sprintf('The option "%s" set in the "mercure" attribute of the "%s" resource does not exist. Existing options: "%s"', $key, $resourceClass, implode('", "', self::ALLOWED_KEYS)));
+            }
         }
 
         if ('deletedObjects' === $property) {
             $this->deletedObjects[(object) [
                 'id' => $this->iriConverter->getIriFromItem($object),
                 'iri' => $this->iriConverter->getIriFromItem($object, UrlGeneratorInterface::ABS_URL),
-            ]] = $value;
+            ]] = $options;
 
             return;
         }
 
-        $this->{$property}[$object] = $value;
+        $this->{$property}[$object] = $options;
     }
 
     /**
      * @param object $object
      */
-    private function publishUpdate($object, array $targets, string $type): void
+    private function publishUpdate($object, array $options, string $type): void
     {
         if ($object instanceof \stdClass) {
             // By convention, if the object has been deleted, we send only its IRI.
             // This may change in the feature, because it's not JSON Merge Patch compliant,
             // and I'm not a fond of this approach.
-            $iri = $object->iri;
+            $iri = $options['topics'] ?? $object->iri;
             /** @var string $data */
-            $data = json_encode(['@id' => $object->id]);
+            $data = $options['data'] ?? json_encode(['@id' => $object->id]);
         } else {
             $resourceClass = $this->getObjectClass($object);
             $context = $this->resourceMetadataFactory->create($resourceClass)->getAttribute('normalization_context', []);
 
-            $iri = $this->iriConverter->getIriFromItem($object, UrlGeneratorInterface::ABS_URL);
-            $data = $this->serializer->serialize($object, key($this->formats), $context);
+            $iri = $options['topics'] ?? $this->iriConverter->getIriFromItem($object, UrlGeneratorInterface::ABS_URL);
+            $data = $options['data'] ?? $this->serializer->serialize($object, key($this->formats), $context);
         }
 
-        $updates = array_merge([new Update($iri, $data, $targets)], $this->getGraphQlSubscriptionUpdates($object, $targets, $type));
+        $updates = array_merge([$this->buildUpdate($iri, $data, $options)], $this->getGraphQlSubscriptionUpdates($object, $options, $type));
 
         foreach ($updates as $update) {
             $this->messageBus ? $this->dispatch($update) : ($this->publisher)($update);
@@ -209,7 +233,7 @@ final class PublishMercureUpdatesListener
      *
      * @return Update[]
      */
-    private function getGraphQlSubscriptionUpdates($object, array $targets, string $type): array
+    private function getGraphQlSubscriptionUpdates($object, array $options, string $type): array
     {
         if ('update' !== $type || !$this->graphQlSubscriptionManager || !$this->graphQlMercureSubscriptionIriGenerator) {
             return [];
@@ -219,13 +243,24 @@ final class PublishMercureUpdatesListener
 
         $updates = [];
         foreach ($payloads as [$subscriptionId, $data]) {
-            $updates[] = new Update(
+            $updates[] = $this->buildUpdate(
                 $this->graphQlMercureSubscriptionIriGenerator->generateTopicIri($subscriptionId),
                 (string) (new JsonResponse($data))->getContent(),
-                $targets
+                $options
             );
         }
 
         return $updates;
+    }
+
+    private function buildUpdate(string $iri, string $data, array $options): Update
+    {
+        if (method_exists(Update::class, 'isPrivate')) {
+            return new Update($iri, $data, $options['private'] ?? false, $options['id'] ?? null, $options['type'] ?? null, $options['retry'] ?? null);
+        }
+
+        // Mercure Component < 0.4.
+        /* @phpstan-ignore-next-line */
+        return new Update($iri, $data, $options);
     }
 }
