@@ -121,6 +121,10 @@ class PublishMercureUpdatesListenerTest extends TestCase
 
     public function testPublishUpdate(): void
     {
+        if (!method_exists(Update::class, 'isPrivate')) {
+            $this->markTestSkipped();
+        }
+
         $toInsert = new Dummy();
         $toInsert->setId(1);
         $toInsertNotResource = new NotAResource('foo', 'bar');
