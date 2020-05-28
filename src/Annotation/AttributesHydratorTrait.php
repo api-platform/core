@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Annotation;
 
 use ApiPlatform\Core\Exception\InvalidArgumentException;
-use Doctrine\Common\Inflector\Inflector;
+use ApiPlatform\Core\Util\Inflector;
 
 /**
  * Hydrates attributes from annotation's parameters.
