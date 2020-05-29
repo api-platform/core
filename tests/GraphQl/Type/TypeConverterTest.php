@@ -96,6 +96,19 @@ class TypeConverterTest extends TestCase
         $this->assertNull($graphqlType);
     }
 
+    public function testConvertTypeNodeResource(): void
+    {
+        $type = new Type(Type::BUILTIN_TYPE_OBJECT, false, 'node');
+
+        $this->typeBuilderProphecy->isCollection($type)->shouldBeCalled()->willReturn(false);
+        $this->resourceMetadataFactoryProphecy->create('node')->shouldBeCalled()->willReturn((new ResourceMetadata('Node'))->withGraphql(['test']));
+
+        $this->expectException(\UnexpectedValueException::class);
+        $this->expectExceptionMessage('A "Node" resource cannot be used with GraphQL because the type is already used by the Relay specification.');
+
+        $this->typeConverter->convertType($type, false, null, null, null, 'resourceClass', 'rootClass', null, 0);
+    }
+
     public function testConvertTypeResourceClassNotFound(): void
     {
         $type = new Type(Type::BUILTIN_TYPE_OBJECT, false, 'dummy');

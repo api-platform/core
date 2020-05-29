@@ -84,6 +84,44 @@ Feature: JSON-LD DTO input and output
     """
 
   @createSchema
+  Scenario: Get an item with same class as custom output
+    Given there is a DummyDtoOutputSameClass
+    When I send a "GET" request to "/dummy_dto_output_same_classes/1"
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+    And the JSON should be equal to:
+    """
+    {
+      "@context": "/contexts/DummyDtoOutputSameClass",
+      "@id": "/dummy_dto_output_same_classes/1",
+      "@type": "DummyDtoOutputSameClass",
+      "lorem": "test",
+      "ipsum": "modified",
+      "id": 1
+    }
+    """
+
+  @createSchema
+  Scenario: Get an item with a data transformer that will return the original class as a fallback
+    Given there is a DummyDtoOutputFallbackToSameClass
+    When I send a "GET" request to "/dummy_dto_output_fallback_to_same_classes/1"
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+    And the JSON should be equal to:
+    """
+    {
+      "@context": "/contexts/DummyDtoOutputFallbackToSameClass",
+      "@id": "/dummy_dto_output_fallback_to_same_classes/1",
+      "@type": "DummyDtoOutputFallbackToSameClass",
+      "lorem": "test",
+      "ipsum": "modified",
+      "id": 1
+    }
+    """
+
+  @createSchema
   Scenario: Create a DummyDtoCustom object without output
     When I send a "POST" request to "/dummy_dto_custom_post_without_output" with body:
     """

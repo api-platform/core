@@ -35,6 +35,8 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\DummyDifferentGraphQlSer
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\DummyDtoCustom as DummyDtoCustomDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\DummyDtoNoInput as DummyDtoNoInputDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\DummyDtoNoOutput as DummyDtoNoOutputDocument;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\DummyDtoOutputFallbackToSameClass as DummyDtoOutputFallbackToSameClassDocument;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\DummyDtoOutputSameClass as DummyDtoOutputSameClassDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\DummyFriend as DummyFriendDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\DummyGroup as DummyGroupDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\DummyMercure as DummyMercureDocument;
@@ -72,7 +74,6 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\CompositeItem;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\CompositeLabel;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\CompositePrimitiveItem;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\CompositeRelation;
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Container;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\ConvertedBoolean;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\ConvertedDate;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\ConvertedInteger;
@@ -91,6 +92,8 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyDifferentGraphQlSeria
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyDtoCustom;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyDtoNoInput;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyDtoNoOutput;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyDtoOutputFallbackToSameClass;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyDtoOutputSameClass;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyFriend;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyGroup;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyImmutableDate;
@@ -109,7 +112,6 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\FourthLevel;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Greeting;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\InternalUser;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\MaxDepthDummy;
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Node;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Order;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Person;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\PersonToPet;
@@ -1054,25 +1056,6 @@ final class DoctrineContext implements Context
     }
 
     /**
-     * @Given there are :nb nodes in a container :uuid
-     */
-    public function thereAreNodesInAContainer(int $nb, string $uuid)
-    {
-        $container = new Container();
-        $container->setId($uuid);
-        $this->manager->persist($container);
-
-        for ($i = 0; $i < $nb; ++$i) {
-            $node = new Node();
-            $node->setContainer($container);
-            $node->setSerial($i);
-            $this->manager->persist($node);
-        }
-
-        $this->manager->flush();
-    }
-
-    /**
      * @Then the password :password for user :user should be hashed
      */
     public function thePasswordForUserShouldBeHashed(string $password, string $user)
@@ -1382,6 +1365,32 @@ final class DoctrineContext implements Context
     }
 
     /**
+     * @Given there is a DummyDtoOutputSameClass
+     */
+    public function thereIsADummyDtoOutputSameClass()
+    {
+        $dto = $this->isOrm() ? new DummyDtoOutputSameClass() : new DummyDtoOutputSameClassDocument();
+        $dto->lorem = 'test';
+        $dto->ipsum = '1';
+        $this->manager->persist($dto);
+        $this->manager->flush();
+        $this->manager->clear();
+    }
+
+    /**
+     * @Given there is a DummyDtoOutputFallbackToSameClass
+     */
+    public function thereIsADummyDtoOutputFallbackToSameClass()
+    {
+        $dto = $this->isOrm() ? new DummyDtoOutputFallbackToSameClass() : new DummyDtoOutputFallbackToSameClassDocument();
+        $dto->lorem = 'test';
+        $dto->ipsum = '1';
+        $this->manager->persist($dto);
+        $this->manager->flush();
+        $this->manager->clear();
+    }
+
+    /**
      * @Given there is an order with same customer and recipient
      */
     public function thereIsAnOrderWithSameCustomerAndRecipient()
@@ -1474,7 +1483,7 @@ final class DoctrineContext implements Context
         $product = $this->isOrm() ? new Product() : new ProductDocument();
         $product->setCode($data['code']);
         if (isset($data['mainTaxon'])) {
-            $mainTaxonCode = str_replace('/taxons/', '', $data['mainTaxon']);
+            $mainTaxonCode = str_replace('/taxa/', '', $data['mainTaxon']);
             $mainTaxon = $this->manager->getRepository($this->isOrm() ? Taxon::class : TaxonDocument::class)->findOneBy([
                 'code' => $mainTaxonCode,
             ]);
