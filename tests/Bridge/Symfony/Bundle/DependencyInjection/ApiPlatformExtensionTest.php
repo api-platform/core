@@ -1012,6 +1012,11 @@ class ApiPlatformExtensionTest extends TestCase
             $containerBuilderProphecy->removeBindings(Argument::type('string'))->will(function () {});
         }
 
+        $containerBuilderProphecy->getDefinition(Argument::type('string'))
+            ->willReturn($this->prophesize(Definition::class)->reveal());
+        $containerBuilderProphecy->getAlias(Argument::type('string'))
+            ->willReturn($this->prophesize(Alias::class)->reveal());
+
         return $containerBuilderProphecy;
     }
 
@@ -1347,6 +1352,11 @@ class ApiPlatformExtensionTest extends TestCase
         $containerBuilderProphecy->removeDefinition('api_platform.cache_warmer.cache_pool_clearer')->will(function () {});
         $containerBuilderProphecy->getDefinition('api_platform.mercure.listener.response.add_link_header')->willReturn($definitionDummy);
         $containerBuilderProphecy->getDefinition('api_platform.doctrine.listener.mercure.publish')->willReturn($definitionDummy);
+
+        $containerBuilderProphecy->getDefinition(Argument::type('string'))
+            ->willReturn($this->prophesize(Definition::class)->reveal());
+        $containerBuilderProphecy->getAlias(Argument::type('string'))
+            ->willReturn($this->prophesize(Alias::class)->reveal());
 
         return $containerBuilderProphecy;
     }

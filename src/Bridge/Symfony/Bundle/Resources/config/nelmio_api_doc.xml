@@ -6,8 +6,6 @@
 
     <services>
         <service id="api_platform.nelmio_api_doc.annotations_provider" class="ApiPlatform\Core\Bridge\NelmioApiDoc\Extractor\AnnotationsProvider\ApiPlatformProvider">
-            <deprecated>The "%service_id%" service is deprecated since API Platform 2.2 and will be removed in 3.0. NelmioApiDocBundle 3 has native support for API Platform.</deprecated>
-
             <argument type="service" id="api_platform.metadata.resource.name_collection_factory" />
             <argument type="service" id="api_platform.hydra.normalizer.documentation" />
             <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
@@ -18,8 +16,6 @@
         </service>
 
         <service id="api_platform.nelmio_api_doc.parser" class="ApiPlatform\Core\Bridge\NelmioApiDoc\Parser\ApiPlatformParser">
-            <deprecated>The "%service_id%" service is deprecated since API Platform 2.2 and will be removed in 3.0. NelmioApiDocBundle 3 has native support for API Platform.</deprecated>
-
             <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
             <argument type="service" id="api_platform.metadata.property.name_collection_factory" />
             <argument type="service" id="api_platform.metadata.property.metadata_factory" />

@@ -26,6 +26,7 @@ use GraphQL\GraphQL;
 use Symfony\Bundle\FullStack;
 use Symfony\Bundle\MercureBundle\MercureBundle;
 use Symfony\Bundle\TwigBundle\TwigBundle;
+use Symfony\Component\Config\Definition\BaseNode;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
@@ -85,7 +86,7 @@ final class Configuration implements ConfigurationInterface
                 ->booleanNode('show_webby')->defaultTrue()->info('If true, show Webby on the documentation page')->end()
                 ->scalarNode('default_operation_path_resolver')
                     ->defaultValue('api_platform.operation_path_resolver.underscore')
-                    ->setDeprecated('The use of the `default_operation_path_resolver` has been deprecated in 2.1 and will be removed in 3.0. Use `path_segment_name_generator` instead.')
+                    ->setDeprecated(...$this->buildDeprecationArgs('2.1', 'The use of the `default_operation_path_resolver` has been deprecated in 2.1 and will be removed in 3.0. Use `path_segment_name_generator` instead.'))
                     ->info('Specify the default operation path resolver to use for generating resources operations path.')
                 ->end()
                 ->scalarNode('name_converter')->defaultNull()->info('Specify a name converter to use.')->end()
@@ -109,7 +110,7 @@ final class Configuration implements ConfigurationInterface
                 ->booleanNode('enable_fos_user')->defaultValue(class_exists(FOSUserBundle::class))->info('Enable the FOSUserBundle integration.')->end()
                 ->booleanNode('enable_nelmio_api_doc')
                     ->defaultFalse()
-                    ->setDeprecated('Enabling the NelmioApiDocBundle integration has been deprecated in 2.2 and will be removed in 3.0. NelmioApiDocBundle 3 has native support for API Platform.')
+                    ->setDeprecated(...$this->buildDeprecationArgs('2.2', 'Enabling the NelmioApiDocBundle integration has been deprecated in 2.2 and will be removed in 3.0. NelmioApiDocBundle 3 has native support for API Platform.'))
                     ->info('Enable the NelmioApiDocBundle integration.')
                 ->end()
                 ->booleanNode('enable_swagger')->defaultTrue()->info('Enable the Swagger documentation and export.')->end()
@@ -493,5 +494,12 @@ final class Configuration implements ConfigurationInterface
                     ->end()
                 ->end()
             ->end();
+    }
+
+    private function buildDeprecationArgs(string $version, string $message): array
+    {
+        return method_exists(BaseNode::class, 'getDeprecation')
+            ? ['api-platform/core', $version, $message]
+            : [$message];
     }
 }

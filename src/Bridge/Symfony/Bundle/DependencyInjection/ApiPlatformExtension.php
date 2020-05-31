@@ -41,6 +41,7 @@ use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Resource\DirectoryResource;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
@@ -144,6 +145,19 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $loader->load('data_persister.xml');
         $loader->load('data_provider.xml');
         $loader->load('filter.xml');
+
+        $container->getDefinition('api_platform.operation_method_resolver')
+            ->setDeprecated(...$this->buildDeprecationArgs('2.5', 'The "%service_id%" service is deprecated since API Platform 2.5.'));
+        $container->getDefinition('api_platform.formats_provider')
+            ->setDeprecated(...$this->buildDeprecationArgs('2.5', 'The "%service_id%" service is deprecated since API Platform 2.5.'));
+        $container->getAlias('ApiPlatform\Core\Api\OperationAwareFormatsProviderInterface')
+            ->setDeprecated(...$this->buildDeprecationArgs('2.5', 'The "%alias_id%" alias is deprecated since API Platform 2.5.'));
+        $container->getDefinition('api_platform.operation_path_resolver.underscore')
+            ->setDeprecated(...$this->buildDeprecationArgs('2.1', 'The "%service_id%" service is deprecated since API Platform 2.1 and will be removed in 3.0. Use "api_platform.path_segment_name_generator.underscore" instead.'));
+        $container->getDefinition('api_platform.operation_path_resolver.dash')
+            ->setDeprecated(...$this->buildDeprecationArgs('2.1', 'The "%service_id%" service is deprecated since API Platform 2.1 and will be removed in 3.0. Use "api_platform.path_segment_name_generator.dash" instead.'));
+        $container->getDefinition('api_platform.filters')
+            ->setDeprecated(...$this->buildDeprecationArgs('2.1', 'The "%service_id%" service is deprecated since 2.1 and will be removed in 3.0. Use the "api_platform.filter_locator" service instead.'));
 
         if (class_exists(Uuid::class)) {
             $loader->load('ramsey_uuid.xml');
@@ -416,6 +430,11 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
 
         if (isset($bundles['NelmioApiDocBundle']) && $config['enable_nelmio_api_doc']) {
             $loader->load('nelmio_api_doc.xml');
+
+            $container->getDefinition('api_platform.nelmio_api_doc.annotations_provider')
+                ->setDeprecated(...$this->buildDeprecationArgs('2.2', 'The "%service_id%" service is deprecated since API Platform 2.2 and will be removed in 3.0. NelmioApiDocBundle 3 has native support for API Platform.'));
+            $container->getDefinition('api_platform.nelmio_api_doc.parser')
+                ->setDeprecated(...$this->buildDeprecationArgs('2.2', 'The "%service_id%" service is deprecated since API Platform 2.2 and will be removed in 3.0. NelmioApiDocBundle 3 has native support for API Platform.'));
         }
     }
 
@@ -608,5 +627,12 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         if (isset($bundles['SecurityBundle'])) {
             $loader->load('security.xml');
         }
+    }
+
+    private function buildDeprecationArgs(string $version, string $message): array
+    {
+        return method_exists(Definition::class, 'getDeprecation')
+            ? ['api-platform/core', $version, $message]
+            : [true, $message];
     }
 }
