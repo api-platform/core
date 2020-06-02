@@ -62,6 +62,10 @@ final class TypeConverter implements TypeConverterInterface
                 return GraphQLType::string();
             case Type::BUILTIN_TYPE_ARRAY:
             case Type::BUILTIN_TYPE_ITERABLE:
+                if ($resourceType = $this->getResourceType($type, $input, $queryName, $mutationName, $depth)) {
+                    return $resourceType;
+                }
+
                 return 'Iterable';
             case Type::BUILTIN_TYPE_OBJECT:
                 if ($input && $depth > 0) {
