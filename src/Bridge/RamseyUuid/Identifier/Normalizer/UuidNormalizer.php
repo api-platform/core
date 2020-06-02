@@ -43,6 +43,6 @@ final class UuidNormalizer implements DenormalizerInterface
      */
     public function supportsDenormalization($data, $type, $format = null)
     {
-        return is_a($type, UuidInterface::class, true);
+        return \is_string($data) && is_a($type, UuidInterface::class, true);
     }
 }

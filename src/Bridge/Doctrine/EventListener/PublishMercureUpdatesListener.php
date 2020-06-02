@@ -36,11 +36,19 @@ use Symfony\Component\Serializer\SerializerInterface;
  */
 final class PublishMercureUpdatesListener
 {
+    private const ALLOWED_KEYS = [
+        'topics' => true,
+        'data' => true,
+        'private' => true,
+        'id' => true,
+        'type' => true,
+        'retry' => true,
+    ];
+
     use DispatchTrait;
     use ResourceClassInfoTrait;
 
     private $iriConverter;
-    private $resourceMetadataFactory;
     private $serializer;
     private $publisher;
     private $expressionLanguage;
@@ -127,60 +135,84 @@ final class PublishMercureUpdatesListener
             return;
         }
 
-        $value = $this->resourceMetadataFactory->create($resourceClass)->getAttribute('mercure', false);
-        if (false === $value) {
+        $options = $this->resourceMetadataFactory->create($resourceClass)->getAttribute('mercure', false);
+        if (false === $options) {
             return;
         }
 
-        if (\is_string($value)) {
+        if (\is_string($options)) {
             if (null === $this->expressionLanguage) {
                 throw new RuntimeException('The Expression Language component is not installed. Try running "composer require symfony/expression-language".');
             }
 
-            $value = $this->expressionLanguage->evaluate($value, ['object' => $entity]);
+            $options = $this->expressionLanguage->evaluate($options, ['object' => $entity]);
         }
 
-        if (true === $value) {
-            $value = [];
+        if (true === $options) {
+            $options = [];
         }
 
-        if (!\is_array($value)) {
-            throw new InvalidArgumentException(sprintf('The value of the "mercure" attribute of the "%s" resource class must be a boolean, an array of targets or a valid expression, "%s" given.', $resourceClass, \gettype($value)));
+        if (!\is_array($options)) {
+            throw new InvalidArgumentException(sprintf('The value of the "mercure" attribute of the "%s" resource class must be a boolean, an array of options or an expression returning this array, "%s" given.', $resourceClass, \gettype($options)));
+        }
+
+        foreach ($options as $key => $value) {
+            if (0 === $key) {
+                if (method_exists(Update::class, 'isPrivate')) {
+                    throw new \InvalidArgumentException('Targets do not exist anymore since Mercure 0.10. Mark the update as private instead or downgrade the Mercure Component to version 0.3');
+                }
+
+                @trigger_error('Targets do not exist anymore since Mercure 0.10. Mark the update as private instead.', E_USER_DEPRECATED);
+                break;
+            }
+
+            if (!isset(self::ALLOWED_KEYS[$key])) {
+                throw new InvalidArgumentException(sprintf('The option "%s" set in the "mercure" attribute of the "%s" resource does not exist. Existing options: "%s"', $key, $resourceClass, implode('", "', self::ALLOWED_KEYS)));
+            }
         }
 
         if ('deletedEntities' === $property) {
             $this->deletedEntities[(object) [
                 'id' => $this->iriConverter->getIriFromItem($entity),
                 'iri' => $this->iriConverter->getIriFromItem($entity, UrlGeneratorInterface::ABS_URL),
-            ]] = $value;
+            ]] = $options;
 
             return;
         }
 
-        $this->{$property}[$entity] = $value;
+        $this->{$property}[$entity] = $options;
     }
 
     /**
      * @param object $entity
      */
-    private function publishUpdate($entity, array $targets): void
+    private function publishUpdate($entity, array $options): void
     {
         if ($entity instanceof \stdClass) {
             // By convention, if the entity has been deleted, we send only its IRI
             // This may change in the feature, because it's not JSON Merge Patch compliant,
             // and I'm not a fond of this approach
-            $iri = $entity->iri;
+            $iri = $options['topics'] ?? $entity->iri;
             /** @var string $data */
-            $data = json_encode(['@id' => $entity->id]);
+            $data = $options['data'] ?? json_encode(['@id' => $entity->id]);
         } else {
             $resourceClass = $this->getObjectClass($entity);
             $context = $this->resourceMetadataFactory->create($resourceClass)->getAttribute('normalization_context', []);
 
-            $iri = $this->iriConverter->getIriFromItem($entity, UrlGeneratorInterface::ABS_URL);
-            $data = $this->serializer->serialize($entity, key($this->formats), $context);
+            $iri = $options['topics'] ?? $this->iriConverter->getIriFromItem($entity, UrlGeneratorInterface::ABS_URL);
+            $data = $options['data'] ?? $this->serializer->serialize($entity, key($this->formats), $context);
         }
 
-        $update = new Update($iri, $data, $targets);
+        if (method_exists(Update::class, 'isPrivate')) {
+            $update = new Update($iri, $data, $options['private'] ?? false, $options['id'] ?? null, $options['type'] ?? null, $options['retry'] ?? null);
+        } else {
+            /**
+             * Mercure Component < 0.4.
+             *
+             * @phpstan-ignore-next-line
+             */
+            $update = new Update($iri, $data, $options);
+        }
         $this->messageBus ? $this->dispatch($update) : ($this->publisher)($update);
     }
 }

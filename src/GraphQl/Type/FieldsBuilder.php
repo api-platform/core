@@ -21,7 +21,7 @@ use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
-use Doctrine\Common\Inflector\Inflector;
+use ApiPlatform\Core\Util\Inflector;
 use GraphQL\Type\Definition\InputObjectType;
 use GraphQL\Type\Definition\NullableType;
 use GraphQL\Type\Definition\Type as GraphQLType;
