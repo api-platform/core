@@ -16,6 +16,8 @@ namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity;
 use ApiPlatform\Core\Annotation\ApiResource;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Dto\InputDto;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Dto\OutputDto;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -28,6 +30,11 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class DummyDtoInputOutput
 {
+    public function __construct()
+    {
+        $this->relatedDummies = new ArrayCollection();
+    }
+
     /**
      * @var int The id
      * @ORM\Column(type="integer")
@@ -47,4 +54,10 @@ class DummyDtoInputOutput
      * @ORM\Column(type="float")
      */
     public $num;
+
+    /**
+     * @var Collection<RelatedDummy>
+     * @ORM\ManyToMany(targetEntity="RelatedDummy")
+     */
+    public $relatedDummies;
 }

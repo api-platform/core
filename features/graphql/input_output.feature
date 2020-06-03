@@ -5,12 +5,14 @@ Feature: GraphQL DTO input and output
 
   @createSchema
   Scenario: Retrieve an Output with GraphQL
+    Given there is a RelatedDummy with 0 friends
     When I add "Content-Type" header equal to "application/ld+json"
     And I send a "POST" request to "/dummy_dto_input_outputs" with body:
     """
     {
       "foo": "test",
-      "bar": 1
+      "bar": 1,
+      "relatedDummies": ["/related_dummies/1"]
     }
     """
     Then the response status code should be 201
@@ -22,20 +24,51 @@ Feature: GraphQL DTO input and output
         "hydra": "http://www.w3.org/ns/hydra/core#",
         "id": "OutputDto/id",
         "baz": "OutputDto/baz",
-        "bat": "OutputDto/bat"
+        "bat": "OutputDto/bat",
+        "relatedDummies": "OutputDto/relatedDummies"
       },
       "@type": "DummyDtoInputOutput",
       "@id": "/dummy_dto_input_outputs/1",
       "id": 1,
       "baz": 1,
-      "bat": "test"
+      "bat": "test",
+      "relatedDummies": [
+        {
+          "@context": "/contexts/RelatedDummy",
+          "@id": "/related_dummies/1",
+          "@type": "https://schema.org/Product",
+          "name": "RelatedDummy with friends",
+          "dummyDate": null,
+          "thirdLevel": null,
+          "relatedToDummyFriend": [],
+          "dummyBoolean": null,
+          "embeddedDummy": {
+            "dummyName": null,
+            "dummyBoolean": null,
+            "dummyDate": null,
+            "dummyFloat": null,
+            "dummyPrice": null,
+            "symfony": null
+          },
+          "id": 1,
+          "symfony": "symfony",
+          "age": null
+        }
+      ]
     }
     """
     When I send the following GraphQL request:
     """
     {
       dummyDtoInputOutput(id: "/dummy_dto_input_outputs/1") {
-        _id, id, baz
+        _id, id, baz,
+        relatedDummies {
+          edges {
+            node {
+              name
+            }
+          }
+        }
       }
     }
     """
@@ -49,7 +82,16 @@ Feature: GraphQL DTO input and output
         "dummyDtoInputOutput": {
           "_id": 1,
           "id": "/dummy_dto_input_outputs/1",
-          "baz": 1
+          "baz": 1,
+          "relatedDummies": {
+            "edges": [
+              {
+                "node": {
+                  "name": "RelatedDummy with friends"
+                }
+              }
+            ]
+          }
         }
       }
     }

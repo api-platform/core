@@ -11,9 +11,9 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Dto;
+namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Dto\Document;
 
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RelatedDummy;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\RelatedDummy as DocumentRelatedDummy;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
@@ -36,7 +36,7 @@ class OutputDto
     public $bat;
 
     /**
-     * @var RelatedDummy[]
+     * @var DocumentRelatedDummy[]
      */
     public $relatedDummies = [];
 }
