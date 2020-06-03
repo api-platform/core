@@ -60,7 +60,6 @@ class DoctrineExtractorTest extends TestCase
                 'integer',
                 'string',
                 'key',
-                'file',
                 'hash',
                 'collection',
                 'objectId',
@@ -149,7 +148,6 @@ class DoctrineExtractorTest extends TestCase
             ['integer', [new Type(Type::BUILTIN_TYPE_INT)]],
             ['string', [new Type(Type::BUILTIN_TYPE_STRING)]],
             ['key', [new Type(Type::BUILTIN_TYPE_INT)]],
-            ['file', null],
             ['hash', [new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true)]],
             ['collection', [new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(TYPE::BUILTIN_TYPE_INT))]],
             ['objectId', [new Type(Type::BUILTIN_TYPE_STRING)]],
@@ -208,8 +206,8 @@ class DoctrineExtractorTest extends TestCase
         $config = DoctrineMongoDbOdmSetup::createAnnotationMetadataConfiguration([__DIR__.\DIRECTORY_SEPARATOR.'Fixtures'], true);
         $documentManager = DocumentManager::create(null, $config);
 
-        if (!MongoDbType::hasType('foo')) {
-            MongoDbType::addType('foo', DoctrineFooType::class);
+        if (!MongoDbType::hasType('custom_foo')) {
+            MongoDbType::addType('custom_foo', DoctrineFooType::class);
         }
 
         return new DoctrineExtractor($documentManager);
