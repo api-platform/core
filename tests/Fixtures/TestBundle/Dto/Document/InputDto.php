@@ -11,32 +11,27 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Dto;
+namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Dto\Document;
 
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RelatedDummy;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\RelatedDummy as DocumentRelatedDummy;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class OutputDto
+class InputDto
 {
-    /**
-     * @var int
-     */
-    public $id;
-
-    /**
-     * @var float
-     */
-    public $baz;
-
     /**
      * @var string
      */
-    public $bat;
+    public $foo;
 
     /**
-     * @var RelatedDummy[]
+     * @var int
      */
-    public $relatedDummies = [];
+    public $bar;
+
+    /**
+     * @var DocumentRelatedDummy[]
+     */
+    public $relatedDummies;
 }
