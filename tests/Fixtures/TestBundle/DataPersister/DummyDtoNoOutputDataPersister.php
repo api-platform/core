@@ -15,6 +15,7 @@ namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\DataPersister;
 
 use ApiPlatform\Core\DataPersister\DataPersisterInterface;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\DummyDtoNoOutput as DummyDtoNoOutputDocument;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Dto\Document\InputDto as InputDtoDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Dto\InputDto;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyDtoNoOutput;
 use Doctrine\Common\Persistence\ManagerRegistry;
@@ -33,7 +34,7 @@ class DummyDtoNoOutputDataPersister implements DataPersisterInterface
      */
     public function supports($data): bool
     {
-        return $data instanceof InputDto;
+        return $data instanceof InputDto || $data instanceof InputDtoDocument;
     }
 
     /**

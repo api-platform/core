@@ -17,6 +17,7 @@ use ApiPlatform\Core\DataProvider\ArrayPaginator;
 use ApiPlatform\Core\DataProvider\ContextAwareCollectionDataProviderInterface;
 use ApiPlatform\Core\DataProvider\RestrictedDataProviderInterface;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\DummyDtoNoInput as DummyDtoNoInputDocument;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Dto\Document\OutputDto as OutputDtoDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Dto\OutputDto;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyDtoNoInput;
 use Doctrine\Common\Persistence\ManagerRegistry;
@@ -50,7 +51,7 @@ final class DummyDtoNoInputCollectionDataProvider implements ContextAwareCollect
         $dummyDtos = $this->registry->getManagerForClass($resourceClass)->getRepository($resourceClass)->findAll();
         $objects = [];
         foreach ($dummyDtos as $dummyDto) {
-            $object = new OutputDto();
+            $object = DummyDtoNoInput::class === $resourceClass ? new OutputDto() : new OutputDtoDocument();
             $object->bat = $dummyDto->lorem;
             $object->baz = $dummyDto->ipsum;
             $objects[] = $object;

@@ -93,9 +93,10 @@ final class ReadStage implements ReadStageInterface
         $source = $context['source'];
         /** @var ResolveInfo $info */
         $info = $context['info'];
-        if (isset($source[$rootProperty = $info->fieldName], $source[ItemNormalizer::ITEM_IDENTIFIERS_KEY])) {
+        if (isset($source[$rootProperty = $info->fieldName], $source[ItemNormalizer::ITEM_IDENTIFIERS_KEY], $source[ItemNormalizer::ITEM_RESOURCE_CLASS_KEY])) {
             $rootResolvedFields = $source[ItemNormalizer::ITEM_IDENTIFIERS_KEY];
-            $subresourceCollection = $this->getSubresource($rootClass, $rootResolvedFields, $rootProperty, $resourceClass, $normalizationContext, $operationName);
+            $rootResolvedClass = $source[ItemNormalizer::ITEM_RESOURCE_CLASS_KEY];
+            $subresourceCollection = $this->getSubresource($rootResolvedClass, $rootResolvedFields, $rootProperty, $resourceClass, $normalizationContext, $operationName);
             if (!is_iterable($subresourceCollection)) {
                 throw new \UnexpectedValueException('Expected subresource collection to be iterable.');
             }
@@ -148,12 +149,12 @@ final class ReadStage implements ReadStageInterface
     /**
      * @return iterable|object|null
      */
-    private function getSubresource(string $rootClass, array $rootResolvedFields, string $rootProperty, string $subresourceClass, array $normalizationContext, string $operationName)
+    private function getSubresource(string $rootResolvedClass, array $rootResolvedFields, string $rootProperty, string $subresourceClass, array $normalizationContext, string $operationName)
     {
         $resolvedIdentifiers = [];
         $rootIdentifiers = array_keys($rootResolvedFields);
         foreach ($rootIdentifiers as $rootIdentifier) {
-            $resolvedIdentifiers[] = [$rootIdentifier, $rootClass];
+            $resolvedIdentifiers[] = [$rootIdentifier, $rootResolvedClass];
         }
 
         return $this->subresourceDataProvider->getSubresource($subresourceClass, $rootResolvedFields, $normalizationContext + [
