@@ -210,13 +210,13 @@ class OpenApiFactoryTest extends TestCase
         $components = $openApi->getComponents();
         $this->assertInstanceOf(Model\Components::class, $components);
 
-        $this->assertEquals($components->getSchemas(), ['Dummy' => $dummySchema->getDefinitions()]);
+        $this->assertEquals($components->getSchemas(), new \ArrayObject(['Dummy' => $dummySchema->getDefinitions()]));
 
-        $this->assertEquals($components->getSecuritySchemes(), [
+        $this->assertEquals($components->getSecuritySchemes(), new \ArrayObject([
             'oauth' => new Model\SecurityScheme('oauth2', 'OAuth 2.0 authorization code Grant', null, null, 'oauth2', null, new Model\OAuthFlows(null, null, null, new Model\OAuthFlow('/oauth/v2/auth', '/oauth/v2/token', '/oauth/v2/refresh', new \ArrayObject(['scope param'])))),
             'header' => new Model\SecurityScheme('apiKey', 'Value for the Authorization header parameter.', 'Authorization', 'header', 'bearer'),
             'query' => new Model\SecurityScheme('apiKey', 'Value for the key query parameter.', 'key', 'query', 'bearer'),
-        ]);
+        ]));
 
         $paths = $openApi->getPaths();
         $dummiesPath = $paths->getPath('/dummies');

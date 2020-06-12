@@ -1327,6 +1327,7 @@ class ApiPlatformExtensionTest extends TestCase
             $definitions[] = 'api_platform.json_schema.json_schema_generate_command';
             $definitions[] = 'api_platform.openapi.options';
             $definitions[] = 'api_platform.openapi.normalizer';
+            $definitions[] = 'api_platform.openapi.normalizer.api_gateway';
             $definitions[] = 'api_platform.openapi.factory';
             $definitions[] = 'api_platform.openapi.command';
         }

@@ -32,7 +32,7 @@ class PathItem
     private $servers;
     private $parameters;
 
-    public function __construct(?string $ref = null, string $summary = '', string $description = '', Operation $get = null, Operation $put = null, Operation $post = null, Operation $delete = null, Operation $options = null, Operation $head = null, Operation $patch = null, Operation $trace = null, array $servers = [], array $parameters = [])
+    public function __construct(string $ref = null, string $summary = null, string $description = null, Operation $get = null, Operation $put = null, Operation $post = null, Operation $delete = null, Operation $options = null, Operation $head = null, Operation $patch = null, Operation $trace = null, array $servers = [], array $parameters = [])
     {
         $this->ref = $ref;
         $this->summary = $summary;
@@ -54,12 +54,12 @@ class PathItem
         return $this->ref;
     }
 
-    public function getSummary(): string
+    public function getSummary(): ?string
     {
         return $this->summary;
     }
 
-    public function getDescription(): string
+    public function getDescription(): ?string
     {
         return $this->description;
     }

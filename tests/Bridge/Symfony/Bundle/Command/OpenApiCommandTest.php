@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Tests\Bridge\Symfony\Bundle\Command;
 
+use ApiPlatform\Core\OpenApi\OpenApi;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Console\Tester\ApplicationTester;
@@ -72,7 +73,7 @@ YAML;
 YAML;
 
         $this->assertStringContainsString($expected, $result, 'arrays should be correctly formatted.');
-        $this->assertStringContainsString('openapi: 3.0.2', $result);
+        $this->assertStringContainsString('openapi: '.OpenApi::VERSION, $result);
 
         $expected = <<<YAML
 info:

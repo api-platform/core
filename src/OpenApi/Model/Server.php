@@ -38,7 +38,7 @@ class Server
         return $this->description;
     }
 
-    public function getVariables(): \ArrayObject
+    public function getVariables(): ?\ArrayObject
     {
         return $this->variables;
     }

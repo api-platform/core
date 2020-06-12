@@ -138,8 +138,5 @@
         "symfony": {
             "require": "^3.4 || ^4.0 || ^5.0"
         }
-    },
-    "scripts": {
-      "post-update-cmd": "cd vendor/symfony/serializer && cat ../../../serializer.patch | patch"
     }
 }

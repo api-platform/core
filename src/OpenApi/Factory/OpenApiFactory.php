@@ -190,7 +190,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
                 isset($operation['openapi_context']['externalDocs']) ? new ExternalDocumentation($operation['openapi_context']['externalDocs']['description'] ?? null, $operation['openapi_context']['externalDocs']['url']) : null,
                 $parameters,
                 $requestBody,
-                new \ArrayObject($operation['openapi_context']['callbacks'] ?? []),
+                isset($operation['openapi_context']['callbacks']) ? new \ArrayObject($operation['openapi_context']['callbacks']) : null,
                 $operation['openapi_context']['deprecated'] ?? (bool) $resourceMetadata->getTypedOperationAttribute($operationType, $operationName, 'deprecation_reason', false, true),
                 $operation['openapi_context']['security'] ?? [],
                 $operation['openapi_context']['servers'] ?? []
