@@ -22,6 +22,7 @@ use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\HttpFoundation\InputBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
@@ -204,8 +205,13 @@ class ExistsFilter extends AbstractContextAwareFilter implements ExistsFilterInt
 
         @trigger_error(sprintf('The use of "%s::extractProperties()" is deprecated since 2.2. Use the "filters" key of the context instead.', __CLASS__), E_USER_DEPRECATED);
 
-        $properties = $request->query->get($this->existsParameterName);
+        // symfony > 5.1
+        if (class_exists(InputBag::class)) {
+            return $request->query->all($this->existsParameterName);
+        }
 
+        $properties = $request->query->get($this->existsParameterName);
+        /* @phpstan-ignore-next-line */
         return \is_array($properties) ? $properties : [];
     }
 }

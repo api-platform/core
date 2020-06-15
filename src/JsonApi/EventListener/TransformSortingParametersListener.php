@@ -35,9 +35,12 @@ final class TransformSortingParametersListener
     {
         $request = $event->getRequest();
 
+        $orderParameter = $request->query->get('sort');
+
         if (
             'jsonapi' !== $request->getRequestFormat() ||
-            null === ($orderParameter = $request->query->get('sort')) ||
+            null === $orderParameter ||
+            /* @phpstan-ignore-next-line */
             \is_array($orderParameter)
         ) {
             return;

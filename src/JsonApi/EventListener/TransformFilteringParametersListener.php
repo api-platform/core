@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\JsonApi\EventListener;
 
+use Symfony\Component\HttpFoundation\InputBag;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 
 /**
@@ -27,13 +28,16 @@ final class TransformFilteringParametersListener
     public function onKernelRequest(RequestEvent $event): void
     {
         $request = $event->getRequest();
+        $filterParameter = class_exists(InputBag::class) ? $request->query->all('filter') : $request->query->get('filter');
+
         if (
             'jsonapi' !== $request->getRequestFormat() ||
-            null === ($filterParameter = $request->query->get('filter')) ||
-            !\is_array($filterParameter)
+            !\is_array($filterParameter) ||
+            !$filterParameter
         ) {
             return;
         }
+
         $filters = $request->attributes->get('_api_filters', []);
         $request->attributes->set('_api_filters', array_merge($filterParameter, $filters));
     }
