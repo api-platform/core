@@ -89,7 +89,7 @@ final class EntrypointAction
     {
         $query = $request->query->get('query');
         $operation = $request->query->get('operation');
-        if ($variables = $request->query->get('variables', [])) {
+        if ($variables = $request->query->get('variables') ?: []) {
             $variables = $this->decodeVariables($variables);
         }
 
