@@ -221,10 +221,6 @@ class Dummy
         return $this->description;
     }
 
-    public function hasRole($role)
-    {
-    }
-
     public function getFoo()
     {
         return $this->foo;
