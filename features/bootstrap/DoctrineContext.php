@@ -67,6 +67,7 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\SecuredDummy as SecuredD
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\SoMany as SoManyDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\Taxon as TaxonDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\ThirdLevel as ThirdLevelDocument;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\UrlEncodedId as UrlEncodedIdDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\User as UserDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Address;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Answer;
@@ -129,6 +130,7 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Site;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\SoMany;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Taxon;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\ThirdLevel;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\UrlEncodedId;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\User;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\UuidIdentifierDummy;
 use Behat\Behat\Context\Context;
@@ -1051,6 +1053,17 @@ final class DoctrineContext implements Context
         $this->manager->persist($answer);
         $this->manager->persist($question);
 
+        $this->manager->flush();
+        $this->manager->clear();
+    }
+
+    /**
+     * @Given there is a UrlEncodedId resource
+     */
+    public function thereIsAUrlEncodedIdResource()
+    {
+        $urlEncodedIdResource = ($this->isOrm() ? new UrlEncodedId() : new UrlEncodedIdDocument());
+        $this->manager->persist($urlEncodedIdResource);
         $this->manager->flush();
         $this->manager->clear();
     }
