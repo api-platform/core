@@ -538,7 +538,7 @@ Feature: Table inheritance
         },
         "@id": {
           "type": "string",
-          "pattern": "^/resource_interfaces/single%2520item$"
+          "pattern": "^/resource_interfaces/single%20item$"
         },
         "@type": {
           "type": "string",
