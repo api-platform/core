@@ -67,6 +67,7 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\SecuredDummy as SecuredD
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\SoMany as SoManyDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\Taxon as TaxonDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\ThirdLevel as ThirdLevelDocument;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\UrlEncodedId as UrlEncodedIdDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\User as UserDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Address;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Answer;
@@ -1061,7 +1062,7 @@ final class DoctrineContext implements Context
      */
     public function thereIsAUrlEncodedIdResource()
     {
-        $urlEncodedIdResource = new UrlEncodedId();
+        $urlEncodedIdResource = ($this->isOrm() ? new UrlEncodedId() : new UrlEncodedIdDocument());
         $this->manager->persist($urlEncodedIdResource);
         $this->manager->flush();
         $this->manager->clear();
