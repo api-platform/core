@@ -25,7 +25,6 @@
 * JSON Schema: Missing JSON-LD context from Data Transformers (#3479)
 * GraphQL: Resource with no operations should be available through relations (#3532)
 
-
 ## 2.5.5
 
 * Filter: Improve the RangeFilter query in case the values are equals using the between operator (#3488)
