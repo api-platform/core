@@ -74,7 +74,6 @@ final class ItemNormalizer extends AbstractItemNormalizer
 
         $resourceClass = $this->resourceClassResolver->getResourceClass($object, $context['resource_class'] ?? null);
         $context = $this->initContext($resourceClass, $context);
-
         $iri = $this->iriConverter->getIriFromItem($object);
         $context['iri'] = $iri;
         $context['api_normalize'] = true;

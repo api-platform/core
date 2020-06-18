@@ -13,7 +13,7 @@
 * OpenAPI: Add PHP default values to the documentation (#2386)
 * Deprecate using a validation groups generator service not implementing `ApiPlatform\Core\Bridge\Symfony\Validator\ValidationGroupsGeneratorInterface` (#3346)
 * Subresources: subresource resourceClass can now be defined as a container parameter in XML and Yaml definitions
-* Url Encoded IRIs: Fix IRI url encoding
+* IriConverter: Fix IRI url double encoding - may cause breaking change as some characters no longer encoded in output (#3552)
 
 ## 2.5.6
 

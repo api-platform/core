@@ -14,8 +14,6 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity;
 
 use ApiPlatform\Core\Annotation\ApiResource;
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Dto\CustomInputDto;
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Dto\CustomOutputDto;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -27,18 +25,16 @@ use Doctrine\ORM\Mapping as ORM;
  *
  * @ApiResource(
  *     itemOperations={
- *        "get"={
- *            "method"="GET",
- *            "requirements"={"id"=".+"}
- *        }
+ *         "get"={
+ *             "method"="GET",
+ *             "requirements"={"id"=".+"}
+ *         }
  *     }
  * )
  */
 class UrlEncodedId
 {
     /**
-     * @var int The id
-     *
      * @ORM\Column(type="string")
      * @ORM\Id
      */
