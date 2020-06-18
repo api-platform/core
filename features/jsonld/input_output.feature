@@ -151,13 +151,15 @@ Feature: JSON-LD DTO input and output
         "hydra": "http://www.w3.org/ns/hydra/core#",
         "id": "OutputDto/id",
         "baz": "OutputDto/baz",
-        "bat": "OutputDto/bat"
+        "bat": "OutputDto/bat",
+        "relatedDummies": "OutputDto/relatedDummies"
       },
       "@type": "DummyDtoInputOutput",
       "@id": "/dummy_dto_input_outputs/1",
       "id": 1,
       "baz": 1,
-      "bat": "test"
+      "bat": "test",
+      "relatedDummies": []
     }
     """
     When I add "Accept" header equal to "application/ld+json"
@@ -178,13 +180,15 @@ Feature: JSON-LD DTO input and output
         "hydra": "http://www.w3.org/ns/hydra/core#",
         "id": "OutputDto/id",
         "baz": "OutputDto/baz",
-        "bat": "OutputDto/bat"
+        "bat": "OutputDto/bat",
+        "relatedDummies": "OutputDto/relatedDummies"
       },
       "@type": "DummyDtoInputOutput",
       "@id": "/dummy_dto_input_outputs/1",
       "id": 1,
       "baz": 2,
-      "bat": "test"
+      "bat": "test",
+      "relatedDummies": []
     }
     """
 
@@ -237,13 +241,15 @@ Feature: JSON-LD DTO input and output
         "hydra": "http://www.w3.org/ns/hydra/core#",
         "id": "OutputDto/id",
         "baz": "OutputDto/baz",
-        "bat": "OutputDto/bat"
+        "bat": "OutputDto/bat",
+        "relatedDummies": "OutputDto/relatedDummies"
       },
       "@type": "DummyDtoNoInput",
       "@id": "/dummy_dto_no_inputs/1",
       "id": 1,
       "baz": 1,
-      "bat": "test"
+      "bat": "test",
+      "relatedDummies": []
     }
     """
 
@@ -260,13 +266,15 @@ Feature: JSON-LD DTO input and output
         "hydra": "http://www.w3.org/ns/hydra/core#",
         "id": "OutputDto/id",
         "baz": "OutputDto/baz",
-        "bat": "OutputDto/bat"
+        "bat": "OutputDto/bat",
+        "relatedDummies": "OutputDto/relatedDummies"
       },
       "@type": "DummyDtoNoInput",
       "@id": "/dummy_dto_no_inputs/1",
       "id": 1,
       "baz": 1,
-      "bat": "testtest"
+      "bat": "testtest",
+      "relatedDummies": []
     }
     """
 

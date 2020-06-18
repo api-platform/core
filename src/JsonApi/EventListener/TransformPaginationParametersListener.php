@@ -28,9 +28,10 @@ final class TransformPaginationParametersListener
     {
         $request = $event->getRequest();
 
+        $pageParameter = class_exists(InputBag::class) ? $request->query->all('page') : $request->query->get('page');
+
         if (
             'jsonapi' !== $request->getRequestFormat() ||
-            null === ($pageParameter = $request->query->get('page')) ||
             !\is_array($pageParameter)
         ) {
             return;

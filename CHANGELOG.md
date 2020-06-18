@@ -1,8 +1,19 @@
 # Changelog
 
-## 2.5.x
+## 2.6.x-dev
 
-* Url Encoded IRIs: Fix IRI url encoding #3552
+* MongoDB: Possibility to add execute options (aggregate command fields) for a resource, like `allowDiskUse` (#3144)
+* MongoDB: Mercure support (#3290)
+* GraphQL: Subscription support with Mercure (#3321)
+* GraphQL: Allow to format GraphQL errors based on exceptions (#3063)
+* GraphQL: Add page-based pagination (#3175, #3517)
+* GraphQL: Possibility to add a custom description for queries, mutations and subscriptions (#3477, #3514)
+* GraphQL: Support for field name conversion (serialized name) (#3455, #3516)
+* GraphQL: **BC** `operation` is now `operationName` to follow the standard (#3568)
+* OpenAPI: Add PHP default values to the documentation (#2386)
+* Deprecate using a validation groups generator service not implementing `ApiPlatform\Core\Bridge\Symfony\Validator\ValidationGroupsGeneratorInterface` (#3346)
+* Subresources: subresource resourceClass can now be defined as a container parameter in XML and Yaml definitions
+* Url Encoded IRIs: Fix IRI url encoding - may cause breaking change as some characters no longer encoded in output. Encoded requests not broken see PR. (#3552)
 
 ## 2.5.6
 
@@ -90,7 +101,7 @@
 
 * Allow to not declare GET item operation
 * Add support for the Accept-Patch header
-* Make the `maximum_items_per_page` attribute consistent with other attributes controlling pagination 
+* Make the `maximum_items_per_page` attribute consistent with other attributes controlling pagination
 * Allow to use a string instead of an array for serializer groups
 * Test: Add a helper method to find the IRI of a resource
 * Test: Add assertions for testing response against JSON Schema from API resource

@@ -153,6 +153,8 @@ final class SchemaFactory implements SchemaFactoryInterface
     {
         $version = $schema->getVersion();
         $swagger = false;
+        $propertySchema = $propertyMetadata->getSchema() ?? [];
+
         switch ($version) {
             case Schema::VERSION_SWAGGER:
                 $swagger = true;
@@ -165,7 +167,11 @@ final class SchemaFactory implements SchemaFactoryInterface
                 $basePropertySchemaAttribute = 'json_schema_context';
         }
 
-        $propertySchema = $propertyMetadata->getAttributes()[$basePropertySchemaAttribute] ?? [];
+        $propertySchema = array_merge(
+            $propertySchema,
+            $propertyMetadata->getAttributes()[$basePropertySchemaAttribute] ?? []
+        );
+
         if (false === $propertyMetadata->isWritable() && !$propertyMetadata->isInitializable()) {
             $propertySchema['readOnly'] = true;
         }
@@ -183,6 +189,18 @@ final class SchemaFactory implements SchemaFactoryInterface
         // See https://json-schema.org/latest/json-schema-core.html#rfc.section.6.4
         if (null !== $iri = $propertyMetadata->getIri()) {
             $propertySchema['externalDocs'] = ['url' => $iri];
+        }
+
+        if (!isset($propertySchema['default']) && null !== $default = $propertyMetadata->getDefault()) {
+            $propertySchema['default'] = $default;
+        }
+
+        if (!isset($propertySchema['example']) && null !== $example = $propertyMetadata->getExample()) {
+            $propertySchema['example'] = $example;
+        }
+
+        if (!isset($propertySchema['example']) && isset($propertySchema['default'])) {
+            $propertySchema['example'] = $propertySchema['default'];
         }
 
         $valueSchema = [];
@@ -215,7 +233,9 @@ final class SchemaFactory implements SchemaFactoryInterface
 
         $prefix = $resourceMetadata ? $resourceMetadata->getShortName() : (new \ReflectionClass($className))->getShortName();
         if (null !== $inputOrOutputClass && $className !== $inputOrOutputClass) {
-            $prefix .= ':'.md5($inputOrOutputClass);
+            $parts = explode('\\', $inputOrOutputClass);
+            $shortName = end($parts);
+            $prefix .= ':'.$shortName;
         }
 
         if (isset($this->distinctFormats[$format])) {

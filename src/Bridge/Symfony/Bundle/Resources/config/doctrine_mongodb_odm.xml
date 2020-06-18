@@ -24,11 +24,13 @@
 
         <service id="api_platform.doctrine_mongodb.odm.collection_data_provider" public="false" abstract="true">
             <argument type="service" id="doctrine_mongodb"/>
+            <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
             <argument type="tagged" tag="api_platform.doctrine_mongodb.odm.aggregation_extension.collection" />
         </service>
 
         <service id="api_platform.doctrine_mongodb.odm.item_data_provider" public="false" abstract="true">
             <argument type="service" id="doctrine_mongodb"/>
+            <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
             <argument type="service" id="api_platform.metadata.property.name_collection_factory"/>
             <argument type="service" id="api_platform.metadata.property.metadata_factory"/>
             <argument type="tagged" tag="api_platform.doctrine_mongodb.odm.aggregation_extension.item" />
@@ -36,6 +38,7 @@
 
         <service id="api_platform.doctrine_mongodb.odm.subresource_data_provider" public="false" abstract="true">
             <argument type="service" id="doctrine_mongodb" />
+            <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
             <argument type="service" id="api_platform.metadata.property.name_collection_factory" />
             <argument type="service" id="api_platform.metadata.property.metadata_factory" />
             <argument type="tagged" tag="api_platform.doctrine_mongodb.odm.aggregation_extension.collection" />
@@ -46,7 +49,6 @@
                  parent="api_platform.doctrine_mongodb.odm.collection_data_provider"
                  class="ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\CollectionDataProvider">
             <tag name="api_platform.collection_data_provider"/>
-
         </service>
         <service id="api_platform.doctrine_mongodb.odm.default.item_data_provider"
                  parent="api_platform.doctrine_mongodb.odm.item_data_provider"
@@ -138,6 +140,7 @@
         <service id="api_platform.doctrine_mongodb.odm.aggregation_extension.pagination"
                  class="ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Extension\PaginationExtension" public="false">
             <argument type="service" id="doctrine_mongodb"/>
+            <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
             <argument type="service" id="api_platform.pagination" />
 
             <tag name="api_platform.doctrine_mongodb.odm.aggregation_extension.collection"/>

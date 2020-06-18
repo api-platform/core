@@ -59,7 +59,8 @@ Feature: Authorization checking
     {
         "title": "Special Title",
         "description": "Description",
-        "owner": "dunglas"
+        "owner": "dunglas",
+        "adminOnlyProperty": "secret"
     }
     """
     Then the response status code should be 201
@@ -100,3 +101,53 @@ Feature: Authorization checking
     }
     """
     Then the response status code should be 200
+
+  Scenario: An admin retrieves a resource with an admin only viewable property
+    When I add "Accept" header equal to "application/ld+json"
+    And I add "Content-Type" header equal to "application/ld+json"
+    And I add "Authorization" header equal to "Basic YWRtaW46a2l0dGVu"
+    And I send a "GET" request to "/secured_dummies"
+    Then the response status code should be 200
+    And the response should contain "adminOnlyProperty"
+
+  Scenario: A user retrieves a resource with an admin only viewable property
+    When I add "Accept" header equal to "application/ld+json"
+    And I add "Authorization" header equal to "Basic ZHVuZ2xhczprZXZpbg=="
+    And I send a "GET" request to "/secured_dummies"
+    Then the response status code should be 200
+    And the response should not contain "adminOnlyProperty"
+
+  Scenario: An admin can create a secured resource with a secured Property
+    When I add "Accept" header equal to "application/ld+json"
+    And I add "Content-Type" header equal to "application/ld+json"
+    And I add "Authorization" header equal to "Basic YWRtaW46a2l0dGVu"
+    And I send a "POST" request to "/secured_dummies" with body:
+    """
+    {
+        "title": "Common Title",
+        "description": "Description",
+        "owner": "dunglas",
+        "adminOnlyProperty": "Is it safe?"
+    }
+    """
+    Then the response status code should be 201
+    And the response should contain "adminOnlyProperty"
+    And the JSON node "adminOnlyProperty" should be equal to the string "Is it safe?"
+
+  Scenario: A user cannot update a secured property
+    When I add "Accept" header equal to "application/ld+json"
+    And I add "Content-Type" header equal to "application/ld+json"
+    And I add "Authorization" header equal to "Basic ZHVuZ2xhczprZXZpbg=="
+    And I send a "PUT" request to "/secured_dummies/3" with body:
+    """
+    {
+        "adminOnlyProperty": "Yes it is!"
+    }
+    """
+    Then the response status code should be 200
+    And the response should not contain "adminOnlyProperty"
+    And I add "Authorization" header equal to "Basic YWRtaW46a2l0dGVu"
+    And I send a "GET" request to "/secured_dummies"
+    Then the response status code should be 200
+    And the response should contain "adminOnlyProperty"
+    And the JSON node "hydra:member[2].adminOnlyProperty" should be equal to the string "Is it safe?"

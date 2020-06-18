@@ -28,4 +28,19 @@ class DummyMercure
      * @ODM\Id(strategy="INCREMENT", type="integer")
      */
     public $id;
+
+    /**
+     * @ODM\Field(type="string")
+     */
+    public $name;
+
+    /**
+     * @ODM\Field(type="string")
+     */
+    public $description;
+
+    /**
+     * @ODM\ReferenceOne(targetDocument=RelatedDummy::class, storeAs="id", nullable=true)
+     */
+    public $relatedDummy;
 }

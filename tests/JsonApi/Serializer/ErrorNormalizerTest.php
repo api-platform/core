@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\JsonApi\Serializer;
 
 use ApiPlatform\Core\JsonApi\Serializer\ErrorNormalizer;
+use ApiPlatform\Core\Tests\Mock\Exception\ErrorCodeSerializable;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Debug\Exception\FlattenException;
 use Symfony\Component\HttpFoundation\Response;
@@ -57,6 +58,42 @@ class ErrorNormalizerTest extends TestCase
         if ($debug) {
             $expected['trace'] = $exception->getTrace();
         }
+
+        $this->assertEquals($expected, $normalizer->normalize($exception, ErrorNormalizer::FORMAT, ['statusCode' => $status]));
+    }
+
+    public function testNormalizeAnExceptionWithCustomErrorCode(): void
+    {
+        $status = Response::HTTP_BAD_REQUEST;
+        $originalMessage = 'my-message';
+        $debug = false;
+
+        $normalizer = new ErrorNormalizer($debug);
+        $exception = new ErrorCodeSerializable($originalMessage);
+
+        $expected = [
+            'title' => 'An error occurred',
+            'description' => 'my-message',
+            'code' => ErrorCodeSerializable::getErrorCode(),
+        ];
+
+        $this->assertEquals($expected, $normalizer->normalize($exception, ErrorNormalizer::FORMAT, ['statusCode' => $status]));
+    }
+
+    public function testNormalizeAFlattenExceptionWithCustomErrorCode(): void
+    {
+        $status = Response::HTTP_BAD_REQUEST;
+        $originalMessage = 'my-message';
+        $debug = false;
+
+        $normalizer = new ErrorNormalizer($debug);
+        $exception = FlattenException::create(new ErrorCodeSerializable($originalMessage), $status);
+
+        $expected = [
+            'title' => 'An error occurred',
+            'description' => 'my-message',
+            'code' => ErrorCodeSerializable::getErrorCode(),
+        ];
 
         $this->assertEquals($expected, $normalizer->normalize($exception, ErrorNormalizer::FORMAT, ['statusCode' => $status]));
     }

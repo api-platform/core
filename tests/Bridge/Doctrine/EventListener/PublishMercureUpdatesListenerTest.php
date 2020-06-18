@@ -18,6 +18,8 @@ use ApiPlatform\Core\Api\ResourceClassResolverInterface;
 use ApiPlatform\Core\Api\UrlGeneratorInterface;
 use ApiPlatform\Core\Bridge\Doctrine\EventListener\PublishMercureUpdatesListener;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
+use ApiPlatform\Core\GraphQl\Subscription\MercureSubscriptionIriGeneratorInterface as GraphQlMercureSubscriptionIriGeneratorInterface;
+use ApiPlatform\Core\GraphQl\Subscription\SubscriptionManagerInterface as GraphQlSubscriptionManagerInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Tests\Fixtures\NotAResource;
@@ -204,6 +206,81 @@ class PublishMercureUpdatesListenerTest extends TestCase
         $this->assertSame([null, null, null, 10], $retry);
     }
 
+    public function testPublishGraphQlUpdates(): void
+    {
+        if (!method_exists(Update::class, 'isPrivate')) {
+            $this->markTestSkipped();
+        }
+
+        $toUpdate = new Dummy();
+        $toUpdate->setId(2);
+
+        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
+        $resourceClassResolverProphecy->getResourceClass(Argument::type(Dummy::class))->willReturn(Dummy::class);
+        $resourceClassResolverProphecy->isResourceClass(Dummy::class)->willReturn(true);
+
+        $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
+        $iriConverterProphecy->getIriFromItem($toUpdate, UrlGeneratorInterface::ABS_URL)->willReturn('http://example.com/dummies/2');
+
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
+        $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadata(null, null, null, null, null, ['mercure' => true, 'normalization_context' => ['groups' => ['foo', 'bar']]]));
+
+        $serializerProphecy = $this->prophesize(SerializerInterface::class);
+        $serializerProphecy->serialize($toUpdate, 'jsonld', ['groups' => ['foo', 'bar']])->willReturn('2');
+
+        $formats = ['jsonld' => ['application/ld+json'], 'jsonhal' => ['application/hal+json']];
+
+        $topics = [];
+        $private = [];
+        $retry = [];
+        $data = [];
+        $publisher = function (Update $update) use (&$topics, &$private, &$retry, &$data): string {
+            $topics = array_merge($topics, $update->getTopics());
+            $private[] = $update->isPrivate();
+            $retry[] = $update->getRetry();
+            $data[] = $update->getData();
+
+            return 'id';
+        };
+
+        $graphQlSubscriptionManagerProphecy = $this->prophesize(GraphQlSubscriptionManagerInterface::class);
+        $graphQlSubscriptionId = 'subscription-id';
+        $graphQlSubscriptionData = ['data'];
+        $graphQlSubscriptionManagerProphecy->getPushPayloads($toUpdate)->willReturn([[$graphQlSubscriptionId, $graphQlSubscriptionData]]);
+        $graphQlMercureSubscriptionIriGenerator = $this->prophesize(GraphQlMercureSubscriptionIriGeneratorInterface::class);
+        $topicIri = 'subscription-topic-iri';
+        $graphQlMercureSubscriptionIriGenerator->generateTopicIri($graphQlSubscriptionId)->willReturn($topicIri);
+
+        $listener = new PublishMercureUpdatesListener(
+            $resourceClassResolverProphecy->reveal(),
+            $iriConverterProphecy->reveal(),
+            $resourceMetadataFactoryProphecy->reveal(),
+            $serializerProphecy->reveal(),
+            $formats,
+            null,
+            $publisher,
+            $graphQlSubscriptionManagerProphecy->reveal(),
+            $graphQlMercureSubscriptionIriGenerator->reveal()
+        );
+
+        $uowProphecy = $this->prophesize(UnitOfWork::class);
+        $uowProphecy->getScheduledEntityInsertions()->willReturn([])->shouldBeCalled();
+        $uowProphecy->getScheduledEntityUpdates()->willReturn([$toUpdate])->shouldBeCalled();
+        $uowProphecy->getScheduledEntityDeletions()->willReturn([])->shouldBeCalled();
+
+        $emProphecy = $this->prophesize(EntityManagerInterface::class);
+        $emProphecy->getUnitOfWork()->willReturn($uowProphecy->reveal())->shouldBeCalled();
+        $eventArgs = new OnFlushEventArgs($emProphecy->reveal());
+
+        $listener->onFlush($eventArgs);
+        $listener->postFlush();
+
+        $this->assertSame(['http://example.com/dummies/2', 'subscription-topic-iri'], $topics);
+        $this->assertSame([false, false], $private);
+        $this->assertSame([null, null], $retry);
+        $this->assertSame(['2', '["data"]'], $data);
+    }
+
     public function testNoPublisher(): void
     {
         $this->expectException(InvalidArgumentException::class);
@@ -220,7 +297,7 @@ class PublishMercureUpdatesListenerTest extends TestCase
         );
     }
 
-    public function testInvalidMercureAttribute()
+    public function testInvalidMercureAttribute(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('The value of the "mercure" attribute of the "ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy" resource class must be a boolean, an array of options or an expression returning this array, "integer" given.');

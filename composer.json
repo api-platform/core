@@ -133,7 +133,7 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "2.5.x-dev"
+            "dev-master": "2.6.x-dev"
         },
         "symfony": {
             "require": "^3.4 || ^4.0 || ^5.0"

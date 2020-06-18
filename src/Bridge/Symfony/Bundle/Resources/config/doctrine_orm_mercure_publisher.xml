@@ -8,7 +8,7 @@
 
         <!-- Event listener -->
 
-        <service id="api_platform.doctrine.listener.mercure.publish" class="ApiPlatform\Core\Bridge\Doctrine\EventListener\PublishMercureUpdatesListener">
+        <service id="api_platform.doctrine.orm.listener.mercure.publish" class="ApiPlatform\Core\Bridge\Doctrine\EventListener\PublishMercureUpdatesListener">
             <argument type="service" id="api_platform.resource_class_resolver" />
             <argument type="service" id="api_platform.iri_converter" />
             <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
@@ -16,9 +16,15 @@
             <argument>%api_platform.formats%</argument>
             <argument type="service" id="messenger.default_bus" on-invalid="ignore" />
             <argument type="service" id="mercure.hub.default.publisher" />
+            <argument type="service" id="api_platform.graphql.subscription.subscription_manager" on-invalid="ignore" />
+            <argument type="service" id="api_platform.graphql.subscription.mercure_iri_generator" on-invalid="ignore" />
 
             <tag name="doctrine.event_listener" event="onFlush" />
             <tag name="doctrine.event_listener" event="postFlush" />
+        </service>
+
+        <service id="api_platform.doctrine.listener.mercure.publish" alias="api_platform.doctrine.orm.listener.mercure.publish">
+            <deprecated>Using "%alias_id%" service is deprecated since API Platform 2.6. Use "api_platform.doctrine.orm.listener.mercure.publish" instead.</deprecated>
         </service>
 
     </services>

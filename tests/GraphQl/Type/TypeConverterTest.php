@@ -63,7 +63,7 @@ class TypeConverterTest extends TestCase
     {
         $this->typeBuilderProphecy->isCollection($type)->willReturn(false);
 
-        $graphqlType = $this->typeConverter->convertType($type, $input, null, null, 'resourceClass', 'rootClass', null, $depth);
+        $graphqlType = $this->typeConverter->convertType($type, $input, null, null, null, 'resourceClass', 'rootClass', null, $depth);
         $this->assertEquals($expectedGraphqlType, $graphqlType);
     }
 
@@ -92,7 +92,7 @@ class TypeConverterTest extends TestCase
         $this->typeBuilderProphecy->isCollection($type)->shouldBeCalled()->willReturn(false);
         $this->resourceMetadataFactoryProphecy->create('dummy')->shouldBeCalled()->willReturn(new ResourceMetadata());
 
-        $graphqlType = $this->typeConverter->convertType($type, false, null, null, 'resourceClass', 'rootClass', null, 0);
+        $graphqlType = $this->typeConverter->convertType($type, false, null, null, null, 'resourceClass', 'rootClass', null, 0);
         $this->assertNull($graphqlType);
     }
 
@@ -106,7 +106,7 @@ class TypeConverterTest extends TestCase
         $this->expectException(\UnexpectedValueException::class);
         $this->expectExceptionMessage('A "Node" resource cannot be used with GraphQL because the type is already used by the Relay specification.');
 
-        $this->typeConverter->convertType($type, false, null, null, 'resourceClass', 'rootClass', null, 0);
+        $this->typeConverter->convertType($type, false, null, null, null, 'resourceClass', 'rootClass', null, 0);
     }
 
     public function testConvertTypeResourceClassNotFound(): void
@@ -116,22 +116,31 @@ class TypeConverterTest extends TestCase
         $this->typeBuilderProphecy->isCollection($type)->shouldBeCalled()->willReturn(false);
         $this->resourceMetadataFactoryProphecy->create('dummy')->shouldBeCalled()->willThrow(new ResourceClassNotFoundException());
 
-        $graphqlType = $this->typeConverter->convertType($type, false, null, null, 'resourceClass', 'rootClass', null, 0);
+        $graphqlType = $this->typeConverter->convertType($type, false, null, null, null, 'resourceClass', 'rootClass', null, 0);
         $this->assertNull($graphqlType);
     }
 
-    public function testConvertTypeResource(): void
+    /**
+     * @dataProvider convertTypeResourceProvider
+     */
+    public function testConvertTypeResource(Type $type, ObjectType $expectedGraphqlType): void
     {
         $graphqlResourceMetadata = (new ResourceMetadata())->withGraphql(['test']);
-        $type = new Type(Type::BUILTIN_TYPE_OBJECT, false, null, true, null, new Type(Type::BUILTIN_TYPE_OBJECT, false, 'dummyValue'));
-        $expectedGraphqlType = new ObjectType(['name' => 'resourceObjectType']);
 
         $this->typeBuilderProphecy->isCollection($type)->shouldBeCalled()->willReturn(true);
         $this->resourceMetadataFactoryProphecy->create('dummyValue')->shouldBeCalled()->willReturn($graphqlResourceMetadata);
-        $this->typeBuilderProphecy->getResourceObjectType('dummyValue', $graphqlResourceMetadata, false, null, null, false, 0)->shouldBeCalled()->willReturn($expectedGraphqlType);
+        $this->typeBuilderProphecy->getResourceObjectType('dummyValue', $graphqlResourceMetadata, false, null, null, null, false, 0)->shouldBeCalled()->willReturn($expectedGraphqlType);
 
-        $graphqlType = $this->typeConverter->convertType($type, false, null, null, 'resourceClass', 'rootClass', null, 0);
+        $graphqlType = $this->typeConverter->convertType($type, false, null, null, null, 'resourceClass', 'rootClass', null, 0);
         $this->assertEquals($expectedGraphqlType, $graphqlType);
+    }
+
+    public function convertTypeResourceProvider(): array
+    {
+        return [
+            [new Type(Type::BUILTIN_TYPE_OBJECT, false, null, true, null, new Type(Type::BUILTIN_TYPE_OBJECT, false, 'dummyValue')), new ObjectType(['name' => 'resourceObjectType'])],
+            [new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, null, new Type(Type::BUILTIN_TYPE_OBJECT, false, 'dummyValue')), new ObjectType(['name' => 'resourceObjectType'])],
+        ];
     }
 
     /**

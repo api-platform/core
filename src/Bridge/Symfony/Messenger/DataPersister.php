@@ -75,7 +75,10 @@ final class DataPersister implements ContextAwareDataPersisterInterface
      */
     public function persist($data, array $context = [])
     {
-        $envelope = $this->dispatch($data);
+        $envelope = $this->dispatch(
+            (new Envelope($data))
+                ->with(new ContextStamp($context))
+        );
 
         $handledStamp = $envelope->last(HandledStamp::class);
         if (!$handledStamp instanceof HandledStamp) {

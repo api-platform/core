@@ -46,6 +46,40 @@ class AnnotationResourceMetadataFactoryTest extends TestCase
         $this->assertEquals(['foo' => 'bar'], $metadata->getGraphql());
     }
 
+    public function testCreateWithDefaults()
+    {
+        $defaults = [
+            'shortName' => 'Default shortname should not be ignored',
+            'description' => 'CHANGEME!',
+            'collection_operations' => ['get'],
+            'item_operations' => ['get', 'put'],
+            'attributes' => [
+                'pagination_items_per_page' => 4,
+                'pagination_maximum_items_per_page' => 6,
+            ],
+        ];
+
+        $annotation = new ApiResource([
+            'itemOperations' => ['get', 'delete'],
+            'attributes' => [
+                'pagination_client_enabled' => true,
+                'pagination_maximum_items_per_page' => 10,
+            ],
+        ]);
+        $reader = $this->prophesize(Reader::class);
+        $reader->getClassAnnotation(Argument::type(\ReflectionClass::class), ApiResource::class)->willReturn($annotation)->shouldBeCalled();
+        $factory = new AnnotationResourceMetadataFactory($reader->reveal(), null, $defaults);
+        $metadata = $factory->create(Dummy::class);
+
+        $this->assertNull($metadata->getShortName());
+        $this->assertEquals('CHANGEME!', $metadata->getDescription());
+        $this->assertEquals(['get'], $metadata->getCollectionOperations());
+        $this->assertEquals(['get', 'delete'], $metadata->getItemOperations());
+        $this->assertTrue($metadata->getAttribute('pagination_client_enabled'));
+        $this->assertEquals(4, $metadata->getAttribute('pagination_items_per_page'));
+        $this->assertEquals(10, $metadata->getAttribute('pagination_maximum_items_per_page'));
+    }
+
     public function testCreateWithoutAttributes()
     {
         $annotation = new ApiResource([]);

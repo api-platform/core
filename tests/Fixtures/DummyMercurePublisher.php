@@ -17,8 +17,20 @@ use Symfony\Component\Mercure\Update;
 
 class DummyMercurePublisher
 {
+    private $updates = [];
+
     public function __invoke(Update $update): string
     {
+        $this->updates[] = $update;
+
         return 'dummy';
+    }
+
+    /**
+     * @return array<Update>
+     */
+    public function getUpdates(): array
+    {
+        return $this->updates;
     }
 }

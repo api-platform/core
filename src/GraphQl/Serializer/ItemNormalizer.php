@@ -73,11 +73,13 @@ final class ItemNormalizer extends BaseItemNormalizer
 
         $data = parent::normalize($object, $format, $context);
         if (!\is_array($data)) {
-            throw new UnexpectedValueException('Expected data to be an array');
+            throw new UnexpectedValueException('Expected data to be an array.');
         }
 
-        $data[self::ITEM_RESOURCE_CLASS_KEY] = $this->getObjectClass($object);
-        $data[self::ITEM_IDENTIFIERS_KEY] = $this->identifiersExtractor->getIdentifiersFromItem($object);
+        if (!($context['no_resolver_data'] ?? false)) {
+            $data[self::ITEM_RESOURCE_CLASS_KEY] = $this->getObjectClass($object);
+            $data[self::ITEM_IDENTIFIERS_KEY] = $this->identifiersExtractor->getIdentifiersFromItem($object);
+        }
 
         return $data;
     }

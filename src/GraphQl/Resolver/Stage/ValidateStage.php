@@ -14,10 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\GraphQl\Resolver\Stage;
 
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
-use ApiPlatform\Core\Validator\Exception\ValidationException;
 use ApiPlatform\Core\Validator\ValidatorInterface;
-use GraphQL\Error\Error;
-use GraphQL\Type\Definition\ResolveInfo;
 
 /**
  * Validate stage of GraphQL resolvers.
@@ -48,13 +45,6 @@ final class ValidateStage implements ValidateStageInterface
         }
 
         $validationGroups = $resourceMetadata->getGraphqlAttribute($operationName, 'validation_groups', null, true);
-        try {
-            $this->validator->validate($object, ['groups' => $validationGroups]);
-        } catch (ValidationException $e) {
-            /** @var ResolveInfo $info */
-            $info = $context['info'];
-
-            throw Error::createLocatedError($e->getMessage(), $info->fieldNodes, $info->path);
-        }
+        $this->validator->validate($object, ['groups' => $validationGroups]);
     }
 }

@@ -115,6 +115,16 @@ class DummyCar
      */
     private $availableAt;
 
+    /**
+     * @var string
+     *
+     * @Serializer\Groups({"colors"})
+     * @Serializer\SerializedName("carBrand")
+     *
+     * @ORM\Column
+     */
+    private $brand = 'DummyBrand';
+
     public function __construct()
     {
         $this->colors = new ArrayCollection();
@@ -198,5 +208,15 @@ class DummyCar
     public function setAvailableAt(\DateTime $availableAt)
     {
         $this->availableAt = $availableAt;
+    }
+
+    public function getBrand(): string
+    {
+        return $this->brand;
+    }
+
+    public function setBrand(string $brand): void
+    {
+        $this->brand = $brand;
     }
 }

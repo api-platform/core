@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\JsonApi\EventListener;
 
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
+use Symfony\Component\HttpFoundation\InputBag;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 
 /**
@@ -36,17 +37,19 @@ final class TransformFieldsetsParametersListener
         $request = $event->getRequest();
 
         $includeParameter = $request->query->get('include');
+        $fieldsParameter = class_exists(InputBag::class) ? $request->query->all('fields') : $request->query->get('fields');
+
         if (
             'jsonapi' !== $request->getRequestFormat() ||
             !($resourceClass = $request->attributes->get('_api_resource_class')) ||
-            (!($fieldsParameter = $request->query->get('fields')) && !$includeParameter)
+            (!$fieldsParameter && !$includeParameter)
         ) {
             return;
         }
 
         if (
             ($fieldsParameter && !\is_array($fieldsParameter)) ||
-            ($includeParameter && !\is_string($includeParameter))
+            (!\is_string($includeParameter))
         ) {
             return;
         }

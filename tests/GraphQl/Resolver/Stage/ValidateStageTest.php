@@ -18,7 +18,6 @@ use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Validator\Exception\ValidationException;
 use ApiPlatform\Core\Validator\ValidatorInterface;
-use GraphQL\Error\Error;
 use GraphQL\Type\Definition\ResolveInfo;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
@@ -92,7 +91,7 @@ class ValidateStageTest extends TestCase
         $object = new \stdClass();
         $this->validatorProphecy->validate($object, ['groups' => $validationGroups])->shouldBeCalled()->willThrow(new ValidationException());
 
-        $this->expectException(Error::class);
+        $this->expectException(ValidationException::class);
 
         ($this->validateStage)($object, $resourceClass, $operationName, $context);
     }

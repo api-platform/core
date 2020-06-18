@@ -8,7 +8,7 @@ parameters:
 	symfony:
 		container_xml_path: tests/Fixtures/app/var/cache/test/appAppKernelTestDebugContainer.xml
 		constant_hassers: false
-	autoload_files:
+	bootstrapFiles:
 		- tests/Fixtures/app/AppKernel.php
 	excludes_analyse:
 		- tests/Fixtures/app/var/cache
@@ -38,9 +38,6 @@ parameters:
 		-
 			message: '#Variable \$positionPm might not be defined\.#'
 			path: src/Util/ClassInfoTrait.php
-		-
-			message: "#Cannot access offset 'node' on bool\\.#"
-			path: src/GraphQl/Serializer/SerializerContextBuilder.php
 		- '#Access to an undefined property Prophecy\\Prophecy\\ObjectProphecy<(\\?[a-zA-Z0-9_]+)+>::\$[a-zA-Z0-9_]+#'
 		-
 			message: '#Call to an undefined method Doctrine\\Persistence\\ObjectManager::getConnection\(\)#'
@@ -82,6 +79,9 @@ parameters:
 		-
 			message: '#Call to method PHPUnit\\Framework\\Assert::assertSame\(\) with 2 and int will always evaluate to false\.#'
 			path: tests/Identifier/Normalizer/IntegerDenormalizerTest.php
+		-
+			message: '#Call to method PHPUnit\\Framework\\Assert::assertSame\(\) with array\(.+\) and array\(.+\) will always evaluate to false\.#'
+			path: tests/Util/SortTraitTest.php
 		-
 			message: '#Binary operation "\+" between (float\|int\|)?string and 0 results in an error\.#'
 			path: src/Bridge/Doctrine/Common/Filter/RangeFilterTrait.php
@@ -132,3 +132,10 @@ parameters:
 		-
 			message: "#Call to function method_exists\\(\\) with ApiPlatform\\\\Core\\\\JsonApi\\\\Serializer\\\\ItemNormalizer and 'setCircularReferenc…' will always evaluate to false\\.#"
 			path: tests/JsonApi/Serializer/ItemNormalizerTest.php
+
+		# Waiting to be fixed by https://github.com/Roave/BetterReflection/issues/663
+		-
+			message: '#Call to private method getNestedFieldPath\(\) of class ApiPlatform\\Core\\Bridge\\Elasticsearch\\DataProvider\\Filter\\AbstractFilter\.#'
+			paths:
+				- src/Bridge/Elasticsearch/DataProvider/Filter/OrderFilter.php
+				- src/Bridge/Elasticsearch/DataProvider/Filter/AbstractSearchFilter.php

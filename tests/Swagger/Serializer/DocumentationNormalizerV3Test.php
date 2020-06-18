@@ -110,10 +110,10 @@ class DocumentationNormalizerV3Test extends TestCase
         $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn($dummyMetadata);
 
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
-        $propertyMetadataFactoryProphecy->create(Dummy::class, 'id', Argument::cetera())->willReturn(new PropertyMetadata(new Type(Type::BUILTIN_TYPE_INT), 'This is an id.', true, false, null, null, null, true));
-        $propertyMetadataFactoryProphecy->create(Dummy::class, 'name', Argument::cetera())->willReturn(new PropertyMetadata(new Type(Type::BUILTIN_TYPE_STRING), 'This is a name.', true, true, true, true, false, false, null, null, []));
-        $propertyMetadataFactoryProphecy->create(Dummy::class, 'description', Argument::cetera())->willReturn(new PropertyMetadata(new Type(Type::BUILTIN_TYPE_STRING), 'This is an initializable but not writable property.', true, false, true, true, false, false, null, null, [], null, true));
-        $propertyMetadataFactoryProphecy->create(Dummy::class, 'dummyDate', Argument::cetera())->willReturn(new PropertyMetadata(new Type(Type::BUILTIN_TYPE_OBJECT, true, \DateTime::class), 'This is a \DateTimeInterface object.', true, true, true, true, false, false, null, null, []));
+        $propertyMetadataFactoryProphecy->create(Dummy::class, 'id', Argument::cetera())->shouldBeCalled()->willReturn(new PropertyMetadata(new Type(Type::BUILTIN_TYPE_INT), 'This is an id.', true, false, null, null, null, true, null, null, null, null, null, null, null, ['minLength' => 3, 'maxLength' => 20, 'pattern' => '^dummyPattern$']));
+        $propertyMetadataFactoryProphecy->create(Dummy::class, 'name', Argument::cetera())->shouldBeCalled()->willReturn(new PropertyMetadata(new Type(Type::BUILTIN_TYPE_STRING), 'This is a name.', true, true, true, true, false, false, null, null, [], null, null, null, null));
+        $propertyMetadataFactoryProphecy->create(Dummy::class, 'description', Argument::cetera())->shouldBeCalled()->willReturn(new PropertyMetadata(new Type(Type::BUILTIN_TYPE_STRING), 'This is an initializable but not writable property.', true, false, true, true, false, false, null, null, [], null, true));
+        $propertyMetadataFactoryProphecy->create(Dummy::class, 'dummyDate', Argument::cetera())->shouldBeCalled()->willReturn(new PropertyMetadata(new Type(Type::BUILTIN_TYPE_OBJECT, true, \DateTime::class), 'This is a \DateTimeInterface object.', true, true, true, true, false, false, null, null, []));
 
         $operationPathResolver = new CustomOperationPathResolver(new OperationPathResolver(new UnderscorePathSegmentNameGenerator()));
 
@@ -374,6 +374,9 @@ class DocumentationNormalizerV3Test extends TestCase
                                 'type' => 'integer',
                                 'description' => 'This is an id.',
                                 'readOnly' => true,
+                                'minLength' => 3,
+                                'maxLength' => 20,
+                                'pattern' => '^dummyPattern$',
                             ]),
                             'name' => new \ArrayObject([
                                 'type' => 'string',

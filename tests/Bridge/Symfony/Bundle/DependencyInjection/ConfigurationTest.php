@@ -182,6 +182,7 @@ class ConfigurationTest extends TestCase
                     'enabled' => false,
                     'varnish_urls' => [],
                     'request_options' => [],
+                    'max_header_length' => 7500,
                 ],
                 'etag' => true,
                 'max_age' => null,
@@ -289,7 +290,7 @@ class ConfigurationTest extends TestCase
     public function testExceptionToStatusConfigWithInvalidHttpStatusCodeValue($invalidHttpStatusCodeValue)
     {
         $this->expectException(InvalidTypeException::class);
-        $this->expectExceptionMessageRegExp('/Invalid type for path "api_platform\\.exception_to_status\\.Exception". Expected "?int"?, but got .+\\./');
+        $this->expectExceptionMessageRegExp('/Invalid type for path "api_platform\\.exception_to_status\\.Exception". Expected "?int"?, but got "?.+"?\./');
 
         $this->processor->processConfiguration($this->configuration, [
             'api_platform' => [

@@ -17,6 +17,7 @@ default:
             jsonApiSchemaFile: '%paths.base%/tests/Fixtures/JsonSchema/jsonapi.json'
         - 'JsonHalContext':
             schemaFile: '%paths.base%/tests/Fixtures/JsonHal/jsonhal.json'
+        - 'MercureContext'
         - 'Behat\MinkExtension\Context\MinkContext'
         - 'Behatch\Context\RestContext'
       filters:
@@ -56,6 +57,7 @@ postgres:
             jsonApiSchemaFile: '%paths.base%/tests/Fixtures/JsonSchema/jsonapi.json'
         - 'JsonHalContext':
             schemaFile: '%paths.base%/tests/Fixtures/JsonHal/jsonhal.json'
+        - 'MercureContext'
         - 'Behat\MinkExtension\Context\MinkContext'
         - 'Behatch\Context\RestContext'
       filters:
@@ -81,6 +83,7 @@ mongodb:
             jsonApiSchemaFile: '%paths.base%/tests/Fixtures/JsonSchema/jsonapi.json'
         - 'JsonHalContext':
             schemaFile: '%paths.base%/tests/Fixtures/JsonHal/jsonhal.json'
+        - 'MercureContext'
         - 'Behat\MinkExtension\Context\MinkContext'
         - 'Behatch\Context\RestContext'
       filters:
@@ -124,6 +127,7 @@ default-coverage:
             jsonApiSchemaFile: '%paths.base%/tests/Fixtures/JsonSchema/jsonapi.json'
         - 'JsonHalContext':
             schemaFile: '%paths.base%/tests/Fixtures/JsonHal/jsonhal.json'
+        - 'MercureContext'
         - 'CoverageContext'
         - 'Behat\MinkExtension\Context\MinkContext'
         - 'Behatch\Context\RestContext'
@@ -149,6 +153,7 @@ mongodb-coverage:
             jsonApiSchemaFile: '%paths.base%/tests/Fixtures/JsonSchema/jsonapi.json'
         - 'JsonHalContext':
             schemaFile: '%paths.base%/tests/Fixtures/JsonHal/jsonhal.json'
+        - 'MercureContext'
         - 'CoverageContext'
         - 'Behat\MinkExtension\Context\MinkContext'
         - 'Behatch\Context\RestContext'
