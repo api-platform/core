@@ -335,7 +335,7 @@ class FieldsBuilderTest extends TestCase
                     ],
                 ],
             ],
-            'collection with page-based pagination enabled' => ['resourceClass', (new ResourceMetadata('ShortName', null, null, null, null, ['paginationType' => 'page']))->withGraphql(['action' => ['filters' => ['my_filter']]]), 'action', [], $graphqlType = GraphQLType::listOf(new ObjectType(['name' => 'collection'])), $resolver = function () {
+            'collection with page-based pagination enabled' => ['resourceClass', (new ResourceMetadata('ShortName', null, null, null, null, ['pagination_type' => 'page']))->withGraphql(['action' => ['filters' => ['my_filter']]]), 'action', [], $graphqlType = GraphQLType::listOf(new ObjectType(['name' => 'collection'])), $resolver = function () {
             },
                 [
                     'actionShortNames' => [

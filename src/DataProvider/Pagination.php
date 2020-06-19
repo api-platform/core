@@ -215,7 +215,7 @@ final class Pagination
             return 'cursor';
         }
 
-        return (string) $resourceMetadata->getGraphqlAttribute($operationName, 'paginationType', 'cursor', true);
+        return (string) $resourceMetadata->getGraphqlAttribute($operationName, 'pagination_type', 'cursor', true);
     }
 
     /**
