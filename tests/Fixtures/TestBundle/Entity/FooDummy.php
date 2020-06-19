@@ -26,7 +26,7 @@ use Doctrine\ORM\Mapping as ORM;
  *         "order"={"dummy.name"}
  *     },
  *     graphql={
- *         "collection_query"={"paginationType"="page"}
+ *         "collection_query"={"pagination_type"="page"}
  *     }
  * )
  * @ORM\Entity

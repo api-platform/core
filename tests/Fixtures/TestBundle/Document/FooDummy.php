@@ -26,7 +26,7 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
  *         "order"={"dummy.name"}
  *     },
  *     graphql={
- *         "collection_query"={"paginationType"="page"}
+ *         "collection_query"={"pagination_type"="page"}
  *     }
  * )
  * @ODM\Document

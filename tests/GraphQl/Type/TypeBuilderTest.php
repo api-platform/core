@@ -436,7 +436,7 @@ class TypeBuilderTest extends TestCase
             null,
             null,
             null,
-            ['paginationType' => 'cursor']
+            ['pagination_type' => 'cursor']
         ));
 
         /** @var ObjectType $resourcePaginatedCollectionType */
@@ -498,7 +498,7 @@ class TypeBuilderTest extends TestCase
             null,
             null,
             null,
-            ['paginationType' => 'page']
+            ['pagination_type' => 'page']
         ));
 
         /** @var ObjectType $resourcePaginatedCollectionType */
