@@ -129,7 +129,7 @@ final class SubresourceOperationFactory implements SubresourceOperationFactoryIn
                 $operation['path'] = $subresourceOperation['path'] ?? sprintf(
                     '/%s%s/{id}/%s%s',
                     $prefix,
-                    $this->pathSegmentNameGenerator->getSegmentName($rootShortname, true),
+                    $this->pathSegmentNameGenerator->getSegmentName($rootShortname),
                     $this->pathSegmentNameGenerator->getSegmentName($operation['property'], $operation['collection']),
                     self::FORMAT_SUFFIX
                 );
