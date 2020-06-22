@@ -15,8 +15,10 @@ namespace ApiPlatform\Core\Bridge\Symfony\Messenger;
 
 use ApiPlatform\Core\Api\OperationType;
 use ApiPlatform\Core\DataPersister\ContextAwareDataPersisterInterface;
+use ApiPlatform\Core\DataPersister\LoopDataPersisterInterface;
 use ApiPlatform\Core\Exception\ResourceClassNotFoundException;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
+use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Util\ClassInfoTrait;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\MessageBusInterface;
@@ -29,7 +31,7 @@ use Symfony\Component\Messenger\Stamp\HandledStamp;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-final class DataPersister implements ContextAwareDataPersisterInterface
+final class DataPersister implements ContextAwareDataPersisterInterface, LoopDataPersisterInterface
 {
     use ClassInfoTrait;
     use DispatchTrait;
@@ -53,21 +55,7 @@ final class DataPersister implements ContextAwareDataPersisterInterface
             return false;
         }
 
-        if (null !== $operationName = $context['collection_operation_name'] ?? $context['item_operation_name'] ?? null) {
-            return false !== $resourceMetadata->getTypedOperationAttribute(
-                $context['collection_operation_name'] ?? false ? OperationType::COLLECTION : OperationType::ITEM,
-                $operationName,
-                'messenger',
-                false,
-                true
-            );
-        }
-
-        if (isset($context['graphql_operation_name'])) {
-            return false !== $resourceMetadata->getGraphqlAttribute($context['graphql_operation_name'], 'messenger', false, true);
-        }
-
-        return false !== $resourceMetadata->getAttribute('messenger', false);
+        return false !== $this->getMessengerAttributeValue($resourceMetadata, $context);
     }
 
     /**
@@ -97,5 +85,34 @@ final class DataPersister implements ContextAwareDataPersisterInterface
             (new Envelope($data))
                 ->with(new RemoveStamp())
         );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function loop($data, array $context = []): bool
+    {
+        $value = $this->getMessengerAttributeValue($this->resourceMetadataFactory->create($context['resource_class'] ?? $this->getObjectClass($data)), $context);
+
+        return 'persist' === $value || (\is_array($value) && \in_array('persist', $value, true));
+    }
+
+    private function getMessengerAttributeValue(ResourceMetadata $resourceMetadata, array $context = [])
+    {
+        if (null !== $operationName = $context['collection_operation_name'] ?? $context['item_operation_name'] ?? null) {
+            return $resourceMetadata->getTypedOperationAttribute(
+                    $context['collection_operation_name'] ?? false ? OperationType::COLLECTION : OperationType::ITEM,
+                    $operationName,
+                    'messenger',
+                    false,
+                    true
+                );
+        }
+
+        if (isset($context['graphql_operation_name'])) {
+            return $resourceMetadata->getGraphqlAttribute($context['graphql_operation_name'], 'messenger', false, true);
+        }
+
+        return $resourceMetadata->getAttribute('messenger', false);
     }
 }

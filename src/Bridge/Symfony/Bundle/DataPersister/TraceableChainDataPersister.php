@@ -16,6 +16,7 @@ namespace ApiPlatform\Core\Bridge\Symfony\Bundle\DataPersister;
 use ApiPlatform\Core\DataPersister\ChainDataPersister;
 use ApiPlatform\Core\DataPersister\ContextAwareDataPersisterInterface;
 use ApiPlatform\Core\DataPersister\DataPersisterInterface;
+use ApiPlatform\Core\DataPersister\LoopDataPersisterInterface;
 
 /**
  * @author Anthony GRASSIOT <antograssiot@free.fr>
@@ -52,8 +53,12 @@ final class TraceableChainDataPersister implements ContextAwareDataPersisterInte
      */
     public function persist($data, array $context = [])
     {
-        if ($match = $this->tracePersisters($data, $context)) {
-            return $match->persist($data, $context) ?? $data;
+        foreach ($this->tracePersisters($data, $context) as $match) {
+            $result = $match->persist($data, $context) ?? $data;
+
+            if (!$match instanceof LoopDataPersisterInterface || !$match->loop($data, $context)) {
+                return $result;
+            }
         }
     }
 
@@ -62,8 +67,12 @@ final class TraceableChainDataPersister implements ContextAwareDataPersisterInte
      */
     public function remove($data, array $context = [])
     {
-        if ($match = $this->tracePersisters($data, $context)) {
-            return $match->remove($data, $context);
+        foreach ($this->tracePersisters($data, $context) as $match) {
+            $match->remove($data, $context);
+
+            if (!$match instanceof LoopDataPersisterInterface || !$match->loop($data, $context)) {
+                return;
+            }
         }
     }
 
@@ -78,6 +87,10 @@ final class TraceableChainDataPersister implements ContextAwareDataPersisterInte
             }
         }
 
-        return $match;
+        foreach ($this->persisters as $persister) {
+            if ($persister->supports($data, $context)) {
+                yield $persister;
+            }
+        }
     }
 }
