@@ -16,6 +16,7 @@ namespace ApiPlatform\Core\GraphQl\Action;
 use ApiPlatform\Core\GraphQl\ExecutorInterface;
 use ApiPlatform\Core\GraphQl\Type\SchemaBuilderInterface;
 use GraphQL\Error\Debug;
+use GraphQL\Error\DebugFlag;
 use GraphQL\Error\Error;
 use GraphQL\Error\UserError;
 use GraphQL\Executor\ExecutionResult;
@@ -46,7 +47,8 @@ final class EntrypointAction
         $this->executor = $executor;
         $this->graphiQlAction = $graphiQlAction;
         $this->graphQlPlaygroundAction = $graphQlPlaygroundAction;
-        $this->debug = $debug ? Debug::INCLUDE_DEBUG_MESSAGE | Debug::INCLUDE_TRACE : false;
+        $debugClass = class_exists(Debug::class) ? Debug::class : DebugFlag::class;
+        $this->debug = $debug ? $debugClass::INCLUDE_DEBUG_MESSAGE | $debugClass::INCLUDE_TRACE : false;
         $this->graphiqlEnabled = $graphiqlEnabled;
         $this->graphQlPlaygroundEnabled = $graphQlPlaygroundEnabled;
         $this->defaultIde = $defaultIde;
