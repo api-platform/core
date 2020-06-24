@@ -93,7 +93,7 @@ final class FieldsBuilder implements FieldsBuilderInterface
         $shortName = $resourceMetadata->getShortName();
         $fieldName = lcfirst('item_query' === $queryName ? $shortName : $queryName.$shortName);
 
-        $deprecationReason = (string) $resourceMetadata->getGraphqlAttribute($queryName, 'deprecation_reason', '', true);
+        $deprecationReason = $resourceMetadata->getGraphqlAttribute($queryName, 'deprecation_reason', null, true);
 
         if ($fieldConfiguration = $this->getResourceFieldConfiguration(null, null, $deprecationReason, new Type(Type::BUILTIN_TYPE_OBJECT, true, $resourceClass), $resourceClass, false, $queryName, null)) {
             $args = $this->resolveResourceArgs($configuration['args'] ?? [], $queryName, $shortName);
@@ -113,7 +113,7 @@ final class FieldsBuilder implements FieldsBuilderInterface
         $shortName = $resourceMetadata->getShortName();
         $fieldName = lcfirst('collection_query' === $queryName ? $shortName : $queryName.$shortName);
 
-        $deprecationReason = (string) $resourceMetadata->getGraphqlAttribute($queryName, 'deprecation_reason', '', true);
+        $deprecationReason = $resourceMetadata->getGraphqlAttribute($queryName, 'deprecation_reason', null, true);
 
         if ($fieldConfiguration = $this->getResourceFieldConfiguration(null, null, $deprecationReason, new Type(Type::BUILTIN_TYPE_OBJECT, false, null, true, null, new Type(Type::BUILTIN_TYPE_OBJECT, false, $resourceClass)), $resourceClass, false, $queryName, null)) {
             $args = $this->resolveResourceArgs($configuration['args'] ?? [], $queryName, $shortName);
@@ -133,7 +133,7 @@ final class FieldsBuilder implements FieldsBuilderInterface
         $mutationFields = [];
         $shortName = $resourceMetadata->getShortName();
         $resourceType = new Type(Type::BUILTIN_TYPE_OBJECT, true, $resourceClass);
-        $deprecationReason = $resourceMetadata->getGraphqlAttribute($mutationName, 'deprecation_reason', '', true);
+        $deprecationReason = $resourceMetadata->getGraphqlAttribute($mutationName, 'deprecation_reason', null, true);
 
         if ($fieldConfiguration = $this->getResourceFieldConfiguration(null, ucfirst("{$mutationName}s a $shortName."), $deprecationReason, $resourceType, $resourceClass, false, null, $mutationName)) {
             $fieldConfiguration['args'] += ['input' => $this->getResourceFieldConfiguration(null, null, $deprecationReason, $resourceType, $resourceClass, true, null, $mutationName)];
@@ -194,7 +194,7 @@ final class FieldsBuilder implements FieldsBuilderInterface
                     continue;
                 }
 
-                if ($fieldConfiguration = $this->getResourceFieldConfiguration($property, $propertyMetadata->getDescription(), $propertyMetadata->getAttribute('deprecation_reason', ''), $propertyType, $resourceClass, $input, $queryName, $mutationName, $depth)) {
+                if ($fieldConfiguration = $this->getResourceFieldConfiguration($property, $propertyMetadata->getDescription(), $propertyMetadata->getAttribute('deprecation_reason', null), $propertyType, $resourceClass, $input, $queryName, $mutationName, $depth)) {
                     $fields['id' === $property ? '_id' : $this->normalizePropertyName($property)] = $fieldConfiguration;
                 }
             }
@@ -228,7 +228,7 @@ final class FieldsBuilder implements FieldsBuilderInterface
      *
      * @see http://webonyx.github.io/graphql-php/type-system/object-types/
      */
-    private function getResourceFieldConfiguration(?string $property, ?string $fieldDescription, string $deprecationReason, Type $type, string $rootResource, bool $input, ?string $queryName, ?string $mutationName, int $depth = 0): ?array
+    private function getResourceFieldConfiguration(?string $property, ?string $fieldDescription, ?string $deprecationReason, Type $type, string $rootResource, bool $input, ?string $queryName, ?string $mutationName, int $depth = 0): ?array
     {
         try {
             $resourceClass = $this->typeBuilder->isCollection($type) && ($collectionValueType = $type->getCollectionValueType()) ? $collectionValueType->getClassName() : $type->getClassName();
