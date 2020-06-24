@@ -38,9 +38,6 @@ parameters:
 		-
 			message: '#Variable \$positionPm might not be defined\.#'
 			path: src/Util/ClassInfoTrait.php
-		-
-			message: "#Cannot access offset 'node' on bool\\.#"
-			path: src/GraphQl/Serializer/SerializerContextBuilder.php
 		- '#Access to an undefined property Prophecy\\Prophecy\\ObjectProphecy<(\\?[a-zA-Z0-9_]+)+>::\$[a-zA-Z0-9_]+#'
 		-
 			message: '#Call to an undefined method Doctrine\\Persistence\\ObjectManager::getConnection\(\)#'

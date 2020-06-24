@@ -18,6 +18,7 @@ use ApiPlatform\Core\GraphQl\Action\GraphiQlAction;
 use ApiPlatform\Core\GraphQl\Action\GraphQlPlaygroundAction;
 use ApiPlatform\Core\GraphQl\ExecutorInterface;
 use ApiPlatform\Core\GraphQl\Type\SchemaBuilderInterface;
+use GraphQL\Error\DebugFlag;
 use GraphQL\Executor\ExecutionResult;
 use GraphQL\Type\Schema;
 use PHPUnit\Framework\TestCase;
@@ -229,7 +230,7 @@ class EntrypointActionTest extends TestCase
         $schemaBuilderProphecy->getSchema()->willReturn($schema->reveal());
 
         $executionResultProphecy = $this->prophesize(ExecutionResult::class);
-        $executionResultProphecy->toArray(false)->willReturn(['GraphQL']);
+        $executionResultProphecy->toArray(DebugFlag::NONE)->willReturn(['GraphQL']);
         $executorProphecy = $this->prophesize(ExecutorInterface::class);
         $executorProphecy->executeQuery(Argument::is($schema->reveal()), 'graphqlQuery', null, null, $variables, 'graphqlOperationName')->willReturn($executionResultProphecy->reveal());
 
