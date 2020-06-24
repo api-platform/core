@@ -1536,14 +1536,13 @@ final class DoctrineContext implements Context
     }
 
     /**
-<<<<<<< HEAD
      * @Given there are :nb dummy mercure objects
      */
     public function thereAreDummyMercureObjects(int $nb)
     {
         for ($i = 1; $i <= $nb; ++$i) {
             $relatedDummy = $this->buildRelatedDummy();
-            $relatedDummy->setName('RelatedDummy #'.$i);
+            $relatedDummy->setName('RelatedDummy #' . $i);
 
             $dummyMercure = $this->buildDummyMercure();
             $dummyMercure->name = "Dummy Mercure #$i";
@@ -1552,7 +1551,12 @@ final class DoctrineContext implements Context
 
             $this->manager->persist($relatedDummy);
             $this->manager->persist($dummyMercure);
-=======
+        }
+
+        $this->manager->flush();
+    }
+
+    /**
      * @Given there are :nb absoluteUrlDummy objects with a related absoluteUrlRelationDummy
      */
     public function thereAreAbsoluteUrlDummies(int $nb)
@@ -1572,7 +1576,7 @@ final class DoctrineContext implements Context
     /**
      * @Given there are :nb networkPathDummy objects with a related networkPathRelationDummy
      */
-    public function thereArenetworkPathDummies(int $nb)
+    public function thereAreNetworkPathDummies(int $nb)
     {
         for ($i = 1; $i <= $nb; ++$i) {
             $networkPathRelationDummy = $this->buildNetworkPathRelationDummy();
@@ -1581,7 +1585,6 @@ final class DoctrineContext implements Context
 
             $this->manager->persist($networkPathRelationDummy);
             $this->manager->persist($networkPathDummy);
->>>>>>> 880597f6... add ability to return absolute urls instead of relative IRIs
         }
 
         $this->manager->flush();
@@ -1966,13 +1969,15 @@ final class DoctrineContext implements Context
     }
 
     /**
-<<<<<<< HEAD
      * @return DummyMercure|DummyMercureDocument
      */
     private function buildDummyMercure()
     {
         return $this->isOrm() ? new DummyMercure() : new DummyMercureDocument();
-=======
+
+    }
+
+    /**
      * @return AbsoluteUrlDummyDocument|AbsoluteUrlDummy
      */
     private function buildAbsoluteUrlDummy()
@@ -2002,6 +2007,5 @@ final class DoctrineContext implements Context
     private function buildNetworkPathRelationDummy()
     {
         return $this->isOrm() ? new NetworkPathRelationDummy() : new NetworkPathRelationDummyDocument();
->>>>>>> 880597f6... add ability to return absolute urls instead of relative IRIs
     }
 }
