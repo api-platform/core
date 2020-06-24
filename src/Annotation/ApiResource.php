@@ -66,7 +66,8 @@ use ApiPlatform\Core\Exception\InvalidArgumentException;
  *     @Attribute("subresourceOperations", type="array"),
  *     @Attribute("sunset", type="string"),
  *     @Attribute("swaggerContext", type="array"),
- *     @Attribute("validationGroups", type="mixed")
+ *     @Attribute("urlGenerationStrategy", type="int"),
+ *     @Attribute("validationGroups", type="mixed"),
  * )
  */
 final class ApiResource
@@ -119,6 +120,7 @@ final class ApiResource
         'routePrefix',
         'sunset',
         'swaggerContext',
+        'urlGenerationStrategy',
         'validationGroups',
     ];
 
@@ -433,6 +435,13 @@ final class ApiResource
      * @see https://github.com/Haehnchen/idea-php-annotation-plugin/issues/112
      */
     private $validationGroups;
+
+    /**
+     * @see https://github.com/Haehnchen/idea-php-annotation-plugin/issues/112
+     *
+     * @var int
+     */
+    private $urlGenerationStrategy;
 
     /**
      * @throws InvalidArgumentException

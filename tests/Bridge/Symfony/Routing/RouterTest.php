@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Tests\Bridge\Symfony\Routing;
 
+use ApiPlatform\Core\Api\UrlGeneratorInterface;
 use ApiPlatform\Core\Bridge\Symfony\Routing\Router;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
@@ -57,6 +58,24 @@ class RouterTest extends TestCase
 
         $router = new Router($mockedRouter->reveal());
         $this->assertSame('/bar', $router->generate('foo'));
+    }
+
+    public function testGenerateWithDefaultStrategy()
+    {
+        $mockedRouter = $this->prophesize(RouterInterface::class);
+        $mockedRouter->generate('foo', [], UrlGeneratorInterface::ABS_URL)->willReturn('/bar')->shouldBeCalled();
+
+        $router = new Router($mockedRouter->reveal(), UrlGeneratorInterface::ABS_URL);
+        $this->assertSame('/bar', $router->generate('foo'));
+    }
+
+    public function testGenerateWithStrategy()
+    {
+        $mockedRouter = $this->prophesize(RouterInterface::class);
+        $mockedRouter->generate('foo', [], UrlGeneratorInterface::ABS_URL)->willReturn('/bar')->shouldBeCalled();
+
+        $router = new Router($mockedRouter->reveal());
+        $this->assertSame('/bar', $router->generate('foo', [], UrlGeneratorInterface::ABS_URL));
     }
 
     public function testMatch()
