@@ -101,6 +101,9 @@ final class DataPersister implements ContextAwareDataPersisterInterface, LoopDat
         return 'persist' === $value || (\is_array($value) && \in_array('persist', $value, true));
     }
 
+    /**
+     * @return bool|string|array|null
+     */
     private function getMessengerAttributeValue(ResourceMetadata $resourceMetadata, array $context = [])
     {
         if (null !== $operationName = $context['collection_operation_name'] ?? $context['item_operation_name'] ?? null) {

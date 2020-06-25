@@ -15,8 +15,9 @@ namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\DataTransformer;
 
 use ApiPlatform\Core\DataTransformer\DataTransformerInterface;
 use ApiPlatform\Core\Serializer\AbstractItemNormalizer;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\MessengerWithArray as MessengerWithArrayDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Dto\MessengerInput;
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\MessengerWithArray;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\MessengerWithArray as MessengerWithArrayEntity;
 
 final class MessengerWithArrayDtoDataTransformer implements DataTransformerInterface
 {
@@ -39,6 +40,6 @@ final class MessengerWithArrayDtoDataTransformer implements DataTransformerInter
      */
     public function supportsTransformation($object, string $to, array $context = []): bool
     {
-        return MessengerWithArray::class === $to && null !== ($context['input']['class'] ?? null);
+        return \in_array($to, [MessengerWithArrayEntity::class, MessengerWithArrayDocument::class], true) && null !== ($context['input']['class'] ?? null);
     }
 }
