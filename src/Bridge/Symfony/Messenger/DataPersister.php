@@ -92,7 +92,11 @@ final class DataPersister implements ContextAwareDataPersisterInterface, LoopDat
      */
     public function loop($data, array $context = []): bool
     {
-        $value = $this->getMessengerAttributeValue($this->resourceMetadataFactory->create($context['resource_class'] ?? $this->getObjectClass($data)), $context);
+        try {
+            $value = $this->getMessengerAttributeValue($this->resourceMetadataFactory->create($context['resource_class'] ?? $this->getObjectClass($data)), $context);
+        } catch (ResourceClassNotFoundException $exception) {
+            return false;
+        }
 
         return 'persist' === $value || (\is_array($value) && \in_array('persist', $value, true));
     }

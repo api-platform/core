@@ -103,4 +103,16 @@ class DataPersisterTest extends TestCase
         $dataPersister = new DataPersister($metadataFactoryProphecy->reveal(), $this->prophesize(MessageBusInterface::class)->reveal());
         $this->assertTrue($dataPersister->supports(new DummyCar(), ['resource_class' => Dummy::class, 'graphql_operation_name' => 'create']));
     }
+
+    public function testLoop()
+    {
+        $metadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
+        $metadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadata(null, null, null, null, null, ['messenger' => 'persist']));
+        $metadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadata(null, null, null, null, null, ['messenger' => ['persist', 'input']]));
+        $metadataFactoryProphecy->create(DummyCar::class)->willThrow(new ResourceClassNotFoundException());
+
+        $dataPersister = new DataPersister($metadataFactoryProphecy->reveal(), $this->prophesize(MessageBusInterface::class)->reveal());
+        $this->assertTrue($dataPersister->loop(new DummyCar(), ['resource_class' => Dummy::class]));
+        $this->assertFalse($dataPersister->loop(new DummyCar()));
+    }
 }
