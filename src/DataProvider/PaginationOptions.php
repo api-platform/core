@@ -13,7 +13,10 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\DataProvider;
 
-class PaginationOptions
+/**
+ * @internal
+ */
+final class PaginationOptions
 {
     private $paginationEnabled;
     private $paginationPageParameterName;

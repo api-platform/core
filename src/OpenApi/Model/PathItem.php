@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\OpenApi\Model;
 
-class PathItem
+final class PathItem
 {
     use ExtensionTrait;
 

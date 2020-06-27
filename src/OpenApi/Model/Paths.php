@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\OpenApi\Model;
 
-class Paths
+final class Paths
 {
     private $paths;
 

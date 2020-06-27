@@ -15,7 +15,7 @@ namespace ApiPlatform\Core\OpenApi\Model;
 
 use ApiPlatform\Core\JsonSchema\Schema as JsonSchema;
 
-class Schema
+final class Schema extends \ArrayObject
 {
     use ExtensionTrait;
 
@@ -40,6 +40,8 @@ class Schema
         $this->example = $example;
         $this->deprecated = $deprecated;
         $this->schema = new JsonSchema();
+
+        parent::__construct([]);
     }
 
     public function setDefinitions(array $definitions)
@@ -47,9 +49,19 @@ class Schema
         $this->schema->setDefinitions(new \ArrayObject($definitions));
     }
 
+    /**
+     * {@inheritdoc}
+     */
+    public function getArrayCopy(): array
+    {
+        $schema = parent::getArrayCopy();
+        unset($schema['schema']);
+        return $schema;
+    }
+
     public function getDefinitions(): \ArrayObject
     {
-        return new \ArrayObject(array_merge((array) $this->schema->getDefinitions(), (array) $this));
+        return new \ArrayObject(array_merge($this->schema->getArrayCopy(true), $this->getArrayCopy()));
     }
 
     public function getNullable(): bool

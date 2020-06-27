@@ -34,7 +34,7 @@ use Psr\Container\ContainerInterface;
 use Symfony\Component\PropertyInfo\Type;
 
 /**
- * Generates an OpenAPI v3 specification.
+ * Generates an Open API v3 specification.
  */
 final class OpenApiFactory implements OpenApiFactoryInterface
 {
@@ -105,6 +105,9 @@ final class OpenApiFactory implements OpenApiFactoryInterface
         return new OpenApi($info, $servers, $paths, new Model\Components(new \ArrayObject($schemas), new \ArrayObject(), new \ArrayObject(), new \ArrayObject(), new \ArrayObject(), new \ArrayObject(), new \ArrayObject($securitySchemes)), $securityRequirements);
     }
 
+    /**
+     * @return array | array
+     */
     private function collectPaths(ResourceMetadata $resourceMetadata, string $resourceClass, string $operationType, array $context, Model\Paths $paths, array $links, array $schemas = []): array
     {
         $resourceShortName = $resourceMetadata->getShortName();
@@ -216,7 +219,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
         return $content;
     }
 
-    private function getMimeTypes($resourceClass, $operationName, $operationType, $resourceMetadata = null)
+    private function getMimeTypes($resourceClass, $operationName, $operationType, $resourceMetadata = null): array
     {
         $requestFormats = $resourceMetadata->getTypedOperationAttribute($operationType, $operationName, 'input_formats', $this->formats, true);
         $responseFormats = $resourceMetadata->getTypedOperationAttribute($operationType, $operationName, 'output_formats', $this->formats, true);
@@ -328,7 +331,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
         return $parameters;
     }
 
-    private function getPaginationParameters(ResourceMetadata $resourceMetadata, string $operationName)
+    private function getPaginationParameters(ResourceMetadata $resourceMetadata, string $operationName): array
     {
         if (!$this->paginationOptions->isPaginationEnabled()) {
             return [];
@@ -361,7 +364,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
         return $parameters;
     }
 
-    private function getOauthSecurityScheme()
+    private function getOauthSecurityScheme(): Model\SecurityScheme
     {
         $oauthFlow = new Model\OAuthFlow($this->openApiOptions->getOAuthAuthorizationUrl(), $this->openApiOptions->getOAuthTokenUrl(), $this->openApiOptions->getOAuthRefreshUrl(), new \ArrayObject($this->openApiOptions->getOAuthScopes()));
         $description = sprintf(
@@ -392,7 +395,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
         return new Model\SecurityScheme($this->openApiOptions->getOAuthType(), $description, null, null, 'oauth2', null, new Model\OAuthFlows($implicit, $password, $clientCredentials, $authorizationCode), null);
     }
 
-    private function getSecuritySchemes()
+    private function getSecuritySchemes(): array
     {
         $securitySchemes = [];
 

@@ -249,6 +249,7 @@ final class Configuration implements ConfigurationInterface
                         ->scalarNode('flow')->defaultValue('application')->info('The oauth flow grant type.')->end()
                         ->scalarNode('tokenUrl')->defaultValue('/oauth/v2/token')->info('The oauth token url.')->end()
                         ->scalarNode('authorizationUrl')->defaultValue('/oauth/v2/auth')->info('The oauth authentication url.')->end()
+                        ->scalarNode('refreshUrl')->defaultValue('/oauth/v2/refresh')->info('The oauth refresh url.')->end()
                         ->arrayNode('scopes')
                             ->prototype('scalar')->end()
                         ->end()
@@ -296,7 +297,7 @@ final class Configuration implements ConfigurationInterface
                     ->addDefaultsIfNotSet()
                     ->children()
                         ->arrayNode('versions')
-                            ->info('The active versions of OpenAPI to be exported or used in the swagger_ui. The first value is the default.')
+                            ->info('The active versions of Open API to be exported or used in the swagger_ui. The first value is the default.')
                             ->defaultValue($defaultVersions)
                             ->beforeNormalization()
                                 ->always(static function ($v) {

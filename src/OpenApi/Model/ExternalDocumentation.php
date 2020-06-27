@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\OpenApi\Model;
 
-class ExternalDocumentation
+final class ExternalDocumentation
 {
     use ExtensionTrait;
 

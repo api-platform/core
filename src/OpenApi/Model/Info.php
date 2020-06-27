@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\OpenApi\Model;
 
-class Info
+final class Info
 {
     use ExtensionTrait;
 

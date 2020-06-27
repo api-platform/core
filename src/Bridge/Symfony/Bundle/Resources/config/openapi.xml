@@ -20,8 +20,7 @@
             <argument>%api_platform.oauth.flow%</argument>
             <argument>%api_platform.oauth.tokenUrl%</argument>
             <argument>%api_platform.oauth.authorizationUrl%</argument>
-            <!-- TODO: RefreshUrl -->
-            <argument></argument>
+            <argument>%api_platform.oauth.refreshUrl%</argument>
             <argument>%api_platform.oauth.scopes%</argument>
             <argument>%api_platform.swagger.api_keys%</argument>
         </service>

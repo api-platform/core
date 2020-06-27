@@ -38,7 +38,6 @@ final class DocumentationAction
     private $openApiFactory;
 
     /**
-     * @param OpenApiFactoryInterface              $openApiFactory
      * @param int[]                                $swaggerVersions
      * @param mixed|array|FormatsProviderInterface $formatsProvider
      */
@@ -52,7 +51,7 @@ final class DocumentationAction
         $this->openApiFactory = $openApiFactory;
 
         if (null === $openApiFactory) {
-            @trigger_error(sprintf('Not passing an array or an instance of "%s" as 7th parameter of the constructor of "%s" is deprecated since API Platform 2.6', OpenApiFactoryInterface::class, __CLASS__), E_USER_DEPRECATED);
+            @trigger_error(sprintf('Not passing an instance of "%s" as 7th parameter of the constructor of "%s" is deprecated since API Platform 2.6', OpenApiFactoryInterface::class, __CLASS__), E_USER_DEPRECATED);
         }
 
         if (null === $formatsProvider) {

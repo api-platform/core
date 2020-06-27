@@ -20,11 +20,12 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Yaml\Yaml;
 
 /**
- * Console command to dump OpenApi documentations.
+ * Dumps Open API documentation.
  */
 final class OpenApiCommand extends Command
 {
@@ -33,9 +34,9 @@ final class OpenApiCommand extends Command
 
     public function __construct(OpenApiFactoryInterface $openApiFactory, NormalizerInterface $normalizer)
     {
+        parent::__construct();
         $this->openApiFactory = $openApiFactory;
         $this->normalizer = $normalizer;
-        parent::__construct();
     }
 
     /**
@@ -45,11 +46,11 @@ final class OpenApiCommand extends Command
     {
         $this
             ->setName('api:openapi:export')
-            ->setDescription('Dump the OpenAPI documentation')
+            ->setDescription('Dump the Open API documentation')
             ->addOption('yaml', 'y', InputOption::VALUE_NONE, 'Dump the documentation in YAML')
             ->addOption('output', 'o', InputOption::VALUE_OPTIONAL, 'Write output to file')
-            ->addOption('spec-version', null, InputOption::VALUE_OPTIONAL, 'OpenAPI version to use (2 or 3) (deprecated)', 3)
-            ->addOption('api-gateway', null, InputOption::VALUE_NONE, 'API Gateway compatibility');
+            ->addOption('spec-version', null, InputOption::VALUE_OPTIONAL, 'Open API version to use (2 or 3) (2 is deprecated)', 3)
+            ->addOption('api-gateway', null, InputOption::VALUE_NONE, 'Enable the Amazon API Gateway compatibility mode');
     }
 
     /**
@@ -59,7 +60,6 @@ final class OpenApiCommand extends Command
     {
         // Backwards compatibility
         if (2 === $specVersion = (int) $input->getOption('spec-version')) {
-            @trigger_error('The command "api:openapi:export --spec-version=2" is deprecated for the OpenApi version 2 use "api:swagger:export".', E_USER_DEPRECATED);
             $command = $this->getApplication()->find('api:swagger:export');
 
             return $command->run(new ArrayInput([
@@ -71,19 +71,20 @@ final class OpenApiCommand extends Command
             ]), $output);
         }
 
+        $filesystem = new Filesystem();
         $io = new SymfonyStyle($input, $output);
         $data = $this->normalizer->normalize($this->openApiFactory->create(), 'json');
         $content = $input->getOption('yaml')
             ? Yaml::dump($data, 10, 2, Yaml::DUMP_OBJECT_AS_MAP | Yaml::DUMP_EMPTY_ARRAY_AS_SEQUENCE | Yaml::DUMP_MULTI_LINE_LITERAL_BLOCK)
             : (json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) ?: '');
 
-        if (!empty($filename = $input->getOption('output')) && \is_string($filename)) {
-            file_put_contents($filename, $content);
+        if (!($filename = $input->getOption('output')) && \is_string($filename)) {
+            $filesystem->dumpFile($filename, $content);
             $io->success(sprintf('Data written to %s.', $filename));
-        } else {
-            $output->writeln($content);
+            return 0;
         }
 
+        $output->writeln($content);
         return 0;
     }
 }

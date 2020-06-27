@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\OpenApi\Model;
 
-class Parameter
+final class Parameter
 {
     use ExtensionTrait;
 
@@ -45,6 +45,7 @@ class Parameter
         $this->example = $example;
         $this->examples = $examples;
         $this->content = $content;
+        $this->style = $style;
 
         if (null === $style) {
             if ('query' === $in || 'cookie' === $in) {
@@ -52,8 +53,6 @@ class Parameter
             } elseif ('path' === $in || 'header' === $in) {
                 $this->style = 'simple';
             }
-        } else {
-            $this->style = $style;
         }
     }
 
