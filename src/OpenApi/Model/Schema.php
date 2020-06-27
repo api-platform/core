@@ -56,6 +56,7 @@ final class Schema extends \ArrayObject
     {
         $schema = parent::getArrayCopy();
         unset($schema['schema']);
+
         return $schema;
     }
 
