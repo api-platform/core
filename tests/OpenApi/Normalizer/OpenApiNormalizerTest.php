@@ -117,7 +117,7 @@ class OpenApiNormalizerTest extends TestCase
             new PaginationOptions(true, 'page', true, 'itemsPerPage', true, 'pagination')
         );
 
-        $openApi = $factory->create(['base_url' => '/app_dev.php/']);
+        $openApi = $factory(['base_url' => '/app_dev.php/']);
 
         $pathItem = $openApi->getPaths()->getPath('/dummies/{id}');
         $operation = $pathItem->getGet();

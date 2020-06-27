@@ -48,7 +48,7 @@ class OpenApiFactoryTest extends TestCase
         'output_formats' => ['jsonld' => ['application/ld+json']],
     ];
 
-    public function testCreate(): void
+    public function testInvoke(): void
     {
         $dummyMetadata = new ResourceMetadata(
             'Dummy',
@@ -201,7 +201,7 @@ class OpenApiFactoryTest extends TestCase
             'externalDocs' => ['url' => 'http://schema.example.com/Dummy'],
         ]));
 
-        $openApi = $factory->create(['base_url' => '/app_dev.php/']);
+        $openApi = $factory(['base_url' => '/app_dev.php/']);
 
         $this->assertInstanceOf(OpenApi::class, $openApi);
         $this->assertEquals($openApi->getInfo(), new Model\Info('Test API', '1.2.3', 'This is a test API.'));
@@ -538,7 +538,7 @@ class OpenApiFactoryTest extends TestCase
             new PaginationOptions(true, 'page', true, 'itemsPerPage', true, 'pagination')
         );
 
-        $openApi = $factory->create(['base_url' => '/app_dev.php/']);
+        $openApi = $factory(['base_url' => '/app_dev.php/']);
 
         $pathItem = $openApi->getPaths()->getPath('/dummies/{id}');
         $operation = $pathItem->getGet();

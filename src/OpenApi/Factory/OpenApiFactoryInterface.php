@@ -20,5 +20,5 @@ interface OpenApiFactoryInterface
     /**
      * Creates an OpenApi class.
      */
-    public function create(array $context = []): OpenApi;
+    public function __invoke(array $context = []): OpenApi;
 }

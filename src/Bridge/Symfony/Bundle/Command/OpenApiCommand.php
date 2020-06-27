@@ -73,12 +73,13 @@ final class OpenApiCommand extends Command
 
         $filesystem = new Filesystem();
         $io = new SymfonyStyle($input, $output);
-        $data = $this->normalizer->normalize($this->openApiFactory->create(), 'json');
+        $data = $this->normalizer->normalize($this->openApiFactory->__invoke(), 'json');
         $content = $input->getOption('yaml')
             ? Yaml::dump($data, 10, 2, Yaml::DUMP_OBJECT_AS_MAP | Yaml::DUMP_EMPTY_ARRAY_AS_SEQUENCE | Yaml::DUMP_MULTI_LINE_LITERAL_BLOCK)
             : (json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) ?: '');
 
-        if (!($filename = $input->getOption('output')) && \is_string($filename)) {
+        $filename = $input->getOption('output');
+        if ($filename && \is_string($filename)) {
             $filesystem->dumpFile($filename, $content);
             $io->success(sprintf('Data written to %s.', $filename));
 

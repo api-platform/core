@@ -73,11 +73,11 @@ final class OpenApiFactory implements OpenApiFactoryInterface
     /**
      * {@inheritdoc}
      */
-    public function create(array $context = []): OpenApi
+    public function __invoke(array $context = []): OpenApi
     {
         $baseUrl = $context[self::BASE_URL] ?? '/';
         $info = new Model\Info($this->openApiOptions->getTitle(), $this->openApiOptions->getVersion(), trim($this->openApiOptions->getDescription()));
-        $servers = '/' !== $baseUrl && '' !== $baseUrl ? [new Model\Server($baseUrl)] : [];
+        $servers = '/' === $baseUrl || '' === $baseUrl ? [] : [new Model\Server($baseUrl)];
         $paths = new Model\Paths();
         $links = [];
         $schemas = [];
@@ -88,10 +88,8 @@ final class OpenApiFactory implements OpenApiFactoryInterface
 
             // Items needs to be parsed first to be able to reference the lines from the collection operation
             list($itemOperationLinks, $itemOperationSchemas) = $this->collectPaths($resourceMetadata, $resourceClass, OperationType::ITEM, $context, $paths, $links, $schemas);
-            $links = array_merge($links, $itemOperationLinks);
             $schemas += $itemOperationSchemas;
             list($collectionOperationLinks, $collectionOperationSchemas) = $this->collectPaths($resourceMetadata, $resourceClass, OperationType::COLLECTION, $context, $paths, $links, $schemas);
-            $links = array_merge($links, $collectionOperationLinks);
             $schemas += $collectionOperationSchemas;
         }
 
@@ -108,7 +106,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
     /**
      * @return array | array
      */
-    private function collectPaths(ResourceMetadata $resourceMetadata, string $resourceClass, string $operationType, array $context, Model\Paths $paths, array $links, array $schemas = []): array
+    private function collectPaths(ResourceMetadata $resourceMetadata, string $resourceClass, string $operationType, array $context, Model\Paths $paths, array &$links, array $schemas = []): array
     {
         $resourceShortName = $resourceMetadata->getShortName();
         if (null === $operations = OperationType::COLLECTION === $operationType ? $resourceMetadata->getCollectionOperations() : $resourceMetadata->getItemOperations()) {
@@ -208,7 +206,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
     /**
      * @TODO: support multiple format schemas
      */
-    private function buildContent(array $responseMimeTypes, $operationSchema): \ArrayObject
+    private function buildContent(array $responseMimeTypes, Schema $operationSchema): \ArrayObject
     {
         $content = new \ArrayObject();
 
@@ -219,7 +217,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
         return $content;
     }
 
-    private function getMimeTypes($resourceClass, $operationName, $operationType, $resourceMetadata = null): array
+    private function getMimeTypes(string $resourceClass, string $operationName, string $operationType, ResourceMetadata $resourceMetadata = null): array
     {
         $requestFormats = $resourceMetadata->getTypedOperationAttribute($operationType, $operationName, 'input_formats', $this->formats, true);
         $responseFormats = $resourceMetadata->getTypedOperationAttribute($operationType, $operationName, 'output_formats', $this->formats, true);
@@ -286,7 +284,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
     }
 
     /**
-     * https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.0.md#linkObject.
+     * @see https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.0.md#linkObject.
      */
     private function getLink(string $resourceClass, string $operationId, string $path): Model\Link
     {
@@ -324,7 +322,21 @@ final class OpenApiFactory implements OpenApiFactoryInterface
             foreach ($filter->getDescription($resourceClass) as $name => $data) {
                 $schema = $data['schema'] ?? \in_array($data['type'], Type::$builtinTypes, true) ? $this->jsonSchemaTypeFactory->getType(new Type($data['type'], false, null, $data['is_collection'] ?? false)) : ['type' => 'string'];
 
-                $parameters[] = new Model\Parameter($name, 'query', $data['description'] ?? '', $data['required'] ?? false, $data['openapi']['deprecated'] ?? false, $data['openapi']['allowEmptyValue'] ?? true, $schema, 'array' === $schema['type'] && \in_array($data['type'], [Type::BUILTIN_TYPE_ARRAY, Type::BUILTIN_TYPE_OBJECT], true) ? 'deepObject' : 'form', 'array' === $schema['type'], $data['openapi']['allowReserved'] ?? false, $data['openapi']['example'] ?? null, isset($data['openapi']['examples']) ? new \ArrayObject($data['openapi']['examples']) : null);
+                $parameters[] = new Model\Parameter(
+                    $name,
+                    'query',
+                    $data['description'] ?? '',
+                    $data['required'] ?? false,
+                    $data['openapi']['deprecated'] ?? false,
+                    $data['openapi']['allowEmptyValue'] ?? true,
+                    $schema,
+                    'array' === $schema['type'] && \in_array($data['type'],
+                    [Type::BUILTIN_TYPE_ARRAY, Type::BUILTIN_TYPE_OBJECT], true) ? 'deepObject' : 'form',
+                    'array' === $schema['type'],
+                    $data['openapi']['allowReserved'] ?? false,
+                    $data['openapi']['example'] ?? null,
+                    isset($data['openapi']['examples']
+                ) ? new \ArrayObject($data['openapi']['examples']) : null);
             }
         }
 

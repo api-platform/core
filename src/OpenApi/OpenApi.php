@@ -19,7 +19,7 @@ use ApiPlatform\Core\OpenApi\Model\ExtensionTrait;
 use ApiPlatform\Core\OpenApi\Model\Info;
 use ApiPlatform\Core\OpenApi\Model\Paths;
 
-class OpenApi implements DocumentationInterface
+final class OpenApi implements DocumentationInterface
 {
     use ExtensionTrait;
 
