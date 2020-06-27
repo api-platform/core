@@ -1149,6 +1149,7 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.oauth.flow' => 'application',
             'api_platform.oauth.tokenUrl' => '/oauth/v2/token',
             'api_platform.oauth.authorizationUrl' => '/oauth/v2/auth',
+            'api_platform.oauth.refreshUrl' => '/oauth/v2/refresh',
             'api_platform.oauth.scopes' => [],
             'api_platform.enable_swagger_ui' => true,
             'api_platform.enable_re_doc' => true,

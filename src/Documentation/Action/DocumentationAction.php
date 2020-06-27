@@ -86,7 +86,7 @@ final class DocumentationAction
         }
 
         if (null !== $this->openApiFactory && isset($context) && 3 === $context['spec_version']) {
-            return $this->openApiFactory->create($context ?? []);
+            return $this->openApiFactory->__invoke($context ?? []);
         }
 
         return new Documentation($this->resourceNameCollectionFactory->create(), $this->title, $this->description, $this->version, $this->formats);

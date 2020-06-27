@@ -19,6 +19,8 @@ use ApiPlatform\Core\Documentation\Documentation;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceNameCollection;
 use ApiPlatform\Core\OpenApi\Factory\OpenApiFactoryInterface;
+use ApiPlatform\Core\OpenApi\Model\Info;
+use ApiPlatform\Core\OpenApi\Model\Paths;
 use ApiPlatform\Core\OpenApi\OpenApi;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
@@ -33,7 +35,7 @@ class DocumentationActionTest extends TestCase
 {
     /**
      * @group legacy
-     * @expectedDeprecation Not passing an array or an instance of "ApiPlatform\Core\OpenApi\Factory\OpenApiFactoryInterface" as 7th parameter of the constructor of "ApiPlatform\Core\Documentation\Action\DocumentationAction" is deprecated since API Platform 2.6
+     * @expectedDeprecation Not passing an instance of "ApiPlatform\Core\OpenApi\Factory\OpenApiFactoryInterface" as 7th parameter of the constructor of "ApiPlatform\Core\Documentation\Action\DocumentationAction" is deprecated since API Platform 2.6
      */
     public function testDocumentationAction(): void
     {
@@ -111,9 +113,9 @@ class DocumentationActionTest extends TestCase
 
     public function testDocumentationActionV3(): void
     {
-        $openApi = $this->prophesize(OpenApi::class)->reveal();
+        $openApi = new OpenApi(new Info('my api', '1.0.0'), [], new Paths());
         $openApiFactoryProphecy = $this->prophesize(OpenApiFactoryInterface::class);
-        $openApiFactoryProphecy->create(Argument::any())->shouldBeCalled()->willReturn($openApi);
+        $openApiFactoryProphecy->__invoke(Argument::any())->shouldBeCalled()->willReturn($openApi);
         $requestProphecy = $this->prophesize(Request::class);
         $attributesProphecy = $this->prophesize(ParameterBagInterface::class);
         $queryProphecy = $this->prophesize(ParameterBag::class);

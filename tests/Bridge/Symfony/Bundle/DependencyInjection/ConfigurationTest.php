@@ -144,6 +144,7 @@ class ConfigurationTest extends TestCase
                 'flow' => 'application',
                 'tokenUrl' => '/oauth/v2/token',
                 'authorizationUrl' => '/oauth/v2/auth',
+                'refreshUrl' => '/oauth/v2/refresh',
                 'scopes' => [],
             ],
             'swagger' => [
