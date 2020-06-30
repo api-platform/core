@@ -260,7 +260,7 @@ class ExtractorResourceMetadataFactoryTest extends FileConfigurationMetadataFact
     public function testCreateWithBadDeclaration()
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessageRegExp('/"ApiPlatform\\\\Core\\\\Tests\\\\Fixtures\\\\TestBundle\\\\Entity\\\\Dummy" setting is expected to be null or an array, string given in ".+\\/Fixtures\\/FileConfigurations\\/bad_declaration\\.yml"\\./');
+        $this->expectExceptionMessageMatches('/"ApiPlatform\\\\Core\\\\Tests\\\\Fixtures\\\\TestBundle\\\\Entity\\\\Dummy" setting is expected to be null or an array, string given in ".+\\/Fixtures\\/FileConfigurations\\/bad_declaration\\.yml"\\./');
 
         $configPath = __DIR__.'/../../../Fixtures/FileConfigurations/bad_declaration.yml';
 

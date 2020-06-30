@@ -261,7 +261,7 @@ class ConfigurationTest extends TestCase
     public function testExceptionToStatusConfigWithInvalidHttpStatusCode($invalidHttpStatusCode)
     {
         $this->expectException(InvalidConfigurationException::class);
-        $this->expectExceptionMessageRegExp('/The HTTP status code ".+" is not valid\\./');
+        $this->expectExceptionMessageMatches('/The HTTP status code ".+" is not valid\\./');
 
         $this->processor->processConfiguration($this->configuration, [
             'api_platform' => [
@@ -290,7 +290,7 @@ class ConfigurationTest extends TestCase
     public function testExceptionToStatusConfigWithInvalidHttpStatusCodeValue($invalidHttpStatusCodeValue)
     {
         $this->expectException(InvalidTypeException::class);
-        $this->expectExceptionMessageRegExp('/Invalid type for path "api_platform\\.exception_to_status\\.Exception". Expected "?int"?, but got "?.+"?\./');
+        $this->expectExceptionMessageMatches('/Invalid type for path "api_platform\\.exception_to_status\\.Exception". Expected "?int"?, but got "?.+"?\./');
 
         $this->processor->processConfiguration($this->configuration, [
             'api_platform' => [
@@ -369,7 +369,7 @@ class ConfigurationTest extends TestCase
         $this->assertSame([2], $config['swagger']['versions']);
 
         $this->expectException(InvalidConfigurationException::class);
-        $this->expectExceptionMessageRegExp('/Only the versions .+ are supported. Got .+./');
+        $this->expectExceptionMessageMatches('/Only the versions .+ are supported. Got .+./');
 
         $this->processor->processConfiguration($this->configuration, [
             'api_platform' => [

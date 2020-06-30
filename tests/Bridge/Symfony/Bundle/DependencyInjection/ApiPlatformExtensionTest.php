@@ -452,7 +452,7 @@ class ApiPlatformExtensionTest extends TestCase
     public function testResourcesToWatchWithUnsupportedMappingType()
     {
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessageRegExp('/Unsupported mapping type in ".+", supported types are XML & YAML\\./');
+        $this->expectExceptionMessageMatches('/Unsupported mapping type in ".+", supported types are XML & YAML\\./');
 
         $config = self::DEFAULT_CONFIG;
         $config['api_platform']['mapping']['paths'] = [__FILE__];
