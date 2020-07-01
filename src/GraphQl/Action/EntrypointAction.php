@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\GraphQl\Action;
 
-use ApiPlatform\Core\GraphQl\ExecutorInterface;
 use ApiPlatform\Core\GraphQl\Error\ErrorHandlerInterface;
+use ApiPlatform\Core\GraphQl\ExecutorInterface;
 use ApiPlatform\Core\GraphQl\Type\SchemaBuilderInterface;
 use GraphQL\Error\Debug;
 use GraphQL\Error\DebugFlag;
@@ -222,5 +222,4 @@ final class EntrypointAction
 
         return new JsonResponse($executionResult->toArray($this->debug), $statusCode);
     }
-
 }

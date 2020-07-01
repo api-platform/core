@@ -9,6 +9,7 @@
 * Handle deprecations from Doctrine Inflector (#3564)
 * JSON Schema: Missing JSON-LD context from Data Transformers (#3479)
 * GraphQL: Resource with no operations should be available through relations (#3532)
+* GraphQL: Allow errors from GraphQL to be handled
 
 ## 2.5.5
 
