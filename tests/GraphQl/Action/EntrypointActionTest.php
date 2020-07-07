@@ -16,6 +16,7 @@ namespace ApiPlatform\Core\Tests\GraphQl\Action;
 use ApiPlatform\Core\GraphQl\Action\EntrypointAction;
 use ApiPlatform\Core\GraphQl\Action\GraphiQlAction;
 use ApiPlatform\Core\GraphQl\Action\GraphQlPlaygroundAction;
+use ApiPlatform\Core\GraphQl\Error\ErrorHandler;
 use ApiPlatform\Core\GraphQl\ExecutorInterface;
 use ApiPlatform\Core\GraphQl\Serializer\Exception\ErrorNormalizer;
 use ApiPlatform\Core\GraphQl\Serializer\Exception\HttpExceptionNormalizer;
@@ -223,6 +224,7 @@ class EntrypointActionTest extends TestCase
 
         $this->assertEquals(200, $mockedEntrypoint($request)->getStatusCode());
         $this->assertEquals('{"errors":[{"message":"GraphQL variables are not valid JSON.","extensions":{"category":"user","status":400}}]}', $mockedEntrypoint($request)->getContent());
+        $this->assertEquals('{"errors":[{"message":"GraphQL variables are not valid JSON.","extensions":{"category":"user","status":400}}]}', $mockedEntrypoint($request)->getContent());
     }
 
     private function getEntrypointAction(array $variables = ['graphqlVariable']): EntrypointAction
@@ -239,15 +241,17 @@ class EntrypointActionTest extends TestCase
         $executionResultProphecy = $this->prophesize(ExecutionResult::class);
         $executionResultProphecy->toArray(false)->willReturn(['GraphQL']);
         $executionResultProphecy->setErrorFormatter([$normalizer, 'normalize'])->willReturn($executionResultProphecy);
+        $executionResultProphecy->setErrorsHandler(Argument::any())->willReturn($executionResultProphecy);
         $executorProphecy = $this->prophesize(ExecutorInterface::class);
         $executorProphecy->executeQuery(Argument::is($schema->reveal()), 'graphqlQuery', null, null, $variables, 'graphqlOperationName')->willReturn($executionResultProphecy->reveal());
 
+        $errorHandler = new ErrorHandler();
         $twigProphecy = $this->prophesize(TwigEnvironment::class);
         $routerProphecy = $this->prophesize(RouterInterface::class);
 
         $graphiQlAction = new GraphiQlAction($twigProphecy->reveal(), $routerProphecy->reveal(), true);
         $graphQlPlaygroundAction = new GraphQlPlaygroundAction($twigProphecy->reveal(), $routerProphecy->reveal(), true);
 
-        return new EntrypointAction($schemaBuilderProphecy->reveal(), $executorProphecy->reveal(), $graphiQlAction, $graphQlPlaygroundAction, $normalizer, false, true, true, 'graphiql');
+        return new EntrypointAction($schemaBuilderProphecy->reveal(), $executorProphecy->reveal(), $graphiQlAction, $graphQlPlaygroundAction, $normalizer, $errorHandler, false, true, true, 'graphiql');
     }
 }

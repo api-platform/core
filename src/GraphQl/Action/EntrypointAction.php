@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\GraphQl\Action;
 
+use ApiPlatform\Core\GraphQl\Error\ErrorHandlerInterface;
 use ApiPlatform\Core\GraphQl\ExecutorInterface;
 use ApiPlatform\Core\GraphQl\Type\SchemaBuilderInterface;
 use GraphQL\Error\Debug;
@@ -42,8 +43,9 @@ final class EntrypointAction
     private $graphiqlEnabled;
     private $graphQlPlaygroundEnabled;
     private $defaultIde;
+    private $errorHandler;
 
-    public function __construct(SchemaBuilderInterface $schemaBuilder, ExecutorInterface $executor, GraphiQlAction $graphiQlAction, GraphQlPlaygroundAction $graphQlPlaygroundAction, NormalizerInterface $normalizer, bool $debug = false, bool $graphiqlEnabled = false, bool $graphQlPlaygroundEnabled = false, $defaultIde = false)
+    public function __construct(SchemaBuilderInterface $schemaBuilder, ExecutorInterface $executor, GraphiQlAction $graphiQlAction, GraphQlPlaygroundAction $graphQlPlaygroundAction, NormalizerInterface $normalizer, ErrorHandlerInterface $errorHandler, bool $debug = false, bool $graphiqlEnabled = false, bool $graphQlPlaygroundEnabled = false, $defaultIde = false)
     {
         $this->schemaBuilder = $schemaBuilder;
         $this->executor = $executor;
@@ -54,6 +56,7 @@ final class EntrypointAction
         $this->graphiqlEnabled = $graphiqlEnabled;
         $this->graphQlPlaygroundEnabled = $graphQlPlaygroundEnabled;
         $this->defaultIde = $defaultIde;
+        $this->errorHandler = $errorHandler;
     }
 
     public function __invoke(Request $request): Response
@@ -76,9 +79,11 @@ final class EntrypointAction
 
             $executionResult = $this->executor
                 ->executeQuery($this->schemaBuilder->getSchema(), $query, null, null, $variables, $operationName)
+                ->setErrorsHandler($this->errorHandler)
                 ->setErrorFormatter([$this->normalizer, 'normalize']);
         } catch (\Exception $exception) {
             $executionResult = (new ExecutionResult(null, [new Error($exception->getMessage(), null, null, null, null, $exception)]))
+                ->setErrorsHandler($this->errorHandler)
                 ->setErrorFormatter([$this->normalizer, 'normalize']);
         }
 

@@ -342,6 +342,7 @@ class ApiPlatformExtensionTest extends TestCase
         $containerBuilderProphecy->setDefinition('api_platform.graphql.action.entrypoint', Argument::type(Definition::class))->shouldNotBeCalled();
         $containerBuilderProphecy->setDefinition('api_platform.graphql.action.graphiql', Argument::type(Definition::class))->shouldNotBeCalled();
         $containerBuilderProphecy->setDefinition('api_platform.graphql.action.graphql_playground', Argument::type(Definition::class))->shouldNotBeCalled();
+        $containerBuilderProphecy->setDefinition('api_platform.graphql.error_handler', Argument::type(Definition::class))->shouldNotBeCalled();
         $containerBuilderProphecy->setDefinition('api_platform.graphql.resolver.factory.collection', Argument::type(Definition::class))->shouldNotBeCalled();
         $containerBuilderProphecy->setDefinition('api_platform.graphql.resolver.factory.item_mutation', Argument::type(Definition::class))->shouldNotBeCalled();
         $containerBuilderProphecy->setDefinition('api_platform.graphql.resolver.factory.item_subscription', Argument::type(Definition::class))->shouldNotBeCalled();
@@ -1195,6 +1196,7 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.graphql.action.entrypoint',
             'api_platform.graphql.action.graphiql',
             'api_platform.graphql.action.graphql_playground',
+            'api_platform.graphql.error_handler',
             'api_platform.graphql.executor',
             'api_platform.graphql.type_builder',
             'api_platform.graphql.fields_builder',
