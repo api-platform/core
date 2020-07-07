@@ -224,7 +224,6 @@ class EntrypointActionTest extends TestCase
 
         $this->assertEquals(200, $mockedEntrypoint($request)->getStatusCode());
         $this->assertEquals('{"errors":[{"message":"GraphQL variables are not valid JSON.","extensions":{"category":"user","status":400}}]}', $mockedEntrypoint($request)->getContent());
-        $this->assertEquals('{"errors":[{"message":"GraphQL variables are not valid JSON.","extensions":{"category":"user","status":400}}]}', $mockedEntrypoint($request)->getContent());
     }
 
     private function getEntrypointAction(array $variables = ['graphqlVariable']): EntrypointAction
