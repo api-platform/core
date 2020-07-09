@@ -14,8 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\GraphQl\Error;
 
 /**
- *
- * A function which passes the errors thrown by the GraphQL library into the formatters
+ * A function which passes the errors thrown by the GraphQL library into the formatters.
  *
  * @experimental
  *
