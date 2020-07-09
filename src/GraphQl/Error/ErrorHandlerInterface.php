@@ -13,7 +13,15 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\GraphQl\Error;
 
+/**
+ *
+ * A function which passes the errors thrown by the GraphQL library into the formatters
+ *
+ * @experimental
+ *
+ * @author Ollie Harridge <code@oll.ie>
+ */
 interface ErrorHandlerInterface
 {
-    public function __invoke(array $errors, callable $formatter);
+    public function __invoke(array $errors, callable $formatter): array;
 }

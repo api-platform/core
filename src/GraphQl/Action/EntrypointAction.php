@@ -52,11 +52,11 @@ final class EntrypointAction
         $this->graphiQlAction = $graphiQlAction;
         $this->graphQlPlaygroundAction = $graphQlPlaygroundAction;
         $this->normalizer = $normalizer;
+        $this->errorHandler = $errorHandler;
         $this->debug = $debug ? Debug::INCLUDE_DEBUG_MESSAGE | Debug::INCLUDE_TRACE : false;
         $this->graphiqlEnabled = $graphiqlEnabled;
         $this->graphQlPlaygroundEnabled = $graphQlPlaygroundEnabled;
         $this->defaultIde = $defaultIde;
-        $this->errorHandler = $errorHandler;
     }
 
     public function __invoke(Request $request): Response

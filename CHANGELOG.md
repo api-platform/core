@@ -14,6 +14,7 @@
 * Deprecate using a validation groups generator service not implementing `ApiPlatform\Core\Bridge\Symfony\Validator\ValidationGroupsGeneratorInterface` (#3346)
 * Subresources: subresource resourceClass can now be defined as a container parameter in XML and Yaml definitions
 * IriConverter: Fix IRI url double encoding - may cause breaking change as some characters no longer encoded in output (#3552)
+* GraphQL: Errors thrown from the GraphQL library can now be handled
 
 ## 2.5.6
 

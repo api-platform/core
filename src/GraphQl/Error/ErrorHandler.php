@@ -15,7 +15,7 @@ namespace ApiPlatform\Core\GraphQl\Error;
 
 class ErrorHandler implements ErrorHandlerInterface
 {
-    public function __invoke(array $errors, callable $formatter)
+    public function __invoke(array $errors, callable $formatter): array
     {
         return array_map($formatter, $errors);
     }

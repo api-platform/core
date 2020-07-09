@@ -200,6 +200,8 @@
             <argument>%api_platform.title%</argument>
         </service>
 
+        <!-- Error -->
+
         <service id="api_platform.graphql.error_handler" class="ApiPlatform\Core\GraphQl\Error\ErrorHandler" public="false" />
 
         <!-- Serializer -->

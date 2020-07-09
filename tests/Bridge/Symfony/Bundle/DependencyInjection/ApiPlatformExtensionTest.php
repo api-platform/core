@@ -65,6 +65,7 @@ use ApiPlatform\Core\DataProvider\SubresourceDataProviderInterface;
 use ApiPlatform\Core\DataTransformer\DataTransformerInterface;
 use ApiPlatform\Core\Exception\FilterValidationException;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
+use ApiPlatform\Core\GraphQl\Error\ErrorHandlerInterface;
 use ApiPlatform\Core\GraphQl\Resolver\MutationResolverInterface;
 use ApiPlatform\Core\GraphQl\Resolver\QueryCollectionResolverInterface;
 use ApiPlatform\Core\GraphQl\Resolver\QueryItemResolverInterface;
@@ -393,6 +394,8 @@ class ApiPlatformExtensionTest extends TestCase
         $containerBuilderProphecy->setParameter('api_platform.graphql.graphql_playground.enabled', false)->shouldBeCalled();
         $containerBuilderProphecy->registerForAutoconfiguration(GraphQlTypeInterface::class)->shouldNotBeCalled();
         $this->childDefinitionProphecy->addTag('api_platform.graphql.type')->shouldNotBeCalled();
+        $containerBuilderProphecy->registerForAutoconfiguration(ErrorHandlerInterface::class)->shouldNotBeCalled();
+        $this->childDefinitionProphecy->addTag('api_platform.graphql.error_handler')->shouldNotBeCalled();
         $containerBuilderProphecy->registerForAutoconfiguration(QueryItemResolverInterface::class)->shouldNotBeCalled();
         $containerBuilderProphecy->registerForAutoconfiguration(QueryCollectionResolverInterface::class)->shouldNotBeCalled();
         $this->childDefinitionProphecy->addTag('api_platform.graphql.query_resolver')->shouldNotBeCalled();
@@ -1077,6 +1080,10 @@ class ApiPlatformExtensionTest extends TestCase
         $containerBuilderProphecy->registerForAutoconfiguration(GraphQlTypeInterface::class)
             ->willReturn($this->childDefinitionProphecy)->shouldBeCalledTimes(1);
         $this->childDefinitionProphecy->addTag('api_platform.graphql.type')->shouldBeCalledTimes(1);
+
+        $containerBuilderProphecy->registerForAutoconfiguration(ErrorHandlerInterface::class)
+            ->willReturn($this->childDefinitionProphecy)->shouldBeCalledTimes(1);
+        $this->childDefinitionProphecy->addTag('api_platform.graphql.error_handler')->shouldBeCalledTimes(1);
 
         $containerBuilderProphecy->registerForAutoconfiguration(QueryItemResolverInterface::class)
             ->willReturn($this->childDefinitionProphecy)->shouldBeCalledTimes(1);
