@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Tests\OpenApi\Factory;
 
+use ApiPlatform\Core\Bridge\Symfony\Routing\RouterOperationPathResolver;
 use ApiPlatform\Core\DataProvider\PaginationOptions;
 use ApiPlatform\Core\JsonSchema\Schema;
 use ApiPlatform\Core\JsonSchema\SchemaFactory;
@@ -21,6 +22,7 @@ use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 use ApiPlatform\Core\Metadata\Property\PropertyNameCollection;
+use ApiPlatform\Core\Metadata\Property\SubresourceMetadata;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
@@ -29,16 +31,22 @@ use ApiPlatform\Core\OpenApi\Factory\OpenApiFactory;
 use ApiPlatform\Core\OpenApi\Model;
 use ApiPlatform\Core\OpenApi\OpenApi;
 use ApiPlatform\Core\OpenApi\Options;
+use ApiPlatform\Core\Operation\Factory\SubresourceOperationFactory;
 use ApiPlatform\Core\Operation\Factory\SubresourceOperationFactoryInterface;
 use ApiPlatform\Core\Operation\UnderscorePathSegmentNameGenerator;
 use ApiPlatform\Core\PathResolver\CustomOperationPathResolver;
 use ApiPlatform\Core\PathResolver\OperationPathResolver;
 use ApiPlatform\Core\Tests\Fixtures\DummyFilter;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Answer;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Question;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\PropertyInfo\Type;
+use Symfony\Component\Routing\Route;
+use Symfony\Component\Routing\RouteCollection;
+use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
 
 class OpenApiFactoryTest extends TestCase
@@ -71,6 +79,7 @@ class OpenApiFactoryTest extends TestCase
         );
 
         $subresourceOperationFactoryProphecy = $this->prophesize(SubresourceOperationFactoryInterface::class);
+        $subresourceOperationFactoryProphecy->create(Argument::any())->willReturn([]);
 
         $resourceNameCollectionFactoryProphecy = $this->prophesize(ResourceNameCollectionFactoryInterface::class);
         $resourceNameCollectionFactoryProphecy->create()->shouldBeCalled()->willReturn(new ResourceNameCollection([Dummy::class]));
@@ -489,6 +498,7 @@ class OpenApiFactoryTest extends TestCase
         );
 
         $subresourceOperationFactoryProphecy = $this->prophesize(SubresourceOperationFactoryInterface::class);
+        $subresourceOperationFactoryProphecy->create(Argument::any())->willReturn([]);
 
         $resourceNameCollectionFactoryProphecy = $this->prophesize(ResourceNameCollectionFactoryInterface::class);
         $resourceNameCollectionFactoryProphecy->create()->shouldBeCalled()->willReturn(new ResourceNameCollection([Dummy::class]));
@@ -558,175 +568,105 @@ class OpenApiFactoryTest extends TestCase
         $this->assertEquals($openApi->getExtensionProperties(), ['x-key' => 'Custom x-key value', 'x-value' => 'Custom x-value value']);
     }
 
-    // public function testSubresourceDocumentation() {
-        // $documentation = new Documentation(new ResourceNameCollection([Question::class]), 'Test API', 'This is a test API.', '1.2.3');
-        //
-        // $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
-        // $propertyNameCollectionFactoryProphecy->create(Question::class, Argument::any())->shouldBeCalled()->willReturn(new PropertyNameCollection(['answer']));
-        // $propertyNameCollectionFactoryProphecy->create(Answer::class, Argument::any())->shouldBeCalled()->willReturn(new PropertyNameCollection(['content']));
-        //
-        // $questionMetadata = new ResourceMetadata(
-        //     'Question',
-        //     'This is a question.',
-        //     'http://schema.example.com/Question',
-        //     ['get' => ['method' => 'GET', 'input_formats' => ['json' => ['application/json'], 'csv' => ['text/csv']], 'output_formats' => ['json' => ['application/json'], 'csv' => ['text/csv']]]]
-        // );
-        // $answerMetadata = new ResourceMetadata(
-        //     'Answer',
-        //     'This is an answer.',
-        //     'http://schema.example.com/Answer',
-        //     [],
-        //     ['get' => ['method' => 'GET']] + self::OPERATION_FORMATS,
-        //     [],
-        //     ['get' => ['method' => 'GET', 'input_formats' => ['xml' => ['text/xml']], 'output_formats' => ['xml' => ['text/xml']]]]
-        // );
-        // $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        // $resourceMetadataFactoryProphecy->create(Question::class)->shouldBeCalled()->willReturn($questionMetadata);
-        // $resourceMetadataFactoryProphecy->create(Answer::class)->shouldBeCalled()->willReturn($answerMetadata);
-        //
-        // $subresourceMetadata = new SubresourceMetadata(Answer::class, false);
-        // $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
-        // $propertyMetadataFactoryProphecy->create(Question::class, 'answer')->shouldBeCalled()->willReturn(new PropertyMetadata(new Type(Type::BUILTIN_TYPE_OBJECT, false, Question::class, true, null, new Type(Type::BUILTIN_TYPE_OBJECT, false, Answer::class)), 'This is a name.', true, true, true, true, false, false, null, null, [], $subresourceMetadata));
-        //
-        // $propertyMetadataFactoryProphecy->create(Answer::class, 'content')->shouldBeCalled()->willReturn(new PropertyMetadata(new Type(Type::BUILTIN_TYPE_OBJECT, false, Question::class, true, null, new Type(Type::BUILTIN_TYPE_OBJECT, false, Answer::class)), 'This is a name.', true, true, true, true, false, false, null, null, []));
-        //
-        // $routeCollection = new RouteCollection();
-        // $routeCollection->add('api_questions_answer_get_subresource', new Route('/api/questions/{id}/answer.{_format}'));
-        // $routeCollection->add('api_questions_get_item', new Route('/api/questions/{id}.{_format}'));
-        //
-        // $routerProphecy = $this->prophesize(RouterInterface::class);
-        // $routerProphecy->getRouteCollection()->shouldBeCalled()->willReturn($routeCollection);
-        //
-        // $operationPathResolver = new RouterOperationPathResolver($routerProphecy->reveal(), new CustomOperationPathResolver(new OperationPathResolver(new UnderscorePathSegmentNameGenerator())));
-        //
-        // $resourceMetadataFactory = $resourceMetadataFactoryProphecy->reveal();
-        // $propertyNameCollectionFactory = $propertyNameCollectionFactoryProphecy->reveal();
-        // $propertyMetadataFactory = $propertyMetadataFactoryProphecy->reveal();
-        //
-        // $subresourceOperationFactory = new SubresourceOperationFactory($resourceMetadataFactory, $propertyNameCollectionFactory, $propertyMetadataFactory, new UnderscorePathSegmentNameGenerator());
-        //
-        // $normalizer = new DocumentationNormalizer(
-        //     $resourceMetadataFactory,
-        //     $propertyNameCollectionFactory,
-        //     $propertyMetadataFactory,
-        //     null,
-        //     null,
-        //     $operationPathResolver,
-        //     null,
-        //     null,
-        //     null,
-        //     false,
-        //     '',
-        //     '',
-        //     '',
-        //     '',
-        //     [],
-        //     [],
-        //     $subresourceOperationFactory,
-        //     true,
-        //     'page',
-        //     false,
-        //     'itemsPerPage',
-        //     $formatProvider ?? [],
-        //     false,
-        //     'pagination',
-        //     ['spec_version' => 3]
-        // );
-        //
-        // $expected = [
-        //     'openapi' => '3.0.2',
-        //     'info' => [
-        //         'title' => 'Test API',
-        //         'description' => 'This is a test API.',
-        //         'version' => '1.2.3',
-        //     ],
-        //     'paths' => new \ArrayObject([
-        //         '/api/questions/{id}' => [
-        //             'get' => new \ArrayObject([
-        //                 'tags' => ['Question'],
-        //                 'operationId' => 'getQuestionItem',
-        //                 'summary' => 'Retrieves a Question resource.',
-        //                 'parameters' => [
-        //                     [
-        //                         'name' => 'id',
-        //                         'in' => 'path',
-        //                         'schema' => ['type' => 'string'],
-        //                         'required' => true,
-        //                     ],
-        //                 ],
-        //                 'responses' => [
-        //                     '200' => [
-        //                         'description' => 'Question resource response',
-        //                         'content' => [
-        //                             'application/json' => [
-        //                                 'schema' => ['$ref' => '#/components/schemas/Question'],
-        //                             ],
-        //                             'text/csv' => [
-        //                                 'schema' => ['$ref' => '#/components/schemas/Question'],
-        //                             ],
-        //                         ],
-        //                     ],
-        //                     '404' => ['description' => 'Resource not found'],
-        //                 ],
-        //             ]),
-        //         ],
-        //         '/api/questions/{id}/answer' => new \ArrayObject([
-        //             'get' => new \ArrayObject([
-        //                 'tags' => ['Answer', 'Question'],
-        //                 'operationId' => 'api_questions_answer_get_subresource',
-        //                 'summary' => 'Retrieves a Answer resource.',
-        //                 'responses' => [
-        //                     '200' => [
-        //                         'description' => 'Answer resource response',
-        //                         'content' => [
-        //                             'text/xml' => [
-        //                                 'schema' => ['$ref' => '#/components/schemas/Answer'],
-        //                             ],
-        //                         ],
-        //                     ],
-        //                     '404' => ['description' => 'Resource not found'],
-        //                 ],
-        //                 'parameters' => [
-        //                     [
-        //                         'name' => 'id',
-        //                         'in' => 'path',
-        //                         'schema' => ['type' => 'string'],
-        //                         'required' => true,
-        //                     ],
-        //                 ],
-        //             ]),
-        //         ]),
-        //     ]),
-        //     'components' => [
-        //         'schemas' => new \ArrayObject([
-        //             'Question' => new \ArrayObject([
-        //                 'type' => 'object',
-        //                 'description' => 'This is a question.',
-        //                 'externalDocs' => ['url' => 'http://schema.example.com/Question'],
-        //                 'properties' => [
-        //                     'answer' => new \ArrayObject([
-        //                         'type' => 'array',
-        //                         'description' => 'This is a name.',
-        //                         'items' => ['$ref' => '#/components/schemas/Answer'],
-        //                     ]),
-        //                 ],
-        //             ]),
-        //             'Answer' => new \ArrayObject([
-        //                 'type' => 'object',
-        //                 'description' => 'This is an answer.',
-        //                 'externalDocs' => ['url' => 'http://schema.example.com/Answer'],
-        //                 'properties' => [
-        //                     'content' => new \ArrayObject([
-        //                         'type' => 'array',
-        //                         'description' => 'This is a name.',
-        //                         'items' => ['$ref' => '#/components/schemas/Answer'],
-        //                     ]),
-        //                 ],
-        //             ]),
-        //         ]),
-        //     ],
-        // ];
-        //
-        // $this->assertEquals($expected, $normalizer->normalize($documentation));
-    // }
+    public function testSubresourceDocumentation()
+    {
+        $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
+        $propertyNameCollectionFactoryProphecy->create(Question::class, Argument::any())->shouldBeCalled()->willReturn(new PropertyNameCollection(['answer']));
+        $propertyNameCollectionFactoryProphecy->create(Answer::class, Argument::any())->shouldBeCalled()->willReturn(new PropertyNameCollection(['content']));
+
+        $questionMetadata = new ResourceMetadata(
+            'Question',
+            'This is a question.',
+            'http://schema.example.com/Question',
+            ['get' => ['method' => 'GET', 'input_formats' => ['json' => ['application/json'], 'csv' => ['text/csv']], 'output_formats' => ['json' => ['application/json'], 'csv' => ['text/csv']]]]
+        );
+        $answerMetadata = new ResourceMetadata(
+            'Answer',
+            'This is an answer.',
+            'http://schema.example.com/Answer',
+            [],
+            ['get' => ['method' => 'GET'] + self::OPERATION_FORMATS],
+            [],
+            ['get' => ['method' => 'GET', 'input_formats' => ['xml' => ['text/xml']], 'output_formats' => ['xml' => ['text/xml']]]]
+        );
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
+        $resourceMetadataFactoryProphecy->create(Question::class)->shouldBeCalled()->willReturn($questionMetadata);
+        $resourceMetadataFactoryProphecy->create(Answer::class)->shouldBeCalled()->willReturn($answerMetadata);
+
+        $subresourceMetadata = new SubresourceMetadata(Answer::class, false);
+        $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
+        $propertyMetadataFactoryProphecy->create(Question::class, 'answer', Argument::any())->shouldBeCalled()->willReturn(new PropertyMetadata(new Type(Type::BUILTIN_TYPE_OBJECT, false, Question::class, true, null, new Type(Type::BUILTIN_TYPE_OBJECT, false, Answer::class)), 'This is a name.', true, true, true, true, false, false, null, null, [], $subresourceMetadata));
+
+        $propertyMetadataFactoryProphecy->create(Answer::class, 'content', Argument::any())->shouldBeCalled()->willReturn(new PropertyMetadata(new Type(Type::BUILTIN_TYPE_OBJECT, false, Question::class, true, null, new Type(Type::BUILTIN_TYPE_OBJECT, false, Answer::class)), 'This is a name.', true, true, true, true, false, false, null, null, []));
+
+        $routeCollection = new RouteCollection();
+        $routeCollection->add('api_answers_get_collection', new Route('/api/answers.{_format}'));
+        $routeCollection->add('api_questions_answer_get_subresource', new Route('/api/questions/{id}/answer.{_format}'));
+        $routeCollection->add('api_questions_get_item', new Route('/api/questions/{id}.{_format}'));
+
+        $routerProphecy = $this->prophesize(RouterInterface::class);
+        $routerProphecy->getRouteCollection()->shouldBeCalled()->willReturn($routeCollection);
+
+        $operationPathResolver = new RouterOperationPathResolver($routerProphecy->reveal(), new CustomOperationPathResolver(new OperationPathResolver(new UnderscorePathSegmentNameGenerator())));
+
+        $resourceMetadataFactory = $resourceMetadataFactoryProphecy->reveal();
+        $propertyNameCollectionFactory = $propertyNameCollectionFactoryProphecy->reveal();
+        $propertyMetadataFactory = $propertyMetadataFactoryProphecy->reveal();
+
+        $subresourceOperationFactory = new SubresourceOperationFactory($resourceMetadataFactory, $propertyNameCollectionFactory, $propertyMetadataFactory, new UnderscorePathSegmentNameGenerator());
+
+        $resourceNameCollectionFactoryProphecy = $this->prophesize(ResourceNameCollectionFactoryInterface::class);
+        $resourceNameCollectionFactoryProphecy->create()->shouldBeCalled()->willReturn(new ResourceNameCollection([Question::class, Answer::class]));
+
+        $typeFactory = new TypeFactory();
+        $schemaFactory = new SchemaFactory($typeFactory, $resourceMetadataFactory, $propertyNameCollectionFactory, $propertyMetadataFactory, new CamelCaseToSnakeCaseNameConverter());
+        $typeFactory->setSchemaFactory($schemaFactory);
+        $filterLocatorProphecy = $this->prophesize(ContainerInterface::class);
+
+        $factory = new OpenApiFactory(
+            $resourceNameCollectionFactoryProphecy->reveal(),
+            $resourceMetadataFactory,
+            $propertyNameCollectionFactory,
+            $propertyMetadataFactory,
+            $schemaFactory,
+            $typeFactory,
+            $operationPathResolver,
+            $filterLocatorProphecy->reveal(),
+            $subresourceOperationFactory,
+            ['jsonld' => ['application/ld+json']],
+            new Options('Test API', 'This is a test API.', '1.2.3', true, 'oauth2', 'authorizationCode', '/oauth/v2/token', '/oauth/v2/auth', '/oauth/v2/refresh', ['scope param'], [
+                'header' => [
+                    'type' => 'header',
+                    'name' => 'Authorization',
+                ],
+                'query' => [
+                    'type' => 'query',
+                    'name' => 'key',
+                ],
+            ]),
+            new PaginationOptions(true, 'page', true, 'itemsPerPage', true, 'pagination')
+        );
+
+        $openApi = $factory(['base_url', '/app_dev.php/']);
+
+        $paths = $openApi->getPaths();
+        $pathItem = $paths->getPath('/questions/{id}/answer.{_format}');
+
+        $this->assertEquals($pathItem->getGet(), new Model\Operation(
+            'api_questions_answer_get_subresourceQuestionSubresource',
+            ['Answer', 'Question'],
+            [
+                '200' => new Model\Response(
+                    'Question resource',
+                    new \ArrayObject([
+                        'application/ld+json' => new Model\MediaType(new \ArrayObject(new \ArrayObject(['$ref' => '#/components/schemas/Question']))),
+                    ])
+                ),
+            ],
+            '',
+            'Retrieves a Question resource.',
+            null,
+            [new Model\Parameter('id', 'path', 'Question identifier', true, false, false, ['type' => 'string'])]
+        ));
+    }
 }

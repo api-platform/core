@@ -90,6 +90,8 @@ final class OpenApiFactory implements OpenApiFactoryInterface
             list($itemOperationLinks, $itemOperationSchemas) = $this->collectPaths($resourceMetadata, $resourceClass, OperationType::ITEM, $context, $paths, $links, $schemas);
             $schemas += $itemOperationSchemas;
             list($collectionOperationLinks, $collectionOperationSchemas) = $this->collectPaths($resourceMetadata, $resourceClass, OperationType::COLLECTION, $context, $paths, $links, $schemas);
+
+            list($subresourceOperationLinks, $subresourceOperationSchemas) = $this->collectPaths($resourceMetadata, $resourceClass, OperationType::SUBRESOURCE, $context, $paths, $links, $schemas);
             $schemas += $collectionOperationSchemas;
         }
 
@@ -109,12 +111,13 @@ final class OpenApiFactory implements OpenApiFactoryInterface
     private function collectPaths(ResourceMetadata $resourceMetadata, string $resourceClass, string $operationType, array $context, Model\Paths $paths, array &$links, array $schemas = []): array
     {
         $resourceShortName = $resourceMetadata->getShortName();
-        if (null === $operations = OperationType::COLLECTION === $operationType ? $resourceMetadata->getCollectionOperations() : $resourceMetadata->getItemOperations()) {
+        $operations = OperationType::COLLECTION === $operationType ? $resourceMetadata->getCollectionOperations() : (OperationType::ITEM === $operationType ? $resourceMetadata->getItemOperations() : $this->subresourceOperationFactory->create($resourceClass));
+        if (!$operations) {
             return [$links, $schemas];
         }
 
         foreach ($operations as $operationName => $operation) {
-            $path = $this->getPath($resourceShortName, $operationName, $operation, $operationType);
+            $path = $operation['path'] ?? $this->getPath($resourceShortName, $operationName, $operation, $operationType);
             $method = $resourceMetadata->getTypedOperationAttribute($operationType, $operationName, 'method', 'GET');
             list($requestMimeTypes, $responseMimeTypes) = $this->getMimeTypes($resourceClass, $operationName, $operationType, $resourceMetadata);
             $operationId = $operation['openapi_context']['operationId'] ?? lcfirst($operationName).ucfirst($resourceShortName).ucfirst($operationType);
@@ -135,6 +138,15 @@ final class OpenApiFactory implements OpenApiFactoryInterface
                 $links[$operationId] = $this->getLink($resourceClass, $operationId, $path);
             } elseif (OperationType::COLLECTION === $operationType && 'GET' === $method) {
                 $parameters = array_merge($parameters, $this->getPaginationParameters($resourceMetadata, $operationName), $this->getFiltersParameters($resourceMetadata, $operationName, $resourceClass));
+            } elseif (OperationType::SUBRESOURCE === $operationType) {
+                foreach ($operation['identifiers'] as $identifier) {
+                    $parameterShortname = $this->resourceMetadataFactory->create($identifier[1])->getShortName();
+                    $parameters[] = new Model\Parameter($identifier[0], 'path', $parameterShortname.' identifier', true, false, false, ['type' => 'string']);
+                }
+
+                if ($operation['collection']) {
+                    $parameters = array_merge($parameters, $this->getPaginationParameters($resourceMetadata, $operationName), $this->getFiltersParameters($resourceMetadata, $operationName, $resourceClass));
+                }
             }
 
             // Create responses
@@ -184,7 +196,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
 
             $pathItem = $pathItem->{'with'.ucfirst($method)}(new Model\Operation(
                 $operationId,
-                $operation['openapi_context']['tags'] ?? [$resourceShortName],
+                $operation['openapi_context']['tags'] ?? (OperationType::SUBRESOURCE === $operationType ? $operation['shortNames'] : [$resourceShortName]),
                 $responses,
                 $operation['openapi_context']['summary'] ?? '',
                 $operation['openapi_context']['description'] ?? $this->getPathDescription($resourceShortName, $method, $operationType),
