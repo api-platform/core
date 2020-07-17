@@ -124,11 +124,13 @@ final class OpenApiFactory implements OpenApiFactoryInterface
             $linkedOperationId = 'get'.ucfirst($resourceShortName).ucfirst(OperationType::ITEM);
             $pathItem = $paths->getPath($path) ?: new Model\PathItem();
 
-            /** @TODO support multiple formats for schemas? */
-            $operationFormat = array_values($responseMimeTypes)[0];
-            $operationSchemaOutput = $this->jsonSchemaFactory->buildSchema($resourceClass, $operationFormat, Schema::TYPE_OUTPUT, $operationType, $operationName, new Schema('openapi'), $context);
+            $operationOutputSchemas = [];
+            foreach ($responseMimeTypes as $operationFormat) {
+                $operationOutputSchema = $this->jsonSchemaFactory->buildSchema($resourceClass, $operationFormat, Schema::TYPE_OUTPUT, $operationType, $operationName, new Schema('openapi'), $context);
+                $schemas += $operationOutputSchema->getDefinitions()->getArrayCopy();
+                $operationOutputSchemas[$operationFormat] = $operationOutputSchema;
+            }
 
-            $schemas += $operationSchemaOutput->getDefinitions()->getArrayCopy();
             $parameters = [];
             $responses = [];
 
@@ -153,12 +155,12 @@ final class OpenApiFactory implements OpenApiFactoryInterface
             switch ($method) {
                 case 'GET':
                     $successStatus = (string) $resourceMetadata->getTypedOperationAttribute($operationType, $operationName, 'status', '200');
-                    $responseContent = $this->buildContent($responseMimeTypes, $operationSchemaOutput);
+                    $responseContent = $this->buildContent($responseMimeTypes, $operationOutputSchemas);
                     $responses[$successStatus] = new Model\Response(sprintf('%s %s', $resourceShortName, OperationType::COLLECTION === $operationType ? 'collection' : 'resource'), $responseContent);
                     break;
                 case 'POST':
                     $responseLinks = new \ArrayObject(isset($links[$linkedOperationId]) ? [ucfirst($linkedOperationId) => $links[$linkedOperationId]] : []);
-                    $responseContent = $this->buildContent($responseMimeTypes, $operationSchemaOutput);
+                    $responseContent = $this->buildContent($responseMimeTypes, $operationOutputSchemas);
                     $successStatus = (string) $resourceMetadata->getTypedOperationAttribute($operationType, $operationName, 'status', '201');
                     $responses[$successStatus] = new Model\Response(sprintf('%s resource created', $resourceShortName), $responseContent, null, $responseLinks);
                     $responses['400'] = new Model\Response('Invalid input');
@@ -167,7 +169,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
                 case 'PUT':
                     $responseLinks = new \ArrayObject(isset($links[$linkedOperationId]) ? [ucfirst($linkedOperationId) => $links[$linkedOperationId]] : []);
                     $successStatus = (string) $resourceMetadata->getTypedOperationAttribute($operationType, $operationName, 'status', '200');
-                    $responseContent = $this->buildContent($responseMimeTypes, $operationSchemaOutput);
+                    $responseContent = $this->buildContent($responseMimeTypes, $operationOutputSchemas);
                     $responses[$successStatus] = new Model\Response(sprintf('%s resource updated', $resourceShortName), $responseContent, null, $responseLinks);
                     $responses['400'] = new Model\Response('Invalid input');
                     break;
@@ -187,11 +189,14 @@ final class OpenApiFactory implements OpenApiFactoryInterface
 
             $requestBody = null;
             if ('PUT' === $method || 'POST' === $method || 'PATCH' === $method) {
-                /** @TODO support multiple input formats */
-                $operationFormatInput = array_values($requestMimeTypes)[0];
-                $operationSchemaInput = $this->jsonSchemaFactory->buildSchema($resourceClass, $operationFormatInput, Schema::TYPE_INPUT, $operationType, $operationName, new Schema('openapi'), $context);
-                $schemas += $operationSchemaInput->getDefinitions()->getArrayCopy();
-                $requestBody = new Model\RequestBody(sprintf('The %s %s resource', 'POST' === $method ? 'new' : 'updated', $resourceShortName), $this->buildContent($requestMimeTypes, $operationSchemaInput), true);
+                $operationInputSchemas = [];
+                foreach ($requestMimeTypes as $operationFormat) {
+                    $operationInputSchema = $this->jsonSchemaFactory->buildSchema($resourceClass, $operationFormat, Schema::TYPE_INPUT, $operationType, $operationName, new Schema('openapi'), $context);
+                    $schemas += $operationInputSchema->getDefinitions()->getArrayCopy();
+                    $operationInputSchemas[$operationFormat] = $operationInputSchema;
+                }
+
+                $requestBody = new Model\RequestBody(sprintf('The %s %s resource', 'POST' === $method ? 'new' : 'updated', $resourceShortName), $this->buildContent($requestMimeTypes, $operationInputSchemas), true);
             }
 
             $pathItem = $pathItem->{'with'.ucfirst($method)}(new Model\Operation(
@@ -215,15 +220,12 @@ final class OpenApiFactory implements OpenApiFactoryInterface
         return [$links, $schemas];
     }
 
-    /**
-     * @TODO: support multiple format schemas
-     */
-    private function buildContent(array $responseMimeTypes, Schema $operationSchema): \ArrayObject
+    private function buildContent(array $responseMimeTypes, array $operationSchemas): \ArrayObject
     {
         $content = new \ArrayObject();
 
         foreach ($responseMimeTypes as $mimeType => $format) {
-            $content[$mimeType] = new Model\MediaType(new \ArrayObject($operationSchema->getArrayCopy(false)));
+            $content[$mimeType] = new Model\MediaType(new \ArrayObject($operationSchemas[$format]->getArrayCopy(false)));
         }
 
         return $content;
