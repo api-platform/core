@@ -7,6 +7,7 @@
 * GraphQL: Subscription support with Mercure (#3321)
 * GraphQL: Allow to format GraphQL errors based on exceptions (#3063)
 * GraphQL: Add page-based pagination (#3175, #3517)
+* GraphQL: Errors thrown from the GraphQL library can now be handled (#3632)
 * GraphQL: Possibility to add a custom description for queries, mutations and subscriptions (#3477, #3514)
 * GraphQL: Support for field name conversion (serialized name) (#3455, #3516)
 * GraphQL: **BC** `operation` is now `operationName` to follow the standard (#3568)

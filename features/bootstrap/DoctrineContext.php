@@ -121,7 +121,6 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\InternalUser;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\MaxDepthDummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\NetworkPathDummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\NetworkPathRelationDummy;
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Node;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Order;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Person;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\PersonToPet;
@@ -1542,7 +1541,7 @@ final class DoctrineContext implements Context
     {
         for ($i = 1; $i <= $nb; ++$i) {
             $relatedDummy = $this->buildRelatedDummy();
-            $relatedDummy->setName('RelatedDummy #' . $i);
+            $relatedDummy->setName('RelatedDummy #'.$i);
 
             $dummyMercure = $this->buildDummyMercure();
             $dummyMercure->name = "Dummy Mercure #$i";
@@ -1974,7 +1973,6 @@ final class DoctrineContext implements Context
     private function buildDummyMercure()
     {
         return $this->isOrm() ? new DummyMercure() : new DummyMercureDocument();
-
     }
 
     /**

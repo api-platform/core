@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\GraphQl\Action;
 
+use ApiPlatform\Core\GraphQl\Error\ErrorHandlerInterface;
 use ApiPlatform\Core\GraphQl\ExecutorInterface;
 use ApiPlatform\Core\GraphQl\Type\SchemaBuilderInterface;
 use GraphQL\Error\Debug;
@@ -38,18 +39,20 @@ final class EntrypointAction
     private $graphiQlAction;
     private $graphQlPlaygroundAction;
     private $normalizer;
+    private $errorHandler;
     private $debug;
     private $graphiqlEnabled;
     private $graphQlPlaygroundEnabled;
     private $defaultIde;
 
-    public function __construct(SchemaBuilderInterface $schemaBuilder, ExecutorInterface $executor, GraphiQlAction $graphiQlAction, GraphQlPlaygroundAction $graphQlPlaygroundAction, NormalizerInterface $normalizer, bool $debug = false, bool $graphiqlEnabled = false, bool $graphQlPlaygroundEnabled = false, $defaultIde = false)
+    public function __construct(SchemaBuilderInterface $schemaBuilder, ExecutorInterface $executor, GraphiQlAction $graphiQlAction, GraphQlPlaygroundAction $graphQlPlaygroundAction, NormalizerInterface $normalizer, ErrorHandlerInterface $errorHandler, bool $debug = false, bool $graphiqlEnabled = false, bool $graphQlPlaygroundEnabled = false, $defaultIde = false)
     {
         $this->schemaBuilder = $schemaBuilder;
         $this->executor = $executor;
         $this->graphiQlAction = $graphiQlAction;
         $this->graphQlPlaygroundAction = $graphQlPlaygroundAction;
         $this->normalizer = $normalizer;
+        $this->errorHandler = $errorHandler;
         $this->debug = $debug ? Debug::INCLUDE_DEBUG_MESSAGE | Debug::INCLUDE_TRACE : false;
         $this->graphiqlEnabled = $graphiqlEnabled;
         $this->graphQlPlaygroundEnabled = $graphQlPlaygroundEnabled;
@@ -76,9 +79,11 @@ final class EntrypointAction
 
             $executionResult = $this->executor
                 ->executeQuery($this->schemaBuilder->getSchema(), $query, null, null, $variables, $operationName)
+                ->setErrorsHandler($this->errorHandler)
                 ->setErrorFormatter([$this->normalizer, 'normalize']);
         } catch (\Exception $exception) {
             $executionResult = (new ExecutionResult(null, [new Error($exception->getMessage(), null, null, null, null, $exception)]))
+                ->setErrorsHandler($this->errorHandler)
                 ->setErrorFormatter([$this->normalizer, 'normalize']);
         }
 
