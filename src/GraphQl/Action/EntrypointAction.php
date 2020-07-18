@@ -39,11 +39,11 @@ final class EntrypointAction
     private $graphiQlAction;
     private $graphQlPlaygroundAction;
     private $normalizer;
+    private $errorHandler;
     private $debug;
     private $graphiqlEnabled;
     private $graphQlPlaygroundEnabled;
     private $defaultIde;
-    private $errorHandler;
 
     public function __construct(SchemaBuilderInterface $schemaBuilder, ExecutorInterface $executor, GraphiQlAction $graphiQlAction, GraphQlPlaygroundAction $graphQlPlaygroundAction, NormalizerInterface $normalizer, ErrorHandlerInterface $errorHandler, bool $debug = false, bool $graphiqlEnabled = false, bool $graphQlPlaygroundEnabled = false, $defaultIde = false)
     {

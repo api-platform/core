@@ -236,15 +236,15 @@ class EntrypointActionTest extends TestCase
             new HttpExceptionNormalizer(),
             new ErrorNormalizer(),
         ]);
+        $errorHandler = new ErrorHandler();
 
         $executionResultProphecy = $this->prophesize(ExecutionResult::class);
         $executionResultProphecy->toArray(false)->willReturn(['GraphQL']);
         $executionResultProphecy->setErrorFormatter([$normalizer, 'normalize'])->willReturn($executionResultProphecy);
-        $executionResultProphecy->setErrorsHandler(Argument::any())->willReturn($executionResultProphecy);
+        $executionResultProphecy->setErrorsHandler($errorHandler)->willReturn($executionResultProphecy);
         $executorProphecy = $this->prophesize(ExecutorInterface::class);
         $executorProphecy->executeQuery(Argument::is($schema->reveal()), 'graphqlQuery', null, null, $variables, 'graphqlOperationName')->willReturn($executionResultProphecy->reveal());
 
-        $errorHandler = new ErrorHandler();
         $twigProphecy = $this->prophesize(TwigEnvironment::class);
         $routerProphecy = $this->prophesize(RouterInterface::class);
 

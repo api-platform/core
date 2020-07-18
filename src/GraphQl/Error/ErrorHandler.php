@@ -13,8 +13,18 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\GraphQl\Error;
 
+/**
+ * Handles the errors thrown by the GraphQL library by applying the formatter to them (default behavior).
+ *
+ * @experimental
+ *
+ * @author Ollie Harridge <code@oll.ie>
+ */
 class ErrorHandler implements ErrorHandlerInterface
 {
+    /**
+     * {@inheritdoc}
+     */
     public function __invoke(array $errors, callable $formatter): array
     {
         return array_map($formatter, $errors);
