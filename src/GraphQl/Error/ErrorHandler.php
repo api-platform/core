@@ -20,7 +20,7 @@ namespace ApiPlatform\Core\GraphQl\Error;
  *
  * @author Ollie Harridge <code@oll.ie>
  */
-class ErrorHandler implements ErrorHandlerInterface
+final class ErrorHandler implements ErrorHandlerInterface
 {
     /**
      * {@inheritdoc}
