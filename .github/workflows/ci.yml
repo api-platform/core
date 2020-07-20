@@ -24,6 +24,7 @@ jobs:
       matrix:
         php:
           - '7.4'
+          - 'rc'
       fail-fast: false
     timeout-minutes: 5
     env:
@@ -57,7 +58,7 @@ jobs:
       - name: Install PHP-CS-Fixer
         run: |
           composer global require --prefer-dist --no-progress --no-suggest --ansi \
-            friendsofphp/php-cs-fixer:"${PHP_CS_FIXER_VERSION}"
+            friendsofphp/php-cs-fixer:"${PHP_CS_FIXER_VERSION} "
       - name: Cache PHP-CS-Fixer results
         uses: actions/cache@v2
         with:
@@ -150,6 +151,7 @@ jobs:
           - '7.2'
           - '7.3'
           - '7.4'
+          - 'rc'
         include:
           - php: '7.4'
             coverage: true
@@ -290,6 +292,7 @@ jobs:
           - '7.2'
           - '7.3'
           - '7.4'
+          - 'rc'
         include:
           - php: '7.4'
             coverage: true
@@ -1013,6 +1016,7 @@ jobs:
       matrix:
         php:
           - '7.4'
+          - 'rc'
       fail-fast: false
     timeout-minutes: 20
     env:
@@ -1256,6 +1260,7 @@ jobs:
       matrix:
         php:
           - '7.4'
+          - 'rc'
       fail-fast: false
     timeout-minutes: 20
     env:
@@ -1699,6 +1704,7 @@ jobs:
       matrix:
         php:
           - '7.4'
+          - 'rc'
         include:
           - php: '7.4'
             coverage: true
@@ -1842,9 +1848,12 @@ jobs:
       matrix:
         php:
           - '7.4'
+          - 'rc'
         include:
           - php: '7.4'
             coverage: true
+          - php: 'rc'
+            coverage: false
       fail-fast: false
     timeout-minutes: 20
     env:
@@ -2005,6 +2014,7 @@ jobs:
       matrix:
         php:
           - '7.4'
+          - 'rc'
       fail-fast: false
     timeout-minutes: 20
     env:
@@ -2091,6 +2101,7 @@ jobs:
       matrix:
         php:
           - '7.4'
+          - 'rc'
         symfony:
           - '5.1'
       fail-fast: false
@@ -2197,6 +2208,7 @@ jobs:
       matrix:
         php:
           - '7.4'
+          - 'rc'
         symfony:
           - '5.1'
       fail-fast: false
