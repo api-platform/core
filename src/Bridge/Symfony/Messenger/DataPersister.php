@@ -98,7 +98,7 @@ final class DataPersister implements ContextAwareDataPersisterInterface, LoopDat
             return false;
         }
 
-        return 'persist' === $value || (\is_array($value) && \in_array('persist', $value, true));
+        return 'persist' === $value || (\is_array($value) && (\in_array('persist', $value, true) || (true === $value['persist'] ?? false)));
     }
 
     /**
