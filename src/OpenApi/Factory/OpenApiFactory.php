@@ -117,7 +117,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
         }
 
         foreach ($operations as $operationName => $operation) {
-            $path = $operation['path'] ?? $this->getPath($resourceShortName, $operationName, $operation, $operationType);
+            $path = $this->getPath($resourceShortName, $operationName, $operation, $operationType);
             $method = $resourceMetadata->getTypedOperationAttribute($operationType, $operationName, 'method', 'GET');
             list($requestMimeTypes, $responseMimeTypes) = $this->getMimeTypes($resourceClass, $operationName, $operationType, $resourceMetadata);
             $operationId = $operation['openapi_context']['operationId'] ?? lcfirst($operationName).ucfirst($resourceShortName).ucfirst($operationType);
@@ -141,7 +141,13 @@ final class OpenApiFactory implements OpenApiFactoryInterface
             } elseif (OperationType::COLLECTION === $operationType && 'GET' === $method) {
                 $parameters = array_merge($parameters, $this->getPaginationParameters($resourceMetadata, $operationName), $this->getFiltersParameters($resourceMetadata, $operationName, $resourceClass));
             } elseif (OperationType::SUBRESOURCE === $operationType) {
+                // FIXME: In SubresourceOperationFactory identifiers may happen twice
+                $added = [];
                 foreach ($operation['identifiers'] as $identifier) {
+                    if (\in_array($identifier[0], $added, true)) {
+                        continue;
+                    }
+                    $added[] = $identifier[0];
                     $parameterShortname = $this->resourceMetadataFactory->create($identifier[1])->getShortName();
                     $parameters[] = new Model\Parameter($identifier[0], 'path', $parameterShortname.' identifier', true, false, false, ['type' => 'string']);
                 }
@@ -264,6 +270,9 @@ final class OpenApiFactory implements OpenApiFactoryInterface
      */
     private function getPath(string $resourceShortName, string $operationName, array $operation, string $operationType): string
     {
+        if ($operation['path'] ?? null) {
+            return 0 === strpos($operation['path'], '/') ? $operation['path'] : '/'.$operation['path'];
+        }
         $path = $this->operationPathResolver->resolveOperationPath($resourceShortName, $operation, $operationType, $operationName);
         if ('.{_format}' === substr($path, -10)) {
             $path = substr($path, 0, -10);
