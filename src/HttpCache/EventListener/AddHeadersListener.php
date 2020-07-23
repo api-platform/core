@@ -83,7 +83,7 @@ final class AddHeadersListener
         }
 
         // Cache-Control "s-maxage" is only relevant is resource is not marked as "private"
-        if ($public !== false && null !== ($sharedMaxAge = $resourceCacheHeaders['shared_max_age'] ?? $this->sharedMaxAge) && !$response->headers->hasCacheControlDirective('s-maxage')) {
+        if (false !== $public && null !== ($sharedMaxAge = $resourceCacheHeaders['shared_max_age'] ?? $this->sharedMaxAge) && !$response->headers->hasCacheControlDirective('s-maxage')) {
             $response->setSharedMaxAge($sharedMaxAge);
         }
     }
