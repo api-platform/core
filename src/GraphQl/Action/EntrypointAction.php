@@ -101,17 +101,17 @@ final class EntrypointAction
     private function parseRequest(Request $request): array
     {
         $query = $request->query->get('query');
-        $operation = $request->query->get('operation');
+        $operationName = $request->query->get('operationName');
         if ($variables = $request->query->get('variables') ?: []) {
             $variables = $this->decodeVariables($variables);
         }
 
         if (!$request->isMethod('POST')) {
-            return [$query, $operation, $variables];
+            return [$query, $operationName, $variables];
         }
 
         if ('json' === $request->getContentType()) {
-            return $this->parseData($query, $operation, $variables, $request->getContent());
+            return $this->parseData($query, $operationName, $variables, $request->getContent());
         }
 
         if ('graphql' === $request->getContentType()) {
@@ -119,10 +119,10 @@ final class EntrypointAction
         }
 
         if ('multipart' === $request->getContentType()) {
-            return $this->parseMultipartRequest($query, $operation, $variables, $request->request->all(), $request->files->all());
+            return $this->parseMultipartRequest($query, $operationName, $variables, $request->request->all(), $request->files->all());
         }
 
-        return [$query, $operation, $variables];
+        return [$query, $operationName, $variables];
     }
 
     /**
