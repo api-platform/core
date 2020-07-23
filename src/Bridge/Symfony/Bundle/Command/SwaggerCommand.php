@@ -67,9 +67,8 @@ final class SwaggerCommand extends Command
     protected function configure()
     {
         $this
-            ->setName('api:openapi:export')
-            ->setAliases(['api:swagger:export'])
-            ->setDescription('Dump the OpenAPI documentation')
+            ->setName('api:swagger:export')
+            ->setDescription('Dump the Swagger v2 documentation')
             ->addOption('yaml', 'y', InputOption::VALUE_NONE, 'Dump the documentation in YAML')
             ->addOption('spec-version', null, InputOption::VALUE_OPTIONAL, sprintf('OpenAPI version to use (%s)', implode(' or ', $this->swaggerVersions)), $this->swaggerVersions[0] ?? 2)
             ->addOption('output', 'o', InputOption::VALUE_OPTIONAL, 'Write output to file')
@@ -88,6 +87,10 @@ final class SwaggerCommand extends Command
 
         if (!\in_array((int) $version, $this->swaggerVersions, true)) {
             throw new InvalidOptionException(sprintf('This tool only supports versions %s of the OpenAPI specification ("%s" given).', implode(', ', $this->swaggerVersions), $version));
+        }
+
+        if (3 === (int) $version) {
+            @trigger_error('The command "api:swagger:export" is deprecated for the spec version 3 use "api:openapi:export".', E_USER_DEPRECATED);
         }
 
         $documentation = new Documentation($this->resourceNameCollectionFactory->create(), $this->apiTitle, $this->apiDescription, $this->apiVersion, $this->apiFormats);

@@ -85,6 +85,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
     private $paginationClientEnabledParameterName;
     private $formats;
     private $formatsProvider;
+
     /**
      * @var SchemaFactoryInterface
      */

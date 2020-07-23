@@ -13,9 +13,9 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Tests\Bridge\Symfony\Bundle\Command;
 
+use ApiPlatform\Core\OpenApi\OpenApi;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
-use Symfony\Component\Console\Exception\InvalidOptionException;
 use Symfony\Component\Console\Tester\ApplicationTester;
 use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Yaml;
@@ -23,7 +23,7 @@ use Symfony\Component\Yaml\Yaml;
 /**
  * @author Amrouche Hamza <hamza.simperfit@gmail.com>
  */
-class SwaggerCommandTest extends KernelTestCase
+class OpenApiCommandTest extends KernelTestCase
 {
     /**
      * @var ApplicationTester
@@ -41,24 +41,16 @@ class SwaggerCommandTest extends KernelTestCase
         $this->tester = new ApplicationTester($application);
     }
 
-    /**
-     * @group legacy
-     * @expectedDeprecation The command "api:swagger:export" is deprecated for the spec version 3 use "api:openapi:export".
-     */
-    public function testExecuteWithAliasVersion3()
+    public function testExecute()
     {
-        $this->tester->run(['command' => 'api:swagger:export', '--spec-version' => 3]);
+        $this->tester->run(['command' => 'api:openapi:export']);
 
         $this->assertJson($this->tester->getDisplay());
     }
 
-    /**
-     * @group legacy
-     * @expectedDeprecation The command "api:swagger:export" is deprecated for the spec version 3 use "api:openapi:export".
-     */
-    public function testExecuteWithYamlVersion3()
+    public function testExecuteWithYaml()
     {
-        $this->tester->run(['command' => 'api:swagger:export', '--yaml' => true, '--spec-version' => 3]);
+        $this->tester->run(['command' => 'api:openapi:export', '--yaml' => true]);
 
         $result = $this->tester->getDisplay();
         $this->assertYaml($result);
@@ -66,9 +58,9 @@ class SwaggerCommandTest extends KernelTestCase
         $expected = <<<YAML
   /dummy_cars:
     get:
+      operationId: getDummyCarCollection
       tags:
         - DummyCar
-      operationId: getDummyCarCollection
 YAML;
 
         $this->assertStringContainsString($expected, $result, 'nested object should be present.');
@@ -76,29 +68,22 @@ YAML;
         $expected = <<<YAML
   '/dummy_cars/{id}':
     get:
-      tags: []
       operationId: getDummyCarItem
+      tags: []
 YAML;
 
         $this->assertStringContainsString($expected, $result, 'arrays should be correctly formatted.');
-        $this->assertStringContainsString('openapi: 3.0.2', $result);
+        $this->assertStringContainsString('openapi: '.OpenApi::VERSION, $result);
 
         $expected = <<<YAML
 info:
   title: 'My Dummy API'
-  version: 0.0.0
   description: |
     This is a test API.
     Made with love
+  version: 0.0.0
 YAML;
         $this->assertStringContainsString($expected, $result, 'multiline formatting must be preserved (using literal style).');
-    }
-
-    public function testExecuteWithBadArguments()
-    {
-        $this->expectException(InvalidOptionException::class);
-        $this->expectExceptionMessage('This tool only supports versions 2, 3 of the OpenAPI specification ("foo" given).');
-        $this->tester->run(['command' => 'api:swagger:export', '--spec-version' => 'foo', '--yaml' => true]);
     }
 
     public function testWriteToFile()
@@ -106,7 +91,7 @@ YAML;
         /** @var string $tmpFile */
         $tmpFile = tempnam(sys_get_temp_dir(), 'test_write_to_file');
 
-        $this->tester->run(['command' => 'api:swagger:export', '--output' => $tmpFile]);
+        $this->tester->run(['command' => 'api:openapi:export', '--output' => $tmpFile]);
 
         $this->assertJson((string) @file_get_contents($tmpFile));
         @unlink($tmpFile);

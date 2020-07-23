@@ -33,6 +33,17 @@
             <argument>%api_platform.graphql.collection.pagination%</argument>
         </service>
         <service id="ApiPlatform\Core\DataProvider\Pagination" alias="api_platform.pagination" />
+
+        <service id="api_platform.pagination_options" class="ApiPlatform\Core\DataProvider\PaginationOptions">
+            <argument>%api_platform.collection.pagination.enabled%</argument>
+            <argument>%api_platform.collection.pagination.page_parameter_name%</argument>
+            <argument>%api_platform.collection.pagination.client_items_per_page%</argument>
+            <argument>%api_platform.collection.pagination.items_per_page_parameter_name%</argument>
+            <argument>%api_platform.collection.pagination.client_enabled%</argument>
+            <argument>%api_platform.collection.pagination.enabled_parameter_name%</argument>
+        </service>
+        <service id="ApiPlatform\Core\DataProvider\PaginationOptions" alias="api_platform.pagination_options" />
+
     </services>
 
 </container>
