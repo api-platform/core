@@ -80,12 +80,15 @@ final class AddHeadersListener
             $response->setVary(array_diff($this->vary, $response->getVary()), false);
         }
 
-        if (null !== ($sharedMaxAge = $resourceCacheHeaders['shared_max_age'] ?? $this->sharedMaxAge) && !$response->headers->hasCacheControlDirective('s-maxage')) {
-            $response->setSharedMaxAge($sharedMaxAge);
+        // if the public-property is defined and not yet set; apply it to the response
+        $public = ($resourceCacheHeaders['public'] ?? $this->public);
+        if (null !== $public && !$response->headers->hasCacheControlDirective('public')) {
+            $public ? $response->setPublic() : $response->setPrivate();
         }
 
-        if (null !== $this->public && !$response->headers->hasCacheControlDirective('public')) {
-            $this->public ? $response->setPublic() : $response->setPrivate();
+        // Cache-Control "s-maxage" is only relevant is resource is not marked as "private"
+        if (false !== $public && null !== ($sharedMaxAge = $resourceCacheHeaders['shared_max_age'] ?? $this->sharedMaxAge) && !$response->headers->hasCacheControlDirective('s-maxage')) {
+            $response->setSharedMaxAge($sharedMaxAge);
         }
 
         if (null !== ($staleWhileRevalidate = $resourceCacheHeaders['stale_while_revalidate'] ?? $this->staleWhileRevalidate) && !$response->headers->hasCacheControlDirective('stale-while-revalidate')) {

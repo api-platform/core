@@ -17,6 +17,7 @@ use ApiPlatform\Core\GraphQl\Error\ErrorHandlerInterface;
 use ApiPlatform\Core\GraphQl\ExecutorInterface;
 use ApiPlatform\Core\GraphQl\Type\SchemaBuilderInterface;
 use GraphQL\Error\Debug;
+use GraphQL\Error\DebugFlag;
 use GraphQL\Error\Error;
 use GraphQL\Executor\ExecutionResult;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -53,7 +54,11 @@ final class EntrypointAction
         $this->graphQlPlaygroundAction = $graphQlPlaygroundAction;
         $this->normalizer = $normalizer;
         $this->errorHandler = $errorHandler;
-        $this->debug = $debug ? Debug::INCLUDE_DEBUG_MESSAGE | Debug::INCLUDE_TRACE : false;
+        if (class_exists(Debug::class)) {
+            $this->debug = $debug ? Debug::INCLUDE_DEBUG_MESSAGE | Debug::INCLUDE_TRACE : false;
+        } else {
+            $this->debug = $debug ? DebugFlag::INCLUDE_DEBUG_MESSAGE | DebugFlag::INCLUDE_TRACE : DebugFlag::NONE;
+        }
         $this->graphiqlEnabled = $graphiqlEnabled;
         $this->graphQlPlaygroundEnabled = $graphQlPlaygroundEnabled;
         $this->defaultIde = $defaultIde;
@@ -82,7 +87,7 @@ final class EntrypointAction
                 ->setErrorsHandler($this->errorHandler)
                 ->setErrorFormatter([$this->normalizer, 'normalize']);
         } catch (\Exception $exception) {
-            $executionResult = (new ExecutionResult(null, [new Error($exception->getMessage(), null, null, null, null, $exception)]))
+            $executionResult = (new ExecutionResult(null, [new Error($exception->getMessage(), null, null, [], null, $exception)]))
                 ->setErrorsHandler($this->errorHandler)
                 ->setErrorFormatter([$this->normalizer, 'normalize']);
         }

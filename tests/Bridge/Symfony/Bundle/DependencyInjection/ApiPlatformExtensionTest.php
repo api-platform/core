@@ -1413,6 +1413,11 @@ class ApiPlatformExtensionTest extends TestCase
         $containerBuilderProphecy->getAlias(Argument::type('string'))
             ->willReturn($this->prophesize(Alias::class)->reveal());
 
+        $containerBuilderProphecy->getDefinition(Argument::type('string'))
+            ->willReturn($this->prophesize(Definition::class)->reveal());
+        $containerBuilderProphecy->getAlias(Argument::type('string'))
+            ->willReturn($this->prophesize(Alias::class)->reveal());
+
         return $containerBuilderProphecy;
     }
 

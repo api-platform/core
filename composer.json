@@ -14,7 +14,7 @@
     ],
     "require": {
         "php": ">=7.1",
-        "doctrine/inflector": "^1.0",
+        "doctrine/inflector": "^1.0 || ^2.0",
         "fig/link-util": "^1.0",
         "psr/cache": "^1.0",
         "psr/container": "^1.0",
@@ -88,7 +88,7 @@
         "symfony/yaml": "^3.4 || ^4.0 || ^5.0",
         "teohhanhui/stubs-mongodb": "@dev",
         "twig/twig": "^1.42.3 || ^2.12",
-        "webonyx/graphql-php": ">=0.13.1 <1.0"
+        "webonyx/graphql-php": "^14.0"
     },
     "conflict": {
         "doctrine/common": "<2.7",

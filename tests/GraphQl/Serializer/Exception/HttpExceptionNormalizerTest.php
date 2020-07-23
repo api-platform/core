@@ -42,7 +42,7 @@ class HttpExceptionNormalizerTest extends TestCase
      */
     public function testNormalize(HttpException $exception, string $expectedExceptionMessage, int $expectedStatus, string $expectedCategory): void
     {
-        $error = new Error('test message', null, null, null, null, $exception);
+        $error = new Error('test message', null, null, [], null, $exception);
 
         $normalizedError = $this->httpExceptionNormalizer->normalize($error);
         $this->assertSame($expectedExceptionMessage, $normalizedError['message']);
@@ -63,7 +63,7 @@ class HttpExceptionNormalizerTest extends TestCase
     public function testSupportsNormalization(): void
     {
         $exception = new BadRequestHttpException();
-        $error = new Error('test message', null, null, null, null, $exception);
+        $error = new Error('test message', null, null, [], null, $exception);
 
         $this->assertTrue($this->httpExceptionNormalizer->supportsNormalization($error));
     }
