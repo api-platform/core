@@ -38,7 +38,7 @@ class RuntimeExceptionNormalizerTest extends TestCase
     {
         $exceptionMessage = 'exception message';
         $exception = new \RuntimeException($exceptionMessage);
-        $error = new Error('test message', null, null, null, null, $exception);
+        $error = new Error('test message', null, null, [], null, $exception);
 
         $normalizedError = $this->runtimeExceptionNormalizer->normalize($error);
         $this->assertSame($exceptionMessage, $normalizedError['message']);
@@ -48,7 +48,7 @@ class RuntimeExceptionNormalizerTest extends TestCase
     public function testSupportsNormalization(): void
     {
         $exception = new \RuntimeException();
-        $error = new Error('test message', null, null, null, null, $exception);
+        $error = new Error('test message', null, null, [], null, $exception);
 
         $this->assertTrue($this->runtimeExceptionNormalizer->supportsNormalization($error));
     }

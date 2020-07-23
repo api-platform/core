@@ -17,6 +17,7 @@ use ApiPlatform\Core\GraphQl\Error\ErrorHandlerInterface;
 use ApiPlatform\Core\GraphQl\ExecutorInterface;
 use ApiPlatform\Core\GraphQl\Type\SchemaBuilderInterface;
 use GraphQL\Error\Debug;
+use GraphQL\Error\DebugFlag;
 use GraphQL\Error\Error;
 use GraphQL\Executor\ExecutionResult;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -53,7 +54,11 @@ final class EntrypointAction
         $this->graphQlPlaygroundAction = $graphQlPlaygroundAction;
         $this->normalizer = $normalizer;
         $this->errorHandler = $errorHandler;
-        $this->debug = $debug ? Debug::INCLUDE_DEBUG_MESSAGE | Debug::INCLUDE_TRACE : false;
+        if (class_exists(Debug::class)) {
+            $this->debug = $debug ? Debug::INCLUDE_DEBUG_MESSAGE | Debug::INCLUDE_TRACE : false;
+        } else {
+            $this->debug = $debug ? DebugFlag::INCLUDE_DEBUG_MESSAGE | DebugFlag::INCLUDE_TRACE : DebugFlag::NONE;
+        }
         $this->graphiqlEnabled = $graphiqlEnabled;
         $this->graphQlPlaygroundEnabled = $graphQlPlaygroundEnabled;
         $this->defaultIde = $defaultIde;
@@ -82,7 +87,7 @@ final class EntrypointAction
                 ->setErrorsHandler($this->errorHandler)
                 ->setErrorFormatter([$this->normalizer, 'normalize']);
         } catch (\Exception $exception) {
-            $executionResult = (new ExecutionResult(null, [new Error($exception->getMessage(), null, null, null, null, $exception)]))
+            $executionResult = (new ExecutionResult(null, [new Error($exception->getMessage(), null, null, [], null, $exception)]))
                 ->setErrorsHandler($this->errorHandler)
                 ->setErrorFormatter([$this->normalizer, 'normalize']);
         }
@@ -96,17 +101,17 @@ final class EntrypointAction
     private function parseRequest(Request $request): array
     {
         $query = $request->query->get('query');
-        $operationName = $request->query->get('operationName');
+        $operation = $request->query->get('operation');
         if ($variables = $request->query->get('variables') ?: []) {
             $variables = $this->decodeVariables($variables);
         }
 
         if (!$request->isMethod('POST')) {
-            return [$query, $operationName, $variables];
+            return [$query, $operation, $variables];
         }
 
         if ('json' === $request->getContentType()) {
-            return $this->parseData($query, $operationName, $variables, $request->getContent());
+            return $this->parseData($query, $operation, $variables, $request->getContent());
         }
 
         if ('graphql' === $request->getContentType()) {
@@ -114,10 +119,10 @@ final class EntrypointAction
         }
 
         if ('multipart' === $request->getContentType()) {
-            return $this->parseMultipartRequest($query, $operationName, $variables, $request->request->all(), $request->files->all());
+            return $this->parseMultipartRequest($query, $operation, $variables, $request->request->all(), $request->files->all());
         }
 
-        return [$query, $operationName, $variables];
+        return [$query, $operation, $variables];
     }
 
     /**

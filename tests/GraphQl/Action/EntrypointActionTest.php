@@ -21,6 +21,7 @@ use ApiPlatform\Core\GraphQl\ExecutorInterface;
 use ApiPlatform\Core\GraphQl\Serializer\Exception\ErrorNormalizer;
 use ApiPlatform\Core\GraphQl\Serializer\Exception\HttpExceptionNormalizer;
 use ApiPlatform\Core\GraphQl\Type\SchemaBuilderInterface;
+use GraphQL\Error\DebugFlag;
 use GraphQL\Executor\ExecutionResult;
 use GraphQL\Type\Schema;
 use PHPUnit\Framework\TestCase;
@@ -239,7 +240,7 @@ class EntrypointActionTest extends TestCase
         $errorHandler = new ErrorHandler();
 
         $executionResultProphecy = $this->prophesize(ExecutionResult::class);
-        $executionResultProphecy->toArray(false)->willReturn(['GraphQL']);
+        $executionResultProphecy->toArray(DebugFlag::NONE)->willReturn(['GraphQL']);
         $executionResultProphecy->setErrorFormatter([$normalizer, 'normalize'])->willReturn($executionResultProphecy);
         $executionResultProphecy->setErrorsHandler($errorHandler)->willReturn($executionResultProphecy);
         $executorProphecy = $this->prophesize(ExecutorInterface::class);
