@@ -18,7 +18,6 @@ use GraphQL\Language\AST\BooleanValueNode;
 use GraphQL\Language\AST\FloatValueNode;
 use GraphQL\Language\AST\IntValueNode;
 use GraphQL\Language\AST\ListValueNode;
-use GraphQL\Language\AST\Node;
 use GraphQL\Language\AST\NullValueNode;
 use GraphQL\Language\AST\ObjectValueNode;
 use GraphQL\Language\AST\StringValueNode;
@@ -77,7 +76,7 @@ final class IterableType extends ScalarType implements TypeInterface
      *
      * @param ObjectValueNode|ListValueNode|IntValueNode|FloatValueNode|StringValueNode|BooleanValueNode|NullValueNode $valueNode
      */
-    public function parseLiteral(Node $valueNode, ?array $variables = null)
+    public function parseLiteral(/*Node */$valueNode, ?array $variables = null)
     {
         if ($valueNode instanceof ObjectValueNode || $valueNode instanceof ListValueNode) {
             return $this->parseIterableLiteral($valueNode);
