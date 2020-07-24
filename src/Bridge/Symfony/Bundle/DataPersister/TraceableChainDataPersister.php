@@ -16,7 +16,7 @@ namespace ApiPlatform\Core\Bridge\Symfony\Bundle\DataPersister;
 use ApiPlatform\Core\DataPersister\ChainDataPersister;
 use ApiPlatform\Core\DataPersister\ContextAwareDataPersisterInterface;
 use ApiPlatform\Core\DataPersister\DataPersisterInterface;
-use ApiPlatform\Core\DataPersister\LoopDataPersisterInterface;
+use ApiPlatform\Core\DataPersister\HandOverDataPersisterInterface;
 
 /**
  * @author Anthony GRASSIOT <antograssiot@free.fr>
@@ -56,7 +56,7 @@ final class TraceableChainDataPersister implements ContextAwareDataPersisterInte
         foreach ($this->tracePersisters($data, $context) as $match) {
             $result = $match->persist($data, $context) ?? $data;
 
-            if (!$match instanceof LoopDataPersisterInterface || !$match->loop($data, $context)) {
+            if (!$match instanceof HandOverDataPersisterInterface || !$match->handOver($data, $context)) {
                 return $result;
             }
         }
@@ -70,7 +70,7 @@ final class TraceableChainDataPersister implements ContextAwareDataPersisterInte
         foreach ($this->tracePersisters($data, $context) as $match) {
             $match->remove($data, $context);
 
-            if (!$match instanceof LoopDataPersisterInterface || !$match->loop($data, $context)) {
+            if (!$match instanceof HandOverDataPersisterInterface || !$match->handOver($data, $context)) {
                 return;
             }
         }

@@ -58,7 +58,7 @@ final class ChainDataPersister implements ContextAwareDataPersisterInterface
             if ($persister->supports($data, $context)) {
                 $result = $persister->persist($data, $context) ?? $data;
 
-                if (!$persister instanceof LoopDataPersisterInterface || !$persister->loop($data, $context)) {
+                if (!$persister instanceof HandOverDataPersisterInterface || !$persister->handOver($data, $context)) {
                     return $result;
                 }
             }
@@ -74,7 +74,7 @@ final class ChainDataPersister implements ContextAwareDataPersisterInterface
             if ($persister->supports($data, $context)) {
                 $persister->remove($data, $context);
 
-                if (!$persister instanceof LoopDataPersisterInterface || !$persister->loop($data, $context)) {
+                if (!$persister instanceof HandOverDataPersisterInterface || !$persister->handOver($data, $context)) {
                     return;
                 }
             }

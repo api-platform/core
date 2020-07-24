@@ -15,7 +15,7 @@ namespace ApiPlatform\Core\Tests\DataPersister;
 
 use ApiPlatform\Core\DataPersister\ChainDataPersister;
 use ApiPlatform\Core\DataPersister\DataPersisterInterface;
-use ApiPlatform\Core\DataPersister\LoopDataPersisterInterface;
+use ApiPlatform\Core\DataPersister\HandOverDataPersisterInterface;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Core\Tests\ProphecyTrait;
 use PHPUnit\Framework\TestCase;
@@ -61,7 +61,7 @@ class ChainDataPersisterTest extends TestCase
         $fooPersisterProphecy->supports($dummy, Argument::type('array'))->willReturn(false)->shouldBeCalled();
         $fooPersisterProphecy->persist($dummy, Argument::type('array'))->shouldNotBeCalled();
 
-        $loopPersisterProphecy = $this->prophesize(DataPersisterInterface::class)->willImplement(LoopDataPersisterInterface::class);
+        $loopPersisterProphecy = $this->prophesize(DataPersisterInterface::class)->willImplement(HandOverDataPersisterInterface::class);
         $loopPersisterProphecy->supports($dummy, Argument::type('array'))->willReturn(true)->shouldBeCalled();
         $loopPersisterProphecy->loop($dummy, Argument::type('array'))->willReturn(true)->shouldBeCalled();
         $loopPersisterProphecy->persist($dummy, Argument::type('array'))->shouldBeCalled();
@@ -85,7 +85,7 @@ class ChainDataPersisterTest extends TestCase
         $fooPersisterProphecy->supports($dummy, Argument::type('array'))->willReturn(false)->shouldBeCalled();
         $fooPersisterProphecy->remove($dummy, Argument::type('array'))->shouldNotBeCalled();
 
-        $loopPersisterProphecy = $this->prophesize(DataPersisterInterface::class)->willImplement(LoopDataPersisterInterface::class);
+        $loopPersisterProphecy = $this->prophesize(DataPersisterInterface::class)->willImplement(HandOverDataPersisterInterface::class);
         $loopPersisterProphecy->supports($dummy, Argument::type('array'))->willReturn(true)->shouldBeCalled();
         $loopPersisterProphecy->loop($dummy, Argument::type('array'))->willReturn(true)->shouldBeCalled();
         $loopPersisterProphecy->remove($dummy, Argument::type('array'))->shouldBeCalled();

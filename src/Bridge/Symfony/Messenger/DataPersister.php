@@ -15,7 +15,7 @@ namespace ApiPlatform\Core\Bridge\Symfony\Messenger;
 
 use ApiPlatform\Core\Api\OperationType;
 use ApiPlatform\Core\DataPersister\ContextAwareDataPersisterInterface;
-use ApiPlatform\Core\DataPersister\LoopDataPersisterInterface;
+use ApiPlatform\Core\DataPersister\HandOverDataPersisterInterface;
 use ApiPlatform\Core\Exception\ResourceClassNotFoundException;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
@@ -31,7 +31,7 @@ use Symfony\Component\Messenger\Stamp\HandledStamp;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-final class DataPersister implements ContextAwareDataPersisterInterface, LoopDataPersisterInterface
+final class DataPersister implements ContextAwareDataPersisterInterface, HandOverDataPersisterInterface
 {
     use ClassInfoTrait;
     use DispatchTrait;
@@ -90,7 +90,7 @@ final class DataPersister implements ContextAwareDataPersisterInterface, LoopDat
     /**
      * {@inheritdoc}
      */
-    public function loop($data, array $context = []): bool
+    public function handOver($data, array $context = []): bool
     {
         try {
             $value = $this->getMessengerAttributeValue($this->resourceMetadataFactory->create($context['resource_class'] ?? $this->getObjectClass($data)), $context);

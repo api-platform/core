@@ -16,10 +16,10 @@ namespace ApiPlatform\Core\DataPersister;
 /**
  * @author Vincent Chalamon <vincentchalamon@gmail.com>
  */
-interface LoopDataPersisterInterface
+interface HandOverDataPersisterInterface
 {
     /**
      * Should the chain data persister continue to the next one?
      */
-    public function loop($data, array $context = []): bool;
+    public function handOver($data, array $context = []): bool;
 }

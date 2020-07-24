@@ -112,7 +112,7 @@ class DataPersisterTest extends TestCase
         $metadataFactoryProphecy->create(DummyCar::class)->willThrow(new ResourceClassNotFoundException());
 
         $dataPersister = new DataPersister($metadataFactoryProphecy->reveal(), $this->prophesize(MessageBusInterface::class)->reveal());
-        $this->assertTrue($dataPersister->loop(new DummyCar(), ['resource_class' => Dummy::class]));
-        $this->assertFalse($dataPersister->loop(new DummyCar()));
+        $this->assertTrue($dataPersister->handOver(new DummyCar(), ['resource_class' => Dummy::class]));
+        $this->assertFalse($dataPersister->handOver(new DummyCar()));
     }
 }
