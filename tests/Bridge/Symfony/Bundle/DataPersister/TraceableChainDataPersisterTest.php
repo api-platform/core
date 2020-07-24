@@ -16,7 +16,6 @@ namespace ApiPlatform\Core\Tests\Bridge\Symfony\Bundle\DataPersister;
 use ApiPlatform\Core\Bridge\Symfony\Bundle\DataPersister\TraceableChainDataPersister;
 use ApiPlatform\Core\DataPersister\ChainDataPersister;
 use ApiPlatform\Core\DataPersister\DataPersisterInterface;
-use ApiPlatform\Core\DataPersister\HandOverDataPersisterInterface;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -75,7 +74,7 @@ class TraceableChainDataPersisterTest extends TestCase
                     {
                     }
                 },
-                new class() implements DataPersisterInterface, HandOverDataPersisterInterface {
+                new class() implements DataPersisterInterface {
                     public function supports($data): bool
                     {
                         return true;
@@ -87,11 +86,6 @@ class TraceableChainDataPersisterTest extends TestCase
 
                     public function remove($data)
                     {
-                    }
-
-                    public function handOver($data, array $context = []): bool
-                    {
-                        return true;
                     }
                 },
                 new class() implements DataPersisterInterface {

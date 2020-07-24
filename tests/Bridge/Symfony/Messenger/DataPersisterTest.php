@@ -16,6 +16,7 @@ namespace ApiPlatform\Core\Tests\Bridge\Symfony\Messenger;
 use ApiPlatform\Core\Bridge\Symfony\Messenger\ContextStamp;
 use ApiPlatform\Core\Bridge\Symfony\Messenger\DataPersister;
 use ApiPlatform\Core\Bridge\Symfony\Messenger\RemoveStamp;
+use ApiPlatform\Core\DataPersister\ContextAwareDataPersisterInterface;
 use ApiPlatform\Core\Exception\ResourceClassNotFoundException;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
@@ -26,7 +27,6 @@ use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\MessageBusInterface;
-use Symfony\Component\Messenger\Stamp\HandledStamp;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
@@ -40,7 +40,7 @@ class DataPersisterTest extends TestCase
         $metadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $metadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadata(null, null, null, null, null, ['messenger' => true]));
 
-        $dataPersister = new DataPersister($metadataFactoryProphecy->reveal(), $this->prophesize(MessageBusInterface::class)->reveal());
+        $dataPersister = new DataPersister($metadataFactoryProphecy->reveal(), $this->prophesize(MessageBusInterface::class)->reveal(), $this->prophesize(ContextAwareDataPersisterInterface::class)->reveal());
         $this->assertTrue($dataPersister->supports(new Dummy()));
     }
 
@@ -50,7 +50,7 @@ class DataPersisterTest extends TestCase
         $metadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadata(null, null, null, null, null, ['messenger' => true]));
         $metadataFactoryProphecy->create(DummyCar::class)->willThrow(new ResourceClassNotFoundException());
 
-        $dataPersister = new DataPersister($metadataFactoryProphecy->reveal(), $this->prophesize(MessageBusInterface::class)->reveal());
+        $dataPersister = new DataPersister($metadataFactoryProphecy->reveal(), $this->prophesize(MessageBusInterface::class)->reveal(), $this->prophesize(ContextAwareDataPersisterInterface::class)->reveal());
         $this->assertTrue($dataPersister->supports(new DummyCar(), ['resource_class' => Dummy::class]));
         $this->assertFalse($dataPersister->supports(new DummyCar()));
     }
@@ -59,12 +59,20 @@ class DataPersisterTest extends TestCase
     {
         $dummy = new Dummy();
 
+        $metadataFactory = $this->prophesize(ResourceMetadataFactoryInterface::class);
+        $metadataFactory->create(Dummy::class)->willReturn(new ResourceMetadata(null, null, null, null, null, ['messenger' => true]));
+        $metadataFactory->create(Dummy::class)->willReturn(new ResourceMetadata(null, null, null, null, null, ['messenger' => 'input']));
+        $metadataFactory->create(DummyCar::class)->willThrow(new ResourceClassNotFoundException());
+
+        $chainDataPersister = $this->prophesize(ContextAwareDataPersisterInterface::class);
+        $chainDataPersister->persist($dummy, ['messenger_dispatched' => true])->shouldNotBeCalled();
+
         $messageBus = $this->prophesize(MessageBusInterface::class);
         $messageBus->dispatch(Argument::that(function (Envelope $envelope) use ($dummy) {
             return $dummy === $envelope->getMessage() && null !== $envelope->last(ContextStamp::class);
         }))->willReturn(new Envelope($dummy))->shouldBeCalled();
 
-        $dataPersister = new DataPersister($this->prophesize(ResourceMetadataFactoryInterface::class)->reveal(), $messageBus->reveal());
+        $dataPersister = new DataPersister($metadataFactory->reveal(), $messageBus->reveal(), $chainDataPersister->reveal());
         $this->assertSame($dummy, $dataPersister->persist($dummy));
     }
 
@@ -72,27 +80,63 @@ class DataPersisterTest extends TestCase
     {
         $dummy = new Dummy();
 
-        $messageBus = $this->prophesize(MessageBusInterface::class);
+        $metadataFactory = $this->prophesize(ResourceMetadataFactoryInterface::class);
+        $metadataFactory->create(Dummy::class)->willReturn(new ResourceMetadata(null, null, null, null, null, ['messenger' => true]));
+        $metadataFactory->create(Dummy::class)->willReturn(new ResourceMetadata(null, null, null, null, null, ['messenger' => 'input']));
+        $metadataFactory->create(DummyCar::class)->willThrow(new ResourceClassNotFoundException());
 
+        $chainDataPersister = $this->prophesize(ContextAwareDataPersisterInterface::class);
+        $chainDataPersister->remove($dummy, ['messenger_dispatched' => true])->shouldNotBeCalled();
+
+        $messageBus = $this->prophesize(MessageBusInterface::class);
         $messageBus->dispatch(Argument::that(function (Envelope $envelope) use ($dummy) {
             return $dummy === $envelope->getMessage() && null !== $envelope->last(RemoveStamp::class);
         }))->willReturn(new Envelope($dummy))->shouldBeCalled();
 
-        $dataPersister = new DataPersister($this->prophesize(ResourceMetadataFactoryInterface::class)->reveal(), $messageBus->reveal());
+        $dataPersister = new DataPersister($metadataFactory->reveal(), $messageBus->reveal(), $chainDataPersister->reveal());
         $dataPersister->remove($dummy);
     }
 
-    public function testHandle()
+    public function testPersistWithHandOver()
     {
         $dummy = new Dummy();
+
+        $metadataFactory = $this->prophesize(ResourceMetadataFactoryInterface::class);
+        $metadataFactory->create(Dummy::class)->willReturn(new ResourceMetadata(null, null, null, null, null, ['messenger' => 'persist']));
+        $metadataFactory->create(Dummy::class)->willReturn(new ResourceMetadata(null, null, null, null, null, ['messenger' => ['persist', 'input']]));
+        $metadataFactory->create(DummyCar::class)->willThrow(new ResourceClassNotFoundException());
+
+        $chainDataPersister = $this->prophesize(ContextAwareDataPersisterInterface::class);
+        $chainDataPersister->persist($dummy, ['messenger_dispatched' => true])->willReturn($dummy)->shouldBeCalled();
 
         $messageBus = $this->prophesize(MessageBusInterface::class);
         $messageBus->dispatch(Argument::that(function (Envelope $envelope) use ($dummy) {
             return $dummy === $envelope->getMessage() && null !== $envelope->last(ContextStamp::class);
-        }))->willReturn((new Envelope($dummy))->with(new HandledStamp($dummy, 'DummyHandler::__invoke')))->shouldBeCalled();
+        }))->willReturn(new Envelope($dummy))->shouldBeCalled();
 
-        $dataPersister = new DataPersister($this->prophesize(ResourceMetadataFactoryInterface::class)->reveal(), $messageBus->reveal());
+        $dataPersister = new DataPersister($metadataFactory->reveal(), $messageBus->reveal(), $chainDataPersister->reveal());
         $this->assertSame($dummy, $dataPersister->persist($dummy));
+    }
+
+    public function testRemoveWithHandOver()
+    {
+        $dummy = new Dummy();
+
+        $metadataFactory = $this->prophesize(ResourceMetadataFactoryInterface::class);
+        $metadataFactory->create(Dummy::class)->willReturn(new ResourceMetadata(null, null, null, null, null, ['messenger' => 'persist']));
+        $metadataFactory->create(Dummy::class)->willReturn(new ResourceMetadata(null, null, null, null, null, ['messenger' => ['persist', 'input']]));
+        $metadataFactory->create(DummyCar::class)->willThrow(new ResourceClassNotFoundException());
+
+        $chainDataPersister = $this->prophesize(ContextAwareDataPersisterInterface::class);
+        $chainDataPersister->remove($dummy, ['messenger_dispatched' => true])->shouldBeCalled();
+
+        $messageBus = $this->prophesize(MessageBusInterface::class);
+        $messageBus->dispatch(Argument::that(function (Envelope $envelope) use ($dummy) {
+            return $dummy === $envelope->getMessage() && null !== $envelope->last(RemoveStamp::class);
+        }))->willReturn(new Envelope($dummy))->shouldBeCalled();
+
+        $dataPersister = new DataPersister($metadataFactory->reveal(), $messageBus->reveal(), $chainDataPersister->reveal());
+        $dataPersister->remove($dummy);
     }
 
     public function testSupportWithGraphqlContext()
@@ -100,19 +144,7 @@ class DataPersisterTest extends TestCase
         $metadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $metadataFactoryProphecy->create(Dummy::class)->willReturn((new ResourceMetadata(null, null, null, null, null, []))->withGraphQl(['create' => ['messenger' => 'input']]));
 
-        $dataPersister = new DataPersister($metadataFactoryProphecy->reveal(), $this->prophesize(MessageBusInterface::class)->reveal());
+        $dataPersister = new DataPersister($metadataFactoryProphecy->reveal(), $this->prophesize(MessageBusInterface::class)->reveal(), $this->prophesize(ContextAwareDataPersisterInterface::class)->reveal());
         $this->assertTrue($dataPersister->supports(new DummyCar(), ['resource_class' => Dummy::class, 'graphql_operation_name' => 'create']));
-    }
-
-    public function testLoop()
-    {
-        $metadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $metadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadata(null, null, null, null, null, ['messenger' => 'persist']));
-        $metadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadata(null, null, null, null, null, ['messenger' => ['persist', 'input']]));
-        $metadataFactoryProphecy->create(DummyCar::class)->willThrow(new ResourceClassNotFoundException());
-
-        $dataPersister = new DataPersister($metadataFactoryProphecy->reveal(), $this->prophesize(MessageBusInterface::class)->reveal());
-        $this->assertTrue($dataPersister->handOver(new DummyCar(), ['resource_class' => Dummy::class]));
-        $this->assertFalse($dataPersister->handOver(new DummyCar()));
     }
 }
