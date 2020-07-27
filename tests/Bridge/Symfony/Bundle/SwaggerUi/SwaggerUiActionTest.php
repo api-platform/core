@@ -11,29 +11,30 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Bridge\Symfony\Bundle\Action;
+namespace ApiPlatform\Core\Tests\Bridge\Symfony\Bundle\SwaggerUi;
 
-use ApiPlatform\Core\Bridge\Symfony\Bundle\Action\SwaggerUiAction;
-use ApiPlatform\Core\Documentation\Documentation;
+use ApiPlatform\Core\Bridge\Symfony\Bundle\SwaggerUi\SwaggerUiAction;
+use ApiPlatform\Core\Bridge\Symfony\Bundle\SwaggerUi\SwaggerUiContext;
+use ApiPlatform\Core\Documentation\DocumentationInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
-use ApiPlatform\Core\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
-use ApiPlatform\Core\Metadata\Resource\ResourceNameCollection;
+use ApiPlatform\Core\OpenApi\Factory\OpenApiFactoryInterface;
+use ApiPlatform\Core\OpenApi\Model\Info;
+use ApiPlatform\Core\OpenApi\Model\Paths;
+use ApiPlatform\Core\OpenApi\OpenApi;
+use ApiPlatform\Core\OpenApi\Options;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
-use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Generator\UrlGenerator;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Twig\Environment as TwigEnvironment;
 
 /**
- * @author Kévin Dunglas <dunglas@gmail.com>
+ * @author Antoine Bluchet <soyuka@gmail.com>
  */
 class SwaggerUiActionTest extends TestCase
 {
-    use ExpectDeprecationTrait;
-
     public const SPEC = [
         'paths' => [
             '/fs' => ['get' => ['operationId' => 'getFCollection']],
@@ -43,29 +44,30 @@ class SwaggerUiActionTest extends TestCase
 
     /**
      * @dataProvider getInvokeParameters
-     * @group legacy
      */
     public function testInvoke(Request $request, $twigProphecy)
     {
-        $this->expectDeprecation('The use of "ApiPlatform\Core\Bridge\Symfony\Bundle\Action\SwaggerUiAction" is deprecated since API Platform 2.6, use "ApiPlatform\Core\Bridge\Symfony\Bundle\SwaggerUi\SwaggerUiAction" instead.');
-        $resourceNameCollectionFactoryProphecy = $this->prophesize(ResourceNameCollectionFactoryInterface::class);
-        $resourceNameCollectionFactoryProphecy->create()->willReturn(new ResourceNameCollection(['Foo', 'Bar']))->shouldBeCalled();
-
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadata('F'))->shouldBeCalled();
 
         $normalizerProphecy = $this->prophesize(NormalizerInterface::class);
-        $normalizerProphecy->normalize(Argument::type(Documentation::class), 'json', Argument::type('array'))->willReturn(self::SPEC)->shouldBeCalled();
+        $normalizerProphecy->normalize(Argument::type(DocumentationInterface::class), 'json', Argument::type('array'))->willReturn(self::SPEC)->shouldBeCalled();
 
         $urlGeneratorProphecy = $this->prophesize(UrlGenerator::class);
         $urlGeneratorProphecy->generate('api_doc', ['format' => 'json'])->willReturn('/url')->shouldBeCalled();
 
+        $openApiFactoryProphecy = $this->prophesize(OpenApiFactoryInterface::class);
+        $openApiFactoryProphecy->__invoke(Argument::type('array'))->willReturn(new OpenApi(new Info('title', '1.0.0'), [], new Paths()))->shouldBeCalled();
+
         $action = new SwaggerUiAction(
-            $resourceNameCollectionFactoryProphecy->reveal(),
             $resourceMetadataFactoryProphecy->reveal(),
-            $normalizerProphecy->reveal(),
             $twigProphecy->reveal(),
-            $urlGeneratorProphecy->reveal()
+            $urlGeneratorProphecy->reveal(),
+            $normalizerProphecy->reveal(),
+            $openApiFactoryProphecy->reveal(),
+            new Options('title', '', '1.0.0'),
+            new SwaggerUiContext(),
+            ['jsonld' => ['application/ld+json']]
         );
         $action($request);
     }
@@ -147,25 +149,20 @@ class SwaggerUiActionTest extends TestCase
 
     /**
      * @dataProvider getDoNotRunCurrentRequestParameters
-     * @group legacy
      */
     public function testDoNotRunCurrentRequest(Request $request)
     {
-        $this->expectDeprecation('The use of "ApiPlatform\Core\Bridge\Symfony\Bundle\Action\SwaggerUiAction" is deprecated since API Platform 2.6, use "ApiPlatform\Core\Bridge\Symfony\Bundle\SwaggerUi\SwaggerUiAction" instead.');
-        $resourceNameCollectionFactoryProphecy = $this->prophesize(ResourceNameCollectionFactoryInterface::class);
-        $resourceNameCollectionFactoryProphecy->create()->willReturn(new ResourceNameCollection(['Foo', 'Bar']))->shouldBeCalled();
-
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadata());
 
         $normalizerProphecy = $this->prophesize(NormalizerInterface::class);
-        $normalizerProphecy->normalize(Argument::type(Documentation::class), 'json', Argument::type('array'))->willReturn(self::SPEC)->shouldBeCalled();
+        $normalizerProphecy->normalize(Argument::type(DocumentationInterface::class), 'json', Argument::type('array'))->willReturn(self::SPEC)->shouldBeCalled();
 
         $twigProphecy = $this->prophesize(TwigEnvironment::class);
         $twigProphecy->render('@ApiPlatform/SwaggerUi/index.html.twig', [
-            'title' => '',
+            'title' => 'title',
             'description' => '',
-            'formats' => [],
+            'formats' => ['jsonld' => ['application/ld+json']],
             'showWebby' => true,
             'swaggerUiEnabled' => false,
             'reDocEnabled' => false,
@@ -191,12 +188,18 @@ class SwaggerUiActionTest extends TestCase
         $urlGeneratorProphecy = $this->prophesize(UrlGenerator::class);
         $urlGeneratorProphecy->generate('api_doc', ['format' => 'json'])->willReturn('/url')->shouldBeCalled();
 
+        $openApiFactoryProphecy = $this->prophesize(OpenApiFactoryInterface::class);
+        $openApiFactoryProphecy->__invoke(Argument::type('array'))->willReturn(new OpenApi(new Info('title', '1.0.0'), [], new Paths()))->shouldBeCalled();
+
         $action = new SwaggerUiAction(
-            $resourceNameCollectionFactoryProphecy->reveal(),
             $resourceMetadataFactoryProphecy->reveal(),
-            $normalizerProphecy->reveal(),
             $twigProphecy->reveal(),
-            $urlGeneratorProphecy->reveal()
+            $urlGeneratorProphecy->reveal(),
+            $normalizerProphecy->reveal(),
+            $openApiFactoryProphecy->reveal(),
+            new Options('title', '', '1.0.0'),
+            new SwaggerUiContext(),
+            ['jsonld' => ['application/ld+json']]
         );
         $action($request);
     }
