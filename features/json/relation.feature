@@ -156,7 +156,7 @@ Feature: JSON relations support
     And I send a "POST" request to "/related_dummies" with body:
     """
     {
-      "thirdLevel": "1"
+      "thirdLevel": "/third_levels/1"
     }
     """
     Then the response status code should be 201
@@ -184,16 +184,16 @@ Feature: JSON relations support
     }
     """
 
-  Scenario: Passing a (valid) plain identifier on a relation
+  Scenario: Create a Dummy with relations to RelatedDummy
     When I add "Content-Type" header equal to "application/json"
     And I send a "POST" request to "/dummies" with body:
     """
     {
-      "relatedDummy": "1",
+      "relatedDummy": "/related_dummies/1",
       "relatedDummies": [
-        "1"
+        "/related_dummies/1"
       ],
-      "name": "Dummy with plain relations"
+      "name": "Dummy with relations"
     }
     """
     Then the response status code should be 201
@@ -221,7 +221,7 @@ Feature: JSON relations support
       "relatedOwnedDummy": null,
       "relatedOwningDummy": null,
       "id": 1,
-      "name": "Dummy with plain relations",
+      "name": "Dummy with relations",
       "alias": null,
       "foo": null
     }

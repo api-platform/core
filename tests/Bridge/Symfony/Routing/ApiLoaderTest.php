@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Tests\Bridge\Symfony\Routing;
 
+use ApiPlatform\Core\Api\IdentifiersExtractorInterface;
 use ApiPlatform\Core\Bridge\Symfony\Routing\ApiLoader;
 use ApiPlatform\Core\Exception\InvalidResourceException;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
@@ -50,6 +51,7 @@ class ApiLoaderTest extends TestCase
     {
         $resourceMetadata = new ResourceMetadata();
         $resourceMetadata = $resourceMetadata->withShortName('dummy');
+        $resourceMetadata = $resourceMetadata->withAttributes(['identified_by' => 'id']);
         //default operation based on OperationResourceMetadataFactory
         $resourceMetadata = $resourceMetadata->withItemOperations([
             'get' => ['method' => 'GET', 'requirements' => ['id' => '\d+'], 'defaults' => ['my_default' => 'default_value', '_controller' => 'should_not_be_overriden'], 'stateless' => null],
@@ -105,7 +107,7 @@ class ApiLoaderTest extends TestCase
         );
 
         $this->assertEquals(
-            $this->getSubresourceRoute('/dummies/{id}/subresources.{_format}', 'api_platform.action.get_subresource', RelatedDummyEntity::class, 'api_dummies_subresources_get_subresource', ['property' => 'subresource', 'identifiers' => [['id', DummyEntity::class, true]], 'collection' => true, 'operationId' => 'api_dummies_subresources_get_subresource'], [], ['_stateless' => true]),
+            $this->getSubresourceRoute('/dummies/{id}/subresources.{_format}', 'api_platform.action.get_subresource', RelatedDummyEntity::class, 'api_dummies_subresources_get_subresource', ['property' => 'subresource', 'identifiers' => [['id', DummyEntity::class, true, ['id']]], 'collection' => true, 'operationId' => 'api_dummies_subresources_get_subresource'], [], ['_stateless' => true]),
             $routeCollection->get('api_dummies_subresources_get_subresource')
         );
     }
@@ -119,7 +121,7 @@ class ApiLoaderTest extends TestCase
             'put' => ['method' => 'PUT', 'stateless' => null],
             'delete' => ['method' => 'DELETE', 'stateless' => null],
         ]);
-        $resourceMetadata = $resourceMetadata->withAttributes(['route_prefix' => '/foobar-prefix']);
+        $resourceMetadata = $resourceMetadata->withAttributes(['route_prefix' => '/foobar-prefix', 'identified_by' => 'id']);
 
         $routeCollection = $this->getApiLoaderWithResourceMetadata($resourceMetadata)->load(null);
 
@@ -200,32 +202,32 @@ class ApiLoaderTest extends TestCase
         $routeCollection = $this->getApiLoaderWithResourceMetadata($resourceMetadata, true)->load(null);
 
         $this->assertEquals(
-            $this->getSubresourceRoute('/dummies/{id}/subresources.{_format}', 'api_platform.action.get_subresource', RelatedDummyEntity::class, 'api_dummies_subresources_get_subresource', ['property' => 'subresource', 'identifiers' => [['id', DummyEntity::class, true]], 'collection' => true, 'operationId' => 'api_dummies_subresources_get_subresource']),
+            $this->getSubresourceRoute('/dummies/{id}/subresources.{_format}', 'api_platform.action.get_subresource', RelatedDummyEntity::class, 'api_dummies_subresources_get_subresource', ['property' => 'subresource', 'identifiers' => [['id', DummyEntity::class, true, ['id']]], 'collection' => true, 'operationId' => 'api_dummies_subresources_get_subresource']),
             $routeCollection->get('api_dummies_subresources_get_subresource')
         );
 
         $this->assertEquals(
-            $this->getSubresourceRoute('/related_dummies/{id}/recursivesubresource/subresources.{_format}', 'api_platform.action.get_subresource', RelatedDummyEntity::class, 'api_related_dummies_recursivesubresource_subresources_get_subresource', ['property' => 'subresource', 'identifiers' => [['id', RelatedDummyEntity::class, true], ['recursivesubresource', DummyEntity::class, false]], 'collection' => true, 'operationId' => 'api_related_dummies_recursivesubresource_subresources_get_subresource']),
+            $this->getSubresourceRoute('/related_dummies/{id}/recursivesubresource/subresources.{_format}', 'api_platform.action.get_subresource', RelatedDummyEntity::class, 'api_related_dummies_recursivesubresource_subresources_get_subresource', ['property' => 'subresource', 'identifiers' => [['id', RelatedDummyEntity::class, true, ['id']], ['recursivesubresource', DummyEntity::class, false, ['id']]], 'collection' => true, 'operationId' => 'api_related_dummies_recursivesubresource_subresources_get_subresource']),
             $routeCollection->get('api_related_dummies_recursivesubresource_subresources_get_subresource')
         );
 
         $this->assertEquals(
-            $this->getSubresourceRoute('/related_dummies/{id}/recursivesubresource.{_format}', 'dummy_controller', DummyEntity::class, 'api_related_dummies_recursivesubresource_get_subresource', ['property' => 'recursivesubresource', 'identifiers' => [['id', RelatedDummyEntity::class, true]], 'collection' => false, 'operationId' => 'api_related_dummies_recursivesubresource_get_subresource']),
+            $this->getSubresourceRoute('/related_dummies/{id}/recursivesubresource.{_format}', 'dummy_controller', DummyEntity::class, 'api_related_dummies_recursivesubresource_get_subresource', ['property' => 'recursivesubresource', 'identifiers' => [['id', RelatedDummyEntity::class, true, ['id']]], 'collection' => false, 'operationId' => 'api_related_dummies_recursivesubresource_get_subresource']),
             $routeCollection->get('api_related_dummies_recursivesubresource_get_subresource')
         );
 
         $this->assertEquals(
-            $this->getSubresourceRoute('/dummies/{id}/subresources/{subresource}/recursivesubresource.{_format}', 'api_platform.action.get_subresource', DummyEntity::class, 'api_dummies_subresources_recursivesubresource_get_subresource', ['property' => 'recursivesubresource', 'identifiers' => [['id', DummyEntity::class, true], ['subresource', RelatedDummyEntity::class, true]], 'collection' => false, 'operationId' => 'api_dummies_subresources_recursivesubresource_get_subresource']),
+            $this->getSubresourceRoute('/dummies/{id}/subresources/{subresource}/recursivesubresource.{_format}', 'api_platform.action.get_subresource', DummyEntity::class, 'api_dummies_subresources_recursivesubresource_get_subresource', ['property' => 'recursivesubresource', 'identifiers' => [['id', DummyEntity::class, true, ['id']], ['subresource', RelatedDummyEntity::class, true, ['id']]], 'collection' => false, 'operationId' => 'api_dummies_subresources_recursivesubresource_get_subresource']),
             $routeCollection->get('api_dummies_subresources_recursivesubresource_get_subresource')
         );
 
         $this->assertEquals(
-            $this->getSubresourceRoute('/related_dummies/{id}/secondrecursivesubresource/subresources.{_format}', 'api_platform.action.get_subresource', RelatedDummyEntity::class, 'api_related_dummies_secondrecursivesubresource_subresources_get_subresource', ['property' => 'subresource', 'identifiers' => [['id', RelatedDummyEntity::class, true], ['secondrecursivesubresource', DummyEntity::class, false]], 'collection' => true, 'operationId' => 'api_related_dummies_secondrecursivesubresource_subresources_get_subresource']),
+            $this->getSubresourceRoute('/related_dummies/{id}/secondrecursivesubresource/subresources.{_format}', 'api_platform.action.get_subresource', RelatedDummyEntity::class, 'api_related_dummies_secondrecursivesubresource_subresources_get_subresource', ['property' => 'subresource', 'identifiers' => [['id', RelatedDummyEntity::class, true, ['id']], ['secondrecursivesubresource', DummyEntity::class, false, ['id']]], 'collection' => true, 'operationId' => 'api_related_dummies_secondrecursivesubresource_subresources_get_subresource']),
             $routeCollection->get('api_related_dummies_secondrecursivesubresource_subresources_get_subresource')
         );
 
         $this->assertEquals(
-            $this->getSubresourceRoute('/related_dummies/{id}/secondrecursivesubresource.{_format}', 'api_platform.action.get_subresource', DummyEntity::class, 'api_related_dummies_secondrecursivesubresource_get_subresource', ['property' => 'secondrecursivesubresource', 'identifiers' => [['id', RelatedDummyEntity::class, true]], 'collection' => false, 'operationId' => 'api_related_dummies_secondrecursivesubresource_get_subresource']),
+            $this->getSubresourceRoute('/related_dummies/{id}/secondrecursivesubresource.{_format}', 'api_platform.action.get_subresource', DummyEntity::class, 'api_related_dummies_secondrecursivesubresource_get_subresource', ['property' => 'secondrecursivesubresource', 'identifiers' => [['id', RelatedDummyEntity::class, true, ['id']]], 'collection' => false, 'operationId' => 'api_related_dummies_secondrecursivesubresource_get_subresource']),
             $routeCollection->get('api_related_dummies_secondrecursivesubresource_get_subresource')
         );
     }
@@ -301,9 +303,13 @@ class ApiLoaderTest extends TestCase
 
         $resourceMetadataFactory = $resourceMetadataFactoryProphecy->reveal();
 
-        $subresourceOperationFactory = new SubresourceOperationFactory($resourceMetadataFactory, $propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), new UnderscorePathSegmentNameGenerator());
+        $identifiersExtractorProphecy = $this->prophesize(IdentifiersExtractorInterface::class);
+        $identifiersExtractorProphecy->getIdentifiersFromResourceClass(Argument::type('string'))->willReturn(['id']);
+        $identifiersExtractor = $identifiersExtractorProphecy->reveal();
 
-        return new ApiLoader($kernelProphecy->reveal(), $resourceNameCollectionFactoryProphecy->reveal(), $resourceMetadataFactory, $operationPathResolver, $containerProphecy->reveal(), ['jsonld' => ['application/ld+json']], [], $subresourceOperationFactory, false, true, true, false, false);
+        $subresourceOperationFactory = new SubresourceOperationFactory($resourceMetadataFactory, $propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), new UnderscorePathSegmentNameGenerator(), $identifiersExtractor);
+
+        return new ApiLoader($kernelProphecy->reveal(), $resourceNameCollectionFactoryProphecy->reveal(), $resourceMetadataFactory, $operationPathResolver, $containerProphecy->reveal(), ['jsonld' => ['application/ld+json']], [], $subresourceOperationFactory, false, true, true, false, false, $identifiersExtractor);
     }
 
     private function getRoute(string $path, string $controller, string $resourceClass, string $operationName, array $methods, bool $collection = false, array $requirements = [], array $extraDefaults = ['_stateless' => null], array $options = [], string $host = '', array $schemes = [], string $condition = ''): Route
@@ -314,6 +320,8 @@ class ApiLoaderTest extends TestCase
                 '_controller' => $controller,
                 '_format' => null,
                 '_api_resource_class' => $resourceClass,
+                '_api_identified_by' => ['id'],
+                '_api_has_composite_identifier' => false,
                 sprintf('_api_%s_operation_name', $collection ? 'collection' : 'item') => $operationName,
             ] + $extraDefaults,
             $requirements,
@@ -335,6 +343,8 @@ class ApiLoaderTest extends TestCase
                 '_api_resource_class' => $resourceClass,
                 '_api_subresource_operation_name' => $operationName,
                 '_api_subresource_context' => $context,
+                '_api_identified_by' => ['id'],
+                '_api_has_composite_identifier' => false,
             ] + $extraDefaults,
             $requirements,
             [],

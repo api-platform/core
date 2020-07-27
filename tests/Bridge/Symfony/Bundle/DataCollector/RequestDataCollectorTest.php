@@ -142,6 +142,8 @@ class RequestDataCollectorTest extends TestCase
 
         $this->assertSame([
             'resource_class' => DummyEntity::class,
+            'identified_by' => null,
+            'has_composite_identifier' => false,
             'item_operation_name' => 'get',
             'receive' => true,
             'respond' => true,
@@ -275,13 +277,13 @@ class RequestDataCollectorTest extends TestCase
     {
         $itemDataProvider = new TraceableChainItemDataProvider(new ChainItemDataProvider([
             new class() implements ItemDataProviderInterface {
-                public function getItem(string $resourceClass, $id, string $operationName = null, array $context = [])
+                public function getItem(string $resourceClass, array $identifiers, string $operationName = null, array $context = [])
                 {
                     return null;
                 }
             },
         ]));
-        $itemDataProvider->getItem('', '', null, ['item_context']);
+        $itemDataProvider->getItem('', [], null, ['item_context']);
 
         return $itemDataProvider;
     }

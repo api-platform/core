@@ -15,7 +15,6 @@ namespace ApiPlatform\Core\Tests\Bridge\Symfony\Bundle\DataProvider;
 
 use ApiPlatform\Core\Bridge\Symfony\Bundle\DataProvider\TraceableChainItemDataProvider;
 use ApiPlatform\Core\DataProvider\ChainItemDataProvider;
-use ApiPlatform\Core\DataProvider\DenormalizedIdentifiersAwareItemDataProviderInterface;
 use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
 use ApiPlatform\Core\DataProvider\RestrictedDataProviderInterface;
 use ApiPlatform\Core\Exception\ResourceClassNotSupportedException;
@@ -30,7 +29,7 @@ class TraceableChainItemDataCollectorTest extends TestCase
     public function testGetItem($provider, $context, $expected)
     {
         $dataProvider = new TraceableChainItemDataProvider($provider);
-        $dataProvider->getItem('', '', null, $context);
+        $dataProvider->getItem('', [], null, $context);
 
         $result = $dataProvider->getProvidersResponse();
         $this->assertCount(\count($expected), $result);
@@ -48,7 +47,7 @@ class TraceableChainItemDataCollectorTest extends TestCase
     public function testDeprecatedGetItem($provider, $context, $expected)
     {
         $dataProvider = new TraceableChainItemDataProvider($provider);
-        $dataProvider->getItem('', '', null, $context);
+        $dataProvider->getItem('', [], null, $context);
 
         $result = $dataProvider->getProvidersResponse();
         $this->assertCount(\count($expected), $result);
@@ -63,7 +62,7 @@ class TraceableChainItemDataCollectorTest extends TestCase
     {
         yield 'Not a ChainItemDataProvider' => [
             new class() implements ItemDataProviderInterface {
-                public function getItem(string $resourceClass, $id, string $operationName = null, array $context = [])
+                public function getItem(string $resourceClass, array $identifiers, string $operationName = null, array $context = [])
                 {
                     return null;
                 }
@@ -86,13 +85,13 @@ class TraceableChainItemDataCollectorTest extends TestCase
                         return false;
                     }
 
-                    public function getItem(string $resourceClass, $id, string $operationName = null, array $context = [])
+                    public function getItem(string $resourceClass, array $identifiers, string $operationName = null, array $context = [])
                     {
                         return null;
                     }
                 },
-                new class() implements RestrictedDataProviderInterface, DenormalizedIdentifiersAwareItemDataProviderInterface {
-                    public function getItem(string $resourceClass, /* array */ $id, string $operationName = null, array $context = [])
+                new class() implements RestrictedDataProviderInterface {
+                    public function getItem(string $resourceClass, array $identifiers, string $operationName = null, array $context = [])
                     {
                         return null;
                     }
@@ -103,7 +102,7 @@ class TraceableChainItemDataCollectorTest extends TestCase
                     }
                 },
                 new class() implements ItemDataProviderInterface {
-                    public function getItem(string $resourceClass, $id, string $operationName = null, array $context = [])
+                    public function getItem(string $resourceClass, array $identifiers, string $operationName = null, array $context = [])
                     {
                         return null;
                     }
@@ -119,13 +118,13 @@ class TraceableChainItemDataCollectorTest extends TestCase
         yield 'deprecated ChainItemDataProvider - ResourceClassNotSupportedException' => [
             new ChainItemDataProvider([
                 new class() implements ItemDataProviderInterface {
-                    public function getItem(string $resourceClass, $id, string $operationName = null, array $context = [])
+                    public function getItem(string $resourceClass, array $identifiers, string $operationName = null, array $context = [])
                     {
                         throw new ResourceClassNotSupportedException('nope');
                     }
                 },
                 new class() implements ItemDataProviderInterface {
-                    public function getItem(string $resourceClass, $id, string $operationName = null, array $context = [])
+                    public function getItem(string $resourceClass, array $identifiers, string $operationName = null, array $context = [])
                     {
                         return null;
                     }

@@ -21,7 +21,6 @@ use ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Extension\AggregationResultItemE
 use ApiPlatform\Core\DataProvider\SubresourceDataProviderInterface;
 use ApiPlatform\Core\Exception\ResourceClassNotSupportedException;
 use ApiPlatform\Core\Exception\RuntimeException;
-use ApiPlatform\Core\Identifier\IdentifierConverterInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
@@ -136,24 +135,14 @@ final class SubresourceDataProvider implements SubresourceDataProviderInterface
         }
 
         $aggregation = $manager->createAggregationBuilder($identifierResourceClass);
-        $normalizedIdentifiers = [];
-
-        if (isset($identifiers[$identifier])) {
-            // if it's an array it's already normalized, the IdentifierManagerTrait is deprecated
-            if ($context[IdentifierConverterInterface::HAS_IDENTIFIER_CONVERTER] ?? false) {
-                $normalizedIdentifiers = $identifiers[$identifier];
-            } else {
-                $normalizedIdentifiers = $this->normalizeIdentifiers($identifiers[$identifier], $manager, $identifierResourceClass);
-            }
-        }
 
         if ($classMetadata->hasAssociation($previousAssociationProperty)) {
             $aggregation->lookup($previousAssociationProperty)->alias($previousAssociationProperty);
-            foreach ($normalizedIdentifiers as $key => $value) {
+            foreach (\is_array($identifiers[$identifier]) ? $identifiers[$identifier] : $identifiers as $key => $value) {
                 $aggregation->match()->field($key)->equals($value);
             }
         } elseif ($classMetadata->isIdentifier($previousAssociationProperty)) {
-            foreach ($normalizedIdentifiers as $key => $value) {
+            foreach (\is_array($identifiers[$identifier]) ? $identifiers[$identifier] : $identifiers as $key => $value) {
                 $aggregation->match()->field($key)->equals($value);
             }
 

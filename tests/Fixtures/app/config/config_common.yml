@@ -44,7 +44,6 @@ api_platform:
     description: |
         This is a test API.
         Made with love
-    allow_plain_identifiers:           true
     formats:
         jsonld:                        ['application/ld+json']
         jsonhal:                       ['application/hal+json']

@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Bridge\Symfony\Bundle\DataProvider;
 
 use ApiPlatform\Core\DataProvider\ChainItemDataProvider;
-use ApiPlatform\Core\DataProvider\DenormalizedIdentifiersAwareItemDataProviderInterface;
 use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
 use ApiPlatform\Core\DataProvider\RestrictedDataProviderInterface;
 use ApiPlatform\Core\Exception\ResourceClassNotSupportedException;
@@ -45,7 +44,7 @@ final class TraceableChainItemDataProvider implements ItemDataProviderInterface
         return $this->context;
     }
 
-    public function getItem(string $resourceClass, $id, string $operationName = null, array $context = [])
+    public function getItem(string $resourceClass, array $identifiers, string $operationName = null, array $context = [])
     {
         $this->context = $context;
         $match = false;
@@ -62,17 +61,7 @@ final class TraceableChainItemDataProvider implements ItemDataProviderInterface
                     continue;
                 }
 
-                $identifier = $id;
-                if (!$dataProvider instanceof DenormalizedIdentifiersAwareItemDataProviderInterface && $identifier && \is_array($identifier)) {
-                    if (\count($identifier) > 1) {
-                        @trigger_error(sprintf('Receiving "$id" as non-array in an item data provider is deprecated in 2.3 in favor of implementing "%s".', DenormalizedIdentifiersAwareItemDataProviderInterface::class), E_USER_DEPRECATED);
-                        $identifier = http_build_query($identifier, '', ';');
-                    } else {
-                        $identifier = current($identifier);
-                    }
-                }
-
-                $result = $dataProvider->getItem($resourceClass, $identifier, $operationName, $context);
+                $result = $dataProvider->getItem($resourceClass, $identifiers, $operationName, $context);
                 $this->providersResponse[\get_class($dataProvider)] = $match = true;
             } catch (ResourceClassNotSupportedException $e) {
                 @trigger_error(sprintf('Throwing a "%s" is deprecated in favor of implementing "%s"', \get_class($e), RestrictedDataProviderInterface::class), E_USER_DEPRECATED);

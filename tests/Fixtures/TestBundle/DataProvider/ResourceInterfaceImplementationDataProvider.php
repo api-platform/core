@@ -26,9 +26,9 @@ class ResourceInterfaceImplementationDataProvider implements ItemDataProviderInt
         return ResourceInterface::class === $resourceClass;
     }
 
-    public function getItem(string $resourceClass, $id, string $operationName = null, array $context = [])
+    public function getItem(string $resourceClass, array $identifiers, string $operationName = null, array $context = [])
     {
-        if ('some-id' === $id) {
+        if ('some-id' === $identifiers['foo']) {
             return (new ResourceInterfaceImplementation())->setFoo('single item');
         }
 

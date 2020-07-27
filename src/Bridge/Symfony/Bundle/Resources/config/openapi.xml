@@ -39,6 +39,7 @@
             <argument>%api_platform.formats%</argument>
             <argument type="service" id="api_platform.openapi.options" />
             <argument type="service" id="api_platform.pagination_options" />
+            <argument type="service" id="api_platform.identifiers_extractor.cached" />
         </service>
         <service id="ApiPlatform\Core\OpenApi\Factory\OpenApiFactoryInterface" alias="api_platform.openapi.factory" />
 

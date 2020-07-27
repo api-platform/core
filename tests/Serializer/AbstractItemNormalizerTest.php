@@ -113,7 +113,6 @@ class AbstractItemNormalizerTest extends TestCase
             null,
             null,
             null,
-            false,
             [],
             [],
             null,
@@ -180,7 +179,6 @@ class AbstractItemNormalizerTest extends TestCase
             null,
             null,
             null,
-            false,
             [],
             [],
             null,
@@ -242,7 +240,6 @@ class AbstractItemNormalizerTest extends TestCase
             null,
             null,
             null,
-            false,
             [],
             [],
             null,
@@ -315,7 +312,6 @@ class AbstractItemNormalizerTest extends TestCase
             null,
             null,
             null,
-            false,
             [],
             [],
             null,
@@ -377,7 +373,6 @@ class AbstractItemNormalizerTest extends TestCase
             null,
             null,
             null,
-            false,
             [],
             [],
             null,
@@ -439,7 +434,7 @@ class AbstractItemNormalizerTest extends TestCase
         $serializerProphecy->willImplement(DenormalizerInterface::class);
         $serializerProphecy->denormalize($data, DummyForAdditionalFieldsInput::class, 'json', $cleanedContextWithObjectToPopulate)->willReturn($dummyInputDto);
 
-        $normalizer = new class($propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), $iriConverterProphecy->reveal(), $resourceClassResolverProphecy->reveal(), null, null, null, null, false, [], [$inputDataTransformerProphecy->reveal()], null, null) extends AbstractItemNormalizer {
+        $normalizer = new class($propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), $iriConverterProphecy->reveal(), $resourceClassResolverProphecy->reveal(), null, null, null, null, [], [$inputDataTransformerProphecy->reveal()], null, null) extends AbstractItemNormalizer {
         };
         $normalizer->setSerializer($serializerProphecy->reveal());
 
@@ -494,7 +489,6 @@ class AbstractItemNormalizerTest extends TestCase
             null,
             null,
             null,
-            false,
             [],
             [],
             null,
@@ -514,7 +508,7 @@ class AbstractItemNormalizerTest extends TestCase
     public function testBadRelationType()
     {
         $this->expectException(UnexpectedValueException::class);
-        $this->expectExceptionMessage('Expected IRI or nested document for attribute "relatedDummy", "integer" given.');
+        $this->expectExceptionMessage('Nested documents for attribute "relatedDummy" are not allowed. Use IRIs instead.');
 
         $data = [
             'relatedDummy' => 22,
@@ -556,7 +550,6 @@ class AbstractItemNormalizerTest extends TestCase
             null,
             null,
             null,
-            false,
             [],
             [],
             null,
@@ -614,7 +607,6 @@ class AbstractItemNormalizerTest extends TestCase
             null,
             null,
             null,
-            false,
             [],
             [],
             null,
@@ -659,7 +651,6 @@ class AbstractItemNormalizerTest extends TestCase
             null,
             null,
             null,
-            false,
             [],
             [],
             null,
@@ -701,7 +692,6 @@ class AbstractItemNormalizerTest extends TestCase
             null,
             null,
             null,
-            false,
             [],
             [],
             null,
@@ -747,7 +737,6 @@ class AbstractItemNormalizerTest extends TestCase
             null,
             null,
             null,
-            false,
             [],
             [],
             null,
@@ -822,7 +811,6 @@ class AbstractItemNormalizerTest extends TestCase
             null,
             null,
             null,
-            false,
             [],
             [],
             null,
@@ -864,7 +852,6 @@ class AbstractItemNormalizerTest extends TestCase
             null,
             null,
             null,
-            false,
             [],
             [],
             null,
@@ -924,7 +911,6 @@ class AbstractItemNormalizerTest extends TestCase
             null,
             null,
             null,
-            false,
             [],
             [],
             null,
@@ -940,6 +926,7 @@ class AbstractItemNormalizerTest extends TestCase
 
     public function testDenormalizeRelationWithPlainId()
     {
+        static::markTestSkipped('Legacy plain identifiers.');
         $data = [
             'relatedDummy' => 1,
         ];
@@ -976,7 +963,6 @@ class AbstractItemNormalizerTest extends TestCase
             null,
             null,
             $itemDataProviderProphecy->reveal(),
-            true,
             [],
             [],
             null,
@@ -993,6 +979,7 @@ class AbstractItemNormalizerTest extends TestCase
 
     public function testDenormalizeRelationWithPlainIdNotFound()
     {
+        $this->markTestSkipped('Legacy plain identifiers.');
         $this->expectException(ItemNotFoundException::class);
         $this->expectExceptionMessage(sprintf('Item not found for resource "%s" with id "1".', RelatedDummy::class));
 
@@ -1039,7 +1026,6 @@ class AbstractItemNormalizerTest extends TestCase
             null,
             null,
             $itemDataProviderProphecy->reveal(),
-            true,
             [],
             [],
             null,
@@ -1052,6 +1038,7 @@ class AbstractItemNormalizerTest extends TestCase
 
     public function testDoNotDenormalizeRelationWithPlainIdWhenPlainIdentifiersAreNotAllowed()
     {
+        $this->markTestSkipped('Legacy plain identifiers.');
         $this->expectException(UnexpectedValueException::class);
         $this->expectExceptionMessage('Expected IRI or nested document for attribute "relatedDummy", "integer" given.');
 
@@ -1097,7 +1084,6 @@ class AbstractItemNormalizerTest extends TestCase
             null,
             null,
             $itemDataProviderProphecy->reveal(),
-            false,
             [],
             [],
             null,
@@ -1184,7 +1170,6 @@ class AbstractItemNormalizerTest extends TestCase
             null,
             null,
             $itemDataProviderProphecy->reveal(),
-            false,
             [],
             [$dataTransformerProphecy->reveal(), $secondDataTransformerProphecy->reveal()],
             $resourceMetadataFactoryProphecy->reveal(),

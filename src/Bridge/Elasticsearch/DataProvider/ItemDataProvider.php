@@ -83,19 +83,15 @@ final class ItemDataProvider implements ItemDataProviderInterface, RestrictedDat
     /**
      * {@inheritdoc}
      */
-    public function getItem(string $resourceClass, $id, ?string $operationName = null, array $context = [])
+    public function getItem(string $resourceClass, array $identifiers, ?string $operationName = null, array $context = [])
     {
-        if (\is_array($id)) {
-            $id = $id[$this->identifierExtractor->getIdentifierFromResourceClass($resourceClass)];
-        }
-
         $documentMetadata = $this->documentMetadataFactory->create($resourceClass);
 
         try {
             $document = $this->client->get([
                 'index' => $documentMetadata->getIndex(),
                 'type' => $documentMetadata->getType(),
-                'id' => (string) $id,
+                'id' => $identifiers[$this->identifierExtractor->getIdentifierFromResourceClass($resourceClass)],
             ]);
         } catch (Missing404Exception $e) {
             return null;
