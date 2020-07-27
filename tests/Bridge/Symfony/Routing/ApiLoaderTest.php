@@ -302,6 +302,7 @@ class ApiLoaderTest extends TestCase
                 '_controller' => $controller,
                 '_format' => null,
                 '_api_resource_class' => $resourceClass,
+                '_api_identified_by' => ['id'],
                 sprintf('_api_%s_operation_name', $collection ? 'collection' : 'item') => $operationName,
             ] + $extraDefaults,
             $requirements,

@@ -147,7 +147,6 @@ final class IriConverter implements IriConverterInterface
     public function getItemIriFromResourceClass(string $resourceClass, array $identifiers, int $referenceType = null): string
     {
         $routeName = $this->routeNameResolver->getRouteName($resourceClass, OperationType::ITEM);
-
         try {
             $identifiers = $this->generateIdentifiersUrl($identifiers, $resourceClass);
 

@@ -85,6 +85,19 @@ trait OperationDataProviderTrait
      */
     private function extractIdentifiers(array $parameters, array $attributes)
     {
+        if (isset($attributes['identified_by'])) {
+            $identifiers = [];
+            foreach ($attributes['identified_by'] as $identifier) {
+                if (!isset($parameters[$identifier])) {
+                    throw new InvalidIdentifierException(sprintf('Parameter "%s" not found', $identifier));
+                }
+
+                $identifiers[$identifier] = $parameters[$identifier];
+            }
+
+            return $this->identifierConverter->normalizeIdentifiers($identifiers, $attributes['resource_class'], array_keys($identifiers));
+        }
+
         if (isset($attributes['item_operation_name'])) {
             if (!isset($parameters['id'])) {
                 throw new InvalidIdentifierException('Parameter "id" not found');

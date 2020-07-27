@@ -200,6 +200,7 @@ class DeserializeListenerTest extends TestCase
         $formatsProviderProphecy->getFormatsFromAttributes([
             'resource_class' => 'Foo',
             'collection_operation_name' => 'post',
+            'identified_by' => null,
             'receive' => true,
             'respond' => true,
             'persist' => true,

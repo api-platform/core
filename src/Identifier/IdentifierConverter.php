@@ -25,7 +25,7 @@ use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
  *
  * @author Antoine Bluchet <soyuka@gmail.com>
  */
-final class IdentifierConverter implements ContextAwareIdentifierConverterInterface
+final class IdentifierConverter implements NormalizeIdentifierConverterInterface
 {
     private $propertyMetadataFactory;
     private $identifiersExtractor;
@@ -63,6 +63,11 @@ final class IdentifierConverter implements ContextAwareIdentifierConverterInterf
             $identifiers = [$keys[0] => $data];
         }
 
+        return $this->normalizeIdentifiers($identifiers, $class, $keys);
+    }
+
+    public function normalizeIdentifiers(array $identifiers, string $class, array $keys, array $context = []): array
+    {
         // Normalize every identifier (DateTime, UUID etc.)
         foreach ($keys as $key) {
             if (!isset($identifiers[$key])) {

@@ -15,6 +15,7 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\AbsoluteUrlDummy as Abso
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\AbsoluteUrlRelationDummy as AbsoluteUrlRelationDummyDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\Address as AddressDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\Answer as AnswerDocument;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\Book as BookDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\CompositeItem as CompositeItemDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\CompositeLabel as CompositeLabelDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\CompositePrimitiveItem as CompositePrimitiveItemDocument;
@@ -77,6 +78,7 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\AbsoluteUrlDummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\AbsoluteUrlRelationDummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Address;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Answer;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Book;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\CompositeItem;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\CompositeLabel;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\CompositePrimitiveItem;
@@ -1589,6 +1591,18 @@ final class DoctrineContext implements Context
         $this->manager->flush();
     }
 
+    /**
+     * @Given there is a book
+     */
+    public function thereIsABook()
+    {
+        $book = $this->buildBook();
+        $book->name = '1984';
+        $book->isbn = '9780451524935';
+        $this->manager->persist($book);
+        $this->manager->flush();
+    }
+
     private function isOrm(): bool
     {
         return null !== $this->schemaTool;
@@ -2005,5 +2019,13 @@ final class DoctrineContext implements Context
     private function buildNetworkPathRelationDummy()
     {
         return $this->isOrm() ? new NetworkPathRelationDummy() : new NetworkPathRelationDummyDocument();
+    }
+
+    /**
+     * @return BookDocument | Book
+     */
+    private function buildBook()
+    {
+        return $this->isOrm() ? new Book() : new BookDocument();
     }
 }

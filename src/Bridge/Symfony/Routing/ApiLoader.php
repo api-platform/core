@@ -224,12 +224,15 @@ final class ApiLoader extends Loader
         $path = trim(trim($resourceMetadata->getAttribute('route_prefix', '')), '/');
         $path .= $this->operationPathResolver->resolveOperationPath($resourceShortName, $operation, $operationType, $operationName);
 
+        $identifiers = $operation['identifiedBy'] ?? ['id'];
+
         $route = new Route(
             $path,
             [
                 '_controller' => $controller,
                 '_format' => null,
                 '_api_resource_class' => $resourceClass,
+                '_api_identified_by' => \is_array($identifiers) ? $identifiers : [$identifiers],
                 sprintf('_api_%s_operation_name', $operationType) => $operationName,
             ] + ($operation['defaults'] ?? []),
             $operation['requirements'] ?? [],
