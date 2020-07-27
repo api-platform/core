@@ -1331,6 +1331,8 @@ class ApiPlatformExtensionTest extends TestCase
             $definitions[] = 'api_platform.openapi.normalizer.api_gateway';
             $definitions[] = 'api_platform.openapi.factory';
             $definitions[] = 'api_platform.openapi.command';
+            $definitions[] = 'api_platform.swagger_ui.context';
+            $definitions[] = 'api_platform.swagger_ui.action';
         }
 
         // has jsonld
@@ -1405,6 +1407,7 @@ class ApiPlatformExtensionTest extends TestCase
                 Options::class => 'api_platform.openapi.options',
                 OpenApiNormalizer::class => 'api_platform.openapi.normalizer',
                 OpenApiFactoryInterface::class => 'api_platform.openapi.factory',
+                'api_platform.swagger_ui.listener' => 'api_platform.swagger.listener.ui',
             ];
         }
 
