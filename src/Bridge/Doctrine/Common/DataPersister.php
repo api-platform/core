@@ -17,6 +17,7 @@ use ApiPlatform\Core\DataPersister\ContextAwareDataPersisterInterface;
 use ApiPlatform\Core\Util\ClassInfoTrait;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Persistence\ObjectManager as DoctrineObjectManager;
+use Doctrine\ODM\MongoDB\Mapping\ClassMetadata;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 
 /**
@@ -89,7 +90,7 @@ final class DataPersister implements ContextAwareDataPersisterInterface
     private function isDeferredExplicit(DoctrineObjectManager $manager, $data): bool
     {
         $classMetadata = $manager->getClassMetadata($this->getObjectClass($data));
-        if ($classMetadata instanceof ClassMetadataInfo && method_exists($classMetadata, 'isChangeTrackingDeferredExplicit')) {
+        if (($classMetadata instanceof ClassMetadataInfo || $classMetadata instanceof ClassMetadata) && method_exists($classMetadata, 'isChangeTrackingDeferredExplicit')) {
             return $classMetadata->isChangeTrackingDeferredExplicit();
         }
 
