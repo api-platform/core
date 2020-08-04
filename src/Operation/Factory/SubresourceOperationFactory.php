@@ -85,12 +85,6 @@ final class SubresourceOperationFactory implements SubresourceOperationFactoryIn
             $visiting = "$resourceClass $property $subresourceClass";
 
             // Handle maxDepth
-            if ($rootResourceClass === $resourceClass) {
-                $maxDepth = $subresource->getMaxDepth();
-                // reset depth when we return to rootResourceClass
-                $depth = 0;
-            }
-
             if (null !== $maxDepth && $depth >= $maxDepth) {
                 break;
             }
@@ -183,7 +177,11 @@ final class SubresourceOperationFactory implements SubresourceOperationFactoryIn
 
             $tree[$operation['route_name']] = $operation;
 
-            $this->computeSubresourceOperations($subresourceClass, $tree, $rootResourceClass, $operation, $visited + [$visiting => true], ++$depth, $maxDepth);
+            // Get the minimum maxDepth between the rootMaxDepth and the maxDepth of the to be visited Subresource
+            $currentMaxDepth = array_filter([$maxDepth, $subresource->getMaxDepth()], 'is_int');
+            $currentMaxDepth = empty($currentMaxDepth) ? null : min($currentMaxDepth);
+
+            $this->computeSubresourceOperations($subresourceClass, $tree, $rootResourceClass, $operation, $visited + [$visiting => true], $depth + 1, $currentMaxDepth);
         }
     }
 }
