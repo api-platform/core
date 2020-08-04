@@ -133,7 +133,11 @@ class DataPersisterTest extends TestCase
         $dummy = new Dummy();
 
         $classMetadataInfo = $this->prophesize($metadataClass);
-        $classMetadataInfo->isChangeTrackingDeferredExplicit()->willReturn($deferredExplicit)->shouldBeCalled();
+        if (method_exists($metadataClass, 'isChangeTrackingDeferredExplicit')) {
+            $classMetadataInfo->isChangeTrackingDeferredExplicit()->willReturn($deferredExplicit)->shouldBeCalled();
+        } else {
+            $persisted = false;
+        }
 
         $objectManagerProphecy = $this->prophesize(ObjectManager::class);
         $objectManagerProphecy->getClassMetadata(Dummy::class)->willReturn($classMetadataInfo)->shouldBeCalled();
