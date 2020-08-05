@@ -56,6 +56,7 @@ final class IdentifierConverter implements NormalizeIdentifierConverterInterface
         $keys = $this->identifiersExtractor->getIdentifiersFromResourceClass($class);
 
         if (($numIdentifiers = \count($keys)) > 1) {
+            // todo put this in normalizer
             $identifiers = CompositeIdentifierParser::parse($data);
         } elseif (0 === $numIdentifiers) {
             throw new InvalidIdentifierException(sprintf('Resource "%s" has no identifiers.', $class));
@@ -63,30 +64,32 @@ final class IdentifierConverter implements NormalizeIdentifierConverterInterface
             $identifiers = [$keys[0] => $data];
         }
 
-        return $this->normalizeIdentifiers($identifiers, $class, $keys);
+        return $this->denormalize($identifiers, $class);
     }
 
-    public function normalizeIdentifiers(array $identifiers, string $class, array $keys, array $context = []): array
+    /**
+     * {@inheritdoc}
+     */
+    public function denormalize($identifiers, $class, $format = null, array $context = []): array
     {
         // Normalize every identifier (DateTime, UUID etc.)
-        foreach ($keys as $key) {
-            if (!isset($identifiers[$key])) {
-                throw new InvalidIdentifierException(sprintf('Invalid identifier "%1$s", "%1$s" was not found.', $key));
-            }
-
-            if (null === $type = $this->getIdentifierType($class, $key)) {
+        foreach ($identifiers as $identifier => $value) {
+            if (null === $type = $this->getIdentifierType($class, $identifier)) {
+                if (preg_match_all(CompositeIdentifierParser::COMPOSITE_IDENTIFIER_REGEXP, $value)) {
+                    return CompositeIdentifierParser::parse($value);
+                }
                 continue;
             }
 
             foreach ($this->identifierDenormalizers as $identifierDenormalizer) {
-                if (!$identifierDenormalizer->supportsDenormalization($identifiers[$key], $type)) {
+                if (!$identifierDenormalizer->supportsDenormalization($value, $type)) {
                     continue;
                 }
 
                 try {
-                    $identifiers[$key] = $identifierDenormalizer->denormalize($identifiers[$key], $type);
+                    $identifiers[$identifier] = $identifierDenormalizer->denormalize($value, $type);
                 } catch (InvalidIdentifierException $e) {
-                    throw new InvalidIdentifierException(sprintf('Identifier "%s" could not be denormalized.', $key), $e->getCode(), $e);
+                    throw new InvalidIdentifierException(sprintf('Identifier "%s" could not be denormalized.', $identifier), $e->getCode(), $e);
                 }
             }
         }

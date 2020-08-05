@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Bridge\Symfony\Routing;
 
+use ApiPlatform\Core\Api\IdentifiersExtractorInterface;
 use ApiPlatform\Core\Api\OperationType;
 use ApiPlatform\Core\Exception\InvalidResourceException;
 use ApiPlatform\Core\Exception\RuntimeException;
@@ -56,8 +57,9 @@ final class ApiLoader extends Loader
     private $graphQlPlaygroundEnabled;
     private $entrypointEnabled;
     private $docsEnabled;
+    private $identifiersExtractor;
 
-    public function __construct(KernelInterface $kernel, ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, ResourceMetadataFactoryInterface $resourceMetadataFactory, OperationPathResolverInterface $operationPathResolver, ContainerInterface $container, array $formats, array $resourceClassDirectories = [], SubresourceOperationFactoryInterface $subresourceOperationFactory = null, bool $graphqlEnabled = false, bool $entrypointEnabled = true, bool $docsEnabled = true, bool $graphiQlEnabled = false, bool $graphQlPlaygroundEnabled = false)
+    public function __construct(KernelInterface $kernel, ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, ResourceMetadataFactoryInterface $resourceMetadataFactory, OperationPathResolverInterface $operationPathResolver, ContainerInterface $container, array $formats, array $resourceClassDirectories = [], SubresourceOperationFactoryInterface $subresourceOperationFactory = null, bool $graphqlEnabled = false, bool $entrypointEnabled = true, bool $docsEnabled = true, bool $graphiQlEnabled = false, bool $graphQlPlaygroundEnabled = false, IdentifiersExtractorInterface $identifiersExtractor = null)
     {
         /** @var string[]|string $paths */
         $paths = $kernel->locateResource('@ApiPlatformBundle/Resources/config/routing');
@@ -74,6 +76,7 @@ final class ApiLoader extends Loader
         $this->graphQlPlaygroundEnabled = $graphQlPlaygroundEnabled;
         $this->entrypointEnabled = $entrypointEnabled;
         $this->docsEnabled = $docsEnabled;
+        $this->identifiersExtractor = $identifiersExtractor;
     }
 
     /**
@@ -221,10 +224,12 @@ final class ApiLoader extends Loader
             }
         }
 
+        if (!isset($operation['identifiedBy'])) {
+            $operation['identifiedBy'] = null !== $this->identifiersExtractor ? $this->identifiersExtractor->getIdentifiersFromResourceClass($resourceClass) : ['id'];
+        }
+
         $path = trim(trim($resourceMetadata->getAttribute('route_prefix', '')), '/');
         $path .= $this->operationPathResolver->resolveOperationPath($resourceShortName, $operation, $operationType, $operationName);
-
-        $identifiers = $operation['identifiedBy'] ?? ['id'];
 
         $route = new Route(
             $path,
@@ -232,7 +237,7 @@ final class ApiLoader extends Loader
                 '_controller' => $controller,
                 '_format' => null,
                 '_api_resource_class' => $resourceClass,
-                '_api_identified_by' => \is_array($identifiers) ? $identifiers : [$identifiers],
+                '_api_identified_by' => \is_array($operation['identifiedBy']) ? $operation['identifiedBy'] : [$operation['identifiedBy']],
                 sprintf('_api_%s_operation_name', $operationType) => $operationName,
             ] + ($operation['defaults'] ?? []),
             $operation['requirements'] ?? [],

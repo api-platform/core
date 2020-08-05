@@ -23,5 +23,5 @@ interface NormalizeIdentifierConverterInterface extends ContextAwareIdentifierCo
     /**
      * {@inheritdoc}
      */
-    public function normalizeIdentifiers(array $identifiers, string $class, array $keys, array $context = []): array;
+    public function denormalize(array $identifiers, string $class, string $format = null, array $context = []): array;
 }

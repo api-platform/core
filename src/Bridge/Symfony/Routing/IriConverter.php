@@ -25,6 +25,7 @@ use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\Exception\InvalidIdentifierException;
 use ApiPlatform\Core\Exception\ItemNotFoundException;
 use ApiPlatform\Core\Exception\RuntimeException;
+use ApiPlatform\Core\Identifier\CompositeIdentifierParser;
 use ApiPlatform\Core\Identifier\IdentifierConverterInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
@@ -94,10 +95,6 @@ final class IriConverter implements IriConverterInterface
             throw new InvalidArgumentException($e->getMessage(), $e->getCode(), $e);
         }
 
-        if ($this->identifierConverter) {
-            $context[IdentifierConverterInterface::HAS_IDENTIFIER_CONVERTER] = true;
-        }
-
         if (isset($attributes['subresource_operation_name'])) {
             if (($item = $this->getSubresourceData($identifiers, $attributes, $context)) && !\is_array($item)) {
                 return $item;
@@ -147,10 +144,17 @@ final class IriConverter implements IriConverterInterface
     public function getItemIriFromResourceClass(string $resourceClass, array $identifiers, int $referenceType = null): string
     {
         $routeName = $this->routeNameResolver->getRouteName($resourceClass, OperationType::ITEM);
-        try {
-            $identifiers = $this->generateIdentifiersUrl($identifiers, $resourceClass);
 
-            return $this->router->generate($routeName, ['id' => implode(';', $identifiers)], $this->getReferenceType($resourceClass, $referenceType));
+        // Make composite identifiers work, there's only one identifier but the Resources has several:
+        if (1 < \count($identifiers)) {
+            $route = $this->router->getRouteCollection()->get($routeName);
+            if (1 === \count($identifiedBy = $route->getDefault('_api_identified_by'))) {
+                $identifiers = [$identifiedBy[0] => CompositeIdentifierParser::stringify($identifiers)];
+            }
+        }
+
+        try {
+            return $this->router->generate($routeName, $identifiers, $this->getReferenceType($resourceClass, $referenceType));
         } catch (RoutingExceptionInterface $e) {
             throw new InvalidArgumentException(sprintf('Unable to generate an IRI for "%s".', $resourceClass), $e->getCode(), $e);
         }
@@ -166,30 +170,6 @@ final class IriConverter implements IriConverterInterface
         } catch (RoutingExceptionInterface $e) {
             throw new InvalidArgumentException(sprintf('Unable to generate an IRI for "%s".', $resourceClass), $e->getCode(), $e);
         }
-    }
-
-    /**
-     * Generate the identifier url.
-     *
-     * @throws InvalidArgumentException
-     *
-     * @return string[]
-     */
-    private function generateIdentifiersUrl(array $identifiers, string $resourceClass): array
-    {
-        if (0 === \count($identifiers)) {
-            throw new InvalidArgumentException(sprintf('No identifiers defined for resource of type "%s"', $resourceClass));
-        }
-
-        if (1 === \count($identifiers)) {
-            return [(string) reset($identifiers)];
-        }
-
-        foreach ($identifiers as $name => $value) {
-            $identifiers[$name] = sprintf('%s=%s', $name, $value);
-        }
-
-        return array_values($identifiers);
     }
 
     private function getReferenceType(string $resourceClass, ?int $referenceType): ?int

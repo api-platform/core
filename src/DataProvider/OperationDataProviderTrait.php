@@ -85,51 +85,16 @@ trait OperationDataProviderTrait
      */
     private function extractIdentifiers(array $parameters, array $attributes)
     {
-        if (isset($attributes['identified_by'])) {
-            $identifiers = [];
-            foreach ($attributes['identified_by'] as $identifier) {
-                if (!isset($parameters[$identifier])) {
-                    throw new InvalidIdentifierException(sprintf('Parameter "%s" not found', $identifier));
-                }
-
-                $identifiers[$identifier] = $parameters[$identifier];
-            }
-
-            return $this->identifierConverter->normalizeIdentifiers($identifiers, $attributes['resource_class'], array_keys($identifiers));
-        }
-
-        if (isset($attributes['item_operation_name'])) {
-            if (!isset($parameters['id'])) {
-                throw new InvalidIdentifierException('Parameter "id" not found');
-            }
-
-            $id = $parameters['id'];
-
-            if (null !== $this->identifierConverter) {
-                return $this->identifierConverter->convert((string) $id, $attributes['resource_class']);
-            }
-
-            return $id;
-        }
-
-        if (!isset($attributes['subresource_context'])) {
-            throw new RuntimeException('Either "item_operation_name" or "collection_operation_name" must be defined, unless the "_api_receive" request attribute is set to false.');
-        }
-
+        $identifiersKeys = $attributes['identified_by'] ?? $attributes['subresource_context']['identifiers'];
         $identifiers = [];
-
-        foreach ($attributes['subresource_context']['identifiers'] as $key => [$id, $resourceClass, $hasIdentifier]) {
-            if (false === $hasIdentifier) {
-                continue;
+        foreach ($identifiersKeys as $identifier) {
+            if (!isset($parameters[$identifier])) {
+                throw new InvalidIdentifierException(sprintf('Parameter "%s" not found', $identifier));
             }
 
-            $identifiers[$id] = $parameters[$id];
-
-            if (null !== $this->identifierConverter) {
-                $identifiers[$id] = $this->identifierConverter->convert((string) $identifiers[$id], $resourceClass);
-            }
+            $identifiers[$identifier] = $parameters[$identifier];
         }
 
-        return $identifiers;
+        return $this->identifierConverter->denormalize($identifiers, $attributes['resource_class']);
     }
 }
