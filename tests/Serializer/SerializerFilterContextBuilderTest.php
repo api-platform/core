@@ -150,6 +150,7 @@ class SerializerFilterContextBuilderTest extends TestCase
             'receive' => true,
             'respond' => true,
             'persist' => true,
+            'cache_invalidation' => true,
         ];
 
         $resourceMetadata = new ResourceMetadata(

@@ -142,6 +142,7 @@ class RequestDataCollectorTest extends TestCase
             'receive' => true,
             'respond' => true,
             'persist' => true,
+            'cache_invalidation' => true,
         ], $dataCollector->getRequestAttributes());
         $this->assertSame(['foo', 'bar'], $dataCollector->getAcceptableContentTypes());
         $this->assertSame(DummyEntity::class, $dataCollector->getResourceClass());

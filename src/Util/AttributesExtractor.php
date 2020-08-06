@@ -61,6 +61,7 @@ final class AttributesExtractor
             'receive' => (bool) ($attributes['_api_receive'] ?? true),
             'respond' => (bool) ($attributes['_api_respond'] ?? true),
             'persist' => (bool) ($attributes['_api_persist'] ?? true),
+            'cache_invalidation' => (bool) ($attributes['_api_cache_invalidation'] ?? true),
         ];
 
         return $result;
