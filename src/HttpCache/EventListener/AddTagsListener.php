@@ -58,7 +58,7 @@ final class AddTagsListener
             || !$response->isCacheable()
             || (!$attributes = RequestAttributesExtractor::extractAttributes($request))
             || !$attributes['cache_invalidation']
-            || $this->isOperationAttributeDisabled($attributes, self::OPERATION_ATTRIBUTE_KEY)
+            || $this->isOperationAttributeDisabled($attributes, self::OPERATION_ATTRIBUTE_KEY, false)
         ) {
             return;
         }

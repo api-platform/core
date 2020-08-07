@@ -160,17 +160,7 @@ class AddTagsListenerTest extends TestCase
     {
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
 
-        $resourceMetadata = new ResourceMetadata('Dummy', null, null, [
-            'get' => [
-                'cache_invalidation' => true,
-            ],
-        ]);
-
-        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn($resourceMetadata);
-
         $request = new Request([], [], ['_resources' => ['/foo', '/bar'], '_api_resource_class' => Dummy::class, '_api_item_operation_name' => 'get']);
-        $request->setMethod('GET');
 
         $response = new Response();
         $response->setPublic();
@@ -180,7 +170,7 @@ class AddTagsListenerTest extends TestCase
         $event->getRequest()->willReturn($request)->shouldBeCalled();
         $event->getResponse()->willReturn($response)->shouldBeCalled();
 
-        $listener = new AddTagsListener($iriConverterProphecy->reveal(), $resourceMetadataFactoryProphecy->reveal());
+        $listener = new AddTagsListener($iriConverterProphecy->reveal());
         $listener->onKernelResponse($event->reveal());
 
         $this->assertSame('/foo,/bar', $response->headers->get('Cache-Tags'));

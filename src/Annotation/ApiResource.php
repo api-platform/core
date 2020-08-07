@@ -178,9 +178,6 @@ final class ApiResource
     private $cacheHeaders;
 
     /**
-     * @see https://api-platform.com/docs/core/performance/#enabling-disabling-http-cache-invalidation
-     * @see https://github.com/Haehnchen/idea-php-annotation-plugin/issues/112
-     *
      * @var bool
      */
     private $cacheInvalidation;
