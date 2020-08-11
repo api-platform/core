@@ -2776,7 +2776,7 @@ class DocumentationNormalizerV2Test extends TestCase
                                 'schema' => [
                                     'type' => 'array',
                                     'items' => [
-                                        '$ref' => '#/definitions/Dummy:OutputDto',
+                                        '$ref' => '#/definitions/Dummy%3AOutputDto',
                                     ],
                                 ],
                             ],
@@ -2801,7 +2801,7 @@ class DocumentationNormalizerV2Test extends TestCase
                             201 => [
                                 'description' => 'Dummy resource created',
                                 'schema' => [
-                                    '$ref' => '#/definitions/Dummy:OutputDto',
+                                    '$ref' => '#/definitions/Dummy%3AOutputDto',
                                 ],
                             ],
                             400 => [
@@ -2817,7 +2817,7 @@ class DocumentationNormalizerV2Test extends TestCase
                                 'in' => 'body',
                                 'description' => 'The new Dummy resource',
                                 'schema' => [
-                                    '$ref' => '#/definitions/Dummy:InputDto',
+                                    '$ref' => '#/definitions/Dummy%3AInputDto',
                                 ],
                             ],
                         ],
@@ -2841,7 +2841,7 @@ class DocumentationNormalizerV2Test extends TestCase
                             200 => [
                                 'description' => 'Dummy resource response',
                                 'schema' => [
-                                    '$ref' => '#/definitions/Dummy:OutputDto',
+                                    '$ref' => '#/definitions/Dummy%3AOutputDto',
                                 ],
                             ],
                             404 => [
@@ -2867,7 +2867,7 @@ class DocumentationNormalizerV2Test extends TestCase
                                 'in' => 'body',
                                 'description' => 'The updated Dummy resource',
                                 'schema' => [
-                                    '$ref' => '#/definitions/Dummy:InputDto',
+                                    '$ref' => '#/definitions/Dummy%3AInputDto',
                                 ],
                             ],
                         ],
@@ -2875,7 +2875,7 @@ class DocumentationNormalizerV2Test extends TestCase
                             200 => [
                                 'description' => 'Dummy resource updated',
                                 'schema' => [
-                                    '$ref' => '#/definitions/Dummy:OutputDto',
+                                    '$ref' => '#/definitions/Dummy%3AOutputDto',
                                 ],
                             ],
                             400 => [
