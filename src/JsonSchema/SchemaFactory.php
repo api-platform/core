@@ -92,7 +92,8 @@ final class SchemaFactory implements SchemaFactoryInterface
         }
 
         if (!isset($schema['$ref']) && !isset($schema['type'])) {
-            $ref = Schema::VERSION_OPENAPI === $version ? '#/components/schemas/'.$definitionName : '#/definitions/'.$definitionName;
+            $refDefinitionName = $this->encodeDefinitionName($definitionName);
+            $ref = Schema::VERSION_OPENAPI === $version ? '#/components/schemas/'.$refDefinitionName : '#/definitions/'.$refDefinitionName;
 
             $method = null !== $operationType && null !== $operationName ? $resourceMetadata->getTypedOperationAttribute($operationType, $operationName, 'method', 'GET') : 'GET';
             if ($forceCollection || (OperationType::COLLECTION === $operationType && 'POST' !== $method)) {
@@ -251,6 +252,14 @@ final class SchemaFactory implements SchemaFactoryInterface
         }
 
         return $name;
+    }
+
+    private function encodeDefinitionName(string $name): string
+    {
+        $entities = ['%2F', '%7E'];
+        $replacements = ['~1', '~0'];
+
+        return str_replace($entities, $replacements, urlencode($name));
     }
 
     private function getMetadata(string $className, string $type = Schema::TYPE_OUTPUT, ?string $operationType, ?string $operationName, ?array $serializerContext): ?array

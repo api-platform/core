@@ -95,7 +95,7 @@ Feature: Documentation support
     And the JSON node "paths./related_dummies/{id}/related_to_dummy_friends.get.parameters" should have 6 elements
 
     # Subcollection - check schema
-    And the JSON node "paths./related_dummies/{id}/related_to_dummy_friends.get.responses.200.content.application/ld+json.schema.properties.hydra:member.items.$ref" should be equal to "#/components/schemas/RelatedToDummyFriend:jsonld-fakemanytomany"
+    And the JSON node "paths./related_dummies/{id}/related_to_dummy_friends.get.responses.200.content.application/ld+json.schema.properties.hydra:member.items.$ref" should be equal to "#/components/schemas/RelatedToDummyFriend%3Ajsonld-fakemanytomany"
 
     # Deprecations
     And the JSON node "paths./dummies.get.deprecated" should not exist
