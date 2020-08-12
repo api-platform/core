@@ -167,8 +167,8 @@ class AddHeadersListenerTest extends TestCase
             'cache_headers' => [
                 'max_age' => 123,
                 'public' => false,
-                'shared_max_age' => 456
-            ]
+                'shared_max_age' => 456,
+            ],
         ]);
         $factory = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $factory->create(Dummy::class)->willReturn($metadata)->shouldBeCalled();
@@ -179,7 +179,7 @@ class AddHeadersListenerTest extends TestCase
         $this->assertSame('max-age=123, private', $response->headers->get('Cache-Control'));
 
         // resource's cache marked as private must not contain s-maxage
-        $this->assertStringNotContainsString("s-maxage", $response->headers->get('Cache-Control'));
+        $this->assertStringNotContainsString('s-maxage', $response->headers->get('Cache-Control'));
     }
 
     public function testSetHeadersFromResourceMetadataMarkedAsPublic()
@@ -195,8 +195,8 @@ class AddHeadersListenerTest extends TestCase
             'cache_headers' => [
                 'max_age' => 123,
                 'public' => true,
-                'shared_max_age' => 456
-            ]
+                'shared_max_age' => 456,
+            ],
         ]);
         $factory = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $factory->create(Dummy::class)->willReturn($metadata)->shouldBeCalled();
@@ -219,8 +219,8 @@ class AddHeadersListenerTest extends TestCase
         $metadata = new ResourceMetadata(null, null, null, null, null, [
             'cache_headers' => [
                 'max_age' => 123,
-                'shared_max_age' => 456
-            ]
+                'shared_max_age' => 456,
+            ],
         ]);
         $factory = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $factory->create(Dummy::class)->willReturn($metadata)->shouldBeCalled();
@@ -243,8 +243,8 @@ class AddHeadersListenerTest extends TestCase
         $metadata = new ResourceMetadata(null, null, null, null, null, [
             'cache_headers' => [
                 'max_age' => 123,
-                'shared_max_age' => 456
-            ]
+                'shared_max_age' => 456,
+            ],
         ]);
         $factory = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $factory->create(Dummy::class)->willReturn($metadata)->shouldBeCalled();
@@ -255,6 +255,6 @@ class AddHeadersListenerTest extends TestCase
         $this->assertSame('max-age=123, private', $response->headers->get('Cache-Control'));
 
         // resource's cache marked as private must not contain s-maxage
-        $this->assertStringNotContainsString("s-maxage", $response->headers->get('Cache-Control'));
+        $this->assertStringNotContainsString('s-maxage', $response->headers->get('Cache-Control'));
     }
 }

@@ -8,7 +8,7 @@ env:
   COMPOSER_ALLOW_SUPERUSER: '1' # https://getcomposer.org/doc/03-cli.md#composer-allow-superuser
   COMPOSER_INSTALLER_COMMIT: fb22b78362d31c0d2bf516d1f8cdfd2745caa431
   COVERAGE: '0'
-  EXT_MONGODB_VERSION: '1.7.3'
+  EXT_MONGODB_VERSION: '1.7.5'
   EXT_PCOV_VERSION: '1.0.6'
 
 jobs:
@@ -41,7 +41,7 @@ jobs:
       - name: Install Composer
         run: wget -qO - https://raw.githubusercontent.com/composer/getcomposer.org/$COMPOSER_INSTALLER_COMMIT/web/installer | php -- --install-dir=/usr/local/bin --filename=composer --quiet
       - name: Cache Composer packages
-        uses: actions/cache@v1
+        uses: actions/cache@v2
         with:
           path: ~/.composer/cache
           key: composer-php${{ matrix.php }}-php-cs-fixer-${{ github.sha }}
@@ -59,7 +59,7 @@ jobs:
           composer global require --prefer-dist --no-progress --no-suggest --ansi \
             friendsofphp/php-cs-fixer:"${PHP_CS_FIXER_VERSION}"
       - name: Cache PHP-CS-Fixer results
-        uses: actions/cache@v1
+        uses: actions/cache@v2
         with:
           path: /var/cache/php-cs-fixer
           key: php-cs-fixer-php${{ matrix.php }}-${{ github.sha }}
@@ -101,7 +101,7 @@ jobs:
       - name: Install Composer
         run: wget -qO - https://raw.githubusercontent.com/composer/getcomposer.org/$COMPOSER_INSTALLER_COMMIT/web/installer | php -- --install-dir=/usr/local/bin --filename=composer --quiet
       - name: Cache Composer packages
-        uses: actions/cache@v1
+        uses: actions/cache@v2
         with:
           path: ~/.composer/cache
           key: composer-php${{ matrix.php }}-${{ github.sha }}
@@ -124,7 +124,7 @@ jobs:
           ln -s /tmp/api-platform/core/var tests/Fixtures/app/var
           tests/Fixtures/app/console cache:clear --ansi
       - name: Cache PHPStan results
-        uses: actions/cache@v1
+        uses: actions/cache@v2
         with:
           path: /tmp/phpstan
           key: phpstan-php${{ matrix.php }}-${{ github.sha }}
@@ -165,7 +165,7 @@ jobs:
             unzip \
       - name: Cache mongodb PHP extension build
         if: (!startsWith(matrix.php, '7.1'))
-        uses: actions/cache@v1
+        uses: actions/cache@v2
         with:
           path: /var/tmp/build/ext-mongodb-${{ env.EXT_MONGODB_VERSION }}
           key: ext-mongodb-${{ env.EXT_MONGODB_VERSION }}-php${{ matrix.php }}-${{ github.sha }}
@@ -211,7 +211,7 @@ jobs:
       - name: Install Composer
         run: wget -qO - https://raw.githubusercontent.com/composer/getcomposer.org/$COMPOSER_INSTALLER_COMMIT/web/installer | php -- --install-dir=/usr/local/bin --filename=composer --quiet
       - name: Cache Composer packages
-        uses: actions/cache@v1
+        uses: actions/cache@v2
         with:
           path: ~/.composer/cache
           key: composer-php${{ matrix.php }}-${{ github.sha }}
@@ -305,7 +305,7 @@ jobs:
             unzip \
       - name: Cache mongodb PHP extension build
         if: (!startsWith(matrix.php, '7.1'))
-        uses: actions/cache@v1
+        uses: actions/cache@v2
         with:
           path: /var/tmp/build/ext-mongodb-${{ env.EXT_MONGODB_VERSION }}
           key: ext-mongodb-${{ env.EXT_MONGODB_VERSION }}-php${{ matrix.php }}-${{ github.sha }}
@@ -351,7 +351,7 @@ jobs:
       - name: Install Composer
         run: wget -qO - https://raw.githubusercontent.com/composer/getcomposer.org/$COMPOSER_INSTALLER_COMMIT/web/installer | php -- --install-dir=/usr/local/bin --filename=composer --quiet
       - name: Cache Composer packages
-        uses: actions/cache@v1
+        uses: actions/cache@v2
         with:
           path: ~/.composer/cache
           key: composer-php${{ matrix.php }}-${{ github.sha }}
@@ -468,7 +468,7 @@ jobs:
           apk add \
             unzip \
       - name: Cache mongodb PHP extension build
-        uses: actions/cache@v1
+        uses: actions/cache@v2
         with:
           path: /var/tmp/build/ext-mongodb-${{ env.EXT_MONGODB_VERSION }}
           key: ext-mongodb-${{ env.EXT_MONGODB_VERSION }}-php${{ matrix.php }}-${{ github.sha }}
@@ -496,7 +496,7 @@ jobs:
       - name: Install Composer
         run: wget -qO - https://raw.githubusercontent.com/composer/getcomposer.org/$COMPOSER_INSTALLER_COMMIT/web/installer | php -- --install-dir=/usr/local/bin --filename=composer --quiet
       - name: Cache Composer packages
-        uses: actions/cache@v1
+        uses: actions/cache@v2
         with:
           path: ~/.composer/cache
           key: composer-php${{ matrix.php }}-lowest-deps-${{ github.sha }}
@@ -553,7 +553,7 @@ jobs:
           apk add \
             unzip \
       - name: Cache mongodb PHP extension build
-        uses: actions/cache@v1
+        uses: actions/cache@v2
         with:
           path: /var/tmp/build/ext-mongodb-${{ env.EXT_MONGODB_VERSION }}
           key: ext-mongodb-${{ env.EXT_MONGODB_VERSION }}-php${{ matrix.php }}-${{ github.sha }}
@@ -581,7 +581,7 @@ jobs:
       - name: Install Composer
         run: wget -qO - https://raw.githubusercontent.com/composer/getcomposer.org/$COMPOSER_INSTALLER_COMMIT/web/installer | php -- --install-dir=/usr/local/bin --filename=composer --quiet
       - name: Cache Composer packages
-        uses: actions/cache@v1
+        uses: actions/cache@v2
         with:
           path: ~/.composer/cache
           key: composer-php${{ matrix.php }}-lowest-deps-${{ github.sha }}
@@ -672,7 +672,7 @@ jobs:
             unzip \
       - name: Cache mongodb PHP extension build
         if: (!startsWith(matrix.php, '7.1'))
-        uses: actions/cache@v1
+        uses: actions/cache@v2
         with:
           path: /var/tmp/build/ext-mongodb-${{ env.EXT_MONGODB_VERSION }}
           key: ext-mongodb-${{ env.EXT_MONGODB_VERSION }}-php${{ matrix.php }}-${{ github.sha }}
@@ -718,7 +718,7 @@ jobs:
       - name: Install Composer
         run: wget -qO - https://raw.githubusercontent.com/composer/getcomposer.org/$COMPOSER_INSTALLER_COMMIT/web/installer | php -- --install-dir=/usr/local/bin --filename=composer --quiet
       - name: Cache Composer packages
-        uses: actions/cache@v1
+        uses: actions/cache@v2
         with:
           path: ~/.composer/cache
           key: composer-php${{ matrix.php }}-legacy-${{ github.sha }}
@@ -815,7 +815,7 @@ jobs:
           apk add \
             unzip \
       - name: Cache mongodb PHP extension build
-        uses: actions/cache@v1
+        uses: actions/cache@v2
         with:
           path: /var/tmp/build/ext-mongodb-${{ env.EXT_MONGODB_VERSION }}
           key: ext-mongodb-${{ env.EXT_MONGODB_VERSION }}-php${{ matrix.php }}-${{ github.sha }}
@@ -843,7 +843,7 @@ jobs:
       - name: Install Composer
         run: wget -qO - https://raw.githubusercontent.com/composer/getcomposer.org/$COMPOSER_INSTALLER_COMMIT/web/installer | php -- --install-dir=/usr/local/bin --filename=composer --quiet
       - name: Cache Composer packages
-        uses: actions/cache@v1
+        uses: actions/cache@v2
         with:
           path: ~/.composer/cache
           key: composer-php${{ matrix.php }}-lowest-deps-legacy-${{ github.sha }}
@@ -926,7 +926,7 @@ jobs:
             pdo_pgsql \
           ;
       - name: Cache mongodb PHP extension build
-        uses: actions/cache@v1
+        uses: actions/cache@v2
         with:
           path: /var/tmp/build/ext-mongodb-${{ env.EXT_MONGODB_VERSION }}
           key: ext-mongodb-${{ env.EXT_MONGODB_VERSION }}-php${{ matrix.php }}-${{ github.sha }}
@@ -954,7 +954,7 @@ jobs:
       - name: Install Composer
         run: wget -qO - https://raw.githubusercontent.com/composer/getcomposer.org/$COMPOSER_INSTALLER_COMMIT/web/installer | php -- --install-dir=/usr/local/bin --filename=composer --quiet
       - name: Cache Composer packages
-        uses: actions/cache@v1
+        uses: actions/cache@v2
         with:
           path: ~/.composer/cache
           key: composer-php${{ matrix.php }}-${{ github.sha }}
@@ -1035,7 +1035,7 @@ jobs:
             pdo_pgsql \
           ;
       - name: Cache mongodb PHP extension build
-        uses: actions/cache@v1
+        uses: actions/cache@v2
         with:
           path: /var/tmp/build/ext-mongodb-${{ env.EXT_MONGODB_VERSION }}
           key: ext-mongodb-${{ env.EXT_MONGODB_VERSION }}-php${{ matrix.php }}-${{ github.sha }}
@@ -1063,7 +1063,7 @@ jobs:
       - name: Install Composer
         run: wget -qO - https://raw.githubusercontent.com/composer/getcomposer.org/$COMPOSER_INSTALLER_COMMIT/web/installer | php -- --install-dir=/usr/local/bin --filename=composer --quiet
       - name: Cache Composer packages
-        uses: actions/cache@v1
+        uses: actions/cache@v2
         with:
           path: ~/.composer/cache
           key: composer-php${{ matrix.php }}-${{ github.sha }}
@@ -1168,7 +1168,7 @@ jobs:
             pdo_mysql \
           ;
       - name: Cache mongodb PHP extension build
-        uses: actions/cache@v1
+        uses: actions/cache@v2
         with:
           path: /var/tmp/build/ext-mongodb-${{ env.EXT_MONGODB_VERSION }}
           key: ext-mongodb-${{ env.EXT_MONGODB_VERSION }}-php${{ matrix.php }}-${{ github.sha }}
@@ -1196,7 +1196,7 @@ jobs:
       - name: Install Composer
         run: wget -qO - https://raw.githubusercontent.com/composer/getcomposer.org/$COMPOSER_INSTALLER_COMMIT/web/installer | php -- --install-dir=/usr/local/bin --filename=composer --quiet
       - name: Cache Composer packages
-        uses: actions/cache@v1
+        uses: actions/cache@v2
         with:
           path: ~/.composer/cache
           key: composer-php${{ matrix.php }}-${{ github.sha }}
@@ -1277,7 +1277,7 @@ jobs:
             pdo_mysql \
           ;
       - name: Cache mongodb PHP extension build
-        uses: actions/cache@v1
+        uses: actions/cache@v2
         with:
           path: /var/tmp/build/ext-mongodb-${{ env.EXT_MONGODB_VERSION }}
           key: ext-mongodb-${{ env.EXT_MONGODB_VERSION }}-php${{ matrix.php }}-${{ github.sha }}
@@ -1305,7 +1305,7 @@ jobs:
       - name: Install Composer
         run: wget -qO - https://raw.githubusercontent.com/composer/getcomposer.org/$COMPOSER_INSTALLER_COMMIT/web/installer | php -- --install-dir=/usr/local/bin --filename=composer --quiet
       - name: Cache Composer packages
-        uses: actions/cache@v1
+        uses: actions/cache@v2
         with:
           path: ~/.composer/cache
           key: composer-php${{ matrix.php }}-${{ github.sha }}
@@ -1401,7 +1401,7 @@ jobs:
             bash \
             unzip \
       - name: Cache mongodb PHP extension build
-        uses: actions/cache@v1
+        uses: actions/cache@v2
         with:
           path: /var/tmp/build/ext-mongodb-${{ env.EXT_MONGODB_VERSION }}
           key: ext-mongodb-${{ env.EXT_MONGODB_VERSION }}-php${{ matrix.php }}-${{ github.sha }}
@@ -1446,7 +1446,7 @@ jobs:
       - name: Install Composer
         run: wget -qO - https://raw.githubusercontent.com/composer/getcomposer.org/$COMPOSER_INSTALLER_COMMIT/web/installer | php -- --install-dir=/usr/local/bin --filename=composer --quiet
       - name: Cache Composer packages
-        uses: actions/cache@v1
+        uses: actions/cache@v2
         with:
           path: ~/.composer/cache
           key: composer-php${{ matrix.php }}-${{ github.sha }}
@@ -1542,7 +1542,7 @@ jobs:
             bash \
             unzip \
       - name: Cache mongodb PHP extension build
-        uses: actions/cache@v1
+        uses: actions/cache@v2
         with:
           path: /var/tmp/build/ext-mongodb-${{ env.EXT_MONGODB_VERSION }}
           key: ext-mongodb-${{ env.EXT_MONGODB_VERSION }}-php${{ matrix.php }}-${{ github.sha }}
@@ -1587,7 +1587,7 @@ jobs:
       - name: Install Composer
         run: wget -qO - https://raw.githubusercontent.com/composer/getcomposer.org/$COMPOSER_INSTALLER_COMMIT/web/installer | php -- --install-dir=/usr/local/bin --filename=composer --quiet
       - name: Cache Composer packages
-        uses: actions/cache@v1
+        uses: actions/cache@v2
         with:
           path: ~/.composer/cache
           key: composer-php${{ matrix.php }}-${{ github.sha }}
@@ -1716,7 +1716,7 @@ jobs:
             bash \
             unzip \
       - name: Cache mongodb PHP extension build
-        uses: actions/cache@v1
+        uses: actions/cache@v2
         with:
           path: /var/tmp/build/ext-mongodb-${{ env.EXT_MONGODB_VERSION }}
           key: ext-mongodb-${{ env.EXT_MONGODB_VERSION }}-php${{ matrix.php }}-${{ github.sha }}
@@ -1761,7 +1761,7 @@ jobs:
       - name: Install Composer
         run: wget -qO - https://raw.githubusercontent.com/composer/getcomposer.org/$COMPOSER_INSTALLER_COMMIT/web/installer | php -- --install-dir=/usr/local/bin --filename=composer --quiet
       - name: Cache Composer packages
-        uses: actions/cache@v1
+        uses: actions/cache@v2
         with:
           path: ~/.composer/cache
           key: composer-php${{ matrix.php }}-${{ github.sha }}
@@ -1859,7 +1859,7 @@ jobs:
             bash \
             unzip \
       - name: Cache mongodb PHP extension build
-        uses: actions/cache@v1
+        uses: actions/cache@v2
         with:
           path: /var/tmp/build/ext-mongodb-${{ env.EXT_MONGODB_VERSION }}
           key: ext-mongodb-${{ env.EXT_MONGODB_VERSION }}-php${{ matrix.php }}-${{ github.sha }}
@@ -1904,7 +1904,7 @@ jobs:
       - name: Install Composer
         run: wget -qO - https://raw.githubusercontent.com/composer/getcomposer.org/$COMPOSER_INSTALLER_COMMIT/web/installer | php -- --install-dir=/usr/local/bin --filename=composer --quiet
       - name: Cache Composer packages
-        uses: actions/cache@v1
+        uses: actions/cache@v2
         with:
           path: ~/.composer/cache
           key: composer-php${{ matrix.php }}-${{ github.sha }}
@@ -2017,7 +2017,7 @@ jobs:
           apk add \
             unzip \
       - name: Cache mongodb PHP extension build
-        uses: actions/cache@v1
+        uses: actions/cache@v2
         with:
           path: /var/tmp/build/ext-mongodb-${{ env.EXT_MONGODB_VERSION }}
           key: ext-mongodb-${{ env.EXT_MONGODB_VERSION }}-php${{ matrix.php }}-${{ github.sha }}
@@ -2045,7 +2045,7 @@ jobs:
       - name: Install Composer
         run: wget -qO - https://raw.githubusercontent.com/composer/getcomposer.org/$COMPOSER_INSTALLER_COMMIT/web/installer | php -- --install-dir=/usr/local/bin --filename=composer --quiet
       - name: Cache Composer packages
-        uses: actions/cache@v1
+        uses: actions/cache@v2
         with:
           path: ~/.composer/cache
           key: composer-php${{ matrix.php }}-${{ github.sha }}
@@ -2105,7 +2105,7 @@ jobs:
             moreutils \
             unzip \
       - name: Cache mongodb PHP extension build
-        uses: actions/cache@v1
+        uses: actions/cache@v2
         with:
           path: /var/tmp/build/ext-mongodb-${{ env.EXT_MONGODB_VERSION }}
           key: ext-mongodb-${{ env.EXT_MONGODB_VERSION }}-php${{ matrix.php }}-${{ github.sha }}
@@ -2133,7 +2133,7 @@ jobs:
       - name: Install Composer
         run: wget -qO - https://raw.githubusercontent.com/composer/getcomposer.org/$COMPOSER_INSTALLER_COMMIT/web/installer | php -- --install-dir=/usr/local/bin --filename=composer --quiet
       - name: Cache Composer packages
-        uses: actions/cache@v1
+        uses: actions/cache@v2
         with:
           path: ~/.composer/cache
           key: composer-php${{ matrix.php }}-symfony${{ matrix.symfony }}-${{ github.sha }}
@@ -2211,7 +2211,7 @@ jobs:
             moreutils \
             unzip \
       - name: Cache mongodb PHP extension build
-        uses: actions/cache@v1
+        uses: actions/cache@v2
         with:
           path: /var/tmp/build/ext-mongodb-${{ env.EXT_MONGODB_VERSION }}
           key: ext-mongodb-${{ env.EXT_MONGODB_VERSION }}-php${{ matrix.php }}-${{ github.sha }}
@@ -2239,7 +2239,7 @@ jobs:
       - name: Install Composer
         run: wget -qO - https://raw.githubusercontent.com/composer/getcomposer.org/$COMPOSER_INSTALLER_COMMIT/web/installer | php -- --install-dir=/usr/local/bin --filename=composer --quiet
       - name: Cache Composer packages
-        uses: actions/cache@v1
+        uses: actions/cache@v2
         with:
           path: ~/.composer/cache
           key: composer-php${{ matrix.php }}-symfony${{ matrix.symfony }}-${{ github.sha }}

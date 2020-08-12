@@ -18,6 +18,7 @@ use ApiPlatform\Core\DataPersister\DataPersisterInterface;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\ODM\MongoDB\Mapping\ClassMetadata;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Prediction\CallPrediction;
@@ -117,20 +118,26 @@ class DataPersisterTest extends TestCase
     public function getTrackingPolicyParameters()
     {
         return [
-            'deferred explicit' => [true, true],
-            'deferred implicit' => [false, false],
+            'deferred explicit ORM' => [ClassMetadataInfo::class, true, true],
+            'deferred implicit ORM' => [ClassMetadataInfo::class, false, false],
+            'deferred explicit ODM' => [ClassMetadata::class, true, true],
+            'deferred implicit ODM' => [ClassMetadata::class, false, false],
         ];
     }
 
     /**
      * @dataProvider getTrackingPolicyParameters
      */
-    public function testTrackingPolicy($deferredExplicit, $persisted)
+    public function testTrackingPolicy($metadataClass, $deferredExplicit, $persisted)
     {
         $dummy = new Dummy();
 
-        $classMetadataInfo = $this->prophesize(ClassMetadataInfo::class);
-        $classMetadataInfo->isChangeTrackingDeferredExplicit()->willReturn($deferredExplicit)->shouldBeCalled();
+        $classMetadataInfo = $this->prophesize($metadataClass);
+        if (method_exists($metadataClass, 'isChangeTrackingDeferredExplicit')) {
+            $classMetadataInfo->isChangeTrackingDeferredExplicit()->willReturn($deferredExplicit)->shouldBeCalled();
+        } else {
+            $persisted = false;
+        }
 
         $objectManagerProphecy = $this->prophesize(ObjectManager::class);
         $objectManagerProphecy->getClassMetadata(Dummy::class)->willReturn($classMetadataInfo)->shouldBeCalled();

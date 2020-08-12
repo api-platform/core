@@ -19,6 +19,30 @@ use GraphQL\Type\Definition\ScalarType;
 use GraphQL\Utils\Utils;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
+if (\PHP_VERSION_ID >= 70200) {
+    trait UploadTypeParseLiteralTrait
+    {
+        /**
+         * {@inheritdoc}
+         */
+        public function parseLiteral(/*Node */$valueNode, array $variables = null)
+        {
+            throw new Error('`Upload` cannot be hardcoded in query, be sure to conform to GraphQL multipart request specification.', $valueNode);
+        }
+    }
+} else {
+    trait UploadTypeParseLiteralTrait
+    {
+        /**
+         * {@inheritdoc}
+         */
+        public function parseLiteral(Node $valueNode, array $variables = null)
+        {
+            throw new Error('`Upload` cannot be hardcoded in query, be sure to conform to GraphQL multipart request specification.', $valueNode);
+        }
+    }
+}
+
 /**
  * Represents an upload type.
  *
@@ -26,6 +50,8 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
  */
 final class UploadType extends ScalarType implements TypeInterface
 {
+    use UploadTypeParseLiteralTrait;
+
     public function __construct()
     {
         $this->name = 'Upload';
@@ -57,13 +83,5 @@ final class UploadType extends ScalarType implements TypeInterface
         }
 
         return $value;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function parseLiteral(Node $valueNode, array $variables = null)
-    {
-        throw new Error('`Upload` cannot be hardcoded in query, be sure to conform to GraphQL multipart request specification.', $valueNode);
     }
 }
