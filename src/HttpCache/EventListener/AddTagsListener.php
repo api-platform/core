@@ -34,7 +34,7 @@ final class AddTagsListener
 {
     use ToggleableOperationAttributeTrait;
 
-    public const OPERATION_ATTRIBUTE_KEY = 'cache_invalidation';
+    public const OPERATION_ATTRIBUTE_KEY = 'cache_tags_invalidation';
 
     private $iriConverter;
     private $resourceMetadataFactory;
@@ -57,7 +57,7 @@ final class AddTagsListener
             !$request->isMethodCacheable()
             || !$response->isCacheable()
             || (!$attributes = RequestAttributesExtractor::extractAttributes($request))
-            || !$attributes['cache_invalidation']
+            || !$attributes[self::OPERATION_ATTRIBUTE_KEY]
             || $this->isOperationAttributeDisabled($attributes, self::OPERATION_ATTRIBUTE_KEY, false)
         ) {
             return;

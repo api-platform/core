@@ -203,7 +203,7 @@ class DeserializeListenerTest extends TestCase
             'receive' => true,
             'respond' => true,
             'persist' => true,
-            'cache_invalidation' => true,
+            'cache_tags_invalidation' => true,
         ])->willReturn(self::FORMATS)->shouldBeCalled();
 
         $this->doTestDeserializeResourceClassSupportedFormat($method, $populateObject, $formatsProviderProphecy->reveal());

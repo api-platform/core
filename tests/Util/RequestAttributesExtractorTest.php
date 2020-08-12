@@ -33,7 +33,7 @@ class RequestAttributesExtractorTest extends TestCase
                 'receive' => true,
                 'respond' => true,
                 'persist' => true,
-                'cache_invalidation' => true,
+                'cache_tags_invalidation' => true,
             ],
             RequestAttributesExtractor::extractAttributes($request)
         );
@@ -50,7 +50,7 @@ class RequestAttributesExtractorTest extends TestCase
                 'receive' => true,
                 'respond' => true,
                 'persist' => true,
-                'cache_invalidation' => true,
+                'cache_tags_invalidation' => true,
             ],
             RequestAttributesExtractor::extractAttributes($request)
         );
@@ -67,7 +67,7 @@ class RequestAttributesExtractorTest extends TestCase
                 'receive' => false,
                 'respond' => true,
                 'persist' => true,
-                'cache_invalidation' => true,
+                'cache_tags_invalidation' => true,
             ],
             RequestAttributesExtractor::extractAttributes($request)
         );
@@ -81,7 +81,7 @@ class RequestAttributesExtractorTest extends TestCase
                 'receive' => true,
                 'respond' => true,
                 'persist' => true,
-                'cache_invalidation' => true,
+                'cache_tags_invalidation' => true,
             ],
             RequestAttributesExtractor::extractAttributes($request)
         );
@@ -95,7 +95,7 @@ class RequestAttributesExtractorTest extends TestCase
                 'receive' => true,
                 'respond' => true,
                 'persist' => true,
-                'cache_invalidation' => true,
+                'cache_tags_invalidation' => true,
             ],
             RequestAttributesExtractor::extractAttributes($request)
         );
@@ -112,7 +112,7 @@ class RequestAttributesExtractorTest extends TestCase
                 'receive' => true,
                 'respond' => false,
                 'persist' => true,
-                'cache_invalidation' => true,
+                'cache_tags_invalidation' => true,
             ],
             RequestAttributesExtractor::extractAttributes($request)
         );
@@ -126,7 +126,7 @@ class RequestAttributesExtractorTest extends TestCase
                 'receive' => true,
                 'respond' => true,
                 'persist' => true,
-                'cache_invalidation' => true,
+                'cache_tags_invalidation' => true,
             ],
             RequestAttributesExtractor::extractAttributes($request)
         );
@@ -140,7 +140,7 @@ class RequestAttributesExtractorTest extends TestCase
                 'receive' => true,
                 'respond' => true,
                 'persist' => true,
-                'cache_invalidation' => true,
+                'cache_tags_invalidation' => true,
             ],
             RequestAttributesExtractor::extractAttributes($request)
         );
@@ -157,7 +157,7 @@ class RequestAttributesExtractorTest extends TestCase
                 'receive' => true,
                 'respond' => true,
                 'persist' => false,
-                'cache_invalidation' => true,
+                'cache_tags_invalidation' => true,
             ],
             RequestAttributesExtractor::extractAttributes($request)
         );
@@ -171,7 +171,7 @@ class RequestAttributesExtractorTest extends TestCase
                 'receive' => true,
                 'respond' => true,
                 'persist' => true,
-                'cache_invalidation' => true,
+                'cache_tags_invalidation' => true,
             ],
             RequestAttributesExtractor::extractAttributes($request)
         );
@@ -185,7 +185,7 @@ class RequestAttributesExtractorTest extends TestCase
                 'receive' => true,
                 'respond' => true,
                 'persist' => true,
-                'cache_invalidation' => true,
+                'cache_tags_invalidation' => true,
             ],
             RequestAttributesExtractor::extractAttributes($request)
         );
@@ -193,7 +193,7 @@ class RequestAttributesExtractorTest extends TestCase
 
     public function testExtractAddTags()
     {
-        $request = new Request([], [], ['_api_resource_class' => 'Foo', '_api_item_operation_name' => 'get', '_api_cache_invalidation' => '0']);
+        $request = new Request([], [], ['_api_resource_class' => 'Foo', '_api_item_operation_name' => 'get', '_api_cache_tags_invalidation' => '0']);
 
         $this->assertEquals(
             [
@@ -202,12 +202,12 @@ class RequestAttributesExtractorTest extends TestCase
                 'receive' => true,
                 'respond' => true,
                 'persist' => true,
-                'cache_invalidation' => false,
+                'cache_tags_invalidation' => false,
             ],
             RequestAttributesExtractor::extractAttributes($request)
         );
 
-        $request = new Request([], [], ['_api_resource_class' => 'Foo', '_api_item_operation_name' => 'get', '_api_cache_invalidation' => '1']);
+        $request = new Request([], [], ['_api_resource_class' => 'Foo', '_api_item_operation_name' => 'get', '_api_cache_tags_invalidation' => '1']);
 
         $this->assertEquals(
             [
@@ -216,7 +216,7 @@ class RequestAttributesExtractorTest extends TestCase
                 'receive' => true,
                 'respond' => true,
                 'persist' => true,
-                'cache_invalidation' => true,
+                'cache_tags_invalidation' => true,
             ],
             RequestAttributesExtractor::extractAttributes($request)
         );
@@ -230,7 +230,7 @@ class RequestAttributesExtractorTest extends TestCase
                 'receive' => true,
                 'respond' => true,
                 'persist' => true,
-                'cache_invalidation' => true,
+                'cache_tags_invalidation' => true,
             ],
             RequestAttributesExtractor::extractAttributes($request)
         );

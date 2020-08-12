@@ -111,7 +111,7 @@ class AddTagsListenerTest extends TestCase
     {
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
 
-        $request = new Request([], [], ['_resources' => ['/foo', '/bar'], '_api_resource_class' => Dummy::class, '_api_item_operation_name' => 'get', '_api_cache_invalidation' => false]);
+        $request = new Request([], [], ['_resources' => ['/foo', '/bar'], '_api_resource_class' => Dummy::class, '_api_item_operation_name' => 'get', '_api_cache_tags_invalidation' => false]);
 
         $response = new Response();
         $response->setPublic();
@@ -133,7 +133,7 @@ class AddTagsListenerTest extends TestCase
 
         $resourceMetadata = new ResourceMetadata('Dummy', null, null, [
             'get' => [
-                'cache_invalidation' => false,
+                'cache_tags_invalidation' => false,
             ],
         ]);
 
