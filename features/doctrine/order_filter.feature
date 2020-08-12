@@ -986,3 +986,12 @@ Feature: Order filter on collections
       }
     }
     """
+
+  # See https://github.com/api-platform/core/pull/3673
+  @createSchema
+  Scenario: Get collection filtered using a name converter
+    Given there are 3 convertedInteger objects
+    When I send a "GET" request to "/converted_integers?order[]=desc"
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
