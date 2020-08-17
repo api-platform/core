@@ -330,7 +330,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
             $pathOperation['responses'] ?? $pathOperation['responses'] = [$successStatus => $successResponse];
             $pathOperation['parameters'] ?? $pathOperation['parameters'] = $this->getFiltersParameters($v3, $resourceClass, $operationName, $resourceMetadata);
 
-            $this->addPaginationParameters($v3, $resourceMetadata, $operationName, $pathOperation);
+            $this->addPaginationParameters($v3, $resourceMetadata, OperationType::COLLECTION, $operationName, $pathOperation);
 
             return $pathOperation;
         }
@@ -350,9 +350,9 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
         return $pathOperation;
     }
 
-    private function addPaginationParameters(bool $v3, ResourceMetadata $resourceMetadata, string $operationName, \ArrayObject $pathOperation)
+    private function addPaginationParameters(bool $v3, ResourceMetadata $resourceMetadata, string $operationType, string $operationName, \ArrayObject $pathOperation)
     {
-        if ($this->paginationEnabled && $resourceMetadata->getCollectionOperationAttribute($operationName, 'pagination_enabled', true, true)) {
+        if ($this->paginationEnabled && $resourceMetadata->getTypedOperationAttribute($operationType, $operationName, 'pagination_enabled', true, true)) {
             $paginationParameter = [
                 'name' => $this->paginationPageParameterName,
                 'in' => 'query',
@@ -365,7 +365,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
             ] : $paginationParameter['type'] = 'integer';
             $pathOperation['parameters'][] = $paginationParameter;
 
-            if ($resourceMetadata->getCollectionOperationAttribute($operationName, 'pagination_client_items_per_page', $this->clientItemsPerPage, true)) {
+            if ($resourceMetadata->getTypedOperationAttribute($operationType, $operationName, 'pagination_client_items_per_page', $this->clientItemsPerPage, true)) {
                 $itemPerPageParameter = [
                     'name' => $this->itemsPerPageParameterName,
                     'in' => 'query',
@@ -375,15 +375,15 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
                 if ($v3) {
                     $itemPerPageParameter['schema'] = [
                         'type' => 'integer',
-                        'default' => $resourceMetadata->getCollectionOperationAttribute($operationName, 'pagination_items_per_page', 30, true),
+                        'default' => $resourceMetadata->getTypedOperationAttribute($operationType, $operationName, 'pagination_items_per_page', 30, true),
                         'minimum' => 0,
                     ];
 
-                    $maxItemsPerPage = $resourceMetadata->getCollectionOperationAttribute($operationName, 'maximum_items_per_page', null, true);
+                    $maxItemsPerPage = $resourceMetadata->getTypedOperationAttribute($operationType, $operationName, 'maximum_items_per_page', null, true);
                     if (null !== $maxItemsPerPage) {
                         @trigger_error('The "maximum_items_per_page" option has been deprecated since API Platform 2.5 in favor of "pagination_maximum_items_per_page" and will be removed in API Platform 3.', E_USER_DEPRECATED);
                     }
-                    $maxItemsPerPage = $resourceMetadata->getCollectionOperationAttribute($operationName, 'pagination_maximum_items_per_page', $maxItemsPerPage, true);
+                    $maxItemsPerPage = $resourceMetadata->getTypedOperationAttribute($operationType, $operationName, 'pagination_maximum_items_per_page', $maxItemsPerPage, true);
 
                     if (null !== $maxItemsPerPage) {
                         $itemPerPageParameter['schema']['maximum'] = $maxItemsPerPage;
@@ -396,7 +396,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
             }
         }
 
-        if ($this->paginationEnabled && $resourceMetadata->getCollectionOperationAttribute($operationName, 'pagination_client_enabled', $this->paginationClientEnabled, true)) {
+        if ($this->paginationEnabled && $resourceMetadata->getTypedOperationAttribute($operationType, $operationName, 'pagination_client_enabled', $this->paginationClientEnabled, true)) {
             $paginationEnabledParameter = [
                 'name' => $this->paginationClientEnabledParameterName,
                 'in' => 'query',
@@ -467,7 +467,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
         }
 
         if ($subresourceOperation['collection']) {
-            $this->addPaginationParameters($v3, $resourceMetadata, $operationName, $pathOperation);
+            $this->addPaginationParameters($v3, $subResourceMetadata, OperationType::SUBRESOURCE, $subresourceOperation['operation_name'], $pathOperation);
         }
 
         return new \ArrayObject(['get' => $pathOperation]);
