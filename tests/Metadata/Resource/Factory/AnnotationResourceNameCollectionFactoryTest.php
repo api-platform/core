@@ -18,12 +18,15 @@ use ApiPlatform\Core\Metadata\Resource\Factory\ResourceNameCollectionFactoryInte
 use ApiPlatform\Core\Metadata\Resource\ResourceNameCollection;
 use Doctrine\Common\Annotations\Reader;
 use PHPUnit\Framework\TestCase;
+use Prophecy\PhpUnit\ProphecyTrait;
 
 /**
  * @author Antoine Bluchet <soyuka@gmail.com>
  */
 class AnnotationResourceNameCollectionFactoryTest extends TestCase
 {
+    use ProphecyTrait;
+
     public function testCreate()
     {
         $decorated = $this->prophesize(ResourceNameCollectionFactoryInterface::class);

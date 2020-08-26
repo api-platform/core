@@ -21,6 +21,7 @@ use Doctrine\ODM\MongoDB\DocumentManager;
 use Doctrine\ODM\MongoDB\Mapping\ClassMetadata;
 use Doctrine\Persistence\ManagerRegistry;
 use PHPUnit\Framework\TestCase;
+use Prophecy\PhpUnit\ProphecyTrait;
 
 /**
  * @group mongodb
@@ -29,6 +30,8 @@ use PHPUnit\Framework\TestCase;
  */
 class DoctrineMongoDbOdmPropertyMetadataFactoryTest extends TestCase
 {
+    use ProphecyTrait;
+
     public function testCreateNoManager()
     {
         $propertyMetadata = new PropertyMetadata();

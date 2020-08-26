@@ -27,6 +27,7 @@ use ApiPlatform\Core\Tests\Fixtures\NotAResource;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
+use Prophecy\PhpUnit\ProphecyTrait;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\Serializer\Normalizer\CacheableSupportsMethodInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
@@ -36,6 +37,8 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
  */
 class CollectionFiltersNormalizerTest extends TestCase
 {
+    use ProphecyTrait;
+
     public function testSupportsNormalization()
     {
         $decoratedProphecy = $this->prophesize(NormalizerInterface::class);

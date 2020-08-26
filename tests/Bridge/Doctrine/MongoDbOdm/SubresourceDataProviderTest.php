@@ -37,6 +37,7 @@ use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\ObjectRepository;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
+use Prophecy\PhpUnit\ProphecyTrait;
 
 /**
  * @group mongodb
@@ -45,6 +46,8 @@ use Prophecy\Argument;
  */
 class SubresourceDataProviderTest extends TestCase
 {
+    use ProphecyTrait;
+
     private function getMetadataProphecies(array $resourceClassesIdentifiers)
     {
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);

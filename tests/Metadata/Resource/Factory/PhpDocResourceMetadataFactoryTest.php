@@ -19,9 +19,12 @@ use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Tests\Fixtures\ClassWithNoDocBlock;
 use ApiPlatform\Core\Tests\Fixtures\DummyEntity;
 use PHPUnit\Framework\TestCase;
+use Prophecy\PhpUnit\ProphecyTrait;
 
 class PhpDocResourceMetadataFactoryTest extends TestCase
 {
+    use ProphecyTrait;
+
     public function testExistingDescription()
     {
         $resourceMetadata = new ResourceMetadata(null, 'My desc');

@@ -21,6 +21,7 @@ use ApiPlatform\Core\Exception\ResourceClassNotSupportedException;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\CompositePrimitiveItem;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use PHPUnit\Framework\TestCase;
+use Prophecy\PhpUnit\ProphecyTrait;
 
 /**
  * Retrieves items from a persistence layer.
@@ -29,6 +30,8 @@ use PHPUnit\Framework\TestCase;
  */
 class ChainItemDataProviderTest extends TestCase
 {
+    use ProphecyTrait;
+
     public function testGetItem()
     {
         $dummy = new Dummy();

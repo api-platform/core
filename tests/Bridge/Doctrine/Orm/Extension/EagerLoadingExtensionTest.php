@@ -37,6 +37,7 @@ use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\QueryBuilder;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
+use Prophecy\PhpUnit\ProphecyTrait;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Serializer\Mapping\AttributeMetadata;
@@ -50,6 +51,8 @@ use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
  */
 class EagerLoadingExtensionTest extends TestCase
 {
+    use ProphecyTrait;
+
     public function testApplyToCollection()
     {
         $context = ['groups' => ['foo']];

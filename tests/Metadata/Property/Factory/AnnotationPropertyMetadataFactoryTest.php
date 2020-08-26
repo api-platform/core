@@ -22,12 +22,15 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use Doctrine\Common\Annotations\Reader;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
+use Prophecy\PhpUnit\ProphecyTrait;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
 class AnnotationPropertyMetadataFactoryTest extends TestCase
 {
+    use ProphecyTrait;
+
     /**
      * @dataProvider dependenciesProvider
      */

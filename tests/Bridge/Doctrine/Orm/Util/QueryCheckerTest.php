@@ -22,9 +22,12 @@ use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\ObjectManager;
 use PHPUnit\Framework\TestCase;
+use Prophecy\PhpUnit\ProphecyTrait;
 
 class QueryCheckerTest extends TestCase
 {
+    use ProphecyTrait;
+
     public function testHasHavingClauseWithHavingClause()
     {
         $queryBuilder = $this->prophesize(QueryBuilder::class);

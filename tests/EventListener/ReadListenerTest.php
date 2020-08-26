@@ -25,6 +25,7 @@ use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
+use Prophecy\PhpUnit\ProphecyTrait;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -34,6 +35,8 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  */
 class ReadListenerTest extends TestCase
 {
+    use ProphecyTrait;
+
     public function testNotAnApiPlatformRequest()
     {
         $identifierConverter = $this->prophesize(IdentifierConverterInterface::class);

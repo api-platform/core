@@ -19,11 +19,14 @@ use ApiPlatform\Core\Swagger\Serializer\ApiGatewayNormalizer;
 use ApiPlatform\Core\Swagger\Serializer\DocumentationNormalizer;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use PHPUnit\Framework\TestCase;
+use Prophecy\PhpUnit\ProphecyTrait;
 use Symfony\Component\Serializer\Normalizer\CacheableSupportsMethodInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 final class ApiGatewayNormalizerTest extends TestCase
 {
+    use ProphecyTrait;
+
     public function testSupportsNormalization(): void
     {
         $documentationNormalizerProphecy = $this->prophesize(NormalizerInterface::class);

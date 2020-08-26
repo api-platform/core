@@ -32,10 +32,13 @@ use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\Mapping\ClassMetadata;
 use Doctrine\Persistence\ObjectManager;
 use PHPUnit\Framework\TestCase;
+use Prophecy\PhpUnit\ProphecyTrait;
 use Ramsey\Uuid\Doctrine\UuidType;
 
 class IdentifierManagerTraitTest extends TestCase
 {
+    use ProphecyTrait;
+
     private function getIdentifierManagerTraitImpl(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory)
     {
         return new class($propertyNameCollectionFactory, $propertyMetadataFactory) {

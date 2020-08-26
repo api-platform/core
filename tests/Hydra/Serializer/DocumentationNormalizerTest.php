@@ -30,6 +30,7 @@ use ApiPlatform\Core\Operation\Factory\SubresourceOperationFactoryInterface;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Serializer\NameConverter\CustomConverter;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
+use Prophecy\PhpUnit\ProphecyTrait;
 use Symfony\Component\PropertyInfo\Type;
 
 /**
@@ -37,6 +38,8 @@ use Symfony\Component\PropertyInfo\Type;
  */
 class DocumentationNormalizerTest extends TestCase
 {
+    use ProphecyTrait;
+
     public function testNormalize(): void
     {
         $this->doTestNormalize();

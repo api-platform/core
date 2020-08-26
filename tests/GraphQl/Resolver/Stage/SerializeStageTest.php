@@ -24,6 +24,7 @@ use GraphQL\Error\Error;
 use GraphQL\Type\Definition\ResolveInfo;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
+use Prophecy\PhpUnit\ProphecyTrait;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 /**
@@ -31,6 +32,8 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
  */
 class SerializeStageTest extends TestCase
 {
+    use ProphecyTrait;
+
     private $resourceMetadataFactoryProphecy;
     private $normalizerProphecy;
     private $serializerContextBuilderProphecy;

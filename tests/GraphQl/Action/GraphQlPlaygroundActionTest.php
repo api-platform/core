@@ -15,6 +15,7 @@ namespace ApiPlatform\Core\Tests\GraphQl\Action;
 
 use ApiPlatform\Core\GraphQl\Action\GraphQlPlaygroundAction;
 use PHPUnit\Framework\TestCase;
+use Prophecy\PhpUnit\ProphecyTrait;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
@@ -26,6 +27,8 @@ use Twig\Environment as TwigEnvironment;
  */
 class GraphQlPlaygroundActionTest extends TestCase
 {
+    use ProphecyTrait;
+
     public function testEnabledAction(): void
     {
         $request = new Request();

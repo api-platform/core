@@ -28,12 +28,15 @@ use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\UnitOfWork;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
+use Prophecy\PhpUnit\ProphecyTrait;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
 class PurgeHttpCacheListenerTest extends TestCase
 {
+    use ProphecyTrait;
+
     public function testOnFlush()
     {
         $toInsert1 = new Dummy();

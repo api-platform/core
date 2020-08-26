@@ -17,6 +17,7 @@ use ApiPlatform\Core\Api\FilterCollection;
 use ApiPlatform\Core\Api\FilterInterface;
 use ApiPlatform\Core\Api\FilterLocatorTrait;
 use PHPUnit\Framework\TestCase;
+use Prophecy\PhpUnit\ProphecyTrait;
 use Psr\Container\ContainerInterface;
 
 /**
@@ -24,6 +25,8 @@ use Psr\Container\ContainerInterface;
  */
 class FilterLocatorTraitTest extends TestCase
 {
+    use ProphecyTrait;
+
     public function testSetFilterLocator()
     {
         $filterLocator = $this->prophesize(ContainerInterface::class)->reveal();

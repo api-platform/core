@@ -26,6 +26,7 @@ use ApiPlatform\Core\Tests\Fixtures\Foo;
 use ApiPlatform\Core\Tests\Fixtures\NotAResource;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
+use Prophecy\PhpUnit\ProphecyTrait;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 
@@ -35,6 +36,8 @@ use Symfony\Component\Serializer\SerializerInterface;
  */
 class CollectionNormalizerTest extends TestCase
 {
+    use ProphecyTrait;
+
     public function testSupportsNormalize()
     {
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);

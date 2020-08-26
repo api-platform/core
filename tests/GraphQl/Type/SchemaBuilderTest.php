@@ -24,6 +24,7 @@ use ApiPlatform\Core\Metadata\Resource\ResourceNameCollection;
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\Type as GraphQLType;
 use PHPUnit\Framework\TestCase;
+use Prophecy\PhpUnit\ProphecyTrait;
 use Prophecy\Prophecy\ObjectProphecy;
 
 /**
@@ -31,6 +32,8 @@ use Prophecy\Prophecy\ObjectProphecy;
  */
 class SchemaBuilderTest extends TestCase
 {
+    use ProphecyTrait;
+
     /** @var ObjectProphecy */
     private $resourceNameCollectionFactoryProphecy;
 

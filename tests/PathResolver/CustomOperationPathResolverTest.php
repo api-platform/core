@@ -17,12 +17,15 @@ use ApiPlatform\Core\Api\OperationType;
 use ApiPlatform\Core\PathResolver\CustomOperationPathResolver;
 use ApiPlatform\Core\PathResolver\OperationPathResolverInterface;
 use PHPUnit\Framework\TestCase;
+use Prophecy\PhpUnit\ProphecyTrait;
 
 /**
  * @author Baptiste Meyer <baptiste.meyer@gmail.com>
  */
 class CustomOperationPathResolverTest extends TestCase
 {
+    use ProphecyTrait;
+
     public function testResolveOperationPath()
     {
         $operationPathResolver = new CustomOperationPathResolver($this->prophesize(OperationPathResolverInterface::class)->reveal());

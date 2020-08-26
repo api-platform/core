@@ -23,12 +23,15 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\UpperCaseIdentifierDummy;
 use Doctrine\Common\Annotations\Reader;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
+use Prophecy\PhpUnit\ProphecyTrait;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
 class AnnotationPropertyNameCollectionFactoryTest extends TestCase
 {
+    use ProphecyTrait;
+
     /**
      * @dataProvider dependenciesProvider
      */

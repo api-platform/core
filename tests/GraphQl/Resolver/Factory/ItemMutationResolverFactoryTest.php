@@ -28,6 +28,7 @@ use GraphQL\Error\Error;
 use GraphQL\Type\Definition\ResolveInfo;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
+use Prophecy\PhpUnit\ProphecyTrait;
 use Psr\Container\ContainerInterface;
 
 /**
@@ -35,6 +36,8 @@ use Psr\Container\ContainerInterface;
  */
 class ItemMutationResolverFactoryTest extends TestCase
 {
+    use ProphecyTrait;
+
     private $itemMutationResolverFactory;
     private $readStageProphecy;
     private $securityStageProphecy;

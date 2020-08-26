@@ -42,12 +42,15 @@ use Doctrine\Persistence\ObjectManager;
 use Doctrine\Persistence\ObjectRepository;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
+use Prophecy\PhpUnit\ProphecyTrait;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
 class SubresourceDataProviderTest extends TestCase
 {
+    use ProphecyTrait;
+
     private function assertIdentifierManagerMethodCalls($managerProphecy)
     {
         $platformProphecy = $this->prophesize(AbstractPlatform::class);

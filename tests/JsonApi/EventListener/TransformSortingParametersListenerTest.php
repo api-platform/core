@@ -15,6 +15,7 @@ namespace ApiPlatform\Core\Tests\JsonApi\EventListener;
 
 use ApiPlatform\Core\JsonApi\EventListener\TransformSortingParametersListener;
 use PHPUnit\Framework\TestCase;
+use Prophecy\PhpUnit\ProphecyTrait;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 
@@ -23,6 +24,8 @@ use Symfony\Component\HttpKernel\Event\RequestEvent;
  */
 class TransformSortingParametersListenerTest extends TestCase
 {
+    use ProphecyTrait;
+
     private $listener;
 
     protected function setUp(): void

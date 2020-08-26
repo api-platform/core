@@ -24,6 +24,7 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use GraphQL\Error\Error;
 use GraphQL\Type\Definition\ResolveInfo;
 use PHPUnit\Framework\TestCase;
+use Prophecy\PhpUnit\ProphecyTrait;
 use Psr\Container\ContainerInterface;
 
 /**
@@ -32,6 +33,8 @@ use Psr\Container\ContainerInterface;
  */
 class ItemResolverFactoryTest extends TestCase
 {
+    use ProphecyTrait;
+
     private $itemResolverFactory;
     private $readStageProphecy;
     private $securityStageProphecy;

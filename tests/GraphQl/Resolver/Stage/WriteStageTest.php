@@ -20,12 +20,15 @@ use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
+use Prophecy\PhpUnit\ProphecyTrait;
 
 /**
  * @author Alan Poulain <contact@alanpoulain.eu>
  */
 class WriteStageTest extends TestCase
 {
+    use ProphecyTrait;
+
     /** @var WriteStage */
     private $writeStage;
     private $resourceMetadataFactoryProphecy;

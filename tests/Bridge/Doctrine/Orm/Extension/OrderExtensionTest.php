@@ -23,12 +23,15 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\QueryBuilder;
 use PHPUnit\Framework\TestCase;
+use Prophecy\PhpUnit\ProphecyTrait;
 
 /**
  * @author Amrouche Hamza <hamza.simperfit@gmail.com>
  */
 class OrderExtensionTest extends TestCase
 {
+    use ProphecyTrait;
+
     public function testApplyToCollectionWithValidOrder()
     {
         $queryBuilderProphecy = $this->prophesize(QueryBuilder::class);

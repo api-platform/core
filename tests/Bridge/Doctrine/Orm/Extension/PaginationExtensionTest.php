@@ -33,6 +33,7 @@ use Doctrine\ORM\Tools\Pagination\CountWalker;
 use Doctrine\Persistence\ManagerRegistry;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
+use Prophecy\PhpUnit\ProphecyTrait;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
@@ -42,6 +43,8 @@ use Symfony\Component\HttpFoundation\RequestStack;
  */
 class PaginationExtensionTest extends TestCase
 {
+    use ProphecyTrait;
+
     /**
      * @group legacy
      * @expectedDeprecation Passing an instance of "Symfony\Component\HttpFoundation\RequestStack" as second argument of "ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\PaginationExtension" is deprecated since API Platform 2.4 and will not be possible anymore in API Platform 3. Pass an instance of "ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface" instead.

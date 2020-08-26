@@ -22,12 +22,15 @@ use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\Mapping\ClassMetadata;
 use Doctrine\Persistence\ObjectManager;
 use PHPUnit\Framework\TestCase;
+use Prophecy\PhpUnit\ProphecyTrait;
 
 /**
  * @author Antoine Bluchet <soyuka@gmail.com>
  */
 class DoctrineOrmPropertyMetadataFactoryTest extends TestCase
 {
+    use ProphecyTrait;
+
     public function testCreateNoManager()
     {
         $propertyMetadata = new PropertyMetadata();

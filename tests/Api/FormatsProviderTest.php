@@ -18,6 +18,7 @@ use ApiPlatform\Core\Api\OperationType;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use PHPUnit\Framework\TestCase;
+use Prophecy\PhpUnit\ProphecyTrait;
 
 /**
  * @author Anthony GRASSIOT <antograssiot@free.fr>
@@ -26,6 +27,8 @@ use PHPUnit\Framework\TestCase;
  */
 class FormatsProviderTest extends TestCase
 {
+    use ProphecyTrait;
+
     public function testNoResourceClass()
     {
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);

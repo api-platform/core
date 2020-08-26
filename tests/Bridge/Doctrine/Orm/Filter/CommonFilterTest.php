@@ -16,6 +16,7 @@ namespace ApiPlatform\Core\Tests\Bridge\Doctrine\Orm\Filter;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Doctrine\Orm\Filter\DummyFilter;
 use Doctrine\Persistence\ManagerRegistry;
 use PHPUnit\Framework\TestCase;
+use Prophecy\PhpUnit\ProphecyTrait;
 
 /**
  * Regression test case on issue 1154.
@@ -24,6 +25,8 @@ use PHPUnit\Framework\TestCase;
  */
 class CommonFilterTest extends TestCase
 {
+    use ProphecyTrait;
+
     public function testSplitPropertiesWithoutResourceClass()
     {
         $managerRegistry = $this->prophesize(ManagerRegistry::class);

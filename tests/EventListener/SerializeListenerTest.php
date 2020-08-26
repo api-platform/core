@@ -21,6 +21,7 @@ use ApiPlatform\Core\Serializer\SerializerContextBuilderInterface;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
+use Prophecy\PhpUnit\ProphecyTrait;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ViewEvent;
@@ -32,6 +33,8 @@ use Symfony\Component\Serializer\SerializerInterface;
  */
 class SerializeListenerTest extends TestCase
 {
+    use ProphecyTrait;
+
     public function testDoNotSerializeWhenControllerResultIsResponse()
     {
         $serializerProphecy = $this->prophesize(SerializerInterface::class);

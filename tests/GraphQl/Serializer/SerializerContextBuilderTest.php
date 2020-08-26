@@ -19,12 +19,15 @@ use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Serializer\NameConverter\CustomConverter;
 use GraphQL\Type\Definition\ResolveInfo;
 use PHPUnit\Framework\TestCase;
+use Prophecy\PhpUnit\ProphecyTrait;
 
 /**
  * @author Alan Poulain <contact@alanpoulain.eu>
  */
 class SerializerContextBuilderTest extends TestCase
 {
+    use ProphecyTrait;
+
     /** @var SerializerContextBuilder */
     private $serializerContextBuilder;
     private $resourceMetadataFactoryProphecy;

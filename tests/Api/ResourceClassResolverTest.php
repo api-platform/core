@@ -25,12 +25,15 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyCar;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyTableInheritance;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyTableInheritanceChild;
 use PHPUnit\Framework\TestCase;
+use Prophecy\PhpUnit\ProphecyTrait;
 
 /**
  * @author Amrouche Hamza <hamza.simperfit@gmail.com>
  */
 class ResourceClassResolverTest extends TestCase
 {
+    use ProphecyTrait;
+
     public function testGetResourceClassWithIntendedClassName()
     {
         $resourceNameCollectionFactoryProphecy = $this->prophesize(ResourceNameCollectionFactoryInterface::class);

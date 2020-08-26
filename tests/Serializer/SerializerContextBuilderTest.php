@@ -19,6 +19,7 @@ use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Serializer\SerializerContextBuilder;
 use ApiPlatform\Core\Swagger\Serializer\DocumentationNormalizer;
 use PHPUnit\Framework\TestCase;
+use Prophecy\PhpUnit\ProphecyTrait;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -26,6 +27,8 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class SerializerContextBuilderTest extends TestCase
 {
+    use ProphecyTrait;
+
     /**
      * @var SerializerContextBuilder
      */

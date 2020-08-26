@@ -18,6 +18,7 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\User;
 use FOS\UserBundle\Model\UserInterface;
 use FOS\UserBundle\Model\UserManagerInterface;
 use PHPUnit\Framework\TestCase;
+use Prophecy\PhpUnit\ProphecyTrait;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\ViewEvent;
 
@@ -26,6 +27,8 @@ use Symfony\Component\HttpKernel\Event\ViewEvent;
  */
 class EventListenerTest extends TestCase
 {
+    use ProphecyTrait;
+
     public function testDelete()
     {
         $user = $this->prophesize(UserInterface::class);

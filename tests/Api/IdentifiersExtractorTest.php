@@ -27,12 +27,15 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Model\ResourceInterface;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Model\ResourceInterfaceImplementation;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
+use Prophecy\PhpUnit\ProphecyTrait;
 
 /**
  * @author Antoine Bluchet <soyuka@gmail.com>
  */
 class IdentifiersExtractorTest extends TestCase
 {
+    use ProphecyTrait;
+
     public function testGetIdentifiersFromResourceClass()
     {
         [$propertyNameCollectionFactoryProphecy, $propertyMetadataFactoryProphecy] = $this->getMetadataFactoryProphecies(Dummy::class, ['id']);

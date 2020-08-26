@@ -295,7 +295,7 @@ final class PaginationExtension implements ContextAwareQueryResultCollectionExte
             return \array_key_exists($parameterName, $paginationAttribute) ? $paginationAttribute[$parameterName] : $default;
         }
 
-        return $request->query->get($parameterName, $default);
+        return $request->query->all()[$parameterName] ?? $default;
     }
 
     private function addCountToContext(QueryBuilder $queryBuilder, array $context): array

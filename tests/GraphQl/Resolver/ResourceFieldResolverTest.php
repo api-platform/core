@@ -22,9 +22,12 @@ use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\ResolveInfo;
 use GraphQL\Type\Schema;
 use PHPUnit\Framework\TestCase;
+use Prophecy\PhpUnit\ProphecyTrait;
 
 class ResourceFieldResolverTest extends TestCase
 {
+    use ProphecyTrait;
+
     public function testId()
     {
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);

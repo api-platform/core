@@ -24,6 +24,7 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Serializer\NameConverter\CustomCo
 use Doctrine\Persistence\ManagerRegistry;
 use MongoDB\BSON\Regex;
 use Prophecy\Argument;
+use Prophecy\PhpUnit\ProphecyTrait;
 
 /**
  * @group mongodb
@@ -32,6 +33,7 @@ use Prophecy\Argument;
  */
 class SearchFilterTest extends DoctrineMongoDbOdmFilterTestCase
 {
+    use ProphecyTrait;
     use SearchFilterTestTrait;
 
     protected $filterClass = SearchFilter::class;

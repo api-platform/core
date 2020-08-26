@@ -22,6 +22,7 @@ use ApiPlatform\Core\Serializer\SerializerContextBuilderInterface;
 use ApiPlatform\Core\Serializer\SerializerFilterContextBuilder;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyGroup;
 use PHPUnit\Framework\TestCase;
+use Prophecy\PhpUnit\ProphecyTrait;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -30,6 +31,8 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class SerializerFilterContextBuilderTest extends TestCase
 {
+    use ProphecyTrait;
+
     public function testCreateFromRequestWithCollectionOperation()
     {
         $request = new Request();

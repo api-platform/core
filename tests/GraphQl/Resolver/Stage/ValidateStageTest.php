@@ -22,12 +22,15 @@ use GraphQL\Error\Error;
 use GraphQL\Type\Definition\ResolveInfo;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
+use Prophecy\PhpUnit\ProphecyTrait;
 
 /**
  * @author Alan Poulain <contact@alanpoulain.eu>
  */
 class ValidateStageTest extends TestCase
 {
+    use ProphecyTrait;
+
     /** @var ValidateStage */
     private $validateStage;
     private $resourceMetadataFactoryProphecy;

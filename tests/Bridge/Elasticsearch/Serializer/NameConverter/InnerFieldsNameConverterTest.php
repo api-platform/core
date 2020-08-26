@@ -15,10 +15,13 @@ namespace ApiPlatform\Core\Tests\Bridge\Elasticsearch\Serializer\NameConverter;
 
 use ApiPlatform\Core\Bridge\Elasticsearch\Serializer\NameConverter\InnerFieldsNameConverter;
 use PHPUnit\Framework\TestCase;
+use Prophecy\PhpUnit\ProphecyTrait;
 use Symfony\Component\Serializer\NameConverter\AdvancedNameConverterInterface;
 
 class InnerFieldsNameConverterTest extends TestCase
 {
+    use ProphecyTrait;
+
     public function testConstruct()
     {
         self::assertInstanceOf(

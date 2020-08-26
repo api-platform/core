@@ -77,7 +77,7 @@ final class CommandContext implements KernelAwareContext
     {
         $expectedOutput = str_replace('###', '"""', $expectedOutput->getRaw());
 
-        Assert::assertContains($expectedOutput, $this->commandTester->getDisplay());
+        Assert::assertStringContainsString($expectedOutput, $this->commandTester->getDisplay());
     }
 
     public function setKernel(KernelInterface $kernel): void

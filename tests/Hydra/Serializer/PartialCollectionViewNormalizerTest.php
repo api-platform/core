@@ -19,6 +19,7 @@ use ApiPlatform\Core\Hydra\Serializer\PartialCollectionViewNormalizer;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
+use Prophecy\PhpUnit\ProphecyTrait;
 use Symfony\Component\Serializer\Normalizer\CacheableSupportsMethodInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerAwareInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
@@ -28,6 +29,8 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
  */
 class PartialCollectionViewNormalizerTest extends TestCase
 {
+    use ProphecyTrait;
+
     public function testNormalizeDoesNotChangeSubLevel()
     {
         $decoratedNormalizerProphecy = $this->prophesize(NormalizerInterface::class);

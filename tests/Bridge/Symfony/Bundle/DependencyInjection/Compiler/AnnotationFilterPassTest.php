@@ -27,6 +27,7 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Filter\NoPropertiesArgumentFilter
 use Doctrine\Common\Annotations\Reader;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
+use Prophecy\PhpUnit\ProphecyTrait;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -38,6 +39,8 @@ use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException as 
  */
 class AnnotationFilterPassTest extends TestCase
 {
+    use ProphecyTrait;
+
     public function testConstruct(): void
     {
         $annotationFilterPass = new AnnotationFilterPass();

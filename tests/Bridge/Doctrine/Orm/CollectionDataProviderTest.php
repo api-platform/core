@@ -27,12 +27,15 @@ use Doctrine\Persistence\ObjectManager;
 use Doctrine\Persistence\ObjectRepository;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
+use Prophecy\PhpUnit\ProphecyTrait;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
 class CollectionDataProviderTest extends TestCase
 {
+    use ProphecyTrait;
+
     public function testGetCollection()
     {
         $queryProphecy = $this->prophesize(AbstractQuery::class);

@@ -19,6 +19,7 @@ use ApiPlatform\Core\GraphQl\Serializer\SerializerContextBuilderInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use PHPUnit\Framework\TestCase;
+use Prophecy\PhpUnit\ProphecyTrait;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
 /**
@@ -26,6 +27,8 @@ use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
  */
 class DeserializeStageTest extends TestCase
 {
+    use ProphecyTrait;
+
     /** @var DeserializeStage */
     private $deserializeStage;
     private $resourceMetadataFactoryProphecy;

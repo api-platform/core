@@ -23,9 +23,12 @@ use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
+use Prophecy\PhpUnit\ProphecyTrait;
 
 class QueryBuilderHelperTest extends TestCase
 {
+    use ProphecyTrait;
+
     /**
      * @dataProvider provideAddJoinOnce
      */

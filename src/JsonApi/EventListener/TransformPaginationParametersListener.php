@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\JsonApi\EventListener;
 
-use Symfony\Component\HttpFoundation\InputBag;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 
 /**
@@ -28,12 +27,11 @@ final class TransformPaginationParametersListener
     public function onKernelRequest(RequestEvent $event): void
     {
         $request = $event->getRequest();
-
-        $pageParameter = class_exists(InputBag::class) ? $request->query->all('page') : $request->query->get('page');
+        $pageParameter = $request->query->all()['page'] ?? null;
 
         if (
-            'jsonapi' !== $request->getRequestFormat() ||
-            !\is_array($pageParameter)
+            !\is_array($pageParameter) ||
+            'jsonapi' !== $request->getRequestFormat()
         ) {
             return;
         }

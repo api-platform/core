@@ -17,12 +17,15 @@ use ApiPlatform\Core\HttpCache\VarnishPurger;
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Psr7\Response;
 use PHPUnit\Framework\TestCase;
+use Prophecy\PhpUnit\ProphecyTrait;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
 class VarnishPurgerTest extends TestCase
 {
+    use ProphecyTrait;
+
     public function testPurge()
     {
         $clientProphecy1 = $this->prophesize(ClientInterface::class);

@@ -18,9 +18,12 @@ use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\Tests\Fixtures\Query;
 use Doctrine\ORM\Tools\Pagination\Paginator as DoctrinePaginator;
 use PHPUnit\Framework\TestCase;
+use Prophecy\PhpUnit\ProphecyTrait;
 
 class PaginatorTest extends TestCase
 {
+    use ProphecyTrait;
+
     /**
      * @dataProvider initializeProvider
      */

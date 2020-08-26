@@ -16,6 +16,7 @@ namespace ApiPlatform\Core\Tests\Hydra\Serializer;
 use ApiPlatform\Core\Api\UrlGeneratorInterface;
 use ApiPlatform\Core\Hydra\Serializer\ErrorNormalizer;
 use PHPUnit\Framework\TestCase;
+use Prophecy\PhpUnit\ProphecyTrait;
 use Symfony\Component\Debug\Exception\FlattenException;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -24,6 +25,8 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class ErrorNormalizerTest extends TestCase
 {
+    use ProphecyTrait;
+
     public function testSupportsNormalization()
     {
         $urlGeneratorProphecy = $this->prophesize(UrlGeneratorInterface::class);

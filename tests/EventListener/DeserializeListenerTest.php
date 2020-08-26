@@ -21,6 +21,7 @@ use ApiPlatform\Core\Serializer\SerializerContextBuilderInterface;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
+use Prophecy\PhpUnit\ProphecyTrait;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\Exception\UnsupportedMediaTypeHttpException;
@@ -32,6 +33,8 @@ use Symfony\Component\Serializer\SerializerInterface;
  */
 class DeserializeListenerTest extends TestCase
 {
+    use ProphecyTrait;
+
     private const FORMATS = ['json' => ['application/json']];
 
     public function testDoNotCallWhenRequestMethodIsSafe(): void

@@ -25,12 +25,15 @@ use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use GraphQL\Error\Error;
 use GraphQL\Type\Definition\ResolveInfo;
 use PHPUnit\Framework\TestCase;
+use Prophecy\PhpUnit\ProphecyTrait;
 
 /**
  * @author Alan Poulain <contact@alanpoulain.eu>
  */
 class ReadStageTest extends TestCase
 {
+    use ProphecyTrait;
+
     /** @var ReadStage */
     private $readStage;
     private $resourceMetadataFactoryProphecy;

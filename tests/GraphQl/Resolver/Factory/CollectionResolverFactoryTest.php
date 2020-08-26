@@ -22,6 +22,7 @@ use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use GraphQL\Type\Definition\ResolveInfo;
 use PHPUnit\Framework\TestCase;
+use Prophecy\PhpUnit\ProphecyTrait;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request;
@@ -33,6 +34,8 @@ use Symfony\Component\HttpFoundation\RequestStack;
  */
 class CollectionResolverFactoryTest extends TestCase
 {
+    use ProphecyTrait;
+
     private $collectionResolverFactory;
     private $readStageProphecy;
     private $securityStageProphecy;

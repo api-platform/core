@@ -20,6 +20,7 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use Fig\Link\GenericLinkProvider;
 use Fig\Link\Link;
 use PHPUnit\Framework\TestCase;
+use Prophecy\PhpUnit\ProphecyTrait;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\WebLink\HttpHeaderSerializer;
@@ -29,6 +30,8 @@ use Symfony\Component\WebLink\HttpHeaderSerializer;
  */
 class AddLinkHeaderListenerTest extends TestCase
 {
+    use ProphecyTrait;
+
     /**
      * @dataProvider addProvider
      */

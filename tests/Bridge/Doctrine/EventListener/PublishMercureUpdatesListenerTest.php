@@ -29,6 +29,7 @@ use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\UnitOfWork;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
+use Prophecy\PhpUnit\ProphecyTrait;
 use Symfony\Component\Mercure\Update;
 use Symfony\Component\Serializer\SerializerInterface;
 
@@ -37,6 +38,8 @@ use Symfony\Component\Serializer\SerializerInterface;
  */
 class PublishMercureUpdatesListenerTest extends TestCase
 {
+    use ProphecyTrait;
+
     public function testLegacyPublishUpdate(): void
     {
         if (method_exists(Update::class, 'isPrivate')) {

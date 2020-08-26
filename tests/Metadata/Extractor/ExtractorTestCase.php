@@ -16,6 +16,7 @@ namespace ApiPlatform\Core\Tests\Metadata\Extractor;
 use ApiPlatform\Core\Metadata\Extractor\ExtractorInterface;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
+use Prophecy\PhpUnit\ProphecyTrait;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface as SymfonyContainerInterface;
 use function is_a;
@@ -25,6 +26,8 @@ use function is_a;
  */
 abstract class ExtractorTestCase extends TestCase
 {
+    use ProphecyTrait;
+
     protected $extractorClass;
 
     final public function testEmptyResources()

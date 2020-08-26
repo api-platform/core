@@ -23,6 +23,7 @@ use Doctrine\ODM\MongoDB\DocumentManager;
 use Doctrine\ODM\MongoDB\Mapping\ClassMetadata;
 use Doctrine\Persistence\ManagerRegistry;
 use PHPUnit\Framework\TestCase;
+use Prophecy\PhpUnit\ProphecyTrait;
 
 /**
  * @group mongodb
@@ -31,6 +32,8 @@ use PHPUnit\Framework\TestCase;
  */
 class OrderExtensionTest extends TestCase
 {
+    use ProphecyTrait;
+
     public function testApplyToCollectionWithValidOrder()
     {
         $aggregationBuilderProphecy = $this->prophesize(Builder::class);

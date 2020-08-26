@@ -23,6 +23,7 @@ use GraphQL\Executor\ExecutionResult;
 use GraphQL\Type\Schema;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
+use Prophecy\PhpUnit\ProphecyTrait;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -35,6 +36,8 @@ use Twig\Environment as TwigEnvironment;
  */
 class EntrypointActionTest extends TestCase
 {
+    use ProphecyTrait;
+
     /**
      * Hack to avoid transient failing test because of Date header.
      */

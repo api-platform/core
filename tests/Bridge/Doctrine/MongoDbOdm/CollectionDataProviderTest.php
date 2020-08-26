@@ -25,6 +25,7 @@ use Doctrine\ODM\MongoDB\Repository\DocumentRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\ObjectRepository;
 use PHPUnit\Framework\TestCase;
+use Prophecy\PhpUnit\ProphecyTrait;
 
 /**
  * @group mongodb
@@ -33,6 +34,8 @@ use PHPUnit\Framework\TestCase;
  */
 class CollectionDataProviderTest extends TestCase
 {
+    use ProphecyTrait;
+
     public function testGetCollection()
     {
         $iterator = $this->prophesize(Iterator::class)->reveal();

@@ -21,6 +21,7 @@ use GraphQL\Error\Error;
 use GraphQL\Type\Definition\ResolveInfo;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
+use Prophecy\PhpUnit\ProphecyTrait;
 
 /**
  * @author Alan Poulain <contact@alanpoulain.eu>
@@ -28,6 +29,8 @@ use Prophecy\Argument;
  */
 class SecurityPostDenormalizeStageTest extends TestCase
 {
+    use ProphecyTrait;
+
     /** @var SecurityPostDenormalizeStage */
     private $securityPostDenormalizeStage;
     private $resourceMetadataFactoryProphecy;

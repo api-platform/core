@@ -19,12 +19,15 @@ use ApiPlatform\Core\DataProvider\SubresourceDataProviderInterface;
 use ApiPlatform\Core\Exception\ResourceClassNotSupportedException;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use PHPUnit\Framework\TestCase;
+use Prophecy\PhpUnit\ProphecyTrait;
 
 /**
  * Retrieves items from a persistence layer.
  */
 class ChainSubresourcedataProviderTest extends TestCase
 {
+    use ProphecyTrait;
+
     public function testGetSubresource()
     {
         $dummy = new Dummy();
