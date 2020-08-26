@@ -97,7 +97,7 @@ abstract class AbstractFilter implements FilterInterface
             return $property;
         }
 
-        return implode('.', array_map([$this->nameConverter, 'denormalize'], explode('.', $property)));
+        return implode('.', array_map([$this->nameConverter, 'denormalize'], explode('.', (string) $property)));
     }
 
     protected function normalizePropertyName($property)
@@ -106,6 +106,6 @@ abstract class AbstractFilter implements FilterInterface
             return $property;
         }
 
-        return implode('.', array_map([$this->nameConverter, 'normalize'], explode('.', $property)));
+        return implode('.', array_map([$this->nameConverter, 'normalize'], explode('.', (string) $property)));
     }
 }
