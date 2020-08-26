@@ -21,7 +21,7 @@ use ApiPlatform\Core\Test\DoctrineMongoDbOdmFilterTestCase;
 use ApiPlatform\Core\Tests\Bridge\Doctrine\Common\Filter\SearchFilterTestTrait;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\RelatedDummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Serializer\NameConverter\CustomConverter;
-use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ManagerRegistry;
 use MongoDB\BSON\Regex;
 use Prophecy\Argument;
 

@@ -16,10 +16,10 @@ namespace ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Extension;
 use ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Paginator;
 use ApiPlatform\Core\DataProvider\Pagination;
 use ApiPlatform\Core\Exception\RuntimeException;
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ODM\MongoDB\Aggregation\Builder;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Doctrine\ODM\MongoDB\Repository\DocumentRepository;
+use Doctrine\Persistence\ManagerRegistry;
 
 /**
  * Applies pagination on the Doctrine aggregation for resource collection when enabled.

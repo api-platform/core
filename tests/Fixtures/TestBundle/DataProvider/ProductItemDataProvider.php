@@ -18,7 +18,7 @@ use ApiPlatform\Core\DataProvider\RestrictedDataProviderInterface;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\Product as ProductDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Product;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Model\ProductInterface;
-use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ManagerRegistry;
 
 class ProductItemDataProvider implements ItemDataProviderInterface, RestrictedDataProviderInterface
 {

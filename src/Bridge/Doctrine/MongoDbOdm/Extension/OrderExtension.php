@@ -16,8 +16,8 @@ namespace ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Extension;
 use ApiPlatform\Core\Bridge\Doctrine\Common\PropertyHelperTrait;
 use ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\PropertyHelperTrait as MongoDbOdmPropertyHelperTrait;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ODM\MongoDB\Aggregation\Builder;
+use Doctrine\Persistence\ManagerRegistry;
 
 /**
  * Applies selected ordering while querying resource collection.

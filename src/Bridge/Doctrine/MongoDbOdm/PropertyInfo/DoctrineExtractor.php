@@ -14,11 +14,11 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\PropertyInfo;
 
 use Doctrine\Common\Collections\Collection;
-use Doctrine\Common\Persistence\Mapping\ClassMetadata;
-use Doctrine\Common\Persistence\Mapping\MappingException;
-use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\ODM\MongoDB\Mapping\ClassMetadata as MongoDbClassMetadata;
 use Doctrine\ODM\MongoDB\Types\Type as MongoDbType;
+use Doctrine\Persistence\Mapping\ClassMetadata;
+use Doctrine\Persistence\Mapping\MappingException;
+use Doctrine\Persistence\ObjectManager;
 use Symfony\Component\PropertyInfo\PropertyAccessExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyListExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyTypeExtractorInterface;

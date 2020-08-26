@@ -16,11 +16,11 @@ namespace ApiPlatform\Core\Tests\Bridge\Doctrine\Orm\Util;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryChecker;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RelatedDummy;
-use Doctrine\Common\Persistence\ManagerRegistry;
-use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\QueryBuilder;
+use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ObjectManager;
 use PHPUnit\Framework\TestCase;
 
 class QueryCheckerTest extends TestCase
