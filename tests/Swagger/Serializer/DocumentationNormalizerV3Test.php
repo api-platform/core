@@ -2303,7 +2303,7 @@ class DocumentationNormalizerV3Test extends TestCase
                         ],
                     ]),
                 ],
-                '/api/questions/{id}/answer' => new \ArrayObject([
+                '/api/questions/{id}/answer' => [
                     'get' => new \ArrayObject([
                         'tags' => ['Answer', 'Question'],
                         'operationId' => 'api_questions_answer_get_subresource',
@@ -2328,7 +2328,7 @@ class DocumentationNormalizerV3Test extends TestCase
                             ],
                         ],
                     ]),
-                ]),
+                ],
             ]),
             'components' => [
                 'schemas' => new \ArrayObject([
