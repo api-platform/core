@@ -24,7 +24,7 @@ use ApiPlatform\Core\Metadata\Resource\ResourceNameCollection;
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\Type as GraphQLType;
 use PHPUnit\Framework\TestCase;
-use Prophecy\PhpUnit\ProphecyTrait;
+use ApiPlatform\Core\Tests\ProphecyTrait;
 use Prophecy\Prophecy\ObjectProphecy;
 
 /**

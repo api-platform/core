@@ -27,7 +27,7 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Model\ResourceInterface;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Model\ResourceInterfaceImplementation;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
-use Prophecy\PhpUnit\ProphecyTrait;
+use ApiPlatform\Core\Tests\ProphecyTrait;
 
 /**
  * @author Antoine Bluchet <soyuka@gmail.com>

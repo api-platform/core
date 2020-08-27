@@ -1,19 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
-<!-- http://phpunit.de/manual/4.1/en/appendixes.configuration.html -->
 <phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:noNamespaceSchemaLocation="http://schema.phpunit.de/4.6/phpunit.xsd"
-         backupGlobals="false"
-         bootstrap="tests/Fixtures/app/bootstrap.php"
-         colors="true"
->
+         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.3/phpunit.xsd" backupGlobals="false"
+         bootstrap="tests/Fixtures/app/bootstrap.php" colors="true">
     <php>
-        <ini name="error_reporting" value="-1" />
-        <ini name="memory_limit" value="-1" />
-        <env name="SYMFONY_DEPRECATIONS_HELPER" value="max[self]=0" />
-        <server name="KERNEL_DIR" value="tests/Fixtures/app/" />
-        <server name="KERNEL_CLASS" value="AppKernel" />
-        <server name="APP_ENV" value="test" />
+        <ini name="error_reporting" value="-1"/>
+        <ini name="memory_limit" value="-1"/>
+        <server name="SYMFONY_DEPRECATIONS_HELPER" value="max[self]=0"/>
+        <server name="KERNEL_DIR" value="tests/Fixtures/app/"/>
+        <server name="KERNEL_CLASS" value="AppKernel"/>
+        <server name="APP_ENV" value="test"/>
     </php>
 
     <testsuites>
@@ -22,20 +17,8 @@
         </testsuite>
     </testsuites>
 
-    <filter>
-        <whitelist processUncoveredFilesFromWhitelist="true">
-            <directory>.</directory>
-            <exclude>
-                <directory>features</directory>
-                <directory>tests</directory>
-                <directory>vendor</directory>
-                <file>src/Bridge/Symfony/Bundle/DependencyInjection/ApiPlatformExtension.php</file>
-            </exclude>
-        </whitelist>
-    </filter>
-
     <listeners>
-        <listener class="Symfony\Bridge\PhpUnit\SymfonyTestsListener" />
+        <listener class="Symfony\Bridge\PhpUnit\SymfonyTestsListener"/>
     </listeners>
 
     <groups>
@@ -43,4 +26,16 @@
             <group>mongodb</group>
         </exclude>
     </groups>
+
+    <coverage processUncoveredFiles="true">
+        <include>
+            <directory>.</directory>
+        </include>
+        <exclude>
+            <directory>features</directory>
+            <directory>tests</directory>
+            <directory>vendor</directory>
+            <file>src/Bridge/Symfony/Bundle/DependencyInjection/ApiPlatformExtension.php</file>
+        </exclude>
+    </coverage>
 </phpunit>

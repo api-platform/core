@@ -20,7 +20,7 @@ use ApiPlatform\Core\Bridge\Elasticsearch\Exception\NonUniqueIdentifierException
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\CompositeRelation;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use PHPUnit\Framework\TestCase;
-use Prophecy\PhpUnit\ProphecyTrait;
+use ApiPlatform\Core\Tests\ProphecyTrait;
 
 class IdentifierExtractorTest extends TestCase
 {

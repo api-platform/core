@@ -26,7 +26,7 @@ use ApiPlatform\Core\Tests\Fixtures\Foo;
 use ApiPlatform\Core\Tests\Fixtures\NotAResource;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
-use Prophecy\PhpUnit\ProphecyTrait;
+use ApiPlatform\Core\Tests\ProphecyTrait;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 

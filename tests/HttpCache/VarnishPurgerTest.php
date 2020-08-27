@@ -17,7 +17,7 @@ use ApiPlatform\Core\HttpCache\VarnishPurger;
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Psr7\Response;
 use PHPUnit\Framework\TestCase;
-use Prophecy\PhpUnit\ProphecyTrait;
+use ApiPlatform\Core\Tests\ProphecyTrait;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>

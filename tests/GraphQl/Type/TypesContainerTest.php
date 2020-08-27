@@ -17,7 +17,7 @@ use ApiPlatform\Core\GraphQl\Type\TypeNotFoundException;
 use ApiPlatform\Core\GraphQl\Type\TypesContainer;
 use GraphQL\Type\Definition\Type as GraphQLType;
 use PHPUnit\Framework\TestCase;
-use Prophecy\PhpUnit\ProphecyTrait;
+use ApiPlatform\Core\Tests\ProphecyTrait;
 
 /**
  * @author Alan Poulain <contact@alanpoulain.eu>

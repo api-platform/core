@@ -23,7 +23,7 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\UpperCaseIdentifierDummy;
 use Doctrine\Common\Annotations\Reader;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
-use Prophecy\PhpUnit\ProphecyTrait;
+use ApiPlatform\Core\Tests\ProphecyTrait;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>

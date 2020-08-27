@@ -24,7 +24,7 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Serializer\NameConverter\CustomCo
 use Doctrine\Persistence\ManagerRegistry;
 use MongoDB\BSON\Regex;
 use Prophecy\Argument;
-use Prophecy\PhpUnit\ProphecyTrait;
+use ApiPlatform\Core\Tests\ProphecyTrait;
 
 /**
  * @group mongodb

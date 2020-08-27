@@ -16,7 +16,7 @@ namespace ApiPlatform\Core\Tests\GraphQl\Type;
 use ApiPlatform\Core\GraphQl\Type\Definition\TypeInterface;
 use ApiPlatform\Core\GraphQl\Type\TypesFactory;
 use PHPUnit\Framework\TestCase;
-use Prophecy\PhpUnit\ProphecyTrait;
+use ApiPlatform\Core\Tests\ProphecyTrait;
 use Psr\Container\ContainerInterface;
 
 /**

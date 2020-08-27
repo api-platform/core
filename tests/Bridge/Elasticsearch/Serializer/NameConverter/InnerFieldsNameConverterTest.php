@@ -15,7 +15,7 @@ namespace ApiPlatform\Core\Tests\Bridge\Elasticsearch\Serializer\NameConverter;
 
 use ApiPlatform\Core\Bridge\Elasticsearch\Serializer\NameConverter\InnerFieldsNameConverter;
 use PHPUnit\Framework\TestCase;
-use Prophecy\PhpUnit\ProphecyTrait;
+use ApiPlatform\Core\Tests\ProphecyTrait;
 use Symfony\Component\Serializer\NameConverter\AdvancedNameConverterInterface;
 
 class InnerFieldsNameConverterTest extends TestCase
