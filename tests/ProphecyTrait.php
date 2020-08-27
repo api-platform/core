@@ -54,7 +54,7 @@ trait ProphecyTrait
      *
      * @psalm-param class-string|null $classOrInterface
      */
-    protected function prophesize(string $classOrInterface = null): ObjectProphecy
+    protected function prophesize($classOrInterface = null): ObjectProphecy
     {
         if (\is_string($classOrInterface)) {
             \assert($this instanceof TestCase);
