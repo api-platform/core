@@ -118,6 +118,9 @@ jobs:
           mkdir -p /tmp/api-platform/core/vendor
           ln -s /tmp/api-platform/core/vendor vendor
           composer update --no-progress --no-suggest --ansi
+      - name: Install PHPUnit
+        run: |
+          composer require --dev phpunit/phpunit 
       - name: Clear test app cache
         run: |
           mkdir -p /tmp/api-platform/core/var
