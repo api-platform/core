@@ -120,7 +120,7 @@ jobs:
           composer update --no-progress --no-suggest --ansi
       - name: Install PHPUnit
         run: |
-          composer require --dev phpunit/phpunit 
+          SYMFONY_PHPUNIT_VERSION=9.2 vendor/bin/simple-phpunit --version
       - name: Clear test app cache
         run: |
           mkdir -p /tmp/api-platform/core/var
@@ -245,12 +245,8 @@ jobs:
       - name: Enable code coverage
         if: matrix.coverage
         run: echo '::set-env name=COVERAGE::1'
-      - name: Force PHPUnit version
-        if: matrix.php == '7.4'
-        run: echo '::set-env name=SYMFONY_PHPUNIT_VERSION::9.2'
       - name: Run PHPUnit tests
         run: |
-          echo $SYMFONY_PHPUNIT_VERSION
           mkdir -p build/logs/phpunit
           if [ "$COVERAGE" = '1' ]; then
             vendor/bin/simple-phpunit --coverage-clover build/logs/phpunit/clover.xml --log-junit build/logs/phpunit/junit.xml --colors=always

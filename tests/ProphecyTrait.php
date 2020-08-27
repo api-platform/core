@@ -60,7 +60,7 @@ trait ProphecyTrait
     {
         if (
             \is_string($classOrInterface) &&
-            is_callable([$this, 'recordDoubledType']) // Support for PHPUnit 7
+            \is_callable([$this, 'recordDoubledType']) // Support for PHPUnit 7
         ) {
             \assert($this instanceof TestCase);
             $this->recordDoubledType($classOrInterface);
