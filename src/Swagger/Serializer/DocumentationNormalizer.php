@@ -192,7 +192,8 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
             }
 
             foreach ($this->subresourceOperationFactory->create($resourceClass) as $operationId => $subresourceOperation) {
-                $paths[$this->getPath($subresourceOperation['shortNames'][0], $subresourceOperation['route_name'], $subresourceOperation, OperationType::SUBRESOURCE)] = $this->addSubresourceOperation($v3, $subresourceOperation, $definitions, $operationId, $resourceMetadata);
+                $method = $resourceMetadata->getTypedOperationAttribute(OperationType::SUBRESOURCE, $subresourceOperation['operation_name'], 'method', 'GET');
+                $paths[$this->getPath($subresourceOperation['shortNames'][0], $subresourceOperation['route_name'], $subresourceOperation, OperationType::SUBRESOURCE)][strtolower($method)] = $this->addSubresourceOperation($v3, $subresourceOperation, $definitions, $operationId, $resourceMetadata);
             }
         }
 
@@ -470,7 +471,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
             $this->addPaginationParameters($v3, $resourceMetadata, $operationName, $pathOperation);
         }
 
-        return new \ArrayObject(['get' => $pathOperation]);
+        return $pathOperation;
     }
 
     private function updatePostOperation(bool $v3, \ArrayObject $pathOperation, array $requestMimeTypes, array $responseMimeTypes, string $operationType, ResourceMetadata $resourceMetadata, string $resourceClass, string $resourceShortName, string $operationName, \ArrayObject $definitions, \ArrayObject $links): \ArrayObject
