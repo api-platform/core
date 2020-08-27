@@ -137,14 +137,10 @@ jobs:
           SYMFONY_PHPUNIT_VERSION: '9.2'
           SYMFONY_PHPUNIT_DIR: 'vendor/bin/.phpunit'
         run: |
-          pwd
-          mkdir -p /tmp/api-platform/core/vendor/bin/.phpunit
-          ln -s /tmp/api-platform/core/vendor/bin/.phpunit vendor/bin/.phpunit
           vendor/bin/simple-phpunit --version
-          ls vendor/bin/.phpunit
       - name: Run PHPStan analysis
         run: |
-          vendor/bin/phpstan analyse --ansi
+          vendor/bin/phpstan analyse --no-progress --no-interaction --ansi
 
   phpunit:
     name: PHPUnit (PHP ${{ matrix.php }})
