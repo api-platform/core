@@ -24,8 +24,8 @@ use ApiPlatform\Core\Metadata\Property\PropertyNameCollection;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
-use PHPUnit\Framework\TestCase;
 use ApiPlatform\Core\Tests\ProphecyTrait;
+use PHPUnit\Framework\TestCase;
 
 class SchemaFactoryTest extends TestCase
 {

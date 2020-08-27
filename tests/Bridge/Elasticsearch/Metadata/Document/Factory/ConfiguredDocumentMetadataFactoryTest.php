@@ -18,8 +18,8 @@ use ApiPlatform\Core\Bridge\Elasticsearch\Metadata\Document\DocumentMetadata;
 use ApiPlatform\Core\Bridge\Elasticsearch\Metadata\Document\Factory\ConfiguredDocumentMetadataFactory;
 use ApiPlatform\Core\Bridge\Elasticsearch\Metadata\Document\Factory\DocumentMetadataFactoryInterface;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Foo;
-use PHPUnit\Framework\TestCase;
 use ApiPlatform\Core\Tests\ProphecyTrait;
+use PHPUnit\Framework\TestCase;
 
 class ConfiguredDocumentMetadataFactoryTest extends TestCase
 {

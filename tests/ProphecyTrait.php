@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the API Platform project.
+ *
+ * (c) Kévin Dunglas <dunglas@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 declare(strict_types=1);
 
 namespace ApiPlatform\Core\Tests;
@@ -18,6 +27,7 @@ use Prophecy\Prophet;
  * To replace by the official package when we'll drop support for PHP 7.1.
  *
  * @see https://github.com/phpspec/prophecy-phpunit
+ *
  * @copyright Christophe Coevoet <stof@notk.org>
  * @author Christophe Coevoet <stof@notk.org>
  * @mixin TestCase
@@ -42,9 +52,9 @@ trait ProphecyTrait
      * @throws DoubleException
      * @throws InterfaceNotFoundException
      *
-     * @psalm-param class-string|null $type
+     * @psalm-param class-string|null $classOrInterface
      */
-    protected function prophesize(?string $classOrInterface = null): ObjectProphecy
+    protected function prophesize(string $classOrInterface = null): ObjectProphecy
     {
         if (\is_string($classOrInterface)) {
             \assert($this instanceof TestCase);
@@ -59,7 +69,7 @@ trait ProphecyTrait
      */
     protected function verifyProphecyDoubles(): void
     {
-        if ($this->prophet === null) {
+        if (null === $this->prophet) {
             return;
         }
 
@@ -94,6 +104,9 @@ trait ProphecyTrait
         $this->prophecyAssertionsCounted = true;
 
         foreach ($this->prophet->getProphecies() as $objectProphecy) {
+            /**
+             * @var MethodProphecy[] $methodProphecies
+             */
             foreach ($objectProphecy->getMethodProphecies() as $methodProphecies) {
                 foreach ($methodProphecies as $methodProphecy) {
                     \assert($methodProphecy instanceof MethodProphecy);
@@ -109,8 +122,8 @@ trait ProphecyTrait
      */
     private function getProphet(): Prophet
     {
-        if ($this->prophet === null) {
-            $this->prophet = new Prophet;
+        if (null === $this->prophet) {
+            $this->prophet = new Prophet();
         }
 
         return $this->prophet;

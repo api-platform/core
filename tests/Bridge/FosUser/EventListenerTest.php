@@ -15,10 +15,10 @@ namespace ApiPlatform\Core\Tests\Bridge\FosUser;
 
 use ApiPlatform\Core\Bridge\FosUser\EventListener;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\User;
+use ApiPlatform\Core\Tests\ProphecyTrait;
 use FOS\UserBundle\Model\UserInterface;
 use FOS\UserBundle\Model\UserManagerInterface;
 use PHPUnit\Framework\TestCase;
-use ApiPlatform\Core\Tests\ProphecyTrait;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\ViewEvent;
 

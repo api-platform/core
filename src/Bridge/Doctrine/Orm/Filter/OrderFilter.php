@@ -122,6 +122,7 @@ class OrderFilter extends AbstractContextAwareFilter implements OrderFilterInter
         @trigger_error(sprintf('The use of "%s::extractProperties()" is deprecated since 2.2. Use the "filters" key of the context instead.', __CLASS__), E_USER_DEPRECATED);
 
         $properties = $request->query->all()[$this->orderParameterName] ?? null;
+
         return \is_array($properties) ? $properties : [];
     }
 }

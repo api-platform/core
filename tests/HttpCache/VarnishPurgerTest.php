@@ -14,10 +14,10 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\HttpCache;
 
 use ApiPlatform\Core\HttpCache\VarnishPurger;
+use ApiPlatform\Core\Tests\ProphecyTrait;
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Psr7\Response;
 use PHPUnit\Framework\TestCase;
-use ApiPlatform\Core\Tests\ProphecyTrait;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>

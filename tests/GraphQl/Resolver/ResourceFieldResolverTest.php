@@ -17,12 +17,12 @@ use ApiPlatform\Core\Api\IriConverterInterface;
 use ApiPlatform\Core\GraphQl\Resolver\ResourceFieldResolver;
 use ApiPlatform\Core\GraphQl\Serializer\ItemNormalizer;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
+use ApiPlatform\Core\Tests\ProphecyTrait;
 use GraphQL\Type\Definition\FieldDefinition;
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\ResolveInfo;
 use GraphQL\Type\Schema;
 use PHPUnit\Framework\TestCase;
-use ApiPlatform\Core\Tests\ProphecyTrait;
 
 class ResourceFieldResolverTest extends TestCase
 {

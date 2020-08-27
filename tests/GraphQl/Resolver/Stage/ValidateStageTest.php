@@ -16,13 +16,13 @@ namespace ApiPlatform\Core\Tests\GraphQl\Resolver\Stage;
 use ApiPlatform\Core\GraphQl\Resolver\Stage\ValidateStage;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
+use ApiPlatform\Core\Tests\ProphecyTrait;
 use ApiPlatform\Core\Validator\Exception\ValidationException;
 use ApiPlatform\Core\Validator\ValidatorInterface;
 use GraphQL\Error\Error;
 use GraphQL\Type\Definition\ResolveInfo;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
-use ApiPlatform\Core\Tests\ProphecyTrait;
 
 /**
  * @author Alan Poulain <contact@alanpoulain.eu>

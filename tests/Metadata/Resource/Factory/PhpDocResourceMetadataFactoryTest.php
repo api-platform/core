@@ -18,8 +18,8 @@ use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Tests\Fixtures\ClassWithNoDocBlock;
 use ApiPlatform\Core\Tests\Fixtures\DummyEntity;
-use PHPUnit\Framework\TestCase;
 use ApiPlatform\Core\Tests\ProphecyTrait;
+use PHPUnit\Framework\TestCase;
 
 class PhpDocResourceMetadataFactoryTest extends TestCase
 {

@@ -16,8 +16,8 @@ namespace ApiPlatform\Core\Tests\Api;
 use ApiPlatform\Core\Api\FilterCollection;
 use ApiPlatform\Core\Api\FilterCollectionFactory;
 use ApiPlatform\Core\Api\FilterInterface;
-use PHPUnit\Framework\TestCase;
 use ApiPlatform\Core\Tests\ProphecyTrait;
+use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 
 /**

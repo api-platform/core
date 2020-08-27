@@ -24,8 +24,8 @@ use ApiPlatform\Core\Metadata\Property\SubresourceMetadata;
 use ApiPlatform\Core\Tests\Fixtures\DummyResourceInterface;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\FileConfigDummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RelatedDummy;
-use Doctrine\Common\Collections\ArrayCollection;
 use ApiPlatform\Core\Tests\ProphecyTrait;
+use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\PropertyInfo\Type;
 
 /**

@@ -80,10 +80,6 @@ parameters:
 			message: '#Call to method PHPUnit\\Framework\\Assert::assertSame\(\) with 2 and int will always evaluate to false\.#'
 			path: tests/Identifier/Normalizer/IntegerDenormalizerTest.php
 		-
-			message: '#Binary operation "\+" between (float\|int\|)?string and 0 results in an error\.#'
-			path: src/Bridge/Doctrine/Common/Filter/RangeFilterTrait.php
-		# https://github.com/phpstan/phpstan-symfony/issues/27
-		-
 			message: '#Service "api_platform\.json_schema\.schema_factory" is private\.#'
 			path: src/Bridge/Symfony/Bundle/Test/ApiTestAssertionsTrait.php
 		-

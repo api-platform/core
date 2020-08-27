@@ -16,9 +16,9 @@ namespace ApiPlatform\Core\Tests\Metadata\Resource\Factory;
 use ApiPlatform\Core\Metadata\Resource\Factory\AnnotationResourceNameCollectionFactory;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceNameCollection;
+use ApiPlatform\Core\Tests\ProphecyTrait;
 use Doctrine\Common\Annotations\Reader;
 use PHPUnit\Framework\TestCase;
-use ApiPlatform\Core\Tests\ProphecyTrait;
 
 /**
  * @author Antoine Bluchet <soyuka@gmail.com>
