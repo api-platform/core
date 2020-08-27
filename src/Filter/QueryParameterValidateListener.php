@@ -93,7 +93,6 @@ final class QueryParameterValidateListener
 
         if (\is_array($matches[$rootName])) {
             $queryParameter = $request->query->all()[$rootName] ?? null;
-            /* @phpstan-ignore-next-line */
             return \is_array($queryParameter) && isset($queryParameter[array_keys($matches[$rootName])[0]]);
         }
 

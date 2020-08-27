@@ -38,7 +38,6 @@ final class TransformSortingParametersListener
 
         if (
             null === $orderParameter ||
-            /* @phpstan-ignore-next-line */
             \is_array($orderParameter) ||
             'jsonapi' !== $request->getRequestFormat()
         ) {
