@@ -11,7 +11,6 @@
         <ini name="error_reporting" value="-1" />
         <ini name="memory_limit" value="-1" />
         <server name="SYMFONY_DEPRECATIONS_HELPER" value="max[self]=0" />
-        <server name="SYMFONY_PHPUNIT_VERSION" value="9.2" />
         <server name="KERNEL_DIR" value="tests/Fixtures/app/" />
         <server name="KERNEL_CLASS" value="AppKernel" />
         <server name="APP_ENV" value="test" />
