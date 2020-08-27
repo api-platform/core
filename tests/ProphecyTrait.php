@@ -49,14 +49,19 @@ trait ProphecyTrait
     private $prophecyAssertionsCounted = false;
 
     /**
+     * @psalm-param class-string|null $classOrInterface
+     *
+     * @param mixed|null $classOrInterface
+     *
      * @throws DoubleException
      * @throws InterfaceNotFoundException
-     *
-     * @psalm-param class-string|null $classOrInterface
      */
     protected function prophesize($classOrInterface = null): ObjectProphecy
     {
-        if (\is_string($classOrInterface)) {
+        if (
+            \is_string($classOrInterface) &&
+            method_exists($this, 'recordDoubledType')// Support for PHPUnit 7
+        ) {
             \assert($this instanceof TestCase);
             $this->recordDoubledType($classOrInterface);
         }
