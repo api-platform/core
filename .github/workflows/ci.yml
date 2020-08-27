@@ -132,12 +132,18 @@ jobs:
             phpstan-php${{ matrix.php }}-
             phpstan-
         continue-on-error: true
+      - name: Install PHPUnit
+        env:
+          SYMFONY_PHPUNIT_VERSION: '9.2'
+          SYMFONY_PHPUNIT_DIR: 'vendor/bin/.phpunit'
+        run: |
+          pwd
+          mkdir -p /tmp/api-platform/core/simple-phpunit
+          ln -s /tmp/api-platform/core/simple-phpunit vendor/bin/.phpunit
+          vendor/bin/simple-phpunit --version
+          ls vendor/bin/.phpunit
       - name: Run PHPStan analysis
         run: |
-          # Install PHPUnit
-          SYMFONY_PHPUNIT_VERSION=9.2 vendor/bin/simple-phpunit --version
-          ls vendor/bin/.phpunit
-          ls vendor/bin/.phpunit/phpunit-9.2-0/vendor
           vendor/bin/phpstan analyse --ansi
 
   phpunit:
