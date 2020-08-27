@@ -136,6 +136,8 @@ jobs:
         run: |
           # Install PHPUnit
           SYMFONY_PHPUNIT_VERSION=9.2 vendor/bin/simple-phpunit --version
+          ls vendor/bin/.phpunit
+          ls vendor/bin/.phpunit/phpunit-9.2-0/vendor
           vendor/bin/phpstan analyse --ansi
 
   phpunit:
