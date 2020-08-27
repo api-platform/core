@@ -135,7 +135,6 @@ jobs:
       - name: Install PHPUnit
         env:
           SYMFONY_PHPUNIT_VERSION: '9.2'
-          SYMFONY_PHPUNIT_DIR: 'vendor/bin/.phpunit'
         run: |
           vendor/bin/simple-phpunit --version
       - name: Run PHPStan analysis
