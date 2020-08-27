@@ -17,6 +17,7 @@ use ApiPlatform\Core\Bridge\Symfony\Bundle\Test\ApiTestCase;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\Dummy as DummyDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Model\ResourceInterface;
+use ApiPlatform\Core\Tests\PhpUnitPolyfillTrait;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Tools\SchemaTool;
 use PHPUnit\Framework\ExpectationFailedException;
@@ -24,6 +25,8 @@ use PHPUnit\Runner\Version;
 
 class ApiTestCaseTest extends ApiTestCase
 {
+    use PhpUnitPolyfillTrait;
+
     public function testAssertJsonContains(): void
     {
         if (version_compare(Version::id(), '8.0.0', '<')) {

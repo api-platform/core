@@ -15,6 +15,7 @@ namespace ApiPlatform\Core\Tests\Metadata\Extractor;
 
 use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\Metadata\Extractor\YamlExtractor;
+use ApiPlatform\Core\Tests\PhpUnitPolyfillTrait;
 use Generator;
 
 /**
@@ -23,6 +24,8 @@ use Generator;
  */
 class YamlExtractorTestCase extends ExtractorTestCase
 {
+    use PhpUnitPolyfillTrait;
+
     public function testInvalidProperty()
     {
         $this->expectException(InvalidArgumentException::class);
