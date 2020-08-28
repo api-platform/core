@@ -18,6 +18,7 @@ use ApiPlatform\Core\GraphQl\Action\GraphiQlAction;
 use ApiPlatform\Core\GraphQl\Action\GraphQlPlaygroundAction;
 use ApiPlatform\Core\GraphQl\ExecutorInterface;
 use ApiPlatform\Core\GraphQl\Type\SchemaBuilderInterface;
+use ApiPlatform\Core\Tests\ProphecyTrait;
 use GraphQL\Error\DebugFlag;
 use GraphQL\Executor\ExecutionResult;
 use GraphQL\Type\Schema;
@@ -35,6 +36,8 @@ use Twig\Environment as TwigEnvironment;
  */
 class EntrypointActionTest extends TestCase
 {
+    use ProphecyTrait;
+
     /**
      * Hack to avoid transient failing test because of Date header.
      */

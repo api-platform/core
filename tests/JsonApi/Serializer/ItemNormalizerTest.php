@@ -28,6 +28,7 @@ use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\CircularReference;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RelatedDummy;
+use ApiPlatform\Core\Tests\ProphecyTrait;
 use Doctrine\Common\Collections\ArrayCollection;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
@@ -44,6 +45,8 @@ use Symfony\Component\Serializer\SerializerInterface;
  */
 class ItemNormalizerTest extends TestCase
 {
+    use ProphecyTrait;
+
     /**
      * @group legacy
      */

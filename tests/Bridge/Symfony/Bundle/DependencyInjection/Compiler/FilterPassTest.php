@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\Bridge\Symfony\Bundle\DependencyInjection\Compiler;
 
 use ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\Compiler\FilterPass;
+use ApiPlatform\Core\Tests\ProphecyTrait;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
@@ -26,6 +27,8 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class FilterPassTest extends TestCase
 {
+    use ProphecyTrait;
+
     public function testProcess()
     {
         $filterPass = new FilterPass();

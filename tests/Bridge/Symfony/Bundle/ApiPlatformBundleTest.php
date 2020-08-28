@@ -22,6 +22,7 @@ use ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\Compiler\GraphQlM
 use ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\Compiler\GraphQlQueryResolverPass;
 use ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\Compiler\GraphQlTypePass;
 use ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\Compiler\MetadataAwareNameConverterPass;
+use ApiPlatform\Core\Tests\ProphecyTrait;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
@@ -32,6 +33,8 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  */
 class ApiPlatformBundleTest extends TestCase
 {
+    use ProphecyTrait;
+
     public function testBuild()
     {
         $containerProphecy = $this->prophesize(ContainerBuilder::class);

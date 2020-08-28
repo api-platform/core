@@ -17,6 +17,7 @@ use ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Paginator;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\Test\DoctrineMongoDbOdmSetup;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\Dummy;
+use ApiPlatform\Core\Tests\ProphecyTrait;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Doctrine\ODM\MongoDB\Iterator\Iterator;
 use PHPUnit\Framework\TestCase;
@@ -26,6 +27,8 @@ use PHPUnit\Framework\TestCase;
  */
 class PaginatorTest extends TestCase
 {
+    use ProphecyTrait;
+
     /**
      * @dataProvider initializeProvider
      */

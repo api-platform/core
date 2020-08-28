@@ -15,6 +15,7 @@ namespace ApiPlatform\Core\Tests\Hydra\EventListener;
 
 use ApiPlatform\Core\Api\UrlGeneratorInterface;
 use ApiPlatform\Core\Hydra\EventListener\AddLinkHeaderListener;
+use ApiPlatform\Core\Tests\ProphecyTrait;
 use Fig\Link\GenericLinkProvider;
 use Fig\Link\Link;
 use PHPUnit\Framework\TestCase;
@@ -27,6 +28,8 @@ use Symfony\Component\WebLink\HttpHeaderSerializer;
  */
 class AddLinkHeaderListenerTest extends TestCase
 {
+    use ProphecyTrait;
+
     /**
      * @dataProvider provider
      */

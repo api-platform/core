@@ -17,6 +17,7 @@ use ApiPlatform\Core\HttpCache\EventListener\AddHeadersListener;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
+use ApiPlatform\Core\Tests\ProphecyTrait;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -27,6 +28,8 @@ use Symfony\Component\HttpKernel\Event\ResponseEvent;
  */
 class AddHeadersListenerTest extends TestCase
 {
+    use ProphecyTrait;
+
     public function testDoNotSetHeaderWhenMethodNotCacheable()
     {
         $request = new Request([], [], ['_api_resource_class' => Dummy::class, '_api_item_operation_name' => 'get']);

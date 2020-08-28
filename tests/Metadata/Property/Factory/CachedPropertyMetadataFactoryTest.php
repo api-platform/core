@@ -17,6 +17,7 @@ use ApiPlatform\Core\Metadata\Property\Factory\CachedPropertyMetadataFactory;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
+use ApiPlatform\Core\Tests\ProphecyTrait;
 use PHPUnit\Framework\TestCase;
 use Psr\Cache\CacheException;
 use Psr\Cache\CacheItemInterface;
@@ -27,6 +28,8 @@ use Psr\Cache\CacheItemPoolInterface;
  */
 class CachedPropertyMetadataFactoryTest extends TestCase
 {
+    use ProphecyTrait;
+
     public function testCreateWithItemHit()
     {
         $cacheItem = $this->prophesize(CacheItemInterface::class);

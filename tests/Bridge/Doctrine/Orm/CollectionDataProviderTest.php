@@ -19,6 +19,7 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\QueryResultCollectionExtensio
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Core\Exception\RuntimeException;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
+use ApiPlatform\Core\Tests\ProphecyTrait;
 use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\QueryBuilder;
@@ -33,6 +34,8 @@ use Prophecy\Argument;
  */
 class CollectionDataProviderTest extends TestCase
 {
+    use ProphecyTrait;
+
     public function testGetCollection()
     {
         $queryProphecy = $this->prophesize(AbstractQuery::class);

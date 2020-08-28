@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\HttpCache;
 
 use ApiPlatform\Core\HttpCache\VarnishPurger;
+use ApiPlatform\Core\Tests\ProphecyTrait;
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Psr7\Response;
 use PHPUnit\Framework\TestCase;
@@ -23,6 +24,8 @@ use PHPUnit\Framework\TestCase;
  */
 class VarnishPurgerTest extends TestCase
 {
+    use ProphecyTrait;
+
     public function testPurge()
     {
         $clientProphecy1 = $this->prophesize(ClientInterface::class);

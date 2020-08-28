@@ -18,6 +18,7 @@ use ApiPlatform\Core\Documentation\Action\DocumentationAction;
 use ApiPlatform\Core\Documentation\Documentation;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceNameCollection;
+use ApiPlatform\Core\Tests\ProphecyTrait;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
@@ -29,6 +30,8 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class DocumentationActionTest extends TestCase
 {
+    use ProphecyTrait;
+
     public function testyDocumentationAction(): void
     {
         $requestProphecy = $this->prophesize(Request::class);

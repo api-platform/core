@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\Bridge\Symfony\Bundle\DependencyInjection\Compiler;
 
 use ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\Compiler\ElasticsearchClientPass;
+use ApiPlatform\Core\Tests\ProphecyTrait;
 use Elasticsearch\ClientBuilder;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
@@ -27,6 +28,8 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class ElasticsearchClientPassTest extends TestCase
 {
+    use ProphecyTrait;
+
     public function testConstruct()
     {
         self::assertInstanceOf(CompilerPassInterface::class, new ElasticsearchClientPass());

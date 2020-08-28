@@ -17,6 +17,7 @@ use ApiPlatform\Core\Api\ResourceClassResolverInterface;
 use ApiPlatform\Core\DataProvider\PaginatorInterface;
 use ApiPlatform\Core\DataProvider\PartialPaginatorInterface;
 use ApiPlatform\Core\JsonApi\Serializer\CollectionNormalizer;
+use ApiPlatform\Core\Tests\ProphecyTrait;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
@@ -26,6 +27,8 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
  */
 class CollectionNormalizerTest extends TestCase
 {
+    use ProphecyTrait;
+
     public function testSupportsNormalize()
     {
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);

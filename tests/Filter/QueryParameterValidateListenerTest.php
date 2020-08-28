@@ -19,6 +19,7 @@ use ApiPlatform\Core\Filter\QueryParameterValidateListener;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
+use ApiPlatform\Core\Tests\ProphecyTrait;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -26,6 +27,8 @@ use Symfony\Component\HttpKernel\Event\RequestEvent;
 
 class QueryParameterValidateListenerTest extends TestCase
 {
+    use ProphecyTrait;
+
     private $testedInstance;
     private $filterLocatorProphecy;
 

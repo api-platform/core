@@ -24,6 +24,7 @@ use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
+use ApiPlatform\Core\Tests\ProphecyTrait;
 use Doctrine\ORM\Configuration;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
@@ -42,6 +43,8 @@ use Symfony\Component\HttpFoundation\RequestStack;
  */
 class PaginationExtensionTest extends TestCase
 {
+    use ProphecyTrait;
+
     /**
      * @group legacy
      * @expectedDeprecation Passing an instance of "Symfony\Component\HttpFoundation\RequestStack" as second argument of "ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\PaginationExtension" is deprecated since API Platform 2.4 and will not be possible anymore in API Platform 3. Pass an instance of "ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface" instead.

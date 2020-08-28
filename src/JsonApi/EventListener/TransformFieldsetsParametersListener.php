@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\JsonApi\EventListener;
 
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
-use Symfony\Component\HttpFoundation\InputBag;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 
 /**
@@ -36,28 +35,21 @@ final class TransformFieldsetsParametersListener
     {
         $request = $event->getRequest();
 
-        $includeParameter = $request->query->get('include');
-        $fieldsParameter = class_exists(InputBag::class) ? $request->query->all('fields') : $request->query->get('fields');
+        $queryParameters = $request->query->all();
+        $includeParameter = $queryParameters['include'] ?? null;
+        $fieldsParameter = $queryParameters['fields'] ?? null;
 
         if (
-            'jsonapi' !== $request->getRequestFormat() ||
-            !($resourceClass = $request->attributes->get('_api_resource_class')) ||
-            (!$fieldsParameter && !$includeParameter)
-        ) {
-            return;
-        }
-
-        if (
+            (!$fieldsParameter && !$includeParameter) ||
             ($fieldsParameter && !\is_array($fieldsParameter)) ||
-            (!\is_string($includeParameter))
+            (!\is_string($includeParameter)) ||
+            'jsonapi' !== $request->getRequestFormat() ||
+            !($resourceClass = $request->attributes->get('_api_resource_class'))
         ) {
             return;
         }
-
-        $properties = [];
 
         $includeParameter = explode(',', $includeParameter ?? '');
-
         if (!$fieldsParameter) {
             $request->attributes->set('_api_included', $includeParameter);
 
@@ -66,6 +58,7 @@ final class TransformFieldsetsParametersListener
 
         $resourceShortName = $this->resourceMetadataFactory->create($resourceClass)->getShortName();
 
+        $properties = [];
         foreach ($fieldsParameter as $resourceType => $fields) {
             $fields = explode(',', $fields);
 

@@ -31,6 +31,7 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\EmbeddableDummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RelatedDummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\UnknownDummy;
+use ApiPlatform\Core\Tests\ProphecyTrait;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
@@ -50,6 +51,8 @@ use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
  */
 class EagerLoadingExtensionTest extends TestCase
 {
+    use ProphecyTrait;
+
     public function testApplyToCollection()
     {
         $context = ['groups' => ['foo']];

@@ -19,6 +19,7 @@ use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Serializer\ResourceList;
 use ApiPlatform\Core\Serializer\SerializerContextBuilderInterface;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
+use ApiPlatform\Core\Tests\ProphecyTrait;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Symfony\Component\HttpFoundation\Request;
@@ -32,6 +33,8 @@ use Symfony\Component\Serializer\SerializerInterface;
  */
 class SerializeListenerTest extends TestCase
 {
+    use ProphecyTrait;
+
     public function testDoNotSerializeWhenControllerResultIsResponse()
     {
         $serializerProphecy = $this->prophesize(SerializerInterface::class);

@@ -118,6 +118,10 @@ jobs:
           mkdir -p /tmp/api-platform/core/vendor
           ln -s /tmp/api-platform/core/vendor vendor
           composer update --no-progress --no-suggest --ansi
+      - name: Install PHPUnit
+        env:
+          SYMFONY_PHPUNIT_VERSION: '9.2'
+        run: vendor/bin/simple-phpunit --version
       - name: Clear test app cache
         run: |
           mkdir -p /tmp/api-platform/core/var
@@ -133,7 +137,7 @@ jobs:
             phpstan-
         continue-on-error: true
       - name: Run PHPStan analysis
-        run: vendor/bin/phpstan analyse --ansi
+        run: vendor/bin/phpstan analyse --no-progress --no-interaction --ansi
 
   phpunit:
     name: PHPUnit (PHP ${{ matrix.php }})
@@ -234,6 +238,8 @@ jobs:
           mkdir -p /tmp/api-platform/core/vendor
           ln -s /tmp/api-platform/core/vendor vendor
           composer update --no-progress --no-suggest --ansi
+      - name: Install PHPUnit
+        run: vendor/bin/simple-phpunit --version
       - name: Clear test app cache
         run: |
           mkdir -p /tmp/api-platform/core/var
@@ -246,9 +252,9 @@ jobs:
         run: |
           mkdir -p build/logs/phpunit
           if [ "$COVERAGE" = '1' ]; then
-            vendor/bin/phpunit --coverage-clover build/logs/phpunit/clover.xml --log-junit build/logs/phpunit/junit.xml --colors=always
+            vendor/bin/simple-phpunit --coverage-clover build/logs/phpunit/clover.xml --log-junit build/logs/phpunit/junit.xml --colors=always
           else
-            vendor/bin/phpunit --log-junit build/logs/phpunit/junit.xml --colors=always
+            vendor/bin/simple-phpunit --log-junit build/logs/phpunit/junit.xml --colors=always
           fi
       - name: Upload test artifacts
         if: always()
@@ -374,6 +380,8 @@ jobs:
           mkdir -p /tmp/api-platform/core/vendor
           ln -s /tmp/api-platform/core/vendor vendor
           composer update --no-progress --no-suggest --ansi
+      - name: Install PHPUnit
+        run: vendor/bin/simple-phpunit --version
       - name: Clear test app cache
         run: |
           mkdir -p /tmp/api-platform/core/var
@@ -382,6 +390,8 @@ jobs:
       - name: Enable code coverage
         if: matrix.coverage
         run: echo '::set-env name=COVERAGE::1'
+      - name: Install PHPUnit
+        run: vendor/bin/simple-phpunit --version
       - name: Run Behat tests
         run: |
           mkdir -p build/logs/behat
@@ -514,6 +524,8 @@ jobs:
           mkdir -p /tmp/api-platform/core/vendor
           ln -s /tmp/api-platform/core/vendor vendor
           composer update --no-progress --no-suggest --prefer-stable --prefer-lowest --ansi
+      - name: Install PHPUnit
+        run: vendor/bin/simple-phpunit --version
       - name: Clear test app cache
         run: |
           mkdir -p /tmp/api-platform/core/var
@@ -522,7 +534,7 @@ jobs:
       - name: Run PHPUnit tests
         run: |
           mkdir -p build/logs/phpunit
-          vendor/bin/phpunit --log-junit build/logs/phpunit/junit.xml --colors=always
+          vendor/bin/simple-phpunit --log-junit build/logs/phpunit/junit.xml --colors=always
       - name: Upload test artifacts
         if: always()
         uses: actions/upload-artifact@v1
@@ -599,6 +611,8 @@ jobs:
           mkdir -p /tmp/api-platform/core/vendor
           ln -s /tmp/api-platform/core/vendor vendor
           composer update --no-progress --no-suggest --prefer-stable --prefer-lowest --ansi
+      - name: Install PHPUnit
+        run: vendor/bin/simple-phpunit --version
       - name: Clear test app cache
         run: |
           mkdir -p /tmp/api-platform/core/var
@@ -742,6 +756,8 @@ jobs:
           mkdir -p /tmp/api-platform/core/vendor
           ln -s /tmp/api-platform/core/vendor vendor
           composer update --no-progress --no-suggest --ansi
+      - name: Install PHPUnit
+        run: vendor/bin/simple-phpunit --version
       - name: Clear test app cache
         run: |
           mkdir -p /tmp/api-platform/core/var
@@ -862,6 +878,8 @@ jobs:
           mkdir -p /tmp/api-platform/core/vendor
           ln -s /tmp/api-platform/core/vendor vendor
           composer update --no-progress --no-suggest --prefer-stable --prefer-lowest --ansi
+      - name: Install PHPUnit
+        run: vendor/bin/simple-phpunit --version
       - name: Clear test app cache
         run: |
           mkdir -p /tmp/api-platform/core/var
@@ -971,6 +989,8 @@ jobs:
           mkdir -p /tmp/api-platform/core/vendor
           ln -s /tmp/api-platform/core/vendor vendor
           composer update --no-progress --no-suggest --ansi
+      - name: Install PHPUnit
+        run: vendor/bin/simple-phpunit --version
       - name: Clear test app cache
         run: |
           mkdir -p /tmp/api-platform/core/var
@@ -979,7 +999,7 @@ jobs:
       - name: Run PHPUnit tests
         run: |
           mkdir -p build/logs/phpunit
-          vendor/bin/phpunit --log-junit build/logs/phpunit/junit.xml --colors=always
+          vendor/bin/simple-phpunit --log-junit build/logs/phpunit/junit.xml --colors=always
       - name: Upload test artifacts
         if: always()
         uses: actions/upload-artifact@v1
@@ -1080,6 +1100,8 @@ jobs:
           mkdir -p /tmp/api-platform/core/vendor
           ln -s /tmp/api-platform/core/vendor vendor
           composer update --no-progress --no-suggest --ansi
+      - name: Install PHPUnit
+        run: vendor/bin/simple-phpunit --version
       - name: Clear test app cache
         run: |
           mkdir -p /tmp/api-platform/core/var
@@ -1213,6 +1235,8 @@ jobs:
           mkdir -p /tmp/api-platform/core/vendor
           ln -s /tmp/api-platform/core/vendor vendor
           composer update --no-progress --no-suggest --ansi
+      - name: Install PHPUnit
+        run: vendor/bin/simple-phpunit --version
       - name: Clear test app cache
         run: |
           mkdir -p /tmp/api-platform/core/var
@@ -1221,7 +1245,7 @@ jobs:
       - name: Run PHPUnit tests
         run: |
           mkdir -p build/logs/phpunit
-          vendor/bin/phpunit --log-junit build/logs/phpunit/junit.xml --colors=always
+          vendor/bin/simple-phpunit --log-junit build/logs/phpunit/junit.xml --colors=always
       - name: Upload test artifacts
         if: always()
         uses: actions/upload-artifact@v1
@@ -1322,6 +1346,8 @@ jobs:
           mkdir -p /tmp/api-platform/core/vendor
           ln -s /tmp/api-platform/core/vendor vendor
           composer update --no-progress --no-suggest --ansi
+      - name: Install PHPUnit
+        run: vendor/bin/simple-phpunit --version
       - name: Clear test app cache
         run: |
           mkdir -p /tmp/api-platform/core/var
@@ -1463,6 +1489,8 @@ jobs:
           mkdir -p /tmp/api-platform/core/vendor
           ln -s /tmp/api-platform/core/vendor vendor
           composer update --no-progress --no-suggest --ansi
+      - name: Install PHPUnit
+        run: vendor/bin/simple-phpunit --version
       - name: Clear test app cache
         run: |
           mkdir -p /tmp/api-platform/core/var
@@ -1475,9 +1503,9 @@ jobs:
         run: |
           mkdir -p build/logs/phpunit
           if [ "$COVERAGE" = '1' ]; then
-            vendor/bin/phpunit --coverage-clover build/logs/phpunit/clover.xml --log-junit build/logs/phpunit/junit.xml --colors=always --configuration phpunit_mongodb.xml
+            vendor/bin/simple-phpunit --coverage-clover build/logs/phpunit/clover.xml --log-junit build/logs/phpunit/junit.xml --colors=always --configuration phpunit_mongodb.xml
           else
-            vendor/bin/phpunit --log-junit build/logs/phpunit/junit.xml --colors=always --configuration phpunit_mongodb.xml
+            vendor/bin/simple-phpunit --log-junit build/logs/phpunit/junit.xml --colors=always --configuration phpunit_mongodb.xml
           fi
       - name: Upload test artifacts
         if: always()
@@ -1604,6 +1632,8 @@ jobs:
           mkdir -p /tmp/api-platform/core/vendor
           ln -s /tmp/api-platform/core/vendor vendor
           composer update --no-progress --no-suggest --ansi
+      - name: Install PHPUnit
+        run: vendor/bin/simple-phpunit --version
       - name: Clear test app cache
         run: |
           mkdir -p /tmp/api-platform/core/var
@@ -1778,6 +1808,8 @@ jobs:
           mkdir -p /tmp/api-platform/core/vendor
           ln -s /tmp/api-platform/core/vendor vendor
           composer update --no-progress --no-suggest --ansi
+      - name: Install PHPUnit
+        run: vendor/bin/simple-phpunit --version
       - name: Clear test app cache
         run: |
           mkdir -p /tmp/api-platform/core/var
@@ -1790,9 +1822,9 @@ jobs:
         run: |
           mkdir -p build/logs/phpunit
           if [ "$COVERAGE" = '1' ]; then
-            vendor/bin/phpunit --coverage-clover build/logs/phpunit/clover.xml --log-junit build/logs/phpunit/junit.xml --colors=always
+            vendor/bin/simple-phpunit --coverage-clover build/logs/phpunit/clover.xml --log-junit build/logs/phpunit/junit.xml --colors=always
           else
-            vendor/bin/phpunit --log-junit build/logs/phpunit/junit.xml --colors=always
+            vendor/bin/simple-phpunit --log-junit build/logs/phpunit/junit.xml --colors=always
           fi
       - name: Upload test artifacts
         if: always()
@@ -1921,6 +1953,8 @@ jobs:
           mkdir -p /tmp/api-platform/core/vendor
           ln -s /tmp/api-platform/core/vendor vendor
           composer update --no-progress --no-suggest --ansi
+      - name: Install PHPUnit
+        run: vendor/bin/simple-phpunit --version
       - name: Clear test app cache
         run: |
           mkdir -p /tmp/api-platform/core/var
@@ -2008,7 +2042,7 @@ jobs:
       fail-fast: false
     timeout-minutes: 20
     env:
-      SYMFONY_DEPRECATIONS_HELPER: max[total]=5
+      SYMFONY_DEPRECATIONS_HELPER: max[total]=7
     steps:
       - name: Checkout
         uses: actions/checkout@v1
@@ -2062,6 +2096,8 @@ jobs:
           mkdir -p /tmp/api-platform/core/vendor
           ln -s /tmp/api-platform/core/vendor vendor
           composer update --no-progress --no-suggest --ansi
+      - name: Install PHPUnit
+        run: vendor/bin/simple-phpunit --version
       - name: Clear test app cache
         run: |
           mkdir -p /tmp/api-platform/core/var
@@ -2070,7 +2106,7 @@ jobs:
       - name: Run PHPUnit tests
         run: |
           mkdir -p build/logs/phpunit
-          vendor/bin/phpunit --log-junit build/logs/phpunit/junit.xml --colors=always
+          vendor/bin/simple-phpunit --log-junit build/logs/phpunit/junit.xml --colors=always
       - name: Upload test artifacts
         if: always()
         uses: actions/upload-artifact@v1
@@ -2092,7 +2128,7 @@ jobs:
         php:
           - '7.4'
         symfony:
-          - '5.1'
+          - '5.2'
       fail-fast: false
     timeout-minutes: 20
     steps:
@@ -2168,6 +2204,8 @@ jobs:
           symfony_packages=$(composer show symfony/* | tr -s ' ' '\t' | cut -f1-2 | grep -vE 'polyfill|contracts|mercure')
           ! echo "$symfony_packages" | grep -vE "$version_pattern"
         continue-on-error: true
+      - name: Install PHPUnit
+        run: vendor/bin/simple-phpunit --version
       - name: Clear test app cache
         run: |
           mkdir -p /tmp/api-platform/core/var
@@ -2176,7 +2214,7 @@ jobs:
       - name: Run PHPUnit tests
         run: |
           mkdir -p build/logs/phpunit
-          vendor/bin/phpunit --log-junit build/logs/phpunit/junit.xml --colors=always
+          vendor/bin/simple-phpunit --log-junit build/logs/phpunit/junit.xml --colors=always
       - name: Upload test artifacts
         if: always()
         uses: actions/upload-artifact@v1
@@ -2198,7 +2236,7 @@ jobs:
         php:
           - '7.4'
         symfony:
-          - '5.1'
+          - '5.2'
       fail-fast: false
     timeout-minutes: 20
     steps:
@@ -2274,6 +2312,8 @@ jobs:
           symfony_packages=$(composer show symfony/* | tr -s ' ' '\t' | cut -f1-2 | grep -vE 'polyfill|contracts|mercure')
           ! echo "$symfony_packages" | grep -vE "$version_pattern"
         continue-on-error: true
+      - name: Install PHPUnit
+        run: vendor/bin/simple-phpunit --version
       - name: Clear test app cache
         run: |
           mkdir -p /tmp/api-platform/core/var

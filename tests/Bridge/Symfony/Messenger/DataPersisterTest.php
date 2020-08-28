@@ -20,6 +20,7 @@ use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyCar;
+use ApiPlatform\Core\Tests\ProphecyTrait;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Symfony\Component\Messenger\Envelope;
@@ -31,6 +32,8 @@ use Symfony\Component\Messenger\Stamp\HandledStamp;
  */
 class DataPersisterTest extends TestCase
 {
+    use ProphecyTrait;
+
     public function testSupport()
     {
         $metadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);

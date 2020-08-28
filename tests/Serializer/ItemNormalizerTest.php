@@ -24,6 +24,7 @@ use ApiPlatform\Core\Metadata\Property\PropertyNameCollection;
 use ApiPlatform\Core\Serializer\ItemNormalizer;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Dto\OutputDto;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
+use ApiPlatform\Core\Tests\ProphecyTrait;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
@@ -36,6 +37,8 @@ use Symfony\Component\Serializer\SerializerInterface;
  */
 class ItemNormalizerTest extends TestCase
 {
+    use ProphecyTrait;
+
     /**
      * @group legacy
      */

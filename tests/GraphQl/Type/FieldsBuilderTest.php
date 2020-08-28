@@ -28,6 +28,7 @@ use ApiPlatform\Core\Metadata\Property\SubresourceMetadata;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Serializer\NameConverter\CustomConverter;
+use ApiPlatform\Core\Tests\ProphecyTrait;
 use GraphQL\Type\Definition\InputObjectType;
 use GraphQL\Type\Definition\InterfaceType;
 use GraphQL\Type\Definition\NonNull;
@@ -44,6 +45,8 @@ use Symfony\Component\PropertyInfo\Type;
  */
 class FieldsBuilderTest extends TestCase
 {
+    use ProphecyTrait;
+
     /** @var ObjectProphecy */
     private $propertyNameCollectionFactoryProphecy;
 

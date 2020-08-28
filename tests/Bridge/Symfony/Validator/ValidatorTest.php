@@ -16,6 +16,7 @@ namespace ApiPlatform\Core\Tests\Bridge\Symfony\Validator;
 use ApiPlatform\Core\Bridge\Symfony\Validator\Exception\ValidationException;
 use ApiPlatform\Core\Bridge\Symfony\Validator\Validator;
 use ApiPlatform\Core\Tests\Fixtures\DummyEntity;
+use ApiPlatform\Core\Tests\ProphecyTrait;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
@@ -26,6 +27,8 @@ use Symfony\Component\Validator\Validator\ValidatorInterface as SymfonyValidator
  */
 class ValidatorTest extends TestCase
 {
+    use ProphecyTrait;
+
     public function testValid()
     {
         $data = new DummyEntity();

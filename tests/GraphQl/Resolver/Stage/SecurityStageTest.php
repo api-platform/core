@@ -17,6 +17,7 @@ use ApiPlatform\Core\GraphQl\Resolver\Stage\SecurityStage;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Security\ResourceAccessCheckerInterface;
+use ApiPlatform\Core\Tests\ProphecyTrait;
 use GraphQL\Error\Error;
 use GraphQL\Type\Definition\ResolveInfo;
 use PHPUnit\Framework\TestCase;
@@ -28,6 +29,8 @@ use Prophecy\Argument;
  */
 class SecurityStageTest extends TestCase
 {
+    use ProphecyTrait;
+
     /** @var SecurityStage */
     private $securityStage;
     private $resourceMetadataFactoryProphecy;

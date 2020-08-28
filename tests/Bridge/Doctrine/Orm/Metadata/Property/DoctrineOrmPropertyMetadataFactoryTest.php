@@ -17,6 +17,7 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Metadata\Property\DoctrineOrmPropertyMe
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
+use ApiPlatform\Core\Tests\ProphecyTrait;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\Mapping\ClassMetadata;
@@ -28,6 +29,8 @@ use PHPUnit\Framework\TestCase;
  */
 class DoctrineOrmPropertyMetadataFactoryTest extends TestCase
 {
+    use ProphecyTrait;
+
     public function testCreateNoManager()
     {
         $propertyMetadata = new PropertyMetadata();

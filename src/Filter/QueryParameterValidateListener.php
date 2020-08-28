@@ -18,8 +18,6 @@ use ApiPlatform\Core\Exception\FilterValidationException;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Util\RequestAttributesExtractor;
 use Psr\Container\ContainerInterface;
-use Symfony\Component\HttpFoundation\Exception\BadRequestException;
-use Symfony\Component\HttpFoundation\InputBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 
@@ -94,22 +92,11 @@ final class QueryParameterValidateListener
         }
 
         if (\is_array($matches[$rootName])) {
-            $keyName = array_keys($matches[$rootName])[0];
+            $queryParameter = $request->query->all()[$rootName] ?? null;
 
-            // symfony > 5.1
-            if (class_exists(InputBag::class)) {
-                try {
-                    return isset($request->query->all($rootName)[$keyName]);
-                } catch (BadRequestException $e) {
-                    return false;
-                }
-            }
-
-            $queryParameter = $request->query->get($rootName);
-            /* @phpstan-ignore-next-line */
-            return \is_array($queryParameter) && isset($queryParameter[$keyName]);
+            return \is_array($queryParameter) && isset($queryParameter[array_keys($matches[$rootName])[0]]);
         }
 
-        return null !== $request->query->get($rootName);
+        return isset($request->query->all()[$rootName]);
     }
 }

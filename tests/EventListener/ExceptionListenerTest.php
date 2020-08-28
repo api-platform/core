@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\EventListener;
 
 use ApiPlatform\Core\EventListener\ExceptionListener;
+use ApiPlatform\Core\Tests\ProphecyTrait;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Symfony\Component\HttpFoundation\Request;
@@ -27,6 +28,8 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
  */
 class ExceptionListenerTest extends TestCase
 {
+    use ProphecyTrait;
+
     /**
      * @dataProvider getRequest
      */

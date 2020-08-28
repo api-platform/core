@@ -25,6 +25,7 @@ use ApiPlatform\Core\Operation\PathSegmentNameGeneratorInterface;
 use ApiPlatform\Core\Tests\Fixtures\DummyEntity;
 use ApiPlatform\Core\Tests\Fixtures\DummyValidatedEntity;
 use ApiPlatform\Core\Tests\Fixtures\RelatedDummyEntity;
+use ApiPlatform\Core\Tests\ProphecyTrait;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -32,6 +33,8 @@ use PHPUnit\Framework\TestCase;
  */
 class SubresourceOperationFactoryTest extends TestCase
 {
+    use ProphecyTrait;
+
     public function testCreate()
     {
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);

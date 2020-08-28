@@ -20,6 +20,7 @@ use ApiPlatform\Core\DataProvider\RestrictedDataProviderInterface;
 use ApiPlatform\Core\Exception\ResourceClassNotSupportedException;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\CompositePrimitiveItem;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
+use ApiPlatform\Core\Tests\ProphecyTrait;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -29,6 +30,8 @@ use PHPUnit\Framework\TestCase;
  */
 class ChainItemDataProviderTest extends TestCase
 {
+    use ProphecyTrait;
+
     public function testGetItem()
     {
         $dummy = new Dummy();

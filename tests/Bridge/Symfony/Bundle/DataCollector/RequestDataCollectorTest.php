@@ -29,6 +29,7 @@ use ApiPlatform\Core\DataProvider\SubresourceDataProviderInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Tests\Fixtures\DummyEntity;
+use ApiPlatform\Core\Tests\ProphecyTrait;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\HttpFoundation\ParameterBag;
@@ -41,6 +42,8 @@ use Symfony\Component\VarDumper\Cloner\Data;
  */
 class RequestDataCollectorTest extends TestCase
 {
+    use ProphecyTrait;
+
     private $request;
     private $response;
     private $attributes;

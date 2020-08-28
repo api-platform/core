@@ -24,6 +24,7 @@ use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInte
 use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 use ApiPlatform\Core\Metadata\Property\PropertyNameCollection;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\Dummy;
+use ApiPlatform\Core\Tests\ProphecyTrait;
 use Doctrine\ODM\MongoDB\Aggregation\Builder;
 use Doctrine\ODM\MongoDB\Aggregation\Stage\Match;
 use Doctrine\ODM\MongoDB\Iterator\Iterator;
@@ -42,6 +43,8 @@ use PHPUnit\Framework\TestCase;
  */
 class ItemDataProviderTest extends TestCase
 {
+    use ProphecyTrait;
+
     public function testGetItemSingleIdentifier()
     {
         $context = ['foo' => 'bar', 'fetch_data' => true, IdentifierConverterInterface::HAS_IDENTIFIER_CONVERTER => true];

@@ -18,6 +18,7 @@ use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 use ApiPlatform\Core\Tests\Fixtures\DummyIriWithValidationEntity;
 use ApiPlatform\Core\Tests\Fixtures\DummyValidatedEntity;
+use ApiPlatform\Core\Tests\ProphecyTrait;
 use Doctrine\Common\Annotations\AnnotationReader;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
@@ -29,6 +30,8 @@ use Symfony\Component\Validator\Mapping\Loader\AnnotationLoader;
  */
 class ValidatorPropertyMetadataFactoryTest extends TestCase
 {
+    use ProphecyTrait;
+
     private $validatorClassMetadata;
 
     protected function setUp(): void

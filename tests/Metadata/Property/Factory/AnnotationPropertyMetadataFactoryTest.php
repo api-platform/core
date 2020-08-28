@@ -19,6 +19,7 @@ use ApiPlatform\Core\Metadata\Property\Factory\AnnotationPropertyMetadataFactory
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
+use ApiPlatform\Core\Tests\ProphecyTrait;
 use Doctrine\Common\Annotations\Reader;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
@@ -28,6 +29,8 @@ use Prophecy\Argument;
  */
 class AnnotationPropertyMetadataFactoryTest extends TestCase
 {
+    use ProphecyTrait;
+
     /**
      * @dataProvider dependenciesProvider
      */

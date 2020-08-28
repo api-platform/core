@@ -17,6 +17,7 @@ use ApiPlatform\Core\Metadata\Resource\Factory\OperationResourceMetadataFactory;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
+use ApiPlatform\Core\Tests\ProphecyTrait;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -24,6 +25,8 @@ use PHPUnit\Framework\TestCase;
  */
 class OperationResourceMetadataFactoryTest extends TestCase
 {
+    use ProphecyTrait;
+
     /**
      * @dataProvider getMetadata
      */

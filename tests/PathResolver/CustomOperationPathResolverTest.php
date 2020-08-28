@@ -16,6 +16,7 @@ namespace ApiPlatform\Core\Tests\PathResolver;
 use ApiPlatform\Core\Api\OperationType;
 use ApiPlatform\Core\PathResolver\CustomOperationPathResolver;
 use ApiPlatform\Core\PathResolver\OperationPathResolverInterface;
+use ApiPlatform\Core\Tests\ProphecyTrait;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -23,6 +24,8 @@ use PHPUnit\Framework\TestCase;
  */
 class CustomOperationPathResolverTest extends TestCase
 {
+    use ProphecyTrait;
+
     public function testResolveOperationPath()
     {
         $operationPathResolver = new CustomOperationPathResolver($this->prophesize(OperationPathResolverInterface::class)->reveal());

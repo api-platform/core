@@ -27,6 +27,7 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RelatedDummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RelatedOwningDummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\ThirdLevel;
+use ApiPlatform\Core\Tests\ProphecyTrait;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Types\Type as DBALType;
@@ -48,6 +49,8 @@ use Prophecy\Argument;
  */
 class SubresourceDataProviderTest extends TestCase
 {
+    use ProphecyTrait;
+
     private function assertIdentifierManagerMethodCalls($managerProphecy)
     {
         $platformProphecy = $this->prophesize(AbstractPlatform::class);

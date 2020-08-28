@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\Bridge\Symfony\Routing;
 
 use ApiPlatform\Core\Bridge\Symfony\Routing\Router;
+use ApiPlatform\Core\Tests\ProphecyTrait;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Symfony\Component\Routing\Exception\ExceptionInterface as RoutingExceptionInterface;
@@ -26,6 +27,8 @@ use Symfony\Component\Routing\RouterInterface;
  */
 class RouterTest extends TestCase
 {
+    use ProphecyTrait;
+
     public function testContextAccessor()
     {
         $context = new RequestContext();

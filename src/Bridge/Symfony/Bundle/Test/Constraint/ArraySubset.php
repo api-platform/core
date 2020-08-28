@@ -14,7 +14,12 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Bridge\Symfony\Bundle\Test\Constraint;
 
 use PHPUnit\Framework\Constraint\Constraint;
-use SebastianBergmann\Comparator\ComparisonFailure;
+use PHPUnit\SebastianBergmann\Comparator\ComparisonFailure;
+use SebastianBergmann\Comparator\ComparisonFailure as LegacyComparisonFailure;
+
+if (!class_exists(ComparisonFailure::class)) {
+    class_alias(LegacyComparisonFailure::class, ComparisonFailure::class);
+}
 
 /**
  * Constraint that asserts that the array it is evaluated for has a specified subset.
@@ -43,7 +48,7 @@ final class ArraySubset extends Constraint
     /**
      * {@inheritdoc}
      */
-    public function evaluate($other, string $description = '', bool $returnResult = false)
+    public function evaluate($other, string $description = '', bool $returnResult = false): ?bool
     {
         //type cast $other & $this->subset as an array to allow
         //support in standard array functions.

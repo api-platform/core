@@ -24,6 +24,7 @@ use ApiPlatform\Core\JsonLd\ContextBuilderInterface;
 use ApiPlatform\Core\Serializer\AbstractItemNormalizer;
 use ApiPlatform\Core\Tests\Fixtures\Foo;
 use ApiPlatform\Core\Tests\Fixtures\NotAResource;
+use ApiPlatform\Core\Tests\ProphecyTrait;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
@@ -35,6 +36,8 @@ use Symfony\Component\Serializer\SerializerInterface;
  */
 class CollectionNormalizerTest extends TestCase
 {
+    use ProphecyTrait;
+
     public function testSupportsNormalize()
     {
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);

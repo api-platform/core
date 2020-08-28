@@ -15,6 +15,7 @@ namespace ApiPlatform\Core\Tests\Bridge\Doctrine\EventListener;
 
 use ApiPlatform\Core\Bridge\Doctrine\EventListener\WriteListener;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
+use ApiPlatform\Core\Tests\ProphecyTrait;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\ObjectManager;
 use PHPUnit\Framework\TestCase;
@@ -27,6 +28,8 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
  */
 class WriteListenerTest extends TestCase
 {
+    use ProphecyTrait;
+
     /**
      * @expectedDeprecation The ApiPlatform\Core\Bridge\Doctrine\EventListener\WriteListener class is deprecated since version 2.2 and will be removed in 3.0. Use the ApiPlatform\Core\EventListener\WriteListener class instead.
      */

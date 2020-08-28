@@ -16,6 +16,7 @@ namespace ApiPlatform\Core\Tests\Bridge\Doctrine\Common;
 use ApiPlatform\Core\Bridge\Doctrine\Common\DataPersister;
 use ApiPlatform\Core\DataPersister\DataPersisterInterface;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
+use ApiPlatform\Core\Tests\ProphecyTrait;
 use Doctrine\ODM\MongoDB\Mapping\ClassMetadata;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\Persistence\ManagerRegistry;
@@ -29,6 +30,8 @@ use Prophecy\Prediction\NoCallsPrediction;
  */
 class DataPersisterTest extends TestCase
 {
+    use ProphecyTrait;
+
     public function testConstruct()
     {
         $this->assertInstanceOf(DataPersisterInterface::class, new DataPersister($this->prophesize(ManagerRegistry::class)->reveal()));

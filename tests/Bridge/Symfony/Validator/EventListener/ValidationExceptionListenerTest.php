@@ -15,6 +15,7 @@ namespace ApiPlatform\Core\Tests\Bridge\Symfony\Validator\EventListener;
 
 use ApiPlatform\Core\Bridge\Symfony\Validator\EventListener\ValidationExceptionListener;
 use ApiPlatform\Core\Bridge\Symfony\Validator\Exception\ValidationException;
+use ApiPlatform\Core\Tests\ProphecyTrait;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Symfony\Component\HttpFoundation\Request;
@@ -28,6 +29,8 @@ use Symfony\Component\Validator\ConstraintViolationList;
  */
 class ValidationExceptionListenerTest extends TestCase
 {
+    use ProphecyTrait;
+
     public function testNotValidationException()
     {
         $eventProphecy = $this->prophesize(ExceptionEvent::class);

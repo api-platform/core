@@ -22,6 +22,7 @@ use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 use ApiPlatform\Core\Metadata\Property\PropertyNameCollection;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\Dummy as DummyDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
+use ApiPlatform\Core\Tests\ProphecyTrait;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Types\Type as DBALType;
@@ -36,6 +37,8 @@ use Ramsey\Uuid\Doctrine\UuidType;
 
 class IdentifierManagerTraitTest extends TestCase
 {
+    use ProphecyTrait;
+
     private function getIdentifierManagerTraitImpl(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory)
     {
         return new class($propertyNameCollectionFactory, $propertyMetadataFactory) {

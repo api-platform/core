@@ -30,6 +30,7 @@ use ApiPlatform\Core\PathResolver\CustomOperationPathResolver;
 use ApiPlatform\Core\PathResolver\OperationPathResolver;
 use ApiPlatform\Core\Tests\Fixtures\DummyEntity;
 use ApiPlatform\Core\Tests\Fixtures\RelatedDummyEntity;
+use ApiPlatform\Core\Tests\ProphecyTrait;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -43,6 +44,8 @@ use Symfony\Component\Routing\Route;
  */
 class ApiLoaderTest extends TestCase
 {
+    use ProphecyTrait;
+
     public function testApiLoader()
     {
         $resourceMetadata = new ResourceMetadata();

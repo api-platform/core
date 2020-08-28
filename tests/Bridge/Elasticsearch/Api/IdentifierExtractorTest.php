@@ -19,10 +19,13 @@ use ApiPlatform\Core\Bridge\Elasticsearch\Api\IdentifierExtractorInterface;
 use ApiPlatform\Core\Bridge\Elasticsearch\Exception\NonUniqueIdentifierException;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\CompositeRelation;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
+use ApiPlatform\Core\Tests\ProphecyTrait;
 use PHPUnit\Framework\TestCase;
 
 class IdentifierExtractorTest extends TestCase
 {
+    use ProphecyTrait;
+
     public function testConstruct()
     {
         self::assertInstanceOf(

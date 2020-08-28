@@ -34,7 +34,7 @@ class YamlExtractorTestCase extends ExtractorTestCase
     public function testParseException()
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessageRegExp('/Unable to parse in ".+\\/\\.\\.\\/\\.\\.\\/Fixtures\\/FileConfigurations\\/parse_exception.yml"/');
+        $this->expectExceptionMessageMatches('/Unable to parse in ".+\\/\\.\\.\\/\\.\\.\\/Fixtures\\/FileConfigurations\\/parse_exception.yml"/');
 
         (new YamlExtractor([__DIR__.'/../../Fixtures/FileConfigurations/parse_exception.yml']))->getResources();
     }
@@ -49,7 +49,7 @@ class YamlExtractorTestCase extends ExtractorTestCase
 
             $this->fail('Expected exception to be thrown.');
         } catch (\InvalidArgumentException $exception) {
-            $this->assertRegExp(
+            $this->assertMatchesRegularExpression(
                 $exceptionRegex,
                 $exception->getMessage()
             );

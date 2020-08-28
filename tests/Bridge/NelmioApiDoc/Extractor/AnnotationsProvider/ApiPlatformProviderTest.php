@@ -25,6 +25,7 @@ use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Metadata\Resource\ResourceNameCollection;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RelatedDummy;
+use ApiPlatform\Core\Tests\ProphecyTrait;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Nelmio\ApiDocBundle\Extractor\AnnotationsProviderInterface;
 use PHPUnit\Framework\TestCase;
@@ -39,6 +40,8 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
  */
 class ApiPlatformProviderTest extends TestCase
 {
+    use ProphecyTrait;
+
     /**
      * @expectedDeprecation The ApiPlatform\Core\Bridge\NelmioApiDoc\Extractor\AnnotationsProvider\ApiPlatformProvider class is deprecated since version 2.2 and will be removed in 3.0. NelmioApiDocBundle 3 has native support for API Platform.
      */
