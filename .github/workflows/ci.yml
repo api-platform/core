@@ -135,11 +135,9 @@ jobs:
       - name: Install PHPUnit
         env:
           SYMFONY_PHPUNIT_VERSION: '9.2'
-        run: |
-          vendor/bin/simple-phpunit --version
+        run: vendor/bin/simple-phpunit --version
       - name: Run PHPStan analysis
-        run: |
-          vendor/bin/phpstan analyse --no-progress --no-interaction --ansi
+        run: vendor/bin/phpstan analyse --no-progress --no-interaction --ansi
 
   phpunit:
     name: PHPUnit (PHP ${{ matrix.php }})
@@ -388,6 +386,10 @@ jobs:
       - name: Enable code coverage
         if: matrix.coverage
         run: echo '::set-env name=COVERAGE::1'
+      - name: Install PHPUnit
+        env:
+          SYMFONY_PHPUNIT_VERSION: '9.2'
+        run: vendor/bin/simple-phpunit --version
       - name: Run Behat tests
         run: |
           mkdir -p build/logs/behat
