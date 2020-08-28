@@ -313,7 +313,6 @@ class ApiPlatformExtensionTest extends TestCase
 
     /**
      * @group legacy
-     * @expectedDeprecation Enabling the NelmioApiDocBundle integration has been deprecated in 2.2 and will be removed in 3.0. NelmioApiDocBundle 3 has native support for API Platform.
      */
     public function testEnableNelmioApiDoc()
     {
