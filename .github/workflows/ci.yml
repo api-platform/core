@@ -118,6 +118,10 @@ jobs:
           mkdir -p /tmp/api-platform/core/vendor
           ln -s /tmp/api-platform/core/vendor vendor
           composer update --no-progress --no-suggest --ansi
+      - name: Install PHPUnit
+        env:
+          SYMFONY_PHPUNIT_VERSION: '9.2'
+        run: vendor/bin/simple-phpunit --version
       - name: Clear test app cache
         run: |
           mkdir -p /tmp/api-platform/core/var
@@ -132,10 +136,6 @@ jobs:
             phpstan-php${{ matrix.php }}-
             phpstan-
         continue-on-error: true
-      - name: Install PHPUnit
-        env:
-          SYMFONY_PHPUNIT_VERSION: '9.2'
-        run: vendor/bin/simple-phpunit --version
       - name: Run PHPStan analysis
         run: vendor/bin/phpstan analyse --no-progress --no-interaction --ansi
 
@@ -238,6 +238,8 @@ jobs:
           mkdir -p /tmp/api-platform/core/vendor
           ln -s /tmp/api-platform/core/vendor vendor
           composer update --no-progress --no-suggest --ansi
+      - name: Install PHPUnit
+        run: vendor/bin/simple-phpunit --version
       - name: Clear test app cache
         run: |
           mkdir -p /tmp/api-platform/core/var
@@ -378,6 +380,8 @@ jobs:
           mkdir -p /tmp/api-platform/core/vendor
           ln -s /tmp/api-platform/core/vendor vendor
           composer update --no-progress --no-suggest --ansi
+      - name: Install PHPUnit
+        run: vendor/bin/simple-phpunit --version
       - name: Clear test app cache
         run: |
           mkdir -p /tmp/api-platform/core/var
@@ -387,8 +391,6 @@ jobs:
         if: matrix.coverage
         run: echo '::set-env name=COVERAGE::1'
       - name: Install PHPUnit
-        env:
-          SYMFONY_PHPUNIT_VERSION: '9.2'
         run: vendor/bin/simple-phpunit --version
       - name: Run Behat tests
         run: |
@@ -522,6 +524,8 @@ jobs:
           mkdir -p /tmp/api-platform/core/vendor
           ln -s /tmp/api-platform/core/vendor vendor
           composer update --no-progress --no-suggest --prefer-stable --prefer-lowest --ansi
+      - name: Install PHPUnit
+        run: vendor/bin/simple-phpunit --version
       - name: Clear test app cache
         run: |
           mkdir -p /tmp/api-platform/core/var
@@ -607,6 +611,8 @@ jobs:
           mkdir -p /tmp/api-platform/core/vendor
           ln -s /tmp/api-platform/core/vendor vendor
           composer update --no-progress --no-suggest --prefer-stable --prefer-lowest --ansi
+      - name: Install PHPUnit
+        run: vendor/bin/simple-phpunit --version
       - name: Clear test app cache
         run: |
           mkdir -p /tmp/api-platform/core/var
@@ -750,6 +756,8 @@ jobs:
           mkdir -p /tmp/api-platform/core/vendor
           ln -s /tmp/api-platform/core/vendor vendor
           composer update --no-progress --no-suggest --ansi
+      - name: Install PHPUnit
+        run: vendor/bin/simple-phpunit --version
       - name: Clear test app cache
         run: |
           mkdir -p /tmp/api-platform/core/var
@@ -870,6 +878,8 @@ jobs:
           mkdir -p /tmp/api-platform/core/vendor
           ln -s /tmp/api-platform/core/vendor vendor
           composer update --no-progress --no-suggest --prefer-stable --prefer-lowest --ansi
+      - name: Install PHPUnit
+        run: vendor/bin/simple-phpunit --version
       - name: Clear test app cache
         run: |
           mkdir -p /tmp/api-platform/core/var
@@ -979,6 +989,8 @@ jobs:
           mkdir -p /tmp/api-platform/core/vendor
           ln -s /tmp/api-platform/core/vendor vendor
           composer update --no-progress --no-suggest --ansi
+      - name: Install PHPUnit
+        run: vendor/bin/simple-phpunit --version
       - name: Clear test app cache
         run: |
           mkdir -p /tmp/api-platform/core/var
@@ -1088,6 +1100,8 @@ jobs:
           mkdir -p /tmp/api-platform/core/vendor
           ln -s /tmp/api-platform/core/vendor vendor
           composer update --no-progress --no-suggest --ansi
+      - name: Install PHPUnit
+        run: vendor/bin/simple-phpunit --version
       - name: Clear test app cache
         run: |
           mkdir -p /tmp/api-platform/core/var
@@ -1221,6 +1235,8 @@ jobs:
           mkdir -p /tmp/api-platform/core/vendor
           ln -s /tmp/api-platform/core/vendor vendor
           composer update --no-progress --no-suggest --ansi
+      - name: Install PHPUnit
+        run: vendor/bin/simple-phpunit --version
       - name: Clear test app cache
         run: |
           mkdir -p /tmp/api-platform/core/var
@@ -1330,6 +1346,8 @@ jobs:
           mkdir -p /tmp/api-platform/core/vendor
           ln -s /tmp/api-platform/core/vendor vendor
           composer update --no-progress --no-suggest --ansi
+      - name: Install PHPUnit
+        run: vendor/bin/simple-phpunit --version
       - name: Clear test app cache
         run: |
           mkdir -p /tmp/api-platform/core/var
@@ -1471,6 +1489,8 @@ jobs:
           mkdir -p /tmp/api-platform/core/vendor
           ln -s /tmp/api-platform/core/vendor vendor
           composer update --no-progress --no-suggest --ansi
+      - name: Install PHPUnit
+        run: vendor/bin/simple-phpunit --version
       - name: Clear test app cache
         run: |
           mkdir -p /tmp/api-platform/core/var
@@ -1612,6 +1632,8 @@ jobs:
           mkdir -p /tmp/api-platform/core/vendor
           ln -s /tmp/api-platform/core/vendor vendor
           composer update --no-progress --no-suggest --ansi
+      - name: Install PHPUnit
+        run: vendor/bin/simple-phpunit --version
       - name: Clear test app cache
         run: |
           mkdir -p /tmp/api-platform/core/var
@@ -1786,6 +1808,8 @@ jobs:
           mkdir -p /tmp/api-platform/core/vendor
           ln -s /tmp/api-platform/core/vendor vendor
           composer update --no-progress --no-suggest --ansi
+      - name: Install PHPUnit
+        run: vendor/bin/simple-phpunit --version
       - name: Clear test app cache
         run: |
           mkdir -p /tmp/api-platform/core/var
@@ -1929,6 +1953,8 @@ jobs:
           mkdir -p /tmp/api-platform/core/vendor
           ln -s /tmp/api-platform/core/vendor vendor
           composer update --no-progress --no-suggest --ansi
+      - name: Install PHPUnit
+        run: vendor/bin/simple-phpunit --version
       - name: Clear test app cache
         run: |
           mkdir -p /tmp/api-platform/core/var
@@ -2070,6 +2096,8 @@ jobs:
           mkdir -p /tmp/api-platform/core/vendor
           ln -s /tmp/api-platform/core/vendor vendor
           composer update --no-progress --no-suggest --ansi
+      - name: Install PHPUnit
+        run: vendor/bin/simple-phpunit --version
       - name: Clear test app cache
         run: |
           mkdir -p /tmp/api-platform/core/var
@@ -2176,6 +2204,8 @@ jobs:
           symfony_packages=$(composer show symfony/* | tr -s ' ' '\t' | cut -f1-2 | grep -vE 'polyfill|contracts|mercure')
           ! echo "$symfony_packages" | grep -vE "$version_pattern"
         continue-on-error: true
+      - name: Install PHPUnit
+        run: vendor/bin/simple-phpunit --version
       - name: Clear test app cache
         run: |
           mkdir -p /tmp/api-platform/core/var
@@ -2282,6 +2312,8 @@ jobs:
           symfony_packages=$(composer show symfony/* | tr -s ' ' '\t' | cut -f1-2 | grep -vE 'polyfill|contracts|mercure')
           ! echo "$symfony_packages" | grep -vE "$version_pattern"
         continue-on-error: true
+      - name: Install PHPUnit
+        run: vendor/bin/simple-phpunit --version
       - name: Clear test app cache
         run: |
           mkdir -p /tmp/api-platform/core/var
