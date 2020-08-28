@@ -14,11 +14,11 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Doctrine\Generator;
 
 use Doctrine\ODM\MongoDB\DocumentManager;
-use Doctrine\ODM\MongoDB\Id\AbstractIdGenerator;
+use Doctrine\ODM\MongoDB\Id\IdGenerator;
 
-class DocumentUuidGenerator extends AbstractIdGenerator
+class DocumentUuidGenerator implements IdGenerator
 {
-    public function generate(DocumentManager $dm, $document): Uuid
+    public function generate(DocumentManager $dm, object $document): Uuid
     {
         return new Uuid();
     }
