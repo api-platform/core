@@ -2,18 +2,22 @@
 
 ## 2.5.7
 
-* Doctrine: Fix missing ManagerRegistry class (#3684)
-* Swagger: Allow subresources context to be added (#3685) 
-* Swagger: Fix pagination documentation on subresources (#3678)
-* Doctrine: Order filter doesn't throw anymore with numeric key (#3673 #3687)
-* Subresource: Fix query when using a custom identifier (#3529 and #3671)
+* Compatibility with Symfony 5.1 (#3589 and #3688)
+* Resource `Cache-Control` HTTP header can be private (#3543)
+* Doctrine: Fix missing `ManagerRegistry` class (#3684)
+* Doctrine: Order filter doesn't throw anymore with numeric key (#3673 and #3687)
 * Doctrine: Fix ODM check change tracking deferred (#3629)
+* Doctrine: Allow 2inflector version 2.0 (#3607)
+* OpenAPI: Allow subresources context to be added (#3685) 
+* OpenAPI: Fix pagination documentation on subresources (#3678)
+* Subresource: Fix query when using a custom identifier (#3529 and #3671)
 * GraphQL: Fix relation types without Doctrine (#3591)
-* HTTP: Resource Cache-Control HTTP header can be private (#3543)
-* GraphQL: Compatibility with graphql-php ^14.0 (#3621 and #3654)
-* Doctrine: Allow 2.0 inflector (#3607)
-* Symfony: Handle 5.1 deprecations (#3589)
-* GraphQL: Fix DTO relations (#3594) 
+* GraphQL: Fix DTO relations (#3594)
+* GraphQL: Compatibility with graphql-php version 14 (#3621 and #3654)
+* Docs: Upgrade Swagger UI to version 3.32.5 (#3693)
+* Docs:Upgrade ReDoc to version 2.0.0-rc.40 (#3693)
+* Docs:Upgrade GraphiQL to version 1.0.3 (#3693)
+* Docs:Upgrade GraphQL Playground to version 1.7.23 (#3693)
 
 ## 2.5.6
 
