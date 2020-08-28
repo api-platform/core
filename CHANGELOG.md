@@ -10,7 +10,7 @@
 * Doctrine: Fix ODM check change tracking deferred (#3629)
 * GraphQL: Fix relation types without Doctrine (#3591)
 * HTTP: Resource Cache-Control HTTP header can be private (#3543)
-* GraphQL: Use graphql-php ^14.0 (#3621 and #3654)
+* GraphQL: Compatibility with graphql-php ^14.0 (#3621 and #3654)
 * Doctrine: Allow 2.0 inflector (#3607)
 * Symfony: Handle 5.1 deprecations (#3589)
 * GraphQL: Fix DTO relations (#3594) 
