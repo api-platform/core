@@ -46,6 +46,7 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyPropertyWithDefaultValue;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Question;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RelatedDummy;
+use ApiPlatform\Core\Tests\ProphecyTrait;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Psr\Container\ContainerInterface;
@@ -63,6 +64,8 @@ use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
  */
 class DocumentationNormalizerV2Test extends TestCase
 {
+    use ProphecyTrait;
+
     private const OPERATION_FORMATS = [
         'input_formats' => ['jsonld' => ['application/ld+json']],
         'output_formats' => ['jsonld' => ['application/ld+json']],
@@ -2266,7 +2269,7 @@ class DocumentationNormalizerV2Test extends TestCase
                         ],
                     ]),
                 ],
-                '/api/questions/{id}/answer' => new \ArrayObject([
+                '/api/questions/{id}/answer' => [
                     'get' => new \ArrayObject([
                         'tags' => ['Answer', 'Question'],
                         'operationId' => 'api_questions_answer_get_subresource',
@@ -2288,7 +2291,7 @@ class DocumentationNormalizerV2Test extends TestCase
                             ],
                         ],
                     ]),
-                ]),
+                ],
             ]),
             'definitions' => new \ArrayObject([
                 'Question' => new \ArrayObject([

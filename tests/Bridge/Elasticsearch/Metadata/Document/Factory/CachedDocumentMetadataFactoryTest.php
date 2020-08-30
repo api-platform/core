@@ -18,6 +18,7 @@ use ApiPlatform\Core\Bridge\Elasticsearch\Metadata\Document\DocumentMetadata;
 use ApiPlatform\Core\Bridge\Elasticsearch\Metadata\Document\Factory\CachedDocumentMetadataFactory;
 use ApiPlatform\Core\Bridge\Elasticsearch\Metadata\Document\Factory\DocumentMetadataFactoryInterface;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Foo;
+use ApiPlatform\Core\Tests\ProphecyTrait;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Psr\Cache\CacheItemInterface;
@@ -26,6 +27,8 @@ use Symfony\Component\Cache\Exception\CacheException;
 
 class CachedDocumentMetadataFactoryTest extends TestCase
 {
+    use ProphecyTrait;
+
     public function testConstruct()
     {
         self::assertInstanceOf(

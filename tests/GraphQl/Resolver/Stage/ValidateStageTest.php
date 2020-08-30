@@ -16,6 +16,7 @@ namespace ApiPlatform\Core\Tests\GraphQl\Resolver\Stage;
 use ApiPlatform\Core\GraphQl\Resolver\Stage\ValidateStage;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
+use ApiPlatform\Core\Tests\ProphecyTrait;
 use ApiPlatform\Core\Validator\Exception\ValidationException;
 use ApiPlatform\Core\Validator\ValidatorInterface;
 use GraphQL\Type\Definition\ResolveInfo;
@@ -27,6 +28,8 @@ use Prophecy\Argument;
  */
 class ValidateStageTest extends TestCase
 {
+    use ProphecyTrait;
+
     /** @var ValidateStage */
     private $validateStage;
     private $resourceMetadataFactoryProphecy;

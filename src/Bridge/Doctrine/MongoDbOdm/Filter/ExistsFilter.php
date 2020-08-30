@@ -15,9 +15,9 @@ namespace ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Filter;
 
 use ApiPlatform\Core\Bridge\Doctrine\Common\Filter\ExistsFilterInterface;
 use ApiPlatform\Core\Bridge\Doctrine\Common\Filter\ExistsFilterTrait;
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ODM\MongoDB\Aggregation\Builder;
 use Doctrine\ODM\MongoDB\Mapping\ClassMetadata;
+use Doctrine\Persistence\ManagerRegistry;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 

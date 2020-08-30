@@ -17,6 +17,7 @@ use ApiPlatform\Core\Api\OperationType;
 use ApiPlatform\Core\Bridge\Symfony\Routing\CachedRouteNameResolver;
 use ApiPlatform\Core\Bridge\Symfony\Routing\RouteNameResolverInterface;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
+use ApiPlatform\Core\Tests\ProphecyTrait;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Psr\Cache\CacheException;
@@ -28,6 +29,8 @@ use Psr\Cache\CacheItemPoolInterface;
  */
 class CachedRouteNameResolverTest extends TestCase
 {
+    use ProphecyTrait;
+
     public function testConstruct()
     {
         $cacheItemPoolProphecy = $this->prophesize(CacheItemPoolInterface::class);

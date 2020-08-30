@@ -27,6 +27,7 @@ install:
   - echo memory_limit=3G >> php.ini
   - cd %APPVEYOR_BUILD_FOLDER%
   - composer install --no-progress --no-suggest --no-interaction
+  - vendor\bin\simple-phpunit --version
 
 services:
   - mongodb
@@ -35,4 +36,4 @@ test_script:
   - cd %APPVEYOR_BUILD_FOLDER%
   - php vendor\behat\behat\bin\behat --format=progress --suite=default --no-interaction
   - rmdir tests\Fixtures\app\var\cache /s /q
-  - php vendor\phpunit\phpunit\phpunit
+  - php vendor\bin\simple-phpunit

@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\Problem\Serializer;
 
 use ApiPlatform\Core\Problem\Serializer\ConstraintViolationListNormalizer;
+use ApiPlatform\Core\Tests\ProphecyTrait;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
@@ -26,6 +27,8 @@ use Symfony\Component\Validator\ConstraintViolationList;
  */
 class ConstraintViolationNormalizerTest extends TestCase
 {
+    use ProphecyTrait;
+
     public function testSupportNormalization()
     {
         $nameConverterProphecy = $this->prophesize(NameConverterInterface::class);

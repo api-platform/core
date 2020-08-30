@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\JsonApi\EventListener;
 
 use ApiPlatform\Core\JsonApi\EventListener\TransformPaginationParametersListener;
+use ApiPlatform\Core\Tests\ProphecyTrait;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
@@ -23,6 +24,8 @@ use Symfony\Component\HttpKernel\Event\RequestEvent;
  */
 class TransformPaginationParametersListenerTest extends TestCase
 {
+    use ProphecyTrait;
+
     private $listener;
 
     protected function setUp(): void

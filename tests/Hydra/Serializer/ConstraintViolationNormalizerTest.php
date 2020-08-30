@@ -15,6 +15,7 @@ namespace ApiPlatform\Core\Tests\Hydra\Serializer;
 
 use ApiPlatform\Core\Api\UrlGeneratorInterface;
 use ApiPlatform\Core\Hydra\Serializer\ConstraintViolationListNormalizer;
+use ApiPlatform\Core\Tests\ProphecyTrait;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
@@ -27,6 +28,8 @@ use Symfony\Component\Validator\ConstraintViolationList;
  */
 class ConstraintViolationNormalizerTest extends TestCase
 {
+    use ProphecyTrait;
+
     public function testSupportNormalization()
     {
         $urlGeneratorProphecy = $this->prophesize(UrlGeneratorInterface::class);

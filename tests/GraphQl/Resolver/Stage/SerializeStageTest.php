@@ -20,6 +20,7 @@ use ApiPlatform\Core\GraphQl\Serializer\ItemNormalizer;
 use ApiPlatform\Core\GraphQl\Serializer\SerializerContextBuilderInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
+use ApiPlatform\Core\Tests\ProphecyTrait;
 use GraphQL\Type\Definition\ResolveInfo;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
@@ -30,6 +31,8 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
  */
 class SerializeStageTest extends TestCase
 {
+    use ProphecyTrait;
+
     private $resourceMetadataFactoryProphecy;
     private $normalizerProphecy;
     private $serializerContextBuilderProphecy;

@@ -17,12 +17,15 @@ use ApiPlatform\Core\Bridge\Elasticsearch\DataProvider\Paginator;
 use ApiPlatform\Core\Bridge\Elasticsearch\Serializer\ItemNormalizer;
 use ApiPlatform\Core\DataProvider\PaginatorInterface;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Foo;
+use ApiPlatform\Core\Tests\ProphecyTrait;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
 class PaginatorTest extends TestCase
 {
+    use ProphecyTrait;
+
     private const DOCUMENTS = [
         'hits' => [
             'total' => 8,

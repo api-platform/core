@@ -26,6 +26,7 @@ use ApiPlatform\Core\Tests\Fixtures\NotAResource;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyCar;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyFriend;
+use ApiPlatform\Core\Tests\ProphecyTrait;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\UnitOfWork;
@@ -39,6 +40,8 @@ use Symfony\Component\Serializer\SerializerInterface;
  */
 class PublishMercureUpdatesListenerTest extends TestCase
 {
+    use ProphecyTrait;
+
     public function testLegacyPublishUpdate(): void
     {
         if (method_exists(Update::class, 'isPrivate')) {

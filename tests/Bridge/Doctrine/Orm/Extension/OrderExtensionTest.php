@@ -19,6 +19,7 @@ use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\EmbeddedDummy;
+use ApiPlatform\Core\Tests\ProphecyTrait;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\QueryBuilder;
@@ -29,6 +30,8 @@ use PHPUnit\Framework\TestCase;
  */
 class OrderExtensionTest extends TestCase
 {
+    use ProphecyTrait;
+
     public function testApplyToCollectionWithValidOrder()
     {
         $queryBuilderProphecy = $this->prophesize(QueryBuilder::class);

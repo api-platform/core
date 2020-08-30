@@ -17,10 +17,13 @@ use ApiPlatform\Core\Metadata\Resource\Factory\InputOutputResourceMetadataFactor
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Tests\Fixtures\DummyEntity;
+use ApiPlatform\Core\Tests\ProphecyTrait;
 use PHPUnit\Framework\TestCase;
 
 class InputOutputResourceMetadataFactoryTest extends TestCase
 {
+    use ProphecyTrait;
+
     /**
      * @dataProvider getAttributes
      */

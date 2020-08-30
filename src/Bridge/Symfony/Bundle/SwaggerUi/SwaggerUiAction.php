@@ -112,7 +112,7 @@ final class SwaggerUiAction
     {
         foreach ($swaggerData['spec']['paths'] as $path => $operations) {
             foreach ($operations as $method => $operation) {
-                if ($operation['operationId'] === $swaggerData['operationId']) {
+                if ($operation['operationId'] ?? null === $swaggerData['operationId']) {
                     return [$path, $method];
                 }
             }

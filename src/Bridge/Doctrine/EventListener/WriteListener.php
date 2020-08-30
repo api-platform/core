@@ -14,8 +14,8 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Bridge\Doctrine\EventListener;
 
 use ApiPlatform\Core\EventListener\WriteListener as BaseWriteListener;
-use Doctrine\Common\Persistence\ManagerRegistry;
-use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ObjectManager;
 use Symfony\Component\HttpKernel\Event\ViewEvent;
 
 /**

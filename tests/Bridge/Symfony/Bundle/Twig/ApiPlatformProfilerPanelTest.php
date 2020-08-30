@@ -21,9 +21,9 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\ItemDataProvider;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\DataProvider\ContainNonResourceItemDataProvider;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\Dummy as DocumentDummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Tools\SchemaTool;
+use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 /**

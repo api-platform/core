@@ -18,12 +18,15 @@ use ApiPlatform\Core\Metadata\Resource\ResourceNameCollection;
 use ApiPlatform\Core\Swagger\Serializer\ApiGatewayNormalizer;
 use ApiPlatform\Core\Swagger\Serializer\DocumentationNormalizer;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
+use ApiPlatform\Core\Tests\ProphecyTrait;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Serializer\Normalizer\CacheableSupportsMethodInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 final class ApiGatewayNormalizerTest extends TestCase
 {
+    use ProphecyTrait;
+
     public function testSupportsNormalization(): void
     {
         $documentationNormalizerProphecy = $this->prophesize(NormalizerInterface::class);

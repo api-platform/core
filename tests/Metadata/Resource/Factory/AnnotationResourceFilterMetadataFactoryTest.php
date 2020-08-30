@@ -19,6 +19,7 @@ use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Doctrine\Orm\Filter\DummyFilter;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
+use ApiPlatform\Core\Tests\ProphecyTrait;
 use Doctrine\Common\Annotations\Reader;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
@@ -28,6 +29,8 @@ use Prophecy\Argument;
  */
 class AnnotationResourceFilterMetadataFactoryTest extends TestCase
 {
+    use ProphecyTrait;
+
     public function testCreate()
     {
         $decorated = $this->prophesize(ResourceMetadataFactoryInterface::class);

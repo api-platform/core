@@ -14,7 +14,8 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\Bridge\Doctrine\Orm\Filter;
 
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Doctrine\Orm\Filter\DummyFilter;
-use Doctrine\Common\Persistence\ManagerRegistry;
+use ApiPlatform\Core\Tests\ProphecyTrait;
+use Doctrine\Persistence\ManagerRegistry;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -24,6 +25,8 @@ use PHPUnit\Framework\TestCase;
  */
 class CommonFilterTest extends TestCase
 {
+    use ProphecyTrait;
+
     public function testSplitPropertiesWithoutResourceClass()
     {
         $managerRegistry = $this->prophesize(ManagerRegistry::class);

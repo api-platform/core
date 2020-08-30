@@ -16,6 +16,7 @@ namespace ApiPlatform\Core\Tests\DataPersister;
 use ApiPlatform\Core\DataPersister\ChainDataPersister;
 use ApiPlatform\Core\DataPersister\DataPersisterInterface;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
+use ApiPlatform\Core\Tests\ProphecyTrait;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 
@@ -24,6 +25,8 @@ use Prophecy\Argument;
  */
 class ChainDataPersisterTest extends TestCase
 {
+    use ProphecyTrait;
+
     public function testConstruct()
     {
         $this->assertInstanceOf(DataPersisterInterface::class, new ChainDataPersister([$this->prophesize(DataPersisterInterface::class)->reveal()]));

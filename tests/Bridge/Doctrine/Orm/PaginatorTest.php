@@ -16,11 +16,14 @@ namespace ApiPlatform\Core\Tests\Bridge\Doctrine\Orm;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Paginator;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\Tests\Fixtures\Query;
+use ApiPlatform\Core\Tests\ProphecyTrait;
 use Doctrine\ORM\Tools\Pagination\Paginator as DoctrinePaginator;
 use PHPUnit\Framework\TestCase;
 
 class PaginatorTest extends TestCase
 {
+    use ProphecyTrait;
+
     /**
      * @dataProvider initializeProvider
      */

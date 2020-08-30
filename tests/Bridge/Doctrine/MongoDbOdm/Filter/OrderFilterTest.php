@@ -17,7 +17,7 @@ use ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Filter\OrderFilter;
 use ApiPlatform\Core\Test\DoctrineMongoDbOdmFilterTestCase;
 use ApiPlatform\Core\Tests\Bridge\Doctrine\Common\Filter\OrderFilterTestTrait;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Serializer\NameConverter\CustomConverter;
-use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ManagerRegistry;
 
 /**
  * @group mongodb

@@ -19,6 +19,7 @@ use ApiPlatform\Core\DataProvider\PartialPaginatorInterface;
 use ApiPlatform\Core\Hal\Serializer\CollectionNormalizer;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
+use ApiPlatform\Core\Tests\ProphecyTrait;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
@@ -27,6 +28,8 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
  */
 class CollectionNormalizerTest extends TestCase
 {
+    use ProphecyTrait;
+
     public function testSupportsNormalize()
     {
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);

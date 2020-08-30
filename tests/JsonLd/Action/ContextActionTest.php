@@ -19,6 +19,7 @@ use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Metadata\Resource\ResourceNameCollection;
+use ApiPlatform\Core\Tests\ProphecyTrait;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
@@ -27,6 +28,8 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  */
 class ContextActionTest extends TestCase
 {
+    use ProphecyTrait;
+
     public function testContextActionWithEntrypoint()
     {
         $contextBuilderProphecy = $this->prophesize(ContextBuilderInterface::class);

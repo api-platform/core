@@ -24,6 +24,7 @@ use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RelatedDummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\UnknownDummy;
+use ApiPlatform\Core\Tests\ProphecyTrait;
 use Doctrine\Common\Collections\Collection;
 use Nelmio\ApiDocBundle\DataTypes;
 use Nelmio\ApiDocBundle\Parser\ParserInterface;
@@ -40,6 +41,8 @@ use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
  */
 class ApiPlatformParserTest extends TestCase
 {
+    use ProphecyTrait;
+
     /**
      * @expectedDeprecation The ApiPlatform\Core\Bridge\NelmioApiDoc\Parser\ApiPlatformParser class is deprecated since version 2.2 and will be removed in 3.0. NelmioApiDocBundle 3 has native support for API Platform.
      */

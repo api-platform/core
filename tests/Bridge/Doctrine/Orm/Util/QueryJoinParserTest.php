@@ -16,12 +16,13 @@ namespace ApiPlatform\Core\Tests\Bridge\Doctrine\Orm\Util;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryJoinParser;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RelatedDummy;
-use Doctrine\Common\Persistence\ManagerRegistry;
+use ApiPlatform\Core\Tests\ProphecyTrait;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\Query\Expr\OrderBy;
 use Doctrine\ORM\QueryBuilder;
+use Doctrine\Persistence\ManagerRegistry;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -29,6 +30,8 @@ use PHPUnit\Framework\TestCase;
  */
 class QueryJoinParserTest extends TestCase
 {
+    use ProphecyTrait;
+
     /**
      * @group legacy
      * @expectedDeprecation The use of "ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryJoinParser::getClassMetadataFromJoinAlias()" is deprecated since 2.4 and will be removed in 3.0. Use "ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryBuilderHelper::getEntityClassByAlias()" instead.

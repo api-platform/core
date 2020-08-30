@@ -21,6 +21,7 @@ use ApiPlatform\Core\HttpCache\PurgerInterface;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyNoGetOperation;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RelatedDummy;
+use ApiPlatform\Core\Tests\ProphecyTrait;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\Event\PreUpdateEventArgs;
@@ -34,6 +35,8 @@ use Prophecy\Argument;
  */
 class PurgeHttpCacheListenerTest extends TestCase
 {
+    use ProphecyTrait;
+
     public function testOnFlush()
     {
         $toInsert1 = new Dummy();

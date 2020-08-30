@@ -22,6 +22,7 @@ use ApiPlatform\Core\OpenApi\Factory\OpenApiFactoryInterface;
 use ApiPlatform\Core\OpenApi\Model\Info;
 use ApiPlatform\Core\OpenApi\Model\Paths;
 use ApiPlatform\Core\OpenApi\OpenApi;
+use ApiPlatform\Core\Tests\ProphecyTrait;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
@@ -33,6 +34,8 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class DocumentationActionTest extends TestCase
 {
+    use ProphecyTrait;
+
     /**
      * @group legacy
      * @expectedDeprecation Not passing an instance of "ApiPlatform\Core\OpenApi\Factory\OpenApiFactoryInterface" as 7th parameter of the constructor of "ApiPlatform\Core\Documentation\Action\DocumentationAction" is deprecated since API Platform 2.6

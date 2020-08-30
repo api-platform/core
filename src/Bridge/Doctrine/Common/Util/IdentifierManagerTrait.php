@@ -15,12 +15,12 @@ namespace ApiPlatform\Core\Bridge\Doctrine\Common\Util;
 
 use ApiPlatform\Core\Exception\InvalidIdentifierException;
 use ApiPlatform\Core\Exception\PropertyNotFoundException;
-use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\DBAL\Types\ConversionException;
 use Doctrine\DBAL\Types\Type as DBALType;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Doctrine\ODM\MongoDB\Types\Type as MongoDbType;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\Persistence\ObjectManager;
 
 /**
  * @internal

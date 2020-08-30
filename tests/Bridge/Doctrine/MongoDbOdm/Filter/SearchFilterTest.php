@@ -21,7 +21,8 @@ use ApiPlatform\Core\Test\DoctrineMongoDbOdmFilterTestCase;
 use ApiPlatform\Core\Tests\Bridge\Doctrine\Common\Filter\SearchFilterTestTrait;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\RelatedDummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Serializer\NameConverter\CustomConverter;
-use Doctrine\Common\Persistence\ManagerRegistry;
+use ApiPlatform\Core\Tests\ProphecyTrait;
+use Doctrine\Persistence\ManagerRegistry;
 use MongoDB\BSON\Regex;
 use Prophecy\Argument;
 
@@ -32,6 +33,7 @@ use Prophecy\Argument;
  */
 class SearchFilterTest extends DoctrineMongoDbOdmFilterTestCase
 {
+    use ProphecyTrait;
     use SearchFilterTestTrait;
 
     protected $filterClass = SearchFilter::class;

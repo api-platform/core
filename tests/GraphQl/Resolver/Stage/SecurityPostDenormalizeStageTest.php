@@ -17,6 +17,7 @@ use ApiPlatform\Core\GraphQl\Resolver\Stage\SecurityPostDenormalizeStage;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Security\ResourceAccessCheckerInterface;
+use ApiPlatform\Core\Tests\ProphecyTrait;
 use GraphQL\Type\Definition\ResolveInfo;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
@@ -28,6 +29,8 @@ use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
  */
 class SecurityPostDenormalizeStageTest extends TestCase
 {
+    use ProphecyTrait;
+
     /** @var SecurityPostDenormalizeStage */
     private $securityPostDenormalizeStage;
     private $resourceMetadataFactoryProphecy;

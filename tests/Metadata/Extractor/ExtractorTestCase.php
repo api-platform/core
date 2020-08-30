@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\Metadata\Extractor;
 
 use ApiPlatform\Core\Metadata\Extractor\ExtractorInterface;
+use ApiPlatform\Core\Tests\ProphecyTrait;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Psr\Container\ContainerInterface;
@@ -25,6 +26,8 @@ use function is_a;
  */
 abstract class ExtractorTestCase extends TestCase
 {
+    use ProphecyTrait;
+
     protected $extractorClass;
 
     final public function testEmptyResources()

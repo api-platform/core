@@ -31,6 +31,7 @@ use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RelatedDummy;
+use ApiPlatform\Core\Tests\ProphecyTrait;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Symfony\Component\Routing\Exception\RouteNotFoundException;
@@ -41,6 +42,8 @@ use Symfony\Component\Routing\RouterInterface;
  */
 class IriConverterTest extends TestCase
 {
+    use ProphecyTrait;
+
     public function testGetItemFromIriNoRouteException()
     {
         $this->expectException(InvalidArgumentException::class);

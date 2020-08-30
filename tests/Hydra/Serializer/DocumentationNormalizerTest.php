@@ -28,6 +28,7 @@ use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Metadata\Resource\ResourceNameCollection;
 use ApiPlatform\Core\Operation\Factory\SubresourceOperationFactoryInterface;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Serializer\NameConverter\CustomConverter;
+use ApiPlatform\Core\Tests\ProphecyTrait;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Symfony\Component\PropertyInfo\Type;
@@ -37,6 +38,8 @@ use Symfony\Component\PropertyInfo\Type;
  */
 class DocumentationNormalizerTest extends TestCase
 {
+    use ProphecyTrait;
+
     public function testNormalize(): void
     {
         $this->doTestNormalize();

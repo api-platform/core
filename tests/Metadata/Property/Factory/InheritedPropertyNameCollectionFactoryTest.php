@@ -20,6 +20,7 @@ use ApiPlatform\Core\Metadata\Resource\Factory\ResourceNameCollectionFactoryInte
 use ApiPlatform\Core\Metadata\Resource\ResourceNameCollection;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyTableInheritance;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyTableInheritanceChild;
+use ApiPlatform\Core\Tests\ProphecyTrait;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -27,6 +28,8 @@ use PHPUnit\Framework\TestCase;
  */
 class InheritedPropertyNameCollectionFactoryTest extends TestCase
 {
+    use ProphecyTrait;
+
     public function testCreateOnParent()
     {
         $resourceNameCollectionFactory = $this->prophesize(ResourceNameCollectionFactoryInterface::class);

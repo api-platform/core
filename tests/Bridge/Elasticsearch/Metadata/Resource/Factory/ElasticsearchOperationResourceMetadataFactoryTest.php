@@ -17,10 +17,13 @@ use ApiPlatform\Core\Bridge\Elasticsearch\Metadata\Resource\Factory\Elasticsearc
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Foo;
+use ApiPlatform\Core\Tests\ProphecyTrait;
 use PHPUnit\Framework\TestCase;
 
 class ElasticsearchOperationResourceMetadataFactoryTest extends TestCase
 {
+    use ProphecyTrait;
+
     public function testConstruct()
     {
         self::assertInstanceOf(

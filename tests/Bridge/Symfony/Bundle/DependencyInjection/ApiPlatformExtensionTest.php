@@ -86,6 +86,7 @@ use ApiPlatform\Core\Serializer\Filter\GroupFilter;
 use ApiPlatform\Core\Serializer\Filter\PropertyFilter;
 use ApiPlatform\Core\Serializer\SerializerContextBuilderInterface;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\TestBundle;
+use ApiPlatform\Core\Tests\ProphecyTrait;
 use ApiPlatform\Core\Validator\ValidatorInterface;
 use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
 use Doctrine\ORM\OptimisticLockException;
@@ -120,6 +121,8 @@ use Symfony\Component\Serializer\Exception\ExceptionInterface;
  */
 class ApiPlatformExtensionTest extends TestCase
 {
+    use ProphecyTrait;
+
     public const DEFAULT_CONFIG = ['api_platform' => [
         'title' => 'title',
         'description' => 'description',
@@ -320,7 +323,6 @@ class ApiPlatformExtensionTest extends TestCase
 
     /**
      * @group legacy
-     * @expectedDeprecation Enabling the NelmioApiDocBundle integration has been deprecated in 2.2 and will be removed in 3.0. NelmioApiDocBundle 3 has native support for API Platform.
      */
     public function testEnableNelmioApiDoc()
     {
@@ -460,7 +462,7 @@ class ApiPlatformExtensionTest extends TestCase
     public function testResourcesToWatchWithUnsupportedMappingType()
     {
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessageRegExp('/Unsupported mapping type in ".+", supported types are XML & YAML\\./');
+        $this->expectExceptionMessageMatches('/Unsupported mapping type in ".+", supported types are XML & YAML\\./');
 
         $config = self::DEFAULT_CONFIG;
         $config['api_platform']['mapping']['paths'] = [__FILE__];

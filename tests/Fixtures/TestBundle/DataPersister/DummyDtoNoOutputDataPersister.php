@@ -18,7 +18,7 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\DummyDtoNoOutput as Dumm
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Dto\Document\InputDto as InputDtoDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Dto\InputDto;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyDtoNoOutput;
-use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ManagerRegistry;
 
 class DummyDtoNoOutputDataPersister implements DataPersisterInterface
 {

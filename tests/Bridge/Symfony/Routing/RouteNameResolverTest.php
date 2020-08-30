@@ -16,6 +16,7 @@ namespace ApiPlatform\Core\Tests\Bridge\Symfony\Routing;
 use ApiPlatform\Core\Api\OperationType;
 use ApiPlatform\Core\Bridge\Symfony\Routing\RouteNameResolver;
 use ApiPlatform\Core\Bridge\Symfony\Routing\RouteNameResolverInterface;
+use ApiPlatform\Core\Tests\ProphecyTrait;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
@@ -26,6 +27,8 @@ use Symfony\Component\Routing\RouterInterface;
  */
 class RouteNameResolverTest extends TestCase
 {
+    use ProphecyTrait;
+
     public function testConstruct()
     {
         $routerProphecy = $this->prophesize(RouterInterface::class);

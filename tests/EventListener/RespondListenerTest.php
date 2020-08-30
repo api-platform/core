@@ -17,6 +17,7 @@ use ApiPlatform\Core\EventListener\RespondListener;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
+use ApiPlatform\Core\Tests\ProphecyTrait;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Symfony\Component\HttpFoundation\Request;
@@ -29,6 +30,8 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
  */
 class RespondListenerTest extends TestCase
 {
+    use ProphecyTrait;
+
     public function testDoNotHandleResponse()
     {
         $request = new Request();

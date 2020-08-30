@@ -15,10 +15,10 @@ namespace ApiPlatform\Core\Bridge\Doctrine\Common;
 
 use ApiPlatform\Core\DataPersister\ContextAwareDataPersisterInterface;
 use ApiPlatform\Core\Util\ClassInfoTrait;
-use Doctrine\Common\Persistence\ManagerRegistry;
-use Doctrine\Common\Persistence\ObjectManager as DoctrineObjectManager;
 use Doctrine\ODM\MongoDB\Mapping\ClassMetadata;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
+use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ObjectManager as DoctrineObjectManager;
 
 /**
  * Data persister for Doctrine.

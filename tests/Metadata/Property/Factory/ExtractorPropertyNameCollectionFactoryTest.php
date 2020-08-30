@@ -21,6 +21,7 @@ use ApiPlatform\Core\Metadata\Property\Factory\ExtractorPropertyNameCollectionFa
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\PropertyNameCollection;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\FileConfigDummy;
+use ApiPlatform\Core\Tests\ProphecyTrait;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -28,6 +29,8 @@ use PHPUnit\Framework\TestCase;
  */
 class ExtractorPropertyNameCollectionFactoryTest extends TestCase
 {
+    use ProphecyTrait;
+
     public function testCreateXml()
     {
         $configPath = __DIR__.'/../../../Fixtures/FileConfigurations/resources.xml';
@@ -67,7 +70,7 @@ class ExtractorPropertyNameCollectionFactoryTest extends TestCase
     public function testCreateWithInvalidXml()
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessageRegExp('#.+Element \'\\{https://api-platform.com/schema/metadata\\}foo\': This element is not expected\\..+#');
+        $this->expectExceptionMessageMatches('#.+Element \'\\{https://api-platform.com/schema/metadata\\}foo\': This element is not expected\\..+#');
 
         $configPath = __DIR__.'/../../../Fixtures/FileConfigurations/propertyinvalid.xml';
 
@@ -113,7 +116,7 @@ class ExtractorPropertyNameCollectionFactoryTest extends TestCase
     public function testCreateWithMalformedResourcesSettingYaml()
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessageRegExp('/"resources" setting is expected to be null or an array, string given in ".+\\/\\.\\.\\/\\.\\.\\/\\.\\.\\/Fixtures\\/FileConfigurations\\/resourcesinvalid\\.yml"\\./');
+        $this->expectExceptionMessageMatches('/"resources" setting is expected to be null or an array, string given in ".+\\/\\.\\.\\/\\.\\.\\/\\.\\.\\/Fixtures\\/FileConfigurations\\/resourcesinvalid\\.yml"\\./');
 
         $configPath = __DIR__.'/../../../Fixtures/FileConfigurations/resourcesinvalid.yml';
 
@@ -123,7 +126,7 @@ class ExtractorPropertyNameCollectionFactoryTest extends TestCase
     public function testCreateWithMalformedPropertiesSettingYaml()
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessageRegExp('/"properties" setting is expected to be null or an array, string given in ".+\\/\\.\\.\\/\\.\\.\\/\\.\\.\\/Fixtures\\/FileConfigurations\\/propertiesinvalid\\.yml"\\./');
+        $this->expectExceptionMessageMatches('/"properties" setting is expected to be null or an array, string given in ".+\\/\\.\\.\\/\\.\\.\\/\\.\\.\\/Fixtures\\/FileConfigurations\\/propertiesinvalid\\.yml"\\./');
 
         $configPath = __DIR__.'/../../../Fixtures/FileConfigurations/propertiesinvalid.yml';
 
@@ -133,7 +136,7 @@ class ExtractorPropertyNameCollectionFactoryTest extends TestCase
     public function testCreateWithMalformedPropertySettingYaml()
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessageRegExp('/"foo" setting is expected to be null or an array, string given in ".+\\/\\.\\.\\/\\.\\.\\/\\.\\.\\/Fixtures\\/FileConfigurations\\/propertyinvalid\\.yml"\\./');
+        $this->expectExceptionMessageMatches('/"foo" setting is expected to be null or an array, string given in ".+\\/\\.\\.\\/\\.\\.\\/\\.\\.\\/Fixtures\\/FileConfigurations\\/propertyinvalid\\.yml"\\./');
 
         $configPath = __DIR__.'/../../../Fixtures/FileConfigurations/propertyinvalid.yml';
 

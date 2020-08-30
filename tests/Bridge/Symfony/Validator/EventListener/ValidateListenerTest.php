@@ -18,6 +18,7 @@ use ApiPlatform\Core\Bridge\Symfony\Validator\Exception\ValidationException;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Tests\Fixtures\DummyEntity;
+use ApiPlatform\Core\Tests\ProphecyTrait;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Psr\Container\ContainerInterface;
@@ -34,6 +35,8 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
  */
 class ValidateListenerTest extends TestCase
 {
+    use ProphecyTrait;
+
     public function testNotAnApiPlatformRequest()
     {
         $validatorProphecy = $this->prophesize(ValidatorInterface::class);

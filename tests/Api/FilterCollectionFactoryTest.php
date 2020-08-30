@@ -16,6 +16,7 @@ namespace ApiPlatform\Core\Tests\Api;
 use ApiPlatform\Core\Api\FilterCollection;
 use ApiPlatform\Core\Api\FilterCollectionFactory;
 use ApiPlatform\Core\Api\FilterInterface;
+use ApiPlatform\Core\Tests\ProphecyTrait;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 
@@ -24,6 +25,8 @@ use Psr\Container\ContainerInterface;
  */
 class FilterCollectionFactoryTest extends TestCase
 {
+    use ProphecyTrait;
+
     /**
      * @group legacy
      * @expectedDeprecation The ApiPlatform\Core\Api\FilterCollection class is deprecated since version 2.1 and will be removed in 3.0. Provide an implementation of Psr\Container\ContainerInterface instead.
