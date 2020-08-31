@@ -204,6 +204,7 @@ class ConfigurationTest extends TestCase
             ],
             'allow_plain_identifiers' => false,
             'resource_class_directories' => [],
+            'enabled_locales' => [],
         ], $config);
     }
 
@@ -400,5 +401,36 @@ class ConfigurationTest extends TestCase
         ]);
 
         $this->assertTrue($config['elasticsearch']['enabled']);
+    }
+
+    public function testEnabledLocales()
+    {
+        $config = $this->processor->processConfiguration($this->configuration, [
+            'api_platform' => [
+                'enabled_locales' => ['mi', 'fr'],
+            ],
+        ]);
+
+        $this->assertEquals(['mi', 'fr'], $config['enabled_locales']);
+    }
+
+    public function testEmptiedEnabledLocales()
+    {
+        $config = $this->processor->processConfiguration($this->configuration, [
+            'api_platform' => [
+                'enabled_locales' => [],
+            ],
+        ]);
+
+        $this->assertEquals([], $config['enabled_locales']);
+    }
+
+    public function testNoLocaleEnabled()
+    {
+        $config = $this->processor->processConfiguration($this->configuration, [
+            'api_platform' => [],
+        ]);
+
+        $this->assertEquals([], $config['enabled_locales']);
     }
 }

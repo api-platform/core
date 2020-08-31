@@ -166,6 +166,7 @@ final class Configuration implements ConfigurationInterface
         $this->addMercureSection($rootNode);
         $this->addMessengerSection($rootNode);
         $this->addElasticsearchSection($rootNode);
+        $this->addLocaleSection($rootNode);
 
         $this->addExceptionToStatusSection($rootNode);
 
@@ -492,6 +493,17 @@ final class Configuration implements ConfigurationInterface
                             ->arrayNode('mime_types')->prototype('scalar')->end()->end()
                         ->end()
                     ->end()
+                ->end()
+            ->end();
+    }
+
+    private function addLocaleSection(ArrayNodeDefinition $rootNode): void
+    {
+        $rootNode
+            ->children()
+                ->arrayNode('enabled_locales')
+                    ->info('An array of enabled locales for your application. It will help determine the locale according to the Accept-Language header.')
+                    ->prototype('scalar')->end()
                 ->end()
             ->end();
     }

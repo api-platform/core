@@ -118,6 +118,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $this->registerElasticsearchConfiguration($container, $config, $loader);
         $this->registerDataTransformerConfiguration($container);
         $this->registerSecurityConfiguration($container, $loader);
+        $this->registerLocaleConfiguration($container, $config, $loader);
 
         $container->registerForAutoconfiguration(DataPersisterInterface::class)
             ->addTag('api_platform.data_persister');
@@ -627,6 +628,11 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         if (isset($bundles['SecurityBundle'])) {
             $loader->load('security.xml');
         }
+    }
+
+    private function registerLocaleConfiguration(ContainerBuilder $container, array $config): void
+    {
+        $container->setParameter('api_platform.locales.enabled', $config['enabled_locales'] ?? null);
     }
 
     private function buildDeprecationArgs(string $version, string $message): array
