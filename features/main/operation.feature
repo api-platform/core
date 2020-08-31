@@ -43,16 +43,17 @@ Feature: Operation support
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
-    And the JSON should be equal to:
+    And the JSON should be a superset of:
     """
     {
-        "@context": "/contexts/EmbeddedDummy",
-        "@id": "/embedded_dummies/1",
-        "@type": "EmbeddedDummy",
-        "name": "Dummy #1",
-        "embeddedDummy": {
-            "dummyName": "Dummy #1"
-        }
+      "@context": "/contexts/EmbeddedDummy",
+      "@id": "/embedded_dummies/1",
+      "@type": "EmbeddedDummy",
+      "name": "Dummy #1",
+      "embeddedDummy": {
+      "@type": "EmbeddableDummy",
+        "dummyName": "Dummy #1"
+      }
     }
     """
 

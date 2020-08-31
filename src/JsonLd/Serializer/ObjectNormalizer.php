@@ -79,7 +79,7 @@ final class ObjectNormalizer implements NormalizerInterface, CacheableSupportsMe
         $context['api_empty_resource_as_iri'] = true;
 
         $data = $this->decorated->normalize($object, $format, $context);
-        if (!\is_array($data)) {
+        if (!\is_array($data) || !$data) {
             return $data;
         }
 
