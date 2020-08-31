@@ -319,3 +319,16 @@ Feature: JSON-LD DTO input and output
       "data": 123
     }
     """
+
+  @createSchema
+  Scenario: Create a resource with a custom Input
+    When I send a "POST" request to "/dummy_dto_customs" with body:
+    """
+    {
+      "foo": "test",
+      "bar": "test" 
+    }
+    """
+    Then the response status code should be 400
+    And the response should be in JSON
+    And the JSON node "hydra:description" should be equal to "The input data is misformatted."

@@ -31,6 +31,7 @@ use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Serializer\Exception\LogicException;
 use Symfony\Component\Serializer\Exception\MissingConstructorArgumentsException;
+use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
 use Symfony\Component\Serializer\Exception\RuntimeException;
 use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
@@ -190,9 +191,14 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             if (!$this->serializer instanceof DenormalizerInterface) {
                 throw new LogicException('Cannot denormalize the input because the injected serializer is not a denormalizer');
             }
-            $denormalizedInput = $this->serializer->denormalize($data, $inputClass, $format, $context);
+            try {
+                $denormalizedInput = $this->serializer->denormalize($data, $inputClass, $format, $context);
+            } catch (NotNormalizableValueException $e) {
+                throw new UnexpectedValueException('The input data is misformatted.', $e->getCode(), $e);
+            }
+
             if (!\is_object($denormalizedInput)) {
-                throw new \UnexpectedValueException('Expected denormalized input to be an object.');
+                throw new UnexpectedValueException('Expected denormalized input to be an object.');
             }
 
             return $dataTransformer->transform($denormalizedInput, $resourceClass, $dataTransformerContext);
