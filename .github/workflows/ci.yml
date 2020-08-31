@@ -829,6 +829,7 @@ jobs:
       - name: Install system packages
         run: |
           apk add \
+            git \
             unzip \
       - name: Cache mongodb PHP extension build
         uses: actions/cache@v2
