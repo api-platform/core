@@ -71,6 +71,7 @@ trait ProphecyTrait
 
     /**
      * @postCondition
+     * @after
      */
     protected function verifyProphecyDoubles(): void
     {
@@ -110,7 +111,7 @@ trait ProphecyTrait
 
         foreach ($this->prophet->getProphecies() as $objectProphecy) {
             /**
-             * @var MethodProphecy[] $methodProphecies
+             * @var MethodProphecy[]
              */
             foreach ($objectProphecy->getMethodProphecies() as $methodProphecies) {
                 foreach ($methodProphecies as $methodProphecy) {
