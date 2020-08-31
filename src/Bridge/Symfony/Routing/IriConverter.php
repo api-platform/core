@@ -18,6 +18,7 @@ use ApiPlatform\Core\Api\IdentifiersExtractorInterface;
 use ApiPlatform\Core\Api\IriConverterInterface;
 use ApiPlatform\Core\Api\OperationType;
 use ApiPlatform\Core\Api\ResourceClassResolverInterface;
+use ApiPlatform\Core\Api\UrlGeneratorInterface;
 use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
 use ApiPlatform\Core\DataProvider\OperationDataProviderTrait;
 use ApiPlatform\Core\DataProvider\SubresourceDataProviderInterface;
@@ -200,6 +201,6 @@ final class IriConverter implements IriConverterInterface
             $referenceType = $metadata->getAttribute('url_generation_strategy');
         }
 
-        return $referenceType;
+        return $referenceType ?? UrlGeneratorInterface::ABS_PATH;
     }
 }
