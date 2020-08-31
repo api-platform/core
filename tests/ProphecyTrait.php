@@ -111,7 +111,7 @@ trait ProphecyTrait
 
         foreach ($this->prophet->getProphecies() as $objectProphecy) {
             /**
-             * @var MethodProphecy[]
+             * @var MethodProphecy[] $methodProphecies
              */
             foreach ($objectProphecy->getMethodProphecies() as $methodProphecies) {
                 foreach ($methodProphecies as $methodProphecy) {
