@@ -688,6 +688,9 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
     {
         $container->registerForAutoconfiguration(DataTransformerInterface::class)
             ->addTag('api_platform.data_transformer');
+
+        $container->registerForAutoconfiguration(DataTransformerInitializerInterface::class)
+            ->addTag('api_platform.data_transformer');
     }
 
     private function registerSecurityConfiguration(ContainerBuilder $container, XmlFileLoader $loader): void

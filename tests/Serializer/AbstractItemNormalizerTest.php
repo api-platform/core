@@ -16,8 +16,8 @@ namespace ApiPlatform\Core\Tests\Serializer;
 use ApiPlatform\Core\Api\IriConverterInterface;
 use ApiPlatform\Core\Api\ResourceClassResolverInterface;
 use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
+use ApiPlatform\Core\DataTransformer\DataTransformerInitializerInterface;
 use ApiPlatform\Core\DataTransformer\DataTransformerInterface;
-use ApiPlatform\Core\DataTransformer\PreHydrateInputInterface;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\Exception\ItemNotFoundException;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
@@ -430,8 +430,8 @@ class AbstractItemNormalizerTest extends TestCase
         $resourceClassResolverProphecy->getResourceClass(null, DummyForAdditionalFields::class)->willReturn(DummyForAdditionalFields::class);
 
         $inputDataTransformerProphecy = $this->prophesize(DataTransformerInterface::class);
-        $inputDataTransformerProphecy->willImplement(PreHydrateInputInterface::class);
-        $inputDataTransformerProphecy->createInput(DummyForAdditionalFieldsInput::class, $cleanedContext)->willReturn($preHydratedDummy);
+        $inputDataTransformerProphecy->willImplement(DataTransformerInitializerInterface::class);
+        $inputDataTransformerProphecy->initialize(DummyForAdditionalFieldsInput::class, $cleanedContext)->willReturn($preHydratedDummy);
         $inputDataTransformerProphecy->supportsTransformation($data, DummyForAdditionalFields::class, $augmentedContext)->willReturn(true);
         $inputDataTransformerProphecy->transform($dummyInputDto, DummyForAdditionalFields::class, $augmentedContext)->willReturn($dummy);
 

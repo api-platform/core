@@ -16,8 +16,8 @@ namespace ApiPlatform\Core\Serializer;
 use ApiPlatform\Core\Api\IriConverterInterface;
 use ApiPlatform\Core\Api\ResourceClassResolverInterface;
 use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
+use ApiPlatform\Core\DataTransformer\DataTransformerInitializerInterface;
 use ApiPlatform\Core\DataTransformer\DataTransformerInterface;
-use ApiPlatform\Core\DataTransformer\PreHydrateInputInterface;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\Exception\InvalidValueException;
 use ApiPlatform\Core\Exception\ItemNotFoundException;
@@ -198,8 +198,8 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             if (!$this->serializer instanceof DenormalizerInterface) {
                 throw new LogicException('Cannot denormalize the input because the injected serializer is not a denormalizer');
             }
-            if ($dataTransformer instanceof PreHydrateInputInterface) {
-                $context[AbstractObjectNormalizer::OBJECT_TO_POPULATE] = $dataTransformer->createInput($inputClass, $context);
+            if ($dataTransformer instanceof DataTransformerInitializerInterface) {
+                $context[AbstractObjectNormalizer::OBJECT_TO_POPULATE] = $dataTransformer->initialize($inputClass, $context);
                 $context[AbstractObjectNormalizer::DEEP_OBJECT_TO_POPULATE] = true;
             }
             $denormalizedInput = $this->serializer->denormalize($data, $inputClass, $format, $context);
