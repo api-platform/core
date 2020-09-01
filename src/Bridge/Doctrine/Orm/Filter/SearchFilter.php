@@ -81,14 +81,14 @@ class SearchFilter extends AbstractContextAwareFilter implements SearchFilterInt
         $alias = $queryBuilder->getRootAliases()[0];
         $field = $property;
 
-        $associations = [];
-        if ($this->isPropertyNested($property, $resourceClass)) {
-            [$alias, $field, $associations] = $this->addJoinsForNestedProperty($property, $alias, $queryBuilder, $queryNameGenerator, $resourceClass);
-        }
-
         $values = $this->normalizeValues((array) $value, $property);
         if (null === $values) {
             return;
+        }
+
+        $associations = [];
+        if ($this->isPropertyNested($property, $resourceClass)) {
+            [$alias, $field, $associations] = $this->addJoinsForNestedProperty($property, $alias, $queryBuilder, $queryNameGenerator, $resourceClass);
         }
 
         $metadata = $this->getNestedMetadata($resourceClass, $associations);
