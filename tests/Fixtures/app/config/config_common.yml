@@ -291,6 +291,12 @@ services:
         tags:
             -  { name: 'api_platform.data_transformer' }
 
+    app.data_transformer.initialize_input:
+        class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\DataTransformer\InitializeInputDataTransformer'
+        public: false
+        tags:
+            -  { name: 'api_platform.data_transformer' }
+
     app.messenger_handler.messenger_with_response:
         class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\MessengerHandler\MessengerWithResponseHandler'
         public: false

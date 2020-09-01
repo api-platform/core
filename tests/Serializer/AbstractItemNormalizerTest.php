@@ -429,7 +429,7 @@ class AbstractItemNormalizerTest extends TestCase
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
         $resourceClassResolverProphecy->getResourceClass(null, DummyForAdditionalFields::class)->willReturn(DummyForAdditionalFields::class);
 
-        $inputDataTransformerProphecy = $this->prophesize(DataTransformerInterface::class);
+        $inputDataTransformerProphecy = $this->prophesize(DataTransformerInitializerInterface::class);
         $inputDataTransformerProphecy->willImplement(DataTransformerInitializerInterface::class);
         $inputDataTransformerProphecy->initialize(DummyForAdditionalFieldsInput::class, $cleanedContext)->willReturn($preHydratedDummy);
         $inputDataTransformerProphecy->supportsTransformation($data, DummyForAdditionalFields::class, $augmentedContext)->willReturn(true);

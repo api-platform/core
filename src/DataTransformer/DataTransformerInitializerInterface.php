@@ -19,6 +19,8 @@ interface DataTransformerInitializerInterface extends DataTransformerInterface
      * Creates a new DTO object that the data will then be serialized into (using object_to_populate).
      *
      * This is useful to "initialize" the DTO object based on the current resource's data.
+     *
+     * @return object|null
      */
-    public function initialize(string $inputClass, array $context = []): ?object;
+    public function initialize(string $inputClass, array $context = []);
 }

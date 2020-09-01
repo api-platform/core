@@ -317,3 +317,26 @@ Feature: JSON-LD DTO input and output
       "data": 123
     }
     """
+
+  @createSchema
+  Scenario: Initialize input data with a DataTransformerInitializer 
+    Given there is an InitializeInput object with id 1
+    When I send a "PUT" request to "/initialize_inputs/1" with body:
+    """
+    {
+      "name": "La peste"
+    }
+    """
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the JSON should be equal to:
+    """
+    {
+      "@context": "/contexts/InitializeInput",
+      "@id": "/initialize_inputs/1",
+      "@type": "InitializeInput",
+      "id": 1,
+      "manager": "Orwell",
+      "name": "La peste"
+    }
+    """

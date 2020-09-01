@@ -30,6 +30,7 @@ use ApiPlatform\Core\DataPersister\DataPersisterInterface;
 use ApiPlatform\Core\DataProvider\CollectionDataProviderInterface;
 use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
 use ApiPlatform\Core\DataProvider\SubresourceDataProviderInterface;
+use ApiPlatform\Core\DataTransformer\DataTransformerInitializerInterface;
 use ApiPlatform\Core\DataTransformer\DataTransformerInterface;
 use ApiPlatform\Core\GraphQl\Error\ErrorHandlerInterface;
 use ApiPlatform\Core\GraphQl\Resolver\MutationResolverInterface;
