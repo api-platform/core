@@ -908,6 +908,7 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.listener.exception',
             'api_platform.listener.exception.validation',
             'api_platform.listener.request.add_format',
+            'api_platform.listener.request.add_enabled_locales',
             'api_platform.listener.request.deserialize',
             'api_platform.listener.request.read',
             'api_platform.listener.view.respond',
@@ -1122,6 +1123,7 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.resource_class_directories' => Argument::type('array'),
             'api_platform.validator.serialize_payload_fields' => [],
             'api_platform.elasticsearch.enabled' => false,
+            'api_platform.enabled_locales' => [],
         ];
 
         if ($hasSwagger) {
@@ -1378,5 +1380,18 @@ class ApiPlatformExtensionTest extends TestCase
         }
 
         return $formats;
+    }
+
+    public function testEnabledLocales()
+    {
+        $containerBuilderProphecy = $this->getBaseContainerBuilderProphecy();
+        $containerBuilderProphecy->setParameter('api_platform.enabled_locales', [])->shouldNotBeCalled();
+        $containerBuilderProphecy->setParameter('api_platform.enabled_locales', ['mi', 'fr'])->shouldBeCalledOnce();
+        $containerBuilder = $containerBuilderProphecy->reveal();
+
+        $config = self::DEFAULT_CONFIG;
+        $config['api_platform']['enabled_locales'] = ['mi','fr'];
+
+        $this->extension->load($config, $containerBuilder);
     }
 }

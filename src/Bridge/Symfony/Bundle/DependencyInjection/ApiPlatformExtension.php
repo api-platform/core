@@ -632,7 +632,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
 
     private function registerLocaleConfiguration(ContainerBuilder $container, array $config): void
     {
-        $container->setParameter('api_platform.locales.enabled', $config['enabled_locales'] ?? null);
+        $container->setParameter('api_platform.enabled_locales', $config['enabled_locales']);
     }
 
     private function buildDeprecationArgs(string $version, string $message): array
