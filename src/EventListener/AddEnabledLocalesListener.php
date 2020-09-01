@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\EventListener;
 
+use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
+use ApiPlatform\Core\Util\RequestAttributesExtractor;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\Routing\RequestContextAwareInterface;
@@ -15,12 +17,14 @@ use Symfony\Component\Routing\RequestContextAwareInterface;
  */
 final class AddEnabledLocalesListener
 {
-    private $enabledLocales;
+    private $defaultEnabledLocales;
     private $router;
+    private $resourceMetadataFactory;
 
-    public function __construct(RequestContextAwareInterface $router = null, array $enabledLocales = [])
+    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, RequestContextAwareInterface $router = null, array $defaultEnabledLocales = [])
     {
-        $this->enabledLocales = $enabledLocales;
+        $this->resourceMetadataFactory = $resourceMetadataFactory;
+        $this->defaultEnabledLocales = $defaultEnabledLocales;
         $this->router = $router;
     }
 
@@ -44,12 +48,26 @@ final class AddEnabledLocalesListener
 
     private function setLocale(Request $request): void
     {
+        $enabledLocales = $this->extractEnabledLocales($request);
+
         // If no locale has been sent to the request, then try to guess the locale from the Accept-Language header
-        if (!empty($this->enabledLocales) && null === $request->attributes->get('_locale') && $preferredLanguage = $request->getPreferredLanguage($this->enabledLocales)) {
+        if (!empty($enabledLocales) && null === $request->attributes->get('_locale') && $preferredLanguage = $request->getPreferredLanguage($enabledLocales)) {
             $request->setLocale($preferredLanguage);
 
             $this->setRouterContext($request);
         }
+    }
+
+    private function extractEnabledLocales(Request $request)
+    {
+        if ($attributes = RequestAttributesExtractor::extractAttributes($request)) {
+            return $this
+                ->resourceMetadataFactory
+                ->create($attributes['resource_class'])
+                ->getOperationAttribute($attributes, 'enabled_locales', $this->defaultEnabledLocales, true);
+        }
+
+        return $this->defaultEnabledLocales;
     }
 
     private function setRouterContext(Request $request): void

@@ -158,6 +158,7 @@
 
         <!-- kernel.request priority must be < 15 to be executed after Symfony's LocaleListener -->
         <service id="api_platform.listener.request.add_enabled_locales" class="ApiPlatform\Core\EventListener\AddEnabledLocalesListener">
+            <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
             <argument type="service" id="router" on-invalid="ignore" />
             <argument>%api_platform.enabled_locales%</argument>
 

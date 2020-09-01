@@ -14,6 +14,8 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\EventListener;
 
 use ApiPlatform\Core\EventListener\AddEnabledLocalesListener;
+use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
+use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Tests\ProphecyTrait;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
@@ -31,50 +33,178 @@ class AddEnabledLocalesListenerTest extends TestCase
 
     public function testRequestPreferredLocaleFromAcceptLanguageHeader()
     {
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
+        $resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadata(
+            null,
+            null,
+            null,
+            null,
+           null
+        ));
+
         $request = Request::create('/');
         $request->setDefaultLocale('de');
-        $request->attributes->set('_api_resource_class', true);
+        $request->attributes->set('_api_resource_class', 'Foo');
+        $request->attributes->set('resource_class', true);
         $request->headers->set('Accept-Language', ['Accept-Language: fr-FR,fr;q=0.9,en-GB;q=0.8,en;q=0.7,en-US;q=0.6,es;q=0.5']);
 
-        $listener = new AddEnabledLocalesListener(null, ['de', 'fr']);
+        $listener = new AddEnabledLocalesListener($resourceMetadataFactoryProphecy->reveal(), null, ['de', 'fr']);
         $event = $this->getEvent($request);
 
         $listener->onKernelRequest($event);
         self::assertEquals('fr', $request->getLocale());
     }
 
-    public function testWithRouterContextPreferredLocaleFromAcceptLanguageHeader()
+    public function testRequestPreferredLocaleFromAcceptLanguageHeaderFromItemOperation()
     {
-        $requestContext = $this->prophesize(RequestContext::class);
-
-        $router = $this->prophesize(RequestContextAwareInterface::class);
-        $router->getContext()->willReturn($requestContext)->shouldBeCalledTimes(1);
-
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
+        $resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadata(
+            null,
+            null,
+            null,
+            ['get' => ['enabled_locales' => ['mi','it']]],
+            null
+        ));
 
         $request = Request::create('/');
         $request->setDefaultLocale('de');
-        $request->attributes->set('_api_resource_class', true);
+        $request->attributes->set('_api_resource_class', 'Foo');
+        $request->attributes->set('_api_item_operation_name', 'get');
+        $request->attributes->set('resource_class', true);
+        $request->headers->set('Accept-Language', ['Accept-Language: fr-FR,fr;q=0.9,en-GB;q=0.8,en;q=0.7,en-US;q=0.6,es;q=0.5,mi;q=0.4']);
+
+        $listener = new AddEnabledLocalesListener($resourceMetadataFactoryProphecy->reveal(), null, ['de', 'fr']);
+        $event = $this->getEvent($request);
+
+        $listener->onKernelRequest($event);
+        self::assertEquals('mi', $request->getLocale());
+    }
+
+    public function testRequestPreferredLocaleFromAcceptLanguageHeaderFromCollectionOperation()
+    {
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
+        $resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadata(
+            null,
+            null,
+            null,
+            null,
+            ['get' => ['enabled_locales' => ['mi','it']]]
+        ));
+
+        $request = Request::create('/');
+        $request->setDefaultLocale('de');
+        $request->attributes->set('_api_resource_class', 'Foo');
+        $request->attributes->set('_api_collection_operation_name', 'get');
+        $request->attributes->set('resource_class', true);
+        $request->headers->set('Accept-Language', ['Accept-Language: fr-FR,fr;q=0.9,en-GB;q=0.8,en;q=0.7,en-US;q=0.6,es;q=0.5,mi;q=0.4']);
+
+        $listener = new AddEnabledLocalesListener($resourceMetadataFactoryProphecy->reveal(), null, ['de', 'fr']);
+        $event = $this->getEvent($request);
+
+        $listener->onKernelRequest($event);
+        self::assertEquals('mi', $request->getLocale());
+    }
+
+    public function testRequestPreferredLocaleFromAcceptLanguageHeaderFromSubressourceOperation()
+    {
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
+        $resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadata(
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            ['get' => ['enabled_locales' => ['mi','it']]]
+        ));
+
+        $request = Request::create('/');
+        $request->setDefaultLocale('de');
+        $request->attributes->set('_api_resource_class', 'Foo');
+        $request->attributes->set('_api_subresource_operation_name', 'get');
+        $request->attributes->set('resource_class', true);
+        $request->headers->set('Accept-Language', ['Accept-Language: fr-FR,fr;q=0.9,en-GB;q=0.8,en;q=0.7,en-US;q=0.6,es;q=0.5,mi;q=0.4']);
+
+        $listener = new AddEnabledLocalesListener($resourceMetadataFactoryProphecy->reveal(), null, ['de', 'fr']);
+        $event = $this->getEvent($request);
+
+        $listener->onKernelRequest($event);
+        self::assertEquals('mi', $request->getLocale());
+    }
+
+    public function testRequestPreferredLocaleFromAcceptLanguageHeaderFalledBackOnResource()
+    {
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
+        $resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadata(
+            null,
+            null,
+            null,
+            null,
+            null,
+            ['enabled_locales' => ['mi','it']]
+        ));
+
+        $request = Request::create('/');
+        $request->setDefaultLocale('de');
+        $request->attributes->set('_api_resource_class', 'Foo');
+        $request->attributes->set('_api_collection_operation_name', 'get');
+        $request->attributes->set('resource_class', true);
+        $request->headers->set('Accept-Language', ['Accept-Language: fr-FR,fr;q=0.9,en-GB;q=0.8,en;q=0.7,en-US;q=0.6,es;q=0.5,mi;q=0.4']);
+
+        $listener = new AddEnabledLocalesListener($resourceMetadataFactoryProphecy->reveal(), null, ['de', 'fr']);
+        $event = $this->getEvent($request);
+
+        $listener->onKernelRequest($event);
+        self::assertEquals('mi', $request->getLocale());
+    }
+
+    public function testWithRouterContextPreferredLocaleFromAcceptLanguageHeader()
+    {
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
+        $resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadata(
+            null,
+            null,
+            null,
+            null,
+            null
+        ));
+
+        $requestContextProphecy = $this->prophesize(RequestContext::class);
+        $requestContextProphecy->setParameter('_locale', 'fr')->shouldBeCalledOnce();
+
+        $routerProphecy = $this->prophesize(RequestContextAwareInterface::class);
+        $routerProphecy->getContext()->willReturn($requestContextProphecy)->shouldBeCalledOnce();
+
+        $request = Request::create('/');
+        $request->setDefaultLocale('de');
+        $request->attributes->set('_api_resource_class', 'Foo');
         $request->headers->set('Accept-Language', ['Accept-Language: fr-FR,fr;q=0.9,en-GB;q=0.8,en;q=0.7,en-US;q=0.6,es;q=0.5']);
 
-        $listener = new AddEnabledLocalesListener($router->reveal(), ['de', 'fr']);
+        $listener = new AddEnabledLocalesListener($resourceMetadataFactoryProphecy->reveal(), $routerProphecy->reveal(), ['de', 'fr']);
         $event = $this->getEvent($request);
 
         $listener->onKernelRequest($event);
 
-        $this->getProphet()->checkPredictions();
-        $requestContext->setParameter('_locale', 'fr')->shouldHaveBeenCalledOnce();
-//        $router->getContext()->shouldHaveBeenCalledOnce();
         self::assertEquals('fr', $request->getLocale());
     }
 
     public function testRequestSecondPreferredLocaleFromAcceptLanguageHeader()
     {
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
+        $resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadata(
+            null,
+            null,
+            null,
+            null,
+            null
+        ));
+
         $request = Request::create('/');
         $request->setDefaultLocale('de');
-        $request->attributes->set('_api_resource_class', true);
+        $request->attributes->set('_api_resource_class', 'Foo');
         $request->headers->set('Accept-Language', ['Accept-Language: fr-FR,fr;q=0.9,en-GB;q=0.8,en;q=0.7,en-US;q=0.6,es;q=0.5']);
 
-        $listener = new AddEnabledLocalesListener(null, ['de', 'en']);
+        $listener = new AddEnabledLocalesListener($resourceMetadataFactoryProphecy->reveal(), null, ['de', 'en']);
         $event = $this->getEvent($request);
 
         $listener->onKernelRequest($event);
@@ -83,12 +213,21 @@ class AddEnabledLocalesListenerTest extends TestCase
 
     public function testRequestUnavailablePreferredLocaleFromAcceptLanguageHeader()
     {
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
+        $resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadata(
+            null,
+            null,
+            null,
+            null,
+            null
+        ));
+
         $request = Request::create('/');
         $request->setDefaultLocale('de');
-        $request->attributes->set('_api_resource_class', true);
+        $request->attributes->set('_api_resource_class', 'Foo');
         $request->headers->set('Accept-Language', ['Accept-Language: fr-FR,fr;q=0.9,en-GB;q=0.8,en;q=0.7,en-US;q=0.6,es;q=0.5']);
 
-        $listener = new AddEnabledLocalesListener(null, ['de', 'it']);
+        $listener = new AddEnabledLocalesListener($resourceMetadataFactoryProphecy->reveal(), null, ['de', 'it']);
         $event = $this->getEvent($request);
 
         $listener->onKernelRequest($event);
@@ -97,12 +236,15 @@ class AddEnabledLocalesListenerTest extends TestCase
 
     public function testRequestNoLocaleFromAcceptLanguageHeader()
     {
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
+        $resourceMetadataFactoryProphecy->create('Foo')->shouldNotBeCalled();
+
         $request = Request::create('/');
         $request->setDefaultLocale('de');
-        $request->attributes->set('_api_resource_class', true);
+        $request->attributes->set('_api_resource_class', 'Foo');
         $request->headers->set('Accept-Language', ['Accept-Language: fr-FR,fr;q=0.9,en-GB;q=0.8,en;q=0.7,en-US;q=0.6,es;q=0.5']);
 
-        $listener = new AddEnabledLocalesListener();
+        $listener = new AddEnabledLocalesListener($resourceMetadataFactoryProphecy->reveal());
         $event = $this->getEvent($request);
 
         $listener->onKernelRequest($event);
@@ -111,14 +253,23 @@ class AddEnabledLocalesListenerTest extends TestCase
 
     public function testRequestAttributeLocaleNotOverridenFromAcceptLanguageHeader()
     {
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
+        $resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadata(
+            null,
+            null,
+            null,
+            null,
+            null
+        ));
+
         $request = Request::create('/');
         $request->setDefaultLocale('de');
-        $request->attributes->set('_api_resource_class', true);
+        $request->attributes->set('_api_resource_class', 'Foo');
         $request->attributes->set('_locale', 'it');
         $request->setLocale('it');
         $request->headers->set('Accept-Language', ['Accept-Language: fr-FR,fr;q=0.9,en-GB;q=0.8,en;q=0.7,en-US;q=0.6,es;q=0.5']);
 
-        $listener = new AddEnabledLocalesListener(null, ['fr', 'en']);
+        $listener = new AddEnabledLocalesListener($resourceMetadataFactoryProphecy->reveal(), null, ['fr', 'en']);
         $event = $this->getEvent($request);
 
         $listener->onKernelRequest($event);
@@ -127,11 +278,14 @@ class AddEnabledLocalesListenerTest extends TestCase
 
     public function testRequestNotAnApiResource()
     {
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
+        $resourceMetadataFactoryProphecy->create('Foo')->shouldNotBeCalled();
+
         $request = Request::create('/');
         $request->setDefaultLocale('de');
         $request->headers->set('Accept-Language', ['Accept-Language: fr-FR,fr;q=0.9,en-GB;q=0.8,en;q=0.7,en-US;q=0.6,es;q=0.5']);
 
-        $listener = new AddEnabledLocalesListener(null, ['fr']);
+        $listener = new AddEnabledLocalesListener($resourceMetadataFactoryProphecy->reveal(), null, ['fr']);
         $event = $this->getEvent($request);
 
         $listener->onKernelRequest($event);
