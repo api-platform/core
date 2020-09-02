@@ -92,8 +92,7 @@ final class SchemaFactory implements SchemaFactoryInterface
         }
 
         if (!isset($schema['$ref']) && !isset($schema['type'])) {
-            $refDefinitionName = $this->encodeDefinitionName($definitionName);
-            $ref = Schema::VERSION_OPENAPI === $version ? '#/components/schemas/'.$refDefinitionName : '#/definitions/'.$refDefinitionName;
+            $ref = Schema::VERSION_OPENAPI === $version ? '#/components/schemas/'.$definitionName : '#/definitions/'.$definitionName;
 
             $method = null !== $operationType && null !== $operationName ? $resourceMetadata->getTypedOperationAttribute($operationType, $operationName, 'method', 'GET') : 'GET';
             if ($forceCollection || (OperationType::COLLECTION === $operationType && 'POST' !== $method)) {
@@ -236,12 +235,12 @@ final class SchemaFactory implements SchemaFactoryInterface
         if (null !== $inputOrOutputClass && $className !== $inputOrOutputClass) {
             $parts = explode('\\', $inputOrOutputClass);
             $shortName = end($parts);
-            $prefix .= ':'.$shortName;
+            $prefix .= '.'.$shortName;
         }
 
         if (isset($this->distinctFormats[$format])) {
             // JSON is the default, and so isn't included in the definition name
-            $prefix .= ':'.$format;
+            $prefix .= '.'.$format;
         }
 
         if (isset($serializerContext[DocumentationNormalizer::SWAGGER_DEFINITION_NAME])) {
@@ -251,15 +250,12 @@ final class SchemaFactory implements SchemaFactoryInterface
             $name = $groups ? sprintf('%s-%s', $prefix, implode('_', $groups)) : $prefix;
         }
 
-        return $name;
+        return $this->encodeDefinitionName($name);
     }
 
     private function encodeDefinitionName(string $name): string
     {
-        $entities = ['%2F', '%7E'];
-        $replacements = ['~1', '~0'];
-
-        return str_replace($entities, $replacements, urlencode($name));
+        return preg_replace('/^[a-zA-Z0-9.\-_]+$./', '.', $name);
     }
 
     private function getMetadata(string $className, string $type = Schema::TYPE_OUTPUT, ?string $operationType, ?string $operationName, ?array $serializerContext): ?array
