@@ -43,6 +43,7 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\DummyOffer as DummyOffer
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\DummyProduct as DummyProductDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\DummyProperty as DummyPropertyDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\DummyTableInheritanceNotApiResourceChild as DummyTableInheritanceNotApiResourceChildDocument;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\DummyWithEnabledLocales as DummyWithEnabledLocalesDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\EmbeddableDummy as EmbeddableDummyDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\EmbeddedDummy as EmbeddedDummyDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\FileConfigDummy as FileConfigDummyDocument;
@@ -100,6 +101,7 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyOffer;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyProduct;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyProperty;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyTableInheritanceNotApiResourceChild;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyWithEnabledLocales;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\EmbeddableDummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\EmbeddedDummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\ExternalUser;
@@ -1302,6 +1304,35 @@ final class DoctrineContext implements Context
     }
 
     /**
+     * @Given there is a DummyWithEnabledLocales
+     */
+    public function thereIsADummyWithEnabledLocales()
+    {
+        $dummy = $this->buildDummyWithEnabledLocales();
+        $dummy->setName('hòla');
+        $this->manager->persist($dummy);
+
+        $this->manager->flush();
+    }
+
+    /**
+     * @Given there is a DummyWithEnabledLocales related to a subresource
+     */
+    public function thereIsADummyWithEnabledLocalesRelatedToSubresource()
+    {
+        $subresource = $this->buildDummyWithEnabledLocales();
+        $subresource->setName('Subodor');
+
+        $dummy = $this->buildDummyWithEnabledLocales();
+        $dummy->setName('Odor');
+        $dummy->setSubResourceDummy($subresource);
+
+        $this->manager->persist($dummy);
+        $this->manager->persist($subresource);
+        $this->manager->flush();
+    }
+
+    /**
      * @Given there is a person named :name greeting with a :message message
      */
     public function thereIsAPersonWithAGreeting(string $name, string $message)
@@ -1567,6 +1598,14 @@ final class DoctrineContext implements Context
     private function buildDummy()
     {
         return $this->isOrm() ? new Dummy() : new DummyDocument();
+    }
+
+    /**
+     * @return DummyWithEnabledLocales|DummyWithEnabledLocalesDocument
+     */
+    private function buildDummyWithEnabledLocales()
+    {
+        return $this->isOrm() ? new DummyWithEnabledLocales() : new DummyWithEnabledLocalesDocument();
     }
 
     /**

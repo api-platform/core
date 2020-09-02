@@ -17,6 +17,7 @@ use ApiPlatform\Core\EventListener\RespondListener;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyWithEnabledLocales;
 use ApiPlatform\Core\Tests\ProphecyTrait;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
@@ -245,5 +246,89 @@ class RespondListenerTest extends TestCase
 
         $listener = new RespondListener();
         $listener->onKernelView($eventProphecy->reveal());
+    }
+
+    public function testDefaultEnabledLocales()
+    {
+        $kernelProphecy = $this->prophesize(HttpKernelInterface::class);
+        $request = new Request([], [], ['_api_resource_class' => Dummy::class, '_api_item_operation_name' => 'get', '_api_respond' => true]);
+
+        $event = new ViewEvent(
+            $kernelProphecy->reveal(),
+            $request,
+            HttpKernelInterface::MASTER_REQUEST,
+            'bar'
+        );
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
+        $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadata());
+
+        $listener = new RespondListener($resourceMetadataFactoryProphecy->reveal(), ['kz']);
+        $listener->onKernelView($event);
+
+        $response = $event->getResponse();
+
+        /** @var string $vary */
+        $vary = $response->headers->get('Vary');
+        /** @var string $contentLanguage */
+        $contentLanguage = $response->headers->get('Content-Language');
+
+        self::assertStringContainsString('Accept-Language', $vary);
+        self::assertEquals('kz,en', $contentLanguage);
+    }
+
+    public function testResourceEnabledLocales()
+    {
+        $kernelProphecy = $this->prophesize(HttpKernelInterface::class);
+        $request = new Request([], [], ['_api_resource_class' => Dummy::class, '_api_item_operation_name' => 'get', '_api_respond' => true]);
+
+        $event = new ViewEvent(
+            $kernelProphecy->reveal(),
+            $request,
+            HttpKernelInterface::MASTER_REQUEST,
+            'bar'
+        );
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
+        $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadata(null, null, null, ['get'],null, ['enabled_locales'=>['az']]));
+
+        $listener = new RespondListener($resourceMetadataFactoryProphecy->reveal(), ['kz']);
+        $listener->onKernelView($event);
+
+        $response = $event->getResponse();
+
+        /** @var string $vary */
+        $vary = $response->headers->get('Vary');
+        /** @var string $contentLanguage */
+        $contentLanguage = $response->headers->get('Content-Language');
+
+        self::assertStringContainsString('Accept-Language', $vary);
+        self::assertEquals('az,en', $contentLanguage);
+    }
+
+    public function testOperationEnabledLocales()
+    {
+        $kernelProphecy = $this->prophesize(HttpKernelInterface::class);
+        $request = new Request([], [], ['_api_resource_class' => Dummy::class, '_api_item_operation_name' => 'get', '_api_respond' => true]);
+
+        $event = new ViewEvent(
+            $kernelProphecy->reveal(),
+            $request,
+            HttpKernelInterface::MASTER_REQUEST,
+            'bar'
+        );
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
+        $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadata(null, null, null, ['get' => ['enabled_locales'=>['pl']]],null, ['enabled_locales'=>['az']]));
+
+        $listener = new RespondListener($resourceMetadataFactoryProphecy->reveal(), ['kz']);
+        $listener->onKernelView($event);
+
+        $response = $event->getResponse();
+
+        /** @var string $vary */
+        $vary = $response->headers->get('Vary');
+        /** @var string $contentLanguage */
+        $contentLanguage = $response->headers->get('Content-Language');
+
+        self::assertStringContainsString('Accept-Language', $vary);
+        self::assertEquals('pl,en', $contentLanguage);
     }
 }

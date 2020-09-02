@@ -66,7 +66,7 @@ use ApiPlatform\Core\Exception\InvalidArgumentException;
  *     @Attribute("subresourceOperations", type="array"),
  *     @Attribute("sunset", type="string"),
  *     @Attribute("swaggerContext", type="array"),
- *     @Attribute("validationGroups", type="mixed")
+ *     @Attribute("validationGroups", type="mixed"),
  *     @Attribute("enabledLocales", type="array")
  * )
  */
@@ -388,6 +388,8 @@ final class ApiResource
 
     /**
      * @see https://github.com/Haehnchen/idea-php-annotation-plugin/issues/112
+     *
+     * @var array
      */
     private $enabledLocales;
 

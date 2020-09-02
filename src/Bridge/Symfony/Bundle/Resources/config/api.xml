@@ -203,6 +203,7 @@
 
         <service id="api_platform.listener.view.respond" class="ApiPlatform\Core\EventListener\RespondListener">
             <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
+            <argument>%api_platform.enabled_locales%</argument>
             <tag name="kernel.event_listener" event="kernel.view" method="onKernelView" priority="8" />
         </service>
 
