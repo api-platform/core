@@ -54,7 +54,6 @@
         "phpstan/phpstan-doctrine": "^0.12.7",
         "phpstan/phpstan-phpunit": "^0.12.4",
         "phpstan/phpstan-symfony": "^0.12.4",
-        "phpunit/php-code-coverage": "^6.0 || ^7.0 || ^8.0 || ^9.0",
         "psr/log": "^1.0",
         "ramsey/uuid": "^3.7",
         "ramsey/uuid-doctrine": "^1.4",
