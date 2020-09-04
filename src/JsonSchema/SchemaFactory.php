@@ -255,7 +255,7 @@ final class SchemaFactory implements SchemaFactoryInterface
 
     private function encodeDefinitionName(string $name): string
     {
-        return preg_replace('/^[a-zA-Z0-9.\-_]+$./', '.', $name);
+        return preg_replace('/[^a-zA-Z0-9.\-_]/', '.', $name);
     }
 
     private function getMetadata(string $className, string $type = Schema::TYPE_OUTPUT, ?string $operationType, ?string $operationName, ?array $serializerContext): ?array

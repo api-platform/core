@@ -15,7 +15,7 @@
 * Deprecate using a validation groups generator service not implementing `ApiPlatform\Core\Bridge\Symfony\Validator\ValidationGroupsGeneratorInterface` (#3346)
 * Subresources: subresource resourceClass can now be defined as a container parameter in XML and Yaml definitions
 * IriConverter: Fix IRI url double encoding - may cause breaking change as some characters no longer encoded in output (#3552)
-* OpenAPI: **BC** Replace all characters other than `^[a-zA-Z0-9\.\-_]+$.` to `.` in definition names to be compliant with OpenAPI 3.0 (#3669)
+* OpenAPI: **BC** Replace all characters other than `[a-zA-Z0-9\.\-_]` to `.` in definition names to be compliant with OpenAPI 3.0 (#3669)
 
 ## 2.5.7
 
