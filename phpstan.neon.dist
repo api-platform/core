@@ -9,8 +9,10 @@ parameters:
 		container_xml_path: tests/Fixtures/app/var/cache/test/appAppKernelTestDebugContainer.xml
 		constant_hassers: false
 	bootstrapFiles:
-		- vendor/bin/.phpunit/phpunit-9.2-0/vendor/autoload.php
+		- vendor/bin/.phpunit/phpunit/vendor/autoload.php
 		- tests/Fixtures/app/AppKernel.php
+		# We're aliasing classes for phpunit in this file, it needs to be added here see phpstan/#2194
+		- src/Bridge/Symfony/Bundle/Test/Constraint/ArraySubset.php
 	excludes_analyse:
 		- tests/Fixtures/app/var/cache
 		# The Symfony Configuration API isn't good enough to be analysed
