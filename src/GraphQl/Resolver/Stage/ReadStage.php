@@ -21,6 +21,7 @@ use ApiPlatform\Core\GraphQl\Resolver\Util\IdentifierTrait;
 use ApiPlatform\Core\GraphQl\Serializer\ItemNormalizer;
 use ApiPlatform\Core\GraphQl\Serializer\SerializerContextBuilderInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
+use ApiPlatform\Core\Util\ArrayTrait;
 use ApiPlatform\Core\Util\ClassInfoTrait;
 use GraphQL\Type\Definition\ResolveInfo;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -36,6 +37,7 @@ final class ReadStage implements ReadStageInterface
 {
     use ClassInfoTrait;
     use IdentifierTrait;
+    use ArrayTrait;
 
     private $resourceMetadataFactory;
     private $iriConverter;
@@ -135,7 +137,7 @@ final class ReadStage implements ReadStageInterface
                     $name = substr($name, 0, \strlen($name) - \strlen('_list'));
                 }
 
-                // If it's just a simple array of string values, for example when using the _list syntax we don't want to decompose the array because it's will return multiple string and not multipe array that we can merge
+                //If the value contains arrays, we need to merge them for the filters to understand this syntax, proper to GraphQL to preserve the order of the arguments.
                 if ($this->isNumericIndexArrayOfArray($value)) {
                     $value = array_merge(...$value);
                 }
@@ -167,20 +169,5 @@ final class ReadStage implements ReadStageInterface
             'identifiers' => $resolvedIdentifiers,
             'collection' => true,
         ], $operationName);
-    }
-
-    private function isNumericIndexArrayOfArray(array $array): bool
-    {
-        if ([] === $array) {
-            return false;
-        }
-
-        if (array_keys($array) !== range(0, \count($array) - 1)) {
-            return false;
-        }
-
-        return $array === array_filter($array, static function ($item) {
-            return \is_array($item);
-        });
     }
 }
