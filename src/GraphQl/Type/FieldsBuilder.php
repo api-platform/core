@@ -96,7 +96,7 @@ final class FieldsBuilder implements FieldsBuilderInterface
         $shortName = $resourceMetadata->getShortName();
         $fieldName = lcfirst('item_query' === $queryName ? $shortName : $queryName.$shortName);
         $description = $resourceMetadata->getGraphqlAttribute($queryName, 'description');
-        $deprecationReason = (string) $resourceMetadata->getGraphqlAttribute($queryName, 'deprecation_reason', null, true);
+        $deprecationReason = $resourceMetadata->getGraphqlAttribute($queryName, 'deprecation_reason', null, true);
 
         if ($fieldConfiguration = $this->getResourceFieldConfiguration(null, $description, $deprecationReason, new Type(Type::BUILTIN_TYPE_OBJECT, true, $resourceClass), $resourceClass, false, $queryName, null, null)) {
             $args = $this->resolveResourceArgs($configuration['args'] ?? [], $queryName, $shortName);
@@ -116,7 +116,7 @@ final class FieldsBuilder implements FieldsBuilderInterface
         $shortName = $resourceMetadata->getShortName();
         $fieldName = lcfirst('collection_query' === $queryName ? $shortName : $queryName.$shortName);
         $description = $resourceMetadata->getGraphqlAttribute($queryName, 'description');
-        $deprecationReason = (string) $resourceMetadata->getGraphqlAttribute($queryName, 'deprecation_reason', null, true);
+        $deprecationReason = $resourceMetadata->getGraphqlAttribute($queryName, 'deprecation_reason', null, true);
 
         if ($fieldConfiguration = $this->getResourceFieldConfiguration(null, $description, $deprecationReason, new Type(Type::BUILTIN_TYPE_OBJECT, false, null, true, null, new Type(Type::BUILTIN_TYPE_OBJECT, false, $resourceClass)), $resourceClass, false, $queryName, null, null)) {
             $args = $this->resolveResourceArgs($configuration['args'] ?? [], $queryName, $shortName);
