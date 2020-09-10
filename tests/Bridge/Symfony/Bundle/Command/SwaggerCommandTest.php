@@ -70,7 +70,8 @@ class SwaggerCommandTest extends KernelTestCase
       operationId: getDummyCarCollection
 YAML;
 
-        $this->assertStringContainsString($expected, $result, 'nested object should be present.');
+        // Windows uses \r\n as PHP_EOL but symfony exports YAML with \n
+        $this->assertStringContainsString(str_replace(PHP_EOL, "\n", $expected), $result, 'nested object should be present.');
 
         $expected = <<<YAML
   '/dummy_cars/{id}':
@@ -79,7 +80,7 @@ YAML;
       operationId: getDummyCarItem
 YAML;
 
-        $this->assertStringContainsString($expected, $result, 'arrays should be correctly formatted.');
+        $this->assertStringContainsString(str_replace(PHP_EOL, "\n", $expected), $result, 'arrays should be correctly formatted.');
         $this->assertStringContainsString('openapi: 3.0.2', $result);
 
         $expected = <<<YAML
@@ -90,7 +91,7 @@ info:
     This is a test API.
     Made with love
 YAML;
-        $this->assertStringContainsString($expected, $result, 'multiline formatting must be preserved (using literal style).');
+        $this->assertStringContainsString(str_replace(PHP_EOL, "\n", $expected), $result, 'multiline formatting must be preserved (using literal style).');
     }
 
     public function testExecuteOpenApiVersion2WithYaml()

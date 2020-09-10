@@ -1,0 +1,12 @@
+imports:
+    - { resource: config_test.yml }
+
+parameters:
+    env(DATABASE_URL): sqlite:///%kernel.project_dir%/var/data.db
+
+doctrine:
+    dbal:
+        driver: pdo_sqlite
+        url: '%env(resolve:DATABASE_URL)%'
+        types:
+            uuid: Ramsey\Uuid\Doctrine\UuidType
