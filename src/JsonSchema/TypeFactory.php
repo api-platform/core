@@ -17,6 +17,8 @@ use ApiPlatform\Core\Api\ResourceClassResolverInterface;
 use ApiPlatform\Core\Util\ResourceClassInfoTrait;
 use Ramsey\Uuid\UuidInterface;
 use Symfony\Component\PropertyInfo\Type;
+use Symfony\Component\Uid\Ulid;
+use Symfony\Component\Uid\Uuid;
 
 /**
  * {@inheritdoc}
@@ -106,10 +108,16 @@ final class TypeFactory implements TypeFactoryInterface
                 'format' => 'duration',
             ];
         }
-        if (is_a($className, UuidInterface::class, true)) {
+        if (is_a($className, UuidInterface::class, true) || is_a($className, Uuid::class, true)) {
             return [
                 'type' => 'string',
                 'format' => 'uuid',
+            ];
+        }
+        if (is_a($className, Ulid::class, true)) {
+            return [
+                'type' => 'string',
+                'format' => 'ulid',
             ];
         }
 

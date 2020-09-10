@@ -113,6 +113,8 @@ jobs:
         run: |
           composer global require --prefer-dist --no-progress --no-suggest --ansi \
             symfony/flex
+      - name: Require Symfony Uid
+        run: composer require symfony/uid --dev --no-progress --ansi
       - name: Update project dependencies
         run: |
           mkdir -p /tmp/api-platform/core/vendor
@@ -235,6 +237,9 @@ jobs:
           composer remove --dev --no-progress --no-update --ansi \
             doctrine/mongodb-odm \
             doctrine/mongodb-odm-bundle \
+      - name: Require Symfony Uid
+        if: (!startsWith(matrix.php, '7.1'))
+        run: composer require symfony/uid --dev --no-progress --ansi
       - name: Update project dependencies
         run: |
           mkdir -p /tmp/api-platform/core/vendor
@@ -377,6 +382,9 @@ jobs:
           composer remove --dev --no-progress --no-update --ansi \
             doctrine/mongodb-odm \
             doctrine/mongodb-odm-bundle \
+      - name: Require Symfony Uid
+        if: (!startsWith(matrix.php, '7.1'))
+        run: composer require symfony/uid --dev --no-progress --ansi
       - name: Update project dependencies
         run: |
           mkdir -p /tmp/api-platform/core/vendor
@@ -521,6 +529,8 @@ jobs:
         run: |
           composer global require --prefer-dist --no-progress --no-suggest --ansi \
             symfony/flex
+      - name: Require Symfony Uid
+        run: composer require symfony/uid --dev --no-progress --ansi
       - name: Update project dependencies
         run: |
           mkdir -p /tmp/api-platform/core/vendor
@@ -613,6 +623,8 @@ jobs:
           mkdir -p /tmp/api-platform/core/vendor
           ln -s /tmp/api-platform/core/vendor vendor
           composer update --no-progress --no-suggest --prefer-stable --prefer-lowest --ansi
+      - name: Require Symfony Uid
+        run: composer require symfony/uid --dev --no-progress --ansi
       - name: Install PHPUnit
         run: vendor/bin/simple-phpunit --version
       - name: Clear test app cache
@@ -753,6 +765,9 @@ jobs:
           composer remove --dev --no-progress --no-update --ansi \
             doctrine/mongodb-odm \
             doctrine/mongodb-odm-bundle \
+      - name: Require Symfony Uid
+        if: (!startsWith(matrix.php, '7.1'))
+        run: composer require symfony/uid --dev --no-progress --ansi
       - name: Update project dependencies
         run: |
           mkdir -p /tmp/api-platform/core/vendor
@@ -876,6 +891,8 @@ jobs:
         run: |
           composer global require --prefer-dist --no-progress --no-suggest --ansi \
             symfony/flex
+      - name: Require Symfony Uid
+        run: composer require symfony/uid --dev --no-progress --ansi
       - name: Update project dependencies
         run: |
           mkdir -p /tmp/api-platform/core/vendor
@@ -987,6 +1004,8 @@ jobs:
         run: |
           composer global require --prefer-dist --no-progress --no-suggest --ansi \
             symfony/flex
+      - name: Require Symfony Uid
+        run: composer require symfony/uid --dev --no-progress --ansi
       - name: Update project dependencies
         run: |
           mkdir -p /tmp/api-platform/core/vendor
@@ -1098,6 +1117,8 @@ jobs:
         run: |
           composer global require --prefer-dist --no-progress --no-suggest --ansi \
             symfony/flex
+      - name: Require Symfony Uid
+        run: composer require symfony/uid --dev --no-progress --ansi
       - name: Update project dependencies
         run: |
           mkdir -p /tmp/api-platform/core/vendor
@@ -1233,6 +1254,8 @@ jobs:
         run: |
           composer global require --prefer-dist --no-progress --no-suggest --ansi \
             symfony/flex
+      - name: Require Symfony Uid
+        run: composer require symfony/uid --dev --no-progress --ansi
       - name: Update project dependencies
         run: |
           mkdir -p /tmp/api-platform/core/vendor
@@ -1344,6 +1367,8 @@ jobs:
         run: |
           composer global require --prefer-dist --no-progress --no-suggest --ansi \
             symfony/flex
+      - name: Require Symfony Uid
+        run: composer require symfony/uid --dev --no-progress --ansi
       - name: Update project dependencies
         run: |
           mkdir -p /tmp/api-platform/core/vendor
@@ -1492,6 +1517,8 @@ jobs:
           mkdir -p /tmp/api-platform/core/vendor
           ln -s /tmp/api-platform/core/vendor vendor
           composer update --no-progress --no-suggest --ansi
+      - name: Require Symfony Uid
+        run: composer require symfony/uid --dev --no-progress --ansi
       - name: Install PHPUnit
         run: vendor/bin/simple-phpunit --version
       - name: Clear test app cache
@@ -1630,6 +1657,8 @@ jobs:
         run: |
           composer global require --prefer-dist --no-progress --no-suggest --ansi \
             symfony/flex
+      - name: Require Symfony Uid
+        run: composer require symfony/uid --dev --no-progress --ansi
       - name: Update project dependencies
         run: |
           mkdir -p /tmp/api-platform/core/vendor
@@ -1806,6 +1835,8 @@ jobs:
         run: |
           composer global require --prefer-dist --no-progress --no-suggest --ansi \
             symfony/flex
+      - name: Require Symfony Uid
+        run: composer require symfony/uid --dev --no-progress --ansi
       - name: Update project dependencies
         run: |
           mkdir -p /tmp/api-platform/core/vendor
@@ -1951,6 +1982,8 @@ jobs:
         run: |
           composer global require --prefer-dist --no-progress --no-suggest --ansi \
             symfony/flex
+      - name: Require Symfony Uid
+        run: composer require symfony/uid --dev --no-progress --ansi
       - name: Update project dependencies
         run: |
           mkdir -p /tmp/api-platform/core/vendor
@@ -2094,6 +2127,8 @@ jobs:
         run: |
           composer global require --prefer-dist --no-progress --no-suggest --ansi \
             symfony/flex
+      - name: Require Symfony Uid
+        run: composer require symfony/uid --dev --no-progress --ansi
       - name: Update project dependencies
         run: |
           mkdir -p /tmp/api-platform/core/vendor
@@ -2185,6 +2220,8 @@ jobs:
         run: |
           composer global require --prefer-dist --no-progress --no-suggest --ansi \
             symfony/flex
+      - name: Require Symfony Uid
+        run: composer require symfony/uid --dev --no-progress --ansi
       - name: Allow unstable project dependencies
         run: |
           jq '. + {"minimum-stability": "dev"}' composer.json | sponge composer.json
@@ -2293,6 +2330,8 @@ jobs:
         run: |
           composer global require --prefer-dist --no-progress --no-suggest --ansi \
             symfony/flex
+      - name: Require Symfony Uid
+        run: composer require symfony/uid --dev --no-progress --ansi
       - name: Allow unstable project dependencies
         run: |
           jq '. + {"minimum-stability": "dev"}' composer.json | sponge composer.json

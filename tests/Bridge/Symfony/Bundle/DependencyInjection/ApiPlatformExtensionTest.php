@@ -113,6 +113,7 @@ use Symfony\Component\DependencyInjection\ParameterBag\EnvPlaceholderParameterBa
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Serializer\Exception\ExceptionInterface;
+use Symfony\Component\Uid\AbstractUid;
 
 /**
  * @group resource-hog
@@ -985,6 +986,11 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.subresource_operation_factory',
             'api_platform.subresource_operation_factory.cached',
         ];
+
+        if (class_exists(AbstractUid::class)) {
+            $definitions[] = 'api_platform.identifier.symfony_ulid_normalizer';
+            $definitions[] = 'api_platform.identifier.symfony_uuid_normalizer';
+        }
 
         foreach ($definitions as $definition) {
             $containerBuilderProphecy->setDefinition($definition, Argument::type(Definition::class))->shouldBeCalled();
