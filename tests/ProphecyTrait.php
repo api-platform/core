@@ -71,6 +71,7 @@ trait ProphecyTrait
 
     /**
      * @postCondition
+     * @after
      */
     protected function verifyProphecyDoubles(): void
     {
