@@ -137,6 +137,8 @@ jobs:
             phpstan-
         continue-on-error: true
       - name: Run PHPStan analysis
+        env:
+          SYMFONY_PHPUNIT_VERSION: '9.2'
         run: vendor/bin/phpstan analyse --no-progress --no-interaction --ansi
 
   phpunit:
