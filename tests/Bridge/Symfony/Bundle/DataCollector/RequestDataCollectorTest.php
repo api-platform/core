@@ -30,8 +30,8 @@ use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Tests\Fixtures\DummyEntity;
 use ApiPlatform\Core\Tests\ProphecyTrait;
+use PackageVersions\Versions;
 use PHPUnit\Framework\TestCase;
-use ProxyManager\Version;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request;
@@ -231,7 +231,7 @@ class RequestDataCollectorTest extends TestCase
             $this->response
         );
 
-        $this->assertSame(null !== $dataCollector->getVersion(), class_exists(Version::class));
+        $this->assertSame(null !== $dataCollector->getVersion(), class_exists(Versions::class));
     }
 
     private function apiResourceClassWillReturn($data, $context = [])
