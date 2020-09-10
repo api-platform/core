@@ -80,10 +80,15 @@
     {% set icon %}
         {% set status_color = collector.counters.ignored_filters|default(false) ? 'yellow' : 'default' %}
         {{ include('@ApiPlatform/DataCollector/api-platform-icon.svg') }}
-        <span class="sf-toolbar-value"></span>
     {% endset %}
 
     {% set text %}
+        {% if collector.version %}
+            <div class="sf-toolbar-info-piece">
+                <b>Version</b>
+                <span>{{ collector.version }}</span>
+            </div>
+        {% endif %}
         <div class="sf-toolbar-info-piece">
             <b>Resource Class</b>
             <span>{{ collector.resourceClass|default('Not an API Platform resource') }}</span>
