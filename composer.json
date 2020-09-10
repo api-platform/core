@@ -104,6 +104,7 @@
         "symfony/expression-language": "To use authorization features.",
         "symfony/security": "To use authorization features.",
         "symfony/twig-bundle": "To use the Swagger UI integration.",
+        "symfony/uid": "To support Symfony UUID/ULID identifiers.",
         "symfony/web-profiler-bundle": "To use the data collector.",
         "webonyx/graphql-php": "To support GraphQL."
     },
