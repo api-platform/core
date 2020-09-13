@@ -60,8 +60,7 @@ class ConstraintViolationNormalizerTest extends TestCase
         $expected = [
             'type' => 'https://tools.ietf.org/html/rfc2616#section-10',
             'title' => 'An error occurred',
-            'detail' => '_d: a
-_4: 1',
+            'detail' => "_d: a\n_4: 1",
             'violations' => [
                 [
                     'propertyPath' => '_d',

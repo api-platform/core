@@ -115,6 +115,10 @@ final class AnnotationResourceMetadataFactory implements ResourceMetadataFactory
             return $resourceMetadata;
         }
 
+        if (null === $value) {
+            return $resourceMetadata;
+        }
+
         $wither = "with$upperProperty";
 
         return $resourceMetadata->{$wither}($value);
