@@ -69,11 +69,13 @@ Feature: JSON-LD DTO input and output
       "@type": "hydra:Collection",
       "hydra:member": [
         {
+          "@type": "DummyDtoCustom",
           "@id": "/dummy_dto_customs/1",
           "foo": "test",
           "bar": 1
         },
         {
+          "@type": "DummyDtoCustom",
           "@id": "/dummy_dto_customs/2",
           "foo": "test",
           "bar": 2
