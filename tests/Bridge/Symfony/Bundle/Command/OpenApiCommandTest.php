@@ -63,7 +63,7 @@ class OpenApiCommandTest extends KernelTestCase
         - DummyCar
 YAML;
 
-        $this->assertStringContainsString($expected, $result, 'nested object should be present.');
+        $this->assertStringContainsString(str_replace(PHP_EOL, "\n", $expected), $result, 'nested object should be present.');
 
         $expected = <<<YAML
   '/dummy_cars/{id}':
@@ -72,7 +72,7 @@ YAML;
       tags: []
 YAML;
 
-        $this->assertStringContainsString($expected, $result, 'arrays should be correctly formatted.');
+        $this->assertStringContainsString(str_replace(PHP_EOL, "\n", $expected), $result, 'arrays should be correctly formatted.');
         $this->assertStringContainsString('openapi: '.OpenApi::VERSION, $result);
 
         $expected = <<<YAML
@@ -83,7 +83,7 @@ info:
     Made with love
   version: 0.0.0
 YAML;
-        $this->assertStringContainsString($expected, $result, 'multiline formatting must be preserved (using literal style).');
+        $this->assertStringContainsString(str_replace(PHP_EOL, "\n", $expected), $result, 'multiline formatting must be preserved (using literal style).');
     }
 
     public function testWriteToFile()
