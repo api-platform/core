@@ -2333,14 +2333,13 @@ jobs:
           path: build/logs/behat
         continue-on-error: true
 
-  windows:
-    name: Windows PHPUnit + Behat (PHP 7.4) (SQLite)
+  windows-phpunit:
+    name: Windows PHPUnit (PHP 7.4) (SQLite)
     runs-on: windows-latest
     timeout-minutes: 10
     env:
       APP_ENV: sqlite
       DATABASE_URL: sqlite:///%kernel.project_dir%/var/data.db
-      PGPASSWORD: root 
     steps:
       - name: Checkout
         uses: actions/checkout@v1
@@ -2370,6 +2369,41 @@ jobs:
       - name: Run PHPUnit tests
         run: |
           vendor/bin/simple-phpunit --log-junit build/logs/phpunit/junit.xml --colors=always
+
+  windows-behat:
+    name: Windows Behat (PHP 7.4) (SQLite)
+    runs-on: windows-latest
+    timeout-minutes: 15
+    env:
+      APP_ENV: sqlite
+      DATABASE_URL: sqlite:///%kernel.project_dir%/var/data.db
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v1
+      - name: Setup PHP with pre-release PECL extension
+        uses: shivammathur/setup-php@v2
+        with:
+            php-version: '7.4'
+            tools: pecl, composer, flex
+            extensions: intl, openssl, mbstring, pdo_sqlite 
+            coverage: none
+            ini-values: memory_limit=-1
+      - name: Cache Composer packages
+        uses: actions/cache@v2
+        with:
+          path: ~/.composer/cache
+          key: composer-php${{ matrix.php }}-${{ github.sha }}
+          restore-keys: |
+            composer-php${{ matrix.php }}-
+            composer-
+        continue-on-error: true
+      - name: Update project dependencies
+        run: |
+          composer update --no-progress --no-suggest --ansi
+          vendor/bin/simple-phpunit --version
+      - name: Clear test app cache
+        run: |
+          tests/Fixtures/app/console cache:clear --ansi
       - name: Run Behat tests
         run: |
           vendor/bin/behat --format=progress --profile=default --no-interaction --colors
