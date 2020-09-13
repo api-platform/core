@@ -1146,11 +1146,11 @@ class ApiPlatformExtensionTest extends TestCase
 
         $containerBuilderProphecy->registerForAutoconfiguration(DataTransformerInterface::class)
             ->willReturn($this->childDefinitionProphecy)->shouldBeCalledTimes(1);
-        $this->childDefinitionProphecy->addTag('api_platform.data_transformer')->shouldBeCalledTimes(1);
 
         $containerBuilderProphecy->registerForAutoconfiguration(DataTransformerInitializerInterface::class)
             ->willReturn($this->childDefinitionProphecy)->shouldBeCalledTimes(1);
-        $this->childDefinitionProphecy->addTag('api_platform.data_transformer')->shouldBeCalledTimes(1);
+
+        $this->childDefinitionProphecy->addTag('api_platform.data_transformer')->shouldBeCalledTimes(2);
 
         $containerBuilderProphecy->addResource(Argument::type(DirectoryResource::class))->shouldBeCalled();
 
