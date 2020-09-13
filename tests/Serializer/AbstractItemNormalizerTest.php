@@ -16,6 +16,7 @@ namespace ApiPlatform\Core\Tests\Serializer;
 use ApiPlatform\Core\Api\IriConverterInterface;
 use ApiPlatform\Core\Api\ResourceClassResolverInterface;
 use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
+use ApiPlatform\Core\DataTransformer\DataTransformerInitializerInterface;
 use ApiPlatform\Core\DataTransformer\DataTransformerInterface;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\Exception\ItemNotFoundException;
@@ -44,6 +45,7 @@ use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 use Symfony\Component\Serializer\NameConverter\AdvancedNameConverterInterface;
+use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\SerializerInterface;
@@ -404,13 +406,19 @@ class AbstractItemNormalizerTest extends TestCase
             'output' => ['class' => DummyForAdditionalFields::class],
         ];
         $augmentedContext = $context + ['api_denormalize' => true];
+
+        $preHydratedDummy = new DummyForAdditionalFieldsInput('Name Dummy');
         $cleanedContext = array_diff_key($augmentedContext, [
             'input' => null,
             'resource_class' => null,
         ]);
+        $cleanedContextWithObjectToPopulate = array_merge($cleanedContext, [
+            AbstractObjectNormalizer::OBJECT_TO_POPULATE => $preHydratedDummy,
+            AbstractObjectNormalizer::DEEP_OBJECT_TO_POPULATE => true,
+        ]);
 
         $dummyInputDto = new DummyForAdditionalFieldsInput('Dummy Name');
-        $dummy = new DummyForAdditionalFields('Dummy Name', 'dummy-name');
+        $dummy = new DummyForAdditionalFields('Dummy Name', 'name-dummy');
 
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
 
@@ -421,13 +429,15 @@ class AbstractItemNormalizerTest extends TestCase
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
         $resourceClassResolverProphecy->getResourceClass(null, DummyForAdditionalFields::class)->willReturn(DummyForAdditionalFields::class);
 
-        $inputDataTransformerProphecy = $this->prophesize(DataTransformerInterface::class);
+        $inputDataTransformerProphecy = $this->prophesize(DataTransformerInitializerInterface::class);
+        $inputDataTransformerProphecy->willImplement(DataTransformerInitializerInterface::class);
+        $inputDataTransformerProphecy->initialize(DummyForAdditionalFieldsInput::class, $cleanedContext)->willReturn($preHydratedDummy);
         $inputDataTransformerProphecy->supportsTransformation($data, DummyForAdditionalFields::class, $augmentedContext)->willReturn(true);
         $inputDataTransformerProphecy->transform($dummyInputDto, DummyForAdditionalFields::class, $augmentedContext)->willReturn($dummy);
 
         $serializerProphecy = $this->prophesize(SerializerInterface::class);
         $serializerProphecy->willImplement(DenormalizerInterface::class);
-        $serializerProphecy->denormalize($data, DummyForAdditionalFieldsInput::class, 'json', $cleanedContext)->willReturn($dummyInputDto);
+        $serializerProphecy->denormalize($data, DummyForAdditionalFieldsInput::class, 'json', $cleanedContextWithObjectToPopulate)->willReturn($dummyInputDto);
 
         $normalizer = new class($propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), $iriConverterProphecy->reveal(), $resourceClassResolverProphecy->reveal(), null, null, null, null, false, [], [$inputDataTransformerProphecy->reveal()], null, null) extends AbstractItemNormalizer {
         };

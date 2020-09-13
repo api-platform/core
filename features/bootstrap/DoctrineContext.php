@@ -53,6 +53,7 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\Foo as FooDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\FooDummy as FooDummyDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\FourthLevel as FourthLevelDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\Greeting as GreetingDocument;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\InitializeInput as InitializeInputDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\MaxDepthDummy as MaxDepthDummyDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\NetworkPathDummy as NetworkPathDummyDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\NetworkPathRelationDummy as NetworkPathRelationDummyDocument;
@@ -117,6 +118,7 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Foo;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\FooDummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\FourthLevel;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Greeting;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\InitializeInput;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\InternalUser;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\MaxDepthDummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\NetworkPathDummy;
@@ -1589,6 +1591,20 @@ final class DoctrineContext implements Context
         $this->manager->flush();
     }
 
+    /**
+     * @Given there is an InitializeInput object with id :id
+     */
+    public function thereIsAnInitializeInput(int $id)
+    {
+        $initializeInput = $this->buildInitializeInput();
+        $initializeInput->id = $id;
+        $initializeInput->manager = 'Orwell';
+        $initializeInput->name = '1984';
+
+        $this->manager->persist($initializeInput);
+        $this->manager->flush();
+    }
+
     private function isOrm(): bool
     {
         return null !== $this->schemaTool;
@@ -2005,5 +2021,13 @@ final class DoctrineContext implements Context
     private function buildNetworkPathRelationDummy()
     {
         return $this->isOrm() ? new NetworkPathRelationDummy() : new NetworkPathRelationDummyDocument();
+    }
+
+    /**
+     * @return InitializeInput|InitializeInputDocument
+     */
+    private function buildInitializeInput()
+    {
+        return $this->isOrm() ? new InitializeInput() : new InitializeInputDocument();
     }
 }

@@ -30,6 +30,7 @@ use ApiPlatform\Core\DataPersister\DataPersisterInterface;
 use ApiPlatform\Core\DataProvider\CollectionDataProviderInterface;
 use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
 use ApiPlatform\Core\DataProvider\SubresourceDataProviderInterface;
+use ApiPlatform\Core\DataTransformer\DataTransformerInitializerInterface;
 use ApiPlatform\Core\DataTransformer\DataTransformerInterface;
 use ApiPlatform\Core\GraphQl\Error\ErrorHandlerInterface;
 use ApiPlatform\Core\GraphQl\Resolver\MutationResolverInterface;
@@ -687,6 +688,9 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
     private function registerDataTransformerConfiguration(ContainerBuilder $container): void
     {
         $container->registerForAutoconfiguration(DataTransformerInterface::class)
+            ->addTag('api_platform.data_transformer');
+
+        $container->registerForAutoconfiguration(DataTransformerInitializerInterface::class)
             ->addTag('api_platform.data_transformer');
     }
 
