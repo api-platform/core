@@ -57,6 +57,7 @@
         "psr/log": "^1.0",
         "ramsey/uuid": "^3.7",
         "ramsey/uuid-doctrine": "^1.4",
+        "soyuka/stubs-mongodb": "^1.0",
         "symfony/asset": "^3.4 || ^4.0 || ^5.0",
         "symfony/browser-kit": "^4.3 || ^5.0",
         "symfony/cache": "^3.4 || ^4.0 || ^5.0",
@@ -83,7 +84,6 @@
         "symfony/validator": "^3.4 || ^4.0 || ^5.0",
         "symfony/web-profiler-bundle": "^4.2 || ^5.0",
         "symfony/yaml": "^3.4 || ^4.0 || ^5.0",
-        "teohhanhui/stubs-mongodb": "@dev",
         "twig/twig": "^1.42.3 || ^2.12",
         "webonyx/graphql-php": "^14.0"
     },
@@ -117,12 +117,6 @@
             "ApiPlatform\\Core\\Tests\\": "tests/"
         }
     },
-    "repositories": [
-        {
-            "type": "vcs",
-            "url": "https://github.com/teohhanhui/stubs-mongodb"
-        }
-    ],
     "config": {
         "preferred-install": {
             "*": "dist"
