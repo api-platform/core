@@ -253,7 +253,7 @@ final class PublishMercureUpdatesListener
         return $updates;
     }
 
-    private function buildUpdate(string $iri, string $data, array $options): Update
+    private function buildUpdate($iri, string $data, array $options): Update
     {
         if (method_exists(Update::class, 'isPrivate')) {
             return new Update($iri, $data, $options['private'] ?? false, $options['id'] ?? null, $options['type'] ?? null, $options['retry'] ?? null);
