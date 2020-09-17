@@ -60,7 +60,7 @@ final class ItemResolverFactory implements ResolverFactoryInterface
     {
         return function (?array $source, array $args, $context, ResolveInfo $info) use ($resourceClass, $rootClass, $operationName) {
             // Data already fetched and normalized (field or nested resource)
-            if (isset($source[$info->fieldName])) {
+            if (isset($source[$info->fieldName]) || (\is_array($source) && \array_key_exists($info->fieldName, $source) && null === $source[$info->fieldName] && null === $resourceClass)) {
                 return $source[$info->fieldName];
             }
 
