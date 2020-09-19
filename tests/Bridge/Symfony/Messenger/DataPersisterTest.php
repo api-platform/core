@@ -55,6 +55,16 @@ class DataPersisterTest extends TestCase
         $this->assertFalse($dataPersister->supports(new DummyCar()));
     }
 
+    public function testSupportWithContextAndMessengerDispatched()
+    {
+        $metadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
+        $metadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadata(null, null, null, null, null, ['messenger' => true]));
+        $metadataFactoryProphecy->create(DummyCar::class)->willThrow(new ResourceClassNotFoundException());
+
+        $dataPersister = new DataPersister($metadataFactoryProphecy->reveal(), $this->prophesize(MessageBusInterface::class)->reveal(), $this->prophesize(ContextAwareDataPersisterInterface::class)->reveal());
+        $this->assertFalse($dataPersister->supports(new DummyCar(), ['resource_class' => Dummy::class, 'messenger_dispatched' => true]));
+    }
+
     public function testPersist()
     {
         $dummy = new Dummy();
@@ -108,6 +118,27 @@ class DataPersisterTest extends TestCase
 
         $chainDataPersister = $this->prophesize(ContextAwareDataPersisterInterface::class);
         $chainDataPersister->persist($dummy, ['messenger_dispatched' => true])->willReturn($dummy)->shouldBeCalled();
+
+        $messageBus = $this->prophesize(MessageBusInterface::class);
+        $messageBus->dispatch(Argument::that(function (Envelope $envelope) use ($dummy) {
+            return $dummy === $envelope->getMessage() && null !== $envelope->last(ContextStamp::class);
+        }))->willReturn(new Envelope($dummy))->shouldBeCalled();
+
+        $dataPersister = new DataPersister($metadataFactory->reveal(), $messageBus->reveal(), $chainDataPersister->reveal());
+        $this->assertSame($dummy, $dataPersister->persist($dummy));
+    }
+
+    public function testPersistWithExceptionOnHandOver()
+    {
+        $dummy = new Dummy();
+
+        $metadataFactory = $this->prophesize(ResourceMetadataFactoryInterface::class);
+        $metadataFactory->create(DummyCar::class)->willThrow(new ResourceClassNotFoundException());
+        $metadataFactory->create(Dummy::class)->willThrow(new ResourceClassNotFoundException());
+        $metadataFactory->create(Dummy::class)->willThrow(new ResourceClassNotFoundException());
+
+        $chainDataPersister = $this->prophesize(ContextAwareDataPersisterInterface::class);
+        $chainDataPersister->persist(Argument::any(), Argument::any())->shouldNotBeCalled();
 
         $messageBus = $this->prophesize(MessageBusInterface::class);
         $messageBus->dispatch(Argument::that(function (Envelope $envelope) use ($dummy) {
