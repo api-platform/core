@@ -20,6 +20,7 @@ use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
+use ApiPlatform\Core\Security\ResourceAccessCheckerInterface;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
@@ -36,9 +37,9 @@ class ItemNormalizer extends AbstractItemNormalizer
 {
     private $logger;
 
-    public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, IriConverterInterface $iriConverter, ResourceClassResolverInterface $resourceClassResolver, PropertyAccessorInterface $propertyAccessor = null, NameConverterInterface $nameConverter = null, ClassMetadataFactoryInterface $classMetadataFactory = null, ItemDataProviderInterface $itemDataProvider = null, bool $allowPlainIdentifiers = false, LoggerInterface $logger = null, iterable $dataTransformers = [], ResourceMetadataFactoryInterface $resourceMetadataFactory = null)
+    public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, IriConverterInterface $iriConverter, ResourceClassResolverInterface $resourceClassResolver, PropertyAccessorInterface $propertyAccessor = null, NameConverterInterface $nameConverter = null, ClassMetadataFactoryInterface $classMetadataFactory = null, ItemDataProviderInterface $itemDataProvider = null, bool $allowPlainIdentifiers = false, LoggerInterface $logger = null, iterable $dataTransformers = [], ResourceMetadataFactoryInterface $resourceMetadataFactory = null, ResourceAccessCheckerInterface $resourceAccessChecker = null)
     {
-        parent::__construct($propertyNameCollectionFactory, $propertyMetadataFactory, $iriConverter, $resourceClassResolver, $propertyAccessor, $nameConverter, $classMetadataFactory, $itemDataProvider, $allowPlainIdentifiers, [], $dataTransformers, $resourceMetadataFactory);
+        parent::__construct($propertyNameCollectionFactory, $propertyMetadataFactory, $iriConverter, $resourceClassResolver, $propertyAccessor, $nameConverter, $classMetadataFactory, $itemDataProvider, $allowPlainIdentifiers, [], $dataTransformers, $resourceMetadataFactory, $resourceAccessChecker);
 
         $this->logger = $logger ?: new NullLogger();
     }
@@ -72,7 +73,7 @@ class ItemNormalizer extends AbstractItemNormalizer
     private function updateObjectToPopulate(array $data, array &$context): void
     {
         try {
-            $context[self::OBJECT_TO_POPULATE] = $this->iriConverter->getItemFromIri((string) $data['id'], $context + ['fetch_data' => true]);
+            $context[self::OBJECT_TO_POPULATE] = $this->iriConverter->getItemFromIri((string) $data['@id'], $context + ['fetch_data' => true]);
         } catch (InvalidArgumentException $e) {
             $identifier = null;
             $options = $this->getFactoryOptions($context);
@@ -88,7 +89,7 @@ class ItemNormalizer extends AbstractItemNormalizer
                 throw $e;
             }
 
-            $context[self::OBJECT_TO_POPULATE] = $this->iriConverter->getItemFromIri(sprintf('%s/%s', $this->iriConverter->getIriFromResourceClass($context['resource_class']), $data[$identifier]), $context + ['fetch_data' => true]);
+            $context[self::OBJECT_TO_POPULATE] = $this->iriConverter->getItemFromIri($this->iriConverter->getItemIriFromResourceClass($context['resource_class'], [$data[$identifier]]), $context + ['fetch_data' => true]);
         }
     }
 }
