@@ -29,10 +29,12 @@ final class MatchFilter extends AbstractSearchFilter
      */
     protected function getQuery(string $property, array $values, ?string $nestedPath): array
     {
+        $snakeCasedProperty = $this->snakeCasePropertyPath($property);
+
         $matches = [];
 
         foreach ($values as $value) {
-            $matches[] = ['match' => [$property => $value]];
+            $matches[] = ['match' => [$snakeCasedProperty => $value]];
         }
 
         $matchQuery = isset($matches[1]) ? ['bool' => ['should' => $matches]] : $matches[0];

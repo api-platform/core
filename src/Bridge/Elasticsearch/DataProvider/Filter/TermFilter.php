@@ -30,10 +30,12 @@ final class TermFilter extends AbstractSearchFilter
      */
     protected function getQuery(string $property, array $values, ?string $nestedPath): array
     {
+        $snakeCasedProperty = $this->snakeCasePropertyPath($property);
+
         if (1 === \count($values)) {
-            $termQuery = ['term' => [$property => reset($values)]];
+            $termQuery = ['term' => [$snakeCasedProperty => reset($values)]];
         } else {
-            $termQuery = ['terms' => [$property => $values]];
+            $termQuery = ['terms' => [$snakeCasedProperty => $values]];
         }
 
         if (null !== $nestedPath) {
