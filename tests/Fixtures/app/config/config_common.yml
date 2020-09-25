@@ -11,6 +11,11 @@ framework:
     profiler:
         enabled:                        true
         collect:                        false
+    messenger:
+        default_bus: messenger.bus.default
+        buses:
+            messenger.bus.default:
+                default_middleware: allow_no_handlers
 
 web_profiler:
     toolbar: true
@@ -252,6 +257,12 @@ services:
 
     app.data_transformer.custom_output_dto:
         class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\DataTransformer\CustomOutputDtoDataTransformer'
+        public: false
+        tags:
+            -  { name: 'api_platform.data_transformer' }
+
+    app.data_transformer.messenger_with_array_dto:
+        class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\DataTransformer\MessengerWithArrayDtoDataTransformer'
         public: false
         tags:
             -  { name: 'api_platform.data_transformer' }
