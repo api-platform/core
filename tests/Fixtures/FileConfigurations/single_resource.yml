@@ -25,4 +25,6 @@
         hydra_context:
             '@type': 'hydra:Operation'
             '@hydra:title': 'File config Dummy'
+        stateless: true
     iri: 'someirischema'
+    stateless: true

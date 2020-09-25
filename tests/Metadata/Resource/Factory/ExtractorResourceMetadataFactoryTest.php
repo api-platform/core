@@ -302,6 +302,7 @@ class ExtractorResourceMetadataFactoryTest extends FileConfigurationMetadataFact
             'attributes' => [
                 'pagination_items_per_page' => 4,
                 'pagination_maximum_items_per_page' => 6,
+                'stateless' => true,
             ],
         ];
         $resourceConfiguration = [
@@ -312,6 +313,7 @@ class ExtractorResourceMetadataFactoryTest extends FileConfigurationMetadataFact
                 'itemOperations' => ['get', 'delete'],
                 'attributes' => [
                     'pagination_maximum_items_per_page' => 10,
+                    'stateless' => false,
                 ],
             ],
         ];
@@ -338,5 +340,6 @@ class ExtractorResourceMetadataFactoryTest extends FileConfigurationMetadataFact
         $this->assertEquals(['get', 'delete'], $metadata->getItemOperations());
         $this->assertEquals(4, $metadata->getAttribute('pagination_items_per_page'));
         $this->assertEquals(10, $metadata->getAttribute('pagination_maximum_items_per_page'));
+        $this->assertFalse($metadata->getAttribute('stateless'));
     }
 }

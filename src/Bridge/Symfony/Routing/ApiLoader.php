@@ -126,6 +126,7 @@ final class ApiLoader extends Loader
                     [
                         '_controller' => $controller,
                         '_format' => null,
+                        '_stateless' => $operation['stateless'] ?? $resourceMetadata->getAttribute('stateless'),
                         '_api_resource_class' => $operation['resource_class'],
                         '_api_subresource_operation_name' => $operation['route_name'],
                         '_api_subresource_context' => [
@@ -229,6 +230,7 @@ final class ApiLoader extends Loader
             [
                 '_controller' => $controller,
                 '_format' => null,
+                '_stateless' => $operation['stateless'],
                 '_api_resource_class' => $resourceClass,
                 sprintf('_api_%s_operation_name', $operationType) => $operationName,
             ] + ($operation['defaults'] ?? []),

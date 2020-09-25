@@ -53,6 +53,7 @@
             <attribute name="@type">hydra:Operation</attribute>
             <attribute name="@hydra:title">File config Dummy</attribute>
         </attribute>
+        <attribute name="stateless">true</attribute>
 
         <property
                 name="foo"

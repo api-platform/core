@@ -76,6 +76,7 @@ api_platform:
             shared_max_age:                   3600
             vary:                             ['Accept', 'Cookie']
             public:                           true
+        stateless: true
 
 parameters:
     container.autowiring.strict_mode: true

@@ -257,6 +257,11 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             }
         }
 
+        if (!\array_key_exists('stateless', $defaults)) {
+            @trigger_error('Not setting the "api_platform.defaults.stateless" configuration is deprecated since API Platform 2.6 and it will default to `true` in 3.0. You can override this at the operation level if you have stateful operations (highly not recommended).', E_USER_DEPRECATED);
+            $normalizedDefaults['attributes']['stateless'] = false;
+        }
+
         return $normalizedDefaults;
     }
 
