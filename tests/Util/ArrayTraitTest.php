@@ -20,9 +20,9 @@ class ArrayTraitTest extends TestCase
 {
     private $arrayTraitClass;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
-        $this->arrayTraitClass = (new class {
+        $this->arrayTraitClass = (new class() {
             use ArrayTrait;
         });
     }
@@ -34,32 +34,32 @@ class ArrayTraitTest extends TestCase
 
     public function testIsSequentialArrayWithNonNumericIndex()
     {
-        self::assertFalse($this->arrayTraitClass->isSequentialArray(["foo" => "bar"]));
+        self::assertFalse($this->arrayTraitClass->isSequentialArray(['foo' => 'bar']));
     }
 
     public function testIsSequentialArrayWithNumericNonContinuousIndex()
     {
-        self::assertFalse($this->arrayTraitClass->isSequentialArray([1 => "bar", 3 => 'foo']));
+        self::assertFalse($this->arrayTraitClass->isSequentialArray([1 => 'bar', 3 => 'foo']));
     }
 
     public function testIsSequentialArrayWithNumericContinuousIndex()
     {
-        self::assertTrue($this->arrayTraitClass->isSequentialArray([0 => "bar", 1 => 'foo']));
+        self::assertTrue($this->arrayTraitClass->isSequentialArray([0 => 'bar', 1 => 'foo']));
     }
 
     public function testArrayContainsOnlyWithDifferentTypes()
     {
-        self::assertFalse($this->arrayTraitClass->arrayContainsOnly([1, "foo"], gettype("")));
+        self::assertFalse($this->arrayTraitClass->arrayContainsOnly([1, 'foo'], \gettype('')));
     }
 
     public function testArrayContainsOnlyWithSameType()
     {
-        self::assertTrue($this->arrayTraitClass->arrayContainsOnly(["foo", "bar"], gettype("")));
+        self::assertTrue($this->arrayTraitClass->arrayContainsOnly(['foo', 'bar'], \gettype('')));
     }
 
     public function testIsNumericIndexArrayOfArray()
     {
         self::assertFalse($this->arrayTraitClass->isNumericIndexArrayOfArray([]));
-        self::assertTrue($this->arrayTraitClass->isNumericIndexArrayOfArray([["foo"], ["bar"]]));
+        self::assertTrue($this->arrayTraitClass->isNumericIndexArrayOfArray([['foo'], ['bar']]));
     }
 }

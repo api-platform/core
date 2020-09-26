@@ -21,7 +21,7 @@ trait ArrayTrait
             return false;
         }
 
-        return $this->arrayContainsOnly($array, gettype([]));
+        return $this->arrayContainsOnly($array, \gettype([]));
     }
 
     public function isSequentialArray(array $array): bool
@@ -35,8 +35,8 @@ trait ArrayTrait
 
     public function arrayContainsOnly(array $array, string $type): bool
     {
-        return $array === array_filter($array, static function ($item) use ($type){
-            return $type === gettype($item);
+        return $array === array_filter($array, static function ($item) use ($type) {
+            return $type === \gettype($item);
         });
     }
 }
