@@ -74,7 +74,9 @@ final class OrderFilter extends AbstractFilter implements SortFilterInterface
                 $order['nested'] = ['path' => $nestedPath];
             }
 
-            $property = $this->snakeCasePropertyPath($property);
+            $property = null === $this->nameConverter
+                ? $this->snakeCasePropertyPath($property)
+                : $this->nameConverter->normalize($property, $resourceClass, null, $context);
             $orders[] = [$property => $order];
         }
 
