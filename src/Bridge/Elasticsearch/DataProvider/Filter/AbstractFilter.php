@@ -20,6 +20,7 @@ use ApiPlatform\Core\Exception\ResourceClassNotFoundException;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use Symfony\Component\PropertyInfo\Type;
+use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 
 /**
@@ -141,5 +142,25 @@ abstract class AbstractFilter implements FilterInterface
         }
 
         return [$type, $hasAssociation, $currentResourceClass, $currentProperty];
+    }
+
+    /**
+     * Convert CamelCase properties to snake_case.
+     *
+     * @example 'some_parent.some_child' === snakeCasePropertyPath('someParent.someChild');
+     */
+    public function convertPropertyName(string $property, ?string $resourceClass = null, array $context = []): string
+    {
+        if (null !== $this->nameConverter) {
+            $property = $this->nameConverter->normalize($property, $resourceClass, null, $context);
+        }
+
+        $unnested = explode('.', $property);
+        $normalizer = new CamelCaseToSnakeCaseNameConverter($unnested);
+        $normalized = array_map(static function (string $unnestedProperty) use ($normalizer) {
+            return $normalizer->normalize($unnestedProperty);
+        }, $unnested);
+
+        return implode('.', $normalized);
     }
 }

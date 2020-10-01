@@ -30,7 +30,6 @@ final class MatchFilter extends AbstractSearchFilter
     protected function getQuery(string $property, array $values, ?string $nestedPath): array
     {
         $matches = [];
-
         foreach ($values as $value) {
             $matches[] = ['match' => [$property => $value]];
         }
