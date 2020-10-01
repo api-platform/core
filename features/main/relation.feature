@@ -402,7 +402,7 @@ Feature: Relations support
     And I send a "GET" request to "/people"
     Then the response status code should be 200
     And the response should be in JSON
-    And the JSON should be equal to:
+    And the JSON should be a superset of:
     """
     {
       "@context": "/contexts/Person",
@@ -415,6 +415,7 @@ Feature: Relations support
           "name": "foo",
           "pets": [
             {
+              "@type": "PersonToPet",
               "pet": {
                 "@id": "/pets/1",
                 "@type": "Pet",
