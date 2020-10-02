@@ -16,7 +16,7 @@ Feature: GraphQL DTO input and output
     }
     """
     Then the response status code should be 201
-    And the JSON should be equal to:
+    And the JSON should be a superset of:
     """
     {
       "@context": {
@@ -43,6 +43,7 @@ Feature: GraphQL DTO input and output
           "relatedToDummyFriend": [],
           "dummyBoolean": null,
           "embeddedDummy": {
+            "@type": "EmbeddableDummy",
             "dummyName": null,
             "dummyBoolean": null,
             "dummyDate": null,
