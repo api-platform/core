@@ -73,7 +73,7 @@ final class PublishMercureUpdatesListener
         $this->formats = $formats;
         $this->messageBus = $messageBus;
         $this->publisher = $publisher;
-        $this->expressionLanguage = $expressionLanguage ?? class_exists(ExpressionLanguage::class) ? new ExpressionLanguage() : null;
+        $this->expressionLanguage = $expressionLanguage ?? (class_exists(ExpressionLanguage::class) ? new ExpressionLanguage() : null);
         $this->reset();
     }
 
