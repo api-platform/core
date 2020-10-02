@@ -233,7 +233,7 @@ final class SchemaFactory implements SchemaFactoryInterface
         return $name;
     }
 
-    private function getMetadata(string $className, string $type = Schema::TYPE_OUTPUT, ?string $operationType, ?string $operationName, ?array $serializerContext): ?array
+    private function getMetadata(string $className, string $type = Schema::TYPE_OUTPUT, ?string $operationType = null, ?string $operationName = null, ?array $serializerContext = null): ?array
     {
         if (!$this->isResourceClass($className)) {
             return [
@@ -263,7 +263,7 @@ final class SchemaFactory implements SchemaFactoryInterface
         ];
     }
 
-    private function getSerializerContext(ResourceMetadata $resourceMetadata, string $type = Schema::TYPE_OUTPUT, ?string $operationType, ?string $operationName): array
+    private function getSerializerContext(ResourceMetadata $resourceMetadata, string $type = Schema::TYPE_OUTPUT, ?string $operationType = null, ?string $operationName = null): array
     {
         $attribute = Schema::TYPE_OUTPUT === $type ? 'normalization_context' : 'denormalization_context';
 
