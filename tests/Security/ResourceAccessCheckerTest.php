@@ -41,16 +41,24 @@ class ResourceAccessCheckerTest extends TestCase
         $authenticationTrustResolverProphecy = $this->prophesize(AuthenticationTrustResolverInterface::class);
         $tokenStorageProphecy = $this->prophesize(TokenStorageInterface::class);
 
-        $tokenProphecy = $this->prophesize(TokenInterface::class);
-        $token = $tokenProphecy->reveal();
-        $tokenProphecy->getUser()->shouldBeCalled();
-        if (method_exists($token, 'getRoleNames')) {
-            $tokenProphecy->getRoleNames()->willReturn([])->shouldBeCalled();
+        $tokenProphecy = $this->createMock(TokenInterface::class);
+        $tokenProphecy
+            ->expects(self::once())
+            ->method('getUser');
+
+        if (method_exists(TokenInterface::class, 'getRoleNames')) {
+            $tokenProphecy
+                ->expects(self::once())
+                ->method('getRoleNames')
+                ->willReturn([]);
         } else {
-            $tokenProphecy->getRoles()->willReturn([])->shouldBeCalled();
+            $tokenProphecy
+                ->expects(self::once())
+                ->method('getRoles')
+                ->willReturn([]);
         }
 
-        $tokenStorageProphecy->getToken()->willReturn($token);
+        $tokenStorageProphecy->getToken()->willReturn($tokenProphecy);
 
         $checker = new ResourceAccessChecker($expressionLanguageProphecy->reveal(), $authenticationTrustResolverProphecy->reveal(), null, $tokenStorageProphecy->reveal());
         $this->assertSame($granted, $checker->isGranted(Dummy::class, 'is_granted("ROLE_ADMIN")'));
@@ -77,7 +85,7 @@ class ResourceAccessCheckerTest extends TestCase
 
         $authenticationTrustResolverProphecy = $this->prophesize(AuthenticationTrustResolverInterface::class);
         $tokenStorageProphecy = $this->prophesize(TokenStorageInterface::class);
-        $tokenStorageProphecy->getToken()->willReturn($this->prophesize(TokenInterface::class)->reveal());
+        $tokenStorageProphecy->getToken()->willReturn($this->createMock(TokenInterface::class));
 
         $checker = new ResourceAccessChecker(null, $authenticationTrustResolverProphecy->reveal(), null, $tokenStorageProphecy->reveal());
         $checker->isGranted(Dummy::class, 'is_granted("ROLE_ADMIN")');

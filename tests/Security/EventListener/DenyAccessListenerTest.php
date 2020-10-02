@@ -253,7 +253,7 @@ class DenyAccessListenerTest extends TestCase
 
         $authenticationTrustResolverProphecy = $this->prophesize(AuthenticationTrustResolverInterface::class);
         $tokenStorageProphecy = $this->prophesize(TokenStorageInterface::class);
-        $tokenStorageProphecy->getToken()->willReturn($this->prophesize(TokenInterface::class)->reveal());
+        $tokenStorageProphecy->getToken()->willReturn($this->createMock(TokenInterface::class));
 
         $listener = new DenyAccessListener($resourceMetadataFactoryProphecy->reveal(), null, $authenticationTrustResolverProphecy->reveal(), null, $tokenStorageProphecy->reveal());
         $listener->onSecurity($event);
