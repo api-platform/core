@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Bridge\Doctrine\Orm;
 
-use ApiPlatform\Core\Bridge\Doctrine\Common\Util\IdentifierManagerTrait;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\FilterEagerLoadingExtension;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\QueryCollectionExtensionInterface;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\QueryItemExtensionInterface;
@@ -23,13 +22,10 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGenerator;
 use ApiPlatform\Core\DataProvider\SubresourceDataProviderInterface;
 use ApiPlatform\Core\Exception\ResourceClassNotSupportedException;
 use ApiPlatform\Core\Exception\RuntimeException;
-use ApiPlatform\Core\Identifier\IdentifierConverterInterface;
-use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
-use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
+use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\QueryBuilder;
-use Doctrine\Persistence\ManagerRegistry;
 
 /**
  * Subresource data provider for the Doctrine ORM.
@@ -38,8 +34,6 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 final class SubresourceDataProvider implements SubresourceDataProviderInterface
 {
-    use IdentifierManagerTrait;
-
     private $managerRegistry;
     private $collectionExtensions;
     private $itemExtensions;
@@ -48,11 +42,9 @@ final class SubresourceDataProvider implements SubresourceDataProviderInterface
      * @param QueryCollectionExtensionInterface[] $collectionExtensions
      * @param QueryItemExtensionInterface[]       $itemExtensions
      */
-    public function __construct(ManagerRegistry $managerRegistry, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, iterable $collectionExtensions = [], iterable $itemExtensions = [])
+    public function __construct(ManagerRegistry $managerRegistry, iterable $collectionExtensions = [], iterable $itemExtensions = [])
     {
         $this->managerRegistry = $managerRegistry;
-        $this->propertyNameCollectionFactory = $propertyNameCollectionFactory;
-        $this->propertyMetadataFactory = $propertyMetadataFactory;
         $this->collectionExtensions = $collectionExtensions;
         $this->itemExtensions = $itemExtensions;
     }
@@ -147,16 +139,6 @@ final class SubresourceDataProvider implements SubresourceDataProviderInterface
 
         $qb = $manager->createQueryBuilder();
         $alias = $queryNameGenerator->generateJoinAlias($identifier);
-        $normalizedIdentifiers = [];
-
-        if (isset($identifiers[$identifier])) {
-            // if it's an array it's already normalized, the IdentifierManagerTrait is deprecated
-            if ($context[IdentifierConverterInterface::HAS_IDENTIFIER_CONVERTER] ?? false) {
-                $normalizedIdentifiers = $identifiers[$identifier];
-            } else {
-                $normalizedIdentifiers = $this->normalizeIdentifiers($identifiers[$identifier], $manager, $identifierResourceClass);
-            }
-        }
 
         if ($classMetadata->hasAssociation($previousAssociationProperty)) {
             $relationType = $classMetadata->getAssociationMapping($previousAssociationProperty)['type'];
@@ -201,7 +183,7 @@ final class SubresourceDataProvider implements SubresourceDataProviderInterface
         $isLeaf = 1 === $remainingIdentifiers;
 
         // Add where clause for identifiers
-        foreach ($normalizedIdentifiers as $key => $value) {
+        foreach (\is_array($identifiers[$identifier]) ? $identifiers[$identifier] : $identifiers as $key => $value) {
             $placeholder = $queryNameGenerator->generateParameterName($key);
             $topQueryBuilder->setParameter($placeholder, $value, (string) $classMetadata->getTypeOfField($key));
 

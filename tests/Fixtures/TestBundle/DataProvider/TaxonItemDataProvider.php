@@ -42,10 +42,10 @@ class TaxonItemDataProvider implements ItemDataProviderInterface, RestrictedData
     /**
      * {@inheritdoc}
      */
-    public function getItem(string $resourceClass, $id, string $operationName = null, array $context = [])
+    public function getItem(string $resourceClass, array $identifiers, string $operationName = null, array $context = [])
     {
         return $this->managerRegistry->getRepository($this->orm ? Taxon::class : TaxonDocument::class)->findOneBy([
-            'code' => $id,
+            'code' => $identifiers['code'],
         ]);
     }
 }

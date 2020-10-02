@@ -42,10 +42,10 @@ class ProductItemDataProvider implements ItemDataProviderInterface, RestrictedDa
     /**
      * {@inheritdoc}
      */
-    public function getItem(string $resourceClass, $id, string $operationName = null, array $context = [])
+    public function getItem(string $resourceClass, array $identifiers, string $operationName = null, array $context = [])
     {
         return $this->managerRegistry->getRepository($this->orm ? Product::class : ProductDocument::class)->findOneBy([
-            'code' => $id,
+            'code' => $identifiers['code'],
         ]);
     }
 }

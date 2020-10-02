@@ -32,18 +32,18 @@ class ContainNonResourceItemDataProvider implements ItemDataProviderInterface, R
     /**
      * {@inheritdoc}
      */
-    public function getItem(string $resourceClass, $id, string $operationName = null, array $context = [])
+    public function getItem(string $resourceClass, array $identifiers, string $operationName = null, array $context = [])
     {
-        if (!is_scalar($id)) {
+        if (!is_scalar($identifiers['id'])) {
             throw new \InvalidArgumentException('The id must be a scalar.');
         }
 
         // Retrieve the blog post item from somewhere
         $cnr = new $resourceClass();
-        $cnr->id = $id;
+        $cnr->id = $identifiers['id'];
         $cnr->notAResource = new NotAResource('f1', 'b1');
         $cnr->nested = new $resourceClass();
-        $cnr->nested->id = "$id-nested";
+        $cnr->nested->id = "{$identifiers['id']}-nested";
         $cnr->nested->notAResource = new NotAResource('f2', 'b2');
 
         return $cnr;

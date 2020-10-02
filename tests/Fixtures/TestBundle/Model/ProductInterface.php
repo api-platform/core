@@ -21,6 +21,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 /**
  * @ApiResource(
  *     shortName="Product",
+ *     attributes={"identified_by"="code"},
  *     normalizationContext={
  *         "groups"={"product_read"},
  *     },

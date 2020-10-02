@@ -16,10 +16,9 @@ namespace ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm;
 use ApiPlatform\Core\Bridge\Doctrine\Common\Util\IdentifierManagerTrait;
 use ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Extension\AggregationItemExtensionInterface;
 use ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Extension\AggregationResultItemExtensionInterface;
-use ApiPlatform\Core\DataProvider\DenormalizedIdentifiersAwareItemDataProviderInterface;
+use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
 use ApiPlatform\Core\DataProvider\RestrictedDataProviderInterface;
 use ApiPlatform\Core\Exception\RuntimeException;
-use ApiPlatform\Core\Identifier\IdentifierConverterInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
@@ -34,7 +33,7 @@ use Doctrine\ODM\MongoDB\Repository\DocumentRepository;
  *
  * @author Alan Poulain <contact@alanpoulain.eu>
  */
-final class ItemDataProvider implements DenormalizedIdentifiersAwareItemDataProviderInterface, RestrictedDataProviderInterface
+final class ItemDataProvider implements ItemDataProviderInterface, RestrictedDataProviderInterface
 {
     use IdentifierManagerTrait;
 
@@ -64,19 +63,13 @@ final class ItemDataProvider implements DenormalizedIdentifiersAwareItemDataProv
      *
      * @throws RuntimeException
      */
-    public function getItem(string $resourceClass, $id, string $operationName = null, array $context = [])
+    public function getItem(string $resourceClass, array $identifiers, ?string $operationName = null, array $context = [])
     {
         /** @var DocumentManager $manager */
         $manager = $this->managerRegistry->getManagerForClass($resourceClass);
 
-        if (!\is_array($id) && !($context[IdentifierConverterInterface::HAS_IDENTIFIER_CONVERTER] ?? false)) {
-            $id = $this->normalizeIdentifiers($id, $manager, $resourceClass);
-        }
-
-        $id = (array) $id;
-
         if (!($context['fetch_data'] ?? true)) {
-            return $manager->getReference($resourceClass, reset($id));
+            return $manager->getReference($resourceClass, reset($identifiers));
         }
 
         $repository = $manager->getRepository($resourceClass);
@@ -86,12 +79,12 @@ final class ItemDataProvider implements DenormalizedIdentifiersAwareItemDataProv
 
         $aggregationBuilder = $repository->createAggregationBuilder();
 
-        foreach ($id as $propertyName => $value) {
+        foreach ($identifiers as $propertyName => $value) {
             $aggregationBuilder->match()->field($propertyName)->equals($value);
         }
 
         foreach ($this->itemExtensions as $extension) {
-            $extension->applyToItem($aggregationBuilder, $resourceClass, $id, $operationName, $context);
+            $extension->applyToItem($aggregationBuilder, $resourceClass, $identifiers, $operationName, $context);
 
             if ($extension instanceof AggregationResultItemExtensionInterface && $extension->supportsResult($resourceClass, $operationName, $context)) {
                 return $extension->getResult($aggregationBuilder, $resourceClass, $operationName, $context);

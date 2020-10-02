@@ -138,3 +138,9 @@ parameters:
 			paths:
 				- src/Bridge/Elasticsearch/DataProvider/Filter/OrderFilter.php
 				- src/Bridge/Elasticsearch/DataProvider/Filter/AbstractSearchFilter.php
+
+		-
+			message: '#Unreachable statement - code above always terminates.#'
+			paths:
+				- tests/Serializer/AbstractItemNormalizerTest.php 
+				- tests/Bridge/Doctrine/MongoDbOdm/ItemDataProviderTest.php

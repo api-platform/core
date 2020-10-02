@@ -28,7 +28,7 @@ class CustomActionController extends AbstractController
      *     methods={"GET"},
      *     name="custom_normalization",
      *     path="/custom/{id}/normalization",
-     *     defaults={"_api_resource_class"=CustomActionDummy::class, "_api_item_operation_name"="custom_normalization"}
+     *     defaults={"_api_resource_class"=CustomActionDummy::class, "_api_item_operation_name"="custom_normalization", "_api_identified_by"={"id"}}
      * )
      */
     public function customNormalizationAction(CustomActionDummy $data)
@@ -67,7 +67,7 @@ class CustomActionController extends AbstractController
      *     methods={"GET"},
      *     name="short_custom_normalization",
      *     path="/short_custom/{id}/normalization",
-     *     defaults={"_api_resource_class"=CustomActionDummy::class, "_api_item_operation_name"="custom_normalization"}
+     *     defaults={"_api_resource_class"=CustomActionDummy::class, "_api_item_operation_name"="custom_normalization", "_api_identified_by"={"id"}}
      * )
      */
     public function shortCustomNormalizationAction(CustomActionDummy $data)

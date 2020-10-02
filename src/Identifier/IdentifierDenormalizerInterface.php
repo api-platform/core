@@ -13,15 +13,10 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Identifier;
 
-/**
- * Gives access to the context in the IdentifierConverter.
- *
- * @author Antoine Bluchet <soyuka@gmail.com>
- */
-interface ContextAwareIdentifierConverterInterface extends IdentifierConverterInterface
+interface IdentifierDenormalizerInterface
 {
     /**
-     * {@inheritdoc}
+     * Takes an array of identifiers and transform their values from strings to the expected type.
      */
-    public function convert(string $data, string $class, array $context = []): array;
+    public function denormalize($identifiers, $class, ?string $format = null, array $context = []): array;
 }

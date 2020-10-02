@@ -19,7 +19,6 @@ use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
 use ApiPlatform\Core\DataTransformer\DataTransformerInitializerInterface;
 use ApiPlatform\Core\DataTransformer\DataTransformerInterface;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
-use ApiPlatform\Core\Exception\InvalidValueException;
 use ApiPlatform\Core\Exception\ItemNotFoundException;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
@@ -62,11 +61,10 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
     protected $resourceAccessChecker;
     protected $propertyAccessor;
     protected $itemDataProvider;
-    protected $allowPlainIdentifiers;
     protected $dataTransformers = [];
     protected $localCache = [];
 
-    public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, IriConverterInterface $iriConverter, ResourceClassResolverInterface $resourceClassResolver, PropertyAccessorInterface $propertyAccessor = null, NameConverterInterface $nameConverter = null, ClassMetadataFactoryInterface $classMetadataFactory = null, ItemDataProviderInterface $itemDataProvider = null, bool $allowPlainIdentifiers = false, array $defaultContext = [], iterable $dataTransformers = [], ResourceMetadataFactoryInterface $resourceMetadataFactory = null, ResourceAccessCheckerInterface $resourceAccessChecker = null)
+    public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, IriConverterInterface $iriConverter, ResourceClassResolverInterface $resourceClassResolver, PropertyAccessorInterface $propertyAccessor = null, NameConverterInterface $nameConverter = null, ClassMetadataFactoryInterface $classMetadataFactory = null, ItemDataProviderInterface $itemDataProvider = null, array $defaultContext = [], iterable $dataTransformers = [], ResourceMetadataFactoryInterface $resourceMetadataFactory = null, ResourceAccessCheckerInterface $resourceAccessChecker = null)
     {
         if (!isset($defaultContext['circular_reference_handler'])) {
             $defaultContext['circular_reference_handler'] = function ($object) {
@@ -85,7 +83,6 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
         $this->resourceClassResolver = $resourceClassResolver;
         $this->propertyAccessor = $propertyAccessor ?: PropertyAccess::createPropertyAccessor();
         $this->itemDataProvider = $itemDataProvider;
-        $this->allowPlainIdentifiers = $allowPlainIdentifiers;
         $this->dataTransformers = $dataTransformers;
         $this->resourceMetadataFactory = $resourceMetadataFactory;
         $this->resourceAccessChecker = $resourceAccessChecker;
@@ -210,33 +207,18 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             return $dataTransformer->transform($denormalizedInput, $resourceClass, $dataTransformerContext);
         }
 
-        $supportsPlainIdentifiers = $this->supportsPlainIdentifiers();
-
         if (\is_string($data)) {
             try {
                 return $this->iriConverter->getItemFromIri($data, $context + ['fetch_data' => true]);
             } catch (ItemNotFoundException $e) {
-                if (!$supportsPlainIdentifiers) {
-                    throw new UnexpectedValueException($e->getMessage(), $e->getCode(), $e);
-                }
+                throw new UnexpectedValueException($e->getMessage(), $e->getCode(), $e);
             } catch (InvalidArgumentException $e) {
-                if (!$supportsPlainIdentifiers) {
-                    throw new UnexpectedValueException(sprintf('Invalid IRI "%s".', $data), $e->getCode(), $e);
-                }
+                throw new UnexpectedValueException(sprintf('Invalid IRI "%s".', $data), $e->getCode(), $e);
             }
         }
 
         if (!\is_array($data)) {
-            if (!$supportsPlainIdentifiers) {
-                throw new UnexpectedValueException(sprintf('Expected IRI or document for resource "%s", "%s" given.', $resourceClass, \gettype($data)));
-            }
-
-            $item = $this->itemDataProvider->getItem($resourceClass, $data, null, $context + ['fetch_data' => true]);
-            if (null === $item) {
-                throw new ItemNotFoundException(sprintf('Item not found for resource "%s" with id "%s".', $resourceClass, $data));
-            }
-
-            return $item;
+            throw new UnexpectedValueException(sprintf('Expected IRI or document for resource "%s", "%s" given.', $resourceClass, \gettype($data)));
         }
 
         return parent::denormalize($data, $resourceClass, $format, $context);
@@ -448,19 +430,13 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
      */
     protected function denormalizeRelation(string $attributeName, PropertyMetadata $propertyMetadata, string $className, $value, ?string $format, array $context)
     {
-        $supportsPlainIdentifiers = $this->supportsPlainIdentifiers();
-
         if (\is_string($value)) {
             try {
                 return $this->iriConverter->getItemFromIri($value, $context + ['fetch_data' => true]);
             } catch (ItemNotFoundException $e) {
-                if (!$supportsPlainIdentifiers) {
-                    throw new UnexpectedValueException($e->getMessage(), $e->getCode(), $e);
-                }
+                throw new UnexpectedValueException($e->getMessage(), $e->getCode(), $e);
             } catch (InvalidArgumentException $e) {
-                if (!$supportsPlainIdentifiers) {
-                    throw new UnexpectedValueException(sprintf('Invalid IRI "%s".', $value), $e->getCode(), $e);
-                }
+                throw new UnexpectedValueException(sprintf('Invalid IRI "%s".', $value), $e->getCode(), $e);
             }
         }
 
@@ -471,28 +447,9 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
                 throw new LogicException(sprintf('The injected serializer must be an instance of "%s".', DenormalizerInterface::class));
             }
 
-            try {
-                $item = $this->serializer->denormalize($value, $className, $format, $context);
-                if (!\is_object($item) && null !== $item) {
-                    throw new \UnexpectedValueException('Expected item to be an object or null.');
-                }
-
-                return $item;
-            } catch (InvalidValueException $e) {
-                if (!$supportsPlainIdentifiers) {
-                    throw $e;
-                }
-            }
-        }
-
-        if (!\is_array($value)) {
-            if (!$supportsPlainIdentifiers) {
-                throw new UnexpectedValueException(sprintf('Expected IRI or nested document for attribute "%s", "%s" given.', $attributeName, \gettype($value)));
-            }
-
-            $item = $this->itemDataProvider->getItem($className, $value, null, $context + ['fetch_data' => true]);
-            if (null === $item) {
-                throw new ItemNotFoundException(sprintf('Item not found for resource "%s" with id "%s".', $className, $value));
+            $item = $this->serializer->denormalize($value, $className, $format, $context);
+            if (!\is_object($item) && null !== $item) {
+                throw new \UnexpectedValueException('Expected item to be an object or null.');
             }
 
             return $item;
@@ -777,10 +734,5 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
         } catch (NoSuchPropertyException $exception) {
             // Properties not found are ignored
         }
-    }
-
-    private function supportsPlainIdentifiers(): bool
-    {
-        return $this->allowPlainIdentifiers && null !== $this->itemDataProvider;
     }
 }

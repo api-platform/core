@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Tests\OpenApi\Serializer;
 
+use ApiPlatform\Core\Api\IdentifiersExtractorInterface;
 use ApiPlatform\Core\DataProvider\PaginationOptions;
 use ApiPlatform\Core\JsonSchema\SchemaFactory;
 use ApiPlatform\Core\JsonSchema\TypeFactory;
@@ -95,6 +96,9 @@ class OpenApiNormalizerTest extends TestCase
         $schemaFactory = new SchemaFactory($typeFactory, $resourceMetadataFactory, $propertyNameCollectionFactory, $propertyMetadataFactory, new CamelCaseToSnakeCaseNameConverter());
         $typeFactory->setSchemaFactory($schemaFactory);
 
+        $identifiersExtractorProphecy = $this->prophesize(IdentifiersExtractorInterface::class);
+        $identifiersExtractorProphecy->getIdentifiersFromResourceClass(Argument::type('string'))->willReturn(['id']);
+
         $factory = new OpenApiFactory(
             $resourceNameCollectionFactoryProphecy->reveal(),
             $resourceMetadataFactory,
@@ -116,7 +120,8 @@ class OpenApiNormalizerTest extends TestCase
                     'name' => 'key',
                 ],
             ]),
-            new PaginationOptions(true, 'page', true, 'itemsPerPage', true, 'pagination')
+            new PaginationOptions(true, 'page', true, 'itemsPerPage', true, 'pagination'),
+            $identifiersExtractorProphecy->reveal()
         );
 
         $openApi = $factory(['base_url' => '/app_dev.php/']);

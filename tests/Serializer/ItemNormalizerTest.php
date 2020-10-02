@@ -105,7 +105,6 @@ class ItemNormalizerTest extends TestCase
             null,
             null,
             null,
-            false,
             null,
             [],
             null
@@ -144,7 +143,6 @@ class ItemNormalizerTest extends TestCase
             null,
             null,
             null,
-            false,
             null,
             [],
             null
@@ -184,7 +182,6 @@ class ItemNormalizerTest extends TestCase
             null,
             null,
             null,
-            false,
             null,
             [],
             null
@@ -221,7 +218,6 @@ class ItemNormalizerTest extends TestCase
             null,
             null,
             null,
-            false,
             null,
             [],
             null
@@ -260,7 +256,6 @@ class ItemNormalizerTest extends TestCase
             null,
             null,
             null,
-            false,
             null,
             [],
             null
@@ -305,7 +300,6 @@ class ItemNormalizerTest extends TestCase
             null,
             null,
             null,
-            false,
             null,
             [$dataTransformer->reveal()],
             null

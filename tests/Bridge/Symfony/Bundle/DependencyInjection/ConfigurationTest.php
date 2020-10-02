@@ -204,7 +204,6 @@ class ConfigurationTest extends TestCase
                 'enabled' => true,
                 'hub_url' => null,
             ],
-            'allow_plain_identifiers' => false,
             'resource_class_directories' => [],
         ], $config);
     }

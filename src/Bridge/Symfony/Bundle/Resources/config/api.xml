@@ -43,6 +43,7 @@
             <argument>%api_platform.enable_docs%</argument>
             <argument>%api_platform.graphql.graphiql.enabled%</argument>
             <argument>%api_platform.graphql.graphql_playground.enabled%</argument>
+            <argument type="service" id="api_platform.identifiers_extractor.cached"></argument>
 
             <tag name="routing.loader" />
         </service>
@@ -55,15 +56,12 @@
         </service>
 
         <service id="api_platform.iri_converter" class="ApiPlatform\Core\Bridge\Symfony\Routing\IriConverter" public="false">
-            <argument type="service" id="api_platform.metadata.property.name_collection_factory" />
-            <argument type="service" id="api_platform.metadata.property.metadata_factory" />
             <argument type="service" id="api_platform.item_data_provider" />
             <argument type="service" id="api_platform.route_name_resolver" />
             <argument type="service" id="api_platform.router" />
-            <argument type="service" id="api_platform.property_accessor" />
             <argument type="service" id="api_platform.identifiers_extractor.cached" />
             <argument type="service" id="api_platform.subresource_data_provider" on-invalid="ignore" />
-            <argument type="service" id="api_platform.identifier.converter" on-invalid="ignore" />
+            <argument type="service" id="api_platform.identifier.denormalizer" on-invalid="ignore" />
             <argument type="service" id="api_platform.resource_class_resolver" />
             <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
         </service>
@@ -110,7 +108,6 @@
             <argument type="service" id="api_platform.name_converter" on-invalid="ignore" />
             <argument type="service" id="serializer.mapping.class_metadata_factory" on-invalid="ignore" />
             <argument type="service" id="api_platform.item_data_provider" on-invalid="ignore" />
-            <argument>%api_platform.allow_plain_identifiers%</argument>
             <argument>null</argument>
             <argument type="tagged" tag="api_platform.data_transformer" on-invalid="ignore" />
             <argument type="service" id="api_platform.metadata.resource.metadata_factory" on-invalid="ignore" />
@@ -163,7 +160,7 @@
             <argument type="service" id="api_platform.item_data_provider" />
             <argument type="service" id="api_platform.subresource_data_provider" />
             <argument type="service" id="api_platform.serializer.context_builder" />
-            <argument type="service" id="api_platform.identifier.converter" />
+            <argument type="service" id="api_platform.identifier.denormalizer" />
             <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
 
             <tag name="kernel.event_listener" event="kernel.request" method="onKernelRequest" priority="4" />
@@ -265,8 +262,7 @@
         </service>
         <service id="ApiPlatform\Core\Api\IdentifiersExtractorInterface" alias="api_platform.identifiers_extractor.cached" />
 
-        <service id="api_platform.identifier.converter" class="ApiPlatform\Core\Identifier\IdentifierConverter" public="false">
-            <argument type="service" id="api_platform.identifiers_extractor.cached" />
+        <service id="api_platform.identifier.denormalizer" class="ApiPlatform\Core\Identifier\IdentifierDenormalizer" public="false">
             <argument type="service" id="api_platform.metadata.property.metadata_factory" />
             <argument type="tagged" tag="api_platform.identifier.denormalizer" />
         </service>
@@ -286,6 +282,7 @@
             <argument type="service" id="api_platform.metadata.property.name_collection_factory" />
             <argument type="service" id="api_platform.metadata.property.metadata_factory" />
             <argument type="service" id="api_platform.path_segment_name_generator" />
+            <argument type="service" id="api_platform.identifiers_extractor.cached" />
         </service>
 
         <service id="api_platform.subresource_operation_factory.cached" class="ApiPlatform\Core\Operation\Factory\CachedSubresourceOperationFactory" decorates="api_platform.subresource_operation_factory" decoration-priority="-10" public="false">

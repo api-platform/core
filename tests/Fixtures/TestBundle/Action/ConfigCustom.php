@@ -35,6 +35,6 @@ class ConfigCustom
     {
         $attributes = RequestAttributesExtractor::extractAttributes($request);
 
-        return $this->dataProvider->getItem($attributes['resource_class'], $id);
+        return $this->dataProvider->getItem($attributes['resource_class'], ['id' => $id]);
     }
 }

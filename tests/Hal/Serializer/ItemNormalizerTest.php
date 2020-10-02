@@ -151,7 +151,6 @@ class ItemNormalizerTest extends TestCase
             $nameConverter->reveal(),
             null,
             null,
-            false,
             [],
             [],
             null
@@ -218,7 +217,6 @@ class ItemNormalizerTest extends TestCase
             $nameConverter->reveal(),
             null,
             null,
-            false,
             [],
             [],
             null
@@ -298,7 +296,6 @@ class ItemNormalizerTest extends TestCase
             null,
             $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader())),
             null,
-            false,
             [],
             [],
             null

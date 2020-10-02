@@ -28,6 +28,7 @@ use ApiPlatform\Core\Exception\InvalidArgumentException;
  *     @Attribute("attributes", type="array"),
  *     @Attribute("cacheHeaders", type="array"),
  *     @Attribute("collectionOperations", type="array"),
+ *     @Attribute("compositeIdentifier", type="bool"),
  *     @Attribute("denormalizationContext", type="array"),
  *     @Attribute("deprecationReason", type="string"),
  *     @Attribute("description", type="string"),
@@ -89,6 +90,7 @@ final class ApiResource
         'securityPostDenormalizeMessage',
         'cacheHeaders',
         'collectionOperations',
+        'compositeIdentifier',
         'denormalizationContext',
         'deprecationReason',
         'description',
@@ -451,6 +453,13 @@ final class ApiResource
      * @var int
      */
     private $urlGenerationStrategy;
+
+    /**
+     * @see https://github.com/Haehnchen/idea-php-annotation-plugin/issues/112
+     *
+     * @var bool
+     */
+    private $compositeIdentifier;
 
     /**
      * @throws InvalidArgumentException

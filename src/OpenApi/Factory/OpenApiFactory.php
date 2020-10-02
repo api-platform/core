@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\OpenApi\Factory;
 
 use ApiPlatform\Core\Api\FilterLocatorTrait;
+use ApiPlatform\Core\Api\IdentifiersExtractorInterface;
 use ApiPlatform\Core\Api\OperationType;
 use ApiPlatform\Core\DataProvider\PaginationOptions;
 use ApiPlatform\Core\JsonSchema\Schema;
@@ -53,8 +54,9 @@ final class OpenApiFactory implements OpenApiFactoryInterface
     private $jsonSchemaTypeFactory;
     private $openApiOptions;
     private $paginationOptions;
+    private $identifiersExtractor;
 
-    public function __construct(ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, ResourceMetadataFactoryInterface $resourceMetadataFactory, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, SchemaFactoryInterface $jsonSchemaFactory, TypeFactoryInterface $jsonSchemaTypeFactory, OperationPathResolverInterface $operationPathResolver, ContainerInterface $filterLocator, SubresourceOperationFactoryInterface $subresourceOperationFactory, array $formats = [], Options $openApiOptions, PaginationOptions $paginationOptions)
+    public function __construct(ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, ResourceMetadataFactoryInterface $resourceMetadataFactory, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, SchemaFactoryInterface $jsonSchemaFactory, TypeFactoryInterface $jsonSchemaTypeFactory, OperationPathResolverInterface $operationPathResolver, ContainerInterface $filterLocator, SubresourceOperationFactoryInterface $subresourceOperationFactory, array $formats = [], Options $openApiOptions, PaginationOptions $paginationOptions, IdentifiersExtractorInterface $identifiersExtractor)
     {
         $this->resourceNameCollectionFactory = $resourceNameCollectionFactory;
         $this->jsonSchemaFactory = $jsonSchemaFactory;
@@ -68,6 +70,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
         $this->openApiOptions = $openApiOptions;
         $this->paginationOptions = $paginationOptions;
         $this->subresourceOperationFactory = $subresourceOperationFactory;
+        $this->identifiersExtractor = $identifiersExtractor;
     }
 
     /**
@@ -84,6 +87,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
 
         foreach ($this->resourceNameCollectionFactory->create() as $resourceClass) {
             $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
+            $resourceMetadata = $resourceMetadata->withAttributes(($resourceMetadata->getAttributes() ?: []) + ['identified_by' => $this->identifiersExtractor->getIdentifiersFromResourceClass($resourceClass)]);
             $resourceShortName = $resourceMetadata->getShortName();
 
             // Items needs to be parsed first to be able to reference the lines from the collection operation
@@ -117,6 +121,13 @@ final class OpenApiFactory implements OpenApiFactoryInterface
         }
 
         foreach ($operations as $operationName => $operation) {
+            $identifiers = (array) ($operation['identified_by'] ?? $resourceMetadata->getAttribute('identified_by'));
+            $hasCompositeIdentifiers = \count($identifiers) > 1 ? $resourceMetadata->getAttribute('composite_identifier', true) : false;
+
+            if ($hasCompositeIdentifiers) {
+                $identifiers = ['id'];
+            }
+
             $path = $this->getPath($resourceShortName, $operationName, $operation, $operationType);
             $method = $resourceMetadata->getTypedOperationAttribute($operationType, $operationName, 'method', 'GET');
             list($requestMimeTypes, $responseMimeTypes) = $this->getMimeTypes($resourceClass, $operationName, $operationType, $resourceMetadata);
@@ -136,7 +147,10 @@ final class OpenApiFactory implements OpenApiFactoryInterface
 
             // Set up parameters
             if (OperationType::ITEM === $operationType) {
-                $parameters[] = new Model\Parameter('id', 'path', 'Resource identifier', true, false, false, ['type' => 'string']);
+                foreach ($identifiers as $identifier) {
+                    $parameters[] = new Model\Parameter($identifier, 'path', 'Resource identifier', true, false, false, ['type' => 'string']);
+                }
+
                 $links[$operationId] = $this->getLink($resourceClass, $operationId, $path);
             } elseif (OperationType::COLLECTION === $operationType && 'GET' === $method) {
                 $parameters = array_merge($parameters, $this->getPaginationParameters($resourceMetadata, $operationName), $this->getFiltersParameters($resourceMetadata, $operationName, $resourceClass));

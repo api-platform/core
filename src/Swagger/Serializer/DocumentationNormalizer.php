@@ -16,6 +16,7 @@ namespace ApiPlatform\Core\Swagger\Serializer;
 use ApiPlatform\Core\Api\FilterCollection;
 use ApiPlatform\Core\Api\FilterLocatorTrait;
 use ApiPlatform\Core\Api\FormatsProviderInterface;
+use ApiPlatform\Core\Api\IdentifiersExtractorInterface;
 use ApiPlatform\Core\Api\OperationAwareFormatsProviderInterface;
 use ApiPlatform\Core\Api\OperationMethodResolverInterface;
 use ApiPlatform\Core\Api\OperationType;
@@ -85,6 +86,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
     private $paginationClientEnabledParameterName;
     private $formats;
     private $formatsProvider;
+    private $identifiersExtractor;
 
     /**
      * @var SchemaFactoryInterface
@@ -106,7 +108,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
      * @param mixed|null                                                 $jsonSchemaTypeFactory
      * @param int[]                                                      $swaggerVersions
      */
-    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, $jsonSchemaFactory = null, $jsonSchemaTypeFactory = null, OperationPathResolverInterface $operationPathResolver, UrlGeneratorInterface $urlGenerator = null, $filterLocator = null, NameConverterInterface $nameConverter = null, bool $oauthEnabled = false, string $oauthType = '', string $oauthFlow = '', string $oauthTokenUrl = '', string $oauthAuthorizationUrl = '', array $oauthScopes = [], array $apiKeys = [], SubresourceOperationFactoryInterface $subresourceOperationFactory = null, bool $paginationEnabled = true, string $paginationPageParameterName = 'page', bool $clientItemsPerPage = false, string $itemsPerPageParameterName = 'itemsPerPage', $formats = [], bool $paginationClientEnabled = false, string $paginationClientEnabledParameterName = 'pagination', array $defaultContext = [], array $swaggerVersions = [2, 3])
+    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, $jsonSchemaFactory = null, $jsonSchemaTypeFactory = null, OperationPathResolverInterface $operationPathResolver, UrlGeneratorInterface $urlGenerator = null, $filterLocator = null, NameConverterInterface $nameConverter = null, bool $oauthEnabled = false, string $oauthType = '', string $oauthFlow = '', string $oauthTokenUrl = '', string $oauthAuthorizationUrl = '', array $oauthScopes = [], array $apiKeys = [], SubresourceOperationFactoryInterface $subresourceOperationFactory = null, bool $paginationEnabled = true, string $paginationPageParameterName = 'page', bool $clientItemsPerPage = false, string $itemsPerPageParameterName = 'itemsPerPage', $formats = [], bool $paginationClientEnabled = false, string $paginationClientEnabledParameterName = 'pagination', array $defaultContext = [], array $swaggerVersions = [2, 3], IdentifiersExtractorInterface $identifiersExtractor = null)
     {
         if ($jsonSchemaTypeFactory instanceof OperationMethodResolverInterface) {
             @trigger_error(sprintf('Passing an instance of %s to %s() is deprecated since version 2.5 and will be removed in 3.0.', OperationMethodResolverInterface::class, __METHOD__), E_USER_DEPRECATED);
@@ -163,6 +165,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
         $this->itemsPerPageParameterName = $itemsPerPageParameterName;
         $this->paginationClientEnabled = $paginationClientEnabled;
         $this->paginationClientEnabledParameterName = $paginationClientEnabledParameterName;
+        $this->identifiersExtractor = $identifiersExtractor;
 
         $this->defaultContext[self::SPEC_VERSION] = $swaggerVersions[0] ?? 2;
 
@@ -183,6 +186,9 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
         foreach ($object->getResourceNameCollection() as $resourceClass) {
             $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
             $resourceShortName = $resourceMetadata->getShortName();
+            if ($this->identifiersExtractor) {
+                $resourceMetadata = $resourceMetadata->withAttributes(($resourceMetadata->getAttributes() ?: []) + ['identified_by' => $this->identifiersExtractor->getIdentifiersFromResourceClass($resourceClass)]);
+            }
 
             // Items needs to be parsed first to be able to reference the lines from the collection operation
             $this->addPaths($v3, $paths, $definitions, $resourceClass, $resourceShortName, $resourceMetadata, OperationType::ITEM, $links);
@@ -339,7 +345,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
 
         $pathOperation['summary'] ?? $pathOperation['summary'] = sprintf('Retrieves a %s resource.', $resourceShortName);
 
-        $pathOperation = $this->addItemOperationParameters($v3, $pathOperation);
+        $pathOperation = $this->addItemOperationParameters($v3, $pathOperation, $operationType, $operationName, $resourceMetadata);
 
         $successResponse = ['description' => sprintf('%s resource response', $resourceShortName)];
         [$successResponse] = $this->addSchemas($v3, $successResponse, $definitions, $resourceClass, $operationType, $operationName, $mimeTypes);
@@ -485,7 +491,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
         $pathOperation['summary'] ?? $pathOperation['summary'] = sprintf('Creates a %s resource.', $resourceShortName);
 
         if (OperationType::ITEM === $operationType) {
-            $pathOperation = $this->addItemOperationParameters($v3, $pathOperation);
+            $pathOperation = $this->addItemOperationParameters($v3, $pathOperation, $operationType, $operationName, $resourceMetadata);
         }
 
         $successResponse = ['description' => sprintf('%s resource created', $resourceShortName)];
@@ -513,7 +519,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
 
         $pathOperation['summary'] ?? $pathOperation['summary'] = sprintf('Replaces the %s resource.', $resourceShortName);
 
-        $pathOperation = $this->addItemOperationParameters($v3, $pathOperation);
+        $pathOperation = $this->addItemOperationParameters($v3, $pathOperation, $operationType, $operationName, $resourceMetadata);
 
         $successResponse = ['description' => sprintf('%s resource updated', $resourceShortName)];
         [$successResponse] = $this->addSchemas($v3, $successResponse, $definitions, $resourceClass, $operationType, $operationName, $responseMimeTypes);
@@ -575,18 +581,32 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
             '404' => ['description' => 'Resource not found'],
         ];
 
-        return $this->addItemOperationParameters($v3, $pathOperation);
+        return $this->addItemOperationParameters($v3, $pathOperation, $operationType, $operationName, $resourceMetadata);
     }
 
-    private function addItemOperationParameters(bool $v3, \ArrayObject $pathOperation): \ArrayObject
+    private function addItemOperationParameters(bool $v3, \ArrayObject $pathOperation, string $operationType, string $operationName, ResourceMetadata $resourceMetadata): \ArrayObject
     {
-        $parameter = [
-            'name' => 'id',
-            'in' => 'path',
-            'required' => true,
-        ];
-        $v3 ? $parameter['schema'] = ['type' => 'string'] : $parameter['type'] = 'string';
-        $pathOperation['parameters'] ?? $pathOperation['parameters'] = [$parameter];
+        $identifiers = (array) $resourceMetadata
+                ->getTypedOperationAttribute(OperationType::ITEM, $operationName, 'identified_by', ['id'], true);
+        $hasCompositeIdentifiers = \count($identifiers) > 1 ? $resourceMetadata->getAttribute('composite_identifier', true) : false;
+
+        if ($hasCompositeIdentifiers) {
+            $identifiers = ['id'];
+        }
+
+        if (!($pathOperation['parameters'] ?? null)) {
+            $pathOperation['parameters'] = [];
+        }
+
+        foreach ($identifiers as $identifier) {
+            $parameter = [
+                'name' => $identifier,
+                'in' => 'path',
+                'required' => true,
+            ];
+            $v3 ? $parameter['schema'] = ['type' => 'string'] : $parameter['type'] = 'string';
+            $pathOperation['parameters'][] = $parameter;
+        }
 
         return $pathOperation;
     }

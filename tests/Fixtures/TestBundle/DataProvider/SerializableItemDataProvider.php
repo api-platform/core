@@ -29,7 +29,7 @@ class SerializableItemDataProvider implements ItemDataProviderInterface, Restric
     /**
      * {@inheritdoc}
      */
-    public function getItem(string $resourceClass, $id, string $operationName = null, array $context = [])
+    public function getItem(string $resourceClass, array $identifiers, string $operationName = null, array $context = [])
     {
         return $this->getSerializer()->deserialize(<<<'JSON'
 {
