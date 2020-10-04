@@ -30,7 +30,7 @@ Feature: Collections filtering
     When I send the following GraphQL request:
     """
     {
-      dummies(exists: {relatedDummy: true}) {
+      dummies(exists: [{relatedDummy: true}]) {
         edges {
           node {
             id
@@ -52,7 +52,7 @@ Feature: Collections filtering
     When I send the following GraphQL request:
     """
     {
-      dummies(dummyDate: {after: "2015-04-02"}) {
+      dummies(dummyDate: [{after: "2015-04-02"}]) {
         edges {
           node {
             id
@@ -204,7 +204,7 @@ Feature: Collections filtering
     When I send the following GraphQL request:
     """
     {
-      dummies(order: {relatedDummy__name: "DESC"}) {
+      dummies(order: [{relatedDummy__name: "DESC"}]) {
         edges {
           node {
             name
