@@ -16,5 +16,6 @@ namespace ApiPlatform\Core\Tests\Fixtures;
 interface Serializable
 {
     public function __serialize(): array;
+
     public function __unserialize(array $data);
 }
