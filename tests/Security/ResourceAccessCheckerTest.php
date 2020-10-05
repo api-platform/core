@@ -15,6 +15,7 @@ namespace ApiPlatform\Core\Tests\Security;
 
 use ApiPlatform\Core\Security\ExpressionLanguage;
 use ApiPlatform\Core\Security\ResourceAccessChecker;
+use ApiPlatform\Core\Tests\Fixtures\Serializable;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Core\Tests\ProphecyTrait;
 use PHPUnit\Framework\TestCase;
@@ -41,21 +42,16 @@ class ResourceAccessCheckerTest extends TestCase
         $authenticationTrustResolverProphecy = $this->prophesize(AuthenticationTrustResolverInterface::class);
         $tokenStorageProphecy = $this->prophesize(TokenStorageInterface::class);
 
-        $tokenProphecy = $this->createMock(TokenInterface::class);
-        $tokenProphecy
-            ->expects(self::once())
-            ->method('getUser');
+        $tokenProphecy = $this->prophesize(TokenInterface::class);
+        $tokenProphecy->willImplement(Serializable::class);
+        $token = $tokenProphecy->reveal();
 
-        if (method_exists(TokenInterface::class, 'getRoleNames')) {
-            $tokenProphecy
-                ->expects(self::once())
-                ->method('getRoleNames')
-                ->willReturn([]);
+        $tokenProphecy->getUser()->shouldBeCalled();
+
+        if (method_exists($token, 'getRoleNames')) {
+            $tokenProphecy->getRoleNames()->willReturn([])->shouldBeCalled();
         } else {
-            $tokenProphecy
-                ->expects(self::once())
-                ->method('getRoles')
-                ->willReturn([]);
+            $tokenProphecy->getRoles()->willReturn([])->shouldBeCalled();
         }
 
         $tokenStorageProphecy->getToken()->willReturn($tokenProphecy);
@@ -85,7 +81,7 @@ class ResourceAccessCheckerTest extends TestCase
 
         $authenticationTrustResolverProphecy = $this->prophesize(AuthenticationTrustResolverInterface::class);
         $tokenStorageProphecy = $this->prophesize(TokenStorageInterface::class);
-        $tokenStorageProphecy->getToken()->willReturn($this->createMock(TokenInterface::class));
+        $tokenStorageProphecy->getToken()->willReturn($this->prophesize(TokenInterface::class)->willImplement(Serializable::class)->reveal());
 
         $checker = new ResourceAccessChecker(null, $authenticationTrustResolverProphecy->reveal(), null, $tokenStorageProphecy->reveal());
         $checker->isGranted(Dummy::class, 'is_granted("ROLE_ADMIN")');
