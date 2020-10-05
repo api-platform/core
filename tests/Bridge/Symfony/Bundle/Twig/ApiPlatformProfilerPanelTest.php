@@ -40,6 +40,10 @@ class ApiPlatformProfilerPanelTest extends WebTestCase
 
     protected function setUp(): void
     {
+        if (\PHP_VERSION_ID >= 80000) {
+            $this->markTestSkipped();
+        }
+
         parent::setUp();
         $kernel = self::bootKernel();
         $this->env = $kernel->getEnvironment();
