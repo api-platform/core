@@ -45,7 +45,6 @@ class ResourceAccessCheckerTest extends TestCase
         $tokenProphecy = $this->prophesize(TokenInterface::class);
         $tokenProphecy->willImplement(Serializable::class);
         $token = $tokenProphecy->reveal();
-
         $tokenProphecy->getUser()->shouldBeCalled();
 
         if (method_exists($token, 'getRoleNames')) {
@@ -54,7 +53,7 @@ class ResourceAccessCheckerTest extends TestCase
             $tokenProphecy->getRoles()->willReturn([])->shouldBeCalled();
         }
 
-        $tokenStorageProphecy->getToken()->willReturn($tokenProphecy);
+        $tokenStorageProphecy->getToken()->willReturn($token);
 
         $checker = new ResourceAccessChecker($expressionLanguageProphecy->reveal(), $authenticationTrustResolverProphecy->reveal(), null, $tokenStorageProphecy->reveal());
         $this->assertSame($granted, $checker->isGranted(Dummy::class, 'is_granted("ROLE_ADMIN")'));

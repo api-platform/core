@@ -179,7 +179,6 @@ class RequestDataCollectorTest extends TestCase
         );
 
         $dataProvider = $dataCollector->getCollectionDataProviders();
-
         foreach ($dataProvider['responses'] as $class => $response) {
             if (\PHP_VERSION_ID >= 80000) {
                 $this->assertStringStartsWith('ApiPlatform\\Core\\DataProvider\\CollectionDataProviderInterface@anonymous', $class);
