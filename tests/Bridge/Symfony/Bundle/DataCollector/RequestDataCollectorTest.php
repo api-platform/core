@@ -180,11 +180,7 @@ class RequestDataCollectorTest extends TestCase
 
         $dataProvider = $dataCollector->getCollectionDataProviders();
         foreach ($dataProvider['responses'] as $class => $response) {
-            if (\PHP_VERSION_ID >= 80000) {
-                $this->assertStringStartsWith('ApiPlatform\\Core\\DataProvider\\CollectionDataProviderInterface@anonymous', $class);
-            } else {
-                $this->assertStringStartsWith('class@anonymous', $class);
-            }
+            $this->assertStringContainsString('@anonymous', $class);
 
             $this->assertTrue($response);
         }
@@ -194,12 +190,7 @@ class RequestDataCollectorTest extends TestCase
 
         $dataProvider = $dataCollector->getItemDataProviders();
         foreach ($dataProvider['responses'] as $class => $response) {
-            if (\PHP_VERSION_ID >= 80000) {
-                $this->assertStringStartsWith('ApiPlatform\Core\DataProvider\ItemDataProviderInterface@anonymous', $class);
-            } else {
-                $this->assertStringStartsWith('class@anonymous', $class);
-            }
-
+            $this->assertStringContainsString('@anonymous', $class);
             $this->assertTrue($response);
         }
         $context = $dataProvider['context'];
@@ -208,12 +199,7 @@ class RequestDataCollectorTest extends TestCase
 
         $dataProvider = $dataCollector->getSubresourceDataProviders();
         foreach ($dataProvider['responses'] as $class => $response) {
-            if (\PHP_VERSION_ID >= 80000) {
-                $this->assertStringStartsWith('ApiPlatform\Core\DataProvider\SubresourceDataProviderInterface@anonymous', $class);
-            } else {
-                $this->assertStringStartsWith('class@anonymous', $class);
-            }
-
+            $this->assertStringContainsString('@anonymous', $class);
             $this->assertTrue($response);
         }
         $context = $dataProvider['context'];
@@ -222,12 +208,7 @@ class RequestDataCollectorTest extends TestCase
 
         $dataPersister = $dataCollector->getDataPersisters();
         foreach ($dataPersister['responses'] as $class => $response) {
-            if (\PHP_VERSION_ID >= 80000) {
-                $this->assertStringStartsWith('ApiPlatform\Core\DataPersister\DataPersisterInterface@anonymous', $class);
-            } else {
-                $this->assertStringStartsWith('class@anonymous', $class);
-            }
-
+            $this->assertStringContainsString('@anonymous', $class);
             $this->assertTrue($response);
         }
     }

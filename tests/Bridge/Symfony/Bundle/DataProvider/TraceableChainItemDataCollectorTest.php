@@ -36,7 +36,7 @@ class TraceableChainItemDataCollectorTest extends TestCase
         $this->assertCount(\count($expected), $result);
         $this->assertEmpty(array_filter($result, function ($key) {
             if (\PHP_VERSION_ID >= 80000) {
-                return !str_starts_with($key, 'ApiPlatform\\Core\\DataProvider\\ItemDataProviderInterface@anonymous');
+                return !str_starts_with($key, ItemDataProviderInterface::class.'@anonymous');
             }
 
             return 0 !== strpos($key, 'class@anonymous');
@@ -58,7 +58,7 @@ class TraceableChainItemDataCollectorTest extends TestCase
         $this->assertCount(\count($expected), $result);
         $this->assertEmpty(array_filter($result, function ($key) {
             if (\PHP_VERSION_ID >= 80000) {
-                return !str_starts_with($key, 'ApiPlatform\\Core\\DataProvider\\ItemDataProviderInterface@anonymous');
+                return !str_starts_with($key, ItemDataProviderInterface::class.'@anonymous');
             }
 
             return 0 !== strpos($key, 'class@anonymous');
