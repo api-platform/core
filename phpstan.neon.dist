@@ -108,6 +108,9 @@ parameters:
 		-
 			message: '#Cannot assign new offset to string\.#'
 			path: src/JsonSchema/SchemaFactory.php
+		-
+			message: '#Property Doctrine\\ORM\\Mapping\\ClassMetadataInfo::\$fieldMappings \(array.*\)>\) does not accept array\(.*\)\.#'
+			path: tests/Bridge/Doctrine/Orm/Metadata/Property/DoctrineOrmPropertyMetadataFactoryTest.php
 
 		# Expected, due to optional interfaces
 		- '#Method ApiPlatform\\Core\\Bridge\\Doctrine\\Orm\\Extension\\QueryCollectionExtensionInterface::applyToCollection\(\) invoked with 5 parameters, 3-4 required\.#'

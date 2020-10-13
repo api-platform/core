@@ -767,7 +767,7 @@ jobs:
             doctrine/mongodb-odm-bundle \
       - name: Require Symfony Uid
         if: (!startsWith(matrix.php, '7.1'))
-        run: composer require symfony/uid --dev --no-progress --ansi
+        run: composer require symfony/uid:^5.1 --dev --no-progress --ansi
       - name: Update project dependencies
         run: |
           mkdir -p /tmp/api-platform/core/vendor
