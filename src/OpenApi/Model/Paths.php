@@ -29,6 +29,6 @@ final class Paths
 
     public function getPaths(): array
     {
-        return $this->paths;
+        return $this->paths ?? [];
     }
 }
