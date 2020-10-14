@@ -77,7 +77,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
     {
         $baseUrl = $context[self::BASE_URL] ?? '/';
         $info = new Model\Info($this->openApiOptions->getTitle(), $this->openApiOptions->getVersion(), trim($this->openApiOptions->getDescription()));
-        $servers = '/' === $baseUrl || '' === $baseUrl ? [] : [new Model\Server($baseUrl)];
+        $servers = '/' === $baseUrl || '' === $baseUrl ? [new Model\Server('/')] : [new Model\Server($baseUrl)];
         $paths = new Model\Paths();
         $links = [];
         $schemas = [];
@@ -216,8 +216,8 @@ final class OpenApiFactory implements OpenApiFactoryInterface
                 $requestBody,
                 isset($operation['openapi_context']['callbacks']) ? new \ArrayObject($operation['openapi_context']['callbacks']) : null,
                 $operation['openapi_context']['deprecated'] ?? (bool) $resourceMetadata->getTypedOperationAttribute($operationType, $operationName, 'deprecation_reason', false, true),
-                $operation['openapi_context']['security'] ?? [],
-                $operation['openapi_context']['servers'] ?? []
+                $operation['openapi_context']['security'] ?? null,
+                $operation['openapi_context']['servers'] ?? null
             ));
 
             $paths->addPath($path, $pathItem);
