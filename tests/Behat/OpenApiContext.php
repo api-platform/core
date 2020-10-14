@@ -86,7 +86,7 @@ final class OpenApiContext implements Context
     /**
      * @Then the OpenAPI class :class doesn't exist
      */
-    public function assertTheOPenAPIClassNotExist(string $className)
+    public function assertTheOpenAPIClassNotExist(string $className)
     {
         try {
             $this->getClassInfo($className, 3);
