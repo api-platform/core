@@ -24,7 +24,6 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 final class OpenApiNormalizer implements NormalizerInterface, CacheableSupportsMethodInterface
 {
     public const FORMAT = 'json';
-    public const OPEN_API_PRESERVE_EMPTY_OBJECTS = 'open_api_preserve_empty_objects';
     private const EXTENSION_PROPERTIES_KEY = 'extensionProperties';
 
     private $decorated;

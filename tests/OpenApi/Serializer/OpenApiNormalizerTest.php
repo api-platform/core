@@ -68,7 +68,7 @@ class OpenApiNormalizerTest extends TestCase
             ],
             [
                 'get' => ['method' => 'GET'] + self::OPERATION_FORMATS,
-                'post' => ['method' => 'POST'] + self::OPERATION_FORMATS,
+                'post' => ['method' => 'POST', 'openapi_context' => ['security' => [], 'servers' => ['url' => '/test']]] + self::OPERATION_FORMATS,
             ],
             []
         );
@@ -154,5 +154,11 @@ class OpenApiNormalizerTest extends TestCase
         $this->assertArrayNotHasKey('termsOfService', $openApiAsArray['info']);
         $this->assertArrayNotHasKey('paths', $openApiAsArray['paths']);
         $this->assertArrayHasKey('/dummies/{id}', $openApiAsArray['paths']);
+        $this->assertArrayNotHasKey('servers', $openApiAsArray['paths']['/dummies/{id}']['get']);
+        $this->assertArrayNotHasKey('security', $openApiAsArray['paths']['/dummies/{id}']['get']);
+
+        // Security can be disabled per-operation using an empty array
+        $this->assertEquals([], $openApiAsArray['paths']['/dummies']['post']['security']);
+        $this->assertEquals(['url' => '/test'], $openApiAsArray['paths']['/dummies']['post']['servers']);
     }
 }
