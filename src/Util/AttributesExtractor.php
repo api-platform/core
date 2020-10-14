@@ -53,6 +53,10 @@ final class AttributesExtractor
             }
         }
 
+        if ($previousObject = $attributes['previous_data'] ?? null) {
+            $result['previous_data'] = $previousObject;
+        }
+
         if (false === $hasRequestAttributeKey) {
             return [];
         }
