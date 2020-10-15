@@ -6,11 +6,11 @@
 
     {% block stylesheet %}
         <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:400,700|Source+Code+Pro:300,600|Titillium+Web:400,600,700">
-        <link rel="stylesheet" href="{{ asset('bundles/apiplatform/swagger-ui/swagger-ui.css') }}">
-        <link rel="stylesheet" href="{{ asset('bundles/apiplatform/style.css') }}">
+        <link rel="stylesheet" href="{{ asset('bundles/apiplatform/swagger-ui/swagger-ui.css', assetPackage) }}">
+        <link rel="stylesheet" href="{{ asset('bundles/apiplatform/style.css', assetPackage) }}">
     {% endblock %}
 
-    {% set oauth_data = {'oauth': swagger_data.oauth|merge({'redirectUrl' : absolute_url(asset('bundles/apiplatform/swagger-ui/oauth2-redirect.html')) })} %}
+    {% set oauth_data = {'oauth': swagger_data.oauth|merge({'redirectUrl' : absolute_url(asset('bundles/apiplatform/swagger-ui/oauth2-redirect.html', assetPackage)) })} %}
     {# json_encode(65) is for JSON_UNESCAPED_SLASHES|JSON_HEX_TAG to avoid JS XSS #}
     <script id="swagger-data" type="application/json">{{ swagger_data|merge(oauth_data)|json_encode(65)|raw }}</script>
 </head>
@@ -50,12 +50,12 @@
     </defs>
 </svg>
 <header>
-    <a id="logo" href="https://api-platform.com"><img src="{{ asset('bundles/apiplatform/logo-header.svg') }}" alt="API Platform"></a>
+    <a id="logo" href="https://api-platform.com"><img src="{{ asset('bundles/apiplatform/logo-header.svg', assetPackage) }}" alt="API Platform"></a>
 </header>
 
 {% if showWebby %}
-    <div class="web"><img src="{{ asset('bundles/apiplatform/web.png') }}"></div>
-    <div class="webby"><img src="{{ asset('bundles/apiplatform/webby.png') }}"></div>
+    <div class="web"><img src="{{ asset('bundles/apiplatform/web.png', assetPackage) }}"></div>
+    <div class="webby"><img src="{{ asset('bundles/apiplatform/webby.png', assetPackage) }}"></div>
 {% endif %}
 
 <div id="swagger-ui" class="api-platform"></div>
@@ -82,12 +82,12 @@
 
 {% block javascript %}
     {% if (reDocEnabled and not swaggerUiEnabled) or (reDocEnabled and 're_doc' == active_ui) %}
-        <script src="{{ asset('bundles/apiplatform/redoc/redoc.standalone.js') }}"></script>
-        <script src="{{ asset('bundles/apiplatform/init-redoc-ui.js') }}"></script>
+        <script src="{{ asset('bundles/apiplatform/redoc/redoc.standalone.js', assetPackage) }}"></script>
+        <script src="{{ asset('bundles/apiplatform/init-redoc-ui.js', assetPackage) }}"></script>
     {% else %}
-        <script src="{{ asset('bundles/apiplatform/swagger-ui/swagger-ui-bundle.js') }}"></script>
-        <script src="{{ asset('bundles/apiplatform/swagger-ui/swagger-ui-standalone-preset.js') }}"></script>
-        <script src="{{ asset('bundles/apiplatform/init-swagger-ui.js') }}"></script>
+        <script src="{{ asset('bundles/apiplatform/swagger-ui/swagger-ui-bundle.js', assetPackage) }}"></script>
+        <script src="{{ asset('bundles/apiplatform/swagger-ui/swagger-ui-standalone-preset.js', assetPackage) }}"></script>
+        <script src="{{ asset('bundles/apiplatform/init-swagger-ui.js', assetPackage) }}"></script>
     {% endif %}
 {% endblock %}
 

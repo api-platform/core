@@ -70,6 +70,7 @@ final class SwaggerUiAction
             'graphqlEnabled' => $this->swaggerUiContext->isGraphQlEnabled(),
             'graphiQlEnabled' => $this->swaggerUiContext->isGraphiQlEnabled(),
             'graphQlPlaygroundEnabled' => $this->swaggerUiContext->isGraphQlPlaygroundEnabled(),
+            'assetPackage' => $this->swaggerUiContext->getAssetPackage(),
         ];
 
         $swaggerData = [

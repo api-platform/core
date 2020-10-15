@@ -92,6 +92,7 @@ final class Configuration implements ConfigurationInterface
                     ->info('Specify the default operation path resolver to use for generating resources operations path.')
                 ->end()
                 ->scalarNode('name_converter')->defaultNull()->info('Specify a name converter to use.')->end()
+                ->scalarNode('asset_package')->defaultNull()->info('Specify an asset package name to use.')->end()
                 ->scalarNode('path_segment_name_generator')->defaultValue('api_platform.path_segment_name_generator.underscore')->info('Specify a path name generator to use.')->end()
                 ->booleanNode('allow_plain_identifiers')->defaultFalse()->info('Allow plain identifiers, for example "id" instead of "@id" when denormalizing a relation.')->end()
                 ->arrayNode('validator')
