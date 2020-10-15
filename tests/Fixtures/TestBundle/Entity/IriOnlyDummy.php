@@ -17,7 +17,7 @@ use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * Dummy IriOnly.
+ * Dummy with iri_only.
  *
  * @author Pierre Thibaudeau <pierre.thibaudeau@les-tilleuls.coop>
  *
@@ -47,7 +47,7 @@ class IriOnlyDummy
      */
     private $foo;
 
-    public function getId()
+    public function getId(): int
     {
         return $this->id;
     }

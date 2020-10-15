@@ -1588,15 +1588,17 @@ final class DoctrineContext implements Context
     }
 
     /**
-    * @Given there are :nb iriOnlyDummies
-    */
-    public function thereAreIrionlydummies(int $nb)
+     * @Given there are :nb iriOnlyDummies
+     */
+    public function thereAreIriOnlyDummies(int $nb)
     {
         for ($i = 1; $i <= $nb; ++$i) {
             $iriOnlyDummy = $this->buildIriOnlyDummy();
             $iriOnlyDummy->setFoo('bar'.$nb);
             $this->manager->persist($iriOnlyDummy);
         }
+
+        $this->manager->flush();
     }
 
     /**

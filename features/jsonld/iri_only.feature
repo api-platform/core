@@ -1,9 +1,9 @@
-Feature: JSON-LD using IriOnly parameter
+Feature: JSON-LD using iri_only parameter
   In order to improve Vulcain support
-  As a vulcain user and as a developer
-  I should be able to only get an IRI list when I ask a resource to do so.
+  As a Vulcain user and as a developer
+  I should be able to only get an IRI list when I ask a resource.
 
-  Scenario: Retrieve Dummy's resource context with IriOnly
+  Scenario: Retrieve Dummy's resource context with iri_only
     When I send a "GET" request to "/contexts/IriOnlyDummy"
     Then the response status code should be 200
     And the response should be in JSON
@@ -22,7 +22,7 @@ Feature: JSON-LD using IriOnly parameter
       """
 
   @createSchema
-  Scenario: Retrieve Dummies with an embedded IriOnly context
+  Scenario: Retrieve Dummies with iri_only and jsonld_embed_context
     Given there are 3 iriOnlyDummies
     When I send a "GET" request to "/iri_only_dummies"
     Then the response status code should be 200

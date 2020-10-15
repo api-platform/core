@@ -381,7 +381,7 @@ class CollectionNormalizerTest extends TestCase
         ], $actual);
     }
 
-    public function testNormalizeIriOnlyEmbeddedResourceCollection(): void
+    public function testNormalizeIriOnlyEmbedContextResourceCollection(): void
     {
         $fooOne = new Foo();
         $fooOne->id = 1;
