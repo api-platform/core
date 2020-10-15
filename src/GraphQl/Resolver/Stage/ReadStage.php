@@ -133,12 +133,12 @@ final class ReadStage implements ReadStageInterface
 
         foreach ($filters as $name => $value) {
             if (\is_array($value)) {
-                if (\is_string($name) && strpos($name, '_list')) {
+                if (strpos($name, '_list')) {
                     $name = substr($name, 0, \strlen($name) - \strlen('_list'));
                 }
 
                 // If the value contains arrays, we need to merge them for the filters to understand this syntax, proper to GraphQL to preserve the order of the arguments.
-                if ($this->isNumericIndexArrayOfArray($value)) {
+                if ($this->isSequentialArrayOfArrays($value)) {
                     if (\count($value[0]) > 1) {
                         $deprecationMessage = "The filter syntax \"$name: {";
                         $filterArgsOld = [];

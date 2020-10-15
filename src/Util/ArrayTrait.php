@@ -15,13 +15,13 @@ namespace ApiPlatform\Core\Util;
 
 trait ArrayTrait
 {
-    public function isNumericIndexArrayOfArray(array $array): bool
+    public function isSequentialArrayOfArrays(array $array): bool
     {
         if (!$this->isSequentialArray($array)) {
             return false;
         }
 
-        return $this->arrayContainsOnly($array, \gettype([]));
+        return $this->arrayContainsOnly($array, 'array');
     }
 
     public function isSequentialArray(array $array): bool
@@ -35,7 +35,7 @@ trait ArrayTrait
 
     public function arrayContainsOnly(array $array, string $type): bool
     {
-        return $array === array_filter($array, static function ($item) use ($type) {
+        return $array === array_filter($array, static function ($item) use ($type): bool {
             return $type === \gettype($item);
         });
     }

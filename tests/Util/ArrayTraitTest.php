@@ -27,39 +27,39 @@ class ArrayTraitTest extends TestCase
         });
     }
 
-    public function testIsSequentialArrayWithEmptyArray()
+    public function testIsSequentialArrayWithEmptyArray(): void
     {
         self::assertFalse($this->arrayTraitClass->isSequentialArray([]));
     }
 
-    public function testIsSequentialArrayWithNonNumericIndex()
+    public function testIsSequentialArrayWithNonNumericIndex(): void
     {
         self::assertFalse($this->arrayTraitClass->isSequentialArray(['foo' => 'bar']));
     }
 
-    public function testIsSequentialArrayWithNumericNonContinuousIndex()
+    public function testIsSequentialArrayWithNumericNonSequentialIndex(): void
     {
         self::assertFalse($this->arrayTraitClass->isSequentialArray([1 => 'bar', 3 => 'foo']));
     }
 
-    public function testIsSequentialArrayWithNumericContinuousIndex()
+    public function testIsSequentialArrayWithNumericSequentialIndex(): void
     {
         self::assertTrue($this->arrayTraitClass->isSequentialArray([0 => 'bar', 1 => 'foo']));
     }
 
-    public function testArrayContainsOnlyWithDifferentTypes()
+    public function testArrayContainsOnlyWithDifferentTypes(): void
     {
-        self::assertFalse($this->arrayTraitClass->arrayContainsOnly([1, 'foo'], \gettype('')));
+        self::assertFalse($this->arrayTraitClass->arrayContainsOnly([1, 'foo'], 'string'));
     }
 
-    public function testArrayContainsOnlyWithSameType()
+    public function testArrayContainsOnlyWithSameType(): void
     {
-        self::assertTrue($this->arrayTraitClass->arrayContainsOnly(['foo', 'bar'], \gettype('')));
+        self::assertTrue($this->arrayTraitClass->arrayContainsOnly(['foo', 'bar'], 'string'));
     }
 
-    public function testIsNumericIndexArrayOfArray()
+    public function testIsSequentialArrayOfArrays(): void
     {
-        self::assertFalse($this->arrayTraitClass->isNumericIndexArrayOfArray([]));
-        self::assertTrue($this->arrayTraitClass->isNumericIndexArrayOfArray([['foo'], ['bar']]));
+        self::assertFalse($this->arrayTraitClass->isSequentialArrayOfArrays([]));
+        self::assertTrue($this->arrayTraitClass->isSequentialArrayOfArrays([['foo'], ['bar']]));
     }
 }
