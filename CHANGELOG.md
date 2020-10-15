@@ -12,6 +12,7 @@
 * GraphQL: Possibility to add a custom description for queries, mutations and subscriptions (#3477, #3514)
 * GraphQL: Support for field name conversion (serialized name) (#3455, #3516)
 * GraphQL: **BC** `operation` is now `operationName` to follow the standard (#3568)
+* GraphQL: **BC** New syntax for the filters' arguments to preserve the order: `order: [{foo: 'asc'}, {bar: 'desc'}]` (#3468)
 * OpenAPI: Add PHP default values to the documentation (#2386)
 * Deprecate using a validation groups generator service not implementing `ApiPlatform\Core\Bridge\Symfony\Validator\ValidationGroupsGeneratorInterface` (#3346)
 * Subresources: subresource resourceClass can now be defined as a container parameter in XML and Yaml definitions
