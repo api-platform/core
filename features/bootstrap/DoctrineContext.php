@@ -54,6 +54,7 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\FooDummy as FooDummyDocu
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\FourthLevel as FourthLevelDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\Greeting as GreetingDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\InitializeInput as InitializeInputDocument;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\IriOnlyDummy as IriOnlyDummyDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\MaxDepthDummy as MaxDepthDummyDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\NetworkPathDummy as NetworkPathDummyDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\NetworkPathRelationDummy as NetworkPathRelationDummyDocument;
@@ -120,6 +121,7 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\FourthLevel;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Greeting;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\InitializeInput;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\InternalUser;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\IriOnlyDummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\MaxDepthDummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\NetworkPathDummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\NetworkPathRelationDummy;
@@ -1586,6 +1588,20 @@ final class DoctrineContext implements Context
     }
 
     /**
+     * @Given there are :nb iriOnlyDummies
+     */
+    public function thereAreIriOnlyDummies(int $nb)
+    {
+        for ($i = 1; $i <= $nb; ++$i) {
+            $iriOnlyDummy = $this->buildIriOnlyDummy();
+            $iriOnlyDummy->setFoo('bar'.$nb);
+            $this->manager->persist($iriOnlyDummy);
+        }
+
+        $this->manager->flush();
+    }
+
+    /**
      * @Given there are :nb absoluteUrlDummy objects with a related absoluteUrlRelationDummy
      */
     public function thereAreAbsoluteUrlDummies(int $nb)
@@ -1865,6 +1881,14 @@ final class DoctrineContext implements Context
     private function buildGreeting()
     {
         return $this->isOrm() ? new Greeting() : new GreetingDocument();
+    }
+
+    /**
+     * @return IriOnlyDummy|IriOnlyDummyDocument
+     */
+    private function buildIriOnlyDummy()
+    {
+        return $this->isOrm() ? new IriOnlyDummy() : new IriOnlyDummyDocument();
     }
 
     /**

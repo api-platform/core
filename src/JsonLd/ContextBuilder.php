@@ -95,6 +95,13 @@ final class ContextBuilder implements AnonymousContextBuilderInterface
             return [];
         }
 
+        if ($resourceMetadata->getAttribute('normalization_context')['iri_only'] ?? false) {
+            $context = $this->getBaseContext($referenceType);
+            $context['hydra:member']['@type'] = '@id';
+
+            return $context;
+        }
+
         return $this->getResourceContextWithShortname($resourceClass, $referenceType, $shortName);
     }
 
