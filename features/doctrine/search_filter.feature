@@ -578,7 +578,8 @@ Feature: Search filter on collections
     """
 
   Scenario: Get collection ordered by a non valid properties
-    When I send a "GET" request to "/dummies?unknown=0"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/dummies?unknown=0"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
@@ -616,7 +617,8 @@ Feature: Search filter on collections
     }
     """
 
-    When I send a "GET" request to "/dummies?unknown=1"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/dummies?unknown=1"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"

@@ -33,7 +33,8 @@ Feature: Content Negotiation support
     """
 
   Scenario:  Retrieve a collection in XML using the .xml URL
-    When I send a "GET" request to "/dummies.xml"
+    When I add "Accept" header equal to "application/xml"
+    And I send a "GET" request to "/dummies.xml"
     Then the response status code should be 200
     And the header "Content-Type" should be equal to "application/xml; charset=utf-8"
     And the response should be equal to

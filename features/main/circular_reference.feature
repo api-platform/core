@@ -5,11 +5,13 @@ Feature: Circular references handling
 
   @createSchema
   Scenario: Create a circular reference
-    When I add "Content-Type" header equal to "application/ld+json"
+    When I add "Accept" header equal to "application/ld+json"
+    And I add "Content-Type" header equal to "application/ld+json"
     And I send a "POST" request to "/circular_references" with body:
     """
     {}
     """
+    And I add "Accept" header equal to "application/ld+json"
     And I add "Content-Type" header equal to "application/ld+json"
     And I send a "PUT" request to "/circular_references/1" with body:
     """
@@ -34,11 +36,13 @@ Feature: Circular references handling
     """
 
   Scenario: Fetch circular reference
-    When I add "Content-Type" header equal to "application/ld+json"
+    When I add "Accept" header equal to "application/ld+json"
+    And I add "Content-Type" header equal to "application/ld+json"
     And I send a "POST" request to "/circular_references" with body:
     """
     {}
     """
+    And I add "Accept" header equal to "application/ld+json"
     And I add "Content-Type" header equal to "application/ld+json"
     And I send a "PUT" request to "/circular_references/2" with body:
     """
@@ -67,6 +71,7 @@ Feature: Circular references handling
       "children": []
     }
     """
+    And I add "Accept" header equal to "application/ld+json"
     And I send a "GET" request to "/circular_references/1"
     Then the response status code should be 200
     And the JSON should be equal to:

@@ -12,7 +12,6 @@
 declare(strict_types=1);
 
 use Behat\Behat\Context\Context;
-use Behat\Behat\Hook\Scope\AfterStepScope;
 use Behatch\HttpCall\Request;
 
 final class HttpHeaderContext implements Context
@@ -25,24 +24,12 @@ final class HttpHeaderContext implements Context
     }
 
     /**
-     * Sets the default Accept HTTP header to null (workaround to artificially remove it).
-     *
-     * @AfterStep
-     */
-    public function removeAcceptHeaderAfterRequest(AfterStepScope $event)
-    {
-        if (preg_match('/^I send a "[A-Z]+" request to ".+"/', $event->getStep()->getText())) {
-            $this->request->setHttpHeader('Accept', null);
-        }
-    }
-
-    /**
-     * Sets the default Accept HTTP header to null (workaround to artificially remove it).
+     * Sets the default Accept HTTP header to application/ld+json before each scenario.
      *
      * @BeforeScenario
      */
     public function removeAcceptHeaderBeforeScenario()
     {
-        $this->request->setHttpHeader('Accept', null);
+        $this->request->setHttpHeader('Accept', 'application/ld+json');
     }
 }

@@ -599,7 +599,8 @@ Feature: Order filter on collections
     """
 
   Scenario: Get collection ordered by a non valid properties and on which order filter has been enabled in whitelist mode
-    When I send a "GET" request to "/dummies?order[alias]=asc"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/dummies?order[alias]=asc"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
@@ -657,7 +658,8 @@ Feature: Order filter on collections
     }
     """
 
-    When I send a "GET" request to "/dummies?order[alias]=desc"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/dummies?order[alias]=desc"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
@@ -715,7 +717,8 @@ Feature: Order filter on collections
     }
     """
 
-    When I send a "GET" request to "/dummies?order[unknown]=asc"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/dummies?order[unknown]=asc"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
@@ -773,7 +776,8 @@ Feature: Order filter on collections
     }
     """
 
-    When I send a "GET" request to "/dummies?order[unknown]=desc"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/dummies?order[unknown]=desc"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"

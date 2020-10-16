@@ -6,7 +6,8 @@ Feature: Date filter on collections
   @createSchema
   Scenario: Get collection filtered by date
     Given there are 30 dummy objects with dummyDate
-    When I send a "GET" request to "/dummies?dummyDate[after]=2015-04-28"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/dummies?dummyDate[after]=2015-04-28"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
@@ -49,7 +50,8 @@ Feature: Date filter on collections
     }
     """
 
-    When I send a "GET" request to "/dummies?dummyDate[before]=2015-04-05"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/dummies?dummyDate[before]=2015-04-05"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
@@ -92,7 +94,8 @@ Feature: Date filter on collections
     }
     """
 
-    When I send a "GET" request to "/dummies?dummyDate[after]=2015-04-28T00:00:00%2B00:00"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/dummies?dummyDate[after]=2015-04-28T00:00:00%2B00:00"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
@@ -134,7 +137,8 @@ Feature: Date filter on collections
     }
     """
 
-    When I send a "GET" request to "/dummies?dummyDate[before]=2015-04-05Z"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/dummies?dummyDate[before]=2015-04-05Z"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
@@ -179,7 +183,8 @@ Feature: Date filter on collections
 
   Scenario: Search for entities within a range
     # The order should not influence the search
-    When I send a "GET" request to "/dummies?dummyDate[before]=2015-04-05&dummyDate[after]=2015-04-05"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/dummies?dummyDate[before]=2015-04-05&dummyDate[after]=2015-04-05"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
@@ -216,7 +221,8 @@ Feature: Date filter on collections
     }
     """
 
-    When I send a "GET" request to "/dummies?dummyDate[after]=2015-04-05&dummyDate[before]=2015-04-05"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/dummies?dummyDate[after]=2015-04-05&dummyDate[before]=2015-04-05"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
@@ -285,7 +291,8 @@ Feature: Date filter on collections
 
   Scenario: Get collection filtered by association date
     Given there are 30 dummy objects with dummyDate and relatedDummy
-    When I send a "GET" request to "/dummies?relatedDummy.dummyDate[after]=2015-04-28"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/dummies?relatedDummy.dummyDate[after]=2015-04-28"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
@@ -329,7 +336,8 @@ Feature: Date filter on collections
     }
     """
 
-    When I send a "GET" request to "/dummies?relatedDummy.dummyDate[after]=2015-04-28&relatedDummy_dummyDate[after]=2015-04-28"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/dummies?relatedDummy.dummyDate[after]=2015-04-28&relatedDummy_dummyDate[after]=2015-04-28"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
@@ -373,7 +381,8 @@ Feature: Date filter on collections
     }
     """
 
-    When I send a "GET" request to "/dummies?relatedDummy.dummyDate[after]=2015-04-28T00:00:00%2B00:00"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/dummies?relatedDummy.dummyDate[after]=2015-04-28T00:00:00%2B00:00"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
@@ -461,13 +470,15 @@ Feature: Date filter on collections
   @createSchema
   Scenario: Get collection filtered by date that is not a datetime including null after
     Given there are 3 dummydate objects with nullable dateIncludeNullAfter
-    When I send a "GET" request to "/dummy_dates?dateIncludeNullAfter[after]=2015-04-02"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/dummy_dates?dateIncludeNullAfter[after]=2015-04-02"
     Then the response status code should be 200
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
     And the JSON node "hydra:totalItems" should be equal to 2
     And the JSON node "hydra:member[0].dateIncludeNullAfter" should be equal to "2015-04-02T00:00:00+00:00"
     And the JSON node "hydra:member[1].dateIncludeNullAfter" should be null
-    When I send a "GET" request to "/dummy_dates?dateIncludeNullAfter[before]=2015-04-02"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/dummy_dates?dateIncludeNullAfter[before]=2015-04-02"
     Then the response status code should be 200
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
     And the JSON node "hydra:totalItems" should be equal to 2
@@ -477,13 +488,15 @@ Feature: Date filter on collections
   @createSchema
   Scenario: Get collection filtered by date that is not a datetime including null before
     Given there are 3 dummydate objects with nullable dateIncludeNullBefore
-    When I send a "GET" request to "/dummy_dates?dateIncludeNullBefore[before]=2015-04-01"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/dummy_dates?dateIncludeNullBefore[before]=2015-04-01"
     Then the response status code should be 200
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
     And the JSON node "hydra:totalItems" should be equal to 2
     And the JSON node "hydra:member[0].dateIncludeNullBefore" should be equal to "2015-04-01T00:00:00+00:00"
     And the JSON node "hydra:member[1].dateIncludeNullBefore" should be null
-    When I send a "GET" request to "/dummy_dates?dateIncludeNullBefore[after]=2015-04-01"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/dummy_dates?dateIncludeNullBefore[after]=2015-04-01"
     Then the response status code should be 200
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
     And the JSON node "hydra:totalItems" should be equal to 2
@@ -493,13 +506,15 @@ Feature: Date filter on collections
   @createSchema
   Scenario: Get collection filtered by date that is not a datetime including null before and after
     Given there are 3 dummydate objects with nullable dateIncludeNullBeforeAndAfter
-    When I send a "GET" request to "/dummy_dates?dateIncludeNullBeforeAndAfter[before]=2015-04-01"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/dummy_dates?dateIncludeNullBeforeAndAfter[before]=2015-04-01"
     Then the response status code should be 200
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
     And the JSON node "hydra:totalItems" should be equal to 2
     And the JSON node "hydra:member[0].dateIncludeNullBeforeAndAfter" should be equal to "2015-04-01T00:00:00+00:00"
     And the JSON node "hydra:member[1].dateIncludeNullBeforeAndAfter" should be null
-    When I send a "GET" request to "/dummy_dates?dateIncludeNullBeforeAndAfter[after]=2015-04-02"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/dummy_dates?dateIncludeNullBeforeAndAfter[after]=2015-04-02"
     Then the response status code should be 200
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
     And the JSON node "hydra:totalItems" should be equal to 2

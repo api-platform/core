@@ -5,7 +5,8 @@ Feature: Documentation support
 
   @createSchema
   Scenario: Retrieve the Swagger/OpenAPI documentation
-    Given I send a "GET" request to "/docs.json"
+    Given I add "Accept" header equal to "application/json"
+    And I send a "GET" request to "/docs.json"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/json; charset=utf-8"
@@ -127,7 +128,8 @@ Feature: Documentation support
     And I should see text matching "2.0"
 
   Scenario: Retrieve the Swagger/OpenAPI documentation with API Gateway compatibility
-    Given I send a "GET" request to "/docs.json?api_gateway=true"
+    Given I add "Accept" header equal to "application/json"
+    And I send a "GET" request to "/docs.json?api_gateway=true"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/json; charset=utf-8"
