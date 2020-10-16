@@ -9,7 +9,8 @@ Feature: Sending PATCH requets
     """
     {"name": "Hello"}
     """
-    When I add "Content-Type" header equal to "application/ld+json"
+    When I add "Accept" header equal to "application/ld+json"
+    And I add "Content-Type" header equal to "application/ld+json"
     And I send a "GET" request to "/patch_dummies/1"
     Then the header "Accept-Patch" should be equal to "application/merge-patch+json, application/vnd.api+json"
 

@@ -64,13 +64,15 @@ Feature: Cache invalidation through HTTP Cache tags
     And "/relation_embedders,/relation_embedders/1,/related_dummies/1" IRIs should be purged
 
   Scenario: Create two Relation2
-    When I add "Content-Type" header equal to "application/ld+json"
+    When I add "Accept" header equal to "application/ld+json"
+    And I add "Content-Type" header equal to "application/ld+json"
     And I send a "POST" request to "/relation2s" with body:
     """
     {
     }
     """
-    When I add "Content-Type" header equal to "application/ld+json"
+    When I add "Accept" header equal to "application/ld+json"
+    And I add "Content-Type" header equal to "application/ld+json"
     And I send a "POST" request to "/relation2s" with body:
     """
     {
