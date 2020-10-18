@@ -17,6 +17,7 @@ use ApiPlatform\Core\Api\OperationType;
 use ApiPlatform\Core\DataPersister\ContextAwareDataPersisterInterface;
 use ApiPlatform\Core\Exception\ResourceClassNotFoundException;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
+use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Util\ClassInfoTrait;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\MessageBusInterface;
@@ -35,11 +36,13 @@ final class DataPersister implements ContextAwareDataPersisterInterface
     use DispatchTrait;
 
     private $resourceMetadataFactory;
+    private $dataPersister;
 
-    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, MessageBusInterface $messageBus)
+    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, MessageBusInterface $messageBus, ContextAwareDataPersisterInterface $dataPersister)
     {
         $this->resourceMetadataFactory = $resourceMetadataFactory;
         $this->messageBus = $messageBus;
+        $this->dataPersister = $dataPersister;
     }
 
     /**
@@ -47,27 +50,17 @@ final class DataPersister implements ContextAwareDataPersisterInterface
      */
     public function supports($data, array $context = []): bool
     {
+        if (true === ($context['messenger_dispatched'] ?? false)) {
+            return false;
+        }
+
         try {
             $resourceMetadata = $this->resourceMetadataFactory->create($context['resource_class'] ?? $this->getObjectClass($data));
         } catch (ResourceClassNotFoundException $e) {
             return false;
         }
 
-        if (null !== $operationName = $context['collection_operation_name'] ?? $context['item_operation_name'] ?? null) {
-            return false !== $resourceMetadata->getTypedOperationAttribute(
-                $context['collection_operation_name'] ?? false ? OperationType::COLLECTION : OperationType::ITEM,
-                $operationName,
-                'messenger',
-                false,
-                true
-            );
-        }
-
-        if (isset($context['graphql_operation_name'])) {
-            return false !== $resourceMetadata->getGraphqlAttribute($context['graphql_operation_name'], 'messenger', false, true);
-        }
-
-        return false !== $resourceMetadata->getAttribute('messenger', false);
+        return false !== $this->getMessengerAttributeValue($resourceMetadata, $context);
     }
 
     /**
@@ -75,6 +68,10 @@ final class DataPersister implements ContextAwareDataPersisterInterface
      */
     public function persist($data, array $context = [])
     {
+        if ($this->handOver($data, $context)) {
+            $data = $this->dataPersister->persist($data, $context + ['messenger_dispatched' => true]);
+        }
+
         $envelope = $this->dispatch(
             (new Envelope($data))
                 ->with(new ContextStamp($context))
@@ -93,9 +90,49 @@ final class DataPersister implements ContextAwareDataPersisterInterface
      */
     public function remove($data, array $context = [])
     {
+        if ($this->handOver($data, $context)) {
+            $this->dataPersister->remove($data, $context + ['messenger_dispatched' => true]);
+        }
+
         $this->dispatch(
             (new Envelope($data))
                 ->with(new RemoveStamp())
         );
+    }
+
+    /**
+     * Should this DataPersister hand over in "persist" mode?
+     */
+    private function handOver($data, array $context = []): bool
+    {
+        try {
+            $value = $this->getMessengerAttributeValue($this->resourceMetadataFactory->create($context['resource_class'] ?? $this->getObjectClass($data)), $context);
+        } catch (ResourceClassNotFoundException $exception) {
+            return false;
+        }
+
+        return 'persist' === $value || (\is_array($value) && (\in_array('persist', $value, true) || (true === $value['persist'] ?? false)));
+    }
+
+    /**
+     * @return bool|string|array|null
+     */
+    private function getMessengerAttributeValue(ResourceMetadata $resourceMetadata, array $context = [])
+    {
+        if (null !== $operationName = $context['collection_operation_name'] ?? $context['item_operation_name'] ?? null) {
+            return $resourceMetadata->getTypedOperationAttribute(
+                    $context['collection_operation_name'] ?? false ? OperationType::COLLECTION : OperationType::ITEM,
+                    $operationName,
+                    'messenger',
+                    false,
+                    true
+                );
+        }
+
+        if (isset($context['graphql_operation_name'])) {
+            return $resourceMetadata->getGraphqlAttribute($context['graphql_operation_name'], 'messenger', false, true);
+        }
+
+        return $resourceMetadata->getAttribute('messenger', false);
     }
 }

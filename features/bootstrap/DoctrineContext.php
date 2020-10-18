@@ -11,6 +11,8 @@
 
 declare(strict_types=1);
 
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\AbsoluteUrlDummy as AbsoluteUrlDummyDocument;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\AbsoluteUrlRelationDummy as AbsoluteUrlRelationDummyDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\Address as AddressDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\Answer as AnswerDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\CompositeItem as CompositeItemDocument;
@@ -51,7 +53,11 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\Foo as FooDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\FooDummy as FooDummyDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\FourthLevel as FourthLevelDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\Greeting as GreetingDocument;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\InitializeInput as InitializeInputDocument;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\IriOnlyDummy as IriOnlyDummyDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\MaxDepthDummy as MaxDepthDummyDocument;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\NetworkPathDummy as NetworkPathDummyDocument;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\NetworkPathRelationDummy as NetworkPathRelationDummyDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\Order as OrderDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\Person as PersonDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\PersonToPet as PersonToPetDocument;
@@ -69,6 +75,8 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\Taxon as TaxonDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\ThirdLevel as ThirdLevelDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\UrlEncodedId as UrlEncodedIdDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\User as UserDocument;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\AbsoluteUrlDummy;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\AbsoluteUrlRelationDummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Address;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Answer;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\CompositeItem;
@@ -111,8 +119,12 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Foo;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\FooDummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\FourthLevel;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Greeting;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\InitializeInput;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\InternalUser;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\IriOnlyDummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\MaxDepthDummy;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\NetworkPathDummy;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\NetworkPathRelationDummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Order;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Person;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\PersonToPet;
@@ -435,6 +447,34 @@ final class DoctrineContext implements Context
             $this->manager->persist($dummy);
         }
 
+        $this->manager->flush();
+    }
+
+    /**
+     * @Given there are dummies with similar properties
+     */
+    public function thereAreDummiesWithSimilarProperties()
+    {
+        $dummy1 = $this->buildDummy();
+        $dummy1->setName('foo');
+        $dummy1->setDescription('bar');
+
+        $dummy2 = $this->buildDummy();
+        $dummy2->setName('baz');
+        $dummy2->setDescription('qux');
+
+        $dummy3 = $this->buildDummy();
+        $dummy3->setName('foo');
+        $dummy3->setDescription('qux');
+
+        $dummy4 = $this->buildDummy();
+        $dummy4->setName('baz');
+        $dummy4->setDescription('bar');
+
+        $this->manager->persist($dummy1);
+        $this->manager->persist($dummy2);
+        $this->manager->persist($dummy3);
+        $this->manager->persist($dummy4);
         $this->manager->flush();
     }
 
@@ -1547,6 +1587,68 @@ final class DoctrineContext implements Context
         $this->manager->flush();
     }
 
+    /**
+     * @Given there are :nb iriOnlyDummies
+     */
+    public function thereAreIriOnlyDummies(int $nb)
+    {
+        for ($i = 1; $i <= $nb; ++$i) {
+            $iriOnlyDummy = $this->buildIriOnlyDummy();
+            $iriOnlyDummy->setFoo('bar'.$nb);
+            $this->manager->persist($iriOnlyDummy);
+        }
+
+        $this->manager->flush();
+    }
+
+    /**
+     * @Given there are :nb absoluteUrlDummy objects with a related absoluteUrlRelationDummy
+     */
+    public function thereAreAbsoluteUrlDummies(int $nb)
+    {
+        for ($i = 1; $i <= $nb; ++$i) {
+            $absoluteUrlRelationDummy = $this->buildAbsoluteUrlRelationDummy();
+            $absoluteUrlDummy = $this->buildAbsoluteUrlDummy();
+            $absoluteUrlDummy->absoluteUrlRelationDummy = $absoluteUrlRelationDummy;
+
+            $this->manager->persist($absoluteUrlRelationDummy);
+            $this->manager->persist($absoluteUrlDummy);
+        }
+
+        $this->manager->flush();
+    }
+
+    /**
+     * @Given there are :nb networkPathDummy objects with a related networkPathRelationDummy
+     */
+    public function thereAreNetworkPathDummies(int $nb)
+    {
+        for ($i = 1; $i <= $nb; ++$i) {
+            $networkPathRelationDummy = $this->buildNetworkPathRelationDummy();
+            $networkPathDummy = $this->buildNetworkPathDummy();
+            $networkPathDummy->networkPathRelationDummy = $networkPathRelationDummy;
+
+            $this->manager->persist($networkPathRelationDummy);
+            $this->manager->persist($networkPathDummy);
+        }
+
+        $this->manager->flush();
+    }
+
+    /**
+     * @Given there is an InitializeInput object with id :id
+     */
+    public function thereIsAnInitializeInput(int $id)
+    {
+        $initializeInput = $this->buildInitializeInput();
+        $initializeInput->id = $id;
+        $initializeInput->manager = 'Orwell';
+        $initializeInput->name = '1984';
+
+        $this->manager->persist($initializeInput);
+        $this->manager->flush();
+    }
+
     private function isOrm(): bool
     {
         return null !== $this->schemaTool;
@@ -1782,6 +1884,14 @@ final class DoctrineContext implements Context
     }
 
     /**
+     * @return IriOnlyDummy|IriOnlyDummyDocument
+     */
+    private function buildIriOnlyDummy()
+    {
+        return $this->isOrm() ? new IriOnlyDummy() : new IriOnlyDummyDocument();
+    }
+
+    /**
      * @return MaxDepthDummy|MaxDepthDummyDocument
      */
     private function buildMaxDepthDummy()
@@ -1931,5 +2041,45 @@ final class DoctrineContext implements Context
     private function buildDummyMercure()
     {
         return $this->isOrm() ? new DummyMercure() : new DummyMercureDocument();
+    }
+
+    /**
+     * @return AbsoluteUrlDummyDocument|AbsoluteUrlDummy
+     */
+    private function buildAbsoluteUrlDummy()
+    {
+        return $this->isOrm() ? new AbsoluteUrlDummy() : new AbsoluteUrlDummyDocument();
+    }
+
+    /**
+     * @return AbsoluteUrlRelationDummyDocument|AbsoluteUrlRelationDummy
+     */
+    private function buildAbsoluteUrlRelationDummy()
+    {
+        return $this->isOrm() ? new AbsoluteUrlRelationDummy() : new AbsoluteUrlRelationDummyDocument();
+    }
+
+    /**
+     * @return NetworkPathDummyDocument|NetworkPathDummy
+     */
+    private function buildNetworkPathDummy()
+    {
+        return $this->isOrm() ? new NetworkPathDummy() : new NetworkPathDummyDocument();
+    }
+
+    /**
+     * @return NetworkPathRelationDummyDocument|NetworkPathRelationDummy
+     */
+    private function buildNetworkPathRelationDummy()
+    {
+        return $this->isOrm() ? new NetworkPathRelationDummy() : new NetworkPathRelationDummyDocument();
+    }
+
+    /**
+     * @return InitializeInput|InitializeInputDocument
+     */
+    private function buildInitializeInput()
+    {
+        return $this->isOrm() ? new InitializeInput() : new InitializeInputDocument();
     }
 }

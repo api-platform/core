@@ -17,6 +17,7 @@ use ApiPlatform\Core\Action\EntrypointAction;
 use ApiPlatform\Core\Api\Entrypoint;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceNameCollection;
+use ApiPlatform\Core\Tests\ProphecyTrait;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -24,6 +25,8 @@ use PHPUnit\Framework\TestCase;
  */
 class EntrypointActionTest extends TestCase
 {
+    use ProphecyTrait;
+
     public function testGetEntrypoint()
     {
         $resourceNameCollectionFactoryProphecy = $this->prophesize(ResourceNameCollectionFactoryInterface::class);

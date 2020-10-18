@@ -17,6 +17,9 @@ use ApiPlatform\Core\Api\ResourceClassResolverInterface;
 use ApiPlatform\Core\DataProvider\PaginatorInterface;
 use ApiPlatform\Core\DataProvider\PartialPaginatorInterface;
 use ApiPlatform\Core\JsonApi\Serializer\CollectionNormalizer;
+use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
+use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
+use ApiPlatform\Core\Tests\ProphecyTrait;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
@@ -26,11 +29,14 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
  */
 class CollectionNormalizerTest extends TestCase
 {
+    use ProphecyTrait;
+
     public function testSupportsNormalize()
     {
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
 
-        $normalizer = new CollectionNormalizer($resourceClassResolverProphecy->reveal(), 'page');
+        $normalizer = new CollectionNormalizer($resourceClassResolverProphecy->reveal(), 'page', $resourceMetadataFactoryProphecy->reveal());
 
         $this->assertTrue($normalizer->supportsNormalization([], CollectionNormalizer::FORMAT));
         $this->assertTrue($normalizer->supportsNormalization(new \ArrayObject(), CollectionNormalizer::FORMAT));
@@ -56,9 +62,13 @@ class CollectionNormalizerTest extends TestCase
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
         $resourceClassResolverProphecy->getResourceClass($paginator, 'Foo')->willReturn('Foo');
 
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
+        $resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadata());
+
         $itemNormalizer = $this->prophesize(NormalizerInterface::class);
         $itemNormalizer->normalize('foo', CollectionNormalizer::FORMAT, [
             'request_uri' => '/foos?page=3',
+            'uri' => 'http://example.com/foos?page=3',
             'api_sub_level' => true,
             'resource_class' => 'Foo',
         ])->willReturn([
@@ -72,7 +82,7 @@ class CollectionNormalizerTest extends TestCase
             ],
         ]);
 
-        $normalizer = new CollectionNormalizer($resourceClassResolverProphecy->reveal(), 'page');
+        $normalizer = new CollectionNormalizer($resourceClassResolverProphecy->reveal(), 'page', $resourceMetadataFactoryProphecy->reveal());
         $normalizer->setNormalizer($itemNormalizer->reveal());
 
         $expected = [
@@ -102,6 +112,7 @@ class CollectionNormalizerTest extends TestCase
 
         $this->assertEquals($expected, $normalizer->normalize($paginator, CollectionNormalizer::FORMAT, [
             'request_uri' => '/foos?page=3',
+            'uri' => 'http://example.com/foos?page=3',
             'resource_class' => 'Foo',
         ]));
     }
@@ -122,9 +133,13 @@ class CollectionNormalizerTest extends TestCase
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
         $resourceClassResolverProphecy->getResourceClass($paginator, 'Foo')->willReturn('Foo');
 
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
+        $resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadata());
+
         $itemNormalizer = $this->prophesize(NormalizerInterface::class);
         $itemNormalizer->normalize('foo', CollectionNormalizer::FORMAT, [
             'request_uri' => '/foos?page=3',
+            'uri' => 'http://example.com/foos?page=3',
             'api_sub_level' => true,
             'resource_class' => 'Foo',
         ])->willReturn([
@@ -138,7 +153,7 @@ class CollectionNormalizerTest extends TestCase
             ],
         ]);
 
-        $normalizer = new CollectionNormalizer($resourceClassResolverProphecy->reveal(), 'page');
+        $normalizer = new CollectionNormalizer($resourceClassResolverProphecy->reveal(), 'page', $resourceMetadataFactoryProphecy->reveal());
         $normalizer->setNormalizer($itemNormalizer->reveal());
 
         $expected = [
@@ -165,6 +180,7 @@ class CollectionNormalizerTest extends TestCase
 
         $this->assertEquals($expected, $normalizer->normalize($paginator, CollectionNormalizer::FORMAT, [
             'request_uri' => '/foos?page=3',
+            'uri' => 'http://example.com/foos?page=3',
             'resource_class' => 'Foo',
         ]));
     }
@@ -175,10 +191,12 @@ class CollectionNormalizerTest extends TestCase
 
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
         $resourceClassResolverProphecy->getResourceClass($data, 'Foo')->willReturn('Foo');
-
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
+        $resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadata());
         $itemNormalizer = $this->prophesize(NormalizerInterface::class);
         $itemNormalizer->normalize('foo', CollectionNormalizer::FORMAT, [
             'request_uri' => '/foos',
+            'uri' => 'http://example.com/foos',
             'api_sub_level' => true,
             'resource_class' => 'Foo',
         ])->willReturn([
@@ -192,7 +210,7 @@ class CollectionNormalizerTest extends TestCase
             ],
         ]);
 
-        $normalizer = new CollectionNormalizer($resourceClassResolverProphecy->reveal(), 'page');
+        $normalizer = new CollectionNormalizer($resourceClassResolverProphecy->reveal(), 'page', $resourceMetadataFactoryProphecy->reveal());
         $normalizer->setNormalizer($itemNormalizer->reveal());
 
         $expected = [
@@ -212,6 +230,7 @@ class CollectionNormalizerTest extends TestCase
 
         $this->assertEquals($expected, $normalizer->normalize($data, CollectionNormalizer::FORMAT, [
             'request_uri' => '/foos',
+            'uri' => 'http://example.com/foos',
             'resource_class' => 'Foo',
         ]));
     }
@@ -223,9 +242,13 @@ class CollectionNormalizerTest extends TestCase
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
         $resourceClassResolverProphecy->getResourceClass($data, 'Foo')->willReturn('Foo');
 
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
+        $resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadata());
+
         $itemNormalizer = $this->prophesize(NormalizerInterface::class);
         $itemNormalizer->normalize('foo', CollectionNormalizer::FORMAT, [
             'request_uri' => '/foos',
+            'uri' => 'http://example.com/foos',
             'api_sub_level' => true,
             'resource_class' => 'Foo',
         ])->willReturn([
@@ -249,7 +272,7 @@ class CollectionNormalizerTest extends TestCase
             ],
         ]);
 
-        $normalizer = new CollectionNormalizer($resourceClassResolverProphecy->reveal(), 'page');
+        $normalizer = new CollectionNormalizer($resourceClassResolverProphecy->reveal(), 'page', $resourceMetadataFactoryProphecy->reveal());
         $normalizer->setNormalizer($itemNormalizer->reveal());
 
         $expected = [
@@ -279,6 +302,7 @@ class CollectionNormalizerTest extends TestCase
 
         $this->assertEquals($expected, $normalizer->normalize($data, CollectionNormalizer::FORMAT, [
             'request_uri' => '/foos',
+            'uri' => 'http://example.com/foos',
             'resource_class' => 'Foo',
         ]));
     }
@@ -293,18 +317,23 @@ class CollectionNormalizerTest extends TestCase
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
         $resourceClassResolverProphecy->getResourceClass($data, 'Foo')->willReturn('Foo');
 
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
+        $resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadata());
+
         $itemNormalizer = $this->prophesize(NormalizerInterface::class);
         $itemNormalizer->normalize('foo', CollectionNormalizer::FORMAT, [
             'request_uri' => '/foos',
+            'uri' => 'http://example.com/foos',
             'api_sub_level' => true,
             'resource_class' => 'Foo',
         ])->willReturn([]);
 
-        $normalizer = new CollectionNormalizer($resourceClassResolverProphecy->reveal(), 'page');
+        $normalizer = new CollectionNormalizer($resourceClassResolverProphecy->reveal(), 'page', $resourceMetadataFactoryProphecy->reveal());
         $normalizer->setNormalizer($itemNormalizer->reveal());
 
         $normalizer->normalize($data, CollectionNormalizer::FORMAT, [
             'request_uri' => '/foos',
+            'uri' => 'http://example.com/foos',
             'resource_class' => 'Foo',
         ]);
     }

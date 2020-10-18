@@ -17,14 +17,15 @@ use ApiPlatform\Core\JsonApi\EventListener\TransformFieldsetsParametersListener;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
+use ApiPlatform\Core\Tests\ProphecyTrait;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\HttpFoundation\Exception\BadRequestException;
-use Symfony\Component\HttpFoundation\InputBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 
 class TransformFieldsetsParametersListenerTest extends TestCase
 {
+    use ProphecyTrait;
+
     private $listener;
 
     protected function setUp(): void
@@ -52,10 +53,6 @@ class TransformFieldsetsParametersListenerTest extends TestCase
 
     public function testOnKernelRequestWithInvalidFilter()
     {
-        if (class_exists(InputBag::class)) {
-            $this->expectException(BadRequestException::class);
-        }
-
         $eventProphecy = $this->prophesize(RequestEvent::class);
 
         $expectedRequest = new Request();
@@ -133,10 +130,6 @@ class TransformFieldsetsParametersListenerTest extends TestCase
 
     public function testOnKernelRequestWithWrongParametersTypesDoesnTAffectRequestAttributes()
     {
-        if (class_exists(InputBag::class)) {
-            $this->expectException(BadRequestException::class);
-        }
-
         $request = new Request(
             ['fields' => 'foo', 'include' => ['relatedDummy,foo']],
             [],

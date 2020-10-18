@@ -20,7 +20,7 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\DummyDtoNoInput as Dummy
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Dto\Document\OutputDto as OutputDtoDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Dto\OutputDto;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyDtoNoInput;
-use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ManagerRegistry;
 
 /**
  * @author Vincent Chalamon <vincentchalamon@gmail.com>

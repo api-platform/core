@@ -20,7 +20,7 @@ use ApiPlatform\Core\Metadata\Resource\ResourceNameCollection;
  *
  * @author Amrouche Hamza <hamza.simperfit@gmail.com>
  */
-final class Documentation
+final class Documentation implements DocumentationInterface
 {
     private $resourceNameCollection;
     private $title;

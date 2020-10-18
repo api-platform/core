@@ -19,6 +19,7 @@ use ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Filter\FilterInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\Dummy;
+use ApiPlatform\Core\Tests\ProphecyTrait;
 use Doctrine\ODM\MongoDB\Aggregation\Builder;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
@@ -30,6 +31,8 @@ use Psr\Container\ContainerInterface;
  */
 class FilterExtensionTest extends TestCase
 {
+    use ProphecyTrait;
+
     public function testApplyToCollectionWithValidFilters()
     {
         $aggregationBuilderProphecy = $this->prophesize(Builder::class);

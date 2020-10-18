@@ -16,10 +16,13 @@ namespace ApiPlatform\Core\Tests\GraphQl\Action;
 use ApiPlatform\Core\GraphQl\Action\EntrypointAction;
 use ApiPlatform\Core\GraphQl\Action\GraphiQlAction;
 use ApiPlatform\Core\GraphQl\Action\GraphQlPlaygroundAction;
+use ApiPlatform\Core\GraphQl\Error\ErrorHandler;
 use ApiPlatform\Core\GraphQl\ExecutorInterface;
 use ApiPlatform\Core\GraphQl\Serializer\Exception\ErrorNormalizer;
 use ApiPlatform\Core\GraphQl\Serializer\Exception\HttpExceptionNormalizer;
 use ApiPlatform\Core\GraphQl\Type\SchemaBuilderInterface;
+use ApiPlatform\Core\Tests\ProphecyTrait;
+use GraphQL\Error\DebugFlag;
 use GraphQL\Executor\ExecutionResult;
 use GraphQL\Type\Schema;
 use PHPUnit\Framework\TestCase;
@@ -37,6 +40,8 @@ use Twig\Environment as TwigEnvironment;
  */
 class EntrypointActionTest extends TestCase
 {
+    use ProphecyTrait;
+
     /**
      * Hack to avoid transient failing test because of Date header.
      */
@@ -235,10 +240,12 @@ class EntrypointActionTest extends TestCase
             new HttpExceptionNormalizer(),
             new ErrorNormalizer(),
         ]);
+        $errorHandler = new ErrorHandler();
 
         $executionResultProphecy = $this->prophesize(ExecutionResult::class);
-        $executionResultProphecy->toArray(false)->willReturn(['GraphQL']);
+        $executionResultProphecy->toArray(DebugFlag::NONE)->willReturn(['GraphQL']);
         $executionResultProphecy->setErrorFormatter([$normalizer, 'normalize'])->willReturn($executionResultProphecy);
+        $executionResultProphecy->setErrorsHandler($errorHandler)->willReturn($executionResultProphecy);
         $executorProphecy = $this->prophesize(ExecutorInterface::class);
         $executorProphecy->executeQuery(Argument::is($schema->reveal()), 'graphqlQuery', null, null, $variables, 'graphqlOperationName')->willReturn($executionResultProphecy->reveal());
 
@@ -248,6 +255,6 @@ class EntrypointActionTest extends TestCase
         $graphiQlAction = new GraphiQlAction($twigProphecy->reveal(), $routerProphecy->reveal(), true);
         $graphQlPlaygroundAction = new GraphQlPlaygroundAction($twigProphecy->reveal(), $routerProphecy->reveal(), true);
 
-        return new EntrypointAction($schemaBuilderProphecy->reveal(), $executorProphecy->reveal(), $graphiQlAction, $graphQlPlaygroundAction, $normalizer, false, true, true, 'graphiql');
+        return new EntrypointAction($schemaBuilderProphecy->reveal(), $executorProphecy->reveal(), $graphiQlAction, $graphQlPlaygroundAction, $normalizer, $errorHandler, false, true, true, 'graphiql');
     }
 }

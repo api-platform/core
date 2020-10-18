@@ -12,7 +12,7 @@ Feature: JSON-LD non-resource handling
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
-    And the JSON should be equal to:
+    And the JSON should be a superset of:
     """
     {
       "@context": "/contexts/ContainNonResource",
@@ -25,11 +25,13 @@ Feature: JSON-LD non-resource handling
         "id": "1-nested",
         "nested": null,
         "notAResource": {
+          "@type": "NotAResource",
           "foo": "f2",
           "bar": "b2"
         }
       },
       "notAResource": {
+        "@type": "NotAResource",
         "foo": "f1",
         "bar": "b1"
       }
@@ -50,13 +52,14 @@ Feature: JSON-LD non-resource handling
     Then the response status code should be 201
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
-    And the JSON should be equal to:
+    And the JSON should be a superset of:
     """
     {
       "@context": "/contexts/NonRelationResource",
       "@id": "/non_relation_resources/1",
       "@type": "NonRelationResource",
       "relation": {
+        "@type": "NonResourceClass",
         "foo": "test"
       },
       "id": 1

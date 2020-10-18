@@ -30,6 +30,7 @@ use ApiPlatform\Core\PathResolver\CustomOperationPathResolver;
 use ApiPlatform\Core\PathResolver\OperationPathResolver;
 use ApiPlatform\Core\Tests\Fixtures\DummyEntity;
 use ApiPlatform\Core\Tests\Fixtures\RelatedDummyEntity;
+use ApiPlatform\Core\Tests\ProphecyTrait;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -43,27 +44,33 @@ use Symfony\Component\Routing\Route;
  */
 class ApiLoaderTest extends TestCase
 {
+    use ProphecyTrait;
+
     public function testApiLoader()
     {
         $resourceMetadata = new ResourceMetadata();
         $resourceMetadata = $resourceMetadata->withShortName('dummy');
         //default operation based on OperationResourceMetadataFactory
         $resourceMetadata = $resourceMetadata->withItemOperations([
-            'get' => ['method' => 'GET', 'requirements' => ['id' => '\d+'], 'defaults' => ['my_default' => 'default_value', '_controller' => 'should_not_be_overriden']],
-            'put' => ['method' => 'PUT'],
-            'delete' => ['method' => 'DELETE'],
+            'get' => ['method' => 'GET', 'requirements' => ['id' => '\d+'], 'defaults' => ['my_default' => 'default_value', '_controller' => 'should_not_be_overriden'], 'stateless' => null],
+            'put' => ['method' => 'PUT', 'stateless' => null],
+            'delete' => ['method' => 'DELETE', 'stateless' => null],
         ]);
         //custom operations
         $resourceMetadata = $resourceMetadata->withCollectionOperations([
-            'my_op' => ['method' => 'GET', 'controller' => 'some.service.name', 'requirements' => ['_format' => 'a valid format'], 'defaults' => ['my_default' => 'default_value'], 'condition' => "request.headers.get('User-Agent') matches '/firefox/i'"], //with controller
-            'my_second_op' => ['method' => 'POST', 'options' => ['option' => 'option_value'], 'host' => '{subdomain}.api-platform.com', 'schemes' => ['https']], //without controller, takes the default one
-            'my_path_op' => ['method' => 'GET', 'path' => 'some/custom/path'], //custom path
+            'my_op' => ['method' => 'GET', 'controller' => 'some.service.name', 'requirements' => ['_format' => 'a valid format'], 'defaults' => ['my_default' => 'default_value'], 'condition' => "request.headers.get('User-Agent') matches '/firefox/i'", 'stateless' => null], //with controller
+            'my_second_op' => ['method' => 'POST', 'options' => ['option' => 'option_value'], 'host' => '{subdomain}.api-platform.com', 'schemes' => ['https'], 'stateless' => null], //without controller, takes the default one
+            'my_path_op' => ['method' => 'GET', 'path' => 'some/custom/path', 'stateless' => null], //custom path
+            'my_stateless_op' => ['method' => 'GET', 'stateless' => true],
+        ]);
+        $resourceMetadata = $resourceMetadata->withSubresourceOperations([
+            'subresources_get_subresource' => ['stateless' => true],
         ]);
 
         $routeCollection = $this->getApiLoaderWithResourceMetadata($resourceMetadata)->load(null);
 
         $this->assertEquals(
-            $this->getRoute('/dummies/{id}.{_format}', 'api_platform.action.get_item', DummyEntity::class, 'get', ['GET'], false, ['id' => '\d+'], ['my_default' => 'default_value']),
+            $this->getRoute('/dummies/{id}.{_format}', 'api_platform.action.get_item', DummyEntity::class, 'get', ['GET'], false, ['id' => '\d+'], ['my_default' => 'default_value', '_stateless' => null]),
             $routeCollection->get('api_dummies_get_item')
         );
 
@@ -78,12 +85,12 @@ class ApiLoaderTest extends TestCase
         );
 
         $this->assertEquals(
-            $this->getRoute('/dummies.{_format}', 'some.service.name', DummyEntity::class, 'my_op', ['GET'], true, ['_format' => 'a valid format'], ['my_default' => 'default_value'], [], '', [], "request.headers.get('User-Agent') matches '/firefox/i'"),
+            $this->getRoute('/dummies.{_format}', 'some.service.name', DummyEntity::class, 'my_op', ['GET'], true, ['_format' => 'a valid format'], ['my_default' => 'default_value', '_stateless' => null], [], '', [], "request.headers.get('User-Agent') matches '/firefox/i'"),
             $routeCollection->get('api_dummies_my_op_collection')
         );
 
         $this->assertEquals(
-            $this->getRoute('/dummies.{_format}', 'api_platform.action.post_collection', DummyEntity::class, 'my_second_op', ['POST'], true, [], [], ['option' => 'option_value'], '{subdomain}.api-platform.com', ['https']),
+            $this->getRoute('/dummies.{_format}', 'api_platform.action.post_collection', DummyEntity::class, 'my_second_op', ['POST'], true, [], ['_stateless' => null], ['option' => 'option_value'], '{subdomain}.api-platform.com', ['https']),
             $routeCollection->get('api_dummies_my_second_op_collection')
         );
 
@@ -93,7 +100,12 @@ class ApiLoaderTest extends TestCase
         );
 
         $this->assertEquals(
-            $this->getSubresourceRoute('/dummies/{id}/subresources.{_format}', 'api_platform.action.get_subresource', RelatedDummyEntity::class, 'api_dummies_subresources_get_subresource', ['property' => 'subresource', 'identifiers' => [['id', DummyEntity::class, true]], 'collection' => true, 'operationId' => 'api_dummies_subresources_get_subresource']),
+            $this->getRoute('/dummies.{_format}', 'api_platform.action.get_collection', DummyEntity::class, 'my_stateless_op', ['GET'], true, [], ['_stateless' => true]),
+            $routeCollection->get('api_dummies_my_stateless_op_collection')
+        );
+
+        $this->assertEquals(
+            $this->getSubresourceRoute('/dummies/{id}/subresources.{_format}', 'api_platform.action.get_subresource', RelatedDummyEntity::class, 'api_dummies_subresources_get_subresource', ['property' => 'subresource', 'identifiers' => [['id', DummyEntity::class, true]], 'collection' => true, 'operationId' => 'api_dummies_subresources_get_subresource'], [], ['_stateless' => true]),
             $routeCollection->get('api_dummies_subresources_get_subresource')
         );
     }
@@ -103,16 +115,16 @@ class ApiLoaderTest extends TestCase
         $resourceMetadata = new ResourceMetadata();
         $resourceMetadata = $resourceMetadata->withShortName('dummy');
         $resourceMetadata = $resourceMetadata->withItemOperations([
-            'get' => ['method' => 'GET', 'requirements' => ['id' => '\d+'], 'defaults' => ['my_default' => 'default_value', '_controller' => 'should_not_be_overriden']],
-            'put' => ['method' => 'PUT'],
-            'delete' => ['method' => 'DELETE'],
+            'get' => ['method' => 'GET', 'requirements' => ['id' => '\d+'], 'defaults' => ['my_default' => 'default_value', '_controller' => 'should_not_be_overriden'], 'stateless' => null],
+            'put' => ['method' => 'PUT', 'stateless' => null],
+            'delete' => ['method' => 'DELETE', 'stateless' => null],
         ]);
         $resourceMetadata = $resourceMetadata->withAttributes(['route_prefix' => '/foobar-prefix']);
 
         $routeCollection = $this->getApiLoaderWithResourceMetadata($resourceMetadata)->load(null);
 
         $this->assertEquals(
-            $this->getRoute('/foobar-prefix/dummies/{id}.{_format}', 'api_platform.action.get_item', DummyEntity::class, 'get', ['GET'], false, ['id' => '\d+'], ['my_default' => 'default_value']),
+            $this->getRoute('/foobar-prefix/dummies/{id}.{_format}', 'api_platform.action.get_item', DummyEntity::class, 'get', ['GET'], false, ['id' => '\d+'], ['my_default' => 'default_value', '_stateless' => null]),
             $routeCollection->get('api_dummies_get_item')
         );
 
@@ -139,7 +151,7 @@ class ApiLoaderTest extends TestCase
         ]);
 
         $resourceMetadata = $resourceMetadata->withCollectionOperations([
-            'get' => ['method' => 'GET'],
+            'get' => ['method' => 'GET', 'stateless' => null],
         ]);
 
         $this->getApiLoaderWithResourceMetadata($resourceMetadata)->load(null);
@@ -153,11 +165,11 @@ class ApiLoaderTest extends TestCase
         $resourceMetadata = $resourceMetadata->withShortName('dummy');
 
         $resourceMetadata = $resourceMetadata->withItemOperations([
-            'post' => ['method' => 'POST'],
+            'post' => ['method' => 'POST', 'stateless' => null],
         ]);
 
         $resourceMetadata = $resourceMetadata->withCollectionOperations([
-            'get' => ['method' => 'GET'],
+            'get' => ['method' => 'GET', 'stateless' => null],
         ]);
 
         $this->getApiLoaderWithResourceMetadata($resourceMetadata)->load(null);
@@ -175,14 +187,14 @@ class ApiLoaderTest extends TestCase
         $resourceMetadata = new ResourceMetadata();
         $resourceMetadata = $resourceMetadata->withShortName('dummy');
         $resourceMetadata = $resourceMetadata->withItemOperations([
-            'get' => ['method' => 'GET'],
-            'put' => ['method' => 'PUT'],
-            'delete' => ['method' => 'DELETE'],
+            'get' => ['method' => 'GET', 'stateless' => null],
+            'put' => ['method' => 'PUT', 'stateless' => null],
+            'delete' => ['method' => 'DELETE', 'stateless' => null],
         ]);
         $resourceMetadata = $resourceMetadata->withCollectionOperations([
-            'my_op' => ['method' => 'GET', 'controller' => 'some.service.name'], //with controller
-            'my_second_op' => ['method' => 'POST'], //without controller, takes the default one
-            'my_path_op' => ['method' => 'GET', 'path' => 'some/custom/path'], //custom path
+            'my_op' => ['method' => 'GET', 'controller' => 'some.service.name', 'stateless' => null], //with controller
+            'my_second_op' => ['method' => 'POST', 'stateless' => null], //without controller, takes the default one
+            'my_path_op' => ['method' => 'GET', 'path' => 'some/custom/path', 'stateless' => null], //custom path
         ]);
 
         $routeCollection = $this->getApiLoaderWithResourceMetadata($resourceMetadata, true)->load(null);
@@ -294,7 +306,7 @@ class ApiLoaderTest extends TestCase
         return new ApiLoader($kernelProphecy->reveal(), $resourceNameCollectionFactoryProphecy->reveal(), $resourceMetadataFactory, $operationPathResolver, $containerProphecy->reveal(), ['jsonld' => ['application/ld+json']], [], $subresourceOperationFactory, false, true, true, false, false);
     }
 
-    private function getRoute(string $path, string $controller, string $resourceClass, string $operationName, array $methods, bool $collection = false, array $requirements = [], array $extraDefaults = [], array $options = [], string $host = '', array $schemes = [], string $condition = ''): Route
+    private function getRoute(string $path, string $controller, string $resourceClass, string $operationName, array $methods, bool $collection = false, array $requirements = [], array $extraDefaults = ['_stateless' => null], array $options = [], string $host = '', array $schemes = [], string $condition = ''): Route
     {
         return new Route(
             $path,
@@ -313,7 +325,7 @@ class ApiLoaderTest extends TestCase
         );
     }
 
-    private function getSubresourceRoute(string $path, string $controller, string $resourceClass, string $operationName, array $context, array $requirements = []): Route
+    private function getSubresourceRoute(string $path, string $controller, string $resourceClass, string $operationName, array $context, array $requirements = [], array $extraDefaults = ['_stateless' => null]): Route
     {
         return new Route(
             $path,
@@ -323,7 +335,7 @@ class ApiLoaderTest extends TestCase
                 '_api_resource_class' => $resourceClass,
                 '_api_subresource_operation_name' => $operationName,
                 '_api_subresource_context' => $context,
-            ],
+            ] + $extraDefaults,
             $requirements,
             [],
             '',

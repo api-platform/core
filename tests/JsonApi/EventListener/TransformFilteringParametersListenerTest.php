@@ -14,9 +14,8 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\JsonApi\EventListener;
 
 use ApiPlatform\Core\JsonApi\EventListener\TransformFilteringParametersListener;
+use ApiPlatform\Core\Tests\ProphecyTrait;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\HttpFoundation\Exception\BadRequestException;
-use Symfony\Component\HttpFoundation\InputBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 
@@ -25,6 +24,8 @@ use Symfony\Component\HttpKernel\Event\RequestEvent;
  */
 class TransformFilteringParametersListenerTest extends TestCase
 {
+    use ProphecyTrait;
+
     private $listener;
 
     protected function setUp(): void
@@ -49,10 +50,6 @@ class TransformFilteringParametersListenerTest extends TestCase
 
     public function testOnKernelRequestWithInvalidFilter()
     {
-        if (class_exists(InputBag::class)) {
-            $this->expectException(BadRequestException::class);
-        }
-
         $eventProphecy = $this->prophesize(RequestEvent::class);
 
         $expectedRequest = new Request();

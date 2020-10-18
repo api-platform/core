@@ -29,6 +29,8 @@ use ApiPlatform\Core\DataProvider\SubresourceDataProviderInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Tests\Fixtures\DummyEntity;
+use ApiPlatform\Core\Tests\ProphecyTrait;
+use PackageVersions\Versions;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\HttpFoundation\ParameterBag;
@@ -41,6 +43,8 @@ use Symfony\Component\VarDumper\Cloner\Data;
  */
 class RequestDataCollectorTest extends TestCase
 {
+    use ProphecyTrait;
+
     private $request;
     private $response;
     private $attributes;
@@ -207,6 +211,27 @@ class RequestDataCollectorTest extends TestCase
             $this->assertStringStartsWith('class@anonymous', $class);
             $this->assertTrue($response);
         }
+    }
+
+    public function testVersionCollection()
+    {
+        $this->apiResourceClassWillReturn(DummyEntity::class);
+
+        $dataCollector = new RequestDataCollector(
+            $this->metadataFactory->reveal(),
+            $this->filterLocator->reveal(),
+            $this->getUsedCollectionDataProvider(),
+            $this->getUsedItemDataProvider(),
+            $this->getUsedSubresourceDataProvider(),
+            $this->getUsedPersister()
+        );
+
+        $dataCollector->collect(
+            $this->request->reveal(),
+            $this->response
+        );
+
+        $this->assertSame(null !== $dataCollector->getVersion(), class_exists(Versions::class));
     }
 
     private function apiResourceClassWillReturn($data, $context = [])

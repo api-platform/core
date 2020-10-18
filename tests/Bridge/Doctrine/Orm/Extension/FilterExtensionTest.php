@@ -22,6 +22,7 @@ use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
+use ApiPlatform\Core\Tests\ProphecyTrait;
 use Doctrine\ORM\QueryBuilder;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
@@ -31,6 +32,8 @@ use Psr\Container\ContainerInterface;
  */
 class FilterExtensionTest extends TestCase
 {
+    use ProphecyTrait;
+
     public function testApplyToCollectionWithValidFilters()
     {
         $queryBuilderProphecy = $this->prophesize(QueryBuilder::class);

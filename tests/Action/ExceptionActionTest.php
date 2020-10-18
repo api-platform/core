@@ -15,6 +15,7 @@ namespace ApiPlatform\Core\Tests\Action;
 
 use ApiPlatform\Core\Action\ExceptionAction;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
+use ApiPlatform\Core\Tests\ProphecyTrait;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Debug\Exception\FlattenException;
 use Symfony\Component\HttpFoundation\Request;
@@ -30,6 +31,8 @@ use Symfony\Component\Serializer\SerializerInterface;
  */
 class ExceptionActionTest extends TestCase
 {
+    use ProphecyTrait;
+
     public function testActionWithCatchableException()
     {
         $serializerException = $this->prophesize(ExceptionInterface::class);

@@ -1,19 +1,44 @@
 # Changelog
 
-## 2.6.x-dev
+## 2.6.0
 
+* Display the API Platform's version in the debug-bar
 * MongoDB: Possibility to add execute options (aggregate command fields) for a resource, like `allowDiskUse` (#3144)
 * MongoDB: Mercure support (#3290)
 * GraphQL: Subscription support with Mercure (#3321)
 * GraphQL: Allow to format GraphQL errors based on exceptions (#3063)
 * GraphQL: Add page-based pagination (#3175, #3517)
+* GraphQL: Errors thrown from the GraphQL library can now be handled (#3632)
 * GraphQL: Possibility to add a custom description for queries, mutations and subscriptions (#3477, #3514)
 * GraphQL: Support for field name conversion (serialized name) (#3455, #3516)
 * GraphQL: **BC** `operation` is now `operationName` to follow the standard (#3568)
+* GraphQL: **BC** New syntax for the filters' arguments to preserve the order: `order: [{foo: 'asc'}, {bar: 'desc'}]` (#3468)
 * OpenAPI: Add PHP default values to the documentation (#2386)
 * Deprecate using a validation groups generator service not implementing `ApiPlatform\Core\Bridge\Symfony\Validator\ValidationGroupsGeneratorInterface` (#3346)
 * Subresources: subresource resourceClass can now be defined as a container parameter in XML and Yaml definitions
 * IriConverter: Fix IRI url double encoding - may cause breaking change as some characters no longer encoded in output (#3552)
+* OpenAPI: **BC** Replace all characters other than `[a-zA-Z0-9\.\-_]` to `.` in definition names to be compliant with OpenAPI 3.0 (#3669)
+* Add stateless ApiResource attribute
+
+## 2.5.7
+
+* Compatibility with Symfony 5.1 (#3589 and #3688)
+* Resource `Cache-Control` HTTP header can be private (#3543)
+* Doctrine: Fix missing `ManagerRegistry` class (#3684)
+* Doctrine: Order filter doesn't throw anymore with numeric key (#3673 and #3687)
+* Doctrine: Fix ODM check change tracking deferred (#3629)
+* Doctrine: Allow 2inflector version 2.0 (#3607)
+* OpenAPI: Allow subresources context to be added (#3685) 
+* OpenAPI: Fix pagination documentation on subresources (#3678)
+* Subresource: Fix query when using a custom identifier (#3529 and #3671)
+* GraphQL: Fix relation types without Doctrine (#3591)
+* GraphQL: Fix DTO relations (#3594)
+* GraphQL: Compatibility with graphql-php version 14 (#3621 and #3654)
+* Docs: Upgrade Swagger UI to version 3.32.5 (#3693)
+* Docs:Upgrade ReDoc to version 2.0.0-rc.40 (#3693)
+* Docs:Upgrade GraphiQL to version 1.0.3 (#3693)
+* Docs:Upgrade GraphQL Playground to version 1.7.23 (#3693)
+>>>>>>> 2.5
 
 ## 2.5.6
 

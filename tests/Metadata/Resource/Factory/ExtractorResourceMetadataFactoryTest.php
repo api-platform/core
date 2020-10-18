@@ -26,6 +26,7 @@ use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Tests\Fixtures\DummyResourceInterface;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\FileConfigDummy;
+use ApiPlatform\Core\Tests\ProphecyTrait;
 
 /**
  * Tests extractor resource metadata factory.
@@ -34,6 +35,8 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\FileConfigDummy;
  */
 class ExtractorResourceMetadataFactoryTest extends FileConfigurationMetadataFactoryProvider
 {
+    use ProphecyTrait;
+
     /**
      * @dataProvider resourceMetadataProvider
      */
@@ -260,7 +263,7 @@ class ExtractorResourceMetadataFactoryTest extends FileConfigurationMetadataFact
     public function testCreateWithBadDeclaration()
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessageRegExp('/"ApiPlatform\\\\Core\\\\Tests\\\\Fixtures\\\\TestBundle\\\\Entity\\\\Dummy" setting is expected to be null or an array, string given in ".+\\/Fixtures\\/FileConfigurations\\/bad_declaration\\.yml"\\./');
+        $this->expectExceptionMessageMatches('/"ApiPlatform\\\\Core\\\\Tests\\\\Fixtures\\\\TestBundle\\\\Entity\\\\Dummy" setting is expected to be null or an array, string given in ".+\\/Fixtures\\/FileConfigurations\\/bad_declaration\\.yml"\\./');
 
         $configPath = __DIR__.'/../../../Fixtures/FileConfigurations/bad_declaration.yml';
 
@@ -299,6 +302,7 @@ class ExtractorResourceMetadataFactoryTest extends FileConfigurationMetadataFact
             'attributes' => [
                 'pagination_items_per_page' => 4,
                 'pagination_maximum_items_per_page' => 6,
+                'stateless' => true,
             ],
         ];
         $resourceConfiguration = [
@@ -309,6 +313,7 @@ class ExtractorResourceMetadataFactoryTest extends FileConfigurationMetadataFact
                 'itemOperations' => ['get', 'delete'],
                 'attributes' => [
                     'pagination_maximum_items_per_page' => 10,
+                    'stateless' => false,
                 ],
             ],
         ];
@@ -335,5 +340,6 @@ class ExtractorResourceMetadataFactoryTest extends FileConfigurationMetadataFact
         $this->assertEquals(['get', 'delete'], $metadata->getItemOperations());
         $this->assertEquals(4, $metadata->getAttribute('pagination_items_per_page'));
         $this->assertEquals(10, $metadata->getAttribute('pagination_maximum_items_per_page'));
+        $this->assertFalse($metadata->getAttribute('stateless'));
     }
 }

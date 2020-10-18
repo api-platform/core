@@ -43,7 +43,7 @@ class IterableTypeTest extends TestCase
         $iterableType = new IterableType();
 
         $this->expectException(Error::class);
-        $this->expectExceptionMessageRegExp('/`Iterable` cannot represent non iterable value: .+/');
+        $this->expectExceptionMessageMatches('/`Iterable` cannot represent non iterable value: .+/');
 
         $iterableType->serialize('foo');
 
@@ -55,7 +55,7 @@ class IterableTypeTest extends TestCase
         $iterableType = new IterableType();
 
         $this->expectException(Error::class);
-        $this->expectExceptionMessageRegExp('/`Iterable` cannot represent non iterable value: .+/');
+        $this->expectExceptionMessageMatches('/`Iterable` cannot represent non iterable value: .+/');
 
         $iterableType->parseValue('foo');
 

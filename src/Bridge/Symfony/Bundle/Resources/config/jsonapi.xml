@@ -26,6 +26,7 @@
         <service id="api_platform.jsonapi.normalizer.collection" class="ApiPlatform\Core\JsonApi\Serializer\CollectionNormalizer" public="false">
             <argument type="service" id="api_platform.resource_class_resolver" />
             <argument>%api_platform.collection.pagination.page_parameter_name%</argument>
+            <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
 
             <!-- Run after api_platform.jsonapi.normalizer.object but before serializer.normalizer.object and serializer.denormalizer.array -->
             <tag name="serializer.normalizer" priority="-985" />

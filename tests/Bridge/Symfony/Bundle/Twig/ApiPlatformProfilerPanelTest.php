@@ -21,9 +21,9 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\ItemDataProvider;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\DataProvider\ContainNonResourceItemDataProvider;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\Dummy as DocumentDummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Tools\SchemaTool;
+use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 /**
@@ -81,7 +81,7 @@ class ApiPlatformProfilerPanelTest extends WebTestCase
 
         // Check extra info content
         $this->assertStringContainsString('sf-toolbar-status-default', $block->attr('class'), 'The toolbar block should have the default color.');
-        $this->assertSame('Not an API Platform resource', $block->filter('.sf-toolbar-info-piece span')->html());
+        $this->assertSame('Not an API Platform resource', $block->filterXPath('//div[@class="sf-toolbar-info-piece"][./b[contains(., "Resource Class")]]/span')->html());
     }
 
     public function testDebugBarContent()
@@ -99,7 +99,7 @@ class ApiPlatformProfilerPanelTest extends WebTestCase
 
         // Check extra info content
         $this->assertStringContainsString('sf-toolbar-status-default', $block->attr('class'), 'The toolbar block should have the default color.');
-        $this->assertSame('mongodb' === $this->env ? DocumentDummy::class : Dummy::class, $block->filter('.sf-toolbar-info-piece span')->html());
+        $this->assertSame('mongodb' === $this->env ? DocumentDummy::class : Dummy::class, $block->filterXPath('//div[@class="sf-toolbar-info-piece"][./b[contains(., "Resource Class")]]/span')->html());
     }
 
     public function testProfilerGeneralLayoutNotResourceClass()

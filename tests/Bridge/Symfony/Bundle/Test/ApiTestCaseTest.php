@@ -181,7 +181,7 @@ JSON;
         $this->assertResponseIsSuccessful();
 
         $resource = 'mongodb' === self::$container->getParameter('kernel.environment') ? DummyDocument::class : Dummy::class;
-        $this->assertRegExp('~^/dummies/\d+~', self::findIriBy($resource, ['name' => 'Kevin']));
+        $this->assertMatchesRegularExpression('~^/dummies/\d+~', self::findIriBy($resource, ['name' => 'Kevin']));
         $this->assertNull(self::findIriBy($resource, ['name' => 'not-exist']));
     }
 }

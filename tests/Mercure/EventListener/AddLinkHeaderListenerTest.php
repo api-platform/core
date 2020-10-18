@@ -17,6 +17,7 @@ use ApiPlatform\Core\Mercure\EventListener\AddLinkHeaderListener;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
+use ApiPlatform\Core\Tests\ProphecyTrait;
 use Fig\Link\GenericLinkProvider;
 use Fig\Link\Link;
 use PHPUnit\Framework\TestCase;
@@ -29,6 +30,8 @@ use Symfony\Component\WebLink\HttpHeaderSerializer;
  */
 class AddLinkHeaderListenerTest extends TestCase
 {
+    use ProphecyTrait;
+
     /**
      * @dataProvider addProvider
      */

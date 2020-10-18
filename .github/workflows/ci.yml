@@ -8,7 +8,7 @@ env:
   COMPOSER_ALLOW_SUPERUSER: '1' # https://getcomposer.org/doc/03-cli.md#composer-allow-superuser
   COMPOSER_INSTALLER_COMMIT: fb22b78362d31c0d2bf516d1f8cdfd2745caa431
   COVERAGE: '0'
-  EXT_MONGODB_VERSION: '1.7.3'
+  EXT_MONGODB_VERSION: '1.7.5'
   EXT_PCOV_VERSION: '1.0.6'
 
 jobs:
@@ -41,7 +41,7 @@ jobs:
       - name: Install Composer
         run: wget -qO - https://raw.githubusercontent.com/composer/getcomposer.org/$COMPOSER_INSTALLER_COMMIT/web/installer | php -- --install-dir=/usr/local/bin --filename=composer --quiet
       - name: Cache Composer packages
-        uses: actions/cache@v1
+        uses: actions/cache@v2
         with:
           path: ~/.composer/cache
           key: composer-php${{ matrix.php }}-php-cs-fixer-${{ github.sha }}
@@ -59,7 +59,7 @@ jobs:
           composer global require --prefer-dist --no-progress --no-suggest --ansi \
             friendsofphp/php-cs-fixer:"${PHP_CS_FIXER_VERSION}"
       - name: Cache PHP-CS-Fixer results
-        uses: actions/cache@v1
+        uses: actions/cache@v2
         with:
           path: /var/cache/php-cs-fixer
           key: php-cs-fixer-php${{ matrix.php }}-${{ github.sha }}
@@ -101,7 +101,7 @@ jobs:
       - name: Install Composer
         run: wget -qO - https://raw.githubusercontent.com/composer/getcomposer.org/$COMPOSER_INSTALLER_COMMIT/web/installer | php -- --install-dir=/usr/local/bin --filename=composer --quiet
       - name: Cache Composer packages
-        uses: actions/cache@v1
+        uses: actions/cache@v2
         with:
           path: ~/.composer/cache
           key: composer-php${{ matrix.php }}-${{ github.sha }}
@@ -113,18 +113,24 @@ jobs:
         run: |
           composer global require --prefer-dist --no-progress --no-suggest --ansi \
             symfony/flex
+      - name: Require Symfony Uid
+        run: composer require symfony/uid --dev --no-progress --ansi
       - name: Update project dependencies
         run: |
           mkdir -p /tmp/api-platform/core/vendor
           ln -s /tmp/api-platform/core/vendor vendor
           composer update --no-progress --no-suggest --ansi
+      - name: Install PHPUnit
+        env:
+          SYMFONY_PHPUNIT_VERSION: '9.2'
+        run: vendor/bin/simple-phpunit --version
       - name: Clear test app cache
         run: |
           mkdir -p /tmp/api-platform/core/var
           ln -s /tmp/api-platform/core/var tests/Fixtures/app/var
           tests/Fixtures/app/console cache:clear --ansi
       - name: Cache PHPStan results
-        uses: actions/cache@v1
+        uses: actions/cache@v2
         with:
           path: /tmp/phpstan
           key: phpstan-php${{ matrix.php }}-${{ github.sha }}
@@ -133,7 +139,9 @@ jobs:
             phpstan-
         continue-on-error: true
       - name: Run PHPStan analysis
-        run: vendor/bin/phpstan analyse --ansi
+        env:
+          SYMFONY_PHPUNIT_VERSION: '9.2'
+        run: vendor/bin/phpstan analyse --no-progress --no-interaction --ansi
 
   phpunit:
     name: PHPUnit (PHP ${{ matrix.php }})
@@ -165,7 +173,7 @@ jobs:
             unzip \
       - name: Cache mongodb PHP extension build
         if: (!startsWith(matrix.php, '7.1'))
-        uses: actions/cache@v1
+        uses: actions/cache@v2
         with:
           path: /var/tmp/build/ext-mongodb-${{ env.EXT_MONGODB_VERSION }}
           key: ext-mongodb-${{ env.EXT_MONGODB_VERSION }}-php${{ matrix.php }}-${{ github.sha }}
@@ -211,7 +219,7 @@ jobs:
       - name: Install Composer
         run: wget -qO - https://raw.githubusercontent.com/composer/getcomposer.org/$COMPOSER_INSTALLER_COMMIT/web/installer | php -- --install-dir=/usr/local/bin --filename=composer --quiet
       - name: Cache Composer packages
-        uses: actions/cache@v1
+        uses: actions/cache@v2
         with:
           path: ~/.composer/cache
           key: composer-php${{ matrix.php }}-${{ github.sha }}
@@ -229,11 +237,16 @@ jobs:
           composer remove --dev --no-progress --no-update --ansi \
             doctrine/mongodb-odm \
             doctrine/mongodb-odm-bundle \
+      - name: Require Symfony Uid
+        if: (!startsWith(matrix.php, '7.1'))
+        run: composer require symfony/uid --dev --no-progress --ansi
       - name: Update project dependencies
         run: |
           mkdir -p /tmp/api-platform/core/vendor
           ln -s /tmp/api-platform/core/vendor vendor
           composer update --no-progress --no-suggest --ansi
+      - name: Install PHPUnit
+        run: vendor/bin/simple-phpunit --version
       - name: Clear test app cache
         run: |
           mkdir -p /tmp/api-platform/core/var
@@ -246,9 +259,9 @@ jobs:
         run: |
           mkdir -p build/logs/phpunit
           if [ "$COVERAGE" = '1' ]; then
-            vendor/bin/phpunit --coverage-clover build/logs/phpunit/clover.xml --log-junit build/logs/phpunit/junit.xml --colors=always
+            vendor/bin/simple-phpunit --coverage-clover build/logs/phpunit/clover.xml --log-junit build/logs/phpunit/junit.xml --colors=always
           else
-            vendor/bin/phpunit --log-junit build/logs/phpunit/junit.xml --colors=always
+            vendor/bin/simple-phpunit --log-junit build/logs/phpunit/junit.xml --colors=always
           fi
       - name: Upload test artifacts
         if: always()
@@ -305,7 +318,7 @@ jobs:
             unzip \
       - name: Cache mongodb PHP extension build
         if: (!startsWith(matrix.php, '7.1'))
-        uses: actions/cache@v1
+        uses: actions/cache@v2
         with:
           path: /var/tmp/build/ext-mongodb-${{ env.EXT_MONGODB_VERSION }}
           key: ext-mongodb-${{ env.EXT_MONGODB_VERSION }}-php${{ matrix.php }}-${{ github.sha }}
@@ -351,7 +364,7 @@ jobs:
       - name: Install Composer
         run: wget -qO - https://raw.githubusercontent.com/composer/getcomposer.org/$COMPOSER_INSTALLER_COMMIT/web/installer | php -- --install-dir=/usr/local/bin --filename=composer --quiet
       - name: Cache Composer packages
-        uses: actions/cache@v1
+        uses: actions/cache@v2
         with:
           path: ~/.composer/cache
           key: composer-php${{ matrix.php }}-${{ github.sha }}
@@ -369,11 +382,16 @@ jobs:
           composer remove --dev --no-progress --no-update --ansi \
             doctrine/mongodb-odm \
             doctrine/mongodb-odm-bundle \
+      - name: Require Symfony Uid
+        if: (!startsWith(matrix.php, '7.1'))
+        run: composer require symfony/uid --dev --no-progress --ansi
       - name: Update project dependencies
         run: |
           mkdir -p /tmp/api-platform/core/vendor
           ln -s /tmp/api-platform/core/vendor vendor
           composer update --no-progress --no-suggest --ansi
+      - name: Install PHPUnit
+        run: vendor/bin/simple-phpunit --version
       - name: Clear test app cache
         run: |
           mkdir -p /tmp/api-platform/core/var
@@ -382,6 +400,8 @@ jobs:
       - name: Enable code coverage
         if: matrix.coverage
         run: echo '::set-env name=COVERAGE::1'
+      - name: Install PHPUnit
+        run: vendor/bin/simple-phpunit --version
       - name: Run Behat tests
         run: |
           mkdir -p build/logs/behat
@@ -468,7 +488,7 @@ jobs:
           apk add \
             unzip \
       - name: Cache mongodb PHP extension build
-        uses: actions/cache@v1
+        uses: actions/cache@v2
         with:
           path: /var/tmp/build/ext-mongodb-${{ env.EXT_MONGODB_VERSION }}
           key: ext-mongodb-${{ env.EXT_MONGODB_VERSION }}-php${{ matrix.php }}-${{ github.sha }}
@@ -496,7 +516,7 @@ jobs:
       - name: Install Composer
         run: wget -qO - https://raw.githubusercontent.com/composer/getcomposer.org/$COMPOSER_INSTALLER_COMMIT/web/installer | php -- --install-dir=/usr/local/bin --filename=composer --quiet
       - name: Cache Composer packages
-        uses: actions/cache@v1
+        uses: actions/cache@v2
         with:
           path: ~/.composer/cache
           key: composer-php${{ matrix.php }}-lowest-deps-${{ github.sha }}
@@ -509,11 +529,15 @@ jobs:
         run: |
           composer global require --prefer-dist --no-progress --no-suggest --ansi \
             symfony/flex
+      - name: Require Symfony Uid
+        run: composer require symfony/uid --dev --no-progress --ansi
       - name: Update project dependencies
         run: |
           mkdir -p /tmp/api-platform/core/vendor
           ln -s /tmp/api-platform/core/vendor vendor
           composer update --no-progress --no-suggest --prefer-stable --prefer-lowest --ansi
+      - name: Install PHPUnit
+        run: vendor/bin/simple-phpunit --version
       - name: Clear test app cache
         run: |
           mkdir -p /tmp/api-platform/core/var
@@ -522,7 +546,7 @@ jobs:
       - name: Run PHPUnit tests
         run: |
           mkdir -p build/logs/phpunit
-          vendor/bin/phpunit --log-junit build/logs/phpunit/junit.xml --colors=always
+          vendor/bin/simple-phpunit --log-junit build/logs/phpunit/junit.xml --colors=always
       - name: Upload test artifacts
         if: always()
         uses: actions/upload-artifact@v1
@@ -553,7 +577,7 @@ jobs:
           apk add \
             unzip \
       - name: Cache mongodb PHP extension build
-        uses: actions/cache@v1
+        uses: actions/cache@v2
         with:
           path: /var/tmp/build/ext-mongodb-${{ env.EXT_MONGODB_VERSION }}
           key: ext-mongodb-${{ env.EXT_MONGODB_VERSION }}-php${{ matrix.php }}-${{ github.sha }}
@@ -581,7 +605,7 @@ jobs:
       - name: Install Composer
         run: wget -qO - https://raw.githubusercontent.com/composer/getcomposer.org/$COMPOSER_INSTALLER_COMMIT/web/installer | php -- --install-dir=/usr/local/bin --filename=composer --quiet
       - name: Cache Composer packages
-        uses: actions/cache@v1
+        uses: actions/cache@v2
         with:
           path: ~/.composer/cache
           key: composer-php${{ matrix.php }}-lowest-deps-${{ github.sha }}
@@ -599,6 +623,10 @@ jobs:
           mkdir -p /tmp/api-platform/core/vendor
           ln -s /tmp/api-platform/core/vendor vendor
           composer update --no-progress --no-suggest --prefer-stable --prefer-lowest --ansi
+      - name: Require Symfony Uid
+        run: composer require symfony/uid --dev --no-progress --ansi
+      - name: Install PHPUnit
+        run: vendor/bin/simple-phpunit --version
       - name: Clear test app cache
         run: |
           mkdir -p /tmp/api-platform/core/var
@@ -672,7 +700,7 @@ jobs:
             unzip \
       - name: Cache mongodb PHP extension build
         if: (!startsWith(matrix.php, '7.1'))
-        uses: actions/cache@v1
+        uses: actions/cache@v2
         with:
           path: /var/tmp/build/ext-mongodb-${{ env.EXT_MONGODB_VERSION }}
           key: ext-mongodb-${{ env.EXT_MONGODB_VERSION }}-php${{ matrix.php }}-${{ github.sha }}
@@ -718,7 +746,7 @@ jobs:
       - name: Install Composer
         run: wget -qO - https://raw.githubusercontent.com/composer/getcomposer.org/$COMPOSER_INSTALLER_COMMIT/web/installer | php -- --install-dir=/usr/local/bin --filename=composer --quiet
       - name: Cache Composer packages
-        uses: actions/cache@v1
+        uses: actions/cache@v2
         with:
           path: ~/.composer/cache
           key: composer-php${{ matrix.php }}-legacy-${{ github.sha }}
@@ -742,6 +770,8 @@ jobs:
           mkdir -p /tmp/api-platform/core/vendor
           ln -s /tmp/api-platform/core/vendor vendor
           composer update --no-progress --no-suggest --ansi
+      - name: Install PHPUnit
+        run: vendor/bin/simple-phpunit --version
       - name: Clear test app cache
         run: |
           mkdir -p /tmp/api-platform/core/var
@@ -813,9 +843,10 @@ jobs:
       - name: Install system packages
         run: |
           apk add \
+            git \
             unzip \
       - name: Cache mongodb PHP extension build
-        uses: actions/cache@v1
+        uses: actions/cache@v2
         with:
           path: /var/tmp/build/ext-mongodb-${{ env.EXT_MONGODB_VERSION }}
           key: ext-mongodb-${{ env.EXT_MONGODB_VERSION }}-php${{ matrix.php }}-${{ github.sha }}
@@ -843,7 +874,7 @@ jobs:
       - name: Install Composer
         run: wget -qO - https://raw.githubusercontent.com/composer/getcomposer.org/$COMPOSER_INSTALLER_COMMIT/web/installer | php -- --install-dir=/usr/local/bin --filename=composer --quiet
       - name: Cache Composer packages
-        uses: actions/cache@v1
+        uses: actions/cache@v2
         with:
           path: ~/.composer/cache
           key: composer-php${{ matrix.php }}-lowest-deps-legacy-${{ github.sha }}
@@ -862,6 +893,8 @@ jobs:
           mkdir -p /tmp/api-platform/core/vendor
           ln -s /tmp/api-platform/core/vendor vendor
           composer update --no-progress --no-suggest --prefer-stable --prefer-lowest --ansi
+      - name: Install PHPUnit
+        run: vendor/bin/simple-phpunit --version
       - name: Clear test app cache
         run: |
           mkdir -p /tmp/api-platform/core/var
@@ -926,7 +959,7 @@ jobs:
             pdo_pgsql \
           ;
       - name: Cache mongodb PHP extension build
-        uses: actions/cache@v1
+        uses: actions/cache@v2
         with:
           path: /var/tmp/build/ext-mongodb-${{ env.EXT_MONGODB_VERSION }}
           key: ext-mongodb-${{ env.EXT_MONGODB_VERSION }}-php${{ matrix.php }}-${{ github.sha }}
@@ -954,7 +987,7 @@ jobs:
       - name: Install Composer
         run: wget -qO - https://raw.githubusercontent.com/composer/getcomposer.org/$COMPOSER_INSTALLER_COMMIT/web/installer | php -- --install-dir=/usr/local/bin --filename=composer --quiet
       - name: Cache Composer packages
-        uses: actions/cache@v1
+        uses: actions/cache@v2
         with:
           path: ~/.composer/cache
           key: composer-php${{ matrix.php }}-${{ github.sha }}
@@ -966,11 +999,15 @@ jobs:
         run: |
           composer global require --prefer-dist --no-progress --no-suggest --ansi \
             symfony/flex
+      - name: Require Symfony Uid
+        run: composer require symfony/uid --dev --no-progress --ansi
       - name: Update project dependencies
         run: |
           mkdir -p /tmp/api-platform/core/vendor
           ln -s /tmp/api-platform/core/vendor vendor
           composer update --no-progress --no-suggest --ansi
+      - name: Install PHPUnit
+        run: vendor/bin/simple-phpunit --version
       - name: Clear test app cache
         run: |
           mkdir -p /tmp/api-platform/core/var
@@ -979,7 +1016,7 @@ jobs:
       - name: Run PHPUnit tests
         run: |
           mkdir -p build/logs/phpunit
-          vendor/bin/phpunit --log-junit build/logs/phpunit/junit.xml --colors=always
+          vendor/bin/simple-phpunit --log-junit build/logs/phpunit/junit.xml --colors=always
       - name: Upload test artifacts
         if: always()
         uses: actions/upload-artifact@v1
@@ -1035,7 +1072,7 @@ jobs:
             pdo_pgsql \
           ;
       - name: Cache mongodb PHP extension build
-        uses: actions/cache@v1
+        uses: actions/cache@v2
         with:
           path: /var/tmp/build/ext-mongodb-${{ env.EXT_MONGODB_VERSION }}
           key: ext-mongodb-${{ env.EXT_MONGODB_VERSION }}-php${{ matrix.php }}-${{ github.sha }}
@@ -1063,7 +1100,7 @@ jobs:
       - name: Install Composer
         run: wget -qO - https://raw.githubusercontent.com/composer/getcomposer.org/$COMPOSER_INSTALLER_COMMIT/web/installer | php -- --install-dir=/usr/local/bin --filename=composer --quiet
       - name: Cache Composer packages
-        uses: actions/cache@v1
+        uses: actions/cache@v2
         with:
           path: ~/.composer/cache
           key: composer-php${{ matrix.php }}-${{ github.sha }}
@@ -1075,11 +1112,15 @@ jobs:
         run: |
           composer global require --prefer-dist --no-progress --no-suggest --ansi \
             symfony/flex
+      - name: Require Symfony Uid
+        run: composer require symfony/uid --dev --no-progress --ansi
       - name: Update project dependencies
         run: |
           mkdir -p /tmp/api-platform/core/vendor
           ln -s /tmp/api-platform/core/vendor vendor
           composer update --no-progress --no-suggest --ansi
+      - name: Install PHPUnit
+        run: vendor/bin/simple-phpunit --version
       - name: Clear test app cache
         run: |
           mkdir -p /tmp/api-platform/core/var
@@ -1168,7 +1209,7 @@ jobs:
             pdo_mysql \
           ;
       - name: Cache mongodb PHP extension build
-        uses: actions/cache@v1
+        uses: actions/cache@v2
         with:
           path: /var/tmp/build/ext-mongodb-${{ env.EXT_MONGODB_VERSION }}
           key: ext-mongodb-${{ env.EXT_MONGODB_VERSION }}-php${{ matrix.php }}-${{ github.sha }}
@@ -1196,7 +1237,7 @@ jobs:
       - name: Install Composer
         run: wget -qO - https://raw.githubusercontent.com/composer/getcomposer.org/$COMPOSER_INSTALLER_COMMIT/web/installer | php -- --install-dir=/usr/local/bin --filename=composer --quiet
       - name: Cache Composer packages
-        uses: actions/cache@v1
+        uses: actions/cache@v2
         with:
           path: ~/.composer/cache
           key: composer-php${{ matrix.php }}-${{ github.sha }}
@@ -1208,11 +1249,15 @@ jobs:
         run: |
           composer global require --prefer-dist --no-progress --no-suggest --ansi \
             symfony/flex
+      - name: Require Symfony Uid
+        run: composer require symfony/uid --dev --no-progress --ansi
       - name: Update project dependencies
         run: |
           mkdir -p /tmp/api-platform/core/vendor
           ln -s /tmp/api-platform/core/vendor vendor
           composer update --no-progress --no-suggest --ansi
+      - name: Install PHPUnit
+        run: vendor/bin/simple-phpunit --version
       - name: Clear test app cache
         run: |
           mkdir -p /tmp/api-platform/core/var
@@ -1221,7 +1266,7 @@ jobs:
       - name: Run PHPUnit tests
         run: |
           mkdir -p build/logs/phpunit
-          vendor/bin/phpunit --log-junit build/logs/phpunit/junit.xml --colors=always
+          vendor/bin/simple-phpunit --log-junit build/logs/phpunit/junit.xml --colors=always
       - name: Upload test artifacts
         if: always()
         uses: actions/upload-artifact@v1
@@ -1277,7 +1322,7 @@ jobs:
             pdo_mysql \
           ;
       - name: Cache mongodb PHP extension build
-        uses: actions/cache@v1
+        uses: actions/cache@v2
         with:
           path: /var/tmp/build/ext-mongodb-${{ env.EXT_MONGODB_VERSION }}
           key: ext-mongodb-${{ env.EXT_MONGODB_VERSION }}-php${{ matrix.php }}-${{ github.sha }}
@@ -1305,7 +1350,7 @@ jobs:
       - name: Install Composer
         run: wget -qO - https://raw.githubusercontent.com/composer/getcomposer.org/$COMPOSER_INSTALLER_COMMIT/web/installer | php -- --install-dir=/usr/local/bin --filename=composer --quiet
       - name: Cache Composer packages
-        uses: actions/cache@v1
+        uses: actions/cache@v2
         with:
           path: ~/.composer/cache
           key: composer-php${{ matrix.php }}-${{ github.sha }}
@@ -1317,11 +1362,15 @@ jobs:
         run: |
           composer global require --prefer-dist --no-progress --no-suggest --ansi \
             symfony/flex
+      - name: Require Symfony Uid
+        run: composer require symfony/uid --dev --no-progress --ansi
       - name: Update project dependencies
         run: |
           mkdir -p /tmp/api-platform/core/vendor
           ln -s /tmp/api-platform/core/vendor vendor
           composer update --no-progress --no-suggest --ansi
+      - name: Install PHPUnit
+        run: vendor/bin/simple-phpunit --version
       - name: Clear test app cache
         run: |
           mkdir -p /tmp/api-platform/core/var
@@ -1401,7 +1450,7 @@ jobs:
             bash \
             unzip \
       - name: Cache mongodb PHP extension build
-        uses: actions/cache@v1
+        uses: actions/cache@v2
         with:
           path: /var/tmp/build/ext-mongodb-${{ env.EXT_MONGODB_VERSION }}
           key: ext-mongodb-${{ env.EXT_MONGODB_VERSION }}-php${{ matrix.php }}-${{ github.sha }}
@@ -1446,7 +1495,7 @@ jobs:
       - name: Install Composer
         run: wget -qO - https://raw.githubusercontent.com/composer/getcomposer.org/$COMPOSER_INSTALLER_COMMIT/web/installer | php -- --install-dir=/usr/local/bin --filename=composer --quiet
       - name: Cache Composer packages
-        uses: actions/cache@v1
+        uses: actions/cache@v2
         with:
           path: ~/.composer/cache
           key: composer-php${{ matrix.php }}-${{ github.sha }}
@@ -1463,6 +1512,10 @@ jobs:
           mkdir -p /tmp/api-platform/core/vendor
           ln -s /tmp/api-platform/core/vendor vendor
           composer update --no-progress --no-suggest --ansi
+      - name: Require Symfony Uid
+        run: composer require symfony/uid --dev --no-progress --ansi
+      - name: Install PHPUnit
+        run: vendor/bin/simple-phpunit --version
       - name: Clear test app cache
         run: |
           mkdir -p /tmp/api-platform/core/var
@@ -1475,9 +1528,9 @@ jobs:
         run: |
           mkdir -p build/logs/phpunit
           if [ "$COVERAGE" = '1' ]; then
-            vendor/bin/phpunit --coverage-clover build/logs/phpunit/clover.xml --log-junit build/logs/phpunit/junit.xml --colors=always --configuration phpunit_mongodb.xml
+            vendor/bin/simple-phpunit --coverage-clover build/logs/phpunit/clover.xml --log-junit build/logs/phpunit/junit.xml --colors=always --configuration phpunit_mongodb.xml
           else
-            vendor/bin/phpunit --log-junit build/logs/phpunit/junit.xml --colors=always --configuration phpunit_mongodb.xml
+            vendor/bin/simple-phpunit --log-junit build/logs/phpunit/junit.xml --colors=always --configuration phpunit_mongodb.xml
           fi
       - name: Upload test artifacts
         if: always()
@@ -1542,7 +1595,7 @@ jobs:
             bash \
             unzip \
       - name: Cache mongodb PHP extension build
-        uses: actions/cache@v1
+        uses: actions/cache@v2
         with:
           path: /var/tmp/build/ext-mongodb-${{ env.EXT_MONGODB_VERSION }}
           key: ext-mongodb-${{ env.EXT_MONGODB_VERSION }}-php${{ matrix.php }}-${{ github.sha }}
@@ -1587,7 +1640,7 @@ jobs:
       - name: Install Composer
         run: wget -qO - https://raw.githubusercontent.com/composer/getcomposer.org/$COMPOSER_INSTALLER_COMMIT/web/installer | php -- --install-dir=/usr/local/bin --filename=composer --quiet
       - name: Cache Composer packages
-        uses: actions/cache@v1
+        uses: actions/cache@v2
         with:
           path: ~/.composer/cache
           key: composer-php${{ matrix.php }}-${{ github.sha }}
@@ -1599,11 +1652,15 @@ jobs:
         run: |
           composer global require --prefer-dist --no-progress --no-suggest --ansi \
             symfony/flex
+      - name: Require Symfony Uid
+        run: composer require symfony/uid --dev --no-progress --ansi
       - name: Update project dependencies
         run: |
           mkdir -p /tmp/api-platform/core/vendor
           ln -s /tmp/api-platform/core/vendor vendor
           composer update --no-progress --no-suggest --ansi
+      - name: Install PHPUnit
+        run: vendor/bin/simple-phpunit --version
       - name: Clear test app cache
         run: |
           mkdir -p /tmp/api-platform/core/var
@@ -1716,7 +1773,7 @@ jobs:
             bash \
             unzip \
       - name: Cache mongodb PHP extension build
-        uses: actions/cache@v1
+        uses: actions/cache@v2
         with:
           path: /var/tmp/build/ext-mongodb-${{ env.EXT_MONGODB_VERSION }}
           key: ext-mongodb-${{ env.EXT_MONGODB_VERSION }}-php${{ matrix.php }}-${{ github.sha }}
@@ -1761,7 +1818,7 @@ jobs:
       - name: Install Composer
         run: wget -qO - https://raw.githubusercontent.com/composer/getcomposer.org/$COMPOSER_INSTALLER_COMMIT/web/installer | php -- --install-dir=/usr/local/bin --filename=composer --quiet
       - name: Cache Composer packages
-        uses: actions/cache@v1
+        uses: actions/cache@v2
         with:
           path: ~/.composer/cache
           key: composer-php${{ matrix.php }}-${{ github.sha }}
@@ -1773,11 +1830,15 @@ jobs:
         run: |
           composer global require --prefer-dist --no-progress --no-suggest --ansi \
             symfony/flex
+      - name: Require Symfony Uid
+        run: composer require symfony/uid --dev --no-progress --ansi
       - name: Update project dependencies
         run: |
           mkdir -p /tmp/api-platform/core/vendor
           ln -s /tmp/api-platform/core/vendor vendor
           composer update --no-progress --no-suggest --ansi
+      - name: Install PHPUnit
+        run: vendor/bin/simple-phpunit --version
       - name: Clear test app cache
         run: |
           mkdir -p /tmp/api-platform/core/var
@@ -1790,9 +1851,9 @@ jobs:
         run: |
           mkdir -p build/logs/phpunit
           if [ "$COVERAGE" = '1' ]; then
-            vendor/bin/phpunit --coverage-clover build/logs/phpunit/clover.xml --log-junit build/logs/phpunit/junit.xml --colors=always
+            vendor/bin/simple-phpunit --coverage-clover build/logs/phpunit/clover.xml --log-junit build/logs/phpunit/junit.xml --colors=always
           else
-            vendor/bin/phpunit --log-junit build/logs/phpunit/junit.xml --colors=always
+            vendor/bin/simple-phpunit --log-junit build/logs/phpunit/junit.xml --colors=always
           fi
       - name: Upload test artifacts
         if: always()
@@ -1859,7 +1920,7 @@ jobs:
             bash \
             unzip \
       - name: Cache mongodb PHP extension build
-        uses: actions/cache@v1
+        uses: actions/cache@v2
         with:
           path: /var/tmp/build/ext-mongodb-${{ env.EXT_MONGODB_VERSION }}
           key: ext-mongodb-${{ env.EXT_MONGODB_VERSION }}-php${{ matrix.php }}-${{ github.sha }}
@@ -1904,7 +1965,7 @@ jobs:
       - name: Install Composer
         run: wget -qO - https://raw.githubusercontent.com/composer/getcomposer.org/$COMPOSER_INSTALLER_COMMIT/web/installer | php -- --install-dir=/usr/local/bin --filename=composer --quiet
       - name: Cache Composer packages
-        uses: actions/cache@v1
+        uses: actions/cache@v2
         with:
           path: ~/.composer/cache
           key: composer-php${{ matrix.php }}-${{ github.sha }}
@@ -1916,11 +1977,15 @@ jobs:
         run: |
           composer global require --prefer-dist --no-progress --no-suggest --ansi \
             symfony/flex
+      - name: Require Symfony Uid
+        run: composer require symfony/uid --dev --no-progress --ansi
       - name: Update project dependencies
         run: |
           mkdir -p /tmp/api-platform/core/vendor
           ln -s /tmp/api-platform/core/vendor vendor
           composer update --no-progress --no-suggest --ansi
+      - name: Install PHPUnit
+        run: vendor/bin/simple-phpunit --version
       - name: Clear test app cache
         run: |
           mkdir -p /tmp/api-platform/core/var
@@ -2008,7 +2073,7 @@ jobs:
       fail-fast: false
     timeout-minutes: 20
     env:
-      SYMFONY_DEPRECATIONS_HELPER: max[total]=5
+      SYMFONY_DEPRECATIONS_HELPER: max[total]=7
     steps:
       - name: Checkout
         uses: actions/checkout@v1
@@ -2017,7 +2082,7 @@ jobs:
           apk add \
             unzip \
       - name: Cache mongodb PHP extension build
-        uses: actions/cache@v1
+        uses: actions/cache@v2
         with:
           path: /var/tmp/build/ext-mongodb-${{ env.EXT_MONGODB_VERSION }}
           key: ext-mongodb-${{ env.EXT_MONGODB_VERSION }}-php${{ matrix.php }}-${{ github.sha }}
@@ -2045,7 +2110,7 @@ jobs:
       - name: Install Composer
         run: wget -qO - https://raw.githubusercontent.com/composer/getcomposer.org/$COMPOSER_INSTALLER_COMMIT/web/installer | php -- --install-dir=/usr/local/bin --filename=composer --quiet
       - name: Cache Composer packages
-        uses: actions/cache@v1
+        uses: actions/cache@v2
         with:
           path: ~/.composer/cache
           key: composer-php${{ matrix.php }}-${{ github.sha }}
@@ -2057,11 +2122,15 @@ jobs:
         run: |
           composer global require --prefer-dist --no-progress --no-suggest --ansi \
             symfony/flex
+      - name: Require Symfony Uid
+        run: composer require symfony/uid --dev --no-progress --ansi
       - name: Update project dependencies
         run: |
           mkdir -p /tmp/api-platform/core/vendor
           ln -s /tmp/api-platform/core/vendor vendor
           composer update --no-progress --no-suggest --ansi
+      - name: Install PHPUnit
+        run: vendor/bin/simple-phpunit --version
       - name: Clear test app cache
         run: |
           mkdir -p /tmp/api-platform/core/var
@@ -2070,7 +2139,7 @@ jobs:
       - name: Run PHPUnit tests
         run: |
           mkdir -p build/logs/phpunit
-          vendor/bin/phpunit --log-junit build/logs/phpunit/junit.xml --colors=always
+          vendor/bin/simple-phpunit --log-junit build/logs/phpunit/junit.xml --colors=always
       - name: Upload test artifacts
         if: always()
         uses: actions/upload-artifact@v1
@@ -2092,7 +2161,7 @@ jobs:
         php:
           - '7.4'
         symfony:
-          - '5.1'
+          - '5.2'
       fail-fast: false
     timeout-minutes: 20
     steps:
@@ -2105,7 +2174,7 @@ jobs:
             moreutils \
             unzip \
       - name: Cache mongodb PHP extension build
-        uses: actions/cache@v1
+        uses: actions/cache@v2
         with:
           path: /var/tmp/build/ext-mongodb-${{ env.EXT_MONGODB_VERSION }}
           key: ext-mongodb-${{ env.EXT_MONGODB_VERSION }}-php${{ matrix.php }}-${{ github.sha }}
@@ -2133,7 +2202,7 @@ jobs:
       - name: Install Composer
         run: wget -qO - https://raw.githubusercontent.com/composer/getcomposer.org/$COMPOSER_INSTALLER_COMMIT/web/installer | php -- --install-dir=/usr/local/bin --filename=composer --quiet
       - name: Cache Composer packages
-        uses: actions/cache@v1
+        uses: actions/cache@v2
         with:
           path: ~/.composer/cache
           key: composer-php${{ matrix.php }}-symfony${{ matrix.symfony }}-${{ github.sha }}
@@ -2146,6 +2215,8 @@ jobs:
         run: |
           composer global require --prefer-dist --no-progress --no-suggest --ansi \
             symfony/flex
+      - name: Require Symfony Uid
+        run: composer require symfony/uid --dev --no-progress --ansi
       - name: Allow unstable project dependencies
         run: |
           jq '. + {"minimum-stability": "dev"}' composer.json | sponge composer.json
@@ -2168,6 +2239,8 @@ jobs:
           symfony_packages=$(composer show symfony/* | tr -s ' ' '\t' | cut -f1-2 | grep -vE 'polyfill|contracts|mercure')
           ! echo "$symfony_packages" | grep -vE "$version_pattern"
         continue-on-error: true
+      - name: Install PHPUnit
+        run: vendor/bin/simple-phpunit --version
       - name: Clear test app cache
         run: |
           mkdir -p /tmp/api-platform/core/var
@@ -2176,7 +2249,7 @@ jobs:
       - name: Run PHPUnit tests
         run: |
           mkdir -p build/logs/phpunit
-          vendor/bin/phpunit --log-junit build/logs/phpunit/junit.xml --colors=always
+          vendor/bin/simple-phpunit --log-junit build/logs/phpunit/junit.xml --colors=always
       - name: Upload test artifacts
         if: always()
         uses: actions/upload-artifact@v1
@@ -2198,7 +2271,7 @@ jobs:
         php:
           - '7.4'
         symfony:
-          - '5.1'
+          - '5.2'
       fail-fast: false
     timeout-minutes: 20
     steps:
@@ -2211,7 +2284,7 @@ jobs:
             moreutils \
             unzip \
       - name: Cache mongodb PHP extension build
-        uses: actions/cache@v1
+        uses: actions/cache@v2
         with:
           path: /var/tmp/build/ext-mongodb-${{ env.EXT_MONGODB_VERSION }}
           key: ext-mongodb-${{ env.EXT_MONGODB_VERSION }}-php${{ matrix.php }}-${{ github.sha }}
@@ -2239,7 +2312,7 @@ jobs:
       - name: Install Composer
         run: wget -qO - https://raw.githubusercontent.com/composer/getcomposer.org/$COMPOSER_INSTALLER_COMMIT/web/installer | php -- --install-dir=/usr/local/bin --filename=composer --quiet
       - name: Cache Composer packages
-        uses: actions/cache@v1
+        uses: actions/cache@v2
         with:
           path: ~/.composer/cache
           key: composer-php${{ matrix.php }}-symfony${{ matrix.symfony }}-${{ github.sha }}
@@ -2252,6 +2325,8 @@ jobs:
         run: |
           composer global require --prefer-dist --no-progress --no-suggest --ansi \
             symfony/flex
+      - name: Require Symfony Uid
+        run: composer require symfony/uid --dev --no-progress --ansi
       - name: Allow unstable project dependencies
         run: |
           jq '. + {"minimum-stability": "dev"}' composer.json | sponge composer.json
@@ -2274,6 +2349,8 @@ jobs:
           symfony_packages=$(composer show symfony/* | tr -s ' ' '\t' | cut -f1-2 | grep -vE 'polyfill|contracts|mercure')
           ! echo "$symfony_packages" | grep -vE "$version_pattern"
         continue-on-error: true
+      - name: Install PHPUnit
+        run: vendor/bin/simple-phpunit --version
       - name: Clear test app cache
         run: |
           mkdir -p /tmp/api-platform/core/var
@@ -2290,3 +2367,78 @@ jobs:
           name: behat-logs-php${{ matrix.php }}-symfony${{ matrix.symfony }}
           path: build/logs/behat
         continue-on-error: true
+
+  windows-phpunit:
+    name: Windows PHPUnit (PHP 7.4) (SQLite)
+    runs-on: windows-latest
+    timeout-minutes: 10
+    env:
+      APP_ENV: sqlite
+      DATABASE_URL: sqlite:///%kernel.project_dir%/var/data.db
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v1
+      - name: Setup PHP with pre-release PECL extension
+        uses: shivammathur/setup-php@v2
+        with:
+            php-version: '7.4'
+            tools: pecl, composer, flex
+            extensions: intl, openssl, mbstring, pdo_sqlite 
+            coverage: none
+            ini-values: memory_limit=-1
+      - name: Cache Composer packages
+        uses: actions/cache@v2
+        with:
+          path: ~/.composer/cache
+          key: composer-php${{ matrix.php }}-${{ github.sha }}
+          restore-keys: |
+            composer-php${{ matrix.php }}-
+            composer-
+        continue-on-error: true
+      - name: Update project dependencies
+        run: |
+          composer update --no-progress --no-suggest --ansi
+      - name: Clear test app cache
+        run: |
+          tests/Fixtures/app/console cache:clear --ansi
+      - name: Run PHPUnit tests
+        run: |
+          vendor/bin/simple-phpunit --log-junit build/logs/phpunit/junit.xml --colors=always
+
+  windows-behat:
+    name: Windows Behat (PHP 7.4) (SQLite)
+    runs-on: windows-latest
+    timeout-minutes: 15
+    env:
+      APP_ENV: sqlite
+      DATABASE_URL: sqlite:///%kernel.project_dir%/var/data.db
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v1
+      - name: Setup PHP with pre-release PECL extension
+        uses: shivammathur/setup-php@v2
+        with:
+            php-version: '7.4'
+            tools: pecl, composer, flex
+            extensions: intl, openssl, mbstring, pdo_sqlite 
+            coverage: none
+            ini-values: memory_limit=-1
+      - name: Cache Composer packages
+        uses: actions/cache@v2
+        with:
+          path: ~/.composer/cache
+          key: composer-php${{ matrix.php }}-${{ github.sha }}
+          restore-keys: |
+            composer-php${{ matrix.php }}-
+            composer-
+        continue-on-error: true
+      - name: Update project dependencies
+        run: |
+          composer update --no-progress --no-suggest --ansi
+          vendor/bin/simple-phpunit --version
+      - name: Clear test app cache
+        run: |
+          tests/Fixtures/app/console cache:clear --ansi
+      - name: Run Behat tests
+        run: |
+          vendor/bin/behat --format=progress --profile=default --no-interaction --colors

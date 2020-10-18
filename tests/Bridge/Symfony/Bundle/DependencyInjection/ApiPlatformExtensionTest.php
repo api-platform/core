@@ -61,10 +61,13 @@ use ApiPlatform\Core\DataPersister\DataPersisterInterface;
 use ApiPlatform\Core\DataProvider\CollectionDataProviderInterface;
 use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
 use ApiPlatform\Core\DataProvider\Pagination;
+use ApiPlatform\Core\DataProvider\PaginationOptions;
 use ApiPlatform\Core\DataProvider\SubresourceDataProviderInterface;
+use ApiPlatform\Core\DataTransformer\DataTransformerInitializerInterface;
 use ApiPlatform\Core\DataTransformer\DataTransformerInterface;
 use ApiPlatform\Core\Exception\FilterValidationException;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
+use ApiPlatform\Core\GraphQl\Error\ErrorHandlerInterface;
 use ApiPlatform\Core\GraphQl\Resolver\MutationResolverInterface;
 use ApiPlatform\Core\GraphQl\Resolver\QueryCollectionResolverInterface;
 use ApiPlatform\Core\GraphQl\Resolver\QueryItemResolverInterface;
@@ -76,11 +79,15 @@ use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
+use ApiPlatform\Core\OpenApi\Factory\OpenApiFactoryInterface;
+use ApiPlatform\Core\OpenApi\Options;
+use ApiPlatform\Core\OpenApi\Serializer\OpenApiNormalizer;
 use ApiPlatform\Core\Security\ResourceAccessCheckerInterface;
 use ApiPlatform\Core\Serializer\Filter\GroupFilter;
 use ApiPlatform\Core\Serializer\Filter\PropertyFilter;
 use ApiPlatform\Core\Serializer\SerializerContextBuilderInterface;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\TestBundle;
+use ApiPlatform\Core\Tests\ProphecyTrait;
 use ApiPlatform\Core\Validator\ValidatorInterface;
 use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
 use Doctrine\ORM\OptimisticLockException;
@@ -107,6 +114,7 @@ use Symfony\Component\DependencyInjection\ParameterBag\EnvPlaceholderParameterBa
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Serializer\Exception\ExceptionInterface;
+use Symfony\Component\Uid\AbstractUid;
 
 /**
  * @group resource-hog
@@ -115,6 +123,8 @@ use Symfony\Component\Serializer\Exception\ExceptionInterface;
  */
 class ApiPlatformExtensionTest extends TestCase
 {
+    use ProphecyTrait;
+
     public const DEFAULT_CONFIG = ['api_platform' => [
         'title' => 'title',
         'description' => 'description',
@@ -148,6 +158,7 @@ class ApiPlatformExtensionTest extends TestCase
         ],
         'defaults' => [
             'attributes' => [],
+            'stateless' => true,
         ],
     ]];
 
@@ -315,7 +326,6 @@ class ApiPlatformExtensionTest extends TestCase
 
     /**
      * @group legacy
-     * @expectedDeprecation Enabling the NelmioApiDocBundle integration has been deprecated in 2.2 and will be removed in 3.0. NelmioApiDocBundle 3 has native support for API Platform.
      */
     public function testEnableNelmioApiDoc()
     {
@@ -342,6 +352,7 @@ class ApiPlatformExtensionTest extends TestCase
         $containerBuilderProphecy->setDefinition('api_platform.graphql.action.entrypoint', Argument::type(Definition::class))->shouldNotBeCalled();
         $containerBuilderProphecy->setDefinition('api_platform.graphql.action.graphiql', Argument::type(Definition::class))->shouldNotBeCalled();
         $containerBuilderProphecy->setDefinition('api_platform.graphql.action.graphql_playground', Argument::type(Definition::class))->shouldNotBeCalled();
+        $containerBuilderProphecy->setDefinition('api_platform.graphql.error_handler', Argument::type(Definition::class))->shouldNotBeCalled();
         $containerBuilderProphecy->setDefinition('api_platform.graphql.resolver.factory.collection', Argument::type(Definition::class))->shouldNotBeCalled();
         $containerBuilderProphecy->setDefinition('api_platform.graphql.resolver.factory.item_mutation', Argument::type(Definition::class))->shouldNotBeCalled();
         $containerBuilderProphecy->setDefinition('api_platform.graphql.resolver.factory.item_subscription', Argument::type(Definition::class))->shouldNotBeCalled();
@@ -392,6 +403,8 @@ class ApiPlatformExtensionTest extends TestCase
         $containerBuilderProphecy->setParameter('api_platform.graphql.graphql_playground.enabled', false)->shouldBeCalled();
         $containerBuilderProphecy->registerForAutoconfiguration(GraphQlTypeInterface::class)->shouldNotBeCalled();
         $this->childDefinitionProphecy->addTag('api_platform.graphql.type')->shouldNotBeCalled();
+        $containerBuilderProphecy->registerForAutoconfiguration(ErrorHandlerInterface::class)->shouldNotBeCalled();
+        $this->childDefinitionProphecy->addTag('api_platform.graphql.error_handler')->shouldNotBeCalled();
         $containerBuilderProphecy->registerForAutoconfiguration(QueryItemResolverInterface::class)->shouldNotBeCalled();
         $containerBuilderProphecy->registerForAutoconfiguration(QueryCollectionResolverInterface::class)->shouldNotBeCalled();
         $this->childDefinitionProphecy->addTag('api_platform.graphql.query_resolver')->shouldNotBeCalled();
@@ -452,7 +465,7 @@ class ApiPlatformExtensionTest extends TestCase
     public function testResourcesToWatchWithUnsupportedMappingType()
     {
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessageRegExp('/Unsupported mapping type in ".+", supported types are XML & YAML\\./');
+        $this->expectExceptionMessageMatches('/Unsupported mapping type in ".+", supported types are XML & YAML\\./');
 
         $config = self::DEFAULT_CONFIG;
         $config['api_platform']['mapping']['paths'] = [__FILE__];
@@ -708,7 +721,7 @@ class ApiPlatformExtensionTest extends TestCase
         $containerBuilderProphecy->registerForAutoconfiguration(RequestBodySearchCollectionExtensionInterface::class)->willReturn($this->childDefinitionProphecy)->shouldBeCalled();
         $containerBuilderProphecy->setParameter('api_platform.elasticsearch.hosts', ['http://elasticsearch:9200'])->shouldBeCalled();
         $containerBuilderProphecy->setParameter('api_platform.elasticsearch.mapping', [])->shouldBeCalled();
-        $containerBuilderProphecy->setParameter('api_platform.defaults', ['attributes' => []])->shouldBeCalled();
+        $containerBuilderProphecy->setParameter('api_platform.defaults', ['attributes' => ['stateless' => true]])->shouldBeCalled();
 
         $config = self::DEFAULT_CONFIG;
         $config['api_platform']['elasticsearch'] = [
@@ -859,9 +872,10 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.http_cache.vary' => ['Accept'],
             'api_platform.http_cache.public' => null,
             'api_platform.http_cache.invalidation.max_header_length' => 7500,
-            'api_platform.defaults' => ['attributes' => []],
+            'api_platform.defaults' => ['attributes' => ['stateless' => true]],
             'api_platform.enable_entrypoint' => true,
             'api_platform.enable_docs' => true,
+            'api_platform.url_generation_strategy' => 1,
         ];
 
         $pagination = [
@@ -955,6 +969,7 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.operation_path_resolver.generator',
             'api_platform.operation_path_resolver.underscore',
             'api_platform.pagination',
+            'api_platform.pagination_options',
             'api_platform.path_segment_name_generator.underscore',
             'api_platform.path_segment_name_generator.dash',
             'api_platform.resource_class_resolver',
@@ -973,6 +988,11 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.subresource_operation_factory',
             'api_platform.subresource_operation_factory.cached',
         ];
+
+        if (class_exists(AbstractUid::class)) {
+            $definitions[] = 'api_platform.identifier.symfony_ulid_normalizer';
+            $definitions[] = 'api_platform.identifier.symfony_uuid_normalizer';
+        }
 
         foreach ($definitions as $definition) {
             $containerBuilderProphecy->setDefinition($definition, Argument::type(Definition::class))->shouldBeCalled();
@@ -1014,6 +1034,7 @@ class ApiPlatformExtensionTest extends TestCase
             SerializerContextBuilderInterface::class => 'api_platform.serializer.context_builder',
             SubresourceDataProviderInterface::class => 'api_platform.subresource_data_provider',
             UrlGeneratorInterface::class => 'api_platform.router',
+            PaginationOptions::class => 'api_platform.pagination_options',
         ];
 
         foreach ($aliases as $alias => $service) {
@@ -1076,6 +1097,10 @@ class ApiPlatformExtensionTest extends TestCase
             ->willReturn($this->childDefinitionProphecy)->shouldBeCalledTimes(1);
         $this->childDefinitionProphecy->addTag('api_platform.graphql.type')->shouldBeCalledTimes(1);
 
+        $containerBuilderProphecy->registerForAutoconfiguration(ErrorHandlerInterface::class)
+            ->willReturn($this->childDefinitionProphecy)->shouldBeCalledTimes(1);
+        $this->childDefinitionProphecy->addTag('api_platform.graphql.error_handler')->shouldBeCalledTimes(1);
+
         $containerBuilderProphecy->registerForAutoconfiguration(QueryItemResolverInterface::class)
             ->willReturn($this->childDefinitionProphecy)->shouldBeCalledTimes(1);
         $containerBuilderProphecy->registerForAutoconfiguration(QueryCollectionResolverInterface::class)
@@ -1122,7 +1147,11 @@ class ApiPlatformExtensionTest extends TestCase
 
         $containerBuilderProphecy->registerForAutoconfiguration(DataTransformerInterface::class)
             ->willReturn($this->childDefinitionProphecy)->shouldBeCalledTimes(1);
-        $this->childDefinitionProphecy->addTag('api_platform.data_transformer')->shouldBeCalledTimes(1);
+
+        $containerBuilderProphecy->registerForAutoconfiguration(DataTransformerInitializerInterface::class)
+            ->willReturn($this->childDefinitionProphecy)->shouldBeCalledTimes(1);
+
+        $this->childDefinitionProphecy->addTag('api_platform.data_transformer')->shouldBeCalledTimes(2);
 
         $containerBuilderProphecy->addResource(Argument::type(DirectoryResource::class))->shouldBeCalled();
 
@@ -1134,6 +1163,7 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.oauth.flow' => 'application',
             'api_platform.oauth.tokenUrl' => '/oauth/v2/token',
             'api_platform.oauth.authorizationUrl' => '/oauth/v2/auth',
+            'api_platform.oauth.refreshUrl' => '/oauth/v2/refresh',
             'api_platform.oauth.scopes' => [],
             'api_platform.enable_swagger_ui' => true,
             'api_platform.enable_re_doc' => true,
@@ -1146,7 +1176,7 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.resource_class_directories' => Argument::type('array'),
             'api_platform.validator.serialize_payload_fields' => [],
             'api_platform.elasticsearch.enabled' => false,
-            'api_platform.defaults' => ['attributes' => []],
+            'api_platform.defaults' => ['attributes' => ['stateless' => true]],
         ];
 
         if ($hasSwagger) {
@@ -1194,6 +1224,7 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.graphql.action.entrypoint',
             'api_platform.graphql.action.graphiql',
             'api_platform.graphql.action.graphql_playground',
+            'api_platform.graphql.error_handler',
             'api_platform.graphql.executor',
             'api_platform.graphql.type_builder',
             'api_platform.graphql.fields_builder',
@@ -1309,6 +1340,13 @@ class ApiPlatformExtensionTest extends TestCase
             $definitions[] = 'api_platform.json_schema.type_factory';
             $definitions[] = 'api_platform.json_schema.schema_factory';
             $definitions[] = 'api_platform.json_schema.json_schema_generate_command';
+            $definitions[] = 'api_platform.openapi.options';
+            $definitions[] = 'api_platform.openapi.normalizer';
+            $definitions[] = 'api_platform.openapi.normalizer.api_gateway';
+            $definitions[] = 'api_platform.openapi.factory';
+            $definitions[] = 'api_platform.openapi.command';
+            $definitions[] = 'api_platform.swagger_ui.context';
+            $definitions[] = 'api_platform.swagger_ui.action';
         }
 
         // has jsonld
@@ -1380,6 +1418,10 @@ class ApiPlatformExtensionTest extends TestCase
             $aliases += [
                 TypeFactoryInterface::class => 'api_platform.json_schema.type_factory',
                 SchemaFactoryInterface::class => 'api_platform.json_schema.schema_factory',
+                Options::class => 'api_platform.openapi.options',
+                OpenApiNormalizer::class => 'api_platform.openapi.normalizer',
+                OpenApiFactoryInterface::class => 'api_platform.openapi.factory',
+                'api_platform.swagger_ui.listener' => 'api_platform.swagger.listener.ui',
             ];
         }
 
@@ -1397,6 +1439,11 @@ class ApiPlatformExtensionTest extends TestCase
         $containerBuilderProphecy->getDefinition('api_platform.doctrine_mongodb.odm.listener.mercure.publish')->willReturn($definitionDummy);
         $containerBuilderProphecy->getDefinition('api_platform.graphql.subscription.mercure_iri_generator')->willReturn($definitionDummy);
         $this->childDefinitionProphecy->setPublic(true)->will(function () {});
+
+        $containerBuilderProphecy->getDefinition(Argument::type('string'))
+            ->willReturn($this->prophesize(Definition::class)->reveal());
+        $containerBuilderProphecy->getAlias(Argument::type('string'))
+            ->willReturn($this->prophesize(Alias::class)->reveal());
 
         $containerBuilderProphecy->getDefinition(Argument::type('string'))
             ->willReturn($this->prophesize(Definition::class)->reveal());

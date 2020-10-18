@@ -16,6 +16,7 @@ namespace ApiPlatform\Core\Tests\HttpCache\EventListener;
 use ApiPlatform\Core\Api\IriConverterInterface;
 use ApiPlatform\Core\HttpCache\EventListener\AddTagsListener;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
+use ApiPlatform\Core\Tests\ProphecyTrait;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -26,6 +27,8 @@ use Symfony\Component\HttpKernel\Event\ResponseEvent;
  */
 class AddTagsListenerTest extends TestCase
 {
+    use ProphecyTrait;
+
     public function testDoNotSetHeaderWhenMethodNotCacheable()
     {
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);

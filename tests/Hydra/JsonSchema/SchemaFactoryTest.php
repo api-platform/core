@@ -24,10 +24,13 @@ use ApiPlatform\Core\Metadata\Property\PropertyNameCollection;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
+use ApiPlatform\Core\Tests\ProphecyTrait;
 use PHPUnit\Framework\TestCase;
 
 class SchemaFactoryTest extends TestCase
 {
+    use ProphecyTrait;
+
     private $schemaFactory;
 
     protected function setUp(): void
@@ -54,7 +57,7 @@ class SchemaFactoryTest extends TestCase
         $resultSchema = $this->schemaFactory->buildSchema(Dummy::class);
 
         $this->assertTrue($resultSchema->isDefined());
-        $this->assertEquals(Dummy::class.':jsonld', $resultSchema->getRootDefinitionKey());
+        $this->assertEquals(str_replace('\\', '.', Dummy::class).'.jsonld', $resultSchema->getRootDefinitionKey());
     }
 
     public function testCustomFormatBuildSchema(): void
@@ -62,7 +65,7 @@ class SchemaFactoryTest extends TestCase
         $resultSchema = $this->schemaFactory->buildSchema(Dummy::class, 'json');
 
         $this->assertTrue($resultSchema->isDefined());
-        $this->assertEquals(Dummy::class, $resultSchema->getRootDefinitionKey());
+        $this->assertEquals(str_replace('\\', '.', Dummy::class), $resultSchema->getRootDefinitionKey());
     }
 
     public function testHasRootDefinitionKeyBuildSchema(): void
@@ -71,7 +74,7 @@ class SchemaFactoryTest extends TestCase
         $definitions = $resultSchema->getDefinitions();
         $rootDefinitionKey = $resultSchema->getRootDefinitionKey();
 
-        $this->assertEquals(Dummy::class.':jsonld', $rootDefinitionKey);
+        $this->assertEquals(str_replace('\\', '.', Dummy::class).'.jsonld', $rootDefinitionKey);
         $this->assertArrayHasKey($rootDefinitionKey, $definitions);
         $this->assertArrayHasKey('properties', $definitions[$rootDefinitionKey]);
     }

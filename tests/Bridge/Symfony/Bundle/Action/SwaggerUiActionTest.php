@@ -19,8 +19,10 @@ use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Metadata\Resource\ResourceNameCollection;
+use ApiPlatform\Core\Tests\ProphecyTrait;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
+use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Generator\UrlGenerator;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
@@ -31,6 +33,9 @@ use Twig\Environment as TwigEnvironment;
  */
 class SwaggerUiActionTest extends TestCase
 {
+    use ExpectDeprecationTrait;
+    use ProphecyTrait;
+
     public const SPEC = [
         'paths' => [
             '/fs' => ['get' => ['operationId' => 'getFCollection']],
@@ -40,9 +45,11 @@ class SwaggerUiActionTest extends TestCase
 
     /**
      * @dataProvider getInvokeParameters
+     * @group legacy
      */
     public function testInvoke(Request $request, $twigProphecy)
     {
+        $this->expectDeprecation('The use of "ApiPlatform\Core\Bridge\Symfony\Bundle\Action\SwaggerUiAction" is deprecated since API Platform 2.6, use "ApiPlatform\Core\Bridge\Symfony\Bundle\SwaggerUi\SwaggerUiAction" instead.');
         $resourceNameCollectionFactoryProphecy = $this->prophesize(ResourceNameCollectionFactoryInterface::class);
         $resourceNameCollectionFactoryProphecy->create()->willReturn(new ResourceNameCollection(['Foo', 'Bar']))->shouldBeCalled();
 
@@ -142,9 +149,11 @@ class SwaggerUiActionTest extends TestCase
 
     /**
      * @dataProvider getDoNotRunCurrentRequestParameters
+     * @group legacy
      */
     public function testDoNotRunCurrentRequest(Request $request)
     {
+        $this->expectDeprecation('The use of "ApiPlatform\Core\Bridge\Symfony\Bundle\Action\SwaggerUiAction" is deprecated since API Platform 2.6, use "ApiPlatform\Core\Bridge\Symfony\Bundle\SwaggerUi\SwaggerUiAction" instead.');
         $resourceNameCollectionFactoryProphecy = $this->prophesize(ResourceNameCollectionFactoryInterface::class);
         $resourceNameCollectionFactoryProphecy->create()->willReturn(new ResourceNameCollection(['Foo', 'Bar']))->shouldBeCalled();
 

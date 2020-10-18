@@ -13,9 +13,11 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\GraphQl\Action;
 
+use ApiPlatform\Core\GraphQl\Error\ErrorHandlerInterface;
 use ApiPlatform\Core\GraphQl\ExecutorInterface;
 use ApiPlatform\Core\GraphQl\Type\SchemaBuilderInterface;
 use GraphQL\Error\Debug;
+use GraphQL\Error\DebugFlag;
 use GraphQL\Error\Error;
 use GraphQL\Executor\ExecutionResult;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -38,19 +40,25 @@ final class EntrypointAction
     private $graphiQlAction;
     private $graphQlPlaygroundAction;
     private $normalizer;
+    private $errorHandler;
     private $debug;
     private $graphiqlEnabled;
     private $graphQlPlaygroundEnabled;
     private $defaultIde;
 
-    public function __construct(SchemaBuilderInterface $schemaBuilder, ExecutorInterface $executor, GraphiQlAction $graphiQlAction, GraphQlPlaygroundAction $graphQlPlaygroundAction, NormalizerInterface $normalizer, bool $debug = false, bool $graphiqlEnabled = false, bool $graphQlPlaygroundEnabled = false, $defaultIde = false)
+    public function __construct(SchemaBuilderInterface $schemaBuilder, ExecutorInterface $executor, GraphiQlAction $graphiQlAction, GraphQlPlaygroundAction $graphQlPlaygroundAction, NormalizerInterface $normalizer, ErrorHandlerInterface $errorHandler, bool $debug = false, bool $graphiqlEnabled = false, bool $graphQlPlaygroundEnabled = false, $defaultIde = false)
     {
         $this->schemaBuilder = $schemaBuilder;
         $this->executor = $executor;
         $this->graphiQlAction = $graphiQlAction;
         $this->graphQlPlaygroundAction = $graphQlPlaygroundAction;
         $this->normalizer = $normalizer;
-        $this->debug = $debug ? Debug::INCLUDE_DEBUG_MESSAGE | Debug::INCLUDE_TRACE : false;
+        $this->errorHandler = $errorHandler;
+        if (class_exists(Debug::class)) {
+            $this->debug = $debug ? Debug::INCLUDE_DEBUG_MESSAGE | Debug::INCLUDE_TRACE : false;
+        } else {
+            $this->debug = $debug ? DebugFlag::INCLUDE_DEBUG_MESSAGE | DebugFlag::INCLUDE_TRACE : DebugFlag::NONE;
+        }
         $this->graphiqlEnabled = $graphiqlEnabled;
         $this->graphQlPlaygroundEnabled = $graphQlPlaygroundEnabled;
         $this->defaultIde = $defaultIde;
@@ -76,9 +84,11 @@ final class EntrypointAction
 
             $executionResult = $this->executor
                 ->executeQuery($this->schemaBuilder->getSchema(), $query, null, null, $variables, $operationName)
+                ->setErrorsHandler($this->errorHandler)
                 ->setErrorFormatter([$this->normalizer, 'normalize']);
         } catch (\Exception $exception) {
-            $executionResult = (new ExecutionResult(null, [new Error($exception->getMessage(), null, null, null, null, $exception)]))
+            $executionResult = (new ExecutionResult(null, [new Error($exception->getMessage(), null, null, [], null, $exception)]))
+                ->setErrorsHandler($this->errorHandler)
                 ->setErrorFormatter([$this->normalizer, 'normalize']);
         }
 
@@ -90,9 +100,10 @@ final class EntrypointAction
      */
     private function parseRequest(Request $request): array
     {
-        $query = $request->query->get('query');
-        $operationName = $request->query->get('operationName');
-        if ($variables = $request->query->get('variables') ?: []) {
+        $queryParameters = $request->query->all();
+        $query = $queryParameters['query'] ?? null;
+        $operationName = $queryParameters['operationName'] ?? null;
+        if ($variables = $queryParameters['variables'] ?? []) {
             $variables = $this->decodeVariables($variables);
         }
 

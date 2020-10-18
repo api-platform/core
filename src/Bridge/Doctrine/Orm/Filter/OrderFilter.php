@@ -16,11 +16,10 @@ namespace ApiPlatform\Core\Bridge\Doctrine\Orm\Filter;
 use ApiPlatform\Core\Bridge\Doctrine\Common\Filter\OrderFilterInterface;
 use ApiPlatform\Core\Bridge\Doctrine\Common\Filter\OrderFilterTrait;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGeneratorInterface;
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
+use Doctrine\Persistence\ManagerRegistry;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\HttpFoundation\InputBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
@@ -122,13 +121,8 @@ class OrderFilter extends AbstractContextAwareFilter implements OrderFilterInter
     {
         @trigger_error(sprintf('The use of "%s::extractProperties()" is deprecated since 2.2. Use the "filters" key of the context instead.', __CLASS__), E_USER_DEPRECATED);
 
-        // symfony > 5.1
-        if (class_exists(InputBag::class)) {
-            return $request->query->all($this->orderParameterName);
-        }
+        $properties = $request->query->all()[$this->orderParameterName] ?? null;
 
-        $properties = $request->query->get($this->orderParameterName);
-        /* @phpstan-ignore-next-line */
         return \is_array($properties) ? $properties : [];
     }
 }

@@ -18,6 +18,7 @@ use ApiPlatform\Core\Bridge\Symfony\Messenger\DataTransformer;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
+use ApiPlatform\Core\Tests\ProphecyTrait;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -25,6 +26,11 @@ use PHPUnit\Framework\TestCase;
  */
 class DataTransformerTest extends TestCase
 {
+    use ProphecyTrait;
+
+    /**
+     * @dataProvider getMessengerAttribute
+     */
     public function testSupport()
     {
         $metadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
@@ -34,6 +40,9 @@ class DataTransformerTest extends TestCase
         $this->assertTrue($dataTransformer->supportsTransformation([], Dummy::class, ['input' => ['class' => 'smth']]));
     }
 
+    /**
+     * @dataProvider getMessengerAttribute
+     */
     public function testSupportWithinRequest()
     {
         $metadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
@@ -61,6 +70,9 @@ class DataTransformerTest extends TestCase
         $this->assertFalse($dataTransformer->supportsTransformation([], Dummy::class, ['input' => ['class' => 'smth'], 'operation_type' => OperationType::ITEM, 'item_operation_name' => 'foo']));
     }
 
+    /**
+     * @dataProvider getMessengerAttribute
+     */
     public function testNoSupportWithoutInput()
     {
         $metadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
@@ -70,6 +82,9 @@ class DataTransformerTest extends TestCase
         $this->assertFalse($dataTransformer->supportsTransformation([], Dummy::class, []));
     }
 
+    /**
+     * @dataProvider getMessengerAttribute
+     */
     public function testNoSupportWithObject()
     {
         $metadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
@@ -87,11 +102,25 @@ class DataTransformerTest extends TestCase
         $this->assertSame($dummy, $dataTransformer->transform($dummy, Dummy::class));
     }
 
+    /**
+     * @dataProvider getMessengerAttribute
+     */
     public function testSupportWithGraphqlContext()
     {
         $metadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $metadataFactoryProphecy->create(Dummy::class)->willReturn((new ResourceMetadata(null, null, null, null, null, []))->withGraphQl(['create' => ['messenger' => 'input']]));
         $dataTransformer = new DataTransformer($metadataFactoryProphecy->reveal());
         $this->assertTrue($dataTransformer->supportsTransformation([], Dummy::class, ['input' => ['class' => 'smth'], 'graphql_operation_name' => 'create']));
+    }
+
+    public function getMessengerAttribute()
+    {
+        yield [
+            'input',
+        ];
+
+        yield [
+            ['persist', 'input'],
+        ];
     }
 }

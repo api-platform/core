@@ -63,10 +63,12 @@ use ApiPlatform\Core\Exception\InvalidArgumentException;
  *     @Attribute("securityPostDenormalize", type="string"),
  *     @Attribute("securityPostDenormalizeMessage", type="string"),
  *     @Attribute("shortName", type="string"),
+ *     @Attribute("stateless", type="bool"),
  *     @Attribute("subresourceOperations", type="array"),
  *     @Attribute("sunset", type="string"),
  *     @Attribute("swaggerContext", type="array"),
- *     @Attribute("validationGroups", type="mixed")
+ *     @Attribute("urlGenerationStrategy", type="int"),
+ *     @Attribute("validationGroups", type="mixed"),
  * )
  */
 final class ApiResource
@@ -117,8 +119,10 @@ final class ApiResource
         'paginationPartial',
         'paginationViaCursor',
         'routePrefix',
+        'stateless',
         'sunset',
         'swaggerContext',
+        'urlGenerationStrategy',
         'validationGroups',
     ];
 
@@ -413,6 +417,13 @@ final class ApiResource
     private $securityPostDenormalizeMessage;
 
     /**
+     * @see https://github.com/Haehnchen/idea-php-annotation-plugin/issues/112
+     *
+     * @var bool
+     */
+    private $stateless;
+
+    /**
      * @see https://api-platform.com/docs/core/deprecations/#setting-the-sunset-http-header-to-indicate-when-a-resource-or-an-operation-will-be-removed
      * @see https://github.com/Haehnchen/idea-php-annotation-plugin/issues/112
      *
@@ -433,6 +444,13 @@ final class ApiResource
      * @see https://github.com/Haehnchen/idea-php-annotation-plugin/issues/112
      */
     private $validationGroups;
+
+    /**
+     * @see https://github.com/Haehnchen/idea-php-annotation-plugin/issues/112
+     *
+     * @var int
+     */
+    private $urlGenerationStrategy;
 
     /**
      * @throws InvalidArgumentException

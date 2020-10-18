@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\Bridge\Symfony\Bundle\EventListener;
 
 use ApiPlatform\Core\Bridge\Symfony\Bundle\EventListener\SwaggerUiListener;
+use ApiPlatform\Core\Tests\ProphecyTrait;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
@@ -23,6 +24,8 @@ use Symfony\Component\HttpKernel\Event\RequestEvent;
  */
 class SwaggerUiListenerTest extends TestCase
 {
+    use ProphecyTrait;
+
     /**
      * @dataProvider getParameters
      */

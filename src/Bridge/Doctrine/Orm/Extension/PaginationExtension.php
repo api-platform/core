@@ -21,10 +21,10 @@ use ApiPlatform\Core\DataProvider\Pagination;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Tools\Pagination\CountWalker;
 use Doctrine\ORM\Tools\Pagination\Paginator as DoctrineOrmPaginator;
+use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
@@ -295,7 +295,7 @@ final class PaginationExtension implements ContextAwareQueryResultCollectionExte
             return \array_key_exists($parameterName, $paginationAttribute) ? $paginationAttribute[$parameterName] : $default;
         }
 
-        return $request->query->get($parameterName, $default);
+        return $request->query->all()[$parameterName] ?? $default;
     }
 
     private function addCountToContext(QueryBuilder $queryBuilder, array $context): array

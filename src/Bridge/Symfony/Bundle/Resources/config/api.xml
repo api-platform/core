@@ -51,6 +51,7 @@
 
         <service id="api_platform.router" class="ApiPlatform\Core\Bridge\Symfony\Routing\Router" public="false">
             <argument type="service" id="router" />
+            <argument>%api_platform.url_generation_strategy%</argument>
         </service>
 
         <service id="api_platform.iri_converter" class="ApiPlatform\Core\Bridge\Symfony\Routing\IriConverter" public="false">
@@ -64,6 +65,7 @@
             <argument type="service" id="api_platform.subresource_data_provider" on-invalid="ignore" />
             <argument type="service" id="api_platform.identifier.converter" on-invalid="ignore" />
             <argument type="service" id="api_platform.resource_class_resolver" />
+            <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
         </service>
         <service id="ApiPlatform\Core\Api\IriConverterInterface" alias="api_platform.iri_converter" />
 

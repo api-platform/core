@@ -16,9 +16,11 @@ namespace ApiPlatform\Core\Tests\Bridge\Doctrine\Common;
 use ApiPlatform\Core\Bridge\Doctrine\Common\DataPersister;
 use ApiPlatform\Core\DataPersister\DataPersisterInterface;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
-use Doctrine\Common\Persistence\ManagerRegistry;
-use Doctrine\Common\Persistence\ObjectManager;
+use ApiPlatform\Core\Tests\ProphecyTrait;
+use Doctrine\ODM\MongoDB\Mapping\ClassMetadata;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
+use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ObjectManager;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Prediction\CallPrediction;
 use Prophecy\Prediction\NoCallsPrediction;
@@ -28,6 +30,8 @@ use Prophecy\Prediction\NoCallsPrediction;
  */
 class DataPersisterTest extends TestCase
 {
+    use ProphecyTrait;
+
     public function testConstruct()
     {
         $this->assertInstanceOf(DataPersisterInterface::class, new DataPersister($this->prophesize(ManagerRegistry::class)->reveal()));
@@ -117,20 +121,26 @@ class DataPersisterTest extends TestCase
     public function getTrackingPolicyParameters()
     {
         return [
-            'deferred explicit' => [true, true],
-            'deferred implicit' => [false, false],
+            'deferred explicit ORM' => [ClassMetadataInfo::class, true, true],
+            'deferred implicit ORM' => [ClassMetadataInfo::class, false, false],
+            'deferred explicit ODM' => [ClassMetadata::class, true, true],
+            'deferred implicit ODM' => [ClassMetadata::class, false, false],
         ];
     }
 
     /**
      * @dataProvider getTrackingPolicyParameters
      */
-    public function testTrackingPolicy($deferredExplicit, $persisted)
+    public function testTrackingPolicy($metadataClass, $deferredExplicit, $persisted)
     {
         $dummy = new Dummy();
 
-        $classMetadataInfo = $this->prophesize(ClassMetadataInfo::class);
-        $classMetadataInfo->isChangeTrackingDeferredExplicit()->willReturn($deferredExplicit)->shouldBeCalled();
+        $classMetadataInfo = $this->prophesize($metadataClass);
+        if (method_exists($metadataClass, 'isChangeTrackingDeferredExplicit')) {
+            $classMetadataInfo->isChangeTrackingDeferredExplicit()->willReturn($deferredExplicit)->shouldBeCalled();
+        } else {
+            $persisted = false;
+        }
 
         $objectManagerProphecy = $this->prophesize(ObjectManager::class);
         $objectManagerProphecy->getClassMetadata(Dummy::class)->willReturn($classMetadataInfo)->shouldBeCalled();

@@ -41,6 +41,10 @@ class SwaggerCommandTest extends KernelTestCase
         $this->tester = new ApplicationTester($application);
     }
 
+    /**
+     * @group legacy
+     * @expectedDeprecation The command "api:swagger:export" is deprecated for the spec version 3 use "api:openapi:export".
+     */
     public function testExecuteWithAliasVersion3()
     {
         $this->tester->run(['command' => 'api:swagger:export', '--spec-version' => 3]);
@@ -48,13 +52,10 @@ class SwaggerCommandTest extends KernelTestCase
         $this->assertJson($this->tester->getDisplay());
     }
 
-    public function testExecuteOpenApiVersion2()
-    {
-        $this->tester->run(['command' => 'api:openapi:export']);
-
-        $this->assertJson($this->tester->getDisplay());
-    }
-
+    /**
+     * @group legacy
+     * @expectedDeprecation The command "api:swagger:export" is deprecated for the spec version 3 use "api:openapi:export".
+     */
     public function testExecuteWithYamlVersion3()
     {
         $this->tester->run(['command' => 'api:swagger:export', '--yaml' => true, '--spec-version' => 3]);
@@ -70,7 +71,8 @@ class SwaggerCommandTest extends KernelTestCase
       operationId: getDummyCarCollection
 YAML;
 
-        $this->assertStringContainsString($expected, $result, 'nested object should be present.');
+        // Windows uses \r\n as PHP_EOL but symfony exports YAML with \n
+        $this->assertStringContainsString(str_replace(PHP_EOL, "\n", $expected), $result, 'nested object should be present.');
 
         $expected = <<<YAML
   '/dummy_cars/{id}':
@@ -79,7 +81,7 @@ YAML;
       operationId: getDummyCarItem
 YAML;
 
-        $this->assertStringContainsString($expected, $result, 'arrays should be correctly formatted.');
+        $this->assertStringContainsString(str_replace(PHP_EOL, "\n", $expected), $result, 'arrays should be correctly formatted.');
         $this->assertStringContainsString('openapi: 3.0.2', $result);
 
         $expected = <<<YAML
@@ -90,23 +92,14 @@ info:
     This is a test API.
     Made with love
 YAML;
-        $this->assertStringContainsString($expected, $result, 'multiline formatting must be preserved (using literal style).');
-    }
-
-    public function testExecuteOpenApiVersion2WithYaml()
-    {
-        $this->tester->run(['command' => 'api:openapi:export', '--yaml' => true]);
-
-        $result = $this->tester->getDisplay();
-        $this->assertYaml($result);
-        $this->assertStringContainsString("swagger: '2.0'", $result);
+        $this->assertStringContainsString(str_replace(PHP_EOL, "\n", $expected), $result, 'multiline formatting must be preserved (using literal style).');
     }
 
     public function testExecuteWithBadArguments()
     {
         $this->expectException(InvalidOptionException::class);
         $this->expectExceptionMessage('This tool only supports versions 2, 3 of the OpenAPI specification ("foo" given).');
-        $this->tester->run(['command' => 'api:openapi:export', '--spec-version' => 'foo', '--yaml' => true]);
+        $this->tester->run(['command' => 'api:swagger:export', '--spec-version' => 'foo', '--yaml' => true]);
     }
 
     public function testWriteToFile()

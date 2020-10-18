@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\Bridge\Symfony\Bundle\DependencyInjection\Compiler;
 
 use ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\Compiler\MetadataAwareNameConverterPass;
+use ApiPlatform\Core\Tests\ProphecyTrait;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Symfony\Component\DependencyInjection\Alias;
@@ -27,6 +28,8 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class MetadataAwareNameConverterPassTest extends TestCase
 {
+    use ProphecyTrait;
+
     public function testConstruct()
     {
         $this->assertInstanceOf(CompilerPassInterface::class, new MetadataAwareNameConverterPass());

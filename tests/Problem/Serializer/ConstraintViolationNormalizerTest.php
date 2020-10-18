@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\Problem\Serializer;
 
 use ApiPlatform\Core\Problem\Serializer\ConstraintViolationListNormalizer;
+use ApiPlatform\Core\Tests\ProphecyTrait;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
@@ -26,6 +27,8 @@ use Symfony\Component\Validator\ConstraintViolationList;
  */
 class ConstraintViolationNormalizerTest extends TestCase
 {
+    use ProphecyTrait;
+
     public function testSupportNormalization()
     {
         $nameConverterProphecy = $this->prophesize(NameConverterInterface::class);
@@ -57,8 +60,7 @@ class ConstraintViolationNormalizerTest extends TestCase
         $expected = [
             'type' => 'https://tools.ietf.org/html/rfc2616#section-10',
             'title' => 'An error occurred',
-            'detail' => '_d: a
-_4: 1',
+            'detail' => "_d: a\n_4: 1",
             'violations' => [
                 [
                     'propertyPath' => '_d',

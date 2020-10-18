@@ -17,6 +17,7 @@ use ApiPlatform\Core\HttpCache\EventListener\AddHeadersListener;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
+use ApiPlatform\Core\Tests\ProphecyTrait;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -27,6 +28,8 @@ use Symfony\Component\HttpKernel\Event\ResponseEvent;
  */
 class AddHeadersListenerTest extends TestCase
 {
+    use ProphecyTrait;
+
     public function testDoNotSetHeaderWhenMethodNotCacheable()
     {
         $request = new Request([], [], ['_api_resource_class' => Dummy::class, '_api_item_operation_name' => 'get']);
@@ -152,5 +155,109 @@ class AddHeadersListenerTest extends TestCase
 
         $this->assertSame('max-age=123, public, s-maxage=456, stale-if-error=70, stale-while-revalidate=928', $response->headers->get('Cache-Control'));
         $this->assertSame(['Vary-1', 'Vary-2'], $response->getVary());
+    }
+
+    public function testSetHeadersFromResourceMetadataMarkedAsPrivate()
+    {
+        $request = new Request([], [], ['_api_resource_class' => Dummy::class, '_api_item_operation_name' => 'get']);
+        $response = new Response('some content', 200);
+
+        $event = $this->prophesize(ResponseEvent::class);
+        $event->getRequest()->willReturn($request)->shouldBeCalled();
+        $event->getResponse()->willReturn($response)->shouldBeCalled();
+
+        $metadata = new ResourceMetadata(null, null, null, null, null, [
+            'cache_headers' => [
+                'max_age' => 123,
+                'public' => false,
+                'shared_max_age' => 456,
+            ],
+        ]);
+        $factory = $this->prophesize(ResourceMetadataFactoryInterface::class);
+        $factory->create(Dummy::class)->willReturn($metadata)->shouldBeCalled();
+
+        $listener = new AddHeadersListener(true, 100, 200, [], true, $factory->reveal());
+        $listener->onKernelResponse($event->reveal());
+
+        $this->assertSame('max-age=123, private', $response->headers->get('Cache-Control'));
+
+        // resource's cache marked as private must not contain s-maxage
+        $this->assertStringNotContainsString('s-maxage', $response->headers->get('Cache-Control'));
+    }
+
+    public function testSetHeadersFromResourceMetadataMarkedAsPublic()
+    {
+        $request = new Request([], [], ['_api_resource_class' => Dummy::class, '_api_item_operation_name' => 'get']);
+        $response = new Response('some content', 200);
+
+        $event = $this->prophesize(ResponseEvent::class);
+        $event->getRequest()->willReturn($request)->shouldBeCalled();
+        $event->getResponse()->willReturn($response)->shouldBeCalled();
+
+        $metadata = new ResourceMetadata(null, null, null, null, null, [
+            'cache_headers' => [
+                'max_age' => 123,
+                'public' => true,
+                'shared_max_age' => 456,
+            ],
+        ]);
+        $factory = $this->prophesize(ResourceMetadataFactoryInterface::class);
+        $factory->create(Dummy::class)->willReturn($metadata)->shouldBeCalled();
+
+        $listener = new AddHeadersListener(true, 100, 200, [], true, $factory->reveal());
+        $listener->onKernelResponse($event->reveal());
+
+        $this->assertSame('max-age=123, public, s-maxage=456', $response->headers->get('Cache-Control'));
+    }
+
+    public function testSetHeadersFromResourceMetadataWithNoPrivacy()
+    {
+        $request = new Request([], [], ['_api_resource_class' => Dummy::class, '_api_item_operation_name' => 'get']);
+        $response = new Response('some content', 200);
+
+        $event = $this->prophesize(ResponseEvent::class);
+        $event->getRequest()->willReturn($request)->shouldBeCalled();
+        $event->getResponse()->willReturn($response)->shouldBeCalled();
+
+        $metadata = new ResourceMetadata(null, null, null, null, null, [
+            'cache_headers' => [
+                'max_age' => 123,
+                'shared_max_age' => 456,
+            ],
+        ]);
+        $factory = $this->prophesize(ResourceMetadataFactoryInterface::class);
+        $factory->create(Dummy::class)->willReturn($metadata)->shouldBeCalled();
+
+        $listener = new AddHeadersListener(true, 100, 200, [], true, $factory->reveal());
+        $listener->onKernelResponse($event->reveal());
+
+        $this->assertSame('max-age=123, public, s-maxage=456', $response->headers->get('Cache-Control'));
+    }
+
+    public function testSetHeadersFromResourceMetadataWithNoPrivacyDefaultsPrivate()
+    {
+        $request = new Request([], [], ['_api_resource_class' => Dummy::class, '_api_item_operation_name' => 'get']);
+        $response = new Response('some content', 200);
+
+        $event = $this->prophesize(ResponseEvent::class);
+        $event->getRequest()->willReturn($request)->shouldBeCalled();
+        $event->getResponse()->willReturn($response)->shouldBeCalled();
+
+        $metadata = new ResourceMetadata(null, null, null, null, null, [
+            'cache_headers' => [
+                'max_age' => 123,
+                'shared_max_age' => 456,
+            ],
+        ]);
+        $factory = $this->prophesize(ResourceMetadataFactoryInterface::class);
+        $factory->create(Dummy::class)->willReturn($metadata)->shouldBeCalled();
+
+        $listener = new AddHeadersListener(true, 100, 200, ['Accept', 'Accept-Encoding'], false, $factory->reveal());
+        $listener->onKernelResponse($event->reveal());
+
+        $this->assertSame('max-age=123, private', $response->headers->get('Cache-Control'));
+
+        // resource's cache marked as private must not contain s-maxage
+        $this->assertStringNotContainsString('s-maxage', $response->headers->get('Cache-Control'));
     }
 }

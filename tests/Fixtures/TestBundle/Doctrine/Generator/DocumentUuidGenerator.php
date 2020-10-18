@@ -15,11 +15,23 @@ namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Doctrine\Generator;
 
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Doctrine\ODM\MongoDB\Id\AbstractIdGenerator;
+use Doctrine\ODM\MongoDB\Id\IdGenerator;
 
-class DocumentUuidGenerator extends AbstractIdGenerator
-{
-    public function generate(DocumentManager $dm, $document): Uuid
+if (interface_exists(IdGenerator::class)) {
+    class DocumentUuidGenerator implements IdGenerator
     {
-        return new Uuid();
+        public function generate(DocumentManager $dm, object $document): Uuid
+        {
+            return new Uuid();
+        }
+    }
+} else {
+    // Support for old versions of Doctrine MongoDB
+    class DocumentUuidGenerator extends AbstractIdGenerator
+    {
+        public function generate(DocumentManager $dm, $document): Uuid
+        {
+            return new Uuid();
+        }
     }
 }

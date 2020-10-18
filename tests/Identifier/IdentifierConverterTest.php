@@ -19,6 +19,7 @@ use ApiPlatform\Core\Identifier\Normalizer\DateTimeIdentifierDenormalizer;
 use ApiPlatform\Core\Identifier\Normalizer\IntegerDenormalizer;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
+use ApiPlatform\Core\Tests\ProphecyTrait;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\PropertyInfo\Type;
 
@@ -27,6 +28,8 @@ use Symfony\Component\PropertyInfo\Type;
  */
 class IdentifierConverterTest extends TestCase
 {
+    use ProphecyTrait;
+
     public function testCompositeIdentifier()
     {
         $identifier = 'a=1;c=2;d=2015-04-05';

@@ -15,6 +15,7 @@ namespace ApiPlatform\Core\Tests\GraphQl\Type;
 
 use ApiPlatform\Core\GraphQl\Type\Definition\TypeInterface;
 use ApiPlatform\Core\GraphQl\Type\TypesFactory;
+use ApiPlatform\Core\Tests\ProphecyTrait;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 
@@ -23,6 +24,8 @@ use Psr\Container\ContainerInterface;
  */
 class TypesFactoryTest extends TestCase
 {
+    use ProphecyTrait;
+
     public function testGetTypes()
     {
         $typeProphecy = $this->prophesize(TypeInterface::class);

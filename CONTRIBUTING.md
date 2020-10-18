@@ -66,19 +66,19 @@ that you did not make in your PR, you're doing it wrong.
 
 ### Tests
 
-On `api-platform/core` there are two kinds of tests: unit (`phpunit`) and integration tests (`behat`).
+On `api-platform/core` there are two kinds of tests: unit (`phpunit` through `simple-phpunit`) and integration tests (`behat`).
 
-Both `phpunit` and `behat` are development dependencies and should be available in the `vendor` directory.
+Both `simple-phpunit` and `behat` are development dependencies and should be available in the `vendor` directory.
 
 #### PHPUnit and Coverage Generation
 
 To launch unit tests:
 
-    vendor/bin/phpunit --stop-on-failure -vvv
+    vendor/bin/simple-phpunit --stop-on-failure -vvv
 
 If you want coverage, you will need the `pcov` PHP extension and run:
 
-    vendor/bin/phpunit --coverage-html coverage -vvv --stop-on-failure
+    vendor/bin/simple-phpunit --coverage-html coverage -vvv --stop-on-failure
 
 Sometimes there might be an error with too many open files when generating coverage. To fix this, you can increase the `ulimit`, for example:
 
@@ -131,7 +131,7 @@ If you include code from another project, please mention it in the Pull Request 
 
 # Releases
 
-This section is dedicated to maintainers.
+This section is for maintainers.
 
 1. Update the JavaScript dependencies by running `./update-js.sh` (always check if it works in a browser)
 2. Update the `CHANGELOG.md` file (be sure to include Pull Request numbers when appropriate)

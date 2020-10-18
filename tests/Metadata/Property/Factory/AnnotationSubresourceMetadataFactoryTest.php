@@ -21,6 +21,7 @@ use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 use ApiPlatform\Core\Metadata\Property\SubresourceMetadata;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RelatedDummy;
+use ApiPlatform\Core\Tests\ProphecyTrait;
 use Doctrine\Common\Annotations\Reader;
 use Doctrine\Common\Collections\ArrayCollection;
 use PHPUnit\Framework\TestCase;
@@ -29,6 +30,8 @@ use Symfony\Component\PropertyInfo\Type;
 
 class AnnotationSubresourceMetadataFactoryTest extends TestCase
 {
+    use ProphecyTrait;
+
     /**
      * @dataProvider dependenciesProvider
      */

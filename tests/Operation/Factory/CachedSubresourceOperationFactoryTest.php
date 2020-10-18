@@ -16,6 +16,7 @@ namespace ApiPlatform\Core\Tests\Operation\Factory;
 use ApiPlatform\Core\Operation\Factory\CachedSubresourceOperationFactory;
 use ApiPlatform\Core\Operation\Factory\SubresourceOperationFactoryInterface;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
+use ApiPlatform\Core\Tests\ProphecyTrait;
 use PHPUnit\Framework\TestCase;
 use Psr\Cache\CacheException;
 use Psr\Cache\CacheItemInterface;
@@ -26,6 +27,8 @@ use Psr\Cache\CacheItemPoolInterface;
  */
 class CachedSubresourceOperationFactoryTest extends TestCase
 {
+    use ProphecyTrait;
+
     public function testCreateWithItemHit()
     {
         $cacheItem = $this->prophesize(CacheItemInterface::class);

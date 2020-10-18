@@ -16,6 +16,7 @@ namespace ApiPlatform\Core\Serializer;
 use ApiPlatform\Core\Api\ResourceClassResolverInterface;
 use ApiPlatform\Core\DataProvider\PaginatorInterface;
 use ApiPlatform\Core\DataProvider\PartialPaginatorInterface;
+use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use Symfony\Component\Serializer\Normalizer\CacheableSupportsMethodInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerAwareInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerAwareTrait;
@@ -40,11 +41,13 @@ abstract class AbstractCollectionNormalizer implements NormalizerInterface, Norm
 
     protected $resourceClassResolver;
     protected $pageParameterName;
+    protected $resourceMetadataFactory;
 
-    public function __construct(ResourceClassResolverInterface $resourceClassResolver, string $pageParameterName)
+    public function __construct(ResourceClassResolverInterface $resourceClassResolver, string $pageParameterName, ResourceMetadataFactoryInterface $resourceMetadataFactory = null)
     {
         $this->resourceClassResolver = $resourceClassResolver;
         $this->pageParameterName = $pageParameterName;
+        $this->resourceMetadataFactory = $resourceMetadataFactory;
     }
 
     /**

@@ -12,7 +12,7 @@
             <tag name="property_info.type_extractor" priority="-999" />
         </service>
 
-        <service id="api_platform.doctrine.metadata_factory" class="Doctrine\Common\Persistence\Mapping\ClassMetadataFactory" public="false">
+        <service id="api_platform.doctrine.metadata_factory" class="Doctrine\Persistence\Mapping\ClassMetadataFactory" public="false">
             <factory service="doctrine_mongodb.odm.default_document_manager" method="getMetadataFactory"/>
         </service>
 

@@ -179,6 +179,7 @@
             <argument type="service" id="api_platform.graphql.action.graphiql" />
             <argument type="service" id="api_platform.graphql.action.graphql_playground" />
             <argument type="service" id="serializer" />
+            <argument type="service" id="api_platform.graphql.error_handler" />
             <argument>%kernel.debug%</argument>
             <argument>%api_platform.graphql.graphiql.enabled%</argument>
             <argument>%api_platform.graphql.graphql_playground.enabled%</argument>
@@ -198,6 +199,10 @@
             <argument>%api_platform.graphql.graphql_playground.enabled%</argument>
             <argument>%api_platform.title%</argument>
         </service>
+
+        <!-- Error -->
+
+        <service id="api_platform.graphql.error_handler" class="ApiPlatform\Core\GraphQl\Error\ErrorHandler" public="false" />
 
         <!-- Serializer -->
 

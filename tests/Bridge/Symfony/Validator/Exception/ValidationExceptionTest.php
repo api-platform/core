@@ -35,10 +35,10 @@ class ValidationExceptionTest extends TestCase
         $this->assertInstanceOf(RuntimeException::class, $e);
         $this->assertInstanceOf(\RuntimeException::class, $e);
 
-        $this->assertEquals(<<<TXT
+        $this->assertEquals(str_replace(PHP_EOL, "\n", <<<TXT
 message 1
 foo: message 2
 TXT
-, $e->__toString());
+), $e->__toString());
     }
 }

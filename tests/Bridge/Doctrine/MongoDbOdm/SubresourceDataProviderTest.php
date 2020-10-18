@@ -28,8 +28,7 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\Dummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\RelatedDummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\RelatedOwningDummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\ThirdLevel;
-use Doctrine\Common\Persistence\ManagerRegistry;
-use Doctrine\Common\Persistence\ObjectRepository;
+use ApiPlatform\Core\Tests\ProphecyTrait;
 use Doctrine\ODM\MongoDB\Aggregation\Builder;
 use Doctrine\ODM\MongoDB\Aggregation\Stage\Lookup;
 use Doctrine\ODM\MongoDB\Aggregation\Stage\Match;
@@ -37,6 +36,8 @@ use Doctrine\ODM\MongoDB\DocumentManager;
 use Doctrine\ODM\MongoDB\Iterator\Iterator;
 use Doctrine\ODM\MongoDB\Mapping\ClassMetadata;
 use Doctrine\ODM\MongoDB\Repository\DocumentRepository;
+use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ObjectRepository;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 
@@ -47,6 +48,8 @@ use Prophecy\Argument;
  */
 class SubresourceDataProviderTest extends TestCase
 {
+    use ProphecyTrait;
+
     private $resourceMetadataFactoryProphecy;
 
     /**

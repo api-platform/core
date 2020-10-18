@@ -21,6 +21,7 @@ use ApiPlatform\Core\GraphQl\Type\TypesContainerInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
+use ApiPlatform\Core\Tests\ProphecyTrait;
 use GraphQL\Type\Definition\InputObjectType;
 use GraphQL\Type\Definition\InterfaceType;
 use GraphQL\Type\Definition\ListOfType;
@@ -39,6 +40,8 @@ use Symfony\Component\PropertyInfo\Type;
  */
 class TypeBuilderTest extends TestCase
 {
+    use ProphecyTrait;
+
     /** @var ObjectProphecy */
     private $typesContainerProphecy;
 

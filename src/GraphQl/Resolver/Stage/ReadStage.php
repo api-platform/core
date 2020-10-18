@@ -21,6 +21,7 @@ use ApiPlatform\Core\GraphQl\Resolver\Util\IdentifierTrait;
 use ApiPlatform\Core\GraphQl\Serializer\ItemNormalizer;
 use ApiPlatform\Core\GraphQl\Serializer\SerializerContextBuilderInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
+use ApiPlatform\Core\Util\ArrayTrait;
 use ApiPlatform\Core\Util\ClassInfoTrait;
 use GraphQL\Type\Definition\ResolveInfo;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -36,6 +37,7 @@ final class ReadStage implements ReadStageInterface
 {
     use ClassInfoTrait;
     use IdentifierTrait;
+    use ArrayTrait;
 
     private $resourceMetadataFactory;
     private $iriConverter;
@@ -133,6 +135,22 @@ final class ReadStage implements ReadStageInterface
             if (\is_array($value)) {
                 if (strpos($name, '_list')) {
                     $name = substr($name, 0, \strlen($name) - \strlen('_list'));
+                }
+
+                // If the value contains arrays, we need to merge them for the filters to understand this syntax, proper to GraphQL to preserve the order of the arguments.
+                if ($this->isSequentialArrayOfArrays($value)) {
+                    if (\count($value[0]) > 1) {
+                        $deprecationMessage = "The filter syntax \"$name: {";
+                        $filterArgsOld = [];
+                        $filterArgsNew = [];
+                        foreach ($value[0] as $filterArgName => $filterArgValue) {
+                            $filterArgsOld[] = "$filterArgName: \"$filterArgValue\"";
+                            $filterArgsNew[] = sprintf('{%s: "%s"}', $filterArgName, $filterArgValue);
+                        }
+                        $deprecationMessage .= sprintf('%s}" is deprecated since API Platform 2.6, use the following syntax instead: "%s: [%s]".', implode(', ', $filterArgsOld), $name, implode(', ', $filterArgsNew));
+                        @trigger_error($deprecationMessage, E_USER_DEPRECATED);
+                    }
+                    $value = array_merge(...$value);
                 }
                 $filters[$name] = $this->getNormalizedFilters($value);
             }

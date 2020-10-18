@@ -95,7 +95,7 @@ Feature: Documentation support
     And the JSON node "paths./related_dummies/{id}/related_to_dummy_friends.get.parameters" should have 6 elements
 
     # Subcollection - check schema
-    And the JSON node "paths./related_dummies/{id}/related_to_dummy_friends.get.responses.200.content.application/ld+json.schema.properties.hydra:member.items.$ref" should be equal to "#/components/schemas/RelatedToDummyFriend:jsonld-fakemanytomany"
+    And the JSON node "paths./related_dummies/{id}/related_to_dummy_friends.get.responses.200.content.application/ld+json.schema.properties.hydra:member.items.$ref" should be equal to "#/components/schemas/RelatedToDummyFriend.jsonld-fakemanytomany"
 
     # Deprecations
     And the JSON node "paths./dummies.get.deprecated" should not exist
@@ -112,11 +112,9 @@ Feature: Documentation support
     Then the response status code should be 200
     And I should see text matching "My Dummy API"
     And I should see text matching "openapi"
-    And I should see text matching "3.0.2"
 
   Scenario: OpenAPI UI is enabled for an arbitrary endpoint
     Given I add "Accept" header equal to "text/html"
     And I send a "GET" request to "/dummies?spec_version=3"
     Then the response status code should be 200
     And I should see text matching "openapi"
-    And I should see text matching "3.0.2"

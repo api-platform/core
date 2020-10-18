@@ -11,6 +11,7 @@
 
 declare(strict_types=1);
 
+use ApiPlatform\Core\Bridge\Symfony\Bundle\Test\ApiTestCase;
 use Behat\Gherkin\Node\PyStringNode;
 use Behatch\Context\JsonContext as BaseJsonContext;
 use Behatch\HttpCall\HttpCallResultPool;
@@ -51,8 +52,11 @@ final class JsonContext extends BaseJsonContext
      */
     public function theJsonIsASupersetOf(PyStringNode $content)
     {
-        $actual = json_decode($this->httpCallResultPool->getResult()->getValue(), true);
-        Assert::assertArraySubset(json_decode($content->getRaw(), true), $actual);
+        $array = json_decode($this->httpCallResultPool->getResult()->getValue(), true);
+        $subset = json_decode($content->getRaw(), true);
+
+        // Compatibility with PHPUnit 7
+        method_exists(Assert::class, 'assertArraySubset') ? Assert::assertArraySubset($subset, $array) : ApiTestCase::assertArraySubset($subset, $array);
     }
 
     private function sortArrays($obj)

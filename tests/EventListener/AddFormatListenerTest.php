@@ -17,6 +17,7 @@ use ApiPlatform\Core\Api\FormatsProviderInterface;
 use ApiPlatform\Core\EventListener\AddFormatListener;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
+use ApiPlatform\Core\Tests\ProphecyTrait;
 use Negotiation\Negotiator;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
@@ -30,6 +31,8 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  */
 class AddFormatListenerTest extends TestCase
 {
+    use ProphecyTrait;
+
     public function testNoResourceClass()
     {
         $request = new Request();
