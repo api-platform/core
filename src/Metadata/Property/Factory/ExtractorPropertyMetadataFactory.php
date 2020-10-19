@@ -48,10 +48,8 @@ final class ExtractorPropertyMetadataFactory implements PropertyMetadataFactoryI
             }
         }
 
-        $isInterface = interface_exists($resourceClass);
-
         if (
-            !property_exists($resourceClass, $property) && !$isInterface ||
+            $this->doesIdentifierExist($resourceClass, $property) ||
             null === ($propertyMetadata = $this->extractor->getResources()[$resourceClass]['properties'][$property] ?? null)
         ) {
             return $this->handleNotFound($parentPropertyMetadata, $resourceClass, $property);
@@ -148,5 +146,30 @@ final class ExtractorPropertyMetadataFactory implements PropertyMetadataFactoryI
         }
 
         return new SubresourceMetadata($resourceClass, $isCollection, $maxDepth);
+    }
+
+
+    /**
+     * @param string $resourceClass
+     * @param string $property
+     *
+     * @return bool
+     */
+    private function doesIdentifierExist(string $resourceClass, string $property): bool
+    {
+        if (interface_exists($resourceClass)) {
+            return false;
+        }
+
+        if (property_exists($resourceClass, $property)) {
+            return true;
+        }
+
+        $getter = 'get' . ucfirst($property);
+        if (method_exists($resourceClass, $getter)) {
+            return true;
+        }
+
+        return false;
     }
 }
