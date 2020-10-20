@@ -122,7 +122,7 @@ jobs:
           composer update --no-progress --no-suggest --ansi
       - name: Install PHPUnit
         env:
-          SYMFONY_PHPUNIT_VERSION: '9.2'
+          SYMFONY_PHPUNIT_VERSION: '9.4'
         run: vendor/bin/simple-phpunit --version
       - name: Clear test app cache
         run: |
@@ -140,7 +140,7 @@ jobs:
         continue-on-error: true
       - name: Run PHPStan analysis
         env:
-          SYMFONY_PHPUNIT_VERSION: '9.2'
+          SYMFONY_PHPUNIT_VERSION: '9.4'
         run: vendor/bin/phpstan analyse --no-progress --no-interaction --ansi
 
   phpunit:
