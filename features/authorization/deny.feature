@@ -147,6 +147,7 @@ Feature: Authorization checking
     Then the response status code should be 200
     And the response should not contain "adminOnlyProperty"
     And I add "Authorization" header equal to "Basic YWRtaW46a2l0dGVu"
+    And I add "Accept" header equal to "application/ld+json"
     And I send a "GET" request to "/secured_dummies"
     Then the response status code should be 200
     And the response should contain "adminOnlyProperty"
