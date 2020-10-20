@@ -48,6 +48,7 @@ final class PublishMercureUpdatesListener
         'id' => true,
         'type' => true,
         'retry' => true,
+        'normalization_context' => true,
     ];
 
     use DispatchTrait;
@@ -215,7 +216,7 @@ final class PublishMercureUpdatesListener
             $data = $options['data'] ?? json_encode(['@id' => $object->id]);
         } else {
             $resourceClass = $this->getObjectClass($object);
-            $context = $this->resourceMetadataFactory->create($resourceClass)->getAttribute('normalization_context', []);
+            $context = $options['normalization_context'] ?? $this->resourceMetadataFactory->create($resourceClass)->getAttribute('normalization_context', []);
 
             $iri = $options['topics'] ?? $this->iriConverter->getIriFromItem($object, UrlGeneratorInterface::ABS_URL);
             $data = $options['data'] ?? $this->serializer->serialize($object, key($this->formats), $context);
