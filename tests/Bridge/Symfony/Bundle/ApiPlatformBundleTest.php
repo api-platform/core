@@ -21,6 +21,7 @@ use ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\Compiler\FilterPa
 use ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\Compiler\GraphQlMutationResolverPass;
 use ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\Compiler\GraphQlQueryResolverPass;
 use ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\Compiler\GraphQlTypePass;
+use ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\Compiler\HandleDeprecatedPass;
 use ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\Compiler\MetadataAwareNameConverterPass;
 use ApiPlatform\Core\Tests\ProphecyTrait;
 use PHPUnit\Framework\TestCase;
@@ -45,6 +46,7 @@ class ApiPlatformBundleTest extends TestCase
         $containerProphecy->addCompilerPass(Argument::type(GraphQlTypePass::class))->shouldBeCalled();
         $containerProphecy->addCompilerPass(Argument::type(GraphQlQueryResolverPass::class))->shouldBeCalled();
         $containerProphecy->addCompilerPass(Argument::type(GraphQlMutationResolverPass::class))->shouldBeCalled();
+        $containerProphecy->addCompilerPass(Argument::type(HandleDeprecatedPass::class))->shouldBeCalled();
         $containerProphecy->addCompilerPass(Argument::type(MetadataAwareNameConverterPass::class))->shouldBeCalled();
 
         $bundle = new ApiPlatformBundle();
