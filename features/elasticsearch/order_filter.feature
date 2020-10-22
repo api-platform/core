@@ -5,7 +5,8 @@ Feature: Order filter on collections from Elasticsearch
   I need to retrieve collections ordered properties
 
   Scenario: Get collection ordered in ascending order on an identifier property
-    When I send a "GET" request to "/tweets?order%5Bid%5D=asc"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/tweets?order%5Bid%5D=asc"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
@@ -64,7 +65,8 @@ Feature: Order filter on collections from Elasticsearch
     """
 
   Scenario: Get collection ordered in descending order on an identifier property
-    When I send a "GET" request to "/tweets?order%5Bid%5D=desc"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/tweets?order%5Bid%5D=desc"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
@@ -123,7 +125,8 @@ Feature: Order filter on collections from Elasticsearch
     """
 
   Scenario: Get collection ordered in ascending order on an identifier property and in ascending order on a nested identifier property
-    When I send a "GET" request to "/tweets?order%5Bauthor.id%5D=asc&order%5Bid%5D=asc"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/tweets?order%5Bauthor.id%5D=asc&order%5Bid%5D=asc"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
@@ -182,7 +185,8 @@ Feature: Order filter on collections from Elasticsearch
     """
 
   Scenario: Get collection ordered in descending order on an identifier property and in ascending order on a nested identifier property
-    When I send a "GET" request to "/tweets?order%5Bauthor.id%5D=asc&order%5Bid%5D=desc"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/tweets?order%5Bauthor.id%5D=asc&order%5Bid%5D=desc"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
@@ -241,7 +245,8 @@ Feature: Order filter on collections from Elasticsearch
     """
 
   Scenario: Get collection ordered in ascending order on an identifier property and in descending order on a nested identifier property
-    When I send a "GET" request to "/tweets?order%5Bauthor.id%5D=desc&order%5Bid%5D=asc"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/tweets?order%5Bauthor.id%5D=desc&order%5Bid%5D=asc"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
@@ -300,7 +305,8 @@ Feature: Order filter on collections from Elasticsearch
     """
 
   Scenario: Get collection ordered in descending order on an identifier property and in descending order on a nested identifier property
-    When I send a "GET" request to "/tweets?order%5Bauthor.id%5D=desc&order%5Bid%5D=desc"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/tweets?order%5Bauthor.id%5D=desc&order%5Bid%5D=desc"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"

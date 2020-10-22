@@ -5,7 +5,8 @@ Feature: Term filter on collections from Elasticsearch
   I need to search for resources containing the exact terms specified
 
   Scenario: Term filter on an identifier property
-    When I send a "GET" request to "/users?id=%2Fusers%2Fcf875c95-41ab-48df-af66-38c74db18f72"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/users?id=%2Fusers%2Fcf875c95-41ab-48df-af66-38c74db18f72"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
@@ -40,7 +41,8 @@ Feature: Term filter on collections from Elasticsearch
     """
 
   Scenario: Term filter on a property of keyword type
-    When I send a "GET" request to "/users?gender=female"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/users?gender=female"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
@@ -82,7 +84,8 @@ Feature: Term filter on collections from Elasticsearch
     """
 
   Scenario: Combining term filters on a property of integer type and a property of keyword type
-    When I send a "GET" request to "/users?age=42&gender=female"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/users?age=42&gender=female"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
@@ -127,7 +130,8 @@ Feature: Term filter on collections from Elasticsearch
     """
 
   Scenario: Combining term filters on a property of integer type and a property of keyword type
-    When I send a "GET" request to "/users?age=42&gender=male"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/users?age=42&gender=male"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
@@ -156,7 +160,8 @@ Feature: Term filter on collections from Elasticsearch
     """
 
   Scenario: Term filter on a property of text type
-    When I send a "GET" request to "/users?firstName=xavier"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/users?firstName=xavier"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
@@ -192,7 +197,8 @@ Feature: Term filter on collections from Elasticsearch
     """
 
   Scenario: Term filter on a nested identifier property
-    When I send a "GET" request to "/users?tweets.id=%2Ftweets%2Fdcaef1db-225d-442b-960e-5de6984a44be"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/users?tweets.id=%2Ftweets%2Fdcaef1db-225d-442b-960e-5de6984a44be"
     Then the response should be in JSON
     Then the response status code should be 200
     And the response should be in JSON
@@ -228,7 +234,8 @@ Feature: Term filter on collections from Elasticsearch
     """
 
   Scenario: Term filter on a nested property of date type
-    When I send a "GET" request to "/users?tweets.date=2018-02-02%2014%3A14%3A14"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/users?tweets.date=2018-02-02%2014%3A14%3A14"
     Then the response should be in JSON
     Then the response status code should be 200
     And the response should be in JSON

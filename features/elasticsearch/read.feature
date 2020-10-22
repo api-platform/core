@@ -5,7 +5,8 @@ Feature: Retrieve from Elasticsearch
   I need to be able to retrieve JSON-LD encoded resources from Elasticsearch
 
   Scenario: Get a resource
-    When I send a "GET" request to "/users/116b83f8-6c32-48d8-8e28-c5c247532d3f"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/users/116b83f8-6c32-48d8-8e28-c5c247532d3f"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
@@ -47,11 +48,13 @@ Feature: Retrieve from Elasticsearch
     """
 
   Scenario: Get a not found exception
-    When I send a "GET" request to "/users/12345678-abcd-1234-abcdefgh"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/users/12345678-abcd-1234-abcdefgh"
     Then the response status code should be 404
 
   Scenario: Get the first page of a collection
-    When I send a "GET" request to "/tweets"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/tweets"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
@@ -166,7 +169,8 @@ Feature: Retrieve from Elasticsearch
     """
 
   Scenario: Get a page of a collection
-    When I send a "GET" request to "/tweets?page=3"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/tweets?page=3"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
@@ -282,7 +286,8 @@ Feature: Retrieve from Elasticsearch
     """
 
   Scenario: Get the last page of a collection
-    When I send a "GET" request to "/tweets?page=7"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/tweets?page=7"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"

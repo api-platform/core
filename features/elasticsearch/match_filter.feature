@@ -5,7 +5,8 @@ Feature: Match filter on collections from Elasticsearch
   I need to search for resources matching the text specified
 
   Scenario: Match filter on a text property
-    When I send a "GET" request to "/tweets?message=Good%20job"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/tweets?message=Good%20job"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
@@ -55,7 +56,8 @@ Feature: Match filter on collections from Elasticsearch
     """
 
   Scenario: Match filter on a text property
-    When I send a "GET" request to "/tweets?message%5B%5D=Good%20job&message%5B%5D=run"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/tweets?message%5B%5D=Good%20job&message%5B%5D=run"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
@@ -118,7 +120,8 @@ Feature: Match filter on collections from Elasticsearch
     """
 
   Scenario: Match filter on a nested property of text type
-    When I send a "GET" request to "/tweets?author.firstName=Caroline"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/tweets?author.firstName=Caroline"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
@@ -168,7 +171,8 @@ Feature: Match filter on collections from Elasticsearch
     """
 
   Scenario: Combining match filters on properties of text type and a nested property of text type
-    When I send a "GET" request to "/tweets?message%5B%5D=Good%20job&message%5B%5D=run&author.firstName=Caroline"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/tweets?message%5B%5D=Good%20job&message%5B%5D=run&author.firstName=Caroline"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
