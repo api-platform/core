@@ -7,7 +7,8 @@ Feature: Filters on collections
   @createSchema
   Scenario: Error when getting collection with nested properties if references are not correctly stored (owning side)
     Given there is a dummy object with a fourth level relation
-    When I send a "GET" request to "/dummies?relatedDummy.thirdLevel.badFourthLevel.level=4"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/dummies?relatedDummy.thirdLevel.badFourthLevel.level=4"
     Then the response status code should be 500
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
@@ -18,7 +19,8 @@ Feature: Filters on collections
     And the JSON node "trace" should exist
 
   Scenario: Error when getting collection with nested properties if references are not correctly stored (not owning side)
-    When I send a "GET" request to "/dummies?relatedDummy.thirdLevel.fourthLevel.badThirdLevel.level=3"
+    When When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/dummies?relatedDummy.thirdLevel.fourthLevel.badThirdLevel.level=3"
     Then the response status code should be 500
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
