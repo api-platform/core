@@ -241,7 +241,8 @@ Feature: Subresource support
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
 
   Scenario: Get the embedded relation subresource item at the third level
-    When I send a "GET" request to "/dummies/1/related_dummies/1/third_level"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/dummies/1/related_dummies/1/third_level"
     And the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
@@ -260,7 +261,8 @@ Feature: Subresource support
     """
 
   Scenario: Get the embedded relation subresource item at the fourth level
-    When I send a "GET" request to "/dummies/1/related_dummies/1/third_level/fourth_level"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/dummies/1/related_dummies/1/third_level/fourth_level"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
@@ -278,7 +280,8 @@ Feature: Subresource support
 
   Scenario: Get offers subresource from aggregate offers subresource
     Given I have a product with offers
-    When I send a "GET" request to "/dummy_products/2/offers/1/offers"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/dummy_products/2/offers/1/offers"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
@@ -302,7 +305,8 @@ Feature: Subresource support
     """
 
   Scenario: Get offers subresource from aggregate offers subresource
-    When I send a "GET" request to "/dummy_aggregate_offers/1/offers"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/dummy_aggregate_offers/1/offers"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
@@ -327,7 +331,8 @@ Feature: Subresource support
 
   Scenario: The recipient of the person's greetings should be empty
     Given there is a person named "Alice" greeting with a "hello" message
-    When I send a "GET" request to "/people/1/sent_greetings"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/people/1/sent_greetings"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
@@ -354,7 +359,8 @@ Feature: Subresource support
 
   Scenario: The OneToOne subresource should be accessible from owned side
     Given there is a RelatedOwnedDummy object with OneToOne relation
-    When I send a "GET" request to "/related_owned_dummies/1/owning_dummy"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/related_owned_dummies/1/owning_dummy"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
@@ -386,7 +392,8 @@ Feature: Subresource support
 
   Scenario: The OneToOne subresource should be accessible from owning side
     Given there is a RelatedOwningDummy object with OneToOne relation
-    When I send a "GET" request to "/related_owning_dummies/1/owned_dummy"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/related_owning_dummies/1/owned_dummy"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
@@ -417,7 +424,8 @@ Feature: Subresource support
     """
 
   Scenario: Recursive resource
-    When I send a "GET" request to "/dummy_products/2"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/dummy_products/2"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"

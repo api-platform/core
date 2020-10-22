@@ -128,6 +128,9 @@ class DummyCar
     public function __construct()
     {
         $this->colors = new ArrayCollection();
+        $this->secondColors = new ArrayCollection();
+        $this->thirdColors = new ArrayCollection();
+        $this->uuid = new ArrayCollection();
     }
 
     public function getId()

@@ -31,7 +31,8 @@ Feature: Create-Retrieve-Update-Delete with a Overridden Operation context
     """
 
   Scenario: Get a resource
-    When I send a "GET" request to "/overridden_operation_dummies/1"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/overridden_operation_dummies/1"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
@@ -63,7 +64,8 @@ Feature: Create-Retrieve-Update-Delete with a Overridden Operation context
     Then the response status code should be 404
 
   Scenario: Get a collection
-    When I send a "GET" request to "/overridden_operation_dummies"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/overridden_operation_dummies"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
@@ -87,7 +89,8 @@ Feature: Create-Retrieve-Update-Delete with a Overridden Operation context
     """
 
   Scenario: Update a resource
-    When I add "Content-Type" header equal to "application/ld+json"
+    When I add "Accept" header equal to "application/ld+json"
+    And I add "Content-Type" header equal to "application/ld+json"
     And I send a "PUT" request to "/overridden_operation_dummies/1" with body:
       """
       {
@@ -111,7 +114,8 @@ Feature: Create-Retrieve-Update-Delete with a Overridden Operation context
       """
 
   Scenario: Get the final resource
-    When I send a "GET" request to "/overridden_operation_dummies/1"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/overridden_operation_dummies/1"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
@@ -128,6 +132,7 @@ Feature: Create-Retrieve-Update-Delete with a Overridden Operation context
     """
 
   Scenario: Delete a resource
-    When I send a "DELETE" request to "/overridden_operation_dummies/1"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "DELETE" request to "/overridden_operation_dummies/1"
     Then the response status code should be 204
     And the response should be empty
