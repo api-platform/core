@@ -8,6 +8,7 @@ Feature: Expose persisted object state
   @createSchema
   Scenario: Create a resource with truncable value should return the correct object state
     When I add "Content-Type" header equal to "application/ld+json"
+    And I add "Accept" header equal to "application/ld+json"
     And I send a "POST" request to "/truncated_dummies" with body:
     """
     {
@@ -29,6 +30,7 @@ Feature: Expose persisted object state
   @!mongodb
   Scenario: Update a resource with truncable value value should return the correct object state
     When I add "Content-Type" header equal to "application/ld+json"
+    And I add "Accept" header equal to "application/ld+json"
     And I send a "PUT" request to "/truncated_dummies/1" with body:
     """
     {
