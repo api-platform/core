@@ -15,6 +15,7 @@ namespace ApiPlatform\Core\Tests\GraphQl\Resolver\Stage;
 
 use ApiPlatform\Core\GraphQl\Resolver\Stage\SecurityStage;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
+use ApiPlatform\Core\Metadata\Resource\OperationCollectionMetadata;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Security\ResourceAccessCheckerInterface;
 use ApiPlatform\Core\Tests\ProphecyTrait;
@@ -53,7 +54,7 @@ class SecurityStageTest extends TestCase
     public function testNoSecurity(): void
     {
         $resourceClass = 'myResource';
-        $this->resourceMetadataFactoryProphecy->create($resourceClass)->willReturn(new ResourceMetadata());
+        $this->resourceMetadataFactoryProphecy->create($resourceClass)->willReturn(new ResourceMetadata([new OperationCollectionMetadata('/dummies')]));
 
         $this->resourceAccessCheckerProphecy->isGranted(Argument::cetera())->shouldNotBeCalled();
 
@@ -66,9 +67,9 @@ class SecurityStageTest extends TestCase
         $resourceClass = 'myResource';
         $isGranted = 'not_granted';
         $extraVariables = ['extra' => false];
-        $resourceMetadata = (new ResourceMetadata())->withGraphql([
+        $resourceMetadata = (new ResourceMetadata([(new OperationCollectionMetadata('/dummies'))->withGraphql([
             $operationName => ['security' => $isGranted],
-        ]);
+        ])]));
         $this->resourceMetadataFactoryProphecy->create($resourceClass)->willReturn($resourceMetadata);
 
         $this->resourceAccessCheckerProphecy->isGranted($resourceClass, $isGranted, $extraVariables)->shouldBeCalled()->willReturn(true);
@@ -82,9 +83,9 @@ class SecurityStageTest extends TestCase
         $resourceClass = 'myResource';
         $isGranted = 'not_granted';
         $extraVariables = ['extra' => false];
-        $resourceMetadata = (new ResourceMetadata())->withGraphql([
+        $resourceMetadata = (new ResourceMetadata([(new OperationCollectionMetadata('/dummies'))->withGraphql([
             $operationName => ['security' => $isGranted],
-        ]);
+        ])]));
         $this->resourceMetadataFactoryProphecy->create($resourceClass)->willReturn($resourceMetadata);
 
         $this->resourceAccessCheckerProphecy->isGranted($resourceClass, $isGranted, $extraVariables)->shouldBeCalled()->willReturn(false);
@@ -107,9 +108,9 @@ class SecurityStageTest extends TestCase
         $operationName = 'item_query';
         $resourceClass = 'myResource';
         $isGranted = 'not_granted';
-        $resourceMetadata = (new ResourceMetadata())->withGraphql([
+        $resourceMetadata = (new ResourceMetadata([(new OperationCollectionMetadata('/dummies'))->withGraphql([
             $operationName => ['security' => $isGranted],
-        ]);
+        ])]));
         $this->resourceMetadataFactoryProphecy->create($resourceClass)->willReturn($resourceMetadata);
 
         $this->expectException(\LogicException::class);
@@ -122,7 +123,7 @@ class SecurityStageTest extends TestCase
         $this->securityStage = new SecurityStage($this->resourceMetadataFactoryProphecy->reveal(), null);
 
         $resourceClass = 'myResource';
-        $resourceMetadata = new ResourceMetadata();
+        $resourceMetadata = new ResourceMetadata([new OperationCollectionMetadata('/dummies')]);
         $this->resourceMetadataFactoryProphecy->create($resourceClass)->willReturn($resourceMetadata);
 
         $this->resourceAccessCheckerProphecy->isGranted(Argument::any())->shouldNotBeCalled();

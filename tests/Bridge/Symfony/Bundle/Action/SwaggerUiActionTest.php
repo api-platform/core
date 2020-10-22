@@ -17,6 +17,7 @@ use ApiPlatform\Core\Bridge\Symfony\Bundle\Action\SwaggerUiAction;
 use ApiPlatform\Core\Documentation\Documentation;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
+use ApiPlatform\Core\Metadata\Resource\OperationCollectionMetadata;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Metadata\Resource\ResourceNameCollection;
 use ApiPlatform\Core\Tests\ProphecyTrait;
@@ -54,7 +55,7 @@ class SwaggerUiActionTest extends TestCase
         $resourceNameCollectionFactoryProphecy->create()->willReturn(new ResourceNameCollection(['Foo', 'Bar']))->shouldBeCalled();
 
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadata('F'))->shouldBeCalled();
+        $resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadata([new OperationCollectionMetadata('/dummies', 'F')]))->shouldBeCalled();
 
         $normalizerProphecy = $this->prophesize(NormalizerInterface::class);
         $normalizerProphecy->normalize(Argument::type(Documentation::class), 'json', Argument::type('array'))->willReturn(self::SPEC)->shouldBeCalled();
@@ -158,7 +159,7 @@ class SwaggerUiActionTest extends TestCase
         $resourceNameCollectionFactoryProphecy->create()->willReturn(new ResourceNameCollection(['Foo', 'Bar']))->shouldBeCalled();
 
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadata());
+        $resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadata([new OperationCollectionMetadata('/dummies')]));
 
         $normalizerProphecy = $this->prophesize(NormalizerInterface::class);
         $normalizerProphecy->normalize(Argument::type(Documentation::class), 'json', Argument::type('array'))->willReturn(self::SPEC)->shouldBeCalled();

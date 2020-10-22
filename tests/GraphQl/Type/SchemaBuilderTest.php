@@ -19,6 +19,7 @@ use ApiPlatform\Core\GraphQl\Type\TypesContainerInterface;
 use ApiPlatform\Core\GraphQl\Type\TypesFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
+use ApiPlatform\Core\Metadata\Resource\OperationCollectionMetadata;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Metadata\Resource\ResourceNameCollection;
 use ApiPlatform\Core\Tests\ProphecyTrait;
@@ -101,7 +102,7 @@ class SchemaBuilderTest extends TestCase
     public function schemaProvider(): array
     {
         return [
-            'no graphql configuration' => ['resourceClass', new ResourceMetadata(),
+            'no graphql configuration' => ['resourceClass', new ResourceMetadata([new OperationCollectionMetadata('/dummies')]),
                 new ObjectType([
                     'name' => 'Query',
                     'fields' => [
@@ -109,16 +110,7 @@ class SchemaBuilderTest extends TestCase
                     ],
                 ]), null, null,
             ],
-            'item query' => ['resourceClass', (new ResourceMetadata())->withGraphql(['item_query' => []]),
-                new ObjectType([
-                    'name' => 'Query',
-                    'fields' => [
-                        'node' => ['node_fields'],
-                        'query' => ['query_fields'],
-                    ],
-                ]), null, null,
-            ],
-            'collection query' => ['resourceClass', (new ResourceMetadata())->withGraphql(['collection_query' => []]),
+            'item query' => ['resourceClass', (new ResourceMetadata([(new OperationCollectionMetadata('/dummies'))->withGraphql(['item_query' => []])])),
                 new ObjectType([
                     'name' => 'Query',
                     'fields' => [
@@ -127,7 +119,16 @@ class SchemaBuilderTest extends TestCase
                     ],
                 ]), null, null,
             ],
-            'custom item query' => ['resourceClass', (new ResourceMetadata())->withGraphql(['custom_item_query' => ['item_query' => 'item_query_resolver']]),
+            'collection query' => ['resourceClass', (new ResourceMetadata([(new OperationCollectionMetadata('/dummies'))->withGraphql(['collection_query' => []])])),
+                new ObjectType([
+                    'name' => 'Query',
+                    'fields' => [
+                        'node' => ['node_fields'],
+                        'query' => ['query_fields'],
+                    ],
+                ]), null, null,
+            ],
+            'custom item query' => ['resourceClass', (new ResourceMetadata([(new OperationCollectionMetadata('/dummies'))->withGraphql(['custom_item_query' => ['item_query' => 'item_query_resolver']])])),
                 new ObjectType([
                     'name' => 'Query',
                     'fields' => [
@@ -136,7 +137,7 @@ class SchemaBuilderTest extends TestCase
                     ],
                 ]), null, null,
             ],
-            'custom collection query' => ['resourceClass', (new ResourceMetadata())->withGraphql(['custom_collection_query' => ['collection_query' => 'collection_query_resolver']]),
+            'custom collection query' => ['resourceClass', (new ResourceMetadata([(new OperationCollectionMetadata('/dummies'))->withGraphql(['custom_collection_query' => ['collection_query' => 'collection_query_resolver']])])),
                 new ObjectType([
                     'name' => 'Query',
                     'fields' => [
@@ -145,7 +146,7 @@ class SchemaBuilderTest extends TestCase
                     ],
                 ]), null, null,
             ],
-            'mutation' => ['resourceClass', (new ResourceMetadata())->withGraphql(['mutation' => []]),
+            'mutation' => ['resourceClass', (new ResourceMetadata([(new OperationCollectionMetadata('/dummies'))->withGraphql(['mutation' => []])])),
                 new ObjectType([
                     'name' => 'Query',
                     'fields' => [
@@ -160,7 +161,7 @@ class SchemaBuilderTest extends TestCase
                 ]),
                 null,
             ],
-            'subscription' => ['resourceClass', (new ResourceMetadata())->withGraphql(['update' => []]),
+            'subscription' => ['resourceClass', (new ResourceMetadata([(new OperationCollectionMetadata('/dummies'))->withGraphql(['update' => []])])),
                 new ObjectType([
                     'name' => 'Query',
                     'fields' => [

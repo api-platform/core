@@ -22,6 +22,7 @@ use ApiPlatform\Core\GraphQl\Resolver\Stage\SerializeStageInterface;
 use ApiPlatform\Core\GraphQl\Resolver\Stage\ValidateStageInterface;
 use ApiPlatform\Core\GraphQl\Resolver\Stage\WriteStageInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
+use ApiPlatform\Core\Metadata\Resource\OperationCollectionMetadata;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Core\Tests\ProphecyTrait;
@@ -94,7 +95,7 @@ class ItemMutationResolverFactoryTest extends TestCase
         $deserializeStageItem->field = 'deserialize';
         $this->deserializeStageProphecy->__invoke($readStageItem, $resourceClass, $operationName, $resolverContext)->shouldBeCalled()->willReturn($deserializeStageItem);
 
-        $this->resourceMetadataFactoryProphecy->create($resourceClass)->willReturn(new ResourceMetadata());
+        $this->resourceMetadataFactoryProphecy->create($resourceClass)->willReturn(new ResourceMetadata([new OperationCollectionMetadata('/dummies')]));
 
         $this->securityStageProphecy->__invoke($resourceClass, $operationName, $resolverContext + [
             'extra_variables' => [
@@ -180,7 +181,7 @@ class ItemMutationResolverFactoryTest extends TestCase
         $deserializeStageItem = null;
         $this->deserializeStageProphecy->__invoke($readStageItem, $resourceClass, $operationName, $resolverContext)->shouldBeCalled()->willReturn($deserializeStageItem);
 
-        $this->resourceMetadataFactoryProphecy->create($resourceClass)->willReturn(new ResourceMetadata());
+        $this->resourceMetadataFactoryProphecy->create($resourceClass)->willReturn(new ResourceMetadata([new OperationCollectionMetadata('/dummies')]));
 
         $this->securityStageProphecy->__invoke($resourceClass, $operationName, $resolverContext + [
             'extra_variables' => [
@@ -263,7 +264,7 @@ class ItemMutationResolverFactoryTest extends TestCase
         $this->deserializeStageProphecy->__invoke($readStageItem, $resourceClass, $operationName, $resolverContext)->shouldBeCalled()->willReturn($deserializeStageItem);
 
         $this->resourceMetadataFactoryProphecy->create($resourceClass)->willReturn(
-            (new ResourceMetadata())->withGraphql([$operationName => ['mutation' => 'query_resolver_id']])
+            (new ResourceMetadata([(new OperationCollectionMetadata('/dummies'))->withGraphql([$operationName => ['mutation' => 'query_resolver_id']])]))
         );
 
         $customItem = new \stdClass();
@@ -315,7 +316,7 @@ class ItemMutationResolverFactoryTest extends TestCase
         $this->deserializeStageProphecy->__invoke($readStageItem, $resourceClass, $operationName, $resolverContext)->shouldBeCalled()->willReturn($deserializeStageItem);
 
         $this->resourceMetadataFactoryProphecy->create($resourceClass)->willReturn(
-            (new ResourceMetadata('shortName'))->withGraphql([$operationName => ['mutation' => 'query_resolver_id']])
+            (new ResourceMetadata([(new OperationCollectionMetadata('/dummies', 'shortName'))->withGraphql([$operationName => ['mutation' => 'query_resolver_id']])]))
         );
 
         $customItem = new Dummy();

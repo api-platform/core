@@ -15,6 +15,7 @@ namespace ApiPlatform\Core\Tests\GraphQl\Resolver\Stage;
 
 use ApiPlatform\Core\GraphQl\Resolver\Stage\ValidateStage;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
+use ApiPlatform\Core\Metadata\Resource\OperationCollectionMetadata;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Tests\ProphecyTrait;
 use ApiPlatform\Core\Validator\Exception\ValidationException;
@@ -53,9 +54,9 @@ class ValidateStageTest extends TestCase
     {
         $operationName = 'item_query';
         $resourceClass = 'myResource';
-        $resourceMetadata = (new ResourceMetadata())->withGraphql([
+        $resourceMetadata = (new ResourceMetadata([(new OperationCollectionMetadata('/dummies'))->withGraphql([
             $operationName => ['validate' => false],
-        ]);
+        ])]));
         $this->resourceMetadataFactoryProphecy->create($resourceClass)->willReturn($resourceMetadata);
 
         $this->validatorProphecy->validate(Argument::cetera())->shouldNotBeCalled();
@@ -68,9 +69,9 @@ class ValidateStageTest extends TestCase
         $operationName = 'item_query';
         $resourceClass = 'myResource';
         $validationGroups = ['group'];
-        $resourceMetadata = (new ResourceMetadata())->withGraphql([
+        $resourceMetadata = (new ResourceMetadata([(new OperationCollectionMetadata('/dummies'))->withGraphql([
             $operationName => ['validation_groups' => $validationGroups],
-        ]);
+        ])]));
         $this->resourceMetadataFactoryProphecy->create($resourceClass)->willReturn($resourceMetadata);
 
         $object = new \stdClass();
@@ -84,9 +85,9 @@ class ValidateStageTest extends TestCase
         $operationName = 'item_query';
         $resourceClass = 'myResource';
         $validationGroups = ['group'];
-        $resourceMetadata = (new ResourceMetadata())->withGraphql([
+        $resourceMetadata = (new ResourceMetadata([(new OperationCollectionMetadata('/dummies'))->withGraphql([
             $operationName => ['validation_groups' => $validationGroups],
-        ]);
+        ])]));
         $info = $this->prophesize(ResolveInfo::class)->reveal();
         $context = ['info' => $info];
         $this->resourceMetadataFactoryProphecy->create($resourceClass)->willReturn($resourceMetadata);

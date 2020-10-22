@@ -20,6 +20,7 @@ use ApiPlatform\Core\GraphQl\Resolver\Stage\SerializeStageInterface;
 use ApiPlatform\Core\GraphQl\Subscription\MercureSubscriptionIriGeneratorInterface;
 use ApiPlatform\Core\GraphQl\Subscription\SubscriptionManagerInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
+use ApiPlatform\Core\Metadata\Resource\OperationCollectionMetadata;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use GraphQL\Type\Definition\ResolveInfo;
 use PHPUnit\Framework\TestCase;
@@ -85,7 +86,7 @@ class ItemSubscriptionResolverFactoryTest extends TestCase
         $subscriptionId = 'subscriptionId';
         $this->subscriptionManagerProphecy->retrieveSubscriptionId($resolverContext, $serializeStageData)->shouldBeCalled()->willReturn($subscriptionId);
 
-        $this->resourceMetadataFactoryProphecy->create($resourceClass)->willReturn((new ResourceMetadata())->withAttributes(['mercure' => true]));
+        $this->resourceMetadataFactoryProphecy->create($resourceClass)->willReturn((new ResourceMetadata([(new OperationCollectionMetadata('/dummies'))->withAttributes(['mercure' => true])])));
 
         $mercureUrl = 'mercure-url';
         $this->mercureSubscriptionIriGeneratorProphecy->generateMercureUrl($subscriptionId)->shouldBeCalled()->willReturn($mercureUrl);
@@ -154,7 +155,7 @@ class ItemSubscriptionResolverFactoryTest extends TestCase
 
         $this->subscriptionManagerProphecy->retrieveSubscriptionId($resolverContext, $serializeStageData)->willReturn(null);
 
-        $this->resourceMetadataFactoryProphecy->create($resourceClass)->willReturn((new ResourceMetadata())->withAttributes(['mercure' => true]));
+        $this->resourceMetadataFactoryProphecy->create($resourceClass)->willReturn((new ResourceMetadata([(new OperationCollectionMetadata('/dummies'))->withAttributes(['mercure' => true])])));
 
         $this->mercureSubscriptionIriGeneratorProphecy->generateMercureUrl(Argument::any())->shouldNotBeCalled();
 
@@ -180,7 +181,7 @@ class ItemSubscriptionResolverFactoryTest extends TestCase
         $subscriptionId = 'subscriptionId';
         $this->subscriptionManagerProphecy->retrieveSubscriptionId($resolverContext, $serializeStageData)->willReturn($subscriptionId);
 
-        $this->resourceMetadataFactoryProphecy->create($resourceClass)->willReturn((new ResourceMetadata())->withAttributes(['mercure' => true]));
+        $this->resourceMetadataFactoryProphecy->create($resourceClass)->willReturn((new ResourceMetadata([(new OperationCollectionMetadata('/dummies'))->withAttributes(['mercure' => true])])));
 
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Cannot use Mercure for subscriptions when MercureBundle is not installed. Try running "composer require mercure".');

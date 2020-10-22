@@ -43,17 +43,19 @@ final class PhpDocResourceMetadataFactory implements ResourceMetadataFactoryInte
     {
         $resourceMetadata = $this->decorated->create($resourceClass);
 
-        if (null !== $resourceMetadata->getDescription()) {
-            return $resourceMetadata;
-        }
+        foreach ($resourceMetadata as $path => $operationCollectionMetadata) {
+            if (null !== $operationCollectionMetadata->getDescription()) {
+                continue;
+            }
 
-        $reflectionClass = new \ReflectionClass($resourceClass);
+            $reflectionClass = new \ReflectionClass($resourceClass);
 
-        try {
-            $docBlock = $this->docBlockFactory->create($reflectionClass, $this->contextFactory->createFromReflector($reflectionClass));
-            $resourceMetadata = $resourceMetadata->withDescription($docBlock->getSummary());
-        } catch (\InvalidArgumentException $e) {
-            // Ignore empty DocBlocks
+            try {
+                $docBlock = $this->docBlockFactory->create($reflectionClass, $this->contextFactory->createFromReflector($reflectionClass));
+                $resourceMetadata[$path] = $operationCollectionMetadata->withDescription($docBlock->getSummary());
+            } catch (\InvalidArgumentException $e) {
+                // Ignore empty DocBlocks
+            }
         }
 
         return $resourceMetadata;

@@ -23,6 +23,7 @@ use ApiPlatform\Core\Metadata\Property\PropertyNameCollection;
 use ApiPlatform\Core\Metadata\Property\SubresourceMetadata;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
+use ApiPlatform\Core\Metadata\Resource\OperationCollectionMetadata;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Metadata\Resource\ResourceNameCollection;
 use ApiPlatform\Core\Operation\Factory\SubresourceOperationFactory;
@@ -49,24 +50,25 @@ class ApiLoaderTest extends TestCase
 
     public function testApiLoader()
     {
-        $resourceMetadata = new ResourceMetadata();
-        $resourceMetadata = $resourceMetadata->withShortName('dummy');
-        $resourceMetadata = $resourceMetadata->withAttributes(['identified_by' => 'id']);
-        //default operation based on OperationResourceMetadataFactory
-        $resourceMetadata = $resourceMetadata->withItemOperations([
-            'get' => ['method' => 'GET', 'requirements' => ['id' => '\d+'], 'defaults' => ['my_default' => 'default_value', '_controller' => 'should_not_be_overriden'], 'stateless' => null],
-            'put' => ['method' => 'PUT', 'stateless' => null],
-            'delete' => ['method' => 'DELETE', 'stateless' => null],
-        ]);
-        //custom operations
-        $resourceMetadata = $resourceMetadata->withCollectionOperations([
-            'my_op' => ['method' => 'GET', 'controller' => 'some.service.name', 'requirements' => ['_format' => 'a valid format'], 'defaults' => ['my_default' => 'default_value'], 'condition' => "request.headers.get('User-Agent') matches '/firefox/i'", 'stateless' => null], //with controller
-            'my_second_op' => ['method' => 'POST', 'options' => ['option' => 'option_value'], 'host' => '{subdomain}.api-platform.com', 'schemes' => ['https'], 'stateless' => null], //without controller, takes the default one
-            'my_path_op' => ['method' => 'GET', 'path' => 'some/custom/path', 'stateless' => null], //custom path
-            'my_stateless_op' => ['method' => 'GET', 'stateless' => true],
-        ]);
-        $resourceMetadata = $resourceMetadata->withSubresourceOperations([
-            'subresources_get_subresource' => ['stateless' => true],
+        $resourceMetadata = new ResourceMetadata([(new OperationCollectionMetadata('/dummies'))
+            ->withShortName('dummy')
+            ->withAttributes(['identified_by' => 'id'])
+            //default operation based on OperationResourceMetadataFactory
+            ->withItemOperations([
+                'get' => ['method' => 'GET', 'requirements' => ['id' => '\d+'], 'defaults' => ['my_default' => 'default_value', '_controller' => 'should_not_be_overriden'], 'stateless' => null],
+                'put' => ['method' => 'PUT', 'stateless' => null],
+                'delete' => ['method' => 'DELETE', 'stateless' => null],
+            ])
+            //custom operations
+            ->withCollectionOperations([
+                'my_op' => ['method' => 'GET', 'controller' => 'some.service.name', 'requirements' => ['_format' => 'a valid format'], 'defaults' => ['my_default' => 'default_value'], 'condition' => "request.headers.get('User-Agent') matches '/firefox/i'", 'stateless' => null], //with controller
+                'my_second_op' => ['method' => 'POST', 'options' => ['option' => 'option_value'], 'host' => '{subdomain}.api-platform.com', 'schemes' => ['https'], 'stateless' => null], //without controller, takes the default one
+                'my_path_op' => ['method' => 'GET', 'path' => 'some/custom/path', 'stateless' => null], //custom path
+                'my_stateless_op' => ['method' => 'GET', 'stateless' => true],
+            ])
+            ->withSubresourceOperations([
+                'subresources_get_subresource' => ['stateless' => true],
+            ]),
         ]);
 
         $routeCollection = $this->getApiLoaderWithResourceMetadata($resourceMetadata)->load(null);
@@ -114,14 +116,15 @@ class ApiLoaderTest extends TestCase
 
     public function testApiLoaderWithPrefix()
     {
-        $resourceMetadata = new ResourceMetadata();
-        $resourceMetadata = $resourceMetadata->withShortName('dummy');
-        $resourceMetadata = $resourceMetadata->withItemOperations([
-            'get' => ['method' => 'GET', 'requirements' => ['id' => '\d+'], 'defaults' => ['my_default' => 'default_value', '_controller' => 'should_not_be_overriden'], 'stateless' => null],
-            'put' => ['method' => 'PUT', 'stateless' => null],
-            'delete' => ['method' => 'DELETE', 'stateless' => null],
+        $resourceMetadata = new ResourceMetadata([(new OperationCollectionMetadata('/dummies'))
+            ->withShortName('dummy')
+            ->withItemOperations([
+                'get' => ['method' => 'GET', 'requirements' => ['id' => '\d+'], 'defaults' => ['my_default' => 'default_value', '_controller' => 'should_not_be_overriden'], 'stateless' => null],
+                'put' => ['method' => 'PUT', 'stateless' => null],
+                'delete' => ['method' => 'DELETE', 'stateless' => null],
+            ])
+            ->withAttributes(['route_prefix' => '/foobar-prefix', 'identified_by' => 'id']),
         ]);
-        $resourceMetadata = $resourceMetadata->withAttributes(['route_prefix' => '/foobar-prefix', 'identified_by' => 'id']);
 
         $routeCollection = $this->getApiLoaderWithResourceMetadata($resourceMetadata)->load(null);
 
@@ -145,15 +148,14 @@ class ApiLoaderTest extends TestCase
     {
         $this->expectException(\RuntimeException::class);
 
-        $resourceMetadata = new ResourceMetadata();
-        $resourceMetadata = $resourceMetadata->withShortName('dummy');
-
-        $resourceMetadata = $resourceMetadata->withItemOperations([
-            'get' => [],
-        ]);
-
-        $resourceMetadata = $resourceMetadata->withCollectionOperations([
-            'get' => ['method' => 'GET', 'stateless' => null],
+        $resourceMetadata = new ResourceMetadata([(new OperationCollectionMetadata('/dummies'))
+            ->withShortName('dummy')
+            ->withItemOperations([
+                'get' => [],
+            ])
+            ->withCollectionOperations([
+                'get' => ['method' => 'GET', 'stateless' => null],
+            ]),
         ]);
 
         $this->getApiLoaderWithResourceMetadata($resourceMetadata)->load(null);
@@ -163,15 +165,14 @@ class ApiLoaderTest extends TestCase
     {
         $this->expectException(\RuntimeException::class);
 
-        $resourceMetadata = new ResourceMetadata();
-        $resourceMetadata = $resourceMetadata->withShortName('dummy');
-
-        $resourceMetadata = $resourceMetadata->withItemOperations([
-            'post' => ['method' => 'POST', 'stateless' => null],
-        ]);
-
-        $resourceMetadata = $resourceMetadata->withCollectionOperations([
-            'get' => ['method' => 'GET', 'stateless' => null],
+        $resourceMetadata = new ResourceMetadata([(new OperationCollectionMetadata('/dummies'))
+            ->withShortName('dummy')
+            ->withItemOperations([
+                'post' => ['method' => 'POST', 'stateless' => null],
+            ])
+            ->withCollectionOperations([
+                'get' => ['method' => 'GET', 'stateless' => null],
+            ]),
         ]);
 
         $this->getApiLoaderWithResourceMetadata($resourceMetadata)->load(null);
@@ -181,22 +182,23 @@ class ApiLoaderTest extends TestCase
     {
         $this->expectException(InvalidResourceException::class);
 
-        $this->getApiLoaderWithResourceMetadata(new ResourceMetadata())->load(null);
+        $this->getApiLoaderWithResourceMetadata(new ResourceMetadata([new OperationCollectionMetadata('/dummies')]))->load(null);
     }
 
     public function testRecursiveSubresource()
     {
-        $resourceMetadata = new ResourceMetadata();
-        $resourceMetadata = $resourceMetadata->withShortName('dummy');
-        $resourceMetadata = $resourceMetadata->withItemOperations([
-            'get' => ['method' => 'GET', 'stateless' => null],
-            'put' => ['method' => 'PUT', 'stateless' => null],
-            'delete' => ['method' => 'DELETE', 'stateless' => null],
-        ]);
-        $resourceMetadata = $resourceMetadata->withCollectionOperations([
-            'my_op' => ['method' => 'GET', 'controller' => 'some.service.name', 'stateless' => null], //with controller
-            'my_second_op' => ['method' => 'POST', 'stateless' => null], //without controller, takes the default one
-            'my_path_op' => ['method' => 'GET', 'path' => 'some/custom/path', 'stateless' => null], //custom path
+        $resourceMetadata = new ResourceMetadata([(new OperationCollectionMetadata('/dummies'))
+            ->withShortName('dummy')
+            ->withItemOperations([
+                'get' => ['method' => 'GET', 'stateless' => null],
+                'put' => ['method' => 'PUT', 'stateless' => null],
+                'delete' => ['method' => 'DELETE', 'stateless' => null],
+            ])
+            ->withCollectionOperations([
+                'my_op' => ['method' => 'GET', 'controller' => 'some.service.name', 'stateless' => null], //with controller
+                'my_second_op' => ['method' => 'POST', 'stateless' => null], //without controller, takes the default one
+                'my_path_op' => ['method' => 'GET', 'path' => 'some/custom/path', 'stateless' => null], //custom path
+            ]),
         ]);
 
         $routeCollection = $this->getApiLoaderWithResourceMetadata($resourceMetadata, true)->load(null);
@@ -257,11 +259,11 @@ class ApiLoaderTest extends TestCase
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create(DummyEntity::class)->willReturn($resourceMetadata);
 
-        $relatedDummyEntityMetadata = (new ResourceMetadata())->withShortName('related_dummies')->withSubresourceOperations([
+        $relatedDummyEntityMetadata = (new ResourceMetadata([(new OperationCollectionMetadata('/dummies'))->withShortName('related_dummies')->withSubresourceOperations([
             'recursivesubresource_get_subresource' => [
                 'controller' => 'dummy_controller',
             ],
-        ]);
+        ])]));
 
         $resourceMetadataFactoryProphecy->create(RelatedDummyEntity::class)->willReturn($relatedDummyEntityMetadata);
 

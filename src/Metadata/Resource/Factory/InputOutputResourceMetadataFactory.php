@@ -36,23 +36,27 @@ final class InputOutputResourceMetadataFactory implements ResourceMetadataFactor
     {
         $resourceMetadata = $this->decorated->create($resourceClass);
 
-        $attributes = $resourceMetadata->getAttributes() ?: [];
-        $attributes['input'] = isset($attributes['input']) ? $this->transformInputOutput($attributes['input']) : null;
-        $attributes['output'] = isset($attributes['output']) ? $this->transformInputOutput($attributes['output']) : null;
+        foreach ($resourceMetadata as $path => $operationCollectionMetadata) {
+            $attributes = $operationCollectionMetadata->getAttributes() ?: [];
+            $attributes['input'] = isset($attributes['input']) ? $this->transformInputOutput($attributes['input']) : null;
+            $attributes['output'] = isset($attributes['output']) ? $this->transformInputOutput($attributes['output']) : null;
 
-        if (null !== $collectionOperations = $resourceMetadata->getCollectionOperations()) {
-            $resourceMetadata = $resourceMetadata->withCollectionOperations($this->getTransformedOperations($collectionOperations, $attributes));
+            if (null !== $collectionOperations = $operationCollectionMetadata->getCollectionOperations()) {
+                $resourceMetadata[$path] = $operationCollectionMetadata->withCollectionOperations($this->getTransformedOperations($collectionOperations, $attributes));
+            }
+
+            if (null !== $itemOperations = $operationCollectionMetadata->getItemOperations()) {
+                $resourceMetadata[$path] = $operationCollectionMetadata->withItemOperations($this->getTransformedOperations($itemOperations, $attributes));
+            }
+
+            if (null !== $graphQlAttributes = $operationCollectionMetadata->getGraphql()) {
+                $resourceMetadata[$path] = $operationCollectionMetadata->withGraphql($this->getTransformedOperations($graphQlAttributes, $attributes));
+            }
+
+            $resourceMetadata[$path] = $operationCollectionMetadata->withAttributes($attributes);
         }
 
-        if (null !== $itemOperations = $resourceMetadata->getItemOperations()) {
-            $resourceMetadata = $resourceMetadata->withItemOperations($this->getTransformedOperations($itemOperations, $attributes));
-        }
-
-        if (null !== $graphQlAttributes = $resourceMetadata->getGraphql()) {
-            $resourceMetadata = $resourceMetadata->withGraphql($this->getTransformedOperations($graphQlAttributes, $attributes));
-        }
-
-        return $resourceMetadata->withAttributes($attributes);
+        return $resourceMetadata;
     }
 
     private function getTransformedOperations(array $operations, array $resourceAttributes): array

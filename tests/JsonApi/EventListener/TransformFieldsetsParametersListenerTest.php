@@ -15,6 +15,7 @@ namespace ApiPlatform\Core\Tests\JsonApi\EventListener;
 
 use ApiPlatform\Core\JsonApi\EventListener\TransformFieldsetsParametersListener;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
+use ApiPlatform\Core\Metadata\Resource\OperationCollectionMetadata;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Core\Tests\ProphecyTrait;
@@ -31,7 +32,7 @@ class TransformFieldsetsParametersListenerTest extends TestCase
     protected function setUp(): void
     {
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadata('dummy'));
+        $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadata([new OperationCollectionMetadata('/dummies', 'dummy')]));
 
         $this->listener = new TransformFieldsetsParametersListener($resourceMetadataFactoryProphecy->reveal());
     }

@@ -21,6 +21,7 @@ use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 use ApiPlatform\Core\Metadata\Property\PropertyNameCollection;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
+use ApiPlatform\Core\Metadata\Resource\OperationCollectionMetadata;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Metadata\Resource\ResourceNameCollection;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Dto\OutputDto;
@@ -55,7 +56,7 @@ class ContextBuilderTest extends TestCase
 
     public function testResourceContext()
     {
-        $this->resourceMetadataFactoryProphecy->create($this->entityClass)->willReturn(new ResourceMetadata('DummyEntity'));
+        $this->resourceMetadataFactoryProphecy->create($this->entityClass)->willReturn(new ResourceMetadata([new OperationCollectionMetadata('/dummies', 'DummyEntity')]));
         $this->propertyNameCollectionFactoryProphecy->create($this->entityClass)->willReturn(new PropertyNameCollection(['dummyPropertyA']));
         $this->propertyMetadataFactoryProphecy->create($this->entityClass, 'dummyPropertyA')->willReturn(new PropertyMetadata(new Type(Type::BUILTIN_TYPE_STRING), 'Dummy property A', true, true, true, true, false, false, null, null, []));
 
@@ -72,7 +73,7 @@ class ContextBuilderTest extends TestCase
 
     public function testResourceContextWithJsonldContext()
     {
-        $this->resourceMetadataFactoryProphecy->create($this->entityClass)->willReturn(new ResourceMetadata('DummyEntity'));
+        $this->resourceMetadataFactoryProphecy->create($this->entityClass)->willReturn(new ResourceMetadata([new OperationCollectionMetadata('/dummies', 'DummyEntity')]));
         $this->propertyNameCollectionFactoryProphecy->create($this->entityClass)->willReturn(new PropertyNameCollection(['dummyPropertyA']));
         $this->propertyMetadataFactoryProphecy->create($this->entityClass, 'dummyPropertyA')->willReturn(new PropertyMetadata(new Type(Type::BUILTIN_TYPE_STRING), 'Dummy property A', true, true, true, true, false, false, null, null, ['jsonld_context' => ['@type' => '@id', '@id' => 'customId', 'foo' => 'bar']]));
 
@@ -93,7 +94,7 @@ class ContextBuilderTest extends TestCase
 
     public function testGetEntryPointContext()
     {
-        $this->resourceMetadataFactoryProphecy->create('dummyPropertyA')->willReturn(new ResourceMetadata('DummyEntity'));
+        $this->resourceMetadataFactoryProphecy->create('dummyPropertyA')->willReturn(new ResourceMetadata([new OperationCollectionMetadata('/dummies', 'DummyEntity')]));
         $this->propertyNameCollectionFactoryProphecy->create($this->entityClass)->willReturn(new PropertyNameCollection(['dummyPropertyA']));
         $this->resourceNameCollectionFactoryProphecy->create()->willReturn(new ResourceNameCollection(['dummyPropertyA']));
         $this->propertyMetadataFactoryProphecy->create($this->entityClass, 'dummyPropertyA')->willReturn(new PropertyMetadata(new Type(Type::BUILTIN_TYPE_STRING), 'Dummy property A', true, true, true, true, false, false, null, null, ['jsonld_context' => ['@type' => '@id', '@id' => 'customId', 'foo' => 'bar']]));
@@ -114,7 +115,7 @@ class ContextBuilderTest extends TestCase
 
     public function testResourceContextWithReverse()
     {
-        $this->resourceMetadataFactoryProphecy->create($this->entityClass)->willReturn(new ResourceMetadata('DummyEntity'));
+        $this->resourceMetadataFactoryProphecy->create($this->entityClass)->willReturn(new ResourceMetadata([new OperationCollectionMetadata('/dummies', 'DummyEntity')]));
         $this->propertyNameCollectionFactoryProphecy->create($this->entityClass)->willReturn(new PropertyNameCollection(['dummyPropertyA']));
         $this->propertyMetadataFactoryProphecy->create($this->entityClass, 'dummyPropertyA')->willReturn(new PropertyMetadata(new Type(Type::BUILTIN_TYPE_STRING), 'Dummy property A', true, true, true, true, false, false, null, null, ['jsonld_context' => ['@reverse' => 'parent']]));
 
@@ -181,7 +182,7 @@ class ContextBuilderTest extends TestCase
         $this->propertyNameCollectionFactoryProphecy->create(OutputDto::class)->willReturn(new PropertyNameCollection(['dummyPropertyA']));
         $this->propertyMetadataFactoryProphecy->create(OutputDto::class, 'dummyPropertyA')->willReturn(new PropertyMetadata(new Type(Type::BUILTIN_TYPE_STRING), 'Dummy property A', true, true, true, true, false, false, null, null, []));
 
-        $this->resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadata('Dummy'));
+        $this->resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadata([new OperationCollectionMetadata('/dummies', 'Dummy')]));
 
         $contextBuilder = new ContextBuilder($this->resourceNameCollectionFactoryProphecy->reveal(), $this->resourceMetadataFactoryProphecy->reveal(), $this->propertyNameCollectionFactoryProphecy->reveal(), $this->propertyMetadataFactoryProphecy->reveal(), $this->urlGeneratorProphecy->reveal());
 

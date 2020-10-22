@@ -16,6 +16,7 @@ namespace ApiPlatform\Core\Tests\Metadata\Resource\Factory;
 use ApiPlatform\Core\Annotation\ApiFilter;
 use ApiPlatform\Core\Metadata\Resource\Factory\AnnotationResourceFilterMetadataFactory;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
+use ApiPlatform\Core\Metadata\Resource\OperationCollectionMetadata;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Doctrine\Orm\Filter\DummyFilter;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
@@ -34,7 +35,7 @@ class AnnotationResourceFilterMetadataFactoryTest extends TestCase
     public function testCreate()
     {
         $decorated = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $decorated->create(Dummy::class)->willReturn(new ResourceMetadata('hello', 'blabla'))->shouldBeCalled();
+        $decorated->create(Dummy::class)->willReturn(new ResourceMetadata([new OperationCollectionMetadata('/dummies', 'hello', 'blabla')]))->shouldBeCalled();
 
         $reader = $this->prophesize(Reader::class);
         $reader->getClassAnnotations(Argument::type(\ReflectionClass::class))->shouldBeCalled()->willReturn([

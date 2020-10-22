@@ -18,6 +18,7 @@ use ApiPlatform\Core\Bridge\Elasticsearch\DataProvider\Extension\SortFilterExten
 use ApiPlatform\Core\Bridge\Elasticsearch\DataProvider\Filter\ConstantScoreFilterInterface;
 use ApiPlatform\Core\Bridge\Elasticsearch\DataProvider\Filter\SortFilterInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
+use ApiPlatform\Core\Metadata\Resource\OperationCollectionMetadata;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Foo;
 use ApiPlatform\Core\Tests\ProphecyTrait;
@@ -42,7 +43,7 @@ class SortFilterExtensionTest extends TestCase
     public function testApplyToCollection()
     {
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $resourceMetadataFactoryProphecy->create(Foo::class)->willReturn(new ResourceMetadata(null, null, null, null, ['get' => ['filters' => ['filter.order']]]))->shouldBeCalled();
+        $resourceMetadataFactoryProphecy->create(Foo::class)->willReturn(new ResourceMetadata([new OperationCollectionMetadata('/dummies', null, null, null, null, ['get' => ['filters' => ['filter.order']]])]))->shouldBeCalled();
 
         $sortFilterProphecy = $this->prophesize(SortFilterInterface::class);
         $sortFilterProphecy->apply([], Foo::class, 'get', ['filters' => ['order' => ['id' => 'desc']]])->willReturn([['id' => ['order' => 'desc']]])->shouldBeCalled();
@@ -59,7 +60,7 @@ class SortFilterExtensionTest extends TestCase
     public function testApplyToCollectionWithNoFilters()
     {
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $resourceMetadataFactoryProphecy->create(Foo::class)->willReturn(new ResourceMetadata());
+        $resourceMetadataFactoryProphecy->create(Foo::class)->willReturn(new ResourceMetadata([new OperationCollectionMetadata('/dummies')]));
 
         $sortFilterExtension = new SortFilterExtension($resourceMetadataFactoryProphecy->reveal(), $this->prophesize(ContainerInterface::class)->reveal());
 
@@ -69,7 +70,7 @@ class SortFilterExtensionTest extends TestCase
     public function testApplyToCollectionWithNoSortFilters()
     {
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $resourceMetadataFactoryProphecy->create(Foo::class)->willReturn(new ResourceMetadata(null, null, null, null, ['get' => ['filters' => ['filter.term']]]))->shouldBeCalled();
+        $resourceMetadataFactoryProphecy->create(Foo::class)->willReturn(new ResourceMetadata([new OperationCollectionMetadata('/dummies', null, null, null, null, ['get' => ['filters' => ['filter.term']]])]))->shouldBeCalled();
 
         $containerProphecy = $this->prophesize(ContainerInterface::class);
         $containerProphecy->has('filter.term')->willReturn(true)->shouldBeCalled();

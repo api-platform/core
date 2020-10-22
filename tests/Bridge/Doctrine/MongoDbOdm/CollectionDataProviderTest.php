@@ -18,6 +18,7 @@ use ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Extension\AggregationCollectionE
 use ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Extension\AggregationResultCollectionExtensionInterface;
 use ApiPlatform\Core\Exception\RuntimeException;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
+use ApiPlatform\Core\Metadata\Resource\OperationCollectionMetadata;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\Dummy;
 use ApiPlatform\Core\Tests\ProphecyTrait;
@@ -69,7 +70,7 @@ class CollectionDataProviderTest extends TestCase
 
         $this->managerRegistryProphecy->getManagerForClass(Dummy::class)->willReturn($managerProphecy->reveal())->shouldBeCalled();
 
-        $this->resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadata());
+        $this->resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadata([new OperationCollectionMetadata('/dummies')]));
 
         $extensionProphecy = $this->prophesize(AggregationCollectionExtensionInterface::class);
         $extensionProphecy->applyToCollection($aggregationBuilder, Dummy::class, 'foo', [])->shouldBeCalled();

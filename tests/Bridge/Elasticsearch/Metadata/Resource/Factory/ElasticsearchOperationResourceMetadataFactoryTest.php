@@ -15,6 +15,7 @@ namespace ApiPlatform\Core\Tests\Bridge\Elasticsearch\Metadata\Resource\Factory;
 
 use ApiPlatform\Core\Bridge\Elasticsearch\Metadata\Resource\Factory\ElasticsearchOperationResourceMetadataFactory;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
+use ApiPlatform\Core\Metadata\Resource\OperationCollectionMetadata;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Foo;
 use ApiPlatform\Core\Tests\ProphecyTrait;
@@ -35,7 +36,7 @@ class ElasticsearchOperationResourceMetadataFactoryTest extends TestCase
     public function testCreate()
     {
         $decoratedProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $decoratedProphecy->create(Foo::class)->willReturn(new ResourceMetadata())->shouldBeCalled();
+        $decoratedProphecy->create(Foo::class)->willReturn(new ResourceMetadata([new OperationCollectionMetadata('/dummies')]))->shouldBeCalled();
 
         $resourceMetadata = (new ElasticsearchOperationResourceMetadataFactory($decoratedProphecy->reveal()))->create(Foo::class);
 
@@ -45,9 +46,10 @@ class ElasticsearchOperationResourceMetadataFactoryTest extends TestCase
 
     public function testCreateWithExistingOperations()
     {
-        $originalResourceMetadata = new ResourceMetadata();
-        $originalResourceMetadata = $originalResourceMetadata->withItemOperations(['foo' => ['method' => 'GET']]);
-        $originalResourceMetadata = $originalResourceMetadata->withCollectionOperations(['bar' => ['method' => 'GET']]);
+        $originalResourceMetadata = new ResourceMetadata([(new OperationCollectionMetadata('/dummies'))
+            ->withItemOperations(['foo' => ['method' => 'GET']])
+            ->withCollectionOperations(['bar' => ['method' => 'GET']]),
+        ]);
 
         $decoratedProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $decoratedProphecy->create(Foo::class)->willReturn($originalResourceMetadata)->shouldBeCalled();

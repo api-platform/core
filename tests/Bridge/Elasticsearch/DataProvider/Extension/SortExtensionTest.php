@@ -20,6 +20,7 @@ use ApiPlatform\Core\Bridge\Elasticsearch\DataProvider\Extension\SortExtension;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
+use ApiPlatform\Core\Metadata\Resource\OperationCollectionMetadata;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Foo;
 use ApiPlatform\Core\Tests\ProphecyTrait;
@@ -49,7 +50,7 @@ class SortExtensionTest extends TestCase
     public function testApplyToCollection()
     {
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $resourceMetadataFactoryProphecy->create(Foo::class)->willReturn(new ResourceMetadata(null, null, null, null, null, ['order' => ['name', 'bar' => 'desc']]))->shouldBeCalled();
+        $resourceMetadataFactoryProphecy->create(Foo::class)->willReturn(new ResourceMetadata([new OperationCollectionMetadata('/dummies', null, null, null, null, null, ['order' => ['name', 'bar' => 'desc']])]))->shouldBeCalled();
 
         $nameConverterProphecy = $this->prophesize(NameConverterInterface::class);
         $nameConverterProphecy->normalize('name', Foo::class)->willReturn('name')->shouldBeCalled();
@@ -63,7 +64,7 @@ class SortExtensionTest extends TestCase
     public function testApplyToCollectionWithNestedProperty()
     {
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $resourceMetadataFactoryProphecy->create(Foo::class)->willReturn(new ResourceMetadata(null, null, null, null, null, ['order' => ['foo.bar' => 'desc']]))->shouldBeCalled();
+        $resourceMetadataFactoryProphecy->create(Foo::class)->willReturn(new ResourceMetadata([new OperationCollectionMetadata('/dummies', null, null, null, null, null, ['order' => ['foo.bar' => 'desc']])]))->shouldBeCalled();
 
         $fooType = new Type(Type::BUILTIN_TYPE_ARRAY, false, Foo::class, true, new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_OBJECT, false, Foo::class));
 
@@ -85,7 +86,7 @@ class SortExtensionTest extends TestCase
     public function testApplyToCollectionWithDefaultDirection()
     {
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $resourceMetadataFactoryProphecy->create(Foo::class)->willReturn(new ResourceMetadata())->shouldBeCalled();
+        $resourceMetadataFactoryProphecy->create(Foo::class)->willReturn(new ResourceMetadata([new OperationCollectionMetadata('/dummies')]))->shouldBeCalled();
 
         $identifierExtractorProphecy = $this->prophesize(IdentifierExtractorInterface::class);
         $identifierExtractorProphecy->getIdentifierFromResourceClass(Foo::class)->willReturn('id')->shouldBeCalled();
@@ -101,7 +102,7 @@ class SortExtensionTest extends TestCase
     public function testApplyToCollectionWithNoOrdering()
     {
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $resourceMetadataFactoryProphecy->create(Foo::class)->willReturn(new ResourceMetadata())->shouldBeCalled();
+        $resourceMetadataFactoryProphecy->create(Foo::class)->willReturn(new ResourceMetadata([new OperationCollectionMetadata('/dummies')]))->shouldBeCalled();
 
         $sortExtension = new SortExtension($resourceMetadataFactoryProphecy->reveal(), $this->prophesize(IdentifierExtractorInterface::class)->reveal(), $this->prophesize(PropertyMetadataFactoryInterface::class)->reveal(), $this->prophesize(ResourceClassResolverInterface::class)->reveal(), $this->prophesize(NameConverterInterface::class)->reveal());
 

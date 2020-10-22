@@ -17,6 +17,7 @@ use ApiPlatform\Core\Annotation\ApiResource;
 use ApiPlatform\Core\Exception\ResourceClassNotFoundException;
 use ApiPlatform\Core\Metadata\Resource\Factory\AnnotationResourceMetadataFactory;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
+use ApiPlatform\Core\Metadata\Resource\OperationCollectionMetadata;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Core\Tests\ProphecyTrait;
@@ -71,7 +72,7 @@ class AnnotationResourceMetadataFactoryTest extends TestCase
             ],
         ]);
         $reader = $this->prophesize(Reader::class);
-        $reader->getClassAnnotation(Argument::type(\ReflectionClass::class), ApiResource::class)->willReturn($annotation)->shouldBeCalled();
+        $reader->getClassAnnotations(Argument::type(\ReflectionClass::class), ApiResource::class)->willReturn([$annotation])->shouldBeCalled();
         $factory = new AnnotationResourceMetadataFactory($reader->reveal(), null, $defaults);
         $metadata = $factory->create(Dummy::class);
 
@@ -89,7 +90,7 @@ class AnnotationResourceMetadataFactoryTest extends TestCase
     {
         $annotation = new ApiResource([]);
         $reader = $this->prophesize(Reader::class);
-        $reader->getClassAnnotation(Argument::type(\ReflectionClass::class), ApiResource::class)->willReturn($annotation)->shouldBeCalled();
+        $reader->getClassAnnotations(Argument::type(\ReflectionClass::class), ApiResource::class)->willReturn([$annotation])->shouldBeCalled();
         $factory = new AnnotationResourceMetadataFactory($reader->reveal(), null);
         $metadata = $factory->create(Dummy::class);
 
@@ -112,22 +113,22 @@ class AnnotationResourceMetadataFactoryTest extends TestCase
         $annotationFull = new ApiResource($resourceData);
 
         $reader = $this->prophesize(Reader::class);
-        $reader->getClassAnnotation(Argument::type(\ReflectionClass::class), ApiResource::class)->willReturn($annotationFull)->shouldBeCalled();
+        $reader->getClassAnnotations(Argument::type(\ReflectionClass::class), ApiResource::class)->willReturn([$annotationFull])->shouldBeCalled();
 
         $decoratedThrow = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $decoratedThrow->create(Dummy::class)->willThrow(ResourceClassNotFoundException::class);
 
         $decoratedReturn = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $decoratedReturn->create(Dummy::class)->willReturn(new ResourceMetadata('hello', 'blabla'))->shouldBeCalled();
+        $decoratedReturn->create(Dummy::class)->willReturn(new ResourceMetadata([new OperationCollectionMetadata('/dummies', 'hello', 'blabla')]))->shouldBeCalled();
 
         $resourceData['description'] = null;
         $annotationWithNull = new ApiResource($resourceData);
 
         $decoratedReturnWithNull = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $decoratedReturnWithNull->create(Dummy::class)->willReturn(new ResourceMetadata('hello'))->shouldBeCalled();
+        $decoratedReturnWithNull->create(Dummy::class)->willReturn(new ResourceMetadata([new OperationCollectionMetadata('/dummies', 'hello')]))->shouldBeCalled();
 
         $readerWithNull = $this->prophesize(Reader::class);
-        $readerWithNull->getClassAnnotation(Argument::type(\ReflectionClass::class), ApiResource::class)->willReturn($annotationWithNull)->shouldBeCalled();
+        $readerWithNull->getClassAnnotations(Argument::type(\ReflectionClass::class), ApiResource::class)->willReturn([$annotationWithNull])->shouldBeCalled();
 
         return [
             [$reader, $decoratedThrow, 'shortName', 'description'],

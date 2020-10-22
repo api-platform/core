@@ -15,6 +15,7 @@ namespace ApiPlatform\Core\Metadata\Resource\Factory;
 
 use ApiPlatform\Core\Exception\ResourceClassNotFoundException;
 use ApiPlatform\Core\Metadata\Extractor\ExtractorInterface;
+use ApiPlatform\Core\Metadata\Resource\OperationCollectionMetadata;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 
 /**
@@ -61,7 +62,7 @@ final class ExtractorResourceMetadataFactory implements ResourceMetadataFactoryI
         $resource['graphql'] = $resource['graphql'] ?? $this->defaults['graphql'] ?? null;
         $resource['attributes'] = (null === $resource['attributes'] && [] === $this->defaults['attributes']) ? null : (array) $resource['attributes'] + $this->defaults['attributes'];
 
-        return $this->update($parentResourceMetadata ?: new ResourceMetadata(), $resource);
+        return $this->update($parentResourceMetadata ?: new ResourceMetadata([]), $resource);
     }
 
     /**
@@ -83,12 +84,13 @@ final class ExtractorResourceMetadataFactory implements ResourceMetadataFactoryI
      */
     private function update(ResourceMetadata $resourceMetadata, array $metadata): ResourceMetadata
     {
-        foreach (['shortName', 'description', 'iri', 'itemOperations', 'collectionOperations', 'subresourceOperations', 'graphql', 'attributes'] as $property) {
-            if (null === $metadata[$property] || null !== $resourceMetadata->{'get'.ucfirst($property)}()) {
+        $operationCollectionMetadata = $resourceMetadata[$metadata['path']] ?: new OperationCollectionMetadata();
+        foreach (['path', 'shortName', 'description', 'iri', 'itemOperations', 'collectionOperations', 'subresourceOperations', 'graphql', 'attributes'] as $property) {
+            if (null === $metadata[$property] || null !== $operationCollectionMetadata->{'get'.ucfirst($property)}()) {
                 continue;
             }
 
-            $resourceMetadata = $resourceMetadata->{'with'.ucfirst($property)}($metadata[$property]);
+            $resourceMetadata[$metadata['path']] = $operationCollectionMetadata->{'with'.ucfirst($property)}($metadata[$property]);
         }
 
         return $resourceMetadata;

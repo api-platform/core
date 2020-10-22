@@ -19,6 +19,7 @@ use ApiPlatform\Core\GraphQl\Resolver\Stage\SecurityPostDenormalizeStageInterfac
 use ApiPlatform\Core\GraphQl\Resolver\Stage\SecurityStageInterface;
 use ApiPlatform\Core\GraphQl\Resolver\Stage\SerializeStageInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
+use ApiPlatform\Core\Metadata\Resource\OperationCollectionMetadata;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Tests\ProphecyTrait;
 use GraphQL\Type\Definition\ResolveInfo;
@@ -89,7 +90,7 @@ class CollectionResolverFactoryTest extends TestCase
         $readStageCollection = [new \stdClass()];
         $this->readStageProphecy->__invoke($resourceClass, $rootClass, $operationName, $resolverContext)->shouldBeCalled()->willReturn($readStageCollection);
 
-        $this->resourceMetadataFactoryProphecy->create($resourceClass)->willReturn(new ResourceMetadata());
+        $this->resourceMetadataFactoryProphecy->create($resourceClass)->willReturn(new ResourceMetadata([new OperationCollectionMetadata('/dummies')]));
 
         $this->securityStageProphecy->__invoke($resourceClass, $operationName, $resolverContext + [
             'extra_variables' => [
@@ -166,7 +167,7 @@ class CollectionResolverFactoryTest extends TestCase
         $this->readStageProphecy->__invoke($resourceClass, $rootClass, $operationName, $resolverContext)->shouldBeCalled()->willReturn($readStageCollection);
 
         $this->resourceMetadataFactoryProphecy->create($resourceClass)->willReturn(
-            (new ResourceMetadata())->withGraphql([$operationName => ['collection_query' => 'query_resolver_id']])
+            (new ResourceMetadata([(new OperationCollectionMetadata('/dummies'))->withGraphql([$operationName => ['collection_query' => 'query_resolver_id']])]))
         );
 
         $customCollection = [new \stdClass()];

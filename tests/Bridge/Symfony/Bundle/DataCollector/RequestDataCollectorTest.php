@@ -27,6 +27,7 @@ use ApiPlatform\Core\DataProvider\CollectionDataProviderInterface;
 use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
 use ApiPlatform\Core\DataProvider\SubresourceDataProviderInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
+use ApiPlatform\Core\Metadata\Resource\OperationCollectionMetadata;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Tests\Fixtures\DummyEntity;
 use ApiPlatform\Core\Tests\ProphecyTrait;
@@ -253,7 +254,7 @@ class RequestDataCollectorTest extends TestCase
                 ->create($data)
                 ->shouldBeCalled()
                 ->willReturn(
-                    new ResourceMetadata(null, null, null, [], [], ['filters' => ['foo', 'a_filter']])
+                    new ResourceMetadata([new OperationCollectionMetadata('/dummies', null, null, null, [], [], ['filters' => ['foo', 'a_filter']])])
                 );
         }
     }

@@ -22,6 +22,7 @@ use ApiPlatform\Core\Metadata\Resource\Factory\ExtractorResourceMetadataFactory;
 use ApiPlatform\Core\Metadata\Resource\Factory\ExtractorResourceNameCollectionFactory;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ShortNameResourceMetadataFactory;
+use ApiPlatform\Core\Metadata\Resource\OperationCollectionMetadata;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Tests\Fixtures\DummyResourceInterface;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
@@ -136,12 +137,12 @@ class ExtractorResourceMetadataFactoryTest extends FileConfigurationMetadataFact
         $configPath = __DIR__.'/../../../Fixtures/FileConfigurations/resourcesoptional.xml';
 
         $decorated = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $decorated->create(FileConfigDummy::class)->willReturn(new ResourceMetadata(null, 'test'))->shouldBeCalled();
+        $decorated->create(FileConfigDummy::class)->willReturn(new ResourceMetadata([new OperationCollectionMetadata('/dummies', null, 'test')]))->shouldBeCalled();
 
         $resourceMetadataFactory = new ExtractorResourceMetadataFactory(new XmlExtractor([$configPath]), $decorated->reveal());
 
         $resourceMetadata = $resourceMetadataFactory->create(FileConfigDummy::class);
-        $expectedResourceMetadata = $expectedResourceMetadata->withDescription('test');
+        $expectedResourceMetadata['/dummies'] = $expectedResourceMetadata['/dummies']->withDescription('test');
 
         $this->assertEquals($expectedResourceMetadata, $resourceMetadata);
     }
@@ -224,12 +225,12 @@ class ExtractorResourceMetadataFactoryTest extends FileConfigurationMetadataFact
         $configPath = __DIR__.'/../../../Fixtures/FileConfigurations/resourcesoptional.yml';
 
         $decorated = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $decorated->create(FileConfigDummy::class)->willReturn(new ResourceMetadata(null, 'test'))->shouldBeCalled();
+        $decorated->create(FileConfigDummy::class)->willReturn(new ResourceMetadata([new OperationCollectionMetadata('/dummies', null, 'test')]))->shouldBeCalled();
 
         $resourceMetadataFactory = new ExtractorResourceMetadataFactory(new YamlExtractor([$configPath]), $decorated->reveal());
 
         $resourceMetadata = $resourceMetadataFactory->create(FileConfigDummy::class);
-        $expectedResourceMetadata = $expectedResourceMetadata->withDescription('test');
+        $expectedResourceMetadata['/dummies'] = $expectedResourceMetadata['/dummies']->withDescription('test');
 
         $this->assertEquals($expectedResourceMetadata, $resourceMetadata);
     }
@@ -292,6 +293,17 @@ class ExtractorResourceMetadataFactoryTest extends FileConfigurationMetadataFact
         $this->assertSame('DummyResourceInterface', $resourceMetadata->getShortName());
     }
 
+    public function testItSupportsMultipleApiResource()
+    {
+        $configPath = __DIR__.'/../../../Fixtures/FileConfigurations/multiple_resources.yml';
+
+        $resourceMetadataFactory = new ExtractorResourceMetadataFactory(new YamlExtractor([$configPath]));
+        $shortNameResourceMetadataFactory = new ShortNameResourceMetadataFactory($resourceMetadataFactory);
+
+        $resourceMetadata = $shortNameResourceMetadataFactory->create(DummyResourceInterface::class);
+        $this->assertSame('DummyResourceInterface', $resourceMetadata->getShortName());
+    }
+
     public function testItFallbacksToDefaultConfiguration()
     {
         $defaults = [
@@ -307,13 +319,16 @@ class ExtractorResourceMetadataFactoryTest extends FileConfigurationMetadataFact
         ];
         $resourceConfiguration = [
             Dummy::class => [
-                'shortName' => null,
-                'description' => null,
-                'subresourceOperations' => null,
-                'itemOperations' => ['get', 'delete'],
-                'attributes' => [
-                    'pagination_maximum_items_per_page' => 10,
-                    'stateless' => false,
+                [
+                    'path' => '/dummies',
+                    'shortName' => null,
+                    'description' => null,
+                    'subresourceOperations' => null,
+                    'itemOperations' => ['get', 'delete'],
+                    'attributes' => [
+                        'pagination_maximum_items_per_page' => 10,
+                        'stateless' => false,
+                    ],
                 ],
             ],
         ];
@@ -332,8 +347,10 @@ class ExtractorResourceMetadataFactoryTest extends FileConfigurationMetadataFact
             }
         };
         $factory = new ExtractorResourceMetadataFactory($extractor, null, $defaults);
-        $metadata = $factory->create(Dummy::class);
+        $resourceMetadata = $factory->create(Dummy::class);
 
+        $metadata = $resourceMetadata['/dummies'];
+        $this->assertEquals('/dummies', $metadata->getPath());
         $this->assertNull($metadata->getShortName());
         $this->assertEquals('CHANGEME!', $metadata->getDescription());
         $this->assertEquals(['get'], $metadata->getCollectionOperations());

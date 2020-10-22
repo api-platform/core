@@ -19,6 +19,7 @@ use ApiPlatform\Core\Bridge\Symfony\Messenger\RemoveStamp;
 use ApiPlatform\Core\DataPersister\ContextAwareDataPersisterInterface;
 use ApiPlatform\Core\Exception\ResourceClassNotFoundException;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
+use ApiPlatform\Core\Metadata\Resource\OperationCollectionMetadata;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyCar;
@@ -38,7 +39,7 @@ class DataPersisterTest extends TestCase
     public function testSupport()
     {
         $metadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $metadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadata(null, null, null, null, null, ['messenger' => true]));
+        $metadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadata([new OperationCollectionMetadata('/dummies', null, null, null, null, null, ['messenger' => true])]));
 
         $dataPersister = new DataPersister($metadataFactoryProphecy->reveal(), $this->prophesize(MessageBusInterface::class)->reveal(), $this->prophesize(ContextAwareDataPersisterInterface::class)->reveal());
         $this->assertTrue($dataPersister->supports(new Dummy()));
@@ -47,7 +48,7 @@ class DataPersisterTest extends TestCase
     public function testSupportWithContext()
     {
         $metadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $metadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadata(null, null, null, null, null, ['messenger' => true]));
+        $metadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadata([new OperationCollectionMetadata('/dummies', null, null, null, null, null, ['messenger' => true])]));
         $metadataFactoryProphecy->create(DummyCar::class)->willThrow(new ResourceClassNotFoundException());
 
         $dataPersister = new DataPersister($metadataFactoryProphecy->reveal(), $this->prophesize(MessageBusInterface::class)->reveal(), $this->prophesize(ContextAwareDataPersisterInterface::class)->reveal());
@@ -58,7 +59,7 @@ class DataPersisterTest extends TestCase
     public function testSupportWithContextAndMessengerDispatched()
     {
         $metadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $metadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadata(null, null, null, null, null, ['messenger' => true]));
+        $metadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadata([new OperationCollectionMetadata('/dummies', null, null, null, null, null, ['messenger' => true])]));
         $metadataFactoryProphecy->create(DummyCar::class)->willThrow(new ResourceClassNotFoundException());
 
         $dataPersister = new DataPersister($metadataFactoryProphecy->reveal(), $this->prophesize(MessageBusInterface::class)->reveal(), $this->prophesize(ContextAwareDataPersisterInterface::class)->reveal());
@@ -70,8 +71,8 @@ class DataPersisterTest extends TestCase
         $dummy = new Dummy();
 
         $metadataFactory = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $metadataFactory->create(Dummy::class)->willReturn(new ResourceMetadata(null, null, null, null, null, ['messenger' => true]));
-        $metadataFactory->create(Dummy::class)->willReturn(new ResourceMetadata(null, null, null, null, null, ['messenger' => 'input']));
+        $metadataFactory->create(Dummy::class)->willReturn(new ResourceMetadata([new OperationCollectionMetadata('/dummies', null, null, null, null, null, ['messenger' => true])]));
+        $metadataFactory->create(Dummy::class)->willReturn(new ResourceMetadata([new OperationCollectionMetadata('/dummies', null, null, null, null, null, ['messenger' => 'input'])]));
         $metadataFactory->create(DummyCar::class)->willThrow(new ResourceClassNotFoundException());
 
         $chainDataPersister = $this->prophesize(ContextAwareDataPersisterInterface::class);
@@ -91,8 +92,8 @@ class DataPersisterTest extends TestCase
         $dummy = new Dummy();
 
         $metadataFactory = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $metadataFactory->create(Dummy::class)->willReturn(new ResourceMetadata(null, null, null, null, null, ['messenger' => true]));
-        $metadataFactory->create(Dummy::class)->willReturn(new ResourceMetadata(null, null, null, null, null, ['messenger' => 'input']));
+        $metadataFactory->create(Dummy::class)->willReturn(new ResourceMetadata([new OperationCollectionMetadata('/dummies', null, null, null, null, null, ['messenger' => true])]));
+        $metadataFactory->create(Dummy::class)->willReturn(new ResourceMetadata([new OperationCollectionMetadata('/dummies', null, null, null, null, null, ['messenger' => 'input'])]));
         $metadataFactory->create(DummyCar::class)->willThrow(new ResourceClassNotFoundException());
 
         $chainDataPersister = $this->prophesize(ContextAwareDataPersisterInterface::class);
@@ -112,8 +113,8 @@ class DataPersisterTest extends TestCase
         $dummy = new Dummy();
 
         $metadataFactory = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $metadataFactory->create(Dummy::class)->willReturn(new ResourceMetadata(null, null, null, null, null, ['messenger' => 'persist']));
-        $metadataFactory->create(Dummy::class)->willReturn(new ResourceMetadata(null, null, null, null, null, ['messenger' => ['persist', 'input']]));
+        $metadataFactory->create(Dummy::class)->willReturn(new ResourceMetadata([new OperationCollectionMetadata('/dummies', null, null, null, null, null, ['messenger' => 'persist'])]));
+        $metadataFactory->create(Dummy::class)->willReturn(new ResourceMetadata([new OperationCollectionMetadata('/dummies', null, null, null, null, null, ['messenger' => ['persist', 'input']])]));
         $metadataFactory->create(DummyCar::class)->willThrow(new ResourceClassNotFoundException());
 
         $chainDataPersister = $this->prophesize(ContextAwareDataPersisterInterface::class);
@@ -154,8 +155,8 @@ class DataPersisterTest extends TestCase
         $dummy = new Dummy();
 
         $metadataFactory = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $metadataFactory->create(Dummy::class)->willReturn(new ResourceMetadata(null, null, null, null, null, ['messenger' => 'persist']));
-        $metadataFactory->create(Dummy::class)->willReturn(new ResourceMetadata(null, null, null, null, null, ['messenger' => ['persist', 'input']]));
+        $metadataFactory->create(Dummy::class)->willReturn(new ResourceMetadata([new OperationCollectionMetadata('/dummies', null, null, null, null, null, ['messenger' => 'persist'])]));
+        $metadataFactory->create(Dummy::class)->willReturn(new ResourceMetadata([new OperationCollectionMetadata('/dummies', null, null, null, null, null, ['messenger' => ['persist', 'input']])]));
         $metadataFactory->create(DummyCar::class)->willThrow(new ResourceClassNotFoundException());
 
         $chainDataPersister = $this->prophesize(ContextAwareDataPersisterInterface::class);
@@ -173,7 +174,7 @@ class DataPersisterTest extends TestCase
     public function testSupportWithGraphqlContext()
     {
         $metadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $metadataFactoryProphecy->create(Dummy::class)->willReturn((new ResourceMetadata(null, null, null, null, null, []))->withGraphQl(['create' => ['messenger' => 'input']]));
+        $metadataFactoryProphecy->create(Dummy::class)->willReturn((new ResourceMetadata([(new OperationCollectionMetadata('/dummies', null, null, null, null, null, []))->withGraphQl(['create' => ['messenger' => 'input']])])));
 
         $dataPersister = new DataPersister($metadataFactoryProphecy->reveal(), $this->prophesize(MessageBusInterface::class)->reveal(), $this->prophesize(ContextAwareDataPersisterInterface::class)->reveal());
         $this->assertTrue($dataPersister->supports(new DummyCar(), ['resource_class' => Dummy::class, 'graphql_operation_name' => 'create']));

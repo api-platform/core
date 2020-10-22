@@ -22,6 +22,7 @@ use ApiPlatform\Core\DataProvider\PaginatorInterface;
 use ApiPlatform\Core\DataProvider\PartialPaginatorInterface;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
+use ApiPlatform\Core\Metadata\Resource\OperationCollectionMetadata;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Core\Tests\ProphecyTrait;
@@ -127,7 +128,7 @@ class PaginationExtensionTest extends TestCase
             'pagination_client_enabled' => true,
             'pagination_items_per_page' => 40,
         ];
-        $resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadata(null, null, null, [], [], $attributes));
+        $resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadata([new OperationCollectionMetadata('/dummies', null, null, null, [], [], $attributes)]));
         $resourceMetadataFactory = $resourceMetadataFactoryProphecy->reveal();
 
         $pagination = new Pagination($resourceMetadataFactory, [
@@ -164,7 +165,7 @@ class PaginationExtensionTest extends TestCase
             'pagination_client_enabled' => true,
             'pagination_items_per_page' => 40,
         ];
-        $resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadata(null, null, null, [], [], $attributes))->shouldBeCalled();
+        $resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadata([new OperationCollectionMetadata('/dummies', null, null, null, [], [], $attributes)]))->shouldBeCalled();
         $resourceMetadataFactory = $resourceMetadataFactoryProphecy->reveal();
 
         $queryBuilderProphecy = $this->prophesize(QueryBuilder::class);
@@ -193,7 +194,7 @@ class PaginationExtensionTest extends TestCase
             'pagination_client_enabled' => true,
             'pagination_items_per_page' => 0,
         ];
-        $resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadata(null, null, null, [], [], $attributes));
+        $resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadata([new OperationCollectionMetadata('/dummies', null, null, null, [], [], $attributes)]));
         $resourceMetadataFactory = $resourceMetadataFactoryProphecy->reveal();
 
         $pagination = new Pagination($resourceMetadataFactory, [
@@ -231,7 +232,7 @@ class PaginationExtensionTest extends TestCase
             'pagination_client_enabled' => true,
             'pagination_items_per_page' => 0,
         ];
-        $resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadata(null, null, null, [], [], $attributes))->shouldBeCalled();
+        $resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadata([new OperationCollectionMetadata('/dummies', null, null, null, [], [], $attributes)]))->shouldBeCalled();
         $resourceMetadataFactory = $resourceMetadataFactoryProphecy->reveal();
 
         $queryBuilderProphecy = $this->prophesize(QueryBuilder::class);
@@ -263,7 +264,7 @@ class PaginationExtensionTest extends TestCase
             'pagination_client_enabled' => true,
             'pagination_items_per_page' => 0,
         ];
-        $resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadata(null, null, null, [], [], $attributes));
+        $resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadata([new OperationCollectionMetadata('/dummies', null, null, null, [], [], $attributes)]));
         $resourceMetadataFactory = $resourceMetadataFactoryProphecy->reveal();
 
         $pagination = new Pagination($resourceMetadataFactory, [
@@ -304,7 +305,7 @@ class PaginationExtensionTest extends TestCase
             'pagination_client_enabled' => true,
             'pagination_items_per_page' => 0,
         ];
-        $resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadata(null, null, null, [], [], $attributes))->shouldBeCalled();
+        $resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadata([new OperationCollectionMetadata('/dummies', null, null, null, [], [], $attributes)]))->shouldBeCalled();
         $resourceMetadataFactory = $resourceMetadataFactoryProphecy->reveal();
 
         $queryBuilderProphecy = $this->prophesize(QueryBuilder::class);
@@ -336,7 +337,7 @@ class PaginationExtensionTest extends TestCase
             'pagination_client_enabled' => true,
             'pagination_items_per_page' => -20,
         ];
-        $resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadata(null, null, null, [], [], $attributes));
+        $resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadata([new OperationCollectionMetadata('/dummies', null, null, null, [], [], $attributes)]));
         $resourceMetadataFactory = $resourceMetadataFactoryProphecy->reveal();
 
         $pagination = new Pagination($resourceMetadataFactory, [
@@ -377,7 +378,7 @@ class PaginationExtensionTest extends TestCase
             'pagination_client_enabled' => true,
             'pagination_items_per_page' => -20,
         ];
-        $resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadata(null, null, null, [], [], $attributes))->shouldBeCalled();
+        $resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadata([new OperationCollectionMetadata('/dummies', null, null, null, [], [], $attributes)]))->shouldBeCalled();
         $resourceMetadataFactory = $resourceMetadataFactoryProphecy->reveal();
 
         $queryBuilderProphecy = $this->prophesize(QueryBuilder::class);
@@ -406,7 +407,7 @@ class PaginationExtensionTest extends TestCase
             'pagination_client_enabled' => true,
             'pagination_client_items_per_page' => true,
         ];
-        $resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadata(null, null, null, [], [], $attributes));
+        $resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadata([new OperationCollectionMetadata('/dummies', null, null, null, [], [], $attributes)]));
         $resourceMetadataFactory = $resourceMetadataFactoryProphecy->reveal();
 
         $pagination = new Pagination($resourceMetadataFactory, [
@@ -444,7 +445,7 @@ class PaginationExtensionTest extends TestCase
             'pagination_client_enabled' => true,
             'pagination_client_items_per_page' => true,
         ];
-        $resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadata(null, null, null, [], [], $attributes))->shouldBeCalled();
+        $resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadata([new OperationCollectionMetadata('/dummies', null, null, null, [], [], $attributes)]))->shouldBeCalled();
         $resourceMetadataFactory = $resourceMetadataFactoryProphecy->reveal();
 
         $queryBuilderProphecy = $this->prophesize(QueryBuilder::class);
@@ -476,7 +477,7 @@ class PaginationExtensionTest extends TestCase
             'pagination_client_enabled' => true,
             'pagination_client_items_per_page' => 20,
         ];
-        $resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadata(null, null, null, [], [], $attributes));
+        $resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadata([new OperationCollectionMetadata('/dummies', null, null, null, [], [], $attributes)]));
         $resourceMetadataFactory = $resourceMetadataFactoryProphecy->reveal();
 
         $pagination = new Pagination($resourceMetadataFactory);
@@ -514,7 +515,7 @@ class PaginationExtensionTest extends TestCase
             'pagination_client_enabled' => true,
             'pagination_client_items_per_page' => 20,
         ];
-        $resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadata(null, null, null, [], [], $attributes))->shouldBeCalled();
+        $resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadata([new OperationCollectionMetadata('/dummies', null, null, null, [], [], $attributes)]))->shouldBeCalled();
         $resourceMetadataFactory = $resourceMetadataFactoryProphecy->reveal();
 
         $queryBuilderProphecy = $this->prophesize(QueryBuilder::class);
@@ -537,7 +538,7 @@ class PaginationExtensionTest extends TestCase
     public function testApplyToCollectionNofilters()
     {
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadata(null, null, null, [], []));
+        $resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadata([new OperationCollectionMetadata('/dummies', null, null, null, [], [])]));
         $resourceMetadataFactory = $resourceMetadataFactoryProphecy->reveal();
 
         $pagination = new Pagination($resourceMetadataFactory);
@@ -586,7 +587,7 @@ class PaginationExtensionTest extends TestCase
         $requestStack->push(new Request());
 
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadata(null, null, null, [], []))->shouldBeCalled();
+        $resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadata([new OperationCollectionMetadata('/dummies', null, null, null, [], [])]))->shouldBeCalled();
         $resourceMetadataFactory = $resourceMetadataFactoryProphecy->reveal();
 
         $queryBuilderProphecy = $this->prophesize(QueryBuilder::class);
@@ -605,7 +606,7 @@ class PaginationExtensionTest extends TestCase
     public function testApplyToCollectionPaginationDisabled()
     {
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadata(null, null, null, [], []));
+        $resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadata([new OperationCollectionMetadata('/dummies', null, null, null, [], [])]));
         $resourceMetadataFactory = $resourceMetadataFactoryProphecy->reveal();
 
         $pagination = new Pagination($resourceMetadataFactory, [
@@ -637,7 +638,7 @@ class PaginationExtensionTest extends TestCase
         $requestStack->push(new Request());
 
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadata(null, null, null, [], []))->shouldBeCalled();
+        $resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadata([new OperationCollectionMetadata('/dummies', null, null, null, [], [])]))->shouldBeCalled();
         $resourceMetadataFactory = $resourceMetadataFactoryProphecy->reveal();
 
         $queryBuilderProphecy = $this->prophesize(QueryBuilder::class);
@@ -657,7 +658,7 @@ class PaginationExtensionTest extends TestCase
     public function testApplyToCollectionGraphQlPaginationDisabled()
     {
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadata(null, null, null, [], []));
+        $resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadata([new OperationCollectionMetadata('/dummies', null, null, null, [], [])]));
         $resourceMetadataFactory = $resourceMetadataFactoryProphecy->reveal();
 
         $pagination = new Pagination($resourceMetadataFactory, [], [
@@ -685,7 +686,7 @@ class PaginationExtensionTest extends TestCase
             'pagination_client_enabled' => true,
             'pagination_maximum_items_per_page' => 80,
         ];
-        $resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadata(null, null, null, [], [], $attributes));
+        $resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadata([new OperationCollectionMetadata('/dummies', null, null, null, [], [], $attributes)]));
         $resourceMetadataFactory = $resourceMetadataFactoryProphecy->reveal();
 
         $pagination = new Pagination($resourceMetadataFactory, [
@@ -725,7 +726,7 @@ class PaginationExtensionTest extends TestCase
             'pagination_client_enabled' => true,
             'maximum_items_per_page' => 80,
         ];
-        $resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadata(null, null, null, [], [], $attributes))->shouldBeCalled();
+        $resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadata([new OperationCollectionMetadata('/dummies', null, null, null, [], [], $attributes)]))->shouldBeCalled();
         $resourceMetadataFactory = $resourceMetadataFactoryProphecy->reveal();
 
         $queryBuilderProphecy = $this->prophesize(QueryBuilder::class);
@@ -752,7 +753,7 @@ class PaginationExtensionTest extends TestCase
     public function testSupportsResult()
     {
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadata(null, null, null, [], []));
+        $resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadata([new OperationCollectionMetadata('/dummies', null, null, null, [], [])]));
         $resourceMetadataFactory = $resourceMetadataFactoryProphecy->reveal();
 
         $pagination = new Pagination($resourceMetadataFactory);
@@ -776,7 +777,7 @@ class PaginationExtensionTest extends TestCase
         $requestStack->push(new Request());
 
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadata(null, null, null, [], []))->shouldBeCalled();
+        $resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadata([new OperationCollectionMetadata('/dummies', null, null, null, [], [])]))->shouldBeCalled();
         $resourceMetadataFactory = $resourceMetadataFactoryProphecy->reveal();
 
         $extension = new PaginationExtension(
@@ -813,7 +814,7 @@ class PaginationExtensionTest extends TestCase
         $requestStack->push(new Request());
 
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadata(null, null, null, [], []))->shouldBeCalled();
+        $resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadata([new OperationCollectionMetadata('/dummies', null, null, null, [], [])]))->shouldBeCalled();
         $resourceMetadataFactory = $resourceMetadataFactoryProphecy->reveal();
 
         $extension = new PaginationExtension(
@@ -827,7 +828,7 @@ class PaginationExtensionTest extends TestCase
     public function testSupportsResultClientNotAllowedToPaginate()
     {
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadata(null, null, null, [], []));
+        $resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadata([new OperationCollectionMetadata('/dummies', null, null, null, [], [])]));
         $resourceMetadataFactory = $resourceMetadataFactoryProphecy->reveal();
 
         $pagination = new Pagination($resourceMetadataFactory, [
@@ -855,7 +856,7 @@ class PaginationExtensionTest extends TestCase
         $requestStack->push(new Request(['pagination' => true]));
 
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadata(null, null, null, [], []))->shouldBeCalled();
+        $resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadata([new OperationCollectionMetadata('/dummies', null, null, null, [], [])]))->shouldBeCalled();
         $resourceMetadataFactory = $resourceMetadataFactoryProphecy->reveal();
 
         $extension = new PaginationExtension(
@@ -871,7 +872,7 @@ class PaginationExtensionTest extends TestCase
     public function testSupportsResultPaginationDisabled()
     {
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadata(null, null, null, [], []));
+        $resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadata([new OperationCollectionMetadata('/dummies', null, null, null, [], [])]));
         $resourceMetadataFactory = $resourceMetadataFactoryProphecy->reveal();
 
         $pagination = new Pagination($resourceMetadataFactory, [
@@ -898,7 +899,7 @@ class PaginationExtensionTest extends TestCase
         $requestStack->push(new Request());
 
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadata(null, null, null, [], []))->shouldBeCalled();
+        $resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadata([new OperationCollectionMetadata('/dummies', null, null, null, [], [])]))->shouldBeCalled();
         $resourceMetadataFactory = $resourceMetadataFactoryProphecy->reveal();
 
         $extension = new PaginationExtension(
@@ -913,7 +914,7 @@ class PaginationExtensionTest extends TestCase
     public function testSupportsResultGraphQlPaginationDisabled()
     {
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadata(null, null, null, [], []));
+        $resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadata([new OperationCollectionMetadata('/dummies', null, null, null, [], [])]));
         $resourceMetadataFactory = $resourceMetadataFactoryProphecy->reveal();
 
         $pagination = new Pagination($resourceMetadataFactory, [], [
@@ -949,7 +950,7 @@ class PaginationExtensionTest extends TestCase
         $managerRegistryProphecy->getManagerForClass(Dummy::class)->willReturn($entityManagerProphecy);
 
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadata('Dummy'));
+        $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadata([new OperationCollectionMetadata('/dummies', 'Dummy')]));
 
         $paginationExtension = new PaginationExtension(
             $managerRegistryProphecy->reveal(),
@@ -984,7 +985,7 @@ class PaginationExtensionTest extends TestCase
         $managerRegistryProphecy->getManagerForClass(Dummy::class)->willReturn($entityManagerProphecy);
 
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadata('Dummy'));
+        $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadata([new OperationCollectionMetadata('/dummies', 'Dummy')]));
 
         $paginationExtension = new PaginationExtension(
             $managerRegistryProphecy->reveal(),
@@ -1029,7 +1030,7 @@ class PaginationExtensionTest extends TestCase
         $requestStack->push(new Request());
 
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadata('Dummy'));
+        $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadata([new OperationCollectionMetadata('/dummies', 'Dummy')]));
 
         $paginationExtension = new PaginationExtension(
             $managerRegistryProphecy->reveal(),
@@ -1064,7 +1065,7 @@ class PaginationExtensionTest extends TestCase
         $managerRegistryProphecy->getManagerForClass(Dummy::class)->willReturn($entityManagerProphecy);
 
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadata('Dummy', null, null, null, null, ['pagination_fetch_join_collection' => false]));
+        $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadata([new OperationCollectionMetadata('/dummies', 'Dummy', null, null, null, null, ['pagination_fetch_join_collection' => false])]));
 
         $paginationExtension = new PaginationExtension(
             $managerRegistryProphecy->reveal(),
@@ -1113,7 +1114,7 @@ class PaginationExtensionTest extends TestCase
         $requestStack->push(new Request());
 
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadata('Dummy', null, null, null, null, ['pagination_fetch_join_collection' => false]));
+        $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadata([new OperationCollectionMetadata('/dummies', 'Dummy', null, null, null, null, ['pagination_fetch_join_collection' => false])]));
 
         $paginationExtension = new PaginationExtension(
             $managerRegistryProphecy->reveal(),
@@ -1154,7 +1155,7 @@ class PaginationExtensionTest extends TestCase
         $managerRegistryProphecy->getManagerForClass(Dummy::class)->willReturn($entityManagerProphecy);
 
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadata('Dummy', null, null, null, null, ['pagination_use_output_walkers' => false]));
+        $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadata([new OperationCollectionMetadata('/dummies', 'Dummy', null, null, null, null, ['pagination_use_output_walkers' => false])]));
 
         $paginationExtension = new PaginationExtension(
             $managerRegistryProphecy->reveal(),
@@ -1203,7 +1204,7 @@ class PaginationExtensionTest extends TestCase
         $requestStack->push(new Request());
 
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadata('Dummy', null, null, null, null, ['pagination_use_output_walkers' => false]));
+        $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadata([new OperationCollectionMetadata('/dummies', 'Dummy', null, null, null, null, ['pagination_use_output_walkers' => false])]));
 
         $paginationExtension = new PaginationExtension(
             $managerRegistryProphecy->reveal(),
@@ -1244,7 +1245,7 @@ class PaginationExtensionTest extends TestCase
         $managerRegistryProphecy->getManagerForClass(Dummy::class)->willReturn($entityManagerProphecy);
 
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadata('Dummy', null, null, null, null, ['pagination_partial' => true]));
+        $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadata([new OperationCollectionMetadata('/dummies', 'Dummy', null, null, null, null, ['pagination_partial' => true])]));
 
         $paginationExtension = new PaginationExtension(
             $managerRegistryProphecy->reveal(),
@@ -1287,7 +1288,7 @@ class PaginationExtensionTest extends TestCase
         $requestStack->push(new Request());
 
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadata('Dummy', null, null, null, null, ['pagination_partial' => true]));
+        $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadata([new OperationCollectionMetadata('/dummies', 'Dummy', null, null, null, null, ['pagination_partial' => true])]));
 
         $paginationExtension = new PaginationExtension(
             $managerRegistryProphecy->reveal(),

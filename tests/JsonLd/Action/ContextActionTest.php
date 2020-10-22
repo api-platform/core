@@ -17,6 +17,7 @@ use ApiPlatform\Core\JsonLd\Action\ContextAction;
 use ApiPlatform\Core\JsonLd\ContextBuilderInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
+use ApiPlatform\Core\Metadata\Resource\OperationCollectionMetadata;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Metadata\Resource\ResourceNameCollection;
 use ApiPlatform\Core\Tests\ProphecyTrait;
@@ -62,7 +63,7 @@ class ContextActionTest extends TestCase
         $contextBuilderProphecy->getResourceContext('dummy')->willReturn(['/dummies']);
 
         $resourceMetadataFactoryProphecy->create('dummy')->shouldBeCalled()->willReturn(
-            new ResourceMetadata('dummy', 'dummy', '#dummy', ['get' => ['method' => 'GET'], 'put' => ['method' => 'PUT']], ['get' => ['method' => 'GET'], 'post' => ['method' => 'POST'], 'custom' => ['method' => 'GET', 'path' => '/foo'], 'custom2' => ['method' => 'POST', 'path' => '/foo']], [])
+            new ResourceMetadata([new OperationCollectionMetadata('/dummies', 'dummy', 'dummy', '#dummy', ['get' => ['method' => 'GET'], 'put' => ['method' => 'PUT']], ['get' => ['method' => 'GET'], 'post' => ['method' => 'POST'], 'custom' => ['method' => 'GET', 'path' => '/foo'], 'custom2' => ['method' => 'POST', 'path' => '/foo']], [])])
         );
         $this->assertEquals(['@context' => ['/dummies']], $contextAction('dummy'));
     }
@@ -78,7 +79,7 @@ class ContextActionTest extends TestCase
         $contextAction = new ContextAction($contextBuilderProphecy->reveal(), $resourceNameCollectionFactoryProphecy->reveal(), $resourceMetadataFactoryProphecy->reveal());
 
         $resourceMetadataFactoryProphecy->create('gerard')->shouldBeCalled()->willReturn(
-            new ResourceMetadata('gerard', 'gerard', '#dummy', ['get' => ['method' => 'GET'], 'put' => ['method' => 'PUT']], ['get' => ['method' => 'GET'], 'post' => ['method' => 'POST'], 'custom' => ['method' => 'GET', 'path' => '/foo'], 'custom2' => ['method' => 'POST', 'path' => '/foo']], [])
+            new ResourceMetadata([new OperationCollectionMetadata('/dummies', 'gerard', 'gerard', '#dummy', ['get' => ['method' => 'GET'], 'put' => ['method' => 'PUT']], ['get' => ['method' => 'GET'], 'post' => ['method' => 'POST'], 'custom' => ['method' => 'GET', 'path' => '/foo'], 'custom2' => ['method' => 'POST', 'path' => '/foo']], [])])
         );
         $contextAction('dummy');
     }

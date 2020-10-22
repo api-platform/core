@@ -27,6 +27,7 @@
             </xsd:sequence>
 
             <xsd:attribute type="xsd:string" name="class" use="required"/>
+            <xsd:attribute type="xsd:string" name="path"/>
             <xsd:attribute type="xsd:string" name="shortName"/>
             <xsd:attribute type="xsd:string" name="description"/>
             <xsd:attribute type="xsd:string" name="iri"/>

@@ -16,6 +16,7 @@ namespace ApiPlatform\Core\Tests\Bridge\Doctrine\Orm\Extension;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\OrderExtension;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGenerator;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
+use ApiPlatform\Core\Metadata\Resource\OperationCollectionMetadata;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\EmbeddedDummy;
@@ -82,7 +83,7 @@ class OrderExtensionTest extends TestCase
         $classMetadataProphecy = $this->prophesize(ClassMetadata::class);
         $classMetadataProphecy->getIdentifier()->shouldBeCalled()->willReturn(['name']);
 
-        $resourceMetadataFactoryProphecy->create(Dummy::class)->shouldBeCalled()->willReturn(new ResourceMetadata(null, null, null, null, null, ['order' => ['foo' => 'DESC']]));
+        $resourceMetadataFactoryProphecy->create(Dummy::class)->shouldBeCalled()->willReturn(new ResourceMetadata([new OperationCollectionMetadata('/dummies', null, null, null, null, null, ['order' => ['foo' => 'DESC']])]));
 
         $emProphecy = $this->prophesize(EntityManager::class);
         $emProphecy->getClassMetadata(Dummy::class)->shouldBeCalled()->willReturn($classMetadataProphecy->reveal());
@@ -106,7 +107,7 @@ class OrderExtensionTest extends TestCase
         $classMetadataProphecy = $this->prophesize(ClassMetadata::class);
         $classMetadataProphecy->getIdentifier()->shouldBeCalled()->willReturn(['name']);
 
-        $resourceMetadataFactoryProphecy->create(Dummy::class)->shouldBeCalled()->willReturn(new ResourceMetadata(null, null, null, null, null, ['order' => ['foo', 'bar' => 'DESC']]));
+        $resourceMetadataFactoryProphecy->create(Dummy::class)->shouldBeCalled()->willReturn(new ResourceMetadata([new OperationCollectionMetadata('/dummies', null, null, null, null, null, ['order' => ['foo', 'bar' => 'DESC']])]));
 
         $emProphecy = $this->prophesize(EntityManager::class);
         $emProphecy->getClassMetadata(Dummy::class)->shouldBeCalled()->willReturn($classMetadataProphecy->reveal());
@@ -131,7 +132,7 @@ class OrderExtensionTest extends TestCase
         $classMetadataProphecy = $this->prophesize(ClassMetadata::class);
         $classMetadataProphecy->getIdentifier()->shouldBeCalled()->willReturn(['name']);
 
-        $resourceMetadataFactoryProphecy->create(Dummy::class)->shouldBeCalled()->willReturn(new ResourceMetadata(null, null, null, null, null, ['order' => ['author.name']]));
+        $resourceMetadataFactoryProphecy->create(Dummy::class)->shouldBeCalled()->willReturn(new ResourceMetadata([new OperationCollectionMetadata('/dummies', null, null, null, null, null, ['order' => ['author.name']])]));
 
         $emProphecy = $this->prophesize(EntityManager::class);
         $emProphecy->getClassMetadata(Dummy::class)->shouldBeCalled()->willReturn($classMetadataProphecy->reveal());
@@ -155,7 +156,7 @@ class OrderExtensionTest extends TestCase
         $classMetadataProphecy->getIdentifier()->shouldBeCalled()->willReturn(['id']);
         $classMetadataProphecy->embeddedClasses = ['embeddedDummy' => []];
 
-        $resourceMetadataFactoryProphecy->create(EmbeddedDummy::class)->shouldBeCalled()->willReturn(new ResourceMetadata(null, null, null, null, null, ['order' => ['embeddedDummy.dummyName' => 'DESC']]));
+        $resourceMetadataFactoryProphecy->create(EmbeddedDummy::class)->shouldBeCalled()->willReturn(new ResourceMetadata([new OperationCollectionMetadata('/dummies', null, null, null, null, null, ['order' => ['embeddedDummy.dummyName' => 'DESC']])]));
 
         $emProphecy = $this->prophesize(EntityManager::class);
         $emProphecy->getClassMetadata(EmbeddedDummy::class)->shouldBeCalled()->willReturn($classMetadataProphecy->reveal());

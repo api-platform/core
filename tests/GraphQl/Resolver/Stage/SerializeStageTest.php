@@ -19,6 +19,7 @@ use ApiPlatform\Core\GraphQl\Resolver\Stage\SerializeStage;
 use ApiPlatform\Core\GraphQl\Serializer\ItemNormalizer;
 use ApiPlatform\Core\GraphQl\Serializer\SerializerContextBuilderInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
+use ApiPlatform\Core\Metadata\Resource\OperationCollectionMetadata;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Tests\ProphecyTrait;
 use GraphQL\Type\Definition\ResolveInfo;
@@ -54,9 +55,9 @@ class SerializeStageTest extends TestCase
     {
         $operationName = 'item_query';
         $resourceClass = 'myResource';
-        $resourceMetadata = (new ResourceMetadata())->withGraphql([
+        $resourceMetadata = (new ResourceMetadata([(new OperationCollectionMetadata('/dummies'))->withGraphql([
             $operationName => ['serialize' => false],
-        ]);
+        ])]));
         $this->resourceMetadataFactoryProphecy->create($resourceClass)->willReturn($resourceMetadata);
 
         $result = ($this->createSerializeStage($paginationEnabled))(null, $resourceClass, $operationName, $context);
@@ -83,7 +84,7 @@ class SerializeStageTest extends TestCase
     public function testApply($itemOrCollection, string $operationName, array $context, bool $paginationEnabled, ?array $expectedResult): void
     {
         $resourceClass = 'myResource';
-        $this->resourceMetadataFactoryProphecy->create($resourceClass)->willReturn(new ResourceMetadata('shortName'));
+        $this->resourceMetadataFactoryProphecy->create($resourceClass)->willReturn(new ResourceMetadata([new OperationCollectionMetadata('/dummies', 'shortName')]));
 
         $normalizationContext = ['normalization' => true];
         $this->serializerContextBuilderProphecy->create($resourceClass, $operationName, $context, true)->shouldBeCalled()->willReturn($normalizationContext);
@@ -125,7 +126,7 @@ class SerializeStageTest extends TestCase
             'args' => $args,
             'info' => $this->prophesize(ResolveInfo::class)->reveal(),
         ];
-        $this->resourceMetadataFactoryProphecy->create($resourceClass)->willReturn(new ResourceMetadata('shortName'));
+        $this->resourceMetadataFactoryProphecy->create($resourceClass)->willReturn(new ResourceMetadata([new OperationCollectionMetadata('/dummies', 'shortName')]));
 
         $normalizationContext = ['normalization' => true];
         $this->serializerContextBuilderProphecy->create($resourceClass, $operationName, $context, true)->shouldBeCalled()->willReturn($normalizationContext);
@@ -163,7 +164,7 @@ class SerializeStageTest extends TestCase
         $operationName = 'item_query';
         $resourceClass = 'myResource';
         $context = ['is_collection' => false, 'is_mutation' => false, 'is_subscription' => false, 'args' => [], 'info' => $this->prophesize(ResolveInfo::class)->reveal()];
-        $this->resourceMetadataFactoryProphecy->create($resourceClass)->willReturn(new ResourceMetadata());
+        $this->resourceMetadataFactoryProphecy->create($resourceClass)->willReturn(new ResourceMetadata([new OperationCollectionMetadata('/dummies')]));
 
         $normalizationContext = ['normalization' => true];
         $this->serializerContextBuilderProphecy->create($resourceClass, $operationName, $context, true)->shouldBeCalled()->willReturn($normalizationContext);

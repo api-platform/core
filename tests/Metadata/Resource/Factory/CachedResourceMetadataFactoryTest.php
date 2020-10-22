@@ -15,6 +15,7 @@ namespace ApiPlatform\Core\Tests\Metadata\Resource\Factory;
 
 use ApiPlatform\Core\Metadata\Resource\Factory\CachedResourceMetadataFactory;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
+use ApiPlatform\Core\Metadata\Resource\OperationCollectionMetadata;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Core\Tests\ProphecyTrait;
@@ -34,7 +35,7 @@ class CachedResourceMetadataFactoryTest extends TestCase
     {
         $cacheItem = $this->prophesize(CacheItemInterface::class);
         $cacheItem->isHit()->willReturn(true)->shouldBeCalled();
-        $cacheItem->get()->willReturn(new ResourceMetadata(null, 'Dummy.'))->shouldBeCalled();
+        $cacheItem->get()->willReturn(new ResourceMetadata([new OperationCollectionMetadata('/dummies', null, 'Dummy.')]))->shouldBeCalled();
 
         $cacheItemPool = $this->prophesize(CacheItemPoolInterface::class);
         $cacheItemPool->getItem($this->generateCacheKey())->willReturn($cacheItem->reveal())->shouldBeCalled();
@@ -44,12 +45,12 @@ class CachedResourceMetadataFactoryTest extends TestCase
         $cachedResourceMetadataFactory = new CachedResourceMetadataFactory($cacheItemPool->reveal(), $decoratedResourceMetadataFactory->reveal());
         $resultedResourceMetadata = $cachedResourceMetadataFactory->create(Dummy::class);
 
-        $this->assertEquals(new ResourceMetadata(null, 'Dummy.'), $resultedResourceMetadata);
+        $this->assertEquals(new ResourceMetadata([new OperationCollectionMetadata('/dummies', null, 'Dummy.')]), $resultedResourceMetadata);
     }
 
     public function testCreateWithItemNotHit()
     {
-        $propertyMetadata = new ResourceMetadata(null, 'Dummy.');
+        $propertyMetadata = new ResourceMetadata([new OperationCollectionMetadata('/dummies', null, 'Dummy.')]);
 
         $decoratedResourceMetadataFactory = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $decoratedResourceMetadataFactory->create(Dummy::class)->willReturn($propertyMetadata)->shouldBeCalled();
@@ -65,7 +66,7 @@ class CachedResourceMetadataFactoryTest extends TestCase
         $cachedResourceMetadataFactory = new CachedResourceMetadataFactory($cacheItemPool->reveal(), $decoratedResourceMetadataFactory->reveal());
         $resultedResourceMetadata = $cachedResourceMetadataFactory->create(Dummy::class);
 
-        $expectedResult = new ResourceMetadata(null, 'Dummy.');
+        $expectedResult = new ResourceMetadata([new OperationCollectionMetadata('/dummies', null, 'Dummy.')]);
         $this->assertEquals($expectedResult, $resultedResourceMetadata);
         $this->assertEquals($expectedResult, $cachedResourceMetadataFactory->create(Dummy::class), 'Trigger the local cache');
     }
@@ -73,7 +74,7 @@ class CachedResourceMetadataFactoryTest extends TestCase
     public function testCreateWithGetCacheItemThrowsCacheException()
     {
         $decoratedResourceMetadataFactory = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $decoratedResourceMetadataFactory->create(Dummy::class)->willReturn(new ResourceMetadata(null, 'Dummy.'))->shouldBeCalled();
+        $decoratedResourceMetadataFactory->create(Dummy::class)->willReturn(new ResourceMetadata([new OperationCollectionMetadata('/dummies', null, 'Dummy.')]))->shouldBeCalled();
 
         $cacheException = $this->prophesize(\Exception::class);
         $cacheException->willImplement(CacheException::class);
@@ -84,7 +85,7 @@ class CachedResourceMetadataFactoryTest extends TestCase
         $cachedResourceMetadataFactory = new CachedResourceMetadataFactory($cacheItemPool->reveal(), $decoratedResourceMetadataFactory->reveal());
         $resultedResourceMetadata = $cachedResourceMetadataFactory->create(Dummy::class);
 
-        $expectedResult = new ResourceMetadata(null, 'Dummy.');
+        $expectedResult = new ResourceMetadata([new OperationCollectionMetadata('/dummies', null, 'Dummy.')]);
         $this->assertEquals($expectedResult, $resultedResourceMetadata);
         $this->assertEquals($expectedResult, $cachedResourceMetadataFactory->create(Dummy::class), 'Trigger the local cache');
     }

@@ -15,6 +15,7 @@ namespace ApiPlatform\Core\Tests\Bridge\Doctrine\MongoDbOdm\Extension;
 
 use ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Extension\OrderExtension;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
+use ApiPlatform\Core\Metadata\Resource\OperationCollectionMetadata;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\Dummy;
 use ApiPlatform\Core\Tests\ProphecyTrait;
@@ -84,7 +85,7 @@ class OrderExtensionTest extends TestCase
         $classMetadataProphecy = $this->prophesize(ClassMetadata::class);
         $classMetadataProphecy->getIdentifier()->shouldBeCalled()->willReturn(['name']);
 
-        $resourceMetadataFactoryProphecy->create(Dummy::class)->shouldBeCalled()->willReturn(new ResourceMetadata(null, null, null, null, null, ['order' => ['foo' => 'DESC']]));
+        $resourceMetadataFactoryProphecy->create(Dummy::class)->shouldBeCalled()->willReturn(new ResourceMetadata([new OperationCollectionMetadata('/dummies', null, null, null, null, null, ['order' => ['foo' => 'DESC']])]));
 
         $objectManagerProphecy = $this->prophesize(DocumentManager::class);
         $objectManagerProphecy->getClassMetadata(Dummy::class)->shouldBeCalled()->willReturn($classMetadataProphecy->reveal());
@@ -108,7 +109,7 @@ class OrderExtensionTest extends TestCase
         $classMetadataProphecy = $this->prophesize(ClassMetadata::class);
         $classMetadataProphecy->getIdentifier()->shouldBeCalled()->willReturn(['name']);
 
-        $resourceMetadataFactoryProphecy->create(Dummy::class)->shouldBeCalled()->willReturn(new ResourceMetadata(null, null, null, null, null, ['order' => ['foo', 'bar' => 'DESC']]));
+        $resourceMetadataFactoryProphecy->create(Dummy::class)->shouldBeCalled()->willReturn(new ResourceMetadata([new OperationCollectionMetadata('/dummies', null, null, null, null, null, ['order' => ['foo', 'bar' => 'DESC']])]));
 
         $objectManagerProphecy = $this->prophesize(DocumentManager::class);
         $objectManagerProphecy->getClassMetadata(Dummy::class)->shouldBeCalled()->willReturn($classMetadataProphecy->reveal());
@@ -142,7 +143,7 @@ class OrderExtensionTest extends TestCase
         $classMetadataProphecy->hasReference('author')->shouldBeCalled()->willReturn(true);
         $classMetadataProphecy->getFieldMapping('author')->shouldBeCalled()->willReturn(['isOwningSide' => true, 'storeAs' => ClassMetadata::REFERENCE_STORE_AS_ID]);
 
-        $resourceMetadataFactoryProphecy->create(Dummy::class)->shouldBeCalled()->willReturn(new ResourceMetadata(null, null, null, null, null, ['order' => ['author.name']]));
+        $resourceMetadataFactoryProphecy->create(Dummy::class)->shouldBeCalled()->willReturn(new ResourceMetadata([new OperationCollectionMetadata('/dummies', null, null, null, null, null, ['order' => ['author.name']])]));
 
         $objectManagerProphecy = $this->prophesize(DocumentManager::class);
         $objectManagerProphecy->getClassMetadata(Dummy::class)->shouldBeCalled()->willReturn($classMetadataProphecy->reveal());

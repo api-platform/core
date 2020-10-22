@@ -39,12 +39,14 @@ final class ElasticsearchOperationResourceMetadataFactory implements ResourceMet
     {
         $resourceMetadata = $this->decorated->create($resourceClass);
 
-        if (null === $resourceMetadata->getCollectionOperations()) {
-            $resourceMetadata = $resourceMetadata->withCollectionOperations(['get' => ['method' => 'GET']]);
-        }
+        foreach ($resourceMetadata as $path => $operationCollectionMetadata) {
+            if (null === $operationCollectionMetadata->getCollectionOperations()) {
+                $resourceMetadata[$path] = $operationCollectionMetadata->withCollectionOperations(['get' => ['method' => 'GET']]);
+            }
 
-        if (null === $resourceMetadata->getItemOperations()) {
-            $resourceMetadata = $resourceMetadata->withItemOperations(['get' => ['method' => 'GET']]);
+            if (null === $operationCollectionMetadata->getItemOperations()) {
+                $resourceMetadata[$path] = $operationCollectionMetadata->withItemOperations(['get' => ['method' => 'GET']]);
+            }
         }
 
         return $resourceMetadata;

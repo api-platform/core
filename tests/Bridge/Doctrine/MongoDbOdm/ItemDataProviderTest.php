@@ -23,6 +23,7 @@ use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInte
 use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 use ApiPlatform\Core\Metadata\Property\PropertyNameCollection;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
+use ApiPlatform\Core\Metadata\Resource\OperationCollectionMetadata;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\Dummy;
 use ApiPlatform\Core\Tests\ProphecyTrait;
@@ -81,7 +82,7 @@ class ItemDataProviderTest extends TestCase
         ]);
         $managerRegistry = $this->getManagerRegistry(Dummy::class, $aggregationBuilder);
 
-        $this->resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadata());
+        $this->resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadata([new OperationCollectionMetadata('/dummies')]));
 
         $extensionProphecy = $this->prophesize(AggregationItemExtensionInterface::class);
         $extensionProphecy->applyToItem($aggregationBuilder, Dummy::class, ['id' => 1], 'foo', $context)->shouldBeCalled();
@@ -153,7 +154,7 @@ class ItemDataProviderTest extends TestCase
         ]);
         $managerRegistry = $this->getManagerRegistry(Dummy::class, $aggregationBuilder);
 
-        $this->resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadata());
+        $this->resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadata([new OperationCollectionMetadata('/dummies')]));
 
         $context = [];
         $extensionProphecy = $this->prophesize(AggregationItemExtensionInterface::class);

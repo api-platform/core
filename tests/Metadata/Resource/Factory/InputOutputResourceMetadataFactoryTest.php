@@ -15,6 +15,7 @@ namespace ApiPlatform\Core\Tests\Metadata\Resource\Factory;
 
 use ApiPlatform\Core\Metadata\Resource\Factory\InputOutputResourceMetadataFactory;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
+use ApiPlatform\Core\Metadata\Resource\OperationCollectionMetadata;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Tests\Fixtures\DummyEntity;
 use ApiPlatform\Core\Tests\ProphecyTrait;
@@ -29,7 +30,7 @@ class InputOutputResourceMetadataFactoryTest extends TestCase
      */
     public function testInputOutputMetadata($attributes, $expected)
     {
-        $resourceMetadata = (new ResourceMetadata(null))->withAttributes($attributes);
+        $resourceMetadata = (new ResourceMetadata([(new OperationCollectionMetadata('/dummies', null))->withAttributes($attributes)]));
         $decoratedProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $decoratedProphecy->create('Foo')->willReturn($resourceMetadata)->shouldBeCalled();
         $decorated = $decoratedProphecy->reveal();
@@ -43,7 +44,7 @@ class InputOutputResourceMetadataFactoryTest extends TestCase
      */
     public function testInputOutputViaGraphQlMetadata($attributes, $expected)
     {
-        $resourceMetadata = (new ResourceMetadata(null))->withGraphQl(['create' => $attributes]);
+        $resourceMetadata = (new ResourceMetadata([(new OperationCollectionMetadata('/dummies', null))->withGraphQl(['create' => $attributes])]));
         $decoratedProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $decoratedProphecy->create('Foo')->willReturn($resourceMetadata)->shouldBeCalled();
         $decorated = $decoratedProphecy->reveal();

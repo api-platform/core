@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Tests\Metadata\Resource\Factory;
 
+use ApiPlatform\Core\Metadata\Resource\OperationCollectionMetadata;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
@@ -26,7 +27,7 @@ abstract class FileConfigurationMetadataFactoryProvider extends TestCase
 {
     public function resourceMetadataProvider()
     {
-        $resourceMetadata = new ResourceMetadata();
+        $resourceMetadata = new ResourceMetadata([new OperationCollectionMetadata('/dummies')]);
 
         $metadata = [
             'shortName' => 'thedummyshortname',
@@ -74,39 +75,39 @@ abstract class FileConfigurationMetadataFactoryProvider extends TestCase
 
     public function optionalResourceMetadataProvider()
     {
-        $resourceMetadata = new ResourceMetadata();
-        $resourceMetadata = $resourceMetadata->withItemOperations(['my_op_name' => ['method' => 'POST']]);
-
-        return [[$resourceMetadata]];
+        return [[new ResourceMetadata([(new OperationCollectionMetadata('/dummies'))->withItemOperations(['my_op_name' => ['method' => 'POST']])])]];
     }
 
     public function noCollectionOperationsResourceMetadataProvider()
     {
-        $resourceMetadata = new ResourceMetadata();
-        $resourceMetadata = $resourceMetadata->withItemOperations(['my_op_name' => ['method' => 'POST']]);
-        $resourceMetadata = $resourceMetadata->withCollectionOperations([]);
+        $resourceMetadata = new ResourceMetadata([(new OperationCollectionMetadata('/dummies'))
+            ->withItemOperations(['my_op_name' => ['method' => 'POST']])
+            ->withCollectionOperations([]),
+        ]);
 
         return [[$resourceMetadata]];
     }
 
     public function noItemOperationsResourceMetadataProvider()
     {
-        $resourceMetadata = new ResourceMetadata();
-        $resourceMetadata = $resourceMetadata->withCollectionOperations(['my_op_name' => ['method' => 'POST']]);
-        $resourceMetadata = $resourceMetadata->withItemOperations([]);
+        $resourceMetadata = new ResourceMetadata([(new OperationCollectionMetadata('/dummies'))
+            ->withCollectionOperations(['my_op_name' => ['method' => 'POST']])
+            ->withItemOperations([]),
+        ]);
 
         return [[$resourceMetadata]];
     }
 
     public function legacyOperationsResourceMetadataProvider()
     {
-        $resourceMetadata = new ResourceMetadata();
-        $resourceMetadata = $resourceMetadata->withItemOperations([
-            'my_op_name' => ['method' => 'POST'],
-            'my_other_op_name' => ['method' => 'GET'],
-        ]);
-        $resourceMetadata = $resourceMetadata->withCollectionOperations([
-            'my_op_name' => ['method' => 'POST'],
+        $resourceMetadata = new ResourceMetadata([(new OperationCollectionMetadata('/dummies'))
+            ->withItemOperations([
+                'my_op_name' => ['method' => 'POST'],
+                'my_other_op_name' => ['method' => 'GET'],
+            ])
+            ->withCollectionOperations([
+                'my_op_name' => ['method' => 'POST'],
+            ]),
         ]);
 
         return [[$resourceMetadata]];

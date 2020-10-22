@@ -20,6 +20,7 @@ use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 use ApiPlatform\Core\Metadata\Property\PropertyNameCollection;
 use ApiPlatform\Core\Metadata\Property\SubresourceMetadata;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
+use ApiPlatform\Core\Metadata\Resource\OperationCollectionMetadata;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Operation\Factory\SubresourceOperationFactory;
 use ApiPlatform\Core\Operation\PathSegmentNameGeneratorInterface;
@@ -40,8 +41,8 @@ class SubresourceOperationFactoryTest extends TestCase
     public function testCreate()
     {
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $resourceMetadataFactoryProphecy->create(RelatedDummyEntity::class)->shouldBeCalled()->willReturn(new ResourceMetadata('relatedDummyEntity'));
-        $resourceMetadataFactoryProphecy->create(DummyEntity::class)->shouldBeCalled()->willReturn(new ResourceMetadata('dummyEntity'));
+        $resourceMetadataFactoryProphecy->create(RelatedDummyEntity::class)->shouldBeCalled()->willReturn(new ResourceMetadata([new OperationCollectionMetadata('/dummies', 'relatedDummyEntity')]));
+        $resourceMetadataFactoryProphecy->create(DummyEntity::class)->shouldBeCalled()->willReturn(new ResourceMetadata([new OperationCollectionMetadata('/dummies', 'dummyEntity')]));
 
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyNameCollectionFactoryProphecy->create(DummyEntity::class)->shouldBeCalled()->willReturn(new PropertyNameCollection(['foo', 'subresource', 'subcollection']));
@@ -160,15 +161,15 @@ class SubresourceOperationFactoryTest extends TestCase
     public function testCreateByOverriding()
     {
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $resourceMetadataFactoryProphecy->create(RelatedDummyEntity::class)->shouldBeCalled()->willReturn(new ResourceMetadata('relatedDummyEntity'));
-        $resourceMetadataFactoryProphecy->create(DummyEntity::class)->shouldBeCalled()->willReturn((new ResourceMetadata('dummyEntity'))->withSubresourceOperations([
+        $resourceMetadataFactoryProphecy->create(RelatedDummyEntity::class)->shouldBeCalled()->willReturn(new ResourceMetadata([new OperationCollectionMetadata('/dummies', 'relatedDummyEntity')]));
+        $resourceMetadataFactoryProphecy->create(DummyEntity::class)->shouldBeCalled()->willReturn(new ResourceMetadata([(new OperationCollectionMetadata('/dummies', 'dummyEntity'))->withSubresourceOperations([
             'subcollections_get_subresource' => [
                 'path' => '/dummy_entities/{id}/foobars',
             ],
             'subcollections_another_subresource_get_subresource' => [
                 'path' => '/dummy_entities/{id}/foobars/{subcollection}/another_foobar.{_format}',
             ],
-        ]));
+        ])]));
 
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyNameCollectionFactoryProphecy->create(DummyEntity::class)->shouldBeCalled()->willReturn(new PropertyNameCollection(['foo', 'subresource', 'subcollection']));
@@ -287,8 +288,8 @@ class SubresourceOperationFactoryTest extends TestCase
     public function testCreateWithMaxDepth()
     {
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $resourceMetadataFactoryProphecy->create(RelatedDummyEntity::class)->shouldBeCalled()->willReturn(new ResourceMetadata('relatedDummyEntity'));
-        $resourceMetadataFactoryProphecy->create(DummyEntity::class)->shouldBeCalled()->willReturn(new ResourceMetadata('dummyEntity'));
+        $resourceMetadataFactoryProphecy->create(RelatedDummyEntity::class)->shouldBeCalled()->willReturn(new ResourceMetadata([new OperationCollectionMetadata('/dummies', 'relatedDummyEntity')]));
+        $resourceMetadataFactoryProphecy->create(DummyEntity::class)->shouldBeCalled()->willReturn(new ResourceMetadata([new OperationCollectionMetadata('/dummies', 'dummyEntity')]));
 
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyNameCollectionFactoryProphecy->create(DummyEntity::class)->shouldBeCalled()->willReturn(new PropertyNameCollection(['subresource']));
@@ -344,9 +345,9 @@ class SubresourceOperationFactoryTest extends TestCase
          * DummyEntity -secondSubresource-> dummyValidatedEntity -moreSubresource-> RelatedDummyEntity.
          */
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $resourceMetadataFactoryProphecy->create(RelatedDummyEntity::class)->shouldBeCalled()->willReturn(new ResourceMetadata('relatedDummyEntity'));
-        $resourceMetadataFactoryProphecy->create(DummyEntity::class)->shouldBeCalled()->willReturn(new ResourceMetadata('dummyEntity'));
-        $resourceMetadataFactoryProphecy->create(DummyValidatedEntity::class)->shouldBeCalled()->willReturn(new ResourceMetadata('dummyValidatedEntity'));
+        $resourceMetadataFactoryProphecy->create(RelatedDummyEntity::class)->shouldBeCalled()->willReturn(new ResourceMetadata([new OperationCollectionMetadata('/dummies', 'relatedDummyEntity')]));
+        $resourceMetadataFactoryProphecy->create(DummyEntity::class)->shouldBeCalled()->willReturn(new ResourceMetadata([new OperationCollectionMetadata('/dummies', 'dummyEntity')]));
+        $resourceMetadataFactoryProphecy->create(DummyValidatedEntity::class)->shouldBeCalled()->willReturn(new ResourceMetadata([new OperationCollectionMetadata('/dummies', 'dummyValidatedEntity')]));
 
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyNameCollectionFactoryProphecy->create(DummyEntity::class)->shouldBeCalled()->willReturn(new PropertyNameCollection(['subresource', 'secondSubresource']));
@@ -436,9 +437,9 @@ class SubresourceOperationFactoryTest extends TestCase
          * DummyEntity -secondSubresource (maxDepth=1)-> dummyValidatedEntity -moreSubresource-> RelatedDummyEntity.
          */
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $resourceMetadataFactoryProphecy->create(DummyEntity::class)->shouldBeCalled()->willReturn(new ResourceMetadata('dummyEntity'));
-        $resourceMetadataFactoryProphecy->create(RelatedDummyEntity::class)->shouldBeCalled()->willReturn(new ResourceMetadata('relatedDummyEntity'));
-        $resourceMetadataFactoryProphecy->create(DummyValidatedEntity::class)->shouldBeCalled()->willReturn(new ResourceMetadata('dummyValidatedEntity'));
+        $resourceMetadataFactoryProphecy->create(DummyEntity::class)->shouldBeCalled()->willReturn(new ResourceMetadata([new OperationCollectionMetadata('/dummies', 'dummyEntity')]));
+        $resourceMetadataFactoryProphecy->create(RelatedDummyEntity::class)->shouldBeCalled()->willReturn(new ResourceMetadata([new OperationCollectionMetadata('/dummies', 'relatedDummyEntity')]));
+        $resourceMetadataFactoryProphecy->create(DummyValidatedEntity::class)->shouldBeCalled()->willReturn(new ResourceMetadata([new OperationCollectionMetadata('/dummies', 'dummyValidatedEntity')]));
 
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyNameCollectionFactoryProphecy->create(DummyEntity::class)->shouldBeCalled()->willReturn(new PropertyNameCollection(['subresource', 'secondSubresource']));
@@ -509,7 +510,7 @@ class SubresourceOperationFactoryTest extends TestCase
          * DummyEntity -subresource-> DummyEntity --> DummyEntity ...
          */
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $resourceMetadataFactoryProphecy->create(DummyEntity::class)->shouldBeCalled()->willReturn(new ResourceMetadata('dummyEntity'));
+        $resourceMetadataFactoryProphecy->create(DummyEntity::class)->shouldBeCalled()->willReturn(new ResourceMetadata([new OperationCollectionMetadata('/dummies', 'dummyEntity')]));
 
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyNameCollectionFactoryProphecy->create(DummyEntity::class)->shouldBeCalled()->willReturn(new PropertyNameCollection(['subresource']));
@@ -563,7 +564,7 @@ class SubresourceOperationFactoryTest extends TestCase
          * DummyEntity -secondSubresource-> DummyEntity !!!-subresource-> DummyEntity ...
          */
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $resourceMetadataFactoryProphecy->create(DummyEntity::class)->shouldBeCalled()->willReturn(new ResourceMetadata('dummyEntity'));
+        $resourceMetadataFactoryProphecy->create(DummyEntity::class)->shouldBeCalled()->willReturn(new ResourceMetadata([new OperationCollectionMetadata('/dummies', 'dummyEntity')]));
 
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyNameCollectionFactoryProphecy->create(DummyEntity::class)->shouldBeCalled()->willReturn(new PropertyNameCollection(['subresource', 'secondSubresource']));
@@ -638,8 +639,8 @@ class SubresourceOperationFactoryTest extends TestCase
     public function testCreateWithEnd()
     {
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $resourceMetadataFactoryProphecy->create(RelatedDummyEntity::class)->shouldBeCalled()->willReturn(new ResourceMetadata('relatedDummyEntity'));
-        $resourceMetadataFactoryProphecy->create(DummyEntity::class)->shouldBeCalled()->willReturn(new ResourceMetadata('dummyEntity'));
+        $resourceMetadataFactoryProphecy->create(RelatedDummyEntity::class)->shouldBeCalled()->willReturn(new ResourceMetadata([new OperationCollectionMetadata('/dummies', 'relatedDummyEntity')]));
+        $resourceMetadataFactoryProphecy->create(DummyEntity::class)->shouldBeCalled()->willReturn(new ResourceMetadata([new OperationCollectionMetadata('/dummies', 'dummyEntity')]));
 
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyNameCollectionFactoryProphecy->create(DummyEntity::class)->shouldBeCalled()->willReturn(new PropertyNameCollection(['subresource']));
@@ -702,8 +703,8 @@ class SubresourceOperationFactoryTest extends TestCase
     public function testCreateWithEndButNoCollection()
     {
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $resourceMetadataFactoryProphecy->create(RelatedDummyEntity::class)->shouldBeCalled()->willReturn(new ResourceMetadata('relatedDummyEntity'));
-        $resourceMetadataFactoryProphecy->create(DummyEntity::class)->shouldBeCalled()->willReturn(new ResourceMetadata('dummyEntity'));
+        $resourceMetadataFactoryProphecy->create(RelatedDummyEntity::class)->shouldBeCalled()->willReturn(new ResourceMetadata([new OperationCollectionMetadata('/dummies', 'relatedDummyEntity')]));
+        $resourceMetadataFactoryProphecy->create(DummyEntity::class)->shouldBeCalled()->willReturn(new ResourceMetadata([new OperationCollectionMetadata('/dummies', 'dummyEntity')]));
 
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyNameCollectionFactoryProphecy->create(DummyEntity::class)->shouldBeCalled()->willReturn(new PropertyNameCollection(['subresource']));
@@ -752,8 +753,8 @@ class SubresourceOperationFactoryTest extends TestCase
     public function testCreateWithRootResourcePrefix()
     {
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $resourceMetadataFactoryProphecy->create(RelatedDummyEntity::class)->shouldBeCalled()->willReturn(new ResourceMetadata('relatedDummyEntity'));
-        $resourceMetadataFactoryProphecy->create(DummyEntity::class)->shouldBeCalled()->willReturn(new ResourceMetadata('dummyEntity', null, null, null, null, ['route_prefix' => 'root_resource_prefix']));
+        $resourceMetadataFactoryProphecy->create(RelatedDummyEntity::class)->shouldBeCalled()->willReturn(new ResourceMetadata([new OperationCollectionMetadata('/dummies', 'relatedDummyEntity')]));
+        $resourceMetadataFactoryProphecy->create(DummyEntity::class)->shouldBeCalled()->willReturn(new ResourceMetadata([new OperationCollectionMetadata('/dummies', 'dummyEntity', null, null, null, null, ['route_prefix' => 'root_resource_prefix'])]));
 
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyNameCollectionFactoryProphecy->create(DummyEntity::class)->shouldBeCalled()->willReturn(new PropertyNameCollection(['subresource']));
@@ -806,8 +807,8 @@ class SubresourceOperationFactoryTest extends TestCase
          * DummyEntity -subresource (maxDepth=1) -> DummyEntity -otherSubresource-> RelatedDummyEntity.
          */
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $resourceMetadataFactoryProphecy->create(DummyEntity::class)->shouldBeCalled()->willReturn(new ResourceMetadata('dummyEntity'));
-        $resourceMetadataFactoryProphecy->create(RelatedDummyEntity::class)->shouldBeCalled()->willReturn(new ResourceMetadata('relatedDummyEntity'));
+        $resourceMetadataFactoryProphecy->create(DummyEntity::class)->shouldBeCalled()->willReturn(new ResourceMetadata([new OperationCollectionMetadata('/dummies', 'dummyEntity')]));
+        $resourceMetadataFactoryProphecy->create(RelatedDummyEntity::class)->shouldBeCalled()->willReturn(new ResourceMetadata([new OperationCollectionMetadata('/dummies', 'relatedDummyEntity')]));
 
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyNameCollectionFactoryProphecy->create(DummyEntity::class)->shouldBeCalled()->willReturn(new PropertyNameCollection(['subresource', 'otherSubresource']));

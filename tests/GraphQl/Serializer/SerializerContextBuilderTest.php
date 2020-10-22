@@ -15,6 +15,7 @@ namespace ApiPlatform\Core\Tests\GraphQl\Serializer;
 
 use ApiPlatform\Core\GraphQl\Serializer\SerializerContextBuilder;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
+use ApiPlatform\Core\Metadata\Resource\OperationCollectionMetadata;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Serializer\NameConverter\CustomConverter;
 use ApiPlatform\Core\Tests\ProphecyTrait;
@@ -68,15 +69,14 @@ class SerializerContextBuilderTest extends TestCase
         }
 
         $this->resourceMetadataFactoryProphecy->create($resourceClass)->willReturn(
-            (new ResourceMetadata('shortName'))
-                ->withGraphql([
-                    $operationName => [
-                        'input' => ['class' => 'inputClass'],
-                        'output' => ['class' => 'outputClass'],
-                        'normalization_context' => ['groups' => ['normalization_group']],
-                    ],
-                ])
-        );
+            (new ResourceMetadata([(new OperationCollectionMetadata('/dummies', 'shortName'))->withGraphql([
+                $operationName => [
+                    'input' => ['class' => 'inputClass'],
+                    'output' => ['class' => 'outputClass'],
+                    'normalization_context' => ['groups' => ['normalization_group']],
+                ],
+            ]),
+            ])));
 
         if ($expectedExceptionClass) {
             $this->expectException($expectedExceptionClass);
@@ -231,15 +231,14 @@ class SerializerContextBuilderTest extends TestCase
     public function testCreateDenormalizationContext(?string $resourceClass, string $operationName, array $expectedContext): void
     {
         $this->resourceMetadataFactoryProphecy->create($resourceClass)->willReturn(
-            (new ResourceMetadata())
-                ->withGraphql([
-                    $operationName => [
-                        'input' => ['class' => 'inputClass'],
-                        'output' => ['class' => 'outputClass'],
-                        'denormalization_context' => ['groups' => ['denormalization_group']],
-                    ],
-                ])
-        );
+            (new ResourceMetadata([(new OperationCollectionMetadata('/dummies'))->withGraphql([
+                $operationName => [
+                    'input' => ['class' => 'inputClass'],
+                    'output' => ['class' => 'outputClass'],
+                    'denormalization_context' => ['groups' => ['denormalization_group']],
+                ],
+            ]),
+            ])));
 
         $context = $this->serializerContextBuilder->create($resourceClass, $operationName, [], false);
 

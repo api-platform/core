@@ -17,6 +17,7 @@ use ApiPlatform\Core\Bridge\Symfony\Bundle\SwaggerUi\SwaggerUiAction;
 use ApiPlatform\Core\Bridge\Symfony\Bundle\SwaggerUi\SwaggerUiContext;
 use ApiPlatform\Core\Documentation\DocumentationInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
+use ApiPlatform\Core\Metadata\Resource\OperationCollectionMetadata;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\OpenApi\Factory\OpenApiFactoryInterface;
 use ApiPlatform\Core\OpenApi\Model\Info;
@@ -48,7 +49,7 @@ class SwaggerUiActionTest extends TestCase
     public function testInvoke(Request $request, $twigProphecy)
     {
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadata('F'))->shouldBeCalled();
+        $resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadata([new OperationCollectionMetadata('/dummies', 'F')]))->shouldBeCalled();
 
         $normalizerProphecy = $this->prophesize(NormalizerInterface::class);
         $normalizerProphecy->normalize(Argument::type(DocumentationInterface::class), 'json', Argument::type('array'))->willReturn(self::SPEC)->shouldBeCalled();
@@ -153,7 +154,7 @@ class SwaggerUiActionTest extends TestCase
     public function testDoNotRunCurrentRequest(Request $request)
     {
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadata());
+        $resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadata([new OperationCollectionMetadata('/dummies')]));
 
         $normalizerProphecy = $this->prophesize(NormalizerInterface::class);
         $normalizerProphecy->normalize(Argument::type(DocumentationInterface::class), 'json', Argument::type('array'))->willReturn(self::SPEC)->shouldBeCalled();

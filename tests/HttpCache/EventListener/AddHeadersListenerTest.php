@@ -15,6 +15,7 @@ namespace ApiPlatform\Core\Tests\HttpCache\EventListener;
 
 use ApiPlatform\Core\HttpCache\EventListener\AddHeadersListener;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
+use ApiPlatform\Core\Metadata\Resource\OperationCollectionMetadata;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Core\Tests\ProphecyTrait;
@@ -103,7 +104,7 @@ class AddHeadersListenerTest extends TestCase
         $event->getResponse()->willReturn($response)->shouldBeCalled();
 
         $factory = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $factory->create(Dummy::class)->willReturn(new ResourceMetadata())->shouldBeCalled();
+        $factory->create(Dummy::class)->willReturn(new ResourceMetadata([new OperationCollectionMetadata('/dummies')]))->shouldBeCalled();
 
         $listener = new AddHeadersListener(true, 100, 200, ['Accept', 'Accept-Encoding'], true, $factory->reveal(), 15, 30);
         $listener->onKernelResponse($event->reveal());
@@ -127,7 +128,7 @@ class AddHeadersListenerTest extends TestCase
         $event->getResponse()->willReturn($response)->shouldBeCalled();
 
         $factory = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $factory->create(Dummy::class)->willReturn(new ResourceMetadata())->shouldBeCalled();
+        $factory->create(Dummy::class)->willReturn(new ResourceMetadata([new OperationCollectionMetadata('/dummies')]))->shouldBeCalled();
 
         $listener = new AddHeadersListener(true, 100, 200, ['Accept', 'Accept-Encoding'], true, $factory->reveal(), 15, 30);
         $listener->onKernelResponse($event->reveal());
@@ -146,7 +147,7 @@ class AddHeadersListenerTest extends TestCase
         $event->getRequest()->willReturn($request)->shouldBeCalled();
         $event->getResponse()->willReturn($response)->shouldBeCalled();
 
-        $metadata = new ResourceMetadata(null, null, null, null, null, ['cache_headers' => ['max_age' => 123, 'shared_max_age' => 456, 'stale_while_revalidate' => 928, 'stale_if_error' => 70,  'vary' => ['Vary-1', 'Vary-2']]]);
+        $metadata = new ResourceMetadata([new OperationCollectionMetadata('/dummies', null, null, null, null, null, ['cache_headers' => ['max_age' => 123, 'shared_max_age' => 456, 'stale_while_revalidate' => 928, 'stale_if_error' => 70,  'vary' => ['Vary-1', 'Vary-2']]])]);
         $factory = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $factory->create(Dummy::class)->willReturn($metadata)->shouldBeCalled();
 
@@ -166,13 +167,13 @@ class AddHeadersListenerTest extends TestCase
         $event->getRequest()->willReturn($request)->shouldBeCalled();
         $event->getResponse()->willReturn($response)->shouldBeCalled();
 
-        $metadata = new ResourceMetadata(null, null, null, null, null, [
+        $metadata = new ResourceMetadata([new OperationCollectionMetadata('/dummies', null, null, null, null, null, [
             'cache_headers' => [
                 'max_age' => 123,
                 'public' => false,
                 'shared_max_age' => 456,
             ],
-        ]);
+        ])]);
         $factory = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $factory->create(Dummy::class)->willReturn($metadata)->shouldBeCalled();
 
@@ -194,13 +195,13 @@ class AddHeadersListenerTest extends TestCase
         $event->getRequest()->willReturn($request)->shouldBeCalled();
         $event->getResponse()->willReturn($response)->shouldBeCalled();
 
-        $metadata = new ResourceMetadata(null, null, null, null, null, [
+        $metadata = new ResourceMetadata([new OperationCollectionMetadata('/dummies', null, null, null, null, null, [
             'cache_headers' => [
                 'max_age' => 123,
                 'public' => true,
                 'shared_max_age' => 456,
             ],
-        ]);
+        ])]);
         $factory = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $factory->create(Dummy::class)->willReturn($metadata)->shouldBeCalled();
 
@@ -219,12 +220,12 @@ class AddHeadersListenerTest extends TestCase
         $event->getRequest()->willReturn($request)->shouldBeCalled();
         $event->getResponse()->willReturn($response)->shouldBeCalled();
 
-        $metadata = new ResourceMetadata(null, null, null, null, null, [
+        $metadata = new ResourceMetadata([new OperationCollectionMetadata('/dummies', null, null, null, null, null, [
             'cache_headers' => [
                 'max_age' => 123,
                 'shared_max_age' => 456,
             ],
-        ]);
+        ])]);
         $factory = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $factory->create(Dummy::class)->willReturn($metadata)->shouldBeCalled();
 
@@ -243,12 +244,12 @@ class AddHeadersListenerTest extends TestCase
         $event->getRequest()->willReturn($request)->shouldBeCalled();
         $event->getResponse()->willReturn($response)->shouldBeCalled();
 
-        $metadata = new ResourceMetadata(null, null, null, null, null, [
+        $metadata = new ResourceMetadata([new OperationCollectionMetadata('/dummies', null, null, null, null, null, [
             'cache_headers' => [
                 'max_age' => 123,
                 'shared_max_age' => 456,
             ],
-        ]);
+        ])]);
         $factory = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $factory->create(Dummy::class)->willReturn($metadata)->shouldBeCalled();
 

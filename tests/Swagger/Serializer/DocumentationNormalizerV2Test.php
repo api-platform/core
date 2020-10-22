@@ -31,6 +31,7 @@ use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 use ApiPlatform\Core\Metadata\Property\PropertyNameCollection;
 use ApiPlatform\Core\Metadata\Property\SubresourceMetadata;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
+use ApiPlatform\Core\Metadata\Resource\OperationCollectionMetadata;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Metadata\Resource\ResourceNameCollection;
 use ApiPlatform\Core\Operation\Factory\SubresourceOperationFactory;
@@ -375,7 +376,7 @@ class DocumentationNormalizerV2Test extends TestCase
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyNameCollectionFactoryProphecy->create(Dummy::class, Argument::type('array'))->willReturn(new PropertyNameCollection(['name', 'nameConverted']));
 
-        $dummyMetadata = new ResourceMetadata('Dummy', 'This is a dummy.', null, ['get' => ['method' => 'GET'] + self::OPERATION_FORMATS]);
+        $dummyMetadata = new ResourceMetadata([new OperationCollectionMetadata('/dummies', 'Dummy', 'This is a dummy.', null, ['get' => ['method' => 'GET'] + self::OPERATION_FORMATS])]);
 
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn($dummyMetadata);
@@ -499,7 +500,7 @@ class DocumentationNormalizerV2Test extends TestCase
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyNameCollectionFactoryProphecy->create(Dummy::class, Argument::type('array'))->willReturn(new PropertyNameCollection(['name']));
 
-        $dummyMetadata = new ResourceMetadata('Dummy', 'This is a dummy.', null, ['get' => ['method' => 'GET'] + self::OPERATION_FORMATS]);
+        $dummyMetadata = new ResourceMetadata([new OperationCollectionMetadata('/dummies', 'Dummy', 'This is a dummy.', null, ['get' => ['method' => 'GET'] + self::OPERATION_FORMATS])]);
 
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn($dummyMetadata);
@@ -2948,7 +2949,7 @@ class DocumentationNormalizerV2Test extends TestCase
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyNameCollectionFactoryProphecy->create(DummyPropertyWithDefaultValue::class, Argument::any())->shouldBeCalled()->willReturn(new PropertyNameCollection(['foo']));
 
-        $dummyMetadata = new ResourceMetadata('DummyPropertyWithDefaultValue', null, null, ['get' => ['method' => 'GET']]);
+        $dummyMetadata = new ResourceMetadata([new OperationCollectionMetadata('/dummies', 'DummyPropertyWithDefaultValue', null, null, ['get' => ['method' => 'GET']])]);
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create(DummyPropertyWithDefaultValue::class)->shouldBeCalled()->willReturn($dummyMetadata);
 

@@ -53,6 +53,12 @@ final class YamlExtractor extends AbstractExtractor
     private function extractResources(array $resourcesYaml, string $path): void
     {
         foreach ($resourcesYaml as $resourceName => $resourceYaml) {
+            if (is_numeric($resourceName)) {
+                // Multi ApiResource declared
+                $resourceName = array_key_first($resourceYaml);
+                $resourceYaml = $resourceYaml[$resourceName];
+            }
+
             $resourceName = $this->resolve($resourceName);
 
             if (null === $resourceYaml) {
@@ -63,7 +69,8 @@ final class YamlExtractor extends AbstractExtractor
                 throw new InvalidArgumentException(sprintf('"%s" setting is expected to be null or an array, %s given in "%s".', $resourceName, \gettype($resourceYaml), $path));
             }
 
-            $this->resources[$resourceName] = [
+            $resource = [
+                'path' => $this->phpize($resourceYaml, 'path', 'string'),
                 'shortName' => $this->phpize($resourceYaml, 'shortName', 'string'),
                 'description' => $this->phpize($resourceYaml, 'description', 'string'),
                 'iri' => $this->phpize($resourceYaml, 'iri', 'string'),
@@ -75,7 +82,8 @@ final class YamlExtractor extends AbstractExtractor
             ];
 
             if (!isset($resourceYaml['properties'])) {
-                $this->resources[$resourceName]['properties'] = null;
+                $resource['properties'] = null;
+                $this->resources[$resourceName][] = $resource;
 
                 continue;
             }
@@ -84,15 +92,17 @@ final class YamlExtractor extends AbstractExtractor
                 throw new InvalidArgumentException(sprintf('"properties" setting is expected to be null or an array, %s given in "%s".', \gettype($resourceYaml['properties']), $path));
             }
 
-            $this->extractProperties($resourceYaml, $resourceName, $path);
+            $this->extractProperties($resourceYaml, $resource, $path);
+
+            $this->resources[$resourceName][] = $resource;
         }
     }
 
-    private function extractProperties(array $resourceYaml, string $resourceName, string $path): void
+    private function extractProperties(array $resourceYaml, array $resource, string $path): void
     {
         foreach ($resourceYaml['properties'] as $propertyName => $propertyValues) {
             if (null === $propertyValues) {
-                $this->resources[$resourceName]['properties'][$propertyName] = null;
+                $resource['properties'][$propertyName] = null;
 
                 continue;
             }
@@ -104,7 +114,7 @@ final class YamlExtractor extends AbstractExtractor
                 $propertyValues['subresource']['resourceClass'] = $this->resolve($propertyValues['subresource']['resourceClass']);
             }
 
-            $this->resources[$resourceName]['properties'][$propertyName] = [
+            $resource['properties'][$propertyName] = [
                 'description' => $this->phpize($propertyValues, 'description', 'string'),
                 'readable' => $this->phpize($propertyValues, 'readable', 'bool'),
                 'writable' => $this->phpize($propertyValues, 'writable', 'bool'),

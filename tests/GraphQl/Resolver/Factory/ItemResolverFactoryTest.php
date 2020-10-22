@@ -19,6 +19,7 @@ use ApiPlatform\Core\GraphQl\Resolver\Stage\SecurityPostDenormalizeStageInterfac
 use ApiPlatform\Core\GraphQl\Resolver\Stage\SecurityStageInterface;
 use ApiPlatform\Core\GraphQl\Resolver\Stage\SerializeStageInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
+use ApiPlatform\Core\Metadata\Resource\OperationCollectionMetadata;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Core\Tests\ProphecyTrait;
@@ -80,7 +81,7 @@ class ItemResolverFactoryTest extends TestCase
 
         $this->readStageProphecy->__invoke($resourceClass, $rootClass, $operationName, $resolverContext)->shouldBeCalled()->willReturn($readStageItem);
 
-        $this->resourceMetadataFactoryProphecy->create($determinedResourceClass)->willReturn(new ResourceMetadata());
+        $this->resourceMetadataFactoryProphecy->create($determinedResourceClass)->willReturn(new ResourceMetadata([new OperationCollectionMetadata('/dummies')]));
 
         $this->securityStageProphecy->__invoke($determinedResourceClass, $operationName, $resolverContext + [
             'extra_variables' => [
@@ -189,7 +190,7 @@ class ItemResolverFactoryTest extends TestCase
         $this->readStageProphecy->__invoke($resourceClass, $rootClass, $operationName, $resolverContext)->shouldBeCalled()->willReturn($readStageItem);
 
         $this->resourceMetadataFactoryProphecy->create($resourceClass)->willReturn(
-            (new ResourceMetadata())->withGraphql([$operationName => ['item_query' => 'query_resolver_id']])
+            (new ResourceMetadata([(new OperationCollectionMetadata('/dummies'))->withGraphql([$operationName => ['item_query' => 'query_resolver_id']])]))
         );
 
         $customItem = new \stdClass();
@@ -230,7 +231,7 @@ class ItemResolverFactoryTest extends TestCase
         $this->readStageProphecy->__invoke($resourceClass, $rootClass, $operationName, $resolverContext)->shouldBeCalled()->willReturn($readStageItem);
 
         $this->resourceMetadataFactoryProphecy->create($resourceClass)->willReturn(
-            (new ResourceMetadata())->withGraphql([$operationName => ['item_query' => 'query_resolver_id']])
+            (new ResourceMetadata([(new OperationCollectionMetadata('/dummies'))->withGraphql([$operationName => ['item_query' => 'query_resolver_id']])]))
         );
 
         $customItem = new Dummy();

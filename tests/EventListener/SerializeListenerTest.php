@@ -15,6 +15,7 @@ namespace ApiPlatform\Core\Tests\EventListener;
 
 use ApiPlatform\Core\EventListener\SerializeListener;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
+use ApiPlatform\Core\Metadata\Resource\OperationCollectionMetadata;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Serializer\ResourceList;
 use ApiPlatform\Core\Serializer\SerializerContextBuilderInterface;
@@ -81,11 +82,11 @@ class SerializeListenerTest extends TestCase
 
         $serializerContextBuilderProphecy = $this->prophesize(SerializerContextBuilderInterface::class);
 
-        $resourceMetadata = new ResourceMetadata('Dummy', null, null, [], [
+        $resourceMetadata = new ResourceMetadata([new OperationCollectionMetadata('/dummies', 'Dummy', null, null, [], [
             'post' => [
                 'serialize' => false,
             ],
-        ]);
+        ])]);
 
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn($resourceMetadata);

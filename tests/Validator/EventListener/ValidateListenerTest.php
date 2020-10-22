@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\Validator\EventListener;
 
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
+use ApiPlatform\Core\Metadata\Resource\OperationCollectionMetadata;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Tests\Fixtures\DummyEntity;
 use ApiPlatform\Core\Tests\ProphecyTrait;
@@ -117,11 +118,11 @@ class ValidateListenerTest extends TestCase
         $validatorProphecy = $this->prophesize(ValidatorInterface::class);
         $validatorProphecy->validate(Argument::cetera())->shouldNotBeCalled();
 
-        $resourceMetadata = new ResourceMetadata('DummyEntity', null, null, [], [
+        $resourceMetadata = new ResourceMetadata([new OperationCollectionMetadata('/dummies', 'DummyEntity', null, null, [], [
             'post' => [
                 'validate' => false,
             ],
-        ]);
+        ])]);
 
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create(DummyEntity::class)->willReturn($resourceMetadata);
@@ -158,9 +159,9 @@ class ValidateListenerTest extends TestCase
 
     private function createEventObject($expectedValidationGroups, $data, bool $receive = true): array
     {
-        $resourceMetadata = new ResourceMetadata(null, null, null, [
+        $resourceMetadata = new ResourceMetadata([new OperationCollectionMetadata('/dummies', null, null, null, [
             'create' => ['validation_groups' => $expectedValidationGroups],
-        ]);
+        ])]);
 
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         if ($receive) {

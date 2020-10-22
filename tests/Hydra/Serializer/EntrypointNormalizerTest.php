@@ -18,6 +18,7 @@ use ApiPlatform\Core\Api\IriConverterInterface;
 use ApiPlatform\Core\Api\UrlGeneratorInterface;
 use ApiPlatform\Core\Hydra\Serializer\EntrypointNormalizer;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
+use ApiPlatform\Core\Metadata\Resource\OperationCollectionMetadata;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Metadata\Resource\ResourceNameCollection;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
@@ -55,8 +56,8 @@ class EntrypointNormalizerTest extends TestCase
         $entrypoint = new Entrypoint($collection);
 
         $factoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $factoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadata('Dummy', null, null, null, ['get']))->shouldBeCalled();
-        $factoryProphecy->create(FooDummy::class)->willReturn(new ResourceMetadata('FooDummy', null, null, null, ['get']))->shouldBeCalled();
+        $factoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadata([new OperationCollectionMetadata('/dummies', 'Dummy', null, null, null, ['get'])]))->shouldBeCalled();
+        $factoryProphecy->create(FooDummy::class)->willReturn(new ResourceMetadata([new OperationCollectionMetadata('/dummies', 'FooDummy', null, null, null, ['get'])]))->shouldBeCalled();
 
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
         $iriConverterProphecy->getIriFromResourceClass(Dummy::class)->willReturn('/api/dummies')->shouldBeCalled();

@@ -26,6 +26,7 @@ use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 use ApiPlatform\Core\Metadata\Property\PropertyNameCollection;
 use ApiPlatform\Core\Metadata\Property\SubresourceMetadata;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
+use ApiPlatform\Core\Metadata\Resource\OperationCollectionMetadata;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Serializer\NameConverter\CustomConverter;
 use ApiPlatform\Core\Tests\ProphecyTrait;
@@ -151,8 +152,8 @@ class FieldsBuilderTest extends TestCase
     public function itemQueryFieldsProvider(): array
     {
         return [
-            'no resource field configuration' => ['resourceClass', new ResourceMetadata(), 'action', [], null, null, []],
-            'nominal standard type case with deprecation reason and description' => ['resourceClass', (new ResourceMetadata('ShortName'))->withGraphql(['action' => ['deprecation_reason' => 'not useful', 'description' => 'Custom description.']]), 'action', [], GraphQLType::string(), null,
+            'no resource field configuration' => ['resourceClass', new ResourceMetadata([new OperationCollectionMetadata('/dummies')]), 'action', [], null, null, []],
+            'nominal standard type case with deprecation reason and description' => ['resourceClass', (new ResourceMetadata([(new OperationCollectionMetadata('/dummies', 'ShortName'))->withGraphql(['action' => ['deprecation_reason' => 'not useful', 'description' => 'Custom description.']])])), 'action', [], GraphQLType::string(), null,
                 [
                     'actionShortName' => [
                         'type' => GraphQLType::string(),
@@ -165,7 +166,7 @@ class FieldsBuilderTest extends TestCase
                     ],
                 ],
             ],
-            'nominal item case' => ['resourceClass', new ResourceMetadata('ShortName'), 'action', [], $graphqlType = new ObjectType(['name' => 'item']), $resolver = function () {
+            'nominal item case' => ['resourceClass', new ResourceMetadata([new OperationCollectionMetadata('/dummies', 'ShortName')]), 'action', [], $graphqlType = new ObjectType(['name' => 'item']), $resolver = function () {
             },
                 [
                     'actionShortName' => [
@@ -180,7 +181,7 @@ class FieldsBuilderTest extends TestCase
                 ],
             ],
             'empty overridden args and add fields' => [
-                'resourceClass', new ResourceMetadata('ShortName'), 'item_query', ['args' => [], 'name' => 'customActionName'], GraphQLType::string(), null,
+                'resourceClass', new ResourceMetadata([new OperationCollectionMetadata('/dummies', 'ShortName')]), 'item_query', ['args' => [], 'name' => 'customActionName'], GraphQLType::string(), null,
                 [
                     'shortName' => [
                         'type' => GraphQLType::string(),
@@ -193,7 +194,7 @@ class FieldsBuilderTest extends TestCase
                 ],
             ],
             'override args with custom ones' => [
-                'resourceClass', new ResourceMetadata('ShortName'), 'item_query', ['args' => ['customArg' => ['type' => 'a type']]], GraphQLType::string(), null,
+                'resourceClass', new ResourceMetadata([new OperationCollectionMetadata('/dummies', 'ShortName')]), 'item_query', ['args' => ['customArg' => ['type' => 'a type']]], GraphQLType::string(), null,
                 [
                     'shortName' => [
                         'type' => GraphQLType::string(),
@@ -244,8 +245,8 @@ class FieldsBuilderTest extends TestCase
     public function collectionQueryFieldsProvider(): array
     {
         return [
-            'no resource field configuration' => ['resourceClass', new ResourceMetadata(), 'action', [], null, null, []],
-            'nominal collection case with deprecation reason and description' => ['resourceClass', (new ResourceMetadata('ShortName'))->withGraphql(['action' => ['deprecation_reason' => 'not useful', 'description' => 'Custom description.']]), 'action', [], $graphqlType = GraphQLType::listOf(new ObjectType(['name' => 'collection'])), $resolver = function () {
+            'no resource field configuration' => ['resourceClass', new ResourceMetadata([new OperationCollectionMetadata('/dummies')]), 'action', [], null, null, []],
+            'nominal collection case with deprecation reason and description' => ['resourceClass', (new ResourceMetadata([(new OperationCollectionMetadata('/dummies', 'ShortName'))->withGraphql(['action' => ['deprecation_reason' => 'not useful', 'description' => 'Custom description.']])])), 'action', [], $graphqlType = GraphQLType::listOf(new ObjectType(['name' => 'collection'])), $resolver = function () {
             },
                 [
                     'actionShortNames' => [
@@ -274,7 +275,7 @@ class FieldsBuilderTest extends TestCase
                     ],
                 ],
             ],
-            'collection with filters' => ['resourceClass', (new ResourceMetadata('ShortName'))->withGraphql(['action' => ['filters' => ['my_filter']]]), 'action', [], $graphqlType = GraphQLType::listOf(new ObjectType(['name' => 'collection'])), $resolver = function () {
+            'collection with filters' => ['resourceClass', (new ResourceMetadata([(new OperationCollectionMetadata('/dummies', 'ShortName'))->withGraphql(['action' => ['filters' => ['my_filter']]])])), 'action', [], $graphqlType = GraphQLType::listOf(new ObjectType(['name' => 'collection'])), $resolver = function () {
             },
                 [
                     'actionShortNames' => [
@@ -308,7 +309,7 @@ class FieldsBuilderTest extends TestCase
                 ],
             ],
             'collection empty overridden args and add fields' => [
-                'resourceClass', new ResourceMetadata('ShortName'), 'action', ['args' => [], 'name' => 'customActionName'], $graphqlType = GraphQLType::listOf(new ObjectType(['name' => 'collection'])), $resolver = function () {
+                'resourceClass', new ResourceMetadata([new OperationCollectionMetadata('/dummies', 'ShortName')]), 'action', ['args' => [], 'name' => 'customActionName'], $graphqlType = GraphQLType::listOf(new ObjectType(['name' => 'collection'])), $resolver = function () {
                 },
                 [
                     'actionShortNames' => [
@@ -322,7 +323,7 @@ class FieldsBuilderTest extends TestCase
                 ],
             ],
             'collection override args with custom ones' => [
-                'resourceClass', new ResourceMetadata('ShortName'), 'action', ['args' => ['customArg' => ['type' => 'a type']]], $graphqlType = GraphQLType::listOf(new ObjectType(['name' => 'collection'])), $resolver = function () {
+                'resourceClass', new ResourceMetadata([new OperationCollectionMetadata('/dummies', 'ShortName')]), 'action', ['args' => ['customArg' => ['type' => 'a type']]], $graphqlType = GraphQLType::listOf(new ObjectType(['name' => 'collection'])), $resolver = function () {
                 },
                 [
                     'actionShortNames' => [
@@ -338,7 +339,7 @@ class FieldsBuilderTest extends TestCase
                     ],
                 ],
             ],
-            'collection with page-based pagination enabled' => ['resourceClass', (new ResourceMetadata('ShortName', null, null, null, null, ['pagination_type' => 'page']))->withGraphql(['action' => ['filters' => ['my_filter']]]), 'action', [], $graphqlType = GraphQLType::listOf(new ObjectType(['name' => 'collection'])), $resolver = function () {
+            'collection with page-based pagination enabled' => ['resourceClass', (new ResourceMetadata([(new OperationCollectionMetadata('/dummies', 'ShortName', null, null, null, null, ['pagination_type' => 'page']))->withGraphql(['action' => ['filters' => ['my_filter']]])])), 'action', [], $graphqlType = GraphQLType::listOf(new ObjectType(['name' => 'collection'])), $resolver = function () {
             },
                 [
                     'actionShortNames' => [
@@ -382,7 +383,7 @@ class FieldsBuilderTest extends TestCase
     public function mutationFieldsProvider(): array
     {
         return [
-            'nominal case with deprecation reason' => ['resourceClass', (new ResourceMetadata('ShortName'))->withGraphql(['action' => ['deprecation_reason' => 'not useful']]), 'action', $graphqlType = new ObjectType(['name' => 'mutation']), $inputGraphqlType = new ObjectType(['name' => 'input']), $mutationResolver = function () {
+            'nominal case with deprecation reason' => ['resourceClass', (new ResourceMetadata([(new OperationCollectionMetadata('/dummies', 'ShortName'))->withGraphql(['action' => ['deprecation_reason' => 'not useful']])])), 'action', $graphqlType = new ObjectType(['name' => 'mutation']), $inputGraphqlType = new ObjectType(['name' => 'input']), $mutationResolver = function () {
             },
                 [
                     'actionShortName' => [
@@ -402,7 +403,7 @@ class FieldsBuilderTest extends TestCase
                     ],
                 ],
             ],
-            'custom description' => ['resourceClass', (new ResourceMetadata('ShortName'))->withGraphql(['action' => ['description' => 'Custom description.']]), 'action', $graphqlType = new ObjectType(['name' => 'mutation']), $inputGraphqlType = new ObjectType(['name' => 'input']), $mutationResolver = function () {
+            'custom description' => ['resourceClass', (new ResourceMetadata([(new OperationCollectionMetadata('/dummies', 'ShortName'))->withGraphql(['action' => ['description' => 'Custom description.']])])), 'action', $graphqlType = new ObjectType(['name' => 'mutation']), $inputGraphqlType = new ObjectType(['name' => 'input']), $mutationResolver = function () {
             },
                 [
                     'actionShortName' => [
@@ -445,9 +446,9 @@ class FieldsBuilderTest extends TestCase
     public function subscriptionFieldsProvider(): array
     {
         return [
-            'mercure not enabled' => ['resourceClass', new ResourceMetadata('ShortName'), 'action', new ObjectType(['name' => 'subscription']), new ObjectType(['name' => 'input']), null, [],
+            'mercure not enabled' => ['resourceClass', new ResourceMetadata([new OperationCollectionMetadata('/dummies', 'ShortName')]), 'action', new ObjectType(['name' => 'subscription']), new ObjectType(['name' => 'input']), null, [],
             ],
-            'nominal case with deprecation reason' => ['resourceClass', (new ResourceMetadata('ShortName'))->withAttributes(['mercure' => true])->withGraphql(['action' => ['deprecation_reason' => 'not useful']]), 'action', $graphqlType = new ObjectType(['name' => 'subscription']), $inputGraphqlType = new ObjectType(['name' => 'input']), $subscriptionResolver = function () {
+            'nominal case with deprecation reason' => ['resourceClass', (new ResourceMetadata([(new OperationCollectionMetadata('/dummies', 'ShortName'))->withAttributes(['mercure' => true])->withGraphql(['action' => ['deprecation_reason' => 'not useful']])])), 'action', $graphqlType = new ObjectType(['name' => 'subscription']), $inputGraphqlType = new ObjectType(['name' => 'input']), $subscriptionResolver = function () {
             },
                 [
                     'actionShortNameSubscribe' => [
@@ -467,7 +468,7 @@ class FieldsBuilderTest extends TestCase
                     ],
                 ],
             ],
-            'custom description' => ['resourceClass', (new ResourceMetadata('ShortName'))->withAttributes(['mercure' => true])->withGraphql(['action' => ['description' => 'Custom description.']]), 'action', $graphqlType = new ObjectType(['name' => 'subscription']), $inputGraphqlType = new ObjectType(['name' => 'input']), $subscriptionResolver = function () {
+            'custom description' => ['resourceClass', (new ResourceMetadata([(new OperationCollectionMetadata('/dummies', 'ShortName'))->withAttributes(['mercure' => true])->withGraphql(['action' => ['description' => 'Custom description.']])])), 'action', $graphqlType = new ObjectType(['name' => 'subscription']), $inputGraphqlType = new ObjectType(['name' => 'input']), $subscriptionResolver = function () {
             },
                 [
                     'actionShortNameSubscribe' => [
@@ -508,7 +509,7 @@ class FieldsBuilderTest extends TestCase
         $this->typesContainerProphecy->has('NotRegisteredType')->willReturn(false);
         $this->typesContainerProphecy->all()->willReturn([]);
         $this->typeBuilderProphecy->isCollection(Argument::type(Type::class))->willReturn(false);
-        $this->resourceMetadataFactoryProphecy->create('subresourceClass')->willReturn(new ResourceMetadata());
+        $this->resourceMetadataFactoryProphecy->create('subresourceClass')->willReturn(new ResourceMetadata([new OperationCollectionMetadata('/dummies')]));
 
         $fieldsBuilder = $this->fieldsBuilder;
         if ($advancedNameConverter) {
@@ -525,7 +526,7 @@ class FieldsBuilderTest extends TestCase
         $advancedNameConverter->normalize('field', 'resourceClass')->willReturn('normalizedField');
 
         return [
-            'query' => ['resourceClass', new ResourceMetadata(),
+            'query' => ['resourceClass', new ResourceMetadata([new OperationCollectionMetadata('/dummies')]),
                 [
                     'property' => new PropertyMetadata(),
                     'propertyBool' => new PropertyMetadata(new Type(Type::BUILTIN_TYPE_BOOL), null, true, false),
@@ -553,7 +554,7 @@ class FieldsBuilderTest extends TestCase
                     ],
                 ],
             ],
-            'query with advanced name converter' => ['resourceClass', new ResourceMetadata(),
+            'query with advanced name converter' => ['resourceClass', new ResourceMetadata([new OperationCollectionMetadata('/dummies')]),
                 [
                     'field' => new PropertyMetadata(new Type(Type::BUILTIN_TYPE_STRING), null, true, false),
                 ],
@@ -572,7 +573,7 @@ class FieldsBuilderTest extends TestCase
                 ],
                 $advancedNameConverter->reveal(),
             ],
-            'query input' => ['resourceClass', new ResourceMetadata(),
+            'query input' => ['resourceClass', new ResourceMetadata([new OperationCollectionMetadata('/dummies')]),
                 [
                     'property' => new PropertyMetadata(),
                     'propertyBool' => new PropertyMetadata(new Type(Type::BUILTIN_TYPE_BOOL), null, false, false),
@@ -591,7 +592,7 @@ class FieldsBuilderTest extends TestCase
                     ],
                 ],
             ],
-            'mutation non input' => ['resourceClass', new ResourceMetadata(),
+            'mutation non input' => ['resourceClass', new ResourceMetadata([new OperationCollectionMetadata('/dummies')]),
                 [
                     'property' => new PropertyMetadata(),
                     'propertyBool' => new PropertyMetadata(new Type(Type::BUILTIN_TYPE_BOOL), null, false, true),
@@ -611,7 +612,7 @@ class FieldsBuilderTest extends TestCase
                     ],
                 ],
             ],
-            'mutation input' => ['resourceClass', new ResourceMetadata(),
+            'mutation input' => ['resourceClass', new ResourceMetadata([new OperationCollectionMetadata('/dummies')]),
                 [
                     'property' => new PropertyMetadata(),
                     'propertyBool' => (new PropertyMetadata(new Type(Type::BUILTIN_TYPE_BOOL), 'propertyBool description', false, true))->withAttributes(['deprecation_reason' => 'not useful']),
@@ -647,7 +648,7 @@ class FieldsBuilderTest extends TestCase
                     'clientMutationId' => GraphQLType::string(),
                 ],
             ],
-            'delete mutation input' => ['resourceClass', new ResourceMetadata(),
+            'delete mutation input' => ['resourceClass', new ResourceMetadata([new OperationCollectionMetadata('/dummies')]),
                 [
                     'propertyBool' => new PropertyMetadata(new Type(Type::BUILTIN_TYPE_BOOL), null, false, true),
                 ],
@@ -659,7 +660,7 @@ class FieldsBuilderTest extends TestCase
                     'clientMutationId' => GraphQLType::string(),
                 ],
             ],
-            'create mutation input' => ['resourceClass', new ResourceMetadata(),
+            'create mutation input' => ['resourceClass', new ResourceMetadata([new OperationCollectionMetadata('/dummies')]),
                 [
                     'propertyBool' => new PropertyMetadata(new Type(Type::BUILTIN_TYPE_BOOL), null, false, true),
                 ],
@@ -675,7 +676,7 @@ class FieldsBuilderTest extends TestCase
                     'clientMutationId' => GraphQLType::string(),
                 ],
             ],
-            'update mutation input' => ['resourceClass', new ResourceMetadata(),
+            'update mutation input' => ['resourceClass', new ResourceMetadata([new OperationCollectionMetadata('/dummies')]),
                 [
                     'propertyBool' => new PropertyMetadata(new Type(Type::BUILTIN_TYPE_BOOL), null, false, true),
                 ],
@@ -694,7 +695,7 @@ class FieldsBuilderTest extends TestCase
                     'clientMutationId' => GraphQLType::string(),
                 ],
             ],
-            'subscription non input' => ['resourceClass', new ResourceMetadata(),
+            'subscription non input' => ['resourceClass', new ResourceMetadata([new OperationCollectionMetadata('/dummies')]),
                 [
                     'property' => new PropertyMetadata(),
                     'propertyBool' => new PropertyMetadata(new Type(Type::BUILTIN_TYPE_BOOL), null, false, true),
@@ -714,7 +715,7 @@ class FieldsBuilderTest extends TestCase
                     ],
                 ],
             ],
-            'subscription input' => ['resourceClass', new ResourceMetadata(),
+            'subscription input' => ['resourceClass', new ResourceMetadata([new OperationCollectionMetadata('/dummies')]),
                 [
                     'property' => new PropertyMetadata(),
                     'propertyBool' => (new PropertyMetadata(new Type(Type::BUILTIN_TYPE_BOOL), 'propertyBool description', false, true))->withAttributes(['deprecation_reason' => 'not useful']),
@@ -729,13 +730,13 @@ class FieldsBuilderTest extends TestCase
                     'clientSubscriptionId' => GraphQLType::string(),
                 ],
             ],
-            'null io metadata non input' => ['resourceClass', new ResourceMetadata(),
+            'null io metadata non input' => ['resourceClass', new ResourceMetadata([new OperationCollectionMetadata('/dummies')]),
                 [
                     'propertyBool' => new PropertyMetadata(new Type(Type::BUILTIN_TYPE_BOOL), null, false, true),
                 ],
                 false, null, 'update', null, ['class' => null], [],
             ],
-            'null io metadata input' => ['resourceClass', new ResourceMetadata(),
+            'null io metadata input' => ['resourceClass', new ResourceMetadata([new OperationCollectionMetadata('/dummies')]),
                 [
                     'propertyBool' => new PropertyMetadata(new Type(Type::BUILTIN_TYPE_BOOL), null, false, true),
                 ],
@@ -744,7 +745,7 @@ class FieldsBuilderTest extends TestCase
                     'clientMutationId' => GraphQLType::string(),
                 ],
             ],
-            'invalid types' => ['resourceClass', new ResourceMetadata(),
+            'invalid types' => ['resourceClass', new ResourceMetadata([new OperationCollectionMetadata('/dummies')]),
                 [
                     'propertyInvalidType' => new PropertyMetadata(new Type(Type::BUILTIN_TYPE_NULL), null, true, false),
                     'propertyNotRegisteredType' => new PropertyMetadata(new Type(Type::BUILTIN_TYPE_CALLABLE), null, true, false),

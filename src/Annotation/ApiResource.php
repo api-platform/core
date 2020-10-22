@@ -63,6 +63,7 @@ use ApiPlatform\Core\Exception\InvalidArgumentException;
  *     @Attribute("securityMessage", type="string"),
  *     @Attribute("securityPostDenormalize", type="string"),
  *     @Attribute("securityPostDenormalizeMessage", type="string"),
+ *     @Attribute("path", type="string"),
  *     @Attribute("shortName", type="string"),
  *     @Attribute("stateless", type="bool"),
  *     @Attribute("subresourceOperations", type="array"),
@@ -158,6 +159,11 @@ final class ApiResource
      * @var array
      */
     public $itemOperations;
+
+    /**
+     * @var string
+     */
+    public $path;
 
     /**
      * @var string

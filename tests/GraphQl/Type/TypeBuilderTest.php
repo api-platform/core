@@ -19,6 +19,7 @@ use ApiPlatform\Core\GraphQl\Type\FieldsBuilderInterface;
 use ApiPlatform\Core\GraphQl\Type\TypeBuilder;
 use ApiPlatform\Core\GraphQl\Type\TypesContainerInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
+use ApiPlatform\Core\Metadata\Resource\OperationCollectionMetadata;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Core\Tests\ProphecyTrait;
@@ -77,7 +78,7 @@ class TypeBuilderTest extends TestCase
 
     public function testGetResourceObjectType(): void
     {
-        $resourceMetadata = new ResourceMetadata('shortName', 'description');
+        $resourceMetadata = new ResourceMetadata([new OperationCollectionMetadata('/dummies', 'shortName', 'description')]);
         $this->typesContainerProphecy->has('shortName')->shouldBeCalled()->willReturn(false);
         $this->typesContainerProphecy->set('shortName', Argument::type(ObjectType::class))->shouldBeCalled();
         $this->typesContainerProphecy->has('Node')->shouldBeCalled()->willReturn(false);
@@ -99,8 +100,9 @@ class TypeBuilderTest extends TestCase
 
     public function testGetResourceObjectTypeOutputClass(): void
     {
-        $resourceMetadata = (new ResourceMetadata('shortName', 'description'))
-            ->withGraphql(['item_query' => ['output' => ['class' => 'outputClass']]]);
+        $resourceMetadata = (new ResourceMetadata([(new OperationCollectionMetadata('/dummies', 'shortName', 'description'))
+            ->withGraphql(['item_query' => ['output' => ['class' => 'outputClass']]]),
+        ]));
         $this->typesContainerProphecy->has('shortName')->shouldBeCalled()->willReturn(false);
         $this->typesContainerProphecy->set('shortName', Argument::type(ObjectType::class))->shouldBeCalled();
         $this->typesContainerProphecy->has('Node')->shouldBeCalled()->willReturn(false);
@@ -125,11 +127,12 @@ class TypeBuilderTest extends TestCase
      */
     public function testGetResourceObjectTypeQuerySerializationGroups(string $itemSerializationGroup, string $collectionSerializationGroup, string $shortName, string $queryName)
     {
-        $resourceMetadata = (new ResourceMetadata('shortName', 'description'))
+        $resourceMetadata = (new ResourceMetadata([(new OperationCollectionMetadata('/dummies', 'shortName', 'description'))
             ->withGraphql([
                 'item_query' => ['normalization_context' => ['groups' => [$itemSerializationGroup]]],
                 'collection_query' => ['normalization_context' => ['groups' => [$collectionSerializationGroup]]],
-            ]);
+            ]),
+        ]));
         $this->typesContainerProphecy->has($shortName)->shouldBeCalled()->willReturn(false);
         $this->typesContainerProphecy->set($shortName, Argument::type(ObjectType::class))->shouldBeCalled();
         $this->typesContainerProphecy->has('Node')->shouldBeCalled()->willReturn(false);
@@ -166,7 +169,7 @@ class TypeBuilderTest extends TestCase
 
     public function testGetResourceObjectTypeInput(): void
     {
-        $resourceMetadata = new ResourceMetadata('shortName', 'description');
+        $resourceMetadata = new ResourceMetadata([new OperationCollectionMetadata('/dummies', 'shortName', 'description')]);
         $this->typesContainerProphecy->has('customShortNameInput')->shouldBeCalled()->willReturn(false);
         $this->typesContainerProphecy->set('customShortNameInput', Argument::type(NonNull::class))->shouldBeCalled();
         $this->typesContainerProphecy->has('Node')->shouldBeCalled()->willReturn(false);
@@ -190,8 +193,7 @@ class TypeBuilderTest extends TestCase
 
     public function testGetResourceObjectTypeCustomMutationInputArgs(): void
     {
-        $resourceMetadata = (new ResourceMetadata('shortName', 'description'))
-            ->withGraphql(['custom' => ['args' => []]]);
+        $resourceMetadata = (new ResourceMetadata([(new OperationCollectionMetadata('/dummies', 'shortName', 'description'))->withGraphql(['custom' => ['args' => []]])]));
         $this->typesContainerProphecy->has('customShortNameInput')->shouldBeCalled()->willReturn(false);
         $this->typesContainerProphecy->set('customShortNameInput', Argument::type(NonNull::class))->shouldBeCalled();
         $this->typesContainerProphecy->has('Node')->shouldBeCalled()->willReturn(false);
@@ -217,7 +219,7 @@ class TypeBuilderTest extends TestCase
 
     public function testGetResourceObjectTypeMutation(): void
     {
-        $resourceMetadata = new ResourceMetadata('shortName', 'description');
+        $resourceMetadata = new ResourceMetadata([new OperationCollectionMetadata('/dummies', 'shortName', 'description')]);
         $this->typesContainerProphecy->has('createShortNamePayload')->shouldBeCalled()->willReturn(false);
         $this->typesContainerProphecy->set('createShortNamePayload', Argument::type(ObjectType::class))->shouldBeCalled();
         $this->typesContainerProphecy->has('Node')->shouldBeCalled()->willReturn(false);
@@ -244,11 +246,10 @@ class TypeBuilderTest extends TestCase
 
     public function testGetResourceObjectTypeMutationWrappedType(): void
     {
-        $resourceMetadata = (new ResourceMetadata('shortName', 'description'))
-            ->withGraphql([
-                'item_query' => ['normalization_context' => ['groups' => ['item_query']]],
-                'create' => ['normalization_context' => ['groups' => ['create']]],
-            ]);
+        $resourceMetadata = (new ResourceMetadata([(new OperationCollectionMetadata('/dummies', 'shortName', 'description'))->withGraphql([
+            'item_query' => ['normalization_context' => ['groups' => ['item_query']]],
+            'create' => ['normalization_context' => ['groups' => ['create']]],
+        ])]));
         $this->typesContainerProphecy->has('createShortNamePayload')->shouldBeCalled()->willReturn(false);
         $this->typesContainerProphecy->set('createShortNamePayload', Argument::type(ObjectType::class))->shouldBeCalled();
         $this->typesContainerProphecy->has('Node')->shouldBeCalled()->willReturn(false);
@@ -288,7 +289,7 @@ class TypeBuilderTest extends TestCase
 
     public function testGetResourceObjectTypeMutationNested(): void
     {
-        $resourceMetadata = new ResourceMetadata('shortName', 'description');
+        $resourceMetadata = new ResourceMetadata([new OperationCollectionMetadata('/dummies', 'shortName', 'description')]);
         $this->typesContainerProphecy->has('createShortNameNestedPayload')->shouldBeCalled()->willReturn(false);
         $this->typesContainerProphecy->set('createShortNameNestedPayload', Argument::type(ObjectType::class))->shouldBeCalled();
         $this->typesContainerProphecy->has('Node')->shouldBeCalled()->willReturn(false);
@@ -310,7 +311,7 @@ class TypeBuilderTest extends TestCase
 
     public function testGetResourceObjectTypeSubscription(): void
     {
-        $resourceMetadata = (new ResourceMetadata('shortName', 'description'))->withAttributes(['mercure' => true]);
+        $resourceMetadata = (new ResourceMetadata([(new OperationCollectionMetadata('/dummies', 'shortName', 'description'))->withAttributes(['mercure' => true])]));
         $this->typesContainerProphecy->has('updateShortNameSubscriptionPayload')->shouldBeCalled()->willReturn(false);
         $this->typesContainerProphecy->set('updateShortNameSubscriptionPayload', Argument::type(ObjectType::class))->shouldBeCalled();
         $this->typesContainerProphecy->has('Node')->shouldBeCalled()->willReturn(false);
@@ -339,11 +340,12 @@ class TypeBuilderTest extends TestCase
 
     public function testGetResourceObjectTypeSubscriptionWrappedType(): void
     {
-        $resourceMetadata = (new ResourceMetadata('shortName', 'description'))
+        $resourceMetadata = (new ResourceMetadata([(new OperationCollectionMetadata('/dummies', 'shortName', 'description'))
             ->withGraphql([
                 'item_query' => ['normalization_context' => ['groups' => ['item_query']]],
                 'update' => ['normalization_context' => ['groups' => ['update']]],
-            ]);
+            ]),
+        ]));
         $this->typesContainerProphecy->has('updateShortNameSubscriptionPayload')->shouldBeCalled()->willReturn(false);
         $this->typesContainerProphecy->set('updateShortNameSubscriptionPayload', Argument::type(ObjectType::class))->shouldBeCalled();
         $this->typesContainerProphecy->has('Node')->shouldBeCalled()->willReturn(false);
@@ -384,7 +386,7 @@ class TypeBuilderTest extends TestCase
 
     public function testGetResourceObjectTypeSubscriptionNested(): void
     {
-        $resourceMetadata = (new ResourceMetadata('shortName', 'description'))->withAttributes(['mercure' => true]);
+        $resourceMetadata = (new ResourceMetadata([(new OperationCollectionMetadata('/dummies', 'shortName', 'description'))->withAttributes(['mercure' => true])]));
         $this->typesContainerProphecy->has('updateShortNameSubscriptionNestedPayload')->shouldBeCalled()->willReturn(false);
         $this->typesContainerProphecy->set('updateShortNameSubscriptionNestedPayload', Argument::type(ObjectType::class))->shouldBeCalled();
         $this->typesContainerProphecy->has('Node')->shouldBeCalled()->willReturn(false);

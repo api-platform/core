@@ -18,6 +18,7 @@ use ApiPlatform\Core\Bridge\Elasticsearch\Metadata\Document\DocumentMetadata;
 use ApiPlatform\Core\Bridge\Elasticsearch\Metadata\Document\Factory\AttributeDocumentMetadataFactory;
 use ApiPlatform\Core\Bridge\Elasticsearch\Metadata\Document\Factory\DocumentMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
+use ApiPlatform\Core\Metadata\Resource\OperationCollectionMetadata;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Foo;
 use ApiPlatform\Core\Tests\ProphecyTrait;
@@ -45,8 +46,9 @@ class AttributeDocumentMetadataFactoryTest extends TestCase
         $decoratedProphecy = $this->prophesize(DocumentMetadataFactoryInterface::class);
         $decoratedProphecy->create(Foo::class)->willReturn($originalDocumentMetadata)->shouldBeCalled();
 
-        $resourceMetadata = new ResourceMetadata();
-        $resourceMetadata = $resourceMetadata->withAttributes(['elasticsearch_index' => 'foo', 'elasticsearch_type' => 'bar']);
+        $resourceMetadata = new ResourceMetadata([(new OperationCollectionMetadata('/dummies'))
+            ->withAttributes(['elasticsearch_index' => 'foo', 'elasticsearch_type' => 'bar']),
+        ]);
 
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create(Foo::class)->willReturn($resourceMetadata)->shouldBeCalled();
@@ -67,7 +69,7 @@ class AttributeDocumentMetadataFactoryTest extends TestCase
         $decoratedProphecy->create(Foo::class)->willThrow(new IndexNotFoundException())->shouldBeCalled();
 
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $resourceMetadataFactoryProphecy->create(Foo::class)->willReturn(new ResourceMetadata())->shouldBeCalled();
+        $resourceMetadataFactoryProphecy->create(Foo::class)->willReturn(new ResourceMetadata([new OperationCollectionMetadata('/dummies')]))->shouldBeCalled();
 
         (new AttributeDocumentMetadataFactory($resourceMetadataFactoryProphecy->reveal(), $decoratedProphecy->reveal()))->create(Foo::class);
     }

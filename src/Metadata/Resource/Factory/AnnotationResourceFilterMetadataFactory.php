@@ -42,44 +42,48 @@ final class AnnotationResourceFilterMetadataFactory implements ResourceMetadataF
      */
     public function create(string $resourceClass): ResourceMetadata
     {
-        $parentResourceMetadata = null;
+        $resourceMetadata = null;
         if ($this->decorated) {
             try {
-                $parentResourceMetadata = $this->decorated->create($resourceClass);
+                $resourceMetadata = $this->decorated->create($resourceClass);
             } catch (ResourceClassNotFoundException $resourceNotFoundException) {
                 // Ignore not found exception from decorated factories
             }
         }
 
-        if (null === $parentResourceMetadata) {
-            return $this->handleNotFound($parentResourceMetadata, $resourceClass);
+        if (null === $resourceMetadata) {
+            return $this->handleNotFound($resourceMetadata, $resourceClass);
         }
 
         try {
             $reflectionClass = new \ReflectionClass($resourceClass);
         } catch (\ReflectionException $reflectionException) {
-            return $this->handleNotFound($parentResourceMetadata, $resourceClass);
+            return $this->handleNotFound($resourceMetadata, $resourceClass);
         }
 
         $filters = array_keys($this->readFilterAnnotations($reflectionClass, $this->reader));
 
         if (!$filters) {
-            return $parentResourceMetadata;
+            return $resourceMetadata;
         }
 
-        $parentFilters = $parentResourceMetadata->getAttribute('filters', []);
+        foreach ($resourceMetadata as $path => $operationCollectionMetadata) {
+            $parentFilters = $operationCollectionMetadata->getAttribute('filters', []);
 
-        if ($parentFilters) {
-            $filters = array_merge($parentFilters, $filters);
+            if ($parentFilters) {
+                $filters = array_merge($parentFilters, $filters);
+            }
+
+            $attributes = $operationCollectionMetadata->getAttributes();
+
+            if (!$attributes) {
+                $attributes = [];
+            }
+
+            $resourceMetadata[$path] = $operationCollectionMetadata->withAttributes(array_merge($attributes, ['filters' => $filters]));
         }
 
-        $attributes = $parentResourceMetadata->getAttributes();
-
-        if (!$attributes) {
-            $attributes = [];
-        }
-
-        return $parentResourceMetadata->withAttributes(array_merge($attributes, ['filters' => $filters]));
+        return $resourceMetadata;
     }
 
     /**

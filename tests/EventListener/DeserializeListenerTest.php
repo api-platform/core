@@ -16,6 +16,7 @@ namespace ApiPlatform\Core\Tests\EventListener;
 use ApiPlatform\Core\Api\FormatsProviderInterface;
 use ApiPlatform\Core\EventListener\DeserializeListener;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
+use ApiPlatform\Core\Metadata\Resource\OperationCollectionMetadata;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Serializer\SerializerContextBuilderInterface;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
@@ -106,11 +107,11 @@ class DeserializeListenerTest extends TestCase
 
         $serializerContextBuilderProphecy = $this->prophesize(SerializerContextBuilderInterface::class);
 
-        $resourceMetadata = new ResourceMetadata('Dummy', null, null, [], [
+        $resourceMetadata = new ResourceMetadata([new OperationCollectionMetadata('/dummies', 'Dummy', null, null, [], [
             'post' => [
                 'deserialize' => false,
             ],
-        ]);
+        ])]);
 
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn($resourceMetadata);
@@ -339,7 +340,7 @@ class DeserializeListenerTest extends TestCase
         $serializerContextBuilderProphecy->createFromRequest(Argument::type(Request::class), false, Argument::type('array'))->willReturn(['input' => ['class' => 'Foo'], 'output' => ['class' => 'Foo']]);
 
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadata(null, null, null, null, null, ['formats' => ['jsonld' => ['application/ld+json'], 'xml' => ['text/xml']]]));
+        $resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadata([new OperationCollectionMetadata('/dummies', null, null, null, null, null, ['formats' => ['jsonld' => ['application/ld+json'], 'xml' => ['text/xml']]])]));
 
         $listener = new DeserializeListener(
             $serializerProphecy->reveal(),

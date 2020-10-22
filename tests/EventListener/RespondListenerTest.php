@@ -15,6 +15,7 @@ namespace ApiPlatform\Core\Tests\EventListener;
 
 use ApiPlatform\Core\EventListener\RespondListener;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
+use ApiPlatform\Core\Metadata\Resource\OperationCollectionMetadata;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Core\Tests\ProphecyTrait;
@@ -97,7 +98,7 @@ class RespondListenerTest extends TestCase
             'bar'
         );
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadata(null, null, null, ['get' => ['status' => Response::HTTP_OK]]));
+        $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadata([new OperationCollectionMetadata('/dummies', null, null, null, ['get' => ['status' => Response::HTTP_OK]])]));
 
         $listener = new RespondListener($resourceMetadataFactoryProphecy->reveal());
         $listener->onKernelView($event);
@@ -121,7 +122,7 @@ class RespondListenerTest extends TestCase
             'bar'
         );
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadata(null, null, null, ['get' => ['status' => Response::HTTP_MOVED_PERMANENTLY]]));
+        $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadata([new OperationCollectionMetadata('/dummies', null, null, null, ['get' => ['status' => Response::HTTP_MOVED_PERMANENTLY]])]));
 
         $listener = new RespondListener($resourceMetadataFactoryProphecy->reveal());
         $listener->onKernelView($event);
@@ -202,7 +203,7 @@ class RespondListenerTest extends TestCase
             'bar'
         );
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadata(null, null, null, ['get' => ['sunset' => 'tomorrow']]));
+        $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadata([new OperationCollectionMetadata('/dummies', null, null, null, ['get' => ['sunset' => 'tomorrow']])]));
 
         $listener = new RespondListener($resourceMetadataFactoryProphecy->reveal());
         $listener->onKernelView($event);
@@ -226,7 +227,7 @@ class RespondListenerTest extends TestCase
             'bar'
         );
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadata(null, null, null, ['get' => ['status' => Response::HTTP_ACCEPTED]]));
+        $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadata([new OperationCollectionMetadata('/dummies', null, null, null, ['get' => ['status' => Response::HTTP_ACCEPTED]])]));
 
         $listener = new RespondListener($resourceMetadataFactoryProphecy->reveal());
         $listener->onKernelView($event);

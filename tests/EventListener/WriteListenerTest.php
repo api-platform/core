@@ -17,6 +17,7 @@ use ApiPlatform\Core\Api\IriConverterInterface;
 use ApiPlatform\Core\DataPersister\DataPersisterInterface;
 use ApiPlatform\Core\EventListener\WriteListener;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
+use ApiPlatform\Core\Metadata\Resource\OperationCollectionMetadata;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\ConcreteDummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
@@ -151,7 +152,7 @@ class WriteListenerTest extends TestCase
         $iriConverterProphecy->getIriFromItem($dummy)->shouldNotBeCalled();
 
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadata(null, null, null, null, null, ['output' => ['class' => null]]));
+        $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadata([new OperationCollectionMetadata('/dummies', null, null, null, null, null, ['output' => ['class' => null]])]));
 
         $dataPersisterProphecy->persist($dummy, Argument::type('array'))->willReturn($dummy)->shouldBeCalled();
 
@@ -281,11 +282,11 @@ class WriteListenerTest extends TestCase
 
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
 
-        $resourceMetadata = new ResourceMetadata('Dummy', null, null, [], [
+        $resourceMetadata = new ResourceMetadata([new OperationCollectionMetadata('/dummies', 'Dummy', null, null, [], [
             'post' => [
                 'write' => false,
             ],
-        ]);
+        ])]);
 
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn($resourceMetadata);

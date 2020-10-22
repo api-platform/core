@@ -22,6 +22,7 @@ use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInte
 use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 use ApiPlatform\Core\Metadata\Property\PropertyNameCollection;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
+use ApiPlatform\Core\Metadata\Resource\OperationCollectionMetadata;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\Dummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\RelatedDummy;
@@ -160,7 +161,7 @@ class SubresourceDataProviderTest extends TestCase
         $managerRegistryProphecy->getManagerForClass(RelatedDummy::class)->shouldBeCalled()->willReturn($managerProphecy->reveal());
         $managerRegistryProphecy->getManagerForClass(Dummy::class)->shouldBeCalled()->willReturn($managerProphecy->reveal());
 
-        $this->resourceMetadataFactoryProphecy->create(RelatedDummy::class)->willReturn(new ResourceMetadata());
+        $this->resourceMetadataFactoryProphecy->create(RelatedDummy::class)->willReturn(new ResourceMetadata([new OperationCollectionMetadata('/dummies')]));
 
         [$propertyNameCollectionFactory, $propertyMetadataFactory] = $this->getMetadataProphecies([Dummy::class => ['id']]);
 
@@ -249,7 +250,7 @@ class SubresourceDataProviderTest extends TestCase
 
         $managerRegistryProphecy->getManagerForClass(ThirdLevel::class)->shouldBeCalled()->willReturn($managerProphecy->reveal());
 
-        $this->resourceMetadataFactoryProphecy->create(ThirdLevel::class)->willReturn(new ResourceMetadata());
+        $this->resourceMetadataFactoryProphecy->create(ThirdLevel::class)->willReturn(new ResourceMetadata([new OperationCollectionMetadata('/dummies')]));
 
         [$propertyNameCollectionFactory, $propertyMetadataFactory] = $this->getMetadataProphecies([Dummy::class => $identifiers, RelatedDummy::class => $identifiers]);
 
@@ -398,7 +399,7 @@ class SubresourceDataProviderTest extends TestCase
         $managerRegistryProphecy->getManagerForClass(RelatedOwningDummy::class)->shouldBeCalled()->willReturn($managerProphecy->reveal());
         $managerRegistryProphecy->getManagerForClass(Dummy::class)->shouldBeCalled()->willReturn($managerProphecy->reveal());
 
-        $this->resourceMetadataFactoryProphecy->create(RelatedOwningDummy::class)->willReturn(new ResourceMetadata());
+        $this->resourceMetadataFactoryProphecy->create(RelatedOwningDummy::class)->willReturn(new ResourceMetadata([new OperationCollectionMetadata('/dummies')]));
 
         [$propertyNameCollectionFactory, $propertyMetadataFactory] = $this->getMetadataProphecies([Dummy::class => $identifiers]);
 
@@ -446,7 +447,7 @@ class SubresourceDataProviderTest extends TestCase
         $managerRegistryProphecy->getManagerForClass(RelatedDummy::class)->shouldBeCalled()->willReturn($managerProphecy->reveal());
         $managerRegistryProphecy->getManagerForClass(Dummy::class)->shouldBeCalled()->willReturn($managerProphecy->reveal());
 
-        $this->resourceMetadataFactoryProphecy->create(RelatedDummy::class)->willReturn(new ResourceMetadata());
+        $this->resourceMetadataFactoryProphecy->create(RelatedDummy::class)->willReturn(new ResourceMetadata([new OperationCollectionMetadata('/dummies')]));
 
         [$propertyNameCollectionFactory, $propertyMetadataFactory] = $this->getMetadataProphecies([Dummy::class => $identifiers]);
 
@@ -532,7 +533,7 @@ class SubresourceDataProviderTest extends TestCase
 
         $rDummyManagerProphecy->getRepository(RelatedDummy::class)->shouldBeCalled()->willReturn($repositoryProphecy->reveal());
 
-        $this->resourceMetadataFactoryProphecy->create(RelatedDummy::class)->willReturn(new ResourceMetadata());
+        $this->resourceMetadataFactoryProphecy->create(RelatedDummy::class)->willReturn(new ResourceMetadata([new OperationCollectionMetadata('/dummies')]));
 
         [$propertyNameCollectionFactory, $propertyMetadataFactory] = $this->getMetadataProphecies([Dummy::class => $identifiers, RelatedDummy::class => $identifiers]);
 

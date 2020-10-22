@@ -16,6 +16,7 @@ namespace ApiPlatform\Core\Tests\Api;
 use ApiPlatform\Core\Api\FormatsProvider;
 use ApiPlatform\Core\Api\OperationType;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
+use ApiPlatform\Core\Metadata\Resource\OperationCollectionMetadata;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Tests\ProphecyTrait;
 use PHPUnit\Framework\TestCase;
@@ -42,7 +43,7 @@ class FormatsProviderTest extends TestCase
     public function testResourceClassWithoutFormatsAttributes()
     {
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadata())->shouldBeCalled();
+        $resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadata([new OperationCollectionMetadata('/dummies')]))->shouldBeCalled();
 
         $formatProvider = new FormatsProvider($resourceMetadataFactoryProphecy->reveal(), ['jsonld' => ['application/ld+json']]);
 
@@ -52,7 +53,7 @@ class FormatsProviderTest extends TestCase
     public function testResourceClassWithFormatsAttributes()
     {
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $resourceMetadata = new ResourceMetadata(null, null, null, null, null, ['formats' => ['jsonld']]);
+        $resourceMetadata = new ResourceMetadata([new OperationCollectionMetadata(null, null, null, null, null, null, ['formats' => ['jsonld']])]);
         $resourceMetadataFactoryProphecy->create('Foo')->willReturn($resourceMetadata)->shouldBeCalled();
 
         $formatProvider = new FormatsProvider($resourceMetadataFactoryProphecy->reveal(), ['jsonld' => ['application/ld+json'], 'json' => ['application/json']]);
@@ -63,7 +64,7 @@ class FormatsProviderTest extends TestCase
     public function testResourceClassWithFormatsAttributesOverRiddingMimeTypes()
     {
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $resourceMetadata = new ResourceMetadata(null, null, null, null, null, ['formats' => ['jsonld' => ['application/foo'], 'bar' => ['application/bar', 'application/baz'], 'buz' => 'application/fuz']]);
+        $resourceMetadata = new ResourceMetadata([new OperationCollectionMetadata(null, null, null, null, null, null, ['formats' => ['jsonld' => ['application/foo'], 'bar' => ['application/bar', 'application/baz'], 'buz' => 'application/fuz']])]);
         $resourceMetadataFactoryProphecy->create('Foo')->willReturn($resourceMetadata)->shouldBeCalled();
 
         $formatProvider = new FormatsProvider($resourceMetadataFactoryProphecy->reveal(), ['jsonld' => ['application/ld+json'], 'json' => ['application/json']]);
@@ -77,7 +78,7 @@ class FormatsProviderTest extends TestCase
         $this->expectExceptionMessage('You either need to add the format \'foo\' to your project configuration or declare a mime type for it in your annotation.');
 
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $resourceMetadata = new ResourceMetadata(null, null, null, null, null, ['formats' => ['foo']]);
+        $resourceMetadata = new ResourceMetadata([new OperationCollectionMetadata(null, null, null, null, null, null, ['formats' => ['foo']])]);
         $resourceMetadataFactoryProphecy->create('Foo')->willReturn($resourceMetadata)->shouldBeCalled();
 
         $formatProvider = new FormatsProvider($resourceMetadataFactoryProphecy->reveal(), ['jsonld' => ['application/ld+json']]);
@@ -91,7 +92,7 @@ class FormatsProviderTest extends TestCase
         $this->expectExceptionMessage('The \'formats\' attributes value must be a string when trying to include an already configured format, array given.');
 
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $resourceMetadata = new ResourceMetadata(null, null, null, null, null, ['formats' => [['badFormat']]]);
+        $resourceMetadata = new ResourceMetadata([new OperationCollectionMetadata(null, null, null, null, null, null, ['formats' => [['badFormat']]])]);
         $resourceMetadataFactoryProphecy->create('Foo')->willReturn($resourceMetadata)->shouldBeCalled();
 
         $formatProvider = new FormatsProvider($resourceMetadataFactoryProphecy->reveal(), ['jsonld' => ['application/ld+json'], 'json' => ['application/json']]);
@@ -105,7 +106,7 @@ class FormatsProviderTest extends TestCase
         $this->expectExceptionMessage('The \'formats\' attributes must be an array, string given for resource class \'Foo\'.');
 
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $resourceMetadata = new ResourceMetadata(null, null, null, null, null, ['formats' => 'badFormat']);
+        $resourceMetadata = new ResourceMetadata([new OperationCollectionMetadata(null, null, null, null, null, null, ['formats' => 'badFormat'])]);
         $resourceMetadataFactoryProphecy->create('Foo')->willReturn($resourceMetadata)->shouldBeCalled();
 
         $formatProvider = new FormatsProvider($resourceMetadataFactoryProphecy->reveal(), ['jsonld' => ['application/ld+json'], 'json' => ['application/json']]);
@@ -116,7 +117,7 @@ class FormatsProviderTest extends TestCase
     public function testResourceClassWithoutFormatsAttributesFromOperation()
     {
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadata())->shouldBeCalled();
+        $resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadata([new OperationCollectionMetadata('/dummies')]))->shouldBeCalled();
 
         $formatProvider = new FormatsProvider($resourceMetadataFactoryProphecy->reveal(), ['jsonld' => ['application/ld+json']]);
 
@@ -126,7 +127,7 @@ class FormatsProviderTest extends TestCase
     public function testResourceClassWithFormatsAttributesFromOperation()
     {
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $resourceMetadata = new ResourceMetadata(null, null, null, null, null, ['formats' => ['jsonld']]);
+        $resourceMetadata = new ResourceMetadata([new OperationCollectionMetadata(null, null, null, null, null, null, ['formats' => ['jsonld']])]);
         $resourceMetadataFactoryProphecy->create('Foo')->willReturn($resourceMetadata)->shouldBeCalled();
 
         $formatProvider = new FormatsProvider($resourceMetadataFactoryProphecy->reveal(), ['jsonld' => ['application/ld+json'], 'json' => ['application/json']]);
@@ -137,7 +138,7 @@ class FormatsProviderTest extends TestCase
     public function testResourceClassWithFormatsAttributesOverRiddingMimeTypesFromOperation()
     {
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $resourceMetadata = new ResourceMetadata(null, null, null, null, null, ['formats' => ['jsonld' => ['application/foo'], 'bar' => ['application/bar', 'application/baz'], 'buz' => 'application/fuz']]);
+        $resourceMetadata = new ResourceMetadata([new OperationCollectionMetadata('/dummies', null, null, null, null, null, ['formats' => ['jsonld' => ['application/foo'], 'bar' => ['application/bar', 'application/baz'], 'buz' => 'application/fuz']])]);
         $resourceMetadataFactoryProphecy->create('Foo')->willReturn($resourceMetadata)->shouldBeCalled();
 
         $formatProvider = new FormatsProvider($resourceMetadataFactoryProphecy->reveal(), ['jsonld' => ['application/ld+json'], 'json' => ['application/json']]);
@@ -151,7 +152,7 @@ class FormatsProviderTest extends TestCase
         $this->expectExceptionMessage('You either need to add the format \'foo\' to your project configuration or declare a mime type for it in your annotation.');
 
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $resourceMetadata = new ResourceMetadata(null, null, null, null, null, ['formats' => ['foo']]);
+        $resourceMetadata = new ResourceMetadata([new OperationCollectionMetadata(null, null, null, null, null, null, ['formats' => ['foo']])]);
         $resourceMetadataFactoryProphecy->create('Foo')->willReturn($resourceMetadata)->shouldBeCalled();
 
         $formatProvider = new FormatsProvider($resourceMetadataFactoryProphecy->reveal(), ['jsonld' => ['application/ld+json']]);
@@ -165,7 +166,7 @@ class FormatsProviderTest extends TestCase
         $this->expectExceptionMessage('The \'formats\' attributes value must be a string when trying to include an already configured format, array given.');
 
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $resourceMetadata = new ResourceMetadata(null, null, null, null, null, ['formats' => [['badFormat']]]);
+        $resourceMetadata = new ResourceMetadata([new OperationCollectionMetadata(null, null, null, null, null, null, ['formats' => [['badFormat']]])]);
         $resourceMetadataFactoryProphecy->create('Foo')->willReturn($resourceMetadata)->shouldBeCalled();
 
         $formatProvider = new FormatsProvider($resourceMetadataFactoryProphecy->reveal(), ['jsonld' => ['application/ld+json'], 'json' => ['application/json']]);
@@ -179,7 +180,7 @@ class FormatsProviderTest extends TestCase
         $this->expectExceptionMessage('The \'formats\' attributes must be an array, string given for resource class \'Foo\'.');
 
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $resourceMetadata = new ResourceMetadata(null, null, null, null, null, ['formats' => 'badFormat']);
+        $resourceMetadata = new ResourceMetadata([new OperationCollectionMetadata(null, null, null, null, null, null, ['formats' => 'badFormat'])]);
         $resourceMetadataFactoryProphecy->create('Foo')->willReturn($resourceMetadata)->shouldBeCalled();
 
         $formatProvider = new FormatsProvider($resourceMetadataFactoryProphecy->reveal(), ['jsonld' => ['application/ld+json'], 'json' => ['application/json']]);

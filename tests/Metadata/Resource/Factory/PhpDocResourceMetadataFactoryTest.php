@@ -15,6 +15,7 @@ namespace ApiPlatform\Core\Tests\Metadata\Resource\Factory;
 
 use ApiPlatform\Core\Metadata\Resource\Factory\PhpDocResourceMetadataFactory;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
+use ApiPlatform\Core\Metadata\Resource\OperationCollectionMetadata;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Tests\Fixtures\ClassWithNoDocBlock;
 use ApiPlatform\Core\Tests\Fixtures\DummyEntity;
@@ -27,7 +28,7 @@ class PhpDocResourceMetadataFactoryTest extends TestCase
 
     public function testExistingDescription()
     {
-        $resourceMetadata = new ResourceMetadata(null, 'My desc');
+        $resourceMetadata = new ResourceMetadata([new OperationCollectionMetadata('/dummies', null, 'My desc')]);
         $decoratedProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $decoratedProphecy->create('Foo')->willReturn($resourceMetadata)->shouldBeCalled();
         $decorated = $decoratedProphecy->reveal();
@@ -38,7 +39,7 @@ class PhpDocResourceMetadataFactoryTest extends TestCase
 
     public function testNoDocBlock()
     {
-        $resourceMetadata = new ResourceMetadata();
+        $resourceMetadata = new ResourceMetadata([new OperationCollectionMetadata('/dummies')]);
         $decoratedProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $decoratedProphecy->create(ClassWithNoDocBlock::class)->willReturn($resourceMetadata)->shouldBeCalled();
         $decorated = $decoratedProphecy->reveal();
@@ -50,7 +51,7 @@ class PhpDocResourceMetadataFactoryTest extends TestCase
     public function testExtractDescription()
     {
         $decoratedProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $decoratedProphecy->create(DummyEntity::class)->willReturn(new ResourceMetadata())->shouldBeCalled();
+        $decoratedProphecy->create(DummyEntity::class)->willReturn(new ResourceMetadata([new OperationCollectionMetadata('/dummies')]))->shouldBeCalled();
         $decorated = $decoratedProphecy->reveal();
 
         $factory = new PhpDocResourceMetadataFactory($decorated);

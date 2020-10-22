@@ -16,6 +16,7 @@ namespace ApiPlatform\Core\Tests\Bridge\Symfony\Validator\EventListener;
 use ApiPlatform\Core\Bridge\Symfony\Validator\EventListener\ValidateListener;
 use ApiPlatform\Core\Bridge\Symfony\Validator\Exception\ValidationException;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
+use ApiPlatform\Core\Metadata\Resource\OperationCollectionMetadata;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Tests\Fixtures\DummyEntity;
 use ApiPlatform\Core\Tests\ProphecyTrait;
@@ -178,9 +179,9 @@ class ValidateListenerTest extends TestCase
 
     private function createEventObject($expectedValidationGroups, $data, bool $receive = true): array
     {
-        $resourceMetadata = new ResourceMetadata(null, null, null, [
+        $resourceMetadata = new ResourceMetadata([new OperationCollectionMetadata('/dummies', null, null, null, [
             'create' => ['validation_groups' => $expectedValidationGroups],
-        ]);
+        ])]);
 
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         if ($receive) {

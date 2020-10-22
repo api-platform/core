@@ -25,6 +25,7 @@ use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInte
 use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 use ApiPlatform\Core\Metadata\Property\PropertyNameCollection;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
+use ApiPlatform\Core\Metadata\Resource\OperationCollectionMetadata;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Security\ResourceAccessCheckerInterface;
 use ApiPlatform\Core\Serializer\AbstractItemNormalizer;
@@ -1151,7 +1152,7 @@ class AbstractItemNormalizerTest extends TestCase
         $itemDataProviderProphecy = $this->prophesize(ItemDataProviderInterface::class);
 
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadata('dummy', '', '', null, null, ['input' => ['class' => InputDto::class]]));
+        $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadata([new OperationCollectionMetadata('/dummies', 'dummy', '', '', null, null, ['input' => ['class' => InputDto::class]])]));
 
         $dataTransformerProphecy = $this->prophesize(DataTransformerInterface::class);
         $dataTransformerProphecy->supportsTransformation($jsonInput, Dummy::class, $context)->willReturn(true);

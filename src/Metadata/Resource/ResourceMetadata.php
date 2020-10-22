@@ -13,34 +13,82 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Metadata\Resource;
 
-use ApiPlatform\Core\Api\OperationType;
-
 /**
  * Resource metadata.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
+ * @author Vincent Chalamon <vincentchalamon@gmail.com>
  */
-final class ResourceMetadata
+final class ResourceMetadata implements \IteratorAggregate, \ArrayAccess
 {
-    private $shortName;
-    private $description;
-    private $iri;
-    private $itemOperations;
-    private $collectionOperations;
-    private $subresourceOperations;
-    private $graphql;
-    private $attributes;
+    /**
+     * @var OperationCollectionMetadata[]
+     */
+    private $operations;
 
-    public function __construct(string $shortName = null, string $description = null, string $iri = null, array $itemOperations = null, array $collectionOperations = null, array $attributes = null, array $subresourceOperations = null, array $graphql = null)
+    public function __construct(array $operations)
     {
-        $this->shortName = $shortName;
-        $this->description = $description;
-        $this->iri = $iri;
-        $this->itemOperations = $itemOperations;
-        $this->collectionOperations = $collectionOperations;
-        $this->subresourceOperations = $subresourceOperations;
-        $this->graphql = $graphql;
-        $this->attributes = $attributes;
+        $this->operations = $operations;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getIterator(): \Traversable
+    {
+        return new \ArrayIterator($this->operations);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function offsetExists($offset): bool
+    {
+        return \array_key_exists($offset, $this->operations);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function offsetGet($offset): OperationCollectionMetadata
+    {
+        return $this->operations[$offset];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function offsetSet($offset, $value): void
+    {
+        $this->operations[$offset] = $value;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function offsetUnset($offset): void
+    {
+        unset($this->operations[$offset]);
+    }
+
+    /**
+     * Gets the path.
+     */
+    public function getPath(): ?string
+    {
+        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.7 and will be removed in 3.0, prefer parsing '.__CLASS__.' collection of OperationCollectionMetadata objects.', E_USER_DEPRECATED);
+
+        return $this->getFirstOperation()->getPath();
+    }
+
+    /**
+     * Returns a new instance with the given path.
+     */
+    public function withPath(string $path): OperationCollectionMetadata
+    {
+        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.7 and will be removed in 3.0, prefer parsing '.__CLASS__.' collection of OperationCollectionMetadata objects.', E_USER_DEPRECATED);
+
+        return $this->getFirstOperation()->withPath($path);
     }
 
     /**
@@ -48,18 +96,19 @@ final class ResourceMetadata
      */
     public function getShortName(): ?string
     {
-        return $this->shortName;
+        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.7 and will be removed in 3.0, prefer parsing '.__CLASS__.' collection of OperationCollectionMetadata objects.', E_USER_DEPRECATED);
+
+        return $this->getFirstOperation()->getShortName();
     }
 
     /**
      * Returns a new instance with the given short name.
      */
-    public function withShortName(string $shortName): self
+    public function withShortName(string $shortName): OperationCollectionMetadata
     {
-        $metadata = clone $this;
-        $metadata->shortName = $shortName;
+        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.7 and will be removed in 3.0, prefer parsing '.__CLASS__.' collection of OperationCollectionMetadata objects.', E_USER_DEPRECATED);
 
-        return $metadata;
+        return $this->getFirstOperation()->withShortName($shortName);
     }
 
     /**
@@ -67,18 +116,19 @@ final class ResourceMetadata
      */
     public function getDescription(): ?string
     {
-        return $this->description;
+        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.7 and will be removed in 3.0, prefer parsing '.__CLASS__.' collection of OperationCollectionMetadata objects.', E_USER_DEPRECATED);
+
+        return $this->getFirstOperation()->getDescription();
     }
 
     /**
      * Returns a new instance with the given description.
      */
-    public function withDescription(string $description): self
+    public function withDescription(string $description): OperationCollectionMetadata
     {
-        $metadata = clone $this;
-        $metadata->description = $description;
+        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.7 and will be removed in 3.0, prefer parsing '.__CLASS__.' collection of OperationCollectionMetadata objects.', E_USER_DEPRECATED);
 
-        return $metadata;
+        return $this->getFirstOperation()->withDescription($description);
     }
 
     /**
@@ -86,18 +136,19 @@ final class ResourceMetadata
      */
     public function getIri(): ?string
     {
-        return $this->iri;
+        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.7 and will be removed in 3.0, prefer parsing '.__CLASS__.' collection of OperationCollectionMetadata objects.', E_USER_DEPRECATED);
+
+        return $this->getFirstOperation()->getIri();
     }
 
     /**
      * Returns a new instance with the given IRI.
      */
-    public function withIri(string $iri): self
+    public function withIri(string $iri): OperationCollectionMetadata
     {
-        $metadata = clone $this;
-        $metadata->iri = $iri;
+        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.7 and will be removed in 3.0, prefer parsing '.__CLASS__.' collection of OperationCollectionMetadata objects.', E_USER_DEPRECATED);
 
-        return $metadata;
+        return $this->getFirstOperation()->withIri($iri);
     }
 
     /**
@@ -105,18 +156,19 @@ final class ResourceMetadata
      */
     public function getItemOperations(): ?array
     {
-        return $this->itemOperations;
+        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.7 and will be removed in 3.0, prefer parsing '.__CLASS__.' collection of OperationCollectionMetadata objects.', E_USER_DEPRECATED);
+
+        return $this->getFirstOperation()->getItemOperations();
     }
 
     /**
      * Returns a new instance with the given item operations.
      */
-    public function withItemOperations(array $itemOperations): self
+    public function withItemOperations(array $itemOperations): OperationCollectionMetadata
     {
-        $metadata = clone $this;
-        $metadata->itemOperations = $itemOperations;
+        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.7 and will be removed in 3.0, prefer parsing '.__CLASS__.' collection of OperationCollectionMetadata objects.', E_USER_DEPRECATED);
 
-        return $metadata;
+        return $this->getFirstOperation()->withItemOperations($itemOperations);
     }
 
     /**
@@ -124,18 +176,19 @@ final class ResourceMetadata
      */
     public function getCollectionOperations(): ?array
     {
-        return $this->collectionOperations;
+        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.7 and will be removed in 3.0, prefer parsing '.__CLASS__.' collection of OperationCollectionMetadata objects.', E_USER_DEPRECATED);
+
+        return $this->getFirstOperation()->getCollectionOperations();
     }
 
     /**
      * Returns a new instance with the given collection operations.
      */
-    public function withCollectionOperations(array $collectionOperations): self
+    public function withCollectionOperations(array $collectionOperations): OperationCollectionMetadata
     {
-        $metadata = clone $this;
-        $metadata->collectionOperations = $collectionOperations;
+        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.7 and will be removed in 3.0, prefer parsing '.__CLASS__.' collection of OperationCollectionMetadata objects.', E_USER_DEPRECATED);
 
-        return $metadata;
+        return $this->getFirstOperation()->withCollectionOperations($collectionOperations);
     }
 
     /**
@@ -143,18 +196,19 @@ final class ResourceMetadata
      */
     public function getSubresourceOperations(): ?array
     {
-        return $this->subresourceOperations;
+        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.7 and will be removed in 3.0, prefer parsing '.__CLASS__.' collection of OperationCollectionMetadata objects.', E_USER_DEPRECATED);
+
+        return $this->getFirstOperation()->getSubresourceOperations();
     }
 
     /**
      * Returns a new instance with the given subresource operations.
      */
-    public function withSubresourceOperations(array $subresourceOperations): self
+    public function withSubresourceOperations(array $subresourceOperations): OperationCollectionMetadata
     {
-        $metadata = clone $this;
-        $metadata->subresourceOperations = $subresourceOperations;
+        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.7 and will be removed in 3.0, prefer parsing '.__CLASS__.' collection of OperationCollectionMetadata objects.', E_USER_DEPRECATED);
 
-        return $metadata;
+        return $this->getFirstOperation()->withSubresourceOperations($subresourceOperations);
     }
 
     /**
@@ -164,7 +218,9 @@ final class ResourceMetadata
      */
     public function getCollectionOperationAttribute(?string $operationName, string $key, $defaultValue = null, bool $resourceFallback = false)
     {
-        return $this->findOperationAttribute($this->collectionOperations, $operationName, $key, $defaultValue, $resourceFallback);
+        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.7 and will be removed in 3.0, prefer parsing '.__CLASS__.' collection of OperationCollectionMetadata objects.', E_USER_DEPRECATED);
+
+        return $this->getFirstOperation()->getCollectionOperationAttribute($operationName, $key, $defaultValue, $resourceFallback);
     }
 
     /**
@@ -174,7 +230,9 @@ final class ResourceMetadata
      */
     public function getItemOperationAttribute(?string $operationName, string $key, $defaultValue = null, bool $resourceFallback = false)
     {
-        return $this->findOperationAttribute($this->itemOperations, $operationName, $key, $defaultValue, $resourceFallback);
+        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.7 and will be removed in 3.0, prefer parsing '.__CLASS__.' collection of OperationCollectionMetadata objects.', E_USER_DEPRECATED);
+
+        return $this->getFirstOperation()->getItemOperationAttribute($operationName, $key, $defaultValue, $resourceFallback);
     }
 
     /**
@@ -184,20 +242,16 @@ final class ResourceMetadata
      */
     public function getSubresourceOperationAttribute(?string $operationName, string $key, $defaultValue = null, bool $resourceFallback = false)
     {
-        return $this->findOperationAttribute($this->subresourceOperations, $operationName, $key, $defaultValue, $resourceFallback);
+        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.7 and will be removed in 3.0, prefer parsing '.__CLASS__.' collection of OperationCollectionMetadata objects.', E_USER_DEPRECATED);
+
+        return $this->getFirstOperation()->getSubresourceOperationAttribute($operationName, $key, $defaultValue, $resourceFallback);
     }
 
     public function getGraphqlAttribute(string $operationName, string $key, $defaultValue = null, bool $resourceFallback = false)
     {
-        if (isset($this->graphql[$operationName][$key])) {
-            return $this->graphql[$operationName][$key];
-        }
+        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.7 and will be removed in 3.0, prefer parsing '.__CLASS__.' collection of OperationCollectionMetadata objects.', E_USER_DEPRECATED);
 
-        if ($resourceFallback && isset($this->attributes[$key])) {
-            return $this->attributes[$key];
-        }
-
-        return $defaultValue;
+        return $this->getFirstOperation()->getGraphqlAttribute($operationName, $key, $defaultValue, $resourceFallback);
     }
 
     /**
@@ -207,23 +261,9 @@ final class ResourceMetadata
      */
     public function getOperationAttribute(array $attributes, string $key, $defaultValue = null, bool $resourceFallback = false)
     {
-        if (isset($attributes['collection_operation_name'])) {
-            return $this->getCollectionOperationAttribute($attributes['collection_operation_name'], $key, $defaultValue, $resourceFallback);
-        }
+        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.7 and will be removed in 3.0, prefer parsing '.__CLASS__.' collection of OperationCollectionMetadata objects.', E_USER_DEPRECATED);
 
-        if (isset($attributes['item_operation_name'])) {
-            return $this->getItemOperationAttribute($attributes['item_operation_name'], $key, $defaultValue, $resourceFallback);
-        }
-
-        if (isset($attributes['subresource_operation_name'])) {
-            return $this->getSubresourceOperationAttribute($attributes['subresource_operation_name'], $key, $defaultValue, $resourceFallback);
-        }
-
-        if ($resourceFallback && isset($this->attributes[$key])) {
-            return $this->attributes[$key];
-        }
-
-        return $defaultValue;
+        return $this->getFirstOperation()->getOperationAttribute($attributes, $key, $defaultValue, $resourceFallback);
     }
 
     /**
@@ -233,14 +273,9 @@ final class ResourceMetadata
      */
     public function getTypedOperationAttribute(string $operationType, string $operationName, string $key, $defaultValue = null, bool $resourceFallback = false)
     {
-        switch ($operationType) {
-            case OperationType::COLLECTION:
-                return $this->getCollectionOperationAttribute($operationName, $key, $defaultValue, $resourceFallback);
-            case OperationType::ITEM:
-                return $this->getItemOperationAttribute($operationName, $key, $defaultValue, $resourceFallback);
-            default:
-                return $this->getSubresourceOperationAttribute($operationName, $key, $defaultValue, $resourceFallback);
-        }
+        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.7 and will be removed in 3.0, prefer parsing '.__CLASS__.' collection of OperationCollectionMetadata objects.', E_USER_DEPRECATED);
+
+        return $this->getFirstOperation()->getTypedOperationAttribute($operationType, $operationName, $key, $defaultValue, $resourceFallback);
     }
 
     /**
@@ -248,7 +283,9 @@ final class ResourceMetadata
      */
     public function getAttributes(): ?array
     {
-        return $this->attributes;
+        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.7 and will be removed in 3.0, prefer parsing '.__CLASS__.' collection of OperationCollectionMetadata objects.', E_USER_DEPRECATED);
+
+        return $this->getFirstOperation()->getAttributes();
     }
 
     /**
@@ -258,18 +295,19 @@ final class ResourceMetadata
      */
     public function getAttribute(string $key, $defaultValue = null)
     {
-        return $this->attributes[$key] ?? $defaultValue;
+        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.7 and will be removed in 3.0, prefer parsing '.__CLASS__.' collection of OperationCollectionMetadata objects.', E_USER_DEPRECATED);
+
+        return $this->getFirstOperation()->getAttribute($key, $defaultValue);
     }
 
     /**
      * Returns a new instance with the given attribute.
      */
-    public function withAttributes(array $attributes): self
+    public function withAttributes(array $attributes): OperationCollectionMetadata
     {
-        $metadata = clone $this;
-        $metadata->attributes = $attributes;
+        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.7 and will be removed in 3.0, prefer parsing '.__CLASS__.' collection of OperationCollectionMetadata objects.', E_USER_DEPRECATED);
 
-        return $metadata;
+        return $this->getFirstOperation()->withAttributes($attributes);
     }
 
     /**
@@ -277,35 +315,23 @@ final class ResourceMetadata
      */
     public function getGraphql(): ?array
     {
-        return $this->graphql;
+        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.7 and will be removed in 3.0, prefer parsing '.__CLASS__.' collection of OperationCollectionMetadata objects.', E_USER_DEPRECATED);
+
+        return $this->getFirstOperation()->getGraphql();
     }
 
     /**
      * Returns a new instance with the given GraphQL options.
      */
-    public function withGraphql(array $graphql): self
+    public function withGraphql(array $graphql): OperationCollectionMetadata
     {
-        $metadata = clone $this;
-        $metadata->graphql = $graphql;
+        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.7 and will be removed in 3.0, prefer parsing '.__CLASS__.' collection of OperationCollectionMetadata objects.', E_USER_DEPRECATED);
 
-        return $metadata;
+        return $this->getFirstOperation()->withGraphql($graphql);
     }
 
-    /**
-     * Gets an operation attribute, optionally fallback to a resource attribute.
-     *
-     * @param mixed|null $defaultValue
-     */
-    private function findOperationAttribute(?array $operations, ?string $operationName, string $key, $defaultValue, bool $resourceFallback)
+    private function getFirstOperation(): ?OperationCollectionMetadata
     {
-        if (null !== $operationName && isset($operations[$operationName][$key])) {
-            return $operations[$operationName][$key];
-        }
-
-        if ($resourceFallback && isset($this->attributes[$key])) {
-            return $this->attributes[$key];
-        }
-
-        return $defaultValue;
+        return reset($this->operations) ?: null;
     }
 }

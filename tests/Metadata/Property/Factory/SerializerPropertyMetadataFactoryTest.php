@@ -18,6 +18,7 @@ use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\SerializerPropertyMetadataFactory;
 use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
+use ApiPlatform\Core\Metadata\Resource\OperationCollectionMetadata;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyTableInheritance;
@@ -57,7 +58,7 @@ class SerializerPropertyMetadataFactoryTest extends TestCase
     public function testCreate($readGroups, $writeGroups)
     {
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $dummyResourceMetadata = (new ResourceMetadata())
+        $dummyResourceMetadata = (new ResourceMetadata([(new OperationCollectionMetadata('/dummies'))
             ->withAttributes([
                 'normalization_context' => [
                     AbstractNormalizer::GROUPS => $readGroups,
@@ -65,7 +66,8 @@ class SerializerPropertyMetadataFactoryTest extends TestCase
                 'denormalization_context' => [
                     AbstractNormalizer::GROUPS => $writeGroups,
                 ],
-            ]);
+            ]),
+        ]));
         $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn($dummyResourceMetadata);
 
         $serializerClassMetadataFactoryProphecy = $this->prophesize(SerializerClassMetadataFactoryInterface::class);
@@ -143,7 +145,7 @@ class SerializerPropertyMetadataFactoryTest extends TestCase
     public function testCreateInherited(): void
     {
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $resourceMetadataFactoryProphecy->create(DummyTableInheritanceChild::class)->willReturn(new ResourceMetadata());
+        $resourceMetadataFactoryProphecy->create(DummyTableInheritanceChild::class)->willReturn(new ResourceMetadata([new OperationCollectionMetadata('/dummies')]));
 
         $serializerClassMetadataFactoryProphecy = $this->prophesize(SerializerClassMetadataFactoryInterface::class);
         $dummySerializerClassMetadata = new SerializerClassMetadata(DummyTableInheritanceChild::class);

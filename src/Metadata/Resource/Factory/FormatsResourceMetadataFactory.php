@@ -51,25 +51,28 @@ final class FormatsResourceMetadataFactory implements ResourceMetadataFactoryInt
     public function create(string $resourceClass): ResourceMetadata
     {
         $resourceMetadata = $this->decorated->create($resourceClass);
-        $rawResourceFormats = $resourceMetadata->getAttribute('formats');
-        $resourceFormats = null === $rawResourceFormats ? $this->formats : $this->normalizeFormats($rawResourceFormats);
 
-        $rawResourceInputFormats = $resourceMetadata->getAttribute('input_formats');
-        $rawResourceOutputFormats = $resourceMetadata->getAttribute('output_formats');
+        foreach ($resourceMetadata as $path => $operationCollectionMetadata) {
+            $rawResourceFormats = $operationCollectionMetadata->getAttribute('formats');
+            $resourceFormats = null === $rawResourceFormats ? $this->formats : $this->normalizeFormats($rawResourceFormats);
 
-        $resourceInputFormats = $rawResourceInputFormats ? $this->normalizeFormats($rawResourceInputFormats) : $resourceFormats;
-        $resourceOutputFormats = $rawResourceOutputFormats ? $this->normalizeFormats($rawResourceOutputFormats) : $resourceFormats;
+            $rawResourceInputFormats = $operationCollectionMetadata->getAttribute('input_formats');
+            $rawResourceOutputFormats = $operationCollectionMetadata->getAttribute('output_formats');
 
-        if (null !== $collectionOperations = $resourceMetadata->getCollectionOperations()) {
-            $resourceMetadata = $resourceMetadata->withCollectionOperations($this->normalize($resourceInputFormats, $resourceOutputFormats, $collectionOperations));
-        }
+            $resourceInputFormats = $rawResourceInputFormats ? $this->normalizeFormats($rawResourceInputFormats) : $resourceFormats;
+            $resourceOutputFormats = $rawResourceOutputFormats ? $this->normalizeFormats($rawResourceOutputFormats) : $resourceFormats;
 
-        if (null !== $itemOperations = $resourceMetadata->getItemOperations()) {
-            $resourceMetadata = $resourceMetadata->withItemOperations($this->normalize($resourceInputFormats, $resourceOutputFormats, $itemOperations));
-        }
+            if (null !== $collectionOperations = $operationCollectionMetadata->getCollectionOperations()) {
+                $resourceMetadata[$path] = $operationCollectionMetadata->withCollectionOperations($this->normalize($resourceInputFormats, $resourceOutputFormats, $collectionOperations));
+            }
 
-        if (null !== $subresourceOperations = $resourceMetadata->getSubresourceOperations()) {
-            $resourceMetadata = $resourceMetadata->withSubresourceOperations($this->normalize($resourceInputFormats, $resourceOutputFormats, $subresourceOperations));
+            if (null !== $itemOperations = $operationCollectionMetadata->getItemOperations()) {
+                $resourceMetadata[$path] = $operationCollectionMetadata->withItemOperations($this->normalize($resourceInputFormats, $resourceOutputFormats, $itemOperations));
+            }
+
+            if (null !== $subresourceOperations = $operationCollectionMetadata->getSubresourceOperations()) {
+                $resourceMetadata[$path] = $operationCollectionMetadata->withSubresourceOperations($this->normalize($resourceInputFormats, $resourceOutputFormats, $subresourceOperations));
+            }
         }
 
         return $resourceMetadata;

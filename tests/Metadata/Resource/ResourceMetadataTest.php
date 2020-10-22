@@ -14,60 +14,66 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\Metadata\Resource;
 
 use ApiPlatform\Core\Api\OperationType;
+use ApiPlatform\Core\Metadata\Resource\OperationCollectionMetadata;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use PHPUnit\Framework\TestCase;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
+ * @author Vincent Chalamon <vincentchalamon@gmail.com>
+ *
+ * todo Update this test
+ * todo Add OperationCollectionMetadataTest
  */
 class ResourceMetadataTest extends TestCase
 {
     public function testValueObject()
     {
-        $metadata = new ResourceMetadata('shortName', 'desc', 'http://example.com/foo', ['iop1' => ['foo' => 'a'], 'iop2' => ['bar' => 'b']], ['cop1' => ['foo' => 'c'], 'cop2' => ['bar' => 'd']], ['baz' => 'bar'], ['sop1' => ['sub' => 'bus']], ['query' => ['foo' => 'graphql']]);
-        $this->assertSame('shortName', $metadata->getShortName());
-        $this->assertSame('desc', $metadata->getDescription());
-        $this->assertSame('http://example.com/foo', $metadata->getIri());
-        $this->assertSame(['iop1' => ['foo' => 'a'], 'iop2' => ['bar' => 'b']], $metadata->getItemOperations());
-        $this->assertSame('a', $metadata->getItemOperationAttribute('iop1', 'foo', 'z'));
-        $this->assertSame('a', $metadata->getTypedOperationAttribute(OperationType::ITEM, 'iop1', 'foo', 'z'));
-        $this->assertSame('bar', $metadata->getItemOperationAttribute('iop1', 'baz', 'z', true));
-        $this->assertSame('bar', $metadata->getItemOperationAttribute(null, 'baz', 'z', true));
-        $this->assertSame('z', $metadata->getItemOperationAttribute('iop1', 'notExist', 'z', true));
-        $this->assertSame('z', $metadata->getItemOperationAttribute('notExist', 'notExist', 'z', true));
-        $this->assertSame(['cop1' => ['foo' => 'c'], 'cop2' => ['bar' => 'd']], $metadata->getCollectionOperations());
-        $this->assertSame('c', $metadata->getCollectionOperationAttribute('cop1', 'foo', 'z'));
-        $this->assertSame('c', $metadata->getTypedOperationAttribute(OperationType::COLLECTION, 'cop1', 'foo', 'z'));
-        $this->assertSame('bar', $metadata->getCollectionOperationAttribute('cop1', 'baz', 'z', true));
-        $this->assertSame('bar', $metadata->getCollectionOperationAttribute(null, 'baz', 'z', true));
-        $this->assertSame('z', $metadata->getCollectionOperationAttribute('cop1', 'notExist', 'z', true));
-        $this->assertSame('z', $metadata->getCollectionOperationAttribute('notExist', 'notExist', 'z', true));
-        $this->assertSame(['baz' => 'bar'], $metadata->getAttributes());
-        $this->assertSame('bar', $metadata->getAttribute('baz'));
-        $this->assertSame('z', $metadata->getAttribute('notExist', 'z'));
-        $this->assertSame(['sop1' => ['sub' => 'bus']], $metadata->getSubresourceOperations());
-        $this->assertSame('bus', $metadata->getSubresourceOperationAttribute('sop1', 'sub'));
-        $this->assertSame('bus', $metadata->getTypedOperationAttribute(OperationType::SUBRESOURCE, 'sop1', 'sub'));
-        $this->assertSame('sub', $metadata->getSubresourceOperationAttribute('sop1', 'bus', 'sub'));
-        $this->assertSame('bar', $metadata->getSubresourceOperationAttribute('sop1', 'baz', 'sub', true));
-        $this->assertSame('graphql', $metadata->getGraphqlAttribute('query', 'foo'));
-        $this->assertSame('bar', $metadata->getGraphqlAttribute('query', 'baz', null, true));
-        $this->assertSame('hey', $metadata->getGraphqlAttribute('query', 'notExist', 'hey', true));
+        $resourceMetadata = new ResourceMetadata([new OperationCollectionMetadata('/dummies', 'shortName', 'desc', 'http://example.com/foo', ['iop1' => ['foo' => 'a'], 'iop2' => ['bar' => 'b']], ['cop1' => ['foo' => 'c'], 'cop2' => ['bar' => 'd']], ['baz' => 'bar'], ['sop1' => ['sub' => 'bus']], ['query' => ['foo' => 'graphql']])]);
+        $operationCollectionMetadata = $resourceMetadata['/dummies'];
+        $this->assertSame('shortName', $operationCollectionMetadata->getShortName());
+        $this->assertSame('desc', $operationCollectionMetadata->getDescription());
+        $this->assertSame('http://example.com/foo', $operationCollectionMetadata->getIri());
+        $this->assertSame(['iop1' => ['foo' => 'a'], 'iop2' => ['bar' => 'b']], $operationCollectionMetadata->getItemOperations());
+        $this->assertSame('a', $operationCollectionMetadata->getItemOperationAttribute('iop1', 'foo', 'z'));
+        $this->assertSame('a', $operationCollectionMetadata->getTypedOperationAttribute(OperationType::ITEM, 'iop1', 'foo', 'z'));
+        $this->assertSame('bar', $operationCollectionMetadata->getItemOperationAttribute('iop1', 'baz', 'z', true));
+        $this->assertSame('bar', $operationCollectionMetadata->getItemOperationAttribute(null, 'baz', 'z', true));
+        $this->assertSame('z', $operationCollectionMetadata->getItemOperationAttribute('iop1', 'notExist', 'z', true));
+        $this->assertSame('z', $operationCollectionMetadata->getItemOperationAttribute('notExist', 'notExist', 'z', true));
+        $this->assertSame(['cop1' => ['foo' => 'c'], 'cop2' => ['bar' => 'd']], $operationCollectionMetadata->getCollectionOperations());
+        $this->assertSame('c', $operationCollectionMetadata->getCollectionOperationAttribute('cop1', 'foo', 'z'));
+        $this->assertSame('c', $operationCollectionMetadata->getTypedOperationAttribute(OperationType::COLLECTION, 'cop1', 'foo', 'z'));
+        $this->assertSame('bar', $operationCollectionMetadata->getCollectionOperationAttribute('cop1', 'baz', 'z', true));
+        $this->assertSame('bar', $operationCollectionMetadata->getCollectionOperationAttribute(null, 'baz', 'z', true));
+        $this->assertSame('z', $operationCollectionMetadata->getCollectionOperationAttribute('cop1', 'notExist', 'z', true));
+        $this->assertSame('z', $operationCollectionMetadata->getCollectionOperationAttribute('notExist', 'notExist', 'z', true));
+        $this->assertSame(['baz' => 'bar'], $operationCollectionMetadata->getAttributes());
+        $this->assertSame('bar', $operationCollectionMetadata->getAttribute('baz'));
+        $this->assertSame('z', $operationCollectionMetadata->getAttribute('notExist', 'z'));
+        $this->assertSame(['sop1' => ['sub' => 'bus']], $operationCollectionMetadata->getSubresourceOperations());
+        $this->assertSame('bus', $operationCollectionMetadata->getSubresourceOperationAttribute('sop1', 'sub'));
+        $this->assertSame('bus', $operationCollectionMetadata->getTypedOperationAttribute(OperationType::SUBRESOURCE, 'sop1', 'sub'));
+        $this->assertSame('sub', $operationCollectionMetadata->getSubresourceOperationAttribute('sop1', 'bus', 'sub'));
+        $this->assertSame('bar', $operationCollectionMetadata->getSubresourceOperationAttribute('sop1', 'baz', 'sub', true));
+        $this->assertSame('graphql', $operationCollectionMetadata->getGraphqlAttribute('query', 'foo'));
+        $this->assertSame('bar', $operationCollectionMetadata->getGraphqlAttribute('query', 'baz', null, true));
+        $this->assertSame('hey', $operationCollectionMetadata->getGraphqlAttribute('query', 'notExist', 'hey', true));
 
-        $newMetadata = $metadata->withShortName('name');
-        $this->assertNotSame($metadata, $newMetadata);
+        $newMetadata = $operationCollectionMetadata->withShortName('name');
+        $this->assertNotSame($operationCollectionMetadata, $newMetadata);
         $this->assertSame('name', $newMetadata->getShortName());
 
-        $newMetadata = $metadata->withDescription('description');
-        $this->assertNotSame($metadata, $newMetadata);
+        $newMetadata = $operationCollectionMetadata->withDescription('description');
+        $this->assertNotSame($operationCollectionMetadata, $newMetadata);
         $this->assertSame('description', $newMetadata->getDescription());
 
-        $newMetadata = $metadata->withIri('foo:bar');
-        $this->assertNotSame($metadata, $newMetadata);
+        $newMetadata = $operationCollectionMetadata->withIri('foo:bar');
+        $this->assertNotSame($operationCollectionMetadata, $newMetadata);
         $this->assertSame('foo:bar', $newMetadata->getIri());
 
-        $newMetadata = $metadata->withItemOperations(['a' => ['b' => 'c']]);
-        $this->assertNotSame($metadata, $newMetadata);
+        $newMetadata = $operationCollectionMetadata->withItemOperations(['a' => ['b' => 'c']]);
+        $this->assertNotSame($operationCollectionMetadata, $newMetadata);
         $this->assertSame(['a' => ['b' => 'c']], $newMetadata->getItemOperations());
     }
 
@@ -76,7 +82,7 @@ class ResourceMetadataTest extends TestCase
      */
     public function testWithMethods(string $name, $value)
     {
-        $metadata = new ResourceMetadata();
+        $metadata = new ResourceMetadata([new OperationCollectionMetadata('/dummies')]);
         $newMetadata = $metadata->{"with$name"}($value);
         $this->assertNotSame($metadata, $newMetadata);
         $this->assertSame($value, $newMetadata->{"get$name"}());
@@ -84,13 +90,13 @@ class ResourceMetadataTest extends TestCase
 
     public function testGetOperationAttributeFallback()
     {
-        $metadata = new ResourceMetadata();
+        $metadata = new ResourceMetadata([new OperationCollectionMetadata('/dummies')]);
         $this->assertSame('okay', $metadata->getOperationAttribute([], 'doh', 'okay'));
     }
 
     public function testGetOperationAttributeFallbackToResourceAttribute()
     {
-        $metadata = new ResourceMetadata(null, null, null, null, null, ['doh' => 'nuts']);
+        $metadata = new ResourceMetadata([new OperationCollectionMetadata('/dummies', null, null, null, null, null, ['doh' => 'nuts'])]);
         $this->assertSame('nuts', $metadata->getOperationAttribute([], 'doh', 'okay', true));
     }
 

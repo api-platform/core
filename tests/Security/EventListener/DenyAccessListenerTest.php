@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\Security\EventListener;
 
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
+use ApiPlatform\Core\Metadata\Resource\OperationCollectionMetadata;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Security\EventListener\DenyAccessListener;
 use ApiPlatform\Core\Security\ExpressionLanguage;
@@ -63,7 +64,7 @@ class DenyAccessListenerTest extends TestCase
         $eventProphecy->getRequest()->willReturn($request)->shouldBeCalled();
         $event = $eventProphecy->reveal();
 
-        $resourceMetadata = new ResourceMetadata();
+        $resourceMetadata = new ResourceMetadata([new OperationCollectionMetadata('/dummies')]);
 
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create('Foo')->willReturn($resourceMetadata)->shouldBeCalled();
@@ -81,7 +82,7 @@ class DenyAccessListenerTest extends TestCase
         $eventProphecy->getRequest()->willReturn($request)->shouldBeCalled();
         $event = $eventProphecy->reveal();
 
-        $resourceMetadata = new ResourceMetadata(null, null, null, null, null, ['security' => 'is_granted("ROLE_ADMIN")']);
+        $resourceMetadata = new ResourceMetadata([new OperationCollectionMetadata('/dummies', null, null, null, null, null, ['security' => 'is_granted("ROLE_ADMIN")'])]);
 
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create('Foo')->willReturn($resourceMetadata)->shouldBeCalled();
@@ -105,7 +106,7 @@ class DenyAccessListenerTest extends TestCase
         $eventProphecy->getRequest()->willReturn($request)->shouldBeCalled();
         $event = $eventProphecy->reveal();
 
-        $resourceMetadata = new ResourceMetadata(null, null, null, null, null, ['access_control' => 'is_granted("ROLE_ADMIN")']);
+        $resourceMetadata = new ResourceMetadata([new OperationCollectionMetadata('/dummies', null, null, null, null, null, ['access_control' => 'is_granted("ROLE_ADMIN")'])]);
 
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create('Foo')->willReturn($resourceMetadata)->shouldBeCalled();
@@ -127,7 +128,7 @@ class DenyAccessListenerTest extends TestCase
         $eventProphecy->getRequest()->willReturn($request)->shouldBeCalled();
         $event = $eventProphecy->reveal();
 
-        $resourceMetadata = new ResourceMetadata(null, null, null, null, null, ['security' => 'is_granted("ROLE_ADMIN")']);
+        $resourceMetadata = new ResourceMetadata([new OperationCollectionMetadata('/dummies', null, null, null, null, null, ['security' => 'is_granted("ROLE_ADMIN")'])]);
 
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create('Foo')->willReturn($resourceMetadata)->shouldBeCalled();
@@ -150,7 +151,7 @@ class DenyAccessListenerTest extends TestCase
         $eventProphecy->getRequest()->willReturn($request)->shouldBeCalled();
         $event = $eventProphecy->reveal();
 
-        $resourceMetadata = new ResourceMetadata(null, null, null, null, null, ['security' => 'is_granted("ROLE_ADMIN")', 'security_message' => 'You are not admin.']);
+        $resourceMetadata = new ResourceMetadata([new OperationCollectionMetadata('/dummies', null, null, null, null, null, ['security' => 'is_granted("ROLE_ADMIN")', 'security_message' => 'You are not admin.'])]);
 
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create('Foo')->willReturn($resourceMetadata)->shouldBeCalled();
@@ -174,7 +175,7 @@ class DenyAccessListenerTest extends TestCase
         $eventProphecy->getRequest()->willReturn($request)->shouldBeCalled();
         $event = $eventProphecy->reveal();
 
-        $resourceMetadata = new ResourceMetadata(null, null, null, null, null, ['security' => 'is_granted("ROLE_ADMIN")']);
+        $resourceMetadata = new ResourceMetadata([new OperationCollectionMetadata('/dummies', null, null, null, null, null, ['security' => 'is_granted("ROLE_ADMIN")'])]);
 
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create('Foo')->willReturn($resourceMetadata)->shouldBeCalled();
@@ -199,7 +200,7 @@ class DenyAccessListenerTest extends TestCase
         $eventProphecy->getRequest()->willReturn($request)->shouldBeCalled();
         $event = $eventProphecy->reveal();
 
-        $resourceMetadata = new ResourceMetadata(null, null, null, null, null, ['security' => 'is_granted("ROLE_ADMIN")']);
+        $resourceMetadata = new ResourceMetadata([new OperationCollectionMetadata('/dummies', null, null, null, null, null, ['security' => 'is_granted("ROLE_ADMIN")'])]);
 
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create('Foo')->willReturn($resourceMetadata)->shouldBeCalled();
@@ -224,7 +225,7 @@ class DenyAccessListenerTest extends TestCase
         $eventProphecy->getRequest()->willReturn($request)->shouldBeCalled();
         $event = $eventProphecy->reveal();
 
-        $resourceMetadata = new ResourceMetadata(null, null, null, null, null, ['security' => 'is_granted("ROLE_ADMIN")']);
+        $resourceMetadata = new ResourceMetadata([new OperationCollectionMetadata('/dummies', null, null, null, null, null, ['security' => 'is_granted("ROLE_ADMIN")'])]);
 
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create('Foo')->willReturn($resourceMetadata)->shouldBeCalled();
@@ -246,7 +247,7 @@ class DenyAccessListenerTest extends TestCase
         $eventProphecy->getRequest()->willReturn($request)->shouldBeCalled();
         $event = $eventProphecy->reveal();
 
-        $resourceMetadata = new ResourceMetadata(null, null, null, null, null, ['security' => 'is_granted("ROLE_ADMIN")']);
+        $resourceMetadata = new ResourceMetadata([new OperationCollectionMetadata('/dummies', null, null, null, null, null, ['security' => 'is_granted("ROLE_ADMIN")'])]);
 
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create('Foo')->willReturn($resourceMetadata)->shouldBeCalled();
@@ -272,7 +273,7 @@ class DenyAccessListenerTest extends TestCase
         $eventProphecy->getRequest()->willReturn($request)->shouldBeCalled();
         $event = $eventProphecy->reveal();
 
-        $resourceMetadata = new ResourceMetadata(null, null, null, null, null, ['security' => 'is_granted("ROLE_ADMIN")']);
+        $resourceMetadata = new ResourceMetadata([new OperationCollectionMetadata('/dummies', null, null, null, null, null, ['security' => 'is_granted("ROLE_ADMIN")'])]);
 
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create('Foo')->willReturn($resourceMetadata)->shouldBeCalled();

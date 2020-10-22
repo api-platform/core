@@ -21,6 +21,7 @@ use ApiPlatform\Core\Exception\InvalidIdentifierException;
 use ApiPlatform\Core\Exception\RuntimeException;
 use ApiPlatform\Core\Identifier\IdentifierDenormalizerInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
+use ApiPlatform\Core\Metadata\Resource\OperationCollectionMetadata;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Core\Tests\ProphecyTrait;
@@ -114,11 +115,11 @@ class ReadListenerTest extends TestCase
 
         $identifierConverter = $this->prophesize(IdentifierDenormalizerInterface::class);
 
-        $resourceMetadata = new ResourceMetadata('Dummy', null, null, [
+        $resourceMetadata = new ResourceMetadata([new OperationCollectionMetadata('/dummies', 'Dummy', null, null, [
             'put' => [
                 'read' => false,
             ],
-        ]);
+        ])]);
 
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn($resourceMetadata);

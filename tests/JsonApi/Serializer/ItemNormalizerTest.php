@@ -24,6 +24,7 @@ use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInte
 use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 use ApiPlatform\Core\Metadata\Property\PropertyNameCollection;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
+use ApiPlatform\Core\Metadata\Resource\OperationCollectionMetadata;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\CircularReference;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
@@ -124,7 +125,7 @@ class ItemNormalizerTest extends TestCase
         $propertyAccessorProphecy->getValue($dummy, 'name')->willReturn('hello');
 
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadata('Dummy', 'A dummy', '/dummy', null, null, ['id', 'name']));
+        $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadata([new OperationCollectionMetadata('/dummies', 'Dummy', 'A dummy', '/dummy', null, null, ['id', 'name'])]));
 
         $serializerProphecy = $this->prophesize(SerializerInterface::class);
         $serializerProphecy->willImplement(NormalizerInterface::class);
@@ -191,7 +192,7 @@ class ItemNormalizerTest extends TestCase
         $propertyAccessorProphecy->getValue($dummy, 'inherited')->willThrow(new NoSuchPropertyException());
 
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadata('Dummy', 'A dummy', '/dummy', null, null, ['id', 'name']));
+        $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadata([new OperationCollectionMetadata('/dummies', 'Dummy', 'A dummy', '/dummy', null, null, ['id', 'name'])]));
 
         $serializerProphecy = $this->prophesize(SerializerInterface::class);
         $serializerProphecy->willImplement(NormalizerInterface::class);
@@ -242,7 +243,7 @@ class ItemNormalizerTest extends TestCase
         $resourceClassResolverProphecy->getResourceClass($circularReferenceEntity, CircularReference::class)->willReturn(CircularReference::class);
 
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $resourceMetadataFactoryProphecy->create(CircularReference::class)->willReturn(new ResourceMetadata('CircularReference'));
+        $resourceMetadataFactoryProphecy->create(CircularReference::class)->willReturn(new ResourceMetadata([new OperationCollectionMetadata('/dummies', 'CircularReference')]));
 
         $normalizer = new ItemNormalizer(
             $this->prophesize(PropertyNameCollectionFactoryInterface::class)->reveal(),
@@ -301,7 +302,7 @@ class ItemNormalizerTest extends TestCase
         $propertyAccessorProphecy->getValue($dummy, 'bar')->willThrow(new NoSuchPropertyException());
 
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadata('Dummy'));
+        $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadata([new OperationCollectionMetadata('/dummies', 'Dummy')]));
 
         $normalizer = new ItemNormalizer(
             $propertyNameCollectionFactoryProphecy->reveal(),

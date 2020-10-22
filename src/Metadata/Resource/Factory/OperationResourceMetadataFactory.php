@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Metadata\Resource\Factory;
 
+use ApiPlatform\Core\Metadata\Resource\OperationCollectionMetadata;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 
 /**
@@ -57,51 +58,53 @@ final class OperationResourceMetadataFactory implements ResourceMetadataFactoryI
         $resourceMetadata = $this->decorated->create($resourceClass);
         $isAbstract = (new \ReflectionClass($resourceClass))->isAbstract();
 
-        $collectionOperations = $resourceMetadata->getCollectionOperations();
-        if (null === $collectionOperations) {
-            $resourceMetadata = $resourceMetadata->withCollectionOperations($this->createOperations($isAbstract ? ['GET'] : ['GET', 'POST'], $resourceMetadata));
-        } else {
-            $resourceMetadata = $this->normalize(true, $resourceClass, $resourceMetadata, $collectionOperations);
-        }
-
-        $itemOperations = $resourceMetadata->getItemOperations();
-        if (null === $itemOperations) {
-            $methods = ['GET', 'DELETE'];
-
-            if (!$isAbstract) {
-                $methods[] = 'PUT';
-
-                if ($this->patchFormats) {
-                    $methods[] = 'PATCH';
-                }
+        foreach ($resourceMetadata as $path => $operationCollectionMetadata) {
+            $collectionOperations = $operationCollectionMetadata->getCollectionOperations();
+            if (null === $collectionOperations) {
+                $resourceMetadata[$path] = $operationCollectionMetadata->withCollectionOperations($this->createOperations($isAbstract ? ['GET'] : ['GET', 'POST'], $operationCollectionMetadata));
+            } else {
+                $resourceMetadata[$path] = $this->normalize(true, $resourceClass, $operationCollectionMetadata, $collectionOperations);
             }
 
-            $resourceMetadata = $resourceMetadata->withItemOperations($this->createOperations($methods, $resourceMetadata));
-        } else {
-            $resourceMetadata = $this->normalize(false, $resourceClass, $resourceMetadata, $itemOperations);
-        }
+            $itemOperations = $operationCollectionMetadata->getItemOperations();
+            if (null === $itemOperations) {
+                $methods = ['GET', 'DELETE'];
 
-        $graphql = $resourceMetadata->getGraphql();
-        if (null === $graphql) {
-            $resourceMetadata = $resourceMetadata->withGraphql(['item_query' => [], 'collection_query' => [], 'delete' => [], 'update' => [], 'create' => []]);
-        } else {
-            $resourceMetadata = $this->normalizeGraphQl($resourceMetadata, $graphql);
+                if (!$isAbstract) {
+                    $methods[] = 'PUT';
+
+                    if ($this->patchFormats) {
+                        $methods[] = 'PATCH';
+                    }
+                }
+
+                $resourceMetadata[$path] = $operationCollectionMetadata->withItemOperations($this->createOperations($methods, $operationCollectionMetadata));
+            } else {
+                $resourceMetadata[$path] = $this->normalize(false, $resourceClass, $operationCollectionMetadata, $itemOperations);
+            }
+
+            $graphql = $operationCollectionMetadata->getGraphql();
+            if (null === $graphql) {
+                $resourceMetadata[$path] = $operationCollectionMetadata->withGraphql(['item_query' => [], 'collection_query' => [], 'delete' => [], 'update' => [], 'create' => []]);
+            } else {
+                $resourceMetadata[$path] = $this->normalizeGraphQl($operationCollectionMetadata, $graphql);
+            }
         }
 
         return $resourceMetadata;
     }
 
-    private function createOperations(array $methods, ResourceMetadata $resourceMetadata): array
+    private function createOperations(array $methods, OperationCollectionMetadata $operationCollectionMetadata): array
     {
         $operations = [];
         foreach ($methods as $method) {
-            $operations[strtolower($method)] = ['method' => $method, 'stateless' => $resourceMetadata->getAttribute('stateless')];
+            $operations[strtolower($method)] = ['method' => $method, 'stateless' => $operationCollectionMetadata->getAttribute('stateless')];
         }
 
         return $operations;
     }
 
-    private function normalize(bool $collection, string $resourceClass, ResourceMetadata $resourceMetadata, array $operations): ResourceMetadata
+    private function normalize(bool $collection, string $resourceClass, OperationCollectionMetadata $operationCollectionMetadata, array $operations): OperationCollectionMetadata
     {
         $newOperations = [];
         foreach ($operations as $operationName => $operation) {
@@ -131,15 +134,15 @@ final class OperationResourceMetadataFactory implements ResourceMetadataFactoryI
                 $operation['method'] = strtoupper($operation['method']);
             }
 
-            $operation['stateless'] = $operation['stateless'] ?? $resourceMetadata->getAttribute('stateless');
+            $operation['stateless'] = $operation['stateless'] ?? $operationCollectionMetadata->getAttribute('stateless');
 
             $newOperations[$operationName] = $operation;
         }
 
-        return $collection ? $resourceMetadata->withCollectionOperations($newOperations) : $resourceMetadata->withItemOperations($newOperations);
+        return $collection ? $operationCollectionMetadata->withCollectionOperations($newOperations) : $operationCollectionMetadata->withItemOperations($newOperations);
     }
 
-    private function normalizeGraphQl(ResourceMetadata $resourceMetadata, array $operations): ResourceMetadata
+    private function normalizeGraphQl(OperationCollectionMetadata $operationCollectionMetadata, array $operations): OperationCollectionMetadata
     {
         foreach ($operations as $operationName => $operation) {
             if (\is_int($operationName) && \is_string($operation)) {
@@ -148,6 +151,6 @@ final class OperationResourceMetadataFactory implements ResourceMetadataFactoryI
             }
         }
 
-        return $resourceMetadata->withGraphql($operations);
+        return $operationCollectionMetadata->withGraphql($operations);
     }
 }

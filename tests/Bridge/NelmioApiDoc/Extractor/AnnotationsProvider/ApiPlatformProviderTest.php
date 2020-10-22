@@ -21,6 +21,7 @@ use ApiPlatform\Core\Bridge\Symfony\Routing\OperationMethodResolverInterface;
 use ApiPlatform\Core\Documentation\Documentation;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
+use ApiPlatform\Core\Metadata\Resource\OperationCollectionMetadata;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Metadata\Resource\ResourceNameCollection;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
@@ -126,7 +127,7 @@ class ApiPlatformProviderTest extends TestCase
         $apiDocumentationBuilderProphecy = $this->prophesize(NormalizerInterface::class);
         $apiDocumentationBuilderProphecy->normalize(new Documentation($resourceNameCollection))->willReturn($this->getHydraDoc())->shouldBeCalled();
 
-        $dummyResourceMetadata = (new ResourceMetadata())
+        $dummyResourceMetadata = (new ResourceMetadata([(new OperationCollectionMetadata('/dummies'))
             ->withShortName('Dummy')
             ->withItemOperations([
                 'get' => [
@@ -149,10 +150,9 @@ class ApiPlatformProviderTest extends TestCase
                 'post' => [
                     'method' => 'POST',
                 ],
-            ]);
+            ]), ]));
 
-        $relatedDummyResourceMetadata = (new ResourceMetadata())
-            ->withShortName('RelatedDummy');
+        $relatedDummyResourceMetadata = (new ResourceMetadata([(new OperationCollectionMetadata('/dummies'))->withShortName('RelatedDummy')]));
 
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn($dummyResourceMetadata)->shouldBeCalled();
@@ -396,13 +396,13 @@ JSON;
         $resourceNameCollectionFactoryProphecy = $this->prophesize(ResourceNameCollectionFactoryInterface::class);
         $resourceNameCollectionFactoryProphecy->create()->willReturn(new ResourceNameCollection([Dummy::class]))->shouldBeCalled();
 
-        $dummyResourceMetadata = (new ResourceMetadata())
+        $dummyResourceMetadata = (new ResourceMetadata([(new OperationCollectionMetadata('/dummies'))
             ->withShortName('Dummy')
             ->withItemOperations([
                 'get' => [
                     'method' => 'GET',
                 ],
-            ]);
+            ]), ]));
 
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn($dummyResourceMetadata)->shouldBeCalled();
@@ -440,13 +440,13 @@ JSON;
         $resourceNameCollectionFactoryProphecy = $this->prophesize(ResourceNameCollectionFactoryInterface::class);
         $resourceNameCollectionFactoryProphecy->create()->willReturn(new ResourceNameCollection([Dummy::class]))->shouldBeCalled();
 
-        $dummyResourceMetadata = (new ResourceMetadata())
+        $dummyResourceMetadata = (new ResourceMetadata([(new OperationCollectionMetadata('/dummies'))
             ->withShortName('Dummy')
             ->withItemOperations([
                 'get' => [
                     'method' => 'GET',
                 ],
-            ]);
+            ]), ]));
 
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn($dummyResourceMetadata)->shouldBeCalled();
@@ -484,13 +484,13 @@ JSON;
         $resourceNameCollectionFactoryProphecy = $this->prophesize(ResourceNameCollectionFactoryInterface::class);
         $resourceNameCollectionFactoryProphecy->create()->willReturn(new ResourceNameCollection([Dummy::class]))->shouldBeCalled();
 
-        $dummyResourceMetadata = (new ResourceMetadata())
+        $dummyResourceMetadata = (new ResourceMetadata([(new OperationCollectionMetadata('/dummies'))
             ->withShortName('Dummy')
             ->withCollectionOperations([
                 'get' => [
                     'method' => 'GET',
                 ],
-            ]);
+            ]), ]));
 
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn($dummyResourceMetadata)->shouldBeCalled();
@@ -528,13 +528,13 @@ JSON;
         $resourceNameCollectionFactoryProphecy = $this->prophesize(ResourceNameCollectionFactoryInterface::class);
         $resourceNameCollectionFactoryProphecy->create()->willReturn(new ResourceNameCollection([Dummy::class]))->shouldBeCalled();
 
-        $dummyResourceMetadata = (new ResourceMetadata())
+        $dummyResourceMetadata = (new ResourceMetadata([(new OperationCollectionMetadata('/dummies'))
             ->withShortName('Dummy')
             ->withCollectionOperations([
                 'get' => [
                     'method' => 'GET',
                 ],
-            ]);
+            ]), ]));
 
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn($dummyResourceMetadata)->shouldBeCalled();

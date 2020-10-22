@@ -1,0 +1,17 @@
+resources:
+    - 'ApiPlatform\Core\Tests\Fixtures\DummyResourceInterface':
+          path: /dummy-resources
+          properties:
+              something:
+                  identifier: true
+              somethingElse:
+                  writable: false
+                  readable: true
+    - 'ApiPlatform\Core\Tests\Fixtures\DummyResourceInterface':
+          path: /dummy-resources-subresource
+          properties:
+              something:
+                  identifier: true
+              somethingElse:
+                  writable: false
+                  readable: true

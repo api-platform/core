@@ -17,6 +17,7 @@ use ApiPlatform\Core\EventListener\QueryParameterValidateListener;
 use ApiPlatform\Core\Exception\FilterValidationException;
 use ApiPlatform\Core\Filter\QueryParameterValidator;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
+use ApiPlatform\Core\Metadata\Resource\OperationCollectionMetadata;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Core\Tests\ProphecyTrait;
@@ -125,12 +126,7 @@ class QueryParameterValidateListenerTest extends TestCase
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataFactoryProphecy
             ->create(Dummy::class)
-            ->willReturn(
-                (new ResourceMetadata('dummy'))
-                ->withAttributes([
-                    'filters' => $filters,
-                ])
-            );
+            ->willReturn(new ResourceMetadata([(new OperationCollectionMetadata('/dummies', 'dummy'))->withAttributes(['filters' => $filters])]));
 
         $this->queryParameterValidor = $this->prophesize(QueryParameterValidator::class);
 

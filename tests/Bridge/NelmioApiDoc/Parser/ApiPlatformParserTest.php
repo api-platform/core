@@ -20,6 +20,7 @@ use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInte
 use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 use ApiPlatform\Core\Metadata\Property\PropertyNameCollection;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
+use ApiPlatform\Core\Metadata\Resource\OperationCollectionMetadata;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RelatedDummy;
@@ -68,7 +69,7 @@ class ApiPlatformParserTest extends TestCase
     public function testSupports()
     {
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadata())->shouldBeCalled();
+        $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadata([new OperationCollectionMetadata('/dummies')]))->shouldBeCalled();
         $resourceMetadataFactory = $resourceMetadataFactoryProphecy->reveal();
 
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
@@ -90,7 +91,7 @@ class ApiPlatformParserTest extends TestCase
     public function testNoOnDataFirstArray()
     {
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadata());
+        $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadata([new OperationCollectionMetadata('/dummies')]));
         $resourceMetadataFactory = $resourceMetadataFactoryProphecy->reveal();
 
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
@@ -112,11 +113,11 @@ class ApiPlatformParserTest extends TestCase
     public function testSupportsAttributeNormalization()
     {
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $resourceMetadataFactoryProphecy->create('Acme\CustomAttributeDummy')->willReturn(new ResourceMetadata('dummy', 'dummy', null, [
+        $resourceMetadataFactoryProphecy->create('Acme\CustomAttributeDummy')->willReturn(new ResourceMetadata([new OperationCollectionMetadata('/dummies', 'dummy', 'dummy', null, [
             'get' => ['method' => 'GET', 'normalization_context' => [AbstractNormalizer::GROUPS => ['custom_attr_dummy_get']]],
             'put' => ['method' => 'PUT', 'denormalization_context' => [AbstractNormalizer::GROUPS => ['custom_attr_dummy_put']]],
             'delete' => ['method' => 'DELETE'],
-        ], []))->shouldBeCalled();
+        ], [])]))->shouldBeCalled();
         $resourceMetadataFactory = $resourceMetadataFactoryProphecy->reveal();
 
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
@@ -216,12 +217,12 @@ class ApiPlatformParserTest extends TestCase
     public function testParse()
     {
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadata('dummy', 'dummy', null, [
+        $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadata([new OperationCollectionMetadata('/dummies', 'dummy', 'dummy', null, [
             'get' => ['method' => 'GET', 'normalization_context' => [AbstractNormalizer::GROUPS => ['custom_attr_dummy_get']]],
             'put' => ['method' => 'PUT', 'denormalization_context' => [AbstractNormalizer::GROUPS => ['custom_attr_dummy_put']]],
             'gerard' => ['method' => 'get', 'path' => '/gerard', 'denormalization_context' => [AbstractNormalizer::GROUPS => ['custom_attr_dummy_put']]],
             'delete' => ['method' => 'DELETE'],
-        ], []))->shouldBeCalled();
+        ], [])]))->shouldBeCalled();
         $resourceMetadataFactory = $resourceMetadataFactoryProphecy->reveal();
 
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
@@ -290,7 +291,7 @@ class ApiPlatformParserTest extends TestCase
     public function testParseDateTime()
     {
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadata('dummy', 'dummy', null, [], []))->shouldBeCalled();
+        $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadata([new OperationCollectionMetadata('/dummies', 'dummy', 'dummy', null, [], [])]))->shouldBeCalled();
         $resourceMetadataFactory = $resourceMetadataFactoryProphecy->reveal();
 
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
@@ -332,8 +333,8 @@ class ApiPlatformParserTest extends TestCase
     public function testParseRelation()
     {
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadata('dummy', 'dummy', null, [], []))->shouldBeCalled();
-        $resourceMetadataFactoryProphecy->create(RelatedDummy::class)->willReturn(new ResourceMetadata())->shouldBeCalled();
+        $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadata([new OperationCollectionMetadata('/dummies', 'dummy', 'dummy', null, [], [])]))->shouldBeCalled();
+        $resourceMetadataFactoryProphecy->create(RelatedDummy::class)->willReturn(new ResourceMetadata([new OperationCollectionMetadata('/dummies')]))->shouldBeCalled();
         $resourceMetadataFactory = $resourceMetadataFactoryProphecy->reveal();
 
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
@@ -423,7 +424,7 @@ class ApiPlatformParserTest extends TestCase
     public function testParseWithNameConverter()
     {
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadata('dummy', 'dummy', null, [], []))->shouldBeCalled();
+        $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadata([new OperationCollectionMetadata('/dummies', 'dummy', 'dummy', null, [], [])]))->shouldBeCalled();
         $resourceMetadataFactory = $resourceMetadataFactoryProphecy->reveal();
 
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
@@ -468,8 +469,8 @@ class ApiPlatformParserTest extends TestCase
     public function testParseRecursive()
     {
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadata('dummy', 'dummy', null, [], []))->shouldBeCalled();
-        $resourceMetadataFactoryProphecy->create(RelatedDummy::class)->willReturn(new ResourceMetadata())->shouldBeCalled();
+        $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadata([new OperationCollectionMetadata('/dummies', 'dummy', 'dummy', null, [], [])]))->shouldBeCalled();
+        $resourceMetadataFactoryProphecy->create(RelatedDummy::class)->willReturn(new ResourceMetadata([new OperationCollectionMetadata('/dummies')]))->shouldBeCalled();
         $resourceMetadataFactory = $resourceMetadataFactoryProphecy->reveal();
 
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);

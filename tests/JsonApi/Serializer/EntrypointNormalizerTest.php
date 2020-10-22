@@ -19,6 +19,7 @@ use ApiPlatform\Core\Api\UrlGeneratorInterface;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\JsonApi\Serializer\EntrypointNormalizer;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
+use ApiPlatform\Core\Metadata\Resource\OperationCollectionMetadata;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Metadata\Resource\ResourceNameCollection;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
@@ -56,9 +57,9 @@ class EntrypointNormalizerTest extends TestCase
         $collection = new ResourceNameCollection([Dummy::class, RelatedDummy::class, DummyCar::class]);
         $entrypoint = new Entrypoint($collection);
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadata('Dummy', null, null, null, ['get']))->shouldBeCalled();
-        $resourceMetadataFactoryProphecy->create(RelatedDummy::class)->willReturn(new ResourceMetadata('RelatedDummy', null, null, ['get'], null))->shouldBeCalled();
-        $resourceMetadataFactoryProphecy->create(DummyCar::class)->willReturn(new ResourceMetadata('DummyCar', null, null, null, ['post']))->shouldBeCalled();
+        $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadata([new OperationCollectionMetadata('/dummies', 'Dummy', null, null, null, ['get'])]))->shouldBeCalled();
+        $resourceMetadataFactoryProphecy->create(RelatedDummy::class)->willReturn(new ResourceMetadata([new OperationCollectionMetadata('/dummies', 'RelatedDummy', null, null, ['get'], null)]))->shouldBeCalled();
+        $resourceMetadataFactoryProphecy->create(DummyCar::class)->willReturn(new ResourceMetadata([new OperationCollectionMetadata('/dummies', 'DummyCar', null, null, null, ['post'])]))->shouldBeCalled();
 
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
         $iriConverterProphecy->getIriFromResourceClass(Dummy::class, UrlGeneratorInterface::ABS_URL)->willReturn('http://localhost/api/dummies')->shouldBeCalled();

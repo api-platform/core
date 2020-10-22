@@ -21,6 +21,7 @@ use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\Hydra\Serializer\CollectionFiltersNormalizer;
 use ApiPlatform\Core\Hydra\Serializer\CollectionNormalizer;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
+use ApiPlatform\Core\Metadata\Resource\OperationCollectionMetadata;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Tests\Fixtures\Foo;
 use ApiPlatform\Core\Tests\Fixtures\NotAResource;
@@ -205,7 +206,7 @@ class CollectionFiltersNormalizerTest extends TestCase
         ])->willReturn(['name' => 'foo']);
 
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadata('foo', '', null, [], ['get' => []]));
+        $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadata([new OperationCollectionMetadata('/dummies', 'foo', '', null, [], ['get' => []])]));
 
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
         $resourceClassResolverProphecy->getResourceClass($dummy, Dummy::class)->willReturn(Dummy::class);
@@ -233,7 +234,7 @@ class CollectionFiltersNormalizerTest extends TestCase
         ])->willReturn(['name' => 'foo']);
 
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadata('foo', '', null, [], [], ['filters' => ['foo']]));
+        $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadata([new OperationCollectionMetadata('/dummies', 'foo', '', null, [], [], ['filters' => ['foo']])]));
 
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
         $resourceClassResolverProphecy->getResourceClass($dummy, Dummy::class)->willReturn(Dummy::class);
@@ -301,7 +302,7 @@ class CollectionFiltersNormalizerTest extends TestCase
         ])->willReturn(['name' => 'foo']);
 
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadata('foo', '', null, [], [], ['filters' => ['foo']]));
+        $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadata([new OperationCollectionMetadata('/dummies', 'foo', '', null, [], [], ['filters' => ['foo']])]));
 
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
         $resourceClassResolverProphecy->getResourceClass($dummy, Dummy::class)->willReturn(Dummy::class);

@@ -15,6 +15,7 @@ namespace ApiPlatform\Core\Tests\GraphQl\Resolver\Stage;
 
 use ApiPlatform\Core\GraphQl\Resolver\Stage\SecurityPostDenormalizeStage;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
+use ApiPlatform\Core\Metadata\Resource\OperationCollectionMetadata;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Security\ResourceAccessCheckerInterface;
 use ApiPlatform\Core\Tests\ProphecyTrait;
@@ -53,7 +54,7 @@ class SecurityPostDenormalizeStageTest extends TestCase
     public function testNoSecurity(): void
     {
         $resourceClass = 'myResource';
-        $this->resourceMetadataFactoryProphecy->create($resourceClass)->willReturn(new ResourceMetadata());
+        $this->resourceMetadataFactoryProphecy->create($resourceClass)->willReturn(new ResourceMetadata([new OperationCollectionMetadata('/dummies')]));
 
         $this->resourceAccessCheckerProphecy->isGranted(Argument::cetera())->shouldNotBeCalled();
 
@@ -66,9 +67,9 @@ class SecurityPostDenormalizeStageTest extends TestCase
         $resourceClass = 'myResource';
         $isGranted = 'not_granted';
         $extraVariables = ['extra' => false];
-        $resourceMetadata = (new ResourceMetadata())->withGraphql([
+        $resourceMetadata = (new ResourceMetadata([(new OperationCollectionMetadata('/dummies'))->withGraphql([
             $operationName => ['security_post_denormalize' => $isGranted],
-        ]);
+        ])]));
         $this->resourceMetadataFactoryProphecy->create($resourceClass)->willReturn($resourceMetadata);
 
         $this->resourceAccessCheckerProphecy->isGranted($resourceClass, $isGranted, $extraVariables)->shouldBeCalled()->willReturn(true);
@@ -85,9 +86,9 @@ class SecurityPostDenormalizeStageTest extends TestCase
         $resourceClass = 'myResource';
         $isGranted = 'not_granted';
         $extraVariables = ['extra' => false];
-        $resourceMetadata = (new ResourceMetadata())->withGraphql([
+        $resourceMetadata = (new ResourceMetadata([(new OperationCollectionMetadata('/dummies'))->withGraphql([
             $operationName => ['access_control' => $isGranted],
-        ]);
+        ])]));
         $this->resourceMetadataFactoryProphecy->create($resourceClass)->willReturn($resourceMetadata);
 
         $this->resourceAccessCheckerProphecy->isGranted($resourceClass, $isGranted, $extraVariables)->shouldBeCalled()->willReturn(true);
@@ -101,9 +102,9 @@ class SecurityPostDenormalizeStageTest extends TestCase
         $resourceClass = 'myResource';
         $isGranted = 'not_granted';
         $extraVariables = ['extra' => false];
-        $resourceMetadata = (new ResourceMetadata())->withGraphql([
+        $resourceMetadata = (new ResourceMetadata([(new OperationCollectionMetadata('/dummies'))->withGraphql([
             $operationName => ['security_post_denormalize' => $isGranted],
-        ]);
+        ])]));
         $this->resourceMetadataFactoryProphecy->create($resourceClass)->willReturn($resourceMetadata);
 
         $this->resourceAccessCheckerProphecy->isGranted($resourceClass, $isGranted, $extraVariables)->shouldBeCalled()->willReturn(false);
@@ -126,9 +127,9 @@ class SecurityPostDenormalizeStageTest extends TestCase
         $operationName = 'item_query';
         $resourceClass = 'myResource';
         $isGranted = 'not_granted';
-        $resourceMetadata = (new ResourceMetadata())->withGraphql([
+        $resourceMetadata = (new ResourceMetadata([(new OperationCollectionMetadata('/dummies'))->withGraphql([
             $operationName => ['security_post_denormalize' => $isGranted],
-        ]);
+        ])]));
         $this->resourceMetadataFactoryProphecy->create($resourceClass)->willReturn($resourceMetadata);
 
         $this->expectException(\LogicException::class);
@@ -141,7 +142,7 @@ class SecurityPostDenormalizeStageTest extends TestCase
         $this->securityPostDenormalizeStage = new SecurityPostDenormalizeStage($this->resourceMetadataFactoryProphecy->reveal(), null);
 
         $resourceClass = 'myResource';
-        $resourceMetadata = new ResourceMetadata();
+        $resourceMetadata = new ResourceMetadata([new OperationCollectionMetadata('/dummies')]);
         $this->resourceMetadataFactoryProphecy->create($resourceClass)->willReturn($resourceMetadata);
 
         $this->resourceAccessCheckerProphecy->isGranted(Argument::any())->shouldNotBeCalled();

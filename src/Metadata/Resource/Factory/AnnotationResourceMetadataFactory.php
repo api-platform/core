@@ -15,6 +15,7 @@ namespace ApiPlatform\Core\Metadata\Resource\Factory;
 
 use ApiPlatform\Core\Annotation\ApiResource;
 use ApiPlatform\Core\Exception\ResourceClassNotFoundException;
+use ApiPlatform\Core\Metadata\Resource\OperationCollectionMetadata;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use Doctrine\Common\Annotations\Reader;
 
@@ -41,10 +42,10 @@ final class AnnotationResourceMetadataFactory implements ResourceMetadataFactory
      */
     public function create(string $resourceClass): ResourceMetadata
     {
-        $parentResourceMetadata = null;
+        $resourceMetadata = null;
         if ($this->decorated) {
             try {
-                $parentResourceMetadata = $this->decorated->create($resourceClass);
+                $resourceMetadata = $this->decorated->create($resourceClass);
             } catch (ResourceClassNotFoundException $resourceNotFoundException) {
                 // Ignore not found exception from decorated factories
             }
@@ -53,15 +54,28 @@ final class AnnotationResourceMetadataFactory implements ResourceMetadataFactory
         try {
             $reflectionClass = new \ReflectionClass($resourceClass);
         } catch (\ReflectionException $reflectionException) {
-            return $this->handleNotFound($parentResourceMetadata, $resourceClass);
+            return $this->handleNotFound($resourceMetadata, $resourceClass);
         }
 
-        $resourceAnnotation = $this->reader->getClassAnnotation($reflectionClass, ApiResource::class);
-        if (!$resourceAnnotation instanceof ApiResource) {
-            return $this->handleNotFound($parentResourceMetadata, $resourceClass);
+        if (!$resourceMetadata) {
+            $resourceMetadata = new ResourceMetadata([]);
         }
 
-        return $this->createMetadata($resourceAnnotation, $parentResourceMetadata);
+        foreach ($this->reader->getClassAnnotations($reflectionClass) as $resourceAnnotation) {
+            if ($resourceAnnotation instanceof ApiResource) {
+                $resourceMetadata[$resourceAnnotation->path] = $this->createMetadata(
+                    $resourceAnnotation,
+                    $resourceMetadata[$resourceAnnotation->path] ?? null
+                );
+            }
+        }
+
+        // todo Does empty work with ArrayAccess and IteratorAggregate?
+        if (empty($resourceMetadata)) {
+            return $this->handleNotFound($resourceMetadata, $resourceClass);
+        }
+
+        return $resourceMetadata;
     }
 
     /**
@@ -78,12 +92,13 @@ final class AnnotationResourceMetadataFactory implements ResourceMetadataFactory
         throw new ResourceClassNotFoundException(sprintf('Resource "%s" not found.', $resourceClass));
     }
 
-    private function createMetadata(ApiResource $annotation, ResourceMetadata $parentResourceMetadata = null): ResourceMetadata
+    private function createMetadata(ApiResource $annotation, OperationCollectionMetadata $operationCollectionMetadata = null): OperationCollectionMetadata
     {
         $attributes = (null === $annotation->attributes && [] === $this->defaults['attributes']) ? null : (array) $annotation->attributes + $this->defaults['attributes'];
 
-        if (!$parentResourceMetadata) {
-            return new ResourceMetadata(
+        if (!$operationCollectionMetadata) {
+            return new OperationCollectionMetadata(
+                $annotation->path,
                 $annotation->shortName,
                 $annotation->description ?? $this->defaults['description'] ?? null,
                 $annotation->iri ?? $this->defaults['iri'] ?? null,
@@ -95,18 +110,17 @@ final class AnnotationResourceMetadataFactory implements ResourceMetadataFactory
             );
         }
 
-        $resourceMetadata = $parentResourceMetadata;
-        foreach (['shortName', 'description', 'iri', 'itemOperations', 'collectionOperations', 'subresourceOperations', 'graphql', 'attributes'] as $property) {
-            $resourceMetadata = $this->createWith($resourceMetadata, $property, $annotation->{$property});
+        foreach (['path', 'shortName', 'description', 'iri', 'itemOperations', 'collectionOperations', 'subresourceOperations', 'graphql', 'attributes'] as $property) {
+            $operationCollectionMetadata = $this->createWith($operationCollectionMetadata, $property, $annotation->{$property});
         }
 
-        return $resourceMetadata;
+        return $operationCollectionMetadata;
     }
 
     /**
      * Creates a new instance of metadata if the property is not already set.
      */
-    private function createWith(ResourceMetadata $resourceMetadata, string $property, $value): ResourceMetadata
+    private function createWith(OperationCollectionMetadata $resourceMetadata, string $property, $value): OperationCollectionMetadata
     {
         $upperProperty = ucfirst($property);
         $getter = "get$upperProperty";
