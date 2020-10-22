@@ -7,6 +7,7 @@ Feature: FOSUser integration
   @createSchema
   Scenario: Create a user
     When I add "Content-Type" header equal to "application/ld+json"
+    And I add "Accept" header equal to "application/ld+json"
     And I send a "POST" request to "/users" with body:
     """
     {
@@ -33,5 +34,6 @@ Feature: FOSUser integration
     And the password "azerty" for user 1 should be hashed
 
   Scenario: Delete a user
-    When I send a "DELETE" request to "/users/1"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "DELETE" request to "/users/1"
     Then the response status code should be 204
