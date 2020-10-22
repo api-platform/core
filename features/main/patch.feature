@@ -4,7 +4,8 @@ Feature: Sending PATCH requets
 
   @createSchema
   Scenario: Detect accepted patch formats
-    Given I add "Content-Type" header equal to "application/ld+json"
+    Given I add "Accept" header equal to "application/ld+json"
+    And I add "Content-Type" header equal to "application/ld+json"
     And I send a "POST" request to "/patch_dummies" with body:
     """
     {"name": "Hello"}
@@ -15,7 +16,8 @@ Feature: Sending PATCH requets
     Then the header "Accept-Patch" should be equal to "application/merge-patch+json, application/vnd.api+json"
 
   Scenario: Patch an item
-    When I add "Content-Type" header equal to "application/merge-patch+json"
+    When I add "Accept" header equal to "application/ld+json"
+    And I add "Content-Type" header equal to "application/merge-patch+json"
     And I send a "PATCH" request to "/patch_dummies/1" with body:
     """
     {"name": "Patched"}

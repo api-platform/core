@@ -16,12 +16,12 @@ namespace ApiPlatform\Core\Tests\Bridge\Symfony\Bundle;
 use ApiPlatform\Core\Bridge\Symfony\Bundle\ApiPlatformBundle;
 use ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\Compiler\AnnotationFilterPass;
 use ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\Compiler\DataProviderPass;
+use ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\Compiler\DeprecateMercurePublisherPass;
 use ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\Compiler\ElasticsearchClientPass;
 use ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\Compiler\FilterPass;
 use ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\Compiler\GraphQlMutationResolverPass;
 use ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\Compiler\GraphQlQueryResolverPass;
 use ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\Compiler\GraphQlTypePass;
-use ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\Compiler\HandleDeprecatedPass;
 use ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\Compiler\MetadataAwareNameConverterPass;
 use ApiPlatform\Core\Tests\ProphecyTrait;
 use PHPUnit\Framework\TestCase;
@@ -46,7 +46,7 @@ class ApiPlatformBundleTest extends TestCase
         $containerProphecy->addCompilerPass(Argument::type(GraphQlTypePass::class))->shouldBeCalled();
         $containerProphecy->addCompilerPass(Argument::type(GraphQlQueryResolverPass::class))->shouldBeCalled();
         $containerProphecy->addCompilerPass(Argument::type(GraphQlMutationResolverPass::class))->shouldBeCalled();
-        $containerProphecy->addCompilerPass(Argument::type(HandleDeprecatedPass::class))->shouldBeCalled();
+        $containerProphecy->addCompilerPass(Argument::type(DeprecateMercurePublisherPass::class))->shouldBeCalled();
         $containerProphecy->addCompilerPass(Argument::type(MetadataAwareNameConverterPass::class))->shouldBeCalled();
 
         $bundle = new ApiPlatformBundle();

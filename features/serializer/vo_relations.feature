@@ -6,6 +6,7 @@ Feature: Value object as ApiResource
   @createSchema
   Scenario: Create Value object resource
     When I add "Content-Type" header equal to "application/ld+json"
+    And I add "Accept" header equal to "application/ld+json"
     And I send a "POST" request to "/vo_dummy_cars" with body:
     """
     {
@@ -53,6 +54,7 @@ Feature: Value object as ApiResource
 
   Scenario: Create Value object with IRI and nullable parameter
     When I add "Content-Type" header equal to "application/ld+json"
+    And I add "Accept" header equal to "application/ld+json"
     And I send a "POST" request to "/vo_dummy_inspections" with body:
     """
     {
@@ -82,6 +84,7 @@ Feature: Value object as ApiResource
 
   Scenario: Update Value object with writable and non writable property
     When I add "Content-Type" header equal to "application/ld+json"
+    And I add "Accept" header equal to "application/ld+json"
     And I send a "PUT" request to "/vo_dummy_inspections/1" with body:
     """
     {
@@ -105,6 +108,7 @@ Feature: Value object as ApiResource
   @createSchema
   Scenario: Create Value object without required params
     When I add "Content-Type" header equal to "application/ld+json"
+    And I add "Accept" header equal to "application/ld+json"
     And I send a "POST" request to "/vo_dummy_cars" with body:
     """
     {
@@ -150,6 +154,7 @@ Feature: Value object as ApiResource
   @createSchema
   Scenario: Create Value object without default param
     When I add "Content-Type" header equal to "application/ld+json"
+    And I add "Accept" header equal to "application/ld+json"
     And I send a "POST" request to "/vo_dummy_cars" with body:
     """
     {

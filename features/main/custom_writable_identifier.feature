@@ -5,7 +5,8 @@ Feature: Using custom writable identifier on resource
 
   @createSchema
   Scenario: Create a resource
-    When I add "Content-Type" header equal to "application/ld+json"
+    When I add "Accept" header equal to "application/ld+json"
+    And I add "Content-Type" header equal to "application/ld+json"
     And I send a "POST" request to "/custom_writable_identifier_dummies" with body:
     """
     {
@@ -30,7 +31,8 @@ Feature: Using custom writable identifier on resource
     """
 
   Scenario: Get a resource
-    When I send a "GET" request to "/custom_writable_identifier_dummies/my_slug"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/custom_writable_identifier_dummies/my_slug"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
@@ -46,7 +48,8 @@ Feature: Using custom writable identifier on resource
     """
 
   Scenario: Get a collection
-    When I send a "GET" request to "/custom_writable_identifier_dummies"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/custom_writable_identifier_dummies"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
@@ -70,7 +73,8 @@ Feature: Using custom writable identifier on resource
 
   @!mongodb
   Scenario: Update a resource
-    When I add "Content-Type" header equal to "application/ld+json"
+    When I add "Accept" header equal to "application/ld+json"
+    And I add "Content-Type" header equal to "application/ld+json"
     And I send a "PUT" request to "/custom_writable_identifier_dummies/my_slug" with body:
     """
     {
@@ -107,6 +111,7 @@ Feature: Using custom writable identifier on resource
 
   @!mongodb
   Scenario: Delete a resource
-    When I send a "DELETE" request to "/custom_writable_identifier_dummies/slug_modified"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "DELETE" request to "/custom_writable_identifier_dummies/slug_modified"
     Then the response status code should be 204
     And the response should be empty

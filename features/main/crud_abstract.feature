@@ -5,7 +5,8 @@ Feature: Create-Retrieve-Update-Delete on abstract resource
 
   @createSchema
   Scenario: Create a concrete resource
-    When I add "Content-Type" header equal to "application/ld+json"
+    When I add "Accept" header equal to "application/ld+json"
+    And I add "Content-Type" header equal to "application/ld+json"
     And I send a "POST" request to "/concrete_dummies" with body:
     """
     {
@@ -31,7 +32,8 @@ Feature: Create-Retrieve-Update-Delete on abstract resource
     """
 
   Scenario: Get a resource
-    When I send a "GET" request to "/abstract_dummies/1"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/abstract_dummies/1"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
@@ -48,7 +50,8 @@ Feature: Create-Retrieve-Update-Delete on abstract resource
     """
 
   Scenario: Get a collection
-    When I send a "GET" request to "/abstract_dummies"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/abstract_dummies"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
@@ -80,7 +83,8 @@ Feature: Create-Retrieve-Update-Delete on abstract resource
     """
 
   Scenario: Update a concrete resource
-    When I add "Content-Type" header equal to "application/ld+json"
+    When I add "Accept" header equal to "application/ld+json"
+    And I add "Content-Type" header equal to "application/ld+json"
     And I send a "PUT" request to "/concrete_dummies/1" with body:
       """
       {
@@ -106,7 +110,8 @@ Feature: Create-Retrieve-Update-Delete on abstract resource
       """
 
   Scenario: Update a concrete resource using abstract resource uri
-    When I add "Content-Type" header equal to "application/ld+json"
+    When I add "Accept" header equal to "application/ld+json"
+    And I add "Content-Type" header equal to "application/ld+json"
     And I send a "PUT" request to "/abstract_dummies/1" with body:
       """
       {
@@ -132,13 +137,15 @@ Feature: Create-Retrieve-Update-Delete on abstract resource
       """
 
   Scenario: Delete a resource
-    When I send a "DELETE" request to "/abstract_dummies/1"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "DELETE" request to "/abstract_dummies/1"
     Then the response status code should be 204
     And the response should be empty
 
   @createSchema
   Scenario: Create a concrete resource with discriminator
-    When I add "Content-Type" header equal to "application/ld+json"
+    When I add "Accept" header equal to "application/ld+json"
+    And I add "Content-Type" header equal to "application/ld+json"
     And I send a "POST" request to "/abstract_dummies" with body:
     """
     {

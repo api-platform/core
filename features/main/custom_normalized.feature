@@ -5,7 +5,8 @@ Feature: Using custom normalized entity
 
   @createSchema
   Scenario: Create a resource
-    When I add "Content-Type" header equal to "application/ld+json"
+    When I add "Accept" header equal to "application/ld+json"
+    And I add "Content-Type" header equal to "application/ld+json"
     And I send a "POST" request to "/custom_normalized_dummies" with body:
     """
     {
@@ -88,7 +89,8 @@ Feature: Using custom normalized entity
 
 
   Scenario: Get a custom normalized dummy resource
-    When I send a "GET" request to "/custom_normalized_dummies/1"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/custom_normalized_dummies/1"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
@@ -105,7 +107,8 @@ Feature: Using custom normalized entity
     """
 
   Scenario: Get a collection
-    When I send a "GET" request to "/custom_normalized_dummies"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/custom_normalized_dummies"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
@@ -129,7 +132,8 @@ Feature: Using custom normalized entity
     """
 
   Scenario: Update a resource
-    When I add "Content-Type" header equal to "application/ld+json"
+    When I add "Accept" header equal to "application/ld+json"
+    And I add "Content-Type" header equal to "application/ld+json"
     And I send a "PUT" request to "/custom_normalized_dummies/1" with body:
     """
     {
@@ -165,6 +169,7 @@ Feature: Using custom normalized entity
     And "alias" property is writable for Hydra class "CustomNormalizedDummy"
 
   Scenario: Delete a resource
-    When I send a "DELETE" request to "/custom_normalized_dummies/1"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "DELETE" request to "/custom_normalized_dummies/1"
     Then the response status code should be 204
     And the response should be empty

@@ -5,7 +5,8 @@ Feature: Operation support
 
   @createSchema
   Scenario: Can not write readonly property
-    When I add "Content-Type" header equal to "application/ld+json"
+    When I add "Accept" header equal to "application/ld+json"
+    And I add "Content-Type" header equal to "application/ld+json"
     And I send a "POST" request to "/readable_only_properties" with body:
     """
     {
@@ -39,7 +40,8 @@ Feature: Operation support
   @createSchema
   Scenario: Select a resource and it's embedded data
     Given there are 1 embedded dummy objects
-    When I send a "GET" request to "/embedded_dummies_groups/1"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/embedded_dummies_groups/1"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
@@ -62,5 +64,6 @@ Feature: Operation support
     Then the response status code should be 200
 
   Scenario: Get a 404 response for the disabled item operation
-    When I send a "GET" request to "/disable_item_operations/1"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/disable_item_operations/1"
     Then the response status code should be 404

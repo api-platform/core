@@ -7,7 +7,8 @@ Feature: Multiple filters on collections
   Scenario: Get collection filtered by multiple parameters
     Given there are 30 dummy objects with dummyDate and dummyBoolean true
     And there are 20 dummy objects with dummyDate and dummyBoolean false
-    When I send a "GET" request to "/dummies?dummyDate[after]=2015-04-28&dummyBoolean=1"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/dummies?dummyDate[after]=2015-04-28&dummyBoolean=1"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"

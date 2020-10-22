@@ -6,7 +6,8 @@ Feature: Range filter on collections
   @createSchema
   Scenario: Get collection filtered by range (between)
     Given there are 30 dummy objects with dummyPrice
-    When I send a "GET" request to "/dummies?dummyPrice[between]=12.99..15.99"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/dummies?dummyPrice[between]=12.99..15.99"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
@@ -63,7 +64,8 @@ Feature: Range filter on collections
   @createSchema
   Scenario: Get collection filtered by range (between the same values)
     Given there are 30 dummy objects with dummyPrice
-    When I send a "GET" request to "/dummies?dummyPrice[between]=12.99..12.99"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/dummies?dummyPrice[between]=12.99..12.99"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
@@ -106,7 +108,8 @@ Feature: Range filter on collections
     """
 
   Scenario: Filter by range (between) with invalid format
-    When I send a "GET" request to "/dummies?dummyPrice[between]=9.99..12.99..15.99"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/dummies?dummyPrice[between]=9.99..12.99..15.99"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
@@ -145,7 +148,8 @@ Feature: Range filter on collections
     """
 
   Scenario: Filter for entities by range (less than)
-    When I send a "GET" request to "/dummies?dummyPrice[lt]=12.99"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/dummies?dummyPrice[lt]=12.99"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
@@ -193,7 +197,8 @@ Feature: Range filter on collections
     """
 
   Scenario: Filter for entities by range (less than or equal)
-    When I send a "GET" request to "/dummies?dummyPrice[lte]=12.99"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/dummies?dummyPrice[lte]=12.99"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
@@ -249,7 +254,8 @@ Feature: Range filter on collections
     """
 
   Scenario: Filter for entities by range (greater than)
-    When I send a "GET" request to "/dummies?dummyPrice[gt]=15.99"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/dummies?dummyPrice[gt]=15.99"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
@@ -296,7 +302,8 @@ Feature: Range filter on collections
     """
 
   Scenario: Filter for entities by range (greater than or equal)
-    When I send a "GET" request to "/dummies?dummyPrice[gte]=15.99"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/dummies?dummyPrice[gte]=15.99"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
@@ -350,7 +357,8 @@ Feature: Range filter on collections
     """
 
   Scenario: Filter for entities by range (greater than and less than)
-    When I send a "GET" request to "/dummies?dummyPrice[gt]=12.99&dummyPrice[lt]=19.99"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/dummies?dummyPrice[gt]=12.99&dummyPrice[lt]=19.99"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
@@ -397,7 +405,8 @@ Feature: Range filter on collections
     """
 
   Scenario: Filter for entities within an impossible range
-    When I send a "GET" request to "/dummies?dummyPrice[gt]=19.99"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/dummies?dummyPrice[gt]=19.99"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
@@ -428,7 +437,8 @@ Feature: Range filter on collections
   @createSchema
   Scenario: Get collection filtered using a name converter
     Given there are 5 convertedInteger objects
-    When I send a "GET" request to "/converted_integers?name_converted[lte]=2"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/converted_integers?name_converted[lte]=2"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"

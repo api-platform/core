@@ -6,7 +6,8 @@ Feature: Subresource support
   @createSchema
   Scenario: Get subresource one to one relation
     Given there is an answer "42" to the question "What's the answer to the Ultimate Question of Life, the Universe and Everything?"
-    When I send a "GET" request to "/questions/1/answer"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/questions/1/answer"
     Then the response status code should be 200
     And the response should be in JSON
     And the JSON should be equal to:
@@ -26,12 +27,14 @@ Feature: Subresource support
 
   Scenario: Get a non existent subresource
     Given there is an answer "42" to the question "What's the answer to the Ultimate Question of Life, the Universe and Everything?"
-    When I send a "GET" request to "/questions/999999/answer"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/questions/999999/answer"
     Then the response status code should be 404
     And the response should be in JSON
 
   Scenario: Get recursive subresource one to many relation
-    When I send a "GET" request to "/questions/1/answer/related_questions"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/questions/1/answer/related_questions"
     And the response status code should be 200
     And the response should be in JSON
     And the JSON should be equal to:
@@ -55,7 +58,8 @@ Feature: Subresource support
 
   Scenario: Get the subresource relation collection
     Given there is a dummy object with a fourth level relation
-    When I send a "GET" request to "/dummies/1/related_dummies"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/dummies/1/related_dummies"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
@@ -131,7 +135,8 @@ Feature: Subresource support
     """
 
   Scenario: Get filtered embedded relation subresource collection
-    When I send a "GET" request to "/dummies/1/related_dummies?name=Hello"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/dummies/1/related_dummies?name=Hello"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
@@ -194,7 +199,8 @@ Feature: Subresource support
     """
 
   Scenario: Get the subresource relation item
-    When I send a "GET" request to "/dummies/1/related_dummies/2"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/dummies/1/related_dummies/2"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
@@ -221,7 +227,8 @@ Feature: Subresource support
     """
 
   Scenario: Create a dummy with a relation that is a subresource
-    When I add "Content-Type" header equal to "application/ld+json"
+    When I add "Accept" header equal to "application/ld+json"
+    And I add "Content-Type" header equal to "application/ld+json"
     And I send a "POST" request to "/dummies" with body:
     """
     {

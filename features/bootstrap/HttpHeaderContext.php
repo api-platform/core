@@ -22,14 +22,4 @@ final class HttpHeaderContext implements Context
     {
         $this->request = $request;
     }
-
-    /**
-     * Sets the default Accept HTTP header to application/ld+json before each scenario.
-     *
-     * @BeforeScenario
-     */
-    public function removeAcceptHeaderBeforeScenario()
-    {
-        $this->request->setHttpHeader('Accept', 'application/ld+json');
-    }
 }

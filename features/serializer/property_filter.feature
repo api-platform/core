@@ -6,7 +6,8 @@ Feature: Filter with serialization attributes on items and collections
   @createSchema
   Scenario: Get a collection of resources by attributes id, foo and bar
     Given there are 10 dummy property objects
-    When I send a "GET" request to "/dummy_properties?properties[]=id&properties[]=foo&properties[]=bar&properties[]=name_converted"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/dummy_properties?properties[]=id&properties[]=foo&properties[]=bar&properties[]=name_converted"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
@@ -49,7 +50,8 @@ Feature: Filter with serialization attributes on items and collections
     """
 
   Scenario: Get a collection of resources by attributes foo, bar, group.baz and group.qux
-    When I send a "GET" request to "/dummy_properties?properties[]=foo&properties[]=bar&properties[group][]=baz&properties[group][]=qux"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/dummy_properties?properties[]=foo&properties[]=bar&properties[group][]=baz&properties[group][]=qux"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
@@ -99,7 +101,8 @@ Feature: Filter with serialization attributes on items and collections
     """
 
   Scenario: Get a collection of resources by attributes foo, bar
-    When I send a "GET" request to "/dummy_properties?whitelisted_properties[]=foo&whitelisted_properties[]=bar&whitelisted_properties[]=name_converted"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/dummy_properties?whitelisted_properties[]=foo&whitelisted_properties[]=bar&whitelisted_properties[]=name_converted"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
@@ -139,7 +142,8 @@ Feature: Filter with serialization attributes on items and collections
     """
 
   Scenario: Get a collection of resources by attributes foo, bar, group.baz and group.qux
-    When I send a "GET" request to "/dummy_properties?whitelisted_nested_properties[]=foo&whitelisted_nested_properties[]=bar&whitelisted_nested_properties[group][]=baz"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/dummy_properties?whitelisted_nested_properties[]=foo&whitelisted_nested_properties[]=bar&whitelisted_nested_properties[group][]=baz"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
@@ -188,7 +192,8 @@ Feature: Filter with serialization attributes on items and collections
     """
 
   Scenario: Get a collection of resources by attributes bar not allowed
-    When I send a "GET" request to "/dummy_properties?whitelisted_properties[]=bar"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/dummy_properties?whitelisted_properties[]=bar"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
@@ -226,7 +231,8 @@ Feature: Filter with serialization attributes on items and collections
     """
 
   Scenario: Get a collection of resources by attributes empty
-    When I send a "GET" request to "/dummy_properties?properties[]=&properties[group][]="
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/dummy_properties?properties[]=&properties[group][]="
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
@@ -273,7 +279,8 @@ Feature: Filter with serialization attributes on items and collections
     """
 
   Scenario: Get a resource by attributes id, foo and bar
-    When I send a "GET" request to "/dummy_properties/1?properties[]=id&properties[]=foo&properties[]=bar"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/dummy_properties/1?properties[]=id&properties[]=foo&properties[]=bar"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
@@ -295,7 +302,8 @@ Feature: Filter with serialization attributes on items and collections
     """
 
   Scenario: Get a resource by attributes foo, bar, group.baz and group.qux
-    When I send a "GET" request to "/dummy_properties/1?properties[]=foo&properties[]=bar&properties[group][]=baz&properties[group][]=qux"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/dummy_properties/1?properties[]=foo&properties[]=bar&properties[group][]=baz&properties[group][]=qux"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
@@ -326,7 +334,8 @@ Feature: Filter with serialization attributes on items and collections
     """
 
   Scenario: Get a resource by attributes empty
-    When I send a "GET" request to "/dummy_properties/1?properties[]=&properties[group][]="
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/dummy_properties/1?properties[]=&properties[group][]="
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
@@ -355,6 +364,7 @@ Feature: Filter with serialization attributes on items and collections
 
   Scenario: Create a resource by attributes foo and bar
     When I add "Content-Type" header equal to "application/ld+json"
+    And I add "Accept" header equal to "application/ld+json"
     And I send a "POST" request to "/dummy_properties?properties[]=foo&properties[]=bar" with body:
     """
     {
@@ -378,6 +388,7 @@ Feature: Filter with serialization attributes on items and collections
 
   Scenario: Create a resource by attributes foo, bar, group.foo, group.baz and group.qux
     When I add "Content-Type" header equal to "application/ld+json"
+    And I add "Accept" header equal to "application/ld+json"
     And I send a "POST" request to "/dummy_properties?properties[]=foo&properties[]=bar&properties[group][]=foo&properties[group][]=baz&properties[group][]=qux" with body:
     """
     {

@@ -5,7 +5,8 @@ Feature: Max depth handling
 
   @createSchema
   Scenario: Create a resource with 1 level of descendants
-    When I add "Content-Type" header equal to "application/ld+json"
+    When I add "Accept" header equal to "application/ld+json"
+    And I add "Content-Type" header equal to "application/ld+json"
     And I send a "POST" request to "/max_depth_eager_dummies" with body:
     """
     {
@@ -36,7 +37,8 @@ Feature: Max depth handling
     """
 
   Scenario: Add a 2nd level of descendants
-    When I add "Content-Type" header equal to "application/ld+json"
+    When I add "Accept" header equal to "application/ld+json"
+    And I add "Content-Type" header equal to "application/ld+json"
     And I send a "PUT" request to "max_depth_eager_dummies/1" with body:
     """
     {

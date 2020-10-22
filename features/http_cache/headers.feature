@@ -5,7 +5,8 @@ Feature: Default values of HTTP cache headers
 
   @createSchema
   Scenario: Cache headers default value
-    When I send a "GET" request to "/relation_embedders"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/relation_embedders"
     Then the response status code should be 200
     And the header "Etag" should be equal to '"21248afbca1f242fd3009ac7cdf13293"'
     And the header "Cache-Control" should be equal to "max-age=60, public, s-maxage=3600"

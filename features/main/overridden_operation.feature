@@ -5,7 +5,8 @@ Feature: Create-Retrieve-Update-Delete with a Overridden Operation context
 
   @createSchema
   Scenario: Create a resource
-    When I add "Content-Type" header equal to "application/ld+json"
+    When I add "Accept" header equal to "application/ld+json"
+    And I add "Content-Type" header equal to "application/ld+json"
     And I send a "POST" request to "/overridden_operation_dummies" with body:
     """
     {

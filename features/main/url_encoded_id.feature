@@ -7,6 +7,7 @@ Feature: Allowing resource identifiers with characters that should be URL encode
   Scenario Outline: Get a resource whether or not the id is URL encoded
     Given there is a UrlEncodedId resource
     And I add "Content-Type" header equal to "application/ld+json"
+    And I add "Accept" header equal to "application/ld+json"
     When I send a "GET" request to "<url>"
     Then the response status code should be 200
     And the JSON should be equal to:

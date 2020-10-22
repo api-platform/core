@@ -15,12 +15,12 @@ namespace ApiPlatform\Core\Bridge\Symfony\Bundle;
 
 use ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\Compiler\AnnotationFilterPass;
 use ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\Compiler\DataProviderPass;
+use ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\Compiler\DeprecateMercurePublisherPass;
 use ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\Compiler\ElasticsearchClientPass;
 use ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\Compiler\FilterPass;
 use ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\Compiler\GraphQlMutationResolverPass;
 use ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\Compiler\GraphQlQueryResolverPass;
 use ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\Compiler\GraphQlTypePass;
-use ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\Compiler\HandleDeprecatedPass;
 use ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\Compiler\MetadataAwareNameConverterPass;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\Compiler\ResolveInstanceofConditionalsPass;
@@ -49,7 +49,7 @@ final class ApiPlatformBundle extends Bundle
         $container->addCompilerPass(new GraphQlTypePass());
         $container->addCompilerPass(new GraphQlQueryResolverPass());
         $container->addCompilerPass(new GraphQlMutationResolverPass());
-        $container->addCompilerPass(new HandleDeprecatedPass());
+        $container->addCompilerPass(new DeprecateMercurePublisherPass());
         $container->addCompilerPass(new MetadataAwareNameConverterPass());
     }
 }

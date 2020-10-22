@@ -6,7 +6,8 @@ Feature: Order filter on collections
   @createSchema
   Scenario: Get collection ordered in ascending order on an integer property and on which order filter has been enabled in whitelist mode
     Given there are 30 dummy objects
-    When I send a "GET" request to "/dummies?order[id]=asc"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/dummies?order[id]=asc"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
@@ -65,7 +66,8 @@ Feature: Order filter on collections
     """
 
   Scenario: Get collection ordered in descending order on an integer property and on which order filter has been enabled in whitelist mode
-    When I send a "GET" request to "/dummies?order[id]=desc"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/dummies?order[id]=desc"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
@@ -124,7 +126,8 @@ Feature: Order filter on collections
     """
 
   Scenario: Get collection ordered in ascending order on a string property and on which order filter has been enabled in whitelist mode
-    When I send a "GET" request to "/dummies?order[name]=asc"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/dummies?order[name]=asc"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
@@ -183,7 +186,8 @@ Feature: Order filter on collections
     """
 
   Scenario: Get collection ordered in descending order on a string property and on which order filter has been enabled in whitelist mode
-    When I send a "GET" request to "/dummies?order[name]=desc"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/dummies?order[name]=desc"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
@@ -242,7 +246,8 @@ Feature: Order filter on collections
     """
 
   Scenario: Get collection ordered by default configured order on a string property and on which order filter has been enabled in whitelist mode with default descending order
-    When I send a "GET" request to "/dummies?order[name]"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/dummies?order[name]"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
@@ -303,7 +308,8 @@ Feature: Order filter on collections
   Scenario: Get collection ordered collection on several property keep the order
     # Adding 30 more data with the same name
     Given there are 30 dummy objects
-    When I send a "GET" request to "/dummies?order[name]=desc&order[id]=desc"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/dummies?order[name]=desc&order[id]=desc"
     Then the response status code should be 200
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
     And the JSON should be valid according to this schema:
@@ -362,7 +368,8 @@ Feature: Order filter on collections
 
   Scenario: Get collection ordered in ascending order on an association and on which order filter has been enabled in whitelist mode
     Given there are 30 dummy objects with relatedDummy
-    When I send a "GET" request to "/dummies?order[relatedDummy]=asc"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/dummies?order[relatedDummy]=asc"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
@@ -422,7 +429,8 @@ Feature: Order filter on collections
 
   Scenario: Get collection ordered in ascending order on an embedded and on which order filter has been enabled in whitelist mode
     Given there are 30 dummy objects with embeddedDummy
-    When I send a "GET" request to "/embedded_dummies?order[embeddedDummy]=asc"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/embedded_dummies?order[embeddedDummy]=asc"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
@@ -481,7 +489,8 @@ Feature: Order filter on collections
     """
 
   Scenario: Get collection ordered by default configured order on a embedded string property and on which order filter has been enabled in whitelist mode with default descending order
-    When I send a "GET" request to "/embedded_dummies?order[embeddedDummy.dummyName]"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/embedded_dummies?order[embeddedDummy.dummyName]"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
@@ -540,7 +549,8 @@ Feature: Order filter on collections
     """
 
   Scenario: Get a collection even if the order parameter is not well-formed
-    When I send a "GET" request to "/dummies?sort=id&order=asc"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/dummies?sort=id&order=asc"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
@@ -838,7 +848,8 @@ Feature: Order filter on collections
   @createSchema
   Scenario: Get collection ordered in descending order on a related property
     Given there are 2 dummy objects with relatedDummy
-    When I send a "GET" request to "/dummies?order[relatedDummy.name]=desc"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/dummies?order[relatedDummy.name]=desc"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
@@ -890,7 +901,8 @@ Feature: Order filter on collections
   @createSchema
   Scenario: Get collection filtered using a name converter
     Given there are 3 convertedInteger objects
-    When I send a "GET" request to "/converted_integers?order[name_converted]=desc"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/converted_integers?order[name_converted]=desc"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
@@ -995,7 +1007,8 @@ Feature: Order filter on collections
   @createSchema
   Scenario: Get collection filtered using a name converter
     Given there are 3 convertedInteger objects
-    When I send a "GET" request to "/converted_integers?order[]=desc"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/converted_integers?order[]=desc"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"

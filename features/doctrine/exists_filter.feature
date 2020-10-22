@@ -6,7 +6,8 @@ Feature: Exists filter on collections
   @createSchema
   Scenario: Get collection where a property does not exist
     Given there are 15 dummy objects with dummyBoolean true
-    When I send a "GET" request to "/dummies?exists[dummyBoolean]=0"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/dummies?exists[dummyBoolean]=0"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
@@ -35,7 +36,8 @@ Feature: Exists filter on collections
     """
 
   Scenario: Get collection where a property does exist
-    When I send a "GET" request to "/dummies?exists[dummyBoolean]=1"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/dummies?exists[dummyBoolean]=1"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
@@ -74,7 +76,8 @@ Feature: Exists filter on collections
   Scenario: Use exists filter with a empty relation collection
     Given there are 3 dummy objects having each 0 relatedDummies
     And there are 2 dummy objects having each 3 relatedDummies
-    When I send a "GET" request to "/dummies?exists[relatedDummies]=0"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/dummies?exists[relatedDummies]=0"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
@@ -111,7 +114,8 @@ Feature: Exists filter on collections
     """
 
   Scenario: Use exists filter with a non empty relation collection
-    When I send a "GET" request to "/dummies?exists[relatedDummies]=1"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/dummies?exists[relatedDummies]=1"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
@@ -150,7 +154,8 @@ Feature: Exists filter on collections
   @createSchema
   Scenario: Get collection filtered using a name converter
     Given there are 4 convertedString objects
-    When I send a "GET" request to "/converted_strings?exists[name_converted]=true"
+    When I add "Accept" header equal to "application/ld+json
+    And I send a "GET" request to "/converted_strings?exists[name_converted]=true"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"

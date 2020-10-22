@@ -5,7 +5,8 @@ Feature: Create-Retrieve-Update-Delete
 
   @createSchema
   Scenario: Create a resource
-    When I add "Content-Type" header equal to "application/ld+json"
+    When I add "Accept" header equal to "application/ld+json"
+    And I add "Content-Type" header equal to "application/ld+json"
     And I send a "POST" request to "/dummies" with body:
     """
     {
@@ -56,7 +57,8 @@ Feature: Create-Retrieve-Update-Delete
     """
 
   Scenario: Get a resource
-    When I send a "GET" request to "/dummies/1"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/dummies/1"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
@@ -92,7 +94,8 @@ Feature: Create-Retrieve-Update-Delete
     """
 
   Scenario: Create a resource with empty body
-    When I add "Content-Type" header equal to "application/ld+json"
+    When I add "Accept" header equal to "application/ld+json"
+    And I add "Content-Type" header equal to "application/ld+json"
     And I send a "POST" request to "/dummies"
     Then the response status code should be 400
     And the JSON node "hydra:description" should be equal to "Syntax error"
@@ -102,7 +105,8 @@ Feature: Create-Retrieve-Update-Delete
     Then the response status code should be 404
 
   Scenario: Get a collection
-    When I send a "GET" request to "/dummies"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/dummies"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
@@ -494,7 +498,8 @@ Feature: Create-Retrieve-Update-Delete
     """
 
   Scenario: Update a resource
-    When I add "Content-Type" header equal to "application/ld+json"
+    When I add "Accept" header equal to "application/ld+json"
+    And I add "Content-Type" header equal to "application/ld+json"
     And I send a "PUT" request to "/dummies/1" with body:
     """
     {
@@ -548,12 +553,14 @@ Feature: Create-Retrieve-Update-Delete
     """
 
   Scenario: Update a resource with empty body
-    When I add "Content-Type" header equal to "application/ld+json"
+    When I add "Accept" header equal to "application/ld+json"
+    And I add "Content-Type" header equal to "application/ld+json"
     And I send a "PUT" request to "/dummies/1"
     Then the response status code should be 400
     And the JSON node "hydra:description" should be equal to "Syntax error"
 
   Scenario: Delete a resource
-    When I send a "DELETE" request to "/dummies/1"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "DELETE" request to "/dummies/1"
     Then the response status code should be 204
     And the response should be empty

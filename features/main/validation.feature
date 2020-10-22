@@ -5,6 +5,7 @@ Feature: Using validations groups
   @createSchema
   Scenario: Create a resource
     When I add "Content-Type" header equal to "application/ld+json"
+    And I add "Accept" header equal to "application/ld+json"
     And I send a "POST" request to "/dummy_validation" with body:
     """
     {
@@ -18,6 +19,7 @@ Feature: Using validations groups
   @createSchema
   Scenario: Create a resource with validation
     When I add "Content-Type" header equal to "application/ld+json"
+    And I add "Accept" header equal to "application/ld+json"
     And I send a "POST" request to "/dummy_validation/validation_groups" with body:
     """
     {
@@ -46,6 +48,7 @@ Feature: Using validations groups
   @createSchema
   Scenario: Create a resource with validation group sequence
     When I add "Content-Type" header equal to "application/ld+json"
+    And I add "Accept" header equal to "application/ld+json"
     And I send a "POST" request to "/dummy_validation/validation_sequence" with body:
     """
     {

@@ -15,7 +15,8 @@ Feature: HAL support
     And the JSON node "_links.dummy.href" should be equal to "/dummies"
 
   Scenario: Create a third level
-    When I add "Content-Type" header equal to "application/json"
+    When I add "Accept" header equal to "application/ld+json"
+    And I add "Content-Type" header equal to "application/json"
     And I send a "POST" request to "/third_levels" with body:
     """
     {"level": 3}
@@ -23,7 +24,8 @@ Feature: HAL support
     Then the response status code should be 201
 
   Scenario: Create a related dummy
-    When I add "Content-Type" header equal to "application/json"
+    When I add "Accept" header equal to "application/ld+json"
+    And I add "Content-Type" header equal to "application/json"
     And I send a "POST" request to "/related_dummies" with body:
     """
     {"thirdLevel": "/third_levels/1"}
@@ -31,7 +33,8 @@ Feature: HAL support
     Then the response status code should be 201
 
   Scenario: Create a dummy with relations
-    When I add "Content-Type" header equal to "application/json"
+    When I add "Accept" header equal to "application/ld+json"
+    And I add "Content-Type" header equal to "application/json"
     And I send a "POST" request to "/dummies" with body:
     """
     {
@@ -128,7 +131,8 @@ Feature: HAL support
     """
 
   Scenario: Embed a relation in a parent object
-    When I add "Content-Type" header equal to "application/json"
+    When I add "Accept" header equal to "application/ld+json"
+    And I add "Content-Type" header equal to "application/json"
     And I send a "POST" request to "/relation_embedders" with body:
     """
     {

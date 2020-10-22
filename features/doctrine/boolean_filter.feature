@@ -7,7 +7,8 @@ Feature: Boolean filter on collections
   Scenario: Get collection by dummyBoolean true
     Given there are 15 dummy objects with dummyBoolean true
     And there are 10 dummy objects with dummyBoolean false
-    When I send a "GET" request to "/dummies?dummyBoolean=true"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/dummies?dummyBoolean=true"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
@@ -47,7 +48,8 @@ Feature: Boolean filter on collections
     And the JSON node "hydra:totalItems" should be equal to 15
 
   Scenario: Get collection by dummyBoolean true
-    When I send a "GET" request to "/dummies?dummyBoolean=1"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/dummies?dummyBoolean=1"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
@@ -87,7 +89,8 @@ Feature: Boolean filter on collections
     And the JSON node "hydra:totalItems" should be equal to 15
 
   Scenario: Get collection by dummyBoolean false
-    When I send a "GET" request to "/dummies?dummyBoolean=false"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/dummies?dummyBoolean=false"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
@@ -127,7 +130,8 @@ Feature: Boolean filter on collections
     And the JSON node "hydra:totalItems" should be equal to 10
 
   Scenario: Get collection by dummyBoolean false
-    When I send a "GET" request to "/dummies?dummyBoolean=0"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/dummies?dummyBoolean=0"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
@@ -169,7 +173,8 @@ Feature: Boolean filter on collections
   Scenario: Get collection by embeddedDummy.dummyBoolean true
     Given there are 15 embedded dummy objects with embeddedDummy.dummyBoolean true
     And there are 10 embedded dummy objects with embeddedDummy.dummyBoolean false
-    When I send a "GET" request to "/embedded_dummies?embeddedDummy.dummyBoolean=true"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/embedded_dummies?embeddedDummy.dummyBoolean=true"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
@@ -209,7 +214,8 @@ Feature: Boolean filter on collections
     And the JSON node "hydra:totalItems" should be equal to 15
 
   Scenario: Get collection by embeddedDummy.dummyBoolean true
-    When I send a "GET" request to "/embedded_dummies?embeddedDummy.dummyBoolean=1"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/embedded_dummies?embeddedDummy.dummyBoolean=1"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
@@ -249,7 +255,8 @@ Feature: Boolean filter on collections
     And the JSON node "hydra:totalItems" should be equal to 15
 
   Scenario: Get collection by embeddedDummy.dummyBoolean false
-    When I send a "GET" request to "/embedded_dummies?embeddedDummy.dummyBoolean=false"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/embedded_dummies?embeddedDummy.dummyBoolean=false"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
@@ -289,7 +296,8 @@ Feature: Boolean filter on collections
     And the JSON node "hydra:totalItems" should be equal to 10
 
   Scenario: Get collection by embeddedDummy.dummyBoolean false
-    When I send a "GET" request to "/embedded_dummies?embeddedDummy.dummyBoolean=0"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/embedded_dummies?embeddedDummy.dummyBoolean=0"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
@@ -331,7 +339,8 @@ Feature: Boolean filter on collections
   Scenario: Get collection by association with embed relatedDummy.embeddedDummy.dummyBoolean true
     Given there are 15 embedded dummy objects with relatedDummy.embeddedDummy.dummyBoolean true
     And there are 10 embedded dummy objects with relatedDummy.embeddedDummy.dummyBoolean false
-    When I send a "GET" request to "/embedded_dummies?relatedDummy.embeddedDummy.dummyBoolean=true"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/embedded_dummies?relatedDummy.embeddedDummy.dummyBoolean=true"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
@@ -454,7 +463,8 @@ Feature: Boolean filter on collections
   @createSchema
   Scenario: Get collection filtered using a name converter
     Given there are 5 convertedBoolean objects
-    When I send a "GET" request to "/converted_booleans?name_converted=false"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/converted_booleans?name_converted=false"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"

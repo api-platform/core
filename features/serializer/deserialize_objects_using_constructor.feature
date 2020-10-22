@@ -6,6 +6,7 @@ Feature: Resource with constructor deserializable
   @createSchema
   Scenario: post a resource built with constructor
     When I add "Content-Type" header equal to "application/ld+json"
+    And I add "Accept" header equal to "application/ld+json"
     And I send a "POST" request to "/dummy_entity_with_constructors" with body:
     """
     {

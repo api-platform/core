@@ -260,7 +260,8 @@ Feature: Date filter on collections
     """
 
   Scenario: Search for entities within an impossible range
-    When I send a "GET" request to "/dummies?dummyDate[after]=2015-04-06&dummyDate[before]=2015-04-04"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/dummies?dummyDate[after]=2015-04-06&dummyDate[before]=2015-04-04"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
@@ -429,7 +430,8 @@ Feature: Date filter on collections
   @createSchema
   Scenario: Get collection filtered by association date
     Given there are 2 dummy objects with dummyDate and relatedDummy
-    When I send a "GET" request to "/dummies?relatedDummy.dummyDate[after]=2015-04-28"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/dummies?relatedDummy.dummyDate[after]=2015-04-28"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
@@ -462,7 +464,8 @@ Feature: Date filter on collections
   @createSchema
   Scenario: Get collection filtered by date that is not a datetime
     Given there are 30 dummydate objects with dummyDate
-    When I send a "GET" request to "/dummy_dates?dummyDate[after]=2015-04-28"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/dummy_dates?dummyDate[after]=2015-04-28"
     Then the response status code should be 200
     And the JSON node "hydra:totalItems" should be equal to 3
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
@@ -525,7 +528,8 @@ Feature: Date filter on collections
   @createSchema
   Scenario: Get collection filtered by date that is an immutable date variant
     Given there are 30 dummyimmutabledate objects with dummyDate
-    When I send a "GET" request to "/dummy_immutable_dates?dummyDate[after]=2015-04-28"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/dummy_immutable_dates?dummyDate[after]=2015-04-28"
     Then the response status code should be 200
     And the JSON node "hydra:totalItems" should be equal to 3
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
@@ -533,7 +537,8 @@ Feature: Date filter on collections
   @createSchema
   Scenario: Get collection filtered by embedded date
     Given there are 29 embedded dummy objects with dummyDate and embeddedDummy
-    When I send a "GET" request to "/embedded_dummies?embeddedDummy.dummyDate[after]=2015-04-28"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/embedded_dummies?embeddedDummy.dummyDate[after]=2015-04-28"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
@@ -579,7 +584,8 @@ Feature: Date filter on collections
   @createSchema
   Scenario: Get collection filtered using a name converter
     Given there are 30 convertedDate objects
-    When I send a "GET" request to "/converted_dates?name_converted[strictly_after]=2015-04-28"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/converted_dates?name_converted[strictly_after]=2015-04-28"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"

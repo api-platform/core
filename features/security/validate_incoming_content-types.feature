@@ -7,6 +7,7 @@ Feature: Validate incoming content type
 
   Scenario: Send a document with a not supported content-type
     When I add "Content-Type" header equal to "text/plain"
+    And I add "Accept" header equal to "application/ld+json"
     And I send a "POST" request to "/dummies" with body:
     """
     something

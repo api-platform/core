@@ -7,7 +7,8 @@ Feature: Retrieve data with Composite identifiers
   @createSchema
   Scenario: Get a collection with composite identifiers
     Given there are Composite identifier objects
-    When I send a "GET" request to "/composite_items"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/composite_items"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
@@ -38,7 +39,8 @@ Feature: Retrieve data with Composite identifiers
   @createSchema
   Scenario: Get collection with composite identifiers
     Given there are Composite identifier objects
-    When I send a "GET" request to "/composite_relations"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/composite_relations"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
@@ -85,7 +87,8 @@ Feature: Retrieve data with Composite identifiers
   @createSchema
   Scenario: Get the first composite relation
     Given there are Composite identifier objects
-    When I send a "GET" request to "/composite_relations/compositeItem=1;compositeLabel=1"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/composite_relations/compositeItem=1;compositeLabel=1"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
@@ -103,7 +106,8 @@ Feature: Retrieve data with Composite identifiers
 
   Scenario: Get the first composite relation with a reverse identifiers order
     Given there are Composite identifier objects
-    When I send a "GET" request to "/composite_relations/compositeLabel=1;compositeItem=1"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/composite_relations/compositeLabel=1;compositeItem=1"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
@@ -121,12 +125,14 @@ Feature: Retrieve data with Composite identifiers
 
   Scenario: Get the first composite relation with a missing identifier
     Given there are Composite identifier objects
-    When I send a "GET" request to "/composite_relations/compositeLabel=1;"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/composite_relations/compositeLabel=1;"
     Then the response status code should be 404
 
   Scenario: Get first composite item
     Given there are Composite identifier objects
-    When I send a "GET" request to "/composite_items/1"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/composite_items/1"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"

@@ -6,7 +6,8 @@ Feature: Filter with serialization groups on items and collections
   @createSchema
   Scenario: Get a collection of resources by group dummy_foo without overriding
     Given there are 10 dummy group objects
-    When I send a "GET" request to "/dummy_groups?groups[]=dummy_foo"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/dummy_groups?groups[]=dummy_foo"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
@@ -77,7 +78,8 @@ Feature: Filter with serialization groups on items and collections
     """
 
   Scenario: Get a collection of resources by group dummy_foo with overriding
-    When I send a "GET" request to "/dummy_groups?override_groups[]=dummy_foo"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/dummy_groups?override_groups[]=dummy_foo"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
@@ -139,7 +141,8 @@ Feature: Filter with serialization groups on items and collections
     """
 
   Scenario: Get a collection of resources by groups dummy_foo, dummy_qux and without overriding
-    When I send a "GET" request to "/dummy_groups?groups[]=dummy_foo&groups[]=dummy_qux"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/dummy_groups?groups[]=dummy_foo&groups[]=dummy_qux"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
@@ -213,7 +216,8 @@ Feature: Filter with serialization groups on items and collections
     """
 
   Scenario: Get a collection of resources by groups dummy_foo, dummy_qux and with overriding
-    When I send a "GET" request to "/dummy_groups?override_groups[]=dummy_foo&override_groups[]=dummy_qux"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/dummy_groups?override_groups[]=dummy_foo&override_groups[]=dummy_qux"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
@@ -279,7 +283,8 @@ Feature: Filter with serialization groups on items and collections
 
 
   Scenario: Get a collection of resources by groups dummy_foo, dummy_qux, without overriding and with whitelist
-    When I send a "GET" request to "/dummy_groups?whitelisted_groups[]=dummy_foo&whitelisted_groups[]=dummy_qux"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/dummy_groups?whitelisted_groups[]=dummy_foo&whitelisted_groups[]=dummy_qux"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
@@ -350,7 +355,8 @@ Feature: Filter with serialization groups on items and collections
     """
 
   Scenario: Get a collection of resources by groups dummy_foo, dummy_qux with overriding and with whitelist
-    When I send a "GET" request to "/dummy_groups?override_whitelisted_groups[]=dummy_foo&override_whitelisted_groups[]=dummy_qux"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/dummy_groups?override_whitelisted_groups[]=dummy_foo&override_whitelisted_groups[]=dummy_qux"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
@@ -412,7 +418,8 @@ Feature: Filter with serialization groups on items and collections
     """
 
   Scenario: Get a collection of resources by group empty and without overriding
-    When I send a "GET" request to "/dummy_groups?groups[]="
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/dummy_groups?groups[]="
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
@@ -483,7 +490,8 @@ Feature: Filter with serialization groups on items and collections
     """
 
   Scenario: Get a collection of resources by group empty and with overriding
-    When I send a "GET" request to "/dummy_groups?override_groups[]="
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/dummy_groups?override_groups[]="
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
@@ -542,7 +550,8 @@ Feature: Filter with serialization groups on items and collections
     """
 
   Scenario: Get a resource by group dummy_foo without overriding
-    When I send a "GET" request to "/dummy_groups/1?groups[]=dummy_foo"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/dummy_groups/1?groups[]=dummy_foo"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
@@ -565,7 +574,8 @@ Feature: Filter with serialization groups on items and collections
     """
 
   Scenario: Get a resource by group dummy_foo with overriding
-    When I send a "GET" request to "/dummy_groups/1?override_groups[]=dummy_foo"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/dummy_groups/1?override_groups[]=dummy_foo"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
@@ -585,7 +595,8 @@ Feature: Filter with serialization groups on items and collections
     """
 
   Scenario: Get a resource by groups dummy_foo, dummy_qux and without overriding
-    When I send a "GET" request to "/dummy_groups/1?groups[]=dummy_foo&groups[]=dummy_qux"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/dummy_groups/1?groups[]=dummy_foo&groups[]=dummy_qux"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
@@ -609,7 +620,8 @@ Feature: Filter with serialization groups on items and collections
     """
 
   Scenario: Get a resource by groups dummy_foo, dummy_qux and with overriding
-    When I send a "GET" request to "/dummy_groups/1?override_groups[]=dummy_foo&override_groups[]=dummy_qux"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/dummy_groups/1?override_groups[]=dummy_foo&override_groups[]=dummy_qux"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
@@ -630,7 +642,8 @@ Feature: Filter with serialization groups on items and collections
     """
 
   Scenario: Get a resource by groups dummy_foo, dummy_qux and without overriding and with whitelist
-    When I send a "GET" request to "/dummy_groups/1?whitelisted_groups[]=dummy_foo&whitelisted_groups[]=dummy_qux"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/dummy_groups/1?whitelisted_groups[]=dummy_foo&whitelisted_groups[]=dummy_qux"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
@@ -653,7 +666,8 @@ Feature: Filter with serialization groups on items and collections
     """
 
   Scenario: Get a resource by groups dummy_foo, dummy_qux and with overriding and with whitelist
-    When I send a "GET" request to "/dummy_groups/1?override_whitelisted_groups[]=dummy_foo&override_whitelisted_groups[]=dummy_qux"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/dummy_groups/1?override_whitelisted_groups[]=dummy_foo&override_whitelisted_groups[]=dummy_qux"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
@@ -673,7 +687,8 @@ Feature: Filter with serialization groups on items and collections
     """
 
   Scenario: Get a resource by group empty and without overriding
-    When I send a "GET" request to "/dummy_groups/1?groups[]="
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/dummy_groups/1?groups[]="
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
@@ -696,7 +711,8 @@ Feature: Filter with serialization groups on items and collections
     """
 
   Scenario: Get a resource by group empty and with overriding
-    When I send a "GET" request to "/dummy_groups/1?override_groups[]="
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/dummy_groups/1?override_groups[]="
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
@@ -716,6 +732,7 @@ Feature: Filter with serialization groups on items and collections
 
   Scenario: Create a resource by group dummy_foo and without overriding
     When I add "Content-Type" header equal to "application/ld+json"
+    And I add "Accept" header equal to "application/ld+json"
     And I send a "POST" request to "/dummy_groups?groups[]=dummy_foo" with body:
     """
     {
@@ -743,6 +760,7 @@ Feature: Filter with serialization groups on items and collections
 
   Scenario: Create a resource by group dummy_foo and with overriding
     When I add "Content-Type" header equal to "application/ld+json"
+    And I add "Accept" header equal to "application/ld+json"
     And I send a "POST" request to "/dummy_groups?override_groups[]=dummy_foo" with body:
     """
     {
@@ -767,6 +785,7 @@ Feature: Filter with serialization groups on items and collections
 
   Scenario: Create a resource by groups dummy_foo, dummy_baz, dummy_qux and without overriding
     When I add "Content-Type" header equal to "application/ld+json"
+    And I add "Accept" header equal to "application/ld+json"
     And I send a "POST" request to "/dummy_groups?groups[]=dummy_foo&groups[]=dummy_baz&groups[]=dummy_qux" with body:
     """
     {
@@ -795,6 +814,7 @@ Feature: Filter with serialization groups on items and collections
 
   Scenario: Create a resource by groups dummy_foo, dummy_baz, dummy_qux and with overriding
     When I add "Content-Type" header equal to "application/ld+json"
+    And I add "Accept" header equal to "application/ld+json"
     And I send a "POST" request to "/dummy_groups?override_groups[]=dummy_foo&override_groups[]=dummy_baz&override_groups[]=dummy_qux" with body:
     """
     {
@@ -821,6 +841,7 @@ Feature: Filter with serialization groups on items and collections
 
   Scenario: Create a resource by groups dummy, dummy_baz, without overriding
     When I add "Content-Type" header equal to "application/ld+json"
+    And I add "Accept" header equal to "application/ld+json"
     And I send a "POST" request to "/dummy_groups?groups[]=dummy&groups[]=dummy_baz" with body:
     """
     {
@@ -849,6 +870,7 @@ Feature: Filter with serialization groups on items and collections
 
   Scenario: Create a resource by groups dummy, dummy_baz and with overriding
     When I add "Content-Type" header equal to "application/ld+json"
+    And I add "Accept" header equal to "application/ld+json"
     And I send a "POST" request to "/dummy_groups?override_groups[]=dummy&override_groups[]=dummy_baz" with body:
     """
     {
@@ -877,6 +899,7 @@ Feature: Filter with serialization groups on items and collections
 
   Scenario: Create a resource by group empty and without overriding
     When I add "Content-Type" header equal to "application/ld+json"
+    And I add "Accept" header equal to "application/ld+json"
     And I send a "POST" request to "/dummy_groups?groups[]=" with body:
     """
     {
@@ -904,6 +927,7 @@ Feature: Filter with serialization groups on items and collections
 
   Scenario: Create a resource by group empty and with overriding
     When I add "Content-Type" header equal to "application/ld+json"
+    And I add "Accept" header equal to "application/ld+json"
     And I send a "POST" request to "/dummy_groups?override_groups[]=" with body:
     """
     {
@@ -927,6 +951,7 @@ Feature: Filter with serialization groups on items and collections
 
   Scenario: Create a resource by groups dummy, dummy_baz, without overriding and with whitelist
     When I add "Content-Type" header equal to "application/ld+json"
+    And I add "Accept" header equal to "application/ld+json"
     And I send a "POST" request to "/dummy_groups?whitelisted_groups[]=dummy&whitelisted_groups[]=dummy_baz" with body:
     """
     {
@@ -954,6 +979,7 @@ Feature: Filter with serialization groups on items and collections
 
   Scenario: Create a resource by groups dummy, dummy_baz, with overriding and with whitelist
     When I add "Content-Type" header equal to "application/ld+json"
+    And I add "Accept" header equal to "application/ld+json"
     And I send a "POST" request to "/dummy_groups?override_whitelisted_groups[]=dummy&override_whitelisted_groups[]=dummy_baz" with body:
     """
     {

@@ -6,6 +6,7 @@ Feature: Handle properly invalid data submitted to the API
   @createSchema
   Scenario: Create a resource
     When I add "Content-Type" header equal to "application/ld+json"
+    And I add "Accept" header equal to "application/ld+json"
     And I send a "POST" request to "/dummies" with body:
     """
     {
@@ -44,6 +45,7 @@ Feature: Handle properly invalid data submitted to the API
 
   Scenario: Create a resource without a required property with a strongly-typed setter
     When I add "Content-Type" header equal to "application/ld+json"
+    And I add "Accept" header equal to "application/ld+json"
     And I send a "POST" request to "/dummies" with body:
     """
     {
@@ -60,6 +62,7 @@ Feature: Handle properly invalid data submitted to the API
 
   Scenario: Create a resource with wrong value type for relation
     When I add "Content-Type" header equal to "application/ld+json"
+    And I add "Accept" header equal to "application/ld+json"
     And I send a "POST" request to "/dummies" with body:
     """
     {
@@ -78,6 +81,7 @@ Feature: Handle properly invalid data submitted to the API
 
   Scenario: Ignore invalid dates
     When I add "Content-Type" header equal to "application/ld+json"
+    And I add "Accept" header equal to "application/ld+json"
     And I send a "POST" request to "/dummies" with body:
     """
     {
@@ -91,6 +95,7 @@ Feature: Handle properly invalid data submitted to the API
 
   Scenario: Send non-array data when an array is expected
     When I add "Content-Type" header equal to "application/ld+json"
+    And I add "Accept" header equal to "application/ld+json"
     And I send a "POST" request to "/dummies" with body:
     """
     {
@@ -109,6 +114,7 @@ Feature: Handle properly invalid data submitted to the API
 
   Scenario: Send an object where an array is expected
     When I add "Content-Type" header equal to "application/ld+json"
+    And I add "Accept" header equal to "application/ld+json"
     And I send a "POST" request to "/dummies" with body:
     """
     {
@@ -126,6 +132,7 @@ Feature: Handle properly invalid data submitted to the API
 
   Scenario: Send a scalar having the bad type
     When I add "Content-Type" header equal to "application/ld+json"
+    And I add "Accept" header equal to "application/ld+json"
     And I send a "POST" request to "/dummies" with body:
     """
     {
@@ -142,6 +149,7 @@ Feature: Handle properly invalid data submitted to the API
 
   Scenario: According to the JSON spec, allow numbers without explicit floating point for JSON formats
     When I add "Content-Type" header equal to "application/ld+json"
+    And I add "Accept" header equal to "application/ld+json"
     And I send a "POST" request to "/dummies" with body:
     """
     {

@@ -5,7 +5,8 @@ Feature: Collections support
 
   @createSchema
   Scenario: Retrieve an empty collection
-    When I send a "GET" request to "/dummies"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/dummies"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
@@ -30,6 +31,7 @@ Feature: Collections support
 
   Scenario: Retrieve the first page of a collection
     Given there are 30 dummy objects
+    And I add "Accept" header equal to "application/ld+json"
     And I send a "GET" request to "/dummies"
     Then the response status code should be 200
     And the response should be in JSON
@@ -74,7 +76,8 @@ Feature: Collections support
     """
 
   Scenario: Retrieve a page of a collection
-    When I send a "GET" request to "/dummies?page=7"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/dummies?page=7"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
@@ -119,7 +122,8 @@ Feature: Collections support
     """
 
   Scenario: Retrieve the last page of a collection
-    When I send a "GET" request to "/dummies?page=10"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/dummies?page=10"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
@@ -166,7 +170,8 @@ Feature: Collections support
 
   @!mongodb
   Scenario: Enable the partial pagination client side
-    When I send a "GET" request to "/dummies?page=7&partial=1"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/dummies?page=7&partial=1"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
@@ -210,7 +215,8 @@ Feature: Collections support
     """
 
   Scenario: Disable the pagination client side
-    When I send a "GET" request to "/dummies?pagination=0"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/dummies?pagination=0"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
@@ -234,7 +240,8 @@ Feature: Collections support
     """
 
   Scenario: Change the number of element by page client side
-    When I send a "GET" request to "/dummies?page=2&itemsPerPage=10"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/dummies?page=2&itemsPerPage=10"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
@@ -270,7 +277,8 @@ Feature: Collections support
     """
 
   Scenario: Test presence of next
-    When I send a "GET" request to "/dummies?page=3"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/dummies?page=3"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
@@ -286,7 +294,8 @@ Feature: Collections support
   }
   """
   Scenario: Filter with exact match
-    When I send a "GET" request to "/dummies?id=8"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/dummies?id=8"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
@@ -323,7 +332,8 @@ Feature: Collections support
     """
 
   Scenario: Filter with a raw URL
-    When I send a "GET" request to "/dummies?id=%2fdummies%2f8"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/dummies?id=%2fdummies%2f8"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
@@ -360,7 +370,8 @@ Feature: Collections support
     """
 
   Scenario: Filter with non-exact match
-    When I send a "GET" request to "/dummies?name=Dummy%20%238"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/dummies?name=Dummy%20%238"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
@@ -440,7 +451,8 @@ Feature: Collections support
     And the JSON node "hydra:description" should be equal to "Page should not be greater than 1 if limit is equal to 0"
 
   Scenario: Cursor-based pagination with an empty collection
-    When I send a "GET" request to "/so_manies"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/so_manies"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
@@ -470,7 +482,8 @@ Feature: Collections support
   @createSchema
   Scenario: Cursor-based pagination with ranged items
     Given there are 10 of these so many objects
-    When I send a "GET" request to "/so_manies?order[id]=desc"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/so_manies?order[id]=desc"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
@@ -515,7 +528,8 @@ Feature: Collections support
   @createSchema
   Scenario: Cursor-based pagination with range filtered items
     Given there are 10 of these so many objects
-    When I send a "GET" request to "/so_manies?order[id]=desc&id[gt]=10"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/so_manies?order[id]=desc&id[gt]=10"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"

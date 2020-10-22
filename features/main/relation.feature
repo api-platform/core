@@ -5,7 +5,8 @@ Feature: Relations support
 
   @createSchema
   Scenario: Create a third level
-    When I add "Content-Type" header equal to "application/ld+json"
+    When I add "Accept" header equal to "application/ld+json"
+    And I add "Content-Type" header equal to "application/ld+json"
     And I send a "POST" request to "/third_levels" with body:
     """
     {"level": 3}
@@ -28,7 +29,8 @@ Feature: Relations support
     """
 
   Scenario: Create a dummy friend
-    When I add "Content-Type" header equal to "application/ld+json"
+    When I add "Accept" header equal to "application/ld+json"
+    And I add "Content-Type" header equal to "application/ld+json"
     And I send a "POST" request to "/dummy_friends" with body:
     """
     {"name": "Zoidberg"}
@@ -48,7 +50,8 @@ Feature: Relations support
     """
 
   Scenario: Create a related dummy
-    When I add "Content-Type" header equal to "application/ld+json"
+    When I add "Accept" header equal to "application/ld+json"
+    And I add "Content-Type" header equal to "application/ld+json"
     And I send a "POST" request to "/related_dummies" with body:
     """
     {"thirdLevel": "/third_levels/1"}
@@ -80,7 +83,8 @@ Feature: Relations support
 
   @!mongodb
   Scenario: Create a friend relationship
-    When I add "Content-Type" header equal to "application/ld+json"
+    When I add "Accept" header equal to "application/ld+json"
+    And I add "Content-Type" header equal to "application/ld+json"
     And I send a "POST" request to "/related_to_dummy_friends" with body:
     """
     {
@@ -110,7 +114,8 @@ Feature: Relations support
 
   @!mongodb
   Scenario: Get the relationship
-    When I send a "GET" request to "/related_to_dummy_friends/dummyFriend=1;relatedDummy=1"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/related_to_dummy_friends/dummyFriend=1;relatedDummy=1"
     And the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
@@ -131,7 +136,8 @@ Feature: Relations support
     """
 
   Scenario: Create a dummy with relations
-    When I add "Content-Type" header equal to "application/ld+json"
+    When I add "Accept" header equal to "application/ld+json"
+    And I add "Content-Type" header equal to "application/ld+json"
     And I send a "POST" request to "/dummies" with body:
     """
     {
@@ -175,7 +181,8 @@ Feature: Relations support
     """
 
   Scenario: Filter on a relation
-    When I send a "GET" request to "/dummies?relatedDummy=%2Frelated_dummies%2F1"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/dummies?relatedDummy=%2Frelated_dummies%2F1"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
@@ -210,7 +217,8 @@ Feature: Relations support
     """
 
   Scenario: Filter on a to-many relation
-    When I send a "GET" request to "/dummies?relatedDummies[]=%2Frelated_dummies%2F1"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/dummies?relatedDummies[]=%2Frelated_dummies%2F1"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
@@ -245,7 +253,8 @@ Feature: Relations support
     """
 
   Scenario: Embed a relation in the parent object
-    When I add "Content-Type" header equal to "application/ld+json"
+    When I add "Accept" header equal to "application/ld+json"
+    And I add "Content-Type" header equal to "application/ld+json"
     And I send a "POST" request to "/relation_embedders" with body:
       """
       {
@@ -278,7 +287,8 @@ Feature: Relations support
       """
 
   Scenario: Create an existing relation
-    When I add "Content-Type" header equal to "application/ld+json"
+    When I add "Accept" header equal to "application/ld+json"
+    And I add "Content-Type" header equal to "application/ld+json"
     And I send a "POST" request to "/relation_embedders" with body:
     """
     {
@@ -308,7 +318,8 @@ Feature: Relations support
     """
 
   Scenario: Update the relation with a new one
-    When I add "Content-Type" header equal to "application/ld+json"
+    When I add "Accept" header equal to "application/ld+json"
+    And I add "Content-Type" header equal to "application/ld+json"
     And I send a "PUT" request to "/relation_embedders/2" with body:
     """
     {
@@ -338,7 +349,8 @@ Feature: Relations support
     """
 
   Scenario: Post a wrong relation
-    When I add "Content-Type" header equal to "application/ld+json"
+    When I add "Accept" header equal to "application/ld+json"
+    And I add "Content-Type" header equal to "application/ld+json"
     And I send a "POST" request to "/relation_embedders" with body:
     """
     {
@@ -354,7 +366,8 @@ Feature: Relations support
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
 
   Scenario: Post a relation with a not existing IRI
-    When I add "Content-Type" header equal to "application/ld+json"
+    When I add "Accept" header equal to "application/ld+json"
+    And I add "Content-Type" header equal to "application/ld+json"
     And I send a "POST" request to "/relation_embedders" with body:
     """
     {
@@ -366,7 +379,8 @@ Feature: Relations support
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
 
   Scenario: Update an embedded relation
-    When I add "Content-Type" header equal to "application/ld+json"
+    When I add "Accept" header equal to "application/ld+json"
+    And I add "Content-Type" header equal to "application/ld+json"
     And I send a "PUT" request to "/relation_embedders/2" with body:
     """
     {
@@ -398,7 +412,8 @@ Feature: Relations support
 
   Scenario: Issue #1222
     Given there are people having pets
-    When I add "Content-Type" header equal to "application/ld+json"
+    When I add "Accept" header equal to "application/ld+json"
+    And I add "Content-Type" header equal to "application/ld+json"
     And I send a "GET" request to "/people"
     Then the response status code should be 200
     And the response should be in JSON
@@ -431,7 +446,8 @@ Feature: Relations support
 
   Scenario: Eager load relations should not be duplicated
     Given there is an order with same customer and recipient
-    When I add "Content-Type" header equal to "application/ld+json"
+    When I add "Accept" header equal to "application/ld+json"
+    And I add "Content-Type" header equal to "application/ld+json"
     And I send a "GET" request to "/orders"
     Then the response status code should be 200
     And the response should be in JSON
@@ -493,7 +509,8 @@ Feature: Relations support
     """
 
   Scenario: Passing an invalid IRI to a relation
-    When I add "Content-Type" header equal to "application/ld+json"
+    When I add "Accept" header equal to "application/ld+json"
+    And I add "Content-Type" header equal to "application/ld+json"
     And I send a "POST" request to "/relation_embedders" with body:
     """
     {
@@ -506,7 +523,8 @@ Feature: Relations support
     And the JSON node "hydra:description" should contain 'Invalid IRI "certainly not an iri and not a plain identifier".'
 
   Scenario: Passing an invalid type to a relation
-    When I add "Content-Type" header equal to "application/ld+json"
+    When I add "Accept" header equal to "application/ld+json"
+    And I add "Content-Type" header equal to "application/ld+json"
     And I send a "POST" request to "/relation_embedders" with body:
     """
     {

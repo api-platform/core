@@ -2,7 +2,8 @@ Feature: GraphQL introspection support
 
   @createSchema
   Scenario: Execute an empty GraphQL query
-    When I send a "GET" request to "/graphql"
+    When I Add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/graphql"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/json"

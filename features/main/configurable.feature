@@ -5,7 +5,8 @@ Feature: Configurable resource CRUD
   @createSchema
   Scenario: Retrieve the ConfigDummy resource
     Given there is a FileConfigDummy object
-    When I send a "GET" request to "/fileconfigdummies"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/fileconfigdummies"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
@@ -29,7 +30,8 @@ Feature: Configurable resource CRUD
     """
 
   Scenario: Get a single file configured resource
-    When I send a "GET" request to "/single_file_configs"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/single_file_configs"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
@@ -45,7 +47,8 @@ Feature: Configurable resource CRUD
     """
 
   Scenario: Retrieve the ConfigDummy resource
-    When I send a "GET" request to "/fileconfigdummies/1"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/fileconfigdummies/1"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"

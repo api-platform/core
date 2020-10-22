@@ -5,7 +5,8 @@ Feature: Using custom parent identifier for subresources
 
   @createSchema
   Scenario: Create a parent dummy
-    When I add "Content-Type" header equal to "application/ld+json"
+    When I add "Accept" header equal to "application/ld+json"
+    And I add "Content-Type" header equal to "application/ld+json"
     And I send a "POST" request to "/slug_parent_dummies" with body:
     """
     {
@@ -28,7 +29,8 @@ Feature: Using custom parent identifier for subresources
     """
 
   Scenario: Create a child dummy
-    When I add "Content-Type" header equal to "application/ld+json"
+    When I add "Accept" header equal to "application/ld+json"
+    And I add "Content-Type" header equal to "application/ld+json"
     And I send a "POST" request to "/slug_child_dummies" with body:
     """
     {
@@ -52,7 +54,8 @@ Feature: Using custom parent identifier for subresources
     """
 
   Scenario: Get child dummies of parent dummy
-    When I send a "GET" request to "/slug_parent_dummies/parent-dummy/child_dummies"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/slug_parent_dummies/parent-dummy/child_dummies"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
@@ -76,7 +79,8 @@ Feature: Using custom parent identifier for subresources
     """
 
   Scenario: Get parent dummy of child dummy
-    When I send a "GET" request to "/slug_child_dummies/child-dummy/parent_dummy"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/slug_child_dummies/child-dummy/parent_dummy"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"

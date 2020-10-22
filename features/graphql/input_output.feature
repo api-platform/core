@@ -6,7 +6,8 @@ Feature: GraphQL DTO input and output
   @createSchema
   Scenario: Retrieve an Output with GraphQL
     Given there is a RelatedDummy with 0 friends
-    When I add "Content-Type" header equal to "application/ld+json"
+    When I add "Accept" header equal to "application/ld+json"
+    And I add "Content-Type" header equal to "application/ld+json"
     And I send a "POST" request to "/dummy_dto_input_outputs" with body:
     """
     {

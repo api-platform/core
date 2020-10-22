@@ -5,7 +5,8 @@ Feature: Table inheritance
 
   @createSchema
   Scenario: Create a table inherited resource
-    When I add "Content-Type" header equal to "application/ld+json"
+    When I add "Accept" header equal to "application/ld+json"
+    And I add "Content-Type" header equal to "application/ld+json"
     And I send a "POST" request to "/dummy_table_inheritance_children" with body:
     """
     {"name": "foo", "nickname": "bar"}
@@ -50,7 +51,8 @@ Feature: Table inheritance
     """
 
   Scenario: Get the parent entity collection
-    When I send a "GET" request to "/dummy_table_inheritances"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/dummy_table_inheritances"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
@@ -99,6 +101,7 @@ Feature: Table inheritance
 
   Scenario: Some children not api resources are created in the app
     When some dummy table inheritance data but not api resource child are created
+    And I add "Accept" header equal to "application/ld+json"
     And I send a "GET" request to "/dummy_table_inheritances"
     Then the response status code should be 200
     And the response should be in JSON
@@ -170,7 +173,8 @@ Feature: Table inheritance
     """
 
   Scenario: Create a table inherited resource
-    When I add "Content-Type" header equal to "application/ld+json"
+    When I add "Accept" header equal to "application/ld+json"
+    And I add "Content-Type" header equal to "application/ld+json"
     And I send a "POST" request to "/dummy_table_inheritance_children" with body:
     """
     {"name": "foo", "nickname": "bar"}
@@ -215,7 +219,8 @@ Feature: Table inheritance
     """
 
   Scenario: Create a different table inherited resource
-    When I add "Content-Type" header equal to "application/ld+json"
+    When I add "Accept" header equal to "application/ld+json"
+    And I add "Content-Type" header equal to "application/ld+json"
     And I send a "POST" request to "/dummy_table_inheritance_different_children" with body:
     """
     {"name": "foo", "email": "bar@localhost"}
@@ -259,7 +264,8 @@ Feature: Table inheritance
     """
 
   Scenario: Get related entity with multiple inherited children types
-    When I add "Content-Type" header equal to "application/ld+json"
+    When I add "Accept" header equal to "application/ld+json"
+    And I add "Content-Type" header equal to "application/ld+json"
     And I send a "POST" request to "/dummy_table_inheritance_relateds" with body:
     """
     {
@@ -346,7 +352,8 @@ Feature: Table inheritance
     """
 
   Scenario: Get the parent entity collection which contains multiple inherited children type
-    When I send a "GET" request to "/dummy_table_inheritances"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/dummy_table_inheritances"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
@@ -446,7 +453,8 @@ Feature: Table inheritance
     """
 
    Scenario: Get the parent interface collection
-    When I send a "GET" request to "/resource_interfaces"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/resource_interfaces"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
@@ -523,7 +531,8 @@ Feature: Table inheritance
     """
 
   Scenario: Get an interface resource item
-    When I send a "GET" request to "/resource_interfaces/some-id"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/resource_interfaces/some-id"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
@@ -567,7 +576,8 @@ Feature: Table inheritance
   @!mongodb
   Scenario: Generate iri from parent resource
     Given there are 3 sites with internal owner
-    When I add "Content-Type" header equal to "application/ld+json"
+    When I add "Accept" header equal to "application/ld+json"
+    And I add "Content-Type" header equal to "application/ld+json"
     And I send a "GET" request to "/sites"
     Then the response status code should be 200
     And the response should be in JSON
@@ -684,7 +694,8 @@ Feature: Table inheritance
   @createSchema
   Scenario: Generate iri from current resource even if parent class is a resource
     Given there are 3 sites with external owner
-    When I add "Content-Type" header equal to "application/ld+json"
+    When I add "Accept" header equal to "application/ld+json"
+    And I add "Content-Type" header equal to "application/ld+json"
     And I send a "GET" request to "/sites"
     Then the response status code should be 200
     And the response should be in JSON

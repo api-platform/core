@@ -5,7 +5,8 @@ Feature: JSON relations support
 
   @createSchema
   Scenario: Create a third level
-    When I add "Content-Type" header equal to "application/json"
+    When I add "Accept" header equal to "application/ld+json"
+    And I add "Content-Type" header equal to "application/json"
     And I send a "POST" request to "/third_levels" with body:
     """
     {
@@ -30,7 +31,8 @@ Feature: JSON relations support
     """
 
   Scenario: Create a new relation
-    When I add "Content-Type" header equal to "application/json"
+    When I add "Accept" header equal to "application/ld+json"
+    And I add "Content-Type" header equal to "application/json"
     And I send a "POST" request to "/relation_embedders" with body:
     """
     {
@@ -60,7 +62,8 @@ Feature: JSON relations support
     """
 
   Scenario: Update the relation with a new one
-    When I add "Content-Type" header equal to "application/json"
+    When I add "Accept" header equal to "application/ld+json"
+    And I add "Content-Type" header equal to "application/json"
     And I send a "PUT" request to "/relation_embedders/1" with body:
     """
     {
@@ -90,7 +93,8 @@ Feature: JSON relations support
     """
 
   Scenario: Update an embedded relation using an IRI
-    When I add "Content-Type" header equal to "application/json"
+    When I add "Accept" header equal to "application/ld+json"
+    And I add "Content-Type" header equal to "application/json"
     And I send a "PUT" request to "/relation_embedders/1" with body:
     """
     {
@@ -121,7 +125,8 @@ Feature: JSON relations support
     """
 
   Scenario: Update an embedded relation using plain identifiers
-    When I add "Content-Type" header equal to "application/json"
+    When I add "Accept" header equal to "application/ld+json"
+    And I add "Content-Type" header equal to "application/json"
     And I send a "PUT" request to "/relation_embedders/1" with body:
     """
     {
@@ -152,7 +157,8 @@ Feature: JSON relations support
     """
 
   Scenario: Create a related dummy with a relation
-    When I add "Content-Type" header equal to "application/json"
+    When I add "Accept" header equal to "application/ld+json"
+    And I add "Content-Type" header equal to "application/json"
     And I send a "POST" request to "/related_dummies" with body:
     """
     {
@@ -185,7 +191,8 @@ Feature: JSON relations support
     """
 
   Scenario: Passing a (valid) plain identifier on a relation
-    When I add "Content-Type" header equal to "application/json"
+    When I add "Accept" header equal to "application/ld+json"
+    And I add "Content-Type" header equal to "application/json"
     And I send a "POST" request to "/dummies" with body:
     """
     {

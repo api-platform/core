@@ -4,7 +4,8 @@ Feature: Serializable item data provider
   I should be able to serialize the response directly from the ItemDataProvider.
 
   Scenario: Get a resource containing a raw object
-    When  I send a "GET" request to "/serializable_resources/1"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/serializable_resources/1"
     Then the JSON should be equal to:
     """
     {

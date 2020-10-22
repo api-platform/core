@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the API Platform project.
+ *
+ * (c) Kévin Dunglas <dunglas@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 declare(strict_types=1);
 
 namespace ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\Compiler;
@@ -8,7 +17,13 @@ use Symfony\Component\Config\Definition\BaseNode;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
-final class HandleDeprecatedPass implements CompilerPassInterface
+/**
+ * Handles Mercure Publisher depreciation.
+ *
+ * @internal calls `setDeprecated` method with valid arguments
+ *  no matter which version of symfony/dependency-injection is used
+ */
+final class DeprecateMercurePublisherPass implements CompilerPassInterface
 {
     public function process(ContainerBuilder $container)
     {

@@ -6,6 +6,7 @@ Feature: Ignore unknown attributes
   @createSchema
   Scenario: Create a resource
     When I add "Content-Type" header equal to "application/ld+json"
+    And I add "Accept" header equal to "application/ld+json"
     And I send a "POST" request to "/dummies" with body:
     """
     {

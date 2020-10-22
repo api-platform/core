@@ -17,7 +17,8 @@ Feature: Search filter on collections
   @createSchema
   Scenario: Test #944
     Given there is a DummyCar entity with related colors
-    When I send a "GET" request to "/dummy_cars?colors.prop=red"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/dummy_cars?colors.prop=red"
     Then the response status code should be 200
     And the JSON should be deep equal to:
     """
@@ -194,7 +195,8 @@ Feature: Search filter on collections
 
   Scenario: Search collection by name (partial)
     Given there are 30 dummy objects
-    When I send a "GET" request to "/dummies?name=my"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/dummies?name=my"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
@@ -234,7 +236,8 @@ Feature: Search filter on collections
 
   Scenario: Search collection by name (partial)
     Given there are 30 embedded dummy objects
-    When I send a "GET" request to "/embedded_dummies?embeddedDummy.dummyName=my"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/embedded_dummies?embeddedDummy.dummyName=my"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
@@ -273,7 +276,8 @@ Feature: Search filter on collections
     """
 
   Scenario: Search collection by name (partial case insensitive)
-    When I send a "GET" request to "/dummies?dummy=somedummytest1"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/dummies?dummy=somedummytest1"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
@@ -301,7 +305,8 @@ Feature: Search filter on collections
     """
 
   Scenario: Search collection by alias (start)
-    When I send a "GET" request to "/dummies?alias=Ali"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/dummies?alias=Ali"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
@@ -341,7 +346,8 @@ Feature: Search filter on collections
 
   @sqlite
   Scenario: Search collection by description (word_start)
-    When I send a "GET" request to "/dummies?description=smart"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/dummies?description=smart"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
@@ -421,7 +427,8 @@ Feature: Search filter on collections
     """
 
   Scenario: Search for entities within an impossible range
-    When I send a "GET" request to "/dummies?name=MuYm"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/dummies?name=MuYm"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
@@ -450,7 +457,8 @@ Feature: Search filter on collections
 
   @sqlite
   Scenario: Search for entities with an existing collection route name
-    When I send a "GET" request to "/dummies?relatedDummies=dummy_cars"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/dummies?relatedDummies=dummy_cars"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
@@ -502,7 +510,8 @@ Feature: Search filter on collections
   @createSchema
   Scenario: Get collection by id equals 9.99 which is not possible
     Given there are 30 dummy objects
-    When I send a "GET" request to "/dummies?id=9.99"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/dummies?id=9.99"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
@@ -541,7 +550,8 @@ Feature: Search filter on collections
     """
 
   Scenario: Get collection by id 10
-    When I send a "GET" request to "/dummies?id=10"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/dummies?id=10"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
@@ -658,7 +668,8 @@ Feature: Search filter on collections
 
   Scenario: Search at third level
     Given there is a dummy object with a fourth level relation
-    When I send a "GET" request to "/dummies?relatedDummy.thirdLevel.level=3"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/dummies?relatedDummy.thirdLevel.level=3"
     Then the response status code should be 200
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
     And the JSON should be valid according to this schema:
@@ -694,7 +705,8 @@ Feature: Search filter on collections
     """
 
   Scenario: Search at fourth level
-    When I send a "GET" request to "/dummies?relatedDummy.thirdLevel.fourthLevel.level=4"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/dummies?relatedDummy.thirdLevel.fourthLevel.level=4"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
@@ -733,7 +745,8 @@ Feature: Search filter on collections
   @createSchema
   Scenario: Search collection on a property using a name converted
     Given there are 30 dummy objects
-    When I send a "GET" request to "/dummies?name_converted=Converted 3"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/dummies?name_converted=Converted 3"
     Then the response status code should be 200
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
     And the JSON should be valid according to this schema:
@@ -804,7 +817,8 @@ Feature: Search filter on collections
   @createSchema
   Scenario: Search collection on a property using a nested name converted
     Given there are 30 convertedOwner objects with convertedRelated
-    When I send a "GET" request to "/converted_owners?name_converted.name_converted=Converted 3"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/converted_owners?name_converted.name_converted=Converted 3"
     Then the response status code should be 200
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
     And the JSON should be valid according to this schema:

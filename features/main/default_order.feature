@@ -6,7 +6,8 @@ Feature: Default order
   @createSchema
   Scenario: Override custom order
     Given there are 5 foo objects with fake names
-    When I send a "GET" request to "/foos?itemsPerPage=10"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/foos?itemsPerPage=10"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
@@ -63,7 +64,8 @@ Feature: Default order
 
   Scenario: Override custom order by association
     Given there are 5 fooDummy objects with fake names
-    When I send a "GET" request to "/foo_dummies?itemsPerPage=10"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/foo_dummies?itemsPerPage=10"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"

@@ -24,7 +24,8 @@ Feature: JSON-LD using iri_only parameter
   @createSchema
   Scenario: Retrieve Dummies with iri_only and jsonld_embed_context
     Given there are 3 iriOnlyDummies
-    When I send a "GET" request to "/iri_only_dummies"
+    When I add "Accept" header equal to "application/ld+json"
+    And I send a "GET" request to "/iri_only_dummies"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
