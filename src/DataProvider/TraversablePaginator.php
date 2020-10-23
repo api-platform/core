@@ -72,7 +72,7 @@ class TraversablePaginator implements \IteratorAggregate, PaginatorInterface
     public function count(): int
     {
         if ($this->getCurrentPage() < $this->getLastPage()) {
-            return (int) eil($this->itemsPerPage);
+            return (int) ceil($this->itemsPerPage);
         }
 
         if (0. === $this->itemsPerPage) {
