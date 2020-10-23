@@ -21,7 +21,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  * Handles Mercure Publisher depreciation.
  *
  * @internal calls `setDeprecated` method with valid arguments
- *  no matter which version of symfony/dependency-injection is used
+ *  depending which version of symfony/dependency-injection is used
  */
 final class DeprecateMercurePublisherPass implements CompilerPassInterface
 {
