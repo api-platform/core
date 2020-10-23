@@ -3,7 +3,7 @@
 /*
  * This file is part of the API Platform project.
  *
- * (c) Toby Griffiths <toby@cubicmushroom.co.uk>
+ * (c) Kévin Dunglas <dunglas@gmail.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -17,7 +17,6 @@ use Traversable;
 
 class TraversablePaginator implements \IteratorAggregate, PaginatorInterface
 {
-
     private $taverable;
     private $currentPage;
     private $itemsPerPage;
@@ -73,11 +72,11 @@ class TraversablePaginator implements \IteratorAggregate, PaginatorInterface
     public function count(): int
     {
         if ($this->getCurrentPage() < $this->getLastPage()) {
-            return (int)ceil($this->itemsPerPage);
+            return (int) eil($this->itemsPerPage);
         }
 
         if (0. === $this->itemsPerPage) {
-            return (int)ceil($this->totalItems);
+            return (int) ceil($this->totalItems);
         }
 
         return $this->totalItems % $this->itemsPerPage;
