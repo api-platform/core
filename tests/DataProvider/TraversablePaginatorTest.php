@@ -16,8 +16,6 @@ namespace ApiPlatform\Core\Tests\DataProvider;
 use ApiPlatform\Core\DataProvider\TraversablePaginator;
 use ArrayIterator;
 use PHPUnit\Framework\TestCase;
-use Traversable;
-use function iterator_to_array;
 
 class TraversablePaginatorTest extends TestCase
 {
