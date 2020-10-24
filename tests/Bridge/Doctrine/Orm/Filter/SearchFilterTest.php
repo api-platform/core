@@ -493,6 +493,147 @@ class SearchFilterTest extends DoctrineOrmFilterTestCase
                     ],
                     $filterFactory,
                 ],
+                // Additional tests for property aliasing and explicit strategies
+                'aliased property' => [
+                    [
+                        'id' => null,
+                        'aliasedName' => ['property' => 'name', 'defaultStrategy' => 'exact'],
+                    ],
+                    [
+                        'aliasedName' => 'test',
+                    ],
+                    sprintf('SELECT %s FROM %s %1$s WHERE %1$s.name = :name_p1', $this->alias, Dummy::class),
+                    ['name_p1' => 'test'],
+                    $filterFactory,
+                ],
+                'aliased property (with explicit strategy)' => [
+                    [
+                        'id' => null,
+                        'aliasedName' => ['property' => 'name', 'defaultStrategy' => 'exact'],
+                    ],
+                    [
+                        'aliasedName' => ['exact' => 'test'],
+                    ],
+                    sprintf('SELECT %s FROM %s %1$s WHERE %1$s.name = :name_p1', $this->alias, Dummy::class),
+                    ['name_p1' => 'test'],
+                    $filterFactory,
+                ],
+                'aliased property (with multiple explicit strategies)' => [
+                    [
+                        'id' => null,
+                        'aliasedName' => ['property' => 'name', 'defaultStrategy' => 'exact'],
+                    ],
+                    [
+                        'aliasedName' => ['partial' => 'test_partial', 'start' => 'test_start', 'end' => 'test_end', 'word_start' => 'test_word_start'],
+                    ],
+                    sprintf('SELECT %s FROM %s %1$s WHERE %1$s.name LIKE CONCAT(\'%%\', :name_p1, \'%%\') AND %1$s.name LIKE CONCAT(:name_p2, \'%%\') AND %1$s.name LIKE CONCAT(\'%%\', :name_p3) AND (%1$s.name LIKE CONCAT(:name_p4, \'%%\') OR %1$s.name LIKE CONCAT(\'%% \', :name_p4, \'%%\'))', $this->alias, Dummy::class),
+                    ['name_p1' => 'test_partial', 'name_p2' => 'test_start', 'name_p3' => 'test_end', 'name_p4' => 'test_word_start'],
+                    $filterFactory,
+                ],
+                'aliased property (with multiple explicit strategies lowercase)' => [
+                    [
+                        'id' => null,
+                        'aliasedName' => ['property' => 'name', 'defaultStrategy' => 'exact'],
+                    ],
+                    [
+                        'aliasedName' => ['ipartial' => 'test_partial', 'istart' => 'test_start', 'iend' => 'test_end', 'iword_start' => 'test_word_start'],
+                    ],
+                    sprintf('SELECT %s FROM %s %1$s WHERE LOWER(%1$s.name) LIKE LOWER(CONCAT(\'%%\', :name_p1, \'%%\')) AND LOWER(%1$s.name) LIKE LOWER(CONCAT(:name_p2, \'%%\')) AND LOWER(%1$s.name) LIKE LOWER(CONCAT(\'%%\', :name_p3)) AND (LOWER(%1$s.name) LIKE LOWER(CONCAT(:name_p4, \'%%\')) OR LOWER(%1$s.name) LIKE LOWER(CONCAT(\'%% \', :name_p4, \'%%\')))', $this->alias, Dummy::class),
+                    ['name_p1' => 'test_partial', 'name_p2' => 'test_start', 'name_p3' => 'test_end', 'name_p4' => 'test_word_start'],
+                    $filterFactory,
+                ],
+                'aliased property (original property name)' => [
+                    [
+                        'id' => null,
+                        'aliasedName' => ['property' => 'name', 'defaultStrategy' => 'exact'],
+                    ],
+                    [
+                        'name' => ['partial' => 'test_partial', 'start' => 'test_start'],
+                    ],
+                    sprintf('SELECT %s FROM %s %1$s', $this->alias, Dummy::class),
+                    [],
+                    $filterFactory,
+                ],
+                'aliased property (IRI value for relation)' => [
+                    [
+                        'id' => null,
+                        'aliasedRelatedDummy' => ['property' => 'relatedDummy'],
+                    ],
+                    [
+                        'aliasedRelatedDummy' => '/related_dummies/1',
+                    ],
+                    sprintf('SELECT %s FROM %s %1$s WHERE %1$s.relatedDummy = :relatedDummy_p1', $this->alias, Dummy::class),
+                    ['relatedDummy_p1' => 1],
+                    $filterFactory,
+                ],
+                'aliased property (IRI value for relation; invalid strategy)' => [
+                    [
+                        'id' => null,
+                        'aliasedRelatedDummy' => ['property' => 'relatedDummy', 'defaultStrategy' => 'ipartial'],
+                    ],
+                    [
+                        'aliasedRelatedDummy' => '/related_dummies/1',
+                    ],
+                    sprintf('SELECT %s FROM %s %1$s', $this->alias, Dummy::class),
+                    [],
+                    $filterFactory,
+                ],
+                'aliased property (IRI value for relation; invalid explicit strategy)' => [
+                    [
+                        'id' => null,
+                        'aliasedRelatedDummy' => ['property' => 'relatedDummy'],
+                    ],
+                    [
+                        'aliasedRelatedDummy' => ['partial' => '/related_dummies/1'],
+                    ],
+                    sprintf('SELECT %s FROM %s %1$s', $this->alias, Dummy::class),
+                    [],
+                    $filterFactory,
+                ],
+                'aliased property (mixed IRI and entity ID values for relations)' => [
+                    [
+                        'id' => null,
+                        'aliasedRelatedDummy' => ['property' => 'relatedDummy'],
+                        'aliasedRelatedDummies' => ['property' => 'relatedDummies'],
+                    ],
+                    [
+                        'aliasedRelatedDummy' => ['/related_dummies/1', '2'],
+                        'aliasedRelatedDummies' => '1',
+                    ],
+                    sprintf('SELECT %s FROM %s %1$s INNER JOIN %1$s.relatedDummies relatedDummies_a1 WHERE %1$s.relatedDummy IN (:relatedDummy_p1) AND relatedDummies_a1.id = :relatedDummies_p2', $this->alias, Dummy::class),
+                    [
+                        'relatedDummy_p1' => [1, 2],
+                        'relatedDummies_p2' => 1,
+                    ],
+                    $filterFactory,
+                ],
+                'aliased property (nested)' => [
+                    [
+                        'id' => null,
+                        'name' => 'exact',
+                        'aliasedRelatedDummySymfony' => ['property' => 'relatedDummy.symfony'],
+                    ],
+                    [
+                        'name' => 'test_name',
+                        'aliasedRelatedDummySymfony' => 'test_symfony',
+                    ],
+                    sprintf('SELECT %s FROM %s %1$s INNER JOIN %1$s.relatedDummy relatedDummy_a1 WHERE %1$s.name = :name_p1 AND relatedDummy_a1.symfony = :symfony_p2', $this->alias, Dummy::class),
+                    [
+                        'name_p1' => 'test_name',
+                        'symfony_p2' => 'test_symfony',
+                    ],
+                    $filterFactory,
+                ],
+                'no properties specified' => [
+                    null,
+                    [
+                        'name' => 'test_name',
+                        'aliasedRelatedDummySymfony' => 'test_symfony',
+                    ],
+                    sprintf('SELECT %s FROM %s %1$s WHERE %1$s.name = :name_p1', $this->alias, Dummy::class),
+                    ['name_p1' => 'test_name'],
+                    $filterFactory,
+                ],
             ]
         );
     }

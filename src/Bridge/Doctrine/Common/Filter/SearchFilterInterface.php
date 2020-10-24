@@ -45,4 +45,33 @@ interface SearchFilterInterface
      * @var string Finds fields that are starting with the word
      */
     public const STRATEGY_WORD_START = 'word_start';
+
+    /**
+     * All avaliable strategies.
+     */
+    public const STRATEGIES = [
+        self::STRATEGY_EXACT,
+        self::STRATEGY_PARTIAL,
+        self::STRATEGY_START,
+        self::STRATEGY_END,
+        self::STRATEGY_WORD_START,
+        'i'.self::STRATEGY_EXACT,
+        'i'.self::STRATEGY_PARTIAL,
+        'i'.self::STRATEGY_START,
+        'i'.self::STRATEGY_END,
+        'i'.self::STRATEGY_WORD_START,
+    ];
+
+    public const STRATEGIES_MAP = [
+        self::STRATEGY_EXACT => true,
+        self::STRATEGY_PARTIAL => true,
+        self::STRATEGY_START => true,
+        self::STRATEGY_END => true,
+        self::STRATEGY_WORD_START => true,
+        'i'.self::STRATEGY_EXACT => true,
+        'i'.self::STRATEGY_PARTIAL => true,
+        'i'.self::STRATEGY_START => true,
+        'i'.self::STRATEGY_END => true,
+        'i'.self::STRATEGY_WORD_START => true,
+    ];
 }

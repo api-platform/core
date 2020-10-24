@@ -32,9 +32,21 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 /**
  * Filter the collection by given properties.
  *
+ * Filter supports multiple strategies per property and also property aliasing. It can be configured as follows:
+ * properties = {
+ *   "<queryParamName>" : {
+ *     "property": "<entity property name, defaults to queryParamName>,
+ *     "defaultStrategy": "exact|partial|ipartial"
+ *   }
+ * }
+ *
+ * Filter can then be invoked as follows
+ * ?queryParamName[<strategy>]=<value>
+ * ?queryParamName[<strategy>][]=<value>
+ *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class SearchFilter extends AbstractContextAwareFilter implements SearchFilterInterface
+class SearchFilter extends AbstractContextAwareFilter implements SearchFilterInterface, ContextAwareFilterInterface
 {
     use SearchFilterTrait;
 
@@ -64,18 +76,99 @@ class SearchFilter extends AbstractContextAwareFilter implements SearchFilterInt
     }
 
     /**
+     * @param $value
+     *
+     * @return array = [
+     *               [
+     *               'propertyAlias' => 'original requested property'
+     *               'property' => 'actual resource property name'
+     *               'strategy' => 'strategy',
+     *               'value' => 'value',
+     *               ]
+     *               ]
+     */
+    protected function getFilteringOperations(string $propertyAlias, $value)
+    {
+        // Extract which entity property we are referring to, keep BC with old filter implementation
+        $propertyData = $this->properties[$propertyAlias] ?? self::STRATEGY_EXACT;
+        if (\is_array($propertyData)) {
+            $property = $propertyData['property'] ?? $propertyAlias;
+            $strategy = $propertyData['defaultStrategy'] ?? self::STRATEGY_EXACT;
+        } else {
+            // BC Layer
+            // TODO Throw deprecation notice?
+            $property = $propertyAlias;
+            $strategy = $propertyData;
+        }
+        if (\is_array($value)) {
+            $operations = [];
+            // If value is an array, it could mean that:
+            //   - the user wants to specify a strategy (e.g. property[exact]='test')
+            //   - the user is specifying multiple values for the selected defaultStrategy (e.g. property[]='test'&property[]='test2')
+            //   - other filters are active on the same property
+            // Thus, here we need to extract all operations related to the SearchFilter
+            $arrayValues = [];
+            foreach ($value as $key => $val) {
+                if (\is_int($key)) {
+                    // User is appending multiple values to default strategy
+                    $arrayValues[] = $val;
+                }
+                if (\is_string($key) && \array_key_exists($key, self::STRATEGIES_MAP)) {
+                    // User is requesting a strategy and said strategy is valid
+                    $operations[] = [
+                        'propertyAlias' => $propertyAlias,
+                        'property' => $property,
+                        'strategy' => $key,
+                        'value' => $val,
+                    ];
+                }
+            }
+            if ($arrayValues) {
+                $operations[] = [
+                    'propertyAlias' => $propertyAlias,
+                    'property' => $property,
+                    'strategy' => $strategy,
+                    'value' => $arrayValues,
+                ];
+            }
+
+            return $operations;
+        }
+
+        // User is not specifying a strategy, use the default one
+        return [
+            [
+                'propertyAlias' => $propertyAlias,
+                'property' => $property,
+                'strategy' => $strategy,
+                'value' => $value,
+            ],
+        ];
+    }
+
+    /**
      * {@inheritdoc}
      */
     protected function filterProperty(string $property, $value, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, string $operationName = null)
     {
-        if (
-            null === $value ||
-            !$this->isPropertyEnabled($property, $resourceClass) ||
-            !$this->isPropertyMapped($property, $resourceClass, true)
-        ) {
+        if (null === $value) {
             return;
         }
+        // Here, $property is actually the queryParamName, we need to transform it into an actual resource property
+        $operations = $this->getFilteringOperations($property, $value);
+        foreach ($operations as $op) {
+            if (
+                !$this->isPropertyEnabled($op['propertyAlias'], $resourceClass) ||
+                !$this->isPropertyMapped($op['property'], $resourceClass, true)
+            ) {
+                continue;
+            }
+            $this->doFilterProperty($op['property'], $op['strategy'], $op['value'], $queryBuilder, $queryNameGenerator, $resourceClass, $operationName);
+        }
+    }
 
+    protected function doFilterProperty(string $property, string $strategy, $value, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, string $operationName = null)
+    {
         $alias = $queryBuilder->getRootAliases()[0];
         $field = $property;
 
@@ -104,8 +197,6 @@ class SearchFilter extends AbstractContextAwareFilter implements SearchFilterInt
 
                 return;
             }
-
-            $strategy = $this->properties[$property] ?? self::STRATEGY_EXACT;
 
             // prefixing the strategy with i makes it case insensitive
             if (0 === strpos($strategy, 'i')) {
@@ -137,6 +228,13 @@ class SearchFilter extends AbstractContextAwareFilter implements SearchFilterInt
 
         // metadata doesn't have the field, nor an association on the field
         if (!$metadata->hasAssociation($field)) {
+            return;
+        }
+        if (self::STRATEGY_EXACT !== $strategy) {
+            $this->logger->notice('Invalid filter ignored', [
+                'exception' => new InvalidArgumentException(sprintf('Field "%s" is an association and supports only the exact strategy', $field)),
+            ]);
+
             return;
         }
 
