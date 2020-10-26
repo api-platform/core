@@ -160,10 +160,6 @@ JSON;
 
     public function testFindIriBy(): void
     {
-        if (\PHP_VERSION_ID >= 80000) {
-            $this->markTestSkipped();
-        }
-
         self::bootKernel();
         /**
          * @var EntityManagerInterface
