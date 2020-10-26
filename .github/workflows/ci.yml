@@ -156,6 +156,7 @@ jobs:
           - '7.2'
           - '7.3'
           - '7.4'
+          - 'rc'
         include:
           - php: '7.4'
             coverage: true
@@ -170,7 +171,7 @@ jobs:
             bash \
             unzip \
       - name: Cache mongodb PHP extension build
-        if: (!startsWith(matrix.php, '7.1'))
+        if: (!startsWith(matrix.php, '7.1') && !startsWith(matrix.php, 'rc'))
         uses: actions/cache@v2
         with:
           path: /var/tmp/build/ext-mongodb-${{ env.EXT_MONGODB_VERSION }}
@@ -179,7 +180,7 @@ jobs:
             ext-mongodb-${{ env.EXT_MONGODB_VERSION }}-php${{ matrix.php }}-
         continue-on-error: true
       - name: Install mongodb PHP extension
-        if: (!startsWith(matrix.php, '7.1'))
+        if: (!startsWith(matrix.php, '7.1') && !startsWith(matrix.php, 'rc'))
         env:
           BUILD_DIR: /var/tmp/build/ext-mongodb-${{ env.EXT_MONGODB_VERSION }}
           SRC_DIR: /usr/src/php/ext/mongodb
@@ -230,11 +231,14 @@ jobs:
           composer global require --prefer-dist --no-progress --no-suggest --ansi \
             symfony/flex
       - name: Remove Doctrine MongoDB ODM
-        if: startsWith(matrix.php, '7.1')
+        if: (startsWith(matrix.php, '7.1') || startsWith(matrix.php, 'rc'))
         run: |
           composer remove --dev --no-progress --no-update --ansi \
             doctrine/mongodb-odm \
             doctrine/mongodb-odm-bundle \
+      - name: Set Composer platform config
+        if: (startsWith(matrix.php, 'rc'))
+        run: composer config platform.php 7.4.99
       - name: Update project dependencies
         run: |
           mkdir -p /tmp/api-platform/core/vendor
@@ -2348,7 +2352,7 @@ jobs:
         with:
             php-version: '7.4'
             tools: pecl, composer, flex
-            extensions: intl, openssl, mbstring, pdo_sqlite 
+            extensions: intl, openssl, mbstring, pdo_sqlite
             coverage: none
             ini-values: memory_limit=-1
       - name: Cache Composer packages
@@ -2385,7 +2389,7 @@ jobs:
         with:
             php-version: '7.4'
             tools: pecl, composer, flex
-            extensions: intl, openssl, mbstring, pdo_sqlite 
+            extensions: intl, openssl, mbstring, pdo_sqlite
             coverage: none
             ini-values: memory_limit=-1
       - name: Cache Composer packages
