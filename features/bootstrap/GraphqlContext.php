@@ -162,7 +162,6 @@ final class GraphqlContext implements Context
 
     private function sendGraphqlRequest()
     {
-        $this->request->setHttpHeader('Accept', null);
         $this->restContext->iSendARequestTo('GET', '/graphql?'.http_build_query($this->graphqlRequest));
     }
 }

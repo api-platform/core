@@ -6,7 +6,6 @@ default:
         - 'DoctrineContext':
             doctrine: '@doctrine'
             passwordEncoder: '@security.password_encoder'
-        - 'HttpHeaderContext'
         - 'GraphqlContext'
         - 'JsonContext'
         - 'HydraContext'
@@ -45,7 +44,6 @@ postgres:
         - 'DoctrineContext':
             doctrine: '@doctrine'
             passwordEncoder: '@security.password_encoder'
-        - 'HttpHeaderContext'
         - 'GraphqlContext'
         - 'JsonContext'
         - 'HydraContext'
@@ -70,7 +68,6 @@ mongodb:
         - 'DoctrineContext':
             doctrine: '@doctrine_mongodb'
             passwordEncoder: '@security.password_encoder'
-        - 'HttpHeaderContext'
         - 'GraphqlContext'
         - 'JsonContext'
         - 'HydraContext'
@@ -98,7 +95,6 @@ elasticsearch:
             client: '@test.api_platform.elasticsearch.client'
             elasticsearchMappingsPath: '%paths.base%/tests/Fixtures/Elasticsearch/Mappings/'
             elasticsearchFixturesPath: '%paths.base%/tests/Fixtures/Elasticsearch/Fixtures/'
-        - 'HttpHeaderContext'
         - 'JsonContext'
         - 'Behatch\Context\RestContext'
         - 'Behat\MinkExtension\Context\MinkContext'
@@ -113,7 +109,6 @@ default-coverage:
         - 'DoctrineContext':
             doctrine: '@doctrine'
             passwordEncoder: '@security.password_encoder'
-        - 'HttpHeaderContext'
         - 'GraphqlContext'
         - 'JsonContext'
         - 'HydraContext'
@@ -138,7 +133,6 @@ mongodb-coverage:
         - 'DoctrineContext':
             doctrine: '@doctrine_mongodb'
             passwordEncoder: '@security.password_encoder'
-        - 'HttpHeaderContext'
         - 'GraphqlContext'
         - 'JsonContext'
         - 'HydraContext'
@@ -164,7 +158,6 @@ elasticsearch-coverage:
             client: '@test.api_platform.elasticsearch.client'
             elasticsearchMappingsPath: '%paths.base%/tests/Fixtures/Elasticsearch/Mappings/'
             elasticsearchFixturesPath: '%paths.base%/tests/Fixtures/Elasticsearch/Fixtures/'
-        - 'HttpHeaderContext'
         - 'JsonContext'
         - 'CoverageContext'
         - 'Behatch\Context\RestContext'
