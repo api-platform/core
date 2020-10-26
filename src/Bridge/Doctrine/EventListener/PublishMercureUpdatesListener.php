@@ -136,9 +136,6 @@ final class PublishMercureUpdatesListener
         }
 
         $options = $this->resourceMetadataFactory->create($resourceClass)->getAttribute('mercure', false);
-        if (false === $options) {
-            return;
-        }
 
         if (\is_string($options)) {
             if (null === $this->expressionLanguage) {
@@ -146,6 +143,10 @@ final class PublishMercureUpdatesListener
             }
 
             $options = $this->expressionLanguage->evaluate($options, ['object' => $entity]);
+        }
+
+        if (false === $options) {
+            return;
         }
 
         if (true === $options) {
