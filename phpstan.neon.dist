@@ -134,3 +134,5 @@ parameters:
 			paths:
 				- src/Bridge/Elasticsearch/DataProvider/Filter/OrderFilter.php
 				- src/Bridge/Elasticsearch/DataProvider/Filter/AbstractSearchFilter.php
+
+		- '#Call to function iterator_to_array\(\) on a separate line has no effect#'
