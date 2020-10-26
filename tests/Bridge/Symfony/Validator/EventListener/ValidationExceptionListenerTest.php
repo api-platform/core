@@ -21,6 +21,7 @@ use Prophecy\Argument;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
+use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Validator\ConstraintViolationList;
 
@@ -44,6 +45,8 @@ class ValidationExceptionListenerTest extends TestCase
         $serializerProphecy = $this->prophesize(SerializerInterface::class);
 
         $listener = new ValidationExceptionListener($serializerProphecy->reveal(), ['hydra' => ['application/ld+json']]);
+
+
         $listener->onKernelException($eventProphecy->reveal());
     }
 

@@ -7,10 +7,11 @@ framework:
     test:                              ~
     session:
         storage_id:                    'session.storage.mock_file'
-    form:                              ~ # For FOSUser
     profiler:
         enabled:                        true
         collect:                        false
+    router:
+        utf8:                           true
 
 web_profiler:
     toolbar: true
@@ -121,9 +122,6 @@ services:
         public: false
         tags:
             -  { name: 'serializer.normalizer' }
-
-    fos_user.mailer.default:
-        class: 'ApiPlatform\Core\Tests\Mock\FosUser\MailerMock'
 
     app.name_converter:
         class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\Serializer\NameConverter\CustomConverter'

@@ -49,11 +49,10 @@ class ValidateListenerTest extends TestCase
         $request = new Request();
         $request->setMethod('POST');
 
-        $event = $this->prophesize(ViewEvent::class);
-        $event->getRequest()->willReturn($request);
-
         $listener = new ValidateListener($validator, $resourceMetadataFactory);
-        $listener->onKernelView($event->reveal());
+
+        $event = new ViewEvent($this->prophesize(HttpKernelInterface::class)->reveal(), $request, HttpKernelInterface::MASTER_REQUEST, []);
+        $listener->onKernelView($event);
     }
 
     public function testValidatorIsCalled()

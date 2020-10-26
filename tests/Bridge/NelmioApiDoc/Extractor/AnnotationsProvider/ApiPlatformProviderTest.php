@@ -28,6 +28,7 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RelatedDummy;
 use ApiPlatform\Core\Tests\ProphecyTrait;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Nelmio\ApiDocBundle\Extractor\AnnotationsProviderInterface;
+use Nelmio\ApiDocBundle\NelmioApiDocBundle;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\Routing\Route;
@@ -41,6 +42,13 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 class ApiPlatformProviderTest extends TestCase
 {
     use ProphecyTrait;
+
+    protected function setUp(): void
+    {
+        if (!class_exists(NelmioApiDocBundle::class)) {
+            $this->markTestSkipped('NelmioApiDocBundle is not installed.');
+        }
+    }
 
     /**
      * @expectedDeprecation The ApiPlatform\Core\Bridge\NelmioApiDoc\Extractor\AnnotationsProvider\ApiPlatformProvider class is deprecated since version 2.2 and will be removed in 3.0. NelmioApiDocBundle 3 has native support for API Platform.

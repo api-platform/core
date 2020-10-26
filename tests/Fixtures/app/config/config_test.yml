@@ -8,15 +8,6 @@ api_platform:
             - '%kernel.project_dir%/../TestBundle/Model'
             - '%kernel.project_dir%/config/api_resources_orm.yaml'
 
-# FIXME: move this in the Kernel
-#fos_user:
-#    db_driver:        'orm'
-#    firewall_name:    'api'
-#    user_class:       'ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\User'
-#    from_email:
-#        address:      'no-reply@les-tilleuls.coop'
-#        sender_name:  'Kévin Dunglas'
-
 services:
     app.my_dummy_resource.search_filter:
         parent:    'api_platform.doctrine.orm.search_filter'
