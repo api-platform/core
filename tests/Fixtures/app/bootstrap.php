@@ -22,6 +22,11 @@ if (!$phpunitInstalls) {
     die('PHPUnit is not installed. Please run ./vendor/bin/simple-phpunit to install it');
 }
 
+// Use the most recent version available
+$phpunitLoader = require end($phpunitInstalls).'/vendor/autoload.php';
+$phpunitLoader->unregister();
+$phpunitLoader->register();
+
 $loader = require __DIR__.'/../../../vendor/autoload.php';
 require __DIR__.'/AppKernel.php';
 
