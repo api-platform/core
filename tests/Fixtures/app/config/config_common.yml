@@ -57,7 +57,6 @@ api_platform:
         enabled: true
         nesting_separator: __
     name_converter:                    'app.name_converter'
-    enable_fos_user:                   true
     collection:
         order_parameter_name:          'order'
         order:                         'ASC'

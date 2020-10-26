@@ -244,8 +244,15 @@ class ApiPlatformExtensionTest extends TestCase
         $this->extension->load($config, $containerBuilder);
     }
 
+    /**
+     * @group legacy
+     */
     public function testEnableFosUser()
     {
+        if (!class_exists(NelmioApiDocBundle::class)) {
+            $this->markTestSkipped('FOSUserBundle is not installed');
+        }
+
         $containerBuilderProphecy = $this->getBaseContainerBuilderProphecy();
         $containerBuilderProphecy->hasParameter('kernel.debug')->willReturn(true);
         $containerBuilderProphecy->getParameter('kernel.debug')->willReturn(false);

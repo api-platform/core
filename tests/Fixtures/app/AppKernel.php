@@ -67,7 +67,6 @@ class AppKernel extends Kernel
             new MercureBundle(),
             new ApiPlatformBundle(),
             new SecurityBundle(),
-            new FOSUserBundle(),
             new WebProfilerBundle(),
         ];
 
@@ -75,12 +74,16 @@ class AppKernel extends Kernel
             $bundles[] = new DoctrineMongoDBBundle();
         }
 
-        if ('elasticsearch' !== $this->getEnvironment()) {
-            $bundles[] = new TestBundle();
+        if (class_exists(FOSUserBundle::class)) {
+            $bundles[] = new FOSUserBundle();
         }
 
-        if ($_SERVER['LEGACY'] ?? false) {
+        if (class_exists(NelmioApiDocBundle::class)) {
             $bundles[] = new NelmioApiDocBundle();
+        }
+
+        if ('elasticsearch' !== $this->getEnvironment()) {
+            $bundles[] = new TestBundle();
         }
 
         return $bundles;
