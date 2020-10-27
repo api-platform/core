@@ -34,20 +34,14 @@ class ValidationExceptionListenerTest extends TestCase
 
     public function testNotValidationException()
     {
-        $eventProphecy = $this->prophesize(ExceptionEvent::class);
-        if (method_exists(ExceptionEvent::class, 'getThrowable')) {
-            $eventProphecy->getThrowable()->willReturn(new \Exception())->shouldBeCalled();
-        } else {
-            $eventProphecy->getException()->willReturn(new \Exception())->shouldBeCalled();
-        }
-        $eventProphecy->setResponse()->shouldNotBeCalled();
+        $listener = new ValidationExceptionListener(
+            $this->prophesize(SerializerInterface::class)->reveal(),
+            ['hydra' => ['application/ld+json']])
+        ;
 
-        $serializerProphecy = $this->prophesize(SerializerInterface::class);
-
-        $listener = new ValidationExceptionListener($serializerProphecy->reveal(), ['hydra' => ['application/ld+json']]);
-
-
-        $listener->onKernelException($eventProphecy->reveal());
+        $event = new ExceptionEvent($this->prophesize(HttpKernelInterface::class)->reveal(), new Request(), HttpKernelInterface::MASTER_REQUEST, new \Exception());
+        $listener->onKernelException($event);
+        $this->assertNull($event->getResponse());
     }
 
     public function testValidationException()
@@ -55,29 +49,19 @@ class ValidationExceptionListenerTest extends TestCase
         $exceptionJson = '{"foo": "bar"}';
         $list = new ConstraintViolationList([]);
 
-        $eventProphecy = $this->prophesize(ExceptionEvent::class);
-        if (method_exists(ExceptionEvent::class, 'getThrowable')) {
-            $eventProphecy->getThrowable()->willReturn(new ValidationException($list))->shouldBeCalled();
-        } else {
-            $eventProphecy->getException()->willReturn(new ValidationException($list))->shouldBeCalled();
-        }
-        $eventProphecy->getRequest()->willReturn(new Request())->shouldBeCalled();
-        $eventProphecy->setResponse(Argument::allOf(
-            Argument::type(Response::class),
-            Argument::which('getContent', $exceptionJson),
-            Argument::which('getStatusCode', Response::HTTP_BAD_REQUEST),
-            Argument::that(function (Response $response): bool {
-                return
-                    'application/ld+json; charset=utf-8' === $response->headers->get('Content-Type')
-                    && 'nosniff' === $response->headers->get('X-Content-Type-Options')
-                    && 'deny' === $response->headers->get('X-Frame-Options');
-            })
-        ))->shouldBeCalled();
-
         $serializerProphecy = $this->prophesize(SerializerInterface::class);
         $serializerProphecy->serialize($list, 'hydra')->willReturn($exceptionJson)->shouldBeCalled();
 
         $listener = new ValidationExceptionListener($serializerProphecy->reveal(), ['hydra' => ['application/ld+json']]);
-        $listener->onKernelException($eventProphecy->reveal());
+        $event = new ExceptionEvent($this->prophesize(HttpKernelInterface::class)->reveal(), new Request(), HttpKernelInterface::MASTER_REQUEST, new ValidationException($list));
+        $listener->onKernelException($event);
+
+        $response = $event->getResponse();
+        $this->assertInstanceOf(Response::class, $response);
+        $this->assertSame($exceptionJson, $response->getContent());
+        $this->assertSame(Response::HTTP_BAD_REQUEST, $response->getStatusCode());
+        $this->assertSame('application/ld+json; charset=utf-8', $response->headers->get('Content-Type'));
+        $this->assertSame('nosniff', $response->headers->get('X-Content-Type-Options'));
+        $this->assertSame('deny', $response->headers->get('X-Frame-Options'));
     }
 }
