@@ -21,18 +21,18 @@ default:
       filters:
         tags: '~@postgres&&~@mongodb&&~@elasticsearch&&~@legacy'
   extensions:
-    'Behat\Symfony2Extension':
+    'FriendsOfBehat\SymfonyExtension':
+      bootstrap: 'tests/Fixtures/app/bootstrap.php'
       kernel:
-        env: 'test'
-        debug: 'true'
+        environment: 'test'
+        debug: true
         path: 'tests/Fixtures/app/AppKernel.php'
-        bootstrap: 'tests/Fixtures/app/bootstrap.php'
     'Behat\MinkExtension':
       base_url: 'http://example.com/'
       files_path: 'features/files'
       sessions:
         default:
-          symfony2: ~
+          symfony: ~
     'Behatch\Extension': ~
 
 postgres:

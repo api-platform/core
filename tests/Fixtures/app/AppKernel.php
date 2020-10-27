@@ -19,6 +19,7 @@ use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
 use Doctrine\Bundle\MongoDBBundle\DoctrineMongoDBBundle;
 use Doctrine\Common\Inflector\Inflector;
 use Doctrine\Inflector\InflectorFactory;
+use FriendsOfBehat\SymfonyExtension\Bundle\FriendsOfBehatSymfonyExtensionBundle;
 use Nelmio\ApiDocBundle\NelmioApiDocBundle;
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
 use Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait;
@@ -68,6 +69,7 @@ class AppKernel extends Kernel
             new ApiPlatformBundle(),
             new SecurityBundle(),
             new WebProfilerBundle(),
+            new FriendsOfBehatSymfonyExtensionBundle(),
         ];
 
         if (class_exists(DoctrineMongoDBBundle::class)) {
