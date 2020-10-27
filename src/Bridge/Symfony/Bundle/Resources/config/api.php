@@ -11,6 +11,8 @@
 
 declare(strict_types=1);
 
+namespace Symfony\Component\DependencyInjection\Loader\Configurator;
+
 use ApiPlatform\Core\Action\EntrypointAction;
 use ApiPlatform\Core\Action\ExceptionAction;
 use ApiPlatform\Core\Action\NotFoundAction;
@@ -59,7 +61,6 @@ use ApiPlatform\Core\Serializer\SerializerContextBuilder;
 use ApiPlatform\Core\Serializer\SerializerContextBuilderInterface;
 use ApiPlatform\Core\Serializer\SerializerFilterContextBuilder;
 use Negotiation\Negotiator;
-use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 
 return static function (ContainerConfigurator $container) {
     $container->services()
@@ -101,7 +102,7 @@ return static function (ContainerConfigurator $container) {
         ->set('api_platform.serializer.group_filter', GroupFilter::class)
         ->alias(GroupFilter::class, 'api_platform.serializer.group_filter')
         ->set('api_platform.serializer.normalizer.item', ItemNormalizer::class)
-            ->args([service('api_platform.metadata.property.name_collection_factory'), service('api_platform.metadata.property.metadata_factory'), service('api_platform.iri_converter'), service('api_platform.resource_class_resolver'), service('api_platform.property_accessor'), service('api_platform.name_converter')->ignoreOnInvalid(), service('serializer.mapping.class_metadata_factory')->ignoreOnInvalid(), service('api_platform.item_data_provider')->ignoreOnInvalid(), param('api_platform.allow_plain_identifiers'), 'null', tagged('api_platform.data_transformer')->ignoreOnInvalid(), service('api_platform.metadata.resource.metadata_factory')->ignoreOnInvalid(), 'false'])
+            ->args([service('api_platform.metadata.property.name_collection_factory'), service('api_platform.metadata.property.metadata_factory'), service('api_platform.iri_converter'), service('api_platform.resource_class_resolver'), service('api_platform.property_accessor'), service('api_platform.name_converter')->ignoreOnInvalid(), service('serializer.mapping.class_metadata_factory')->ignoreOnInvalid(), service('api_platform.item_data_provider')->ignoreOnInvalid(), param('api_platform.allow_plain_identifiers'), 'null', tagged_iterator('api_platform.data_transformer')->ignoreOnInvalid(), service('api_platform.metadata.resource.metadata_factory')->ignoreOnInvalid(), 'false'])
             ->tag('serializer.normalizer', ['priority' => -895])
         ->alias('api_platform.operation_path_resolver', 'api_platform.operation_path_resolver.router')
         ->set('api_platform.operation_path_resolver.router', RouterOperationPathResolver::class)
@@ -175,7 +176,7 @@ return static function (ContainerConfigurator $container) {
             ->args([service('api_platform.cache.identifiers_extractor'), service('api_platform.identifiers_extractor.cached.inner'), service('api_platform.property_accessor'), service('api_platform.resource_class_resolver')])
         ->alias(IdentifiersExtractorInterface::class, 'api_platform.identifiers_extractor.cached')
         ->set('api_platform.identifier.converter', IdentifierConverter::class)
-            ->args([service('api_platform.identifiers_extractor.cached'), service('api_platform.metadata.property.metadata_factory'), tagged('api_platform.identifier.denormalizer')])
+            ->args([service('api_platform.identifiers_extractor.cached'), service('api_platform.metadata.property.metadata_factory'), tagged_iterator('api_platform.identifier.denormalizer')])
         ->set('api_platform.identifier.integer', IntegerDenormalizer::class)
             ->tag('api_platform.identifier.denormalizer')
         ->set('api_platform.identifier.date_normalizer', DateTimeIdentifierDenormalizer::class)

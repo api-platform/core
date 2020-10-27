@@ -11,6 +11,8 @@
 
 declare(strict_types=1);
 
+namespace Symfony\Component\DependencyInjection\Loader\Configurator;
+
 use ApiPlatform\Core\Metadata\Property\Factory\AnnotationPropertyMetadataFactory;
 use ApiPlatform\Core\Metadata\Property\Factory\AnnotationSubresourceMetadataFactory;
 use ApiPlatform\Core\Metadata\Resource\Factory\AnnotationResourceFilterMetadataFactory;

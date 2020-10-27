@@ -11,6 +11,8 @@
 
 declare(strict_types=1);
 
+namespace Symfony\Component\DependencyInjection\Loader\Configurator;
+
 use ApiPlatform\Core\JsonApi\EventListener\TransformFieldsetsParametersListener;
 use ApiPlatform\Core\JsonApi\EventListener\TransformFilteringParametersListener;
 use ApiPlatform\Core\JsonApi\EventListener\TransformPaginationParametersListener;
@@ -38,7 +40,7 @@ return static function (ContainerConfigurator $container) {
             ->args([service('api_platform.resource_class_resolver'), param('api_platform.collection.pagination.page_parameter_name')])
             ->tag('serializer.normalizer', ['priority' => -985])
         ->set('api_platform.jsonapi.normalizer.item', ItemNormalizer::class)
-            ->args([service('api_platform.metadata.property.name_collection_factory'), service('api_platform.metadata.property.metadata_factory'), service('api_platform.iri_converter'), service('api_platform.resource_class_resolver'), service('api_platform.property_accessor'), service('api_platform.jsonapi.name_converter.reserved_attribute_name'), service('api_platform.metadata.resource.metadata_factory'), [], tagged('api_platform.data_transformer')->ignoreOnInvalid(), 'false'])
+            ->args([service('api_platform.metadata.property.name_collection_factory'), service('api_platform.metadata.property.metadata_factory'), service('api_platform.iri_converter'), service('api_platform.resource_class_resolver'), service('api_platform.property_accessor'), service('api_platform.jsonapi.name_converter.reserved_attribute_name'), service('api_platform.metadata.resource.metadata_factory'), [], tagged_iterator('api_platform.data_transformer')->ignoreOnInvalid(), 'false'])
             ->tag('serializer.normalizer', ['priority' => -890])
         ->set('api_platform.jsonapi.normalizer.object', ObjectNormalizer::class)
             ->args([service('serializer.normalizer.object'), service('api_platform.iri_converter'), service('api_platform.resource_class_resolver'), service('api_platform.metadata.resource.metadata_factory')])

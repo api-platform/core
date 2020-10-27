@@ -11,6 +11,8 @@
 
 declare(strict_types=1);
 
+namespace Symfony\Component\DependencyInjection\Loader\Configurator;
+
 use ApiPlatform\Core\Bridge\Doctrine\Common\DataPersister;
 use ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\CollectionDataProvider;
 use ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Extension\FilterExtension;
@@ -40,11 +42,11 @@ return static function (ContainerConfigurator $container) {
             ->args([service('doctrine_mongodb')])
             ->tag('api_platform.data_persister', ['priority' => -1000])
         ->set('api_platform.doctrine_mongodb.odm.collection_data_provider')
-            ->args([service('doctrine_mongodb'), tagged('api_platform.doctrine_mongodb.odm.aggregation_extension.collection')])
+            ->args([service('doctrine_mongodb'), tagged_iterator('api_platform.doctrine_mongodb.odm.aggregation_extension.collection')])
         ->set('api_platform.doctrine_mongodb.odm.item_data_provider')
-            ->args([service('doctrine_mongodb'), service('api_platform.metadata.property.name_collection_factory'), service('api_platform.metadata.property.metadata_factory'), tagged('api_platform.doctrine_mongodb.odm.aggregation_extension.item')])
+            ->args([service('doctrine_mongodb'), service('api_platform.metadata.property.name_collection_factory'), service('api_platform.metadata.property.metadata_factory'), tagged_iterator('api_platform.doctrine_mongodb.odm.aggregation_extension.item')])
         ->set('api_platform.doctrine_mongodb.odm.subresource_data_provider')
-            ->args([service('doctrine_mongodb'), service('api_platform.metadata.property.name_collection_factory'), service('api_platform.metadata.property.metadata_factory'), tagged('api_platform.doctrine_mongodb.odm.aggregation_extension.collection'), tagged('api_platform.doctrine_mongodb.odm.aggregation_extension.item')])
+            ->args([service('doctrine_mongodb'), service('api_platform.metadata.property.name_collection_factory'), service('api_platform.metadata.property.metadata_factory'), tagged_iterator('api_platform.doctrine_mongodb.odm.aggregation_extension.collection'), tagged_iterator('api_platform.doctrine_mongodb.odm.aggregation_extension.item')])
         ->set('api_platform.doctrine_mongodb.odm.default.collection_data_provider', CollectionDataProvider::class)
             ->parent('api_platform.doctrine_mongodb.odm.collection_data_provider')
             ->tag('api_platform.collection_data_provider')

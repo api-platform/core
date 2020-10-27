@@ -11,6 +11,8 @@
 
 declare(strict_types=1);
 
+namespace Symfony\Component\DependencyInjection\Loader\Configurator;
+
 use ApiPlatform\Core\Mercure\EventListener\AddLinkHeaderListener;
 
 return static function (ContainerConfigurator $container) {

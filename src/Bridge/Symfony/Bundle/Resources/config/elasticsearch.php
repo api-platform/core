@@ -11,6 +11,8 @@
 
 declare(strict_types=1);
 
+namespace Symfony\Component\DependencyInjection\Loader\Configurator;
+
 use ApiPlatform\Core\Bridge\Elasticsearch\Api\IdentifierExtractor;
 use ApiPlatform\Core\Bridge\Elasticsearch\Api\IdentifierExtractorInterface;
 use ApiPlatform\Core\Bridge\Elasticsearch\DataProvider\CollectionDataProvider;
@@ -65,7 +67,7 @@ return static function (ContainerConfigurator $container) {
             ->args([service('api_platform.elasticsearch.client'), service('api_platform.elasticsearch.metadata.document.metadata_factory'), service('api_platform.elasticsearch.identifier_extractor'), service('serializer'), service('api_platform.metadata.resource.metadata_factory')])
             ->tag('api_platform.item_data_provider', ['priority' => 5])
         ->set('api_platform.elasticsearch.collection_data_provider', CollectionDataProvider::class)
-            ->args([service('api_platform.elasticsearch.client'), service('api_platform.elasticsearch.metadata.document.metadata_factory'), service('api_platform.elasticsearch.identifier_extractor'), service('serializer'), service('api_platform.pagination'), service('api_platform.metadata.resource.metadata_factory'), tagged('api_platform.elasticsearch.request_body_search_extension.collection')])
+            ->args([service('api_platform.elasticsearch.client'), service('api_platform.elasticsearch.metadata.document.metadata_factory'), service('api_platform.elasticsearch.identifier_extractor'), service('serializer'), service('api_platform.pagination'), service('api_platform.metadata.resource.metadata_factory'), tagged_iterator('api_platform.elasticsearch.request_body_search_extension.collection')])
             ->tag('api_platform.collection_data_provider', ['priority' => 5])
         ->set('api_platform.elasticsearch.request_body_search_extension.filter')
             ->args([service('api_platform.metadata.resource.metadata_factory'), service('api_platform.filter_locator')])

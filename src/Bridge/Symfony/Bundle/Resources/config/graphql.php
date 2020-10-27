@@ -11,6 +11,8 @@
 
 declare(strict_types=1);
 
+namespace Symfony\Component\DependencyInjection\Loader\Configurator;
+
 use ApiPlatform\Core\Bridge\Symfony\Bundle\Command\GraphQlExportCommand;
 use ApiPlatform\Core\GraphQl\Action\EntrypointAction;
 use ApiPlatform\Core\GraphQl\Action\GraphiQlAction;
@@ -100,7 +102,7 @@ return static function (ContainerConfigurator $container) {
             ->args([service('twig'), service('api_platform.router'), param('api_platform.graphql.graphql_playground.enabled'), param('api_platform.title')])
             ->public()
         ->set('api_platform.graphql.normalizer.item', ItemNormalizer::class)
-            ->args([service('api_platform.metadata.property.name_collection_factory'), service('api_platform.metadata.property.metadata_factory'), service('api_platform.iri_converter'), service('api_platform.identifiers_extractor.cached'), service('api_platform.resource_class_resolver'), service('api_platform.property_accessor'), service('api_platform.name_converter')->ignoreOnInvalid(), service('serializer.mapping.class_metadata_factory')->ignoreOnInvalid(), service('api_platform.item_data_provider')->ignoreOnInvalid(), param('api_platform.allow_plain_identifiers'), 'null', tagged('api_platform.data_transformer')->ignoreOnInvalid(), service('api_platform.metadata.resource.metadata_factory')->ignoreOnInvalid()])
+            ->args([service('api_platform.metadata.property.name_collection_factory'), service('api_platform.metadata.property.metadata_factory'), service('api_platform.iri_converter'), service('api_platform.identifiers_extractor.cached'), service('api_platform.resource_class_resolver'), service('api_platform.property_accessor'), service('api_platform.name_converter')->ignoreOnInvalid(), service('serializer.mapping.class_metadata_factory')->ignoreOnInvalid(), service('api_platform.item_data_provider')->ignoreOnInvalid(), param('api_platform.allow_plain_identifiers'), 'null', tagged_iterator('api_platform.data_transformer')->ignoreOnInvalid(), service('api_platform.metadata.resource.metadata_factory')->ignoreOnInvalid()])
             ->tag('serializer.normalizer', ['priority' => -890])
         ->set('api_platform.graphql.normalizer.object', ObjectNormalizer::class)
             ->args([service('serializer.normalizer.object'), service('api_platform.iri_converter'), service('api_platform.identifiers_extractor.cached')])

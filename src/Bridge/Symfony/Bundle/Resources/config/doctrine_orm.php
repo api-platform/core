@@ -11,6 +11,8 @@
 
 declare(strict_types=1);
 
+namespace Symfony\Component\DependencyInjection\Loader\Configurator;
+
 use ApiPlatform\Core\Bridge\Doctrine\Common\DataPersister;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\CollectionDataProvider;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\EagerLoadingExtension;
@@ -37,11 +39,11 @@ return static function (ContainerConfigurator $container) {
             ->args([service('doctrine')])
             ->tag('api_platform.data_persister', ['priority' => -1000])
         ->set('api_platform.doctrine.orm.collection_data_provider')
-            ->args([service('doctrine'), tagged('api_platform.doctrine.orm.query_extension.collection')])
+            ->args([service('doctrine'), tagged_iterator('api_platform.doctrine.orm.query_extension.collection')])
         ->set('api_platform.doctrine.orm.item_data_provider')
-            ->args([service('doctrine'), service('api_platform.metadata.property.name_collection_factory'), service('api_platform.metadata.property.metadata_factory'), tagged('api_platform.doctrine.orm.query_extension.item')])
+            ->args([service('doctrine'), service('api_platform.metadata.property.name_collection_factory'), service('api_platform.metadata.property.metadata_factory'), tagged_iterator('api_platform.doctrine.orm.query_extension.item')])
         ->set('api_platform.doctrine.orm.subresource_data_provider')
-            ->args([service('doctrine'), service('api_platform.metadata.property.name_collection_factory'), service('api_platform.metadata.property.metadata_factory'), tagged('api_platform.doctrine.orm.query_extension.collection'), tagged('api_platform.doctrine.orm.query_extension.item')])
+            ->args([service('doctrine'), service('api_platform.metadata.property.name_collection_factory'), service('api_platform.metadata.property.metadata_factory'), tagged_iterator('api_platform.doctrine.orm.query_extension.collection'), tagged_iterator('api_platform.doctrine.orm.query_extension.item')])
         ->set('api_platform.doctrine.orm.default.collection_data_provider', CollectionDataProvider::class)
             ->parent('api_platform.doctrine.orm.collection_data_provider')
             ->tag('api_platform.collection_data_provider')

@@ -11,6 +11,8 @@
 
 declare(strict_types=1);
 
+namespace Symfony\Component\DependencyInjection\Loader\Configurator;
+
 use ApiPlatform\Core\Api\FilterCollection;
 use ApiPlatform\Core\Api\FilterCollectionFactory;
 use Symfony\Component\DependencyInjection\ServiceLocator;

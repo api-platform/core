@@ -11,6 +11,8 @@
 
 declare(strict_types=1);
 
+namespace Symfony\Component\DependencyInjection\Loader\Configurator;
+
 use ApiPlatform\Core\Hydra\EventListener\AddLinkHeaderListener;
 use ApiPlatform\Core\Hydra\JsonSchema\SchemaFactory;
 use ApiPlatform\Core\Hydra\Serializer\CollectionFiltersNormalizer;

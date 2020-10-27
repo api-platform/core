@@ -11,6 +11,8 @@
 
 declare(strict_types=1);
 
+namespace Symfony\Component\DependencyInjection\Loader\Configurator;
+
 use ApiPlatform\Core\Metadata\Resource\Factory\PhpDocResourceMetadataFactory;
 
 return static function (ContainerConfigurator $container) {
