@@ -89,7 +89,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
      */
     public function load(array $configs, ContainerBuilder $container): void
     {
-        $loader = new XmlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
+        $phpFileLoader = new PhpFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
 
         $configuration = new Configuration();
         $config = $this->processConfiguration($configuration, $configs);
@@ -103,27 +103,27 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             $patchFormats['jsonapi'] = ['application/vnd.api+json'];
         }
 
-        $this->registerCommonConfiguration($container, $config, $loader, $formats, $patchFormats, $errorFormats);
-        $this->registerMetadataConfiguration($container, $config, $loader);
+        $this->registerCommonConfiguration($container, $config, $phpFileLoader, $formats, $patchFormats, $errorFormats);
+        $this->registerMetadataConfiguration($container, $config, $phpFileLoader);
         $this->registerOAuthConfiguration($container, $config);
-        $this->registerSwaggerConfiguration($container, $config, $loader);
-        $this->registerJsonApiConfiguration($formats, $loader);
-        $this->registerJsonLdHydraConfiguration($container, $formats, $loader, $config['enable_docs']);
-        $this->registerJsonHalConfiguration($formats, $loader);
-        $this->registerJsonProblemConfiguration($errorFormats, $loader);
-        $this->registerGraphQlConfiguration($container, $config, $loader);
-        $this->registerLegacyBundlesConfiguration($container, $config, $loader);
+        $this->registerSwaggerConfiguration($container, $config, $phpFileLoader);
+        $this->registerJsonApiConfiguration($formats, $phpFileLoader);
+        $this->registerJsonLdHydraConfiguration($container, $formats, $phpFileLoader, $config['enable_docs']);
+        $this->registerJsonHalConfiguration($formats, $phpFileLoader);
+        $this->registerJsonProblemConfiguration($errorFormats, $phpFileLoader);
+        $this->registerGraphQlConfiguration($container, $config, $phpFileLoader);
+        $this->registerLegacyBundlesConfiguration($container, $config, $phpFileLoader);
         $this->registerCacheConfiguration($container);
-        $this->registerDoctrineOrmConfiguration($container, $config, $loader);
-        $this->registerDoctrineMongoDbOdmConfiguration($container, $config, $loader);
-        $this->registerHttpCacheConfiguration($container, $config, $loader);
-        $this->registerValidatorConfiguration($container, $config, $loader);
-        $this->registerDataCollectorConfiguration($container, $config, $loader);
-        $this->registerMercureConfiguration($container, $config, $loader);
-        $this->registerMessengerConfiguration($container, $config, $loader);
-        $this->registerElasticsearchConfiguration($container, $config, $loader);
+        $this->registerDoctrineOrmConfiguration($container, $config, $phpFileLoader);
+        $this->registerDoctrineMongoDbOdmConfiguration($container, $config, $phpFileLoader);
+        $this->registerHttpCacheConfiguration($container, $config, $phpFileLoader);
+        $this->registerValidatorConfiguration($container, $config, $phpFileLoader);
+        $this->registerDataCollectorConfiguration($container, $config, $phpFileLoader);
+        $this->registerMercureConfiguration($container, $config, $phpFileLoader);
+        $this->registerMessengerConfiguration($container, $config, $phpFileLoader);
+        $this->registerElasticsearchConfiguration($container, $config, $phpFileLoader);
         $this->registerDataTransformerConfiguration($container);
-        $this->registerSecurityConfiguration($container, $loader);
+        $this->registerSecurityConfiguration($container, $phpFileLoader);
 
         $container->registerForAutoconfiguration(DataPersisterInterface::class)
             ->addTag('api_platform.data_persister');
@@ -137,7 +137,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             ->addTag('api_platform.filter');
 
         if ($container->hasParameter('test.client.parameters')) {
-            $loader->load('test.xml');
+            $phpFileLoader->load('test.php');
 
             if (!class_exists(AbstractBrowser::class) || !trait_exists(HttpClientTrait::class)) {
                 $container->removeDefinition('test.api_platform.client');
@@ -145,12 +145,13 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         }
     }
 
-    private function registerCommonConfiguration(ContainerBuilder $container, array $config, XmlFileLoader $loader, array $formats, array $patchFormats, array $errorFormats): void
+    private function registerCommonConfiguration(ContainerBuilder $container, array $config, PhpFileLoader $phpFileLoader, array $formats, array $patchFormats, array $errorFormats): void
     {
-        $loader->load('api.xml');
-        $loader->load('data_persister.xml');
-        $loader->load('data_provider.xml');
-        $loader->load('filter.xml');
+        $phpFileLoader->load('api.php');
+        $phpFileLoader->load('data_persister.php');
+
+        $phpFileLoader->load('data_provider.php');
+        $phpFileLoader->load('filter.php');
 
         $container->getDefinition('api_platform.operation_method_resolver')
             ->setDeprecated(...$this->buildDeprecationArgs('2.5', 'The "%service_id%" service is deprecated since API Platform 2.5.'));
@@ -166,7 +167,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             ->setDeprecated(...$this->buildDeprecationArgs('2.1', 'The "%service_id%" service is deprecated since 2.1 and will be removed in 3.0. Use the "api_platform.filter_locator" service instead.'));
 
         if (class_exists(Uuid::class)) {
-            $loader->load('ramsey_uuid.xml');
+            $phpFileLoader->load('ramsey_uuid.php');
         }
 
         if (class_exists(AbstractUid::class)) {
@@ -266,10 +267,10 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         return $normalizedDefaults;
     }
 
-    private function registerMetadataConfiguration(ContainerBuilder $container, array $config, XmlFileLoader $loader): void
+    private function registerMetadataConfiguration(ContainerBuilder $container, array $config, PhpFileLoader $phpFileLoader): void
     {
-        $loader->load('metadata/metadata.xml');
-        $loader->load('metadata/xml.xml');
+        $phpFileLoader->load('metadata/metadata.php');
+        $phpFileLoader->load('metadata/xml.php');
 
         [$xmlResources, $yamlResources] = $this->getResourcesToWatch($container, $config);
 
@@ -279,19 +280,19 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             ));
         }
 
-        $container->getDefinition('api_platform.metadata.extractor.xml')->replaceArgument(0, $xmlResources);
+        $container->getDefinition('api_platform.metadata.extractor.php')->replaceArgument(0, $xmlResources);
 
         if (class_exists(Annotation::class)) {
-            $loader->load('metadata/annotation.xml');
+            $phpFileLoader->load('metadata/annotation.php');
         }
 
         if (class_exists(Yaml::class)) {
-            $loader->load('metadata/yaml.xml');
+            $phpFileLoader->load('metadata/yaml.php');
             $container->getDefinition('api_platform.metadata.extractor.yaml')->replaceArgument(0, $yamlResources);
         }
 
         if (interface_exists(DocBlockFactoryInterface::class)) {
-            $loader->load('metadata/php_doc.xml');
+            $phpFileLoader->load('metadata/php_doc.php');
         }
     }
 
@@ -384,7 +385,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
     /**
      * Registers the Swagger, ReDoc and Swagger UI configuration.
      */
-    private function registerSwaggerConfiguration(ContainerBuilder $container, array $config, XmlFileLoader $loader): void
+    private function registerSwaggerConfiguration(ContainerBuilder $container, array $config, PhpFileLoader $phpFileLoader): void
     {
         $container->setParameter('api_platform.swagger.versions', $config['swagger']['versions']);
 
@@ -392,10 +393,16 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             return;
         }
 
+<<<<<<< HEAD
         $loader->load('json_schema.xml');
         $loader->load('swagger.xml');
         $loader->load('openapi.xml');
         $loader->load('swagger-ui.xml');
+=======
+        $phpFileLoader->load('json_schema.php');
+        $phpFileLoader->load('swagger.php');
+        $phpFileLoader->load('swagger-ui.php');
+>>>>>>> 0545d325... Change XMlFIleLoader by PhpFileLoader
 
         if (!$config['enable_swagger_ui'] && !$config['enable_re_doc']) {
             // Remove the listener but keep the controller to allow customizing the path of the UI
@@ -407,23 +414,23 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $container->setParameter('api_platform.swagger.api_keys', $config['swagger']['api_keys']);
     }
 
-    private function registerJsonApiConfiguration(array $formats, XmlFileLoader $loader): void
+    private function registerJsonApiConfiguration(array $formats, PhpFileLoader $phpFileLoader): void
     {
         if (!isset($formats['jsonapi'])) {
             return;
         }
 
-        $loader->load('jsonapi.xml');
+        $phpFileLoader->load('jsonapi.php');
     }
 
-    private function registerJsonLdHydraConfiguration(ContainerBuilder $container, array $formats, XmlFileLoader $loader, bool $docEnabled): void
+    private function registerJsonLdHydraConfiguration(ContainerBuilder $container, array $formats, PhpFileLoader $phpFileLoader, bool $docEnabled): void
     {
         if (!isset($formats['jsonld'])) {
             return;
         }
 
-        $loader->load('jsonld.xml');
-        $loader->load('hydra.xml');
+        $phpFileLoader->load('jsonld.php');
+        $phpFileLoader->load('hydra.php');
 
         if (!$container->has('api_platform.json_schema.schema_factory')) {
             $container->removeDefinition('api_platform.hydra.json_schema.schema_factory');
@@ -434,25 +441,25 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         }
     }
 
-    private function registerJsonHalConfiguration(array $formats, XmlFileLoader $loader): void
+    private function registerJsonHalConfiguration(array $formats, PhpFileLoader $phpFileLoader): void
     {
         if (!isset($formats['jsonhal'])) {
             return;
         }
 
-        $loader->load('hal.xml');
+        $phpFileLoader->load('hal.php');
     }
 
-    private function registerJsonProblemConfiguration(array $errorFormats, XmlFileLoader $loader): void
+    private function registerJsonProblemConfiguration(array $errorFormats, PhpFileLoader $phpFileLoader): void
     {
         if (!isset($errorFormats['jsonproblem'])) {
             return;
         }
 
-        $loader->load('problem.xml');
+        $phpFileLoader->load('problem.php');
     }
 
-    private function registerGraphQlConfiguration(ContainerBuilder $container, array $config, XmlFileLoader $loader): void
+    private function registerGraphQlConfiguration(ContainerBuilder $container, array $config, PhpFileLoader $phpFileLoader): void
     {
         $enabled = $this->isConfigEnabled($container, $config['graphql']);
 
@@ -468,7 +475,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $container->setParameter('api_platform.graphql.default_ide', $config['graphql']['default_ide']);
         $container->setParameter('api_platform.graphql.nesting_separator', $config['graphql']['nesting_separator']);
 
-        $loader->load('graphql.xml');
+        $phpFileLoader->load('graphql.php');
 
         $container->registerForAutoconfiguration(QueryItemResolverInterface::class)
             ->addTag('api_platform.graphql.query_resolver');
@@ -482,17 +489,17 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             ->addTag('api_platform.graphql.error_handler');
     }
 
-    private function registerLegacyBundlesConfiguration(ContainerBuilder $container, array $config, XmlFileLoader $loader): void
+    private function registerLegacyBundlesConfiguration(ContainerBuilder $container, array $config, PhpFileLoader $phpFileLoader): void
     {
         /** @var string[] $bundles */
         $bundles = $container->getParameter('kernel.bundles');
 
         if (isset($bundles['FOSUserBundle']) && $config['enable_fos_user']) {
-            $loader->load('fos_user.xml');
+            $phpFileLoader->load('fos_user.php');
         }
 
         if (isset($bundles['NelmioApiDocBundle']) && $config['enable_nelmio_api_doc']) {
-            $loader->load('nelmio_api_doc.xml');
+            $phpFileLoader->load('nelmio_api_doc.php');
 
             $container->getDefinition('api_platform.nelmio_api_doc.annotations_provider')
                 ->setDeprecated(...$this->buildDeprecationArgs('2.2', 'The "%service_id%" service is deprecated since API Platform 2.2 and will be removed in 3.0. NelmioApiDocBundle 3 has native support for API Platform.'));
@@ -526,7 +533,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         }
     }
 
-    private function registerDoctrineOrmConfiguration(ContainerBuilder $container, array $config, XmlFileLoader $loader): void
+    private function registerDoctrineOrmConfiguration(ContainerBuilder $container, array $config, PhpFileLoader $phpFileLoader): void
     {
         if (!$this->isConfigEnabled($container, $config['doctrine'])) {
             return;
@@ -539,7 +546,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $container->registerForAutoconfiguration(DoctrineOrmAbstractContextAwareFilter::class)
             ->setBindings(['$requestStack' => null]);
 
-        $loader->load('doctrine_orm.xml');
+        $phpFileLoader->load('doctrine_orm.php');
 
         if ($this->isConfigEnabled($container, $config['eager_loading'])) {
             return;
@@ -551,7 +558,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $container->removeDefinition('api_platform.doctrine.orm.query_extension.filter_eager_loading');
     }
 
-    private function registerDoctrineMongoDbOdmConfiguration(ContainerBuilder $container, array $config, XmlFileLoader $loader): void
+    private function registerDoctrineMongoDbOdmConfiguration(ContainerBuilder $container, array $config, PhpFileLoader $phpFileLoader): void
     {
         if (!$this->isConfigEnabled($container, $config['doctrine_mongodb_odm'])) {
             return;
@@ -564,22 +571,22 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $container->registerForAutoconfiguration(DoctrineMongoDbOdmAbstractFilter::class)
             ->setBindings(['$managerRegistry' => new Reference('doctrine_mongodb')]);
 
-        $loader->load('doctrine_mongodb_odm.xml');
+        $phpFileLoader->load('doctrine_mongodb_odm.php');
     }
 
-    private function registerHttpCacheConfiguration(ContainerBuilder $container, array $config, XmlFileLoader $loader): void
+    private function registerHttpCacheConfiguration(ContainerBuilder $container, array $config, PhpFileLoader $phpFileLoader): void
     {
-        $loader->load('http_cache.xml');
+        $phpFileLoader->load('http_cache.php');
 
         if (!$this->isConfigEnabled($container, $config['http_cache']['invalidation'])) {
             return;
         }
 
         if ($this->isConfigEnabled($container, $config['doctrine'])) {
-            $loader->load('doctrine_orm_http_cache_purger.xml');
+            $phpFileLoader->load('doctrine_orm_http_cache_purger.php');
         }
 
-        $loader->load('http_cache_tags.xml');
+        $phpFileLoader->load('http_cache_tags.php');
 
         $definitions = [];
         foreach ($config['http_cache']['invalidation']['varnish_urls'] as $key => $url) {
@@ -609,9 +616,10 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         return $formats;
     }
 
-    private function registerValidatorConfiguration(ContainerBuilder $container, array $config, XmlFileLoader $loader): void
+    private function registerValidatorConfiguration(ContainerBuilder $container, array $config, PhpFileLoader $phpFileLoader): void
     {
         if (interface_exists(ValidatorInterface::class)) {
+<<<<<<< HEAD
             $loader->load('validator.xml');
 
             $container->registerForAutoconfiguration(ValidationGroupsGeneratorInterface::class)
@@ -619,6 +627,9 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
                 ->setPublic(true); // this line should be removed in 3.0
             $container->registerForAutoconfiguration(PropertySchemaRestrictionMetadataInterface::class)
                 ->addTag('api_platform.metadata.property_schema_restriction');
+=======
+            $phpFileLoader->load('validator.php');
+>>>>>>> 0545d325... Change XMlFIleLoader by PhpFileLoader
         }
 
         if (!$config['validator']) {
@@ -628,30 +639,30 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $container->setParameter('api_platform.validator.serialize_payload_fields', $config['validator']['serialize_payload_fields']);
     }
 
-    private function registerDataCollectorConfiguration(ContainerBuilder $container, array $config, XmlFileLoader $loader): void
+    private function registerDataCollectorConfiguration(ContainerBuilder $container, array $config, PhpFileLoader $phpFileLoader): void
     {
         if (!$config['enable_profiler']) {
             return;
         }
 
-        $loader->load('data_collector.xml');
+        $phpFileLoader->load('data_collector.php');
 
         if ($container->hasParameter('kernel.debug') && $container->getParameter('kernel.debug')) {
-            $loader->load('debug.xml');
+            $phpFileLoader->load('debug.php');
         }
     }
 
-    private function registerMercureConfiguration(ContainerBuilder $container, array $config, XmlFileLoader $loader): void
+    private function registerMercureConfiguration(ContainerBuilder $container, array $config, PhpFileLoader $phpFileLoader): void
     {
         if (!$this->isConfigEnabled($container, $config['mercure'])) {
             return;
         }
 
-        $loader->load('mercure.xml');
+        $phpFileLoader->load('mercure.php');
         $container->getDefinition('api_platform.mercure.listener.response.add_link_header')->addArgument($config['mercure']['hub_url'] ?? '%mercure.default_hub%');
 
         if ($this->isConfigEnabled($container, $config['doctrine'])) {
-            $loader->load('doctrine_orm_mercure_publisher.xml');
+            $phpFileLoader->load('doctrine_orm_mercure_publisher.php');
         }
         if ($this->isConfigEnabled($container, $config['doctrine_mongodb_odm'])) {
             $loader->load('doctrine_mongodb_odm_mercure_publisher.xml');
@@ -663,16 +674,16 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         }
     }
 
-    private function registerMessengerConfiguration(ContainerBuilder $container, array $config, XmlFileLoader $loader): void
+    private function registerMessengerConfiguration(ContainerBuilder $container, array $config, PhpFileLoader $phpFileLoader): void
     {
         if (!$this->isConfigEnabled($container, $config['messenger'])) {
             return;
         }
 
-        $loader->load('messenger.xml');
+        $phpFileLoader->load('messenger.php');
     }
 
-    private function registerElasticsearchConfiguration(ContainerBuilder $container, array $config, XmlFileLoader $loader): void
+    private function registerElasticsearchConfiguration(ContainerBuilder $container, array $config, PhpFileLoader $phpFileLoader): void
     {
         $enabled = $this->isConfigEnabled($container, $config['elasticsearch']);
 
@@ -682,7 +693,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             return;
         }
 
-        $loader->load('elasticsearch.xml');
+        $phpFileLoader->load('elasticsearch.php');
 
         $container->registerForAutoconfiguration(RequestBodySearchCollectionExtensionInterface::class)
             ->addTag('api_platform.elasticsearch.request_body_search_extension.collection');
@@ -700,13 +711,13 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             ->addTag('api_platform.data_transformer');
     }
 
-    private function registerSecurityConfiguration(ContainerBuilder $container, XmlFileLoader $loader): void
+    private function registerSecurityConfiguration(ContainerBuilder $container, PhpFileLoader $phpFileLoader): void
     {
         /** @var string[] $bundles */
         $bundles = $container->getParameter('kernel.bundles');
 
         if (isset($bundles['SecurityBundle'])) {
-            $loader->load('security.xml');
+            $phpFileLoader->load('security.php');
         }
     }
 
