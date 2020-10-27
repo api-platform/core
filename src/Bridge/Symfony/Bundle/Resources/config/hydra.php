@@ -28,27 +28,35 @@ return static function (ContainerConfigurator $container) {
         ->set('api_platform.hydra.normalizer.documentation', DocumentationNormalizer::class)
             ->args([service('api_platform.metadata.resource.metadata_factory'), service('api_platform.metadata.property.name_collection_factory'), service('api_platform.metadata.property.metadata_factory'), service('api_platform.resource_class_resolver'), 'null', service('api_platform.router'), service('api_platform.subresource_operation_factory'), service('api_platform.name_converter')->ignoreOnInvalid()])
             ->tag('serializer.normalizer', ['priority' => -800])
+
         ->set('api_platform.hydra.listener.response.add_link_header', AddLinkHeaderListener::class)
             ->args([service('api_platform.router')])
             ->tag('kernel.event_listener', ['event' => 'kernel.response', 'method' => 'onKernelResponse'])
+
         ->set('api_platform.hydra.normalizer.constraint_violation_list', ConstraintViolationListNormalizer::class)
             ->args([service('api_platform.router'), param('api_platform.validator.serialize_payload_fields'), service('api_platform.name_converter')->ignoreOnInvalid()])
             ->tag('serializer.normalizer', ['priority' => -780])
+
         ->set('api_platform.hydra.normalizer.entrypoint', EntrypointNormalizer::class)
             ->args([service('api_platform.metadata.resource.metadata_factory'), service('api_platform.iri_converter'), service('api_platform.router')])
             ->tag('serializer.normalizer', ['priority' => -800])
+
         ->set('api_platform.hydra.normalizer.error', ErrorNormalizer::class)
             ->args([service('api_platform.router'), param('kernel.debug')])
             ->tag('serializer.normalizer', ['priority' => -800])
+
         ->set('api_platform.hydra.normalizer.collection', CollectionNormalizer::class)
             ->args([service('api_platform.jsonld.context_builder'), service('api_platform.resource_class_resolver'), service('api_platform.iri_converter')])
             ->tag('serializer.normalizer', ['priority' => -985])
+
         ->set('api_platform.hydra.normalizer.partial_collection_view', PartialCollectionViewNormalizer::class)
             ->decorate('api_platform.hydra.normalizer.collection')
             ->args([service('api_platform.hydra.normalizer.partial_collection_view.inner'), param('api_platform.collection.pagination.page_parameter_name'), param('api_platform.collection.pagination.enabled_parameter_name'), service('api_platform.metadata.resource.metadata_factory'), service('api_platform.property_accessor')])
+
         ->set('api_platform.hydra.normalizer.collection_filters', CollectionFiltersNormalizer::class)
             ->decorate('api_platform.hydra.normalizer.collection')
             ->args([service('api_platform.hydra.normalizer.collection_filters.inner'), service('api_platform.metadata.resource.metadata_factory'), service('api_platform.resource_class_resolver'), service('api_platform.filter_locator')])
+
         ->set('api_platform.hydra.json_schema.schema_factory', SchemaFactory::class)
             ->decorate('api_platform.json_schema.schema_factory')
             ->args([service('api_platform.hydra.json_schema.schema_factory.inner')]);

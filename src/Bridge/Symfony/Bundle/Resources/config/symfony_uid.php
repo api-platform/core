@@ -13,14 +13,14 @@ declare(strict_types=1);
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-use ApiPlatform\Core\Bridge\RamseyUuid\Identifier\Normalizer\UuidNormalizer;
-use ApiPlatform\Core\Bridge\RamseyUuid\Serializer\UuidDenormalizer;
+use ApiPlatform\Core\Bridge\Symfony\Identifier\Normalizer\UlidNormalizer;
+use ApiPlatform\Core\Bridge\Symfony\Identifier\Normalizer\UuidNormalizer;
 
 return static function (ContainerConfigurator $container) {
     $container->services()
-        ->set('api_platform.identifier.uuid_normalizer', UuidNormalizer::class)
+        ->set('api_platform.identifier.symfony_ulid_normalizer', UlidNormalizer::class)
             ->tag('api_platform.identifier.denormalizer')
 
-        ->set('api_platform.serializer.uuid_denormalizer', UuidDenormalizer::class)
-            ->tag('serializer.normalizer');
+        ->set('api_platform.identifier.symfony_uuid_normalizer', UuidNormalizer::class)
+            ->tag('api_platform.identifier.denormalizer');
 };

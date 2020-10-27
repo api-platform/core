@@ -171,7 +171,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         }
 
         if (class_exists(AbstractUid::class)) {
-            $loader->load('symfony_uid.xml');
+            $phpFileLoader->load('symfony_uid.php');
         }
 
         $container->setParameter('api_platform.enable_entrypoint', $config['enable_entrypoint']);
@@ -393,16 +393,10 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             return;
         }
 
-<<<<<<< HEAD
-        $loader->load('json_schema.xml');
-        $loader->load('swagger.xml');
-        $loader->load('openapi.xml');
-        $loader->load('swagger-ui.xml');
-=======
         $phpFileLoader->load('json_schema.php');
         $phpFileLoader->load('swagger.php');
+        $phpFileLoader->load('openapi.php');
         $phpFileLoader->load('swagger-ui.php');
->>>>>>> 0545d325... Change XMlFIleLoader by PhpFileLoader
 
         if (!$config['enable_swagger_ui'] && !$config['enable_re_doc']) {
             // Remove the listener but keep the controller to allow customizing the path of the UI
@@ -619,17 +613,13 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
     private function registerValidatorConfiguration(ContainerBuilder $container, array $config, PhpFileLoader $phpFileLoader): void
     {
         if (interface_exists(ValidatorInterface::class)) {
-<<<<<<< HEAD
-            $loader->load('validator.xml');
+            $phpFileLoader->load('validator.php');
 
             $container->registerForAutoconfiguration(ValidationGroupsGeneratorInterface::class)
                 ->addTag('api_platform.validation_groups_generator')
                 ->setPublic(true); // this line should be removed in 3.0
             $container->registerForAutoconfiguration(PropertySchemaRestrictionMetadataInterface::class)
                 ->addTag('api_platform.metadata.property_schema_restriction');
-=======
-            $phpFileLoader->load('validator.php');
->>>>>>> 0545d325... Change XMlFIleLoader by PhpFileLoader
         }
 
         if (!$config['validator']) {
@@ -665,11 +655,11 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             $phpFileLoader->load('doctrine_orm_mercure_publisher.php');
         }
         if ($this->isConfigEnabled($container, $config['doctrine_mongodb_odm'])) {
-            $loader->load('doctrine_mongodb_odm_mercure_publisher.xml');
+            $phpFileLoader->load('doctrine_mongodb_odm_mercure_publisher.php');
         }
 
         if ($this->isConfigEnabled($container, $config['graphql'])) {
-            $loader->load('graphql_mercure.xml');
+            $phpFileLoader->load('graphql_mercure.php');
             $container->getDefinition('api_platform.graphql.subscription.mercure_iri_generator')->addArgument($config['mercure']['hub_url'] ?? '%mercure.default_hub%');
         }
     }

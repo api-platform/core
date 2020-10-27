@@ -13,14 +13,10 @@ declare(strict_types=1);
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-use ApiPlatform\Core\Bridge\RamseyUuid\Identifier\Normalizer\UuidNormalizer;
-use ApiPlatform\Core\Bridge\RamseyUuid\Serializer\UuidDenormalizer;
+use ApiPlatform\Core\GraphQl\Subscription\MercureSubscriptionIriGenerator;
 
 return static function (ContainerConfigurator $container) {
     $container->services()
-        ->set('api_platform.identifier.uuid_normalizer', UuidNormalizer::class)
-            ->tag('api_platform.identifier.denormalizer')
-
-        ->set('api_platform.serializer.uuid_denormalizer', UuidDenormalizer::class)
-            ->tag('serializer.normalizer');
+        ->set('api_platform.graphql.subscription.mercure_iri_generator', MercureSubscriptionIriGenerator::class)
+            ->args([service('router.request_context')]);
 };

@@ -21,6 +21,7 @@ return static function (ContainerConfigurator $container) {
         ->set('api_platform.nelmio_api_doc.annotations_provider', ApiPlatformProvider::class)
             ->args([service('api_platform.metadata.resource.name_collection_factory'), service('api_platform.hydra.normalizer.documentation'), service('api_platform.metadata.resource.metadata_factory'), service('api_platform.filter_locator'), service('api_platform.operation_method_resolver')])
             ->tag('nelmio_api_doc.extractor.annotations_provider')
+
         ->set('api_platform.nelmio_api_doc.parser', ApiPlatformParser::class)
             ->args([service('api_platform.metadata.resource.metadata_factory'), service('api_platform.metadata.property.name_collection_factory'), service('api_platform.metadata.property.metadata_factory'), service('api_platform.name_converter')->ignoreOnInvalid()])
             ->tag('nelmio_api_doc.extractor.parser');
