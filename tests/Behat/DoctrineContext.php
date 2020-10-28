@@ -11,6 +11,8 @@
 
 declare(strict_types=1);
 
+namespace ApiPlatform\Core\Tests\Behat;
+
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\Address as AddressDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\Answer as AnswerDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\CompositeItem as CompositeItemDocument;
@@ -131,7 +133,7 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\User;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\UuidIdentifierDummy;
 use Behat\Behat\Context\Context;
 use Behat\Gherkin\Node\PyStringNode;
-use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Tools\SchemaTool;

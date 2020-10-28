@@ -11,7 +11,10 @@
 
 declare(strict_types=1);
 
+namespace ApiPlatform\Core\Tests\Behat;
+
 use ApiPlatform\Core\Bridge\Symfony\Bundle\Test\ApiTestCase;
+use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use Behat\Gherkin\Node\PyStringNode;
 use Behatch\Context\JsonContext as BaseJsonContext;
 use Behatch\HttpCall\HttpCallResultPool;

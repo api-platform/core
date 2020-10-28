@@ -11,6 +11,8 @@
 
 declare(strict_types=1);
 
+namespace ApiPlatform\Core\Tests\Behat;
+
 use Behat\Behat\Context\Context;
 use Behat\Behat\Context\Environment\InitializedContextEnvironment;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
@@ -18,7 +20,7 @@ use Behatch\Context\RestContext;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\ExpectationFailedException;
 
-final class SwaggerContext implements Context
+final class OpenApiContext implements Context
 {
     /**
      * @var RestContext

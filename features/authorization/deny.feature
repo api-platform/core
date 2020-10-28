@@ -13,6 +13,7 @@ Feature: Authorization checking
     When I add "Accept" header equal to "application/ld+json"
     And I add "Authorization" header equal to "Basic ZHVuZ2xhczprZXZpbg=="
     And I send a "GET" request to "/secured_dummies"
+    #And print last response
     Then the response status code should be 200
     And the response should be in JSON
 

@@ -11,13 +11,15 @@
 
 declare(strict_types=1);
 
+namespace ApiPlatform\Core\Tests\Behat;
+
 use Behat\Behat\Context\Context;
 use Behat\Behat\Context\Environment\InitializedContextEnvironment;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use Behatch\Context\RestContext;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\ExpectationFailedException;
-use Symfony\Component\PropertyAccess\PropertyAccess;
+use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 final class HydraContext implements Context
 {
@@ -27,9 +29,9 @@ final class HydraContext implements Context
     private $restContext;
     private $propertyAccessor;
 
-    public function __construct()
+    public function __construct(PropertyAccessorInterface $propertyAccessor)
     {
-        $this->propertyAccessor = PropertyAccess::createPropertyAccessor();
+        $this->propertyAccessor = $propertyAccessor;
     }
 
     /**
