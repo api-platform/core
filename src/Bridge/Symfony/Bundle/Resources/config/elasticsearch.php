@@ -39,7 +39,7 @@ return static function (ContainerConfigurator $container) {
 
         ->set('api_platform.elasticsearch.metadata.resource.metadata_factory.operation', ElasticsearchOperationResourceMetadataFactory::class)
             ->decorate('api_platform.metadata.resource.metadata_factory', null, 10)
-            ->args([service('api_platform.elasticsearch.metadata.resource.metadata_factory.operation.inner')])
+            ->args([ref('api_platform.elasticsearch.metadata.resource.metadata_factory.operation.inner')])
 
         ->set('api_platform.elasticsearch.cache.metadata.document')
             ->parent('cache.system')
@@ -52,37 +52,37 @@ return static function (ContainerConfigurator $container) {
 
         ->set('api_platform.elasticsearch.metadata.document.metadata_factory.attribute', AttributeDocumentMetadataFactory::class)
             ->decorate('api_platform.elasticsearch.metadata.document.metadata_factory', null, 20)
-            ->args([service('api_platform.metadata.resource.metadata_factory'), service('api_platform.elasticsearch.metadata.document.metadata_factory.attribute.inner')])
+            ->args([ref('api_platform.metadata.resource.metadata_factory'), ref('api_platform.elasticsearch.metadata.document.metadata_factory.attribute.inner')])
 
         ->set('api_platform.elasticsearch.metadata.document.metadata_factory.cat', CatDocumentMetadataFactory::class)
             ->decorate('api_platform.elasticsearch.metadata.document.metadata_factory', null, 10)
-            ->args([service('api_platform.elasticsearch.client'), service('api_platform.metadata.resource.metadata_factory'), service('api_platform.elasticsearch.metadata.document.metadata_factory.cat.inner')])
+            ->args([ref('api_platform.elasticsearch.client'), ref('api_platform.metadata.resource.metadata_factory'), ref('api_platform.elasticsearch.metadata.document.metadata_factory.cat.inner')])
 
         ->set('api_platform.elasticsearch.metadata.document.metadata_factory.cached', CachedDocumentMetadataFactory::class)
             ->decorate('api_platform.elasticsearch.metadata.document.metadata_factory', null, -10)
-            ->args([service('api_platform.elasticsearch.cache.metadata.document'), service('api_platform.elasticsearch.metadata.document.metadata_factory.cached.inner')])
+            ->args([ref('api_platform.elasticsearch.cache.metadata.document'), ref('api_platform.elasticsearch.metadata.document.metadata_factory.cached.inner')])
 
         ->set('api_platform.elasticsearch.identifier_extractor', IdentifierExtractor::class)
-            ->args([service('api_platform.identifiers_extractor')])
+            ->args([ref('api_platform.identifiers_extractor')])
         ->alias(IdentifierExtractorInterface::class, 'api_platform.elasticsearch.identifier_extractor')
 
         ->set('api_platform.elasticsearch.name_converter.inner_fields', InnerFieldsNameConverter::class)
-            ->args([service('api_platform.name_converter')->ignoreOnInvalid()])
+            ->args([ref('api_platform.name_converter')->ignoreOnInvalid()])
 
         ->set('api_platform.elasticsearch.normalizer.item', ItemNormalizer::class)
-            ->args([service('api_platform.elasticsearch.identifier_extractor'), service('serializer.mapping.class_metadata_factory'), service('api_platform.elasticsearch.name_converter.inner_fields'), service('serializer.property_accessor'), service('property_info')->ignoreOnInvalid(), service('serializer.mapping.class_discriminator_resolver')->ignoreOnInvalid()])
+            ->args([ref('api_platform.elasticsearch.identifier_extractor'), ref('serializer.mapping.class_metadata_factory'), ref('api_platform.elasticsearch.name_converter.inner_fields'), ref('serializer.property_accessor'), ref('property_info')->ignoreOnInvalid(), ref('serializer.mapping.class_discriminator_resolver')->ignoreOnInvalid()])
             ->tag('serializer.normalizer', ['priority' => -890])
 
         ->set('api_platform.elasticsearch.item_data_provider', ItemDataProvider::class)
-            ->args([service('api_platform.elasticsearch.client'), service('api_platform.elasticsearch.metadata.document.metadata_factory'), service('api_platform.elasticsearch.identifier_extractor'), service('serializer'), service('api_platform.metadata.resource.metadata_factory')])
+            ->args([ref('api_platform.elasticsearch.client'), ref('api_platform.elasticsearch.metadata.document.metadata_factory'), ref('api_platform.elasticsearch.identifier_extractor'), ref('serializer'), ref('api_platform.metadata.resource.metadata_factory')])
             ->tag('api_platform.item_data_provider', ['priority' => 5])
 
         ->set('api_platform.elasticsearch.collection_data_provider', CollectionDataProvider::class)
-            ->args([service('api_platform.elasticsearch.client'), service('api_platform.elasticsearch.metadata.document.metadata_factory'), service('api_platform.elasticsearch.identifier_extractor'), service('serializer'), service('api_platform.pagination'), service('api_platform.metadata.resource.metadata_factory'), tagged_iterator('api_platform.elasticsearch.request_body_search_extension.collection')])
+            ->args([ref('api_platform.elasticsearch.client'), ref('api_platform.elasticsearch.metadata.document.metadata_factory'), ref('api_platform.elasticsearch.identifier_extractor'), ref('serializer'), ref('api_platform.pagination'), ref('api_platform.metadata.resource.metadata_factory'), tagged_iterator('api_platform.elasticsearch.request_body_search_extension.collection')])
             ->tag('api_platform.collection_data_provider', ['priority' => 5])
 
         ->set('api_platform.elasticsearch.request_body_search_extension.filter')
-            ->args([service('api_platform.metadata.resource.metadata_factory'), service('api_platform.filter_locator')])
+            ->args([ref('api_platform.metadata.resource.metadata_factory'), ref('api_platform.filter_locator')])
 
         ->set('api_platform.elasticsearch.request_body_search_extension.constant_score_filter', ConstantScoreFilterExtension::class)
             ->parent('api_platform.elasticsearch.request_body_search_extension.filter')
@@ -93,11 +93,11 @@ return static function (ContainerConfigurator $container) {
             ->tag('api_platform.elasticsearch.request_body_search_extension.collection', ['priority' => 20])
 
         ->set('api_platform.elasticsearch.request_body_search_extension.sort', SortExtension::class)
-            ->args([service('api_platform.metadata.resource.metadata_factory'), service('api_platform.elasticsearch.identifier_extractor'), service('api_platform.metadata.property.metadata_factory'), service('api_platform.resource_class_resolver'), service('api_platform.elasticsearch.name_converter.inner_fields'), param('api_platform.collection.order')])
+            ->args([ref('api_platform.metadata.resource.metadata_factory'), ref('api_platform.elasticsearch.identifier_extractor'), ref('api_platform.metadata.property.metadata_factory'), ref('api_platform.resource_class_resolver'), ref('api_platform.elasticsearch.name_converter.inner_fields'), param('api_platform.collection.order')])
             ->tag('api_platform.elasticsearch.request_body_search_extension.collection', ['priority' => 10])
 
         ->set('api_platform.elasticsearch.search_filter')
-            ->args([service('api_platform.metadata.property.name_collection_factory'), service('api_platform.metadata.property.metadata_factory'), service('api_platform.resource_class_resolver'), service('api_platform.elasticsearch.identifier_extractor'), service('api_platform.iri_converter'), service('api_platform.property_accessor'), service('api_platform.elasticsearch.name_converter.inner_fields')])
+            ->args([ref('api_platform.metadata.property.name_collection_factory'), ref('api_platform.metadata.property.metadata_factory'), ref('api_platform.resource_class_resolver'), ref('api_platform.elasticsearch.identifier_extractor'), ref('api_platform.iri_converter'), ref('api_platform.property_accessor'), ref('api_platform.elasticsearch.name_converter.inner_fields')])
 
         ->set('api_platform.elasticsearch.term_filter', TermFilter::class)
             ->parent('api_platform.elasticsearch.search_filter')
@@ -108,6 +108,6 @@ return static function (ContainerConfigurator $container) {
         ->alias(MatchFilter::class, 'api_platform.elasticsearch.match_filter')
 
         ->set('api_platform.elasticsearch.order_filter', OrderFilter::class)
-            ->args([service('api_platform.metadata.property.name_collection_factory'), service('api_platform.metadata.property.metadata_factory'), service('api_platform.resource_class_resolver'), service('api_platform.elasticsearch.name_converter.inner_fields'), param('api_platform.collection.order_parameter_name')])
+            ->args([ref('api_platform.metadata.property.name_collection_factory'), ref('api_platform.metadata.property.metadata_factory'), ref('api_platform.resource_class_resolver'), ref('api_platform.elasticsearch.name_converter.inner_fields'), param('api_platform.collection.order_parameter_name')])
         ->alias(OrderFilter::class, 'api_platform.elasticsearch.order_filter');
 };

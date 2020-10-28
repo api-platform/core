@@ -34,24 +34,25 @@ use Doctrine\Persistence\Mapping\ClassMetadataFactory;
 return static function (ContainerConfigurator $container) {
     $container->services()
         ->set('api_platform.doctrine_mongodb.odm.default_document_manager.property_info_extractor', DoctrineExtractor::class)
-            ->args([service('doctrine_mongodb.odm.default_document_manager')])
+            ->args([ref('doctrine_mongodb.odm.default_document_manager')])
             ->tag('property_info.list_extractor', ['priority' => -1001])
             ->tag('property_info.type_extractor', ['priority' => -999])
 
         ->set('api_platform.doctrine.metadata_factory', ClassMetadataFactory::class)
+            ->factory([ref('doctrine_mongodb.odm.default_document_manager'), 'getMetadataFactory'])
 
         ->set('api_platform.doctrine_mongodb.odm.data_persister', DataPersister::class)
-            ->args([service('doctrine_mongodb')])
+            ->args([ref('doctrine_mongodb')])
             ->tag('api_platform.data_persister', ['priority' => -1000])
 
         ->set('api_platform.doctrine_mongodb.odm.collection_data_provider')
-            ->args([service('doctrine_mongodb'), tagged_iterator('api_platform.doctrine_mongodb.odm.aggregation_extension.collection')])
+            ->args([ref('doctrine_mongodb'), tagged_iterator('api_platform.doctrine_mongodb.odm.aggregation_extension.collection')])
 
         ->set('api_platform.doctrine_mongodb.odm.item_data_provider')
-            ->args([service('doctrine_mongodb'), service('api_platform.metadata.property.name_collection_factory'), service('api_platform.metadata.property.metadata_factory'), tagged_iterator('api_platform.doctrine_mongodb.odm.aggregation_extension.item')])
+            ->args([ref('doctrine_mongodb'), ref('api_platform.metadata.property.name_collection_factory'), ref('api_platform.metadata.property.metadata_factory'), tagged_iterator('api_platform.doctrine_mongodb.odm.aggregation_extension.item')])
 
         ->set('api_platform.doctrine_mongodb.odm.subresource_data_provider')
-            ->args([service('doctrine_mongodb'), service('api_platform.metadata.property.name_collection_factory'), service('api_platform.metadata.property.metadata_factory'), tagged_iterator('api_platform.doctrine_mongodb.odm.aggregation_extension.collection'), tagged_iterator('api_platform.doctrine_mongodb.odm.aggregation_extension.item')])
+            ->args([ref('doctrine_mongodb'), ref('api_platform.metadata.property.name_collection_factory'), ref('api_platform.metadata.property.metadata_factory'), tagged_iterator('api_platform.doctrine_mongodb.odm.aggregation_extension.collection'), tagged_iterator('api_platform.doctrine_mongodb.odm.aggregation_extension.item')])
 
         ->set('api_platform.doctrine_mongodb.odm.default.collection_data_provider', CollectionDataProvider::class)
             ->parent('api_platform.doctrine_mongodb.odm.collection_data_provider')
@@ -66,49 +67,49 @@ return static function (ContainerConfigurator $container) {
             ->tag('api_platform.subresource_data_provider')
 
         ->set('api_platform.doctrine_mongodb.odm.search_filter', SearchFilter::class)
-            ->args([service('doctrine_mongodb'), service('api_platform.iri_converter'), service('api_platform.identifiers_extractor.cached'), service('api_platform.property_accessor'), service('logger')->ignoreOnInvalid(), "$nameConverter" => service('api_platform.name_converter')->ignoreOnInvalid()])
+            ->args([ref('doctrine_mongodb'), ref('api_platform.iri_converter'), ref('api_platform.identifiers_extractor.cached'), ref('api_platform.property_accessor'), ref('logger')->ignoreOnInvalid(), "$nameConverter" => ref('api_platform.name_converter')->ignoreOnInvalid()])
         ->alias(SearchFilter::class, 'api_platform.doctrine_mongodb.odm.search_filter')
 
         ->set('api_platform.doctrine_mongodb.odm.boolean_filter', BooleanFilter::class)
-            ->args([service('doctrine_mongodb'), service('logger')->ignoreOnInvalid(), "$nameConverter" => service('api_platform.name_converter')->ignoreOnInvalid()])
+            ->args([ref('doctrine_mongodb'), ref('logger')->ignoreOnInvalid(), "$nameConverter" => ref('api_platform.name_converter')->ignoreOnInvalid()])
         ->alias(BooleanFilter::class, 'api_platform.doctrine_mongodb.odm.boolean_filter')
 
         ->set('api_platform.doctrine_mongodb.odm.date_filter', DateFilter::class)
-            ->args([service('doctrine_mongodb'), service('logger')->ignoreOnInvalid(), "$nameConverter" => service('api_platform.name_converter')->ignoreOnInvalid()])
+            ->args([ref('doctrine_mongodb'), ref('logger')->ignoreOnInvalid(), "$nameConverter" => ref('api_platform.name_converter')->ignoreOnInvalid()])
         ->alias(DateFilter::class, 'api_platform.doctrine_mongodb.odm.date_filter')
 
         ->set('api_platform.doctrine_mongodb.odm.exists_filter', ExistsFilter::class)
-            ->args([service('doctrine_mongodb'), service('logger')->ignoreOnInvalid(), "$existsParameterName" => param('api_platform.collection.exists_parameter_name'), "$nameConverter" => service('api_platform.name_converter')->ignoreOnInvalid()])
+            ->args([ref('doctrine_mongodb'), ref('logger')->ignoreOnInvalid(), "$existsParameterName" => param('api_platform.collection.exists_parameter_name'), "$nameConverter" => ref('api_platform.name_converter')->ignoreOnInvalid()])
         ->alias(ExistsFilter::class, 'api_platform.doctrine_mongodb.odm.exists_filter')
 
         ->set('api_platform.doctrine_mongodb.odm.numeric_filter', NumericFilter::class)
-            ->args([service('doctrine_mongodb'), service('logger')->ignoreOnInvalid(), "$nameConverter" => service('api_platform.name_converter')->ignoreOnInvalid()])
+            ->args([ref('doctrine_mongodb'), ref('logger')->ignoreOnInvalid(), "$nameConverter" => ref('api_platform.name_converter')->ignoreOnInvalid()])
         ->alias(NumericFilter::class, 'api_platform.doctrine_mongodb.odm.numeric_filter')
 
         ->set('api_platform.doctrine_mongodb.odm.order_filter', OrderFilter::class)
-            ->args([service('doctrine_mongodb'), param('api_platform.collection.order_parameter_name'), service('logger')->ignoreOnInvalid(), "$nameConverter" => service('api_platform.name_converter')->ignoreOnInvalid()])
+            ->args([ref('doctrine_mongodb'), param('api_platform.collection.order_parameter_name'), ref('logger')->ignoreOnInvalid(), "$nameConverter" => ref('api_platform.name_converter')->ignoreOnInvalid()])
         ->alias(OrderFilter::class, 'api_platform.doctrine_mongodb.odm.order_filter')
 
         ->set('api_platform.doctrine_mongodb.odm.range_filter', RangeFilter::class)
-            ->args([service('doctrine_mongodb'), service('logger')->ignoreOnInvalid(), "$nameConverter" => service('api_platform.name_converter')->ignoreOnInvalid()])
+            ->args([ref('doctrine_mongodb'), ref('logger')->ignoreOnInvalid(), "$nameConverter" => ref('api_platform.name_converter')->ignoreOnInvalid()])
         ->alias(RangeFilter::class, 'api_platform.doctrine_mongodb.odm.range_filter')
 
         ->set('api_platform.doctrine_mongodb.odm.metadata.property.metadata_factory', DoctrineMongoDbOdmPropertyMetadataFactory::class)
             ->decorate('api_platform.metadata.property.metadata_factory', null, 40)
-            ->args([service('doctrine_mongodb'), service('api_platform.doctrine_mongodb.odm.metadata.property.metadata_factory.inner')])
+            ->args([ref('doctrine_mongodb'), ref('api_platform.doctrine_mongodb.odm.metadata.property.metadata_factory.inner')])
 
         ->set('api_platform.doctrine_mongodb.odm.aggregation_extension.filter', FilterExtension::class)
-            ->args([service('api_platform.metadata.resource.metadata_factory'), service('api_platform.filter_locator')])
+            ->args([ref('api_platform.metadata.resource.metadata_factory'), ref('api_platform.filter_locator')])
             ->tag('api_platform.doctrine_mongodb.odm.aggregation_extension.collection', ['priority' => 32])
         ->alias(FilterExtension::class, 'api_platform.doctrine_mongodb.odm.aggregation_extension.filter')
 
         ->set('api_platform.doctrine_mongodb.odm.aggregation_extension.pagination', PaginationExtension::class)
-            ->args([service('doctrine_mongodb'), service('api_platform.pagination')])
+            ->args([ref('doctrine_mongodb'), ref('api_platform.pagination')])
             ->tag('api_platform.doctrine_mongodb.odm.aggregation_extension.collection')
         ->alias(PaginationExtension::class, 'api_platform.doctrine_mongodb.odm.aggregation_extension.pagination')
 
         ->set('api_platform.doctrine_mongodb.odm.aggregation_extension.order', OrderExtension::class)
-            ->args([param('api_platform.collection.order'), service('api_platform.metadata.resource.metadata_factory'), service('doctrine_mongodb')])
+            ->args([param('api_platform.collection.order'), ref('api_platform.metadata.resource.metadata_factory'), ref('doctrine_mongodb')])
             ->tag('api_platform.doctrine_mongodb.odm.aggregation_extension.collection', ['priority' => 16])
         ->alias(OrderExtension::class, 'api_platform.doctrine_mongodb.odm.aggregation_extension.order');
 };

@@ -23,7 +23,7 @@ use ApiPlatform\Core\Swagger\Serializer\ApiGatewayNormalizer;
 return static function (ContainerConfigurator $container) {
     $container->services()
         ->set('api_platform.openapi.normalizer', OpenApiNormalizer::class)
-            ->args([service('serializer.normalizer.object')])
+            ->args([ref('serializer.normalizer.object')])
             ->tag('serializer.normalizer', ['priority' => -785])
 
         ->alias(OpenApiNormalizer::class, 'api_platform.openapi.normalizer')
@@ -34,16 +34,16 @@ return static function (ContainerConfigurator $container) {
         ->alias(Options::class, 'api_platform.openapi.options')
 
         ->set('api_platform.openapi.factory', OpenApiFactory::class)
-            ->args([service('api_platform.metadata.resource.name_collection_factory'), service('api_platform.metadata.resource.metadata_factory'), service('api_platform.metadata.property.name_collection_factory'), service('api_platform.metadata.property.metadata_factory'), service('api_platform.json_schema.schema_factory'), service('api_platform.json_schema.type_factory'), service('api_platform.operation_path_resolver'), service('api_platform.filter_locator'), service('api_platform.subresource_operation_factory'), param('api_platform.formats'), service('api_platform.openapi.options'), service('api_platform.pagination_options')])
+            ->args([ref('api_platform.metadata.resource.name_collection_factory'), ref('api_platform.metadata.resource.metadata_factory'), ref('api_platform.metadata.property.name_collection_factory'), ref('api_platform.metadata.property.metadata_factory'), ref('api_platform.json_schema.schema_factory'), ref('api_platform.json_schema.type_factory'), ref('api_platform.operation_path_resolver'), ref('api_platform.filter_locator'), ref('api_platform.subresource_operation_factory'), param('api_platform.formats'), ref('api_platform.openapi.options'), ref('api_platform.pagination_options')])
 
         ->alias(OpenApiFactoryInterface::class, 'api_platform.openapi.factory')
 
         ->set('api_platform.openapi.command', OpenApiCommand::class)
-            ->args([service('api_platform.openapi.factory'), service('api_platform.serializer')])
+            ->args([ref('api_platform.openapi.factory'), ref('api_platform.serializer')])
             ->tag('console.command')
 
         ->set('api_platform.openapi.normalizer.api_gateway', ApiGatewayNormalizer::class)
             ->decorate('api_platform.openapi.normalizer', null, -1)
-            ->args([service('api_platform.openapi.normalizer.api_gateway.inner')])
+            ->args([ref('api_platform.openapi.normalizer.api_gateway.inner')])
             ->tag('serializer.normalizer', ['priority' => -780]);
 };

@@ -33,26 +33,26 @@ return static function (ContainerConfigurator $container) {
             ->tag('serializer.encoder')
 
         ->set('api_platform.jsonapi.name_converter.reserved_attribute_name', ReservedAttributeNameConverter::class)
-            ->args([service('api_platform.name_converter')->ignoreOnInvalid()])
+            ->args([ref('api_platform.name_converter')->ignoreOnInvalid()])
 
         ->set('api_platform.jsonapi.normalizer.entrypoint', EntrypointNormalizer::class)
-            ->args([service('api_platform.metadata.resource.metadata_factory'), service('api_platform.iri_converter'), service('api_platform.router')])
+            ->args([ref('api_platform.metadata.resource.metadata_factory'), ref('api_platform.iri_converter'), ref('api_platform.router')])
             ->tag('serializer.normalizer', ['priority' => -800])
 
         ->set('api_platform.jsonapi.normalizer.collection', CollectionNormalizer::class)
-            ->args([service('api_platform.resource_class_resolver'), param('api_platform.collection.pagination.page_parameter_name')])
+            ->args([ref('api_platform.resource_class_resolver'), param('api_platform.collection.pagination.page_parameter_name')])
             ->tag('serializer.normalizer', ['priority' => -985])
 
         ->set('api_platform.jsonapi.normalizer.item', ItemNormalizer::class)
-            ->args([service('api_platform.metadata.property.name_collection_factory'), service('api_platform.metadata.property.metadata_factory'), service('api_platform.iri_converter'), service('api_platform.resource_class_resolver'), service('api_platform.property_accessor'), service('api_platform.jsonapi.name_converter.reserved_attribute_name'), service('api_platform.metadata.resource.metadata_factory'), [], tagged_iterator('api_platform.data_transformer')->ignoreOnInvalid(), 'false'])
+            ->args([ref('api_platform.metadata.property.name_collection_factory'), ref('api_platform.metadata.property.metadata_factory'), ref('api_platform.iri_converter'), ref('api_platform.resource_class_resolver'), ref('api_platform.property_accessor'), ref('api_platform.jsonapi.name_converter.reserved_attribute_name'), ref('api_platform.metadata.resource.metadata_factory'), [], tagged_iterator('api_platform.data_transformer')->ignoreOnInvalid(), 'false'])
             ->tag('serializer.normalizer', ['priority' => -890])
 
         ->set('api_platform.jsonapi.normalizer.object', ObjectNormalizer::class)
-            ->args([service('serializer.normalizer.object'), service('api_platform.iri_converter'), service('api_platform.resource_class_resolver'), service('api_platform.metadata.resource.metadata_factory')])
+            ->args([ref('serializer.normalizer.object'), ref('api_platform.iri_converter'), ref('api_platform.resource_class_resolver'), ref('api_platform.metadata.resource.metadata_factory')])
             ->tag('serializer.normalizer', ['priority' => -995])
 
         ->set('api_platform.jsonapi.normalizer.constraint_violation_list', ConstraintViolationListNormalizer::class)
-            ->args([service('api_platform.metadata.property.metadata_factory'), service('api_platform.jsonapi.name_converter.reserved_attribute_name')])
+            ->args([ref('api_platform.metadata.property.metadata_factory'), ref('api_platform.jsonapi.name_converter.reserved_attribute_name')])
             ->tag('serializer.normalizer', ['priority' => -780])
 
         ->set('api_platform.jsonapi.normalizer.error', ErrorNormalizer::class)
@@ -67,7 +67,7 @@ return static function (ContainerConfigurator $container) {
             ->tag('kernel.event_listener', ['event' => 'kernel.request', 'method' => 'onKernelRequest', 'priority' => 5])
 
         ->set('api_platform.jsonapi.listener.request.transform_fieldsets_parameters', TransformFieldsetsParametersListener::class)
-            ->args([service('api_platform.metadata.resource.metadata_factory')])
+            ->args([ref('api_platform.metadata.resource.metadata_factory')])
             ->tag('kernel.event_listener', ['event' => 'kernel.request', 'method' => 'onKernelRequest', 'priority' => 5])
 
         ->set('api_platform.jsonapi.listener.request.transform_filtering_parameters', TransformFilteringParametersListener::class)
