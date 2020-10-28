@@ -98,7 +98,8 @@ class Dummy
      * @var \DateTime A dummy date
      *
      * @ORM\Column(type="datetime", nullable=true)
-     * @Assert\DateTime
+     * @fixme wtf?
+     * @ Assert\DateTime
      */
     public $dummyDate;
 
