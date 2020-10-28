@@ -151,7 +151,7 @@ final class OpenApiContext implements Context
      *
      * @throws \InvalidArgumentException
      */
-    private function getPropertyInfo(string $propertyName, string $className, int $specVersion = 2): stdClass
+    private function getPropertyInfo(string $propertyName, string $className, int $specVersion = 2): \stdClass
     {
         foreach ($this->getProperties($className, $specVersion) as $classPropertyName => $property) {
             if ($classPropertyName === $propertyName) {
@@ -165,7 +165,7 @@ final class OpenApiContext implements Context
     /**
      * Gets all operations of a given class.
      */
-    private function getProperties(string $className, int $specVersion = 2): stdClass
+    private function getProperties(string $className, int $specVersion = 2): \stdClass
     {
         return $this->getClassInfo($className, $specVersion)->{'properties'} ?? new \stdClass();
     }
@@ -175,7 +175,7 @@ final class OpenApiContext implements Context
      *
      * @throws \InvalidArgumentException
      */
-    private function getClassInfo(string $className, int $specVersion = 2): stdClass
+    private function getClassInfo(string $className, int $specVersion = 2): \stdClass
     {
         $nodes = 2 === $specVersion ? $this->getLastJsonResponse()->{'definitions'} : $this->getLastJsonResponse()->{'components'}->{'schemas'};
         foreach ($nodes as $classTitle => $classData) {
@@ -192,7 +192,7 @@ final class OpenApiContext implements Context
      *
      * @throws \RuntimeException
      */
-    private function getLastJsonResponse(): stdClass
+    private function getLastJsonResponse(): \stdClass
     {
         if (null === ($decoded = json_decode($this->restContext->getMink()->getSession()->getDriver()->getContent()))) {
             throw new \RuntimeException('JSON response seems to be invalid');
