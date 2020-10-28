@@ -22,9 +22,6 @@ use Symfony\Component\HttpKernel\KernelInterface;
  */
 final class HttpCacheContext implements Context
 {
-    /**
-     * @var KernelInterface
-     */
     private $kernel;
 
     public function __construct(KernelInterface $kernel) {
@@ -36,7 +33,7 @@ final class HttpCacheContext implements Context
      */
     public function irisShouldBePurged(string $iris)
     {
-        $purger = $this->kernel->getContainer()->get('test.api_platform.http_cache.purger');
+        $purger = $this->kernel->getContainer()->get('behat.driver.service_container')->get('test.api_platform.http_cache.purger');
 
         $purgedIris = implode(',', $purger->getIris());
         $purger->clear();

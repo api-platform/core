@@ -68,36 +68,61 @@ class User implements UserInterface
      * @ORM\Column(type="integer")
      * @ORM\GeneratedValue(strategy="AUTO")
      */
-    protected $id;
+    private $id;
 
     /**
-     * @var string
+     * @var string|null
      *
      * @Groups({"user"})
      */
-    protected $email;
+    private $email;
 
     /**
-     * @var string
+     * @var string|null
      *
      * @ORM\Column(type="string", length=255, nullable=true)
      * @Groups({"user"})
      */
-    protected $fullname;
+    private $fullname;
 
     /**
-     * @var string
+     * @var string|null
      *
      * @Groups({"user-write"})
      */
-    protected $plainPassword;
+    private $plainPassword;
 
     /**
      * @var string
      *
      * @Groups({"user"})
      */
-    protected $username;
+    private $username;
+
+    public function getId(): int
+    {
+        return $this->id;
+    }
+
+    public function getEmail(): string
+    {
+        return $this->email;
+    }
+
+    public function setEmail(string $email): void
+    {
+        $this->email = $email;
+    }
+
+    public function getPlainPassword(): ?string
+    {
+        return $this->plainPassword;
+    }
+
+    public function setPlainPassword(string $plainPassword): void
+    {
+        $this->plainPassword = $plainPassword;
+    }
 
     /**
      * @param string|null $fullname

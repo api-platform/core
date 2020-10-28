@@ -29,9 +29,6 @@ use Symfony\Component\HttpKernel\KernelInterface;
  */
 final class CommandContext implements Context
 {
-    /**
-     * @var KernelInterface
-     */
     private $kernel;
 
     /**
