@@ -34,9 +34,15 @@ final class OpenApiContext implements Context
      */
     public function gatherContexts(BeforeScenarioScope $scope)
     {
-        /** @var InitializedContextEnvironment $environment */
+        /**
+         * @var InitializedContextEnvironment $environment
+         */
         $environment = $scope->getEnvironment();
-        $this->restContext = $environment->getContext(RestContext::class);
+        /**
+         * @var RestContext $restContext
+         */
+        $restContext = $environment->getContext(RestContext::class);
+        $this->restContext = $restContext;
     }
 
     /**
@@ -153,7 +159,11 @@ final class OpenApiContext implements Context
      */
     private function getPropertyInfo(string $propertyName, string $className, int $specVersion = 2): \stdClass
     {
-        foreach ($this->getProperties($className, $specVersion) as $classPropertyName => $property) {
+        /**
+         * @var iterable $properties
+         */
+        $properties = $this->getProperties($className, $specVersion);
+        foreach ($properties as $classPropertyName => $property) {
             if ($classPropertyName === $propertyName) {
                 return $property;
             }

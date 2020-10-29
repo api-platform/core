@@ -47,9 +47,15 @@ final class JsonHalContext implements Context
      */
     public function gatherContexts(BeforeScenarioScope $scope)
     {
-        /** @var InitializedContextEnvironment $environment */
+        /**
+         * @var InitializedContextEnvironment $environment
+         */
         $environment = $scope->getEnvironment();
-        $this->restContext = $environment->getContext(RestContext::class);
+        /**
+         * @var RestContext $restContext
+         */
+        $restContext = $environment->getContext(RestContext::class);
+        $this->restContext = $restContext;
     }
 
     /**

@@ -109,7 +109,7 @@ final class Configuration implements ConfigurationInterface
                 ->end()
                 ->booleanNode('enable_fos_user')
                     ->defaultValue(class_exists(FOSUserBundle::class))
-                    ->setDeprecated(...$this->buildDeprecationArgs('2.5', 'FOSUser is not actively maintained anymore. Enabling the FOSUserBundle integration has been deprecated in 2.5 and will be removed in 3.0.'))
+                    ->setDeprecated(...$this->buildDeprecationArgs('2.5', 'FOSUserBundle is not actively maintained anymore. Enabling the FOSUserBundle integration has been deprecated in 2.5 and will be removed in 3.0.'))
                     ->info('Enable the FOSUserBundle integration.')
                 ->end()
                 ->booleanNode('enable_nelmio_api_doc')

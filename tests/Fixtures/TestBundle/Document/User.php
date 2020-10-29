@@ -120,10 +120,12 @@ class User implements UserInterface
 
     public function getPassword()
     {
+        return null;
     }
 
     public function getSalt()
     {
+        return null;
     }
 
     public function eraseCredentials()

@@ -14,7 +14,14 @@ parameters:
 		- src/Bridge/Symfony/Bundle/Test/Constraint/ArraySubset.php
 		- tests/Fixtures/app/AppKernel.php
 	excludes_analyse:
+		# Symfony cache
 		- tests/Fixtures/app/var/cache
+		# Deprecated integrations (will be removed in API Platform 3)
+		- src/Bridge/NelmioApiDoc/*
+		- tests/Bridge/NelmioApiDoc/*
+		- src/Bridge/FosUser/*
+		# BC layer
+		- tests/Fixtures/TestBundle/BrowserKit/Client.php
 		# The Symfony Configuration API isn't good enough to be analysed
 		- src/Bridge/Symfony/Bundle/DependencyInjection/Configuration.php
 		# Phpstan runs on phpunit > 9, a signature changed in this file
@@ -27,9 +34,6 @@ parameters:
 		PHPUnit\Framework\Constraint\Constraint:
 			- fail
 	ignoreErrors:
-		# Deprecated integrations
-		- '#FOS\\UserBundle#'
-		- '#Nelmio\\ApiDocBundle#'
 		# Real problems, hard to fix
 		- '#Parameter \#2 \$dqlPart of method Doctrine\\ORM\\QueryBuilder::add\(\) expects array\|object, string given\.#'
 		-
@@ -55,10 +59,6 @@ parameters:
 		-
 			message: '#Call to an undefined method Negotiation\\AcceptHeader::getType\(\)\.#'
 			path: src/EventListener/AddFormatListener.php
-		# https://github.com/symfony/symfony/issues/31814#issuecomment-498749590
-		-
-			message: '#Call to an undefined method Symfony\\Component\\Security\\Core\\Role\\RoleHierarchyInterface::getReachableRoles\(\)\.#'
-			path: src/Security/ResourceAccessChecker.php
 		- '#Parameter \#1 \$vars of class GraphQL\\Language\\AST\\(IntValue|ObjectField|ObjectValue|BooleanValue|ListValue|StringValue)Node constructor expects array<bool\|float\|GraphQL\\Language\\AST\\Location\|GraphQL\\Language\\AST\\NameNode\|GraphQL\\Language\\AST\\NodeList\|GraphQL\\Language\\AST\\SelectionSetNode\|int\|string\|null>, array<string, .+> given\.#'
 		- '#Parameter \#1 \$defaultContext of class Symfony\\Component\\Serializer\\Encoder\\Json(De|En)code constructor expects array, (int|true) given\.#'
 		- '#Parameter \#(2|3) \$(resourceMetadataFactory|pagination) of class ApiPlatform\\Core\\Bridge\\Doctrine\\Orm\\Extension\\PaginationExtension constructor expects (ApiPlatform\\Core\\Metadata\\Resource\\Factory\\ResourceMetadataFactoryInterface\|Symfony\\Component\\HttpFoundation\\RequestStack|ApiPlatform\\Core\\DataProvider\\Pagination\|ApiPlatform\\Core\\Metadata\\Resource\\Factory\\ResourceMetadataFactoryInterface), stdClass given\.#'
@@ -66,7 +66,6 @@ parameters:
 			message: '#Parameter \#[0-9] \$filterLocator of class .+ constructor expects ApiPlatform\\Core\\Api\\FilterCollection|Psr\\Container\\ContainerInterface, ArrayObject<mixed, mixed> given\.#'
 			paths:
 				- tests/Bridge/Doctrine/Orm/Extension/FilterExtensionTest.php
-				- tests/Bridge/NelmioApiDoc/Extractor/AnnotationsProvider/ApiPlatformProviderTest.php
 				- tests/Hydra/Serializer/CollectionFiltersNormalizerTest.php
 				- tests/Swagger/Serializer/DocumentationNormalizerV2Test.php
 				- tests/Swagger/Serializer/DocumentationNormalizerV3Test.php
@@ -124,7 +123,6 @@ parameters:
 		-
 			message: "#Call to function method_exists\\(\\) with ApiPlatform\\\\Core\\\\JsonApi\\\\Serializer\\\\ItemNormalizer and 'setCircularReferenc…' will always evaluate to false\\.#"
 			path: tests/JsonApi/Serializer/ItemNormalizerTest.php
-
 		# Waiting to be fixed by https://github.com/Roave/BetterReflection/issues/663
 		-
 			message: '#Call to private method getNestedFieldPath\(\) of class ApiPlatform\\Core\\Bridge\\Elasticsearch\\DataProvider\\Filter\\AbstractFilter\.#'

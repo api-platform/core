@@ -58,7 +58,7 @@ final class JsonContext extends BaseJsonContext
         $subset = json_decode($content->getRaw(), true);
 
         // Compatibility with PHPUnit 7
-        method_exists(Assert::class, 'assertArraySubset') ? Assert::assertArraySubset($subset, $array) : ApiTestCase::assertArraySubset($subset, $array);
+        method_exists(Assert::class, 'assertArraySubset') ? Assert::assertArraySubset($subset, $array) : ApiTestCase::assertArraySubset($subset, $array); // @phpstan-ignore-line
     }
 
     private function sortArrays($obj)

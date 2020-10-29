@@ -59,9 +59,15 @@ final class GraphqlContext implements Context
      */
     public function gatherContexts(BeforeScenarioScope $scope)
     {
-        /** @var InitializedContextEnvironment $environment */
+        /**
+         * @var InitializedContextEnvironment $environment
+         */
         $environment = $scope->getEnvironment();
-        $this->restContext = $environment->getContext(RestContext::class);
+        /**
+         * @var RestContext $restContext
+         */
+        $restContext = $environment->getContext(RestContext::class);
+        $this->restContext = $restContext;
     }
 
     /**
@@ -135,8 +141,8 @@ final class GraphqlContext implements Context
         $params['operations'] = $string->getRaw();
         $params['map'] = $this->graphqlRequest['map'];
 
-        $this->request->setHttpHeader('Content-type', 'multipart/form-data');
-        $this->request->send('POST', '/graphql', $params, $this->graphqlRequest['files']);
+        $this->request->setHttpHeader('Content-type', 'multipart/form-data'); // @phpstan-ignore-line
+        $this->request->send('POST', '/graphql', $params, $this->graphqlRequest['files']); // @phpstan-ignore-line
     }
 
     /**
@@ -153,7 +159,7 @@ final class GraphqlContext implements Context
      */
     public function theGraphQLFieldIsDeprecatedForTheReason(string $fieldName, string $reason)
     {
-        foreach (json_decode($this->request->getContent(), true)['data']['__type']['fields'] as $field) {
+        foreach (json_decode($this->request->getContent(), true)['data']['__type']['fields'] as $field) { // @phpstan-ignore-line
             if ($fieldName === $field['name'] && $field['isDeprecated'] && $reason === $field['deprecationReason']) {
                 return;
             }

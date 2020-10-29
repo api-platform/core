@@ -34,7 +34,7 @@ final class ExceptionListener
 
     public function __construct($controller, LoggerInterface $logger = null, $debug = false, ErrorListener $errorListener = null)
     {
-        $this->exceptionListener = $errorListener ? new ErrorListener($controller, $logger, $debug) : new LegacyExceptionListener($controller, $logger, $debug);
+        $this->exceptionListener = $errorListener ? new ErrorListener($controller, $logger, $debug) : new LegacyExceptionListener($controller, $logger, $debug); // @phpstan-ignore-line
     }
 
     public function onKernelException(ExceptionEvent $event): void
