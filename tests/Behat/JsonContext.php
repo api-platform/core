@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\Behat;
 
 use ApiPlatform\Core\Bridge\Symfony\Bundle\Test\ApiTestCase;
-use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use Behat\Gherkin\Node\PyStringNode;
 use Behatch\Context\JsonContext as BaseJsonContext;
 use Behatch\HttpCall\HttpCallResultPool;
@@ -64,14 +63,14 @@ final class JsonContext extends BaseJsonContext
 
     private function sortArrays($obj)
     {
-        $isObject = is_object($obj);
+        $isObject = \is_object($obj);
 
         foreach ($obj as $key => $value) {
             if (null === $value || is_scalar($value)) {
                 continue;
             }
 
-            if (is_array($value)) {
+            if (\is_array($value)) {
                 sort($value);
             }
 

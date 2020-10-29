@@ -24,7 +24,8 @@ final class HttpCacheContext implements Context
 {
     private $kernel;
 
-    public function __construct(KernelInterface $kernel) {
+    public function __construct(KernelInterface $kernel)
+    {
         $this->kernel = $kernel;
     }
 

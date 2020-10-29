@@ -17,7 +17,6 @@ use ApiPlatform\Core\Bridge\Symfony\Validator\EventListener\ValidationExceptionL
 use ApiPlatform\Core\Bridge\Symfony\Validator\Exception\ValidationException;
 use ApiPlatform\Core\Tests\ProphecyTrait;
 use PHPUnit\Framework\TestCase;
-use Prophecy\Argument;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
@@ -36,8 +35,7 @@ class ValidationExceptionListenerTest extends TestCase
     {
         $listener = new ValidationExceptionListener(
             $this->prophesize(SerializerInterface::class)->reveal(),
-            ['hydra' => ['application/ld+json']])
-        ;
+            ['hydra' => ['application/ld+json']]);
 
         $event = new ExceptionEvent($this->prophesize(HttpKernelInterface::class)->reveal(), new Request(), HttpKernelInterface::MASTER_REQUEST, new \Exception());
         $listener->onKernelException($event);

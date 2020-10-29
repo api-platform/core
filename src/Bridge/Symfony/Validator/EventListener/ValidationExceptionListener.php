@@ -40,7 +40,7 @@ final class ValidationExceptionListener
      */
     public function onKernelException(ExceptionEvent $event): void
     {
-        $exception = method_exists($event, 'getThrowable') ? $event->getThrowable() : $event->getException();
+        $exception = method_exists($event, 'getException') ? $event->getException() : $event->getThrowable();
         if (!$exception instanceof ValidationException) {
             return;
         }

@@ -112,7 +112,7 @@ final class GraphqlContext implements Context
                 throw new \InvalidArgumentException('You must provide a "name" and "file" column in your table node.');
             }
 
-            $files[$row['name']] = $this->restContext->getMinkParameter('files_path').DIRECTORY_SEPARATOR.$row['file'];
+            $files[$row['name']] = $this->restContext->getMinkParameter('files_path').\DIRECTORY_SEPARATOR.$row['file'];
         }
 
         $this->graphqlRequest['files'] = $files;

@@ -134,7 +134,7 @@ class AppKernel extends Kernel
                 ],
                 'entity' => [
                     'entity' => [
-                        'class'    => User::class,
+                        'class' => User::class,
                         'property' => 'email',
                     ],
                 ],

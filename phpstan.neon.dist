@@ -6,7 +6,7 @@ parameters:
 		- tests/Fixtures/app/console
 	inferPrivatePropertyTypeFromConstructor: true
 	symfony:
-		container_xml_path: tests/Fixtures/app/var/cache/test/appAppKernelTestDebugContainer.xml
+		container_xml_path: tests/Fixtures/app/var/cache/test/AppKernelTestDebugContainer.xml
 		constant_hassers: false
 	bootstrapFiles:
 		- vendor/bin/.phpunit/phpunit/vendor/autoload.php
@@ -27,6 +27,9 @@ parameters:
 		PHPUnit\Framework\Constraint\Constraint:
 			- fail
 	ignoreErrors:
+		# Deprecated integratations
+		- '#FOS\\UserBundle#'
+		- '#Nelmio\\ApiDocBundle#'
 		# Real problems, hard to fix
 		- '#Parameter \#2 \$dqlPart of method Doctrine\\ORM\\QueryBuilder::add\(\) expects array\|object, string given\.#'
 		-
