@@ -1,6 +1,5 @@
 imports:
     - { resource: config_common.yml }
-    - { resource: config_behat.yml }
 
 api_platform:
     doctrine_mongodb_odm: false

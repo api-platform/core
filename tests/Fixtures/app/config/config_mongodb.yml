@@ -117,3 +117,11 @@ services:
         public: false
         tags:
             -  { name: 'messenger.message_handler' }
+
+    ApiPlatform\Core\Tests\Behat\DoctrineContext:
+        $doctrine: '@doctrine_mongodb'
+        $passwordEncoder: '@security.password_encoder'
+
+    ApiPlatform\Core\Tests\Behat\JsonApiContext:
+        $doctrine: '@doctrine_mongodb'
+        $jsonApiSchemaFile: '%kernel.project_dir%/../JsonSchema/jsonapi.json'

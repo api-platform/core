@@ -1,3 +1,6 @@
+imports:
+    - { resource: config_behat.yml }
+
 framework:
     secret:                           'dunglas.fr'
     validation:

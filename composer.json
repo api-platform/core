@@ -36,7 +36,7 @@
         "doctrine/annotations": "^1.7",
         "doctrine/common": "^2.11 || ^3.0",
         "doctrine/data-fixtures": "^1.2.2",
-        "doctrine/doctrine-bundle": "^1.8 || ^2.0",
+        "doctrine/doctrine-bundle": "^1.12 || ^2.0",
         "doctrine/mongodb-odm": "^2.0",
         "doctrine/mongodb-odm-bundle": "^4.0",
         "doctrine/orm": "^2.6.4 || ^3.0",
