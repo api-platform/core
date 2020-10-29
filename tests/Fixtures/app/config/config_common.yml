@@ -140,6 +140,8 @@ services:
 
     ApiPlatform\Core\Tests\Fixtures\TestBundle\Controller\:
         resource: '../../TestBundle/Controller'
+        autowire: true
+        autoconfigure: true
         tags: ['controller.service_arguments']
 
     app.config_dummy_resource.action:

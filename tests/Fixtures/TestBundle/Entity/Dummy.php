@@ -100,6 +100,7 @@ class Dummy
      * @ORM\Column(type="datetime", nullable=true)
      * @fixme wtf?
      * @ Assert\DateTime
+     * @ApiProperty(iri="http://schema.org/DateTime")
      */
     public $dummyDate;
 
