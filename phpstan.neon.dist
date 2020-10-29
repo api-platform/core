@@ -27,7 +27,7 @@ parameters:
 		PHPUnit\Framework\Constraint\Constraint:
 			- fail
 	ignoreErrors:
-		# Deprecated integratations
+		# Deprecated integrations
 		- '#FOS\\UserBundle#'
 		- '#Nelmio\\ApiDocBundle#'
 		# Real problems, hard to fix
