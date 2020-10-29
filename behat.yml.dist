@@ -137,11 +137,11 @@ default-legacy:
   suites:
     default:
       filters:
-        tags: '~@postgres&&~@mongodb&&~@elasticsearch'
+        tags: '~@postgres&&~@mongodb&&~@elasticsearch~@legacy'
 
 default-legacy-coverage:
   suites:
     default:
       <<: *default-coverage-suite
       filters:
-        tags: '~@postgres&&~@mongodb&&~@elasticsearch'
+        tags: '~@postgres&&~@mongodb&&~@elasticsearch~@legacy'
