@@ -99,6 +99,7 @@ class SchemaFactoryTest extends TestCase
                 'normalization_context' => [
                     'groups' => 'overridden_operation_dummy_put',
                 ],
+                'validation_groups' => ['validation_groups_dummy_put'],
             ],
         ], [], [
             'normalization_context' => [
@@ -107,21 +108,22 @@ class SchemaFactoryTest extends TestCase
         ]));
 
         $serializerGroup = 'overridden_operation_dummy_put';
+        $validationGroups = 'validation_groups_dummy_put';
 
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyNameCollectionFactoryProphecy->create(OverriddenOperationDummy::class, Argument::allOf(
             Argument::type('array'),
-            Argument::withEntry('serializer_groups', [$serializerGroup])
+            Argument::allOf(Argument::withEntry('serializer_groups', [$serializerGroup]), Argument::withEntry('validation_groups', [$validationGroups]))
         ))->willReturn(new PropertyNameCollection(['alias', 'description']));
 
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
         $propertyMetadataFactoryProphecy->create(OverriddenOperationDummy::class, 'alias', Argument::allOf(
             Argument::type('array'),
-            Argument::withEntry('serializer_groups', [$serializerGroup])
+            Argument::allOf(Argument::withEntry('serializer_groups', [$serializerGroup]), Argument::withEntry('validation_groups', [$validationGroups]))
         ))->willReturn(new PropertyMetadata(new Type(Type::BUILTIN_TYPE_STRING), null, true));
         $propertyMetadataFactoryProphecy->create(OverriddenOperationDummy::class, 'description', Argument::allOf(
             Argument::type('array'),
-            Argument::withEntry('serializer_groups', [$serializerGroup])
+            Argument::allOf(Argument::withEntry('serializer_groups', [$serializerGroup]), Argument::withEntry('validation_groups', [$validationGroups]))
         ))->willReturn(new PropertyMetadata(new Type(Type::BUILTIN_TYPE_STRING), null, true));
 
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
