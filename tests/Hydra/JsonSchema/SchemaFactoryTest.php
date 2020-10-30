@@ -77,6 +77,10 @@ class SchemaFactoryTest extends TestCase
         $this->assertEquals(Dummy::class.':jsonld', $rootDefinitionKey);
         $this->assertArrayHasKey($rootDefinitionKey, $definitions);
         $this->assertArrayHasKey('properties', $definitions[$rootDefinitionKey]);
+        $properties = $resultSchema['definitions'][$rootDefinitionKey]['properties'];
+        $this->assertArrayHasKey('@context', $properties);
+        $this->assertArrayHasKey('@type', $properties);
+        $this->assertArrayHasKey('@id', $properties);
     }
 
     public function testSchemaTypeBuildSchema(): void
@@ -89,6 +93,10 @@ class SchemaFactoryTest extends TestCase
         $this->assertArrayHasKey('hydra:totalItems', $resultSchema['properties']);
         $this->assertArrayHasKey('hydra:view', $resultSchema['properties']);
         $this->assertArrayHasKey('hydra:search', $resultSchema['properties']);
+        $properties = $resultSchema['definitions'][Dummy::class.':jsonld']['properties'];
+        $this->assertArrayNotHasKey('@context', $properties);
+        $this->assertArrayHasKey('@type', $properties);
+        $this->assertArrayHasKey('@id', $properties);
 
         $resultSchema = $this->schemaFactory->buildSchema(Dummy::class, 'jsonld', Schema::TYPE_OUTPUT, null, null, null, null, true);
 
@@ -98,5 +106,9 @@ class SchemaFactoryTest extends TestCase
         $this->assertArrayHasKey('hydra:totalItems', $resultSchema['properties']);
         $this->assertArrayHasKey('hydra:view', $resultSchema['properties']);
         $this->assertArrayHasKey('hydra:search', $resultSchema['properties']);
+        $properties = $resultSchema['definitions'][Dummy::class.':jsonld']['properties'];
+        $this->assertArrayNotHasKey('@context', $properties);
+        $this->assertArrayHasKey('@type', $properties);
+        $this->assertArrayHasKey('@id', $properties);
     }
 }
